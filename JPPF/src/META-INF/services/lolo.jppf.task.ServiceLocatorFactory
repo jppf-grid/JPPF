@@ -1,1 +1,1 @@
-lolo.jppf.task.impl.ServiceLocatorFactoryImpl
+org.jppf.task.impl.ServiceLocatorFactoryImpl
