@@ -1,0 +1,163 @@
+<project name='jppf' default="build" basedir="..">
+
+	<!-- ========================================================================= -->
+	<!--                          Property definitions                             -->
+	<!-- ========================================================================= -->
+
+  <property name="build.properties.file" value="${basedir}/bin/build.properties"/>
+  <property file="${build.properties.file}"/>
+	<property name="bin" value="${basedir}/bin"/>	
+	<property name="data" value="${basedir}/data"/>	
+	<property name="config" value="${basedir}/config"/>	
+	<property name="build" value="${basedir}/build"/>	
+	<property name="deploy" value="${build}/deploy"/>	
+	<property name="deploy.lib" value="${deploy}/lib"/>	
+	<property name="deploy.config" value="${deploy}/config"/>	
+	<property name="classes" value="${build}/classes"/>	
+	<property name="src" value="${basedir}/src"/>
+	<property name="lib" value="${basedir}/lib"/>
+	<property name="docs" value="${basedir}/docs"/>
+	<property name="javadoc" value="${docs}/api"/>
+	<property name="app.jar.file" value="${ant.project.name}.jar"/>
+	<property name="license.file" value="LICENSE.txt"/>
+
+	<!-- ========================================================================= -->
+	<!--                           Classpath definitions                           -->
+	<!-- ========================================================================= -->
+
+	<path id="project.classpath">
+		<pathelement location="${classes}"/>
+		<fileset dir="${lib}">
+			<include name="jms.jar"/>
+			<include name="log4j-1.2.9.jar"/>
+		</fileset>
+	</path>
+
+  <path id="run.classpath">
+		<pathelement location="${config}"/>
+    <path refid="project.classpath"/>	
+  </path>
+
+	<!-- ========================================================================= -->
+	<!--                                    Clean                                  -->
+	<!-- ========================================================================= -->
+
+  <target name="clean">
+    <delete dir="${build}" quiet="true"/>
+  </target>               
+
+  <target name="clean.deploy">
+    <delete dir="${deploy}" quiet="true"/>
+  </target>               
+
+	<!-- ========================================================================= -->
+	<!--                                    Init                                   -->
+	<!-- ========================================================================= -->
+
+	<target name="init" description="Initialize ressources">
+ 		<mkdir dir="${classes}"/>
+	</target>
+
+	<target name="init.deploy" description="Initialize ressources">
+ 		<mkdir dir="${deploy}"/>
+ 		<mkdir dir="${deploy}/src"/>
+ 		<mkdir dir="${deploy}/docs"/>
+ 		<mkdir dir="${deploy.config}"/>
+		<mkdir dir="${deploy.lib}"/>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                           Build the application                           -->
+	<!-- ========================================================================= -->
+
+  <target name="build" depends="init, compile, jar">
+  </target>
+
+	<target name="rebuild" description="rebuild the application"
+		depends="clean, init, compile, jar">
+	</target>
+
+	<target name="deploy" description="deploy the application"
+		depends="clean.deploy, rebuild, init.deploy, package">
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                         Compile the application                           -->
+	<!-- ========================================================================= -->
+
+	<target name="compile" description="Compile" depends="init">
+		<javac srcdir="${src}" destdir="${classes}"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+		</javac>
+		<copy todir="${classes}">
+			<fileset dir="${src}">
+				<exclude name="**/*.java"/>
+				<exclude name="**/*.html"/>
+			</fileset>
+		</copy>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--                     Build the application jar file                        -->
+	<!-- ========================================================================= -->
+
+	<target name="jar" description="generates the application jar" depends="compile">
+    <jar jarfile="${build}/${app.jar.file}">
+			<fileset dir="${classes}"/>
+		</jar>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                 Package the application for deployment                    -->
+	<!-- ========================================================================= -->
+
+	<target name="package" description="generates the application jar" depends="rebuild">
+		<copy tofile="${deploy}/${app.jar.file}" file="${build}/${app.jar.file}"/>
+		<copy tofile="${deploy}/${license.file}" file="${basedir}/${license.file}"/>
+		<copy todir="${deploy.lib}">
+			<fileset dir="${lib}"/>
+		</copy>
+		<copy todir="${deploy.config}">
+			<fileset dir="${config}">
+				<exclude name="eclipse"/>
+				<exclude name="eclipse/*.*"/>
+			</fileset>
+		</copy>
+		<copy todir="${deploy}/src">
+			<fileset dir="${src}"/>
+		</copy>
+		<copy todir="${deploy}/docs">
+			<fileset dir="${docs}"/>
+		</copy>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                        Generate the Javadoc                               -->
+	<!-- ========================================================================= -->
+
+	<target name="javadoc" description="Generate all java doc">
+    <delete dir="${javadoc}" quiet="true"/>
+    <mkdir dir="${javadoc}"/>
+		<javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"
+			packagenames="**/*.*" classpathref="project.classpath" verbose="false" use="true"
+			stylesheetfile="${bin}/javadoc.css" additionalparam="-quiet">
+			<packageset dir="${src}"/>
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
+			<link href="http://java.sun.com/j2ee/1.4/docs/api"/>
+			<doctitle><![CDATA[Java Parallel Processing Framework V ${version.number}]]></doctitle>
+			<header>
+				<![CDATA[
+					<font face="Arial" color="#000000">Java Parallel Processing Framework</font>
+				]]>
+			</header>
+			<bottom>
+				<![CDATA[
+					<font face="Arial" color="#000000">Copyright &copy; 2005 Laurent Cohen.</font>
+				]]>
+			</bottom>
+		</javadoc>
+	</target>
+
+</project> 
