@@ -78,7 +78,7 @@
 	</target>
 
 	<target name="deploy" description="deploy the application"
-		depends="clean.deploy, rebuild, init.deploy, package">
+		depends="clean.deploy, rebuild, javadoc, init.deploy, package">
 	</target>
 
 	<!-- ========================================================================= -->
@@ -98,9 +98,6 @@
 			</fileset>
 		</copy>
   </target>
-
-	<target name="package.zip">
-	</target>
 
 	<!-- ========================================================================= -->
 	<!--                     Build the application jar file                        -->

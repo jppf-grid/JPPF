@@ -6,25 +6,25 @@
 body { background-color: #B8E6FE }
 
 /* Table colors */
-.TableHeadingColor     { background: #FCCF62 } /* 252, 207, 98 */
-.TableSubHeadingColor  { background: #FCE6AC}  /* 252, 230, 171 */
+.TableHeadingColor     { background: #FCCF62; color: #000060 } /* 252, 207, 98 */
+.TableSubHeadingColor  { background: #FCE6AC; color: #000060}  /* 252, 230, 171 */
 .TableRowColor         { background: #B8E6FE }
 
-table, td {font-size: 10pt; font-family: Arial, Helvetica, san-serif }
-h1, h2, h3 {font-family: Arial, Helvetica, san-serif }
+table, td {font-size: 10pt; font-family: Arial, Helvetica, sans-serif }
+h1, h2, h3 {font-family: Arial, Helvetica, sans-serif; color: #000060 }
 
 /* Font used in left-hand frame lists */
-.FrameTitleFont   { font-size: 10pts; font-family: Arial, Helvetica, san-serif }
-.FrameHeadingFont { font-size: 10pts; font-family: Arial, Helvetica, san-serif }
-.FrameItemFont    { font-size: 10pts; font-family: Arial, Helvetica, san-serif }
+.FrameTitleFont   { font-size: 10pts; font-family: Arial, Helvetica, sans-serif; color: #000060 }
+.FrameHeadingFont { font-size: 10pts; font-family: Arial, Helvetica, sans-serif; color: #000060 }
+.FrameItemFont    { font-size: 10pts; font-family: Arial, Helvetica, sans-serif }
 
 /* Example of smaller, sans-serif font in frames */
 /* .FrameItemFont  { font-size: 10pt; font-family: Helvetica, Arial, sans-serif } */
 
-.NavBarCell1    { background-color:#FCE6AC;} /* 252, 230, 171 */
-.NavBarCell1Rev { background-color:#00008B;}
-.NavBarFont1    { font-family: Arial, Helvetica, sans-serif; color:#000000;}
-.NavBarFont1Rev { font-family: Arial, Helvetica, sans-serif; color:#B8E6FE;}
-.NavBarCell2    { font-family: Arial, Helvetica, sans-serif; background-color:#B8E6FE;}
-.NavBarCell3    { font-family: Arial, Helvetica, sans-serif; background-color:#B8E6FE;}
+.NavBarCell1    { background-color: #FCE6AC } /* 252, 230, 171 */
+.NavBarCell1Rev { background-color: #00008B }
+.NavBarFont1    { font-family: Arial, Helvetica, sans-serif; color: #000060 }
+.NavBarFont1Rev { font-family: Arial, Helvetica, sans-serif; color: #B8E6FE }
+.NavBarCell2    { font-family: Arial, Helvetica, sans-serif; background-color: #B8E6FE }
+.NavBarCell3    { font-family: Arial, Helvetica, sans-serif; background-color: #B8E6FE }
 
