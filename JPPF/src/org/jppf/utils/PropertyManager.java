@@ -120,41 +120,41 @@ public class PropertyManager
 
 	public static String getString(String resName, String key, String defValue)
 	{
-		return getResource(resName).getString(resName, key, defValue);
+		return getResource(resName).getString(key, defValue);
 	}
 	
 	public static String getString(String resName, String key)
 	{
-		return getResource(resName).getString(resName, key, null);
+		return getResource(resName).getString(key, null);
 	}
 	
 	public static int getInt(String resName, String key, int defValue)
 	{
-		return getResource(resName).getInt(resName, key, defValue);
+		return getResource(resName).getInt(key, defValue);
 	}
 	
 	public static int getInt(String resName, String key)
 	{
-		return getResource(resName).getInt(resName, key, 0);
+		return getResource(resName).getInt(key, 0);
 	}
 	
 	public static double getDouble(String resName, String key, double defValue)
 	{
-		return getResource(resName).getDouble(resName, key, defValue);
+		return getResource(resName).getDouble(key, defValue);
 	}
 	
 	public static double getDouble(String resName, String key)
 	{
-		return getResource(resName).getDouble(resName, key, 0d);
+		return getResource(resName).getDouble(key, 0d);
 	}
 	
 	public static boolean getBoolean(String resName, String key, boolean defValue)
 	{
-		return getResource(resName).getBoolean(resName, key, defValue);
+		return getResource(resName).getBoolean(key, defValue);
 	}
 	
 	public static boolean getBoolean(String resName, String key)
 	{
-		return getResource(resName).getBoolean(resName, key, false);
+		return getResource(resName).getBoolean(key, false);
 	}
 }
