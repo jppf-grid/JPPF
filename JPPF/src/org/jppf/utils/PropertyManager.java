@@ -23,13 +23,31 @@ import java.util.*;
 
 /**
  * Utility class for managing multiple properties files through a common API.
+ * Each properties file is lazily loaded, the first time it is accessed.
  * @author Laurent Cohen
  */
 public class PropertyManager
 {
+	/**
+	 * Mapping of string keys to the actual properties files paths managed by this property manager. 
+	 */
 	private static TypedProperties master = init();
+	/**
+	 * Mapping of resource keys to actual TypedProperties instances.
+	 */
 	private static Map<String, TypedProperties> properties = new HashMap<String, TypedProperties>();
 	
+	/**
+	 * Initialization of the property manager by loading the managed resource paths from a properties file.
+	 * The &quot;master&quot; properties file lookup is performed in the following sequence:
+	 * <ol>
+	 * <li>if the <i>master.properties.file</i> system property is defined, it will be used as resource path</li>
+	 * <li>if no resource path is explicitly defined, the name &quot;master.properties&quot; is used</li>
+	 * <li>if the resource path is found on the file system</li>
+	 * <li>otherwise the system will attempt to load it from the classpath</li>
+	 * </ol>
+	 * @return a TypedProperties instance if the master file could be loaded, null otherwise.
+	 */
 	private static TypedProperties init()
 	{
 		TypedProperties props = null;
@@ -57,6 +75,11 @@ public class PropertyManager
 		return props;
 	}
 	
+	/**
+	 * Get the properties mapped to a specified resource key.
+	 * @param name the resource key in string format.
+	 * @return a TypedProperties instance.
+	 */
 	private static TypedProperties getResource(String name)
 	{
 		TypedProperties props = properties.get(name);
@@ -99,6 +122,11 @@ public class PropertyManager
 		return props;
 	}
 
+	/**
+	 * Add a properties file to the property manager, using the specified resource key.
+	 * @param key the properties file resource key in string format.
+	 * @param is the input stream from which the properties are read.
+	 */
 	private static void addResource(String key, InputStream is)
 	{
 		try
@@ -113,46 +141,103 @@ public class PropertyManager
 		}
 	}
 
+	/**
+	 * Add a properties file to the property manager, using the specified resource key.
+	 * @param key the properties file resource key in string format.
+	 * @param props a TypedProeprties instance from which the properties are read.
+	 */
 	private static void addResource(String key, TypedProperties props)
 	{
 		properties.put(key, props);
 	}
 
+	/**
+	 * Get the string value of a property with a specified name, from a resource with a specified key.
+	 * @param resName the name of the resource where the propewrty is to be looked for
+	 * @param key the name of the property to look for.
+	 * @param defValue a default value to return if the property is not found in the specified resource.
+	 * @return the value of the property as a string, or the default value if it is not found.
+	 */
 	public static String getString(String resName, String key, String defValue)
 	{
 		return getResource(resName).getString(key, defValue);
 	}
 	
+	/**
+	 * Get the string value of a property with a specified name, from a resource with a specified key.
+	 * @param resName the name of the resource where the property is to be looked for
+	 * @param key the name of the property to look for.
+	 * @return the value of the property as a string, or null if it is not found.
+	 */
 	public static String getString(String resName, String key)
 	{
 		return getResource(resName).getString(key, null);
 	}
 	
+	/**
+	 * Get the integer value of a property with a specified name, from a resource with a specified key.
+	 * @param resName the name of the resource where the property is to be looked for
+	 * @param key the name of the property to look for.
+	 * @param defValue a default value to return if the property is not found in the specified resource.
+	 * @return the value of the property as an int, or the default value if it is not found.
+	 */
 	public static int getInt(String resName, String key, int defValue)
 	{
 		return getResource(resName).getInt(key, defValue);
 	}
 	
+	/**
+	 * Get the integer value of a property with a specified name, from a resource with a specified key.
+	 * @param resName the name of the resource where the property is to be looked for
+	 * @param key the name of the property to look for.
+	 * @return the value of the property as an int, or zero if it is not found.
+	 */
 	public static int getInt(String resName, String key)
 	{
 		return getResource(resName).getInt(key, 0);
 	}
 	
+	/**
+	 * Get the double precision value of a property with a specified name, from a resource with a specified key.
+	 * @param resName the name of the resource where the property is to be looked for
+	 * @param key the name of the property to look for.
+	 * @param defValue a default value to return if the property is not found in the specified resource.
+	 * @return the value of the property as a double, or the default value if it is not found.
+	 */
 	public static double getDouble(String resName, String key, double defValue)
 	{
 		return getResource(resName).getDouble(key, defValue);
 	}
 	
+	/**
+	 * Get the double precision value of a property with a specified name, from a resource with a specified key.
+	 * @param resName the name of the resource where the property is to be looked for
+	 * @param key the name of the property to look for.
+	 * @return the value of the property as a double, or zero if it is not found.
+	 */
 	public static double getDouble(String resName, String key)
 	{
 		return getResource(resName).getDouble(key, 0d);
 	}
 	
+	/**
+	 * Get the boolean value of a property with a specified name, from a resource with a specified key.
+	 * @param resName the name of the resource where the property is to be looked for
+	 * @param key the name of the property to look for.
+	 * @param defValue a default value to return if the property is not found in the specified resource.
+	 * @return the value of the property as a boolean, or the default value if it is not found.
+	 */
 	public static boolean getBoolean(String resName, String key, boolean defValue)
 	{
 		return getResource(resName).getBoolean(key, defValue);
 	}
 	
+	/**
+	 * Get the boolean value of a property with a specified name, from a resource with a specified key.
+	 * @param resName the name of the resource where the property is to be looked for
+	 * @param key the name of the property to look for.
+	 * @return the value of the property as a boolean, or false if it is not found.
+	 */
 	public static boolean getBoolean(String resName, String key)
 	{
 		return getResource(resName).getBoolean(key, false);
