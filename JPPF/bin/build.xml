@@ -99,6 +99,9 @@
 		</copy>
   </target>
 
+	<target name="package.zip">
+	</target>
+
 	<!-- ========================================================================= -->
 	<!--                     Build the application jar file                        -->
 	<!-- ========================================================================= -->
@@ -131,6 +134,11 @@
 		<copy todir="${deploy}/docs">
 			<fileset dir="${docs}"/>
 		</copy>
+		<delete file="${build}/${ant.project.name}-full-${version.number}.zip" quiet="true"/>
+		<zip destfile="${build}/${ant.project.name}-full-${version.number}.zip">
+			<zipfileset dir="${deploy}" includes="**/*.*"
+			            prefix="${ant.project.name}-${version.number}"/>
+		</zip>
 	</target>
 
 	<!-- ========================================================================= -->
