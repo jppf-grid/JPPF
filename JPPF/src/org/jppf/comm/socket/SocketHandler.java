@@ -68,6 +68,7 @@ public class SocketHandler extends Thread
 				execService.executeMulti(request.getContent());
 				ExecutionResponse response = new ExecutionResponse();
 				response.setContent(request.getContent());
+				response.setCorrelationId(request.getId());
 				socketClient.send(response);
 			}
 		}
