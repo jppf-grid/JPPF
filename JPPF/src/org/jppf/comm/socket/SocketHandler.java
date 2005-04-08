@@ -24,38 +24,52 @@ import org.jppf.comm.*;
 import org.jppf.task.ExecutionService;
 
 /**
- * Class SocketHandler
+ * Instances of this class handle execution requests sent over a TCP socket connections.
  * @author Laurent Cohen
  */
 public class SocketHandler extends Thread
 {
 	private static Logger log = Logger.getLogger(SocketHandler.class);
 
+	/**
+	 * The socket client used to communicate over a socket connection.
+	 */
 	private SocketClient socketClient = null;
+	/**
+	 * Indicates whether this socket handler should be terminated and stop processing.
+	 */
 	private boolean stop = false;
+	/**
+	 * Indicates whether this socket handler is closed, which means it can't hadle requests anymore.
+	 */
 	private boolean closed = false;
+	/**
+	 * The execution service to which tasks execution is delegated.
+	 */
 	private ExecutionService execService = null;
 
+	/**
+	 * Initialize this socket handler with an open socket connection to a remote client, and
+	 * the execution service that will perform the tasks execution.
+	 * @param socket the socket connection from which requests are received and to which responses are sent.
+	 * @param execService the execution service used by this socket handler.
+	 * @throws Exception if this socket handler can't be initialized.
+	 */
 	public SocketHandler(Socket socket, ExecutionService execService) throws Exception
 	{
 		socketClient = new SocketClient(socket);
 		this.execService = execService;
-		try
-		{
-			init();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(),e);
-		}
-	}
-
-	protected void init() throws Exception
-	{
 	}
 
 	/**
-	 * Thread main processing loop
+	 * Main processing loop for this socket handler. During each loop iteration,
+	 * the following operations are performed:
+	 * <ol>
+	 * <li>if the stop flag is set to true, exit the loop</li>
+	 * <li>block until a request is received</li>
+	 * <li>when an execution request is received, delegate the execution to the associated execution service</li>
+	 * <li>send the response</li>
+	 * </ol>
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run()
@@ -79,9 +93,13 @@ public class SocketHandler extends Thread
 		}
 	}
 	
-	public synchronized void setStopped(boolean stopped)
+	/**
+	 * Set the stop flag to true, indicated that this socket handler hsould be closed as
+	 * soon as possible.
+	 */
+	public synchronized void setStopped()
 	{
-		stop = stopped;
+		stop = true;
 	}
 	
 	/**
@@ -99,7 +117,7 @@ public class SocketHandler extends Thread
 	 */
 	public void setClosed()
 	{
-		setStopped(true);
+		setStopped();
 		closed = true;
 		close();
 		//sgHandler.stopService();
