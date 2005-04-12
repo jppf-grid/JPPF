@@ -18,6 +18,7 @@
 	<property name="src" value="${basedir}/src"/>
 	<property name="lib" value="${basedir}/lib"/>
 	<property name="docs" value="${basedir}/docs"/>
+	<property name="examples" value="${basedir}/examples"/>
 	<property name="javadoc" value="${docs}/api"/>
 	<property name="app.jar.file" value="${ant.project.name}.jar"/>
 	<property name="license.file" value="LICENSE.txt"/>
@@ -63,6 +64,7 @@
  		<mkdir dir="${deploy}"/>
  		<mkdir dir="${deploy}/src"/>
  		<mkdir dir="${deploy}/docs"/>
+ 		<mkdir dir="${deploy}/examples"/>
  		<mkdir dir="${deploy.config}"/>
 		<mkdir dir="${deploy.lib}"/>
 	</target>
@@ -134,6 +136,9 @@
 		</copy>
 		<copy todir="${deploy}/docs">
 			<fileset dir="${docs}"/>
+		</copy>
+		<copy todir="${deploy}/examples">
+			<fileset dir="${examples}"/>
 		</copy>
 		<!-- Format the build number to a 4 figures integer with trailing zeroes if required -->
 		<!-- The build number is also incremented by 1                                       -->
