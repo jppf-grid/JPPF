@@ -20,6 +20,8 @@ package org.jppf.comm.socket;
 
 import java.io.*;
 import java.net.*;
+import java.util.zip.*;
+import org.apache.log4j.Logger;
 
 /**
  * This class provides a simple API to transfer objects over a TCP socket connection.
@@ -27,6 +29,8 @@ import java.net.*;
  */
 public class SocketClient
 {
+	private static Logger log = Logger.getLogger(SocketClient.class);
+
 	/**
 	 * The underlying socket wrapped by this SocketClient.
 	 */
@@ -35,10 +39,17 @@ public class SocketClient
 	 * Object stream used to send objects. 
 	 */
 	private ObjectOutputStream oos = null;
+	private OutputStream os = null;
+	private BufferedOutputStream bos = null;
+	private DeflaterOutputStream zos = null;
 	/**
 	 * Object stream used to receive objects. 
 	 */
 	private ObjectInputStream ois = null;
+	private InputStream is = null;
+	private BufferedInputStream bis = null;
+	private InflaterInputStream zis = null;
+
 	/**
 	 * The host the socket connects to.
 	 */
@@ -84,6 +95,8 @@ public class SocketClient
 	{
 		this.host = socket.getInetAddress().getHostName();
 		this.port = socket.getPort();
+		this.socket = socket;
+		initStreams();
 		opened = true;
 	}
 	
@@ -95,9 +108,21 @@ public class SocketClient
 	 */
 	public void send(Object o) throws ConnectException, IOException
 	{
-		checkOpened(); 
-		oos.writeObject(o);
-		oos.flush();
+		checkOpened();
+		try
+		{
+			oos.writeObject(o);
+			oos.flush();
+			//zos.flush();
+			//zos.finish();
+			//Remove references kept by the stream, otherwise leads to OutOfMemory.
+			oos.reset();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+			throw new IOException(e.getMessage());
+		}
 	}
 	
 	/**
@@ -122,17 +147,19 @@ public class SocketClient
 	 * @throws IOException if the underlying input stream throws an exception.
 	 * @throws ClassNotFoundException if the class of the object that was read cannot be loaded.
 	 */
-	public Object receive(long timeout) throws ConnectException, IOException, ClassNotFoundException
+	public Object receive(int timeout) throws ConnectException, IOException, ClassNotFoundException
 	{
 		checkOpened(); 
 		Object o = null;
 		try
 		{
-			if (timeout >= 0) socket.setSoTimeout((int) timeout);
+			if (timeout >= 0) socket.setSoTimeout(timeout);
 			o = ois.readObject();
 		}
-		catch(SocketTimeoutException ste)
+		catch(Exception e)
 		{
+			log.error(e.getMessage(), e);
+			throw new IOException(e.getMessage());
 		}
 		finally
 		{
@@ -156,11 +183,27 @@ public class SocketClient
 			else if (port <= 0)
 				throw new ConnectException("You must specify the port number");
 			socket = new Socket(host, port);
-			oos = new ObjectOutputStream(socket.getOutputStream());
-			ois = new ObjectInputStream(socket.getInputStream());
+			initStreams();
 			opened = true;
 		}
 		else throw new ConnectException("Client connection already opened");
+	}
+	
+	private void initStreams() throws IOException
+	{
+		os = socket.getOutputStream();
+		is = socket.getInputStream();
+		int size = 1024*1024;
+		bos = new BufferedOutputStream(os, size);
+		//Deflater def = new Deflater(9);
+		//zos = new DeflaterOutputStream(bos, def, size);
+		oos = new ObjectOutputStream(bos);
+		oos.flush();
+		//zos.flush();
+		bis = new BufferedInputStream(is);
+		//Inflater inf = new Inflater();
+		//zis = new InflaterInputStream(is, inf, size);
+		ois = new ObjectInputStream(bis); 
 	}
 
 	/**

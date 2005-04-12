@@ -19,9 +19,10 @@
 package org.jppf.comm.socket;
 
 import java.net.Socket;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.jppf.comm.*;
-import org.jppf.task.ExecutionService;
+import org.jppf.task.*;
 
 /**
  * Instances of this class handle execution requests sent over a TCP socket connections.
@@ -79,11 +80,16 @@ public class SocketHandler extends Thread
 			while (!stop)
 			{
 				ExecutionRequest request = (ExecutionRequest) socketClient.receive();
-				execService.executeMulti(request.getContent());
+				long start = System.currentTimeMillis();
+				List<Task> list = request.getContent();
+				execService.executeMulti(list);
 				ExecutionResponse response = new ExecutionResponse();
 				response.setContent(request.getContent());
 				response.setCorrelationId(request.getId());
+				long elapsed = System.currentTimeMillis() - start;
+				response.setElapsed(elapsed);
 				socketClient.send(response);
+				response.getContent().clear();
 			}
 		}
 		catch (Throwable t)
@@ -94,7 +100,7 @@ public class SocketHandler extends Thread
 	}
 	
 	/**
-	 * Set the stop flag to true, indicated that this socket handler hsould be closed as
+	 * Set the stop flag to true, indicating that this socket handler hsould be closed as
 	 * soon as possible.
 	 */
 	public synchronized void setStopped()

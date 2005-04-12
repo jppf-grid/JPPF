@@ -36,7 +36,14 @@ public class PropertyManager
 	 * Mapping of resource keys to actual TypedProperties instances.
 	 */
 	private static Map<String, TypedProperties> properties = new HashMap<String, TypedProperties>();
-	
+
+	/**
+	 * This class should NEVER be instanciated.
+	 */
+	private PropertyManager()
+	{
+	}
+
 	/**
 	 * Initialization of the property manager by loading the managed resource paths from a properties file.
 	 * The &quot;master&quot; properties file lookup is performed in the following sequence:
@@ -85,7 +92,7 @@ public class PropertyManager
 		TypedProperties props = properties.get(name);
 		if (props == null)
 		{
-			String path = master.getProperty(name);
+			String path = master.getString(name);
 			if (path != null) props = loadResource(path);
 		}
 		if (props == null) props = new TypedProperties();

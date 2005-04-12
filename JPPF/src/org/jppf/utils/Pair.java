@@ -30,7 +30,7 @@ public class Pair<U, V> implements Serializable
 	private V second = null;
 	
 	/**
-	 * INitialize this pair with two values.
+	 * Initialize this pair with two values.
 	 * @param first the first value of the new pair.
 	 * @param second the second value of the new pair.
 	 */
