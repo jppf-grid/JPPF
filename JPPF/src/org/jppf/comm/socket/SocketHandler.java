@@ -19,10 +19,9 @@
 package org.jppf.comm.socket;
 
 import java.net.Socket;
-import java.util.List;
 import org.apache.log4j.Logger;
 import org.jppf.comm.*;
-import org.jppf.task.*;
+import org.jppf.task.ExecutionService;
 
 /**
  * Instances of this class handle execution requests sent over a TCP socket connections.
@@ -79,10 +78,11 @@ public class SocketHandler extends Thread
 		{
 			while (!stop)
 			{
+				/*
 				ExecutionRequest request = (ExecutionRequest) socketClient.receive();
 				long start = System.currentTimeMillis();
 				List<Task> list = request.getContent();
-				execService.executeMulti(list);
+				execService.execute(list);
 				ExecutionResponse response = new ExecutionResponse();
 				response.setContent(request.getContent());
 				response.setCorrelationId(request.getId());
@@ -90,20 +90,28 @@ public class SocketHandler extends Thread
 				response.setElapsed(elapsed);
 				socketClient.send(response);
 				response.getContent().clear();
+				*/
+				Request request = (Request) socketClient.receive();
+				Response<?> response = execService.executeRequest(request);
+				socketClient.send(response);
+				response.clearContent();
 			}
 		}
 		catch (Throwable t)
 		{
 			log.error(t.getMessage(), t);
+		}
+		finally
+		{
 			setClosed();
 		}
 	}
 	
 	/**
-	 * Set the stop flag to true, indicating that this socket handler hsould be closed as
+	 * Set the stop flag to true, indicating that this socket handler should be closed as
 	 * soon as possible.
 	 */
-	public synchronized void setStopped()
+	private synchronized void setStopped()
 	{
 		stop = true;
 	}
@@ -124,9 +132,6 @@ public class SocketHandler extends Thread
 	public void setClosed()
 	{
 		setStopped();
-		closed = true;
-		close();
-		//sgHandler.stopService();
 	}
 
 	/**

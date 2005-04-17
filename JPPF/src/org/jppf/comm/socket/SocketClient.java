@@ -20,8 +20,8 @@ package org.jppf.comm.socket;
 
 import java.io.*;
 import java.net.*;
-import java.util.zip.*;
 import org.apache.log4j.Logger;
+import org.jppf.utils.PropertyManager;
 
 /**
  * This class provides a simple API to transfer objects over a TCP socket connection.
@@ -41,14 +41,12 @@ public class SocketClient
 	private ObjectOutputStream oos = null;
 	private OutputStream os = null;
 	private BufferedOutputStream bos = null;
-	private DeflaterOutputStream zos = null;
 	/**
 	 * Object stream used to receive objects. 
 	 */
 	private ObjectInputStream ois = null;
 	private InputStream is = null;
 	private BufferedInputStream bis = null;
-	private InflaterInputStream zis = null;
 
 	/**
 	 * The host the socket connects to.
@@ -84,6 +82,7 @@ public class SocketClient
 		this.host = host;
 		this.port = port;
 		open();
+		//socket.setTcpNoDelay(true);
 	}
 	
 	/**
@@ -96,6 +95,7 @@ public class SocketClient
 		this.host = socket.getInetAddress().getHostName();
 		this.port = socket.getPort();
 		this.socket = socket;
+		//socket.setTcpNoDelay(true);
 		initStreams();
 		opened = true;
 	}
@@ -113,8 +113,6 @@ public class SocketClient
 		{
 			oos.writeObject(o);
 			oos.flush();
-			//zos.flush();
-			//zos.finish();
 			//Remove references kept by the stream, otherwise leads to OutOfMemory.
 			oos.reset();
 		}
@@ -182,7 +180,12 @@ public class SocketClient
 				throw new ConnectException("You must specify the host name");
 			else if (port <= 0)
 				throw new ConnectException("You must specify the port number");
-			socket = new Socket(host, port);
+			socket = new Socket();
+			InetSocketAddress addr = new InetSocketAddress(host, port);
+			int size = PropertyManager.getInt("test", "receive.buffer.size", 1024*1024);
+			socket.setReceiveBufferSize(size);
+			socket.connect(addr);
+			//socket = new Socket(host, port);
 			initStreams();
 			opened = true;
 		}
@@ -193,7 +196,7 @@ public class SocketClient
 	{
 		os = socket.getOutputStream();
 		is = socket.getInputStream();
-		int size = 1024*1024;
+		int size = 32*1024;
 		bos = new BufferedOutputStream(os, size);
 		//Deflater def = new Deflater(9);
 		//zos = new DeflaterOutputStream(bos, def, size);

@@ -20,8 +20,10 @@ package org.jppf.comm.socket;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.jppf.task.ExecutionService;
+import org.jppf.utils.PropertyManager;
 
 /**
  * Instances of this class listen on a configured port for incoming execution requests,
@@ -35,6 +37,7 @@ public class SocketServer extends Thread
 {
 	private static Logger log = Logger.getLogger(SocketServer.class);
 
+	private List<SocketHandler> connections = new Vector<SocketHandler>();
 	/**
 	 * Server socket listening for requests on the configured port.
 	 */
@@ -95,6 +98,7 @@ public class SocketServer extends Thread
 	protected void serve(Socket socket) throws Exception
 	{
 		SocketHandler sc = new SocketHandler(socket, execService);
+		connections.add(sc);
 		sc.start();
 	}
 
@@ -105,7 +109,12 @@ public class SocketServer extends Thread
 	 */
 	protected void init(int port) throws Exception
 	{
-		server = new ServerSocket(port);
+		server = new ServerSocket();
+		InetSocketAddress addr = new InetSocketAddress(port);
+		int size = PropertyManager.getInt("test", "receive.buffer.size", 1024*1024);
+		server.setReceiveBufferSize(size);
+		server.bind(addr);
+		//server = new ServerSocket(port);
 	}
 
 	/**
@@ -119,6 +128,7 @@ public class SocketServer extends Thread
 			{
 				stop = true;
 				server.close();
+				for (SocketHandler sc: connections) sc.setClosed();
 			}
 			catch(IOException ioe)
 			{
