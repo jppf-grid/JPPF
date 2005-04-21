@@ -63,6 +63,7 @@
 	<target name="init.deploy" description="Initialize ressources">
  		<mkdir dir="${deploy}"/>
  		<mkdir dir="${deploy}/src"/>
+ 		<mkdir dir="${deploy}/classes"/>
  		<mkdir dir="${deploy}/docs"/>
  		<mkdir dir="${deploy}/examples"/>
  		<mkdir dir="${deploy.config}"/>
@@ -131,6 +132,9 @@
 		<copy todir="${deploy}/src">
 			<fileset dir="${src}"/>
 		</copy>
+		<copy todir="${deploy}/classes">
+			<fileset dir="${classes}"/>
+		</copy>
 		<copy todir="${deploy}/bin">
 			<fileset dir="${bin}"/>
 		</copy>
@@ -174,7 +178,12 @@
 			<doctitle><![CDATA[Java Parallel Processing Framework V ${version.number}]]></doctitle>
 			<header>
 				<![CDATA[
-					<font face="Arial" color="#000000">Java Parallel Processing Framework</font>
+					<table>
+					<tr>
+						<td valign="center"><img src="http://jppf-project.sourceforge.net/images/jppf-logo.jpg" width="66" height="26"/></td>
+						<td valign="center"><font face="Arial" color="#000000">&nbsp;&nbsp;Java Parallel Processing Framework</font></td>
+					</tr>
+					</table>
 				]]>
 			</header>
 			<bottom>

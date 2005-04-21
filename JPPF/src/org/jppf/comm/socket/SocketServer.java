@@ -18,12 +18,9 @@
  */
 package org.jppf.comm.socket;
 
-import java.io.IOException;
-import java.net.*;
-import java.util.*;
+import java.net.Socket;
 import org.apache.log4j.Logger;
 import org.jppf.task.ExecutionService;
-import org.jppf.utils.PropertyManager;
 
 /**
  * Instances of this class listen on a configured port for incoming execution requests,
@@ -33,27 +30,9 @@ import org.jppf.utils.PropertyManager;
  * This method can be invoked safely from any thread.
  * @author Laurent Cohen
  */
-public class SocketServer extends Thread
+public class SocketServer extends AbstractSocketServer
 {
 	private static Logger log = Logger.getLogger(SocketServer.class);
-
-	private List<SocketHandler> connections = new Vector<SocketHandler>();
-	/**
-	 * Server socket listening for requests on the configured port.
-	 */
-	private ServerSocket server = null;
-	/**
-	 * The execution service to which execution requests are delegated.
-	 */
-	private ExecutionService execService = null;
-	/**
-	 * Flag indicating that this socket server is closed.
-	 */
-	protected boolean stop = false;
-	/**
-	 * The port this socket server is listening to.
-	 */
-	protected int port = -1;
 
 	/**
 	 * Initialize this socket server with a specified execution service and port number.
@@ -63,77 +42,11 @@ public class SocketServer extends Thread
 	 */
 	public SocketServer(ExecutionService execService, int port) throws Exception
 	{
-		this.port = port;
-		this.execService = execService;
-		init(port);
+		super(execService, port);
 	}
 	
-	/**
-	 * Start the underlying server socket by making it accept incoming connections.
-	 * @see java.lang.Runnable#run()
-	 */
-	public void run()
+	protected AbstractSocketHandler createHandler(Socket socket) throws Exception
 	{
-		try
-		{
-			while (!stop)
-			{
-				Socket socket = server.accept();
-				serve(socket);
-			}
-			end();
-		}
-		catch (Throwable t)
-		{
-			log.error(t.getMessage(), t);
-			end();
-		}
-	}
-	
-	/**
-	 * Start serving a new incoming connection.
-	 * @param socket the socket connecting with this socket server.
-	 * @throws Exception if the new connection can't be initialized.
-	 */
-	protected void serve(Socket socket) throws Exception
-	{
-		SocketHandler sc = new SocketHandler(socket, execService);
-		connections.add(sc);
-		sc.start();
-	}
-
-	/**
-	 * Initialize the underlying server socket with a specified port.
-	 * @param port the port the underlying server listens to.
-	 * @throws Exception if the server socket can't be opened on the specified port.
-	 */
-	protected void init(int port) throws Exception
-	{
-		server = new ServerSocket();
-		InetSocketAddress addr = new InetSocketAddress(port);
-		int size = PropertyManager.getInt("test", "receive.buffer.size", 1024*1024);
-		server.setReceiveBufferSize(size);
-		server.bind(addr);
-		//server = new ServerSocket(port);
-	}
-
-	/**
-	 * Close the underlying server socket and stop this socket server.
-	 */
-	public synchronized void end()
-	{
-		if (!stop)
-		{
-			try
-			{
-				stop = true;
-				server.close();
-				for (SocketHandler sc: connections) sc.setClosed();
-			}
-			catch(IOException ioe)
-			{
-				log.error(ioe.getMessage(), ioe);
-			}
-		}
+		return new SocketHandler(socket, execService);
 	}
 }

@@ -18,35 +18,44 @@
  */
 package org.jppf.comm.socket;
 
+import static org.jppf.task.event.AdminEvent.EventType.*;
+
 import java.net.Socket;
 import org.apache.log4j.Logger;
 import org.jppf.comm.*;
-import org.jppf.task.ExecutionService;
+import org.jppf.task.admin.ServiceManager;
+import org.jppf.task.event.*;
 
-/**
- * Instances of this class handle execution requests sent over a TCP socket connections.
- * @author Laurent Cohen
- */
-public class SocketHandler extends AbstractSocketHandler
+public class AdminSocketHandler extends AbstractSocketHandler
 {
-	private static Logger log = Logger.getLogger(SocketHandler.class);
+	private static Logger log = Logger.getLogger(AdminSocketHandler.class);
 
-	/**
-	 * Initialize this socket handler with an open socket connection to a remote client, and
-	 * the execution service that will perform the tasks execution.
-	 * @param socket the socket connection from which requests are received and to which responses are sent.
-	 * @param execService the execution service used by this socket handler.
-	 * @throws Exception if this socket handler can't be initialized.
-	 */
-	public SocketHandler(Socket socket, ExecutionService execService) throws Exception
+	public AdminSocketHandler(Socket socket, ServiceManager manager) throws Exception
 	{
-		super(socket, execService);
+		super(socket, manager);
+	}
+	
+	private ServiceManager getManager()
+	{
+		return (ServiceManager) execService;
 	}
 
 	protected void perform(Request request) throws Exception
 	{
-		Response<?> response = execService.executeRequest(request);
-		socketClient.send(response);
-		response.clearContent();
+		RequestImpl<AdminEvent> notification = (RequestImpl<AdminEvent>) request;
+		AdminEvent event = notification.getContent();
+		ServiceManager manager = getManager();
+		if (STATUS.equals(event.getEventType()))
+		{
+			if ("local-socket".equals(event.getSource()))
+			{
+				int i=0;
+			}
+			manager.statusChanged((StatusEvent) event);
+		}
+		else if (PROFILING.equals(event.getEventType()))
+		{
+			manager.profilingDataReceived((ProfilingEvent) event);
+		}
 	}
 }

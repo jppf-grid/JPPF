@@ -75,9 +75,10 @@ public class SocketClient
 	 * Initialize this socket client and connect it to the specified host on the specified port.
 	 * @param host the remote host this socket client connects to.
 	 * @param port the remote port on the host this socket client connects to.
-	 * @throws Exception if the connection fails.
+	 * @throws ConnectException if the connection fails.
+	 * @throws IOException if there is an issue with the socket streams..
 	 */
-	public SocketClient(String host, int port) throws Exception
+	public SocketClient(String host, int port) throws ConnectException, IOException
 	{
 		this.host = host;
 		this.port = port;
@@ -109,18 +110,10 @@ public class SocketClient
 	public void send(Object o) throws ConnectException, IOException
 	{
 		checkOpened();
-		try
-		{
-			oos.writeObject(o);
-			oos.flush();
-			//Remove references kept by the stream, otherwise leads to OutOfMemory.
-			oos.reset();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-			throw new IOException(e.getMessage());
-		}
+		oos.writeObject(o);
+		oos.flush();
+		// Remove references kept by the stream, otherwise leads to OutOfMemory.
+		oos.reset();
 	}
 	
 	/**
@@ -198,14 +191,9 @@ public class SocketClient
 		is = socket.getInputStream();
 		int size = 32*1024;
 		bos = new BufferedOutputStream(os, size);
-		//Deflater def = new Deflater(9);
-		//zos = new DeflaterOutputStream(bos, def, size);
 		oos = new ObjectOutputStream(bos);
 		oos.flush();
-		//zos.flush();
 		bis = new BufferedInputStream(is);
-		//Inflater inf = new Inflater();
-		//zis = new InflaterInputStream(is, inf, size);
 		ois = new ObjectInputStream(bis); 
 	}
 
