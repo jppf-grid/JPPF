@@ -21,13 +21,31 @@ package org.jppf.comm.socket;
 import java.net.Socket;
 import org.jppf.task.admin.ServiceManager;
 
+/**
+ * Socket server implementation for a service manager.
+ * @author Laurent Cohen
+ */
 public class AdminSocketServer extends AbstractSocketServer
 {
+	/**
+	 * Initialize this socket server with the specified  service manager and TCP port.
+	 * @param manager this socket server's underlying service manager.
+	 * @param port the port to listen to.
+	 * @throws Exception if an error occurs during initialization.
+	 */
 	public AdminSocketServer(ServiceManager manager, int port) throws Exception
 	{
 		super(manager, port);
 	}
 
+	/**
+	 * Instanciate a socket handler that will handle the socket connection obtained through
+	 * this socket server. 
+	 * @param socket the socket conneciton to handle.
+	 * @return an <code>AbstractSocketHandler</code> instance.
+	 * @throws Exception if an error occurs while instanciating the socket handler.
+	 * @see org.jppf.comm.socket.AbstractSocketServer#createHandler(java.net.Socket)
+	 */
 	protected AbstractSocketHandler createHandler(Socket socket) throws Exception
 	{
 		return new AdminSocketHandler(socket, (ServiceManager) execService);

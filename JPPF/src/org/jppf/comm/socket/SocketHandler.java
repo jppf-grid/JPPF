@@ -24,7 +24,7 @@ import org.jppf.comm.*;
 import org.jppf.task.ExecutionService;
 
 /**
- * Instances of this class handle execution requests sent over a TCP socket connections.
+ * Instances of this class handle execution requests sent over a TCP socket connection.
  * @author Laurent Cohen
  */
 public class SocketHandler extends AbstractSocketHandler
@@ -43,6 +43,12 @@ public class SocketHandler extends AbstractSocketHandler
 		super(socket, execService);
 	}
 
+	/**
+	 * Perform the actual request execution.
+	 * @param request the request to execute.
+	 * @throws Exception if an error occurs during the request execution.
+	 * @see org.jppf.comm.socket.AbstractSocketHandler#perform(org.jppf.comm.Request)
+	 */
 	protected void perform(Request request) throws Exception
 	{
 		Response<?> response = execService.executeRequest(request);

@@ -26,20 +26,42 @@ import org.jppf.comm.*;
 import org.jppf.task.admin.ServiceManager;
 import org.jppf.task.event.*;
 
+/**
+ * Implementation of a socket handler for an administration service.
+ * This socket handler is solely dedicated to listening to events from
+ * other, remote service managers and dispatching those events to eventual sunscribers. 
+ * @author Laurent Cohen
+ */
 public class AdminSocketHandler extends AbstractSocketHandler
 {
 	private static Logger log = Logger.getLogger(AdminSocketHandler.class);
 
+	/**
+	 * Initialize this socket handler with a specified socket and service manager.
+	 * @param socket the socket connection to listen to.
+	 * @param manager the service manager the events are dispatched to.
+	 * @throws Exception if an error occurs during initialization.
+	 */
 	public AdminSocketHandler(Socket socket, ServiceManager manager) throws Exception
 	{
 		super(socket, manager);
 	}
 	
+	/**
+	 * Get a reference to the underlying service manager.
+	 * @return a <code>ServiceManager</code> instance.
+	 */
 	private ServiceManager getManager()
 	{
 		return (ServiceManager) execService;
 	}
 
+	/**
+	 * Perform the actual request execution.
+	 * @param request the request wrapping an event notification.
+	 * @throws Exception if an error occurs while dispatching the event.
+	 * @see org.jppf.comm.socket.AbstractSocketHandler#perform(org.jppf.comm.Request)
+	 */
 	protected void perform(Request request) throws Exception
 	{
 		RequestImpl<AdminEvent> notification = (RequestImpl<AdminEvent>) request;
@@ -47,10 +69,6 @@ public class AdminSocketHandler extends AbstractSocketHandler
 		ServiceManager manager = getManager();
 		if (STATUS.equals(event.getEventType()))
 		{
-			if ("local-socket".equals(event.getSource()))
-			{
-				int i=0;
-			}
 			manager.statusChanged((StatusEvent) event);
 		}
 		else if (PROFILING.equals(event.getEventType()))

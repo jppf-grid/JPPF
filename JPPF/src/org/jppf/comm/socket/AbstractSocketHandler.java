@@ -23,12 +23,17 @@ import org.apache.log4j.Logger;
 import org.jppf.comm.Request;
 import org.jppf.task.ExecutionService;
 
+/**
+ * Common abstract superclass for classes handling a socket connection to a remote host,
+ * obtained from the {@link java.net.ServerSocket#accept() ServerSocket.accept()} method.
+ * @author Laurent Cohen
+ */
 public abstract class AbstractSocketHandler extends Thread
 {
 	private static Logger log = Logger.getLogger(SocketHandler.class);
 
 	/**
-	 * The socket client used to communicate over a socket connection.
+	 * The socket client uses to communicate over a socket connection.
 	 */
 	protected SocketClient socketClient = null;
 	/**
@@ -88,6 +93,11 @@ public abstract class AbstractSocketHandler extends Thread
 		}
 	}
 
+	/**
+	 * Perform the actual request execution. Subclasses must implement this method.
+	 * @param request the request to execute.
+	 * @throws Exception if an error occurs during the request execution.
+	 */
 	protected abstract void perform(Request request) throws Exception;
 
 	/**
@@ -100,7 +110,7 @@ public abstract class AbstractSocketHandler extends Thread
 	}
 	
 	/**
-	 * Determines whether the socket connection is closed
+	 * Determine whether the socket connection is closed
 	 * @return true if the socket connection is closed, false otherwise
 	 */
 	public boolean isClosed()
@@ -109,8 +119,8 @@ public abstract class AbstractSocketHandler extends Thread
 	}
 	
 	/**
-	 * Sets the closed state of the socket connection to true
-	 * (Mostly useful for differed actual close with non blocking connections)
+	 * Set the closed state of the socket connection to true. This will cause this socket handler
+	 * to terminate as soon as the current request execution is complete.
 	 */
 	public void setClosed()
 	{
@@ -118,7 +128,7 @@ public abstract class AbstractSocketHandler extends Thread
 	}
 
 	/**
-	 * Closes the socket connection
+	 * Close the socket connection.
 	 */
 	public void close()
 	{

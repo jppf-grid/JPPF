@@ -39,13 +39,25 @@ public class SocketClient
 	 * Object stream used to send objects. 
 	 */
 	private ObjectOutputStream oos = null;
+	/**
+	 * A reference to the underlying socket's output stream.
+	 */
 	private OutputStream os = null;
+	/**
+	 * A buffered stream built on top of to the underlying socket's output stream.
+	 */
 	private BufferedOutputStream bos = null;
 	/**
 	 * Object stream used to receive objects. 
 	 */
 	private ObjectInputStream ois = null;
+	/**
+	 * A reference to the underlying socket's input stream.
+	 */
 	private InputStream is = null;
+	/**
+	 * A buffered stream built on top of to the underlying socket's input stream.
+	 */
 	private BufferedInputStream bis = null;
 
 	/**
@@ -185,6 +197,11 @@ public class SocketClient
 		else throw new ConnectException("Client connection already opened");
 	}
 	
+	/**
+	 * Initialize all the stream used for receiving and sending objects through the
+	 * underlying socket connection.
+	 * @throws IOException if an error occurs during the streams initialization.
+	 */
 	private void initStreams() throws IOException
 	{
 		os = socket.getOutputStream();
