@@ -30,8 +30,7 @@
 	<path id="project.classpath">
 		<pathelement location="${classes}"/>
 		<fileset dir="${lib}">
-			<include name="jms.jar"/>
-			<include name="log4j-1.2.9.jar"/>
+			<include name="**/*.jar"/>
 		</fileset>
 	</path>
 
@@ -139,7 +138,9 @@
 			<fileset dir="${bin}"/>
 		</copy>
 		<copy todir="${deploy}/docs">
-			<fileset dir="${docs}"/>
+			<fileset dir="${docs}">
+				<include name="api/**/*.*"/>
+			</fileset>
 		</copy>
 		<copy todir="${deploy}/examples">
 			<fileset dir="${examples}"/>
@@ -188,7 +189,7 @@
 			</header>
 			<bottom>
 				<![CDATA[
-					<font face="Arial" color="#000000">Copyright &copy; 2005 Laurent Cohen.</font>
+					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005 Laurent Cohen.</i></font>
 				]]>
 			</bottom>
 		</javadoc>
