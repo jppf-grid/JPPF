@@ -18,8 +18,6 @@
  */
 package org.jppf.comm.socket;
 
-import static org.jppf.task.event.AdminEvent.EventType.*;
-
 import java.net.Socket;
 import org.apache.log4j.Logger;
 import org.jppf.comm.*;
@@ -67,13 +65,19 @@ public class AdminSocketHandler extends AbstractSocketHandler
 		RequestImpl<AdminEvent> notification = (RequestImpl<AdminEvent>) request;
 		AdminEvent event = notification.getContent();
 		ServiceManager manager = getManager();
-		if (STATUS.equals(event.getEventType()))
+		switch (event.getEventType())
 		{
-			manager.statusChanged((StatusEvent) event);
-		}
-		else if (PROFILING.equals(event.getEventType()))
-		{
-			manager.profilingDataReceived((ProfilingEvent) event);
+			case STATUS:
+				manager.statusChanged((StatusEvent) event);
+				break;
+			case PROFILING:
+				manager.profilingDataReceived((ProfilingEvent) event);
+				break;
+			case NEW_SERVICE:
+				manager.newService(event);
+				break;
+			default:
+				break;
 		}
 	}
 }
