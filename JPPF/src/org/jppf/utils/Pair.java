@@ -26,7 +26,13 @@ import java.io.Serializable;
  */
 public class Pair<U, V> implements Serializable
 {
+	/**
+	 * The first object of this pair.
+	 */
 	private U first = null;
+	/**
+	 * The second object of this pair.
+	 */
 	private V second = null;
 	
 	/**

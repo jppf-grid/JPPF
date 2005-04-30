@@ -30,6 +30,9 @@ import org.jppf.task.ExecutionService;
  */
 public abstract class AbstractSocketHandler extends Thread
 {
+	/**
+	 * Log4j logger for this class.
+	 */
 	private static Logger log = Logger.getLogger(SocketHandler.class);
 
 	/**
@@ -41,7 +44,7 @@ public abstract class AbstractSocketHandler extends Thread
 	 */
 	protected boolean stop = false;
 	/**
-	 * Indicates whether this socket handler is closed, which means it can't hadle requests anymore.
+	 * Indicates whether this socket handler is closed, which means it can't handle requests anymore.
 	 */
 	protected boolean closed = false;
 	/**

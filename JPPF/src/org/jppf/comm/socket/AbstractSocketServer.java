@@ -25,10 +25,20 @@ import org.apache.log4j.Logger;
 import org.jppf.task.ExecutionService;
 import org.jppf.utils.PropertyManager;
 
+/**
+ * Abstract super class for all socket servers.
+ * @author Laurent Cohen
+ */
 public abstract class AbstractSocketServer extends Thread
 {
+	/**
+	 * Log4j logger for this class.
+	 */
 	private static Logger log = Logger.getLogger(AbstractSocketServer.class);
 
+	/**
+	 * A list of the remote connections handled by this socket server.
+	 */
 	protected List<AbstractSocketHandler> connections = new Vector<AbstractSocketHandler>();
 	/**
 	 * Server socket listening for requests on the configured port.
@@ -94,6 +104,14 @@ public abstract class AbstractSocketServer extends Thread
 		sc.start();
 	}
 	
+	/**
+	 * Instanciate a wrapper for the socket connection opend by this socket server.
+	 * Subclasses must implement this method.
+	 * @param socket the socket connection obtained through a call to
+	 * {@link java.net.ServerSocket#accept() ServerSocket.accept()}.
+	 * @return a <code>AbstractSocketHandler</code> instance.
+	 * @throws Exception if an exception is raised while creating the socket handler.
+	 */
 	protected abstract AbstractSocketHandler createHandler(Socket socket) throws Exception;
 
 	/**

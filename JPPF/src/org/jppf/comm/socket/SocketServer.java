@@ -32,6 +32,9 @@ import org.jppf.task.ExecutionService;
  */
 public class SocketServer extends AbstractSocketServer
 {
+	/**
+	 * Log4j logger for this class.
+	 */
 	private static Logger log = Logger.getLogger(SocketServer.class);
 
 	/**

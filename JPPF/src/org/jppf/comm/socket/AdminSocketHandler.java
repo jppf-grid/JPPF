@@ -27,11 +27,14 @@ import org.jppf.task.event.*;
 /**
  * Implementation of a socket handler for an administration service.
  * This socket handler is solely dedicated to listening to events from
- * other, remote service managers and dispatching those events to eventual sunscribers. 
+ * other, remote service managers and dispatching those events to eventual subscribers. 
  * @author Laurent Cohen
  */
 public class AdminSocketHandler extends AbstractSocketHandler
 {
+	/**
+	 * Log4j logger for this class.
+	 */
 	private static Logger log = Logger.getLogger(AdminSocketHandler.class);
 
 	/**

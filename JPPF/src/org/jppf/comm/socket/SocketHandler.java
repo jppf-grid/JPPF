@@ -29,6 +29,9 @@ import org.jppf.task.ExecutionService;
  */
 public class SocketHandler extends AbstractSocketHandler
 {
+	/**
+	 * Log4j logger for this class.
+	 */
 	private static Logger log = Logger.getLogger(SocketHandler.class);
 
 	/**

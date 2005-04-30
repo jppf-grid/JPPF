@@ -29,6 +29,9 @@ import org.jppf.utils.PropertyManager;
  */
 public class SocketClient
 {
+	/**
+	 * Log4j logger for this class.
+	 */
 	private static Logger log = Logger.getLogger(SocketClient.class);
 
 	/**
@@ -88,7 +91,7 @@ public class SocketClient
 	 * @param host the remote host this socket client connects to.
 	 * @param port the remote port on the host this socket client connects to.
 	 * @throws ConnectException if the connection fails.
-	 * @throws IOException if there is an issue with the socket streams..
+	 * @throws IOException if there is an issue with the socket streams.
 	 */
 	public SocketClient(String host, int port) throws ConnectException, IOException
 	{
