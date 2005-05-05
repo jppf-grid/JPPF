@@ -19,8 +19,7 @@
 package org.jppf.comm.socket;
 
 import java.net.Socket;
-import org.apache.log4j.Logger;
-import org.jppf.task.ExecutionService;
+import org.jppf.task.*;
 
 /**
  * Instances of this class listen on a configured port for incoming execution requests,
@@ -33,17 +32,12 @@ import org.jppf.task.ExecutionService;
 public class SocketServer extends AbstractSocketServer
 {
 	/**
-	 * Log4j logger for this class.
-	 */
-	private static Logger log = Logger.getLogger(SocketServer.class);
-
-	/**
 	 * Initialize this socket server with a specified execution service and port number.
 	 * @param execService the execution service to which execution requests are delegated.
 	 * @param port the port this socket server is listening to.
-	 * @throws Exception if the underlying server socket can't be opened.
+	 * @throws ExecutionServiceException if the underlying server socket can't be opened.
 	 */
-	public SocketServer(ExecutionService execService, int port) throws Exception
+	public SocketServer(ExecutionService execService, int port) throws ExecutionServiceException
 	{
 		super(execService, port);
 	}
@@ -53,10 +47,10 @@ public class SocketServer extends AbstractSocketServer
 	 * this socket server. 
 	 * @param socket the socket conneciton to handle.
 	 * @return an <code>AbstractSocketHandler</code> instance.
-	 * @throws Exception if an error occurs while instanciating the socket handler.
+	 * @throws ExecutionServiceException if an error occurs while instanciating the socket handler.
 	 * @see org.jppf.comm.socket.AbstractSocketServer#createHandler(java.net.Socket)
 	 */
-	protected AbstractSocketHandler createHandler(Socket socket) throws Exception
+	protected AbstractSocketHandler createHandler(Socket socket) throws ExecutionServiceException
 	{
 		return new SocketHandler(socket, execService);
 	}

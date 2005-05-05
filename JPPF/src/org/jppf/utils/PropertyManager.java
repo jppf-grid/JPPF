@@ -94,8 +94,9 @@ public class PropertyManager
 		{
 			String path = master.getString(name);
 			if (path != null) props = loadResource(path);
+			if (props == null) props = new TypedProperties();
+			properties.put(name, props);
 		}
-		if (props == null) props = new TypedProperties();
 		return props;
 	}
 
@@ -127,35 +128,6 @@ public class PropertyManager
 		}
 		
 		return props;
-	}
-
-	/**
-	 * Add a properties file to the property manager, using the specified resource key.
-	 * @param key the properties file resource key in string format.
-	 * @param is the input stream from which the properties are read.
-	 */
-	private static void addResource(String key, InputStream is)
-	{
-		try
-		{
-			TypedProperties props = new TypedProperties();
-			props.load(is);
-			addResource(key, props);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Add a properties file to the property manager, using the specified resource key.
-	 * @param key the properties file resource key in string format.
-	 * @param props a TypedProeprties instance from which the properties are read.
-	 */
-	private static void addResource(String key, TypedProperties props)
-	{
-		properties.put(key, props);
 	}
 
 	/**

@@ -21,6 +21,7 @@ package org.jppf.comm.socket;
 import java.io.*;
 import java.net.*;
 import org.apache.log4j.Logger;
+import org.jppf.task.ExecutionServiceException;
 import org.jppf.utils.PropertyManager;
 
 /**
@@ -104,16 +105,24 @@ public class SocketClient
 	/**
 	 * Initialize this socket client with an already opened and connected socket.
 	 * @param socket the underlying socket this socket client wraps around.
-	 * @throws Exception if the socket connection fails.
+	 * @throws ExecutionServiceException if the socket connection fails.
 	 */
-	public SocketClient(Socket socket) throws Exception
+	public SocketClient(Socket socket) throws ExecutionServiceException
 	{
-		this.host = socket.getInetAddress().getHostName();
-		this.port = socket.getPort();
-		this.socket = socket;
-		//socket.setTcpNoDelay(true);
-		initStreams();
-		opened = true;
+		try
+		{
+			this.host = socket.getInetAddress().getHostName();
+			this.port = socket.getPort();
+			this.socket = socket;
+			//socket.setTcpNoDelay(true);
+			initStreams();
+			opened = true;
+		}
+		catch(IOException ioe)
+		{
+			log.error(ioe.getMessage(), ioe);
+			throw new ExecutionServiceException(ioe.getMessage(), ioe);
+		}
 	}
 	
 	/**
@@ -137,9 +146,8 @@ public class SocketClient
 	 * @return the object that was read from the underlying input stream.
 	 * @throws ConnectException if the socket connection is closed.
 	 * @throws IOException if the underlying input stream throws an exception.
-	 * @throws ClassNotFoundException if the class of the object that was read cannot be loaded.
 	 */
-	public Object receive() throws ConnectException, IOException, ClassNotFoundException
+	public Object receive() throws ConnectException, IOException
 	{
 		return receive(0);
 	}
@@ -151,9 +159,8 @@ public class SocketClient
 	 * @return the object that was read from the underlying input stream or null if the operation timed out.
 	 * @throws ConnectException if the socket connection is closed.
 	 * @throws IOException if the underlying input stream throws an exception.
-	 * @throws ClassNotFoundException if the class of the object that was read cannot be loaded.
 	 */
-	public Object receive(int timeout) throws ConnectException, IOException, ClassNotFoundException
+	public Object receive(int timeout) throws ConnectException, IOException
 	{
 		checkOpened(); 
 		Object o = null;

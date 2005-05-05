@@ -21,7 +21,7 @@ package org.jppf.comm.socket;
 import java.net.Socket;
 import org.apache.log4j.Logger;
 import org.jppf.comm.Request;
-import org.jppf.task.ExecutionService;
+import org.jppf.task.*;
 
 /**
  * Common abstract superclass for classes handling a socket connection to a remote host,
@@ -57,9 +57,9 @@ public abstract class AbstractSocketHandler extends Thread
 	 * the execution service that will perform the tasks execution.
 	 * @param socket the socket connection from which requests are received and to which responses are sent.
 	 * @param execService the execution service used by this socket handler.
-	 * @throws Exception if this socket handler can't be initialized.
+	 * @throws ExecutionServiceException if this socket handler can't be initialized.
 	 */
-	public AbstractSocketHandler(Socket socket, ExecutionService execService) throws Exception
+	public AbstractSocketHandler(Socket socket, ExecutionService execService) throws ExecutionServiceException
 	{
 		socketClient = new SocketClient(socket);
 		this.execService = execService;
@@ -99,9 +99,9 @@ public abstract class AbstractSocketHandler extends Thread
 	/**
 	 * Perform the actual request execution. Subclasses must implement this method.
 	 * @param request the request to execute.
-	 * @throws Exception if an error occurs during the request execution.
+	 * @throws ExecutionServiceException if an error occurs during the request execution.
 	 */
-	protected abstract void perform(Request request) throws Exception;
+	protected abstract void perform(Request request) throws ExecutionServiceException;
 
 	/**
 	 * Set the stop flag to true, indicating that this socket handler should be closed as

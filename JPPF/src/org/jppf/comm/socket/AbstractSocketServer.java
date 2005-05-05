@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.net.*;
 import java.util.*;
 import org.apache.log4j.Logger;
-import org.jppf.task.ExecutionService;
+import org.jppf.task.*;
 import org.jppf.utils.PropertyManager;
 
 /**
@@ -61,9 +61,9 @@ public abstract class AbstractSocketServer extends Thread
 	 * Initialize this socket server with a specified execution service and port number.
 	 * @param execService the execution service to which execution requests are delegated.
 	 * @param port the port this socket server is listening to.
-	 * @throws Exception if the underlying server socket can't be opened.
+	 * @throws ExecutionServiceException if the underlying server socket can't be opened.
 	 */
-	public AbstractSocketServer(ExecutionService execService, int port) throws Exception
+	public AbstractSocketServer(ExecutionService execService, int port) throws ExecutionServiceException
 	{
 		this.port = port;
 		this.execService = execService;
@@ -95,9 +95,9 @@ public abstract class AbstractSocketServer extends Thread
 	/**
 	 * Start serving a new incoming connection.
 	 * @param socket the socket connecting with this socket server.
-	 * @throws Exception if the new connection can't be initialized.
+	 * @throws ExecutionServiceException if the new connection can't be initialized.
 	 */
-	protected void serve(Socket socket) throws Exception
+	protected void serve(Socket socket) throws ExecutionServiceException
 	{
 		AbstractSocketHandler sc = createHandler(socket);
 		connections.add(sc);
@@ -110,22 +110,39 @@ public abstract class AbstractSocketServer extends Thread
 	 * @param socket the socket connection obtained through a call to
 	 * {@link java.net.ServerSocket#accept() ServerSocket.accept()}.
 	 * @return a <code>AbstractSocketHandler</code> instance.
-	 * @throws Exception if an exception is raised while creating the socket handler.
+	 * @throws ExecutionServiceException if an exception is raised while creating the socket handler.
 	 */
-	protected abstract AbstractSocketHandler createHandler(Socket socket) throws Exception;
+	protected abstract AbstractSocketHandler createHandler(Socket socket) throws ExecutionServiceException;
 
 	/**
 	 * Initialize the underlying server socket with a specified port.
 	 * @param port the port the underlying server listens to.
-	 * @throws Exception if the server socket can't be opened on the specified port.
+	 * @throws ExecutionServiceException if the server socket can't be opened on the specified port.
 	 */
-	protected void init(int port) throws Exception
+	protected void init(int port) throws ExecutionServiceException
 	{
-		server = new ServerSocket();
-		InetSocketAddress addr = new InetSocketAddress(port);
-		int size = PropertyManager.getInt("test", "receive.buffer.size", 1024*1024);
-		server.setReceiveBufferSize(size);
-		server.bind(addr);
+		Exception e = null;
+		try
+		{
+			server = new ServerSocket();
+			InetSocketAddress addr = new InetSocketAddress(port);
+			int size = PropertyManager.getInt("test", "receive.buffer.size", 1024*1024);
+			server.setReceiveBufferSize(size);
+			server.bind(addr);
+		}
+		catch(IllegalArgumentException iae)
+		{
+			e = iae;
+		}
+		catch(IOException ioe)
+		{
+			e = ioe;
+		}
+		if (e != null)
+		{
+			log.error(e.getMessage(), e);
+			throw new ExecutionServiceException(e.getMessage(), e);
+		}
 	}
 
 	/**

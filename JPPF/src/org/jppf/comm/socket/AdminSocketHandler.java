@@ -19,10 +19,11 @@
 package org.jppf.comm.socket;
 
 import java.net.Socket;
-import org.apache.log4j.Logger;
 import org.jppf.comm.*;
+import org.jppf.task.ExecutionServiceException;
 import org.jppf.task.admin.ServiceManager;
 import org.jppf.task.event.*;
+import org.jppf.task.impl.ServiceConfigurationImpl;
 
 /**
  * Implementation of a socket handler for an administration service.
@@ -33,21 +34,16 @@ import org.jppf.task.event.*;
 public class AdminSocketHandler extends AbstractSocketHandler
 {
 	/**
-	 * Log4j logger for this class.
-	 */
-	private static Logger log = Logger.getLogger(AdminSocketHandler.class);
-
-	/**
 	 * Initialize this socket handler with a specified socket and service manager.
 	 * @param socket the socket connection to listen to.
 	 * @param manager the service manager the events are dispatched to.
-	 * @throws Exception if an error occurs during initialization.
+	 * @throws ExecutionServiceException if an error occurs during initialization.
 	 */
-	public AdminSocketHandler(Socket socket, ServiceManager manager) throws Exception
+	public AdminSocketHandler(Socket socket, ServiceManager manager) throws ExecutionServiceException
 	{
 		super(socket, manager);
 	}
-	
+
 	/**
 	 * Get a reference to the underlying service manager.
 	 * @return a <code>ServiceManager</code> instance.
@@ -60,14 +56,19 @@ public class AdminSocketHandler extends AbstractSocketHandler
 	/**
 	 * Perform the actual request execution.
 	 * @param request the request wrapping an event notification.
-	 * @throws Exception if an error occurs while dispatching the event.
 	 * @see org.jppf.comm.socket.AbstractSocketHandler#perform(org.jppf.comm.Request)
 	 */
-	protected void perform(Request request) throws Exception
+	protected void perform(Request request)
 	{
 		RequestImpl<AdminEvent> notification = (RequestImpl<AdminEvent>) request;
 		AdminEvent event = notification.getContent();
 		ServiceManager manager = getManager();
+		if (event.getManagerName() == null)
+		{
+			event.setManagerName(manager.getName());
+			ServiceConfigurationImpl cfg = (ServiceConfigurationImpl) event.getConfig();
+			cfg.setManagerName(manager.getName());
+		}
 		switch (event.getEventType())
 		{
 			case STATUS:
