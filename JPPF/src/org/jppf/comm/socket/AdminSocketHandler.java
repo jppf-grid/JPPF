@@ -58,7 +58,7 @@ public class AdminSocketHandler extends AbstractSocketHandler
 	 * @param request the request wrapping an event notification.
 	 * @see org.jppf.comm.socket.AbstractSocketHandler#perform(org.jppf.comm.Request)
 	 */
-	protected void perform(Request request)
+	protected void perform(Request<?> request)
 	{
 		RequestImpl<AdminEvent> notification = (RequestImpl<AdminEvent>) request;
 		AdminEvent event = notification.getContent();
