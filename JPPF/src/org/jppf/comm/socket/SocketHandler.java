@@ -54,7 +54,7 @@ public class SocketHandler extends AbstractSocketHandler
 	 * @throws ExecutionServiceException if an error occurs during the request execution.
 	 * @see org.jppf.comm.socket.AbstractSocketHandler#perform(org.jppf.comm.Request)
 	 */
-	protected void perform(Request<?> request) throws ExecutionServiceException
+	protected void perform(Request request) throws ExecutionServiceException
 	{
 		Exception e = null;
 		try

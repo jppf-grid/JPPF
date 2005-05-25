@@ -101,7 +101,7 @@ public abstract class AbstractSocketHandler extends Thread
 	 * @param request the request to execute.
 	 * @throws ExecutionServiceException if an error occurs during the request execution.
 	 */
-	protected abstract void perform(Request<?> request) throws ExecutionServiceException;
+	protected abstract void perform(Request request) throws ExecutionServiceException;
 
 	/**
 	 * Set the stop flag to true, indicating that this socket handler should be closed as
