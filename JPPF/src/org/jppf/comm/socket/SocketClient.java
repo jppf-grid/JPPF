@@ -128,10 +128,9 @@ public class SocketClient
 	/**
 	 * Send an object over a TCP socket connection.
 	 * @param o the object to send.
-	 * @throws ConnectException is the socket connection is not opened.
 	 * @throws IOException if the underlying output stream throws an exception.
 	 */
-	public void send(Object o) throws ConnectException, IOException
+	public void send(Object o) throws IOException
 	{
 		checkOpened();
 		oos.writeObject(o);
@@ -144,10 +143,10 @@ public class SocketClient
 	 * Read an object from a TCP socket connection.
 	 * This method blocks until an object is received.
 	 * @return the object that was read from the underlying input stream.
-	 * @throws ConnectException if the socket connection is closed.
+	 * @throws ClassNotFoundException if the socket connection is closed.
 	 * @throws IOException if the underlying input stream throws an exception.
 	 */
-	public Object receive() throws ConnectException, IOException
+	public Object receive() throws ClassNotFoundException, IOException
 	{
 		return receive(0);
 	}
@@ -157,10 +156,10 @@ public class SocketClient
 	 * This method blocks until an object is received or the specified timeout has expired, whichever happens first.
 	 * @param timeout timeout after which the operation is aborted. A timeout of zero is interpreted as an infinite timeout.
 	 * @return the object that was read from the underlying input stream or null if the operation timed out.
-	 * @throws ConnectException if the socket connection is closed.
+	 * @throws ClassNotFoundException if the socket connection is closed.
 	 * @throws IOException if the underlying input stream throws an exception.
 	 */
-	public Object receive(int timeout) throws ConnectException, IOException
+	public Object receive(int timeout) throws ClassNotFoundException, IOException
 	{
 		checkOpened(); 
 		Object o = null;
@@ -168,11 +167,6 @@ public class SocketClient
 		{
 			if (timeout >= 0) socket.setSoTimeout(timeout);
 			o = ois.readObject();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-			throw new IOException(e.getMessage());
 		}
 		finally
 		{
