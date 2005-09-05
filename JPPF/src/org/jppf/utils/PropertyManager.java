@@ -26,7 +26,7 @@ import java.util.*;
  * Each properties file is lazily loaded, the first time it is accessed.
  * @author Laurent Cohen
  */
-public class PropertyManager
+public final class PropertyManager
 {
 	/**
 	 * Mapping of string keys to the actual properties files paths managed by this property manager. 

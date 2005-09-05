@@ -99,7 +99,6 @@ public class SocketClient
 		this.host = host;
 		this.port = port;
 		open();
-		//socket.setTcpNoDelay(true);
 	}
 	
 	/**
@@ -114,7 +113,6 @@ public class SocketClient
 			this.host = socket.getInetAddress().getHostName();
 			this.port = socket.getPort();
 			this.socket = socket;
-			//socket.setTcpNoDelay(true);
 			initStreams();
 			opened = true;
 		}
@@ -194,7 +192,6 @@ public class SocketClient
 			int size = PropertyManager.getInt("test", "receive.buffer.size", 1024*1024);
 			socket.setReceiveBufferSize(size);
 			socket.connect(addr);
-			//socket = new Socket(host, port);
 			initStreams();
 			opened = true;
 		}
@@ -210,8 +207,7 @@ public class SocketClient
 	{
 		os = socket.getOutputStream();
 		is = socket.getInputStream();
-		int size = 32*1024;
-		bos = new BufferedOutputStream(os, size);
+		bos = new BufferedOutputStream(os, 32*1024);
 		oos = new ObjectOutputStream(bos);
 		oos.flush();
 		bis = new BufferedInputStream(is);

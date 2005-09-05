@@ -97,7 +97,7 @@
 		<copy todir="${classes}">
 			<fileset dir="${src}">
 				<exclude name="**/*.java"/>
-				<exclude name="**/*.html"/>
+				<exclude name="**/package.html"/>
 			</fileset>
 		</copy>
   </target>

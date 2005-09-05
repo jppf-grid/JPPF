@@ -74,6 +74,10 @@ public class AdminSocketHandler extends AbstractSocketHandler
 			case STATUS:
 				manager.statusChanged((StatusEvent) event);
 				break;
+			case EXCEPTION:
+			case SERVICE_REMOVED:
+				manager.serviceRemoved(event);
+				break;
 			case PROFILING:
 				manager.profilingDataReceived((ProfilingEvent) event);
 				break;

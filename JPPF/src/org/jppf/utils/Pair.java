@@ -22,6 +22,8 @@ import java.io.Serializable;
 
 /**
  * Utility class holding a pair of references to two objects.
+ * @param <U> the type of the first element in the pair.
+ * @param <V> the type of the second element in the pair.
  * @author Laurent Cohen
  */
 public class Pair<U, V> implements Serializable

@@ -2,21 +2,21 @@
  * Java Parallel Processing Framework.
  * Copyright (C) 2005 Laurent Cohen.
  * lcohen@osp-chicago.com
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it under the terms of
  * the GNU General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along with this program;
  * if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307 USA
  */
-package org.jppf.utils;
+ package org.jppf.utils;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -199,5 +199,37 @@ public class ReflectionUtils
 		String basename =
 			attrName.substring(0, 1).toUpperCase() + attrName.substring(1);
 		return getSetter(clazz, "set"+basename);
+	}
+	
+	/**
+	 * Obtain all the getters or setters of a specified class.
+	 * @param clazz the class to get the methods from.
+	 * @param getters if true, indicates that the getters should be looked up, otherwise it should be the setters.
+	 * @return an array of <code>Method</code> instances.
+	 */
+	public static Method[] getAllBeanMethods(Class clazz, boolean getters)
+	{
+		List<Method> methodList = new ArrayList<Method>();
+		Method[] allMethods = clazz.getMethods();
+		for (Method meth: allMethods)
+		{
+			if ((getters && isGetter(meth)) || (!getters && isSetter(meth)))
+			{
+				methodList.add(meth);
+			}
+		}
+		return methodList.toArray(new Method[0]);
+	}
+
+	/**
+	 * Perform a deep copy of an object.
+	 * This method uses reflection to perform the copy through public accessors and mutators (getters and setters).
+	 * @param o the object to copy.
+	 * @return an object whose state is a copy of that of the input object.
+	 */
+	public static Object deepCopy(Object o)
+	{
+		
+		return null;
 	}
 }
