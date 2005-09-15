@@ -164,6 +164,19 @@
 	</target>
 
 	<!-- ========================================================================= -->
+	<!--                     Build the web site content                            -->
+	<!-- ========================================================================= -->
+
+	<target name="home.doc" description="generates the project web site pages">
+		<java fork="yes" classname="org.jppf.doc.HtmlDocGenerator" classpathref="run.classpath">
+			<jvmarg value="-Xmx128m" />
+			<arg value="docs/home/doc-source"/>
+			<arg value="docs/home/"/>
+			<arg value="docs/home/templates/"/>
+		</java>       
+	</target>
+
+	<!-- ========================================================================= -->
 	<!--                        Generate the Javadoc                               -->
 	<!-- ========================================================================= -->
 
