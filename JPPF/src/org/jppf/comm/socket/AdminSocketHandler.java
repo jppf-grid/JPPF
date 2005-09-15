@@ -21,7 +21,7 @@ package org.jppf.comm.socket;
 import java.net.Socket;
 import org.jppf.comm.*;
 import org.jppf.task.ExecutionServiceException;
-import org.jppf.task.admin.ServiceManager;
+import org.jppf.task.admin.*;
 import org.jppf.task.event.*;
 import org.jppf.task.impl.ServiceConfigurationImpl;
 
@@ -79,7 +79,7 @@ public class AdminSocketHandler extends AbstractSocketHandler
 				manager.serviceRemoved(event);
 				break;
 			case PROFILING:
-				manager.profilingDataReceived((ProfilingEvent) event);
+				((AbstractServiceManager) manager).passThru(event);
 				break;
 			case NEW_SERVICE:
 				manager.newService(event);
