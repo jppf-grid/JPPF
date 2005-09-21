@@ -33,7 +33,7 @@ public abstract class AbstractSocketHandler extends Thread
 	/**
 	 * Log4j logger for this class.
 	 */
-	private static Logger log = Logger.getLogger(SocketHandler.class);
+	private static Logger log = Logger.getLogger(ExecutionSocketHandler.class);
 
 	/**
 	 * The socket client uses to communicate over a socket connection.
@@ -111,7 +111,7 @@ public abstract class AbstractSocketHandler extends Thread
 	{
 		stop = true;
 	}
-	
+
 	/**
 	 * Determine whether the socket connection is closed
 	 * @return true if the socket connection is closed, false otherwise
@@ -120,7 +120,7 @@ public abstract class AbstractSocketHandler extends Thread
 	{
 		return closed;
 	}
-	
+
 	/**
 	 * Set the closed state of the socket connection to true. This will cause this socket handler
 	 * to terminate as soon as the current request execution is complete.
@@ -144,5 +144,23 @@ public abstract class AbstractSocketHandler extends Thread
 			log.error(e.getMessage(), e);
 		}
 		closed = true;
+	}
+
+	/**
+	 * Add a <code>SocketExceptionListener</code> to the list of listeners of the socket client.
+	 * @param listener the listener to add to the list.
+	 */
+	public void addSocketExceptionListener(SocketExceptionListener listener)
+	{
+		socketClient.removeSocketExceptionListener(listener);
+	}
+
+	/**
+	 * Remove a <code>SocketExceptionListener</code> from the list of listeners of the socket client.
+	 * @param listener the listener to remove from the list.
+	 */
+	public void removeSocketExceptionListener(SocketExceptionListener listener)
+	{
+		socketClient.removeSocketExceptionListener(listener);
 	}
 }

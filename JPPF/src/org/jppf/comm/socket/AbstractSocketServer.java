@@ -99,9 +99,9 @@ public abstract class AbstractSocketServer extends Thread
 	 */
 	protected void serve(Socket socket) throws ExecutionServiceException
 	{
-		AbstractSocketHandler sc = createHandler(socket);
-		connections.add(sc);
-		sc.start();
+		AbstractSocketHandler handler = createHandler(socket);
+		//connections.add(sc);
+		handler.start();
 	}
 	
 	/**

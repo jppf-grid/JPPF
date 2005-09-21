@@ -20,7 +20,7 @@ package org.jppf.comm.socket;
 
 import java.io.*;
 import java.net.*;
-import org.apache.log4j.Logger;
+import java.util.*;
 import org.jppf.task.ExecutionServiceException;
 import org.jppf.utils.PropertyManager;
 
@@ -30,11 +30,6 @@ import org.jppf.utils.PropertyManager;
  */
 public class SocketClient
 {
-	/**
-	 * Log4j logger for this class.
-	 */
-	private static Logger log = Logger.getLogger(SocketClient.class);
-
 	/**
 	 * The underlying socket wrapped by this SocketClient.
 	 */
@@ -63,7 +58,6 @@ public class SocketClient
 	 * A buffered stream built on top of to the underlying socket's input stream.
 	 */
 	private BufferedInputStream bis = null;
-
 	/**
 	 * The host the socket connects to.
 	 */
@@ -76,6 +70,10 @@ public class SocketClient
 	 * Flag indicating the opened state of the underlying socket.
 	 */
 	private boolean opened = false;
+	/**
+	 * Holds the list of listeners for this SocketClient.
+	 */
+	private List<SocketExceptionListener> listeners = new ArrayList<SocketExceptionListener>();
 
 	/**
 	 * Default constructor is invisible to other classes.
@@ -118,7 +116,6 @@ public class SocketClient
 		}
 		catch(IOException ioe)
 		{
-			log.error(ioe.getMessage(), ioe);
 			throw new ExecutionServiceException(ioe.getMessage(), ioe);
 		}
 	}
@@ -130,11 +127,19 @@ public class SocketClient
 	 */
 	public void send(Object o) throws IOException
 	{
-		checkOpened();
-		oos.writeObject(o);
-		oos.flush();
-		// Remove references kept by the stream, otherwise leads to OutOfMemory.
-		oos.reset();
+		try
+		{
+			checkOpened();
+			oos.writeObject(o);
+			oos.flush();
+			// Remove references kept by the stream, otherwise leads to OutOfMemory.
+			oos.reset();
+		}
+		catch(IOException e)
+		{
+			fireSocketExceptionEvent(e);
+			throw e;
+		}
 	}
 	
 	/**
@@ -165,6 +170,16 @@ public class SocketClient
 		{
 			if (timeout >= 0) socket.setSoTimeout(timeout);
 			o = ois.readObject();
+		}
+		catch(ClassNotFoundException e)
+		{
+			fireSocketExceptionEvent(e);
+			throw e;
+		}
+		catch(IOException e)
+		{
+			fireSocketExceptionEvent(e);
+			throw e;
 		}
 		finally
 		{
@@ -221,9 +236,9 @@ public class SocketClient
 	 */
 	public void close() throws ConnectException, IOException
 	{
+		opened = false;
 		checkOpened();
 		socket.close();
-		opened = false;
 	}
 	
 	/**
@@ -233,6 +248,49 @@ public class SocketClient
 	private void checkOpened() throws ConnectException
 	{
 		if (!opened)
-			throw new ConnectException("Client connection not opened"); 
+		{
+			ConnectException e = new ConnectException("Client connection not opened");
+			fireSocketExceptionEvent(e);
+			throw e;
+		}
+	}
+	
+	/**
+	 * Add a <code>SocketExceptionListener</code> to the list of listeners of this socket client.
+	 * @param listener the listener to add to the list.
+	 */
+	public void addSocketExceptionListener(SocketExceptionListener listener)
+	{
+		listeners.add(listener);
+	}
+
+	/**
+	 * Remove a <code>SocketExceptionListener</code> from the list of listeners of this socket client.
+	 * @param listener the listener to remove from the list.
+	 */
+	public void removeSocketExceptionListener(SocketExceptionListener listener)
+	{
+		listeners.remove(listener);
+	}
+	
+	/**
+	 * Notify all listeners that an exception has occurred.
+	 * @param e the exception to notify the listeners of.
+	 */
+	protected void fireSocketExceptionEvent(Exception e)
+	{
+		for (SocketExceptionListener listener: listeners)
+		{
+			listener.exceptionOccurred(new SocketExceptionEvent(e));
+		}
+	}
+
+	/**
+	 * Determine whether this socket client is opened or not.
+	 * @return true if this client is opened, false otherwise.
+	 */
+	public boolean isOpened()
+	{
+		return opened;
 	}
 }

@@ -26,9 +26,8 @@ import org.jppf.task.event.*;
 import org.jppf.task.impl.ServiceConfigurationImpl;
 
 /**
- * Implementation of a socket handler for an administration service.
- * This socket handler is solely dedicated to listening to events from
- * other, remote service managers and dispatching those events to eventual subscribers. 
+ * Implementation of a socket handler for an administration service, solely dedicated to listening to
+ * events from other, remote service managers and dispatching those events to eventual subscribers. 
  * @author Laurent Cohen
  */
 public class AdminSocketHandler extends AbstractSocketHandler
@@ -83,6 +82,7 @@ public class AdminSocketHandler extends AbstractSocketHandler
 				break;
 			case NEW_SERVICE:
 				manager.newService(event);
+				((AbstractServiceManager) manager).passThru(event);
 				break;
 			default:
 				break;

@@ -20,22 +20,15 @@ package org.jppf.comm.socket;
 
 import java.io.IOException;
 import java.net.*;
-import org.apache.log4j.Logger;
 import org.jppf.comm.*;
 import org.jppf.task.*;
-import org.jppf.task.admin.AbstractServiceManager;
 
 /**
  * Instances of this class handle execution requests sent over a TCP socket connection.
  * @author Laurent Cohen
  */
-public class SocketHandler extends AbstractSocketHandler
+public class ExecutionSocketHandler extends AbstractSocketHandler
 {
-	/**
-	 * Log4j logger for this class.
-	 */
-	private static Logger log = Logger.getLogger(AbstractServiceManager.class);
-
 	/**
 	 * Initialize this socket handler with an open socket connection to a remote client, and
 	 * the execution service that will perform the tasks execution.
@@ -43,9 +36,11 @@ public class SocketHandler extends AbstractSocketHandler
 	 * @param execService the execution service used by this socket handler.
 	 * @throws ExecutionServiceException if this socket handler can't be initialized.
 	 */
-	public SocketHandler(Socket socket, ExecutionService execService) throws ExecutionServiceException
+	public ExecutionSocketHandler(Socket socket, ExecutionService execService) throws ExecutionServiceException
 	{
 		super(socket, execService);
+		if (execService instanceof SocketExceptionListener)
+			socketClient.addSocketExceptionListener((SocketExceptionListener) execService);
 	}
 
 	/**
@@ -73,7 +68,6 @@ public class SocketHandler extends AbstractSocketHandler
 		}
 		if (e != null)
 		{
-			log.error(e.getMessage(), e);
 			throw new ExecutionServiceException(e.getMessage(), e);
 		}
 	}

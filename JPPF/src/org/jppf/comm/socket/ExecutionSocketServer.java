@@ -25,11 +25,11 @@ import org.jppf.task.*;
  * Instances of this class listen on a configured port for incoming execution requests,
  * and delegate them to an execution service.
  * This class acts as the entry point when invoking a socket-based remote execution service.
- * A socket server can be terminated by invoking its {@link org.jppf.comm.socket.SocketServer#end() end()} method.
+ * A socket server can be terminated by invoking its {@link org.jppf.comm.socket.ExecutionSocketServer#end() end()} method.
  * This method can be invoked safely from any thread.
  * @author Laurent Cohen
  */
-public class SocketServer extends AbstractSocketServer
+public class ExecutionSocketServer extends AbstractSocketServer
 {
 	/**
 	 * Initialize this socket server with a specified execution service and port number.
@@ -37,7 +37,7 @@ public class SocketServer extends AbstractSocketServer
 	 * @param port the port this socket server is listening to.
 	 * @throws ExecutionServiceException if the underlying server socket can't be opened.
 	 */
-	public SocketServer(ExecutionService execService, int port) throws ExecutionServiceException
+	public ExecutionSocketServer(ExecutionService execService, int port) throws ExecutionServiceException
 	{
 		super(execService, port);
 	}
@@ -52,6 +52,7 @@ public class SocketServer extends AbstractSocketServer
 	 */
 	protected AbstractSocketHandler createHandler(Socket socket) throws ExecutionServiceException
 	{
-		return new SocketHandler(socket, execService);
+		ExecutionSocketHandler handler = new ExecutionSocketHandler(socket, execService);
+		return handler;
 	}
 }

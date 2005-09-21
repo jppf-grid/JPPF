@@ -291,29 +291,4 @@ public class HtmlDocGenerator
 		System.err.println("including stylesheets, image files and others.");
 		System.exit(0);
 	}
-
-	/**
-	 * Test this class.
-	 * @param args not used.
-	 */
-	public static void main2(String...args)
-	{
-		try
-		{
-			String base = "docs/temp-home/";
-			String base_source = base+"doc-source/";
-			String[] files = new String[] { "left", "center-main" , "center-news" , "center-shots",
-				"center-archi", "center-ack", "index", "center-readme", "center-todos"
-			};
-			HtmlDocGenerator docGen = new HtmlDocGenerator();
-			for (String file: files)
-			{
-				docGen.generatePage(base_source+file+".html", base+file+".html", base+"templates/");
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
 }
