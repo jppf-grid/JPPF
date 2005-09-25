@@ -3,8 +3,8 @@
 /* Define colors, fonts and other style attributes here to override the defaults */
 
 /* Page background color */
-/*body { background-color: #B8E6FE !important }*/
-body { background-color: #9B9DFD !important }
+body { background-color: #B8E6FE !important }
+/*body { background-color: #9B9DFD !important }*/
 
 /* Table colors */
 .TableHeadingColor     { background-color: #FCCF62; color: #000060 } /* 252, 207, 98 */
