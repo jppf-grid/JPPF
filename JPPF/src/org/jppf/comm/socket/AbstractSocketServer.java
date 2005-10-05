@@ -105,7 +105,7 @@ public abstract class AbstractSocketServer extends Thread
 	}
 	
 	/**
-	 * Instanciate a wrapper for the socket connection opend by this socket server.
+	 * Instanciate a wrapper for the socket connection opened by this socket server.
 	 * Subclasses must implement this method.
 	 * @param socket the socket connection obtained through a call to
 	 * {@link java.net.ServerSocket#accept() ServerSocket.accept()}.

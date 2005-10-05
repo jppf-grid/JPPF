@@ -128,6 +128,7 @@ public abstract class AbstractSocketHandler extends Thread
 	public void setClosed()
 	{
 		setStopped();
+		close();
 	}
 
 	/**

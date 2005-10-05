@@ -30,7 +30,7 @@ import org.jppf.task.impl.ServiceConfigurationImpl;
  * events from other, remote service managers and dispatching those events to eventual subscribers. 
  * @author Laurent Cohen
  */
-public class AdminSocketHandler extends AbstractSocketHandler
+public class EventSocketHandler extends AbstractSocketHandler
 {
 	/**
 	 * Initialize this socket handler with a specified socket and service manager.
@@ -38,7 +38,7 @@ public class AdminSocketHandler extends AbstractSocketHandler
 	 * @param manager the service manager the events are dispatched to.
 	 * @throws ExecutionServiceException if an error occurs during initialization.
 	 */
-	public AdminSocketHandler(Socket socket, ServiceManager manager) throws ExecutionServiceException
+	public EventSocketHandler(Socket socket, ServiceManager manager) throws ExecutionServiceException
 	{
 		super(socket, manager);
 	}
