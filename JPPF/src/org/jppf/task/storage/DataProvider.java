@@ -40,5 +40,5 @@ public interface DataProvider extends Serializable
 	 * @param key the key identifying the value to retrieve in the store.
 	 * @param value the value to store, associated with the key.
 	 */
-	void getValue(Object key, Object value);
+	void setValue(Object key, Object value);
 }

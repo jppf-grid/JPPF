@@ -33,7 +33,7 @@ public abstract class AbstractSocketHandler extends Thread
 	/**
 	 * Log4j logger for this class.
 	 */
-	private static Logger log = Logger.getLogger(ExecutionSocketHandler.class);
+	private static Logger log = Logger.getLogger(AbstractSocketHandler.class);
 
 	/**
 	 * The socket client uses to communicate over a socket connection.

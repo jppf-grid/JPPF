@@ -47,9 +47,9 @@ public class MemoryMapDataProvider implements DataProvider
 	 * Set a value specified by its key in the store.
 	 * @param key the key identifying the value to retrieve in the store.
 	 * @param value the value to store, associated with the key.
-	 * @see org.jppf.task.storage.DataProvider#getValue(java.lang.Object, java.lang.Object)
+	 * @see org.jppf.task.storage.DataProvider#setValue(java.lang.Object, java.lang.Object)
 	 */
-	public void getValue(Object key, Object value)
+	public void setValue(Object key, Object value)
 	{
 		store.put(key, value);
 	}

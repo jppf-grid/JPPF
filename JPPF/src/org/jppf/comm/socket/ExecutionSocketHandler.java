@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.*;
 import org.jppf.comm.*;
 import org.jppf.task.*;
+import org.jppf.task.admin.*;
 
 /**
  * Instances of this class handle execution requests sent over a TCP socket connection.
@@ -54,7 +55,9 @@ public class ExecutionSocketHandler extends AbstractSocketHandler
 		Exception e = null;
 		try
 		{
-			Response<?> response = execService.executeRequest(request);
+			RequestQueue requestQueue = RequestQueueFactory.getLocalQueue();
+			Response<?> response = requestQueue.submitBlocking(request);
+			//Response<?> response = execService.executeRequest(request);
 			socketClient.send(response);
 			response.clearContent();
 		}
