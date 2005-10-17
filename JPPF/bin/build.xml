@@ -43,11 +43,11 @@
 	<!--                                    Clean                                  -->
 	<!-- ========================================================================= -->
 
-  <target name="clean">
+  <target name="clean" description="">
     <delete dir="${build}" quiet="true"/>
   </target>               
 
-  <target name="clean.deploy">
+  <target name="clean.deploy" description="clean the deploy folder">
     <delete dir="${deploy}" quiet="true"/>
   </target>               
 
@@ -73,16 +73,9 @@
 	<!--                           Build the application                           -->
 	<!-- ========================================================================= -->
 
-  <target name="build" depends="init, compile, jar">
-  </target>
-
-	<target name="rebuild" description="rebuild the application"
-		depends="clean, init, compile, jar">
-	</target>
-
-	<target name="deploy" description="deploy the application"
-		depends="clean.deploy, rebuild, javadoc, init.deploy, package">
-	</target>
+  <target name="build" depends="init, compile, jar"/>
+	<target name="rebuild" depends="clean, init, compile, jar"/>
+	<target name="deploy" depends="clean.deploy, rebuild, javadoc, doc, init.deploy, package"/>
 
 	<!-- ========================================================================= -->
 	<!--                         Compile the application                           -->
@@ -142,11 +135,16 @@
 				<include name="api/**/*.*"/>
 			</fileset>
 		</copy>
+		<copy todir="${deploy}/docs">
+			<fileset dir="${docs}/home">
+				<include name="manual/**/*.*"/>
+			</fileset>
+		</copy>
 		<copy todir="${deploy}/examples">
 			<fileset dir="${examples}"/>
 		</copy>
-		<!-- Format the build number to a 4 figures integer with trailing zeroes if required -->
-		<!-- The build number is also incremented by 1                                       -->
+		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
+		<!-- The build number is also incremented by 1                                      -->
 		<propertyfile file="${build.number.file}">
 			<entry key="build.number" type="int" default="0000" operation="+" pattern="0000" />
 		</propertyfile>
@@ -167,12 +165,39 @@
 	<!--                     Build the web site content                            -->
 	<!-- ========================================================================= -->
 
-	<target name="home.doc" description="generates the project web site pages">
+  <target name="doc" depends="doc.home, doc.manual">
+    <delete dir="${docs}/home/manual" quiet="true"/>
+ 		<mkdir dir="${docs}/home/manual"/>
+		<copy todir="${docs}/home/manual">
+			<fileset dir="${docs}/manual">
+				<include name="*.*"/>
+				<include name="images/*.*"/>
+			</fileset>
+		</copy>
+	</target>
+
+  <target name="doc.home" description="generates the project web site pages">
+		<antcall target="doc.gen">
+			<param name="source" value="docs/home/doc-source"/>
+			<param name="dest" value="docs/home/"/>
+			<param name="templates" value="docs/home/templates/"/>
+		</antcall>
+	</target>
+
+	<target name="doc.manual" description="generates the project web site pages">
+		<antcall target="doc.gen">
+			<param name="source" value="docs/manual/doc-source"/>
+			<param name="dest" value="docs/manual/"/>
+			<param name="templates" value="docs/home/templates/"/>
+		</antcall>
+	</target>
+
+	<target name="doc.gen" description="generates the project web site pages">
 		<java fork="yes" classname="org.jppf.doc.HtmlDocGenerator" classpathref="run.classpath">
 			<jvmarg value="-Xmx128m" />
-			<arg value="docs/home/doc-source"/>
-			<arg value="docs/home/"/>
-			<arg value="docs/home/templates/"/>
+			<arg value="${source}"/>
+			<arg value="${dest}"/>
+			<arg value="${templates}"/>
 		</java>       
 	</target>
 
@@ -193,7 +218,11 @@
 				<![CDATA[
 					<table>
 					<tr>
-						<td valign="center"><img src="http://jppf-project.sourceforge.net/images/jppf-logo.jpg" width="66" height="26"/></td>
+						<td valign="center">
+							<a href="http://jppf-project.sourceforge.net" target="_top">
+								<img src="http://jppf-project.sourceforge.net/images/jppf-logo.jpg" border="0" width="66" height="26"/>
+							</a>
+						</td>
 						<td valign="center"><font face="Arial" color="#000000">&nbsp;&nbsp;Java Parallel Processing Framework</font></td>
 					</tr>
 					</table>
