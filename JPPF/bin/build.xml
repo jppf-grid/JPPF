@@ -22,6 +22,7 @@
 	<property name="javadoc" value="${docs}/api"/>
 	<property name="app.jar.file" value="${ant.project.name}.jar"/>
 	<property name="license.file" value="LICENSE.txt"/>
+	<property name="runtime" value="${deploy}/runtime"/>	
 
 	<!-- ========================================================================= -->
 	<!--                           Classpath definitions                           -->
@@ -33,6 +34,11 @@
 			<include name="**/*.jar"/>
 		</fileset>
 	</path>
+
+  <path id="javadoc.classpath">
+		<pathelement location="${bin}"/>
+    <path refid="project.classpath"/>	
+  </path>
 
   <path id="run.classpath">
 		<pathelement location="${config}"/>
@@ -49,6 +55,7 @@
 
   <target name="clean.deploy" description="clean the deploy folder">
     <delete dir="${deploy}" quiet="true"/>
+	  <delete dir="${runtime}" quiet="true"/>
   </target>               
 
 	<!-- ========================================================================= -->
@@ -67,6 +74,7 @@
  		<mkdir dir="${deploy}/examples"/>
  		<mkdir dir="${deploy.config}"/>
 		<mkdir dir="${deploy.lib}"/>
+ 		<mkdir dir="${runtime}/classes"/>
 	</target>
 
 	<!-- ========================================================================= -->
@@ -75,7 +83,7 @@
 
   <target name="build" depends="init, compile, jar"/>
 	<target name="rebuild" depends="clean, init, compile, jar"/>
-	<target name="deploy" depends="clean.deploy, rebuild, javadoc, doc, init.deploy, package"/>
+	<target name="deploy" depends="clean.deploy, rebuild, javadoc, doc, init.deploy, package, runtime"/>
 
 	<!-- ========================================================================= -->
 	<!--                         Compile the application                           -->
@@ -143,6 +151,9 @@
 		<copy todir="${deploy}/examples">
 			<fileset dir="${examples}"/>
 		</copy>
+		<copy tofile="${deploy}/README.html" file="${basedir}/index.html"/>
+		<copy tofile="${deploy}/docs/manual/jppf.css" file="${docs}/home/jppf.css"/>
+		<copy tofile="${deploy}/docs/manual/README.html" file="${docs}/home/center-readme.html"/>
 		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
 		<!-- The build number is also incremented by 1                                      -->
 		<propertyfile file="${build.number.file}">
@@ -160,6 +171,33 @@
 			<zipfileset dir="${deploy}" includes="**/*.*" prefix="${ant.project.name}-${version.number}"/>
 		</zip>
 	</target>
+
+	<!-- ========================================================================= -->
+	<!--                 Package the runtime components for deployment             -->
+	<!-- ========================================================================= -->
+
+	<target name="runtime" description="" depends="rebuild">
+		<copy tofile="${runtime}/lib/${app.jar.file}" file="${build}/${app.jar.file}"/>
+		<copy todir="${runtime}/lib">
+			<fileset dir="${lib}"/>
+		</copy>
+		<copy tofile="${runtime}/${license.file}" file="${basedir}/${license.file}"/>
+		<copy todir="${runtime}/config">
+			<fileset dir="${config}">
+				<exclude name="eclipse"/>
+				<exclude name="eclipse/*.*"/>
+			</fileset>
+		</copy>
+		<copy tofile="${runtime}/build.xml" file="${bin}/runtime-build.xml"/>
+		<property name="runtime.file"
+			value="${build}/${ant.project.name}-full-${version.number}.${build.number}-${now}-runtime.zip"/>
+		<delete file="${runtime.file}" quiet="true"/>
+		<zip destfile="${runtime.file}">
+			<zipfileset dir="${runtime}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-runtime"/>
+		</zip>
+	</target>
+
+	
 
 	<!-- ========================================================================= -->
 	<!--                     Build the web site content                            -->
@@ -209,7 +247,7 @@
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
 		<javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"
-			packagenames="**/*.*" classpathref="project.classpath" verbose="false" use="true"
+			packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true"
 			stylesheetfile="${bin}/javadoc.css" additionalparam="-quiet">
 			<packageset dir="${src}"/>
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
@@ -234,6 +272,11 @@
 				]]>
 			</bottom>
 		</javadoc>
+		<copy todir="${docs}/api/resources" overwrite="true">
+			<fileset dir="${bin}">
+				<include name="inherit.gif"/>
+			</fileset>
+		</copy>
 	</target>
 
 </project> 
