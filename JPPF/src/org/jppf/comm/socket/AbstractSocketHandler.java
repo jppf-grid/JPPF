@@ -153,7 +153,7 @@ public abstract class AbstractSocketHandler extends Thread
 	 */
 	public void addSocketExceptionListener(SocketExceptionListener listener)
 	{
-		socketClient.removeSocketExceptionListener(listener);
+		socketClient.addSocketExceptionListener(listener);
 	}
 
 	/**

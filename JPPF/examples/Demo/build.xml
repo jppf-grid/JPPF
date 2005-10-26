@@ -1,0 +1,138 @@
+<project name='LocalTest' default="build" basedir=".">
+
+	<!-- ========================================================================= -->
+	<!--                          Property definitions                             -->
+	<!-- ========================================================================= -->
+
+	<property name="jppf.dir" value="${basedir}/../.."/>
+	<property name="jppf.lib.dir" value="${jppf.dir}/lib"/>
+	<property name="jppf.build.dir" value="${jppf.dir}/build"/>
+	<property name="config.dir" value="${basedir}/config"/>
+	<property name="classes.dir" value="${basedir}/classes"/>	
+	<property name="src.dir" value="${basedir}/src"/>
+
+	<!-- ========================================================================= -->
+	<!--                           Classpath definitions                           -->
+	<!-- ========================================================================= -->
+
+	<path id="project.classpath">
+		<pathelement location="${classes.dir}"/>
+		<pathelement location="${jppf.dir}/classes"/>
+		<fileset dir="${jppf.lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+  <path id="run.classpath">
+		<pathelement location="${config.dir}"/>
+		<pathelement location="${basedir}"/>
+    <path refid="project.classpath"/>	
+  </path>
+
+	<!-- ========================================================================= -->
+	<!--                                    Clean                                  -->
+	<!-- ========================================================================= -->
+
+  <target name="clean">
+    <delete dir="${classes.dir}" quiet="true"/>
+  </target>               
+
+	<!-- ========================================================================= -->
+	<!--                                    Init                                   -->
+	<!-- ========================================================================= -->
+
+	<target name="init" description="Initialize ressources">
+ 		<mkdir dir="${classes.dir}"/>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                           Build the application                           -->
+	<!-- ========================================================================= -->
+
+  <target name="build" depends="init, compile"/>
+
+	<target name="rebuild" depends="clean, init, compile"/>
+
+	<!-- ========================================================================= -->
+	<!--                         Compile the application                           -->
+	<!-- ========================================================================= -->
+
+	<target name="compile" description="Compile" depends="init">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+		</javac>
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}">
+				<exclude name="**/*.java"/>
+				<exclude name="**/*.html"/>
+			</fileset>
+		</copy>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--                     Run the test processes                                -->
+	<!-- ========================================================================= -->
+
+	<target name="run">
+		<parallel>
+			<antcall target="run.2"/>
+			<sequential>
+				<sleep milliseconds="5000"/>
+				<antcall target="run.gui"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="10000"/>
+				<antcall target="run.1"/>
+			</sequential>
+		</parallel>
+	</target>
+
+	<target name="run.1">
+		<java fork="yes" classname="sample.matrix.MatrixRunner" classpathref="run.classpath">
+			<jvmarg value="-server" />
+			<jvmarg value="-Xmx128m" />
+			<jvmarg value="-Dmaster.properties.file=${config.dir}/master-test-1.properties" />
+			<jvmarg value="-Dlog4j.configuration=log4j-test-1.properties" />
+		</java>       
+	</target>
+
+	<target name="run.2">
+		<java fork="yes" classname="org.jppf.task.admin.ServiceManagerImpl" classpathref="run.classpath">
+			<jvmarg value="-server" />
+			<jvmarg value="-Xmx128m" />
+			<jvmarg value="-Dmaster.properties.file=${config.dir}/master-test-2.properties" />
+			<jvmarg value="-Dlog4j.configuration=log4j-test-2.properties" />
+		</java>       
+	</target>
+
+	<target name="run.3">
+		<java fork="yes" classname="org.jppf.task.admin.ServiceManagerImpl" classpathref="run.classpath">
+			<jvmarg value="-server" />
+			<jvmarg value="-Xmx128m" />
+			<jvmarg value="-Dmaster.properties.file=${config.dir}/master-test-3.properties" />
+			<jvmarg value="-Dlog4j.configuration=log4j-test-3.properties" />
+		</java>       
+	</target>
+
+	<target name="run.gui">
+		<java fork="yes" classname="org.jppf.task.admin.ui.GUILauncher" classpathref="run.classpath">
+			<jvmarg value="-server" />
+			<jvmarg value="-Xmx128m" />
+			<jvmarg value="-Dmaster.properties.file=${config.dir}/master-GUI.properties" />
+			<jvmarg value="-Dlog4j.configuration=log4j-GUI.properties" />
+		</java>       
+	</target>
+
+	<target name="run.framework">
+		<parallel>
+			<antcall target="run.2"/>
+			<sequential>
+				<sleep milliseconds="5000"/>
+				<antcall target="run.gui"/>
+			</sequential>
+		</parallel>
+	</target>
+
+</project> 
