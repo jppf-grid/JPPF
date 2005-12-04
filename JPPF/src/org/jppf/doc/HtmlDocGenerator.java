@@ -55,7 +55,7 @@ public class HtmlDocGenerator
 	/**
 	 * End of a content parameter value.
 	 */
-	private static final String CONTENT_END = "]";
+	private static final String CONTENT_END = "]CONTENT$";
 	/**
 	 * Separator for parameter nane/value pair.
 	 */
@@ -160,7 +160,8 @@ public class HtmlDocGenerator
 				{
 					pos += CONTENT_START.length();
 					index = templateCall.indexOf(CONTENT_END+QUOTE, pos);
-					if (index < 0) throw new Exception("Missing closing content string for parameter '"+paramName+"'");
+					if (index < 0) throw new Exception("Missing closing content string for parameter '"+paramName+"' in template call: '"
+							+ templateCall + "'");
 					paramValue = templateCall.substring(pos, index).trim();
 					paramValue = processParameters(callerMap, paramValue);
 					pos = index + (CONTENT_END+QUOTE).length();
@@ -255,7 +256,7 @@ public class HtmlDocGenerator
 					int idx = s.lastIndexOf(".");
 					if (idx < 0) return false;
 					s = s.substring(idx);
-					return ".html".equalsIgnoreCase(s) || ".htm".equalsIgnoreCase(s);
+					return ".html".equalsIgnoreCase(s) || ".htm".equalsIgnoreCase(s) || ".php".equalsIgnoreCase(s);
 				}
 			};
 			HtmlDocGenerator docGen = new HtmlDocGenerator();

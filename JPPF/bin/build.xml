@@ -12,9 +12,12 @@
 	<property name="config" value="${basedir}/config"/>	
 	<property name="build" value="${basedir}/build"/>	
 	<property name="deploy" value="${build}/deploy"/>	
-	<property name="deploy.lib" value="${deploy}/lib"/>	
+	<property name="deploy.lib" value="${deploy}/lib"/>
+	<property name="deploy.build" value="${deploy}/build"/>
 	<property name="deploy.config" value="${deploy}/config"/>	
-	<property name="classes" value="${build}/classes"/>	
+	<property name="classes" value="${build}/classes"/>
+	<property name="bootstrap.classes" value="${build}/bootstrap"/>
+	<property name="bootstrap.src" value="${basedir}/bootstrap"/>
 	<property name="src" value="${basedir}/src"/>
 	<property name="lib" value="${basedir}/lib"/>
 	<property name="docs" value="${basedir}/docs"/>
@@ -30,6 +33,7 @@
 
 	<path id="project.classpath">
 		<pathelement location="${classes}"/>
+		<pathelement location="${bootstrap.classes}"/>
 		<fileset dir="${lib}">
 			<include name="**/*.jar"/>
 		</fileset>
@@ -63,17 +67,21 @@
 	<!-- ========================================================================= -->
 
 	<target name="init" description="Initialize ressources">
+ 		<mkdir dir="${bootstrap.classes}"/>
  		<mkdir dir="${classes}"/>
 	</target>
 
 	<target name="init.deploy" description="Initialize ressources">
  		<mkdir dir="${deploy}"/>
  		<mkdir dir="${deploy}/src"/>
- 		<mkdir dir="${deploy}/classes"/>
+ 		<mkdir dir="${deploy}/bootstrap"/>
+ 		<mkdir dir="${deploy.build}/classes"/>
+ 		<mkdir dir="${deploy.build}/bootstrap"/>
  		<mkdir dir="${deploy}/docs"/>
  		<mkdir dir="${deploy}/examples"/>
  		<mkdir dir="${deploy.config}"/>
 		<mkdir dir="${deploy.lib}"/>
+		<mkdir dir="${deploy.build}"/>
  		<mkdir dir="${runtime}/classes"/>
 	</target>
 
@@ -90,6 +98,17 @@
 	<!-- ========================================================================= -->
 
 	<target name="compile" description="Compile" depends="init">
+		<javac srcdir="${bootstrap.src}" destdir="${bootstrap.classes}"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+		</javac>
+		<copy todir="${bootstrap.classes}">
+			<fileset dir="${basedir}/bootstrap">
+				<exclude name="**/*.java"/>
+				<exclude name="**/package.html"/>
+			</fileset>
+		</copy>
 		<javac srcdir="${src}" destdir="${classes}"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 	    <classpath refid="project.classpath"/>
@@ -110,6 +129,10 @@
 	<target name="jar" description="generates the application jar" depends="compile">
     <jar jarfile="${build}/${app.jar.file}">
 			<fileset dir="${classes}"/>
+			<fileset dir="${bootstrap.classes}"/>
+		</jar>
+    <jar jarfile="${build}/bootstrap-${app.jar.file}">
+			<fileset dir="${bootstrap.classes}"/>
 		</jar>
 	</target>
 
@@ -117,8 +140,9 @@
 	<!--                 Package the application for deployment                    -->
 	<!-- ========================================================================= -->
 
-	<target name="package" description="generates the application jar" depends="rebuild">
+	<target name="package" description="package the application into a release zip file" depends="rebuild">
 		<copy tofile="${deploy}/${app.jar.file}" file="${build}/${app.jar.file}"/>
+		<copy tofile="${deploy}/bootstrap-${app.jar.file}" file="${build}/bootstrap-${app.jar.file}"/>
 		<copy tofile="${deploy}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${deploy.lib}">
 			<fileset dir="${lib}"/>
@@ -132,8 +156,14 @@
 		<copy todir="${deploy}/src">
 			<fileset dir="${src}"/>
 		</copy>
-		<copy todir="${deploy}/classes">
+		<copy todir="${deploy}/bootstrap">
+			<fileset dir="${bootstrap.src}"/>
+		</copy>
+		<copy todir="${deploy.build}/classes">
 			<fileset dir="${classes}"/>
+		</copy>
+		<copy todir="${deploy.build}/bootstrap">
+			<fileset dir="${bootstrap.classes}"/>
 		</copy>
 		<copy todir="${deploy}/bin">
 			<fileset dir="${bin}"/>
@@ -168,7 +198,7 @@
 			value="${build}/${ant.project.name}-full-${version.number}.${build.number}-${now}.zip"/>
 		<delete file="${release.file}" quiet="true"/>
 		<zip destfile="${release.file}">
-			<zipfileset dir="${deploy}" includes="**/*.*" prefix="${ant.project.name}-${version.number}"/>
+			<zipfileset dir="${deploy}" prefix="${ant.project.name}-${version.number}"/>
 		</zip>
 	</target>
 
@@ -177,10 +207,9 @@
 	<!-- ========================================================================= -->
 
 	<target name="runtime" description="" depends="rebuild">
-		<copy tofile="${runtime}/lib/${app.jar.file}" file="${build}/${app.jar.file}"/>
-		<copy todir="${runtime}/lib">
-			<fileset dir="${lib}"/>
-		</copy>
+		<copy tofile="${runtime}/lib/bootstrap-${app.jar.file}" file="${build}/bootstrap-${app.jar.file}"/>
+		<copy tofile="${runtime}/lib/Add_Your_Jars_In_This_Folder.tmp" file="${lib}/Add_Your_Jars_In_This_Folder.tmp"/>
+		<copy tofile="${runtime}/classes/Add_Your_Classes_In_This_Folder.tmp" file="${bootstrap.classes}/Add_Your_Classes_In_This_Folder.tmp"/>
 		<copy tofile="${runtime}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime}/config">
 			<fileset dir="${config}">
@@ -190,7 +219,7 @@
 		</copy>
 		<copy tofile="${runtime}/build.xml" file="${bin}/runtime-build.xml"/>
 		<property name="runtime.file"
-			value="${build}/${ant.project.name}-full-${version.number}.${build.number}-${now}-runtime.zip"/>
+			value="${build}/${ant.project.name}-runtime-${version.number}.${build.number}-${now}.zip"/>
 		<delete file="${runtime.file}" quiet="true"/>
 		<zip destfile="${runtime.file}">
 			<zipfileset dir="${runtime}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-runtime"/>

@@ -24,7 +24,7 @@ import org.jppf.comm.*;
 import org.jppf.task.*;
 import org.jppf.task.admin.*;
 import org.jppf.task.storage.*;
-import org.jppf.utils.PropertyManager;
+import org.jppf.utils.*;
 
 /**
  * RUnner class for the Mattrix example.
@@ -47,8 +47,9 @@ public class MatrixRunner
 	{
 		try
 		{
-			int size = PropertyManager.getInt("test", "matrix.size");
-			int iterations = PropertyManager.getInt("test", "matrix.iterations");
+			TypedProperties props = JPPFConfiguration.getProperties();
+			int size = props.getInt("matrix.size");
+			int iterations = props.getInt("matrix.iterations");
 			perform(size, iterations);
 		}
 		catch(Exception e)
@@ -88,6 +89,7 @@ public class MatrixRunner
 			RequestQueue requestQueue = RequestQueueFactory.getRemoteQueue();
 			// submit the execution request and wait for its completion
 			ExecutionResponse response = (ExecutionResponse) requestQueue.submitBlocking(request);
+			if (response.getException() != null) throw response.getException();
 			// initialize the resulting matrix
 			Matrix c = new Matrix(size);
 			// Get the matrix c values from the tasks results

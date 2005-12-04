@@ -16,38 +16,28 @@
  * 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307 USA
  */
-package org.jppf.comm.socket;
+package org.jppf.classloader;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
-import org.apache.log4j.Logger;
-import org.jppf.classloader.ClassServer;
-import org.jppf.task.*;
+import org.jppf.classloader.JPPFBootstrapException;
+import org.jppf.utils.*;
 
 /**
  * Abstract super class for all socket servers.
  * @author Laurent Cohen
  */
-public abstract class AbstractSocketServer extends Thread
+public class ClassServer extends Thread
 {
 	/**
-	 * Log4j logger for this class.
+	 * A list of the remote resource provider connections handled by this socket server.
 	 */
-	private static Logger log = Logger.getLogger(ClassServer.class);
-
-	/**
-	 * A list of the remote connections handled by this socket server.
-	 */
-	protected List<AbstractSocketHandler> connections = new Vector<AbstractSocketHandler>();
+	protected List<ClassServerConnection> providerConnections = new Vector<ClassServerConnection>();
 	/**
 	 * Server socket listening for requests on the configured port.
 	 */
 	protected ServerSocket server = null;
-	/**
-	 * The execution service to which execution requests are delegated.
-	 */
-	protected ExecutionService execService = null;
 	/**
 	 * Flag indicating that this socket server is closed.
 	 */
@@ -59,14 +49,12 @@ public abstract class AbstractSocketServer extends Thread
 
 	/**
 	 * Initialize this socket server with a specified execution service and port number.
-	 * @param execService the execution service to which execution requests are delegated.
 	 * @param port the port this socket server is listening to.
-	 * @throws ExecutionServiceException if the underlying server socket can't be opened.
+	 * @throws JPPFBootstrapException if the underlying server socket can't be opened.
 	 */
-	public AbstractSocketServer(ExecutionService execService, int port) throws ExecutionServiceException
+	public ClassServer(int port) throws JPPFBootstrapException
 	{
 		this.port = port;
-		this.execService = execService;
 		init(port);
 	}
 	
@@ -87,7 +75,7 @@ public abstract class AbstractSocketServer extends Thread
 		}
 		catch (Throwable t)
 		{
-			log.error(t.getMessage(), t);
+			t.printStackTrace();
 			end();
 		}
 	}
@@ -95,11 +83,11 @@ public abstract class AbstractSocketServer extends Thread
 	/**
 	 * Start serving a new incoming connection.
 	 * @param socket the socket connecting with this socket server.
-	 * @throws ExecutionServiceException if the new connection can't be initialized.
+	 * @throws JPPFBootstrapException if the new connection can't be initialized.
 	 */
-	protected void serve(Socket socket) throws ExecutionServiceException
+	protected void serve(Socket socket) throws JPPFBootstrapException
 	{
-		AbstractSocketHandler handler = createHandler(socket);
+		ClassServerConnection handler = createHandler(socket);
 		//connections.add(sc);
 		handler.start();
 	}
@@ -110,16 +98,19 @@ public abstract class AbstractSocketServer extends Thread
 	 * @param socket the socket connection obtained through a call to
 	 * {@link java.net.ServerSocket#accept() ServerSocket.accept()}.
 	 * @return a <code>JPPFServerConnection</code> instance.
-	 * @throws ExecutionServiceException if an exception is raised while creating the socket handler.
+	 * @throws JPPFBootstrapException if an exception is raised while creating the socket handler.
 	 */
-	protected abstract AbstractSocketHandler createHandler(Socket socket) throws ExecutionServiceException;
+	protected ClassServerConnection createHandler(Socket socket) throws JPPFBootstrapException
+	{
+		return new ClassServerConnection(this, socket);
+	}
 
 	/**
 	 * Initialize the underlying server socket with a specified port.
 	 * @param port the port the underlying server listens to.
-	 * @throws ExecutionServiceException if the server socket can't be opened on the specified port.
+	 * @throws JPPFBootstrapException if the server socket can't be opened on the specified port.
 	 */
-	protected void init(int port) throws ExecutionServiceException
+	protected void init(int port) throws JPPFBootstrapException
 	{
 		Exception e = null;
 		try
@@ -140,8 +131,7 @@ public abstract class AbstractSocketServer extends Thread
 		}
 		if (e != null)
 		{
-			log.error(e.getMessage(), e);
-			throw new ExecutionServiceException(e.getMessage(), e);
+			throw new JPPFBootstrapException(e.getMessage(), e);
 		}
 	}
 
@@ -156,12 +146,38 @@ public abstract class AbstractSocketServer extends Thread
 			{
 				stop = true;
 				server.close();
-				for (AbstractSocketHandler sc: connections) sc.setClosed();
+				for (ClassServerConnection sc: providerConnections) sc.setClosed();
 			}
 			catch(IOException ioe)
 			{
-				log.error(ioe.getMessage(), ioe);
+				ioe.printStackTrace();
 			}
 		}
+	}
+	
+	/**
+	 * Start this class server from the command line.
+	 * @param args not used.
+	 */
+	public static void main(String...args)
+	{
+		try
+		{
+			TypedProperties props = JPPFConfiguration.getProperties();
+			new ClassServer(props.getInt("class.server.port", 11111)).start();
+		}
+		catch(Throwable t)
+		{
+			t.printStackTrace();
+		}
+	}
+
+	/**
+	 * Get the list of active resource provider connections fro this class server.
+	 * @return a list of <code>JPPFServerConnection</code> instances.
+	 */
+	public List<ClassServerConnection> getProviderConnections()
+	{
+		return providerConnections;
 	}
 }

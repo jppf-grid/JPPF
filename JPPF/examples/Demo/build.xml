@@ -4,9 +4,9 @@
 	<!--                          Property definitions                             -->
 	<!-- ========================================================================= -->
 
-	<property name="jppf.dir" value="${basedir}/../.."/>
-	<property name="jppf.lib.dir" value="${jppf.dir}/lib"/>
-	<property name="jppf.build.dir" value="${jppf.dir}/build"/>
+	<property name="jppf" value="${basedir}/../.."/>
+	<property name="jppf.lib" value="${jppf}/lib"/>
+	<property name="jppf.build" value="${jppf}/build"/>
 	<property name="config.dir" value="${basedir}/config"/>
 	<property name="classes.dir" value="${basedir}/classes"/>	
 	<property name="src.dir" value="${basedir}/src"/>
@@ -17,15 +17,33 @@
 
 	<path id="project.classpath">
 		<pathelement location="${classes.dir}"/>
-		<pathelement location="${jppf.dir}/classes"/>
-		<fileset dir="${jppf.lib.dir}">
+		<pathelement location="${jppf.build}/bootstrap"/>
+		<pathelement location="${jppf.build}/classes"/>
+		<fileset dir="${jppf.lib}">
 			<include name="**/*.jar"/>
 		</fileset>
 	</path>
 
-  <path id="run.classpath">
+  <path id="node.classpath">
 		<pathelement location="${config.dir}"/>
-		<pathelement location="${basedir}"/>
+		<pathelement location="${jppf.build}/bootstrap"/>
+  </path>
+
+  <path id="gui.classpath">
+		<pathelement location="${config.dir}"/>
+    <path refid="project.classpath"/>	
+  </path>
+
+  <path id="client.classpath">
+		<pathelement location="${config.dir}"/>
+		<pathelement location="${classes.dir}"/>
+		<pathelement location="${jppf.build}/classes"/>
+		<pathelement location="${jppf.build}/bootstrap"/>
+		<pathelement location="${jppf.lib}/log4j/log4j-1.2.9.jar"/>
+  </path>
+
+  <path id="class.server.classpath">
+		<pathelement location="${config.dir}"/>
     <path refid="project.classpath"/>	
   </path>
 
@@ -77,51 +95,74 @@
 
 	<target name="run">
 		<parallel>
-			<antcall target="run.2"/>
+			<antcall target="run.class.server"/>
 			<sequential>
 				<sleep milliseconds="5000"/>
-				<antcall target="run.gui"/>
-			</sequential>
-			<sequential>
-				<sleep milliseconds="10000"/>
-				<antcall target="run.1"/>
+				<antcall target="run.local"/>
 			</sequential>
 		</parallel>
 	</target>
 
-	<target name="run.1">
-		<java fork="yes" classname="sample.matrix.MatrixRunner" classpathref="run.classpath">
-			<jvmarg value="-server" />
-			<jvmarg value="-Xmx128m" />
-			<jvmarg value="-Dmaster.properties.file=${config.dir}/master-test-1.properties" />
-			<jvmarg value="-Dlog4j.configuration=log4j-test-1.properties" />
+	<target name="run.local">
+		<parallel>
+			<antcall target="run.node1"/>
+			<sequential>
+				<sleep milliseconds="3000"/>
+				<antcall target="run.gui"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="10000"/>
+				<antcall target="run.client"/>
+			</sequential>
+		</parallel>
+	</target>
+
+	<target name="run.client">
+		<echo message="starting the demo application"/>
+		<java fork="yes" classname="sample.matrix.MatrixRunner" classpathref="client.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-client.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
 		</java>       
 	</target>
 
-	<target name="run.2">
-		<java fork="yes" classname="org.jppf.task.admin.ServiceManagerImpl" classpathref="run.classpath">
-			<jvmarg value="-server" />
-			<jvmarg value="-Xmx128m" />
-			<jvmarg value="-Dmaster.properties.file=${config.dir}/master-test-2.properties" />
-			<jvmarg value="-Dlog4j.configuration=log4j-test-2.properties" />
+	<target name="run.node1">
+		<echo message="starting local node"/>
+		<java fork="yes" classname="org.jppf.classloader.NodeLauncher" classpathref="node.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=node1.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-node1.properties"/>
 		</java>       
 	</target>
 
-	<target name="run.3">
-		<java fork="yes" classname="org.jppf.task.admin.ServiceManagerImpl" classpathref="run.classpath">
-			<jvmarg value="-server" />
-			<jvmarg value="-Xmx128m" />
-			<jvmarg value="-Dmaster.properties.file=${config.dir}/master-test-3.properties" />
-			<jvmarg value="-Dlog4j.configuration=log4j-test-3.properties" />
+	<target name="run.node2">
+		<java fork="yes" classname="org.jppf.classloader.NodeLauncher" classpathref="node.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=node2.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-node2.properties"/>
 		</java>       
 	</target>
 
 	<target name="run.gui">
-		<java fork="yes" classname="org.jppf.task.admin.ui.GUILauncher" classpathref="run.classpath">
-			<jvmarg value="-server" />
-			<jvmarg value="-Xmx128m" />
-			<jvmarg value="-Dmaster.properties.file=${config.dir}/master-GUI.properties" />
-			<jvmarg value="-Dlog4j.configuration=log4j-GUI.properties" />
+		<echo message="starting the GUI"/>
+		<java fork="yes" classname="org.jppf.task.admin.ui.GUILauncher" classpathref="gui.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-GUI.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-GUI.properties"/>
+		</java>       
+	</target>
+
+	<target name="run.class.server">
+		<echo message="starting the class server"/>
+		<java fork="yes" classname="org.jppf.classloader.ClassServer" classpathref="class.server.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx32m"/>
+			<jvmarg value="-Dmaster.properties.file=${config.dir}/master-GUI.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-GUI.properties"/>
 		</java>       
 	</target>
 

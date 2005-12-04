@@ -46,9 +46,9 @@ public class ExecutionSocketServer extends AbstractSocketServer
 	 * Instanciate a socket handler that will handle the socket connection obtained through
 	 * this socket server. 
 	 * @param socket the socket conneciton to handle.
-	 * @return an <code>AbstractSocketHandler</code> instance.
+	 * @return an <code>JPPFServerConnection</code> instance.
 	 * @throws ExecutionServiceException if an error occurs while instanciating the socket handler.
-	 * @see org.jppf.comm.socket.AbstractSocketServer#createHandler(java.net.Socket)
+	 * @see org.jppf.classloader.ClassServer#createHandler(java.net.Socket)
 	 */
 	protected AbstractSocketHandler createHandler(Socket socket) throws ExecutionServiceException
 	{

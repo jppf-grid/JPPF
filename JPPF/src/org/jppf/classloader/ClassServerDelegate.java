@@ -16,25 +16,26 @@
  * 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307 USA
  */
-package org.jppf.comm.socket;
+package org.jppf.classloader;
 
-import java.net.Socket;
+import java.io.IOException;
+import java.net.ConnectException;
 import org.apache.log4j.Logger;
-import org.jppf.comm.*;
-import org.jppf.task.*;
+import org.jppf.comm.socket.SocketClient;
 
 /**
- * Common abstract superclass for classes handling a socket connection to a remote host,
- * obtained from the {@link java.net.ServerSocket#accept() ServerSocket.accept()} method.
+ * Wrapper around an incoming socket connection, whose role is to receive the names of classes
+ * to load from the classpath, then send the class files' contents to the remote client.
+ * <p>Instances of this class are part of the JPPF dynamic class loading mechanism. The enable remote nodes
+ * to dynamically load classes from the JVM that run's the class server.
  * @author Laurent Cohen
  */
-public abstract class AbstractSocketHandler extends Thread
+public class ClassServerDelegate extends Thread
 {
 	/**
 	 * Log4j logger for this class.
 	 */
-	private static Logger log = Logger.getLogger(AbstractSocketHandler.class);
-
+	private static Logger log = Logger.getLogger(ClassServerDelegate.class);
 	/**
 	 * The socket client uses to communicate over a socket connection.
 	 */
@@ -48,21 +49,20 @@ public abstract class AbstractSocketHandler extends Thread
 	 */
 	protected boolean closed = false;
 	/**
-	 * The execution service to which tasks execution is delegated.
+	 * Reads resource files from the classpath.
 	 */
-	protected ExecutionService execService = null;
+	protected ResourceProvider resourceProvider = new ResourceProvider();
 
 	/**
-	 * Initialize this socket handler with an open socket connection to a remote client, and
-	 * the execution service that will perform the tasks execution.
-	 * @param socket the socket connection from which requests are received and to which responses are sent.
-	 * @param execService the execution service used by this socket handler.
-	 * @throws ExecutionServiceException if this socket handler can't be initialized.
+	 * Initialize this connection with an open socket connection to a remote client.
+	 * @param host the host name of the class server.
+	 * @param port the port the class server is listening to.
+	 * @throws ConnectException if the connection could not be opended.
+	 * @throws IOException if the connection could not be opended.
 	 */
-	public AbstractSocketHandler(Socket socket, ExecutionService execService) throws ExecutionServiceException
+	public ClassServerDelegate(String host, int port) throws ConnectException, IOException
 	{
-		socketClient = new SocketClient(socket);
-		this.execService = execService;
+		socketClient = new SocketClient(host, port);
 	}
 
 	/**
@@ -70,9 +70,9 @@ public abstract class AbstractSocketHandler extends Thread
 	 * the following operations are performed:
 	 * <ol>
 	 * <li>if the stop flag is set to true, exit the loop</li>
-	 * <li>block until a request is received</li>
-	 * <li>when an execution request is received, delegate the execution to the associated execution service</li>
-	 * <li>send the response</li>
+	 * <li>block until a class name is received</li>
+	 * <li>when a class name is received, read the class file into a byte array from the classpath</li>
+	 * <li>send back the byte array defining the class to load remotely</li>
 	 * </ol>
 	 * @see java.lang.Runnable#run()
 	 */
@@ -80,28 +80,20 @@ public abstract class AbstractSocketHandler extends Thread
 	{
 		try
 		{
+			socketClient.send("provider");
 			while (!stop)
 			{
-				Request request = (Request) socketClient.receive();
-				perform(request);
+				String name = (String) socketClient.receive();
+				byte[] b = resourceProvider.getResourceAsBytes(name);
+				socketClient.send(b);
 			}
 		}
 		catch (Exception e)
 		{
 			log.error(e.getMessage(), e);
-		}
-		finally
-		{
 			setClosed();
 		}
 	}
-
-	/**
-	 * Perform the actual request execution. Subclasses must implement this method.
-	 * @param request the request to execute.
-	 * @throws ExecutionServiceException if an error occurs during the request execution.
-	 */
-	protected abstract void perform(Request request) throws ExecutionServiceException;
 
 	/**
 	 * Set the stop flag to true, indicating that this socket handler should be closed as
@@ -145,23 +137,5 @@ public abstract class AbstractSocketHandler extends Thread
 			log.error(e.getMessage(), e);
 		}
 		closed = true;
-	}
-
-	/**
-	 * Add a <code>SocketExceptionListener</code> to the list of listeners of the socket client.
-	 * @param listener the listener to add to the list.
-	 */
-	public void addSocketExceptionListener(SocketExceptionListener listener)
-	{
-		socketClient.addSocketExceptionListener(listener);
-	}
-
-	/**
-	 * Remove a <code>SocketExceptionListener</code> from the list of listeners of the socket client.
-	 * @param listener the listener to remove from the list.
-	 */
-	public void removeSocketExceptionListener(SocketExceptionListener listener)
-	{
-		socketClient.removeSocketExceptionListener(listener);
 	}
 }

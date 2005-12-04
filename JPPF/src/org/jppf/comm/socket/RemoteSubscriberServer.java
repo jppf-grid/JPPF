@@ -54,7 +54,7 @@ public class RemoteSubscriberServer extends AbstractSocketServer
 	}
 
 	/**
-	 * @see org.jppf.comm.socket.AbstractSocketServer#createHandler(java.net.Socket)
+	 * @see org.jppf.classloader.ClassServer#createHandler(java.net.Socket)
 	 */
 	protected AbstractSocketHandler createHandler(Socket socket) throws ExecutionServiceException
 	{

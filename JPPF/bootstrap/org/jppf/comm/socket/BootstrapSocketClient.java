@@ -20,15 +20,14 @@ package org.jppf.comm.socket;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
-import org.jppf.task.ExecutionServiceException;
-import org.jppf.utils.*;
+import org.jppf.classloader.JPPFBootstrapException;
+import org.jppf.utils.JPPFBuffer;
 
 /**
  * This class provides a simple API to transfer objects over a TCP socket connection.
  * @author Laurent Cohen
  */
-public class SocketClient
+public class BootstrapSocketClient
 {
 	/**
 	 * The underlying socket wrapped by this SocketClient.
@@ -55,21 +54,17 @@ public class SocketClient
 	 */
 	protected boolean opened = false;
 	/**
-	 * Holds the list of listeners for this SocketClient.
+	 * Buffer used to receive data from the socket connection.
 	 */
-	protected List<SocketExceptionListener> listeners = new ArrayList<SocketExceptionListener>();
-	/**
-	 * Used to serialize or deserialize an object into or from an array of bytes.
-	 */
-	protected ObjectSerializer serializer = null;
+	protected JPPFBuffer jppfBuffer = new JPPFBuffer();
 
 	/**
 	 * Default constructor is invisible to other classes.
-	 * See {@link org.jppf.comm.socket.SocketClient#SocketClient(java.lang.String, int) SocketClient(String, int)} and
-	 * {@link org.jppf.comm.socket.SocketClient#SocketClient(java.net.Socket) SocketClient(Socket)} for ways to
+	 * See {@link org.jppf.comm.socket.BootstrapSocketClient#BootstrapSocketClient(java.lang.String, int) BootstrapSocketClient(String, int)} and
+	 * {@link org.jppf.comm.socket.BootstrapSocketClient#BootstrapSocketClient(java.net.Socket) BootstrapSocketClient(Socket)} for ways to
 	 * instanciate a SocketClient. 
 	 */
-	private SocketClient()
+	protected BootstrapSocketClient()
 	{
 	}
 	
@@ -80,7 +75,7 @@ public class SocketClient
 	 * @throws ConnectException if the connection fails.
 	 * @throws IOException if there is an issue with the socket streams.
 	 */
-	public SocketClient(String host, int port) throws ConnectException, IOException
+	public BootstrapSocketClient(String host, int port) throws ConnectException, IOException
 	{
 		this.host = host;
 		this.port = port;
@@ -88,26 +83,11 @@ public class SocketClient
 	}
 	
 	/**
-	 * Initialize this socket client and connect it to the specified host on the specified port.
-	 * @param host the remote host this socket client connects to.
-	 * @param port the remote port on the host this socket client connects to.
-	 * @param serializer the object serializer used by this socket client.
-	 * @throws ConnectException if the connection fails.
-	 * @throws IOException if there is an issue with the socket streams.
-	 */
-	public SocketClient(String host, int port, ObjectSerializer serializer)
-		throws ConnectException, IOException
-	{
-		this(host, port);
-		this.serializer = serializer;
-	}
-	
-	/**
 	 * Initialize this socket client with an already opened and connected socket.
 	 * @param socket the underlying socket this socket client wraps around.
-	 * @throws ExecutionServiceException if the socket connection fails.
+	 * @throws JPPFBootstrapException if the socket connection fails.
 	 */
-	public SocketClient(Socket socket) throws ExecutionServiceException
+	public BootstrapSocketClient(Socket socket) throws JPPFBootstrapException
 	{
 		try
 		{
@@ -119,10 +99,10 @@ public class SocketClient
 		}
 		catch(IOException ioe)
 		{
-			throw new ExecutionServiceException(ioe.getMessage(), ioe);
+			throw new JPPFBootstrapException(ioe.getMessage(), ioe);
 		}
 	}
-
+	
 	/**
 	 * Send an object over a TCP socket connection.
 	 * @param o the object to send.
@@ -130,16 +110,16 @@ public class SocketClient
 	 */
 	public void send(Object o) throws IOException
 	{
-		try
-		{
-			JPPFBuffer buf = getSerializer().serialize(o);
-			sendBytes(buf);
-		}
-		catch(IOException e)
-		{
-			fireSocketExceptionEvent(e);
-			throw e;
-		}
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(baos);
+		oos.writeObject(o);
+		oos.flush();
+		// Remove references kept by the stream, otherwise leads to OutOfMemory.
+		JPPFBuffer buf = new JPPFBuffer();
+		buf.setBuffer(baos.toByteArray());
+		buf.setLength(baos.size());
+		oos.close();
+		sendBytes(buf);
 	}
 	
 	/**
@@ -149,18 +129,10 @@ public class SocketClient
 	 */
 	public void sendBytes(JPPFBuffer buf) throws IOException
 	{
-		try
-		{
-			checkOpened();
-			dos.writeInt(buf.getLength());
-			dos.write(buf.getBuffer(), 0, buf.getLength());
-			dos.flush();
-		}
-		catch(IOException e)
-		{
-			fireSocketExceptionEvent(e);
-			throw e;
-		}
+		checkOpened();
+		dos.writeInt(buf.getLength());
+		dos.write(buf.getBuffer(), 0, buf.getLength());
+		dos.flush();
 	}
 	
 	/**
@@ -191,17 +163,9 @@ public class SocketClient
 		{
 			if (timeout >= 0) socket.setSoTimeout(timeout);
 			JPPFBuffer buf = receiveBytes(timeout);
-			o = getSerializer().deserialize(buf);
-		}
-		catch(ClassNotFoundException e)
-		{
-			fireSocketExceptionEvent(e);
-			throw e;
-		}
-		catch(IOException e)
-		{
-			fireSocketExceptionEvent(e);
-			throw e;
+			ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength()));
+			o = ois.readObject();
+			ois.close();
 		}
 		finally
 		{
@@ -221,31 +185,25 @@ public class SocketClient
 	public JPPFBuffer receiveBytes(int timeout) throws IOException
 	{
 		checkOpened();
-		JPPFBuffer buf = new JPPFBuffer();
 		try
 		{
 			if (timeout >= 0) socket.setSoTimeout(timeout);
-			buf.setLength(dis.readInt());
-			if (buf.getLength() > buf.getBuffer().length) buf.setBuffer(new byte[buf.getLength()]);
+			jppfBuffer.setLength(dis.readInt());
+			if (jppfBuffer.getLength() > jppfBuffer.getBuffer().length) jppfBuffer.setBuffer(new byte[jppfBuffer.getLength()]);
 			int count = 0;
-			while (count < buf.getLength())
+			while (count < jppfBuffer.getLength())
 			{
-				int n = dis.read(buf.getBuffer(), count, buf.getLength() - count);
+				int n = dis.read(jppfBuffer.getBuffer(), count, jppfBuffer.getLength() - count);
 				if (n >= 0) count += n;
 				else break;
 			}
-		}
-		catch(IOException e)
-		{
-			fireSocketExceptionEvent(e);
-			throw e;
 		}
 		finally
 		{
 			// disable the timeout on subsequent read operations.
 			socket.setSoTimeout(0);
 		}
-		return buf;
+		return jppfBuffer;
 	}
 
 	/**
@@ -308,41 +266,10 @@ public class SocketClient
 		if (!opened)
 		{
 			ConnectException e = new ConnectException("Client connection not opened");
-			fireSocketExceptionEvent(e);
 			throw e;
 		}
 	}
 	
-	/**
-	 * Add a <code>SocketExceptionListener</code> to the list of listeners of this socket client.
-	 * @param listener the listener to add to the list.
-	 */
-	public void addSocketExceptionListener(SocketExceptionListener listener)
-	{
-		listeners.add(listener);
-	}
-
-	/**
-	 * Remove a <code>SocketExceptionListener</code> from the list of listeners of this socket client.
-	 * @param listener the listener to remove from the list.
-	 */
-	public void removeSocketExceptionListener(SocketExceptionListener listener)
-	{
-		listeners.remove(listener);
-	}
-	
-	/**
-	 * Notify all listeners that an exception has occurred.
-	 * @param e the exception to notify the listeners of.
-	 */
-	protected void fireSocketExceptionEvent(Exception e)
-	{
-		for (SocketExceptionListener listener: listeners)
-		{
-			listener.exceptionOccurred(new SocketExceptionEvent(e));
-		}
-	}
-
 	/**
 	 * Determine whether this socket client is opened or not.
 	 * @return true if this client is opened, false otherwise.
@@ -350,27 +277,5 @@ public class SocketClient
 	public boolean isOpened()
 	{
 		return opened;
-	}
-	
-	/**
-	 * Get an object serializer / deserializer to convert an object to or from an array of bytes. 
-	 * @return an <code>ObjectSerializer</code> instance.
-	 */
-	public ObjectSerializer getSerializer()
-	{
-		if (serializer == null)
-		{
-			serializer = new ObjectSerializerImpl();
-		}
-		return serializer;
-	}
-
-	/**
-	 * Set the object serializer / deserializer to convert an object to or from an array of bytes. 
-	 * @param serializer an <code>ObjectSerializer</code> instance.
-	 */
-	public void setSerializer(ObjectSerializer serializer)
-	{
-		this.serializer = serializer;
 	}
 }
