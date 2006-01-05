@@ -19,6 +19,7 @@
 	<property name="bootstrap.classes" value="${build}/bootstrap"/>
 	<property name="bootstrap.src" value="${basedir}/bootstrap"/>
 	<property name="src" value="${basedir}/src"/>
+	<property name="asynch" value="${basedir}/asynch"/>
 	<property name="lib" value="${basedir}/lib"/>
 	<property name="docs" value="${basedir}/docs"/>
 	<property name="examples" value="${basedir}/examples"/>
@@ -110,6 +111,11 @@
 			</fileset>
 		</copy>
 		<javac srcdir="${src}" destdir="${classes}"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+		</javac>
+		<javac srcdir="${asynch}" destdir="${classes}"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 	    <classpath refid="project.classpath"/>
 	    <compilerarg line="-Xlint:unchecked"/>
@@ -208,8 +214,6 @@
 
 	<target name="runtime" description="" depends="rebuild">
 		<copy tofile="${runtime}/lib/bootstrap-${app.jar.file}" file="${build}/bootstrap-${app.jar.file}"/>
-		<copy tofile="${runtime}/lib/Add_Your_Jars_In_This_Folder.tmp" file="${lib}/Add_Your_Jars_In_This_Folder.tmp"/>
-		<copy tofile="${runtime}/classes/Add_Your_Classes_In_This_Folder.tmp" file="${bootstrap.classes}/Add_Your_Classes_In_This_Folder.tmp"/>
 		<copy tofile="${runtime}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime}/config">
 			<fileset dir="${config}">

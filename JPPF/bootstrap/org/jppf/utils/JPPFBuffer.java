@@ -34,6 +34,24 @@ public class JPPFBuffer
 	private int length = 0;
 
 	/**
+	 * Initialize this buffer.
+	 */
+	public JPPFBuffer()
+	{
+	}
+
+	/**
+	 * Initialize this buffer with a specified buffer and buffer length.
+	 * @param buffer the buffer to use.
+	 * @param length the number of bytes to use in the buffer.
+	 */
+	public JPPFBuffer(byte[] buffer, int length)
+	{
+		this.buffer = buffer;
+		this.length = length;
+	}
+
+	/**
 	 * Set the buffered data.
 	 * @param buffer an array of bytes containing the data.
 	 */
