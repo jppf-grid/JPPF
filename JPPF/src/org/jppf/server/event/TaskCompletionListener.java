@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005 Laurent Cohen.
+ * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
  * 
  * This program is free software; you can redistribute it and/or modify it under the terms of
@@ -16,34 +16,19 @@
  * 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307 USA
  */
-package org.jppf.comm.socket;
+package org.jppf.server.event;
 
-import java.util.EventObject;
+import org.jppf.server.protocol.JPPFTaskWrapper;
 
 /**
- * This type of event capture exceptions occurring within a socket client.
- * The goal is to detect when a socket connection is lost, so that appropriate action can be taken.
+ * Listener providing a callback to invoke when a task's execution has completed.
  * @author Laurent Cohen
  */
-public class SocketExceptionEvent extends EventObject
+public interface TaskCompletionListener
 {
-
 	/**
-	 * Initialze this event with a specified exception.
-	 * @param source the exception reported by this event.
+	 * Callback method invoked when the execution of a task has completed.
+	 * @param result the result of the task's execution.
 	 */
-	public SocketExceptionEvent(Exception source)
-	{
-		super(source);
-	}
-	
-	/**
-	 * Get the exception source of this event. This method is provided as a convenience, since it
-	 * merely invokes the {@link java.util.EventObject#getSource() EventObject.getSource()} method.
-	 * @return the Exception source of this event.
-	 */
-	public Exception getException()
-	{
-		return (Exception) getSource();
-	}
+	void taskCompleted(JPPFTaskWrapper result);
 }

@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005 Laurent Cohen.
+ * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
  * 
  * This program is free software; you can redistribute it and/or modify it under the terms of
@@ -21,19 +21,23 @@ package org.jppf.classloader;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
-import org.jppf.classloader.JPPFBootstrapException;
+import org.jppf.JPPFException;
 import org.jppf.utils.*;
 
 /**
- * Abstract super class for all socket servers.
+ * This class is a wrapper around a server socket, listenening to incoming connections to and from nodes and client
+ * applications. The connections are created as independant threads, so that requests from remote class loaders
+ * are processed asynchronously.
  * @author Laurent Cohen
  */
 public class ClassServer extends Thread
 {
 	/**
-	 * A list of the remote resource provider connections handled by this socket server.
+	 * A mapping of the remote resource provider connections handled by this socket server, to their unique uuid.<br>
+	 * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine
+	 * in which application classpath to look for the requested resources.
 	 */
-	protected List<ClassServerConnection> providerConnections = new Vector<ClassServerConnection>();
+	protected Map<String, ClassServerConnection> providerConnections = new Hashtable<String, ClassServerConnection>();
 	/**
 	 * Server socket listening for requests on the configured port.
 	 */
@@ -48,7 +52,7 @@ public class ClassServer extends Thread
 	protected int port = -1;
 
 	/**
-	 * Initialize this socket server with a specified execution service and port number.
+	 * Initialize this socket server with a specified port number.
 	 * @param port the port this socket server is listening to.
 	 * @throws JPPFBootstrapException if the underlying server socket can't be opened.
 	 */
@@ -83,24 +87,23 @@ public class ClassServer extends Thread
 	/**
 	 * Start serving a new incoming connection.
 	 * @param socket the socket connecting with this socket server.
-	 * @throws JPPFBootstrapException if the new connection can't be initialized.
+	 * @throws JPPFException if the new connection can't be initialized.
 	 */
-	protected void serve(Socket socket) throws JPPFBootstrapException
+	protected void serve(Socket socket) throws JPPFException
 	{
-		ClassServerConnection handler = createHandler(socket);
-		//connections.add(sc);
+		ClassServerConnection handler = createConnection(socket);
 		handler.start();
 	}
 	
 	/**
-	 * Instanciate a wrapper for the socket connection opened by this socket server.
+	 * Instantiate a wrapper for the socket connection opened by this socket server.
 	 * Subclasses must implement this method.
 	 * @param socket the socket connection obtained through a call to
 	 * {@link java.net.ServerSocket#accept() ServerSocket.accept()}.
 	 * @return a <code>JPPFServerConnection</code> instance.
-	 * @throws JPPFBootstrapException if an exception is raised while creating the socket handler.
+	 * @throws JPPFException if an exception is raised while creating the socket handler.
 	 */
-	protected ClassServerConnection createHandler(Socket socket) throws JPPFBootstrapException
+	protected ClassServerConnection createConnection(Socket socket) throws JPPFException
 	{
 		return new ClassServerConnection(this, socket);
 	}
@@ -146,7 +149,8 @@ public class ClassServer extends Thread
 			{
 				stop = true;
 				server.close();
-				for (ClassServerConnection sc: providerConnections) sc.setClosed();
+				for (ClassServerConnection sc: providerConnections.values()) sc.setClosed();
+				providerConnections.clear();
 			}
 			catch(IOException ioe)
 			{
@@ -173,10 +177,10 @@ public class ClassServer extends Thread
 	}
 
 	/**
-	 * Get the list of active resource provider connections fro this class server.
+	 * Get the list of active resource provider connections from this class server.
 	 * @return a list of <code>JPPFServerConnection</code> instances.
 	 */
-	public List<ClassServerConnection> getProviderConnections()
+	public Map<String, ClassServerConnection> getProviderConnections()
 	{
 		return providerConnections;
 	}

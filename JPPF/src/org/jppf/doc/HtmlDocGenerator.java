@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005 Laurent Cohen.
+ * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
  * 
  * This program is free software; you can redistribute it and/or modify it under the terms of
@@ -43,39 +43,39 @@ public class HtmlDocGenerator
 	/**
 	 * Start of a template insertion.
 	 */
-	private static final String TEMPLATE_START = "$template{";
+	public static final String TEMPLATE_START = "$template{";
 	/**
 	 * End of a template insertion.
 	 */
-	private static final String TEMPLATE_END = "}$";
+	public static final String TEMPLATE_END = "}$";
 	/**
 	 * Start of a content parameter value.
 	 */
-	private static final String CONTENT_START = "$CONTENT[";
+	public static final String CONTENT_START = "$CONTENT[";
 	/**
 	 * End of a content parameter value.
 	 */
-	private static final String CONTENT_END = "]CONTENT$";
+	public static final String CONTENT_END = "]CONTENT$";
 	/**
 	 * Separator for parameter nane/value pair.
 	 */
-	private static final String EQUALS = "=";
+	public static final String EQUALS = "=";
 	/**
 	 * Enclosing sequence for parameter values.
 	 */
-	private static final String QUOTE = "\"";
+	public static final String QUOTE = "\"";
 	/**
 	 * Start of a template line comment.
 	 */
-	private static final String COMMENT = "#";
+	public static final String COMMENT = "#";
 	/**
 	 * Start of a template parameter placeholder.
 	 */
-	private static final String PARAM_START = "${";
+	public static final String PARAM_START = "${";
 	/**
 	 * End of a template parameter placeholder.
 	 */
-	private static final String PARAM_END = "}";
+	public static final String PARAM_END = "}";
 
 	/**
 	 * Generate a target HTML document for a document source, using a specified location for the

@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005 Laurent Cohen.
+ * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
  * 
  * This program is free software; you can redistribute it and/or modify it under the terms of
@@ -18,14 +18,14 @@
  */
 package sample.matrix;
 
-import org.jppf.task.AbstractTask;
+import org.jppf.server.protocol.JPPFTask;
 
 /**
  * This task performs the multiplication of a matrix row by another matrix, as part of
  * the multiplication of 2 whole matrices.
  * @author Laurent Cohen
  */
-public class MatrixTask extends AbstractTask<double[]>
+public class MatrixTask extends JPPFTask
 {
 	/**
 	 * Data provider key mapping to the second matrix operand in the multiplication.
@@ -63,7 +63,7 @@ public class MatrixTask extends AbstractTask<double[]>
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void perform()
+	public void run()
 	{
 		Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
 		int size = matrix.getSize();

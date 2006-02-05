@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005 Laurent Cohen.
+ * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
  * 
  * This program is free software; you can redistribute it and/or modify it under the terms of
@@ -54,6 +54,16 @@ public class TypedProperties extends Properties
 	/**
 	 * Get the integer value of a property with a specified name.
 	 * @param key the name of the property to look for.
+	 * @return the value of the property as an int, or zero if it is not found.
+	 */
+	public int getInt(String key)
+	{
+		return getInt(key, 0);
+	}
+	
+	/**
+	 * Get the integer value of a property with a specified name.
+	 * @param key the name of the property to look for.
 	 * @param defValue a default value to return if the property is not found.
 	 * @return the value of the property as an int, or the default value if it is not found.
 	 */
@@ -75,13 +85,36 @@ public class TypedProperties extends Properties
 	}
 	
 	/**
-	 * Get the integer value of a property with a specified name.
+	 * Get the long integer value of a property with a specified name.
 	 * @param key the name of the property to look for.
-	 * @return the value of the property as an int, or zero if it is not found.
+	 * @return the value of the property as a long, or zero if it is not found.
 	 */
-	public int getInt(String key)
+	public long getLong(String key)
 	{
-		return getInt(key, 0);
+		return getLong(key, 0L);
+	}
+	
+	/**
+	 * Get the long integer value of a property with a specified name.
+	 * @param key the name of the property to look for.
+	 * @param defValue a default value to return if the property is not found.
+	 * @return the value of the property as a long, or the default value if it is not found.
+	 */
+	public long getLong(String key, long defValue)
+	{
+		long longVal = defValue;
+		String val = getProperty(key, null);
+		if (val != null)
+		{
+			try
+			{
+				longVal = Long.parseLong(val);
+			}
+			catch(NumberFormatException e)
+			{
+			}
+		}
+		return longVal;
 	}
 	
 	/**

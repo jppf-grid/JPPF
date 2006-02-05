@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005 Laurent Cohen.
+ * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
  * 
  * This program is free software; you can redistribute it and/or modify it under the terms of
@@ -20,9 +20,9 @@ package sample.matrix;
 
 import java.util.*;
 import org.apache.log4j.Logger;
-import org.jppf.comm.*;
-import org.jppf.task.*;
-import org.jppf.task.admin.*;
+import org.jppf.JPPFException;
+import org.jppf.server.app.JPPFClient;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
 
@@ -36,6 +36,10 @@ public class MatrixRunner
 	 * Log4j logger for this class.
 	 */
 	static Logger log = Logger.getLogger(MatrixRunner.class);
+	/**
+	 * JPPF client used to submit execution requests.
+	 */
+	private static JPPFClient jppfClient = null;
 
 	/**
 	 * Entry point for this class, performs a matrix multiplication a number of times.,<br>
@@ -47,9 +51,11 @@ public class MatrixRunner
 	{
 		try
 		{
+			jppfClient = new JPPFClient();
 			TypedProperties props = JPPFConfiguration.getProperties();
 			int size = props.getInt("matrix.size");
 			int iterations = props.getInt("matrix.iterations");
+			System.out.println("Running Matrix demo with matrix size = "+size+"*"+size+" for "+iterations+" iterations");
 			perform(size, iterations);
 		}
 		catch(Exception e)
@@ -62,43 +68,47 @@ public class MatrixRunner
 	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
 	 * @param size the size of the matrices.
 	 * @param iterations the number of times the multiplication will be performed.
-	 * @throws ExecutionServiceException  if an error is raised during the execution.
+	 * @throws JPPFException if an error is raised during the execution.
 	 */
-	private static void perform(int size, int iterations) throws ExecutionServiceException
+	private static void perform(int size, int iterations) throws JPPFException
 	{
-		// initialize the 2 matrices to multiply
-		Matrix a = new Matrix(size);
-		a.assignRandomValues();
-		Matrix b = new Matrix(size);
-		b.assignRandomValues();
-
-		// perform "iteration" times
-		for (int iter=0; iter<iterations; iter++)
+		try
 		{
-			// create a task for each row in matrix a
-			List<Task> tasks = new ArrayList<Task>();
-			for (int i=0; i<size; i++) tasks.add(new MatrixTask(a.getRow(i)));
-			// create the request to send to the remote service
-			ExecutionRequest request = new ExecutionRequest();
-			request.setContent(tasks);
-			// create a data provider to share matrix b among all tasks
-			DataProvider dataProvider = new MemoryMapDataProvider();
-			dataProvider.setValue(MatrixTask.DATA_KEY, b);
-			request.setDataProvider(dataProvider);
-			// get a reference to the execution service
-			RequestQueue requestQueue = RequestQueueFactory.getRemoteQueue();
-			// submit the execution request and wait for its completion
-			ExecutionResponse response = (ExecutionResponse) requestQueue.submitBlocking(request);
-			if (response.getException() != null) throw response.getException();
-			// initialize the resulting matrix
-			Matrix c = new Matrix(size);
-			// Get the matrix c values from the tasks results
-			for (int i=0; i<response.getContent().size(); i++)
+			// initialize the 2 matrices to multiply
+			Matrix a = new Matrix(size);
+			a.assignRandomValues();
+			Matrix b = new Matrix(size);
+			b.assignRandomValues();
+	
+			// perform "iteration" times
+			for (int iter=0; iter<iterations; iter++)
 			{
-				MatrixTask matrixTask = (MatrixTask) response.getContent().get(i);
-				double[] row = matrixTask.getResult();
-				for (int j=0; j<row.length; j++) c.setValueAt(i, j, row[j]);
+				long start = System.currentTimeMillis();
+				// create a task for each row in matrix a
+				List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+				for (int i=0; i<size; i++) tasks.add(new MatrixTask(a.getRow(i)));
+				// create a data provider to share matrix b among all tasks
+				DataProvider dataProvider = new MemoryMapDataProvider();
+				dataProvider.setValue(MatrixTask.DATA_KEY, b);
+				// submit the tasks for execution
+				jppfClient.submit(tasks, dataProvider);
+				List<JPPFTask> results = jppfClient.submit(tasks, dataProvider);
+				// initialize the resulting matrix
+				Matrix c = new Matrix(size);
+				// Get the matrix values from the tasks results
+				for (int i=0; i<results.size(); i++)
+				{
+					MatrixTask matrixTask = (MatrixTask) results.get(i);
+					double[] row = matrixTask.getResult();
+					for (int j=0; j<row.length; j++) c.setValueAt(i, j, row[j]);
+				}
+				long elapsed = System.currentTimeMillis() - start;
+				System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
 			}
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e.getMessage(), e);
 		}
 	}
 }

@@ -16,53 +16,42 @@
  * 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307 USA
  */
-package org.jppf.utils;
-
-import java.io.Serializable;
+package org.jppf;
 
 /**
- * Utility class holding a pair of references to two objects.
- * @param <U> the type of the first element in the pair.
- * @param <V> the type of the second element in the pair.
+ * Class of JPPF-specific error that may be caught in special cases.
+ * The goal of this class is to provide an unchecked exception, allowing a quick
+ * propagation up the call stack, while still allowing it to be caught specifically, in case the
+ * application chooses not to exit, in response to the problem.
  * @author Laurent Cohen
  */
-public class Pair<U, V> implements Serializable
+public class JPPFError extends Error
 {
 	/**
-	 * The first object of this pair.
+	 * Initialize this error with a specified message and cause exception.
+	 * @param message the message for this error.
+	 * @param cause the cause exception.
 	 */
-	private U first = null;
-	/**
-	 * The second object of this pair.
-	 */
-	private V second = null;
-	
-	/**
-	 * Initialize this pair with two values.
-	 * @param first the first value of the new pair.
-	 * @param second the second value of the new pair.
-	 */
-	public Pair(U first, V second)
+	public JPPFError(String message, Throwable cause)
 	{
-		this.first = first;
-		this.second = second;
+		super(message, cause);
 	}
 
 	/**
-	 * Get the first value of this pair.
-	 * @return an object of type U.
+	 * Initialize this error with a specified message.
+	 * @param message the message for this error.
 	 */
-	public U first()
+	public JPPFError(String message)
 	{
-		return first;
+		super(message);
 	}
 
 	/**
-	 * Get the second value of this pair.
-	 * @return an object of type V.
+	 * Initialize this error with a specified cause exception.
+	 * @param cause the cause exception.
 	 */
-	public V second()
+	public JPPFError(Throwable cause)
 	{
-		return second;
+		super(cause);
 	}
 }

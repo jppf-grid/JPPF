@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005 Laurent Cohen.
+ * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
  * 
  * This program is free software; you can redistribute it and/or modify it under the terms of
@@ -18,14 +18,13 @@
  */
 package org.jppf.classloader;
 
-import java.io.IOException;
-import java.net.ConnectException;
 import org.apache.log4j.Logger;
-import org.jppf.comm.socket.SocketClient;
+import org.jppf.comm.socket.*;
+import org.jppf.utils.*;
 
 /**
  * Wrapper around an incoming socket connection, whose role is to receive the names of classes
- * to load from the classpath, then send the class files' contents to the remote client.
+ * to load from the classpath, then send the class files' contents (or bytecode) to the remote client.
  * <p>Instances of this class are part of the JPPF dynamic class loading mechanism. The enable remote nodes
  * to dynamically load classes from the JVM that run's the class server.
  * @author Laurent Cohen
@@ -39,7 +38,7 @@ public class ClassServerDelegate extends Thread
 	/**
 	 * The socket client uses to communicate over a socket connection.
 	 */
-	protected SocketClient socketClient = null;
+	protected SocketWrapper socketClient = null;
 	/**
 	 * Indicates whether this socket handler should be terminated and stop processing.
 	 */
@@ -52,40 +51,80 @@ public class ClassServerDelegate extends Thread
 	 * Reads resource files from the classpath.
 	 */
 	protected ResourceProvider resourceProvider = new ResourceProvider();
+	/**
+	 * Unique identifier for this class server delegate, obtained from the local JPPF client.
+	 */
+	private String appUuid = null;
+	/**
+	 * Used to synchronize access to the underlying socket from multiple threads.
+	 */
+	private SocketInitializer socketInitializer = new SocketInitializer();
 
 	/**
-	 * Initialize this connection with an open socket connection to a remote client.
-	 * @param host the host name of the class server.
-	 * @param port the port the class server is listening to.
-	 * @throws ConnectException if the connection could not be opended.
-	 * @throws IOException if the connection could not be opended.
+	 * Default instantiation of this class is not permitted.
 	 */
-	public ClassServerDelegate(String host, int port) throws ConnectException, IOException
+	private ClassServerDelegate()
 	{
-		socketClient = new SocketClient(host, port);
 	}
 
 	/**
-	 * Main processing loop for this socket handler. During each loop iteration,
-	 * the following operations are performed:
-	 * <ol>
-	 * <li>if the stop flag is set to true, exit the loop</li>
-	 * <li>block until a class name is received</li>
-	 * <li>when a class name is received, read the class file into a byte array from the classpath</li>
-	 * <li>send back the byte array defining the class to load remotely</li>
-	 * </ol>
+	 * Initialize class server delegate with a spceified application uuid.
+	 * @param uuid the unique identifier for the local JPPF client.
+	 * @throws Exception if the connection could not be opended.
+	 */
+	public ClassServerDelegate(String uuid) throws Exception
+	{
+		this.appUuid = uuid;
+		init();
+	}
+
+	/**
+	 * Initialize this node's resources.
+	 * @throws Exception if an error is raised during initialization.
+	 */
+	public synchronized void init() throws Exception
+	{
+		if (socketClient == null) initSocketClient();
+		System.out.println("ClassServerDelegate.init(): Attempting connection to the class server");
+		socketInitializer.initializeSocket(socketClient);
+		System.out.println("ClassServerDelegate.init(): Reconnected to the class server");
+	}
+	
+	/**
+	 * Initialize this node's resources.
+	 * @throws Exception if an error is raised during initialization.
+	 */
+	public void initSocketClient() throws Exception
+	{
+		TypedProperties props = JPPFConfiguration.getProperties();
+		String host = props.getString("jppf.server.host");
+		int port = props.getInt("class.server.port", 11111);
+		socketClient = new SocketClient();
+		socketClient.setHost(host);
+		socketClient.setPort(port);
+	}
+	
+	/**
+	 * Main processing loop for this thread.
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run()
 	{
 		try
 		{
-			socketClient.send("provider");
+			socketClient.send("provider|"+appUuid);
 			while (!stop)
 			{
-				String name = (String) socketClient.receive();
-				byte[] b = resourceProvider.getResourceAsBytes(name);
-				socketClient.send(b);
+				try
+				{
+					String name = (String) socketClient.receive();
+					byte[] b = resourceProvider.getResourceAsBytes(name);
+					socketClient.send(b);
+				}
+				catch(Exception e)
+				{
+					init();
+				}
 			}
 		}
 		catch (Exception e)

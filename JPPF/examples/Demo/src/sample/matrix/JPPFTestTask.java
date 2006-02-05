@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005 Laurent Cohen.
+ * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
  * 
  * This program is free software; you can redistribute it and/or modify it under the terms of
@@ -16,21 +16,42 @@
  * 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307 USA
  */
-package org.jppf.comm.socket;
+package sample.matrix;
 
-import java.util.EventListener;
+import org.jppf.server.protocol.JPPFTask;
 
 /**
- * Listener interface for capturing <code>SocketExceptionEvent</code> events.
- * By implementing this interface, instances of a class can be notified of events
- * such as socket disconnection, or socket stream errors.
+ * Thnis task is intended for testing the framework only.
  * @author Laurent Cohen
  */
-public interface SocketExceptionListener extends EventListener
+public class JPPFTestTask extends JPPFTask
 {
+	static
+	{
+		System.out.println("JPPFTestTask loaded by "+JPPFTestTask.class.getClassLoader());
+	}
+	
 	/**
-	 * Called when a socket-related exception occurs within a socket client.
-	 * @param event encapsulates the exception that triggered the invocation of this method.
+	 * Dummy data for serialization test.
 	 */
-	void exceptionOccurred(SocketExceptionEvent event);
+	protected String someString = "0000000000111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999";
+
+	/**
+	 * Initialize this task with a specified row of values to multiply.
+	 */
+	public JPPFTestTask()
+	{
+	}
+	
+	/**
+	 * Run the test.
+	 * @see java.lang.Runnable#run()
+	 */
+	public void run()
+	{
+		//run2();
+		System.out.println("Task Executing");
+		System.exit(0);
+	}
+	//public void run2() { System.out.println("Task 2.0 Executing"); }
 }

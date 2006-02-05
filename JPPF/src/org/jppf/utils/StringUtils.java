@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005 Laurent Cohen.
+ * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
  * 
  * This program is free software; you can redistribute it and/or modify it under the terms of
@@ -49,9 +49,65 @@ public final class StringUtils
 		if (length > maxLen) sb.append(source, length-maxLen, maxLen);
 		else
 		{
-			for (int i=0; i<length-maxLen; i++) sb.append(padChar);
+			for (int i=0; i<maxLen-length; i++) sb.append(padChar);
 			sb.append(source);
 		}
+		return sb.toString();
+	}
+
+	/**
+	 * An array of char containing the hex digits in ascending order.
+	 */
+	private static char[] hexDigits =
+		new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+	/**
+	 * Convert a part of an array of bytes, into a string of space-separated hexadecimal numbers.<br>
+	 * This method is proposed as a conveninence for debugging purposes.
+	 * @param bytes the array that contains the sequence of byte values to convert.
+	 * @param start the index to start at in the byte array.
+	 * @param length the number of bytes to convert in the array.
+	 * @return the cinverted bytes as a string of space-separated hexadecimal numbers.
+	 */
+	public static String dumpBytes(byte[] bytes, int start, int length)
+	{
+		StringBuilder sb = new StringBuilder();
+		for (int i=start; i<start+length; i++)
+		{
+			if (i > start) sb.append(' ');
+			sb.append(toHexString(bytes[i]));
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * Convert a byte value into a 2-digits hexadecimal value. The first digit is 0 if the value is less than 16.<br>
+	 * If a value is negative, its 2-complement value is converted, otherwise the value itself is converted.
+	 * @param b the byte value to convert.
+	 * @return a string containing the 2-digit hexadecimal representation of the byte value.
+	 */
+	public static String toHexString(byte b)
+	{
+		int n = (b < 0) ? b + 256 : b;
+		StringBuilder sb = new StringBuilder();
+		sb.append(hexDigits[n / 16]);
+		sb.append(hexDigits[n % 16]);
+		return sb.toString();
+	}
+	
+	/**
+	 * Tranform a duration in milliseconds into a string with hours, minutes, seconds and milliseconds..
+	 * @param elapsed the duration to transform, expressed in milliseconds.
+	 * @return a string specifiying the duration in terms of hours, minutes, seconds and milliseconds.
+	 */
+	public static String toStringDuration(long elapsed)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(elapsed / 3600000L).append(":");
+		elapsed = elapsed % 3600000L;
+		sb.append(elapsed / 60000L).append(":");
+		elapsed = elapsed % 60000L;
+		sb.append(elapsed / 1000L).append(".");
+		sb.append(elapsed % 1000L);
 		return sb.toString();
 	}
 }
