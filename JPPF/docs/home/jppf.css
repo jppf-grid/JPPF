@@ -1,6 +1,7 @@
-/*body { background-color: #B8E6FE }    184, 230, 254 */
-body { background-color: rgb(184, 230, 254) }   /* #B8E6FE */
-
+/*body { background-color: #FFFFC0 }*/
+/*body { background-color: #FFFFFF }*/
+body { font-size=10pt; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
+ 
 .pageTitle { font-family: Arial, Helvetica, sans-serif; font-size: 24pt; font-weight: bold; text-align: center;
             color: #9B9DFD; background-color: #FFFFC0 } /* (155, 157, 253); (255, 255, 192) */
 
@@ -9,19 +10,31 @@ body { background-color: rgb(184, 230, 254) }   /* #B8E6FE */
 .centeredCell {font-size: 12pt; font-family: Arial, Helvetica, sans-serif; text-align: center; valign: middle }
 .nonCenteredCell {font-size: 12pt; font-family: Arial, Helvetica, sans-serif  }
 
+ /*.menu_first { background-color: #8080FF; color: #FFFFC0; font-weight: bold }
+.menu { background-color: #8080FF; color: #FFFFC0; border-left: 1px solid #FFFFC0; font-weight: bold }*/
+.menu_first { background: url("images/bkg-menu.gif"); background-repeat: repeat; background-attachment: fixed; color: #FFFFC0; font-weight: bold }
+.menu { background: url("images/bkg-menu.gif"); background-repeat: repeat; background-attachment: fixed; color: #FFFFC0; border-left: 1px solid #FFFFC0; font-weight: bold }
+.docmenu_first { background-color: #FFFFC0; color: #8080FF; font-weight: bold }
+.docmenu { background-color: #FFFFC0; color: #8080FF; border-left: 1px solid #8080FF; font-weight: bold }
+/*.table_ { border: 2px solid #8080FF; background-color: #FFFFFF }*/
+.table_ { border: 2px solid #8080FF; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
+
+.completed_cell { background-image: url("images/completed.gif"); background-repeat: no-repeat; background-position: center }
+
 h1, h2, h3 {font-family: Arial, Helvetica, sans-serif }
-h3 { font-size: 14pt; color: #FFFF40 }
-h4 { font-size: 12pt; color: #000060; font-weight: bold }
-table  {font-size: 12pt; font-family: Arial, Helvetica, sans-serif }
+h3 { font-size: 14pt; color: #8080FF }
+h4 { font-size: 12pt; color: #8080FF; font-weight: bold }
+table  {font-size: 10pt; font-family: Arial, Helvetica, sans-serif }
 .comic     {font-size: 10pt; font-family: Comic Sans MS, Arial, Helvetica, sans-serif }
 
 .simpleList { list-style: none; text-indent: -20 }
 
 .news { font-size: 9pt; font-family: Times New Roman, Times, serif;  color: #000060 }
-.links { color: #000060; font-size: 12pt; font-family: Comic Sans MS, Arial, Helvetica, sans-serif }
+.links { color: #000060; font-size: 10pt; font-family: Arial, Helvetica, sans-serif }
 /*.newsTitle { color: #8789CF; font-size: 11pt; font-family: Comic Sans MS, Arial, Helvetica, sans-serif; font-size: 12pt }*/
 .newsTitle { color: #7678BE; font-size: 11pt; font-family: Comic Sans MS, Arial, Helvetica, sans-serif; font-weight: bold }
 .ackTitle { color: #000060; font-size: 16pt; font-family: Comic Sans MS, Arial, sans-serif; font-weight: bold }
 .ackText { text-align: center; color: #000060; font-size: 12pt; font-family: Comic Sans MS, Arial, sans-serif; /*font-weight: bold*/ }
-.archiHeader { border: 1px solid #000060; color: #000060; background-color: #FCCF62; font-weight: bold; font-size: 20 }
-/*.archiHeader { color: #000060; font-weight: bold; font-size: 20 }*/
+.archiHeader { color: #FFFF00; background-color: #8080FF; font-weight: bold; font-size: 20 }
+.archiContent { color: #000060; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
+/*.archiHeader { border: 1px solid #000060; color: #FFFF00; background-color: #8080FF; font-weight: bold; font-size: 20 }*/

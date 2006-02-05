@@ -1,0 +1,70 @@
+//------------------------------------------------------------------------------//
+// Java Parallel Processing Framework.                                          //
+// Copyright (C) 2005-2006 Laurent Cohen.                                       //
+// lcohen@osp-chicago.com                                                       //
+//                                                                              //
+// This program is free software; you can redistribute it and/or modify it      //
+// under the terms of the GNU General Public License as published by the Free   //
+// Software Foundation; either version 2 of the License, or (at your option)    //
+// any later version.                                                           //
+//                                                                              //
+// This program is distributed in the hope that it will be useful,              //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of               //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                         //
+// See the GNU General Public License for more details.                         //
+//                                                                              //
+// You should have received a copy of the GNU General Public License along with //
+// this program; if not, write to the                                           //
+// Free Software Foundation, Inc.,                                              //
+// 59 Temple Place, Suite 330,                                                  //
+// Boston, MA 02111-1307 USA                                                    //
+//------------------------------------------------------------------------------//
+
+//------------------------------------------------------------------------------//
+// JPPF Security policy file.                                                   //
+// The syntax used in this file is a subset of that used in Sun's security      //
+// policy files.                                                                //
+// It only accepts "permission" entries.                                        //
+//------------------------------------------------------------------------------//
+
+//------------------------------------------------------------------------------//
+// Runtime permissions.                                                         //
+// Please do not change these permissions. JPPF may not work any more if you do //
+//------------------------------------------------------------------------------//
+
+permission java.lang.RuntimePermission "createClassLoader";
+permission java.lang.RuntimePermission "getClassLoader";
+permission java.lang.RuntimePermission "accessClassInPackage.*";
+permission java.lang.RuntimePermission "defineClassInPackage.*";
+permission java.lang.RuntimePermission "accessDeclaredMembers";
+permission java.lang.RuntimePermission "getStackTrace";
+
+//------------------------------------------------------------------------------//
+// File permissions.                                                            //
+// Please do not change these permissions. JPPF may not work any more if you do //
+//------------------------------------------------------------------------------//
+
+permission java.io.FilePermission "${user.dir}/jppf-node.log", "read,write,delete";
+permission java.io.FilePermission "${user.dir}/jppf-node1.log", "read,write,delete";
+permission java.io.FilePermission "${user.dir}/jppf-node2.log", "read,write,delete";
+permission java.io.FilePermission "${user.dir}/config/log4j-node.properties", "read";
+permission java.io.FilePermission "${user.dir}/config/log4j-node1.properties", "read";
+permission java.io.FilePermission "${user.dir}/config/log4j-node2.properties", "read";
+
+//------------------------------------------------------------------------------//
+// Property permissions.                                                        //
+// Please do not change these permissions. JPPF may not work any more if you do //
+//------------------------------------------------------------------------------//
+
+permission java.util.PropertyPermission "log4j.*", "read";
+permission java.util.PropertyPermission "java.version", "read";
+permission java.util.PropertyPermission "line.separator", "read";
+
+//------------------------------------------------------------------------------//
+// add your own permissions here.                                               //
+//------------------------------------------------------------------------------//
+// For example: permission to connect to a MySQL database server on localhost   //
+// on the default port:                                                         //
+//                                                                              //
+//permission java.net.SocketPermission "localhost:3306", "connect,listen";      //
+//------------------------------------------------------------------------------//

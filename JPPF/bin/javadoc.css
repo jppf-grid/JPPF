@@ -3,12 +3,18 @@
 /* Define colors, fonts and other style attributes here to override the defaults */
 
 /* Page background color */
-body { background-color: #B8E6FE !important }
+/*body { background-color: #FFFFC0 !important }*/
+body { background: url("resources/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
 
 /* Table colors */
-.TableHeadingColor     { background-color: #FCCF62; color: #000060 } /* 252, 207, 98 */
-.TableSubHeadingColor  { background-color: #FCE6AC; color: #000060}  /* 252, 230, 171 */
-.TableRowColor         { background-color: #B8E6FE }
+/*.TableHeadingColor     { background-color: #FCCF62; color: #000060 }
+.TableSubHeadingColor  { background-color: #FCE6AC; color: #000060}
+.TableRowColor         { background-color: #B8E6FE }*/
+
+.TableHeadingColor     { background-color: #8080FF; color: #FFFFC0 }
+.TableSubHeadingColor  { background-color: #D0D0FF; color: #000060 }
+/*.TableRowColor         { background-color: #FFFFC0 }*/
+.TableRowColor         { background: url("resources/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
 
 table, td {font-size: 10pt; font-family: Arial, Helvetica, sans-serif }
 h1, h2, h3 {font-family: Arial, Helvetica, sans-serif; color: #000060 }
@@ -20,11 +26,11 @@ h1, h2, h3 {font-family: Arial, Helvetica, sans-serif; color: #000060 }
 
 /* Example of smaller, sans-serif font in frames */
 
-.NavBarCell1    { background-color: #FCE6AC } /* 252, 230, 171 */
+.NavBarCell1    { background-color: #B0B0FF } /* 252, 230, 171 */
 .NavBarCell1Rev { background-color: #00008B }
 .NavBarFont1    { font-family: Arial, Helvetica, sans-serif; color: #000060 }
 .NavBarFont1Rev { font-family: Arial, Helvetica, sans-serif; color: #B8E6FE }
 
-.NavBarCell2    { font-family: Arial, Helvetica, sans-serif; background-color: #B8E6FE }
-.NavBarCell3    { font-family: Arial, Helvetica, sans-serif; background-color: #B8E6FE }
+.NavBarCell2    { font-family: Arial, Helvetica, sans-serif; background-color: #8080FF }
+.NavBarCell3    { font-family: Arial, Helvetica, sans-serif; background-color: #8080FF }
 

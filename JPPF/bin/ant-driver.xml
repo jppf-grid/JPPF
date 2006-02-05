@@ -1,0 +1,35 @@
+<project name='LocalTest' default="run.node" basedir=".">
+
+	<!-- ========================================================================= -->
+	<!--                          Property definitions                             -->
+	<!-- ========================================================================= -->
+
+	<property name="lib.dir" value="${basedir}/lib"/>
+	<property name="config.dir" value="${basedir}/config"/>
+
+	<!-- ========================================================================= -->
+	<!--                           Classpath definitions                           -->
+	<!-- ========================================================================= -->
+
+  <path id="run.classpath">
+		<pathelement location="${config.dir}"/>
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+  </path>
+
+	<!-- ========================================================================= -->
+	<!--                     Run the framework processes                           -->
+	<!-- ========================================================================= -->
+
+	<target name="run.driver">
+		<echo message="starting the JPPF driver"/>
+		<java fork="yes" classname="org.jppf.server.JPPFDriver" classpathref="client.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx256m"/>
+			<jvmarg value="-Djppf.config=jppf-driver.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-driver.properties"/>
+		</java>       
+	</target>
+
+</project> 

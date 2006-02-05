@@ -19,14 +19,15 @@
 	<property name="bootstrap.classes" value="${build}/bootstrap"/>
 	<property name="bootstrap.src" value="${basedir}/bootstrap"/>
 	<property name="src" value="${basedir}/src"/>
-	<property name="asynch" value="${basedir}/asynch"/>
 	<property name="lib" value="${basedir}/lib"/>
 	<property name="docs" value="${basedir}/docs"/>
 	<property name="examples" value="${basedir}/examples"/>
 	<property name="javadoc" value="${docs}/api"/>
 	<property name="app.jar.file" value="${ant.project.name}.jar"/>
 	<property name="license.file" value="LICENSE.txt"/>
-	<property name="runtime" value="${deploy}/runtime"/>	
+	<property name="runtime" value="${deploy}/runtime"/>
+	<property name="runtime.driver" value="${deploy}/runtime/driver"/>
+	<property name="runtime.node" value="${deploy}/runtime/node"/>
 
 	<!-- ========================================================================= -->
 	<!--                           Classpath definitions                           -->
@@ -83,7 +84,8 @@
  		<mkdir dir="${deploy.config}"/>
 		<mkdir dir="${deploy.lib}"/>
 		<mkdir dir="${deploy.build}"/>
- 		<mkdir dir="${runtime}/classes"/>
+ 		<mkdir dir="${runtime.driver}"/>
+ 		<mkdir dir="${runtime.node}"/>
 	</target>
 
 	<!-- ========================================================================= -->
@@ -115,11 +117,6 @@
 	    <classpath refid="project.classpath"/>
 	    <compilerarg line="-Xlint:unchecked"/>
 		</javac>
-		<javac srcdir="${asynch}" destdir="${classes}"
-			debug="on" deprecation="off" optimize="on" includes="**/*.java">
-	    <classpath refid="project.classpath"/>
-	    <compilerarg line="-Xlint:unchecked"/>
-		</javac>
 		<copy todir="${classes}">
 			<fileset dir="${src}">
 				<exclude name="**/*.java"/>
@@ -129,7 +126,7 @@
   </target>
 
 	<!-- ========================================================================= -->
-	<!--                     Build the application jar file                        -->
+	<!--                     Build the application jar files                       -->
 	<!-- ========================================================================= -->
 
 	<target name="jar" description="generates the application jar" depends="compile">
@@ -147,6 +144,7 @@
 	<!-- ========================================================================= -->
 
 	<target name="package" description="package the application into a release zip file" depends="rebuild">
+		<!-- copy everything to the ${basedir}/build/deploy folder -->
 		<copy tofile="${deploy}/${app.jar.file}" file="${build}/${app.jar.file}"/>
 		<copy tofile="${deploy}/bootstrap-${app.jar.file}" file="${build}/bootstrap-${app.jar.file}"/>
 		<copy tofile="${deploy}/${license.file}" file="${basedir}/${license.file}"/>
@@ -201,7 +199,7 @@
 			<format property="now" pattern="yyyyMMdd"/>
 		</tstamp>
 		<property name="release.file"
-			value="${build}/${ant.project.name}-full-${version.number}.${build.number}-${now}.zip"/>
+			value="${build}/${ant.project.name}-full-src-${version.number}.${build.number}-${now}.zip"/>
 		<delete file="${release.file}" quiet="true"/>
 		<zip destfile="${release.file}">
 			<zipfileset dir="${deploy}" prefix="${ant.project.name}-${version.number}"/>
@@ -213,24 +211,45 @@
 	<!-- ========================================================================= -->
 
 	<target name="runtime" description="" depends="rebuild">
-		<copy tofile="${runtime}/lib/bootstrap-${app.jar.file}" file="${build}/bootstrap-${app.jar.file}"/>
-		<copy tofile="${runtime}/${license.file}" file="${basedir}/${license.file}"/>
-		<copy todir="${runtime}/config">
-			<fileset dir="${config}">
-				<exclude name="eclipse"/>
-				<exclude name="eclipse/*.*"/>
+		<antcall target="runtime.driver"/>
+		<antcall target="runtime.node"/>
+	</target>
+
+	<target name="runtime.driver">
+		<copy tofile="${runtime.driver}/lib/bootstrap-${app.jar.file}" file="${build}/bootstrap-${app.jar.file}"/>
+		<copy tofile="${runtime.driver}/lib/${app.jar.file}" file="${build}/${app.jar.file}"/>
+		<copy todir="${runtime.driver}/lib">
+			<fileset dir="${lib}/log4j">
+				<include name="*.*"/>
 			</fileset>
 		</copy>
-		<copy tofile="${runtime}/build.xml" file="${bin}/runtime-build.xml"/>
-		<property name="runtime.file"
-			value="${build}/${ant.project.name}-runtime-${version.number}.${build.number}-${now}.zip"/>
-		<delete file="${runtime.file}" quiet="true"/>
-		<zip destfile="${runtime.file}">
-			<zipfileset dir="${runtime}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-runtime"/>
+		<copy tofile="${runtime.driver}/${license.file}" file="${basedir}/${license.file}"/>
+		<copy todir="${runtime.driver}/config">
+			<fileset dir="${config}/driver"/>
+		</copy>
+		<copy tofile="${runtime.driver}/build.xml" file="${bin}/ant-driver.xml"/>
+		<property name="runtime.driver.file"
+			value="${build}/${ant.project.name}-driver-bin-${version.number}.${build.number}-${now}.zip"/>
+		<delete file="${runtime.driver.file}" quiet="true"/>
+		<zip destfile="${runtime.driver.file}">
+			<zipfileset dir="${runtime.driver}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-driver"/>
 		</zip>
 	</target>
 
-	
+	<target name="runtime.node">
+		<copy tofile="${runtime.node}/lib/bootstrap-${app.jar.file}" file="${build}/bootstrap-${app.jar.file}"/>
+		<copy tofile="${runtime.node}/${license.file}" file="${basedir}/${license.file}"/>
+		<copy todir="${runtime.node}/config">
+			<fileset dir="${config}/node"/>
+		</copy>
+		<copy tofile="${runtime.node}/build.xml" file="${bin}/ant-node.xml"/>
+		<property name="runtime.node.file"
+			value="${build}/${ant.project.name}-node-bin-${version.number}.${build.number}-${now}.zip"/>
+		<delete file="${runtime.node.file}" quiet="true"/>
+		<zip destfile="${runtime.node.file}">
+			<zipfileset dir="${runtime.node}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-node"/>
+		</zip>
+	</target>
 
 	<!-- ========================================================================= -->
 	<!--                     Build the web site content                            -->
@@ -283,6 +302,7 @@
 			packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true"
 			stylesheetfile="${bin}/javadoc.css" additionalparam="-quiet">
 			<packageset dir="${src}"/>
+			<packageset dir="${bootstrap.src}"/>
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
 			<doctitle><![CDATA[Java Parallel Processing Framework v${version.number}]]></doctitle>
 			<header>
@@ -291,7 +311,7 @@
 					<tr>
 						<td valign="center">
 							<a href="http://jppf-project.sourceforge.net" target="_top">
-								<img src="http://jppf-project.sourceforge.net/images/jppf-logo.jpg" border="0" width="66" height="26"/>
+								<img src="http://jppf-project.sourceforge.net/images/logo-small.gif" border="0" width="66" height="26"/>
 							</a>
 						</td>
 						<td valign="center"><font face="Arial" color="#000000">&nbsp;&nbsp;Java Parallel Processing Framework</font></td>
@@ -301,13 +321,13 @@
 			</header>
 			<bottom>
 				<![CDATA[
-					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005 Laurent Cohen.</i></font>
+					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2006 Laurent Cohen.</i></font>
 				]]>
 			</bottom>
 		</javadoc>
 		<copy todir="${docs}/api/resources" overwrite="true">
 			<fileset dir="${bin}">
-				<include name="inherit.gif"/>
+				<include name="*.gif"/>
 			</fileset>
 		</copy>
 	</target>
