@@ -20,6 +20,8 @@ package org.jppf.server;
 
 import java.util.concurrent.*;
 import org.apache.log4j.Logger;
+import org.jppf.server.protocol.JPPFTaskWrapper;
+import static org.jppf.server.JPPFStatsUpdater.*;
 
 /**
  * Implementation of a generic blocking queue, to allow asynchronous access from a large number of threads.
@@ -35,26 +37,36 @@ public class JPPFQueue
 	 * Executable tasks queue, available for execution nodes to pick from.
 	 * This queue behaves as a FIFO queue and is thread-safe for atomic <code>add()</code> and <code>take()</code> operations.
 	 */
-	private BlockingQueue<Object> queue = new LinkedBlockingQueue<Object>();
+	private BlockingQueue<JPPFTaskWrapper> queue = new LinkedBlockingQueue<JPPFTaskWrapper>();
 
 	/**
 	 * Add an object to the queue.
-	 * @param o the object to add to the queue.
+	 * @param wrapper the object to add to the queue.
 	 */
-	public void addObject(Object o)
+	public void addObject(JPPFTaskWrapper wrapper)
 	{
-		queue.add(o);
+		queue.add(wrapper);
+		if (isStatsEnabled())
+		{
+			wrapper.setQueueEntryTime(System.currentTimeMillis());
+			taskInQueue();
+		}
 	}
 	
 	/**
 	 * Get the next object in the queue. This method waits until the queue has at least one object.
 	 * @return the most recent object that was added to the queue.
 	 */
-	public Object nextObject()
+	public JPPFTaskWrapper nextObject()
 	{
 		try
 		{
-			return queue.take();
+			JPPFTaskWrapper wrapper = queue.take();
+			if (isStatsEnabled())
+			{
+				taskOutOfQueue(System.currentTimeMillis() - wrapper.getQueueEntryTime());
+			}
+			return wrapper;
 		}
 		catch(InterruptedException e)
 		{

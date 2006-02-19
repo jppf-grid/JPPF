@@ -1,0 +1,79 @@
+<html>
+	$template{name="head-section" title="Readme Page"}$
+
+	<body>
+		<div align="center">
+		$template{name="jppf-header"}$
+		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
+			$template{name="page-title" title="JPPF Readme Page"}$
+			<tr>
+				<td>
+					<h3>System Requirements</h3>
+					<ul>
+						<li>Any platform with Java 2, Standard Edition (J2SE) 5.0 or later.</li>
+						<li>Apache Ant 1.6.2 or later, for building and running the application and examples.</li>
+					</ul>
+				</td>
+			</tr>
+			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+			<tr>
+				<td>
+					<h3>Installing</h3>
+					<p><b>Framework distribution</b>
+					<p>Simply unzip the jppf-full-x.y.z-nnnn.zip file in a location of your choice.
+					This gives you the JPPF framework, including the sources, demos, and documentation.
+					<p><b>Runtime distribution</b>
+					<p>Unzip the jppf-full-x.y.z-nnnn-runtime.zip file in a location where you intend to run a node or the UI from.
+					The runtime contains the minimum set of required files and libraries for running a node and the GUI.
+					You'll have to change the configuration properties in the config folder as described in the user guide.
+				</td>
+			</tr>
+			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+			<tr>
+				<td>
+				<h3>Running the Demo</h3>
+				<ol>
+					<li>Go to the <b>jppf-x.y.z/examples/Demo</b> folder</li>
+					<li>type <b>ant run.local</b> to run the example</li>
+				</ol>
+				This script launches 3 separate processes and will take 100% CPU on single-CPU machines.<br>
+				Please give it some time, the demo may take 30 seconds or more to execute.
+				</td>
+			</tr>
+			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+			<tr>
+				<td>
+				<h3>Running the monitoring UI</h3>
+				<ol>
+					<li>Go to the <b>jppf-x.y.z/examples/Demo</b> folder</li>
+					<li>type <b>ant run.ui</b> to run the Swing UI</li>
+				</ol>
+				</td>
+			</tr>
+			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+			<tr><td><h3>More information can be found in the <a href="faq.php"><b>FAQ<b></a></h3></td></tr>
+			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+			<tr>
+				<td>
+					<h3>Description of the distribution</h3>
+					After unzipping, you will see the following folder structure, under the JPPF root folder:
+					<ul>
+						<li><b>bin</b> contains the scripts and config files for building the JPPF distribution, including the zip file you downloaded, the javadoc and the demo</li>
+						<li><b>classes</b> contains the compiled classes of JPPF, excluding the demo</li>
+						<li><b>docs</b> has two subfolders: <b>api</b> for the JPPF api documentation, and <b>manual</b> for a quick guide and tutorial to help you use JPPF through a
+						documented demo that is part of the distribution</li>
+						<li><b>examples</b> is the root container for all demos and examples distributed with the framework</li>
+						<li><b>lib</b> contains all thrid party libraries required to run JPPF nodes and the JPPF GUI. The following third party libraries are required:
+							<ul>
+								<li>log4j: the well known Apache logging framework</li>
+							</ul>
+						</li>
+						<li><b>src</b> contains all sources, fully documented, of the framework</li>
+					</ul>
+				</td>
+			</tr>
+			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+		</table>
+		</div>
+	</body>
+</html>

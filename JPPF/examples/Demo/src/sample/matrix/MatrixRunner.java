@@ -21,6 +21,7 @@ package sample.matrix;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
+import org.jppf.server.JPPFStats;
 import org.jppf.server.app.JPPFClient;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
@@ -57,10 +58,12 @@ public class MatrixRunner
 			int iterations = props.getInt("matrix.iterations");
 			System.out.println("Running Matrix demo with matrix size = "+size+"*"+size+" for "+iterations+" iterations");
 			perform(size, iterations);
+			System.exit(0);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 	
@@ -105,6 +108,8 @@ public class MatrixRunner
 				long elapsed = System.currentTimeMillis() - start;
 				System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
 			}
+			JPPFStats stats = jppfClient.requestStatistics();
+			System.out.println("End statistics :\n"+stats.toString());
 		}
 		catch(Exception e)
 		{

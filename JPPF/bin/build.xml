@@ -183,11 +183,13 @@
 			</fileset>
 		</copy>
 		<copy todir="${deploy}/examples">
-			<fileset dir="${examples}"/>
+			<fileset dir="${examples}">
+				<exclude name="**/*.cmd"/>
+			</fileset>
 		</copy>
 		<copy tofile="${deploy}/README.html" file="${basedir}/index.html"/>
 		<copy tofile="${deploy}/docs/manual/jppf.css" file="${docs}/home/jppf.css"/>
-		<copy tofile="${deploy}/docs/manual/README.html" file="${docs}/home/center-readme.html"/>
+		<copy tofile="${deploy}/docs/manual/README.html" file="${docs}/home/readme.html"/>
 		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
 		<!-- The build number is also incremented by 1                                      -->
 		<propertyfile file="${build.number.file}">

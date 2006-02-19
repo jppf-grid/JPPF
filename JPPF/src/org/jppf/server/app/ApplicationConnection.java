@@ -27,11 +27,12 @@ import org.jppf.server.*;
 import org.jppf.server.event.TaskCompletionListener;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
+import static org.jppf.server.JPPFStatsUpdater.*;
 
 /**
  * Instances of this class listen to incoming client application requests, so as
  * to dispatch them for execution.<br>
- * When the execution is complete, this connection is automatically notified, through
+ * When the execution of a task is complete, this connection is automatically notified, through
  * an asynchronous event mechanism.
  * @author Laurent Cohen
  */
@@ -66,6 +67,7 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 		super(server, socket);
 		InetAddress addr = socket.getInetAddress();
 		setName("appl ["+addr.getHostAddress()+":"+socket.getPort()+"]");
+		if (isStatsEnabled()) newClientConnection();
 	}
 
 	/**
@@ -93,29 +95,64 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 
 		// Read the request header - with tasks count information
 		JPPFRequestHeader header = (JPPFRequestHeader) helper.readNextObject(dis, false);
-		int count = header.getTaskCount();
-		// Read the serialized data provider
-		byte[] dataProvider = helper.readNextBytes(dis);
-		// read each task
-		for (int i=0; i<count; i++)
+		if (JPPFRequestHeader.STATISTICS.equals(header.getRequestType()) && isStatsEnabled())
 		{
-			byte[] taskBytes = helper.readNextBytes(dis);
-			if (log.isDebugEnabled())
-			{
-				log.debug("deserialized task in "+taskBytes.length+" bytes as : "+StringUtils.dumpBytes(taskBytes, 0, taskBytes.length));
-			}
-			String uuid = StringUtils.padLeft(""+i, '0', 10);
-			synchronized(wrapperMap)
-			{
-				JPPFTaskWrapper wrapper = new JPPFTaskWrapper(this, uuid, header.getUuid(), taskBytes);
-				wrapper.setAppUuid(header.getAppUuid());
-				wrapper.setDataProvider(dataProvider);
-				wrapperMap.put(uuid, wrapper);
-				getQueue().addObject(wrapper);
-			}
+			sendStats();
 		}
-		dis.close();
-		waitForExecution();
+		else if (JPPFRequestHeader.EXECUTION.equals(header.getRequestType()))
+		{
+			int count = header.getTaskCount();
+			// Read the serialized data provider
+			byte[] dataProvider = helper.readNextBytes(dis);
+			// read each task
+			for (int i=0; i<count; i++)
+			{
+				byte[] taskBytes = helper.readNextBytes(dis);
+				if (log.isDebugEnabled())
+				{
+					log.debug("deserialized task in "+taskBytes.length+" bytes as : "+StringUtils.dumpBytes(taskBytes, 0, taskBytes.length));
+				}
+				String uuid = StringUtils.padLeft(""+i, '0', 10);
+				synchronized(wrapperMap)
+				{
+					JPPFTaskWrapper wrapper = new JPPFTaskWrapper(this, uuid, header.getUuid(), taskBytes);
+					wrapper.setAppUuid(header.getAppUuid());
+					wrapper.setDataProvider(dataProvider);
+					wrapperMap.put(uuid, wrapper);
+					getQueue().addObject(wrapper);
+				}
+			}
+			dis.close();
+			waitForExecution();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream()
+			{
+		    public synchronized byte[] toByteArray()
+				{
+					return buf;
+				}
+			};
+			DataOutputStream dos = new DataOutputStream(baos);
+			for (String id: resultMap.keySet())
+			{
+				JPPFTaskWrapper wrapper = resultMap.get(id);
+				helper.writeNextBytes(dos, wrapper.getBytes(), 0, wrapper.getBytes().length);
+			}
+			dos.flush();
+			dos.close();
+			buffer = new JPPFBuffer();
+			buffer.setLength(baos.size());
+			buffer.setBuffer(baos.toByteArray());
+			socketClient.sendBytes(buffer);
+		}
+	}
+	
+	/**
+	 * Send the collected statitics in response to a stats request.
+	 * @throws Exception if the statistics could not be sent to the requester.
+	 */
+	private void sendStats() throws Exception
+	{
+		JPPFStats stats = getStats();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream()
 		{
 	    public synchronized byte[] toByteArray()
@@ -124,14 +161,12 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 			}
 		};
 		DataOutputStream dos = new DataOutputStream(baos);
-		for (String id: resultMap.keySet())
-		{
-			JPPFTaskWrapper wrapper = resultMap.get(id);
-			helper.writeNextBytes(dos, wrapper.getBytes(), 0, wrapper.getBytes().length);
-		}
+		SerializationHelper helper = new SerializationHelperImpl();
+		helper.writeNextObject(stats, dos, false);
+
 		dos.flush();
 		dos.close();
-		buffer = new JPPFBuffer();
+		JPPFBuffer buffer = new JPPFBuffer();
 		buffer.setLength(baos.size());
 		buffer.setBuffer(baos.toByteArray());
 		socketClient.sendBytes(buffer);
@@ -183,5 +218,15 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 			wrapperMap.remove(uuid);
 		}
 		notify();
+	}
+
+	/**
+	 * Close this application connection.
+	 * @see org.jppf.server.JPPFConnection#close()
+	 */
+	public void close()
+	{
+		super.close();
+		if (isStatsEnabled()) clientConnectionClosed();
 	}
 }

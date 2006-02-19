@@ -43,6 +43,10 @@ public class JPPFRequestHeader implements Serializable
 	 */
 	public static String ADMIN = "admin";
 	/**
+	 * Value for a statistics collection type of request.
+	 */
+	public static String STATISTICS = "statistics";
+	/**
 	 * The unique identifier for the submitting application.
 	 */
 	private String appUuid = null;
@@ -113,7 +117,7 @@ public class JPPFRequestHeader implements Serializable
 	}
 
 	/**
-	 * Get the type of this request, ie either {@link #EXECUTION EXECUTION} or {@link #ADMIN ADMIN}.
+	 * Get the type of this request, ie either {@link #EXECUTION EXECUTION}, {@link #STATISTICS STATISTICS} or {@link #ADMIN ADMIN}.
 	 * @return the type as a string.
 	 */
 	public String getRequestType()
@@ -123,7 +127,7 @@ public class JPPFRequestHeader implements Serializable
 
 	/**
 	 * Set the type of this request.
-	 * @param requestType the type as a string, either {@link #EXECUTION EXECUTION} or {@link #ADMIN ADMIN}.
+	 * @param requestType the type as a string, either {@link #EXECUTION EXECUTION}, {@link #STATISTICS STATISTICS} or {@link #ADMIN ADMIN}.
 	 */
 	public void setRequestType(String requestType)
 	{

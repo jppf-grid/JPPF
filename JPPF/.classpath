@@ -3,13 +3,19 @@
 	<classpathentry output="build/classes" kind="src" path="src"/>
 	<classpathentry output="examples/Demo/classes" kind="src" path="examples/Demo/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/JFreeChart/gnujaxp.jar"/>
-	<classpathentry kind="lib" path="lib/JFreeChart/jcommon-1.0.0-pre2.jar"/>
-	<classpathentry sourcepath="C:/Tools/jfreechart-1.0.0-pre2/source" kind="lib" path="lib/JFreeChart/jfreechart-1.0.0-pre2.jar"/>
-	<classpathentry kind="lib" path="lib/log4j/log4j-1.2.9.jar"/>
-	<classpathentry kind="lib" path="lib/JDNC/jdnc-0_7-all.jar"/>
-	<classpathentry kind="lib" path="lib/JDNC/jlfgr-1_0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/JFreeChart/gnujaxp.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/log4j/log4j-1.2.9.jar"/>
 	<classpathentry output="build/bootstrap" kind="src" path="bootstrap"/>
-	<classpathentry output="build/classes" kind="src" path="asynch"/>
+	<classpathentry exported="true" sourcepath="C:/Tools/Substance/src" kind="lib" path="lib/Substance/substance.jar">
+		<attributes>
+			<attribute value="file:/C:/Tools/Substance/doc/api/" name="javadoc_location"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="lib/JFreeChart/jcommon-1.0.0.jar"/>
+	<classpathentry exported="true" sourcepath="C:/Tools/jfreechart-1.0.1/source" kind="lib" path="lib/JFreeChart/jfreechart-1.0.1.jar">
+		<attributes>
+			<attribute value="file:/C:/Tools/jfreechart-1.0.1/javadoc/" name="javadoc_location"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

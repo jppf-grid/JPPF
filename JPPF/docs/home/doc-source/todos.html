@@ -1,0 +1,77 @@
+<html>
+	$template{name="head-section" title="Todos Page"}$
+
+	<body>
+		<div align="center">
+		$template{name="jppf-header"}$
+		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
+			$template{name="page-title" title="JPPF Todos"}$
+			<tr>
+				<td class="completed_cell">
+					<h3>Automatic Node Recovery</h3>
+					We haven't addressed the issue of server crashes. We intend to have the nodes try to reconnect, for a limited period of time,
+					before they give up and shutdown gracefully.<br>
+					This is now implemented as of version 0.8.1<br>&nbsp;
+				</td>
+			</tr>
+			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+			<tr>
+				<td class="completed_cell">
+					<h3>Automatic Client Recovery</h3>
+					As for node recovery, we haven't addressed the issue of server crashes, with regards to the client applications.<br>
+					We intend to have the client try to reconnect, then eventually resubmit the tasks that were being executed.<br>
+					This feature is now implemented, as of version 0.8.2<br>&nbsp;
+				</td>
+			</tr>
+			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+			<tr>
+				<td class="completed_cell">
+					<h3>Nodes Security Policy</h3>
+					Currently, it is possible to run any Java code on a node. This is definitely a security risk, both for the code being run, and the host/network
+					the code run on.<br>
+					The short-term plan is to implement a Java security manager with restrictions on network and file I/O, plus other runtime restrictions
+					(i.e. preventing from halting the JVM, that sort of things).<br>
+					This feature is now implemented, as of version 0.9.0<br>&nbsp;
+				</td>
+			</tr>
+			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+			<tr>
+				<td>
+					<h3>Scalability Improvements</h3>
+					Today, the number of nodes the framework can handle is limited, by the number of TCP ports that can be opened on a single machine (the server).
+					To address this, we'll have to upgrade the JPPF driver to a multi-server architecture. This will involve solving many issues, including
+					an increase in communication complexity and potential performance pitfall. Ideally, we'd like to do this without changing the APIs used on the
+					application layer or on the nodes layer. This is a major change and will take a long time to implement. We have no ETA yet.
+					<br>&nbsp;
+				</td>
+			</tr>
+			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+			<tr>
+				<td>
+					<h3>Remote Monitoring and Administration</h3>
+					We are planning on adding the following features :
+					<ul>
+						<li>ability to check the JPPF server's status and health</li>
+						<li>operational statistics collection</li>
+						<li>capacity to manage the server configuration and perform cleanup operations</li>
+						<li>ability to perform scheduled / unscheduled server shutdowns</li>
+					</ul>
+					This is a major change and will take a long time to implement. We have no ETA yet.
+					<br>&nbsp;
+				</td>
+			</tr>
+			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+			<tr>
+				<td>
+					<h3>Nodes Running as Applets</h3>
+					This is about enabling running one or several nodes within a web browser, in the form of Java applets.<br>
+					The goal is to make it easy to start the nodes - as easy as clicking on a link.<br>
+					Also, the plan is to attach a basic UI to the node, displaying execution statistic, resource consumption, and many other things.<br>
+					We are planning to have this feature implemented in the next major version (1.0) at the latest.<br>
+					&nbsp;
+				</td>
+			</tr>
+		</table>
+		</div>
+	</body>
+</html>

@@ -48,7 +48,6 @@ public class JPPFPolicy extends Policy
 	 */
 	public PermissionCollection getPermissions(CodeSource codesource)
 	{
-		System.out.println("JPPFPolicy.getPermissions(CodeSource)");
 		return PermissionsFactory.getPermissions();
 	}
 
@@ -69,7 +68,6 @@ public class JPPFPolicy extends Policy
 	 */
 	public PermissionCollection getPermissions(ProtectionDomain domain)
 	{
-		System.out.println("JPPFPolicy.getPermissions(ProtectionDomain)");
 		return PermissionsFactory.getPermissions();
 	}
 }

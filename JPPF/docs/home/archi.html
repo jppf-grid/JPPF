@@ -1,0 +1,149 @@
+<html>
+		<head>
+		<title>Java Parallel Processing Framework Architecture Page</title>
+		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
+		<meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
+		<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
+		<link rel="stylesheet" type="text/css" href="./jppf.css" title="Style">
+	</head>
+	<body>
+		<div align="center">
+				<table align="center" width="80%" cellspacing="0" cellpadding="5"
+			class="table_" style="background: url('images/grid.gif'); background-repeat: repeat; background-attachment: fixed">
+			<tr><td height="5"></td></tr>
+			<tr>
+				<td width="30%" align="left" valign="center">
+					<h3>Java Parallel Processing Framework</h3>
+				</td>
+				<td width="40%" align="center">
+					<img src="images/logo.gif" border="0" alt="Java Parallel Processing Framework"/>
+				</td>
+				<td width="30%" align="right">
+					<a href="http://sourceforge.net" target="_top">
+						<img src="http://sourceforge.net/sflogo.php?group_id=135654&amp;type=4"
+							width="125" height="37" border="0" alt="SourceForge.net Logo" />
+					</a>
+				</td>
+			</tr>
+			<tr><td height="5"></td></tr>
+		</table>
+		<!--<table border="0" style="background-color: #8080FF" cellspacing="0" cellpadding="0" width="80%">-->
+		<table style="background: url('images/bkg-menu.gif'); background-repeat: repeat; background-attachment: fixed"
+			cellspacing="0" cellpadding="0" width="80%">
+			<tr>
+				<td>
+					<table border="0" cellspacing="0" cellpadding="5">
+						<tr>
+							<td class="menu_first"><a href="index.html">Home</a></td>
+							<td class="menu"><a href="http://sourceforge.net/project/showfiles.php?group_id=135654">Files</a></td>
+							<td class="menu"><a href="faq.php">Faqs</a></td>
+							<td class="menu"><a href="news.php">News</a></td>
+							<td class="menu"><a href="http://sourceforge.net/projects/jppf-project">Project</a></td>
+							<td class="menu"><a href="readme.html">Readme</a></td >
+							<td class="menu"><a href="api/index.html">API Doc</a></td >
+							<td class="menu"><a href="archi.html">Architecture</a></td >
+							<td class="menu"><a href="todos.html">Todos</a></td >
+							<td class="menu"><a href="screenshots.html">Screenshots</a></td >
+							<td class="menu"><a href="links.html">Links</a></td>
+							<td class="menu"></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
+						<tr><td/></tr>
+			<tr>
+				<td>
+					<h1 align="center" style="color: #8080FF"><b>JPPF Architecture</b></h1>
+				</td>
+			</tr>
+			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+			<!--========== Section separator ==========-->
+			<tr>
+				<td align="left" class="archiHeader">
+					Table of Contents
+				</td>
+			</tr>
+			<tr>
+				<td align="left" class="archiContent" style="color: #8080FF; font-weight: bold">
+					<div style="font-size: 10"><br></div>
+					<ol>
+						<li><a href="#diagram">High-level view</a></li>
+						<li><a href="#components">Description of the components</a></li>
+						<li><a href="#flow">Execution Flow</a></li>
+						<li><a href="#classloading">Classloading in JPPF</a></li>
+					</ol>
+					<div style="font-size: 10"><br></div>
+				</td>
+			</tr>
+			<!--========== Section separator ==========-->
+			<tr>
+				<td align="left" class="archiHeader">
+					<a name="diagram"/>1. High Level Architecture View
+				</td>
+			</tr>
+			<tr>
+				<td align="center" class="archiContent">
+					<span style="font-size: 10"><br></span>
+					<!--<img src="images/jppf-architecture.jpg" border="1" alt="JPPF Architecture"/>-->
+					<img src="images/JPPF-Architecture.gif" border="0" alt="JPPF Architecture"/>
+				</td>
+			</tr>
+			<!--========== Section separator ==========-->
+			<tr>
+				<td align="left" class="archiHeader">
+					<a name="components"/>2. Components description
+				</td>
+			</tr>
+			<tr>
+				<td align="left" class="archiContent">
+					<span style="font-size: 10"><br></span>
+					<p>From the diagram, we can see the framework has a 3-tiered architecture, made of 3 distinct layers:
+					<ul>
+						<li><b>client layer</b>: provides an API and communication tools to use the framework to submit tasks, to execute in parallel.</li>
+						<li><b>service layer</b>: responsible for the communication between with the clients and the nodes, along with the management of the execution queue,
+						the load-balancing and recovery features, and the dynamic loading of both framework and application classes onto the appropriate nodes.</li>
+						<li><b>execution layer</b>: these are the nodes. They execute individual tasks, return the execution results, and dynamically request, from the JPPF driver,
+						the code they need to execute the client tasks.</li>
+					</ul>
+					<span style="font-size: 10"><br></span>
+				</td>
+			</tr>
+			<!--========== Section separator ==========-->
+			<tr>
+				<td align="left" class="archiHeader">
+					<a name="flow"/>3. Execution Flow
+				</td>
+			</tr>
+			<tr>
+				<td align="center" class="archiContent">
+					<span style="font-size: 10"><br></span>
+					<img src="images/JPPF-Flow.gif" border="0" alt="JPPF Architecture"/>
+				</td>
+			</tr>
+			<!--========== Section separator ==========-->
+			<tr>
+				<td align="left" class="archiHeader">
+					<a name="classloading"/>4. Class loading in JPPF
+				</td>
+			</tr>
+			<tr>
+				<td align="center" class="archiContent">
+					<span style="font-size: 10"><br></span>
+					<img src="images/JPPF-Classloading.gif" border="0" alt="JPPF Class Loading"/>
+				</td>
+			</tr>
+			<tr><td class="archiContent"/></tr>
+			<tr><td class="archiContent"/></tr>
+			<tr>
+				<td align="center" class="archiContent" style="color: #000060; font-size: 10">
+					Drawings realized with <a href="http://www.openoffice.org">OpenOffice.org</a> Draw
+					<div style="font-size: 10"><br></div>
+				</td>
+			</tr>
+		</table>
+		</div>
+	</body>
+</html>

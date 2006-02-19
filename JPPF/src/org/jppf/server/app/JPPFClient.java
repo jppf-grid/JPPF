@@ -20,9 +20,11 @@ package org.jppf.server.app;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.jppf.classloader.ClassServerDelegate;
 import org.jppf.comm.socket.*;
+import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
@@ -60,6 +62,10 @@ public class JPPFClient
 	 * Used to synchronize access to the underlying socket from multiple threads.
 	 */
 	private SocketInitializer socketInitializer = new SocketInitializer();
+	/**
+	 * Used to synchronize request submissions performed by mutliple threads.
+	 */
+	private ReentrantLock lock = new ReentrantLock();
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -118,51 +124,107 @@ public class JPPFClient
 	/**
 	 * Submit the request to the server.
 	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
 	 * @return the list of executed tasks with their results.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider)
 		throws Exception
 	{
-		boolean completed = false;
-		List<JPPFTask> resultList = new ArrayList<JPPFTask>();
-		while (!completed)
+		lock.lock();
+		try
 		{
-			try
+			boolean completed = false;
+			List<JPPFTask> resultList = new ArrayList<JPPFTask>();
+			
+			while (!completed)
 			{
-				JPPFRequestHeader header = new JPPFRequestHeader();
-				header.setAppUuid(appUuid);
-				int count = taskList.size();
-				header.setTaskCount(count);
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				DataOutputStream dos = new DataOutputStream(baos);
-				helper.writeNextObject(header, dos, false);
-				helper.writeNextObject(dataProvider, dos, true);
-				for (JPPFTask task: taskList) helper.writeNextObject(task, dos, true);
-				dos.flush();
-				dos.close();
-				JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
-				socketClient.sendBytes(buf);
-		
-				buf = socketClient.receiveBytes(0);
-				taskList.clear();
-				ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
-				DataInputStream dis = new DataInputStream(bais);
-				for (int i=0; i<count; i++)
+				try
 				{
-					JPPFTask task = (JPPFTask) helper.readNextObject(dis, true);
-					resultList.add(task);
+					JPPFRequestHeader header = new JPPFRequestHeader();
+					header.setAppUuid(appUuid);
+					int count = taskList.size();
+					header.setTaskCount(count);
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					DataOutputStream dos = new DataOutputStream(baos);
+					helper.writeNextObject(header, dos, false);
+					helper.writeNextObject(dataProvider, dos, true);
+					for (JPPFTask task: taskList) helper.writeNextObject(task, dos, true);
+					dos.flush();
+					dos.close();
+					JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
+					socketClient.sendBytes(buf);
+			
+					buf = socketClient.receiveBytes(0);
+					taskList.clear();
+					ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
+					DataInputStream dis = new DataInputStream(bais);
+					for (int i=0; i<count; i++)
+					{
+						JPPFTask task = (JPPFTask) helper.readNextObject(dis, true);
+						resultList.add(task);
+					}
+					dis.close();
+					completed = true;
 				}
-				dis.close();
-				completed = true;
+				catch(Exception e)
+				{
+					init();
+				}
 			}
-			catch(Exception e)
-			{
-				init();
-			}
+			return resultList;
 		}
-		return resultList;
+		finally
+		{
+			lock.unlock();
+		}
+	}
+	
+	/**
+	 * Send a request to get the statistics collected by the JPPF server.
+	 * @return  a <code>JPPFStats</code> instance.
+	 * @throws Exception if an error occurred while trying to get the server statistics.
+	 */
+	public JPPFStats requestStatistics() throws Exception
+	{
+		lock.lock();
+		try
+		{
+			boolean completed = false;
+			JPPFStats stats = null;
+			while (!completed)
+			{
+				try
+				{
+					JPPFRequestHeader header = new JPPFRequestHeader();
+					header.setAppUuid(appUuid);
+					header.setRequestType(JPPFRequestHeader.STATISTICS);
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					DataOutputStream dos = new DataOutputStream(baos);
+					helper.writeNextObject(header, dos, false);
+					dos.flush();
+					dos.close();
+					JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
+					socketClient.sendBytes(buf);
+			
+					buf = socketClient.receiveBytes(0);
+					ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
+					DataInputStream dis = new DataInputStream(bais);
+					stats = (JPPFStats) helper.readNextObject(dis, false);
+					dis.close();
+					completed = true;
+				}
+				catch(Exception e)
+				{
+					init();
+				}
+			}
+			return stats;
+		}
+		finally
+		{
+			lock.unlock();
+		}
 	}
 
 	/**

@@ -90,10 +90,11 @@ public class SocketInitializer
 			{
 			}
 			// random delay between 0 and 1 second , to avoid overloading the server with simultaneous connection requests.
-			long delay = rand.nextInt(1000);
 			TypedProperties props = JPPFConfiguration.getProperties();
+			long delay = 1000L * props.getLong("reconnect.initial.delay", 0L);
+			if (delay == 0L) delay = rand.nextInt(1000);
 			long maxDuration = 1000L * props.getLong("reconnect.max.time", 60L);
-			long period = 1000L * props.getLong("reconnect.period", 1L);
+			long period = 1000L * props.getLong("reconnect.interval", 1L);
 			latestAttemptDate = new Date(System.currentTimeMillis() + maxDuration);
 			SocketInitializationTask task = new SocketInitializationTask();
 			Timer timer = new Timer("Socket initializer timer");
