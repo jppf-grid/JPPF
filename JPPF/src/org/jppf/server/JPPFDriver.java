@@ -18,6 +18,10 @@
  */
 package org.jppf.server;
 
+import java.net.Socket;
+import java.util.*;
+import org.apache.log4j.Logger;
+import org.jppf.*;
 import org.jppf.classloader.ClassServer;
 import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.node.JPPFNodeServer;
@@ -32,6 +36,10 @@ import org.jppf.utils.*;
  */
 public class JPPFDriver
 {
+	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(JPPFDriver.class);
 	/**
 	 * Singleton instance of the JPPFDriver.
 	 */
@@ -53,6 +61,10 @@ public class JPPFDriver
 	 * Serves class loading requests from the JPPF nodes.
 	 */
 	private ClassServer classServer = null;
+	/**
+	 * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
+	 */
+	private boolean shuttingDown = false;
 	
 	/**
 	 * Initialize and start this driver.
@@ -96,6 +108,75 @@ public class JPPFDriver
 	}
 	
 	/**
+	 * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
+	 * @return true if a shutdown is initiated, false otherwise.
+	 */
+	public boolean isShuttingDown()
+	{
+		return shuttingDown;
+	}
+
+	/**
+	 * Initialize this task with the specified parameters.<br>
+	 * The shutdown is initiated after the specified shutdown delay has expired.<br>
+	 * If the restart parameter is set to false then the JVM exits after the shutdown is complete.
+	 * @param shutdownDelay delay, in milliseconds, after which the server shutdown is initiated. A value of 0 or less
+	 * means an immediate shutdown.
+	 * @param restart determines whether the server should restart after shutdown is complete.
+	 * If set to false, then the JVM will exit.
+	 * @param restartDelay delay, starting from shutdown completion, after which the server is restarted.
+	 * A value of 0 or less means the server is restarted immediately after the shutdown is complete. 
+	 */
+	public void initiateShutdownRestart(long shutdownDelay, boolean restart, long restartDelay)
+	{
+		log.info("Scheduling server shutdown in " + shutdownDelay + " ms");
+		shuttingDown = true;
+		if (shutdownDelay <= 0L) shutdownDelay = 0L;
+		Timer timer = new Timer();
+		ShutdownRestartTask task = new ShutdownRestartTask(timer, restart, restartDelay);
+		timer.schedule(task, shutdownDelay);
+	}
+	
+	/**
+	 * Shutdown this server and all its components.
+	 */
+	private void shutdown()
+	{
+		classServer.end();
+		classServer = null;
+		nodeServer.end();
+		nodeServer = null;
+		applicationServer.end();
+		applicationServer = null;
+	}
+	
+	/**
+	 * Listen to a socket connection setup in the Driver Launcher, to handle the situation when the Launcher dies
+	 * unexpectedly.<br>
+	 * In that situation, the connection is broken and this driver knows that it must exit.
+	 * @param port the port to listen to.
+	 */
+	private static void runDriverListener(final int port)
+	{
+		Runnable r = new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					Socket s = new Socket("localhost", port);
+					s.getInputStream().read();
+				}
+				catch(Throwable t)
+				{
+					System.exit(0);
+				}
+			}
+		};
+		new Thread(r).start();
+	}
+
+	/**
 	 * Start the JPPF server.
 	 * @param args not used.
 	 */
@@ -103,11 +184,96 @@ public class JPPFDriver
 	{
 		try
 		{
-			getInstance().run();
+			if ((args == null) || (args.length <= 0))
+			{
+				throw new JPPFException("The driver should be run with an argument representing a valid TCP port");
+			}
+			int port = Integer.parseInt(args[0]);
+			runDriverListener(port);						
+
+			JPPFDriver driver = getInstance();
+			driver.run();
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			log.fatal(e.getMessage(), e);
+			System.exit(1);
+		}
+	}
+	
+	/**
+	 * Task used by a timer to shutdown, and eventually restart, this server.<br>
+	 * Both shutdown and restart operations can be performed with a specified delay.
+	 */
+	private class ShutdownRestartTask extends TimerTask
+	{
+		/**
+		 * Determines whether the server should restart after shutdown is complete.
+		 */
+		private boolean restart = true;
+		/**
+		 * Delay, starting from shutdown completion, after which the server is restarted.
+		 */
+		private long restartDelay = 0L;
+		/**
+		 * The timer used to schedule this task, and eventually the restart operation.
+		 */
+		private Timer timer = null;
+
+		/**
+		 * Initialize this task with the specified parameters.<br>
+		 * The shutdown is initiated after the specified shutdown delay has expired.<br>
+		 * If the restart parameter is set to false then the JVM exits after the shutdown is complete.
+		 * @param timer the timer used to schedule this task, and eventually the restart operation.
+		 * @param restart determines whether the server should restart after shutdown is complete.
+		 * If set to false, then the JVM will exit.
+		 * @param restartDelay delay, starting from shutdown completion, after which the server is restarted.
+		 * A value of 0 or less means the server is restarted immediately after the shutdown is complete. 
+		 */
+		public ShutdownRestartTask(Timer timer, boolean restart, long restartDelay)
+		{
+			this.timer = timer;
+			this.restart = restart;
+			this.restartDelay = restartDelay;
+		}
+
+		/**
+		 * Perform the actual shutdown, and eventually restart, as specified in the constructor.
+		 * @see java.util.TimerTask#run()
+		 */
+		public void run()
+		{
+			log.info("Initiating shutdown");
+			shutdown();
+			if (!restart)
+			{
+				log.info("Performing requested exit");
+				System.exit(0);
+			}
+			else
+			{
+				TimerTask task = new TimerTask()
+				{
+					public void run()
+					{
+						try
+						{
+							log.info("Initiating restart");
+							//JPPFDriver.getInstance().run();
+							//log.info("Restart complete");
+							System.exit(2);
+						}
+						catch(Exception e)
+						{
+							log.fatal(e.getMessage(), e);
+							throw new JPPFError("Could not restart the JPPFDriver");
+						}
+					}
+				};
+				cancel();
+				timer.schedule(task, restartDelay);
+			}
 		}
 	}
 }

@@ -174,12 +174,14 @@ public class MonitoringPanel extends JPanel implements StatsFormatterListener, S
 			JFrame frame = new JFrame("Test");
 			JTabbedPane tabbedPane = new JTabbedPane();
 			MonitoringPanel monitor = new MonitoringPanel(statsFormatter);
-			statsFormatter.addStatsFormatterListener(monitor);
+			AdminPanel admin = new AdminPanel(statsFormatter);
 			BarChartsPanel chartsPanel = new BarChartsPanel(statsFormatter);
 			PlotChartsPanel plotPanel = new PlotChartsPanel(statsFormatter);
+			statsFormatter.addStatsFormatterListener(monitor);
 			statsFormatter.addStatsFormatterListener(chartsPanel);
 			statsFormatter.addStatsFormatterListener(plotPanel);
 			tabbedPane.addTab("Server Stats", monitor);
+			tabbedPane.addTab("Admin", admin);
 			tabbedPane.addTab("Snapshot Charts", chartsPanel);
 			tabbedPane.addTab("Plot Charts", plotPanel);
 			tabbedPane.addTab("Options", new OptionsPanel(statsFormatter));

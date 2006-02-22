@@ -99,6 +99,10 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 		{
 			sendStats();
 		}
+		else if (JPPFRequestHeader.ADMIN.equals(header.getRequestType()) && isStatsEnabled())
+		{
+			performAdminOperation(header);
+		}
 		else if (JPPFRequestHeader.EXECUTION.equals(header.getRequestType()))
 		{
 			int count = header.getTaskCount();
@@ -173,6 +177,20 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	}
 
 	/**
+	 * Perform a requested administative function.
+	 * @param header the header for the request.
+	 * @throws Exception if the function could not be performed.
+	 */
+	private void performAdminOperation(JPPFRequestHeader header) throws Exception
+	{
+		AdminRequestHeader adminHeader = (AdminRequestHeader) header;
+		long shutdownDelay = adminHeader.getShutdownDelay();
+		boolean restart = !AdminRequestHeader.ADMIN_SHUTDOWN.equals(adminHeader.getCommand());
+		long restartDelay = adminHeader.getRestartDelay();
+		JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay, restart, restartDelay);
+	}
+
+	/**
 	 * Get a reference to the driver's tasks queue.
 	 * @return a <code>JPPFQueue</code> instance.
 	 */
@@ -228,5 +246,15 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	{
 		super.close();
 		if (isStatsEnabled()) clientConnectionClosed();
+	}
+
+	/**
+	 * Get a string representation of this connection.
+	 * @return a string representation of this connection.
+	 * @see org.jppf.server.JPPFConnection#toString()
+	 */
+	public String toString()
+	{
+		return "Application connection : " + super.toString();
 	}
 }

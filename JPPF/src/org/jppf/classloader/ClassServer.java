@@ -21,7 +21,9 @@ package org.jppf.classloader;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
+import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
+import org.jppf.server.JPPFDriver;
 import org.jppf.utils.*;
 
 /**
@@ -33,11 +35,19 @@ import org.jppf.utils.*;
 public class ClassServer extends Thread
 {
 	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(ClassServer.class);
+	/**
 	 * A mapping of the remote resource provider connections handled by this socket server, to their unique uuid.<br>
 	 * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine
 	 * in which application classpath to look for the requested resources.
 	 */
 	protected Map<String, ClassServerConnection> providerConnections = new Hashtable<String, ClassServerConnection>();
+	/**
+	 * The list of connections to remote class loaders.
+	 */
+	protected List<ClassServerConnection> classLoaderConnections = new ArrayList<ClassServerConnection>();
 	/**
 	 * Server socket listening for requests on the configured port.
 	 */
@@ -70,16 +80,21 @@ public class ClassServer extends Thread
 	{
 		try
 		{
-			while (!stop)
+			while (!stop && !JPPFDriver.getInstance().isShuttingDown())
 			{
 				Socket socket = server.accept();
+				if (JPPFDriver.getInstance().isShuttingDown())
+				{
+					socket.close();
+					break;
+				}
 				serve(socket);
 			}
 			end();
 		}
 		catch (Throwable t)
 		{
-			t.printStackTrace();
+			log.error(t.getMessage(), t);
 			end();
 		}
 	}
@@ -109,6 +124,56 @@ public class ClassServer extends Thread
 	}
 
 	/**
+	 * Remove the specified connection from the list of active connections of this server.
+	 * @param connection the connection to remove.
+	 */
+	public void removeConnection(ClassServerConnection connection)
+	{
+		classLoaderConnections.remove(connection);
+	}
+
+	/**
+	 * Add the specified connection to the list of active remote class loader connections of this server.
+	 * @param connection the connection to add.
+	 */
+	public void addClassLoaderConnection(ClassServerConnection connection)
+	{
+		classLoaderConnections.add(connection);
+	}
+
+	/**
+	 * Close and remove all connections accepted by this server.
+	 */
+	public synchronized void removeAllConnections()
+	{
+		if (!stop) return;
+		for (ClassServerConnection connection: classLoaderConnections)
+		{
+			try
+			{
+				connection.setClosed();
+			}
+			catch(Exception e)
+			{
+				log.error("["+connection.toString()+"] "+e.getMessage(), e);
+			}
+		}
+		classLoaderConnections.clear();
+		for (ClassServerConnection connection: providerConnections.values())
+		{
+			try
+			{
+				connection.setClosed();
+			}
+			catch(Exception e)
+			{
+				log.error("["+connection.toString()+"] "+e.getMessage(), e);
+			}
+		}
+		classLoaderConnections.clear();
+	}
+	
+	/**
 	 * Initialize the underlying server socket with a specified port.
 	 * @param port the port the underlying server listens to.
 	 * @throws JPPFBootstrapException if the server socket can't be opened on the specified port.
@@ -119,6 +184,7 @@ public class ClassServer extends Thread
 		try
 		{
 			server = new ServerSocket();
+			server.setReuseAddress(true);
 			InetSocketAddress addr = new InetSocketAddress(port);
 			int size = 32*1024;
 			server.setReceiveBufferSize(size);
@@ -148,9 +214,8 @@ public class ClassServer extends Thread
 			try
 			{
 				stop = true;
-				server.close();
-				for (ClassServerConnection sc: providerConnections.values()) sc.setClosed();
-				providerConnections.clear();
+				if (!server.isClosed()) server.close();
+				removeAllConnections();
 			}
 			catch(IOException ioe)
 			{

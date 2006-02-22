@@ -37,15 +37,15 @@ public class JPPFRequestHeader implements Serializable
 	/**
 	 * Value for an execution request type.
 	 */
-	public static String EXECUTION = "execution";
+	public static final String EXECUTION = "execution";
 	/**
 	 * Value for an administration request type.
 	 */
-	public static String ADMIN = "admin";
+	public static final String ADMIN = "admin";
 	/**
 	 * Value for a statistics collection type of request.
 	 */
-	public static String STATISTICS = "statistics";
+	public static final String STATISTICS = "statistics";
 	/**
 	 * The unique identifier for the submitting application.
 	 */

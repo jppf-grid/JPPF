@@ -228,6 +228,32 @@ public class JPPFClient
 	}
 
 	/**
+	 * Send a request shutdown, or shutdown then restart, the server.
+	 * @param command the command to perform.
+	 * @param shutdownDelay delay, in milliseconds, after which the server shutdown is initiated. A value of 0 or less
+	 * means an immediate shutdown.
+	 * @param restartDelay delay, starting from shutdown completion, after which the server is restarted.
+	 * A value of 0 or less means the server is restarted immediately after the shutdown is complete. 
+	 * @throws Exception if an error occurred while trying to get the server statistics.
+	 */
+	public void submitAdminRequest(String command, long shutdownDelay, long restartDelay) throws Exception
+	{
+		AdminRequestHeader header = new AdminRequestHeader();
+		header.setAppUuid(appUuid);
+		header.setRequestType(JPPFRequestHeader.ADMIN);
+		header.setCommand(command);
+		header.setShutdownDelay(shutdownDelay);
+		header.setRestartDelay(restartDelay);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(baos);
+		helper.writeNextObject(header, dos, false);
+		dos.flush();
+		dos.close();
+		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
+		socketClient.sendBytes(buf);
+	}
+
+	/**
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @throws Exception if an error occcurs while instantiating the class loader.
 	 */

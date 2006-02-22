@@ -69,7 +69,7 @@ public abstract class JPPFConnection extends Thread
 		this.server = server;
 		socketClient = new SocketClient(socket);
 	}
-
+	
 	/**
 	 * Main processing loop for this socket handler. During each loop iteration,
 	 * the following operations are performed:
@@ -95,6 +95,7 @@ public abstract class JPPFConnection extends Thread
 		{
 			log.error(e.getMessage(), e);
 			setClosed();
+			server.removeConnection(this);
 		}
 	}
 
@@ -146,5 +147,18 @@ public abstract class JPPFConnection extends Thread
 			log.error(e.getMessage(), e);
 		}
 		closed = true;
+	}
+
+	/**
+	 * Get a string representation of this connection.
+	 * @return a string representation of this connection.
+	 * @see java.lang.Thread#toString()
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		if (socketClient != null) sb.append(socketClient.getHost()).append(":").append(socketClient.getPort());
+		else sb.append("socket is null");
+		return sb.toString();
 	}
 }

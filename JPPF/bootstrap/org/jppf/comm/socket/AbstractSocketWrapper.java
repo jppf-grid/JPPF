@@ -195,6 +195,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			else if (port <= 0)
 				throw new ConnectException("You must specify the port number");
 			socket = new Socket();
+			//socket.setReuseAddress(true);
 			InetSocketAddress addr = new InetSocketAddress(host, port);
 			int size = 32*1024;
 			socket.setReceiveBufferSize(size);

@@ -20,6 +20,8 @@ package org.jppf.server;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.*;
+import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
 import org.jppf.classloader.ClassServer;
 import org.jppf.utils.*;
@@ -32,6 +34,10 @@ import org.jppf.utils.*;
 public abstract class JPPFServer extends Thread
 {
 	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(JPPFServer.class);
+	/**
 	 * Server socket listening for requests on the configured port.
 	 */
 	protected ServerSocket server = null;
@@ -43,6 +49,10 @@ public abstract class JPPFServer extends Thread
 	 * The port this socket server is listening to.
 	 */
 	protected int port = -1;
+	/**
+	 * The list of connections accepted by this server.
+	 */
+	protected List<JPPFConnection> connections = new ArrayList<JPPFConnection>();
 
 	/**
 	 * Initialize this socket server with a specified execution service and port number.
@@ -63,16 +73,21 @@ public abstract class JPPFServer extends Thread
 	{
 		try
 		{
-			while (!stop)
+			while (!stop && !JPPFDriver.getInstance().isShuttingDown())
 			{
 				Socket socket = server.accept();
+				if (JPPFDriver.getInstance().isShuttingDown())
+				{
+					socket.close();
+					break;
+				}
 				serve(socket);
 			}
 			end();
 		}
 		catch (Throwable t)
 		{
-			t.printStackTrace();
+			log.error(t.getMessage(), t);
 			end();
 		}
 	}
@@ -84,8 +99,9 @@ public abstract class JPPFServer extends Thread
 	 */
 	protected void serve(Socket socket) throws JPPFException
 	{
-		JPPFConnection handler = createConnection(socket);
-		handler.start();
+		JPPFConnection connection = createConnection(socket);
+		connections.add(connection);
+		connection.start();
 	}
 	
 	/**
@@ -109,6 +125,7 @@ public abstract class JPPFServer extends Thread
 		try
 		{
 			server = new ServerSocket();
+			server.setReuseAddress(true);
 			InetSocketAddress addr = new InetSocketAddress(port);
 			int size = 32*1024;
 			server.setReceiveBufferSize(size);
@@ -138,13 +155,43 @@ public abstract class JPPFServer extends Thread
 			try
 			{
 				stop = true;
-				server.close();
+				if (!server.isClosed()) server.close();
+				removeAllConnections();
 			}
 			catch(IOException ioe)
 			{
-				ioe.printStackTrace();
+				log.error(ioe.getMessage(), ioe);
 			}
 		}
+	}
+
+	/**
+	 * Remove the specified connection from the list of active connections of this server.
+	 * @param connection the connection to remove.
+	 */
+	public void removeConnection(JPPFConnection connection)
+	{
+		connections.remove(connection);
+	}
+
+	/**
+	 * Close and remove all connections accepted by this server.
+	 */
+	public synchronized void removeAllConnections()
+	{
+		if (!stop) return;
+		for (JPPFConnection connection: connections)
+		{
+			try
+			{
+				connection.setClosed();
+			}
+			catch(Exception e)
+			{
+				log.error("["+connection.toString()+"] "+e.getMessage(), e);
+			}
+		}
+		connections.clear();
 	}
 	
 	/**
@@ -163,5 +210,4 @@ public abstract class JPPFServer extends Thread
 			t.printStackTrace();
 		}
 	}
-
 }
