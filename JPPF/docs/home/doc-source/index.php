@@ -30,7 +30,7 @@
 						</td></tr>
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 						<tr><td>
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.10.2 - beta</span></h4>
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.11.3 - beta</span></h4>
 						</td></tr>
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 						<tr><td>

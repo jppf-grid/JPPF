@@ -24,9 +24,9 @@
 
 	<target name="run.driver">
 		<echo message="starting the JPPF driver"/>
-		<java fork="yes" classname="org.jppf.server.JPPFDriver" classpathref="client.classpath">
+		<java fork="yes" classname="org.jppf.server.DriverLauncher" classpathref="run.classpath">
 			<jvmarg value="-server"/>
-			<jvmarg value="-Xmx256m"/>
+			<jvmarg value="-Xmx32m"/>
 			<jvmarg value="-Djppf.config=jppf-driver.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-driver.properties"/>
 		</java>       

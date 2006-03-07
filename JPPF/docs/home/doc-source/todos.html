@@ -36,18 +36,7 @@
 			</tr>
 			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 			<tr>
-				<td>
-					<h3>Scalability Improvements</h3>
-					Today, the number of nodes the framework can handle is limited, by the number of TCP ports that can be opened on a single machine (the server).
-					To address this, we'll have to upgrade the JPPF driver to a multi-server architecture. This will involve solving many issues, including
-					an increase in communication complexity and potential performance pitfall. Ideally, we'd like to do this without changing the APIs used on the
-					application layer or on the nodes layer. This is a major change and will take a long time to implement. We have no ETA yet.
-					<br>&nbsp;
-				</td>
-			</tr>
-			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
-			<tr>
-				<td>
+				<td class="completed_cell">
 					<h3>Remote Monitoring and Administration</h3>
 					We are planning on adding the following features :
 					<ul>
@@ -56,7 +45,17 @@
 						<li>capacity to manage the server configuration and perform cleanup operations</li>
 						<li>ability to perform scheduled / unscheduled server shutdowns</li>
 					</ul>
-					This is a major change and will take a long time to implement. We have no ETA yet.
+					This change is now implemented, as of version 0.11.0<br>&nbsp;
+				</td>
+			</tr>
+			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+			<tr>
+				<td>
+					<h3>Scalability Improvements</h3>
+					Today, the number of nodes the framework can handle is limited, by the number of TCP ports that can be opened on a single machine (the server).
+					To address this, we'll have to upgrade the JPPF driver to a multi-server architecture. This will involve solving many issues, including
+					an increase in communication complexity and potential performance pitfall. Ideally, we'd like to do this without changing the APIs used on the
+					application layer or on the nodes layer. This is a major change and will take a long time to implement. We have no ETA yet.
 					<br>&nbsp;
 				</td>
 			</tr>
