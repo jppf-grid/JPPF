@@ -214,7 +214,7 @@ public class JPPFClient
 					dis.close();
 					completed = true;
 				}
-				catch(Exception e)
+				catch(IOException e)
 				{
 					init();
 				}

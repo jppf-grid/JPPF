@@ -215,7 +215,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	{
 		OutputStream os = socket.getOutputStream();
 		InputStream is = socket.getInputStream();
-		BufferedOutputStream bos = new BufferedOutputStream(os, 32*1024);
+		BufferedOutputStream bos = new BufferedOutputStream(os, SOCKET_RECEIVE_BUFFER_SIZE);
 		dos = new DataOutputStream(bos);
 		dos.flush();
 		BufferedInputStream bis = new BufferedInputStream(is);

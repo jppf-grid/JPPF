@@ -32,6 +32,10 @@ public final class CompressionUtils
 	 * Log4j logger for this class.
 	 */
 	private static Logger log = Logger.getLogger(CompressionUtils.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 
 	/**
 	 * Instantiation of this class is not permitted.
@@ -57,7 +61,7 @@ public final class CompressionUtils
 		dos.write(bytes, start, length);
 		dos.flush();
 		dos.close();
-		log.debug("compressed "+length+" bytes into "+baos.size());
+		if (debugEnabled) log.debug("compressed "+length+" bytes into "+baos.size());
 		return baos.toByteArray();
 	}
 
@@ -85,7 +89,7 @@ public final class CompressionUtils
 			count += n;
 		}
 		dis.close();
-		log.debug("uncompressed "+length+" bytes into "+result.length);
+		if (debugEnabled) log.debug("uncompressed "+length+" bytes into "+result.length);
 		return result;
 	}
 }

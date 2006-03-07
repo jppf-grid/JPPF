@@ -24,6 +24,7 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
 import org.jppf.classloader.ClassServer;
+import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.utils.*;
 
 /**
@@ -125,10 +126,8 @@ public abstract class JPPFServer extends Thread
 		try
 		{
 			server = new ServerSocket();
-			server.setReuseAddress(true);
 			InetSocketAddress addr = new InetSocketAddress(port);
-			int size = 32*1024;
-			server.setReceiveBufferSize(size);
+			server.setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 			server.bind(addr);
 		}
 		catch(IllegalArgumentException iae)

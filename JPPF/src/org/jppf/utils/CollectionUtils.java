@@ -18,6 +18,7 @@
  */
 package org.jppf.utils;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -58,5 +59,24 @@ public final class CollectionUtils
 		List<T> list = new ArrayList<T>();
 		for (T element: array) list.add(element);
 		return list;
+	}
+	
+	/**
+	 * Concatenate a set of array into a single array.
+	 * @param <T> the element type of the arrays to concatenate.
+	 * @param arrays the arrays to concatenate.
+	 * @return an array whose size is the sum of the sizes of all the input arrays, and whose elements are all the
+	 * elemetns found in all the input arrays.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T[] concatArrays(T[]...arrays)
+	{
+		if (arrays == null) return null;
+		List<T> result = new ArrayList<T>();
+		for (T[] array: arrays)
+		{
+			for (T t: array) result.add(t);
+		}
+		return result.toArray((T[]) Array.newInstance(arrays[0][0].getClass(), 0));
 	}
 }

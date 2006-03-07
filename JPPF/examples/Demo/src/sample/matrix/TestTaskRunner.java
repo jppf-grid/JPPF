@@ -22,7 +22,7 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
 import org.jppf.server.app.JPPFClient;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.task.storage.*;
 import org.jppf.utils.StringUtils;
 import sample.matrix.SecurityTestTask.ExecutionReport;
@@ -51,8 +51,8 @@ public class TestTaskRunner
 		try
 		{
 			jppfClient = new JPPFClient();
-			perform();
-			//System.exit(0);
+			perform2();
+			System.exit(0);
 		}
 		catch(Exception e)
 		{
@@ -64,7 +64,7 @@ public class TestTaskRunner
 	 * Perform the test.
 	 * @throws JPPFException if an error is raised during the execution.
 	 */
-	private static void perform() throws JPPFException
+	static void perform() throws JPPFException
 	{
 		try
 		{
@@ -92,6 +92,23 @@ public class TestTaskRunner
 				}
 				if (task.getException() != null) throw task.getException();
 			}
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Perform the test.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void perform2() throws JPPFException
+	{
+		try
+		{
+			//jppfClient.submitAdminRequest(AdminRequestHeader.ADMIN_SHUTDOWN_RESTART, 3000L, 3000L);
+			jppfClient.submitAdminRequest(AdminRequestHeader.ADMIN_SHUTDOWN, 3000L, 3000L);
 		}
 		catch(Exception e)
 		{

@@ -45,12 +45,9 @@ public class JPPFQueue
 	 */
 	public void addObject(JPPFTaskWrapper wrapper)
 	{
+		wrapper.setQueueEntryTime(System.currentTimeMillis());
 		queue.add(wrapper);
-		if (isStatsEnabled())
-		{
-			wrapper.setQueueEntryTime(System.currentTimeMillis());
-			taskInQueue();
-		}
+		taskInQueue();
 	}
 	
 	/**
@@ -62,10 +59,7 @@ public class JPPFQueue
 		try
 		{
 			JPPFTaskWrapper wrapper = queue.take();
-			if (isStatsEnabled())
-			{
-				taskOutOfQueue(System.currentTimeMillis() - wrapper.getQueueEntryTime());
-			}
+			taskOutOfQueue(System.currentTimeMillis() - wrapper.getQueueEntryTime());
 			return wrapper;
 		}
 		catch(InterruptedException e)

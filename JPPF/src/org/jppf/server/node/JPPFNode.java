@@ -217,6 +217,7 @@ public class JPPFNode implements Runnable
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 		DataInputStream dis = new DataInputStream(bais);
 		JPPFTaskWrapper wrapper = (JPPFTaskWrapper) helper.readNextObject(dis, false);
+		wrapper.setNodeExecutionTime(System.currentTimeMillis());
 		result[0] = wrapper;
 		String uuid = wrapper.getAppUuid();
 		result[1] = getContainer(uuid).deserializeObject(dis, true);
@@ -235,6 +236,8 @@ public class JPPFNode implements Runnable
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
+		long elapsed = System.currentTimeMillis() - wrapper.getNodeExecutionTime();
+		wrapper.setNodeExecutionTime(elapsed);
 		helper.writeNextObject(wrapper, dos, false);
 		helper.writeNextObject(task, dos, true);
 		dos.flush();

@@ -22,12 +22,13 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jvnet.substance.SubstanceLookAndFeel;
 import org.jvnet.substance.color.ColorScheme;
 import org.jvnet.substance.theme.SubstanceTheme;
 
 /**
- * Options panel for the monitor.
+ * Options chartPanel for the monitor.
  * @author Laurent Cohen
  */
 public class OptionsPanel extends JPanel
@@ -74,7 +75,7 @@ public class OptionsPanel extends JPanel
 	/**
 	 * Determines whether the current theme is a dark theme.
 	 */
-	private boolean currentSchemeDark = true;
+	private boolean currentSchemeDark = false;
 	/**
 	 * The field containing the interval value.
 	 */
@@ -82,13 +83,13 @@ public class OptionsPanel extends JPanel
 	/**
 	 * The stats formatter that provides the data.
 	 */
-	private StatsFormatter statsFormatter = null;
+	private StatsHandler statsFormatter = null;
 
 	/**
 	 * Default contructor.
-	 * @param statsFormatter the monitoring panel to which the options apply.
+	 * @param statsFormatter the monitoring chartPanel to which the options apply.
 	 */
-	public OptionsPanel(StatsFormatter statsFormatter)
+	public OptionsPanel(StatsHandler statsFormatter)
 	{
 		this.statsFormatter = statsFormatter;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -99,16 +100,15 @@ public class OptionsPanel extends JPanel
 	}
 	
 	/**
-	 * Creates a panel with a field to enter the refresh interval, and a button to apply it.
+	 * Creates a chartPanel with a field to enter the refresh interval, and a button to apply it.
 	 * @return a <code>JPanel</code> instance.
 	 */
 	private JPanel createIntervalPanel()
 	{
-		JPanel panel = new JPanel();
+		JPanel panel = GuiUtils.createBoxPanel(BoxLayout.X_AXIS);
 		panel.setBorder(BorderFactory.createTitledBorder("Monitor"));
 		field.setValue(new Long(statsFormatter.getRefreshInterval())); 
 		field.setHorizontalAlignment(JTextField.RIGHT);
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		JButton btn = new JButton("Apply");
 		btn.addActionListener(new ActionListener()
 		{
@@ -138,14 +138,13 @@ public class OptionsPanel extends JPanel
 	}
 
 	/**
-	 * Creates a panel with a combo box to switch the L&F theme.
+	 * Creates a chartPanel with a combo box to switch the L&F theme.
 	 * @return a <code>JPanel</code> instance.
 	 */
 	private JPanel createThemePanel()
 	{
-		JPanel comboPanel = new JPanel();
+		JPanel comboPanel = GuiUtils.createBoxPanel(BoxLayout.X_AXIS);
 		comboPanel.setBorder(BorderFactory.createTitledBorder("UI"));
-		comboPanel.setLayout(new BoxLayout(comboPanel, BoxLayout.X_AXIS));
 		comboPanel.add(new JLabel("Choose a theme :"));
 		comboPanel.add(Box.createHorizontalStrut(5));
 		final JComboBox combo = new JComboBox(colorSchemeMap.keySet().toArray(new String[0]));

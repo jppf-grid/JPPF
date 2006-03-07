@@ -62,10 +62,7 @@ public class DriverLauncher
 			{
 				public void run()
 				{
-					if (process != null)
-					{
-						process.destroy();
-					}
+					if (process != null) process.destroy();
 				}
 			};
 			Runtime.getRuntime().addShutdownHook(new Thread(hook));
@@ -101,6 +98,10 @@ public class DriverLauncher
 		command.add("-server");
 		int n = JPPFConfiguration.getProperties().getInt("max.memory.option", 128);
 		command.add("-Xmx" + n + "m");
+
+		command.add("-Xdebug");
+		command.add("-Xrunjdwp:transport=dt_socket,address=localhost:8000,server=y,suspend=n");		
+
 		command.add("org.jppf.server.JPPFDriver");
 		command.add("" + driverPort);
 		ProcessBuilder builder = new ProcessBuilder(command);
@@ -108,8 +109,8 @@ public class DriverLauncher
 	}
 	
 	/**
-	 * Start a server socket that will accept one connection at a time with the JPPF driver, so the server can shtutdown properly
-	 * when this driver is killed, by a way other than the API.<br>
+	 * Start a server socket that will accept one connection at a time with the JPPF driver, so the server can shtutdown properly,
+	 * when this driver is killed, by a way other than the API (ie CTRL-C or killing the process through the OS shell).<br>
 	 * The port the server socket listens to is dynamically attributed, which is obtained by using the constructor
 	 * <code>new ServerSocket(0)</code>.<br>
 	 * The driver will connect and listen to this port, and exit when the connection is broken.<br>

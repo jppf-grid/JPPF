@@ -22,9 +22,10 @@ import java.awt.Dimension;
 import java.awt.event.*;
 import javax.swing.*;
 import org.jppf.server.protocol.AdminRequestHeader;
+import org.jppf.ui.monitoring.data.StatsHandler;
 
 /**
- * Options panel for the monitor.
+ * Options chartPanel for the monitor.
  * @author Laurent Cohen
  */
 public class AdminPanel extends JPanel
@@ -44,13 +45,13 @@ public class AdminPanel extends JPanel
 	/**
 	 * The stats formatter that provides the data.
 	 */
-	private StatsFormatter statsFormatter = null;
+	private StatsHandler statsFormatter = null;
 
 	/**
 	 * Default contructor.
-	 * @param statsFormatter the monitoring panel to which the options apply.
+	 * @param statsFormatter the monitoring chartPanel to which the options apply.
 	 */
-	public AdminPanel(StatsFormatter statsFormatter)
+	public AdminPanel(StatsHandler statsFormatter)
 	{
 		this.statsFormatter = statsFormatter;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -59,15 +60,14 @@ public class AdminPanel extends JPanel
 	}
 	
 	/**
-	 * Creates a panel with a field to enter the shutdown delay, a field to enter the restart delay,
+	 * Creates a chartPanel with a field to enter the shutdown delay, a field to enter the restart delay,
 	 * and a button to send the shutdown/restart request to the server.
 	 * @return a <code>JPanel</code> instance.
 	 */
 	private JPanel createShutdownRestartPanel()
 	{
-		JPanel panel = new JPanel();
+		JPanel panel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
 		panel.setBorder(BorderFactory.createTitledBorder("Server shutdown/restart"));
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
 		JPanel shutdownPanel = createShtudownPanel();
 		JPanel restartPanel = createRestartPanel();
@@ -92,8 +92,7 @@ public class AdminPanel extends JPanel
 	 */
 	private JPanel createShtudownPanel()
 	{
-		JPanel shutdownPanel = new JPanel();
-		shutdownPanel.setLayout(new BoxLayout(shutdownPanel, BoxLayout.X_AXIS));
+		JPanel shutdownPanel = GuiUtils.createBoxPanel(BoxLayout.X_AXIS);
 		shutdownField.setValue(3000L); 
 		shutdownField.setHorizontalAlignment(JTextField.RIGHT);
 		shutdownField.setPreferredSize(new Dimension(100, 20));
@@ -104,6 +103,7 @@ public class AdminPanel extends JPanel
 		shutdownPanel.add(Box.createHorizontalStrut(5));
 		shutdownPanel.add(shutdownField);
 		shutdownPanel.add(Box.createHorizontalGlue());
+		shutdownPanel.setPreferredSize(new Dimension(25, 300));
 		return shutdownPanel;
 	}
 	
@@ -113,8 +113,7 @@ public class AdminPanel extends JPanel
 	 */
 	private JPanel createRestartPanel()
 	{
-		JPanel restartPanel = new JPanel();
-		restartPanel.setLayout(new BoxLayout(restartPanel, BoxLayout.X_AXIS));
+		JPanel restartPanel = GuiUtils.createBoxPanel(BoxLayout.X_AXIS);
 		restartField.setValue(3000L); 
 		restartField.setHorizontalAlignment(JTextField.RIGHT);
 		restartField.setPreferredSize(new Dimension(100, 20));
@@ -125,6 +124,7 @@ public class AdminPanel extends JPanel
 		restartPanel.add(Box.createHorizontalStrut(5));
 		restartPanel.add(restartField);
 		restartPanel.add(Box.createHorizontalGlue());
+		restartPanel.setPreferredSize(new Dimension(50, 300));
 		return restartPanel;
 	}
 	
@@ -152,11 +152,11 @@ public class AdminPanel extends JPanel
 			}
 		});
 		btn.setPreferredSize(new Dimension(100, 20));
-		JPanel btnPanel = new JPanel();
-		btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.X_AXIS));
+		JPanel btnPanel = GuiUtils.createBoxPanel(BoxLayout.X_AXIS);
 		btnPanel.add(Box.createHorizontalStrut(5));
 		btnPanel.add(btn);
 		btnPanel.add(Box.createHorizontalGlue());
+		btnPanel.setPreferredSize(new Dimension(25, 300));
 		return btnPanel;
 	}
 	
@@ -166,7 +166,7 @@ public class AdminPanel extends JPanel
 	 */
 	private JPanel createCheckboxPanel()
 	{
-		JPanel checkboxPanel = new JPanel();
+		JPanel checkboxPanel = GuiUtils.createBoxPanel(BoxLayout.X_AXIS);
 		restartBox = new JCheckBox("Restart", true);
 		restartBox.addActionListener(new ActionListener()
 		{
@@ -175,7 +175,6 @@ public class AdminPanel extends JPanel
 				restartField.setEnabled(restartBox.isSelected());
 			}
 		});
-		checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.X_AXIS));
 		checkboxPanel.add(Box.createHorizontalStrut(5));
 		checkboxPanel.add(restartBox);
 		checkboxPanel.add(Box.createHorizontalGlue());

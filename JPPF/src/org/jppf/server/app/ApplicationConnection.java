@@ -42,6 +42,10 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	 * Log4j logger for this class.
 	 */
 	private static Logger log = Logger.getLogger(ApplicationConnection.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 
 	/**
 	 * Mapping of received tasks to a unique id within the context of their enclosing request. 
@@ -112,7 +116,7 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 			for (int i=0; i<count; i++)
 			{
 				byte[] taskBytes = helper.readNextBytes(dis);
-				if (log.isDebugEnabled())
+				if (debugEnabled)
 				{
 					log.debug("deserialized task in "+taskBytes.length+" bytes as : "+StringUtils.dumpBytes(taskBytes, 0, taskBytes.length));
 				}

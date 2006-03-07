@@ -26,6 +26,15 @@ package org.jppf.utils;
 public final class StringUtils
 {
 	/**
+	 * Keywords to look for and replace in the legend items of the charts.
+	 */
+	private static final String[] KEYWORDS = new String[] { "Execution", "Maximum", "Minimum", "Average" };
+	/**
+	 * The the replacements words for the keywords in the legend items. Used to shorten the legend labels.
+	 */
+	private static final String[] REPLACEMENTS = new String[] { "Exec", "Max", "Min", "Avg" };
+
+	/**
 	 * Instantiation of this class is not permitted.
 	 */
 	private StringUtils()
@@ -109,5 +118,19 @@ public final class StringUtils
 		sb.append(elapsed / 1000L).append(".");
 		sb.append(elapsed % 1000L);
 		return sb.toString();
+	}
+	
+	/**
+	 * Replace pre-determined keywords in a string, with shorter ones.
+	 * @param key the string to shorten.
+	 * @return the string with its keywords replaced.
+	 */
+	public static String shortenLabel(String key)
+	{
+		for (int i=0; i<KEYWORDS.length; i++)
+		{
+			if (key.indexOf(KEYWORDS[i]) >= 0) key = key.replace(KEYWORDS[i], REPLACEMENTS[i]);
+		}
+		return key;
 	}
 }

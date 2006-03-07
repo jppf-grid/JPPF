@@ -184,7 +184,6 @@ public class ClassServer extends Thread
 		try
 		{
 			server = new ServerSocket();
-			server.setReuseAddress(true);
 			InetSocketAddress addr = new InetSocketAddress(port);
 			int size = 32*1024;
 			server.setReceiveBufferSize(size);

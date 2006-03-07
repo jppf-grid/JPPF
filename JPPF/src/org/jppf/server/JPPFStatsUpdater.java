@@ -133,10 +133,7 @@ public final class JPPFStatsUpdater
 		{
 			stats.queueSize--;
 			stats.totalQueued++;
-			stats.totalQueueTime += time;
-			stats.latestQueueTime = time;
-			if (time > stats.maxQueueTime) stats.maxQueueTime = time;
-			if (time < stats.minQueueTime) stats.minQueueTime = time;
+			stats.queue.newTime(time);
 		}
 		finally
 		{
@@ -146,18 +143,18 @@ public final class JPPFStatsUpdater
 	
 	/**
 	 * Called when a task execution has completed.
-	 * @param time the time it took to execute the task.
+	 * @param time the time it took to execute the task, including transport to and from the node.
+	 * @param remoteTime the time it took to execute the in the node only.
 	 */
-	public static void taskExecuted(long time)
+	public static void taskExecuted(long time, long remoteTime)
 	{
 		lock.lock();
 		try
 		{
 			stats.totalTasksExecuted++;
-			stats.totalExecutionTime += time;
-			stats.latestExecutionTime = time;
-			if (time > stats.maxExecutionTime) stats.maxExecutionTime = time;
-			if (time < stats.minExecutionTime) stats.minExecutionTime = time;
+			stats.execution.newTime(time);
+			stats.nodeExecution.newTime(remoteTime);
+			stats.transport.newTime(time - remoteTime);
 		}
 		finally
 		{
@@ -180,6 +177,16 @@ public final class JPPFStatsUpdater
 		{
 			lock.unlock();
 		}
+	}
+
+	/**
+	 * This method synchronizes calls to <code>System.currentTimeMillis()</code>
+	 * @return the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC.
+	 * @see java.lang.System#currentTimeMillis()
+	 */
+	public static synchronized long currentTimeMillis()
+	{
+		return System.currentTimeMillis();
 	}
 
 	/**

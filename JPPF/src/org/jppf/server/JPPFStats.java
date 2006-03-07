@@ -31,37 +31,26 @@ public class JPPFStats implements Serializable
 	 */
 	public int totalTasksExecuted = 0;
 	/**
-	 * The total tasks execution time.
+	 * Time statistics for the tasks execution, including network transport time and node execution time.
 	 */
-	public long totalExecutionTime = 0L;
+	public TimeSnapshot execution = new TimeSnapshot("execution");
 	/**
-	 * The execution time of the most recently executed task.
+	 * Time statistics for the tasks execution within the nodes only.
 	 */
-	public long latestExecutionTime = 0L;
+	public TimeSnapshot nodeExecution = new TimeSnapshot("node execution");
 	/**
-	 * The minimum task execution time.
+	 * Time statistics for the tasks network transport time between the nodes and server.
 	 */
-	public long minExecutionTime = Long.MAX_VALUE;
+	public TimeSnapshot transport = new TimeSnapshot("transport");
 	/**
-	 * The maximum task execution time.
+	 * Time statistics for the tasks management overhead within the server.
 	 */
-	public long maxExecutionTime = 0L;
+	public TimeSnapshot server = new TimeSnapshot("server");
 	/**
-	 * Time the latest task (at the time of the request) remained in the queue.
+	 * Time statistics for the tasks queue time.
 	 */
-	public long latestQueueTime = 0L;
-	/**
-	 * Total time spent in the queue for all tasks.
-	 */
-	public long totalQueueTime = 0L;
-	/**
-	 * Minimum time a task remained in the queue.
-	 */
-	public long minQueueTime = Long.MAX_VALUE;
-	/**
-	 * Maximum time a task remained in the queue.
-	 */
-	public long maxQueueTime = 0L;
+	public TimeSnapshot queue = new TimeSnapshot("queue");
+
 	/**
 	 * Total number of tasks that have been queue.
 	 */
@@ -100,14 +89,10 @@ public class JPPFStats implements Serializable
 	{
 		JPPFStats s = new JPPFStats();
 		s.totalTasksExecuted = totalTasksExecuted;
-		s.totalExecutionTime = totalExecutionTime;
-		s.latestExecutionTime = latestExecutionTime;
-		s.minExecutionTime = minExecutionTime;
-		s.maxExecutionTime = maxExecutionTime;
-		s.latestQueueTime = latestQueueTime;
-		s.totalQueueTime = totalQueueTime;
-		s.minQueueTime = minQueueTime;
-		s.maxQueueTime = maxQueueTime;
+		s.execution = execution.makeCopy();
+		s.nodeExecution = nodeExecution.makeCopy();
+		s.transport = transport.makeCopy();
+		s.queue = queue.makeCopy();
 		s.totalQueued = totalQueued;
 		s.queueSize = queueSize;
 		s.maxQueueSize = maxQueueSize;
@@ -127,14 +112,10 @@ public class JPPFStats implements Serializable
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("totalTasksExecuted : ").append(totalTasksExecuted).append("\n");
-		sb.append("totalExecutionTime : ").append(totalExecutionTime).append("\n");
-		sb.append("latestExecutionTime : ").append(latestExecutionTime).append("\n");
-		sb.append("minExecutionTime : ").append(minExecutionTime).append("\n");
-		sb.append("maxExecutionTime : ").append(maxExecutionTime).append("\n");
-		sb.append("latestQueueTime : ").append(latestQueueTime).append("\n");
-		sb.append("totalQueueTime : ").append(totalQueueTime).append("\n");
-		sb.append("minQueueTime : ").append(minQueueTime).append("\n");
-		sb.append("maxQueueTime : ").append(maxQueueTime).append("\n");
+		sb.append(execution.toString());
+		sb.append(nodeExecution.toString());
+		sb.append(transport.toString());
+		sb.append(queue.toString());
 		sb.append("totalQueued : ").append(totalQueued).append("\n");
 		sb.append("queueSize : ").append(queueSize).append("\n");
 		sb.append("maxQueueSize : ").append(maxQueueSize).append("\n");

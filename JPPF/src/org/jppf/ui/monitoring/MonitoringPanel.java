@@ -22,9 +22,13 @@ import java.awt.Dimension;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.table.*;
 import org.apache.log4j.Logger;
+import org.jppf.server.JPPFStats;
+import org.jppf.ui.monitoring.charts.*;
+import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
-import org.jvnet.substance.SubstanceLookAndFeel;
+import org.jvnet.substance.*;
 
 /**
  * This class provides a graphical interface for monitoring the status and health 
@@ -33,130 +37,169 @@ import org.jvnet.substance.SubstanceLookAndFeel;
  * and switching the color scheme (skin) fot the whole UI.
  * @author Laurent Cohen
  */
-public class MonitoringPanel extends JPanel implements StatsFormatterListener, StatsConstants
+public class MonitoringPanel extends JPanel implements StatsHandlerListener, StatsConstants
 {
 	/**
 	 * Log4j logger for this class.
 	 */
 	static Logger log = Logger.getLogger(MonitoringPanel.class);
 	/**
-	 * Association of value names to the corresponding <code>JLabel</code> components.
-	 */
-	private Map<String, JLabel> nameLabels = new HashMap<String, JLabel>();
-	/**
-	 * Association of values to the corresponding <code>JLabel</code> components.
-	 */
-	private Map<String, JLabel> valueLabels = new HashMap<String, JLabel>();
-	/**
 	 * The stats formatter that provides the data.
 	 */
-	private StatsFormatter statsFormatter = null;
+	private StatsHandler statsHandler = null;
+	/**
+	 * Holds a list of table models to update wwhen new stats are received.
+	 */
+	private List<MonitorTableModel> tableModels = new ArrayList<MonitorTableModel>();
 
 	/**
 	 * Default contructor.
-	 * @param statsFormatter the stats formatter that provides the data.
+	 * @param statsHandler the stats formatter that provides the data.
 	 */
-	public MonitoringPanel(StatsFormatter statsFormatter)
+	public MonitoringPanel(StatsHandler statsHandler)
 	{
-		this.statsFormatter = statsFormatter;
+		this.statsHandler = statsHandler;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		add(Box.createVerticalStrut(5));
 		add(makeRefreshPanel());
 		add(Box.createVerticalStrut(5));
-		add(makeValuesPanel(EXECUTION_PROPS, "Execution"));
+		add(makeTablePanel(EXECUTION_PROPS, "Execution"));
 		add(Box.createVerticalStrut(5));
-		add(makeValuesPanel(QUEUE_PROPS, "Queue"));
+		add(makeTablePanel(NODE_EXECUTION_PROPS, "Node Execution"));
 		add(Box.createVerticalStrut(5));
-		add(makeValuesPanel(CONNECTION_PROPS, "Connections"));
+		add(makeTablePanel(TRANSPORT_PROPS, "Network ovehead"));
 		add(Box.createVerticalStrut(5));
+		add(makeTablePanel(QUEUE_PROPS, "Queue"));
+		add(Box.createVerticalStrut(5));
+		add(makeTablePanel(CONNECTION_PROPS, "Connections"));
+		//add(Box.createVerticalStrut(5));
+		add(Box.createVerticalGlue());
 	}
 	
 	/**
 	 * Called when new stats have been received from the server.
 	 * @param event holds the new stats values.
 	 */
-	public void dataUpdated(StatsFormatterEvent event)
+	public void dataUpdated(StatsHandlerEvent event)
 	{
-		final StatsFormatter sf = event.getStatsFormatter();
-		SwingUtilities.invokeLater(new Runnable()
+		for (final MonitorTableModel model: tableModels)
 		{
-			public void run()
+			SwingUtilities.invokeLater(new Runnable()
 			{
-				for (String name: nameLabels.keySet())
+				public void run()
 				{
-					valueLabels.get(name).setText(sf.getStringValueMap().get(name));
+					model.fireTableDataChanged();
 				}
-			}
-		});
+			});
+		}
 	}
 	
 	/**
-	 * Create a panel with a &quot;refresh now&quote; button.
-	 * @return a <code>JPanel</code> instance.
+	 * Create a chartPanel with a &quot;refresh now&quote; button.
+	 * @return a <code>JComponent</code> instance.
 	 */
-	private JPanel makeRefreshPanel()
+	private JComponent makeRefreshPanel()
 	{
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		JButton btn = new JButton("Refresh Now");
 		btn.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent event)
 			{
-				statsFormatter.requestUpdate();
+				statsHandler.requestUpdate();
 			}
 		});
 		btn.setPreferredSize(new Dimension(100, 20));
-		panel.add(Box.createHorizontalStrut(5));
-		panel.add(btn);
-		panel.add(Box.createHorizontalGlue());
-		return panel;
+		return btn;
 	}
 
 	/**
-	 * Create a panel displaying a group of values.
+	 * Create a chartPanel displaying a group of values.
 	 * @param props the names of the values to display.
-	 * @param title the title of the panel.
-	 * @return a <code>JPanel</code> instance.
+	 * @param title the title of the chartPanel.
+	 * @return a <code>JComponent</code> instance.
 	 */
-	private JPanel makeValuesPanel(String[] props, String title)
+	private JComponent makeTablePanel(String[] props, String title)
 	{
-		JPanel panel = new JPanel();
+		JPanel panel = GuiUtils.createBoxPanel(BoxLayout.X_AXIS);
 		panel.setBorder(BorderFactory.createTitledBorder(title));
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		for (String name: props)
+		JTable table = new JTable()
 		{
-			String value = statsFormatter.getStringValueMap().get(name);
-			panel.add(makeValueLine(name, value));
-		}
+			public boolean isCellEditable(int row, int column)
+			{
+				return false;
+			}
+		};
+		MonitorTableModel model = new MonitorTableModel(props);
+		table.setModel(model);
+		table.setOpaque(false);
+		DefaultTableCellRenderer rend1 = new SubstanceDefaultTableCellRenderer();
+		rend1.setHorizontalAlignment(JLabel.RIGHT);
+		rend1.setOpaque(false);
+		table.getColumnModel().getColumn(1).setCellRenderer(rend1);
+		DefaultTableCellRenderer rend0 = new SubstanceDefaultTableCellRenderer();
+		rend0.setHorizontalAlignment(JLabel.LEFT);
+		rend0.setOpaque(false);
+		table.getColumnModel().getColumn(0).setCellRenderer(rend0);
+		tableModels.add(model);
+		panel.add(table);
+		table.setShowGrid(false);
 		return panel;
 	}
 
 	/**
-	 * Create a panel displaying a value and its name.
-	 * @param name the name of the value to display.
-	 * @param value the value to display.
-	 * @return a <code>JPanel</code> instance.
+	 * Data model for the tables displaying the values.
 	 */
-	private JPanel makeValueLine(String name, String value)
+	private class MonitorTableModel extends AbstractTableModel
 	{
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		JLabel nameLabel = new JLabel(name);
-		nameLabel.setPreferredSize(new Dimension(150, 20));
-		JLabel valueLabel = new JLabel(value);
-		valueLabel.setPreferredSize(new Dimension(200, 20));
-		valueLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		/**
+		 * The list of fields whose values are displayed in the table.
+		 */
+		private String[] fields = null;
 
-		nameLabels.put(name, nameLabel);
-		valueLabels.put(name, valueLabel);
+		/**
+		 * Initialize this table model witht he specified list of fields.
+		 * @param fields the list of fields whose values are displayed in the table.
+		 */
+		MonitorTableModel(String[] fields)
+		{
+			this.fields = fields;
+		}
 
-		panel.add(Box.createHorizontalStrut(5));
-		panel.add(nameLabel);
-		panel.add(Box.createHorizontalStrut(5));
-		panel.add(valueLabel);
-		panel.add(Box.createHorizontalGlue());
-		return panel;
+		/**
+		 * Get the number of columns in the table.
+		 * @return 2.
+		 * @see javax.swing.table.TableModel#getColumnCount()
+		 */
+		public int getColumnCount()
+		{
+			return 2;
+		}
+
+		/**
+		 * Get the number of rows in the table.
+		 * @return the number of fields displayed in the table.
+		 * @see javax.swing.table.TableModel#getRowCount()
+		 */
+		public int getRowCount()
+		{
+			return fields.length;
+		}
+
+		/**
+		 * Get a value at specified coordinates in the table.
+		 * @param row the row coordinate.
+		 * @param column the column coordinate.
+		 * @return the value as an object.
+		 * @see javax.swing.table.TableModel#getValueAt(int, int)
+		 */
+		public Object getValueAt(int row, int column)
+		{
+			Map<String, String> valuesMap = null;
+			if (statsHandler.getStatsCount() > 0) valuesMap = statsHandler.getLatestStringValues();
+			else valuesMap = StatsFormatter.getStringValuesMap(new JPPFStats());
+			String name = fields[row];
+			return column == 0 ? name : valuesMap.get(name);
+		}
 	}
 
 	/**
@@ -169,22 +212,22 @@ public class MonitoringPanel extends JPanel implements StatsFormatterListener, S
 		{
 			UIManager.setLookAndFeel(new SubstanceLookAndFeel());
 			SubstanceLookAndFeel.setCurrentWatermark(new TiledImageWatermark("org/jppf/ui/resources/GridWatermark.gif"));
-			SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme(new JPPFColorScheme(), "JPPF", true));
-			StatsFormatter statsFormatter = new StatsFormatter();
+			SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme(new JPPFColorScheme(), "JPPF", false));
+			StatsHandler statsHandler = new StatsHandler();
 			JFrame frame = new JFrame("Test");
 			JTabbedPane tabbedPane = new JTabbedPane();
-			MonitoringPanel monitor = new MonitoringPanel(statsFormatter);
-			AdminPanel admin = new AdminPanel(statsFormatter);
-			BarChartsPanel chartsPanel = new BarChartsPanel(statsFormatter);
-			PlotChartsPanel plotPanel = new PlotChartsPanel(statsFormatter);
-			statsFormatter.addStatsFormatterListener(monitor);
-			statsFormatter.addStatsFormatterListener(chartsPanel);
-			statsFormatter.addStatsFormatterListener(plotPanel);
+			MonitoringPanel monitor = new MonitoringPanel(statsHandler);
+			AdminPanel admin = new AdminPanel(statsHandler);
+			JPPFChartBuilder builder = new JPPFChartBuilder(statsHandler);
+			builder.createInitialCharts();
+			ChartConfigurationPanel configPanel = new ChartConfigurationPanel(builder);
+			statsHandler.addStatsHandlerListener(monitor);
+			statsHandler.addStatsHandlerListener(builder);
 			tabbedPane.addTab("Server Stats", monitor);
+			tabbedPane.addTab("Charts", builder.getTabbedPane());
+			tabbedPane.addTab("Charts config", configPanel);
 			tabbedPane.addTab("Admin", admin);
-			tabbedPane.addTab("Snapshot Charts", chartsPanel);
-			tabbedPane.addTab("Plot Charts", plotPanel);
-			tabbedPane.addTab("Options", new OptionsPanel(statsFormatter));
+			tabbedPane.addTab("Options", new OptionsPanel(statsHandler));
 			frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			frame.addWindowListener(new WindowAdapter()
 			{
@@ -194,9 +237,9 @@ public class MonitoringPanel extends JPanel implements StatsFormatterListener, S
 				}
 			});
 			frame.add(tabbedPane);
-			frame.setSize(400, 600);
+			frame.setSize(600, 600);
 			frame.setVisible(true);
-			statsFormatter.startRefreshTimer();
+			statsHandler.startRefreshTimer();
 		}
 		catch(Exception e)
 		{
