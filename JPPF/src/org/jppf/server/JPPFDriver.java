@@ -41,6 +41,10 @@ public class JPPFDriver
 	 */
 	private static Logger log = Logger.getLogger(JPPFDriver.class);
 	/**
+	 * Determines whether debug-level logging is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * Singleton instance of the JPPFDriver.
 	 */
 	private static JPPFDriver instance = null;
@@ -184,6 +188,7 @@ public class JPPFDriver
 	{
 		try
 		{
+			if (debugEnabled) log.debug("starting the JPPF driver");
 			if ((args == null) || (args.length <= 0))
 			{
 				throw new JPPFException("The driver should be run with an argument representing a valid TCP port");

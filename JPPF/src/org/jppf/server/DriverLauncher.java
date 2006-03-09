@@ -21,6 +21,7 @@ package org.jppf.server;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
+import org.apache.log4j.Logger;
 import org.jppf.utils.JPPFConfiguration;
 
 /**
@@ -36,6 +37,14 @@ import org.jppf.utils.JPPFConfiguration;
  */
 public class DriverLauncher
 {
+	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(DriverLauncher.class);
+	/**
+	 * Determines whether debug-level logging is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * A reference to the JPPF driver subprocess, used to kill it when the driver launcher exits.
 	 */
@@ -70,6 +79,7 @@ public class DriverLauncher
 			while (!end)
 			{
 				process = buildProcess();
+				if (debugEnabled) log.debug("started driver process [" + process + "]");
 				int n = process.waitFor();
 				process.destroy();
 				if (n != 2) end = true;
@@ -104,6 +114,7 @@ public class DriverLauncher
 
 		command.add("org.jppf.server.JPPFDriver");
 		command.add("" + driverPort);
+		if (debugEnabled) log.debug("process command:\n" + command);
 		ProcessBuilder builder = new ProcessBuilder(command);
 		return builder.start();
 	}
@@ -137,6 +148,7 @@ public class DriverLauncher
 						}
 						catch(IOException ioe)
 						{
+							if (debugEnabled) log.debug(ioe.getMessage(), ioe);
 						}
 					}
 				}
@@ -152,6 +164,7 @@ public class DriverLauncher
 			catch(IOException ioe)
 			{
 				ioe.printStackTrace();
+				if (debugEnabled) log.debug(ioe.getMessage(), ioe);
 				System.exit(1);
 			}
 		}
