@@ -103,7 +103,26 @@
 		</parallel>
 	</target>
 
-	<target name="run.local">
+	<target name="run.demo1">
+		<parallel>
+			<antcall target="run.driver"/>
+			<sequential>
+				<sleep milliseconds="1000"/>
+				<antcall target="run.node1"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="2000"/>
+				<antcall target="run.ui"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="3000"/>
+				<antcall target="run.long.task"/>
+				<fail status="1" message="Demo has ended normally."/>
+			</sequential>
+		</parallel>
+	</target>
+
+	<target name="run.demo2">
 		<parallel>
 			<antcall target="run.driver"/>
 			<sequential>
@@ -137,8 +156,18 @@
 		</parallel>
 	</target>
 
-	<target name="run.client">
-		<echo message="starting the demo application"/>
+	<target name="run.long.task">
+		<echo message="starting the 'Long task' demo application"/>
+		<java fork="yes" classname="sample.tasklength.LongTaskRunner" classpathref="client.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-client.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+		</java>       
+	</target>
+
+	<target name="run.matrix">
+		<echo message="starting the 'Matrix Multiplication' demo application"/>
 		<java fork="yes" classname="sample.matrix.MatrixRunner" classpathref="client.classpath">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx64m"/>
@@ -147,7 +176,7 @@
 		</java>       
 	</target>
 
-	<target name="run.client2">
+	<target name="run.matrix2">
 		<echo message="starting the second demo application"/>
 		<java fork="yes" classname="sample.matrix.MatrixRunner" classpathref="client.classpath">
 			<jvmarg value="-server"/>
@@ -159,9 +188,9 @@
 
 	<target name="run.driver">
 		<echo message="starting the JPPF driver"/>
-		<java fork="yes" classname="org.jppf.server.JPPFDriver" classpathref="client.classpath">
+		<java fork="yes" classname="org.jppf.server.DriverLauncher" classpathref="client.classpath">
 			<jvmarg value="-server"/>
-			<jvmarg value="-Xmx256m"/>
+			<jvmarg value="-Xmx32m"/>
 			<jvmarg value="-Djppf.config=jppf-driver.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-driver.properties"/>
 		</java>       
