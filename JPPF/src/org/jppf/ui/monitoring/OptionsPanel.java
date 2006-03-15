@@ -92,11 +92,20 @@ public class OptionsPanel extends JPanel
 	public OptionsPanel(StatsHandler statsFormatter)
 	{
 		this.statsFormatter = statsFormatter;
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		add(createIntervalPanel());
-		add(Box.createVerticalStrut(5));
-		add(createThemePanel());
-		add(Box.createVerticalGlue());
+		SpringLayout layout = new SpringLayout();
+		setLayout(layout);
+		JPanel intervalPanel = createIntervalPanel();
+		JPanel themePanel = createThemePanel();
+		add(intervalPanel);
+		add(themePanel);
+		Dimension d = new Dimension(350, 60);
+		intervalPanel.setPreferredSize(d);
+		themePanel.setPreferredSize(d);
+
+		layout.putConstraint(SpringLayout.NORTH, intervalPanel, 10, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, themePanel, 10, SpringLayout.SOUTH, intervalPanel);
+		layout.putConstraint(SpringLayout.WEST, intervalPanel, 10, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.WEST, themePanel, 10, SpringLayout.WEST, this);
 	}
 	
 	/**
@@ -127,12 +136,13 @@ public class OptionsPanel extends JPanel
 		field.setPreferredSize(new Dimension(100, 20));
 		field.setMinimumSize(new Dimension(100, 20));
 		field.setMaximumSize(new Dimension(100, 20));
-		panel.add(Box.createHorizontalStrut(5));
+		panel.add(Box.createHorizontalStrut(10));
 		panel.add(new JLabel("Interval in milliseconds"));
-		panel.add(Box.createHorizontalStrut(5));
+		panel.add(Box.createHorizontalStrut(10));
 		panel.add(field);
-		panel.add(Box.createHorizontalStrut(5));
+		panel.add(Box.createHorizontalStrut(10));
 		panel.add(btn);
+		panel.add(Box.createHorizontalStrut(10));
 		panel.add(Box.createHorizontalGlue());
 		return panel;
 	}
@@ -146,7 +156,7 @@ public class OptionsPanel extends JPanel
 		JPanel comboPanel = GuiUtils.createBoxPanel(BoxLayout.X_AXIS);
 		comboPanel.setBorder(BorderFactory.createTitledBorder("UI"));
 		comboPanel.add(new JLabel("Choose a theme :"));
-		comboPanel.add(Box.createHorizontalStrut(5));
+		comboPanel.add(Box.createHorizontalStrut(10));
 		final JComboBox combo = new JComboBox(colorSchemeMap.keySet().toArray(new String[0]));
 		combo.setSelectedItem("JPPF");
 		combo.addActionListener(new ActionListener()
@@ -174,6 +184,7 @@ public class OptionsPanel extends JPanel
 				}
 			}
 		});
+		comboPanel.add(Box.createHorizontalStrut(10));
 		comboPanel.add(box);
 		comboPanel.add(Box.createHorizontalGlue());
 		return comboPanel;

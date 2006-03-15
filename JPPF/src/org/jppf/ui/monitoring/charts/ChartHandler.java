@@ -18,6 +18,8 @@
  */
 package org.jppf.ui.monitoring.charts;
 
+import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
+
 
 /**
  * Common interface for all chart handlers, which configure, create, initially poppulate and update various

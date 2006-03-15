@@ -19,6 +19,7 @@
 package org.jppf.ui.monitoring.data;
 
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.app.JPPFClient;
@@ -76,6 +77,10 @@ public class StatsHandler implements StatsConstants
 	 * Number of data updates so far.
 	 */
 	private int tickCount = 0;
+	/**
+	 * Used to synchronize concurrent access to the data.
+	 */
+	private ReentrantLock lock = new ReentrantLock();
 
 	/**
 	 * Initialize this formatter.
@@ -173,26 +178,34 @@ public class StatsHandler implements StatsConstants
 	 */
 	public void update(JPPFStats stats)
 	{
-		tickCount++;
-		stats.execution.avgTime = (stats.totalTasksExecuted > 0)
-			? (double) stats.execution.totalTime / (double) stats.totalTasksExecuted : 0d;
-		stats.transport.avgTime = (stats.totalTasksExecuted > 0)
-			? (double) stats.transport.totalTime / (double) stats.totalTasksExecuted : 0d;
-		stats.nodeExecution.avgTime = (stats.totalTasksExecuted > 0)
-			? (double) stats.nodeExecution.totalTime / (double) stats.totalTasksExecuted : 0d;
-		stats.queue.avgTime = (stats.totalQueued > 0)
-			? (double) stats.queue.totalTime / (double) stats.totalQueued : 0d;
-		dataList.add(stats);
-		stringValuesMaps.add(StatsFormatter.getStringValuesMap(stats));
-		doubleValuesMaps.add(StatsFormatter.getDoubleValuesMap(stats));
-		int diff = dataList.size() - rolloverPosition;
-		for (int i=0; i<diff; i++)
+		lock.lock();
+		try
 		{
-			dataList.remove(0);
-			stringValuesMaps.remove(0);
-			doubleValuesMaps.remove(0);
+			tickCount++;
+			stats.execution.avgTime = (stats.totalTasksExecuted > 0)
+				? (double) stats.execution.totalTime / (double) stats.totalTasksExecuted : 0d;
+			stats.transport.avgTime = (stats.totalTasksExecuted > 0)
+				? (double) stats.transport.totalTime / (double) stats.totalTasksExecuted : 0d;
+			stats.nodeExecution.avgTime = (stats.totalTasksExecuted > 0)
+				? (double) stats.nodeExecution.totalTime / (double) stats.totalTasksExecuted : 0d;
+			stats.queue.avgTime = (stats.totalQueued > 0)
+				? (double) stats.queue.totalTime / (double) stats.totalQueued : 0d;
+			dataList.add(stats);
+			stringValuesMaps.add(StatsFormatter.getStringValuesMap(stats));
+			doubleValuesMaps.add(StatsFormatter.getDoubleValuesMap(stats));
+			int diff = dataList.size() - rolloverPosition;
+			for (int i=0; i<diff; i++)
+			{
+				dataList.remove(0);
+				stringValuesMaps.remove(0);
+				doubleValuesMaps.remove(0);
+			}
+			fireStatsHandlerEvent();
 		}
-		fireStatsHandlerEvent();
+		finally
+		{
+			lock.unlock();
+		}
 	}
 
 	/**
@@ -238,15 +251,23 @@ public class StatsHandler implements StatsConstants
 	 */
 	public void setRolloverPosition(int rolloverPosition)
 	{
-		if (rolloverPosition <= 0) throw new IllegalArgumentException("zero or less not accepted: "+rolloverPosition);
-		int diff = dataList.size() - rolloverPosition;
-		for (int i=0; i<diff; i++)
+		lock.lock();
+		try
 		{
-			dataList.remove(0);
-			stringValuesMaps.remove(0);
-			doubleValuesMaps.remove(0);
+			if (rolloverPosition <= 0) throw new IllegalArgumentException("zero or less not accepted: "+rolloverPosition);
+			int diff = dataList.size() - rolloverPosition;
+			for (int i=0; i<diff; i++)
+			{
+				dataList.remove(0);
+				stringValuesMaps.remove(0);
+				doubleValuesMaps.remove(0);
+			}
+			this.rolloverPosition = rolloverPosition;
 		}
-		this.rolloverPosition = rolloverPosition;
+		finally
+		{
+			lock.unlock();
+		}
 	}
 
 	/**
@@ -265,7 +286,15 @@ public class StatsHandler implements StatsConstants
 	 */
 	public JPPFStats getStats(int position)
 	{
-		return dataList.get(position);
+		lock.lock();
+		try
+		{
+			return dataList.get(position);
+		}
+		finally
+		{
+			lock.unlock();
+		}
 	}
 
 	/**
@@ -274,7 +303,7 @@ public class StatsHandler implements StatsConstants
 	 */
 	public JPPFStats getLatestStats()
 	{
-		return dataList.get(getStatsCount() - 1);
+		return getStats(getStatsCount() - 1);
 	}
 
 	/**
@@ -284,7 +313,15 @@ public class StatsHandler implements StatsConstants
 	 */
 	public Map<String, String> getStringValues(int position)
 	{
-		return stringValuesMaps.get(position);
+		lock.lock();
+		try
+		{
+			return stringValuesMaps.get(position);
+		}
+		finally
+		{
+			lock.unlock();
+		}
 	}
 
 	/**
@@ -303,7 +340,15 @@ public class StatsHandler implements StatsConstants
 	 */
 	public Map<String, Double> getDoubleValues(int position)
 	{
-		return doubleValuesMaps.get(position);
+		lock.lock();
+		try
+		{
+			return doubleValuesMaps.get(position);
+		}
+		finally
+		{
+			lock.unlock();
+		}
 	}
 
 	/**

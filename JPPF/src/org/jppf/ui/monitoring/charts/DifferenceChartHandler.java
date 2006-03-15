@@ -25,6 +25,7 @@ import org.jfree.chart.labels.XYSeriesLabelGenerator;
 import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.xy.XYDifferenceRenderer;
 import org.jfree.data.xy.*;
+import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.utils.StringUtils;
 
@@ -52,7 +53,7 @@ public class DifferenceChartHandler implements ChartHandler
 	 * Create a plot XY chart based on a chart configuration.
 	 * @param config holds the configuration parameters for the chart created, modified by this method.
 	 * @return a <code>ChartConfiguration</code> instance.
-	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.ChartConfiguration)
+	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	public ChartConfiguration createChart(ChartConfiguration config)
 	{
@@ -98,7 +99,7 @@ public class DifferenceChartHandler implements ChartHandler
 	 * Populate a dataset based on a chart configuration.
 	 * @param config the chart configuration containing the dataset to populate.
 	 * @return a <code>ChartConfiguration</code> instance.
-	 * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.ChartConfiguration)
+	 * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	public ChartConfiguration populateDataset(ChartConfiguration config)
 	{
@@ -124,7 +125,7 @@ public class DifferenceChartHandler implements ChartHandler
 	 * Update a dataset based on a chart configuration.
 	 * @param config the chart configuration containing the dataset to update.
 	 * @return a <code>ChartConfiguration</code> instance.
-	 * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.ChartConfiguration)
+	 * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	public ChartConfiguration updateDataset(ChartConfiguration config)
 	{

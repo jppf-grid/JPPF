@@ -100,7 +100,7 @@ public class DriverLauncher
 	private static Process buildProcess() throws Exception
 	{
 		List<String> command = new ArrayList<String>();
-		command.add("java");
+		command.add(System.getProperty("java.home")+"/bin/java");
 		command.add("-cp");
 		command.add(System.getProperty("java.class.path"));
 		command.add("-D"+JPPFConfiguration.CONFIG_PROPERTY+"="+System.getProperty(JPPFConfiguration.CONFIG_PROPERTY));

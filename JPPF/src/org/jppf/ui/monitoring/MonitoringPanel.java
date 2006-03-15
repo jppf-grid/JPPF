@@ -25,7 +25,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import org.apache.log4j.Logger;
 import org.jppf.server.JPPFStats;
-import org.jppf.ui.monitoring.charts.*;
+import org.jppf.ui.monitoring.charts.config.*;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jvnet.substance.*;
@@ -218,7 +218,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 			JTabbedPane tabbedPane = new JTabbedPane();
 			MonitoringPanel monitor = new MonitoringPanel(statsHandler);
 			AdminPanel admin = new AdminPanel(statsHandler);
-			JPPFChartBuilder builder = new JPPFChartBuilder(statsHandler);
+			final JPPFChartBuilder builder = new JPPFChartBuilder(statsHandler);
 			builder.createInitialCharts();
 			ChartConfigurationPanel configPanel = new ChartConfigurationPanel(builder);
 			statsHandler.addStatsHandlerListener(monitor);
@@ -233,6 +233,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 			{
 				public void windowClosing(WindowEvent e)
 				{
+					builder.saveAll();
 					System.exit(0);
 				}
 			});

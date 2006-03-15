@@ -18,7 +18,7 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import org.jppf.server.protocol.AdminRequestHeader;
@@ -66,24 +66,41 @@ public class AdminPanel extends JPanel
 	 */
 	private JPanel createShutdownRestartPanel()
 	{
-		JPanel panel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
-		panel.setBorder(BorderFactory.createTitledBorder("Server shutdown/restart"));
+		JPanel mainPanel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
+		mainPanel.setBorder(BorderFactory.createTitledBorder("Server Shutdown / Restart"));
+		JPanel panel = new JPanel();
 
-		JPanel shutdownPanel = createShtudownPanel();
-		JPanel restartPanel = createRestartPanel();
 		JPanel btnPanel = createBtnPanel();
+		JPanel shutdownPanel = createShtudownPanel();
 		JPanel checkboxPanel = createCheckboxPanel();
+		JPanel restartPanel = createRestartPanel();
+		
+		Dimension d = new Dimension(250, 20);
+		btnPanel.setPreferredSize(d);
+		shutdownPanel.setPreferredSize(d);
+		checkboxPanel.setPreferredSize(d);
+		restartPanel.setPreferredSize(d);
 
-		panel.add(Box.createVerticalStrut(5));
+		SpringLayout layout = new SpringLayout();
+		panel.setLayout(layout);
 		panel.add(btnPanel);
-		panel.add(Box.createVerticalStrut(5));
 		panel.add(shutdownPanel);
-		panel.add(Box.createVerticalStrut(5));
 		panel.add(checkboxPanel);
-		panel.add(Box.createVerticalStrut(5));
 		panel.add(restartPanel);
-		panel.add(Box.createVerticalGlue());
-		return panel;
+
+		layout.putConstraint(SpringLayout.NORTH, btnPanel, 10, SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.NORTH, shutdownPanel, 10, SpringLayout.SOUTH, btnPanel);
+		layout.putConstraint(SpringLayout.NORTH, checkboxPanel, 10, SpringLayout.SOUTH, shutdownPanel);
+		layout.putConstraint(SpringLayout.NORTH, restartPanel, 10, SpringLayout.SOUTH, checkboxPanel);
+		layout.putConstraint(SpringLayout.WEST, btnPanel, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.WEST, shutdownPanel, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.WEST, checkboxPanel, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.WEST, restartPanel, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, panel, 10, SpringLayout.EAST, btnPanel);
+
+		mainPanel.add(panel);
+		
+		return mainPanel;
 	}
 	
 	/**

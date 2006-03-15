@@ -20,6 +20,7 @@ package org.jppf.ui.monitoring.charts;
 
 import org.jfree.chart.*;
 import org.jfree.data.general.PieDataset;
+import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
 import org.jppf.ui.monitoring.data.StatsHandler;
 
 /**
@@ -41,7 +42,7 @@ public class RingChartHandler extends Pie3DChartHandler
 	 * Create a ring chart based on a chart configuration.
 	 * @param config holds the configuration parameters for the chart created, modified by this method.
 	 * @return a <code>ChartConfiguration</code> instance.
-	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.ChartConfiguration)
+	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	public ChartConfiguration createChart(ChartConfiguration config)
 	{
