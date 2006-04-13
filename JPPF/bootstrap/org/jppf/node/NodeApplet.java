@@ -32,6 +32,10 @@ import org.jppf.utils.*;
 public class NodeApplet extends JApplet
 {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7299446296348222737L;
+	/**
 	 * Path to the images to display in the UI.
 	 */
 	private static final String IMAGE_PATH = "/org/jppf/node";

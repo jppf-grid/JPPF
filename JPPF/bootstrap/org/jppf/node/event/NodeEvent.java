@@ -27,6 +27,10 @@ import java.util.EventObject;
 public class NodeEvent extends EventObject
 {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8382232218856942352L;
+	/**
 	 * Event type to specify a node is about to attempt connecting to the server. 
 	 */
 	public static String START_CONNECT = "start.connect";

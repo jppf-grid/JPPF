@@ -26,6 +26,11 @@ public class JPPFBootstrapException extends Exception
 {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2263273226174643806L;
+
+	/**
 	 * Initialize this exception with a specified cause and message.
 	 * @param message the reason for this exception.
 	 * @param cause the exception that caused this one.
