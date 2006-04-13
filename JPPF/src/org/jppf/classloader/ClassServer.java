@@ -2,19 +2,20 @@
  * Java Parallel Processing Framework.
  * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
- * 
- * This program is free software; you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation;
- * either version 2 of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program;
- * if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package org.jppf.classloader;
 
@@ -71,7 +72,7 @@ public class ClassServer extends Thread
 		this.port = port;
 		init(port);
 	}
-	
+
 	/**
 	 * Start the underlying server socket by making it accept incoming connections.
 	 * @see java.lang.Runnable#run()
@@ -98,7 +99,7 @@ public class ClassServer extends Thread
 			end();
 		}
 	}
-	
+
 	/**
 	 * Start serving a new incoming connection.
 	 * @param socket the socket connecting with this socket server.
@@ -109,7 +110,7 @@ public class ClassServer extends Thread
 		ClassServerConnection handler = createConnection(socket);
 		handler.start();
 	}
-	
+
 	/**
 	 * Instantiate a wrapper for the socket connection opened by this socket server.
 	 * Subclasses must implement this method.
@@ -172,7 +173,7 @@ public class ClassServer extends Thread
 		}
 		classLoaderConnections.clear();
 	}
-	
+
 	/**
 	 * Initialize the underlying server socket with a specified port.
 	 * @param port the port the underlying server listens to.
@@ -222,7 +223,7 @@ public class ClassServer extends Thread
 			}
 		}
 	}
-	
+
 	/**
 	 * Start this class server from the command line.
 	 * @param args not used.

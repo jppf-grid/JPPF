@@ -2,19 +2,20 @@
  * Java Parallel Processing Framework.
  * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
- * 
- * This program is free software; you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation;
- * either version 2 of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program;
- * if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package org.jppf.doc;
 
@@ -28,7 +29,7 @@ import org.jppf.utils.FileUtils;
  * The templates are place holders inserted within the HTML code. They can hold parameters to make
  * them more generic and resusable.<br>
  * A template can be nested within another template.<br><br>
- * 
+ *
  * Rationale: HTML docs often contain more code for the visual rendering of the content than
  * for the content itself. For example, using rounded tables holding the actual content implies a
  * lot of additional table constructs and ends up cluttering the code. This makes the documentation
@@ -91,7 +92,7 @@ public class HtmlDocGenerator
 		s = processTemplates(new HashMap<String, String>(), s, templateFolder);
 		FileUtils.writeTextFile(target, s);
 	}
-	
+
 	/**
 	 * Generate an instance of a template, to be inserted in an enclosing document.
 	 * @param parameterMap a map of parameters key/values for the template.
@@ -128,7 +129,7 @@ public class HtmlDocGenerator
 
 		return processParameters(parameterMap, sb.toString());
 	}
-	
+
 	/**
 	 * Replace a template call with actual HTML content.
 	 * @param templateCall the string representing the template invocation, with the format:<br>
@@ -189,7 +190,7 @@ public class HtmlDocGenerator
 		content = processParameters(parameterMap, content);
 		return content;
 	}
-	
+
 	/**
 	 * Process a template by processing all nested template calls and substituting parameters with actual values.
 	 * @param parameterMap a map of parameters key/values for the template.
@@ -226,7 +227,7 @@ public class HtmlDocGenerator
 		}
 		return template;
 	}
-	
+
 	/**
 	 * Test this class.
 	 * @param args not used.
@@ -273,7 +274,7 @@ public class HtmlDocGenerator
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Give a brief explanation of the comand-line parameters.
 	 * @param msg text to display before usage text.

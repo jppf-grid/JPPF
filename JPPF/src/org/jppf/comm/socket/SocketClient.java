@@ -2,19 +2,20 @@
  * Java Parallel Processing Framework.
  * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
- * 
- * This program is free software; you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation;
- * either version 2 of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program;
- * if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package org.jppf.comm.socket;
 
@@ -42,7 +43,7 @@ public class SocketClient extends AbstractSocketWrapper
 	{
 		super();
 	}
-	
+
 	/**
 	 * Initialize this socket client and connect it to the specified host on the specified port.
 	 * @param host the remote host this socket client connects to.
@@ -54,7 +55,7 @@ public class SocketClient extends AbstractSocketWrapper
 	{
 		super(host, port, null);
 	}
-	
+
 	/**
 	 * Initialize this socket client and connect it to the specified host on the specified port.
 	 * @param host the remote host this socket client connects to.
@@ -68,7 +69,7 @@ public class SocketClient extends AbstractSocketWrapper
 	{
 		super(host, port, serializer);
 	}
-	
+
 	/**
 	 * Initialize this socket client with an already opened and connected socket.
 	 * @param socket the underlying socket this socket client wraps around.
@@ -97,7 +98,7 @@ public class SocketClient extends AbstractSocketWrapper
 			throw e;
 		}
 	}
-	
+
 	/**
 	 * Read an object from a TCP socket connection.
 	 * This method blocks until an object is received or the specified timeout has expired, whichever happens first.
@@ -109,7 +110,7 @@ public class SocketClient extends AbstractSocketWrapper
 	 */
 	public Object receive(int timeout) throws ClassNotFoundException, IOException
 	{
-		checkOpened(); 
+		checkOpened();
 		Object o = null;
 		try
 		{
@@ -134,7 +135,7 @@ public class SocketClient extends AbstractSocketWrapper
 	}
 
 	/**
-	 * Get an object serializer / deserializer to convert an object to or from an array of bytes. 
+	 * Get an object serializer / deserializer to convert an object to or from an array of bytes.
 	 * @return an <code>ObjectSerializer</code> instance.
 	 * @see org.jppf.comm.socket.SocketWrapper#getSerializer()
 	 */
@@ -165,7 +166,7 @@ public class SocketClient extends AbstractSocketWrapper
 	}
 
 	/**
-	 * Set the object serializer / deserializer to convert an object to or from an array of bytes. 
+	 * Set the object serializer / deserializer to convert an object to or from an array of bytes.
 	 * @param serializer an <code>ObjectSerializer</code> instance.
 	 * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.utils.ObjectSerializer)
 	 */

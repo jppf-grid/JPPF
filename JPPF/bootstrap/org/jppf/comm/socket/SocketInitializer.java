@@ -2,19 +2,20 @@
  * Java Parallel Processing Framework.
  * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
- * 
- * This program is free software; you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation;
- * either version 2 of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program;
- * if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package org.jppf.comm.socket;
 
@@ -39,7 +40,7 @@ public class SocketInitializer
 	/**
 	 * The locking lock used to block all class loaders while initializing the connection.
 	 */
-	private ReentrantLock lock = new ReentrantLock(); 
+	private ReentrantLock lock = new ReentrantLock();
 	/**
 	 * The locking condition used to block all class loaders while initializing the connection.
 	 */
@@ -53,7 +54,7 @@ public class SocketInitializer
 	 */
 	private int attemptCount = 0;
 	/**
-	 * The socket wrapper to initialize. 
+	 * The socket wrapper to initialize.
 	 */
 	private SocketWrapper socketWrapper = null;
 	/**
@@ -67,7 +68,7 @@ public class SocketInitializer
 	public SocketInitializer()
 	{
 	}
-	
+
 	/**
 	 * Initialize the underlying socket client, by starting a <code>Timer</code> and a corresponding
 	 * <code>TimerTask</code> until a specified amount of time has passed.
@@ -125,7 +126,7 @@ public class SocketInitializer
 
 	/**
 	 * This timer task attempts to (re)connect a socket wrapper to its corresponding remote server.
-	 * It also checks that the maximum duration for the attempts has not been reached, and cancels itself if it has. 
+	 * It also checks that the maximum duration for the attempts has not been reached, and cancels itself if it has.
 	 */
 	class SocketInitializationTask extends TimerTask
 	{
@@ -155,7 +156,7 @@ public class SocketInitializer
 			{
 			}
 		}
-		
+
 		/**
 		 * Reset the status of this task.
 		 */

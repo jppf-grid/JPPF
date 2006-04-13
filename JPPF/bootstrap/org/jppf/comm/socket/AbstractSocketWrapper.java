@@ -2,19 +2,20 @@
  * Java Parallel Processing Framework.
  * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
- * 
- * This program is free software; you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation;
- * either version 2 of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program;
- * if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package org.jppf.comm.socket;
 
@@ -69,7 +70,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	protected AbstractSocketWrapper()
 	{
 	}
-	
+
 	/**
 	 * Initialize this socket client and connect it to the specified host on the specified port.
 	 * @param host the remote host this socket client connects to.
@@ -86,7 +87,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 		this.serializer = serializer;
 		open();
 	}
-	
+
 	/**
 	 * Initialize this socket client with an already opened and connected socket.
 	 * @param socket the underlying socket this socket client wraps around.
@@ -107,7 +108,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			throw new JPPFException(ioe.getMessage(), ioe);
 		}
 	}
-	
+
 	/**
 	 * Send an array of bytes over a TCP socket connection.
 	 * @param buf the buffer container for the data to send.
@@ -205,7 +206,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 		}
 		else throw new ConnectException("Client connection already opened");
 	}
-	
+
 	/**
 	 * Initialize all the stream used for receiving and sending objects through the
 	 * underlying socket connection.
@@ -219,7 +220,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 		dos = new DataOutputStream(bos);
 		dos.flush();
 		BufferedInputStream bis = new BufferedInputStream(is);
-		dis = new DataInputStream(bis); 
+		dis = new DataInputStream(bis);
 	}
 
 	/**
@@ -233,7 +234,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 		opened = false;
 		if (socket != null) socket.close();
 	}
-	
+
 	/**
 	 * Determine whether this socket client is opened or not.
 	 * @return true if this client is opened, false otherwise.
@@ -243,7 +244,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	{
 		return opened;
 	}
-	
+
 	/**
 	 * Check whether the underlying socket is opened or not.
 	 * @throws ConnectException if the connection is not opened.
