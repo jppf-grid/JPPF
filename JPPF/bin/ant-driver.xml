@@ -1,4 +1,4 @@
-<project name='LocalTest' default="run.node" basedir=".">
+<project name='LocalTest' default="run.driver" basedir=".">
 
 	<!-- ========================================================================= -->
 	<!--                          Property definitions                             -->
