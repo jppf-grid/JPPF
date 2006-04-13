@@ -34,14 +34,14 @@ public final class FileUtils
 	}
 
 	/**
-	 * Read the content of a specified file into a string.
-	 * @param filename the location of the file to read.
+	 * Read the content of a specified reader into a string.
+	 * @param aReader the reader to read the vcontent from.
 	 * @return the content of the file as a string.
 	 * @throws IOException if the file can't be found or read.
 	 */
-	public static String readTextFile(String filename) throws IOException
+	public static String readTextFile(Reader aReader) throws IOException
 	{
-		LineNumberReader reader = new LineNumberReader(new FileReader(filename));
+		LineNumberReader reader = new LineNumberReader(aReader);
 		StringBuilder sb = new StringBuilder();
 		String s = "";
 		while (s != null)
@@ -50,6 +50,17 @@ public final class FileUtils
 			if (s != null) sb.append(s).append("\n");
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Read the content of a specified file into a string.
+	 * @param filename the location of the file to read.
+	 * @return the content of the file as a string.
+	 * @throws IOException if the file can't be found or read.
+	 */
+	public static String readTextFile(String filename) throws IOException
+	{
+		return readTextFile(new FileReader(filename));
 	}
 
 	/**

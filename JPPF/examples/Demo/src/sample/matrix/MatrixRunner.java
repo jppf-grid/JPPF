@@ -54,8 +54,8 @@ public class MatrixRunner
 		{
 			jppfClient = new JPPFClient();
 			TypedProperties props = JPPFConfiguration.getProperties();
-			int size = props.getInt("matrix.size");
-			int iterations = props.getInt("matrix.iterations");
+			int size = props.getInt("matrix.size",300);
+			int iterations = props.getInt("matrix.iterations",10);
 			System.out.println("Running Matrix demo with matrix size = "+size+"*"+size+" for "+iterations+" iterations");
 			perform(size, iterations);
 			//performLong(size, iterations);

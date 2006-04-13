@@ -18,54 +18,81 @@
  */
 package org.jppf.server;
 
-import java.util.concurrent.*;
+import static org.jppf.server.JPPFStatsUpdater.taskInQueue;
+import static org.jppf.server.JPPFStatsUpdater.taskOutOfQueue;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.apache.log4j.Logger;
-import org.jppf.server.protocol.JPPFTaskWrapper;
-import static org.jppf.server.JPPFStatsUpdater.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**
- * Implementation of a generic blocking queue, to allow asynchronous access from a large number of threads.
+ * Implementation of a generic non-blocking queue, to allow asynchronous access from a large number of threads.
  * @author Laurent Cohen
+ * @author Domingos Creado
  */
 public class JPPFQueue
 {
-	/**
+	
+	List<QueueListener> listeners = new LinkedList<QueueListener>();
+	
+    /**
 	 * Log4j logger for this class.
 	 */
 	private static Logger log = Logger.getLogger(JPPFQueue.class);
-	/**
-	 * Executable tasks queue, available for execution nodes to pick from.
-	 * This queue behaves as a FIFO queue and is thread-safe for atomic <code>add()</code> and <code>take()</code> operations.
-	 */
-	private BlockingQueue<JPPFTaskWrapper> queue = new LinkedBlockingQueue<JPPFTaskWrapper>();
-
-	/**
-	 * Add an object to the queue.
-	 * @param wrapper the object to add to the queue.
-	 */
-	public void addObject(JPPFTaskWrapper wrapper)
-	{
-		wrapper.setQueueEntryTime(System.currentTimeMillis());
-		queue.add(wrapper);
-		taskInQueue();
-	}
 	
 	/**
-	 * Get the next object in the queue. This method waits until the queue has at least one object.
+	 * Executable tasks queue, available for execution nodes to pick from. This
+	 * queue behaves as a FIFO queue and is thread-safe for atomic
+	 * <code>add()</code> and <code>poll()</code> operations.
+	 */
+	private ConcurrentLinkedQueue<JPPFTaskBundle> queue = new ConcurrentLinkedQueue<JPPFTaskBundle>();
+
+	
+	/**
+	 * Add an object to the queue, and notify all listeners about it.
+	 * 
+	 * @param bundle
+	 *            the object to add to the queue.
+	 */
+	public void addBundle(JPPFTaskBundle bundle) {
+		bundle.setQueueEntryTime(System.currentTimeMillis());
+		queue.add(bundle);
+		taskInQueue(bundle.getTaskCount());
+
+		for (QueueListener listener : listeners) {
+			listener.newTask(this);
+		}
+	}
+
+	/**
+	 * Get the next object in the queue. This method waits until the queue has
+	 * at least one object.
+	 * 
 	 * @return the most recent object that was added to the queue.
 	 */
-	public JPPFTaskWrapper nextObject()
-	{
-		try
-		{
-			JPPFTaskWrapper wrapper = queue.take();
-			taskOutOfQueue(System.currentTimeMillis() - wrapper.getQueueEntryTime());
-			return wrapper;
+	public JPPFTaskBundle nextBundle() {
+		JPPFTaskBundle bundle = queue.poll();
+		if (bundle != null) {
+			taskOutOfQueue(bundle.getTaskCount(), System.currentTimeMillis()
+					- bundle.getQueueEntryTime());
 		}
-		catch(InterruptedException e)
-		{
-			log.error(e.getMessage(), e);
-			return null;
-		}
+		return bundle;
+
+	}
+	
+	
+	public void addListener(QueueListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeListener(QueueListener listener) {
+		listeners.remove(listener);
+	}
+
+	public interface QueueListener {
+		void newTask(JPPFQueue queue);
 	}
 }

@@ -18,13 +18,15 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
 import org.apache.log4j.Logger;
 import org.jppf.server.JPPFStats;
+import org.jppf.ui.monitoring.admin.AdminPanel;
 import org.jppf.ui.monitoring.charts.config.*;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
@@ -213,22 +215,12 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 			UIManager.setLookAndFeel(new SubstanceLookAndFeel());
 			SubstanceLookAndFeel.setCurrentWatermark(new TiledImageWatermark("org/jppf/ui/resources/GridWatermark.gif"));
 			SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme(new JPPFColorScheme(), "JPPF", false));
-			StatsHandler statsHandler = new StatsHandler();
-			JFrame frame = new JFrame("Test");
-			JTabbedPane tabbedPane = new JTabbedPane();
-			MonitoringPanel monitor = new MonitoringPanel(statsHandler);
-			AdminPanel admin = new AdminPanel(statsHandler);
-			final JPPFChartBuilder builder = new JPPFChartBuilder(statsHandler);
-			builder.createInitialCharts();
-			ChartConfigurationPanel configPanel = new ChartConfigurationPanel(builder);
-			statsHandler.addStatsHandlerListener(monitor);
-			statsHandler.addStatsHandlerListener(builder);
-			tabbedPane.addTab("Server Stats", monitor);
-			tabbedPane.addTab("Charts", builder.getTabbedPane());
-			tabbedPane.addTab("Charts config", configPanel);
-			tabbedPane.addTab("Admin", admin);
-			tabbedPane.addTab("Options", new OptionsPanel(statsHandler));
+			JFrame frame = new JFrame("JPPF monitoring and administration tool");
+			ImageIcon icon = GuiUtils.loadIcon("/org/jppf/ui/resources/logo-32x32.gif");
+			frame.setIconImage(icon.getImage());
 			frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+			StatsHandler statsHandler = new StatsHandler();
+			final JPPFChartBuilder builder = startTool(frame, statsHandler);
 			frame.addWindowListener(new WindowAdapter()
 			{
 				public void windowClosing(WindowEvent e)
@@ -237,7 +229,6 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 					System.exit(0);
 				}
 			});
-			frame.add(tabbedPane);
 			frame.setSize(600, 600);
 			frame.setVisible(true);
 			statsHandler.startRefreshTimer();
@@ -248,5 +239,30 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 			log.error(e.getMessage(), e);
 			System.exit(1);
 		}
+	}
+
+	/**
+	 * Start this UI.
+	 * @param container the content in which to create the UI components.
+	 * @param statsHandler the object that requests and receives the server data updates.
+	 * @return a JPPFChartBuilder instance.
+	 */
+	public static JPPFChartBuilder startTool(Container container, StatsHandler statsHandler)
+	{
+		JTabbedPane tabbedPane = new JTabbedPane();
+		MonitoringPanel monitor = new MonitoringPanel(statsHandler);
+		AdminPanel admin = new AdminPanel(statsHandler);
+		JPPFChartBuilder builder = new JPPFChartBuilder(statsHandler);
+		builder.createInitialCharts();
+		ChartConfigurationPanel configPanel = new ChartConfigurationPanel(builder);
+		statsHandler.addStatsHandlerListener(monitor);
+		statsHandler.addStatsHandlerListener(builder);
+		tabbedPane.addTab("Server Stats", new JScrollPane(monitor));
+		tabbedPane.addTab("Charts", builder.getTabbedPane());
+		tabbedPane.addTab("Charts config", configPanel);
+		tabbedPane.addTab("Admin", admin);
+		tabbedPane.addTab("Options", new OptionsPanel(statsHandler));
+		container.add(tabbedPane);
+		return builder;
 	}
 }

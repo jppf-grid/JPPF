@@ -29,6 +29,7 @@ import org.jppf.utils.*;
  * <p>Instances of this class are part of the JPPF dynamic class loading mechanism. The enable remote nodes
  * to dynamically load classes from the JVM that run's the class server.
  * @author Laurent Cohen
+ * @author Domingos Creado
  */
 public class ClassServerDelegate extends Thread
 {
@@ -98,7 +99,7 @@ public class ClassServerDelegate extends Thread
 	public void initSocketClient() throws Exception
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = props.getString("jppf.server.host");
+		String host = props.getString("jppf.server.host","localhost");
 		int port = props.getInt("class.server.port", 11111);
 		socketClient = new SocketClient();
 		socketClient.setHost(host);
@@ -113,14 +114,14 @@ public class ClassServerDelegate extends Thread
 	{
 		try
 		{
-			socketClient.send("provider|"+appUuid);
+			socketClient.sendBytes(new JPPFBuffer("provider|"+appUuid));
 			while (!stop)
 			{
 				try
 				{
-					String name = (String) socketClient.receive();
+					String name = new String(socketClient.receiveBytes(0).getBuffer());
 					byte[] b = resourceProvider.getResourceAsBytes(name);
-					socketClient.send(b);
+					socketClient.sendBytes(new JPPFBuffer(b,b.length));
 				}
 				catch(Exception e)
 				{

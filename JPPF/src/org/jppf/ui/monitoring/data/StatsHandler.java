@@ -23,8 +23,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.app.JPPFClient;
+import org.jppf.server.protocol.AdminRequest;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.utils.JPPFConfiguration;
+import static org.jppf.server.protocol.AdminRequest.*;
 
 /**
  * This class provides a convenient access to the statistics obtained from the JPPF server.
@@ -155,21 +157,72 @@ public class StatsHandler implements StatsConstants
 	}
 
 	/**
-	 * Shutdown, and eventually restart, the server.
-	 * @param command the command to perform.
-	 * @param shutdownDelay the delay before shutting down.
-	 * @param restartDelay the delay, starting after shutdown, before restarting.
+	 * Request the server settings.
+	 * @param password the admin password to authenticate the command issuer.
+	 * @param params contains the names of the settings to change and their corresponding value.
+	 * @return the reposne message from the server.
 	 */
-	public void requestShutdownRestart(String command, long shutdownDelay, long restartDelay)
+	public String changeSettings(String password, Map<String, Object> params)
 	{
+		String msg = null;
 		try
 		{
-			jppfClient.submitAdminRequest(command, shutdownDelay, restartDelay);
+			msg = jppfClient.submitAdminRequest(password, null, AdminRequest.CHANGE_SETTINGS, params);
 		}
 		catch(Exception e)
 		{
 			log.error(e.getMessage(), e);
+			msg = "An exception occurred:\n"+e.getMessage();
 		}
+		return msg;
+	}
+
+	/**
+	 * Shutdown, and eventually restart, the server.
+	 * @param password the admin password to authenticate the command issuer.
+	 * @param command the command to perform.
+	 * @param shutdownDelay the delay before shutting down.
+	 * @param restartDelay the delay, starting after shutdown, before restarting.
+	 * @return the reposne message from the server.
+	 */
+	public String requestShutdownRestart(String password, String command, long shutdownDelay, long restartDelay)
+	{
+		String msg = null;
+		try
+		{
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put(SHUTDOWN_DELAY_PARAM, shutdownDelay);
+			params.put(RESTART_DELAY_PARAM, restartDelay);
+			msg = jppfClient.submitAdminRequest(password, null, command, params);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+			msg = "An exception occurred:\n"+e.getMessage();
+		}
+		return msg;
+	}
+
+	/**
+	 * Send a request to change the admin password.
+	 * @param password the admin password to authenticate the command issuer.
+	 * @param newPassword the new password to replace the existing one.
+	 * @return the reposne message from the server.
+	 */
+	public String changeAdminPassword(String password, String newPassword)
+	{
+		String msg = null;
+		if (jppfClient == null) return "Not connected to the server";
+		try
+		{
+			msg = jppfClient.submitAdminRequest(password, newPassword, CHANGE_PASSWORD, null);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+			msg = "An exception occurred:\n"+e.getMessage();
+		}
+		return msg;
 	}
 
 	/**
@@ -190,6 +243,8 @@ public class StatsHandler implements StatsConstants
 				? (double) stats.nodeExecution.totalTime / (double) stats.totalTasksExecuted : 0d;
 			stats.queue.avgTime = (stats.totalQueued > 0)
 				? (double) stats.queue.totalTime / (double) stats.totalQueued : 0d;
+			stats.avgTransportPerByte = (stats.footprint > 0)
+				? 1024d * 1024d * stats.transport.totalTime / stats.footprint : 0d;
 			dataList.add(stats);
 			stringValuesMaps.add(StatsFormatter.getStringValuesMap(stats));
 			doubleValuesMaps.add(StatsFormatter.getDoubleValuesMap(stats));
@@ -330,7 +385,9 @@ public class StatsHandler implements StatsConstants
 	 */
 	public Map<String, String> getLatestStringValues()
 	{
-		return stringValuesMaps.get(getStatsCount() - 1);
+		int n = getStatsCount() - 1;
+		if (n < stringValuesMaps.size()) return stringValuesMaps.get(n);
+		return stringValuesMaps.get(stringValuesMaps.size()-1);
 	}
 
 	/**
@@ -357,7 +414,9 @@ public class StatsHandler implements StatsConstants
 	 */
 	public Map<String, Double> getLatestDoubleValues()
 	{
-		return doubleValuesMaps.get(getStatsCount() - 1);
+		int n = getStatsCount() - 1;
+		if (n < doubleValuesMaps.size()) return doubleValuesMaps.get(n);
+		return doubleValuesMaps.get(doubleValuesMaps.size()-1);
 	}
 
 	/**

@@ -19,13 +19,19 @@
 package org.jppf.server;
 
 import java.io.Serializable;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
- * 
+ * Instances of this class hold server-wide statitics and settings.
  * @author Laurent Cohen
  */
 public class JPPFStats implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2033590485843053214L;
+	
 	/**
 	 * The total number of tasks executed.
 	 */
@@ -47,10 +53,17 @@ public class JPPFStats implements Serializable
 	 */
 	public TimeSnapshot server = new TimeSnapshot("server");
 	/**
+	 * Total footprint of all the data that was sent to the nodes.
+	 */
+	public long footprint = 0L;
+	/**
+	 * The average time to tranport one byte of data.
+	 */
+	public double avgTransportPerByte = 0d;
+	/**
 	 * Time statistics for the tasks queue time.
 	 */
 	public TimeSnapshot queue = new TimeSnapshot("queue");
-
 	/**
 	 * Total number of tasks that have been queue.
 	 */
@@ -79,6 +92,10 @@ public class JPPFStats implements Serializable
 	 * Property name for the maximum number of clients connected to the server.
 	 */
 	public int maxClients = 0;
+	/**
+	 * Determines the maximum number of tasks in each task bundle.
+	 */
+	public int bundleSize = JPPFConfiguration.getProperties().getInt("task.bundle.size", 5);
 
 	/**
 	 * Build a copy of this stats object.
@@ -100,6 +117,7 @@ public class JPPFStats implements Serializable
 		s.maxNodes = maxNodes;
 		s.nbClients = nbClients;
 		s.maxClients = maxClients;
+		s.footprint = footprint;
 		return s;
 	}
 	

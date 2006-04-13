@@ -18,6 +18,8 @@
  */
 package org.jppf.utils;
 
+import java.util.*;
+
 
 /**
  * This class provides a set of utility methods for manipulating strings. 
@@ -71,7 +73,7 @@ public final class StringUtils
 		new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 	/**
 	 * Convert a part of an array of bytes, into a string of space-separated hexadecimal numbers.<br>
-	 * This method is proposed as a conveninence for debugging purposes.
+	 * This method is proposed as a convenience for debugging purposes.
 	 * @param bytes the array that contains the sequence of byte values to convert.
 	 * @param start the index to start at in the byte array.
 	 * @param length the number of bytes to convert in the array.
@@ -101,6 +103,26 @@ public final class StringUtils
 		sb.append(hexDigits[n / 16]);
 		sb.append(hexDigits[n % 16]);
 		return sb.toString();
+	}
+	
+	/**
+	 * Convert a string of space-separated hexadecimal numbers into an array of bytes.
+	 * @param hexString the string to convert.
+	 * @return the resulting array of bytes.
+	 */
+	public static byte[] toBytes(String hexString)
+	{
+		List<Byte> list = new ArrayList<Byte>();
+		String[] bytes = hexString.split("\\s");
+		for (String bStr: bytes)
+		{
+			int n = Byte.parseByte(bStr.substring(0, 1), 16);
+			n = 16 * n + Byte.parseByte(bStr.substring(1), 16);
+			list.add(new Byte((byte) n));
+		}
+		byte[] result = new byte[list.size()];
+		for (int i=0; i<list.size(); i++) result[i] = list.get(i);
+		return result;
 	}
 	
 	/**

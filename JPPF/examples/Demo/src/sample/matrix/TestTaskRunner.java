@@ -18,13 +18,18 @@
  */
 package sample.matrix;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
 import org.jppf.server.app.JPPFClient;
-import org.jppf.server.protocol.*;
-import org.jppf.task.storage.*;
+import org.jppf.server.protocol.AdminRequest;
+import org.jppf.server.protocol.JPPFTask;
+import org.jppf.task.storage.DataProvider;
+import org.jppf.task.storage.MemoryMapDataProvider;
 import org.jppf.utils.StringUtils;
+
 import sample.matrix.SecurityTestTask.ExecutionReport;
 
 /**
@@ -108,7 +113,7 @@ public class TestTaskRunner
 		try
 		{
 			//jppfClient.submitAdminRequest(AdminRequestHeader.ADMIN_SHUTDOWN_RESTART, 3000L, 3000L);
-			jppfClient.submitAdminRequest(AdminRequestHeader.ADMIN_SHUTDOWN, 3000L, 3000L);
+			//jppfClient.submitAdminRequest(AdminRequest.SHUTDOWN, 3000L, 3000L);
 		}
 		catch(Exception e)
 		{

@@ -18,25 +18,46 @@
  */
 package org.jppf.server.node;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.InvalidClassException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
-import org.jppf.classloader.*;
-import org.jppf.comm.socket.*;
-import org.jppf.server.protocol.*;
+import org.jppf.comm.socket.SocketClient;
+import org.jppf.comm.socket.SocketInitializer;
+import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.node.JPPFClassLoader;
+import org.jppf.node.MonitoredNode;
+import org.jppf.node.NodeLauncher;
+import org.jppf.node.event.NodeEvent;
+import org.jppf.node.event.NodeListener;
+import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.task.storage.DataProvider;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.ObjectSerializer;
+import org.jppf.utils.Pair;
+import org.jppf.utils.SerializationHelper;
+import org.jppf.utils.TypedProperties;
 
 /**
  * Instances of this class encapsulate execution nodes.
  * @author Laurent Cohen
  */
-public class JPPFNode implements Runnable
+public class JPPFNode implements MonitoredNode
 {
 	/**
 	 * Log4j logger for this class.
 	 */
-	private static Logger log = Logger.getLogger(JPPFNode.class);
+	private static Logger log = null;
 	/**
 	 * Maximum number of containers kept by this node's cache.
 	 */
@@ -69,6 +90,22 @@ public class JPPFNode implements Runnable
 	 * Used to synchronize access to the underlying socket from multiple threads.
 	 */
 	private SocketInitializer socketInitializer = new SocketInitializer();
+	/**
+	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 */
+	private boolean debugEnabled = false;
+	/**
+	 * Used to programmatically stop this node. 
+	 */
+	private boolean stopped = false;
+	/**
+	 * The list of listeners that receive notifications from this node.
+	 */
+	private List<NodeListener> listeners = new ArrayList<NodeListener>();
+	/**
+	 * This flag is true if there is at least one listener, and false otherwise.
+	 */
+	private boolean notifying = false;
 
 	/**
 	 * Main processing loop of this node.
@@ -76,7 +113,10 @@ public class JPPFNode implements Runnable
 	 */
 	public void run()
 	{
-		while (true)
+		log = log = Logger.getLogger(JPPFNode.class);
+		debugEnabled = log.isDebugEnabled();
+		stopped = false;
+		while (!stopped)
 		{
 			try
 			{
@@ -96,6 +136,7 @@ public class JPPFNode implements Runnable
 				}
 			}
 		}
+		if (notifying) fireNodeEvent(NodeEvent.DISCONNECTED);
 	}
 	
 	/**
@@ -105,22 +146,27 @@ public class JPPFNode implements Runnable
 	 */
 	public void perform() throws Exception
 	{
-		while (true)
+		while (!stopped)
 		{
-			Pair<JPPFTask, JPPFTaskWrapper> pair = readTask();
-			JPPFTask task = pair.first();
-			JPPFTaskWrapper wrapper = pair.second();
+			Pair<JPPFTaskBundle, List<JPPFTask>> pair = readTask();
+			if (notifying) fireNodeEvent(NodeEvent.START_EXEC);
+			JPPFTaskBundle bundle = pair.first();
+			List<JPPFTask> taskList = pair.second();
 
-			try
+			for (JPPFTask task: taskList)
 			{
-				task.run();
+				try
+				{
+					task.run();
+				}
+				catch(Exception e)
+				{
+					log.error(e.getMessage(), e);
+					task.setException(e);
+				}
+				if (notifying) fireNodeEvent(NodeEvent.END_EXEC);
 			}
-			catch(Exception e)
-			{
-				log.error(e.getMessage(), e);
-				task.setException(e);
-			}
-			writeResults(wrapper, task);
+			writeResults(bundle, taskList);
 		}
 	}
 	
@@ -131,8 +177,10 @@ public class JPPFNode implements Runnable
 	public synchronized void init() throws Exception
 	{
 		if (socketClient == null) initSocketClient();
+		if (notifying) fireNodeEvent(NodeEvent.START_CONNECT);
 		System.out.println("JPPFNode.init(): Attempting connection to the JPPF driver");
 		socketInitializer.initializeSocket(socketClient);
+		if (notifying) fireNodeEvent(NodeEvent.END_CONNECT);
 		System.out.println("JPPFNode.init(): Reconnected to the JPPF driver");
 	}
 	
@@ -154,19 +202,24 @@ public class JPPFNode implements Runnable
 	
 	/**
 	 * Read a task from the socket connection, along with its header information.
-	 * @return a pair of <code>JPPFTask</code> and <code>JPPFTaskWrapper</code> instances.
+	 * @return a pair of <code>JPPFTaskBundle</code> and a <code>List</code> of <code>JPPFTask</code> instances.
 	 * @throws Exception if a error is raised while reading the task data.
 	 */
-	private Pair<JPPFTask, JPPFTaskWrapper> readTask() throws Exception
+	private Pair<JPPFTaskBundle, List<JPPFTask>> readTask() throws Exception
 	{
 		JPPFBuffer buf = socketClient.receiveBytes(0);
-		log.debug("Total length read is "+buf.getLength()+" bytes");
+		if (debugEnabled) log.debug("Total length read is "+buf.getLength()+" bytes");
 		Object[] result = readObjects(buf.getBuffer());
-		JPPFTaskWrapper wrapper = (JPPFTaskWrapper) result[0];
-		JPPFTask task = (JPPFTask) result[1];
-		DataProvider dataProvider = (DataProvider) result[2];
-		task.setDataProvider(dataProvider);
-		return new Pair<JPPFTask, JPPFTaskWrapper>(task, wrapper);
+		JPPFTaskBundle bundle = (JPPFTaskBundle) result[0];
+		DataProvider dataProvider = (DataProvider) result[1];
+		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
+		for (int i=0; i<bundle.getTaskCount(); i++)
+		{
+			JPPFTask task = (JPPFTask) result[2+i];
+			task.setDataProvider(dataProvider);
+			taskList.add(task);
+		}
+		return new Pair<JPPFTaskBundle, List<JPPFTask>>(bundle, taskList);
 	}
 	
 	/**
@@ -189,16 +242,17 @@ public class JPPFNode implements Runnable
 		catch(IncompatibleClassChangeError err)
 		{
 			reload = true;
-			log.debug(err.getMessage()+"; reloading classes", err);
+			if (debugEnabled) log.debug(err.getMessage()+"; reloading classes", err);
 		}
 		catch(InvalidClassException e)
 		{
 			reload = true;
-			log.debug(e.getMessage()+"; reloading classes", e);
+			if (debugEnabled) log.debug(e.getMessage()+"; reloading classes", e);
 		}
 		if (reload)
 		{
-			resetHelper();
+			classLoader = null;
+			initHelper();
 			socketClient.setSerializer(serializer);
 			result = deserializeObjects(bytes);
 		}
@@ -213,33 +267,35 @@ public class JPPFNode implements Runnable
 	 */
 	private Object[] deserializeObjects(byte[] bytes) throws Exception
 	{
-		Object[] result = new Object[3];
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 		DataInputStream dis = new DataInputStream(bais);
-		JPPFTaskWrapper wrapper = (JPPFTaskWrapper) helper.readNextObject(dis, false);
-		wrapper.setNodeExecutionTime(System.currentTimeMillis());
-		result[0] = wrapper;
-		String uuid = wrapper.getAppUuid();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) helper.readNextObject(dis, false);
+		bundle.setNodeExecutionTime(System.currentTimeMillis());
+		int count = bundle.getTaskCount();
+		Object[] result = new Object[2+count];
+		result[0] = bundle;
+		String uuid = bundle.getAppUuid();
 		result[1] = getContainer(uuid).deserializeObject(dis, true);
-		result[2] = getContainer(uuid).deserializeObject(dis, true);
+		for (int i=0; i<count; i++)
+			result[2+i] = getContainer(uuid).deserializeObject(dis, true);
 		dis.close();
 		return result;
 	}
 
 	/**
 	 * Write the execution results to the socket stream.
-	 * @param wrapper the task wrapper to send along.
-	 * @param task the task with its result field updated.
+	 * @param bundle the task wrapper to send along.
+	 * @param tasks the list of tasks with their result field updated.
 	 * @throws Exception if an error occurs while writitng to the socket stream.
 	 */
-	private void writeResults(JPPFTaskWrapper wrapper, JPPFTask task) throws Exception
+	private void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
-		long elapsed = System.currentTimeMillis() - wrapper.getNodeExecutionTime();
-		wrapper.setNodeExecutionTime(elapsed);
-		helper.writeNextObject(wrapper, dos, false);
-		helper.writeNextObject(task, dos, true);
+		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
+		bundle.setNodeExecutionTime(elapsed);
+		helper.writeNextObject(bundle, dos, false);
+		for (JPPFTask task: tasks) helper.writeNextObject(task, dos, true);
 		dos.flush();
 		dos.close();
 		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
@@ -274,16 +330,6 @@ public class JPPFNode implements Runnable
 	}
 	
 	/**
-	 * Reset the current class loader so already loaded classes can be dynamically updated.
-	 * @throws Exception if an error occcurs while instantiating the class loader.
-	 */
-	private void resetHelper() throws Exception
-	{
-		classLoader = null;
-		initHelper();
-	}
-	
-	/**
 	 * Get a reference to the JPPF container associated with an application uuid.
 	 * @param uuid the uuuid to find the container for.
 	 * @return a <code>JPPFContainer</code> instance.
@@ -294,7 +340,7 @@ public class JPPFNode implements Runnable
 		JPPFContainer container = containerMap.get(uuid);
 		if (container == null)
 		{
-			log.debug("Creating new container for appuuid="+uuid);
+			if (debugEnabled) log.debug("Creating new container for appuuid="+uuid);
 			container = new JPPFContainer(uuid);
 			if (containerList.size() >= MAX_CONTAINERS)
 			{
@@ -317,10 +363,56 @@ public class JPPFNode implements Runnable
 	}
 
 	/**
-	 * Wake up the thread waiting on this node's initialization.
+	 * Add a listener to the list of listener for this node.
+	 * @param listener the listener to add.
+	 * @see org.jppf.node.MonitoredNode#addNodeListener(org.jppf.node.event.NodeListener)
 	 */
-	public synchronized void wakeUp()
+	public void addNodeListener(NodeListener listener)
 	{
-		notify();
+		if (listener == null) return;
+		listeners.add(listener);
+		notifying = true;
+	}
+
+	/**
+	 * Remove a listener from the list of listener for this node.
+	 * @param listener the listener to remove.
+	 * @see org.jppf.node.MonitoredNode#removeNodeListener(org.jppf.node.event.NodeListener)
+	 */
+	public void removeNodeListener(NodeListener listener)
+	{
+		if (listener == null) return;
+		listeners.remove(listener);
+		if (listeners.size() <= 0) notifying = false;
+	}
+
+	/**
+	 * Notify all listeners that an event has occurred.
+	 * @param eventType the type of the event as a string.
+	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(java.lang.String)
+	 */
+	public void fireNodeEvent(String eventType)
+	{
+		NodeEvent event = new NodeEvent(eventType);
+		for (NodeListener listener: listeners) listener.eventOccurred(event);
+	}
+	
+	/**
+	 * Stop this node and release the resources it is using.
+	 * @see org.jppf.node.MonitoredNode#stopNode()
+	 */
+	public void stopNode()
+	{
+		stopped = true;
+		try
+		{
+			socketClient.close();
+		}
+		catch(Exception ex)
+		{
+			log.error(ex.getMessage(), ex);
+		}
+		socketClient = null;
+		classLoader = null;
 	}
 }

@@ -139,6 +139,10 @@ public interface StatsConstants
 	 */
 	String MAX_CLIENTS = "Maximum Number of Clients";
 	/**
+	 * Property name for the maximum number of clients ever connected to the server.
+	 */
+	String AVG_KILOBYTE_TRANPORT = "Average megabyte transport";
+	/**
 	 * List of stats properties related to network connections.
 	 */
 	String[] CONNECTION_PROPS = new String[]
@@ -175,7 +179,7 @@ public interface StatsConstants
 	 */
 	String[] TRANSPORT_PROPS = new String[]
 	{
-		TOTAL_TRANSPORT_TIME, LATEST_TRANSPORT_TIME, MIN_TRANSPORT_TIME, MAX_TRANSPORT_TIME, AVG_TRANSPORT_TIME
+		TOTAL_TRANSPORT_TIME, LATEST_TRANSPORT_TIME, MIN_TRANSPORT_TIME, MAX_TRANSPORT_TIME, AVG_TRANSPORT_TIME, AVG_KILOBYTE_TRANPORT
 	};
 	/**
 	 * List of all fields.

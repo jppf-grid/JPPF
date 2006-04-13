@@ -21,7 +21,7 @@ package org.jppf.utils;
 import java.io.*;
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
-import org.jppf.classloader.JPPFClassLoader;
+import org.jppf.node.JPPFClassLoader;
 
 /**
  * Collection of utility methods for serializing and deserializing to and from bytes buffers.

@@ -21,13 +21,16 @@ package org.jppf.server.app;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.crypto.SecretKey;
 import org.apache.log4j.Logger;
 import org.jppf.classloader.ClassServerDelegate;
 import org.jppf.comm.socket.*;
+import org.jppf.security.CryptoUtils;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
+import static org.jppf.server.protocol.AdminRequest.*;
 
 /**
  * This class provides an API to submit execution requests.<br>
@@ -167,8 +170,13 @@ public class JPPFClient
 					dis.close();
 					completed = true;
 				}
+				catch(NotSerializableException e)
+				{
+					throw e;
+				}
 				catch(Exception e)
 				{
+					log.error(e.getMessage(), e);
 					init();
 				}
 			}
@@ -216,6 +224,7 @@ public class JPPFClient
 				}
 				catch(IOException e)
 				{
+					log.error(e.getMessage(), e);
 					init();
 				}
 			}
@@ -228,31 +237,69 @@ public class JPPFClient
 	}
 
 	/**
-	 * Send a request shutdown, or shutdown then restart, the server.
-	 * @param command the command to perform.
-	 * @param shutdownDelay delay, in milliseconds, after which the server shutdown is initiated. A value of 0 or less
-	 * means an immediate shutdown.
-	 * @param restartDelay delay, starting from shutdown completion, after which the server is restarted.
-	 * A value of 0 or less means the server is restarted immediately after the shutdown is complete. 
-	 * @throws Exception if an error occurred while trying to get the server statistics.
+	 * Submit an admin request with the specified command name and parameters.
+	 * @param password the current admin password.
+	 * @param newPassword the new password if the password is to be changed, can be null.
+	 * @param command the name of the command to submit.
+	 * @param parameters the parasmeters of the command to submit, may be null.
+	 * @return the reponse message from the server.
+	 * @throws Exception Exception if an error occurred while trying to send or execute the command.
 	 */
-	public void submitAdminRequest(String command, long shutdownDelay, long restartDelay) throws Exception
+	public String submitAdminRequest(String password, String newPassword, String command, Map<String, Object> parameters)
+		throws Exception
 	{
-		AdminRequestHeader header = new AdminRequestHeader();
-		header.setAppUuid(appUuid);
-		header.setRequestType(JPPFRequestHeader.ADMIN);
-		header.setCommand(command);
-		header.setShutdownDelay(shutdownDelay);
-		header.setRestartDelay(restartDelay);
+		lock.lock();
+		try
+		{
+			AdminRequest request = new AdminRequest();
+			request.setAppUuid(appUuid);
+			request.setRequestType(ADMIN);
+			request.setParameter(COMMAND_PARAM, command);
+			SecretKey tmpKey = CryptoUtils.generateSecretKey();
+			request.setParameter(KEY_PARAM, CryptoUtils.encrypt(tmpKey.getEncoded()));
+			request.setParameter(PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, password.getBytes()));
+			if (newPassword != null)
+			{
+				request.setParameter(NEW_PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, newPassword.getBytes()));
+			}
+			if (parameters != null)
+			{
+				for (String key: parameters.keySet())
+				{
+					request.setParameter(key, parameters.get(key));
+				}
+			}
+			sendAdminRequest(request);
+	
+			JPPFBuffer buf = socketClient.receiveBytes(0);
+			ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
+			DataInputStream dis = new DataInputStream(bais);
+			request = (AdminRequest) helper.readNextObject(dis, false);
+			dis.close();
+			return (String) request.getParameter(RESPONSE_PARAM);
+		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
+	
+	/**
+	 * Send an administration request to the server.
+	 * @param request the request to send, with its parameters populated.
+	 * @throws Exception if the request could not be sent.
+	 */
+	private void sendAdminRequest(AdminRequest request) throws Exception
+	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
-		helper.writeNextObject(header, dos, false);
+		helper.writeNextObject(request, dos, false);
 		dos.flush();
 		dos.close();
 		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
 		socketClient.sendBytes(buf);
 	}
-
+	
 	/**
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @throws Exception if an error occcurs while instantiating the class loader.

@@ -18,7 +18,7 @@
  */
 package org.jppf.server.event;
 
-import org.jppf.server.protocol.JPPFTaskWrapper;
+import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**
  * Listener providing a callback to invoke when a task's execution has completed.
@@ -30,5 +30,5 @@ public interface TaskCompletionListener
 	 * Callback method invoked when the execution of a task has completed.
 	 * @param result the result of the task's execution.
 	 */
-	void taskCompleted(JPPFTaskWrapper result);
+	void taskCompleted(JPPFTaskBundle result);
 }

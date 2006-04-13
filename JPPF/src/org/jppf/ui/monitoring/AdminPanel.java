@@ -165,7 +165,7 @@ public class AdminPanel extends JPanel
 					command = AdminRequestHeader.ADMIN_SHUTDOWN_RESTART;
 				}
 				else command = AdminRequestHeader.ADMIN_SHUTDOWN;
-				statsFormatter.requestShutdownRestart(command, shutdownDelay, restartDelay);
+				//statsFormatter.requestShutdownRestart(command, shutdownDelay, restartDelay);
 			}
 		});
 		btn.setPreferredSize(new Dimension(100, 20));

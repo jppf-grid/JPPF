@@ -18,16 +18,55 @@
  */
 package org.jppf.server.app;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import static org.jppf.server.JPPFStatsUpdater.clientConnectionClosed;
+import static org.jppf.server.JPPFStatsUpdater.getStats;
+import static org.jppf.server.JPPFStatsUpdater.isStatsEnabled;
+import static org.jppf.server.JPPFStatsUpdater.newClientConnection;
+import static org.jppf.server.protocol.AdminRequest.BUNDLE_SIZE_PARAM;
+import static org.jppf.server.protocol.AdminRequest.CHANGE_PASSWORD;
+import static org.jppf.server.protocol.AdminRequest.CHANGE_SETTINGS;
+import static org.jppf.server.protocol.AdminRequest.COMMAND_PARAM;
+import static org.jppf.server.protocol.AdminRequest.KEY_PARAM;
+import static org.jppf.server.protocol.AdminRequest.NEW_PASSWORD_PARAM;
+import static org.jppf.server.protocol.AdminRequest.PASSWORD_PARAM;
+import static org.jppf.server.protocol.AdminRequest.RESPONSE_PARAM;
+import static org.jppf.server.protocol.AdminRequest.RESTART_DELAY_PARAM;
+import static org.jppf.server.protocol.AdminRequest.SHUTDOWN;
+import static org.jppf.server.protocol.AdminRequest.SHUTDOWN_DELAY_PARAM;
+import static org.jppf.server.protocol.AdminRequest.SHUTDOWN_RESTART;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.crypto.SecretKey;
+
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
-import org.jppf.server.*;
+import org.jppf.security.CryptoUtils;
+import org.jppf.security.PasswordManager;
+import org.jppf.server.JPPFConnection;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.JPPFQueue;
+import org.jppf.server.JPPFServer;
+import org.jppf.server.JPPFStats;
+import org.jppf.server.JPPFStatsUpdater;
 import org.jppf.server.event.TaskCompletionListener;
-import org.jppf.server.protocol.*;
-import org.jppf.utils.*;
-import static org.jppf.server.JPPFStatsUpdater.*;
+import org.jppf.server.protocol.AdminRequest;
+import org.jppf.server.protocol.JPPFRequestHeader;
+import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.utils.JPPFBuffer;
+import org.jppf.utils.SerializationHelper;
+import org.jppf.utils.SerializationHelperImpl;
+import org.jppf.utils.StringUtils;
 
 /**
  * Instances of this class listen to incoming client application requests, so as
@@ -46,15 +85,14 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	 * Determines whether debug log statements are enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-
 	/**
 	 * Mapping of received tasks to a unique id within the context of their enclosing request. 
 	 */
-	private Map<String, JPPFTaskWrapper> wrapperMap = null;
+	private Map<String, JPPFTaskBundle> bundleMap = null;
 	/**
 	 * Mapping of task results to a unique id within the context of the enclosing request. 
 	 */
-	private Map<String, JPPFTaskWrapper> resultMap = null;
+	private Map<String, JPPFTaskBundle> resultMap = null;
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
@@ -89,9 +127,6 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	 */
 	public void perform() throws Exception
 	{
-		wrapperMap = new HashMap<String, JPPFTaskWrapper>();
-		resultMap = new TreeMap<String, JPPFTaskWrapper>();
-
 		JPPFBuffer buffer = socketClient.receiveBytes(0);
 		SerializationHelper helper = new SerializationHelperImpl();
 		byte[] bytes = buffer.getBuffer();
@@ -103,55 +138,89 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 		{
 			sendStats();
 		}
-		else if (JPPFRequestHeader.ADMIN.equals(header.getRequestType()) && isStatsEnabled())
+		else if (JPPFRequestHeader.ADMIN.equals(header.getRequestType()))
 		{
 			performAdminOperation(header);
 		}
 		else if (JPPFRequestHeader.EXECUTION.equals(header.getRequestType()))
 		{
-			int count = header.getTaskCount();
-			// Read the serialized data provider
-			byte[] dataProvider = helper.readNextBytes(dis);
-			// read each task
-			for (int i=0; i<count; i++)
-			{
-				byte[] taskBytes = helper.readNextBytes(dis);
-				if (debugEnabled)
-				{
-					log.debug("deserialized task in "+taskBytes.length+" bytes as : "+StringUtils.dumpBytes(taskBytes, 0, taskBytes.length));
-				}
-				String uuid = StringUtils.padLeft(""+i, '0', 10);
-				synchronized(wrapperMap)
-				{
-					JPPFTaskWrapper wrapper = new JPPFTaskWrapper(this, uuid, header.getUuid(), taskBytes);
-					wrapper.setAppUuid(header.getAppUuid());
-					wrapper.setDataProvider(dataProvider);
-					wrapperMap.put(uuid, wrapper);
-					getQueue().addObject(wrapper);
-				}
-			}
-			dis.close();
-			waitForExecution();
-			ByteArrayOutputStream baos = new ByteArrayOutputStream()
-			{
-		    public synchronized byte[] toByteArray()
-				{
-					return buf;
-				}
-			};
-			DataOutputStream dos = new DataOutputStream(baos);
-			for (String id: resultMap.keySet())
-			{
-				JPPFTaskWrapper wrapper = resultMap.get(id);
-				helper.writeNextBytes(dos, wrapper.getBytes(), 0, wrapper.getBytes().length);
-			}
-			dos.flush();
-			dos.close();
-			buffer = new JPPFBuffer();
-			buffer.setLength(baos.size());
-			buffer.setBuffer(baos.toByteArray());
-			socketClient.sendBytes(buffer);
+			executeTasks(header, helper, dis);
 		}
+	}
+
+	/**
+	 * Execute the tasks receive from a client.
+	 * @param header the header describing the client request.
+	 * @param helper used to read the tasks data.
+	 * @param dis the stream from which the task data are read.
+	 * @throws Exception if the tasks could not be read.
+	 */
+	protected void executeTasks(JPPFRequestHeader header, SerializationHelper helper, DataInputStream dis)
+		throws Exception
+	{
+		bundleMap = new HashMap<String, JPPFTaskBundle>();
+		resultMap = new TreeMap<String, JPPFTaskBundle>();
+		int count = header.getTaskCount();
+		byte[] dataProvider = helper.readNextBytes(dis);
+		int bundleCount = 0;
+		int n = 0;
+		List<byte[]> taskList = new ArrayList<byte[]>();
+		int bundleSize = JPPFStatsUpdater.getStaticBundleSize();
+		for (int i=0; i<count; i++)
+		{
+			n++;
+			byte[] taskBytes = helper.readNextBytes(dis);
+			if (debugEnabled)
+			{
+				log.debug("deserialized task in "+taskBytes.length+" bytes as : "+StringUtils.dumpBytes(taskBytes, 0, taskBytes.length));
+			}
+			taskList.add(taskBytes);
+			if ((n == bundleSize) || (i == count - 1))
+			{
+				String uuid = StringUtils.padLeft(""+bundleCount, '0', 10);
+				synchronized(bundleMap)
+				{
+					JPPFTaskBundle bundle = new JPPFTaskBundle();
+					bundle.setUuid(uuid);
+					bundle.setRequestUuid(header.getUuid());
+					bundle.setAppUuid(header.getAppUuid());
+					bundle.setDataProvider(dataProvider);
+					bundle.setTaskCount(n);
+					bundle.setTasks(taskList);
+					bundle.setCompletionListener(this);
+					bundleMap.put(uuid, bundle);
+					getQueue().addBundle(bundle);
+				}
+				n = 0;
+				bundleCount++;
+				taskList = new ArrayList<byte[]>();
+			}
+		}
+		dis.close();
+		waitForExecution();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream()
+		{
+	    public synchronized byte[] toByteArray()
+			{
+				return buf;
+			}
+		};
+		DataOutputStream dos = new DataOutputStream(baos);
+		for (String id: resultMap.keySet())
+		{
+			JPPFTaskBundle bundle = resultMap.get(id);
+			for (int i=0; i<bundle.getTaskCount(); i++)
+			{
+				byte[] task = bundle.getTasks().get(i);
+				helper.writeNextBytes(dos, task, 0, task.length);
+			}
+		}
+		dos.flush();
+		dos.close();
+		JPPFBuffer buffer = new JPPFBuffer();
+		buffer.setLength(baos.size());
+		buffer.setBuffer(baos.toByteArray());
+		socketClient.sendBytes(buffer);
 	}
 	
 	/**
@@ -187,11 +256,75 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	 */
 	private void performAdminOperation(JPPFRequestHeader header) throws Exception
 	{
-		AdminRequestHeader adminHeader = (AdminRequestHeader) header;
-		long shutdownDelay = adminHeader.getShutdownDelay();
-		boolean restart = !AdminRequestHeader.ADMIN_SHUTDOWN.equals(adminHeader.getCommand());
-		long restartDelay = adminHeader.getRestartDelay();
-		JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay, restart, restartDelay);
+		String response = "Request executed";
+		AdminRequest request = (AdminRequest) header;
+		byte[] b = (byte[]) request.getParameter(KEY_PARAM);
+		b = CryptoUtils.decrypt(b);
+		SecretKey tmpKey = CryptoUtils.getSecretKeyFromEncoded(b);
+		b = (byte[]) request.getParameter(PASSWORD_PARAM);
+		String remotePwd = new String(CryptoUtils.decrypt(tmpKey, b));
+		PasswordManager pm = new PasswordManager();
+		b = pm.readPassword();
+		String localPwd = new String(CryptoUtils.decrypt(b));
+		if (!localPwd.equals(remotePwd))
+		{
+			response = "Invalid password";
+		}
+		else
+		{
+			String command = (String) request.getParameter(COMMAND_PARAM);
+			if (SHUTDOWN.equals(command) || SHUTDOWN_RESTART.equals(command))
+			{
+				long shutdownDelay = (Long) request.getParameter(SHUTDOWN_DELAY_PARAM);
+				boolean restart = !SHUTDOWN.equals(command);
+				long restartDelay = (Long) request.getParameter(RESTART_DELAY_PARAM);
+				sendAdminResponse(request, "Request acknowledged");
+				JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay, restart, restartDelay);
+				return;
+			}
+			else if (CHANGE_PASSWORD.equals(command))
+			{
+				b = (byte[]) request.getParameter(NEW_PASSWORD_PARAM);
+				String newPwd = new String(CryptoUtils.decrypt(tmpKey, b));
+				pm.savePassword(CryptoUtils.encrypt(newPwd.getBytes()));
+				response = "Password changed";
+			}
+			else if (CHANGE_SETTINGS.equals(command))
+			{
+				Number n = (Number) request.getParameter(BUNDLE_SIZE_PARAM);
+				if (n != null) JPPFStatsUpdater.setStaticBundleSize(n.intValue());
+				response = "Settings changed";
+			}
+		}
+		sendAdminResponse(request, response);
+	}
+	
+	/**
+	 * Send the response to an admin request.
+	 * @param request the admin request that holds the response.
+	 * @param msg the response messages.
+	 * @throws Exception if the response could not be sent.
+	 */
+	private void sendAdminResponse(AdminRequest request, String msg) throws Exception
+	{
+		request.setParameter(RESPONSE_PARAM, msg);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream()
+		{
+	    public synchronized byte[] toByteArray()
+			{
+				return buf;
+			}
+		};
+		DataOutputStream dos = new DataOutputStream(baos);
+		SerializationHelper helper = new SerializationHelperImpl();
+		helper.writeNextObject(request, dos, false);
+
+		dos.flush();
+		dos.close();
+		JPPFBuffer buffer = new JPPFBuffer();
+		buffer.setLength(baos.size());
+		buffer.setBuffer(baos.toByteArray());
+		socketClient.sendBytes(buffer);
 	}
 
 	/**
@@ -209,7 +342,7 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	 */
 	private synchronized void waitForExecution()
 	{
-		while (wrapperMap.size() > 0)
+		while (bundleMap.size() > 0)
 		{
 			try
 			{
@@ -228,16 +361,16 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	 * When all tasks have completed, this connection sends all results back.
 	 * @param result the result of the task's execution.
 	 */
-	public synchronized void taskCompleted(JPPFTaskWrapper result)
+	public synchronized void taskCompleted(JPPFTaskBundle result)
 	{
 		String uuid = result.getUuid();
+		synchronized(bundleMap)
+		{
+			bundleMap.remove(uuid);
+		}
 		synchronized(resultMap)
 		{
 			resultMap.put(uuid, result);
-		}
-		synchronized(wrapperMap)
-		{
-			wrapperMap.remove(uuid);
 		}
 		notify();
 	}

@@ -20,7 +20,7 @@ package org.jppf.server.node;
 
 import java.io.*;
 import org.apache.log4j.Logger;
-import org.jppf.classloader.*;
+import org.jppf.node.*;
 import org.jppf.utils.*;
 
 /**

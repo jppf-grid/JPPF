@@ -42,6 +42,10 @@ public final class StatsFormatter implements StatsConstants
 	 * Formatter for floating point values.
 	 */
 	private static NumberFormat doubleFormatter = initDoubleFormatter();
+	/**
+	 * Formatter for floating point values.
+	 */
+	private static NumberFormat smallDoubleFormatter = initSmallDoubleFormatter();
 
 	/**
 	 * Instantiation of this class is not allowed.
@@ -51,7 +55,21 @@ public final class StatsFormatter implements StatsConstants
 	}
 
 	/**
-	 * Initialize the formatter for doubble values.
+	 * Initialize the formatter for double values.
+	 * @return a <code>NumberFormat</code> instance.
+	 */
+	private static NumberFormat initSmallDoubleFormatter()
+	{
+		NumberFormat doubleFormatter = NumberFormat.getInstance();
+		doubleFormatter.setGroupingUsed(true);
+		doubleFormatter.setMinimumFractionDigits(2);
+		doubleFormatter.setMaximumFractionDigits(10);
+		doubleFormatter.setMinimumIntegerDigits(1);
+		return doubleFormatter;
+	}
+
+	/**
+	 * Initialize the formatter for double values.
 	 * @return a <code>NumberFormat</code> instance.
 	 */
 	private static NumberFormat initDoubleFormatter()
@@ -106,6 +124,7 @@ public final class StatsFormatter implements StatsConstants
 		stringValueMap.put(MIN_TRANSPORT_TIME, s);
 		stringValueMap.put(MAX_TRANSPORT_TIME, formatDouble(stats.transport.maxTime));
 		stringValueMap.put(AVG_TRANSPORT_TIME, formatDouble(stats.transport.avgTime));
+		stringValueMap.put(AVG_KILOBYTE_TRANPORT, formatSmallDouble(stats.avgTransportPerByte));
 		stringValueMap.put(LATEST_QUEUE_TIME, formatDouble(stats.queue.latestTime));
 		stringValueMap.put(TOTAL_QUEUE_TIME, formatTime(stats.queue.totalTime));
 		s = (stats.queue.minTime == Long.MAX_VALUE) ? "" : formatDouble(stats.queue.minTime);
@@ -147,6 +166,7 @@ public final class StatsFormatter implements StatsConstants
 		doubleValueMap.put(MIN_TRANSPORT_TIME, (double) (stats.transport.minTime == Long.MAX_VALUE ? 0L : stats.transport.minTime));
 		doubleValueMap.put(MAX_TRANSPORT_TIME, (double) stats.transport.maxTime);
 		doubleValueMap.put(AVG_TRANSPORT_TIME, stats.transport.avgTime);
+		doubleValueMap.put(AVG_KILOBYTE_TRANPORT, stats.avgTransportPerByte);
 		doubleValueMap.put(LATEST_QUEUE_TIME, (double) stats.queue.latestTime);
 		doubleValueMap.put(TOTAL_QUEUE_TIME, (double) stats.queue.totalTime);
 		doubleValueMap.put(MIN_QUEUE_TIME, (double) (stats.queue.minTime == Long.MAX_VALUE ? 0L : stats.queue.minTime));
@@ -180,6 +200,16 @@ public final class StatsFormatter implements StatsConstants
 	private static String formatDouble(double value)
 	{
 		return doubleFormatter.format(value);
+	}
+	
+	/**
+	 * Format a floating point value.
+	 * @param value the value to format.
+	 * @return the formatted value as a string.
+	 */
+	private static String formatSmallDouble(double value)
+	{
+		return smallDoubleFormatter.format(value);
 	}
 	
 	/**

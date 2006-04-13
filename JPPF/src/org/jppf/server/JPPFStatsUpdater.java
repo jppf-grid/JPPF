@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class JPPFStatsUpdater
 {
 	/**
-	 * Used to synchronize access and updates tot he stats from a large number of threads.
+	 * Used to synchronize access and updates to the stats from a large number of threads.
 	 */
 	private static ReentrantLock lock = new ReentrantLock();
 	/**
@@ -107,14 +107,15 @@ public final class JPPFStatsUpdater
 
 	/**
 	 * Called to notify that a task was added to the queue.
+	 * @param count the number of tasks that have been added to the queue.
 	 */
-	public static void taskInQueue()
+	public static void taskInQueue(int count)
 	{
 		lock.lock();
 		try
 		{
-			stats.queueSize++;
-			if (stats.queueSize > stats.maxQueueSize) stats.maxQueueSize++;
+			stats.queueSize += count;
+			if (stats.queueSize > stats.maxQueueSize) stats.maxQueueSize = stats.queueSize;
 		}
 		finally
 		{
@@ -124,15 +125,16 @@ public final class JPPFStatsUpdater
 
 	/**
 	 * Called to notify that a task was removed from the queue.
+	 * @param count the number of tasks that have been removed from the queue.
 	 * @param time the time the task remained in the queue.
 	 */
-	public static void taskOutOfQueue(long time)
+	public static void taskOutOfQueue(int count, long time)
 	{
 		lock.lock();
 		try
 		{
-			stats.queueSize--;
-			stats.totalQueued++;
+			stats.queueSize -= count;
+			stats.totalQueued += count;
 			stats.queue.newTime(time);
 		}
 		finally
@@ -143,18 +145,21 @@ public final class JPPFStatsUpdater
 	
 	/**
 	 * Called when a task execution has completed.
+	 * @param count the number of tasks that have been executed.
 	 * @param time the time it took to execute the task, including transport to and from the node.
 	 * @param remoteTime the time it took to execute the in the node only.
+	 * @param size the size in bytes of the bundle that was sent to the node.
 	 */
-	public static void taskExecuted(long time, long remoteTime)
+	public static void taskExecuted(int count, long time, long remoteTime, long size)
 	{
 		lock.lock();
 		try
 		{
-			stats.totalTasksExecuted++;
+			stats.totalTasksExecuted += count;
 			stats.execution.newTime(time);
 			stats.nodeExecution.newTime(remoteTime);
 			stats.transport.newTime(time - remoteTime);
+			stats.footprint += size;
 		}
 		finally
 		{
@@ -180,21 +185,54 @@ public final class JPPFStatsUpdater
 	}
 
 	/**
-	 * This method synchronizes calls to <code>System.currentTimeMillis()</code>
-	 * @return the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC.
-	 * @see java.lang.System#currentTimeMillis()
-	 */
-	public static synchronized long currentTimeMillis()
-	{
-		return System.currentTimeMillis();
-	}
-
-	/**
 	 * Determine whether the statistics collection is enabled.
 	 * @return true if the statistics collection is enabled, false otherwise.
 	 */
 	public static boolean isStatsEnabled()
 	{
 		return statsEnabled;
+	}
+	
+	/**
+	 * Get the current number of nodes connected to the server.
+	 * @return the numbe rof nodes as an int.
+	 */
+	public static int getNbNodes()
+	{
+		return stats.nbNodes;
+	}
+
+	/**
+	 * Get the maximum number of tasks in each task bundle.
+	 * @return the bundle size as an int.
+	 */
+	public static int getStaticBundleSize()
+	{
+		lock.lock();
+		try
+		{
+			return stats.bundleSize;
+		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
+
+	/**
+	 * Set the maximum number of tasks in each task bundle.
+	 * @param bundleSize the bundle size as an int.
+	 */
+	public static void setStaticBundleSize(int bundleSize)
+	{
+		lock.lock();
+		try
+		{
+			stats.bundleSize = bundleSize;
+		}
+		finally
+		{
+			lock.unlock();
+		}
 	}
 }
