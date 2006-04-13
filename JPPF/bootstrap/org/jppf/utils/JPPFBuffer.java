@@ -21,6 +21,7 @@ package org.jppf.utils;
 /**
  * buffer for the data read from or written to a socket connection.
  * @author Laurent Cohen
+ * @author Domingos Creado
  */
 public class JPPFBuffer
 {
@@ -40,6 +41,16 @@ public class JPPFBuffer
 	{
 	}
 
+	/**
+	 * Initialize this buffer with the following String.
+	 */
+	public JPPFBuffer(String str)
+	{
+		this.buffer = str.getBytes();
+		this.length = buffer.length;
+	}
+
+	
 	/**
 	 * Initialize this buffer with a specified buffer and buffer length.
 	 * @param buffer the buffer to use.
