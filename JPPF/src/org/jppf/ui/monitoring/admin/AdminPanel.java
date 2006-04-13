@@ -2,19 +2,20 @@
  * Java Parallel Processing Framework.
  * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
- * 
- * This program is free software; you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation;
- * either version 2 of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program;
- * if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package org.jppf.ui.monitoring.admin;
 
@@ -86,7 +87,7 @@ public class AdminPanel extends JPanel
 		add(createMessagesPanel());
 		add(Box.createVerticalGlue());
 	}
-	
+
 	/**
 	 * Creates a chartPanel with a field to enter the shutdown delay, a field to enter the restart delay,
 	 * and a button to send the shutdown/restart request to the server.
@@ -102,7 +103,7 @@ public class AdminPanel extends JPanel
 		JPanel shutdownPanel = createShtudownPanel();
 		JPanel checkboxPanel = createCheckboxPanel();
 		JPanel restartPanel = createRestartPanel();
-		
+
 		Dimension d = new Dimension(250, 20);
 		btnPanel.setPreferredSize(d);
 		shutdownPanel.setPreferredSize(d);
@@ -127,10 +128,10 @@ public class AdminPanel extends JPanel
 		layout.putConstraint(SpringLayout.EAST, panel, 10, SpringLayout.EAST, btnPanel);
 
 		mainPanel.add(panel);
-		
+
 		return mainPanel;
 	}
-	
+
 	/**
 	 * Create the shutdown delay field.
 	 * @return a <code>JPanel</code> instance.
@@ -138,20 +139,20 @@ public class AdminPanel extends JPanel
 	private JPanel createShtudownPanel()
 	{
 		JPanel shutdownPanel = GuiUtils.createBoxPanel(BoxLayout.X_AXIS);
-		shutdownField.setValue(3000L); 
+		shutdownField.setValue(3000L);
 		shutdownField.setHorizontalAlignment(JTextField.RIGHT);
 		shutdownField.setPreferredSize(new Dimension(100, 20));
 		shutdownField.setMinimumSize(new Dimension(100, 20));
 		shutdownField.setMaximumSize(new Dimension(100, 20));
 		shutdownPanel.add(Box.createHorizontalStrut(5));
-		shutdownPanel.add(new JLabel("Shutdown delay (ms)")); 
+		shutdownPanel.add(new JLabel("Shutdown delay (ms)"));
 		shutdownPanel.add(Box.createHorizontalStrut(5));
 		shutdownPanel.add(shutdownField);
 		shutdownPanel.add(Box.createHorizontalGlue());
 		shutdownPanel.setPreferredSize(new Dimension(300, 25));
 		return shutdownPanel;
 	}
-	
+
 	/**
 	 * Create the restart delay field.
 	 * @return a <code>JPanel</code> instance.
@@ -165,14 +166,14 @@ public class AdminPanel extends JPanel
 		restartField.setMinimumSize(new Dimension(100, 20));
 		restartField.setMaximumSize(new Dimension(100, 20));
 		restartPanel.add(Box.createHorizontalStrut(25));
-		restartPanel.add(new JLabel("Restart delay (ms)")); 
+		restartPanel.add(new JLabel("Restart delay (ms)"));
 		restartPanel.add(Box.createHorizontalStrut(5));
 		restartPanel.add(restartField);
 		restartPanel.add(Box.createHorizontalGlue());
 		restartPanel.setPreferredSize(new Dimension(300, 50));
 		return restartPanel;
 	}
-	
+
 	/**
 	 * Create the button to send the request.
 	 * @return a <code>JPanel</code> instance.
@@ -206,7 +207,7 @@ public class AdminPanel extends JPanel
 		btnPanel.setPreferredSize(new Dimension(300, 25));
 		return btnPanel;
 	}
-	
+
 	/**
 	 * Create the checkbox that determines whether a restart should be performed after the shutdown.
 	 * @return a <code>JPanel</code> instance.
@@ -246,7 +247,7 @@ public class AdminPanel extends JPanel
 		JPanel passwordPanel = createPasswordRowPanel(passwordField, "Password");
 		JPanel newPasswordPanel = createPasswordRowPanel(newPasswordField, "New password");
 		JPanel confirmPasswordPanel = createPasswordRowPanel(confirmPasswordField, "Confirm new password");
-		
+
 		Dimension d = new Dimension(250, 20);
 		btnPanel.setPreferredSize(d);
 		passwordPanel.setPreferredSize(d);
@@ -271,12 +272,12 @@ public class AdminPanel extends JPanel
 		layout.putConstraint(SpringLayout.EAST, panel, 10, SpringLayout.EAST, btnPanel);
 
 		mainPanel.add(panel);
-		
+
 		return mainPanel;
 	}
 
 	/**
-	 * Create a panel containing a password field with a corresponding label in a row. 
+	 * Create a panel containing a password field with a corresponding label in a row.
 	 * @param field the password field.
 	 * @param labelText the label corresponding to the field.
 	 * @return a <code>JPanel</code> instance.
@@ -288,7 +289,7 @@ public class AdminPanel extends JPanel
 		JLabel label = new JLabel(labelText);
 		label.setPreferredSize(new Dimension(120, 20));
 		panel.add(Box.createHorizontalStrut(5));
-		panel.add(label); 
+		panel.add(label);
 		panel.add(Box.createHorizontalStrut(5));
 		panel.add(field);
 		panel.add(Box.createHorizontalGlue());
@@ -343,7 +344,7 @@ public class AdminPanel extends JPanel
 		mainPanel.add(scrollPane);
 		return mainPanel;
 	}
-	
+
 	/**
 	 * Perform a validation of the new password before a password change.
 	 * @param newPwd the new admin password to set.
@@ -378,7 +379,7 @@ public class AdminPanel extends JPanel
 		JPanel btnPanel = createConfigBtnPanel();
 		bundleSizeSpinner = new JSpinner(new SpinnerNumberModel(5, 1, 10000, 1));
 		JPanel bundleSizePanel = createConfigRowPanel(bundleSizeSpinner, "Task bundle size");
-		
+
 		Dimension d = new Dimension(250, 20);
 		btnPanel.setPreferredSize(d);
 		bundleSizePanel.setPreferredSize(d);
@@ -395,12 +396,12 @@ public class AdminPanel extends JPanel
 		layout.putConstraint(SpringLayout.EAST, panel, 10, SpringLayout.EAST, btnPanel);
 
 		mainPanel.add(panel);
-		
+
 		return mainPanel;
 	}
 
 	/**
-	 * Create a panel containing a component with a corresponding label in a row. 
+	 * Create a panel containing a component with a corresponding label in a row.
 	 * @param field the component whose value can be changed.
 	 * @param labelText the label corresponding to the field.
 	 * @return a <code>JPanel</code> instance.
@@ -411,7 +412,7 @@ public class AdminPanel extends JPanel
 		JLabel label = new JLabel(labelText);
 		label.setPreferredSize(new Dimension(120, 20));
 		panel.add(Box.createHorizontalStrut(5));
-		panel.add(label); 
+		panel.add(label);
 		panel.add(Box.createHorizontalStrut(5));
 		panel.add(field);
 		panel.add(Box.createHorizontalGlue());
@@ -430,7 +431,7 @@ public class AdminPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent event)
 			{
-				
+
 				int n = statsHandler.getLatestStats().bundleSize;
 				if (n > 0)
 				{

@@ -2,19 +2,20 @@
  * Java Parallel Processing Framework.
  * Copyright (C) 2005-2006 Laurent Cohen.
  * lcohen@osp-chicago.com
- * 
- * This program is free software; you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation;
- * either version 2 of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program;
- * if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package org.jppf.security;
 
@@ -91,7 +92,7 @@ public class CryptoUtils
 		System.out.println("Public key: "+StringUtils.dumpBytes(bytes, 0, bytes.length));
 		return pair;
 	}
-	
+
 	/**
 	 * Generate a Diffie Hellman private/public pair of keys.
 	 * @return a pair of private and corresponding public key, as a <code>KeyPair</code> instance.
@@ -117,7 +118,7 @@ public class CryptoUtils
 		System.out.println("Public DH key: "+StringUtils.dumpBytes(bytes, 0, bytes.length));
 		return pair;
 	}
-	
+
 	/**
 	 * Generate a secret key.
 	 * @return a <code>SecretKey</code> instance.
@@ -146,7 +147,7 @@ public class CryptoUtils
 		String hexString = FileUtils.readTextFile(new InputStreamReader(is));
 		return StringUtils.toBytes(hexString);
 	}
-	 
+
 	/**
 	 * Digitally sign some data.
 	 * @param data the data to sign.
@@ -161,7 +162,7 @@ public class CryptoUtils
 		byte[] signature = sig.sign();
 		return signature;
 	}
-	
+
 	/**
 	 * Check a digital signature for some data.
 	 * @param signature data signature.
@@ -176,7 +177,7 @@ public class CryptoUtils
 		sig.update(data);
 		return sig.verify(signature);
 	}
-	
+
 	/**
 	 * Get the private key used for signature generation.
 	 * @return a <code>PrivateKey</code> instance.
@@ -210,7 +211,7 @@ public class CryptoUtils
 		}
 		return publicKey;
 	}
-	
+
 	/**
 	 * Get the secret key used for encryption and decryption.
 	 * @return a <code>SecretKey</code> instance.
@@ -227,7 +228,7 @@ public class CryptoUtils
 		}
 		return secretKey;
 	}
-	
+
 	/**
 	 * Get a secret key form its encoded representation.
 	 * @param encoded the secret key in encoded format.
@@ -240,7 +241,7 @@ public class CryptoUtils
 		SecretKeyFactory skf = SecretKeyFactory.getInstance("DES");
 		return skf.generateSecret(spec);
 	}
-	
+
 	/**
 	 * Encrypt some data.
 	 * @param data the data as an array of bytes.
