@@ -45,7 +45,6 @@ public class JPPFQueue
 	 * queue behaves as a FIFO queue and is thread-safe for atomic
 	 * <code>add()</code> and <code>poll()</code> operations.
 	 */
-	//private ConcurrentLinkedQueue<JPPFTaskBundle> queue = new ConcurrentLinkedQueue<JPPFTaskBundle>();
 	private Queue<JPPFTaskBundle> queue = new PriorityBlockingQueue<JPPFTaskBundle>();
 
 	
