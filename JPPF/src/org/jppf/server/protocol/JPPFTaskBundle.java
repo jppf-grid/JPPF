@@ -30,7 +30,7 @@ import org.jppf.server.event.TaskCompletionListener;
  * The bundle size is computed dynamically, depending on the number of nodes connected to the server, and other factors.
  * @author Laurent Cohen
  */
-public class JPPFTaskBundle implements Serializable
+public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 {
 	/**
 	 * The unique identifier for this task bundle.
@@ -68,6 +68,10 @@ public class JPPFTaskBundle implements Serializable
 	 * The time it took a node to execute this task.
 	 */
 	private long nodeExecutionTime = 0L;
+	/**
+	 * The priority of this task bundle.
+	 */
+	private int priority = 0;
 
 	/**
 	 * Get the unique identifier for this task bundle.
@@ -229,5 +233,38 @@ public class JPPFTaskBundle implements Serializable
 	public void setCompletionListener(TaskCompletionListener listener)
 	{
 		this.completionListener = listener;
+	}
+
+	/**
+	 * Get the priority of this task bundle.
+	 * @return the priority as an int.
+	 */
+	public int getPriority()
+	{
+		return priority;
+	}
+
+	/**
+	 * Set the priority of this task bundle.
+	 * @param priority the priority as an int. 
+	 */
+	public void setPriority(int priority)
+	{
+		this.priority = priority;
+	}
+
+	/**
+	 * Compare two task bundles, based on their respective priorities.
+	 * @param bundle the bundle compare this one to.
+	 * @return a positive int if this bundle is greater, 0 if both are equal,
+	 * or a negative int if this bundless is less than the other.
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(JPPFTaskBundle bundle)
+	{
+		if (bundle == null) return 1;
+		if (priority < bundle.getPriority()) return -1;
+		if (priority > bundle.getPriority()) return 1;
+		return 0;
 	}
 }

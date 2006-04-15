@@ -115,6 +115,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			} catch (Exception e) {
 				// to not enter in a loop
 				queue.removeListener(this);
+				bundle.setPriority(10);
 				queue.addBundle(bundle);
 				queue.addListener(this);
 				try {
@@ -150,7 +151,6 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 				}
 			}
 		}
-
 	}
 
 	private State SendingJob = new CSendingJob();

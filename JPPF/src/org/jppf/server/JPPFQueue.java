@@ -19,13 +19,9 @@
  */
 package org.jppf.server;
 
-import static org.jppf.server.JPPFStatsUpdater.taskInQueue;
-import static org.jppf.server.JPPFStatsUpdater.taskOutOfQueue;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
+import static org.jppf.server.JPPFStatsUpdater.*;
+import java.util.*;
+import java.util.concurrent.*;
 import org.apache.log4j.Logger;
 import org.jppf.server.protocol.JPPFTaskBundle;
 
@@ -49,7 +45,8 @@ public class JPPFQueue
 	 * queue behaves as a FIFO queue and is thread-safe for atomic
 	 * <code>add()</code> and <code>poll()</code> operations.
 	 */
-	private ConcurrentLinkedQueue<JPPFTaskBundle> queue = new ConcurrentLinkedQueue<JPPFTaskBundle>();
+	//private ConcurrentLinkedQueue<JPPFTaskBundle> queue = new ConcurrentLinkedQueue<JPPFTaskBundle>();
+	private Queue<JPPFTaskBundle> queue = new PriorityBlockingQueue<JPPFTaskBundle>();
 
 	
 	/**

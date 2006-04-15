@@ -106,6 +106,7 @@ public class JPPFStats implements Serializable
 	public JPPFStats makeCopy()
 	{
 		JPPFStats s = new JPPFStats();
+		s.bundleSize = bundleSize;
 		s.totalTasksExecuted = totalTasksExecuted;
 		s.execution = execution.makeCopy();
 		s.nodeExecution = nodeExecution.makeCopy();
