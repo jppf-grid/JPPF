@@ -84,7 +84,7 @@
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 						<tr><td>
 							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the GNU Lesser General Public License (LGPL).
-							A copy of the licensing terms can be obtained <a href="LGPL.html"><b>here</b></a>.</span></h4>
+							A copy of the licensing terms can be obtained <a href="http://www.opensource.org/licenses/lgpl-license.php"><b>here</b></a>.</span></h4>
 						</td></tr>
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 					</table>

@@ -24,7 +24,15 @@
 	<!--                          Property definitions                             -->
 	<!-- ========================================================================= -->
 
-  <property name="build.properties.file" value="${basedir}/bin/build.properties"/>
+
+	<property name="common" value="${basedir}/../common"/>	
+	<property name="admin" value="${basedir}/../admin"/>	
+	<property name="client" value="${basedir}/../client"/>	
+	<property name="node" value="${basedir}/../node"/>	
+	<property name="server" value="${basedir}/../server"/>	
+	<property name="demo" value="${basedir}/../demo"/>	
+
+	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${build.properties.file}"/>
 	<property name="build.number.file" value="${basedir}/bin/build.number"/>
 	<property name="bin" value="${basedir}/bin"/>	
@@ -47,15 +55,20 @@
 	<property name="app.jar.file" value="${ant.project.name}.jar"/>
 	<property name="license.file" value="LICENSE.txt"/>
 	<property name="runtime" value="${deploy}/runtime"/>
-	<property name="runtime.driver" value="${deploy}/runtime/driver"/>
-	<property name="runtime.node" value="${deploy}/runtime/node"/>
+	<property name="runtime.driver" value="${build}/runtime/driver"/>
+	<property name="runtime.node" value="${build}/runtime/node"/>
 
 	<!-- ========================================================================= -->
 	<!--                           Classpath definitions                           -->
 	<!-- ========================================================================= -->
 
 	<path id="project.classpath">
-		<pathelement location="${classes}"/>
+		<pathelement location="${common}/classes"/>
+		<pathelement location="${node}/classes"/>
+		<pathelement location="${admin}/classes"/>
+		<pathelement location="${server}/classes"/>
+		<pathelement location="${client}/classes"/>
+		<pathelement location="${demo}/classes"/>
 		<pathelement location="${bootstrap.classes}"/>
 		<fileset dir="${lib}">
 			<include name="**/*.jar"/>
@@ -115,6 +128,7 @@
 
   <target name="build" depends="init, compile, jar"/>
 	<target name="rebuild" depends="clean, init, compile, jar"/>
+	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy" depends="clean.deploy, rebuild, javadoc, doc, init.deploy, package, runtime"/>
 
 	<!-- ========================================================================= -->
@@ -122,28 +136,37 @@
 	<!-- ========================================================================= -->
 
 	<target name="compile" description="Compile" depends="init">
-		<javac srcdir="${bootstrap.src}" destdir="${bootstrap.classes}"
-			debug="on" deprecation="off" optimize="on" includes="**/*.java">
-	    <classpath refid="project.classpath"/>
-	    <compilerarg line="-Xlint:unchecked"/>
-		</javac>
+		<antcall target="compile.module"><param name="path" value="${common}"/></antcall>
+		<antcall target="compile.module"><param name="path" value="${node}"/></antcall>
+		<antcall target="compile.module"><param name="path" value="${admin}"/></antcall>
+		<antcall target="compile.module"><param name="path" value="${client}"/></antcall>
+		<antcall target="compile.module"><param name="path" value="${server}"/></antcall>
+		<antcall target="compile.module"><param name="path" value="${demo}"/></antcall>
+
+		<!--
 		<copy todir="${bootstrap.classes}">
 			<fileset dir="${basedir}/bootstrap">
 				<exclude name="**/*.java"/>
 				<exclude name="**/package.html"/>
 			</fileset>
 		</copy>
-		<javac srcdir="${src}" destdir="${classes}"
-			debug="on" deprecation="off" optimize="on" includes="**/*.java">
-	    <classpath refid="project.classpath"/>
-	    <compilerarg line="-Xlint:unchecked"/>
-		</javac>
 		<copy todir="${classes}">
 			<fileset dir="${src}">
 				<exclude name="**/*.java"/>
 				<exclude name="**/package.html"/>
 			</fileset>
 		</copy>
+	  -->
+  </target>
+
+	<target name="compile.module">
+		<javac srcdir="" destdir="${path}/classes"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+			<src path="${path}/src/java"/>
+	    <src path="${path}/src/resources"/>
+		</javac>
   </target>
 
 	<!-- ========================================================================= -->
@@ -151,60 +174,28 @@
 	<!-- ========================================================================= -->
 
 	<target name="jar" description="generates the application jar" depends="compile">
-    <jar jarfile="${build}/${app.jar.file}">
-			<fileset dir="${classes}"/>
-			<fileset dir="${bootstrap.classes}"/>
-		</jar>
-    <jar jarfile="${build}/bootstrap-${app.jar.file}">
-			<fileset dir="${bootstrap.classes}"/>
-		</jar>
+		<antcall target="jar.module"><param name="module" value="common"/></antcall>
+		<antcall target="jar.module"><param name="module" value="node"/></antcall>
+		<antcall target="jar.module"><param name="module" value="admin"/></antcall>
+		<antcall target="jar.module"><param name="module" value="client"/></antcall>
+		<antcall target="jar.module"><param name="module" value="server"/></antcall>
+		<antcall target="jar.module"><param name="module" value="demo"/></antcall>
 	</target>
+
+	<target name="jar.module">
+    <jar jarfile="${build}/jppf-${module}.jar">
+			<fileset dir="${basedir}/../${module}/classes"/>
+		</jar>
+  </target>
 
 	<!-- ========================================================================= -->
 	<!--                 Package the application for deployment                    -->
 	<!-- ========================================================================= -->
 
 	<target name="package" description="package the application into a release zip file" depends="rebuild">
-		<!-- copy everything to the ${basedir}/build/deploy folder -->
-		<copy tofile="${deploy}/${app.jar.file}" file="${build}/${app.jar.file}"/>
-		<copy tofile="${deploy}/bootstrap-${app.jar.file}" file="${build}/bootstrap-${app.jar.file}"/>
-		<copy tofile="${deploy}/${license.file}" file="${basedir}/${license.file}"/>
-		<copy todir="${deploy.lib}">
-			<fileset dir="${lib}"/>
-		</copy>
-		<copy todir="${deploy.config}">
-			<fileset dir="${config}">
-				<exclude name="eclipse"/>
-				<exclude name="eclipse/*.*"/>
-			</fileset>
-		</copy>
-		<copy todir="${deploy}/src">
-			<fileset dir="${src}"/>
-		</copy>
-		<copy todir="${deploy}/bootstrap">
-			<fileset dir="${bootstrap.src}"/>
-		</copy>
-		<copy todir="${deploy.build}/classes">
-			<fileset dir="${classes}"/>
-		</copy>
-		<copy todir="${deploy.build}/bootstrap">
-			<fileset dir="${bootstrap.classes}"/>
-		</copy>
-		<copy todir="${deploy}/bin">
-			<fileset dir="${bin}"/>
-		</copy>
-		<copy todir="${deploy}/docs">
-			<fileset dir="${docs}">
-				<include name="api/**/*.*"/>
-			</fileset>
-		</copy>
-		<copy todir="${deploy}/examples">
-			<fileset dir="${examples}">
-				<exclude name="**/*.cmd"/>
-			</fileset>
-		</copy>
 		<copy tofile="${deploy}/README.html" file="${basedir}/index.html"/>
 		<copy tofile="${deploy}/docs/home/README.html" file="${docs}/home/readme.html"/>
+
 		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
 		<!-- The build number is also incremented by 1                                      -->
 		<propertyfile file="${build.number.file}">
@@ -218,8 +209,20 @@
 		<property name="release.file"
 			value="${build}/${ant.project.name}-full-src-${version.number}.${build.number}-${now}.zip"/>
 		<delete file="${release.file}" quiet="true"/>
+
 		<zip destfile="${release.file}">
-			<zipfileset dir="${deploy}" prefix="${ant.project.name}-${version.number}"/>
+			<zipfileset dir="${basedir}" prefix="${ant.project.name}-${version.number}/JPPF">
+				<exclude name="build/**/*.*"/>
+				<exclude name="docs/architecture/**/*.*"/>
+				<exclude name="docs/home/**/*.*"/>
+				<exclude name="docs/misc/**/*.*"/>
+			</zipfileset>
+			<zipfileset dir="${node}" prefix="${ant.project.name}-${version.number}/node"/>
+			<zipfileset dir="${common}" prefix="${ant.project.name}-${version.number}/common"/>
+			<zipfileset dir="${client}" prefix="${ant.project.name}-${version.number}/client"/>
+			<zipfileset dir="${server}" prefix="${ant.project.name}-${version.number}/server"/>
+			<zipfileset dir="${admin}" prefix="${ant.project.name}-${version.number}/admin"/>
+			<zipfileset dir="${demo}" prefix="${ant.project.name}-${version.number}/demo"/>
 		</zip>
 	</target>
 
@@ -230,11 +233,13 @@
 	<target name="runtime" description="" depends="rebuild">
 		<antcall target="runtime.driver"/>
 		<antcall target="runtime.node"/>
+    <delete dir="${runtime}" quiet="true"/>
 	</target>
 
 	<target name="runtime.driver">
-		<copy tofile="${runtime.driver}/lib/bootstrap-${app.jar.file}" file="${build}/bootstrap-${app.jar.file}"/>
-		<copy tofile="${runtime.driver}/lib/${app.jar.file}" file="${build}/${app.jar.file}"/>
+		<copy tofile="${runtime.driver}/lib/node.jar" file="${build}/${ant.project.name}-node.jar"/>
+		<copy tofile="${runtime.driver}/lib/common.jar" file="${build}/${ant.project.name}-common.jar"/>
+		<copy tofile="${runtime.driver}/lib/server.jar" file="${build}/${ant.project.name}-server.jar"/>
 		<copy todir="${runtime.driver}/lib">
 			<fileset dir="${lib}/log4j">
 				<include name="*.*"/>
@@ -251,10 +256,11 @@
 		<zip destfile="${runtime.driver.file}">
 			<zipfileset dir="${runtime.driver}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-driver"/>
 		</zip>
+    <delete dir="${runtime.driver}" quiet="true"/>
 	</target>
 
 	<target name="runtime.node">
-		<copy tofile="${runtime.node}/lib/bootstrap-${app.jar.file}" file="${build}/bootstrap-${app.jar.file}"/>
+		<copy tofile="${runtime.node}/lib/node.jar" file="${build}/${ant.project.name}-node.jar"/>
 		<copy tofile="${runtime.node}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.node}/config">
 			<fileset dir="${config}/node"/>
@@ -266,6 +272,7 @@
 		<zip destfile="${runtime.node.file}">
 			<zipfileset dir="${runtime.node}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-node"/>
 		</zip>
+    <delete dir="${runtime.node}" quiet="true"/>
 	</target>
 
 	<!-- ========================================================================= -->
@@ -310,8 +317,12 @@
 		<javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"
 			packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true"
 			stylesheetfile="${bin}/javadoc.css" additionalparam="-quiet">
-			<packageset dir="${src}"/>
-			<packageset dir="${bootstrap.src}"/>
+			<packageset dir="${node}/src/java"/>
+			<packageset dir="${common}/src/java"/>
+			<packageset dir="${client}/src/java"/>
+			<packageset dir="${server}/src/java"/>
+			<packageset dir="${admin}/src/java"/>
+			<packageset dir="${demo}/src/java"/>
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
 			<doctitle><![CDATA[Java Parallel Processing Framework v${version.number}]]></doctitle>
 			<header>

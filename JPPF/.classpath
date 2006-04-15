@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry output="build/classes" kind="src" path="src"/>
-	<classpathentry output="examples/Demo/classes" kind="src" path="examples/Demo/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="lib/JFreeChart/gnujaxp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j/log4j-1.2.9.jar"/>
-	<classpathentry output="build/bootstrap" kind="src" path="bootstrap"/>
 	<classpathentry exported="true" sourcepath="C:/Tools/Substance/src" kind="lib" path="lib/Substance/substance.jar">
 		<attributes>
 			<attribute value="file:/C:/Tools/Substance/doc/api/" name="javadoc_location"/>
