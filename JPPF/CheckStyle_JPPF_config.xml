@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	This configuration file was written by the eclipse-cs plugin configuration editor
+-->
+<!--
+Checkstyle-Configuration: JPPF Checks
+Description:
+
+-->
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN" "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+<module name="Checker">
+    <property name="severity" value="warning"/>
+    <module name="TreeWalker">
+        <module name="JavadocMethod"/>
+        <module name="JavadocType"/>
+        <module name="JavadocVariable"/>
+        <module name="AnonInnerLength">
+            <metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="20 lines max"/>
+        </module>
+        <module name="FileLength">
+            <metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="600 lines max"/>
+            <property name="max" value="600"/>
+        </module>
+        <module name="MethodLength">
+            <metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="80 lines max"/>
+            <property name="max" value="80"/>
+        </module>
+        <module name="FinalClass"/>
+        <module name="ConstantName"/>
+        <module name="Header">
+            <property name="header" value="/*\n * Java Parallel Processing Framework.\n * Copyright (C) 2005-2006 Laurent Cohen.\n * lcohen@osp-chicago.com\n *\n * This library is free software; you can redistribute it and/or modify it\n * under the terms of the GNU Lesser General Public License as published by the\n * Free Software Foundation; either version 2.1 of the License, or (at your\n * option) any later version.\n *\n * This library is distributed in the hope that it will be useful, but WITHOUT\n * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or\n * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License\n * for more details.\n *\n * You should have received a copy of the GNU Lesser General Public License\n * along with this library; if not, write to the Free Software Foundation,\n * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA\n */"/>
+        </module>
+        <module name="RedundantModifier"/>
+        <module name="RedundantImport"/>
+        <module name="UnusedImports"/>
+    </module>
+    <module name="PackageHtml"/>
+</module>
