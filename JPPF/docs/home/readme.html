@@ -36,15 +36,15 @@
 					<table border="0" cellspacing="0" cellpadding="5">
 						<tr>
 							<td class="menu_first"><a href="index.html">Home</a></td>
+							<td class="menu"><a href="JPPF-Overview.html">Overview</a></td>
 							<td class="menu"><a href="http://sourceforge.net/project/showfiles.php?group_id=135654">Files</a></td>
+							<td class="menu"><a href="screenshots.html">Screenshots</a></td >
+							<td class="menu"><a href="readme.html">Readme</a></td >
+							<td class="menu"><a href="archi.html">Architecture</a></td >
+							<td class="menu"><a href="api/index.html">API Doc</a></td >
 							<td class="menu"><a href="faq.php">Faqs</a></td>
 							<td class="menu"><a href="news.php">News</a></td>
 							<td class="menu"><a href="http://sourceforge.net/projects/jppf-project">Project</a></td>
-							<td class="menu"><a href="readme.html">Readme</a></td >
-							<td class="menu"><a href="api/index.html">API Doc</a></td >
-							<td class="menu"><a href="archi.html">Architecture</a></td >
-							<td class="menu"><a href="todos.html">Todos</a></td >
-							<td class="menu"><a href="screenshots.html">Screenshots</a></td >
 							<td class="menu"><a href="links.html">Links</a></td>
 							<td class="menu"></td>
 						</tr>
@@ -62,50 +62,81 @@
 			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 			<tr>
 				<td>
-					<h3>System Requirements</h3>
-					<ul>
-						<li>Any platform with Java 2, Standard Edition (J2SE) 5.0 or later.</li>
-						<li>Apache Ant 1.6.2 or later, for building and running the application and examples.</li>
-					</ul>
+					<table cellspacing="0" cellpadding="5">
+						<tr>
+							<td width="50%" valign="top">
+								<h3>System Requirements</h3>
+								<ul>
+									<li>Any platform with Java 2, Standard Edition (J2SE) 5.0 or later.</li>
+									<li>Apache Ant 1.6.2 or later, for building and running the application and examples.</li>
+									<li>At least 512 MB of RAM.</li>
+								</ul>
+								<h3>Recommended configuration</h3>
+								<ul>
+									<li>Windows 2K, 2K3 or XP Pro; Linux with 32 or 64 bits kernel version 2.6+, most Unix platforms
+									<li>1 GB of RAM or more.</li>
+									<li>2 CPUs or more.</li>
+								</ul>
+							</td>
+							<td width="50%" valign="top">
+								<h3>Installation</h3>
+								<p><b>Framework distribution</b><br>
+								Simply unzip the file jppf-full-x.y.z-nnnn-yyyymmdd.zip in a location of your choice.
+								This gives you the JPPF framework, including the sources, demos, and documentation.
+								<p><b>JPPF Driver</b><br>
+								Unzip the file jppf-driver-bin-x.y.z-nnnn-yyyymmdd.zip in a location where you intend to run the JPPF server from.
+								This zip file contains all the binaries for running the server only.<br>
+								To run the driver: go to the <b>jppf-x.y.z-driver</b> folder and type <b>ant run.driver</b>
+								<p><b>JPPF Node</b><br>
+								Unzip the file jppf-node-bin-x.y.z-nnnn-yyyymmdd.zip in a location where you intend to run a JPPF node on.
+								This zip file contains all the binaries for running a node only.
+								To run the node: go to the <b>jppf-x.y.z-node</b> folder and type <b>ant run.node</b>
+							</td>
+						</tr>
+					</table>
 				</td>
 			</tr>
 			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 			<tr>
 				<td>
-					<h3>Installing</h3>
-					<p><b>Framework distribution</b>
-					<p>Simply unzip the jppf-full-x.y.z-nnnn.zip file in a location of your choice.
-					This gives you the JPPF framework, including the sources, demos, and documentation.
-					<p><b>Runtime distribution</b>
-					<p>Unzip the jppf-full-x.y.z-nnnn-runtime.zip file in a location where you intend to run a node or the UI from.
-					The runtime contains the minimum set of required files and libraries for running a node and the GUI.
-					You'll have to change the configuration properties in the config folder as described in the user guide.
+					<table cellspacing="0" cellpadding="5">
+						<tr>
+							<td width="50%" valign="top">
+								<h3>Running the &quot;Long Task&quot; demo</h3>
+								Go to the <b>jppf-x.y.z/examples/Demo</b> folder<br>
+								Type <b>ant run.demo1</b> to run the demo.<br>
+								This demo runs a number of tasks with a fixed execution length (default is 10 tasks, 1 second each).  Each task can be executed in parallel.<br>
+								The demo parameters can be changed in the file <b>jppf-x.y.z/examples/Demo/config/jppf-client.properties</b>
+							</td>
+							<td width="50%" valign="top">
+								<h3>Running the &quot;Matrix&quot; demo</h3>
+								Go to the <b>jppf-x.y.z/examples/Demo</b> folder<br>
+								Type <b>ant run.demo2</b> to run the demo.<br>
+								This demo performs the multiplication of 2 square matrices a number of times (default is 5 times, matrix size is 300*300).<br>The multiplication is
+								divided in as many tasks as there are lines in the first matrix (i.e. 300 by default). Each task can be executed in parallel.<br>
+								The demo parameters can be changed in the file <b>jppf-x.y.z/examples/Demo/config/jppf-client.properties</b>
+							</td>
+						</tr>
+					</table>
 				</td>
 			</tr>
 			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 			<tr>
 				<td>
-				<h3>Running the Demo</h3>
-				<ol>
-					<li>Go to the <b>jppf-x.y.z/examples/Demo</b> folder</li>
-					<li>type <b>ant run.local</b> to run the example</li>
-				</ol>
-				This script launches 3 separate processes and will take 100% CPU on single-CPU machines.<br>
-				Please give it some time, the demo may take 30 seconds or more to execute.
+					<table cellspacing="0" cellpadding="5">
+						<tr>
+							<td width="50%" valign="top">
+								<h3>Running the monitoring and administration tool</h3>
+								Install the framework distribution as specified above.<br>
+								Go to the <b>jppf-x.y.z/examples/Demo</b> folder and type <b>ant run.ui</b> to run the graphical user interface.
+							</td>
+							<td width="50%" valign="top">
+								<h3>More information can be found in the <a href="faq.php"><b>FAQ<b></a></h3>
+							</td>
+						</tr>
+					</table>
 				</td>
 			</tr>
-			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
-			<tr>
-				<td>
-				<h3>Running the monitoring UI</h3>
-				<ol>
-					<li>Go to the <b>jppf-x.y.z/examples/Demo</b> folder</li>
-					<li>type <b>ant run.ui</b> to run the Swing UI</li>
-				</ol>
-				</td>
-			</tr>
-			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
-			<tr><td><h3>More information can be found in the <a href="faq.php"><b>FAQ<b></a></h3></td></tr>
 			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 			<tr>
 				<td>
@@ -114,15 +145,17 @@
 					<ul>
 						<li><b>bin</b> contains the scripts and config files for building the JPPF distribution, including the zip file you downloaded, the javadoc and the demo</li>
 						<li><b>classes</b> contains the compiled classes of JPPF, excluding the demo</li>
-						<li><b>docs</b> has two subfolders: <b>api</b> for the JPPF api documentation, and <b>manual</b> for a quick guide and tutorial to help you use JPPF through a
-						documented demo that is part of the distribution</li>
+						<li><b>docs</b> contains JPPF the API documentation, and soon will have a user guide and developer guide as well</li>
 						<li><b>examples</b> is the root container for all demos and examples distributed with the framework</li>
 						<li><b>lib</b> contains all thrid party libraries required to run JPPF nodes and the JPPF GUI. The following third party libraries are required:
 							<ul>
 								<li>log4j: the well known Apache logging framework</li>
+								<li>Substance: a skinnable look &amp; feel for Swing</li>
+								<li>JFreeChart: a great Java-based, open source charts library</li>
 							</ul>
 						</li>
 						<li><b>src</b> contains all sources, fully documented, of the framework</li>
+						<li><b>bootstrap</b> contains a small set of source file, required to start a JPPF node</li>
 					</ul>
 				</td>
 			</tr>

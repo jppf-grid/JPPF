@@ -1,3 +1,23 @@
+<!--
+	Java Parallel Processing Framework.
+	Copyright (C) 2005-2006 Laurent Cohen.
+	lcohen@osp-chicago.com
+
+	This library is free software; you can redistribute it and/or modify it
+	under the terms of the GNU Lesser General Public License as published by the
+	Free Software Foundation; either version 2.1 of the License, or (at your
+	option) any later version.
+
+	This library is distributed in the hope that it will be useful, but WITHOUT
+	ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+	FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+	for more details.
+
+	You should have received a copy of the GNU Lesser General Public License
+	along with this library; if not, write to the Free Software Foundation,
+	Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+-->
+
 <project name='jppf' default="build" basedir="..">
 
 	<!-- ========================================================================= -->
@@ -21,6 +41,7 @@
 	<property name="src" value="${basedir}/src"/>
 	<property name="lib" value="${basedir}/lib"/>
 	<property name="docs" value="${basedir}/docs"/>
+	<property name="home" value="${docs}/home"/>
 	<property name="examples" value="${basedir}/examples"/>
 	<property name="javadoc" value="${docs}/api"/>
 	<property name="app.jar.file" value="${ant.project.name}.jar"/>
@@ -177,19 +198,13 @@
 				<include name="api/**/*.*"/>
 			</fileset>
 		</copy>
-		<copy todir="${deploy}/docs">
-			<fileset dir="${docs}/home">
-				<include name="manual/**/*.*"/>
-			</fileset>
-		</copy>
 		<copy todir="${deploy}/examples">
 			<fileset dir="${examples}">
 				<exclude name="**/*.cmd"/>
 			</fileset>
 		</copy>
 		<copy tofile="${deploy}/README.html" file="${basedir}/index.html"/>
-		<copy tofile="${deploy}/docs/manual/jppf.css" file="${docs}/home/jppf.css"/>
-		<copy tofile="${deploy}/docs/manual/README.html" file="${docs}/home/readme.html"/>
+		<copy tofile="${deploy}/docs/home/README.html" file="${docs}/home/readme.html"/>
 		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
 		<!-- The build number is also incremented by 1                                      -->
 		<propertyfile file="${build.number.file}">
@@ -257,15 +272,7 @@
 	<!--                     Build the web site content                            -->
 	<!-- ========================================================================= -->
 
-  <target name="doc" depends="doc.home, doc.manual">
-    <delete dir="${docs}/home/manual" quiet="true"/>
- 		<mkdir dir="${docs}/home/manual"/>
-		<copy todir="${docs}/home/manual">
-			<fileset dir="${docs}/manual">
-				<include name="*.*"/>
-				<include name="images/*.*"/>
-			</fileset>
-		</copy>
+  <target name="doc" depends="doc.home, doc.overview">
 	</target>
 
   <target name="doc.home" description="generates the project web site pages">
@@ -276,11 +283,11 @@
 		</antcall>
 	</target>
 
-	<target name="doc.manual" description="generates the project web site pages">
+	<target name="doc.overview" description="generates the project web site pages">
 		<antcall target="doc.gen">
-			<param name="source" value="docs/manual/doc-source"/>
-			<param name="dest" value="docs/manual/"/>
-			<param name="templates" value="docs/home/templates/"/>
+			<param name="source" value="${home}/overview-source"/>
+			<param name="dest" value="${home}/"/>
+			<param name="templates" value="${home}/templates/"/>
 		</antcall>
 	</target>
 

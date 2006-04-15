@@ -36,15 +36,15 @@
 					<table border="0" cellspacing="0" cellpadding="5">
 						<tr>
 							<td class="menu_first"><a href="index.html">Home</a></td>
+							<td class="menu"><a href="JPPF-Overview.html">Overview</a></td>
 							<td class="menu"><a href="http://sourceforge.net/project/showfiles.php?group_id=135654">Files</a></td>
+							<td class="menu"><a href="screenshots.html">Screenshots</a></td >
+							<td class="menu"><a href="readme.html">Readme</a></td >
+							<td class="menu"><a href="archi.html">Architecture</a></td >
+							<td class="menu"><a href="api/index.html">API Doc</a></td >
 							<td class="menu"><a href="faq.php">Faqs</a></td>
 							<td class="menu"><a href="news.php">News</a></td>
 							<td class="menu"><a href="http://sourceforge.net/projects/jppf-project">Project</a></td>
-							<td class="menu"><a href="readme.html">Readme</a></td >
-							<td class="menu"><a href="api/index.html">API Doc</a></td >
-							<td class="menu"><a href="archi.html">Architecture</a></td >
-							<td class="menu"><a href="todos.html">Todos</a></td >
-							<td class="menu"><a href="screenshots.html">Screenshots</a></td >
 							<td class="menu"><a href="links.html">Links</a></td>
 							<td class="menu"></td>
 						</tr>

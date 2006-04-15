@@ -31,13 +31,12 @@
 						</td></tr>
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 						<tr><td>
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.11.5 - beta</span></h4>
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.13.0 - beta</span></h4>
 						</td></tr>
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 						<tr><td>
-							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the GNU General Public License (GPL).<br>
-							A copy of the licensing terms can be obtained at the <a href="http://www.opensource.org/licenses/gpl-license.php">
-							<b>Open Source Initiative</b></a> web site.</span></h4>
+							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the GNU Lesser General Public License (LGPL).
+							A copy of the licensing terms can be obtained <a href="LGPL.html"><b>here</b></a>.</span></h4>
 						</td></tr>
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 					</table>
@@ -67,12 +66,33 @@
 
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 						<tr><td>
-							<h3>JPPF in the World</h3>
-							<b>
-							<a href="http://lwn.net/Articles/156109" target=_top>At LWN.net</a><br>
-							<a href="http://www.clustermonkey.net//component/option,com_weblinks/catid,40/Itemid,23" target=_top>At Cluster Monkey</a><br>
-							</b>
-							&nbsp;<br>
+							<h3>JPPF articles on the Web</h3>
+							<table align="center">
+								<tr><td>
+									<a href="http://lwn.net/Articles/156109" target=_top>
+										<img src="http://lwn.net/images/lcorner.png" border="0" alternate="LWN.net"/>
+									</a>
+									</td>
+									<td width="10"/>
+									<td>
+									<p><a href="http://www.artima.com/forums/flat.jsp?forum=276&thread=153331" target=_top>
+										<img src="http://www.artima.com/images/ab_dev.gif" border="0" alternate="artima developer"/>
+									</a>
+									<p><a href="http://linux.softpedia.com/get/System/Clustering-and-Distributed-Networks/Java-Parallel-Processing-Framework-10529.shtml" target=_top>
+										<img src="http://www.softpedia.com/base_img/softpedia_logo.gif" border="0" alternate="Softpedia"/>
+									</a>
+									</td>
+								</tr>
+							</table>
+							<!--
+							<table align="center">
+								<tr><td rowspan="0">
+									<a href="http://www.clustermonkey.net//component/option,com_weblinks/catid,40/Itemid,23" target=_top>
+										<img src="http://www.clustermonkey.net//templates/c7_gentle_white/images/CM_logo-large.jpg" border="0" alternate="Cluster Monkey"/>
+									</a>
+								</td></tr>
+							</table
+							-->
 							
 						</td></tr>
 
