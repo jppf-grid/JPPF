@@ -44,8 +44,6 @@
 	<property name="deploy.build" value="${deploy}/build"/>
 	<property name="deploy.config" value="${deploy}/config"/>	
 	<property name="classes" value="${build}/classes"/>
-	<property name="bootstrap.classes" value="${build}/bootstrap"/>
-	<property name="bootstrap.src" value="${basedir}/bootstrap"/>
 	<property name="src" value="${basedir}/src"/>
 	<property name="lib" value="${basedir}/lib"/>
 	<property name="docs" value="${basedir}/docs"/>
@@ -54,7 +52,7 @@
 	<property name="javadoc" value="${docs}/api"/>
 	<property name="app.jar.file" value="${ant.project.name}.jar"/>
 	<property name="license.file" value="LICENSE.txt"/>
-	<property name="runtime" value="${deploy}/runtime"/>
+	<property name="runtime" value="${build}/runtime"/>
 	<property name="runtime.driver" value="${build}/runtime/driver"/>
 	<property name="runtime.node" value="${build}/runtime/node"/>
 
@@ -69,7 +67,6 @@
 		<pathelement location="${server}/classes"/>
 		<pathelement location="${client}/classes"/>
 		<pathelement location="${demo}/classes"/>
-		<pathelement location="${bootstrap.classes}"/>
 		<fileset dir="${lib}">
 			<include name="**/*.jar"/>
 		</fileset>
@@ -103,21 +100,10 @@
 	<!-- ========================================================================= -->
 
 	<target name="init" description="Initialize ressources">
- 		<mkdir dir="${bootstrap.classes}"/>
- 		<mkdir dir="${classes}"/>
+ 		<mkdir dir="${build}"/>
 	</target>
 
 	<target name="init.deploy" description="Initialize ressources">
- 		<mkdir dir="${deploy}"/>
- 		<mkdir dir="${deploy}/src"/>
- 		<mkdir dir="${deploy}/bootstrap"/>
- 		<mkdir dir="${deploy.build}/classes"/>
- 		<mkdir dir="${deploy.build}/bootstrap"/>
- 		<mkdir dir="${deploy}/docs"/>
- 		<mkdir dir="${deploy}/examples"/>
- 		<mkdir dir="${deploy.config}"/>
-		<mkdir dir="${deploy.lib}"/>
-		<mkdir dir="${deploy.build}"/>
  		<mkdir dir="${runtime.driver}"/>
  		<mkdir dir="${runtime.node}"/>
 	</target>
@@ -142,21 +128,6 @@
 		<antcall target="compile.module"><param name="path" value="${client}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${server}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${demo}"/></antcall>
-
-		<!--
-		<copy todir="${bootstrap.classes}">
-			<fileset dir="${basedir}/bootstrap">
-				<exclude name="**/*.java"/>
-				<exclude name="**/package.html"/>
-			</fileset>
-		</copy>
-		<copy todir="${classes}">
-			<fileset dir="${src}">
-				<exclude name="**/*.java"/>
-				<exclude name="**/package.html"/>
-			</fileset>
-		</copy>
-	  -->
   </target>
 
 	<target name="compile.module">
@@ -193,9 +164,6 @@
 	<!-- ========================================================================= -->
 
 	<target name="package" description="package the application into a release zip file" depends="rebuild">
-		<copy tofile="${deploy}/README.html" file="${basedir}/index.html"/>
-		<copy tofile="${deploy}/docs/home/README.html" file="${docs}/home/readme.html"/>
-
 		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
 		<!-- The build number is also incremented by 1                                      -->
 		<propertyfile file="${build.number.file}">
