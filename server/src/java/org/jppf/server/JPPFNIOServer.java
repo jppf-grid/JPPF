@@ -76,6 +76,7 @@ public abstract class JPPFNIOServer extends Thread{
 	/**
 	 * Initialize this socket server with a specified port number.
 	 * @param port the port this socket server is listening to.
+	 * @param name the name given to this thread.
 	 * @throws JPPFBootstrapException if the underlying server socket can't be opened.
 	 */
 	public JPPFNIOServer(int port,String name) throws JPPFBootstrapException

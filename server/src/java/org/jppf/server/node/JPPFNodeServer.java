@@ -58,6 +58,9 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 */
 	private JPPFQueue queue = null;
 
+	/**
+	 * List of nodes that are available for executing tasks.
+	 */
 	private List<SocketChannel> availableNodes = new LinkedList<SocketChannel>();
 
 	/**
@@ -103,6 +106,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 
 	@Override
 	protected void postAccept(SocketChannel client) {
+		JPPFStatsUpdater.newNodeConnection();
 		JPPFTaskBundle bundle = getQueue().nextBundle();
 		if (bundle != null) {
 			SelectionKey key = client.keyFor(selector);
@@ -115,10 +119,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 				bundle.setPriority(10);
 				queue.addBundle(bundle);
 				queue.addListener(this);
-				try {
-					client.close();
-				} catch (IOException ignored) {
-				}
+				closeNode(client);
 			}
 		} else {
 			availableNodes.add(client);
@@ -142,10 +143,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 				queue.removeListener(this);
 				queue.addBundle(bundle);
 				queue.addListener(this);
-				try {
-					aNode.close();
-				} catch (IOException ignored) {
-				}
+				closeNode(aNode);
 			}
 		}
 	}
@@ -204,20 +202,17 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 					}
 					listener.taskCompleted(bundle);
 
-					// wrapper.setBytes(resultBytes);
-					listener.taskCompleted(bundle);
-
 					// verificar se tem tarefa nova
 					bundle = getQueue().nextBundle();
-					try {
-						if (bundle != null) {
-							sendTask(channel, key, context, bundle);
-							return;
+					if (bundle != null) {
+						try {
+								sendTask(channel, key, context, bundle);
+								return;
+						} catch (Exception e) {
+							resubmitBundle(bundle);
+							bundle = null;
+							throw e;
 						}
-					} catch (Exception e) {
-						getQueue().addBundle(bundle);
-						bundle = null;
-						throw e;
 					}
 
 					availableNodes.add(channel);
@@ -226,10 +221,36 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			} catch (Exception e) {
 
 				if (bundle != null) {
-					getQueue().addBundle(bundle);
+					resubmitBundle(bundle);
 				}
-
 			}
+		}
+	}
+
+	/**
+	 * Resubmit a task bundle at the head of the queue.
+	 * This method is invoked when a node is disconnected while it was executing a task bundle.
+	 * @param bundle the task bundle to resubmit.
+	 */
+	private void resubmitBundle(JPPFTaskBundle bundle)
+	{
+		bundle.setPriority(10);
+		getQueue().addBundle(bundle);
+	}
+	
+	/**
+	 * Close a connection to a node.
+	 * @param aNode a <code>SocketChannel</code> that encapsulates the connection.
+	 */
+	private void closeNode(SocketChannel aNode)
+	{
+		try
+		{
+			JPPFStatsUpdater.nodeConnectionClosed();
+			aNode.close();
+		}
+		catch (IOException ignored)
+		{
 		}
 	}
 
