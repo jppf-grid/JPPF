@@ -167,7 +167,8 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 			byte[] taskBytes = helper.readNextBytes(dis);
 			if (debugEnabled)
 			{
-				log.debug("deserialized task in "+taskBytes.length+" bytes as : "+StringUtils.dumpBytes(taskBytes, 0, taskBytes.length));
+				log.debug("deserialized task in " + taskBytes.length+" bytes as : "
+					+ StringUtils.dumpBytes(taskBytes, 0, taskBytes.length));
 			}
 			taskList.add(taskBytes);
 			if ((n == bundleSize) || (i == count - 1))

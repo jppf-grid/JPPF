@@ -112,9 +112,7 @@ public abstract class JPPFNIOServer extends Thread{
 			end();
 		}
 	}
-	
-	
-	
+
 	public void go(Set<SelectionKey> selectedKeys) throws Exception {
 		Iterator<SelectionKey> it = selectedKeys.iterator();
 		while (it.hasNext()) {
@@ -139,10 +137,6 @@ public abstract class JPPFNIOServer extends Thread{
 			it.remove();
 		}
 	}
-	
-	
-	
-
 	
 	/**
 	 * accept the incoming connection.
