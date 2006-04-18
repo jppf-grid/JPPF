@@ -33,7 +33,6 @@
 
   <path id="run.classpath">
 		<pathelement location="${config.dir}"/>
-		<pathelement location="${classes.dir}"/>
 		<fileset dir="${lib.dir}">
 			<include name="**/*.jar"/>
 		</fileset>
@@ -45,7 +44,7 @@
 
 	<!-- to run a single node -->
 	<target name="run.node">
-		<java fork="yes" classname="org.jppf.classloader.NodeLauncher" classpathref="run.classpath">
+		<java fork="yes" classname="org.jppf.node.NodeLauncher" classpathref="run.classpath">
 			<jvmarg value="-server" />
 			<jvmarg value="-Xmx128m" />
 			<jvmarg value="-Dlog4j.configuration=log4j-node.properties" />
