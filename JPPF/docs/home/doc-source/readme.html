@@ -49,18 +49,18 @@
 						<tr>
 							<td width="50%" valign="top">
 								<h3>Running the &quot;Long Task&quot; demo</h3>
-								Go to the <b>jppf-x.y.z/examples/Demo</b> folder<br>
+								Go to the <b>jppf-x.y.z/demo</b> folder<br>
 								Type <b>ant run.demo1</b> to run the demo.<br>
 								This demo runs a number of tasks with a fixed execution length (default is 10 tasks, 1 second each).  Each task can be executed in parallel.<br>
-								The demo parameters can be changed in the file <b>jppf-x.y.z/examples/Demo/config/jppf-client.properties</b>
+								The demo parameters can be changed in the file <b>jppf-x.y.z/demo/config/jppf-client.properties</b>
 							</td>
 							<td width="50%" valign="top">
 								<h3>Running the &quot;Matrix&quot; demo</h3>
-								Go to the <b>jppf-x.y.z/examples/Demo</b> folder<br>
+								Go to the <b>jppf-x.y.z/demo</b> folder<br>
 								Type <b>ant run.demo2</b> to run the demo.<br>
 								This demo performs the multiplication of 2 square matrices a number of times (default is 5 times, matrix size is 300*300).<br>The multiplication is
 								divided in as many tasks as there are lines in the first matrix (i.e. 300 by default). Each task can be executed in parallel.<br>
-								The demo parameters can be changed in the file <b>jppf-x.y.z/examples/Demo/config/jppf-client.properties</b>
+								The demo parameters can be changed in the file <b>jppf-x.y.z/demo/config/jppf-client.properties</b>
 							</td>
 						</tr>
 					</table>
@@ -74,35 +74,13 @@
 							<td width="50%" valign="top">
 								<h3>Running the monitoring and administration tool</h3>
 								Install the framework distribution as specified above.<br>
-								Go to the <b>jppf-x.y.z/examples/Demo</b> folder and type <b>ant run.ui</b> to run the graphical user interface.
+								Go to the <b>jppf-x.y.z/demo</b> folder and type <b>ant run.ui</b> to run the graphical user interface.
 							</td>
 							<td width="50%" valign="top">
 								<h3>More information can be found in the <a href="faq.php"><b>FAQ<b></a></h3>
 							</td>
 						</tr>
 					</table>
-				</td>
-			</tr>
-			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
-			<tr>
-				<td>
-					<h3>Description of the distribution</h3>
-					After unzipping, you will see the following folder structure, under the JPPF root folder:
-					<ul>
-						<li><b>bin</b> contains the scripts and config files for building the JPPF distribution, including the zip file you downloaded, the javadoc and the demo</li>
-						<li><b>classes</b> contains the compiled classes of JPPF, excluding the demo</li>
-						<li><b>docs</b> contains JPPF the API documentation, and soon will have a user guide and developer guide as well</li>
-						<li><b>examples</b> is the root container for all demos and examples distributed with the framework</li>
-						<li><b>lib</b> contains all thrid party libraries required to run JPPF nodes and the JPPF GUI. The following third party libraries are required:
-							<ul>
-								<li>log4j: the well known Apache logging framework</li>
-								<li>Substance: a skinnable look &amp; feel for Swing</li>
-								<li>JFreeChart: a great Java-based, open source charts library</li>
-							</ul>
-						</li>
-						<li><b>src</b> contains all sources, fully documented, of the framework</li>
-						<li><b>bootstrap</b> contains a small set of source file, required to start a JPPF node</li>
-					</ul>
 				</td>
 			</tr>
 			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
