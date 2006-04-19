@@ -177,9 +177,6 @@ public abstract class JPPFNIOServer extends Thread{
 		}
 	}
 
-	
-
-
 	protected abstract int getInitialInterest() ;
 	
 	protected abstract Object getInitialContent() ;
@@ -187,8 +184,6 @@ public abstract class JPPFNIOServer extends Thread{
 	protected abstract State getInitialState();
 	
 	protected abstract void postAccept(SocketChannel client);
-
-
 
 	/**
 	 * just to not instatiate every invocation of method fillRequest
@@ -282,8 +277,6 @@ public abstract class JPPFNIOServer extends Thread{
 		}
 	}
 	
-
-	
 	/**
 	 * Initialize the underlying server socket with a specified port.
 	 * @param port the port the underlying server listens to.
@@ -301,7 +294,6 @@ public abstract class JPPFNIOServer extends Thread{
 			server.configureBlocking(false);
 			selector = Selector.open();
 			server.register(selector, SelectionKey.OP_ACCEPT);
-			
 		}
 		catch(IllegalArgumentException iae)
 		{
