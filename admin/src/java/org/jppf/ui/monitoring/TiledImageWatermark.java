@@ -26,7 +26,7 @@ import org.jvnet.substance.SubstanceImageCreator;
 import org.jvnet.substance.watermark.SubstanceWatermark;
 
 /**
- * 
+ * This class enables using a watermark image throughout the GUI.
  * @author Laurent Cohen
  */
 public class TiledImageWatermark implements SubstanceWatermark

@@ -35,8 +35,9 @@ import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.TypedProperties;
 
 /**
- * This class is a wrapper around a server socket, listenening to incoming connections to and from nodes and client
- * applications. 
+ * This class is a an important part of the remote class loading mechanism.
+ * Its goal is to manage connections that request classes to be loaded by the nodes, as well as the client
+ * connections that will serve those requests.
  * @author Laurent Cohen
  * @author Domingos Creado
  */

@@ -28,7 +28,6 @@ import org.jppf.ui.monitoring.data.*;
  */
 public class StatsHandlerEvent extends EventObject
 {
-
 	/**
 	 * Initialize this event with a specified source <code>StatsHandler</code>.
 	 * @param source the stats formatter whose data has changed.

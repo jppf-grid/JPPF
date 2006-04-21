@@ -28,7 +28,7 @@ import org.jppf.ui.monitoring.GuiUtils;
 import org.jppf.ui.monitoring.data.StatsHandler;
 
 /**
- * Options chartPanel for the monitor.
+ * This class enables the users to set a number of JPPF server settings through the admin tool.
  * @author Laurent Cohen
  */
 public class AdminPanel extends JPanel

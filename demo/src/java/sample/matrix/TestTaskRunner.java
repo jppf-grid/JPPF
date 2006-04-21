@@ -29,7 +29,7 @@ import org.jppf.utils.StringUtils;
 import sample.matrix.SecurityTestTask.ExecutionReport;
 
 /**
- * RUnner class for the Mattrix example.
+ * Runner class used for testing the framework.
  * @author Laurent Cohen
  */
 public class TestTaskRunner

@@ -29,7 +29,7 @@ import org.jvnet.substance.color.ColorScheme;
 import org.jvnet.substance.theme.SubstanceTheme;
 
 /**
- * Options chartPanel for the monitor.
+ * This panel enbles the users to set the options for the administration and monitoring GUI.
  * @author Laurent Cohen
  */
 public class OptionsPanel extends JPanel

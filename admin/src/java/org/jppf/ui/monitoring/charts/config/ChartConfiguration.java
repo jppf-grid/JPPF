@@ -24,7 +24,7 @@ import org.jfree.data.general.Dataset;
 import org.jppf.ui.monitoring.charts.ChartType;
 
 /**
- * Instances of this class represent the configuration elements used to create and update a chart.
+ * Instances of this class represent the configuration elements used to create and update a chart definition.
  * @author Laurent Cohen
  */
 public class ChartConfiguration

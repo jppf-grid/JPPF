@@ -34,7 +34,8 @@ import org.jppf.utils.*;
 import static org.jppf.server.protocol.AdminRequest.*;
 
 /**
- * This class provides an API to submit execution requests.<br>
+ * This class provides an API to submit execution requests and administration commands,
+ * and request server information data.<br>
  * It has its own unique identifier, used by the nodes, to determine whether classes from the submitting 
  * application should be dynamically reloaded or not, depending on whether the uuid has changed or not.
  * @author Laurent Cohen

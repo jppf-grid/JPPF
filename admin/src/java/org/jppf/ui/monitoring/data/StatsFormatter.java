@@ -26,7 +26,7 @@ import org.jppf.server.JPPFStats;
 import org.jppf.utils.StringUtils;
 
 /**
- * This class provides a convenient access to the statistics obtained from the JPPF server.
+ * This class provides a set of methods to format the statistics data received from the server.
  * @author Laurent Cohen
  */
 public final class StatsFormatter implements StatsConstants

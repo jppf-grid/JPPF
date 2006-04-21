@@ -28,7 +28,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 
 /**
- * RUnner class for the Mattrix example.
+ * Runner class for the &quot;Long Task&quot; demo.
  * @author Laurent Cohen
  */
 public class LongTaskRunner
@@ -43,9 +43,7 @@ public class LongTaskRunner
 	private static JPPFClient jppfClient = null;
 
 	/**
-	 * Entry point for this class, performs a matrix multiplication a number of times.,<br>
-	 * The number of times is specified as a configuration property named &quot;matrix.iterations&quot;.<br>
-	 * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
+	 * Entry point for this class, submits the tasks with a set duration to the server.
 	 * @param args not used.
 	 */
 	public static void main(String...args)

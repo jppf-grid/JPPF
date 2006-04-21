@@ -32,7 +32,7 @@ import org.jppf.ui.monitoring.charts.ChartType;
 import org.jppf.ui.monitoring.data.StatsConstants;
 
 /**
- * 
+ * This panel contains the UI and data components that enable configuring a chart definition.
  * @author Laurent Cohen
  */
 public class FieldsPanel extends JPanel

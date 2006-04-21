@@ -24,7 +24,9 @@ import java.net.ConnectException;
 import org.jppf.utils.*;
 
 /**
- * Common interface for socket clients.
+ * This interface is common to all classes wrapping an underlying socket connections.<br>
+ * The underlying socket API can be either based on a socket channel (blocking or non-blocking),
+ * or just based on a plain socket.
  * @author Laurent Cohen
  */
 public interface SocketWrapper

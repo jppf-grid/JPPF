@@ -29,7 +29,7 @@ import org.jppf.task.storage.*;
 import org.jppf.utils.*;
 
 /**
- * RUnner class for the Mattrix example.
+ * Runner class for the matrix multiplication demo.
  * @author Laurent Cohen
  */
 public class MatrixRunner
@@ -59,7 +59,6 @@ public class MatrixRunner
 			int iterations = props.getInt("matrix.iterations",10);
 			System.out.println("Running Matrix demo with matrix size = "+size+"*"+size+" for "+iterations+" iterations");
 			perform(size, iterations);
-			//performLong(size, iterations);
 			System.exit(0);
 		}
 		catch(Exception e)
@@ -75,7 +74,6 @@ public class MatrixRunner
 	 * @param iterations the number of times the multiplication will be performed.
 	 * @throws JPPFException if an error is raised during the execution.
 	 */
-	@SuppressWarnings("unused")
 	private static void perform(int size, int iterations) throws JPPFException
 	{
 		try
@@ -106,56 +104,6 @@ public class MatrixRunner
 				{
 					MatrixTask matrixTask = (MatrixTask) results.get(i);
 					double[] row = matrixTask.getResult();
-					for (int j=0; j<row.length; j++) c.setValueAt(i, j, row[j]);
-				}
-				long elapsed = System.currentTimeMillis() - start;
-				System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
-			}
-			JPPFStats stats = jppfClient.requestStatistics();
-			System.out.println("End statistics :\n"+stats.toString());
-		}
-		catch(Exception e)
-		{
-			throw new JPPFException(e.getMessage(), e);
-		}
-	}
-	/**
-	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
-	 * @param size the size of the matrices.
-	 * @param iterations the number of times the multiplication will be performed.
-	 * @throws JPPFException if an error is raised during the execution.
-	 */
-	@SuppressWarnings("unused")
-	private static void performLong(int size, int iterations) throws JPPFException
-	{
-		try
-		{
-			// initialize the 2 matrices to multiply
-			LongTypeMatrix a = new LongTypeMatrix(size);
-			a.assignRandomValues();
-			LongTypeMatrix b = new LongTypeMatrix(size);
-			b.assignRandomValues();
-	
-			// perform "iteration" times
-			for (int iter=0; iter<iterations; iter++)
-			{
-				long start = System.currentTimeMillis();
-				// create a task for each row in matrix a
-				List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-				for (int i=0; i<size; i++) tasks.add(new LongMatrixTask(a.getRow(i)));
-				// create a data provider to share matrix b among all tasks
-				DataProvider dataProvider = new MemoryMapDataProvider();
-				dataProvider.setValue(LongMatrixTask.DATA_KEY, b);
-				// submit the tasks for execution
-				jppfClient.submit(tasks, dataProvider);
-				List<JPPFTask> results = jppfClient.submit(tasks, dataProvider);
-				// initialize the resulting matrix
-				LongTypeMatrix c = new LongTypeMatrix(size);
-				// Get the matrix values from the tasks results
-				for (int i=0; i<results.size(); i++)
-				{
-					LongMatrixTask matrixTask = (LongMatrixTask) results.get(i);
-					long[] row = matrixTask.getResult();
 					for (int j=0; j<row.length; j++) c.setValueAt(i, j, row[j]);
 				}
 				long elapsed = System.currentTimeMillis() - start;

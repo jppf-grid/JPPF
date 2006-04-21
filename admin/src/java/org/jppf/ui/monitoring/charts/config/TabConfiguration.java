@@ -23,7 +23,7 @@ import java.util.*;
 import javax.swing.JPanel;
 
 /**
- * 
+ * This class manages the data related to the charts within a tab.
  * @author Laurent Cohen
  */
 public class TabConfiguration

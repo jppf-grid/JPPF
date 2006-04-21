@@ -26,7 +26,7 @@ import javax.swing.event.*;
 import org.jppf.ui.monitoring.GuiUtils;
 
 /**
- * The chartPanel used to create and manage chart configurations.
+ * The panel used to create and manage chart configurations.
  * @author Laurent Cohen
  */
 public class ChartConfigurationPanel extends JPanel
