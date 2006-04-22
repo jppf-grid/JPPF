@@ -21,8 +21,7 @@ package org.jppf.server;
 
 import static org.jppf.server.JPPFStatsUpdater.*;
 import java.util.*;
-import java.util.concurrent.*;
-import org.apache.log4j.Logger;
+import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * Implementation of a generic non-blocking queue, to allow asynchronous access from a large number of threads.
@@ -31,13 +30,10 @@ import org.apache.log4j.Logger;
  */
 public class JPPFQueue
 {
-	
-	List<QueueListener> listeners = new LinkedList<QueueListener>();
-	
-    /**
-	 * Log4j logger for this class.
+	/**
+	 * The current list of listeners to this queue.
 	 */
-	private static Logger log = Logger.getLogger(JPPFQueue.class);
+	List<QueueListener> listeners = new LinkedList<QueueListener>();
 	
 	/**
 	 * Executable tasks queue, available for execution nodes to pick from. This
@@ -45,7 +41,6 @@ public class JPPFQueue
 	 * <code>add()</code> and <code>poll()</code> operations.
 	 */
 	private Queue<JPPFTaskBundle> queue = new PriorityBlockingQueue<JPPFTaskBundle>();
-
 	
 	/**
 	 * Add an object to the queue, and notify all listeners about it.
@@ -79,16 +74,30 @@ public class JPPFQueue
 
 	}
 	
-	
+	/**
+	 * Add a listener to the current list of listener to this queue.
+	 * @param listener the listener to add.
+	 */
 	public void addListener(QueueListener listener) {
 		listeners.add(listener);
 	}
 
+	/**
+	 * Remove a listener from the current list of listener to this queue.
+	 * @param listener the listener to remove.
+	 */
 	public void removeListener(QueueListener listener) {
 		listeners.remove(listener);
 	}
 
+	/**
+	 * Queue listener interface.
+	 */
 	public interface QueueListener {
+		/**
+		 * Notify a listener that a queue event occurred.
+		 * @param queue the queue from which the event originated.
+		 */
 		void newTask(JPPFQueue queue);
 	}
 }

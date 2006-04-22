@@ -219,7 +219,10 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 					key.interestOps(0);
 				}
 			} catch (Exception e) {
-
+				if (e instanceof IOException)
+				{
+					closeNode(channel);
+				}
 				if (bundle != null) {
 					resubmitBundle(bundle);
 				}
@@ -248,6 +251,8 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 		{
 			JPPFStatsUpdater.nodeConnectionClosed();
 			aNode.close();
+			SelectionKey key = aNode.keyFor(selector);
+			if (key != null) key.cancel();
 		}
 		catch (IOException ignored)
 		{

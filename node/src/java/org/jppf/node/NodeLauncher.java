@@ -20,10 +20,9 @@
 package org.jppf.node;
 
 import java.security.Policy;
-
+import org.jppf.JPPFNodeReloadNotification;
 import org.jppf.security.JPPFPolicy;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 
 /**
  * Bootstrap class for lauching a JPPF node. The node class is dynamically loaded from a remote server.
@@ -46,10 +45,26 @@ public class NodeLauncher
 	 */
 	public static void main(String...args)
 	{
+		MonitoredNode node = null;
 		try
 		{
-			MonitoredNode node = createNode();
-			node.run();
+			// to ensure VersionUtils is loaded by the same class loader as this class.
+			VersionUtils.getBuildNumber();
+			while (true)
+			{
+				try
+				{
+					node = createNode();
+					node.run();
+				}
+				catch(JPPFNodeReloadNotification notif)
+				{
+					System.out.println(notif.getMessage());
+					System.out.println("Reloading this node");
+					classLoader = null;
+					node.stopNode();
+				}
+			}
 		}
 		catch(Exception e)
 		{
@@ -66,33 +81,36 @@ public class NodeLauncher
 	{
 		try
 		{
-			if (!securityManagerSet)
-			{
-				TypedProperties props = JPPFConfiguration.getProperties();
-				String s = props.getString("jppf.policy.file");
-				if (s != null)
-				{
-					Policy.setPolicy(new JPPFPolicy());
-					System.setSecurityManager(new SecurityManager());
-					securityManagerSet = true;
-				}
-			}
+			setSecurity();
 			Class clazz = getJPPFClassLoader().loadClass("org.jppf.server.node.JPPFNode");
 			MonitoredNode node = (MonitoredNode) clazz.newInstance();
 			return node;
-			/*
-			Method meth = clazz.getMethod("main", String[].class);
-			String[] a = new String[0];
-			meth.invoke(null, new Object[] { a });
-			*/
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Set the security manager with the permission granted in the plicy file.
+	 * @throws Exception if the security could not be set.
+	 */
+	public static void setSecurity() throws Exception
+	{
+		if (!securityManagerSet)
+		{
+			TypedProperties props = JPPFConfiguration.getProperties();
+			String s = props.getString("jppf.policy.file");
+			if (s != null)
+			{
+				Policy.setPolicy(new JPPFPolicy());
+				System.setSecurityManager(new SecurityManager());
+				securityManagerSet = true;
+			}
+		}
+	}
+
 	/**
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @return a <code>ClassLoader</code> used for loading the classes of the framework.

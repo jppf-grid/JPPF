@@ -22,6 +22,7 @@ package org.jppf.server.node;
 import java.io.*;
 import java.util.*;
 import org.apache.log4j.Logger;
+import org.jppf.JPPFNodeReloadNotification;
 import org.jppf.comm.socket.*;
 import org.jppf.node.*;
 import org.jppf.node.event.*;
@@ -89,6 +90,10 @@ public class JPPFNode implements MonitoredNode
 	 * This flag is true if there is at least one listener, and false otherwise.
 	 */
 	private boolean notifying = false;
+	/**
+	 * Current build number for this node.
+	 */
+	private int buildNumber = -1;
 
 	/**
 	 * Main processing loop of this node.
@@ -96,6 +101,7 @@ public class JPPFNode implements MonitoredNode
 	 */
 	public void run()
 	{
+		buildNumber = VersionUtils.getBuildNumber();
 		log = log = Logger.getLogger(JPPFNode.class);
 		debugEnabled = log.isDebugEnabled();
 		stopped = false;
@@ -158,6 +164,14 @@ public class JPPFNode implements MonitoredNode
 				Thread.currentThread().setContextClassLoader(old);
 			}
 			writeResults(bundle, taskList);
+			int p = bundle.getBuildNumber();
+			if (buildNumber < p)
+			{
+				JPPFNodeReloadNotification notif =
+					new JPPFNodeReloadNotification("detected new build number: "+p+"; previous build number: "+buildNumber);
+				VersionUtils.setBuildNumber(p);
+				throw notif;
+			}
 		}
 	}
 
@@ -395,7 +409,7 @@ public class JPPFNode implements MonitoredNode
 	 */
 	public void stopNode()
 	{
-		stopped = true;
+		stopped =  true;
 		try
 		{
 			socketClient.close();

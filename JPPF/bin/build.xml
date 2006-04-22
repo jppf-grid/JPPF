@@ -156,6 +156,7 @@
 	<target name="jar.module">
     <jar jarfile="${build}/jppf-${module}.jar">
 			<fileset dir="${basedir}/../${module}/classes"/>
+			<fileset file="${bin}/build.number"/>
 		</jar>
   </target>
 

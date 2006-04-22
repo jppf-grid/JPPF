@@ -22,6 +22,7 @@ package org.jppf.server;
 import java.io.Serializable;
 import java.util.List;
 import org.jppf.server.event.TaskCompletionListener;
+import org.jppf.utils.VersionUtils;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
@@ -72,6 +73,18 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * The priority of this task bundle.
 	 */
 	private int priority = 0;
+	/**
+	 * The build number of the current version of JPPF. 
+	 */
+	private int buildNumber = 0;
+
+	/**
+	 * Initialize this task bundle and set its build number.
+	 */
+	public JPPFTaskBundle()
+	{
+		buildNumber = VersionUtils.getBuildNumber();
+	}
 
 	/**
 	 * Get the unique identifier for this task bundle.
@@ -266,5 +279,14 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 		if (priority < bundle.getPriority()) return -1;
 		if (priority > bundle.getPriority()) return 1;
 		return 0;
+	}
+
+	/**
+	 * Get the build number under which this task bundle was created.
+	 * @return the build number as an int value.
+	 */
+	public int getBuildNumber()
+	{
+		return buildNumber;
 	}
 }

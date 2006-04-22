@@ -49,18 +49,15 @@ public abstract class JPPFNIOServer extends Thread{
 	 */
 	protected static Logger log = Logger.getLogger(JPPFNIOServer.class);
 	
-	
 	/**
 	 * the selector of all socket channels open with providers or nodes.
 	 */
 	protected Selector selector;
 	
-	
 	/**
 	 * Reads resource files from the classpath.
 	 */
 	protected ResourceProvider resourceProvider = new ResourceProvider();
-	
 	
 	/**
 	 * Flag indicating that this socket server is closed.
@@ -71,7 +68,6 @@ public abstract class JPPFNIOServer extends Thread{
 	 * The port this socket server is listening to.
 	 */
 	protected int port = -1;
-	
 	
 	/**
 	 * Initialize this socket server with a specified port number.
@@ -113,23 +109,34 @@ public abstract class JPPFNIOServer extends Thread{
 		}
 	}
 
-	public void go(Set<SelectionKey> selectedKeys) throws Exception {
+	public void go(Set<SelectionKey> selectedKeys) throws Exception
+	{
 		Iterator<SelectionKey> it = selectedKeys.iterator();
-		while (it.hasNext()) {
+		while (it.hasNext())
+		{
 			SelectionKey key = it.next();
-			try {
-				if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT) {
+			try
+			{
+				if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT)
+				{
 					doAccept(key);
-				} else {
+				}
+				else
+				{
 					Context context = (Context) key.attachment();
 					context.state.exec(key, context);
 				}
-			} catch (Exception e) {
-
-				if (!(key.channel() instanceof ServerSocketChannel)) {
-					try {
+			}
+			catch (Exception e)
+			{
+				if (!(key.channel() instanceof ServerSocketChannel))
+				{
+					try
+					{
 						key.channel().close();
-					} catch (Exception e2) {
+					}
+					catch (Exception e2)
+					{
 					}
 				}
 				log.error(e.getMessage(), e);
@@ -143,38 +150,47 @@ public abstract class JPPFNIOServer extends Thread{
 	 * It accept and put it in a state to define what type of peer is.
 	 * @param key
 	 */
-	private void doAccept(SelectionKey key) {
-		ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key
-				.channel();
+	private void doAccept(SelectionKey key)
+	{
+		ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
 		SocketChannel client;
-		try {
+		try
+		{
 			client = serverSocketChannel.accept();
-		} catch (IOException ignored) {
+		}
+		catch (IOException ignored)
+		{
 			return;
 		}
-		if (client != null) {
-			try {
-				client.configureBlocking(false);
-			} catch (IOException e) {
-				try {
-					client.close();
-				} catch (IOException ignored) {
-
-				}
-				return;
-			}
-			Context context = new Context();
-			context.state = getInitialState();
-			context.content = getInitialContent();
-			try {
-				client.register(selector,
-						SelectionKey.OP_READ | SelectionKey.OP_WRITE, context)
-						.interestOps(getInitialInterest());
-			} catch (ClosedChannelException ignored) {
-
-			}
-			postAccept(client);
+		if (client == null) return;
+		try
+		{
+			client.configureBlocking(false);
 		}
+		catch (IOException e)
+		{
+			try
+			{
+				client.close();
+			}
+			catch (IOException ignored)
+			{
+			}
+			return;
+		}
+		Context context = new Context();
+		context.state = getInitialState();
+		context.content = getInitialContent();
+		try
+		{
+			client.register(selector,
+					SelectionKey.OP_READ | SelectionKey.OP_WRITE, context)
+					.interestOps(getInitialInterest());
+		}
+		catch (ClosedChannelException ignored)
+		{
+		}
+		postAccept(client);
 	}
 
 	protected abstract int getInitialInterest() ;
