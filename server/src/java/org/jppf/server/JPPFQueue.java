@@ -19,8 +19,12 @@
  */
 package org.jppf.server;
 
-import static org.jppf.server.JPPFStatsUpdater.*;
-import java.util.*;
+import static org.jppf.server.JPPFStatsUpdater.taskInQueue;
+import static org.jppf.server.JPPFStatsUpdater.taskOutOfQueue;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 /**
@@ -54,7 +58,7 @@ public class JPPFQueue
 		taskInQueue(bundle.getTaskCount());
 
 		for (QueueListener listener : listeners) {
-			listener.newTask(this);
+			listener.newBundle(this);
 		}
 	}
 
@@ -98,6 +102,6 @@ public class JPPFQueue
 		 * Notify a listener that a queue event occurred.
 		 * @param queue the queue from which the event originated.
 		 */
-		void newTask(JPPFQueue queue);
+		void newBundle(JPPFQueue queue);
 	}
 }

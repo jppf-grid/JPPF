@@ -34,19 +34,23 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jppf.JPPFException;
 import org.jppf.node.JPPFBootstrapException;
-import org.jppf.server.*;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.JPPFNIOServer;
+import org.jppf.server.JPPFQueue;
+import org.jppf.server.JPPFStatsUpdater;
+import org.jppf.server.JPPFTaskBundle;
 import org.jppf.server.JPPFQueue.QueueListener;
 import org.jppf.server.event.TaskCompletionListener;
 import org.jppf.utils.SerializationHelper;
 import org.jppf.utils.SerializationHelperImpl;
 
 /**
- * This is a node server. It deals with job dispatching and results retrieve.
- * It distribute equaly bundles beteween available jobs (considering that
- * node have the same processing time of jobs).
- * It probably will receive and algorithm to weight each node, or a scheduling
- * algorithm using the mean processing time. 
+ * This is a node server. It deals with job dispatching and results retrieve. It
+ * distribute equaly bundles beteween available jobs (considering that node have
+ * the same processing time of jobs). It probably will receive and algorithm to
+ * weight each node, or a scheduling algorithm using the mean processing time.
  * 
  * @author Laurent Cohen
  * @author Domingos Creado
@@ -74,7 +78,6 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 */
 	public JPPFNodeServer(int port) throws JPPFBootstrapException {
 		super(port, "NodeServer Thread");
-
 		getQueue().addListener(this);
 	}
 
@@ -91,7 +94,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 
 	@Override
 	protected int getInitialInterest() {
-		return 0;
+		return SelectionKey.OP_READ;
 	}
 
 	@Override
@@ -114,19 +117,16 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			try {
 				sendTask(client, key, context, bundle);
 			} catch (Exception e) {
-				// to not enter in a loop
-				queue.removeListener(this);
-				bundle.setPriority(10);
-				queue.addBundle(bundle);
-				queue.addListener(this);
 				closeNode(client);
+				resubmitBundle(bundle);
 			}
 		} else {
 			availableNodes.add(client);
 		}
 	}
 
-	public void newTask(JPPFQueue queue) {
+	
+	public void newBundle(JPPFQueue queue) {
 		if (availableNodes.isEmpty()) {
 			return;
 		}
@@ -139,35 +139,92 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 				sendTask(aNode, key, context, bundle);
 				selector.wakeup();
 			} catch (Exception e) {
-				// to not enter in a loop
-				queue.removeListener(this);
-				queue.addBundle(bundle);
-				queue.addListener(this);
 				closeNode(aNode);
+				resubmitBundle(bundle);
 			}
 		}
 	}
 
+	
+	//*******************************************************************
+	// There is only two state in this automata
+	//    
+	//   +--------------+    job sent    +-----------------+    
+	//   |   Sending    | ------------>  |     Waiting     |
+	//   |     jobs     | <-----------   |     results     |
+	//   +--------------+  bundle fully  +-----------------+
+	//                    trans. back
+	//
+	// See more details in JPPFNIOServer for the architecture of framework
+	//********************************************************************
 	private State SendingJob = new CSendingJob();
 
 	private State WaitingResult = new CWaitingResult();
 
+	/**
+	 * This class represents the state of waiting for some action.
+	 * 
+	 * 
+	 */
 	private class CSendingJob implements State {
 
 		public void exec(SelectionKey key, Context context) throws IOException {
 			SocketChannel channel = (SocketChannel) key.channel();
+			
+			if (key.isReadable()) {
+				//as the SO will select it for read when the channel is suddenly 
+				//closed by peer, and we are not expecting any read...
+				// the channel was closed by node
+				closeNode(channel);
+				TaskRequest out = (TaskRequest) context.content;
+				if (out != null) {
+					JPPFTaskBundle bundle = out.getBundle();
+					if (bundle != null) {
+						resubmitBundle(bundle);
+					}
+				}
+				return;
+			}
+			
 			if (context.content == null)
 				return;
+			
+			// the buffer with the bundle serialized and part transfered
 			ByteBuffer task = ((TaskRequest) context.content).getSending();
 
-			channel.write(task);
+			try {
+				channel.write(task);
+			} catch (IOException e) {
+				
+				closeNode(channel);
+				
+				// putting back the task into queue
+				TaskRequest out = (TaskRequest) context.content;
+				JPPFTaskBundle bundle = out.getBundle();
+				resubmitBundle(bundle);
+				throw e;
+			}
+			
+			//is anything more to send to SO buffer?
 			if (!task.hasRemaining()) {
+				//we finally have sent everything to node
+				// it will do the work and send back to us.
 				context.state = WaitingResult;
+				
+				//we will just wait for the bundle back
 				key.interestOps(SelectionKey.OP_READ);
 			}
 		}
 	}
 
+	/**
+	 * This class implements the state of receiving the bundle
+	 * back from processing at a node. The "wainting" part in 
+	 * provided by the selector, which will any for the first
+	 * bytes be ready to send to the instances of this class.
+	 * 
+	 *
+	 */
 	private class CWaitingResult implements State {
 
 		public void exec(SelectionKey key, Context context) {
@@ -177,50 +234,65 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			JPPFTaskBundle bundle = out.getBundle();
 			Request request = out.getRequest();
 			try {
+				//We will wait the full byte[] of the bundle come to start 
+				//processing. This make the integration of non-blocking with
+				// ObjectInputStream easier.
 				if (fillRequest(channel, out.getRequest())) {
-
-					SerializationHelper helper = new SerializationHelperImpl();
-					TaskCompletionListener listener = bundle
-							.getCompletionListener();
 
 					long elapsed = System.currentTimeMillis()
 							- request.getStart();
-
+					
 					DataInputStream dis = new DataInputStream(
 							new ByteArrayInputStream(request.getOutput()
 									.toByteArray()));
-
+					
+					//reading the bundle as object 
+					SerializationHelper helper = new SerializationHelperImpl();
 					bundle = (JPPFTaskBundle) helper.readNextObject(dis, false);
 					List<byte[]> taskList = new ArrayList<byte[]>();
-					for (int i = 0; i < bundle.getTaskCount(); i++)
+					for (int i = 0; i < bundle.getTaskCount(); i++){
 						taskList.add(helper.readNextBytes(dis));
-					bundle.setTasks(taskList);
+					}
 					dis.close();
+					
+					
+					bundle.setTasks(taskList);
+					
+					//updating stats
 					if (isStatsEnabled()) {
 						taskExecuted(bundle.getTaskCount(), elapsed, bundle
 								.getNodeExecutionTime(), out.getBundleBytes());
 					}
+					
+					//notifing the client thread about the end of a bundle
+					TaskCompletionListener listener = bundle.getCompletionListener();
 					listener.taskCompleted(bundle);
 
-					// verificar se tem tarefa nova
+					//now it's done...
+					//we will now run the scheduler part
+					
+					// verifying if there is other tasks to send to this node
 					bundle = getQueue().nextBundle();
 					if (bundle != null) {
 						try {
-								sendTask(channel, key, context, bundle);
-								return;
+							sendTask(channel, key, context, bundle);
+							return;
 						} catch (Exception e) {
+							closeNode(channel);
 							resubmitBundle(bundle);
 							bundle = null;
 							throw e;
 						}
 					}
-
+					
+					//there is nothing to do, so this instace will wait for job
 					availableNodes.add(channel);
-					key.interestOps(0);
+					//if the node disconnect from driver we will know soon
+					context.state = SendingJob;
+					key.interestOps(SelectionKey.OP_READ);
 				}
 			} catch (Exception e) {
-				if (e instanceof IOException)
-				{
+				if (e instanceof IOException) {
 					closeNode(channel);
 				}
 				if (bundle != null) {
@@ -231,37 +303,62 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	}
 
 	/**
-	 * Resubmit a task bundle at the head of the queue.
-	 * This method is invoked when a node is disconnected while it was executing a task bundle.
-	 * @param bundle the task bundle to resubmit.
+	 * Resubmit a task bundle at the head of the queue. This method is invoked
+	 * when a node is disconnected while it was executing a task bundle.
+	 * 
+	 * @param bundle
+	 *            the task bundle to resubmit.
 	 */
-	private void resubmitBundle(JPPFTaskBundle bundle)
-	{
+	private void resubmitBundle(JPPFTaskBundle bundle) {
+		
 		bundle.setPriority(10);
+        // to not enter in a loop
+		getQueue().removeListener(this);
 		getQueue().addBundle(bundle);
+		getQueue().addListener(this);
 	}
-	
+
 	/**
 	 * Close a connection to a node.
-	 * @param aNode a <code>SocketChannel</code> that encapsulates the connection.
+	 * 
+	 * @param aNode
+	 *            a <code>SocketChannel</code> that encapsulates the
+	 *            connection.
 	 */
-	private void closeNode(SocketChannel aNode)
-	{
-		try
-		{
+	private void closeNode(SocketChannel aNode) {
+		availableNodes.remove(aNode);
+		try {
 			JPPFStatsUpdater.nodeConnectionClosed();
 			aNode.close();
-			SelectionKey key = aNode.keyFor(selector);
-			if (key != null) key.cancel();
-		}
-		catch (IOException ignored)
-		{
+            // all keys are cancelled when a channel is closed
+		} catch (IOException ignored) {
 		}
 	}
 
-	public void sendTask(SocketChannel channel, SelectionKey key,
+	/**
+	 * Send through the specified channel the specified bundle. It sends a piece
+	 * of data and verify if it is finished, If it is fully transfered at first
+	 * try the key is updated to SelectKey.OP_READ and the context is update
+	 * with the bundle transfered and setup to wait for task complete. If the
+	 * data is not fully transfered it enqueue the buffer to continue the
+	 * transfer when the channel is ready to receive more data.
+	 * 
+	 * @param channel
+	 *            the channel with the node
+	 * @param key
+	 *            the key of the channel with the main selector
+	 * @param context
+	 *            the context attached to the channel
+	 * @param bundle
+	 *            the task to be send
+	 * @throws Exception
+	 *             if any error occur
+	 */
+	private void sendTask(SocketChannel channel, SelectionKey key,
 			Context context, JPPFTaskBundle bundle) throws Exception {
 
+		//the preparing part of sending a bundle
+		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream() {
 			// overriden for performance reasons - no need to create a copy of
 			// the buffer here.
@@ -284,18 +381,33 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 		dos.flush();
 		dos.close();
 
+		// it is now converted to byte[]
 		byte[] data = baos.toByteArray();
 		ByteBuffer sending = ByteBuffer.allocateDirect(data.length + 4);
+		//FIXME: probably it is a better idea to make a double buffer with 
+		// directly allocated buffers and a heap based buffer
+		 
 		sending.putInt(data.length);
 		sending.put(data);
 		sending.flip();
+		
+		//make the first shoot
 		channel.write(sending);
+		
 		if (sending.hasRemaining()) {
+			//we must wait until the SO buffer be ready to the more data
+			// or a busy-loop can occur
 			context.content = new TaskRequest(new Request(), sending, bundle,
 					size);
 			context.state = SendingJob;
-			key.interestOps(SelectionKey.OP_WRITE);
+			//the read option is to detect sudden node dead
+			key.interestOps(SelectionKey.OP_WRITE | SelectionKey.OP_READ);
+			
 		} else {
+			//the bundle could be fully tranfered to SO buffer
+			// so we will just wait for node starts sending the results
+			
+			// Probably here would be a nice place to get a SLA agent running 
 			context.state = WaitingResult;
 			context.content = new TaskRequest(new Request(), sending, bundle,
 					size);
