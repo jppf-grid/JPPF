@@ -73,7 +73,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 * 
 	 * @param port
 	 *            the port this socket server is listening to.
-	 * @throws JPPFException
+	 * @throws JPPFBootstrapException
 	 *             if the underlying server socket can't be opened.
 	 */
 	public JPPFNodeServer(int port) throws JPPFBootstrapException {
@@ -146,17 +146,17 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	}
 
 	
-	//*******************************************************************
-	// There is only two state in this automata
-	//    
-	//   +--------------+    job sent    +-----------------+    
-	//   |   Sending    | ------------>  |     Waiting     |
-	//   |     jobs     | <-----------   |     results     |
-	//   +--------------+  bundle fully  +-----------------+
-	//                    trans. back
-	//
-	// See more details in JPPFNIOServer for the architecture of framework
-	//********************************************************************
+	/**
+	 * There are only two states in this automata.<br>
+	 * <pre>
+	 *   +--------------+    job sent    +-----------------+    
+	 *   |   Sending    | ------------>  |     Waiting     |
+	 *   |     jobs     | <-----------   |     results     |
+	 *   +--------------+  bundle fully  +-----------------+
+	 *                    trans. back
+	 * </pre>
+	 * See {@link org.jppf.server.JPPFNIOServer JPPFNIOServer} for more details on the architecture of the framework.
+	 */
 	private State SendingJob = new CSendingJob();
 
 	private State WaitingResult = new CWaitingResult();
