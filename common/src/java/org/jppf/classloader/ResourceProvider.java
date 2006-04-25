@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
  * Instances of this class are dedicated to reading resource files form the JVM's classpath and converting them into
  * arrays of bytes.
  * @author Laurent Cohen
+ * @author Domingos Creado
  */
 public class ResourceProvider
 {
@@ -62,14 +63,17 @@ public class ResourceProvider
 			{
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				boolean end = false;
-				int offset = 0;
 				while (!end)
 				{
 					int n = is.read(buffer, 0, BUFFER_SIZE);
-					if (n < 0) break;
-					if (n < BUFFER_SIZE) end = true;
-					baos.write(buffer, 0, n);
-					offset += n;
+					//by contract instances of InputStream are not require to fill 
+					//the entire byte[]
+					if (n < 0){
+						end = true;
+					} else {
+						baos.write(buffer, 0, n);
+					}
+					
 				}
 				is.close();
 				baos.flush();
