@@ -109,6 +109,11 @@ public abstract class JPPFNIOServer extends Thread{
 		}
 	}
 
+	/**
+	 * Process the keys selected by the selector for IO operations.
+	 * @param selectedKeys the set of keys thast were selected by the latest <code>select()</code> invocation.
+	 * @throws Exception if an error is raised while processing the keys.
+	 */
 	public void go(Set<SelectionKey> selectedKeys) throws Exception
 	{
 		Iterator<SelectionKey> it = selectedKeys.iterator();
@@ -117,7 +122,8 @@ public abstract class JPPFNIOServer extends Thread{
 			SelectionKey key = it.next();
 			try
 			{
-				if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT)
+				//if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT)
+				if (key.isAcceptable())
 				{
 					doAccept(key);
 				}
@@ -148,7 +154,7 @@ public abstract class JPPFNIOServer extends Thread{
 	/**
 	 * accept the incoming connection.
 	 * It accept and put it in a state to define what type of peer is.
-	 * @param key
+	 * @param key the selection key that represents the channel's registration witht the selector.
 	 */
 	private void doAccept(SelectionKey key)
 	{
@@ -193,12 +199,25 @@ public abstract class JPPFNIOServer extends Thread{
 		postAccept(client);
 	}
 
+	/**
+	 * Get the IO operations a connection is initially intertested in.
+	 * @return a bit-wise combination of the interests, taken from {@link java.nio.channels.SelectionKey SelectionKey}
+	 * constants definitions.
+	 */
 	protected abstract int getInitialInterest() ;
 	
+	/**
+	 * 
+	 * @return
+	 */
 	protected abstract Object getInitialContent() ;
 
 	protected abstract State getInitialState();
-	
+
+	/**
+	 * Process a channel that was accepted by the server socket channel.
+	 * @param client the socket channel to process.
+	 */
 	protected abstract void postAccept(SocketChannel client);
 
 	/**
@@ -336,11 +355,8 @@ public abstract class JPPFNIOServer extends Thread{
 			removeAllConnections();
 		}
 	}
-	
 
-	
-	
-    //==========================================================
+  //==========================================================
 	// classes that creates a basic "framework" to deal with nio
 	//==========================================================
 	
