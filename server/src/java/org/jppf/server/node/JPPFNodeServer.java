@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jppf.JPPFException;
 import org.jppf.node.JPPFBootstrapException;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.JPPFNIOServer;
@@ -155,7 +154,8 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 *   +--------------+  bundle fully  +-----------------+
 	 *                    trans. back
 	 * </pre>
-	 * See {@link org.jppf.server.JPPFNIOServer JPPFNIOServer} for more details on the architecture of the framework.
+	 * See {@link org.jppf.server.JPPFNIOServer JPPFNIOServer} for more 
+	 * details on the architecture of the framework.
 	 */
 	private State SendingJob = new CSendingJob();
 
@@ -233,6 +233,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			TaskRequest out = (TaskRequest) context.content;
 			JPPFTaskBundle bundle = out.getBundle();
 			Request request = out.getRequest();
+			TaskCompletionListener listener = bundle.getCompletionListener();
 			try {
 				//We will wait the full byte[] of the bundle come to start 
 				//processing. This make the integration of non-blocking with
@@ -265,7 +266,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 					}
 					
 					//notifing the client thread about the end of a bundle
-					TaskCompletionListener listener = bundle.getCompletionListener();
+					
 					listener.taskCompleted(bundle);
 
 					//now it's done...
