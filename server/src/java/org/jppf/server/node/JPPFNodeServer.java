@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jppf.node.JPPFBootstrapException;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.JPPFNIOServer;
@@ -55,6 +56,11 @@ import org.jppf.utils.SerializationHelperImpl;
  * @author Domingos Creado
  */
 public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
+
+	/**
+	 * Log4j logger for this class.
+	 */
+	protected static Logger log = Logger.getLogger(JPPFNodeServer.class);
 
 	/**
 	 * A reference to the driver's tasks queue.
@@ -138,6 +144,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 				sendTask(aNode, key, context, bundle);
 				selector.wakeup();
 			} catch (Exception e) {
+				log.error(e.getMessage(), e);
 				closeNode(aNode);
 				resubmitBundle(bundle);
 			}
@@ -195,7 +202,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			try {
 				channel.write(task);
 			} catch (IOException e) {
-				
+				log.error(e.getMessage(), e);
 				closeNode(channel);
 				
 				// putting back the task into queue
@@ -293,6 +300,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 					key.interestOps(SelectionKey.OP_READ);
 				}
 			} catch (Exception e) {
+				log.error(e.getMessage(), e);
 				if (e instanceof IOException) {
 					closeNode(channel);
 				}
@@ -333,6 +341,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			aNode.close();
             // all keys are cancelled when a channel is closed
 		} catch (IOException ignored) {
+			log.error(ignored.getMessage(), ignored);
 		}
 	}
 

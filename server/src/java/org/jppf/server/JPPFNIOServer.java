@@ -42,7 +42,6 @@ import org.jppf.node.JPPFBootstrapException;
  * @author Domingos Creado
  */
 public abstract class JPPFNIOServer extends Thread{
-
 	
 	/**
 	 * Log4j logger for this class.
@@ -135,6 +134,7 @@ public abstract class JPPFNIOServer extends Thread{
 			}
 			catch (Exception e)
 			{
+				log.error(e.getMessage(), e);
 				if (!(key.channel() instanceof ServerSocketChannel))
 				{
 					try
@@ -143,9 +143,9 @@ public abstract class JPPFNIOServer extends Thread{
 					}
 					catch (Exception e2)
 					{
+						log.error(e2.getMessage(), e2);
 					}
 				}
-				log.error(e.getMessage(), e);
 			}
 			it.remove();
 		}
@@ -175,12 +175,14 @@ public abstract class JPPFNIOServer extends Thread{
 		}
 		catch (IOException e)
 		{
+			log.error(e.getMessage(), e);
 			try
 			{
 				client.close();
 			}
 			catch (IOException ignored)
 			{
+				log.error(ignored.getMessage(), ignored);
 			}
 			return;
 		}
@@ -195,6 +197,7 @@ public abstract class JPPFNIOServer extends Thread{
 		}
 		catch (ClosedChannelException ignored)
 		{
+			log.error(ignored.getMessage(), ignored);
 		}
 		postAccept(client);
 	}
@@ -308,6 +311,7 @@ public abstract class JPPFNIOServer extends Thread{
 			try {
 				connection.channel().close();
 			} catch (IOException ignored) {
+				log.error(ignored.getMessage(), ignored);
 			}
 		}
 	}
