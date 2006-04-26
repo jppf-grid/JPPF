@@ -19,40 +19,18 @@
  */
 package org.jppf.server.node;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.InvalidClassException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
 import org.apache.log4j.Logger;
 import org.jppf.JPPFNodeReloadNotification;
-import org.jppf.comm.socket.SocketClient;
-import org.jppf.comm.socket.SocketInitializer;
-import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.node.JPPFClassLoader;
-import org.jppf.node.MonitoredNode;
-import org.jppf.node.NodeLauncher;
-import org.jppf.node.event.NodeEvent;
-import org.jppf.node.event.NodeListener;
+import org.jppf.comm.socket.*;
+import org.jppf.node.*;
+import org.jppf.node.event.*;
 import org.jppf.server.JPPFTaskBundle;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
-import org.jppf.utils.JPPFBuffer;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.ObjectSerializer;
-import org.jppf.utils.Pair;
-import org.jppf.utils.SerializationHelper;
-import org.jppf.utils.TypedProperties;
-import org.jppf.utils.VersionUtils;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class encapsulate execution nodes.
@@ -139,17 +117,6 @@ public class JPPFNode implements MonitoredNode {
 	private ExecutorService threadPool;
 
 	/**
-	 * An auxiliary variable to be filled at perform method and used at method
-	 * taskEnded to verify if the bundle is finished
-	 */
-	private int tasks;
-
-	/**
-	 * the sync free task finish counter
-	 */
-	private AtomicInteger done = new AtomicInteger(0);
-
-	/**
 	 * Main processing loop of this node.
 	 * 
 	 * @see java.lang.Runnable#run()
@@ -194,17 +161,11 @@ public class JPPFNode implements MonitoredNode {
 			JPPFTaskBundle bundle = pair.first();
 			List<JPPFTask> taskList = pair.second();
 
-			// FIXME: the structure is not so nice, but it keeps
-			// the order of the task in the list of the bundle
-			// So, the server will receive the bundle with tasks
-			// at the same order
-			tasks = taskList.size();
-			done.set(0);
-
+			List<Future> futureList = new ArrayList<Future>();
 			for (JPPFTask task : taskList) {
-				threadPool.execute(new TaskWrapper(task));
+				futureList.add(threadPool.submit(task));
 			}
-			waitForEnd();
+			for (Future future: futureList) future.get();
 			writeResults(bundle, taskList);
 			int p = bundle.getBuildNumber();
 			if (buildNumber < p) {
@@ -213,31 +174,6 @@ public class JPPFNode implements MonitoredNode {
 								+ "; previous build number: " + buildNumber);
 				VersionUtils.setBuildNumber(p);
 				throw notif;
-			}
-		}
-	}
-
-	/**
-	 * the method block until be awake by threadPool
-	 * 
-	 * @throws InterruptedException
-	 */
-	private void waitForEnd() throws InterruptedException {
-		synchronized (done) {
-			if (done.get() != tasks) {
-				done.wait();
-			}
-		}
-	}
-
-	/**
-	 * The method verify if the bundle is fully done and if it is done, wakeup
-	 * the main thread to send to driver the result.
-	 */
-	private void taskEnded() {
-		if (done.addAndGet(1) == tasks) {
-			synchronized (done) {
-				done.notify();
 			}
 		}
 	}
@@ -523,42 +459,6 @@ public class JPPFNode implements MonitoredNode {
 		}
 		socketClient = null;
 		classLoader = null;
-
-	}
-
-	/**
-	 * A Runnable class to wrap the real task. It exists for 2 purpose: - change
-	 * the contextClassloader to the classloader of the Task - notify the end of
-	 * the task
-	 */
-	private class TaskWrapper implements Runnable {
-		private JPPFTask task;
-
-		public TaskWrapper(JPPFTask task) {
-			this.task = task;
-		}
-
-		public void run() {
-
-			ClassLoader old = Thread.currentThread().getContextClassLoader();
-			try {
-				Thread.currentThread().setContextClassLoader(
-						task.getClass().getClassLoader());
-				try {
-					task.run();
-				} catch (Exception e) {
-					log.error(e.getMessage(), e);
-					task.setException(e);
-				}
-				if (notifying)
-					fireNodeEvent(NodeEvent.END_EXEC);
-			} finally {
-				Thread.currentThread().setContextClassLoader(old);
-			}
-
-			taskEnded();
-
-		}
 
 	}
 }
