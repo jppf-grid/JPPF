@@ -295,6 +295,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 					
 					//there is nothing to do, so this instace will wait for job
 					availableNodes.add(channel);
+					context.content = null;
 					//if the node disconnect from driver we will know soon
 					context.state = SendingJob;
 					key.interestOps(SelectionKey.OP_READ);

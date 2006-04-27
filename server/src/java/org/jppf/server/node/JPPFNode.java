@@ -161,7 +161,7 @@ public class JPPFNode implements MonitoredNode {
 			JPPFTaskBundle bundle = pair.first();
 			List<JPPFTask> taskList = pair.second();
 
-			List<Future> futureList = new ArrayList<Future>();
+			List<Future> futureList = new ArrayList<Future>(taskList.size());
 			for (JPPFTask task : taskList) {
 				futureList.add(threadPool.submit(task));
 			}
