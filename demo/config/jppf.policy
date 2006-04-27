@@ -37,6 +37,7 @@ permission java.lang.RuntimePermission "accessClassInPackage.*";
 permission java.lang.RuntimePermission "defineClassInPackage.*";
 permission java.lang.RuntimePermission "accessDeclaredMembers";
 permission java.lang.RuntimePermission "getStackTrace";
+permission java.lang.RuntimePermission "modifyThread";
 
 //------------------------------------------------------------------------------//
 // File permissions.                                                            //
