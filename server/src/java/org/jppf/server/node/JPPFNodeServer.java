@@ -122,6 +122,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			try {
 				sendTask(client, key, context, bundle);
 			} catch (Exception e) {
+				log.error(e.getMessage(), e);
 				closeNode(client);
 				resubmitBundle(bundle);
 			}
@@ -295,6 +296,8 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 					
 					//there is nothing to do, so this instace will wait for job
 					availableNodes.add(channel);
+					// make sure the context is reset so as not to resubmit
+					// the last bundle executed by the node.
 					context.content = null;
 					//if the node disconnect from driver we will know soon
 					context.state = SendingJob;

@@ -166,6 +166,7 @@ public abstract class JPPFNIOServer extends Thread{
 		}
 		catch (IOException ignored)
 		{
+			log.error(ignored.getMessage(), ignored);
 			return;
 		}
 		if (client == null) return;
