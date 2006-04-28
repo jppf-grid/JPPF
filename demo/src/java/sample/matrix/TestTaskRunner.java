@@ -52,7 +52,8 @@ public class TestTaskRunner
 		try
 		{
 			jppfClient = new JPPFClient();
-			perform2();
+			performExceptionTest();
+			//perform2();
 			System.exit(0);
 		}
 		catch(Exception e)
@@ -93,6 +94,32 @@ public class TestTaskRunner
 				}
 				if (task.getException() != null) throw task.getException();
 			}
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Perform the test.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void performExceptionTest() throws JPPFException
+	{
+		try
+		{
+				List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+				JPPFTask task = new ExceptionTestTask();
+				tasks.add(task);
+				List<JPPFTask> results = jppfClient.submit(tasks, null);
+				JPPFTask resultTask = results.get(0);
+				if (resultTask.getException() != null)
+				{
+					System.out.println("Exception was caught:");
+					resultTask.getException().printStackTrace();
+					throw task.getException();
+				}
 		}
 		catch(Exception e)
 		{
