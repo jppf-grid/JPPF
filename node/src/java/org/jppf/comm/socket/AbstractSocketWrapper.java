@@ -32,6 +32,7 @@ import org.jppf.utils.JPPFBuffer;
  * as set of common methods to all classes implementing the
  * {@link org.jppf.comm.socket.SocketWrapper SocketWrapper} interface.
  * @author Laurent Cohen
+ * @author Domingos Creado
  */
 public abstract class AbstractSocketWrapper implements SocketWrapper
 {
@@ -164,8 +165,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			while (count < len)
 			{
 				int n = dis.read(buffer, count, len - count);
-				if (n > 0) count += n;
-				else break;
+				if (n < 0) break;
+				else count += n;
 			}
 			buf = new JPPFBuffer(buffer, len);
 		}
