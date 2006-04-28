@@ -23,7 +23,7 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import org.apache.log4j.Logger;
-import org.jppf.JPPFNodeReloadNotification;
+import org.jppf.*;
 import org.jppf.comm.socket.*;
 import org.jppf.node.*;
 import org.jppf.node.event.*;
@@ -443,9 +443,10 @@ public class JPPFNode implements MonitoredNode
 			{
 				task.run();
 			}
-			catch(Exception e)
+			catch(Throwable t)
 			{
-				task.setException(e);
+				if (t instanceof Exception) task.setException((Exception) t);
+				else task.setException(new JPPFException(t));
 			}
 		}
 
