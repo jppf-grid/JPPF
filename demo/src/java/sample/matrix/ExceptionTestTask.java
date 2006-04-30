@@ -19,7 +19,6 @@
  */
 package sample.matrix;
 
-import java.io.*;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -29,18 +28,61 @@ import org.jppf.server.protocol.JPPFTask;
 public class ExceptionTestTask extends JPPFTask
 {
 	/**
+	 * The index of the method to invoke.
+	 */
+	int methodNumber = 0;
+
+	/**
+	 * Default constructor - the method that throws an NPE will be invoked.
+	 */
+	public ExceptionTestTask()
+	{
+	}
+
+	/**
+	 * Initialize this test task with the index of a method to invoke.
+	 * @param n th emethod index as int value.
+	 */
+	public ExceptionTestTask(int n)
+	{
+		this.methodNumber = n;
+	}
+
+	/**
 	 * Run some code that throws an exception.
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run()
 	{
-		// ArrayIndexOutOfBoundsException
+		if (methodNumber == 0) testThrowNPE();
+		else if (methodNumber == 1) testThrowArrayIndexOutOfBoundsException();
+		else testThrowSecurityException();
+	}
+	
+	/**
+	 * This method throws a <code>NullPointerException</code>.
+	 */
+	protected void testThrowNPE()
+	{
+		String s = null;
+		s.length();
+	}
+	
+	/**
+	 * This method throws an <code>ArrayIndexOutOfBoundsException</code>.
+	 */
+	protected void testThrowArrayIndexOutOfBoundsException()
+	{
 		int[] intArray = new int[2];
 		int n = intArray[3];
-		// IndexOutOfBoundsException
-		String s = "abc";
-		s = s.substring(3);
-		//SecurityException
+		n += 1;
+	}
+	
+	/**
+	 * This method throws a <code>SecurityException</code>.
+	 */
+	protected void testThrowSecurityException()
+	{
 		System.getProperty("throw.security.exception");
 	}
 }
