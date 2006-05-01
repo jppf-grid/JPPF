@@ -204,18 +204,22 @@ public abstract class JPPFNIOServer extends Thread{
 	}
 
 	/**
-	 * Get the IO operations a connection is initially intertested in.
+	 * Get the IO operations a connection is initially interested in.
 	 * @return a bit-wise combination of the interests, taken from {@link java.nio.channels.SelectionKey SelectionKey}
 	 * constants definitions.
 	 */
 	protected abstract int getInitialInterest() ;
 	
 	/**
-	 * 
-	 * @return
+	 * Get the initial content associated with a new connection.
+	 * @return the content as an <code>Object</code>.
 	 */
 	protected abstract Object getInitialContent() ;
 
+	/**
+	 * Get the initial state associated with a new connection.
+	 * @return a <code>State</code> instance.
+	 */
 	protected abstract State getInitialState();
 
 	/**
@@ -239,7 +243,7 @@ public abstract class JPPFNIOServer extends Thread{
 	 * @param request
 	 *            the request been received
 	 * @return if the request was completed received.
-	 * @throws IOException
+	 * @throws IOException if an error occuurred while reading a request.
 	 */
 	protected boolean fillRequest(SocketChannel channel, Request request)
 			throws IOException {
@@ -387,7 +391,16 @@ public abstract class JPPFNIOServer extends Thread{
 		public String uuid;
 	}
 
+	/**
+	 * Instances of this class represent the state of a socket channel connection.
+	 */
 	public interface State {
+		/**
+		 * Perform the action associated with this state.
+		 * @param key the selector key this state is associated with.
+		 * @param context the context associated with this state.
+		 * @throws IOException if an error occurred while executing the action.
+		 */
 		void exec(SelectionKey key, Context context) throws IOException;
 	}
 
@@ -398,35 +411,69 @@ public abstract class JPPFNIOServer extends Thread{
 	 */
 	public class Request {
 		
+		/**
+		 * Request creation timestamp.
+		 */
 		private long start = System.currentTimeMillis();
+		/**
+		 * Size of the request data in bytes.
+		 */
 		private int size;
+		/**
+		 * Buffer used to transfer the request data to and from streams.
+		 */
 		private ByteBuffer buffer;
+		/**
+		 * Stream where the result of the request is stored.
+		 */
 		private ByteArrayOutputStream output = new ByteArrayOutputStream();
 
+		/**
+		 * Get the request creation timestamp.
+		 * @return the timestamp in milliseconds as a long value.
+		 */
 		public long getStart(){
 			return start;
 		}
 		
+		/**
+		 * Get the stream where the result of the request is stored.
+		 * @return a <code>ByteArrayOutputStream</code> instance.
+		 */
 		public ByteArrayOutputStream getOutput() {
 			return output;
 		}
 
+		/**
+		 * Get the buffer used to transfer the request data to and from streams.
+		 * @return a <code>ByteBuffer</code> instance.
+		 */
 		public ByteBuffer getBuffer() {
 			return buffer;
 		}
 
+		/**
+		 * Set the buffer used to transfer the request data to and from streams.
+		 * @param buffer a <code>ByteBuffer</code> instance.
+		 */
 		public void setBuffer(ByteBuffer buffer) {
 			this.buffer = buffer;
 		}
 
+		/**
+		 * Get the size of the request data in bytes.
+		 * @return the size as an int value.
+		 */
 		public int getSize() {
 			return size;
 		}
 
+		/**
+		 * Set the size of the request data in bytes.
+		 * @param size the size as an int value.
+		 */
 		public void setSize(int size) {
 			this.size = size;
 		}
 	}
-	
-	
 }

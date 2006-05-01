@@ -97,22 +97,32 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 		return queue;
 	}
 
-	@Override
+	/**
+	 * @see org.jppf.server.JPPFNIOServer#getInitialInterest()
+	 */
 	protected int getInitialInterest() {
 		return SelectionKey.OP_READ;
 	}
 
-	@Override
+	/**
+	 * @see org.jppf.server.JPPFNIOServer#getInitialState()
+	 */
 	protected State getInitialState() {
 		return SendingJob;
 	}
 
-	@Override
+	/**
+	 * @see org.jppf.server.JPPFNIOServer#getInitialContent()
+	 */
 	protected Object getInitialContent() {
 		return null;
 	}
 
-	@Override
+	/**
+	 * 
+	 * @param client
+	 * @see org.jppf.server.JPPFNIOServer#postAccept(java.nio.channels.SocketChannel)
+	 */
 	protected void postAccept(SocketChannel client) {
 		JPPFStatsUpdater.newNodeConnection();
 		JPPFTaskBundle bundle = getQueue().nextBundle();
@@ -132,6 +142,11 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	}
 
 	
+	/**
+	 * 
+	 * @param queue
+	 * @see org.jppf.server.JPPFQueue.QueueListener#newBundle(org.jppf.server.JPPFQueue)
+	 */
 	public void newBundle(JPPFQueue queue) {
 		if (availableNodes.isEmpty()) {
 			return;
@@ -167,15 +182,23 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 */
 	private State SendingJob = new CSendingJob();
 
+	/**
+	 * 
+	 */
 	private State WaitingResult = new CWaitingResult();
 
 	/**
 	 * This class represents the state of waiting for some action.
-	 * 
-	 * 
 	 */
 	private class CSendingJob implements State {
 
+		/**
+		 * 
+		 * @param key
+		 * @param context
+		 * @throws IOException
+		 * @see org.jppf.server.JPPFNIOServer.State#exec(java.nio.channels.SelectionKey, org.jppf.server.JPPFNIOServer.Context)
+		 */
 		public void exec(SelectionKey key, Context context) throws IOException {
 			SocketChannel channel = (SocketChannel) key.channel();
 			
@@ -230,11 +253,15 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 * back from processing at a node. The "wainting" part in 
 	 * provided by the selector, which will any for the first
 	 * bytes be ready to send to the instances of this class.
-	 * 
-	 *
 	 */
 	private class CWaitingResult implements State {
 
+		/**
+		 * 
+		 * @param key
+		 * @param context
+		 * @see org.jppf.server.JPPFNIOServer.State#exec(java.nio.channels.SelectionKey, org.jppf.server.JPPFNIOServer.Context)
+		 */
 		public void exec(SelectionKey key, Context context) {
 
 			SocketChannel channel = (SocketChannel) key.channel();
@@ -429,15 +456,36 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private class TaskRequest {
+		/**
+		 * 
+		 */
 		private Request request;
 
+		/**
+		 * 
+		 */
 		private ByteBuffer sending;
 
+		/**
+		 * 
+		 */
 		private JPPFTaskBundle bundle;
 
+		/**
+		 * 
+		 */
 		private long bundleBytes;
 
+		/**
+		 * @param request
+		 * @param sending
+		 * @param bundle
+		 * @param bundleBytes
+		 */
 		public TaskRequest(Request request, ByteBuffer sending,
 				JPPFTaskBundle bundle, long bundleBytes) {
 			super();
@@ -447,21 +495,36 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			this.bundleBytes = bundleBytes;
 		}
 
+		/**
+		 * 
+		 * @return
+		 */
 		public Request getRequest() {
 			return request;
 		}
 
+		/**
+		 * 
+		 * @return
+		 */
 		public ByteBuffer getSending() {
 			return sending;
 		}
 
+		/**
+		 * 
+		 * @return
+		 */
 		public JPPFTaskBundle getBundle() {
 			return bundle;
 		}
 
+		/**
+		 * 
+		 * @return
+		 */
 		public long getBundleBytes() {
 			return bundleBytes;
 		}
-
 	}
 }
