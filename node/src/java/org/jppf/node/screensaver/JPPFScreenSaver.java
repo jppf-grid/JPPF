@@ -36,7 +36,7 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	/**
 	 * The node UI used in the screen saver.
 	 */
-	private NodeApplet node = null; 
+	private NodePanel node = null; 
 
 	/**
 	 * Initialize the UI components.
@@ -74,7 +74,7 @@ public class JPPFScreenSaver extends SimpleScreensaver
 			//c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
 			c.setBackground(Color.BLACK);
 			c.setForeground(Color.BLACK);
-			node = new NodeApplet();
+			node = new NodePanel();
 			c.add(node);
 		}
 	}

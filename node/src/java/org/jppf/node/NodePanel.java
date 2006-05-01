@@ -34,7 +34,7 @@ import org.jppf.utils.*;
  * This class enables launching a JPPF node as an applet, from a web browser.
  * @author Laurent Cohen
  */
-public class NodeApplet extends JPanel
+public class NodePanel extends JPanel
 {
 	/**
 	 * 
@@ -72,7 +72,7 @@ public class NodeApplet extends JPanel
 	/**
 	 * Initialize this UI.
 	 */
-	public NodeApplet()
+	public NodePanel()
 	{
 		init();
 	}
@@ -223,7 +223,7 @@ public class NodeApplet extends JPanel
 		String path = IMAGE_PATH + "/" + file;
 		int MAX_IMAGE_SIZE = 15000;
 		int count = 0;
-		InputStream is = NodeApplet.class.getResourceAsStream(path);
+		InputStream is = NodePanel.class.getResourceAsStream(path);
 		if (is == null)
 		{
 			System.err.println("Couldn't find file: " + path);
