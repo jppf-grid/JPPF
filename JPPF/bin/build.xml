@@ -115,7 +115,7 @@
   <target name="build" depends="init, compile, jar"/>
 	<target name="rebuild" depends="clean, init, compile, jar"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
-	<target name="deploy" depends="clean.deploy, rebuild, javadoc, doc, init.deploy, package, runtime"/>
+	<target name="deploy" depends="clean.deploy, rebuild, javadoc, doc, init.deploy, package, runtime, screensaver"/>
 
 	<!-- ========================================================================= -->
 	<!--                         Compile the application                           -->
@@ -138,6 +138,14 @@
 			<src path="${path}/src/java"/>
 	    <src path="${path}/src/resources"/>
 		</javac>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--                         Compile the application                           -->
+	<!-- ========================================================================= -->
+
+	<target name="screensaver" description="Generate the screen saver packaging for the nodes" depends="init">
+		<ant antfile="${basedir}/../node/bin/build.xml" inheritall="false"/>
   </target>
 
 	<!-- ========================================================================= -->
