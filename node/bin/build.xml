@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Copyright (c) 2004-2005 Sun Microsystems, Inc. All rights reserved. Use is
+subject to license terms.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the Lesser GNU General Public License as
+published by the Free Software Foundation; either version 2 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA
+-->
+
+<project basedir=".." default="dist" name="jppf-screensaver">
+
+	<!-- ========================================================================= -->
+	<!--                          Property definitions                             -->
+	<!-- ========================================================================= -->
+
+	<property name="JPPF.dir" value="${basedir}/../JPPF" />
+	<property name="JPPF.build.dir" value="${JPPF.dir}/build" />
+ 	<property name="saverbeans.path" value="${JPPF.dir}/lib/saverbeans-sdk"/>
+	<property name="screensaver.dir" value="${JPPF.build.dir}/screensaver" />
+	<property name="build" value="${screensaver.dir}/build" />
+	<property name="dist" value="${screensaver.dir}/dist" />
+	<property name="src" value="${basedir}/src/java" />
+	<property name="res" value="${basedir}/src/resources" />
+	<property name="conf" value="${basedir}/config" />
+	<property name="screensaver" value="jppf" />
+	<property name="screensaver.class" value="org.jppf.node.screensaver.JPPFScreenSaver" />
+
+	<!-- ========================================================================= -->
+	<!--                          Classpath definitions                            -->
+	<!-- ========================================================================= -->
+
+	<path id="compile.classpath">
+		<pathelement location="${saverbeans.path}/saverbeans-api.jar"/>
+		<fileset dir="${JPPF.dir}/lib">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<!-- ========================================================================= -->
+	<!--                          Cleanup                                          -->
+	<!-- ========================================================================= -->
+
+  <target name="clean" depends="init" description="Cleans all generated files">
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--              Check that all properties and paths are set                  -->
+	<!-- ========================================================================= -->
+
+  <target name="check" description="Check to make sure properties are set">
+		<fail unless="saverbeans.path">
+			Property saverbeans.path not found. Please copy build.properties.sample to build.properties and
+			follow the instructions in that file.
+		</fail>
+		<available file="${saverbeans.path}" property="saverbeans.present" />
+		<fail unless="saverbeans.present">
+			Property saverbeans.path is invalid.  Please set it to the installation path of the SaverBeans SDK.
+		</fail>
+  </target>
+  
+	<!-- ========================================================================= -->
+	<!--                          Custom tasks definitions                         -->
+	<!-- ========================================================================= -->
+
+  <target name="define" description="Define custom tasks">
+		<taskdef name="foreachscreensaver"  classname="org.jdesktop.jdic.screensaver.autogen.ForEachScreensaver"
+			classpath="${saverbeans.path}/saverbeans-ant.jar" />
+		<taskdef name="makewin32installscript" classname="org.jdesktop.jdic.screensaver.autogen.NsiGeneratorTask"
+			classpath="${saverbeans.path}/saverbeans-ant.jar" />
+  </target>
+	
+  <target name="init" depends="check,define">
+ 		<mkdir dir="${build}"/>
+  </target>
+  
+	<!-- ========================================================================= -->
+	<!--                          Compile the source                               -->
+	<!-- ========================================================================= -->
+
+  <target name="compile" depends="init" description="Compile the screensaver">
+		<mkdir dir="${build}/share" />
+		<javac debug="on" destdir="${build}/share" srcdir="${src}">
+	    <classpath refid="compile.classpath"/>
+		</javac>
+		<copy todir="${build}/share">
+			<fileset dir="${src}">
+				<exclude name="**/CVS" />
+				<exclude name="**/*.java" />
+			</fileset>
+			<fileset dir="${res}">
+				<exclude name="**/CVS" />
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+
+  	<!-- ========================================================================= -->
+  	<!-- Generate Makefile and Unix source distribution for each screen saver      -->
+  	<!-- ========================================================================= -->
+  	<mkdir dir="${build}/unix" />
+		<foreachscreensaver confDir="${conf}" outDir="${build}/unix" os="unix" />
+
+  	<!-- ========================================================================= -->
+  	<!-- Generate Windows .scr and binary distribution for each screen saver       -->
+  	<!-- ========================================================================= -->
+  	<mkdir dir="${build}/win32" />
+		<foreachscreensaver confDir="${conf}" outDir="${build}/win32" os="win32" />
+  </target>
+  
+	<!-- ========================================================================= -->
+	<!--               Create the distributions for Windows and Unix               -->
+	<!-- ========================================================================= -->
+
+  <!-- Create screensaver distribution -->
+  <target name="dist" depends="compile">
+		<mkdir dir="${build}/jar" />
+		<jar destfile="${build}/jar/${screensaver}.jar">
+			<fileset dir="${build}/share" />
+		</jar>
+
+		<!-- Create distribution for win32: -->
+		<mkdir dir="${dist}/${screensaver}-win32" />
+		<copy todir="${dist}/${screensaver}-win32">
+			<fileset dir="${saverbeans.path}">
+				<include name="saverbeans-api.jar" />
+			</fileset>
+			<fileset dir="${build}/jar">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${build}/win32">
+				<include name="*.scr" />
+			</fileset>
+			<fileset dir="${basedir}">
+				<include name="COPYING" />
+			</fileset>
+		</copy>
+		<zip destfile="${JPPF.build.dir}/${screensaver}-screensaver-win32.zip" basedir="${dist}/${screensaver}-win32" includes="**"/>
+
+		<!-- Create distribution for Unix: -->
+		<mkdir dir="${dist}/${screensaver}-unix" />
+		<copy todir="${dist}/${screensaver}-unix">
+			<fileset dir="${saverbeans.path}">
+				<include name="saverbeans-api.jar" />
+			</fileset>
+			<fileset dir="${build}/jar">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${conf}">
+				<include name="*.xml" />
+			</fileset>
+			<fileset dir="${build}/unix" />
+			<fileset dir="${basedir}">
+				<include name="COPYING" />
+			</fileset>
+		</copy>
+		<zip destfile="${JPPF.build.dir}/${screensaver}-screensaver-unix.zip" basedir="${dist}/${screensaver}-unix" includes="**"/>
+
+  	<!-- remove all intermediate files -->
+		<delete dir="${screensaver.dir}"/>
+  	
+  </target>
+
+	<!-- ========================================================================= -->
+	<!-- Compile and debug screensaver in a JFrame.                                -->
+	<!-- Can optionally attach to process using your Java IDE.  Change             -->
+	<!-- to suspend=y if you need to debug before the first frame.                 -->
+	<!-- Use the port number that the JVM gives you.                               -->
+	<!-- ========================================================================= -->
+
+	<target name="debug" depends="compile">
+		<java classname="org.jdesktop.jdic.screensaver.ScreensaverFrame" fork="true">
+		  <classpath>
+				<pathelement location="${build}/share" />
+				<pathelement location="${saverbeans.path}/saverbeans-api.jar" />
+		  </classpath>
+		  <jvmarg value="-Xdebug" />
+		  <jvmarg value="-Xrunjdwp:transport=dt_socket,address=127.0.0.1:9000,server=y,suspend=n" />
+		  <arg value="${screensaver.class}" />
+		  <arg line="${debug.params}" />
+		</java>
+  </target>
+  
+</project>

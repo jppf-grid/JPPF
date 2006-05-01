@@ -22,7 +22,11 @@ package org.jppf.node;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.text.*;
+import java.util.*;
+
 import javax.swing.*;
+
 import org.jppf.node.event.*;
 import org.jppf.utils.*;
 
@@ -30,7 +34,7 @@ import org.jppf.utils.*;
  * This class enables launching a JPPF node as an applet, from a web browser.
  * @author Laurent Cohen
  */
-public class NodeApplet extends JApplet
+public class NodeApplet extends JPanel
 {
 	/**
 	 * 
@@ -59,11 +63,19 @@ public class NodeApplet extends JApplet
 	/**
 	 * Path to the images to display in the UI.
 	 */
-	private static final int MAX_NODES = 2;
+	public static int MAX_NODES = 1;
 	/**
 	 * Holds the states of all nodes.
 	 */
 	private NodeState[] nodeState = new NodeState[MAX_NODES];
+
+	/**
+	 * Initialize this UI.
+	 */
+	public NodeApplet()
+	{
+		init();
+	}
 
 	/**
 	 * Initialize this applet.
@@ -76,20 +88,10 @@ public class NodeApplet extends JApplet
 	{
 		try
 		{
-			String cfg = getParameter(JPPFConfiguration.CONFIG_PROPERTY);
-			System.out.println("JPPF configuration file: "+cfg);
-			//System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, cfg);
-			System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, "jppf-node.properties");
-			String log4jCfg = getParameter("log4j.configuration");
+			String log4jCfg = "log4j-node.properties";
 			System.setProperty("log4j.configuration", log4jCfg);
 			Log4jInitializer.configureFromClasspath(log4jCfg);
-			SwingUtilities.invokeAndWait(new Runnable()
-			{
-				public void run()
-				{
-					createUI();
-				}
-			});
+			createUI();
 		}
 		catch(Exception e)
 		{
@@ -102,10 +104,30 @@ public class NodeApplet extends JApplet
 	 */
 	private void createUI()
 	{
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		for (int i=0; i<MAX_NODES; i++) panel.add(createNodePanel(i));
-		getContentPane().add(panel);
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setBackground(Color.BLACK);
+		JPanel logoPanel = new JPanel();
+		//logoPanel.setLayout(new BoxLayout(logoPanel, BoxLayout.X_AXIS));
+		logoPanel.setBackground(Color.BLACK);
+		ImageIcon logo = loadImage("jppf-at-home.gif");
+		JLabel logoLabel = new JLabel(logo);
+		logoPanel.setPreferredSize(new Dimension(logo.getIconWidth(), logo.getIconHeight()));
+		logoPanel.add(BorderLayout.CENTER, logoLabel);
+		logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+		add(Box.createVerticalStrut(10));
+		add(logoPanel);
+		add(Box.createVerticalStrut(10));
+		for (int i=0; i<MAX_NODES; i++)
+		{
+			add(createNodePanel(i));
+			add(Box.createVerticalStrut(5));
+		}
+		add(Box.createVerticalGlue());
+		for (NodeState state: nodeState)
+		{
+			state.startNode();
+		}
 	}
 
 	/**
@@ -117,34 +139,77 @@ public class NodeApplet extends JApplet
 	{
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBackground(Color.BLACK);
 		nodeState[n] = new NodeState();
-		panel.add(new JLabel("Node " + (n+1)));
-		panel.add(Box.createHorizontalStrut(5));
 
-		JPanel tmpPanel = new JPanel();
-		tmpPanel.setLayout(new BoxLayout(tmpPanel, BoxLayout.Y_AXIS));
-		tmpPanel.add(nodeState[n].statusLabels[0][0]);
-		panel.add(Box.createVerticalStrut(4));
-		tmpPanel.add(nodeState[n].statusLabels[0][1]);
-		panel.add(tmpPanel);
-		panel.add(Box.createHorizontalStrut(5));
-
-		tmpPanel = new JPanel();
-		tmpPanel.setLayout(new BoxLayout(tmpPanel, BoxLayout.Y_AXIS));
-		tmpPanel.add(nodeState[n].statusLabels[1][0]);
-		panel.add(Box.createVerticalStrut(4));
-		tmpPanel.add(nodeState[n].statusLabels[1][1]);
-		panel.add(tmpPanel);
-		panel.add(Box.createHorizontalStrut(5));
-
-		panel.add(new JLabel("tasks"));
-		panel.add(Box.createHorizontalStrut(5));
-		panel.add(nodeState[n].countLabel);
-		panel.add(Box.createHorizontalStrut(5));
-		panel.add(nodeState[n].btn[0]);
-		panel.add(nodeState[n].btn[1]);
 		panel.add(Box.createHorizontalGlue());
+		panel.add(Box.createHorizontalStrut(25));
+		JLabel label = new JLabel("JPPF Node");
+		label.setBackground(Color.BLACK);
+		label.setForeground(Color.WHITE);
+		panel.add(label);
+		panel.add(Box.createHorizontalStrut(50));
+		panel.add(nodeState[n].timeLabel);
+		panel.add(Box.createHorizontalStrut(25));
 
+		panel.add(makeStatusPanel(n, 0, "connection"));
+		panel.add(Box.createHorizontalStrut(5));
+
+		panel.add(makeStatusPanel(n, 1, "execution"));
+		panel.add(Box.createHorizontalStrut(5));
+
+		label = new JLabel("tasks");
+		label.setBackground(Color.BLACK);
+		label.setForeground(Color.WHITE);
+		JPanel labelPanel = new JPanel();
+		labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
+		labelPanel.add(label);
+		labelPanel.setBackground(Color.BLACK);
+		panel.add(labelPanel);
+		panel.add(Box.createHorizontalStrut(5));
+		nodeState[n].countLabel.setPreferredSize(new Dimension(60, 20));
+		panel.add(nodeState[n].countLabel);
+		//panel.add(Box.createHorizontalStrut(25));
+		panel.add(Box.createHorizontalGlue());
+		panel.setPreferredSize(new Dimension(170, 20));
+
+		return panel;
+	}
+	
+	/**
+	 * Generate a panel display the status of the connection or execution.
+	 * @param nodeIdx index of the node the panel is for.
+	 * @param statusIdx index of the status to display: 0 for connection, 1 for execution.
+	 * @param text the text to display on the left of the status lights.
+	 * @return a <code>JPanel</code> instance.
+	 */
+	private JPanel makeStatusPanel(int nodeIdx, int statusIdx, String text)
+	{
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBackground(Color.BLACK);
+
+		JLabel label = new JLabel(text);
+		label.setBackground(Color.BLACK);
+		label.setForeground(Color.WHITE);
+		JPanel labelPanel = new JPanel();
+		labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
+		labelPanel.add(label);
+		labelPanel.setBackground(Color.BLACK);
+
+		JPanel statusPanel = new JPanel();
+		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+		statusPanel.setBackground(Color.BLACK);
+		statusPanel.add(nodeState[nodeIdx].statusLabels[statusIdx][0]);
+		statusPanel.add(Box.createVerticalStrut(4));
+		statusPanel.add(nodeState[nodeIdx].statusLabels[statusIdx][1]);
+
+		labelPanel.setPreferredSize(new Dimension(60, 20));
+		panel.add(labelPanel);
+		panel.add(Box.createHorizontalStrut(5));
+		statusPanel.setPreferredSize(new Dimension(8, 20));
+		panel.add(statusPanel);
+		panel.setPreferredSize(new Dimension(73, 20));
 		return panel;
 	}
 
@@ -156,7 +221,7 @@ public class NodeApplet extends JApplet
 	protected static ImageIcon loadImage(String file)
 	{
 		String path = IMAGE_PATH + "/" + file;
-		int MAX_IMAGE_SIZE = 2400;
+		int MAX_IMAGE_SIZE = 15000;
 		int count = 0;
 		InputStream is = NodeApplet.class.getResourceAsStream(path);
 		if (is == null)
@@ -186,6 +251,23 @@ public class NodeApplet extends JApplet
 	}
 	
 	/**
+	 * Free resources used by the nodes.
+	 */
+	public void cleanup()
+	{
+		try
+		{
+			for (NodeState state: nodeState)
+			{
+				state.stopNode();
+			}
+		}
+		catch (Throwable t)
+		{
+		}
+	}
+	
+	/**
 	 * Instances of this class represent information about a node.
 	 */
 	public class NodeState implements NodeListener
@@ -208,9 +290,13 @@ public class NodeApplet extends JApplet
 		 */
 		public JLabel[][] statusLabels = new JLabel[2][2];
 		/**
-		 * Labels uswed to display the number of tasks executed by each node.
+		 * Labels used to display the number of tasks executed by each node.
 		 */
 		public JLabel countLabel = null;
+		/**
+		 * Label used to display how long the node has been active.
+		 */
+		public JLabel timeLabel = null;
 		/**
 		 * Buttons used to start and stop the node.
 		 */
@@ -218,8 +304,16 @@ public class NodeApplet extends JApplet
 		/**
 		 * Determine whether the node has already been started at least once.
 		 */
-		boolean startedOnce = false;
-		
+		public boolean startedOnce = false;
+		/**
+		 * The time this panel was started.
+		 */
+		public long startedAt = System.currentTimeMillis();
+		/**
+		 * timer used to update the display of activity time.
+		 */
+		private java.util.Timer timer = null;
+
 		/**
 		 * Initialize this node state.
 		 */
@@ -228,7 +322,7 @@ public class NodeApplet extends JApplet
 			for (int i=0; i<statusLabels.length; i++)
 			{
 				statusLabels[i][0] = new JLabel(DARK_GREEN);
-				statusLabels[i][1] = new JLabel(DARK_RED);
+				statusLabels[i][1] = new JLabel(BRIGHT_RED);
 			}
 			Dimension d = new Dimension(8, 8);
 			for (int i=0; i<statusLabels.length; i++)
@@ -237,26 +331,36 @@ public class NodeApplet extends JApplet
 				{
 					statusLabels[i][j].setMinimumSize(d);
 					statusLabels[i][j].setMaximumSize(d);
+					statusLabels[i][j].setBackground(Color.BLACK);
 				}
 			}
 			countLabel = new JLabel(""+taskCount);
-			d = new Dimension(40, 20);
+			d = new Dimension(60, 20);
 			countLabel.setMinimumSize(d);
 			countLabel.setMaximumSize(d);
+			countLabel.setBackground(Color.BLACK);
+			countLabel.setForeground(Color.WHITE);
+
+			timeLabel = new JLabel("Active for: "+toStringDuration(0));
+			timeLabel.setBackground(Color.BLACK);
+			timeLabel.setForeground(Color.WHITE);
+			timer = new java.util.Timer();
+			TimerTask task = new TimerTask()
+			{
+				public void run()
+				{
+					String s = toStringDuration(System.currentTimeMillis() - startedAt);
+					timeLabel.setText("Active for: "+s);
+				}
+			};
+			timer.scheduleAtFixedRate(task, 1000, 1000);
 			nodeThread = new NodeThread(this);
 			btn[0] = new JButton("Start");
 			btn[0].addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent event)
 				{
-					btn[0].setEnabled(false);
-					btn[1].setEnabled(true);
-					if (!startedOnce)
-					{
-						startedOnce = true;
-						nodeThread.start();
-					}
-					else nodeThread.startNode();
+					startNode();
 				}
 			});
 
@@ -265,12 +369,36 @@ public class NodeApplet extends JApplet
 			{
 				public void actionPerformed(ActionEvent event)
 				{
-					btn[0].setEnabled(true);
-					btn[1].setEnabled(false);
-					nodeThread.stopNode();
+					stopNode();
 				}
 			});
 			btn[1].setEnabled(false);
+		}
+
+		/**
+		 * Start the node.
+		 */
+		public void startNode()
+		{
+			btn[0].setEnabled(false);
+			btn[1].setEnabled(true);
+			if (!startedOnce)
+			{
+				startedOnce = true;
+				nodeThread.start();
+			}
+			else nodeThread.startNode();
+		}
+
+		/**
+		 * Stop the node.
+		 */
+		public void stopNode()
+		{
+			if (timer != null) timer.cancel();
+			btn[0].setEnabled(true);
+			btn[1].setEnabled(false);
+			nodeThread.stopNode();
 		}
 
 		/**
@@ -294,22 +422,52 @@ public class NodeApplet extends JApplet
 			else if (NodeEvent.DISCONNECTED.equals(type))
 			{
 				statusLabels[0][0].setIcon(DARK_GREEN);
-				statusLabels[0][1].setIcon(DARK_RED);
+				statusLabels[0][1].setIcon(BRIGHT_RED);
 				statusLabels[1][0].setIcon(DARK_GREEN);
 				statusLabels[1][1].setIcon(DARK_RED);
 			}
 			else if (NodeEvent.START_EXEC.equals(type))
 			{
-				statusLabels[1][0].setIcon(DARK_GREEN);
-				statusLabels[1][1].setIcon(BRIGHT_RED);
+				statusLabels[1][0].setIcon(BRIGHT_GREEN);
+				statusLabels[1][1].setIcon(DARK_RED);
 			}
 			else if (NodeEvent.END_EXEC.equals(type))
 			{
-				statusLabels[1][0].setIcon(BRIGHT_GREEN);
-				statusLabels[1][1].setIcon(DARK_RED);
+				statusLabels[1][0].setIcon(DARK_GREEN);
+				statusLabels[1][1].setIcon(BRIGHT_RED);
 				taskCount++;
 				countLabel.setText(""+taskCount);
 			}
 		}
+	}
+
+	/**
+	 * Used to nicely format integer values.
+	 */
+	private static NumberFormat integerFormatter = null;
+	/**
+	 * Tranform a duration in milliseconds into a string with hours, minutes, seconds and milliseconds..
+	 * @param elapsed the duration to transform, expressed in milliseconds.
+	 * @return a string specifiying the duration in terms of hours, minutes, seconds and milliseconds.
+	 */
+	public static String toStringDuration(long elapsed)
+	{
+		if (integerFormatter == null)
+		{
+			integerFormatter = NumberFormat.getInstance();
+			integerFormatter.setGroupingUsed(false);
+			integerFormatter.setMinimumFractionDigits(0);
+			integerFormatter.setMaximumFractionDigits(0);
+			integerFormatter.setMinimumIntegerDigits(2);
+		}
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(integerFormatter.format(elapsed / 3600000L)).append(" hrs ");
+		elapsed = elapsed % 3600000L;
+		sb.append(integerFormatter.format(elapsed / 60000L)).append(" mn ");
+		elapsed = elapsed % 60000L;
+		sb.append(integerFormatter.format(elapsed / 1000L));
+		sb.append(" sec");
+		return sb.toString();
 	}
 }

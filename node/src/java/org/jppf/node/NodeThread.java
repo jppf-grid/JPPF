@@ -19,6 +19,7 @@
  */
 package org.jppf.node;
 
+import org.jppf.*;
 import org.jppf.node.event.NodeListener;
 
 /**
@@ -53,12 +54,25 @@ public class NodeThread extends Thread
 	{
 		try
 		{
-			node = NodeLauncher.createNode();
-			if (node != null) node.addNodeListener(listener);
 			while (true)
 			{
-				if (node != null) node.run();
-				goToSleep();
+				try
+				{
+					node = NodeLauncher.createNode();
+					if (node != null)
+					{
+						node.addNodeListener(listener);
+					}
+					while (true)
+					{
+						if (node != null) node.run();
+						//goToSleep();
+					}
+				}
+				catch (JPPFNodeReloadNotification e)
+				{
+					//if (node != null) node.removeNodeListener(listener);
+				}
 			}
 		}
 		catch(Exception e)
