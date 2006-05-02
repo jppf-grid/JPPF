@@ -22,23 +22,32 @@ package org.jppf.server.app;
 import java.net.Socket;
 import org.jppf.JPPFException;
 import org.jppf.server.*;
+import org.jppf.server.scheduler.bundle.Bundler;
 
 /**
  * Instances of this class listens for incoming connections from client applications.<br>
  * For each incoming connection, a new connection thread is created. This thread listens to incoming
  * connection requests and puts them on the execution queue.
  * @author Laurent Cohen
+ * @author Domingos Creado
  */
 public class JPPFApplicationServer extends JPPFServer
 {
+	
+	/**
+	 * the algorithm that deals with bundle size 
+	 */
+	Bundler bundler;
+	
 	/**
 	 * Initialize this socket server with a specified execution service and port number.
 	 * @param port the port this socket server is listening to.
 	 * @throws JPPFException if the underlying server socket can't be opened.
 	 */
-	public JPPFApplicationServer(int port) throws JPPFException
+	public JPPFApplicationServer(int port,Bundler bundler) throws JPPFException
 	{
-		super(port);
+		super(port,"Application Server Thread");
+		this.bundler = bundler;
 	}
 	
 	/**
@@ -51,6 +60,6 @@ public class JPPFApplicationServer extends JPPFServer
 	 */
 	protected JPPFConnection createConnection(Socket socket) throws JPPFException
 	{
-		return new ApplicationConnection(this, socket);
+		return new ApplicationConnection(this, socket,bundler);
 	}
 }

@@ -20,13 +20,19 @@
 package org.jppf.server;
 
 import java.net.Socket;
-import java.util.*;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.apache.log4j.Logger;
-import org.jppf.*;
+import org.jppf.JPPFError;
+import org.jppf.JPPFException;
 import org.jppf.classloader.ClassServer;
 import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.node.JPPFNodeServer;
-import org.jppf.utils.*;
+import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.BundlerFactory;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.TypedProperties;
 
 /**
  * This class serves as an initializer for the entire JPPF server. It follows the singleton pattern and provides access,
@@ -84,12 +90,13 @@ public class JPPFDriver
 		classServer = new ClassServer(port);
 		classServer.start();
 
+		Bundler bundler = BundlerFactory.createBundler();
 		port = props.getInt("app.server.port", 11112);
-		applicationServer = new JPPFApplicationServer(port);
+		applicationServer = new JPPFApplicationServer(port,bundler);
 		applicationServer.start();
 
 		port = props.getInt("node.server.port", 11113);
-		nodeServer = new JPPFNodeServer(port);
+		nodeServer = new JPPFNodeServer(port,bundler);
 		nodeServer.start();
 	}
 	

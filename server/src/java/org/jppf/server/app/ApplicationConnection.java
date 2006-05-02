@@ -58,6 +58,7 @@ import org.jppf.server.*;
 import org.jppf.server.event.TaskCompletionListener;
 import org.jppf.server.protocol.AdminRequest;
 import org.jppf.server.protocol.JPPFRequestHeader;
+import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.JPPFBuffer;
 import org.jppf.utils.SerializationHelper;
 import org.jppf.utils.SerializationHelperImpl;
@@ -92,19 +93,26 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	 * A reference to the driver's tasks queue.
 	 */
 	private JPPFQueue queue = null;
-
+	
+	/**
+	 * The algorithm that deals with bundle size
+	 */
+	Bundler bundler;
+	
 	/**
 	 * Initialize this connection with an open socket connection to a remote client.
 	 * @param socket the socket connection from which requests are received and to which responses are sent.
 	 * @param server the class server that created this connection.
+	 * @param bundler the algorithm that will define the size of bundle
 	 * @throws JPPFException if this socket handler can't be initialized.
 	 */
-	public ApplicationConnection(JPPFServer server, Socket socket) throws JPPFException
+	public ApplicationConnection(JPPFServer server, Socket socket,Bundler bundler) throws JPPFException
 	{
 		super(server, socket);
 		InetAddress addr = socket.getInetAddress();
 		setName("appl ["+addr.getHostAddress()+":"+socket.getPort()+"]");
 		if (isStatsEnabled()) newClientConnection();
+		this.bundler = bundler;
 	}
 
 	/**
@@ -160,7 +168,8 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 		int bundleCount = 0;
 		int n = 0;
 		List<byte[]> taskList = new ArrayList<byte[]>();
-		int bundleSize = JPPFStatsUpdater.getStaticBundleSize();
+		
+		int bundleSize = bundler.getBundleSize();
 		for (int i=0; i<count; i++)
 		{
 			n++;

@@ -43,6 +43,7 @@ import org.jppf.server.JPPFStatsUpdater;
 import org.jppf.server.JPPFTaskBundle;
 import org.jppf.server.JPPFQueue.QueueListener;
 import org.jppf.server.event.TaskCompletionListener;
+import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.SerializationHelper;
 import org.jppf.utils.SerializationHelperImpl;
 
@@ -71,6 +72,11 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 * List of nodes that are available for executing tasks.
 	 */
 	private List<SocketChannel> availableNodes = new LinkedList<SocketChannel>();
+	
+	/**
+	 * The algorithm of dealing with task bundle.
+	 */
+	Bundler bundler;
 
 	/**
 	 * Initialize this socket server with a specified execution service and port
@@ -78,12 +84,14 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 * 
 	 * @param port
 	 *            the port this socket server is listening to.
+	 * @param bundler the algorithm that deals with bundle size
 	 * @throws JPPFBootstrapException
 	 *             if the underlying server socket can't be opened.
 	 */
-	public JPPFNodeServer(int port) throws JPPFBootstrapException {
+	public JPPFNodeServer(int port, Bundler bundler) throws JPPFBootstrapException {
 		super(port, "NodeServer Thread");
 		getQueue().addListener(this);
+		this.bundler = bundler;
 	}
 
 	/**
@@ -203,7 +211,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			SocketChannel channel = (SocketChannel) key.channel();
 			
 			if (key.isReadable()) {
-				//as the SO will select it for read when the channel is suddenly 
+				//as the OS will select it for read when the channel is suddenly 
 				//closed by peer, and we are not expecting any read...
 				// the channel was closed by node
 				closeNode(channel);
@@ -296,6 +304,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 					
 					//updating stats
 					if (isStatsEnabled()) {
+						bundler.feedback(bundle.getTaskCount(),elapsed);
 						taskExecuted(bundle.getTaskCount(), elapsed, bundle
 								.getNodeExecutionTime(), out.getBundleBytes());
 					}

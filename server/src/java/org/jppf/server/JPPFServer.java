@@ -61,8 +61,9 @@ public abstract class JPPFServer extends Thread
 	 * @param port the port this socket server is listening to.
 	 * @throws JPPFException if the underlying server socket can't be opened.
 	 */
-	public JPPFServer(int port) throws JPPFException
+	public JPPFServer(int port,String name) throws JPPFException
 	{
+		super(name);
 		this.port = port;
 		init(port);
 	}
