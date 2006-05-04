@@ -106,6 +106,8 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	}
 
 	/**
+	 * Get the IO operations a node connection is initially interested in.
+	 * @return {@link java.nio.channels.SelectionKey.OP_READ SelectionKey.OP_READ}.
 	 * @see org.jppf.server.JPPFNIOServer#getInitialInterest()
 	 */
 	protected int getInitialInterest() {
@@ -113,6 +115,8 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	}
 
 	/**
+	 * Get the initial state of a connection to a node.
+	 * @return a <code>State</code> instance.
 	 * @see org.jppf.server.JPPFNIOServer#getInitialState()
 	 */
 	protected State getInitialState() {
@@ -120,6 +124,8 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	}
 
 	/**
+	 * Get the initial content to send over the connection.
+	 * @return null.
 	 * @see org.jppf.server.JPPFNIOServer#getInitialContent()
 	 */
 	protected Object getInitialContent() {
@@ -127,8 +133,8 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	}
 
 	/**
-	 * 
-	 * @param client
+	 * Called after a connection to a node has been accepted by the server socket channel.
+	 * @param client the <code>SocketChannel</code> that was accepted.
 	 * @see org.jppf.server.JPPFNIOServer#postAccept(java.nio.channels.SocketChannel)
 	 */
 	protected void postAccept(SocketChannel client) {
@@ -151,8 +157,8 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 
 	
 	/**
-	 * 
-	 * @param queue
+	 * Callback method when a task bundle is added to the queue.
+	 * @param queue the queue to which a bundle was added.
 	 * @see org.jppf.server.JPPFQueue.QueueListener#newBundle(org.jppf.server.JPPFQueue)
 	 */
 	public void newBundle(JPPFQueue queue) {

@@ -22,6 +22,7 @@ package org.jppf.server.node;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.jppf.*;
 import org.jppf.comm.socket.*;
@@ -99,6 +100,11 @@ public class JPPFNode implements MonitoredNode
 	 * The Thread Pool that really process the tasks
 	 */
 	private ExecutorService threadPool;
+	/**
+	 * Holds the count of currently executing tasks.
+	 * Used to determine when this node is busy or idle.
+	 */
+	private AtomicInteger executingCount = new AtomicInteger(0);
 
 	/**
 	 * Main processing loop of this node.
@@ -413,6 +419,30 @@ public class JPPFNode implements MonitoredNode
 		socketClient = null;
 		classLoader = null;
 	}
+
+	/**
+	 * Decrement the count of currently executing tasks and determine whether
+	 * an idle notification should be sent.
+	 */
+	private void decrementExecutingCount()
+	{
+		if (executingCount.decrementAndGet() == 0)
+		{
+			fireNodeEvent(NodeEvent.END_EXEC);
+		}
+	}
+	
+	/**
+	 * Increment the count of currently executing tasks and determine whether
+	 * a busy notification should be sent.
+	 */
+	private void incrementExecutingCount()
+	{
+		if (executingCount.incrementAndGet() == 1)
+		{
+			fireNodeEvent(NodeEvent.START_EXEC);
+		}
+	}
 	
 	/**
 	 * Wrapper around a JPPF task used to catch exceptions cause by the task execution.
@@ -439,6 +469,7 @@ public class JPPFNode implements MonitoredNode
 		 */
 		public void run()
 		{
+			if (notifying) incrementExecutingCount();
 			try
 			{
 				task.run();
@@ -448,6 +479,7 @@ public class JPPFNode implements MonitoredNode
 				if (t instanceof Exception) task.setException((Exception) t);
 				else task.setException(new JPPFException(t));
 			}
+			if (notifying) decrementExecutingCount();
 		}
 
 		/**

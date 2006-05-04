@@ -103,10 +103,10 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	 * Initialize this connection with an open socket connection to a remote client.
 	 * @param socket the socket connection from which requests are received and to which responses are sent.
 	 * @param server the class server that created this connection.
-	 * @param bundler the algorithm that will define the size of bundle
+	 * @param bundler the algorithm that will define the size of bundle.
 	 * @throws JPPFException if this socket handler can't be initialized.
 	 */
-	public ApplicationConnection(JPPFServer server, Socket socket,Bundler bundler) throws JPPFException
+	public ApplicationConnection(JPPFServer server, Socket socket, Bundler bundler) throws JPPFException
 	{
 		super(server, socket);
 		InetAddress addr = socket.getInetAddress();

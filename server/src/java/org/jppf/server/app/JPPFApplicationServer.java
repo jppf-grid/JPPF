@@ -35,16 +35,17 @@ public class JPPFApplicationServer extends JPPFServer
 {
 	
 	/**
-	 * the algorithm that deals with bundle size 
+	 * the algorithm that deals with bundle size. 
 	 */
 	Bundler bundler;
 	
 	/**
 	 * Initialize this socket server with a specified execution service and port number.
 	 * @param port the port this socket server is listening to.
+	 * @param bundler the object used to adjust the bundle size for better performance.
 	 * @throws JPPFException if the underlying server socket can't be opened.
 	 */
-	public JPPFApplicationServer(int port,Bundler bundler) throws JPPFException
+	public JPPFApplicationServer(int port, Bundler bundler) throws JPPFException
 	{
 		super(port,"Application Server Thread");
 		this.bundler = bundler;
