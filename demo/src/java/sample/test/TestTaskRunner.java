@@ -17,7 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package sample.matrix;
+package sample.test;
 
 import java.util.*;
 import org.apache.log4j.Logger;
@@ -26,7 +26,7 @@ import org.jppf.client.JPPFClient;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.utils.StringUtils;
-import sample.matrix.SecurityTestTask.ExecutionReport;
+import sample.test.SecurityTestTask.ExecutionReport;
 
 /**
  * Runner class used for testing the framework.
@@ -110,7 +110,7 @@ public class TestTaskRunner
 		try
 		{
 				List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-				JPPFTask task = new ExceptionTestTask();
+				JPPFTask task = new ExceptionTestTask(2);
 				tasks.add(task);
 				List<JPPFTask> results = jppfClient.submit(tasks, null);
 				JPPFTask resultTask = results.get(0);
