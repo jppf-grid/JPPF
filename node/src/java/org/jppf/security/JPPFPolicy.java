@@ -28,16 +28,20 @@ import java.security.*;
 public class JPPFPolicy extends Policy
 {
 	/**
-	 * Reference to the permissions collection for a JPPF node.
+	 * ClassLoader used to retrieve the policy file.
 	 */
-	//private Permissions jppfPermissions = null;
+	private ClassLoader classLoader = null;
 
 	/**
 	 * Initialize this policy.
+	 * @param classLoader the <code>ClassLoader</code> used to retrieve the policy file
+	 * through a call to <code>getResourceAsStream(String)</code>; may be null.
+	 * @see java.lang.ClassLoader.getResourceAsStream(String).
 	 */
-	public JPPFPolicy()
+	public JPPFPolicy(ClassLoader classLoader)
 	{
-		PermissionsFactory.getPermissions();
+		this.classLoader = classLoader;
+		PermissionsFactory.getPermissions(classLoader);
 	}
 	
 	
@@ -49,7 +53,7 @@ public class JPPFPolicy extends Policy
 	 */
 	public PermissionCollection getPermissions(CodeSource codesource)
 	{
-		return PermissionsFactory.getPermissions();
+		return PermissionsFactory.getPermissions(classLoader);
 	}
 
 	/**
@@ -69,6 +73,6 @@ public class JPPFPolicy extends Policy
 	 */
 	public PermissionCollection getPermissions(ProtectionDomain domain)
 	{
-		return PermissionsFactory.getPermissions();
+		return PermissionsFactory.getPermissions(classLoader);
 	}
 }

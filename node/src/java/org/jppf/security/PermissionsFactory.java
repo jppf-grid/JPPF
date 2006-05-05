@@ -44,27 +44,45 @@ public final class PermissionsFactory
 	}
 	
 	/**
+	 * Reset the current permissions to enable their reload.
+	 * @see java.security.Permissions
+	 */
+	public static void resetPermissions()
+	{
+		permissions = null;
+	}
+	
+	/**
 	 * Get the set of permissions granted to a node.
+	 * @param classLoader the ClassLoader used to retrieve the policy file.
 	 * @return a Permissions object.
 	 * @see java.security.Permissions
 	 */
-	public static Permissions getPermissions()
+	public static Permissions getPermissions(ClassLoader classLoader)
 	{
-		if (permissions == null) createPermissions();
+		if (permissions == null)
+		{
+			if (classLoader == null)
+			{
+				classLoader = PermissionsFactory.class.getClassLoader();
+			}
+			createPermissions(classLoader);
+		}
 		return permissions;
 	}
 	
 	/**
 	 * Initialize the permissions granted to a node.
+	 * @param classLoader the ClassLoader used to retrieve the policy file.
 	 */
-	private static synchronized void createPermissions()
+	private static synchronized void createPermissions(ClassLoader classLoader)
 	{
 		if (permissions != null) return;
 		permissions = new Permissions();
 		createDynamicPermissions(permissions);
-		readStaticPermissions();
+		readStaticPermissions(classLoader);
 	}
-	
+
 	/**
 	 * Initialize the permissions that depend on the JPPF configuration.
 	 * @param p the permissions collection to add the permissions to.
@@ -81,8 +99,9 @@ public final class PermissionsFactory
 
 	/**
 	 * Read the static permissions stored in a policy file, if any is defined.
+	 * @param classLoader the ClassLoader used to retrieve the policy file.
 	 */
-	private static void readStaticPermissions()
+	private static void readStaticPermissions(ClassLoader classLoader)
 	{
 		try
 		{
@@ -96,7 +115,7 @@ public final class PermissionsFactory
 			catch(FileNotFoundException e)
 			{
 			}
-			if (is == null) is = PermissionsFactory.class.getClassLoader().getResourceAsStream(file);
+			if (is == null) is = classLoader.getResourceAsStream(file);
 			if (is == null) return;
 			LineNumberReader reader = new LineNumberReader(new InputStreamReader(is));
 			int count = 0;

@@ -19,9 +19,10 @@
  */
 package org.jppf.node;
 
-import java.security.Policy;
-import org.jppf.JPPFNodeReloadNotification;
-import org.jppf.security.JPPFPolicy;
+import java.security.*;
+
+import org.jppf.*;
+import org.jppf.security.*;
 import org.jppf.utils.*;
 
 /**
@@ -33,7 +34,7 @@ public class NodeLauncher
 	/**
 	 * The ClassLoader used for loading the classes of the framework.
 	 */
-	private static ClassLoader classLoader = null;
+	private static JPPFClassLoader classLoader = null;
 	/**
 	 * Determine whether a security manager has already been set.
 	 */
@@ -63,6 +64,15 @@ public class NodeLauncher
 					System.out.println("Reloading this node");
 					classLoader = null;
 					node.stopNode();
+					AccessController.doPrivileged(new PrivilegedAction<Object>()
+					{
+						public Object run()
+						{
+							System.setSecurityManager(null);
+							return null;
+						}
+					});
+					securityManagerSet = false;
 				}
 			}
 		}
@@ -104,7 +114,7 @@ public class NodeLauncher
 			String s = props.getString("jppf.policy.file");
 			if (s != null)
 			{
-				Policy.setPolicy(new JPPFPolicy());
+				Policy.setPolicy(new JPPFPolicy(getJPPFClassLoader()));
 				System.setSecurityManager(new SecurityManager());
 				securityManagerSet = true;
 			}
@@ -115,7 +125,7 @@ public class NodeLauncher
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @return a <code>ClassLoader</code> used for loading the classes of the framework.
 	 */
-	public static ClassLoader getJPPFClassLoader()
+	public static JPPFClassLoader getJPPFClassLoader()
 	{
 		if (classLoader == null)
 		{

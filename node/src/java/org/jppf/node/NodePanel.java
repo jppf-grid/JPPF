@@ -37,10 +37,6 @@ import org.jppf.utils.*;
 public class NodePanel extends JPanel
 {
 	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7299446296348222737L;
-	/**
 	 * Path to the images to display in the UI.
 	 */
 	private static final String IMAGE_PATH = "/org/jppf/node";
@@ -90,7 +86,9 @@ public class NodePanel extends JPanel
 		{
 			String log4jCfg = "log4j-node.properties";
 			System.setProperty("log4j.configuration", log4jCfg);
-			Log4jInitializer.configureFromClasspath(log4jCfg);
+			//Log4jInitializer.configureFromClasspath(log4jCfg);
+			TypedProperties props = JPPFConfiguration.getProperties();
+			props.remove("jppf.policy.file"); 
 			createUI();
 		}
 		catch(Exception e)
@@ -104,26 +102,21 @@ public class NodePanel extends JPanel
 	 */
 	private void createUI()
 	{
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		GridBagLayout g = new GridBagLayout();
+		setLayout(g);
+    GridBagConstraints c = new GridBagConstraints();
+    c.gridx = 0;
 		setBackground(Color.BLACK);
-		JPanel logoPanel = new JPanel();
-		//logoPanel.setLayout(new BoxLayout(logoPanel, BoxLayout.X_AXIS));
-		logoPanel.setBackground(Color.BLACK);
 		ImageIcon logo = loadImage("jppf-at-home.gif");
 		JLabel logoLabel = new JLabel(logo);
-		logoPanel.setPreferredSize(new Dimension(logo.getIconWidth(), logo.getIconHeight()));
-		logoPanel.add(BorderLayout.CENTER, logoLabel);
-		logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-		add(Box.createVerticalStrut(10));
-		add(logoPanel);
-		add(Box.createVerticalStrut(10));
+		addLayoutComp(this, g, c, logoLabel);
+		addLayoutComp(this, g, c, Box.createVerticalStrut(10));
 		for (int i=0; i<MAX_NODES; i++)
 		{
-			add(createNodePanel(i));
-			add(Box.createVerticalStrut(5));
+			addLayoutComp(this, g, c, createNodePanel(i));
+			if (i < MAX_NODES - 1)
+				addLayoutComp(this, g, c, Box.createVerticalStrut(5));
 		}
-		add(Box.createVerticalGlue());
 		for (NodeState state: nodeState)
 		{
 			state.startNode();
@@ -138,42 +131,47 @@ public class NodePanel extends JPanel
 	private JPanel createNodePanel(int n)
 	{
 		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		GridBagLayout g = new GridBagLayout();
+    GridBagConstraints c = new GridBagConstraints();
+    c.gridy = 0;
+		panel.setLayout(g);
 		panel.setBackground(Color.BLACK);
 		nodeState[n] = new NodeState();
 
-		panel.add(Box.createHorizontalGlue());
-		panel.add(Box.createHorizontalStrut(25));
+		addLayoutComp(panel, g, c, Box.createHorizontalStrut(25));
 		JLabel label = new JLabel("JPPF Node");
 		label.setBackground(Color.BLACK);
 		label.setForeground(Color.WHITE);
-		panel.add(label);
-		panel.add(Box.createHorizontalStrut(50));
-		panel.add(nodeState[n].timeLabel);
-		panel.add(Box.createHorizontalStrut(25));
-
-		panel.add(makeStatusPanel(n, 0, "connection"));
-		panel.add(Box.createHorizontalStrut(5));
-
-		panel.add(makeStatusPanel(n, 1, "execution"));
-		panel.add(Box.createHorizontalStrut(5));
-
+		addLayoutComp(panel, g, c, label);
+		addLayoutComp(panel, g, c, Box.createHorizontalStrut(50));
+		addLayoutComp(panel, g, c, nodeState[n].timeLabel);
+		addLayoutComp(panel, g, c, Box.createHorizontalStrut(25));
+		addLayoutComp(panel, g, c, makeStatusPanel(n, 0, "connection"));
+		addLayoutComp(panel, g, c, Box.createHorizontalStrut(15));
+		addLayoutComp(panel, g, c, makeStatusPanel(n, 1, "execution"));
+		addLayoutComp(panel, g, c, Box.createHorizontalStrut(15));
 		label = new JLabel("tasks");
 		label.setBackground(Color.BLACK);
 		label.setForeground(Color.WHITE);
-		JPanel labelPanel = new JPanel();
-		labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
-		labelPanel.add(label);
-		labelPanel.setBackground(Color.BLACK);
-		panel.add(labelPanel);
+		addLayoutComp(panel, g, c, label);
 		panel.add(Box.createHorizontalStrut(5));
 		nodeState[n].countLabel.setPreferredSize(new Dimension(60, 20));
-		panel.add(nodeState[n].countLabel);
-		//panel.add(Box.createHorizontalStrut(25));
-		panel.add(Box.createHorizontalGlue());
-		panel.setPreferredSize(new Dimension(170, 20));
+		addLayoutComp(panel, g, c, nodeState[n].countLabel);
 
 		return panel;
+	}
+	
+	/**
+	 * Add a component to a panel with the specified constaints.
+	 * @param panel the panel to add the component to.
+	 * @param g the <code>GridBagLayout</code> set on the panel.
+	 * @param c the constraints to apply to the component.
+	 * @param comp the component to add.
+	 */
+	private void addLayoutComp(JPanel panel, GridBagLayout g, GridBagConstraints c, Component comp)
+	{
+		g.setConstraints(comp, c);
+    panel.add(comp);
 	}
 	
 	/**
@@ -218,7 +216,7 @@ public class NodePanel extends JPanel
 	 * @param file the file to get the icon from.
 	 * @return an <code>ImageIcon</code> instance.
 	 */
-	protected static ImageIcon loadImage(String file)
+	public static ImageIcon loadImage(String file)
 	{
 		String path = IMAGE_PATH + "/" + file;
 		int MAX_IMAGE_SIZE = 15000;
@@ -349,7 +347,7 @@ public class NodePanel extends JPanel
 			{
 				public void run()
 				{
-					String s = toStringDuration(System.currentTimeMillis() - startedAt);
+					final String s = toStringDuration(System.currentTimeMillis() - startedAt);
 					timeLabel.setText("Active for: "+s);
 				}
 			};

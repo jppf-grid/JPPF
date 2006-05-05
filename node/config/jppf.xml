@@ -36,6 +36,12 @@ USA
 
 	<number id="nbThreads" type="spinbutton" arg="-nbThreads %" _label="Number of threads" low="1" high="10" default="1"/>
 	<string id="host" _label="Server host or address" arg="-host %" default="localhost"/>
+	<number id="nbLogos" type="slider" arg="-nbLogos %" _label="Number of flying logos"
+		_low-label="Few" _high-label="Many" low="1" high="10" default="3"/>
+	<number id="speed" type="slider" arg="-speed %" _label="Speed of flying logos"
+		_low-label="Slow" _high-label="Fast" low="1" high="10" default="5"/>
+
+
   <_description>
 A JPPF node running as a screen saver
   </_description>
