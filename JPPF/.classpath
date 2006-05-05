@@ -13,5 +13,7 @@
 			<attribute value="file:/C:/Tools/jfreechart-1.0.1/javadoc/" name="javadoc_location"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="lib/saverbeans-sdk/saverbeans-ant.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/saverbeans-sdk/saverbeans-api.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
