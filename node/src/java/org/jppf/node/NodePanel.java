@@ -22,11 +22,8 @@ package org.jppf.node;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.text.*;
-import java.util.*;
-
+import java.text.NumberFormat;
 import javax.swing.*;
-
 import org.jppf.node.event.*;
 import org.jppf.utils.*;
 
@@ -39,31 +36,27 @@ public class NodePanel extends JPanel
 	/**
 	 * Path to the images to display in the UI.
 	 */
-	private static final String IMAGE_PATH = "/org/jppf/node";
+	public static final String IMAGE_PATH = "/org/jppf/node";
 	/**
 	 * Image dispalying a bright green traffic light.
 	 */
-	private static final ImageIcon BRIGHT_GREEN = loadImage("active_greenlight.gif");
+	private static final ImageIcon BRIGHT_GREEN = loadImage(IMAGE_PATH + "/" + "active_greenlight.gif");
 	/**
 	 * Image dispalying a dark green traffic light.
 	 */
-	private static final ImageIcon DARK_GREEN = loadImage("inactive_greenlight.gif");
+	private static final ImageIcon DARK_GREEN = loadImage(IMAGE_PATH + "/" + "inactive_greenlight.gif");
 	/**
 	 * Image dispalying a bright red traffic light.
 	 */
-	private static final ImageIcon BRIGHT_RED = loadImage("active_redlight.gif");
+	private static final ImageIcon BRIGHT_RED = loadImage(IMAGE_PATH + "/" + "active_redlight.gif");
 	/**
 	 * Image dispalying a dark red traffic light.
 	 */
-	private static final ImageIcon DARK_RED = loadImage("inactive_redlight.gif");
-	/**
-	 * Path to the images to display in the UI.
-	 */
-	public static int MAX_NODES = 1;
+	private static final ImageIcon DARK_RED = loadImage(IMAGE_PATH + "/" + "inactive_redlight.gif");
 	/**
 	 * Holds the states of all nodes.
 	 */
-	private NodeState[] nodeState = new NodeState[MAX_NODES];
+	public NodeState nodeState = null;
 
 	/**
 	 * Initialize this UI.
@@ -107,28 +100,20 @@ public class NodePanel extends JPanel
     GridBagConstraints c = new GridBagConstraints();
     c.gridx = 0;
 		setBackground(Color.BLACK);
-		ImageIcon logo = loadImage("jppf-at-home.gif");
+		ImageIcon logo = loadImage(IMAGE_PATH + "/" + "jppf-at-home.gif");
 		JLabel logoLabel = new JLabel(logo);
 		addLayoutComp(this, g, c, logoLabel);
 		addLayoutComp(this, g, c, Box.createVerticalStrut(10));
-		for (int i=0; i<MAX_NODES; i++)
-		{
-			addLayoutComp(this, g, c, createNodePanel(i));
-			if (i < MAX_NODES - 1)
-				addLayoutComp(this, g, c, Box.createVerticalStrut(5));
-		}
-		for (NodeState state: nodeState)
-		{
-			state.startNode();
-		}
+		addLayoutComp(this, g, c, createNodePanel());
+		addLayoutComp(this, g, c, Box.createVerticalStrut(5));
+		nodeState.startNode();
 	}
 
 	/**
 	 * Create a panel showing the activity of a node.
-	 * @param n the unique index of the node.
 	 * @return a panel with some node information about is activity. 
 	 */
-	private JPanel createNodePanel(int n)
+	private JPanel createNodePanel()
 	{
 		JPanel panel = new JPanel();
 		GridBagLayout g = new GridBagLayout();
@@ -136,7 +121,7 @@ public class NodePanel extends JPanel
     c.gridy = 0;
 		panel.setLayout(g);
 		panel.setBackground(Color.BLACK);
-		nodeState[n] = new NodeState();
+		nodeState = new NodeState();
 
 		addLayoutComp(panel, g, c, Box.createHorizontalStrut(25));
 		JLabel label = new JLabel("JPPF Node");
@@ -144,19 +129,19 @@ public class NodePanel extends JPanel
 		label.setForeground(Color.WHITE);
 		addLayoutComp(panel, g, c, label);
 		addLayoutComp(panel, g, c, Box.createHorizontalStrut(50));
-		addLayoutComp(panel, g, c, nodeState[n].timeLabel);
+		addLayoutComp(panel, g, c, nodeState.timeLabel);
 		addLayoutComp(panel, g, c, Box.createHorizontalStrut(25));
-		addLayoutComp(panel, g, c, makeStatusPanel(n, 0, "connection"));
+		addLayoutComp(panel, g, c, makeStatusPanel(0, "connection"));
 		addLayoutComp(panel, g, c, Box.createHorizontalStrut(15));
-		addLayoutComp(panel, g, c, makeStatusPanel(n, 1, "execution"));
+		addLayoutComp(panel, g, c, makeStatusPanel(1, "execution"));
 		addLayoutComp(panel, g, c, Box.createHorizontalStrut(15));
 		label = new JLabel("tasks");
 		label.setBackground(Color.BLACK);
 		label.setForeground(Color.WHITE);
 		addLayoutComp(panel, g, c, label);
 		panel.add(Box.createHorizontalStrut(5));
-		nodeState[n].countLabel.setPreferredSize(new Dimension(60, 20));
-		addLayoutComp(panel, g, c, nodeState[n].countLabel);
+		nodeState.countLabel.setPreferredSize(new Dimension(60, 20));
+		addLayoutComp(panel, g, c, nodeState.countLabel);
 
 		return panel;
 	}
@@ -176,12 +161,11 @@ public class NodePanel extends JPanel
 	
 	/**
 	 * Generate a panel display the status of the connection or execution.
-	 * @param nodeIdx index of the node the panel is for.
 	 * @param statusIdx index of the status to display: 0 for connection, 1 for execution.
 	 * @param text the text to display on the left of the status lights.
 	 * @return a <code>JPanel</code> instance.
 	 */
-	private JPanel makeStatusPanel(int nodeIdx, int statusIdx, String text)
+	private JPanel makeStatusPanel(int statusIdx, String text)
 	{
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -198,9 +182,9 @@ public class NodePanel extends JPanel
 		JPanel statusPanel = new JPanel();
 		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
 		statusPanel.setBackground(Color.BLACK);
-		statusPanel.add(nodeState[nodeIdx].statusLabels[statusIdx][0]);
+		statusPanel.add(nodeState.statusLabels[statusIdx][0]);
 		statusPanel.add(Box.createVerticalStrut(4));
-		statusPanel.add(nodeState[nodeIdx].statusLabels[statusIdx][1]);
+		statusPanel.add(nodeState.statusLabels[statusIdx][1]);
 
 		labelPanel.setPreferredSize(new Dimension(60, 20));
 		panel.add(labelPanel);
@@ -218,13 +202,12 @@ public class NodePanel extends JPanel
 	 */
 	public static ImageIcon loadImage(String file)
 	{
-		String path = IMAGE_PATH + "/" + file;
 		int MAX_IMAGE_SIZE = 15000;
 		int count = 0;
-		InputStream is = NodePanel.class.getResourceAsStream(path);
+		InputStream is = NodePanel.class.getResourceAsStream(file);
 		if (is == null)
 		{
-			System.err.println("Couldn't find file: " + path);
+			System.err.println("Couldn't find file: " + file);
 			return null;
 		}
 		BufferedInputStream bis = new BufferedInputStream(is);
@@ -236,13 +219,13 @@ public class NodePanel extends JPanel
 		}
 		catch (IOException ioe)
 		{
-			System.err.println("Couldn't read stream from file: " + path);
+			System.err.println("Couldn't read stream from file: " + file);
 			ioe.printStackTrace();
 			return null;
 		}
 		if (count <= 0)
 		{
-			System.err.println("Empty file: " + path);
+			System.err.println("Empty file: " + file);
 			return null;
 		}
 		return new ImageIcon(Toolkit.getDefaultToolkit().createImage(buf));
@@ -255,10 +238,7 @@ public class NodePanel extends JPanel
 	{
 		try
 		{
-			for (NodeState state: nodeState)
-			{
-				state.stopNode();
-			}
+			nodeState.stopNode();
 		}
 		catch (Throwable t)
 		{
@@ -306,17 +286,14 @@ public class NodePanel extends JPanel
 		/**
 		 * The time this panel was started.
 		 */
-		public long startedAt = System.currentTimeMillis();
-		/**
-		 * timer used to update the display of activity time.
-		 */
-		private java.util.Timer timer = null;
+		public long startedAt = 0L;
 
 		/**
 		 * Initialize this node state.
 		 */
 		public NodeState()
 		{
+			startedAt = System.currentTimeMillis();
 			for (int i=0; i<statusLabels.length; i++)
 			{
 				statusLabels[i][0] = new JLabel(DARK_GREEN);
@@ -342,16 +319,6 @@ public class NodePanel extends JPanel
 			timeLabel = new JLabel("Active for: "+toStringDuration(0));
 			timeLabel.setBackground(Color.BLACK);
 			timeLabel.setForeground(Color.WHITE);
-			timer = new java.util.Timer();
-			TimerTask task = new TimerTask()
-			{
-				public void run()
-				{
-					final String s = toStringDuration(System.currentTimeMillis() - startedAt);
-					timeLabel.setText("Active for: "+s);
-				}
-			};
-			timer.scheduleAtFixedRate(task, 1000, 1000);
 			nodeThread = new NodeThread(this);
 			btn[0] = new JButton("Start");
 			btn[0].addActionListener(new ActionListener()
@@ -393,7 +360,6 @@ public class NodePanel extends JPanel
 		 */
 		public void stopNode()
 		{
-			if (timer != null) timer.cancel();
 			btn[0].setEnabled(true);
 			btn[1].setEnabled(false);
 			nodeThread.stopNode();
@@ -433,6 +399,9 @@ public class NodePanel extends JPanel
 			{
 				statusLabels[1][0].setIcon(DARK_GREEN);
 				statusLabels[1][1].setIcon(BRIGHT_RED);
+			}
+			else if (NodeEvent.TASK_EXECUTED.equals(type))
+			{
 				taskCount++;
 				countLabel.setText(""+taskCount);
 			}

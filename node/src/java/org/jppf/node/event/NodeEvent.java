@@ -51,6 +51,10 @@ public class NodeEvent extends EventObject
 	 * Event type to specify a node finished executing a task. 
 	 */
 	public static String END_EXEC = "end.exec";
+	/**
+	 * Event type to specify a task was executed. 
+	 */
+	public static String TASK_EXECUTED = "task.executed";
 
 	/**
 	 * Initialize this event with a specified event source.

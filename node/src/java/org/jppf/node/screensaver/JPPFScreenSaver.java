@@ -20,13 +20,12 @@
 package org.jppf.node.screensaver;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import java.util.Timer;
-
 import javax.swing.*;
-
 import org.jdesktop.jdic.screensaver.*;
-import org.jppf.node.*;
+import org.jppf.node.NodePanel;
 import org.jppf.utils.*;
 
 /**
@@ -62,7 +61,7 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	/**
 	 * Timer used to update the position of the flying logos at regular intervals.
 	 */
-	private Timer timer = new Timer();
+	private Timer timer = null;
 	/**
 	 * Width of the logo.
 	 */
@@ -71,6 +70,17 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	 * Height of the logo.
 	 */
 	int imgh = 0;
+	/**
+	 * The image object for the flying logos.
+	 */
+	private Image logoImg = null;
+
+	/**
+	 * Default constructor.
+	 */
+	public JPPFScreenSaver()
+	{
+	}
 	
 	/**
 	 * Initialize the UI components.
@@ -80,12 +90,81 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	{
 		try
 		{
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			for (Frame frame: Frame.getFrames()) SwingUtilities.updateComponentTreeUI(frame);
+			try
+			{
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				for (Frame frame: Frame.getFrames())
+				{
+					SwingUtilities.updateComponentTreeUI(frame);
+					frame.addWindowListener(new WindowAdapter()
+					{
+						public void windowClosing(WindowEvent e)
+						{
+							destroy();
+							System.exit(0);
+						}
+					});
+				}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			initializeSettings();
+			data = new ImageData[nbLogos];
+			for (int i=0; i<nbLogos; i++) data[i] = new ImageData();
+			parent = (Container) getContext().getComponent();
+			parent.setBackground(Color.BLACK);
+			if (node == null) node = new NodePanel();
+			node.setDoubleBuffered(true);
+			parent.add(node);
+			initializeFlyingLogos();
+	
+			Dimension dim = parent.getSize();
+			Random rand = new Random(System.currentTimeMillis());
+			for (int i=0; i<nbLogos; i++)
+			{
+				int n = dim.width - imgw;
+				if (n <= 0) n = imgw;
+				data[i].x = rand.nextInt(n);
+				data[i].prevx = data[i].x;
+				data[i].stepX *= 2 * rand.nextInt(2) - 1; 
+				n = dim.height - imgh;
+				if (n <= 0) n = imgh;
+				data[i].y = rand.nextInt(n);
+				data[i].prevy = data[i].y;
+				data[i].stepY *= 2 * rand.nextInt(2) - 1; 
+			}
+			setDoubledBuffering(node);
+			if (timer == null)
+			{
+				timer = new Timer();
+				timer.schedule(new LogoUpdateTask(), 100, 25 + 5 * (11 - speed));
+				// 25 frames/sec = 40ms/frame
+				timer.schedule(new LogoDisplayTask(), 500, 33);
+				TimerTask task = new TimerTask()
+				{
+					public void run()
+					{
+						
+						String s = NodePanel.toStringDuration(System.currentTimeMillis() - node.nodeState.startedAt);
+						node.nodeState.timeLabel.setText("Active for: "+s);
+					}
+				};
+				timer.scheduleAtFixedRate(task, 1000, 1000);
+			}
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Initialize the parameters of the screensaver.
+	 */
+	private void initializeSettings()
+	{
 		ScreensaverSettings settings = getContext().getSettings();
 		System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, "jppf-node.properties");
 		String s = settings.getProperty("host");
@@ -100,36 +179,21 @@ public class JPPFScreenSaver extends SimpleScreensaver
 		if (nbLogos < 1) nbLogos = 1;
 		if (nbLogos > 10) nbLogos = 10;
 
-		speed = getIntSetting("speed", 10);
+		speed = getIntSetting("speed", 5);
 		if (speed < 1) speed = 1;
 		if (speed > 10) speed = 10;
+	}
 
-		data = new ImageData[nbLogos];
-		for (int i=0; i<nbLogos; i++)
-		{
-			data[i] = new ImageData();
-		}
-		parent = (Container) getContext().getComponent();
-		logo = NodePanel.loadImage("logo-small.gif");
+	/**
+	 * Read the logos image file and initialize the graphics objects
+	 * required to render them.
+	 */
+	private void initializeFlyingLogos()
+	{
+		logo = NodePanel.loadImage(NodePanel.IMAGE_PATH + "/" + "logo-small.gif");
+		logoImg = logo.getImage();
 		imgw = logo.getIconWidth();
 		imgh = logo.getIconHeight();
-
-		//parent.setDoubleBuffered(true);
-		Dimension dim = parent.getSize();
-		Random rand = new Random(System.currentTimeMillis());
-		for (int i=0; i<nbLogos; i++)
-		{
-			data[i].x = rand.nextInt(dim.width - imgw);
-			data[i].stepX *= 2 * rand.nextInt(2) - 1; 
-			data[i].y = rand.nextInt(dim.height - imgh);
-			data[i].stepY *= 2 * rand.nextInt(2) - 1; 
-		}
-		parent.setBackground(Color.BLACK);
-		node = new NodePanel();
-		node.setDoubleBuffered(true);
-		parent.add(node);
-		setDoubledBuffering(node);
-		timer.schedule(new LogoTask(), 500, 10 * (11 - speed));
 	}
 	
 	/**
@@ -183,7 +247,12 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	protected void destroy()
 	{
 		timer.cancel();
-		node.cleanup();
+		if (node != null)
+		{
+			node.cleanup();
+			parent.remove(node);
+			node = null;
+		}
 	}
 	
 	/**
@@ -216,11 +285,45 @@ public class JPPFScreenSaver extends SimpleScreensaver
 		 */
 		public int stepY = 1;
 	}
-	
+
+	/**
+	 * Timer task to display the logos at a rate of 25 frames/sec.
+	 */
+	public class LogoDisplayTask  extends TimerTask
+	{
+		/**
+		 * The task that renders the flying logos.
+		 */
+		Runnable task = null;
+
+		/**
+		 * Initialize the task that renders the flying logos.
+		 */
+		public LogoDisplayTask()
+		{
+			task = new Runnable()
+			{
+				public void run()
+				{
+					updateLogos();
+				}
+			};
+		}
+
+		/**
+		 * Update the position and direction of the flying logos.
+		 * @see java.util.TimerTask#run()
+		 */
+		public void run()
+		{
+			SwingUtilities.invokeLater(task);
+		}
+	}
+
 	/**
 	 * Timer task to update the position and direction of the flying logos.
 	 */
-	private class LogoTask extends TimerTask
+	private class LogoUpdateTask extends TimerTask
 	{
 		/**
 		 * Update the position and direction of the flying logos.
@@ -231,26 +334,20 @@ public class JPPFScreenSaver extends SimpleScreensaver
 			Dimension dim = parent.getSize();
 			for (ImageData d: data)
 			{
-				d.prevx = d.x;
-				d.prevy = d.y;
-				if ((d.x + d.stepX < 0) || (d.x + d.stepX + imgw > dim.width))
+				synchronized(d)
 				{
-					d.stepX = -d.stepX;
+					if ((d.x + d.stepX < 0) || (d.x + d.stepX + imgw > dim.width))
+					{
+						d.stepX = -d.stepX;
+					}
+					if ((d.y + d.stepY < 0) || (d.y + d.stepY + imgh > dim.height))
+					{
+						d.stepY = -d.stepY;
+					}
+					d.x += d.stepX;
+					d.y += d.stepY;
 				}
-				if ((d.y + d.stepY < 0) || (d.y + d.stepY + imgh > dim.height))
-				{
-					d.stepY = -d.stepY;
-				}
-				d.x += d.stepX;
-				d.y += d.stepY;
 			}
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					updateLogos();
-				}
-			});
 		}
 	}
 
@@ -264,14 +361,16 @@ public class JPPFScreenSaver extends SimpleScreensaver
 		Shape clip = g.getClip();
 		for (ImageData d: data)
 		{
-			int x1 = Math.min(d.x, d.prevx); 
-			int y1 = Math.min(d.y, d.prevy);
-			Rectangle r = new Rectangle(x1, y1, imgw + 2, imgh + 2);
-			g.setClip(r);
-			parent.paint(g);
-			node.paint(g);
-			g.setClip(clip);
-			g.drawImage(logo.getImage(), d.x, d.y, node);
+			synchronized(d)
+			{
+				g.setClip(d.prevx, d.prevy, imgw, imgh);
+				parent.paint(g);
+				node.paint(g);
+				g.drawImage(logoImg, d.x, d.y, node);
+				d.prevx = d.x;
+				d.prevy = d.y;
+			}
 		}
+		g.setClip(clip);
 	}
 }

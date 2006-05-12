@@ -43,6 +43,7 @@ public class NodeThread extends Thread
 	 */
 	public NodeThread(NodeListener listener)
 	{
+		super("NodeThread thread");
 		this.listener = listener;
 	}
 

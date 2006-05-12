@@ -27,6 +27,7 @@ USA
 	<!-- ========================================================================= -->
 
 	<property name="JPPF.dir" value="${basedir}/../JPPF" />
+	<property file="${JPPF.dir}/bin/build.properties"/>
 	<property name="JPPF.build.dir" value="${JPPF.dir}/build" />
  	<property name="saverbeans.path" value="${JPPF.dir}/lib/saverbeans-sdk"/>
 	<property name="screensaver.dir" value="${JPPF.build.dir}/screensaver" />
@@ -98,9 +99,11 @@ USA
 	    <classpath refid="compile.classpath"/>
 		</javac>
 		<copy todir="${build}/share">
-			<fileset dir="${src}">
-				<exclude name="**/CVS" />
-				<exclude name="**/*.java" />
+			<fileset dir="${JPPF.dir}/config/node">
+				<include name="**" />
+			</fileset>
+			<fileset dir="${JPPF.dir}/bin">
+				<include name="build.number" />
 			</fileset>
 			<fileset dir="${res}">
 				<exclude name="**/CVS" />
@@ -148,7 +151,8 @@ USA
 				<include name="COPYING" />
 			</fileset>
 		</copy>
-		<zip destfile="${JPPF.build.dir}/${screensaver}-screensaver-win32.zip" basedir="${dist}/${screensaver}-win32" includes="**"/>
+		<zip destfile="${JPPF.build.dir}/${screensaver}-${version.number}-screensaver-win32.zip"
+			basedir="${dist}/${screensaver}-win32" includes="**"/>
 
 		<!-- Create distribution for Unix: -->
 		<mkdir dir="${dist}/${screensaver}-unix" />
@@ -167,7 +171,8 @@ USA
 				<include name="COPYING" />
 			</fileset>
 		</copy>
-		<zip destfile="${JPPF.build.dir}/${screensaver}-screensaver-unix.zip" basedir="${dist}/${screensaver}-unix" includes="**"/>
+		<zip destfile="${JPPF.build.dir}/${screensaver}-${version.number}-screensaver-unix.zip"
+			basedir="${dist}/${screensaver}-unix" includes="**"/>
 
   	<!-- remove all intermediate files -->
 		<delete dir="${screensaver.dir}"/>

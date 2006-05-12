@@ -29,13 +29,20 @@ import org.apache.log4j.*;
 public class Log4jInitializer
 {
 	/**
+	 * Set to true once initialization is complete.
+	 */
+	private static boolean initialized = false;
+
+	/**
 	 * Configure log4j from a configuration file located in the classpath.
 	 * @param path the path to the configuration file.
 	 */
 	public static void configureFromClasspath(String path)
 	{
+		if (initialized) return;
 		LogManager.resetConfiguration();
 		URL url = Log4jInitializer.class.getClassLoader().getResource(path);
 		PropertyConfigurator.configure(url);
+		initialized = true;
 	}
 }
