@@ -207,10 +207,10 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	private class CSendingJob implements State {
 
 		/**
-		 * 
-		 * @param key
-		 * @param context
-		 * @throws IOException
+		 * Send an execution request to the node.
+		 * @param key the selector key associated with the socket channel to the node.
+		 * @param context a container for the tasks to execute.
+		 * @throws IOException if an error occurred while sending the request.
 		 * @see org.jppf.server.JPPFNIOServer.State#exec(java.nio.channels.SelectionKey, org.jppf.server.JPPFNIOServer.Context)
 		 */
 		public void exec(SelectionKey key, Context context) throws IOException {
@@ -264,16 +264,16 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 
 	/**
 	 * This class implements the state of receiving the bundle
-	 * back from processing at a node. The "wainting" part in 
+	 * back from processing at a node. The "waiting" part is 
 	 * provided by the selector, which will any for the first
 	 * bytes be ready to send to the instances of this class.
 	 */
 	private class CWaitingResult implements State {
 
 		/**
-		 * 
-		 * @param key
-		 * @param context
+		 * Receive the results of a task bundle execution.
+		 * @param key the selector key associated with the socket channel to the node.
+		 * @param context a container for the execution results.
 		 * @see org.jppf.server.JPPFNIOServer.State#exec(java.nio.channels.SelectionKey, org.jppf.server.JPPFNIOServer.Context)
 		 */
 		public void exec(SelectionKey key, Context context) {
@@ -472,34 +472,37 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	}
 
 	/**
-	 * 
+	 * Instances of this class encapsulate execution requests to send to
+	 * the nodes.
 	 */
 	private class TaskRequest {
 		/**
-		 * 
+		 * The request data. 
 		 */
 		private Request request;
 
 		/**
-		 * 
+		 * Buffer used to send the request data over a socket channel.
 		 */
 		private ByteBuffer sending;
 
 		/**
-		 * 
+		 * Container for the tasks and associated metadata.
 		 */
 		private JPPFTaskBundle bundle;
 
 		/**
-		 * 
+		 * Length in bytes of the request data to send or receive.
 		 */
 		private long bundleBytes;
 
 		/**
-		 * @param request
-		 * @param sending
-		 * @param bundle
-		 * @param bundleBytes
+		 * Initialize this task request with the specified request data,
+		 * sending buffer, bundle data and bundle bytes length.
+		 * @param request the request data.
+		 * @param sending buffer used to send the request data over a socket channel.
+		 * @param bundle container for the tasks and associated metadata.
+		 * @param bundleBytes length in bytes of the request data to send or recieve.
 		 */
 		public TaskRequest(Request request, ByteBuffer sending,
 				JPPFTaskBundle bundle, long bundleBytes) {
@@ -511,32 +514,32 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 		}
 
 		/**
-		 * 
-		 * @return
+		 * Get the request data of this task request.
+		 * @return a <code>Request</code> instance.
 		 */
 		public Request getRequest() {
 			return request;
 		}
 
 		/**
-		 * 
-		 * @return
+		 * Get the buffer used to send the request data over a socket channel.
+		 * @return a <code>ByteBuffer</code> instance.
 		 */
 		public ByteBuffer getSending() {
 			return sending;
 		}
 
 		/**
-		 * 
-		 * @return
+		 * Get the container for the tasks and associated metadata.
+		 * @return a <code>JPPFTaskBundle</code> instance.
 		 */
 		public JPPFTaskBundle getBundle() {
 			return bundle;
 		}
 
 		/**
-		 * 
-		 * @return
+		 * Get the length in bytes of the request data to send or receive.
+		 * @return the length as a long value.
 		 */
 		public long getBundleBytes() {
 			return bundleBytes;
