@@ -425,19 +425,20 @@ public class JPPFNode implements MonitoredNode
 	 * Decrement the count of currently executing tasks and determine whether
 	 * an idle notification should be sent.
 	 */
-	private void decrementExecutingCount()
+	private synchronized void decrementExecutingCount()
 	{
 		if (executingCount.decrementAndGet() == 0)
 		{
 			fireNodeEvent(EventType.END_EXEC);
 		}
+		fireNodeEvent(EventType.TASK_EXECUTED);
 	}
 	
 	/**
 	 * Increment the count of currently executing tasks and determine whether
 	 * a busy notification should be sent.
 	 */
-	private void incrementExecutingCount()
+	private synchronized void incrementExecutingCount()
 	{
 		if (executingCount.incrementAndGet() == 1)
 		{
