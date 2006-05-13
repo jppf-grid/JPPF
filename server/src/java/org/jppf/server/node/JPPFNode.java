@@ -28,6 +28,7 @@ import org.jppf.*;
 import org.jppf.comm.socket.*;
 import org.jppf.node.*;
 import org.jppf.node.event.*;
+import org.jppf.node.event.NodeEvent.EventType;
 import org.jppf.server.JPPFTaskBundle;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
@@ -136,7 +137,7 @@ public class JPPFNode implements MonitoredNode
 				}
 			}
 		}
-		if (notifying) fireNodeEvent(NodeEvent.DISCONNECTED);
+		if (notifying) fireNodeEvent(EventType.DISCONNECTED);
 	}
 
 	/**
@@ -149,7 +150,7 @@ public class JPPFNode implements MonitoredNode
 		while (!stopped)
 		{
 			Pair<JPPFTaskBundle, List<JPPFTask>> pair = readTask();
-			if (notifying) fireNodeEvent(NodeEvent.START_EXEC);
+			if (notifying) fireNodeEvent(EventType.START_EXEC);
 			JPPFTaskBundle bundle = pair.first();
 			List<JPPFTask> taskList = pair.second();
 			List<Future> futureList = new ArrayList<Future>(taskList.size());
@@ -177,10 +178,10 @@ public class JPPFNode implements MonitoredNode
 	public synchronized void init() throws Exception
 	{
 		if (socketClient == null) initSocketClient();
-		if (notifying) fireNodeEvent(NodeEvent.START_CONNECT);
+		if (notifying) fireNodeEvent(EventType.START_CONNECT);
 		System.out.println("JPPFNode.init(): Attempting connection to the JPPF driver");
 		socketInitializer.initializeSocket(socketClient);
-		if (notifying) fireNodeEvent(NodeEvent.END_CONNECT);
+		if (notifying) fireNodeEvent(EventType.END_CONNECT);
 		System.out.println("JPPFNode.init(): Reconnected to the JPPF driver");
 		TypedProperties props = JPPFConfiguration.getProperties();
 		threadPool = Executors.newFixedThreadPool(props.getInt("processing.threads", 1));
@@ -390,10 +391,10 @@ public class JPPFNode implements MonitoredNode
 
 	/**
 	 * Notify all listeners that an event has occurred.
-	 * @param eventType the type of the event as a string.
+	 * @param eventType the type of the event as an enumerated value.
 	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(java.lang.String)
 	 */
-	public void fireNodeEvent(String eventType)
+	public void fireNodeEvent(EventType eventType)
 	{
 		NodeEvent event = new NodeEvent(eventType);
 		for (NodeListener listener : listeners)
@@ -428,7 +429,7 @@ public class JPPFNode implements MonitoredNode
 	{
 		if (executingCount.decrementAndGet() == 0)
 		{
-			fireNodeEvent(NodeEvent.END_EXEC);
+			fireNodeEvent(EventType.END_EXEC);
 		}
 	}
 	
@@ -440,7 +441,7 @@ public class JPPFNode implements MonitoredNode
 	{
 		if (executingCount.incrementAndGet() == 1)
 		{
-			fireNodeEvent(NodeEvent.START_EXEC);
+			fireNodeEvent(EventType.START_EXEC);
 		}
 	}
 	

@@ -25,6 +25,7 @@ import java.io.*;
 import java.text.NumberFormat;
 import javax.swing.*;
 import org.jppf.node.event.*;
+import org.jppf.node.event.NodeEvent.EventType;
 import org.jppf.utils.*;
 
 /**
@@ -372,35 +373,35 @@ public class NodePanel extends JPanel
 		 */
 		public void eventOccurred(NodeEvent event)
 		{
-			String type = event.getType();
-			if (NodeEvent.START_CONNECT.equals(type))
+			EventType type = event.getType();
+			if (EventType.START_CONNECT.equals(type))
 			{
 				statusLabels[0][0].setIcon(DARK_GREEN);
 				statusLabels[0][1].setIcon(BRIGHT_RED);
 			}
-			else if (NodeEvent.END_CONNECT.equals(type))
+			else if (EventType.END_CONNECT.equals(type))
 			{
 				statusLabels[0][0].setIcon(BRIGHT_GREEN);
 				statusLabels[0][1].setIcon(DARK_RED);
 			}
-			else if (NodeEvent.DISCONNECTED.equals(type))
+			else if (EventType.DISCONNECTED.equals(type))
 			{
 				statusLabels[0][0].setIcon(DARK_GREEN);
 				statusLabels[0][1].setIcon(BRIGHT_RED);
 				statusLabels[1][0].setIcon(DARK_GREEN);
 				statusLabels[1][1].setIcon(DARK_RED);
 			}
-			else if (NodeEvent.START_EXEC.equals(type))
+			else if (EventType.START_EXEC.equals(type))
 			{
 				statusLabels[1][0].setIcon(BRIGHT_GREEN);
 				statusLabels[1][1].setIcon(DARK_RED);
 			}
-			else if (NodeEvent.END_EXEC.equals(type))
+			else if (EventType.END_EXEC.equals(type))
 			{
 				statusLabels[1][0].setIcon(DARK_GREEN);
 				statusLabels[1][1].setIcon(BRIGHT_RED);
 			}
-			else if (NodeEvent.TASK_EXECUTED.equals(type))
+			else if (EventType.TASK_EXECUTED.equals(type))
 			{
 				taskCount++;
 				countLabel.setText(""+taskCount);

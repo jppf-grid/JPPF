@@ -20,6 +20,7 @@
 package org.jppf.node;
 
 import org.jppf.node.event.NodeListener;
+import org.jppf.node.event.NodeEvent.EventType;
 
 /**
  * Interface for a node that provides information about its activity.
@@ -39,9 +40,9 @@ public interface MonitoredNode extends Runnable
 	void removeNodeListener(NodeListener listener);
 	/**
 	 * Notify all listeners that an event has occurred.
-	 * @param eventType the type of the event as a string.
+	 * @param eventType the type of the event as an enumerated value.
 	 */
-	void fireNodeEvent(String eventType);
+	void fireNodeEvent(EventType eventType);
 	/**
 	 * Stop this node and release the resources it is using.
 	 */

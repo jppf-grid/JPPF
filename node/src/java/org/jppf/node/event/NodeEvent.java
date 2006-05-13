@@ -28,49 +28,53 @@ import java.util.EventObject;
 public class NodeEvent extends EventObject
 {
 	/**
-	 * 
+	 * Enumeration of all possible event types.
 	 */
-	private static final long serialVersionUID = -8382232218856942352L;
-	/**
-	 * Event type to specify a node is about to attempt connecting to the server. 
-	 */
-	public static String START_CONNECT = "start.connect";
-	/**
-	 * Event type to specify a node has successfully connected to the server. 
-	 */
-	public static String END_CONNECT = "end.connect";
-	/**
-	 * Event type to specify a node is disconnected form the server. 
-	 */
-	public static String DISCONNECTED = "disconnected";
-	/**
-	 * Event type to specify a node is starting to execute a task. 
-	 */
-	public static String START_EXEC = "start.exec";
-	/**
-	 * Event type to specify a node finished executing a task. 
-	 */
-	public static String END_EXEC = "end.exec";
-	/**
-	 * Event type to specify a task was executed. 
-	 */
-	public static String TASK_EXECUTED = "task.executed";
+	public enum EventType
+	{
+		/**
+		 * Event type to specify a node is about to attempt connecting to the server. 
+		 */
+		START_CONNECT,
+		/**
+		 * Event type to specify a node has successfully connected to the server. 
+		 */
+		END_CONNECT,
+		/**
+		 * Event type to specify a node is disconnected from the server. 
+		 */
+		DISCONNECTED,
+		/**
+		 * Event type to specify a node is starting to execute one or more tasks,
+		 * and is switching from idle to executing state. 
+		 */
+		START_EXEC,
+		/**
+		 * Event type to specify a node finished executing one or more tasks,
+		 * and is switching from executing to idle state. 
+		 */
+		END_EXEC,
+		/**
+		 * Event type to specify a task was executed. 
+		 */
+		TASK_EXECUTED
+	}
 
 	/**
 	 * Initialize this event with a specified event source.
 	 * @param source the source of the event.
 	 */
-	public NodeEvent(String source)
+	public NodeEvent(EventType source)
 	{
 		super(source);
 	}
 	
 	/**
 	 * Get the type of this event.
-	 * @return the type as a string.
+	 * @return the type of event as an enumerated value.
 	 */
-	public String getType()
+	public EventType getType()
 	{
-		return (String) getSource();
+		return (EventType) getSource();
 	}
 }
