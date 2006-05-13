@@ -13,7 +13,7 @@ import org.jppf.server.JPPFStatsUpdater;
 public class FixedSizedBundler implements Bundler {
 
 	public FixedSizedBundler(){
-		log.info("Using user-defined bundle size");
+		LOG.info("Using user-defined bundle size");
 	}
 	public int getBundleSize() {
 		return JPPFStatsUpdater.getStaticBundleSize();

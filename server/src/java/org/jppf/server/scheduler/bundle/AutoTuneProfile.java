@@ -40,7 +40,4 @@ public interface AutoTuneProfile {
 	 * @return an always positive diff to be applied to bundle size
 	 */
 	int createDiff(int bestSize, int collectedSamples, Random rnd);
-
-	
-
 }

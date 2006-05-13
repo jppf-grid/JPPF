@@ -14,7 +14,7 @@ public interface Bundler {
 	/**
 	 * Log4j logger for this class.
 	 */
-	static Logger log = Logger.getLogger(Bundler.class);
+	Logger LOG = Logger.getLogger(Bundler.class);
 	
 	/**
 	 * @return the current size of bundle

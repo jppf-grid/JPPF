@@ -36,12 +36,12 @@ public class AutoTunedBundler implements Bundler {
 	 * Creates a new instance with the initial size of bundle as the start size.
 	 */
 	public AutoTunedBundler(AutoTuneProfile profile) {
-		log.info("Using Auto-Tuned bundle size");
+		LOG.info("Using Auto-Tuned bundle size");
 		currentSize = JPPFStatsUpdater.getStaticBundleSize();
 		if (currentSize < 1) {
 			currentSize = 1;
 		}
-		log.info("The initial size is " + currentSize);
+		LOG.info("The initial size is " + currentSize);
 		this.profile = profile;
 	}
 
@@ -52,9 +52,9 @@ public class AutoTunedBundler implements Bundler {
 	public void feedback(int bundleSize, long totalTime) {
 		assert bundleSize > 0;
 
-		boolean isDebugEnable = log.isDebugEnabled();
+		boolean isDebugEnable = LOG.isDebugEnabled();
 		if (isDebugEnable) {
-			log.debug("Got another sample with bundleSize=" + bundleSize
+			LOG.debug("Got another sample with bundleSize=" + bundleSize
 					+ " and totalTime=" + totalTime);
 		}
 
@@ -85,7 +85,7 @@ public class AutoTunedBundler implements Bundler {
 			if (stable) {
 				if (samples > profile.getMinSamplesToCheckConvergency()
 						&& (Math.abs(stableMean - mean) / stableMean > profile.getMaxDevitation())) {
-					log.info("Detected a change in tasks profile... restarting the discovering process");
+					LOG.info("Detected a change in tasks profile... restarting the discovering process");
 					makeAnalysis = true;
 					stable = false;
 				}
@@ -112,7 +112,7 @@ public class AutoTunedBundler implements Bundler {
 					}
 					currentSize = bestSize + diff;
 					if (samplesMap.get(currentSize) == null) {
-						log.info("The next bundle sized that will be used is "
+						LOG.info("The next bundle sized that will be used is "
 								+ currentSize);
 						return;
 					}
@@ -122,7 +122,7 @@ public class AutoTunedBundler implements Bundler {
 				currentSize = bestSize;
 				stableMean = samplesMap.get(currentSize).mean;
 				samplesMap.clear();
-				log.info("The bundle was converged to size " + currentSize
+				LOG.info("The bundle was converged to size " + currentSize
 						+ " with the mean execution of " + stableMean);
 			}
 		}
