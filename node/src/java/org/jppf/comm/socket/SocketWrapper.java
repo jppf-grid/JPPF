@@ -20,7 +20,7 @@
 package org.jppf.comm.socket;
 
 import java.io.IOException;
-import java.net.ConnectException;
+import java.net.*;
 import org.jppf.utils.*;
 
 /**
@@ -132,4 +132,16 @@ public interface SocketWrapper
 	 * @param port the port number on the remote host.
 	 */
 	void setPort(int port);
+	
+	/**
+	 * Get the underlying socket used by this socket wrapper.
+	 * @return a Socket instance.
+	 */
+	Socket getSocket();
+	
+	/**
+	 * Set the underlying socket to be used by this socket wrapper.
+	 * @param socket a Socket instance.
+	 */
+	void setSocket(Socket socket);
 }

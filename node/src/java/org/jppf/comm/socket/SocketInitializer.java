@@ -76,7 +76,6 @@ public class SocketInitializer
 	 */
 	public void initializeSocket(SocketWrapper socketWrapper)
 	{
-		//System.out.println("SocketInitializer.initializeSocket(): attempting connection to the remote server");
 		String errMsg = "SocketInitializer.initializeSocket(): Could not reconnect to the remote server";
 		String fatalErrMsg = "FATAL: could not initialize the Socket Wrapper!";
 		this.socketWrapper = socketWrapper;
@@ -116,7 +115,6 @@ public class SocketInitializer
 				System.err.println(errMsg);
 				throw new JPPFError(fatalErrMsg);
 			}
-			//System.out.println("SocketInitializer.initializeSocket(): Reconnected to the remote server");
 		}
 		finally
 		{

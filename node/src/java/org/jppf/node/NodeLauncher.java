@@ -19,10 +19,10 @@
  */
 package org.jppf.node;
 
+import java.net.Socket;
 import java.security.*;
-
-import org.jppf.*;
-import org.jppf.security.*;
+import org.jppf.JPPFNodeReloadNotification;
+import org.jppf.security.JPPFPolicy;
 import org.jppf.utils.*;
 
 /**
@@ -39,6 +39,12 @@ public class NodeLauncher
 	 * Determine whether a security manager has already been set.
 	 */
 	private static boolean securityManagerSet = false;
+	/**
+	 * The actual socket connection used by the node.
+	 * Provided as a means to reuse it when the node updates its own code, therefore removing the need to
+	 * disconnect from the server.
+	 */
+	private static Socket nodeSocket = null;
 
 	/**
 	 * Run a node as a standalone application.
@@ -60,10 +66,12 @@ public class NodeLauncher
 				}
 				catch(JPPFNodeReloadNotification notif)
 				{
+					nodeSocket = node.getSocket();
 					System.out.println(notif.getMessage());
 					System.out.println("Reloading this node");
 					classLoader = null;
-					node.stopNode();
+					node.stopNode(false);
+					node.setSocket(null);
 					AccessController.doPrivileged(new PrivilegedAction<Object>()
 					{
 						public Object run()
@@ -94,6 +102,7 @@ public class NodeLauncher
 			setSecurity();
 			Class clazz = getJPPFClassLoader().loadClass("org.jppf.server.node.JPPFNode");
 			MonitoredNode node = (MonitoredNode) clazz.newInstance();
+			node.setSocket(nodeSocket);
 			return node;
 		}
 		catch(Exception e)

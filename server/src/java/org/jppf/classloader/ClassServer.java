@@ -261,10 +261,7 @@ public class ClassServer extends JPPFNIOServer
 							List<RemoteClassRequest> queue = 
 								(List<RemoteClassRequest>) ((Context) providerKey.attachment()).content;
 							byte[] nameArray = name.getBytes();
-							ByteBuffer sending = ByteBuffer.allocateDirect(nameArray.length + 4);
-							sending.putInt(nameArray.length);
-							sending.put(nameArray);
-							sending.flip();
+							ByteBuffer sending = createByteBuffer(nameArray);
 							if (queue.isEmpty()) {
 								try {
 									provider.write(sending);
@@ -308,13 +305,8 @@ public class ClassServer extends JPPFNIOServer
 		 */
 		private void returnOrSchedule(SelectionKey key, Context context, byte[] data) throws IOException {
 			SocketChannel channel = (SocketChannel) key.channel();
-			if(data == null){
-				data = new byte[0];
-			}
-			ByteBuffer sending = ByteBuffer.allocateDirect(data.length + 4);
-			sending.putInt(data.length);
-			sending.put(data);
-			sending.flip();
+			if (data == null) data = new byte[0];
+			ByteBuffer sending = createByteBuffer(data);
 			channel.write(sending);
 			if (sending.hasRemaining()) {
 				context.content = sending;
@@ -338,7 +330,7 @@ public class ClassServer extends JPPFNIOServer
 		 */
 		public void exec(SelectionKey key, Context context) throws IOException {
 			SocketChannel channel = (SocketChannel) key.channel();
-			if(key.isReadable()){
+			if (key.isReadable()){
 				//the provider has closed the connection
 				providerConnections.remove(context.uuid);
 				channel.close();
@@ -356,11 +348,7 @@ public class ClassServer extends JPPFNIOServer
 					SocketChannel destination = request.getChannel();
 					try {
 						SelectionKey destinationKey = destination.keyFor(selector);
-						byte[] classDef = new byte[0];
-						ByteBuffer sending = ByteBuffer.allocateDirect(classDef.length + 4);
-						sending.putInt(classDef.length);
-						sending.put(classDef);
-						sending.flip();
+						ByteBuffer sending = createByteBuffer(new byte[0]);
 						destination.write(sending);
 						((Context) destinationKey.attachment()).content = sending;
 						destinationKey.interestOps(SelectionKey.OP_WRITE);
@@ -377,7 +365,6 @@ public class ClassServer extends JPPFNIOServer
 					key.interestOps(SelectionKey.OP_READ);
 				}
 			}
-
 		}
 	}
 
@@ -402,8 +389,7 @@ public class ClassServer extends JPPFNIOServer
 				requestFilled = fillRequest(channel, out);
 			} catch (IOException e) {
 				providerConnections.remove(context.uuid);
-				ByteBuffer sending = ByteBuffer
-				.allocateDirect(4).putInt(0);
+				ByteBuffer sending = ByteBuffer.allocateDirect(4).putInt(0);
 				SocketChannel destination = request.getChannel();
 				SelectionKey destinationKey = destination.keyFor(selector);
 				((Context) destinationKey.attachment()).content = sending;
@@ -418,7 +404,7 @@ public class ClassServer extends JPPFNIOServer
 				else key.interestOps(SelectionKey.OP_WRITE | SelectionKey.OP_READ);
 				// putting the definition in cache
 				CacheClassContent content =
-					new CacheClassContent(out .getOutput().toByteArray());
+					new CacheClassContent(out.getOutput().toByteArray());
 				CacheClassKey cacheKey =
 					new CacheClassKey(context.uuid, request.getResourceName());
 				classCache.put(cacheKey, content);
@@ -427,10 +413,7 @@ public class ClassServer extends JPPFNIOServer
 				try {
 					SelectionKey destinationKey = destination.keyFor(selector);
 					byte[] classDef = out.getOutput().toByteArray();
-					ByteBuffer sending = ByteBuffer.allocateDirect(classDef.length + 4);
-					sending.putInt(classDef.length);
-					sending.put(classDef);
-					sending.flip();
+					ByteBuffer sending = createByteBuffer(classDef);
 					destination.write(sending);
 					((Context) destinationKey.attachment()).content = sending;
 					destinationKey.interestOps(SelectionKey.OP_WRITE);
@@ -442,6 +425,21 @@ public class ClassServer extends JPPFNIOServer
 			}
 			return;
 		}
+	}
+
+	/**
+	 * Create a <code>ByteBuffer</code> filled with the specified data.
+	 * Before being returned, the buffer's position is set to 0.
+	 * @param data the data used to fill the buffer.
+	 * @return a <code>ByteBuffer</code> instance.
+	 */
+	private ByteBuffer createByteBuffer(byte[] data)
+	{
+		ByteBuffer buffer = ByteBuffer.allocateDirect(data.length + 4);
+		buffer.putInt(data.length);
+		buffer.put(data);
+		buffer.flip();
+		return buffer;
 	}
 
 	/**
@@ -472,11 +470,9 @@ public class ClassServer extends JPPFNIOServer
 		 * @param resource buffer used to read the data from a socket channel.
 		 * @param channel the socket channel encapsulating a non-blocking socket connection.
 		 */
-		public RemoteClassRequest(String res, ByteBuffer resource,
-				SocketChannel channel) {
+		public RemoteClassRequest(String res, ByteBuffer resource, SocketChannel channel) {
 			super();
- 
-			this.res = res;
+ 			this.res = res;
 			this.resource = resource;
 			this.channel = channel;
 		}

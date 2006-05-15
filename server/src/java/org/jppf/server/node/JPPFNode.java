@@ -20,6 +20,7 @@
 package org.jppf.server.node;
 
 import java.io.*;
+import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -106,6 +107,10 @@ public class JPPFNode implements MonitoredNode
 	 * Used to determine when this node is busy or idle.
 	 */
 	private AtomicInteger executingCount = new AtomicInteger(0);
+	/**
+	 * The socket used by this node's socket wrapper.
+	 */
+	private Socket socket = null;
 
 	/**
 	 * Main processing loop of this node.
@@ -130,6 +135,7 @@ public class JPPFNode implements MonitoredNode
 				try
 				{
 					socketClient.close();
+					socket = null;
 				}
 				catch(Exception ex)
 				{
@@ -180,7 +186,11 @@ public class JPPFNode implements MonitoredNode
 		if (socketClient == null) initSocketClient();
 		if (notifying) fireNodeEvent(EventType.START_CONNECT);
 		System.out.println("JPPFNode.init(): Attempting connection to the JPPF driver");
-		socketInitializer.initializeSocket(socketClient);
+		if (socket == null)
+		{
+			socketInitializer.initializeSocket(socketClient);
+			socket = socketClient.getSocket();
+		}
 		if (notifying) fireNodeEvent(EventType.END_CONNECT);
 		System.out.println("JPPFNode.init(): Reconnected to the JPPF driver");
 		TypedProperties props = JPPFConfiguration.getProperties();
@@ -193,13 +203,17 @@ public class JPPFNode implements MonitoredNode
 	 */
 	public void initSocketClient() throws Exception
 	{
-		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = props.getString("jppf.server.host", "localhost");
-		int port = props.getInt("node.server.port", 11113);
 		initHelper();
-		socketClient = new SocketClient();
-		socketClient.setHost(host);
-		socketClient.setPort(port);
+		if (socket != null) socketClient = new SocketClient(socket);
+		else
+		{
+			TypedProperties props = JPPFConfiguration.getProperties();
+			String host = props.getString("jppf.server.host", "localhost");
+			int port = props.getInt("node.server.port", 11113);
+			socketClient = new SocketClient();
+			socketClient.setHost(host);
+			socketClient.setPort(port);
+		}
 		socketClient.setSerializer(serializer);
 	}
 
@@ -403,20 +417,26 @@ public class JPPFNode implements MonitoredNode
 
 	/**
 	 * Stop this node and release the resources it is using.
-	 * @see org.jppf.node.MonitoredNode#stopNode()
+	 * @param closeSocket determines whether the underlying socket should be closed.
+	 * @see org.jppf.node.MonitoredNode#stopNode(boolean)
 	 */
-	public void stopNode()
+	public void stopNode(boolean closeSocket)
 	{
 		stopped = true;
 		threadPool.shutdownNow();
-		try
+		if (closeSocket)
 		{
-			socketClient.close();
+			try
+			{
+				socketClient.close();
+			}
+			catch(Exception ex)
+			{
+				log.error(ex.getMessage(), ex);
+			}
+			socket = null;
 		}
-		catch(Exception ex)
-		{
-			log.error(ex.getMessage(), ex);
-		}
+		socketClient.setSocket(null);
 		socketClient = null;
 		classLoader = null;
 	}
@@ -445,9 +465,39 @@ public class JPPFNode implements MonitoredNode
 			fireNodeEvent(EventType.START_EXEC);
 		}
 	}
+
+	/**
+	 * Get the underlying socket used by this socket wrapper.
+	 * @return a Socket instance.
+	 * @see org.jppf.node.MonitoredNode#getSocket()
+	 */
+	public Socket getSocket()
+	{
+		return socket;
+	}
 	
 	/**
-	 * Wrapper around a JPPF task used to catch exceptions cause by the task execution.
+	 * Set the underlying socket to be used by this socket wrapper.
+	 * @param socket a Socket instance.
+	 * @see org.jppf.node.MonitoredNode#setSocket(java.net.Socket)
+	 */
+	public void setSocket(Socket socket)
+	{
+		this.socket = socket;
+	}
+
+	/**
+	 * Get the underlying socket wrapper used by this node.
+	 * @return a <code>SocketWrapper</code> instance.
+	 * @see org.jppf.node.MonitoredNode#getSocketWrapper()
+	 */
+	public SocketWrapper getSocketWrapper()
+	{
+		return socketClient;
+	}
+
+	/**
+	 * Wrapper around a JPPF task used to catch exceptions caused by the task execution.
 	 */
 	private class TaskWrapper implements Runnable
 	{

@@ -110,7 +110,7 @@ public class NodeThread extends Thread
 	 */
 	public void stopNode()
 	{
-		if (node != null) node.stopNode();
+		if (node != null) node.stopNode(true);
 	}
 
 	/**

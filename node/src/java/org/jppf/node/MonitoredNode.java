@@ -19,6 +19,7 @@
  */
 package org.jppf.node;
 
+import java.net.Socket;
 import org.jppf.node.event.NodeListener;
 import org.jppf.node.event.NodeEvent.EventType;
 
@@ -28,6 +29,16 @@ import org.jppf.node.event.NodeEvent.EventType;
  */
 public interface MonitoredNode extends Runnable
 {
+	/**
+	 * Get the underlying socket used by this socket wrapper.
+	 * @return a Socket instance.
+	 */
+	Socket getSocket();
+	/**
+	 * Set the underlying socket to be used by this socket wrapper.
+	 * @param socket a Socket instance.
+	 */
+	void setSocket(Socket socket);
 	/**
 	 * Add a listener to the list of listener for this node.
 	 * @param listener the listener to add.
@@ -45,6 +56,7 @@ public interface MonitoredNode extends Runnable
 	void fireNodeEvent(EventType eventType);
 	/**
 	 * Stop this node and release the resources it is using.
+	 * @param closeSocket determines whether the underlying socket should be closed.
 	 */
-	void stopNode();
+	void stopNode(boolean closeSocket);
 }

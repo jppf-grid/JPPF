@@ -197,7 +197,8 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	private State SendingJob = new CSendingJob();
 
 	/**
-	 * 
+	 * State of a node connection after a task bundle has been sent.
+	 * Waits for and reads the results of the bundle execution.
 	 */
 	private State WaitingResult = new CWaitingResult();
 
@@ -220,14 +221,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 				//as the OS will select it for read when the channel is suddenly 
 				//closed by peer, and we are not expecting any read...
 				// the channel was closed by node
-				closeNode(channel);
-				TaskRequest out = (TaskRequest) context.content;
-				if (out != null) {
-					JPPFTaskBundle bundle = out.getBundle();
-					if (bundle != null) {
-						resubmitBundle(bundle);
-					}
-				}
+				nodeClosing(channel, context);
 				return;
 			}
 			
@@ -236,17 +230,10 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			
 			// the buffer with the bundle serialized and part transfered
 			ByteBuffer task = ((TaskRequest) context.content).getSending();
-
 			try {
 				channel.write(task);
 			} catch (IOException e) {
-				log.error(e.getMessage(), e);
-				closeNode(channel);
-				
-				// putting back the task into queue
-				TaskRequest out = (TaskRequest) context.content;
-				JPPFTaskBundle bundle = out.getBundle();
-				resubmitBundle(bundle);
+				nodeClosing(channel, context);
 				throw e;
 			}
 			
@@ -255,9 +242,25 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 				//we finally have sent everything to node
 				// it will do the work and send back to us.
 				context.state = WaitingResult;
-				
 				//we will just wait for the bundle back
 				key.interestOps(SelectionKey.OP_READ);
+			}
+		}
+
+		/**
+		 * Invoked when an error was detected for a node connection.
+		 * @param channel the SocketChannel for the connection.
+		 * @param context container for the data the server was sending to the node. 
+		 */
+		private void nodeClosing(SocketChannel channel, Context context)
+		{
+			closeNode(channel);
+			TaskRequest out = (TaskRequest) context.content;
+			if (out != null) {
+				JPPFTaskBundle bundle = out.getBundle();
+				if (bundle != null) {
+					resubmitBundle(bundle);
+				}
 			}
 		}
 	}
@@ -316,7 +319,6 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 					}
 					
 					//notifing the client thread about the end of a bundle
-					
 					listener.taskCompleted(bundle);
 
 					//now it's done...
@@ -480,17 +482,14 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 		 * The request data. 
 		 */
 		private Request request;
-
 		/**
 		 * Buffer used to send the request data over a socket channel.
 		 */
 		private ByteBuffer sending;
-
 		/**
 		 * Container for the tasks and associated metadata.
 		 */
 		private JPPFTaskBundle bundle;
-
 		/**
 		 * Length in bytes of the request data to send or receive.
 		 */
