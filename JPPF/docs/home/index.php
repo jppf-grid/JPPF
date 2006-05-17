@@ -79,7 +79,7 @@
 						</td></tr>
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 						<tr><td>
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.13.0 - beta</span></h4>
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.17.1 - beta</span></h4>
 						</td></tr>
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 						<tr><td>
@@ -129,15 +129,6 @@
 									</td>
 								</tr>
 							</table>
-							<!--
-							<table align="center">
-								<tr><td rowspan="0">
-									<a href="http://www.clustermonkey.net//component/option,com_weblinks/catid,40/Itemid,23" target=_top>
-										<img src="http://www.clustermonkey.net//templates/c7_gentle_white/images/CM_logo-large.jpg" border="0" alternate="Cluster Monkey"/>
-									</a>
-								</td></tr>
-							</table
-							-->
 						</td></tr>
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 						<tr><td>

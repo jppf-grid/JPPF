@@ -225,6 +225,9 @@
 		<copy tofile="${runtime.driver}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.driver}/config">
 			<fileset dir="${config}/driver"/>
+			<fileset dir="${config}/node">
+				<include name="jppf.policy"/>
+			</fileset>
 		</copy>
 		<copy tofile="${runtime.driver}/build.xml" file="${bin}/ant-driver.xml"/>
 		<property name="runtime.driver.file"
@@ -240,7 +243,9 @@
 		<copy tofile="${runtime.node}/lib/node.jar" file="${build}/${ant.project.name}-node.jar"/>
 		<copy tofile="${runtime.node}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.node}/config">
-			<fileset dir="${config}/node"/>
+			<fileset dir="${config}/node">
+				<exclude name="jppf.policy"/>
+			</fileset>
 		</copy>
 		<copy tofile="${runtime.node}/build.xml" file="${bin}/ant-node.xml"/>
 		<property name="runtime.node.file"

@@ -185,14 +185,14 @@ public class JPPFNode implements MonitoredNode
 	{
 		if (socketClient == null) initSocketClient();
 		if (notifying) fireNodeEvent(EventType.START_CONNECT);
-		System.out.println("JPPFNode.init(): Attempting connection to the JPPF driver");
 		if (socket == null)
 		{
+			System.out.println("JPPFNode.init(): Attempting connection to the JPPF driver");
 			socketInitializer.initializeSocket(socketClient);
 			socket = socketClient.getSocket();
+			System.out.println("JPPFNode.init(): Reconnected to the JPPF driver");
 		}
 		if (notifying) fireNodeEvent(EventType.END_CONNECT);
-		System.out.println("JPPFNode.init(): Reconnected to the JPPF driver");
 		TypedProperties props = JPPFConfiguration.getProperties();
 		threadPool = Executors.newFixedThreadPool(props.getInt("processing.threads", 1));
 	}

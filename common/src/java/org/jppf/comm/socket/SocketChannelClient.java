@@ -306,4 +306,23 @@ public class SocketChannelClient implements SocketWrapper
 	{
 		this.port = port;
 	}
+
+	/**
+	 * Get the underlying socket used by this socket wrapper.
+	 * @return a Socket instance.
+	 * @see org.jppf.comm.socket.SocketWrapper#getSocket()
+	 */
+	public Socket getSocket()
+	{
+		return null;
+	}
+
+	/**
+	 * Set the underlying socket to be used by this socket wrapper.
+	 * @param socket a Socket instance.
+	 * @see org.jppf.comm.socket.SocketWrapper#setSocket(java.net.Socket)
+	 */
+	public void setSocket(Socket socket)
+	{
+	}
 }

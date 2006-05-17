@@ -109,17 +109,17 @@ public class TestTaskRunner
 	{
 		try
 		{
-				List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-				JPPFTask task = new ExceptionTestTask(2);
-				tasks.add(task);
-				List<JPPFTask> results = jppfClient.submit(tasks, null);
-				JPPFTask resultTask = results.get(0);
-				if (resultTask.getException() != null)
-				{
-					System.out.println("Exception was caught:");
-					resultTask.getException().printStackTrace();
-					throw task.getException();
-				}
+			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+			JPPFTask task = new ExceptionTestTask(2);
+			tasks.add(task);
+			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			JPPFTask resultTask = results.get(0);
+			if (resultTask.getException() != null)
+			{
+				System.out.println("Exception was caught:");
+				resultTask.getException().printStackTrace();
+				throw task.getException();
+			}
 		}
 		catch(Exception e)
 		{
