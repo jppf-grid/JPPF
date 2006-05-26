@@ -29,9 +29,9 @@ public class SmoothProfile extends AnnealingTuneProfile {
 	 * This parameter defines the multiplicity used to define the range available to
 	 * random generator, as the maximum.
 	 * @return the value 1.5f.
-	 * @see org.jppf.server.scheduler.bundle.AnnealingTuneProfile#getSizeRatioDevitation()
+	 * @see org.jppf.server.scheduler.bundle.AnnealingTuneProfile#getSizeRatioDeviation()
 	 */
-	float getSizeRatioDevitation() {
+	float getSizeRatioDeviation() {
 		return 1.5f; 
 	}
 

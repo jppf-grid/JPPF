@@ -39,7 +39,7 @@ public abstract class AnnealingTuneProfile implements AutoTuneProfile{
 	 * random generator, as the maximum.
 	 * @return the multiplicity as a float value.
 	 */
-	abstract float getSizeRatioDevitation() ;
+	abstract float getSizeRatioDeviation() ;
 	
 	/**
 	 * This parameter defines how fast does it will stop generating random numbers. 
@@ -68,7 +68,7 @@ public abstract class AnnealingTuneProfile implements AutoTuneProfile{
 	 * @see org.jppf.server.scheduler.bundle.AutoTuneProfile#createDiff(int, int, java.util.Random)
 	 */
 	public int createDiff(int bestSize, int collectedSamples, Random rnd) {
-		long max = rnd.nextInt(Math.max(Math.round(bestSize * getSizeRatioDevitation()), 1));
+		long max = rnd.nextInt(Math.max(Math.round(bestSize * getSizeRatioDeviation()), 1));
 		return (int) expDist(max, collectedSamples);
 	}
 	
@@ -83,9 +83,7 @@ public abstract class AnnealingTuneProfile implements AutoTuneProfile{
 	 * @return an int value.
 	 */
 	private double expDist(long max, long x) {
-		return max * Math.pow(Math.E, -x * getDecreaseRatio());
+		//return max * Math.pow(Math.E, -x * getDecreaseRatio());
+		return max * Math.exp(-x * getDecreaseRatio());
 	}
-
-	
-
 }

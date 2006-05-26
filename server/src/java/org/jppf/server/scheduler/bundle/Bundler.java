@@ -36,7 +36,8 @@ public interface Bundler {
 	Logger LOG = Logger.getLogger(Bundler.class);
 	
 	/**
-	 * @return the current size of bundle
+	 * Get the current size of bundle.
+	 * @return  the bundle size as an int value.
 	 */
 	int getBundleSize();
 	

@@ -32,7 +32,7 @@ import org.jppf.server.JPPFStatsUpdater;
 public class FixedSizedBundler implements Bundler {
 
 	/**
-	 * 
+	 * Initialize this bundler.
 	 */
 	public FixedSizedBundler(){
 		LOG.info("Using user-defined bundle size");
@@ -56,5 +56,4 @@ public class FixedSizedBundler implements Bundler {
 	public void feedback(int bundleSize, long totalTime) {
 		//just ignored
 	}
-
 }

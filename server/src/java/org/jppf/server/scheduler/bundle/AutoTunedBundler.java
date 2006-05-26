@@ -187,17 +187,18 @@ public class AutoTunedBundler implements Bundler {
 	}
 
 	/**
-	 * 
-	 * @return the best bundle size
+	 * Lookup the best bundle size in the current samples map.
+	 * @return the best bundle size as an int value.
 	 */
 	private int searchBestSize() {
 		int bestSize = 0;
 		double minorMean = Double.POSITIVE_INFINITY;
-		for (Map.Entry<Integer, BundlePerformanceSample> sample : samplesMap
-				.entrySet()) {
-			if (sample.getValue().mean < minorMean) {
-				bestSize = sample.getKey();
-				minorMean = sample.getValue().mean;
+		for (Integer size: samplesMap.keySet())
+		{
+			BundlePerformanceSample sample = samplesMap.get(size);
+			if (sample.mean < minorMean) {
+				bestSize = size;
+				minorMean = sample.mean;
 			}
 		}
 		return bestSize;

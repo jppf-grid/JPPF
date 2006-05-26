@@ -28,10 +28,9 @@ import org.jppf.utils.TypedProperties;
  * @author Domingos Creado
  */
 public final class BundlerFactory {
-
 	
 	/**
-	 * Instantiate a bundler, based on theJPPF driver configurationproperties.
+	 * Instantiate a bundler, based on theJPPF driver configuration properties.
 	 * @return a <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler
 	 */
