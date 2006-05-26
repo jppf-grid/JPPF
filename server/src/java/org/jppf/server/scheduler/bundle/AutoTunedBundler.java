@@ -1,10 +1,25 @@
+/*
+ * Java Parallel Processing Framework.
+ * Copyright (C) 2005-2006 Laurent Cohen.
+ * lcohen@osp-chicago.com
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package org.jppf.server.scheduler.bundle;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
+import java.util.*;
 import org.jppf.server.JPPFStatsUpdater;
 
 /**
@@ -13,27 +28,48 @@ import org.jppf.server.JPPFStatsUpdater;
  * performance. The algorithm starts making The algorithm waits for some
  * execution to get a mean execution time, and them make a change in bundle size
  * Each time the change is done, it is done over a smaller range randomicaly
- * selected (like Monte Carlo algorithm),
+ * selected (like Monte Carlo algorithm).
  * 
  * @author Domingos Creado
  * 
  */
 public class AutoTunedBundler implements Bundler {
 
+	/**
+	 * The currrent bundle size.
+	 */
 	private int currentSize;
 
+	/**
+	 * True if a performance profile analysis is currently being done, false otherwise. 
+	 */
 	private boolean stable = false;
 
+	/**
+	 * The mean performance value associated with the current bundle size.
+	 */
 	private double stableMean;
 
-	private Random rnd = new Random();
+	/**
+	 * Used to compute a pseudo-random increment to the bundle size, as part of a Monte Carlo random walk
+	 * towards a good solution.
+	 */
+	private Random rnd = new Random(System.currentTimeMillis());
 
+	/**
+	 * A map of performance samples, aorted by increasing bundle size.
+	 */
 	private Map<Integer, BundlePerformanceSample> samplesMap = new TreeMap<Integer, BundlePerformanceSample>();
 	
+	/**
+	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
+	 */
 	private AutoTuneProfile profile;
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
+	 * @param profile the parameters of the auto-tuning algorithm,
+	 * grouped as a performance analysis profile.
 	 */
 	public AutoTunedBundler(AutoTuneProfile profile) {
 		LOG.info("Using Auto-Tuned bundle size");
@@ -45,10 +81,29 @@ public class AutoTunedBundler implements Bundler {
 		this.profile = profile;
 	}
 
+	/**
+	 * Get the latest bundle size computed by this bundler.
+	 * @return the bundle size as an int.
+	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
+	 */
 	public int getBundleSize() {
 		return currentSize;
 	}
 
+	/**
+	 * This method performs the actual bundle size computation, based on current and past
+	 * performance data.<br>
+	 * Depending on the the performance samples and profile parameters, the following actions
+	 * may be triggered in this method:
+	 * <ul>
+	 * <li>samples collection (unconditional)</li>
+	 * <li>detection of performance profile changes, if not currently being done</li>
+	 * <li>when a performance profile change is detected, recompute the bundle size.</li>
+	 * </ul>
+	 * @param bundleSize bundle size of the new performance sample.
+	 * @param totalTime total execution time of the new sample.
+	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, long)
+	 */
 	public void feedback(int bundleSize, long totalTime) {
 		assert bundleSize > 0;
 
@@ -82,13 +137,13 @@ public class AutoTunedBundler implements Bundler {
 		boolean makeAnalysis = false;
 		if (bundleSize == currentSize) {
 			if (stable) {
-				if (samples > profile.getMinSamplesToCheckConvergency()
-						&& (Math.abs(stableMean - mean) / stableMean > profile.getMaxDevitation())) {
+				if (samples > profile.getMinSamplesToCheckConvergence()
+						&& (Math.abs(stableMean - mean) / stableMean > profile.getMaxDevtation())) {
 					LOG.info("Detected a change in tasks profile... restarting the discovering process");
 					makeAnalysis = true;
 					stable = false;
 				}
-				if (samples > 2 * profile.getMinSamplesToCheckConvergency()) {
+				if (samples > 2 * profile.getMinSamplesToCheckConvergence()) {
 					bundleSample.mean = 0;
 					bundleSample.samples = 0;
 				}
@@ -151,13 +206,19 @@ public class AutoTunedBundler implements Bundler {
 	
 
 	/**
-	 * this is a utility class to be used to store the pair of mean and the
-	 * number of samples does this mean was based.
+	 * This is a utility class to be used to store the pair of mean and the
+	 * number of samples this mean is based on.
 	 */
 	private class BundlePerformanceSample {
 
+		/**
+		 * Mean compute time for server to node round trip.
+		 */
 		public double mean;
 
+		/**
+		 * Number of samples used to compute the mean value.
+		 */
 		public long samples;
 	}
 }
