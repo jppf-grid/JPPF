@@ -71,16 +71,15 @@ public class AutoTunedBundler implements Bundler {
 		long samples;
 		double mean;
 		synchronized (bundleSample) {
-			bundleSample.mean = (totalTime + bundleSample.samples
-					* bundleSample.mean)
-					/ (bundleSample.samples + bundleSize);
+			bundleSample.mean = 
+				(totalTime + bundleSample.samples * bundleSample.mean)
+				/ (bundleSample.samples + bundleSize);
 			bundleSample.samples = bundleSample.samples + bundleSize;
 			samples = bundleSample.samples;
 			mean = bundleSample.mean;
 		}
 
 		boolean makeAnalysis = false;
-
 		if (bundleSize == currentSize) {
 			if (stable) {
 				if (samples > profile.getMinSamplesToCheckConvergency()
@@ -97,34 +96,38 @@ public class AutoTunedBundler implements Bundler {
 				makeAnalysis = true;
 			}
 		}
+		if (makeAnalysis) performAnalysis();
+	}
 
-		if (makeAnalysis) {
-			synchronized (samplesMap) {
-				int bestSize = searchBestSize();
-				int counter = 0;
-				while (counter < profile.getMaxGuessToStable()) {
-					
-					int diff = profile.createDiff(bestSize,samplesMap.size(),rnd);
-					if (rnd.nextBoolean() && diff < bestSize) {
-						// the second part is there to not let the size be
-						// negative or zero
-						diff = -diff;
-					}
-					currentSize = bestSize + diff;
-					if (samplesMap.get(currentSize) == null) {
-						LOG.info("The next bundle sized that will be used is "
-								+ currentSize);
-						return;
-					}
-					counter++;
+	/**
+	 * Recompute the bundle size after a performance profile change has been detected. 
+	 */
+	private void performAnalysis()
+	{
+		synchronized (samplesMap) {
+			int bestSize = searchBestSize();
+			int counter = 0;
+			while (counter < profile.getMaxGuessToStable()) {
+				
+				int diff = profile.createDiff(bestSize,samplesMap.size(),rnd);
+				if (rnd.nextBoolean() && diff < bestSize) {
+					// the second part is there to ensure the size is > 0
+					diff = -diff;
 				}
-				stable = true;
-				currentSize = bestSize;
-				stableMean = samplesMap.get(currentSize).mean;
-				samplesMap.clear();
-				LOG.info("The bundle was converged to size " + currentSize
-						+ " with the mean execution of " + stableMean);
+				currentSize = bestSize + diff;
+				if (samplesMap.get(currentSize) == null) {
+					LOG.info("The next bundle sized that will be used is "
+							+ currentSize);
+					return;
+				}
+				counter++;
 			}
+			stable = true;
+			currentSize = bestSize;
+			stableMean = samplesMap.get(currentSize).mean;
+			samplesMap.clear();
+			LOG.info("The bundle was converged to size " + currentSize
+					+ " with the mean execution of " + stableMean);
 		}
 	}
 
