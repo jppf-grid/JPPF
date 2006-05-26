@@ -406,7 +406,7 @@ public class JPPFNode implements MonitoredNode
 	/**
 	 * Notify all listeners that an event has occurred.
 	 * @param eventType the type of the event as an enumerated value.
-	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(java.lang.String)
+	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(org.jppf.node.event.NodeEvent.EventType)
 	 */
 	public void fireNodeEvent(EventType eventType)
 	{
@@ -489,7 +489,6 @@ public class JPPFNode implements MonitoredNode
 	/**
 	 * Get the underlying socket wrapper used by this node.
 	 * @return a <code>SocketWrapper</code> instance.
-	 * @see org.jppf.node.MonitoredNode#getSocketWrapper()
 	 */
 	public SocketWrapper getSocketWrapper()
 	{

@@ -36,7 +36,7 @@ public class JPPFPolicy extends Policy
 	 * Initialize this policy.
 	 * @param classLoader the <code>ClassLoader</code> used to retrieve the policy file
 	 * through a call to <code>getResourceAsStream(String)</code>; may be null.
-	 * @see java.lang.ClassLoader.getResourceAsStream(String).
+	 * @see java.lang.ClassLoader#getResourceAsStream(String).
 	 */
 	public JPPFPolicy(ClassLoader classLoader)
 	{
