@@ -68,9 +68,9 @@ public class SmoothProfile extends AnnealingTuneProfile {
 	 * Get the percentage of deviation of the current mean to the mean 
 	 * when the system was considered stable. 
 	 * @return the value 0.2.
-	 * @see org.jppf.server.scheduler.bundle.AutoTuneProfile#getMaxDevtation()
+	 * @see org.jppf.server.scheduler.bundle.AutoTuneProfile#getMaxDeviation()
 	 */
-	public double getMaxDevtation() {
+	public double getMaxDeviation() {
 		return 0.2;
 	}
 

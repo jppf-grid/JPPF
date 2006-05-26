@@ -138,7 +138,7 @@ public class AutoTunedBundler implements Bundler {
 		if (bundleSize == currentSize) {
 			if (stable) {
 				if (samples > profile.getMinSamplesToCheckConvergence()
-						&& (Math.abs(stableMean - mean) / stableMean > profile.getMaxDevtation())) {
+						&& (Math.abs(stableMean - mean) / stableMean > profile.getMaxDeviation())) {
 					LOG.info("Detected a change in tasks profile... restarting the discovering process");
 					makeAnalysis = true;
 					stable = false;

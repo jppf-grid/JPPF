@@ -46,7 +46,7 @@ public interface AutoTuneProfile {
 	 * when the system was considered stable. 
 	 * @return the percentage of deviation as a double value.
 	 */
-	double getMaxDevtation();
+	double getMaxDeviation();
 
 	/**
 	 * Get the maximum number of guesses of number generated that were already tested
