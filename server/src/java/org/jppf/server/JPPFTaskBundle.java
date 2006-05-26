@@ -77,6 +77,10 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * The build number of the current version of JPPF. 
 	 */
 	private int buildNumber = 0;
+	/**
+	 * Index of the first task in this bundle, as part of a larger request. 
+	 */
+	private int startTaskNumber = -1;
 
 	/**
 	 * Initialize this task bundle and set its build number.
@@ -288,5 +292,23 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	public int getBuildNumber()
 	{
 		return buildNumber;
+	}
+
+	/**
+	 * Get the index of the first task in this bundle. 
+	 * @return the index value as an int.
+	 */
+	public int getStartTaskNumber()
+	{
+		return startTaskNumber;
+	}
+
+	/**
+	 * Set the index of the first task in this bundle. 
+	 * @param startTaskNumber the index value as an int.
+	 */
+	public void setStartTaskNumber(int startTaskNumber)
+	{
+		this.startTaskNumber = startTaskNumber;
 	}
 }

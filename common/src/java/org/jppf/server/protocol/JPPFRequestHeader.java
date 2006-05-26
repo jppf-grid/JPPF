@@ -40,6 +40,10 @@ public class JPPFRequestHeader implements Serializable
 	 */
 	public static final String EXECUTION = "execution";
 	/**
+	 * Value for a non-blocking execution request type.
+	 */
+	public static final String NON_BLOCKING_EXECUTION = "nb.execution";
+	/**
 	 * Value for an administration request type.
 	 */
 	public static final String ADMIN = "admin";

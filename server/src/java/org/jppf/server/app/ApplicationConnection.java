@@ -19,50 +19,23 @@
  */
 package org.jppf.server.app;
 
-import static org.jppf.server.JPPFStatsUpdater.clientConnectionClosed;
-import static org.jppf.server.JPPFStatsUpdater.getStats;
-import static org.jppf.server.JPPFStatsUpdater.isStatsEnabled;
-import static org.jppf.server.JPPFStatsUpdater.newClientConnection;
-import static org.jppf.server.protocol.AdminRequest.BUNDLE_SIZE_PARAM;
-import static org.jppf.server.protocol.AdminRequest.CHANGE_PASSWORD;
-import static org.jppf.server.protocol.AdminRequest.CHANGE_SETTINGS;
-import static org.jppf.server.protocol.AdminRequest.COMMAND_PARAM;
-import static org.jppf.server.protocol.AdminRequest.KEY_PARAM;
-import static org.jppf.server.protocol.AdminRequest.NEW_PASSWORD_PARAM;
-import static org.jppf.server.protocol.AdminRequest.PASSWORD_PARAM;
-import static org.jppf.server.protocol.AdminRequest.RESPONSE_PARAM;
-import static org.jppf.server.protocol.AdminRequest.RESTART_DELAY_PARAM;
-import static org.jppf.server.protocol.AdminRequest.SHUTDOWN;
-import static org.jppf.server.protocol.AdminRequest.SHUTDOWN_DELAY_PARAM;
-import static org.jppf.server.protocol.AdminRequest.SHUTDOWN_RESTART;
+import static org.jppf.server.JPPFStatsUpdater.*;
+import static org.jppf.server.protocol.AdminRequest.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
 import javax.crypto.SecretKey;
 
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
-import org.jppf.security.CryptoUtils;
-import org.jppf.security.PasswordManager;
+import org.jppf.security.*;
 import org.jppf.server.*;
 import org.jppf.server.event.TaskCompletionListener;
-import org.jppf.server.protocol.AdminRequest;
-import org.jppf.server.protocol.JPPFRequestHeader;
+import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.Bundler;
-import org.jppf.utils.JPPFBuffer;
-import org.jppf.utils.SerializationHelper;
-import org.jppf.utils.SerializationHelperImpl;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class listen to incoming client application requests, so as
@@ -93,12 +66,19 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	 * A reference to the driver's tasks queue.
 	 */
 	private JPPFQueue queue = null;
-	
 	/**
 	 * The algorithm that deals with bundle size
 	 */
 	Bundler bundler;
-	
+	/**
+	 * Used to serialize and deserialize the tasks data.
+	 */
+	private SerializationHelper helper = new SerializationHelperImpl();
+	/**
+	 * The header describing the current client request.
+	 */
+	private JPPFRequestHeader header = null;
+
 	/**
 	 * Initialize this connection with an open socket connection to a remote client.
 	 * @param socket the socket connection from which requests are received and to which responses are sent.
@@ -131,47 +111,48 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	public void perform() throws Exception
 	{
 		JPPFBuffer buffer = socketClient.receiveBytes(0);
-		SerializationHelper helper = new SerializationHelperImpl();
 		byte[] bytes = buffer.getBuffer();
 		DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
 
 		// Read the request header - with tasks count information
-		JPPFRequestHeader header = (JPPFRequestHeader) helper.readNextObject(dis, false);
-		if (JPPFRequestHeader.STATISTICS.equals(header.getRequestType()) && isStatsEnabled())
+		header = (JPPFRequestHeader) helper.readNextObject(dis, false);
+		String type = header.getRequestType();
+		if (STATISTICS.equals(type) && isStatsEnabled())
 		{
 			sendStats();
 		}
-		else if (JPPFRequestHeader.ADMIN.equals(header.getRequestType()))
+		else if (ADMIN.equals(type))
 		{
 			performAdminOperation(header);
 		}
-		else if (JPPFRequestHeader.EXECUTION.equals(header.getRequestType()))
+		else if (EXECUTION.equals(type) || NON_BLOCKING_EXECUTION.equals(type))
 		{
-			executeTasks(header, helper, dis);
+			executeTasks(dis);
 		}
 	}
 
 	/**
-	 * Execute the tasks receive from a client.
-	 * @param header the header describing the client request.
-	 * @param helper used to read the tasks data.
+	 * Execute the tasks received from a client.
 	 * @param dis the stream from which the task data are read.
 	 * @throws Exception if the tasks could not be read.
 	 */
-	protected void executeTasks(JPPFRequestHeader header, SerializationHelper helper, DataInputStream dis)
+	protected void executeTasks(DataInputStream dis)
 		throws Exception
 	{
 		bundleMap = new HashMap<String, JPPFTaskBundle>();
 		resultMap = new TreeMap<String, JPPFTaskBundle>();
 		int count = header.getTaskCount();
+		boolean blocking = EXECUTION.equals(header.getRequestType());
 		byte[] dataProvider = helper.readNextBytes(dis);
 		int bundleCount = 0;
 		int n = 0;
 		List<byte[]> taskList = new ArrayList<byte[]>();
 		
 		int bundleSize = bundler.getBundleSize();
+		int startIdx = -1;
 		for (int i=0; i<count; i++)
 		{
+			if (startIdx < 0) startIdx = i;
 			n++;
 			byte[] taskBytes = helper.readNextBytes(dis);
 			if (debugEnabled)
@@ -193,8 +174,10 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 					bundle.setTaskCount(n);
 					bundle.setTasks(taskList);
 					bundle.setCompletionListener(this);
+					bundle.setStartTaskNumber(startIdx);
 					bundleMap.put(uuid, bundle);
 					getQueue().addBundle(bundle);
+					startIdx = -1;
 				}
 				n = 0;
 				bundleCount++;
@@ -202,7 +185,8 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 			}
 		}
 		dis.close();
-		waitForExecution();
+		waitForExecution(blocking);
+		if (!blocking) return;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream()
 		{
 	    public synchronized byte[] toByteArray()
@@ -211,6 +195,9 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 			}
 		};
 		DataOutputStream dos = new DataOutputStream(baos);
+		dos.writeInt(header.getTaskCount());
+		// start task index is -1 to indicate all task results are being sent
+		dos.writeInt(-1);
 		for (String id: resultMap.keySet())
 		{
 			JPPFTaskBundle bundle = resultMap.get(id);
@@ -219,6 +206,36 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 				byte[] task = bundle.getTasks().get(i);
 				helper.writeNextBytes(dos, task, 0, task.length);
 			}
+		}
+		dos.flush();
+		dos.close();
+		JPPFBuffer buffer = new JPPFBuffer();
+		buffer.setLength(baos.size());
+		buffer.setBuffer(baos.toByteArray());
+		socketClient.sendBytes(buffer);
+	}
+
+	/**
+	 * Send the results of the tasks in a bundle back to the client who submitted the request.
+	 * @param bundle the bundle to get the task results from.
+	 * @throws Exception if an IO exception occurred while sending the results back.
+	 */
+	private void sendPartialResults(JPPFTaskBundle bundle) throws Exception
+	{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream()
+		{
+	    public synchronized byte[] toByteArray()
+			{
+				return buf;
+			}
+		};
+		DataOutputStream dos = new DataOutputStream(baos);
+		dos.writeInt(bundle.getTaskCount());
+		dos.writeInt(bundle.getStartTaskNumber());
+		for (int i=0; i<bundle.getTaskCount(); i++)
+		{
+			byte[] task = bundle.getTasks().get(i);
+			helper.writeNextBytes(dos, task, 0, task.length);
 		}
 		dos.flush();
 		dos.close();
@@ -344,14 +361,29 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 
 	/**
 	 * This method waits until all tasks of a request have been completed.
+	 * @param blocking indicates whether we should wait for all execution results, or send
+	 * them back to the client as soon as they are received.
+	 * @throws Exception if handing of the results fails.
 	 */
-	private synchronized void waitForExecution()
+	private synchronized void waitForExecution(boolean blocking)
+		throws Exception
 	{
 		while (bundleMap.size() > 0)
 		{
 			try
 			{
 				wait();
+				if (!blocking)
+				{
+					synchronized(resultMap)
+					{
+						for (String uuid: resultMap.keySet())
+						{
+							sendPartialResults((resultMap.get(uuid)));
+						}
+						resultMap.clear();
+					}
+				}
 			}
 			catch(InterruptedException e)
 			{
