@@ -19,7 +19,6 @@
  */
 package org.jppf.server;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -46,7 +45,7 @@ public abstract class JPPFNIOServer extends Thread{
 	/**
 	 * Log4j logger for this class.
 	 */
-	protected static Logger log = Logger.getLogger(JPPFNIOServer.class);
+	private static Logger log = Logger.getLogger(JPPFNIOServer.class);
 	
 	/**
 	 * the selector of all socket channels open with providers or nodes.
@@ -128,7 +127,7 @@ public abstract class JPPFNIOServer extends Thread{
 				}
 				else
 				{
-					Context context = (Context) key.attachment();
+					ChannelContext context = (ChannelContext) key.attachment();
 					context.state.exec(key, context);
 				}
 			}
@@ -187,8 +186,8 @@ public abstract class JPPFNIOServer extends Thread{
 			}
 			return;
 		}
-		Context context = new Context();
-		context.state = getInitialState();
+		ChannelContext context = new ChannelContext();
+		context.state = this.getInitialState();
 		context.content = getInitialContent();
 		try
 		{
@@ -220,7 +219,7 @@ public abstract class JPPFNIOServer extends Thread{
 	 * Get the initial state associated with a new connection.
 	 * @return a <code>State</code> instance.
 	 */
-	protected abstract State getInitialState();
+	protected abstract ChannelState getInitialState();
 
 	/**
 	 * Process a channel that was accepted by the server socket channel.
@@ -245,7 +244,7 @@ public abstract class JPPFNIOServer extends Thread{
 	 * @return if the request was completed received.
 	 * @throws IOException if an error occuurred while reading a request.
 	 */
-	protected boolean fillRequest(SocketChannel channel, Request request)
+	public boolean fillRequest(SocketChannel channel, Request request)
 			throws IOException {
 
 		ByteBuffer buffer;
@@ -260,7 +259,7 @@ public abstract class JPPFNIOServer extends Thread{
 				request.setBuffer(buffer);
 			}
 
-			if(channel.read(buffer) < 0){
+			if (channel.read(buffer) < 0) {
 				throw new ClosedChannelException();
 			}
 			if (buffer.remaining() != 0) {
@@ -365,115 +364,21 @@ public abstract class JPPFNIOServer extends Thread{
 		}
 	}
 
-  //==========================================================
-	// classes that creates a basic "framework" to deal with nio
-	//==========================================================
-	
 	/**
-	 * Class that represents a context to a channel.
-	 * 
+	 * Get the resource provider for this server.
+	 * @return a ResourceProvider instance.
 	 */
-	public class Context {
-		/**
-		 * what will be executed when the channel is selected
-		 */
-		public State state;
-
-		/**
-		 * the "memory" of the DFA
-		 */
-		public Object content;
-
-		/**
-		 * the uuid of the application, it does not make sense for channels to
-		 * nodes
-		 */
-		public String uuid;
+	public ResourceProvider getResourceProvider()
+	{
+		return resourceProvider;
 	}
 
 	/**
-	 * Instances of this class represent the state of a socket channel connection.
+	 * Get the selector for this server.
+	 * @return a Selector instance.
 	 */
-	public interface State {
-		/**
-		 * Perform the action associated with this state.
-		 * @param key the selector key this state is associated with.
-		 * @param context the context associated with this state.
-		 * @throws IOException if an error occurred while executing the action.
-		 */
-		void exec(SelectionKey key, Context context) throws IOException;
-	}
-
-	/**
-	 * Represent a request to be or been received.
-	 * It follow the same strategy of JPPFBuffer, but this is designed to run 
-	 * with nonblocking io.
-	 */
-	public class Request {
-		
-		/**
-		 * Request creation timestamp.
-		 */
-		private long start = System.currentTimeMillis();
-		/**
-		 * Size of the request data in bytes.
-		 */
-		private int size;
-		/**
-		 * Buffer used to transfer the request data to and from streams.
-		 */
-		private ByteBuffer buffer;
-		/**
-		 * Stream where the result of the request is stored.
-		 */
-		private ByteArrayOutputStream output = new ByteArrayOutputStream();
-
-		/**
-		 * Get the request creation timestamp.
-		 * @return the timestamp in milliseconds as a long value.
-		 */
-		public long getStart(){
-			return start;
-		}
-		
-		/**
-		 * Get the stream where the result of the request is stored.
-		 * @return a <code>ByteArrayOutputStream</code> instance.
-		 */
-		public ByteArrayOutputStream getOutput() {
-			return output;
-		}
-
-		/**
-		 * Get the buffer used to transfer the request data to and from streams.
-		 * @return a <code>ByteBuffer</code> instance.
-		 */
-		public ByteBuffer getBuffer() {
-			return buffer;
-		}
-
-		/**
-		 * Set the buffer used to transfer the request data to and from streams.
-		 * @param buffer a <code>ByteBuffer</code> instance.
-		 */
-		public void setBuffer(ByteBuffer buffer) {
-			this.buffer = buffer;
-		}
-
-		/**
-		 * Get the size of the request data in bytes.
-		 * @return the size as an int value.
-		 */
-		public int getSize() {
-			return size;
-		}
-
-		/**
-		 * Set the size of the request data in bytes.
-		 * @param size the size as an int value.
-		 */
-		public void setSize(int size) {
-			this.size = size;
-		}
+	public Selector getSelector()
+	{
+		return selector;
 	}
 }

@@ -19,13 +19,14 @@
  */
 package org.jppf.server.scheduler.bundle;
 
+import java.io.Serializable;
 import java.util.Random;
 
 /**
  * This interface defines the set of parameters used by the auto-compute algorithm.
  * @author Domingos Creado
  */
-public interface AutoTuneProfile {
+public interface AutoTuneProfile extends Serializable {
 
 	/**
 	 * Get the minimum number of samples that must be collected before an 
@@ -40,7 +41,7 @@ public interface AutoTuneProfile {
 	 * @return the number of samples as a long value. 
 	 */
 	long getMinSamplesToCheckConvergence();
-	
+
 	/**
 	 * Get the percentage of deviation of the current mean to the mean 
 	 * when the system was considered stable. 

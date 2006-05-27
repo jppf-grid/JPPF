@@ -47,6 +47,10 @@ public class JPPFNode implements MonitoredNode
 	 */
 	private static Logger log = null;
 	/**
+	 * Static uuid for the JPPF driver.
+	 */
+	public static final String JPPF_DRIVER_UUID = "JPPF Driver";
+	/**
 	 * Maximum number of containers kept by this node's cache.
 	 */
 	private static final int MAX_CONTAINERS = 1000;
@@ -159,12 +163,15 @@ public class JPPFNode implements MonitoredNode
 			if (notifying) fireNodeEvent(EventType.START_EXEC);
 			JPPFTaskBundle bundle = pair.first();
 			List<JPPFTask> taskList = pair.second();
-			List<Future> futureList = new ArrayList<Future>(taskList.size());
-			for (JPPFTask task : taskList)
+			if ((taskList != null) && (taskList.size() > 0))
 			{
-				futureList.add(threadPool.submit(new TaskWrapper(task)));
+				List<Future> futureList = new ArrayList<Future>(taskList.size());
+				for (JPPFTask task : taskList)
+				{
+					futureList.add(threadPool.submit(new TaskWrapper(task)));
+				}
+				for (Future future : futureList) future.get();
 			}
-			for (Future future : futureList) future.get();
 			writeResults(bundle, taskList);
 			int p = bundle.getBuildNumber();
 			if (buildNumber < p)
@@ -291,9 +298,16 @@ public class JPPFNode implements MonitoredNode
 		Object[] result = new Object[2 + count];
 		result[0] = bundle;
 		String uuid = bundle.getAppUuid();
-		result[1] = getContainer(uuid).deserializeObject(dis, true);
-		for (int i = 0; i < count; i++)
-			result[2 + i] = getContainer(uuid).deserializeObject(dis, true);
+		if (JPPF_DRIVER_UUID.equals(uuid))
+		{
+			result[1] = null;
+		}
+		else
+		{
+			result[1] = getContainer(uuid).deserializeObject(dis, true);
+			for (int i = 0; i < count; i++)
+				result[2 + i] = getContainer(uuid).deserializeObject(dis, true);
+		}
 		dis.close();
 		return result;
 	}
