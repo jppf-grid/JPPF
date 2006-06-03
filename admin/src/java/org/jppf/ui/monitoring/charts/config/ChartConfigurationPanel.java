@@ -23,7 +23,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.jppf.ui.monitoring.GuiUtils;
+import org.jppf.ui.utils.GuiUtils;
 
 /**
  * The panel used to create and manage chart configurations.

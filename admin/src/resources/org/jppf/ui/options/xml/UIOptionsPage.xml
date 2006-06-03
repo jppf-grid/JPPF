@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="Options" type="page">
+
+	<property name="label" value="Options"/>
+	<property name="scrollable" value="false"/>
+	<property name="orientation" value="vertical"/>
+	<property name="bordered" value="false"/>
+	<property name="main" value="true"/>
+
+	<!-- ===================================================================== -->
+	<!--                    Refresh interval area                              -->
+	<!-- ===================================================================== -->
+
+	<child name="Monitor" type="page">
+
+		<property name="label" value="Monitor"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="vertical"/>
+		<property name="bordered" value="true"/>
+		<property name="main" value="false"/>
+
+		<child name="Interval" type="FormattedNumber">
+			<property name="label" value="Refresh interval (ms)"/>
+			<property name="tooltip" value="The time interval, in milliseconds, between servers requests to refresh the statistics"/>
+			<property name="value" value="1000"/>
+			<property name="pattern" value="###,###,##0"/>
+		</child>
+
+		<child name="Apply" type="Button">
+			<property name="label" value="Apply"/>
+			<property name="tooltip" value="Apply the new interval value immediately"/>
+			<listener type="action" class="org.jppf.ui.options.factory.OptionsPanel$ChangeIntervalAction"/>
+		</child>
+
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--           Server bundle size configuration area                       -->
+	<!-- ===================================================================== -->
+
+	<child name="UI" type="page">
+
+		<property name="label" value="UI"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="vertical"/>
+		<property name="bordered" value="true"/>
+		<property name="main" value="false"/>
+
+		<child name="Theme" type="ComboBox">
+			<property name="label" value="Choose a theme"/>
+			<property name="tooltip" value="Select a color theme"/>
+			<property name="value" value="Aqua"/>
+			<listener type="value" class="org.jppf.ui.options.factory.OptionsPanel$ComboBoxListener"/>
+			<item name="Aqua" selected="true"/>
+			<item name="BarbyPink" selected="false"/>
+			<item name="BottleGreen" selected="false"/>
+			<item name="Brown" selected="false"/>
+			<item name="Charcoal" selected="false"/>
+			<item name="DarkViolet" selected="false"/>
+			<item name="Ebony" selected="false"/>
+			<item name="LightAqua" selected="false"/>
+			<item name="LimeGreen" selected="false"/>
+			<item name="Olive" selected="false"/>
+			<item name="Orange" selected="false"/>
+			<item name="Purple" selected="false"/>
+			<item name="Raspberry" selected="false"/>
+			<item name="Sepia" selected="false"/>
+			<item name="SteelBlue" selected="false"/>
+			<item name="SunfireRed" selected="false"/>
+			<item name="SunGlare" selected="false"/>
+			<item name="Sunset" selected="false"/>
+			<item name="Terracotta" selected="false"/>
+			<item name="JPPF" selected="false"/>
+		</child>
+
+		<child name="Dark" type="Boolean">
+			<property name="label" value="Dark"/>
+			<property name="tooltip" value="Toggles between light and dark versions of the chosen theme"/>
+			<property name="value" value="false"/>
+			<listener type="value" class="org.jppf.ui.options.factory.OptionsPanel$CheckBoxListener"/>
+		</child>
+
+		<child name="filler" type="Filler">
+			<property name="width" value="1"/>
+			<property name="height" value="1"/>
+		</child>
+
+	</child>
+
+</opt:main>

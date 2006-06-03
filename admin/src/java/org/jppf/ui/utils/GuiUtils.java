@@ -17,8 +17,9 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.ui.monitoring;
+package org.jppf.ui.utils;
 
+import java.awt.*;
 import java.net.URL;
 import java.util.*;
 import javax.swing.*;
@@ -62,5 +63,35 @@ public final class GuiUtils
 		icon = new ImageIcon(url);
 		iconMap.put(path, icon);
 		return icon;
+	}
+
+	/**
+	 * Add a component to a panel with the specified constaints.
+	 * @param panel the panel to add the component to.
+	 * @param g the <code>GridBagLayout</code> set on the panel.
+	 * @param c the constraints to apply to the component.
+	 * @param comp the component to add.
+	 */
+	public static void addLayoutComp(JPanel panel, GridBagLayout g, GridBagConstraints c, Component comp)
+	{
+		g.setConstraints(comp, c);
+    panel.add(comp);
+	}
+
+	/**
+	 * Create a filler component with the specified. The resulting component can be used as a
+	 * separator for layout purposes.
+	 * @param width the component's width.
+	 * @param height the component's height.
+	 * @return a <code>JComponent</code> instance.
+	 */
+	public static JComponent createFiller(int width, int height)
+	{
+		JPanel filler = new JPanel();
+		Dimension d = new Dimension(width, height);
+		filler.setMinimumSize(d);
+		filler.setMaximumSize(d);
+		filler.setPreferredSize(d);
+		return filler;
 	}
 }

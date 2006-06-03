@@ -27,10 +27,12 @@ import javax.swing.*;
 import javax.swing.table.*;
 import org.apache.log4j.Logger;
 import org.jppf.server.JPPFStats;
-import org.jppf.ui.monitoring.admin.AdminPanel;
 import org.jppf.ui.monitoring.charts.config.*;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
+import org.jppf.ui.options.OptionsPage;
+import org.jppf.ui.options.xml.OptionsPageBuilder;
+import org.jppf.ui.utils.GuiUtils;
 import org.jvnet.substance.*;
 
 /**
@@ -220,13 +222,13 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 			ImageIcon icon = GuiUtils.loadIcon("/org/jppf/ui/resources/logo-32x32.gif");
 			frame.setIconImage(icon.getImage());
 			frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			StatsHandler statsHandler = new StatsHandler();
+			StatsHandler statsHandler = StatsHandler.getInstance();
 			final JPPFChartBuilder builder = startTool(frame, statsHandler);
 			frame.addWindowListener(new WindowAdapter()
 			{
 				public void windowClosing(WindowEvent e)
 				{
-					builder.saveAll();
+					builder.getStorage().saveAll();
 					System.exit(0);
 				}
 			});
@@ -247,12 +249,17 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	 * @param container the content in which to create the UI components.
 	 * @param statsHandler the object that requests and receives the server data updates.
 	 * @return a JPPFChartBuilder instance.
+	 * @throws Exception if an error occurs while creating the UI.
 	 */
-	public static JPPFChartBuilder startTool(Container container, StatsHandler statsHandler)
+	public static JPPFChartBuilder startTool(Container container, StatsHandler statsHandler) throws Exception
 	{
 		JTabbedPane tabbedPane = new JTabbedPane();
 		MonitoringPanel monitor = new MonitoringPanel(statsHandler);
-		AdminPanel admin = new AdminPanel(statsHandler);
+		//AdminPanel admin = new AdminPanel(statsHandler);
+		OptionsPageBuilder optionBuilder = new OptionsPageBuilder();
+		OptionsPage admin = optionBuilder.buildPage("org/jppf/ui/options/xml/AdminPage.xml");
+		OptionsPage options = optionBuilder.buildPage("org/jppf/ui/options/xml/UIOptionsPage.xml");
+
 		JPPFChartBuilder builder = new JPPFChartBuilder(statsHandler);
 		builder.createInitialCharts();
 		ChartConfigurationPanel configPanel = new ChartConfigurationPanel(builder);
@@ -261,8 +268,8 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		tabbedPane.addTab("Server Stats", new JScrollPane(monitor));
 		tabbedPane.addTab("Charts", builder.getTabbedPane());
 		tabbedPane.addTab("Charts config", configPanel);
-		tabbedPane.addTab("Admin", admin);
-		tabbedPane.addTab("Options", new OptionsPanel(statsHandler));
+		tabbedPane.addTab(admin.getLabel(), admin.getUIComponent());
+		tabbedPane.addTab(options.getLabel(), options.getUIComponent());
 		container.add(tabbedPane);
 		return builder;
 	}

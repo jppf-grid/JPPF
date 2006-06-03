@@ -1,0 +1,255 @@
+/*
+ * Java Parallel Processing Framework.
+ * Copyright (C) 2005-2006 Laurent Cohen.
+ * lcohen@osp-chicago.com
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+package org.jppf.ui.monitoring.charts.config;
+
+import static org.jppf.ui.monitoring.charts.ChartType.CHART_PLOTXY;
+import java.util.*;
+import java.util.prefs.*;
+import org.apache.log4j.Logger;
+import org.jppf.ui.monitoring.charts.ChartType;
+
+/**
+ * This class provides an API to store and retrieve the chart configuration
+ * preferences, using the preferences mechanism.
+ * @author Laurent Cohen
+ */
+public class PreferencesStorage
+{
+	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(PreferencesStorage.class);
+	/**
+	 * The root of the preferences subtree in which the chart configurations are saved.
+	 */
+	private static Preferences CHART_CONFIG_PREFERENCES = Preferences.userRoot().node("jppf/TabConfigurations");
+	/**
+	 * The chart builder used to configure all the charts and corresponding layouts. 
+	 */
+	private JPPFChartBuilder builder = null;
+
+	/**
+	 * Initialize this preferences storage with a specified chart builder.
+	 * @param builder the chart builder used to configure all the charts and corresponding layouts.
+	 */
+	public PreferencesStorage(JPPFChartBuilder builder)
+	{
+		this.builder = builder;
+	}
+
+	/**
+	 * Load all chart configurations from the preferences tree, and create the corresponding charts.
+	 */
+	public void loadChartConfigurations()
+	{
+		Preferences pref = CHART_CONFIG_PREFERENCES;
+		String[] tabChildrenNames = null;
+		try
+		{
+			tabChildrenNames = pref.childrenNames();
+		}
+		catch(BackingStoreException e)
+		{
+			log.error(e.getMessage(), e);
+			return;
+		}
+		if ((tabChildrenNames == null) || (tabChildrenNames.length <= 0)) return;
+		TabConfiguration[] tabs = new TabConfiguration[tabChildrenNames.length];
+		int cnt = 0;
+		for (String s: tabChildrenNames)
+		{
+			Preferences child = pref.node(s);
+			TabConfiguration tab = new TabConfiguration();
+			tab.name = child.get("name", "Tab"+cnt);
+			tab.position = child.getInt("position", -1);
+			ChartConfiguration[] configs = loadTabCharts(child);
+			for (ChartConfiguration config: configs) tab.configs.add(config);
+			tabs[cnt] = tab;
+			cnt++;
+		}
+		Arrays.sort(tabs, new Comparator<TabConfiguration>()
+		{
+			public int compare(TabConfiguration o1, TabConfiguration o2)
+			{
+				if (o1 == o2) return 0;
+				if (o1 == null) return -1;
+				if (o2 == null) return 1;
+				return new Integer(o1.position).compareTo(o2.position);
+			}
+		});
+
+		for (TabConfiguration tab: tabs)
+		{
+			builder.addTab(tab);
+			for (ChartConfiguration config : tab.configs)
+			{
+				builder.createChart(config, false);
+				tab.panel.add(config.chartPanel);
+			}
+		}
+	}
+	
+	/**
+	 * Load the chart configurations for a tab from a specified tab preferences node.
+	 * @param tabNode the tab preferences node that contains the chart configuration nodes.
+	 * @return an array of <code>ChartConfiguration</code> instances.
+	 */
+	public ChartConfiguration[] loadTabCharts(Preferences tabNode)
+	{
+		ChartConfiguration[] result = new ChartConfiguration[0];
+		String[] tabChildrenNames = null;
+		try
+		{
+			tabChildrenNames = tabNode.childrenNames();
+		}
+		catch(BackingStoreException e)
+		{
+			log.error(e.getMessage(), e);
+			return result;
+		}
+		if ((tabChildrenNames == null) || (tabChildrenNames.length <= 0)) return result;
+		result = new ChartConfiguration[tabChildrenNames.length];
+		int cnt = 0;
+		for (String s: tabChildrenNames)
+		{
+			Preferences child = tabNode.node(s);
+			ChartConfiguration config = loadChartConfiguration(child);
+			result[cnt] = config;
+			cnt++;
+		}
+		Arrays.sort(result, new Comparator<ChartConfiguration>()
+		{
+			public int compare(ChartConfiguration o1, ChartConfiguration o2)
+			{
+				if (o1 == o2) return 0;
+				if (o1 == null) return -1;
+				if (o2 == null) return 1;
+				return new Integer(o1.position).compareTo(o2.position);
+			}
+		});
+		return result;
+	}
+	
+	/**
+	 * Load a chart configuration from a preferences node.
+	 * @param child the preferences node to laod the configuration from.
+	 * @return a <code>ChartConfiguration</code> instance.
+	 */
+	public ChartConfiguration loadChartConfiguration(Preferences child)
+	{
+		ChartConfiguration config = new ChartConfiguration();
+		config.name = child.get("name", "");
+		config.precision = child.getInt("precision", 0);
+		config.unit = child.get("unit", null);
+		String fields = child.get("fields", "");
+		config.fields = fields.split("\\|");
+		String type = child.get("type", CHART_PLOTXY.name());
+		try
+		{
+			config.type = ChartType.valueOf(type);
+		}
+		catch(IllegalArgumentException e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		if (config.type == null) config.type = CHART_PLOTXY;
+		return config;
+	}
+	
+	/**
+	 * Save all tabs and charts configurations in the user preferences.
+	 */
+	public void saveAll()
+	{
+		removeAllSaved();
+		int cnt = 0;
+		for (TabConfiguration tab: builder.getTabList())
+		{
+			tab.position = cnt++;
+			saveTabConfiguration(tab);
+			int chartCnt = 0;
+			for (ChartConfiguration config: tab.configs)
+			{
+				config.position = chartCnt++;
+				saveChartConfiguration(tab, config);
+			}
+		}
+		try
+		{
+			CHART_CONFIG_PREFERENCES.flush();
+		}
+		catch(BackingStoreException e)
+		{
+			log.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Save a specified tab configuration in the preferences tree.
+	 * @param tab the tab to save.
+	 */
+	public void saveTabConfiguration(TabConfiguration tab)
+	{
+		String tabNodeName = "TabConfiguration"+tab.position;
+		Preferences pref = CHART_CONFIG_PREFERENCES.node(tabNodeName);
+		pref.put("name", tab.name);
+		pref.putInt("position", tab.position);
+	}
+	
+	/**
+	 * Save a specified chart configuration in the preferences tree.
+	 * @param tab the tab into which to save the configuration.
+	 * @param config the configuration to save.
+	 */
+	public void saveChartConfiguration(TabConfiguration tab, ChartConfiguration config)
+	{
+		String tabNodeName = "TabConfiguration"+tab.position;
+		String nodeName = "ChartConfiguration"+config.position;
+		Preferences pref = CHART_CONFIG_PREFERENCES.node(tabNodeName+"/"+nodeName);
+		pref.put("name", config.name);
+		pref.putInt("precision", config.precision);
+		if (config.unit != null ) pref.put("unit", config.unit);
+		pref.put("type", config.type.name());
+		StringBuilder sb = new StringBuilder();
+		for (int i=0; i<config.fields.length; i++)
+		{
+			if (i > 0) sb.append("|");
+			sb.append(config.fields[i]);
+		}
+		pref.put("fields", sb.toString());
+		pref.putInt("position", config.position);
+	}
+	
+	/**
+	 * Remove all tabs and charts configurations from the user preferences.
+	 */
+	public void removeAllSaved()
+	{
+		try
+		{
+			String[] names = CHART_CONFIG_PREFERENCES.childrenNames();
+			for (String name: names) CHART_CONFIG_PREFERENCES.node(name).removeNode();
+		}
+		catch(BackingStoreException e)
+		{
+			log.error(e.getMessage(), e);
+		}
+	}
+}

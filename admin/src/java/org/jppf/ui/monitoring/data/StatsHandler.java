@@ -33,12 +33,16 @@ import static org.jppf.server.protocol.AdminRequest.*;
  * This class provides a convenient access to the statistics obtained from the JPPF server.
  * @author Laurent Cohen
  */
-public class StatsHandler implements StatsConstants
+public final class StatsHandler implements StatsConstants
 {
 	/**
 	 * Log4j logger for this class.
 	 */
-	static Logger log = Logger.getLogger(StatsHandler.class);
+	private static Logger log = Logger.getLogger(StatsHandler.class);
+	/**
+	 * Singleton instance of this class.
+	 */
+	private static StatsHandler instance = null;
 	/**
 	 * JPPF client used to submit execution requests.
 	 */
@@ -64,7 +68,7 @@ public class StatsHandler implements StatsConstants
 	 */
 	private int rolloverPosition = 50;
 	/**
-	 * The lsit of all snapshots kept in memory. the size of this list is alway equal to or less than
+	 * The list of all snapshots kept in memory. the size of this list is alway equal to or less than
 	 * the rollover position.
 	 */
 	private List<JPPFStats> dataList = new Vector<JPPFStats>();
@@ -86,9 +90,19 @@ public class StatsHandler implements StatsConstants
 	private ReentrantLock lock = new ReentrantLock();
 
 	/**
+	 * Get the singleton instance of this class.
+	 * @return a <code>StatsHandler</code> instance.
+	 */
+	public static synchronized StatsHandler getInstance()
+	{
+		if (instance == null) instance = new StatsHandler();
+		return instance;
+	}
+
+	/**
 	 * Initialize this formatter.
 	 */
-	public StatsHandler()
+	private StatsHandler()
 	{
 		refreshInterval = JPPFConfiguration.getProperties().getLong("default.refresh.interval", 2000L);
 		update(stats);

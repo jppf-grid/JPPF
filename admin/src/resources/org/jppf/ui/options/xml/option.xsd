@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified"
+	targetNamespace="http://www.jppf.org/Options.xsd"
+	xmlns:opt="http://www.jppf.org/Options.xsd"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="main" type="opt:OptionElement"/>
+	<xs:complexType name="OptionElement">
+		<xs:sequence>
+			<xs:element name="property" type="opt:Property" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="listener" type="opt:Listener" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="item" type="opt:Item" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="child" type="opt:OptionElement" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="name"/>
+		<xs:attribute name="type"/>
+	</xs:complexType>
+
+	<!-- Property with value and name -->
+	<xs:complexType name="Property">
+		<xs:attribute name="name"/>
+		<xs:attribute name="value"/>
+	</xs:complexType>
+
+	<xs:complexType name="Listener">
+		<xs:attribute name="type"/>
+		<xs:attribute name="class"/>
+	</xs:complexType>
+
+	<xs:complexType name="Item">
+		<xs:attribute name="name"/>
+		<xs:attribute name="selected"/>
+	</xs:complexType>
+
+</schema>

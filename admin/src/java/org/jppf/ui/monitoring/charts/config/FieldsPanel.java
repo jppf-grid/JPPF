@@ -20,16 +20,12 @@
 package org.jppf.ui.monitoring.charts.config;
 
 import java.awt.*;
-import java.awt.Dimension;
 import java.awt.event.*;
-import java.awt.event.ActionListener;
 import javax.swing.*;
-import javax.swing.JPanel;
 import javax.swing.event.*;
-import javax.swing.event.ListSelectionListener;
-import org.jppf.ui.monitoring.GuiUtils;
 import org.jppf.ui.monitoring.charts.ChartType;
 import org.jppf.ui.monitoring.data.StatsConstants;
+import org.jppf.ui.utils.GuiUtils;
 
 /**
  * This panel contains the UI and data components that enable configuring a chart definition.
