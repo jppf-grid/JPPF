@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="Admin" type="page">
 
 	<property name="label" value="Admin"/>
@@ -6,124 +7,198 @@
 	<property name="orientation" value="vertical"/>
 	<property name="bordered" value="false"/>
 	<property name="main" value="true"/>
+	<property name="tooltip" value="Perform the remote administration of the server"/>
 
 	<!-- ===================================================================== -->
-	<!--                Server shutdown/restart area                           -->
+	<!--                   Top Panels                                          -->
 	<!-- ===================================================================== -->
+	
+	<child name="AdminCommands" type="page">
 
-	<child name="Server" type="page">
-
-		<property name="label" value="Server Shutdown / Restart"/>
+		<property name="label" value="Admin COmmands"/>
 		<property name="scrollable" value="false"/>
-		<property name="orientation" value="vertical"/>
-		<property name="bordered" value="true"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
 		<property name="main" value="false"/>
 
-		<child name="Perform Now" type="Button">
-			<property name="label" value="Perform Now"/>
-			<property name="tooltip" value="Sends the shutdown and/or restart request to the server"/>
-			<listener type="action" class="org.jppf.ui.options.factory.AdminOptionsPanel$ShutdownRestartAction"/>
-		</child>
-
-		<child name="Shutdown delay" type="FormattedNumber">
-			<property name="label" value="Shutdown delay"/>
-			<property name="tooltip" value="delay, in milliseconds, before the server starts shutting down"/>
-			<property name="value" value="3000"/>
-			<property name="pattern" value="###,###,##0"/>
-		</child>
-
-		<child name="Restart" type="Boolean">
-			<property name="label" value="Restart"/>
-			<property name="tooltip" value="Determines whether the server should be restarted"/>
-			<property name="value" value="true"/>
-			<listener type="value" class="org.jppf.ui.options.factory.AdminOptionsPanel$RestartCheckboxListener"/>
-		</child>
-
-		<child name="Restart delay" type="FormattedNumber">
-			<property name="label" value="Restart delay"/>
-			<property name="tooltip" value="delay, in milliseconds, before the server is restarted"/>
-			<property name="value" value="3000"/>
-			<property name="pattern" value="###,###,##0"/>
-		</child>
-
-	</child>
-
-	<!-- ===================================================================== -->
-	<!--           Server bundle size configuration area                       -->
-	<!-- ===================================================================== -->
-
-	<child name="Config" type="page">
-
-		<property name="label" value="Configuration"/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="vertical"/>
-		<property name="bordered" value="true"/>
-		<property name="main" value="false"/>
-
-		<child name="ConfigBtn" type="page">
-			<property name="label" value="Configuration Buttons"/>
+		<!-- ===================================================================== -->
+		<!--                Server shutdown/restart area                           -->
+		<!-- ===================================================================== -->
+	
+		<child name="Server" type="page">
+	
+			<property name="label" value="Server Shutdown / Restart"/>
 			<property name="scrollable" value="false"/>
-			<property name="orientation" value="horizontal"/>
-			<property name="bordered" value="fale"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="true"/>
 			<property name="main" value="false"/>
-
-			<child name="Refresh" type="Button">
-				<property name="label" value="Refresh Settings"/>
-				<property name="tooltip" value="Refreshes the settings from the server values"/>
-				<listener type="action" class="org.jppf.ui.options.factory.AdminOptionsPanel$RefreshSettingsAction"/>
+			<property name="tooltip" value="Stop and restart the server using the specified delays"/>
+	
+			<child name="Perform Now" type="Button">
+				<property name="label" value="Perform Now"/>
+				<property name="tooltip" value="Sends the shutdown and/or restart request to the server"/>
+				<listener type="action" class="org.jppf.ui.options.factory.AdminPanelActions$ShutdownRestartAction"/>
 			</child>
-
-			<child name="Apply" type="Button">
-				<property name="label" value="Change Settings"/>
-				<property name="tooltip" value="Apply new settings by sending them to the server"/>
-				<listener type="action" class="org.jppf.ui.options.factory.AdminOptionsPanel$ApplySettingsAction"/>
+	
+			<child name="Shutdown delay" type="FormattedNumber">
+				<property name="label" value="Shutdown delay"/>
+				<property name="tooltip" value="delay, in milliseconds, before the server starts shutting down"/>
+				<property name="value" value="3000"/>
+				<property name="pattern" value="###,###,##0"/>
 			</child>
+	
+			<child name="Restart" type="Boolean">
+				<property name="label" value="Restart"/>
+				<property name="tooltip" value="Determines whether the server should be restarted"/>
+				<property name="value" value="true"/>
+				<listener type="value" class="org.jppf.ui.options.factory.AdminPanelActions$RestartCheckboxListener"/>
+			</child>
+	
+			<child name="Restart delay" type="FormattedNumber">
+				<property name="label" value="Restart delay"/>
+				<property name="tooltip" value="delay, in milliseconds, before the server is restarted"/>
+				<property name="value" value="3000"/>
+				<property name="pattern" value="###,###,##0"/>
+			</child>
+	
+		</child>
+	
+		<child name="filler" type="Filler">
+			<property name="width" value="10"/>
+			<property name="height" value="10"/>
 		</child>
 
-		<child name="bundleSize" type="SpinnerNumber">
-			<property name="label" value="Task bundle size"/>
-			<property name="tooltip" value="Number of tasks sent at once to each node"/>
-			<property name="value" value="5"/>
-			<property name="minValue" value="1"/>
-			<property name="maxValue" value="10000"/>
+		<!-- ===================================================================== -->
+		<!--          Administrator password configuration area                    -->
+		<!-- ===================================================================== -->
+	
+		<child name="Admin password" type="page">
+	
+			<property name="label" value="Administrator password"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="true"/>
+			<property name="main" value="false"/>
+	
+			<child name="Change password" type="Button">
+				<property name="label" value="Change password"/>
+				<property name="tooltip" value="Tells the server to change the administrator password"/>
+				<listener type="action" class="org.jppf.ui.options.factory.AdminPanelActions$ChangePasswordAction"/>
+			</child>
+	
+			<child name="actualPwd" type="Password">
+				<property name="label" value="Enter password"/>
+				<property name="tooltip" value="The current administrator password"/>
+				<property name="value" value=""/>
+			</child>
+	
+			<child name="newPwd" type="Password">
+				<property name="label" value="New password"/>
+				<property name="tooltip" value="Enter the new administrator password"/>
+				<property name="value" value=""/>
+			</child>
+	
+			<child name="confirmPwd" type="Password">
+				<property name="label" value="Confirm new password"/>
+				<property name="tooltip" value="Confirm the new administrator password"/>
+				<property name="value" value=""/>
+			</child>
+	
 		</child>
 
 	</child>
 
 	<!-- ===================================================================== -->
-	<!--          Administrator password configuration area                    -->
+	<!--                    Bottom Panels                                      -->
 	<!-- ===================================================================== -->
+	
+	<child name="AdminPreferences" type="page">
 
-	<child name="Admin password" type="page">
-
-		<property name="label" value="Administrator password"/>
+		<property name="label" value="Admin Preferences"/>
 		<property name="scrollable" value="false"/>
-		<property name="orientation" value="vertical"/>
-		<property name="bordered" value="true"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
 		<property name="main" value="false"/>
 
-		<child name="Change password" type="Button">
-			<property name="label" value="Change password"/>
-			<property name="tooltip" value="Tells the server to change the administrator password"/>
-			<listener type="action" class="org.jppf.ui.options.factory.AdminOptionsPanel$ChangePasswordAction"/>
-		</child>
+		<child name="Monitor" type="page">
+	
+			<property name="label" value="Monitor"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="true"/>
+			<property name="main" value="false"/>
+	
+			<child name="Interval" type="FormattedNumber">
+				<property name="label" value="Refresh interval (ms)"/>
+				<property name="tooltip" value="The time interval, in milliseconds, between servers requests to refresh the statistics"/>
+				<property name="value" value="1000"/>
+				<property name="pattern" value="###,###,##0"/>
+			</child>
+	
+			<child name="Apply" type="Button">
+				<property name="label" value="Apply"/>
+				<property name="tooltip" value="Apply the new interval value immediately"/>
+				<listener type="action" class="org.jppf.ui.options.factory.OptionsPanelActions$ChangeIntervalAction"/>
+			</child>
+	
+			<child name="filler" type="Filler">
+				<property name="width" value="1"/>
+				<property name="height" value="1"/>
+			</child>
 
-		<child name="actualPwd" type="Password">
-			<property name="label" value="Enter password"/>
-			<property name="tooltip" value="The current administrator password"/>
-			<property name="value" value=""/>
 		</child>
-
-		<child name="newPwd" type="Password">
-			<property name="label" value="New password"/>
-			<property name="tooltip" value="Enter the new administrator password"/>
-			<property name="value" value=""/>
-		</child>
-
-		<child name="confirmPwd" type="Password">
-			<property name="label" value="Confirm new password"/>
-			<property name="tooltip" value="Confirm the new administrator password"/>
-			<property name="value" value=""/>
+	
+		<!-- ===================================================================== -->
+		<!--           Server bundle size configuration area                       -->
+		<!-- ===================================================================== -->
+	
+		<child name="UI" type="page">
+	
+			<property name="label" value="UI"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="true"/>
+			<property name="main" value="false"/>
+	
+			<child name="Theme" type="ComboBox">
+				<property name="label" value="Choose a theme"/>
+				<property name="tooltip" value="Select a color theme"/>
+				<property name="value" value="Aqua"/>
+				<listener type="value" class="org.jppf.ui.options.factory.OptionsPanelActions$ComboBoxListener"/>
+				<item name="Aqua" selected="true"/>
+				<item name="BarbyPink" selected="false"/>
+				<item name="BottleGreen" selected="false"/>
+				<item name="Brown" selected="false"/>
+				<item name="Charcoal" selected="false"/>
+				<item name="DarkViolet" selected="false"/>
+				<item name="Ebony" selected="false"/>
+				<item name="LightAqua" selected="false"/>
+				<item name="LimeGreen" selected="false"/>
+				<item name="Olive" selected="false"/>
+				<item name="Orange" selected="false"/>
+				<item name="Purple" selected="false"/>
+				<item name="Raspberry" selected="false"/>
+				<item name="Sepia" selected="false"/>
+				<item name="SteelBlue" selected="false"/>
+				<item name="SunfireRed" selected="false"/>
+				<item name="SunGlare" selected="false"/>
+				<item name="Sunset" selected="false"/>
+				<item name="Terracotta" selected="false"/>
+				<item name="JPPF" selected="false"/>
+			</child>
+	
+			<child name="Dark" type="Boolean">
+				<property name="label" value="Dark"/>
+				<property name="tooltip" value="Toggles between light and dark versions of the chosen theme"/>
+				<property name="value" value="false"/>
+				<listener type="value" class="org.jppf.ui.options.factory.OptionsPanelActions$CheckBoxListener"/>
+			</child>
+	
+			<child name="filler" type="Filler">
+				<property name="width" value="1"/>
+				<property name="height" value="1"/>
+			</child>
+	
 		</child>
 
 	</child>

@@ -76,6 +76,10 @@ public class AdminRequest extends JPPFRequestHeader
 	 */
 	public static final String BUNDLE_SIZE_PARAM = "bundle.size";
 	/**
+	 * Parameter to determine whether the tasks bundle size is determined manually or automatically.
+	 */
+	public static final String BUNDLE_TUNING_TYPE_PARAM = "bundle.tuning.type";
+	/**
 	 * Map holding the parameters of the request.
 	 */
 	private Map<String, Object> parameters = new HashMap<String, Object>();

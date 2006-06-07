@@ -132,7 +132,6 @@ public class JPPFClient
 		String host = props.getString("jppf.server.host", "localhost");
 		int port = props.getInt("app.server.port", 11112);
 		socketClient = new SocketClient();
-		//socketClient = new SocketChannelClient();
 		socketClient.setHost(host);
 		socketClient.setPort(port);
 	}

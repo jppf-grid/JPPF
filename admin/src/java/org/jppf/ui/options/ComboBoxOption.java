@@ -19,8 +19,6 @@
  */
 package org.jppf.ui.options;
 
-import static org.jppf.ui.utils.GuiUtils.addLayoutComp;
-import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
 import javax.swing.*;
@@ -64,10 +62,10 @@ public class ComboBoxOption extends AbstractOption
 	{
 		this.name = name;
 		this.label = label;
-		this.toolTipText = tooltip;
+		setToolTipText(tooltip);
 		this.value = value;
 		this.items = items;
-		 createUI();
+		createUI();
 	}
 
 	/**
@@ -82,20 +80,13 @@ public class ComboBoxOption extends AbstractOption
 			if (value != null) combo.setSelectedItem(value);
 		}
 		JLabel comboLabel = new JLabel(label);
-		JPanel panel = new JPanel();
-		GridBagLayout g = new GridBagLayout();
-    GridBagConstraints c = new GridBagConstraints();
-    c.gridx = 0;
-		c.insets = new Insets(5, 5, 5, 5);
-		panel.setLayout(g);
 		if (toolTipText != null)
 		{
 			combo.setToolTipText(toolTipText);
 			comboLabel.setToolTipText(toolTipText);
 		}
-		addLayoutComp(panel, g, c, comboLabel);
-		addLayoutComp(panel, g, c, combo);
-		UIComponent = panel;
+
+		UIComponent = layoutComponents(comboLabel, combo);
 		setupValueChangeNotifications();
 	}
 
@@ -118,8 +109,7 @@ public class ComboBoxOption extends AbstractOption
 	public void setValue(Object value)
 	{
 		this.value = value;
-		if (combo != null)
-			combo.setSelectedItem(value);
+		if (combo != null) combo.setSelectedItem(value);
 	}
 
 	/**

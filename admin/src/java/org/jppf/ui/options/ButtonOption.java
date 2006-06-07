@@ -51,7 +51,7 @@ public class ButtonOption extends AbstractOption
 	{
 		this.name = name;
 		this.label = label;
-		this.toolTipText = tooltip;
+		setToolTipText(tooltip);
 		this.action = null;
 		createUI();
 	}

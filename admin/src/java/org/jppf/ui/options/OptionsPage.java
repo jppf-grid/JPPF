@@ -28,19 +28,6 @@ import java.util.List;
 public interface OptionsPage extends OptionElement
 {
 	/**
-	 * Constant defining a horizontal layout in the page.
-	 */
-	int HORIZONTAL = 1;
-	/**
-	 * Constant defining a vertical layout in the page.
-	 */
-	int VERTICAL = 2;
-	/**
-	 * Get the options in this page.
-	 * @return a list of <code>Option</code> instances.
-	 */
-	List<OptionElement> getChildren();
-	/**
 	 * Add an element to this options page.
 	 * @param element the element to add.
 	 */
@@ -70,4 +57,9 @@ public interface OptionsPage extends OptionElement
 	 * @return true if the page has a border, false otherwise.
 	 */
 	boolean isBordered();
+	/**
+	 * Get the options in this page.
+	 * @return a list of <code>Option</code> instances.
+	 */
+	List<OptionElement> getChildren();
 }

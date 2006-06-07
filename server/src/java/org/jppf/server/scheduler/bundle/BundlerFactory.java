@@ -34,18 +34,34 @@ public final class BundlerFactory {
 	 * @return a <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler
 	 */
-	public static Bundler createBundler(){
+	public static Bundler createBundler() {
 		TypedProperties props = JPPFConfiguration.getProperties();
-		if("autotuned".equalsIgnoreCase(props.getProperty("task.bundle.strategy"))){
-			AutoTuneProfile profile;
-			if("smooth".equalsIgnoreCase(props.getProperty("task.bundle.autotuned.strategy"))){
-				profile = new SmoothProfile();
-			} else {
-				//until there is not other profile
-				profile = new SmoothProfile();
+		if("autotuned".equalsIgnoreCase(props.getProperty("task.bundle.strategy"))) {
+			if("smooth".equalsIgnoreCase(props.getProperty("task.bundle.autotuned.strategy"))) {				
+				return createBundler(new SmoothProfile());
 			}
-			return new AutoTunedBundler(profile);
+			// until we define other types of profiles
+			return createBundler(new SmoothProfile());
 		} 
 		return new FixedSizedBundler();
+	}
+
+	/**
+	 * Instantiate a fixed size bundler, based on a user-defined bundle size.
+	 * @return a <code>Bundler</code> instance.
+	 * @see org.jppf.server.scheduler.bundle.Bundler
+	 */
+	public static Bundler createFixedSizeBundler() {
+		return new FixedSizedBundler();
+	}
+
+	/**
+	 * Instantiate a bundler, based on an annealing profile.
+	 * @param profile a <code>AnnealingTuneProfile</code> instance.
+	 * @return a <code>Bundler</code> instance.
+	 * @see org.jppf.server.scheduler.bundle.Bundler
+	 */
+	public static Bundler createBundler(AnnealingTuneProfile profile) {
+		return new AutoTunedBundler(profile);
 	}
 }

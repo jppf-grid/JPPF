@@ -31,7 +31,7 @@ import org.jppf.ui.monitoring.charts.config.*;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.options.OptionsPage;
-import org.jppf.ui.options.xml.OptionsPageBuilder;
+import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
 import org.jvnet.substance.*;
 
@@ -255,21 +255,21 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	{
 		JTabbedPane tabbedPane = new JTabbedPane();
 		MonitoringPanel monitor = new MonitoringPanel(statsHandler);
-		//AdminPanel admin = new AdminPanel(statsHandler);
-		OptionsPageBuilder optionBuilder = new OptionsPageBuilder();
-		OptionsPage admin = optionBuilder.buildPage("org/jppf/ui/options/xml/AdminPage.xml");
-		OptionsPage options = optionBuilder.buildPage("org/jppf/ui/options/xml/UIOptionsPage.xml");
+		OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/AdminPage.xml");
+		OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/BundleSizeTuningPage.xml");
 
 		JPPFChartBuilder builder = new JPPFChartBuilder(statsHandler);
 		builder.createInitialCharts();
 		ChartConfigurationPanel configPanel = new ChartConfigurationPanel(builder);
 		statsHandler.addStatsHandlerListener(monitor);
 		statsHandler.addStatsHandlerListener(builder);
-		tabbedPane.addTab("Server Stats", new JScrollPane(monitor));
-		tabbedPane.addTab("Charts", builder.getTabbedPane());
-		tabbedPane.addTab("Charts config", configPanel);
-		tabbedPane.addTab(admin.getLabel(), admin.getUIComponent());
-		tabbedPane.addTab(options.getLabel(), options.getUIComponent());
+		tabbedPane.addTab("Server Stats", null, new JScrollPane(monitor), "Displays dynamic statistics about the server's performance");
+		tabbedPane.addTab("Charts", null, builder.getTabbedPane(), "Dynamic charts based on the server performance statistics");
+		tabbedPane.addTab("Charts config", null, configPanel, "Manage and configure the server charts");
+		for (OptionsPage page: OptionsHandler.getPageList())
+		{
+			tabbedPane.addTab(page.getLabel(), null, page.getUIComponent(), page.getToolTipText());
+		}
 		container.add(tabbedPane);
 		return builder;
 	}

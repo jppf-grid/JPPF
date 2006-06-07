@@ -64,17 +64,12 @@ class CWaitingResult implements ChannelState {
 		Request request = out.getRequest();
 		TaskCompletionListener listener = bundle.getCompletionListener();
 		try {
-			//We will wait the full byte[] of the bundle come to start 
-			//processing. This make the integration of non-blocking with
-			// ObjectInputStream easier.
+			//Wait the full byte[] of the bundle come to start processing.
+			//This makes the integration of non-blocking with ObjectInputStream easier.
 			if (server.fillRequest(channel, out.getRequest())) {
-
-				long elapsed = System.currentTimeMillis()
-						- request.getStart();
-				
-				DataInputStream dis = new DataInputStream(
-						new ByteArrayInputStream(request.getOutput()
-								.toByteArray()));
+				long elapsed = System.currentTimeMillis() - request.getStart();
+				DataInputStream dis =
+					new DataInputStream(new ByteArrayInputStream(request.getOutput().toByteArray()));
 				
 				//reading the bundle as object 
 				SerializationHelper helper = new SerializationHelperImpl();
@@ -89,9 +84,8 @@ class CWaitingResult implements ChannelState {
 				
 				//updating stats
 				if (isStatsEnabled()) {
-					this.server.bundler.feedback(bundle.getTaskCount(),elapsed);
-					taskExecuted(bundle.getTaskCount(), elapsed, bundle
-							.getNodeExecutionTime(), out.getBundleBytes());
+					server.getBundler().feedback(bundle.getTaskCount(), elapsed);
+					taskExecuted(bundle.getTaskCount(), elapsed, bundle.getNodeExecutionTime(), out.getBundleBytes());
 				}
 				
 				//notifing the client thread about the end of a bundle

@@ -20,7 +20,6 @@
 package org.jppf.ui.options.factory;
 
 import java.awt.event.ActionEvent;
-import java.util.*;
 import org.jppf.server.protocol.AdminRequest;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.*;
@@ -30,7 +29,7 @@ import org.jppf.ui.options.event.*;
  * The admin panel.
  * @author Laurent Cohen
  */
-public class AdminOptionsPanel extends OptionPanel
+public class AdminPanelActions extends OptionPanel
 {
 	/**
 	 * Action associated with the button to shutdown and/or restart the server.
@@ -58,7 +57,8 @@ public class AdminOptionsPanel extends OptionPanel
 				command = AdminRequest.SHUTDOWN_RESTART;
 			}
 			else command = AdminRequest.SHUTDOWN;
-			elt = (Option) option.findElement("/Admin password/actualPwd");
+				
+			elt = (Option) option.findElement("/").findAllWithName("actualPwd").get(0);
 			String pwd = (String) elt.getValue();
 			String msg = StatsHandler.getInstance().requestShutdownRestart(pwd, command, shutdownDelay, restartDelay);
 			((AbstractOption) option.findElement("/msgText")).setValue(msg);
@@ -77,11 +77,13 @@ public class AdminOptionsPanel extends OptionPanel
 		 */
 		public void actionPerformed(ActionEvent event)
 		{
-			AbstractOption elt = (AbstractOption) option.findElement("/Admin password/actualPwd");
+			//AbstractOption elt = (AbstractOption) option.findElement("/Admin password/actualPwd");
+			AbstractOption elt =
+				(AbstractOption) option.findElement("/").findAllWithName("actualPwd").get(0);
 			String pwd = (String) elt.getValue();
-			elt = (AbstractOption) option.findElement("/Admin password/newPwd");
+			elt = (AbstractOption) option.findElement("/").findAllWithName("newPwd").get(0);
 			String newPwd = (String) elt.getValue();
-			elt = (AbstractOption) option.findElement("/Admin password/confirmPwd");
+			elt = (AbstractOption) option.findElement("/").findAllWithName("confirmPwd").get(0);
 			String confirmPwd = (String) elt.getValue();
 			if (validateNewPassword(newPwd, confirmPwd))
 			{
@@ -120,54 +122,13 @@ public class AdminOptionsPanel extends OptionPanel
 	{
 		/**
 		 * Invoked when the state of the check box has changed.
-		 * @param event not used.
+		 * @param event the event that triggered the notification..
 		 * @see org.jppf.ui.options.event.ValueChangeListener#valueChanged(org.jppf.ui.options.event.ValueChangeEvent)
 		 */
 		public void valueChanged(ValueChangeEvent event)
 		{
 			Option restart = (Option) event.getOption().findElement("../Restart delay");
 			restart.setEnabled((Boolean) event.getOption().getValue());
-		}
-	}
-
-	/**
-	 * Action associated with the button to refresh the bundle size from the server.
-	 */
-	public static class RefreshSettingsAction extends OptionAction
-	{
-		/**
-		 * Perform the action.
-		 * @param event not used.
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		 */
-		public void actionPerformed(ActionEvent event)
-		{
-			int n = StatsHandler.getInstance().getLatestStats().bundleSize;
-			if (n <= 0) return;
-			AbstractOption elt = (AbstractOption) option.findElement("/Config/bundleSize");
-			elt.setValue(new Long(n));
-		}
-	}
-
-	/**
-	 * Action associated with the button to apply a new bundle size to the server settings.
-	 */
-	public static class ApplySettingsAction extends OptionAction
-	{
-		/**
-		 * Perform the action.
-		 * @param event not used.
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		 */
-		public void actionPerformed(ActionEvent event)
-		{
-			AbstractOption elt = (AbstractOption) option.findElement("/Admin password/actualPwd");
-			String pwd = (String) elt.getValue();
-			Map<String, Object> params = new HashMap<String, Object>();
-			elt = (AbstractOption) option.findElement("/Config/bundleSize");
-			params.put(AdminRequest.BUNDLE_SIZE_PARAM, elt.getValue());
-			String msg = StatsHandler.getInstance().changeSettings(pwd, params);
-			if (msg != null) ((AbstractOption) option.findElement("/msgText")).setValue(msg);
 		}
 	}
 }

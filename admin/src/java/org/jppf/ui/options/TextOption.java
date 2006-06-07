@@ -19,11 +19,8 @@
  */
 package org.jppf.ui.options;
 
-import static org.jppf.ui.utils.GuiUtils.addLayoutComp;
-import java.awt.*;
 import javax.swing.*;
 import javax.swing.text.*;
-import org.jppf.ui.utils.GuiUtils;
 
 /**
  * Text option displayed as a text field.
@@ -59,7 +56,7 @@ public abstract class TextOption extends AbstractOption
 	{
 		this.name = name;
 		this.label = label;
-		this.toolTipText = tooltip;
+		setToolTipText(tooltip);
 		this.value = value;
 	}
 	
@@ -70,28 +67,13 @@ public abstract class TextOption extends AbstractOption
 	{
 		fieldLabel = new JLabel(label);
 		field = createField();
-		field.setPreferredSize(new Dimension(60, 20));
-		JPanel panel = new JPanel();
-		GridBagLayout g = new GridBagLayout();
-    GridBagConstraints c = new GridBagConstraints();
-    c.gridy = 0;
-		c.insets = new Insets(5, 5, 5, 5);
-		panel.setLayout(g);
+		field.setColumns(10);
 		if (toolTipText != null)
 		{
 			field.setToolTipText(toolTipText);
 			fieldLabel.setToolTipText(toolTipText);
 		}
-		c.anchor = GridBagConstraints.LINE_START;
-		addLayoutComp(panel, g, c, fieldLabel);
-		c.anchor = GridBagConstraints.CENTER;
-		c.weightx = 1.0;
-		JComponent filler = GuiUtils.createFiller(1, 1);
-		addLayoutComp(panel, g, c, filler);
-		c.anchor = GridBagConstraints.LINE_END;
-		c.weightx = 0.0;
-		addLayoutComp(panel, g, c, field);
-		UIComponent = panel;
+		UIComponent = layoutComponents(fieldLabel, field);;
 		setupValueChangeNotifications();
 	}
 

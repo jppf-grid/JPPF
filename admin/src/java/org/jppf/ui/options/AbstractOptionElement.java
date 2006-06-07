@@ -38,6 +38,14 @@ public abstract class AbstractOptionElement implements OptionElement
 	 */
 	protected String name;
 	/**
+	 * The orientation of this panel's layout.
+	 */
+	protected int orientation = HORIZONTAL;
+	/**
+	 * The tooltip text displayed with the UI component.
+	 */
+	protected String toolTipText = null;
+	/**
 	 * The parent panel for this option element.
 	 */
 	protected OptionElement parent = null;
@@ -50,7 +58,7 @@ public abstract class AbstractOptionElement implements OptionElement
 	 * Constructor provided as a convenience to facilitate the creation of
 	 * option elements through reflexion.
 	 */
-	public AbstractOptionElement()
+	protected AbstractOptionElement()
 	{
 	}
 
@@ -136,6 +144,49 @@ public abstract class AbstractOptionElement implements OptionElement
 	}
 
 	/**
+	 * Determine the orientation of this page's layout.
+	 * @return one of {@link #HORIZONTAL} or {@link #VERTICAL}.
+	 * @see org.jppf.ui.options.OptionElement#getOrientation()
+	 */
+	public int getOrientation()
+	{
+		return orientation;
+	}
+
+	/**
+	 * Set the orientation of this page's layout.
+	 * @param orientation one of {@link #HORIZONTAL} or {@link #VERTICAL}.
+	 */
+	public void setOrientation(int orientation)
+	{
+		this.orientation = orientation;
+	}
+
+	/**
+	 * Get the tooltip text displayed with the UI component.
+	 * @return the tooltip as a string.
+	 * @see org.jppf.ui.options.OptionElement#getToolTipText()
+	 */
+	public String getToolTipText()
+	{
+		return toolTipText;
+	}
+
+	/**
+	 * Set the tooltip text displayed with the UI component.
+	 * @param toolTipText the tooltip as a string.
+	 */
+	public void setToolTipText(String toolTipText)
+	{
+		if ((toolTipText != null) && (toolTipText.indexOf("\\n") >= 0))
+		{
+			String s = toolTipText.replace("\\n", "<br>");
+			toolTipText = "<html>"+s+"</html>";
+		}
+		this.toolTipText = toolTipText;
+	}
+
+	/**
 	 * Get the path of this element in the option tree.
 	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances. 
 	 * @see org.jppf.ui.options.OptionElement#getPath()
@@ -186,6 +237,7 @@ public abstract class AbstractOptionElement implements OptionElement
 	public OptionElement findElement(String path)
 	{
 		if (path == null) return null;
+		else if ("".equals(path)) return this;
 		if (path.startsWith("/"))
 		{
 			TreePath treePath = getPath();
@@ -235,5 +287,37 @@ public abstract class AbstractOptionElement implements OptionElement
 		sb.append("name=").append(name);
 		sb.append("; label=").append(label);
 		return sb.toString();
+	}
+
+	/**
+	 * Find all the elements with the specified name in the subtree of which
+	 * this element is the root. 
+	 * @param name the name of the elements to find.
+	 * @return a list of <code>OptionElement</code> instances, or null if no element
+	 * could be found with the specfied name. The resulting list can be empty, but never null.
+	 * @see org.jppf.ui.options.OptionElement#findAllWithName(java.lang.String)
+	 */
+	public List<OptionElement> findAllWithName(String name)
+	{
+		List<OptionElement> list = new ArrayList<OptionElement>();
+		findAll(name, list);
+		return list;
+	}
+
+	/**
+	 * Find all the elements with the specified name in the subtree of which
+	 * this element is the root. 
+	 * @param name the name of the elements to find.
+	 * @param list a list of <code>OptionElement</code> instances, to fill with the elements found.
+	 * could be found with the specfied name. The resulting list can be empty, but never null.
+	 */
+	protected void findAll(String name, List<OptionElement> list)
+	{
+		if (name.equals(getName())) list.add(this);
+		if (this instanceof OptionsPage)
+		{
+			OptionsPage page = (OptionsPage) this;
+			for (OptionElement elt: page.getChildren()) ((AbstractOptionElement) elt).findAll(name, list);
+		}
 	}
 }

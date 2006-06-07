@@ -20,6 +20,7 @@
 package org.jppf.ui.options;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.tree.TreePath;
 
@@ -30,6 +31,14 @@ import javax.swing.tree.TreePath;
  */
 public interface OptionElement extends Serializable
 {
+	/**
+	 * Constant defining a horizontal layout in the page.
+	 */
+	int HORIZONTAL = 1;
+	/**
+	 * Constant defining a vertical layout in the page.
+	 */
+	int VERTICAL = 2;
 	/**
 	 * Get the name of this options page.
 	 * @return the name as a string.
@@ -52,18 +61,41 @@ public interface OptionElement extends Serializable
 	 */
 	TreePath getPath();
 	/**
+	 * Determine the orientation of this page's layout.
+	 * @return one of {@link #HORIZONTAL} or {@link #VERTICAL}.
+	 */
+	int getOrientation();
+	/**
+	 * The tooltip text displayed with the UI component.
+	 * @return the tooltip as a string.
+	 */
+	String getToolTipText();
+	/**
+	 * Enable or disable this option.
+	 * @param enabled true to enable this option, false to disable it.
+	 */
+	void setEnabled(boolean enabled);
+	/**
 	 * Get the path of this element in the option tree, represented as a string.
 	 * The string path is a sequence of element names separted by slashes.
 	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances. 
 	 */
 	String getStringPath();
 	/**
+	 * Find all the elements with the specified name in the subtree of which
+	 * this element is the root. 
+	 * @param name the name of the elements to find.
+	 * @return a list of <code>OptionElement</code> instances, or null if no element
+	 * could be found with the specfied name. 
+	 */
+	List<OptionElement> findAllWithName(String name);
+	/**
 	 * Find the element with the specified path in the options tree.
 	 * The path can be absolute, in which case it starts with a &quote;/&quote, otherwise it
 	 * is considered relative to the requesting element.
 	 * @param path the path of the element to find.
 	 * @return an <code>OptionElement</code> instance, or null if no element could be found with
-	 * the specfied path. 
+	 * the specified path. 
 	 */
 	OptionElement findElement(String path);
 	/**

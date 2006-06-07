@@ -27,18 +27,8 @@ package org.jppf.ui.options;
 public interface Option extends OptionElement
 {
 	/**
-	 * The tooltip text displayed with the UI component.
-	 * @return the tooltip as a string.
-	 */
-	String getToolTipText();
-	/**
 	 * The value of this option.
 	 * @return the value as an <code>Object</code> instance.
 	 */
 	Object getValue();
-	/**
-	 * Enable or disable this option.
-	 * @param enabled true to enable this option, false to disable it.
-	 */
-	void setEnabled(boolean enabled);
 }

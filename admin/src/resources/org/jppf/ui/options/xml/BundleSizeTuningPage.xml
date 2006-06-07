@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="BundleSizeTuning" type="page">
+
+	<property name="label" value="Bundle Size Tuning"/>
+	<property name="scrollable" value="false"/>
+	<property name="orientation" value="vertical"/>
+	<property name="bordered" value="false"/>
+	<property name="main" value="true"/>
+	<property name="tooltip" value=""/>
+
+	<child name="Manual" type="Boolean">
+		<property name="label" value="Use manual settings"/>
+		<property name="tooltip" value="Toggles between manual and automatic tuning of the bundle size"/>
+		<property name="value" value="true"/>
+		<listener type="value" class="org.jppf.ui.options.factory.BundleSizeTuningActions$ToggleManualAutoListener"/>
+	</child>
+
+
+	<!-- ===================================================================== -->
+	<!--           Server bundle size manual configuration area                       -->
+	<!-- ===================================================================== -->
+
+	<child name="ManualConfig" type="page">
+
+		<property name="label" value="Manual Configuration"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="vertical"/>
+		<property name="bordered" value="true"/>
+		<property name="main" value="false"/>
+
+		<child name="ConfigBtn" type="page">
+			<property name="label" value="Configuration Buttons"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="horizontal"/>
+			<property name="bordered" value="fale"/>
+			<property name="main" value="false"/>
+
+			<child name="Refresh" type="Button">
+				<property name="label" value="Refresh Settings"/>
+				<property name="tooltip" value="Refreshes the settings from the server values"/>
+				<listener type="action" class="org.jppf.ui.options.factory.BundleSizeTuningActions$RefreshSettingsAction"/>
+			</child>
+
+			<child name="ApplyManual" type="Button">
+				<property name="label" value="Change Settings"/>
+				<property name="tooltip" value="Apply new settings by sending them to the server"/>
+				<listener type="action" class="org.jppf.ui.options.factory.BundleSizeTuningActions$ApplySettingsAction"/>
+			</child>
+		</child>
+
+		<child name="bundleSize" type="SpinnerNumber">
+			<property name="label" value="Task bundle size"/>
+			<property name="tooltip" value="Number of tasks sent at once to each node"/>
+			<property name="value" value="5"/>
+			<property name="minValue" value="1"/>
+			<property name="maxValue" value="10000"/>
+		</child>
+
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--               Auto-tuning configuration area                          -->
+	<!-- ===================================================================== -->
+
+	<child name="AutoConfig" type="page">
+
+		<property name="label" value="Bundle size auto tuning profile"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="vertical"/>
+		<property name="bordered" value="true"/>
+		<property name="main" value="false"/>
+		<property name="tooltip" value="Configure a profile based on a simulated annealing strategy.\nThe possible move from the best known solution gets smaller each time it makes a move.\nThis strategy lets the algorithm explore the universe of bundle sizes with an almost known end"/>
+
+		<child name="ButtonPanel" type="page">
+			<property name="label" value="ButtonPanel"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="horizontal"/>
+			<property name="bordered" value="false"/>
+			<property name="main" value="false"/>
+
+			<child name="filler1" type="Filler">
+				<property name="width" value="1"/>
+				<property name="height" value="1"/>
+			</child>
+
+			<child name="ApplyAuto" type="Button">
+				<property name="label" value="Apply"/>
+				<property name="tooltip" value="Apply the current settings to the server immediately"/>
+				<listener type="action" class="org.jppf.ui.options.factory.BundleSizeTuningActions$ApplyAutoSettingsAction"/>
+			</child>
+
+			<child name="filler2" type="Filler">
+				<property name="width" value="1"/>
+				<property name="height" value="1"/>
+			</child>
+
+		</child>
+
+		<child name="MinSamplesToAnalyse" type="FormattedNumber">
+			<property name="label" value="Min number of samples to analyse"/>
+			<property name="tooltip" value="The minimum number of samples that must be collected\nbefore an analysis is triggered"/>
+			<property name="value" value="500"/>
+			<property name="pattern" value="###,###,##0"/>
+			<property name="orientation" value="horizontal"/>
+		</child>
+
+		<child name="MinSamplesToCheckConvergence" type="FormattedNumber">
+			<property name="label" value="Min number of samples to check convergence"/>
+			<property name="tooltip" value="The minimum number of samples to be collected\nbefore checking if the performance profile has changed"/>
+			<property name="value" value="300"/>
+			<property name="pattern" value="###,###,##0"/>
+			<property name="orientation" value="horizontal"/>
+		</child>
+
+		<child name="MaxDeviation" type="FormattedNumber">
+			<property name="label" value="Maximum deviation"/>
+			<property name="tooltip" value="The percentage of deviation of the current mean to the mean\nwhen the system was considered stable"/>
+			<property name="value" value="0.2"/>
+			<property name="pattern" value="###,##0.###"/>
+			<property name="orientation" value="horizontal"/>
+		</child>
+
+		<child name="MaxGuessToStable" type="FormattedNumber">
+			<property name="label" value="Max number of guesses to stable"/>
+			<property name="tooltip" value="The maximum number of guesses of number generated that were already tested\nfor the algorithm to consider the current best solution stable"/>
+			<property name="value" value="10"/>
+			<property name="pattern" value="###,###,##0"/>
+			<property name="orientation" value="horizontal"/>
+		</child>
+
+		<child name="SizeRatioDeviation" type="FormattedNumber">
+			<property name="label" value="Size deviation ratio"/>
+			<property name="tooltip" value="This parameter defines the multiplicity used to define the range available to\nthe random number generator, as the maximum"/>
+			<property name="value" value="1.5"/>
+			<property name="pattern" value="###,##0.###"/>
+			<property name="orientation" value="horizontal"/>
+		</child>
+
+		<child name="DecreaseRatio" type="FormattedNumber">
+			<property name="label" value="Size decrease ratio"/>
+			<property name="tooltip" value="This parameter defines how fast the tuning algorithm will stop generating random numbers.\nThis is essential to define what is the size of the universe that will be explored.\nGreater numbers make the algorithm stop sooner"/>
+			<property name="value" value="0.2"/>
+			<property name="pattern" value="###,###,##0"/>
+			<property name="orientation" value="horizontal"/>
+		</child>
+
+		<child name="filler" type="Filler">
+			<property name="width" value="1"/>
+			<property name="height" value="1"/>
+		</child>
+
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--                   Server messages area                                -->
+	<!-- ===================================================================== -->
+
+	<child name="msgText" type="TextArea">
+		<property name="label" value="Server Messages"/>
+		<property name="tooltip" value="Feedback messages received from the server"/>
+		<property name="value" value=""/>
+	</child>
+
+</opt:main>

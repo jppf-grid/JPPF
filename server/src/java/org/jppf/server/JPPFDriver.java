@@ -92,7 +92,7 @@ public class JPPFDriver
 
 		Bundler bundler = BundlerFactory.createBundler();
 		port = props.getInt("app.server.port", 11112);
-		applicationServer = new JPPFApplicationServer(port,bundler);
+		applicationServer = new JPPFApplicationServer(port);
 		applicationServer.start();
 
 		port = props.getInt("node.server.port", 11113);
@@ -119,6 +119,15 @@ public class JPPFDriver
 		return taskQueue;
 	}
 	
+	/**
+	 * Get the JPPF node server.
+	 * @return a <code>JPPFNodeServer</code> instance.
+	 */
+	public JPPFNodeServer getNodeServer()
+	{
+		return nodeServer;
+	}
+
 	/**
 	 * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
 	 * @return true if a shutdown is initiated, false otherwise.

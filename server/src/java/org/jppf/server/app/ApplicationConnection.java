@@ -21,20 +21,18 @@ package org.jppf.server.app;
 
 import static org.jppf.server.JPPFStatsUpdater.*;
 import static org.jppf.server.protocol.AdminRequest.*;
-
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
 import javax.crypto.SecretKey;
-
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
 import org.jppf.security.*;
 import org.jppf.server.*;
 import org.jppf.server.event.TaskCompletionListener;
+import org.jppf.server.node.JPPFNodeServer;
 import org.jppf.server.protocol.*;
-import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
 
 /**
@@ -67,9 +65,9 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	 */
 	private JPPFQueue queue = null;
 	/**
-	 * The algorithm that deals with bundle size
+	 * A reference to the sever for the JPPF nodes.
 	 */
-	Bundler bundler;
+	private JPPFNodeServer nodeServer = null;
 	/**
 	 * Used to serialize and deserialize the tasks data.
 	 */
@@ -81,18 +79,16 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 
 	/**
 	 * Initialize this connection with an open socket connection to a remote client.
+	 * @param server the server that created this connection.
 	 * @param socket the socket connection from which requests are received and to which responses are sent.
-	 * @param server the class server that created this connection.
-	 * @param bundler the algorithm that will define the size of bundle.
 	 * @throws JPPFException if this socket handler can't be initialized.
 	 */
-	public ApplicationConnection(JPPFServer server, Socket socket, Bundler bundler) throws JPPFException
+	public ApplicationConnection(JPPFServer server, Socket socket) throws JPPFException
 	{
 		super(server, socket);
 		InetAddress addr = socket.getInetAddress();
 		setName("appl ["+addr.getHostAddress()+":"+socket.getPort()+"]");
 		if (isStatsEnabled()) newClientConnection();
-		this.bundler = bundler;
 	}
 
 	/**
@@ -136,8 +132,7 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	 * @param dis the stream from which the task data are read.
 	 * @throws Exception if the tasks could not be read.
 	 */
-	protected void executeTasks(DataInputStream dis)
-		throws Exception
+	protected void executeTasks(DataInputStream dis) throws Exception
 	{
 		bundleMap = new HashMap<String, JPPFTaskBundle>();
 		resultMap = new TreeMap<String, JPPFTaskBundle>();
@@ -148,7 +143,7 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 		int n = 0;
 		List<byte[]> taskList = new ArrayList<byte[]>();
 		
-		int bundleSize = bundler.getBundleSize();
+		int bundleSize = getBundler().getBundleSize();
 		int startIdx = -1;
 		for (int i=0; i<count; i++)
 		{
@@ -288,10 +283,8 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 		PasswordManager pm = new PasswordManager();
 		b = pm.readPassword();
 		String localPwd = new String(CryptoUtils.decrypt(b));
-		if (!localPwd.equals(remotePwd))
-		{
-			response = "Invalid password";
-		}
+
+		if (!localPwd.equals(remotePwd)) response = "Invalid password";
 		else
 		{
 			String command = (String) request.getParameter(COMMAND_PARAM);
@@ -313,12 +306,48 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 			}
 			else if (CHANGE_SETTINGS.equals(command))
 			{
-				Number n = (Number) request.getParameter(BUNDLE_SIZE_PARAM);
-				if (n != null) JPPFStatsUpdater.setStaticBundleSize(n.intValue());
-				response = "Settings changed";
+				response = performChangeSettings(request);
 			}
 		}
 		sendAdminResponse(request, response);
+	}
+
+	/**
+	 * Perform the action to change the settings for bundle size tuning.
+	 * @param request the request holding the parametrs to change.
+	 * @return a message to report the change status.
+	 * @throws Exception if the changes could not be applied.
+	 */
+	private String performChangeSettings(AdminRequest request) throws Exception
+	{
+		boolean manual = "manual".equalsIgnoreCase((String) request.getParameter(BUNDLE_TUNING_TYPE_PARAM));
+		String response = null;
+		if (manual)
+		{
+			Number n = (Number) request.getParameter(BUNDLE_SIZE_PARAM);
+			if (n != null) JPPFStatsUpdater.setStaticBundleSize(n.intValue());
+			nodeServer.setBundler(BundlerFactory.createFixedSizeBundler());
+			response = "Manual bundle size settings changed";
+		}
+		else
+		{
+			AnnealingTuneProfile prof = new AnnealingTuneProfile();
+			Number n = (Number) request.getParameter("MinSamplesToAnalyse");
+			prof.setMinSamplesToAnalyse(n.longValue());
+			n = (Number) request.getParameter("MinSamplesToCheckConvergence");
+			prof.setMinSamplesToCheckConvergence(n.longValue());
+			n = (Number) request.getParameter("MaxDeviation");
+			prof.setMaxDeviation(n.doubleValue());
+			n = (Number) request.getParameter("MaxGuessToStable");
+			prof.setMaxGuessToStable(n.intValue());
+			n = (Number) request.getParameter("SizeRatioDeviation");
+			prof.setSizeRatioDeviation(n.floatValue());
+			n = (Number) request.getParameter("DecreaseRatio");
+			prof.setDecreaseRatio(n.floatValue());
+			setBundler(BundlerFactory.createBundler(prof));
+			response = "Automatic bundle size settings changed";
+		}
+		return response;
 	}
 	
 	/**
@@ -420,6 +449,26 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	{
 		super.close();
 		if (isStatsEnabled()) clientConnectionClosed();
+	}
+
+	/**
+	 * Get the algorithm that dynamically computes the task bundle size.
+	 * @return a <code>Bundler</code> instance.
+	 */
+	public Bundler getBundler()
+	{
+		if (nodeServer == null) nodeServer = JPPFDriver.getInstance().getNodeServer();
+		return nodeServer.getBundler();
+	}
+
+	/**
+	 * Set the algorithm that dynamically computes the task bundle size.
+	 * @param bundler a <code>Bundler</code> instance.
+	 */
+	public void setBundler(Bundler bundler)
+	{
+		if (nodeServer == null) nodeServer = JPPFDriver.getInstance().getNodeServer();
+		nodeServer.setBundler(bundler);
 	}
 
 	/**

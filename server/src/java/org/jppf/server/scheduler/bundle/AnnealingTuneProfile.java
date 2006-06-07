@@ -32,33 +32,69 @@ import java.util.Random;
  *  
  * @author Domingos Creado
  */
-public abstract class AnnealingTuneProfile implements AutoTuneProfile{
-	
+public class AnnealingTuneProfile extends AbstractAutoTuneProfile {
+
 	/**
 	 * This parameter defines the multiplicity used to define the range available to
 	 * random generator, as the maximum.
-	 * @return the multiplicity as a float value.
 	 */
-	abstract float getSizeRatioDeviation() ;
-	
+	protected float sizeRatioDeviation = 1f;
 	/**
 	 * This parameter defines how fast does it will stop generating random numbers. 
 	 * This is essential to define what is the size of the universe will be explored. 
 	 * Greater numbers make the algorithm stop sooner.
 	 * Just as example, if the best solution is between 0-100, the following might
 	 * occur:
-	 *   1    => 5 max guesses
-	 *   2    => 2 max guesses
-	 *   0.5  => 9 max guesses
-	 *   0.1  => 46 max guesses
-	 *   0.05 => 96 max guesses
-	 *   
+	 * <ul style="list-style-type: none; text-indent: -20px">
+	 * <li>1    => 5 max guesses</li>
+	 * <li>2    => 2 max guesses</li>
+	 * <li>0.5  => 9 max guesses</li>
+	 * <li>0.1  => 46 max guesses</li>
+	 * <li>0.05 => 96 max guesses</li>
+	 * </ul>
 	 * This expected number of guesses might not occur if the number of getMaxGuessToStable()
 	 * is short.
+	 */
+	protected float decreaseRatio = 1f;
+
+	/**
+	 * Get the multiplicity used to define the range available to
+	 * random generator, as the maximum.
+	 * @return the multiplicity as a float value.
+	 */
+	public float getSizeRatioDeviation()
+	{
+		return sizeRatioDeviation;
+	}
+	
+	/**
+	 * Set the multiplicity used to define the range available to
+	 * random generator, as the maximum.
+	 * @param sizeRatioDeviation the multiplicity as a float value.
+	 */
+	public void setSizeRatioDeviation(float sizeRatioDeviation)
+	{
+		this.sizeRatioDeviation = sizeRatioDeviation;
+	}
+
+	/**
+	 * Get the decrease rate for this profile.
 	 * @return the decrease rate as a float value.
 	 */
-	abstract float getDecreaseRatio() ;
+	public float getDecreaseRatio()
+	{
+		return decreaseRatio;
+	}
 	
+	/**
+	 * Set the decrease rate for this profile.
+	 * @param decreaseRatio the decrease rate as a float value.
+	 */
+	public void setDecreaseRatio(float decreaseRatio)
+	{
+		this.decreaseRatio = decreaseRatio;
+	}
+
 	/**
 	 * Generate a difference to be applied to the best known bundle size.
 	 * @param bestSize the known best size of bundle.

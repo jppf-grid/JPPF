@@ -47,7 +47,7 @@ public class BooleanOption extends AbstractOption
 	{
 		this.name = name;
 		this.label = label;
-		this.toolTipText = tooltip;
+		setToolTipText(tooltip);
 		this.value = value;
 		createUI();
 	}

@@ -41,7 +41,28 @@ public class OptionsPageBuilder
 		OptionDescriptor desc = new OptionDescriptorParser().parse(xmlPath);
 		if (desc == null) return null;
 		OptionsPage page = buildPage(desc);
+		triggerInitialEvents(page);
 		return page;
+	}
+
+	/**
+	 * Trigger all events listeners for all options, immeidately after the page has been built.
+	 * This ensures the consistence of the UI's initial state.
+	 * @param page the root page of the options on which to trigger the events.
+	 */
+	private void triggerInitialEvents(OptionsPage page)
+	{
+		for (OptionElement child: page.getChildren())
+		{
+			if (child instanceof AbstractOption)
+			{
+				((AbstractOption) child).fireValueChanged();
+			}
+			else if (child instanceof OptionsPage)
+			{
+				triggerInitialEvents((OptionsPage) child);
+			}
+		}
 	}
 
 	/**
@@ -54,6 +75,9 @@ public class OptionsPageBuilder
 	{
 		elt.setName(desc.name);
 		elt.setLabel(desc.getProperty("label"));
+		String s = desc.getProperty("orientation", "horizontal");
+		elt.setOrientation("horizontal".equalsIgnoreCase(s) ? OptionsPage.HORIZONTAL : OptionsPage.VERTICAL);
+		elt.setToolTipText(desc.getProperty("tooltip"));
 	}
 
 	/**
@@ -65,7 +89,6 @@ public class OptionsPageBuilder
 	public void initCommonOptionAttributes(AbstractOption option, OptionDescriptor desc) throws Exception
 	{
 		initCommonAttributes(option, desc);
-		option.setToolTipText(desc.getProperty("tooltip"));
 		for (ListenerDescriptor listenerDesc: desc.listeners)
 		{
 			Class clazz = Class.forName(listenerDesc.className);
@@ -95,8 +118,6 @@ public class OptionsPageBuilder
 		page.setMainPage(desc.getBoolean("main"));
 		page.setBordered(desc.getBoolean("bordered"));
 		page.setScrollable(desc.getBoolean("scrollable"));
-		String s = desc.getProperty("orientation");
-		page.setOrientation("horizontal".equalsIgnoreCase(s) ? OptionsPage.HORIZONTAL : OptionsPage.VERTICAL);
 		page.createUI();
 		for (OptionDescriptor child: desc.children)
 		{

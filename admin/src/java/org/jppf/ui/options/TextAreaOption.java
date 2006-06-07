@@ -19,7 +19,6 @@
  */
 package org.jppf.ui.options;
 
-import java.awt.Dimension;
 import javax.swing.*;
 import org.jppf.ui.utils.GuiUtils;
 
@@ -53,7 +52,7 @@ public class TextAreaOption extends AbstractOption
 	{
 		this.name = name;
 		this.label = label;
-		this.toolTipText = tooltip;
+		setToolTipText(tooltip);
 		this.value = value;
 		createUI();
 	}
@@ -69,7 +68,6 @@ public class TextAreaOption extends AbstractOption
 		{
 			textArea.setToolTipText(toolTipText);
 		}
-		textArea.setPreferredSize(new Dimension(300, 20));
 		JPanel mainPanel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
 		mainPanel.setBorder(BorderFactory.createTitledBorder(label));
 		textArea.setEditable(false);

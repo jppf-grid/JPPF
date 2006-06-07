@@ -47,19 +47,27 @@
 				<td>
 					<table cellspacing="0" cellpadding="5">
 						<tr>
-							<td width="50%" valign="top">
-								<h3>Running the &quot;Long Task&quot; demo</h3>
-								Go to the <b>jppf-x.y.z/demo</b> folder<br>
+							<td width="26%" valign="top">
+								<h3>The &quot;Long Task&quot; demo</h3>
+								Go to the <b>jppf-x.y.z/demo</b> folder.<br>
 								Type <b>ant run.demo1</b> to run the demo.<br>
 								This demo runs a number of tasks with a fixed execution length (default is 10 tasks, 1 second each).  Each task can be executed in parallel.<br>
-								The demo parameters can be changed in the file <b>jppf-x.y.z/demo/config/jppf-client.properties</b>
+								The demo parameters can easily be changed in the file <b>jppf-x.y.z/demo/config/jppf-client.properties</b>
 							</td>
-							<td width="50%" valign="top">
+							<td width="39%" valign="top">
 								<h3>Running the &quot;Matrix&quot; demo</h3>
-								Go to the <b>jppf-x.y.z/demo</b> folder<br>
+								Go to the <b>jppf-x.y.z/demo</b> folder.<br>
 								Type <b>ant run.demo2</b> to run the demo.<br>
 								This demo performs the multiplication of 2 square matrices a number of times (default is 5 times, matrix size is 300*300).<br>The multiplication is
 								divided in as many tasks as there are lines in the first matrix (i.e. 300 by default). Each task can be executed in parallel.<br>
+								The demo parameters can be changed in the file <b>jppf-x.y.z/demo/config/jppf-client.properties</b>
+							</td>
+							<td  width="35%" valign="top">
+								<h3>&quot;Non-Blocking Client&quot; demo</h3>
+								Go to the <b>jppf-x.y.z/demo</b> folder.<br>
+								Type <b>ant run.demo3</b> to run the demo.<br>
+								This demo runs the Matrix Multiplication demo with an asynchronous task submission mechanism.<br>
+								While running, it will display a message on the console, each time the server sends a notification that the execution of a task bundle was completed.<br>
 								The demo parameters can be changed in the file <b>jppf-x.y.z/demo/config/jppf-client.properties</b>
 							</td>
 						</tr>

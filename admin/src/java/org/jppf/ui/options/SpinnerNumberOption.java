@@ -19,11 +19,8 @@
  */
 package org.jppf.ui.options;
 
-import static org.jppf.ui.utils.GuiUtils.addLayoutComp;
-import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.jppf.ui.utils.GuiUtils;
 
 /**
  * An option that uses a JSpinner control to edit its value.
@@ -69,7 +66,7 @@ public class SpinnerNumberOption extends AbstractOption
 	{
 		this.name = name;
 		this.label = label;
-		this.toolTipText = tooltip;
+		setToolTipText(tooltip);
 		this.value = value;
 		this.min = min;
 		this.max = max;
@@ -85,26 +82,12 @@ public class SpinnerNumberOption extends AbstractOption
 			new SpinnerNumberModel(((Integer) value).intValue(), min.intValue(), max.intValue(), 1);
 		spinner = new JSpinner(model);
 		spinnerLabel = new JLabel(label);
-		JPanel panel = new JPanel();
-		GridBagLayout g = new GridBagLayout();
-    GridBagConstraints c = new GridBagConstraints();
-    c.gridy = 0;
-		c.insets = new Insets(5, 5, 5, 5);
-		panel.setLayout(g);
 		if (toolTipText != null)
 		{
 			spinner.setToolTipText(toolTipText);
 			spinnerLabel.setToolTipText(toolTipText);
 		}
-		c.anchor = GridBagConstraints.LINE_START;
-		addLayoutComp(panel, g, c, spinnerLabel);
-		c.anchor = GridBagConstraints.CENTER;
-		c.weightx = 1.0;
-		JComponent filler = GuiUtils.createFiller(1, 1);
-		addLayoutComp(panel, g, c, filler);
-		c.anchor = GridBagConstraints.LINE_END;
-		addLayoutComp(panel, g, c, spinner);
-		UIComponent = panel;
+		UIComponent = layoutComponents(spinnerLabel, spinner);
 		setupValueChangeNotifications();
 	}
 

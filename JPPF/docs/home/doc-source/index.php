@@ -31,12 +31,16 @@
 						</td></tr>
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 						<tr><td>
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.17.1 - beta</span></h4>
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.18.0 - beta</span></h4>
 						</td></tr>
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 						<tr><td>
-							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the GNU Lesser General Public License (LGPL).
-							A copy of the licensing terms can be obtained <a href="http://www.opensource.org/licenses/lgpl-license.php"><b>here</b></a>.</span></h4>
+							<h3>Feedback Wanted: <span style="color: #000060">help making JPPF a better open source product</span></h3>
+							Suggestions, bug reports, criticism and ideas are most welcome. I will do my best to answer promptly.<br>
+							<a href="http://sourceforge.net/forum/forum.php?forum_id=458548" target=_top>An open discussion forum is available here</a><br>
+							<a href="http://sourceforge.net/forum/forum.php?forum_id=458549" target=_top>A help forum is available here</a><br>
+							<a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>The bugs tracking system is here</a><br>
+							<a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>The feature request tracking system is here</a><br>
 						</td></tr>
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 					</table>
@@ -85,15 +89,10 @@
 								</tr>
 							</table>
 						</td></tr>
-
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 						<tr><td>
-							<h3>Feedback Wanted: <span style="color: #000060">help making JPPF a better open source product</span></h3>
-							Suggestions, bug reports, criticism and ideas are most welcome. I will do my best to answer promptly.<br>
-							<a href="http://sourceforge.net/forum/forum.php?forum_id=458548" target=_top>An open discussion forum is available here</a><br>
-							<a href="http://sourceforge.net/forum/forum.php?forum_id=458549" target=_top>A help forum is available here</a><br>
-							<a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>The bugs tracking system is here</a><br>
-							<a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>The feature request tracking system is here</a><br>
+							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the GNU Lesser General Public License (LGPL).
+							A copy of the licensing terms can be obtained <a href="http://www.opensource.org/licenses/lgpl-license.php"><b>here</b></a>.</span></h4>
 						</td></tr>
 						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 					</table>

@@ -51,7 +51,7 @@ public interface AutoTuneProfile extends Serializable {
 
 	/**
 	 * Get the maximum number of guesses of number generated that were already tested
-	 * for the algorithm to consider the best solution stable.
+	 * for the algorithm to consider the current best solution stable.
 	 * @return the number guesses as an int value.
 	 */
 	int getMaxGuessToStable();

@@ -60,9 +60,9 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 */
 	List<SocketChannel> availableNodes = new LinkedList<SocketChannel>();
 	/**
-	 * The algorithm of dealing with task bundle.
+	 * The algorithm that dynamically computes the task bundle size.
 	 */
-	Bundler bundler;
+	private Bundler bundler;
 	/**
 	 * The the task bundle sent to a newly connected node.
 	 */
@@ -141,26 +141,6 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			closeNode(client);
 		}
 	}
-
-	/*
-	protected void postAccept(SocketChannel client) {
-		JPPFStatsUpdater.newNodeConnection();
-		JPPFTaskBundle bundle = getQueue().nextBundle();
-		if (bundle != null) {
-			SelectionKey key = client.keyFor(selector);
-			ChannelContext context = (ChannelContext) key.attachment();
-			try {
-				sendTask(client, key, context, bundle);
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-				closeNode(client);
-				resubmitBundle(bundle);
-			}
-		} else {
-			availableNodes.add(client);
-		}
-	}
-	*/
 
 	/**
 	 * Callback method when a task bundle is added to the queue.
@@ -359,5 +339,23 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			log.error(e.getMessage(), e);
 		}
 		return null;
+	}
+
+	/**
+	 * Get the algorithm that dynamically computes the task bundle size.
+	 * @return a <code>Bundler</code> instance.
+	 */
+	public synchronized Bundler getBundler()
+	{
+		return bundler;
+	}
+
+	/**
+	 * Set the algorithm that dynamically computes the task bundle size.
+	 * @param bundler a <code>Bundler</code> instance.
+	 */
+	public synchronized void setBundler(Bundler bundler)
+	{
+		this.bundler = bundler;
 	}
 }

@@ -19,8 +19,12 @@
  */
 package org.jppf.ui.options;
 
+import static org.jppf.ui.utils.GuiUtils.addLayoutComp;
+import java.awt.*;
 import java.util.*;
+import javax.swing.*;
 import org.jppf.ui.options.event.*;
+import org.jppf.ui.utils.GuiUtils;
 
 /**
  * Default abstract implementation of the <code>Option</code> interface.
@@ -29,17 +33,13 @@ import org.jppf.ui.options.event.*;
 public abstract class AbstractOption extends AbstractOptionElement implements Option
 {
 	/**
-	 * The tooltip text displayed with the UI component.
-	 */
-	protected String toolTipText = null;
-	/**
 	 * The value of this option.
 	 */
 	protected Object value = null;
 	/**
 	 * List of listeners that are notified when the value of this option changes.
 	 */
-	protected List<ValueChangeListener> listeners = new ArrayList<ValueChangeListener>();
+	protected java.util.List<ValueChangeListener> listeners = new ArrayList<ValueChangeListener>();
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -47,25 +47,6 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	 */
 	public AbstractOption()
 	{
-	}
-
-	/**
-	 * Get the tooltip text displayed with the UI component.
-	 * @return the tooltip as a string.
-	 * @see org.jppf.ui.options.Option#getToolTipText()
-	 */
-	public String getToolTipText()
-	{
-		return toolTipText;
-	}
-
-	/**
-	 * Set the tooltip text displayed with the UI component.
-	 * @param toolTipText the tooltip as a string.
-	 */
-	public void setToolTipText(String toolTipText)
-	{
-		this.toolTipText = toolTipText;
 	}
 
 	/**
@@ -108,17 +89,63 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	/**
 	 * Notify all registered listeners that the value of this option has changed.
 	 */
-	protected void fireValueChanged()
+	public void fireValueChanged()
 	{
 		for (ValueChangeListener listener: listeners)
 		{
 			listener.valueChanged(new ValueChangeEvent(this));
 		}
 	}
-	
+
 	/**
 	 * Concrete subclasses must implement this method, so they can properly forward
 	 * changes in the value edited by the underlying UI component/editor.
 	 */
 	protected abstract void setupValueChangeNotifications();
+
+	/**
+	 * Layout 2 components according to this option's orientation.
+	 * This method adds a filler (invisible) component between the 2 components,
+	 * which will grow or decrease whenever the enclosing panel is resized.
+	 * @param comp1 the first component to layout.
+	 * @param comp2 the second component to layout.
+	 * @return a <code>JPanel</code> instance, enclosing the 2 components plus the filler.
+	 */
+	protected JPanel layoutComponents(JComponent comp1, JComponent comp2)
+	{
+		JPanel panel = new JPanel();
+		GridBagLayout g = new GridBagLayout();
+		panel.setLayout(g);
+    GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(2, 2, 2, 2);
+		if (orientation == HORIZONTAL)
+		{
+			c.gridy = 0;
+			c.anchor = GridBagConstraints.LINE_START;
+		}
+		else
+		{
+			c.gridx  = 0;
+			c.anchor = GridBagConstraints.PAGE_START;
+		}
+		addLayoutComp(panel, g, c, comp1);
+		c.anchor = GridBagConstraints.CENTER;
+		if (orientation == HORIZONTAL) c.weightx = 1.0;
+		else  c.weighty = 1.0;
+		JComponent filler = GuiUtils.createFiller(1, 1);
+		addLayoutComp(panel, g, c, filler);
+		if (orientation == HORIZONTAL)
+		{
+			c.anchor = GridBagConstraints.LINE_END;
+			c.weightx = 0.0;
+		}
+		else
+		{
+			c.anchor = GridBagConstraints.PAGE_END;
+			c.weighty = 0.0;
+		}
+		addLayoutComp(panel, g, c, comp2);
+
+		return panel;
+	}
 }

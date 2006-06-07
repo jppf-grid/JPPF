@@ -38,10 +38,6 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 */
 	protected List<OptionElement> children = new ArrayList<OptionElement>();
 	/**
-	 * The orientation of this panel's layout.
-	 */
-	protected int orientation = HORIZONTAL;
-	/**
 	 * Determines whether this page should be enclosed within a scroll pane.
 	 */
 	protected boolean scrollable = false;
@@ -62,7 +58,7 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 */
 	protected GridBagConstraints c = null;
 	/**
-	 * 
+	 * Filler component used to handle horizontal and vertical extensions of this page.
 	 */
 	protected JComponent filler = null;
 	/**
@@ -123,6 +119,14 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	public void createUI()
 	{
 		panel = new JPanel();
+		if (bordered)
+		{
+			Border border = (label != null) 
+				? border = BorderFactory.createTitledBorder(label)
+				: BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
+			panel.setBorder(border);
+		}
+		if (toolTipText != null) panel.setToolTipText(toolTipText);
 		g = new GridBagLayout();
     c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.LINE_START;
@@ -139,20 +143,14 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
     	if (mainPage) c.weightx = 1.0;
     }
 		panel.setLayout(g);
-		if (bordered)
-		{
-			Border border = (label != null) 
-				? border = BorderFactory.createTitledBorder(label)
-				: BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
-			panel.setBorder(border);
-		}
 		createFiller();
 		GuiUtils.addLayoutComp(panel, g, fillerConstraints, filler);
 		UIComponent = scrollable ? new JScrollPane(panel) : panel;
 	}
 
 	/**
-	 * 
+	 * Create a filler component used to handle horizontal and vertical
+	 * extensions of the page.
 	 */
 	protected void createFiller()
 	{
@@ -219,25 +217,6 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	}
 
 	/**
-	 * Determine the orientation of this page's layout.
-	 * @return one of {@link #HORIZONTAL} or {@link #VERTICAL}.
-	 * @see org.jppf.ui.options.OptionsPage#getOrientation()
-	 */
-	public int getOrientation()
-	{
-		return orientation;
-	}
-
-	/**
-	 * Set the orientation of this page's layout.
-	 * @param orientation one of {@link #HORIZONTAL} or {@link #VERTICAL}.
-	 */
-	public void setOrientation(int orientation)
-	{
-		this.orientation = orientation;
-	}
-
-	/**
 	 * Determines whether this page is part of another.
 	 * @return true if this page is an outermost page, false if it is embedded within another page.
 	 * @see org.jppf.ui.options.OptionsPage#isMainPage()
@@ -292,5 +271,15 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	public void setBordered(boolean bordered)
 	{
 		this.bordered = bordered;
+	}
+
+	/**
+	 * Enable or disable this option.
+	 * @param enabled true to enable this option, false to disable it.
+	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
+	 */
+	public void setEnabled(boolean enabled)
+	{
+		for (OptionElement elt: children) elt.setEnabled(enabled);
 	}
 }

@@ -35,7 +35,7 @@ import org.jvnet.substance.theme.SubstanceTheme;
  * This panel enbles the users to set the options for the administration and monitoring GUI.
  * @author Laurent Cohen
  */
-public class OptionsPanel extends JPanel
+public class OptionsPanelActions extends JPanel
 {
 	/**
 	 * Contains a list of all available themes fully qualified class names.
