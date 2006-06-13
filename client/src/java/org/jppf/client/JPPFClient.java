@@ -89,62 +89,96 @@ public class JPPFClient {
 	 * The pool of threads used for submitting execution requests.
 	 */
 	private ExecutorService executor = Executors.newFixedThreadPool(1);
+	/**
+	 * The name or IP address of the host the JPPF driver is running on.
+	 */
+	private String host = null;
+	/**
+	 * The TCP port the JPPF driver listening to for submitted tasks.
+	 */
+	private int port = -1;
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
 	 */
-	public JPPFClient() {
+	public JPPFClient()
+	{
 		this(new JPPFUuid().toString());
 	}
 
 	/**
 	 * Initialize this client with a specified application UUID.
-	 * 
-	 * @param uuid
-	 *            the unique identifier for this local client.
+	 * @param uuid the unique identifier for this local client.
 	 */
-	public JPPFClient(String uuid) {
-		try {
+	public JPPFClient(String uuid)
+	{
+		TypedProperties props = JPPFConfiguration.getProperties();
+		String driverHost = props.getString("jppf.server.host", "localhost");
+		int driverPort = props.getInt("app.server.port", 11112);
+		int classServerPort = props.getInt("class.server.port", 11111);
+		init(uuid, driverHost, driverPort, classServerPort);
+	}
+
+	/**
+	 * Initialize this client with a specified application UUID.
+	 * @param uuid the unique identifier for this local client.
+	 * @param host the name or IP address of the host the JPPF driver is running on.
+	 * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
+	 * @param classServerPort the TCP port the class server is listening to.
+	 */
+	public JPPFClient(String uuid, String host, int driverPort, int classServerPort)
+	{
+		init(uuid, host, driverPort, classServerPort);
+	}
+
+	/**
+	 * Initialize this client with a specified application UUID.
+	 * @param uuid the unique identifier for this local client.
+	 * @param host the name or IP address of the host the JPPF driver is running on.
+	 * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
+	 * @param classServerPort the TCP port the class server is listening to.
+	 */
+	private void init(String uuid, String host, int driverPort, int classServerPort)
+	{
+		try
+		{
 			this.appUuid = uuid;
 			initHelper();
-			delegate = new ClassServerDelegate(uuid);
+			this.host = host;
+			this.port = driverPort;
+			delegate = new ClassServerDelegate(uuid, host, classServerPort);
 			delegate.start();
-			init();
-		} catch (Exception e) {
+			initConnection();
+		}
+		catch(Exception e)
+		{
 			log.error(e.getMessage(), e);
 		}
 	}
 
 	/**
 	 * Initialize this node's resources.
-	 * 
-	 * @throws Exception
-	 *             if an error is raised during initialization.
+	 * @throws Exception if an error is raised during initialization.
 	 */
-	public synchronized void init() throws Exception {
-		if (socketClient == null)
-			initSocketClient();
-		System.out
-				.println("JPPFClient.init(): Attempting connection to the JPPF driver");
+	public synchronized void initConnection() throws Exception
+	{
+		if (socketClient == null) initSocketClient();
+		System.out.println("JPPFClient.init(): Attempting connection to the JPPF driver");
 		socketInitializer.initializeSocket(socketClient);
 		System.out.println("JPPFClient.init(): Reconnected to the JPPF driver");
 	}
-
+	
 	/**
 	 * Initialize this node's resources.
-	 * 
-	 * @throws Exception
-	 *             if an error is raised during initialization.
+	 * @throws Exception if an error is raised during initialization.
 	 */
-	public void initSocketClient() throws Exception {
-		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = props.getString("jppf.server.host", "localhost");
-		int port = props.getInt("app.server.port", 11112);
+	public void initSocketClient() throws Exception
+	{
 		socketClient = new SocketClient();
 		socketClient.setHost(host);
 		socketClient.setPort(port);
 	}
-
+	
 	/**
 	 * Submit the request to the server.
 	 * 
@@ -206,9 +240,6 @@ public class JPPFClient {
 	 *            the list of tasks to execute remotely.
 	 * @param dataProvider
 	 *            the provider of the data shared among tasks, may be null.
-	 * @param blocking
-	 *            determines whether the request is sent in non-blocking mode,
-	 *            and whether the tasks results should be sent asynchronously.
 	 * @throws Exception
 	 *             if an error occurs while sending the request.
 	 */
@@ -294,7 +325,7 @@ public class JPPFClient {
 					completed = true;
 				} catch (IOException e) {
 					log.error(e.getMessage(), e);
-					init();
+					initConnection();
 				}
 			}
 			return stats;
@@ -450,7 +481,7 @@ public class JPPFClient {
 						throw e;
 					} catch (Exception e) {
 						log.error(e.getMessage(), e);
-						init();
+						initConnection();
 					}
 				}
 			} catch (Exception e) {

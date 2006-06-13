@@ -20,6 +20,7 @@
 package org.jppf.ui.options.xml;
 
 import java.util.*;
+import javax.swing.ListSelectionModel;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.event.ValueChangeListener;
 import org.jppf.ui.options.xml.OptionDescriptor.*;
@@ -54,7 +55,7 @@ public class OptionsPageBuilder
 	{
 		for (OptionElement child: page.getChildren())
 		{
-			if (child instanceof AbstractOption)
+			if ((child instanceof AbstractOption) && !(child instanceof ButtonOption))
 			{
 				((AbstractOption) child).fireValueChanged();
 			}
@@ -78,6 +79,10 @@ public class OptionsPageBuilder
 		String s = desc.getProperty("orientation", "horizontal");
 		elt.setOrientation("horizontal".equalsIgnoreCase(s) ? OptionsPage.HORIZONTAL : OptionsPage.VERTICAL);
 		elt.setToolTipText(desc.getProperty("tooltip"));
+		elt.setScrollable(desc.getBoolean("scrollable", false));
+		elt.setBordered(desc.getBoolean("bordered", false));
+		elt.setWidth(desc.getInt("width", -1));
+		elt.setHeight(desc.getInt("height", -1));
 	}
 
 	/**
@@ -92,16 +97,8 @@ public class OptionsPageBuilder
 		for (ListenerDescriptor listenerDesc: desc.listeners)
 		{
 			Class clazz = Class.forName(listenerDesc.className);
-			if ("value".equals(listenerDesc.type))
-			{
-				ValueChangeListener listener = (ValueChangeListener) clazz.newInstance();
-				option.addValueChangeListener(listener);
-			}
-			else if ("action".equals(listenerDesc.type) && (option instanceof ButtonOption))
-			{
-				OptionAction action = (OptionAction) clazz.newInstance();
-				((ButtonOption) option).setAction(action);
-			}
+			ValueChangeListener listener = (ValueChangeListener) clazz.newInstance();
+			option.addValueChangeListener(listener);
 		}
 	}
 
@@ -114,10 +111,9 @@ public class OptionsPageBuilder
 	public OptionsPage buildPage(OptionDescriptor desc) throws Exception
 	{
 		OptionPanel page = new OptionPanel();
+		page.setEventsEnabled(false);
 		initCommonAttributes(page, desc);
 		page.setMainPage(desc.getBoolean("main"));
-		page.setBordered(desc.getBoolean("bordered"));
-		page.setScrollable(desc.getBoolean("scrollable"));
 		page.createUI();
 		for (OptionDescriptor child: desc.children)
 		{
@@ -132,7 +128,9 @@ public class OptionsPageBuilder
 			else if ("Boolean".equals(type)) page.add(buildBoolean(child));
 			else if ("ComboBox".equals(type)) page.add(buildComboBox(child));
 			else if ("Filler".equals(type)) page.add(buildFiller(child));
+			else if ("List".equals(type)) page.add(buildList(child));
 		}
+		page.setEventsEnabled(true);
 		return page;
 	}
 
@@ -144,10 +142,12 @@ public class OptionsPageBuilder
 	 */
 	public Option buildButton(OptionDescriptor desc) throws Exception
 	{
-		ButtonOption button = new ButtonOption();
-		initCommonOptionAttributes(button, desc);
-		button.createUI();
-		return button;
+		ButtonOption option = new ButtonOption();
+		option.setEventsEnabled(false);
+		initCommonOptionAttributes(option, desc);
+		option.createUI();
+		option.setEventsEnabled(true);
+		return option;
 	}
 
 	/**
@@ -159,8 +159,10 @@ public class OptionsPageBuilder
 	public Option buildTextArea(OptionDescriptor desc) throws Exception
 	{
 		TextAreaOption option = new TextAreaOption();
+		option.setEventsEnabled(false);
 		initCommonOptionAttributes(option, desc);
 		option.createUI();
+		option.setEventsEnabled(true);
 		return option;
 	}
 
@@ -173,9 +175,11 @@ public class OptionsPageBuilder
 	public Option buildPassword(OptionDescriptor desc) throws Exception
 	{
 		PasswordOption option = new PasswordOption();
+		option.setEventsEnabled(false);
 		initCommonOptionAttributes(option, desc);
 		option.setValue(desc.getProperty("value"));
 		option.createUI();
+		option.setEventsEnabled(true);
 		return option;
 	}
 
@@ -187,10 +191,12 @@ public class OptionsPageBuilder
 	 */
 	public Option buildPlainText(OptionDescriptor desc) throws Exception
 	{
-		TextAreaOption option = new TextAreaOption();
+		PlainTextOption option = new PlainTextOption();
+		option.setEventsEnabled(false);
 		initCommonOptionAttributes(option, desc);
 		option.setValue(desc.getProperty("value"));
 		option.createUI();
+		option.setEventsEnabled(true);
 		return option;
 	}
 
@@ -203,10 +209,12 @@ public class OptionsPageBuilder
 	public Option buildFormattedNumber(OptionDescriptor desc) throws Exception
 	{
 		FormattedNumberOption option = new FormattedNumberOption();
+		option.setEventsEnabled(false);
 		initCommonOptionAttributes(option, desc);
 		option.setValue(new Double(desc.getDouble("value")));
 		option.setPattern(desc.getProperty("pattern"));
 		option.createUI();
+		option.setEventsEnabled(true);
 		return option;
 	}
 
@@ -219,11 +227,13 @@ public class OptionsPageBuilder
 	public Option buildSpinnerNumber(OptionDescriptor desc) throws Exception
 	{
 		SpinnerNumberOption option = new SpinnerNumberOption();
+		option.setEventsEnabled(false);
 		initCommonOptionAttributes(option, desc);
 		option.setValue(new Integer(desc.getInt("value")));
 		option.setMin(new Integer(desc.getInt("minValue")));
 		option.setMax(new Integer(desc.getInt("maxValue")));
 		option.createUI();
+		option.setEventsEnabled(true);
 		return option;
 	}
 
@@ -236,9 +246,11 @@ public class OptionsPageBuilder
 	public Option buildBoolean(OptionDescriptor desc) throws Exception
 	{
 		BooleanOption option = new BooleanOption();
+		option.setEventsEnabled(false);
 		initCommonOptionAttributes(option, desc);
 		option.setValue(new Boolean(desc.getBoolean("value")));
 		option.createUI();
+		option.setEventsEnabled(true);
 		return option;
 	}
 
@@ -251,12 +263,37 @@ public class OptionsPageBuilder
 	public Option buildComboBox(OptionDescriptor desc) throws Exception
 	{
 		ComboBoxOption option = new ComboBoxOption();
+		option.setEventsEnabled(false);
 		initCommonOptionAttributes(option, desc);
 		List<Object> items = new ArrayList<Object>();
 		for (ItemDescriptor itemDesc: desc.items) items.add(itemDesc.name);
 		option.setItems(items);
 		option.setValue(desc.getProperty("value"));
 		option.createUI();
+		option.setEventsEnabled(true);
+		return option;
+	}
+
+	/**
+	 * Build a list option from the specified option descriptor.
+	 * @param desc the descriptor to get the page properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public Option buildList(OptionDescriptor desc) throws Exception
+	{
+		ListOption option = new ListOption();
+		option.setEventsEnabled(false);
+		initCommonOptionAttributes(option, desc);
+		List<Object> items = new ArrayList<Object>();
+		for (ItemDescriptor itemDesc: desc.items) items.add(itemDesc.name);
+		int selMode = "single".equals(desc.getProperty("selection"))
+			? ListSelectionModel.SINGLE_SELECTION : ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
+		option.setSelMode(selMode);
+		option.setItems(items);
+		option.setValue(new ArrayList<Object>());
+		option.createUI();
+		option.setEventsEnabled(true);
 		return option;
 	}
 

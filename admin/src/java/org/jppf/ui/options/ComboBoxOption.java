@@ -40,7 +40,7 @@ public class ComboBoxOption extends AbstractOption
 	/**
 	 * The items in the drop dwon list.
 	 */
-	protected List<Object> items = null;
+	protected List items = null;
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -143,7 +143,7 @@ public class ComboBoxOption extends AbstractOption
 	 * Get the list of items in the combo box.
 	 * @return a list of <code>Object</code> instances.
 	 */
-	public List<Object> getItems()
+	public List getItems()
 	{
 		return items;
 	}
@@ -152,7 +152,7 @@ public class ComboBoxOption extends AbstractOption
 	 * Set the list of items in the combo box.
 	 * @param items a list of <code>Object</code> instances.
 	 */
-	public void setItems(List<Object> items)
+	public void setItems(List items)
 	{
 		this.items = items;
 		if (combo != null)

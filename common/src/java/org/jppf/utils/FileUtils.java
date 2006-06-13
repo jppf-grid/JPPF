@@ -20,6 +20,8 @@
 package org.jppf.utils;
 
 import java.io.*;
+import java.net.URL;
+import java.util.*;
 
 /**
  * This class provides a set of utility methods for reading, writing and manipulating files. 
@@ -86,5 +88,48 @@ public final class FileUtils
 		}
 		writer.flush();
 		writer.close();
+	}
+
+	/**
+	 * Load a file from the specified path.
+	 * This method looks up the schema first in the file system, then in the classpath
+	 * if it is not found in the file system.
+	 * @param path the path to the file to load.
+	 * @return a <code>InputStream</code> instance, or null if the schema file could not be found.
+	 * @throws IOException if an IO error occurs while looking up the file.
+	 */
+	public static InputStream findFile(String path) throws IOException
+	{
+		InputStream is = null;
+		File file = new File(path);
+		if (file.exists()) is = new FileInputStream(file);
+		if (is == null)
+		{
+			URL url = FileUtils.class.getClassLoader().getResource(path);
+			is = (url == null) ? null : url.openStream();
+		}
+		return is;
+	}
+
+	/**
+	 * Get a list of files whose paths are found in a text file.
+	 * @param fileListPath the path to the file that holds the list of documents to validate.
+	 * @return the file paths as a lst of strings.
+	 * @throws IOException if an error occurs while looking up or reading the file.
+	 */
+	public static List<String> getFilePathList(String fileListPath) throws IOException
+	{
+		InputStream is = findFile(fileListPath);
+		String content = readTextFile(new BufferedReader(new InputStreamReader(is)));
+		LineNumberReader reader = new LineNumberReader(new StringReader(content));
+		List<String> filePaths = new ArrayList<String>();
+		boolean end = false;
+		while (!end)
+		{
+			String s = reader.readLine();
+			if (s != null) filePaths.add(s);
+			else end = true;
+		}
+		return filePaths;
 	}
 }

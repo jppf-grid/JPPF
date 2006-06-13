@@ -37,6 +37,10 @@ import org.jppf.ui.utils.GuiUtils;
 public class JPPFChartBuilder implements StatsHandlerListener
 {
 	/**
+	 * Singleton instance of this chart builder.
+	 */
+	private static JPPFChartBuilder instance = null;
+	/**
 	 * The stats formatter that provides the data.
 	 */
 	private StatsHandler statsHandler = null;
@@ -62,13 +66,12 @@ public class JPPFChartBuilder implements StatsHandlerListener
 	private PreferencesStorage storage = null;
 
 	/**
-	 * Initialize this charts builder with a specified stats formatter.
-	 * @param statsHandler the stats formatter that provides the data.
+	 * Initialize this charts builder.
 	 */
-	public JPPFChartBuilder(StatsHandler statsHandler)
+	protected JPPFChartBuilder()
 	{
-		this.statsHandler = statsHandler;
-		storage = new PreferencesStorage(this);
+		this.statsHandler = StatsHandler.getInstance();
+		storage = new PreferencesStorage();
 		initHandlerMap();
 	}
 	
@@ -260,5 +263,15 @@ public class JPPFChartBuilder implements StatsHandlerListener
 	public PreferencesStorage getStorage()
 	{
 		return storage;
+	}
+
+	/**
+	 * Get tingleton instance of this chart builder.
+	 * @return a JPPFChartBuilder instance.
+	 */
+	public static JPPFChartBuilder getInstance()
+	{
+		if (instance == null) instance = new JPPFChartBuilder();
+		return instance;
 	}
 }

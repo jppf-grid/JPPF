@@ -61,6 +61,14 @@ public class ClassServerDelegate extends Thread
 	 * Used to synchronize access to the underlying socket from multiple threads.
 	 */
 	private SocketInitializer socketInitializer = new SocketInitializer();
+	/**
+	 * The name or IP address of the host the class server is running on.
+	 */
+	private String host = null;
+	/**
+	 * The TCP port the class server is listening to.
+	 */
+	private int port = -1;
 
 	/**
 	 * Default instantiation of this class is not permitted.
@@ -72,11 +80,15 @@ public class ClassServerDelegate extends Thread
 	/**
 	 * Initialize class server delegate with a spceified application uuid.
 	 * @param uuid the unique identifier for the local JPPF client.
+	 * @param host the name or IP address of the host the class server is running on.
+	 * @param port the TCP port the class server is listening to.
 	 * @throws Exception if the connection could not be opended.
 	 */
-	public ClassServerDelegate(String uuid) throws Exception
+	public ClassServerDelegate(String uuid, String host, int port) throws Exception
 	{
 		this.appUuid = uuid;
+		this.host = host;
+		this.port = port;
 		init();
 	}
 
@@ -98,9 +110,6 @@ public class ClassServerDelegate extends Thread
 	 */
 	public void initSocketClient() throws Exception
 	{
-		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = props.getString("jppf.server.host","localhost");
-		int port = props.getInt("class.server.port", 11111);
 		socketClient = new SocketClient();
 		socketClient.setHost(host);
 		socketClient.setPort(port);

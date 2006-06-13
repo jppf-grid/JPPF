@@ -56,6 +56,11 @@ public interface OptionElement extends Serializable
 	 */
 	String getLabel();
 	/**
+	 * Get the root of the option tree this option belongs to.
+	 * @return a <code>OptionElement</code> instance. 
+	 */
+	OptionElement getRoot();
+	/**
 	 * Get the path of this element in the option tree.
 	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances. 
 	 */
@@ -76,11 +81,34 @@ public interface OptionElement extends Serializable
 	 */
 	void setEnabled(boolean enabled);
 	/**
+	 * Enable or disable the events firing in this option and/or its children.
+	 * @param enabled true to enable the events, false to disable them.
+	 */
+	void setEventsEnabled(boolean enabled);
+	/**
 	 * Get the path of this element in the option tree, represented as a string.
 	 * The string path is a sequence of element names separted by slashes.
 	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances. 
 	 */
 	String getStringPath();
+	/**
+	 * Determine whether this page should be enclosed within a scroll pane.
+	 * @return true if the page is to be enclosed in a scroll pane, false otherwise.
+	 */
+	boolean isScrollable();
+	/**
+	 * Determine whether this page has a border around it.
+	 * @return true if the page has a border, false otherwise.
+	 */
+	boolean isBordered();
+	/**
+	 * Find the first element with the specified name in the subtree of which
+	 * this element is the root. 
+	 * @param name the name of the element to find.
+	 * @return an <code>OptionElement</code> instance, or null if no element
+	 * could be found with the specfied name.
+	 */
+	OptionElement findFirstWithName(String name);
 	/**
 	 * Find all the elements with the specified name in the subtree of which
 	 * this element is the root. 

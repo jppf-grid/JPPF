@@ -22,6 +22,7 @@ package org.jppf.ui.options.xml;
 import java.io.InputStream;
 import javax.xml.parsers.*;
 import org.jppf.ui.options.xml.OptionDescriptor.*;
+import org.jppf.utils.FileUtils;
 import org.w3c.dom.*;
 
 /**
@@ -55,7 +56,7 @@ public class OptionDescriptorParser
 	 */
 	public OptionDescriptor parse(String docPath) throws Exception
 	{
-		InputStream is = SchemaValidator.findFile(docPath);
+		InputStream is = FileUtils.findFile(docPath);
 		if (is == null) return null;
 		Document doc = parser.parse(is);
 		return generateTree(doc.getFirstChild());

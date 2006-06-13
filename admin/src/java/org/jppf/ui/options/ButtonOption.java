@@ -19,6 +19,7 @@
  */
 package org.jppf.ui.options;
 
+import java.awt.event.*;
 import javax.swing.JButton;
 
 /**
@@ -27,11 +28,6 @@ import javax.swing.JButton;
  */
 public class ButtonOption extends AbstractOption
 {
-	/**
-	 * Action associated with the button.
-	 */
-	private OptionAction action = null;
-
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
 	 * option elements through reflexion.
@@ -52,7 +48,6 @@ public class ButtonOption extends AbstractOption
 		this.name = name;
 		this.label = label;
 		setToolTipText(tooltip);
-		this.action = null;
 		createUI();
 	}
 
@@ -63,11 +58,6 @@ public class ButtonOption extends AbstractOption
 	{
 		JButton button = new JButton(label);
 		if (toolTipText != null) button.setToolTipText(toolTipText);
-		if (action != null)
-		{
-			button.addActionListener(action);
-			action.setOption(this);
-		}
 		UIComponent = button;
 		setupValueChangeNotifications();
 	}
@@ -78,6 +68,13 @@ public class ButtonOption extends AbstractOption
 	 */
 	protected void setupValueChangeNotifications()
 	{
+		((JButton) UIComponent).addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				fireValueChanged();
+			}
+		});
 	}
 
 
@@ -89,23 +86,5 @@ public class ButtonOption extends AbstractOption
 	public void setEnabled(boolean enabled)
 	{
 		((JButton) UIComponent).setEnabled(enabled);
-	}
-
-	/**
-	 * Get the action associated with the button.
-	 * @return an <code>OptionAction</code> instance.
-	 */
-	public OptionAction getAction()
-	{
-		return action;
-	}
-
-	/**
-	 * Set the action associated with the button.
-	 * @param action an <code>OptionAction</code> instance.
-	 */
-	public void setAction(OptionAction action)
-	{
-		this.action = action;
 	}
 }

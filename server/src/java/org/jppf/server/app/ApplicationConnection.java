@@ -386,12 +386,7 @@ public class ApplicationConnection extends JPPFConnection implements
 
 	/**
 	 * This method waits until all tasks of a request have been completed.
-	 * 
-	 * @param blocking
-	 *            indicates whether we should wait for all execution results, or
-	 *            send them back to the client as soon as they are received.
-	 * @throws Exception
-	 *             if handing of the results fails.
+	 * @throws Exception if handing of the results fails.
 	 */
 	private synchronized void waitForExecution() throws Exception {
 		while (bundleMap.size() > 0) {

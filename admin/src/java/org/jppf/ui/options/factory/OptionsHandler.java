@@ -69,11 +69,13 @@ public final class OptionsHandler
 	/**
 	 * Add a page to the list of pages managed by this handler.
 	 * @param page an <code>OptionsPage</code> instance.
+	 * @return the page that was added.
 	 */
-	public static synchronized void addPage(OptionsPage page)
+	public static synchronized OptionsPage addPage(OptionsPage page)
 	{
 		pageList.add(page);
 		pageMap.put(page.getName(), page);
+		return page;
 	}
 
 	/**
@@ -89,16 +91,18 @@ public final class OptionsHandler
 	/**
 	 * Add a page built from an xml document.
 	 * @param xmlPath the path to the xml document.
+	 * @return the page that was added.
 	 */
-	public static synchronized void addPageFromXml(String xmlPath)
+	public static synchronized OptionsPage addPageFromXml(String xmlPath)
 	{
 		try
 		{
-			addPage(builder.buildPage(xmlPath));
+			return addPage(builder.buildPage(xmlPath));
 		}
 		catch(Exception e)
 		{
 			log.error(e.getMessage(), e);
 		}
+		return null;
 	}
 }

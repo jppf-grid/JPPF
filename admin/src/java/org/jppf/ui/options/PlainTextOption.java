@@ -57,4 +57,15 @@ public class PlainTextOption extends TextOption
 	{
 		return new JTextField((String) value);
 	}
+
+	/**
+	 * Set the value of this option.
+	 * @param value the value as an <code>Object</code> instance.
+	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
+	 */
+	public void setValue(Object value)
+	{
+		this.value = value;
+		if ((value != null) && (field != null)) field.setText(value.toString());
+	}
 }

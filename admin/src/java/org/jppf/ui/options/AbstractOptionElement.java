@@ -19,6 +19,7 @@
  */
 package org.jppf.ui.options;
 
+import java.awt.Dimension;
 import java.util.*;
 import javax.swing.JComponent;
 import javax.swing.tree.TreePath;
@@ -50,9 +51,29 @@ public abstract class AbstractOptionElement implements OptionElement
 	 */
 	protected OptionElement parent = null;
 	/**
+	 * The root of the option tree this option belongs to.
+	 */
+	protected OptionElement root = null;
+	/**
 	 * Get the UI component for this option element.
 	 */
 	protected JComponent UIComponent = null;
+	/**
+	 * Determines whether this page should be enclosed within a scroll pane.
+	 */
+	protected boolean scrollable = false;
+	/**
+	 * Determines whether this option has a border around it.
+	 */
+	protected boolean bordered = false;
+	/**
+	 * Preferred width of the UI component.
+	 */
+	protected int width = -1;
+	/**
+	 * Preferred height of the UI component.
+	 */
+	protected int height = -1;
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -187,6 +208,60 @@ public abstract class AbstractOptionElement implements OptionElement
 	}
 
 	/**
+	 * Determine whether this page should be enclosed within a scroll pane.
+	 * @return true if the page is to be enclosed in a scroll pabe, false otherwise.
+	 * @see org.jppf.ui.options.OptionElement#isScrollable()
+	 */
+	public boolean isScrollable()
+	{
+		return scrollable;
+	}
+
+	/**
+	 * Determine whether this page should be enclosed within a scroll pane.
+	 * @param scrollable true if the page is to be enclosed in a scroll pane, false otherwise.
+	 */
+	public void setScrollable(boolean scrollable)
+	{
+		this.scrollable = scrollable;
+	}
+
+	/**
+	 * Determine whether this page has a border around it.
+	 * @return true if the page has a border, false otherwise.
+	 * @see org.jppf.ui.options.OptionElement#isBordered()
+	 */
+	public boolean isBordered()
+	{
+		return bordered;
+	}
+
+	/**
+	 * Determine whether this page has a border around it.
+	 * @param bordered true if the page has a border, false otherwise.
+	 */
+	public void setBordered(boolean bordered)
+	{
+		this.bordered = bordered;
+	}
+
+	/**
+	 * Get the root of the option tree this option belongs to.
+	 * @return a <code>OptionElement</code> instance. 
+	 * @see org.jppf.ui.options.OptionElement#getRoot()
+	 */
+	public OptionElement getRoot()
+	{
+		if (root == null)
+		{
+			OptionElement elt = this;
+			while (elt.getParent() != null) elt = elt.getParent();
+			root = elt;
+		}
+		return root;
+	}
+
+	/**
 	 * Get the path of this element in the option tree.
 	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances. 
 	 * @see org.jppf.ui.options.OptionElement#getPath()
@@ -240,9 +315,7 @@ public abstract class AbstractOptionElement implements OptionElement
 		else if ("".equals(path)) return this;
 		if (path.startsWith("/"))
 		{
-			TreePath treePath = getPath();
-			OptionElement root = (OptionElement) treePath.getPathComponent(0);
-			return root.findElement(path.substring(1));
+			return getRoot().findElement(path.substring(1));
 		}
 		if (path.startsWith(".."))
 		{
@@ -299,9 +372,28 @@ public abstract class AbstractOptionElement implements OptionElement
 	 */
 	public List<OptionElement> findAllWithName(String name)
 	{
+		if (name.startsWith("/"))
+		{
+			name = name.substring(1);
+			return ((OptionElement) getPath().getPathComponent(0)).findAllWithName(name);
+		}
 		List<OptionElement> list = new ArrayList<OptionElement>();
 		findAll(name, list);
 		return list;
+	}
+
+	/**
+	 * Find the first element with the specified name in the subtree of which
+	 * this element is the root. 
+	 * @param name the name of the element to find.
+	 * @return an <code>OptionElement</code> instance, or null if no element
+	 * could be found with the specfied name.
+	 * @see org.jppf.ui.options.OptionElement#findFirstWithName(java.lang.String)
+	 */
+	public OptionElement findFirstWithName(String name)
+	{
+		List<OptionElement> list = findAllWithName(name);
+		return list.isEmpty() ? null : list.get(0);
 	}
 
 	/**
@@ -318,6 +410,53 @@ public abstract class AbstractOptionElement implements OptionElement
 		{
 			OptionsPage page = (OptionsPage) this;
 			for (OptionElement elt: page.getChildren()) ((AbstractOptionElement) elt).findAll(name, list);
+		}
+	}
+
+	/**
+	 * Get the preferred height of the UI component.
+	 * @return the height as an int value.
+	 */
+	public int getHeight()
+	{
+		return height;
+	}
+
+	/**
+	 * Set the preferred height of the UI component.
+	 * @return
+	 * @param height the height as an int value.
+	 */
+	public void setHeight(int height)
+	{
+		this.height = height;
+		if ((height >= 0) && (UIComponent != null))
+		{
+			Dimension d = UIComponent.getPreferredSize();
+			UIComponent.setPreferredSize(new Dimension(d.width, height));
+		}
+	}
+
+	/**
+	 * Get the preferred width of the UI component.
+	 * @return the width as an int value.
+	 */
+	public int getWidth()
+	{
+		return width;
+	}
+
+	/**
+	 * Get the preferred width of the UI component.
+	 * @param width the width as an int value.
+	 */
+	public void setWidth(int width)
+	{
+		this.width = width;
+		if ((width >= 0) && (UIComponent != null))
+		{
+			Dimension d = UIComponent.getPreferredSize();
+			UIComponent.setPreferredSize(new Dimension(width, d.height));
 		}
 	}
 }

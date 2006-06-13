@@ -12,12 +12,12 @@
 		<property name="label" value="Use manual settings"/>
 		<property name="tooltip" value="Toggles between manual and automatic tuning of the bundle size"/>
 		<property name="value" value="true"/>
-		<listener type="value" class="org.jppf.ui.options.factory.BundleSizeTuningActions$ToggleManualAutoListener"/>
+		<listener type="value" class="org.jppf.ui.options.factory.BundleSizeTuningActions"/>
 	</child>
 
 
 	<!-- ===================================================================== -->
-	<!--           Server bundle size manual configuration area                       -->
+	<!--           Server bundle size manual configuration area                -->
 	<!-- ===================================================================== -->
 
 	<child name="ManualConfig" type="page">
@@ -38,13 +38,13 @@
 			<child name="Refresh" type="Button">
 				<property name="label" value="Refresh Settings"/>
 				<property name="tooltip" value="Refreshes the settings from the server values"/>
-				<listener type="action" class="org.jppf.ui.options.factory.BundleSizeTuningActions$RefreshSettingsAction"/>
+				<listener type="action" class="org.jppf.ui.options.factory.BundleSizeTuningActions"/>
 			</child>
 
 			<child name="ApplyManual" type="Button">
 				<property name="label" value="Change Settings"/>
 				<property name="tooltip" value="Apply new settings by sending them to the server"/>
-				<listener type="action" class="org.jppf.ui.options.factory.BundleSizeTuningActions$ApplySettingsAction"/>
+				<listener type="action" class="org.jppf.ui.options.factory.BundleSizeTuningActions"/>
 			</child>
 		</child>
 
@@ -86,7 +86,7 @@
 			<child name="ApplyAuto" type="Button">
 				<property name="label" value="Apply"/>
 				<property name="tooltip" value="Apply the current settings to the server immediately"/>
-				<listener type="action" class="org.jppf.ui.options.factory.BundleSizeTuningActions$ApplyAutoSettingsAction"/>
+				<listener type="action" class="org.jppf.ui.options.factory.BundleSizeTuningActions"/>
 			</child>
 
 			<child name="filler2" type="Filler">

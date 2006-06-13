@@ -40,6 +40,10 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	 * List of listeners that are notified when the value of this option changes.
 	 */
 	protected java.util.List<ValueChangeListener> listeners = new ArrayList<ValueChangeListener>();
+	/**
+	 * Determines whether firing events is enabled or not.
+	 */
+	protected boolean eventsEnabled = true;
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -60,7 +64,7 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	}
 
 	/**
-	 * The value of this option.
+	 * Set the value of this option.
 	 * @param value the value as an <code>Object</code> instance.
 	 */
 	public void setValue(Object value)
@@ -91,6 +95,7 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	 */
 	public void fireValueChanged()
 	{
+		if (!eventsEnabled) return;
 		for (ValueChangeListener listener: listeners)
 		{
 			listener.valueChanged(new ValueChangeEvent(this));
@@ -114,38 +119,60 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	protected JPanel layoutComponents(JComponent comp1, JComponent comp2)
 	{
 		JPanel panel = new JPanel();
-		GridBagLayout g = new GridBagLayout();
-		panel.setLayout(g);
-    GridBagConstraints c = new GridBagConstraints();
-		c.insets = new Insets(2, 2, 2, 2);
-		if (orientation == HORIZONTAL)
+		if ((comp1 == null) && (comp2 == null)) return panel;
+		if ((comp1 != null) && (comp2 != null))
 		{
-			c.gridy = 0;
-			c.anchor = GridBagConstraints.LINE_START;
+			GridBagLayout g = new GridBagLayout();
+			panel.setLayout(g);
+	    GridBagConstraints c = new GridBagConstraints();
+			c.insets = new Insets(2, 2, 2, 2);
+			if (orientation == HORIZONTAL)
+			{
+				c.gridy = 0;
+				c.anchor = GridBagConstraints.LINE_START;
+			}
+			else
+			{
+				c.gridx  = 0;
+				c.anchor = GridBagConstraints.WEST;
+				//c.anchor = GridBagConstraints.NORTHWEST;
+			}
+			addLayoutComp(panel, g, c, comp1);
+			c.anchor = GridBagConstraints.CENTER;
+			if (orientation == HORIZONTAL) c.weightx = 1.0;
+			else  c.weighty = 1.0;
+			JComponent filler = GuiUtils.createFiller(1, 1);
+			addLayoutComp(panel, g, c, filler);
+			if (orientation == HORIZONTAL)
+			{
+				c.anchor = GridBagConstraints.LINE_END;
+				c.weightx = 0.0;
+			}
+			else
+			{
+				c.anchor = GridBagConstraints.WEST;
+				//c.anchor = GridBagConstraints.SOUTHWEST;
+				c.weighty = 0.0;
+			}
+			addLayoutComp(panel, g, c, comp2);
 		}
 		else
 		{
-			c.gridx  = 0;
-			c.anchor = GridBagConstraints.PAGE_START;
+			int or = (orientation == HORIZONTAL) ? BoxLayout.X_AXIS : BoxLayout.Y_AXIS;
+			panel.setLayout(new BoxLayout(panel, or));
+			panel.add(comp1 != null ? comp1 : comp2);
 		}
-		addLayoutComp(panel, g, c, comp1);
-		c.anchor = GridBagConstraints.CENTER;
-		if (orientation == HORIZONTAL) c.weightx = 1.0;
-		else  c.weighty = 1.0;
-		JComponent filler = GuiUtils.createFiller(1, 1);
-		addLayoutComp(panel, g, c, filler);
-		if (orientation == HORIZONTAL)
-		{
-			c.anchor = GridBagConstraints.LINE_END;
-			c.weightx = 0.0;
-		}
-		else
-		{
-			c.anchor = GridBagConstraints.PAGE_END;
-			c.weighty = 0.0;
-		}
-		addLayoutComp(panel, g, c, comp2);
 
 		return panel;
+	}
+
+	/**
+	 * Enable or disable the events firing in this otpion and/or its children.
+	 * @param enabled true to enable the events, false to disable them.
+	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
+	 */
+	public void setEventsEnabled(boolean enabled)
+	{
+		eventsEnabled = enabled;
 	}
 }

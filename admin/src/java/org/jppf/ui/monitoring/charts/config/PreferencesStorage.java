@@ -40,18 +40,12 @@ public class PreferencesStorage
 	 * The root of the preferences subtree in which the chart configurations are saved.
 	 */
 	private static Preferences CHART_CONFIG_PREFERENCES = Preferences.userRoot().node("jppf/TabConfigurations");
-	/**
-	 * The chart builder used to configure all the charts and corresponding layouts. 
-	 */
-	private JPPFChartBuilder builder = null;
 
 	/**
 	 * Initialize this preferences storage with a specified chart builder.
-	 * @param builder the chart builder used to configure all the charts and corresponding layouts.
 	 */
-	public PreferencesStorage(JPPFChartBuilder builder)
+	public PreferencesStorage()
 	{
-		this.builder = builder;
 	}
 
 	/**
@@ -97,10 +91,10 @@ public class PreferencesStorage
 
 		for (TabConfiguration tab: tabs)
 		{
-			builder.addTab(tab);
+			JPPFChartBuilder.getInstance().addTab(tab);
 			for (ChartConfiguration config : tab.configs)
 			{
-				builder.createChart(config, false);
+				JPPFChartBuilder.getInstance().createChart(config, false);
 				tab.panel.add(config.chartPanel);
 			}
 		}
@@ -180,7 +174,7 @@ public class PreferencesStorage
 	{
 		removeAllSaved();
 		int cnt = 0;
-		for (TabConfiguration tab: builder.getTabList())
+		for (TabConfiguration tab: JPPFChartBuilder.getInstance().getTabList())
 		{
 			tab.position = cnt++;
 			saveTabConfiguration(tab);

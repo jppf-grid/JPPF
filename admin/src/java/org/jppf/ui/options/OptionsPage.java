@@ -48,16 +48,6 @@ public interface OptionsPage extends OptionElement
 	 */
 	int getOrientation();
 	/**
-	 * Determine whether this page should be enclosed within a scroll pane.
-	 * @return true if the page is to be enclosed in a scroll pane, false otherwise.
-	 */
-	boolean isScrollable();
-	/**
-	 * Determine whether this page has a border around it.
-	 * @return true if the page has a border, false otherwise.
-	 */
-	boolean isBordered();
-	/**
 	 * Get the options in this page.
 	 * @return a list of <code>Option</code> instances.
 	 */

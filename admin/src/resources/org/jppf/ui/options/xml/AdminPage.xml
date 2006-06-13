@@ -15,7 +15,7 @@
 	
 	<child name="AdminCommands" type="page">
 
-		<property name="label" value="Admin COmmands"/>
+		<property name="label" value="Admin Commands"/>
 		<property name="scrollable" value="false"/>
 		<property name="orientation" value="horizontal"/>
 		<property name="bordered" value="false"/>
@@ -37,7 +37,7 @@
 			<child name="Perform Now" type="Button">
 				<property name="label" value="Perform Now"/>
 				<property name="tooltip" value="Sends the shutdown and/or restart request to the server"/>
-				<listener type="action" class="org.jppf.ui.options.factory.AdminPanelActions$ShutdownRestartAction"/>
+				<listener type="action" class="org.jppf.ui.options.factory.AdminPanelActions"/>
 			</child>
 	
 			<child name="Shutdown delay" type="FormattedNumber">
@@ -51,7 +51,7 @@
 				<property name="label" value="Restart"/>
 				<property name="tooltip" value="Determines whether the server should be restarted"/>
 				<property name="value" value="true"/>
-				<listener type="value" class="org.jppf.ui.options.factory.AdminPanelActions$RestartCheckboxListener"/>
+				<listener type="value" class="org.jppf.ui.options.factory.AdminPanelActions"/>
 			</child>
 	
 			<child name="Restart delay" type="FormattedNumber">
@@ -83,7 +83,7 @@
 			<child name="Change password" type="Button">
 				<property name="label" value="Change password"/>
 				<property name="tooltip" value="Tells the server to change the administrator password"/>
-				<listener type="action" class="org.jppf.ui.options.factory.AdminPanelActions$ChangePasswordAction"/>
+				<listener type="action" class="org.jppf.ui.options.factory.AdminPanelActions"/>
 			</child>
 	
 			<child name="actualPwd" type="Password">
@@ -135,10 +135,10 @@
 				<property name="pattern" value="###,###,##0"/>
 			</child>
 	
-			<child name="Apply" type="Button">
+			<child name="ApplyInterval" type="Button">
 				<property name="label" value="Apply"/>
 				<property name="tooltip" value="Apply the new interval value immediately"/>
-				<listener type="action" class="org.jppf.ui.options.factory.OptionsPanelActions$ChangeIntervalAction"/>
+				<listener type="action" class="org.jppf.ui.options.factory.OptionsPanelActions"/>
 			</child>
 	
 			<child name="filler" type="Filler">
@@ -149,7 +149,7 @@
 		</child>
 	
 		<!-- ===================================================================== -->
-		<!--           Server bundle size configuration area                       -->
+		<!--                      UI options area                                  -->
 		<!-- ===================================================================== -->
 	
 		<child name="UI" type="page">
@@ -164,7 +164,7 @@
 				<property name="label" value="Choose a theme"/>
 				<property name="tooltip" value="Select a color theme"/>
 				<property name="value" value="Aqua"/>
-				<listener type="value" class="org.jppf.ui.options.factory.OptionsPanelActions$ComboBoxListener"/>
+				<listener type="value" class="org.jppf.ui.options.factory.OptionsPanelActions"/>
 				<item name="Aqua" selected="true"/>
 				<item name="BarbyPink" selected="false"/>
 				<item name="BottleGreen" selected="false"/>
@@ -191,7 +191,7 @@
 				<property name="label" value="Dark"/>
 				<property name="tooltip" value="Toggles between light and dark versions of the chosen theme"/>
 				<property name="value" value="false"/>
-				<listener type="value" class="org.jppf.ui.options.factory.OptionsPanelActions$CheckBoxListener"/>
+				<listener type="value" class="org.jppf.ui.options.factory.OptionsPanelActions"/>
 			</child>
 	
 			<child name="filler" type="Filler">

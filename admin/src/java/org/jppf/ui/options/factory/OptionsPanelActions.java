@@ -20,13 +20,11 @@
 package org.jppf.ui.options.factory;
 
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
 import java.util.*;
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import org.jppf.ui.monitoring.JPPFTheme;
 import org.jppf.ui.monitoring.data.StatsHandler;
-import org.jppf.ui.options.*;
-import org.jppf.ui.options.event.*;
+import org.jppf.ui.options.Option;
 import org.jvnet.substance.SubstanceLookAndFeel;
 import org.jvnet.substance.color.ColorScheme;
 import org.jvnet.substance.theme.SubstanceTheme;
@@ -35,7 +33,7 @@ import org.jvnet.substance.theme.SubstanceTheme;
  * This panel enbles the users to set the options for the administration and monitoring GUI.
  * @author Laurent Cohen
  */
-public class OptionsPanelActions extends JPanel
+public class OptionsPanelActions extends AbstractActionsHolder
 {
 	/**
 	 * Contains a list of all available themes fully qualified class names.
@@ -105,68 +103,55 @@ public class OptionsPanelActions extends JPanel
 	}
 
 	/**
+	 * Initialize the mapping of an option name to the method to invoke when the option's value changes.
+	 * @see org.jppf.ui.options.factory.AbstractActionsHolder#initializeMethodMap()
+	 */
+	protected void initializeMethodMap()
+	{
+		addMapping("ApplyInterval", "applyIntervalPressed");
+		addMapping("Theme", "colorSchemeChanged");
+		addMapping("Dark", "darkFlagChanged");
+	}
+
+	/**
 	 * Action associated with the button to change the refresh interval.
 	 */
-	public static class ChangeIntervalAction extends OptionAction
+	public void applyIntervalPressed()
 	{
-		/**
-		 * Perform the action.
-		 * @param event not used.
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		 */
-		public void actionPerformed(ActionEvent event)
+		Option field = (Option) option.findElement("../Interval");
+		long interval = ((Number) field.getValue()).longValue();
+		StatsHandler handler = StatsHandler.getInstance();
+		if (interval != handler.getRefreshInterval())
 		{
-			Option field = (Option) option.findElement("../Interval");
-			long interval = ((Number) field.getValue()).longValue();
-			StatsHandler handler = StatsHandler.getInstance();
-			if (interval != handler.getRefreshInterval())
-			{
-				handler.setRefreshInterval(interval);
-				handler.stopRefreshTimer();
-				handler.startRefreshTimer();
-			}
+			handler.setRefreshInterval(interval);
+			handler.stopRefreshTimer();
+			handler.startRefreshTimer();
 		}
 	}
 
 	/**
 	 * Value change listener for the combo box that determines
-	 * the colr scheme to use in the UI.
+	 * the color scheme to use in the UI.
 	 */
-	public static class ComboBoxListener implements ValueChangeListener
+	public void colorSchemeChanged()
 	{
-		/**
-		 * Invoked when the selection in the combo box has changed.
-		 * @param event not used.
-		 * @see org.jppf.ui.options.event.ValueChangeListener#valueChanged(org.jppf.ui.options.event.ValueChangeEvent)
-		 */
-		public void valueChanged(ValueChangeEvent event)
+		String themeName = (String) option.getValue();
+		if ((themeName != null) && !currentColorScheme.equals(themeName))
 		{
-			String themeName = (String) event.getOption().getValue();
-			if ((themeName != null) && !currentColorScheme.equals(themeName))
-			{
-				changeTheme(themeName, currentSchemeDark);
-			}
+			changeTheme(themeName, currentSchemeDark);
 		}
 	}
 
 	/**
 	 * Value change listener for the checkbox that controls whether
-	 * to use the light or dark version of the col0or theme. 
+	 * to use the light or dark version of the color theme. 
 	 */
-	public static class CheckBoxListener implements ValueChangeListener
+	public void darkFlagChanged()
 	{
-		/**
-		 * Invoked when the state of the check box has changed.
-		 * @param event not used.
-		 * @see org.jppf.ui.options.event.ValueChangeListener#valueChanged(org.jppf.ui.options.event.ValueChangeEvent)
-		 */
-		public void valueChanged(ValueChangeEvent event)
+		boolean isDark = (Boolean) option.getValue();
+		if (isDark != currentSchemeDark)
 		{
-			boolean isDark = (Boolean) event.getOption().getValue();
-			if (isDark != currentSchemeDark)
-			{
-				changeTheme(currentColorScheme, isDark);
-			}
+			changeTheme(currentColorScheme, isDark);
 		}
 	}
 }

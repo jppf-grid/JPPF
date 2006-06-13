@@ -166,7 +166,6 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			}
 		}
 	}
-
 	
 	/**
 	 * There are only two states in this automata.<br>

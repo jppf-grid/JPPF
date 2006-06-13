@@ -81,6 +81,8 @@ public class SpinnerNumberOption extends AbstractOption
 		SpinnerNumberModel model =
 			new SpinnerNumberModel(((Integer) value).intValue(), min.intValue(), max.intValue(), 1);
 		spinner = new JSpinner(model);
+		JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) spinner.getEditor();
+		if (editor.getTextField().getColumns() < 5) editor.getTextField().setColumns(5);
 		spinnerLabel = new JLabel(label);
 		if (toolTipText != null)
 		{

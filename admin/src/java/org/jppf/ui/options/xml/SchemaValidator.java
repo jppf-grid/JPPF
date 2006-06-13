@@ -20,10 +20,11 @@
 package org.jppf.ui.options.xml;
 
 import java.io.*;
-import java.net.URL;
+import java.util.*;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.*;
+import org.jppf.utils.FileUtils;
 import org.xml.sax.*;
 
 
@@ -48,44 +49,40 @@ public class SchemaValidator
 		{
 			// "org/jppf/ui/options/xml/option.xsd"
 			// "org/jppf/ui/options/xml/AdminPage.xml"
-			if ((args == null) || (args.length < 2))
-				throw new Exception("There must be at least 2 arguments");
+			if ((args == null) || (args.length != 2)) usageAndExit();
 
-			for (int i=1; i<args.length; i++)
+			List<String> docPaths = FileUtils.getFilePathList(args[1]);
+			for (String path: docPaths)
 			{
-				boolean b = validate(args[i], args[0]);
-			
-				if (b) System.out.println("the document "+args[i]+" is valid.");
-				else System.out.println("the document "+args[i]+" has errors.");
+				boolean b = validate(path, args[0]);
+				String s = "the document " + path;
+				System.out.println(s + (b ? " is valid." : " has errors."));
 			}
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			System.exit(1);
 		}
 		System.exit(0);
 	}
 
 	/**
-	 * Load a file from the specified path.
-	 * This method looks up the schema first in the file system, then in the classpath
-	 * if it is not found in the file system.
-	 * @param path the path to the file to load.
-	 * @return a <code>InputStream</code> instance, or null if the schema file could not be found.
-	 * @throws IOException if an IO error occurs while looking up the file.
+	 * Show usage instructions for this validation toll, and exit the JVM.
 	 */
-	public static InputStream findFile(String path) throws IOException
+	public static void usageAndExit()
 	{
-		InputStream is = null;
-		File file = new File(path);
-		if (file.exists()) is = new FileInputStream(file);
-		if (is == null)
-		{
-			URL url = SchemaValidator.class.getClassLoader().getResource(path);
-			is = (url == null) ? null : url.openStream();
-			//is = SchemaValidator.class.getClassLoader().getResourceAsStream(path);
-		}
-		return is;
+		StringBuilder sb = new StringBuilder();
+		sb.append("Usage:\n\n");
+		sb.append("    SchemaValidator <xml schema> <xml document list>\n\n");
+		sb.append("Where:\n\n");
+		sb.append("  - xml schema is the location of the XML Schema to validate against\n");
+		sb.append("  - xml schema is the location of the a text file containing the list\n");
+		sb.append("    of XML documents to validate\n\n");
+		sb.append("Any file location, including those in the document list, can be either\n");
+		sb.append("in the file system or in the classpath.");
+		System.out.println(sb.toString());
+		System.exit(1);
 	}
 
 	/**
@@ -99,7 +96,7 @@ public class SchemaValidator
 	 */
 	public static Schema loadSchema(String path) throws IOException, SAXException
 	{
-		InputStream is = findFile(path);
+		InputStream is = FileUtils.findFile(path);
 		if (is == null) return null;
 		Schema schema = getSchemaFactory().newSchema(new StreamSource(is));
 		return schema;
@@ -115,7 +112,7 @@ public class SchemaValidator
 	 */
 	public static boolean validate(String docPath, String schemaPath) throws IOException, SAXException
 	{
-		InputStream docIs = findFile(docPath);
+		InputStream docIs = FileUtils.findFile(docPath);
 		if (docIs == null) return false;
 		Schema schema = loadSchema(schemaPath);
 		if (schema == null) return false;

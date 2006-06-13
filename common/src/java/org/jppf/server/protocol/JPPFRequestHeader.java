@@ -37,29 +37,24 @@ import org.jppf.utils.JPPFUuid;
 public class JPPFRequestHeader implements Serializable
 {
 	
-	public enum Type { NON_BLOCKING_EXECUTION, ADMIN, STATISTICS};
-	
-	
-	//does it still needed?
-	//
-	// Value for an execution request type.
-	//
-	//public static final String EXECUTION = "execution";
-	
-	
 	/**
-	 * Value for a non-blocking execution request type.
+	 * Type safe enum for the type of request.
 	 */
-	//public static final String NON_BLOCKING_EXECUTION = "nb.execution";
-	/**
-	 * Value for an administration request type.
-	 */
-	//public static final String ADMIN = "admin";
-	/**
-	 * Value for a statistics collection type of request.
-	 */
-	//public static final String STATISTICS = "statistics";
-	
+	public enum Type
+	{ 
+		/**
+		 * Task execution request.
+		 */
+		NON_BLOCKING_EXECUTION,
+		/**
+		 * Administration request.
+		 */
+		ADMIN,
+		/**
+		 * Statistics collection request.
+		 */
+		STATISTICS
+	};
 	/**
 	 * The unique identifier for the submitting application.
 	 */
@@ -69,7 +64,7 @@ public class JPPFRequestHeader implements Serializable
 	 */
 	private String uuid = null;
 	/**
-	 * The type of this request, ie either {@link #NON_BLOCKING_EXECUTION NON_BLOCKING_EXECUTION} or {@link #ADMIN ADMIN}.
+	 * The type of this request.
 	 */
 	private Type requestType = Type.NON_BLOCKING_EXECUTION;
 	/**
@@ -131,7 +126,7 @@ public class JPPFRequestHeader implements Serializable
 	}
 
 	/**
-	 * Get the type of this request, ie either {@link #NON_BLOCKING_EXECUTION NON_BLOCKING_EXECUTION}, {@link #STATISTICS STATISTICS} or {@link #ADMIN ADMIN}.
+	 * Get the type of this request.
 	 * @return the type as a string.
 	 */
 	public Type getRequestType()
@@ -141,7 +136,7 @@ public class JPPFRequestHeader implements Serializable
 
 	/**
 	 * Set the type of this request.
-	 * @param requestType the type as a string, either {@link #NON_BLOCKING_EXECUTION NON_BLOCKING_EXECUTION}, {@link #STATISTICS STATISTICS} or {@link #ADMIN ADMIN}.
+	 * @param requestType the type as a string.
 	 */
 	public void setRequestType(Type requestType)
 	{

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<opt:main name="ChartsConfiguration" type="page" xmlns:opt="http://www.jppf.org/Options.xsd">
+
+	<property name="label" value="Charts Configuration"/>
+	<property name="scrollable" value="true"/>
+	<property name="orientation" value="vertical"/>
+	<property name="bordered" value="false"/>
+	<property name="main" value="true"/>
+
+	<!-- ===================================================================== -->
+	<!--                   Top Panels                                          -->
+	<!-- ===================================================================== -->
+
+	<child name="Top" type="page">
+		<property name="label" value="Top"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+
+		<child name="TabsBtnPanel" type="page">
+			<property name="label" value="Monitor"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="false"/>
+			<property name="main" value="false"/>
+
+			<child name="TabNew" type="Button">
+				<property name="label" value="New"/>
+				<property name="tooltip" value="Create a new tab"/>
+				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+			</child>
+
+			<child name="TabRemove" type="Button">
+				<property name="label" value="Remove"/>
+				<property name="tooltip" value="Remove the tab"/>
+				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+			</child>
+
+			<child name="TabUp" type="Button">
+				<property name="label" value="Up"/>
+				<property name="tooltip" value="Move the tab one position up"/>
+				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+			</child>
+
+			<child name="TabDown" type="Button">
+				<property name="label" value="Down"/>
+				<property name="tooltip" value="Move the tab one position down"/>
+				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+			</child>
+
+			<child name="filler" type="Filler">
+				<property name="width" value="1"/>
+				<property name="height" value="1"/>
+			</child>
+
+		</child>
+
+		<child name="TabsList" type="List">
+			<property name="label" value="Tabs"/>
+			<property name="orientation" value="horizontal"/>
+			<property name="tooltip" value="The list of active tabs"/>
+			<property name="scrollable" value="true"/>
+			<property name="bordered" value="true"/>
+			<property name="value" value=""/>
+			<property name="selection" value="single"/>
+			<property name="width" value="140"/>
+			<property name="height" value="80"/>
+			<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+		</child>
+
+		<child name="filler" type="Filler">
+			<property name="width" value="15"/>
+			<property name="height" value="1"/>
+		</child>
+
+		<child name="ChartsBtnPanel" type="page">
+			<property name="label" value="Monitor"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="false"/>
+			<property name="main" value="false"/>
+
+			<child name="ChartRemove" type="Button">
+				<property name="label" value="Remove"/>
+				<property name="tooltip" value="Remove the chart"/>
+				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+			</child>
+
+			<child name="ChartUp" type="Button">
+				<property name="label" value="Up"/>
+				<property name="tooltip" value="Move the chart one position up"/>
+				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+			</child>
+
+			<child name="ChartDown" type="Button">
+				<property name="label" value="Down"/>
+				<property name="tooltip" value="Move the chart one position down"/>
+				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+			</child>
+
+			<child name="filler" type="Filler">
+				<property name="width" value="1"/>
+				<property name="height" value="1"/>
+			</child>
+
+		</child>
+
+		<child name="ChartsList" type="List">
+			<property name="label" value="Charts"/>
+			<property name="tooltip" value="The list of active charts in the selected tab"/>
+			<property name="value" value=""/>
+			<property name="selection" value="single"/>
+			<property name="scrollable" value="true"/>
+			<property name="bordered" value="true"/>
+			<property name="orientation" value="horizontal"/>
+			<property name="width" value="140"/>
+			<property name="height" value="80"/>
+			<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+		</child>
+
+		<child name="filler" type="Filler">
+			<property name="width" value="1"/>
+			<property name="height" value="1"/>
+		</child>
+
+	</child>
+	
+	<!-- ===================================================================== -->
+	<!--                 Bottom Panels                                         -->
+	<!-- ===================================================================== -->
+
+	<child name="Bottom" type="page">
+		<property name="label" value="Bottom"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+
+		<child name="ConfigFields" type="page">
+			<property name="label" value="Configuration"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="true"/>
+			<property name="main" value="false"/>
+
+			<child name="TabName" type="ComboBox">
+				<property name="label" value="Tab name"/>
+				<property name="tooltip" value="Select the name of the tab this chart will be displayed in"/>
+				<property name="value" value="Some tab name"/>
+				<property name="orientation" value="horizontal"/>
+				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+				<item name="Some tab name" selected="true"/>
+			</child>
+	
+			<child name="ChartName" type="PlainText">
+				<property name="label" value="Chart Name"/>
+				<property name="tooltip" value="Name of this chart"/>
+				<property name="value" value=""/>
+				<property name="orientation" value="horizontal"/>
+			</child>
+	
+			<child name="ChartType" type="ComboBox">
+				<property name="label" value="Chart type"/>
+				<property name="tooltip" value="Select the type of chart"/>
+				<property name="value" value="3D Bar Chart"/>
+				<property name="orientation" value="horizontal"/>
+				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+			</child>
+	
+			<child name="Precision" type="SpinnerNumber">
+				<property name="label" value="Precision"/>
+				<property name="tooltip" value="Decimal number precision used in the chart labels"/>
+				<property name="value" value="0"/>
+				<property name="minValue" value="0"/>
+				<property name="maxValue" value="5"/>
+				<property name="orientation" value="horizontal"/>
+			</child>
+
+			<child name="Unit" type="PlainText">
+				<property name="label" value="Unit"/>
+				<property name="tooltip" value="Unit used in the chart labels"/>
+				<property name="value" value=""/>
+				<property name="orientation" value="horizontal"/>
+			</child>
+	
+		</child>
+
+		<child name="FieldsList" type="List">
+			<property name="label" value="Fields"/>
+			<property name="tooltip" value="The list of active charts in the selected tab"/>
+			<property name="value" value=""/>
+			<property name="selection" value="multiple"/>
+			<property name="scrollable" value="true"/>
+			<property name="bordered" value="true"/>
+			<property name="orientation" value="horizontal"/>
+			<property name="width" value="200"/>
+			<property name="height" value="200"/>
+			<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+		</child>
+
+		<child name="ChartActionsPanel" type="page">
+			<property name="label" value="Actions"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="true"/>
+			<property name="main" value="false"/>
+
+			<child name="SaveNewChart" type="Button">
+				<property name="label" value="Save as new"/>
+				<property name="tooltip" value="Save the chart configuration as a new chart"/>
+				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+			</child>
+
+			<child name="UpdateChart" type="Button">
+				<property name="label" value="Update"/>
+				<property name="tooltip" value="Update the chart with the new configuration"/>
+				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+			</child>
+
+			<child name="filler" type="Filler">
+				<property name="width" value="1"/>
+				<property name="height" value="1"/>
+			</child>
+
+		</child>
+
+		<child name="filler" type="Filler">
+			<property name="width" value="1"/>
+			<property name="height" value="1"/>
+		</child>
+
+	</child>
+
+	<child name="ChartPreview" type="page">
+		<property name="label" value="Preview"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="true"/>
+		<property name="main" value="false"/>
+		<property name="tooltip" value="Display a preview of the chart with the current configuration parameters"/>
+		<property name="width" value="200"/>
+		<property name="height" value="150"/>
+	
+	</child>
+
+	<child name="filler" type="Filler">
+		<property name="width" value="1"/>
+		<property name="height" value="1"/>
+	</child>
+
+</opt:main>

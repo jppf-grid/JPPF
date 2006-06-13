@@ -19,116 +19,99 @@
  */
 package org.jppf.ui.options.factory;
 
-import java.awt.event.ActionEvent;
 import org.jppf.server.protocol.AdminRequest;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.*;
-import org.jppf.ui.options.event.*;
 
 /**
  * The admin panel.
  * @author Laurent Cohen
  */
-public class AdminPanelActions extends OptionPanel
+public class AdminPanelActions extends AbstractActionsHolder
 {
+	/**
+	 * Initialize the mapping of an option name to the method to invoke when the option's value changes.
+	 * @see org.jppf.ui.options.factory.AbstractActionsHolder#initializeMethodMap()
+	 */
+	protected void initializeMethodMap()
+	{
+		addMapping("Perform Now", "shutdownRestartPressed");
+		addMapping("Change password", "changePasswordPressed");
+		addMapping("Restart", "restartFlagChanged");
+	}
+
 	/**
 	 * Action associated with the button to shutdown and/or restart the server.
 	 */
-	public static class ShutdownRestartAction extends OptionAction
+	public void shutdownRestartPressed()
 	{
-		/**
-		 * Perform the action.
-		 * @param event not used.
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		 */
-		public void actionPerformed(ActionEvent event)
+		Option elt = (Option) option.findElement("../Shutdown delay");
+		Number n = (Number) elt.getValue();
+		long shutdownDelay = n.longValue();
+		long restartDelay = 0L;
+		String command = null;
+		elt = (Option) option.findElement("../Restart");
+		if ((Boolean) elt.getValue())
 		{
-			Option elt = (Option) option.findElement("../Shutdown delay");
-			Number n = (Number) elt.getValue();
-			long shutdownDelay = n.longValue();
-			long restartDelay = 0L;
-			String command = null;
-			elt = (Option) option.findElement("../Restart");
-			if ((Boolean) elt.getValue())
-			{
-				elt = (Option) option.findElement("../Restart delay");
-				n = (Number) elt.getValue();
-				restartDelay = n.longValue();
-				command = AdminRequest.SHUTDOWN_RESTART;
-			}
-			else command = AdminRequest.SHUTDOWN;
-				
-			elt = (Option) option.findElement("/").findAllWithName("actualPwd").get(0);
-			String pwd = (String) elt.getValue();
-			String msg = StatsHandler.getInstance().requestShutdownRestart(pwd, command, shutdownDelay, restartDelay);
-			((AbstractOption) option.findElement("/msgText")).setValue(msg);
+			elt = (Option) option.findElement("../Restart delay");
+			n = (Number) elt.getValue();
+			restartDelay = n.longValue();
+			command = AdminRequest.SHUTDOWN_RESTART;
 		}
+		else command = AdminRequest.SHUTDOWN;
+			
+		elt = (Option) option.findFirstWithName("/actualPwd");
+		String pwd = (String) elt.getValue();
+		String msg = StatsHandler.getInstance().requestShutdownRestart(pwd, command, shutdownDelay, restartDelay);
+		((AbstractOption) option.findElement("/msgText")).setValue(msg);
 	}
 
 	/**
 	 * Action associated with the button to change the administrator password.
 	 */
-	public static class ChangePasswordAction extends OptionAction
+	public void changePasswordPressed()
 	{
-		/**
-		 * Perform the action.
-		 * @param event not used.
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		 */
-		public void actionPerformed(ActionEvent event)
+		AbstractOption elt = (AbstractOption) option.findFirstWithName("/actualPwd");
+		String pwd = (String) elt.getValue();
+		elt = (AbstractOption) option.findFirstWithName("/newPwd");
+		String newPwd = (String) elt.getValue();
+		elt = (AbstractOption) option.findFirstWithName("/confirmPwd");
+		String confirmPwd = (String) elt.getValue();
+		if (validateNewPassword(newPwd, confirmPwd))
 		{
-			//AbstractOption elt = (AbstractOption) option.findElement("/Admin password/actualPwd");
-			AbstractOption elt =
-				(AbstractOption) option.findElement("/").findAllWithName("actualPwd").get(0);
-			String pwd = (String) elt.getValue();
-			elt = (AbstractOption) option.findElement("/").findAllWithName("newPwd").get(0);
-			String newPwd = (String) elt.getValue();
-			elt = (AbstractOption) option.findElement("/").findAllWithName("confirmPwd").get(0);
-			String confirmPwd = (String) elt.getValue();
-			if (validateNewPassword(newPwd, confirmPwd))
-			{
-				String msg = StatsHandler.getInstance().changeAdminPassword(pwd, newPwd);
-				((AbstractOption) option.findElement("/msgText")).setValue(msg);
-			}
+			String msg = StatsHandler.getInstance().changeAdminPassword(pwd, newPwd);
+			((AbstractOption) option.findElement("/msgText")).setValue(msg);
 		}
+	}
 
-		/**
-		 * Perform a validation of the new password before a password change.
-		 * @param newPwd the new admin password to set.
-		 * @param confirmPwd a confirmation of the new password.
-		 * @return true if the new password is valid, false otherwise.
-		 */
-		public boolean validateNewPassword(String newPwd, String confirmPwd)
+	/**
+	 * Perform a validation of the new password before a password change.
+	 * @param newPwd the new admin password to set.
+	 * @param confirmPwd a confirmation of the new password.
+	 * @return true if the new password is valid, false otherwise.
+	 */
+	public boolean validateNewPassword(String newPwd, String confirmPwd)
+	{
+		String msg = null;
+		if ((newPwd == null) || "".equals(newPwd.trim()))
 		{
-			String msg = null;
-			if ((newPwd == null) || "".equals(newPwd.trim()))
-			{
-				msg = "The new password must not be empty, with at least one non-space character";
-			}
-			else if (!newPwd.equals(confirmPwd))
-			{
-				msg = "The new password and the confirmation do not match";
-			}
-			if (msg != null) ((AbstractOption) option.findElement("/msgText")).setValue(msg);
-			return msg == null;
+			msg = "The new password must not be empty, with at least one non-space character";
 		}
+		else if (!newPwd.equals(confirmPwd))
+		{
+			msg = "The new password and the confirmation do not match";
+		}
+		if (msg != null) ((AbstractOption) option.findElement("/msgText")).setValue(msg);
+		return msg == null;
 	}
 
 	/**
 	 * Value change listener for the checkbox that controls whether
 	 * the server should be restarted after shutdown. 
 	 */
-	public static class RestartCheckboxListener implements ValueChangeListener
+	public void restartFlagChanged()
 	{
-		/**
-		 * Invoked when the state of the check box has changed.
-		 * @param event the event that triggered the notification..
-		 * @see org.jppf.ui.options.event.ValueChangeListener#valueChanged(org.jppf.ui.options.event.ValueChangeEvent)
-		 */
-		public void valueChanged(ValueChangeEvent event)
-		{
-			Option restart = (Option) event.getOption().findElement("../Restart delay");
-			restart.setEnabled((Boolean) event.getOption().getValue());
-		}
+		Option restart = (Option) option.findElement("../Restart delay");
+		restart.setEnabled((Boolean) option.getValue());
 	}
 }

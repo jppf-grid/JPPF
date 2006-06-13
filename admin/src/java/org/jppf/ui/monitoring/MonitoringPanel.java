@@ -31,7 +31,7 @@ import org.jppf.ui.monitoring.charts.config.*;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.options.OptionsPage;
-import org.jppf.ui.options.factory.OptionsHandler;
+import org.jppf.ui.options.factory.*;
 import org.jppf.ui.utils.GuiUtils;
 import org.jvnet.substance.*;
 
@@ -223,7 +223,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 			frame.setIconImage(icon.getImage());
 			frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			StatsHandler statsHandler = StatsHandler.getInstance();
-			final JPPFChartBuilder builder = startTool(frame, statsHandler);
+			final JPPFChartBuilder builder = startTool(frame);
 			frame.addWindowListener(new WindowAdapter()
 			{
 				public void windowClosing(WindowEvent e)
@@ -247,30 +247,33 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	/**
 	 * Start this UI.
 	 * @param container the content in which to create the UI components.
-	 * @param statsHandler the object that requests and receives the server data updates.
 	 * @return a JPPFChartBuilder instance.
 	 * @throws Exception if an error occurs while creating the UI.
 	 */
-	public static JPPFChartBuilder startTool(Container container, StatsHandler statsHandler) throws Exception
+	public static JPPFChartBuilder startTool(Container container) throws Exception
 	{
+		StatsHandler statsHandler = StatsHandler.getInstance();
+		JPPFChartBuilder builder = JPPFChartBuilder.getInstance();
+		builder.createInitialCharts();
 		JTabbedPane tabbedPane = new JTabbedPane();
 		MonitoringPanel monitor = new MonitoringPanel(statsHandler);
+		OptionsPage ccPage = OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/ChartsConfigPage.xml");
+		ChartConfigActions cca = new ChartConfigActions();
+		cca.initialize(ccPage);
+		
 		OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/AdminPage.xml");
 		OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/BundleSizeTuningPage.xml");
 
-		JPPFChartBuilder builder = new JPPFChartBuilder(statsHandler);
-		builder.createInitialCharts();
-		ChartConfigurationPanel configPanel = new ChartConfigurationPanel(builder);
 		statsHandler.addStatsHandlerListener(monitor);
 		statsHandler.addStatsHandlerListener(builder);
 		tabbedPane.addTab("Server Stats", null, new JScrollPane(monitor), "Displays dynamic statistics about the server's performance");
 		tabbedPane.addTab("Charts", null, builder.getTabbedPane(), "Dynamic charts based on the server performance statistics");
-		tabbedPane.addTab("Charts config", null, configPanel, "Manage and configure the server charts");
 		for (OptionsPage page: OptionsHandler.getPageList())
 		{
 			tabbedPane.addTab(page.getLabel(), null, page.getUIComponent(), page.getToolTipText());
 		}
 		container.add(tabbedPane);
+		tabbedPane.updateUI();
 		return builder;
 	}
 }

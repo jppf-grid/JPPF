@@ -38,14 +38,6 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 */
 	protected List<OptionElement> children = new ArrayList<OptionElement>();
 	/**
-	 * Determines whether this page should be enclosed within a scroll pane.
-	 */
-	protected boolean scrollable = false;
-	/**
-	 * Determines whether this page has a border around it.
-	 */
-	protected boolean bordered = false;
-	/**
 	 * The panel used to display this options page.
 	 */
 	protected JPanel panel = null;
@@ -129,9 +121,9 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 		if (toolTipText != null) panel.setToolTipText(toolTipText);
 		g = new GridBagLayout();
     c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.LINE_START;
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(5, 5, 5, 5);
+		c.anchor = GridBagConstraints.LINE_START;
     if (orientation == HORIZONTAL)
     {
     	c.gridy = 0;
@@ -146,6 +138,11 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 		createFiller();
 		GuiUtils.addLayoutComp(panel, g, fillerConstraints, filler);
 		UIComponent = scrollable ? new JScrollPane(panel) : panel;
+		if ((width > 0) && (height > 0))
+		{
+			Dimension d = new Dimension(width, height);
+			UIComponent.setPreferredSize(d);
+		}
 	}
 
 	/**
@@ -156,21 +153,33 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	{
 		filler = GuiUtils.createFiller(1, 1);
 		fillerConstraints = new GridBagConstraints();
-		fillerConstraints.anchor = GridBagConstraints.NORTHWEST;
+ 		fillerConstraints.anchor = GridBagConstraints.SOUTHEAST;
 		fillerConstraints.fill = GridBagConstraints.BOTH;
   	fillerConstraints.gridwidth = GridBagConstraints.REMAINDER;
   	fillerConstraints.gridheight = GridBagConstraints.REMAINDER;
   	if (mainPage)
   	{
-	    if (orientation == HORIZONTAL) fillerConstraints.weightx = 1.0;
-	    else fillerConstraints.weighty = 1.0;
+	    if (orientation == HORIZONTAL)
+	    {
+	    	fillerConstraints.weightx = 1.0;
+	    }
+	    else
+	    {
+	    	fillerConstraints.weighty = 1.0;
+	    }
   	}
   	else
   	{
     	fillerConstraints.weightx = 1.0;
     	fillerConstraints.weighty = 1.0;
-	    if (orientation == HORIZONTAL) fillerConstraints.gridy = 1;
-	    else fillerConstraints.gridx = 1;
+	    if (orientation == HORIZONTAL)
+	    {
+	    	fillerConstraints.gridy = 1;
+	    }
+	    else
+	    {
+	    	fillerConstraints.gridx = 1;
+	    }
   	}
 	}
 	
@@ -191,6 +200,22 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 */
 	public void add(OptionElement element)
 	{
+		/*
+		if (!children.isEmpty())
+		{
+			int n = children.size() - 1;
+			JComponent comp = children.get(n).getUIComponent();
+			GridBagConstraints gbc =(GridBagConstraints) g.getConstraints(comp);
+	    if (orientation == HORIZONTAL)
+	    {
+	    	gbc.gridx = n;
+	    }
+	    else
+	    {
+	    	gbc.gridy = n;
+	    }
+		}
+		*/
 		children.add(element);
 		if (element instanceof AbstractOptionElement)
 		{
@@ -234,45 +259,7 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	{
 		this.mainPage = mainPage;
 	}
-
-	/**
-	 * Determine whether this page should be enclosed within a scroll pane.
-	 * @return true if the page is to be enclosed in a scroll pabe, false otherwise.
-	 * @see org.jppf.ui.options.OptionsPage#isScrollable()
-	 */
-	public boolean isScrollable()
-	{
-		return scrollable;
-	}
-
-	/**
-	 * Determine whether this page should be enclosed within a scroll pane.
-	 * @param scrollable true if the page is to be enclosed in a scroll pane, false otherwise.
-	 */
-	public void setScrollable(boolean scrollable)
-	{
-		this.scrollable = scrollable;
-	}
 	
-	/**
-	 * Determine whether this page has a border around it.
-	 * @return true if the page has a border, false otherwise.
-	 * @see org.jppf.ui.options.OptionsPage#isBordered()
-	 */
-	public boolean isBordered()
-	{
-		return bordered;
-	}
-
-	/**
-	 * Determine whether this page has a border around it.
-	 * @param bordered true if the page has a border, false otherwise.
-	 */
-	public void setBordered(boolean bordered)
-	{
-		this.bordered = bordered;
-	}
-
 	/**
 	 * Enable or disable this option.
 	 * @param enabled true to enable this option, false to disable it.
@@ -281,5 +268,15 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	public void setEnabled(boolean enabled)
 	{
 		for (OptionElement elt: children) elt.setEnabled(enabled);
+	}
+
+	/**
+	 * Enable or disable the events firing in this option and/or its children.
+	 * @param enabled true to enable the events, false to disable them.
+	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
+	 */
+	public void setEventsEnabled(boolean enabled)
+	{
+		for (OptionElement elt: children) elt.setEventsEnabled(enabled);
 	}
 }
