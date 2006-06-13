@@ -19,13 +19,9 @@
  */
 package org.jppf.server;
 
-import static org.jppf.server.JPPFStatsUpdater.taskInQueue;
-import static org.jppf.server.JPPFStatsUpdater.taskOutOfQueue;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.PriorityBlockingQueue;
+import static org.jppf.server.JPPFStatsUpdater.*;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Implementation of a generic non-blocking queue, to allow asynchronous access from a large number of threads.
@@ -38,28 +34,36 @@ public class JPPFQueue
 	 * The current list of listeners to this queue.
 	 */
 	List<QueueListener> listeners = new LinkedList<QueueListener>();
+	/**
+	 * Used for synchronized access to the queue.
+	 */
+	private ReentrantLock lock = new ReentrantLock();
 	
 	/**
 	 * Executable tasks queue, available for execution nodes to pick from. This
 	 * queue behaves as a FIFO queue and is thread-safe for atomic
 	 * <code>add()</code> and <code>poll()</code> operations.
 	 */
-	private Queue<JPPFTaskBundle> queue = new PriorityBlockingQueue<JPPFTaskBundle>();
+	private Queue<JPPFTaskBundle> queue = new PriorityQueue<JPPFTaskBundle>();
 	
 	/**
 	 * Add an object to the queue, and notify all listeners about it.
-	 * 
-	 * @param bundle
-	 *            the object to add to the queue.
+	 * @param bundle the object to add to the queue.
 	 */
-	public void addBundle(JPPFTaskBundle bundle) {
+	public void addBundle(JPPFTaskBundle bundle)
+	{
 		bundle.setQueueEntryTime(System.currentTimeMillis());
-		queue.add(bundle);
-		taskInQueue(bundle.getTaskCount());
-
-		for (QueueListener listener : listeners) {
-			listener.newBundle(this);
+		lock.lock();
+		try
+		{
+			queue.add(bundle);
 		}
+		finally
+		{
+			lock.unlock();
+		}
+		taskInQueue(bundle.getTaskCount());
+		for (QueueListener listener : listeners) listener.newBundle(this);
 	}
 
 	/**
@@ -68,36 +72,78 @@ public class JPPFQueue
 	 * 
 	 * @return the most recent object that was added to the queue.
 	 */
-	public JPPFTaskBundle nextBundle() {
-		JPPFTaskBundle bundle = queue.poll();
-		if (bundle != null) {
-			taskOutOfQueue(bundle.getTaskCount(), System.currentTimeMillis()
-					- bundle.getQueueEntryTime());
+	public JPPFTaskBundle nextBundle()
+	{
+		JPPFTaskBundle bundle = null;
+		lock.lock();
+		try
+		{
+			bundle = queue.poll();
+		}
+		finally
+		{
+			lock.unlock();
+		}
+		if (bundle != null)
+		{
+			taskOutOfQueue(bundle.getTaskCount(),
+				System.currentTimeMillis() - bundle.getQueueEntryTime());
 		}
 		return bundle;
-
 	}
 	
 	/**
-	 * Add a listener to the current list of listener to this queue.
+	 * Get the next object in the queue.
+	 * @param nbTasks the maximum number of tasks to get out of the bundle.
+	 * @return the most recent object that was added to the queue.
+	 */
+	public JPPFTaskBundle nextBundle(int nbTasks)
+	{
+		JPPFTaskBundle result = null;
+		lock.lock();
+		try
+		{
+			JPPFTaskBundle bundle = queue.peek();
+			if (bundle == null) return bundle;
+			if (nbTasks >= bundle.getTaskCount())
+			{
+				result = bundle;
+				queue.remove(bundle);
+			}
+			else result = bundle.copy(nbTasks);
+		}
+		finally
+		{
+			lock.unlock();
+		}
+		taskOutOfQueue(result.getTaskCount(),
+				System.currentTimeMillis() - result.getQueueEntryTime());
+		return result;
+	}
+	
+	/**
+	 * Add a listener to the current list of listeners to this queue.
 	 * @param listener the listener to add.
 	 */
-	public void addListener(QueueListener listener) {
+	public void addListener(QueueListener listener)
+	{
 		listeners.add(listener);
 	}
 
 	/**
-	 * Remove a listener from the current list of listener to this queue.
+	 * Remove a listener from the current list of listeners to this queue.
 	 * @param listener the listener to remove.
 	 */
-	public void removeListener(QueueListener listener) {
+	public void removeListener(QueueListener listener)
+	{
 		listeners.remove(listener);
 	}
 
 	/**
 	 * Queue listener interface.
 	 */
-	public interface QueueListener {
+	public interface QueueListener
+	{
 		/**
 		 * Notify a listener that a queue event occurred.
 		 * @param queue the queue from which the event originated.

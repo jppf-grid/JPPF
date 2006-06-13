@@ -4,7 +4,7 @@
 	<body>
 		<div align="center">
 		$template{name="jppf-header"}$
-		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
+		<table cellspacing="0" cellpadding="0" width="80%">
 			<tr>
 				<td>
 					$template{name="page-title" title="$CONTENT[
@@ -26,7 +26,7 @@
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
 		{
 		?>
-		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
+		<table class="border_" cellspacing="0" cellpadding="5" width="80%">
 			<tr>
 				<td>
 					<?php

@@ -38,6 +38,28 @@ body { font-size=10pt; background: url("images/bkg.gif"); background-repeat: rep
 .docmenu { background-color: #FFFFC0; color: #8080FF; border-left: 1px solid #8080FF; font-weight: bold }
 /*.table_ { border: 2px solid #8080FF; background-color: #FFFFFF }*/
 .table_ { border: 2px solid #8080FF; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
+.noBorderTable_ { background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
+.table2_ { border-right: 2px solid #8080FF; border-top: 2px solid #8080FF; border-bottom: 2px solid #8080FF; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
+
+.border_          { border: 2px solid #8080FF }
+.left_            { border-left: 2px solid #8080FF }
+.right_           { border-right: 2px solid #8080FF }
+.top_             { border-top: 2px solid #8080FF }
+.bottom_          { border-bottom: 2px solid #8080FF }
+.leftRight_       { border-left: 2px solid #8080FF; border-right: 2px solid #8080FF }
+.leftTop_         { border-left: 2px solid #8080FF; border-top: 2px solid #8080FF }
+.leftBottom_      { border-left: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
+.rightTop_        { border-right: 2px solid #8080FF; border-top: 2px solid #8080FF }
+.rigthBottom_     { border-right: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
+.topBottom_       { border-top: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
+.leftRightTop_    { border-left: 2px solid #8080FF; border-right: 2px solid #8080FF; border-top: 2px solid #8080FF }
+.leftRightBottom_ { border-left: 2px solid #8080FF; border-right: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
+.rightTopBottom_  { border-right: 2px solid #8080FF; border-top: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
+
+
+.borderCell_ { border-left: 2px solid #8080FF; border-right: 2px solid #8080FF }
+.borderCell2_ { border: 2px solid #8080FF }
+.borderCell3_ { border-left: 2px solid #8080FF; border-right: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
 
 .completed_cell { background-image: url("images/completed.gif"); background-repeat: no-repeat; background-position: center }
 
@@ -51,6 +73,7 @@ table  {font-size: 10pt; font-family: Arial, Helvetica, sans-serif }
 
 .news { font-size: 9pt; font-family: Times New Roman, Times, serif;  color: #000060 }
 .links { color: #000060; font-size: 10pt; font-family: Arial, Helvetica, sans-serif }
+.linksub { font-size: 12pt; color: #8080FF; font-weight: bold }
 /*.newsTitle { color: #8789CF; font-size: 11pt; font-family: Comic Sans MS, Arial, Helvetica, sans-serif; font-size: 12pt }*/
 .newsTitle { color: #7678BE; font-size: 11pt; font-family: Comic Sans MS, Arial, Helvetica, sans-serif; font-weight: bold }
 .ackTitle { color: #000060; font-size: 16pt; font-family: Comic Sans MS, Arial, sans-serif; font-weight: bold }

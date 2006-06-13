@@ -123,6 +123,19 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	}
 
 	/**
+	 * Create a context for a newly connected channel.
+	 * Subclasses can override this method to add specific content to the context.
+	 * @return a <code>ChannelContext</code> instance.
+	 * @see org.jppf.server.JPPFNIOServer#createChannelContext()
+	 */
+	protected ChannelContext createChannelContext()
+	{
+		NodeChannelContext context = new NodeChannelContext();
+		context.bundler = bundler.copy();
+		return context;
+	}
+
+	/**
 	 * Called after a connection to a node has been accepted by the server socket channel.
 	 * @param client the <code>SocketChannel</code> that was accepted.
 	 * @see org.jppf.server.JPPFNIOServer#postAccept(java.nio.channels.SocketChannel)
@@ -147,19 +160,27 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 * @param queue the queue to which a bundle was added.
 	 * @see org.jppf.server.JPPFQueue.QueueListener#newBundle(org.jppf.server.JPPFQueue)
 	 */
-	public void newBundle(JPPFQueue queue) {
-		if (availableNodes.isEmpty()) {
-			return;
+	public void newBundle(JPPFQueue queue)
+	{
+		if (availableNodes.isEmpty()) return;
+		SocketChannel aNode = availableNodes.remove(0);
+		SelectionKey key = aNode.keyFor(selector);
+		NodeChannelContext context = (NodeChannelContext) key.attachment();
+		// check whether the bundler settings have changed.
+		if (context.bundler.getTimestamp() < bundler.getTimestamp())
+		{
+			context.bundler = bundler.copy();
 		}
-		JPPFTaskBundle bundle = queue.nextBundle();
-		if (bundle != null) {
-			SocketChannel aNode = availableNodes.remove(0);
-			SelectionKey key = aNode.keyFor(selector);
-			ChannelContext context = (ChannelContext) key.attachment();
-			try {
+		JPPFTaskBundle bundle = queue.nextBundle(context.bundler.getBundleSize());
+		if (bundle != null)
+		{
+			try
+			{
 				sendTask(aNode, key, context, bundle);
 				selector.wakeup();
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				log.error(e.getMessage(), e);
 				closeNode(aNode);
 				resubmitBundle(bundle);
@@ -259,8 +280,8 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			size += bundle.getDataProvider().length;
 		}
 		helper.writeNextObject(bundle, dos, false);
-		helper.writeNextBytes(dos, bundle.getDataProvider(), 0, bundle
-				.getDataProvider().length);
+		helper.writeNextBytes(dos, bundle.getDataProvider(), 0, 
+				bundle.getDataProvider().length);
 		if (bundle.getTasks() != null) {
 			for (byte[] task : bundle.getTasks()) {
 				size += task.length;

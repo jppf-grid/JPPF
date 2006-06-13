@@ -186,7 +186,7 @@ public abstract class JPPFNIOServer extends Thread{
 			}
 			return;
 		}
-		ChannelContext context = new ChannelContext();
+		ChannelContext context = createChannelContext();
 		context.state = this.getInitialState();
 		context.content = getInitialContent();
 		try
@@ -200,6 +200,16 @@ public abstract class JPPFNIOServer extends Thread{
 			log.error(ignored.getMessage(), ignored);
 		}
 		postAccept(client);
+	}
+
+	/**
+	 * Create a context for a newly connected channel.
+	 * Subclasses can override this method to add specific content to the context.
+	 * @return a <code>ChannelContext</code> instance.
+	 */
+	protected ChannelContext createChannelContext()
+	{
+		return new ChannelContext();
 	}
 
 	/**

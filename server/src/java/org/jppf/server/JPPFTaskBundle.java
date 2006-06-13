@@ -20,7 +20,7 @@
 package org.jppf.server;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.*;
 import org.jppf.server.event.TaskCompletionListener;
 import org.jppf.utils.VersionUtils;
 
@@ -77,10 +77,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * The build number of the current version of JPPF. 
 	 */
 	private int buildNumber = 0;
-	/**
-	 * Index of the first task in this bundle, as part of a larger request. 
-	 */
-	private int startTaskNumber = -1;
 
 	/**
 	 * Initialize this task bundle and set its build number.
@@ -295,20 +291,25 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	}
 
 	/**
-	 * Get the index of the first task in this bundle. 
-	 * @return the index value as an int.
+	 * Make a copy of this bundle containing only the first nbTasks tasks it contains.
+	 * @param nbTasks the number of tasks to include in the copy.
+	 * @return a new <code>JPPFTaskBundle</code> instance.
 	 */
-	public int getStartTaskNumber()
+	public JPPFTaskBundle copy(int nbTasks)
 	{
-		return startTaskNumber;
-	}
+		JPPFTaskBundle bundle = new JPPFTaskBundle();
+		bundle.setUuid(uuid);
+		bundle.setAppUuid(appUuid);
+		bundle.setRequestUuid(requestUuid);
+		bundle.setTaskCount(nbTasks);
+		bundle.setDataProvider(dataProvider);
+		List<byte[]> list = new ArrayList<byte[]>();
+		bundle.setTasks(list);
+		for (int i=0; i<nbTasks; i++) list.add(tasks.get(0));
+		taskCount -= nbTasks;
+		bundle.setQueueEntryTime(queueEntryTime);
+		bundle.setCompletionListener(completionListener);
 
-	/**
-	 * Set the index of the first task in this bundle. 
-	 * @param startTaskNumber the index value as an int.
-	 */
-	public void setStartTaskNumber(int startTaskNumber)
-	{
-		this.startTaskNumber = startTaskNumber;
+		return bundle;
 	}
 }

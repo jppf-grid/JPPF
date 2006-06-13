@@ -32,10 +32,9 @@ import org.jppf.task.storage.DataProvider;
 public abstract class JPPFTask implements Runnable, Serializable
 {
 	/**
-	 * The position of this task at the submission
+	 * The position of this task at the submission time.
 	 */
 	private int position;
-	
 	/**
 	 * The result of the task execution.
 	 */

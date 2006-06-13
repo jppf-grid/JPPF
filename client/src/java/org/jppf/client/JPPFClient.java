@@ -195,16 +195,19 @@ public class JPPFClient {
 
 		final List<JPPFTask> resultList = new ArrayList<JPPFTask>();
 
-		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(
-				taskList, dataProvider, new TaskResultListener() {
-
-					public void resultsReceived(TaskResultEvent event) {
-						resultList.addAll(event.getTaskList());
-					}
-				});
+		AsynchronousResultProcessor proc =
+			new AsynchronousResultProcessor(taskList, dataProvider, new TaskResultListener()
+			{
+				public void resultsReceived(TaskResultEvent event)
+				{
+					resultList.addAll(event.getTaskList());
+				}
+			});
 		proc.run();
-		Collections.sort(resultList, new Comparator<JPPFTask>() {
-			public int compare(JPPFTask o1, JPPFTask o2) {
+		Collections.sort(resultList, new Comparator<JPPFTask>()
+		{
+			public int compare(JPPFTask o1, JPPFTask o2)
+			{
 				return o1.getPosition() - o2.getPosition();
 			}
 		});
@@ -269,24 +272,25 @@ public class JPPFClient {
 	 *         request.
 	 * @throws Exception
 	 *             if an error is raised while reading the results from the
-	 *             setrver.
+	 *             server.
 	 */
-	private Pair<List<JPPFTask>, Integer> receiveResults() throws Exception {
+	private Pair<List<JPPFTask>, Integer> receiveResults() throws Exception
+	{
 		JPPFBuffer buf = socketClient.receiveBytes(0);
 		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-		ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(),
-				0, buf.getLength());
+		ByteArrayInputStream bais =
+			new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
 		DataInputStream dis = new DataInputStream(bais);
 		int count = dis.readInt();
-		int startIndex = dis.readInt();
-		for (int i = 0; i < count; i++) {
+		for (int i = 0; i < count; i++)
+		{
 			JPPFTask task = (JPPFTask) helper.readNextObject(dis, true);
 			taskList.add(task);
 		}
-		startIndex = taskList.get(0).getPosition();
+		int startIndex = taskList.get(0).getPosition();
 		dis.close();
-		Pair<List<JPPFTask>, Integer> p = new Pair<List<JPPFTask>, Integer>(
-				taskList, startIndex);
+		Pair<List<JPPFTask>, Integer> p =
+			new Pair<List<JPPFTask>, Integer>(taskList, startIndex);
 		return p;
 	}
 

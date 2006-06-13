@@ -45,24 +45,23 @@
 							<td class="menu"><a href="faq.php">Faqs</a></td>
 							<td class="menu"><a href="news.php">News</a></td>
 							<td class="menu"><a href="http://sourceforge.net/projects/jppf-project">Project</a></td>
-							<td class="menu"><a href="links.html">Links</a></td>
+							<td class="menu"><a href="links.php">Links</a></td>
 							<td class="menu"></td>
 						</tr>
 					</table>
 				</td>
 			</tr>
 		</table>
-		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
-						<tr><td/></tr>
-			<tr>
-				<td>
+		<table class="noBorderTable_" border="0" cellspacing="0" cellpadding="0" width="80%">
+						<tr>
+				<td class="leftRightBottom_">
+					<br>
 					<h1 align="center" style="color: #8080FF"><b>JPPF Readme Page</b></h1>
 				</td>
 			</tr>
-			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 			<tr>
 				<td>
-					<table cellspacing="0" cellpadding="5">
+					<table class="border_" cellspacing="0" cellpadding="5">
 						<tr>
 							<td width="50%" valign="top">
 								<h3>System Requirements</h3>
@@ -78,7 +77,7 @@
 									<li>2 CPUs or more.</li>
 								</ul>
 							</td>
-							<td width="50%" valign="top">
+							<td class="left_" width="50%" valign="top">
 								<h3>Installation</h3>
 								<p><b>Framework distribution</b><br>
 								Simply unzip the file jppf-full-x.y.z-nnnn-yyyymmdd.zip in a location of your choice.
@@ -96,19 +95,11 @@
 					</table>
 				</td>
 			</tr>
-			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 			<tr>
 				<td>
-					<table cellspacing="0" cellpadding="5">
+					<table class="border_" cellspacing="0" cellpadding="5">
 						<tr>
-							<td width="26%" valign="top">
-								<h3>The &quot;Long Task&quot; demo</h3>
-								Go to the <b>jppf-x.y.z/demo</b> folder.<br>
-								Type <b>ant run.demo1</b> to run the demo.<br>
-								This demo runs a number of tasks with a fixed execution length (default is 10 tasks, 1 second each).  Each task can be executed in parallel.<br>
-								The demo parameters can easily be changed in the file <b>jppf-x.y.z/demo/config/jppf-client.properties</b>
-							</td>
-							<td width="39%" valign="top">
+							<td width="50%" valign="top">
 								<h3>Running the &quot;Matrix&quot; demo</h3>
 								Go to the <b>jppf-x.y.z/demo</b> folder.<br>
 								Type <b>ant run.demo2</b> to run the demo.<br>
@@ -116,8 +107,8 @@
 								divided in as many tasks as there are lines in the first matrix (i.e. 300 by default). Each task can be executed in parallel.<br>
 								The demo parameters can be changed in the file <b>jppf-x.y.z/demo/config/jppf-client.properties</b>
 							</td>
-							<td  width="35%" valign="top">
-								<h3>&quot;Non-Blocking Client&quot; demo</h3>
+							<td class="left_" width="50%" valign="top">
+								<h3>&quot;Running The Non-Blocking Client&quot; demo</h3>
 								Go to the <b>jppf-x.y.z/demo</b> folder.<br>
 								Type <b>ant run.demo3</b> to run the demo.<br>
 								This demo runs the Matrix Multiplication demo with an asynchronous task submission mechanism.<br>
@@ -128,39 +119,47 @@
 					</table>
 				</td>
 			</tr>
-			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 			<tr>
 				<td>
-					<table cellspacing="0" cellpadding="5">
+					<table class="border_" cellspacing="0" cellpadding="5">
 						<tr>
 							<td width="50%" valign="top">
+								<h3>Running The  &quot;Long Task&quot; demo</h3>
+								Go to the <b>jppf-x.y.z/demo</b> folder.<br>
+								Type <b>ant run.demo1</b> to run the demo.<br>
+								This demo runs a number of tasks with a fixed execution length (default is 10 tasks, 1 second each).  Each task can be executed in parallel.<br>
+								The demo parameters can easily be changed in the file <b>jppf-x.y.z/demo/config/jppf-client.properties</b>
+							</td>
+							<td class="left_" width="50%" valign="top">
 								<h3>Running the monitoring and administration tool</h3>
 								Install the framework distribution as specified above.<br>
 								Go to the <b>jppf-x.y.z/demo</b> folder and type <b>ant run.ui</b> to run the graphical user interface.
 							</td>
-							<td width="50%" valign="top">
-								<!--<h3>More information can be found in the <a href="faq.php"><b>FAQ<b></a></h3>-->
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table class="top_" cellspacing="0" cellpadding="5" width="100%">
+						<tr>
+							<td class="leftBottom_" width="50%" valign="top">
 								<h3>Configuring the JPPF node screensaver on Windows sytems</h3>
 								Download the <b>jppf-x.y.z-screensaver-win32.zip</b> file and unzip it into your <b>Windows\system32</b> directory.<br>
 								Then configure it like any other screensaver.
 							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
-			<tr>
-				<td>
-					<table cellspacing="0" cellpadding="5" width="100%">
-						<tr>
-							<td width="100%" valign="top" align="center">
+							<td class="leftRightBottom_" width="50%" valign="center" align="center">
 								<h3>More information can be found in the <a href="faq.php"><b>FAQ<b></a></h3>
+							</td>
+						</tr>
+						<tr>
+							<td class="top_" width="50%">&nbsp;</td>
+							<td class="top_" width="50%">&nbsp;</td>
 							</td>
 						</tr>
 					</table>
 				</td>
 			</tr>
-			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 		</table>
 		</div>
 	</body>

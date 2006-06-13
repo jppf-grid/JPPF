@@ -7,14 +7,13 @@
 		<table border="0" cellspacing="0" cellpadding="0" width="80%">
 			<tr>
 				<td width="50%" valign="top" rowspan="2">
-					<table class="table_" cellspacing="0" cellpadding="5" width="100%">
-						<tr><td>
+					<table class="left_" cellspacing="0" cellpadding="5" width="100%">
+						<tr><td class="leftTopBottom_">
 							<h3>Project Description</h3>
 							Java Parallel Processing Framework is a set of tools and APIs to facilitate the parallelization of CPU intensive applications, and distribute their execution over a network of heterogenous nodes.
 							It is intended to run in clusters and grids.
 						</td></tr>
-						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
-						<tr><td>
+						<tr><td class="bottom_">
 							<h4>Features</h4>
 							<ul>
 								<li>an <b>API</b> to delegate the processing of parallelized tasks to local and remote execution services</li>
@@ -25,31 +24,30 @@
 								<li>limited <b>intrusiveness</b> for existing or legacy code</li>
 								<li>the framework is <b>deployment-free</b>: no need to install your application code on a server, just connect to the server and any
 								new code is automatically taken into account.</li>
+								<li><b>opportunistic grid</b> capabilities with <b>JPPF@Home</b> (see <a href="http://www.jppf.org/screenshots/shot11.jpg">screenshot</a>)</li>
 								<li>fully <b>documented</b> APIs, administration guide and developer guide</li>
 								<li>runs on any platform supporting Java 2 Platform Standard Edition 5.0 (J2SE 1.5) or later</li>
 							</ul>
 						</td></tr>
-						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
-						<tr><td>
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.18.0 - beta</span></h4>
+						<tr><td class="bottom_">
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.19.0 - beta</span></h4>
 						</td></tr>
-						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
-						<tr><td>
-							<h3>Feedback Wanted: <span style="color: #000060">help making JPPF a better open source product</span></h3>
-							Suggestions, bug reports, criticism and ideas are most welcome. I will do my best to answer promptly.<br>
-							<a href="http://sourceforge.net/forum/forum.php?forum_id=458548" target=_top>An open discussion forum is available here</a><br>
-							<a href="http://sourceforge.net/forum/forum.php?forum_id=458549" target=_top>A help forum is available here</a><br>
-							<a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>The bugs tracking system is here</a><br>
-							<a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>The feature request tracking system is here</a><br>
+						<tr><td class="bottom_">
+							<h3>New: JPPF is looking for developers!</h3>
+							If you're interested, please take a look at the <a href="http://sourceforge.net/people/viewjob.php?group_id=135654&job_id=25512">
+							announcement</a> posted on <b>SF.net</b><br><br>
 						</td></tr>
-						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
+						<tr><td class="bottom_">
+							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the GNU Lesser General Public License (LGPL).
+							A copy of the licensing terms can be obtained <a href="http://www.opensource.org/licenses/lgpl-license.php"><b>here</b></a>.</span></h4>
+						</td></tr>
 					</table>
 				</td>
 
 				<td width="50%" valign="top">
-					<table class="table_" cellspacing="0" cellpadding="5" width="100%">
+					<table class="leftRight_" cellspacing="0" cellpadding="5" width="100%">
 
-						<tr><td>
+						<tr><td class="bottom_">
 						<?php
 							$link = mysql_connect('mysql4-j', 'j135654admin', 'tri75den')
 								 or die('Could not connect: ' . mysql_error());
@@ -68,8 +66,7 @@
 						?>
 						</td></tr>
 
-						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
-						<tr><td>
+						<tr><td class="bottom_">
 							<h3>JPPF articles on the Web</h3>
 							<table align="center">
 								<tr><td>
@@ -89,15 +86,18 @@
 								</tr>
 							</table>
 						</td></tr>
-						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
-						<tr><td>
-							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the GNU Lesser General Public License (LGPL).
-							A copy of the licensing terms can be obtained <a href="http://www.opensource.org/licenses/lgpl-license.php"><b>here</b></a>.</span></h4>
+						<tr><td class="bottom_">
+							<h3>Feedback Wanted: <span style="color: #000060">help making JPPF a better open source product</span></h3>
+							Suggestions, bug reports, criticism and ideas are most welcome. I will do my best to answer promptly.<br>
+							<a href="http://sourceforge.net/forum/forum.php?forum_id=458548" target=_top>An open discussion forum is available here</a><br>
+							<a href="http://sourceforge.net/forum/forum.php?forum_id=458549" target=_top>A help forum is available here</a><br>
+							<a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>The bugs tracking system is here</a><br>
+							<a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>The feature request tracking system is here</a><br>
 						</td></tr>
-						<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 					</table>
 				</td>
 			</tr>
+		</table>
 
 		</div>
 	</body>

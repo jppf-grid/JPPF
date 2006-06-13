@@ -59,7 +59,8 @@ class CWaitingResult implements ChannelState {
 	public void exec(SelectionKey key, ChannelContext context) {
 
 		SocketChannel channel = (SocketChannel) key.channel();
-		TaskRequest out = (TaskRequest) context.content;
+		NodeChannelContext nodeContext = (NodeChannelContext) context;
+		TaskRequest out = (TaskRequest) nodeContext.content;
 		JPPFTaskBundle bundle = out.getBundle();
 		Request request = out.getRequest();
 		TaskCompletionListener listener = bundle.getCompletionListener();
@@ -84,7 +85,7 @@ class CWaitingResult implements ChannelState {
 				
 				//updating stats
 				if (isStatsEnabled()) {
-					server.getBundler().feedback(bundle.getTaskCount(), elapsed);
+					nodeContext.bundler.feedback(bundle.getTaskCount(), elapsed);
 					taskExecuted(bundle.getTaskCount(), elapsed, bundle.getNodeExecutionTime(), out.getBundleBytes());
 				}
 				
@@ -94,8 +95,13 @@ class CWaitingResult implements ChannelState {
 				//now it's done...
 				//we will now run the scheduler part
 				
+				// first check whether the bundler settings have changed.
+				if (nodeContext.bundler.getTimestamp() < server.getBundler().getTimestamp())
+				{
+					nodeContext.bundler = server.getBundler().copy();
+				}
 				// verifying if there is other tasks to send to this node
-				bundle = this.server.getQueue().nextBundle();
+				bundle = server.getQueue().nextBundle(nodeContext.bundler.getBundleSize());
 				if (bundle != null) {
 					try {
 						server.sendTask(channel, key, context, bundle);

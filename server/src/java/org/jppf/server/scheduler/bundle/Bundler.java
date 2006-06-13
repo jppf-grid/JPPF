@@ -49,5 +49,17 @@ public interface Bundler {
 	 * @param totalTime the total time considering the transmission and execution.
 	 */
 	void feedback(int bundleSize, long totalTime) ;
-	
+
+	/**
+	 * Make a copy of this bundler.
+	 * Wich parts are actually copied depends on the implementation.
+	 * @return a new <code>Bundler</code> instance.
+	 */
+	Bundler copy();
+	/**
+	 * Get the timestamp at which this bundler was created.
+	 * This is used to enable node channels to know when the bundler settings have changed.
+	 * @return the timestamp as a long value.
+	 */
+	long getTimestamp();
 }

@@ -45,21 +45,20 @@
 							<td class="menu"><a href="faq.php">Faqs</a></td>
 							<td class="menu"><a href="news.php">News</a></td>
 							<td class="menu"><a href="http://sourceforge.net/projects/jppf-project">Project</a></td>
-							<td class="menu"><a href="links.html">Links</a></td>
+							<td class="menu"><a href="links.php">Links</a></td>
 							<td class="menu"></td>
 						</tr>
 					</table>
 				</td>
 			</tr>
 		</table>
-		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
-						<tr><td/></tr>
-			<tr>
-				<td>
+		<table cellspacing="0" cellpadding="5" width="80%">
+						<tr>
+				<td class="leftRightBottom_">
+					<br>
 					<h1 align="center" style="color: #8080FF"><b>Frequently Asked Questions</b></h1>
 				</td>
 			</tr>
-			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 		</table>
 <?php
 		$link = mysql_connect('mysql4-j', 'j135654admin', 'tri75den')
@@ -74,7 +73,7 @@
 		}
 		mysql_free_result($result);
 ?>
-		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
+		<table class="border_" cellspacing="0" cellpadding="5" width="80%">
 <?php
 		$count = 0;
 		foreach ($groups as $key => $value)
@@ -110,7 +109,7 @@
 		foreach ($groups as $key => $value)
 		{
 ?>
-		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
+		<table class="border_" cellspacing="0" cellpadding="5" width="80%">
 <?php
 ?>
 			<tr><td height="10" style="background-color: #8080FF"/></tr>

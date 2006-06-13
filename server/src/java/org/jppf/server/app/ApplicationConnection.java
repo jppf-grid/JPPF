@@ -21,6 +21,7 @@ package org.jppf.server.app;
 
 import static org.jppf.server.JPPFStatsUpdater.*;
 import static org.jppf.server.protocol.AdminRequest.*;
+import static org.jppf.server.protocol.JPPFRequestHeader.Type.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -49,43 +50,34 @@ public class ApplicationConnection extends JPPFConnection implements
 	 * Log4j logger for this class.
 	 */
 	private static Logger log = Logger.getLogger(ApplicationConnection.class);
-
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-
 	/**
-	 * Mapping of received tasks to a unique id within the context of their
-	 * enclosing request.
+	 * The list of task bundles whose execution has been completed.
 	 */
-	private Map<String, JPPFTaskBundle> bundleMap = null;
-
-	/**
-	 * Mapping of task results to a unique id within the context of the
-	 * enclosing request.
-	 */
-	private Map<String, JPPFTaskBundle> resultMap = null;
-
+	private List<JPPFTaskBundle> resultList = null;
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
 	private JPPFQueue queue = null;
-
 	/**
 	 * A reference to the sever for the JPPF nodes.
 	 */
 	private JPPFNodeServer nodeServer = null;
-
 	/**
 	 * Used to serialize and deserialize the tasks data.
 	 */
 	private SerializationHelper helper = new SerializationHelperImpl();
-
 	/**
 	 * The header describing the current client request.
 	 */
 	private JPPFRequestHeader header = null;
+	/**
+	 * Number of tasks that haven't yet been executed.
+	 */
+	private int pendingTasksCount = 0;
 
 	/**
 	 * Initialize this connection with an open socket connection to a remote
@@ -99,8 +91,7 @@ public class ApplicationConnection extends JPPFConnection implements
 	 * @throws JPPFException
 	 *             if this socket handler can't be initialized.
 	 */
-	public ApplicationConnection(JPPFServer server, Socket socket)
-			throws JPPFException {
+	public ApplicationConnection(JPPFServer server, Socket socket) throws JPPFException {
 		super(server, socket);
 		InetAddress addr = socket.getInetAddress();
 		setName("appl [" + addr.getHostAddress() + ":" + socket.getPort() + "]");
@@ -133,13 +124,50 @@ public class ApplicationConnection extends JPPFConnection implements
 		// Read the request header - with tasks count information
 		header = (JPPFRequestHeader) helper.readNextObject(dis, false);
 		JPPFRequestHeader.Type type = header.getRequestType();
-		if (JPPFRequestHeader.Type.STATISTICS.equals(type) && isStatsEnabled()) {
+		if (STATISTICS.equals(type) && isStatsEnabled()) {
 			sendStats();
-		} else if (JPPFRequestHeader.Type.ADMIN.equals(type)) {
+		} else if (ADMIN.equals(type)) {
 			performAdminOperation(header);
-		} else if (JPPFRequestHeader.Type.NON_BLOCKING_EXECUTION.equals(type)) {
+		} else if (NON_BLOCKING_EXECUTION.equals(type)) {
 			executeTasks(dis);
 		}
+	}
+
+	/**
+	 * Execute the tasks received from a client.
+	 * @param dis the stream from which the task data are read.
+	 * @throws Exception if the tasks could not be read.
+	 */
+	protected void executeTasks(DataInputStream dis) throws Exception
+	{
+		int count = header.getTaskCount();
+		byte[] dataProvider = helper.readNextBytes(dis);
+		List<byte[]> taskList = new ArrayList<byte[]>();
+		resultList = new ArrayList<JPPFTaskBundle>();
+		for (int i = 0; i < count; i++)
+		{
+			byte[] taskBytes = helper.readNextBytes(dis);
+			if (debugEnabled)
+			{
+				StringBuilder sb = new StringBuilder("deserialized task in ").append(taskBytes.length);
+				sb.append(" bytes as : ").append(StringUtils.dumpBytes(taskBytes, 0, taskBytes.length));
+				log.debug(sb.toString());
+			}
+			taskList.add(taskBytes);
+		}
+		dis.close();
+		JPPFTaskBundle bundle = new JPPFTaskBundle();
+		bundle.setUuid("0");
+		bundle.setRequestUuid(header.getUuid());
+		bundle.setAppUuid(header.getAppUuid());
+		bundle.setDataProvider(dataProvider);
+		bundle.setTaskCount(count);
+		bundle.setTasks(taskList);
+		bundle.setCompletionListener(this);
+		getQueue().addBundle(bundle);
+		pendingTasksCount = count;
+		waitForExecution();
+		return;
 	}
 
 	/**
@@ -150,7 +178,8 @@ public class ApplicationConnection extends JPPFConnection implements
 	 * @throws Exception
 	 *             if the tasks could not be read.
 	 */
-	protected void executeTasks(DataInputStream dis) throws Exception {
+	/*
+	protected void executeTasks2(DataInputStream dis) throws Exception {
 		bundleMap = new HashMap<String, JPPFTaskBundle>();
 		resultMap = new TreeMap<String, JPPFTaskBundle>();
 		int count = header.getTaskCount();
@@ -167,13 +196,11 @@ public class ApplicationConnection extends JPPFConnection implements
 				startIdx = i;
 			n++;
 			byte[] taskBytes = helper.readNextBytes(dis);
-			if (debugEnabled) {
-				log
-						.debug("deserialized task in "
-								+ taskBytes.length
-								+ " bytes as : "
-								+ StringUtils.dumpBytes(taskBytes, 0,
-										taskBytes.length));
+			if (debugEnabled)
+			{
+				StringBuilder sb = new StringBuilder("deserialized task in ").append(taskBytes.length);
+				sb.append(" bytes as : ").append(StringUtils.dumpBytes(taskBytes, 0, taskBytes.length));
+				log.debug(sb.toString());
 			}
 			taskList.add(taskBytes);
 			if ((n == bundleSize) || (i == count - 1)) {
@@ -187,7 +214,6 @@ public class ApplicationConnection extends JPPFConnection implements
 					bundle.setTaskCount(n);
 					bundle.setTasks(taskList);
 					bundle.setCompletionListener(this);
-					bundle.setStartTaskNumber(startIdx);
 					bundleMap.put(uuid, bundle);
 					getQueue().addBundle(bundle);
 					startIdx = -1;
@@ -201,6 +227,7 @@ public class ApplicationConnection extends JPPFConnection implements
 		waitForExecution();
 		return;
 	}
+	*/
 
 	/**
 	 * Send the results of the tasks in a bundle back to the client who
@@ -219,7 +246,6 @@ public class ApplicationConnection extends JPPFConnection implements
 		};
 		DataOutputStream dos = new DataOutputStream(baos);
 		dos.writeInt(bundle.getTaskCount());
-		dos.writeInt(bundle.getStartTaskNumber());
 		for (int i = 0; i < bundle.getTaskCount(); i++) {
 			byte[] task = bundle.getTasks().get(i);
 			helper.writeNextBytes(dos, task, 0, task.length);
@@ -388,18 +414,21 @@ public class ApplicationConnection extends JPPFConnection implements
 	 * This method waits until all tasks of a request have been completed.
 	 * @throws Exception if handing of the results fails.
 	 */
-	private synchronized void waitForExecution() throws Exception {
-		while (bundleMap.size() > 0) {
-			try {
+	private synchronized void waitForExecution() throws Exception
+	{
+		while (pendingTasksCount > 0)
+		{
+			try
+			{
 				wait();
-
-				synchronized (resultMap) {
-					for (String uuid : resultMap.keySet()) {
-						sendPartialResults((resultMap.get(uuid)));
-					}
-					resultMap.clear();
+				synchronized (resultList)
+				{
+					for (JPPFTaskBundle bundle : resultList) sendPartialResults(bundle);
+					resultList.clear();
 				}
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e)
+			{
 				log.error(e.getMessage(), e);
 			}
 		}
@@ -413,14 +442,10 @@ public class ApplicationConnection extends JPPFConnection implements
 	 * @param result
 	 *            the result of the task's execution.
 	 */
-	public synchronized void taskCompleted(JPPFTaskBundle result) {
-		String uuid = result.getUuid();
-		synchronized (bundleMap) {
-			bundleMap.remove(uuid);
-		}
-		synchronized (resultMap) {
-			resultMap.put(uuid, result);
-		}
+	public synchronized void taskCompleted(JPPFTaskBundle result)
+	{
+		pendingTasksCount -= result.getTaskCount();
+		resultList.add(result);
 		notify();
 	}
 

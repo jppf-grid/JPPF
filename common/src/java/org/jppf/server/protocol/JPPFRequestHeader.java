@@ -36,7 +36,6 @@ import org.jppf.utils.JPPFUuid;
  */
 public class JPPFRequestHeader implements Serializable
 {
-	
 	/**
 	 * Type safe enum for the type of request.
 	 */
@@ -55,6 +54,7 @@ public class JPPFRequestHeader implements Serializable
 		 */
 		STATISTICS
 	};
+
 	/**
 	 * The unique identifier for the submitting application.
 	 */

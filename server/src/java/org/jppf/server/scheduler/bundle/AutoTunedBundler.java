@@ -36,35 +36,56 @@ import org.jppf.server.JPPFStatsUpdater;
 public class AutoTunedBundler implements Bundler {
 
 	/**
+	 * Count of the bundlers used to generate a readable unique id.
+	 */
+	private static int bundlerCount = 0;
+	/**
+	 * Increment the bundlers count by one.
+	 * @return the new count as an int value.
+	 */
+	private static synchronized int incBundlerCount()
+	{
+		return ++bundlerCount;
+	}
+	/**
+	 * The bundler number for this bundler.
+	 */
+	protected int bundlerNumber = incBundlerCount();
+	/**
 	 * The currrent bundle size.
 	 */
-	private int currentSize;
+	protected int currentSize;
 
 	/**
 	 * True if a performance profile analysis is currently being done, false otherwise. 
 	 */
-	private boolean stable = false;
+	protected boolean stable = false;
 
 	/**
 	 * The mean performance value associated with the current bundle size.
 	 */
-	private double stableMean;
+	protected double stableMean;
 
 	/**
 	 * Used to compute a pseudo-random increment to the bundle size, as part of a Monte Carlo random walk
 	 * towards a good solution.
 	 */
-	private Random rnd = new Random(System.currentTimeMillis());
+	protected Random rnd = new Random(System.currentTimeMillis());
 
 	/**
 	 * A map of performance samples, aorted by increasing bundle size.
 	 */
-	private Map<Integer, BundlePerformanceSample> samplesMap = new TreeMap<Integer, BundlePerformanceSample>();
+	protected Map<Integer, BundlePerformanceSample> samplesMap = new TreeMap<Integer, BundlePerformanceSample>();
 	
 	/**
 	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
 	 */
-	private AutoTuneProfile profile;
+	protected AutoTuneProfile profile;
+
+	/**
+	 * The creation timestamp for this bundler.
+	 */
+	private long timestamp = System.currentTimeMillis();
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
@@ -72,12 +93,12 @@ public class AutoTunedBundler implements Bundler {
 	 * grouped as a performance analysis profile.
 	 */
 	public AutoTunedBundler(AutoTuneProfile profile) {
-		LOG.info("Using Auto-Tuned bundle size");
+		LOG.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		currentSize = JPPFStatsUpdater.getStaticBundleSize();
 		if (currentSize < 1) {
 			currentSize = 1;
 		}
-		LOG.info("The initial size is " + currentSize);
+		LOG.info("Bundler#" + bundlerNumber + ": The initial size is " + currentSize);
 		this.profile = profile;
 	}
 
@@ -109,7 +130,7 @@ public class AutoTunedBundler implements Bundler {
 
 		boolean isDebugEnable = LOG.isDebugEnabled();
 		if (isDebugEnable) {
-			LOG.debug("Got another sample with bundleSize=" + bundleSize
+			LOG.debug("Bundler#" + bundlerNumber + ": Got another sample with bundleSize=" + bundleSize
 					+ " and totalTime=" + totalTime);
 		}
 
@@ -139,7 +160,7 @@ public class AutoTunedBundler implements Bundler {
 			if (stable) {
 				if (samples > profile.getMinSamplesToCheckConvergence()
 						&& (Math.abs(stableMean - mean) / stableMean > profile.getMaxDeviation())) {
-					LOG.info("Detected a change in tasks profile... restarting the discovering process");
+					LOG.info("Bundler#" + bundlerNumber + ": Detected a change in tasks profile... restarting the discovery process");
 					makeAnalysis = true;
 					stable = false;
 				}
@@ -171,7 +192,7 @@ public class AutoTunedBundler implements Bundler {
 				}
 				currentSize = bestSize + diff;
 				if (samplesMap.get(currentSize) == null) {
-					LOG.info("The next bundle sized that will be used is "
+					LOG.info("Bundler#" + bundlerNumber + ": The next bundle sized that will be used is "
 							+ currentSize);
 					return;
 				}
@@ -204,7 +225,16 @@ public class AutoTunedBundler implements Bundler {
 		return bestSize;
 	}
 
-	
+	/**
+	 * Make a copy of this bundler.
+	 * @return a new <code>AutoTunedBundler</code> instance.
+	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
+	 */
+	public Bundler copy()
+	{
+		AutoTunedBundler b = new AutoTunedBundler(profile.copy());
+		return b;
+	}
 
 	/**
 	 * This is a utility class to be used to store the pair of mean and the
@@ -221,5 +251,16 @@ public class AutoTunedBundler implements Bundler {
 		 * Number of samples used to compute the mean value.
 		 */
 		public long samples;
+	}
+
+	/**
+	 * Get the timestamp at which this bundler was created.
+	 * This is used to enable node channels to know when the bundler settings have changed.
+	 * @return the timestamp as a long value.
+	 * @see org.jppf.server.scheduler.bundle.Bundler#getTimestamp()
+	 */
+	public long getTimestamp()
+	{
+		return timestamp;
 	}
 }

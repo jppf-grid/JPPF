@@ -29,7 +29,12 @@ import org.jppf.server.JPPFStatsUpdater;
  * 
  * @author Domingos Creado
  */
-public class FixedSizedBundler implements Bundler {
+public class FixedSizedBundler implements Bundler
+{
+	/**
+	 * The creation timestamp for this bundler.
+	 */
+	private long timestamp = System.currentTimeMillis();
 
 	/**
 	 * Initialize this bundler.
@@ -55,5 +60,26 @@ public class FixedSizedBundler implements Bundler {
 	 */
 	public void feedback(int bundleSize, long totalTime) {
 		//just ignored
+	}
+
+	/**
+	 * Make a copy of this bundler.
+	 * @return a reference to this bundler, no copy is actually made.
+	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
+	 */
+	public Bundler copy()
+	{
+		return this;
+	}
+
+	/**
+	 * Get the timestamp at which this bundler was created.
+	 * This is used to enable node channels to know when the bundler settings have changed.
+	 * @return the timestamp as a long value.
+	 * @see org.jppf.server.scheduler.bundle.Bundler#getTimestamp()
+	 */
+	public long getTimestamp()
+	{
+		return timestamp;
 	}
 }

@@ -17,26 +17,18 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.server.scheduler.bundle;
+package org.jppf.server;
+
+import org.jppf.server.scheduler.bundle.Bundler;
 
 /**
- * This class implements a smoothly changing profile.
- * @author Domingos Creado
+ * Extension of ChannelContext for the nodes, providing an individual bundler for each node. 
+ * @author Laurent Cohen
  */
-public class SmoothProfile extends AnnealingTuneProfile {
-
+public class NodeChannelContext extends ChannelContext
+{
 	/**
-	 * Initialize this profile with default values for the parameters.
+	 * Bundler used to schedule tasks for the corresponding node.
 	 */
-	public SmoothProfile()
-	{
-		//minSamplesToAnalyse = 500;
-		//minSamplesToCheckConvergence = 300;
-		minSamplesToAnalyse = 100;
-		minSamplesToCheckConvergence = 50;
-		maxDeviation = 0.2d;
-		maxGuessToStable = 10;
-		sizeRatioDeviation = 1.5f;
-		decreaseRatio = 0.2f;
-	}
+	public Bundler bundler = null;
 }

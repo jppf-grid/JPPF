@@ -24,7 +24,8 @@ package org.jppf.server;
  * Class that represents a context to a channel.
  * @author Domingos Creado
  */
-public class ChannelContext {
+public class ChannelContext
+{
 	/**
 	 * what will be executed when the channel is selected.
 	 */

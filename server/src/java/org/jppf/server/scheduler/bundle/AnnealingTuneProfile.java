@@ -122,4 +122,21 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile {
 		//return max * Math.pow(Math.E, -x * getDecreaseRatio());
 		return max * Math.exp(-x * getDecreaseRatio());
 	}
+
+	/**
+	 * Make a copy of this profile.
+	 * @return a newly created <code>AutoTuneProfile</code> instance.
+	 * @see org.jppf.server.scheduler.bundle.AutoTuneProfile#copy()
+	 */
+	public AutoTuneProfile copy()
+	{
+		AnnealingTuneProfile p = new AnnealingTuneProfile();
+		p.minSamplesToAnalyse = minSamplesToAnalyse;
+		p.minSamplesToCheckConvergence = minSamplesToCheckConvergence;
+		p.maxDeviation = maxDeviation;
+		p.maxGuessToStable = maxGuessToStable;
+		p.sizeRatioDeviation = sizeRatioDeviation;
+		p.decreaseRatio = decreaseRatio;
+		return p;
+	}
 }

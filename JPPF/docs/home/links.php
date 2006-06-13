@@ -1,15 +1,15 @@
 <html>
 		<head>
-		<title>Java Parallel Processing Framework JPPF Overview</title>
+		<title>Java Parallel Processing Framework Links Page</title>
 		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
 		<meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
 		<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
 		<link rel="stylesheet" type="text/css" href="./jppf.css" title="Style">
 	</head>
-<body>
-<div align="center">
-		<table align="center" width="80%" cellspacing="0" cellpadding="5"
+	<body>
+		<div align="center">
+				<table align="center" width="80%" cellspacing="0" cellpadding="5"
 			class="table_" style="background: url('images/grid.gif'); background-repeat: repeat; background-attachment: fixed">
 			<tr><td height="5"></td></tr>
 			<tr>
@@ -52,8 +52,63 @@
 				</td>
 			</tr>
 		</table>
-<table class="table_" cellspacing="0" cellpadding="0" width="80%"><tr><td align="center">
-<a href="JPPF-Overview.html"><img src="overview/first1.gif" border=0 alt="First page"></a> <a href="img9.html"><img src="overview/prev1.gif" border=0 alt="Back"></a> <a href="img11.html"><img src="overview/next1.gif" border=0 alt="Continue"></a> <a href="img15.html"><img src="overview/last1.gif" border=0 alt="Last page"></a> <br>
-<img src="overview/img10.gif">
-</td></tr></table></div></body>
+		<table cellspacing="0" cellpadding="5" width="80%">
+						<tr>
+				<td class="leftRightBottom_">
+					<br>
+					<h1 align="center" style="color: #8080FF"><b>Related Links</b></h1>
+				</td>
+			</tr>
+		</table>
+<?php
+		$link = mysql_connect('mysql4-j', 'j135654admin', 'tri75den')
+			 or die('Could not connect: ' . mysql_error());
+		mysql_select_db('j135654_web') or die('Could not select database');
+		$query = 'SELECT * FROM links_groups ORDER BY group_id ASC';
+		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+		$groups = array();
+		while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
+		{
+			$groups[$line["group_id"]] = $line["desc"];
+		}
+		mysql_free_result($result);
+?>
+		<table class="leftRightBottom_" cellspacing="0" cellpadding="5" width="80%">
+<?php
+		$count = 0;
+		foreach ($groups as $key => $value)
+		{
+?>
+			<tr>
+				<td class="top_">
+<?php
+					printf("<h3><b><u>%s</u></b></h3>", $value);
+?>
+				</td>
+			</tr>
+<?php
+			$query = "SELECT * FROM links WHERE group_id = '$key' ORDER BY link_id ASC";
+			$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+			while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
+			{
+?>
+			<tr>
+				<td>
+				<ul>
+<?php
+				$ref = $key . "." . $line["q_id"];
+				printf("<li><span class=\"linksub\"><a href=\"%s\">%s</a>:</span> %s</li>", $line["url"], $line["title"], $line["desc"]);
+?>
+				</ul>
+				</td>
+			</tr>
+<?php
+			}
+		}
+		// Closing connection
+		mysql_close($link);
+?>
+		</table>
+	</div>
+	</body>
 </html>

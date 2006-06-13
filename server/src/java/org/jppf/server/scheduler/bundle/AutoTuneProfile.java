@@ -64,4 +64,9 @@ public interface AutoTuneProfile extends Serializable {
 	 * @return an always positive diff to be applied to bundle size
 	 */
 	int createDiff(int bestSize, int collectedSamples, Random rnd);
+	/**
+	 * Make a copy of this profile.
+	 * @return a newly created <code>AutoTuneProfile</code> instance.
+	 */
+	AutoTuneProfile copy();
 }

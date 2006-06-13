@@ -45,24 +45,23 @@
 							<td class="menu"><a href="faq.php">Faqs</a></td>
 							<td class="menu"><a href="news.php">News</a></td>
 							<td class="menu"><a href="http://sourceforge.net/projects/jppf-project">Project</a></td>
-							<td class="menu"><a href="links.html">Links</a></td>
+							<td class="menu"><a href="links.php">Links</a></td>
 							<td class="menu"></td>
 						</tr>
 					</table>
 				</td>
 			</tr>
 		</table>
-		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
+		<table cellspacing="0" cellpadding="0" width="80%">
 			<tr>
 				<td>
-								<tr><td/></tr>
-			<tr>
-				<td>
+								<tr>
+				<td class="leftRightBottom_">
+					<br>
 					<h1 align="center" style="color: #8080FF"><b><a style="color: #8080FF" href="http://sourceforge.net/news/?group_id=135654">Latest news on project pages</a>
 </b></h1>
 				</td>
 			</tr>
-			<tr><td height="1px" colspan="0" style="background-color: #8080FF"/></tr>
 				</td>
 			</tr>
 		</table>
@@ -77,7 +76,7 @@
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
 		{
 		?>
-		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
+		<table class="border_" cellspacing="0" cellpadding="5" width="80%">
 			<tr>
 				<td>
 					<?php

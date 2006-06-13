@@ -4,7 +4,7 @@
 	<body>
 		<div align="center">
 		$template{name="jppf-header"}$
-		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
+		<table cellspacing="0" cellpadding="5" width="80%">
 			$template{name="page-title" title="Frequently Asked Questions"}$
 		</table>
 
@@ -22,7 +22,7 @@
 		}
 		mysql_free_result($result);
 ?>
-		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
+		<table class="border_" cellspacing="0" cellpadding="5" width="80%">
 <?php
 		$count = 0;
 		foreach ($groups as $key => $value)
@@ -58,7 +58,7 @@
 		foreach ($groups as $key => $value)
 		{
 ?>
-		<table class="table_" cellspacing="0" cellpadding="5" width="80%">
+		<table class="border_" cellspacing="0" cellpadding="5" width="80%">
 <?php
 ?>
 			<tr><td height="10" style="background-color: #8080FF"/></tr>
