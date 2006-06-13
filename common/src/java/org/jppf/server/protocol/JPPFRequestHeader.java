@@ -32,25 +32,34 @@ import org.jppf.utils.JPPFUuid;
  * <li>following each task length and the task in serialized format</li>
  * </ul>
  * @author Laurent Cohen
+ * @author Domingos Creado
  */
 public class JPPFRequestHeader implements Serializable
 {
-	/**
-	 * Value for an execution request type.
-	 */
-	public static final String EXECUTION = "execution";
+	
+	public enum Type { NON_BLOCKING_EXECUTION, ADMIN, STATISTICS};
+	
+	
+	//does it still needed?
+	//
+	// Value for an execution request type.
+	//
+	//public static final String EXECUTION = "execution";
+	
+	
 	/**
 	 * Value for a non-blocking execution request type.
 	 */
-	public static final String NON_BLOCKING_EXECUTION = "nb.execution";
+	//public static final String NON_BLOCKING_EXECUTION = "nb.execution";
 	/**
 	 * Value for an administration request type.
 	 */
-	public static final String ADMIN = "admin";
+	//public static final String ADMIN = "admin";
 	/**
 	 * Value for a statistics collection type of request.
 	 */
-	public static final String STATISTICS = "statistics";
+	//public static final String STATISTICS = "statistics";
+	
 	/**
 	 * The unique identifier for the submitting application.
 	 */
@@ -60,9 +69,9 @@ public class JPPFRequestHeader implements Serializable
 	 */
 	private String uuid = null;
 	/**
-	 * The type of this request, ie either {@link #EXECUTION EXECUTION} or {@link #ADMIN ADMIN}.
+	 * The type of this request, ie either {@link #NON_BLOCKING_EXECUTION NON_BLOCKING_EXECUTION} or {@link #ADMIN ADMIN}.
 	 */
-	private String requestType = EXECUTION;
+	private Type requestType = Type.NON_BLOCKING_EXECUTION;
 	/**
 	 * The number of tasks in this request.
 	 */
@@ -122,19 +131,19 @@ public class JPPFRequestHeader implements Serializable
 	}
 
 	/**
-	 * Get the type of this request, ie either {@link #EXECUTION EXECUTION}, {@link #STATISTICS STATISTICS} or {@link #ADMIN ADMIN}.
+	 * Get the type of this request, ie either {@link #NON_BLOCKING_EXECUTION NON_BLOCKING_EXECUTION}, {@link #STATISTICS STATISTICS} or {@link #ADMIN ADMIN}.
 	 * @return the type as a string.
 	 */
-	public String getRequestType()
+	public Type getRequestType()
 	{
 		return requestType;
 	}
 
 	/**
 	 * Set the type of this request.
-	 * @param requestType the type as a string, either {@link #EXECUTION EXECUTION}, {@link #STATISTICS STATISTICS} or {@link #ADMIN ADMIN}.
+	 * @param requestType the type as a string, either {@link #NON_BLOCKING_EXECUTION NON_BLOCKING_EXECUTION}, {@link #STATISTICS STATISTICS} or {@link #ADMIN ADMIN}.
 	 */
-	public void setRequestType(String requestType)
+	public void setRequestType(Type requestType)
 	{
 		this.requestType = requestType;
 	}

@@ -38,61 +38,79 @@ import org.jppf.utils.*;
 /**
  * Instances of this class listen to incoming client application requests, so as
  * to dispatch them for execution.<br>
- * When the execution of a task is complete, this connection is automatically notified, through
- * an asynchronous event mechanism.
+ * When the execution of a task is complete, this connection is automatically
+ * notified, through an asynchronous event mechanism.
+ * 
  * @author Laurent Cohen
  */
-public class ApplicationConnection extends JPPFConnection implements TaskCompletionListener
-{
+public class ApplicationConnection extends JPPFConnection implements
+		TaskCompletionListener {
 	/**
 	 * Log4j logger for this class.
 	 */
 	private static Logger log = Logger.getLogger(ApplicationConnection.class);
+
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+
 	/**
-	 * Mapping of received tasks to a unique id within the context of their enclosing request. 
+	 * Mapping of received tasks to a unique id within the context of their
+	 * enclosing request.
 	 */
 	private Map<String, JPPFTaskBundle> bundleMap = null;
+
 	/**
-	 * Mapping of task results to a unique id within the context of the enclosing request. 
+	 * Mapping of task results to a unique id within the context of the
+	 * enclosing request.
 	 */
 	private Map<String, JPPFTaskBundle> resultMap = null;
+
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
 	private JPPFQueue queue = null;
+
 	/**
 	 * A reference to the sever for the JPPF nodes.
 	 */
 	private JPPFNodeServer nodeServer = null;
+
 	/**
 	 * Used to serialize and deserialize the tasks data.
 	 */
 	private SerializationHelper helper = new SerializationHelperImpl();
+
 	/**
 	 * The header describing the current client request.
 	 */
 	private JPPFRequestHeader header = null;
 
 	/**
-	 * Initialize this connection with an open socket connection to a remote client.
-	 * @param server the server that created this connection.
-	 * @param socket the socket connection from which requests are received and to which responses are sent.
-	 * @throws JPPFException if this socket handler can't be initialized.
+	 * Initialize this connection with an open socket connection to a remote
+	 * client.
+	 * 
+	 * @param server
+	 *            the server that created this connection.
+	 * @param socket
+	 *            the socket connection from which requests are received and to
+	 *            which responses are sent.
+	 * @throws JPPFException
+	 *             if this socket handler can't be initialized.
 	 */
-	public ApplicationConnection(JPPFServer server, Socket socket) throws JPPFException
-	{
+	public ApplicationConnection(JPPFServer server, Socket socket)
+			throws JPPFException {
 		super(server, socket);
 		InetAddress addr = socket.getInetAddress();
-		setName("appl ["+addr.getHostAddress()+":"+socket.getPort()+"]");
-		if (isStatsEnabled()) newClientConnection();
+		setName("appl [" + addr.getHostAddress() + ":" + socket.getPort() + "]");
+		if (isStatsEnabled())
+			newClientConnection();
 	}
 
 	/**
-	 * Handle execution requests from a remote client application, and send the results back to the client.<br>
+	 * Handle execution requests from a remote client application, and send the
+	 * results back to the client.<br>
 	 * The main flow is as follows:
 	 * <ul>
 	 * <li>receive an execution request</li>
@@ -101,66 +119,66 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 	 * <li>recompose the tasks results in the same order as they were received</li>
 	 * <li><send results back to the client/li>
 	 * </ul>
-	 * @throws Exception if an error is raised while processing an execution request.
+	 * 
+	 * @throws Exception
+	 *             if an error is raised while processing an execution request.
 	 * @see org.jppf.server.JPPFConnection#perform()
 	 */
-	public void perform() throws Exception
-	{
+	public void perform() throws Exception {
 		JPPFBuffer buffer = socketClient.receiveBytes(0);
 		byte[] bytes = buffer.getBuffer();
-		DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
+		DataInputStream dis = new DataInputStream(new ByteArrayInputStream(
+				bytes));
 
 		// Read the request header - with tasks count information
 		header = (JPPFRequestHeader) helper.readNextObject(dis, false);
-		String type = header.getRequestType();
-		if (STATISTICS.equals(type) && isStatsEnabled())
-		{
+		JPPFRequestHeader.Type type = header.getRequestType();
+		if (JPPFRequestHeader.Type.STATISTICS.equals(type) && isStatsEnabled()) {
 			sendStats();
-		}
-		else if (ADMIN.equals(type))
-		{
+		} else if (JPPFRequestHeader.Type.ADMIN.equals(type)) {
 			performAdminOperation(header);
-		}
-		else if (EXECUTION.equals(type) || NON_BLOCKING_EXECUTION.equals(type))
-		{
+		} else if (JPPFRequestHeader.Type.NON_BLOCKING_EXECUTION.equals(type)) {
 			executeTasks(dis);
 		}
 	}
 
 	/**
 	 * Execute the tasks received from a client.
-	 * @param dis the stream from which the task data are read.
-	 * @throws Exception if the tasks could not be read.
+	 * 
+	 * @param dis
+	 *            the stream from which the task data are read.
+	 * @throws Exception
+	 *             if the tasks could not be read.
 	 */
-	protected void executeTasks(DataInputStream dis) throws Exception
-	{
+	protected void executeTasks(DataInputStream dis) throws Exception {
 		bundleMap = new HashMap<String, JPPFTaskBundle>();
 		resultMap = new TreeMap<String, JPPFTaskBundle>();
 		int count = header.getTaskCount();
-		boolean blocking = EXECUTION.equals(header.getRequestType());
+		
 		byte[] dataProvider = helper.readNextBytes(dis);
 		int bundleCount = 0;
 		int n = 0;
 		List<byte[]> taskList = new ArrayList<byte[]>();
-		
+
 		int bundleSize = getBundler().getBundleSize();
 		int startIdx = -1;
-		for (int i=0; i<count; i++)
-		{
-			if (startIdx < 0) startIdx = i;
+		for (int i = 0; i < count; i++) {
+			if (startIdx < 0)
+				startIdx = i;
 			n++;
 			byte[] taskBytes = helper.readNextBytes(dis);
-			if (debugEnabled)
-			{
-				log.debug("deserialized task in " + taskBytes.length+" bytes as : "
-					+ StringUtils.dumpBytes(taskBytes, 0, taskBytes.length));
+			if (debugEnabled) {
+				log
+						.debug("deserialized task in "
+								+ taskBytes.length
+								+ " bytes as : "
+								+ StringUtils.dumpBytes(taskBytes, 0,
+										taskBytes.length));
 			}
 			taskList.add(taskBytes);
-			if ((n == bundleSize) || (i == count - 1))
-			{
-				String uuid = StringUtils.padLeft(""+bundleCount, '0', 10);
-				synchronized(bundleMap)
-				{
+			if ((n == bundleSize) || (i == count - 1)) {
+				String uuid = StringUtils.padLeft("" + bundleCount, '0', 10);
+				synchronized (bundleMap) {
 					JPPFTaskBundle bundle = new JPPFTaskBundle();
 					bundle.setUuid(uuid);
 					bundle.setRequestUuid(header.getUuid());
@@ -180,55 +198,29 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 			}
 		}
 		dis.close();
-		waitForExecution(blocking);
-		if (!blocking) return;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream()
-		{
-	    public synchronized byte[] toByteArray()
-			{
-				return buf;
-			}
-		};
-		DataOutputStream dos = new DataOutputStream(baos);
-		dos.writeInt(header.getTaskCount());
-		// start task index is -1 to indicate all task results are being sent
-		dos.writeInt(-1);
-		for (String id: resultMap.keySet())
-		{
-			JPPFTaskBundle bundle = resultMap.get(id);
-			for (int i=0; i<bundle.getTaskCount(); i++)
-			{
-				byte[] task = bundle.getTasks().get(i);
-				helper.writeNextBytes(dos, task, 0, task.length);
-			}
-		}
-		dos.flush();
-		dos.close();
-		JPPFBuffer buffer = new JPPFBuffer();
-		buffer.setLength(baos.size());
-		buffer.setBuffer(baos.toByteArray());
-		socketClient.sendBytes(buffer);
+		waitForExecution();
+		return;
 	}
 
 	/**
-	 * Send the results of the tasks in a bundle back to the client who submitted the request.
-	 * @param bundle the bundle to get the task results from.
-	 * @throws Exception if an IO exception occurred while sending the results back.
+	 * Send the results of the tasks in a bundle back to the client who
+	 * submitted the request.
+	 * 
+	 * @param bundle
+	 *            the bundle to get the task results from.
+	 * @throws Exception
+	 *             if an IO exception occurred while sending the results back.
 	 */
-	private void sendPartialResults(JPPFTaskBundle bundle) throws Exception
-	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream()
-		{
-	    public synchronized byte[] toByteArray()
-			{
+	private void sendPartialResults(JPPFTaskBundle bundle) throws Exception {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream() {
+			public synchronized byte[] toByteArray() {
 				return buf;
 			}
 		};
 		DataOutputStream dos = new DataOutputStream(baos);
 		dos.writeInt(bundle.getTaskCount());
 		dos.writeInt(bundle.getStartTaskNumber());
-		for (int i=0; i<bundle.getTaskCount(); i++)
-		{
+		for (int i = 0; i < bundle.getTaskCount(); i++) {
 			byte[] task = bundle.getTasks().get(i);
 			helper.writeNextBytes(dos, task, 0, task.length);
 		}
@@ -239,18 +231,17 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 		buffer.setBuffer(baos.toByteArray());
 		socketClient.sendBytes(buffer);
 	}
-	
+
 	/**
 	 * Send the collected statitics in response to a stats request.
-	 * @throws Exception if the statistics could not be sent to the requester.
+	 * 
+	 * @throws Exception
+	 *             if the statistics could not be sent to the requester.
 	 */
-	private void sendStats() throws Exception
-	{
+	private void sendStats() throws Exception {
 		JPPFStats stats = getStats();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream()
-		{
-	    public synchronized byte[] toByteArray()
-			{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream() {
+			public synchronized byte[] toByteArray() {
 				return buf;
 			}
 		};
@@ -268,11 +259,14 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 
 	/**
 	 * Perform a requested administative function.
-	 * @param header the header for the request.
-	 * @throws Exception if the function could not be performed.
+	 * 
+	 * @param header
+	 *            the header for the request.
+	 * @throws Exception
+	 *             if the function could not be performed.
 	 */
-	private void performAdminOperation(JPPFRequestHeader header) throws Exception
-	{
+	private void performAdminOperation(JPPFRequestHeader header)
+			throws Exception {
 		String response = "Request executed";
 		AdminRequest request = (AdminRequest) header;
 		byte[] b = (byte[]) request.getParameter(KEY_PARAM);
@@ -284,28 +278,26 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 		b = pm.readPassword();
 		String localPwd = new String(CryptoUtils.decrypt(b));
 
-		if (!localPwd.equals(remotePwd)) response = "Invalid password";
-		else
-		{
+		if (!localPwd.equals(remotePwd))
+			response = "Invalid password";
+		else {
 			String command = (String) request.getParameter(COMMAND_PARAM);
-			if (SHUTDOWN.equals(command) || SHUTDOWN_RESTART.equals(command))
-			{
-				long shutdownDelay = (Long) request.getParameter(SHUTDOWN_DELAY_PARAM);
+			if (SHUTDOWN.equals(command) || SHUTDOWN_RESTART.equals(command)) {
+				long shutdownDelay = (Long) request
+						.getParameter(SHUTDOWN_DELAY_PARAM);
 				boolean restart = !SHUTDOWN.equals(command);
-				long restartDelay = (Long) request.getParameter(RESTART_DELAY_PARAM);
+				long restartDelay = (Long) request
+						.getParameter(RESTART_DELAY_PARAM);
 				sendAdminResponse(request, "Request acknowledged");
-				JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay, restart, restartDelay);
+				JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay,
+						restart, restartDelay);
 				return;
-			}
-			else if (CHANGE_PASSWORD.equals(command))
-			{
+			} else if (CHANGE_PASSWORD.equals(command)) {
 				b = (byte[]) request.getParameter(NEW_PASSWORD_PARAM);
 				String newPwd = new String(CryptoUtils.decrypt(tmpKey, b));
 				pm.savePassword(CryptoUtils.encrypt(newPwd.getBytes()));
 				response = "Password changed";
-			}
-			else if (CHANGE_SETTINGS.equals(command))
-			{
+			} else if (CHANGE_SETTINGS.equals(command)) {
 				response = performChangeSettings(request);
 			}
 		}
@@ -314,23 +306,24 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 
 	/**
 	 * Perform the action to change the settings for bundle size tuning.
-	 * @param request the request holding the parametrs to change.
+	 * 
+	 * @param request
+	 *            the request holding the parametrs to change.
 	 * @return a message to report the change status.
-	 * @throws Exception if the changes could not be applied.
+	 * @throws Exception
+	 *             if the changes could not be applied.
 	 */
-	private String performChangeSettings(AdminRequest request) throws Exception
-	{
-		boolean manual = "manual".equalsIgnoreCase((String) request.getParameter(BUNDLE_TUNING_TYPE_PARAM));
+	private String performChangeSettings(AdminRequest request) throws Exception {
+		boolean manual = "manual".equalsIgnoreCase((String) request
+				.getParameter(BUNDLE_TUNING_TYPE_PARAM));
 		String response = null;
-		if (manual)
-		{
+		if (manual) {
 			Number n = (Number) request.getParameter(BUNDLE_SIZE_PARAM);
-			if (n != null) JPPFStatsUpdater.setStaticBundleSize(n.intValue());
+			if (n != null)
+				JPPFStatsUpdater.setStaticBundleSize(n.intValue());
 			nodeServer.setBundler(BundlerFactory.createFixedSizeBundler());
 			response = "Manual bundle size settings changed";
-		}
-		else
-		{
+		} else {
 			AnnealingTuneProfile prof = new AnnealingTuneProfile();
 			Number n = (Number) request.getParameter("MinSamplesToAnalyse");
 			prof.setMinSamplesToAnalyse(n.longValue());
@@ -349,20 +342,22 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 		}
 		return response;
 	}
-	
+
 	/**
 	 * Send the response to an admin request.
-	 * @param request the admin request that holds the response.
-	 * @param msg the response messages.
-	 * @throws Exception if the response could not be sent.
+	 * 
+	 * @param request
+	 *            the admin request that holds the response.
+	 * @param msg
+	 *            the response messages.
+	 * @throws Exception
+	 *             if the response could not be sent.
 	 */
-	private void sendAdminResponse(AdminRequest request, String msg) throws Exception
-	{
+	private void sendAdminResponse(AdminRequest request, String msg)
+			throws Exception {
 		request.setParameter(RESPONSE_PARAM, msg);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream()
-		{
-	    public synchronized byte[] toByteArray()
-			{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream() {
+			public synchronized byte[] toByteArray() {
 				return buf;
 			}
 		};
@@ -380,62 +375,55 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 
 	/**
 	 * Get a reference to the driver's tasks queue.
+	 * 
 	 * @return a <code>JPPFQueue</code> instance.
 	 */
-	private JPPFQueue getQueue()
-	{
-		if (queue == null) queue = JPPFDriver.getInstance().getTaskQueue();
+	private JPPFQueue getQueue() {
+		if (queue == null)
+			queue = JPPFDriver.getInstance().getTaskQueue();
 		return queue;
 	}
 
 	/**
 	 * This method waits until all tasks of a request have been completed.
-	 * @param blocking indicates whether we should wait for all execution results, or send
-	 * them back to the client as soon as they are received.
-	 * @throws Exception if handing of the results fails.
+	 * 
+	 * @param blocking
+	 *            indicates whether we should wait for all execution results, or
+	 *            send them back to the client as soon as they are received.
+	 * @throws Exception
+	 *             if handing of the results fails.
 	 */
-	private synchronized void waitForExecution(boolean blocking)
-		throws Exception
-	{
-		while (bundleMap.size() > 0)
-		{
-			try
-			{
+	private synchronized void waitForExecution() throws Exception {
+		while (bundleMap.size() > 0) {
+			try {
 				wait();
-				if (!blocking)
-				{
-					synchronized(resultMap)
-					{
-						for (String uuid: resultMap.keySet())
-						{
-							sendPartialResults((resultMap.get(uuid)));
-						}
-						resultMap.clear();
+
+				synchronized (resultMap) {
+					for (String uuid : resultMap.keySet()) {
+						sendPartialResults((resultMap.get(uuid)));
 					}
+					resultMap.clear();
 				}
-			}
-			catch(InterruptedException e)
-			{
+			} catch (InterruptedException e) {
 				log.error(e.getMessage(), e);
 			}
 		}
 	}
-	
+
 	/**
-	 * Callback method invoked when the execution of a task has completed.
-	 * This method triggers a check of the request completion status.
-	 * When all tasks have completed, this connection sends all results back.
-	 * @param result the result of the task's execution.
+	 * Callback method invoked when the execution of a task has completed. This
+	 * method triggers a check of the request completion status. When all tasks
+	 * have completed, this connection sends all results back.
+	 * 
+	 * @param result
+	 *            the result of the task's execution.
 	 */
-	public synchronized void taskCompleted(JPPFTaskBundle result)
-	{
+	public synchronized void taskCompleted(JPPFTaskBundle result) {
 		String uuid = result.getUuid();
-		synchronized(bundleMap)
-		{
+		synchronized (bundleMap) {
 			bundleMap.remove(uuid);
 		}
-		synchronized(resultMap)
-		{
+		synchronized (resultMap) {
 			resultMap.put(uuid, result);
 		}
 		notify();
@@ -443,41 +431,45 @@ public class ApplicationConnection extends JPPFConnection implements TaskComplet
 
 	/**
 	 * Close this application connection.
+	 * 
 	 * @see org.jppf.server.JPPFConnection#close()
 	 */
-	public void close()
-	{
+	public void close() {
 		super.close();
-		if (isStatsEnabled()) clientConnectionClosed();
+		if (isStatsEnabled())
+			clientConnectionClosed();
 	}
 
 	/**
 	 * Get the algorithm that dynamically computes the task bundle size.
+	 * 
 	 * @return a <code>Bundler</code> instance.
 	 */
-	public Bundler getBundler()
-	{
-		if (nodeServer == null) nodeServer = JPPFDriver.getInstance().getNodeServer();
+	public Bundler getBundler() {
+		if (nodeServer == null)
+			nodeServer = JPPFDriver.getInstance().getNodeServer();
 		return nodeServer.getBundler();
 	}
 
 	/**
 	 * Set the algorithm that dynamically computes the task bundle size.
-	 * @param bundler a <code>Bundler</code> instance.
+	 * 
+	 * @param bundler
+	 *            a <code>Bundler</code> instance.
 	 */
-	public void setBundler(Bundler bundler)
-	{
-		if (nodeServer == null) nodeServer = JPPFDriver.getInstance().getNodeServer();
+	public void setBundler(Bundler bundler) {
+		if (nodeServer == null)
+			nodeServer = JPPFDriver.getInstance().getNodeServer();
 		nodeServer.setBundler(bundler);
 	}
 
 	/**
 	 * Get a string representation of this connection.
+	 * 
 	 * @return a string representation of this connection.
 	 * @see org.jppf.server.JPPFConnection#toString()
 	 */
-	public String toString()
-	{
+	public String toString() {
 		return "Application connection : " + super.toString();
 	}
 }

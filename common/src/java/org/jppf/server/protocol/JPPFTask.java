@@ -20,6 +20,7 @@
 package org.jppf.server.protocol;
 
 import java.io.Serializable;
+
 import org.jppf.task.storage.DataProvider;
 
 /**
@@ -30,6 +31,11 @@ import org.jppf.task.storage.DataProvider;
  */
 public abstract class JPPFTask implements Runnable, Serializable
 {
+	/**
+	 * The position of this task at the submission
+	 */
+	private int position;
+	
 	/**
 	 * The result of the task execution.
 	 */
@@ -96,4 +102,20 @@ public abstract class JPPFTask implements Runnable, Serializable
 	{
 		this.dataProvider = dataProvider;
 	}
+
+	/**
+	 * @return Returns the position of this task at the submission.
+	 */
+	public int getPosition() {
+		return position;
+	}
+
+	/**
+	 * @param position The position of this task into the submission.
+	 */
+	public void setPosition(int position) {
+		this.position = position;
+	}
+	
+	
 }
