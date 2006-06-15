@@ -54,9 +54,8 @@ USA
 	<!--                          Cleanup                                          -->
 	<!-- ========================================================================= -->
 
-  <target name="clean" depends="init" description="Cleans all generated files">
-		<delete dir="${build}"/>
-		<delete dir="${dist}"/>
+  <target name="clean" description="Cleans all generated files">
+  	<delete dir="${screensaver.dir}"/>
   </target>
 
 	<!-- ========================================================================= -->
@@ -174,10 +173,17 @@ USA
 		<zip destfile="${JPPF.build.dir}/${screensaver}-${version.number}-screensaver-unix.zip"
 			basedir="${dist}/${screensaver}-unix" includes="**"/>
 
-  	<!-- remove all intermediate files -->
-		<delete dir="${screensaver.dir}"/>
+  	<antcall target="installer"/>
+  	<antcall target="clean"/>
   	
   </target>
+
+	<target name="installer">
+		<exec executable="C:/Tools/NSIS/makensis.exe">
+			<arg value="/V4"/>
+			<arg value="${basedir}/bin/JPPF@Home_Setup.nsi"/>
+		</exec>
+	</target>
 
 	<!-- ========================================================================= -->
 	<!-- Compile and debug screensaver in a JFrame.                                -->
