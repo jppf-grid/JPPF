@@ -215,7 +215,6 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	{
 		try
 		{
-			Locale.setDefault(Locale.FRENCH);
 			UIManager.setLookAndFeel(new SubstanceLookAndFeel());
 			SubstanceLookAndFeel.setCurrentWatermark(new TiledImageWatermark("org/jppf/ui/resources/GridWatermark.gif"));
 			SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme(new JPPFColorScheme(), "JPPF", false));
