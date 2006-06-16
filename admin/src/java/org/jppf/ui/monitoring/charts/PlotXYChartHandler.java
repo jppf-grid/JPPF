@@ -27,7 +27,7 @@ import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.*;
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
-import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.data.*;
 import org.jppf.utils.StringUtils;
 
 /**
@@ -79,7 +79,7 @@ public class PlotXYChartHandler implements ChartHandler
 	private XYSeriesCollection createDataset(ChartConfiguration config)
 	{
 		XYSeriesCollection ds = new XYSeriesCollection();
-		for (String key: config.fields)
+		for (Fields key: config.fields)
 		{
 			XYSeries series = new XYSeries(key);
 			ds.addSeries(series);
@@ -101,12 +101,12 @@ public class PlotXYChartHandler implements ChartHandler
 		XYSeriesCollection dataset = (XYSeriesCollection) config.dataset;
 		for (int i=0; i<dataset.getSeriesCount(); i++)
 		{
-			String key = (String) dataset.getSeriesKey(i);
+			Fields key = (Fields) dataset.getSeriesKey(i);
 			XYSeries series = dataset.getSeries(i);
 			int start = Math.max(0, statsHandler.getTickCount() - statsHandler.getStatsCount());
 			for (int j=0; j<statsHandler.getStatsCount(); j++)
 			{
-				Map<String, Double> valueMap = statsHandler.getDoubleValues(j);
+				Map<Fields, Double> valueMap = statsHandler.getDoubleValues(j);
 				series.add(start + j, valueMap.get(key));
 			}
 		}
@@ -122,7 +122,7 @@ public class PlotXYChartHandler implements ChartHandler
 	public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
 		XYSeriesCollection dataset = (XYSeriesCollection) config.dataset;
-		Map<String, Double> valueMap = statsHandler.getLatestDoubleValues();
+		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
 		for (int i=0; i<dataset.getSeriesCount(); i++)
 		{
 			XYSeries series = dataset.getSeries(i);
@@ -145,8 +145,8 @@ public class PlotXYChartHandler implements ChartHandler
 		 */
 		public String generateLabel(XYDataset dataset, int seriesIndex)
 		{
-			String key = (String) dataset.getSeriesKey(seriesIndex);
-			return StringUtils.shortenLabel(key);
+			Fields key = (Fields) dataset.getSeriesKey(seriesIndex);
+			return StringUtils.shortenLabel(key.toString());
 		}
 	}
 }

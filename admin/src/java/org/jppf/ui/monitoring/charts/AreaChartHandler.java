@@ -27,7 +27,7 @@ import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.category.AreaRenderer;
 import org.jfree.data.category.*;
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
-import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.data.*;
 import org.jppf.utils.StringUtils;
 
 /**
@@ -96,8 +96,8 @@ public class AreaChartHandler implements ChartHandler
 		int start = Math.max(0, statsHandler.getTickCount() - statsHandler.getStatsCount());
 		for (int j=0; j<statsHandler.getStatsCount(); j++)
 		{
-			Map<String, Double> valueMap = statsHandler.getDoubleValues(j);
-			for (String key: config.fields)
+			Map<Fields, Double> valueMap = statsHandler.getDoubleValues(j);
+			for (Fields key: config.fields)
 			{
 				dataset.setValue(valueMap.get(key), key, new Integer(j + start));
 			}
@@ -114,8 +114,8 @@ public class AreaChartHandler implements ChartHandler
 	public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
 		DefaultCategoryDataset dataset = (DefaultCategoryDataset) config.dataset;
-		Map<String, Double> valueMap = statsHandler.getLatestDoubleValues();
-		for (String key: config.fields)
+		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
+		for (Fields key: config.fields)
 			dataset.setValue(valueMap.get(key), key, new Integer(statsHandler.getTickCount()));
 		if (dataset.getRowCount() > statsHandler.getRolloverPosition()) dataset.removeRow(0);
 		return config;

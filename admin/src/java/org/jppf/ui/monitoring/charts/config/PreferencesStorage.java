@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.prefs.*;
 import org.apache.log4j.Logger;
 import org.jppf.ui.monitoring.charts.ChartType;
+import org.jppf.ui.monitoring.data.Fields;
 
 /**
  * This class provides an API to store and retrieve the chart configuration
@@ -153,7 +154,14 @@ public class PreferencesStorage
 		config.precision = child.getInt("precision", 0);
 		config.unit = child.get("unit", null);
 		String fields = child.get("fields", "");
-		config.fields = fields.split("\\|");
+		String[] sFields = fields.split("\\|");
+		List<Fields> list = new ArrayList<Fields>();
+		for (int i=0; i<sFields.length; i++)
+		{
+			Fields f = lookupEnum(sFields[i]);
+			if (f != null) list.add(f);
+		}
+		config.fields = list.toArray(new Fields[0]);
 		String type = child.get("type", CHART_PLOTXY.name());
 		try
 		{
@@ -166,7 +174,33 @@ public class PreferencesStorage
 		if (config.type == null) config.type = CHART_PLOTXY;
 		return config;
 	}
-	
+
+	/**
+	 * Get a <code>Fields</code> instance from a fields name.
+	 * @param name the name of the field to find.
+	 * @return a <code>Fields</code>, or null if the field could not be found.
+	 */
+	private Fields lookupEnum(String name)
+	{
+		Fields field = null;
+		try
+		{
+			field = Fields.valueOf(name);
+		}
+		catch (IllegalArgumentException e)
+		{
+			for (Fields f: Fields.values())
+			{
+				if (name.equals(f.toString()))
+				{
+					field = f;
+					break;
+				}
+			}
+		}
+		return field;
+	}
+
 	/**
 	 * Save all tabs and charts configurations in the user preferences.
 	 */
@@ -225,7 +259,7 @@ public class PreferencesStorage
 		for (int i=0; i<config.fields.length; i++)
 		{
 			if (i > 0) sb.append("|");
-			sb.append(config.fields[i]);
+			sb.append(config.fields[i].name());
 		}
 		pref.put("fields", sb.toString());
 		pref.putInt("position", config.position);

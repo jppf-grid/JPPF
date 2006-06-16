@@ -20,6 +20,7 @@
 package org.jppf.utils;
 
 import java.util.*;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -28,6 +29,10 @@ import java.util.*;
  */
 public final class StringUtils
 {
+	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(StringUtils.class);
 	/**
 	 * Keywords to look for and replace in the legend items of the charts.
 	 */
@@ -153,6 +158,29 @@ public final class StringUtils
 		for (int i=0; i<KEYWORDS.length; i++)
 		{
 			if (key.indexOf(KEYWORDS[i]) >= 0) key = key.replace(KEYWORDS[i], REPLACEMENTS[i]);
+		}
+		return key;
+	}
+
+	/**
+	 * Get a localized property value.
+	 * @param baseName the base name to use, in combination with the default locale,
+	 * to lookup the appropriate resource bundle.
+	 * @param key the key for the localized value to lookup.
+	 * @return the name localized through the default locale information, or the key itself if
+	 * it could not be localized.
+	 * @see java.util.ResourceBundle
+	 */
+	public static String getLocalized(String baseName, String key)
+	{
+		try
+		{
+			ResourceBundle bundle = ResourceBundle.getBundle(baseName);
+			if (bundle != null) return bundle.getString(key);
+		}
+		catch (Exception e)
+		{
+			log.error(e.getMessage(), e);
 		}
 		return key;
 	}

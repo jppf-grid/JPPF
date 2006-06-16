@@ -35,8 +35,8 @@ public class AdminPanelActions extends AbstractActionsHolder
 	 */
 	protected void initializeMethodMap()
 	{
-		addMapping("Perform Now", "shutdownRestartPressed");
-		addMapping("Change password", "changePasswordPressed");
+		addMapping("Perform_Now", "shutdownRestartPressed");
+		addMapping("Change_password", "changePasswordPressed");
 		addMapping("Restart", "restartFlagChanged");
 	}
 
@@ -45,7 +45,7 @@ public class AdminPanelActions extends AbstractActionsHolder
 	 */
 	public void shutdownRestartPressed()
 	{
-		Option elt = (Option) option.findElement("../Shutdown delay");
+		Option elt = (Option) option.findElement("../Shutdown_delay");
 		Number n = (Number) elt.getValue();
 		long shutdownDelay = n.longValue();
 		long restartDelay = 0L;
@@ -53,7 +53,7 @@ public class AdminPanelActions extends AbstractActionsHolder
 		elt = (Option) option.findElement("../Restart");
 		if ((Boolean) elt.getValue())
 		{
-			elt = (Option) option.findElement("../Restart delay");
+			elt = (Option) option.findElement("../Restart_delay");
 			n = (Number) elt.getValue();
 			restartDelay = n.longValue();
 			command = AdminRequest.SHUTDOWN_RESTART;
@@ -111,7 +111,7 @@ public class AdminPanelActions extends AbstractActionsHolder
 	 */
 	public void restartFlagChanged()
 	{
-		Option restart = (Option) option.findElement("../Restart delay");
+		Option restart = (Option) option.findElement("../Restart_delay");
 		restart.setEnabled((Boolean) option.getValue());
 	}
 }

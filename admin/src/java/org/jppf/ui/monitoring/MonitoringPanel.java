@@ -27,7 +27,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import org.apache.log4j.Logger;
 import org.jppf.server.JPPFStats;
-import org.jppf.ui.monitoring.charts.config.*;
+import org.jppf.ui.monitoring.charts.config.JPPFChartBuilder;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.options.OptionsPage;
@@ -123,7 +123,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	 * @param title the title of the chartPanel.
 	 * @return a <code>JComponent</code> instance.
 	 */
-	private JComponent makeTablePanel(String[] props, String title)
+	private JComponent makeTablePanel(Fields[] props, String title)
 	{
 		JPanel panel = GuiUtils.createBoxPanel(BoxLayout.X_AXIS);
 		panel.setBorder(BorderFactory.createTitledBorder(title));
@@ -159,13 +159,13 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		/**
 		 * The list of fields whose values are displayed in the table.
 		 */
-		private String[] fields = null;
+		private Fields[] fields = null;
 
 		/**
 		 * Initialize this table model witht he specified list of fields.
 		 * @param fields the list of fields whose values are displayed in the table.
 		 */
-		MonitorTableModel(String[] fields)
+		MonitorTableModel(Fields[] fields)
 		{
 			this.fields = fields;
 		}
@@ -199,10 +199,10 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		 */
 		public Object getValueAt(int row, int column)
 		{
-			Map<String, String> valuesMap = null;
+			Map<Fields, String> valuesMap = null;
 			if (statsHandler.getStatsCount() > 0) valuesMap = statsHandler.getLatestStringValues();
 			else valuesMap = StatsFormatter.getStringValuesMap(new JPPFStats());
-			String name = fields[row];
+			Fields name = fields[row];
 			return column == 0 ? name : valuesMap.get(name);
 		}
 	}
@@ -215,6 +215,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	{
 		try
 		{
+			Locale.setDefault(Locale.FRENCH);
 			UIManager.setLookAndFeel(new SubstanceLookAndFeel());
 			SubstanceLookAndFeel.setCurrentWatermark(new TiledImageWatermark("org/jppf/ui/resources/GridWatermark.gif"));
 			SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme(new JPPFColorScheme(), "JPPF", false));

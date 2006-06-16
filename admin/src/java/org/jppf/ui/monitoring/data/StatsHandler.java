@@ -75,11 +75,11 @@ public final class StatsHandler implements StatsConstants
 	/**
 	 * Cache of the data snapashots fields maps to their corresponding string values. 
 	 */
-	private List<Map<String, String>> stringValuesMaps = new Vector<Map<String, String>>();
+	private List<Map<Fields, String>> stringValuesMaps = new Vector<Map<Fields, String>>();
 	/**
 	 * Cache of the data snapashots fields maps to their corresponding double values. 
 	 */
-	private List<Map<String, Double>> doubleValuesMaps = new Vector<Map<String, Double>>();
+	private List<Map<Fields, Double>> doubleValuesMaps = new Vector<Map<Fields, Double>>();
 	/**
 	 * Number of data updates so far.
 	 */
@@ -381,7 +381,7 @@ public final class StatsHandler implements StatsConstants
 	 * @param position the position to get the data at.
 	 * @return a map of field names to their values represented as strings.
 	 */
-	public Map<String, String> getStringValues(int position)
+	public Map<Fields, String> getStringValues(int position)
 	{
 		lock.lock();
 		try
@@ -398,7 +398,7 @@ public final class StatsHandler implements StatsConstants
 	 * Get the mapping of the most recent data snapshot's fields to their corresponding string values.
 	 * @return a map of field names to their values represented as strings.
 	 */
-	public Map<String, String> getLatestStringValues()
+	public Map<Fields, String> getLatestStringValues()
 	{
 		int n = getStatsCount() - 1;
 		if (n < stringValuesMaps.size()) return stringValuesMaps.get(n);
@@ -410,7 +410,7 @@ public final class StatsHandler implements StatsConstants
 	 * @param position the position to get the data at.
 	 * @return a map of field names to their values represented as double values.
 	 */
-	public Map<String, Double> getDoubleValues(int position)
+	public Map<Fields, Double> getDoubleValues(int position)
 	{
 		lock.lock();
 		try
@@ -427,7 +427,7 @@ public final class StatsHandler implements StatsConstants
 	 * Get the mapping of the most recent data snapshot's fields to their corresponding double values.
 	 * @return a map of field names to their values represented as double values.
 	 */
-	public Map<String, Double> getLatestDoubleValues()
+	public Map<Fields, Double> getLatestDoubleValues()
 	{
 		int n = getStatsCount() - 1;
 		if (n < doubleValuesMaps.size()) return doubleValuesMaps.get(n);

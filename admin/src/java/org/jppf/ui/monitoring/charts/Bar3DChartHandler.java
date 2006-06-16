@@ -30,7 +30,7 @@ import org.jfree.chart.renderer.category.BarRenderer3D;
 import org.jfree.data.category.*;
 import org.jfree.ui.TextAnchor;
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
-import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.data.*;
 
 /**
  * Instances of this class are used to create and update 3D bar charts with an horizontal orientation.
@@ -119,8 +119,8 @@ public class Bar3DChartHandler implements ChartHandler
 	public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
 		DefaultCategoryDataset dataset = (DefaultCategoryDataset) config.dataset;
-		Map<String, Double> valueMap = statsHandler.getLatestDoubleValues();
-		for (String key: config.fields) dataset.setValue(valueMap.get(key), "0", key);
+		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
+		for (Fields key: config.fields) dataset.setValue(valueMap.get(key), "0", key);
 		return config;
 	}
 

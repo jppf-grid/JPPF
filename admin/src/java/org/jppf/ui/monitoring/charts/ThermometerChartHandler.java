@@ -26,7 +26,7 @@ import org.jfree.chart.plot.ThermometerPlot;
 import org.jfree.data.general.DefaultValueDataset;
 import org.jfree.ui.RectangleInsets;
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
-import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.data.*;
 
 /**
  * Instances of this class are used to create and update thermometer charts.
@@ -105,7 +105,7 @@ public class ThermometerChartHandler implements ChartHandler
 	public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
 		DefaultValueDataset dataset = (DefaultValueDataset) config.dataset;
-		Map<String, Double> valueMap = statsHandler.getLatestDoubleValues();
+		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
 		dataset.setValue(valueMap.get(config.fields[0]));
 		return config;
 	}

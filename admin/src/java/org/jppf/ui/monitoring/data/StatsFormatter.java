@@ -19,6 +19,7 @@
  */
 package org.jppf.ui.monitoring.data;
 
+import static org.jppf.ui.monitoring.data.Fields.*;
 import java.text.NumberFormat;
 import java.util.*;
 import org.apache.log4j.Logger;
@@ -102,9 +103,9 @@ public final class StatsFormatter implements StatsConstants
 	 * @param stats the data snapshot to map.
 	 * @return a map of field names to their corresponding string values.
 	 */
-	public static Map<String, String> getStringValuesMap(JPPFStats stats)
+	public static Map<Fields, String> getStringValuesMap(JPPFStats stats)
 	{
-		Map<String, String> stringValueMap = new HashMap<String, String>();
+		Map<Fields, String> stringValueMap = new HashMap<Fields, String>();
 		stringValueMap.put(TOTAL_TASKS_EXECUTED, formatInt(stats.totalTasksExecuted));
 
 		stringValueMap.put(TOTAL_EXECUTION_TIME, formatTime(stats.execution.totalTime));
@@ -125,7 +126,6 @@ public final class StatsFormatter implements StatsConstants
 		stringValueMap.put(MIN_TRANSPORT_TIME, s);
 		stringValueMap.put(MAX_TRANSPORT_TIME, formatDouble(stats.transport.maxTime));
 		stringValueMap.put(AVG_TRANSPORT_TIME, formatDouble(stats.transport.avgTime));
-		stringValueMap.put(AVG_KILOBYTE_TRANPORT, formatSmallDouble(stats.avgTransportPerByte));
 		stringValueMap.put(LATEST_QUEUE_TIME, formatDouble(stats.queue.latestTime));
 		stringValueMap.put(TOTAL_QUEUE_TIME, formatTime(stats.queue.totalTime));
 		s = (stats.queue.minTime == Long.MAX_VALUE) ? "" : formatDouble(stats.queue.minTime);
@@ -147,9 +147,9 @@ public final class StatsFormatter implements StatsConstants
 	 * @param stats the data snapshot to map.
 	 * @return a map of field names to their corresponding double values.
 	 */
-	public static Map<String, Double> getDoubleValuesMap(JPPFStats stats)
+	public static Map<Fields, Double> getDoubleValuesMap(JPPFStats stats)
 	{
-		Map<String, Double> doubleValueMap = new HashMap<String, Double>();
+		Map<Fields, Double> doubleValueMap = new HashMap<Fields, Double>();
 		doubleValueMap.put(TOTAL_TASKS_EXECUTED, (double) stats.totalTasksExecuted);
 
 		doubleValueMap.put(TOTAL_EXECUTION_TIME, (double) stats.execution.totalTime);
@@ -167,7 +167,6 @@ public final class StatsFormatter implements StatsConstants
 		doubleValueMap.put(MIN_TRANSPORT_TIME, (double) (stats.transport.minTime == Long.MAX_VALUE ? 0L : stats.transport.minTime));
 		doubleValueMap.put(MAX_TRANSPORT_TIME, (double) stats.transport.maxTime);
 		doubleValueMap.put(AVG_TRANSPORT_TIME, stats.transport.avgTime);
-		doubleValueMap.put(AVG_KILOBYTE_TRANPORT, stats.avgTransportPerByte);
 		doubleValueMap.put(LATEST_QUEUE_TIME, (double) stats.queue.latestTime);
 		doubleValueMap.put(TOTAL_QUEUE_TIME, (double) stats.queue.totalTime);
 		doubleValueMap.put(MIN_QUEUE_TIME, (double) (stats.queue.minTime == Long.MAX_VALUE ? 0L : stats.queue.minTime));
@@ -208,7 +207,7 @@ public final class StatsFormatter implements StatsConstants
 	 * @param value the value to format.
 	 * @return the formatted value as a string.
 	 */
-	private static String formatSmallDouble(double value)
+	protected static String formatSmallDouble(double value)
 	{
 		return smallDoubleFormatter.format(value);
 	}

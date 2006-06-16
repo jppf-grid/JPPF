@@ -22,6 +22,7 @@ package org.jppf.ui.monitoring.charts.config;
 import org.jfree.chart.*;
 import org.jfree.data.general.Dataset;
 import org.jppf.ui.monitoring.charts.ChartType;
+import org.jppf.ui.monitoring.data.Fields;
 
 /**
  * Instances of this class represent the configuration elements used to create and update a chart definition.
@@ -48,7 +49,7 @@ public class ChartConfiguration
 	/**
 	 * The list of fields charted in this chart.
 	 */
-	public String[] fields = null;
+	public Fields[] fields = null;
 	/**
 	 * The dataset associated witht the chart.
 	 */
@@ -81,7 +82,7 @@ public class ChartConfiguration
 	 * @param precision the precision of the number to display in items and tooltip labels.
 	 * @param fields the list of fields charted in this chart.
 	 */
-	public ChartConfiguration(String name, ChartType type, String unit, int precision, String[] fields)
+	public ChartConfiguration(String name, ChartType type, String unit, int precision, Fields[] fields)
 	{
 		this.name = name;
 		this.type = type;

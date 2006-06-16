@@ -20,12 +20,12 @@
 package org.jppf.ui.monitoring.charts.config;
 
 import static org.jppf.ui.monitoring.charts.ChartType.*;
-import static org.jppf.ui.monitoring.data.StatsConstants.*;
+import static org.jppf.ui.monitoring.data.Fields.*;
 import java.util.*;
 import javax.swing.*;
 import org.jfree.chart.ChartPanel;
 import org.jppf.ui.monitoring.charts.*;
-import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.utils.GuiUtils;
 
@@ -222,15 +222,15 @@ public class JPPFChartBuilder implements StatsHandlerListener
 		TabConfiguration bar = new TabConfiguration("Bar Charts", 2);
 		addTab(bar);
 
-		String[] fields = new String[] { AVG_EXECUTION_TIME, LATEST_EXECUTION_TIME, AVG_NODE_EXECUTION_TIME, LATEST_NODE_EXECUTION_TIME };
+		Fields[] fields = new Fields[] { AVG_EXECUTION_TIME, LATEST_EXECUTION_TIME, AVG_NODE_EXECUTION_TIME, LATEST_NODE_EXECUTION_TIME };
 		addChart(network, new ChartConfiguration("Execution time", CHART_PLOTXY, "ms", 2, fields));
-		fields = new String[] { AVG_EXECUTION_TIME, LATEST_EXECUTION_TIME, MAX_EXECUTION_TIME };
+		fields = new Fields[] { AVG_EXECUTION_TIME, LATEST_EXECUTION_TIME, MAX_EXECUTION_TIME };
 		addChart(bar, new ChartConfiguration("Execution time (bar chart)", CHART_3DBAR, "ms", 2, fields));
 		addChart(plot, new ChartConfiguration("Execution time", CHART_PLOTXY, "ms", 2, fields));
-		fields = new String[] { AVG_QUEUE_TIME, LATEST_QUEUE_TIME, MAX_QUEUE_TIME };
+		fields = new Fields[] { AVG_QUEUE_TIME, LATEST_QUEUE_TIME, MAX_QUEUE_TIME };
 		addChart(bar, new ChartConfiguration("Queue time (bar chart)", CHART_3DBAR, "ms", 2, fields));
 		addChart(plot, new ChartConfiguration("Queue time", CHART_PLOTXY, "ms", 2, fields));
-		fields = new String[] { QUEUE_SIZE, MAX_QUEUE_SIZE };
+		fields = new Fields[] { QUEUE_SIZE, MAX_QUEUE_SIZE };
 		addChart(bar, new ChartConfiguration("Queue size (bar chart)", CHART_3DBAR, null, 0, fields));
 		addChart(plot, new ChartConfiguration("Queue size", CHART_PLOTXY, null, 0, fields));
 	}

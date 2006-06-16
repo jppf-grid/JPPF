@@ -23,7 +23,7 @@ import java.util.Map;
 import org.jfree.chart.*;
 import org.jfree.data.general.*;
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
-import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.data.*;
 
 /**
  * Instances of this class are used to create and update 3D pie charts.
@@ -92,8 +92,8 @@ public class Pie3DChartHandler implements ChartHandler
 	public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
 		DefaultPieDataset dataset = (DefaultPieDataset) config.dataset;
-		Map<String, Double> valueMap = statsHandler.getLatestDoubleValues();
-		for (String key: config.fields) dataset.setValue(key, valueMap.get(key));
+		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
+		for (Fields key: config.fields) dataset.setValue(key, valueMap.get(key));
 		return config;
 	}
 }

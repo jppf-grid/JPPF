@@ -19,6 +19,7 @@
  */
 package org.jppf.ui.monitoring.data;
 
+import static org.jppf.ui.monitoring.data.Fields.*;
 import org.jppf.utils.CollectionUtils;
 
 /**
@@ -30,130 +31,130 @@ public interface StatsConstants
 	/**
 	 * Property name for the total number of tasks executed.
 	 */
-	String TOTAL_TASKS_EXECUTED = "Total Tasks Executed";
+	//String TOTAL_TASKS_EXECUTED = "Total Tasks Executed";
 	/**
 	 * Property name for the total execution time for all tasks.
 	 */
-	String TOTAL_EXECUTION_TIME = "Total Execution Time";
+	//String TOTAL_EXECUTION_TIME = "Total Execution Time";
 	/**
 	 * Property name for the execution time of the last executed task.
 	 */
-	String LATEST_EXECUTION_TIME = "Latest Execution Time";
+	//String LATEST_EXECUTION_TIME = "Latest Execution Time";
 	/**
 	 * Property name for the minimum task execution time.
 	 */
-	String MIN_EXECUTION_TIME = "Minimum Execution Time";
+	//String MIN_EXECUTION_TIME = "Minimum Execution Time";
 	/**
 	 * Property name for the maximum task execution time.
 	 */
-	String MAX_EXECUTION_TIME = "Maximum Execution Time";
+	//String MAX_EXECUTION_TIME = "Maximum Execution Time";
 	/**
 	 * Property name for the average task execution time.
 	 */
-	String AVG_EXECUTION_TIME = "Average Execution Time";
+	//String AVG_EXECUTION_TIME = "Average Execution Time";
 	/**
 	 * Property name for the total tansport time for all tasks.
 	 */
-	String TOTAL_TRANSPORT_TIME = "Total Tansport Time";
+	//String TOTAL_TRANSPORT_TIME = "Total Tansport Time";
 	/**
 	 * Property name for the execution time of the last tansported task.
 	 */
-	String LATEST_TRANSPORT_TIME = "Latest Tansport Time";
+	//String LATEST_TRANSPORT_TIME = "Latest Tansport Time";
 	/**
 	 * Property name for the minimum task tansport time.
 	 */
-	String MIN_TRANSPORT_TIME = "Minimum Tansport Time";
+	//String MIN_TRANSPORT_TIME = "Minimum Tansport Time";
 	/**
 	 * Property name for the maximum task tansport time.
 	 */
-	String MAX_TRANSPORT_TIME = "Maximum Tansport Time";
+	//String MAX_TRANSPORT_TIME = "Maximum Tansport Time";
 	/**
 	 * Property name for the average task tansport time.
 	 */
-	String AVG_TRANSPORT_TIME = "Average Tansport Time";
+	//String AVG_TRANSPORT_TIME = "Average Tansport Time";
 	/**
 	 * Property name for the total execution time for all tasks on the nodes.
 	 */
-	String TOTAL_NODE_EXECUTION_TIME = "Total Node Execution Time";
+	//String TOTAL_NODE_EXECUTION_TIME = "Total Node Execution Time";
 	/**
 	 * Property name for the execution time of the last executed task on a node.
 	 */
-	String LATEST_NODE_EXECUTION_TIME = "Latest Node Execution Time";
+	//String LATEST_NODE_EXECUTION_TIME = "Latest Node Execution Time";
 	/**
 	 * Property name for the minimum task execution time on a node.
 	 */
-	String MIN_NODE_EXECUTION_TIME = "Minimum Node Execution Time";
+	//String MIN_NODE_EXECUTION_TIME = "Minimum Node Execution Time";
 	/**
 	 * Property name for the maximum task execution time on a node.
 	 */
-	String MAX_NODE_EXECUTION_TIME = "Maximum Node Execution Time";
+	//String MAX_NODE_EXECUTION_TIME = "Maximum Node Execution Time";
 	/**
 	 * Property name for the average task execution time on a node.
 	 */
-	String AVG_NODE_EXECUTION_TIME = "Average Node Execution Time";
+	//String AVG_NODE_EXECUTION_TIME = "Average Node Execution Time";
 	/**
 	 * Property name for the time the last queued task remained in the queue.
 	 */
-	String LATEST_QUEUE_TIME = "Latest Queue Time";
+	//String LATEST_QUEUE_TIME = "Latest Queue Time";
 	/**
 	 * Property name for the total time spent in the queue by all tasks.
 	 */
-	String TOTAL_QUEUE_TIME = "Total Queue Time";
+	//String TOTAL_QUEUE_TIME = "Total Queue Time";
 	/**
 	 * Property name for the minimum time a task remained in the queue .
 	 */
-	String MIN_QUEUE_TIME = "Minimum Queue Time";
+	//String MIN_QUEUE_TIME = "Minimum Queue Time";
 	/**
 	 * Property name for the maximum time a task remained in the queue .
 	 */
-	String MAX_QUEUE_TIME = "Maximum Queue Time";
+	//String MAX_QUEUE_TIME = "Maximum Queue Time";
 	/**
 	 * Property name for the maximum time a task remained in the queue .
 	 */
-	String AVG_QUEUE_TIME = "Average Queue Time";
+	//String AVG_QUEUE_TIME = "Average Queue Time";
 	/**
 	 * Property name for the total number of tasks that have been queued.
 	 */
-	String TOTAL_QUEUED = "Total Queued";
+	//String TOTAL_QUEUED = "Total Queued";
 	/**
 	 * Property name for the current queue size.
 	 */
-	String QUEUE_SIZE = "Queue Size";
+	//String QUEUE_SIZE = "Queue Size";
 	/**
 	 * Property name for the maximum size the queue reached.
 	 */
-	String MAX_QUEUE_SIZE = "Maximum Queue Size";
+	//String MAX_QUEUE_SIZE = "Maximum Queue Size";
 	/**
 	 * Property name for the current number of nodes connected to the server.
 	 */
-	String NB_NODES = "Number of Nodes";
+	//String NB_NODES = "Number of Nodes";
 	/**
 	 * Property name for the maximum number of nodes ever connected to the server.
 	 */
-	String MAX_NODES = "Maximum Number of Nodes";
+	//String MAX_NODES = "Maximum Number of Nodes";
 	/**
 	 * Property name for the current number of clients connected to the server.
 	 */
-	String NB_CLIENTS = "Number of Clients";
+	//String NB_CLIENTS = "Number of Clients";
 	/**
 	 * Property name for the maximum number of clients ever connected to the server.
 	 */
-	String MAX_CLIENTS = "Maximum Number of Clients";
+	//String MAX_CLIENTS = "Maximum Number of Clients";
 	/**
 	 * Property name for the maximum number of clients ever connected to the server.
 	 */
-	String AVG_KILOBYTE_TRANPORT = "Average megabyte transport";
+	//String AVG_KILOBYTE_TRANPORT = "Average megabyte transport";
 	/**
 	 * List of stats properties related to network connections.
 	 */
-	String[] CONNECTION_PROPS = new String[]
+	Fields[] CONNECTION_PROPS = new Fields[]
 	{
 		NB_NODES, MAX_NODES, NB_CLIENTS, MAX_CLIENTS
 	};
 	/**
 	 * List of stats properties related to queue operations.
 	 */
-	String[] QUEUE_PROPS = new String[]
+	Fields[] QUEUE_PROPS = new Fields[]
 	{
 		LATEST_QUEUE_TIME, TOTAL_QUEUE_TIME, MIN_QUEUE_TIME, MAX_QUEUE_TIME, AVG_QUEUE_TIME, TOTAL_QUEUED, QUEUE_SIZE,
 		MAX_QUEUE_SIZE
@@ -161,7 +162,7 @@ public interface StatsConstants
 	/**
 	 * List of stats properties related to tasks execution.
 	 */
-	String[] EXECUTION_PROPS = new String[]
+	Fields[] EXECUTION_PROPS = new Fields[]
 	{
 		TOTAL_TASKS_EXECUTED, TOTAL_EXECUTION_TIME, LATEST_EXECUTION_TIME, MIN_EXECUTION_TIME, MAX_EXECUTION_TIME,
 		AVG_EXECUTION_TIME
@@ -170,7 +171,7 @@ public interface StatsConstants
 	/**
 	 * List of stats properties related to tasks execution.
 	 */
-	String[] NODE_EXECUTION_PROPS = new String[]
+	Fields[] NODE_EXECUTION_PROPS = new Fields[]
 	{
 		TOTAL_NODE_EXECUTION_TIME, LATEST_NODE_EXECUTION_TIME, MIN_NODE_EXECUTION_TIME, MAX_NODE_EXECUTION_TIME,
 		AVG_NODE_EXECUTION_TIME
@@ -178,13 +179,13 @@ public interface StatsConstants
 	/**
 	 * List of stats properties related to tasks execution.
 	 */
-	String[] TRANSPORT_PROPS = new String[]
+	Fields[] TRANSPORT_PROPS = new Fields[]
 	{
 		TOTAL_TRANSPORT_TIME, LATEST_TRANSPORT_TIME, MIN_TRANSPORT_TIME, MAX_TRANSPORT_TIME, AVG_TRANSPORT_TIME
 	};
 	/**
 	 * List of all fields.
 	 */
-	String[] ALL_FIELDS =
+	Fields[] ALL_FIELDS =
 		CollectionUtils.concatArrays(EXECUTION_PROPS, NODE_EXECUTION_PROPS, TRANSPORT_PROPS, QUEUE_PROPS, CONNECTION_PROPS);
 }

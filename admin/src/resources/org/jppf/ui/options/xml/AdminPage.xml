@@ -34,13 +34,13 @@
 			<property name="main" value="false"/>
 			<property name="tooltip" value="Stop and restart the server using the specified delays"/>
 	
-			<child name="Perform Now" type="Button">
+			<child name="Perform_Now" type="Button">
 				<property name="label" value="Perform Now"/>
 				<property name="tooltip" value="Sends the shutdown and/or restart request to the server"/>
 				<listener type="action" class="org.jppf.ui.options.factory.AdminPanelActions"/>
 			</child>
 	
-			<child name="Shutdown delay" type="FormattedNumber">
+			<child name="Shutdown_delay" type="FormattedNumber">
 				<property name="label" value="Shutdown delay"/>
 				<property name="tooltip" value="delay, in milliseconds, before the server starts shutting down"/>
 				<property name="value" value="3000"/>
@@ -54,7 +54,7 @@
 				<listener type="value" class="org.jppf.ui.options.factory.AdminPanelActions"/>
 			</child>
 	
-			<child name="Restart delay" type="FormattedNumber">
+			<child name="Restart_delay" type="FormattedNumber">
 				<property name="label" value="Restart delay"/>
 				<property name="tooltip" value="delay, in milliseconds, before the server is restarted"/>
 				<property name="value" value="3000"/>
@@ -72,7 +72,7 @@
 		<!--          Administrator password configuration area                    -->
 		<!-- ===================================================================== -->
 	
-		<child name="Admin password" type="page">
+		<child name="Admin_password" type="page">
 	
 			<property name="label" value="Administrator password"/>
 			<property name="scrollable" value="false"/>
@@ -80,7 +80,7 @@
 			<property name="bordered" value="true"/>
 			<property name="main" value="false"/>
 	
-			<child name="Change password" type="Button">
+			<child name="Change_password" type="Button">
 				<property name="label" value="Change password"/>
 				<property name="tooltip" value="Tells the server to change the administrator password"/>
 				<listener type="action" class="org.jppf.ui.options.factory.AdminPanelActions"/>

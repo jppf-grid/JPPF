@@ -24,7 +24,7 @@ import java.util.*;
 import javax.swing.*;
 import org.jppf.ui.monitoring.charts.ChartType;
 import org.jppf.ui.monitoring.charts.config.*;
-import org.jppf.ui.monitoring.data.StatsConstants;
+import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.options.*;
 import org.jppf.utils.CollectionUtils;
 
@@ -307,8 +307,8 @@ public class ChartConfigActions extends AbstractActionsHolder
 		config.type = (ChartType) ((Option) option.findFirstWithName("/ChartType")).getValue();
 
 		List list = (List) ((Option) option.findFirstWithName("/FieldsList")).getValue();
-		String[] fields = new String[list.size()];
-		for (int i=0; i<fields.length; i++) fields[i] = (String) list.get(i);
+		Fields[] fields = new Fields[list.size()];
+		for (int i=0; i<fields.length; i++) fields[i] = (Fields) list.get(i);
 		config.fields = fields;
 		return config;
 	}

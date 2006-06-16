@@ -24,6 +24,7 @@ import javax.swing.ListSelectionModel;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.event.ValueChangeListener;
 import org.jppf.ui.options.xml.OptionDescriptor.*;
+import org.jppf.utils.StringUtils;
 
 /**
  * Instances of this class build options pages from XML descriptors.
@@ -32,6 +33,15 @@ import org.jppf.ui.options.xml.OptionDescriptor.*;
 public class OptionsPageBuilder
 {
 	/**
+	 * Base name used to localize labels and tooltips.
+	 */
+	private final static String BASE_PREFIX = "org.jppf.ui.i18n.";
+	/**
+	 * Base name used to localize labels and tooltips.
+	 */
+	private String baseName = null;
+
+	/**
 	 * Build an option page from the specified XML descriptor.
 	 * @param xmlPath the path to the XML descriptor file.
 	 * @return an <code>OptionsPage</code> instance, or null if the page could not be build.
@@ -39,6 +49,10 @@ public class OptionsPageBuilder
 	 */
 	public OptionsPage buildPage(String xmlPath) throws Exception
 	{
+		int idx = xmlPath.lastIndexOf("/");
+		baseName = BASE_PREFIX + ((idx < 0) ? xmlPath : xmlPath.substring(idx + 1));
+		idx = baseName.lastIndexOf(".xml");
+		if (idx >= 0) baseName = baseName.substring(0, idx);
 		OptionDescriptor desc = new OptionDescriptorParser().parse(xmlPath);
 		if (desc == null) return null;
 		OptionsPage page = buildPage(desc);
@@ -75,10 +89,10 @@ public class OptionsPageBuilder
 	public void initCommonAttributes(AbstractOptionElement elt, OptionDescriptor desc) throws Exception
 	{
 		elt.setName(desc.name);
-		elt.setLabel(desc.getProperty("label"));
+		elt.setLabel(StringUtils.getLocalized(baseName, desc.name+".label"));
 		String s = desc.getProperty("orientation", "horizontal");
 		elt.setOrientation("horizontal".equalsIgnoreCase(s) ? OptionsPage.HORIZONTAL : OptionsPage.VERTICAL);
-		elt.setToolTipText(desc.getProperty("tooltip"));
+		elt.setToolTipText(StringUtils.getLocalized(baseName, desc.name+".tooltip"));
 		elt.setScrollable(desc.getBoolean("scrollable", false));
 		elt.setBordered(desc.getBoolean("bordered", false));
 		elt.setWidth(desc.getInt("width", -1));
