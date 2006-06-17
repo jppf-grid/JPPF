@@ -208,7 +208,8 @@ public class ChartConfigActions extends AbstractActionsHolder
 	 */
 	public void updateChartPressed()
 	{
-		TabConfiguration newTab = (TabConfiguration) ((Option) option.findElement("/TabsList")).getValue();
+		ListOption listOption = (ListOption) option.findFirstWithName("/TabsList");
+		TabConfiguration newTab = (TabConfiguration) ((List) listOption.getValue()).get(0);
 		TabConfiguration currentTab = getTabConfig();
 		option.getRoot().setEventsEnabled(false);
 		ChartConfiguration oldConfig = getChartConfig();

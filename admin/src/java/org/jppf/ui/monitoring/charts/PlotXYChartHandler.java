@@ -126,7 +126,7 @@ public class PlotXYChartHandler implements ChartHandler
 		for (int i=0; i<dataset.getSeriesCount(); i++)
 		{
 			XYSeries series = dataset.getSeries(i);
-			String key = (String) series.getKey();
+			Fields key = (Fields) series.getKey();
 			series.add(statsHandler.getTickCount(), valueMap.get(key));
 		}
 		return config;

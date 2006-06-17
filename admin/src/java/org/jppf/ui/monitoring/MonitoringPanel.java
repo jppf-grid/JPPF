@@ -33,6 +33,7 @@ import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.options.OptionsPage;
 import org.jppf.ui.options.factory.*;
 import org.jppf.ui.utils.GuiUtils;
+import org.jppf.utils.StringUtils;
 import org.jvnet.substance.*;
 
 /**
@@ -48,6 +49,10 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	 * Log4j logger for this class.
 	 */
 	static Logger log = Logger.getLogger(MonitoringPanel.class);
+	/**
+	 * Base name for localization bundle lookups.
+	 */
+	private static final String BASE = "org.jppf.ui.i18n.StatsPage";
 	/**
 	 * The stats formatter that provides the data.
 	 */
@@ -68,15 +73,15 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		add(Box.createVerticalStrut(5));
 		add(makeRefreshPanel());
 		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(EXECUTION_PROPS, "Execution"));
+		add(makeTablePanel(EXECUTION_PROPS, StringUtils.getLocalized(BASE, "ExecutionTable.label")));
 		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(NODE_EXECUTION_PROPS, "Node Execution"));
+		add(makeTablePanel(NODE_EXECUTION_PROPS, StringUtils.getLocalized(BASE, "NodeExecutionTable.label")));
 		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(TRANSPORT_PROPS, "Network ovehead"));
+		add(makeTablePanel(TRANSPORT_PROPS, StringUtils.getLocalized(BASE, "NetworkOverheadTable.label")));
 		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(QUEUE_PROPS, "Queue"));
+		add(makeTablePanel(QUEUE_PROPS, StringUtils.getLocalized(BASE, "QueueTable.label")));
 		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(CONNECTION_PROPS, "Connections"));
+		add(makeTablePanel(CONNECTION_PROPS, StringUtils.getLocalized(BASE, "ConnectionsTable.label")));
 		//add(Box.createVerticalStrut(5));
 		add(Box.createVerticalGlue());
 	}
@@ -105,7 +110,9 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	 */
 	private JComponent makeRefreshPanel()
 	{
-		JButton btn = new JButton("Refresh Now");
+		JButton btn = new JButton(StringUtils.getLocalized(BASE, "RefreshBtn.label"));
+		String s = StringUtils.getLocalized(BASE, "RefreshBtn.tooltip");
+		if (s != null) btn.setToolTipText(s);
 		btn.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent event)
@@ -266,8 +273,10 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 
 		statsHandler.addStatsHandlerListener(monitor);
 		statsHandler.addStatsHandlerListener(builder);
-		tabbedPane.addTab("Server Stats", null, new JScrollPane(monitor), "Displays dynamic statistics about the server's performance");
-		tabbedPane.addTab("Charts", null, builder.getTabbedPane(), "Dynamic charts based on the server performance statistics");
+		tabbedPane.addTab(StringUtils.getLocalized(BASE, "StatsPage.label"), null, new JScrollPane(monitor),
+			StringUtils.getLocalized(BASE, "StatsPage.tooltip"));
+		tabbedPane.addTab(StringUtils.getLocalized(BASE, "ChartsPage.label"), null, builder.getTabbedPane(), 
+				StringUtils.getLocalized(BASE, "ChartsPage.tooltip"));
 		for (OptionsPage page: OptionsHandler.getPageList())
 		{
 			tabbedPane.addTab(page.getLabel(), null, page.getUIComponent(), page.getToolTipText());

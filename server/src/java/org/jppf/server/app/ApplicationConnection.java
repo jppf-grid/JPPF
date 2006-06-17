@@ -51,6 +51,10 @@ public class ApplicationConnection extends JPPFConnection implements
 	 */
 	private static Logger log = Logger.getLogger(ApplicationConnection.class);
 	/**
+	 * Base name used for localization lookups";
+	 */
+	private static final String I18N_BASE = "org.jppf.server.i18n.messages";
+	/**
 	 * Determines whether debug log statements are enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
@@ -171,65 +175,6 @@ public class ApplicationConnection extends JPPFConnection implements
 	}
 
 	/**
-	 * Execute the tasks received from a client.
-	 * 
-	 * @param dis
-	 *            the stream from which the task data are read.
-	 * @throws Exception
-	 *             if the tasks could not be read.
-	 */
-	/*
-	protected void executeTasks2(DataInputStream dis) throws Exception {
-		bundleMap = new HashMap<String, JPPFTaskBundle>();
-		resultMap = new TreeMap<String, JPPFTaskBundle>();
-		int count = header.getTaskCount();
-		
-		byte[] dataProvider = helper.readNextBytes(dis);
-		int bundleCount = 0;
-		int n = 0;
-		List<byte[]> taskList = new ArrayList<byte[]>();
-
-		int bundleSize = getBundler().getBundleSize();
-		int startIdx = -1;
-		for (int i = 0; i < count; i++) {
-			if (startIdx < 0)
-				startIdx = i;
-			n++;
-			byte[] taskBytes = helper.readNextBytes(dis);
-			if (debugEnabled)
-			{
-				StringBuilder sb = new StringBuilder("deserialized task in ").append(taskBytes.length);
-				sb.append(" bytes as : ").append(StringUtils.dumpBytes(taskBytes, 0, taskBytes.length));
-				log.debug(sb.toString());
-			}
-			taskList.add(taskBytes);
-			if ((n == bundleSize) || (i == count - 1)) {
-				String uuid = StringUtils.padLeft("" + bundleCount, '0', 10);
-				synchronized (bundleMap) {
-					JPPFTaskBundle bundle = new JPPFTaskBundle();
-					bundle.setUuid(uuid);
-					bundle.setRequestUuid(header.getUuid());
-					bundle.setAppUuid(header.getAppUuid());
-					bundle.setDataProvider(dataProvider);
-					bundle.setTaskCount(n);
-					bundle.setTasks(taskList);
-					bundle.setCompletionListener(this);
-					bundleMap.put(uuid, bundle);
-					getQueue().addBundle(bundle);
-					startIdx = -1;
-				}
-				n = 0;
-				bundleCount++;
-				taskList = new ArrayList<byte[]>();
-			}
-		}
-		dis.close();
-		waitForExecution();
-		return;
-	}
-	*/
-
-	/**
 	 * Send the results of the tasks in a bundle back to the client who
 	 * submitted the request.
 	 * 
@@ -293,7 +238,7 @@ public class ApplicationConnection extends JPPFConnection implements
 	 */
 	private void performAdminOperation(JPPFRequestHeader header)
 			throws Exception {
-		String response = "Request executed";
+		String response = StringUtils.getLocalized(I18N_BASE, "request.executed");
 		AdminRequest request = (AdminRequest) header;
 		byte[] b = (byte[]) request.getParameter(KEY_PARAM);
 		b = CryptoUtils.decrypt(b);
@@ -305,18 +250,16 @@ public class ApplicationConnection extends JPPFConnection implements
 		String localPwd = new String(CryptoUtils.decrypt(b));
 
 		if (!localPwd.equals(remotePwd))
-			response = "Invalid password";
+			response = StringUtils.getLocalized(I18N_BASE, "invalid.password");
 		else {
 			String command = (String) request.getParameter(COMMAND_PARAM);
 			if (SHUTDOWN.equals(command) || SHUTDOWN_RESTART.equals(command)) {
-				long shutdownDelay = (Long) request
-						.getParameter(SHUTDOWN_DELAY_PARAM);
+				long shutdownDelay = (Long) request.getParameter(SHUTDOWN_DELAY_PARAM);
 				boolean restart = !SHUTDOWN.equals(command);
-				long restartDelay = (Long) request
-						.getParameter(RESTART_DELAY_PARAM);
-				sendAdminResponse(request, "Request acknowledged");
+				long restartDelay = (Long) request.getParameter(RESTART_DELAY_PARAM);
+				sendAdminResponse(request, StringUtils.getLocalized(I18N_BASE, "request.acknowledged"));
 				JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay,
-						restart, restartDelay);
+					restart, restartDelay);
 				return;
 			} else if (CHANGE_PASSWORD.equals(command)) {
 				b = (byte[]) request.getParameter(NEW_PASSWORD_PARAM);
@@ -347,8 +290,8 @@ public class ApplicationConnection extends JPPFConnection implements
 			Number n = (Number) request.getParameter(BUNDLE_SIZE_PARAM);
 			if (n != null)
 				JPPFStatsUpdater.setStaticBundleSize(n.intValue());
-			nodeServer.setBundler(BundlerFactory.createFixedSizeBundler());
-			response = "Manual bundle size settings changed";
+			setBundler(BundlerFactory.createFixedSizeBundler());
+			response = StringUtils.getLocalized(I18N_BASE, "manual.settings.changed");
 		} else {
 			AnnealingTuneProfile prof = new AnnealingTuneProfile();
 			Number n = (Number) request.getParameter("MinSamplesToAnalyse");
@@ -364,7 +307,7 @@ public class ApplicationConnection extends JPPFConnection implements
 			n = (Number) request.getParameter("DecreaseRatio");
 			prof.setDecreaseRatio(n.floatValue());
 			setBundler(BundlerFactory.createBundler(prof));
-			response = "Automatic bundle size settings changed";
+			response = StringUtils.getLocalized(I18N_BASE, "automatic.settings.changed");
 		}
 		return response;
 	}
