@@ -19,6 +19,8 @@
  */
 package org.jppf.security;
 
+import java.io.Serializable;
+
 /**
  * <p>This interface encapsulates the required information and behaviour to manage
  * how a component (driver, node or client) interacts with the others, in terms
@@ -28,7 +30,7 @@ package org.jppf.security;
  * onto the network. If it is not present, any component of this organization should be denied access.
  * @author Laurent Cohen
  */
-public interface JPPFCredentials
+public interface JPPFCredentials extends Serializable
 {
 	/**
 	 * Get the unique universal identifier of the component that owns these credentials.

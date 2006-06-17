@@ -19,12 +19,14 @@
  */
 package org.jppf.security;
 
+import java.io.Serializable;
+
 /**
  * <p>Instances of this interface are used to prove that a component (driver, node or client) is actually
  * who it pretends to be through its credentials.
  * <p>This is a marker interface, therefore any functionality has to be in a concrete implementation.
  * @author Laurent Cohen
  */
-public interface JPPFSignature
+public interface JPPFSignature extends Serializable
 {
 }
