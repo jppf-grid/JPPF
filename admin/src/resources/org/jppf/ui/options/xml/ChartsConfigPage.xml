@@ -195,7 +195,7 @@
 			<property name="scrollable" value="true"/>
 			<property name="bordered" value="true"/>
 			<property name="orientation" value="horizontal"/>
-			<property name="width" value="200"/>
+			<property name="width" value="220"/>
 			<property name="height" value="200"/>
 			<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
 		</child>

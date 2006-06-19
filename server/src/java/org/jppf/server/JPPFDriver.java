@@ -20,19 +20,15 @@
 package org.jppf.server;
 
 import java.net.Socket;
-import java.util.Timer;
-import java.util.TimerTask;
-
+import java.util.*;
 import org.apache.log4j.Logger;
-import org.jppf.JPPFError;
-import org.jppf.JPPFException;
+import org.jppf.*;
 import org.jppf.classloader.ClassServer;
+import org.jppf.security.*;
 import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.node.JPPFNodeServer;
-import org.jppf.server.scheduler.bundle.Bundler;
-import org.jppf.server.scheduler.bundle.BundlerFactory;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.TypedProperties;
+import org.jppf.server.scheduler.bundle.*;
+import org.jppf.utils.*;
 
 /**
  * This class serves as an initializer for the entire JPPF server. It follows the singleton pattern and provides access,
@@ -76,7 +72,19 @@ public class JPPFDriver
 	 * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
 	 */
 	private boolean shuttingDown = false;
-	
+	/**
+	 * Security credentials associated with this JPPF driver.
+	 */
+	private JPPFCredentials credentials = null;
+
+	/**
+	 * Initialize this JPPFDriver.
+	 */
+	protected JPPFDriver()
+	{
+		initCredentials();
+	}
+
 	/**
 	 * Initialize and start this driver.
 	 * @throws Exception if the initialization fails.
@@ -98,6 +106,21 @@ public class JPPFDriver
 		port = props.getInt("node.server.port", 11113);
 		nodeServer = new JPPFNodeServer(port,bundler);
 		nodeServer.start();
+	}
+
+	/**
+	 * Initialize the security credentials associated with this JPPF driver.
+	 */
+	private void initCredentials()
+	{
+		String uuid = new JPPFUuid().toString();
+		StringBuilder sb = new StringBuilder("Driver:");
+		sb.append(VersionUtils.getLocalIpAddress()).append(":");
+		TypedProperties props = JPPFConfiguration.getProperties();
+		sb.append(props.getInt("class.server.port", 11111)).append(":");
+		sb.append(props.getInt("app.server.port", 11112)).append(":");
+		sb.append(props.getInt("node.server.port", 11113));
+		credentials = new DefaultJPPFCredentials(uuid, sb.toString(), new DefaultJPPFSignature());
 	}
 	
 	/**
@@ -135,6 +158,15 @@ public class JPPFDriver
 	public boolean isShuttingDown()
 	{
 		return shuttingDown;
+	}
+
+	/**
+	 * Get the security credentials associated with this JPPF driver.
+	 * @return a <code>JPPFCredentials</code> instance.
+	 */
+	public JPPFCredentials getCredentials()
+	{
+		return credentials;
 	}
 
 	/**

@@ -114,17 +114,13 @@ public class ApplicationConnection extends JPPFConnection implements
 	 * <li>recompose the tasks results in the same order as they were received</li>
 	 * <li><send results back to the client/li>
 	 * </ul>
-	 * 
-	 * @throws Exception
-	 *             if an error is raised while processing an execution request.
+	 * @throws Exception if an error is raised while processing an execution request.
 	 * @see org.jppf.server.JPPFConnection#perform()
 	 */
 	public void perform() throws Exception {
 		JPPFBuffer buffer = socketClient.receiveBytes(0);
 		byte[] bytes = buffer.getBuffer();
-		DataInputStream dis = new DataInputStream(new ByteArrayInputStream(
-				bytes));
-
+		DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
 		// Read the request header - with tasks count information
 		header = (JPPFRequestHeader) helper.readNextObject(dis, false);
 		JPPFRequestHeader.Type type = header.getRequestType();
@@ -177,11 +173,8 @@ public class ApplicationConnection extends JPPFConnection implements
 	/**
 	 * Send the results of the tasks in a bundle back to the client who
 	 * submitted the request.
-	 * 
-	 * @param bundle
-	 *            the bundle to get the task results from.
-	 * @throws Exception
-	 *             if an IO exception occurred while sending the results back.
+	 * @param bundle the bundle to get the task results from.
+	 * @throws Exception if an IO exception occurred while sending the results back.
 	 */
 	private void sendPartialResults(JPPFTaskBundle bundle) throws Exception {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream() {
@@ -344,7 +337,6 @@ public class ApplicationConnection extends JPPFConnection implements
 
 	/**
 	 * Get a reference to the driver's tasks queue.
-	 * 
 	 * @return a <code>JPPFQueue</code> instance.
 	 */
 	private JPPFQueue getQueue() {
@@ -381,9 +373,7 @@ public class ApplicationConnection extends JPPFConnection implements
 	 * Callback method invoked when the execution of a task has completed. This
 	 * method triggers a check of the request completion status. When all tasks
 	 * have completed, this connection sends all results back.
-	 * 
-	 * @param result
-	 *            the result of the task's execution.
+	 * @param result the result of the task's execution.
 	 */
 	public synchronized void taskCompleted(JPPFTaskBundle result)
 	{

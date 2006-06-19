@@ -17,23 +17,42 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.server;
+package org.jppf.security;
 
-import org.jppf.security.JPPFCredentials;
-import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.JPPFException;
 
 /**
- * Extension of ChannelContext for the nodes, providing an individual bundler for each node. 
+ * Exception thrown when the security credentials of two or more components of
+ * the framework fail to match.
  * @author Laurent Cohen
  */
-public class NodeChannelContext extends ChannelContext
+public class JPPFSecurityException extends JPPFException
 {
 	/**
-	 * Bundler used to schedule tasks for the corresponding node.
+	 * Initialize this exception with a specified message and cause exception.
+	 * @param message the message for this exception.
+	 * @param cause the cause exception.
 	 */
-	public Bundler bundler = null;
+	public JPPFSecurityException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
+
 	/**
-	 * The security credentials of the node.
+	 * Initialize this exception with a specified message.
+	 * @param message the message for this exception.
 	 */
-	public JPPFCredentials credentials = null;
+	public JPPFSecurityException(String message)
+	{
+		super(message);
+	}
+
+	/**
+	 * Initialize this exception with a specified cause exception.
+	 * @param cause the cause exception.
+	 */
+	public JPPFSecurityException(Throwable cause)
+	{
+		super(cause);
+	}
 }

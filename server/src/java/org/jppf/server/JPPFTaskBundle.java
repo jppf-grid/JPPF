@@ -21,6 +21,7 @@ package org.jppf.server;
 
 import java.io.Serializable;
 import java.util.*;
+import org.jppf.security.JPPFCredentials;
 import org.jppf.server.event.TaskCompletionListener;
 import org.jppf.utils.VersionUtils;
 
@@ -33,6 +34,21 @@ import org.jppf.utils.VersionUtils;
  */
 public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 {
+	/**
+	 * Type safe enumeration for the values of the bundle state.
+	 */
+	public enum State
+	{
+		/**
+		 * Means the bundle is used for handshake with the server (inital bundle).
+		 */
+		INITIAL_BUNDLE,
+		/**
+		 * Means the bundle is used normally, to transport executable tasks.
+		 */
+		EXECUTION_BUNDLE
+	}
+
 	/**
 	 * The unique identifier for this task bundle.
 	 */
@@ -77,6 +93,15 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * The build number of the current version of JPPF. 
 	 */
 	private int buildNumber = 0;
+	/**
+	 * Security credentials associated with the sender of this bundle.
+	 */
+	private JPPFCredentials credentials = null;
+	/**
+	 * The state of this bundle, to indicate whether it is used for handshake with
+	 * the server or for transporting tasks to execute.
+	 */
+	private State state = State.EXECUTION_BUNDLE;
 
 	/**
 	 * Initialize this task bundle and set its build number.
@@ -309,7 +334,44 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 		taskCount -= nbTasks;
 		bundle.setQueueEntryTime(queueEntryTime);
 		bundle.setCompletionListener(completionListener);
+		bundle.setCredentials(credentials);
 
 		return bundle;
+	}
+
+	/**
+	 * Get the security credentials associated with the sender of this bundle.
+	 * @return a <code>JPPFCredential</code> instance.
+	 */
+	public JPPFCredentials getCredentials()
+	{
+		return credentials;
+	}
+
+	/**
+	 * Set the security credentials associated with the sender of this bundle.
+	 * @param credentials a <code>JPPFCredential</code> instance.
+	 */
+	public void setCredentials(JPPFCredentials credentials)
+	{
+		this.credentials = credentials;
+	}
+
+	/**
+	 * Get the state of this bundle.
+	 * @return a <code>State</code> type safe enumeration value.
+	 */
+	public State getState()
+	{
+		return state;
+	}
+
+	/**
+	 * Set the state of this bundle.
+	 * @param state a <code>State</code> type safe enumeration value.
+	 */
+	public void setState(State state)
+	{
+		this.state = state;
 	}
 }

@@ -243,26 +243,21 @@ public abstract class JPPFNIOServer extends Thread{
 	private byte[] buf = new byte[1024];
 
 	/**
-	 * This method read everything it can from the channel until the request is
-	 * fulfill. The request must be a transfer of object like JPPFBuffer, with
+	 * This method reads everything it can from the channel until the request is
+	 * fulfilled. The request must be a transfer of object like JPPFBuffer, with
 	 * the first 4 bytes as the size of the payload and the payload.
 	 * 
-	 * @param channel
-	 *            from where data will be read
-	 * @param request
-	 *            the request been received
-	 * @return if the request was completed received.
+	 * @param channel from where data will be read
+	 * @param request the request that was received
+	 * @return true if the request was completely received, false otherwise.
 	 * @throws IOException if an error occuurred while reading a request.
 	 */
 	public boolean fillRequest(SocketChannel channel, Request request)
 			throws IOException {
 
 		ByteBuffer buffer;
-
 		if (request.getSize() == 0) {
-
 			buffer = request.getBuffer();
-
 			if (buffer == null) {
 				// determining the size of the packet
 				buffer = ByteBuffer.allocate(4);
@@ -283,22 +278,15 @@ public abstract class JPPFNIOServer extends Thread{
 			// allocating a buffer with the size of the payload
 			request.setBuffer(ByteBuffer.allocateDirect(request.getSize()));
 		}
-
 		buffer = request.getBuffer();
-
-		// read every it can
+		// read everything we can
 		int readed = channel.read(buffer);
 		while (readed > 0){
 			readed = channel.read(buffer);
 		}
-		if(readed < 0 ){
-			throw new ClosedChannelException();
-		}
-			
+		if(readed < 0 ) throw new ClosedChannelException();
 
-		if (buffer.remaining() != 0) {
-			return false;
-		}
+		if (buffer.remaining() != 0) return false;
 		// the payload has been fully received
 		buffer.flip();
 		while (buffer.hasRemaining()) {
@@ -307,7 +295,6 @@ public abstract class JPPFNIOServer extends Thread{
 			buffer.get(buf, 0, size);
 			request.getOutput().write(buf, 0, size);
 		}
-
 		buffer.clear();
 		request.setBuffer(null);
 		return true;
@@ -319,7 +306,6 @@ public abstract class JPPFNIOServer extends Thread{
 	public synchronized void removeAllConnections()
 	{
 		if (!stop) return;
-		
 		for (SelectionKey connection: selector.keys())
 		{
 			try {

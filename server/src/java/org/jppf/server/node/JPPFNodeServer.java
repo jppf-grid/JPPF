@@ -26,6 +26,7 @@ import java.nio.channels.*;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.jppf.node.JPPFBootstrapException;
+import org.jppf.security.JPPFCredentials;
 import org.jppf.server.*;
 import org.jppf.server.JPPFQueue.QueueListener;
 import org.jppf.server.scheduler.bundle.Bundler;
@@ -50,7 +51,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	/**
 	 * The uuid for the task bundle sent to a newly connected node.
 	 */
-	static final String INITIAL_BUNDLE_UUID = "initialBundle";
+	static final String INITIAL_BUNDLE_UUID = JPPFDriver.getInstance().getCredentials().getUuid();
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
@@ -66,17 +67,15 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	/**
 	 * The the task bundle sent to a newly connected node.
 	 */
-	private JPPFTaskBundle initialBundle = getInitialBundle();
+	private JPPFTaskBundle initialBundle = null;
 
 	/**
 	 * Initialize this socket server with a specified execution service and port
 	 * number.
 	 * 
-	 * @param port
-	 *            the port this socket server is listening to.
+	 * @param port the port this socket server is listening to.
 	 * @param bundler the algorithm that deals with bundle size
-	 * @throws JPPFBootstrapException
-	 *             if the underlying server socket can't be opened.
+	 * @throws JPPFBootstrapException if the underlying server socket can't be opened.
 	 */
 	public JPPFNodeServer(int port, Bundler bundler) throws JPPFBootstrapException {
 		super(port, "NodeServer Thread");
@@ -146,7 +145,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 		ChannelContext context = (ChannelContext) key.attachment();
 		try
 		{
-			sendTask(client, key, context, initialBundle);
+			sendTask(client, key, context, getInitialBundle());
 		}
 		catch (Exception e)
 		{
@@ -209,11 +208,16 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	ChannelState WaitingResult = new CWaitingResult(this);
 
 	/**
+	 * State of a node connection after a task bundle has been sent.
+	 * Waits for and reads the results of the bundle execution.
+	 */
+	ChannelState WaitingInitialInfo = new CWaitingInitialInfo(this);
+
+	/**
 	 * Resubmit a task bundle at the head of the queue. This method is invoked
 	 * when a node is disconnected while it was executing a task bundle.
 	 * 
-	 * @param bundle
-	 *            the task bundle to resubmit.
+	 * @param bundle the task bundle to resubmit.
 	 */
 	void resubmitBundle(JPPFTaskBundle bundle) {
 		
@@ -250,16 +254,11 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 * data is not fully transfered it enqueue the buffer to continue the
 	 * transfer when the channel is ready to receive more data.
 	 * 
-	 * @param channel
-	 *            the channel with the node
-	 * @param key
-	 *            the key of the channel with the main selector
-	 * @param context
-	 *            the context attached to the channel
-	 * @param bundle
-	 *            the task to be send
-	 * @throws Exception
-	 *             if any error occur
+	 * @param channel the channel with the node
+	 * @param key the key of the channel with the main selector
+	 * @param context the context attached to the channel
+	 * @param bundle the task to be send
+	 * @throws Exception if any error occur
 	 */
 	void sendTask(SocketChannel channel, SelectionKey key,
 			ChannelContext context, JPPFTaskBundle bundle) throws Exception {
@@ -294,32 +293,35 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 		// it is now converted to byte[]
 		byte[] data = baos.toByteArray();
 		ByteBuffer sending = ByteBuffer.allocateDirect(data.length + 4);
-		//FIXME: probably it is a better idea to make a double buffer with 
-		// directly allocated buffers and a heap based buffer
-		 
 		sending.putInt(data.length);
 		sending.put(data);
 		sending.flip();
 		
-		//make the first shoot
+		//make the first shot
 		channel.write(sending);
-		
-		if (sending.hasRemaining()) {
+		if (sending.hasRemaining())
+		{
 			//we must wait until the SO buffer be ready to the more data
 			// or a busy-loop can occur
 			context.content = new TaskRequest(new Request(), sending, bundle,	size);
 			context.state = SendingJob;
 			//the read option is to detect sudden node dead
 			key.interestOps(SelectionKey.OP_WRITE | SelectionKey.OP_READ);
-			
-		} else {
-			//the bundle could be fully tranfered to SO buffer
+		}
+		else
+		{
+			//the bundle could be fully transfered to SO buffer
 			// so we will just wait for node starts sending the results
-			
-			// Probably here would be a nice place to get a SLA agent running 
-			context.state = WaitingResult;
-			context.content = new TaskRequest(new Request(), sending, bundle,
-					size);
+			// Probably here would be a nice place to get a SLA agent running
+			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+			{
+				context.state = WaitingInitialInfo;
+			}
+			else
+			{
+				context.state = WaitingResult;
+			}
+			context.content = new TaskRequest(new Request(), sending, bundle, size);
 			key.interestOps(SelectionKey.OP_READ);
 		}
 	}
@@ -332,33 +334,39 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 */
 	private JPPFTaskBundle getInitialBundle()
 	{
-		try
+		if (initialBundle == null)
 		{
-			DataProvider dp = null;
-			ByteArrayOutputStream baos = new ByteArrayOutputStream() {
-				public synchronized byte[] toByteArray() {
-					return buf;
-				}
-			};
-			DataOutputStream dos = new DataOutputStream(baos);
-			SerializationHelper helper = new SerializationHelperImpl();
-			helper.writeNextObject(dp, dos, true);
-			dos.close();
-			byte[] dpBytes = baos.toByteArray();
-			JPPFTaskBundle bundle = new JPPFTaskBundle();
-			bundle.setUuid(INITIAL_BUNDLE_UUID);
-			bundle.setRequestUuid("0");
-			bundle.setAppUuid(JPPFNode.JPPF_DRIVER_UUID);
-			bundle.setTaskCount(0);
-			bundle.setTasks(new ArrayList<byte[]>());
-			bundle.setDataProvider(dpBytes);
-			return bundle;
+			try
+			{
+				DataProvider dp = null;
+				ByteArrayOutputStream baos = new ByteArrayOutputStream() {
+					public synchronized byte[] toByteArray() {
+						return buf;
+					}
+				};
+				JPPFCredentials cred = JPPFDriver.getInstance().getCredentials();
+				DataOutputStream dos = new DataOutputStream(baos);
+				SerializationHelper helper = new SerializationHelperImpl();
+				helper.writeNextObject(dp, dos, true);
+				dos.close();
+				byte[] dpBytes = baos.toByteArray();
+				JPPFTaskBundle bundle = new JPPFTaskBundle();
+				bundle.setUuid(INITIAL_BUNDLE_UUID);
+				bundle.setRequestUuid("0");
+				bundle.setAppUuid(INITIAL_BUNDLE_UUID);
+				bundle.setTaskCount(0);
+				bundle.setTasks(new ArrayList<byte[]>());
+				bundle.setDataProvider(dpBytes);
+				bundle.setCredentials(cred);
+				bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
+				initialBundle =  bundle;
+			}
+			catch(Exception e)
+			{
+				log.error(e.getMessage(), e);
+			}
 		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		return null;
+		return initialBundle;
 	}
 
 	/**

@@ -26,6 +26,7 @@ import org.jppf.ui.monitoring.charts.ChartType;
 import org.jppf.ui.monitoring.charts.config.*;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.options.*;
+import org.jppf.utils.*;
 import org.jppf.utils.CollectionUtils;
 
 /**
@@ -34,6 +35,11 @@ import org.jppf.utils.CollectionUtils;
  */
 public class ChartConfigActions extends AbstractActionsHolder
 {
+	/**
+	 * Base name used to localize strings.
+	 */
+	private final static String BASE_NAME = "org.jppf.ui.i18n.ChartsConfigPage";
+
 	/**
 	 * Initialize this action holder by populating the adequate fields.
 	 * @param page an <code>OptionsPage</code> used for bbotstrapping.
@@ -130,8 +136,11 @@ public class ChartConfigActions extends AbstractActionsHolder
 	public void newTabPressed()
 	{
 		option.getRoot().setEventsEnabled(false);
-		String s = JOptionPane.showInputDialog(option.getUIComponent(), "Enter a name for the new tab", "new tab");
-		if (s != null)
+		String s = (String) JOptionPane.showInputDialog(option.getUIComponent(),
+			StringUtils.getLocalized(BASE_NAME, "new.tab.name"), 
+			StringUtils.getLocalized(BASE_NAME, "new.tab.title"),
+			JOptionPane.PLAIN_MESSAGE, null, null, null);
+		if ((s != null) && !"".equals(s.trim()))
 		{
 			TabConfiguration tab = new TabConfiguration(s, -1);
 			JPPFChartBuilder.getInstance().addTab(tab);

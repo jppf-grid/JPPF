@@ -30,6 +30,7 @@ import org.jppf.comm.socket.*;
 import org.jppf.node.*;
 import org.jppf.node.event.*;
 import org.jppf.node.event.NodeEvent.EventType;
+import org.jppf.security.*;
 import org.jppf.server.JPPFTaskBundle;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
@@ -115,6 +116,10 @@ public class JPPFNode implements MonitoredNode
 	 * The socket used by this node's socket wrapper.
 	 */
 	private Socket socket = null;
+	/**
+	 * Security credentials associated with this JPPF node.
+	 */
+	private JPPFCredentials credentials = null;
 
 	/**
 	 * Main processing loop of this node.
@@ -172,6 +177,21 @@ public class JPPFNode implements MonitoredNode
 				}
 				for (Future future : futureList) future.get();
 			}
+			else
+			{
+				JPPFCredentials serverCred = bundle.getCredentials();
+				if ((serverCred == null) || !credentials.canReceive(serverCred) || !credentials.canExecute(serverCred))
+				{
+					StringBuilder sb = new StringBuilder();
+					sb.append("The security credentials for node [");
+					sb.append(credentials.getIdentifier());
+					sb.append("] do not permit it to receive or execute jobs from JPPF Driver [");
+					sb.append((serverCred != null) ? serverCred.getIdentifier() : "unknown");
+					sb.append("]. This node is now disconnecting.");
+					throw new JPPFError(new JPPFSecurityException(sb.toString()));
+				}
+				bundle.setCredentials(credentials);
+			}
 			writeResults(bundle, taskList);
 			int p = bundle.getBuildNumber();
 			if (buildNumber < p)
@@ -191,6 +211,7 @@ public class JPPFNode implements MonitoredNode
 	public synchronized void init() throws Exception
 	{
 		if (socketClient == null) initSocketClient();
+		initCredentials();
 		if (notifying) fireNodeEvent(EventType.START_CONNECT);
 		if (socket == null)
 		{
@@ -224,6 +245,19 @@ public class JPPFNode implements MonitoredNode
 		socketClient.setSerializer(serializer);
 	}
 
+	/**
+	 * Initialize the security credentials associated with this JPPF node.
+	 */
+	private void initCredentials()
+	{
+		String uuid = new JPPFUuid().toString();
+		StringBuilder sb = new StringBuilder("Node:");
+		sb.append(VersionUtils.getLocalIpAddress()).append(":");
+		sb.append(socketClient.getPort());
+		// testing that the server throws a JPPFSecurityException
+		credentials = new DefaultJPPFCredentials(uuid, sb.toString(), new DefaultJPPFSignature());
+	}
+	
 	/**
 	 * Read a task from the socket connection, along with its header information.
 	 * @return a pair of <code>JPPFTaskBundle</code> and a <code>List</code> of <code>JPPFTask</code> instances.
@@ -298,7 +332,7 @@ public class JPPFNode implements MonitoredNode
 		Object[] result = new Object[2 + count];
 		result[0] = bundle;
 		String uuid = bundle.getAppUuid();
-		if (JPPF_DRIVER_UUID.equals(uuid))
+		if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 		{
 			result[1] = null;
 		}

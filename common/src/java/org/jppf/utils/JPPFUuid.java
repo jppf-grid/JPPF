@@ -20,9 +20,7 @@
 package org.jppf.utils;
 
 import java.io.Serializable;
-import java.net.*;
 import java.util.Random;
-import org.apache.log4j.Logger;
 
 /**
  * Instances of this class serve as unique identifiers for messages sent to and from
@@ -38,11 +36,6 @@ import org.apache.log4j.Logger;
 public class JPPFUuid implements Serializable
 {
   /**
-   * Log4j logger for this class.
-   */
-  private static Logger log = Logger.getLogger(JPPFUuid.class);
-
-  /**
 	 * Random number generator, static to ensure generated uuid are unique.
 	 */
 	private static Random rand = new Random(System.currentTimeMillis());
@@ -50,7 +43,6 @@ public class JPPFUuid implements Serializable
 	 * The IP address of the host the JVM is running on.
 	 */
 	private static String ipAddress = obtainIpAddress();
-
 	/**
 	 * String holding a generated unique identifier.
 	 */
@@ -92,22 +84,15 @@ public class JPPFUuid implements Serializable
 	 */
 	private static String obtainIpAddress()
 	{
-		try
+		String ip = VersionUtils.getLocalIpAddress();
+		if (ip == null) return null;
+		String[] tokens = ip.split("\\.");
+		StringBuilder sb = new StringBuilder();
+		for (String token: tokens)
 		{
-			InetAddress ip = InetAddress.getLocalHost();
-			String[] tokens = ip.getHostAddress().split("\\.");
-			StringBuilder sb = new StringBuilder();
-			for (String token: tokens)
-			{
-				sb.append(StringUtils.padLeft(token, '0', 3));
-			}
-			return sb.toString();
+			sb.append(StringUtils.padLeft(token, '0', 3));
 		}
-		catch(UnknownHostException e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		return null;
+		return sb.toString();
 	}
 
 	/**

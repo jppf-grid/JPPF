@@ -19,23 +19,21 @@
  */
 package org.jppf.server.node;
 
-import static org.jppf.server.JPPFStatsUpdater.*;
 import java.io.*;
 import java.nio.channels.*;
 import java.util.*;
+import org.jppf.security.*;
 import org.jppf.server.*;
-import org.jppf.server.event.TaskCompletionListener;
 import org.jppf.utils.*;
 
 /**
- * This class implements the state of receiving the bundle
- * back from processing at a node. The "waiting" part is 
- * provided by the selector, which will any for the first
- * bytes be ready to send to the instances of this class.
- * @author Domingos Creado
+ * This class implements the state of receiving information from the node as a
+ * response to sending the initial bundle. The expected information includes the
+ * nodes security credentials and authorizations.
+ * @author Laurent Cohen
  */
-class CWaitingResult implements ChannelState {
-
+class CWaitingInitialInfo implements ChannelState
+{
 	/**
 	 * The JPPFNIOServer this state relates to.
 	 */
@@ -45,7 +43,7 @@ class CWaitingResult implements ChannelState {
 	 * Initialize this state with a specified JPPFNIOServer.
 	 * @param server the JPPFNIOServer this state relates to.
 	 */
-	CWaitingResult(JPPFNodeServer server)
+	CWaitingInitialInfo(JPPFNodeServer server)
 	{
 		this.server = server;
 	}
@@ -56,20 +54,20 @@ class CWaitingResult implements ChannelState {
 	 * @param context a container for the execution results.
 	 * @see org.jppf.server.ChannelState#exec(java.nio.channels.SelectionKey, org.jppf.server.ChannelContext)
 	 */
-	public void exec(SelectionKey key, ChannelContext context) {
-
+	public void exec(SelectionKey key, ChannelContext context)
+	{
 		SocketChannel channel = (SocketChannel) key.channel();
 		NodeChannelContext nodeContext = (NodeChannelContext) context;
 		TaskRequest out = (TaskRequest) nodeContext.content;
 		JPPFTaskBundle bundle = out.getBundle();
 		Request request = out.getRequest();
-		TaskCompletionListener listener = bundle.getCompletionListener();
-		try {
-			//Wait the full byte[] of the bundle come to start processing.
-			//This makes the integration of non-blocking with ObjectInputStream easier.
-			if (server.fillRequest(channel, out.getRequest())) {
-				long elapsed = System.currentTimeMillis() - request.getStart();
-				DataInputStream dis =
+		try
+		{
+			// Wait the full byte[] of the bundle come to start processing.
+			// This makes the integration of non-blocking with ObjectInputStream easier.
+			if (server.fillRequest(channel, out.getRequest()))
+			{
+				DataInputStream dis = 
 					new DataInputStream(new ByteArrayInputStream(request.getOutput().toByteArray()));
 				// reading the bundle as object
 				SerializationHelper helper = new SerializationHelperImpl();
@@ -79,55 +77,44 @@ class CWaitingResult implements ChannelState {
 					taskList.add(helper.readNextBytes(dis));
 				}
 				dis.close();
-
 				bundle.setTasks(taskList);
-				
-				//updating stats
-				if (isStatsEnabled()) {
-					nodeContext.bundler.feedback(bundle.getTaskCount(), elapsed);
-					taskExecuted(bundle.getTaskCount(), elapsed, bundle.getNodeExecutionTime(), out.getBundleBytes());
-				}
-				
-				//notifing the client thread about the end of a bundle
-				if (listener != null) listener.taskCompleted(bundle);
-
-				//now it's done...
-				//we will now run the scheduler part
-				
-				// first check whether the bundler settings have changed.
+				// check whether the bundler settings have changed.
 				if (nodeContext.bundler.getTimestamp() < server.getBundler().getTimestamp())
 				{
 					nodeContext.bundler = server.getBundler().copy();
 				}
-				// verifying if there is other tasks to send to this node
-				bundle = server.getQueue().nextBundle(nodeContext.bundler.getBundleSize());
-				if (bundle != null) {
-					try {
-						server.sendTask(channel, key, context, bundle);
-						return;
-					} catch (Exception e) {
-						server.closeNode(channel);
-						server.resubmitBundle(bundle);
-						bundle = null;
-						throw e;
-					}
+				JPPFCredentials cred = JPPFDriver.getInstance().getCredentials();
+				if ((bundle.getCredentials() == null) ||
+					!cred.canSend(bundle.getCredentials()) || !cred.canExecute(bundle.getCredentials()))
+				{
+					server.closeNode(channel);
+					StringBuilder sb = new StringBuilder();
+					sb.append("The security credentials for node [");
+					sb.append((bundle.getCredentials() != null) ? bundle.getCredentials().getIdentifier() : "unknown");
+					sb.append("] do not permit it to receive or execute jobs from JPPF Driver [");
+					sb.append(cred.getIdentifier()).append("]");
+					throw new JPPFSecurityException(sb.toString());
 				}
-				
-				//there is nothing to do, so this instace will wait for job
+				nodeContext.credentials = bundle.getCredentials();
+				// there is nothing to do, so this instance will wait for a job
 				server.availableNodes.add(channel);
 				// make sure the context is reset so as not to resubmit
 				// the last bundle executed by the node.
 				context.content = null;
-				//if the node disconnect from driver we will know soon
+				// if the node disconnect from driver we will know soon
 				context.state = server.SendingJob;
 				key.interestOps(SelectionKey.OP_READ);
 			}
-		} catch (Exception e) {
+		}
+		catch(Exception e)
+		{
 			JPPFNodeServer.log.error(e.getMessage(), e);
-			if (e instanceof IOException) {
+			if (e instanceof IOException)
+			{
 				server.closeNode(channel);
 			}
-			if ((bundle != null)  && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState())) {
+			if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+			{
 				server.resubmitBundle(bundle);
 			}
 		}

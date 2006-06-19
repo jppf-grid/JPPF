@@ -35,7 +35,7 @@ public class OptionsPageBuilder
 	/**
 	 * Base name used to localize labels and tooltips.
 	 */
-	private final static String BASE_PREFIX = "org.jppf.ui.i18n.";
+	private final static String BASE_NAME = "org.jppf.ui.i18n.";
 	/**
 	 * Base name used to localize labels and tooltips.
 	 */
@@ -50,7 +50,7 @@ public class OptionsPageBuilder
 	public OptionsPage buildPage(String xmlPath) throws Exception
 	{
 		int idx = xmlPath.lastIndexOf("/");
-		baseName = BASE_PREFIX + ((idx < 0) ? xmlPath : xmlPath.substring(idx + 1));
+		baseName = BASE_NAME + ((idx < 0) ? xmlPath : xmlPath.substring(idx + 1));
 		idx = baseName.lastIndexOf(".xml");
 		if (idx >= 0) baseName = baseName.substring(0, idx);
 		OptionDescriptor desc = new OptionDescriptorParser().parse(xmlPath);

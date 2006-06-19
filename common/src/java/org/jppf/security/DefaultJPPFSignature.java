@@ -17,23 +17,13 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.server;
-
-import org.jppf.security.JPPFCredentials;
-import org.jppf.server.scheduler.bundle.Bundler;
+package org.jppf.security;
 
 /**
- * Extension of ChannelContext for the nodes, providing an individual bundler for each node. 
+ * Default implementation of the JPPFSignature interface provided for convenience.
+ * Other implementations can extennd this class and override any method.
  * @author Laurent Cohen
  */
-public class NodeChannelContext extends ChannelContext
+public class DefaultJPPFSignature implements JPPFSignature
 {
-	/**
-	 * Bundler used to schedule tasks for the corresponding node.
-	 */
-	public Bundler bundler = null;
-	/**
-	 * The security credentials of the node.
-	 */
-	public JPPFCredentials credentials = null;
 }

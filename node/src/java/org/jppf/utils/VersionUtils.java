@@ -20,6 +20,8 @@
 package org.jppf.utils;
 
 import java.io.InputStream;
+import java.net.*;
+import org.apache.log4j.Logger;
 
 /**
  * This class provides a utility method to determine the JPPF build number available in the class path.<br>
@@ -29,10 +31,18 @@ import java.io.InputStream;
  */
 public final class VersionUtils
 {
+  /**
+   * Log4j logger for this class.
+   */
+  private static Logger log = Logger.getLogger(VersionUtils.class);
 	/**
 	 * The current JPPF build number.
 	 */
 	private static int buildNumber = -1;
+	/**
+	 * IP addresse of the current host.
+	 */
+	private static String ip = getLocalIpAddress();
 
 	/**
 	 * Instantiation of this class is not permitted.
@@ -70,5 +80,24 @@ public final class VersionUtils
 	public static void setBuildNumber(int buildNumber)
 	{
 		VersionUtils.buildNumber = buildNumber;
+	}
+
+	/**
+	 * Get the IP address of the current host.<br>
+	 * @return the IP address as a string in the format &quot;a.b.c.d&quot;.
+	 */
+	public static String getLocalIpAddress()
+	{
+		if (ip != null) return ip;
+		try
+		{
+			InetAddress ip = InetAddress.getLocalHost();
+			return ip.getHostAddress();
+		}
+		catch(UnknownHostException e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		return null;
 	}
 }

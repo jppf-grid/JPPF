@@ -95,7 +95,7 @@ class CSendingJob implements ChannelState {
 		TaskRequest out = (TaskRequest) context.content;
 		if (out != null) {
 			JPPFTaskBundle bundle = out.getBundle();
-			if ((bundle != null) && !JPPFNodeServer.INITIAL_BUNDLE_UUID.equals(bundle.getUuid())) {
+			if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState())) {
 				server.resubmitBundle(bundle);
 			}
 		}

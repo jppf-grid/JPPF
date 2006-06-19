@@ -20,6 +20,7 @@
 package org.jppf.server.protocol;
 
 import java.io.Serializable;
+import org.jppf.security.JPPFCredentials;
 import org.jppf.utils.JPPFUuid;
 
 /**
@@ -71,6 +72,10 @@ public class JPPFRequestHeader implements Serializable
 	 * The number of tasks in this request.
 	 */
 	private int taskCount = 0;
+	/**
+	 * Security credentials associated with the application that sent this request.
+	 */
+	private JPPFCredentials credentials = null;
 
 	/**
 	 * Initialize this request header.
@@ -141,5 +146,23 @@ public class JPPFRequestHeader implements Serializable
 	public void setRequestType(Type requestType)
 	{
 		this.requestType = requestType;
+	}
+
+	/**
+	 * Get the security credentials associated with the application that sent this request.
+	 * @return a <code>JPPFCredential</code> instance.
+	 */
+	public JPPFCredentials getCredentials()
+	{
+		return credentials;
+	}
+
+	/**
+	 * Set the security credentials associated with the application that sent this request.
+	 * @param credentials a <code>JPPFCredential</code> instance.
+	 */
+	public void setCredentials(JPPFCredentials credentials)
+	{
+		this.credentials = credentials;
 	}
 }
