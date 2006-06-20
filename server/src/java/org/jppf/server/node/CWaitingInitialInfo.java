@@ -83,7 +83,7 @@ class CWaitingInitialInfo implements ChannelState
 				{
 					nodeContext.bundler = server.getBundler().copy();
 				}
-				JPPFCredentials cred = JPPFDriver.getInstance().getCredentials();
+				JPPFSecurityContext cred = JPPFDriver.getInstance().getCredentials();
 				if ((bundle.getCredentials() == null) ||
 					!cred.canSend(bundle.getCredentials()) || !cred.canExecute(bundle.getCredentials()))
 				{

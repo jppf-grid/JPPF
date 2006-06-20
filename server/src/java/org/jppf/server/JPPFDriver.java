@@ -75,7 +75,7 @@ public class JPPFDriver
 	/**
 	 * Security credentials associated with this JPPF driver.
 	 */
-	private JPPFCredentials credentials = null;
+	private JPPFSecurityContext credentials = null;
 
 	/**
 	 * Initialize this JPPFDriver.
@@ -120,7 +120,7 @@ public class JPPFDriver
 		sb.append(props.getInt("class.server.port", 11111)).append(":");
 		sb.append(props.getInt("app.server.port", 11112)).append(":");
 		sb.append(props.getInt("node.server.port", 11113));
-		credentials = new DefaultJPPFCredentials(uuid, sb.toString(), new DefaultJPPFSignature());
+		credentials = new JPPFSecurityContext(uuid, sb.toString(), new JPPFCredentials());
 	}
 	
 	/**
@@ -162,9 +162,9 @@ public class JPPFDriver
 
 	/**
 	 * Get the security credentials associated with this JPPF driver.
-	 * @return a <code>JPPFCredentials</code> instance.
+	 * @return a <code>JPPFSecurityContext</code> instance.
 	 */
-	public JPPFCredentials getCredentials()
+	public JPPFSecurityContext getCredentials()
 	{
 		return credentials;
 	}

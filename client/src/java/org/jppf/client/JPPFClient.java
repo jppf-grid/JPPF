@@ -96,7 +96,7 @@ public class JPPFClient {
 	/**
 	 * Security credentials associated with the application.
 	 */
-	JPPFCredentials credentials = null;
+	JPPFSecurityContext credentials = null;
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -191,7 +191,7 @@ public class JPPFClient {
 		TypedProperties props = JPPFConfiguration.getProperties();
 		sb.append(props.getInt("class.server.port", 11111)).append(":");
 		sb.append(port).append(":");
-		credentials = new DefaultJPPFCredentials(appUuid, sb.toString(), new DefaultJPPFSignature());
+		credentials = new JPPFSecurityContext(appUuid, sb.toString(), new JPPFCredentials());
 	}
 	
 	/**

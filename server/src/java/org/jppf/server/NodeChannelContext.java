@@ -19,7 +19,7 @@
  */
 package org.jppf.server;
 
-import org.jppf.security.JPPFCredentials;
+import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.scheduler.bundle.Bundler;
 
 /**
@@ -35,5 +35,5 @@ public class NodeChannelContext extends ChannelContext
 	/**
 	 * The security credentials of the node.
 	 */
-	public JPPFCredentials credentials = null;
+	public JPPFSecurityContext credentials = null;
 }

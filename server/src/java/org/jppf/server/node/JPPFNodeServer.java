@@ -26,7 +26,7 @@ import java.nio.channels.*;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.jppf.node.JPPFBootstrapException;
-import org.jppf.security.JPPFCredentials;
+import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.*;
 import org.jppf.server.JPPFQueue.QueueListener;
 import org.jppf.server.scheduler.bundle.Bundler;
@@ -344,7 +344,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 						return buf;
 					}
 				};
-				JPPFCredentials cred = JPPFDriver.getInstance().getCredentials();
+				JPPFSecurityContext cred = JPPFDriver.getInstance().getCredentials();
 				DataOutputStream dos = new DataOutputStream(baos);
 				SerializationHelper helper = new SerializationHelperImpl();
 				helper.writeNextObject(dp, dos, true);

@@ -21,7 +21,7 @@ package org.jppf.server;
 
 import java.io.Serializable;
 import java.util.*;
-import org.jppf.security.JPPFCredentials;
+import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.event.TaskCompletionListener;
 import org.jppf.utils.VersionUtils;
 
@@ -96,7 +96,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	/**
 	 * Security credentials associated with the sender of this bundle.
 	 */
-	private JPPFCredentials credentials = null;
+	private JPPFSecurityContext credentials = null;
 	/**
 	 * The state of this bundle, to indicate whether it is used for handshake with
 	 * the server or for transporting tasks to execute.
@@ -343,7 +343,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * Get the security credentials associated with the sender of this bundle.
 	 * @return a <code>JPPFCredential</code> instance.
 	 */
-	public JPPFCredentials getCredentials()
+	public JPPFSecurityContext getCredentials()
 	{
 		return credentials;
 	}
@@ -352,7 +352,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * Set the security credentials associated with the sender of this bundle.
 	 * @param credentials a <code>JPPFCredential</code> instance.
 	 */
-	public void setCredentials(JPPFCredentials credentials)
+	public void setCredentials(JPPFSecurityContext credentials)
 	{
 		this.credentials = credentials;
 	}

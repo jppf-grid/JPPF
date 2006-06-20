@@ -119,7 +119,7 @@ public class JPPFNode implements MonitoredNode
 	/**
 	 * Security credentials associated with this JPPF node.
 	 */
-	private JPPFCredentials credentials = null;
+	private JPPFSecurityContext credentials = null;
 
 	/**
 	 * Main processing loop of this node.
@@ -179,7 +179,7 @@ public class JPPFNode implements MonitoredNode
 			}
 			else
 			{
-				JPPFCredentials serverCred = bundle.getCredentials();
+				JPPFSecurityContext serverCred = bundle.getCredentials();
 				if ((serverCred == null) || !credentials.canReceive(serverCred) || !credentials.canExecute(serverCred))
 				{
 					StringBuilder sb = new StringBuilder();
@@ -255,7 +255,7 @@ public class JPPFNode implements MonitoredNode
 		sb.append(VersionUtils.getLocalIpAddress()).append(":");
 		sb.append(socketClient.getPort());
 		// testing that the server throws a JPPFSecurityException
-		credentials = new DefaultJPPFCredentials(uuid, sb.toString(), new DefaultJPPFSignature());
+		credentials = new JPPFSecurityContext(uuid, sb.toString(), new JPPFCredentials());
 	}
 	
 	/**

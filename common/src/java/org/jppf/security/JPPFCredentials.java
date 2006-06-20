@@ -19,62 +19,19 @@
  */
 package org.jppf.security;
 
-import java.io.Serializable;
 
 /**
- * <p>This interface encapsulates the required information and behaviour to manage
- * how a component (driver, node or client) interacts with the others, in terms
- * of authorizations and clearance.
- * <p>Organizations  - or users or entities - willing to participate in a JPPF grid network
- * must have an implementation of this interface provided with every component they send
- * onto the network. If it is not present, any component of this organization should be denied access.
+ * Default implementation of the JPPFCredentials interface provided for convenience.
  * @author Laurent Cohen
  */
-public interface JPPFCredentials extends Serializable
+public class JPPFCredentials
 {
 	/**
-	 * Get the unique universal identifier of the component that owns these credentials.
-	 * @return the uuid as a String.
+	 * User group.
 	 */
-	String getUuid();
+	String group = null;
 	/**
-	 * Get the identifier for these credentials' owner. It doesn't have to be universally unique,
-	 * and is used to identify the entity that makes use of the framework. The entity can be an organization,
-	 * user, software component, etc...
-	 * @return the identifier as a String.
+	 * User id.
 	 */
-	String getIdentifier();
-	/**
-	 * Get the signature for these credentials.
-	 * @return a <code>JPPFSignature</code> instance.
-	 */
-	JPPFSignature getSignature();
-	/**
-	 * Determine whether the owner of these credentials can execute tasks from another
-	 * entity on the network.
-	 * @param credentials the entity's security credentials.
-	 * @return true if the owner can execute the entity's tasks, false otherwise.
-	 */
-	boolean canExecute(JPPFCredentials credentials);
-	/**
-	 * Determine whether the owner of these credentials can send tasks to another
-	 * entity on the network.
-	 * @param credentials the entity's security credentials.
-	 * @return true if the owner can send tasks to the other entity, false otherwise.
-	 */
-	boolean canSend(JPPFCredentials credentials);
-	/**
-	 * Determine whether the owner of these credentials can receive tasks from another
-	 * entity on the network.
-	 * @param credentials the entity's security credentials.
-	 * @return true if the owner can receive tasks from the other entity, false otherwise.
-	 */
-	boolean canReceive(JPPFCredentials credentials);
-	/**
-	 * Determine whether the owner of these credentials can administrate an other
-	 * entity on the network.
-	 * @param credentials the entity's security credentials.
-	 * @return true if the owner can administrate the other entity, false otherwise.
-	 */
-	boolean canAdministrate(JPPFCredentials credentials);
+	String userId = null;
 }
