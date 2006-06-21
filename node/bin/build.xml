@@ -150,8 +150,9 @@ USA
 				<include name="COPYING" />
 			</fileset>
 		</copy>
+  	<antcall target="installer"/>
 		<zip destfile="${JPPF.build.dir}/${screensaver}-${version.number}-screensaver-win32.zip"
-			basedir="${dist}/${screensaver}-win32" includes="**"/>
+			basedir="${JPPF.build.dir}" includes="JPPF@Home_Setup.exe"/>
 
 		<!-- Create distribution for Unix: -->
 		<mkdir dir="${dist}/${screensaver}-unix" />
@@ -173,7 +174,6 @@ USA
 		<zip destfile="${JPPF.build.dir}/${screensaver}-${version.number}-screensaver-unix.zip"
 			basedir="${dist}/${screensaver}-unix" includes="**"/>
 
-  	<antcall target="installer"/>
   	<antcall target="clean"/>
   	
   </target>

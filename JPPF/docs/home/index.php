@@ -55,7 +55,7 @@
 		<table border="0" cellspacing="0" cellpadding="0" width="80%">
 			<tr>
 				<td width="50%" valign="top" rowspan="2">
-					<table class="left_" cellspacing="0" cellpadding="5" width="100%">
+					<table class="leftRight_" cellspacing="0" cellpadding="5" width="100%">
 						<tr><td class="leftTopBottom_">
 							<h3>Project Description</h3>
 							Java Parallel Processing Framework is a set of tools and APIs to facilitate the parallelization of CPU intensive applications, and distribute their execution over a network of heterogenous nodes.
@@ -78,7 +78,7 @@
 							</ul>
 						</td></tr>
 						<tr><td class="bottom_">
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.19.0 - beta</span></h4>
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.20.0 - beta</span></h4>
 						</td></tr>
 						<tr><td class="bottom_">
 							<h3>New: JPPF is looking for developers!</h3>
@@ -92,10 +92,10 @@
 					</table>
 				</td>
 				<td width="50%" valign="top">
-					<table class="leftRight_" cellspacing="0" cellpadding="5" width="100%">
+					<table class="right_" cellspacing="0" cellpadding="5" width="100%">
 						<tr><td class="bottom_">
 						<?php
-							$link = mysql_connect('mysql4-j', 'j135654admin', 'tri75den')
+							$link = mysql_connect('mysql4-j', 'j135654admin', 'Faz600er')
 								 or die('Could not connect: ' . mysql_error());
 							mysql_select_db('j135654_web') or die('Could not select database');
 							$query = 'SELECT * FROM news ORDER BY date DESC';

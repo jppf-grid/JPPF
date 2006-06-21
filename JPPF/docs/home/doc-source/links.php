@@ -9,7 +9,7 @@
 		</table>
 
 <?php
-		$link = mysql_connect('mysql4-j', 'j135654admin', 'tri75den')
+		$link = mysql_connect('mysql4-j', 'j135654admin', 'Faz600er')
 			 or die('Could not connect: ' . mysql_error());
 		mysql_select_db('j135654_web') or die('Could not select database');
 

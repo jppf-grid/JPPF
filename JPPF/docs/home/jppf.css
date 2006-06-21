@@ -50,7 +50,7 @@ body { font-size=10pt; background: url("images/bkg.gif"); background-repeat: rep
 .leftTop_         { border-left: 2px solid #8080FF; border-top: 2px solid #8080FF }
 .leftBottom_      { border-left: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
 .rightTop_        { border-right: 2px solid #8080FF; border-top: 2px solid #8080FF }
-.rigthBottom_     { border-right: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
+.rightBottom_     { border-right: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
 .topBottom_       { border-top: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
 .leftRightTop_    { border-left: 2px solid #8080FF; border-right: 2px solid #8080FF; border-top: 2px solid #8080FF }
 .leftRightBottom_ { border-left: 2px solid #8080FF; border-right: 2px solid #8080FF; border-bottom: 2px solid #8080FF }

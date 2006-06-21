@@ -193,6 +193,7 @@
 				<exclude name="docs/architecture/**/*.*"/>
 				<exclude name="docs/home/**/*.*"/>
 				<exclude name="docs/misc/**/*.*"/>
+				<exclude name="docs/**/*.zip"/>
 			</zipfileset>
 			<zipfileset dir="${node}" prefix="${ant.project.name}-${version.number}/node"/>
 			<zipfileset dir="${common}" prefix="${ant.project.name}-${version.number}/common"/>

@@ -19,12 +19,14 @@
  */
 package org.jppf.security;
 
+import java.io.Serializable;
+
 
 /**
  * Default implementation of the JPPFCredentials interface provided for convenience.
  * @author Laurent Cohen
  */
-public class JPPFCredentials
+public class JPPFCredentials implements Serializable
 {
 	/**
 	 * User group.

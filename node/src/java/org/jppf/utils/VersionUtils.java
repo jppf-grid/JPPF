@@ -21,7 +21,6 @@ package org.jppf.utils;
 
 import java.io.InputStream;
 import java.net.*;
-import org.apache.log4j.Logger;
 
 /**
  * This class provides a utility method to determine the JPPF build number available in the class path.<br>
@@ -31,10 +30,6 @@ import org.apache.log4j.Logger;
  */
 public final class VersionUtils
 {
-  /**
-   * Log4j logger for this class.
-   */
-  private static Logger log = Logger.getLogger(VersionUtils.class);
 	/**
 	 * The current JPPF build number.
 	 */
@@ -96,7 +91,7 @@ public final class VersionUtils
 		}
 		catch(UnknownHostException e)
 		{
-			log.error(e.getMessage(), e);
+			e.printStackTrace();
 		}
 		return null;
 	}
