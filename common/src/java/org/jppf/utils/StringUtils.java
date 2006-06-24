@@ -180,7 +180,8 @@ public final class StringUtils
 		}
 		catch (Exception e)
 		{
-			log.error(e.getMessage(), e);
+			log.error(e.getMessage());
+			log.debug(e);
 		}
 		return key;
 	}

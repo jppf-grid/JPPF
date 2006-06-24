@@ -51,7 +51,7 @@ public final class JPPFSecurityContext implements Serializable
 	private String domain = null;
 
 	/**
-	 * No default instantiation allowed fdor this class.
+	 * No default instantiation allowed for this class.
 	 */
 	private JPPFSecurityContext()
 	{
