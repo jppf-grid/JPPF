@@ -134,7 +134,13 @@ public class SerializationHelperImpl implements SerializationHelper
 		byte[] actual = null;
 		int len = dis.readInt();
 		byte[] temp = new byte[len];
-		dis.read(temp, 0, len);
+		
+		
+		int aux = 0;
+		while(aux < len){
+			aux += dis.read(temp, aux, len - aux);
+		}
+		
 		if (isCompressed) actual = CompressionUtils.unzip(temp, 0, len);
 		else actual = temp;
 		if (log.isDebugEnabled())
@@ -186,7 +192,10 @@ public class SerializationHelperImpl implements SerializationHelper
 	{
 		int length = dis.readInt();
 		byte[] result = new byte[length];
-		dis.read(result, 0, length);
+		int aux = 0;
+		while(aux < length){
+			aux += dis.read(result, aux, length - aux);
+		}
 		return result;
 	}
 

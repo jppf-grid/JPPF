@@ -188,7 +188,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @throws IOException if the underlying input and output streams raise an error.
 	 * @see org.jppf.comm.socket.SocketWrapper#open()
 	 */
-	public void open() throws ConnectException, IOException
+	public final void open() throws ConnectException, IOException
 	{
 		if (!opened)
 		{
@@ -213,7 +213,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * underlying socket connection.
 	 * @throws IOException if an error occurs during the streams initialization.
 	 */
-	protected void initStreams() throws IOException
+	protected final void initStreams() throws IOException
 	{
 		OutputStream os = socket.getOutputStream();
 		InputStream is = socket.getInputStream();

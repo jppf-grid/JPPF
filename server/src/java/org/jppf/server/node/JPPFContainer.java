@@ -65,7 +65,7 @@ public class JPPFContainer
 	 * Initialize this node's resources.
 	 * @throws Exception if an error is raised during initialization.
 	 */
-	public void init() throws Exception
+	public final void init() throws Exception
 	{
 		initHelper();
 	}

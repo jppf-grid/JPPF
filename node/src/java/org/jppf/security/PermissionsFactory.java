@@ -103,11 +103,11 @@ public final class PermissionsFactory
 	 */
 	private static void readStaticPermissions(ClassLoader classLoader)
 	{
+		InputStream is = null;
 		try
 		{
 			String file = JPPFConfiguration.getProperties().getString("jppf.policy.file");
 			if (file == null) return;
-			InputStream is = null;
 			try
 			{
 				is = new FileInputStream(file);
@@ -147,6 +147,13 @@ public final class PermissionsFactory
 		catch(Exception e)
 		{
 			e.printStackTrace();
+		}
+		finally{
+			if(is != null){
+				try{
+					is.close();
+				}catch(Exception ignored){}
+			}
 		}
 	}
 	

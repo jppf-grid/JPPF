@@ -161,7 +161,7 @@ public class TypedProperties extends Properties
 	{
 		boolean booleanVal = defValue;
 		String val = getProperty(key, null);
-		if (val != null) booleanVal = new Boolean(val).booleanValue();
+		if (val != null) booleanVal = Boolean.valueOf(val).booleanValue();
 		return booleanVal;
 	}
 	

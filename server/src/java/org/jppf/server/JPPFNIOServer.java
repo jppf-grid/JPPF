@@ -321,7 +321,7 @@ public abstract class JPPFNIOServer extends Thread{
 	 * @param port the port the underlying server listens to.
 	 * @throws JPPFBootstrapException if the server socket can't be opened on the specified port.
 	 */
-	protected void init(int port) throws JPPFBootstrapException
+	protected final void init(int port) throws JPPFBootstrapException
 	{
 		Exception e = null;
 		try

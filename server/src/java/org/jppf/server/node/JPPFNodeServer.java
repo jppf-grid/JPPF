@@ -47,7 +47,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	/**
 	 * Log4j logger for this class.
 	 */
-	protected static Logger log = Logger.getLogger(JPPFNodeServer.class);
+	protected static final Logger log = Logger.getLogger(JPPFNodeServer.class);
 	/**
 	 * The uuid for the task bundle sent to a newly connected node.
 	 */

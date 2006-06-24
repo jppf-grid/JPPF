@@ -20,8 +20,10 @@
 package org.jppf.classloader;
 
 import org.apache.log4j.Logger;
-import org.jppf.comm.socket.*;
-import org.jppf.utils.*;
+import org.jppf.comm.socket.SocketClient;
+import org.jppf.comm.socket.SocketInitializer;
+import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.utils.JPPFBuffer;
 
 /**
  * Wrapper around an incoming socket connection, whose role is to receive the names of classes
@@ -96,7 +98,7 @@ public class ClassServerDelegate extends Thread
 	 * Initialize this node's resources.
 	 * @throws Exception if an error is raised during initialization.
 	 */
-	public synchronized void init() throws Exception
+	public final void init() throws Exception
 	{
 		if (socketClient == null) initSocketClient();
 		System.out.println("ClassServerDelegate.init(): Attempting connection to the class server");
@@ -149,7 +151,7 @@ public class ClassServerDelegate extends Thread
 	 * Set the stop flag to true, indicating that this socket handler should be closed as
 	 * soon as possible.
 	 */
-	private synchronized void setStopped()
+	private void setStopped()
 	{
 		stop = true;
 	}
