@@ -195,16 +195,20 @@ public abstract class AbstractOptionElement implements OptionElement
 
 	/**
 	 * Set the tooltip text displayed with the UI component.
-	 * @param toolTipText the tooltip as a string.
+	 * @param tooltip the tooltip as a string.
 	 */
-	public void setToolTipText(String toolTipText)
+	public void setToolTipText(String tooltip)
 	{
-		if ((toolTipText != null) && (toolTipText.indexOf("\\n") >= 0))
+		if (((tooltip == null) || "".equals(tooltip.trim())))
 		{
-			String s = toolTipText.replace("\\n", "<br>");
-			toolTipText = "<html>"+s+"</html>";
+			tooltip = null;
 		}
-		this.toolTipText = toolTipText;
+		else if (tooltip.indexOf("\\n") >= 0)
+		{
+			String s = tooltip.replace("\\n", "<br>");
+			tooltip = "<html>"+s+"</html>";
+		}
+		this.toolTipText = tooltip;
 	}
 
 	/**

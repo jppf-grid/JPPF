@@ -1,0 +1,4 @@
+<laf-plugin>
+	<theme-plugin-class>org.jppf.ui.monitoring.JPPFThemePlugin</theme-plugin-class>
+	<watermark-plugin-class>org.jppf.ui.monitoring.JPPFWatermarkPlugin</watermark-plugin-class>
+</laf-plugin>

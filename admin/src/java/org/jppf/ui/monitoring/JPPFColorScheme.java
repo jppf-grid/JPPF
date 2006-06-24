@@ -35,7 +35,7 @@ public class JPPFColorScheme implements ColorScheme
 	 */
 	public Color getForegroundColor()
 	{
-		return new Color(0, 0, 128);
+		return new Color(0, 0, 96);
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class JPPFColorScheme implements ColorScheme
 	 */
 	public Color getUltraLightColor()
 	{
-		return new Color(255, 255, 255);
+		return new Color(64, 64, 128);
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class JPPFColorScheme implements ColorScheme
 	 */
 	public Color getExtraLightColor()
 	{
-		return new Color(255, 255, 192);
+		return new Color(64, 64, 160);
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class JPPFColorScheme implements ColorScheme
 	 */
 	public Color getLightColor()
 	{
-		return new Color(255, 255, 128);
+		return new Color(96, 96, 160);
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class JPPFColorScheme implements ColorScheme
 	 */
 	public Color getDarkColor()
 	{
-		return new Color(128, 128, 255);
+		return new Color(255, 255, 128);
 	}
 
 	/**
@@ -95,6 +95,6 @@ public class JPPFColorScheme implements ColorScheme
 	 */
 	public Color getUltraDarkColor()
 	{
-		return new Color(128, 128, 255);
+		return new Color(255, 255, 160);
 	}
 }

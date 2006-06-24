@@ -118,6 +118,20 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	 */
 	protected JPanel layoutComponents(JComponent comp1, JComponent comp2)
 	{
+		return layoutComponents(comp1, comp2, this.orientation);
+	}
+
+	/**
+	 * Layout 2 components according to the specified orientation.
+	 * This method adds a filler (invisible) component between the 2 components,
+	 * which will grow or decrease whenever the enclosing panel is resized.
+	 * @param comp1 the first component to layout.
+	 * @param comp2 the second component to layout.
+	 * @param orientation the orientation to use to compute the layout.
+	 * @return a <code>JPanel</code> instance, enclosing the 2 components plus the filler.
+	 */
+	protected JPanel layoutComponents(JComponent comp1, JComponent comp2, int orientation)
+	{
 		JPanel panel = new JPanel();
 		if ((comp1 == null) && (comp2 == null)) return panel;
 		if ((comp1 != null) && (comp2 != null))

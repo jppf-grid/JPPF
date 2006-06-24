@@ -137,7 +137,14 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 		panel.setLayout(g);
 		createFiller();
 		GuiUtils.addLayoutComp(panel, g, fillerConstraints, filler);
-		UIComponent = scrollable ? new JScrollPane(panel) : panel;
+		if (scrollable)
+		{
+			JScrollPane sp = new JScrollPane(panel);
+			sp.setBorder(BorderFactory.createEmptyBorder());
+			UIComponent = sp;
+		}
+		else UIComponent = panel;
+		
 		if ((width > 0) && (height > 0))
 		{
 			Dimension d = new Dimension(width, height);
@@ -200,22 +207,6 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 */
 	public void add(OptionElement element)
 	{
-		/*
-		if (!children.isEmpty())
-		{
-			int n = children.size() - 1;
-			JComponent comp = children.get(n).getUIComponent();
-			GridBagConstraints gbc =(GridBagConstraints) g.getConstraints(comp);
-	    if (orientation == HORIZONTAL)
-	    {
-	    	gbc.gridx = n;
-	    }
-	    else
-	    {
-	    	gbc.gridy = n;
-	    }
-		}
-		*/
 		children.add(element);
 		if (element instanceof AbstractOptionElement)
 		{
@@ -238,7 +229,7 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 		{
 			((AbstractOption) element).setParent(null);
 		}
-		UIComponent.remove(element.getUIComponent());
+		panel.remove(element.getUIComponent());
 	}
 
 	/**

@@ -64,10 +64,7 @@ public class TextAreaOption extends AbstractOption
 	{
 		textArea = new JTextArea((String) value);
 		textArea.setBorder(BorderFactory.createEmptyBorder());
-		if (toolTipText != null)
-		{
-			textArea.setToolTipText(toolTipText);
-		}
+		if (toolTipText != null) textArea.setToolTipText(toolTipText);
 		JPanel mainPanel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
 		mainPanel.setBorder(BorderFactory.createTitledBorder(label));
 		textArea.setEditable(false);

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="PreviewTool" type="page">
+
+	<property name="label" value="Preview XML-based Page"/>
+	<property name="scrollable" value="false"/>
+	<property name="orientation" value="vertical"/>
+	<property name="bordered" value="false"/>
+	<property name="main" value="true"/>
+
+	<!-- ===================================================================== -->
+	<!--           Server bundle size manual configuration area                -->
+	<!-- ===================================================================== -->
+
+	<child name="SelPreviewPanel" type="page">
+
+		<property name="label" value="Selection and Preview"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="vertical"/>
+		<property name="bordered" value="true"/>
+		<property name="main" value="false"/>
+
+		<child name="BtnPanel" type="page">
+	
+			<property name="label" value="Button Panel"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="horizontal"/>
+			<property name="bordered" value="false"/>
+			<property name="main" value="false"/>
+
+			<child name="filler" type="Filler">
+				<property name="width" value="1"/>
+				<property name="height" value="1"/>
+			</child>
+
+			<child name="Preview" type="Button">
+				<property name="label" value="Preview"/>
+				<property name="tooltip" value="Displays a preview of the selected XML file in a separate frame"/>
+				<listener type="action" class="org.jppf.ui.options.factory.PreviewTool"/>
+			</child>
+
+			<child name="filler" type="Filler">
+				<property name="width" value="1"/>
+				<property name="height" value="1"/>
+			</child>
+
+		</child>
+
+		<child name="SelectFile" type="FileChooser">
+			<property name="label" value="Select file"/>
+			<property name="tooltip" value="Select the file to preview"/>
+			<property name="value" value="../admin/src/resources/org/jppf/ui/options/xml/PreviewTool.xml"/>
+			<property name="extensions" value="xml; XML Files (*.xml)"/>
+			<property name="orientation" value="horizontal"/>
+			<property name="type" value="open"/>
+			<listener type="action" class="org.jppf.ui.options.factory.PreviewTool"/>
+		</child>
+
+	</child>
+
+	<child name="PreviewPanel" type="page">
+		<property name="label" value="Preview"/>
+		<property name="scrollable" value="true"/>
+		<property name="orientation" value="vertical"/>
+		<property name="bordered" value="true"/>
+		<property name="main" value="false"/>
+	</child>
+
+</opt:main>

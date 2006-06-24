@@ -35,6 +35,9 @@ import org.jppf.ui.options.factory.*;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.StringUtils;
 import org.jvnet.substance.*;
+import org.jvnet.substance.tabbed.DefaultTabPreviewPainter;
+import org.jvnet.substance.theme.SubstanceAquaTheme;
+import org.jvnet.substance.watermark.SubstanceNullWatermark;
 
 /**
  * This class provides a graphical interface for monitoring the status and health 
@@ -143,14 +146,14 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		};
 		MonitorTableModel model = new MonitorTableModel(props);
 		table.setModel(model);
-		table.setOpaque(false);
+		table.setOpaque(true);
 		DefaultTableCellRenderer rend1 = new SubstanceDefaultTableCellRenderer();
 		rend1.setHorizontalAlignment(JLabel.RIGHT);
-		rend1.setOpaque(false);
+		rend1.setOpaque(true);
 		table.getColumnModel().getColumn(1).setCellRenderer(rend1);
 		DefaultTableCellRenderer rend0 = new SubstanceDefaultTableCellRenderer();
 		rend0.setHorizontalAlignment(JLabel.LEFT);
-		rend0.setOpaque(false);
+		rend0.setOpaque(true);
 		table.getColumnModel().getColumn(0).setCellRenderer(rend0);
 		tableModels.add(model);
 		panel.add(table);
@@ -222,9 +225,14 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	{
 		try
 		{
+			UIManager.put(SubstanceLookAndFeel.ENABLE_INVERTED_THEMES, Boolean.TRUE);
+			UIManager.put(SubstanceLookAndFeel.TABBED_PANE_PREVIEW_PAINTER, new DefaultTabPreviewPainter());
+			JFrame.setDefaultLookAndFeelDecorated(true);
 			UIManager.setLookAndFeel(new SubstanceLookAndFeel());
-			SubstanceLookAndFeel.setCurrentWatermark(new TiledImageWatermark("org/jppf/ui/resources/GridWatermark.gif"));
-			SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme(new JPPFColorScheme(), "JPPF", false));
+			//SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme(new JPPFColorScheme(), "JPPF", false));
+			SubstanceLookAndFeel.setCurrentTheme(new SubstanceAquaTheme());
+			SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
+			for (Frame frm: Frame.getFrames()) SwingUtilities.updateComponentTreeUI(frm);
 			JFrame frame = new JFrame("JPPF monitoring and administration tool");
 			ImageIcon icon = GuiUtils.loadIcon("/org/jppf/ui/resources/logo-32x32.gif");
 			frame.setIconImage(icon.getImage());

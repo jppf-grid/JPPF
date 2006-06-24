@@ -19,19 +19,34 @@
  */
 package org.jppf.ui.monitoring;
 
-import org.jvnet.substance.theme.SubstanceTheme;
+import java.util.*;
+import org.jvnet.substance.plugin.SubstanceWatermarkPlugin;
+import org.jvnet.substance.watermark.WatermarkInfo;
 
 /**
- * JPPF Theme for Substance L&F.
+ * 
  * @author Laurent Cohen
  */
-public class JPPFTheme extends SubstanceTheme
+public class JPPFWatermarkPlugin implements SubstanceWatermarkPlugin
 {
 	/**
-	 * Default initialization.
+	 * @return .
+	 * @see org.jvnet.substance.plugin.SubstanceWatermarkPlugin#getWatermarks()
 	 */
-	public JPPFTheme()
+	public Set<WatermarkInfo> getWatermarks()
 	{
-		super(new JPPFColorScheme(), "JPPF Theme", ThemeKind.COLD);
+		WatermarkInfo wi = new WatermarkInfo("JPPF", JPPFTiledWatermark.class.getName());
+		Set<WatermarkInfo> set = new HashSet<WatermarkInfo>();
+		set.add(wi);
+		return set;
+	}
+
+	/**
+	 * @return .
+	 * @see org.jvnet.substance.plugin.SubstanceWatermarkPlugin#getDefaultWatermarkClassName()
+	 */
+	public String getDefaultWatermarkClassName()
+	{
+		return JPPFTiledWatermark.class.getName();
 	}
 }

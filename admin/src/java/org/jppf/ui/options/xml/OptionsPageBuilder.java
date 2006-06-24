@@ -21,6 +21,7 @@ package org.jppf.ui.options.xml;
 
 import java.util.*;
 import javax.swing.ListSelectionModel;
+import org.apache.log4j.Logger;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.event.ValueChangeListener;
 import org.jppf.ui.options.xml.OptionDescriptor.*;
@@ -32,6 +33,10 @@ import org.jppf.utils.StringUtils;
  */
 public class OptionsPageBuilder
 {
+	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(OptionsPageBuilder.class);
 	/**
 	 * Base name used to localize labels and tooltips.
 	 */
@@ -69,7 +74,7 @@ public class OptionsPageBuilder
 	{
 		for (OptionElement child: page.getChildren())
 		{
-			if ((child instanceof AbstractOption) && !(child instanceof ButtonOption))
+			if ((child instanceof AbstractOption) && !(child instanceof ButtonOption) && !(child instanceof FileChooserOption))
 			{
 				((AbstractOption) child).fireValueChanged();
 			}
@@ -84,9 +89,8 @@ public class OptionsPageBuilder
 	 * Initialize the attributes common to all option elements from an option descriptor. 
 	 * @param elt the element whose attributes are to be initialized.
 	 * @param desc the descriptor to get the attribute values from.
-	 * @throws Exception if an error was raised while initializing the attributes.
 	 */
-	public void initCommonAttributes(AbstractOptionElement elt, OptionDescriptor desc) throws Exception
+	public void initCommonAttributes(AbstractOptionElement elt, OptionDescriptor desc)
 	{
 		elt.setName(desc.name);
 		elt.setLabel(StringUtils.getLocalized(baseName, desc.name+".label"));
@@ -103,16 +107,22 @@ public class OptionsPageBuilder
 	 * Initialize the attributes common to all options from an option descriptor. 
 	 * @param option the option whose attributes are to be initialized.
 	 * @param desc the descriptor to get the attribute values from.
-	 * @throws Exception if an error was raised while initializing the attributes.
 	 */
-	public void initCommonOptionAttributes(AbstractOption option, OptionDescriptor desc) throws Exception
+	public void initCommonOptionAttributes(AbstractOption option, OptionDescriptor desc)
 	{
 		initCommonAttributes(option, desc);
 		for (ListenerDescriptor listenerDesc: desc.listeners)
 		{
-			Class clazz = Class.forName(listenerDesc.className);
-			ValueChangeListener listener = (ValueChangeListener) clazz.newInstance();
-			option.addValueChangeListener(listener);
+			try
+			{
+				Class clazz = Class.forName(listenerDesc.className);
+				ValueChangeListener listener = (ValueChangeListener) clazz.newInstance();
+				option.addValueChangeListener(listener);
+			}
+			catch(Exception e)
+			{
+				log.error(e.getMessage(), e);
+			}
 		}
 	}
 
@@ -143,6 +153,7 @@ public class OptionsPageBuilder
 			else if ("ComboBox".equals(type)) page.add(buildComboBox(child));
 			else if ("Filler".equals(type)) page.add(buildFiller(child));
 			else if ("List".equals(type)) page.add(buildList(child));
+			else if ("FileChooser".equals(type)) page.add(buildFileChooser(child));
 		}
 		page.setEventsEnabled(true);
 		return page;
@@ -322,6 +333,25 @@ public class OptionsPageBuilder
 		int width = desc.getInt("width", 1);
 		int height = desc.getInt("height", 1);
 		FillerOption option = new FillerOption(width, height);
+		return option;
+	}
+
+	/**
+	 * Build a file chooser option from the specified option descriptor.
+	 * @param desc the descriptor to get the page properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public Option buildFileChooser(OptionDescriptor desc) throws Exception
+	{
+		FileChooserOption option = new FileChooserOption();
+		initCommonOptionAttributes(option, desc);
+		int dlgType = "open".equals(desc.getProperty("type"))
+			? FileChooserOption.OPEN : FileChooserOption.SAVE;
+		option.setDialogType(dlgType);
+		option.setExtensions(desc.getProperty("extensions"));
+		option.setValue(desc.getProperty("value"));
+		option.createUI();
 		return option;
 	}
 }

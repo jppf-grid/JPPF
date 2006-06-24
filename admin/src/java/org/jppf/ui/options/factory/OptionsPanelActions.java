@@ -26,8 +26,7 @@ import org.jppf.ui.monitoring.JPPFTheme;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.Option;
 import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.color.ColorScheme;
-import org.jvnet.substance.theme.SubstanceTheme;
+import org.jvnet.substance.theme.*;
 
 /**
  * This panel enbles the users to set the options for the administration and monitoring GUI.
@@ -38,35 +37,39 @@ public class OptionsPanelActions extends AbstractActionsHolder
 	/**
 	 * Contains a list of all available themes fully qualified class names.
 	 */
-	private static Map<String, String> colorSchemeMap = createThemeMap();
+	//private static Map<String, String> themeMap = createThemeMap();
+	/**
+	 * Contains a list of all available themes fully qualified class names.
+	 */
+	private static Map<String, SubstanceTheme> themeMap = createThemeInstanceMap();
 	
 	/**
 	 * Create a map of names to corresponding themes fully qualified class names.
 	 * @return a map of string keys associated to string values.
 	 */
-	private static Map<String, String> createThemeMap()
+	private static Map<String, SubstanceTheme> createThemeInstanceMap()
 	{
-		Map<String, String> map = new TreeMap<String, String>();
-		map.put("Aqua",  "org.jvnet.substance.color.AquaColorScheme");
-		map.put("BarbyPink",  "org.jvnet.substance.color.BarbyPinkColorScheme");
-		map.put("BottleGreen",  "org.jvnet.substance.color.BottleGreenColorScheme");
-		map.put("Brown",  "org.jvnet.substance.color.BrownColorScheme");
-		map.put("Charcoal",  "org.jvnet.substance.color.CharcoalColorScheme");
-		map.put("DarkViolet",  "org.jvnet.substance.color.DarkVioletColorScheme");
-		map.put("Ebony",  "org.jvnet.substance.color.EbonyColorScheme");
-		map.put("LightAqua",  "org.jvnet.substance.color.LightAquaColorScheme");
-		map.put("LimeGreen",  "org.jvnet.substance.color.LimeGreenColorScheme");
-		map.put("Olive",  "org.jvnet.substance.color.OliveColorScheme");
-		map.put("Orange",  "org.jvnet.substance.color.OrangeColorScheme");
-		map.put("Purple",  "org.jvnet.substance.color.PurpleColorScheme");
-		map.put("Raspberry",  "org.jvnet.substance.color.RaspberryColorScheme");
-		map.put("Sepia",  "org.jvnet.substance.color.SepiaColorScheme");
-		map.put("SteelBlue",  "org.jvnet.substance.color.SteelBlueColorScheme");
-		map.put("SunfireRed",  "org.jvnet.substance.color.SunfireRedColorScheme");
-		map.put("SunGlare",  "org.jvnet.substance.color.SunGlareColorScheme");
-		map.put("Sunset",  "org.jvnet.substance.color.SunsetColorScheme");
-		map.put("Terracotta",  "org.jvnet.substance.color.TerracottaColorScheme");
-		map.put("JPPF", "org.jppf.ui.monitoring.JPPFColorScheme");
+		Map<String, SubstanceTheme> map = new TreeMap<String, SubstanceTheme>();
+		map.put("Aqua",  new SubstanceAquaTheme());
+		map.put("BarbyPink",  new SubstanceBarbyPinkTheme());
+		map.put("BottleGreen",  new SubstanceBottleGreenTheme());
+		map.put("Brown",  new SubstanceBrownTheme());
+		map.put("Charcoal",  new SubstanceCharcoalTheme());
+		map.put("DarkViolet",  new SubstanceDarkVioletTheme());
+		map.put("Ebony",  new SubstanceEbonyTheme());
+		map.put("LightAqua",  new SubstanceLightAquaTheme());
+		map.put("LimeGreen",  new SubstanceLimeGreenTheme());
+		map.put("Olive",  new SubstanceOliveTheme());
+		map.put("Orange",  new SubstanceOrangeTheme());
+		map.put("Purple",  new SubstancePurpleTheme());
+		map.put("Raspberry",  new SubstanceRaspberryTheme());
+		map.put("Sepia",  new SubstanceSepiaTheme());
+		map.put("SteelBlue",  new SubstanceSteelBlueTheme());
+		map.put("SunfireRed",  new SubstanceSunfireRedTheme());
+		map.put("SunGlare",  new SubstanceSunGlareTheme());
+		map.put("Sunset",  new SubstanceSunsetTheme());
+		map.put("Terracotta",  new SubstanceTerracottaTheme());
+		map.put("JPPF", new JPPFTheme());
 		return map;
 	}
 	
@@ -88,11 +91,12 @@ public class OptionsPanelActions extends AbstractActionsHolder
 	{
 		currentColorScheme = colorSchemeName;
 		currentSchemeDark = dark;
-		String className = colorSchemeMap.get(currentColorScheme);
+		//String className = themeMap.get(currentColorScheme);
 		try
 		{
-			ColorScheme scheme = (ColorScheme) Class.forName(className).newInstance();
-			SubstanceTheme theme = new JPPFTheme(scheme, colorSchemeName, dark);
+			//ThemeInfo ti = new ThemeInfo(colorSchemeName, className, dark ? ThemeKind.DARK : ThemeKind.BRIGHT);
+			//SubstanceTheme theme = SubstanceTheme.createInstance(ti);
+			SubstanceTheme theme = themeMap.get(currentColorScheme);
 			SubstanceLookAndFeel.setCurrentTheme(theme);
 			for (Frame frame: Frame.getFrames()) SwingUtilities.updateComponentTreeUI(frame);
 		}

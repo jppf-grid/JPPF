@@ -19,19 +19,36 @@
  */
 package org.jppf.ui.monitoring;
 
-import org.jvnet.substance.theme.SubstanceTheme;
+import java.util.*;
+import org.jvnet.substance.plugin.SubstanceThemePlugin;
+import org.jvnet.substance.theme.ThemeInfo;
+import org.jvnet.substance.theme.SubstanceTheme.ThemeKind;
 
 /**
- * JPPF Theme for Substance L&F.
+ * 
  * @author Laurent Cohen
  */
-public class JPPFTheme extends SubstanceTheme
+public class JPPFThemePlugin implements SubstanceThemePlugin
 {
 	/**
-	 * Default initialization.
+	 * 
+	 * @return .
+	 * @see org.jvnet.substance.plugin.SubstanceThemePlugin#getDefaultThemeClassName()
 	 */
-	public JPPFTheme()
+	public String getDefaultThemeClassName()
 	{
-		super(new JPPFColorScheme(), "JPPF Theme", ThemeKind.COLD);
+		return JPPFTheme.class.getName();
+	}
+
+	/**
+	 * 
+	 * @return .
+	 * @see org.jvnet.substance.plugin.SubstanceThemePlugin#getThemes()
+	 */
+	public Set<ThemeInfo> getThemes()
+	{
+		Set<ThemeInfo> set = new HashSet<ThemeInfo>();
+		set.add(new ThemeInfo("JPPF Theme", JPPFTheme.class.getName(), ThemeKind.COLD));
+		return set;
 	}
 }

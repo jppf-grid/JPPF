@@ -107,6 +107,7 @@ public class ListOption extends AbstractOption
 	public void createUI()
 	{
 		list = new JList();
+		if (toolTipText != null) list.setToolTipText(toolTipText);
 		DefaultListModel model = new DefaultListModel();
 		list.setModel(model);
 		list.setSelectionMode(selMode);
