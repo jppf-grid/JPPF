@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.util.*;
 import javax.swing.JComponent;
 import javax.swing.tree.TreePath;
+import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
 
 /**
  * Default abstract implementation of the <code>OptionElement</code> interface.
@@ -74,6 +75,10 @@ public abstract class AbstractOptionElement implements OptionElement
 	 * Preferred height of the UI component.
 	 */
 	protected int height = -1;
+	/**
+	 * Scripts used by this option or its children.
+	 */
+	protected List<ScriptDescriptor> scripts = new ArrayList<ScriptDescriptor>();
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -462,5 +467,15 @@ public abstract class AbstractOptionElement implements OptionElement
 			Dimension d = UIComponent.getPreferredSize();
 			UIComponent.setPreferredSize(new Dimension(width, d.height));
 		}
+	}
+
+	/**
+	 * Get the scripts used by this option or its children.
+	 * @return a list of <code>ScriptDescriptor</code> instances.
+	 * @see org.jppf.ui.options.OptionElement#getScripts()
+	 */
+	public List<ScriptDescriptor> getScripts()
+	{
+		return scripts;
 	}
 }

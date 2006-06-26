@@ -26,8 +26,8 @@ import org.jppf.ui.monitoring.charts.ChartType;
 import org.jppf.ui.monitoring.charts.config.*;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.options.*;
+import org.jppf.ui.options.event.AbstractActionsHolder;
 import org.jppf.utils.*;
-import org.jppf.utils.CollectionUtils;
 
 /**
  * Actions and listeners for the charts configuration panel.
@@ -61,7 +61,7 @@ public class ChartConfigActions extends AbstractActionsHolder
 
 	/**
 	 * Initialize the mapping of an option name to the method to invoke when the option's value changes.
-	 * @see org.jppf.ui.options.factory.AbstractActionsHolder#initializeMethodMap()
+	 * @see org.jppf.ui.options.event.AbstractActionsHolder#initializeMethodMap()
 	 */
 	protected void initializeMethodMap()
 	{

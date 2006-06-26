@@ -7,12 +7,28 @@
 	<property name="bordered" value="false"/>
 	<property name="main" value="true"/>
 	<property name="tooltip" value=""/>
+	<script language="javascript"><![CDATA[
+		importPackage(java.lang);
+		importPackage(java.util);
+		importPackage(Packages.org.jppf.server.protocol);
+		importPackage(Packages.org.jppf.server.protocol);
+		importPackage(Packages.org.jppf.ui.monitoring.data);
+		importPackage(Packages.org.jppf.ui.options);
+		importPackage(Packages.org.jppf.ui.options.factory);
+		importPackage(Packages.org.jppf.ui.options.event);
+	]]></script>
 
 	<child name="Manual" type="Boolean">
 		<property name="label" value="Use manual settings"/>
 		<property name="tooltip" value="Toggles between manual and automatic tuning of the bundle size"/>
 		<property name="value" value="true"/>
-		<listener type="value" class="org.jppf.ui.options.factory.BundleSizeTuningActions"/>
+		<listener type="script">
+			<script language="javascript"><![CDATA[
+				b = option.getValue().booleanValue();
+				option.findElement("../ManualConfig").setEnabled(b);
+				option.findElement("../AutoConfig").setEnabled(!b);
+			]]></script>
+		</listener>
 	</child>
 
 
@@ -38,13 +54,31 @@
 			<child name="Refresh" type="Button">
 				<property name="label" value="Refresh Settings"/>
 				<property name="tooltip" value="Refreshes the settings from the server values"/>
-				<listener type="action" class="org.jppf.ui.options.factory.BundleSizeTuningActions"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						n = StatsHandler.getInstance().getLatestStats().bundleSize;
+						if (n > 0)
+						{
+							option.findFirstWithName("/bundleSize").setValue(new Long(n));
+						}
+					]]></script>
+				</listener>
 			</child>
 
 			<child name="ApplyManual" type="Button">
 				<property name="label" value="Change Settings"/>
 				<property name="tooltip" value="Apply new settings by sending them to the server"/>
-				<listener type="action" class="org.jppf.ui.options.factory.BundleSizeTuningActions"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						page = OptionsHandler.getPage("Admin");
+						pwd = page.findFirstWithName("/actualPwd").getValue();
+						params = new HashMap();
+						params.put(AdminRequest.BUNDLE_SIZE_PARAM, option.findFirstWithName("/bundleSize").getValue());
+						params.put(AdminRequest.BUNDLE_TUNING_TYPE_PARAM, "manual");
+						msg = StatsHandler.getInstance().changeSettings(pwd, params);
+						if (msg != null) option.findElement("/msgText").setValue(msg);
+					]]></script>
+				</listener>
 			</child>
 		</child>
 
@@ -86,7 +120,23 @@
 			<child name="ApplyAuto" type="Button">
 				<property name="label" value="Apply"/>
 				<property name="tooltip" value="Apply the current settings to the server immediately"/>
-				<listener type="action" class="org.jppf.ui.options.factory.BundleSizeTuningActions"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						page = OptionsHandler.getPage("Admin");
+						pwd = page.findFirstWithName("actualPwd").getValue();
+						params = new HashMap();
+						params.put(AdminRequest.BUNDLE_TUNING_TYPE_PARAM, "auto");
+						params.put("MinSamplesToAnalyse", option.findFirstWithName("/MinSamplesToAnalyse").getValue());
+						params.put("MinSamplesToCheckConvergence", option.findFirstWithName("/MinSamplesToCheckConvergence").getValue());
+						params.put("MaxDeviation", option.findFirstWithName("/MaxDeviation").getValue());
+						params.put("MaxGuessToStable", option.findFirstWithName("/MaxGuessToStable").getValue());
+						params.put("SizeRatioDeviation", option.findFirstWithName("/SizeRatioDeviation").getValue());
+						params.put("DecreaseRatio", option.findFirstWithName("/DecreaseRatio").getValue());
+						params.put("manual", Boolean.FALSE);
+						msg = StatsHandler.getInstance().changeSettings(pwd, params);
+						if (msg != null) option.findElement("/msgText").setValue(msg);
+					]]></script>
+				</listener>
 			</child>
 
 			<child name="filler2" type="Filler">

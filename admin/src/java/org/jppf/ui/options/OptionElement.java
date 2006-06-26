@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.tree.TreePath;
+import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
 
 
 /**
@@ -131,4 +132,9 @@ public interface OptionElement extends Serializable
 	 * @return a <code>JComponent</code> instance.
 	 */
 	JComponent getUIComponent();
+	/**
+	 * Get the scripts used by this option or its children.
+	 * @return a list of <code>ScriptDescriptor</code> instances.
+	 */
+	List<ScriptDescriptor> getScripts();
 }

@@ -83,6 +83,8 @@ public class OptionDescriptorParser
 				String name = childNode.getNodeName();
 				if ("child".equals(name))
 					desc.children.add(generateTree(childNode));
+				else if ("script".equals(name))
+					desc.scripts.add(createScriptDescriptor(childNode));
 				else if ("property".equals(name))
 					addProperty(desc, childNode);
 				else if ("item".equals(name))
@@ -118,10 +120,74 @@ public class OptionDescriptorParser
 		ListenerDescriptor desc = new ListenerDescriptor();
 		NamedNodeMap attrMap = node.getAttributes();
 		desc.type = attrMap.getNamedItem("type").getNodeValue();
-		desc.className = attrMap.getNamedItem("class").getNodeValue();
+		setListenerAttributes(node, desc);
 		return desc;
 	}
 
+	/**
+	 * Set the attributes of a listener descriptor.
+	 * @param node the parent listener node.
+	 * @param desc the listener descriptor whose attributeshave to be set.
+	 */
+	public void setListenerAttributes(Node node, ListenerDescriptor desc)
+	{
+		NodeList list = node.getChildNodes();
+		for (int i=0; i<list.getLength(); i++)
+		{
+			Node childNode = list.item(i);
+			if (childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				String name = childNode.getNodeName();
+				if ("class".equals(name)) desc.className = getTextNodeValue(childNode);
+				else if ("script".equals(name)) desc.script = createScriptDescriptor(childNode);
+				else continue;
+				break;
+			}
+		}
+		getClass();
+	}
+
+	/**
+	 * Get the value of a node's text subelement.
+	 * @param node the node to generate whosde child is a text node.
+	 * @return the text as a string.
+	 */
+	public String getTextNodeValue(Node node)
+	{
+		NodeList children = node.getChildNodes();
+		for (int j=0; j<children.getLength(); j++)
+		{
+			Node tmpNode = children.item(j);
+			if (tmpNode.getNodeType() == Node.TEXT_NODE)
+			{
+				return tmpNode.getNodeValue();
+			}
+		}
+		return null;
+	}
+
+
+	/**
+	 * Create a script descriptor from a DOM node.
+	 * @param node the node to generate the listener from.
+	 * @return a <code>ScriptDescriptor</code> instance.
+	 */
+	public ScriptDescriptor createScriptDescriptor(Node node)
+	{
+		ScriptDescriptor desc = new ScriptDescriptor();
+		NodeList children = node.getChildNodes();
+		for (int j=0; j<children.getLength(); j++)
+		{
+			Node tmpNode = children.item(j);
+			if (tmpNode.getNodeType() == Node.CDATA_SECTION_NODE)
+			{
+				desc.scriptLanguage = node.getAttributes().getNamedItem("language").getNodeValue();
+				desc.scriptSource = tmpNode.getNodeValue();
+				break;
+			}
+		}
+		return desc;
+	}
 	/**
 	 * Add a property to an option descriptor from a DOM node.
 	 * @param desc the option descriptor to add the property to.

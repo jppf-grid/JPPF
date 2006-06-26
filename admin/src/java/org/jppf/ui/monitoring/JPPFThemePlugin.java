@@ -48,7 +48,7 @@ public class JPPFThemePlugin implements SubstanceThemePlugin
 	public Set<ThemeInfo> getThemes()
 	{
 		Set<ThemeInfo> set = new HashSet<ThemeInfo>();
-		set.add(new ThemeInfo("JPPF Theme", JPPFTheme.class.getName(), ThemeKind.COLD));
+		set.add(new ThemeInfo("JPPF", JPPFTheme.class.getName(), ThemeKind.COLD));
 		return set;
 	}
 }

@@ -38,6 +38,10 @@ public class SchemaValidator
 	 * Schema factory instance used to load XML schemas. 
 	 */
 	private static SchemaFactory sf = null;
+	/**
+	 * Path to the document currently being validated.
+	 */
+	private static String currentDocPath = null;
 
 	/**
 	 * Entry point to test this class.
@@ -54,6 +58,7 @@ public class SchemaValidator
 			List<String> docPaths = FileUtils.getFilePathList(args[1]);
 			for (String path: docPaths)
 			{
+				currentDocPath = path;
 				boolean b = validate(path, args[0]);
 				String s = "the document " + path;
 				System.out.println(s + (b ? " is valid." : " has errors."));
@@ -183,7 +188,10 @@ public class SchemaValidator
 	 */
 	public static void printSAXParseException(SAXParseException e)
 	{
-		e.printStackTrace();
+		System.out.println("File " + currentDocPath + "at " +
+			e.getLineNumber() + ":" + e.getColumnNumber() + ":");
+		System.out.println(e.getMessage());
+		//e.printStackTrace();
 	}
 
 	/**

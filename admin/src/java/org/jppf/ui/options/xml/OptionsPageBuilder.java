@@ -23,7 +23,7 @@ import java.util.*;
 import javax.swing.ListSelectionModel;
 import org.apache.log4j.Logger;
 import org.jppf.ui.options.*;
-import org.jppf.ui.options.event.ValueChangeListener;
+import org.jppf.ui.options.event.*;
 import org.jppf.ui.options.xml.OptionDescriptor.*;
 import org.jppf.utils.StringUtils;
 
@@ -101,6 +101,7 @@ public class OptionsPageBuilder
 		elt.setBordered(desc.getBoolean("bordered", false));
 		elt.setWidth(desc.getInt("width", -1));
 		elt.setHeight(desc.getInt("height", -1));
+		for (ScriptDescriptor script: desc.scripts) elt.getScripts().add(script);
 	}
 
 	/**
@@ -115,8 +116,17 @@ public class OptionsPageBuilder
 		{
 			try
 			{
-				Class clazz = Class.forName(listenerDesc.className);
-				ValueChangeListener listener = (ValueChangeListener) clazz.newInstance();
+				ValueChangeListener listener = null;
+				if ("java".equals(listenerDesc.type))
+				{
+					Class clazz = Class.forName(listenerDesc.className);
+					listener = (ValueChangeListener) clazz.newInstance();
+				}
+				else
+				{
+					listener = new ScriptedValueChangeListener(listenerDesc.script.scriptLanguage,
+						listenerDesc.script.scriptSource);
+				}
 				option.addValueChangeListener(listener);
 			}
 			catch(Exception e)

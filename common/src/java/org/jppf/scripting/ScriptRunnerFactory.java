@@ -17,21 +17,29 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.ui.monitoring;
-
-import org.jvnet.substance.theme.SubstanceTheme;
+package org.jppf.scripting;
 
 /**
- * JPPF Theme for Substance L&F.
+ * Factory used to instantiate script runners.
  * @author Laurent Cohen
  */
-public class JPPFTheme extends SubstanceTheme
+public final class ScriptRunnerFactory
 {
 	/**
-	 * Default initialization.
+	 * Instantiation of this class is not allowed.
 	 */
-	public JPPFTheme()
+	private ScriptRunnerFactory()
 	{
-		super(new JPPFColorScheme(), "JPPF", ThemeKind.COLD);
+	}
+
+	/**
+	 * Instantiate a script runner based on the specified script language.
+	 * @param language the name of the script language to use.
+	 * @return A <code>ScriptRunner</code> instance, or null if no known sciprt runner
+	 * exists for the specified language.
+	 */
+	public static ScriptRunner makeScriptRunner(String language)
+	{
+		return new RhinoScriptRunner();
 	}
 }

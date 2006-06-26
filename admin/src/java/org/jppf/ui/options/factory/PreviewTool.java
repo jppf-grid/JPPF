@@ -19,10 +19,9 @@
  */
 package org.jppf.ui.options.factory;
 
-import java.util.*;
 import javax.swing.*;
 import org.jppf.ui.monitoring.JPPFTheme;
-import org.jppf.ui.options.*;
+import org.jppf.ui.options.OptionsPage;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
 import org.jppf.ui.utils.GuiUtils;
 import org.jvnet.substance.SubstanceLookAndFeel;
@@ -33,46 +32,12 @@ import org.jvnet.substance.watermark.SubstanceNullWatermark;
  * This class implements a tool that gives the user a preview of an XML-defined page.
  * @author Laurent Cohen
  */
-public class PreviewTool extends AbstractActionsHolder
+public class PreviewTool
 {
 	/**
 	 * The top-level frame of this tool.
 	 */
 	private static JFrame topFrame = null;
-
-	/**
-	 * Initialize the mapping of option name to the method to invoke when the option's value changes.
-	 * @see org.jppf.ui.options.factory.AbstractActionsHolder#initializeMethodMap()
-	 */
-	protected void initializeMethodMap()
-	{
-		addMapping("Preview", "previewPage");
-		addMapping("SelectFile", "previewPage");
-	}
-
-	/**
-	 * Preview an XML-based page.
-	 */
-	public void previewPage()
-	{
-		try
-		{
-			Option file = (Option) option.findFirstWithName("/SelectFile");
-			String s = (String) file.getValue();
-			OptionsPageBuilder builder = new OptionsPageBuilder();
-			OptionsPage page = builder.buildPage(s);
-			OptionsPage pp = (OptionsPage) option.findFirstWithName("/PreviewPanel");
-			List<OptionElement> list = new ArrayList<OptionElement>(pp.getChildren());
-			for (OptionElement elt: list) pp.remove(elt);
-			pp.add(page);
-			pp.add(new FillerOption(1, 1));
-			pp.getUIComponent().updateUI();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * Entry point for this tool.

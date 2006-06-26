@@ -17,21 +17,41 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.ui.monitoring;
+package org.jppf.scripting;
 
-import org.jvnet.substance.theme.SubstanceTheme;
+import org.jppf.JPPFException;
 
 /**
- * JPPF Theme for Substance L&F.
+ * Exception thrown when an error occurs while executring a script.
  * @author Laurent Cohen
  */
-public class JPPFTheme extends SubstanceTheme
+public class JPPFScriptingException extends JPPFException
 {
 	/**
-	 * Default initialization.
+	 * Initialize this exception with a specified message and cause exception.
+	 * @param message the message for this exception.
+	 * @param cause the cause exception.
 	 */
-	public JPPFTheme()
+	public JPPFScriptingException(String message, Throwable cause)
 	{
-		super(new JPPFColorScheme(), "JPPF", ThemeKind.COLD);
+		super(message, cause);
+	}
+
+	/**
+	 * Initialize this exception with a specified message.
+	 * @param message the message for this exception.
+	 */
+	public JPPFScriptingException(String message)
+	{
+		super(message);
+	}
+
+	/**
+	 * Initialize this exception with a specified cause exception.
+	 * @param cause the cause exception.
+	 */
+	public JPPFScriptingException(Throwable cause)
+	{
+		super(cause);
 	}
 }

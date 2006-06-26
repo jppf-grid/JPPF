@@ -10,6 +10,15 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/saverbeans-sdk/saverbeans-ant.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saverbeans-sdk/saverbeans-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/Substance/substance-2.3.jar"/>
+	<classpathentry exported="true" sourcepath="C:/Tools/Substance-2.3/src" kind="lib" path="lib/Substance/substance-2.3.jar">
+		<attributes>
+			<attribute value="file:/C:/Tools/Substance-2.3/docs/api/" name="javadoc_location"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry exported="true" sourcepath="C:/Tools/rhino1_6R2/src" kind="lib" path="lib/Rhino/js.jar">
+		<attributes>
+			<attribute value="file:/C:/Tools/rhino1_6R2/docs/apidocs/" name="javadoc_location"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

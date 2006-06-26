@@ -45,7 +45,7 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 	/**
 	 * 
 	 */
-	private static float opacity = 0.5f;
+	private static float opacity = 0.2f;
 	/**
 	 * The original image (as read from the disk / HTTP connection).
 	 */

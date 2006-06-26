@@ -18,6 +18,23 @@
 		<property name="orientation" value="vertical"/>
 		<property name="bordered" value="true"/>
 		<property name="main" value="false"/>
+		<script language="javascript"><![CDATA[
+			importPackage(Packages.org.jppf.ui.options.xml);
+			importPackage(Packages.org.jppf.ui.options);
+			function doAction()
+			{
+				file = option.findFirstWithName("/SelectFile");
+				s = file.getValue();
+				var builder = new OptionsPageBuilder();
+				page = builder.buildPage(s);
+				pp = option.findFirstWithName("/PreviewPanel");
+				list = new java.util.ArrayList(pp.getChildren());
+				for (i=0; i<list.size(); i++) pp.remove(list.get(i));
+				pp.add(page);
+				pp.add(new FillerOption(1, 1));
+				pp.getUIComponent().updateUI();
+			}
+		]]></script>
 
 		<child name="BtnPanel" type="page">
 	
@@ -35,7 +52,9 @@
 			<child name="Preview" type="Button">
 				<property name="label" value="Preview"/>
 				<property name="tooltip" value="Displays a preview of the selected XML file in a separate frame"/>
-				<listener type="action" class="org.jppf.ui.options.factory.PreviewTool"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[ doAction(); ]]></script>
+				</listener>
 			</child>
 
 			<child name="filler" type="Filler">
@@ -52,7 +71,9 @@
 			<property name="extensions" value="xml; XML Files (*.xml)"/>
 			<property name="orientation" value="horizontal"/>
 			<property name="type" value="open"/>
-			<listener type="action" class="org.jppf.ui.options.factory.PreviewTool"/>
+			<listener type="script">
+				<script language="javascript"><![CDATA[ doAction(); ]]></script>
+			</listener>
 		</child>
 
 	</child>

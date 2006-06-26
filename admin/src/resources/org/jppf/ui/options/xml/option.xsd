@@ -13,6 +13,7 @@
 	<xs:complexType name="OptionElement">
 		<xs:sequence>
 			<xs:element name="property" type="opt:Property" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="script" type="opt:Script" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="listener" type="opt:Listener" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="item" type="opt:Item" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="child" type="opt:OptionElement" minOccurs="0" maxOccurs="unbounded"/>
@@ -28,13 +29,31 @@
 	</xs:complexType>
 
 	<xs:complexType name="Listener">
-		<xs:attribute name="type"/>
-		<xs:attribute name="class"/>
+		<xs:choice>
+			<xs:element name="class" type="xs:string"/>
+			<xs:element name="script" type="opt:Script"/>
+		</xs:choice>
+		<xs:attribute name="type" type="opt:ListenerType"/>
 	</xs:complexType>
 
 	<xs:complexType name="Item">
 		<xs:attribute name="name"/>
 		<xs:attribute name="selected"/>
 	</xs:complexType>
+
+	<xs:complexType name="Script">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="language"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:simpleType name="ListenerType">
+	  <xs:restriction base="xs:string">
+	    <xs:enumeration value="java"/>
+	    <xs:enumeration value="script"/>
+	  </xs:restriction>
+	</xs:simpleType>
 
 </schema>

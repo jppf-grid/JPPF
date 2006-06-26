@@ -1,3 +1,4 @@
 org/jppf/ui/options/xml/AdminPage.xml
 org/jppf/ui/options/xml/BundleSizeTuningPage.xml
 org/jppf/ui/options/xml/ChartsConfigPage.xml
+org/jppf/ui/options/xml/PreviewTool.xml

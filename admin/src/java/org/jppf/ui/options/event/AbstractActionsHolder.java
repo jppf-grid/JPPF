@@ -17,13 +17,13 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.ui.options.factory;
+package org.jppf.ui.options.event;
 
 import java.lang.reflect.Method;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.jppf.ui.options.*;
-import org.jppf.ui.options.event.*;
+import org.jppf.ui.options.factory.OptionsHandler;
 
 /**
  * 

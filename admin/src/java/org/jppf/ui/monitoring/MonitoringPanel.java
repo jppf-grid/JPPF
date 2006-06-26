@@ -35,8 +35,7 @@ import org.jppf.ui.options.factory.*;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.StringUtils;
 import org.jvnet.substance.*;
-import org.jvnet.substance.tabbed.DefaultTabPreviewPainter;
-import org.jvnet.substance.theme.SubstanceAquaTheme;
+import org.jvnet.substance.tabbed.*;
 import org.jvnet.substance.watermark.SubstanceNullWatermark;
 
 /**
@@ -85,7 +84,6 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		add(makeTablePanel(QUEUE_PROPS, StringUtils.getLocalized(BASE, "QueueTable.label")));
 		add(Box.createVerticalStrut(5));
 		add(makeTablePanel(CONNECTION_PROPS, StringUtils.getLocalized(BASE, "ConnectionsTable.label")));
-		//add(Box.createVerticalStrut(5));
 		add(Box.createVerticalGlue());
 	}
 	
@@ -230,7 +228,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 			JFrame.setDefaultLookAndFeelDecorated(true);
 			UIManager.setLookAndFeel(new SubstanceLookAndFeel());
 			//SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme(new JPPFColorScheme(), "JPPF", false));
-			SubstanceLookAndFeel.setCurrentTheme(new SubstanceAquaTheme());
+			SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme());
 			SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
 			for (Frame frm: Frame.getFrames()) SwingUtilities.updateComponentTreeUI(frm);
 			JFrame frame = new JFrame("JPPF monitoring and administration tool");

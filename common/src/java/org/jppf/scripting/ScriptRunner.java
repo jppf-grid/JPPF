@@ -17,21 +17,32 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.ui.monitoring;
+package org.jppf.scripting;
 
-import org.jvnet.substance.theme.SubstanceTheme;
+import java.util.Map;
+
 
 /**
- * JPPF Theme for Substance L&F.
+ * Common interface for all script runners, allowing access to a scripting engine.
  * @author Laurent Cohen
  */
-public class JPPFTheme extends SubstanceTheme
+public interface ScriptRunner
 {
 	/**
-	 * Default initialization.
+	 * Evaluate the script specified as input and get the evaluation result.
+	 * @param script a string containing the script to evaluate.
+	 * @param variables a mapping of objects to add the scope of the script.
+	 * @return the result of the evaluation as an object. The actual type of the result
+	 * depends on the scripting engine that is used.
+	 * @throws JPPFScriptingException if an error occurs while evaluating the script.
 	 */
-	public JPPFTheme()
-	{
-		super(new JPPFColorScheme(), "JPPF", ThemeKind.COLD);
-	}
+	Object evaluate(String script, Map<String, Object> variables) throws JPPFScriptingException;
+	/**
+	 * Initialize the execution environment.
+	 */
+	void init();
+	/**
+	 * Perform cleanup after we're done using this script runner.
+	 */
+	void cleanup();
 }

@@ -7,6 +7,174 @@
 	<property name="orientation" value="vertical"/>
 	<property name="bordered" value="false"/>
 	<property name="main" value="true"/>
+	<script language="javascript"><![CDATA[
+		importPackage(java.lang);
+		importPackage(java.util);
+		importPackage(java.awt);
+		importPackage(javax.swing);
+		importPackage(org.jppf.ui.monitoring.charts);
+		importPackage(org.jppf.ui.monitoring.charts.config);
+		importPackage(org.jppf.ui.monitoring.data);
+		importPackage(org.jppf.ui.options);
+		importPackage(org.jppf.ui.options.event);
+		importPackage(org.jppf.utils);
+	]]></script>
+	<script language="javascript"><![CDATA[
+		root = option.getRoot();
+	]]></script>
+	<script language="javascript"><![CDATA[
+		function populateChartsList(tabConfig, chartConfig)
+		{
+			listOption = option.findFirstWithName("/ChartsList");
+			if (tabConfig == null)
+			{
+				listOption.setItems(new ArrayList());
+				listOption.setValue(null);
+			}
+			else
+			{
+				listOption.setItems(tabConfig.configs);
+				values = new ArrayList();
+				if (chartConfig != null) values.add(chartConfig);
+				listOption.setValue(values);
+			}
+		}
+
+		function populateTabsList(tab)
+		{
+			listOption = option.findFirstWithName("/TabsList");
+			listOption.setItems(JPPFChartBuilder.getInstance().getTabList());
+			if (tab != null)
+			{
+				List value = new ArrayList();
+				value.add(tab);
+				listOption.setValue(value);
+			}
+		}
+
+		function populateTabsCombo(tab)
+		{
+			comboOption = option.findFirstWithName("/TabName");
+			comboOption.setItems(JPPFChartBuilder.getInstance().getTabList());
+			if (tab != null) comboOption.setValue(tab);
+		}
+
+		function populateFields(tab, config)
+		{
+			option.findFirstWithName("/ChartName").setValue(config.name);
+			option.findFirstWithName("/TabName").setValue(tab);
+			option.findFirstWithName("/Unit").setValue(config.unit == null ? "" : config.unit);
+			option.findFirstWithName("/Precision").setValue(config.precision);
+			option.findFirstWithName("/ChartType").setValue(config.type);
+			option.findFirstWithName("/FieldsList").setValue(CollectionUtils.list(config.fields));
+		}
+
+		function getPopulatedConfiguration()
+		{
+			config = new ChartConfiguration();
+			config.name = option.findFirstWithName("/ChartName").getValue();
+			config.unit = option.findFirstWithName("/Unit").getValue();
+			if ("".equals(config.unit)) config.unit = null;
+			config.precision = option.findFirstWithName("/Precision").getValue().intValue();
+			config.type = option.findFirstWithName("/ChartType").getValue();
+			list = option.findFirstWithName("/FieldsList").getValue();
+			fields = new Fields[list.size()];
+			for (int i=0; i<fields.length; i++) fields[i] = list.get(i);
+			config.fields = fields;
+			return config;
+		}
+
+		function getTabConfig()
+		{
+			values = getListValues("TabsList");
+			return values.isEmpty() ? null : values.get(0);
+		}
+
+		function getChartConfig()
+		{
+			values = getListValues("ChartsList");
+			return values.isEmpty() ? null : values.get(0);
+		}
+
+		function getListValues(optionName)
+		{
+			if (option == null) return new ArrayList();
+			listOption = option.findFirstWithName("/" + optionName);
+			values = listOption.getValue();
+			return values == null ? new ArrayList() : values;
+		}
+
+		function getListItems(String optionName)
+		{
+			if (option == null) return new ArrayList();
+			listOption = option.findFirstWithName("/" + optionName);
+			item = listOption.getItems();
+			return item == null ? new ArrayList<Object>() : item;
+		}
+
+		function changePreview(config)
+		{
+			if (config == null) return;
+			if (option == null) return;
+			JPPFChartBuilder.getInstance().createChart(config, true);
+			JComponent comp = option.findFirstWithName("/ChartPreview").getUIComponent();
+			comp.removeAll();
+			GridBagConstraints c = new GridBagConstraints();
+			c.weightx = 1.0;
+			c.weighty = 1.0;
+			c.gridheight = GridBagConstraints.REMAINDER;
+			c.gridwidth = GridBagConstraints.REMAINDER;
+			c.fill = GridBagConstraints.BOTH;
+			comp.add(config.chartPanel, c);
+			config.chart.setBackgroundPaint(comp.getBackground());
+			comp.updateUI();
+		}
+
+		function resetAllEnabledStates()
+		{
+			resetListEnabledStates("TabsList", "TabRemove", "TabUp", "TabDown");
+			resetListEnabledStates("ChartsList", "ChartRemove", "ChartUp", "ChartDown");
+		}
+
+		function resetListEnabledStates(listName, String[] btnName)
+		{
+			list = getListValues(listName);
+			o = list.isEmpty() ? null : list.get(0);
+			items = getListItems(listName);
+			idx = (o == null) ? -1 : items.indexOf(o);
+			option.findFirstWithName("/" + btnName[0]).setEnabled(o != null);
+			option.findFirstWithName("/" + btnName[1]).setEnabled(idx > 0);
+			option.findFirstWithName("/" + btnName[2]).setEnabled((idx >= 0) && (idx < items.size() - 1));
+		}
+
+		function tabMoved()
+		{
+			root.setEventsEnabled(false);
+			tab = getTabConfig();
+			increment = "TabUp".equals(option.getName()) ? -1 : 1;
+			builder = JPPFChartBuilder.getInstance();
+			builder.removeTab(tab);
+			tab.position += increment;
+			builder.addTab(tab);
+			populateTabsList(tab);
+			populateTabsCombo(tab);
+			root.setEventsEnabled(true);
+		}
+
+		function chartMoved()
+		{
+			root.setEventsEnabled(false);
+			chartConfig = getChartConfig();
+			tabConfig = getTabConfig();
+			increment = "ChartUp".equals(option.getName()) ? -1 : 1;
+			builder = JPPFChartBuilder.getInstance();
+			builder.removeChart(tabConfig, chartConfig);
+			chartConfig.position += increment;
+			builder.addChart(tabConfig, chartConfig);
+			populateChartsList(tabConfig, chartConfig);
+			root.setEventsEnabled(true);
+		}
+	]]></script>
 
 	<!-- ===================================================================== -->
 	<!--                   Top Panels                                          -->
@@ -29,25 +197,58 @@
 			<child name="TabNew" type="Button">
 				<property name="label" value="New"/>
 				<property name="tooltip" value="Create a new tab"/>
-				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+				<!--<listener type="java"><class>org.jppf.ui.options.factory.ChartConfigActions</class></listener>-->
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						root.setEventsEnabled(false);
+						s = JOptionPane.showInputDialog(option.getUIComponent(), StringUtils.getLocalized(BASE_NAME, "new.tab.name"), 
+							StringUtils.getLocalized(BASE_NAME, "new.tab.title"), JOptionPane.PLAIN_MESSAGE, null, null, null);
+						if ((s != null) && !"".equals(s.trim()))
+						{
+							tab = new TabConfiguration(s, -1);
+							JPPFChartBuilder.getInstance().addTab(tab);
+							populateTabsList(tab);
+							populateTabsCombo(tab);
+							populateChartsList(tab, null);
+						}
+						root.setEventsEnabled(true);
+					]]></script>
+				</listener>
 			</child>
 
 			<child name="TabRemove" type="Button">
 				<property name="label" value="Remove"/>
 				<property name="tooltip" value="Remove the tab"/>
-				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						root.setEventsEnabled(false);
+						JPPFChartBuilder.getInstance().removeTab(getTabConfig());
+						populateTabsList(null);
+						populateTabsCombo(null);
+						populateChartsList(null, null);
+						root.setEventsEnabled(true);
+					]]></script>
+				</listener>
 			</child>
 
 			<child name="TabUp" type="Button">
 				<property name="label" value="Up"/>
 				<property name="tooltip" value="Move the tab one position up"/>
-				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						tabMoved();
+					]]></script>
+				</listener>
 			</child>
 
 			<child name="TabDown" type="Button">
 				<property name="label" value="Down"/>
 				<property name="tooltip" value="Move the tab one position down"/>
-				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						tabMoved();
+					]]></script>
+				</listener>
 			</child>
 
 			<child name="filler" type="Filler">
@@ -67,7 +268,16 @@
 			<property name="selection" value="single"/>
 			<property name="width" value="140"/>
 			<property name="height" value="80"/>
-			<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+			<listener type="script">
+				<script language="javascript"><![CDATA[
+					root.setEventsEnabled(false);
+					values = option.getValue();
+					if ((values == null) || (values.isEmpty())) return;
+					populateChartsList(getTabConfig(), null);
+					resetAllEnabledStates();
+					root.setEventsEnabled(true);
+				]]></script>
+			</listener>
 		</child>
 
 		<child name="filler" type="Filler">
@@ -85,19 +295,36 @@
 			<child name="ChartRemove" type="Button">
 				<property name="label" value="Remove"/>
 				<property name="tooltip" value="Remove the chart"/>
-				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						option.findElement("/").setEventsEnabled(false);
+						tabConfig = getTabConfig();
+						chartConfig = getChartConfig();
+						JPPFChartBuilder.getInstance().removeChart(tabConfig, chartConfig);
+						populateChartsList(tabConfig, chartConfig);
+						root.setEventsEnabled(true);
+					]]></script>
+				</listener>
 			</child>
 
 			<child name="ChartUp" type="Button">
 				<property name="label" value="Up"/>
 				<property name="tooltip" value="Move the chart one position up"/>
-				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						chartMoved();
+					]]></script>
+				</listener>
 			</child>
 
 			<child name="ChartDown" type="Button">
 				<property name="label" value="Down"/>
 				<property name="tooltip" value="Move the chart one position down"/>
-				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						chartMoved();
+					]]></script>
+				</listener>
 			</child>
 
 			<child name="filler" type="Filler">
@@ -117,7 +344,18 @@
 			<property name="orientation" value="horizontal"/>
 			<property name="width" value="140"/>
 			<property name="height" value="80"/>
-			<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+			<listener type="script">
+				<script language="javascript"><![CDATA[
+					root.setEventsEnabled(false);
+					values = option.getValue();
+					if ((values == null) || values.isEmpty()) return;
+					config = values.get(0);
+					populateFields(getTabConfig(), config);
+					changePreview(config);
+					resetAllEnabledStates();
+					root.setEventsEnabled(true);
+				]]></script>
+			</listener>
 		</child>
 
 		<child name="filler" type="Filler">
@@ -150,7 +388,6 @@
 				<property name="tooltip" value="Select the name of the tab this chart will be displayed in"/>
 				<property name="value" value="Some tab name"/>
 				<property name="orientation" value="horizontal"/>
-				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
 				<item name="Some tab name" selected="true"/>
 			</child>
 	
@@ -166,7 +403,11 @@
 				<property name="tooltip" value="Select the type of chart"/>
 				<property name="value" value="3D Bar Chart"/>
 				<property name="orientation" value="horizontal"/>
-				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						changePreview(getPopulatedConfiguration());
+					]]></script>
+				</listener>
 			</child>
 	
 			<child name="Precision" type="SpinnerNumber">
@@ -197,7 +438,11 @@
 			<property name="orientation" value="horizontal"/>
 			<property name="width" value="220"/>
 			<property name="height" value="200"/>
-			<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+			<listener type="script">
+				<script language="javascript"><![CDATA[
+					changePreview(getPopulatedConfiguration());
+				]]></script>
+			</listener>
 		</child>
 
 		<child name="ChartActionsPanel" type="page">
@@ -210,13 +455,39 @@
 			<child name="SaveNewChart" type="Button">
 				<property name="label" value="Save as new"/>
 				<property name="tooltip" value="Save the chart configuration as a new chart"/>
-				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						root.setEventsEnabled(false);
+						config = getPopulatedConfiguration();
+						tabConfig = getTabConfig();
+						JPPFChartBuilder.getInstance().addChart(tabConfig, config);
+						populateTabsList(tabConfig);
+						populateChartsList(tabConfig, config);
+						root.setEventsEnabled(true);
+					]]></script>
+				</listener>
 			</child>
 
 			<child name="UpdateChart" type="Button">
 				<property name="label" value="Update"/>
 				<property name="tooltip" value="Update the chart with the new configuration"/>
-				<listener type="action" class="org.jppf.ui.options.factory.ChartConfigActions"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						listOption = option.findFirstWithName("/TabsList");
+						newTab = (TabConfiguration) ((List) listOption.getValue()).get(0);
+						currentTab = getTabConfig();
+						root.setEventsEnabled(false);
+						oldConfig = getChartConfig();
+						newConfig = getPopulatedConfiguration();
+						if (newTab == currentTab) newConfig.position = currentTab.configs.indexOf(oldConfig);
+						builder = JPPFChartBuilder.getInstance();
+						builder.removeChart(currentTab, oldConfig);
+						builder.addChart(newTab, newConfig);
+						populateTabsList(newTab);
+						populateChartsList(newTab, newConfig);
+						root.setEventsEnabled(true);
+					]]></script>
+				</listener>
 			</child>
 
 			<child name="filler" type="Filler">
