@@ -75,14 +75,15 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 			OptionElement elt = (OptionElement) o;
 			for (ScriptDescriptor desc: elt.getScripts())
 			{
-				if (language.equals(desc.scriptLanguage))
+				if (language.equals(desc.language))
 				{
-					sb.append(desc.scriptSource).append("\n");
+					sb.append(desc.source).append("\n");
 				}
 			}
 		}
 		sb.append(script);
 		Map<String, Object> variables = new HashMap<String, Object>();
+		variables.put("root", option.getRoot());
 		variables.put("option", option);
 		try
 		{

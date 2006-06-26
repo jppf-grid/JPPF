@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.util.*;
 import javax.swing.JComponent;
 import javax.swing.tree.TreePath;
+import org.jppf.ui.options.event.ValueChangeListener;
 import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
 
 /**
@@ -79,6 +80,11 @@ public abstract class AbstractOptionElement implements OptionElement
 	 * Scripts used by this option or its children.
 	 */
 	protected List<ScriptDescriptor> scripts = new ArrayList<ScriptDescriptor>();
+	/**
+	 * The action to fire immediately after the page is built, allowing to
+	 * perform initializations before the page is displayed and used.
+	 */
+	protected ValueChangeListener initializer = null;
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -148,6 +154,7 @@ public abstract class AbstractOptionElement implements OptionElement
 	public void setParent(OptionElement parent)
 	{
 		this.parent = parent;
+		if (parent == null) root = null;
 	}
 
 	/**
@@ -477,5 +484,24 @@ public abstract class AbstractOptionElement implements OptionElement
 	public List<ScriptDescriptor> getScripts()
 	{
 		return scripts;
+	}
+
+	/**
+	 * Get the initializer for this option.
+	 * @return a <code>ValueChangeListener</code> instance. 
+	 * @see org.jppf.ui.options.OptionElement#getInitializer()
+	 */
+	public ValueChangeListener getInitializer()
+	{
+		return initializer;
+	}
+
+	/**
+	 * Set the initializer for this option.
+	 * @param initializer a <code>ValueChangeListener</code> instance.
+	 */
+	public void setInitializer(ValueChangeListener initializer)
+	{
+		this.initializer = initializer;
 	}
 }

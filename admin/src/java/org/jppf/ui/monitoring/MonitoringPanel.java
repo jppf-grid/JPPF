@@ -227,7 +227,6 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 			UIManager.put(SubstanceLookAndFeel.TABBED_PANE_PREVIEW_PAINTER, new DefaultTabPreviewPainter());
 			JFrame.setDefaultLookAndFeelDecorated(true);
 			UIManager.setLookAndFeel(new SubstanceLookAndFeel());
-			//SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme(new JPPFColorScheme(), "JPPF", false));
 			SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme());
 			SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
 			for (Frame frm: Frame.getFrames()) SwingUtilities.updateComponentTreeUI(frm);
@@ -270,10 +269,10 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		builder.createInitialCharts();
 		JTabbedPane tabbedPane = new JTabbedPane();
 		MonitoringPanel monitor = new MonitoringPanel(statsHandler);
-		OptionsPage ccPage = OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/ChartsConfigPage.xml");
-		ChartConfigActions cca = new ChartConfigActions();
-		cca.initialize(ccPage);
-		
+		//OptionsPage ccPage = OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/ChartsConfigPage.xml");
+		//ChartConfigActions cca = new ChartConfigActions();
+		//cca.initialize(ccPage);
+		OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/ChartsConfigPage.xml");
 		OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/AdminPage.xml");
 		OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/BundleSizeTuningPage.xml");
 

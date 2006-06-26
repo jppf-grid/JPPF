@@ -68,19 +68,19 @@ public class OptionsPageBuilder
 	/**
 	 * Trigger all events listeners for all options, immeidately after the page has been built.
 	 * This ensures the consistence of the UI's initial state.
-	 * @param page the root page of the options on which to trigger the events.
+	 * @param elt the root element of the options on which to trigger the events.
 	 */
-	private void triggerInitialEvents(OptionsPage page)
+	private void triggerInitialEvents(OptionElement elt)
 	{
-		for (OptionElement child: page.getChildren())
+		if (elt.getInitializer() != null)
 		{
-			if ((child instanceof AbstractOption) && !(child instanceof ButtonOption) && !(child instanceof FileChooserOption))
+			elt.getInitializer().valueChanged(new ValueChangeEvent(elt));
+		}
+		if (elt instanceof OptionsPage)
+		{
+			for (OptionElement child: ((OptionsPage) elt).getChildren())
 			{
-				((AbstractOption) child).fireValueChanged();
-			}
-			else if (child instanceof OptionsPage)
-			{
-				triggerInitialEvents((OptionsPage) child);
+				triggerInitialEvents(child);
 			}
 		}
 	}
@@ -102,6 +102,7 @@ public class OptionsPageBuilder
 		elt.setWidth(desc.getInt("width", -1));
 		elt.setHeight(desc.getInt("height", -1));
 		for (ScriptDescriptor script: desc.scripts) elt.getScripts().add(script);
+		if (desc.initializer != null) elt.setInitializer(createListener(desc.initializer));
 	}
 
 	/**
@@ -114,9 +115,23 @@ public class OptionsPageBuilder
 		initCommonAttributes(option, desc);
 		for (ListenerDescriptor listenerDesc: desc.listeners)
 		{
-			try
+			ValueChangeListener listener = createListener(listenerDesc);
+			if (listener != null) option.addValueChangeListener(listener);
+		}
+	}
+
+	/**
+	 * Create a value change listener from a listener descriptor.
+	 * @param listenerDesc the listener descriptor to get the listener properties from.
+	 * @return a ValueChangeListener instance.
+	 */
+	public ValueChangeListener createListener(ListenerDescriptor listenerDesc)
+	{
+		ValueChangeListener listener = null;
+		try
+		{
+			if (listenerDesc != null)
 			{
-				ValueChangeListener listener = null;
 				if ("java".equals(listenerDesc.type))
 				{
 					Class clazz = Class.forName(listenerDesc.className);
@@ -124,16 +139,16 @@ public class OptionsPageBuilder
 				}
 				else
 				{
-					listener = new ScriptedValueChangeListener(listenerDesc.script.scriptLanguage,
-						listenerDesc.script.scriptSource);
+					ScriptDescriptor script = listenerDesc.script;
+					listener = new ScriptedValueChangeListener(script.language, script.source);
 				}
-				option.addValueChangeListener(listener);
-			}
-			catch(Exception e)
-			{
-				log.error(e.getMessage(), e);
 			}
 		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		return listener;
 	}
 
 	/**

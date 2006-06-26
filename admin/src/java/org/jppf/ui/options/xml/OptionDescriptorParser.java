@@ -85,6 +85,8 @@ public class OptionDescriptorParser
 					desc.children.add(generateTree(childNode));
 				else if ("script".equals(name))
 					desc.scripts.add(createScriptDescriptor(childNode));
+				else if ("initializer".equals(name))
+					desc.initializer = createListenerDescriptor(childNode);
 				else if ("property".equals(name))
 					addProperty(desc, childNode);
 				else if ("item".equals(name))
@@ -181,8 +183,8 @@ public class OptionDescriptorParser
 			Node tmpNode = children.item(j);
 			if (tmpNode.getNodeType() == Node.CDATA_SECTION_NODE)
 			{
-				desc.scriptLanguage = node.getAttributes().getNamedItem("language").getNodeValue();
-				desc.scriptSource = tmpNode.getNodeValue();
+				desc.language = node.getAttributes().getNamedItem("language").getNodeValue();
+				desc.source = tmpNode.getNodeValue();
 				break;
 			}
 		}

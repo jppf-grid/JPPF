@@ -66,6 +66,11 @@ public class OptionDescriptor extends TypedProperties
 	public List<ScriptDescriptor> scripts = new ArrayList<ScriptDescriptor>();
 
 	/**
+	 * Items used in list boxes or combo boxes.
+	 */
+	public ListenerDescriptor initializer = null;
+
+	/**
 	 * Descriptor for listeners set on option elements.
 	 */
 	public static class ListenerDescriptor
@@ -98,11 +103,11 @@ public class OptionDescriptor extends TypedProperties
 		/**
 		 * The source of the script to execute if this listener is script-based.
 		 */
-		public String scriptSource = null;
+		public String source = null;
 		/**
 		 * The language in which the script is written, for instancew JavaScript, Groovy, etc.
 		 */
-		public String scriptLanguage = null;
+		public String language = null;
 	}
 
 	/**

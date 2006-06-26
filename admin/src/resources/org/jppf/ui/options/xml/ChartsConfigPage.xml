@@ -8,19 +8,16 @@
 	<property name="bordered" value="false"/>
 	<property name="main" value="true"/>
 	<script language="javascript"><![CDATA[
-		importPackage(java.lang);
-		importPackage(java.util);
-		importPackage(java.awt);
-		importPackage(javax.swing);
-		importPackage(org.jppf.ui.monitoring.charts);
-		importPackage(org.jppf.ui.monitoring.charts.config);
-		importPackage(org.jppf.ui.monitoring.data);
-		importPackage(org.jppf.ui.options);
-		importPackage(org.jppf.ui.options.event);
-		importPackage(org.jppf.utils);
-	]]></script>
-	<script language="javascript"><![CDATA[
-		root = option.getRoot();
+		importPackage(Packages.java.lang);
+		importPackage(Packages.java.util);
+		importPackage(Packages.java.awt);
+		importPackage(Packages.javax.swing);
+		importPackage(Packages.org.jppf.ui.monitoring.charts);
+		importPackage(Packages.org.jppf.ui.monitoring.charts.config);
+		importPackage(Packages.org.jppf.ui.monitoring.data);
+		importPackage(Packages.org.jppf.ui.options);
+		importPackage(Packages.org.jppf.ui.options.event);
+		importPackage(Packages.org.jppf.utils);
 	]]></script>
 	<script language="javascript"><![CDATA[
 		function populateChartsList(tabConfig, chartConfig)
@@ -46,7 +43,7 @@
 			listOption.setItems(JPPFChartBuilder.getInstance().getTabList());
 			if (tab != null)
 			{
-				List value = new ArrayList();
+				value = new ArrayList();
 				value.add(tab);
 				listOption.setValue(value);
 			}
@@ -79,7 +76,8 @@
 			config.type = option.findFirstWithName("/ChartType").getValue();
 			list = option.findFirstWithName("/FieldsList").getValue();
 			fields = new Fields[list.size()];
-			for (int i=0; i<fields.length; i++) fields[i] = list.get(i);
+			var i=0;
+			for (i=0; i<fields.length; i++) fields[i] = list.get(i);
 			config.fields = fields;
 			return config;
 		}
@@ -87,13 +85,15 @@
 		function getTabConfig()
 		{
 			values = getListValues("TabsList");
-			return values.isEmpty() ? null : values.get(0);
+			if (values.isEmpty()) return null;
+			return values.get(0);
 		}
 
 		function getChartConfig()
 		{
 			values = getListValues("ChartsList");
-			return values.isEmpty() ? null : values.get(0);
+			if (values.isEmpty()) return null;
+			return values.get(0);
 		}
 
 		function getListValues(optionName)
@@ -101,15 +101,17 @@
 			if (option == null) return new ArrayList();
 			listOption = option.findFirstWithName("/" + optionName);
 			values = listOption.getValue();
-			return values == null ? new ArrayList() : values;
+			if (values == null) return new ArrayList();
+			return values;
 		}
 
-		function getListItems(String optionName)
+		function getListItems(optionName)
 		{
 			if (option == null) return new ArrayList();
 			listOption = option.findFirstWithName("/" + optionName);
 			item = listOption.getItems();
-			return item == null ? new ArrayList<Object>() : item;
+			if (item == null) return new ArrayList();
+			return item;
 		}
 
 		function changePreview(config)
@@ -117,9 +119,9 @@
 			if (config == null) return;
 			if (option == null) return;
 			JPPFChartBuilder.getInstance().createChart(config, true);
-			JComponent comp = option.findFirstWithName("/ChartPreview").getUIComponent();
+			comp = option.findFirstWithName("/ChartPreview").getUIComponent();
 			comp.removeAll();
-			GridBagConstraints c = new GridBagConstraints();
+			c = new GridBagConstraints();
 			c.weightx = 1.0;
 			c.weighty = 1.0;
 			c.gridheight = GridBagConstraints.REMAINDER;
@@ -136,15 +138,15 @@
 			resetListEnabledStates("ChartsList", "ChartRemove", "ChartUp", "ChartDown");
 		}
 
-		function resetListEnabledStates(listName, String[] btnName)
+		function resetListEnabledStates(listName, btnName0, btnName1, btnName2)
 		{
 			list = getListValues(listName);
 			o = list.isEmpty() ? null : list.get(0);
 			items = getListItems(listName);
 			idx = (o == null) ? -1 : items.indexOf(o);
-			option.findFirstWithName("/" + btnName[0]).setEnabled(o != null);
-			option.findFirstWithName("/" + btnName[1]).setEnabled(idx > 0);
-			option.findFirstWithName("/" + btnName[2]).setEnabled((idx >= 0) && (idx < items.size() - 1));
+			option.findFirstWithName("/" + btnName0).setEnabled(o != null);
+			option.findFirstWithName("/" + btnName1).setEnabled(idx > 0);
+			option.findFirstWithName("/" + btnName2).setEnabled((idx >= 0) && (idx < items.size() - 1));
 		}
 
 		function tabMoved()
@@ -175,6 +177,19 @@
 			root.setEventsEnabled(true);
 		}
 	]]></script>
+	<initializer type="script">
+		<script language="javascript"><![CDATA[
+			option.setEventsEnabled(false);
+			values = CollectionUtils.list(ChartType.values());
+			option.findFirstWithName("ChartType").setItems(values);
+			values = CollectionUtils.list(StatsConstants.ALL_FIELDS);
+			option.findFirstWithName("/FieldsList").setItems(values);
+			populateTabsList(null);
+			populateChartsList(null, null);
+			populateTabsCombo(null);
+			option.setEventsEnabled(true);
+		]]></script>
+	</initializer>
 
 	<!-- ===================================================================== -->
 	<!--                   Top Panels                                          -->
@@ -272,9 +287,11 @@
 				<script language="javascript"><![CDATA[
 					root.setEventsEnabled(false);
 					values = option.getValue();
-					if ((values == null) || (values.isEmpty())) return;
-					populateChartsList(getTabConfig(), null);
-					resetAllEnabledStates();
+					if ((values != null) && !values.isEmpty())
+					{
+						populateChartsList(getTabConfig(), null);
+						resetAllEnabledStates();
+					}
 					root.setEventsEnabled(true);
 				]]></script>
 			</listener>
@@ -348,11 +365,13 @@
 				<script language="javascript"><![CDATA[
 					root.setEventsEnabled(false);
 					values = option.getValue();
-					if ((values == null) || values.isEmpty()) return;
-					config = values.get(0);
-					populateFields(getTabConfig(), config);
-					changePreview(config);
-					resetAllEnabledStates();
+					if ((values != null) && !values.isEmpty())
+					{
+						config = values.get(0);
+						populateFields(getTabConfig(), config);
+						changePreview(config);
+						resetAllEnabledStates();
+					}
 					root.setEventsEnabled(true);
 				]]></script>
 			</listener>

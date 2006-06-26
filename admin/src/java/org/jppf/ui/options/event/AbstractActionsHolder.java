@@ -91,7 +91,7 @@ public abstract class AbstractActionsHolder  implements ValueChangeListener
 	 */
 	public void valueChanged(ValueChangeEvent event)
 	{
-		this.option = event.getOption();
+		this.option = (Option) event.getOption();
 		try
 		{
 			Method m = methodsMap.get(event.getOption().getName());

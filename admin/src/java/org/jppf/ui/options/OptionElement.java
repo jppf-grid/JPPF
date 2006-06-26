@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.tree.TreePath;
+import org.jppf.ui.options.event.ValueChangeListener;
 import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
 
 
@@ -137,4 +138,10 @@ public interface OptionElement extends Serializable
 	 * @return a list of <code>ScriptDescriptor</code> instances.
 	 */
 	List<ScriptDescriptor> getScripts();
+	/**
+	 * Get the action to fire immediately after the page is built, allowing to
+	 * perform initializations before the page is displayed and used.
+	 * @return a ValueChangeListener instance.
+	 */
+	ValueChangeListener getInitializer();
 }

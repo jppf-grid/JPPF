@@ -20,7 +20,7 @@
 package org.jppf.ui.options.event;
 
 import java.util.EventObject;
-import org.jppf.ui.options.Option;
+import org.jppf.ui.options.*;
 
 /**
  * Event generated when the value of an option has changed.
@@ -32,17 +32,17 @@ public class ValueChangeEvent extends EventObject
 	 * Initialize this event with the specified event source.
 	 * @param option the event source.
 	 */
-	public ValueChangeEvent(Option option)
+	public ValueChangeEvent(OptionElement option)
 	{
 		super(option);
 	}
 	
 	/**
 	 * Get the source of this event as an option.
-	 * @return an <code>Option</code> instance.
+	 * @return an <code>OptionElement</code> instance.
 	 */
-	public Option getOption()
+	public OptionElement getOption()
 	{
-		return (Option) getSource();
+		return (OptionElement) getSource();
 	}
 }

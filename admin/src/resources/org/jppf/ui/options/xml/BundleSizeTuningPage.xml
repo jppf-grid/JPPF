@@ -17,6 +17,12 @@
 		importPackage(Packages.org.jppf.ui.options.factory);
 		importPackage(Packages.org.jppf.ui.options.event);
 	]]></script>
+	<initializer type="script">
+		<script language="javascript"><![CDATA[
+			option.findFirstWithName("/ManualConfig").setEnabled(true);
+			option.findFirstWithName("/AutoConfig").setEnabled(false);
+		]]></script>
+	</initializer>
 
 	<child name="Manual" type="Boolean">
 		<property name="label" value="Use manual settings"/>
