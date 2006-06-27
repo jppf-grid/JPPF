@@ -234,4 +234,12 @@
 		</java>       
 	</target>
 
+	<target name="run.ui.builder">
+		<echo message="starting UI Builder Tool"/>
+		<java fork="yes" classname="org.jppf.ui.options.factory.JPPFGuiBuilder" classpathref="gui.classpath">
+			<jvmarg value="-Djppf.config=jppf-gui.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-gui-builder.properties"/>
+		</java>       
+	</target>
+
 </project> 
