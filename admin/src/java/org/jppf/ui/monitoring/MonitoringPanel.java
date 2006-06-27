@@ -31,11 +31,11 @@ import org.jppf.ui.monitoring.charts.config.JPPFChartBuilder;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.options.OptionsPage;
-import org.jppf.ui.options.factory.*;
+import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.StringUtils;
 import org.jvnet.substance.*;
-import org.jvnet.substance.tabbed.*;
+import org.jvnet.substance.tabbed.DefaultTabPreviewPainter;
 import org.jvnet.substance.watermark.SubstanceNullWatermark;
 
 /**

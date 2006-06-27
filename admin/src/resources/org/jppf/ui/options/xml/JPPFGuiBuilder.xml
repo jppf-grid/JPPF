@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="PreviewTool" type="page">
+
+	<property name="label" value="Preview XML-based Page"/>
+	<property name="scrollable" value="false"/>
+	<property name="orientation" value="vertical"/>
+	<property name="bordered" value="false"/>
+	<property name="main" value="true"/>
+	<script language="javascript"><![CDATA[
+		importPackage(Packages.java.lang);
+		importPackage(Packages.java.util);
+		importPackage(Packages.org.jppf.utils);
+		importPackage(Packages.org.jppf.ui.options);
+		importPackage(Packages.org.jppf.ui.options.xml);
+	]]></script>
+
+	<!--
+	<child name="Toolbar" type="Toolbar">
+		<property name="label" value="GUI Builder Toolbar"/>
+		<property name="tooltip" value=""/>
+	</child>
+	-->
+
+	<child name="MainPane" type="SplitPane">
+		<property name="label" value="Selection and Preview"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+		<property name="resizeWeight" value="0.2"/>
+
+		<child name="LeftPane" type="SplitPane">
+			<property name="label" value="Selection and Preview"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="false"/>
+			<property name="main" value="false"/>
+			<property name="resizeWeight" value="0.2"/>
+	
+			<!-- ===================================================================== -->
+			<!--           Selection of the XML file                                   -->
+			<!-- ===================================================================== -->
+		
+			<child name="SelPreviewPanel" type="page">
+				<property name="label" value="Selection and Preview"/>
+				<property name="scrollable" value="true"/>
+				<property name="orientation" value="vertical"/>
+				<property name="bordered" value="true"/>
+				<property name="main" value="false"/>
+				<script language="javascript"><![CDATA[
+					function doAction()
+					{
+						file = option.findFirstWithName("/SelectFile");
+						s = file.getValue();
+						if ((s != null) && !"".equals(s.trim()))
+						{
+							var builder = new OptionsPageBuilder();
+							page = builder.buildPage(s);
+							pp = option.findFirstWithName("/PreviewPanel");
+							list = new ArrayList(pp.getChildren());
+							for (i=0; i<list.size(); i++) pp.remove(list.get(i));
+							pp.add(page);
+							pp.add(new FillerOption(1, 1));
+							pp.getUIComponent().updateUI();
+							text = FileUtils.readTextFile(s);
+							option.findFirstWithName("/Editor").setValue(text);
+						}
+					}
+				]]></script>
+
+				<child name="SelectFile" type="FileChooser">
+					<property name="label" value="Select file"/>
+					<property name="tooltip" value="Select the file to preview"/>
+					<property name="value" value="../admin/src/resources/org/jppf/ui/options/xml/AdminPage.xml"/>
+					<property name="extensions" value="xml; XML Files (*.xml)"/>
+					<property name="orientation" value="vertical"/>
+					<property name="type" value="open"/>
+					<initializer type="script">
+						<script language="javascript"><![CDATA[ doAction(); ]]></script>
+					</initializer>
+					<listener type="script">
+						<script language="javascript"><![CDATA[ doAction(); ]]></script>
+					</listener>
+				</child>
+		
+				<child name="filler" type="Filler">
+					<property name="width" value="1"/>
+					<property name="height" value="1"/>
+				</child>
+	
+			</child>
+		
+			<child name="PreviewPanel" type="page">
+				<property name="label" value="Preview"/>
+				<property name="scrollable" value="true"/>
+				<property name="orientation" value="vertical"/>
+				<property name="bordered" value="true"/>
+				<property name="main" value="false"/>
+			</child>
+	
+		</child>
+
+		<child name="RightPane" type="page">
+			<property name="label" value="XML Editor"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="false"/>
+			<property name="main" value="true"/>
+
+			<child name="Editor" type="XMLEditor">
+				<property name="label" value="XML Editor"/>
+				<property name="tooltip" value=""/>
+				<property name="value" value=""/>
+				<property name="scrollable" value="true"/>
+			</child>
+
+		</child>
+
+	</child>
+
+</opt:main>

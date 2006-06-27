@@ -72,6 +72,10 @@ public class OptionsPageBuilder
 	 */
 	private void triggerInitialEvents(OptionElement elt)
 	{
+		if (elt == null)
+		{
+			return;
+		}
 		if (elt.getInitializer() != null)
 		{
 			elt.getInitializer().valueChanged(new ValueChangeEvent(elt));
@@ -164,12 +168,26 @@ public class OptionsPageBuilder
 		initCommonAttributes(page, desc);
 		page.setMainPage(desc.getBoolean("main"));
 		page.createUI();
+		addChildren(page, desc);
+		page.setEventsEnabled(true);
+		return page;
+	}
+
+	/**
+	 * Add all the children elements in a page.
+	 * @param page the page to add the children to.
+	 * @param desc the descriptor for the page.
+	 * @throws Exception if an error was raised while building the page.
+	 */
+	public void addChildren(OptionsPage page, OptionDescriptor desc) throws Exception
+	{
 		for (OptionDescriptor child: desc.children)
 		{
 			String type = child.type;
 			if ("page".equals(type)) page.add(buildPage(child));
 			else if ("Button".equals(type)) page.add(buildButton(child));
 			else if ("TextArea".equals(type)) page.add(buildTextArea(child));
+			else if ("XMLEditor".equals(type)) page.add(buildXMLEditor(child));
 			else if ("Password".equals(type)) page.add(buildPassword(child));
 			else if ("PlainText".equals(type)) page.add(buildPlainText(child));
 			else if ("FormattedNumber".equals(type)) page.add(buildFormattedNumber(child));
@@ -179,9 +197,9 @@ public class OptionsPageBuilder
 			else if ("Filler".equals(type)) page.add(buildFiller(child));
 			else if ("List".equals(type)) page.add(buildList(child));
 			else if ("FileChooser".equals(type)) page.add(buildFileChooser(child));
+			else if ("SplitPane".equals(type)) page.add(buildSplitPane(child));
+			else if ("Toolbar".equals(type)) page.add(buildToolbar(child));
 		}
-		page.setEventsEnabled(true);
-		return page;
 	}
 
 	/**
@@ -377,6 +395,55 @@ public class OptionsPageBuilder
 		option.setExtensions(desc.getProperty("extensions"));
 		option.setValue(desc.getProperty("value"));
 		option.createUI();
+		return option;
+	}
+
+	/**
+	 * Build a split pane option from the specified option descriptor.
+	 * @param desc the descriptor to get the properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public OptionElement buildSplitPane(OptionDescriptor desc) throws Exception
+	{
+		SplitPaneOption option = new SplitPaneOption();
+		initCommonAttributes(option, desc);
+		option.setDividerWidth(desc.getInt("dividerWidth", 4));
+		option.setResizeWeight(desc.getDouble("resizeWeight", 0.5d));
+		option.createUI();
+		addChildren(option, desc);
+		return option;
+	}
+
+	/**
+	 * Build a text area option from the specified option descriptor.
+	 * @param desc the descriptor to get the page properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public Option buildXMLEditor(OptionDescriptor desc) throws Exception
+	{
+		XMLEditorOption option = new XMLEditorOption();
+		option.setEventsEnabled(false);
+		initCommonOptionAttributes(option, desc);
+		option.createUI();
+		option.setEventsEnabled(true);
+		return option;
+	}
+
+	/**
+	 * Build a filler option from the specified option descriptor.
+	 * @param desc the descriptor to get the properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public OptionElement buildToolbar(OptionDescriptor desc) throws Exception
+	{
+		ToolbarOption option = new ToolbarOption();
+		option.setEventsEnabled(false);
+		initCommonAttributes(option, desc);
+		option.createUI();
+		option.setEventsEnabled(true);
 		return option;
 	}
 }

@@ -9,6 +9,7 @@
 	<property name="main" value="true"/>
 	<script language="javascript"><![CDATA[
 		importPackage(Packages.java.lang);
+		importPackage(Packages.java.lang.reflect);
 		importPackage(Packages.java.util);
 		importPackage(Packages.java.awt);
 		importPackage(Packages.javax.swing);
@@ -75,7 +76,7 @@
 			config.precision = option.findFirstWithName("/Precision").getValue().intValue();
 			config.type = option.findFirstWithName("/ChartType").getValue();
 			list = option.findFirstWithName("/FieldsList").getValue();
-			fields = new Fields[list.size()];
+			var fields = java.lang.reflect.Array.newInstance(Fields, list.size());
 			var i=0;
 			for (i=0; i<fields.length; i++) fields[i] = list.get(i);
 			config.fields = fields;
@@ -116,20 +117,21 @@
 
 		function changePreview(config)
 		{
-			if (config == null) return;
-			if (option == null) return;
-			JPPFChartBuilder.getInstance().createChart(config, true);
-			comp = option.findFirstWithName("/ChartPreview").getUIComponent();
-			comp.removeAll();
-			c = new GridBagConstraints();
-			c.weightx = 1.0;
-			c.weighty = 1.0;
-			c.gridheight = GridBagConstraints.REMAINDER;
-			c.gridwidth = GridBagConstraints.REMAINDER;
-			c.fill = GridBagConstraints.BOTH;
-			comp.add(config.chartPanel, c);
-			config.chart.setBackgroundPaint(comp.getBackground());
-			comp.updateUI();
+			if (config != null)
+			{
+				JPPFChartBuilder.getInstance().createChart(config, true);
+				comp = option.findFirstWithName("/ChartPreview").getUIComponent();
+				comp.removeAll();
+				c = new GridBagConstraints();
+				c.weightx = 1.0;
+				c.weighty = 1.0;
+				c.gridheight = GridBagConstraints.REMAINDER;
+				c.gridwidth = GridBagConstraints.REMAINDER;
+				c.fill = GridBagConstraints.BOTH;
+				comp.add(config.chartPanel, c);
+				config.chart.setBackgroundPaint(comp.getBackground());
+				comp.updateUI();
+			}
 		}
 
 		function resetAllEnabledStates()

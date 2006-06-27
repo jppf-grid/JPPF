@@ -391,7 +391,7 @@ public abstract class AbstractOptionElement implements OptionElement
 		if (name.startsWith("/"))
 		{
 			name = name.substring(1);
-			return ((OptionElement) getPath().getPathComponent(0)).findAllWithName(name);
+			return getRoot().findAllWithName(name);
 		}
 		List<OptionElement> list = new ArrayList<OptionElement>();
 		findAll(name, list);

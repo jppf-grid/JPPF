@@ -105,12 +105,14 @@ public class FileChooserOption extends AbstractOption
 		if ((val == null) || "".equals(val.trim()))
 		{
 			val = System.getProperty("user.dir");
+			value = val;
 		}
 		fileLabel = new JLabel(label);
 		fileField = new JTextField(val);
+		if (val.length() < 10) fileField.setColumns(10);
 		fileBtn = new JButton(" ... ");
-		JPanel valuePanel = layoutComponents(fileField, fileBtn, HORIZONTAL);
-		JPanel panel = layoutComponents(fileLabel, valuePanel);
+		JPanel topPanel = layoutComponents(fileLabel, fileBtn, HORIZONTAL);
+		JPanel panel = layoutComponents(topPanel, fileField);
 		if ((toolTipText != null) && !"".equals(toolTipText.trim()))
 		{
 			fileLabel.setToolTipText(toolTipText);
@@ -162,6 +164,7 @@ public class FileChooserOption extends AbstractOption
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
 			value = chooser.getSelectedFile().getAbsolutePath();
+			fileField.setText((String) value);
 			fireValueChanged();
 		}
 	}
@@ -258,6 +261,7 @@ public class FileChooserOption extends AbstractOption
 		public boolean accept(File f)
 		{
 			if (f == null) return false;
+			if (f.isDirectory()) return true;
 			if ("*".equals(ext)) return true;
 			String s = f.getAbsolutePath();
 			int idx = s.lastIndexOf(".");

@@ -19,6 +19,8 @@
  */
 package org.jppf.ui.options.factory;
 
+import java.awt.Frame;
+import java.awt.event.*;
 import javax.swing.*;
 import org.jppf.ui.monitoring.JPPFTheme;
 import org.jppf.ui.options.OptionsPage;
@@ -32,7 +34,7 @@ import org.jvnet.substance.watermark.SubstanceNullWatermark;
  * This class implements a tool that gives the user a preview of an XML-defined page.
  * @author Laurent Cohen
  */
-public class PreviewTool
+public class JPPFGuiBuilder
 {
 	/**
 	 * The top-level frame of this tool.
@@ -51,15 +53,23 @@ public class PreviewTool
 			UIManager.put(SubstanceLookAndFeel.TABBED_PANE_PREVIEW_PAINTER, new DefaultTabPreviewPainter());
 			JFrame.setDefaultLookAndFeelDecorated(true);
 			UIManager.setLookAndFeel(new SubstanceLookAndFeel());
+			for (Frame frame: Frame.getFrames()) SwingUtilities.updateComponentTreeUI(frame);
 			SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
 			SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme());
-			topFrame = new JFrame("JPPF XML-based UI preview tool");
+			topFrame = new JFrame("JPPF XML-based UI building tool");
+			topFrame.addWindowListener(new WindowAdapter()
+			{
+				public void windowClosing(WindowEvent e)
+				{
+					System.exit(0);
+				}
+			});
 			ImageIcon icon = GuiUtils.loadIcon("/org/jppf/ui/resources/logo-32x32.gif");
 			topFrame.setIconImage(icon.getImage());
 			topFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			topFrame.setSize(500, 400);
 			OptionsPageBuilder builder = new OptionsPageBuilder();
-			OptionsPage page = builder.buildPage("org/jppf/ui/options/xml/PreviewTool.xml");
+			OptionsPage page = builder.buildPage("org/jppf/ui/options/xml/JPPFGuiBuilder.xml");
 			topFrame.getContentPane().add(page.getUIComponent());
 			topFrame.setVisible(true);
 		}
