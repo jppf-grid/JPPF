@@ -98,17 +98,32 @@ public final class FileUtils
 	 * @return a <code>InputStream</code> instance, or null if the schema file could not be found.
 	 * @throws IOException if an IO error occurs while looking up the file.
 	 */
-	public static InputStream findFile(String path) throws IOException
+	public static InputStream getFileInputStream(String path) throws IOException
 	{
 		InputStream is = null;
 		File file = new File(path);
-		if (file.exists()) is = new FileInputStream(file);
+		if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
 		if (is == null)
 		{
 			URL url = FileUtils.class.getClassLoader().getResource(path);
 			is = (url == null) ? null : url.openStream();
 		}
 		return is;
+	}
+
+	/**
+	 * Load a file from the specified path.
+	 * This method looks up the schema first in the file system, then in the classpath
+	 * if it is not found in the file system.
+	 * @param path the path to the file to load.
+	 * @return a <code>Reader</code> instance, or null if the schema file could not be found.
+	 * @throws IOException if an IO error occurs while looking up the file.
+	 */
+	public static Reader getFileReader(String path) throws IOException
+	{
+		InputStream is = getFileInputStream(path);
+		if (is == null) return null;
+		return new InputStreamReader(is);
 	}
 
 	/**
@@ -119,7 +134,7 @@ public final class FileUtils
 	 */
 	public static List<String> getFilePathList(String fileListPath) throws IOException
 	{
-		InputStream is = findFile(fileListPath);
+		InputStream is = getFileInputStream(fileListPath);
 		String content = readTextFile(new BufferedReader(new InputStreamReader(is)));
 		LineNumberReader reader = new LineNumberReader(new StringReader(content));
 		List<String> filePaths = new ArrayList<String>();

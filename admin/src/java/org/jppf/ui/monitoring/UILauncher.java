@@ -17,67 +17,54 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.ui.options.factory;
+package org.jppf.ui.monitoring;
 
 import java.awt.Frame;
-import java.awt.event.*;
 import javax.swing.*;
-import org.jppf.ui.monitoring.JPPFTheme;
-import org.jppf.ui.options.OptionElement;
-import org.jppf.ui.options.xml.OptionsPageBuilder;
-import org.jppf.ui.utils.GuiUtils;
+import org.apache.log4j.Logger;
+import org.jppf.ui.options.factory.OptionsHandler;
 import org.jvnet.substance.SubstanceLookAndFeel;
 import org.jvnet.substance.tabbed.DefaultTabPreviewPainter;
 import org.jvnet.substance.watermark.SubstanceNullWatermark;
 
 /**
- * This class implements a tool that gives the user a preview of an XML-defined page.
+ * This class provides a graphical interface for monitoring the status and health 
+ * of the JPPF server.<br>
+ * It also provides a few customization options, such as setting the interval between 2 server refreshes,
+ * and switching the color scheme (skin) fot the whole UI.
  * @author Laurent Cohen
  */
-public class JPPFGuiBuilder
+public class UILauncher
 {
 	/**
-	 * The top-level frame of this tool.
+	 * Log4j logger for this class.
 	 */
-	private static JFrame topFrame = null;
-
+	static Logger log = Logger.getLogger(UILauncher.class);
 	/**
-	 * Entry point for this tool.
+	 * Start this UI.
 	 * @param args not used.
 	 */
 	public static void main(String...args)
 	{
 		try
 		{
+			if ((args  == null) || (args.length < 2))
+				throw new Exception("Usage: UILauncher page_location location_source");
 			UIManager.put(SubstanceLookAndFeel.ENABLE_INVERTED_THEMES, Boolean.TRUE);
 			UIManager.put(SubstanceLookAndFeel.TABBED_PANE_PREVIEW_PAINTER, new DefaultTabPreviewPainter());
 			JFrame.setDefaultLookAndFeelDecorated(true);
 			UIManager.setLookAndFeel(new SubstanceLookAndFeel());
-			UIManager.getDefaults().put("UJACTextAreaUI", "org.ujac.ui.editor.TextAreaUI");
-			for (Frame frame: Frame.getFrames()) SwingUtilities.updateComponentTreeUI(frame);
-			SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
 			SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme());
-			topFrame = new JFrame("JPPF XML-based UI building tool");
-			topFrame.addWindowListener(new WindowAdapter()
-			{
-				public void windowClosing(WindowEvent e)
-				{
-					System.exit(0);
-				}
-			});
-			ImageIcon icon = GuiUtils.loadIcon("/org/jppf/ui/resources/logo-32x32.gif");
-			topFrame.setIconImage(icon.getImage());
-			topFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			topFrame.setSize(500, 400);
-			OptionsPageBuilder builder = new OptionsPageBuilder();
-			OptionElement page = builder.buildPage("org/jppf/ui/options/xml/JPPFGuiBuilder.xml", null);
-			page.getUIComponent().setDoubleBuffered(true);
-			topFrame.getContentPane().add(page.getUIComponent());
-			topFrame.setVisible(true);
+			SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
+			if ("url".equalsIgnoreCase(args[1]))
+				OptionsHandler.addPageFromURL(args[0], null);
+			else OptionsHandler.addPageFromXml(args[0]);
+			for (Frame frm: Frame.getFrames()) SwingUtilities.updateComponentTreeUI(frm);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 			System.exit(1);
 		}
 	}

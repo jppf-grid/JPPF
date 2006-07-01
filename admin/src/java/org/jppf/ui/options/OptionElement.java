@@ -105,12 +105,22 @@ public interface OptionElement extends Serializable
 	boolean isBordered();
 	/**
 	 * Find the first element with the specified name in the subtree of which
-	 * this element is the root. 
+	 * this element is the root.
+	 * The notion of first element relates to a depth-first search in the tree. 
 	 * @param name the name of the element to find.
 	 * @return an <code>OptionElement</code> instance, or null if no element
 	 * could be found with the specfied name.
 	 */
 	OptionElement findFirstWithName(String name);
+	/**
+	 * Find the last element with the specified name in the subtree of which
+	 * this element is the root. 
+	 * The notion of last element relates to a depth-first search in the tree. 
+	 * @param name the name of the element to find.
+	 * @return an <code>OptionElement</code> instance, or null if no element
+	 * could be found with the specfied name.
+	 */
+	OptionElement findLastWithName(String name);
 	/**
 	 * Find all the elements with the specified name in the subtree of which
 	 * this element is the root. 
@@ -144,4 +154,9 @@ public interface OptionElement extends Serializable
 	 * @return a ValueChangeListener instance.
 	 */
 	ValueChangeListener getInitializer();
+	/**
+	 * Get the path to an eventual icon displayed in the button.
+	 * @return the path as a string.
+	 */
+	String getIconPath();
 }

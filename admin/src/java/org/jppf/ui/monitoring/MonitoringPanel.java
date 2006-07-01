@@ -30,7 +30,7 @@ import org.jppf.server.JPPFStats;
 import org.jppf.ui.monitoring.charts.config.JPPFChartBuilder;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
-import org.jppf.ui.options.OptionsPage;
+import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.StringUtils;
@@ -66,11 +66,10 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 
 	/**
 	 * Default contructor.
-	 * @param statsHandler the stats formatter that provides the data.
 	 */
-	public MonitoringPanel(StatsHandler statsHandler)
+	public MonitoringPanel()
 	{
-		this.statsHandler = statsHandler;
+		this.statsHandler = StatsHandler.getInstance();
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		add(Box.createVerticalStrut(5));
 		add(makeRefreshPanel());
@@ -268,10 +267,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		JPPFChartBuilder builder = JPPFChartBuilder.getInstance();
 		builder.createInitialCharts();
 		JTabbedPane tabbedPane = new JTabbedPane();
-		MonitoringPanel monitor = new MonitoringPanel(statsHandler);
-		//OptionsPage ccPage = OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/ChartsConfigPage.xml");
-		//ChartConfigActions cca = new ChartConfigActions();
-		//cca.initialize(ccPage);
+		MonitoringPanel monitor = new MonitoringPanel();
 		OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/ChartsConfigPage.xml");
 		OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/AdminPage.xml");
 		OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/BundleSizeTuningPage.xml");
@@ -282,7 +278,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 			StringUtils.getLocalized(BASE, "StatsPage.tooltip"));
 		tabbedPane.addTab(StringUtils.getLocalized(BASE, "ChartsPage.label"), null, builder.getTabbedPane(), 
 				StringUtils.getLocalized(BASE, "ChartsPage.tooltip"));
-		for (OptionsPage page: OptionsHandler.getPageList())
+		for (OptionElement page: OptionsHandler.getPageList())
 		{
 			tabbedPane.addTab(page.getLabel(), null, page.getUIComponent(), page.getToolTipText());
 		}

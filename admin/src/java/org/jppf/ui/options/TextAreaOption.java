@@ -20,6 +20,8 @@
 package org.jppf.ui.options;
 
 import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.text.Document;
 import org.jppf.ui.utils.GuiUtils;
 
 /**
@@ -65,12 +67,21 @@ public class TextAreaOption extends AbstractOption
 		textArea = new JTextArea((String) value);
 		textArea.setBorder(BorderFactory.createEmptyBorder());
 		if (toolTipText != null) textArea.setToolTipText(toolTipText);
-		JPanel mainPanel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
-		mainPanel.setBorder(BorderFactory.createTitledBorder(label));
 		textArea.setEditable(false);
 		textArea.setOpaque(false);
-		mainPanel.add(textArea);
-		UIComponent = mainPanel;
+		if (scrollable)
+		{
+			JScrollPane scrollPane = new JScrollPane(textArea);
+			scrollPane.setOpaque(false);
+			UIComponent = scrollPane;
+		}
+		else
+		{
+			JPanel mainPanel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
+			mainPanel.setBorder(BorderFactory.createTitledBorder(label));
+			mainPanel.add(textArea);
+			UIComponent = mainPanel;
+		}
 		setupValueChangeNotifications();
 	}
 
@@ -102,6 +113,24 @@ public class TextAreaOption extends AbstractOption
 	 */
 	protected void setupValueChangeNotifications()
 	{
+		Document doc = (Document) textArea.getDocument();
+		doc.addDocumentListener(new DocumentListener()
+		{
+			public void changedUpdate(DocumentEvent e)
+			{
+				fireValueChanged();
+			}
+
+			public void insertUpdate(DocumentEvent e)
+			{
+				fireValueChanged();
+			}
+
+			public void removeUpdate(DocumentEvent e)
+			{
+				fireValueChanged();
+			}
+		});
 	}
 
 	/**

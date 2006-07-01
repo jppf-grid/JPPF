@@ -19,11 +19,12 @@
  */
 package org.jppf.ui.options.xml;
 
-import java.io.InputStream;
+import java.io.*;
 import javax.xml.parsers.*;
 import org.jppf.ui.options.xml.OptionDescriptor.*;
 import org.jppf.utils.FileUtils;
 import org.w3c.dom.*;
+import org.xml.sax.InputSource;
 
 /**
  * Instances of this class are used to parse an XML document, describing
@@ -48,7 +49,7 @@ public class OptionDescriptorParser
 	}
 
 	/**
-	 * Parse an XML document into a tree of option descriptors. 
+	 * Parse an XML document in a file into a tree of option descriptors. 
 	 * @param docPath the path to XML document to parse.
 	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
 	 * or null if the docuement could not be parsed.
@@ -56,8 +57,22 @@ public class OptionDescriptorParser
 	 */
 	public OptionDescriptor parse(String docPath) throws Exception
 	{
-		InputStream is = FileUtils.findFile(docPath);
+		InputStream is = FileUtils.getFileInputStream(docPath);
 		if (is == null) return null;
+		Document doc = parser.parse(is);
+		return generateTree(doc.getFirstChild());
+	}
+
+	/**
+	 * Parse an XML document in a reader into a tree of option descriptors. 
+	 * @param reader the reader providing the XML document.
+	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
+	 * or null if the docuement could not be parsed.
+	 * @throws Exception if an error occurs while parsing the document.
+	 */
+	public OptionDescriptor parse(Reader reader) throws Exception
+	{
+		InputSource is = new InputSource(reader);
 		Document doc = parser.parse(is);
 		return generateTree(doc.getFirstChild());
 	}
@@ -93,6 +108,8 @@ public class OptionDescriptorParser
 					desc.items.add(createItemDescriptor(childNode));
 				else if ("listener".equals(name))
 					desc.listeners.add(createListenerDescriptor(childNode));
+				else if ("import".equals(name))
+					desc.children.add(loadImport(childNode));
 			}
 		}
 		return desc;
@@ -168,7 +185,6 @@ public class OptionDescriptorParser
 		return null;
 	}
 
-
 	/**
 	 * Create a script descriptor from a DOM node.
 	 * @param node the node to generate the listener from.
@@ -190,6 +206,7 @@ public class OptionDescriptorParser
 		}
 		return desc;
 	}
+
 	/**
 	 * Add a property to an option descriptor from a DOM node.
 	 * @param desc the option descriptor to add the property to.
@@ -200,6 +217,21 @@ public class OptionDescriptorParser
 		NamedNodeMap attrMap = node.getAttributes();
 		String name = attrMap.getNamedItem("name").getNodeValue();
 		String value = attrMap.getNamedItem("value").getNodeValue();
-		desc.setProperty(name, value);
+		if ((name != null) && (value != null)) desc.setProperty(name, value);
+	}
+
+	/**
+	 * Import an external XML descriptor.
+	 * @param node the node to get the import description from.
+	 * @return a <code>OptionDescriptor</code> instance.
+	 */
+	public OptionDescriptor loadImport(Node node)
+	{
+		NamedNodeMap attrMap = node.getAttributes();
+		OptionDescriptor desc = new OptionDescriptor();
+		desc.type = "import";
+		desc.setProperty("source", attrMap.getNamedItem("source").getNodeValue());
+		desc.setProperty("location", attrMap.getNamedItem("location").getNodeValue());
+		return desc;
 	}
 }

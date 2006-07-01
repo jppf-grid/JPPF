@@ -19,37 +19,21 @@
  */
 package org.jppf.ui.options;
 
-import java.awt.event.*;
 import javax.swing.*;
 import org.jppf.ui.utils.GuiUtils;
 
 /**
- * Option implementation with a JButton as the underlying component.
+ * An option for simple labels that have text, an icon, or both.
  * @author Laurent Cohen
  */
-public class ButtonOption extends AbstractOption
+public class LabelOption extends AbstractOption
 {
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
 	 * option elements through reflexion.
 	 */
-	public ButtonOption()
+	public LabelOption()
 	{
-	}
-
-	/**
-	 * Initialize this text option with the specified parameters.
-	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox. 
-	 * @param tooltip the tooltip associated with the checkbox.
-	 * @param action the action to execute when the button is pressed.
-	 */
-	public ButtonOption(String name, String label, String tooltip, OptionAction action)
-	{
-		this.name = name;
-		this.label = label;
-		setToolTipText(tooltip);
-		createUI();
 	}
 
 	/**
@@ -57,31 +41,35 @@ public class ButtonOption extends AbstractOption
 	 */
 	public void createUI()
 	{
-		JButton button = new JButton();
-		if (label != null) button.setText(label);
+		JLabel lab = new JLabel();
+		lab.setHorizontalAlignment(SwingConstants.RIGHT);
+		if (value != null) lab.setText((String) value);
 		if (iconPath != null)
 		{
 			ImageIcon icon = GuiUtils.loadIcon(iconPath);
-			if (icon != null) button.setIcon(icon);
+			if (icon != null) lab.setIcon(icon);
 		}
-		if (toolTipText != null) button.setToolTipText(toolTipText);
-		UIComponent = button;
-		setupValueChangeNotifications();
+		if (toolTipText != null) lab.setToolTipText(toolTipText);
+		UIComponent = lab;
 	}
 
 	/**
-	 * This method does nothing.
+	 * Set the value of this option.
+	 * @param value the value as an <code>Object</code> instance.
+	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
+	 */
+	public void setValue(Object value)
+	{
+		this.value = value;
+		if (UIComponent != null) ((JLabel) UIComponent).setText((String) value);
+	}
+
+	/**
+	 * Propagate the state changes of the underlying checkbox to the listeners to this option.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	protected void setupValueChangeNotifications()
 	{
-		((JButton) UIComponent).addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				fireValueChanged();
-			}
-		});
 	}
 
 	/**
@@ -91,6 +79,6 @@ public class ButtonOption extends AbstractOption
 	 */
 	public void setEnabled(boolean enabled)
 	{
-		((JButton) UIComponent).setEnabled(enabled);
+		UIComponent.setEnabled(enabled);
 	}
 }

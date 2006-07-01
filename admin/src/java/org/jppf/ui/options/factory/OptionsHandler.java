@@ -21,7 +21,7 @@ package org.jppf.ui.options.factory;
 
 import java.util.*;
 import org.apache.log4j.Logger;
-import org.jppf.ui.options.OptionsPage;
+import org.jppf.ui.options.*;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
 
 /**
@@ -37,11 +37,11 @@ public final class OptionsHandler
 	/**
 	 * The list of option pages managed by this handler.
 	 */
-	private static List<OptionsPage> pageList = new Vector<OptionsPage>();
+	private static List<OptionElement> pageList = new Vector<OptionElement>();
 	/**
 	 * A mapping of option pages to their name.
 	 */
-	private static Map<String, OptionsPage> pageMap = new Hashtable<String, OptionsPage>();
+	private static Map<String, OptionElement> pageMap = new Hashtable<String, OptionElement>();
 	/**
 	 * The page builder used to instantiate pages from XML descriptors.
 	 */
@@ -51,7 +51,7 @@ public final class OptionsHandler
 	 * Get the list of option pages managed by this handler.
 	 * @return a list of <code>OptionsPage</code> instances.
 	 */
-	public static List<OptionsPage> getPageList()
+	public static List<OptionElement> getPageList()
 	{
 		return pageList;
 	}
@@ -61,7 +61,7 @@ public final class OptionsHandler
 	 * @param name the name of the page to retrieve.
 	 * @return an <code>OptionsPage</code> instance.
 	 */
-	public static synchronized OptionsPage getPage(String name)
+	public static synchronized OptionElement getPage(String name)
 	{
 		return pageMap.get(name);
 	}
@@ -71,7 +71,7 @@ public final class OptionsHandler
 	 * @param page an <code>OptionsPage</code> instance.
 	 * @return the page that was added.
 	 */
-	public static synchronized OptionsPage addPage(OptionsPage page)
+	public static synchronized OptionElement addPage(OptionElement page)
 	{
 		pageList.add(page);
 		pageMap.put(page.getName(), page);
@@ -93,11 +93,30 @@ public final class OptionsHandler
 	 * @param xmlPath the path to the xml document.
 	 * @return the page that was added.
 	 */
-	public static synchronized OptionsPage addPageFromXml(String xmlPath)
+	public static synchronized OptionElement addPageFromXml(String xmlPath)
 	{
 		try
 		{
-			return addPage(builder.buildPage(xmlPath));
+			return addPage(builder.buildPage(xmlPath, null));
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		return null;
+	}
+
+	/**
+	 * Add a page built from an xml document.
+	 * @param xmlPath the path to the xml document.
+	 * @param baseName base name for resource bundle lookup.
+	 * @return the page that was added.
+	 */
+	public static synchronized OptionElement addPageFromURL(String xmlPath, String baseName)
+	{
+		try
+		{
+			return addPage(builder.buildPageFromURL(xmlPath, baseName));
 		}
 		catch(Exception e)
 		{

@@ -19,13 +19,13 @@
  */
 package org.jppf.ui.options;
 
-import java.awt.Color;
+import java.awt.*;
+import java.beans.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.color.ColorScheme;
-import org.jvnet.substance.utils.SubstanceColorUtilities;
+import javax.swing.text.PlainDocument;
 import org.ujac.ui.editor.*;
+import org.ujac.ui.editor.TextArea;
 
 /**
  * This option encapsulates an XML editor with syntax highlighting.
@@ -34,9 +34,18 @@ import org.ujac.ui.editor.*;
 public class XMLEditorOption extends AbstractOption
 {
 	/**
+	 * The default syntactic styles for the editor.
+	 */
+	private static SyntaxStyle[] styles = getDefaultStyles();
+	/**
 	 * The underlying UI component used to edit the value of this option.
 	 */
 	private TextArea textArea = null;
+	/**
+	 * Use to detect when the parent's backgorunbd color has changed,
+	 * to set that of the text area accordingly.
+	 */
+	private PropertyChangeListener backgroundChangeListener = null;
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -68,11 +77,15 @@ public class XMLEditorOption extends AbstractOption
 	public void createUI()
 	{
 		textArea = new TextArea("text/xml");
+		textArea.setStyles(styles);
+		textArea.setOpaque(true);
+    textArea.getDocument().getDocumentProperties().put(PlainDocument.tabSizeAttribute, new Integer(2));
 		textArea.setText("");
+		textArea.setEditable(true);
+		textArea.setEnabled(true);
+		textArea.setEOLMarkersPainted(false);
 		textArea.setBorder(BorderFactory.createEmptyBorder());
 		if (toolTipText != null) textArea.setToolTipText(toolTipText);
-		textArea.setEditable(false);
-		textArea.setOpaque(false);
 		if (scrollable)
 		{
 			JScrollPane scrollPane = new JScrollPane(textArea);
@@ -81,7 +94,17 @@ public class XMLEditorOption extends AbstractOption
 		}
 		else UIComponent = textArea;
 		setupValueChangeNotifications();
-		//setBackgroundColor();
+		backgroundChangeListener = new PropertyChangeListener()
+		{
+			public void propertyChange(PropertyChangeEvent evt)
+			{
+				Object val = evt.getNewValue();
+				if (val instanceof Color)
+				{
+					textArea.setBackground((Color) val);
+				}
+			}
+		};
 	}
 
 	/**
@@ -104,7 +127,7 @@ public class XMLEditorOption extends AbstractOption
 	{
 		this.value = value;
 		textArea.setText((String) value);
-		//setBackgroundColor();
+		setBackgroundColor();
 	}
 
 	/**
@@ -134,6 +157,15 @@ public class XMLEditorOption extends AbstractOption
 	}
 
 	/**
+	 * Get the underlying text editor component.
+	 * @return a <code>TextArea</code> instance.
+	 */
+	public TextArea getTextArea()
+	{
+		return textArea;
+	}
+
+	/**
 	 * Enable or disable this option.
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
@@ -148,11 +180,49 @@ public class XMLEditorOption extends AbstractOption
 	 */
 	protected void setBackgroundColor()
 	{
-		ColorScheme cs = SubstanceLookAndFeel.getColorScheme();
-		if (cs != null)
+		Color c = textArea.getParent().getBackground();
+		textArea.setBackground(c);
+	}
+
+	/**
+	 * Set the parent panel for this option.
+	 * @param parent an <code>ElementOption</code> instance.
+	 * @see org.jppf.ui.options.AbstractOptionElement#setParent(org.jppf.ui.options.OptionElement)
+	 */
+	public void setParent(OptionElement parent)
+	{
+		if (this.parent != null)
 		{
-			Color c = SubstanceColorUtilities.getInterpolatedColor(cs.getLightColor(), cs.getUltraDarkColor(), 0.5d);
-			textArea.setBackground(c);
+			Component c = this.getParent().getUIComponent();
+			if (c != null) c.removePropertyChangeListener("background", backgroundChangeListener);
 		}
+		super.setParent(parent);
+		if (parent != null)
+		{
+			Component c = this.getParent().getUIComponent();
+			if (c != null) c.addPropertyChangeListener("background", backgroundChangeListener);
+		}
+	}
+
+	/**
+	 * Get the default syntactic styles for the editor.
+	 * @return an array of <code>SyntaxStyle</code> instances.
+	 */
+	private static SyntaxStyle[] getDefaultStyles()
+	{
+    SyntaxStyle[] styles = new SyntaxStyle[Token.ID_COUNT];
+
+    styles[Token.COMMENT1] = new SyntaxStyle(Color.green.darker().darker(), true, false);
+    styles[Token.COMMENT2] = new SyntaxStyle(new Color(0x990033), true, false);
+    styles[Token.KEYWORD1] = new SyntaxStyle(Color.blue.darker(), false, true);
+    styles[Token.KEYWORD2] = new SyntaxStyle(Color.blue, false, false);
+    styles[Token.KEYWORD3] = new SyntaxStyle(new Color(0x009600), false, false);
+    styles[Token.LITERAL1] = new SyntaxStyle(new Color(96, 192, 192), false, false);
+    styles[Token.LITERAL2] = new SyntaxStyle(new Color(0x650099), false, true);
+    styles[Token.LABEL] = new SyntaxStyle(new Color(0x990033), false, true);
+    styles[Token.OPERATOR] = new SyntaxStyle(Color.blue, false, true);
+    styles[Token.INVALID] = new SyntaxStyle(Color.red, false, true);
+
+    return styles;
 	}
 }

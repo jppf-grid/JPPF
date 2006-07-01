@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JPPFAdminTool" type="TabbedPane">
+
+	<property name="label" value="JPPF Monitoring and Administration Tool"/>
+	<property name="scrollable" value="false"/>
+	<property name="orientation" value="horizontal"/>
+	<property name="bordered" value="false"/>
+	<property name="main" value="true"/>
+	<property name="tooltip" value="Perform the remote administration of the server"/>
+	<script language="javascript"><![CDATA[
+		importPackage(Packages.java.lang);
+		importPackage(Packages.java.util);
+		importPackage(Packages.java.awt);
+		importPackage(Packages.java.awt.event);
+		importPackage(Packages.javax.swing);
+		importPackage(Packages.org.jppf.server.protocol);
+		importPackage(Packages.org.jppf.ui.monitoring);
+		importPackage(Packages.org.jppf.ui.monitoring.charts.config);
+		importPackage(Packages.org.jppf.ui.monitoring.data);
+		importPackage(Packages.org.jppf.ui.options);
+		importPackage(Packages.org.jppf.ui.options.event);
+		importPackage(Packages.org.jppf.ui.options.factory);
+	]]></script>
+	<initializer type="script">
+		<script language="javascript"><![CDATA[
+			var comp = option.getUIComponent();
+			function updateTab(name, component)
+			{
+				var page = option.findFirstWithName(name);
+				comp.remove(page.getUIComponent());
+				page.setUIComponent(component);
+				comp.insertTab(page.getLabel(), null, page.getUIComponent(), page.getToolTipText(), 0);
+			}
+			var statsHandler = StatsHandler.getInstance();
+			var builder = JPPFChartBuilder.getInstance();
+			builder.createInitialCharts();
+			var monitor = new MonitoringPanel();
+			statsHandler.addStatsHandlerListener(monitor);
+			statsHandler.addStatsHandlerListener(builder);
+			updateTab("/ChartsPage", builder.getTabbedPane());
+			updateTab("/StatsPage", new JScrollPane(monitor));
+			var ccPage = OptionsHandler.getPage("ChartsConfiguration");
+			ccPage.getInitializer().valueChanged(new ValueChangeEvent(ccPage));
+			comp.setSelectedIndex(0);
+			comp.updateUI();
+			wa = 
+			{
+				windowClosing: function(event)
+				{
+					JPPFChartBuilder.getInstance().getStorage().saveAll();
+					System.exit(0);
+				}
+			};
+			var frame = new JFrame(option.getLabel());
+			frame.addWindowListener(new WindowAdapter(wa));
+			frame.getContentPane().add(option.getUIComponent());
+			frame.setSize(600, 600);
+			frame.setVisible(true);
+			statsHandler.startRefreshTimer();
+		]]></script>
+	</initializer>
+
+	<child name="StatsPage" type="page">
+		<property name="label" value="Server Stats"/>
+		<property name="scrollable" value="true"/>
+		<property name="orientation" value="vertical"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+	</child>
+
+	<child name="ChartsPage" type="page">
+		<property name="label" value="Charts"/>
+		<property name="scrollable" value="true"/>
+		<property name="orientation" value="vertical"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+	</child>
+
+	<import source="file" location="org/jppf/ui/options/xml/ChartsConfigPage.xml"/>
+	<import source="file" location="org/jppf/ui/options/xml/AdminPage.xml"/>
+	<import source="file" location="org/jppf/ui/options/xml/BundleSizeTuningPage.xml"/>
+
+</opt:main>

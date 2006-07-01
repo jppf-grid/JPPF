@@ -19,13 +19,17 @@
  */
 package org.jppf.ui.options.xml;
 
+import java.awt.Insets;
+import java.io.*;
+import java.net.*;
 import java.util.*;
 import javax.swing.ListSelectionModel;
 import org.apache.log4j.Logger;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.event.*;
+import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.options.xml.OptionDescriptor.*;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class build options pages from XML descriptors.
@@ -45,23 +49,90 @@ public class OptionsPageBuilder
 	 * Base name used to localize labels and tooltips.
 	 */
 	private String baseName = null;
+	/**
+	 * Base name used to localize labels and tooltips.
+	 */
+	private boolean eventEnabled = true;
+
+	/**
+	 * Default constructor.
+	 */
+	public OptionsPageBuilder()
+	{
+	}
+
+	/**
+	 * Initialize this page builder.
+	 * @param enableEvents determines if events triggering should be performed
+	 * once the page is built.
+	 */
+	public OptionsPageBuilder(boolean enableEvents)
+	{
+		this.eventEnabled = enableEvents;
+	}
+
+	/**
+	 * Build an option page from the specified XML descriptor.
+	 * @param content the text of the XML document to parse.
+	 * @param baseName the base path where the localization resources are located.
+	 * @return an <code>OptionElement</code> instance, or null if the page could not be build.
+	 * @throws Exception if an error was raised while parsing the xml document or building the page.
+	 */
+	public OptionElement buildPageFromContent(String content, String baseName) throws Exception
+	{
+		this.baseName = baseName;
+		OptionDescriptor desc = new OptionDescriptorParser().parse(new StringReader(content));
+		if (desc == null) return null;
+		OptionElement page = build(desc);
+		if (eventEnabled) triggerInitialEvents(page);
+		return page;
+	}
+
+	/**
+	 * Build an option page from an XML descriptor specified as a URL.
+	 * @param urlString the URL of the XML descriptor file.
+	 * @param baseName the base path where the localization resources are located.
+	 * @return an <code>OptionsPage</code> instance, or null if the page could not be build.
+	 * @throws Exception if an error was raised while parsing the xml document or building the page.
+	 */
+	public OptionElement buildPageFromURL(String urlString, String baseName) throws Exception
+	{
+		if (urlString == null) return null;
+		URL url = null;
+		try
+		{
+			url = new URL(urlString);
+		}
+		catch(MalformedURLException e)
+		{
+			log.error(e.getMessage(), e);
+			return null;
+		}
+		Reader reader = new InputStreamReader(url.openStream());
+		return buildPageFromContent(FileUtils.readTextFile(reader), baseName);
+	}
 
 	/**
 	 * Build an option page from the specified XML descriptor.
 	 * @param xmlPath the path to the XML descriptor file.
-	 * @return an <code>OptionsPage</code> instance, or null if the page could not be build.
+	 * @param baseName the base path where the localization resources are located.
+	 * @return an <code>OptionElement</code> instance, or null if the page could not be build.
 	 * @throws Exception if an error was raised while parsing the xml document or building the page.
 	 */
-	public OptionsPage buildPage(String xmlPath) throws Exception
+	public OptionElement buildPage(String xmlPath, String baseName) throws Exception
 	{
-		int idx = xmlPath.lastIndexOf("/");
-		baseName = BASE_NAME + ((idx < 0) ? xmlPath : xmlPath.substring(idx + 1));
-		idx = baseName.lastIndexOf(".xml");
-		if (idx >= 0) baseName = baseName.substring(0, idx);
+		if (baseName == null)
+		{
+			int idx = xmlPath.lastIndexOf("/");
+			this.baseName = BASE_NAME + ((idx < 0) ? xmlPath : xmlPath.substring(idx + 1));
+			idx = this.baseName.lastIndexOf(".xml");
+			if (idx >= 0) this.baseName = this.baseName.substring(0, idx);
+		}
+		else this.baseName = baseName;
 		OptionDescriptor desc = new OptionDescriptorParser().parse(xmlPath);
 		if (desc == null) return null;
-		OptionsPage page = buildPage(desc);
-		triggerInitialEvents(page);
+		OptionElement page = build(desc);
+		if (eventEnabled) triggerInitialEvents(page);
 		return page;
 	}
 
@@ -72,10 +143,7 @@ public class OptionsPageBuilder
 	 */
 	private void triggerInitialEvents(OptionElement elt)
 	{
-		if (elt == null)
-		{
-			return;
-		}
+		if (elt == null) return;
 		if (elt.getInitializer() != null)
 		{
 			elt.getInitializer().valueChanged(new ValueChangeEvent(elt));
@@ -97,14 +165,39 @@ public class OptionsPageBuilder
 	public void initCommonAttributes(AbstractOptionElement elt, OptionDescriptor desc)
 	{
 		elt.setName(desc.name);
-		elt.setLabel(StringUtils.getLocalized(baseName, desc.name+".label"));
+		elt.setLabel(StringUtils.getLocalized(baseName, desc.name+".label", desc.getProperty("label")));
 		String s = desc.getProperty("orientation", "horizontal");
 		elt.setOrientation("horizontal".equalsIgnoreCase(s) ? OptionsPage.HORIZONTAL : OptionsPage.VERTICAL);
-		elt.setToolTipText(StringUtils.getLocalized(baseName, desc.name+".tooltip"));
+		elt.setToolTipText(StringUtils.getLocalized(baseName, desc.name+".tooltip", desc.getProperty("tooltip")));
 		elt.setScrollable(desc.getBoolean("scrollable", false));
 		elt.setBordered(desc.getBoolean("bordered", false));
 		elt.setWidth(desc.getInt("width", -1));
 		elt.setHeight(desc.getInt("height", -1));
+		s = desc.getProperty("insets");
+		int defMargin = 2;
+		if ((s == null) || ("".equals(s.trim())))
+			elt.setInsets(new Insets(defMargin, defMargin, defMargin, defMargin));
+		else
+		{
+			String[] sVals = s.split(",");
+			if (sVals.length != 4) elt.setInsets(new Insets(defMargin, defMargin, defMargin, defMargin));
+			else
+			{
+				int[] vals = new int[4];
+				for (int i=0; i<4; i++)
+				{
+					try
+					{
+						vals[i] = Integer.parseInt(sVals[i].trim());
+					}
+					catch(NumberFormatException e)
+					{
+						vals[i] = defMargin;
+					}
+				}
+				elt.setInsets(new Insets(vals[0], vals[1], vals[2], vals[3]));
+			}
+		}
 		for (ScriptDescriptor script: desc.scripts) elt.getScripts().add(script);
 		if (desc.initializer != null) elt.setInitializer(createListener(desc.initializer));
 	}
@@ -156,50 +249,52 @@ public class OptionsPageBuilder
 	}
 
 	/**
+	 * Add all the children elements in a page.
+	 * @param desc the descriptor for the page.
+	 * @return an OptionElement instance.
+	 * @throws Exception if an error was raised while building the page.
+	 */
+	public OptionElement build(OptionDescriptor desc) throws Exception
+	{
+		OptionElement elt = null; 
+		String type = desc.type;
+		if ("page".equals(type)) elt = buildPage(desc);
+		else if ("SplitPane".equals(desc.type)) elt = buildSplitPane(desc);
+		else if ("TabbedPane".equals(desc.type)) elt = buildTabbedPane(desc);
+		else if ("Toolbar".equals(desc.type)) elt = buildToolbar(desc);
+		else if ("Button".equals(desc.type)) elt = buildButton(desc);
+		else if ("TextArea".equals(desc.type)) elt = buildTextArea(desc);
+		else if ("XMLEditor".equals(desc.type)) elt = buildXMLEditor(desc);
+		else if ("Password".equals(desc.type)) elt = buildPassword(desc);
+		else if ("PlainText".equals(desc.type)) elt = buildPlainText(desc);
+		else if ("FormattedNumber".equals(desc.type)) elt = buildFormattedNumber(desc);
+		else if ("SpinnerNumber".equals(desc.type)) elt = buildSpinnerNumber(desc);
+		else if ("Boolean".equals(desc.type)) elt = buildBoolean(desc);
+		else if ("ComboBox".equals(desc.type)) elt = buildComboBox(desc);
+		else if ("Filler".equals(desc.type)) elt = buildFiller(desc);
+		else if ("List".equals(desc.type)) elt = buildList(desc);
+		else if ("FileChooser".equals(desc.type)) elt = buildFileChooser(desc);
+		else if ("Label".equals(desc.type)) elt = buildLabel(desc);
+		else if ("import".equals(desc.type)) elt = loadImport(desc);
+		return elt;
+	}
+
+	/**
 	 * Build an option page from the specified option descriptor.
 	 * @param desc the descriptor to get the page properties from.
 	 * @return an <code>OptionsPage</code> instance, or null if the page could not be build.
 	 * @throws Exception if an error was raised while building the page.
 	 */
-	public OptionsPage buildPage(OptionDescriptor desc) throws Exception
+	public OptionElement buildPage(OptionDescriptor desc) throws Exception
 	{
 		OptionPanel page = new OptionPanel();
 		page.setEventsEnabled(false);
-		initCommonAttributes(page, desc);
+		initCommonAttributes((OptionPanel) page, desc);
 		page.setMainPage(desc.getBoolean("main"));
 		page.createUI();
-		addChildren(page, desc);
+		for (OptionDescriptor child: desc.children) page.add(build(child));
 		page.setEventsEnabled(true);
 		return page;
-	}
-
-	/**
-	 * Add all the children elements in a page.
-	 * @param page the page to add the children to.
-	 * @param desc the descriptor for the page.
-	 * @throws Exception if an error was raised while building the page.
-	 */
-	public void addChildren(OptionsPage page, OptionDescriptor desc) throws Exception
-	{
-		for (OptionDescriptor child: desc.children)
-		{
-			String type = child.type;
-			if ("page".equals(type)) page.add(buildPage(child));
-			else if ("Button".equals(type)) page.add(buildButton(child));
-			else if ("TextArea".equals(type)) page.add(buildTextArea(child));
-			else if ("XMLEditor".equals(type)) page.add(buildXMLEditor(child));
-			else if ("Password".equals(type)) page.add(buildPassword(child));
-			else if ("PlainText".equals(type)) page.add(buildPlainText(child));
-			else if ("FormattedNumber".equals(type)) page.add(buildFormattedNumber(child));
-			else if ("SpinnerNumber".equals(type)) page.add(buildSpinnerNumber(child));
-			else if ("Boolean".equals(type)) page.add(buildBoolean(child));
-			else if ("ComboBox".equals(type)) page.add(buildComboBox(child));
-			else if ("Filler".equals(type)) page.add(buildFiller(child));
-			else if ("List".equals(type)) page.add(buildList(child));
-			else if ("FileChooser".equals(type)) page.add(buildFileChooser(child));
-			else if ("SplitPane".equals(type)) page.add(buildSplitPane(child));
-			else if ("Toolbar".equals(type)) page.add(buildToolbar(child));
-		}
 	}
 
 	/**
@@ -213,6 +308,25 @@ public class OptionsPageBuilder
 		ButtonOption option = new ButtonOption();
 		option.setEventsEnabled(false);
 		initCommonOptionAttributes(option, desc);
+		option.setIconPath(desc.getProperty("icon"));
+		option.createUI();
+		option.setEventsEnabled(true);
+		return option;
+	}
+
+	/**
+	 * Build a label option from the specified option descriptor.
+	 * @param desc the descriptor to get the page properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public Option buildLabel(OptionDescriptor desc) throws Exception
+	{
+		LabelOption option = new LabelOption();
+		option.setEventsEnabled(false);
+		initCommonOptionAttributes(option, desc);
+		option.setValue(desc.getProperty("value"));
+		option.setIconPath(desc.getProperty("icon"));
 		option.createUI();
 		option.setEventsEnabled(true);
 		return option;
@@ -394,6 +508,7 @@ public class OptionsPageBuilder
 		option.setDialogType(dlgType);
 		option.setExtensions(desc.getProperty("extensions"));
 		option.setValue(desc.getProperty("value"));
+		option.setIconPath(desc.getProperty("icon"));
 		option.createUI();
 		return option;
 	}
@@ -411,12 +526,12 @@ public class OptionsPageBuilder
 		option.setDividerWidth(desc.getInt("dividerWidth", 4));
 		option.setResizeWeight(desc.getDouble("resizeWeight", 0.5d));
 		option.createUI();
-		addChildren(option, desc);
+		for (OptionDescriptor child: desc.children) option.add(build(child));
 		return option;
 	}
 
 	/**
-	 * Build a text area option from the specified option descriptor.
+	 * Build an XML editor option from the specified option descriptor.
 	 * @param desc the descriptor to get the page properties from.
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
@@ -432,7 +547,7 @@ public class OptionsPageBuilder
 	}
 
 	/**
-	 * Build a filler option from the specified option descriptor.
+	 * Build a toolbar option from the specified option descriptor.
 	 * @param desc the descriptor to get the properties from.
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
@@ -443,7 +558,43 @@ public class OptionsPageBuilder
 		option.setEventsEnabled(false);
 		initCommonAttributes(option, desc);
 		option.createUI();
+		for (OptionDescriptor child: desc.children) option.add(build(child));
 		option.setEventsEnabled(true);
 		return option;
+	}
+
+	/**
+	 * Build a toolbar option from the specified option descriptor.
+	 * @param desc the descriptor to get the properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public OptionElement buildTabbedPane(OptionDescriptor desc) throws Exception
+	{
+		TabbedPaneOption option = new TabbedPaneOption();
+		option.setEventsEnabled(false);
+		initCommonAttributes(option, desc);
+		option.setMainPage(desc.getBoolean("main"));
+		option.createUI();
+		for (OptionDescriptor child: desc.children) option.add(build(child));
+		option.setEventsEnabled(true);
+		return option;
+	}
+
+	/**
+	 * Build a toolbar option from the specified option descriptor.
+	 * @param desc the descriptor to get the properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public OptionElement loadImport(OptionDescriptor desc) throws Exception
+	{
+		OptionsPageBuilder builder = new OptionsPageBuilder(true);
+		OptionElement elt = null;
+		if ("url".equalsIgnoreCase(desc.getProperty("source")))
+			elt = builder.buildPageFromURL(desc.getProperty("location"), baseName);
+		else elt = builder.buildPage(desc.getProperty("location"), null);
+		OptionsHandler.addPage(elt);
+		return elt;
 	}
 }

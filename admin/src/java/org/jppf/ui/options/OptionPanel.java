@@ -122,7 +122,7 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 		g = new GridBagLayout();
     c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(5, 5, 5, 5);
+		c.insets = insets;
 		c.anchor = GridBagConstraints.LINE_START;
     if (orientation == HORIZONTAL)
     {

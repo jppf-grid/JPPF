@@ -139,7 +139,7 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 			GridBagLayout g = new GridBagLayout();
 			panel.setLayout(g);
 	    GridBagConstraints c = new GridBagConstraints();
-			c.insets = new Insets(2, 2, 2, 2);
+			c.insets = insets;
 			if (orientation == HORIZONTAL)
 			{
 				c.gridy = 0;
@@ -154,7 +154,7 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 			addLayoutComp(panel, g, c, comp1);
 			c.anchor = GridBagConstraints.CENTER;
 			if (orientation == HORIZONTAL) c.weightx = 1.0;
-			else  c.weighty = 1.0;
+			else c.weighty = 1.0;
 			JComponent filler = GuiUtils.createFiller(1, 1);
 			addLayoutComp(panel, g, c, filler);
 			if (orientation == HORIZONTAL)

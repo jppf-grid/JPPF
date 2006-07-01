@@ -21,23 +21,28 @@ package org.jppf.ui.options;
 
 import java.awt.Dimension;
 import java.util.*;
-import javax.swing.JToolBar;
+import javax.swing.*;
+import org.jppf.ui.utils.GuiUtils;
 
 /**
- * This option class encapsulates a split pane, as the one present in the Swing api.
+ * This option class encapsulates a tabbed pane, as the one present in the Swing api.
  * @author Laurent Cohen
  */
-public class ToolbarOption extends AbstractOptionElement implements OptionsPage
+public class TabbedPaneOption extends AbstractOptionElement implements OptionsPage
 {
 	/**
 	 * The list of children of this options page.
 	 */
 	protected List<OptionElement> children = new ArrayList<OptionElement>();
+	/**
+	 * Determines whether this page is an outermost page.
+	 */
+	protected boolean mainPage = false;
 
 	/**
 	 * Initialize the split pane with 2 fillers as left (or top) and right (or bottom) components.
 	 */
-	public ToolbarOption()
+	public TabbedPaneOption()
 	{
 	}
 
@@ -46,11 +51,11 @@ public class ToolbarOption extends AbstractOptionElement implements OptionsPage
 	 */
 	public void createUI()
 	{
-		JToolBar toolbar = new JToolBar(JToolBar.HORIZONTAL);
-		toolbar.setFloatable(false);
-		if ((width > 0) && (height > 0)) toolbar.setPreferredSize(new Dimension(width, height));
-		UIComponent = toolbar;
-		toolbar.setOpaque(false);
+		JTabbedPane pane = new JTabbedPane();
+		pane.setDoubleBuffered(true);
+		if ((width > 0) && (height > 0)) pane.setPreferredSize(new Dimension(width, height));
+		UIComponent = pane;
+		pane.setOpaque(false);
 	}
 
 	/**
@@ -81,11 +86,13 @@ public class ToolbarOption extends AbstractOptionElement implements OptionsPage
 	 */
 	public void add(OptionElement element)
 	{
-		JToolBar toolbar = (JToolBar) UIComponent;
 		children.add(element);
+		JTabbedPane pane = (JTabbedPane) UIComponent;
+		ImageIcon icon = null;
+		if (element.getIconPath() != null) icon = GuiUtils.loadIcon(element.getIconPath());
+		pane.addTab(element.getLabel(), icon, element.getUIComponent(), element.getToolTipText());
 		if (element instanceof AbstractOptionElement)
 			((AbstractOptionElement) element).setParent(this);
-		toolbar.add(element.getUIComponent());
 	}
 
 	/**
@@ -95,21 +102,10 @@ public class ToolbarOption extends AbstractOptionElement implements OptionsPage
 	 */
 	public void remove(OptionElement element)
 	{
-		JToolBar toolbar = (JToolBar) UIComponent;
 		children.remove(element);
+		UIComponent.remove(element.getUIComponent());
 		if (element instanceof AbstractOptionElement)
 			((AbstractOptionElement) element).setParent(null);
-		toolbar.remove(element.getUIComponent());
-	}
-
-	/**
-	 * Determines whether this page is part of another.
-	 * @return true if this page is an outermost page, false if it is embedded within another page.
-	 * @see org.jppf.ui.options.OptionsPage#isMainPage()
-	 */
-	public boolean isMainPage()
-	{
-		return false;
 	}
 
 	/**
@@ -120,5 +116,24 @@ public class ToolbarOption extends AbstractOptionElement implements OptionsPage
 	public List<OptionElement> getChildren()
 	{
 		return Collections.unmodifiableList(children);
+	}
+
+	/**
+	 * Determines whether this page is part of another.
+	 * @return true if this page is an outermost page, false if it is embedded within another page.
+	 * @see org.jppf.ui.options.OptionsPage#isMainPage()
+	 */
+	public boolean isMainPage()
+	{
+		return mainPage;
+	}
+
+	/**
+	 * Set whether this page is part of another.
+	 * @param mainPage true if this page is an outermost page, false if it is embedded within another page.
+	 */
+	public void setMainPage(boolean mainPage)
+	{
+		this.mainPage = mainPage;
 	}
 }

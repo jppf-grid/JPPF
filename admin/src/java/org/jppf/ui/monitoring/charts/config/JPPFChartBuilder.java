@@ -41,10 +41,6 @@ public class JPPFChartBuilder implements StatsHandlerListener
 	 */
 	private static JPPFChartBuilder instance = null;
 	/**
-	 * The stats formatter that provides the data.
-	 */
-	private StatsHandler statsHandler = null;
-	/**
 	 * Mapping of chart types to the chart handler used to create and update them.
 	 */
 	private Map<ChartType, ChartHandler> handlerMap = new HashMap<ChartType, ChartHandler>();
@@ -70,7 +66,6 @@ public class JPPFChartBuilder implements StatsHandlerListener
 	 */
 	protected JPPFChartBuilder()
 	{
-		this.statsHandler = StatsHandler.getInstance();
 		storage = new PreferencesStorage();
 		initHandlerMap();
 	}
@@ -80,6 +75,7 @@ public class JPPFChartBuilder implements StatsHandlerListener
 	 */
 	private void initHandlerMap()
 	{
+		StatsHandler statsHandler = StatsHandler.getInstance();
 		handlerMap.put(CHART_PLOTXY, new PlotXYChartHandler(statsHandler));
 		handlerMap.put(CHART_3DBAR, new Bar3DChartHandler(statsHandler));
 		handlerMap.put(CHART_AREA, new AreaChartHandler(statsHandler));

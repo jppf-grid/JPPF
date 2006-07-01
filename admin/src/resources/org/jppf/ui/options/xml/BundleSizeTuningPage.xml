@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="BundleSizeTuning" type="page">
 
+	<!-- test commewnt for save -->
 	<property name="label" value="Bundle Size Tuning"/>
 	<property name="scrollable" value="false"/>
 	<property name="orientation" value="vertical"/>
@@ -82,7 +83,7 @@
 						params.put(AdminRequest.BUNDLE_SIZE_PARAM, option.findFirstWithName("/bundleSize").getValue());
 						params.put(AdminRequest.BUNDLE_TUNING_TYPE_PARAM, "manual");
 						msg = StatsHandler.getInstance().changeSettings(pwd, params);
-						if (msg != null) option.findElement("/msgText").setValue(msg);
+						if (msg != null) option.findElement("/TuningMessages").setValue(msg);
 					]]></script>
 				</listener>
 			</child>
@@ -140,7 +141,7 @@
 						params.put("DecreaseRatio", option.findFirstWithName("/DecreaseRatio").getValue());
 						params.put("manual", Boolean.FALSE);
 						msg = StatsHandler.getInstance().changeSettings(pwd, params);
-						if (msg != null) option.findElement("/msgText").setValue(msg);
+						if (msg != null) option.findElement("/TuningMessages").setValue(msg);
 					]]></script>
 				</listener>
 			</child>
@@ -211,7 +212,7 @@
 	<!--                   Server messages area                                -->
 	<!-- ===================================================================== -->
 
-	<child name="msgText" type="TextArea">
+	<child name="TuningMessages" type="TextArea">
 		<property name="label" value="Server Messages"/>
 		<property name="tooltip" value="Feedback messages received from the server"/>
 		<property name="value" value=""/>

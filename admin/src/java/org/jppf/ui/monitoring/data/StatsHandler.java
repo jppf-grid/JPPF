@@ -66,7 +66,7 @@ public final class StatsHandler implements StatsConstants
 	/**
 	 * Number of data snapshots kept in memeory.
 	 */
-	private int rolloverPosition = 50;
+	private int rolloverPosition = 200;
 	/**
 	 * The list of all snapshots kept in memory. the size of this list is alway equal to or less than
 	 * the rollover position.

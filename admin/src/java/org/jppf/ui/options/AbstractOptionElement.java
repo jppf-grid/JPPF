@@ -20,6 +20,7 @@
 package org.jppf.ui.options;
 
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.util.*;
 import javax.swing.JComponent;
 import javax.swing.tree.TreePath;
@@ -61,6 +62,10 @@ public abstract class AbstractOptionElement implements OptionElement
 	 */
 	protected JComponent UIComponent = null;
 	/**
+	 * Path to an eventual icon displayed in the button.
+	 */
+	protected String iconPath = null;
+	/**
 	 * Determines whether this page should be enclosed within a scroll pane.
 	 */
 	protected boolean scrollable = false;
@@ -76,6 +81,10 @@ public abstract class AbstractOptionElement implements OptionElement
 	 * Preferred height of the UI component.
 	 */
 	protected int height = -1;
+	/**
+	 * Insets to use when this component is a container.
+	 */
+	protected Insets insets = null;
 	/**
 	 * Scripts used by this option or its children.
 	 */
@@ -413,6 +422,21 @@ public abstract class AbstractOptionElement implements OptionElement
 	}
 
 	/**
+	 * Find the last element with the specified name in the subtree of which
+	 * this element is the root. 
+	 * The notion of last element relates to a depth-first search in the tree. 
+	 * @param name the name of the element to find.
+	 * @return an <code>OptionElement</code> instance, or null if no element
+	 * could be found with the specfied name.
+	 * @see org.jppf.ui.options.OptionElement#findLastWithName(java.lang.String)
+	 */
+	public OptionElement findLastWithName(String name)
+	{
+		List<OptionElement> list = findAllWithName(name);
+		return list.isEmpty() ? null : list.get(list.size() - 1);
+	}
+
+	/**
 	 * Find all the elements with the specified name in the subtree of which
 	 * this element is the root. 
 	 * @param name the name of the elements to find.
@@ -503,5 +527,41 @@ public abstract class AbstractOptionElement implements OptionElement
 	public void setInitializer(ValueChangeListener initializer)
 	{
 		this.initializer = initializer;
+	}
+
+	/**
+	 * Get the insets to use when this component is a container.
+	 * @return an <code>Insets</code> instance.
+	 */
+	public Insets getInsets()
+	{
+		return insets;
+	}
+
+	/**
+	 * Set the insets to use when this component is a container.
+	 * @param insets an <code>Insets</code> instance.
+	 */
+	public void setInsets(Insets insets)
+	{
+		this.insets = insets;
+	}
+
+	/**
+	 * Get the path to an eventual icon displayed in the button.
+	 * @return the path as a string.
+	 */
+	public String getIconPath()
+	{
+		return iconPath;
+	}
+
+	/**
+	 * Set the path to an eventual icon displayed in the button.
+	 * @param iconPath the path as a string.
+	 */
+	public void setIconPath(String iconPath)
+	{
+		this.iconPath = iconPath;
 	}
 }

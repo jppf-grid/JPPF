@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import org.jppf.ui.utils.GuiUtils;
 
 /**
  * This option encapsulates a file chooser control. It is composed of three components:
@@ -50,17 +51,9 @@ public class FileChooserOption extends AbstractOption
 	 */
 	private int dialogType = OPEN;
 	/**
-	 * Contains the name of the selected file.
-	 */
-	private JTextField fileField = null;
-	/**
-	 * Contains the label associated with the control.
-	 */
-	private JLabel fileLabel = null;
-	/**
 	 * The button used to popup a file chooser dialog.
 	 */
-	private JButton fileBtn = null;
+	private JButton button = null;
 	/**
 	 * The list of extensions for the files the user can select.
 	 */
@@ -101,32 +94,25 @@ public class FileChooserOption extends AbstractOption
 	 */
 	public void createUI()
 	{
-		String val = (String) value;
-		if ((val == null) || "".equals(val.trim()))
+		button = new JButton();
+		if ((label != null) && !"".equals(label.trim())) button.setText(label);
+		if (iconPath != null)
 		{
-			val = System.getProperty("user.dir");
-			value = val;
+			ImageIcon icon = GuiUtils.loadIcon(iconPath);
+			if (icon != null) button.setIcon(icon);
 		}
-		fileLabel = new JLabel(label);
-		fileField = new JTextField(val);
-		if (val.length() < 10) fileField.setColumns(10);
-		fileBtn = new JButton(" ... ");
-		JPanel topPanel = layoutComponents(fileLabel, fileBtn, HORIZONTAL);
-		JPanel panel = layoutComponents(topPanel, fileField);
 		if ((toolTipText != null) && !"".equals(toolTipText.trim()))
 		{
-			fileLabel.setToolTipText(toolTipText);
-			fileField.setToolTipText(toolTipText);
-			fileBtn.setToolTipText(toolTipText);
+			button.setToolTipText(toolTipText);
 		}
-		fileBtn.addActionListener(new ActionListener()
+		button.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent event)
 			{
 				doChooseFile();
 			}
 		});
-		UIComponent = panel;
+		UIComponent = button;
 	}
 
 	/**
@@ -145,9 +131,7 @@ public class FileChooserOption extends AbstractOption
 	 */
 	public void setEnabled(boolean enabled)
 	{
-		if (fileLabel != null) fileLabel.setEnabled(enabled);
-		if (fileField != null) fileField.setEnabled(enabled);
-		if (fileBtn != null) fileBtn.setEnabled(enabled);
+		if (button != null) button.setEnabled(enabled);
 	}
 
 	/**
@@ -155,16 +139,21 @@ public class FileChooserOption extends AbstractOption
 	 */
 	public void doChooseFile()
 	{
-		JFileChooser chooser = new JFileChooser((String) value);
+		String val = (String) value;
+		if ((val == null) || "".equals(val.trim()))
+		{
+			val = System.getProperty("user.dir");
+			//value = val;
+		}
+		JFileChooser chooser = new JFileChooser(val);
 		chooser.setDialogType(dialogType == OPEN ? JFileChooser.OPEN_DIALOG : JFileChooser.SAVE_DIALOG);
 		for (FileFilter filter: filters) chooser.addChoosableFileFilter(filter);
 		int result = -1;
-		if (OPEN == dialogType) result = chooser.showOpenDialog(fileBtn);
-		else result = chooser.showSaveDialog(fileBtn);
+		if (OPEN == dialogType) result = chooser.showOpenDialog(button);
+		else result = chooser.showSaveDialog(button);
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
 			value = chooser.getSelectedFile().getAbsolutePath();
-			fileField.setText((String) value);
 			fireValueChanged();
 		}
 	}

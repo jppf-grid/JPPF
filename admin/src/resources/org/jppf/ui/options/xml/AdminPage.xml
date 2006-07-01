@@ -14,11 +14,6 @@
 		importPackage(Packages.org.jppf.ui.options);
 		importPackage(Packages.org.jppf.ui.options.event);
 	]]></script>
-	<initializer type="script">
-		<script language="javascript"><![CDATA[
-			option.findFirstWithName("/Restart_delay").setEnabled(true);
-		]]></script>
-	</initializer>
 
 	<!-- ===================================================================== -->
 	<!--                   Top Panels                                          -->
