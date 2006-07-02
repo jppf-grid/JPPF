@@ -72,6 +72,7 @@ public class JPPFQueue
 	 * 
 	 * @return the most recent object that was added to the queue.
 	 */
+	/*
 	public JPPFTaskBundle nextBundle()
 	{
 		JPPFTaskBundle bundle = null;
@@ -91,6 +92,7 @@ public class JPPFQueue
 		}
 		return bundle;
 	}
+	*/
 	
 	/**
 	 * Get the next object in the queue.
@@ -111,6 +113,7 @@ public class JPPFQueue
 				queue.remove(bundle);
 			}
 			else result = bundle.copy(nbTasks);
+			result.setExecutionStartTime(System.currentTimeMillis());
 		}
 		finally
 		{

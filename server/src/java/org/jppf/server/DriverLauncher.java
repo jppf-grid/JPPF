@@ -104,9 +104,6 @@ public class DriverLauncher
 		command.add(System.getProperty("java.home")+"/bin/java");
 		command.add("-cp");
 		command.add(System.getProperty("java.class.path"));
-		String s = System.getProperty("user.language");
-		if (s == null) s = Locale.getDefault().getLanguage();
-		command.add("-Duser.language="+s);
 		command.add("-D"+JPPFConfiguration.CONFIG_PROPERTY+"="+System.getProperty(JPPFConfiguration.CONFIG_PROPERTY));
 		command.add("-Dlog4j.configuration="+System.getProperty("log4j.configuration"));
 		command.add("-server");

@@ -58,13 +58,16 @@ class CWaitingRequest implements ChannelState
 	 * @see org.jppf.server.ChannelState#exec(java.nio.channels.SelectionKey, org.jppf.server.ChannelContext)
 	 */
 	@SuppressWarnings("unchecked")
-	public void exec(SelectionKey key, ChannelContext context) throws IOException {
+	public void exec(SelectionKey key, ChannelContext context) throws IOException
+	{
 		SocketChannel channel = (SocketChannel) key.channel();
 		Request out = (Request) context.content;
-		if (this.server.fillRequest(channel, out)) {
+		if (server.fillRequest(channel, out))
+		{
 			String name = new String(out.getOutput().toByteArray());
 			boolean dynamic = false;
-			if (name.startsWith(":")) {
+			if (name.startsWith(":"))
+			{
 				dynamic = true;
 				name = name.substring(1);
 			}
@@ -76,40 +79,51 @@ class CWaitingRequest implements ChannelState
 				uuid = name.substring(0, idx);
 				name = name.substring(idx + 1);
 			}
-			if (uuid == null) {
+			if (uuid == null)
+			{
 				b = server.getResourceProvider().getResourceAsBytes(name);
 				// Sending b back to node
 				returnOrSchedule(key, context, b);
 			}
-			if ((b == null) && dynamic) {
+			if ((b == null) && dynamic)
+			{
 				CacheClassContent content = server.classCache.get(new CacheClassKey(uuid, name));
-				if (content != null) {
+				if (content != null)
+				{
 					returnOrSchedule(key, context, content.getContent());
 				}
-				else {
+				else
+				{
 					SocketChannel provider = server.providerConnections.get(uuid);
-					if (provider != null) {
+					if (provider != null)
+					{
 						SelectionKey providerKey = provider.keyFor(server.getSelector());
 						ChannelContext providerContext = (ChannelContext) providerKey.attachment();
 						List<RemoteClassRequest> queue = (List<RemoteClassRequest>) providerContext.content;
 						byte[] nameArray = name.getBytes();
 						ByteBuffer sending = server.createByteBuffer(nameArray);
-						if (queue.isEmpty()) {
-							try {
+						if (queue.isEmpty())
+						{
+							try
+							{
 								provider.write(sending);
 							}
-							catch(IOException e) {
+							catch(IOException e)
+							{
 								log.error(e.getMessage(), e);
 								server.providerConnections.remove(uuid);
-								try {
+								try
+								{
 									provider.close();
 								}
-								catch(Exception ignored) {
+								catch(Exception ignored)
+								{
 									log.error(ignored.getMessage(), ignored);
 								}
 								returnOrSchedule(key, context, new byte[0]);
 							}
-							if (!sending.hasRemaining()) {
+							if (!sending.hasRemaining())
+							{
 								providerContext.state = server.ReceivingResource;
 								providerKey.interestOps(SelectionKey.OP_READ);
 								context.state = server.SendingNodeData;

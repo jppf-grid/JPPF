@@ -48,6 +48,13 @@ public class Request {
 	private ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 	/**
+	 * Initialize an instance of this class.
+	 */
+	public Request()
+	{
+	}
+
+	/**
 	 * Get the request creation timestamp.
 	 * @return the timestamp in milliseconds as a long value.
 	 */

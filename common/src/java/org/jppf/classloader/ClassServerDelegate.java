@@ -132,7 +132,7 @@ public class ClassServerDelegate extends Thread
 				{
 					String name = new String(socketClient.receiveBytes(0).getBuffer());
 					byte[] b = resourceProvider.getResourceAsBytes(name);
-					socketClient.sendBytes(new JPPFBuffer(b,b.length));
+					socketClient.sendBytes(new JPPFBuffer(b, b.length));
 				}
 				catch(Exception e)
 				{

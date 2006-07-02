@@ -136,7 +136,7 @@ public final class JPPFStatsUpdater
 		{
 			stats.queueSize -= count;
 			stats.totalQueued += count;
-			stats.queue.newTime(time);
+			stats.queue.newTime(time, count);
 		}
 		finally
 		{
@@ -157,9 +157,13 @@ public final class JPPFStatsUpdater
 		try
 		{
 			stats.totalTasksExecuted += count;
-			stats.execution.newTime(time);
-			stats.nodeExecution.newTime(remoteTime);
-			stats.transport.newTime(time - remoteTime);
+			stats.execution.newTime(time, count);
+			stats.nodeExecution.newTime(remoteTime, count);
+			stats.transport.newTime(time - remoteTime, count);
+			if (time - remoteTime < 0)
+			{
+				stats.getClass();
+			}
 			stats.footprint += size;
 		}
 		finally

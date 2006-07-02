@@ -86,6 +86,10 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 */
 	private long nodeExecutionTime = 0L;
 	/**
+	 * The time at which the bundle is taken out of the queue fir sending to a node.
+	 */
+	private long executionStartTime = 0L;
+	/**
 	 * The priority of this task bundle.
 	 */
 	private int priority = 0;
@@ -373,5 +377,23 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	public void setState(State state)
 	{
 		this.state = state;
+	}
+
+	/**
+	 * Get the time at which the bundle is taken out of the queue for sending to a node.
+	 * @return the time as a long value.
+	 */
+	public long getExecutionStartTime()
+	{
+		return executionStartTime;
+	}
+
+	/**
+	 * Set the time at which the bundle is taken out of the queue for sending to a node.
+	 * @param executionStartTime the time as a long value.
+	 */
+	public void setExecutionStartTime(long executionStartTime)
+	{
+		this.executionStartTime = executionStartTime;
 	}
 }

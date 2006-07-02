@@ -68,12 +68,8 @@ public class ResourceProvider
 					int n = is.read(buffer, 0, BUFFER_SIZE);
 					//by contract instances of InputStream are not require to fill 
 					//the entire byte[]
-					if (n < 0){
-						end = true;
-					} else {
-						baos.write(buffer, 0, n);
-					}
-					
+					if (n < 0) end = true;
+					else baos.write(buffer, 0, n);
 				}
 				is.close();
 				baos.flush();
