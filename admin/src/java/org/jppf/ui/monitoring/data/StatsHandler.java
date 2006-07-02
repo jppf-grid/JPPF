@@ -249,6 +249,10 @@ public final class StatsHandler implements StatsConstants
 		lock.lock();
 		try
 		{
+			if (stats.transport.minTime < 0)
+			{
+				getClass();
+			}
 			tickCount++;
 			stats.execution.avgTime = (stats.totalTasksExecuted > 0)
 				? (double) stats.execution.totalTime / (double) stats.totalTasksExecuted : 0d;

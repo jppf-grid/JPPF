@@ -19,24 +19,18 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.awt.event.*;
 import java.util.*;
-import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
 import org.apache.log4j.Logger;
 import org.jppf.server.JPPFStats;
-import org.jppf.ui.monitoring.charts.config.JPPFChartBuilder;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
-import org.jppf.ui.options.OptionElement;
-import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.StringUtils;
-import org.jvnet.substance.*;
-import org.jvnet.substance.tabbed.DefaultTabPreviewPainter;
-import org.jvnet.substance.watermark.SubstanceNullWatermark;
+import org.jvnet.substance.SubstanceDefaultTableCellRenderer;
 
 /**
  * This class provides a graphical interface for monitoring the status and health 
@@ -212,78 +206,5 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 			Fields name = fields[row];
 			return column == 0 ? name : valuesMap.get(name);
 		}
-	}
-
-	/**
-	 * Start this UI.
-	 * @param args not used.
-	 */
-	public static void main(String...args)
-	{
-		try
-		{
-			UIManager.put(SubstanceLookAndFeel.ENABLE_INVERTED_THEMES, Boolean.TRUE);
-			UIManager.put(SubstanceLookAndFeel.TABBED_PANE_PREVIEW_PAINTER, new DefaultTabPreviewPainter());
-			JFrame.setDefaultLookAndFeelDecorated(true);
-			UIManager.setLookAndFeel(new SubstanceLookAndFeel());
-			SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme());
-			SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
-			for (Frame frm: Frame.getFrames()) SwingUtilities.updateComponentTreeUI(frm);
-			JFrame frame = new JFrame("JPPF monitoring and administration tool");
-			ImageIcon icon = GuiUtils.loadIcon("/org/jppf/ui/resources/logo-32x32.gif");
-			frame.setIconImage(icon.getImage());
-			frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			StatsHandler statsHandler = StatsHandler.getInstance();
-			final JPPFChartBuilder builder = startTool(frame);
-			frame.addWindowListener(new WindowAdapter()
-			{
-				public void windowClosing(WindowEvent e)
-				{
-					builder.getStorage().saveAll();
-					System.exit(0);
-				}
-			});
-			frame.setSize(600, 600);
-			frame.setVisible(true);
-			statsHandler.startRefreshTimer();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			log.error(e.getMessage(), e);
-			System.exit(1);
-		}
-	}
-
-	/**
-	 * Start this UI.
-	 * @param container the content in which to create the UI components.
-	 * @return a JPPFChartBuilder instance.
-	 * @throws Exception if an error occurs while creating the UI.
-	 */
-	public static JPPFChartBuilder startTool(Container container) throws Exception
-	{
-		StatsHandler statsHandler = StatsHandler.getInstance();
-		JPPFChartBuilder builder = JPPFChartBuilder.getInstance();
-		builder.createInitialCharts();
-		JTabbedPane tabbedPane = new JTabbedPane();
-		MonitoringPanel monitor = new MonitoringPanel();
-		OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/ChartsConfigPage.xml");
-		OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/AdminPage.xml");
-		OptionsHandler.addPageFromXml("org/jppf/ui/options/xml/BundleSizeTuningPage.xml");
-
-		statsHandler.addStatsHandlerListener(monitor);
-		statsHandler.addStatsHandlerListener(builder);
-		tabbedPane.addTab(StringUtils.getLocalized(BASE, "StatsPage.label"), null, new JScrollPane(monitor),
-			StringUtils.getLocalized(BASE, "StatsPage.tooltip"));
-		tabbedPane.addTab(StringUtils.getLocalized(BASE, "ChartsPage.label"), null, builder.getTabbedPane(), 
-				StringUtils.getLocalized(BASE, "ChartsPage.tooltip"));
-		for (OptionElement page: OptionsHandler.getPageList())
-		{
-			tabbedPane.addTab(page.getLabel(), null, page.getUIComponent(), page.getToolTipText());
-		}
-		container.add(tabbedPane);
-		tabbedPane.updateUI();
-		return builder;
 	}
 }

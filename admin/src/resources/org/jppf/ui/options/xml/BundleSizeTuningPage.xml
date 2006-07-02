@@ -141,7 +141,7 @@
 						params.put("DecreaseRatio", option.findFirstWithName("/DecreaseRatio").getValue());
 						params.put("manual", Boolean.FALSE);
 						msg = StatsHandler.getInstance().changeSettings(pwd, params);
-						if (msg != null) option.findElement("/TuningMessages").setValue(msg);
+						if (msg != null) option.findFirstWithName("/TuningMessages").setValue(msg);
 					]]></script>
 				</listener>
 			</child>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="PreviewTool" type="page">
 
-	<property name="label" value="Preview XML-based Page"/>
+	<property name="label" value="JPPF GUI Builder"/>
 	<property name="scrollable" value="false"/>
 	<property name="orientation" value="vertical"/>
 	<property name="bordered" value="false"/>
@@ -11,6 +11,8 @@
 		importPackage(Packages.java.lang);
 		importPackage(Packages.java.util);
 		importPackage(Packages.java.awt);
+		importPackage(Packages.java.awt.event);
+		importPackage(Packages.javax.swing);
 		importPackage(Packages.javax.swing.event);
 		importPackage(Packages.java.io);
 		importPackage(Packages.org.jppf.utils);
@@ -60,6 +62,22 @@
 			}
 		}
 	]]></script>
+	<initializer type="script">
+		<script language="javascript"><![CDATA[
+			var frame = new JFrame(option.getLabel());
+			wa = 
+			{
+				windowClosing: function(event)
+				{
+					System.exit(0);
+				}
+			};
+			frame.addWindowListener(new WindowAdapter(wa));
+			frame.getContentPane().add(option.getUIComponent());
+			frame.setSize(600, 600);
+			frame.setVisible(true);
+		]]></script>
+	</initializer>
 
 	<child name="Toolbar" type="Toolbar">
 		<property name="label" value="GUI Builder Toolbar"/>
@@ -89,7 +107,6 @@
 			<listener type="script">
 				<script language="javascript"><![CDATA[
 					var file = option.findLastWithName("/OpenBtn").getValue();
-					System.out.println("File = " + file);
 					if ((file != null) && !"".equals(file.trim())) save(file);
 					else option.findLastWithName("/SaveAsBtn").doChooseFile();
 				]]></script>
