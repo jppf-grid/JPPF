@@ -19,7 +19,6 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.awt.Frame;
 import javax.swing.*;
 import org.apache.log4j.Logger;
 import org.jppf.ui.options.factory.OptionsHandler;
@@ -59,7 +58,6 @@ public class UILauncher
 			if ("url".equalsIgnoreCase(args[1]))
 				OptionsHandler.addPageFromURL(args[0], null);
 			else OptionsHandler.addPageFromXml(args[0]);
-			for (Frame frm: Frame.getFrames()) SwingUtilities.updateComponentTreeUI(frm);
 		}
 		catch(Exception e)
 		{

@@ -90,7 +90,14 @@ public class TabbedPaneOption extends AbstractOptionElement implements OptionsPa
 		JTabbedPane pane = (JTabbedPane) UIComponent;
 		ImageIcon icon = null;
 		if (element.getIconPath() != null) icon = GuiUtils.loadIcon(element.getIconPath());
-		pane.addTab(element.getLabel(), icon, element.getUIComponent(), element.getToolTipText());
+		try
+		{
+			pane.addTab(element.getLabel(), icon, element.getUIComponent(), element.getToolTipText());
+		}
+		catch(Throwable t)
+		{
+			t.printStackTrace();
+		}
 		if (element instanceof AbstractOptionElement)
 			((AbstractOptionElement) element).setParent(this);
 	}
