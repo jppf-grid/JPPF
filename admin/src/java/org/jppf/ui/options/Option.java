@@ -31,4 +31,9 @@ public interface Option extends OptionElement
 	 * @return the value as an <code>Object</code> instance.
 	 */
 	Object getValue();
+	/**
+	 * Determine whether the value of this option should be saved in the user preferences.
+	 * @return true if the value should be saved, false otherwise.
+	 */
+	boolean isPersistent();
 }

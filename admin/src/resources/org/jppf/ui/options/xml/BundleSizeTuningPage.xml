@@ -29,6 +29,7 @@
 		<property name="label" value="Use manual settings"/>
 		<property name="tooltip" value="Toggles between manual and automatic tuning of the bundle size"/>
 		<property name="value" value="true"/>
+		<property name="persistent" value="true"/>
 		<listener type="script">
 			<script language="javascript"><![CDATA[
 				b = option.getValue().booleanValue();
@@ -95,6 +96,7 @@
 			<property name="value" value="5"/>
 			<property name="minValue" value="1"/>
 			<property name="maxValue" value="10000"/>
+			<property name="persistent" value="true"/>
 		</child>
 
 	</child>
@@ -159,6 +161,7 @@
 			<property name="value" value="500"/>
 			<property name="pattern" value="###,###,##0"/>
 			<property name="orientation" value="horizontal"/>
+			<property name="persistent" value="true"/>
 		</child>
 
 		<child name="MinSamplesToCheckConvergence" type="FormattedNumber">
@@ -167,6 +170,7 @@
 			<property name="value" value="300"/>
 			<property name="pattern" value="###,###,##0"/>
 			<property name="orientation" value="horizontal"/>
+			<property name="persistent" value="true"/>
 		</child>
 
 		<child name="MaxDeviation" type="FormattedNumber">
@@ -175,6 +179,7 @@
 			<property name="value" value="0.2"/>
 			<property name="pattern" value="###,##0.###"/>
 			<property name="orientation" value="horizontal"/>
+			<property name="persistent" value="true"/>
 		</child>
 
 		<child name="MaxGuessToStable" type="FormattedNumber">
@@ -183,6 +188,7 @@
 			<property name="value" value="10"/>
 			<property name="pattern" value="###,###,##0"/>
 			<property name="orientation" value="horizontal"/>
+			<property name="persistent" value="true"/>
 		</child>
 
 		<child name="SizeRatioDeviation" type="FormattedNumber">
@@ -191,6 +197,7 @@
 			<property name="value" value="1.5"/>
 			<property name="pattern" value="###,##0.###"/>
 			<property name="orientation" value="horizontal"/>
+			<property name="persistent" value="true"/>
 		</child>
 
 		<child name="DecreaseRatio" type="FormattedNumber">
@@ -199,6 +206,7 @@
 			<property name="value" value="0.2"/>
 			<property name="pattern" value="###,###,##0"/>
 			<property name="orientation" value="horizontal"/>
+			<property name="persistent" value="true"/>
 		</child>
 
 		<child name="filler" type="Filler">

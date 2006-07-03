@@ -108,6 +108,17 @@ public class ComboBoxOption extends AbstractOption
 	 */
 	public void setValue(Object value)
 	{
+		if (value instanceof String)
+		{
+			for (Object o: items)
+			{
+				if (((String) value).equals(o.toString()))
+				{
+					value = o;
+					break;
+				}
+			}
+		}
 		this.value = value;
 		if (combo != null) combo.setSelectedItem(value);
 	}

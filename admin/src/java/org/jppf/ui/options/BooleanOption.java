@@ -75,6 +75,17 @@ public class BooleanOption extends AbstractOption
 	}
 
 	/**
+	 * Set the value of this option.
+	 * @param value the value as an <code>Object</code> instance.
+	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
+	 */
+	public void setValue(Object value)
+	{
+		if (value instanceof String) value = "true".equalsIgnoreCase((String) value);
+		super.setValue(value);
+	}
+
+	/**
 	 * Propagate the state changes of the underlying checkbox to the listeners to this option.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */

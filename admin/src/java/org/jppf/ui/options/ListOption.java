@@ -146,6 +146,24 @@ public class ListOption extends AbstractOption
 		list.clearSelection();
 		DefaultListModel model = (DefaultListModel) list.getModel();
 		if (value == null) value = new ArrayList();
+		else if (value instanceof String)
+		{
+			List<Object> tmpList = new ArrayList<Object>();
+			String[] names = ((String) value).split(",");
+			for (String s: names)
+			{
+				s = s.trim();
+				for (Object o: items)
+				{
+					if (s.equals(o.toString()))
+					{
+						tmpList.add(o);
+						break;
+					}
+				}
+			}
+			value = tmpList;
+		}
 		List selectedItems = (List) value;
 		model.removeAllElements();
 		for (Object item: items) model.addElement(item);

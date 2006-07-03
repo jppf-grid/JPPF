@@ -117,6 +117,28 @@ public class FormattedNumberOption extends AbstractOption
 	}
 
 	/**
+	 * Set the value of this option.
+	 * @param value the value as an <code>Object</code> instance.
+	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
+	 */
+	public void setValue(Object value)
+	{
+		if (value instanceof String)
+		{
+			try
+			{
+				value = Double.parseDouble((String) value);
+			}
+			catch(NumberFormatException e)
+			{
+				value = 0;
+			}
+		}
+		if (field != null) field.setValue(value);
+		this.value = value;
+	}
+
+	/**
 	 * Add a listener to the underlying text document, to receive and propagate change events.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */

@@ -20,6 +20,7 @@
 package org.jppf.ui.options.factory;
 
 import java.util.*;
+import java.util.prefs.Preferences;
 import org.apache.log4j.Logger;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
@@ -34,6 +35,10 @@ public final class OptionsHandler
 	 * Log4j logger for this class.
 	 */
 	private static Logger log = Logger.getLogger(OptionsHandler.class);
+	/**
+	 * The root of the preferences subtree in which the chart configurations are saved.
+	 */
+	private static Preferences PREFERENCES = Preferences.userRoot().node("jppf/AdminTool");
 	/**
 	 * The list of option pages managed by this handler.
 	 */
@@ -123,5 +128,81 @@ public final class OptionsHandler
 			log.error(e.getMessage(), e);
 		}
 		return null;
+	}
+
+	/**
+	 * Save the value of all persistent options in the preferences store.
+	 */
+	public static void savePreferences()
+	{
+		try
+		{
+			for (OptionElement elt: pageList)
+			{
+				Preferences prefs = PREFERENCES.node(elt.getName());
+				prefs.clear();
+				savePreferences(elt, prefs);
+			}
+			PREFERENCES.flush();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Save the value of all persistent options in the preferences store.
+	 * @param elt the root of the options subtree to save.
+	 * @param prefs the preferences node in which to save the vaues.
+	 */
+	public static void savePreferences(OptionElement elt, Preferences prefs)
+	{
+		if (elt instanceof OptionsPage)
+		{
+			for (OptionElement child: ((OptionsPage) elt).getChildren())
+				savePreferences(child, prefs);
+		}
+		else if (elt instanceof Option)
+		{
+			Option option = (Option) elt;
+			if (option.isPersistent()) prefs.put(option.getName(), ""+option.getValue());
+		}
+	}
+
+
+	/**
+	 * L:oad the value of all persistent options in the preferences store.
+	 */
+	public static void loadPreferences()
+	{
+		for (OptionElement elt: pageList)
+		{
+			Preferences prefs = PREFERENCES.node(elt.getName());
+			loadPreferences(elt, prefs);
+		}
+	}
+
+	/**
+	 * Save the value of all persistent options in the preferences store.
+	 * @param elt the root of the options subtree to save.
+	 * @param prefs the preferences node in which to save the vaues.
+	 */
+	public static void loadPreferences(OptionElement elt, Preferences prefs)
+	{
+		if (elt instanceof OptionsPage)
+		{
+			for (OptionElement child: ((OptionsPage) elt).getChildren())
+				loadPreferences(child, prefs);
+		}
+		else if (elt instanceof AbstractOption)
+		{
+			AbstractOption option = (AbstractOption) elt;
+			if (option.isPersistent())
+			{
+				String val = prefs.get(option.getName(), null);
+				option.setValue(val);
+			}
+		}
 	}
 }

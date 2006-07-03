@@ -93,4 +93,14 @@ public class ButtonOption extends AbstractOption
 	{
 		((JButton) UIComponent).setEnabled(enabled);
 	}
+
+	/**
+	 * This method always returns false, since buttons have no value to persist.
+	 * @return false.
+	 * @see org.jppf.ui.options.AbstractOption#isPersistent()
+	 */
+	public boolean isPersistent()
+	{
+		return false;
+	}
 }

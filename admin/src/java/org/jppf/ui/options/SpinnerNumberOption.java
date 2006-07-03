@@ -111,6 +111,18 @@ public class SpinnerNumberOption extends AbstractOption
 	 */
 	public void setValue(Object value)
 	{
+		if (value instanceof String)
+		{
+			try
+			{
+				value = new Integer((String) value);
+			}
+			catch(NumberFormatException e)
+			{
+				value = new Integer(min);
+			}
+		}
+		else if (value == null) value = new Integer(min);
 		this.value = value;
 		if (spinner != null)
 		{

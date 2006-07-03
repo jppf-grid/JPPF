@@ -81,4 +81,14 @@ public class LabelOption extends AbstractOption
 	{
 		UIComponent.setEnabled(enabled);
 	}
+
+	/**
+	 * This method always returns false, since labels have no value to persist.
+	 * @return false.
+	 * @see org.jppf.ui.options.AbstractOption#isPersistent()
+	 */
+	public boolean isPersistent()
+	{
+		return false;
+	}
 }

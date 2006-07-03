@@ -53,7 +53,6 @@ public class OptionsPageBuilder
 	 * Base name used to localize labels and tooltips.
 	 */
 	private boolean eventEnabled = true;
-
 	/**
 	 * Default constructor.
 	 */
@@ -210,6 +209,7 @@ public class OptionsPageBuilder
 	public void initCommonOptionAttributes(AbstractOption option, OptionDescriptor desc)
 	{
 		initCommonAttributes(option, desc);
+		option.setPersistent(desc.getBoolean("persistent", false));
 		for (ListenerDescriptor listenerDesc: desc.listeners)
 		{
 			ValueChangeListener listener = createListener(listenerDesc);

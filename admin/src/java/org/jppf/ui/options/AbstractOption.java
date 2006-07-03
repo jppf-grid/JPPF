@@ -44,6 +44,10 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	 * Determines whether firing events is enabled or not.
 	 */
 	protected boolean eventsEnabled = true;
+	/**
+	 * Determines whether the value of this option should be saved in the user preferences.
+	 */
+	protected boolean persistent = false;
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -188,5 +192,24 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	public void setEventsEnabled(boolean enabled)
 	{
 		eventsEnabled = enabled;
+	}
+
+	/**
+	 * Determine whether the value of this option should be saved in the user preferences.
+	 * @return true if the value should be saved, false otherwise.
+	 * @see org.jppf.ui.options.Option#isPersistent()
+	 */
+	public boolean isPersistent()
+	{
+		return persistent;
+	}
+
+	/**
+	 * Set whether the value of this option should be saved in the user preferences.
+	 * @param persistent true if the value should be saved, false otherwise.
+	 */
+	public void setPersistent(boolean persistent)
+	{
+		this.persistent = persistent;
 	}
 }
