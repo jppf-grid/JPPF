@@ -140,7 +140,7 @@ public class JPPFNode implements MonitoredNode
 			}
 			catch(SecurityException e)
 			{
-				log.error(e.getMessage(), e);
+				//log.error(e.getMessage(), e);
 				throw new JPPFError(e);
 			}
 			catch(Exception e)
