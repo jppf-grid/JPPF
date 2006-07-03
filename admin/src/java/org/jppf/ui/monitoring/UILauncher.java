@@ -49,12 +49,16 @@ public class UILauncher
 		{
 			if ((args  == null) || (args.length < 2))
 				throw new Exception("Usage: UILauncher page_location location_source");
-			UIManager.put(SubstanceLookAndFeel.ENABLE_INVERTED_THEMES, Boolean.TRUE);
-			UIManager.put(SubstanceLookAndFeel.TABBED_PANE_PREVIEW_PAINTER, new DefaultTabPreviewPainter());
-			JFrame.setDefaultLookAndFeelDecorated(true);
-			UIManager.setLookAndFeel(new SubstanceLookAndFeel());
-			SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme());
-			SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
+			String s = System.getProperty("swing.defaultlaf");
+			if ((s == null) || SubstanceLookAndFeel.class.getName().equals(s))
+			{
+				UIManager.put(SubstanceLookAndFeel.ENABLE_INVERTED_THEMES, Boolean.TRUE);
+				UIManager.put(SubstanceLookAndFeel.TABBED_PANE_PREVIEW_PAINTER, new DefaultTabPreviewPainter());
+				JFrame.setDefaultLookAndFeelDecorated(true);
+				UIManager.setLookAndFeel(new SubstanceLookAndFeel());
+				SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme());
+				SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
+			}
 			if ("url".equalsIgnoreCase(args[1]))
 				OptionsHandler.addPageFromURL(args[0], null);
 			else OptionsHandler.addPageFromXml(args[0]);
