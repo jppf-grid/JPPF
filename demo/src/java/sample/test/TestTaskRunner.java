@@ -52,7 +52,8 @@ public class TestTaskRunner
 		try
 		{
 			jppfClient = new JPPFClient();
-			performExceptionTest();
+			//performExceptionTest();
+			performURLTest();
 			//perform2();
 			System.exit(0);
 		}
@@ -97,7 +98,7 @@ public class TestTaskRunner
 		}
 		catch(Exception e)
 		{
-			throw new JPPFException(e.getMessage(), e);
+			throw new JPPFException(e);
 		}
 	}
 
@@ -123,7 +124,37 @@ public class TestTaskRunner
 		}
 		catch(Exception e)
 		{
-			throw new JPPFException(e.getMessage(), e);
+			throw new JPPFException(e);
+		}
+	}
+
+	/**
+	 * Perform the test.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void performURLTest() throws JPPFException
+	{
+		try
+		{
+			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+			JPPFTask task = new FileDownloadTestTask("http://www.jppf.org/Options.xsd");
+			tasks.add(task);
+			List<JPPFTask> results = jppfClient.submit(tasks, new CompositeDataProvider());
+			JPPFTask resultTask = results.get(0);
+			if (resultTask.getException() != null)
+			{
+				System.out.println("Exception was caught:");
+				resultTask.getException().printStackTrace();
+				throw task.getException();
+			}
+			else
+			{
+				System.out.println("Result is: "+resultTask.getResult());
+			}
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e);
 		}
 	}
 

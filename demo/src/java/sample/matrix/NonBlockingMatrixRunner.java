@@ -122,7 +122,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 				for (int i=0; i<results.size(); i++)
 				{
 					MatrixTask matrixTask = (MatrixTask) results.get(i);
-					double[] row = matrixTask.getResult();
+					double[] row = (double[]) matrixTask.getResult();
 					for (int j=0; j<row.length; j++) c.setValueAt(i, j, row[j]);
 				}
 				long elapsed = System.currentTimeMillis() - start;

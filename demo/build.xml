@@ -228,7 +228,9 @@
 
 	<target name="run.ui">
 		<echo message="starting the server monitoring GUI"/>
-		<java fork="yes" classname="org.jppf.ui.monitoring.MonitoringPanel" classpathref="gui.classpath">
+		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="gui.classpath">
+			<arg value="org/jppf/ui/options/xml/JPPFAdminTool.xml"/>
+			<arg value="file"/>
 			<jvmarg value="-Djppf.config=jppf-gui.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-gui.properties"/>
 		</java>       
@@ -236,7 +238,9 @@
 
 	<target name="run.ui.builder">
 		<echo message="starting UI Builder Tool"/>
-		<java fork="yes" classname="org.jppf.ui.options.factory.JPPFGuiBuilder" classpathref="gui.classpath">
+		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="gui.classpath">
+			<arg value="org/jppf/ui/options/xml/JPPFGuiBuilder.xml"/>
+			<arg value="file"/>
 			<jvmarg value="-Djppf.config=jppf-gui.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-gui-builder.properties"/>
 		</java>       

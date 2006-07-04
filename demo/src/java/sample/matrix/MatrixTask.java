@@ -55,7 +55,7 @@ public class MatrixTask extends JPPFTask
 	 * @return a matrix column as an array of <code>double</code> values.
 	 * @see org.jppf.server.protocol.JPPFTask#getResult()
 	 */
-	public double[] getResult()
+	public Object getResult()
 	{
 		return result;
 	}
@@ -66,18 +66,25 @@ public class MatrixTask extends JPPFTask
 	 */
 	public void run()
 	{
-		Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
-		int size = matrix.getSize();
-		result = new double[size];
-
-		for (int col=0; col<size; col++)
+		try
 		{
-			double sum = 0d;
-			for (int row=0; row<size; row++)
+			Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
+			int size = matrix.getSize();
+			result = new double[size];
+	
+			for (int col=0; col<size; col++)
 			{
-				sum += matrix.getValueAt(row, col) * rowValues[row];
+				double sum = 0d;
+				for (int row=0; row<size; row++)
+				{
+					sum += matrix.getValueAt(row, col) * rowValues[row];
+				}
+				result[col] = sum;
 			}
-			result[col] = sum;
+		}
+		catch(Exception e)
+		{
+			setException(e);
 		}
 	}
 }

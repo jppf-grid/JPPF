@@ -19,30 +19,50 @@
  */
 package org.jppf.task.storage;
 
-import java.io.Serializable;
+import java.net.URL;
 import org.jppf.JPPFException;
 
 /**
- * Instances of this class provide a way for tasks to share common data.
- * The objective is to avoid data duplication through marshaling/unmarshaling of the data,
- * which can cause crashes due to insufficient available memory in a node.
+ * This data provider is composed of multiple data provider implementations
+ * to which it delegates its operations. The determination of which underlying
+ * data provider to used is performed through the types of the arguments.
+ * @see org.jppf.task.storage.DataProvider
  * @author Laurent Cohen
  */
-public interface DataProvider extends Serializable
+public class CompositeDataProvider implements DataProvider
 {
+	/**
+	 * Data provider for reading from or writing to a URL.
+	 */
+	URLDataProvider udp = new URLDataProvider();
+	/**
+	 * Data provider for reading from or writing to an in-memory map.
+	 */
+	MemoryMapDataProvider mmdp = new MemoryMapDataProvider();
+
 	/**
 	 * Get a value specified by its key.
 	 * @param key the key identifying the value to retrieve in the store.
 	 * @return the value as an <code>Object</code>.
 	 * @throws JPPFException if an error occured while retrieving the data.
+	 * @see org.jppf.task.storage.DataProvider#getValue(java.lang.Object)
 	 */
-	Object getValue(Object key) throws JPPFException;
-	
+	public Object getValue(Object key) throws JPPFException
+	{
+		if (key instanceof URL) return udp.getValue(key);
+		return mmdp.getValue(key);
+	}
+
 	/**
 	 * Set a value specified by its key in the store.
 	 * @param key the key identifying the value to retrieve in the store.
 	 * @param value the value to store, associated with the key.
 	 * @throws JPPFException if an error occured setting the data.
+	 * @see org.jppf.task.storage.DataProvider#setValue(java.lang.Object, java.lang.Object)
 	 */
-	void setValue(Object key, Object value) throws JPPFException;
+	public void setValue(Object key, Object value) throws JPPFException
+	{
+		if (key instanceof URL) udp.setValue(key, value);
+		else mmdp.setValue(key, value);
+	}
 }
