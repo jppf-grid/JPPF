@@ -20,6 +20,11 @@
 			<attribute value="file:/C:/Tools/rhino1_6R2/docs/apidocs/" name="javadoc_location"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/UJAC-UI/ujac-ui.jar"/>
+	<classpathentry exported="true" sourcepath="C:/ftp/dev/JEdit/UJAC-UI/src" kind="lib" path="lib/UJAC-UI/ujac-ui.jar"/>
+	<classpathentry exported="true" sourcepath="C:/Tools/Apache/commons-io-1.2/src/java" kind="lib" path="lib/ApacheCommons/commons-io-1.2.jar">
+		<attributes>
+			<attribute value="file:/C:/Tools/Apache/commons-io-1.2/docs/" name="javadoc_location"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
