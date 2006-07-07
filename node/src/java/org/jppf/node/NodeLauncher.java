@@ -112,7 +112,7 @@ public class NodeLauncher
 	}
 
 	/**
-	 * Set the security manager with the permission granted in the plicy file.
+	 * Set the security manager with the permission granted in the policy file.
 	 * @throws Exception if the security could not be set.
 	 */
 	public static void setSecurity() throws Exception
