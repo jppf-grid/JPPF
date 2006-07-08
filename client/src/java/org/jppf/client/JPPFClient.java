@@ -360,8 +360,8 @@ public class JPPFClient {
 						tmpKey, newPassword.getBytes()));
 			}
 			if (parameters != null) {
-				for (String key : parameters.keySet()) {
-					request.setParameter(key, parameters.get(key));
+				for( Map.Entry<String, Object> entry : parameters.entrySet()){
+					request.setParameter(entry.getKey(), entry.getValue());
 				}
 			}
 			sendAdminRequest(request);

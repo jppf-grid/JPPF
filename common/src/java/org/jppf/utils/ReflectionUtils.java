@@ -83,12 +83,11 @@ public class ReflectionUtils
 				attrMap.put(attrName, value);
 			}
 		}
-		Iterator<String> it = attrMap.keySet().iterator();
+		Iterator<Map.Entry<String, Object>> it = attrMap.entrySet().iterator();
 		while (it.hasNext())
 		{
-			String name = it.next();
-			Object value = attrMap.get(name);
-			sb.append(name).append("=").append(value);
+			Map.Entry<String, Object> entry = it.next();
+			sb.append(entry.getKey()).append("=").append(entry.getValue());
 			if (it.hasNext()) sb.append(separator);
 		}
 		return sb.toString();
