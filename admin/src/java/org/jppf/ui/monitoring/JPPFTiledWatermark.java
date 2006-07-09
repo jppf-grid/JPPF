@@ -299,12 +299,12 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 
 	/**
 	 * .
-	 * @param kind .
+	 * @param aKind .
 	 */
-	public static void setKind(ImageWatermarkKind kind)
+	public static void setKind(ImageWatermarkKind aKind)
 	{
-		if (kind == null) { throw new IllegalArgumentException("Can't pass null to SubstanceImageWatermark.setKind()"); }
-		kind = kind;
+		if (aKind == null) { throw new IllegalArgumentException("Can't pass null to SubstanceImageWatermark.setKind()"); }
+		kind = aKind;
 	}
 
 	/**
@@ -327,12 +327,12 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 
 	/**
 	 * 
-	 * @param opacity .
+	 * @param aOpacity .
 	 */
-	public static void setOpacity(float opacity)
+	public static void setOpacity(float aOpacity)
 	{
 		if ((opacity < 0.0f) || (opacity > 1.0f)) { throw new IllegalArgumentException(
 				"SubstanceImageWatermark.setOpacity() can get value in 0.0-1.0 range, was passed value " + opacity); }
-		opacity = opacity;
+		opacity = aOpacity;
 	}
 }
