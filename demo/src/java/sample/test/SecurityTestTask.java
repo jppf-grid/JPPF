@@ -50,7 +50,6 @@ public class SecurityTestTask extends JPPFTask
 	 */
 	public void run()
 	{
-		System.out.println("Task Executing");
 		runTestMethods();
 	}
 
@@ -143,7 +142,7 @@ public class SecurityTestTask extends JPPFTask
 		try
 		{
 			String host = JPPFConfiguration.getProperties().getString("jppf.server.host", "localhost");
-			Socket s = new Socket(host, 8000);
+			Socket s = new Socket(host, 1001);
 			s.close();
 		}
 		catch(IOException e)
@@ -220,5 +219,23 @@ public class SecurityTestTask extends JPPFTask
 	public List<ExecutionReport> getReports()
 	{
 		return reports;
+	}
+
+	/**
+	 * Get a string representation of this task.
+	 * @return a string describing the task execution result.
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		for (ExecutionReport r: reports)
+		{
+			sb.append("----------------------------------------------------------\n");
+			sb.append("method name: ").append(r.methodName).append("\n");
+			sb.append("description: ").append(r.description).append("\n");
+			sb.append("stack trace:\n").append(r.stackTrace).append("\n");
+		}
+		return sb.toString();
 	}
 }

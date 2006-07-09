@@ -19,14 +19,16 @@
  */
 package sample.test;
 
-import java.util.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFClient;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.*;
-import org.jppf.utils.StringUtils;
-import sample.test.SecurityTestTask.ExecutionReport;
+import org.jppf.task.storage.CompositeDataProvider;
 
 /**
  * Runner class used for testing the framework.
@@ -52,9 +54,10 @@ public class TestTaskRunner
 		try
 		{
 			jppfClient = new JPPFClient();
-			//performExceptionTest();
+			performEmptyTaskListTest();
+			performExceptionTest();
 			performURLTest();
-			//perform2();
+			performSecurityTest();
 			System.exit(0);
 		}
 		catch(Exception e)
@@ -67,47 +70,9 @@ public class TestTaskRunner
 	 * Perform the test.
 	 * @throws JPPFException if an error is raised during the execution.
 	 */
-	static void perform() throws JPPFException
-	{
-		try
-		{
-			int nbIter = 1;
-			int nbTasks = 1;
-			DataProvider dp = new MemoryMapDataProvider();
-			String s = StringUtils.padLeft("", 'x', 1000);
-			dp.setValue("dummyValue", s);
-			for (int n=0; n<nbIter; n++)
-			{
-				List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-				for (int i=0; i<nbTasks; i++)
-				{
-					JPPFTask task = new SecurityTestTask();
-					tasks.add(task);
-				}
-				List<JPPFTask> results = jppfClient.submit(tasks, dp);
-				JPPFTask task = results.get(0);
-				SecurityTestTask t = (SecurityTestTask) task;
-				for (ExecutionReport r: t.getReports())
-				{
-					System.out.println(r.methodName);
-					System.out.println(r.description);
-					System.out.println(r.stackTrace+"\n");
-				}
-				if (task.getException() != null) throw task.getException();
-			}
-		}
-		catch(Exception e)
-		{
-			throw new JPPFException(e);
-		}
-	}
-
-	/**
-	 * Perform the test.
-	 * @throws JPPFException if an error is raised during the execution.
-	 */
 	static void performExceptionTest() throws JPPFException
 	{
+		System.out.println("Starting exception testing...");
 		try
 		{
 			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
@@ -117,23 +82,26 @@ public class TestTaskRunner
 			JPPFTask resultTask = results.get(0);
 			if (resultTask.getException() != null)
 			{
-				System.out.println("Exception was caught:");
-				resultTask.getException().printStackTrace();
-				throw task.getException();
+				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
 			}
 		}
 		catch(Exception e)
 		{
 			throw new JPPFException(e);
 		}
+		finally
+		{
+			System.out.println("Exception testing complete.");
+		}
 	}
 
 	/**
-	 * Perform the test.
+	 * Test a task that reads a file from an HTTP url and uploads it to an FTP server.
 	 * @throws JPPFException if an error is raised during the execution.
 	 */
 	static void performURLTest() throws JPPFException
 	{
+		System.out.println("Starting URL testing...");
 		try
 		{
 			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
@@ -143,9 +111,7 @@ public class TestTaskRunner
 			JPPFTask resultTask = results.get(0);
 			if (resultTask.getException() != null)
 			{
-				System.out.println("Exception was caught:");
-				resultTask.getException().printStackTrace();
-				throw task.getException();
+				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
 			}
 			else
 			{
@@ -156,22 +122,78 @@ public class TestTaskRunner
 		{
 			throw new JPPFException(e);
 		}
+		finally
+		{
+			System.out.println("URL testing complete.");
+		}
 	}
 
 	/**
-	 * Perform the test.
+	 * Test various permission violations.
 	 * @throws JPPFException if an error is raised during the execution.
 	 */
-	static void perform2() throws JPPFException
+	static void performSecurityTest() throws JPPFException
 	{
+		System.out.println("Starting security testing...");
 		try
 		{
-			//jppfClient.submitAdminRequest(AdminRequestHeader.ADMIN_SHUTDOWN_RESTART, 3000L, 3000L);
-			//jppfClient.submitAdminRequest(AdminRequest.SHUTDOWN, 3000L, 3000L);
+			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+			JPPFTask task = new SecurityTestTask();
+			tasks.add(task);
+			List<JPPFTask> results = jppfClient.submit(tasks, new CompositeDataProvider());
+			JPPFTask resultTask = results.get(0);
+			System.out.println("Result is:\n"+resultTask);
 		}
 		catch(Exception e)
 		{
-			throw new JPPFException(e.getMessage(), e);
+			throw new JPPFException(e);
 		}
+		finally
+		{
+			System.out.println("Security testing complete.");
+		}
+	}
+
+	/**
+	 * Test with an empty list of tasks.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void performEmptyTaskListTest() throws JPPFException
+	{
+		System.out.println("Starting empty tasks list testing...");
+		try
+		{
+			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+			List<JPPFTask> results = jppfClient.submit(tasks, null);
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e);
+		}
+		finally
+		{
+			System.out.println("Empty tasks list testing complete.");
+		}
+	}
+	
+	/**
+	 * Return an exception stack trace as a string.
+	 * @param t the throwable toget the stack trace from.
+	 * @return a string.
+	 */
+	static String getStackTrace(Throwable t)
+	{
+		try
+		{
+			StringWriter sw = new StringWriter();
+			PrintWriter writer = new PrintWriter(sw);
+			t.printStackTrace(writer);
+			return sw.toString();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return "";
 	}
 }

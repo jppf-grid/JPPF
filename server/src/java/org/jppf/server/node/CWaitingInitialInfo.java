@@ -19,12 +19,21 @@
  */
 package org.jppf.server.node;
 
-import java.io.*;
-import java.nio.channels.*;
-import java.util.*;
-import org.jppf.security.*;
-import org.jppf.server.*;
-import org.jppf.utils.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jppf.server.ChannelContext;
+import org.jppf.server.ChannelState;
+import org.jppf.server.JPPFTaskBundle;
+import org.jppf.server.NodeChannelContext;
+import org.jppf.server.Request;
+import org.jppf.utils.SerializationHelper;
+import org.jppf.utils.SerializationHelperImpl;
 
 /**
  * This class implements the state of receiving information from the node as a
@@ -81,18 +90,6 @@ class CWaitingInitialInfo implements ChannelState
 				{
 					nodeContext.bundler = server.getBundler().copy();
 				}
-				JPPFSecurityContext cred = JPPFDriver.getInstance().getCredentials();
-				if ((bundle.getCredentials() == null) ||
-					!cred.canSend(bundle.getCredentials()) || !cred.canExecute(bundle.getCredentials()))
-				{
-					server.closeNode(channel);
-					StringBuilder sb = new StringBuilder();
-					sb.append("The security credentials for node [");
-					sb.append((bundle.getCredentials() != null) ? bundle.getCredentials().getIdentifier() : "unknown");
-					sb.append("] do not permit it to receive or execute jobs from JPPF Driver [");
-					sb.append(cred.getIdentifier()).append("]");
-					throw new JPPFSecurityException(sb.toString());
-				}
 				// verifying if there is other tasks to send to this node
 				bundle = server.getQueue().nextBundle(nodeContext.bundler.getBundleSize());
 				if (bundle != null)
@@ -110,7 +107,6 @@ class CWaitingInitialInfo implements ChannelState
 						throw e;
 					}
 				}
-				nodeContext.credentials = bundle.getCredentials();
 				// there is nothing to do, so this instance will wait for a job
 				server.availableNodes.add(channel);
 				// make sure the context is reset so as not to resubmit

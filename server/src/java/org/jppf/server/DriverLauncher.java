@@ -19,9 +19,10 @@
  */
 package org.jppf.server;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
 import java.util.*;
+
 import org.apache.log4j.Logger;
 import org.jppf.utils.JPPFConfiguration;
 
@@ -82,6 +83,7 @@ public class DriverLauncher
 				process = buildProcess();
 				if (debugEnabled) log.debug("started driver process [" + process + "]");
 				int n = process.waitFor();
+				System.out.println("error output: "+getOutput(process, "err"));
 				process.destroy();
 				if (n != 2) end = true;
 			}
@@ -170,5 +172,37 @@ public class DriverLauncher
 			}
 		}
 		return driverPort;
+	}
+	
+	/**
+	 * .
+	 * @param process .
+	 * @param streamType .
+	 * @return .
+	 */
+	private static String getOutput(Process process, String streamType)
+	{
+		StringBuilder sb = new StringBuilder();
+		try
+		{
+			InputStream is = null;
+			if ("std".equals(streamType)) is = process.getInputStream();
+			else is = process.getErrorStream();
+			LineNumberReader reader = new LineNumberReader(new InputStreamReader(is));
+			String s = "";
+			while (s != null)
+			{
+				s = reader.readLine();
+				if (s != null)
+				{
+					sb.append(s).append("\n");
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return sb.toString();
 	}
 }

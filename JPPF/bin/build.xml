@@ -101,6 +101,7 @@
 
 	<target name="init" description="Initialize ressources">
  		<mkdir dir="${build}"/>
+		<available file="${NSIS.home}/makensis.exe" property="NSIS.present"/>
 	</target>
 
 	<target name="init.deploy" description="Initialize ressources">
@@ -144,7 +145,8 @@
 	<!--                         Compile the application                           -->
 	<!-- ========================================================================= -->
 
-	<target name="screensaver" description="Generate the screen saver packaging for the nodes" depends="init">
+	<target name="screensaver" description="Generate the screen saver packaging for the nodes"
+		depends="init" if="NSIS.present">
 		<ant antfile="${basedir}/../node/bin/build.xml" inheritall="false"/>
   </target>
 

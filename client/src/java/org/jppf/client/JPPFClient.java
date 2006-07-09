@@ -283,7 +283,7 @@ public class JPPFClient {
 			JPPFTask task = (JPPFTask) helper.readNextObject(dis, true);
 			taskList.add(task);
 		}
-		int startIndex = taskList.get(0).getPosition();
+		int startIndex = (taskList.isEmpty()) ? -1 : taskList.get(0).getPosition();
 		dis.close();
 		Pair<List<JPPFTask>, Integer> p =
 			new Pair<List<JPPFTask>, Integer>(taskList, startIndex);

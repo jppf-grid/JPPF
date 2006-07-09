@@ -22,7 +22,7 @@ package sample.test;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
- * Thnis task is intended for testing the framework only.
+ * This task is intended for testing the framework only.
  * @author Laurent Cohen
  */
 public class JPPFTestTask extends JPPFTask

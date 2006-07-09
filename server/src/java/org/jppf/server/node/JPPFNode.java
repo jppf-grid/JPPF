@@ -182,21 +182,6 @@ public class JPPFNode implements MonitoredNode
 				}
 				for (Future future : futureList) future.get();
 			}
-			else
-			{
-				JPPFSecurityContext serverCred = bundle.getCredentials();
-				if ((serverCred == null) || !credentials.canReceive(serverCred) || !credentials.canExecute(serverCred))
-				{
-					StringBuilder sb = new StringBuilder();
-					sb.append("The security credentials for node [");
-					sb.append(credentials.getIdentifier());
-					sb.append("] do not permit it to receive or execute jobs from JPPF Driver [");
-					sb.append((serverCred != null) ? serverCred.getIdentifier() : "unknown");
-					sb.append("]. This node is now disconnecting.");
-					throw new JPPFError(new JPPFSecurityException(sb.toString()));
-				}
-				bundle.setCredentials(credentials);
-			}
 			writeResults(bundle, taskList);
 			int p = bundle.getBuildNumber();
 			if (buildNumber < p)

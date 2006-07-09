@@ -165,8 +165,12 @@ public class ApplicationConnection extends JPPFConnection implements
 		bundle.setTasks(taskList);
 		bundle.setCompletionListener(this);
 		getQueue().addBundle(bundle);
-		pendingTasksCount = count;
-		waitForExecution();
+		if (count <= 0) sendPartialResults(bundle);
+		else
+		{
+			pendingTasksCount = count;
+			waitForExecution();
+		}
 		return;
 	}
 
@@ -197,10 +201,8 @@ public class ApplicationConnection extends JPPFConnection implements
 	}
 
 	/**
-	 * Send the collected statitics in response to a stats request.
-	 * 
-	 * @throws Exception
-	 *             if the statistics could not be sent to the requester.
+	 * Send the collected statistics in response to a stats request.
+	 * @throws Exception if the statistics could not be sent to the requester.
 	 */
 	private void sendStats() throws Exception {
 		JPPFStats stats = getStats();
@@ -223,11 +225,8 @@ public class ApplicationConnection extends JPPFConnection implements
 
 	/**
 	 * Perform a requested administative function.
-	 * 
-	 * @param header
-	 *            the header for the request.
-	 * @throws Exception
-	 *             if the function could not be performed.
+	 * @param header the header for the request.
+	 * @throws Exception if the function could not be performed.
 	 */
 	private void performAdminOperation(JPPFRequestHeader header)
 			throws Exception {
@@ -268,12 +267,9 @@ public class ApplicationConnection extends JPPFConnection implements
 
 	/**
 	 * Perform the action to change the settings for bundle size tuning.
-	 * 
-	 * @param request
-	 *            the request holding the parametrs to change.
+	 * @param request the request holding the parametrs to change.
 	 * @return a message to report the change status.
-	 * @throws Exception
-	 *             if the changes could not be applied.
+	 * @throws Exception if the changes could not be applied.
 	 */
 	private String performChangeSettings(AdminRequest request) throws Exception {
 		boolean manual = "manual".equalsIgnoreCase((String) request
@@ -307,13 +303,9 @@ public class ApplicationConnection extends JPPFConnection implements
 
 	/**
 	 * Send the response to an admin request.
-	 * 
-	 * @param request
-	 *            the admin request that holds the response.
-	 * @param msg
-	 *            the response messages.
-	 * @throws Exception
-	 *             if the response could not be sent.
+	 * @param request the admin request that holds the response.
+	 * @param msg the response messages.
+	 * @throws Exception if the response could not be sent.
 	 */
 	private void sendAdminResponse(AdminRequest request, String msg)
 			throws Exception {
@@ -384,7 +376,6 @@ public class ApplicationConnection extends JPPFConnection implements
 
 	/**
 	 * Close this application connection.
-	 * 
 	 * @see org.jppf.server.JPPFConnection#close()
 	 */
 	public void close() {
@@ -395,7 +386,6 @@ public class ApplicationConnection extends JPPFConnection implements
 
 	/**
 	 * Get the algorithm that dynamically computes the task bundle size.
-	 * 
 	 * @return a <code>Bundler</code> instance.
 	 */
 	public Bundler getBundler() {
@@ -406,9 +396,7 @@ public class ApplicationConnection extends JPPFConnection implements
 
 	/**
 	 * Set the algorithm that dynamically computes the task bundle size.
-	 * 
-	 * @param bundler
-	 *            a <code>Bundler</code> instance.
+	 * @param bundler a <code>Bundler</code> instance.
 	 */
 	public void setBundler(Bundler bundler) {
 		if (nodeServer == null)
@@ -418,7 +406,6 @@ public class ApplicationConnection extends JPPFConnection implements
 
 	/**
 	 * Get a string representation of this connection.
-	 * 
 	 * @return a string representation of this connection.
 	 * @see org.jppf.server.JPPFConnection#toString()
 	 */
