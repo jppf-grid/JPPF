@@ -63,8 +63,6 @@ class CWaitingInitialInfo implements ChannelState
 		Request request = out.getRequest();
 		try
 		{
-			// Wait the full byte[] of the bundle come to start processing.
-			// This makes the integration of non-blocking with ObjectInputStream easier.
 			if (server.fillRequest(channel, out.getRequest()))
 			{
 				DataInputStream dis = 
@@ -94,6 +92,23 @@ class CWaitingInitialInfo implements ChannelState
 					sb.append("] do not permit it to receive or execute jobs from JPPF Driver [");
 					sb.append(cred.getIdentifier()).append("]");
 					throw new JPPFSecurityException(sb.toString());
+				}
+				// verifying if there is other tasks to send to this node
+				bundle = server.getQueue().nextBundle(nodeContext.bundler.getBundleSize());
+				if (bundle != null)
+				{
+					try
+					{
+						server.sendTask(channel, key, context, bundle);
+						return;
+					}
+					catch(Exception e)
+					{
+						server.closeNode(channel);
+						server.resubmitBundle(bundle);
+						bundle = null;
+						throw e;
+					}
 				}
 				nodeContext.credentials = bundle.getCredentials();
 				// there is nothing to do, so this instance will wait for a job
