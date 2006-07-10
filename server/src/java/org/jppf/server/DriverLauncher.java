@@ -83,7 +83,8 @@ public class DriverLauncher
 				process = buildProcess();
 				if (debugEnabled) log.debug("started driver process [" + process + "]");
 				int n = process.waitFor();
-				System.out.println("error output: "+getOutput(process, "err"));
+				log.info("standard output:\n"+getOutput(process, "std"));
+				log.info("error output:\n"+getOutput(process, "err"));
 				process.destroy();
 				if (n != 2) end = true;
 			}
@@ -175,10 +176,10 @@ public class DriverLauncher
 	}
 	
 	/**
-	 * .
-	 * @param process .
-	 * @param streamType .
-	 * @return .
+	 * Get the output of the driver process.
+	 * @param process the process to get the standard or error output from.
+	 * @param streamType detrmines whether to obtain the standard or error output..
+	 * @return the output as a string.
 	 */
 	private static String getOutput(Process process, String streamType)
 	{
@@ -201,7 +202,7 @@ public class DriverLauncher
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return sb.toString();
 	}
