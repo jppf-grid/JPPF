@@ -26,7 +26,18 @@ import org.jppf.task.storage.DataProvider;
 /**
  * Abstract superclass for all tasks submitted to the execution server.
  * This class provides the basic facilities to handle data shared among tasks, handling of task execution exception,
- * and handling of the execution results.
+ * and handling of the execution results.<p>
+ * JPPF clients have to extend this class and must implement the <code>run</code> method. In the
+ * <code>run</code> method the task calculations are performed, and the result of the calculations
+ * is set with the {@link #setResult(Object)} method:
+ * <pre>
+ * class MyTask extends JPPFTask {
+ *     	public void run() {
+ *          // do the calculation ...
+ *          setResult(myResult);
+ *      }
+ * }
+ * </pre>
  * @author Laurent Cohen
  */
 public abstract class JPPFTask implements Runnable, Serializable
@@ -67,7 +78,8 @@ public abstract class JPPFTask implements Runnable, Serializable
 	}
 
 	/**
-	 * Get the exception that was raised by this task's execution.
+	 * Get the exception that was raised by this task's execution. If the task raised a
+	 * {@link Throwable}, the exception is embedded into a {@link org.jppf.JPPFException}.
 	 * @return a <code>Exception</code> instance, or null if no exception was raised.
 	 */
 	public Exception getException()
@@ -76,7 +88,8 @@ public abstract class JPPFTask implements Runnable, Serializable
 	}
 
 	/**
-	 * Get the exception that was raised by this task's execution.
+	 * Sets the exception that was raised by this task's execution in the <code>run</code> method.
+	 * The exception is set by the JPPF framework.
 	 * @param exception a <code>ClientApplicationException</code> instance.
 	 */
 	public void setException(Exception exception)
@@ -103,6 +116,7 @@ public abstract class JPPFTask implements Runnable, Serializable
 	}
 
 	/**
+	 * Returns the position of this task at the submission.
 	 * @return Returns the position of this task at the submission.
 	 */
 	public int getPosition() {
@@ -110,6 +124,7 @@ public abstract class JPPFTask implements Runnable, Serializable
 	}
 
 	/**
+	 * Sets the position of this task into the submission.
 	 * @param position The position of this task into the submission.
 	 */
 	public void setPosition(int position) {
