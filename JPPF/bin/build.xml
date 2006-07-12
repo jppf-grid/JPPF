@@ -248,6 +248,14 @@
 		<copy todir="${runtime.node}/config">
 			<fileset dir="${config}/node">
 				<exclude name="jppf.policy"/>
+				<exclude name="*.bat"/>
+			</fileset>
+		</copy>
+		<copy todir="${runtime.node}">
+			<fileset dir="${config}/node">
+				<exclude name="*.properties"/>
+				<exclude name="*.policy"/>
+				<include name="*.bat"/>
 			</fileset>
 		</copy>
 		<copy tofile="${runtime.node}/build.xml" file="${bin}/ant-node.xml"/>
