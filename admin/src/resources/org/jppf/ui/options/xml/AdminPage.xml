@@ -9,10 +9,14 @@
 	<property name="main" value="true"/>
 	<property name="tooltip" value="Perform the remote administration of the server"/>
 	<script language="javascript"><![CDATA[
+		importPackage(Packages.org.jppf.utils);
 		importPackage(Packages.org.jppf.server.protocol);
 		importPackage(Packages.org.jppf.ui.monitoring.data);
 		importPackage(Packages.org.jppf.ui.options);
 		importPackage(Packages.org.jppf.ui.options.event);
+	]]></script>
+	<script language="javascript"><![CDATA[
+		BASE = "org.jppf.ui.i18n.AdminPage";
 	]]></script>
 
 	<!-- ===================================================================== -->
@@ -56,7 +60,7 @@
 						else command = AdminRequest.SHUTDOWN;
 						pwd = option.findFirstWithName("/actualPwd");
 						msg = StatsHandler.getInstance().requestShutdownRestart(pwd, command, shutdownDelay, restartDelay);
-						option.findElement("/msgText").setValue(msg);
+						option.findFirstWithName("/msgText").setValue(msg);
 					]]></script>
 				</listener>
 			</child>
@@ -119,7 +123,7 @@
 						if (validateNewPassword(newPwd, confirmPwd))
 						{
 							msg = StatsHandler.getInstance().changeAdminPassword(pwd, newPwd);
-							option.findElement("/msgText").setValue(msg);
+							option.findFirstWithName("/msgText").setValue(msg);
 						}
 
 						function validateNewPassword(newPwd, confirmPwd)
@@ -128,15 +132,15 @@
 							result = true;
 							if ((newPwd == null) || "".equals(newPwd))
 							{
-								msg = "The new password must not be empty, with at least one non-space character";
+								msg = StringUtils.getLocalized(BASE, "empty.pwd.msg");
 								result = false;
 							}
 							else if (!newPwd.equals(confirmPwd))
 							{
-								msg = "The new password and the confirmation do not match";
+								msg = StringUtils.getLocalized(BASE, "pwd.match.err.msg");
 								result = false;
 							}
-							if (!result) option.findElement("/msgText").setValue(msg);
+							if (!result) option.findFirstWithName("/msgText").setValue(msg);
 							return result;
 						}
 					]]></script>
