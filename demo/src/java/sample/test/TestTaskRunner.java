@@ -58,6 +58,7 @@ public class TestTaskRunner
 			performExceptionTest();
 			performURLTest();
 			performSecurityTest();
+			performEmptyConstantTaskTest();
 			System.exit(0);
 		}
 		catch(Exception e)
@@ -173,6 +174,33 @@ public class TestTaskRunner
 		finally
 		{
 			System.out.println("Empty tasks list testing complete.");
+		}
+	}
+
+	/**
+	 * Check that correct results are returned by the framework.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void performEmptyConstantTaskTest() throws JPPFException
+	{
+		System.out.println("Starting constant tasks testing...");
+		try
+		{
+			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+			for (int i=0; i<15; i++) tasks.add(new ConstantTask(i));
+			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			for (int i=0; i<15; i++)
+			{
+				System.out.println("result for task #"+i+" is : "+results.get(i).getResult());
+			}
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e);
+		}
+		finally
+		{
+			System.out.println("Constant tasks testing complete.");
 		}
 	}
 	
