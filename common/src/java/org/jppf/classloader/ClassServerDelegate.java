@@ -28,7 +28,7 @@ import org.jppf.utils.JPPFBuffer;
 /**
  * Wrapper around an incoming socket connection, whose role is to receive the names of classes
  * to load from the classpath, then send the class files' contents (or bytecode) to the remote client.
- * <p>Instances of this class are part of the JPPF dynamic class loading mechanism. The enable remote nodes
+ * <p>Instances of this class are part of the JPPF dynamic class loading mechanism. They enable remote nodes
  * to dynamically load classes from the JVM that run's the class server.
  * @author Laurent Cohen
  * @author Domingos Creado
@@ -133,9 +133,13 @@ public class ClassServerDelegate extends Thread
 					String name = new String(socketClient.receiveBytes(0).getBuffer());
 					byte[] b = resourceProvider.getResourceAsBytes(name);
 					socketClient.sendBytes(new JPPFBuffer(b, b.length));
+					if  (log.isInfoEnabled()) {
+						log.info("sent resource "+name+" ("+b.length+" bytes)");
+					}
 				}
 				catch(Exception e)
 				{
+					log.warn("caught "+e+", will re-initialise ...", e);
 					init();
 				}
 			}
