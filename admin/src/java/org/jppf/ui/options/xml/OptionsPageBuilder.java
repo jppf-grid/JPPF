@@ -23,7 +23,9 @@ import java.awt.Insets;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
 import javax.swing.ListSelectionModel;
+
 import org.apache.log4j.Logger;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.event.*;
@@ -262,6 +264,7 @@ public class OptionsPageBuilder
 		else if ("SplitPane".equals(desc.type)) elt = buildSplitPane(desc);
 		else if ("TabbedPane".equals(desc.type)) elt = buildTabbedPane(desc);
 		else if ("Toolbar".equals(desc.type)) elt = buildToolbar(desc);
+		else if ("ToolbarSeparator".equals(desc.type)) elt = buildToolbarSeparator(desc);
 		else if ("Button".equals(desc.type)) elt = buildButton(desc);
 		else if ("TextArea".equals(desc.type)) elt = buildTextArea(desc);
 		else if ("XMLEditor".equals(desc.type)) elt = buildXMLEditor(desc);
@@ -490,6 +493,20 @@ public class OptionsPageBuilder
 		int width = desc.getInt("width", 1);
 		int height = desc.getInt("height", 1);
 		FillerOption option = new FillerOption(width, height);
+		return option;
+	}
+
+	/**
+	 * Build a toolbar separator option from the specified option descriptor.
+	 * @param desc the descriptor to get the properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public Option buildToolbarSeparator(OptionDescriptor desc) throws Exception
+	{
+		int width = desc.getInt("width", 1);
+		int height = desc.getInt("height", 1);
+		ToolbarSeparatorOption option = new ToolbarSeparatorOption(width, height);
 		return option;
 	}
 

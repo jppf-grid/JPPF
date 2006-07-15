@@ -223,7 +223,7 @@ public final class StringUtils
 		catch (Exception e)
 		{
 			log.error(e.getMessage());
-			log.debug(e);
+			if (log.isDebugEnabled()) log.debug(e);
 		}
 		return result == null ? def : result;
 	}

@@ -133,7 +133,39 @@
 			</listener>
 		</child>
 
-		<child name="filler" type="Filler">
+		<child name="filler" type="ToolbarSeparator">
+			<property name="width" value="10"/>
+			<property name="height" value="1"/>
+		</child>
+
+		<child name="Copy" type="Button">
+			<property name="tooltip" value="Copy the current selection"/>
+			<property name="icon" value="/org/jppf/ui/resources/copy.gif"/>
+			<listener type="script">
+				<script language="javascript"><![CDATA[
+				]]></script>
+			</listener>
+		</child>
+
+		<child name="Cut" type="Button">
+			<property name="tooltip" value="Cut the current selection"/>
+			<property name="icon" value="/org/jppf/ui/resources/cut.gif"/>
+			<listener type="script">
+				<script language="javascript"><![CDATA[
+				]]></script>
+			</listener>
+		</child>
+
+		<child name="Paste" type="Button">
+			<property name="tooltip" value="Paste"/>
+			<property name="icon" value="/org/jppf/ui/resources/paste.gif"/>
+			<listener type="script">
+				<script language="javascript"><![CDATA[
+				]]></script>
+			</listener>
+		</child>
+
+		<child name="filler" type="ToolbarSeparator">
 			<property name="width" value="10"/>
 			<property name="height" value="1"/>
 		</child>
@@ -174,7 +206,7 @@
 			</listener>
 		</child>
 
-		<child name="filler" type="Filler">
+		<child name="filler" type="ToolbarSeparator">
 			<property name="width" value="10"/>
 			<property name="height" value="1"/>
 		</child>
