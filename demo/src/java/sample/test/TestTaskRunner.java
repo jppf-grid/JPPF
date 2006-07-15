@@ -165,7 +165,7 @@ public class TestTaskRunner
 		try
 		{
 			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			jppfClient.submit(tasks, null);
 		}
 		catch(Exception e)
 		{
