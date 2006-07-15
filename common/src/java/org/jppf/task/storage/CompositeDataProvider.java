@@ -25,7 +25,7 @@ import org.jppf.JPPFException;
 /**
  * This data provider is composed of multiple data provider implementations
  * to which it delegates its operations. The determination of which underlying
- * data provider to used is performed through the types of the arguments.
+ * data provider to use is performed based on the types of the arguments.
  * @see org.jppf.task.storage.DataProvider
  * @author Laurent Cohen
  */
@@ -42,6 +42,8 @@ public class CompositeDataProvider implements DataProvider
 
 	/**
 	 * Get a value specified by its key.
+	 * If the key is an instance of {@link java.net.URL URL}, this method call is delegated
+	 * to a <code>URLDataProvider</code>, otherwise it is delegated to a <code>MemoryMapDataProvider</code>.
 	 * @param key the key identifying the value to retrieve in the store.
 	 * @return the value as an <code>Object</code>.
 	 * @throws JPPFException if an error occured while retrieving the data.
@@ -55,6 +57,8 @@ public class CompositeDataProvider implements DataProvider
 
 	/**
 	 * Set a value specified by its key in the store.
+	 * If the key is an instance of {@link java.net.URL URL}, this method call is delegated
+	 * to a <code>URLDataProvider</code>, otherwise it is delegated to a <code>MemoryMapDataProvider</code>.
 	 * @param key the key identifying the value to retrieve in the store.
 	 * @param value the value to store, associated with the key.
 	 * @throws JPPFException if an error occured setting the data.

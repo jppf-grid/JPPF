@@ -32,8 +32,8 @@ public class URLDataProvider implements DataProvider
 {
 	/**
 	 * Get an input stream from a URL.
-	 * @param key the URL identifying the data to retrieve.
-	 * @return an InputStream opened from the URL location.
+	 * @param key the URL identifying the data to retrieve, must be an instance of <code>java.net.URL</code>.
+	 * @return a <code>java.io.InputStream</code> opened from the URL location.
 	 * @throws JPPFException if an error occured while retrieving the data.
 	 * @see org.jppf.task.storage.DataProvider#getValue(java.lang.Object)
 	 */
@@ -52,8 +52,8 @@ public class URLDataProvider implements DataProvider
 
 	/**
 	 * Copy the content of an input stream to a location specified as a URL.
-	 * @param key the URL specifying the destination.
-	 * @param value the input stream to copy the data from.
+	 * @param key the URL specifying the destination, must be an instance of <code>java.net.URL</code>.
+	 * @param value the input stream to copy the data from, must be an instance of <code>java.io.InputStream</code>.
 	 * @throws JPPFException if an error occured setting the data.
 	 * @see org.jppf.task.storage.DataProvider#setValue(java.lang.Object, java.lang.Object)
 	 */

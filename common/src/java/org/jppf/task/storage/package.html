@@ -3,6 +3,12 @@
 <title>Java Parallel Processing Framework Documentation</title>
 </head>
 <body>
-	Support for sharing common data among tasks.
+	Support for tasks to access and sharing data.
+	The data can be specified either as in-memory or accessed through a URL.
+	<p>In-memory data is transported to the nodes along with he tasks, so it is immediately accessible without
+	need for reading it from or writing it to a specified source.
+	<p>URL-based data is accessed through a URL, where the URL specifies the location of the data, and the
+	actual data is provided as an input stream. This method takes advantage of the JDK's built-in support
+	for multiple protocols, including HTTP, FTP, Jar, File and Gopher.
 </body>
 </html>

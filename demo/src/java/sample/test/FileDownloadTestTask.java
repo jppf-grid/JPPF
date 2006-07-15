@@ -25,6 +25,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.FileUtils;
 
 /**
+ * This task downloads a file from a web site, then uploads it to an ftp server.
  * Task used to test the {@link org.jppf.task.storage.URLDataProvider URLDataProvider} class.
  * @author Laurent Cohen
  */

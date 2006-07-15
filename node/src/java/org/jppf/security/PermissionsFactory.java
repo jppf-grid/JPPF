@@ -37,7 +37,7 @@ public final class PermissionsFactory
 	private static Permissions permissions = null;
 	
 	/**
-	 * Intantiation of this class is not permitted.
+	 * Instantiation of this class is not permitted.
 	 */
 	private PermissionsFactory()
 	{
