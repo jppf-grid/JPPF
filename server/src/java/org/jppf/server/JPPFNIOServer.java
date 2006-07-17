@@ -20,7 +20,7 @@
 package org.jppf.server;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
@@ -91,11 +91,7 @@ public abstract class JPPFNIOServer extends Thread{
 			while (!stop && !JPPFDriver.getInstance().isShuttingDown())
 			{
 				int n = selector.select();
-
-				if (n == 0) {
-					continue;
-				}
-				
+				if (n == 0) continue;
 				go(selector.selectedKeys());
 			}
 			end();
@@ -120,7 +116,6 @@ public abstract class JPPFNIOServer extends Thread{
 			SelectionKey key = it.next();
 			try
 			{
-				//if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT)
 				if (key.isAcceptable())
 				{
 					doAccept(key);
@@ -376,5 +371,18 @@ public abstract class JPPFNIOServer extends Thread{
 	public Selector getSelector()
 	{
 		return selector;
+	}
+
+	/**
+	 * Returns the IP address of the remote host for a socket channel.
+	 * @param channel the channel to get the host from.
+	 * @return an IP address as a string.
+	 */
+	public String getRemostHost(SocketChannel channel)
+	{
+		StringBuilder sb = new StringBuilder();
+		Socket s = channel.socket();
+		sb.append(s.getInetAddress().getHostAddress()).append(":").append(s.getPort());
+		return sb.toString();
 	}
 }

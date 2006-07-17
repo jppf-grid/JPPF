@@ -153,4 +153,21 @@ public class JPPFQueue
 		 */
 		void newBundle(JPPFQueue queue);
 	}
+
+	/**
+	 * Determine whether the queue is empty or not.
+	 * @return true if the queue is empty, false otherwise.
+	 */
+	public boolean isEmpty()
+	{
+		lock.lock();
+		try
+		{
+			return queue.isEmpty();
+		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
 }

@@ -27,6 +27,7 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jppf.server.ChannelContext;
 import org.jppf.server.ChannelState;
 import org.jppf.server.JPPFTaskBundle;
@@ -43,6 +44,10 @@ import org.jppf.utils.SerializationHelperImpl;
  */
 class CWaitingInitialInfo implements ChannelState
 {
+	/**
+	 * Log4j logger for this class.
+	 */
+	protected static Logger log = Logger.getLogger(CWaitingInitialInfo.class);
 	/**
 	 * The JPPFNIOServer this state relates to.
 	 */
@@ -66,6 +71,7 @@ class CWaitingInitialInfo implements ChannelState
 	public void exec(SelectionKey key, ChannelContext context)
 	{
 		SocketChannel channel = (SocketChannel) key.channel();
+		log.info("exec() for "+server.getRemostHost(channel));
 		NodeChannelContext nodeContext = (NodeChannelContext) context;
 		TaskRequest out = (TaskRequest) nodeContext.content;
 		JPPFTaskBundle bundle = out.getBundle();
@@ -114,7 +120,7 @@ class CWaitingInitialInfo implements ChannelState
 				context.content = null;
 				// if the node disconnect from driver we will know soon
 				context.state = server.SendingJob;
-				key.interestOps(SelectionKey.OP_READ);
+				key.interestOps(SelectionKey.OP_READ|SelectionKey.OP_WRITE);
 			}
 		}
 		catch(Exception e)

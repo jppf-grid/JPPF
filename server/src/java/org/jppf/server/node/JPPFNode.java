@@ -30,7 +30,6 @@ import org.jppf.comm.socket.*;
 import org.jppf.node.*;
 import org.jppf.node.event.*;
 import org.jppf.node.event.NodeEvent.EventType;
-import org.jppf.security.*;
 import org.jppf.server.JPPFTaskBundle;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
@@ -117,9 +116,13 @@ public class JPPFNode implements MonitoredNode
 	 */
 	private Socket socket = null;
 	/**
+	 * Total number of tasks executed.
+	 */
+	private int taskCount = 0;
+	/**
 	 * Security credentials associated with this JPPF node.
 	 */
-	private JPPFSecurityContext credentials = null;
+	//private JPPFSecurityContext credentials = null;
 
 	/**
 	 * Main processing loop of this node.
@@ -183,6 +186,11 @@ public class JPPFNode implements MonitoredNode
 				for (Future future : futureList) future.get();
 			}
 			writeResults(bundle, taskList);
+			if ((taskList != null) && (taskList.size() > 0))
+			{
+				taskCount += taskList.size();
+				log.info("tasks executed: "+taskCount);
+			}
 			int p = bundle.getBuildNumber();
 			if (buildNumber < p)
 			{
@@ -240,12 +248,14 @@ public class JPPFNode implements MonitoredNode
 	 */
 	private void initCredentials()
 	{
+		/*
 		String uuid = new JPPFUuid().toString();
 		StringBuilder sb = new StringBuilder("Node:");
 		sb.append(VersionUtils.getLocalIpAddress()).append(":");
 		sb.append(socketClient.getPort());
 		// testing that the server throws a JPPFSecurityException
 		credentials = new JPPFSecurityContext(uuid, sb.toString(), new JPPFCredentials());
+		*/
 	}
 	
 	/**

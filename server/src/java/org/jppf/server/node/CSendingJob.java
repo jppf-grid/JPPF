@@ -22,6 +22,7 @@ package org.jppf.server.node;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
+import org.apache.log4j.Logger;
 import org.jppf.server.*;
 
 /**
@@ -30,6 +31,10 @@ import org.jppf.server.*;
  */
 class CSendingJob implements ChannelState {
 
+	/**
+	 * Log4j logger for this class.
+	 */
+	protected static Logger log = Logger.getLogger(CSendingJob.class);
 	/**
 	 * The JPPFNIOServer this state relates to.
 	 */
@@ -53,7 +58,7 @@ class CSendingJob implements ChannelState {
 	 */
 	public void exec(SelectionKey key, ChannelContext context) throws IOException {
 		SocketChannel channel = (SocketChannel) key.channel();
-		
+		log.info("exec() for "+server.getRemostHost(channel));
 		if (key.isReadable()) {
 			//as the OS will select it for read when the channel is suddenly 
 			//closed by peer, and we are not expecting any read...
