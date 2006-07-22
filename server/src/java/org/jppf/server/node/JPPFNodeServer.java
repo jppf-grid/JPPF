@@ -49,6 +49,10 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 */
 	protected static Logger log = Logger.getLogger(JPPFNodeServer.class);
 	/**
+	 * Determines whther DEBUG logging level is enabled.
+	 */
+	protected static boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * The uuid for the task bundle sent to a newly connected node.
 	 */
 	static final String INITIAL_BUNDLE_UUID = JPPFDriver.getInstance().getCredentials().getUuid();
@@ -159,31 +163,16 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 * @param queue the queue to which a bundle was added.
 	 * @see org.jppf.server.JPPFQueue.QueueListener#newBundle(org.jppf.server.JPPFQueue)
 	 */
-	public void newBundle(JPPFQueue queue)
+	public synchronized void newBundle(JPPFQueue queue)
 	{
-		if (availableNodes.isEmpty()) return;
-		SocketChannel aNode = availableNodes.remove(0);
-		SelectionKey key = aNode.keyFor(selector);
-		NodeChannelContext context = (NodeChannelContext) key.attachment();
-		// check whether the bundler settings have changed.
-		if (context.bundler.getTimestamp() < bundler.getTimestamp())
+		while (!availableNodes.isEmpty() && !queue.isEmpty())
 		{
-			context.bundler = bundler.copy();
-		}
-		JPPFTaskBundle bundle = queue.nextBundle(context.bundler.getBundleSize());
-		if (bundle != null)
-		{
-			try
-			{
-				sendTask(aNode, key, context, bundle);
-				selector.wakeup();
-			}
-			catch (Exception e)
-			{
-				log.error(e.getMessage(), e);
-				closeNode(aNode);
-				resubmitBundle(bundle);
-			}
+			SocketChannel aNode = availableNodes.remove(0);
+			SelectionKey key = aNode.keyFor(selector);
+			ChannelContext context = (ChannelContext) key.attachment();
+			context.state = SendingJob;
+			context.content = null;
+			key.interestOps(SelectionKey.OP_READ|SelectionKey.OP_WRITE);
 		}
 	}
 	
@@ -223,9 +212,9 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 		
 		bundle.setPriority(10);
         // to not enter in a loop
-		getQueue().removeListener(this);
+		//getQueue().removeListener(this);
 		getQueue().addBundle(bundle);
-		getQueue().addListener(this);
+		//getQueue().addListener(this);
 	}
 
 	/**

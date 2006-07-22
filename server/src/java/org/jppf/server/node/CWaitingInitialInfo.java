@@ -49,6 +49,10 @@ class CWaitingInitialInfo implements ChannelState
 	 */
 	protected static Logger log = Logger.getLogger(CWaitingInitialInfo.class);
 	/**
+	 * Determines whther DEBUG logging level is enabled.
+	 */
+	protected static boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * The JPPFNIOServer this state relates to.
 	 */
 	private JPPFNodeServer server;
@@ -71,7 +75,7 @@ class CWaitingInitialInfo implements ChannelState
 	public void exec(SelectionKey key, ChannelContext context)
 	{
 		SocketChannel channel = (SocketChannel) key.channel();
-		log.info("exec() for "+server.getRemostHost(channel));
+		if (debugEnabled) log.debug("exec() for "+server.getRemostHost(channel));
 		NodeChannelContext nodeContext = (NodeChannelContext) context;
 		TaskRequest out = (TaskRequest) nodeContext.content;
 		JPPFTaskBundle bundle = out.getBundle();
@@ -86,33 +90,12 @@ class CWaitingInitialInfo implements ChannelState
 				SerializationHelper helper = new SerializationHelperImpl();
 				bundle = (JPPFTaskBundle) helper.readNextObject(dis, false);
 				List<byte[]> taskList = new ArrayList<byte[]>();
-				for (int i = 0; i < bundle.getTaskCount(); i++){
+				for (int i = 0; i < bundle.getTaskCount(); i++)
+				{
 					taskList.add(helper.readNextBytes(dis));
 				}
 				dis.close();
 				bundle.setTasks(taskList);
-				// check whether the bundler settings have changed.
-				if (nodeContext.bundler.getTimestamp() < server.getBundler().getTimestamp())
-				{
-					nodeContext.bundler = server.getBundler().copy();
-				}
-				// verifying if there is other tasks to send to this node
-				bundle = server.getQueue().nextBundle(nodeContext.bundler.getBundleSize());
-				if (bundle != null)
-				{
-					try
-					{
-						server.sendTask(channel, key, context, bundle);
-						return;
-					}
-					catch(Exception e)
-					{
-						server.closeNode(channel);
-						server.resubmitBundle(bundle);
-						bundle = null;
-						throw e;
-					}
-				}
 				// there is nothing to do, so this instance will wait for a job
 				server.availableNodes.add(channel);
 				// make sure the context is reset so as not to resubmit
@@ -120,7 +103,9 @@ class CWaitingInitialInfo implements ChannelState
 				context.content = null;
 				// if the node disconnect from driver we will know soon
 				context.state = server.SendingJob;
-				key.interestOps(SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+				//key.interestOps(SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+				key.interestOps(SelectionKey.OP_READ);
+				if (!server.getQueue().isEmpty()) server.newBundle(server.getQueue());
 			}
 		}
 		catch(Exception e)

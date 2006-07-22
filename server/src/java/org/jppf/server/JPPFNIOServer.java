@@ -90,7 +90,7 @@ public abstract class JPPFNIOServer extends Thread{
 		{
 			while (!stop && !JPPFDriver.getInstance().isShuttingDown())
 			{
-				int n = selector.select();
+				int n = selector.select(1);
 				if (n == 0) continue;
 				go(selector.selectedKeys());
 			}

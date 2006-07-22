@@ -82,6 +82,10 @@ public class ApplicationConnection extends JPPFConnection implements
 	 * Number of tasks that haven't yet been executed.
 	 */
 	private int pendingTasksCount = 0;
+	/**
+	 * Total number of tasks submitted to this application connection.
+	 */
+	private int totalTaskCount = 0;
 
 	/**
 	 * Initialize this connection with an open socket connection to a remote
@@ -165,6 +169,11 @@ public class ApplicationConnection extends JPPFConnection implements
 		bundle.setTasks(taskList);
 		bundle.setCompletionListener(this);
 		getQueue().addBundle(bundle);
+		if (count > 0)
+		{
+			totalTaskCount += count;
+			if (debugEnabled) log.debug("Queued "+totalTaskCount+" tasks");
+		}
 		if (count <= 0) sendPartialResults(bundle);
 		else
 		{

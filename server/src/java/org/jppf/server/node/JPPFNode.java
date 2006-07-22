@@ -176,7 +176,8 @@ public class JPPFNode implements MonitoredNode
 			if (notifying) fireNodeEvent(EventType.START_EXEC);
 			JPPFTaskBundle bundle = pair.first();
 			List<JPPFTask> taskList = pair.second();
-			if ((taskList != null) && (taskList.size() > 0))
+			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
+			if (notEmpty)
 			{
 				List<Future> futureList = new ArrayList<Future>(taskList.size());
 				for (JPPFTask task : taskList)
@@ -186,10 +187,10 @@ public class JPPFNode implements MonitoredNode
 				for (Future future : futureList) future.get();
 			}
 			writeResults(bundle, taskList);
-			if ((taskList != null) && (taskList.size() > 0))
+			if (notEmpty)
 			{
 				taskCount += taskList.size();
-				log.info("tasks executed: "+taskCount);
+				if (debugEnabled) log.debug("tasks executed: "+taskCount);
 			}
 			int p = bundle.getBuildNumber();
 			if (buildNumber < p)

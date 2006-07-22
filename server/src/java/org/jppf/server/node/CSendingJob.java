@@ -36,6 +36,10 @@ class CSendingJob implements ChannelState {
 	 */
 	protected static Logger log = Logger.getLogger(CSendingJob.class);
 	/**
+	 * Determines whther DEBUG logging level is enabled.
+	 */
+	protected static boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * The JPPFNIOServer this state relates to.
 	 */
 	private JPPFNodeServer server;
@@ -56,34 +60,59 @@ class CSendingJob implements ChannelState {
 	 * @throws IOException if an error occurred while sending the request.
 	 * @see org.jppf.server.ChannelState#exec(java.nio.channels.SelectionKey, org.jppf.server.ChannelContext)
 	 */
-	public void exec(SelectionKey key, ChannelContext context) throws IOException {
+	public void exec(SelectionKey key, ChannelContext context) throws IOException
+	{
 		SocketChannel channel = (SocketChannel) key.channel();
-		log.info("exec() for "+server.getRemostHost(channel));
+		if (debugEnabled) log.debug("exec() for "+server.getRemostHost(channel));
 		if (key.isReadable()) {
 			//as the OS will select it for read when the channel is suddenly 
-			//closed by peer, and we are not expecting any read...
-			// the channel was closed by node
+			//closed by peer, and we are not expecting any read... the channel was closed by node
 			nodeClosing(channel, context);
 			return;
 		}
 		
+		NodeChannelContext nodeContext = (NodeChannelContext) key.attachment();
 		if (context.content == null)
+		{
+			// check whether the bundler settings have changed.
+			if (nodeContext.bundler.getTimestamp() < server.getBundler().getTimestamp())
+			{
+				nodeContext.bundler = server.getBundler().copy();
+			}
+			JPPFTaskBundle bundle = server.getQueue().nextBundle(nodeContext.bundler.getBundleSize());
+			if (bundle != null)
+			{
+				try
+				{
+					server.sendTask(channel, key, context, bundle);
+				}
+				catch (Exception e)
+				{
+					log.error(e.getMessage(), e);
+					server.closeNode(channel);
+					server.resubmitBundle(bundle);
+				}
+			}
 			return;
+		}
 		
 		// the buffer with the bundle serialized and part transfered
 		ByteBuffer task = ((TaskRequest) context.content).getSending();
-		try {
+		try 
+		{
 			channel.write(task);
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			nodeClosing(channel, context);
 			throw e;
 		}
-		
+
 		//is anything more to send to SO buffer?
 		if (!task.hasRemaining()) {
 			//we finally have sent everything to node
 			// it will do the work and send back to us.
-			context.state = this.server.WaitingResult;
+			context.state = server.WaitingResult;
 			//we will just wait for the bundle back
 			key.interestOps(SelectionKey.OP_READ);
 		}
@@ -105,4 +134,5 @@ class CSendingJob implements ChannelState {
 			}
 		}
 	}
+
 }
