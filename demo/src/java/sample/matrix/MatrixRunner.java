@@ -95,7 +95,6 @@ public class MatrixRunner
 				DataProvider dataProvider = new MemoryMapDataProvider();
 				dataProvider.setValue(MatrixTask.DATA_KEY, b);
 				// submit the tasks for execution
-				jppfClient.submit(tasks, dataProvider);
 				List<JPPFTask> results = jppfClient.submit(tasks, dataProvider);
 				// initialize the resulting matrix
 				Matrix c = new Matrix(size);
