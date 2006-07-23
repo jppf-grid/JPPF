@@ -132,6 +132,7 @@ public class ClassServerDelegate extends Thread
 				{
 					String name = new String(socketClient.receiveBytes(0).getBuffer());
 					byte[] b = resourceProvider.getResourceAsBytes(name);
+					if (b == null) b = new byte[0];
 					socketClient.sendBytes(new JPPFBuffer(b, b.length));
 					if  (log.isInfoEnabled()) {
 						log.info("sent resource "+name+" ("+b.length+" bytes)");

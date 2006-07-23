@@ -59,6 +59,7 @@ public class TestTaskRunner
 			performURLTest();
 			performSecurityTest();
 			performEmptyConstantTaskTest();
+			performClassNotFoundTaskTest();
 			System.exit(0);
 		}
 		catch(Exception e)
@@ -201,6 +202,40 @@ public class TestTaskRunner
 		finally
 		{
 			System.out.println("Constant tasks testing complete.");
+		}
+	}
+	
+	/**
+	 * Check that correct results are returned by the framework.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void performClassNotFoundTaskTest() throws JPPFException
+	{
+		System.out.println("Starting ClassNotFound task testing...");
+		String cp = System.getProperty("java.class.path");
+		System.out.println("classpath: "+cp);
+		try
+		{
+			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+			tasks.add(new ClassNotFoundTestTask());
+			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			JPPFTask resultTask = results.get(0);
+			if (resultTask.getException() != null)
+			{
+				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
+			}
+			else
+			{
+				System.out.println("Result is: "+resultTask.getResult());
+			}
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e);
+		}
+		finally
+		{
+			System.out.println("ClassNotFound task testing complete.");
 		}
 	}
 	

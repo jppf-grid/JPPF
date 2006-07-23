@@ -97,6 +97,10 @@ public class JPPFClient {
 	 * Security credentials associated with the application.
 	 */
 	JPPFSecurityContext credentials = null;
+	/**
+	 * Total count of the tasks submitted by this client.
+	 */
+	private int totalTaskCount = 0;
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -214,6 +218,11 @@ public class JPPFClient {
 				}
 			});
 		proc.run();
+		if ((taskList != null) && (taskList.size() > 0))
+		{
+			totalTaskCount += taskList.size();
+			log.info("submitted " + totalTaskCount + " tasks");
+		}
 		Collections.sort(resultList, new Comparator<JPPFTask>()
 		{
 			public int compare(JPPFTask o1, JPPFTask o2)
