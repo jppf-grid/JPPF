@@ -83,8 +83,12 @@ public class DriverLauncher
 				process = buildProcess();
 				if (debugEnabled) log.debug("started driver process [" + process + "]");
 				int n = process.waitFor();
-				log.info("standard output:\n"+getOutput(process, "std"));
-				log.info("error output:\n"+getOutput(process, "err"));
+				String s = getOutput(process, "std").trim();
+				System.out.println("\nstandard output:\n" + s);
+				log.info("standard output:\n" + s);
+				s = getOutput(process, "err").trim();
+				System.out.println("\nerror output:\n" + s);
+				log.info("error output:\n" + s);
 				process.destroy();
 				if (n != 2) end = true;
 			}

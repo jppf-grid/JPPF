@@ -250,7 +250,6 @@ public class JPPFDriver
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
 			log.fatal(e.getMessage(), e);
 			System.exit(1);
 		}
