@@ -52,13 +52,13 @@
 						shutdownDelay = option.findElement("../Shutdown_delay").getValue();
 						restartDelay = 0;
 						var command;
-						if (option.findElement("../Restart"))
+						if (option.findElement("../Restart").getValue())
 						{
 							restartDelay = option.findElement("../Restart_delay").getValue();
 							command = AdminRequest.SHUTDOWN_RESTART;
 						}
 						else command = AdminRequest.SHUTDOWN;
-						pwd = option.findFirstWithName("/actualPwd");
+						pwd = option.findFirstWithName("/actualPwd").getValue();
 						msg = StatsHandler.getInstance().requestShutdownRestart(pwd, command, shutdownDelay, restartDelay);
 						option.findFirstWithName("/msgText").setValue(msg);
 					]]></script>
