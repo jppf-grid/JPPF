@@ -7,7 +7,7 @@
 		<table border="0" cellspacing="0" cellpadding="0" width="80%">
 			<tr>
 				<td width="50%" valign="top" rowspan="2">
-					<table class="leftRight_" cellspacing="0" cellpadding="5" width="100%">
+					<table class="left_" cellspacing="0" cellpadding="5" width="100%">
 						<tr><td class="leftTopBottom_">
 							<h3>Project Description</h3>
 							Java Parallel Processing Framework is a set of tools and APIs to facilitate the parallelization of CPU intensive applications, and distribute their execution over a network of heterogenous nodes.
@@ -30,7 +30,7 @@
 							</ul>
 						</td></tr>
 						<tr><td class="bottom_">
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.20.0 - beta</span></h4>
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.22.0 - beta</span></h4>
 						</td></tr>
 						<tr><td class="bottom_">
 							<h3>New: JPPF is looking for developers!</h3>
@@ -45,7 +45,7 @@
 				</td>
 
 				<td width="50%" valign="top">
-					<table class="right_" cellspacing="0" cellpadding="5" width="100%">
+					<table class="leftRight_" cellspacing="0" cellpadding="5" width="100%">
 
 						<tr><td class="bottom_">
 						<?php
@@ -70,27 +70,22 @@
 							<h3>JPPF articles on the Web</h3>
 							<table align="center">
 								<tr><td>
-									<a href="http://lwn.net/Articles/156109" target=_top>
+									<p><a href="http://lwn.net/Articles/156109" target=_top>
 										<img src="http://lwn.net/images/lcorner.png" border="0" alternate="LWN.net"/>
 									</a>
-									</td>
-									<td width="10"/>
-									<td>
 									<p><a href="http://www.artima.com/forums/flat.jsp?forum=276&thread=153331" target=_top>
 										<img src="http://www.artima.com/images/ab_dev.gif" border="0" alternate="artima developer"/>
 									</a>
 									<p><a href="http://linux.softpedia.com/get/System/Clustering-and-Distributed-Networks/Java-Parallel-Processing-Framework-10529.shtml" target=_top>
 										<img src="http://www.softpedia.com/base_img/softpedia_logo.gif" border="0" alternate="Softpedia"/>
 									</a>
-									</td>
-								</tr>
+								</td></tr>
 							</table>
 						</td></tr>
 						<tr><td class="bottom_">
 							<h3>Feedback Wanted: <span style="color: #000060">help making JPPF a better open source product</span></h3>
-							Suggestions, bug reports, criticism and ideas are most welcome. I will do my best to answer promptly.<br>
-							<a href="http://sourceforge.net/forum/forum.php?forum_id=458548" target=_top>An open discussion forum is available here</a><br>
-							<a href="http://sourceforge.net/forum/forum.php?forum_id=458549" target=_top>A help forum is available here</a><br>
+							Suggestions, bug reports, criticism and ideas are most welcome. We will do our best to answer promptly.<br>
+							<a href="./forums" target=_top>Discussion forums are available here</a><br>
 							<a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>The bugs tracking system is here</a><br>
 							<a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>The feature request tracking system is here</a><br>
 						</td></tr>
