@@ -200,7 +200,8 @@ public final class OptionsHandler
 			AbstractOption option = (AbstractOption) elt;
 			if (option.isPersistent())
 			{
-				String val = prefs.get(option.getName(), null);
+				Object def = option.getValue();
+				String val = prefs.get(option.getName(), def == null ? null : def.toString());
 				option.setValue(val);
 			}
 		}

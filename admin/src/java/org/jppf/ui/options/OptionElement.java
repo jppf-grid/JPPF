@@ -131,7 +131,7 @@ public interface OptionElement extends Serializable
 	List<OptionElement> findAllWithName(String name);
 	/**
 	 * Find the element with the specified path in the options tree.
-	 * The path can be absolute, in which case it starts with a &quote;/&quote, otherwise it
+	 * The path can be absolute, in which case it starts with a &quot;/&quot;, otherwise it
 	 * is considered relative to the requesting element.
 	 * @param path the path of the element to find.
 	 * @return an <code>OptionElement</code> instance, or null if no element could be found with
