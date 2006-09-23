@@ -211,5 +211,6 @@ public class SerializationHelperImpl implements SerializationHelper
 	{
 		dos.writeInt(length);
 		dos.write(bytes, start, length);
+		dos.flush();
 	}
 }

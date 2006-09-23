@@ -75,16 +75,22 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 	 */
 	public void send(Object o) throws IOException
 	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream()
+		{
+			public synchronized byte[] toByteArray()
+			{
+				return buf;
+			}
+		};
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 		oos.writeObject(o);
 		oos.flush();
 		// Remove references kept by the stream, otherwise leads to OutOfMemory.
-		JPPFBuffer buf = new JPPFBuffer();
-		buf.setBuffer(baos.toByteArray());
-		buf.setLength(baos.size());
+		JPPFBuffer buffer = new JPPFBuffer();
+		buffer.setBuffer(baos.toByteArray());
+		buffer.setLength(baos.size());
 		oos.close();
-		sendBytes(buf);
+		sendBytes(buffer);
 	}
 
 	/**
@@ -103,7 +109,8 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 		{
 			if (timeout >= 0) socket.setSoTimeout(timeout);
 			JPPFBuffer buf = receiveBytes(timeout);
-			ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength()));
+			ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
+			ObjectInputStream ois = new ObjectInputStream(bais);
 			o = ois.readObject();
 			ois.close();
 		}

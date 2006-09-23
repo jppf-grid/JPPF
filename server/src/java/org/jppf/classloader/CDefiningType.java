@@ -22,26 +22,24 @@ package org.jppf.classloader;
 import java.io.IOException;
 import java.nio.channels.*;
 import java.util.LinkedList;
+import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.server.*;
+
+import static org.jppf.node.JPPFResourceWrapper.State.*;
 
 /**
  * This class represents the state of a new class server connection, whose type is yet undetermined.
  * @author Domingos Creado
  */
-class CDefiningType implements ChannelState
+class CDefiningType extends ClassChannelState
 {
-	/**
-	 * The JPPFNIOServer this state relates to.
-	 */
-	private ClassServer server;
-
 	/**
 	 * Initialize this state with a specified JPPFNIOServer.
 	 * @param server the JPPFNIOServer this state relates to.
 	 */
 	CDefiningType(ClassServer server)
 	{
-		this.server = server;
+		super(server);
 	}
 
 	/**
@@ -52,6 +50,37 @@ class CDefiningType implements ChannelState
 	 * @see org.jppf.server.ChannelState#exec(java.nio.channels.SelectionKey,
 	 *      org.jppf.server.ChannelContext)
 	 */
+	public void exec(SelectionKey key, ChannelContext context) throws IOException
+	{
+		// we don't know yet which whom we are talking, is it a node or a provider?
+		SocketChannel channel = (SocketChannel) key.channel();
+		Request out = (Request) context.content;
+		if (server.fillRequest(channel, out))
+		{
+			JPPFResourceWrapper resource = readResource(out.getOutput().toByteArray());
+			if (PROVIDER_INITIATION.equals(resource.getState()))
+			{
+				String uuid = resource.getAppUuid();
+				// it is a provider
+				server.providerConnections.put(uuid, channel);
+				context.uuid = uuid;
+				context.state = this.server.SendingRequest;
+				// create the queue of requests to this provider
+				context.content = new LinkedList<RemoteClassRequest>();
+				key.interestOps(SelectionKey.OP_READ);
+			}
+			else if (NODE_INITIATION.equals(resource.getState()))
+			{
+				// it is a provider
+				context.content = new Request();
+				// we will wait for a request
+				context.state = server.WaitingRequest;
+				key.interestOps(SelectionKey.OP_READ);
+			}
+		}
+	}
+
+	/*
 	public void exec(SelectionKey key, ChannelContext context) throws IOException
 	{
 		// we don't know yet which whom we are talking, is it a node or a provider?
@@ -81,4 +110,5 @@ class CDefiningType implements ChannelState
 			}
 		}
 	}
+	*/
 }

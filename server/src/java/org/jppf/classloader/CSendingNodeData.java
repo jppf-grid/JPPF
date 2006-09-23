@@ -28,20 +28,15 @@ import org.jppf.server.*;
  * This class represents the state of sending a answer to nodes.
  * @author Domingos Creado
  */
-class CSendingNodeData implements ChannelState
+class CSendingNodeData extends ClassChannelState
 {
-	/**
-	 * The JPPFNIOServer this state relates to.
-	 */
-	private ClassServer server;
-
 	/**
 	 * Initialize this state with a specified JPPFNIOServer.
 	 * @param server the JPPFNIOServer this state relates to.
 	 */
 	CSendingNodeData(ClassServer server)
 	{
-		this.server = server;
+		super(server);
 	}
 
 	/**

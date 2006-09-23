@@ -212,13 +212,13 @@ public abstract class JPPFNIOServer extends Thread{
 	 * @return a bit-wise combination of the interests, taken from {@link java.nio.channels.SelectionKey SelectionKey}
 	 * constants definitions.
 	 */
-	protected abstract int getInitialInterest() ;
+	protected abstract int getInitialInterest();
 	
 	/**
 	 * Get the initial content associated with a new connection.
 	 * @return the content as an <code>Object</code>.
 	 */
-	protected abstract Object getInitialContent() ;
+	protected abstract Object getInitialContent();
 
 	/**
 	 * Get the initial state associated with a new connection.
@@ -233,11 +233,6 @@ public abstract class JPPFNIOServer extends Thread{
 	protected abstract void postAccept(SocketChannel client);
 
 	/**
-	 * just to not instatiate every invocation of method fillRequest
-	 */
-	private byte[] buf = new byte[1024];
-
-	/**
 	 * This method reads everything it can from the channel until the request is
 	 * fulfilled. The request must be a transfer of object like JPPFBuffer, with
 	 * the first 4 bytes as the size of the payload and the payload.
@@ -247,22 +242,25 @@ public abstract class JPPFNIOServer extends Thread{
 	 * @return true if the request was completely received, false otherwise.
 	 * @throws IOException if an error occuurred while reading a request.
 	 */
-	public boolean fillRequest(SocketChannel channel, Request request)
-			throws IOException {
-
-		ByteBuffer buffer;
-		if (request.getSize() == 0) {
+	public boolean fillRequest(SocketChannel channel, Request request) throws IOException
+	{
+		ByteBuffer buffer = null;
+		if (request.getSize() == 0)
+		{
 			buffer = request.getBuffer();
-			if (buffer == null) {
+			if (buffer == null)
+			{
 				// determining the size of the packet
 				buffer = ByteBuffer.allocate(4);
 				request.setBuffer(buffer);
 			}
 
-			if (channel.read(buffer) < 0) {
+			if (channel.read(buffer) < 0)
+			{
 				throw new ClosedChannelException();
 			}
-			if (buffer.remaining() != 0) {
+			if (buffer.remaining() != 0)
+			{
 				// the first 4 bytes was not received yet
 				return false;
 			}
@@ -276,7 +274,8 @@ public abstract class JPPFNIOServer extends Thread{
 		buffer = request.getBuffer();
 		// read everything we can
 		int readed = channel.read(buffer);
-		while (readed > 0){
+		while (readed > 0)
+		{
 			readed = channel.read(buffer);
 		}
 		if(readed < 0 ) throw new ClosedChannelException();
@@ -284,9 +283,10 @@ public abstract class JPPFNIOServer extends Thread{
 		if (buffer.remaining() != 0) return false;
 		// the payload has been fully received
 		buffer.flip();
-		while (buffer.hasRemaining()) {
-			int size = (buf.length < buffer.remaining() ? buf.length : buffer
-					.remaining());
+		byte[] buf = new byte[1024];
+		while (buffer.hasRemaining())
+		{
+			int size = (buf.length < buffer.remaining() ? buf.length : buffer.remaining());
 			buffer.get(buf, 0, size);
 			request.getOutput().write(buf, 0, size);
 		}
@@ -303,9 +303,12 @@ public abstract class JPPFNIOServer extends Thread{
 		if (!stop) return;
 		for (SelectionKey connection: selector.keys())
 		{
-			try {
+			try
+			{
 				connection.channel().close();
-			} catch (IOException ignored) {
+			}
+			catch (IOException ignored)
+			{
 				log.error(ignored.getMessage(), ignored);
 			}
 		}

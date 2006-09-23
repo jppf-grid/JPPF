@@ -134,15 +134,17 @@ public class NodeLauncher
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @return a <code>ClassLoader</code> used for loading the classes of the framework.
 	 */
-	public static JPPFClassLoader getJPPFClassLoader() {
-		if (classLoader == null) {
-			classLoader = AccessController
-					.doPrivileged(new PrivilegedAction<JPPFClassLoader>() {
-						public JPPFClassLoader run() {
-							return new JPPFClassLoader(NodeLauncher.class
-									.getClassLoader());
-						}
-					});
+	public static JPPFClassLoader getJPPFClassLoader()
+	{
+		if (classLoader == null)
+		{
+			classLoader = AccessController.doPrivileged(new PrivilegedAction<JPPFClassLoader>()
+			{
+				public JPPFClassLoader run()
+				{
+					return new JPPFClassLoader(NodeLauncher.class.getClassLoader());
+				}
+			});
 		}
 		return classLoader;
 	}

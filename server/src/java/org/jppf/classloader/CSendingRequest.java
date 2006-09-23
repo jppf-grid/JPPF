@@ -30,16 +30,12 @@ import org.jppf.server.*;
  * This class represents the state of sending a request to a provider.
  * @author Domingos Creado
  */
-class CSendingRequest implements ChannelState
+class CSendingRequest extends ClassChannelState
 {
 	/**
 	 * Log4j logger for this class.
 	 */
 	private static Logger log = Logger.getLogger(CSendingRequest.class);
-	/**
-	 * The JPPFNIOServer this state relates to.
-	 */
-	private ClassServer server;
 
 	/**
 	 * Initialize this state with a specified JPPFNIOServer.
@@ -47,7 +43,7 @@ class CSendingRequest implements ChannelState
 	 */
 	CSendingRequest(ClassServer server)
 	{
-		this.server = server;
+		super(server);
 	}
 
 	/**
@@ -107,7 +103,7 @@ class CSendingRequest implements ChannelState
 			}
 			if (!request.getResource().hasRemaining())
 			{
-				context.state = this.server.ReceivingResource;
+				context.state = server.ReceivingResource;
 				key.interestOps(SelectionKey.OP_READ);
 			}
 		}

@@ -45,7 +45,13 @@ public class Request {
 	/**
 	 * Stream where the result of the request is stored.
 	 */
-	private ByteArrayOutputStream output = new ByteArrayOutputStream();
+	private ByteArrayOutputStream output = new ByteArrayOutputStream()
+	{
+		public synchronized byte[] toByteArray()
+		{
+			return buf;
+		}
+	};
 
 	/**
 	 * Initialize an instance of this class.

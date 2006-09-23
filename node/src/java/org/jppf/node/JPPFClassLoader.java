@@ -107,9 +107,15 @@ public class JPPFClassLoader extends ClassLoader
 			
 			// we need to do this in order to dramaticaly simplify the 
 			// state machine of ClassServer
-			try {
-				socketClient.sendBytes(new JPPFBuffer("node"));
-			} catch (IOException e) {
+			try
+			{
+				JPPFResourceWrapper resource = new JPPFResourceWrapper();
+				resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
+				socketClient.send(resource);
+				//socketClient.sendBytes(new JPPFBuffer("node"));
+			}
+			catch (IOException e)
+			{
 				throw new RuntimeException(e);
 			}
 			System.out.println("JPPFClassLoader.init(): Reconnected to the class server");
@@ -212,6 +218,7 @@ public class JPPFClassLoader extends ClassLoader
 	 * @throws ClassNotFoundException if the class could not be loaded from the remote server.
 	 * @throws IOException if the connection was lost and could not be reestablished.
 	 */
+	/*
 	private byte[] loadResourceData0(String name) throws ClassNotFoundException, IOException
 	{
 		byte[] b = null;
@@ -224,6 +231,37 @@ public class JPPFClassLoader extends ClassLoader
 			sb.append(name);
 			socketClient.sendBytes(new JPPFBuffer(sb.toString()));
 			b = socketClient.receiveBytes(0).getBuffer();
+		}
+		finally
+		{
+			lock.unlock();
+		}
+		return b;
+	}
+	*/
+
+	/**
+	 * Load the specified class from a socket connection.
+	 * @param name the binary name of the class to load, such as specified in the JLS.
+	 * @return an array of bye containing the class' byte code.
+	 * @throws ClassNotFoundException if the class could not be loaded from the remote server.
+	 * @throws IOException if the connection was lost and could not be reestablished.
+	 */
+	private byte[] loadResourceData0(String name) throws ClassNotFoundException, IOException
+	{
+		byte[] b = null;
+		try
+		{
+			lock.lock();
+			JPPFResourceWrapper resource = new JPPFResourceWrapper();
+			resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
+			resource.setDynamic(dynamic);
+			resource.setAppUuid(appUuid);
+			resource.setName(name);
+			
+			socketClient.send(resource);
+			resource = (JPPFResourceWrapper) socketClient.receive();
+			b = resource.getDefinition();
 		}
 		finally
 		{

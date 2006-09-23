@@ -20,10 +20,8 @@
 package org.jppf.classloader;
 
 import org.apache.log4j.Logger;
-import org.jppf.comm.socket.SocketClient;
-import org.jppf.comm.socket.SocketInitializer;
-import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.utils.JPPFBuffer;
+import org.jppf.comm.socket.*;
+import org.jppf.node.JPPFResourceWrapper;
 
 /**
  * Wrapper around an incoming socket connection, whose role is to receive the names of classes
@@ -125,6 +123,44 @@ public class ClassServerDelegate extends Thread
 	{
 		try
 		{
+			JPPFResourceWrapper resource = new JPPFResourceWrapper();
+			resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
+			resource.setAppUuid(appUuid);
+			socketClient.send(resource);
+			while (!stop)
+			{
+				try
+				{
+					resource = (JPPFResourceWrapper) socketClient.receive();
+					String name = resource.getName();
+					byte[] b = resourceProvider.getResourceAsBytes(name);
+					if (b == null) b = new byte[0];
+					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
+					resource.setDefinition(b);
+					socketClient.send(resource);
+					if  (log.isInfoEnabled())
+					{
+						log.info("sent resource " + name + " (" + b.length + " bytes)");
+					}
+				}
+				catch(Exception e)
+				{
+					log.warn("caught " + e + ", will re-initialise ...", e);
+					init();
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			log.error(e.getMessage(), e);
+			setClosed();
+		}
+	}
+	/*
+	public void run()
+	{
+		try
+		{
 			socketClient.sendBytes(new JPPFBuffer("provider|"+appUuid));
 			while (!stop)
 			{
@@ -151,6 +187,7 @@ public class ClassServerDelegate extends Thread
 			setClosed();
 		}
 	}
+	*/
 
 	/**
 	 * Set the stop flag to true, indicating that this socket handler should be closed as

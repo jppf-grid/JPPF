@@ -24,30 +24,26 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.List;
 import org.apache.log4j.Logger;
+import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.server.*;
 
 /**
  * This class represents the state of waiting the response of a provider.
  * @author Domingos Creado
  */
-class CReceivingResource implements ChannelState
+class CReceivingResource extends ClassChannelState
 {
 	/**
 	 * Log4j logger for this class.
 	 */
 	private static Logger log = Logger.getLogger(CReceivingResource.class);
 	/**
-	 * The JPPFNIOServer this state relates to.
-	 */
-	private ClassServer server;
-
-	/**
 	 * Initialize this state with a specified JPPFNIOServer.
 	 * @param server the JPPFNIOServer this state relates to.
 	 */
 	CReceivingResource(ClassServer server)
 	{
-		this.server = server;
+		super(server);
 	}
 
 	/**
@@ -58,6 +54,69 @@ class CReceivingResource implements ChannelState
 	 * @see org.jppf.server.ChannelState#exec(java.nio.channels.SelectionKey,
 	 *      org.jppf.server.ChannelContext)
 	 */
+	public void exec(SelectionKey key, ChannelContext context) throws IOException
+	{
+		SocketChannel channel = (SocketChannel) key.channel();
+		List queue = (List) context.content;
+		RemoteClassRequest request = (RemoteClassRequest) queue.get(0);
+		Request out = request.getRequest();
+		boolean requestFilled = false;
+		try
+		{
+			requestFilled = server.fillRequest(channel, out);
+		}
+		catch(IOException e)
+		{
+			server.providerConnections.remove(context.uuid);
+			ByteBuffer sendingBuffer = ByteBuffer.allocateDirect(4).putInt(0);
+			SocketChannel destination = request.getChannel();
+			SelectionKey destinationKey = destination.keyFor(server.getSelector());
+			ChannelContext destinationContext = ((ChannelContext) destinationKey.attachment());
+			destinationContext.content = sendingBuffer;
+			destinationKey.interestOps(SelectionKey.OP_WRITE);
+			throw e;
+		}
+		if (requestFilled)
+		{
+			// the request was totaly transfered from provider
+			queue.remove(0);
+			context.state = server.SendingRequest;
+			if (queue.isEmpty()) key.interestOps(SelectionKey.OP_READ);
+			else key.interestOps(SelectionKey.OP_WRITE | SelectionKey.OP_READ);
+			// putting the definition in cache
+			JPPFResourceWrapper resource = readResource(out.getOutput().toByteArray());
+			CacheClassContent content = new CacheClassContent(resource.getDefinition());
+			CacheClassKey cacheKey = new CacheClassKey(context.uuid, request.getResourceName());
+			server.classCache.put(cacheKey, content);
+			// fowarding it to channel that requested
+			SocketChannel destination = request.getChannel();
+			try
+			{
+				SelectionKey destinationKey = destination.keyFor(server.getSelector());
+				resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
+				byte[] ser = writeResource(resource);
+				ByteBuffer sendingBuffer = server.createByteBuffer(ser);
+				destination.write(sendingBuffer);
+				ChannelContext destinationContext = ((ChannelContext) destinationKey.attachment());
+				destinationContext.state = server.SendingNodeData;
+				destinationContext.content = sendingBuffer;
+				destinationKey.interestOps(SelectionKey.OP_WRITE);
+			}
+			catch(IOException e)
+			{
+				log.error(e.getMessage(), e);
+				try
+				{
+					destination.close();
+				}
+				catch(IOException ignored)
+				{
+					log.error(ignored.getMessage(), ignored);
+				}
+			}
+		}
+	}
+	/*
 	public void exec(SelectionKey key, ChannelContext context) throws IOException
 	{
 		SocketChannel channel = (SocketChannel) key.channel();
@@ -118,4 +177,5 @@ class CReceivingResource implements ChannelState
 			}
 		}
 	}
+	*/
 }

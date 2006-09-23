@@ -118,17 +118,10 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 */
 	public void sendBytes(JPPFBuffer buf) throws IOException
 	{
-		try
-		{
-			checkOpened();
-			dos.writeInt(buf.getLength());
-			dos.write(buf.getBuffer(), 0, buf.getLength());
-			dos.flush();
-		}
-		catch(IOException e)
-		{
-			throw e;
-		}
+		checkOpened();
+		dos.writeInt(buf.getLength());
+		dos.write(buf.getBuffer(), 0, buf.getLength());
+		dos.flush();
 	}
 
 	/**
