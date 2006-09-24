@@ -89,14 +89,7 @@ class CSendingRequest extends ClassChannelState
 				catch(IOException e2)
 				{
 					log.error(e2.getMessage(), e2);
-					try
-					{
-						destination.close();
-					}
-					catch(IOException ignored)
-					{
-						log.error(ignored.getMessage(), ignored);
-					}
+					closeChannel(destination);
 				}
 				// let the main loop close the channel
 				throw e;

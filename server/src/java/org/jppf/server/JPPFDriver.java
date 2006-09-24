@@ -170,6 +170,15 @@ public class JPPFDriver
 	}
 
 	/**
+	 * Get this driver's unique identifier.
+	 * @return the uuid as a string.
+	 */
+	public String getUuid()
+	{
+		return credentials.getUuid();
+	}
+
+	/**
 	 * Initialize this task with the specified parameters.<br>
 	 * The shutdown is initiated after the specified shutdown delay has expired.<br>
 	 * If the restart parameter is set to false then the JVM exits after the shutdown is complete.

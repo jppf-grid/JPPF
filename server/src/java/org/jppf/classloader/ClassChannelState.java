@@ -20,6 +20,8 @@
 package org.jppf.classloader;
 
 import java.io.*;
+import java.nio.channels.SocketChannel;
+import org.apache.log4j.Logger;
 import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.server.ChannelState;
 
@@ -29,6 +31,11 @@ import org.jppf.server.ChannelState;
  */
 public abstract class ClassChannelState implements ChannelState
 {
+	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(ClassChannelState.class);
+
 	/**
 	 * The JPPFNIOServer this state relates to.
 	 */
@@ -94,5 +101,21 @@ public abstract class ClassChannelState implements ChannelState
 		}
 		oos.close();
 		return baos.toByteArray();
+	}
+
+	/**
+	 * Close a specified socket channel and log any eventual exception.
+	 * @param channel the channel to close.
+	 */
+	public void closeChannel(SocketChannel channel)
+	{
+		try
+		{
+			channel.close();
+		}
+		catch(Exception ignored)
+		{
+			log.error(ignored.getMessage(), ignored);
+		}
 	}
 }

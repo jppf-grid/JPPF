@@ -20,6 +20,7 @@
 package org.jppf.node;
 
 import java.io.*;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
@@ -42,7 +43,7 @@ public class JPPFClassLoader extends ClassLoader
 	/**
 	 * The unique identifier for the submitting application.
 	 */
-	private String appUuid = null;
+	private List<String> uuidPath = new ArrayList<String>();
 	/**
 	 * Used to synchronize access to the underlying socket from multiple threads.
 	 */
@@ -77,12 +78,12 @@ public class JPPFClassLoader extends ClassLoader
 	/**
 	 * Initialize this class loader with a parent class loader.
 	 * @param parent a ClassLoader instance.
-	 * @param appUuid unique identifier for the submitting application.
+	 * @param uuidPath unique identifier for the submitting application.
 	 */
-	public JPPFClassLoader(ClassLoader parent, String appUuid)
+	public JPPFClassLoader(ClassLoader parent, List<String> uuidPath)
 	{
 		this(parent);
-		this.appUuid = appUuid;
+		this.uuidPath = uuidPath;
 	}
 
 	/**
@@ -218,35 +219,6 @@ public class JPPFClassLoader extends ClassLoader
 	 * @throws ClassNotFoundException if the class could not be loaded from the remote server.
 	 * @throws IOException if the connection was lost and could not be reestablished.
 	 */
-	/*
-	private byte[] loadResourceData0(String name) throws ClassNotFoundException, IOException
-	{
-		byte[] b = null;
-		try
-		{
-			lock.lock();
-			StringBuilder sb = new StringBuilder();
-			if (dynamic) sb.append(":");
-			if (appUuid != null) sb.append(appUuid).append("|");
-			sb.append(name);
-			socketClient.sendBytes(new JPPFBuffer(sb.toString()));
-			b = socketClient.receiveBytes(0).getBuffer();
-		}
-		finally
-		{
-			lock.unlock();
-		}
-		return b;
-	}
-	*/
-
-	/**
-	 * Load the specified class from a socket connection.
-	 * @param name the binary name of the class to load, such as specified in the JLS.
-	 * @return an array of bye containing the class' byte code.
-	 * @throws ClassNotFoundException if the class could not be loaded from the remote server.
-	 * @throws IOException if the connection was lost and could not be reestablished.
-	 */
 	private byte[] loadResourceData0(String name) throws ClassNotFoundException, IOException
 	{
 		byte[] b = null;
@@ -256,7 +228,9 @@ public class JPPFClassLoader extends ClassLoader
 			JPPFResourceWrapper resource = new JPPFResourceWrapper();
 			resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
 			resource.setDynamic(dynamic);
-			resource.setAppUuid(appUuid);
+			TraversalList<String> list = new TraversalList<String>(uuidPath);
+			resource.setUuidPath(list);
+			if (list.size() > 0) list.setPosition(uuidPath.size()-1);
 			resource.setName(name);
 			
 			socketClient.send(resource);

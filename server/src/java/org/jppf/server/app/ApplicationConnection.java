@@ -91,13 +91,10 @@ public class ApplicationConnection extends JPPFConnection implements
 	 * Initialize this connection with an open socket connection to a remote
 	 * client.
 	 * 
-	 * @param server
-	 *            the server that created this connection.
-	 * @param socket
-	 *            the socket connection from which requests are received and to
-	 *            which responses are sent.
-	 * @throws JPPFException
-	 *             if this socket handler can't be initialized.
+	 * @param server the server that created this connection.
+	 * @param socket the socket connection from which requests are received and to
+	 * which responses are sent.
+	 * @throws JPPFException if this socket handler can't be initialized.
 	 */
 	public ApplicationConnection(JPPFServer server, Socket socket) throws JPPFException {
 		super(server, socket);
@@ -161,9 +158,10 @@ public class ApplicationConnection extends JPPFConnection implements
 		}
 		dis.close();
 		JPPFTaskBundle bundle = new JPPFTaskBundle();
-		bundle.setUuid("0");
+		bundle.setBundleUuid("0");
 		bundle.setRequestUuid(header.getUuid());
-		bundle.setAppUuid(header.getAppUuid());
+		bundle.getUuidPath().add(header.getAppUuid());
+		bundle.getUuidPath().add(JPPFDriver.getInstance().getCredentials().getUuid());
 		bundle.setDataProvider(dataProvider);
 		bundle.setTaskCount(count);
 		bundle.setTasks(taskList);

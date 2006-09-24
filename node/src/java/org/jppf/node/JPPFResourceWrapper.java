@@ -20,6 +20,7 @@
 package org.jppf.node;
 
 import java.io.Serializable;
+import org.jppf.utils.TraversalList;
 
 /**
  * Instances of this class encapsulate the necessary information used by the network classloader,
@@ -62,7 +63,15 @@ public class JPPFResourceWrapper implements Serializable
 	/**
 	 * The unique identifier of the application in whose classpath the class definition should be found. 
 	 */
-	private String appUuid = null;
+	//private List<String> uuidPath = new ArrayList<String>();
+	/**
+	 * Position of the current uuid in the uuid path.
+	 */
+	//private int uuidPosition = 0;
+	/**
+	 * Keeps and manages the uuid path list and the current position in it.
+	 */
+	private TraversalList<String> uuidPath = new TraversalList<String>();
 	/**
 	 * The name of the class whose definition is requested.
 	 */
@@ -81,21 +90,12 @@ public class JPPFResourceWrapper implements Serializable
 	private State state = null;
 
 	/**
-	 * Get the unique identifier of the application in whose classpath the class definition should be found. 
-	 * @return the identifier as a string.
+	 * Add a uuid to the uuid path of this resource wrapper. 
+	 * @param uuid the identifier as a string.
 	 */
-	public String getAppUuid()
+	public void addUuid(String uuid)
 	{
-		return appUuid;
-	}
-
-	/**
-	 * Set the unique identifier of the application in whose classpath the class definition should be found. 
-	 * @param appUuid the identifier as a string.
-	 */
-	public void setAppUuid(String appUuid)
-	{
-		this.appUuid = appUuid;
+		uuidPath.add(uuid);
 	}
 
 	/**
@@ -168,5 +168,25 @@ public class JPPFResourceWrapper implements Serializable
 	public void setState(State state)
 	{
 		this.state = state;
+	}
+
+	/**
+	 * Get a reference to the traversal list that Keeps and manages the uuid path list
+	 * and the current position in it.
+	 * @return a traversal list of string elements.
+	 */
+	public TraversalList<String> getUuidPath()
+	{
+		return uuidPath;
+	}
+
+	/**
+	 * Set the reference to the traversal list that Keeps and manages the uuid path list
+	 * and the current position in it.
+	 * @param uuidPath a traversal list of string elements.
+	 */
+	public void setUuidPath(TraversalList<String> uuidPath)
+	{
+		this.uuidPath = uuidPath;
 	}
 }

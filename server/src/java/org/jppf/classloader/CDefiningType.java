@@ -60,7 +60,7 @@ class CDefiningType extends ClassChannelState
 			JPPFResourceWrapper resource = readResource(out.getOutput().toByteArray());
 			if (PROVIDER_INITIATION.equals(resource.getState()))
 			{
-				String uuid = resource.getAppUuid();
+				String uuid = resource.getUuidPath().getFirst();
 				// it is a provider
 				server.providerConnections.put(uuid, channel);
 				context.uuid = uuid;
@@ -79,36 +79,4 @@ class CDefiningType extends ClassChannelState
 			}
 		}
 	}
-
-	/*
-	public void exec(SelectionKey key, ChannelContext context) throws IOException
-	{
-		// we don't know yet which whom we are talking, is it a node or a provider?
-		SocketChannel channel = (SocketChannel) key.channel();
-		Request out = (Request) context.content;
-		if (server.fillRequest(channel, out))
-		{
-			String name = new String(out.getOutput().toByteArray());
-			if (name.startsWith("provider|"))
-			{
-				String uuid = name.substring("provider|".length(), name.length());
-				// it is a provider
-				this.server.providerConnections.put(uuid, channel);
-				context.uuid = uuid;
-				context.state = this.server.SendingRequest;
-				// create the queue of requests to this provider
-				context.content = new LinkedList<RemoteClassRequest>();
-				key.interestOps(SelectionKey.OP_READ);
-			}
-			else if (name.equalsIgnoreCase("node"))
-			{
-				// it is a provider
-				context.content = new Request();
-				// we will wait for a request
-				context.state = this.server.WaitingRequest;
-				key.interestOps(SelectionKey.OP_READ);
-			}
-		}
-	}
-	*/
 }

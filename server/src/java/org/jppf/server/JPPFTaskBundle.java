@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.*;
 import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.event.TaskCompletionListener;
-import org.jppf.utils.VersionUtils;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
@@ -60,7 +60,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	/**
 	 * The unique identifier for the submitting application.
 	 */
-	private String appUuid = null;
+	private TraversalList<String> uuidPath = new TraversalList<String>();
 	/**
 	 * The number of tasks in this bundle.
 	 */
@@ -119,7 +119,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * Get the unique identifier for this task bundle.
 	 * @return the uuid as a string.
 	 */
-	public String getUuid()
+	public String getBundleUuid()
 	{
 		return uuid;
 	}
@@ -128,7 +128,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * Set the unique identifier for this task bundle.
 	 * @param uuid the uuid as a string.
 	 */
-	public void setUuid(String uuid)
+	public void setBundleUuid(String uuid)
 	{
 		this.uuid = uuid;
 	}
@@ -152,15 +152,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	}
 
 	/**
-	 * Get the unique identifier for the submitting application.
-	 * @return the application uuid as a string.
-	 */
-	public String getAppUuid()
-	{
-		return appUuid;
-	}
-
-	/**
 	 * Get shared data provider for this task.
 	 * @return a <code>DataProvider</code> instance.
 	 */
@@ -179,12 +170,21 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	}
 
 	/**
-	 * Set the unique identifier for the submitting application.
-	 * @param appUuid the application uuid as a string.
+	 * Get the uuid path of the applications (driver or client) in whose classpath the class definition may be found. 
+	 * @return the uuid path as a list of string elements.
 	 */
-	public void setAppUuid(String appUuid)
+	public TraversalList<String> getUuidPath()
 	{
-		this.appUuid = appUuid;
+		return uuidPath;
+	}
+
+	/**
+	 * Set the uuid path of the applications (driver or client) in whose classpath the class definition may be found. 
+	 * @param uuidPath the uuid path as a list of string elements.
+	 */
+	public void setUuidPath(TraversalList<String> uuidPath)
+	{
+		this.uuidPath = uuidPath;
 	}
 
 	/**
@@ -327,8 +327,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	public JPPFTaskBundle copy(int nbTasks)
 	{
 		JPPFTaskBundle bundle = new JPPFTaskBundle();
-		bundle.setUuid(uuid);
-		bundle.setAppUuid(appUuid);
+		bundle.setBundleUuid(uuid);
+		bundle.setUuidPath(uuidPath);
 		bundle.setRequestUuid(requestUuid);
 		bundle.setTaskCount(nbTasks);
 		bundle.setDataProvider(dataProvider);

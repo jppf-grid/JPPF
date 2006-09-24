@@ -64,7 +64,9 @@ class CWaitingRequest extends ClassChannelState
 			JPPFResourceWrapper resource = readResource(out.getOutput().toByteArray());
 			boolean dynamic = resource.isDynamic();
 			String name = resource.getName();
-			String uuid = resource.getAppUuid();
+			String uuid = null; 
+			if (resource.getUuidPath().size() <= 0) uuid = null;
+			else uuid = resource.getUuidPath().getFirst();
 			byte[] b = null;
 			if (uuid == null)
 			{
@@ -101,14 +103,7 @@ class CWaitingRequest extends ClassChannelState
 							{
 								log.error(e.getMessage(), e);
 								server.providerConnections.remove(uuid);
-								try
-								{
-									provider.close();
-								}
-								catch(Exception ignored)
-								{
-									log.error(ignored.getMessage(), ignored);
-								}
+								closeChannel(provider);
 								returnOrSchedule(key, context, resource);
 							}
 							if (!sending.hasRemaining())
@@ -128,89 +123,6 @@ class CWaitingRequest extends ClassChannelState
 			}
 		}
 	}
-	/*
-	public void exec(SelectionKey key, ChannelContext context) throws IOException
-	{
-		SocketChannel channel = (SocketChannel) key.channel();
-		Request out = (Request) context.content;
-		if (server.fillRequest(channel, out))
-		{
-			String name = new String(out.getOutput().toByteArray());
-			boolean dynamic = false;
-			if (name.startsWith(":"))
-			{
-				dynamic = true;
-				name = name.substring(1);
-			}
-			byte[] b = null;
-			String uuid = null;
-			int idx = name.indexOf("|");
-			if (idx >= 0)
-			{
-				uuid = name.substring(0, idx);
-				name = name.substring(idx + 1);
-			}
-			if (uuid == null)
-			{
-				b = server.getResourceProvider().getResourceAsBytes(name);
-				// Sending b back to node
-				returnOrSchedule(key, context, b);
-			}
-			if ((b == null) && dynamic)
-			{
-				CacheClassContent content = server.classCache.get(new CacheClassKey(uuid, name));
-				if (content != null)
-				{
-					returnOrSchedule(key, context, content.getContent());
-				}
-				else
-				{
-					SocketChannel provider = server.providerConnections.get(uuid);
-					if (provider != null)
-					{
-						SelectionKey providerKey = provider.keyFor(server.getSelector());
-						ChannelContext providerContext = (ChannelContext) providerKey.attachment();
-						List<RemoteClassRequest> queue = (List<RemoteClassRequest>) providerContext.content;
-						byte[] nameArray = name.getBytes();
-						ByteBuffer sending = server.createByteBuffer(nameArray);
-						if (queue.isEmpty())
-						{
-							try
-							{
-								provider.write(sending);
-							}
-							catch(IOException e)
-							{
-								log.error(e.getMessage(), e);
-								server.providerConnections.remove(uuid);
-								try
-								{
-									provider.close();
-								}
-								catch(Exception ignored)
-								{
-									log.error(ignored.getMessage(), ignored);
-								}
-								returnOrSchedule(key, context, new byte[0]);
-							}
-							if (!sending.hasRemaining())
-							{
-								providerContext.state = server.ReceivingResource;
-								providerKey.interestOps(SelectionKey.OP_READ);
-								context.state = server.SendingNodeData;
-								context.content = null;
-							}
-							else providerKey.interestOps(SelectionKey.OP_WRITE);
-						}
-						queue.add(new RemoteClassRequest(name, sending, channel));
-						// hangs until the response from provider is fulfilled
-						key.interestOps(0);
-					}
-				}
-			}
-		}
-	}
-	*/
 
 	/**
 	 * This method tries to replay a request to a node, but as the channel is in non-blocking mode, the packet can be
@@ -239,20 +151,4 @@ class CWaitingRequest extends ClassChannelState
 		}
 		else context.content = new Request();
 	}
-	/*
-	void returnOrSchedule(SelectionKey key, ChannelContext context, byte[] data) throws IOException
-	{
-		SocketChannel channel = (SocketChannel) key.channel();
-		if (data == null) data = new byte[0];
-		ByteBuffer sendingBuffer = server.createByteBuffer(data);
-		channel.write(sendingBuffer);
-		if (sendingBuffer.hasRemaining())
-		{
-			context.content = sendingBuffer;
-			context.state = server.SendingNodeData;
-			key.interestOps(SelectionKey.OP_WRITE);
-		}
-		else context.content = new Request();
-	}
-	*/
 }

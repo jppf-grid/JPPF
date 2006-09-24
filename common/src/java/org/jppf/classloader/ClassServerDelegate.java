@@ -125,7 +125,7 @@ public class ClassServerDelegate extends Thread
 		{
 			JPPFResourceWrapper resource = new JPPFResourceWrapper();
 			resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
-			resource.setAppUuid(appUuid);
+			resource.addUuid(appUuid);
 			socketClient.send(resource);
 			while (!stop)
 			{
@@ -156,38 +156,6 @@ public class ClassServerDelegate extends Thread
 			setClosed();
 		}
 	}
-	/*
-	public void run()
-	{
-		try
-		{
-			socketClient.sendBytes(new JPPFBuffer("provider|"+appUuid));
-			while (!stop)
-			{
-				try
-				{
-					String name = new String(socketClient.receiveBytes(0).getBuffer());
-					byte[] b = resourceProvider.getResourceAsBytes(name);
-					if (b == null) b = new byte[0];
-					socketClient.sendBytes(new JPPFBuffer(b, b.length));
-					if  (log.isInfoEnabled()) {
-						log.info("sent resource "+name+" ("+b.length+" bytes)");
-					}
-				}
-				catch(Exception e)
-				{
-					log.warn("caught "+e+", will re-initialise ...", e);
-					init();
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			log.error(e.getMessage(), e);
-			setClosed();
-		}
-	}
-	*/
 
 	/**
 	 * Set the stop flag to true, indicating that this socket handler should be closed as

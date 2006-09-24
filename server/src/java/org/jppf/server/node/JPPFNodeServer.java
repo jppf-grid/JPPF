@@ -340,9 +340,9 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 				dos.close();
 				byte[] dpBytes = baos.toByteArray();
 				JPPFTaskBundle bundle = new JPPFTaskBundle();
-				bundle.setUuid(INITIAL_BUNDLE_UUID);
+				bundle.setBundleUuid(INITIAL_BUNDLE_UUID);
 				bundle.setRequestUuid("0");
-				bundle.setAppUuid(INITIAL_BUNDLE_UUID);
+				bundle.getUuidPath().add(JPPFDriver.getInstance().getUuid());
 				bundle.setTaskCount(0);
 				bundle.setTasks(new ArrayList<byte[]>());
 				bundle.setDataProvider(dpBytes);

@@ -332,16 +332,14 @@ public class JPPFNode implements MonitoredNode
 		int count = bundle.getTaskCount();
 		Object[] result = new Object[2 + count];
 		result[0] = bundle;
-		String uuid = bundle.getAppUuid();
-		if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 		{
-			result[1] = null;
-		}
-		else
-		{
-			result[1] = getContainer(uuid).deserializeObject(dis, true);
+			JPPFContainer cont = getContainer(bundle.getUuidPath().getList());
+			result[1] = cont.deserializeObject(dis, true);
 			for (int i = 0; i < count; i++)
-				result[2 + i] = getContainer(uuid).deserializeObject(dis, true);
+			{
+				result[2 + i] = cont.deserializeObject(dis, true);
+			}
 		}
 		dis.close();
 		return result;
@@ -360,8 +358,7 @@ public class JPPFNode implements MonitoredNode
 		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		bundle.setNodeExecutionTime(elapsed);
 		helper.writeNextObject(bundle, dos, false);
-		for (JPPFTask task : tasks)
-			helper.writeNextObject(task, dos, true);
+		for (JPPFTask task : tasks) helper.writeNextObject(task, dos, true);
 		dos.flush();
 		dos.close();
 		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
@@ -397,17 +394,18 @@ public class JPPFNode implements MonitoredNode
 
 	/**
 	 * Get a reference to the JPPF container associated with an application uuid.
-	 * @param uuid the uuuid to find the container for.
+	 * @param uuidPath the uuid path containing the key to the container.
 	 * @return a <code>JPPFContainer</code> instance.
 	 * @throws Exception if an error occcurs while getting the container.
 	 */
-	private JPPFContainer getContainer(String uuid) throws Exception
+	private JPPFContainer getContainer(List<String> uuidPath) throws Exception
 	{
+		String uuid = uuidPath.get(0);
 		JPPFContainer container = containerMap.get(uuid);
 		if (container == null)
 		{
 			if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
-			container = new JPPFContainer(uuid);
+			container = new JPPFContainer(uuidPath);
 			if (containerList.size() >= MAX_CONTAINERS)
 			{
 				JPPFContainer toRemove = containerList.remove(0);

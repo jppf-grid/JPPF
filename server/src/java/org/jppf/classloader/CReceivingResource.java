@@ -105,77 +105,8 @@ class CReceivingResource extends ClassChannelState
 			catch(IOException e)
 			{
 				log.error(e.getMessage(), e);
-				try
-				{
-					destination.close();
-				}
-				catch(IOException ignored)
-				{
-					log.error(ignored.getMessage(), ignored);
-				}
+				closeChannel(destination);
 			}
 		}
 	}
-	/*
-	public void exec(SelectionKey key, ChannelContext context) throws IOException
-	{
-		SocketChannel channel = (SocketChannel) key.channel();
-		List queue = (List) context.content;
-		RemoteClassRequest request = (RemoteClassRequest) queue.get(0);
-		Request out = request.getRequest();
-		boolean requestFilled = false;
-		try
-		{
-			requestFilled = server.fillRequest(channel, out);
-		}
-		catch(IOException e)
-		{
-			server.providerConnections.remove(context.uuid);
-			ByteBuffer sendingBuffer = ByteBuffer.allocateDirect(4).putInt(0);
-			SocketChannel destination = request.getChannel();
-			SelectionKey destinationKey = destination.keyFor(server.getSelector());
-			ChannelContext destinationContext = ((ChannelContext) destinationKey.attachment());
-			destinationContext.content = sendingBuffer;
-			destinationKey.interestOps(SelectionKey.OP_WRITE);
-			throw e;
-		}
-		if (requestFilled)
-		{
-			// the request was totaly transfered from provider
-			queue.remove(0);
-			context.state = server.SendingRequest;
-			if (queue.isEmpty()) key.interestOps(SelectionKey.OP_READ);
-			else key.interestOps(SelectionKey.OP_WRITE | SelectionKey.OP_READ);
-			// putting the definition in cache
-			CacheClassContent content = new CacheClassContent(out.getOutput().toByteArray());
-			CacheClassKey cacheKey = new CacheClassKey(context.uuid, request.getResourceName());
-			server.classCache.put(cacheKey, content);
-			// fowarding it to channel that requested
-			SocketChannel destination = request.getChannel();
-			try
-			{
-				SelectionKey destinationKey = destination.keyFor(server.getSelector());
-				byte[] classDef = out.getOutput().toByteArray();
-				ByteBuffer sendingBuffer = server.createByteBuffer(classDef);
-				destination.write(sendingBuffer);
-				ChannelContext destinationContext = ((ChannelContext) destinationKey.attachment());
-				destinationContext.state = server.SendingNodeData;
-				destinationContext.content = sendingBuffer;
-				destinationKey.interestOps(SelectionKey.OP_WRITE);
-			}
-			catch(IOException e)
-			{
-				log.error(e.getMessage(), e);
-				try
-				{
-					destination.close();
-				}
-				catch(IOException ignored)
-				{
-					log.error(ignored.getMessage(), ignored);
-				}
-			}
-		}
-	}
-	*/
 }

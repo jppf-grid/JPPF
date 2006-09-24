@@ -19,10 +19,11 @@
  */
 package org.jppf.server.node;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.jppf.node.*;
-import org.jppf.utils.*;
+import org.jppf.utils.SerializationHelper;
 
 /**
  * Instances of this class represent dynamic class loading, and serialization/deserialization, capabilities, associated
@@ -48,16 +49,16 @@ public class JPPFContainer
 	/**
 	 * The unique identifier for the submitting application.
 	 */
-	private String appUuid = null;
+	private List<String> uuidPath = new ArrayList<String>();
 
 	/**
 	 * Initialize this container with a specified application uuid.
-	 * @param appUuid the unique identifier of a submitting application.
+	 * @param uuidPath the unique identifier of a submitting application.
 	 * @throws Exception if an error occurs while initializing.
 	 */
-	public JPPFContainer(String appUuid) throws Exception
+	public JPPFContainer(List<String> uuidPath) throws Exception
 	{
-		this.appUuid = appUuid;
+		this.uuidPath = uuidPath;
 		init();
 	}
 
@@ -90,8 +91,8 @@ public class JPPFContainer
 	{
 		if (classLoader == null)
 		{
-			log.debug("Creating new class loader with appUuid="+appUuid);
-			classLoader = new JPPFClassLoader(NodeLauncher.getJPPFClassLoader(), appUuid);
+			log.debug("Creating new class loader with uuidPath="+uuidPath);
+			classLoader = new JPPFClassLoader(NodeLauncher.getJPPFClassLoader(), uuidPath);
 		}
 		return classLoader;
 	}
@@ -113,15 +114,15 @@ public class JPPFContainer
 	 */
 	public String getAppUuid()
 	{
-		return appUuid;
+		return uuidPath.isEmpty() ? null : uuidPath.get(0);
 	}
 
 	/**
 	 * Set the unique identifier for the submitting application.
-	 * @param appUuid the application uuid as a string.
+	 * @param uuidPath the application uuid as a string.
 	 */
-	public void setAppUuid(String appUuid)
+	public void setUuidPath(List<String> uuidPath)
 	{
-		this.appUuid = appUuid;
+		this.uuidPath = uuidPath;
 	}
 }
