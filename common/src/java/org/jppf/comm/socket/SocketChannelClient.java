@@ -54,29 +54,34 @@ public class SocketChannelClient implements SocketWrapper
 	 */
 	private ObjectSerializer serializer = null;
 	/**
-	 * Determiens whether this client is opened or not.
+	 * Determines whether this client is opened or not.
 	 */
 	private boolean opened = false;
+	/**
+	 * Determines whther the socket channel must be in blocking or non-blocking mode.
+	 */
+	private boolean blocking = false;
 
 	/**
 	 * Initialize this socket channel client.
+	 * @param blocking true if the socket channel is in blocking mode, false otherwise.
 	 * @throws IOException if the socket channel could not be opened.
 	 */
-	public SocketChannelClient() throws IOException
+	public SocketChannelClient(boolean blocking) throws IOException
 	{
-		channel = SocketChannel.open();
-		channel.configureBlocking(true);
+		this.blocking = blocking;
 	}
 
 	/**
 	 * Initialize this socket channel client with a specified host and port.
 	 * @param host the host to connect to.
 	 * @param port the port to listen on the host.
+	 * @param blocking true if the socket channel is in blocking mode, false otherwise.
 	 * @throws IOException if the socket channel could not be opened.
 	 */
-	public SocketChannelClient(String host, int port) throws IOException
+	public SocketChannelClient(String host, int port, boolean blocking) throws IOException
 	{
-		this();
+		this(blocking);
 		this.host = host;
 		this.port = port;
 	}
@@ -196,8 +201,23 @@ public class SocketChannelClient implements SocketWrapper
 	 */
 	public void open() throws ConnectException, IOException
 	{
+		channel = SocketChannel.open();
+		channel.configureBlocking(blocking);
 		InetSocketAddress address = new InetSocketAddress(host, port);
 		channel.connect(address);
+		if (!channel.isBlocking())
+		{
+			while (!channel.finishConnect())
+			{
+				try
+				{
+					Thread.sleep(1);
+				}
+				catch(InterruptedException e)
+				{
+				}
+			}
+		}
 		opened = true;
 	}
 
@@ -324,5 +344,23 @@ public class SocketChannelClient implements SocketWrapper
 	 */
 	public void setSocket(Socket socket)
 	{
+	}
+
+	/**
+	 * Get the underlying socket used by this socket wrapper.
+	 * @return a SocketChannel instance.
+	 */
+	public SocketChannel getChannel()
+	{
+		return channel;
+	}
+
+	/**
+	 * Set the underlying socket to be used by this socket wrapper.
+	 * @param channel a SocketChannel instance.
+	 */
+	public void setChannel(SocketChannel channel)
+	{
+		this.channel = channel;
 	}
 }

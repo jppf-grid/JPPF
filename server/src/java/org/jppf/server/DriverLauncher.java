@@ -24,7 +24,7 @@ import java.net.*;
 import java.util.*;
 
 import org.apache.log4j.Logger;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 
 /**
  * <p>This class is intended as a controller for the JPPF driver, to enable stopping and restarting it when requested.
@@ -117,8 +117,11 @@ public class DriverLauncher
 		int n = JPPFConfiguration.getProperties().getInt("max.memory.option", 128);
 		command.add("-Xmx" + n + "m");
 
+		TypedProperties props = JPPFConfiguration.getProperties();
+		int debugPort = props.getInt("remote.debug.port", 8000);
+		boolean b = props.getBoolean("remote.debug.suspend", false);
 		command.add("-Xdebug");
-		command.add("-Xrunjdwp:transport=dt_socket,address=localhost:8000,server=y,suspend=n");		
+		command.add("-Xrunjdwp:transport=dt_socket,address=localhost:"+debugPort+",server=y,suspend="+(b?"y":"n"));		
 
 		command.add("org.jppf.server.JPPFDriver");
 		command.add("" + driverPort);

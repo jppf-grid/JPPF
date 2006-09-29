@@ -21,6 +21,7 @@ package org.jppf.node;
 
 import java.net.Socket;
 import java.security.*;
+import org.apache.log4j.Logger;
 import org.jppf.JPPFNodeReloadNotification;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.utils.*;
@@ -31,6 +32,10 @@ import org.jppf.utils.*;
  */
 public class NodeLauncher
 {
+	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(NodeLauncher.class);
 	/**
 	 * The ClassLoader used for loading the classes of the framework.
 	 */
@@ -55,6 +60,7 @@ public class NodeLauncher
 		MonitoredNode node = null;
 		try
 		{
+			log.info("starting node");
 			// to ensure VersionUtils is loaded by the same class loader as this class.
 			VersionUtils.getBuildNumber();
 			while (true)

@@ -29,8 +29,8 @@ import org.jppf.server.*;
  * This class represents the state of waiting for some action.
  * @author Domingos Creado
  */
-class CSendingJob implements ChannelState {
-
+class CSendingJob implements ChannelState
+{
 	/**
 	 * Log4j logger for this class.
 	 */
@@ -62,59 +62,79 @@ class CSendingJob implements ChannelState {
 	 */
 	public void exec(SelectionKey key, ChannelContext context) throws IOException
 	{
-		SocketChannel channel = (SocketChannel) key.channel();
-		if (debugEnabled) log.debug("exec() for "+server.getRemostHost(channel));
-		if (key.isReadable()) {
-			//as the OS will select it for read when the channel is suddenly 
-			//closed by peer, and we are not expecting any read... the channel was closed by node
-			nodeClosing(channel, context);
-			return;
-		}
-		
-		NodeChannelContext nodeContext = (NodeChannelContext) key.attachment();
-		if (context.content == null)
+		try
 		{
-			// check whether the bundler settings have changed.
-			if (nodeContext.bundler.getTimestamp() < server.getBundler().getTimestamp())
+			SocketChannel channel = (SocketChannel) key.channel();
+			//if (debugEnabled) log.debug("exec() for "+server.getRemostHost(channel));
+			log.info("exec() for "+server.getRemostHost(channel));
+			if (key.isReadable())
 			{
-				nodeContext.bundler = server.getBundler().copy();
+				//as the OS will select it for read when the channel is suddenly 
+				//closed by peer, and we are not expecting any read... the channel was closed by node
+				nodeClosing(channel, context);
+				return;
 			}
-			JPPFTaskBundle bundle = server.getQueue().nextBundle(nodeContext.bundler.getBundleSize());
-			if (bundle != null)
+
+			NodeChannelContext nodeContext = (NodeChannelContext) key.attachment();
+			if (context.content == null)
 			{
-				try
+				// check whether the bundler settings have changed.
+				if (nodeContext.bundler.getTimestamp() < server.getBundler().getTimestamp())
 				{
-					server.sendTask(channel, key, context, bundle);
+					nodeContext.bundler = server.getBundler().copy();
 				}
-				catch (Exception e)
+				JPPFTaskBundle bundle = server.getQueue().nextBundle(nodeContext.bundler.getBundleSize());
+				if (bundle != null)
 				{
-					log.error(e.getMessage(), e);
-					server.closeNode(channel);
-					server.resubmitBundle(bundle);
+					// to avoid cycles in peer-to-peer routing of jobs.
+					if (bundle.getUuidPath().contains(context.uuid))
+					{
+						if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: "+bundle.getUuidPath().getList());
+						server.resubmitBundle(bundle);
+						return;
+					}
+					try
+					{
+						server.sendTask(channel, key, context, bundle);
+					}
+					catch (Exception e)
+					{
+						log.error(e.getMessage(), e);
+						if (debugEnabled) log.debug("closing channel and resubmitting bundle");
+						server.closeNode(channel);
+						server.resubmitBundle(bundle);
+					}
 				}
+				return;
 			}
-			return;
-		}
-		
-		// the buffer with the bundle serialized and part transfered
-		ByteBuffer task = ((TaskRequest) context.content).getSending();
-		try 
-		{
-			channel.write(task);
+			
+			// the buffer with the bundle serialized and part transfered
+			ByteBuffer task = ((TaskRequest) context.content).getSending();
+			try 
+			{
+				channel.write(task);
+			}
+			catch (IOException e)
+			{
+				if (debugEnabled) log.debug("closing channel");
+				nodeClosing(channel, context);
+				throw e;
+			}
+	
+			//is anything more to send to SO buffer?
+			if (!task.hasRemaining())
+			{
+				//we finally have sent everything to node
+				// it will do the work and send back to us.
+				context.state = server.WaitingResult;
+				//we will just wait for the bundle back
+				key.interestOps(SelectionKey.OP_READ);
+			}
 		}
 		catch (IOException e)
 		{
-			nodeClosing(channel, context);
+			if (debugEnabled) log.debug(e.getMessage(), e);
 			throw e;
-		}
-
-		//is anything more to send to SO buffer?
-		if (!task.hasRemaining()) {
-			//we finally have sent everything to node
-			// it will do the work and send back to us.
-			context.state = server.WaitingResult;
-			//we will just wait for the bundle back
-			key.interestOps(SelectionKey.OP_READ);
 		}
 	}
 

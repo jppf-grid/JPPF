@@ -34,6 +34,14 @@ public class SerializationHelperImpl implements SerializationHelper
 	 * Log4j logger for this class.
 	 */
 	private static Logger log = Logger.getLogger(SerializationHelperImpl.class);
+	/**
+	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 */
+	private boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Determines whether dumping byte arrays in the log is enabled.
+	 */
+	private boolean dumpEnabled = JPPFConfiguration.getProperties().getBoolean("byte.array.dump.enabled", false);
 
 	/**
 	 * Used to serialize and deserialize objects to and from object streams.
@@ -62,10 +70,10 @@ public class SerializationHelperImpl implements SerializationHelper
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 		DataInputStream dis = new DataInputStream(bais);
 
-		if (log.isDebugEnabled())
+		if (debugEnabled)
 		{
-	    log.debug("bytes to read : "+StringUtils.dumpBytes(bytes, 0, bytes.length));
 			log.debug("buffer length is "+bytes.length+", start is "+start);
+			if (dumpEnabled) log.debug("bytes to read : "+StringUtils.dumpBytes(bytes, 0, bytes.length));
 		}
 		for (int i=0; i<count; i++) result[i] =  readNextObject(dis, false);
 		dis.close();
@@ -143,10 +151,11 @@ public class SerializationHelperImpl implements SerializationHelper
 		
 		if (isCompressed) actual = CompressionUtils.unzip(temp, 0, len);
 		else actual = temp;
-		if (log.isDebugEnabled())
+		if (debugEnabled)
 		{
-			log.debug(""+actual.length+" bytes to deserialize:\n"+
-				StringUtils.dumpBytes(actual, 0, actual.length));
+			log.debug(""+actual.length+" bytes to deserialize");
+			if (dumpEnabled)
+				log.debug("bytes to deserialize:\n"+ StringUtils.dumpBytes(actual, 0, actual.length));
 		}
 		return getSerializer().deserialize(actual);
 	}
@@ -163,10 +172,11 @@ public class SerializationHelperImpl implements SerializationHelper
 	{
 		byte[] actual = null;
 		JPPFBuffer buf = getSerializer().serialize(o);
-		if (log.isDebugEnabled())
+		if (debugEnabled)
 		{
-			log.debug(""+buf.getLength()+" bytes to serialize:\n"+
-				StringUtils.dumpBytes(buf.getBuffer(), 0, buf.getLength()));
+			log.debug(""+buf.getLength()+" bytes to serialize");
+			if (dumpEnabled)
+				log.debug("dump of bytes to serialize:\n"+ StringUtils.dumpBytes(buf.getBuffer(), 0, buf.getLength()));
 		}
 		int len = 0;
 		if (isCompressed)

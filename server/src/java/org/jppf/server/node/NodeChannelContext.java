@@ -17,9 +17,10 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.server;
+package org.jppf.server.node;
 
 import org.jppf.security.JPPFSecurityContext;
+import org.jppf.server.ChannelContext;
 import org.jppf.server.scheduler.bundle.Bundler;
 
 /**
@@ -36,4 +37,8 @@ public class NodeChannelContext extends ChannelContext
 	 * The security credentials of the node.
 	 */
 	public JPPFSecurityContext credentials = null;
+	/**
+	 * Number of takss that remain to be received from the node.
+	 */
+	public int pendingTasks = 0;
 }

@@ -19,11 +19,8 @@
  */
 package sample.test;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-
+import java.io.*;
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFClient;
@@ -60,6 +57,7 @@ public class TestTaskRunner
 			performSecurityTest();
 			performEmptyConstantTaskTest();
 			performClassNotFoundTaskTest();
+			performInnerTask();
 			System.exit(0);
 		}
 		catch(Exception e)
@@ -238,7 +236,46 @@ public class TestTaskRunner
 			System.out.println("ClassNotFound task testing complete.");
 		}
 	}
-	
+
+	/**
+	 * Test with a non-static inner task.
+	 */
+	static void performInnerTask()
+	{
+		System.out.println("Starting InnerTask task testing...");
+		HelloJPPF h = new HelloJPPF();
+		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+		for (int i=1; i<4;i++)
+		{
+			tasks.add(h.new InnerTask(i));
+		}
+		try
+		{
+			// execute tasks
+			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			// show results
+			System.out.println("Got "+results.size()+" results: ");
+			Iterator it = results.iterator();
+			while (it.hasNext())
+			{
+				JPPFTask t = (JPPFTask) it.next();
+				System.out.println("Result object: "+t);
+				System.out.println("Result: "+t.getResult()+ ", Exception: "+t.getException());
+				if  (null != t.getException()) {
+					t.getException().printStackTrace();
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			System.out.println("InnerTask task testing complete.");
+		}
+	}
+
 	/**
 	 * Return an exception stack trace as a string.
 	 * @param t the throwable toget the stack trace from.

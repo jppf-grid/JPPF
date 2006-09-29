@@ -27,6 +27,7 @@ import org.jppf.classloader.ClassServer;
 import org.jppf.security.*;
 import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.node.JPPFNodeServer;
+import org.jppf.server.peer.JPPFPeerInitializer;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
 
@@ -106,6 +107,8 @@ public class JPPFDriver
 		port = props.getInt("node.server.port", 11113);
 		nodeServer = new JPPFNodeServer(port,bundler);
 		nodeServer.start();
+
+		initPeers();
 	}
 
 	/**
@@ -121,6 +124,18 @@ public class JPPFDriver
 		sb.append(props.getInt("app.server.port", 11112)).append(":");
 		sb.append(props.getInt("node.server.port", 11113));
 		credentials = new JPPFSecurityContext(uuid, sb.toString(), new JPPFCredentials());
+	}
+
+	/**
+	 * Initialize this driver's peers.
+	 */
+	private void initPeers()
+	{
+		TypedProperties props = JPPFConfiguration.getProperties();
+		String peerNames = props.getString("jppf.peers");
+		if ((peerNames == null) || "".equals(peerNames.trim())) return;
+		String[] names = peerNames.split(" ");
+		for (String peerName: names) new JPPFPeerInitializer(peerName).start();
 	}
 	
 	/**
@@ -149,6 +164,15 @@ public class JPPFDriver
 	public JPPFNodeServer getNodeServer()
 	{
 		return nodeServer;
+	}
+
+	/**
+	 * Get the JPPF class server.
+	 * @return a <code>ClassServer</code> instance.
+	 */
+	public ClassServer getClassServer()
+	{
+		return classServer;
 	}
 
 	/**

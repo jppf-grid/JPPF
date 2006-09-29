@@ -20,8 +20,10 @@
 package org.jppf.classloader;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.LinkedList;
+import org.apache.log4j.Logger;
 import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.server.*;
 
@@ -33,6 +35,11 @@ import static org.jppf.node.JPPFResourceWrapper.State.*;
  */
 class CDefiningType extends ClassChannelState
 {
+	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(CDefiningType.class);
+
 	/**
 	 * Initialize this state with a specified JPPFNIOServer.
 	 * @param server the JPPFNIOServer this state relates to.
@@ -64,7 +71,7 @@ class CDefiningType extends ClassChannelState
 				// it is a provider
 				server.providerConnections.put(uuid, channel);
 				context.uuid = uuid;
-				context.state = this.server.SendingRequest;
+				context.state = server.SendingRequest;
 				// create the queue of requests to this provider
 				context.content = new LinkedList<RemoteClassRequest>();
 				key.interestOps(SelectionKey.OP_READ);
@@ -73,9 +80,30 @@ class CDefiningType extends ClassChannelState
 			{
 				// it is a provider
 				context.content = new Request();
+
+				// send the uuid of this driver to the node or node peer.
+				try
+				{
+					resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
+					resource.setProviderUuid(JPPFDriver.getInstance().getUuid());
+					byte[] ser = writeResource(resource);
+					ByteBuffer sendingBuffer = server.createByteBuffer(ser);
+					channel.write(sendingBuffer);
+					context.state = server.SendingNodeData;
+					context.content = sendingBuffer;
+					key.interestOps(SelectionKey.OP_WRITE);
+				}
+				catch(IOException e)
+				{
+					log.error(e.getMessage(), e);
+					closeChannel(channel);
+				}
+
+				/*
 				// we will wait for a request
 				context.state = server.WaitingRequest;
 				key.interestOps(SelectionKey.OP_READ);
+				*/
 			}
 		}
 	}

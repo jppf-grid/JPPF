@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.server.*;
+import org.jppf.utils.TraversalList;
 
 /**
  * This class represents the state of waiting for a request from Nodes
@@ -62,22 +63,29 @@ class CWaitingRequest extends ClassChannelState
 		if (server.fillRequest(channel, out))
 		{
 			JPPFResourceWrapper resource = readResource(out.getOutput().toByteArray());
+			TraversalList<String> uuidPath = resource.getUuidPath();
 			boolean dynamic = resource.isDynamic();
 			String name = resource.getName();
 			String uuid = null; 
-			if (resource.getUuidPath().size() <= 0) uuid = null;
-			else uuid = resource.getUuidPath().getFirst();
+			if (uuidPath.size() <= 0) uuid = null;
+			else
+			{
+				uuid = uuidPath.getCurrentElement();
+			}
 			byte[] b = null;
-			if (uuid == null)
+			if ((uuid == null) || (uuid.equals(JPPFDriver.getInstance().getUuid())))
 			{
 				b = server.getResourceProvider().getResourceAsBytes(name);
-				// Sending b back to node
-				resource.setDefinition(b);
-				returnOrSchedule(key, context, resource);
+				if ((b != null) || !dynamic)
+				{
+					// Sending b back to node
+					resource.setDefinition(b);
+					returnOrSchedule(key, context, resource);
+				}
 			}
 			if ((b == null) && dynamic)
 			{
-				CacheClassContent content = server.classCache.get(new CacheClassKey(uuid, name));
+				CacheClassContent content = server.classCache.get(new CacheClassKey(uuidPath.getFirst(), name));
 				if (content != null)
 				{
 					resource.setDefinition(content.getContent());
@@ -85,6 +93,8 @@ class CWaitingRequest extends ClassChannelState
 				}
 				else
 				{
+					uuidPath.decPosition();
+					uuid = uuidPath.getCurrentElement();
 					SocketChannel provider = server.providerConnections.get(uuid);
 					if (provider != null)
 					{

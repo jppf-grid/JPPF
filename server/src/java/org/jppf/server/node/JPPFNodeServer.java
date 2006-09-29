@@ -103,7 +103,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 * @return {@link java.nio.channels.SelectionKey.OP_READ SelectionKey.OP_READ}.
 	 * @see org.jppf.server.JPPFNIOServer#getInitialInterest()
 	 */
-	protected int getInitialInterest() {
+	public int getInitialInterest() {
 		return SelectionKey.OP_READ;
 	}
 
@@ -112,7 +112,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 * @return a <code>State</code> instance.
 	 * @see org.jppf.server.JPPFNIOServer#getInitialState()
 	 */
-	protected ChannelState getInitialState() {
+	public ChannelState getInitialState() {
 		return SendingJob;
 	}
 
@@ -121,7 +121,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 * @return null.
 	 * @see org.jppf.server.JPPFNIOServer#getInitialContent()
 	 */
-	protected Object getInitialContent() {
+	public Object getInitialContent() {
 		return null;
 	}
 
@@ -131,7 +131,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 * @return a <code>ChannelContext</code> instance.
 	 * @see org.jppf.server.JPPFNIOServer#createChannelContext()
 	 */
-	protected ChannelContext createChannelContext()
+	public ChannelContext createChannelContext()
 	{
 		NodeChannelContext context = new NodeChannelContext();
 		context.bundler = bundler.copy();
@@ -143,7 +143,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 * @param client the <code>SocketChannel</code> that was accepted.
 	 * @see org.jppf.server.JPPFNIOServer#postAccept(java.nio.channels.SocketChannel)
 	 */
-	protected void postAccept(SocketChannel client) {
+	public void postAccept(SocketChannel client) {
 		JPPFStatsUpdater.newNodeConnection();
 		SelectionKey key = client.keyFor(selector);
 		ChannelContext context = (ChannelContext) key.attachment();

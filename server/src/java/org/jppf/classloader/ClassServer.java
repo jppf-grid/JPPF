@@ -94,7 +94,7 @@ public class ClassServer extends JPPFNIOServer
 	 * @return a <code>State</code> instance.
 	 * @see org.jppf.server.JPPFNIOServer#getInitialState()
 	 */
-	protected ChannelState getInitialState()
+	public ChannelState getInitialState()
 	{
 		return DefiningType;
 	}
@@ -104,7 +104,7 @@ public class ClassServer extends JPPFNIOServer
 	 * @return {@link java.nio.channels.SelectionKey.OP_READ SelectionKey.OP_READ}.
 	 * @see org.jppf.server.JPPFNIOServer#getInitialInterest()
 	 */
-	protected int getInitialInterest()
+	public int getInitialInterest()
 	{
 		return SelectionKey.OP_READ;
 	}
@@ -114,7 +114,7 @@ public class ClassServer extends JPPFNIOServer
 	 * @return a <code>Request</code> instance.
 	 * @see org.jppf.server.JPPFNIOServer#getInitialContent()
 	 */
-	protected Object getInitialContent()
+	public Object getInitialContent()
 	{
 		return new Request();
 	}
@@ -125,7 +125,7 @@ public class ClassServer extends JPPFNIOServer
 	 * @param client the <code>SocketChannel</code> that was accepted.
 	 * @see org.jppf.server.JPPFNIOServer#postAccept(java.nio.channels.SocketChannel)
 	 */
-	protected void postAccept(SocketChannel client)
+	public void postAccept(SocketChannel client)
 	{
 	}
 
@@ -135,23 +135,23 @@ public class ClassServer extends JPPFNIOServer
 	/**
 	 * Initial state of all channel, where it's type is not yet defined, it can be a provider or a node channel.
 	 */
-	ChannelState DefiningType = new CDefiningType(this);
+	public ChannelState DefiningType = new CDefiningType(this);
 	/**
 	 * State of a channel to a node, it is waiting for request from node.
 	 */
-	ChannelState WaitingRequest = new CWaitingRequest(this);
+	public ChannelState WaitingRequest = new CWaitingRequest(this);
 	/**
 	 * State of a channel to a node where there is a class definition been send.
 	 */
-	ChannelState SendingNodeData = new CSendingNodeData(this);
+	public ChannelState SendingNodeData = new CSendingNodeData(this);
 	/**
 	 * State of channel with providers, where the request is been send to a provider.
 	 */
-	ChannelState SendingRequest = new CSendingRequest(this);
+	public ChannelState SendingRequest = new CSendingRequest(this);
 	/**
 	 * State of channel with providers, where the provider is sending the class definition.
 	 */
-	ChannelState ReceivingResource = new CReceivingResource(this);
+	public ChannelState ReceivingResource = new CReceivingResource(this);
 
 	/**
 	 * Create a <code>ByteBuffer</code> filled with the specified data.
@@ -166,5 +166,15 @@ public class ClassServer extends JPPFNIOServer
 		buffer.put(data);
 		buffer.flip();
 		return buffer;
+	}
+
+	/**
+	 * Add a provider connection to the exiasting map.
+	 * @param uuid application uuid used as a key.
+	 * @param channel the provider connection.
+	 */
+	public void addProviderConnections(String uuid, SocketChannel channel)
+	{
+		providerConnections.put(uuid, channel);
 	}
 }

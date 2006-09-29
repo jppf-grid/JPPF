@@ -27,7 +27,7 @@ import org.jppf.server.Request;
  * This class encapsulate a resource request to a resource provider.
  * @author Domingos Creado
  */
-class RemoteClassRequest
+public class RemoteClassRequest
 {
 	/**
 	 * Buffer used to read the data from a socket channel.

@@ -105,7 +105,7 @@ public class JPPFClassLoader extends ClassLoader
 		{
 			if (socketClient == null) initSocketClient();
 			socketInitializer.initializeSocket(socketClient);
-			
+
 			// we need to do this in order to dramaticaly simplify the 
 			// state machine of ClassServer
 			try
@@ -113,7 +113,11 @@ public class JPPFClassLoader extends ClassLoader
 				JPPFResourceWrapper resource = new JPPFResourceWrapper();
 				resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
 				socketClient.send(resource);
-				//socketClient.sendBytes(new JPPFBuffer("node"));
+				socketClient.receive();
+			}
+			catch(ClassNotFoundException e)
+			{
+				throw new RuntimeException(e);
 			}
 			catch (IOException e)
 			{
@@ -179,6 +183,10 @@ public class JPPFClassLoader extends ClassLoader
 	public Class<?> findClass(String name) throws ClassNotFoundException
 	{
 		byte[] b = null;
+		if ("sample.matrix.Matrix".equals(name))
+		{
+			getClass();
+		}
 		String resName = name.replace('.', '/') + ".class";
 		b = loadResourceData(resName);
 		if ((b == null) || (b.length == 0)) throw new ClassNotFoundException("Could not load class '" + name + "'");

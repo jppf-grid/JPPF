@@ -132,7 +132,7 @@ public class TraversalList<E> implements Serializable
 		if (list.isEmpty()) throw new IndexOutOfBoundsException("list is empty");
 		else if (pos < 0) throw new IndexOutOfBoundsException("value "+pos+" is negative");
 		else if (pos >= list.size()) throw new IndexOutOfBoundsException("value "+pos+" larger than "+(list.size()-1));
-		this.position = position;
+		this.position = pos;
 	}
 
 	/**
@@ -151,5 +151,15 @@ public class TraversalList<E> implements Serializable
 	public int size()
 	{
 		return list.size();
+	}
+
+	/**
+	 * Determine whether this traversal list contains a specified element.
+	 * @param element the element to lookup.
+	 * @return true if this list contains the element, false otherwise.
+	 */
+	public boolean contains(E element)
+	{
+		return list.contains(element);
 	}
 }

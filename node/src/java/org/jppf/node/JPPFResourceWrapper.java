@@ -61,14 +61,6 @@ public class JPPFResourceWrapper implements Serializable
 	}
 
 	/**
-	 * The unique identifier of the application in whose classpath the class definition should be found. 
-	 */
-	//private List<String> uuidPath = new ArrayList<String>();
-	/**
-	 * Position of the current uuid in the uuid path.
-	 */
-	//private int uuidPosition = 0;
-	/**
 	 * Keeps and manages the uuid path list and the current position in it.
 	 */
 	private TraversalList<String> uuidPath = new TraversalList<String>();
@@ -88,6 +80,10 @@ public class JPPFResourceWrapper implements Serializable
 	 * The state associated with this resource wrapper.
 	 */
 	private State state = null;
+	/**
+	 * The uuid sent by a node when it first contacts a resource provider.
+	 */
+	private String providerUuid = null;
 
 	/**
 	 * Add a uuid to the uuid path of this resource wrapper. 
@@ -188,5 +184,23 @@ public class JPPFResourceWrapper implements Serializable
 	public void setUuidPath(TraversalList<String> uuidPath)
 	{
 		this.uuidPath = uuidPath;
+	}
+
+	/**
+	 * Get the uuid sent by a node when it first contacts a resource provider.
+	 * @return the uuid as a string.
+	 */
+	public String getProviderUuid()
+	{
+		return providerUuid;
+	}
+
+	/**
+	 * Set the uuid sent by a node when it first contacts a resource provider.
+	 * @param providerUuid the uuid as a string.
+	 */
+	public void setProviderUuid(String providerUuid)
+	{
+		this.providerUuid = providerUuid;
 	}
 }

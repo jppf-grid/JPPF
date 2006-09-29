@@ -37,6 +37,7 @@ class CReceivingResource extends ClassChannelState
 	 * Log4j logger for this class.
 	 */
 	private static Logger log = Logger.getLogger(CReceivingResource.class);
+
 	/**
 	 * Initialize this state with a specified JPPFNIOServer.
 	 * @param server the JPPFNIOServer this state relates to.
@@ -86,7 +87,8 @@ class CReceivingResource extends ClassChannelState
 			// putting the definition in cache
 			JPPFResourceWrapper resource = readResource(out.getOutput().toByteArray());
 			CacheClassContent content = new CacheClassContent(resource.getDefinition());
-			CacheClassKey cacheKey = new CacheClassKey(context.uuid, request.getResourceName());
+			//CacheClassKey cacheKey = new CacheClassKey(context.uuid, request.getResourceName());
+			CacheClassKey cacheKey = new CacheClassKey(resource.getUuidPath().getFirst(), request.getResourceName());
 			server.classCache.put(cacheKey, content);
 			// fowarding it to channel that requested
 			SocketChannel destination = request.getChannel();

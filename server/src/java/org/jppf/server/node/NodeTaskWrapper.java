@@ -1,0 +1,77 @@
+/*
+ * Java Parallel Processing Framework.
+ * Copyright (C) 2005-2006 Laurent Cohen.
+ * lcohen@osp-chicago.com
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+package org.jppf.server.node;
+
+import org.jppf.JPPFException;
+import org.jppf.server.protocol.JPPFTask;
+
+/**
+ * Wrapper around a JPPF task used to catch exceptions caused by the task execution.
+ */
+class NodeTaskWrapper implements Runnable
+{
+	/**
+	 * The JPPF node that runs this task.
+	 */
+	private final JPPFNode node;
+	/**
+	 * The task to execute within a try/catch block.
+	 */
+	private JPPFTask task = null;
+
+	/**
+	 * Initialize this task wrapper with a specified JPPF task.
+	 * @param node the JPPF node that runs this task.
+	 * @param task the task to execute within a try/catch block.
+	 */
+	public NodeTaskWrapper(JPPFNode node, JPPFTask task)
+	{
+		this.node = node;
+		this.task = task;
+	}
+
+	/**
+	 * Execute the task within a try/catch block.
+	 * @see java.lang.Runnable#run()
+	 */
+	public void run()
+	{
+		if (node.notifying) node.incrementExecutingCount();
+		try
+		{
+			task.run();
+		}
+		catch(Throwable t)
+		{
+			if (t instanceof Exception) task.setException((Exception) t);
+			else task.setException(new JPPFException(t));
+		}
+		if (node.notifying) node.decrementExecutingCount();
+	}
+
+	/**
+	 * Get the task this wrapper executes within a try/catch block.
+	 * @return the task as a <code>JPPFTask</code> instance.
+	 */
+	public JPPFTask getTask()
+	{
+		return task;
+	}
+}

@@ -47,10 +47,6 @@ public class JPPFNode implements MonitoredNode
 	 */
 	private static Logger log = null;
 	/**
-	 * Static uuid for the JPPF driver.
-	 */
-	public static final String JPPF_DRIVER_UUID = "JPPF Driver";
-	/**
 	 * Maximum number of containers kept by this node's cache.
 	 */
 	private static final int MAX_CONTAINERS = 1000;
@@ -87,6 +83,10 @@ public class JPPFNode implements MonitoredNode
 	 */
 	private boolean debugEnabled = false;
 	/**
+	 * Determines whether dumping byte arrays in the log is enabled.
+	 */
+	private boolean dumpEnabled = JPPFConfiguration.getProperties().getBoolean("byte.array.dump.enabled", false);
+	/**
 	 * Used to programmatically stop this node.
 	 */
 	private boolean stopped = false;
@@ -97,7 +97,7 @@ public class JPPFNode implements MonitoredNode
 	/**
 	 * This flag is true if there is at least one listener, and false otherwise.
 	 */
-	private boolean notifying = false;
+	boolean notifying = false;
 	/**
 	 * Current build number for this node.
 	 */
@@ -120,9 +120,9 @@ public class JPPFNode implements MonitoredNode
 	 */
 	private int taskCount = 0;
 	/**
-	 * Security credentials associated with this JPPF node.
+	 * This node's universal identifier.
 	 */
-	//private JPPFSecurityContext credentials = null;
+	private String uuid = new JPPFUuid().toString();
 
 	/**
 	 * Main processing loop of this node.
@@ -134,6 +134,7 @@ public class JPPFNode implements MonitoredNode
 		log = Logger.getLogger(JPPFNode.class);
 		debugEnabled = log.isDebugEnabled();
 		stopped = false;
+		if (debugEnabled) log.debug("Start of node main loop");
 		while (!stopped)
 		{
 			try
@@ -160,6 +161,7 @@ public class JPPFNode implements MonitoredNode
 				}
 			}
 		}
+		if (debugEnabled) log.debug("End of node main loop");
 		if (notifying) fireNodeEvent(EventType.DISCONNECTED);
 	}
 
@@ -170,11 +172,16 @@ public class JPPFNode implements MonitoredNode
 	 */
 	public void perform() throws Exception
 	{
+		if (debugEnabled) log.debug("Start of node secondary loop");
 		while (!stopped)
 		{
 			Pair<JPPFTaskBundle, List<JPPFTask>> pair = readTask();
 			if (notifying) fireNodeEvent(EventType.START_EXEC);
 			JPPFTaskBundle bundle = pair.first();
+			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+			{
+				bundle.setBundleUuid(uuid);
+			}
 			List<JPPFTask> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
 			if (notEmpty)
@@ -182,7 +189,7 @@ public class JPPFNode implements MonitoredNode
 				List<Future> futureList = new ArrayList<Future>(taskList.size());
 				for (JPPFTask task : taskList)
 				{
-					futureList.add(threadPool.submit(new TaskWrapper(task)));
+					futureList.add(threadPool.submit(new NodeTaskWrapper(this, task)));
 				}
 				for (Future future : futureList) future.get();
 			}
@@ -201,6 +208,7 @@ public class JPPFNode implements MonitoredNode
 				throw notif;
 			}
 		}
+		if (debugEnabled) log.debug("End of node secondary loop");
 	}
 
 	/**
@@ -209,19 +217,23 @@ public class JPPFNode implements MonitoredNode
 	 */
 	public synchronized void init() throws Exception
 	{
+		if (debugEnabled) log.debug("start node initialization");
 		if (socketClient == null) initSocketClient();
 		initCredentials();
 		if (notifying) fireNodeEvent(EventType.START_CONNECT);
 		if (socket == null)
 		{
-			System.out.println("JPPFNode.init(): Attempting connection to the JPPF driver");
+			if (debugEnabled) log.debug("start socket initialization");
+			System.out.println("PeerNode.init(): Attempting connection to the JPPF driver");
 			socketInitializer.initializeSocket(socketClient);
 			socket = socketClient.getSocket();
-			System.out.println("JPPFNode.init(): Reconnected to the JPPF driver");
+			System.out.println("PeerNode.init(): Reconnected to the JPPF driver");
+			if (debugEnabled) log.debug("end socket initialization");
 		}
 		if (notifying) fireNodeEvent(EventType.END_CONNECT);
 		TypedProperties props = JPPFConfiguration.getProperties();
 		threadPool = Executors.newFixedThreadPool(props.getInt("processing.threads", 1));
+		if (debugEnabled) log.debug("end node initialization");
 	}
 
 	/**
@@ -230,10 +242,12 @@ public class JPPFNode implements MonitoredNode
 	 */
 	public void initSocketClient() throws Exception
 	{
+		if (debugEnabled) log.debug("start socket client initialization");
 		initHelper();
 		if (socket != null) socketClient = new SocketClient(socket);
 		else
 		{
+			if (debugEnabled) log.debug("Initializing socket");
 			TypedProperties props = JPPFConfiguration.getProperties();
 			String host = props.getString("jppf.server.host", "localhost");
 			int port = props.getInt("node.server.port", 11113);
@@ -242,6 +256,7 @@ public class JPPFNode implements MonitoredNode
 			socketClient.setPort(port);
 		}
 		socketClient.setSerializer(serializer);
+		if (debugEnabled) log.debug("end socket client initialization");
 	}
 
 	/**
@@ -249,14 +264,6 @@ public class JPPFNode implements MonitoredNode
 	 */
 	private void initCredentials()
 	{
-		/*
-		String uuid = new JPPFUuid().toString();
-		StringBuilder sb = new StringBuilder("Node:");
-		sb.append(VersionUtils.getLocalIpAddress()).append(":");
-		sb.append(socketClient.getPort());
-		// testing that the server throws a JPPFSecurityException
-		credentials = new JPPFSecurityContext(uuid, sb.toString(), new JPPFCredentials());
-		*/
 	}
 	
 	/**
@@ -309,6 +316,7 @@ public class JPPFNode implements MonitoredNode
 		}
 		if (reload)
 		{
+			if (debugEnabled) log.debug("reloading classes");
 			classLoader = null;
 			initHelper();
 			socketClient.setSerializer(serializer);
@@ -325,6 +333,8 @@ public class JPPFNode implements MonitoredNode
 	 */
 	private Object[] deserializeObjects(byte[] bytes) throws Exception
 	{
+		if (dumpEnabled)
+			log.debug("Deserializing " + bytes.length + " bytes :\n" + StringUtils.dumpBytes(bytes, 0, bytes.length));
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 		DataInputStream dis = new DataInputStream(bais);
 		JPPFTaskBundle bundle = (JPPFTaskBundle) helper.readNextObject(dis, false);
@@ -336,10 +346,7 @@ public class JPPFNode implements MonitoredNode
 		{
 			JPPFContainer cont = getContainer(bundle.getUuidPath().getList());
 			result[1] = cont.deserializeObject(dis, true);
-			for (int i = 0; i < count; i++)
-			{
-				result[2 + i] = cont.deserializeObject(dis, true);
-			}
+			for (int i = 0; i < count; i++) result[2 + i] = cont.deserializeObject(dis, true);
 		}
 		dis.close();
 		return result;
@@ -353,7 +360,10 @@ public class JPPFNode implements MonitoredNode
 	 */
 	private void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
 	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream()
+		{
+			public synchronized byte[] toByteArray() { return buf; }
+		};
 		DataOutputStream dos = new DataOutputStream(baos);
 		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		bundle.setNodeExecutionTime(elapsed);
@@ -362,6 +372,8 @@ public class JPPFNode implements MonitoredNode
 		dos.flush();
 		dos.close();
 		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
+		if (dumpEnabled)
+			log.debug("Serialized " + buf.getLength() + " bytes :\n" + StringUtils.dumpBytes(buf.getBuffer(), 0, buf.getLength()));
 		socketClient.sendBytes(buf);
 	}
 
@@ -373,6 +385,7 @@ public class JPPFNode implements MonitoredNode
 	{
 		if (classLoader == null)
 		{
+			if (debugEnabled) log.debug("Initializing classloader");
 			classLoader = new JPPFClassLoader(NodeLauncher.getJPPFClassLoader());
 		}
 		return classLoader;
@@ -384,6 +397,7 @@ public class JPPFNode implements MonitoredNode
 	 */
 	private void initHelper() throws Exception
 	{
+		if (debugEnabled) log.debug("Initializing serializer");
 		Class c = getClassLoader().loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
 		Object o = c.newInstance();
 		serializer = (ObjectSerializer) o;
@@ -418,15 +432,6 @@ public class JPPFNode implements MonitoredNode
 	}
 
 	/**
-	 * Starting point for this JPPFNode.
-	 * @param args not used.
-	 */
-	public static void main(String... args)
-	{
-		new JPPFNode().run();
-	}
-
-	/**
 	 * Add a listener to the list of listener for this node.
 	 * @param listener the listener to add.
 	 * @see org.jppf.node.MonitoredNode#addNodeListener(org.jppf.node.event.NodeListener)
@@ -458,8 +463,7 @@ public class JPPFNode implements MonitoredNode
 	public void fireNodeEvent(EventType eventType)
 	{
 		NodeEvent event = new NodeEvent(eventType);
-		for (NodeListener listener : listeners)
-			listener.eventOccurred(event);
+		for (NodeListener listener : listeners) listener.eventOccurred(event);
 	}
 
 	/**
@@ -469,6 +473,7 @@ public class JPPFNode implements MonitoredNode
 	 */
 	public void stopNode(boolean closeSocket)
 	{
+		if (debugEnabled) log.debug("stopping node");
 		stopped = true;
 		threadPool.shutdownNow();
 		if (closeSocket)
@@ -492,7 +497,7 @@ public class JPPFNode implements MonitoredNode
 	 * Decrement the count of currently executing tasks and determine whether
 	 * an idle notification should be sent.
 	 */
-	private synchronized void decrementExecutingCount()
+	synchronized void decrementExecutingCount()
 	{
 		if (executingCount.decrementAndGet() == 0)
 		{
@@ -505,7 +510,7 @@ public class JPPFNode implements MonitoredNode
 	 * Increment the count of currently executing tasks and determine whether
 	 * a busy notification should be sent.
 	 */
-	private synchronized void incrementExecutingCount()
+	synchronized void incrementExecutingCount()
 	{
 		if (executingCount.incrementAndGet() == 1)
 		{
@@ -540,53 +545,5 @@ public class JPPFNode implements MonitoredNode
 	public SocketWrapper getSocketWrapper()
 	{
 		return socketClient;
-	}
-
-	/**
-	 * Wrapper around a JPPF task used to catch exceptions caused by the task execution.
-	 */
-	private class TaskWrapper implements Runnable
-	{
-		/**
-		 * The task to execute within a try/catch block.
-		 */
-		private JPPFTask task = null;
-
-		/**
-		 * Initialize this task wrapper with a specified JPPF task.
-		 * @param task the task to execute within a try/catch block.
-		 */
-		public TaskWrapper(JPPFTask task)
-		{
-			this.task = task;
-		}
-
-		/**
-		 * Execute the task within a try/catch block.
-		 * @see java.lang.Runnable#run()
-		 */
-		public void run()
-		{
-			if (notifying) incrementExecutingCount();
-			try
-			{
-				task.run();
-			}
-			catch(Throwable t)
-			{
-				if (t instanceof Exception) task.setException((Exception) t);
-				else task.setException(new JPPFException(t));
-			}
-			if (notifying) decrementExecutingCount();
-		}
-
-		/**
-		 * Get the task this wrapper executes within a try/catch block.
-		 * @return the task as a <code>JPPFTask</code> instance.
-		 */
-		public JPPFTask getTask()
-		{
-			return task;
-		}
 	}
 }

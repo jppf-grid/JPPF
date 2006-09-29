@@ -182,7 +182,7 @@ public abstract class JPPFNIOServer extends Thread{
 			return;
 		}
 		ChannelContext context = createChannelContext();
-		context.state = this.getInitialState();
+		context.state = getInitialState();
 		context.content = getInitialContent();
 		try
 		{
@@ -202,7 +202,7 @@ public abstract class JPPFNIOServer extends Thread{
 	 * Subclasses can override this method to add specific content to the context.
 	 * @return a <code>ChannelContext</code> instance.
 	 */
-	protected ChannelContext createChannelContext()
+	public ChannelContext createChannelContext()
 	{
 		return new ChannelContext();
 	}
@@ -212,25 +212,25 @@ public abstract class JPPFNIOServer extends Thread{
 	 * @return a bit-wise combination of the interests, taken from {@link java.nio.channels.SelectionKey SelectionKey}
 	 * constants definitions.
 	 */
-	protected abstract int getInitialInterest();
+	public abstract int getInitialInterest();
 	
 	/**
 	 * Get the initial content associated with a new connection.
 	 * @return the content as an <code>Object</code>.
 	 */
-	protected abstract Object getInitialContent();
+	public abstract Object getInitialContent();
 
 	/**
 	 * Get the initial state associated with a new connection.
 	 * @return a <code>State</code> instance.
 	 */
-	protected abstract ChannelState getInitialState();
+	public abstract ChannelState getInitialState();
 
 	/**
 	 * Process a channel that was accepted by the server socket channel.
 	 * @param client the socket channel to process.
 	 */
-	protected abstract void postAccept(SocketChannel client);
+	public abstract void postAccept(SocketChannel client);
 
 	/**
 	 * This method reads everything it can from the channel until the request is

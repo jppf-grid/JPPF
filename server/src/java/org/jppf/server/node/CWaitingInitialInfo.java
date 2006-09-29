@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.jppf.server.ChannelContext;
 import org.jppf.server.ChannelState;
 import org.jppf.server.JPPFTaskBundle;
-import org.jppf.server.NodeChannelContext;
 import org.jppf.server.Request;
 import org.jppf.utils.SerializationHelper;
 import org.jppf.utils.SerializationHelperImpl;
@@ -96,6 +95,7 @@ class CWaitingInitialInfo implements ChannelState
 				}
 				dis.close();
 				bundle.setTasks(taskList);
+				context.uuid = bundle.getBundleUuid();
 				// there is nothing to do, so this instance will wait for a job
 				server.availableNodes.add(channel);
 				// make sure the context is reset so as not to resubmit

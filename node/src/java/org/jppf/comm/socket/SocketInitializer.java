@@ -93,9 +93,10 @@ public class SocketInitializer
 			TypedProperties props = JPPFConfiguration.getProperties();
 			long delay = 1000L * props.getLong("reconnect.initial.delay", 0L);
 			if (delay == 0L) delay = rand.nextInt(1000);
-			long maxDuration = 1000L * props.getLong("reconnect.max.time", 60L);
+			long maxTime = props.getLong("reconnect.max.time", 60L);
+			long maxDuration = (maxTime <= 0) ? -1L : 1000L * maxTime;
 			long period = 1000L * props.getLong("reconnect.interval", 1L);
-			latestAttemptDate = new Date(System.currentTimeMillis() + maxDuration);
+			latestAttemptDate = (maxDuration > 0) ? new Date(System.currentTimeMillis() + maxDuration) : null;
 			SocketInitializationTask task = new SocketInitializationTask();
 			Timer timer = new Timer("Socket initializer timer");
 			timer.schedule(task, delay, period);
@@ -113,7 +114,7 @@ public class SocketInitializer
 			if (!isSuccessfull())
 			{
 				System.err.println(errMsg);
-				throw new JPPFError(fatalErrMsg);
+				//throw new JPPFError(fatalErrMsg);
 			}
 		}
 		finally
@@ -143,15 +144,15 @@ public class SocketInitializer
 			}
 			catch(Exception e)
 			{
-				Date now = new Date();
-				if (now.after(latestAttemptDate))
+				if (latestAttemptDate != null)
 				{
-					successfull = false;
-					reset();
+					Date now = new Date();
+					if (now.after(latestAttemptDate))
+					{
+						successfull = false;
+						reset();
+					}
 				}
-			}
-			finally
-			{
 			}
 		}
 

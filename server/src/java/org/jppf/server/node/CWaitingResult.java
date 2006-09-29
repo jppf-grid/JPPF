@@ -100,26 +100,27 @@ class CWaitingResult implements ChannelState
 				// notifing the client thread about the end of a bundle
 				if (listener != null) listener.taskCompleted(bundle);
 				// there is nothing to do, so this instance will wait for job
-				server.availableNodes.add(channel);
 				// make sure the context is reset so as not to resubmit
 				// the last bundle executed by the node.
 				context.content = null;
 				// if the node disconnect from driver we will know soon
 				context.state = server.SendingJob;
-				//key.interestOps(SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+				server.availableNodes.add(channel);
 				key.interestOps(SelectionKey.OP_READ);
 				if (!server.getQueue().isEmpty()) server.newBundle(server.getQueue());
 			}
 		}
 		catch(Exception e)
 		{
-			JPPFNodeServer.log.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			if (e instanceof IOException)
 			{
+				if (debugEnabled) log.debug("closing channel");
 				server.closeNode(channel);
 			}
 			if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 			{
+				if (debugEnabled) log.debug("resubmitting bundle");
 				server.resubmitBundle(bundle);
 			}
 		}

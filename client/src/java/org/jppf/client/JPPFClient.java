@@ -36,51 +36,42 @@ import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 
 /**
- * This class provides an API to submit execution requests and administration
- * commands, and request server information data.<br>
- * It has its own unique identifier, used by the nodes, to determine whether
- * classes from the submitting application should be dynamically reloaded or
- * not, depending on whether the uuid has changed or not.
- * 
+ * This class provides an API to submit execution requests and administration commands, and request server information
+ * data.<br>
+ * It has its own unique identifier, used by the nodes, to determine whether classes from the submitting application
+ * should be dynamically reloaded or not, depending on whether the uuid has changed or not.
  * @author Laurent Cohen
  */
-public class JPPFClient {
+public class JPPFClient
+{
 	/**
 	 * Log4j logger for this class.
 	 */
 	private static Logger log = Logger.getLogger(JPPFClient.class);
-
 	/**
 	 * The socket client used to communicate over a socket connection.
 	 */
 	protected SocketWrapper socketClient = null;
-
 	/**
 	 * Enables loading local classes onto remote nodes.
 	 */
 	private ClassServerDelegate delegate = null;
-
 	/**
 	 * Utility for deserialization and serialization.
 	 */
 	private SerializationHelper helper = null;
-
 	/**
 	 * Unique identifier for this JPPF client.
 	 */
 	private String appUuid = null;
-
 	/**
-	 * Used to synchronize access to the underlying socket from multiple
-	 * threads.
+	 * Used to synchronize access to the underlying socket from multiple threads.
 	 */
 	private SocketInitializer socketInitializer = new SocketInitializer();
-
 	/**
 	 * Used to synchronize request submissions performed by mutliple threads.
 	 */
 	private ReentrantLock lock = new ReentrantLock();
-
 	/**
 	 * The pool of threads used for submitting execution requests.
 	 */
@@ -172,7 +163,7 @@ public class JPPFClient {
 		socketInitializer.initializeSocket(socketClient);
 		System.out.println("JPPFClient.init(): Reconnected to the JPPF driver");
 	}
-	
+
 	/**
 	 * Initialize this node's resources.
 	 * @throws Exception if an error is raised during initialization.
@@ -183,7 +174,7 @@ public class JPPFClient {
 		socketClient.setHost(host);
 		socketClient.setPort(port);
 	}
-	
+
 	/**
 	 * Initialize this client's security credentials.
 	 * @throws Exception if an error is raised during initialization.
@@ -197,7 +188,7 @@ public class JPPFClient {
 		sb.append(port).append(":");
 		credentials = new JPPFSecurityContext(appUuid, sb.toString(), new JPPFCredentials());
 	}
-	
+
 	/**
 	 * Submit the request to the server.
 	 * @param taskList the list of tasks to execute remotely.
@@ -205,18 +196,16 @@ public class JPPFClient {
 	 * @return the list of executed tasks with their results.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
-	public List<JPPFTask> submit(List<JPPFTask> taskList,
-			DataProvider dataProvider) throws Exception {
-
+	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
+	{
 		final List<JPPFTask> resultList = new ArrayList<JPPFTask>();
-		AsynchronousResultProcessor proc =
-			new AsynchronousResultProcessor(taskList, dataProvider, new TaskResultListener()
+		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(taskList, dataProvider, new TaskResultListener()
+		{
+			public void resultsReceived(TaskResultEvent event)
 			{
-				public void resultsReceived(TaskResultEvent event)
-				{
-					resultList.addAll(event.getTaskList());
-				}
-			});
+				resultList.addAll(event.getTaskList());
+			}
+		});
 		proc.run();
 		if ((taskList != null) && (taskList.size() > 0))
 		{
@@ -240,11 +229,11 @@ public class JPPFClient {
 	 * @param listener listener to notify whenever a set of results have been received.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
-	public void submitNonBlocking(List<JPPFTask> taskList,
-			DataProvider dataProvider, TaskResultListener listener)
-			throws Exception {
-		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(
-				taskList, dataProvider, listener);
+	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
+			throws Exception
+	{
+		AsynchronousResultProcessor proc =
+			new AsynchronousResultProcessor(taskList, dataProvider, listener);
 		executor.submit(proc);
 	}
 
@@ -254,19 +243,25 @@ public class JPPFClient {
 	 * @param dataProvider the provider of the data shared among tasks, may be null.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
-	private void sendTasks(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception {
+	private void sendTasks(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
+	{
 		JPPFRequestHeader header = new JPPFRequestHeader();
 		header.setRequestType(JPPFRequestHeader.Type.NON_BLOCKING_EXECUTION);
 		header.setAppUuid(appUuid);
 		header.setCredentials(credentials);
 		int count = taskList.size();
 		header.setTaskCount(count);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream()
+		{
+			public synchronized byte[] toByteArray()
+			{
+				return buf;
+			}
+		};
 		DataOutputStream dos = new DataOutputStream(baos);
 		helper.writeNextObject(header, dos, false);
 		helper.writeNextObject(dataProvider, dos, true);
-		for (JPPFTask task : taskList)
-			helper.writeNextObject(task, dos, true);
+		for (JPPFTask task : taskList) helper.writeNextObject(task, dos, true);
 		dos.flush();
 		dos.close();
 		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
@@ -275,16 +270,15 @@ public class JPPFClient {
 
 	/**
 	 * Receive results of tasks execution.
-	 * @return a pair of objects representing the executed tasks results, and
-	 * the index of the first result within the initial task execution request.
+	 * @return a pair of objects representing the executed tasks results, and the index of the first result within the
+	 *         initial task execution request.
 	 * @throws Exception if an error is raised while reading the results from the server.
 	 */
 	private Pair<List<JPPFTask>, Integer> receiveResults() throws Exception
 	{
 		JPPFBuffer buf = socketClient.receiveBytes(0);
 		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-		ByteArrayInputStream bais =
-			new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
+		ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
 		DataInputStream dis = new DataInputStream(bais);
 		int count = dis.readInt();
 		for (int i = 0; i < count; i++)
@@ -294,8 +288,7 @@ public class JPPFClient {
 		}
 		int startIndex = (taskList.isEmpty()) ? -1 : taskList.get(0).getPosition();
 		dis.close();
-		Pair<List<JPPFTask>, Integer> p =
-			new Pair<List<JPPFTask>, Integer>(taskList, startIndex);
+		Pair<List<JPPFTask>, Integer> p = new Pair<List<JPPFTask>, Integer>(taskList, startIndex);
 		return p;
 	}
 
@@ -304,13 +297,17 @@ public class JPPFClient {
 	 * @return a <code>JPPFStats</code> instance.
 	 * @throws Exception if an error occurred while trying to get the server statistics.
 	 */
-	public JPPFStats requestStatistics() throws Exception {
+	public JPPFStats requestStatistics() throws Exception
+	{
 		lock.lock();
-		try {
+		try
+		{
 			boolean completed = false;
 			JPPFStats stats = null;
-			while (!completed) {
-				try {
+			while (!completed)
+			{
+				try
+				{
 					JPPFRequestHeader header = new JPPFRequestHeader();
 					header.setAppUuid(appUuid);
 					header.setCredentials(credentials);
@@ -320,23 +317,25 @@ public class JPPFClient {
 					helper.writeNextObject(header, dos, false);
 					dos.flush();
 					dos.close();
-					JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos
-							.size());
+					JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
 					socketClient.sendBytes(buf);
 					buf = socketClient.receiveBytes(0);
-					ByteArrayInputStream bais = new ByteArrayInputStream(buf
-							.getBuffer(), 0, buf.getLength());
+					ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
 					DataInputStream dis = new DataInputStream(bais);
 					stats = (JPPFStats) helper.readNextObject(dis, false);
 					dis.close();
 					completed = true;
-				} catch (IOException e) {
+				}
+				catch(IOException e)
+				{
 					log.error(e.getMessage(), e);
 					initConnection();
 				}
 			}
 			return stats;
-		} finally {
+		}
+		finally
+		{
 			lock.unlock();
 		}
 	}
@@ -350,39 +349,41 @@ public class JPPFClient {
 	 * @return the reponse message from the server.
 	 * @throws Exception if an error occurred while trying to send or execute the command.
 	 */
-	public String submitAdminRequest(String password, String newPassword,
-			String command, Map<String, Object> parameters) throws Exception {
+	public String submitAdminRequest(String password, String newPassword, String command, Map<String, Object> parameters)
+			throws Exception
+	{
 		lock.lock();
-		try {
+		try
+		{
 			AdminRequest request = new AdminRequest();
 			request.setAppUuid(appUuid);
 			request.setCredentials(credentials);
 			request.setRequestType(JPPFRequestHeader.Type.ADMIN);
 			request.setParameter(COMMAND_PARAM, command);
 			SecretKey tmpKey = CryptoUtils.generateSecretKey();
-			request.setParameter(KEY_PARAM, CryptoUtils.encrypt(tmpKey
-					.getEncoded()));
-			request.setParameter(PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey,
-					password.getBytes()));
-			if (newPassword != null) {
-				request.setParameter(NEW_PASSWORD_PARAM, CryptoUtils.encrypt(
-						tmpKey, newPassword.getBytes()));
+			request.setParameter(KEY_PARAM, CryptoUtils.encrypt(tmpKey.getEncoded()));
+			request.setParameter(PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, password.getBytes()));
+			if (newPassword != null)
+			{
+				request.setParameter(NEW_PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, newPassword.getBytes()));
 			}
-			if (parameters != null) {
-				for( Map.Entry<String, Object> entry : parameters.entrySet()){
-					request.setParameter(entry.getKey(), entry.getValue());
+			if (parameters != null)
+			{
+				for (String key: parameters.keySet())
+				{
+					request.setParameter(key, parameters.get(key));
 				}
 			}
 			sendAdminRequest(request);
-
 			JPPFBuffer buf = socketClient.receiveBytes(0);
-			ByteArrayInputStream bais = new ByteArrayInputStream(buf
-					.getBuffer(), 0, buf.getLength());
+			ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
 			DataInputStream dis = new DataInputStream(bais);
 			request = (AdminRequest) helper.readNextObject(dis, false);
 			dis.close();
 			return (String) request.getParameter(RESPONSE_PARAM);
-		} finally {
+		}
+		finally
+		{
 			lock.unlock();
 		}
 	}
@@ -392,7 +393,8 @@ public class JPPFClient {
 	 * @param request the request to send, with its parameters populated.
 	 * @throws Exception if the request could not be sent.
 	 */
-	private void sendAdminRequest(AdminRequest request) throws Exception {
+	private void sendAdminRequest(AdminRequest request) throws Exception
+	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
 		helper.writeNextObject(request, dos, false);
@@ -403,42 +405,40 @@ public class JPPFClient {
 	}
 
 	/**
-	 * Get the main classloader for the node. This method performs a lazy
-	 * initialization of the classloader.
+	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @throws Exception if an error occcurs while instantiating the class loader.
 	 */
-	private void initHelper() throws Exception {
+	private void initHelper() throws Exception
+	{
 		helper = new SerializationHelperImpl();
 	}
 
 	/**
 	 * 
 	 */
-	private class AsynchronousResultProcessor implements Runnable {
+	private class AsynchronousResultProcessor implements Runnable
+	{
 		/**
 		 * The list of tasks to execute remotely.
 		 */
 		private List<JPPFTask> taskList = null;
-
 		/**
 		 * The provider of the data shared among tasks, may be null.
 		 */
 		private DataProvider dataProvider = null;
-
 		/**
 		 * Listener to notify whenever a set of results have been received.
 		 */
 		private TaskResultListener listener = null;
 
 		/**
-		 * Initialize this result processor with a specified list of tasks, data
-		 * provider and result listener.
+		 * Initialize this result processor with a specified list of tasks, data provider and result listener.
 		 * @param taskList the list of tasks to execute remotely.
 		 * @param dataProvider the provider of the data shared among tasks, may be null.
 		 * @param listener listener to notify whenever a set of results have been received.
 		 */
-		public AsynchronousResultProcessor(List<JPPFTask> taskList,
-				DataProvider dataProvider, TaskResultListener listener) {
+		public AsynchronousResultProcessor(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
+		{
 			this.taskList = taskList;
 			this.dataProvider = dataProvider;
 			this.listener = listener;
@@ -446,37 +446,47 @@ public class JPPFClient {
 
 		/**
 		 * This method executes until all partial results have been received.
-		 * 
 		 * @see java.lang.Runnable#run()
 		 */
-		public void run() {
+		public void run()
+		{
 			lock.lock();
-			try {
+			try
+			{
 				int count = 0;
 				for (JPPFTask task : taskList) task.setPosition(count++);
 				count = 0;
 				boolean completed = false;
-				while (!completed) {
-					try {
+				while (!completed)
+				{
+					try
+					{
 						sendTasks(taskList, dataProvider);
-						while (count < taskList.size()) {
+						while (count < taskList.size())
+						{
 							Pair<List<JPPFTask>, Integer> p = receiveResults();
 							count += p.first().size();
-							if (listener != null)
-								listener.resultsReceived(new TaskResultEvent(p
-										.first(), p.second()));
+							if (listener != null) listener.resultsReceived(new TaskResultEvent(p.first(), p.second()));
 						}
 						completed = true;
-					} catch (NotSerializableException e) {
+					}
+					catch(NotSerializableException e)
+					{
 						throw e;
-					} catch (Exception e) {
+					}
+					catch(Exception e)
+					{
 						log.error(e.getMessage(), e);
 						initConnection();
 					}
 				}
-			} catch (Exception e) {
+			}
+			catch(Exception e)
+			{
 				log.error(e.getMessage(), e);
-			} finally {
+			}
+			finally
+			{
 				lock.unlock();
 			}
 		}
