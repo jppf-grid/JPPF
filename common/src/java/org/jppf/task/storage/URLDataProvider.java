@@ -22,7 +22,6 @@ package org.jppf.task.storage;
 import java.io.*;
 import java.net.*;
 import org.apache.commons.io.IOUtils;
-import org.jppf.JPPFException;
 
 /**
  * Implementation of the DataProvider interface to read data from a URL
@@ -34,10 +33,10 @@ public class URLDataProvider implements DataProvider
 	 * Get an input stream from a URL.
 	 * @param key the URL identifying the data to retrieve, must be an instance of <code>java.net.URL</code>.
 	 * @return a <code>java.io.InputStream</code> opened from the URL location.
-	 * @throws JPPFException if an error occured while retrieving the data.
+	 * @throws Exception if an error occured while retrieving the data.
 	 * @see org.jppf.task.storage.DataProvider#getValue(java.lang.Object)
 	 */
-	public Object getValue(Object key) throws JPPFException
+	public Object getValue(Object key) throws Exception
 	{
 		URL url = (URL) key;
 		try
@@ -46,7 +45,7 @@ public class URLDataProvider implements DataProvider
 		}
 		catch(Exception e)
 		{
-			throw new JPPFException(e);
+			throw new Exception(e);
 		}
 	}
 
@@ -54,10 +53,10 @@ public class URLDataProvider implements DataProvider
 	 * Copy the content of an input stream to a location specified as a URL.
 	 * @param key the URL specifying the destination, must be an instance of <code>java.net.URL</code>.
 	 * @param value the input stream to copy the data from, must be an instance of <code>java.io.InputStream</code>.
-	 * @throws JPPFException if an error occured setting the data.
+	 * @throws Exception if an error occured setting the data.
 	 * @see org.jppf.task.storage.DataProvider#setValue(java.lang.Object, java.lang.Object)
 	 */
-	public void setValue(Object key, Object value) throws JPPFException
+	public void setValue(Object key, Object value) throws Exception
 	{
 		URL url = (URL) key;
 		InputStream is = (InputStream) value;
@@ -71,7 +70,7 @@ public class URLDataProvider implements DataProvider
 		}
 		catch(Exception e)
 		{
-			throw new JPPFException(e);
+			throw new Exception(e);
 		}
 	}
 }

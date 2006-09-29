@@ -20,7 +20,6 @@
 package org.jppf.task.storage;
 
 import java.net.URL;
-import org.jppf.JPPFException;
 
 /**
  * This data provider is composed of multiple data provider implementations
@@ -46,10 +45,10 @@ public class CompositeDataProvider implements DataProvider
 	 * to a <code>URLDataProvider</code>, otherwise it is delegated to a <code>MemoryMapDataProvider</code>.
 	 * @param key the key identifying the value to retrieve in the store.
 	 * @return the value as an <code>Object</code>.
-	 * @throws JPPFException if an error occured while retrieving the data.
+	 * @throws Exception if an error occured while retrieving the data.
 	 * @see org.jppf.task.storage.DataProvider#getValue(java.lang.Object)
 	 */
-	public Object getValue(Object key) throws JPPFException
+	public Object getValue(Object key) throws Exception
 	{
 		if (key instanceof URL) return udp.getValue(key);
 		return mmdp.getValue(key);
@@ -61,10 +60,10 @@ public class CompositeDataProvider implements DataProvider
 	 * to a <code>URLDataProvider</code>, otherwise it is delegated to a <code>MemoryMapDataProvider</code>.
 	 * @param key the key identifying the value to retrieve in the store.
 	 * @param value the value to store, associated with the key.
-	 * @throws JPPFException if an error occured setting the data.
+	 * @throws Exception if an error occured setting the data.
 	 * @see org.jppf.task.storage.DataProvider#setValue(java.lang.Object, java.lang.Object)
 	 */
-	public void setValue(Object key, Object value) throws JPPFException
+	public void setValue(Object key, Object value) throws Exception
 	{
 		if (key instanceof URL) udp.setValue(key, value);
 		else mmdp.setValue(key, value);

@@ -20,7 +20,6 @@
 package org.jppf.task.storage;
 
 import java.io.Serializable;
-import org.jppf.JPPFException;
 
 /**
  * Instances of this class provide a way for tasks to share common data.
@@ -34,15 +33,15 @@ public interface DataProvider extends Serializable
 	 * Get a value specified by its key.
 	 * @param key the key identifying the value to retrieve in the store.
 	 * @return the value as an <code>Object</code>.
-	 * @throws JPPFException if an error occured while retrieving the data.
+	 * @throws Exception if an error occured while retrieving the data.
 	 */
-	Object getValue(Object key) throws JPPFException;
+	Object getValue(Object key) throws Exception;
 	
 	/**
 	 * Set a value specified by its key in the store.
 	 * @param key the key identifying the value to retrieve in the store.
 	 * @param value the value to store, associated with the key.
-	 * @throws JPPFException if an error occured setting the data.
+	 * @throws Exception if an error occured setting the data.
 	 */
-	void setValue(Object key, Object value) throws JPPFException;
+	void setValue(Object key, Object value) throws Exception;
 }
