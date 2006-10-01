@@ -65,8 +65,7 @@ class CSendingJob implements ChannelState
 		try
 		{
 			SocketChannel channel = (SocketChannel) key.channel();
-			//if (debugEnabled) log.debug("exec() for "+server.getRemostHost(channel));
-			log.info("exec() for "+server.getRemostHost(channel));
+			if (debugEnabled) log.debug("exec() for "+server.getRemostHost(channel));
 			if (key.isReadable())
 			{
 				//as the OS will select it for read when the channel is suddenly 

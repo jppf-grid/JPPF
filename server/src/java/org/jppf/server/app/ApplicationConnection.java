@@ -193,11 +193,7 @@ public class ApplicationConnection extends JPPFConnection
 	 */
 	private void sendStats() throws Exception {
 		JPPFStats stats = getStats();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream() {
-			public synchronized byte[] toByteArray() {
-				return buf;
-			}
-		};
+		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
 		SerializationHelper helper = new SerializationHelperImpl();
 		helper.writeNextObject(stats, dos, false);
@@ -297,11 +293,7 @@ public class ApplicationConnection extends JPPFConnection
 	private void sendAdminResponse(AdminRequest request, String msg)
 			throws Exception {
 		request.setParameter(RESPONSE_PARAM, msg);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream() {
-			public synchronized byte[] toByteArray() {
-				return buf;
-			}
-		};
+		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
 		SerializationHelper helper = new SerializationHelperImpl();
 		helper.writeNextObject(request, dos, false);

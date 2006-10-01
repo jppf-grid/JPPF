@@ -54,17 +54,17 @@ public class RhinoScriptRunner implements ScriptRunner
 	 * @param variables a mapping of objects to add the scope of the script.
 	 * @return the result of the evaluation as an object.
 	 * @throws JPPFScriptingException if an error occurs while evaluating the script.
-	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String)
+	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String script, java.util.Map)
 	 */
 	public Object evaluate(String script, Map<String, Object> variables) throws JPPFScriptingException
 	{
 		init();
 		errorHandler.errors.clear();
 		Object result = null;
-		for( Map.Entry<String, Object> entry : variables.entrySet())
+		for (String key: variables.keySet())
 		{
-			Object wrapped = Context.javaToJS(entry.getValue(), scope);
-			ScriptableObject.putProperty(scope, entry.getKey(), wrapped);
+			Object wrapped = Context.javaToJS(variables.get(key), scope);
+			ScriptableObject.putProperty(scope, key, wrapped);
 		}
 		try
 		{

@@ -91,7 +91,7 @@ public class SerializationHelperImpl implements SerializationHelper
 	{
 		try
 		{
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 			DataOutputStream dos = new DataOutputStream(baos);
 			for (Object o: objects) writeNextObject(o, dos, false);
 			dos.flush();

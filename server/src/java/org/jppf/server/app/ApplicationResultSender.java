@@ -23,7 +23,7 @@ import java.io.*;
 import org.apache.log4j.Logger;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.server.*;
-import org.jppf.utils.JPPFBuffer;
+import org.jppf.utils.*;
 
 /**
  * 
@@ -57,13 +57,7 @@ public class ApplicationResultSender extends AbstractResultSender
 	public void sendPartialResults(JPPFTaskBundle bundle) throws Exception
 	{
 		if (debugEnabled) log.debug("Sending bundle with "+bundle.getTaskCount()+" tasks");
-		ByteArrayOutputStream baos = new ByteArrayOutputStream()
-		{
-			public synchronized byte[] toByteArray()
-			{
-				return buf;
-			}
-		};
+		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
 		dos.writeInt(bundle.getTaskCount());
 		for (int i = 0; i < bundle.getTaskCount(); i++)

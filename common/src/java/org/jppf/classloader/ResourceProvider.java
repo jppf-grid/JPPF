@@ -21,6 +21,7 @@ package org.jppf.classloader;
 
 import java.io.*;
 import org.apache.log4j.Logger;
+import org.jppf.utils.JPPFByteArrayOutputStream;
 
 /**
  * Instances of this class are dedicated to reading resource files form the JVM's classpath and converting them into
@@ -61,7 +62,7 @@ public class ResourceProvider
 			}
 			if (is != null)
 			{
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 				boolean end = false;
 				while (!end)
 				{

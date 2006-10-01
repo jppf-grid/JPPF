@@ -20,6 +20,7 @@
 package org.jppf.server.scheduler.bundle;
 
 import java.util.Random;
+import org.jppf.utils.*;
 
 
 /**
@@ -56,6 +57,29 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile {
 	 * is short.
 	 */
 	protected float decreaseRatio = 1f;
+
+	/**
+	 * Initialize this profile with default values.
+	 */
+	public AnnealingTuneProfile()
+	{
+	}
+
+	/**
+	 * Initialize this profile with values read from the configuration file.
+	 * @param profileName name of the profile in the configuration file.
+	 */
+	public AnnealingTuneProfile(String profileName)
+	{
+		String prefix = "strategy." + profileName + ".";
+		TypedProperties props = JPPFConfiguration.getProperties();
+		minSamplesToAnalyse = props.getInt(prefix + "minSamplesToAnalyse", 500);
+		minSamplesToCheckConvergence = props.getInt(prefix + "minSamplesToCheckConvergence", 300);
+		maxDeviation = props.getDouble(prefix + "maxDeviation", 0.2d);
+		maxGuessToStable = props.getInt(prefix + "maxGuessToStable", 10);
+		sizeRatioDeviation = props.getFloat(prefix + "sizeRatioDeviation", 1.5f);
+		decreaseRatio = props.getFloat(prefix + "decreaseRatio", 0.2f);
+	}
 
 	/**
 	 * Get the multiplicity used to define the range available to

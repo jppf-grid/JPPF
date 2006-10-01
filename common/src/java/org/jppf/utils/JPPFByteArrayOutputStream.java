@@ -17,26 +17,25 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.server.scheduler.bundle;
+package org.jppf.utils;
+
+import java.io.ByteArrayOutputStream;
 
 /**
- * This class implements a smoothly changing profile.
- * @author Domingos Creado
+ * Extension of {@link java.io.ByteArrayOutputStream ByteArrayOutputStream}, providing
+ * a faster toByteArray() method that does not involve copying its internal buffer.
+ * @author Laurent Cohen
  */
-public class SmoothProfile extends AnnealingTuneProfile {
-
+public class JPPFByteArrayOutputStream extends ByteArrayOutputStream
+{
 	/**
-	 * Initialize this profile with default values for the parameters.
+	 * Override of <code>toByteArray()</code> that returns a reference to the internal buffer
+	 * instead of copy of it, significantly increasing the performance of this operation.
+	 * @return the content of the stream as an array of bytes.
+	 * @see java.io.ByteArrayOutputStream#toByteArray()
 	 */
-	public SmoothProfile()
+	public synchronized byte[] toByteArray()
 	{
-		//minSamplesToAnalyse = 500;
-		//minSamplesToCheckConvergence = 300;
-		minSamplesToAnalyse = 100;
-		minSamplesToCheckConvergence = 50;
-		maxDeviation = 0.2d;
-		maxGuessToStable = 10;
-		sizeRatioDeviation = 1.5f;
-		decreaseRatio = 0.2f;
+		return buf;
 	}
 }

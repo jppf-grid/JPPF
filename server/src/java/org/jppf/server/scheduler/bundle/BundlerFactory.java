@@ -34,14 +34,13 @@ public final class BundlerFactory {
 	 * @return a <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler
 	 */
-	public static Bundler createBundler() {
+	public static Bundler createBundler()
+	{
 		TypedProperties props = JPPFConfiguration.getProperties();
-		if("autotuned".equalsIgnoreCase(props.getProperty("task.bundle.strategy"))) {
-			if("smooth".equalsIgnoreCase(props.getProperty("task.bundle.autotuned.strategy"))) {				
-				return createBundler(new SmoothProfile());
-			}
-			// until we define other types of profiles
-			return createBundler(new SmoothProfile());
+		if("autotuned".equalsIgnoreCase(props.getProperty("task.bundle.strategy")))
+		{
+			String profile = props.getProperty("task.bundle.autotuned.strategy");
+			return createBundler(new AnnealingTuneProfile(profile));
 		} 
 		return new FixedSizedBundler();
 	}

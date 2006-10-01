@@ -22,14 +22,8 @@ package org.jppf.server;
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-import java.util.Iterator;
-import java.util.Set;
-
+import java.nio.channels.*;
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.node.JPPFBootstrapException;
@@ -124,6 +118,7 @@ public abstract class JPPFNIOServer extends Thread{
 				{
 					ChannelContext context = (ChannelContext) key.attachment();
 					context.state.exec(key, context);
+					//threadPool.submit(new ContextStateExec(context, key));
 				}
 			}
 			catch (Exception e)
@@ -144,7 +139,7 @@ public abstract class JPPFNIOServer extends Thread{
 			it.remove();
 		}
 	}
-	
+
 	/**
 	 * accept the incoming connection.
 	 * It accept and put it in a state to define what type of peer is.

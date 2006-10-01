@@ -24,6 +24,7 @@ import java.nio.channels.SocketChannel;
 import org.apache.log4j.Logger;
 import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.server.ChannelState;
+import org.jppf.utils.JPPFByteArrayOutputStream;
 
 /**
  * Abstract superclass for all states of the class server.
@@ -82,13 +83,7 @@ public abstract class ClassChannelState implements ChannelState
 	 */
 	public byte[] writeResource(JPPFResourceWrapper resource) throws IOException
 	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream()
-		{
-			public synchronized byte[] toByteArray()
-			{
-				return buf;
-			}
-		};
+		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 		try
 		{

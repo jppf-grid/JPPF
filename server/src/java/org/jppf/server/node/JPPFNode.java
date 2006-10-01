@@ -186,6 +186,8 @@ public class JPPFNode implements MonitoredNode
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
 			if (notEmpty)
 			{
+				//if (debugEnabled) log.debug("End of node secondary loop");
+				log.info("node["+socket.getLocalPort()+"] executing "+taskList.size()+" tasks");
 				List<Future> futureList = new ArrayList<Future>(taskList.size());
 				for (JPPFTask task : taskList)
 				{
@@ -360,10 +362,7 @@ public class JPPFNode implements MonitoredNode
 	 */
 	private void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
 	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream()
-		{
-			public synchronized byte[] toByteArray() { return buf; }
-		};
+		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
 		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		bundle.setNodeExecutionTime(elapsed);

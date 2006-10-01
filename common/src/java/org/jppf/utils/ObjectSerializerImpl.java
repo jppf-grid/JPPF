@@ -50,7 +50,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 */
 	public JPPFBuffer serialize(Object o) throws IOException
 	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 		oos.writeObject(o);
 		oos.flush();

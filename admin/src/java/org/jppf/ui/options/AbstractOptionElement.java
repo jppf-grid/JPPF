@@ -464,7 +464,6 @@ public abstract class AbstractOptionElement implements OptionElement
 
 	/**
 	 * Set the preferred height of the UI component.
-	 * @return
 	 * @param height the height as an int value.
 	 */
 	public void setHeight(int height)

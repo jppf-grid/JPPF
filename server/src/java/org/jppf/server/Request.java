@@ -21,6 +21,7 @@ package org.jppf.server;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import org.jppf.utils.JPPFByteArrayOutputStream;
 
 /**
  * Represent a request to be or been received.
@@ -45,13 +46,7 @@ public class Request {
 	/**
 	 * Stream where the result of the request is stored.
 	 */
-	private ByteArrayOutputStream output = new ByteArrayOutputStream()
-	{
-		public synchronized byte[] toByteArray()
-		{
-			return buf;
-		}
-	};
+	private ByteArrayOutputStream output = new JPPFByteArrayOutputStream();
 
 	/**
 	 * Initialize an instance of this class.

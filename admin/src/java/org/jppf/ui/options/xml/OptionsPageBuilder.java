@@ -22,14 +22,9 @@ package org.jppf.ui.options.xml;
 import java.awt.Insets;
 import java.io.*;
 import java.net.*;
-import java.util.*;
-
-import javax.swing.ListSelectionModel;
-
 import org.apache.log4j.Logger;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.event.*;
-import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.options.xml.OptionDescriptor.*;
 import org.jppf.utils.*;
 
@@ -46,7 +41,7 @@ public class OptionsPageBuilder
 	/**
 	 * Base name used to localize labels and tooltips.
 	 */
-	private final static String BASE_NAME = "org.jppf.ui.i18n.";
+	public final static String BASE_NAME = "org.jppf.ui.i18n.";
 	/**
 	 * Base name used to localize labels and tooltips.
 	 */
@@ -55,6 +50,11 @@ public class OptionsPageBuilder
 	 * Base name used to localize labels and tooltips.
 	 */
 	private boolean eventEnabled = true;
+	/**
+	 * Element factory used by this builder.
+	 */
+	private OptionElementFactory factory = null;
+
 	/**
 	 * Default constructor.
 	 */
@@ -258,360 +258,47 @@ public class OptionsPageBuilder
 	 */
 	public OptionElement build(OptionDescriptor desc) throws Exception
 	{
+		OptionElementFactory f = getFactory();
 		OptionElement elt = null; 
 		String type = desc.type;
-		if ("page".equals(type)) elt = buildPage(desc);
-		else if ("SplitPane".equals(desc.type)) elt = buildSplitPane(desc);
-		else if ("TabbedPane".equals(desc.type)) elt = buildTabbedPane(desc);
-		else if ("Toolbar".equals(desc.type)) elt = buildToolbar(desc);
-		else if ("ToolbarSeparator".equals(desc.type)) elt = buildToolbarSeparator(desc);
-		else if ("Button".equals(desc.type)) elt = buildButton(desc);
-		else if ("TextArea".equals(desc.type)) elt = buildTextArea(desc);
-		else if ("XMLEditor".equals(desc.type)) elt = buildXMLEditor(desc);
-		else if ("Password".equals(desc.type)) elt = buildPassword(desc);
-		else if ("PlainText".equals(desc.type)) elt = buildPlainText(desc);
-		else if ("FormattedNumber".equals(desc.type)) elt = buildFormattedNumber(desc);
-		else if ("SpinnerNumber".equals(desc.type)) elt = buildSpinnerNumber(desc);
-		else if ("Boolean".equals(desc.type)) elt = buildBoolean(desc);
-		else if ("ComboBox".equals(desc.type)) elt = buildComboBox(desc);
-		else if ("Filler".equals(desc.type)) elt = buildFiller(desc);
-		else if ("List".equals(desc.type)) elt = buildList(desc);
-		else if ("FileChooser".equals(desc.type)) elt = buildFileChooser(desc);
-		else if ("Label".equals(desc.type)) elt = buildLabel(desc);
-		else if ("import".equals(desc.type)) elt = loadImport(desc);
+		if ("page".equals(type)) elt = f.buildPage(desc);
+		else if ("SplitPane".equals(desc.type)) elt = f.buildSplitPane(desc);
+		else if ("TabbedPane".equals(desc.type)) elt = f.buildTabbedPane(desc);
+		else if ("Toolbar".equals(desc.type)) elt = f.buildToolbar(desc);
+		else if ("ToolbarSeparator".equals(desc.type)) elt = f.buildToolbarSeparator(desc);
+		else if ("Button".equals(desc.type)) elt = f.buildButton(desc);
+		else if ("TextArea".equals(desc.type)) elt = f.buildTextArea(desc);
+		else if ("XMLEditor".equals(desc.type)) elt = f.buildXMLEditor(desc);
+		else if ("Password".equals(desc.type)) elt = f.buildPassword(desc);
+		else if ("PlainText".equals(desc.type)) elt = f.buildPlainText(desc);
+		else if ("FormattedNumber".equals(desc.type)) elt = f.buildFormattedNumber(desc);
+		else if ("SpinnerNumber".equals(desc.type)) elt = f.buildSpinnerNumber(desc);
+		else if ("Boolean".equals(desc.type)) elt = f.buildBoolean(desc);
+		else if ("ComboBox".equals(desc.type)) elt = f.buildComboBox(desc);
+		else if ("Filler".equals(desc.type)) elt = f.buildFiller(desc);
+		else if ("List".equals(desc.type)) elt = f.buildList(desc);
+		else if ("FileChooser".equals(desc.type)) elt = f.buildFileChooser(desc);
+		else if ("Label".equals(desc.type)) elt = f.buildLabel(desc);
+		else if ("import".equals(desc.type)) elt = f.loadImport(desc);
 		return elt;
 	}
 
 	/**
-	 * Build an option page from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>OptionsPage</code> instance, or null if the page could not be build.
-	 * @throws Exception if an error was raised while building the page.
+	 * Get the element factory used by this builder.
+	 * @return an <code>OptionElementFactory</code> instance.
 	 */
-	public OptionElement buildPage(OptionDescriptor desc) throws Exception
+	public OptionElementFactory getFactory()
 	{
-		OptionPanel page = new OptionPanel();
-		page.setEventsEnabled(false);
-		initCommonAttributes((OptionPanel) page, desc);
-		page.setMainPage(desc.getBoolean("main"));
-		page.createUI();
-		for (OptionDescriptor child: desc.children) page.add(build(child));
-		page.setEventsEnabled(true);
-		return page;
+		if (factory == null) factory = new OptionElementFactory(this);
+		return factory;
 	}
 
 	/**
-	 * Build a button option from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
+	 * Get the base name used to localize labels and tooltips.
+	 * @return the base name as a string value.
 	 */
-	public Option buildButton(OptionDescriptor desc) throws Exception
+	public String getBaseName()
 	{
-		ButtonOption option = new ButtonOption();
-		option.setEventsEnabled(false);
-		initCommonOptionAttributes(option, desc);
-		option.setIconPath(desc.getProperty("icon"));
-		option.createUI();
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a label option from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildLabel(OptionDescriptor desc) throws Exception
-	{
-		LabelOption option = new LabelOption();
-		option.setEventsEnabled(false);
-		initCommonOptionAttributes(option, desc);
-		option.setValue(desc.getProperty("value"));
-		option.setIconPath(desc.getProperty("icon"));
-		option.createUI();
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a text area option from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildTextArea(OptionDescriptor desc) throws Exception
-	{
-		TextAreaOption option = new TextAreaOption();
-		option.setEventsEnabled(false);
-		initCommonOptionAttributes(option, desc);
-		option.createUI();
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a password option from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildPassword(OptionDescriptor desc) throws Exception
-	{
-		PasswordOption option = new PasswordOption();
-		option.setEventsEnabled(false);
-		initCommonOptionAttributes(option, desc);
-		option.setValue(desc.getProperty("value"));
-		option.createUI();
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a plain text option from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildPlainText(OptionDescriptor desc) throws Exception
-	{
-		PlainTextOption option = new PlainTextOption();
-		option.setEventsEnabled(false);
-		initCommonOptionAttributes(option, desc);
-		option.setValue(desc.getProperty("value"));
-		option.createUI();
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a formatted number option from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildFormattedNumber(OptionDescriptor desc) throws Exception
-	{
-		FormattedNumberOption option = new FormattedNumberOption();
-		option.setEventsEnabled(false);
-		initCommonOptionAttributes(option, desc);
-		option.setValue(new Double(desc.getDouble("value")));
-		option.setPattern(desc.getProperty("pattern"));
-		option.createUI();
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a spinner number option from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildSpinnerNumber(OptionDescriptor desc) throws Exception
-	{
-		SpinnerNumberOption option = new SpinnerNumberOption();
-		option.setEventsEnabled(false);
-		initCommonOptionAttributes(option, desc);
-		option.setValue(new Integer(desc.getInt("value")));
-		option.setMin(new Integer(desc.getInt("minValue")));
-		option.setMax(new Integer(desc.getInt("maxValue")));
-		option.createUI();
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a check box option from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildBoolean(OptionDescriptor desc) throws Exception
-	{
-		BooleanOption option = new BooleanOption();
-		option.setEventsEnabled(false);
-		initCommonOptionAttributes(option, desc);
-		option.setValue(new Boolean(desc.getBoolean("value")));
-		option.createUI();
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a combo box option from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildComboBox(OptionDescriptor desc) throws Exception
-	{
-		ComboBoxOption option = new ComboBoxOption();
-		option.setEventsEnabled(false);
-		initCommonOptionAttributes(option, desc);
-		List<Object> items = new ArrayList<Object>();
-		for (ItemDescriptor itemDesc: desc.items) items.add(itemDesc.name);
-		option.setItems(items);
-		option.setValue(desc.getProperty("value"));
-		option.createUI();
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a list option from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildList(OptionDescriptor desc) throws Exception
-	{
-		ListOption option = new ListOption();
-		option.setEventsEnabled(false);
-		initCommonOptionAttributes(option, desc);
-		List<Object> items = new ArrayList<Object>();
-		for (ItemDescriptor itemDesc: desc.items) items.add(itemDesc.name);
-		int selMode = "single".equals(desc.getProperty("selection"))
-			? ListSelectionModel.SINGLE_SELECTION : ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
-		option.setSelMode(selMode);
-		option.setItems(items);
-		option.setValue(new ArrayList<Object>());
-		option.createUI();
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a filler option from the specified option descriptor.
-	 * @param desc the descriptor to get the properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildFiller(OptionDescriptor desc) throws Exception
-	{
-		int width = desc.getInt("width", 1);
-		int height = desc.getInt("height", 1);
-		FillerOption option = new FillerOption(width, height);
-		return option;
-	}
-
-	/**
-	 * Build a toolbar separator option from the specified option descriptor.
-	 * @param desc the descriptor to get the properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildToolbarSeparator(OptionDescriptor desc) throws Exception
-	{
-		int width = desc.getInt("width", 1);
-		int height = desc.getInt("height", 1);
-		ToolbarSeparatorOption option = new ToolbarSeparatorOption(width, height);
-		return option;
-	}
-
-	/**
-	 * Build a file chooser option from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildFileChooser(OptionDescriptor desc) throws Exception
-	{
-		FileChooserOption option = new FileChooserOption();
-		initCommonOptionAttributes(option, desc);
-		int dlgType = "open".equals(desc.getProperty("type"))
-			? FileChooserOption.OPEN : FileChooserOption.SAVE;
-		option.setDialogType(dlgType);
-		option.setExtensions(desc.getProperty("extensions"));
-		option.setValue(desc.getProperty("value"));
-		option.setIconPath(desc.getProperty("icon"));
-		option.createUI();
-		return option;
-	}
-
-	/**
-	 * Build a split pane option from the specified option descriptor.
-	 * @param desc the descriptor to get the properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public OptionElement buildSplitPane(OptionDescriptor desc) throws Exception
-	{
-		SplitPaneOption option = new SplitPaneOption();
-		initCommonAttributes(option, desc);
-		option.setDividerWidth(desc.getInt("dividerWidth", 4));
-		option.setResizeWeight(desc.getDouble("resizeWeight", 0.5d));
-		option.createUI();
-		for (OptionDescriptor child: desc.children) option.add(build(child));
-		return option;
-	}
-
-	/**
-	 * Build an XML editor option from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildXMLEditor(OptionDescriptor desc) throws Exception
-	{
-		XMLEditorOption option = new XMLEditorOption();
-		option.setEventsEnabled(false);
-		initCommonOptionAttributes(option, desc);
-		option.createUI();
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a toolbar option from the specified option descriptor.
-	 * @param desc the descriptor to get the properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public OptionElement buildToolbar(OptionDescriptor desc) throws Exception
-	{
-		ToolbarOption option = new ToolbarOption();
-		option.setEventsEnabled(false);
-		initCommonAttributes(option, desc);
-		option.createUI();
-		for (OptionDescriptor child: desc.children) option.add(build(child));
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a toolbar option from the specified option descriptor.
-	 * @param desc the descriptor to get the properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public OptionElement buildTabbedPane(OptionDescriptor desc) throws Exception
-	{
-		TabbedPaneOption option = new TabbedPaneOption();
-		option.setEventsEnabled(false);
-		initCommonAttributes(option, desc);
-		option.setMainPage(desc.getBoolean("main"));
-		option.createUI();
-		for (OptionDescriptor child: desc.children) option.add(build(child));
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a toolbar option from the specified option descriptor.
-	 * @param desc the descriptor to get the properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public OptionElement loadImport(OptionDescriptor desc) throws Exception
-	{
-		OptionsPageBuilder builder = new OptionsPageBuilder(true);
-		OptionElement elt = null;
-		if ("url".equalsIgnoreCase(desc.getProperty("source")))
-			elt = builder.buildPageFromURL(desc.getProperty("location"), baseName);
-		else elt = builder.buildPage(desc.getProperty("location"), null);
-		OptionsHandler.addPage(elt);
-		return elt;
+		return baseName;
 	}
 }

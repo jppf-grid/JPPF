@@ -251,13 +251,7 @@ public class JPPFClient
 		header.setCredentials(credentials);
 		int count = taskList.size();
 		header.setTaskCount(count);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream()
-		{
-			public synchronized byte[] toByteArray()
-			{
-				return buf;
-			}
-		};
+		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
 		helper.writeNextObject(header, dos, false);
 		helper.writeNextObject(dataProvider, dos, true);
@@ -312,7 +306,7 @@ public class JPPFClient
 					header.setAppUuid(appUuid);
 					header.setCredentials(credentials);
 					header.setRequestType(JPPFRequestHeader.Type.STATISTICS);
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 					DataOutputStream dos = new DataOutputStream(baos);
 					helper.writeNextObject(header, dos, false);
 					dos.flush();
@@ -395,7 +389,7 @@ public class JPPFClient
 	 */
 	private void sendAdminRequest(AdminRequest request) throws Exception
 	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
 		helper.writeNextObject(request, dos, false);
 		dos.flush();

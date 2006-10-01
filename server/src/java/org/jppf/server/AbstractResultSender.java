@@ -123,6 +123,8 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 							count += bundle.getTaskCount();
 						}
 						first.setTaskCount(count);
+						long elapsed = System.currentTimeMillis() - first.getNodeExecutionTime();
+						first.setNodeExecutionTime(elapsed);
 						sendPartialResults(first);
 					}
 					resultList.clear();

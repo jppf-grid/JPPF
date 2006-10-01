@@ -24,6 +24,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
+import java.util.concurrent.*;
 import org.apache.log4j.Logger;
 import org.jppf.node.JPPFBootstrapException;
 import org.jppf.security.JPPFSecurityContext;
@@ -159,31 +160,46 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	}
 
 	/**
+	 * Used to perform the newBundle() operation in a separate thread.
+	 */
+	final ExecutorService threadPool =	Executors.newFixedThreadPool(1);
+	/**
+	 * Task used to dispatch tasks in the queue to available nodes.
+	 */
+	final Runnable dispatchTask = new Runnable()
+	{
+		public void run()
+		{
+			while (!availableNodes.isEmpty() && !queue.isEmpty())
+			{
+				SocketChannel channel = availableNodes.remove(0);
+				SelectionKey key = channel.keyFor(selector);
+				ChannelContext context = (ChannelContext) key.attachment();
+				context.state = SendingJob;
+				context.content = null;
+				key.interestOps(SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+			}
+		}
+	};
+
+	/**
 	 * Callback method when a task bundle is added to the queue.
 	 * @param queue the queue to which a bundle was added.
 	 * @see org.jppf.server.JPPFQueue.QueueListener#newBundle(org.jppf.server.JPPFQueue)
 	 */
-	public synchronized void newBundle(JPPFQueue queue)
+	public synchronized void newBundle(final JPPFQueue queue)
 	{
-		while (!availableNodes.isEmpty() && !queue.isEmpty())
-		{
-			SocketChannel aNode = availableNodes.remove(0);
-			SelectionKey key = aNode.keyFor(selector);
-			ChannelContext context = (ChannelContext) key.attachment();
-			context.state = SendingJob;
-			context.content = null;
-			key.interestOps(SelectionKey.OP_READ|SelectionKey.OP_WRITE);
-		}
+		threadPool.submit(dispatchTask);
 	}
-	
+
 	/**
-	 * There are only two states in this automata.<br>
+	 * There are only three states in this automata.<br>
 	 * <pre>
-	 *   +--------------+    job sent    +-----------------+    
-	 *   |   Sending    | ------------>  |     Waiting     |
-	 *   |     jobs     | <-----------   |     results     |
-	 *   +--------------+  bundle fully  +-----------------+
-	 *                    trans. back
+	 * +--------------+  initialized  +---------+    job sent    +---------+    
+	 * | Waiting for  |  start work   | Sending | ------------>  | Waiting |
+	 * | initial info | ------------> |  jobs   | <-----------   | results |
+	 * +--------------+               +---------+  bundle fully  +---------+
+	 *                                             trans. back
 	 * </pre>
 	 * See {@link org.jppf.server.JPPFNIOServer JPPFNIOServer} for more 
 	 * details on the architecture of the framework.
@@ -197,8 +213,10 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	ChannelState WaitingResult = new CWaitingResult(this);
 
 	/**
-	 * State of a node connection after a task bundle has been sent.
-	 * Waits for and reads the results of the bundle execution.
+	 * Initial state of a node connection. This is where the node and
+	 * the driver exchange information about themselves, which can be
+	 * used for node code reload determination and security purposes
+	 * (i.e. exchanging credentials, authentication, ...).
 	 */
 	ChannelState WaitingInitialInfo = new CWaitingInitialInfo(this);
 
@@ -253,13 +271,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			ChannelContext context, JPPFTaskBundle bundle) throws Exception {
 
 		//the preparing part of sending a bundle
-		ByteArrayOutputStream baos = new ByteArrayOutputStream() {
-			// overriden for performance reasons - no need to create a copy of
-			// the buffer here.
-			public synchronized byte[] toByteArray() {
-				return buf;
-			}
-		};
+		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
 		SerializationHelper helper = new SerializationHelperImpl();
 
@@ -328,11 +340,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 			try
 			{
 				DataProvider dp = null;
-				ByteArrayOutputStream baos = new ByteArrayOutputStream() {
-					public synchronized byte[] toByteArray() {
-						return buf;
-					}
-				};
+				ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 				JPPFSecurityContext cred = JPPFDriver.getInstance().getCredentials();
 				DataOutputStream dos = new DataOutputStream(baos);
 				SerializationHelper helper = new SerializationHelperImpl();

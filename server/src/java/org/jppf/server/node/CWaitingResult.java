@@ -106,7 +106,8 @@ class CWaitingResult implements ChannelState
 				// if the node disconnect from driver we will know soon
 				context.state = server.SendingJob;
 				server.availableNodes.add(channel);
-				key.interestOps(SelectionKey.OP_READ);
+				//key.interestOps(SelectionKey.OP_READ);
+				key.interestOps(0);
 				if (!server.getQueue().isEmpty()) server.newBundle(server.getQueue());
 			}
 		}

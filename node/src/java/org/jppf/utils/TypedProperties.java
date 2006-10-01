@@ -119,6 +119,39 @@ public class TypedProperties extends Properties
 	}
 	
 	/**
+	 * Get the single precision value of a property with a specified name.
+	 * @param key the name of the property to look for.
+	 * @param defValue a default value to return if the property is not found.
+	 * @return the value of the property as a float, or the default value if it is not found.
+	 */
+	public float getFloat(String key, float defValue)
+	{
+		float floatVal = defValue;
+		String val = getProperty(key, null);
+		if (val != null)
+		{
+			try
+			{
+				floatVal = Float.parseFloat(val);
+			}
+			catch(NumberFormatException e)
+			{
+			}
+		}
+		return floatVal;
+	}
+	
+	/**
+	 * Get the single precision value of a property with a specified name.
+	 * @param key the name of the property to look for.
+	 * @return the value of the property as a float, or zero if it is not found.
+	 */
+	public double getFloat(String key)
+	{
+		return getFloat(key, 0f);
+	}
+	
+	/**
 	 * Get the double precision value of a property with a specified name.
 	 * @param key the name of the property to look for.
 	 * @param defValue a default value to return if the property is not found.

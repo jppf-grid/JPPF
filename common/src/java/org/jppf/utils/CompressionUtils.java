@@ -55,7 +55,7 @@ public final class CompressionUtils
 	 */
 	public static byte[] zip(byte[] bytes, int start, int length) throws Exception
 	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		GZIPOutputStream gzos = new GZIPOutputStream(baos);
 		DataOutputStream dos = new DataOutputStream(gzos);
 		dos.writeInt(length);
