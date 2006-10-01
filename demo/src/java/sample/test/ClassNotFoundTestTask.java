@@ -20,14 +20,13 @@
 
 package sample.test;
 
-import org.jppf.server.protocol.JPPFTask;
 
 /**
  * Test task to test that the framework behaves correctly when a class is not found
  * by the classloader.
  * @author Laurent Cohen
  */
-public class ClassNotFoundTestTask extends JPPFTask
+public class ClassNotFoundTestTask extends JPPFTestTask
 {
 	/**
 	 * Initialize this task.
@@ -40,7 +39,7 @@ public class ClassNotFoundTestTask extends JPPFTask
 	 * Execute the task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	public void test()
 	{
 		new org.ujac.ui.editor.TextArea();
 		String s = "Please make sure the library 'ujac-ui.jar' is NOT present in the node, server or client classpath";

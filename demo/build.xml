@@ -206,6 +206,16 @@
 		</java>       
 	</target>
 
+	<target name="run.driver2">
+		<echo message="starting the JPPF driver"/>
+		<java fork="yes" classname="org.jppf.server.DriverLauncher" classpathref="client.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx32m"/>
+			<jvmarg value="-Djppf.config=jppf-driver-2.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-driver-2.properties"/>
+		</java>       
+	</target>
+
 	<target name="run.node1">
 		<echo message="starting local node"/>
 		<java fork="yes" classname="org.jppf.node.NodeLauncher" classpathref="node.classpath">
@@ -226,6 +236,16 @@
 		</java>       
 	</target>
 
+	<target name="run.node3">
+		<echo message="starting third local node"/>
+		<java fork="yes" classname="org.jppf.node.NodeLauncher" classpathref="node.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=node3.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-node3.properties"/>
+		</java>       
+	</target>
+
 	<target name="run.ui">
 		<echo message="starting the server monitoring GUI"/>
 		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="gui.classpath">
@@ -233,6 +253,16 @@
 			<arg value="file"/>
 			<jvmarg value="-Djppf.config=jppf-gui.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-gui.properties"/>
+		</java>       
+	</target>
+
+	<target name="run.ui2">
+		<echo message="starting the server monitoring GUI"/>
+		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="gui.classpath">
+			<arg value="org/jppf/ui/options/xml/JPPFAdminTool.xml"/>
+			<arg value="file"/>
+			<jvmarg value="-Djppf.config=jppf-gui-2.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-gui-2.properties"/>
 		</java>       
 	</target>
 

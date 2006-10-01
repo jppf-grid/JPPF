@@ -26,6 +26,7 @@ import org.jppf.JPPFException;
 import org.jppf.client.JPPFClient;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.CompositeDataProvider;
+import org.jppf.utils.StringUtils;
 
 /**
  * Runner class used for testing the framework.
@@ -41,6 +42,10 @@ public class TestTaskRunner
 	 * JPPF client used to submit execution requests.
 	 */
 	private static JPPFClient jppfClient = null;
+	/**
+	 * Separator for each test.
+	 */
+	private static String banner = "\n"+StringUtils.padLeft("", '-', 80)+"\n";
 
 	/**
 	 * Entry point for this class, performs a matrix multiplication a number of times.
@@ -72,11 +77,12 @@ public class TestTaskRunner
 	 */
 	static void performExceptionTest() throws JPPFException
 	{
+		System.out.println(banner);
 		System.out.println("Starting exception testing...");
 		try
 		{
 			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			JPPFTask task = new ExceptionTestTask(2);
+			JPPFTask task = new ExceptionTestTask();
 			tasks.add(task);
 			List<JPPFTask> results = jppfClient.submit(tasks, null);
 			JPPFTask resultTask = results.get(0);
@@ -101,6 +107,7 @@ public class TestTaskRunner
 	 */
 	static void performURLTest() throws JPPFException
 	{
+		System.out.println(banner);
 		System.out.println("Starting URL testing...");
 		try
 		{
@@ -134,6 +141,7 @@ public class TestTaskRunner
 	 */
 	static void performSecurityTest() throws JPPFException
 	{
+		System.out.println(banner);
 		System.out.println("Starting security testing...");
 		try
 		{
@@ -160,6 +168,7 @@ public class TestTaskRunner
 	 */
 	static void performEmptyTaskListTest() throws JPPFException
 	{
+		System.out.println(banner);
 		System.out.println("Starting empty tasks list testing...");
 		try
 		{
@@ -182,6 +191,7 @@ public class TestTaskRunner
 	 */
 	static void performEmptyConstantTaskTest() throws JPPFException
 	{
+		System.out.println(banner);
 		System.out.println("Starting constant tasks testing...");
 		try
 		{
@@ -209,6 +219,7 @@ public class TestTaskRunner
 	 */
 	static void performClassNotFoundTaskTest() throws JPPFException
 	{
+		System.out.println(banner);
 		System.out.println("Starting ClassNotFound task testing...");
 		String cp = System.getProperty("java.class.path");
 		System.out.println("classpath: "+cp);
@@ -242,6 +253,7 @@ public class TestTaskRunner
 	 */
 	static void performInnerTask()
 	{
+		System.out.println(banner);
 		System.out.println("Starting InnerTask task testing...");
 		HelloJPPF h = new HelloJPPF();
 		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
@@ -255,13 +267,12 @@ public class TestTaskRunner
 			List<JPPFTask> results = jppfClient.submit(tasks, null);
 			// show results
 			System.out.println("Got "+results.size()+" results: ");
-			Iterator it = results.iterator();
-			while (it.hasNext())
+			System.out.println("Result is:");
+			for (JPPFTask t: results)
 			{
-				JPPFTask t = (JPPFTask) it.next();
-				System.out.println("Result object: "+t);
-				System.out.println("Result: "+t.getResult()+ ", Exception: "+t.getException());
-				if  (null != t.getException()) {
+				System.out.println(""+t);
+				if  (null != t.getException())
+				{
 					t.getException().printStackTrace();
 				}
 			}

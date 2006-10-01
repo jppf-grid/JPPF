@@ -17,30 +17,25 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 package sample.test;
 
+import java.io.Serializable;
 
 /**
- * Test task to check that correct results are returned by the framework.
- * @author Laurent Cohen
+ * Holds the result of the execution of a test method.
  */
-public class ConstantTask extends JPPFTestTask
+public class ExecutionReport implements Serializable
 {
 	/**
-	 * Initialize this task with a specfied returned result.
-	 * @param n the task result as an integer value.
+	 * Name of the method executed.
 	 */
-	public ConstantTask(int n)
-	{
-		setResult(new Integer(n));
-	}
-
+	public String methodName = "";
 	/**
-	 * Execute ther task
-	 * @see java.lang.Runnable#run()
+	 * Stack trace of the resulting exception, if any.
 	 */
-	public void test()
-	{
-	}
+	public String stackTrace = "";
+	/**
+	 * Description of the test.
+	 */
+	public String description = "";
 }

@@ -19,19 +19,13 @@
  */
 package sample.test;
 
-import org.jppf.server.protocol.JPPFTask;
 
 /**
  * JPPF task used to test how exceptions are handled within the nodes.
  * @author Laurent Cohen
  */
-public class ExceptionTestTask extends JPPFTask
+public class ExceptionTestTask extends JPPFTestTask
 {
-	/**
-	 * The index of the method to invoke.
-	 */
-	int methodNumber = 0;
-
 	/**
 	 * Default constructor - the method that throws an NPE will be invoked.
 	 */
@@ -39,26 +33,6 @@ public class ExceptionTestTask extends JPPFTask
 	{
 	}
 
-	/**
-	 * Initialize this test task with the index of a method to invoke.
-	 * @param n th emethod index as int value.
-	 */
-	public ExceptionTestTask(int n)
-	{
-		this.methodNumber = n;
-	}
-
-	/**
-	 * Run some code that throws an exception.
-	 * @see java.lang.Runnable#run()
-	 */
-	public void run()
-	{
-		if (methodNumber == 0) testThrowNPE();
-		else if (methodNumber == 1) testThrowArrayIndexOutOfBoundsException();
-		else testThrowSecurityException();
-	}
-	
 	/**
 	 * This method throws a <code>NullPointerException</code>.
 	 */

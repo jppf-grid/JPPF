@@ -21,7 +21,6 @@ package sample.test;
 
 import java.io.*;
 import java.net.URL;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.FileUtils;
 
 /**
@@ -29,7 +28,7 @@ import org.jppf.utils.FileUtils;
  * Task used to test the {@link org.jppf.task.storage.URLDataProvider URLDataProvider} class.
  * @author Laurent Cohen
  */
-public class FileDownloadTestTask extends JPPFTask
+public class FileDownloadTestTask extends JPPFTestTask
 {
 	/**
 	 * The URL of a file to downlod as a string.
@@ -47,22 +46,16 @@ public class FileDownloadTestTask extends JPPFTask
 
 	/**
 	 * Run the task.
+	 * @throws Exception if any error occurs while running ths task..
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	public void testDownloadUpload() throws Exception
 	{
-		try
-		{
-			URL url = new URL(location);
-			InputStream is = (InputStream) getDataProvider().getValue(url);
-			String s = FileUtils.readTextFile(new BufferedReader(new InputStreamReader(is)));
-			setResult(s);
-			url = new URL("ftp://localhost/Options.xsd");
-			getDataProvider().setValue(url, new ByteArrayInputStream(s.getBytes()));
-		}
-		catch(Exception e)
-		{
-			setException(e);
-		}
+		URL url = new URL(location);
+		InputStream is = (InputStream) getDataProvider().getValue(url);
+		String s = FileUtils.readTextFile(new BufferedReader(new InputStreamReader(is)));
+		setResult(s);
+		url = new URL("ftp://localhost/Options.xsd");
+		getDataProvider().setValue(url, new ByteArrayInputStream(s.getBytes()));
 	}
 }

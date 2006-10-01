@@ -37,7 +37,7 @@ public class HelloJPPF implements Serializable
 	/**
 	 * JPPF Task used in the HelloJPPF code sample.
 	 */
-	public class InnerTask extends JPPFTask
+	public class InnerTask extends JPPFTestTask
 	{
 		/** task count */
 		int count = 1;
@@ -54,7 +54,7 @@ public class HelloJPPF implements Serializable
 		/**
 		 * Calculate the result of the task and set the result object with setResult().
 		 */
-		public void run()
+		public void test()
 		{
 			// ModelPackage a = ModelPackage.createPackage("x");
 			setResult("Hello World " + count);

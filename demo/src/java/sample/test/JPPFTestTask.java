@@ -19,23 +19,21 @@
  */
 package sample.test;
 
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
  * This task is intended for testing the framework only.
  * @author Laurent Cohen
  */
-public class JPPFTestTask extends JPPFTask
+public abstract class JPPFTestTask extends JPPFTask
 {
-	static
-	{
-		System.out.println("JPPFTestTask loaded by "+JPPFTestTask.class.getClassLoader());
-	}
-	
 	/**
-	 * Dummy data for serialization test.
+	 * Holder for the execution results.
 	 */
-	protected String someString = "0000000000111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999";
+	protected List<ExecutionReport> reports = new ArrayList<ExecutionReport>();
 
 	/**
 	 * Initialize this task with a specified row of values to multiply.
@@ -43,16 +41,95 @@ public class JPPFTestTask extends JPPFTask
 	public JPPFTestTask()
 	{
 	}
-	
+
 	/**
 	 * Run the test.
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run()
 	{
-		//run2();
-		System.out.println("Task Executing");
-		System.exit(0);
+		runTestMethods();
 	}
-	//public void run2() { System.out.println("Task 2.0 Executing"); }
+
+	/**
+	 * Execute the test methods and generate an execution report for each. 
+	 */
+	protected void runTestMethods()
+	{
+		Class thisClass = getClass();
+		Method[] methods = thisClass.getMethods();
+		for (Method m: methods)
+		{
+			if (!isTestMethod(m)) continue;
+			ExecutionReport report = new ExecutionReport();
+			report.methodName = m.getName();
+			try
+			{
+				m.invoke(this, (Object[]) null);
+				report.description = "No exception was raised";
+			}
+			catch(Exception e)
+			{
+				Throwable t = e.getCause() == null ? e : e.getCause(); 
+				report.description = t.getMessage();
+				StringWriter sw = new StringWriter();
+				PrintWriter writer = new PrintWriter(sw);
+				t.printStackTrace(writer);
+				report.stackTrace = sw.toString();
+			}
+			reports.add(report);
+		}
+	}
+	
+	/**
+	 * Determine whether a method is a test method.
+	 * The method must:
+	 * <ul>
+	 * <li>have a name starting with &quot;test&quot;</li>
+	 * <li>be non-static</li>
+	 * <li>be public</li>
+	 * <li>have a void return type</li>
+	 * <li>have no parameters</li>
+	 * </ul>
+	 * @param m the method to check.
+	 * @return true if the method is a test method, false otherwise.
+	 */
+	protected boolean isTestMethod(Method m)
+	{
+		if (m == null) return false;
+		if (!m.getName().startsWith("test")) return false;
+		int mod = m.getModifiers();
+		if (Modifier.isStatic(mod) || !Modifier.isPublic(mod)) return false;
+		if (!Void.TYPE.equals(m.getReturnType())) return false;
+		Class[] paramTypes = m.getParameterTypes();
+		if ((paramTypes != null) && (paramTypes.length > 0)) return false;
+		return true;
+	}
+
+	/**
+	 * Get the holder for the execution results.
+	 * @return a list of <code>ExecutionReport</code> instances.
+	 */
+	public List<ExecutionReport> getReports()
+	{
+		return reports;
+	}
+
+	/**
+	 * Get a string representation of this task.
+	 * @return a string describing the task execution result.
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		for (ExecutionReport r: reports)
+		{
+			sb.append("----------------------------------------------------------\n");
+			sb.append("method name: ").append(r.methodName).append("\n");
+			sb.append("description: ").append(r.description).append("\n");
+			sb.append("stack trace:\n").append(r.stackTrace).append("\n");
+		}
+		return sb.toString();
+	}
 }
