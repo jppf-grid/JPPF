@@ -38,10 +38,9 @@
 							<td class="menu_first"><a href="index.html">Home</a></td>
 							<td class="menu"><a href="JPPF-Overview.html">Overview</a></td>
 							<td class="menu"><a href="http://sourceforge.net/project/showfiles.php?group_id=135654">Files</a></td>
-							<td class="menu"><a href="./wiki">Wiki</a></td>
+							<td class="menu"><a href="./wiki">Wiki &amp; Doc</a></td>
 							<td class="menu"><a href="./forums">Forums</a></td>
 							<td class="menu"><a href="screenshots.html">Screenshots</a></td >
-							<td class="menu"><a href="archi.html">Architecture</a></td >
 							<td class="menu"><a href="api/index.html">API Doc</a></td >
 							<td class="menu"><a href="faq.php">Faqs</a></td>
 							<td class="menu"><a href="news.php">News</a></td>

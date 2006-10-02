@@ -70,12 +70,21 @@
 							<h3>JPPF articles on the Web</h3>
 							<table align="center">
 								<tr><td>
+									<p><a href="http://www.infoq.com/news/Grid-Computing-JPPF" target=_top>
+										<img src="http://www.infoq.com/styles/i/logo.gif" border="0" alternate="InfoQ"/>
+									</a>
+									</td>
+									<td>
 									<p><a href="http://lwn.net/Articles/156109" target=_top>
 										<img src="http://lwn.net/images/lcorner.png" border="0" alternate="LWN.net"/>
 									</a>
+								</td></tr>
+								<tr><td>
 									<p><a href="http://www.artima.com/forums/flat.jsp?forum=276&thread=153331" target=_top>
 										<img src="http://www.artima.com/images/ab_dev.gif" border="0" alternate="artima developer"/>
 									</a>
+								</td></tr>
+								<tr><td>
 									<p><a href="http://linux.softpedia.com/get/System/Clustering-and-Distributed-Networks/Java-Parallel-Processing-Framework-10529.shtml" target=_top>
 										<img src="http://www.softpedia.com/base_img/softpedia_logo.gif" border="0" alternate="Softpedia"/>
 									</a>

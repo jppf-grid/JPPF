@@ -38,10 +38,9 @@
 							<td class="menu_first"><a href="index.html">Home</a></td>
 							<td class="menu"><a href="JPPF-Overview.html">Overview</a></td>
 							<td class="menu"><a href="http://sourceforge.net/project/showfiles.php?group_id=135654">Files</a></td>
-							<td class="menu"><a href="./wiki">Wiki</a></td>
+							<td class="menu"><a href="./wiki">Wiki &amp; Doc</a></td>
 							<td class="menu"><a href="./forums">Forums</a></td>
 							<td class="menu"><a href="screenshots.html">Screenshots</a></td >
-							<td class="menu"><a href="archi.html">Architecture</a></td >
 							<td class="menu"><a href="api/index.html">API Doc</a></td >
 							<td class="menu"><a href="faq.php">Faqs</a></td>
 							<td class="menu"><a href="news.php">News</a></td>
@@ -116,12 +115,21 @@
 							<h3>JPPF articles on the Web</h3>
 							<table align="center">
 								<tr><td>
+									<p><a href="http://www.infoq.com/news/Grid-Computing-JPPF" target=_top>
+										<img src="http://www.infoq.com/styles/i/logo.gif" border="0" alternate="InfoQ"/>
+									</a>
+									</td>
+									<td>
 									<p><a href="http://lwn.net/Articles/156109" target=_top>
 										<img src="http://lwn.net/images/lcorner.png" border="0" alternate="LWN.net"/>
 									</a>
+								</td></tr>
+								<tr><td>
 									<p><a href="http://www.artima.com/forums/flat.jsp?forum=276&thread=153331" target=_top>
 										<img src="http://www.artima.com/images/ab_dev.gif" border="0" alternate="artima developer"/>
 									</a>
+								</td></tr>
+								<tr><td>
 									<p><a href="http://linux.softpedia.com/get/System/Clustering-and-Distributed-Networks/Java-Parallel-Processing-Framework-10529.shtml" target=_top>
 										<img src="http://www.softpedia.com/base_img/softpedia_logo.gif" border="0" alternate="Softpedia"/>
 									</a>
