@@ -108,7 +108,7 @@ class CWaitingResult implements ChannelState
 				server.availableNodes.add(channel);
 				//key.interestOps(SelectionKey.OP_READ);
 				key.interestOps(0);
-				if (!server.getQueue().isEmpty()) server.newBundle(server.getQueue());
+				if (!server.getQueue().isEmpty()) server.newBundle(null);
 			}
 		}
 		catch(Exception e)

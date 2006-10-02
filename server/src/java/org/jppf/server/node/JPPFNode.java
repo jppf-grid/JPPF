@@ -234,7 +234,10 @@ public class JPPFNode implements MonitoredNode
 		}
 		if (notifying) fireNodeEvent(EventType.END_CONNECT);
 		TypedProperties props = JPPFConfiguration.getProperties();
-		threadPool = Executors.newFixedThreadPool(props.getInt("processing.threads", 1));
+		int poolSize = props.getInt("processing.threads", 1);
+		//threadPool = Executors.newFixedThreadPool(poolSize);
+		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.SECONDS,
+			new LinkedBlockingQueue<Runnable>());
 		if (debugEnabled) log.debug("end node initialization");
 	}
 

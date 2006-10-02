@@ -170,7 +170,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	{
 		public void run()
 		{
-			while (!availableNodes.isEmpty() && !queue.isEmpty())
+			while (!availableNodes.isEmpty() && !getQueue().isEmpty())
 			{
 				SocketChannel channel = availableNodes.remove(0);
 				SelectionKey key = channel.keyFor(selector);

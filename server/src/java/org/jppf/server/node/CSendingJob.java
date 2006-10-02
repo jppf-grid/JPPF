@@ -104,10 +104,15 @@ class CSendingJob implements ChannelState
 						server.resubmitBundle(bundle);
 					}
 				}
+				else
+				{
+					key.interestOps(SelectionKey.OP_READ);
+					server.availableNodes.add(channel);
+					if (!server.getQueue().isEmpty()) server.newBundle(null);
+				}
 				return;
 			}
-			
-			// the buffer with the bundle serialized and part transfered
+				// the buffer with the bundle serialized and part transfered
 			ByteBuffer task = ((TaskRequest) context.content).getSending();
 			try 
 			{
@@ -119,12 +124,10 @@ class CSendingJob implements ChannelState
 				nodeClosing(channel, context);
 				throw e;
 			}
-	
-			//is anything more to send to SO buffer?
+				//is anything more to send to SO buffer?
 			if (!task.hasRemaining())
 			{
-				//we finally have sent everything to node
-				// it will do the work and send back to us.
+				//we finally have sent everything to node, it will do the work and send back to us.
 				context.state = server.WaitingResult;
 				//we will just wait for the bundle back
 				key.interestOps(SelectionKey.OP_READ);

@@ -105,7 +105,7 @@ class CWaitingInitialInfo implements ChannelState
 				context.state = server.SendingJob;
 				//key.interestOps(SelectionKey.OP_READ|SelectionKey.OP_WRITE);
 				key.interestOps(SelectionKey.OP_READ);
-				if (!server.getQueue().isEmpty()) server.newBundle(server.getQueue());
+				if (!server.getQueue().isEmpty()) server.newBundle(null);
 			}
 		}
 		catch(Exception e)

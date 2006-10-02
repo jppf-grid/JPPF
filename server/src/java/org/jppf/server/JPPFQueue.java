@@ -67,34 +67,6 @@ public class JPPFQueue
 	}
 
 	/**
-	 * Get the next object in the queue. This method waits until the queue has
-	 * at least one object.
-	 * 
-	 * @return the most recent object that was added to the queue.
-	 */
-	/*
-	public JPPFTaskBundle nextBundle()
-	{
-		JPPFTaskBundle bundle = null;
-		lock.lock();
-		try
-		{
-			bundle = queue.poll();
-		}
-		finally
-		{
-			lock.unlock();
-		}
-		if (bundle != null)
-		{
-			taskOutOfQueue(bundle.getTaskCount(),
-				System.currentTimeMillis() - bundle.getQueueEntryTime());
-		}
-		return bundle;
-	}
-	*/
-	
-	/**
 	 * Get the next object in the queue.
 	 * @param nbTasks the maximum number of tasks to get out of the bundle.
 	 * @return the most recent object that was added to the queue.
