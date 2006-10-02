@@ -18,7 +18,7 @@
 	Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 -->
 
-<project name='jppf' default="build" basedir="..">
+<project name="jppf" default="build" basedir="..">
 
 	<!-- ========================================================================= -->
 	<!--                          Property definitions                             -->
@@ -217,12 +217,17 @@
 	</target>
 
 	<target name="runtime.driver">
-		<copy tofile="${runtime.driver}/lib/node.jar" file="${build}/${ant.project.name}-node.jar"/>
-		<copy tofile="${runtime.driver}/lib/common.jar" file="${build}/${ant.project.name}-common.jar"/>
-		<copy tofile="${runtime.driver}/lib/server.jar" file="${build}/${ant.project.name}-server.jar"/>
 		<copy todir="${runtime.driver}/lib">
+			<fileset dir="${build}">
+				<include name="${ant.project.name}-node.jar"/>
+				<include name="${ant.project.name}-common.jar"/>
+				<include name="${ant.project.name}-server.jar"/>
+			</fileset>
 			<fileset dir="${lib}/log4j">
 				<include name="*.*"/>
+			</fileset>
+			<fileset dir="${lib}/ApacheCommons">
+				<include name="commons-io*.jar"/>
 			</fileset>
 		</copy>
 		<copy tofile="${runtime.driver}/${license.file}" file="${basedir}/${license.file}"/>
@@ -243,7 +248,7 @@
 	</target>
 
 	<target name="runtime.node">
-		<copy tofile="${runtime.node}/lib/node.jar" file="${build}/${ant.project.name}-node.jar"/>
+		<copy todir="${runtime.node}/lib" file="${build}/${ant.project.name}-node.jar"/>
 		<copy tofile="${runtime.node}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.node}/config">
 			<fileset dir="${config}/node">
