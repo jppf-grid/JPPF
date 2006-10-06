@@ -248,7 +248,14 @@
 	</target>
 
 	<target name="runtime.node">
-		<copy todir="${runtime.node}/lib" file="${build}/${ant.project.name}-node.jar"/>
+		<copy todir="${runtime.node}/lib">
+			<fileset dir="${build}">
+				<include name="${ant.project.name}-node.jar"/>
+			</fileset>
+			<fileset dir="${lib}/log4j">
+				<include name="*.*"/>
+			</fileset>
+		</copy>
 		<copy tofile="${runtime.node}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.node}/config">
 			<fileset dir="${config}/node">
