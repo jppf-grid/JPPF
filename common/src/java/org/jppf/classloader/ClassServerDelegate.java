@@ -140,7 +140,7 @@ public class ClassServerDelegate extends Thread
 					socketClient.send(resource);
 					if  (log.isInfoEnabled())
 					{
-						log.info("sent resource " + name + " (" + b.length + " bytes)");
+						log.debug("sent resource " + name + " (" + b.length + " bytes)");
 					}
 				}
 				catch(Exception e)

@@ -185,7 +185,7 @@ public class DriverLauncher
 	/**
 	 * Get the output of the driver process.
 	 * @param process the process to get the standard or error output from.
-	 * @param streamType detrmines whether to obtain the standard or error output..
+	 * @param streamType detrmines whether to obtain the standard or error output.
 	 * @return the output as a string.
 	 */
 	private static String getOutput(Process process, String streamType)
@@ -201,10 +201,7 @@ public class DriverLauncher
 			while (s != null)
 			{
 				s = reader.readLine();
-				if (s != null)
-				{
-					sb.append(s).append("\n");
-				}
+				if (s != null) sb.append(s).append("\n");
 			}
 		}
 		catch(Exception e)
