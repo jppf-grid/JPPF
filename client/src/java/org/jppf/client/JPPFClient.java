@@ -210,7 +210,7 @@ public class JPPFClient
 		if ((taskList != null) && (taskList.size() > 0))
 		{
 			totalTaskCount += taskList.size();
-			log.info("submitted " + totalTaskCount + " tasks");
+			log.debug("submitted " + totalTaskCount + " tasks");
 		}
 		Collections.sort(resultList, new Comparator<JPPFTask>()
 		{
