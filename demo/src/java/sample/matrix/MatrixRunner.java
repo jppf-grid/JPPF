@@ -57,13 +57,14 @@ public class MatrixRunner
 			TypedProperties props = JPPFConfiguration.getProperties();
 			int size = props.getInt("matrix.size",300);
 			int iterations = props.getInt("matrix.iterations",10);
-			System.out.println("Running Matrix demo with matrix size = "+size+"*"+size+" for "+iterations+" iterations");
+			output("Running Matrix demo with matrix size = "+size+"*"+size+" for "+iterations+" iterations");
 			perform(size, iterations);
 			System.exit(0);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			output("before exit(1)");
 			System.exit(1);
 		}
 	}
@@ -106,14 +107,24 @@ public class MatrixRunner
 					for (int j=0; j<row.length; j++) c.setValueAt(i, j, row[j]);
 				}
 				long elapsed = System.currentTimeMillis() - start;
-				System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
+				output("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
 			}
 			JPPFStats stats = jppfClient.requestStatistics();
-			System.out.println("End statistics :\n"+stats.toString());
+			output("End statistics :\n"+stats.toString());
 		}
 		catch(Exception e)
 		{
 			throw new JPPFException(e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * Print a message to the console and/or log file.
+	 * @param message the message to print.
+	 */
+	private static void output(String message)
+	{
+		System.out.println(message);
+		log.info(message);
 	}
 }
