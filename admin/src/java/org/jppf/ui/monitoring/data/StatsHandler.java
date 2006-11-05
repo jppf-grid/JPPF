@@ -254,6 +254,7 @@ public final class StatsHandler implements StatsConstants
 				getClass();
 			}
 			tickCount++;
+			/*
 			stats.execution.avgTime = (stats.totalTasksExecuted > 0)
 				? (double) stats.execution.totalTime / (double) stats.totalTasksExecuted : 0d;
 			stats.transport.avgTime = (stats.totalTasksExecuted > 0)
@@ -262,6 +263,7 @@ public final class StatsHandler implements StatsConstants
 				? (double) stats.nodeExecution.totalTime / (double) stats.totalTasksExecuted : 0d;
 			stats.queue.avgTime = (stats.totalQueued > 0)
 				? (double) stats.queue.totalTime / (double) stats.totalQueued : 0d;
+			*/
 			stats.avgTransportPerByte = (stats.footprint > 0)
 				? 1024d * 1024d * stats.transport.totalTime / stats.footprint : 0d;
 			dataList.add(stats);

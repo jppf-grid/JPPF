@@ -64,8 +64,9 @@ public class TimeSnapshot implements Serializable
 	 * Called when a new time has been collected.
 	 * @param time the new time used to compute the new statistics of this time snapshot.
 	 * @param count the unit count to which the time applies.
+	 * @param totalCount the total unit count to which the time applies.
 	 */
-	public void newTime(long time, int count)
+	public void newTime(long time, int count, int totalCount)
 	{
 		totalTime += time;
 		if (count > 0)
@@ -73,6 +74,7 @@ public class TimeSnapshot implements Serializable
 			latestTime = time/count;
 			if (latestTime > maxTime) maxTime = latestTime;
 			if (latestTime < minTime) minTime = latestTime;
+			if (totalCount > 0) avgTime = (double) totalTime / (double) totalCount;
 		}
 	}
 	
