@@ -38,6 +38,14 @@ public class JPPFQueue
 	 * Used for synchronized access to the queue.
 	 */
 	private ReentrantLock lock = new ReentrantLock();
+	/**
+	 * The maximum bundle size for the bundles present in the queue.
+	 */
+	private int maxBundleSize = 0;
+	/**
+	 * An ordered map of bundle sizes, mapping to a list of bundles of this size.
+	 */
+	private TreeMap<Integer, List<JPPFTaskBundle>> sizeMap = new TreeMap<Integer, List<JPPFTaskBundle>>(); 
 	
 	/**
 	 * Executable tasks queue, available for execution nodes to pick from. This
@@ -56,7 +64,17 @@ public class JPPFQueue
 		lock.lock();
 		try
 		{
+			if (queue.isEmpty()) setMaxBundleSize(0);
 			queue.add(bundle);
+			int size = bundle.getTaskCount();
+			if (size > maxBundleSize) setMaxBundleSize(size);
+			List<JPPFTaskBundle> list = sizeMap.get(size);
+			if (list == null)
+			{
+				list = new ArrayList<JPPFTaskBundle>();
+				sizeMap.put(size, list);
+			}
+			list.add(bundle);
 		}
 		finally
 		{
@@ -83,6 +101,12 @@ public class JPPFQueue
 			{
 				result = bundle;
 				queue.remove(bundle);
+				int size = bundle.getInitialTaskCount();
+				List<JPPFTaskBundle> list = sizeMap.get(size);
+				list.remove(bundle);
+				if (list.isEmpty()) sizeMap.remove(size);
+				//if (sizeMap.isEmpty()) setMaxBundleSize(0);
+				if (!sizeMap.isEmpty()) setMaxBundleSize(sizeMap.lastKey());
 			}
 			else result = bundle.copy(nbTasks);
 			result.setExecutionStartTime(System.currentTimeMillis());
@@ -141,5 +165,23 @@ public class JPPFQueue
 		{
 			lock.unlock();
 		}
+	}
+
+	/**
+	 * Get the maximum bundle size for the bundles present in the queue.
+	 * @return the bundle size as an int.
+	 */
+	public synchronized int getMaxBundleSize()
+	{
+		return maxBundleSize;
+	}
+
+	/**
+	 * Set the maximum bundle size for the bundles present in the queue.
+	 * @param maxBundleSize the bundle size as an int.
+	 */
+	public synchronized void setMaxBundleSize(int maxBundleSize)
+	{
+		this.maxBundleSize = maxBundleSize;
 	}
 }

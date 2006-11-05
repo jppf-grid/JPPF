@@ -66,6 +66,10 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 */
 	private int taskCount = 0;
 	/**
+	 * The initial number of tasks in this bundle.
+	 */
+	private int initialTaskCount = 0;
+	/**
 	 * The shared data provider for this task bundle.
 	 */
 	private transient byte[] dataProvider = null;
@@ -257,6 +261,10 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	public void setTaskCount(int taskCount)
 	{
 		this.taskCount = taskCount;
+		if (initialTaskCount <= 0)
+		{
+			initialTaskCount = taskCount;
+		}
 	}
 
 	/**
@@ -395,5 +403,14 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	public void setExecutionStartTime(long executionStartTime)
 	{
 		this.executionStartTime = executionStartTime;
+	}
+
+	/**
+	 * Get the initial task count of this bundle.
+	 * @return the task count as an int.
+	 */
+	public int getInitialTaskCount()
+	{
+		return initialTaskCount;
 	}
 }

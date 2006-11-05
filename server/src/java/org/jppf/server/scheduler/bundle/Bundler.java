@@ -34,7 +34,11 @@ public interface Bundler {
 	 * Log4j logger for this class.
 	 */
 	Logger LOG = Logger.getLogger(Bundler.class);
-	
+	/**
+	 * Determines whether debugging level is set for logging.
+	 */
+	boolean DEBUG_ENABLED = LOG.isDebugEnabled();
+
 	/**
 	 * Get the current size of bundle.
 	 * @return  the bundle size as an int value.
@@ -48,7 +52,7 @@ public interface Bundler {
 	 * @param bundleSize the bundle size used
 	 * @param totalTime the total time considering the transmission and execution.
 	 */
-	void feedback(int bundleSize, long totalTime) ;
+	void feedback(int bundleSize, double totalTime) ;
 
 	/**
 	 * Make a copy of this bundler.

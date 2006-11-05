@@ -165,7 +165,7 @@ public class PeerNode implements MonitoredNode
 			{
 				bundle.getUuidPath().add(driver.getUuid());
 				bundle.setCompletionListener(resultSender);
-				driver.getTaskQueue().addBundle(bundle);
+				JPPFDriver.getQueue().addBundle(bundle);
 				resultSender.run(bundle.getTaskCount());
 				taskCount += bundle.getTaskCount();
 				if (debugEnabled) log.debug("tasks executed: "+taskCount);

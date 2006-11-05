@@ -95,7 +95,7 @@ public class JPPFNodeServer extends JPPFNIOServer implements QueueListener {
 	 */
 	JPPFQueue getQueue() {
 		if (queue == null)
-			queue = JPPFDriver.getInstance().getTaskQueue();
+			queue = JPPFDriver.getQueue();
 		return queue;
 	}
 

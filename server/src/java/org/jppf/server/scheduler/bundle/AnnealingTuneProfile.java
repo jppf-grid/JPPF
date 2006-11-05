@@ -33,8 +33,8 @@ import org.jppf.utils.*;
  *  
  * @author Domingos Creado
  */
-public class AnnealingTuneProfile extends AbstractAutoTuneProfile {
-
+public class AnnealingTuneProfile extends AbstractAutoTuneProfile
+{
 	/**
 	 * This parameter defines the multiplicity used to define the range available to
 	 * random generator, as the maximum.
@@ -127,9 +127,11 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile {
 	 * @return an always positive diff to be applied to bundle size
 	 * @see org.jppf.server.scheduler.bundle.AutoTuneProfile#createDiff(int, int, java.util.Random)
 	 */
-	public int createDiff(int bestSize, int collectedSamples, Random rnd) {
-		long max = rnd.nextInt(Math.max(Math.round(bestSize * getSizeRatioDeviation()), 1));
-		return (int) expDist(max, collectedSamples);
+	public int createDiff(int bestSize, int collectedSamples, Random rnd)
+	{
+		return rnd.nextInt(Math.max(Math.round(bestSize * (getSizeRatioDeviation()-1f)), 1));
+		//long max = rnd.nextInt(Math.max(Math.round(bestSize * getSizeRatioDeviation()), 1));
+		//return (int) expDist(max, collectedSamples);
 	}
 	
 	/**
@@ -142,9 +144,10 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile {
 	 * @param x a randomly generated bundle size increment.
 	 * @return an int value.
 	 */
-	private double expDist(long max, long x) {
-		//return max * Math.pow(Math.E, -x * getDecreaseRatio());
-		return max * Math.exp(-x * getDecreaseRatio());
+	protected double expDist(long max, long x)
+	{
+		//return max * Math.exp(-x * getDecreaseRatio());
+		return (double) max / (double) (x * decreaseRatio);
 	}
 
 	/**

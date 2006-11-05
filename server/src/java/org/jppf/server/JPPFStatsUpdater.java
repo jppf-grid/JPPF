@@ -136,7 +136,7 @@ public final class JPPFStatsUpdater
 		{
 			stats.queueSize -= count;
 			stats.totalQueued += count;
-			stats.queue.newTime(time, count);
+			stats.queue.newTime(time, count, stats.totalQueued);
 		}
 		finally
 		{
@@ -157,13 +157,9 @@ public final class JPPFStatsUpdater
 		try
 		{
 			stats.totalTasksExecuted += count;
-			stats.execution.newTime(time, count);
-			stats.nodeExecution.newTime(remoteTime, count);
-			stats.transport.newTime(time - remoteTime, count);
-			if (time - remoteTime < 0)
-			{
-				stats.getClass();
-			}
+			stats.execution.newTime(time, count, stats.totalTasksExecuted);
+			stats.nodeExecution.newTime(remoteTime, count, stats.totalTasksExecuted);
+			stats.transport.newTime(time - remoteTime, count, stats.totalTasksExecuted);
 			stats.footprint += size;
 		}
 		finally
@@ -178,6 +174,11 @@ public final class JPPFStatsUpdater
 	 */
 	public static JPPFStats getStats()
 	{
+		return stats;
+	}
+	/*
+	public static JPPFStats getStats()
+	{
 		lock.lock();
 		try
 		{
@@ -188,6 +189,7 @@ public final class JPPFStatsUpdater
 			lock.unlock();
 		}
 	}
+	*/
 
 	/**
 	 * Determine whether the statistics collection is enabled.

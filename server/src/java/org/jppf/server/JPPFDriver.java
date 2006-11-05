@@ -152,9 +152,9 @@ public class JPPFDriver
 	 * Get the queue that handles the tasks to execute.
 	 * @return a JPPFQueue instance.
 	 */
-	public JPPFQueue getTaskQueue()
+	public static JPPFQueue getQueue()
 	{
-		return taskQueue;
+		return getInstance().taskQueue;
 	}
 	
 	/**

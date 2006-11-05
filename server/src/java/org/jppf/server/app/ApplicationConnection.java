@@ -312,7 +312,7 @@ public class ApplicationConnection extends JPPFConnection
 	 */
 	private JPPFQueue getQueue() {
 		if (queue == null)
-			queue = JPPFDriver.getInstance().getTaskQueue();
+			queue = JPPFDriver.getQueue();
 		return queue;
 	}
 

@@ -83,6 +83,7 @@ class CSendingJob implements ChannelState
 					nodeContext.bundler = server.getBundler().copy();
 				}
 				JPPFTaskBundle bundle = server.getQueue().nextBundle(nodeContext.bundler.getBundleSize());
+				//JPPFTaskBundle bundle = server.getQueue().nextBundle(server.getBundler().getBundleSize());
 				if (bundle != null)
 				{
 					// to avoid cycles in peer-to-peer routing of jobs.

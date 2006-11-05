@@ -94,8 +94,9 @@ class CWaitingResult implements ChannelState
 				// updating stats
 				if (isStatsEnabled())
 				{
-					nodeContext.bundler.feedback(bundle.getTaskCount(), elapsed);
 					taskExecuted(bundle.getTaskCount(), elapsed, bundle.getNodeExecutionTime(), out.getBundleBytes());
+					nodeContext.bundler.feedback(bundle.getTaskCount(), elapsed);
+					//server.getBundler().feedback(bundle.getTaskCount(), elapsed);
 				}
 				// notifing the client thread about the end of a bundle
 				if (listener != null) listener.taskCompleted(bundle);
