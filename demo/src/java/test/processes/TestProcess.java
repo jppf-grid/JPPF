@@ -23,6 +23,7 @@ import java.io.*;
 import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.jppf.process.*;
+import org.jppf.utils.StringUtils;
 
 /**
  * 
@@ -45,13 +46,14 @@ public class TestProcess
 
 	/**
 	 * Create a new node process using default values.
+	 * @param nodeNumber used to distinguish the node's log files form that of other nodes.
 	 * @return the started node process.
 	 * @throws Exception if an error occurs while building the process.
 	 */
-	public ProcessWrapper startNodeProcess() throws Exception
+	public ProcessWrapper startNodeProcess(int nodeNumber) throws Exception
 	{
 		Properties jppfConfig = ProcessConfig.buildNodeConfig();
-		Properties log4jConfig = ProcessConfig.buildLog4jConfig("node.log");
+		Properties log4jConfig = ProcessConfig.buildLog4jConfig("node" + nodeNumber + ".log", false);
 		return ProcessCommand.buildProcess("org.jppf.node.NodeLauncher", jppfConfig, log4jConfig, 64);
 	}
 	
@@ -63,7 +65,7 @@ public class TestProcess
 	public ProcessWrapper startDriverProcess() throws Exception
 	{
 		Properties jppfConfig = ProcessConfig.buildDriverConfig();
-		Properties log4jConfig = ProcessConfig.buildLog4jConfig("driver.log");
+		Properties log4jConfig = ProcessConfig.buildLog4jConfig("driver.log", false);
 		return ProcessCommand.buildProcess("org.jppf.server.DriverLauncher", jppfConfig, log4jConfig, 32);
 	}
 	
@@ -79,7 +81,7 @@ public class TestProcess
 		Properties jppfConfig = ProcessConfig.buildDriverConfig();
 		jppfConfig.setProperty("matrix.size", ""+matrixSize);
 		jppfConfig.setProperty("matrix.iterations", ""+nbIter);
-		Properties log4jConfig = ProcessConfig.buildLog4jConfig("matrix.log");
+		Properties log4jConfig = ProcessConfig.buildLog4jConfig("matrix.log", true);
 		return ProcessCommand.buildProcess("sample.matrix.MatrixRunner", jppfConfig, log4jConfig, 64);
 	}
 	
@@ -91,10 +93,11 @@ public class TestProcess
 	{
 		try
 		{
+			/*
 			TestProcess tp = new TestProcess();
 			ProcessWrapper driver = tp.startDriverProcess();
 			Thread.sleep(500);
-			ProcessWrapper node = tp.startNodeProcess();
+			ProcessWrapper node = tp.startNodeProcess(1);
 			Thread.sleep(1000);
 			ProcessWrapper sample = tp.startMatrixSampleProcess(300, 1);
 			sample.getProcess().waitFor();
@@ -103,12 +106,46 @@ public class TestProcess
 			printProcessOutput(driver, "driver");
 			node.getProcess().destroy();
 			driver.getProcess().destroy();
+			*/
+			testMatrixPerformance();
 		}
 		catch(Throwable t)
 		{
 			t.printStackTrace();
 		}
 		System.exit(1);
+	}
+
+	/**
+	 * Performance testing for the Matrix demo, with various sizes of the square matrix.
+	 * @throws Exception if an error occurs while running the test.
+	 */
+	public static void testMatrixPerformance() throws Exception
+	{
+		String line = StringUtils.padLeft("", '#', 80);
+		TestProcess tp = new TestProcess();
+		ProcessWrapper driver = tp.startDriverProcess();
+		Thread.sleep(500);
+		int[] matrixSize = new int[] { 300, 500, 700, 900, 1000 };
+		int[] nbNodes = new int[] { 1, 2 };
+		for (int i=0; i<nbNodes.length; i++)
+		{
+			ProcessWrapper[] nodes = new ProcessWrapper[nbNodes[i]];
+			for (int j=0; j<nbNodes[i]; j++) nodes[i] = tp.startNodeProcess(j);
+			Thread.sleep(1000);
+			for (int j=0; j<matrixSize.length; j++)
+			{
+				long start = System.currentTimeMillis();
+				output(line);
+				output("Sarting test with nbNodes = "+nbNodes[i]+", matrix size = "+matrixSize[j]+", nbIter = 15");
+				ProcessWrapper sample = tp.startMatrixSampleProcess(matrixSize[j], 15);
+				sample.getProcess().waitFor();
+				long time = System.currentTimeMillis() - start;
+				output("Test performed in "+StringUtils.toStringDuration(time)+" ("+time+" ms)");
+			}
+			for (int j=0; j<nbNodes[i]; j++) nodes[i].getProcess().destroy();
+		}
+		driver.getProcess().destroy();
 	}
 
 	/**

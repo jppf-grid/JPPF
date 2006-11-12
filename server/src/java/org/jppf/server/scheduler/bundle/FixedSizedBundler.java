@@ -56,7 +56,7 @@ public class FixedSizedBundler implements Bundler
 	 * This method does nothing.
 	 * @param bundleSize not used.
 	 * @param time not used.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, long)
+	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
 	 */
 	public void feedback(int bundleSize, double time) {
 		//just ignored

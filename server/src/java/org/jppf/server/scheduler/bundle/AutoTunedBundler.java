@@ -120,7 +120,7 @@ public class AutoTunedBundler implements Bundler
 	 * </ul>
 	 * @param bundleSize bundle size of the new performance sample.
 	 * @param time total execution time of the new sample.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, long)
+	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
 	 */
 	public void feedback(int bundleSize, double time)
 	{
@@ -174,7 +174,10 @@ public class AutoTunedBundler implements Bundler
 				currentSize = bestSize + diff;
 				if (samplesMap.get(currentSize) == null)
 				{
-					LOG.info("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + currentSize);
+					if (DEBUG_ENABLED)
+					{
+						LOG.debug("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + currentSize);
+					}
 					return;
 				}
 				counter++;

@@ -83,6 +83,11 @@ public class BooleanOption extends AbstractOption
 	{
 		if (value instanceof String) value = "true".equalsIgnoreCase((String) value);
 		super.setValue(value);
+		if (UIComponent != null)
+		{
+			((JCheckBox) UIComponent).setSelected((Boolean) value);
+			fireValueChanged();
+		}
 	}
 
 	/**

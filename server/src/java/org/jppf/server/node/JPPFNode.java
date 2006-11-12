@@ -187,7 +187,7 @@ public class JPPFNode implements MonitoredNode
 			if (notEmpty)
 			{
 				//if (debugEnabled) log.debug("End of node secondary loop");
-				log.info("node["+socket.getLocalPort()+"] executing "+taskList.size()+" tasks");
+				if (debugEnabled) log.debug("node["+socket.getLocalPort()+"] executing "+taskList.size()+" tasks");
 				List<Future> futureList = new ArrayList<Future>(taskList.size());
 				for (JPPFTask task : taskList)
 				{
