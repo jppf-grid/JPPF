@@ -21,6 +21,7 @@ package org.jppf.node;
 
 import java.net.Socket;
 import java.security.*;
+
 import org.apache.log4j.Logger;
 import org.jppf.JPPFNodeReloadNotification;
 import org.jppf.security.JPPFPolicy;
@@ -148,9 +149,11 @@ public class NodeLauncher
 			{
 				public JPPFClassLoader run()
 				{
-					return new JPPFClassLoader(NodeLauncher.class.getClassLoader());
+					JPPFClassLoader cl = new JPPFClassLoader(NodeLauncher.class.getClassLoader());
+					return cl;
 				}
 			});
+			Thread.currentThread().setContextClassLoader(classLoader);
 		}
 		return classLoader;
 	}

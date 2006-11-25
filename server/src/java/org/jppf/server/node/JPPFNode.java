@@ -191,7 +191,8 @@ public class JPPFNode implements MonitoredNode
 				List<Future> futureList = new ArrayList<Future>(taskList.size());
 				for (JPPFTask task : taskList)
 				{
-					futureList.add(threadPool.submit(new NodeTaskWrapper(this, task)));
+					NodeTaskWrapper taskWrapper = new NodeTaskWrapper(this, task, bundle.getUuidPath().getList());
+					futureList.add(threadPool.submit(taskWrapper));
 				}
 				for (Future future : futureList) future.get();
 			}
@@ -414,7 +415,7 @@ public class JPPFNode implements MonitoredNode
 	 * @return a <code>JPPFContainer</code> instance.
 	 * @throws Exception if an error occcurs while getting the container.
 	 */
-	private JPPFContainer getContainer(List<String> uuidPath) throws Exception
+	public JPPFContainer getContainer(List<String> uuidPath) throws Exception
 	{
 		String uuid = uuidPath.get(0);
 		JPPFContainer container = containerMap.get(uuid);

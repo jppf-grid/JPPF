@@ -38,6 +38,10 @@ public class ClassServerDelegate extends Thread
 	 */
 	private static Logger log = Logger.getLogger(ClassServerDelegate.class);
 	/**
+	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 */
+	private boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * The socket client uses to communicate over a socket connection.
 	 */
 	protected SocketWrapper socketClient = null;
@@ -133,15 +137,13 @@ public class ClassServerDelegate extends Thread
 				{
 					resource = (JPPFResourceWrapper) socketClient.receive();
 					String name = resource.getName();
+					if  (debugEnabled) log.debug("resource requested:" + name);
 					byte[] b = resourceProvider.getResourceAsBytes(name);
 					if (b == null) b = new byte[0];
 					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
 					resource.setDefinition(b);
 					socketClient.send(resource);
-					if  (log.isInfoEnabled())
-					{
-						log.debug("sent resource " + name + " (" + b.length + " bytes)");
-					}
+					if  (debugEnabled) log.debug("sent resource " + name + " (" + b.length + " bytes)");
 				}
 				catch(Exception e)
 				{

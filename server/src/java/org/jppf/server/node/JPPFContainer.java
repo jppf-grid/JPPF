@@ -87,7 +87,7 @@ public class JPPFContainer
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @return a <code>ClassLoader</code> used for loading the classes of the framework.
 	 */
-	private JPPFClassLoader getClassLoader()
+	public JPPFClassLoader getClassLoader()
 	{
 		if (classLoader == null)
 		{

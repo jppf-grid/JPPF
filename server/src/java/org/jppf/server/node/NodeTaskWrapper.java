@@ -19,6 +19,8 @@
  */
 package org.jppf.server.node;
 
+import java.util.List;
+
 import org.jppf.JPPFException;
 import org.jppf.server.protocol.JPPFTask;
 
@@ -35,16 +37,22 @@ class NodeTaskWrapper implements Runnable
 	 * The task to execute within a try/catch block.
 	 */
 	private JPPFTask task = null;
+	/**
+	 * The key to the JPPFContainer for the task's classloader.
+	 */
+	private List<String> uuidPath = null;
 
 	/**
 	 * Initialize this task wrapper with a specified JPPF task.
 	 * @param node the JPPF node that runs this task.
 	 * @param task the task to execute within a try/catch block.
+	 * @param uuidPath the key to the JPPFContainer for the task's classloader.
 	 */
-	public NodeTaskWrapper(JPPFNode node, JPPFTask task)
+	public NodeTaskWrapper(JPPFNode node, JPPFTask task, List<String> uuidPath)
 	{
 		this.node = node;
 		this.task = task;
+		this.uuidPath = uuidPath;
 	}
 
 	/**
@@ -56,6 +64,7 @@ class NodeTaskWrapper implements Runnable
 		if (node.notifying) node.incrementExecutingCount();
 		try
 		{
+			Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
 			task.run();
 		}
 		catch(Throwable t)

@@ -22,6 +22,8 @@ package sample.test;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+
+import org.jppf.JPPFException;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -36,7 +38,7 @@ public abstract class JPPFTestTask extends JPPFTask
 	protected List<ExecutionReport> reports = new ArrayList<ExecutionReport>();
 
 	/**
-	 * Initialize this task with a specified row of values to multiply.
+	 * Initialize this task.
 	 */
 	public JPPFTestTask()
 	{
@@ -76,6 +78,7 @@ public abstract class JPPFTestTask extends JPPFTask
 				PrintWriter writer = new PrintWriter(sw);
 				t.printStackTrace(writer);
 				report.stackTrace = sw.toString();
+				setException((t instanceof Exception) ? (Exception) t : new JPPFException(t));
 			}
 			reports.add(report);
 		}

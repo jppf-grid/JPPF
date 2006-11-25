@@ -22,6 +22,8 @@ package org.jppf.node;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.apache.log4j.Logger;
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
 
@@ -32,6 +34,14 @@ import org.jppf.utils.*;
  */
 public class JPPFClassLoader extends ClassLoader
 {
+	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(JPPFClassLoader.class);
+	/**
+	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 */
+	private boolean debugEnabled = false;
 	/**
 	 * Wrapper for the underlying socket connection.
 	 */
@@ -167,9 +177,14 @@ public class JPPFClassLoader extends ClassLoader
 		{
 			ClassLoader parent = getParent();
 			if (parent instanceof JPPFClassLoader)
+			{
 				c = ((JPPFClassLoader) parent).findAlreadyLoadedClass(name);
+			}
 		}
-		if (c == null) return findClass(name);
+		if (c == null)
+		{
+			c = findClass(name);
+		}
 		return c;
 	}
 
@@ -182,15 +197,18 @@ public class JPPFClassLoader extends ClassLoader
 	 */
 	public Class<?> findClass(String name) throws ClassNotFoundException
 	{
-		byte[] b = null;
-		if ("sample.matrix.Matrix".equals(name))
+		try
 		{
-			getClass();
-		}
+		byte[] b = null;
 		String resName = name.replace('.', '/') + ".class";
 		b = loadResourceData(resName);
 		if ((b == null) || (b.length == 0)) throw new ClassNotFoundException("Could not load class '" + name + "'");
 		return defineClass(name, b, 0, b.length);
+		}
+		catch(Error e)
+		{
+			throw e;
+		}
 	}
 
 	/**
@@ -293,5 +311,44 @@ public class JPPFClassLoader extends ClassLoader
 	private static synchronized void setInitializing(boolean initFlag)
 	{
 		initializing = initFlag;
+	}
+
+	/**
+	 * Load a class from the classpath.
+	 * @param name the name of the class to load.
+	 * @return a Class instance.
+	 * @throws ClassNotFoundException if the class could not be found.
+	 * @see java.lang.ClassLoader#loadClass(java.lang.String)
+	 */
+	public Class<?> loadClass(String name) throws ClassNotFoundException
+	{
+		Class c = null;
+		try
+		{
+			c = super.loadClass(name);
+		}
+		catch(ClassNotFoundException e)
+		{
+		}
+		if (c == null)
+		{
+			c = findClass(name);
+		}
+		return c;
+	}
+
+	/**
+	 * @param name the binary name of the class
+	 * @return the resulting <tt>Class</tt> object
+	 * @throws ClassNotFoundException if the class could not be found
+	 */
+	public synchronized Class<?> forceLoadJPPFClass(String name) throws ClassNotFoundException
+	{
+		Class c = findLoadedClass(name);
+		if (c == null)
+		{
+			c = findClass(name);
+		}
+		return c;
 	}
 }

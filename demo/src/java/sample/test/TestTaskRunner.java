@@ -231,7 +231,7 @@ public class TestTaskRunner
 			JPPFTask resultTask = results.get(0);
 			if (resultTask.getException() != null)
 			{
-				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
+				System.out.println("Exception was caught: "+getStackTrace(resultTask.getException()));
 			}
 			else
 			{
@@ -270,7 +270,7 @@ public class TestTaskRunner
 			System.out.println("Result is:");
 			for (JPPFTask t: results)
 			{
-				System.out.println(""+t);
+				System.out.println(""+t.getResult());
 				if  (null != t.getException())
 				{
 					t.getException().printStackTrace();
