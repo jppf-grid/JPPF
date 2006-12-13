@@ -19,19 +19,17 @@
  */
 package org.jppf.client;
 
-import static org.jppf.server.protocol.AdminRequest.*;
-import java.io.*;
+import static org.jppf.client.JPPFClientConnectionStatus.*;
+
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.ReentrantLock;
-import javax.crypto.SecretKey;
+
 import org.apache.log4j.Logger;
-import org.jppf.classloader.ClassServerDelegate;
+import org.jppf.JPPFError;
 import org.jppf.client.event.*;
-import org.jppf.comm.socket.*;
-import org.jppf.security.*;
+import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.JPPFStats;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 
@@ -42,48 +40,16 @@ import org.jppf.utils.*;
  * should be dynamically reloaded or not, depending on whether the uuid has changed or not.
  * @author Laurent Cohen
  */
-public class JPPFClient
+public class JPPFClient implements ClientConnectionStatusListener
 {
 	/**
 	 * Log4j logger for this class.
 	 */
 	private static Logger log = Logger.getLogger(JPPFClient.class);
 	/**
-	 * The socket client used to communicate over a socket connection.
-	 */
-	protected SocketWrapper socketClient = null;
-	/**
-	 * Enables loading local classes onto remote nodes.
-	 */
-	private ClassServerDelegate delegate = null;
-	/**
-	 * Utility for deserialization and serialization.
-	 */
-	private SerializationHelper helper = null;
-	/**
-	 * Unique identifier for this JPPF client.
-	 */
-	private String appUuid = null;
-	/**
-	 * Used to synchronize access to the underlying socket from multiple threads.
-	 */
-	private SocketInitializer socketInitializer = new SocketInitializer();
-	/**
-	 * Used to synchronize request submissions performed by mutliple threads.
-	 */
-	private ReentrantLock lock = new ReentrantLock();
-	/**
 	 * The pool of threads used for submitting execution requests.
 	 */
 	private ExecutorService executor = Executors.newFixedThreadPool(1);
-	/**
-	 * The name or IP address of the host the JPPF driver is running on.
-	 */
-	private String host = null;
-	/**
-	 * The TCP port the JPPF driver listening to for submitted tasks.
-	 */
-	private int port = -1;
 	/**
 	 * Security credentials associated with the application.
 	 */
@@ -92,6 +58,10 @@ public class JPPFClient
 	 * Total count of the tasks submitted by this client.
 	 */
 	private int totalTaskCount = 0;
+	/**
+	 * Contains all the connections pools in ascending priority order.
+	 */
+	private TreeMap<Integer, ClientPool> pools = new TreeMap<Integer, ClientPool>(new DescendingIntegerComparator());
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -107,44 +77,57 @@ public class JPPFClient
 	 */
 	public JPPFClient(String uuid)
 	{
-		TypedProperties props = JPPFConfiguration.getProperties();
-		String driverHost = props.getString("jppf.server.host", "localhost");
-		int driverPort = props.getInt("app.server.port", 11112);
-		int classServerPort = props.getInt("class.server.port", 11111);
-		init(uuid, driverHost, driverPort, classServerPort);
+		initPools();
 	}
 
 	/**
-	 * Initialize this client with a specified application UUID.
-	 * @param uuid the unique identifier for this local client.
-	 * @param host the name or IP address of the host the JPPF driver is running on.
-	 * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
-	 * @param classServerPort the TCP port the class server is listening to.
+	 * Read all client connection information from the configuration and initialize
+	 * the connection pools accordingly.
 	 */
-	public JPPFClient(String uuid, String host, int driverPort, int classServerPort)
-	{
-		init(uuid, host, driverPort, classServerPort);
-	}
-
-	/**
-	 * Initialize this client with a specified application UUID.
-	 * @param uuid the unique identifier for this local client.
-	 * @param host the name or IP address of the host the JPPF driver is running on.
-	 * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
-	 * @param classServerPort the TCP port the class server is listening to.
-	 */
-	private void init(String uuid, String host, int driverPort, int classServerPort)
+	public void initPools()
 	{
 		try
 		{
-			this.appUuid = uuid;
-			initHelper();
-			this.host = host;
-			this.port = driverPort;
-			delegate = new ClassServerDelegate(uuid, host, classServerPort);
-			initCredentials();
-			delegate.start();
-			initConnection();
+			TypedProperties props = JPPFConfiguration.getProperties();
+			String driverNames = props.getString("jppf.drivers");
+			String[] names = null;
+			// if config file is still used as with single client version
+			if ((driverNames == null) || "".equals(driverNames.trim()))
+			{
+				names = new String[] { "" };
+			}
+			else
+			{
+				names = driverNames.split("\\s");
+			}
+			for (String s: names)
+			{
+				String prefix = "".equals(s) ? "" : s + ".";
+				String name = "".equals(s) ? "default" : s;
+				String uuid = new JPPFUuid().toString();
+				String host = props.getString(prefix + "jppf.server.host", "localhost");
+				int driverPort = props.getInt(prefix + "app.server.port", 11112);
+				int classServerPort = props.getInt(prefix + "class.server.port", 11111);
+				int priority = props.getInt(prefix + "priority", 0);
+				JPPFClientConnection c = new JPPFClientConnection(uuid, name, host, driverPort, classServerPort, priority);
+				c.addClientConnectionStatusListener(this);
+				ClientPool pool = pools.get(priority);
+				if (pool == null)
+				{
+					pool = new ClientPool();
+					pool.priority = priority;
+					pools.put(priority, pool);
+				}
+				pool.clientList.add(c);
+			}
+			for (Integer priority: pools.keySet())
+			{
+				ClientPool pool = pools.get(priority);
+				for (JPPFClientConnection c: pool.clientList)
+				{
+					executor.submit(new ConnectionInitializer(c));
+				}
+			}
 		}
 		catch(Exception e)
 		{
@@ -153,26 +136,50 @@ public class JPPFClient
 	}
 
 	/**
-	 * Initialize this node's resources.
-	 * @throws Exception if an error is raised during initialization.
+	 * Get an available connection with the highest possible priority.
+	 * @return a <code>JPPFClientConnection</code> with the highest possible priority.
 	 */
-	public synchronized void initConnection() throws Exception
+	private JPPFClientConnection getClientConnection()
 	{
-		if (socketClient == null) initSocketClient();
-		System.out.println("JPPFClient.init(): Attempting connection to the JPPF driver");
-		socketInitializer.initializeSocket(socketClient);
-		System.out.println("JPPFClient.init(): Reconnected to the JPPF driver");
-	}
-
-	/**
-	 * Initialize this node's resources.
-	 * @throws Exception if an error is raised during initialization.
-	 */
-	public void initSocketClient() throws Exception
-	{
-		socketClient = new SocketClient();
-		socketClient.setHost(host);
-		socketClient.setPort(port);
+		JPPFClientConnection client = null;
+		while ((client == null) && !pools.isEmpty())
+		{
+			Iterator<Integer> poolIterator = pools.keySet().iterator();
+			while (poolIterator.hasNext())
+			{
+				int priority = poolIterator.next();
+				ClientPool pool = pools.get(priority);
+				int size = pool.clientList.size();
+				int count = 0;
+				while (count < size)
+				{
+					JPPFClientConnection c = pool.nextClient();
+					if (SUCCESSFUL.equals(c.getStatus()))
+					{
+						client = c;
+						break;
+					}
+					else if (FAILED.equals(c.getStatus()))
+					{
+						pool.clientList.remove(c);
+						size--;
+						if (pool.lastUsedIndex >= size) pool.lastUsedIndex--;
+						if (pool.clientList.isEmpty()) poolIterator.remove();
+					}
+					else if (CONNECTING.equals(c.getStatus()))
+					{
+						// nothing to do, just continue to the next connection or next pool
+						// with a lower priority.
+					}
+					count++;
+				}
+			}
+			if (pools.isEmpty())
+			{
+				throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
+			}
+		}
+		return client;
 	}
 
 	/**
@@ -181,12 +188,6 @@ public class JPPFClient
 	 */
 	public void initCredentials() throws Exception
 	{
-		StringBuilder sb = new StringBuilder("Client:");
-		sb.append(VersionUtils.getLocalIpAddress()).append(":");
-		TypedProperties props = JPPFConfiguration.getProperties();
-		sb.append(props.getInt("class.server.port", 11111)).append(":");
-		sb.append(port).append(":");
-		credentials = new JPPFSecurityContext(appUuid, sb.toString(), new JPPFCredentials());
 	}
 
 	/**
@@ -198,28 +199,19 @@ public class JPPFClient
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
 	{
-		final List<JPPFTask> resultList = new ArrayList<JPPFTask>();
-		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(taskList, dataProvider, new TaskResultListener()
+		List<JPPFTask> result = null;
+		while ((result == null) && !pools.isEmpty())
 		{
-			public void resultsReceived(TaskResultEvent event)
+			try
 			{
-				resultList.addAll(event.getTaskList());
+				result = getClientConnection().submit(taskList, dataProvider);
 			}
-		});
-		proc.run();
-		if ((taskList != null) && (taskList.size() > 0))
-		{
-			totalTaskCount += taskList.size();
-			log.debug("submitted " + totalTaskCount + " tasks");
+			catch(Exception e)
+			{
+				if (pools.isEmpty()) throw e;
+			}
 		}
-		Collections.sort(resultList, new Comparator<JPPFTask>()
-		{
-			public int compare(JPPFTask o1, JPPFTask o2)
-			{
-				return o1.getPosition() - o2.getPosition();
-			}
-		});
-		return resultList;
+		return result;
 	}
 
 	/**
@@ -232,58 +224,7 @@ public class JPPFClient
 	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
 			throws Exception
 	{
-		AsynchronousResultProcessor proc =
-			new AsynchronousResultProcessor(taskList, dataProvider, listener);
-		executor.submit(proc);
-	}
-
-	/**
-	 * Send tasks to the server for execution.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @throws Exception if an error occurs while sending the request.
-	 */
-	private void sendTasks(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
-	{
-		JPPFRequestHeader header = new JPPFRequestHeader();
-		header.setRequestType(JPPFRequestHeader.Type.NON_BLOCKING_EXECUTION);
-		header.setAppUuid(appUuid);
-		header.setCredentials(credentials);
-		int count = taskList.size();
-		header.setTaskCount(count);
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(baos);
-		helper.writeNextObject(header, dos, false);
-		helper.writeNextObject(dataProvider, dos, true);
-		for (JPPFTask task : taskList) helper.writeNextObject(task, dos, true);
-		dos.flush();
-		dos.close();
-		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
-		socketClient.sendBytes(buf);
-	}
-
-	/**
-	 * Receive results of tasks execution.
-	 * @return a pair of objects representing the executed tasks results, and the index of the first result within the
-	 *         initial task execution request.
-	 * @throws Exception if an error is raised while reading the results from the server.
-	 */
-	private Pair<List<JPPFTask>, Integer> receiveResults() throws Exception
-	{
-		JPPFBuffer buf = socketClient.receiveBytes(0);
-		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-		ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
-		DataInputStream dis = new DataInputStream(bais);
-		int count = dis.readInt();
-		for (int i = 0; i < count; i++)
-		{
-			JPPFTask task = (JPPFTask) helper.readNextObject(dis, true);
-			taskList.add(task);
-		}
-		int startIndex = (taskList.isEmpty()) ? -1 : taskList.get(0).getPosition();
-		dis.close();
-		Pair<List<JPPFTask>, Integer> p = new Pair<List<JPPFTask>, Integer>(taskList, startIndex);
-		return p;
+		getClientConnection().submitNonBlocking(taskList, dataProvider, listener);
 	}
 
 	/**
@@ -293,45 +234,7 @@ public class JPPFClient
 	 */
 	public JPPFStats requestStatistics() throws Exception
 	{
-		lock.lock();
-		try
-		{
-			boolean completed = false;
-			JPPFStats stats = null;
-			while (!completed)
-			{
-				try
-				{
-					JPPFRequestHeader header = new JPPFRequestHeader();
-					header.setAppUuid(appUuid);
-					header.setCredentials(credentials);
-					header.setRequestType(JPPFRequestHeader.Type.STATISTICS);
-					ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-					DataOutputStream dos = new DataOutputStream(baos);
-					helper.writeNextObject(header, dos, false);
-					dos.flush();
-					dos.close();
-					JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
-					socketClient.sendBytes(buf);
-					buf = socketClient.receiveBytes(0);
-					ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
-					DataInputStream dis = new DataInputStream(bais);
-					stats = (JPPFStats) helper.readNextObject(dis, false);
-					dis.close();
-					completed = true;
-				}
-				catch(IOException e)
-				{
-					log.error(e.getMessage(), e);
-					initConnection();
-				}
-			}
-			return stats;
-		}
-		finally
-		{
-			lock.unlock();
-		}
+		return getClientConnection().requestStatistics();
 	}
 
 	/**
@@ -346,143 +249,129 @@ public class JPPFClient
 	public String submitAdminRequest(String password, String newPassword, String command, Map<String, Object> parameters)
 			throws Exception
 	{
-		lock.lock();
-		try
+		return getClientConnection().submitAdminRequest(password, newPassword, command, parameters);
+	}
+
+	/**
+	 * Invoked the status of a client connection has changed.
+	 * @param event the event to notify of.
+	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+	 */
+	public void statusChanged(ClientConnectionStatusEvent event)
+	{
+		JPPFClientConnection c = event.getJPPFClientConnection();
+		if (c.getStatus().equals(JPPFClientConnectionStatus.FAILED))
 		{
-			AdminRequest request = new AdminRequest();
-			request.setAppUuid(appUuid);
-			request.setCredentials(credentials);
-			request.setRequestType(JPPFRequestHeader.Type.ADMIN);
-			request.setParameter(COMMAND_PARAM, command);
-			SecretKey tmpKey = CryptoUtils.generateSecretKey();
-			request.setParameter(KEY_PARAM, CryptoUtils.encrypt(tmpKey.getEncoded()));
-			request.setParameter(PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, password.getBytes()));
-			if (newPassword != null)
+			log.info("Connection [" + c.name + "] failed - resubmitting tasks");
+			c.removeClientConnectionStatusListener(this);
+			int priority = c.getPriority();
+			ClientPool pool = pools.get(priority);
+			if (pool != null)
 			{
-				request.setParameter(NEW_PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, newPassword.getBytes()));
-			}
-			if (parameters != null)
-			{
-				for (String key: parameters.keySet())
+				pool.clientList.remove(c);
+				if (pool.clientList.isEmpty()) pools.remove(priority);
+				if (pools.isEmpty())
 				{
-					request.setParameter(key, parameters.get(key));
+					throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
 				}
 			}
-			sendAdminRequest(request);
-			JPPFBuffer buf = socketClient.receiveBytes(0);
-			ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
-			DataInputStream dis = new DataInputStream(bais);
-			request = (AdminRequest) helper.readNextObject(dis, false);
-			dis.close();
-			return (String) request.getParameter(RESPONSE_PARAM);
+			List<ClientExecution> toResubmit = c.shutdownConnection();
+			if (c != null)
+			{
+				try
+				{
+					for (ClientExecution execution: toResubmit)
+					{
+						if (execution.isBlocking)
+						{
+							submit(execution.tasks, execution.dataProvider);
+						}
+						else
+						{
+							submitNonBlocking(execution.tasks, execution.dataProvider, execution.listener);
+						}
+					}
+				}
+				catch(Exception e)
+				{
+					log.error(e.getMessage(), e);
+				}
+			}
 		}
-		finally
+	}
+
+	/**
+	 * Instances of this class manage a list of client connections with the same priority.
+	 */
+	private class ClientPool
+	{
+		/**
+		 * The priority associated with this client pool.
+		 */
+		public int priority = 0;
+		/**
+		 * Index of the last used client in the pool.
+		 */
+		public int lastUsedIndex = 0;
+		/**
+		 * List of <code>JPPFClientConnection</code> instances with the same priority.
+		 */
+		public List<JPPFClientConnection> clientList = new ArrayList<JPPFClientConnection>();
+
+		/**
+		 * Get the next client connection.
+		 * @return a <code>JPPFClientConnection</code> instances.
+		 */
+		public JPPFClientConnection nextClient()
 		{
-			lock.unlock();
+			lastUsedIndex = ++lastUsedIndex % clientList.size();
+			return clientList.get(lastUsedIndex);
 		}
 	}
 
 	/**
-	 * Send an administration request to the server.
-	 * @param request the request to send, with its parameters populated.
-	 * @throws Exception if the request could not be sent.
+	 * This comparator defines a decending value order for integers.
 	 */
-	private void sendAdminRequest(AdminRequest request) throws Exception
-	{
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(baos);
-		helper.writeNextObject(request, dos, false);
-		dos.flush();
-		dos.close();
-		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
-		socketClient.sendBytes(buf);
-	}
-
-	/**
-	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
-	 * @throws Exception if an error occcurs while instantiating the class loader.
-	 */
-	private void initHelper() throws Exception
-	{
-		helper = new SerializationHelperImpl();
-	}
-
-	/**
-	 * 
-	 */
-	private class AsynchronousResultProcessor implements Runnable
+	private class DescendingIntegerComparator implements Comparator<Integer>
 	{
 		/**
-		 * The list of tasks to execute remotely.
+		 * Compare two integers.
+		 * @param o1 first integer to compare.
+		 * @param o2 second integrto compare.
+		 * @return -1 if o1 > o2, 0 if o1 == o2, 1 if o1 < o2
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
-		private List<JPPFTask> taskList = null;
-		/**
-		 * The provider of the data shared among tasks, may be null.
-		 */
-		private DataProvider dataProvider = null;
-		/**
-		 * Listener to notify whenever a set of results have been received.
-		 */
-		private TaskResultListener listener = null;
-
-		/**
-		 * Initialize this result processor with a specified list of tasks, data provider and result listener.
-		 * @param taskList the list of tasks to execute remotely.
-		 * @param dataProvider the provider of the data shared among tasks, may be null.
-		 * @param listener listener to notify whenever a set of results have been received.
-		 */
-		public AsynchronousResultProcessor(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
+		public int compare(Integer o1, Integer o2)
 		{
-			this.taskList = taskList;
-			this.dataProvider = dataProvider;
-			this.listener = listener;
+			return o1.compareTo(o2);
+		}
+	}
+
+	/**
+	 * Wrapper class for the initialization of a client connection.
+	 */
+	private class ConnectionInitializer implements Runnable
+	{
+		/**
+		 * The client connection to initialize.
+		 */
+		private JPPFClientConnection c = null;
+		/**
+		 * Instantiate this connection initializer with the specified client connection.
+		 * @param c the client connection to initialize.
+		 */
+		public ConnectionInitializer(JPPFClientConnection c)
+		{
+			this.c = c;
 		}
 
 		/**
-		 * This method executes until all partial results have been received.
+		 * Perform the initialization of a client connection.
 		 * @see java.lang.Runnable#run()
 		 */
 		public void run()
 		{
-			lock.lock();
-			try
-			{
-				int count = 0;
-				for (JPPFTask task : taskList) task.setPosition(count++);
-				count = 0;
-				boolean completed = false;
-				while (!completed)
-				{
-					try
-					{
-						sendTasks(taskList, dataProvider);
-						while (count < taskList.size())
-						{
-							Pair<List<JPPFTask>, Integer> p = receiveResults();
-							count += p.first().size();
-							if (listener != null) listener.resultsReceived(new TaskResultEvent(p.first(), p.second()));
-						}
-						completed = true;
-					}
-					catch(NotSerializableException e)
-					{
-						throw e;
-					}
-					catch(Exception e)
-					{
-						log.error(e.getMessage(), e);
-						initConnection();
-					}
-				}
-			}
-			catch(Exception e)
-			{
-				log.error(e.getMessage(), e);
-			}
-			finally
-			{
-				lock.unlock();
-			}
+			c.init();
 		}
 	}
 }

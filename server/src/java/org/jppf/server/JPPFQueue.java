@@ -103,9 +103,12 @@ public class JPPFQueue
 				queue.remove(bundle);
 				int size = bundle.getInitialTaskCount();
 				List<JPPFTaskBundle> list = sizeMap.get(size);
-				list.remove(bundle);
-				if (list.isEmpty()) sizeMap.remove(size);
-				//if (sizeMap.isEmpty()) setMaxBundleSize(0);
+				if (list != null)
+				{
+					list.remove(bundle);
+					if (list.isEmpty()) sizeMap.remove(size);
+					//if (sizeMap.isEmpty()) setMaxBundleSize(0);
+				}
 				if (!sizeMap.isEmpty()) setMaxBundleSize(sizeMap.lastKey());
 			}
 			else result = bundle.copy(nbTasks);

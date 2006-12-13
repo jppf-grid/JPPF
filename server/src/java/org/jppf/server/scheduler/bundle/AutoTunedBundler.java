@@ -57,11 +57,6 @@ public class AutoTunedBundler implements Bundler
 	protected int currentSize;
 
 	/**
-	 * The mean performance value associated with the current bundle size.
-	 */
-	protected double stableMean;
-
-	/**
 	 * Used to compute a pseudo-random increment to the bundle size, as part of a Monte Carlo random walk
 	 * towards a good solution.
 	 */
@@ -157,6 +152,7 @@ public class AutoTunedBundler implements Bundler
 	 */
 	private void performAnalysis()
 	{
+		double stableMean = 0;
 		synchronized (samplesMap)
 		{
 			int bestSize = searchBestSize();

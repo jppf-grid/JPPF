@@ -157,7 +157,7 @@ public class ApplicationConnection extends JPPFConnection
 			if (debugEnabled)
 			{
 				StringBuilder sb = new StringBuilder("deserialized task in ").append(taskBytes.length).append(" bytes");
-				log.debug(sb.toString());
+				//log.debug(sb.toString());
 				if (dumpEnabled)
 				{
 					sb = new StringBuilder("bytes: ").append(StringUtils.dumpBytes(taskBytes, 0, taskBytes.length));

@@ -72,7 +72,7 @@ public class TestProcess
 	/**
 	 * Create a new matrix sample process using default values.
 	 * @param matrixSize size of the matrix to use.
-	 * @param nbIter number of times the computation will be eprformed.
+	 * @param nbIter number of times the computation will be performed.
 	 * @return the started node process.
 	 * @throws Exception if an error occurs while building the process.
 	 */

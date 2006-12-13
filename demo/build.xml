@@ -52,6 +52,7 @@
   <path id="node.classpath">
 		<pathelement location="${config.dir}"/>
 		<pathelement location="${basedir}/../node/classes"/>
+		<pathelement location="${jppf.lib}/log4j/log4j-1.2.9.jar"/>
   </path>
 
   <path id="gui.classpath">

@@ -21,6 +21,7 @@ package org.jppf.node;
 
 import java.net.Socket;
 import java.security.*;
+import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.jppf.JPPFNodeReloadNotification;
@@ -51,6 +52,10 @@ public class NodeLauncher
 	 * disconnect from the server.
 	 */
 	private static Socket nodeSocket = null;
+	/**
+	 * Container for data stored at the JVM level.
+	 */
+	private static Hashtable<Object, Object> persistentData = new Hashtable<Object, Object>();
 
 	/**
 	 * Run a node as a standalone application.
@@ -156,5 +161,25 @@ public class NodeLauncher
 			Thread.currentThread().setContextClassLoader(classLoader);
 		}
 		return classLoader;
+	}
+
+	/**
+	 * Set a persistent object with the specified key.
+	 * @param key the key used to retrieve the object.
+	 * @param value the object to persist.
+	 */
+	public static void setPersistentData(Object key, Object value)
+	{
+		persistentData.put(key, value);
+	}
+
+	/**
+	 * Get a persistent object given its key.
+	 * @param key the used to find a persistent object.
+	 * @return the value associated with the key.
+	 */
+	public static Object getPersistentData(Object key)
+	{
+		return persistentData.get(key);
 	}
 }

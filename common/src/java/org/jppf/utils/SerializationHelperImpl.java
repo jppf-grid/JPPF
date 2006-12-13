@@ -153,7 +153,7 @@ public class SerializationHelperImpl implements SerializationHelper
 		else actual = temp;
 		if (debugEnabled)
 		{
-			log.debug(""+actual.length+" bytes to deserialize");
+			//log.debug(""+actual.length+" bytes to deserialize");
 			if (dumpEnabled)
 				log.debug("bytes to deserialize:\n"+ StringUtils.dumpBytes(actual, 0, actual.length));
 		}
@@ -174,7 +174,7 @@ public class SerializationHelperImpl implements SerializationHelper
 		JPPFBuffer buf = getSerializer().serialize(o);
 		if (debugEnabled)
 		{
-			log.debug(""+buf.getLength()+" bytes to serialize");
+			//log.debug(""+buf.getLength()+" bytes to serialize");
 			if (dumpEnabled)
 				log.debug("dump of bytes to serialize:\n"+ StringUtils.dumpBytes(buf.getBuffer(), 0, buf.getLength()));
 		}

@@ -62,7 +62,7 @@ public final class CompressionUtils
 		dos.write(bytes, start, length);
 		dos.flush();
 		dos.close();
-		if (debugEnabled) log.debug("compressed "+length+" bytes into "+baos.size());
+		//if (debugEnabled) log.debug("compressed "+length+" bytes into "+baos.size());
 		return baos.toByteArray();
 	}
 
@@ -90,7 +90,7 @@ public final class CompressionUtils
 			count += n;
 		}
 		dis.close();
-		if (debugEnabled) log.debug("uncompressed "+length+" bytes into "+result.length);
+		//if (debugEnabled) log.debug("uncompressed " + length + " bytes into " + len);
 		return result;
 	}
 }

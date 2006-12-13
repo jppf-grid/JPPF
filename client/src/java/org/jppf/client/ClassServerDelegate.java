@@ -17,9 +17,11 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.classloader;
+package org.jppf.client;
 
 import org.apache.log4j.Logger;
+import org.jppf.JPPFException;
+import org.jppf.classloader.ResourceProvider;
 import org.jppf.comm.socket.*;
 import org.jppf.node.JPPFResourceWrapper;
 
@@ -73,6 +75,14 @@ public class ClassServerDelegate extends Thread
 	 * The TCP port the class server is listening to.
 	 */
 	private int port = -1;
+	/**
+	 * The client connection which owns this delegate.
+	 */
+	private JPPFClientConnection owner = null;
+	/**
+	 * Configuration name for this local client.
+	 */
+	private String name = null;
 
 	/**
 	 * Default instantiation of this class is not permitted.
@@ -83,16 +93,19 @@ public class ClassServerDelegate extends Thread
 
 	/**
 	 * Initialize class server delegate with a spceified application uuid.
+	 * @param owner the client connection which owns this delegate.
 	 * @param uuid the unique identifier for the local JPPF client.
 	 * @param host the name or IP address of the host the class server is running on.
 	 * @param port the TCP port the class server is listening to.
 	 * @throws Exception if the connection could not be opended.
 	 */
-	public ClassServerDelegate(String uuid, String host, int port) throws Exception
+	public ClassServerDelegate(JPPFClientConnection owner, String uuid, String host, int port) throws Exception
 	{
 		this.appUuid = uuid;
 		this.host = host;
 		this.port = port;
+		this.owner = owner;
+		this.name = owner.name;
 		init();
 	}
 
@@ -102,10 +115,24 @@ public class ClassServerDelegate extends Thread
 	 */
 	public final void init() throws Exception
 	{
-		if (socketClient == null) initSocketClient();
-		System.out.println("ClassServerDelegate.init(): Attempting connection to the class server");
-		socketInitializer.initializeSocket(socketClient);
-		System.out.println("ClassServerDelegate.init(): Reconnected to the class server");
+		try
+		{
+			owner.setStatus(JPPFClientConnectionStatus.CONNECTING);
+			if (socketClient == null) initSocketClient();
+			System.out.println("[client: "+name+"] ClassServerDelegate.init(): Attempting connection to the class server");
+			socketInitializer.initializeSocket(socketClient);
+			if (!socketInitializer.isSuccessfull())
+			{
+				throw new JPPFException("["+name+"] Could not reconnect to the JPPF Driver");
+			}
+			System.out.println("[client: "+name+"] ClassServerDelegate.init(): Reconnected to the class server");
+			owner.setStatus(JPPFClientConnectionStatus.SUCCESSFUL);
+		}
+		catch(Exception e)
+		{
+			owner.setStatus(JPPFClientConnectionStatus.FAILED);
+			throw new Exception(e);
+		}
 	}
 
 	/**
@@ -135,26 +162,35 @@ public class ClassServerDelegate extends Thread
 			{
 				try
 				{
+					boolean found = true;
 					resource = (JPPFResourceWrapper) socketClient.receive();
 					String name = resource.getName();
-					if  (debugEnabled) log.debug("resource requested:" + name);
+					if  (debugEnabled) log.debug("["+this.name+"] resource requested: " + name);
 					byte[] b = resourceProvider.getResourceAsBytes(name);
-					if (b == null) b = new byte[0];
+					if (b == null)
+					{
+						b = new byte[0];
+						found = false;
+					}
 					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
 					resource.setDefinition(b);
 					socketClient.send(resource);
-					if  (debugEnabled) log.debug("sent resource " + name + " (" + b.length + " bytes)");
+					if  (debugEnabled)
+					{
+						if (found) log.debug("["+this.name+"] sent resource: " + name + " (" + b.length + " bytes)");
+						else log.debug("["+this.name+"] resource not found: " + name);
+					}
 				}
 				catch(Exception e)
 				{
-					log.warn("caught " + e + ", will re-initialise ...", e);
+					log.warn("["+name+"] caught " + e + ", will re-initialise ...", e);
 					init();
 				}
 			}
 		}
 		catch (Exception e)
 		{
-			log.error(e.getMessage(), e);
+			log.error("["+name+"] "+e.getMessage(), e);
 			setClosed();
 		}
 	}
@@ -198,7 +234,7 @@ public class ClassServerDelegate extends Thread
 		}
 		catch (Exception e)
 		{
-			log.error(e.getMessage(), e);
+			log.error("["+name+"] "+e.getMessage(), e);
 		}
 		closed = true;
 	}

@@ -86,5 +86,18 @@ permission org.tanukisoftware.wrapper.security.WrapperPermission "signalStopped"
 permission java.net.SocketPermission "www.jppf.org:80", "connect,listen";
 permission java.net.SocketPermission "127.0.0.1:21", "accept,connect,listen,resolve";
 permission java.net.SocketPermission "127.0.0.1:1024-", "accept,connect,listen,resolve";
-permission java.lang.RuntimePermission "org.jboss.security.SecurityAssociation.getPrincipalInfo";
-permission java.io.SerializablePermission "enableSubstitution";
+//------------------------------------------------------------------------------//
+// permissions for JBoss                                                        //
+//------------------------------------------------------------------------------//
+//permission java.lang.RuntimePermission "org.jboss.security.SecurityAssociation.getPrincipalInfo";
+//permission java.io.SerializablePermission "enableSubstitution";
+//------------------------------------------------------------------------------//
+// permissions for Weblogic                                                     //
+//------------------------------------------------------------------------------//
+permission java.net.SocketPermission "127.0.0.1:7001", "accept,connect,listen,resolve";
+permission java.net.SocketPermission "localhost:7001", "accept,connect,listen,resolve";
+permission java.net.SocketPermission "192.168.0.4:7001", "accept,connect,listen,resolve";
+permission java.net.SocketPermission "192.168.0.4:1024-", "accept,connect,listen,resolve";
+permission java.util.PropertyPermission "java.vendor", "read";
+permission java.util.PropertyPermission "weblogic.system.iiop.enableClient", "read,write";
+
