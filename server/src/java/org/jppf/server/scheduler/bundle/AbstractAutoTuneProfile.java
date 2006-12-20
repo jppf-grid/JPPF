@@ -23,6 +23,7 @@ package org.jppf.server.scheduler.bundle;
 /**
  * Default abstract implementation of the {@link AutoTuneProfile} interface,
  * providing an encapsulation of the parameters as Java properties.
+ * @author Domingos Creado
  * @author Laurent Cohen
  */
 public abstract class AbstractAutoTuneProfile implements AutoTuneProfile

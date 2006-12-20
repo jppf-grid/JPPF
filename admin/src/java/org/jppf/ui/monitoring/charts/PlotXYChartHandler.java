@@ -20,7 +20,8 @@
 package org.jppf.ui.monitoring.charts;
 
 import java.awt.BasicStroke;
-import java.util.Map;
+import java.util.*;
+
 import org.jfree.chart.*;
 import org.jfree.chart.labels.XYSeriesLabelGenerator;
 import org.jfree.chart.plot.*;
@@ -99,6 +100,12 @@ public class PlotXYChartHandler implements ChartHandler
 	public ChartConfiguration populateDataset(ChartConfiguration config)
 	{
 		XYSeriesCollection dataset = (XYSeriesCollection) config.dataset;
+		List list = dataset.getSeries();
+		for (Object o: list)
+		{
+			XYSeries series = (XYSeries) o;
+			series.clear();
+		}
 		for (int i=0; i<dataset.getSeriesCount(); i++)
 		{
 			Fields key = (Fields) dataset.getSeriesKey(i);

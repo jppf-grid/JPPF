@@ -20,6 +20,7 @@
 package org.jppf.ui.monitoring.charts;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Map;
 import org.jfree.chart.*;
 import org.jfree.chart.labels.XYSeriesLabelGenerator;
@@ -108,6 +109,12 @@ public class DifferenceChartHandler implements ChartHandler
 		int len = config.fields.length;
 		if (len < 2) return config;
 		XYSeriesCollection dataset = (XYSeriesCollection) config.dataset;
+		List list = dataset.getSeries();
+		for (Object o: list)
+		{
+			XYSeries series = (XYSeries) o;
+			series.clear();
+		}
 		for (int i=0; i<2; i++)
 		{
 			Fields key = config.fields[i];

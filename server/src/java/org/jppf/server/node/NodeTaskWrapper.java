@@ -26,6 +26,8 @@ import org.jppf.server.protocol.JPPFTask;
 
 /**
  * Wrapper around a JPPF task used to catch exceptions caused by the task execution.
+ * @author Domingos Creado
+ * @author Laurent Cohen
  */
 class NodeTaskWrapper implements Runnable
 {

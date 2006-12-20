@@ -168,7 +168,7 @@ public class JPPFClientConnection
 			initCredentials();
 			delegate.start();
 			initConnection();
-			setStatus(SUCCESSFUL);
+			setStatus(ACTIVE);
 		}
 		catch(Exception e)
 		{
@@ -199,7 +199,7 @@ public class JPPFClientConnection
 				throw new JPPFException("["+name+"] Could not reconnect to the JPPF Driver");
 			}
 			System.out.println("[client: "+name+"] JPPFClient.init(): Reconnected to the JPPF driver");
-			setStatus(SUCCESSFUL);
+			setStatus(ACTIVE);
 		}
 		catch(Exception e)
 		{
@@ -548,5 +548,24 @@ public class JPPFClientConnection
 		{
 			//lock.unlock();
 		}
+	}
+
+	/**
+	 * Get the name assigned tothis client connection.
+	 * @return the name as a string.
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 * Get a string representation of this client connection.
+	 * @return a string representing this connection.
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
+	{
+		return name + " : " + status;
 	}
 }

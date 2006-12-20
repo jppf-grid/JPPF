@@ -39,6 +39,7 @@ import org.jppf.utils.SerializationHelperImpl;
  * This class implements the state of receiving information from the node as a
  * response to sending the initial bundle. The expected information includes the
  * nodes security credentials and authorizations.
+ * @author Domingos Creado
  * @author Laurent Cohen
  */
 class CWaitingInitialInfo implements ChannelState

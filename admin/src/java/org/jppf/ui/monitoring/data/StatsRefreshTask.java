@@ -18,24 +18,38 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package org.jppf.client;
+package org.jppf.ui.monitoring.data;
+
+import java.util.TimerTask;
+
+import org.jppf.client.JPPFClientConnection;
 
 /**
- * Connection status of a JPPFClientConnection instance.
+ * Instances of this class are tasks run periodically from a timer thread.
  * @author Laurent Cohen
  */
-public enum JPPFClientConnectionStatus
+public class StatsRefreshTask extends TimerTask
 {
 	/**
-	 * Indicates that the connection instance is currently attempting to connect to the driver.
+	 * Client connection ot request the data from.
 	 */
-	CONNECTING,
+	private JPPFClientConnection connection = null;
+
 	/**
-	 * Indicates that the connection instance has successfully connected to the driver.
+	 * Initialize this task with a specified client connection.
+	 * @param connection the connection to use to request data.
 	 */
-	ACTIVE,
+	public StatsRefreshTask(JPPFClientConnection connection)
+	{
+		this.connection = connection;
+	}
+
 	/**
-	 * Indicates that the connection instance has failed to connect to the driver.
+	 * Request an update from the JPPF driver.
+	 * @see java.util.TimerTask#run()
 	 */
-	FAILED
+	public void run()
+	{
+		StatsHandler.getInstance().requestUpdate(connection);
+	}
 }

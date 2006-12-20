@@ -18,7 +18,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package test.processes;
+package org.jppf.process;
 
 import java.util.Properties;
 
@@ -26,7 +26,7 @@ import java.util.Properties;
  * 
  * @author Laurent Cohen
  */
-public class NodePropertiesBuilder
+public class ClientPropertiesBuilder
 {
 	/**
 	 * Driver connection configuration 1.
@@ -61,9 +61,9 @@ public class NodePropertiesBuilder
 	}
 
 	/**
-	 * Generate the configuration dfor a driver connection.
+	 * Generate the configuration for a driver connection.
 	 * @param name the connection name.
-	 * @param host the host on which the driver is.
+	 * @param host the host on which the driver is running.
 	 * @param classPort the class server port.
 	 * @param appPort the application server port.
 	 * @param priority the connection priority.

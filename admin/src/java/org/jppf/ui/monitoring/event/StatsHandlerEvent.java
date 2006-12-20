@@ -20,7 +20,8 @@
 package org.jppf.ui.monitoring.event;
 
 import java.util.EventObject;
-import org.jppf.ui.monitoring.data.*;
+
+import org.jppf.ui.monitoring.data.StatsHandler;
 
 /**
  * Event sent when the stats data has changed.
@@ -29,10 +30,30 @@ import org.jppf.ui.monitoring.data.*;
 public class StatsHandlerEvent extends EventObject
 {
 	/**
+	 * Enumeration of the types of events.
+	 */
+	public enum Type
+	{
+		/**
+		 * Update with a new data snapashot.
+		 */
+		UPDATE,
+		/**
+		 * The whole dataset shall be reset. 
+		 */
+		RESET
+	}
+	/**
+	 * The type of this event.
+	 */
+	private Type type = Type.UPDATE;
+
+	/**
 	 * Initialize this event with a specified source <code>StatsHandler</code>.
 	 * @param source the stats formatter whose data has changed.
+	 * @param type the type of this event.
 	 */
-	public StatsHandlerEvent(StatsConstants source)
+	public StatsHandlerEvent(StatsHandler source, Type type)
 	{
 		super(source);
 	}
@@ -44,5 +65,14 @@ public class StatsHandlerEvent extends EventObject
 	public StatsHandler getStatsFormatter()
 	{
 		return (StatsHandler) getSource();
+	}
+
+	/**
+	 * Get the type of this event.
+	 * @return the type as a typesafe <code>Type</code> enumerated value.
+	 */
+	public Type getType()
+	{
+		return type;
 	}
 }

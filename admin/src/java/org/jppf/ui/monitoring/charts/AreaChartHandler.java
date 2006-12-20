@@ -20,6 +20,7 @@
 package org.jppf.ui.monitoring.charts;
 
 import java.util.Map;
+
 import org.jfree.chart.*;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.labels.CategorySeriesLabelGenerator;
@@ -93,6 +94,7 @@ public class AreaChartHandler implements ChartHandler
 	public ChartConfiguration populateDataset(ChartConfiguration config)
 	{
 		DefaultCategoryDataset dataset = (DefaultCategoryDataset) config.dataset;
+		dataset.clear();
 		int start = Math.max(0, statsHandler.getTickCount() - statsHandler.getStatsCount());
 		for (int j=0; j<statsHandler.getStatsCount(); j++)
 		{

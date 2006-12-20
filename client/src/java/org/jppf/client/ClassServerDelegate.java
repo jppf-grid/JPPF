@@ -126,7 +126,7 @@ public class ClassServerDelegate extends Thread
 				throw new JPPFException("["+name+"] Could not reconnect to the JPPF Driver");
 			}
 			System.out.println("[client: "+name+"] ClassServerDelegate.init(): Reconnected to the class server");
-			owner.setStatus(JPPFClientConnectionStatus.SUCCESSFUL);
+			owner.setStatus(JPPFClientConnectionStatus.ACTIVE);
 		}
 		catch(Exception e)
 		{

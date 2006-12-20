@@ -34,10 +34,11 @@ import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 
 /**
- * This class provides an API to submit execution requests and administration commands, and request server information
- * data.<br>
- * It has its own unique identifier, used by the nodes, to determine whether classes from the submitting application
- * should be dynamically reloaded or not, depending on whether the uuid has changed or not.
+ * This class provides an API to submit execution requests and administration commands,
+ * and request server information data.<br>
+ * It has its own unique identifier, used by the nodes, to determine whether classes from
+ * the submitting application should be dynamically reloaded or not, depending on whether
+ * the uuid has changed or not.
  * @author Laurent Cohen
  */
 public class JPPFClient implements ClientConnectionStatusListener
@@ -49,7 +50,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 	/**
 	 * The pool of threads used for submitting execution requests.
 	 */
-	private ExecutorService executor = Executors.newFixedThreadPool(1);
+	private ExecutorService executor = null;
 	/**
 	 * Security credentials associated with the application.
 	 */
@@ -62,6 +63,14 @@ public class JPPFClient implements ClientConnectionStatusListener
 	 * Contains all the connections pools in ascending priority order.
 	 */
 	private TreeMap<Integer, ClientPool> pools = new TreeMap<Integer, ClientPool>(new DescendingIntegerComparator());
+	/**
+	 * Unique universal identifier for this JPPF client.
+	 */
+	private String uuid = null;
+	/**
+	 * A list of all the connections initially created. 
+	 */
+	private List<JPPFClientConnection> allConnections = new ArrayList<JPPFClientConnection>();
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -77,6 +86,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 	 */
 	public JPPFClient(String uuid)
 	{
+		this.uuid = uuid;
 		initPools();
 	}
 
@@ -104,7 +114,6 @@ public class JPPFClient implements ClientConnectionStatusListener
 			{
 				String prefix = "".equals(s) ? "" : s + ".";
 				String name = "".equals(s) ? "default" : s;
-				String uuid = new JPPFUuid().toString();
 				String host = props.getString(prefix + "jppf.server.host", "localhost");
 				int driverPort = props.getInt(prefix + "app.server.port", 11112);
 				int classServerPort = props.getInt(prefix + "class.server.port", 11111);
@@ -120,6 +129,12 @@ public class JPPFClient implements ClientConnectionStatusListener
 				}
 				pool.clientList.add(c);
 			}
+			for (int priority: pools.keySet())
+			{
+				ClientPool pool = pools.get(priority);
+				for (JPPFClientConnection c: pool.clientList) allConnections.add(c);
+			}
+			executor = Executors.newFixedThreadPool(Math.max(1, allConnections.size()));
 			for (Integer priority: pools.keySet())
 			{
 				ClientPool pool = pools.get(priority);
@@ -133,6 +148,15 @@ public class JPPFClient implements ClientConnectionStatusListener
 		{
 			log.error(e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * Get all the client connections handled by this JPPFClient. 
+	 * @return a list of <code>JPPFClientConnection</code> instances.
+	 */
+	public List<JPPFClientConnection> getAllConnections()
+	{
+		return allConnections;
 	}
 
 	/**
@@ -154,7 +178,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 				while (count < size)
 				{
 					JPPFClientConnection c = pool.nextClient();
-					if (SUCCESSFUL.equals(c.getStatus()))
+					if (ACTIVE.equals(c.getStatus()))
 					{
 						client = c;
 						break;
@@ -164,7 +188,10 @@ public class JPPFClient implements ClientConnectionStatusListener
 						pool.clientList.remove(c);
 						size--;
 						if (pool.lastUsedIndex >= size) pool.lastUsedIndex--;
-						if (pool.clientList.isEmpty()) poolIterator.remove();
+						if (pool.clientList.isEmpty())
+						{
+							poolIterator.remove();
+						}
 					}
 					else if (CONNECTING.equals(c.getStatus()))
 					{
@@ -269,7 +296,10 @@ public class JPPFClient implements ClientConnectionStatusListener
 			if (pool != null)
 			{
 				pool.clientList.remove(c);
-				if (pool.clientList.isEmpty()) pools.remove(priority);
+				if (pool.clientList.isEmpty())
+				{
+					pools.remove(priority);
+				}
 				if (pools.isEmpty())
 				{
 					throw new JPPFError("FATAL ERROR: No more driver connection available for this client");

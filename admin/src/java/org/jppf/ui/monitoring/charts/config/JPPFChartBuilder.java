@@ -152,7 +152,7 @@ public class JPPFChartBuilder implements StatsHandlerListener
 	 * Update the data displayed in the charts.
 	 * @param event holds the new stats values.
 	 */
-	public void dataUpdated(StatsHandlerEvent event)
+	public void dataUpdated(final StatsHandlerEvent event)
 	{
 		for (TabConfiguration tab: tabMap.values())
 		{
@@ -162,7 +162,14 @@ public class JPPFChartBuilder implements StatsHandlerListener
 				{
 					public void run()
 					{
-						handlerMap.get(config.type).updateDataset(config);
+						if (event.getType().equals(StatsHandlerEvent.Type.UPDATE))
+						{
+							handlerMap.get(config.type).updateDataset(config);
+						}
+						else
+						{
+							handlerMap.get(config.type).populateDataset(config);
+						}
 					}
 				});
 			}

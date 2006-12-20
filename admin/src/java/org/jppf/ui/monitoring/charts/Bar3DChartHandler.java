@@ -107,6 +107,7 @@ public class Bar3DChartHandler implements ChartHandler
 	 */
 	public ChartConfiguration populateDataset(ChartConfiguration config)
 	{
+		((DefaultCategoryDataset) config.dataset).clear();
 		return updateDataset(config);
 	}
 

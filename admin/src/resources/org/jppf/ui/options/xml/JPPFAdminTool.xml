@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JPPFAdminTool" type="TabbedPane">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JPPFAdminTool" type="page">
 
 	<property name="label" value="JPPF Monitoring and Administration Tool"/>
 	<property name="scrollable" value="false"/>
-	<property name="orientation" value="horizontal"/>
+	<property name="orientation" value="vertical"/>
 	<property name="bordered" value="false"/>
 	<property name="main" value="true"/>
-	<property name="tooltip" value="Perform the remote administration of the server"/>
 	<script language="javascript"><![CDATA[
 		importPackage(Packages.java.lang);
 		importPackage(Packages.java.util);
 		importPackage(Packages.java.awt);
 		importPackage(Packages.java.awt.event);
 		importPackage(Packages.javax.swing);
+		importPackage(Packages.org.jppf.client);
 		importPackage(Packages.org.jppf.utils);
 		importPackage(Packages.org.jppf.server.protocol);
 		importPackage(Packages.org.jppf.ui.monitoring);
+		importPackage(Packages.org.jppf.ui.monitoring.event);
 		importPackage(Packages.org.jppf.ui.monitoring.charts.config);
 		importPackage(Packages.org.jppf.ui.monitoring.data);
 		importPackage(Packages.org.jppf.ui.options);
@@ -25,9 +26,9 @@
 	]]></script>
 	<initializer type="script">
 		<script language="javascript"><![CDATA[
-			try
+			//try
 			{
-				var comp = option.getUIComponent();
+				var comp = option.findFirstWithName("/AdminPanels").getUIComponent();
 				var frame = new JFrame(option.getLabel());
 				wa = 
 				{
@@ -58,16 +59,69 @@
 				statsHandler.addStatsHandlerListener(monitor);
 				statsHandler.addStatsHandlerListener(builder);
 			}
-			catch(e)
+			/*catch(e)
 			{
 				e.javaException.printStackTrace();
-			}
+			}*/
+			System.out.println("before startRefreshTimer()");
 			statsHandler.startRefreshTimer();
+			System.out.println("after startRefreshTimer()");
 		]]></script>
 	</initializer>
 
-	<import source="file" location="org/jppf/ui/options/xml/ChartsConfigPage.xml"/>
-	<import source="file" location="org/jppf/ui/options/xml/AdminPage.xml"/>
-	<import source="file" location="org/jppf/ui/options/xml/BundleSizeTuningPage.xml"/>
+	<!-- ===================================================================== -->
+	<!--                    Server Chooser Panel                               -->
+	<!-- ===================================================================== -->
+	
+	<!--
+	-->
+	<child name="Tabs" type="page">
+		<property name="label" value=""/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+		<property name="tooltip" value="The list of drivers to connect to"/>
+
+		<child name="ServerChooser" type="ComboBox">
+			<property name="label" value="Server connection"/>
+			<property name="orientation" value="horizontal"/>
+			<property name="tooltip" value="The list of drivers to connect to"/>
+			<property name="value" value=""/>
+			<initializer type="script">
+				<script language="javascript"><![CDATA[
+					var list = StatsHandler.getInstance().getJppfClient().getAllConnections();
+					option.setItems(list);
+					option.setValue(list.get(0));
+				]]></script>
+			</initializer>
+			<listener type="script">
+				<script language="javascript"><![CDATA[
+					StatsHandler.getInstance().setCurrentConnection(option.getValue());
+				]]></script>
+			</listener>
+		</child>
+	
+		<child name="filler" type="Filler">
+			<property name="width" value="1"/>
+			<property name="height" value="1"/>
+		</child>
+
+	</child>
+
+	<child name="AdminPanels" type="TabbedPane">
+	
+		<property name="label" value=""/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+		<property name="tooltip" value="Perform the remote administration of the server"/>
+	
+		<import source="file" location="org/jppf/ui/options/xml/ChartsConfigPage.xml"/>
+		<import source="file" location="org/jppf/ui/options/xml/AdminPage.xml"/>
+		<import source="file" location="org/jppf/ui/options/xml/BundleSizeTuningPage.xml"/>
+	
+	</child>
 
 </opt:main>
