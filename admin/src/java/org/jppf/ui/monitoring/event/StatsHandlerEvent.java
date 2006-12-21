@@ -56,6 +56,7 @@ public class StatsHandlerEvent extends EventObject
 	public StatsHandlerEvent(StatsHandler source, Type type)
 	{
 		super(source);
+		this.type = type;
 	}
 	
 	/**
