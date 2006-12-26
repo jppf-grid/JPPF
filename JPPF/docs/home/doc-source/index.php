@@ -28,7 +28,7 @@
 							</ul>
 						</td></tr>
 						<tr><td class="bottom_">
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.23.0 - beta</span></h4>
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.24.0 - beta</span></h4>
 						</td></tr>
 						<tr><td class="bottom_">
 							<h3>New: JPPF is looking for developers!</h3>

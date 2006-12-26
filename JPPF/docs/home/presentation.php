@@ -1,6 +1,9 @@
+<?php
+	session_start();
+?>
 <html>
 		<head>
-		<title>Java Parallel Processing Framework News Page</title>
+		<title>Java Parallel Processing Framework Links Page</title>
 		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
 		<meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
 		<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
@@ -53,50 +56,76 @@
 				</td>
 			</tr>
 		</table>
-		<table cellspacing="0" cellpadding="0" width="80%">
-			<tr>
-				<td>
-								<tr>
-				<td class="leftRightBottom_">
-					<br>
-					<h1 align="center" style="color: #8080FF"><b><a style="color: #8080FF" href="http://sourceforge.net/news/?group_id=135654">Latest news on project pages</a>
-</b></h1>
+<?php
+			$defined = $_SESSION["defined"];
+			if (!$defined)
+			{
+				$_SESSION["defined"] = "true";
+				$_SESSION["first"] = 0;
+				$_SESSION["last"] = 20;
+			}
+			$current = $_REQUEST["current"];
+			if (!$current)
+			{
+				$currrent = 0;
+			}
+?>
+			<table class="table_" cellspacing="0" cellpadding="0" width="80%">
+				<tr><td align="center">
+<?php
+					// Link to first page
+					if ($current > $_SESSION["first"])
+					{
+						echo '<a href="presentation.php?current=', $_SESSION["first"], '">';
+						echo '<img src="overview/first1.gif" border=0 alt="Last page"></a>';
+					}
+					else
+					{
+						echo '<img src="overview/first0.gif" border=0 alt="Last page">';
+					}
+					echo '&nbsp;';
+					// Link to previous page
+					if ($current > $_SESSION["first"])
+					{
+						echo '<a href="presentation.php?current=', ($current-1), '">';
+						echo '<img src="overview/prev1.gif" border=0 alt="Back"></a>';
+					}
+					else
+					{
+						echo '<img src="overview/prev0.gif" border=0 alt="Back">';
+					}
+					echo '&nbsp;';
+					// Link to next page
+					if ($current < $_SESSION["last"])
+					{
+						echo '<a href="presentation.php?current=', ($current+1), '">';
+						echo '<img src="overview/next1.gif" border=0 alt="Continue"></a>';
+					}
+					else
+					{
+						echo '<img src="overview/next0.gif" border=0 alt="Continue">';
+					}
+					echo '&nbsp;';
+					// Link to last page
+					if ($current < $_SESSION["last"])
+					{
+						echo '<a href="presentation.php?current=', $_SESSION["last"], '">';
+						echo '<img src="overview/last1.gif" border=0 alt="Last page"></a>';
+					}
+					else
+					{
+						echo '<img src="overview/last0.gif" border=0 alt="Last page"></a>';
+					}
+?>
 				</td>
-			</tr>
-				</td>
-			</tr>
-		</table>
-		<?php
-		// Connecting, selecting database
-		$link = mysql_connect('mysql4-j', 'j135654admin', 'Faz600er')
-			 or die('Could not connect: ' . mysql_error());
-		mysql_select_db('j135654_web') or die('Could not select database');
-		// Performing SQL query
-		$query = 'SELECT * FROM news ORDER BY date DESC';
-		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-		while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
-		{
-		?>
-		<table class="border_" cellspacing="0" cellpadding="5" width="80%">
-			<tr>
-				<td>
-					<?php
-						printf("<h3>%s %s</h3>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
-						printf("%s", $line["desc"]);
-					?>
-						<p><u style="color: #8080FF"><strong style="color: #8080FF">Summary of changes:</strong></u>
-					<?php
-						printf("%s", $line["content"]);
-					?>
-				</td>
-			</tr>
-		</table>
-		<?php
-		}
-		// Free resultset
-		mysql_free_result($result);
-		// Closing connection
-		mysql_close($link);
-		?>
+				<td align="left">This presentation is available in <a href="documents/JPPF-Presentation.pdf">PDF Format</a></td>
+				</tr>
+				<tr><td align="center" colspan="2">
+<?php
+					echo '<img src="overview/img', $current, '.gif">';
+?>
+				</td></tr>
+			</table>
+		</div>
 	</body>
 </html>

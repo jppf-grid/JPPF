@@ -36,7 +36,8 @@
 					<table border="0" cellspacing="0" cellpadding="5">
 						<tr>
 							<td class="menu_first"><a href="index.html">Home</a></td>
-							<td class="menu"><a href="JPPF-Overview.html">Overview</a></td>
+							<!--<td class="menu"><a href="JPPF-Overview.html">Overview</a></td>-->
+							<td class="menu"><a href="presentation.php?current=0">Overview</a></td>
 							<td class="menu"><a href="http://sourceforge.net/project/showfiles.php?group_id=135654">Files</a></td>
 							<td class="menu"><a href="./wiki">Wiki &amp; Doc</a></td>
 							<td class="menu"><a href="./forums">Forums</a></td>
@@ -76,7 +77,7 @@
 							</ul>
 						</td></tr>
 						<tr><td class="bottom_">
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.23.0 - beta</span></h4>
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.24.0 - beta</span></h4>
 						</td></tr>
 						<tr><td class="bottom_">
 							<h3>New: JPPF is looking for developers!</h3>
