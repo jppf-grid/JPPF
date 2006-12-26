@@ -51,6 +51,10 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	 */
 	private int speed = 10;
 	/**
+	 * Flag to determine whether to handle collisions between logos.
+	 */
+	private boolean collisions = false;
+	/**
 	 * Array of ImageData instances holding the position and speed of the logos.
 	 */
 	private ImageData[] data = null;
@@ -167,21 +171,16 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	{
 		ScreensaverSettings settings = getContext().getSettings();
 		System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, "jppf-node.properties");
-		String s = settings.getProperty("host");
-		if (s == null) s = "localhost";
+
 		TypedProperties props = JPPFConfiguration.getProperties();
-		props.put("jppf.server.host", s);
+		props.setProperty("jppf.server.host", settings.getProperty("host"));
+		props.setProperty("class.server.port", settings.getProperty("classServerPort"));
+		props.setProperty("node.server.port", settings.getProperty("nodeServerPort"));
+		props.setProperty("processing.threads", settings.getProperty("nbThreads"));
 
-		int n = getIntSetting("nbThreads", 1);
-		props.put("processing.threads", ""+n);
-
+		collisions = settings.getProperty("collisions") != null;
 		nbLogos = getIntSetting("nbLogos", 10);
-		if (nbLogos < 1) nbLogos = 1;
-		if (nbLogos > 10) nbLogos = 10;
-
 		speed = getIntSetting("speed", 5);
-		if (speed < 1) speed = 1;
-		if (speed > 10) speed = 10;
 	}
 
 	/**
@@ -332,8 +331,17 @@ public class JPPFScreenSaver extends SimpleScreensaver
 		public void run()
 		{
 			Dimension dim = parent.getSize();
-			for (ImageData d: data)
+			for (int i=0; i<data.length; i++)
 			{
+				ImageData d = data[i];
+				if (collisions)
+				{
+					for (int j=i+1; j<data.length; j++)
+					{
+						ImageData d2 = data[j];
+						checkColliding(d, d2);
+					}
+				}
 				synchronized(d)
 				{
 					if ((d.x + d.stepX < 0) || (d.x + d.stepX + imgw > dim.width))
@@ -348,6 +356,91 @@ public class JPPFScreenSaver extends SimpleScreensaver
 					d.y += d.stepY;
 				}
 			}
+		}
+
+		/**
+		 * Determine whether two logos are colliding.
+		 * @param d1 the position and speed vector data for the first logo.
+		 * @param d2 the position and speed vector data for the second logo.
+		 * @return true if the two logos are colliding, false otherwise.
+		 */
+		public boolean checkColliding(ImageData d1, ImageData d2)
+		{
+			int x1 = d1.x + d1.stepX;
+			int x2 = d2.x + d2.stepX;
+			int y1 = d1.y + d1.stepY;
+			int y2 = d2.y + d2.stepY;
+			boolean b = false;
+			if (isIn(x1, y1, x2, y2))
+			{
+				if (d1.x >= d2.x + imgw)
+				{
+					d1.stepX  = -d1.stepX;
+					d2.stepX  = -d2.stepX;
+				}
+				if (d1.y >= d2.y + imgh)
+				{
+					d1.stepY  = -d1.stepY;
+					d2.stepY  = -d2.stepY;
+				}
+				return true;
+			}
+			if (isIn(x1 + imgw, y1, x2, y2))
+			{
+				if (d1.x + imgw <= d2.x)
+				{
+					d1.stepX  = -d1.stepX;
+					d2.stepX  = -d2.stepX;
+				}
+				if (d1.y >= d2.y + imgh)
+				{
+					d1.stepY  = -d1.stepY;
+					d2.stepY  = -d2.stepY;
+				}
+				return true;
+			}
+			if (isIn(x1, y1 + imgh, x2, y2))
+			{
+				if (d1.x >= d2.x + imgw)
+				{
+					d1.stepX  = -d1.stepX;
+					d2.stepX  = -d2.stepX;
+				}
+				if (d1.y + imgh <= d2.y)
+				{
+					d1.stepY  = -d1.stepY;
+					d2.stepY  = -d2.stepY;
+				}
+				return true;
+			}
+			if (isIn(x1 + imgw, y1 + imgh, x2, y2))
+			{
+				if (d1.x + imgw <= d2.x)
+				{
+					d1.stepX  = -d1.stepX;
+					d2.stepX  = -d2.stepX;
+				}
+				if (d1.y + imgh <= d2.y)
+				{
+					d1.stepY  = -d1.stepY;
+					d2.stepY  = -d2.stepY;
+				}
+				return true;
+			}
+			return false;
+		}
+
+		/**
+		 * .
+		 * @param x1 .
+		 * @param y1 .
+		 * @param x2 .
+		 * @param y2 .
+		 * @return .
+		 */
+		public boolean isIn(int x1, int y1, int x2, int y2)
+		{
+			return ((x1 >= x2) && (x1 <= x2 + imgw)) && ((y1 >= y2) && (y1 <= y2 + imgh));
 		}
 	}
 

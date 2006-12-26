@@ -48,6 +48,10 @@ public class JPPFClient implements ClientConnectionStatusListener
 	 */
 	private static Logger log = Logger.getLogger(JPPFClient.class);
 	/**
+	 * Determines whether debug-level logging is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * The pool of threads used for submitting execution requests.
 	 */
 	private ExecutorService executor = null;
@@ -100,6 +104,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 		{
 			TypedProperties props = JPPFConfiguration.getProperties();
 			String driverNames = props.getString("jppf.drivers");
+			if (debugEnabled) log.debug("list of drivers: "+driverNames);
 			String[] names = null;
 			// if config file is still used as with single client version
 			if ((driverNames == null) || "".equals(driverNames.trim()))
@@ -206,6 +211,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 				throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
 			}
 		}
+		if (debugEnabled) log.debug("found client connection \"" + client + "\"");
 		return client;
 	}
 
@@ -249,7 +255,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 	 * @throws Exception if an error occurs while sending the request.
 	 */
 	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
-			throws Exception
+		throws Exception
 	{
 		getClientConnection().submitNonBlocking(taskList, dataProvider, listener);
 	}
@@ -289,7 +295,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 		JPPFClientConnection c = event.getJPPFClientConnection();
 		if (c.getStatus().equals(JPPFClientConnectionStatus.FAILED))
 		{
-			log.info("Connection [" + c.name + "] failed - resubmitting tasks");
+			log.info("Connection [" + c.name + "] failed");
 			c.removeClientConnectionStatusListener(this);
 			int priority = c.getPriority();
 			ClientPool pool = pools.get(priority);
@@ -306,6 +312,17 @@ public class JPPFClient implements ClientConnectionStatusListener
 				}
 			}
 			List<ClientExecution> toResubmit = c.shutdownConnection();
+			int taskCount = 0;
+			int execCount = toResubmit.size();
+			for (ClientExecution exec: toResubmit)
+			{
+				if (exec.tasks != null) taskCount += exec.tasks.size();
+			}
+			if (taskCount > 0)
+			{
+				log.info("Connection [" + c.name + "] : resubmitting " +
+					taskCount + "tasks for " + execCount + " executions");
+			}
 			if (c != null)
 			{
 				try
@@ -401,6 +418,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 		 */
 		public void run()
 		{
+			if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
 			c.init();
 		}
 	}

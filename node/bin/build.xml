@@ -130,13 +130,15 @@ USA
   <!-- Create screensaver distribution -->
   <target name="dist" depends="compile">
 		<mkdir dir="${build}/jar" />
+  	<unjar src="${JPPF.dir}/lib/log4j/log4j-1.2.9.jar" dest="${build}/share"/>
 		<jar destfile="${build}/jar/${screensaver}.jar">
 			<fileset dir="${build}/share" />
 		</jar>
 
 		<!-- Create distribution for win32: -->
 		<mkdir dir="${dist}/${screensaver}-win32" />
-		<copy todir="${dist}/${screensaver}-win32">
+		<mkdir dir="${dist}/${screensaver}-win32/tmp" />
+  	<copy todir="${dist}/${screensaver}-win32">
 			<fileset dir="${saverbeans.path}">
 				<include name="saverbeans-api.jar" />
 			</fileset>

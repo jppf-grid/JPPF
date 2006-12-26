@@ -198,7 +198,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			initStreams();
 			opened = true;
 		}
-		else throw new ConnectException("Client connection already opened");
+		//else throw new ConnectException("Client connection already opened");
 	}
 
 	/**
@@ -225,6 +225,10 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 */
 	public void close() throws ConnectException, IOException
 	{
+		if (port == 11111)
+		{
+			getClass();
+		}
 		opened = false;
 		if (socket != null) socket.close();
 	}

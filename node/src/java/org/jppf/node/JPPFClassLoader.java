@@ -278,7 +278,7 @@ public class JPPFClassLoader extends ClassLoader
 	 */
 	public InputStream getResourceAsStream(String name)
 	{
-		InputStream is = JPPFClassLoader.class.getClassLoader().getResourceAsStream(name);
+		InputStream is = getClass().getClassLoader().getResourceAsStream(name);
 		if (is == null)
 		{
 			try

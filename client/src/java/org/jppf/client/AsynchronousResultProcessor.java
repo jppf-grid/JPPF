@@ -36,7 +36,11 @@ class AsynchronousResultProcessor implements Runnable
 	/**
 	 * Log4j logger for this class.
 	 */
-	static Logger log = Logger.getLogger(JPPFClientConnection.class);
+	private static Logger log = Logger.getLogger(AsynchronousResultProcessor.class);
+	/**
+	 * Determines whether debug-level logging is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Client connection owning this results processor.
 	 */
@@ -98,7 +102,7 @@ class AsynchronousResultProcessor implements Runnable
 				}
 				catch(Exception e)
 				{
-					log.error("["+this.connection.name+"] "+e.getMessage(), e);
+					log.error("["+connection.getName()+"] "+e.getMessage(), e);
 					connection.initConnection();
 				}
 			}
@@ -106,7 +110,7 @@ class AsynchronousResultProcessor implements Runnable
 		catch(Exception e)
 		{
 			error = true;
-			log.error("["+this.connection.name+"] "+e.getMessage(), e);
+			log.error("["+connection.getName()+"] "+e.getMessage(), e);
 		}
 		finally
 		{

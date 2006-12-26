@@ -41,10 +41,11 @@ import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 
 /**
- * This class provides an API to submit execution requests and administration commands, and request server information
- * data.<br>
- * It has its own unique identifier, used by the nodes, to determine whether classes from the submitting application
- * should be dynamically reloaded or not, depending on whether the uuid has changed or not.
+ * This class provides an API to submit execution requests and administration
+ * commands, and request server information data.<br>
+ * It has its own unique identifier, used by the nodes, to determine whether
+ * classes from the submitting application should be dynamically reloaded or not
+ * depending on whether the uuid has changed or not.
  * @author Laurent Cohen
  */
 public class JPPFClientConnection
@@ -53,6 +54,10 @@ public class JPPFClientConnection
 	 * Log4j logger for this class.
 	 */
 	static Logger log = Logger.getLogger(JPPFClientConnection.class);
+	/**
+	 * Determines whether debug-level logging is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The socket client used to communicate over a socket connection.
 	 */
@@ -108,7 +113,7 @@ public class JPPFClientConnection
 	String name = null;
 	/**
 	 * Priority given to the driver this client is connected to.
-	 * The client is always connected to the available fdriver(s) with the highest
+	 * The client is always connected to the available driver(s) with the highest
 	 * priority. If multiple drivers have the same priority, they will be used as a
 	 * pool and tasks will be evenly distributed among them.
 	 */
@@ -192,13 +197,17 @@ public class JPPFClientConnection
 		{
 			setStatus(CONNECTING);
 			if (socketClient == null) initSocketClient();
-			System.out.println("[client: "+name+"] JPPFClient.init(): Attempting connection to the JPPF driver");
+			String msg = "[client: "+name+"] JPPFClient.init(): Attempting connection to the JPPF driver";
+			System.out.println(msg);
+			if (debugEnabled) log.debug(msg);
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isSuccessfull())
 			{
 				throw new JPPFException("["+name+"] Could not reconnect to the JPPF Driver");
 			}
-			System.out.println("[client: "+name+"] JPPFClient.init(): Reconnected to the JPPF driver");
+			msg = "[client: "+name+"] JPPFClient.init(): Reconnected to the JPPF driver";
+			System.out.println(msg);
+			if (debugEnabled) log.debug(msg);
 			setStatus(ACTIVE);
 		}
 		catch(Exception e)
@@ -259,7 +268,7 @@ public class JPPFClientConnection
 			if ((taskList != null) && (taskList.size() > 0))
 			{
 				totalTaskCount += taskList.size();
-				log.debug("["+name+"] submitted " + totalTaskCount + " tasks");
+				if (debugEnabled) log.debug("["+name+"] submitted " + taskList.size() + " tasks for a total of " + totalTaskCount);
 			}
 			Collections.sort(resultList, new Comparator<JPPFTask>()
 			{
@@ -290,6 +299,7 @@ public class JPPFClientConnection
 		AsynchronousResultProcessor proc =
 			new AsynchronousResultProcessor(this, exec);
 		executor.submit(proc);
+		if (debugEnabled) log.debug("["+name+"] submitted " + taskList.size() + " tasks");
 	}
 
 	/**
@@ -484,7 +494,7 @@ public class JPPFClientConnection
 	 * Set the status of this connection.
 	 * @param status  a <code>JPPFClientConnectionStatus</code> enumerated value.
 	 */
-	public void setStatus(JPPFClientConnectionStatus status)
+	public synchronized void setStatus(JPPFClientConnectionStatus status)
 	{
 		this.status = status;
 		fireStatusChanged();
@@ -494,7 +504,7 @@ public class JPPFClientConnection
 	 * Add a connection status listener to this connection's list of listeners.
 	 * @param listener the listener to add to the list.
 	 */
-	public void addClientConnectionStatusListener(ClientConnectionStatusListener listener)
+	public synchronized void addClientConnectionStatusListener(ClientConnectionStatusListener listener)
 	{
 		listeners.add(listener);
 	}
@@ -503,7 +513,7 @@ public class JPPFClientConnection
 	 * Remove a connection status listener from this connection's list of listeners.
 	 * @param listener the listener to remove from the list.
 	 */
-	public void removeClientConnectionStatusListener(ClientConnectionStatusListener listener)
+	public synchronized void removeClientConnectionStatusListener(ClientConnectionStatusListener listener)
 	{
 		listeners.remove(listener);
 	}
@@ -511,10 +521,12 @@ public class JPPFClientConnection
 	/**
 	 * Notify all listeners that the status of this connection has changed.
 	 */
-	protected void fireStatusChanged()
+	protected synchronized void fireStatusChanged()
 	{
 		ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this);
-		for (ClientConnectionStatusListener listener: listeners)
+		// to avoid ConcurrentModificationException
+		ClientConnectionStatusListener[] array = listeners.toArray(new ClientConnectionStatusListener[0]);
+		for (ClientConnectionStatusListener listener: array)
 		{
 			listener.statusChanged(event);
 		}

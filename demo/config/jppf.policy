@@ -100,4 +100,6 @@ permission java.net.SocketPermission "192.168.0.4:7001", "accept,connect,listen,
 permission java.net.SocketPermission "192.168.0.4:1024-", "accept,connect,listen,resolve";
 permission java.util.PropertyPermission "java.vendor", "read";
 permission java.util.PropertyPermission "weblogic.system.iiop.enableClient", "read,write";
+permission java.util.PropertyPermission "weblogic.*", "read";
+permission java.lang.RuntimePermission "getProtectionDomain";
 
