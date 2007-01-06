@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -117,7 +117,7 @@ public abstract class JPPFNIOServer extends Thread{
 				else
 				{
 					ChannelContext context = (ChannelContext) key.attachment();
-					context.state.exec(key, context);
+					context.state.exec(key);
 					//threadPool.submit(new ContextStateExec(context, key));
 				}
 			}
@@ -181,9 +181,8 @@ public abstract class JPPFNIOServer extends Thread{
 		context.content = getInitialContent();
 		try
 		{
-			client.register(selector,
-					SelectionKey.OP_READ | SelectionKey.OP_WRITE, context)
-					.interestOps(getInitialInterest());
+			SelectionKey selKey = client.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE, context); 
+			selKey.interestOps(getInitialInterest());
 		}
 		catch (ClosedChannelException ignored)
 		{

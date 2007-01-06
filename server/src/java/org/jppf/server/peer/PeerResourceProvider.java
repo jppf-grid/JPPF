@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -21,12 +21,13 @@ package org.jppf.server.peer;
 
 import java.io.IOException;
 import java.nio.channels.*;
-import java.util.LinkedList;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
-import org.jppf.classloader.*;
 import org.jppf.comm.socket.*;
 import org.jppf.node.JPPFResourceWrapper;
-import org.jppf.server.*;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
 
 /**
@@ -83,20 +84,22 @@ public class PeerResourceProvider
 			if (debugEnabled) log.debug("sent node initiation");
 			// get a response containing the uuid of the contacted peer
 			resource = (JPPFResourceWrapper) socketClient.receive();
-			if (debugEnabled) log.debug("received node initiation repsonse");
-			ClassServer server = JPPFDriver.getInstance().getClassServer();
+			if (debugEnabled) log.debug("received node initiation response");
+			ClassNioServer server = JPPFDriver.getInstance().getClassServer();
 			Selector selector = server.getSelector();
 
 			SocketChannel channel = socketClient.getChannel();
 			socketClient.setChannel(null);
-			ChannelContext context = server.createChannelContext();
-			context.state = server.WaitingRequest;
-			context.content = new LinkedList<RemoteClassRequest>();
-			context.uuid = resource.getProviderUuid();
-			server.addProviderConnections(resource.getProviderUuid(), channel);
+			ClassContext context = (ClassContext) server.createNioContext();
+			//context.setState(server.WAITING_NODE_REQUEST);
+			context.setState(ChannelState.SENDING_PROVIDER_REQUEST);
+			context.setPendingRequests(new Vector<SelectionKey>());
+			context.setUuid(resource.getProviderUuid());
 			try
 			{
-				channel.register(selector, SelectionKey.OP_READ, context);
+				channel.register(selector, 0, context);
+				server.addProviderConnection(resource.getProviderUuid(), channel);
+				//channel.register(selector, SelectionKey.OP_READ, context);
 				if (debugEnabled) log.debug("registered class server channel");
 			}
 			catch (ClosedChannelException ignored)

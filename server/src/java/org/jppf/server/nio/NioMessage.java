@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -17,28 +17,27 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.server.node;
 
-import org.jppf.security.JPPFSecurityContext;
-import org.jppf.server.ChannelContext;
-import org.jppf.server.scheduler.bundle.Bundler;
+package org.jppf.server.nio;
+
+import java.nio.ByteBuffer;
 
 /**
- * Extension of ChannelContext for the nodes, providing an individual bundler for each node. 
+ * Instances of this class are wrappers for the data to send to or receive from nodes.
  * @author Laurent Cohen
  */
-public class NodeChannelContext extends ChannelContext
+public class NioMessage
 {
 	/**
-	 * Bundler used to schedule tasks for the corresponding node.
+	 * Total length of the message to read.
 	 */
-	public Bundler bundler = null;
+	public int length = 0;
 	/**
-	 * The security credentials of the node.
+	 * Buffer containg the message's data. 
 	 */
-	public JPPFSecurityContext credentials = null;
+	public ByteBuffer buffer = null;
 	/**
-	 * Number of takss that remain to be received from the node.
+	 * Determines whether the buffer length has already been sent.
 	 */
-	public int pendingTasks = 0;
+	public boolean lengthWritten = false;
 }

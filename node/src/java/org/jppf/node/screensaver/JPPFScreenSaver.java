@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -119,7 +119,7 @@ public class JPPFScreenSaver extends SimpleScreensaver
 			for (int i=0; i<nbLogos; i++) data[i] = new ImageData();
 			parent = (Container) getContext().getComponent();
 			parent.setBackground(Color.BLACK);
-			if (node == null) node = new NodePanel();
+			if (node == null) node = new NodePanel(getContext().isFullScreen());
 			node.setDoubleBuffered(true);
 			parent.add(node);
 			initializeFlyingLogos();
@@ -145,7 +145,7 @@ public class JPPFScreenSaver extends SimpleScreensaver
 				timer = new Timer();
 				timer.schedule(new LogoUpdateTask(), 100, 25 + 5 * (11 - speed));
 				// 25 frames/sec = 40ms/frame
-				timer.schedule(new LogoDisplayTask(), 500, 33);
+				timer.schedule(new LogoDisplayTask(), 500, 25);
 				TimerTask task = new TimerTask()
 				{
 					public void run()
@@ -179,7 +179,7 @@ public class JPPFScreenSaver extends SimpleScreensaver
 		props.setProperty("processing.threads", settings.getProperty("nbThreads"));
 
 		collisions = settings.getProperty("collisions") != null;
-		nbLogos = getIntSetting("nbLogos", 10);
+		nbLogos = getIntSetting("nbLogos", 5);
 		speed = getIntSetting("speed", 5);
 	}
 
@@ -431,16 +431,16 @@ public class JPPFScreenSaver extends SimpleScreensaver
 		}
 
 		/**
-		 * .
-		 * @param x1 .
-		 * @param y1 .
-		 * @param x2 .
-		 * @param y2 .
-		 * @return .
+		 * Determine whether a corner of a logo is inside another logo.
+		 * @param x1 x coordinate of the corner of the first logo.
+		 * @param y1 y coordinate of the corner of the first logo.
+		 * @param x2 x coordinate of the top left corner of the second logo.
+		 * @param y2 y coordinate of the top left corner of the second logo.
+		 * @return true if the corner of the first is logo isinside the second, false otherwise.
 		 */
 		public boolean isIn(int x1, int y1, int x2, int y2)
 		{
-			return ((x1 >= x2) && (x1 <= x2 + imgw)) && ((y1 >= y2) && (y1 <= y2 + imgh));
+			return (x1 >= x2) && (x1 <= x2 + imgw) && (y1 >= y2) && (y1 <= y2 + imgh);
 		}
 	}
 

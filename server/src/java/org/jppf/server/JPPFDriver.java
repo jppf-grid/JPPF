@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -21,12 +21,13 @@ package org.jppf.server;
 
 import java.net.Socket;
 import java.util.*;
+
 import org.apache.log4j.Logger;
 import org.jppf.*;
-import org.jppf.classloader.ClassServer;
 import org.jppf.security.*;
 import org.jppf.server.app.JPPFApplicationServer;
-import org.jppf.server.node.JPPFNodeServer;
+import org.jppf.server.nio.classloader.ClassNioServer;
+import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.peer.JPPFPeerInitializer;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
@@ -64,11 +65,11 @@ public class JPPFDriver
 	/**
 	 * Serves the JPPF nodes.
 	 */
-	private JPPFNodeServer nodeServer = null;
+	private NodeNioServer nodeNioServer = null;
 	/**
 	 * Serves class loading requests from the JPPF nodes.
 	 */
-	private ClassServer classServer = null;
+	private ClassNioServer classServer = null;
 	/**
 	 * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
 	 */
@@ -96,7 +97,7 @@ public class JPPFDriver
 		TypedProperties props = JPPFConfiguration.getProperties();
 
 		int port = props.getInt("class.server.port", 11111);
-		classServer = new ClassServer(port);
+		classServer = new ClassNioServer(port);
 		classServer.start();
 
 		Bundler bundler = BundlerFactory.createBundler();
@@ -105,8 +106,10 @@ public class JPPFDriver
 		applicationServer.start();
 
 		port = props.getInt("node.server.port", 11113);
-		nodeServer = new JPPFNodeServer(port,bundler);
-		nodeServer.start();
+		//nodeServer = new JPPFNodeServer(port, bundler);
+		//nodeServer.start();
+		nodeNioServer = new NodeNioServer(port, bundler);
+		nodeNioServer.start();
 
 		initPeers();
 	}
@@ -158,19 +161,10 @@ public class JPPFDriver
 	}
 	
 	/**
-	 * Get the JPPF node server.
-	 * @return a <code>JPPFNodeServer</code> instance.
-	 */
-	public JPPFNodeServer getNodeServer()
-	{
-		return nodeServer;
-	}
-
-	/**
 	 * Get the JPPF class server.
-	 * @return a <code>ClassServer</code> instance.
+	 * @return a <code>ClassNioServer</code> instance.
 	 */
-	public ClassServer getClassServer()
+	public ClassNioServer getClassServer()
 	{
 		return classServer;
 	}
@@ -230,8 +224,8 @@ public class JPPFDriver
 	{
 		classServer.end();
 		classServer = null;
-		nodeServer.end();
-		nodeServer = null;
+		nodeNioServer.end();
+		nodeNioServer = null;
 		applicationServer.end();
 		applicationServer = null;
 	}

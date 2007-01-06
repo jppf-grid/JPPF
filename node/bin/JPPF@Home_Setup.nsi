@@ -28,10 +28,10 @@ Var MUI_TEMP
 # Installer pages
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_DIRECTORY
-!insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
-!insertmacro MUI_PAGE_FINISH
-!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_PAGE_INSTFILES
+#!insertmacro MUI_PAGE_FINISH
+#!insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 
 # Installer languages

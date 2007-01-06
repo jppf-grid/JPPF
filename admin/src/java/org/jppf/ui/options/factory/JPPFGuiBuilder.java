@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -21,13 +21,16 @@ package org.jppf.ui.options.factory;
 
 import java.awt.Frame;
 import java.awt.event.*;
+
 import javax.swing.*;
+
 import org.jppf.ui.monitoring.JPPFTheme;
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
 import org.jppf.ui.utils.GuiUtils;
+import org.jvnet.lafwidget.LafWidget;
+import org.jvnet.lafwidget.tabbed.DefaultTabPreviewPainter;
 import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.tabbed.DefaultTabPreviewPainter;
 import org.jvnet.substance.watermark.SubstanceNullWatermark;
 
 /**
@@ -50,7 +53,7 @@ public class JPPFGuiBuilder
 		try
 		{
 			UIManager.put(SubstanceLookAndFeel.ENABLE_INVERTED_THEMES, Boolean.TRUE);
-			UIManager.put(SubstanceLookAndFeel.TABBED_PANE_PREVIEW_PAINTER, new DefaultTabPreviewPainter());
+			UIManager.put(LafWidget.TABBED_PANE_PREVIEW_PAINTER, new DefaultTabPreviewPainter());
 			JFrame.setDefaultLookAndFeelDecorated(true);
 			UIManager.setLookAndFeel(new SubstanceLookAndFeel());
 			UIManager.getDefaults().put("UJACTextAreaUI", "org.ujac.ui.editor.TextAreaUI");

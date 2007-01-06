@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Java Parallel Processing Framework.
+  Copyright (C) 2005-2007 JPPF Team.
+  http://www.jppf.org
+
+	This library is free software; you can redistribute it and/or modify it
+	under the terms of the GNU Lesser General Public License as published by the
+	Free Software Foundation; either version 2.1 of the License, or (at your
+	option) any later version.
+
+	This library is distributed in the hope that it will be useful, but WITHOUT
+	ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+	FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+	for more details.
+
+	You should have received a copy of the GNU Lesser General Public License
+	along with this library; if not, write to the Free Software Foundation,
+	Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="BundleSizeTuning" type="page">
+
+	<!-- test comment for save -->
+	<property name="label" value="Bundle Size Tuning"/>
+	<property name="scrollable" value="false"/>
+	<property name="orientation" value="vertical"/>
+	<property name="bordered" value="false"/>
+	<property name="main" value="true"/>
+	<property name="tooltip" value=""/>
+	<script language="javascript"><![CDATA[
+		importPackage(java.lang);
+		importPackage(java.util);
+		importPackage(Packages.org.jppf.server.protocol);
+		importPackage(Packages.org.jppf.server.protocol);
+		importPackage(Packages.org.jppf.ui.monitoring.data);
+		importPackage(Packages.org.jppf.ui.options);
+		importPackage(Packages.org.jppf.ui.options.factory);
+		importPackage(Packages.org.jppf.ui.options.event);
+	]]></script>
+	<initializer type="script">
+		<script language="javascript"><![CDATA[
+			option.findFirstWithName("/ManualConfig").setEnabled(true);
+			option.findFirstWithName("/AutoConfig").setEnabled(false);
+		]]></script>
+	</initializer>
+
+	<!-- ===================================================================== -->
+	<!--           Server bundle size manual configuration area                -->
+	<!-- ===================================================================== -->
+
+	<!-- ===================================================================== -->
+	<!--               Auto-tuning configuration area                          -->
+	<!-- ===================================================================== -->
+
+	<child name="ColorFields" type="page">
+
+		<property name="label" value="Color Scheme"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="vertical"/>
+		<property name="bordered" value="true"/>
+		<property name="main" value="false"/>
+		<property name="tooltip" value="configure the colors for this color scheme"/>
+
+		<child name="MinSamplesToAnalyse" type="FormattedNumber">
+			<property name="label" value="Min number of samples to analyse"/>
+			<property name="tooltip" value="The minimum number of samples that must be collected\nbefore an analysis is triggered"/>
+			<property name="value" value="500"/>
+			<property name="pattern" value="###,###,##0"/>
+			<property name="orientation" value="horizontal"/>
+		</child>
+
+		<child name="MinSamplesToCheckConvergence" type="FormattedNumber">
+			<property name="label" value="Min number of samples to check convergence"/>
+			<property name="tooltip" value="The minimum number of samples to be collected\nbefore checking if the performance profile has changed"/>
+			<property name="value" value="300"/>
+			<property name="pattern" value="###,###,##0"/>
+			<property name="orientation" value="horizontal"/>
+		</child>
+
+		<child name="MaxDeviation" type="FormattedNumber">
+			<property name="label" value="Maximum deviation"/>
+			<property name="tooltip" value="The percentage of deviation of the current mean to the mean\nwhen the system was considered stable"/>
+			<property name="value" value="0.2"/>
+			<property name="pattern" value="###,##0.###"/>
+			<property name="orientation" value="horizontal"/>
+		</child>
+
+		<child name="MaxGuessToStable" type="FormattedNumber">
+			<property name="label" value="Max number of guesses to stable"/>
+			<property name="tooltip" value="The maximum number of guesses of number generated that were already tested\nfor the algorithm to consider the current best solution stable"/>
+			<property name="value" value="10"/>
+			<property name="pattern" value="###,###,##0"/>
+			<property name="orientation" value="horizontal"/>
+		</child>
+
+		<child name="SizeRatioDeviation" type="FormattedNumber">
+			<property name="label" value="Size deviation ratio"/>
+			<property name="tooltip" value="This parameter defines the multiplicity used to define the range available to\nthe random number generator, as the maximum"/>
+			<property name="value" value="1.5"/>
+			<property name="pattern" value="###,##0.###"/>
+			<property name="orientation" value="horizontal"/>
+		</child>
+
+		<child name="DecreaseRatio" type="FormattedNumber">
+			<property name="label" value="Size decrease ratio"/>
+			<property name="tooltip" value="This parameter defines how fast the tuning algorithm will stop generating random numbers.\nThis is essential to define what is the size of the universe that will be explored.\nGreater numbers make the algorithm stop sooner"/>
+			<property name="value" value="0.2"/>
+			<property name="pattern" value="###,###,##0"/>
+			<property name="orientation" value="horizontal"/>
+		</child>
+
+		<child name="filler" type="Filler">
+			<property name="width" value="1"/>
+			<property name="height" value="1"/>
+		</child>
+
+	</child>
+
+</opt:main>

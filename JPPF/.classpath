@@ -3,28 +3,24 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j/log4j-1.2.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/JFreeChart/jcommon-1.0.0.jar"/>
-	<classpathentry exported="true" sourcepath="C:/Tools/jfreechart-1.0.1/source" kind="lib" path="lib/JFreeChart/jfreechart-1.0.1.jar">
+	<classpathentry exported="true" kind="lib" path="lib/JFreeChart/jfreechart-1.0.1.jar" sourcepath="C:/Tools/jfreechart-1.0.1/source">
 		<attributes>
-			<attribute value="file:/C:/Tools/jfreechart-1.0.1/javadoc/" name="javadoc_location"/>
+			<attribute name="javadoc_location" value="file:/C:/Tools/jfreechart-1.0.1/javadoc/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/saverbeans-sdk/saverbeans-ant.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saverbeans-sdk/saverbeans-api.jar"/>
-	<classpathentry exported="true" sourcepath="C:/Tools/Substance-2.3/src" kind="lib" path="lib/Substance/substance-2.3.jar">
+	<classpathentry exported="true" kind="lib" path="lib/Rhino/js.jar" sourcepath="C:/Tools/rhino1_6R2/src">
 		<attributes>
-			<attribute value="file:/C:/Tools/Substance-2.3/docs/api/" name="javadoc_location"/>
+			<attribute name="javadoc_location" value="file:/C:/Tools/rhino1_6R2/docs/apidocs/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" sourcepath="C:/Tools/rhino1_6R2/src" kind="lib" path="lib/Rhino/js.jar">
+	<classpathentry exported="true" kind="lib" path="lib/UJAC-UI/ujac-ui.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ApacheCommons/commons-io-1.2.jar" sourcepath="C:/Tools/Apache/commons-io-1.2/src/java">
 		<attributes>
-			<attribute value="file:/C:/Tools/rhino1_6R2/docs/apidocs/" name="javadoc_location"/>
+			<attribute name="javadoc_location" value="file:/C:/Tools/Apache/commons-io-1.2/docs/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" sourcepath="C:/ftp/dev/JEdit/UJAC-UI/src" kind="lib" path="lib/UJAC-UI/ujac-ui.jar"/>
-	<classpathentry exported="true" sourcepath="C:/Tools/Apache/commons-io-1.2/src/java" kind="lib" path="lib/ApacheCommons/commons-io-1.2.jar">
-		<attributes>
-			<attribute value="file:/C:/Tools/Apache/commons-io-1.2/docs/" name="javadoc_location"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="lib/Substance/substance-3.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

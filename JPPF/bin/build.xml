@@ -1,7 +1,7 @@
 <!--
 	Java Parallel Processing Framework.
-	Copyright (C) 2005-2006 Laurent Cohen.
-	lcohen@osp-chicago.com
+  Copyright (C) 2005-2007 JPPF Team.
+  http://www.jppf.org
 
 	This library is free software; you can redistribute it and/or modify it
 	under the terms of the GNU Lesser General Public License as published by the
@@ -200,6 +200,7 @@
 				<include name="config/**/*.*"/>
 				<include name="docs/api/**/*.*"/>
 				<include name="lib/**/*.*"/>
+				<include name="${license.file}"/>
 			</zipfileset>
 			<zipfileset dir="${node}" prefix="${ant.project.name}-${version.number}/node"/>
 			<zipfileset dir="${common}" prefix="${ant.project.name}-${version.number}/common"/>

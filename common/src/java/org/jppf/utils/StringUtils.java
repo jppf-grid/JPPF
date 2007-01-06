@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -20,6 +20,8 @@
 package org.jppf.utils;
 
 import java.io.File;
+import java.net.Socket;
+import java.nio.channels.SocketChannel;
 import java.util.*;
 import org.apache.log4j.Logger;
 
@@ -145,7 +147,7 @@ public final class StringUtils
 		sb.append(elapsed / 60000L).append(":");
 		elapsed = elapsed % 60000L;
 		sb.append(elapsed / 1000L).append(".");
-		sb.append(elapsed % 1000L);
+		sb.append(padLeft(""+(elapsed % 1000L), '0', 3));
 		return sb.toString();
 	}
 	
@@ -226,5 +228,18 @@ public final class StringUtils
 			if (log.isDebugEnabled()) log.debug(e);
 		}
 		return result == null ? def : result;
+	}
+
+	/**
+	 * Returns the IP address of the remote host for a socket channel.
+	 * @param channel the channel to get the host from.
+	 * @return an IP address as a string.
+	 */
+	public static String getRemostHost(SocketChannel channel)
+	{
+		StringBuilder sb = new StringBuilder();
+		Socket s = channel.socket();
+		sb.append("[").append(s.getInetAddress().getHostAddress()).append(":").append(s.getPort()).append("]");
+		return sb.toString();
 	}
 }

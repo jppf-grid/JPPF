@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -390,7 +390,8 @@ public class JPPFClient implements ClientConnectionStatusListener
 		 */
 		public int compare(Integer o1, Integer o2)
 		{
-			return o1.compareTo(o2);
+			return o2 - o1; 
+			//return o1.compareTo(o2);
 		}
 	}
 

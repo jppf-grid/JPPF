@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -60,7 +60,7 @@ public class OptionDescriptorParser
 		InputStream is = FileUtils.getFileInputStream(docPath);
 		if (is == null) return null;
 		Document doc = parser.parse(is);
-		return generateTree(doc.getFirstChild());
+		return generateTree(findFirstElement(doc));
 	}
 
 	/**
@@ -74,7 +74,23 @@ public class OptionDescriptorParser
 	{
 		InputSource is = new InputSource(reader);
 		Document doc = parser.parse(is);
-		return generateTree(doc.getFirstChild());
+		return generateTree(findFirstElement(doc));
+	}
+
+	/**
+	 * Find the first node in a docuemnt that is an element node.
+	 * @param doc the document whose children are looked up.
+	 * @return a <code>Node</code> instance if one was found, or null otherwise.
+	 */
+	public Node findFirstElement(Document doc)
+	{
+		NodeList list = doc.getChildNodes();
+		for (int i=0; i<list.getLength(); i++)
+		{
+			Node node = list.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) return node;
+		}
+		return null;
 	}
 
 	/**

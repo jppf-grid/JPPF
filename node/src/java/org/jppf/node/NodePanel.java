@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -58,12 +58,18 @@ public class NodePanel extends JPanel
 	 * Holds the states of all nodes.
 	 */
 	public NodeState nodeState = null;
+	/**
+	 * 
+	 */
+	private boolean activate = true;
 
 	/**
 	 * Initialize this UI.
+	 * @param activate .
 	 */
-	public NodePanel()
+	public NodePanel(boolean activate)
 	{
+		this.activate = activate;
 		init();
 	}
 
@@ -107,7 +113,7 @@ public class NodePanel extends JPanel
 		addLayoutComp(this, g, c, Box.createVerticalStrut(10));
 		addLayoutComp(this, g, c, createNodePanel());
 		addLayoutComp(this, g, c, Box.createVerticalStrut(5));
-		nodeState.startNode();
+		if (activate) nodeState.startNode();
 	}
 
 	/**
@@ -239,7 +245,7 @@ public class NodePanel extends JPanel
 	{
 		try
 		{
-			nodeState.stopNode();
+			if (activate) nodeState.stopNode();
 		}
 		catch (Throwable t)
 		{

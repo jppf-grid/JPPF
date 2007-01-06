@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -26,12 +26,19 @@ import java.nio.channels.SelectionKey;
  * Instances of this class represent the state of a socket channel connection.
  * @author Domingos Creado
  */
-public interface ChannelState {
+public interface ChannelState
+{
+	/**
+	 * Perform the action associated with this state.
+	 * @param key the selector key this state is associated with.
+	 * @throws IOException if an error occurred while executing the action.
+	 */
+	void exec(SelectionKey key) throws IOException;
 	/**
 	 * Perform the action associated with this state.
 	 * @param key the selector key this state is associated with.
 	 * @param context the context associated with this state.
 	 * @throws IOException if an error occurred while executing the action.
 	 */
-	void exec(SelectionKey key, ChannelContext context) throws IOException;
+	//void exec(SelectionKey key, ChannelContext context) throws IOException;
 }

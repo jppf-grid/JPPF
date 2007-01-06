@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -22,17 +22,19 @@ package org.jppf.server.app;
 import static org.jppf.server.JPPFStatsUpdater.*;
 import static org.jppf.server.protocol.AdminRequest.*;
 import static org.jppf.server.protocol.JPPFRequestHeader.Type.*;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
 import javax.crypto.SecretKey;
+
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
 import org.jppf.security.*;
 import org.jppf.server.*;
-import org.jppf.server.node.JPPFNodeServer;
 import org.jppf.server.protocol.*;
-import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.AnnealingTuneProfile;
 import org.jppf.utils.*;
 
 /**
@@ -40,7 +42,6 @@ import org.jppf.utils.*;
  * to dispatch them for execution.<br>
  * When the execution of a task is complete, this connection is automatically
  * notified, through an asynchronous event mechanism.
- * 
  * @author Laurent Cohen
  */
 public class ApplicationConnection extends JPPFConnection
@@ -49,53 +50,56 @@ public class ApplicationConnection extends JPPFConnection
 	 * Log4j logger for this class.
 	 */
 	private static Logger log = Logger.getLogger(ApplicationConnection.class);
+
 	/**
 	 * Base name used for localization lookups";
 	 */
 	private static final String I18N_BASE = "org.jppf.server.i18n.messages";
+
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+
 	/**
 	 * Determines whether dumping byte arrays in the log is enabled.
 	 */
 	private boolean dumpEnabled = JPPFConfiguration.getProperties().getBoolean("byte.array.dump.enabled", false);
+
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
 	private JPPFQueue queue = null;
-	/**
-	 * A reference to the sever for the JPPF nodes.
-	 */
-	private JPPFNodeServer nodeServer = null;
+
 	/**
 	 * Used to serialize and deserialize the tasks data.
 	 */
 	private SerializationHelper helper = new SerializationHelperImpl();
+
 	/**
 	 * The header describing the current client request.
 	 */
 	private JPPFRequestHeader header = null;
+
 	/**
 	 * Total number of tasks submitted to this application connection.
 	 */
 	private int totalTaskCount = 0;
+
 	/**
 	 * Used to send the task results back to the requester.
 	 */
 	private ApplicationResultSender resultSender = null;
 
 	/**
-	 * Initialize this connection with an open socket connection to a remote
-	 * client.
-	 * 
+	 * Initialize this connection with an open socket connection to a remote client.
 	 * @param server the server that created this connection.
 	 * @param socket the socket connection from which requests are received and to
 	 * which responses are sent.
 	 * @throws JPPFException if this socket handler can't be initialized.
 	 */
-	public ApplicationConnection(JPPFServer server, Socket socket) throws JPPFException
+	public ApplicationConnection(JPPFServer server, Socket socket)
+			throws JPPFException
 	{
 		super(server, socket);
 		resultSender = new ApplicationResultSender(socketClient);
@@ -115,6 +119,7 @@ public class ApplicationConnection extends JPPFConnection
 	 * <li>recompose the tasks results in the same order as they were received</li>
 	 * <li><send results back to the client/li>
 	 * </ul>
+	 * 
 	 * @throws Exception if an error is raised while processing an execution request.
 	 * @see org.jppf.server.JPPFConnection#perform()
 	 */
@@ -148,7 +153,7 @@ public class ApplicationConnection extends JPPFConnection
 	protected void executeTasks(DataInputStream dis) throws Exception
 	{
 		int count = header.getTaskCount();
-		if (debugEnabled) log.debug("Received "+count+" tasks");
+		if (debugEnabled) log.debug("Received " + count + " tasks");
 		byte[] dataProvider = helper.readNextBytes(dis);
 		List<byte[]> taskList = new ArrayList<byte[]>();
 		for (int i = 0; i < count; i++)
@@ -157,7 +162,7 @@ public class ApplicationConnection extends JPPFConnection
 			if (debugEnabled)
 			{
 				StringBuilder sb = new StringBuilder("deserialized task in ").append(taskBytes.length).append(" bytes");
-				//log.debug(sb.toString());
+				// log.debug(sb.toString());
 				if (dumpEnabled)
 				{
 					sb = new StringBuilder("bytes: ").append(StringUtils.dumpBytes(taskBytes, 0, taskBytes.length));
@@ -180,7 +185,7 @@ public class ApplicationConnection extends JPPFConnection
 		if (count > 0)
 		{
 			totalTaskCount += count;
-			if (debugEnabled) log.debug("Queued "+totalTaskCount+" tasks");
+			if (debugEnabled) log.debug("Queued " + totalTaskCount + " tasks");
 		}
 		if (count <= 0) resultSender.sendPartialResults(bundle);
 		else resultSender.run(count);
@@ -191,7 +196,8 @@ public class ApplicationConnection extends JPPFConnection
 	 * Send the collected statistics in response to a stats request.
 	 * @throws Exception if the statistics could not be sent to the requester.
 	 */
-	private void sendStats() throws Exception {
+	private void sendStats() throws Exception
+	{
 		JPPFStats stats = getStats();
 		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
@@ -207,12 +213,12 @@ public class ApplicationConnection extends JPPFConnection
 	}
 
 	/**
-	 * Perform a requested administative function.
+	 * Perform a requested administrative function.
 	 * @param header the header for the request.
 	 * @throws Exception if the function could not be performed.
 	 */
-	private void performAdminOperation(JPPFRequestHeader header)
-			throws Exception {
+	private void performAdminOperation(JPPFRequestHeader header) throws Exception
+	{
 		String response = StringUtils.getLocalized(I18N_BASE, "request.executed");
 		AdminRequest request = (AdminRequest) header;
 		byte[] b = (byte[]) request.getParameter(KEY_PARAM);
@@ -224,24 +230,28 @@ public class ApplicationConnection extends JPPFConnection
 		b = pm.readPassword();
 		String localPwd = new String(CryptoUtils.decrypt(b));
 
-		if (!localPwd.equals(remotePwd))
-			response = StringUtils.getLocalized(I18N_BASE, "invalid.password");
-		else {
+		if (!localPwd.equals(remotePwd)) response = StringUtils.getLocalized(I18N_BASE, "invalid.password");
+		else
+		{
 			String command = (String) request.getParameter(COMMAND_PARAM);
-			if (SHUTDOWN.equals(command) || SHUTDOWN_RESTART.equals(command)) {
+			if (SHUTDOWN.equals(command) || SHUTDOWN_RESTART.equals(command))
+			{
 				long shutdownDelay = (Long) request.getParameter(SHUTDOWN_DELAY_PARAM);
 				boolean restart = !SHUTDOWN.equals(command);
 				long restartDelay = (Long) request.getParameter(RESTART_DELAY_PARAM);
 				sendAdminResponse(request, StringUtils.getLocalized(I18N_BASE, "request.acknowledged"));
-				JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay,
-					restart, restartDelay);
+				JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay, restart, restartDelay);
 				return;
-			} else if (CHANGE_PASSWORD.equals(command)) {
+			}
+			else if (CHANGE_PASSWORD.equals(command))
+			{
 				b = (byte[]) request.getParameter(NEW_PASSWORD_PARAM);
 				String newPwd = new String(CryptoUtils.decrypt(tmpKey, b));
 				pm.savePassword(CryptoUtils.encrypt(newPwd.getBytes()));
 				response = "Password changed";
-			} else if (CHANGE_SETTINGS.equals(command)) {
+			}
+			else if (CHANGE_SETTINGS.equals(command))
+			{
 				response = performChangeSettings(request);
 			}
 		}
@@ -250,21 +260,23 @@ public class ApplicationConnection extends JPPFConnection
 
 	/**
 	 * Perform the action to change the settings for bundle size tuning.
-	 * @param request the request holding the parametrs to change.
+	 * @param request the request holding the parameters to change.
 	 * @return a message to report the change status.
 	 * @throws Exception if the changes could not be applied.
 	 */
-	private String performChangeSettings(AdminRequest request) throws Exception {
-		boolean manual = "manual".equalsIgnoreCase((String) request
-				.getParameter(BUNDLE_TUNING_TYPE_PARAM));
+	private String performChangeSettings(AdminRequest request) throws Exception
+	{
+		boolean manual =
+			"manual".equalsIgnoreCase((String) request.getParameter(BUNDLE_TUNING_TYPE_PARAM));
 		String response = null;
-		if (manual) {
+		if (manual)
+		{
 			Number n = (Number) request.getParameter(BUNDLE_SIZE_PARAM);
-			if (n != null)
-				JPPFStatsUpdater.setStaticBundleSize(n.intValue());
-			setBundler(BundlerFactory.createFixedSizeBundler());
+			if (n != null) JPPFStatsUpdater.setStaticBundleSize(n.intValue());
 			response = StringUtils.getLocalized(I18N_BASE, "manual.settings.changed");
-		} else {
+		}
+		else
+		{
 			AnnealingTuneProfile prof = new AnnealingTuneProfile();
 			Number n = (Number) request.getParameter("MinSamplesToAnalyse");
 			prof.setMinSamplesToAnalyse(n.longValue());
@@ -278,7 +290,6 @@ public class ApplicationConnection extends JPPFConnection
 			prof.setSizeRatioDeviation(n.floatValue());
 			n = (Number) request.getParameter("DecreaseRatio");
 			prof.setDecreaseRatio(n.floatValue());
-			setBundler(BundlerFactory.createBundler(prof));
 			response = StringUtils.getLocalized(I18N_BASE, "automatic.settings.changed");
 		}
 		return response;
@@ -290,8 +301,8 @@ public class ApplicationConnection extends JPPFConnection
 	 * @param msg the response messages.
 	 * @throws Exception if the response could not be sent.
 	 */
-	private void sendAdminResponse(AdminRequest request, String msg)
-			throws Exception {
+	private void sendAdminResponse(AdminRequest request, String msg) throws Exception
+	{
 		request.setParameter(RESPONSE_PARAM, msg);
 		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
@@ -310,9 +321,9 @@ public class ApplicationConnection extends JPPFConnection
 	 * Get a reference to the driver's tasks queue.
 	 * @return a <code>JPPFQueue</code> instance.
 	 */
-	private JPPFQueue getQueue() {
-		if (queue == null)
-			queue = JPPFDriver.getQueue();
+	private JPPFQueue getQueue()
+	{
+		if (queue == null) queue = JPPFDriver.getQueue();
 		return queue;
 	}
 
@@ -320,38 +331,20 @@ public class ApplicationConnection extends JPPFConnection
 	 * Close this application connection.
 	 * @see org.jppf.server.JPPFConnection#close()
 	 */
-	public void close() {
+	public void close()
+	{
 		super.close();
-		if (isStatsEnabled())
-			clientConnectionClosed();
-	}
-
-	/**
-	 * Get the algorithm that dynamically computes the task bundle size.
-	 * @return a <code>Bundler</code> instance.
-	 */
-	public Bundler getBundler() {
-		if (nodeServer == null)
-			nodeServer = JPPFDriver.getInstance().getNodeServer();
-		return nodeServer.getBundler();
-	}
-
-	/**
-	 * Set the algorithm that dynamically computes the task bundle size.
-	 * @param bundler a <code>Bundler</code> instance.
-	 */
-	public void setBundler(Bundler bundler) {
-		if (nodeServer == null)
-			nodeServer = JPPFDriver.getInstance().getNodeServer();
-		nodeServer.setBundler(bundler);
+		if (isStatsEnabled()) clientConnectionClosed();
 	}
 
 	/**
 	 * Get a string representation of this connection.
+	 * 
 	 * @return a string representation of this connection.
 	 * @see org.jppf.server.JPPFConnection#toString()
 	 */
-	public String toString() {
+	public String toString()
+	{
 		return "Application connection : " + super.toString();
 	}
 }

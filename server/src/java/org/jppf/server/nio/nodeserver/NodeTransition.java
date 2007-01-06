@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -17,35 +17,34 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.classloader;
+
+package org.jppf.server.nio.nodeserver;
+
 
 /**
- * This class encapsulates the content oif a class cache entry.
- * @author Domingos Creado
+ * Enumeration of the possible state transitions for a Node server channel.
+ * @author Laurent Cohen
  */
-class CacheClassContent
+public enum NodeTransition
 {
 	/**
-	 * The actual content of this element.
+	 * Transition from a state to SENDING_BUNDLE.
 	 */
-	private byte[] content;
-
+	TRANSITION_TO_SENDING, 
 	/**
-	 * Initialize this content with the specified data.
-	 * @param content the data as an array of bytes.
+	 * Transition from a state to WAITING_RESULTS.
 	 */
-	public CacheClassContent(byte[] content)
-	{
-		super();
-		this.content = content;
-	}
-
+	TRANSITION_TO_WAITING,
 	/**
-	 * Get the actual content of this element.
-	 * @return the data as an array of bytes.
+	 * Transition from a state to SEND_INITIAL_BUNDLE.
 	 */
-	public byte[] getContent()
-	{
-		return content;
-	}
+	TRANSITION_TO_SEND_INITIAL,
+	/**
+	 * Transition from a state to WAIT_INITIAL_BUNDLE.
+	 */
+	TRANSITION_TO_WAIT_INITIAL,
+	/**
+	 * Transition from a state to SENDING_BUNDLE in idle mode.
+	 */
+	TRANSITION_TO_IDLE;
 }

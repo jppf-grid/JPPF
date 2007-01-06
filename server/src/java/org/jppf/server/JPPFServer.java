@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -22,11 +22,10 @@ package org.jppf.server;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
+
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
-import org.jppf.classloader.ClassServer;
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.utils.*;
 
 /**
  * This class is a common abstract superclass for servers listening to incoming connections from
@@ -194,22 +193,5 @@ public abstract class JPPFServer extends Thread
 			}
 		}
 		connections.clear();
-	}
-	
-	/**
-	 * Start this class server from the command line.
-	 * @param args not used.
-	 */
-	public static void main(String...args)
-	{
-		try
-		{
-			TypedProperties props = JPPFConfiguration.getProperties();
-			new ClassServer(props.getInt("class.server.port", 11111)).start();
-		}
-		catch(Throwable t)
-		{
-			t.printStackTrace();
-		}
 	}
 }

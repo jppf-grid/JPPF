@@ -1,7 +1,7 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2006 Laurent Cohen.
- * lcohen@osp-chicago.com
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -20,10 +20,14 @@
 package org.jppf.ui.monitoring;
 
 import javax.swing.*;
+
 import org.apache.log4j.Logger;
 import org.jppf.ui.options.factory.OptionsHandler;
+import org.jvnet.lafwidget.LafWidget;
+import org.jvnet.lafwidget.tabbed.DefaultTabPreviewPainter;
 import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.tabbed.DefaultTabPreviewPainter;
+import org.jvnet.substance.color.ColorScheme;
+import org.jvnet.substance.theme.*;
 import org.jvnet.substance.watermark.SubstanceNullWatermark;
 
 /**
@@ -53,14 +57,21 @@ public class UILauncher
 			if ((s == null) || SubstanceLookAndFeel.class.getName().equals(s))
 			{
 				UIManager.put(SubstanceLookAndFeel.ENABLE_INVERTED_THEMES, Boolean.TRUE);
-				UIManager.put(SubstanceLookAndFeel.TABBED_PANE_PREVIEW_PAINTER, new DefaultTabPreviewPainter());
+				UIManager.put(LafWidget.TABBED_PANE_PREVIEW_PAINTER, new DefaultTabPreviewPainter());
 				JFrame.setDefaultLookAndFeelDecorated(true);
 				UIManager.setLookAndFeel(new SubstanceLookAndFeel());
 				SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme());
 				SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
+				SubstanceLookAndFeel.registerThemeChangeListener(new ThemeChangeListener()
+				{
+					public void themeChanged()
+					{
+						SubstanceTheme th = SubstanceLookAndFeel.getTheme();
+						ColorScheme scheme = th.getColorScheme();
+					}
+				});
 			}
-			if ("url".equalsIgnoreCase(args[1]))
-				OptionsHandler.addPageFromURL(args[0], null);
+			if ("url".equalsIgnoreCase(args[1])) OptionsHandler.addPageFromURL(args[0], null);
 			else OptionsHandler.addPageFromXml(args[0]);
 		}
 		catch(Exception e)
