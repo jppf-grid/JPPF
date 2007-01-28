@@ -92,7 +92,7 @@ public class PeerResourceProvider
 			socketClient.setChannel(null);
 			ClassContext context = (ClassContext) server.createNioContext();
 			//context.setState(server.WAITING_NODE_REQUEST);
-			context.setState(ChannelState.SENDING_PROVIDER_REQUEST);
+			context.setState(ClassState.SENDING_PROVIDER_REQUEST);
 			context.setPendingRequests(new Vector<SelectionKey>());
 			context.setUuid(resource.getProviderUuid());
 			try

@@ -269,8 +269,11 @@ public class JPPFDriver
 			{
 				throw new JPPFException("The driver should be run with an argument representing a valid TCP port");
 			}
-			int port = Integer.parseInt(args[0]);
-			runDriverListener(port);						
+			if (!"noLauncher".equals(args[0]))
+			{
+				int port = Integer.parseInt(args[0]);
+				runDriverListener(port);
+			}
 
 			JPPFDriver driver = getInstance();
 			driver.run();

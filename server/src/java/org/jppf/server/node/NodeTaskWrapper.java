@@ -63,7 +63,7 @@ class NodeTaskWrapper implements Runnable
 	 */
 	public void run()
 	{
-		if (node.notifying) node.incrementExecutingCount();
+		if (node.isNotifying()) node.incrementExecutingCount();
 		try
 		{
 			Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
@@ -74,7 +74,7 @@ class NodeTaskWrapper implements Runnable
 			if (t instanceof Exception) task.setException((Exception) t);
 			else task.setException(new JPPFException(t));
 		}
-		if (node.notifying) node.decrementExecutingCount();
+		if (node.isNotifying()) node.decrementExecutingCount();
 	}
 
 	/**

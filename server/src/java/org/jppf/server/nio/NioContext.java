@@ -110,7 +110,7 @@ public abstract class NioContext<S extends Enum>
 			log.debug(
 					"[" + getNonQualifiedClassName() + "] " +  
 				"read " + readByteCount + " bytes out of " + message.length +
-				" for " + StringUtils.getRemostHost((SocketChannel) channel));
+				" for " + StringUtils.getRemoteHost((SocketChannel) channel));
 		}
 		return readByteCount >= message.length;
 	}
@@ -143,7 +143,7 @@ public abstract class NioContext<S extends Enum>
 			log.debug(
 				"[" + getNonQualifiedClassName() + "] " +  
 				"written " + writeByteCount + " bytes out of " + message.length +
-				" for " + StringUtils.getRemostHost((SocketChannel) channel));
+				" for " + StringUtils.getRemoteHost((SocketChannel) channel));
 		}
 		return writeByteCount >= message.length;
 	}

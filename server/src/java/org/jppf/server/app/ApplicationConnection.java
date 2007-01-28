@@ -23,7 +23,6 @@ import static org.jppf.server.JPPFStatsUpdater.*;
 import static org.jppf.server.protocol.AdminRequest.*;
 import static org.jppf.server.protocol.JPPFRequestHeader.Type.*;
 
-import java.io.*;
 import java.net.*;
 import java.util.*;
 
@@ -127,9 +126,10 @@ public class ApplicationConnection extends JPPFConnection
 	{
 		JPPFBuffer buffer = socketClient.receiveBytes(0);
 		byte[] bytes = buffer.getBuffer();
-		DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
 		// Read the request header - with tasks count information
-		header = (JPPFRequestHeader) helper.readNextObject(dis, false);
+		List<JPPFRequestHeader> list = new ArrayList<JPPFRequestHeader>();
+		int pos = helper.fromBytes(buffer.getBuffer(), 0, false, list, 1);
+		header = list.get(0);
 		JPPFRequestHeader.Type type = header.getRequestType();
 		if (STATISTICS.equals(type) && isStatsEnabled())
 		{
@@ -141,24 +141,30 @@ public class ApplicationConnection extends JPPFConnection
 		}
 		else if (NON_BLOCKING_EXECUTION.equals(type))
 		{
-			executeTasks(dis);
+			executeTasks(buffer.getBuffer(), pos);
 		}
 	}
 
 	/**
 	 * Execute the tasks received from a client.
-	 * @param dis the stream from which the task data are read.
+	 * @param data the source data from where to read the data provider and task data.
+	 * @param offset the position at which to start reading in the source data.
 	 * @throws Exception if the tasks could not be read.
 	 */
-	protected void executeTasks(DataInputStream dis) throws Exception
+	protected void executeTasks(byte[] data, int offset) throws Exception
 	{
 		int count = header.getTaskCount();
 		if (debugEnabled) log.debug("Received " + count + " tasks");
-		byte[] dataProvider = helper.readNextBytes(dis);
+		
+		int pos = offset;
+		//byte[] dataProvider = helper.readNextBytes(dis);
+		byte[] dataProvider = helper.copyFromBuffer(data, pos);
+		pos += 4 + dataProvider.length;
 		List<byte[]> taskList = new ArrayList<byte[]>();
 		for (int i = 0; i < count; i++)
 		{
-			byte[] taskBytes = helper.readNextBytes(dis);
+			byte[] taskBytes = helper.copyFromBuffer(data, pos);
+			pos += 4 + taskBytes.length; 
 			if (debugEnabled)
 			{
 				StringBuilder sb = new StringBuilder("deserialized task in ").append(taskBytes.length).append(" bytes");
@@ -171,7 +177,6 @@ public class ApplicationConnection extends JPPFConnection
 			}
 			taskList.add(taskBytes);
 		}
-		dis.close();
 		JPPFTaskBundle bundle = new JPPFTaskBundle();
 		bundle.setBundleUuid("0");
 		bundle.setRequestUuid(header.getUuid());
@@ -199,16 +204,8 @@ public class ApplicationConnection extends JPPFConnection
 	private void sendStats() throws Exception
 	{
 		JPPFStats stats = getStats();
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(baos);
 		SerializationHelper helper = new SerializationHelperImpl();
-		helper.writeNextObject(stats, dos, false);
-
-		dos.flush();
-		dos.close();
-		JPPFBuffer buffer = new JPPFBuffer();
-		buffer.setLength(baos.size());
-		buffer.setBuffer(baos.toByteArray());
+		JPPFBuffer buffer = helper.toBytes(stats, false);
 		socketClient.sendBytes(buffer);
 	}
 
@@ -304,16 +301,8 @@ public class ApplicationConnection extends JPPFConnection
 	private void sendAdminResponse(AdminRequest request, String msg) throws Exception
 	{
 		request.setParameter(RESPONSE_PARAM, msg);
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(baos);
 		SerializationHelper helper = new SerializationHelperImpl();
-		helper.writeNextObject(request, dos, false);
-
-		dos.flush();
-		dos.close();
-		JPPFBuffer buffer = new JPPFBuffer();
-		buffer.setLength(baos.size());
-		buffer.setBuffer(baos.toByteArray());
+		JPPFBuffer buffer = helper.toBytes(request, false);
 		socketClient.sendBytes(buffer);
 	}
 

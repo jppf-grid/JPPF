@@ -21,7 +21,8 @@
 package org.jppf.server.nio.classloader;
 
 import static org.jppf.node.JPPFResourceWrapper.State.*;
-import static org.jppf.server.nio.classloader.ChannelTransition.*;
+import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.nio.channels.*;
 import java.util.Vector;
@@ -29,7 +30,6 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.server.JPPFDriver;
-import org.jppf.utils.StringUtils;
 
 /**
  * This class represents the state of a new class server connection, whose type is yet undetermined.
@@ -62,7 +62,7 @@ public class DefiningChannelTypeState extends ClassServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ChannelTransition performTransition(SelectionKey key) throws Exception
+	public ClassTransition performTransition(SelectionKey key) throws Exception
 	{
 		// we don't know yet which whom we are talking, is it a node or a provider?
 		SocketChannel channel = (SocketChannel) key.channel();
@@ -70,10 +70,10 @@ public class DefiningChannelTypeState extends ClassServerState
 		if (context.readMessage(channel))
 		{
 			JPPFResourceWrapper resource = context.deserializeResource();
-			if (debugEnabled) log.debug("channel: " + StringUtils.getRemostHost(channel) + " read resource [" + resource.getName() + "] done");
+			if (debugEnabled) log.debug("channel: " + getRemoteHost(channel) + " read resource [" + resource.getName() + "] done");
 			if (PROVIDER_INITIATION.equals(resource.getState()))
 			{
-				if (debugEnabled) log.debug("initiating provider: " + StringUtils.getRemostHost(channel));
+				if (debugEnabled) log.debug("initiating provider: " + getRemoteHost(channel));
 				String uuid = resource.getUuidPath().getFirst();
 				// it is a provider
 				server.providerConnections.put(uuid, channel);
@@ -84,7 +84,7 @@ public class DefiningChannelTypeState extends ClassServerState
 			}
 			else if (NODE_INITIATION.equals(resource.getState()))
 			{
-				if (debugEnabled) log.debug("initiating node: " + StringUtils.getRemostHost(channel));
+				if (debugEnabled) log.debug("initiating node: " + getRemoteHost(channel));
 				// send the uuid of this driver to the node or node peer.
 				resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
 				resource.setProviderUuid(JPPFDriver.getInstance().getUuid());

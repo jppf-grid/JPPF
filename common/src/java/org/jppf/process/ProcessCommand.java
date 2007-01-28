@@ -95,7 +95,7 @@ public class ProcessCommand
 			{
 				sb.append(p.toString()).append("\n");
 			}
-			String policyFile = createTempFile("", "policy", null, sb.toString());
+			String policyFile = createTempFile("jppf-", "policy", null, sb.toString());
 			jppfConfig.setProperty("jppf.policy.file", policyFile);
 		}
 		return buildProcess(mainClass, jppfConfig, log4jConfig, maxMem);

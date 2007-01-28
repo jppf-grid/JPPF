@@ -25,6 +25,7 @@ import java.net.InetSocketAddress;
 import java.nio.channels.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
@@ -53,12 +54,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	 * the selector of all socket channels open with providers or nodes.
 	 */
 	protected Selector selector;
-	
 	/**
 	 * Reads resource files from the classpath.
 	 */
 	protected ResourceProvider resourceProvider = new ResourceProvider();
-	
 	/**
 	 * Flag indicating that this socket server is closed.
 	 */
@@ -80,6 +79,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	 * The factory for this server.
 	 */
 	protected NioServerFactory<S, T, U> factory = null;
+	/**
+	 * Lock used to synchronize selector operations.
+	 */
+	protected ReentrantLock lock = new ReentrantLock();
 
 	/**
 	 * Initialize this server with a specified port number and name.
@@ -145,6 +148,14 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 			boolean hasTimeout = selectTimeout > 0L;
 			while (!stop && !JPPFDriver.getInstance().isShuttingDown())
 			{
+				try
+				{
+					lock.lock();
+				}
+				finally
+				{
+					lock.unlock();
+				}
 				int n = 0;
 				n =  hasTimeout ? selector.select(selectTimeout) : selector.select();
 				if (n > 0) go(selector.selectedKeys());
@@ -209,7 +220,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	 */
 	protected void submitTransition(SelectionKey key, boolean sequential)
 	{
-		key.interestOps(0);
+		setKeyOps(key, 0);
 		if (sequential) new StateTransitionTask<S, T, U>(key, factory).run();
 		else executor.submit(new StateTransitionTask<S, T, U>(key, factory));
 	}
@@ -329,5 +340,34 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	public NioServerFactory getFactory()
 	{
 		return factory;
+	}
+
+	/**
+	 * Get the lock used to synchronize selector operations.
+	 * @return a <code>ReentrantLock</code> instance.
+	 */
+	public ReentrantLock getLock()
+	{
+		return lock;
+	}
+
+	/**
+	 * Set the interest ops of a specified selection key, ensuring no blocking occurs while doing so.
+	 * This method is proposed as a convenience, to encapsulate the inner locking mechanism. 
+	 * @param key the key on which to set the interest operations.
+	 * @param ops the operations to set on the key.
+	 */
+	public void setKeyOps(SelectionKey key, int ops)
+	{
+		lock.lock();
+		try
+		{
+			selector.wakeup();
+			key.interestOps(ops);
+		}
+		finally
+		{
+			lock.unlock();
+		}
 	}
 }

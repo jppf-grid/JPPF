@@ -19,8 +19,8 @@
  */
 package org.jppf.server.node;
 
-import java.io.DataInputStream;
 import java.util.*;
+
 import org.apache.log4j.Logger;
 import org.jppf.node.*;
 import org.jppf.utils.SerializationHelper;
@@ -72,15 +72,18 @@ public class JPPFContainer
 	}
 	
 	/**
-	 * Perform the deserialization of a single object from a data output stream.
-	 * @param dis the stream to deserialize from.
-	 * @param compressed determine whether the object must be decompressed first.
-	 * @return the deserializ object
+	 * Deserialize a number of objects from an array of bytes.
+	 * @param data the array pf bytes from which to deserialize.
+	 * @param offset the position in the source data at whcih to start reading.
+	 * @param compressed deternines whether the source data is comprssed or not.
+	 * @param list a list holding the resulting deserialized objects.
+	 * @param count the number of objects to deserialize.
+	 * @return the new position in the source data after deserialization.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	public Object deserializeObject(DataInputStream dis, boolean compressed) throws Exception
+	public int deserializeObject(byte[] data, int offset, boolean compressed, List<Object> list, int count) throws Exception
 	{
-		return helper.readNextObject(dis, compressed);
+		return helper.fromBytes(data, offset, compressed, list, count);
 	}
 
 	/**

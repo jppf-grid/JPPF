@@ -142,9 +142,10 @@ public class ProcessConfig
 	 * Build the set of log4j configuration properties for a process.
 	 * @param logFile the name of the log file.
 	 * @param append determines whether the log file should be re-created or appended to.
+	 * @param logLevel the logging level to use.
 	 * @return the configuration properties as a <code>Properties</code> instance.
 	 */
-	public static Properties buildLog4jConfig(String logFile, boolean append)
+	public static Properties buildLog4jConfig(String logFile, boolean append, String logLevel)
 	{
 		Properties props = new Properties();
 		props.setProperty("log4j.appender.JPPF", "org.apache.log4j.FileAppender");
@@ -152,7 +153,7 @@ public class ProcessConfig
 		props.setProperty("log4j.appender.JPPF.Append", ""+append);
 		props.setProperty("log4j.appender.JPPF.layout", "org.apache.log4j.PatternLayout");
 		props.setProperty("log4j.appender.JPPF.layout.ConversionPattern", "%d [%-5p][%c.%M(%L)]: %m\n");
-		props.setProperty("log4j.rootLogger", "INFO, JPPF");
+		props.setProperty("log4j.rootLogger", logLevel+", JPPF");
 		return props;
 	}
 }

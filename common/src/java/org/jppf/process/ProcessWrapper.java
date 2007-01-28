@@ -116,8 +116,13 @@ public class ProcessWrapper
 				while (s != null)
 				{
 					s = reader.readLine();
-					if (s != null) sb.append(s).append("\n");
+					if (s != null)
+					{
+						System.out.println(s);
+						sb.append(s).append("\n");
+					}
 				}
+				Thread.sleep(10);
 			}
 			catch(Throwable t)
 			{

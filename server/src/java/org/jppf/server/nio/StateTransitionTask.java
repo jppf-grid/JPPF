@@ -61,7 +61,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>, U extends
 	{
 		this.key = key;
 		this.factory = factory;
-		ctx = (NioContext<S>) key.attachment();
+		this.ctx = (NioContext<S>) key.attachment();
 	}
 
 	/**
@@ -75,8 +75,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>, U extends
 			NioState<T> state = factory.getState(ctx.getState());
 			NioTransition<S> transition = factory.getTransition(state.performTransition(key));
 			ctx.setState(transition.getState());
-			key.interestOps(transition.getInterestOps());
-			key.selector().wakeup();
+			factory.getServer().setKeyOps(key, transition.getInterestOps());
 		}
 		catch(Exception e)
 		{

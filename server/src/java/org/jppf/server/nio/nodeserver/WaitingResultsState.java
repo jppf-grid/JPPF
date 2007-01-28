@@ -22,13 +22,13 @@ package org.jppf.server.nio.nodeserver;
 
 import static org.jppf.server.JPPFStatsUpdater.*;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
+import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.nio.channels.*;
 
 import org.apache.log4j.Logger;
 import org.jppf.server.JPPFTaskBundle;
 import org.jppf.server.event.TaskCompletionListener;
-import org.jppf.utils.StringUtils;
 
 /**
  * 
@@ -64,15 +64,16 @@ public class WaitingResultsState extends NodeServerState
 	{
 		SocketChannel channel = (SocketChannel) key.channel();
 		NodeContext context = (NodeContext) key.attachment();
-		if (debugEnabled) log.debug("exec() for " + StringUtils.getRemostHost(channel));
-		JPPFTaskBundle bundle = context.getBundle();
-		TaskCompletionListener listener = bundle.getCompletionListener();
+		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 
 		// Wait the full byte[] of the bundle come to start processing.
 		// This makes the integration of non-blocking with ObjectInputStream easier.
 		if (context.readMessage(channel))
 		{
+			if (debugEnabled) log.debug("read bundle from node " + getRemoteHost(channel) + " done");
+			JPPFTaskBundle bundle = context.getBundle();
 			long elapsed = System.currentTimeMillis() - bundle.getExecutionStartTime();
+			TaskCompletionListener listener = bundle.getCompletionListener();
 			bundle = context.deserializeBundle();
 			// updating stats
 			if (isStatsEnabled())
@@ -87,8 +88,8 @@ public class WaitingResultsState extends NodeServerState
 			context.setMessage(null);
 			context.setBundle(null);
 			server.addIdleChannel(channel);
-			return TRANSITION_TO_IDLE;
+			return TO_IDLE;
 		}
-		return TRANSITION_TO_WAITING;
+		return TO_WAITING;
 	}
 }

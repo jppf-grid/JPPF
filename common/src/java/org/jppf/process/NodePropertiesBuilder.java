@@ -31,15 +31,15 @@ public class NodePropertiesBuilder
 	/**
 	 * Node configuration 1.
 	 */
-	public static final Properties NODE_1 = buildNodeConfig("localhost", 11111, 11112, 1);
+	public static final Properties NODE_1 = buildNodeConfig("localhost", 11111, 11113, 1);
 	/**
 	 * Node configuration 2.
 	 */
-	public static final Properties NODE_2 = buildNodeConfig("localhost", 11111, 11112, 1);
+	public static final Properties NODE_2 = buildNodeConfig("localhost", 11111, 11113, 1);
 	/**
 	 * Node configuration 3.
 	 */
-	public static final Properties NODE_3 = buildNodeConfig("localhost", 11121, 11122, 1);
+	public static final Properties NODE_3 = buildNodeConfig("localhost", 11121, 11123, 1);
 
 	/**
 	 * Generate the base configuration properties for a node.
@@ -55,6 +55,7 @@ public class NodePropertiesBuilder
 		props.setProperty("jppf.server.host", "" + host);
 		props.setProperty("class.server.port", "" + classPort);
 		props.setProperty("node.server.port", "" + nodePort);
+		props.setProperty("processing.threads", "" + nbThreads);
 		props.setProperty("reconnect.initial.delay", "1");
 		props.setProperty("reconnect.max.time", "-1");
 		props.setProperty("reconnect.interval", "1");

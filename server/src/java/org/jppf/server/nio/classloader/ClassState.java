@@ -17,30 +17,36 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.node;
+package org.jppf.server.nio.classloader;
 
 /**
- * Instances of this exception are thrown by the JPPF dynamic class loading mechanism.
+ * Enumeration of the possible states for a class server channel.
  * @author Laurent Cohen
  */
-public class JPPFBootstrapException extends Exception
+public enum ClassState
 {
 	/**
-	 * Initialize this exception with a specified cause and message.
-	 * @param message the reason for this exception.
-	 * @param cause the exception that caused this one.
+	 * State of determining the type of a channel.
 	 */
-	public JPPFBootstrapException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
-
+	DEFINING_TYPE,
 	/**
-	 * Initialize this exception with a specified message.
-	 * @param message the reason for this exception.
+	 * State of sending the initial information to a node classloader.
 	 */
-	public JPPFBootstrapException(String message)
-	{
-		super(message);
-	}
+	SENDING_INITIAL_RESPONSE,
+	/**
+	 * State of waiting for a request from a node classloader.
+	 */
+	WAITING_NODE_REQUEST,
+	/**
+	 * State of waiting for a response to a node classloader.
+	 */
+	SENDING_NODE_RESPONSE,
+	/**
+	 * State of waiting for a response form a resource provider.
+	 */
+	WAITING_PROVIDER_RESPONSE,
+	/**
+	 * State of waiting for a response from a resource provider.
+	 */
+	SENDING_PROVIDER_REQUEST
 }

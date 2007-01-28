@@ -21,12 +21,12 @@
 package org.jppf.server.nio.nodeserver;
 
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
+import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.net.ConnectException;
 import java.nio.channels.*;
 
 import org.apache.log4j.Logger;
-import org.jppf.utils.StringUtils;
 
 /**
  * 
@@ -61,26 +61,26 @@ public class SendInitialBundleState extends NodeServerState
 	public NodeTransition performTransition(SelectionKey key) throws Exception
 	{
 		SocketChannel channel = (SocketChannel) key.channel();
-		if (debugEnabled) log.debug("exec() for " + StringUtils.getRemostHost(channel));
+		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		if (key.isReadable())
 		{
-			throw new ConnectException("node " + StringUtils.getRemostHost(channel) + " has been disconnected");
+			throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");
 		}
 
 		NodeContext context = (NodeContext) key.attachment();
 		if (context.getMessage() == null)
 		{
-			if (debugEnabled) log.debug("serializing initial bundle for " + StringUtils.getRemostHost(channel));
+			if (debugEnabled) log.debug("serializing initial bundle for " + getRemoteHost(channel));
 			context.serializeBundle();
 		}
 		if (context.writeMessage(channel))
 		{
-			if (debugEnabled) log.debug("sent entire initial bundle for " + StringUtils.getRemostHost(channel));
+			if (debugEnabled) log.debug("sent entire initial bundle for " + getRemoteHost(channel));
 			context.setMessage(null);
 			context.setBundle(null);
-			return TRANSITION_TO_WAIT_INITIAL;
+			return TO_WAIT_INITIAL;
 		}
-		if (debugEnabled) log.debug("part yet to send for " + StringUtils.getRemostHost(channel));
-		return TRANSITION_TO_SEND_INITIAL;
+		if (debugEnabled) log.debug("part yet to send for " + getRemoteHost(channel));
+		return TO_SEND_INITIAL;
 	}
 }

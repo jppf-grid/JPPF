@@ -33,7 +33,7 @@ import org.jppf.utils.JPPFByteArrayOutputStream;
  * 
  * @author Laurent Cohen
  */
-public class ClassContext extends NioContext<ChannelState>
+public class ClassContext extends NioContext<ClassState>
 {
 	/**
 	 * The resource read from or written to the associated channel.

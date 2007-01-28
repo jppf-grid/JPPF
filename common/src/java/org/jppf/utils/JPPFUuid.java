@@ -35,6 +35,16 @@ import java.util.Random;
  */
 public class JPPFUuid implements Serializable
 {
+	/**
+	 * Set of characters used to compose a uuid.
+	 */
+	private static final String[] ALPHABET =
+	{
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
+	  "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H",
+	  "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "'", "!", "@", "#",
+	  "$", "%", "^", "&", "*", "(", ")", "_", "+", "|", "{", "}", "[", "]", "-", "=", "/", ",", ".", "?", ":", ";"
+	};
   /**
 	 * Random number generator, static to ensure generated uuid are unique.
 	 */
@@ -55,12 +65,24 @@ public class JPPFUuid implements Serializable
 	{
 		uuid = generateUuid();
 	}
-	
+
 	/**
 	 * Generate a unique uuid.
 	 * @return the uuid as a string.
 	 */
 	private static String generateUuid()
+	{
+		int len = ALPHABET.length;
+		StringBuilder sb = new StringBuilder();
+		for (int i=0; i<16; i++) sb.append(ALPHABET[rand.nextInt(len)]);
+		return sb.toString();
+	}
+	
+	/**
+	 * Generate a unique uuid.
+	 * @return the uuid as a string.
+	 */
+	private static String generateUuid2()
 	{
 		int n = 2;
 		StringBuilder sb = new StringBuilder();

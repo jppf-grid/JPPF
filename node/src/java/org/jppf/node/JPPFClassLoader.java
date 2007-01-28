@@ -41,7 +41,7 @@ public class JPPFClassLoader extends ClassLoader
 	/**
 	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = false;
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Wrapper for the underlying socket connection.
 	 */
@@ -101,12 +101,23 @@ public class JPPFClassLoader extends ClassLoader
 	 */
 	private static void init()
 	{
-		if (!isInitializing()) setInitializing(true);
+		if (!isInitializing())
+		{
+			if (debugEnabled) log.debug("initializing connection");
+			setInitializing(true);
+		}
 		else
 		{
+			if (debugEnabled) log.debug("waiting for end of connection initialization");
 			// wait until initialization is over.
-			lock.lock();
-			lock.unlock();
+			try
+			{
+				lock.lock();
+			}
+			finally
+			{
+				lock.unlock();
+			}
 			return;
 		}
 		lock.lock();
@@ -120,10 +131,12 @@ public class JPPFClassLoader extends ClassLoader
 			// state machine of ClassServer
 			try
 			{
+				if (debugEnabled) log.debug("sending node initiation message");
 				JPPFResourceWrapper resource = new JPPFResourceWrapper();
 				resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
 				socketClient.send(resource);
 				socketClient.receive();
+				if (debugEnabled) log.debug("received sending node initiation response");
 			}
 			catch(ClassNotFoundException e)
 			{
@@ -147,6 +160,7 @@ public class JPPFClassLoader extends ClassLoader
 	 */
 	private static void initSocketClient()
 	{
+		if (debugEnabled) log.debug("initializing socket connection");
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String host = props.getString("jppf.server.host", "localhost");
 		int port = props.getInt("class.server.port", 11111);
@@ -172,6 +186,7 @@ public class JPPFClassLoader extends ClassLoader
 	 */
 	public synchronized Class<?> loadJPPFClass(String name) throws ClassNotFoundException
 	{
+		if (debugEnabled) log.debug("looking up resource [" + name + "]");
 		Class c = findLoadedClass(name);
 		if (c == null)
 		{
@@ -183,8 +198,10 @@ public class JPPFClassLoader extends ClassLoader
 		}
 		if (c == null)
 		{
+			if (debugEnabled) log.debug("resource [" + name + "] not already loaded");
 			c = findClass(name);
 		}
+		if (debugEnabled) log.debug("definition for resource [" + name + "] : " + c);
 		return c;
 	}
 
@@ -199,11 +216,17 @@ public class JPPFClassLoader extends ClassLoader
 	{
 		try
 		{
-		byte[] b = null;
-		String resName = name.replace('.', '/') + ".class";
-		b = loadResourceData(resName);
-		if ((b == null) || (b.length == 0)) throw new ClassNotFoundException("Could not load class '" + name + "'");
-		return defineClass(name, b, 0, b.length);
+			if (debugEnabled) log.debug("looking up definition for resource [" + name + "]");
+			byte[] b = null;
+			String resName = name.replace('.', '/') + ".class";
+			b = loadResourceData(resName);
+			if ((b == null) || (b.length == 0))
+			{
+				if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
+				throw new ClassNotFoundException("Could not load class '" + name + "'");
+			}
+			if (debugEnabled) log.debug("found definition for resource [" + name + "]");
+			return defineClass(name, b, 0, b.length);
 		}
 		catch(Error e)
 		{
@@ -222,10 +245,12 @@ public class JPPFClassLoader extends ClassLoader
 		byte[] b = null;
 		try
 		{
+			if (debugEnabled) log.debug("loading remote definition for resource [" + name + "]");
 			b = loadResourceData0(name);
 		}
 		catch(IOException e)
 		{
+			if (debugEnabled) log.debug("connection with class server ended, re-initializing");
 			init();
 			try
 			{
@@ -250,6 +275,7 @@ public class JPPFClassLoader extends ClassLoader
 		byte[] b = null;
 		try
 		{
+			if (debugEnabled) log.debug("loading remote definition for resource [" + name + "]");
 			lock.lock();
 			JPPFResourceWrapper resource = new JPPFResourceWrapper();
 			resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
@@ -262,6 +288,7 @@ public class JPPFClassLoader extends ClassLoader
 			socketClient.send(resource);
 			resource = (JPPFResourceWrapper) socketClient.receive();
 			b = resource.getDefinition();
+			if (debugEnabled) log.debug("remote definition for resource [" + name + "] "+ (b==null ? "not " : "") + "found");
 		}
 		finally
 		{
@@ -281,14 +308,18 @@ public class JPPFClassLoader extends ClassLoader
 		InputStream is = getClass().getClassLoader().getResourceAsStream(name);
 		if (is == null)
 		{
+			if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
 			try
 			{
 				byte[] b = loadResourceData(name);
-				if ((b == null) || (b.length == 0)) return null;
+				boolean found = (b == null) || (b.length == 0);
+				if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
+				if (found) return null;
 				is = new ByteArrayInputStream(b);
 			}
 			catch(ClassNotFoundException e)
 			{
+				if (debugEnabled) log.debug("resource [" + name + "] not found remotely");
 				return null;
 			}
 		}
@@ -330,21 +361,6 @@ public class JPPFClassLoader extends ClassLoader
 		catch(ClassNotFoundException e)
 		{
 		}
-		if (c == null)
-		{
-			c = findClass(name);
-		}
-		return c;
-	}
-
-	/**
-	 * @param name the binary name of the class
-	 * @return the resulting <tt>Class</tt> object
-	 * @throws ClassNotFoundException if the class could not be found
-	 */
-	public synchronized Class<?> forceLoadJPPFClass(String name) throws ClassNotFoundException
-	{
-		Class c = findLoadedClass(name);
 		if (c == null)
 		{
 			c = findClass(name);

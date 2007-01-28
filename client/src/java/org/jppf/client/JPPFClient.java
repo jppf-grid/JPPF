@@ -311,7 +311,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 					throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
 				}
 			}
-			List<ClientExecution> toResubmit = c.shutdownConnection();
+			List<ClientExecution> toResubmit = c.close();
 			int taskCount = 0;
 			int execCount = toResubmit.size();
 			for (ClientExecution exec: toResubmit)

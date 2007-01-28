@@ -42,7 +42,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	/**
 	 * The list of task bundles whose execution has been completed.
 	 */
-	protected List<JPPFTaskBundle> resultList = new ArrayList<JPPFTaskBundle>();
+	protected List<JPPFTaskBundle> resultList = new Vector<JPPFTaskBundle>();
 	/**
 	 * Number of tasks that haven't yet been executed.
 	 */
@@ -105,7 +105,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 			try
 			{
 				wait();
-				synchronized (resultList)
+				//synchronized (resultList)
 				{
 					if (debugEnabled) log.debug(""+resultList.size()+" in result list");
 					if (asynch)
@@ -116,15 +116,19 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 					{
 						JPPFTaskBundle first = resultList.remove(0);
 						List<byte[]> taskList = first.getTasks();
-						int count = first.getTaskCount();
-						for (JPPFTaskBundle bundle : resultList)
+						int count = first.getTasks().size();
+						int size = resultList.size();
+						for (int i=0; i<size; i++)
 						{
-							taskList.addAll(bundle.getTasks());
-							count += bundle.getTaskCount();
+							JPPFTaskBundle bundle = resultList.remove(0);
+							for (byte[] task: bundle.getTasks())
+							{
+								taskList.add(task);
+								count++;
+							}
+							bundle.getTasks().clear();
 						}
 						first.setTaskCount(count);
-						long elapsed = System.currentTimeMillis() - first.getNodeExecutionTime();
-						first.setNodeExecutionTime(elapsed);
 						sendPartialResults(first);
 					}
 					resultList.clear();
@@ -146,7 +150,9 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	public synchronized void taskCompleted(JPPFTaskBundle result)
 	{
 		pendingTasksCount -= result.getTaskCount();
-		if (debugEnabled) log.debug("Pending tasks: "+pendingTasksCount);
+		if (debugEnabled) log.debug("Received results for : " + result.getTaskCount() + " [size=" +
+			result.getTasks().size() + "] tasks");
+		if (debugEnabled) log.debug("Pending tasks: " + pendingTasksCount);
 		resultList.add(result);
 		if (asynch || (pendingTasksCount <= 0)) notify();
 	}

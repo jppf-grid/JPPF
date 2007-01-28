@@ -19,13 +19,11 @@
  */
 package org.jppf.server.peer;
 
-import java.io.*;
-import java.net.Socket;
 import java.util.*;
+
 import org.apache.log4j.Logger;
-import org.jppf.comm.socket.*;
-import org.jppf.node.MonitoredNode;
-import org.jppf.node.event.*;
+import org.jppf.comm.socket.SocketClient;
+import org.jppf.node.AbstractMonitoredNode;
 import org.jppf.node.event.NodeEvent.EventType;
 import org.jppf.server.*;
 import org.jppf.utils.*;
@@ -35,60 +33,24 @@ import org.jppf.utils.*;
  * @author Laurent Cohen
  * @author Domingos Creado
  */
-public class PeerNode implements MonitoredNode
+public class PeerNode extends AbstractMonitoredNode
 {
 	/**
 	 * Log4j logger for this class.
 	 */
-	private static Logger log = Logger.getLogger(PeerNode.class);;
-	/**
-	 * Utility for deserialization and serialization.
-	 */
-	private SerializationHelper helper = new SerializationHelperImpl();
-	/**
-	 * Wrapper around the underlying server connection.
-	 */
-	private SocketWrapper socketClient = null;
-	/**
-	 * Used to synchronize access to the underlying socket from multiple threads.
-	 */
-	private SocketInitializer socketInitializer = new SocketInitializer();
+	private static Logger log = Logger.getLogger(PeerNode.class);
 	/**
 	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = false;
-	/**
-	 * Used to programmatically stop this node.
-	 */
-	private boolean stopped = false;
-	/**
-	 * The list of listeners that receive notifications from this node.
-	 */
-	private List<NodeListener> listeners = new ArrayList<NodeListener>();
-	/**
-	 * This flag is true if there is at least one listener, and false otherwise.
-	 */
-	private boolean notifying = false;
-	/**
-	 * The socket used by this node's socket wrapper.
-	 */
-	private Socket socket = null;
-	/**
-	 * Total number of tasks executed.
-	 */
-	private int taskCount = 0;
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Used to send the task results back to the requester.
 	 */
-	private PeerNodeResultSender resultSender = null;
+	private AbstractResultSender resultSender = null;
 	/**
 	 * The name of the peer in the configuration file.
 	 */
 	private String peerName = null;
-	/**
-	 * This node's universal identifier.
-	 */
-	private String uuid = new JPPFUuid().toString();
 	/**
 	 * Security credentials associated with this JPPF node.
 	 */
@@ -101,6 +63,8 @@ public class PeerNode implements MonitoredNode
 	public PeerNode(String peerName)
 	{
 		this.peerName = peerName;
+		this.uuid = new JPPFUuid().toString();
+		this.helper = new SerializationHelperImpl();
 	}
 
 	/**
@@ -111,7 +75,7 @@ public class PeerNode implements MonitoredNode
 	{
 		debugEnabled = log.isDebugEnabled();
 		stopped = false;
-		if (debugEnabled) log.debug("Start of peer node main loop");
+		if (debugEnabled) log.debug(getName() + "Start of peer node main loop");
 		while (!stopped)
 		{
 			try
@@ -136,10 +100,11 @@ public class PeerNode implements MonitoredNode
 			catch(Error e)
 			{
 				log.error(e.getMessage(), e);
+				e.printStackTrace();
 				throw e;
 			}
 		}
-		if (debugEnabled) log.debug("End of peer node main loop");
+		if (debugEnabled) log.debug(getName() + "End of peer node main loop");
 		if (notifying) fireNodeEvent(EventType.DISCONNECTED);
 	}
 
@@ -151,7 +116,7 @@ public class PeerNode implements MonitoredNode
 	public void perform() throws Exception
 	{
 		JPPFDriver driver = JPPFDriver.getInstance();
-		if (debugEnabled) log.debug("Start of peer node secondary loop");
+		if (debugEnabled) log.debug(getName() + "Start of peer node secondary loop");
 		while (!stopped)
 		{
 			JPPFTaskBundle bundle = readBundle();
@@ -163,19 +128,26 @@ public class PeerNode implements MonitoredNode
 			boolean notEmpty = (bundle.getTasks() != null) && (bundle.getTaskCount() > 0);
 			if (notEmpty)
 			{
+				int n = bundle.getTaskCount();
+
 				bundle.getUuidPath().add(driver.getUuid());
 				bundle.setCompletionListener(resultSender);
 				JPPFDriver.getQueue().addBundle(bundle);
-				resultSender.run(bundle.getTaskCount());
-				taskCount += bundle.getTaskCount();
-				if (debugEnabled) log.debug("tasks executed: "+taskCount);
+				resultSender.run(n);
+				/*
+				resultSender.sendPartialResults(bundle);
+				*/
+
+				taskCount += n;
+				if (debugEnabled) log.debug(getName() + "tasks executed: "+taskCount);
 			}
 			else
 			{
 				resultSender.sendPartialResults(bundle);
 			}
+			if (notifying) fireNodeEvent(EventType.END_EXEC);
 		}
-		if (debugEnabled) log.debug("End of peer node secondary loop");
+		if (debugEnabled) log.debug(getName() + " End of peer node secondary loop");
 	}
 
 	/**
@@ -184,17 +156,17 @@ public class PeerNode implements MonitoredNode
 	 */
 	public synchronized void init() throws Exception
 	{
-		if (debugEnabled) log.debug("initializing socket client");
+		if (debugEnabled) log.debug(getName() + "] initializing socket client");
 		if (socketClient == null) initSocketClient();
 		initCredentials();
 		if (notifying) fireNodeEvent(EventType.START_CONNECT);
 		if (socket == null)
 		{
-			if (debugEnabled) log.debug("initializing socket");
-			System.out.println("PeerNode.init(): Attempting connection to the JPPF driver");
+			if (debugEnabled) log.debug(getName() + "initializing socket");
+			System.out.println(getName() + "PeerNode.init(): Attempting connection to the JPPF driver");
 			socketInitializer.initializeSocket(socketClient);
 			socket = socketClient.getSocket();
-			System.out.println("PeerNode.init(): Reconnected to the JPPF driver");
+			System.out.println(getName() + "PeerNode.init(): Reconnected to the JPPF driver");
 		}
 		if (notifying) fireNodeEvent(EventType.END_CONNECT);
 	}
@@ -208,7 +180,7 @@ public class PeerNode implements MonitoredNode
 		if (socket != null) socketClient = new SocketClient(socket);
 		else
 		{
-			if (debugEnabled) log.debug("initializing socket client");
+			if (debugEnabled) log.debug(getName() + "initializing socket client");
 			TypedProperties props = JPPFConfiguration.getProperties();
 			String host = props.getString("jppf.peer."+peerName+".server.host", "localhost");
 			int port = props.getInt("node.peer."+peerName+".server.port", 11113);
@@ -242,60 +214,31 @@ public class PeerNode implements MonitoredNode
 	private JPPFTaskBundle readBundle() throws Exception
 	{
 		JPPFBuffer buf = socketClient.receiveBytes(0);
-		if (debugEnabled) log.debug("read  "+buf.getLength()+" bytes");
-		ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer());
-		DataInputStream dis = new DataInputStream(bais);
-		JPPFTaskBundle bundle = (JPPFTaskBundle) helper.readNextObject(dis, false);
+		byte[] data = buf.getBuffer();
+		if (debugEnabled) log.debug(getName() + "read " + buf.getLength() + " bytes");
+
+		List<JPPFTaskBundle> list = new ArrayList<JPPFTaskBundle>();
+		int pos = helper.fromBytes(data, 0, false, list, 1);
+		JPPFTaskBundle bundle = list.get(0);
 		bundle.setNodeExecutionTime(System.currentTimeMillis());
 		int count = bundle.getTaskCount();
 		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 		{
 			List<byte[]> taskList = new ArrayList<byte[]>();
-			bundle.setDataProvider(helper.readNextBytes(dis));
+			byte[] dataProvider = helper.copyFromBuffer(data, pos);
+			pos += 4 + dataProvider.length;
+			bundle.setDataProvider(dataProvider);
 			for (int i = 0; i < count; i++)
 			{
-				taskList.add(helper.readNextBytes(dis));
+				byte[] task = helper.copyFromBuffer(data, pos);
+				pos += 4 + task.length;
+				taskList.add(task);
 			}
 			bundle.setTasks(taskList);
 		}
-		dis.close();
-		if (debugEnabled) log.debug("read bundle with "+bundle.getTaskCount()+" tasks");
+		
+		if (debugEnabled) log.debug(getName() + "read bundle with " + count + " tasks");
 		return bundle;
-	}
-
-	/**
-	 * Add a listener to the list of listener for this node.
-	 * @param listener the listener to add.
-	 * @see org.jppf.node.MonitoredNode#addNodeListener(org.jppf.node.event.NodeListener)
-	 */
-	public void addNodeListener(NodeListener listener)
-	{
-		if (listener == null) return;
-		listeners.add(listener);
-		notifying = true;
-	}
-
-	/**
-	 * Remove a listener from the list of listener for this node.
-	 * @param listener the listener to remove.
-	 * @see org.jppf.node.MonitoredNode#removeNodeListener(org.jppf.node.event.NodeListener)
-	 */
-	public void removeNodeListener(NodeListener listener)
-	{
-		if (listener == null) return;
-		listeners.remove(listener);
-		if (listeners.size() <= 0) notifying = false;
-	}
-
-	/**
-	 * Notify all listeners that an event has occurred.
-	 * @param eventType the type of the event as an enumerated value.
-	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(org.jppf.node.event.NodeEvent.EventType)
-	 */
-	public void fireNodeEvent(EventType eventType)
-	{
-		NodeEvent event = new NodeEvent(eventType);
-		for (NodeListener listener : listeners) listener.eventOccurred(event);
 	}
 
 	/**
@@ -305,13 +248,13 @@ public class PeerNode implements MonitoredNode
 	 */
 	public void stopNode(boolean closeSocket)
 	{
-		if (debugEnabled) log.debug("closing node");
+		if (debugEnabled) log.debug(getName() + "closing node");
 		stopped = true;
 		if (closeSocket)
 		{
 			try
 			{
-				if (debugEnabled) log.debug("closing socket: "+socket);
+				if (debugEnabled) log.debug(getName() + "closing socket: "+socket);
 				socketClient.close();
 			}
 			catch(Exception ex)
@@ -325,31 +268,11 @@ public class PeerNode implements MonitoredNode
 	}
 
 	/**
-	 * Get the underlying socket used by this socket wrapper.
-	 * @return a Socket instance.
-	 * @see org.jppf.node.MonitoredNode#getSocket()
+	 * Get a string representation of this peer node's name.
+	 * @return the name as a string.
 	 */
-	public Socket getSocket()
+	private String getName()
 	{
-		return socket;
-	}
-	
-	/**
-	 * Set the underlying socket to be used by this socket wrapper.
-	 * @param socket a Socket instance.
-	 * @see org.jppf.node.MonitoredNode#setSocket(java.net.Socket)
-	 */
-	public void setSocket(Socket socket)
-	{
-		this.socket = socket;
-	}
-
-	/**
-	 * Get the underlying socket wrapper used by this node.
-	 * @return a <code>SocketWrapper</code> instance.
-	 */
-	public SocketWrapper getSocketWrapper()
-	{
-		return socketClient;
+		return "[peer: " + peerName +"] ";
 	}
 }

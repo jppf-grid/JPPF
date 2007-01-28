@@ -19,11 +19,10 @@
  */
 package org.jppf.server.app;
 
-import java.io.*;
 import org.apache.log4j.Logger;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.server.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
 
 /**
  * 
@@ -57,19 +56,18 @@ public class ApplicationResultSender extends AbstractResultSender
 	public void sendPartialResults(JPPFTaskBundle bundle) throws Exception
 	{
 		if (debugEnabled) log.debug("Sending bundle with "+bundle.getTaskCount()+" tasks");
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(baos);
-		dos.writeInt(bundle.getTaskCount());
-		for (int i = 0; i < bundle.getTaskCount(); i++)
+		int size = 4;
+		for (byte[] task : bundle.getTasks())
 		{
-			byte[] task = bundle.getTasks().get(i);
-			helper.writeNextBytes(dos, task, 0, task.length);
+			size += 4 + task.length;
 		}
-		dos.flush();
-		dos.close();
-		JPPFBuffer buffer = new JPPFBuffer();
-		buffer.setLength(baos.size());
-		buffer.setBuffer(baos.toByteArray());
+		byte[] data = new byte[size];
+		int pos = helper.writeInt(bundle.getTaskCount(), data, 0);
+		for (byte[] task : bundle.getTasks())
+		{
+			pos = helper.copyToBuffer(task, data, pos, task.length);
+		}
+		JPPFBuffer buffer = new JPPFBuffer(data, size);
 		socketClient.sendBytes(buffer);
 	}
 }

@@ -21,13 +21,13 @@
 package org.jppf.server.nio.nodeserver;
 
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
+import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.net.ConnectException;
 import java.nio.channels.*;
 
 import org.apache.log4j.Logger;
 import org.jppf.server.JPPFTaskBundle;
-import org.jppf.utils.StringUtils;
 
 /**
  * This class represents the state of waiting for some action.
@@ -65,7 +65,7 @@ public class SendingBundleState extends NodeServerState
 		//if (debugEnabled) log.debug("exec() for " + getRemostHost(channel));
 		if (key.isReadable())
 		{
-			throw new ConnectException("node " + StringUtils.getRemostHost(channel) + " has been disconnected");
+			throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");
 		}
 
 		NodeContext context = (NodeContext) key.attachment();
@@ -79,7 +79,7 @@ public class SendingBundleState extends NodeServerState
 			JPPFTaskBundle bundle = server.getQueue().nextBundle(context.getBundler().getBundleSize());
 			if (bundle != null)
 			{
-				if (debugEnabled) log.debug("got bundle from the queue for " + StringUtils.getRemostHost(channel));
+				if (debugEnabled) log.debug("got bundle from the queue for " + getRemoteHost(channel));
 				// to avoid cycles in peer-to-peer routing of jobs.
 				if (bundle.getUuidPath().contains(context.getUuid()))
 				{
@@ -87,7 +87,7 @@ public class SendingBundleState extends NodeServerState
 					context.resubmitBundle(bundle);
 					context.setBundle(null);
 					server.addIdleChannel(channel);
-					return TRANSITION_TO_IDLE;
+					return TO_IDLE;
 				}
 				context.setBundle(bundle);
 				context.serializeBundle();
@@ -95,16 +95,16 @@ public class SendingBundleState extends NodeServerState
 			else
 			{
 				server.addIdleChannel(channel);
-				return TRANSITION_TO_IDLE;
+				return TO_IDLE;
 			}
 		}
 		if (context.writeMessage(channel))
 		{
-			if (debugEnabled) log.debug("sent entire bundle for " + StringUtils.getRemostHost(channel));
+			if (debugEnabled) log.debug("sent entire bundle to node " + getRemoteHost(channel));
 			context.setMessage(null);
-			return TRANSITION_TO_WAITING;
+			return TO_WAITING;
 		}
-		if (debugEnabled) log.debug("part yet to send for " + StringUtils.getRemostHost(channel));
-		return TRANSITION_TO_SENDING;
+		if (debugEnabled) log.debug("part yet to send to node " + getRemoteHost(channel));
+		return TO_SENDING;
 	}
 }

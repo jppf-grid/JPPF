@@ -235,7 +235,7 @@ public final class StringUtils
 	 * @param channel the channel to get the host from.
 	 * @return an IP address as a string.
 	 */
-	public static String getRemostHost(SocketChannel channel)
+	public static String getRemoteHost(SocketChannel channel)
 	{
 		StringBuilder sb = new StringBuilder();
 		Socket s = channel.socket();

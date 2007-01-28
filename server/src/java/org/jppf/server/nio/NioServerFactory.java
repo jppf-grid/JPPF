@@ -50,6 +50,10 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>, U e
 	 * Map of all states for a class server.
 	 */
 	protected Map<T, NioTransition<S>> transitionMap = null;
+	/**
+	 * The server for which this factory is intended.
+	 */
+	protected U server = null;
 
 	/**
 	 * Initialize this factory with the specified server.
@@ -57,6 +61,7 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>, U e
 	 */
 	protected NioServerFactory(U server)
 	{
+		this.server = server;
 		stateMap = createStateMap(server);
 		transitionMap = createTransitionMap();
 	}
@@ -92,5 +97,14 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>, U e
 	public NioTransition<S> getTransition(T name)
 	{
 		return transitionMap.get(name);
+	}
+
+	/**
+	 * Get the server for which this factory is intended.
+	 * @return an <code>NioServer</code> instance.
+	 */
+	public U getServer()
+	{
+		return server;
 	}
 }

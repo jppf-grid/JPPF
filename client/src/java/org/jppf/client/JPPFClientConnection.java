@@ -259,7 +259,7 @@ public class JPPFClientConnection
 			{
 				public void resultsReceived(TaskResultEvent event)
 				{
-					resultList.addAll(event.getTaskList());
+					for (JPPFTask task: event.getTaskList()) resultList.add(task);
 				}
 			};
 			ClientExecution exec = new ClientExecution(taskList, dataProvider, true, listener);
@@ -316,37 +316,47 @@ public class JPPFClientConnection
 		header.setCredentials(credentials);
 		int count = taskList.size();
 		header.setTaskCount(count);
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(baos);
-		helper.writeNextObject(header, dos, false);
-		helper.writeNextObject(dataProvider, dos, true);
-		for (JPPFTask task : taskList) helper.writeNextObject(task, dos, true);
-		dos.flush();
-		dos.close();
-		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
-		socketClient.sendBytes(buf);
+		List<JPPFBuffer> bufList = new ArrayList<JPPFBuffer>();
+		JPPFBuffer buffer = helper.toBytes(header, false);
+		int size = 4 + buffer.getLength();
+		bufList.add(buffer);
+		buffer = helper.toBytes(dataProvider, true); 
+		size += 4 + buffer.getLength();
+		bufList.add(buffer);
+		for (JPPFTask task : taskList)
+		{
+			buffer = helper.toBytes(task, true); 
+			size += 4 + buffer.getLength();
+			bufList.add(buffer);
+		}
+		byte[] data = new byte[size];
+		int pos = 0;
+		for (JPPFBuffer buf: bufList)
+		{
+			//pos = helper.writeInt(buf.getLength(), data, pos);
+			pos = helper.copyToBuffer(buf.getBuffer(), data, pos, buf.getLength());
+		}
+
+		buffer = new JPPFBuffer(data, size);
+		socketClient.sendBytes(buffer);
 	}
 
 	/**
 	 * Receive results of tasks execution.
-	 * @return a pair of objects representing the executed tasks results, and the index of the first result within the
-	 *         initial task execution request.
+	 * @return a pair of objects representing the executed tasks results, and the index
+	 * of the first result within the initial task execution request.
 	 * @throws Exception if an error is raised while reading the results from the server.
 	 */
 	Pair<List<JPPFTask>, Integer> receiveResults() throws Exception
 	{
 		JPPFBuffer buf = socketClient.receiveBytes(0);
+		byte[] data = buf.getBuffer();
 		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-		ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
-		DataInputStream dis = new DataInputStream(bais);
-		int count = dis.readInt();
-		for (int i = 0; i < count; i++)
-		{
-			JPPFTask task = (JPPFTask) helper.readNextObject(dis, true);
-			taskList.add(task);
-		}
+		int pos = 0;
+		int count = helper.readInt(data, pos);
+		pos += 4;
+		helper.fromBytes(data, pos, true, taskList, count);
 		int startIndex = (taskList.isEmpty()) ? -1 : taskList.get(0).getPosition();
-		dis.close();
 		Pair<List<JPPFTask>, Integer> p = new Pair<List<JPPFTask>, Integer>(taskList, startIndex);
 		return p;
 	}
@@ -371,18 +381,15 @@ public class JPPFClientConnection
 					header.setAppUuid(appUuid);
 					header.setCredentials(credentials);
 					header.setRequestType(JPPFRequestHeader.Type.STATISTICS);
-					ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-					DataOutputStream dos = new DataOutputStream(baos);
-					helper.writeNextObject(header, dos, false);
-					dos.flush();
-					dos.close();
-					JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
+					JPPFBuffer buf = helper.toBytes(header, false);
+					byte[] data = new byte[buf.getLength() + 4];
+					helper.copyToBuffer(buf.getBuffer(), data, 0, buf.getLength());
+					buf.setLength(data.length);
+					buf.setBuffer(data);
 					socketClient.sendBytes(buf);
 					buf = socketClient.receiveBytes(0);
-					ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
-					DataInputStream dis = new DataInputStream(bais);
-					stats = (JPPFStats) helper.readNextObject(dis, false);
-					dis.close();
+					ObjectSerializer serializer = new ObjectSerializerImpl();
+					stats = (JPPFStats) serializer.deserialize(buf.getBuffer());
 					completed = true;
 				}
 				catch(IOException e)
@@ -435,10 +442,9 @@ public class JPPFClientConnection
 			}
 			sendAdminRequest(request);
 			JPPFBuffer buf = socketClient.receiveBytes(0);
-			ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
-			DataInputStream dis = new DataInputStream(bais);
-			request = (AdminRequest) helper.readNextObject(dis, false);
-			dis.close();
+			List<AdminRequest> list = new ArrayList<AdminRequest>();
+			helper.fromBytes(buf.getBuffer(), 0, false, list, 1);
+			request = list.get(0);
 			return (String) request.getParameter(RESPONSE_PARAM);
 		}
 		finally
@@ -454,12 +460,7 @@ public class JPPFClientConnection
 	 */
 	private void sendAdminRequest(AdminRequest request) throws Exception
 	{
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(baos);
-		helper.writeNextObject(request, dos, false);
-		dos.flush();
-		dos.close();
-		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
+		JPPFBuffer buf = helper.toBytes(request, false);
 		socketClient.sendBytes(buf);
 	}
 
@@ -536,30 +537,31 @@ public class JPPFClientConnection
 	 * Shutdown this client and retrieve all pending executions for resubmission.
 	 * @return a list of <code>ClientExecution</code> instances to resubmit.
 	 */
-	public List<ClientExecution> shutdownConnection()
+	public List<ClientExecution> close()
 	{
-		//lock.lock();
-		try
+		if (!isShutdown)
 		{
-			if (!isShutdown)
+			isShutdown = true;
+			try
 			{
-				isShutdown = true;
-				List<Runnable> pending = executor.shutdownNow();
-				List<ClientExecution> result = new ArrayList<ClientExecution>();
-				if (currentExecution != null) result.add(currentExecution);
-				while (!pending.isEmpty())
-				{
-					AsynchronousResultProcessor proc = (AsynchronousResultProcessor) pending.remove(0);
-					result.add(proc.getExecution());
-				}
-				return result;
+				socketClient.close();
+				delegate.close();
 			}
-			return null;
+			catch(IOException e)
+			{
+				log.error("[" + name + "] "+ e.getMessage(), e);
+			}
+			List<Runnable> pending = executor.shutdownNow();
+			List<ClientExecution> result = new ArrayList<ClientExecution>();
+			if (currentExecution != null) result.add(currentExecution);
+			while (!pending.isEmpty())
+			{
+				AsynchronousResultProcessor proc = (AsynchronousResultProcessor) pending.remove(0);
+				result.add(proc.getExecution());
+			}
+			return result;
 		}
-		finally
-		{
-			//lock.unlock();
-		}
+		return null;
 	}
 
 	/**

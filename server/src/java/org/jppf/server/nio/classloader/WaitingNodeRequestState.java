@@ -20,8 +20,8 @@
 
 package org.jppf.server.nio.classloader;
 
-import static org.jppf.server.nio.classloader.ChannelTransition.*;
-import static org.jppf.utils.StringUtils.getRemostHost;
+import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.nio.channels.*;
 
@@ -61,13 +61,13 @@ public class WaitingNodeRequestState extends ClassServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ChannelTransition performTransition(SelectionKey key) throws Exception
+	public ClassTransition performTransition(SelectionKey key) throws Exception
 	{
 		SocketChannel channel = (SocketChannel) key.channel();
 		ClassContext context = (ClassContext) key.attachment();
 		if (context.readMessage(channel))
 		{
-			if (debugEnabled) log.debug("read resource request from node: " + getRemostHost(channel));
+			if (debugEnabled) log.debug("read resource request from node: " + getRemoteHost(channel));
 			JPPFResourceWrapper resource = context.deserializeResource();
 			TraversalList<String> uuidPath = resource.getUuidPath();
 			boolean dynamic = resource.isDynamic();
@@ -76,14 +76,23 @@ public class WaitingNodeRequestState extends ClassServerState
 			byte[] b = null;
 			if ((uuid == null) || uuid.equals(JPPFDriver.getInstance().getUuid()))
 			{
-				b = server.getResourceProvider().getResourceAsBytes(name);
+				if ((uuid == null) && !dynamic) uuid = JPPFDriver.getInstance().getUuid();
+				if (uuid != null) b = server.getCacheContent(uuid, name);
+				boolean alreadyInCache = (b != null);
+				if (debugEnabled)
+				{
+					log.debug("resource " + (alreadyInCache ? "" : "not ") + "found [" + name +
+						"] in cache for node: " + getRemoteHost(channel));
+				}
+				if (!alreadyInCache) b = server.getResourceProvider().getResourceAsBytes(name);
 				if ((b != null) || !dynamic)
 				{
 					if (debugEnabled)
 					{
-						log.debug("resource " + (b == null ? " not " : "") + "found [" + name +
-							"] in the driver's classpath for node: " + getRemostHost(channel));
+						log.debug("resource " + (b == null ? "not " : "") + "found [" + name +
+							"] in the driver's classpath for node: " + getRemoteHost(channel));
 					}
+					if ((b != null) && !alreadyInCache) server.setCacheContent(JPPFDriver.getInstance().getUuid(), name, b);
 					resource.setDefinition(b);
 					context.serializeResource();
 					return TO_SENDING_NODE_RESPONSE;
@@ -91,11 +100,11 @@ public class WaitingNodeRequestState extends ClassServerState
 			}
 			if ((b == null) && dynamic)
 			{
-				CacheClassContent content = server.classCache.get(new CacheClassKey(uuidPath.getFirst(), name));
-				if (content != null)
+				b = server.getCacheContent(uuidPath.getFirst(), name);
+				if (b != null)
 				{
-					if (debugEnabled) log.debug("found cached resource [" + name + "] for node: " + getRemostHost(channel));
-					resource.setDefinition(content.getContent());
+					if (debugEnabled) log.debug("found cached resource [" + name + "] for node: " + getRemoteHost(channel));
+					resource.setDefinition(b);
 					context.serializeResource();
 					return TO_SENDING_NODE_RESPONSE;
 				}
@@ -107,17 +116,21 @@ public class WaitingNodeRequestState extends ClassServerState
 					if (provider != null)
 					{
 						if (debugEnabled) log.debug("request resource [" + name + "] from client: " +
-								getRemostHost(provider) + " for node: " + getRemostHost(channel));
+							getRemoteHost(provider) + " for node: " + getRemoteHost(channel));
 						SelectionKey providerKey = provider.keyFor(server.getSelector());
 						ClassContext providerContext = (ClassContext) providerKey.attachment();
 						providerContext.addRequest(key);
 						if (providerContext.getCurrentRequest() == null)
-							providerKey.interestOps(SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+						{
+							server.setKeyOps(providerKey, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+						}
 						return TO_IDLE_NODE;
 					}
 				}
 			}
-			if (debugEnabled) log.debug("resource [" + name + "] not found for node: " + getRemostHost(channel));
+			if (debugEnabled) log.debug("resource [" + name + "] not found for node: " + getRemoteHost(channel));
+			resource.setDefinition(null);
+			context.serializeResource();
 			return TO_SENDING_NODE_RESPONSE;
 		}
 		return TO_WAITING_NODE_REQUEST;

@@ -55,9 +55,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
 		oos.writeObject(o);
 		oos.flush();
 		oos.close();
-		JPPFBuffer buf = new JPPFBuffer();
-		buf.setBuffer(baos.toByteArray());
-		buf.setLength(baos.size());
+		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
 		return buf;
 	}
 

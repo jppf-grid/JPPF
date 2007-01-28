@@ -32,6 +32,10 @@ import org.jppf.utils.StringUtils;
 public class TestProcess
 {
 	/**
+	 * Logging level to use in the create processes.
+	 */
+	private static final String LOGGING_LEVEL = "INFO";
+	/**
 	 * Constant identifying the standard output of a process.
 	 */
 	public static final String STANDARD_OUTPUT = "std";
@@ -53,7 +57,7 @@ public class TestProcess
 	public ProcessWrapper startNodeProcess(int nodeNumber) throws Exception
 	{
 		Properties jppfConfig = ProcessConfig.buildNodeConfig();
-		Properties log4jConfig = ProcessConfig.buildLog4jConfig("node" + nodeNumber + ".log", false);
+		Properties log4jConfig = ProcessConfig.buildLog4jConfig("node" + nodeNumber + ".log", false, LOGGING_LEVEL);
 		return ProcessCommand.buildProcess("org.jppf.node.NodeLauncher", jppfConfig, log4jConfig, 64);
 	}
 	
@@ -65,7 +69,7 @@ public class TestProcess
 	public ProcessWrapper startDriverProcess() throws Exception
 	{
 		Properties jppfConfig = ProcessConfig.buildDriverConfig();
-		Properties log4jConfig = ProcessConfig.buildLog4jConfig("driver.log", false);
+		Properties log4jConfig = ProcessConfig.buildLog4jConfig("driver.log", false, LOGGING_LEVEL);
 		return ProcessCommand.buildProcess("org.jppf.server.DriverLauncher", jppfConfig, log4jConfig, 32);
 	}
 	
@@ -81,7 +85,7 @@ public class TestProcess
 		Properties jppfConfig = ProcessConfig.buildDriverConfig();
 		jppfConfig.setProperty("matrix.size", ""+matrixSize);
 		jppfConfig.setProperty("matrix.iterations", ""+nbIter);
-		Properties log4jConfig = ProcessConfig.buildLog4jConfig("matrix.log", true);
+		Properties log4jConfig = ProcessConfig.buildLog4jConfig("matrix.log", true, LOGGING_LEVEL);
 		return ProcessCommand.buildProcess("sample.matrix.MatrixRunner", jppfConfig, log4jConfig, 64);
 	}
 	

@@ -19,7 +19,7 @@
  */
 package org.jppf.utils;
 
-import java.io.*;
+import java.util.List;
 
 
 /**
@@ -29,59 +29,61 @@ import java.io.*;
 public interface SerializationHelper
 {
 	/**
-	 * Deserialize a specified number of objects from an array of bytes.
-	 * @param bytes the array of bytes to read from.
-	 * @param start the offset to start reading at.
-	 * @param count the number of objects to read.
-	 * @return an array of the deserialized objects.
-	 * @throws Exception if an error occurs during deserialization.
-	 */
-	Object[] readFromBuffer(byte[] bytes, int start, int count) throws Exception;
-	/**
-	 * Serialize a set of objects into an array of bytes.
-	 * @param objects the objects to serialize.
-	 * @return a <code>JPPFBuffer</code> instance.
-	 * @throws Exception if an error occurs during the serialization.
-	 */
-	JPPFBuffer writeToBuffer(Object[] objects) throws Exception;
-	/**
 	 * Get a reference to the <code>ObjectSerializer</code> used by this helper.
 	 * @return an <code>ObjectSerializer</code> instance.
 	 * @throws Exception if the serializer could not be obtained.
 	 */
 	ObjectSerializer getSerializer() throws Exception;
 	/**
-	 * Deserialize the next object from a stream.
-	 * @param dis the data stream from which to fetch the serialized object.
-	 * @param isCompressed determines whether the serialized representation object should be
-	 * decompressed before deserialization. 
-	 * @return the deserialized object.
-	 * @throws Exception if an error occurs while reading from the stream, uncompressing or deserializing.
-	 */
-	Object readNextObject(DataInputStream dis, boolean isCompressed) throws Exception;
-	/**
-	 * Serialize an object into a stream.
+	 * Serialize an object into an array of bytes.
 	 * @param o the object to serialize.
-	 * @param dos the data stream into which to write the serialized object.
 	 * @param isCompressed determines whether the serialized representation object should be
-	 * compressed before serialization. 
+	 * compressed before serialization.
+	 * @return a <code>JPPFBuffer</code> instance encapsulating the resulting array of bytes. 
 	 * @throws Exception if an error occurs while writing to the stream, compressing or serializing.
 	 */
-	void writeNextObject(Object o, DataOutputStream dos, boolean isCompressed) throws Exception;
+	JPPFBuffer toBytes(Object o, boolean isCompressed) throws Exception;
 	/**
-	 * Read the next series of bytes from an input stream.
-	 * @param dis the stream to read from.
-	 * @return an array of the bytes read from the stream.
-	 * @throws Exception if an error occurs while reading from the stream.
+	 * Serialize an int value into an array of bytes.
+	 * @param value the int value to serialize.
+	 * @param data the array of bytes into which to serialize the value.
+	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @return the new offset after serialization.
 	 */
-	byte[] readNextBytes(DataInputStream dis) throws Exception;
+	int writeInt(int value, byte[] data, int offset);
 	/**
-	 * Write the next series of bytes to an output stream.
-	 * @param dos the stream to write to.
-	 * @param bytes the array of bytes to write to the stream.
-	 * @param start the start position in the bytes array.
-	 * @param length the number of bytes to write.
-	 * @throws Exception if an error occurs while writing the stream.
+	 * Copy some byte data to a byte buffer.
+	 * @param source the source data.
+	 * @param dest the destination buffer
+	 * @param offset the position at which to start copying in the destination.
+	 * @param length the length of the data to copy.
+	 * @return the new postion in the destination buffer.
 	 */
-	void writeNextBytes(DataOutputStream dos, byte[] bytes, int start, int length) throws Exception;
+	int copyToBuffer(byte[] source, byte[] dest, int offset, int length);
+	/**
+	 * Deserialize an int value from an array of bytes.
+	 * @param data the array of bytes into which to serialize the value.
+	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @return the int value read from the array of bytes
+	 */
+	int readInt(byte[] data, int offset);
+	/**
+	 * Copy some byte data from a byte buffer.
+	 * @param source the source data.
+	 * @param offset the position at which to start copying from the source.
+	 * @return the copied data as an array of bytes.
+	 */
+	byte[] copyFromBuffer(byte[] source, int offset);
+	/**
+	 * Deserialize a number of objects from an array of bytes.
+	 * @param <T> the type of the objects to deserialize.
+	 * @param source the array pf bytes from which to deserialize.
+	 * @param offset the position in the source data at whcih to start reading.
+	 * @param compressed determines whether the source data is comprssed or not.
+	 * @param result a list holding the resulting deserialized objects.
+	 * @param count the number of objects to deserialize.
+	 * @return the new position in the source data after deserialization.
+	 * @throws Exception if an error occurs while deserializing.
+	 */
+	<T> int fromBytes(byte[] source, int offset, boolean compressed, List<T> result, int count) throws Exception;
 }

@@ -20,33 +20,41 @@
 package org.jppf.server.nio.classloader;
 
 /**
- * Enumeration of the possible states for a class server channel.
+ * Enumeration of the possible state transitions for a class server channel.
  * @author Laurent Cohen
  */
-public enum ChannelState
+public enum ClassTransition
 {
 	/**
-	 * State of determining the type of a channel.
+	 * Transition to the DEFINING_TYPE state.
 	 */
-	DEFINING_TYPE,
+	TO_DEFINING_TYPE,
 	/**
-	 * State of sending the initial information to a node classloader.
+	 * Transition to the DEFINING_TYPE state.
 	 */
-	SENDING_INITIAL_RESPONSE,
+	TO_SENDING_INITIAL_RESPONSE,
 	/**
-	 * State of waiting for a request from a node classloader.
+	 * Transition to the WAITING_NODE_REQUEST state.
 	 */
-	WAITING_NODE_REQUEST,
+	TO_WAITING_NODE_REQUEST,
 	/**
-	 * State of waiting for a response to a node classloader.
+	 * Transition to the TO_SENDING_NODE_RESPONSE state.
 	 */
-	SENDING_NODE_RESPONSE,
+	TO_SENDING_NODE_RESPONSE,
 	/**
-	 * State of waiting for a response form a resource provider.
+	 * Transition to the TO_SENDING_NODE_RESPONSE state.
 	 */
-	WAITING_PROVIDER_RESPONSE,
+	TO_SENDING_PROVIDER_REQUEST,
 	/**
-	 * State of waiting for a response from a resource provider.
+	 * Transition to the WAITING_PROVIDER_RESPONSE state.
 	 */
-	SENDING_PROVIDER_REQUEST
+	TO_WAITING_PROVIDER_RESPONSE,
+	/**
+	 * Transition to the TO_SENDING_NODE_RESPONSE state in idle mode.
+	 */
+	TO_IDLE_NODE,
+	/**
+	 * Transition to the SENDING_PROVIDER_REQUEST state in idle mode.
+	 */
+	TO_IDLE_PROVIDER;
 }

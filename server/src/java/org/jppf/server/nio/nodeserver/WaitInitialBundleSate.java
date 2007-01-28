@@ -21,12 +21,12 @@
 package org.jppf.server.nio.nodeserver;
 
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
+import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.nio.channels.*;
 
 import org.apache.log4j.Logger;
 import org.jppf.server.JPPFTaskBundle;
-import org.jppf.utils.StringUtils;
 
 /**
  * This class implements the state of receiving information from the node as a
@@ -64,18 +64,18 @@ public class WaitInitialBundleSate extends NodeServerState
 	{
 		SocketChannel channel = (SocketChannel) key.channel();
 		NodeContext context = (NodeContext) key.attachment();
-		if (debugEnabled) log.debug("exec() for " + StringUtils.getRemostHost(channel));
+		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		if (context.readMessage(channel))
 		{
-			if (debugEnabled) log.debug("read bundle for " + StringUtils.getRemostHost(channel) + " done");
+			if (debugEnabled) log.debug("read bundle for " + getRemoteHost(channel) + " done");
 			JPPFTaskBundle bundle = context.deserializeBundle();
 			context.setUuid(bundle.getBundleUuid());
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setMessage(null);
 			context.setBundle(null);
 			server.addIdleChannel(channel);
-			return TRANSITION_TO_IDLE;
+			return TO_IDLE;
 		}
-		return TRANSITION_TO_WAIT_INITIAL;
+		return TO_WAIT_INITIAL;
 	}
 }

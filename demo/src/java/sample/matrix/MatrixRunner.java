@@ -97,6 +97,15 @@ public class MatrixRunner
 				dataProvider.setValue(MatrixTask.DATA_KEY, b);
 				// submit the tasks for execution
 				List<JPPFTask> results = jppfClient.submit(tasks, dataProvider);
+				/*
+				List<JPPFTask> results = new ArrayList<JPPFTask>();
+				for (JPPFTask t: tasks)
+				{
+					t.setDataProvider(dataProvider);
+					t.run();
+					results.add(t);
+				}
+				*/
 				// initialize the resulting matrix
 				Matrix c = new Matrix(size);
 				// Get the matrix values from the tasks results

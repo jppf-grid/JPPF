@@ -59,6 +59,7 @@ permission java.io.FilePermission "${user.dir}/config/log4j-node2.properties", "
 permission java.util.PropertyPermission "log4j.*", "read";
 permission java.util.PropertyPermission "java.version", "read";
 permission java.util.PropertyPermission "line.separator", "read";
+permission java.util.PropertyPermission "os.name", "read";
 
 //------------------------------------------------------------------------------//
 // Permissions for running the node with the Java Wrapper.                      //
@@ -103,3 +104,17 @@ permission java.util.PropertyPermission "weblogic.system.iiop.enableClient", "re
 permission java.util.PropertyPermission "weblogic.*", "read";
 permission java.lang.RuntimePermission "getProtectionDomain";
 
+//permission java.lang.RuntimePermission "stopThread";
+//permission java.util.PropertyPermission "wls.*", "read";
+//permission java.util.PropertyPermission "bea.*", "read";
+//permission java.lang.RuntimePermission "setFactory";
+//permission java.lang.RuntimePermission "enableContextClassLoaderOverride";
+
+//------------------------------------------------------------------------------//
+// permissions for WAS                                                          //
+//------------------------------------------------------------------------------//
+//permission java.util.PropertyPermission "com.ibm.*", "read";
+//permission java.util.PropertyPermission "ws.*", "read";
+//permission java.util.PropertyPermission "was.*", "read";
+//permission java.util.PropertyPermission "client.logsRedirected", "read";
+//permission java.util.PropertyPermission "disableLogs", "read";

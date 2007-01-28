@@ -20,13 +20,13 @@
 
 package org.jppf.server.nio.classloader;
 
-import static org.jppf.server.nio.classloader.ChannelTransition.*;
+import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.net.ConnectException;
 import java.nio.channels.*;
 
 import org.apache.log4j.Logger;
-import org.jppf.utils.StringUtils;
 
 /**
  * State of sending the initial response to a newly created node channel.
@@ -59,17 +59,17 @@ public class SendingInitialResponseState extends ClassServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ChannelTransition performTransition(SelectionKey key) throws Exception
+	public ClassTransition performTransition(SelectionKey key) throws Exception
 	{
 		SocketChannel channel = (SocketChannel) key.channel();
 		ClassContext context = (ClassContext) key.attachment();
 		if (key.isReadable())
 		{
-			throw new ConnectException("node " + StringUtils.getRemostHost(channel) + " has been disconnected");
+			throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");
 		}
 		if (context.writeMessage(channel))
 		{
-			if (debugEnabled) log.debug("sent uuid to node: " + StringUtils.getRemostHost(channel));
+			if (debugEnabled) log.debug("sent uuid to node: " + getRemoteHost(channel));
 			context.setMessage(null);
 			return TO_WAITING_NODE_REQUEST;
 		}

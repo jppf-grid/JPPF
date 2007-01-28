@@ -20,14 +20,14 @@
 
 package org.jppf.server.nio.classloader;
 
+import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.utils.StringUtils.getRemoteHost;
+
 import java.net.ConnectException;
 import java.nio.channels.*;
 
 import org.apache.log4j.Logger;
-import org.jppf.server.nio.*;
-import org.jppf.utils.StringUtils;
-
-import static org.jppf.server.nio.classloader.ChannelTransition.*;
+import org.jppf.server.nio.NioMessage;
 
 /**
  * This class represents the state of sending a request to a provider.
@@ -60,14 +60,26 @@ public class SendingProviderRequestState extends ClassServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ChannelTransition performTransition(SelectionKey key) throws Exception
+	public ClassTransition performTransition(SelectionKey key) throws Exception
 	{
 		SocketChannel channel = (SocketChannel) key.channel();
 		ClassContext context = (ClassContext) key.attachment();
 		if (key.isReadable())
 		{
 			server.providerConnections.remove(context.getUuid());
-			throw new ConnectException("node " + StringUtils.getRemostHost(channel) + " has been disconnected");
+			SelectionKey currentRequest = context.getCurrentRequest();
+			if (debugEnabled) log.debug("provider: " + getRemoteHost(channel) + " sending null response for disconnected provider");
+			if ((currentRequest != null) || !context.getPendingRequests().isEmpty())
+			{
+				if (currentRequest != null)
+				{
+					context.setCurrentRequest(null);
+					sendNullResponse(currentRequest);
+				}
+				for (int i=0; i<context.getPendingRequests().size(); i++)
+					sendNullResponse(context.getPendingRequests().remove(0));
+			}
+			throw new ConnectException("provider " + getRemoteHost(channel) + " has been disconnected");
 		}
 		if ((context.getCurrentRequest() == null) && !context.getPendingRequests().isEmpty())
 		{
@@ -77,22 +89,21 @@ public class SendingProviderRequestState extends ClassServerState
 			context.setResource(requestContext.getResource());
 			if (debugEnabled)
 			{
-				log.debug("provider " + StringUtils.getRemostHost(channel) +
-					" serving new resource request [" + context.getResource().getName() +
-					"] from node: " + StringUtils.getRemostHost((SocketChannel) request.channel()));
+				log.debug("provider " + getRemoteHost(channel) + " serving new resource request [" +
+					context.getResource().getName() + "] from node: " + getRemoteHost((SocketChannel) request.channel()));
 			}
 			context.serializeResource();
 			context.setCurrentRequest(request);
 		}
 		if (context.getCurrentRequest() == null)
 		{
-			if (debugEnabled) log.debug("provider: " + StringUtils.getRemostHost(channel) + " has no request to process, returning to idle mode");
+			if (debugEnabled) log.debug("provider: " + getRemoteHost(channel) + " has no request to process, returning to idle mode");
 			context.setMessage(null);
 			return TO_IDLE_PROVIDER;
 		}
 		if (context.writeMessage(channel))
 		{
-			if (debugEnabled) log.debug("provider: " + StringUtils.getRemostHost(channel) + ", request sent to the client");
+			if (debugEnabled) log.debug("provider: " + getRemoteHost(channel) + ", request sent to the client");
 			context.setMessage(new NioMessage());
 			return TO_WAITING_PROVIDER_RESPONSE;
 		}

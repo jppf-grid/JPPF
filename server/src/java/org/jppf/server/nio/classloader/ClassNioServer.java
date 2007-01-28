@@ -20,7 +20,7 @@
 
 package org.jppf.server.nio.classloader;
 
-import static org.jppf.server.nio.classloader.ChannelState.DEFINING_TYPE;
+import static org.jppf.server.nio.classloader.ClassState.DEFINING_TYPE;
 
 import java.nio.channels.*;
 import java.util.*;
@@ -34,7 +34,7 @@ import org.jppf.server.nio.*;
  * 
  * @author Laurent Cohen
  */
-public class ClassNioServer extends NioServer<ChannelState, ChannelTransition, ClassNioServer>
+public class ClassNioServer extends NioServer<ClassState, ClassTransition, ClassNioServer>
 {
 	/**
 	 * Log4j logger for this class.
@@ -56,7 +56,6 @@ public class ClassNioServer extends NioServer<ChannelState, ChannelTransition, C
 	 */
 	protected ResourceProvider resourceProvider = new ResourceProvider();
 
-
 	/**
 	 * Initialize this class server with the port it will listen to.
 	 * @param port the port number as an int value.
@@ -73,7 +72,7 @@ public class ClassNioServer extends NioServer<ChannelState, ChannelTransition, C
 	 * @return an <code>NioServerFactory</code> instance.
 	 * @see org.jppf.server.nio.NioServer#createFactory()
 	 */
-	protected NioServerFactory<ChannelState, ChannelTransition, ClassNioServer> createFactory()
+	protected NioServerFactory<ClassState, ClassTransition, ClassNioServer> createFactory()
 	{
 		return new ClassServerFactory(this);
 	}
@@ -136,5 +135,30 @@ public class ClassNioServer extends NioServer<ChannelState, ChannelTransition, C
 	public void addProviderConnection(String uuid, SocketChannel channel)
 	{
 		providerConnections.put(uuid, channel);
+	}
+
+	/**
+	 * Add a resource content to the class cache.
+	 * @param uuid uuid of the resource provider.
+	 * @param name name of the resource.
+	 * @param content content of the resource.
+	 */
+	public void setCacheContent(String uuid, String name, byte[] content)
+	{
+		CacheClassContent cacheContent = new CacheClassContent(content);
+		CacheClassKey cacheKey = new CacheClassKey(uuid, name);
+		classCache.put(cacheKey, cacheContent);
+	}
+
+	/**
+	 * Get a resource definition from the resource cache.
+	 * @param uuid uuid of the reosurce provider.
+	 * @param name name of the resource.
+	 * @return the content of the resource as an array of bytes.
+	 */
+	public byte[] getCacheContent(String uuid, String name)
+	{
+		CacheClassContent content = classCache.get(new CacheClassKey(uuid, name));
+		return content != null ? content.getContent() : null;
 	}
 }

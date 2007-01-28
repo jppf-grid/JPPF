@@ -19,14 +19,15 @@
  */
 package org.jppf.server.peer;
 
-import java.io.*;
 import org.apache.log4j.Logger;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.server.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
 
 /**
- * 
+ * Result sender for a peer driver.<br>
+ * Instances of this class are used by a driver to receive task bundles from another driver
+ * and send the results back to this driver.
  * @author Laurent Cohen
  */
 public class PeerNodeResultSender extends AbstractResultSender
@@ -57,21 +58,20 @@ public class PeerNodeResultSender extends AbstractResultSender
 	public void sendPartialResults(JPPFTaskBundle bundle) throws Exception
 	{
 		if (debugEnabled) log.debug("Sending bundle with "+bundle.getTaskCount()+" tasks");
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(baos);
 		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		bundle.setNodeExecutionTime(elapsed);
-		helper.writeNextObject(bundle, dos, false);
-		for (int i = 0; i < bundle.getTaskCount(); i++)
+
+		JPPFBuffer buf = helper.toBytes(bundle, false);
+		int size = 4 + buf.getLength();
+		for (int i = 0; i < bundle.getTaskCount(); i++) size += 4 + bundle.getTasks().get(i).length;
+		byte[] data = new byte[size];
+		int pos = helper.copyToBuffer(buf.getBuffer(), data, 0, buf.getLength());
+		for (int i = 0; i < bundle.getTaskCount(); i++) 
 		{
 			byte[] task = bundle.getTasks().get(i);
-			helper.writeNextBytes(dos, task, 0, task.length);
+			pos = helper.copyToBuffer(task, data, pos, task.length);
 		}
-		dos.flush();
-		dos.close();
-		JPPFBuffer buffer = new JPPFBuffer();
-		buffer.setLength(baos.size());
-		buffer.setBuffer(baos.toByteArray());
+		JPPFBuffer buffer = new JPPFBuffer(data, size);
 		socketClient.sendBytes(buffer);
 	}
 }

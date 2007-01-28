@@ -19,15 +19,15 @@
  */
 package org.jppf.server.nio.classloader;
 
-import static org.jppf.server.nio.classloader.ChannelState.SENDING_NODE_RESPONSE;
-import static org.jppf.server.nio.classloader.ChannelTransition.*;
+import static org.jppf.server.nio.classloader.ClassState.SENDING_NODE_RESPONSE;
+import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.io.IOException;
 import java.nio.channels.*;
 
 import org.apache.log4j.Logger;
 import org.jppf.node.JPPFResourceWrapper;
-import org.jppf.utils.StringUtils;
 
 /**
  * This class represents the state of waiting for the response from a provider.
@@ -60,7 +60,7 @@ public class WaitingProviderResponseState extends ClassServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ChannelTransition performTransition(SelectionKey key) throws Exception
+	public ClassTransition performTransition(SelectionKey key) throws Exception
 	{
 		SocketChannel channel = (SocketChannel) key.channel();
 		ClassContext context = (ClassContext) key.attachment();
@@ -71,22 +71,28 @@ public class WaitingProviderResponseState extends ClassServerState
 		}
 		catch(IOException e)
 		{
-			if (debugEnabled) log.debug("an exception occurred while reading response from provider: " + StringUtils.getRemostHost(channel));
+			if (debugEnabled) log.debug("an exception occurred while reading response from provider: " + getRemoteHost(channel));
 			server.providerConnections.remove(context.getUuid());
-			SelectionKey destinationKey = context.getCurrentRequest();
-			ClassContext destinationContext = (ClassContext) destinationKey.attachment();
-			destinationContext.setState(SENDING_NODE_RESPONSE);
-			destinationKey.interestOps(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+			SelectionKey currentRequest = context.getCurrentRequest();
+			if ((currentRequest != null) || !context.getPendingRequests().isEmpty())
+			{
+				if (debugEnabled) log.debug("provider: " + getRemoteHost(channel) + " sending null response for disconnected provider");
+				if (currentRequest != null)
+				{
+					context.setCurrentRequest(null);
+					sendNullResponse(currentRequest);
+				}
+				for (int i=0; i<context.getPendingRequests().size(); i++)
+					sendNullResponse(context.getPendingRequests().remove(0));
+			}
 			throw e;
 		}
 		if (messageRead)
 		{
-			if (debugEnabled) log.debug("read response from provider: " + StringUtils.getRemostHost(channel) + " complete");
+			if (debugEnabled) log.debug("read response from provider: " + getRemoteHost(channel) + " complete");
 			JPPFResourceWrapper resource = context.deserializeResource();
 			// putting the definition in cache
-			CacheClassContent content = new CacheClassContent(resource.getDefinition());
-			CacheClassKey cacheKey = new CacheClassKey(resource.getUuidPath().getFirst(), resource.getName());
-			server.classCache.put(cacheKey, content);
+			server.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
 			// fowarding it to channel that requested
 			SelectionKey destinationKey = context.getCurrentRequest();
 			ClassContext destinationContext = (ClassContext) destinationKey.attachment();
@@ -95,7 +101,7 @@ public class WaitingProviderResponseState extends ClassServerState
 			destinationContext.setResource(resource);
 			destinationContext.serializeResource();
 			destinationContext.setState(SENDING_NODE_RESPONSE);
-			destinationKey.interestOps(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+			server.setKeyOps(destinationKey, SelectionKey.OP_WRITE|SelectionKey.OP_READ);
 			context.setMessage(null);
 			context.setCurrentRequest(null);
 			return TO_SENDING_PROVIDER_REQUEST;

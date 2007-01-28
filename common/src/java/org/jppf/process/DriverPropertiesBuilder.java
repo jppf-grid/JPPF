@@ -39,7 +39,7 @@ public class DriverPropertiesBuilder
 	/**
 	 * "agressive" tuning profile.
 	 */
-	public static Properties AGGRESSIVE_TUNING = buildTuning(5, "aggressive", AGGRESSIVE_PROFILE); 
+	public static Properties AGGRESSIVE_TUNING = buildTuning(50, "aggressive", AGGRESSIVE_PROFILE); 
 	/**
 	 * Base config for driver 1.
 	 */

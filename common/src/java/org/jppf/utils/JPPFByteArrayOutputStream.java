@@ -29,6 +29,23 @@ import java.io.ByteArrayOutputStream;
 public class JPPFByteArrayOutputStream extends ByteArrayOutputStream
 {
 	/**
+	 * Instantiate this stream with a default size.
+	 */
+	public JPPFByteArrayOutputStream()
+	{
+		super();
+	}
+
+	/**
+	 * Instantiate this stream with the specified size.
+	 * @param size the initial size of the underlying buffer.
+	 */
+	public JPPFByteArrayOutputStream(int size)
+	{
+		super(size);
+	}
+
+	/**
 	 * Override of <code>toByteArray()</code> that returns a reference to the internal buffer
 	 * instead of copy of it, significantly increasing the performance of this operation.
 	 * @return the content of the stream as an array of bytes.

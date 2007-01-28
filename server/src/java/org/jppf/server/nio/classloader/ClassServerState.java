@@ -20,14 +20,28 @@
 
 package org.jppf.server.nio.classloader;
 
-import org.jppf.server.nio.NioState;
+import static org.jppf.server.nio.classloader.ClassState.SENDING_NODE_RESPONSE;
+import static org.jppf.utils.StringUtils.getRemoteHost;
+
+import java.nio.channels.*;
+
+import org.apache.log4j.Logger;
+import org.jppf.server.nio.*;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public abstract class ClassServerState extends NioState<ChannelTransition>
+public abstract class ClassServerState extends NioState<ClassTransition>
 {
+	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(ClassServerState.class);
+	/**
+	 * Determines whether DEBUG logging level is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The server that handles this state.
 	 */
@@ -40,5 +54,22 @@ public abstract class ClassServerState extends NioState<ChannelTransition>
 	public ClassServerState(ClassNioServer server)
 	{
 		this.server = server;
+	}
+
+	/**
+	 * Send a null response to a request node connection. This method is called for a provider
+	 * that was disconnected but still has pending requests, so as not to block the requesting channels.
+	 * @param request the selection key wrapping the requesting channel.
+	 * @throws Exception if an error occurs while setting the new requester's state.
+	 */
+	protected void sendNullResponse(SelectionKey request) throws Exception
+	{
+		if (debugEnabled) log.debug("disconnected provider: sending null response to node " +
+			getRemoteHost((SocketChannel) request.channel()));
+		ClassContext requestContext = (ClassContext) request.attachment();
+		requestContext.getResource().setDefinition(null);
+		requestContext.serializeResource();
+		requestContext.setState(SENDING_NODE_RESPONSE);
+		server.setKeyOps(request, SelectionKey.OP_WRITE|SelectionKey.OP_READ);
 	}
 }

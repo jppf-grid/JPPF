@@ -20,8 +20,8 @@
 
 package org.jppf.server.nio.classloader;
 
-import static org.jppf.server.nio.classloader.ChannelState.*;
-import static org.jppf.server.nio.classloader.ChannelTransition.*;
+import static org.jppf.server.nio.classloader.ClassState.*;
+import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.util.*;
 
@@ -32,9 +32,8 @@ import org.jppf.server.nio.*;
  * @author Laurent Cohen
  */
 public final class ClassServerFactory
-	extends NioServerFactory<ChannelState, ChannelTransition, ClassNioServer>
+	extends NioServerFactory<ClassState, ClassTransition, ClassNioServer>
 {
-
 	/**
 	 * Initialize this factory with the specified server.
 	 * @param server the server for which to initialize.
@@ -50,10 +49,10 @@ public final class ClassServerFactory
 	 * @return a mapping of the states enumeration to the corresponding NioStateInstances.
 	 * @see org.jppf.server.nio.NioServerFactory#createStateMap(org.jppf.server.nio.NioServer)
 	 */
-	public Map<ChannelState, NioState<ChannelTransition>> createStateMap(ClassNioServer server)
+	public Map<ClassState, NioState<ClassTransition>> createStateMap(ClassNioServer server)
 	{
-		Map<ChannelState, NioState<ChannelTransition>> map =
-			new EnumMap<ChannelState, NioState<ChannelTransition>>(ChannelState.class);
+		Map<ClassState, NioState<ClassTransition>> map =
+			new EnumMap<ClassState, NioState<ClassTransition>>(ClassState.class);
 		map.put(DEFINING_TYPE, new DefiningChannelTypeState(server));
 		map.put(SENDING_INITIAL_RESPONSE, new SendingInitialResponseState(server));
 		map.put(SENDING_NODE_RESPONSE, new SendingNodeResponseState(server));
@@ -68,18 +67,18 @@ public final class ClassServerFactory
 	 * @return a mapping of the states enumeration to the corresponding NioStateInstances.
 	 * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
 	 */
-	public Map<ChannelTransition, NioTransition<ChannelState>> createTransitionMap()
+	public Map<ClassTransition, NioTransition<ClassState>> createTransitionMap()
 	{
-		Map<ChannelTransition, NioTransition<ChannelState>> map =
-			new EnumMap<ChannelTransition, NioTransition<ChannelState>>(ChannelTransition.class);
-		map.put(TO_DEFINING_TYPE, new NioTransition<ChannelState>(DEFINING_TYPE, R));
-		map.put(TO_SENDING_INITIAL_RESPONSE, new NioTransition<ChannelState>(SENDING_INITIAL_RESPONSE, RW));
-		map.put(TO_WAITING_NODE_REQUEST, new NioTransition<ChannelState>(WAITING_NODE_REQUEST, R));
-		map.put(TO_SENDING_NODE_RESPONSE, new NioTransition<ChannelState>(SENDING_NODE_RESPONSE, RW));
-		map.put(TO_SENDING_PROVIDER_REQUEST, new NioTransition<ChannelState>(SENDING_PROVIDER_REQUEST, RW));
-		map.put(TO_WAITING_PROVIDER_RESPONSE, new NioTransition<ChannelState>(WAITING_PROVIDER_RESPONSE, R));
-		map.put(TO_IDLE_NODE, new NioTransition<ChannelState>(SENDING_NODE_RESPONSE, 0));
-		map.put(TO_IDLE_PROVIDER, new NioTransition<ChannelState>(SENDING_PROVIDER_REQUEST, 0));
+		Map<ClassTransition, NioTransition<ClassState>> map =
+			new EnumMap<ClassTransition, NioTransition<ClassState>>(ClassTransition.class);
+		map.put(TO_DEFINING_TYPE, new NioTransition<ClassState>(DEFINING_TYPE, R));
+		map.put(TO_SENDING_INITIAL_RESPONSE, new NioTransition<ClassState>(SENDING_INITIAL_RESPONSE, RW));
+		map.put(TO_WAITING_NODE_REQUEST, new NioTransition<ClassState>(WAITING_NODE_REQUEST, R));
+		map.put(TO_SENDING_NODE_RESPONSE, new NioTransition<ClassState>(SENDING_NODE_RESPONSE, RW));
+		map.put(TO_SENDING_PROVIDER_REQUEST, new NioTransition<ClassState>(SENDING_PROVIDER_REQUEST, RW));
+		map.put(TO_WAITING_PROVIDER_RESPONSE, new NioTransition<ClassState>(WAITING_PROVIDER_RESPONSE, R));
+		map.put(TO_IDLE_NODE, new NioTransition<ClassState>(SENDING_NODE_RESPONSE, 0));
+		map.put(TO_IDLE_PROVIDER, new NioTransition<ClassState>(SENDING_PROVIDER_REQUEST, 0));
 		return map;
 	}
 }

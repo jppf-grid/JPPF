@@ -20,7 +20,7 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.channels.*;
 import java.util.*;
 
@@ -31,7 +31,6 @@ import org.jppf.server.*;
 import org.jppf.server.JPPFQueue.QueueListener;
 import org.jppf.server.nio.*;
 import org.jppf.server.scheduler.bundle.Bundler;
-import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 
 /**
@@ -80,6 +79,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 	public NodeNioServer(int port, Bundler bundler) throws JPPFException
 	{
 		super(port, "NodeServer Thread");
+		//this.selectTimeout = 1L;
 		this.bundler = bundler;
 		getQueue().addListener(new QueueListener()
 		{
@@ -124,10 +124,14 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 	}
 
 	/**
-	 * .
+	 * This class ensures that idle node get assigned pending tasks in the queue.
 	 */
-	private final Runnable r = new Runnable()
+	private class TaskQueueChecker implements Runnable
 	{
+		/**
+		 * Perform the assignment of tasks.
+		 * @see java.lang.Runnable#run()
+		 */
 		public void run()
 		{
 			synchronized(idleChannels)
@@ -137,15 +141,28 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 				Iterator<SocketChannel> it = idleChannels.iterator();
 				while (!getQueue().isEmpty() && it.hasNext())
 				{
-					SocketChannel channel = it.next();
-					it.remove();
-					SelectionKey key = channel.keyFor(selector);
-					key.interestOps(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+					try
+					{
+						lock.lock();
+						SocketChannel channel = it.next();
+						it.remove();
+						SelectionKey key = channel.keyFor(selector);
+						selector.wakeup();
+						key.interestOps(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+					}
+					finally
+					{
+						lock.unlock();
+					}
 				}
 			}
-			selector.wakeup();
 		}
-	};
+	}
+
+	/**
+	 * .
+	 */
+	private final Runnable r = new TaskQueueChecker();
 
 	/**
 	 * This method is invoked after all selected keys have been processed.
@@ -201,14 +218,11 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 		{
 			try
 			{
-				DataProvider dp = null;
-				ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 				JPPFSecurityContext cred = JPPFDriver.getInstance().getCredentials();
-				DataOutputStream dos = new DataOutputStream(baos);
 				SerializationHelper helper = new SerializationHelperImpl();
-				helper.writeNextObject(dp, dos, true);
-				dos.close();
-				byte[] dpBytes = baos.toByteArray();
+				JPPFBuffer buf = helper.toBytes(null, true);
+				byte[] dpBytes = new byte[4 + buf.getLength()];
+				helper.copyToBuffer(buf.getBuffer(), dpBytes, 0, buf.getLength());
 				JPPFTaskBundle bundle = new JPPFTaskBundle();
 				bundle.setBundleUuid(INITIAL_BUNDLE_UUID);
 				bundle.setRequestUuid("0");

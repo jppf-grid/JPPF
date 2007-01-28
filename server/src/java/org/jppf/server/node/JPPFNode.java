@@ -20,15 +20,14 @@
 package org.jppf.server.node;
 
 import java.io.*;
-import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.log4j.Logger;
 import org.jppf.*;
 import org.jppf.comm.socket.*;
 import org.jppf.node.*;
-import org.jppf.node.event.*;
 import org.jppf.node.event.NodeEvent.EventType;
 import org.jppf.server.JPPFTaskBundle;
 import org.jppf.server.protocol.JPPFTask;
@@ -40,12 +39,20 @@ import org.jppf.utils.*;
  * @author Laurent Cohen
  * @author Domingos Creado
  */
-public class JPPFNode implements MonitoredNode
+public class JPPFNode extends AbstractMonitoredNode
 {
 	/**
 	 * Log4j logger for this class.
 	 */
-	private static Logger log = null;
+	private static Logger log = Logger.getLogger(JPPFNode.class);
+	/**
+	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 */
+	private boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Determines whether dumping byte arrays in the log is enabled.
+	 */
+	private boolean dumpEnabled = JPPFConfiguration.getProperties().getBoolean("byte.array.dump.enabled", false);
 	/**
 	 * Maximum number of containers kept by this node's cache.
 	 */
@@ -55,17 +62,9 @@ public class JPPFNode implements MonitoredNode
 	 */
 	private ObjectSerializer serializer = null;
 	/**
-	 * Utility for deserialization and serialization.
-	 */
-	private SerializationHelper helper = null;
-	/**
 	 * Class loader used for dynamic loading and updating of client classes.
 	 */
 	private JPPFClassLoader classLoader = null;
-	/**
-	 * Wrapper around the underlying server connection.
-	 */
-	private SocketWrapper socketClient = null;
 	/**
 	 * Mapping of containers to their corresponding application uuid.
 	 */
@@ -74,30 +73,6 @@ public class JPPFNode implements MonitoredNode
 	 * A list retaining the container in chronological order of their creation.
 	 */
 	private List<JPPFContainer> containerList = new LinkedList<JPPFContainer>();
-	/**
-	 * Used to synchronize access to the underlying socket from multiple threads.
-	 */
-	private SocketInitializer socketInitializer = new SocketInitializer();
-	/**
-	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
-	 */
-	private boolean debugEnabled = false;
-	/**
-	 * Determines whether dumping byte arrays in the log is enabled.
-	 */
-	private boolean dumpEnabled = JPPFConfiguration.getProperties().getBoolean("byte.array.dump.enabled", false);
-	/**
-	 * Used to programmatically stop this node.
-	 */
-	private boolean stopped = false;
-	/**
-	 * The list of listeners that receive notifications from this node.
-	 */
-	private List<NodeListener> listeners = new ArrayList<NodeListener>();
-	/**
-	 * This flag is true if there is at least one listener, and false otherwise.
-	 */
-	boolean notifying = false;
 	/**
 	 * Current build number for this node.
 	 */
@@ -111,18 +86,6 @@ public class JPPFNode implements MonitoredNode
 	 * Used to determine when this node is busy or idle.
 	 */
 	private AtomicInteger executingCount = new AtomicInteger(0);
-	/**
-	 * The socket used by this node's socket wrapper.
-	 */
-	private Socket socket = null;
-	/**
-	 * Total number of tasks executed.
-	 */
-	private int taskCount = 0;
-	/**
-	 * This node's universal identifier.
-	 */
-	private String uuid = new JPPFUuid().toString();
 
 	/**
 	 * Main processing loop of this node.
@@ -130,9 +93,8 @@ public class JPPFNode implements MonitoredNode
 	 */
 	public void run()
 	{
+		uuid = new JPPFUuid().toString();
 		buildNumber = VersionUtils.getBuildNumber();
-		log = Logger.getLogger(JPPFNode.class);
-		debugEnabled = log.isDebugEnabled();
 		stopped = false;
 		if (debugEnabled) log.debug("Start of node main loop");
 		while (!stopped)
@@ -180,10 +142,12 @@ public class JPPFNode implements MonitoredNode
 			JPPFTaskBundle bundle = pair.first();
 			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 			{
+				if (debugEnabled) log.debug("setting initial bundle uuid");
 				bundle.setBundleUuid(uuid);
 			}
 			List<JPPFTask> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
+			if (debugEnabled) log.debug("received " + (notEmpty ? "a non-" : "an ") + "empty bundle");
 			if (notEmpty)
 			{
 				//if (debugEnabled) log.debug("End of node secondary loop");
@@ -206,7 +170,7 @@ public class JPPFNode implements MonitoredNode
 			if (buildNumber < p)
 			{
 				JPPFNodeReloadNotification notif = new JPPFNodeReloadNotification("detected new build number: " + p
-						+ "; previous build number: " + buildNumber);
+					+ "; previous build number: " + buildNumber);
 				VersionUtils.setBuildNumber(p);
 				throw notif;
 			}
@@ -236,9 +200,7 @@ public class JPPFNode implements MonitoredNode
 		if (notifying) fireNodeEvent(EventType.END_CONNECT);
 		TypedProperties props = JPPFConfiguration.getProperties();
 		int poolSize = props.getInt("processing.threads", 1);
-		//threadPool = Executors.newFixedThreadPool(poolSize);
-		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.SECONDS,
-			new LinkedBlockingQueue<Runnable>());
+		threadPool = Executors.newFixedThreadPool(poolSize);
 		if (debugEnabled) log.debug("end node initialization");
 	}
 
@@ -283,13 +245,16 @@ public class JPPFNode implements MonitoredNode
 		if (debugEnabled) log.debug("Total length read is " + buf.getLength() + " bytes");
 		Object[] result = readObjects(buf.getBuffer());
 		JPPFTaskBundle bundle = (JPPFTaskBundle) result[0];
-		DataProvider dataProvider = (DataProvider) result[1];
 		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-		for (int i = 0; i < bundle.getTaskCount(); i++)
+		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 		{
-			JPPFTask task = (JPPFTask) result[2 + i];
-			task.setDataProvider(dataProvider);
-			taskList.add(task);
+			DataProvider dataProvider = (DataProvider) result[1];
+			for (int i = 0; i < bundle.getTaskCount(); i++)
+			{
+				JPPFTask task = (JPPFTask) result[2 + i];
+				task.setDataProvider(dataProvider);
+				taskList.add(task);
+			}
 		}
 		return new Pair<JPPFTaskBundle, List<JPPFTask>>(bundle, taskList);
 	}
@@ -341,21 +306,18 @@ public class JPPFNode implements MonitoredNode
 	{
 		if (dumpEnabled)
 			log.debug("Deserializing " + bytes.length + " bytes :\n" + StringUtils.dumpBytes(bytes, 0, bytes.length));
-		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-		DataInputStream dis = new DataInputStream(bais);
-		JPPFTaskBundle bundle = (JPPFTaskBundle) helper.readNextObject(dis, false);
+		List<Object> list = new ArrayList<Object>();
+		int pos = helper.fromBytes(bytes, 0, false, list, 1);
+		JPPFTaskBundle bundle = (JPPFTaskBundle) list.get(0);
+		
 		bundle.setNodeExecutionTime(System.currentTimeMillis());
 		int count = bundle.getTaskCount();
-		Object[] result = new Object[2 + count];
-		result[0] = bundle;
 		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 		{
 			JPPFContainer cont = getContainer(bundle.getUuidPath().getList());
-			result[1] = cont.deserializeObject(dis, true);
-			for (int i = 0; i < count; i++) result[2 + i] = cont.deserializeObject(dis, true);
+			pos = cont.deserializeObject(bytes, pos, true, list, 1+count);
 		}
-		dis.close();
-		return result;
+		return list.toArray(new Object[0]);
 	}
 
 	/**
@@ -366,15 +328,17 @@ public class JPPFNode implements MonitoredNode
 	 */
 	private void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
 	{
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(baos);
 		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		bundle.setNodeExecutionTime(elapsed);
-		helper.writeNextObject(bundle, dos, false);
-		for (JPPFTask task : tasks) helper.writeNextObject(task, dos, true);
-		dos.flush();
-		dos.close();
-		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
+		List<JPPFBuffer> list = new ArrayList<JPPFBuffer>();
+		list.add(helper.toBytes(bundle, false));
+		for (JPPFTask task : tasks) list.add(helper.toBytes(task, true));
+		int size = 0;
+		for (JPPFBuffer buf: list) size += 4 + buf.getLength();
+		byte[] data = new byte[size];
+		int pos = 0;
+		for (JPPFBuffer buf: list) pos = helper.copyToBuffer(buf.getBuffer(), data, pos, buf.getLength());
+		JPPFBuffer buf = new JPPFBuffer(data, size);
 		if (dumpEnabled)
 			log.debug("Serialized " + buf.getLength() + " bytes :\n" + StringUtils.dumpBytes(buf.getBuffer(), 0, buf.getLength()));
 		socketClient.sendBytes(buf);
@@ -435,41 +399,6 @@ public class JPPFNode implements MonitoredNode
 	}
 
 	/**
-	 * Add a listener to the list of listener for this node.
-	 * @param listener the listener to add.
-	 * @see org.jppf.node.MonitoredNode#addNodeListener(org.jppf.node.event.NodeListener)
-	 */
-	public void addNodeListener(NodeListener listener)
-	{
-		if (listener == null) return;
-		listeners.add(listener);
-		notifying = true;
-	}
-
-	/**
-	 * Remove a listener from the list of listener for this node.
-	 * @param listener the listener to remove.
-	 * @see org.jppf.node.MonitoredNode#removeNodeListener(org.jppf.node.event.NodeListener)
-	 */
-	public void removeNodeListener(NodeListener listener)
-	{
-		if (listener == null) return;
-		listeners.remove(listener);
-		if (listeners.size() <= 0) notifying = false;
-	}
-
-	/**
-	 * Notify all listeners that an event has occurred.
-	 * @param eventType the type of the event as an enumerated value.
-	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(org.jppf.node.event.NodeEvent.EventType)
-	 */
-	public void fireNodeEvent(EventType eventType)
-	{
-		NodeEvent event = new NodeEvent(eventType);
-		for (NodeListener listener : listeners) listener.eventOccurred(event);
-	}
-
-	/**
 	 * Stop this node and release the resources it is using.
 	 * @param closeSocket determines whether the underlying socket should be closed.
 	 * @see org.jppf.node.MonitoredNode#stopNode(boolean)
@@ -519,34 +448,5 @@ public class JPPFNode implements MonitoredNode
 		{
 			fireNodeEvent(EventType.START_EXEC);
 		}
-	}
-
-	/**
-	 * Get the underlying socket used by this socket wrapper.
-	 * @return a Socket instance.
-	 * @see org.jppf.node.MonitoredNode#getSocket()
-	 */
-	public Socket getSocket()
-	{
-		return socket;
-	}
-	
-	/**
-	 * Set the underlying socket to be used by this socket wrapper.
-	 * @param socket a Socket instance.
-	 * @see org.jppf.node.MonitoredNode#setSocket(java.net.Socket)
-	 */
-	public void setSocket(Socket socket)
-	{
-		this.socket = socket;
-	}
-
-	/**
-	 * Get the underlying socket wrapper used by this node.
-	 * @return a <code>SocketWrapper</code> instance.
-	 */
-	public SocketWrapper getSocketWrapper()
-	{
-		return socketClient;
 	}
 }
