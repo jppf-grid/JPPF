@@ -116,6 +116,12 @@ public class DriverLauncher
 		command.add("-server");
 		int n = JPPFConfiguration.getProperties().getInt("max.memory.option", 128);
 		command.add("-Xmx" + n + "m");
+		String s = JPPFConfiguration.getProperties().getString("other.jvm.options");
+		if (s != null)
+		{
+			String[] options = s.split("\\s");
+			for (String opt: options) command.add(opt);
+		}
 
 		TypedProperties props = JPPFConfiguration.getProperties();
 		int debugPort = props.getInt("remote.debug.port", 8000);

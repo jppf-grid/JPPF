@@ -20,8 +20,11 @@
 package org.jppf.server;
 
 import static org.jppf.server.JPPFStatsUpdater.*;
+
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.apache.log4j.Logger;
 
 /**
  * Implementation of a generic non-blocking queue, to allow asynchronous access from a large number of threads.
@@ -30,6 +33,14 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class JPPFQueue
 {
+	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(JPPFQueue.class);
+	/**
+	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The current list of listeners to this queue.
 	 */
@@ -62,11 +73,13 @@ public class JPPFQueue
 	{
 		bundle.setQueueEntryTime(System.currentTimeMillis());
 		lock.lock();
+		if (debugEnabled) log.debug("adding bundle with [initialTasksCount=" + bundle.getInitialTaskCount() +
+			", taskCount=" + bundle.getTaskCount() + "]");
 		try
 		{
 			if (queue.isEmpty()) setMaxBundleSize(0);
 			queue.add(bundle);
-			int size = bundle.getTaskCount();
+			int size = bundle.getInitialTaskCount();
 			if (size > maxBundleSize) setMaxBundleSize(size);
 			List<JPPFTaskBundle> list = sizeMap.get(size);
 			if (list == null)
@@ -80,6 +93,7 @@ public class JPPFQueue
 		{
 			lock.unlock();
 		}
+		if (debugEnabled) log.debug("sizeMap size = " + sizeMap.size());
 		taskInQueue(bundle.getTaskCount());
 		for (QueueListener listener : listeners) listener.newBundle(this);
 	}
@@ -93,12 +107,15 @@ public class JPPFQueue
 	{
 		JPPFTaskBundle result = null;
 		lock.lock();
+		if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks");
 		try
 		{
 			JPPFTaskBundle bundle = queue.peek();
 			if (bundle == null) return bundle;
+			if (debugEnabled) log.debug("next bundle has " + bundle.getTaskCount() + " tasks");
 			if (nbTasks >= bundle.getTaskCount())
 			{
+				if (debugEnabled) log.debug("removing bundle from queue");
 				result = bundle;
 				queue.remove(bundle);
 				int size = bundle.getInitialTaskCount();
@@ -111,12 +128,23 @@ public class JPPFQueue
 				}
 				if (!sizeMap.isEmpty()) setMaxBundleSize(sizeMap.lastKey());
 			}
-			else result = bundle.copy(nbTasks);
+			else
+			{
+				if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle");
+				result = bundle.copy(nbTasks);
+			}
 			result.setExecutionStartTime(System.currentTimeMillis());
 		}
 		finally
 		{
 			lock.unlock();
+		}
+		if (debugEnabled)
+		{
+			log.debug("sizeMap size = " + sizeMap.size());
+			int count = 0;
+			for (int n: sizeMap.keySet()) count += sizeMap.get(n).size();
+			log.debug("total bundles in sizeMap = " + count);
 		}
 		taskOutOfQueue(result.getTaskCount(), System.currentTimeMillis() - result.getQueueEntryTime());
 		return result;
