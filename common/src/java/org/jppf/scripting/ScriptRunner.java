@@ -31,7 +31,7 @@ public interface ScriptRunner
 	/**
 	 * Evaluate the script specified as input and get the evaluation result.
 	 * @param script a string containing the script to evaluate.
-	 * @param variables a mapping of objects to add the scope of the script.
+	 * @param variables a mapping of objects to variable names, added within the scope of the script.
 	 * @return the result of the evaluation as an object. The actual type of the result
 	 * depends on the scripting engine that is used.
 	 * @throws JPPFScriptingException if an error occurs while evaluating the script.

@@ -61,6 +61,10 @@ public class SocketInitializer
 	 * Used to compute a random start delay for this node.
 	 */
 	private static Random rand = new Random(System.currentTimeMillis());
+	/**
+	 * The timer that periodically attempts the connection to the server.
+	 */
+	private Timer timer = null;
 
 	/**
 	 * Instantiate this SocketInitializer with a specified socket wrapper.
@@ -98,7 +102,7 @@ public class SocketInitializer
 			long period = 1000L * props.getLong("reconnect.interval", 1L);
 			latestAttemptDate = (maxDuration > 0) ? new Date(System.currentTimeMillis() + maxDuration) : null;
 			SocketInitializationTask task = new SocketInitializationTask();
-			Timer timer = new Timer("Socket initializer timer");
+			timer = new Timer("Socket initializer timer");
 			timer.schedule(task, delay, period);
 			try
 			{
@@ -120,6 +124,18 @@ public class SocketInitializer
 		finally
 		{
 			lock.unlock();
+		}
+	}
+
+	/**
+	 * Close this initializer.
+	 */
+	public void close()
+	{
+		if (timer != null)
+		{
+			timer.cancel();
+			timer.purge();
 		}
 	}
 

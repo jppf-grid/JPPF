@@ -221,7 +221,7 @@ public final class PermissionsFactory
 	private static Permission instantiatePermission(String className, String name, String actions, String file, int line)
 	{
 		Permission permission = null;
-		Class c = null;
+		Class<?> c = null;
 		try
 		{
 			c = Class.forName(className);

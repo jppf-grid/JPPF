@@ -65,7 +65,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	/**
 	 * The port this socket server is listening to.
 	 */
-	protected int port = -1;
+	protected int[] ports = null;
 	/**
 	 * The pool of threads used for submitting channel state transitions.
 	 */
@@ -86,6 +86,16 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 
 	/**
 	 * Initialize this server with a specified port number and name.
+	 * @param name the name given to this thread.
+	 * @throws JPPFException if the underlying server socket can't be opened.
+	 */
+	protected NioServer(String name) throws JPPFException
+	{
+		super(name);
+	}
+
+	/**
+	 * Initialize this server with a specified port number and name.
 	 * @param port the port this socket server is listening to.
 	 * @param name the name given to this thread.
 	 * @throws JPPFException if the underlying server socket can't be opened.
@@ -94,9 +104,24 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	{
 		super(name);
 		
-		this.port = port;
+		this.ports = new int[] { port };
 		factory = createFactory();
-		init(port);
+		init(ports);
+	}
+
+	/**
+	 * Initialize this server with a specified list of port numbers and name.
+	 * @param ports the list of port this server accepts connections from.
+	 * @param name the name given to this thread.
+	 * @throws JPPFException if the underlying server socket can't be opened.
+	 */
+	public NioServer(int[] ports, String name) throws JPPFException
+	{
+		super(name);
+		
+		this.ports = ports;
+		factory = createFactory();
+		init(ports);
 	}
 
 	/**
@@ -107,21 +132,24 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 
 	/**
 	 * Initialize the underlying server socket with a specified port.
-	 * @param port the port the underlying server listens to.
+	 * @param ports the port the underlying server listens to.
 	 * @throws JPPFException if the server socket can't be opened on the specified port.
 	 */
-	protected final void init(int port) throws JPPFException
+	protected final void init(int[] ports) throws JPPFException
 	{
 		Exception e = null;
 		try
 		{
-			ServerSocketChannel server = ServerSocketChannel.open();
-			int size = 32*1024;
-			server.socket().setReceiveBufferSize(size);
-			server.socket().bind(new InetSocketAddress(port));
-			server.configureBlocking(false);
-			selector = Selector.open();
-			server.register(selector, SelectionKey.OP_ACCEPT);
+			for (int port: ports)
+			{
+				ServerSocketChannel server = ServerSocketChannel.open();
+				int size = 32*1024;
+				server.socket().setReceiveBufferSize(size);
+				server.socket().bind(new InetSocketAddress(port));
+				server.configureBlocking(false);
+				selector = Selector.open();
+				server.register(selector, SelectionKey.OP_ACCEPT);
+			}
 		}
 		catch(IllegalArgumentException iae)
 		{

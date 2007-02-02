@@ -423,4 +423,24 @@ public class JPPFClient implements ClientConnectionStatusListener
 			c.init();
 		}
 	}
+
+	/**
+	 * Close this client and release all the resources it is using.
+	 */
+	public void close()
+	{
+		List<JPPFClientConnection> list = getAllConnections();
+		for (JPPFClientConnection c: list)
+		{
+			try
+			{
+				c.close();
+			}
+			catch(Exception e)
+			{
+				log.error(e.getMessage(), e);
+			}
+		}
+		if (executor != null) executor.shutdownNow();
+	}
 }

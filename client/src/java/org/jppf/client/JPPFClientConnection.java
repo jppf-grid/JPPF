@@ -544,6 +544,7 @@ public class JPPFClientConnection
 			isShutdown = true;
 			try
 			{
+				socketInitializer.close();
 				socketClient.close();
 				delegate.close();
 			}

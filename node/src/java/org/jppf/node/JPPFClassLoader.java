@@ -312,9 +312,9 @@ public class JPPFClassLoader extends ClassLoader
 			try
 			{
 				byte[] b = loadResourceData(name);
-				boolean found = (b == null) || (b.length == 0);
+				boolean found = (b != null) && (b.length > 0);
 				if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
-				if (found) return null;
+				if (!found) return null;
 				is = new ByteArrayInputStream(b);
 			}
 			catch(ClassNotFoundException e)
