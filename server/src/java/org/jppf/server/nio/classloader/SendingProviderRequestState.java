@@ -73,6 +73,9 @@ public class SendingProviderRequestState extends ClassServerState
 			{
 				if (currentRequest != null)
 				{
+					if (debugEnabled) log.debug("provider: " + getRemoteHost(channel) +
+						" disconnected while serving request [" + context.getResource().getName() +
+						"] for node " + getRemoteHost((SocketChannel) context.getCurrentRequest().channel()));
 					context.setCurrentRequest(null);
 					sendNullResponse(currentRequest);
 				}
@@ -103,7 +106,9 @@ public class SendingProviderRequestState extends ClassServerState
 		}
 		if (context.writeMessage(channel))
 		{
-			if (debugEnabled) log.debug("provider: " + getRemoteHost(channel) + ", request sent to the client");
+			if (debugEnabled) log.debug("request sent to the provider " + getRemoteHost(channel) + " from node " + 
+				getRemoteHost((SocketChannel) context.getCurrentRequest().channel()) + 
+				", resource: " + context.getResource().getName());
 			context.setMessage(new NioMessage());
 			return TO_WAITING_PROVIDER_RESPONSE;
 		}

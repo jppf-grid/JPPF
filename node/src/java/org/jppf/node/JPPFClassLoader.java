@@ -288,6 +288,18 @@ public class JPPFClassLoader extends ClassLoader
 			socketClient.send(resource);
 			resource = (JPPFResourceWrapper) socketClient.receive();
 			b = resource.getDefinition();
+			if (b != null)
+			{
+				try
+				{
+					b = CompressionUtils.unzip(b, 0, b.length);
+				}
+				catch(Exception e)
+				{
+					b = null;
+					log.error(e.getMessage(), e);
+				}
+			}
 			if (debugEnabled) log.debug("remote definition for resource [" + name + "] "+ (b==null ? "not " : "") + "found");
 		}
 		finally

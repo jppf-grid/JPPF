@@ -89,10 +89,13 @@ public class WaitingProviderResponseState extends ClassServerState
 		}
 		if (messageRead)
 		{
-			if (debugEnabled) log.debug("read response from provider: " + getRemoteHost(channel) + " complete");
+			if (debugEnabled) log.debug("read response from provider: " + getRemoteHost(channel) +
+				" complete, sending to node " + getRemoteHost((SocketChannel) context.getCurrentRequest().channel()) + 
+				", resource: " + context.getResource().getName());
 			JPPFResourceWrapper resource = context.deserializeResource();
 			// putting the definition in cache
-			server.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
+			if (resource.getDefinition() != null)
+				server.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
 			// fowarding it to channel that requested
 			SelectionKey destinationKey = context.getCurrentRequest();
 			ClassContext destinationContext = (ClassContext) destinationKey.attachment();

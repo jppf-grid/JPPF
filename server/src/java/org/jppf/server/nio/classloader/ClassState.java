@@ -48,5 +48,9 @@ public enum ClassState
 	/**
 	 * State of waiting for a response from a resource provider.
 	 */
-	SENDING_PROVIDER_REQUEST
+	SENDING_PROVIDER_REQUEST,
+	/**
+	 * State of doing nothing for a resource provider.
+	 */
+	IDLE_PROVIDER
 }

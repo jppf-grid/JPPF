@@ -24,6 +24,7 @@ import org.jppf.JPPFException;
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.comm.socket.*;
 import org.jppf.node.JPPFResourceWrapper;
+import org.jppf.utils.CompressionUtils;
 
 /**
  * Wrapper around an incoming socket connection, whose role is to receive the names of classes
@@ -169,11 +170,12 @@ public class ClassServerDelegate extends Thread
 					byte[] b = resourceProvider.getResourceAsBytes(name);
 					if (b == null)
 					{
-						b = new byte[0];
+						//b = new byte[0];
 						found = false;
 					}
 					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
-					resource.setDefinition(b);
+					//resource.setDefinition(b);
+					resource.setDefinition(CompressionUtils.zip(b, 0, b.length));
 					socketClient.send(resource);
 					if  (debugEnabled)
 					{

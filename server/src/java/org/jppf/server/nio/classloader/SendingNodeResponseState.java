@@ -69,7 +69,8 @@ public class SendingNodeResponseState extends ClassServerState
 		ClassContext context = (ClassContext) key.attachment();
 		if (context.writeMessage(channel))
 		{
-			if (debugEnabled) log.debug("node: " + getRemoteHost(channel) + ", response sent to the node");
+			if (debugEnabled) log.debug("node: " + getRemoteHost(channel) + ", response [" +
+				context.getResource().getName() + "] sent to the node");
 			context.setMessage(null);
 			return TO_WAITING_NODE_REQUEST;
 		}

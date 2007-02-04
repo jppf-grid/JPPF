@@ -28,7 +28,7 @@ import java.nio.channels.*;
 import org.apache.log4j.Logger;
 import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.server.JPPFDriver;
-import org.jppf.utils.TraversalList;
+import org.jppf.utils.*;
 
 /**
  * This class represents the state of waiting for a request from a node.
@@ -81,16 +81,18 @@ public class WaitingNodeRequestState extends ClassServerState
 				boolean alreadyInCache = (b != null);
 				if (debugEnabled)
 				{
-					log.debug("resource " + (alreadyInCache ? "" : "not ") + "found [" + name +
-						"] in cache for node: " + getRemoteHost(channel));
+					log.debug("resource " + (alreadyInCache ? "" : "not ") + "found [" + name + "] in cache for node: " + getRemoteHost(channel));
 				}
-				if (!alreadyInCache) b = server.getResourceProvider().getResourceAsBytes(name);
+				if (!alreadyInCache)
+				{
+					b = server.getResourceProvider().getResourceAsBytes(name);
+					if (b != null) b = CompressionUtils.zip(b, 0, b.length);
+				}
 				if ((b != null) || !dynamic)
 				{
 					if (debugEnabled)
 					{
-						log.debug("resource " + (b == null ? "not " : "") + "found [" + name +
-							"] in the driver's classpath for node: " + getRemoteHost(channel));
+						log.debug("resource " + (b == null ? "not " : "") + "found [" + name + "] in the driver's classpath for node: " + getRemoteHost(channel));
 					}
 					if ((b != null) && !alreadyInCache) server.setCacheContent(JPPFDriver.getInstance().getUuid(), name, b);
 					resource.setDefinition(b);
@@ -119,9 +121,13 @@ public class WaitingNodeRequestState extends ClassServerState
 							getRemoteHost(provider) + " for node: " + getRemoteHost(channel));
 						SelectionKey providerKey = provider.keyFor(server.getSelector());
 						ClassContext providerContext = (ClassContext) providerKey.attachment();
+						boolean empty = providerContext.getPendingRequests().isEmpty();
 						providerContext.addRequest(key);
-						if (providerContext.getCurrentRequest() == null)
+						if (ClassState.IDLE_PROVIDER.equals(providerContext.getState()))
 						{
+							if (debugEnabled) log.debug("node " + getRemoteHost(channel) +
+								" changing key ops for provider " + getRemoteHost(provider));
+							providerContext.setState(ClassState.SENDING_PROVIDER_REQUEST);
 							server.setKeyOps(providerKey, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
 						}
 						return TO_IDLE_NODE;
@@ -136,3 +142,4 @@ public class WaitingNodeRequestState extends ClassServerState
 		return TO_WAITING_NODE_REQUEST;
 	}
 }
+
