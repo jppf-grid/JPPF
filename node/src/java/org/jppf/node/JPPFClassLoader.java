@@ -206,6 +206,33 @@ public class JPPFClassLoader extends ClassLoader
 	}
 
 	/**
+	 * Load a class from the classpath.
+	 * @param name the name of the class to load.
+	 * @return a Class instance.
+	 * @throws ClassNotFoundException if the class could not be found.
+	 * @see java.lang.ClassLoader#loadClass(java.lang.String)
+	 */
+	/*
+	public Class<?> loadClass(String name) throws ClassNotFoundException
+	{
+		Class c = null;
+		try
+		{
+			c = super.loadClass(name);
+			//c = super.findClass(name);
+		}
+		catch(ClassNotFoundException e)
+		{
+		}
+		if (c == null)
+		{
+			c = findClass(name);
+		}
+		return c;
+	}
+	*/
+
+	/**
 	 * Find a class in this class loader's classpath.
 	 * @param name binary name of the resource to find.
 	 * @return a defined <code>Class</code> instance.
@@ -354,29 +381,5 @@ public class JPPFClassLoader extends ClassLoader
 	private static synchronized void setInitializing(boolean initFlag)
 	{
 		initializing = initFlag;
-	}
-
-	/**
-	 * Load a class from the classpath.
-	 * @param name the name of the class to load.
-	 * @return a Class instance.
-	 * @throws ClassNotFoundException if the class could not be found.
-	 * @see java.lang.ClassLoader#loadClass(java.lang.String)
-	 */
-	public Class<?> loadClass(String name) throws ClassNotFoundException
-	{
-		Class c = null;
-		try
-		{
-			c = super.loadClass(name);
-		}
-		catch(ClassNotFoundException e)
-		{
-		}
-		if (c == null)
-		{
-			c = findClass(name);
-		}
-		return c;
 	}
 }
