@@ -175,7 +175,8 @@ public class ClassServerDelegate extends Thread
 					}
 					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
 					//resource.setDefinition(b);
-					resource.setDefinition(CompressionUtils.zip(b, 0, b.length));
+					if (b != null) resource.setDefinition(CompressionUtils.zip(b, 0, b.length));
+					else resource.setDefinition(null);
 					socketClient.send(resource);
 					if  (debugEnabled)
 					{

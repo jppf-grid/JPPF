@@ -461,6 +461,10 @@ public class JPPFClientConnection
 	private void sendAdminRequest(AdminRequest request) throws Exception
 	{
 		JPPFBuffer buf = helper.toBytes(request, false);
+		byte[] data = new byte[buf.getLength() + 4];
+		helper.copyToBuffer(buf.getBuffer(), data, 0, buf.getLength());
+		buf.setLength(data.length);
+		buf.setBuffer(data);
 		socketClient.sendBytes(buf);
 	}
 

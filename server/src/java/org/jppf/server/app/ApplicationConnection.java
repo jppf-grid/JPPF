@@ -301,9 +301,12 @@ public class ApplicationConnection extends JPPFConnection
 	private void sendAdminResponse(AdminRequest request, String msg) throws Exception
 	{
 		request.setParameter(RESPONSE_PARAM, msg);
-		SerializationHelper helper = new SerializationHelperImpl();
-		JPPFBuffer buffer = helper.toBytes(request, false);
-		socketClient.sendBytes(buffer);
+		JPPFBuffer buf = helper.toBytes(request, false);
+		byte[] data = new byte[buf.getLength() + 4];
+		helper.copyToBuffer(buf.getBuffer(), data, 0, buf.getLength());
+		buf.setLength(data.length);
+		buf.setBuffer(data);
+		socketClient.sendBytes(buf);
 	}
 
 	/**
