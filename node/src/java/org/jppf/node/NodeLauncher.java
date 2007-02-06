@@ -182,26 +182,4 @@ public class NodeLauncher
 	{
 		return persistentData.get(key);
 	}
-
-	/*
-	public synchronized static InitialContext getInitialContext(Hashtable env)
-	{
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		try
-		{
-			//Thread.currentThread().setContextClassLoader(NodeLauncher.class.getClassLoader());
-			Thread.currentThread().setContextClassLoader(cl.getSystemClassLoader());
-			return new InitialContext(env);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			Thread.currentThread().setContextClassLoader(cl);
-		}
-		return null;
-	}
-	*/
 }
