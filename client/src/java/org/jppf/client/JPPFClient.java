@@ -232,12 +232,14 @@ public class JPPFClient implements ClientConnectionStatusListener
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
 	{
+		JPPFResultCollector collector = new JPPFResultCollector(taskList.size());
 		List<JPPFTask> result = null;
 		while ((result == null) && !pools.isEmpty())
 		{
 			try
 			{
-				result = getClientConnection().submit(taskList, dataProvider);
+				getClientConnection().submit(taskList, dataProvider, collector);
+				result = collector.waitForResults();
 			}
 			catch(Exception e)
 			{
@@ -257,7 +259,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
 		throws Exception
 	{
-		getClientConnection().submitNonBlocking(taskList, dataProvider, listener);
+		getClientConnection().submit(taskList, dataProvider, listener);
 	}
 
 	/**

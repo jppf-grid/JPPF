@@ -246,58 +246,14 @@ public class JPPFClientConnection
 	 * Submit the request to the server.
 	 * @param taskList the list of tasks to execute remotely.
 	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @return the list of executed tasks with their results.
-	 * @throws Exception if an error occurs while sending the request.
-	 */
-	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
-	{
-		lock.lock();
-		try
-		{
-			final List<JPPFTask> resultList = new ArrayList<JPPFTask>();
-			TaskResultListener listener = new TaskResultListener()
-			{
-				public void resultsReceived(TaskResultEvent event)
-				{
-					for (JPPFTask task: event.getTaskList()) resultList.add(task);
-				}
-			};
-			ClientExecution exec = new ClientExecution(taskList, dataProvider, true, listener);
-			AsynchronousResultProcessor proc = new AsynchronousResultProcessor(this, exec);
-			proc.run();
-			if ((taskList != null) && (taskList.size() > 0))
-			{
-				totalTaskCount += taskList.size();
-				if (debugEnabled) log.debug("["+name+"] submitted " + taskList.size() + " tasks for a total of " + totalTaskCount);
-			}
-			Collections.sort(resultList, new Comparator<JPPFTask>()
-			{
-				public int compare(JPPFTask o1, JPPFTask o2)
-				{
-					return o1.getPosition() - o2.getPosition();
-				}
-			});
-			return resultList;
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
-
-	/**
-	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
 	 * @param listener listener to notify whenever a set of results have been received.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
-	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
+	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
 			throws Exception
 	{
 		ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener);
-		AsynchronousResultProcessor proc =
-			new AsynchronousResultProcessor(this, exec);
+		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(this, exec);
 		executor.submit(proc);
 		if (debugEnabled) log.debug("["+name+"] submitted " + taskList.size() + " tasks");
 	}
