@@ -131,6 +131,7 @@
   </target>
 
 	<target name="compile.module">
+ 		<mkdir dir="${path}/classes"/>
 		<javac srcdir="" destdir="${path}/classes"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 	    <classpath refid="project.classpath"/>
@@ -189,10 +190,10 @@
 		<tstamp>
 			<format property="now" pattern="yyyyMMdd"/>
 		</tstamp>
+
 		<property name="release.file"
 			value="${build}/${ant.project.name}-full-src-${version.number}.${build.number}-${now}.zip"/>
 		<delete file="${release.file}" quiet="true"/>
-
 		<zip destfile="${release.file}">
 			<zipfileset dir="${basedir}" prefix="${ant.project.name}-${version.number}/JPPF">
 				<include name="build/jppf*.jar"/>
@@ -207,7 +208,27 @@
 			<zipfileset dir="${client}" prefix="${ant.project.name}-${version.number}/client"/>
 			<zipfileset dir="${server}" prefix="${ant.project.name}-${version.number}/server"/>
 			<zipfileset dir="${admin}" prefix="${ant.project.name}-${version.number}/admin"/>
-			<zipfileset dir="${demo}" prefix="${ant.project.name}-${version.number}/demo"/>
+			<zipfileset dir="${demo}" prefix="${ant.project.name}-${version.number}/demo" excludes="*.log"/>
+		</zip>
+
+		<property name="lite.release.file"
+			value="${build}/${ant.project.name}-lite-src-${version.number}.${build.number}-${now}.zip"/>
+		<delete file="${lite.release.file}" quiet="true"/>
+		<zip destfile="${lite.release.file}">
+			<zipfileset dir="${basedir}" prefix="${ant.project.name}-${version.number}/JPPF">
+				<include name="bin/**/*.*"/>
+				<include name="config/**/*.*"/>
+				<include name="${license.file}"/>
+			</zipfileset>
+			<zipfileset dir="${basedir}/lib" prefix="${ant.project.name}-${version.number}/JPPF/lib">
+				<exclude name="**/*.jar"/>
+			</zipfileset>
+			<zipfileset dir="${node}" prefix="${ant.project.name}-${version.number}/node" excludes="classes/**/*.*,"/>
+			<zipfileset dir="${common}" prefix="${ant.project.name}-${version.number}/common" excludes="classes/**/*.*"/>
+			<zipfileset dir="${client}" prefix="${ant.project.name}-${version.number}/client" excludes="classes/**/*.*"/>
+			<zipfileset dir="${server}" prefix="${ant.project.name}-${version.number}/server" excludes="classes/**/*.*"/>
+			<zipfileset dir="${admin}" prefix="${ant.project.name}-${version.number}/admin" excludes="classes/**/*.*"/>
+			<zipfileset dir="${demo}" prefix="${ant.project.name}-${version.number}/demo" excludes="classes/**/*.*,*.log"/>
 		</zip>
 	</target>
 
