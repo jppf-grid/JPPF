@@ -281,7 +281,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 	 * Get a reference to the driver's tasks queue.
 	 * @return a <code>JPPFQueue</code> instance.
 	 */
-	JPPFQueue getQueue()
+	protected JPPFQueue getQueue()
 	{
 		if (queue == null) queue = JPPFDriver.getQueue();
 		return queue;
