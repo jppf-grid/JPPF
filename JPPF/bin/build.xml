@@ -202,6 +202,7 @@
 				<!--<include name="docs/api/**/*.*"/>-->
 				<include name="lib/**/*.*"/>
 				<include name="${license.file}"/>
+				<include name="JPPF-3rd-party.html"/>
 			</zipfileset>
 			<zipfileset dir="${node}" prefix="${ant.project.name}-${version.number}/node"/>
 			<zipfileset dir="${common}" prefix="${ant.project.name}-${version.number}/common"/>
@@ -219,6 +220,7 @@
 				<include name="bin/**/*.*"/>
 				<include name="config/**/*.*"/>
 				<include name="${license.file}"/>
+				<include name="JPPF-3rd-party.html"/>
 			</zipfileset>
 			<zipfileset dir="${basedir}/lib" prefix="${ant.project.name}-${version.number}/JPPF/lib">
 				<exclude name="**/*.jar"/>
