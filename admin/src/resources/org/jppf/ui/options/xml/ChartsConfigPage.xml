@@ -136,7 +136,7 @@
 		{
 			if (config != null)
 			{
-				JPPFChartBuilder.getInstance().createChart(config, true);
+				var cfg = JPPFChartBuilder.getInstance().createChart(config, true);
 				var comp = option.findFirstWithName("/ChartPreview").getUIComponent();
 				comp.removeAll();
 				var c = new GridBagConstraints();
@@ -145,8 +145,8 @@
 				c.gridheight = GridBagConstraints.REMAINDER;
 				c.gridwidth = GridBagConstraints.REMAINDER;
 				c.fill = GridBagConstraints.BOTH;
-				comp.add(config.chartPanel, c);
-				config.chart.setBackgroundPaint(comp.getBackground());
+				comp.add(cfg.chartPanel, c);
+				cfg.chart.setBackgroundPaint(comp.getBackground());
 				comp.updateUI();
 			}
 		}

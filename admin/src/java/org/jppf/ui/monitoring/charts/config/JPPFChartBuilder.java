@@ -137,11 +137,12 @@ public class JPPFChartBuilder implements StatsHandlerListener
 	 */
 	public ChartConfiguration createChart(ChartConfiguration config, boolean preview)
 	{
-		ChartHandler handler = handlerMap.get(config.type);
+		ChartConfiguration cfg = preview ? new ChartConfiguration(config) : config;
+		ChartHandler handler = handlerMap.get(cfg.type);
 		if (handler == null) return null;
-		handler.createChart(config);
-		config.chartPanel = new ChartPanel(config.chart);
-		return config;
+		handler.createChart(cfg);
+		cfg.chartPanel = new ChartPanel(cfg.chart);
+		return cfg;
 	}
 
 	/**

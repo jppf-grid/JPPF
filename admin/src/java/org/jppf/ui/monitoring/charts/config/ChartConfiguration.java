@@ -92,6 +92,19 @@ public class ChartConfiguration
 	}
 	
 	/**
+	 * Create a configuration from another configuration (copy constructor).
+	 * @param cfg the configuration to copy from.
+	 */
+	public ChartConfiguration(ChartConfiguration cfg)
+	{
+		this.name = cfg.name;
+		this.type = cfg.type;
+		this.unit = cfg.unit;
+		this.precision = cfg.precision;
+		this.fields = cfg.fields;
+	}
+	
+	/**
 	 * Get a string representation of this chart configuration.
 	 * @return a string containg this configuration's name.
 	 * @see java.lang.Object#toString()
