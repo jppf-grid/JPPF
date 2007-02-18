@@ -27,7 +27,9 @@ import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
- * 
+ * Implementation of the {@link org.jppf.client.event.TaskResultListener TaskResultListener} interface
+ * that can be used &quot;as is&quot; to collect the results of an asynchronous tasks submission.
+ * @see org.jppf.client.JPPFClient#submitNonBlocking(List, org.jppf.task.storage.DataProvider, TaskResultListener)
  * @author Laurent Cohen
  */
 public class JPPFResultCollector implements TaskResultListener
@@ -73,8 +75,8 @@ public class JPPFResultCollector implements TaskResultListener
 	}
 
 	/**
-	 * Called to notify that that results of number of tasks have been received from the server.
-	 * @param event a notification of completion for a submitted tasks.
+	 * Called to notify that the results of a number of tasks have been received from the server.
+	 * @param event a notification of completion for a set of submitted tasks.
 	 * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
 	 */
 	public synchronized void resultsReceived(TaskResultEvent event)
