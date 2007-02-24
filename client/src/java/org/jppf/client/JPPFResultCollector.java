@@ -43,10 +43,6 @@ public class JPPFResultCollector implements TaskResultListener
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Count of tasks submitted.
-	 */
-	private int count = 0;
-	/**
 	 * Count of results notr yet received.
 	 */
 	private int pendingCount = 0;
@@ -70,8 +66,7 @@ public class JPPFResultCollector implements TaskResultListener
 	 */
 	public JPPFResultCollector(int count)
 	{
-		this.count = count;
-		pendingCount = count;
+		this.pendingCount = count;
 	}
 
 	/**
@@ -117,7 +112,7 @@ public class JPPFResultCollector implements TaskResultListener
 
 	/**
 	 * Get the list of final results.
-	 * @return a list of results as tasks.
+	 * @return a list of results as tasks, or null if not all tasks have been executed.
 	 */
 	public List<JPPFTask> getResults()
 	{

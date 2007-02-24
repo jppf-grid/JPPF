@@ -88,30 +88,16 @@ permission java.net.SocketPermission "www.jppf.org:80", "connect,listen";
 permission java.net.SocketPermission "127.0.0.1:21", "accept,connect,listen,resolve";
 permission java.net.SocketPermission "127.0.0.1:1024-", "accept,connect,listen,resolve";
 //------------------------------------------------------------------------------//
-// permissions for JBoss                                                        //
+// permissions for JBoss 4.0.x                                                  //
 //------------------------------------------------------------------------------//
 //permission java.lang.RuntimePermission "org.jboss.security.SecurityAssociation.getPrincipalInfo";
 //permission java.io.SerializablePermission "enableSubstitution";
 //------------------------------------------------------------------------------//
-// permissions for Weblogic                                                     //
+// for Weblogic 9.2: security should be disabled                                //
 //------------------------------------------------------------------------------//
-permission java.net.SocketPermission "127.0.0.1:7001", "accept,connect,listen,resolve";
-permission java.net.SocketPermission "localhost:7001", "accept,connect,listen,resolve";
-permission java.net.SocketPermission "192.168.0.4:7001", "accept,connect,listen,resolve";
-permission java.net.SocketPermission "192.168.0.4:1024-", "accept,connect,listen,resolve";
-permission java.util.PropertyPermission "java.vendor", "read";
-permission java.util.PropertyPermission "weblogic.system.iiop.enableClient", "read,write";
-permission java.util.PropertyPermission "weblogic.*", "read";
-permission java.lang.RuntimePermission "getProtectionDomain";
-
-//permission java.lang.RuntimePermission "stopThread";
-//permission java.util.PropertyPermission "wls.*", "read";
-//permission java.util.PropertyPermission "bea.*", "read";
-//permission java.lang.RuntimePermission "setFactory";
-//permission java.lang.RuntimePermission "enableContextClassLoaderOverride";
 
 //------------------------------------------------------------------------------//
-// permissions for WAS                                                          //
+// permissions for WAS 6.1                                                      //
 //------------------------------------------------------------------------------//
 //permission java.util.PropertyPermission "com.ibm.*", "read";
 //permission java.util.PropertyPermission "ws.*", "read";

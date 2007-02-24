@@ -157,6 +157,25 @@
 		</parallel>
 	</target>
 
+	<target name="run.demo4">
+		<parallel>
+			<antcall target="run.driver"/>
+			<sequential>
+				<sleep milliseconds="1000"/>
+				<antcall target="run.node1"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="2000"/>
+				<antcall target="run.ui"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="3000"/>
+				<antcall target="run.client.pool"/>
+				<fail status="1" message="Demo has ended normally."/>
+			</sequential>
+		</parallel>
+	</target>
+
 	<target name="run.long.task">
 		<echo message="starting the 'Long task' demo application"/>
 		<java fork="yes" classname="sample.tasklength.LongTaskRunner" classpathref="client.classpath">
@@ -197,11 +216,21 @@
 		</java>       
 	</target>
 
+	<target name="run.client.pool">
+		<echo message="starting the 'Servrer Connection Pool' demo application"/>
+		<java fork="yes" classname="sample.matrix.clientpool.NonBlockingPoolMatrixRunner" classpathref="client.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-client-pool.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client-pool.properties"/>
+		</java>       
+	</target>
+
 	<target name="run.driver">
 		<echo message="starting the JPPF driver"/>
 		<java fork="yes" classname="org.jppf.server.DriverLauncher" classpathref="client.classpath">
 			<jvmarg value="-server"/>
-			<jvmarg value="-Xmx32m"/>
+			<jvmarg value="-Xmx64m"/>
 			<jvmarg value="-Djppf.config=jppf-driver.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-driver.properties"/>
 		</java>       
@@ -222,6 +251,7 @@
 		<java fork="yes" classname="org.jppf.node.NodeLauncher" classpathref="node.classpath">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Xverify:none"/>
 			<jvmarg value="-Djppf.config=node1.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-node1.properties"/>
 		</java>       
@@ -232,6 +262,7 @@
 		<java fork="yes" classname="org.jppf.node.NodeLauncher" classpathref="node.classpath">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Xverify:none"/>
 			<jvmarg value="-Djppf.config=node2.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-node2.properties"/>
 		</java>       
@@ -242,6 +273,7 @@
 		<java fork="yes" classname="org.jppf.node.NodeLauncher" classpathref="node.classpath">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Xverify:none"/>
 			<jvmarg value="-Djppf.config=node3.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-node3.properties"/>
 		</java>       
