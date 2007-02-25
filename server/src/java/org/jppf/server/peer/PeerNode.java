@@ -90,7 +90,7 @@ public class PeerNode extends AbstractMonitoredNode
 				try
 				{
 					socketClient.close();
-					socket = null;
+					socketClient = null;
 				}
 				catch(Exception ex)
 				{
@@ -157,15 +157,19 @@ public class PeerNode extends AbstractMonitoredNode
 	public synchronized void init() throws Exception
 	{
 		if (debugEnabled) log.debug(getName() + "] initializing socket client");
-		if (socketClient == null) initSocketClient();
+		boolean mustInit = false;
+		if (socketClient == null)
+		{
+			mustInit = true;
+			initSocketClient();
+		}
 		initCredentials();
 		if (notifying) fireNodeEvent(EventType.START_CONNECT);
-		if (socket == null)
+		if (mustInit)
 		{
 			if (debugEnabled) log.debug(getName() + "initializing socket");
 			System.out.println(getName() + "PeerNode.init(): Attempting connection to the JPPF driver");
 			socketInitializer.initializeSocket(socketClient);
-			socket = socketClient.getSocket();
 			System.out.println(getName() + "PeerNode.init(): Reconnected to the JPPF driver");
 		}
 		if (notifying) fireNodeEvent(EventType.END_CONNECT);
@@ -177,17 +181,13 @@ public class PeerNode extends AbstractMonitoredNode
 	 */
 	public void initSocketClient() throws Exception
 	{
-		if (socket != null) socketClient = new SocketClient(socket);
-		else
-		{
-			if (debugEnabled) log.debug(getName() + "initializing socket client");
-			TypedProperties props = JPPFConfiguration.getProperties();
-			String host = props.getString("jppf.peer."+peerName+".server.host", "localhost");
-			int port = props.getInt("node.peer."+peerName+".server.port", 11113);
-			socketClient = new SocketClient();
-			socketClient.setHost(host);
-			socketClient.setPort(port);
-		}
+		if (debugEnabled) log.debug(getName() + "initializing socket client");
+		TypedProperties props = JPPFConfiguration.getProperties();
+		String host = props.getString("jppf.peer."+peerName+".server.host", "localhost");
+		int port = props.getInt("node.peer."+peerName+".server.port", 11113);
+		socketClient = new SocketClient();
+		socketClient.setHost(host);
+		socketClient.setPort(port);
 		socketClient.setSerializer(helper.getSerializer());
 	}
 
@@ -254,17 +254,15 @@ public class PeerNode extends AbstractMonitoredNode
 		{
 			try
 			{
-				if (debugEnabled) log.debug(getName() + "closing socket: "+socket);
+				if (debugEnabled) log.debug(getName() + "closing socket: " + socketClient.getSocket());
 				socketClient.close();
 			}
 			catch(Exception ex)
 			{
 				log.error(ex.getMessage(), ex);
 			}
-			socket = null;
+			socketClient = null;
 		}
-		socketClient.setSocket(null);
-		socketClient = null;
 	}
 
 	/**

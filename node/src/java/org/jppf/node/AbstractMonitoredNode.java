@@ -20,7 +20,6 @@
 
 package org.jppf.node;
 
-import java.net.Socket;
 import java.util.*;
 
 import org.jppf.comm.socket.*;
@@ -38,10 +37,6 @@ public abstract class AbstractMonitoredNode implements MonitoredNode
 	 * Utility for deserialization and serialization.
 	 */
 	protected SerializationHelper helper = null;
-	/**
-	 * The socket used by this node's socket wrapper.
-	 */
-	protected Socket socket = null;
 	/**
 	 * Wrapper around the underlying server connection.
 	 */
@@ -107,32 +102,21 @@ public abstract class AbstractMonitoredNode implements MonitoredNode
 	}
 
 	/**
-	 * Get the underlying socket used by this socket wrapper.
-	 * @return a Socket instance.
-	 * @see org.jppf.node.MonitoredNode#getSocket()
-	 */
-	public Socket getSocket()
-	{
-		return socket;
-	}
-	
-	/**
-	 * Set the underlying socket to be used by this socket wrapper.
-	 * @param socket a Socket instance.
-	 * @see org.jppf.node.MonitoredNode#setSocket(java.net.Socket)
-	 */
-	public void setSocket(Socket socket)
-	{
-		this.socket = socket;
-	}
-
-	/**
 	 * Get the underlying socket wrapper used by this node.
 	 * @return a <code>SocketWrapper</code> instance.
 	 */
 	public SocketWrapper getSocketWrapper()
 	{
 		return socketClient;
+	}
+
+	/**
+	 * Get the underlying socket wrapper used by this node.
+	 * @param wrapper a <code>SocketWrapper</code> instance.
+	 */
+	public void setSocketWrapper(SocketWrapper wrapper)
+	{
+		this.socketClient = wrapper;
 	}
 
 	/**

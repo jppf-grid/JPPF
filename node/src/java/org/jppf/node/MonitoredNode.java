@@ -19,7 +19,7 @@
  */
 package org.jppf.node;
 
-import java.net.Socket;
+import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.node.event.NodeListener;
 import org.jppf.node.event.NodeEvent.EventType;
 
@@ -30,15 +30,15 @@ import org.jppf.node.event.NodeEvent.EventType;
 public interface MonitoredNode extends Runnable
 {
 	/**
-	 * Get the underlying socket used by this socket wrapper.
-	 * @return a Socket instance.
+	 * Get the underlying socket used by this node.
+	 * @return a SocketWrapper instance.
 	 */
-	Socket getSocket();
+	SocketWrapper getSocketWrapper();
 	/**
-	 * Set the underlying socket to be used by this socket wrapper.
-	 * @param socket a Socket instance.
+	 * Set the underlying socket to be used by this node.
+	 * @param socketWrapper a SocketWrapper instance.
 	 */
-	void setSocket(Socket socket);
+	void setSocketWrapper(SocketWrapper socketWrapper);
 	/**
 	 * Add a listener to the list of listener for this node.
 	 * @param listener the listener to add.

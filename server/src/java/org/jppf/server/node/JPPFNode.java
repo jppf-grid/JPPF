@@ -115,7 +115,7 @@ public class JPPFNode extends AbstractMonitoredNode
 				try
 				{
 					socketClient.close();
-					socket = null;
+					socketClient = null;
 				}
 				catch(Exception ex)
 				{
@@ -151,7 +151,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			if (notEmpty)
 			{
 				//if (debugEnabled) log.debug("End of node secondary loop");
-				if (debugEnabled) log.debug("node["+socket.getLocalPort()+"] executing "+taskList.size()+" tasks");
+				if (debugEnabled) log.debug("node["+socketClient.getSocket().getLocalPort()+"] executing "+taskList.size()+" tasks");
 				List<Future> futureList = new ArrayList<Future>(taskList.size());
 				for (JPPFTask task : taskList)
 				{
@@ -185,15 +185,20 @@ public class JPPFNode extends AbstractMonitoredNode
 	public synchronized void init() throws Exception
 	{
 		if (debugEnabled) log.debug("start node initialization");
-		if (socketClient == null) initSocketClient();
+		boolean mustInit = false;
+		initHelper();
+		if (socketClient == null)
+		{
+			mustInit = true;
+			initSocketClient();
+		}
 		initCredentials();
 		if (notifying) fireNodeEvent(EventType.START_CONNECT);
-		if (socket == null)
+		if (mustInit)
 		{
 			if (debugEnabled) log.debug("start socket initialization");
 			System.out.println("PeerNode.init(): Attempting connection to the JPPF driver");
 			socketInitializer.initializeSocket(socketClient);
-			socket = socketClient.getSocket();
 			System.out.println("PeerNode.init(): Reconnected to the JPPF driver");
 			if (debugEnabled) log.debug("end socket initialization");
 		}
@@ -210,19 +215,13 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	public void initSocketClient() throws Exception
 	{
-		if (debugEnabled) log.debug("start socket client initialization");
-		initHelper();
-		if (socket != null) socketClient = new SocketClient(socket);
-		else
-		{
-			if (debugEnabled) log.debug("Initializing socket");
-			TypedProperties props = JPPFConfiguration.getProperties();
-			String host = props.getString("jppf.server.host", "localhost");
-			int port = props.getInt("node.server.port", 11113);
-			socketClient = new SocketClient();
-			socketClient.setHost(host);
-			socketClient.setPort(port);
-		}
+		if (debugEnabled) log.debug("Initializing socket");
+		TypedProperties props = JPPFConfiguration.getProperties();
+		String host = props.getString("jppf.server.host", "localhost");
+		int port = props.getInt("node.server.port", 11113);
+		socketClient = new SocketClient();
+		socketClient.setHost(host);
+		socketClient.setPort(port);
 		socketClient.setSerializer(serializer);
 		if (debugEnabled) log.debug("end socket client initialization");
 	}
@@ -418,10 +417,10 @@ public class JPPFNode extends AbstractMonitoredNode
 			{
 				log.error(ex.getMessage(), ex);
 			}
-			socket = null;
+			socketClient = null;
 		}
-		socketClient.setSocket(null);
-		socketClient = null;
+		//socketClient.setSocket(null);
+		//socketClient = null;
 		classLoader = null;
 	}
 
