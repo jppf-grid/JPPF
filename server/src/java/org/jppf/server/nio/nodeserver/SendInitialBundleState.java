@@ -61,7 +61,7 @@ public class SendInitialBundleState extends NodeServerState
 	public NodeTransition performTransition(SelectionKey key) throws Exception
 	{
 		SocketChannel channel = (SocketChannel) key.channel();
-		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
+		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		if (key.isReadable())
 		{
 			throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");

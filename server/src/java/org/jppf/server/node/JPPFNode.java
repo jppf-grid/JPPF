@@ -19,18 +19,19 @@
  */
 package org.jppf.server.node;
 
-import java.io.*;
+import static org.jppf.server.protocol.AdminRequestConstants.*;
+
+import java.io.InvalidClassException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.jppf.*;
-import org.jppf.comm.socket.*;
+import org.jppf.comm.socket.SocketClient;
 import org.jppf.node.*;
 import org.jppf.node.event.NodeEvent.EventType;
-import org.jppf.server.JPPFTaskBundle;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 
@@ -144,6 +145,8 @@ public class JPPFNode extends AbstractMonitoredNode
 			{
 				if (debugEnabled) log.debug("setting initial bundle uuid");
 				bundle.setBundleUuid(uuid);
+				Map<String, Object> params = getBundleTunningParameters();
+				if (params != null) bundle.getParametersMap().putAll(params);
 			}
 			List<JPPFTask> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
@@ -447,5 +450,33 @@ public class JPPFNode extends AbstractMonitoredNode
 		{
 			fireNodeEvent(EventType.START_EXEC);
 		}
+	}
+
+	/**
+	 * Get a configured bundle size tuning profile form the configuration file.
+	 * @return an <code>AnnealingTuneProfile</code> instance, or null if no profile was configured.
+	 */
+	public static Map<String, Object> getBundleTunningParameters()
+	{
+		TypedProperties cfg = JPPFConfiguration.getProperties();
+		String s = cfg.getString("task.bundle.strategy");
+		if (s == null) return null;
+		
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(BUNDLE_TUNING_TYPE_PARAM, s);
+		params.put(BUNDLE_SIZE_PARAM, cfg.getInt("task.bundle.size", 10));
+		if ("autotuned".equalsIgnoreCase(s))
+		{
+			String profile = cfg.getString("task.bundle.autotuned.strategy", "smooth");
+			String prefix = "strategy." + profile + ".";
+			params.put(MIN_SAMPLES_TO_ANALYSE, cfg.getInt(prefix + "minSamplesToAnalyse", 500));
+			params.put(MIN_SAMPLES_TO_CHECK_CONVERGENCE, cfg.getInt(prefix + "minSamplesToCheckConvergence", 300));
+			params.put(MAX_DEVIATION, cfg.getDouble(prefix + "maxDeviation", 0.2d));
+			params.put(MAX_GUESS_TO_STABLE, cfg.getInt(prefix + "maxGuessToStable", 10));
+			params.put(SIZE_RATIO_DEVIATION, cfg.getFloat(prefix + "sizeRatioDeviation", 1.5f));
+			params.put(DECREASE_RATIO, cfg.getFloat(prefix + "decreaseRatio", 0.2f));
+		}
+		
+		return params;
 	}
 }

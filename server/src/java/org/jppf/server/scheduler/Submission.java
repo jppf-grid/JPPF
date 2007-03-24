@@ -21,7 +21,7 @@ package org.jppf.server.scheduler;
 
 import java.util.List;
 
-import org.jppf.server.event.TaskCompletionListener;
+import org.jppf.server.protocol.TaskCompletionListener;
 import org.jppf.server.scheduler.bundle.Bundler;
 
 /**

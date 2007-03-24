@@ -185,11 +185,7 @@ public class SocketChannelClient implements SocketWrapper
 		JPPFBuffer buf = new JPPFBuffer(new byte[length], length);
 		byteBuffer = ByteBuffer.wrap(buf.getBuffer());
 		count = 0;
-		while (count < length)
-		{
-			int n = channel.read(byteBuffer);
-			count += n;
-		}
+		while (count < length) count += channel.read(byteBuffer);
 		return buf;
 	}
 
@@ -334,7 +330,7 @@ public class SocketChannelClient implements SocketWrapper
 	 */
 	public Socket getSocket()
 	{
-		return null;
+		return channel.socket();
 	}
 
 	/**

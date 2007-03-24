@@ -21,7 +21,7 @@
 package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
-import static org.jppf.server.protocol.AdminRequest.*;
+import static org.jppf.server.protocol.AdminRequestConstants.*;
 
 import java.io.*;
 import java.util.*;
@@ -266,9 +266,12 @@ public class JPPFClientConnection
 	 */
 	void sendTasks(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
 	{
-		JPPFRequestHeader header = new JPPFRequestHeader();
-		header.setRequestType(JPPFRequestHeader.Type.NON_BLOCKING_EXECUTION);
-		header.setAppUuid(appUuid);
+		JPPFTaskBundle header = new JPPFTaskBundle();
+		header.setRequestType(JPPFTaskBundle.Type.EXECUTION);
+		header.setRequestUuid(new JPPFUuid().toString());
+		TraversalList<String> uuidPath = new TraversalList<String>();
+		uuidPath.add(appUuid);
+		header.setUuidPath(uuidPath);
 		header.setCredentials(credentials);
 		int count = taskList.size();
 		header.setTaskCount(count);
@@ -333,10 +336,13 @@ public class JPPFClientConnection
 			{
 				try
 				{
-					JPPFRequestHeader header = new JPPFRequestHeader();
-					header.setAppUuid(appUuid);
+					JPPFTaskBundle header = new JPPFTaskBundle();
+					header.setRequestUuid(new JPPFUuid().toString());
+					TraversalList<String> uuidPath = new TraversalList<String>();
+					uuidPath.add(appUuid);
+					header.setUuidPath(uuidPath);
 					header.setCredentials(credentials);
-					header.setRequestType(JPPFRequestHeader.Type.STATISTICS);
+					header.setRequestType(JPPFTaskBundle.Type.STATISTICS);
 					JPPFBuffer buf = helper.toBytes(header, false);
 					byte[] data = new byte[buf.getLength() + 4];
 					helper.copyToBuffer(buf.getBuffer(), data, 0, buf.getLength());
@@ -377,10 +383,13 @@ public class JPPFClientConnection
 		lock.lock();
 		try
 		{
-			AdminRequest request = new AdminRequest();
-			request.setAppUuid(appUuid);
+			JPPFTaskBundle request = new JPPFTaskBundle();
+			request.setRequestUuid(new JPPFUuid().toString());
+			TraversalList<String> uuidPath = new TraversalList<String>();
+			uuidPath.add(appUuid);
+			request.setUuidPath(uuidPath);
 			request.setCredentials(credentials);
-			request.setRequestType(JPPFRequestHeader.Type.ADMIN);
+			request.setRequestType(JPPFTaskBundle.Type.ADMIN);
 			request.setParameter(COMMAND_PARAM, command);
 			SecretKey tmpKey = CryptoUtils.generateSecretKey();
 			request.setParameter(KEY_PARAM, CryptoUtils.encrypt(tmpKey.getEncoded()));
@@ -398,7 +407,7 @@ public class JPPFClientConnection
 			}
 			sendAdminRequest(request);
 			JPPFBuffer buf = socketClient.receiveBytes(0);
-			List<AdminRequest> list = new ArrayList<AdminRequest>();
+			List<JPPFTaskBundle> list = new ArrayList<JPPFTaskBundle>();
 			helper.fromBytes(buf.getBuffer(), 0, false, list, 1);
 			request = list.get(0);
 			return (String) request.getParameter(RESPONSE_PARAM);
@@ -414,7 +423,7 @@ public class JPPFClientConnection
 	 * @param request the request to send, with its parameters populated.
 	 * @throws Exception if the request could not be sent.
 	 */
-	private void sendAdminRequest(AdminRequest request) throws Exception
+	private void sendAdminRequest(JPPFTaskBundle request) throws Exception
 	{
 		JPPFBuffer buf = helper.toBytes(request, false);
 		byte[] data = new byte[buf.getLength() + 4];

@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
+import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**
  * Implementation of a generic non-blocking queue, to allow asynchronous access from a large number of threads.

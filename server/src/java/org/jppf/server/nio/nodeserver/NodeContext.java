@@ -26,6 +26,7 @@ import java.util.*;
 
 import org.jppf.server.*;
 import org.jppf.server.nio.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;
 

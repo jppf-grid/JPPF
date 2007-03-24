@@ -17,58 +17,61 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 package org.jppf.server.scheduler.bundle;
 
-import org.apache.log4j.Logger;
-
 /**
- * This is the interface of all strategies for defining bundle task size.
- * A Bundler define the current bundle size using different ways, 
- * can it be fixed or auto-tunned.
- * 
- * @author Domingos Creado
+ * Abstract implementation of the bundler interface.
+ * @author Laurent Cohen
  */
-public interface Bundler {
-	
+public abstract class AbstractBundler implements Bundler
+{
 	/**
-	 * Log4j logger for this class.
+	 * The creation timestamp for this bundler.
 	 */
-	Logger LOG = Logger.getLogger(Bundler.class);
+	protected long timestamp = System.currentTimeMillis();
 	/**
-	 * Determines whether debugging level is set for logging.
+	 * The override indicator.
 	 */
-	boolean DEBUG_ENABLED = LOG.isDebugEnabled();
+	protected boolean override = false;
 
 	/**
-	 * Get the current size of bundle.
-	 * @return  the bundle size as an int value.
+	 * This method does nothing and should be overriden in subclasses.
+	 * @param bundleSize not used.
+	 * @param totalTime not used.
+	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
 	 */
-	int getBundleSize();
-	
-	/**
-	 * feedback the bundler with the result of using the bundle
-	 * with the specified size.
-	 * 
-	 * @param bundleSize the bundle size used
-	 * @param totalTime the total time considering the transmission and execution.
-	 */
-	void feedback(int bundleSize, double totalTime) ;
+	public void feedback(int bundleSize, double totalTime)
+	{
+	}
 
-	/**
-	 * Make a copy of this bundler.
-	 * Wich parts are actually copied depends on the implementation.
-	 * @return a new <code>Bundler</code> instance.
-	 */
-	Bundler copy();
 	/**
 	 * Get the timestamp at which this bundler was created.
 	 * This is used to enable node channels to know when the bundler settings have changed.
 	 * @return the timestamp as a long value.
+	 * @see org.jppf.server.scheduler.bundle.Bundler#getTimestamp()
 	 */
-	long getTimestamp();
+	public long getTimestamp()
+	{
+		return timestamp;
+	}
+
 	/**
 	 * Get the  override indicator.
 	 * @return true if the settings were overriden by the node, false otherwise.
+	 * @see org.jppf.server.scheduler.bundle.Bundler#isOverride()
 	 */
-	boolean isOverride();
+	public boolean isOverride()
+	{
+		return override;
+	}
+
+	/**
+	 * Set the  override indicator.
+	 * @param override true if the settings were overriden by the node, false otherwise.
+	 */
+	public void setOverride(boolean override)
+	{
+		this.override = override;
+	}
 }

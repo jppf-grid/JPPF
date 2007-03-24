@@ -30,6 +30,7 @@ import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.*;
 import org.jppf.server.JPPFQueue.QueueListener;
 import org.jppf.server.nio.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;
 
@@ -112,7 +113,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 		try
 		{
 			context.setBundle(getInitialBundle());
-			context.setBundler(bundler.copy());
+			//context.setBundler(bundler.copy());
 			context.setState(NodeState.SEND_INITIAL_BUNDLE);
 			key.interestOps(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
 		}

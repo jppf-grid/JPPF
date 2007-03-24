@@ -29,12 +29,13 @@ import org.jppf.server.JPPFStatsUpdater;
  * 
  * @author Domingos Creado
  */
-public class FixedSizedBundler implements Bundler
+public class FixedSizedBundler extends AbstractBundler
 {
 	/**
-	 * The creation timestamp for this bundler.
+	 * The fixed bundle size such as specified by the node.
+	 * If the node doesn't specifiy a size, the size provided by the driver is used.
 	 */
-	private long timestamp = System.currentTimeMillis();
+	private int overrideSize = -1;
 
 	/**
 	 * Initialize this bundler.
@@ -44,22 +45,23 @@ public class FixedSizedBundler implements Bundler
 	}
 
 	/**
+	 * Initialize this bundler.
+	 * @param overrideSize the node-defined (override) size.
+	 */
+	public FixedSizedBundler(int overrideSize){
+		this.overrideSize = overrideSize;
+		override = true;
+		LOG.info("Using node-overriden bundle size: " + overrideSize);
+	}
+
+	/**
 	 * This method always returns a statically assigned bundle size.
 	 * @return the bundle size defined in the JPPF driver configuration.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
 	public int getBundleSize() {
+		if (override) return overrideSize;
 		return JPPFStatsUpdater.getStaticBundleSize();
-	}
-
-	/**
-	 * This method does nothing.
-	 * @param bundleSize not used.
-	 * @param time not used.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
-	 */
-	public void feedback(int bundleSize, double time) {
-		//just ignored
 	}
 
 	/**
@@ -70,16 +72,5 @@ public class FixedSizedBundler implements Bundler
 	public Bundler copy()
 	{
 		return this;
-	}
-
-	/**
-	 * Get the timestamp at which this bundler was created.
-	 * This is used to enable node channels to know when the bundler settings have changed.
-	 * @return the timestamp as a long value.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#getTimestamp()
-	 */
-	public long getTimestamp()
-	{
-		return timestamp;
 	}
 }

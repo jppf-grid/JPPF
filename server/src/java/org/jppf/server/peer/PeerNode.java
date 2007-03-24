@@ -26,6 +26,7 @@ import org.jppf.comm.socket.SocketClient;
 import org.jppf.node.AbstractMonitoredNode;
 import org.jppf.node.event.NodeEvent.EventType;
 import org.jppf.server.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.*;
 
 /**

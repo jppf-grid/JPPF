@@ -22,7 +22,7 @@ package org.jppf.server;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.server.event.TaskCompletionListener;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 
 /**

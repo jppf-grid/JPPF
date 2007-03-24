@@ -27,7 +27,7 @@ import java.net.ConnectException;
 import java.nio.channels.*;
 
 import org.apache.log4j.Logger;
-import org.jppf.server.JPPFTaskBundle;
+import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**
  * This class represents the state of waiting for some action.
@@ -72,7 +72,8 @@ public class SendingBundleState extends NodeServerState
 		if (context.getMessage() == null)
 		{
 			// check whether the bundler settings have changed.
-			if (context.getBundler().getTimestamp() < server.getBundler().getTimestamp())
+			if (!context.getBundler().isOverride() &&
+					(context.getBundler().getTimestamp() < server.getBundler().getTimestamp()))
 			{
 				context.setBundler(server.getBundler().copy());
 			}

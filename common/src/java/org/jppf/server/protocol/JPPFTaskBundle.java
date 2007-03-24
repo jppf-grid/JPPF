@@ -17,12 +17,12 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.server;
+package org.jppf.server.protocol;
 
 import java.io.Serializable;
 import java.util.*;
+
 import org.jppf.security.JPPFSecurityContext;
-import org.jppf.server.event.TaskCompletionListener;
 import org.jppf.utils.*;
 
 /**
@@ -32,7 +32,7 @@ import org.jppf.utils.*;
  * The bundle size is computed dynamically, depending on the number of nodes connected to the server, and other factors.
  * @author Laurent Cohen
  */
-public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
+public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>, AdminRequestConstants
 {
 	/**
 	 * Type safe enumeration for the values of the bundle state.
@@ -48,6 +48,25 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 		 */
 		EXECUTION_BUNDLE
 	}
+
+	/**
+	 * Type safe enum for the type of request.
+	 */
+	public enum Type
+	{ 
+		/**
+		 * Task execution request.
+		 */
+		EXECUTION,
+		/**
+		 * Administration request.
+		 */
+		ADMIN,
+		/**
+		 * Statistics collection request.
+		 */
+		STATISTICS
+	};
 
 	/**
 	 * The unique identifier for this task bundle.
@@ -110,6 +129,14 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * the server or for transporting tasks to execute.
 	 */
 	private State state = State.EXECUTION_BUNDLE;
+	/**
+	 * The type of this request.
+	 */
+	private Type requestType = Type.EXECUTION;
+	/**
+	 * Map holding the parameters of the request.
+	 */
+	private Map<String, Object> parameters = new HashMap<String, Object>();
 
 	/**
 	 * Initialize this task bundle and set its build number.
@@ -412,5 +439,53 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	public int getInitialTaskCount()
 	{
 		return initialTaskCount;
+	}
+
+	/**
+	 * Get the type of this request.
+	 * @return the type as a string.
+	 */
+	public Type getRequestType()
+	{
+		return requestType;
+	}
+
+	/**
+	 * Set the type of this request.
+	 * @param requestType the type as a string.
+	 */
+	public void setRequestType(Type requestType)
+	{
+		this.requestType = requestType;
+	}
+
+
+	/**
+	 * Set a parameter of this request.
+	 * @param name the name of the parameter to set.
+	 * @param value the value of the parameter to set.
+	 */
+	public void setParameter(String name, Object value)
+	{
+		parameters.put(name, value);
+	}
+
+	/**
+	 * Get the value of a parameter of this request.
+	 * @param name the name of the parameter to get.
+	 * @return the value of the parameter to set.
+	 */
+	public Object getParameter(String name)
+	{
+		return parameters.get(name);
+	}
+
+	/**
+	 * Get the map holding the parameters of the request.
+	 * @return a map of string keys to object values.
+	 */
+	public Map<String, Object> getParametersMap()
+	{
+		return parameters;
 	}
 }

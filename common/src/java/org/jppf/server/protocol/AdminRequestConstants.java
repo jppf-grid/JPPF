@@ -17,90 +17,89 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 package org.jppf.server.protocol;
 
-import java.util.*;
-
 /**
- * Request header for an admin request.
+ * Constants used when a client sends an admin command to a server.
  * @author Laurent Cohen
  */
-public class AdminRequest extends JPPFRequestHeader
+public interface AdminRequestConstants
 {
 	/**
 	 * Admin command for scheduled shutdown of the server.
 	 */
-	public static final String SHUTDOWN = "shutdown";
+	String SHUTDOWN = "shutdown";
 	/**
 	 * Admin command for scheduled shutdown and restart of the server.
 	 */
-	public static final String SHUTDOWN_RESTART = "shutdown.restart";
+	String SHUTDOWN_RESTART = "shutdown.restart";
 	/**
 	 * Admin command for scheduled shutdown and restart of the server.
 	 */
-	public static final String CHANGE_PASSWORD = "change.pwd";
+	String CHANGE_PASSWORD = "change.pwd";
 	/**
 	 * Admin command for setting the size of the task bundles used by the server and nodes.
 	 */
-	public static final String CHANGE_SETTINGS = "set.bundle.size";
+	String CHANGE_SETTINGS = "set.bundle.size";
 	/**
 	 * Parameter name for the administration command to perform.
 	 */
-	public static final String COMMAND_PARAM = "command";
+	String COMMAND_PARAM = "command";
 	/**
 	 * Parameter name for the key, in encrypted format, used to decrypt the password.
 	 */
-	public static final String KEY_PARAM = "key";
+	String KEY_PARAM = "key";
 	/**
 	 * Parameter name for the administration password in encrypted format.
 	 */
-	public static final String PASSWORD_PARAM = "pwd";
+	String PASSWORD_PARAM = "pwd";
 	/**
 	 * Parameter name for the new administration password in encrypted format, for password change.
 	 */
-	public static final String NEW_PASSWORD_PARAM = "pwd.new";
+	String NEW_PASSWORD_PARAM = "pwd.new";
 	/**
 	 * Parameter name for the delay before shutting down the server.
 	 */
-	public static final String SHUTDOWN_DELAY_PARAM = "shutdown.delay";
+	String SHUTDOWN_DELAY_PARAM = "shutdown.delay";
 	/**
 	 * Parameter name for the delay before restarting the server.
 	 */
-	public static final String RESTART_DELAY_PARAM = "restart.delay";
+	String RESTART_DELAY_PARAM = "restart.delay";
 	/**
 	 * Parameter name for the response message to this request.
 	 */
-	public static final String RESPONSE_PARAM = "response";
+	String RESPONSE_PARAM = "response";
 	/**
 	 * Parameter name for the size of the task bundles used by the server and nodes.
 	 */
-	public static final String BUNDLE_SIZE_PARAM = "bundle.size";
+	String BUNDLE_SIZE_PARAM = "bundle.size";
 	/**
 	 * Parameter to determine whether the tasks bundle size is determined manually or automatically.
 	 */
-	public static final String BUNDLE_TUNING_TYPE_PARAM = "bundle.tuning.type";
+	String BUNDLE_TUNING_TYPE_PARAM = "bundle.tuning.type";
 	/**
-	 * Map holding the parameters of the request.
+	 * Autotuning parameter: minimum number of samples to analyse
 	 */
-	private Map<String, Object> parameters = new HashMap<String, Object>();
-
+	String MIN_SAMPLES_TO_ANALYSE = "MinSamplesToAnalyse";
 	/**
-	 * Set a parameter of this request.
-	 * @param name the name of the parameter to set.
-	 * @param value the value of the parameter to set.
+	 * Autotuning parameter: minimum number of samples to check algorithm convergence
 	 */
-	public void setParameter(String name, Object value)
-	{
-		parameters.put(name, value);
-	}
-
+	String MIN_SAMPLES_TO_CHECK_CONVERGENCE = "MinSamplesToCheckConvergence";
 	/**
-	 * Get the value of a parameter of this request.
-	 * @param name the name of the parameter to get.
-	 * @return the value of the parameter to set.
+	 * Autotuning parameter: maximum allowed deviation.
 	 */
-	public Object getParameter(String name)
-	{
-		return parameters.get(name);
-	}
+	String MAX_DEVIATION = "MaxDeviation";
+	/**
+	 * Autotuning parameter: maximum number of guesses before best size is deemed stable.
+	 */
+	String MAX_GUESS_TO_STABLE = "MaxGuessToStable";
+	/**
+	 * Autotuning parameter: size ration deviation.
+	 */
+	String SIZE_RATIO_DEVIATION = "SizeRatioDeviation";
+	/**
+	 * Autotuning parameter: decrease ratio.
+	 */
+	String DECREASE_RATIO = "DecreaseRatio";
 }

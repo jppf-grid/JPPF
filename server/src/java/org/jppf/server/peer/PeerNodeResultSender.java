@@ -22,6 +22,7 @@ package org.jppf.server.peer;
 import org.apache.log4j.Logger;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.server.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.JPPFBuffer;
 
 /**

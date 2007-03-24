@@ -27,8 +27,7 @@ import static org.jppf.utils.StringUtils.getRemoteHost;
 import java.nio.channels.*;
 
 import org.apache.log4j.Logger;
-import org.jppf.server.JPPFTaskBundle;
-import org.jppf.server.event.TaskCompletionListener;
+import org.jppf.server.protocol.*;
 
 /**
  * 

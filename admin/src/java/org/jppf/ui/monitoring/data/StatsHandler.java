@@ -19,7 +19,7 @@
  */
 package org.jppf.ui.monitoring.data;
 
-import static org.jppf.server.protocol.AdminRequest.*;
+import static org.jppf.server.protocol.AdminRequestConstants.*;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.jppf.client.*;
 import org.jppf.server.JPPFStats;
-import org.jppf.server.protocol.AdminRequest;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.utils.JPPFConfiguration;
 
@@ -189,7 +189,7 @@ public final class StatsHandler implements StatsConstants
 		String msg = null;
 		try
 		{
-			msg = currentConnection.submitAdminRequest(password, null, AdminRequest.CHANGE_SETTINGS, params);
+			msg = currentConnection.submitAdminRequest(password, null, JPPFTaskBundle.CHANGE_SETTINGS, params);
 		}
 		catch(Exception e)
 		{

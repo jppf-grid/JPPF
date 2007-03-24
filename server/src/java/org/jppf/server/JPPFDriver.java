@@ -170,6 +170,15 @@ public class JPPFDriver
 	}
 
 	/**
+	 * Get the JPPF nodes server.
+	 * @return a <code>NodeNioServer</code> instance.
+	 */
+	public NodeNioServer getNodeNioServer()
+	{
+		return nodeNioServer;
+	}
+
+	/**
 	 * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
 	 * @return true if a shutdown is initiated, false otherwise.
 	 */

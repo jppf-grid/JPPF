@@ -33,20 +33,12 @@ import org.jppf.server.*;
  * @author Domingos Creado
  * 
  */
-public class AutoTunedBundler implements Bundler
+public class AutoTunedBundler extends AbstractBundler
 {
 	/**
 	 * Count of the bundlers used to generate a readable unique id.
 	 */
 	private static int bundlerCount = 0;
-	/**
-	 * Increment the bundlers count by one.
-	 * @return the new count as an int value.
-	 */
-	private static synchronized int incBundlerCount()
-	{
-		return ++bundlerCount;
-	}
 	/**
 	 * The bundler number for this bundler.
 	 */
@@ -66,15 +58,19 @@ public class AutoTunedBundler implements Bundler
 	 * A map of performance samples, aorted by increasing bundle size.
 	 */
 	protected Map<Integer, BundlePerformanceSample> samplesMap = new HashMap<Integer, BundlePerformanceSample>();
-	
 	/**
 	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
 	 */
 	protected AutoTuneProfile profile;
+
 	/**
-	 * The creation timestamp for this bundler.
+	 * Increment the bundlers count by one.
+	 * @return the new count as an int value.
 	 */
-	private long timestamp = System.currentTimeMillis();
+	private static synchronized int incBundlerCount()
+	{
+		return ++bundlerCount;
+	}
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
@@ -83,7 +79,19 @@ public class AutoTunedBundler implements Bundler
 	 */
 	public AutoTunedBundler(AutoTuneProfile profile)
 	{
+		this(profile, false);
+	}
+
+	/**
+	 * Creates a new instance with the initial size of bundle as the start size.
+	 * @param profile the parameters of the auto-tuning algorithm,
+	 * @param override true if the settings were overriden by the node, false otherwise.
+	 * grouped as a performance analysis profile.
+	 */
+	public AutoTunedBundler(AutoTuneProfile profile, boolean override)
+	{
 		LOG.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
+		this.override = override;
 		currentSize = JPPFStatsUpdater.getStaticBundleSize();
 		if (currentSize < 1)
 		{
@@ -219,17 +227,6 @@ public class AutoTunedBundler implements Bundler
 	{
 		AutoTunedBundler b = new AutoTunedBundler(profile.copy());
 		return b;
-	}
-
-	/**
-	 * Get the timestamp at which this bundler was created.
-	 * This is used to enable node channels to know when the bundler settings have changed.
-	 * @return the timestamp as a long value.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#getTimestamp()
-	 */
-	public long getTimestamp()
-	{
-		return timestamp;
 	}
 
 	/**

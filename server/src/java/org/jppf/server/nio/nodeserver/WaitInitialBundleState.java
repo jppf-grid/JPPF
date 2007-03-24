@@ -26,19 +26,20 @@ import static org.jppf.utils.StringUtils.getRemoteHost;
 import java.nio.channels.*;
 
 import org.apache.log4j.Logger;
-import org.jppf.server.JPPFTaskBundle;
+import org.jppf.server.protocol.*;
+import org.jppf.server.scheduler.bundle.BundlerFactory;
 
 /**
  * This class implements the state of receiving information from the node as a
  * response to sending the initial bundle.
  * @author Laurent Cohen
  */
-public class WaitInitialBundleSate extends NodeServerState
+public class WaitInitialBundleState extends NodeServerState
 {
 	/**
 	 * Log4j logger for this class.
 	 */
-	protected static Logger log = Logger.getLogger(WaitInitialBundleSate.class);
+	protected static Logger log = Logger.getLogger(WaitInitialBundleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
@@ -48,7 +49,7 @@ public class WaitInitialBundleSate extends NodeServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public WaitInitialBundleSate(NodeNioServer server)
+	public WaitInitialBundleState(NodeNioServer server)
 	{
 		super(server);
 	}
@@ -70,6 +71,9 @@ public class WaitInitialBundleSate extends NodeServerState
 			if (debugEnabled) log.debug("read bundle for " + getRemoteHost(channel) + " done");
 			JPPFTaskBundle bundle = context.deserializeBundle();
 			context.setUuid(bundle.getBundleUuid());
+			boolean override = bundle.getParameter(AdminRequestConstants.BUNDLE_TUNING_TYPE_PARAM) != null;
+			if (override) context.setBundler(BundlerFactory.createBundler(bundle.getParametersMap(), true));
+			else context.setBundler(server.getBundler().copy());
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setMessage(null);
 			context.setBundle(null);

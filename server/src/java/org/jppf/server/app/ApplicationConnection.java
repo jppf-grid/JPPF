@@ -20,8 +20,8 @@
 package org.jppf.server.app;
 
 import static org.jppf.server.JPPFStatsUpdater.*;
-import static org.jppf.server.protocol.AdminRequest.*;
-import static org.jppf.server.protocol.JPPFRequestHeader.Type.*;
+import static org.jppf.server.protocol.AdminRequestConstants.*;
+import static org.jppf.server.protocol.JPPFTaskBundle.Type.*;
 
 import java.net.*;
 import java.util.*;
@@ -32,8 +32,8 @@ import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
 import org.jppf.security.*;
 import org.jppf.server.*;
-import org.jppf.server.protocol.*;
-import org.jppf.server.scheduler.bundle.AnnealingTuneProfile;
+import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
 
 /**
@@ -78,7 +78,7 @@ public class ApplicationConnection extends JPPFConnection
 	/**
 	 * The header describing the current client request.
 	 */
-	private JPPFRequestHeader header = null;
+	private JPPFTaskBundle header = null;
 
 	/**
 	 * Total number of tasks submitted to this application connection.
@@ -127,10 +127,10 @@ public class ApplicationConnection extends JPPFConnection
 		JPPFBuffer buffer = socketClient.receiveBytes(0);
 		byte[] bytes = buffer.getBuffer();
 		// Read the request header - with tasks count information
-		List<JPPFRequestHeader> list = new ArrayList<JPPFRequestHeader>();
+		List<JPPFTaskBundle> list = new ArrayList<JPPFTaskBundle>();
 		int pos = helper.fromBytes(buffer.getBuffer(), 0, false, list, 1);
 		header = list.get(0);
-		JPPFRequestHeader.Type type = header.getRequestType();
+		JPPFTaskBundle.Type type = header.getRequestType();
 		if (STATISTICS.equals(type) && isStatsEnabled())
 		{
 			sendStats();
@@ -139,7 +139,7 @@ public class ApplicationConnection extends JPPFConnection
 		{
 			performAdminOperation(header);
 		}
-		else if (NON_BLOCKING_EXECUTION.equals(type))
+		else if (EXECUTION.equals(type))
 		{
 			executeTasks(buffer.getBuffer(), pos);
 		}
@@ -157,7 +157,6 @@ public class ApplicationConnection extends JPPFConnection
 		if (debugEnabled) log.debug("Received " + count + " tasks");
 		
 		int pos = offset;
-		//byte[] dataProvider = helper.readNextBytes(dis);
 		byte[] dataProvider = helper.copyFromBuffer(data, pos);
 		pos += 4 + dataProvider.length;
 		List<byte[]> taskList = new ArrayList<byte[]>();
@@ -177,22 +176,17 @@ public class ApplicationConnection extends JPPFConnection
 			}
 			taskList.add(taskBytes);
 		}
-		JPPFTaskBundle bundle = new JPPFTaskBundle();
-		bundle.setBundleUuid("0");
-		bundle.setRequestUuid(header.getUuid());
-		bundle.getUuidPath().add(header.getAppUuid());
-		bundle.getUuidPath().add(JPPFDriver.getInstance().getUuid());
-		bundle.setDataProvider(dataProvider);
-		bundle.setTaskCount(count);
-		bundle.setTasks(taskList);
-		bundle.setCompletionListener(resultSender);
-		getQueue().addBundle(bundle);
+		header.setDataProvider(dataProvider);
+		header.getUuidPath().add(JPPFDriver.getInstance().getUuid());
+		header.setTasks(taskList);
+		header.setCompletionListener(resultSender);
+		getQueue().addBundle(header);
 		if (count > 0)
 		{
 			totalTaskCount += count;
 			if (debugEnabled) log.debug("Queued " + totalTaskCount + " tasks");
 		}
-		if (count <= 0) resultSender.sendPartialResults(bundle);
+		if (count <= 0) resultSender.sendPartialResults(header);
 		else resultSender.run(count);
 		return;
 	}
@@ -214,14 +208,13 @@ public class ApplicationConnection extends JPPFConnection
 	 * @param header the header for the request.
 	 * @throws Exception if the function could not be performed.
 	 */
-	private void performAdminOperation(JPPFRequestHeader header) throws Exception
+	private void performAdminOperation(JPPFTaskBundle header) throws Exception
 	{
 		String response = StringUtils.getLocalized(I18N_BASE, "request.executed");
-		AdminRequest request = (AdminRequest) header;
-		byte[] b = (byte[]) request.getParameter(KEY_PARAM);
+		byte[] b = (byte[]) header.getParameter(KEY_PARAM);
 		b = CryptoUtils.decrypt(b);
 		SecretKey tmpKey = CryptoUtils.getSecretKeyFromEncoded(b);
-		b = (byte[]) request.getParameter(PASSWORD_PARAM);
+		b = (byte[]) header.getParameter(PASSWORD_PARAM);
 		String remotePwd = new String(CryptoUtils.decrypt(tmpKey, b));
 		PasswordManager pm = new PasswordManager();
 		b = pm.readPassword();
@@ -230,29 +223,29 @@ public class ApplicationConnection extends JPPFConnection
 		if (!localPwd.equals(remotePwd)) response = StringUtils.getLocalized(I18N_BASE, "invalid.password");
 		else
 		{
-			String command = (String) request.getParameter(COMMAND_PARAM);
+			String command = (String) header.getParameter(COMMAND_PARAM);
 			if (SHUTDOWN.equals(command) || SHUTDOWN_RESTART.equals(command))
 			{
-				long shutdownDelay = (Long) request.getParameter(SHUTDOWN_DELAY_PARAM);
+				long shutdownDelay = (Long) header.getParameter(SHUTDOWN_DELAY_PARAM);
 				boolean restart = !SHUTDOWN.equals(command);
-				long restartDelay = (Long) request.getParameter(RESTART_DELAY_PARAM);
-				sendAdminResponse(request, StringUtils.getLocalized(I18N_BASE, "request.acknowledged"));
+				long restartDelay = (Long) header.getParameter(RESTART_DELAY_PARAM);
+				sendAdminResponse(header, StringUtils.getLocalized(I18N_BASE, "request.acknowledged"));
 				JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay, restart, restartDelay);
 				return;
 			}
 			else if (CHANGE_PASSWORD.equals(command))
 			{
-				b = (byte[]) request.getParameter(NEW_PASSWORD_PARAM);
+				b = (byte[]) header.getParameter(NEW_PASSWORD_PARAM);
 				String newPwd = new String(CryptoUtils.decrypt(tmpKey, b));
 				pm.savePassword(CryptoUtils.encrypt(newPwd.getBytes()));
 				response = "Password changed";
 			}
 			else if (CHANGE_SETTINGS.equals(command))
 			{
-				response = performChangeSettings(request);
+				response = performChangeSettings(header);
 			}
 		}
-		sendAdminResponse(request, response);
+		sendAdminResponse(header, response);
 	}
 
 	/**
@@ -261,34 +254,15 @@ public class ApplicationConnection extends JPPFConnection
 	 * @return a message to report the change status.
 	 * @throws Exception if the changes could not be applied.
 	 */
-	private String performChangeSettings(AdminRequest request) throws Exception
+	private String performChangeSettings(JPPFTaskBundle request) throws Exception
 	{
+		String response = null;
+		Bundler bundler = BundlerFactory.createBundler(request.getParametersMap(), false);
+		JPPFDriver.getInstance().getNodeNioServer().setBundler(bundler);
 		boolean manual =
 			"manual".equalsIgnoreCase((String) request.getParameter(BUNDLE_TUNING_TYPE_PARAM));
-		String response = null;
-		if (manual)
-		{
-			Number n = (Number) request.getParameter(BUNDLE_SIZE_PARAM);
-			if (n != null) JPPFStatsUpdater.setStaticBundleSize(n.intValue());
-			response = StringUtils.getLocalized(I18N_BASE, "manual.settings.changed");
-		}
-		else
-		{
-			AnnealingTuneProfile prof = new AnnealingTuneProfile();
-			Number n = (Number) request.getParameter("MinSamplesToAnalyse");
-			prof.setMinSamplesToAnalyse(n.longValue());
-			n = (Number) request.getParameter("MinSamplesToCheckConvergence");
-			prof.setMinSamplesToCheckConvergence(n.longValue());
-			n = (Number) request.getParameter("MaxDeviation");
-			prof.setMaxDeviation(n.doubleValue());
-			n = (Number) request.getParameter("MaxGuessToStable");
-			prof.setMaxGuessToStable(n.intValue());
-			n = (Number) request.getParameter("SizeRatioDeviation");
-			prof.setSizeRatioDeviation(n.floatValue());
-			n = (Number) request.getParameter("DecreaseRatio");
-			prof.setDecreaseRatio(n.floatValue());
-			response = StringUtils.getLocalized(I18N_BASE, "automatic.settings.changed");
-		}
+		if (manual) JPPFStatsUpdater.setStaticBundleSize((Integer) request.getParameter(BUNDLE_SIZE_PARAM));
+		response = StringUtils.getLocalized(I18N_BASE, manual ? "manual.settings.changed" : "automatic.settings.changed");
 		return response;
 	}
 
@@ -298,7 +272,7 @@ public class ApplicationConnection extends JPPFConnection
 	 * @param msg the response messages.
 	 * @throws Exception if the response could not be sent.
 	 */
-	private void sendAdminResponse(AdminRequest request, String msg) throws Exception
+	private void sendAdminResponse(JPPFTaskBundle request, String msg) throws Exception
 	{
 		request.setParameter(RESPONSE_PARAM, msg);
 		JPPFBuffer buf = helper.toBytes(request, false);

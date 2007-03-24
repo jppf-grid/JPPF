@@ -52,7 +52,7 @@ public final class NodeServerFactory extends NioServerFactory<NodeState, NodeTra
 	{
 		Map<NodeState, NioState<NodeTransition>> map = new EnumMap<NodeState, NioState<NodeTransition>>(NodeState.class);
 		map.put(SEND_INITIAL_BUNDLE, new SendInitialBundleState(server));
-		map.put(WAIT_INITIAL_BUNDLE, new WaitInitialBundleSate(server));
+		map.put(WAIT_INITIAL_BUNDLE, new WaitInitialBundleState(server));
 		map.put(SENDING_BUNDLE, new SendingBundleState(server));
 		map.put(WAITING_RESULTS, new WaitingResultsState(server));
 		return map;
