@@ -17,39 +17,33 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.ui.options;
 
-import java.util.List;
+package org.jppf.process.event;
+
+import java.util.EventObject;
 
 /**
- * 
+ * Instances of this class encapsulate an event occurring when a process wrties to
+ * its output or error stream. 
  * @author Laurent Cohen
  */
-public interface OptionsPage extends OptionElement
+public class ProcessWrapperEvent extends EventObject
 {
 	/**
-	 * Add an element to this options page.
-	 * @param element the element to add.
+	 * Initialize this event with the specified source.
+	 * @param sb the source of this event, in effect the content of the corresponding process stream.
 	 */
-	void add(OptionElement element);
+	public ProcessWrapperEvent(StringBuilder sb)
+	{
+		super(sb);
+	}
+
 	/**
-	 * Remove an element from this options page.
-	 * @param element the element to remove.
+	 * Get the content of this event.
+	 * @return the content encapsualted in a <code>StringBuilder</code> instance.
 	 */
-	void remove(OptionElement element);
-	/**
-	 * Determines whether this page is part of another.
-	 * @return true if this page is an outermost page, false if it is embedded within another page.
-	 */
-	boolean isMainPage();
-	/**
-	 * Determine the orientation of this page's layout.
-	 * @return one of {@link #HORIZONTAL} or {@link #VERTICAL}.
-	 */
-	int getOrientation();
-	/**
-	 * Get the options in this page.
-	 * @return a list of <code>Option</code> instances.
-	 */
-	List<OptionElement> getChildren();
+	public StringBuilder getContent()
+	{
+		return (StringBuilder) getSource();
+	}
 }

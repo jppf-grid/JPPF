@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Java Parallel Processing Framework.
+  Copyright (C) 2005-2007 JPPF Team.
+  http://www.jppf.org
+
+	This library is free software; you can redistribute it and/or modify it
+	under the terms of the GNU Lesser General Public License as published by the
+	Free Software Foundation; either version 2.1 of the License, or (at your
+	option) any later version.
+
+	This library is distributed in the hope that it will be useful, but WITHOUT
+	ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+	FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+	for more details.
+
+	You should have received a copy of the GNU Lesser General Public License
+	along with this library; if not, write to the Free Software Foundation,
+	Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+-->
+
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="Matrix" type="page">
+
+	<property name="label" value="Matrix demos"/>
+	<property name="scrollable" value="false"/>
+	<property name="orientation" value="vertical"/>
+	<property name="bordered" value="false"/>
+	<property name="main" value="true"/>
+	<property name="tooltip" value="Run the matrix multiplication demos"/>
+	<script language="javascript"><![CDATA[
+		importPackage(Packages.org.jppf.utils);
+		importPackage(Packages.org.jppf.ui.options);
+		importPackage(Packages.org.jppf.ui.options.event);
+	]]></script>
+	<script language="javascript"><![CDATA[
+		BASE = "org.jppf.demo.console.i18n.MatrixPage";
+	]]></script>
+
+	<!-- ===================================================================== -->
+	<!--                   Top Panels                                          -->
+	<!-- ===================================================================== -->
+	
+	<child name="MatrixPage" type="page">
+
+		<property name="label" value="Matrix demo configuration page"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+
+		<!-- ===================================================================== -->
+		<!--          Administrator password configuration area                    -->
+		<!-- ===================================================================== -->
+	
+		<child name="Matrix" type="page">
+	
+			<property name="label" value="Matrix demos"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="true"/>
+			<property name="main" value="false"/>
+	
+			<child name="RunMatrixDemo" type="Button">
+				<property name="label" value="Run the Demo"/>
+				<property name="tooltip" value="Run the matrix demonstration"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						//pwd = option.findFirstWithName("/actualPwd").getValue();
+					]]></script>
+				</listener>
+			</child>
+
+			<child name="Asynchronous" type="Boolean">
+				<property name="label" value="Asynchronous"/>
+				<property name="tooltip" value="Determines whether the tasks submissions should be performed asynchronously"/>
+				<property name="value" value="true"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+			<child name="MatrixSize" type="SpinnerNumber">
+				<property name="label" value="Matrix size"/>
+				<property name="tooltip" value="Size of the square matrices to multiply"/>
+				<property name="value" value="300"/>
+				<property name="minValue" value="3"/>
+				<property name="maxValue" value="3000"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+			<child name="NbIterations" type="SpinnerNumber">
+				<property name="label" value="Number of iterations"/>
+				<property name="tooltip" value="Number of times to multiply the square matrices"/>
+				<property name="value" value="20"/>
+				<property name="minValue" value="1"/>
+				<property name="maxValue" value="1000"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+		</child>
+
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--                   Messages area                                       -->
+	<!-- ===================================================================== -->
+
+	<child name="msgText" type="TextArea">
+		<property name="label" value="Server Messages"/>
+		<property name="tooltip" value="Console messages"/>
+		<property name="value" value=""/>
+	</child>
+
+</opt:main>

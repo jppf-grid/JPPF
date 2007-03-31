@@ -177,9 +177,9 @@ public class OptionElementFactory
 		SpinnerNumberOption option = new SpinnerNumberOption();
 		option.setEventsEnabled(false);
 		builder.initCommonOptionAttributes(option, desc);
-		option.setValue(new Integer(desc.getInt("value")));
 		option.setMin(new Integer(desc.getInt("minValue")));
 		option.setMax(new Integer(desc.getInt("maxValue")));
+		option.setValue(new Integer(desc.getInt("value")));
 		option.createUI();
 		option.setEventsEnabled(true);
 		return option;

@@ -17,39 +17,25 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.ui.options;
 
-import java.util.List;
+package org.jppf.process.event;
+
+import java.util.EventListener;
 
 /**
- * 
+ * Listener interface for receiving veent notifications from a process wrapper.
  * @author Laurent Cohen
  */
-public interface OptionsPage extends OptionElement
+public interface ProcessWrapperEventListener extends EventListener
 {
 	/**
-	 * Add an element to this options page.
-	 * @param element the element to add.
+	 * Notification that the process has written to its output stream.
+	 * @param event encapsulate the output stream's content.
 	 */
-	void add(OptionElement element);
+	void outputStreamAltered(ProcessWrapperEvent event);
 	/**
-	 * Remove an element from this options page.
-	 * @param element the element to remove.
+	 * Notification that the process has written to its error stream.
+	 * @param event encapsulate the error stream's content.
 	 */
-	void remove(OptionElement element);
-	/**
-	 * Determines whether this page is part of another.
-	 * @return true if this page is an outermost page, false if it is embedded within another page.
-	 */
-	boolean isMainPage();
-	/**
-	 * Determine the orientation of this page's layout.
-	 * @return one of {@link #HORIZONTAL} or {@link #VERTICAL}.
-	 */
-	int getOrientation();
-	/**
-	 * Get the options in this page.
-	 * @return a list of <code>Option</code> instances.
-	 */
-	List<OptionElement> getChildren();
+	void errorStreamAltered(ProcessWrapperEvent event);
 }

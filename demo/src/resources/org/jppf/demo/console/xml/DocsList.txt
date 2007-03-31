@@ -1,0 +1,2 @@
+org/jppf/demo/console/xml/JPPFDemoConsole.xml
+org/jppf/demo/console/xml/MatrixPage.xml
