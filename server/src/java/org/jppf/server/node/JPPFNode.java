@@ -19,7 +19,7 @@
  */
 package org.jppf.server.node;
 
-import static org.jppf.server.protocol.AdminRequestConstants.*;
+import static org.jppf.server.protocol.BundleParameter.*;
 
 import java.io.InvalidClassException;
 import java.util.*;
@@ -145,7 +145,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			{
 				if (debugEnabled) log.debug("setting initial bundle uuid");
 				bundle.setBundleUuid(uuid);
-				Map<String, Object> params = getBundleTunningParameters();
+				Map<BundleParameter, Object> params = getBundleTunningParameters();
 				if (params != null) bundle.getParametersMap().putAll(params);
 			}
 			List<JPPFTask> taskList = pair.second();
@@ -456,13 +456,13 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Get a configured bundle size tuning profile form the configuration file.
 	 * @return an <code>AnnealingTuneProfile</code> instance, or null if no profile was configured.
 	 */
-	public static Map<String, Object> getBundleTunningParameters()
+	public static Map<BundleParameter, Object> getBundleTunningParameters()
 	{
 		TypedProperties cfg = JPPFConfiguration.getProperties();
 		String s = cfg.getString("task.bundle.strategy");
 		if (s == null) return null;
 		
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
 		params.put(BUNDLE_TUNING_TYPE_PARAM, s);
 		params.put(BUNDLE_SIZE_PARAM, cfg.getInt("task.bundle.size", 10));
 		if ("autotuned".equalsIgnoreCase(s))

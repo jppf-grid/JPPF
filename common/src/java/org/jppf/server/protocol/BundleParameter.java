@@ -24,82 +24,86 @@ package org.jppf.server.protocol;
  * Constants used when a client sends an admin command to a server.
  * @author Laurent Cohen
  */
-public interface AdminRequestConstants
+public enum  BundleParameter
 {
 	/**
 	 * Admin command for scheduled shutdown of the server.
 	 */
-	String SHUTDOWN = "shutdown";
+	SHUTDOWN,
 	/**
 	 * Admin command for scheduled shutdown and restart of the server.
 	 */
-	String SHUTDOWN_RESTART = "shutdown.restart";
+	SHUTDOWN_RESTART,
 	/**
 	 * Admin command for scheduled shutdown and restart of the server.
 	 */
-	String CHANGE_PASSWORD = "change.pwd";
+	CHANGE_PASSWORD,
 	/**
 	 * Admin command for setting the size of the task bundles used by the server and nodes.
 	 */
-	String CHANGE_SETTINGS = "set.bundle.size";
+	CHANGE_SETTINGS,
 	/**
 	 * Parameter name for the administration command to perform.
 	 */
-	String COMMAND_PARAM = "command";
+	COMMAND_PARAM,
 	/**
 	 * Parameter name for the key, in encrypted format, used to decrypt the password.
 	 */
-	String KEY_PARAM = "key";
+	KEY_PARAM,
 	/**
 	 * Parameter name for the administration password in encrypted format.
 	 */
-	String PASSWORD_PARAM = "pwd";
+	PASSWORD_PARAM,
 	/**
 	 * Parameter name for the new administration password in encrypted format, for password change.
 	 */
-	String NEW_PASSWORD_PARAM = "pwd.new";
+	NEW_PASSWORD_PARAM,
 	/**
 	 * Parameter name for the delay before shutting down the server.
 	 */
-	String SHUTDOWN_DELAY_PARAM = "shutdown.delay";
+	SHUTDOWN_DELAY_PARAM,
 	/**
 	 * Parameter name for the delay before restarting the server.
 	 */
-	String RESTART_DELAY_PARAM = "restart.delay";
+	RESTART_DELAY_PARAM,
 	/**
 	 * Parameter name for the response message to this request.
 	 */
-	String RESPONSE_PARAM = "response";
+	RESPONSE_PARAM,
 	/**
 	 * Parameter name for the size of the task bundles used by the server and nodes.
 	 */
-	String BUNDLE_SIZE_PARAM = "bundle.size";
+	BUNDLE_SIZE_PARAM,
 	/**
 	 * Parameter to determine whether the tasks bundle size is determined manually or automatically.
 	 */
-	String BUNDLE_TUNING_TYPE_PARAM = "bundle.tuning.type";
+	BUNDLE_TUNING_TYPE_PARAM,
 	/**
 	 * Autotuning parameter: minimum number of samples to analyse
 	 */
-	String MIN_SAMPLES_TO_ANALYSE = "MinSamplesToAnalyse";
+	MIN_SAMPLES_TO_ANALYSE,
 	/**
 	 * Autotuning parameter: minimum number of samples to check algorithm convergence
 	 */
-	String MIN_SAMPLES_TO_CHECK_CONVERGENCE = "MinSamplesToCheckConvergence";
+	MIN_SAMPLES_TO_CHECK_CONVERGENCE,
 	/**
 	 * Autotuning parameter: maximum allowed deviation.
 	 */
-	String MAX_DEVIATION = "MaxDeviation";
+	MAX_DEVIATION,
 	/**
 	 * Autotuning parameter: maximum number of guesses before best size is deemed stable.
 	 */
-	String MAX_GUESS_TO_STABLE = "MaxGuessToStable";
+	MAX_GUESS_TO_STABLE,
 	/**
 	 * Autotuning parameter: size ration deviation.
 	 */
-	String SIZE_RATIO_DEVIATION = "SizeRatioDeviation";
+	SIZE_RATIO_DEVIATION,
 	/**
 	 * Autotuning parameter: decrease ratio.
 	 */
-	String DECREASE_RATIO = "DecreaseRatio";
+	DECREASE_RATIO,
+	/**
+	 * To determine whether a node connection is for a peer driver or an actual execution node.
+	 */
+	IS_PEER
 }

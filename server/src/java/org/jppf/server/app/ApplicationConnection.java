@@ -20,7 +20,7 @@
 package org.jppf.server.app;
 
 import static org.jppf.server.JPPFStatsUpdater.*;
-import static org.jppf.server.protocol.AdminRequestConstants.*;
+import static org.jppf.server.protocol.BundleParameter.*;
 import static org.jppf.server.protocol.JPPFTaskBundle.Type.*;
 
 import java.net.*;

@@ -31,19 +31,19 @@ public class ProcessWrapperEvent extends EventObject
 {
 	/**
 	 * Initialize this event with the specified source.
-	 * @param sb the source of this event, in effect the content of the corresponding process stream.
+	 * @param content the source of this event, in effect the content of the corresponding process stream.
 	 */
-	public ProcessWrapperEvent(StringBuilder sb)
+	public ProcessWrapperEvent(String content)
 	{
-		super(sb);
+		super(content);
 	}
 
 	/**
 	 * Get the content of this event.
 	 * @return the content encapsualted in a <code>StringBuilder</code> instance.
 	 */
-	public StringBuilder getContent()
+	public String getContent()
 	{
-		return (StringBuilder) getSource();
+		return (String) getSource();
 	}
 }

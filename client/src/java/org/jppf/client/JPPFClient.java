@@ -29,7 +29,7 @@ import org.jppf.JPPFError;
 import org.jppf.client.event.*;
 import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.JPPFStats;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 
@@ -281,7 +281,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 	 * @return the reponse message from the server.
 	 * @throws Exception if an error occurred while trying to send or execute the command.
 	 */
-	public String submitAdminRequest(String password, String newPassword, String command, Map<String, Object> parameters)
+	public String submitAdminRequest(String password, String newPassword, BundleParameter command, Map<BundleParameter, Object> parameters)
 			throws Exception
 	{
 		return getClientConnection().submitAdminRequest(password, newPassword, command, parameters);

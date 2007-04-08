@@ -19,9 +19,9 @@
 	Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 -->
 
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="Admin" type="page">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ConfigPage" type="page">
 
-	<property name="label" value="Matrix demos"/>
+	<property name="label" value="Configuration"/>
 	<property name="scrollable" value="false"/>
 	<property name="orientation" value="vertical"/>
 	<property name="bordered" value="false"/>
@@ -86,10 +86,12 @@
 	<!--                   Messages area                                       -->
 	<!-- ===================================================================== -->
 
+	<!--
 	<child name="msgText" type="TextArea">
 		<property name="label" value="Server Messages"/>
 		<property name="tooltip" value="Console messages"/>
 		<property name="value" value=""/>
 	</child>
+	-->
 
 </opt:main>

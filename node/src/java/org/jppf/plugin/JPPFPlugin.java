@@ -17,36 +17,31 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.jppf.ui.options;
 
-import javax.swing.AbstractAction;
+package org.jppf.plugin;
 
 /**
- * This class represents an action listener that can be set onto a button action.
+ * Interface for defining a plugin and managing its lifecycle and dependencies.
  * @author Laurent Cohen
  */
-public abstract class OptionAction extends AbstractAction
+public interface JPPFPlugin
 {
 	/**
-	 * The option element this action is set unto.
+	 * Get the id of this plugin. The id should be unique within a single JVM.
+	 * @return the id as a string.
 	 */
-	protected Option option = null;
-
+	String getPluginId();
 	/**
-	 * Get the option element this action is set unto.
-	 * @return an <code>OptionElement</code> instance.
+	 * Start this plugin and eventually the plugins it depends on.
 	 */
-	public Option getOption()
-	{
-		return option;
-	}
-
+	void startPlugin();
 	/**
-	 * Set the option element this action is set unto.
-	 * @param option an <code>Option</code> instance.
+	 * Terminate this plugin and free the resources it uses.
 	 */
-	public void setOption(Option option)
-	{
-		this.option = option;
-	}
+	void endPlugin();
+	/**
+	 * Get the ids of the plugins this plugin depends on.
+	 * @return an array of string ids.
+	 */
+	String[] getPluginDependencies();
 }

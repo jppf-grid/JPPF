@@ -28,7 +28,7 @@ import org.jppf.ui.utils.GuiUtils;
  * An option that uses a <code>JTextArea</code> to edit its value.
  * @author Laurent Cohen
  */
-public class TextAreaOption extends AbstractOption
+public class CopyOfTextAreaOption extends AbstractOption
 {
 	/**
 	 * The underlying UI component used to edit the value of this option.
@@ -39,7 +39,7 @@ public class TextAreaOption extends AbstractOption
 	 * Constructor provided as a convenience to facilitate the creation of
 	 * option elements through reflexion.
 	 */
-	public TextAreaOption()
+	public CopyOfTextAreaOption()
 	{
 	}
 
@@ -50,7 +50,7 @@ public class TextAreaOption extends AbstractOption
 	 * @param tooltip the tooltip associated with the text area.
 	 * @param value the initial value of this component.
 	 */
-	public TextAreaOption(String name, String label, String tooltip, String value)
+	public CopyOfTextAreaOption(String name, String label, String tooltip, String value)
 	{
 		this.name = name;
 		this.label = label;
@@ -108,23 +108,7 @@ public class TextAreaOption extends AbstractOption
 		{
 			public void run()
 			{
-				textArea.setText((String) TextAreaOption.this.value);
-			}
-		});		
-	}
-
-	/**
-	 * Set the current value for this option.
-	 * @param value a <code>String</code> instance.
-	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
-	 */
-	public void append(final String value)
-	{
-		SwingUtilities.invokeLater( new Runnable()
-		{
-			public void run()
-			{
-				textArea.append(value);
+				textArea.setText((String) CopyOfTextAreaOption.this.value);
 			}
 		});		
 	}

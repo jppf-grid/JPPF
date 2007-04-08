@@ -32,7 +32,7 @@ import org.jppf.utils.*;
  * The bundle size is computed dynamically, depending on the number of nodes connected to the server, and other factors.
  * @author Laurent Cohen
  */
-public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>, AdminRequestConstants
+public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 {
 	/**
 	 * Type safe enumeration for the values of the bundle state.
@@ -136,7 +136,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	/**
 	 * Map holding the parameters of the request.
 	 */
-	private Map<String, Object> parameters = new HashMap<String, Object>();
+	private Map<BundleParameter, Object> parameters = new HashMap<BundleParameter, Object>();
 
 	/**
 	 * Initialize this task bundle and set its build number.
@@ -465,7 +465,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	 * @param name the name of the parameter to set.
 	 * @param value the value of the parameter to set.
 	 */
-	public void setParameter(String name, Object value)
+	public void setParameter(BundleParameter name, Object value)
 	{
 		parameters.put(name, value);
 	}
@@ -475,7 +475,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	 * @param name the name of the parameter to get.
 	 * @return the value of the parameter to set.
 	 */
-	public Object getParameter(String name)
+	public Object getParameter(BundleParameter name)
 	{
 		return parameters.get(name);
 	}
@@ -484,7 +484,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	 * Get the map holding the parameters of the request.
 	 * @return a map of string keys to object values.
 	 */
-	public Map<String, Object> getParametersMap()
+	public Map<BundleParameter, Object> getParametersMap()
 	{
 		return parameters;
 	}

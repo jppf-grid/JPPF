@@ -26,7 +26,7 @@ import org.jppf.comm.socket.SocketClient;
 import org.jppf.node.AbstractMonitoredNode;
 import org.jppf.node.event.NodeEvent.EventType;
 import org.jppf.server.*;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 
 /**
@@ -124,6 +124,8 @@ public class PeerNode extends AbstractMonitoredNode
 			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 			{
 				bundle.setBundleUuid(uuid);
+				boolean override = bundle.getParameter(BundleParameter.BUNDLE_TUNING_TYPE_PARAM) != null;
+				bundle.setParameter(BundleParameter.IS_PEER, true);
 			}
 			if (notifying) fireNodeEvent(EventType.START_EXEC);
 			boolean notEmpty = (bundle.getTasks() != null) && (bundle.getTaskCount() > 0);

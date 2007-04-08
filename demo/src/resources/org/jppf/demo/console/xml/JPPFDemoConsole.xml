@@ -32,13 +32,8 @@
 		importPackage(Packages.java.awt);
 		importPackage(Packages.java.awt.event);
 		importPackage(Packages.javax.swing);
-		importPackage(Packages.org.jppf.client);
 		importPackage(Packages.org.jppf.utils);
-		importPackage(Packages.org.jppf.server.protocol);
 		importPackage(Packages.org.jppf.ui.monitoring);
-		importPackage(Packages.org.jppf.ui.monitoring.event);
-		importPackage(Packages.org.jppf.ui.monitoring.charts.config);
-		importPackage(Packages.org.jppf.ui.monitoring.data);
 		importPackage(Packages.org.jppf.ui.options);
 		importPackage(Packages.org.jppf.ui.options.event);
 		importPackage(Packages.org.jppf.ui.options.factory);

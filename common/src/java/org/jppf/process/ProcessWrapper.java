@@ -105,12 +105,13 @@ public class ProcessWrapper
 	}
 
 	/**
-	 * Notify all listeners that a stream eevnt has occurred.
+	 * Notify all listeners that a stream event has occurred.
 	 * @param output true if the event is for the outpuit stream, false if it is for the error stream.   
+	 * @param content the text that written to the stream.
 	 */
-	protected synchronized void fireStreamEvent(boolean output)
+	protected synchronized void fireStreamEvent(boolean output, String content)
 	{
-		ProcessWrapperEvent event = new ProcessWrapperEvent(output ? standardOutput : errorOutput);
+		ProcessWrapperEvent event = new ProcessWrapperEvent(content);
 		for (ProcessWrapperEventListener listener: listeners)
 		{
 			if (output) listener.outputStreamAltered(event);
@@ -166,7 +167,7 @@ public class ProcessWrapper
 					{
 						System.out.println(s);
 						sb.append(s).append("\n");
-						fireStreamEvent(output);
+						fireStreamEvent(output, s);
 					}
 				}
 				Thread.sleep(10);

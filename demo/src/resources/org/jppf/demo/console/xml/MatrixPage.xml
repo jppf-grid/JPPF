@@ -31,6 +31,8 @@
 		importPackage(Packages.org.jppf.utils);
 		importPackage(Packages.org.jppf.ui.options);
 		importPackage(Packages.org.jppf.ui.options.event);
+		importPackage(Packages.org.jppf.demo.console);
+		importPackage(Packages.javax.swing);
 	]]></script>
 	<script language="javascript"><![CDATA[
 		BASE = "org.jppf.demo.console.i18n.MatrixPage";
@@ -59,20 +61,60 @@
 			<property name="orientation" value="vertical"/>
 			<property name="bordered" value="true"/>
 			<property name="main" value="false"/>
+			<initializer type="script">
+				<script language="javascript"><![CDATA[
+					option.findFirstWithName("/RunMatrixDemo").setEnabled(true);
+					option.findFirstWithName("/CancelMatrixDemo").setEnabled(false);
+				]]></script>
+			</initializer>
+
 	
-			<child name="RunMatrixDemo" type="Button">
-				<property name="label" value="Run the Demo"/>
-				<property name="tooltip" value="Run the matrix demonstration"/>
-				<listener type="script">
-					<script language="javascript"><![CDATA[
-						//pwd = option.findFirstWithName("/actualPwd").getValue();
-					]]></script>
-				</listener>
+			<child name="MatrixActions" type="page">
+				<property name="label" value="Actions"/>
+				<property name="scrollable" value="false"/>
+				<property name="orientation" value="horizontal"/>
+				<property name="bordered" value="false"/>
+				<property name="main" value="false"/>
+		
+				<child name="RunMatrixDemo" type="Button">
+					<property name="label" value="Run the Demo"/>
+					<property name="tooltip" value="Run the matrix demonstration"/>
+					<listener type="script">
+						<script language="javascript"><![CDATA[
+							option.findFirstWithName("/RunMatrixDemo").setEnabled(false);
+							option.findFirstWithName("/CancelMatrixDemo").setEnabled(true);
+							var page = OptionsHandler.getPage("ConfigPage");
+							var nbNodes = page.findFirstWithName("/NbNodes").getValue().intValue();
+							var poolSize = page.findFirstWithName("/NbConnections").getValue().intValue();
+							var blocking = option.findFirstWithName("/Blocking").getValue().booleanValue();
+							var matrixSize = option.findFirstWithName("/MatrixSize").getValue().intValue();
+							var nbIter = option.findFirstWithName("/NbIterations").getValue().intValue();
+							var area = option.findFirstWithName("/msgText");
+							area.setValue("");
+							var helper = ConsoleHelper.getInstance().configure(matrixSize, nbIter, blocking, poolSize, nbNodes, area);
+							helper.start();
+						]]></script>
+					</listener>
+				</child>
+
+				<child name="CancelMatrixDemo" type="Button">
+					<property name="label" value="Cancel"/>
+					<property name="tooltip" value="Canel and stop the matrix demonstration"/>
+					<listener type="script">
+						<script language="javascript"><![CDATA[
+							option.findFirstWithName("/RunMatrixDemo").setEnabled(true);
+							option.findFirstWithName("/CancelMatrixDemo").setEnabled(false);
+							var helper = ConsoleHelper.getInstance();
+							helper.stop();
+						]]></script>
+					</listener>
+				</child>
+
 			</child>
 
-			<child name="Asynchronous" type="Boolean">
-				<property name="label" value="Asynchronous"/>
-				<property name="tooltip" value="Determines whether the tasks submissions should be performed asynchronously"/>
+			<child name="Blocking" type="Boolean">
+				<property name="label" value="Blocking submission"/>
+				<property name="tooltip" value="Determines whether the tasks submissions should be performed in blocking mode"/>
 				<property name="value" value="true"/>
 				<property name="persistent" value="true"/>
 			</child>
@@ -107,6 +149,7 @@
 		<property name="label" value="Server Messages"/>
 		<property name="tooltip" value="Console messages"/>
 		<property name="value" value=""/>
+		<property name="scrollable" value="true"/>
 	</child>
 
 </opt:main>

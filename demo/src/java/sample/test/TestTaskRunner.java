@@ -195,10 +195,11 @@ public class TestTaskRunner
 		System.out.println("Starting constant tasks testing...");
 		try
 		{
+			int n = 50;
 			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			for (int i=0; i<15; i++) tasks.add(new ConstantTask(i));
+			for (int i=0; i<n; i++) tasks.add(new ConstantTask(i));
 			List<JPPFTask> results = jppfClient.submit(tasks, null);
-			for (int i=0; i<15; i++)
+			for (int i=0; i<n; i++)
 			{
 				System.out.println("result for task #"+i+" is : "+results.get(i).getResult());
 			}

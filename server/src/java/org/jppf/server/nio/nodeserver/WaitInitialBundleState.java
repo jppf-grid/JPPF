@@ -71,7 +71,7 @@ public class WaitInitialBundleState extends NodeServerState
 			if (debugEnabled) log.debug("read bundle for " + getRemoteHost(channel) + " done");
 			JPPFTaskBundle bundle = context.deserializeBundle();
 			context.setUuid(bundle.getBundleUuid());
-			boolean override = bundle.getParameter(AdminRequestConstants.BUNDLE_TUNING_TYPE_PARAM) != null;
+			boolean override = bundle.getParameter(BundleParameter.BUNDLE_TUNING_TYPE_PARAM) != null;
 			if (override) context.setBundler(BundlerFactory.createBundler(bundle.getParametersMap(), true));
 			else context.setBundler(server.getBundler().copy());
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.

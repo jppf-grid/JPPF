@@ -19,7 +19,7 @@
  */
 package org.jppf.ui.monitoring.data;
 
-import static org.jppf.server.protocol.AdminRequestConstants.*;
+import static org.jppf.server.protocol.BundleParameter.*;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.jppf.client.*;
 import org.jppf.server.JPPFStats;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.utils.JPPFConfiguration;
 
@@ -184,12 +184,12 @@ public final class StatsHandler implements StatsConstants
 	 * @param params contains the names of the settings to change and their corresponding value.
 	 * @return the response message from the server.
 	 */
-	public String changeSettings(String password, Map<String, Object> params)
+	public String changeSettings(String password, Map<BundleParameter, Object> params)
 	{
 		String msg = null;
 		try
 		{
-			msg = currentConnection.submitAdminRequest(password, null, JPPFTaskBundle.CHANGE_SETTINGS, params);
+			msg = currentConnection.submitAdminRequest(password, null, BundleParameter.CHANGE_SETTINGS, params);
 		}
 		catch(Exception e)
 		{
@@ -207,12 +207,12 @@ public final class StatsHandler implements StatsConstants
 	 * @param restartDelay the delay, starting after shutdown, before restarting.
 	 * @return the response message from the server.
 	 */
-	public String requestShutdownRestart(String password, String command, long shutdownDelay, long restartDelay)
+	public String requestShutdownRestart(String password, BundleParameter command, long shutdownDelay, long restartDelay)
 	{
 		String msg = null;
 		try
 		{
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
 			params.put(SHUTDOWN_DELAY_PARAM, shutdownDelay);
 			params.put(RESTART_DELAY_PARAM, restartDelay);
 			msg = currentConnection.submitAdminRequest(password, null, command, params);

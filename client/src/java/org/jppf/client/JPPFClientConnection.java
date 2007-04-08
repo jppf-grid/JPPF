@@ -21,7 +21,7 @@
 package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
-import static org.jppf.server.protocol.AdminRequestConstants.*;
+import static org.jppf.server.protocol.BundleParameter.*;
 
 import java.io.*;
 import java.util.*;
@@ -377,7 +377,7 @@ public class JPPFClientConnection
 	 * @return the reponse message from the server.
 	 * @throws Exception if an error occurred while trying to send or execute the command.
 	 */
-	public String submitAdminRequest(String password, String newPassword, String command, Map<String, Object> parameters)
+	public String submitAdminRequest(String password, String newPassword, BundleParameter command, Map<BundleParameter, Object> parameters)
 			throws Exception
 	{
 		lock.lock();
@@ -400,7 +400,7 @@ public class JPPFClientConnection
 			}
 			if (parameters != null)
 			{
-				for (String key: parameters.keySet())
+				for (BundleParameter key: parameters.keySet())
 				{
 					request.setParameter(key, parameters.get(key));
 				}

@@ -19,11 +19,12 @@
  */
 package org.jppf.server.scheduler.bundle;
 
-import static org.jppf.server.protocol.AdminRequestConstants.*;
+import static org.jppf.server.protocol.BundleParameter.*;
 
 import java.util.Map;
 
 import org.jppf.server.*;
+import org.jppf.server.protocol.BundleParameter;
 import org.jppf.utils.*;
 
 /**
@@ -95,7 +96,7 @@ public final class BundlerFactory {
 	 * @return a <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler
 	 */
-	public static Bundler createBundler(Map<String, Object> map, boolean override)
+	public static Bundler createBundler(Map<BundleParameter, Object> map, boolean override)
 	{
 		Bundler bundler = null;
 		boolean manual = "manual".equalsIgnoreCase((String) map.get(BUNDLE_TUNING_TYPE_PARAM));

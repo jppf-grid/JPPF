@@ -42,9 +42,8 @@ public class ButtonOption extends AbstractOption
 	 * @param name this component's name.
 	 * @param label the label displayed with the checkbox. 
 	 * @param tooltip the tooltip associated with the checkbox.
-	 * @param action the action to execute when the button is pressed.
 	 */
-	public ButtonOption(String name, String label, String tooltip, OptionAction action)
+	public ButtonOption(String name, String label, String tooltip)
 	{
 		this.name = name;
 		this.label = label;

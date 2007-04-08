@@ -283,8 +283,7 @@ public class OptionElementFactory
 	{
 		FileChooserOption option = new FileChooserOption();
 		builder.initCommonOptionAttributes(option, desc);
-		int dlgType = "open".equals(desc.getProperty("type"))
-			? FileChooserOption.OPEN : FileChooserOption.SAVE;
+		int dlgType = "open".equals(desc.getProperty("type")) ? FileChooserOption.OPEN : FileChooserOption.SAVE;
 		option.setDialogType(dlgType);
 		option.setExtensions(desc.getProperty("extensions"));
 		option.setValue(desc.getProperty("value"));
