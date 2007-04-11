@@ -89,7 +89,7 @@ public class NodeContext extends NioContext<NodeState>
 	public void resubmitBundle(JPPFTaskBundle bundle)
 	{
 		bundle.setPriority(10);
-		JPPFDriver.getInstance().getQueue().addBundle(bundle);
+		JPPFDriver.getQueue().addBundle(bundle);
 	}
 
 	/**
