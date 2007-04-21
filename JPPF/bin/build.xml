@@ -63,8 +63,8 @@
 		<pathelement location="${common}/classes"/>
 		<pathelement location="${node}/classes"/>
 		<pathelement location="${admin}/classes"/>
-		<pathelement location="${server}/classes"/>
 		<pathelement location="${client}/classes"/>
+		<pathelement location="${server}/classes"/>
 		<pathelement location="${demo}/classes"/>
 		<fileset dir="${lib}">
 			<include name="**/*.jar"/>
@@ -122,10 +122,10 @@
 	<!-- ========================================================================= -->
 
 	<target name="compile" description="Compile" depends="init">
-		<antcall target="compile.module"><param name="path" value="${common}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${node}"/></antcall>
-		<antcall target="compile.module"><param name="path" value="${admin}"/></antcall>
+		<antcall target="compile.module"><param name="path" value="${common}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${client}"/></antcall>
+		<antcall target="compile.module"><param name="path" value="${admin}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${server}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${demo}"/></antcall>
   </target>
