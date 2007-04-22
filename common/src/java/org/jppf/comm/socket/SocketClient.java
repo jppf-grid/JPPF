@@ -199,6 +199,11 @@ public class SocketClient extends AbstractSocketWrapper
         this.serializer = serializer;
     }
 
+    /**
+     * Generate a string representation of this socket client.
+     * @return as string describing this object.
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString()
     {
