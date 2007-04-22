@@ -19,14 +19,14 @@
 	Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 -->
 
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="Matrix" type="page">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="LongTask" type="page">
 
-	<property name="label" value="Matrix demos"/>
+	<property name="label" value="Long task demos"/>
 	<property name="scrollable" value="false"/>
 	<property name="orientation" value="vertical"/>
 	<property name="bordered" value="false"/>
 	<property name="main" value="true"/>
-	<property name="tooltip" value="Run the matrix multiplication demos"/>
+	<property name="tooltip" value="Run the long task multiplication demos"/>
 	<script language="javascript"><![CDATA[
 		importPackage(Packages.org.jppf.utils);
 		importPackage(Packages.org.jppf.ui.options);
@@ -42,68 +42,69 @@
 	<!--                   Top Panels                                          -->
 	<!-- ===================================================================== -->
 	
-	<child name="MatrixPage" type="page">
+	<child name="LongTaskPage" type="page">
 
-		<property name="label" value="Matrix demo configuration page"/>
+		<property name="label" value="Long task demo configuration page"/>
 		<property name="scrollable" value="false"/>
 		<property name="orientation" value="horizontal"/>
 		<property name="bordered" value="false"/>
 		<property name="main" value="false"/>
 
 		<!-- ===================================================================== -->
-		<!--          Administrator password configuration area                    -->
+		<!--          configuration parameters area                                -->
 		<!-- ===================================================================== -->
 	
-		<child name="Matrix" type="page">
+		<child name="LongTask" type="page">
 	
-			<property name="label" value="Matrix demos"/>
+			<property name="label" value="Long task demos"/>
 			<property name="scrollable" value="false"/>
 			<property name="orientation" value="vertical"/>
 			<property name="bordered" value="true"/>
 			<property name="main" value="false"/>
 			<initializer type="script">
 				<script language="javascript"><![CDATA[
-					option.findFirstWithName("/RunMatrixDemo").setEnabled(true);
-					option.findFirstWithName("/CancelMatrixDemo").setEnabled(false);
+					option.findFirstWithName("/RunLongTaskDemo").setEnabled(true);
+					option.findFirstWithName("/CancelLongTaskDemo").setEnabled(false);
 				]]></script>
 			</initializer>
 
 	
-			<child name="MatrixActions" type="page">
+			<child name="LongTaskActions" type="page">
 				<property name="label" value="Actions"/>
 				<property name="scrollable" value="false"/>
 				<property name="orientation" value="horizontal"/>
 				<property name="bordered" value="false"/>
 				<property name="main" value="false"/>
 		
-				<child name="RunMatrixDemo" type="Button">
+				<child name="RunLongTaskDemo" type="Button">
 					<property name="label" value="Run the Demo"/>
-					<property name="tooltip" value="Run the matrix demonstration"/>
+					<property name="tooltip" value="Run the long task  demonstration"/>
 					<listener type="script">
 						<script language="javascript"><![CDATA[
-							option.findFirstWithName("/RunMatrixDemo").setEnabled(false);
-							option.findFirstWithName("/CancelMatrixDemo").setEnabled(true);
+							option.findFirstWithName("/RunLongTaskDemo").setEnabled(false);
+							option.findFirstWithName("/CancelLongTaskDemo").setEnabled(true);
 							var page = OptionsHandler.getPage("ConfigPage");
 							var nbNodes = page.findFirstWithName("/NbNodes").getValue().intValue();
 							var poolSize = page.findFirstWithName("/NbConnections").getValue().intValue();
-							var blocking = option.findFirstWithName("/Blocking").getValue().booleanValue();
-							var matrixSize = option.findFirstWithName("/MatrixSize").getValue().intValue();
-							var nbIter = option.findFirstWithName("/NbIterations").getValue().intValue();
-							var area = option.findFirstWithName("/msgText");
+							var blocking = option.findFirstWithName("/LTBlocking").getValue().booleanValue();
+							var length = option.findFirstWithName("/LongTaskLength").getValue().intValue();
+							var size = option.findFirstWithName("/NbTasks").getValue().intValue();
+							var nbIter = option.findFirstWithName("/LTNbIterations").getValue().intValue();
+							var area = option.findFirstWithName("/msgTextLongTask");
 							area.setValue("");
-							var helper = ConsoleHelper.getInstance().configureMatrix(matrixSize, nbIter, blocking, poolSize, nbNodes, area);
+							var helper = ConsoleHelper.getInstance().configureLongTask(length, size, nbIter, blocking, poolSize, nbNodes, area);
 							helper.start();
 						]]></script>
 					</listener>
 				</child>
 
-				<child name="CancelMatrixDemo" type="Button">
+				<child name="CancelLongTaskDemo" type="Button">
 					<property name="label" value="Cancel"/>
-					<property name="tooltip" value="Canel and stop the matrix demonstration"/>
+					<property name="tooltip" value="Cancel and stop the long task demonstration"/>
 					<listener type="script">
 						<script language="javascript"><![CDATA[
-							option.findFirstWithName("/RunMatrixDemo").setEnabled(true);
-							option.findFirstWithName("/CancelMatrixDemo").setEnabled(false);
+							option.findFirstWithName("/RunLongTaskDemo").setEnabled(true);
+							option.findFirstWithName("/CancelLongTaskDemo").setEnabled(false);
 							var helper = ConsoleHelper.getInstance();
 							helper.stop();
 						]]></script>
@@ -112,25 +113,34 @@
 
 			</child>
 
-			<child name="Blocking" type="Boolean">
+			<child name="LTBlocking" type="Boolean">
 				<property name="label" value="Blocking submission"/>
 				<property name="tooltip" value="Determines whether the tasks submissions should be performed in blocking mode"/>
 				<property name="value" value="true"/>
 				<property name="persistent" value="true"/>
 			</child>
 	
-			<child name="MatrixSize" type="SpinnerNumber">
-				<property name="label" value="Matrix size"/>
-				<property name="tooltip" value="Size of the square matrices to multiply"/>
+			<child name="LongTaskLength" type="SpinnerNumber">
+				<property name="label" value="Task length"/>
+				<property name="tooltip" value="Length in milliseconds of each task"/>
 				<property name="value" value="300"/>
-				<property name="minValue" value="3"/>
+				<property name="minValue" value="1"/>
+				<property name="maxValue" value="30000"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+			<child name="NbTasks" type="SpinnerNumber">
+				<property name="label" value="Number of tasks"/>
+				<property name="tooltip" value="Numbber of tasks to run at each iteration"/>
+				<property name="value" value="300"/>
+				<property name="minValue" value="1"/>
 				<property name="maxValue" value="3000"/>
 				<property name="persistent" value="true"/>
 			</child>
 	
-			<child name="NbIterations" type="SpinnerNumber">
+			<child name="LTNbIterations" type="SpinnerNumber">
 				<property name="label" value="Number of iterations"/>
-				<property name="tooltip" value="Number of times to multiply the square matrices"/>
+				<property name="tooltip" value="Number of iterations"/>
 				<property name="value" value="20"/>
 				<property name="minValue" value="1"/>
 				<property name="maxValue" value="1000"/>
@@ -145,7 +155,7 @@
 	<!--                   Messages area                                       -->
 	<!-- ===================================================================== -->
 
-	<child name="msgText" type="TextArea">
+	<child name="msgTextLongTask" type="TextArea">
 		<property name="label" value="Server Messages"/>
 		<property name="tooltip" value="Console messages"/>
 		<property name="value" value=""/>

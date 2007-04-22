@@ -76,6 +76,26 @@ public final class StringUtils
 	}
 
 	/**
+	 * Padds a string on the right side with a given character
+	 * If the string is longer than the specified length, then characters on the right are truncated, ortherwise
+	 * the specified character is appended to the result on the right  to obtain the appropriate length.
+	 * @param source the string to pad to the right
+	 * @param padChar the character used for padding
+	 * @param maxLen the length to pad the string up to
+	 * if its length is greater than the padding length
+	 * @return the padded (or truncated) string
+	 */
+	public static String padRight(String source, char padChar, int maxLen)
+	{
+		String s = source;
+		if (s == null) s = "";
+		if (s.length() > maxLen) s = s.substring(0, maxLen);
+		StringBuilder sb = new StringBuilder(s);
+		while (sb.length() < maxLen) sb.append(padChar);
+		return sb.toString();
+	}
+
+	/**
 	 * An array of char containing the hex digits in ascending order.
 	 */
 	private static char[] hexDigits =
@@ -142,11 +162,11 @@ public final class StringUtils
 	public static String toStringDuration(long elapsed)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(elapsed / 3600000L).append(":");
+		sb.append(padLeft(""+(elapsed / 3600000L), '0', 2)).append(":");
 		elapsed = elapsed % 3600000L;
-		sb.append(elapsed / 60000L).append(":");
+		sb.append(padLeft(""+(elapsed / 60000L), '0', 2)).append(":");
 		elapsed = elapsed % 60000L;
-		sb.append(elapsed / 1000L).append(".");
+		sb.append(padLeft(""+(elapsed / 1000L), '0', 2)).append(".");
 		sb.append(padLeft(""+(elapsed % 1000L), '0', 3));
 		return sb.toString();
 	}

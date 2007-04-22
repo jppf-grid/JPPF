@@ -41,10 +41,11 @@ public final class BundlerFactory {
 	public static Bundler createBundler()
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
-		if("autotuned".equalsIgnoreCase(props.getProperty("task.bundle.strategy")))
+		String algorithm = props.getProperty("task.bundle.strategy");
+		if(!"manual".equalsIgnoreCase(algorithm))
 		{
 			String profile = props.getProperty("task.bundle.autotuned.strategy");
-			return createBundler(new AnnealingTuneProfile(profile));
+			return createBundler(new AnnealingTuneProfile(profile), algorithm);
 		} 
 		return new FixedSizedBundler();
 	}
@@ -71,21 +72,24 @@ public final class BundlerFactory {
 	/**
 	 * Instantiate a bundler, based on an annealing profile.
 	 * @param profile a <code>AnnealingTuneProfile</code> instance.
+	 * @param algorithm a <code>AnnealingTuneProfile</code> instance.
 	 * @return a <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler
 	 */
-	public static Bundler createBundler(AnnealingTuneProfile profile) {
-		return createBundler(profile, false);
+	public static Bundler createBundler(AnnealingTuneProfile profile, String algorithm) {
+		return createBundler(profile, false, algorithm);
 	}
 
 	/**
 	 * Instantiate a bundler, based on an annealing profile.
 	 * @param profile a <code>AnnealingTuneProfile</code> instance.
 	 * @param override true if the settings were overriden by the node, false otherwise.
+	 * @param algorithm a <code>AnnealingTuneProfile</code> instance.
 	 * @return a <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler
 	 */
-	public static Bundler createBundler(AnnealingTuneProfile profile, boolean override) {
+	public static Bundler createBundler(AnnealingTuneProfile profile, boolean override, String algorithm) {
+		if ("resilient".equalsIgnoreCase(algorithm)) return new ResilientBundler(profile);
 		return new AutoTunedBundler(profile);
 	}
 
@@ -99,7 +103,8 @@ public final class BundlerFactory {
 	public static Bundler createBundler(Map<BundleParameter, Object> map, boolean override)
 	{
 		Bundler bundler = null;
-		boolean manual = "manual".equalsIgnoreCase((String) map.get(BUNDLE_TUNING_TYPE_PARAM));
+		String algorithm = (String) map.get(BUNDLE_TUNING_TYPE_PARAM);
+		boolean manual = "manual".equalsIgnoreCase(algorithm);
 		if (manual)
 		{
 			Number n = (Number) map.get(BUNDLE_SIZE_PARAM);
@@ -121,7 +126,7 @@ public final class BundlerFactory {
 			prof.setSizeRatioDeviation(n.floatValue());
 			n = (Number) map.get(DECREASE_RATIO);
 			prof.setDecreaseRatio(n.floatValue());
-			bundler = BundlerFactory.createBundler(prof, override);
+			bundler = createBundler(prof, override, algorithm);
 			JPPFDriver.getInstance().getNodeNioServer().setBundler(bundler);
 		}
 		return bundler;

@@ -53,12 +53,14 @@ public class LongTask extends JPPFTask
 	public void run()
 	{
 		taskStart = System.currentTimeMillis();
-		while (System.currentTimeMillis() - taskStart < taskLength)
+		double elapsed = 0L;
+		while (elapsed < taskLength)
 		{
 			Random rand = new Random(System.currentTimeMillis());
 			String s = "";
-			for (int i=0; i<100; i++) s += "A"+rand.nextInt(10);
-			s.replace("8", "$");
+			for (int i=0; i<10; i++) s += "A"+rand.nextInt(10);
+			//s.replace("8", "$");
+			elapsed = System.currentTimeMillis() - taskStart;
 		}
 	}
 }

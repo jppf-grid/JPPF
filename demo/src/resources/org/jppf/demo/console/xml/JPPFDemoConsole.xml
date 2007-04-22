@@ -67,6 +67,7 @@
 	<child name="AdminPanels" type="TabbedPane">
 	
 		<import source="file" location="org/jppf/demo/console/xml/MatrixPage.xml"/>
+		<import source="file" location="org/jppf/demo/console/xml/LongTaskPage.xml"/>
 		<import source="file" location="org/jppf/demo/console/xml/FrameworkConfigPage.xml"/>
 	
 	</child>

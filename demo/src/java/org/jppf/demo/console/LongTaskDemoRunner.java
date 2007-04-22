@@ -25,21 +25,21 @@ import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.*;
+import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 
-import sample.matrix.*;
+import sample.tasklength.LongTask;
 
 /**
  * Runner class for the matrix multiplication demo.
  * @author Laurent Cohen
  */
-public class MatrixDemoRunner
+public class LongTaskDemoRunner
 {
 	/**
 	 * Log4j logger for this class.
 	 */
-	static Logger log = Logger.getLogger(MatrixDemoRunner.class);
+	static Logger log = Logger.getLogger(LongTaskDemoRunner.class);
 	/**
 	 * JPPF client used to submit execution requests.
 	 */
@@ -61,14 +61,16 @@ public class MatrixDemoRunner
 		{
 			jppfClient = new JPPFClient();
 			TypedProperties props = JPPFConfiguration.getProperties();
-			int size = props.getInt("matrix.size", 300);
-			int iterations = props.getInt("matrix.iterations", 10);
+			int length = props.getInt("longtask.length", 1000);
+			int size = props.getInt("longtask.number", 10);
+			int iterations = props.getInt("longtask.iterations", 10);
 			int poolSize = props.getInt("pool.size", 1);
 			boolean blocking = props.getBoolean("submission.blocking", true);
-			System.out.println("Running Matrix demo with matrix size = " + size + "*" + size + " for " + iterations + " iterations");
+			System.out.println("Running Long Task demo with task length = " + length +
+				", number of tasks = " + size + " for " + iterations + " iterations");
 			System.out.println("submission mode: " + (blocking ? "" : "non-") + "blocking, poolSize: " + poolSize);
-			MatrixDemoRunner runner = new MatrixDemoRunner();
-			runner.perform(size, iterations, blocking, poolSize);
+			LongTaskDemoRunner runner = new LongTaskDemoRunner();
+			runner.perform(length, size, iterations, blocking, poolSize);
 			System.exit(0);
 		}
 		catch(Throwable t)
@@ -80,22 +82,17 @@ public class MatrixDemoRunner
 	
 	/**
 	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
-	 * @param size the size of the matrices.
-	 * @param iterations the number of times the multiplication will be performed.
+	 * @param length the length in milliseconds of each task.
+	 * @param size the number of tasks to run per iteration.
+	 * @param iterations the number of iterations.
 	 * @param blocking determines whether the tasks should be submitted in blocking or non-blocking mode.
 	 * @param poolSize the size of the connection pool to  use
 	 * @throws JPPFException if an error is raised during the execution.
 	 */
-	public void perform(int size, int iterations, boolean blocking, int poolSize) throws JPPFException
+	public void perform(int length, int size, int iterations, boolean blocking, int poolSize) throws JPPFException
 	{
 		try
 		{
-			// initialize the 2 matrices to multiply
-			Matrix a = new Matrix(size);
-			a.assignRandomValues();
-			Matrix b = new Matrix(size);
-			b.assignRandomValues();
-	
 			// perform "iteration" times
 			long totalElapsed = 0L;
 			for (int iter=0; iter<iterations; iter++)
@@ -104,24 +101,12 @@ public class MatrixDemoRunner
 				long start = System.currentTimeMillis();
 				// create a task for each row in matrix a
 				List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-				for (int i=0; i<size; i++) tasks.add(new MatrixTask(a.getRow(i)));
-				// create a data provider to share matrix b among all tasks
-				DataProvider dataProvider = new MemoryMapDataProvider();
-				dataProvider.setValue(MatrixTask.DATA_KEY, b);
+				for (int i=0; i<size; i++) tasks.add(new LongTask(length));
 				// submit the tasks for execution
 				List<JPPFTask> results = null;
-				if (blocking) results = submit(tasks, dataProvider);
-				else if (poolSize == 1) results = submitAsynchronous(tasks, dataProvider);
-				else results = submitPooled(tasks, dataProvider, poolSize);
-				// initialize the resulting matrix
-				Matrix c = new Matrix(size);
-				// Get the matrix values from the tasks results
-				for (int i=0; i<results.size(); i++)
-				{
-					MatrixTask matrixTask = (MatrixTask) results.get(i);
-					double[] row = (double[]) matrixTask.getResult();
-					for (int j=0; j<row.length; j++) c.setValueAt(i, j, row[j]);
-				}
+				if (blocking) results = submit(tasks, null);
+				else if (poolSize == 1) results = submitAsynchronous(tasks, null);
+				else results = submitPooled(tasks, null, poolSize);
 				long elapsed = System.currentTimeMillis() - start;
 				totalElapsed += elapsed;
 				System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
@@ -198,5 +183,4 @@ public class MatrixDemoRunner
 		}
 		return results;
 	}
-
 }

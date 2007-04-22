@@ -27,6 +27,15 @@ package org.jppf.server.scheduler.bundle;
 public abstract class AbstractBundler implements Bundler
 {
 	/**
+	 * Count of the bundlers used to generate a readable unique id.
+	 */
+	protected static int bundlerCount = 0;
+	/**
+	 * The bundler number for this bundler.
+	 */
+	protected int bundlerNumber = incBundlerCount();
+
+	/**
 	 * The creation timestamp for this bundler.
 	 */
 	protected long timestamp = System.currentTimeMillis();
@@ -34,6 +43,15 @@ public abstract class AbstractBundler implements Bundler
 	 * The override indicator.
 	 */
 	protected boolean override = false;
+
+	/**
+	 * Increment the bundlers count by one.
+	 * @return the new count as an int value.
+	 */
+	private static synchronized int incBundlerCount()
+	{
+		return ++bundlerCount;
+	}
 
 	/**
 	 * This method does nothing and should be overriden in subclasses.

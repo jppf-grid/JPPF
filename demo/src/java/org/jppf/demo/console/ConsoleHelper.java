@@ -37,6 +37,14 @@ public final class ConsoleHelper
 	 */
 	private static final String LOGGING_LEVEL = "INFO";
 	/**
+	 * Identifier for the matrix multiplication demo.
+	 */
+	private static final String MATRIX = "Matrix";
+	/**
+	 * Identifier for the matrix multiplication demo.
+	 */
+	private static final String LONG_TASK = "LongTask";
+	/**
 	 * Log4j logger for this class.
 	 */
 	static Logger log = Logger.getLogger(ConsoleHelper.class);
@@ -48,6 +56,14 @@ public final class ConsoleHelper
 	 * The size of the matrices.
 	 */
 	private int matrixSize = 0;
+	/**
+	 * The length in milliseconds of the task.
+	 */
+	private int taskLength = 0;
+	/**
+	 * The number of tasks per iteration (long task demo).
+	 */
+	private int nbTasks = 0;
 	/**
 	 * The number of times the multiplication will be performed.
 	 */
@@ -89,6 +105,10 @@ public final class ConsoleHelper
 	 * Thread from which processes are started. 
 	 */
 	private Runnable mainExecRunnable = null;
+	/**
+	 * Identifier of the demo to run.
+	 */
+	private String demoName = null;
 
 	/**
 	 * Initialize this demo helper with the specified parameters.
@@ -139,7 +159,7 @@ public final class ConsoleHelper
 	 * @param area the text area to send output to.
 	 * @return this console helper.
 	 */
-	public ConsoleHelper configure(int matrixSize, int nbIter, boolean blocking, int poolSize, int nbNodes, TextAreaOption area)
+	public ConsoleHelper configureMatrix(int matrixSize, int nbIter, boolean blocking, int poolSize, int nbNodes, TextAreaOption area)
 	{
 		this.matrixSize = matrixSize;
 		this.nbIter = nbIter;
@@ -147,6 +167,32 @@ public final class ConsoleHelper
 		this.poolSize = poolSize;
 		this.nbNodes = nbNodes;
 		this.area = area;
+		demoName = MATRIX;
+		return this;
+	}
+	
+	/**
+	 * Initialize this demo helper with the specified parameters.
+	 * @param taskLength the length in milliseconds of the task.
+	 * @param nbTasks the number of tasks per iteration (long task demo).
+	 * @param nbIter the number of times the multiplication will be performed.
+	 * @param blocking determines whether the tasks should be submitted in blocking or non-blocking mode.
+	 * @param poolSize the size of the connection pool to  use.
+	 * @param nbNodes the number of nodes.
+	 * @param area the text area to send output to.
+	 * @return this console helper.
+	 */
+	public ConsoleHelper configureLongTask(int taskLength, int nbTasks, int nbIter, boolean blocking, int poolSize,
+		int nbNodes, TextAreaOption area)
+	{
+		this.taskLength = taskLength;
+		this.nbTasks = nbTasks;
+		this.nbIter = nbIter;
+		this.blocking = blocking;
+		this.poolSize = poolSize;
+		this.nbNodes = nbNodes;
+		this.area = area;
+		demoName = LONG_TASK;
 		return this;
 	}
 	
@@ -162,7 +208,7 @@ public final class ConsoleHelper
 		Properties log4jConfig = ProcessConfig.buildLog4jConfig("node" + nodeNumber + ".log", false, LOGGING_LEVEL);
 		return ProcessCommand.buildProcess("org.jppf.node.NodeLauncher", nodeConfig, log4jConfig, 64);
 	}
-	
+
 	/**
 	 * Create a new driver process using default values.
 	 * @return the started node process.
@@ -179,11 +225,39 @@ public final class ConsoleHelper
 	}
 	
 	/**
-	 * Create a new matrix sample process using default values.
+	 * Create a new matrix demo process using default values.
 	 * @return the started node process.
 	 * @throws Exception if an error occurs while building the process.
 	 */
-	public ProcessWrapper startMatrixSampleProcess() throws Exception
+	public ProcessWrapper startMatrixDemoProcess() throws Exception
+	{
+		Properties cfg = configureBaseClient();
+		cfg.setProperty("matrix.size", "" + matrixSize);
+		cfg.setProperty("matrix.iterations", "" + nbIter);
+		Properties log4jConfig = ProcessConfig.buildLog4jConfig("matrix.log", true, LOGGING_LEVEL);
+		return ProcessCommand.buildProcess("org.jppf.demo.console.MatrixDemoRunner", cfg, log4jConfig, 64);
+	}
+
+	/**
+	 * Create a new long task demo process using default values.
+	 * @return the started node process.
+	 * @throws Exception if an error occurs while building the process.
+	 */
+	public ProcessWrapper startLongTaskDemoProcess() throws Exception
+	{
+		Properties cfg = configureBaseClient();
+		cfg.setProperty("longtask.length", "" + taskLength);
+		cfg.setProperty("longtask.number", "" + nbTasks);
+		cfg.setProperty("longtask.iterations", "" + nbIter);
+		Properties log4jConfig = ProcessConfig.buildLog4jConfig("longtask.log", true, LOGGING_LEVEL);
+		return ProcessCommand.buildProcess("org.jppf.demo.console.LongTaskDemoRunner", cfg, log4jConfig, 64);
+	}
+
+	/**
+	 * Configure the properties that do not depend on the type of demo.
+	 * @return a <code>Properties</code> instance.
+	 */
+	private Properties configureBaseClient()
 	{
 		Properties cfg = new Properties();
 		StringBuilder sb = new StringBuilder();
@@ -206,14 +280,12 @@ public final class ConsoleHelper
 		cfg.setProperty("reconnect.max.time", "60");
 		cfg.setProperty("reconnect.interval", "1");
 
-		cfg.setProperty("matrix.size", "" + matrixSize);
-		cfg.setProperty("matrix.iterations", "" + nbIter);
 		cfg.setProperty("submission.blocking", "" + blocking);
 		cfg.setProperty("pool.size", "" + poolSize);
-		Properties log4jConfig = ProcessConfig.buildLog4jConfig("matrix.log", true, LOGGING_LEVEL);
-		return ProcessCommand.buildProcess("org.jppf.demo.console.MatrixDemoRunner", cfg, log4jConfig, 64);
-	}
 
+		return cfg;
+	}
+	
 	/**
 	 * Run the demo in a separate thread.
 	 * @throws Exception if an error occurs while running the test.
@@ -256,12 +328,21 @@ public final class ConsoleHelper
 			long start = System.currentTimeMillis();
 			output(line);
 			TextAreaProcessListener listener = new TextAreaProcessListener(area);
-			sample = startMatrixSampleProcess();
+			if (MATRIX.equals(demoName)) sample = startMatrixDemoProcess();
+			else if (LONG_TASK.equals(demoName)) sample = startLongTaskDemoProcess();
 			sample.addProcessWrapperEventListener(listener);
 			
 			sample.getProcess().waitFor();
-			area.findFirstWithName("/RunMatrixDemo").setEnabled(true);
-			area.findFirstWithName("/CancelMatrixDemo").setEnabled(false);
+			if (MATRIX.equals(demoName))
+			{
+				area.findFirstWithName("/RunMatrixDemo").setEnabled(true);
+				area.findFirstWithName("/CancelMatrixDemo").setEnabled(false);
+			}
+			else if (LONG_TASK.equals(demoName))
+			{
+				area.findFirstWithName("/RunLongTaskDemo").setEnabled(true);
+				area.findFirstWithName("/CancelLongTaskDemo").setEnabled(false);
+			}
 			sample = null;
 			long time = System.currentTimeMillis() - start;
 			output("Test performed in "+StringUtils.toStringDuration(time)+" ("+time+" ms)");

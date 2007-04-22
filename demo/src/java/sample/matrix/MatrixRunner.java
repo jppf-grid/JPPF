@@ -20,6 +20,7 @@
 package sample.matrix;
 
 import java.util.*;
+
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFClient;
@@ -53,12 +54,15 @@ public class MatrixRunner
 	{
 		try
 		{
-			jppfClient = new JPPFClient();
+			if ((args != null) && (args.length > 0)) 
+				jppfClient = new JPPFClient(args[0]);
+			else jppfClient = new JPPFClient();
 			TypedProperties props = JPPFConfiguration.getProperties();
-			int size = props.getInt("matrix.size",300);
-			int iterations = props.getInt("matrix.iterations",10);
+			int size = props.getInt("matrix.size", 300);
+			int iterations = props.getInt("matrix.iterations", 10);
+			int nbRows = props.getInt("task.nbRows", 1);
 			output("Running Matrix demo with matrix size = "+size+"*"+size+" for "+iterations+" iterations");
-			perform(size, iterations);
+			perform(size, iterations, nbRows);
 			System.exit(0);
 		}
 		catch(Exception e)
@@ -73,9 +77,10 @@ public class MatrixRunner
 	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
 	 * @param size the size of the matrices.
 	 * @param iterations the number of times the multiplication will be performed.
+	 * @param nbRows number of rows of matrix a per task.
 	 * @throws JPPFException if an error is raised during the execution.
 	 */
-	private static void perform(int size, int iterations) throws JPPFException
+	private static void perform(int size, int iterations, int nbRows) throws JPPFException
 	{
 		try
 		{
@@ -84,40 +89,17 @@ public class MatrixRunner
 			a.assignRandomValues();
 			Matrix b = new Matrix(size);
 			b.assignRandomValues();
+			performSequentialMultiplication(a, b);
+			long totalIterationTime = 0L;
 	
 			// perform "iteration" times
 			for (int iter=0; iter<iterations; iter++)
 			{
-				long start = System.currentTimeMillis();
-				// create a task for each row in matrix a
-				List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-				for (int i=0; i<size; i++) tasks.add(new MatrixTask(a.getRow(i)));
-				// create a data provider to share matrix b among all tasks
-				DataProvider dataProvider = new MemoryMapDataProvider();
-				dataProvider.setValue(MatrixTask.DATA_KEY, b);
-				// submit the tasks for execution
-				List<JPPFTask> results = jppfClient.submit(tasks, dataProvider);
-				/*
-				List<JPPFTask> results = new ArrayList<JPPFTask>();
-				for (JPPFTask t: tasks)
-				{
-					t.setDataProvider(dataProvider);
-					t.run();
-					results.add(t);
-				}
-				*/
-				// initialize the resulting matrix
-				Matrix c = new Matrix(size);
-				// Get the matrix values from the tasks results
-				for (int i=0; i<results.size(); i++)
-				{
-					MatrixTask matrixTask = (MatrixTask) results.get(i);
-					double[] row = (double[]) matrixTask.getResult();
-					for (int j=0; j<row.length; j++) c.setValueAt(i, j, row[j]);
-				}
-				long elapsed = System.currentTimeMillis() - start;
+				long elapsed = performParallelMultiplication(a, b, nbRows);
+				totalIterationTime += elapsed;
 				output("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
 			}
+			output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations));
 			JPPFStats stats = jppfClient.requestStatistics();
 			output("End statistics :\n"+stats.toString());
 		}
@@ -125,6 +107,83 @@ public class MatrixRunner
 		{
 			throw new JPPFException(e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * Perform the sequential multiplication of 2 squares matrices of equal sizes.
+	 * @param a the left-hand matrix.
+	 * @param b the right-hand matrix.
+	 * @param nbRows number of rows of matrix a per task.
+	 * @return the elpased time for the computation.
+	 * @throws Exception if an error is raised during the execution.
+	 */
+	private static long performParallelMultiplication(Matrix a, Matrix b, int nbRows) throws Exception
+	{
+		long start = System.currentTimeMillis();
+		int size = a.getSize();
+		// create a task for each row in matrix a
+		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+		int remaining = size;
+		for (int i=0; i<size; i+= nbRows)
+		{
+			double[][] rows = null;
+			if (remaining >= nbRows)
+			{
+				rows = new double[nbRows][];
+				remaining -= nbRows;
+			}
+			else rows = new double[remaining][];
+			for (int j=0; j<rows.length; j++) rows[j] = a.getRow(i + j);
+			tasks.add(new ExtMatrixTask(rows));
+		}
+		// create a data provider to share matrix b among all tasks
+		DataProvider dataProvider = new MemoryMapDataProvider();
+		dataProvider.setValue(MatrixTask.DATA_KEY, b);
+		// submit the tasks for execution
+		List<JPPFTask> results = jppfClient.submit(tasks, dataProvider);
+		// initialize the resulting matrix
+		Matrix c = new Matrix(size);
+		// Get the matrix values from the tasks results
+		int rowIdx = 0;
+		long start2 = System.currentTimeMillis();
+		for (int i=0; i<results.size(); i++)
+		{
+			ExtMatrixTask matrixTask = (ExtMatrixTask) results.get(i);
+			double[][] rows = (double[][]) matrixTask.getResult();
+			for (int j=0; j<rows.length; j++)
+			{
+				for (int k=0; k<size; k++) c.setValueAt(rowIdx + j, k, rows[j][k]);
+			}
+			rowIdx += rows.length;
+		}
+		long elapsed2 = System.currentTimeMillis() - start2;
+		//output("results processing performed in "+StringUtils.toStringDuration(elapsed2));
+		return System.currentTimeMillis() - start;
+	}
+
+	/**
+	 * Perform the sequential multiplication of 2 squares matrices of equal sizes.
+	 * @param a the left-hand matrix.
+	 * @param b the right-hand matrix.
+	 */
+	private static void performSequentialMultiplication(Matrix a, Matrix b)
+	{
+		long start = System.currentTimeMillis();
+		int size = a.getSize();
+		Matrix c = new Matrix(size);
+		// iterate over the rows of a
+		for (int i=0; i<size; i++)
+		{
+			// iterate over the columns of b
+			for (int j=0; j<size; j++)
+			{
+				double val = 0d;
+				for (int k=0; k<size; k++) val += a.getValueAt(i, k) * b.getValueAt(k, j); 
+				c.setValueAt(i, j, val);
+			}
+		}
+		long elapsed = System.currentTimeMillis() - start;
+		output("Sequential computation performed in "+StringUtils.toStringDuration(elapsed));
 	}
 
 	/**

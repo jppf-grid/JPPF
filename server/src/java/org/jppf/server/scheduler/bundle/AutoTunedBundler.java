@@ -20,6 +20,8 @@
 package org.jppf.server.scheduler.bundle;
 
 import java.util.*;
+
+import org.apache.log4j.Logger;
 import org.jppf.server.*;
 
 /**
@@ -36,24 +38,22 @@ import org.jppf.server.*;
 public class AutoTunedBundler extends AbstractBundler
 {
 	/**
-	 * Count of the bundlers used to generate a readable unique id.
+	 * Log4j logger for this class.
 	 */
-	private static int bundlerCount = 0;
+	private static Logger log = Logger.getLogger(AutoTunedBundler.class);
 	/**
-	 * The bundler number for this bundler.
+	 * Determines whether debugging level is set for logging.
 	 */
-	protected int bundlerNumber = incBundlerCount();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The currrent bundle size.
 	 */
 	protected int currentSize;
-
 	/**
 	 * Used to compute a pseudo-random increment to the bundle size, as part of a Monte Carlo random walk
 	 * towards a good solution.
 	 */
 	protected Random rnd = new Random(System.currentTimeMillis());
-
 	/**
 	 * A map of performance samples, aorted by increasing bundle size.
 	 */
@@ -62,15 +62,6 @@ public class AutoTunedBundler extends AbstractBundler
 	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
 	 */
 	protected AutoTuneProfile profile;
-
-	/**
-	 * Increment the bundlers count by one.
-	 * @return the new count as an int value.
-	 */
-	private static synchronized int incBundlerCount()
-	{
-		return ++bundlerCount;
-	}
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
@@ -90,14 +81,14 @@ public class AutoTunedBundler extends AbstractBundler
 	 */
 	public AutoTunedBundler(AutoTuneProfile profile, boolean override)
 	{
-		LOG.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
+		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		this.override = override;
 		currentSize = JPPFStatsUpdater.getStaticBundleSize();
 		if (currentSize < 1)
 		{
 			currentSize = 1;
 		}
-		LOG.info("Bundler#" + bundlerNumber + ": The initial size is " + currentSize);
+		log.info("Bundler#" + bundlerNumber + ": The initial size is " + currentSize);
 		this.profile = profile;
 	}
 
@@ -128,9 +119,9 @@ public class AutoTunedBundler extends AbstractBundler
 	public void feedback(int bundleSize, double time)
 	{
 		assert bundleSize > 0;
-		if (DEBUG_ENABLED)
+		if (debugEnabled)
 		{
-			LOG.debug("Bundler#" + bundlerNumber + ": Got another sample with bundleSize="
+			log.debug("Bundler#" + bundlerNumber + ": Got another sample with bundleSize="
 				+ bundleSize + " and totalTime=" + time);
 		}
 
@@ -178,9 +169,9 @@ public class AutoTunedBundler extends AbstractBundler
 				currentSize = bestSize + diff;
 				if (samplesMap.get(currentSize) == null)
 				{
-					if (DEBUG_ENABLED)
+					if (debugEnabled)
 					{
-						LOG.debug("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + currentSize);
+						log.debug("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + currentSize);
 					}
 					return;
 				}
@@ -194,7 +185,7 @@ public class AutoTunedBundler extends AbstractBundler
 				samplesMap.clear();
 			}
 		}
-		LOG.info("Bundler#" + bundlerNumber + ": The bundle size converged to " + currentSize
+		log.info("Bundler#" + bundlerNumber + ": The bundle size converged to " + currentSize
 				+ " with the mean execution of " + stableMean);
 	}
 
@@ -215,6 +206,10 @@ public class AutoTunedBundler extends AbstractBundler
 				minorMean = sample.mean;
 			}
 		}
+		if (debugEnabled)
+		{
+			log.debug("Bundler#" + bundlerNumber + ": best size found = " + bestSize);
+		}
 		return bestSize;
 	}
 
@@ -227,22 +222,5 @@ public class AutoTunedBundler extends AbstractBundler
 	{
 		AutoTunedBundler b = new AutoTunedBundler(profile.copy());
 		return b;
-	}
-
-	/**
-	 * This is a utility class to be used to store the pair of mean and the
-	 * number of samples this mean is based on.
-	 */
-	private class BundlePerformanceSample
-	{
-		/**
-		 * Mean compute time for server to node round trip.
-		 */
-		public double mean;
-
-		/**
-		 * Number of samples used to compute the mean value.
-		 */
-		public long samples;
 	}
 }

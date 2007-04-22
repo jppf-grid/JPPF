@@ -129,9 +129,9 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 */
 	public int createDiff(int bestSize, int collectedSamples, Random rnd)
 	{
-		return rnd.nextInt(Math.max(Math.round(bestSize * (getSizeRatioDeviation()-1f)), 1));
-		//long max = rnd.nextInt(Math.max(Math.round(bestSize * getSizeRatioDeviation()), 1));
-		//return (int) expDist(max, collectedSamples);
+		double max = Math.max(Math.round(bestSize * (getSizeRatioDeviation()-1f)), 1);
+		if (max < 1d) return 1;
+		return rnd.nextInt((int) max) + 1;
 	}
 	
 	/**
