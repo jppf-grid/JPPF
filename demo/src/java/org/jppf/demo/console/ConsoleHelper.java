@@ -217,6 +217,7 @@ public final class ConsoleHelper
 	public ProcessWrapper startDriverProcess() throws Exception
 	{
 		Properties driverConfig = ProcessConfig.buildDriverConfig();
+		driverConfig.setProperty("task.bundle.size", "10");
 		driverConfig.setProperty("task.bundle.autotuned.strategy", "test");
 		driverConfig.setProperty("strategy.test.minSamplesToAnalyse", "100");
 		driverConfig.setProperty("strategy.test.minSamplesToCheckConvergence", "50");
