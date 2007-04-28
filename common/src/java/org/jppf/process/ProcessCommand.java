@@ -58,8 +58,8 @@ public class ProcessCommand
 		command.add("-cp");
 		// add "." to the classpath so the process can access the log4j configuration file
 		command.add("."+System.getProperty("path.separator")+System.getProperty("java.class.path"));
-		command.add("-D"+JPPFConfiguration.CONFIG_PROPERTY+"="+createTempFile(jppfConfig, null));
-		command.add("-Dlog4j.configuration="+createTempFile(log4jConfig, null));
+		command.add("-D"+JPPFConfiguration.CONFIG_PROPERTY+"="+createTempFile(jppfConfig, null)+"");
+		command.add("-Dlog4j.configuration="+createTempFile(log4jConfig, null)+"");
 		command.add("-server");
 		command.add("-Xmx" + maxMem + "m");
 		command.add(mainClass);
@@ -82,7 +82,7 @@ public class ProcessCommand
 	 * @param permissions list of permissions granted to the node.
 	 * @param log4jConfig the set of log4j configuration properties.
 	 * @param maxMem the maximum heap size for the process, in megabytes.
-	 * @return a <code>ProcessWrapper</code> instance encapsualting the started process.
+	 * @return a <code>ProcessWrapper</code> instance encapsulating the started process.
 	 * @throws Exception if the process failed to start.
 	 */
 	public static ProcessWrapper buildNodeProcess(String mainClass, Properties jppfConfig,
@@ -110,14 +110,14 @@ public class ProcessCommand
 	 */
 	public static String createTempFile(Properties props, String dir) throws Exception
 	{
-		File tempDir = new File("./temp");
-		tempDir.mkdir();
+		File tempDir = new File("./jppftemp");
+		if (!tempDir.exists()) tempDir.mkdirs();
 		File file = File.createTempFile("jppf-", ".properties", tempDir);
 		file.deleteOnExit();
 		OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
 		props.store(os, "JPPF generated temp file");
 		os.close();
-		return file.getPath().replaceAll("\\\\", "/");
+		return file.getPath();
 	}
 
 	/**
@@ -131,11 +131,11 @@ public class ProcessCommand
 	 */
 	public static String createTempFile(String prefix, String ext, String dir, String content) throws Exception
 	{
-		File tempDir = new File("./temp");
-		tempDir.mkdir();
+		File tempDir = new File("./jppftemp");
+		if (!tempDir.exists()) tempDir.mkdirs();
 		File file = File.createTempFile(prefix, "." + ext, tempDir);
 		file.deleteOnExit();
-		String filename = file.getPath().replaceAll("\\\\", "/");
+		String filename = file.getPath();
 		FileUtils.writeTextFile(filename, content);
 		return filename;
 	}
