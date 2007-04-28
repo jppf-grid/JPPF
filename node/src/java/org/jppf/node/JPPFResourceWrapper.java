@@ -84,6 +84,10 @@ public class JPPFResourceWrapper implements Serializable
 	 * The uuid sent by a node when it first contacts a resource provider.
 	 */
 	private String providerUuid = null;
+	/**
+	 * Determines whether the resource is to be loaded using <code>ClassLoader.getResource()</code>.
+	 */
+	private boolean asResource = false;
 
 	/**
 	 * Add a uuid to the uuid path of this resource wrapper. 
@@ -202,5 +206,23 @@ public class JPPFResourceWrapper implements Serializable
 	public void setProviderUuid(String providerUuid)
 	{
 		this.providerUuid = providerUuid;
+	}
+
+	/**
+	 * Determine whether the resource is to be loaded using <code>ClassLoader.getResource()</code>.
+	 * @return true if the resource is loaded using getResource(), false otherwise.
+	 */
+	public boolean isAsResource()
+	{
+		return asResource;
+	}
+
+	/**
+	 * Set whether the resource is to be loaded using <code>ClassLoader.getResource()</code>.
+	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
+	 */
+	public void setAsResource(boolean asResource)
+	{
+		this.asResource = asResource;
 	}
 }

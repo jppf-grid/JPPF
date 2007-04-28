@@ -166,13 +166,15 @@ public class ClassServerDelegate extends Thread
 					boolean found = true;
 					resource = (JPPFResourceWrapper) socketClient.receive();
 					String name = resource.getName();
-					if  (debugEnabled) log.debug("["+this.name+"] resource requested: " + name);
-					byte[] b = resourceProvider.getResourceAsBytes(name);
-					if (b == null)
+					if ("com/ibm/db2/jcc/DB2JccConfiguration.properties".equals(name))
 					{
-						//b = new byte[0];
-						found = false;
+						getClass();
 					}
+					if  (debugEnabled) log.debug("["+this.name+"] resource requested: " + name);
+					byte[] b = null;
+					if (resource.isAsResource()) b = resourceProvider.getResource(name);
+					else b = resourceProvider.getResourceAsBytes(name);
+					if (b == null) found = false;
 					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
 					//resource.setDefinition(b);
 					if (b != null) resource.setDefinition(CompressionUtils.zip(b, 0, b.length));

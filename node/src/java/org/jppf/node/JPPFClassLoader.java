@@ -20,6 +20,8 @@
 package org.jppf.node;
 
 import java.io.*;
+import java.net.URL;
+import java.security.*;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -246,7 +248,7 @@ public class JPPFClassLoader extends ClassLoader
 			if (debugEnabled) log.debug("looking up definition for resource [" + name + "]");
 			byte[] b = null;
 			String resName = name.replace('.', '/') + ".class";
-			b = loadResourceData(resName);
+			b = loadResourceData(resName, false);
 			if ((b == null) || (b.length == 0))
 			{
 				if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
@@ -264,16 +266,17 @@ public class JPPFClassLoader extends ClassLoader
 	/**
 	 * Load the specified class from a socket conenction.
 	 * @param name the binary name of the class to load, such as specified in the JLS.
+	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
 	 * @return an array of bye containing the class' byte code.
 	 * @throws ClassNotFoundException if the class could not be loaded from the remote server.
 	 */
-	private byte[] loadResourceData(String name) throws ClassNotFoundException
+	private byte[] loadResourceData(String name, boolean asResource) throws ClassNotFoundException
 	{
 		byte[] b = null;
 		try
 		{
 			if (debugEnabled) log.debug("loading remote definition for resource [" + name + "]");
-			b = loadResourceData0(name);
+			b = loadResourceData0(name, asResource);
 		}
 		catch(IOException e)
 		{
@@ -281,7 +284,7 @@ public class JPPFClassLoader extends ClassLoader
 			init();
 			try
 			{
-				b = loadResourceData0(name);
+				b = loadResourceData0(name, asResource);
 			}
 			catch(IOException ex)
 			{
@@ -293,11 +296,12 @@ public class JPPFClassLoader extends ClassLoader
 	/**
 	 * Load the specified class from a socket connection.
 	 * @param name the binary name of the class to load, such as specified in the JLS.
+	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
 	 * @return an array of bye containing the class' byte code.
 	 * @throws ClassNotFoundException if the class could not be loaded from the remote server.
 	 * @throws IOException if the connection was lost and could not be reestablished.
 	 */
-	private byte[] loadResourceData0(String name) throws ClassNotFoundException, IOException
+	private byte[] loadResourceData0(String name, boolean asResource) throws ClassNotFoundException, IOException
 	{
 		byte[] b = null;
 		try
@@ -311,6 +315,7 @@ public class JPPFClassLoader extends ClassLoader
 			resource.setUuidPath(list);
 			if (list.size() > 0) list.setPosition(uuidPath.size()-1);
 			resource.setName(name);
+			resource.setAsResource(asResource);
 			
 			socketClient.send(resource);
 			resource = (JPPFResourceWrapper) socketClient.receive();
@@ -337,6 +342,64 @@ public class JPPFClassLoader extends ClassLoader
 	}
 
 	/**
+	 * Finds the resource with the specified name.
+	 * @param name the name of the resource to find.
+	 * @return the URL of the resource.
+	 * @see java.lang.ClassLoader#getResource(java.lang.String)
+	 */
+	public URL getResource(String name)
+	{
+		URL url = null;
+		if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
+		try
+		{
+			final byte[] b = loadResourceData(name, true);
+			boolean found = (b != null) && (b.length > 0);
+			if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
+			if (found)
+			{
+				File file = (File) AccessController.doPrivileged(new PrivilegedAction<Object>()
+				{
+					public Object run()
+					{
+						File tmp = null;
+						try
+						{
+							tmp = File.createTempFile("jppftemp_", "tmp");
+							tmp.deleteOnExit();
+							BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(tmp));
+							bos.write(b);
+							bos.flush();
+							bos.close();
+						}
+						catch(Exception e)
+						{
+							log.error(e.getMessage(), e);
+						}
+						return tmp;
+					}
+				});
+				if (file != null)
+				{
+					try
+					{
+						url = file.toURL();
+					}
+					catch (Exception e)
+					{
+						log.error(e.getMessage(), e);
+					}
+				}
+			}
+		}
+		catch(ClassNotFoundException e)
+		{
+			if (debugEnabled) log.debug("resource [" + name + "] not found remotely");
+		}
+		return url;
+	}
+
+	/**
 	 * Get a stream from a resource file in the classpath of this class loader.
 	 * @param name name of the resource to obtain a stram from. 
 	 * @return an <code>InputStream</code> instance, or null if the resource was not found.
@@ -350,7 +413,7 @@ public class JPPFClassLoader extends ClassLoader
 			if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
 			try
 			{
-				byte[] b = loadResourceData(name);
+				byte[] b = loadResourceData(name, false);
 				boolean found = (b != null) && (b.length > 0);
 				if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
 				if (!found) return null;

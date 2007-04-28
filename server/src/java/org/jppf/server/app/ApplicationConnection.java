@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
 import org.jppf.security.*;
 import org.jppf.server.*;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
 
@@ -223,7 +223,7 @@ public class ApplicationConnection extends JPPFConnection
 		if (!localPwd.equals(remotePwd)) response = StringUtils.getLocalized(I18N_BASE, "invalid.password");
 		else
 		{
-			String command = (String) header.getParameter(COMMAND_PARAM);
+			BundleParameter command = (BundleParameter) header.getParameter(COMMAND_PARAM);
 			if (SHUTDOWN.equals(command) || SHUTDOWN_RESTART.equals(command))
 			{
 				long shutdownDelay = (Long) header.getParameter(SHUTDOWN_DELAY_PARAM);
