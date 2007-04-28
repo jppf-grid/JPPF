@@ -70,7 +70,7 @@ public abstract class JPPFTestTask extends JPPFTask
 				m.invoke(this, (Object[]) null);
 				report.description = "No exception was raised";
 			}
-			catch(Exception e)
+			catch(Throwable e)
 			{
 				Throwable t = e.getCause() == null ? e : e.getCause(); 
 				report.description = t.getMessage();
