@@ -31,7 +31,7 @@
 
 	<xs:complexType name="OptionElement">
 		<xs:choice>
-			<xs:element name="import" type="opt:Import" minOccurs="0"/>
+			<xs:element name="import" type="opt:Import" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:sequence>
 				<xs:element name="property" type="opt:Property" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="script" type="opt:Script" minOccurs="0" maxOccurs="unbounded"/>
