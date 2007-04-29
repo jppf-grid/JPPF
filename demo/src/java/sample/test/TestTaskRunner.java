@@ -325,7 +325,7 @@ public class TestTaskRunner
 	
 	/**
 	 * Return an exception stack trace as a string.
-	 * @param t the throwable toget the stack trace from.
+	 * @param t the throwable to get the stack trace from.
 	 * @return a string.
 	 */
 	static String getStackTrace(Throwable t)
