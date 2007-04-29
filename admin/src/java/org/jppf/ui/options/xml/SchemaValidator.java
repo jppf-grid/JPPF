@@ -56,10 +56,17 @@ public class SchemaValidator
 			List<String> docPaths = FileUtils.getFilePathList(args[1]);
 			for (String path: docPaths)
 			{
-				SchemaValidator validator = new SchemaValidator(new JPPFErrorReporter(path));
+				JPPFErrorReporter reporter = new JPPFErrorReporter(path);
+				SchemaValidator validator = new SchemaValidator(reporter);
 				boolean b = validator.validate(path, args[0]);
 				String s = "the document " + path;
 				System.out.println(s + (b ? " is valid." : " has errors."));
+				if (!b)
+				{
+					System.out.println("fatal errors: " + reporter.allFatalErrorsAsStrings());
+					System.out.println("errors      : " + reporter.allErrorsAsStrings());
+					System.out.println("warnings    : " + reporter.allWarningsAsStrings());
+				}
 			}
 		}
 		catch(Exception e)
