@@ -100,6 +100,17 @@
 		</parallel>
 	</target>
 
+	<target name="demo.console">
+		<echo message="starting the JPPF Demonstration Console"/>
+		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="gui.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+			<arg value="org/jppf/demo/console/xml/JPPFDemoConsole.xml"/>
+			<arg value="file"/>
+		</java>       
+	</target>
+
 	<target name="run.demo1">
 		<parallel>
 			<antcall target="run.driver"/>
