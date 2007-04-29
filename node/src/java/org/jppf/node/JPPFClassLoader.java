@@ -214,21 +214,34 @@ public class JPPFClassLoader extends ClassLoader
 	 * @throws ClassNotFoundException if the class could not be found.
 	 * @see java.lang.ClassLoader#loadClass(java.lang.String)
 	 */
-	/*
-	public Class<?> loadClass(String name) throws ClassNotFoundException
-	{
-		Class c = null;
-		try
-		{
-			c = super.loadClass(name);
-			//c = super.findClass(name);
-		}
-		catch(ClassNotFoundException e)
-		{
-		}
+  /*
+	public synchronized Class<?> loadClass(String name) throws ClassNotFoundException
+  {
+		// First, check if the class has already been loaded
+		Class c = findLoadedClass(name);
+		ClassLoader parent = getParent();
 		if (c == null)
 		{
-			c = findClass(name);
+			try
+			{
+				if (parent != null)
+				{
+					c = parent.loadClass(name);
+				}
+				else
+				{
+					c = findBootstrapClass0(name);
+				}
+			}
+			catch (ClassNotFoundException e)
+			{
+				// If still not found, then invoke findClass in order to find the class.
+				c = findClass(name);
+			}
+		}
+		if (resolve)
+		{
+			resolveClass(c);
 		}
 		return c;
 	}
