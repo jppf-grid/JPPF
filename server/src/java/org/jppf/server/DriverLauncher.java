@@ -24,6 +24,8 @@ import java.net.*;
 import java.util.*;
 
 import org.apache.log4j.Logger;
+import org.jppf.process.ProcessWrapper;
+import org.jppf.process.event.*;
 import org.jppf.utils.*;
 
 /**
@@ -81,6 +83,18 @@ public class DriverLauncher
 			while (!end)
 			{
 				process = buildProcess();
+				ProcessWrapper wrapper = new ProcessWrapper(process);
+				wrapper.addProcessWrapperEventListener(new ProcessWrapperEventListener()
+				{
+					public void errorStreamAltered(ProcessWrapperEvent event)
+					{
+						System.err.println(event.getContent());
+					}
+					public void outputStreamAltered(ProcessWrapperEvent event)
+					{
+						System.out.println(event.getContent());
+					}
+				});
 				if (debugEnabled) log.debug("started driver process [" + process + "]");
 				int n = process.waitFor();
 				String s = getOutput(process, "std").trim();

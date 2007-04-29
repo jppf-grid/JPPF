@@ -48,6 +48,7 @@ public class ProcessWrapper
 	 * List of listeners to this wrapper's output and error stream events.
 	 */
 	private List<ProcessWrapperEventListener> listeners = new ArrayList<ProcessWrapperEventListener>();
+
 	/**
 	 * Initialize this process handler with the specified process. 
 	 * @param process the process to handle.
@@ -165,7 +166,7 @@ public class ProcessWrapper
 					s = reader.readLine();
 					if (s != null)
 					{
-						System.out.println(s);
+						//System.out.println(s);
 						sb.append(s).append("\n");
 						fireStreamEvent(output, s);
 					}
