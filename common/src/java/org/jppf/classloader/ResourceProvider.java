@@ -95,6 +95,24 @@ public class ResourceProvider
 				log.error(e.getMessage(), e);
 			}
 		}
+		else
+		{
+			InputStream is = null;
+			try
+			{
+				File file = new File(resName);
+				if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
+				if (is != null)
+				{
+					log.debug("resource [" + resName + "] found");
+					return getInputStreamAsByte(is);
+				}
+			}
+			catch (Exception e)
+			{
+				log.error(e.getMessage(), e);
+			}
+		}
 		log.debug("resource [" + resName + "] not found");
 		return null;
 	}
