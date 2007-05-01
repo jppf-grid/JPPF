@@ -104,3 +104,4 @@ permission java.net.SocketPermission "127.0.0.1:1024-", "accept,connect,listen,r
 //permission java.util.PropertyPermission "was.*", "read";
 //permission java.util.PropertyPermission "client.logsRedirected", "read";
 //permission java.util.PropertyPermission "disableLogs", "read";
+permission java.util.PropertyPermission "db2.*", "read";

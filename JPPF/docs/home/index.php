@@ -39,7 +39,7 @@
 							<!--<td class="menu"><a href="JPPF-Overview.html">Overview</a></td>-->
 							<td class="menu"><a href="presentation.php?current=0">Overview</a></td>
 							<td class="menu"><a href="http://sourceforge.net/project/showfiles.php?group_id=135654">Download</a></td>
-							<td class="menu"><a href="./wiki">Wiki &amp; Doc</a></td>
+							<td class="menu"><a href="./wiki">Documentation</a></td>
 							<td class="menu"><a href="./forums">Forums</a></td>
 							<td class="menu"><a href="screenshots.html">Screenshots</a></td >
 							<td class="menu"><a href="api/index.html">API Doc</a></td >
@@ -59,8 +59,8 @@
 					<table class="left_" cellspacing="0" cellpadding="5" width="100%">
 						<tr><td class="leftTopBottom_">
 							<h3>Project Description</h3>
-							Java Parallel Processing Framework is a computational grid framework for Java, focused on performance and ease of use.
-							It provides a set of extensible and customizable tools and APIs to facilitate the parallelization of CPU intensive applications, and distribute their execution over a network of heterogenous nodes.
+								JPPF is a grid toolkit for Java that makes it easy to run applications in parallel, and speed up their execution by orders of magnitude.
+								Write once, deploy once, execute everywhere!
 						</td></tr>
 						<tr><td class="bottom_">
 							<h4>Features</h4>
@@ -77,7 +77,7 @@
 							</ul>
 						</td></tr>
 						<tr><td class="bottom_">
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.25.0 - beta</span></h4>
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.26.0 - beta</span></h4>
 						</td></tr>
 						<tr><td class="bottom_">
 							<h3>New: JPPF is looking for developers!</h3>

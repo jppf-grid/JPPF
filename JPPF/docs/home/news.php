@@ -39,7 +39,7 @@
 							<!--<td class="menu"><a href="JPPF-Overview.html">Overview</a></td>-->
 							<td class="menu"><a href="presentation.php?current=0">Overview</a></td>
 							<td class="menu"><a href="http://sourceforge.net/project/showfiles.php?group_id=135654">Download</a></td>
-							<td class="menu"><a href="./wiki">Wiki &amp; Doc</a></td>
+							<td class="menu"><a href="./wiki">Documentation</a></td>
 							<td class="menu"><a href="./forums">Forums</a></td>
 							<td class="menu"><a href="screenshots.html">Screenshots</a></td >
 							<td class="menu"><a href="api/index.html">API Doc</a></td >
