@@ -170,10 +170,14 @@ public class JPPFClientConnection
 		{
 			initHelper();
 			delegate = new ClassServerDelegate(this, appUuid, host, classServerPort);
+			delegate.init();
 			initCredentials();
-			delegate.start();
-			initConnection();
-			setStatus(ACTIVE);
+			if (!delegate.isClosed())
+			{
+				delegate.start();
+				initConnection();
+				setStatus(ACTIVE);
+			}
 		}
 		catch(Exception e)
 		{
@@ -513,9 +517,9 @@ public class JPPFClientConnection
 			isShutdown = true;
 			try
 			{
-				socketInitializer.close();
-				socketClient.close();
-				delegate.close();
+				if (socketInitializer != null) socketInitializer.close();
+				if (socketClient != null) socketClient.close();
+				if (delegate != null) delegate.close();
 			}
 			catch(IOException e)
 			{

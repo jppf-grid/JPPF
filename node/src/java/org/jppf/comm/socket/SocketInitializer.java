@@ -22,6 +22,8 @@ package org.jppf.comm.socket;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.locks.*;
+
+import org.apache.log4j.Logger;
 import org.jppf.JPPFError;
 import org.jppf.utils.*;
 
@@ -33,6 +35,14 @@ import org.jppf.utils.*;
  */
 public class SocketInitializer
 {
+	/**
+	 * Log4j logger for this class.
+	 */
+	private static Logger log = Logger.getLogger(SocketInitializer.class);
+	/**
+	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 */
+	private boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Date after which this task stop trying to connect the class loader.
 	 */
@@ -65,6 +75,14 @@ public class SocketInitializer
 	 * The timer that periodically attempts the connection to the server.
 	 */
 	private Timer timer = null;
+	/**
+	 * Determine whether this socket initializer has been intentionally closed. 
+	 */
+	private boolean closed = false;
+	/**
+	 * Name given to this initializer.
+	 */
+	public String name = "";
 
 	/**
 	 * Instantiate this SocketInitializer with a specified socket wrapper.
@@ -88,6 +106,7 @@ public class SocketInitializer
 		{
 			try
 			{
+				if (debugEnabled) log.debug(name + "about to close socket wrapper");
 				socketWrapper.close();
 			}
 			catch(IOException e)
@@ -110,14 +129,20 @@ public class SocketInitializer
 			}
 			catch(InterruptedException e)
 			{
-				System.err.println(errMsg);
-				throw new JPPFError(fatalErrMsg, e);
+				if (debugEnabled) log.debug(name + e.getMessage(), e);
+				if (!closed)
+				{
+					System.err.println(name + errMsg);
+					if (debugEnabled) log.debug(name + errMsg);
+					throw new JPPFError(name + fatalErrMsg, e);
+				}
 			}
 			timer.cancel();
 			timer.purge();
-			if (!isSuccessfull())
+			if (!isSuccessfull() && !closed)
 			{
-				System.err.println(errMsg);
+				if (debugEnabled) log.debug(name + errMsg);
+				System.err.println(name + errMsg);
 				//throw new JPPFError(fatalErrMsg);
 			}
 		}
@@ -132,10 +157,16 @@ public class SocketInitializer
 	 */
 	public void close()
 	{
-		if (timer != null)
+		if (!closed)
 		{
-			timer.cancel();
-			timer.purge();
+			if (debugEnabled) log.debug(name + "closing socket initializer");
+			closed = true;
+			if (timer != null)
+			{
+				if (debugEnabled) log.debug(name + "timer not null");
+				timer.cancel();
+				timer.purge();
+			}
 		}
 	}
 
@@ -197,5 +228,14 @@ public class SocketInitializer
 	public boolean isSuccessfull()
 	{
 		return successfull;
+	}
+
+	/**
+	 * Determine whether this socket initializer has been intentionally closed. 
+	 * @return true if this socket initializer has been intentionally closed, false otherwise.
+	 */
+	public boolean isClosed()
+	{
+		return closed;
 	}
 }

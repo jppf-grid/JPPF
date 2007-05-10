@@ -83,7 +83,7 @@ public class ClassServerDelegate extends Thread
 	/**
 	 * Configuration name for this local client.
 	 */
-	private String name = null;
+	String name = null;
 
 	/**
 	 * Default instantiation of this class is not permitted.
@@ -107,7 +107,6 @@ public class ClassServerDelegate extends Thread
 		this.port = port;
 		this.owner = owner;
 		this.name = owner.name;
-		init();
 	}
 
 	/**
@@ -118,16 +117,20 @@ public class ClassServerDelegate extends Thread
 	{
 		try
 		{
+			socketInitializer.name = "[" + name + " - delegate] ";
 			owner.setStatus(JPPFClientConnectionStatus.CONNECTING);
 			if (socketClient == null) initSocketClient();
 			System.out.println("[client: "+name+"] ClassServerDelegate.init(): Attempting connection to the class server");
 			socketInitializer.initializeSocket(socketClient);
-			if (!socketInitializer.isSuccessfull())
+			if (!socketInitializer.isSuccessfull() && !socketInitializer.isClosed())
 			{
 				throw new JPPFException("["+name+"] Could not reconnect to the class server");
 			}
-			System.out.println("[client: "+name+"] ClassServerDelegate.init(): Reconnected to the class server");
-			//owner.setStatus(JPPFClientConnectionStatus.ACTIVE);
+			if (!socketInitializer.isClosed())
+			{
+				System.out.println("[client: "+name+"] ClassServerDelegate.init(): Reconnected to the class server");
+				//owner.setStatus(JPPFClientConnectionStatus.ACTIVE);
+			}
 		}
 		catch(Exception e)
 		{
@@ -188,25 +191,19 @@ public class ClassServerDelegate extends Thread
 				}
 				catch(Exception e)
 				{
-					log.warn("["+name+"] caught " + e + ", will re-initialise ...", e);
-					init();
+					if (!closed)
+					{
+						log.warn("["+name+"] caught " + e + ", will re-initialise ...", e);
+						init();
+					}
 				}
 			}
 		}
 		catch (Exception e)
 		{
 			log.error("["+name+"] "+e.getMessage(), e);
-			setClosed();
+			close();
 		}
-	}
-
-	/**
-	 * Set the stop flag to true, indicating that this socket handler should be closed as
-	 * soon as possible.
-	 */
-	private void setStopped()
-	{
-		stop = true;
 	}
 
 	/**
@@ -224,7 +221,6 @@ public class ClassServerDelegate extends Thread
 	 */
 	public void setClosed()
 	{
-		setStopped();
 		close();
 	}
 
@@ -233,14 +229,20 @@ public class ClassServerDelegate extends Thread
 	 */
 	public void close()
 	{
-		try
+		if (!closed)
 		{
-			socketClient.close();
+			closed = true;
+			stop = true;
+
+			try
+			{
+				socketInitializer.close();
+				socketClient.close();
+			}
+			catch (Exception e)
+			{
+				log.error("["+name+"] "+e.getMessage(), e);
+			}
 		}
-		catch (Exception e)
-		{
-			log.error("["+name+"] "+e.getMessage(), e);
-		}
-		closed = true;
 	}
 }
