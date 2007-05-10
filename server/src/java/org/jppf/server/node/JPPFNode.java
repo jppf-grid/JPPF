@@ -155,13 +155,13 @@ public class JPPFNode extends AbstractMonitoredNode
 			{
 				//if (debugEnabled) log.debug("End of node secondary loop");
 				if (debugEnabled) log.debug("node["+socketClient.getSocket().getLocalPort()+"] executing "+taskList.size()+" tasks");
-				List<Future> futureList = new ArrayList<Future>(taskList.size());
+				List<Future<?>> futureList = new ArrayList<Future<?>>(taskList.size());
 				for (JPPFTask task : taskList)
 				{
 					NodeTaskWrapper taskWrapper = new NodeTaskWrapper(this, task, bundle.getUuidPath().getList());
 					futureList.add(threadPool.submit(taskWrapper));
 				}
-				for (Future future : futureList) future.get();
+				for (Future<?> future : futureList) future.get();
 			}
 			writeResults(bundle, taskList);
 			if (notEmpty)
@@ -367,7 +367,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	private void initHelper() throws Exception
 	{
 		if (debugEnabled) log.debug("Initializing serializer");
-		Class c = getClassLoader().loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
+		Class<?> c = getClassLoader().loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
 		Object o = c.newInstance();
 		serializer = (ObjectSerializer) o;
 		c = getClassLoader().loadJPPFClass("org.jppf.utils.SerializationHelperImpl");

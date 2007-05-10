@@ -189,7 +189,7 @@ public class JPPFClassLoader extends ClassLoader
 	public synchronized Class<?> loadJPPFClass(String name) throws ClassNotFoundException
 	{
 		if (debugEnabled) log.debug("looking up resource [" + name + "]");
-		Class c = findLoadedClass(name);
+		Class<?> c = findLoadedClass(name);
 		if (c == null)
 		{
 			ClassLoader parent = getParent();
