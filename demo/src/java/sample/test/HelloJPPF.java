@@ -88,7 +88,7 @@ public class HelloJPPF implements Serializable
 			List<JPPFTask> results = client.submit(tasks, null);
 			// show results
 			System.out.println("Got " + results.size() + " results: ");
-			Iterator it = results.iterator();
+			Iterator<JPPFTask> it = results.iterator();
 			while (it.hasNext())
 			{
 				JPPFTask t = (JPPFTask) it.next();

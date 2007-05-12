@@ -58,7 +58,7 @@ public abstract class JPPFTestTask extends JPPFTask
 	 */
 	protected void runTestMethods()
 	{
-		Class thisClass = getClass();
+		Class<?> thisClass = getClass();
 		Method[] methods = thisClass.getMethods();
 		for (Method m: methods)
 		{
@@ -104,7 +104,7 @@ public abstract class JPPFTestTask extends JPPFTask
 		int mod = m.getModifiers();
 		if (Modifier.isStatic(mod) || !Modifier.isPublic(mod)) return false;
 		if (!Void.TYPE.equals(m.getReturnType())) return false;
-		Class[] paramTypes = m.getParameterTypes();
+		Class<?>[] paramTypes = m.getParameterTypes();
 		if ((paramTypes != null) && (paramTypes.length > 0)) return false;
 		return true;
 	}
