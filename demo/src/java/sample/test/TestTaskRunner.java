@@ -64,6 +64,7 @@ public class TestTaskRunner
 			performClassNotFoundTaskTest();
 			performInnerTask();
 			performDB2LoadingTaskTest();
+			performXMLParsingTaskTest();
 			System.exit(0);
 		}
 		catch(Exception e)
@@ -320,6 +321,40 @@ public class TestTaskRunner
 		finally
 		{
 			System.out.println("DB2 Loading tasks testing complete.");
+		}
+	}
+	
+	/**
+	 * Check that correct results are returned by the framework.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void performXMLParsingTaskTest() throws JPPFException
+	{
+		System.out.println(banner);
+		System.out.println("Starting XML parsing task testing...");
+		try
+		{
+			int n = 1;
+			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+			for (int i=0; i<n; i++) tasks.add(new ParserTask("build.xml"));
+			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			JPPFTask resultTask = results.get(0);
+			if (resultTask.getException() != null)
+			{
+				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
+			}
+			else
+			{
+				System.out.println("Result is: "+resultTask.getResult());
+			}
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e);
+		}
+		finally
+		{
+			System.out.println("XML parsing task testing complete.");
 		}
 	}
 	
