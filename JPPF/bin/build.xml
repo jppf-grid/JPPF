@@ -139,6 +139,11 @@
 			<src path="${path}/src/java"/>
 	    <src path="${path}/src/resources"/>
 		</javac>
+		<copy todir="${path}/classes">
+			<fileset dir="${path}/src/resources">
+				<exclude name="**/package.html"/>
+			</fileset>
+		</copy>
   </target>
 
 	<!-- ========================================================================= -->
