@@ -130,6 +130,4 @@ public abstract class JPPFTask implements Runnable, Serializable
 	public void setPosition(int position) {
 		this.position = position;
 	}
-	
-	
 }
