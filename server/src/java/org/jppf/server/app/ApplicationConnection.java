@@ -210,7 +210,7 @@ public class ApplicationConnection extends JPPFConnection
 	 */
 	private void performAdminOperation(JPPFTaskBundle header) throws Exception
 	{
-		String response = StringUtils.getLocalized(I18N_BASE, "request.executed");
+		String response = LocalizationUtils.getLocalized(I18N_BASE, "request.executed");
 		byte[] b = (byte[]) header.getParameter(KEY_PARAM);
 		b = CryptoUtils.decrypt(b);
 		SecretKey tmpKey = CryptoUtils.getSecretKeyFromEncoded(b);
@@ -220,7 +220,7 @@ public class ApplicationConnection extends JPPFConnection
 		b = pm.readPassword();
 		String localPwd = new String(CryptoUtils.decrypt(b));
 
-		if (!localPwd.equals(remotePwd)) response = StringUtils.getLocalized(I18N_BASE, "invalid.password");
+		if (!localPwd.equals(remotePwd)) response = LocalizationUtils.getLocalized(I18N_BASE, "invalid.password");
 		else
 		{
 			BundleParameter command = (BundleParameter) header.getParameter(COMMAND_PARAM);
@@ -229,7 +229,7 @@ public class ApplicationConnection extends JPPFConnection
 				long shutdownDelay = (Long) header.getParameter(SHUTDOWN_DELAY_PARAM);
 				boolean restart = !SHUTDOWN.equals(command);
 				long restartDelay = (Long) header.getParameter(RESTART_DELAY_PARAM);
-				sendAdminResponse(header, StringUtils.getLocalized(I18N_BASE, "request.acknowledged"));
+				sendAdminResponse(header, LocalizationUtils.getLocalized(I18N_BASE, "request.acknowledged"));
 				JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay, restart, restartDelay);
 				return;
 			}
@@ -262,7 +262,7 @@ public class ApplicationConnection extends JPPFConnection
 		boolean manual =
 			"manual".equalsIgnoreCase((String) request.getParameter(BUNDLE_TUNING_TYPE_PARAM));
 		if (manual) JPPFStatsUpdater.setStaticBundleSize((Integer) request.getParameter(BUNDLE_SIZE_PARAM));
-		response = StringUtils.getLocalized(I18N_BASE, manual ? "manual.settings.changed" : "automatic.settings.changed");
+		response = LocalizationUtils.getLocalized(I18N_BASE, (manual ? "manual" : "automatic") + ".settings.changed");
 		return response;
 	}
 

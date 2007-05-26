@@ -166,10 +166,10 @@ public class OptionsPageBuilder
 	public void initCommonAttributes(AbstractOptionElement elt, OptionDescriptor desc)
 	{
 		elt.setName(desc.name);
-		elt.setLabel(StringUtils.getLocalized(baseName, desc.name+".label", desc.getProperty("label")));
+		elt.setLabel(LocalizationUtils.getLocalized(baseName, desc.name+".label", desc.getProperty("label")));
 		String s = desc.getProperty("orientation", "horizontal");
 		elt.setOrientation("horizontal".equalsIgnoreCase(s) ? OptionsPage.HORIZONTAL : OptionsPage.VERTICAL);
-		elt.setToolTipText(StringUtils.getLocalized(baseName, desc.name+".tooltip", desc.getProperty("tooltip")));
+		elt.setToolTipText(LocalizationUtils.getLocalized(baseName, desc.name+".tooltip", desc.getProperty("tooltip")));
 		elt.setScrollable(desc.getBoolean("scrollable", false));
 		elt.setBordered(desc.getBoolean("bordered", false));
 		elt.setWidth(desc.getInt("width", -1));

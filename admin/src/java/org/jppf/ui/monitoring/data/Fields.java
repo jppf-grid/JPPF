@@ -19,7 +19,7 @@
  */
 package org.jppf.ui.monitoring.data;
 
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.LocalizationUtils;
 
 /**
  * 
@@ -154,7 +154,7 @@ public enum Fields
 	 */
 	private Fields()
 	{
-		localName = StringUtils.getLocalized(BASE, name());
+		localName = LocalizationUtils.getLocalized(BASE, name());
 	}
 
 	/**

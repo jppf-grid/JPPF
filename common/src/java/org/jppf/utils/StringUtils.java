@@ -19,11 +19,9 @@
  */
 package org.jppf.utils;
 
-import java.io.File;
 import java.net.Socket;
 import java.nio.channels.SocketChannel;
 import java.util.*;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -32,10 +30,6 @@ import org.apache.log4j.Logger;
  */
 public final class StringUtils
 {
-	/**
-	 * Log4j logger for this class.
-	 */
-	private static Logger log = Logger.getLogger(StringUtils.class);
 	/**
 	 * Keywords to look for and replace in the legend items of the charts.
 	 */
@@ -183,71 +177,6 @@ public final class StringUtils
 			if (key.indexOf(KEYWORDS[i]) >= 0) key = key.replace(KEYWORDS[i], REPLACEMENTS[i]);
 		}
 		return key;
-	}
-
-	/**
-	 * COmpute a localisation base path from a base folder and a file name.
-	 * @param base the base folder path as a string.
-	 * @param filename the filename from which to get the resource bundle name.
-	 * @return the complete path to a resource bundle.
-	 */
-	public static String getLocalisationBase(String base, String filename)
-	{
-		String result = null;
-		try
-		{
-			File file = new File(filename);
-			result = file.getName();
-			int idx = result.lastIndexOf(".xml");
-			if (idx >= 0) result = result.substring(0, idx);
-			result = base + "/" + result;
-		}
-		catch (Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		return result;
-	}
-
-	/**
-	 * Get a localized property value.
-	 * @param baseName the base name to use, in combination with the default locale,
-	 * to lookup the appropriate resource bundle.
-	 * @param key the key for the localized value to lookup.
-	 * @return the name localized through the default locale information, or the key itself if
-	 * it could not be localized.
-	 * @see java.util.ResourceBundle
-	 */
-	public static String getLocalized(String baseName, String key)
-	{
-		return getLocalized(baseName, key, key);
-	}
-
-	/**
-	 * Get a localized property value.
-	 * @param baseName the base name to use, in combination with the default locale,
-	 * to lookup the appropriate resource bundle.
-	 * @param key the key for the localized value to lookup.
-	 * @param def the default value to return if no localized string could be found.
-	 * @return the name localized through the default locale information, or the key itself if
-	 * it could not be localized.
-	 * @see java.util.ResourceBundle
-	 */
-	public static String getLocalized(String baseName, String key, String def)
-	{
-		if (baseName == null) return def;
-		String result = null;
-		try
-		{
-			ResourceBundle bundle = ResourceBundle.getBundle(baseName);
-			result = bundle.getString(key);
-		}
-		catch (Exception e)
-		{
-			log.error(e.getMessage());
-			if (log.isDebugEnabled()) log.debug(e);
-		}
-		return result == null ? def : result;
 	}
 
 	/**

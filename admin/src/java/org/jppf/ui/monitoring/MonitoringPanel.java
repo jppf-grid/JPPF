@@ -22,14 +22,16 @@ package org.jppf.ui.monitoring;
 import java.awt.Dimension;
 import java.awt.event.*;
 import java.util.*;
+
 import javax.swing.*;
 import javax.swing.table.*;
+
 import org.apache.log4j.Logger;
 import org.jppf.server.JPPFStats;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.utils.GuiUtils;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.LocalizationUtils;
 import org.jvnet.substance.SubstanceDefaultTableCellRenderer;
 
 /**
@@ -68,15 +70,15 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		add(Box.createVerticalStrut(5));
 		add(makeRefreshPanel());
 		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(EXECUTION_PROPS, StringUtils.getLocalized(BASE, "ExecutionTable.label")));
+		add(makeTablePanel(EXECUTION_PROPS, LocalizationUtils.getLocalized(BASE, "ExecutionTable.label")));
 		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(NODE_EXECUTION_PROPS, StringUtils.getLocalized(BASE, "NodeExecutionTable.label")));
+		add(makeTablePanel(NODE_EXECUTION_PROPS, LocalizationUtils.getLocalized(BASE, "NodeExecutionTable.label")));
 		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(TRANSPORT_PROPS, StringUtils.getLocalized(BASE, "NetworkOverheadTable.label")));
+		add(makeTablePanel(TRANSPORT_PROPS, LocalizationUtils.getLocalized(BASE, "NetworkOverheadTable.label")));
 		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(QUEUE_PROPS, StringUtils.getLocalized(BASE, "QueueTable.label")));
+		add(makeTablePanel(QUEUE_PROPS, LocalizationUtils.getLocalized(BASE, "QueueTable.label")));
 		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(CONNECTION_PROPS, StringUtils.getLocalized(BASE, "ConnectionsTable.label")));
+		add(makeTablePanel(CONNECTION_PROPS, LocalizationUtils.getLocalized(BASE, "ConnectionsTable.label")));
 		add(Box.createVerticalGlue());
 	}
 	
@@ -104,8 +106,8 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	 */
 	private JComponent makeRefreshPanel()
 	{
-		JButton btn = new JButton(StringUtils.getLocalized(BASE, "RefreshBtn.label"));
-		String s = StringUtils.getLocalized(BASE, "RefreshBtn.tooltip");
+		JButton btn = new JButton(LocalizationUtils.getLocalized(BASE, "RefreshBtn.label"));
+		String s = LocalizationUtils.getLocalized(BASE, "RefreshBtn.tooltip");
 		if (s != null) btn.setToolTipText(s);
 		btn.addActionListener(new ActionListener()
 		{
