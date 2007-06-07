@@ -151,12 +151,12 @@
 							result = true;
 							if ((newPwd == null) || "".equals(newPwd))
 							{
-								msg = StringUtils.getLocalized(BASE, "empty.pwd.msg");
+								msg = LocalizationUtils.getLocalized(BASE, "empty.pwd.msg");
 								result = false;
 							}
 							else if (!newPwd.equals(confirmPwd))
 							{
-								msg = StringUtils.getLocalized(BASE, "pwd.match.err.msg");
+								msg = LocalizationUtils.getLocalized(BASE, "pwd.match.err.msg");
 								result = false;
 							}
 							if (!result) option.findFirstWithName("/msgText").setValue(msg);

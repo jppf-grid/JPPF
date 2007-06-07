@@ -61,10 +61,10 @@
 			builder.createInitialCharts();
 			var monitor = new MonitoringPanel();
 			var BASE = "org.jppf.ui.i18n.StatsPage";
-			comp.insertTab(StringUtils.getLocalized(BASE, "StatsPage.label"), null, new JScrollPane(monitor),
-				StringUtils.getLocalized(BASE, "StatsPage.tooltip"), 0);
-			comp.insertTab(StringUtils.getLocalized(BASE, "ChartsPage.label"), null, builder.getTabbedPane(), 
-				StringUtils.getLocalized(BASE, "ChartsPage.tooltip"), 1);
+			comp.insertTab(LocalizationUtils.getLocalized(BASE, "StatsPage.label"), null, new JScrollPane(monitor),
+				LocalizationUtils.getLocalized(BASE, "StatsPage.tooltip"), 0);
+			comp.insertTab(LocalizationUtils.getLocalized(BASE, "ChartsPage.label"), null, builder.getTabbedPane(), 
+				LocalizationUtils.getLocalized(BASE, "ChartsPage.tooltip"), 1);
 			comp.setSelectedIndex(0);
 			var ccPage = OptionsHandler.getPage("ChartsConfiguration");
 			ccPage.getInitializer().valueChanged(new ValueChangeEvent(ccPage));
