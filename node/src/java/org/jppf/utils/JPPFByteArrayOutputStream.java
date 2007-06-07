@@ -53,6 +53,6 @@ public class JPPFByteArrayOutputStream extends ByteArrayOutputStream
 	 */
 	public synchronized byte[] toByteArray()
 	{
-		return buf;
+		return buf.length == count ? buf : super.toByteArray();
 	}
 }
