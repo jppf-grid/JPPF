@@ -21,11 +21,12 @@ package sample.test;
 
 import java.io.*;
 import java.util.*;
+
 import org.apache.log4j.Logger;
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFClient;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.CompositeDataProvider;
+import org.jppf.task.storage.*;
 import org.jppf.utils.StringUtils;
 
 /**
@@ -56,6 +57,8 @@ public class TestTaskRunner
 		try
 		{
 			jppfClient = new JPPFClient();
+			/*
+			*/
 			performEmptyTaskListTest();
 			performExceptionTest();
 			performURLTest();
@@ -65,6 +68,7 @@ public class TestTaskRunner
 			performInnerTask();
 			performDB2LoadingTaskTest();
 			performXMLParsingTaskTest();
+			performMyTaskTest();
 			System.exit(0);
 		}
 		catch(Exception e)
@@ -355,6 +359,41 @@ public class TestTaskRunner
 		finally
 		{
 			System.out.println("XML parsing task testing complete.");
+		}
+	}
+	
+	/**
+	 * Check that correct results are returned by the framework.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void performMyTaskTest() throws JPPFException
+	{
+		System.out.println(banner);
+		System.out.println("Starting my task testing...");
+		try
+		{
+			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+			tasks.add(new MyTask());
+			DataProvider dataProvider = new MemoryMapDataProvider();
+			dataProvider.setValue("DATA", new SimpleData("Data and more data"));			
+			List<JPPFTask> results = jppfClient.submit(tasks, dataProvider);
+			JPPFTask resultTask = results.get(0);
+			if (resultTask.getException() != null)
+			{
+				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
+			}
+			else
+			{
+				System.out.println("Result is: "+resultTask.getResult());
+			}
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e);
+		}
+		finally
+		{
+			System.out.println("My task testing complete.");
 		}
 	}
 	
