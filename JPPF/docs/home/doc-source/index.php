@@ -4,16 +4,16 @@
 	<body>
 		<div align="center">
 		$template{name="jppf-header"}$
-		<table border="0" cellspacing="0" cellpadding="0" width="80%">
+		<table border="0" cellspacing="20" cellpadding="0" width="80%">
 			<tr>
 				<td width="50%" valign="top" rowspan="2">
-					<table class="left_" cellspacing="0" cellpadding="5" width="100%">
-						<tr><td class="leftTopBottom_">
+					<table class="noborder_" cellspacing="0" cellpadding="5" width="100%">
+						<tr><td class="noborder_">
 							<h3>Project Description</h3>
 								JPPF is a grid toolkit for Java that makes it easy to run applications in parallel, and speed up their execution by orders of magnitude.
 								Write once, deploy once, execute everywhere!
 						</td></tr>
-						<tr><td class="bottom_">
+						<tr><td class="noborder_">
 							<h4>Features</h4>
 							<ul>
 								<li>an easy to use <b>API</b> to submit tasks for execution in parallel</li>
@@ -27,25 +27,26 @@
 								<li>runs on any platform supporting Java 2 Platform Standard Edition 5.0 (J2SE 1.5) or later</li>
 							</ul>
 						</td></tr>
-						<tr><td class="bottom_">
+						<tr><td class="noborder_">
 							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.26.0 - beta</span></h4>
 						</td></tr>
-						<tr><td class="bottom_">
+						<tr><td class="noborder_">
 							<h3>New: JPPF is looking for developers!</h3>
 							If you're interested, please take a look at the <a href="http://sourceforge.net/people/viewjob.php?group_id=135654&job_id=25512">
 							announcement</a> posted on <b>SF.net</b><br><br>
 						</td></tr>
-						<tr><td class="bottom_">
+						<tr><td class="noborder_">
 							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the GNU Lesser General Public License (LGPL).
 							A copy of the licensing terms can be obtained <a href="http://www.opensource.org/licenses/lgpl-license.php"><b>here</b></a>.</span></h4>
 						</td></tr>
+
 					</table>
 				</td>
 
 				<td width="50%" valign="top">
-					<table class="leftRight_" cellspacing="0" cellpadding="5" width="100%">
+					<table class="noborder_" cellspacing="0" cellpadding="5" width="100%">
 
-						<tr><td class="bottom_">
+						<tr><td class="noborder_">
 						<?php
 							$link = mysql_connect('mysql4-j', 'j135654admin', 'Faz600er')
 								 or die('Could not connect: ' . mysql_error());
@@ -64,7 +65,7 @@
 						?>
 						</td></tr>
 
-						<tr><td class="bottom_">
+						<tr><td class="noborder_">
 							<h3>JPPF articles on the Web</h3>
 							<table align="center">
 								<tr><td>
@@ -89,7 +90,7 @@
 								</td></tr>
 							</table>
 						</td></tr>
-						<tr><td class="bottom_">
+						<tr><td class="noborder_">
 							<h3>Feedback Wanted: <span style="color: #000060">help making JPPF a better open source product</span></h3>
 							Suggestions, bug reports, criticism and ideas are most welcome. We will do our best to answer promptly.<br>
 							<a href="./forums" target=_top>Discussion forums are available here</a><br>

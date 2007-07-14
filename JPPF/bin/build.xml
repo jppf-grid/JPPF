@@ -30,6 +30,7 @@
 	<property name="node" value="${basedir}/../node"/>	
 	<property name="server" value="${basedir}/../server"/>	
 	<property name="demo" value="${basedir}/../demo"/>	
+	<property name="jca-client" value="${basedir}/../jca-client"/>	
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${build.properties.file}"/>
@@ -263,6 +264,7 @@
   	<unjar src="${build}/${ant.project.name}-common.jar" dest="${build}/jar"/>
   	<unjar src="${build}/${ant.project.name}-server.jar" dest="${build}/jar"/>
   	<unjar src="${lib}/log4j/log4j-1.2.9.jar" dest="${build}/jar"/>
+  	<unjar src="${lib}/ApacheCommons/commons-logging-1.1.jar" dest="${build}/jar"/>
   	<unjar src="${lib}/ApacheCommons/commons-io-1.2.jar" dest="${build}/jar"/>
     <jar jarfile="${runtime.driver}/lib/jppf-driver.jar">
 			<fileset dir="${build}/jar"/>
@@ -284,6 +286,7 @@
 			</fileset>
 			<fileset dir="${lib}/ApacheCommons">
 				<include name="commons-io*.jar"/>
+				<include name="commons-logging*.jar"/>
 			</fileset>
 		</copy>
 		<antcall target="runtime.driver.common"/>
@@ -316,6 +319,7 @@
 		<mkdir dir="${build}/jar" />
   	<unjar src="${build}/${ant.project.name}-common-node.jar" dest="${build}/jar"/>
   	<unjar src="${lib}/log4j/log4j-1.2.9.jar" dest="${build}/jar"/>
+  	<unjar src="${lib}/ApacheCommons/commons-logging-1.1.jar" dest="${build}/jar"/>
     <jar jarfile="${runtime.node}/lib/jppf-node.jar">
 			<fileset dir="${build}/jar"/>
 		</jar>
@@ -328,6 +332,9 @@
 		<copy todir="${runtime.node}/lib">
 			<fileset dir="${build}">
 				<include name="${ant.project.name}-common-node.jar"/>
+			</fileset>
+			<fileset dir="${lib}/ApacheCommons">
+				<include name="commons-logging*.jar"/>
 			</fileset>
 			<fileset dir="${lib}/log4j">
 				<include name="*.*"/>
@@ -409,6 +416,7 @@
 			<packageset dir="${server}/src/java"/>
 			<packageset dir="${admin}/src/java"/>
 			<packageset dir="${demo}/src/java"/>
+			<packageset dir="${jca-client}/src"/>
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
 			<doctitle><![CDATA[Java Parallel Processing Framework v${version.number}]]></doctitle>
 			<header>

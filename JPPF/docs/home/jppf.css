@@ -41,6 +41,7 @@ body { font-size=10pt; background: url("images/bkg.gif"); background-repeat: rep
 .noBorderTable_ { background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
 .table2_ { border-right: 2px solid #8080FF; border-top: 2px solid #8080FF; border-bottom: 2px solid #8080FF; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
 
+.noborder_        { border: 0px }
 .border_          { border: 2px solid #8080FF }
 .left_            { border-left: 2px solid #8080FF }
 .right_           { border-right: 2px solid #8080FF }
