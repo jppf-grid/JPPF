@@ -1,4 +1,8 @@
 /*
+ * Java Parallel Processing Framework.
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
