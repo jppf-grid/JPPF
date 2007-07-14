@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<weblogic-connector xmlns="http://www.bea.com/ns/weblogic/90"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.bea.com/ns/weblogic/90
+                    http://www.bea.com/ns/weblogic/90/weblogic-ra.xsd">
+
+	<jndi-name>eis/JPPFResourceAdapter</jndi-name>
+
+	<work-manager>
+		<name>JPPFWorkManager</name>
+		<ignore-stuck-threads>true</ignore-stuck-threads>
+	</work-manager>
+
+	<outbound-resource-adapter>
+		<default-connection-properties>
+			<logging>
+				<log-filename>jppf-jca.log</log-filename>
+				<logging-enabled>true</logging-enabled>
+			</logging>
+		</default-connection-properties>
+
+		<connection-definition-group>
+			<connection-factory-interface>javax.resource.cci.ConnectionFactory</connection-factory-interface>
+			<connection-instance>
+				<jndi-name>eis/JPPFConnectionFactory</jndi-name>
+			</connection-instance>
+		</connection-definition-group>
+	</outbound-resource-adapter>
+
+</weblogic-connector>

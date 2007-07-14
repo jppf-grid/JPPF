@@ -1,0 +1,325 @@
+<!--
+	Java Parallel Processing Framework.
+  Copyright (C) 2005-2007 JPPF Team.
+  http://www.jppf.org
+
+	This library is free software; you can redistribute it and/or modify it
+	under the terms of the GNU Lesser General Public License as published by the
+	Free Software Foundation; either version 2.1 of the License, or (at your
+	option) any later version.
+
+	This library is distributed in the hope that it will be useful, but WITHOUT
+	ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+	FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+	for more details.
+
+	You should have received a copy of the GNU Lesser General Public License
+	along with this library; if not, write to the Free Software Foundation,
+	Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+-->
+
+<project name="jca-client" default="build" basedir=".">
+
+	<!-- ========================================================================= -->
+	<!--                          Property definitions                             -->
+	<!-- ========================================================================= -->
+
+	<property name="build.properties.file" value="${basedir}/build.properties"/>
+  <property file="${build.properties.file}"/>
+	<property name="jppf.lib.dir"    value="${basedir}/../jppf/build"/>
+	<property name="lib.dir"         value="${basedir}/lib"/>
+	<property name="config.dir"      value="${basedir}/config"/>
+	<property name="classes.dir"     value="${basedir}/classes"/>	
+	<property name="src.dir"         value="${basedir}/src"/>
+	<property name="build.dir"       value="${basedir}/build"/>
+	<property name="meta.inf.dir"    value="${basedir}/appserver"/>
+	<property name="ejb.client.jar"  value="${build.dir}/JPPFServer-Client.jar"/>
+	<property name="j2ee.jar"		     value="${lib.dir}/javaee.jar"/>
+	<property name="was61"           value="WAS-6.1"/>
+	<property name="jboss40"         value="JBoss-4.0"/>
+	<property name="oracle10"        value="Oracle-10"/>
+	<property name="sunas90"         value="SunAS-9.0"/>
+	<property name="weblogic92"      value="Weblogic-9.2"/>
+	<property name="ear.prefix"      value="JPPF_J2EE_Demo"/>
+
+	<!-- ========================================================================= -->
+	<!--                           Classpath definitions                           -->
+	<!-- ========================================================================= -->
+
+	<path id="client.classpath">
+		<pathelement location="${config.dir}"/>
+		<pathelement location="${classes.dir}"/>
+		<pathelement location="${ejb.client.jar}"/>
+		<fileset dir="${lib.dir}">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${jppf.lib.dir}">
+			<include name="jppf-common-node.jar"/>
+			<include name="jppf-common.jar"/>
+			<include name="jppf-server.jar"/>
+			<include name="jppf-client.jar"/>
+			<include name="log4j-1.2.9.jar"/>
+		</fileset>
+	</path>
+
+	<path id="project.classpath">
+		<pathelement location="${classes.dir}"/>
+		<pathelement location="${config.dir}"/>
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<path refid="client.classpath"/>
+	</path>
+
+	<!-- ========================================================================= -->
+	<!--                                    Clean                                  -->
+	<!-- ========================================================================= -->
+
+  <target name="clean">
+    <delete dir="${classes.dir}" quiet="true"/>
+    <delete dir="${build.dir}" quiet="true"/>
+  </target>               
+
+	<!-- ========================================================================= -->
+	<!--                                    Init                                   -->
+	<!-- ========================================================================= -->
+
+	<target name="init" depends="clean" description="Initialize ressources">
+ 		<mkdir dir="${classes.dir}"/>
+ 		<mkdir dir="${build.dir}"/>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                         Build everything                                  -->
+	<!-- ========================================================================= -->
+
+	<target name="build" depends="ear.all,rar.all"/>
+
+	<!-- ========================================================================= -->
+	<!--                         Compile the application                           -->
+	<!-- ========================================================================= -->
+
+	<target name="compile" depends="init">
+		<echo message="compiling the project..."/>
+		<javac srcdir="" destdir="${classes.dir}"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+			<src path="${src.dir}/java"/>
+		</javac>
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}/java">
+				<exclude name="**/*.java"/>
+			</fileset>
+			<fileset dir="${src.dir}/resources">
+				<exclude name="**/*.java"/>
+			</fileset>
+		</copy>
+  </target>
+
+	<target name="build.util.jar" depends="compile">
+		<echo message="Building the utility jar file ..."/>
+		<delete dir="${build.dir}/lib" quiet="true"/>
+ 		<mkdir dir="${build.dir}/lib"/>
+    <jar jarfile="${build.dir}/lib/jppf-jca.jar">
+			<fileset dir="${classes.dir}"/>
+		</jar>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                     Generate the EAR files                                -->
+	<!-- ========================================================================= -->
+
+  <target name="ear.all" depends="compile,build.util.jar" description="generate the ear files">
+		<echo message="creating the EAR files..."/>
+		<antcall target="ear">
+			<param name="appserver" value="${jboss40}"/>
+			<param name="include.client.classes" value="false"/>
+		</antcall>
+		<antcall target="ear">
+			<param name="appserver" value="${sunas90}"/>
+			<param name="include.client.classes" value="true"/>
+		</antcall>
+		<antcall target="ear">
+			<param name="appserver" value="${was61}"/>
+			<param name="include.client.classes" value="false"/>
+		</antcall>
+		<antcall target="ear">
+			<param name="appserver" value="${weblogic92}"/>
+			<param name="include.client.classes" value="false"/>
+		</antcall>
+		<antcall target="ear">
+			<param name="appserver" value="${oracle10}"/>
+			<param name="include.client.classes" value="false"/>
+		</antcall>
+		<echo message="EAR files created"/>
+	</target>
+
+	<target name="ear">
+		<echo message="creating the EAR file for ${appserver} ..."/>
+    <delete dir="${build.dir}/${appserver}" quiet="true"/>
+ 		<mkdir dir="${build.dir}/${appserver}"/>
+ 		<mkdir dir="${build.dir}/${appserver}/application"/>
+		<copy todir="${build.dir}/${appserver}">
+			<fileset dir="${meta.inf.dir}/${appserver}">
+				<include name="**/*.*"/>
+			</fileset>
+			<fileset dir="${meta.inf.dir}" includes="*.xml"/>
+		</copy>
+
+		<condition property="noclient.classes">
+			<isfalse value="${include.client.classes}"/>
+		</condition>
+
+		<antcall target="ear.noclient.classes"/>
+		<antcall target="ear.client.classes"/>
+
+    <delete dir="${build.dir}/${appserver}" quiet="true"/>
+	</target>
+
+	<!-- Build the WAR and EAR, wihtout any client classes in the application -->
+	<target name="ear.noclient.classes" if="noclient.classes">
+    <war warfile="${build.dir}/${appserver}/jppftest.war" webxml="${meta.inf.dir}/${appserver}/WEB-INF/web.xml">
+			<zipfileset dir="${meta.inf.dir}/${appserver}/WEB-INF" excludes="web.xml" prefix="WEB-INF"/>
+			<zipfileset dir="${meta.inf.dir}/${appserver}/docroot" includes="*.*"/>
+    </war>
+
+		<ear destfile="${build.dir}/${ear.prefix}_${appserver}.ear" appxml="${build.dir}/${appserver}/application.xml">
+			<fileset dir="${build.dir}/${appserver}" includes="jppftest.war"/>
+		</ear>
+	</target>
+
+	<!-- Build the WAR and EAR, including the client classes in the application -->
+	<target name="ear.client.classes" unless="noclient.classes">
+    <war warfile="${build.dir}/${appserver}/jppftest.war" webxml="${meta.inf.dir}/${appserver}/WEB-INF/web.xml"
+    	manifest="${basedir}/docroot/META-INF/manifest.mf">
+			<zipfileset dir="${meta.inf.dir}/${appserver}/WEB-INF" excludes="web.xml" prefix="WEB-INF"/>
+			<zipfileset dir="${meta.inf.dir}/${appserver}/docroot" includes="*.*"/>
+    </war>
+
+		<ear destfile="${build.dir}/${ear.prefix}_${appserver}.ear" appxml="${build.dir}/${appserver}/application.xml">
+			<fileset dir="${build.dir}/${appserver}" includes="jppftest.war"/>
+			<zipfileset dir="${build.dir}/lib" prefix="lib"/>
+			<zipfileset dir="${jppf.lib.dir}" prefix="lib">
+				<include name="jppf-common-node.jar"/>
+				<include name="jppf-common.jar"/>
+				<include name="jppf-client.jar"/>
+			</zipfileset>
+		</ear>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                     Generate the RAR files                                -->
+	<!-- ========================================================================= -->
+
+  <target name="rar.all" depends="compile" description="generate the ear files">
+		<echo message="creating the RAR files..."/>
+		<antcall target="rar"><param name="appserver" value="${jboss40}"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${sunas90}"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${was61}"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${weblogic92}"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${oracle10}"/></antcall>
+		<echo message="RAR files created"/>
+	</target>
+
+	<target name="rar">
+		<echo message="creating the RAR file for ${appserver} ..."/>
+    <delete dir="${build.dir}/${appserver}" quiet="true"/>
+ 		<mkdir dir="${build.dir}/${appserver}"/>
+		<copy todir="${build.dir}/${appserver}">
+			<fileset dir="${meta.inf.dir}/${appserver}">
+				<include name="*.*"/>
+			</fileset>
+			<fileset dir="${meta.inf.dir}" includes="ra.xml"/>
+		</copy>
+ 		<mkdir dir="${build.dir}/${appserver}/ra"/>
+		<copy todir="${build.dir}/${appserver}/ra">
+			<fileset dir="${meta.inf.dir}/${appserver}/ra">
+				<include name="*.*"/>
+			</fileset>
+			<fileset dir="${meta.inf.dir}" includes="ra.xml"/>
+		</copy>
+
+		<jar destfile="${build.dir}/jppf_ra_${appserver}.rar" index="true">
+			<zipfileset dir="${build.dir}/${appserver}">
+				<include name="*.*"/>
+				<exclude name="ra.xml"/>
+			</zipfileset>
+			<zipfileset dir="${build.dir}/${appserver}/ra" prefix="META-INF">
+				<include name="*.*"/>
+			</zipfileset>
+			<zipfileset dir="${build.dir}/lib"/>
+			<zipfileset dir="${jppf.lib.dir}">
+				<include name="jppf-common-node.jar"/>
+				<include name="jppf-common.jar"/>
+				<include name="jppf-client.jar"/>
+			</zipfileset>
+			<zipfileset dir="${lib.dir}">
+				<include name="commons-logging-1.1.jar"/>
+				<include name="jppf-common.jar"/>
+				<include name="jppf-client.jar"/>
+			</zipfileset>
+		</jar>
+    <delete dir="${build.dir}/${appserver}" quiet="true"/>
+	</target>
+	
+	<target name="deploy.rar.jboss">
+		<copy todir="C:/Tools/jboss-4.0.2/server/default/deploy" file="${build.dir}/jppf_ra_${jboss40}.rar"/>
+	</target>
+
+	<target name="deploy.ear.jboss">
+		<copy todir="C:/Tools/jboss-4.0.2/server/default/deploy" file="${build.dir}/${ear.prefix}_${jboss40}.ear"/>
+	</target>
+
+	<!--
+	<target name="replace.log">
+		<replace dir="${basedir}/.." token="import org.apache.log4j.Logger;" value="import org.apache.commons.logging.*;">
+		  <include name="**/*.java"/>
+		</replace>
+		<replace dir="${basedir}/.." token="Logger log = Logger.getLogger" value="Log log = LogFactory.getLog">
+		  <include name="**/*.java"/>
+		</replace>
+	</target>
+	-->
+	<target name="replace.headers">
+		<replace dir="${basedir}/.." summary="true">
+			<include name="**/ResilientBundler.java"/>
+
+			<replacetoken>
+<![CDATA[
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+]]>
+		  </replacetoken>
+
+			<replacevalue>
+<![CDATA[
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+]]>
+		  </replacevalue>
+
+		</replace>
+	</target>
+</project> 
+
