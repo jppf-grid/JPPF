@@ -1,36 +1,24 @@
 /*
- * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
- * http://www.jppf.org
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation; either version 2.1 of the License, or (at your
- * option) any later version.
+ * 	 http://www.apache.org/licenses/LICENSE-2.0
  *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.*;
-
-import java.util.*;
+import java.util.Map;
 import java.util.concurrent.*;
 
-import org.apache.log4j.Logger;
-import org.jppf.JPPFError;
-import org.jppf.client.event.*;
-import org.jppf.security.JPPFSecurityContext;
+import org.apache.commons.logging.*;
 import org.jppf.server.JPPFStats;
-import org.jppf.server.protocol.*;
-import org.jppf.task.storage.DataProvider;
+import org.jppf.server.protocol.BundleParameter;
 import org.jppf.utils.*;
 
 /**
@@ -41,12 +29,12 @@ import org.jppf.utils.*;
  * the uuid has changed or not.
  * @author Laurent Cohen
  */
-public class JPPFClient implements ClientConnectionStatusListener
+public class JPPFClient extends AbstractJPPFClient
 {
 	/**
 	 * Log4j logger for this class.
 	 */
-	private static Logger log = Logger.getLogger(JPPFClient.class);
+	private static Log log = LogFactory.getLog(JPPFClient.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */
@@ -55,33 +43,14 @@ public class JPPFClient implements ClientConnectionStatusListener
 	 * The pool of threads used for submitting execution requests.
 	 */
 	private ExecutorService executor = null;
-	/**
-	 * Security credentials associated with the application.
-	 */
-	JPPFSecurityContext credentials = null;
-	/**
-	 * Total count of the tasks submitted by this client.
-	 */
-	private int totalTaskCount = 0;
-	/**
-	 * Contains all the connections pools in ascending priority order.
-	 */
-	private TreeMap<Integer, ClientPool> pools = new TreeMap<Integer, ClientPool>(new DescendingIntegerComparator());
-	/**
-	 * Unique universal identifier for this JPPF client.
-	 */
-	private String uuid = null;
-	/**
-	 * A list of all the connections initially created. 
-	 */
-	private List<JPPFClientConnection> allConnections = new ArrayList<JPPFClientConnection>();
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
 	 */
 	public JPPFClient()
 	{
-		this(new JPPFUuid().toString());
+		super();
+		initPools();
 	}
 
 	/**
@@ -90,7 +59,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 	 */
 	public JPPFClient(String uuid)
 	{
-		this.uuid = uuid;
+		super(uuid);
 		initPools();
 	}
 
@@ -100,6 +69,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 	 */
 	public void initPools()
 	{
+		System.out.println("in initPool()");
 		try
 		{
 			TypedProperties props = JPPFConfiguration.getProperties();
@@ -123,7 +93,7 @@ public class JPPFClient implements ClientConnectionStatusListener
 				int driverPort = props.getInt(prefix + "app.server.port", 11112);
 				int classServerPort = props.getInt(prefix + "class.server.port", 11111);
 				int priority = props.getInt(prefix + "priority", 0);
-				JPPFClientConnection c = new JPPFClientConnection(uuid, name, host, driverPort, classServerPort, priority);
+				JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, name, host, driverPort, classServerPort, priority);
 				c.addClientConnectionStatusListener(this);
 				ClientPool pool = pools.get(priority);
 				if (pool == null)
@@ -156,120 +126,14 @@ public class JPPFClient implements ClientConnectionStatusListener
 	}
 
 	/**
-	 * Get all the client connections handled by this JPPFClient. 
-	 * @return a list of <code>JPPFClientConnection</code> instances.
-	 */
-	public List<JPPFClientConnection> getAllConnections()
-	{
-		return allConnections;
-	}
-
-	/**
-	 * Get an available connection with the highest possible priority.
-	 * @return a <code>JPPFClientConnection</code> with the highest possible priority.
-	 */
-	private JPPFClientConnection getClientConnection()
-	{
-		JPPFClientConnection client = null;
-		while ((client == null) && !pools.isEmpty())
-		{
-			Iterator<Integer> poolIterator = pools.keySet().iterator();
-			while (poolIterator.hasNext())
-			{
-				int priority = poolIterator.next();
-				ClientPool pool = pools.get(priority);
-				int size = pool.clientList.size();
-				int count = 0;
-				while (count < size)
-				{
-					JPPFClientConnection c = pool.nextClient();
-					if (ACTIVE.equals(c.getStatus()))
-					{
-						client = c;
-						break;
-					}
-					else if (FAILED.equals(c.getStatus()))
-					{
-						pool.clientList.remove(c);
-						size--;
-						if (pool.lastUsedIndex >= size) pool.lastUsedIndex--;
-						if (pool.clientList.isEmpty())
-						{
-							poolIterator.remove();
-						}
-					}
-					else if (CONNECTING.equals(c.getStatus()))
-					{
-						// nothing to do, just continue to the next connection or next pool
-						// with a lower priority.
-					}
-					count++;
-				}
-			}
-			if (pools.isEmpty())
-			{
-				throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
-			}
-		}
-		if (debugEnabled) log.debug("found client connection \"" + client + "\"");
-		return client;
-	}
-
-	/**
-	 * Initialize this client's security credentials.
-	 * @throws Exception if an error is raised during initialization.
-	 */
-	public void initCredentials() throws Exception
-	{
-	}
-
-	/**
-	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @return the list of executed tasks with their results.
-	 * @throws Exception if an error occurs while sending the request.
-	 */
-	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
-	{
-		JPPFResultCollector collector = new JPPFResultCollector(taskList.size());
-		List<JPPFTask> result = null;
-		while ((result == null) && !pools.isEmpty())
-		{
-			try
-			{
-				getClientConnection().submit(taskList, dataProvider, collector);
-				result = collector.waitForResults();
-			}
-			catch(Exception e)
-			{
-				if (pools.isEmpty()) throw e;
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param listener listener to notify whenever a set of results have been received.
-	 * @throws Exception if an error occurs while sending the request.
-	 */
-	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
-		throws Exception
-	{
-		getClientConnection().submit(taskList, dataProvider, listener);
-	}
-
-	/**
 	 * Send a request to get the statistics collected by the JPPF server.
 	 * @return a <code>JPPFStats</code> instance.
 	 * @throws Exception if an error occurred while trying to get the server statistics.
 	 */
 	public JPPFStats requestStatistics() throws Exception
 	{
-		return getClientConnection().requestStatistics();
+		JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) getClientConnection(); 
+		return conn.requestStatistics();
 	}
 
 	/**
@@ -284,117 +148,17 @@ public class JPPFClient implements ClientConnectionStatusListener
 	public String submitAdminRequest(String password, String newPassword, BundleParameter command, Map<BundleParameter, Object> parameters)
 			throws Exception
 	{
-		return getClientConnection().submitAdminRequest(password, newPassword, command, parameters);
+		JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) getClientConnection(); 
+		return conn.submitAdminRequest(password, newPassword, command, parameters);
 	}
 
 	/**
-	 * Invoked the status of a client connection has changed.
-	 * @param event the event to notify of.
-	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+	 * Close this client and release all the resources it is using.
 	 */
-	public void statusChanged(ClientConnectionStatusEvent event)
+	public void close()
 	{
-		JPPFClientConnection c = event.getJPPFClientConnection();
-		if (c.getStatus().equals(JPPFClientConnectionStatus.FAILED))
-		{
-			log.info("Connection [" + c.name + "] failed");
-			c.removeClientConnectionStatusListener(this);
-			int priority = c.getPriority();
-			ClientPool pool = pools.get(priority);
-			if (pool != null)
-			{
-				pool.clientList.remove(c);
-				if (pool.clientList.isEmpty())
-				{
-					pools.remove(priority);
-				}
-				if (pools.isEmpty())
-				{
-					throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
-				}
-			}
-			List<ClientExecution> toResubmit = c.close();
-			int taskCount = 0;
-			int execCount = toResubmit.size();
-			for (ClientExecution exec: toResubmit)
-			{
-				if (exec.tasks != null) taskCount += exec.tasks.size();
-			}
-			if (taskCount > 0)
-			{
-				log.info("Connection [" + c.name + "] : resubmitting " +
-					taskCount + "tasks for " + execCount + " executions");
-			}
-			if (c != null)
-			{
-				try
-				{
-					for (ClientExecution execution: toResubmit)
-					{
-						if (execution.isBlocking)
-						{
-							submit(execution.tasks, execution.dataProvider);
-						}
-						else
-						{
-							submitNonBlocking(execution.tasks, execution.dataProvider, execution.listener);
-						}
-					}
-				}
-				catch(Exception e)
-				{
-					log.error(e.getMessage(), e);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Instances of this class manage a list of client connections with the same priority.
-	 */
-	private class ClientPool
-	{
-		/**
-		 * The priority associated with this client pool.
-		 */
-		public int priority = 0;
-		/**
-		 * Index of the last used client in the pool.
-		 */
-		public int lastUsedIndex = 0;
-		/**
-		 * List of <code>JPPFClientConnection</code> instances with the same priority.
-		 */
-		public List<JPPFClientConnection> clientList = new ArrayList<JPPFClientConnection>();
-
-		/**
-		 * Get the next client connection.
-		 * @return a <code>JPPFClientConnection</code> instances.
-		 */
-		public JPPFClientConnection nextClient()
-		{
-			lastUsedIndex = ++lastUsedIndex % clientList.size();
-			return clientList.get(lastUsedIndex);
-		}
-	}
-
-	/**
-	 * This comparator defines a decending value order for integers.
-	 */
-	private class DescendingIntegerComparator implements Comparator<Integer>
-	{
-		/**
-		 * Compare two integers.
-		 * @param o1 first integer to compare.
-		 * @param o2 second integrto compare.
-		 * @return -1 if o1 > o2, 0 if o1 == o2, 1 if o1 < o2
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
-		public int compare(Integer o1, Integer o2)
-		{
-			return o2 - o1; 
-			//return o1.compareTo(o2);
-		}
+		super.close();
+		if (executor != null) executor.shutdownNow();
 	}
 
 	/**
@@ -424,25 +188,5 @@ public class JPPFClient implements ClientConnectionStatusListener
 			if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
 			c.init();
 		}
-	}
-
-	/**
-	 * Close this client and release all the resources it is using.
-	 */
-	public void close()
-	{
-		List<JPPFClientConnection> list = getAllConnections();
-		for (JPPFClientConnection c: list)
-		{
-			try
-			{
-				c.close();
-			}
-			catch(Exception e)
-			{
-				log.error(e.getMessage(), e);
-			}
-		}
-		if (executor != null) executor.shutdownNow();
 	}
 }

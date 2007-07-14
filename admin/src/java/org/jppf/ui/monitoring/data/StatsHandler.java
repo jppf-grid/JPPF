@@ -1,21 +1,15 @@
 /*
- * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
- * http://www.jppf.org
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation; either version 2.1 of the License, or (at your
- * option) any later version.
+ * 	 http://www.apache.org/licenses/LICENSE-2.0
  *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.jppf.ui.monitoring.data;
 
@@ -24,7 +18,7 @@ import static org.jppf.server.protocol.BundleParameter.*;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.*;
@@ -40,7 +34,7 @@ public final class StatsHandler implements StatsConstants
 	/**
 	 * Log4j logger for this class.
 	 */
-	private static Logger log = Logger.getLogger(StatsHandler.class);
+	private static Log log = LogFactory.getLog(StatsHandler.class);
 	/**
 	 * Singleton instance of this class.
 	 */
@@ -52,7 +46,7 @@ public final class StatsHandler implements StatsConstants
 	/**
 	 * The current client connection for which statistics and charts are displayed.
 	 */
-	private JPPFClientConnection currentConnection = null;
+	private JPPFClientConnectionImpl currentConnection = null;
 	/**
 	 * The object holding the current statistics values.
 	 */
@@ -128,7 +122,7 @@ public final class StatsHandler implements StatsConstants
 		timer = new Timer("Update Timer");
 		for (JPPFClientConnection c: getJppfClient().getAllConnections())
 		{
-			TimerTask task = new StatsRefreshTask(c);
+			TimerTask task = new StatsRefreshTask((JPPFClientConnectionImpl) c);
 			timer.schedule(task, 1000L, refreshInterval);
 		}
 	}
@@ -163,7 +157,7 @@ public final class StatsHandler implements StatsConstants
 	 * Request an update from the server.
 	 * @param c the client connection to request the data from.
 	 */
-	public void requestUpdate(JPPFClientConnection c)
+	public void requestUpdate(JPPFClientConnectionImpl c)
 	{
 		try
 		{
@@ -476,7 +470,7 @@ public final class StatsHandler implements StatsConstants
 	 * Set the current client connection for which statistics and charts are displayed.
 	 * @param connection a <code>JPPFClientConnection</code> instance.
 	 */
-	public void setCurrentConnection(JPPFClientConnection connection)
+	public void setCurrentConnection(JPPFClientConnectionImpl connection)
 	{
 		if ((connection != null) && !connection.getName().equals(currentConnection.getName()))
 		{
@@ -499,7 +493,7 @@ public final class StatsHandler implements StatsConstants
 			jppfClient = new JPPFClient();
 			List<JPPFClientConnection> list = jppfClient.getAllConnections();
 			for (JPPFClientConnection c: list) dataHolderMap.put(c.getName(), new ConnectionDataHolder());
-			if (!list.isEmpty()) currentConnection = list.get(0);
+			if (!list.isEmpty()) currentConnection = (JPPFClientConnectionImpl) list.get(0);
 		}
 		return jppfClient;
 	}

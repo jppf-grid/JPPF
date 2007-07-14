@@ -50,6 +50,7 @@ permission java.io.FilePermission "${user.dir}/jppf-node2.log", "read,write,dele
 permission java.io.FilePermission "${user.dir}/config/log4j-node.properties", "read";
 permission java.io.FilePermission "${user.dir}/config/log4j-node1.properties", "read";
 permission java.io.FilePermission "${user.dir}/config/log4j-node2.properties", "read";
+permission java.io.FilePermission "C:/jdk1.5.0/jre/lib/xerces.properties", "read";
 
 //------------------------------------------------------------------------------//
 // Property permissions.                                                        //
@@ -57,7 +58,7 @@ permission java.io.FilePermission "${user.dir}/config/log4j-node2.properties", "
 //------------------------------------------------------------------------------//
 
 permission java.util.PropertyPermission "log4j.*", "read";
-permission java.util.PropertyPermission "java.version", "read";
+permission java.util.PropertyPermission "java.*", "read";
 permission java.util.PropertyPermission "line.separator", "read";
 permission java.util.PropertyPermission "os.name", "read";
 
