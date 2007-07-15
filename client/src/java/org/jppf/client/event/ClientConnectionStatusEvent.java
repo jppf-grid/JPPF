@@ -32,7 +32,7 @@ public class ClientConnectionStatusEvent extends EventObject
 	 * Initialize this event with a client connection as source.
 	 * @param source the event source.
 	 */
-	public ClientConnectionStatusEvent(JPPFClientConnection source)
+	public ClientConnectionStatusEvent(Object source)
 	{
 		super(source);
 	}
@@ -43,6 +43,17 @@ public class ClientConnectionStatusEvent extends EventObject
 	 */
 	public JPPFClientConnection getJPPFClientConnection()
 	{
-		return (JPPFClientConnection) getSource();
+		if (getSource() instanceof JPPFClientConnection) return (JPPFClientConnection) getSource();
+		return null;
+	}
+
+	/**
+	 * Get the source of this event.
+	 * @return the event as a <code>JPPFClientConnection</code> instance.
+	 */
+	public ClassServerDelegate getClassServerDelegate()
+	{
+		if (getSource() instanceof ClassServerDelegate) return (ClassServerDelegate) getSource();
+		return null;
 	}
 }

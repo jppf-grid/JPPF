@@ -282,7 +282,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	protected void initHelper() throws Exception
 	{
-		helper = new SerializationHelperImpl();
+		if (helper == null) helper = new SerializationHelperImpl();
 	}
 
 	/**

@@ -100,8 +100,9 @@ public class JcaResultProcessor implements Runnable
 				}
 				catch(Exception e)
 				{
-					log.error("["+connection.getName()+"] "+e.getMessage(), e);
-					connection.initConnection();
+					if (debugEnabled) log.debug("["+connection.getName()+"] "+e.getMessage(), e);
+					connection.setStatus(JPPFClientConnectionStatus.DISCONNECTED);
+					//connection.initConnection();
 				}
 			}
 		}

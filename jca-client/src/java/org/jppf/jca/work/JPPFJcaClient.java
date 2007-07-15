@@ -17,9 +17,9 @@
  */
 package org.jppf.jca.work;
 
-import java.util.*;
+import static org.jppf.client.JPPFClientConnectionStatus.*;
 
-import javax.resource.spi.work.Work;
+import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
@@ -63,7 +63,7 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	/**
 	 * Initial list of connections to initialize.
 	 */
-	private List<Work> initialWorkList = new ArrayList<Work>();
+	private List<TimerTask> initialWorkList = new ArrayList<TimerTask>();
 	/**
 	 * The unique class server delegate for all connections.
 	 */
@@ -104,7 +104,7 @@ public class JPPFJcaClient extends AbstractJPPFClient
 		try
 		{
 			delegate = new JcaClassServerDelegate("ra_driver", uuid, host, classPort);
-			initialWorkList.add((JcaClassServerDelegate) delegate);
+			//initialWorkList.add((JcaClassServerDelegate) delegate);
 			if (poolSize <= 0) poolSize = 1;
 			String[] names = new String[poolSize];
 			for (int i=0; i<poolSize; i++) names[i] = "driver_" + (i + 1);
@@ -133,7 +133,7 @@ public class JPPFJcaClient extends AbstractJPPFClient
 				ClientPool pool = pools.get(priority);
 				for (JPPFClientConnection c: pool.clientList)
 				{
-					initialWorkList.add(new ConnectionInitializerWork(c));
+					initialWorkList.add(new ConnectionInitializerTask(c));
 				}
 			}
 		}
@@ -180,7 +180,7 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	/**
 	 * Wrapper class for the initialization of a client connection.
 	 */
-	private class ConnectionInitializerWork implements Work
+	private class ConnectionInitializerTask extends TimerTask
 	{
 		/**
 		 * The client connection to initialize.
@@ -190,7 +190,7 @@ public class JPPFJcaClient extends AbstractJPPFClient
 		 * Instantiate this connection initializer with the specified client connection.
 		 * @param c the client connection to initialize.
 		 */
-		public ConnectionInitializerWork(JPPFClientConnection c)
+		public ConnectionInitializerTask(JPPFClientConnection c)
 		{
 			this.c = c;
 		}
@@ -201,8 +201,8 @@ public class JPPFJcaClient extends AbstractJPPFClient
 		 */
 		public void run()
 		{
-			//if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
-			c.init();
+			if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
+			if (c.getStatus().equals(DISCONNECTED)) c.init();
 		}
 
 		/**
@@ -218,8 +218,17 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	 * Get the initial list of connections to initialize.
 	 * @return a lsit of <code>Work</code> instances.
 	 */
-	public List<Work> getInitialWorkList()
+	public List<TimerTask> getInitialWorkList()
 	{
 		return initialWorkList;
+	}
+
+	/**
+	 * Return the class server delegate aoosicated with this JPPF client.
+	 * @return a <code>ClassServerDelegate</code> instance. 
+	 */
+	public ClassServerDelegate getDelegate()
+	{
+		return delegate;
 	}
 }

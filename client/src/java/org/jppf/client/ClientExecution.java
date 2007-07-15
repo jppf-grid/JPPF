@@ -25,7 +25,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 
 /**
- * 
+ * Instances of this class encapsulate
  * @author Laurent Cohen
  */
 public class ClientExecution

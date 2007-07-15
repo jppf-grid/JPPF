@@ -18,7 +18,7 @@
 
 package org.jppf.jca.spi;
 
-import java.util.List;
+import java.util.*;
 
 import javax.resource.*;
 import javax.resource.spi.*;
@@ -26,8 +26,9 @@ import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.resource.spi.work.*;
 import javax.transaction.xa.XAResource;
 
+import org.apache.commons.logging.*;
 import org.jppf.jca.util.JPPFAccessor;
-import org.jppf.jca.work.JPPFJcaClient;
+import org.jppf.jca.work.*;
 import org.jppf.utils.JPPFUuid;
 
 /**
@@ -37,6 +38,14 @@ import org.jppf.utils.JPPFUuid;
  */
 public class JPPFResourceAdapter extends JPPFAccessor implements ResourceAdapter
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(JPPFJcaClient.class);
+	/**
+	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 */
+	private boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Host name or IP address for the JPPF driver.
 	 */
@@ -65,27 +74,35 @@ public class JPPFResourceAdapter extends JPPFAccessor implements ResourceAdapter
 	{
 		System.out.println("Starting JPPF resource adapter");
 		WorkManager workManager = ctx.getWorkManager();
-		System.out.println("Starting JPPF resource adapter: work manager="+workManager);
 		jppfClient =
 			new JPPFJcaClient(new JPPFUuid().toString(), connectionPoolSize, serverHost, classServerPort, appServerPort);
-		System.out.println("Starting JPPF resource adapter: jpp client="+jppfClient);
-		List<Work> list = jppfClient.getInitialWorkList();
-		for (Work work: list)
+		log.info("Starting JPPF resource adapter: jppf client="+jppfClient);
+		try
 		{
-			try
+			workManager.startWork((JcaClassServerDelegate) jppfClient.getDelegate());
+		}
+		catch(WorkException e)
+		{
+			log.error(e);
+		}
+		try
+		{
+			Timer timer = ctx.createTimer();
+			List<TimerTask> list = jppfClient.getInitialWorkList();
+			for (TimerTask work: list)
 			{
-				workManager.startWork(work);
-			}
-			catch(WorkException e)
-			{
-				e.printStackTrace();
+				timer.schedule(work, 100, 1000);
 			}
 		}
-		System.out.println("JPPF resource adapter started");
+		catch (UnavailableException e)
+		{
+			log.error(e);
+		}
+		log.info("JPPF resource adapter started");
 	}
 
 	/**
-	 * 
+	 * Stop this resource adapter.
 	 * @see javax.resource.spi.ResourceAdapter#stop()
 	 */
 	public void stop()

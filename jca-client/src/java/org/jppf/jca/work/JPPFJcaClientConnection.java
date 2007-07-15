@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.JPPFError;
+import org.jppf.*;
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultListener;
 import org.jppf.comm.socket.SocketInitializer;
@@ -62,6 +62,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	public JPPFJcaClientConnection(String uuid, String name, String host, int driverPort, int classServerPort, int priority)
 	{
 		super(uuid, name, host, driverPort, classServerPort, priority);
+		status = DISCONNECTED;
 	}
 
 	/**
@@ -72,6 +73,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	{
 		try
 		{
+			setStatus(CONNECTING);
 			initHelper();
 			initCredentials();
 			initConnection();
@@ -79,12 +81,39 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
-			setStatus(FAILED);
+			log.error(e);
+			setStatus(DISCONNECTED);
 		}
 		catch(JPPFError e)
 		{
 			setStatus(FAILED);
+			throw e;
+		}
+	}
+
+	/**
+	 * Initialize this node's resources.
+	 * @throws Exception if an error is raised during initialization.
+	 * @see org.jppf.client.AbstractJPPFClientConnection#initConnection()
+	 */
+	public synchronized void initConnection() throws Exception
+	{
+		try
+		{
+			setStatus(CONNECTING);
+			if (socketClient == null) initSocketClient();
+			log.info("[client: "+name+"] Attempting connection to the JPPF driver");
+			socketInitializer.initializeSocket(socketClient);
+			if (!socketInitializer.isSuccessfull())
+			{
+				throw new JPPFException("[client: "+name+"] Could not reconnect to the JPPF Driver");
+			}
+			log.info("[client: "+name+"] Reconnected to the JPPF driver");
+			setStatus(ACTIVE);
+		}
+		catch(Exception e)
+		{
+			setStatus(DISCONNECTED);
 			throw e;
 		}
 	}

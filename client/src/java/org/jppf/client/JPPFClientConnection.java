@@ -25,10 +25,10 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 
 /**
- * 
+ * Interface for a client connection to a JPPF driver.
  * @author Laurent Cohen
  */
-public interface JPPFClientConnection
+public interface JPPFClientConnection extends ClientConnectionStatusHandler
 {
 
 	/**
@@ -51,30 +51,6 @@ public interface JPPFClientConnection
 	 * @return a priority as an int value.
 	 */
 	int getPriority();
-
-	/**
-	 * Get the status of this connection.
-	 * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
-	 */
-	JPPFClientConnectionStatus getStatus();
-
-	/**
-	 * Set the status of this connection.
-	 * @param status  a <code>JPPFClientConnectionStatus</code> enumerated value.
-	 */
-	void setStatus(JPPFClientConnectionStatus status);
-
-	/**
-	 * Add a connection status listener to this connection's list of listeners.
-	 * @param listener the listener to add to the list.
-	 */
-	void addClientConnectionStatusListener(ClientConnectionStatusListener listener);
-
-	/**
-	 * Remove a connection status listener from this connection's list of listeners.
-	 * @param listener the listener to remove from the list.
-	 */
-	void removeClientConnectionStatusListener(ClientConnectionStatusListener listener);
 
 	/**
 	 * Shutdown this client and retrieve all pending executions for resubmission.

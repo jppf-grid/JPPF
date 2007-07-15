@@ -35,5 +35,9 @@ public enum JPPFClientConnectionStatus
 	/**
 	 * Indicates that the connection instance has failed to connect to the driver.
 	 */
-	FAILED
+	FAILED,
+	/**
+	 * Indicates that the connection instance is disconnected from the driver.
+	 */
+	DISCONNECTED
 }

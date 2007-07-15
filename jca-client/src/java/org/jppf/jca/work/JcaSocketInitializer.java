@@ -55,8 +55,17 @@ public class JcaSocketInitializer extends AbstractSocketInitializer
 	 */
 	public void initializeSocket(SocketWrapper socketWrapper)
 	{
+		successfull = false;
 		while ((attemptCount < maxAttempts) && !successfull)
 		{
+			try
+			{
+				if (socketWrapper.isOpened()) socketWrapper.close();
+			}
+			catch(Exception ignored)
+			{
+			}
+			
 			try
 			{
 				socketWrapper.open();
