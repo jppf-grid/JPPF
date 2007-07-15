@@ -121,7 +121,7 @@ public class ColorSchemeData implements ColorScheme
 	 */
 	public Color getExtraLightColor()
 	{
-		return new Color(64, 64, 160);
+		return extraLightColor;
 	}
 
 	/**

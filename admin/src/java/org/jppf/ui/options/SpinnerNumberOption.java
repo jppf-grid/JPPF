@@ -37,11 +37,11 @@ public class SpinnerNumberOption extends AbstractOption
 	/**
 	 * Minimum value for the spinner control.
 	 */
-	protected Integer min = new Integer(0);
+	protected Integer min = Integer.valueOf(0);
 	/**
 	 * Maximum value for the spinner control.
 	 */
-	protected Integer max = new Integer(0);
+	protected Integer max = Integer.valueOf(0);
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -117,10 +117,10 @@ public class SpinnerNumberOption extends AbstractOption
 			}
 			catch(NumberFormatException e)
 			{
-				value = new Integer(min);
+				value = Integer.valueOf(min);
 			}
 		}
-		else if (value == null) value = new Integer(min);
+		else if (value == null) value = Integer.valueOf(min);
 		this.value = value;
 		if (spinner != null)
 		{

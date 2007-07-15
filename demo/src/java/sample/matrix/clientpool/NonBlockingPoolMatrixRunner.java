@@ -44,14 +44,6 @@ public class NonBlockingPoolMatrixRunner
 	 */
 	private static JPPFClient jppfClient = null;
 	/**
-	 * Number of submissions that have not yet been fully executed.
-	 */
-	private int pendingSubmissions = 0;
-	/**
-	 * Number of tasks whose results ot wait for.
-	 */
-	private int nbTasks = 0;
-	/**
 	 * 
 	 */
 	private JPPFResultCollector[] collector = null; 
@@ -103,8 +95,6 @@ public class NonBlockingPoolMatrixRunner
 			// perform "iteration" times
 			for (int iter=0; iter<iterations; iter++)
 			{
-				nbTasks = size;
-				pendingSubmissions = nbSubmissions;
 				long start = System.currentTimeMillis();
 				List<List<JPPFTask>> submissions = new ArrayList<List<JPPFTask>>();
 				for (int n=0; n<nbSubmissions; n++)

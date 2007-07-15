@@ -139,7 +139,7 @@ public final class StringUtils
 		{
 			int n = Byte.parseByte(bStr.substring(0, 1), 16);
 			n = 16 * n + Byte.parseByte(bStr.substring(1), 16);
-			list.add(new Byte((byte) n));
+			list.add(Byte.valueOf((byte) n));
 		}
 		byte[] result = new byte[list.size()];
 		for (int i=0; i<list.size(); i++) result[i] = list.get(i);

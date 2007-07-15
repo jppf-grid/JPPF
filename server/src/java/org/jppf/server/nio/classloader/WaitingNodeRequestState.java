@@ -119,7 +119,6 @@ public class WaitingNodeRequestState extends ClassServerState
 							getRemoteHost(provider) + " for node: " + getRemoteHost(channel));
 						SelectionKey providerKey = provider.keyFor(server.getSelector());
 						ClassContext providerContext = (ClassContext) providerKey.attachment();
-						boolean empty = providerContext.getPendingRequests().isEmpty();
 						providerContext.addRequest(key);
 						if (ClassState.IDLE_PROVIDER.equals(providerContext.getState()))
 						{

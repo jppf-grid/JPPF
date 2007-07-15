@@ -154,8 +154,6 @@ public class MatrixRunner
 			}
 			rowIdx += rows.length;
 		}
-		long elapsed2 = System.currentTimeMillis() - start2;
-		//output("results processing performed in "+StringUtils.toStringDuration(elapsed2));
 		return System.currentTimeMillis() - start;
 	}
 

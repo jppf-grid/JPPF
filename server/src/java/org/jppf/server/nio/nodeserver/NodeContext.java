@@ -114,16 +114,16 @@ public class NodeContext extends NioContext<NodeState>
 		byte[] dataProvider = bundle.getDataProvider();
 		JPPFBuffer buf = helper.toBytes(bundle, false);
 		int size = 4 + buf.getLength();
-		if (bundle.getDataProvider() != null) size += 4 + bundle.getDataProvider().length;
+		if (dataProvider != null) size += 4 + dataProvider.length;
 		if (bundle.getTasks() != null)
 		{
 			for (byte[] task : bundle.getTasks()) size += 4 + task.length;
 		}
 		byte[] data = new byte[size];
 		int pos = helper.copyToBuffer(buf.getBuffer(), data, 0, buf.getLength()); 
-		if (bundle.getDataProvider() != null)
+		if (dataProvider != null)
 		{
-			pos = helper.copyToBuffer(bundle.getDataProvider(), data, pos, bundle.getDataProvider().length);
+			pos = helper.copyToBuffer(dataProvider, data, pos, dataProvider.length);
 		}
 		if (bundle.getTasks() != null)
 		{

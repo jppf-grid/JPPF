@@ -84,7 +84,7 @@ public class PreferencesStorage
 				if (o1 == o2) return 0;
 				if (o1 == null) return -1;
 				if (o2 == null) return 1;
-				return new Integer(o1.position).compareTo(o2.position);
+				return Integer.valueOf(o1.position).compareTo(o2.position);
 			}
 		});
 
@@ -134,7 +134,7 @@ public class PreferencesStorage
 				if (o1 == o2) return 0;
 				if (o1 == null) return -1;
 				if (o2 == null) return 1;
-				return new Integer(o1.position).compareTo(o2.position);
+				return Integer.valueOf(o1.position).compareTo(o2.position);
 			}
 		});
 		return result;

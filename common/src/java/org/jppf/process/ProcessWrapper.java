@@ -28,7 +28,7 @@ import org.jppf.process.event.*;
  * a notification mechanism with separate events for the respective streams. 
  * @author Laurent Cohen
  */
-public class ProcessWrapper
+public final class ProcessWrapper
 {
 	/**
 	 * Content of the standard output for the process.

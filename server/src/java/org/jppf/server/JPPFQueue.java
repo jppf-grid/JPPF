@@ -110,7 +110,7 @@ public class JPPFQueue
 		try
 		{
 			JPPFTaskBundle bundle = queue.peek();
-			if (bundle == null) return bundle;
+			if (bundle == null) return null;
 			if (debugEnabled) log.debug("next bundle has " + bundle.getTaskCount() + " tasks");
 			if (nbTasks >= bundle.getTaskCount())
 			{

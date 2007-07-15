@@ -46,7 +46,7 @@ public class ListOption extends AbstractOption
 	 * Selection listener set on the list and used to propagate selection
 	 * changes as value change events. 
 	 */
-	protected ListSelectionListener selectionListener = null;
+	protected transient ListSelectionListener selectionListener = null;
 
 	/**
 	 * Default constructor.

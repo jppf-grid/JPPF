@@ -140,7 +140,7 @@ public class PlotXYChartHandler implements ChartHandler
 	/**
 	 * A label generator that builds value labels with a specified precision and unit. 
 	 */
-	public class LegendLabelGenerator implements XYSeriesLabelGenerator
+	public static class LegendLabelGenerator implements XYSeriesLabelGenerator
 	{
 		/**
 		 * Generate a label for a value of a specified dataset at the specified row and column.

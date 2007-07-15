@@ -43,10 +43,6 @@ public class JPPFResourceAdapter extends JPPFAccessor implements ResourceAdapter
 	 */
 	private static Log log = LogFactory.getLog(JPPFJcaClient.class);
 	/**
-	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
-	 */
-	private boolean debugEnabled = log.isDebugEnabled();
-	/**
 	 * Host name or IP address for the JPPF driver.
 	 */
 	private String serverHost = "localhost";

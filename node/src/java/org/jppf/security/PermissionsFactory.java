@@ -146,11 +146,15 @@ public final class PermissionsFactory
 		{
 			e.printStackTrace();
 		}
-		finally{
-			if(is != null){
-				try{
+		finally
+		{
+			if (is != null)
+			{
+				try
+				{
 					is.close();
-				}catch(Exception ignored){}
+				}
+				catch(Exception ignored){}
 			}
 		}
 	}

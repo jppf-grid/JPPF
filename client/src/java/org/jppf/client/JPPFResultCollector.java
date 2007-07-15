@@ -45,10 +45,6 @@ public class JPPFResultCollector implements TaskResultListener
 	 */
 	private int pendingCount = 0;
 	/**
-	 * Number of tasks whose results ot wait for.
-	 */
-	private int nbTasks = 0;
-	/**
 	 * A map containing the resulting tasks, ordered by ascending position in the
 	 * submitted list of tasks.
 	 */

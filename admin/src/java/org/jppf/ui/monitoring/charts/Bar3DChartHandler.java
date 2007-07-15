@@ -126,7 +126,7 @@ public class Bar3DChartHandler implements ChartHandler
 	/**
 	 * A label generator that builds value labels with a specified precision and unit. 
 	 */
-	public class LabelGenerator extends StandardCategoryItemLabelGenerator
+	public static class LabelGenerator extends StandardCategoryItemLabelGenerator
 	{
 		/**
 		 * Number format that formats double values in <i>##...##0.00</i> format.

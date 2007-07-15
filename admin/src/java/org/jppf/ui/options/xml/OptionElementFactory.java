@@ -175,9 +175,9 @@ public class OptionElementFactory
 		SpinnerNumberOption option = new SpinnerNumberOption();
 		option.setEventsEnabled(false);
 		builder.initCommonOptionAttributes(option, desc);
-		option.setMin(new Integer(desc.getInt("minValue")));
-		option.setMax(new Integer(desc.getInt("maxValue")));
-		option.setValue(new Integer(desc.getInt("value")));
+		option.setMin(Integer.valueOf(desc.getInt("minValue")));
+		option.setMax(Integer.valueOf(desc.getInt("maxValue")));
+		option.setValue(Integer.valueOf(desc.getInt("value")));
 		option.createUI();
 		option.setEventsEnabled(true);
 		return option;
@@ -194,7 +194,7 @@ public class OptionElementFactory
 		BooleanOption option = new BooleanOption();
 		option.setEventsEnabled(false);
 		builder.initCommonOptionAttributes(option, desc);
-		option.setValue(new Boolean(desc.getBoolean("value")));
+		option.setValue(Boolean.valueOf(desc.getBoolean("value")));
 		option.createUI();
 		option.setEventsEnabled(true);
 		return option;

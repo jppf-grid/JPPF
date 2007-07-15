@@ -43,7 +43,7 @@ public class XMLEditorOption extends AbstractOption
 	 * Use to detect when the parent's backgorunbd color has changed,
 	 * to set that of the text area accordingly.
 	 */
-	private PropertyChangeListener backgroundChangeListener = null;
+	private transient PropertyChangeListener backgroundChangeListener = null;
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -77,7 +77,7 @@ public class XMLEditorOption extends AbstractOption
 		textArea = new TextArea("text/xml");
 		textArea.setStyles(styles);
 		textArea.setOpaque(true);
-    textArea.getDocument().getDocumentProperties().put(PlainDocument.tabSizeAttribute, new Integer(2));
+    textArea.getDocument().getDocumentProperties().put(PlainDocument.tabSizeAttribute, Integer.valueOf(2));
 		textArea.setText("");
 		textArea.setEditable(true);
 		textArea.setEnabled(true);

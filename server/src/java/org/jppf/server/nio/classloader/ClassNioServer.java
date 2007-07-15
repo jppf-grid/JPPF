@@ -49,10 +49,6 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition, Class
 	 * WeakHashMap to minimize the OutOfMemory.
 	 */
 	Map<CacheClassKey, CacheClassContent> classCache = new WeakHashMap<CacheClassKey, CacheClassContent>();
-	/**
-	 * Reads resource files from the classpath.
-	 */
-	protected ResourceProvider resourceProvider = new ResourceProvider();
 
 	/**
 	 * Initialize this class server with the port it will listen to.

@@ -17,6 +17,7 @@
  */
 package org.jppf.server.node;
 
+import java.security.*;
 import java.util.*;
 
 import org.apache.commons.logging.*;
@@ -93,7 +94,14 @@ public class JPPFContainer
 		if (classLoader == null)
 		{
 			log.debug("Creating new class loader with uuidPath="+uuidPath);
-			classLoader = new JPPFClassLoader(NodeLauncher.getJPPFClassLoader(), uuidPath);
+			AccessController.doPrivileged(new PrivilegedAction<Object>()
+			{
+				public Object run()
+				{
+					classLoader = new JPPFClassLoader(NodeLauncher.getJPPFClassLoader(), uuidPath);
+					return null;
+				}
+			});
 		}
 		return classLoader;
 	}

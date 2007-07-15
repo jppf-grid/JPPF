@@ -184,7 +184,7 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 		int origImageHeight = this.origImage.getHeight();
 		if (getKind() == ImageWatermarkKind.SCREEN_CENTER_SCALE)
 		{
-			watermarkImage = SubstanceCoreUtilities.getBlankImage(screenWidth, screenHeight);
+			JPPFTiledWatermark.watermarkImage = SubstanceCoreUtilities.getBlankImage(screenWidth, screenHeight);
 			Graphics2D graphics = (Graphics2D) watermarkImage.getGraphics().create();
 			Composite comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity);
 			graphics.setComposite(comp);
@@ -283,7 +283,7 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 	 */
 	public void dispose()
 	{
-		watermarkImage = null;
+		JPPFTiledWatermark.watermarkImage = null;
 	}
 
 	/**

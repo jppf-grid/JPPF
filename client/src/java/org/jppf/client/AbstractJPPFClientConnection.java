@@ -300,7 +300,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
 	 * @see org.jppf.client.JPPFClientConnection#getStatus()
 	 */
-	public JPPFClientConnectionStatus getStatus()
+	public synchronized JPPFClientConnectionStatus getStatus()
 	{
 		return status;
 	}

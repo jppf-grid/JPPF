@@ -40,7 +40,7 @@ public class DB2LoadingTask extends JPPFTestTask
 	 */
 	public void test() throws Exception
 	{
-		Class<?> c = Class.forName("com.ibm.db2.jcc.DB2Driver");
+		Class.forName("com.ibm.db2.jcc.DB2Driver");
 		//c.newInstance();
 		//Driver driver = new com.ibm.db2.jcc.DB2Driver();
 		//Connection conn = DriverManager.getConnection("", null);

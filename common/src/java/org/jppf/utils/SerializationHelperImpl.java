@@ -92,8 +92,8 @@ public class SerializationHelperImpl implements SerializationHelper
 		JPPFBuffer buf = new ObjectSerializerImpl().serialize(o);
 		if (debugEnabled)
 		{
-			//log.debug(""+buf.getLength()+" bytes to serialize");
-			//if (dumpEnabled) log.debug("dump of bytes to serialize:\n"+ StringUtils.dumpBytes(buf.getBuffer(), 0, buf.getLength()));
+			log.debug(""+buf.getLength()+" bytes to serialize");
+			if (dumpEnabled) log.debug("dump of bytes to serialize:\n"+ StringUtils.dumpBytes(buf.getBuffer(), 0, buf.getLength()));
 		}
 		int len = 0;
 		if (isCompressed)

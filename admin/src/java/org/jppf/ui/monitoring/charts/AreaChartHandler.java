@@ -99,7 +99,7 @@ public class AreaChartHandler implements ChartHandler
 			Map<Fields, Double> valueMap = statsHandler.getDoubleValues(j);
 			for (Fields key: config.fields)
 			{
-				dataset.setValue(valueMap.get(key), key, new Integer(j + start));
+				dataset.setValue(valueMap.get(key), key, Integer.valueOf(j + start));
 			}
 		}
 		return config;
@@ -116,7 +116,7 @@ public class AreaChartHandler implements ChartHandler
 		DefaultCategoryDataset dataset = (DefaultCategoryDataset) config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
 		for (Fields key: config.fields)
-			dataset.setValue(valueMap.get(key), key, new Integer(statsHandler.getTickCount()));
+			dataset.setValue(valueMap.get(key), key, Integer.valueOf(statsHandler.getTickCount()));
 		if (dataset.getRowCount() > statsHandler.getRolloverPosition()) dataset.removeRow(0);
 		return config;
 	}
@@ -124,7 +124,7 @@ public class AreaChartHandler implements ChartHandler
 	/**
 	 * A label generator that builds value labels with a specified precision and unit. 
 	 */
-	public class LegendLabelGenerator implements CategorySeriesLabelGenerator
+	public static class LegendLabelGenerator implements CategorySeriesLabelGenerator
 	{
 		/**
 		 * Generate a label for a value of a specified dataset at the specified row and column.

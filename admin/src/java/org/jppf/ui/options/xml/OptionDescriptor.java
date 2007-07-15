@@ -17,6 +17,7 @@
  */
 package org.jppf.ui.options.xml;
 
+import java.io.Serializable;
 import java.util.*;
 import org.jppf.utils.TypedProperties;
 
@@ -71,7 +72,7 @@ public class OptionDescriptor extends TypedProperties
 	/**
 	 * Descriptor for listeners set on option elements.
 	 */
-	public static class ListenerDescriptor
+	public static class ListenerDescriptor implements Serializable
 	{
 		/**
 		 * Type of listener.
@@ -96,7 +97,7 @@ public class OptionDescriptor extends TypedProperties
 	/**
 	 * Descriptor for script elements.
 	 */
-	public static class ScriptDescriptor
+	public static class ScriptDescriptor implements Serializable
 	{
 		/**
 		 * The source of the script to execute if this listener is script-based.
@@ -111,7 +112,7 @@ public class OptionDescriptor extends TypedProperties
 	/**
 	 * Descriptor for listeners set on option elements.
 	 */
-	public static class ItemDescriptor
+	public static class ItemDescriptor implements Serializable
 	{
 		/**
 		 * The name of this item.

@@ -123,7 +123,6 @@ public class ApplicationConnection extends JPPFConnection
 	public void perform() throws Exception
 	{
 		JPPFBuffer buffer = socketClient.receiveBytes(0);
-		byte[] bytes = buffer.getBuffer();
 		// Read the request header - with tasks count information
 		List<JPPFTaskBundle> list = new ArrayList<JPPFTaskBundle>();
 		int pos = helper.fromBytes(buffer.getBuffer(), 0, false, list, 1);

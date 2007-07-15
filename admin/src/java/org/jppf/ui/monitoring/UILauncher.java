@@ -24,8 +24,7 @@ import org.jppf.ui.options.factory.OptionsHandler;
 import org.jvnet.lafwidget.LafWidget;
 import org.jvnet.lafwidget.tabbed.DefaultTabPreviewPainter;
 import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.color.ColorScheme;
-import org.jvnet.substance.theme.*;
+import org.jvnet.substance.theme.ThemeChangeListener;
 import org.jvnet.substance.watermark.SubstanceNullWatermark;
 
 /**
@@ -64,8 +63,8 @@ public class UILauncher
 				{
 					public void themeChanged()
 					{
-						SubstanceTheme th = SubstanceLookAndFeel.getTheme();
-						ColorScheme scheme = th.getColorScheme();
+						//SubstanceTheme th = SubstanceLookAndFeel.getTheme();
+						//ColorScheme scheme = th.getColorScheme();
 					}
 				});
 			}

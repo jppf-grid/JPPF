@@ -49,10 +49,6 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 */
 	private boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Count of times this delegate has attempted to connect tothe JPPF server.
-	 */
-	private int connectionAttempts = 0;
-	/**
 	 * Status of the connection.
 	 */
 	protected JPPFClientConnectionStatus status = DISCONNECTED;

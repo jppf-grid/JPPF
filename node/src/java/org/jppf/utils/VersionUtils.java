@@ -59,7 +59,7 @@ public final class VersionUtils
 				props.load(is);
 				buildNumber = props.getInt("build.number");
 			}
-			catch(Exception e)
+			catch(Exception ignored)
 			{
 			}
 		}

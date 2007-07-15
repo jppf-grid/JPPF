@@ -217,7 +217,7 @@ public class FileChooserOption extends AbstractOption
 	/**
 	 * A file filter corresponding to a file extension.
 	 */
-	private class Filter extends FileFilter
+	private static class Filter extends FileFilter
 	{
 		/**
 		 * The file extension this filter accepts.

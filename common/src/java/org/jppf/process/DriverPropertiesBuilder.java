@@ -29,31 +29,31 @@ public class DriverPropertiesBuilder
 	/**
 	 * "smooth" tuning profile.
 	 */
-	public static Properties SMOOTH_PROFILE = buildProfile("smooth", 500, 300, 0.2f, 10, 1.5f, 0.2f); 
+	public static final Properties SMOOTH_PROFILE = buildProfile("smooth", 500, 300, 0.2f, 10, 1.5f, 0.2f); 
 	/**
 	 * "agressive" tuning profile.
 	 */
-	public static Properties AGGRESSIVE_PROFILE = buildProfile("aggressive", 100, 50, 0.2f, 10, 1.5f, 0.2f); 
+	public static final Properties AGGRESSIVE_PROFILE = buildProfile("aggressive", 100, 50, 0.2f, 10, 1.5f, 0.2f); 
 	/**
 	 * "agressive" tuning profile.
 	 */
-	public static Properties AGGRESSIVE_TUNING = buildTuning(50, "aggressive", AGGRESSIVE_PROFILE); 
+	public static final Properties AGGRESSIVE_TUNING = buildTuning(50, "aggressive", AGGRESSIVE_PROFILE); 
 	/**
 	 * Base config for driver 1.
 	 */
-	public static Properties BASE_1 = buildBase(11111, 11112, 11113, 8000, false); 
+	public static final Properties BASE_1 = buildBase(11111, 11112, 11113, 8000, false); 
 	/**
 	 * Base config for driver 2.
 	 */
-	public static Properties BASE_2 = buildBase(11121, 11122, 11123, 8001, false); 
+	public static final Properties BASE_2 = buildBase(11121, 11122, 11123, 8001, false); 
 	/**
 	 * Driver 1 configuration.
 	 */
-	public static Properties DRIVER_1 = buildDriverConfig(BASE_1, AGGRESSIVE_TUNING, null); 
+	public static final Properties DRIVER_1 = buildDriverConfig(BASE_1, AGGRESSIVE_TUNING, null); 
 	/**
 	 * Driver 2 configuration.
 	 */
-	public static Properties DRIVER_2 = buildDriverConfig(BASE_2, AGGRESSIVE_TUNING, null); 
+	public static final Properties DRIVER_2 = buildDriverConfig(BASE_2, AGGRESSIVE_TUNING, null); 
 
 	/**
 	 * Create a complete driver configuration.

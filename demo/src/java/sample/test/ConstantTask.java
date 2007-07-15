@@ -31,7 +31,7 @@ public class ConstantTask extends JPPFTestTask
 	 */
 	public ConstantTask(int n)
 	{
-		setResult(new Integer(n));
+		setResult(Integer.valueOf(n));
 	}
 
 	/**

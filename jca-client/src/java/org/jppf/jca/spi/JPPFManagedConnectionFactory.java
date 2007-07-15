@@ -37,7 +37,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessor implements Manage
 	/**
 	 * Handle to the resource adapter.
 	 */
-	private ResourceAdapter resourceAdapter = null;
+	private transient ResourceAdapter resourceAdapter = null;
 
 	/**
 	 * Create a jca connection factory. This method is called by the application server.

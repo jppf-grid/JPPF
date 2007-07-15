@@ -42,10 +42,6 @@ public class LongTaskDemoRunner
 	 * JPPF client used to submit execution requests.
 	 */
 	private static JPPFClient jppfClient = null;
-	/**
-	 * Number of tasks whose results to wait for.
-	 */
-	private int nbTasks = 0;
 
 	/**
 	 * Entry point for this class, performs a matrix multiplication a number of times.,<br>
@@ -95,7 +91,6 @@ public class LongTaskDemoRunner
 			long totalElapsed = 0L;
 			for (int iter=0; iter<iterations; iter++)
 			{
-				nbTasks = size;
 				long start = System.currentTimeMillis();
 				// create a task for each row in matrix a
 				List<JPPFTask> tasks = new ArrayList<JPPFTask>();

@@ -47,7 +47,6 @@ public class ExceptionTestTask extends JPPFTestTask
 	{
 		int[] intArray = new int[2];
 		int n = intArray[3];
-		n += 1;
 	}
 	
 	/**
