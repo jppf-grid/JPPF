@@ -81,7 +81,7 @@ public class JPPFConnectionFactory extends JPPFAccessor implements ConnectionFac
 	/**
 	 * This method does nothing.
 	 * @param spec not used.
-	 * @return nothing..
+	 * @return nothing.
 	 * @throws ResourceException this method always throws a NotSupportedException.
 	 * @see javax.resource.cci.ConnectionFactory#getConnection(javax.resource.cci.ConnectionSpec)
 	 */

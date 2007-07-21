@@ -37,7 +37,7 @@ public class JcaSocketInitializer extends AbstractSocketInitializer
 	/**
 	 * Maximum number of connection attempts.
 	 */
-	private int maxAttempts = 10;
+	private int maxAttempts = 1;
 
 	/**
 	 * 
@@ -55,6 +55,7 @@ public class JcaSocketInitializer extends AbstractSocketInitializer
 	 */
 	public void initializeSocket(SocketWrapper socketWrapper)
 	{
+		attemptCount = 0;
 		successfull = false;
 		while ((attemptCount < maxAttempts) && !successfull)
 		{

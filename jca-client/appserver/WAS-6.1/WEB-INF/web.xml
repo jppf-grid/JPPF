@@ -30,4 +30,12 @@
     <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
 
+	<resource-ref>
+		<description>JPPF Connection Factory</description>
+		<res-ref-name>eis/JPPFConnectionFactory</res-ref-name>
+		<res-type>javax.resource.cci.ConnectionFactory</res-type>
+		<res-auth>Application</res-auth>
+		<res-sharing-scope>Unshareable</res-sharing-scope>
+	</resource-ref>
+
 </web-app>

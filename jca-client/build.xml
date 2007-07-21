@@ -24,8 +24,8 @@
 
 	<property name="build.properties.file" value="${basedir}/build.properties"/>
   <property file="${build.properties.file}"/>
-	<property name="jppf.lib.dir"    value="${basedir}/../jppf/build"/>
-	<property name="lib.dir"         value="${basedir}/lib"/>
+	<property name="jppf.build.dir"    value="${basedir}/../JPPF/build"/>
+	<property name="jppf.lib.dir"    value="${basedir}/../JPPF/lib"/>
 	<property name="config.dir"      value="${basedir}/config"/>
 	<property name="classes.dir"     value="${basedir}/classes"/>	
 	<property name="src.dir"         value="${basedir}/src"/>
@@ -48,22 +48,18 @@
 		<pathelement location="${config.dir}"/>
 		<pathelement location="${classes.dir}"/>
 		<pathelement location="${ejb.client.jar}"/>
-		<fileset dir="${lib.dir}">
-			<include name="*.jar"/>
-		</fileset>
-		<fileset dir="${jppf.lib.dir}">
+		<fileset dir="${jppf.build.dir}">
 			<include name="jppf-common-node.jar"/>
 			<include name="jppf-common.jar"/>
 			<include name="jppf-server.jar"/>
 			<include name="jppf-client.jar"/>
-			<include name="log4j-1.2.9.jar"/>
 		</fileset>
 	</path>
 
 	<path id="project.classpath">
 		<pathelement location="${classes.dir}"/>
 		<pathelement location="${config.dir}"/>
-		<fileset dir="${lib.dir}">
+		<fileset dir="${jppf.lib.dir}">
 			<include name="**/*.jar"/>
 		</fileset>
 		<path refid="client.classpath"/>
@@ -198,10 +194,13 @@
 		<ear destfile="${build.dir}/${ear.prefix}_${appserver}.ear" appxml="${build.dir}/${appserver}/application.xml">
 			<fileset dir="${build.dir}/${appserver}" includes="jppftest.war"/>
 			<zipfileset dir="${build.dir}/lib" prefix="lib"/>
-			<zipfileset dir="${jppf.lib.dir}" prefix="lib">
+			<zipfileset dir="${jppf.build.dir}" prefix="lib">
 				<include name="jppf-common-node.jar"/>
 				<include name="jppf-common.jar"/>
 				<include name="jppf-client.jar"/>
+			</zipfileset>
+			<zipfileset dir="${jppf.lib.dir}/ApacheCommons" prefix="lib">
+				<include name="commons-logging-1.1.jar"/>
 			</zipfileset>
 		</ear>
 	</target>
@@ -247,15 +246,13 @@
 				<include name="*.*"/>
 			</zipfileset>
 			<zipfileset dir="${build.dir}/lib"/>
-			<zipfileset dir="${jppf.lib.dir}">
+			<zipfileset dir="${jppf.build.dir}">
 				<include name="jppf-common-node.jar"/>
 				<include name="jppf-common.jar"/>
 				<include name="jppf-client.jar"/>
 			</zipfileset>
-			<zipfileset dir="${lib.dir}">
+			<zipfileset dir="${jppf.lib.dir}/ApacheCommons">
 				<include name="commons-logging-1.1.jar"/>
-				<include name="jppf-common.jar"/>
-				<include name="jppf-client.jar"/>
 			</zipfileset>
 		</jar>
     <delete dir="${build.dir}/${appserver}" quiet="true"/>
@@ -276,47 +273,6 @@
 		</replace>
 		<replace dir="${basedir}/.." token="Logger log = Logger.getLogger" value="Log log = LogFactory.getLog">
 		  <include name="**/*.java"/>
-		</replace>
-	</target>
-	
-	<target name="replace.headers">
-		<replace dir="${basedir}/.." summary="true">
-			<include name="**/ResilientBundler.java"/>
-
-			<replacetoken>
-<![CDATA[
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation; either version 2.1 of the License, or (at your
- * option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-]]>
-		  </replacetoken>
-
-			<replacevalue>
-<![CDATA[
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
-]]>
-		  </replacevalue>
-
 		</replace>
 	</target>
 	-->

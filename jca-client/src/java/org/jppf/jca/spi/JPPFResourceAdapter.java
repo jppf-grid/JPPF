@@ -18,7 +18,7 @@
 
 package org.jppf.jca.spi;
 
-import java.util.*;
+import java.io.Serializable;
 
 import javax.resource.*;
 import javax.resource.spi.*;
@@ -36,7 +36,7 @@ import org.jppf.utils.JPPFUuid;
  * This class initiates a JPPF client with a pool of driver connections.
  * @author Laurent Cohen
  */
-public class JPPFResourceAdapter extends JPPFAccessor implements ResourceAdapter
+public class JPPFResourceAdapter extends JPPFAccessor implements ResourceAdapter, Serializable
 {
 	/**
 	 * Logger for this class.
@@ -83,14 +83,9 @@ public class JPPFResourceAdapter extends JPPFAccessor implements ResourceAdapter
 		}
 		try
 		{
-			Timer timer = ctx.createTimer();
-			List<TimerTask> list = jppfClient.getInitialWorkList();
-			for (TimerTask work: list)
-			{
-				timer.schedule(work, 100, 1000);
-			}
+			workManager.startWork(new JPPFJcaJob(jppfClient.getInitialWorkList(), 1000));
 		}
-		catch (UnavailableException e)
+		catch(WorkException e)
 		{
 			log.error(e);
 		}

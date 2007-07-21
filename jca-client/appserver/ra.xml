@@ -15,24 +15,28 @@
 	<resourceadapter>
 		<resourceadapter-class>org.jppf.jca.spi.JPPFResourceAdapter</resourceadapter-class>
 
+		<!-- Host name or IP address of the JPPF driver -->
 		<config-property>
 			<config-property-name>ServerHost</config-property-name>
 			<config-property-type>java.lang.String</config-property-type>
 			<config-property-value>localhost</config-property-value>
 		</config-property>
 
+		<!-- Port on which to connect for the JPPF driver class loader -->
 		<config-property>
 			<config-property-name>ClassServerPort</config-property-name>
 			<config-property-type>java.lang.Integer</config-property-type>
 			<config-property-value>11111</config-property-value>
 		</config-property>
 
+		<!-- Port on which to connect to submit tasks to the JPPF driver -->
 		<config-property>
 			<config-property-name>AppServerPort</config-property-name>
 			<config-property-type>java.lang.Integer</config-property-type>
 			<config-property-value>11112</config-property-value>
 		</config-property>
 
+		<!-- Number of connections to the JPPF driver -->
 		<config-property>
 			<config-property-name>ConnectionPoolSize</config-property-name>
 			<config-property-type>java.lang.Integer</config-property-type>
@@ -50,12 +54,6 @@
 		
 			<transaction-support>NoTransaction</transaction-support>
 		
-			<!--
-			<authentication-mechanism>
-				<authentication-mechanism-type>BasicPassword</authentication-mechanism-type>
-				<credential-interface>javax.resource.spi.security.PasswordCredential</credential-interface>
-			</authentication-mechanism>
-			-->
 			<reauthentication-support>false</reauthentication-support>
 		</outbound-resourceadapter>
 

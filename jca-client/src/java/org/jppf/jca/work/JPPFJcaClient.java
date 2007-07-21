@@ -17,8 +17,6 @@
  */
 package org.jppf.jca.work;
 
-import static org.jppf.client.JPPFClientConnectionStatus.*;
-
 import java.util.*;
 
 import org.apache.commons.logging.*;
@@ -63,7 +61,7 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	/**
 	 * Initial list of connections to initialize.
 	 */
-	private List<TimerTask> initialWorkList = new ArrayList<TimerTask>();
+	private List<Runnable> initialWorkList = new ArrayList<Runnable>();
 	/**
 	 * The unique class server delegate for all connections.
 	 */
@@ -178,47 +176,10 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	}
 
 	/**
-	 * Wrapper class for the initialization of a client connection.
-	 */
-	private class ConnectionInitializerTask extends TimerTask
-	{
-		/**
-		 * The client connection to initialize.
-		 */
-		private JPPFClientConnection c = null;
-		/**
-		 * Instantiate this connection initializer with the specified client connection.
-		 * @param c the client connection to initialize.
-		 */
-		public ConnectionInitializerTask(JPPFClientConnection c)
-		{
-			this.c = c;
-		}
-
-		/**
-		 * Perform the initialization of a client connection.
-		 * @see java.lang.Runnable#run()
-		 */
-		public void run()
-		{
-			if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
-			if (c.getStatus().equals(DISCONNECTED)) c.init();
-		}
-
-		/**
-		 * 
-		 * @see javax.resource.spi.work.Work#release()
-		 */
-		public void release()
-		{
-		}
-	}
-
-	/**
 	 * Get the initial list of connections to initialize.
 	 * @return a lsit of <code>Work</code> instances.
 	 */
-	public List<TimerTask> getInitialWorkList()
+	public List<Runnable> getInitialWorkList()
 	{
 		return initialWorkList;
 	}
