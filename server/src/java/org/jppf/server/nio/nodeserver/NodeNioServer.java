@@ -41,11 +41,11 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 	/**
 	 * Log4j logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(NodeNioServer.class);
+	protected static final Log LOG = LogFactory.getLog(NodeNioServer.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	protected static final boolean DEBUG_ENABLED = LOG.isDebugEnabled();
 	/**
 	 * The algorithm that dynamically computes the task bundle size.
 	 */
@@ -117,7 +117,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 		}
 		catch (Exception e)
 		{
-			log.error(e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
 			closeNode(channel);
 		}
 	}
@@ -136,7 +136,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 			synchronized(idleChannels)
 			{
 				if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
-				if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
+				if (DEBUG_ENABLED) LOG.debug(""+idleChannels.size()+" channels idle");
 				Iterator<SocketChannel> it = idleChannels.iterator();
 				while (!getQueue().isEmpty() && it.hasNext())
 				{
@@ -235,7 +235,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 			}
 			catch(Exception e)
 			{
-				log.error(e.getMessage(), e);
+				LOG.error(e.getMessage(), e);
 			}
 		}
 		return initialBundle;
@@ -254,7 +254,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 		}
 		catch (IOException ignored)
 		{
-			log.error(ignored.getMessage(), ignored);
+			LOG.error(ignored.getMessage(), ignored);
 		}
 	}
 

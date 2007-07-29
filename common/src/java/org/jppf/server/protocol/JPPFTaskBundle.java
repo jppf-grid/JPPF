@@ -329,7 +329,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	}
 
 	/**
-	 * Compare two task bundles, based on their respective priorities.
+	 * Compare two task bundles, based on their respective priorities.<br>
+	 * <b>Note:</b> <i>this class has a natural ordering that is inconsistent with equals.</i>
 	 * @param bundle the bundle compare this one to.
 	 * @return a positive int if this bundle is greater, 0 if both are equal,
 	 * or a negative int if this bundless is less than the other.

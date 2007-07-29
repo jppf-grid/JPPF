@@ -35,11 +35,11 @@ public class SendInitialBundleState extends NodeServerState
 	/**
 	 * Log4j logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(SendInitialBundleState.class);
+	protected static final Log LOG = LogFactory.getLog(SendInitialBundleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	protected static final boolean DEBUG_ENABLED = LOG.isDebugEnabled();
 	/**
 	 * Initialize this state.
 	 * @param server the server that handles this state.
@@ -68,17 +68,17 @@ public class SendInitialBundleState extends NodeServerState
 		NodeContext context = (NodeContext) key.attachment();
 		if (context.getMessage() == null)
 		{
-			if (debugEnabled) log.debug("serializing initial bundle for " + getRemoteHost(channel));
+			if (DEBUG_ENABLED) LOG.debug("serializing initial bundle for " + getRemoteHost(channel));
 			context.serializeBundle();
 		}
 		if (context.writeMessage(channel))
 		{
-			if (debugEnabled) log.debug("sent entire initial bundle for " + getRemoteHost(channel));
+			if (DEBUG_ENABLED) LOG.debug("sent entire initial bundle for " + getRemoteHost(channel));
 			context.setMessage(null);
 			context.setBundle(null);
 			return TO_WAIT_INITIAL;
 		}
-		if (debugEnabled) log.debug("part yet to send for " + getRemoteHost(channel));
+		if (DEBUG_ENABLED) LOG.debug("part yet to send for " + getRemoteHost(channel));
 		return TO_SEND_INITIAL;
 	}
 }

@@ -59,7 +59,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	/**
 	 * Flag indicating that this socket server is closed.
 	 */
-	protected boolean stop = false;
+	private boolean stopped = false;
 	/**
 	 * The port this socket server is listening to.
 	 */
@@ -113,11 +113,13 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	 * @param name the name given to this thread.
 	 * @throws JPPFException if the underlying server socket can't be opened.
 	 */
-	public NioServer(int[] ports, String name) throws JPPFException
+	public NioServer(final int[] ports, String name) throws JPPFException
 	{
 		super(name);
 		
-		this.ports = ports;
+		
+		this.ports = new int[ports.length];
+		System.arraycopy(ports, 0, this.ports, 0, ports.length);
 		factory = createFactory();
 		init(ports);
 	}
@@ -172,7 +174,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 		try
 		{
 			boolean hasTimeout = selectTimeout > 0L;
-			while (!stop && !JPPFDriver.getInstance().isShuttingDown())
+			while (!isStopped() && !JPPFDriver.getInstance().isShuttingDown())
 			{
 				try
 				{
@@ -324,9 +326,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	 */
 	public synchronized void end()
 	{
-		if (!stop)
+		if (!isStopped())
 		{
-			stop = true;
+			setStopped(true);
 			removeAllConnections();
 		}
 	}
@@ -336,7 +338,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	 */
 	public synchronized void removeAllConnections()
 	{
-		if (!stop) return;
+		if (!isStopped()) return;
 		for (SelectionKey connection: selector.keys())
 		{
 			try
@@ -395,5 +397,23 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 		{
 			lock.unlock();
 		}
+	}
+
+	/**
+	 * Set this server in the specified stopped state.
+	 * @param stopped true if this server is stopped, false otherwise.
+	 */
+	protected synchronized void setStopped(boolean stopped)
+	{
+		this.stopped = stopped;
+	}
+
+	/**
+	 * Get the stopped state of this server.
+	 * @return  true if this server is stopped, false otherwise.
+	 */
+	protected synchronized boolean isStopped()
+	{
+		return stopped;
 	}
 }

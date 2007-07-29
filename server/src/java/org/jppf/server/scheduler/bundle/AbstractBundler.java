@@ -27,7 +27,7 @@ public abstract class AbstractBundler implements Bundler
 	/**
 	 * Count of the bundlers used to generate a readable unique id.
 	 */
-	protected static int bundlerCount = 0;
+	private static int bundlerCount = 0;
 	/**
 	 * The bundler number for this bundler.
 	 */

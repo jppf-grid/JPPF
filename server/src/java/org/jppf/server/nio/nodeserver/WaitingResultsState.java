@@ -36,11 +36,11 @@ public class WaitingResultsState extends NodeServerState
 	/**
 	 * Log4j logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(WaitingResultsState.class);
+	protected static final Log LOG = LogFactory.getLog(WaitingResultsState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	protected static final boolean DEBUG_ENABLED = LOG.isDebugEnabled();
 	/**
 	 * Initialize this state.
 	 * @param server the server that handles this state.
@@ -67,7 +67,7 @@ public class WaitingResultsState extends NodeServerState
 		// This makes the integration of non-blocking with ObjectInputStream easier.
 		if (context.readMessage(channel))
 		{
-			if (debugEnabled) log.debug("read bundle from node " + getRemoteHost(channel) + " done");
+			if (DEBUG_ENABLED) LOG.debug("read bundle from node " + getRemoteHost(channel) + " done");
 			JPPFTaskBundle bundle = context.getBundle();
 			long elapsed = System.currentTimeMillis() - bundle.getExecutionStartTime();
 			TaskCompletionListener listener = bundle.getCompletionListener();

@@ -91,73 +91,66 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	{
 		try
 		{
-			try
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			for (Frame frame: Frame.getFrames())
 			{
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				for (Frame frame: Frame.getFrames())
+				SwingUtilities.updateComponentTreeUI(frame);
+				frame.addWindowListener(new WindowAdapter()
 				{
-					SwingUtilities.updateComponentTreeUI(frame);
-					frame.addWindowListener(new WindowAdapter()
+					public void windowClosing(WindowEvent e)
 					{
-						public void windowClosing(WindowEvent e)
-						{
-							destroy();
-							System.exit(0);
-						}
-					});
-				}
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-			initializeSettings();
-			data = new ImageData[nbLogos];
-			for (int i=0; i<nbLogos; i++) data[i] = new ImageData();
-			parent = (Container) getContext().getComponent();
-			parent.setBackground(Color.BLACK);
-			if (node == null) node = new NodePanel(getContext().isFullScreen());
-			node.setDoubleBuffered(true);
-			parent.add(node);
-			initializeFlyingLogos();
-	
-			Dimension dim = parent.getSize();
-			Random rand = new Random(System.currentTimeMillis());
-			for (int i=0; i<nbLogos; i++)
-			{
-				int n = dim.width - imgw;
-				if (n <= 0) n = imgw;
-				data[i].x = rand.nextInt(n);
-				data[i].prevx = data[i].x;
-				data[i].stepX *= 2 * rand.nextInt(2) - 1; 
-				n = dim.height - imgh;
-				if (n <= 0) n = imgh;
-				data[i].y = rand.nextInt(n);
-				data[i].prevy = data[i].y;
-				data[i].stepY *= 2 * rand.nextInt(2) - 1; 
-			}
-			setDoubledBuffering(node);
-			if (timer == null)
-			{
-				timer = new Timer();
-				timer.schedule(new LogoUpdateTask(), 100, 25 + 5 * (11 - speed));
-				// 25 frames/sec = 40ms/frame
-				timer.schedule(new LogoDisplayTask(), 500, 25);
-				TimerTask task = new TimerTask()
-				{
-					public void run()
-					{
-						
-						String s = NodePanel.toStringDuration(System.currentTimeMillis() - node.nodeState.startedAt);
-						node.nodeState.timeLabel.setText("Active for: "+s);
+						destroy();
+						System.exit(0);
 					}
-				};
-				timer.scheduleAtFixedRate(task, 1000, 1000);
+				});
 			}
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
+		}
+		initializeSettings();
+		data = new ImageData[nbLogos];
+		for (int i=0; i<nbLogos; i++) data[i] = new ImageData();
+		parent = (Container) getContext().getComponent();
+		parent.setBackground(Color.BLACK);
+		if (node == null) node = new NodePanel(getContext().isFullScreen());
+		node.setDoubleBuffered(true);
+		parent.add(node);
+		initializeFlyingLogos();
+
+		Dimension dim = parent.getSize();
+		Random rand = new Random(System.currentTimeMillis());
+		for (int i=0; i<nbLogos; i++)
+		{
+			int n = dim.width - imgw;
+			if (n <= 0) n = imgw;
+			data[i].x = rand.nextInt(n);
+			data[i].prevx = data[i].x;
+			data[i].stepX *= 2 * rand.nextInt(2) - 1; 
+			n = dim.height - imgh;
+			if (n <= 0) n = imgh;
+			data[i].y = rand.nextInt(n);
+			data[i].prevy = data[i].y;
+			data[i].stepY *= 2 * rand.nextInt(2) - 1; 
+		}
+		setDoubledBuffering(node);
+		if (timer == null)
+		{
+			timer = new Timer();
+			timer.schedule(new LogoUpdateTask(), 100, 25 + 5 * (11 - speed));
+			// 25 frames/sec = 40ms/frame
+			timer.schedule(new LogoDisplayTask(), 500, 25);
+			TimerTask task = new TimerTask()
+			{
+				public void run()
+				{
+					
+					String s = NodePanel.toStringDuration(System.currentTimeMillis() - node.nodeState.startedAt);
+					node.nodeState.timeLabel.setText("Active for: "+s);
+				}
+			};
+			timer.scheduleAtFixedRate(task, 1000, 1000);
 		}
 	}
 
@@ -254,7 +247,7 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	/**
 	 * Data structure holding the position and direction of a flying logo.
 	 */
-	private class ImageData
+	private static class ImageData
 	{
 		/**
 		 * The previous position on the x axis.

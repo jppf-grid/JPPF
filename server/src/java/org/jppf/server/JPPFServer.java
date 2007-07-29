@@ -43,7 +43,7 @@ public abstract class JPPFServer extends Thread
 	/**
 	 * Flag indicating that this socket server is closed.
 	 */
-	protected boolean stop = false;
+	private boolean stopped = false;
 	/**
 	 * The port this socket server is listening to.
 	 */
@@ -74,7 +74,7 @@ public abstract class JPPFServer extends Thread
 	{
 		try
 		{
-			while (!stop && !JPPFDriver.getInstance().isShuttingDown())
+			while (!isStopped() && !JPPFDriver.getInstance().isShuttingDown())
 			{
 				Socket socket = server.accept();
 				if (JPPFDriver.getInstance().isShuttingDown())
@@ -149,11 +149,11 @@ public abstract class JPPFServer extends Thread
 	 */
 	public synchronized void end()
 	{
-		if (!stop)
+		if (!isStopped())
 		{
 			try
 			{
-				stop = true;
+				setStopped(true);
 				if (!server.isClosed()) server.close();
 				removeAllConnections();
 			}
@@ -178,7 +178,7 @@ public abstract class JPPFServer extends Thread
 	 */
 	public synchronized void removeAllConnections()
 	{
-		if (!stop) return;
+		if (!isStopped()) return;
 		for (JPPFConnection connection: connections)
 		{
 			try
@@ -191,5 +191,23 @@ public abstract class JPPFServer extends Thread
 			}
 		}
 		connections.clear();
+	}
+
+	/**
+	 * Set this server in the specified stopped state.
+	 * @param stopped true if this server is stopped, false otherwise.
+	 */
+	protected synchronized void setStopped(boolean stopped)
+	{
+		this.stopped = stopped;
+	}
+
+	/**
+	 * Get the stopped state of this server.
+	 * @return  true if this server is stopped, false otherwise.
+	 */
+	protected synchronized boolean isStopped()
+	{
+		return stopped;
 	}
 }

@@ -120,10 +120,10 @@ public class JPPFClassLoader extends ClassLoader
 			}
 			return;
 		}
-		lock.lock();
-		System.out.println("JPPFClassLoader.init(): attempting connection to the class server");
 		try
 		{
+			lock.lock();
+			System.out.println("JPPFClassLoader.init(): attempting connection to the class server");
 			if (socketClient == null) initSocketClient();
 			socketInitializer.initializeSocket(socketClient);
 
@@ -150,8 +150,8 @@ public class JPPFClassLoader extends ClassLoader
 		}
 		finally
 		{
-			setInitializing(false);
 			lock.unlock();
+			setInitializing(false);
 		}
 	}
 	

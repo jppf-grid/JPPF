@@ -97,7 +97,7 @@ public class ClassContext extends NioContext<ClassState>
 		}
 		catch(Exception ignored)
 		{
-			log.error(ignored.getMessage(), ignored);
+			LOG.error(ignored.getMessage(), ignored);
 		}
 	}
 

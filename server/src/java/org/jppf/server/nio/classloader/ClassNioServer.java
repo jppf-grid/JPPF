@@ -107,7 +107,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition, Class
 	 */
 	public synchronized void removeAllConnections()
 	{
-		if (!stop) return;
+		if (!isStopped()) return;
 		providerConnections.clear();
 		super.removeAllConnections();
 	}

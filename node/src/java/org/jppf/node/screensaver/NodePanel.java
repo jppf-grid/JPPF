@@ -54,7 +54,7 @@ public class NodePanel extends JPanel
 	/**
 	 * Holds the states of all nodes.
 	 */
-	public NodeState nodeState = null;
+	public transient NodeState nodeState = null;
 	/**
 	 * 
 	 */

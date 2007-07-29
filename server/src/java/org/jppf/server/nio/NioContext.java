@@ -35,11 +35,11 @@ public abstract class NioContext<S extends Enum>
 	/**
 	 * Log4j logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(NioContext.class);
+	protected static final Log LOG = LogFactory.getLog(NioContext.class);
 	/**
 	 * Determines whther DEBUG logging level is enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	protected static final boolean DEBUG_ENABLED = LOG.isDebugEnabled();
 	/**
 	 * The current state of the channel this context is associated with.
 	 */
@@ -103,9 +103,9 @@ public abstract class NioContext<S extends Enum>
 			readByteCount = 0;
 		}
 		readByteCount += channel.read(message.buffer);
-		if (debugEnabled)
+		if (DEBUG_ENABLED)
 		{
-			log.debug(
+			LOG.debug(
 					"[" + getNonQualifiedClassName() + "] " +  
 				"read " + readByteCount + " bytes out of " + message.length +
 				" for " + StringUtils.getRemoteHost((SocketChannel) channel));
@@ -136,9 +136,9 @@ public abstract class NioContext<S extends Enum>
 			writeByteCount = 0;
 		}
 		writeByteCount += channel.write(message.buffer);
-		if (debugEnabled)
+		if (DEBUG_ENABLED)
 		{
-			log.debug(
+			LOG.debug(
 				"[" + getNonQualifiedClassName() + "] " +  
 				"written " + writeByteCount + " bytes out of " + message.length +
 				" for " + StringUtils.getRemoteHost((SocketChannel) channel));

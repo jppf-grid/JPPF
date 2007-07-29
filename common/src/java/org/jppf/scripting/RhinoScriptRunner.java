@@ -115,7 +115,7 @@ public class RhinoScriptRunner implements ScriptRunner
 	/**
 	 * Error handler for this script runner.
 	 */
-	public class ErrorHandler implements ErrorReporter
+	public static class ErrorHandler implements ErrorReporter
 	{
 		/**
 		 * Errors thrown during execution or translation of a script.

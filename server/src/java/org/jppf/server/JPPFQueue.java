@@ -71,15 +71,15 @@ public class JPPFQueue
 	public void addBundle(JPPFTaskBundle bundle)
 	{
 		bundle.setQueueEntryTime(System.currentTimeMillis());
-		lock.lock();
-		if (debugEnabled) log.debug("adding bundle with [initialTasksCount=" + bundle.getInitialTaskCount() +
-			", taskCount=" + bundle.getTaskCount() + "]");
 		try
 		{
+			lock.lock();
+			if (debugEnabled) log.debug("adding bundle with [initialTasksCount=" + bundle.getInitialTaskCount() +
+				", taskCount=" + bundle.getTaskCount() + "]");
 			if (queue.isEmpty()) setMaxBundleSize(0);
 			queue.add(bundle);
 			int size = bundle.getInitialTaskCount();
-			if (size > maxBundleSize) setMaxBundleSize(size);
+			if (size > getMaxBundleSize()) setMaxBundleSize(size);
 			List<JPPFTaskBundle> list = sizeMap.get(size);
 			if (list == null)
 			{
@@ -105,10 +105,10 @@ public class JPPFQueue
 	public JPPFTaskBundle nextBundle(int nbTasks)
 	{
 		JPPFTaskBundle result = null;
-		lock.lock();
-		if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks");
 		try
 		{
+			lock.lock();
+			if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks");
 			JPPFTaskBundle bundle = queue.peek();
 			if (bundle == null) return null;
 			if (debugEnabled) log.debug("next bundle has " + bundle.getTaskCount() + " tasks");

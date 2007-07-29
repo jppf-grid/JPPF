@@ -43,7 +43,7 @@ public abstract class JPPFConnection extends Thread
 	/**
 	 * Indicates whether this socket handler should be terminated and stop processing.
 	 */
-	protected boolean stop = false;
+	private boolean stopped = false;
 	/**
 	 * Indicates whether this socket handler is closed, which means it can't handle requests anymore.
 	 */
@@ -85,7 +85,7 @@ public abstract class JPPFConnection extends Thread
 	{
 		try
 		{
-			while (!stop)
+			while (!isStopped())
 			{
 				perform();
 			}
@@ -110,7 +110,7 @@ public abstract class JPPFConnection extends Thread
 	 */
 	public synchronized void setStopped()
 	{
-		stop = true;
+		stopped = true;
 	}
 
 	/**
@@ -159,5 +159,23 @@ public abstract class JPPFConnection extends Thread
 		if (socketClient != null) sb.append(socketClient.getHost()).append(":").append(socketClient.getPort());
 		else sb.append("socket is null");
 		return sb.toString();
+	}
+
+	/**
+	 * Set the stopped state of this connection.
+	 * @param stopped true if this connection is to be stopped, false otherwise.
+	 */
+	protected synchronized void setStopped(boolean stopped)
+	{
+		this.stopped = stopped;
+	}
+
+	/**
+	 * Get the stopped state of this connection.
+	 * @return stopped true if this connection is stopped, false otherwise.
+	 */
+	protected synchronized boolean isStopped()
+	{
+		return stopped;
 	}
 }

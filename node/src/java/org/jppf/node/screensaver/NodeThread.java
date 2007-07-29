@@ -59,13 +59,10 @@ public class NodeThread extends Thread
 				try
 				{
 					node = NodeLauncher.createNode();
-					if (node != null)
-					{
-						node.addNodeListener(listener);
-					}
+					node.addNodeListener(listener);
 					while (true)
 					{
-						if (node != null) node.run();
+						node.run();
 						//goToSleep();
 					}
 				}
@@ -76,21 +73,6 @@ public class NodeThread extends Thread
 			}
 		}
 		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Temporarily suspend this thread.
-	 */
-	public synchronized void goToSleep()
-	{
-		try
-		{
-			wait();
-		}
-		catch(InterruptedException e)
 		{
 			e.printStackTrace();
 		}

@@ -102,6 +102,7 @@ public final class PermissionsFactory
 	private static void readStaticPermissions(ClassLoader classLoader)
 	{
 		InputStream is = null;
+		LineNumberReader reader = null;
 		try
 		{
 			String file = JPPFConfiguration.getProperties().getString("jppf.policy.file");
@@ -115,7 +116,7 @@ public final class PermissionsFactory
 			}
 			if (is == null) is = classLoader.getResourceAsStream(file);
 			if (is == null) return;
-			LineNumberReader reader = new LineNumberReader(new InputStreamReader(is));
+			reader = new LineNumberReader(new InputStreamReader(is));
 			int count = 0;
 			boolean end = false;
 			while (!end)
@@ -148,11 +149,11 @@ public final class PermissionsFactory
 		}
 		finally
 		{
-			if (is != null)
+			if (reader != null)
 			{
 				try
 				{
-					is.close();
+					reader.close();
 				}
 				catch(Exception ignored){}
 			}

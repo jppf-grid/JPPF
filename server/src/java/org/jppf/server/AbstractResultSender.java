@@ -40,11 +40,11 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	/**
 	 * The list of task bundles whose execution has been completed.
 	 */
-	protected List<JPPFTaskBundle> resultList = new Vector<JPPFTaskBundle>();
+	private List<JPPFTaskBundle> resultList = new ArrayList<JPPFTaskBundle>();
 	/**
 	 * Number of tasks that haven't yet been executed.
 	 */
-	protected int pendingTasksCount = 0;
+	private int pendingTasksCount = 0;
 	/**
 	 * Used to serialize and deserialize the tasks data.
 	 */
@@ -79,8 +79,8 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	public void run(int count) throws Exception
 	{
 		if (debugEnabled) log.debug("Pending tasks: "+count);
-		resultList = new ArrayList<JPPFTaskBundle>();
-		pendingTasksCount = count;
+		setResultList(new ArrayList<JPPFTaskBundle>());
+		setPendingTasksCount(count);
 		waitForExecution();
 	}
 
@@ -98,27 +98,27 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 */
 	public synchronized void waitForExecution() throws Exception
 	{
-		while (pendingTasksCount > 0)
+		while (getPendingTasksCount() > 0)
 		{
 			try
 			{
 				wait();
 				//synchronized (resultList)
 				{
-					if (debugEnabled) log.debug(""+resultList.size()+" in result list");
+					if (debugEnabled) log.debug(""+getResultList().size()+" in result list");
 					if (asynch)
 					{
-						for (JPPFTaskBundle bundle : resultList) sendPartialResults(bundle);
+						for (JPPFTaskBundle bundle : getResultList()) sendPartialResults(bundle);
 					}
-					else if (!resultList.isEmpty())
+					else if (!getResultList().isEmpty())
 					{
-						JPPFTaskBundle first = resultList.remove(0);
+						JPPFTaskBundle first = getResultList().remove(0);
 						List<byte[]> taskList = first.getTasks();
 						int count = first.getTasks().size();
-						int size = resultList.size();
+						int size = getResultList().size();
 						for (int i=0; i<size; i++)
 						{
-							JPPFTaskBundle bundle = resultList.remove(0);
+							JPPFTaskBundle bundle = getResultList().remove(0);
 							for (byte[] task: bundle.getTasks())
 							{
 								taskList.add(task);
@@ -129,7 +129,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 						first.setTaskCount(count);
 						sendPartialResults(first);
 					}
-					resultList.clear();
+					getResultList().clear();
 				}
 			}
 			catch (InterruptedException e)
@@ -147,11 +147,47 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 */
 	public synchronized void taskCompleted(JPPFTaskBundle result)
 	{
-		pendingTasksCount -= result.getTaskCount();
+		setPendingTasksCount(getPendingTasksCount() - result.getTaskCount());
 		if (debugEnabled) log.debug("Received results for : " + result.getTaskCount() + " [size=" +
 			result.getTasks().size() + "] tasks");
-		if (debugEnabled) log.debug("Pending tasks: " + pendingTasksCount);
-		resultList.add(result);
-		if (asynch || (pendingTasksCount <= 0)) notify();
+		if (debugEnabled) log.debug("Pending tasks: " + getPendingTasksCount());
+		getResultList().add(result);
+		if (asynch || (getPendingTasksCount() <= 0)) notify();
+	}
+
+	/**
+	 * Set the number of tasks that haven't yet been executed.
+	 * @param pendingTasksCount the number of tasks as an int. 
+	 */
+	protected synchronized void setPendingTasksCount(int pendingTasksCount)
+	{
+		this.pendingTasksCount = pendingTasksCount;
+	}
+
+	/**
+	 * Get the number of tasks that haven't yet been executed.
+	 * @return the number of tasks as an int.
+	 */
+	protected synchronized int getPendingTasksCount()
+	{
+		return pendingTasksCount;
+	}
+
+	/**
+	 * Set the list of task bundles whose execution has been completed.
+	 * @param resultList a list of <code>JPPFTaskBundle</code> instances.
+	 */
+	protected synchronized void setResultList(List<JPPFTaskBundle> resultList)
+	{
+		this.resultList = resultList;
+	}
+
+	/**
+	 * Get the list of task bundles whose execution has been completed.
+	 * @return a list of <code>JPPFTaskBundle</code> instances.
+	 */
+	protected synchronized List<JPPFTaskBundle> getResultList()
+	{
+		return resultList;
 	}
 }

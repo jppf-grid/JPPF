@@ -48,10 +48,6 @@ public class FileReplacer
 	 */
 	private String dest = null;
 	/**
-	 * The root directory from where to start search.
-	 */
-	private String rootDir = null;
-	/**
 	 * Determines whether only the search is performed (no replacement).
 	 */
 	private boolean searchOnly = true;
@@ -83,7 +79,6 @@ public class FileReplacer
 	 */
 	public void replace(String rootDir, String srcFile, String destFile, String ext, boolean searchOnly) throws Exception
 	{
-		this.rootDir = rootDir;
 		src = FileUtils.readTextFile(srcFile);
 		dest = FileUtils.readTextFile(destFile);
 		this.searchOnly = searchOnly;
@@ -171,7 +166,7 @@ public class FileReplacer
 	/**
 	 * File filter based on a set of extensions.
 	 */
-	public class ReplacerFiler implements FileFilter
+	public static class ReplacerFiler implements FileFilter
 	{
 		/**
 		 * The list of file extensions to process.

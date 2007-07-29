@@ -66,9 +66,9 @@ public class AsynchronousResultProcessor implements Runnable
 	public void run()
 	{
 		boolean error = false;
-		if (!execution.isBlocking) connection.lock.lock();
 		try
 		{
+			if (!execution.isBlocking) connection.lock.lock();
 			connection.currentExecution = execution;
 			int count = 0;
 			for (JPPFTask task : execution.tasks) task.setPosition(count++);
@@ -112,8 +112,8 @@ public class AsynchronousResultProcessor implements Runnable
 		}
 		finally
 		{
-			if (!error) connection.currentExecution = null;
 			if (!execution.isBlocking) connection.lock.unlock();
+			if (!error) connection.currentExecution = null;
 		}
 	}
 

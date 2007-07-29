@@ -36,11 +36,11 @@ public class SendingBundleState extends NodeServerState
 	/**
 	 * Log4j logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(SendingBundleState.class);
+	protected static final Log LOG = LogFactory.getLog(SendingBundleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	protected static final boolean DEBUG_ENABLED = LOG.isDebugEnabled();
 	/**
 	 * Initialize this state.
 	 * @param server the server that handles this state.
@@ -78,11 +78,11 @@ public class SendingBundleState extends NodeServerState
 			JPPFTaskBundle bundle = server.getQueue().nextBundle(context.getBundler().getBundleSize());
 			if (bundle != null)
 			{
-				if (debugEnabled) log.debug("got bundle from the queue for " + getRemoteHost(channel));
+				if (DEBUG_ENABLED) LOG.debug("got bundle from the queue for " + getRemoteHost(channel));
 				// to avoid cycles in peer-to-peer routing of jobs.
 				if (bundle.getUuidPath().contains(context.getUuid()))
 				{
-					if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: "+bundle.getUuidPath().getList());
+					if (DEBUG_ENABLED) LOG.debug("cycle detected in peer-to-peer bundle routing: "+bundle.getUuidPath().getList());
 					context.resubmitBundle(bundle);
 					context.setBundle(null);
 					server.addIdleChannel(channel);
@@ -99,11 +99,11 @@ public class SendingBundleState extends NodeServerState
 		}
 		if (context.writeMessage(channel))
 		{
-			if (debugEnabled) log.debug("sent entire bundle to node " + getRemoteHost(channel));
+			if (DEBUG_ENABLED) LOG.debug("sent entire bundle to node " + getRemoteHost(channel));
 			context.setMessage(null);
 			return TO_WAITING;
 		}
-		if (debugEnabled) log.debug("part yet to send to node " + getRemoteHost(channel));
+		if (DEBUG_ENABLED) LOG.debug("part yet to send to node " + getRemoteHost(channel));
 		return TO_SENDING;
 	}
 }

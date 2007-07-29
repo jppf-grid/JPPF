@@ -37,11 +37,11 @@ public class WaitInitialBundleState extends NodeServerState
 	/**
 	 * Log4j logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(WaitInitialBundleState.class);
+	protected static final Log LOG = LogFactory.getLog(WaitInitialBundleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	protected static final boolean DEBUG_ENABLED = LOG.isDebugEnabled();
 
 	/**
 	 * Initialize this state.
@@ -63,10 +63,10 @@ public class WaitInitialBundleState extends NodeServerState
 	{
 		SocketChannel channel = (SocketChannel) key.channel();
 		NodeContext context = (NodeContext) key.attachment();
-		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
+		if (DEBUG_ENABLED) LOG.debug("exec() for " + getRemoteHost(channel));
 		if (context.readMessage(channel))
 		{
-			if (debugEnabled) log.debug("read bundle for " + getRemoteHost(channel) + " done");
+			if (DEBUG_ENABLED) LOG.debug("read bundle for " + getRemoteHost(channel) + " done");
 			JPPFTaskBundle bundle = context.deserializeBundle();
 			context.setUuid(bundle.getBundleUuid());
 			boolean override = bundle.getParameter(BundleParameter.BUNDLE_TUNING_TYPE_PARAM) != null;

@@ -72,7 +72,6 @@ public class PeerNode extends AbstractMonitoredNode
 	 */
 	public void run()
 	{
-		debugEnabled = log.isDebugEnabled();
 		stopped = false;
 		if (debugEnabled) log.debug(getName() + "Start of peer node main loop");
 		while (!stopped)
