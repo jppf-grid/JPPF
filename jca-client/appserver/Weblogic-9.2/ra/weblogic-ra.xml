@@ -7,11 +7,19 @@
 
 	<jndi-name>eis/JPPFResourceAdapter</jndi-name>
 
+	<enable-global-access-to-classes>true</enable-global-access-to-classes>
+
 	<work-manager>
 		<name>JPPFWorkManager</name>
+		<min-threads-constraint>
+			<name>JPPFMinThreadsConstraint</name>
+			<count>1</count>
+		</min-threads-constraint>
 		<ignore-stuck-threads>true</ignore-stuck-threads>
 	</work-manager>
 
+	<!--
+	-->
 	<outbound-resource-adapter>
 		<default-connection-properties>
 			<logging>

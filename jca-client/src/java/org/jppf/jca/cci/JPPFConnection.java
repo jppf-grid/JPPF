@@ -45,7 +45,7 @@ public class JPPFConnection extends JPPFAccessor implements Connection
 	private JPPFManagedConnection conn;
 
 	/**
-	 * Initialize this conneciton from a manbaged cvonnection.
+	 * Initialize this conneciton from a managed connection.
 	 * @param conn a <code>ManagedConnection</code> instance.
 	 */
 	public JPPFConnection(JPPFManagedConnection conn)

@@ -4,14 +4,17 @@
      "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <!-- ============================================================= -->
-<!--                                                               -->
-<!-- Deployement descriptor for the 'builder' Web Application.     -->
-<!--                                                               -->
+<!-- Deployement descriptor for the "jppftest" Web Application.    -->
 <!-- ============================================================= -->
 
 <web-app>
   <display-name>jppftest</display-name>
   <description>jppftest</description>
+
+  <!-- Establish the default list of welcome files -->
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
 
 	<resource-ref>
 		<description>JPPF Connection Factory</description>
@@ -20,22 +23,5 @@
 		<res-auth>Application</res-auth>
 		<!--<res-sharing-scope>Unshareable</res-sharing-scope>-->
 	</resource-ref>
-
-  <!-- =========================================================== -->
-  <!-- Context parameters.                                         -->
-  <!-- =========================================================== -->
-
-  <!-- =========================================================== -->
-  <!-- Servlet declarations.                                       -->
-  <!-- =========================================================== -->
-
-  <!-- =========================================================== -->
-  <!-- Servlet mappings.                                           -->
-  <!-- =========================================================== -->
-
-  <!-- Establish the default list of welcome files -->
-  <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-  </welcome-file-list>
 
 </web-app>

@@ -6,9 +6,7 @@
     <application-managed-security/>
     <rar-name>jppf_ra_JBoss-4.0.rar</rar-name> 
     <connection-definition>javax.resource.cci.ConnectionFactory</connection-definition>
-
     <adapter-display-name>JPPF</adapter-display-name>
-
     <min-pool-size>0</min-pool-size>
     <max-pool-size>10</max-pool-size>
     <blocking-timeout-millis>50000</blocking-timeout-millis>

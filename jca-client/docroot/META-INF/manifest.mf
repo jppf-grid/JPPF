@@ -1,4 +1,4 @@
-Class-Path: lib/jppf-client.jar lib/jppf-common.jar lib/jppf-common-node.jar lib/jca-client.jar lib/commons-logging-1.1.jar
+Class-Path: lib/jppf-client.jar lib/jppf-common.jar lib/jppf-common-node.jar lib/jppf-jca.jar lib/commons-logging-1.1.jar
 
 Name: JPPF
 Title: JPPF 1.0

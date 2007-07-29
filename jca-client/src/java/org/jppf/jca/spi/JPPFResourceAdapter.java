@@ -75,7 +75,8 @@ public class JPPFResourceAdapter extends JPPFAccessor implements ResourceAdapter
 		log.info("Starting JPPF resource adapter: jppf client="+jppfClient);
 		try
 		{
-			workManager.startWork((JcaClassServerDelegate) jppfClient.getDelegate());
+			//workManager.startWork((JcaClassServerDelegate) jppfClient.getDelegate());
+			workManager.scheduleWork((JcaClassServerDelegate) jppfClient.getDelegate());
 		}
 		catch(WorkException e)
 		{
@@ -83,7 +84,8 @@ public class JPPFResourceAdapter extends JPPFAccessor implements ResourceAdapter
 		}
 		try
 		{
-			workManager.startWork(new JPPFJcaJob(jppfClient.getInitialWorkList(), 1000));
+			//workManager.startWork(new JPPFJcaJob(jppfClient.getInitialWorkList(), 1000));
+			workManager.scheduleWork(new JPPFJcaJob(jppfClient.getInitialWorkList(), 1000));
 		}
 		catch(WorkException e)
 		{
