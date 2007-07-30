@@ -102,7 +102,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 		{
 			setStatus(CONNECTING);
 			if (socketClient == null) initSocketClient();
-			log.info("[client: "+name+"] Attempting connection to the JPPF driver");
+			if (debugEnabled) log.debug("[client: "+name+"] Attempting connection to the JPPF driver");
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isSuccessfull())
 			{

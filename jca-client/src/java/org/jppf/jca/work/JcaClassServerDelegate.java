@@ -92,7 +92,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 		{
 			setStatus(CONNECTING);
 			if (socketClient == null) initSocketClient();
-			log.info("[client: "+getName()+"] Attempting connection to the class server");
+			if (debugEnabled) log.debug("[client: "+getName()+"] Attempting connection to the class server");
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isClosed())
 			{
