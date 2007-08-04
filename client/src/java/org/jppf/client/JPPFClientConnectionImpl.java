@@ -81,7 +81,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	}
 
 	/**
-	 * 
+	 * Initialize this client connection.
 	 * @see org.jppf.client.JPPFClientConnection#init()
 	 */
 	public void init()

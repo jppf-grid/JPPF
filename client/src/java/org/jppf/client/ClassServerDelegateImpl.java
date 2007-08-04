@@ -87,7 +87,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			if (!socketInitializer.isClosed())
 			{
 				System.out.println("[client: "+getName()+"] ClassServerDelegate.init(): Reconnected to the class server");
-				//owner.setStatus(JPPFClientConnectionStatus.ACTIVE);
+				owner.setStatus(JPPFClientConnectionStatus.ACTIVE);
 			}
 		}
 		catch(Exception e)

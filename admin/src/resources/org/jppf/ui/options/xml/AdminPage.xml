@@ -69,7 +69,7 @@
 						shutdownDelay = option.findElement("../Shutdown_delay").getValue();
 						restartDelay = 0;
 						var command;
-						if (option.findElement("../Restart").getValue())
+						if (option.findElement("../Restart").getValue().booleanValue())
 						{
 							restartDelay = option.findElement("../Restart_delay").getValue();
 							command = BundleParameter.SHUTDOWN_RESTART;

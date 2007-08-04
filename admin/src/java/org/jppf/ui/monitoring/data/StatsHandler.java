@@ -40,6 +40,10 @@ public final class StatsHandler implements StatsConstants
 	 */
 	private static Log log = LogFactory.getLog(StatsHandler.class);
 	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * Singleton instance of this class.
 	 */
 	private static StatsHandler instance = null;
@@ -187,6 +191,7 @@ public final class StatsHandler implements StatsConstants
 		String msg = null;
 		try
 		{
+			if (debugEnabled) log.debug("parameters: " + params);
 			msg = currentConnection.submitAdminRequest(password, null, BundleParameter.CHANGE_SETTINGS, params);
 		}
 		catch(Exception e)
@@ -213,6 +218,7 @@ public final class StatsHandler implements StatsConstants
 			Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
 			params.put(SHUTDOWN_DELAY_PARAM, shutdownDelay);
 			params.put(RESTART_DELAY_PARAM, restartDelay);
+			if (debugEnabled) log.debug("command: " + command + ", parameters: " + params);
 			msg = currentConnection.submitAdminRequest(password, null, command, params);
 		}
 		catch(Exception e)
@@ -252,9 +258,9 @@ public final class StatsHandler implements StatsConstants
 	 */
 	public void update(JPPFClientConnection connection, JPPFStats stats)
 	{
-		lock.lock();
 		try
 		{
+			lock.lock();
 			if (connection == null)
 			{
 				connection = getJppfClient().getAllConnections().get(0);
