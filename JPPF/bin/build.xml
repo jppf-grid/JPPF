@@ -65,6 +65,7 @@
 		<pathelement location="${client}/classes"/>
 		<pathelement location="${server}/classes"/>
 		<pathelement location="${demo}/classes"/>
+		<pathelement location="${jca-client}/classes"/>
 		<fileset dir="${lib}">
 			<include name="**/*.jar"/>
 		</fileset>
@@ -114,7 +115,11 @@
   <target name="build" depends="init, compile, jar"/>
 	<target name="rebuild" depends="clean, init, compile, jar"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
-	<target name="deploy" depends="clean.deploy, rebuild, javadoc, doc, init.deploy, package, runtime, screensaver"/>
+	<target name="deploy" depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver"/>
+  <target name="deploy.splash">
+  	<splash showduration="500" imageurl="http://www.jppf.org/screenshots/shot11.jpg"/>
+  	<antcall target="deploy"/>
+  </target>
 
 	<!-- ========================================================================= -->
 	<!--                         Compile the application                           -->
@@ -146,12 +151,20 @@
   </target>
 
 	<!-- ========================================================================= -->
-	<!--                         Compile the application                           -->
+	<!--                         Generate the screensaver                          -->
 	<!-- ========================================================================= -->
 
 	<target name="screensaver" description="Generate the screen saver packaging for the nodes"
 		depends="init" if="NSIS.present">
 		<ant antfile="${basedir}/../node/bin/build.xml" inheritall="false"/>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--                         Generate the screensaver                          -->
+	<!-- ========================================================================= -->
+
+	<target name="jca" description="Generate resource adapter for various application servers" depends="init">
+		<ant antfile="${basedir}/../jca-client/build.xml" inheritall="false"/>
   </target>
 
 	<!-- ========================================================================= -->
@@ -195,6 +208,7 @@
 			<format property="now" pattern="yyyyMMdd"/>
 		</tstamp>
 
+		<property name="zip.prefix" value="${ant.project.name}-${version.number}"/>
 		<property name="release.file"
 			value="${build}/${ant.project.name}-full-src-${version.number}.${build.number}-${now}.zip"/>
 		<delete file="${release.file}" quiet="true"/>
@@ -208,12 +222,13 @@
 				<include name="${license.file}"/>
 				<include name="JPPF-3rd-party.html"/>
 			</zipfileset>
-			<zipfileset dir="${node}" prefix="${ant.project.name}-${version.number}/node"/>
-			<zipfileset dir="${common}" prefix="${ant.project.name}-${version.number}/common"/>
-			<zipfileset dir="${client}" prefix="${ant.project.name}-${version.number}/client"/>
-			<zipfileset dir="${server}" prefix="${ant.project.name}-${version.number}/server"/>
-			<zipfileset dir="${admin}" prefix="${ant.project.name}-${version.number}/admin"/>
-			<zipfileset dir="${demo}" prefix="${ant.project.name}-${version.number}/demo" excludes="*.log"/>
+			<zipfileset dir="${node}" prefix="${zip.prefix}/node"/>
+			<zipfileset dir="${common}" prefix="${zip.prefix}/common"/>
+			<zipfileset dir="${client}" prefix="${zip.prefix}/client"/>
+			<zipfileset dir="${server}" prefix="${zip.prefix}/server"/>
+			<zipfileset dir="${admin}" prefix="${zip.prefix}/admin"/>
+			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
+			<zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
 		</zip>
 
 		<property name="lite.release.file"
@@ -229,12 +244,13 @@
 			<zipfileset dir="${basedir}/lib" prefix="${ant.project.name}-${version.number}/JPPF/lib">
 				<exclude name="**/*.jar"/>
 			</zipfileset>
-			<zipfileset dir="${node}" prefix="${ant.project.name}-${version.number}/node" excludes="classes/**/*.*,"/>
-			<zipfileset dir="${common}" prefix="${ant.project.name}-${version.number}/common" excludes="classes/**/*.*"/>
-			<zipfileset dir="${client}" prefix="${ant.project.name}-${version.number}/client" excludes="classes/**/*.*"/>
-			<zipfileset dir="${server}" prefix="${ant.project.name}-${version.number}/server" excludes="classes/**/*.*"/>
-			<zipfileset dir="${admin}" prefix="${ant.project.name}-${version.number}/admin" excludes="classes/**/*.*"/>
-			<zipfileset dir="${demo}" prefix="${ant.project.name}-${version.number}/demo" excludes="classes/**/*.*,*.log"/>
+			<zipfileset dir="${node}" prefix="${zip.prefix}/node" excludes="classes/**/*.*"/>
+			<zipfileset dir="${common}" prefix="${zip.prefix}/common" excludes="classes/**/*.*"/>
+			<zipfileset dir="${client}" prefix="${zip.prefix}/client" excludes="classes/**/*.*"/>
+			<zipfileset dir="${server}" prefix="${zip.prefix}/server" excludes="classes/**/*.*"/>
+			<zipfileset dir="${admin}" prefix="${zip.prefix}/admin" excludes="classes/**/*.*"/>
+			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="classes/**/*.*,*.log"/>
+			<zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client" excludes="classes/**/*.*,**/*.ear,**/**.rar,**/**.jar"/>
 		</zip>
 	</target>
 
@@ -414,8 +430,9 @@
 			<packageset dir="${server}/src/java"/>
 			<packageset dir="${admin}/src/java"/>
 			<packageset dir="${demo}/src/java"/>
-			<packageset dir="${jca-client}/src"/>
+			<packageset dir="${jca-client}/src/java"/>
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
+			<link href="http://java.sun.com/javaee/5/docs/api/"/>
 			<doctitle><![CDATA[Java Parallel Processing Framework v${version.number}]]></doctitle>
 			<header>
 				<![CDATA[
