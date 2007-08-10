@@ -91,13 +91,9 @@ public class JPPFClient extends AbstractJPPFClient
 			}
 			for (String s: names)
 			{
-				String prefix = "".equals(s) ? "" : s + ".";
 				String name = "".equals(s) ? "default" : s;
-				String host = props.getString(prefix + "jppf.server.host", "localhost");
-				int driverPort = props.getInt(prefix + "app.server.port", 11112);
-				int classServerPort = props.getInt(prefix + "class.server.port", 11111);
-				int priority = props.getInt(prefix + "priority", 0);
-				JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, name, host, driverPort, classServerPort, priority);
+				JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, name, props);
+				int priority = c.getPriority();
 				c.addClientConnectionStatusListener(this);
 				ClientPool pool = pools.get(priority);
 				if (pool == null)

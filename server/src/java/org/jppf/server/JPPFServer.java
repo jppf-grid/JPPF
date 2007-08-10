@@ -168,7 +168,7 @@ public abstract class JPPFServer extends Thread
 	 * Remove the specified connection from the list of active connections of this server.
 	 * @param connection the connection to remove.
 	 */
-	public void removeConnection(JPPFConnection connection)
+	public synchronized void removeConnection(JPPFConnection connection)
 	{
 		connections.remove(connection);
 	}

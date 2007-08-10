@@ -69,7 +69,7 @@
 			ccPage.getInitializer().valueChanged(new ValueChangeEvent(ccPage));
 			OptionsHandler.loadPreferences();
 			frame.getContentPane().add(option.getUIComponent());
-			frame.setSize(600, 600);
+			frame.setSize(600, 730);
 			frame.setVisible(true);
 			statsHandler.addStatsHandlerListener(monitor);
 			statsHandler.addStatsHandlerListener(builder);

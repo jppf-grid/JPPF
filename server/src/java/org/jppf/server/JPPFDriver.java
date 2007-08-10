@@ -24,6 +24,7 @@ import org.apache.commons.logging.*;
 import org.jppf.*;
 import org.jppf.security.*;
 import org.jppf.server.app.JPPFApplicationServer;
+import org.jppf.server.management.JMXServerImpl;
 import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.peer.JPPFPeerInitializer;
@@ -76,6 +77,10 @@ public class JPPFDriver
 	 * Security credentials associated with this JPPF driver.
 	 */
 	private JPPFSecurityContext credentials = null;
+	/**
+	 * The jmx server used to manage and monitor this driver.
+	 */
+	private JMXServerImpl jmxServer = null;
 
 	/**
 	 * Initialize this JPPFDriver.
@@ -108,6 +113,9 @@ public class JPPFDriver
 		//nodeServer.start();
 		nodeNioServer = new NodeNioServer(port, bundler);
 		nodeNioServer.start();
+
+		jmxServer = new JMXServerImpl();
+		jmxServer.start();
 
 		initPeers();
 	}

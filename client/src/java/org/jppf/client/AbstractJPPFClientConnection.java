@@ -125,7 +125,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	}
 
 	/**
-	 * Initialize this client with a specified application UUID.
+	 * Initialize this client connection with the specified parameters.
 	 * @param uuid the unique identifier for this local client.
 	 * @param name configuration name for this local client.
 	 * @param host the name or IP address of the host the JPPF driver is running on.
@@ -134,6 +134,20 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @param priority the assigned to this client connection.
 	 */
 	public AbstractJPPFClientConnection(String uuid, String name, String host, int driverPort, int classServerPort, int priority)
+	{
+		configure(uuid, name, host, driverPort, classServerPort, priority);
+	}
+
+	/**
+	 * Configure this client connection with the specified parameters.
+	 * @param uuid the unique identifier for this local client.
+	 * @param name configuration name for this local client.
+	 * @param host the name or IP address of the host the JPPF driver is running on.
+	 * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
+	 * @param classServerPort the TCP port the class server is listening to.
+	 * @param priority the assigned to this client connection.
+	 */
+	protected void configure(String uuid, String name, String host, int driverPort, int classServerPort, int priority)
 	{
 		this.appUuid = uuid;
 		this.host = host;

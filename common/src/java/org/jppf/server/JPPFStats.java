@@ -18,6 +18,7 @@
 package org.jppf.server;
 
 import java.io.Serializable;
+
 import org.jppf.utils.JPPFConfiguration;
 
 /**
@@ -59,7 +60,7 @@ public class JPPFStats implements Serializable
 	 */
 	public TimeSnapshot queue = new TimeSnapshot("queue");
 	/**
-	 * Total number of tasks that have been queue.
+	 * Total number of tasks that have been queued.
 	 */
 	public int totalQueued = 0;
 	/**
@@ -115,7 +116,7 @@ public class JPPFStats implements Serializable
 		s.footprint = footprint;
 		return s;
 	}
-	
+
 	/**
 	 * Get a string representation of this stats object.
 	 * @return a string display the various stats values.

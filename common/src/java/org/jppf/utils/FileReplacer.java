@@ -155,7 +155,7 @@ public class FileReplacer
 		try
 		{
 			FileReplacer replacer = new FileReplacer();
-			replacer.replace("D:/Workspaces/SourceForge", "D:/temp/src.txt", "D:/temp/dest.txt", "java", false); 
+			replacer.replace("D:/Workspaces/SourceForge", "D:/temp/src.txt", "D:/temp/dest.txt", "java", true); 
 		}
 		catch(Exception e)
 		{

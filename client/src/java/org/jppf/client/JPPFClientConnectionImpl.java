@@ -32,6 +32,7 @@ import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
 import org.jppf.client.event.TaskResultListener;
 import org.jppf.comm.socket.*;
+import org.jppf.management.*;
 import org.jppf.security.CryptoUtils;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.*;
@@ -49,35 +50,52 @@ import org.jppf.utils.*;
 public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(JPPFClientConnectionImpl.class);
+	private static Log log = LogFactory.getLog(JPPFClientConnectionImpl.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Name of the JPPF driver mbean.
+	 */
+	private static final String MBEAN_NAME = "org.jppf:name=admin,type=driver";
+	/**
+	 * Signature of the method invoked on the MBean.
+	 */
+	private static final String[] MBEAN_SIGNATURE = new String[] {JPPFManagementRequest.class.getName()};
+	/**
 	 * Used to synchronize request submissions performed by mutliple threads.
 	 */
-	ReentrantLock lock = new ReentrantLock();
+	private ReentrantLock lock = new ReentrantLock();
 	/**
 	 * The pool of threads used for submitting execution requests.
 	 */
 	private ThreadPoolExecutor executor =
 		new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
+	/**
+	 * Provides access to the management functions of the driver.
+	 */
+	private JMXConnectionWrapper jmxConnection = null;
 
 	/**
 	 * Initialize this client with a specified application UUID.
 	 * @param uuid the unique identifier for this local client.
 	 * @param name configuration name for this local client.
-	 * @param host the name or IP address of the host the JPPF driver is running on.
-	 * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
-	 * @param classServerPort the TCP port the class server is listening to.
-	 * @param priority the assigned to this client connection.
+	 * @param props the configuration properties for this connection.
 	 */
-	public JPPFClientConnectionImpl(String uuid, String name, String host, int driverPort, int classServerPort, int priority)
+	public JPPFClientConnectionImpl(String uuid, String name, TypedProperties props)
 	{
-		super(uuid, name, host, driverPort, classServerPort, priority);
+		String prefix = name + ".";
+		configure(uuid, name, props.getString(prefix + "jppf.server.host", "localhost"),
+			props.getInt(prefix + "app.server.port", 11112),
+			classServerPort = props.getInt(prefix + "class.server.port", 11111),
+			props.getInt(prefix + "priority", 0));
+		String mHost = props.getString(prefix + "jppf.management.host", "localhost");
+		int port = props.getInt(prefix + "jppf.management.port", 11198);
+		jmxConnection = new JMXConnectionWrapper(mHost, port);
+		jmxConnection.connect();
 	}
 
 	/**
@@ -137,45 +155,9 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 */
 	public JPPFStats requestStatistics() throws Exception
 	{
-		lock.lock();
-		try
-		{
-			boolean completed = false;
-			JPPFStats stats = null;
-			while (!completed)
-			{
-				try
-				{
-					JPPFTaskBundle header = new JPPFTaskBundle();
-					header.setRequestUuid(new JPPFUuid().toString());
-					TraversalList<String> uuidPath = new TraversalList<String>();
-					uuidPath.add(appUuid);
-					header.setUuidPath(uuidPath);
-					header.setCredentials(credentials);
-					header.setRequestType(JPPFTaskBundle.Type.STATISTICS);
-					JPPFBuffer buf = helper.toBytes(header, false);
-					byte[] data = new byte[buf.getLength() + 4];
-					helper.copyToBuffer(buf.getBuffer(), data, 0, buf.getLength());
-					buf.setLength(data.length);
-					buf.setBuffer(data);
-					socketClient.sendBytes(buf);
-					buf = socketClient.receiveBytes(0);
-					ObjectSerializer serializer = new ObjectSerializerImpl();
-					stats = (JPPFStats) serializer.deserialize(buf.getBuffer());
-					completed = true;
-				}
-				catch(IOException e)
-				{
-					log.error("["+name+"] "+e.getMessage(), e);
-					initConnection();
-				}
-			}
-			return stats;
-		}
-		finally
-		{
-			lock.unlock();
-		}
+		Map<BundleParameter, Object> params = new EnumMap<BundleParameter, Object>(BundleParameter.class);
+		params.put(COMMAND_PARAM, READ_STATISTICS);
+    return (JPPFStats) processManagementRequest(params);
 	}
 
 	/**
@@ -187,60 +169,13 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * @return the reponse message from the server.
 	 * @throws Exception if an error occurred while trying to send or execute the command.
 	 */
-	public String submitAdminRequest(String password, String newPassword, BundleParameter command, Map<BundleParameter, Object> parameters)
-			throws Exception
+	public String submitAdminRequest(String password, String newPassword, BundleParameter command, 
+		Map<BundleParameter, Object> parameters) throws Exception
 	{
-		lock.lock();
-		try
-		{
-			JPPFTaskBundle request = new JPPFTaskBundle();
-			request.setRequestUuid(new JPPFUuid().toString());
-			TraversalList<String> uuidPath = new TraversalList<String>();
-			uuidPath.add(appUuid);
-			request.setUuidPath(uuidPath);
-			request.setCredentials(credentials);
-			request.setRequestType(JPPFTaskBundle.Type.ADMIN);
-			request.setParameter(COMMAND_PARAM, command);
-			SecretKey tmpKey = CryptoUtils.generateSecretKey();
-			request.setParameter(KEY_PARAM, CryptoUtils.encrypt(tmpKey.getEncoded()));
-			request.setParameter(PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, password.getBytes()));
-			if (newPassword != null)
-			{
-				request.setParameter(NEW_PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, newPassword.getBytes()));
-			}
-			if (parameters != null)
-			{
-				for (BundleParameter key: parameters.keySet())
-				{
-					request.setParameter(key, parameters.get(key));
-				}
-			}
-			sendAdminRequest(request);
-			JPPFBuffer buf = socketClient.receiveBytes(0);
-			List<JPPFTaskBundle> list = new ArrayList<JPPFTaskBundle>();
-			helper.fromBytes(buf.getBuffer(), 0, false, list, 1);
-			request = list.get(0);
-			return (String) request.getParameter(RESPONSE_PARAM);
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
-
-	/**
-	 * Send an administration request to the server.
-	 * @param request the request to send, with its parameters populated.
-	 * @throws Exception if the request could not be sent.
-	 */
-	private void sendAdminRequest(JPPFTaskBundle request) throws Exception
-	{
-		JPPFBuffer buf = helper.toBytes(request, false);
-		byte[] data = new byte[buf.getLength() + 4];
-		helper.copyToBuffer(buf.getBuffer(), data, 0, buf.getLength());
-		buf.setLength(data.length);
-		buf.setBuffer(data);
-		socketClient.sendBytes(buf);
+			parameters.put(PASSWORD_PARAM, password);
+			parameters.put(NEW_PASSWORD_PARAM, newPassword);
+			parameters.put(COMMAND_PARAM, command);
+			return (String) processManagementRequest(parameters);
 	}
 
 	/**
@@ -304,5 +239,51 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	protected SocketInitializer createSocketInitializer()
 	{
 		return new SocketInitializerImpl();
+	}
+
+	/**
+	 * Get the lock used to synchronize request submissions performed by mutliple threads.
+	 * @return  a <code>ReentrantLock</code> instance.
+	 */
+	public ReentrantLock getLock()
+	{
+		return lock;
+	}
+
+	/**
+	 * Get the object that provides access to the management functions of the driver.
+	 * @return a <code>JMXConnectionWrapper</code> instance.
+	 */
+	public JMXConnectionWrapper getJmxConnection()
+	{
+		return jmxConnection;
+	}
+
+	/**
+	 * Process a management or monitoring request.
+	 * @param parameters the parameters of the request to process
+	 * @return the result of the request.
+	 * @throws Exception if an error occurred while performing the request.
+	 */
+	public Object processManagementRequest(Map<BundleParameter, Object> parameters) throws Exception
+	{
+		if (!READ_STATISTICS.equals(parameters.get(COMMAND_PARAM)))
+		{
+			String password = (String) parameters.get(PASSWORD_PARAM);
+			SecretKey tmpKey = CryptoUtils.generateSecretKey();
+			parameters.put(KEY_PARAM, CryptoUtils.encrypt(tmpKey.getEncoded()));
+			parameters.put(PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, password.getBytes()));
+			String newPassword = (String) parameters.get(NEW_PASSWORD_PARAM);
+			if (newPassword != null)
+			{
+				parameters.put(NEW_PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, newPassword.getBytes()));
+			}
+		}
+		JPPFManagementRequest<BundleParameter, Object> request =
+			new JPPFManagementRequest<BundleParameter, Object>(parameters);
+		JPPFManagementResponse response = (JPPFManagementResponse) getJmxConnection().invoke(
+			MBEAN_NAME, "performAdminRequest", new Object[] {request}, MBEAN_SIGNATURE);
+		if (response.getException() == null) return response.getResult();
+		throw response.getException();
 	}
 }

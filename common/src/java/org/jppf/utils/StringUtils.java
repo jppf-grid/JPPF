@@ -189,4 +189,27 @@ public final class StringUtils
 		sb.append("[").append(s.getInetAddress().getHostAddress()).append(":").append(s.getPort()).append("]");
 		return sb.toString();
 	}
+
+	/**
+	 * Get a String representation of an array of any type.
+	 * @param <T> the type of the array.
+	 * @param array the array from which to build a string representation.
+	 * @return the array's content as a string.
+	 */
+	public static <T> String arrayToString(T[] array)
+	{
+  	StringBuilder sb = new StringBuilder();
+  	if (array == null) sb.append("null");
+  	else
+  	{
+  		sb.append("[");
+  		for (int i=0; i<array.length; i++)
+  		{
+  			if (i > 0) sb.append(";");
+  			sb.append(array[i]);
+  		}
+  		sb.append("]");
+  	}
+  	return sb.toString();
+	}
 }

@@ -41,6 +41,14 @@ public enum  BundleParameter
 	 */
 	CHANGE_SETTINGS,
 	/**
+	 * Admin command for getting the bundle size settings from the server.
+	 */
+	REFRESH_SETTINGS,
+	/**
+	 * Admin command for getting the latest statistics fropm the server.
+	 */
+	READ_STATISTICS,
+	/**
 	 * Parameter name for the administration command to perform.
 	 */
 	COMMAND_PARAM,

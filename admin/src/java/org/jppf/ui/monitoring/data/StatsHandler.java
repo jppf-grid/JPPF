@@ -24,8 +24,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
+import org.jppf.management.JMXConnectionWrapper;
 import org.jppf.server.JPPFStats;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.BundleParameter;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.utils.JPPFConfiguration;
 
@@ -89,7 +90,6 @@ public final class StatsHandler implements StatsConstants
 	 * Used to synchronize concurrent access to the data.
 	 */
 	private ReentrantLock lock = new ReentrantLock();
-
 	/**
 	 * Get the singleton instance of this class.
 	 * @return a <code>StatsHandler</code> instance.
@@ -154,6 +154,16 @@ public final class StatsHandler implements StatsConstants
 	}
 
 	/**
+	 * Get the connection to the management server.
+	 * @param c the driver connection for which to get aJMX connection.
+	 * @return a <code>MBeanConnectionWrapper</code> instance.
+	 */
+	private JMXConnectionWrapper getMBeanConnection(JPPFClientConnectionImpl c)
+	{
+		return c.getJmxConnection();
+	}
+
+	/**
 	 * Request an update from the current server conenction.
 	 */
 	public void requestUpdate()
@@ -171,7 +181,7 @@ public final class StatsHandler implements StatsConstants
 		{
 			if ((c != null) && JPPFClientConnectionStatus.ACTIVE.equals(c.getStatus()))
 			{
-				update(c, c.requestStatistics());
+        update(c, c.requestStatistics());
 			}
 		}
 		catch(Exception e)
@@ -191,8 +201,10 @@ public final class StatsHandler implements StatsConstants
 		String msg = null;
 		try
 		{
-			if (debugEnabled) log.debug("parameters: " + params);
-			msg = currentConnection.submitAdminRequest(password, null, BundleParameter.CHANGE_SETTINGS, params);
+			params.put(COMMAND_PARAM, CHANGE_SETTINGS);
+			params.put(PASSWORD_PARAM, password);
+			if (debugEnabled) log.debug("command: CHANGE_SETTINGS, parameters: " + params);
+			msg = (String) currentConnection.processManagementRequest(params);
 		}
 		catch(Exception e)
 		{
@@ -218,8 +230,10 @@ public final class StatsHandler implements StatsConstants
 			Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
 			params.put(SHUTDOWN_DELAY_PARAM, shutdownDelay);
 			params.put(RESTART_DELAY_PARAM, restartDelay);
+			params.put(COMMAND_PARAM, command);
+			params.put(PASSWORD_PARAM, password);
 			if (debugEnabled) log.debug("command: " + command + ", parameters: " + params);
-			msg = currentConnection.submitAdminRequest(password, null, command, params);
+			msg = (String) currentConnection.processManagementRequest(params);
 		}
 		catch(Exception e)
 		{
@@ -241,7 +255,12 @@ public final class StatsHandler implements StatsConstants
 		if (jppfClient == null) return "Not connected to the server";
 		try
 		{
-			msg = currentConnection.submitAdminRequest(password, newPassword, CHANGE_PASSWORD, null);
+			Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
+			params.put(COMMAND_PARAM, CHANGE_SETTINGS);
+			params.put(PASSWORD_PARAM, password);
+			params.put(NEW_PASSWORD_PARAM, newPassword);
+			if (debugEnabled) log.debug("command: CHANGE_SETTINGS, parameters: " + params);
+			msg = (String) currentConnection.processManagementRequest(params);
 		}
 		catch(Exception e)
 		{

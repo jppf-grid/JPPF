@@ -18,20 +18,15 @@
 package org.jppf.server.app;
 
 import static org.jppf.server.JPPFStatsUpdater.*;
-import static org.jppf.server.protocol.BundleParameter.*;
-import static org.jppf.server.protocol.JPPFTaskBundle.Type.*;
+import static org.jppf.server.protocol.JPPFTaskBundle.Type.EXECUTION;
 
 import java.net.*;
 import java.util.*;
 
-import javax.crypto.SecretKey;
-
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
-import org.jppf.security.*;
 import org.jppf.server.*;
-import org.jppf.server.protocol.*;
-import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.*;
 
 /**
@@ -128,15 +123,7 @@ public class ApplicationConnection extends JPPFConnection
 		int pos = helper.fromBytes(buffer.getBuffer(), 0, false, list, 1);
 		header = list.get(0);
 		JPPFTaskBundle.Type type = header.getRequestType();
-		if (STATISTICS.equals(type) && isStatsEnabled())
-		{
-			sendStats();
-		}
-		else if (ADMIN.equals(type))
-		{
-			performAdminOperation(header);
-		}
-		else if (EXECUTION.equals(type))
+		if (EXECUTION.equals(type))
 		{
 			executeTasks(buffer.getBuffer(), pos);
 		}
@@ -186,98 +173,6 @@ public class ApplicationConnection extends JPPFConnection
 		if (count <= 0) resultSender.sendPartialResults(header);
 		else resultSender.run(count);
 		return;
-	}
-
-	/**
-	 * Send the collected statistics in response to a stats request.
-	 * @throws Exception if the statistics could not be sent to the requester.
-	 */
-	private void sendStats() throws Exception
-	{
-		JPPFStats stats = getStats();
-		SerializationHelper helper = new SerializationHelperImpl();
-		JPPFBuffer buffer = helper.toBytes(stats, false);
-		socketClient.sendBytes(buffer);
-	}
-
-	/**
-	 * Perform a requested administrative function.
-	 * @param header the header for the request.
-	 * @throws Exception if the function could not be performed.
-	 */
-	private void performAdminOperation(JPPFTaskBundle header) throws Exception
-	{
-		String response = LocalizationUtils.getLocalized(I18N_BASE, "request.executed");
-		byte[] b = (byte[]) header.getParameter(KEY_PARAM);
-		b = CryptoUtils.decrypt(b);
-		SecretKey tmpKey = CryptoUtils.getSecretKeyFromEncoded(b);
-		b = (byte[]) header.getParameter(PASSWORD_PARAM);
-		String remotePwd = new String(CryptoUtils.decrypt(tmpKey, b));
-		PasswordManager pm = new PasswordManager();
-		b = pm.readPassword();
-		String localPwd = new String(CryptoUtils.decrypt(b));
-
-		if (!localPwd.equals(remotePwd)) response = LocalizationUtils.getLocalized(I18N_BASE, "invalid.password");
-		else
-		{
-			BundleParameter command = (BundleParameter) header.getParameter(COMMAND_PARAM);
-			if (SHUTDOWN.equals(command) || SHUTDOWN_RESTART.equals(command))
-			{
-				long shutdownDelay = (Long) header.getParameter(SHUTDOWN_DELAY_PARAM);
-				boolean restart = !SHUTDOWN.equals(command);
-				long restartDelay = (Long) header.getParameter(RESTART_DELAY_PARAM);
-				sendAdminResponse(header, LocalizationUtils.getLocalized(I18N_BASE, "request.acknowledged"));
-				JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay, restart, restartDelay);
-				return;
-			}
-			else if (CHANGE_PASSWORD.equals(command))
-			{
-				b = (byte[]) header.getParameter(NEW_PASSWORD_PARAM);
-				String newPwd = new String(CryptoUtils.decrypt(tmpKey, b));
-				pm.savePassword(CryptoUtils.encrypt(newPwd.getBytes()));
-				response = "Password changed";
-			}
-			else if (CHANGE_SETTINGS.equals(command))
-			{
-				response = performChangeSettings(header);
-			}
-		}
-		sendAdminResponse(header, response);
-	}
-
-	/**
-	 * Perform the action to change the settings for bundle size tuning.
-	 * @param request the request holding the parameters to change.
-	 * @return a message to report the change status.
-	 * @throws Exception if the changes could not be applied.
-	 */
-	private String performChangeSettings(JPPFTaskBundle request) throws Exception
-	{
-		String response = null;
-		Bundler bundler = BundlerFactory.createBundler(request.getParametersMap(), false);
-		JPPFDriver.getInstance().getNodeNioServer().setBundler(bundler);
-		boolean manual =
-			"manual".equalsIgnoreCase((String) request.getParameter(BUNDLE_TUNING_TYPE_PARAM));
-		if (manual) JPPFStatsUpdater.setStaticBundleSize((Integer) request.getParameter(BUNDLE_SIZE_PARAM));
-		response = LocalizationUtils.getLocalized(I18N_BASE, (manual ? "manual" : "automatic") + ".settings.changed");
-		return response;
-	}
-
-	/**
-	 * Send the response to an admin request.
-	 * @param request the admin request that holds the response.
-	 * @param msg the response messages.
-	 * @throws Exception if the response could not be sent.
-	 */
-	private void sendAdminResponse(JPPFTaskBundle request, String msg) throws Exception
-	{
-		request.setParameter(RESPONSE_PARAM, msg);
-		JPPFBuffer buf = helper.toBytes(request, false);
-		byte[] data = new byte[buf.getLength() + 4];
-		helper.copyToBuffer(buf.getBuffer(), data, 0, buf.getLength());
-		buf.setLength(data.length);
-		buf.setBuffer(data);
-		socketClient.sendBytes(buf);
 	}
 
 	/**

@@ -27,7 +27,7 @@ import org.jppf.comm.socket.*;
  * Wrapper around an incoming socket connection, whose role is to receive the names of classes
  * to load from the classpath, then send the class files' contents to the remote client.
  * <p>Instances of this class are part of the JPPF dynamic class loading mechanism. The enable remote nodes
- * to dynamically load classes from the JVM that run's the class server.
+ * to dynamically load classes from the JVM that runs the class server.
  * @author Laurent Cohen
  */
 public abstract class JPPFConnection extends Thread
@@ -117,7 +117,7 @@ public abstract class JPPFConnection extends Thread
 	 * Determine whether the socket connection is closed
 	 * @return true if the socket connection is closed, false otherwise
 	 */
-	public boolean isClosed()
+	public synchronized boolean isClosed()
 	{
 		return closed;
 	}
@@ -126,7 +126,7 @@ public abstract class JPPFConnection extends Thread
 	 * Set the closed state of the socket connection to true. This will cause this socket handler
 	 * to terminate as soon as the current request execution is complete.
 	 */
-	public void setClosed()
+	public synchronized void setClosed()
 	{
 		setStopped();
 		close();
