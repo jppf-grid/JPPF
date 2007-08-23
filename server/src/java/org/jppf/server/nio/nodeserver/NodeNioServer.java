@@ -243,14 +243,15 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 
 	/**
 	 * Close a connection to a node.
-	 * @param aNode a <code>SocketChannel</code> that encapsulates the connection.
+	 * @param channel a <code>SocketChannel</code> that encapsulates the connection.
 	 */
-	public static void closeNode(SocketChannel aNode)
+	public static void closeNode(SocketChannel channel)
 	{
 		try
 		{
 			JPPFStatsUpdater.nodeConnectionClosed();
-			aNode.close();
+			JPPFDriver.getInstance().removeNodeInformation(channel);
+			channel.close();
 		}
 		catch (IOException ignored)
 		{

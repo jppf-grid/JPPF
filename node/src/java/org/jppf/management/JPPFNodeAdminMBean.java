@@ -16,27 +16,13 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.nodeserver;
+package org.jppf.management;
 
-import org.jppf.server.nio.NioState;
 
 /**
- * Common abstract superclass for all states of a node that executes tasks. 
+ * Exposed interface of the JPPF node management bean.
  * @author Laurent Cohen
  */
-public abstract class NodeServerState extends NioState<NodeTransition>
+public interface JPPFNodeAdminMBean extends JPPFAdminMBean<NodeParameter, Object>
 {
-	/**
-	 * The server that handles this state.
-	 */
-	protected NodeNioServer server = null;
-
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public NodeServerState(NodeNioServer server)
-	{
-		this.server = server;
-	}
 }

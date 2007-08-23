@@ -23,13 +23,14 @@ import java.util.TimerTask;
 import org.jppf.client.JPPFClientConnectionImpl;
 
 /**
- * Instances of this class are tasks run periodically from a timer thread.
+ * Instances of this class are tasks run periodically from a timer thread, requesting the latest
+ * statistics form a JPPF driver connection each time they are run.
  * @author Laurent Cohen
  */
 public class StatsRefreshTask extends TimerTask
 {
 	/**
-	 * Client connection ot request the data from.
+	 * Client connection to request the data from.
 	 */
 	private JPPFClientConnectionImpl connection = null;
 

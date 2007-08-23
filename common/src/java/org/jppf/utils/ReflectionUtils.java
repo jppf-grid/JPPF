@@ -63,11 +63,8 @@ public class ReflectionUtils
 			{
 				getter = methods[i];
 				String attrName = null;
-				if (getter.getName().startsWith("get"))
-					attrName = getter.getName().substring(3);
-				else attrName = getter.getName().substring(2);
-				attrName =
-					attrName.substring(0, 1).toLowerCase() + attrName.substring(1);
+				attrName = getter.getName().substring(getter.getName().startsWith("get") ? 3 : 2);
+				attrName = attrName.substring(0, 1).toLowerCase() + attrName.substring(1);
 				Object value = null;
 				try
 				{

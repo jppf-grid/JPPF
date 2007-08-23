@@ -53,6 +53,11 @@ public interface MonitoredNode extends Runnable
 	 */
 	void fireNodeEvent(EventType eventType);
 	/**
+	 * Create an event for the execution of a specified number of tasks.
+	 * @param nbTasks the number of tasks as an int.
+	 */
+	void fireNodeEvent(int nbTasks);
+	/**
 	 * Stop this node and release the resources it is using.
 	 * @param closeSocket determines whether the underlying socket should be closed.
 	 */

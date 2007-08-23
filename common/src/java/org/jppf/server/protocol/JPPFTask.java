@@ -18,6 +18,7 @@
 package org.jppf.server.protocol;
 
 import java.io.Serializable;
+import java.util.*;
 
 import org.jppf.task.storage.DataProvider;
 
@@ -30,10 +31,10 @@ import org.jppf.task.storage.DataProvider;
  * is set with the {@link #setResult(Object)} method:
  * <pre>
  * class MyTask extends JPPFTask {
- *     	public void run() {
- *          // do the calculation ...
- *          setResult(myResult);
- *      }
+ *   public void run() {
+ *     // do the calculation ...
+ *     setResult(myResult);
+ *   }
  * }
  * </pre>
  * @author Laurent Cohen
@@ -56,6 +57,10 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 * The provider of shared data for this task.
 	 */
 	private transient DataProvider dataProvider = null;
+	/**
+	 * List of listeners for this task.
+	 */
+	protected List<JPPFTaskListener> listeners = new ArrayList<JPPFTaskListener>();
 
 	/**
 	 * Get the result of the task execution.
@@ -127,5 +132,35 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 */
 	public void setPosition(int position) {
 		this.position = position;
+	}
+
+	/**
+	 * Add a connection status listener to this connection's list of listeners.
+	 * @param listener the listener to add to the list.
+	 */
+	public void addJPPFTaskListener(JPPFTaskListener listener)
+	{
+		listeners.add(listener);
+	}
+
+	/**
+	 * Remove a connection status listener from this connection's list of listeners.
+	 * @param listener the listener to remove from the list.
+	 */
+	public void removeJPPFTaskListener(JPPFTaskListener listener)
+	{
+		listeners.remove(listener);
+	}
+
+	/**
+	 * Notify all listeners that an event has occurred within this task.
+	 * @param source an object describing the event, must be serializable.
+	 */
+	public void fireStatusChanged(Serializable source)
+	{
+		JPPFTaskEvent event = new JPPFTaskEvent(source);
+		// to avoid ConcurrentModificationException
+		JPPFTaskListener[] array = listeners.toArray(new JPPFTaskListener[0]);
+		for (JPPFTaskListener listener: array) listener.eventOccurred(event);
 	}
 }

@@ -24,7 +24,6 @@ import javax.management.*;
 import javax.management.remote.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.utils.StringUtils;
 
 /**
  * Wrapper around a JMX client.
@@ -41,7 +40,7 @@ public class JMXConnectionWrapper
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * URL of the MBean server, in a JMX-compliantr format.
+	 * URL of the MBean server, in a JMX-compliant format.
 	 */
 	private JMXServiceURL url = null;
 	/**
@@ -64,6 +63,10 @@ public class JMXConnectionWrapper
 	 * The connection thread that performs the connection to the management server.
 	 */
 	private JMXConnectionThread connectionThread = null;
+	/**
+	 * A string representing this connection, used for logging purposes.
+	 */
+	private String id = null;
 
 	/**
 	 * Initialize the connection to the remote MBean server.
@@ -74,6 +77,15 @@ public class JMXConnectionWrapper
 	{
 		this.host = host;
 		this.port = port;
+		id = "[" + (host == null ? "_" : host) + ":" + port + "] ";
+		try
+		{
+			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+host+":"+port+"/server");
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -91,13 +103,13 @@ public class JMXConnectionWrapper
 	 */
 	private void performConnection() throws Exception
 	{
-    url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+host+":"+port+"/server");
     jmxc = JMXConnectorFactory.connect(url, null);
     mbeanConnection = jmxc.getMBeanServerConnection();
+		log.info(getId() + "RMI connection successfully established");
 	}
 
 	/**
-	 * CLose the connection to the remote MBean server.
+	 * Close the connection to the remote MBean server.
 	 * @throws Exception if the connection could not be closed.
 	 */
 	public void close() throws Exception
@@ -117,10 +129,13 @@ public class JMXConnectionWrapper
 	 */
 	public Object invoke(String name, String methodName, Object[] params, String[] signature) throws Exception
 	{
-		while (connectionThread.isConnecting()) goToSleep();
+		//while (connectionThread.isConnecting()) goToSleep();
+		if (connectionThread.isConnecting()) return null;
+		Object result = null;
 		try
 		{
 	    ObjectName mbeanName = new ObjectName(name);
+	    /*
 	    if (debugEnabled)
 	    {
 	    	StringBuilder sb = new StringBuilder();
@@ -129,15 +144,21 @@ public class JMXConnectionWrapper
 	    	sb.append("\nsignature=").append(StringUtils.arrayToString(signature));
 	    	log.debug(sb.toString());
 	    }
-	    Object result = mbeanConnection.invoke(mbeanName, methodName, params, signature);
-	    if (debugEnabled) log.debug("result: " + result);
-			return result;
+	    */
+	    result = mbeanConnection.invoke(mbeanName, methodName, params, signature);
+	    if (name.indexOf("node") >= 0)
+	    {
+	    	getClass();
+	    }
+	    //if (debugEnabled) log.debug(getId() + "result: " + result);
 		}
 		catch(IOException e)
 		{
 			connectionThread.resume();
-			throw e;
+			log.info(getId() + e.getMessage(), e);
+			//throw e;
 		}
+		return result;
 	}
 
 	/**
@@ -152,6 +173,14 @@ public class JMXConnectionWrapper
 		catch(InterruptedException ignored)
 		{
 		}
+	}
+
+	/**
+	 * Cause the current thread to wait until notified.
+	 */
+	private synchronized void wakeUp()
+	{
+		notifyAll();
 	}
 
 	/**
@@ -183,6 +212,7 @@ public class JMXConnectionWrapper
 			{
 				if (suspended)
 				{
+					if (debugEnabled) log.debug(getId() + "about to go to sleep");
 					goToSleep();
 					continue;
 				}
@@ -190,14 +220,39 @@ public class JMXConnectionWrapper
 				{
 					try
 					{
+						if (debugEnabled) log.debug(getId() + "about to perform RMI connection attempts");
 						performConnection();
-						setConnecting(false);
+						if (debugEnabled) log.debug(getId() + "about to suspend RMI connection attempts");
+						wakeUp();
 						suspend();
 					}
 					catch(Exception ignored)
 					{
+						if (debugEnabled) log.debug(getId(), ignored);
+						try
+						{
+							Thread.sleep(100);
+						}
+						catch(InterruptedException e)
+						{
+							log.error(e.getMessage(), e);
+						}
 					}
 				}
+			}
+		}
+
+		/**
+		 * Cause the current thread to wait until notified.
+		 */
+		private synchronized void goToSleep()
+		{
+			try
+			{
+				wait();
+			}
+			catch(InterruptedException ignored)
+			{
 			}
 		}
 
@@ -206,6 +261,7 @@ public class JMXConnectionWrapper
 		 */
 		public synchronized void suspend()
 		{
+			if (debugEnabled) log.debug(getId() + "suspending RMI connection attempts");
 			setConnecting(false);
 			suspended = true;
 		}
@@ -215,9 +271,10 @@ public class JMXConnectionWrapper
 		 */
 		public synchronized void resume()
 		{
+			if (debugEnabled) log.debug(getId() + "resuming RMI connection attempts");
 			setConnecting(true);
 			suspended = false;
-			notify();
+			notifyAll();
 		}
 
 		/**
@@ -246,5 +303,32 @@ public class JMXConnectionWrapper
 		{
 			this.connecting = connecting;
 		}
+	}
+
+	/**
+	 * Get the host the server is running on.
+	 * @return the host as a string.
+	 */
+	public String getHost()
+	{
+		return host;
+	}
+
+	/**
+	 * Get the RMI port used by the server.
+	 * @return the port as an int.
+	 */
+	public int getPort()
+	{
+		return port;
+	}
+
+	/**
+	 * Get a string describing this connection.
+	 * @return a string in the format host:port.
+	 */
+	private String getId()
+	{
+		return id;
 	}
 }

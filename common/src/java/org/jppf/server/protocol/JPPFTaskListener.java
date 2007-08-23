@@ -16,27 +16,19 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.nodeserver;
+package org.jppf.server.protocol;
 
-import org.jppf.server.nio.NioState;
+import java.util.EventListener;
 
 /**
- * Common abstract superclass for all states of a node that executes tasks. 
+ * Listener interface for receiving notifications of tasks events.
  * @author Laurent Cohen
  */
-public abstract class NodeServerState extends NioState<NodeTransition>
+public interface JPPFTaskListener extends EventListener
 {
 	/**
-	 * The server that handles this state.
+	 * Notify this listerer that an event has occurred during a task's life cycle.
+	 * @param event the event this listener is notified of.
 	 */
-	protected NodeNioServer server = null;
-
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public NodeServerState(NodeNioServer server)
-	{
-		this.server = server;
-	}
+	void eventOccurred(JPPFTaskEvent event);
 }

@@ -138,8 +138,8 @@ public class PeerNode extends AbstractMonitoredNode
 				resultSender.sendPartialResults(bundle);
 				*/
 
-				taskCount += n;
-				if (debugEnabled) log.debug(getName() + "tasks executed: "+taskCount);
+				setTaskCount(getTaskCount() + n);
+				if (debugEnabled) log.debug(getName() + "tasks executed: "+getTaskCount());
 			}
 			else
 			{

@@ -18,13 +18,15 @@
 package org.jppf.server;
 
 import java.net.Socket;
+import java.nio.channels.SocketChannel;
 import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.*;
+import org.jppf.management.*;
 import org.jppf.security.*;
 import org.jppf.server.app.JPPFApplicationServer;
-import org.jppf.server.management.JMXServerImpl;
+import org.jppf.server.management.*;
 import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.peer.JPPFPeerInitializer;
@@ -41,7 +43,7 @@ import org.jppf.utils.*;
 public class JPPFDriver
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(JPPFDriver.class);
 	/**
@@ -81,6 +83,11 @@ public class JPPFDriver
 	 * The jmx server used to manage and monitor this driver.
 	 */
 	private JMXServerImpl jmxServer = null;
+	/**
+	 * A list of objects containing the information required to connect to the nodes JMX servers.
+	 */
+	private Map<SocketChannel, NodeManagementInfo> nodeInfo =
+		new HashMap<SocketChannel, NodeManagementInfo>();
 
 	/**
 	 * Initialize this JPPFDriver.
@@ -103,19 +110,19 @@ public class JPPFDriver
 		classServer = new ClassNioServer(port);
 		classServer.start();
 
-		Bundler bundler = BundlerFactory.createBundler();
 		port = props.getInt("app.server.port", 11112);
 		applicationServer = new JPPFApplicationServer(port);
 		applicationServer.start();
 
 		port = props.getInt("node.server.port", 11113);
-		//nodeServer = new JPPFNodeServer(port, bundler);
-		//nodeServer.start();
+		Bundler bundler = BundlerFactory.createBundler();
 		nodeNioServer = new NodeNioServer(port, bundler);
 		nodeNioServer.start();
 
 		jmxServer = new JMXServerImpl();
 		jmxServer.start();
+		jmxServer.registerMbean("org.jppf:name=admin,type=driver",
+			new JPPFDriverAdmin(), JPPFDriverAdminMBean.class);
 
 		initPeers();
 	}
@@ -244,7 +251,35 @@ public class JPPFDriver
 		applicationServer.end();
 		applicationServer = null;
 	}
-	
+
+	/**
+	 * Add a node information object to the map of node information.
+	 * @param channel a <code>SocketChannel</code> instance.
+	 * @param info a <code>JPPFNodeManagementInformation</code> instance.
+	 */
+	public synchronized void addNodeInformation(SocketChannel channel, NodeManagementInfo info)
+	{
+		nodeInfo.put(channel, info);
+	}
+
+	/**
+	 * Remove a node information object from the map of node information.
+	 * @param channel a <code>SocketChannel</code> instance.
+	 */
+	public synchronized void removeNodeInformation(SocketChannel channel)
+	{
+		nodeInfo.remove(channel);
+	}
+
+	/**
+	 * Remove a node information object from the map of node information.
+	 * @return channel a <code>SocketChannel</code> instance.
+	 */
+	public synchronized Map<SocketChannel, NodeManagementInfo> getNodeInformationMap()
+	{
+		return Collections.unmodifiableMap(nodeInfo);
+	}
+
 	/**
 	 * Listen to a socket connection setup in the Driver Launcher, to handle the situation when the Launcher dies
 	 * unexpectedly.<br>
@@ -358,8 +393,6 @@ public class JPPFDriver
 						try
 						{
 							log.info("Initiating restart");
-							//JPPFDriver.getInstance().run();
-							//log.info("Restart complete");
 							System.exit(2);
 						}
 						catch(Exception e)

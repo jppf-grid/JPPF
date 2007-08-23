@@ -19,15 +19,12 @@ package org.jppf.jca.work;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
-import java.util.*;
-
 import javax.resource.spi.work.Work;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
-import org.jppf.client.*;
-import org.jppf.client.event.*;
-import org.jppf.comm.socket.*;
+import org.jppf.client.AbstractClassServerDelegate;
+import org.jppf.comm.socket.SocketInitializer;
 import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.utils.CompressionUtils;
 
@@ -38,7 +35,7 @@ import org.jppf.utils.CompressionUtils;
  * to dynamically load classes from the JVM that run's the class server.
  * @author Laurent Cohen
  */
-public class JcaClassServerDelegate extends AbstractClassServerDelegate implements Work, ClientConnectionStatusHandler
+public class JcaClassServerDelegate extends AbstractClassServerDelegate implements Work
 {
 	/**
 	 * Logger for this class.
@@ -48,14 +45,6 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
 	 */
 	private boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Status of the connection.
-	 */
-	protected JPPFClientConnectionStatus status = DISCONNECTED;
-	/**
-	 * List of status listeners for this connection.
-	 */
-	protected List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
 
 	/**
 	 * Default instantiation of this class is not permitted.
@@ -237,59 +226,5 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 */
 	public void release()
 	{
-	}
-
-	/**
-	 * Get the status of this delegate.
-	 * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
-	 * @see org.jppf.client.event.ClientConnectionStatusHandler#getStatus()
-	 */
-	public JPPFClientConnectionStatus getStatus()
-	{
-		return status;
-	}
-
-	/**
-	 * Set the status of this delegate.
-	 * @param status  a <code>JPPFClientConnectionStatus</code> enumerated value.
-	 * @see org.jppf.client.event.ClientConnectionStatusHandler#setStatus(org.jppf.client.JPPFClientConnectionStatus)
-	 */
-	public void setStatus(JPPFClientConnectionStatus status)
-	{
-		this.status = status;
-	}
-
-	/**
-	 * Add a connection status listener to this connection's list of listeners.
-	 * @param listener the listener to add to the list.
-	 * @see org.jppf.client.event.ClientConnectionStatusHandler#addClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
-	 */
-	public void addClientConnectionStatusListener(ClientConnectionStatusListener listener)
-	{
-		listeners.add(listener);
-	}
-
-	/**
-	 * Remove a connection status listener from this connection's list of listeners.
-	 * @param listener the listener to remove from the list.
-	 * @see org.jppf.client.event.ClientConnectionStatusHandler#removeClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
-	 */
-	public void removeClientConnectionStatusListener(ClientConnectionStatusListener listener)
-	{
-		listeners.remove(listener);
-	}
-
-	/**
-	 * Notify all listeners that the status of this connection has changed.
-	 */
-	protected synchronized void fireStatusChanged()
-	{
-		ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this);
-		// to avoid ConcurrentModificationException
-		ClientConnectionStatusListener[] array = listeners.toArray(new ClientConnectionStatusListener[0]);
-		for (ClientConnectionStatusListener listener: array)
-		{
-			listener.statusChanged(event);
-		}
 	}
 }

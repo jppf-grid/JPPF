@@ -49,6 +49,10 @@ public enum  BundleParameter
 	 */
 	READ_STATISTICS,
 	/**
+	 * Admin command for getting the bundle size settings from the server.
+	 */
+	REFRESH_NODE_INFO,
+	/**
 	 * Parameter name for the administration command to perform.
 	 */
 	COMMAND_PARAM,
@@ -111,5 +115,13 @@ public enum  BundleParameter
 	/**
 	 * To determine whether a node connection is for a peer driver or an actual execution node.
 	 */
-	IS_PEER
+	IS_PEER,
+	/**
+	 * Parameter for an eventual exception that prevented the tasks execution in the node.
+	 */
+	NODE_EXCEPTION_PARAM,
+	/**
+	 * Parameter for the RMI port used by JMX in the node.
+	 */
+	NODE_MANAGEMENT_PORT_PARAM
 }

@@ -28,19 +28,19 @@ import org.apache.commons.logging.*;
 import org.jppf.server.protocol.*;
 
 /**
- * 
+ * This class performs performs the work of reading a task bundle execution response from a node. 
  * @author Laurent Cohen
  */
 public class WaitingResultsState extends NodeServerState
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
-	protected static final Log LOG = LogFactory.getLog(WaitingResultsState.class);
+	private static final Log LOG = LogFactory.getLog(WaitingResultsState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
-	protected static final boolean DEBUG_ENABLED = LOG.isDebugEnabled();
+	private static final boolean DEBUG_ENABLED = LOG.isDebugEnabled();
 	/**
 	 * Initialize this state.
 	 * @param server the server that handles this state.
@@ -71,15 +71,24 @@ public class WaitingResultsState extends NodeServerState
 			JPPFTaskBundle bundle = context.getBundle();
 			long elapsed = System.currentTimeMillis() - bundle.getExecutionStartTime();
 			TaskCompletionListener listener = bundle.getCompletionListener();
-			bundle = context.deserializeBundle();
-			// updating stats
-			if (isStatsEnabled())
+			JPPFTaskBundle newBundle = context.deserializeBundle();
+			// if an exception prevented the node from executing the tasks
+			if (newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM) != null)
 			{
-				taskExecuted(bundle.getTaskCount(), elapsed, bundle.getNodeExecutionTime(), context.getMessage().length);
-				context.getBundler().feedback(bundle.getTaskCount(), elapsed);
+				newBundle.setTasks(bundle.getTasks());
+				newBundle.setTaskCount(bundle.getTaskCount());
+			}
+			else
+			{
+				// updating stats
+				if (isStatsEnabled())
+				{
+					taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getMessage().length);
+					context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
+				}
 			}
 			// notifing the client thread about the end of a bundle
-			if (listener != null) listener.taskCompleted(bundle);
+			if (listener != null) listener.taskCompleted(newBundle);
 			// there is nothing to do, so this instance will wait for a task bundle
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setMessage(null);

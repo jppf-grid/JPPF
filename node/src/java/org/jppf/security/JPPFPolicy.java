@@ -42,7 +42,6 @@ public class JPPFPolicy extends Policy
 		PermissionsFactory.getPermissions(classLoader);
 	}
 	
-	
 	/**
 	 * Get the permissions for this policy.
 	 * @param codesource not used.
@@ -61,7 +60,6 @@ public class JPPFPolicy extends Policy
 	public void refresh()
 	{
 	}
-
 
 	/**
 	 * Get the permissions for a specified protection domain.

@@ -37,7 +37,7 @@ import org.jppf.utils.JPPFConfiguration;
 public final class StatsHandler implements StatsConstants
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(StatsHandler.class);
 	/**
@@ -79,7 +79,6 @@ public final class StatsHandler implements StatsConstants
 	/**
 	 * Contains all the data and its converted values received from the server.
 	 */
-	//private ConnectionDataHolder dataHolder = new ConnectionDataHolder();
 	private Map<String, ConnectionDataHolder> dataHolderMap = new HashMap<String, ConnectionDataHolder>();
 	
 	/**
@@ -101,7 +100,7 @@ public final class StatsHandler implements StatsConstants
 	}
 
 	/**
-	 * Initialize this formatter.
+	 * Initialize this statistics handler.
 	 */
 	private StatsHandler()
 	{
@@ -127,7 +126,7 @@ public final class StatsHandler implements StatsConstants
 	public void startRefreshTimer()
 	{
 		if (refreshInterval <= 0L) return;
-		timer = new Timer("Update Timer");
+		timer = new Timer("JPPF Driver Statistics Update Timer");
 		for (JPPFClientConnection c: getJppfClient().getAllConnections())
 		{
 			TimerTask task = new StatsRefreshTask((JPPFClientConnectionImpl) c);
@@ -277,6 +276,7 @@ public final class StatsHandler implements StatsConstants
 	 */
 	public void update(JPPFClientConnection connection, JPPFStats stats)
 	{
+		if (stats == null) return;
 		try
 		{
 			lock.lock();

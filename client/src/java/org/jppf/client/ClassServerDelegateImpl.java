@@ -17,6 +17,8 @@
  */
 package org.jppf.client;
 
+import static org.jppf.client.JPPFClientConnectionStatus.*;
+
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.*;
@@ -76,7 +78,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 		try
 		{
 			socketInitializer.setName("[" + getName() + " - delegate] ");
-			owner.setStatus(JPPFClientConnectionStatus.CONNECTING);
+			setStatus(CONNECTING);
 			if (socketClient == null) initSocketClient();
 			System.out.println("[client: "+getName()+"] ClassServerDelegate.init(): Attempting connection to the class server");
 			socketInitializer.initializeSocket(socketClient);
@@ -87,12 +89,12 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			if (!socketInitializer.isClosed())
 			{
 				System.out.println("[client: "+getName()+"] ClassServerDelegate.init(): Reconnected to the class server");
-				owner.setStatus(JPPFClientConnectionStatus.ACTIVE);
+				setStatus(ACTIVE);
 			}
 		}
 		catch(Exception e)
 		{
-			owner.setStatus(JPPFClientConnectionStatus.FAILED);
+			setStatus(FAILED);
 			throw e;
 		}
 	}

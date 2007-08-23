@@ -18,7 +18,12 @@
 
 package org.jppf.client;
 
+import static org.jppf.client.JPPFClientConnectionStatus.DISCONNECTED;
+
+import java.util.*;
+
 import org.jppf.classloader.ResourceProvider;
+import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
 
 /**
@@ -67,6 +72,14 @@ public abstract class AbstractClassServerDelegate implements ClassServerDelegate
 	 * The name given to this delegate.
 	 */
 	protected String name = null;
+	/**
+	 * Status of the connection.
+	 */
+	protected JPPFClientConnectionStatus status = DISCONNECTED;
+	/**
+	 * List of status listeners for this connection.
+	 */
+	protected List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
 
 	/**
 	 * Default instantiation of this class is not permitted.
@@ -122,4 +135,58 @@ public abstract class AbstractClassServerDelegate implements ClassServerDelegate
 	 * @return a <code>SocketInitializer</code> instance.
 	 */
 	protected abstract SocketInitializer createSocketInitializer();
+
+	/**
+	 * Get the status of this delegate.
+	 * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
+	 * @see org.jppf.client.event.ClientConnectionStatusHandler#getStatus()
+	 */
+	public JPPFClientConnectionStatus getStatus()
+	{
+		return status;
+	}
+
+	/**
+	 * Set the status of this delegate.
+	 * @param status  a <code>JPPFClientConnectionStatus</code> enumerated value.
+	 * @see org.jppf.client.event.ClientConnectionStatusHandler#setStatus(org.jppf.client.JPPFClientConnectionStatus)
+	 */
+	public void setStatus(JPPFClientConnectionStatus status)
+	{
+		this.status = status;
+	}
+
+	/**
+	 * Add a connection status listener to this connection's list of listeners.
+	 * @param listener the listener to add to the list.
+	 * @see org.jppf.client.event.ClientConnectionStatusHandler#addClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
+	 */
+	public void addClientConnectionStatusListener(ClientConnectionStatusListener listener)
+	{
+		listeners.add(listener);
+	}
+
+	/**
+	 * Remove a connection status listener from this connection's list of listeners.
+	 * @param listener the listener to remove from the list.
+	 * @see org.jppf.client.event.ClientConnectionStatusHandler#removeClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
+	 */
+	public void removeClientConnectionStatusListener(ClientConnectionStatusListener listener)
+	{
+		listeners.remove(listener);
+	}
+
+	/**
+	 * Notify all listeners that the status of this connection has changed.
+	 */
+	protected synchronized void fireStatusChanged()
+	{
+		ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, getStatus());
+		// to avoid ConcurrentModificationException
+		ClientConnectionStatusListener[] array = listeners.toArray(new ClientConnectionStatusListener[0]);
+		for (ClientConnectionStatusListener listener: array)
+		{
+			listener.statusChanged(event);
+		}
+	}
 }

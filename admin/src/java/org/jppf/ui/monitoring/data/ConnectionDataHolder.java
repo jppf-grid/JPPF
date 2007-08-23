@@ -23,7 +23,7 @@ import java.util.*;
 import org.jppf.server.JPPFStats;
 
 /**
- * 
+ * Instances of this class hold and manage statistics data snapshots for a single driver connection.
  * @author Laurent Cohen
  */
 public class ConnectionDataHolder

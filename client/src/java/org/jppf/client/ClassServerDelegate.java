@@ -18,11 +18,13 @@
 
 package org.jppf.client;
 
+import org.jppf.client.event.ClientConnectionStatusHandler;
+
 /**
  * Interface for all class server clients.
  * @author Laurent Cohen
  */
-public interface ClassServerDelegate extends Runnable
+public interface ClassServerDelegate extends Runnable, ClientConnectionStatusHandler
 {
 	/**
 	 * Initialize this node's resources.

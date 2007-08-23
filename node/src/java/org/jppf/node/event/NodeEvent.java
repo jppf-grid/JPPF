@@ -55,9 +55,18 @@ public class NodeEvent extends EventObject
 		/**
 		 * Event type to specify a task was executed. 
 		 */
-		TASK_EXECUTED
+		TASK_EXECUTED,
+		/**
+		 * Event type to specify the state of the node is not known.
+		 */
+		UNKNOWN
 	}
 
+	/**
+	 * Holds the number of executed tasks.
+	 */
+	private int nbTasks = 0;
+	
 	/**
 	 * Initialize this event with a specified event source.
 	 * @param source the source of the event.
@@ -68,11 +77,30 @@ public class NodeEvent extends EventObject
 	}
 	
 	/**
+	 * Create an event for the execution of a specified number of tasks.
+	 * @param nbTasks the number of tasks as an int.
+	 */
+	public NodeEvent(int nbTasks)
+	{
+		super(EventType.TASK_EXECUTED);
+		this.nbTasks = nbTasks;
+	}
+	
+	/**
 	 * Get the type of this event.
 	 * @return the type of event as an enumerated value.
 	 */
 	public EventType getType()
 	{
 		return (EventType) getSource();
+	}
+
+	/**
+	 * Get the number of executed tasks.
+	 * @return the number of tasks as an int.
+	 */
+	public int getNbTasks()
+	{
+		return nbTasks;
 	}
 }

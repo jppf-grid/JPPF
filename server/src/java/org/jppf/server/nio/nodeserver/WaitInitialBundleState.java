@@ -18,12 +18,15 @@
 
 package org.jppf.server.nio.nodeserver;
 
+import static org.jppf.server.protocol.BundleParameter.*;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
+import java.net.InetAddress;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.server.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.BundlerFactory;
 
@@ -69,9 +72,17 @@ public class WaitInitialBundleState extends NodeServerState
 			if (DEBUG_ENABLED) LOG.debug("read bundle for " + getRemoteHost(channel) + " done");
 			JPPFTaskBundle bundle = context.deserializeBundle();
 			context.setUuid(bundle.getBundleUuid());
-			boolean override = bundle.getParameter(BundleParameter.BUNDLE_TUNING_TYPE_PARAM) != null;
+			boolean override = bundle.getParameter(BUNDLE_TUNING_TYPE_PARAM) != null;
 			if (override) context.setBundler(BundlerFactory.createBundler(bundle.getParametersMap(), true));
 			else context.setBundler(server.getBundler().copy());
+			InetAddress addr = channel.socket().getInetAddress();
+			if (addr != null)
+			{
+				String host = addr.getHostName();
+				int port = (Integer) bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM);
+				NodeManagementInfo info = new NodeManagementInfo(host, port);
+				JPPFDriver.getInstance().addNodeInformation(channel, info);
+			}
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setMessage(null);
 			context.setBundle(null);

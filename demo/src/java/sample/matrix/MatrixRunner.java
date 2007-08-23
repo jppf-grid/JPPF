@@ -147,6 +147,7 @@ public class MatrixRunner
 		for (int i=0; i<results.size(); i++)
 		{
 			ExtMatrixTask matrixTask = (ExtMatrixTask) results.get(i);
+			if (matrixTask.getException() != null) throw matrixTask.getException();
 			double[][] rows = (double[][]) matrixTask.getResult();
 			for (int j=0; j<rows.length; j++)
 			{

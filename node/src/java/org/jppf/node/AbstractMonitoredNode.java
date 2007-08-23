@@ -58,7 +58,7 @@ public abstract class AbstractMonitoredNode implements MonitoredNode
 	/**
 	 * Total number of tasks executed.
 	 */
-	protected int taskCount = 0;
+	private int taskCount = 0;
 	/**
 	 * This node's universal identifier.
 	 */
@@ -100,6 +100,17 @@ public abstract class AbstractMonitoredNode implements MonitoredNode
 	}
 
 	/**
+	 * Create an event for the execution of a specified number of tasks.
+	 * @param nbTasks the number of tasks as an int.
+	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(int)
+	 */
+	public void fireNodeEvent(int nbTasks)
+	{
+		NodeEvent event = new NodeEvent(nbTasks);
+		for (NodeListener listener : listeners) listener.eventOccurred(event);
+	}
+
+	/**
 	 * Get the underlying socket wrapper used by this node.
 	 * @return a <code>SocketWrapper</code> instance.
 	 */
@@ -132,4 +143,23 @@ public abstract class AbstractMonitoredNode implements MonitoredNode
 	 * @see org.jppf.node.MonitoredNode#stopNode(boolean)
 	 */
 	public abstract void stopNode(boolean closeSocket);
+
+	/**
+	 * Get the total number of tasks executed.
+	 * @return the number of tasks as an int.
+	 */
+	public synchronized int getTaskCount()
+	{
+		return taskCount;
+	}
+
+	/**
+	 * Set the total number of tasks executed.
+	 * @param taskCount the number of tasks as an int.
+	 */
+	public synchronized void setTaskCount(int taskCount)
+	{
+		this.taskCount = taskCount;
+		fireNodeEvent(taskCount);
+	}
 }

@@ -87,6 +87,11 @@ public class LongTaskRunner
 				for (int i=0; i<nbTask; i++) tasks.add(new LongTask(length));
 				// submit the tasks for execution
 				List<JPPFTask> results = jppfClient.submit(tasks, null);
+				for (JPPFTask task: results)
+				{
+					Exception e = task.getException();
+					if (e != null) throw e;
+				}
 				long elapsed = System.currentTimeMillis() - start;
 				System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
 			}

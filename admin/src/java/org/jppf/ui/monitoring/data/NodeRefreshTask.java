@@ -1,0 +1,111 @@
+/*
+ * Java Parallel Processing Framework.
+ * Copyright (C) 2005-2007 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jppf.ui.monitoring.data;
+
+import java.util.*;
+
+import org.apache.commons.logging.*;
+import org.jppf.management.*;
+import org.jppf.server.NodeManagementInfo;
+import org.jppf.ui.monitoring.event.NodeHandlerEvent;
+
+/**
+ * Instances of this class are tasks run periodically from a timer thread, requesting the latest
+ * statistics form a JPPF driver connection each time they are run.
+ * @author Laurent Cohen
+ */
+public class NodeRefreshTask extends TimerTask
+{
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(NodeRefreshTask.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Name of the JPPF node mbean.
+	 */
+	private static final String MBEAN_NAME = "org.jppf:name=admin,type=node";
+	/**
+	 * Signature of the method invoked on the MBean.
+	 */
+	private static final String[] MBEAN_SIGNATURE = new String[] {JPPFManagementRequest.class.getName()};
+	/**
+	 * The node handler.
+	 */
+	private NodeHandler handler = null;
+
+	/**
+	 * Initialize this task with the specified node handler.
+	 * @param handler The node handler.
+	 */
+	public NodeRefreshTask(NodeHandler handler)
+	{
+		this.handler = handler;
+	}
+
+	/**
+	 * Request an update from the JPPF driver.
+	 * @see java.util.TimerTask#run()
+	 */
+	public void run()
+	{
+		synchronized(handler)
+		{
+			Map<String, NodeInfoManager> nodeManagerMap = handler.getNodeManagerMap();
+			for (String name: nodeManagerMap.keySet())
+			{
+				NodeInfoManager nodeMgr = nodeManagerMap.get(name);
+				Map<NodeManagementInfo, NodeInfoHolder> nodesMap = nodeMgr.getNodeMap();
+				for (NodeManagementInfo info: nodesMap.keySet())
+				{
+					updateNodeState(name, nodesMap.get(info));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Update the state of a node.
+	 * @param driverName the name of the driver to which the node is attached.
+	 * @param infoHolder the object that holds the node information and state.
+	 */
+	private void updateNodeState(String driverName, NodeInfoHolder infoHolder)
+	{
+		JPPFManagementResponse response = null;
+		try
+		{
+			Map<NodeParameter, Object> params = new HashMap<NodeParameter, Object>();
+			JPPFManagementRequest<NodeParameter, Object> request = new JPPFManagementRequest<NodeParameter, Object>(params);
+			response = (JPPFManagementResponse)
+				infoHolder.getJmxClient().invoke(MBEAN_NAME, "performAdminRequest", new Object[] {request}, MBEAN_SIGNATURE);
+		}
+		catch(Exception ignored)
+		{
+			if (debugEnabled) log.debug(ignored.getMessage(), ignored);
+		}
+
+		if ((response == null) || (response.getResult() == null)) return;
+		JPPFNodeState state = (JPPFNodeState) response.getResult();
+		infoHolder.setState(state);
+		handler.fireNodeHandlerEvent(driverName, infoHolder, NodeHandlerEvent.UPDATE_NODE);
+	}
+}

@@ -101,6 +101,31 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	}
 
 	/**
+	 * Get the names of all the client connections handled by this JPPFClient. 
+	 * @return a list of connection names as strings.
+	 */
+	public List<String> getAllConnectionNames()
+	{
+		List<String> names = new ArrayList<String>();
+		for (JPPFClientConnection c: allConnections) names.add(c.getName());
+		return names;
+	}
+
+	/**
+	 * Get a connection given its name.
+	 * @param name the name of the connection to find.
+	 * @return a <code>JPPFClientConnection</code> with the highest possible priority.
+	 */
+	public JPPFClientConnection getClientConnection(String name)
+	{
+		for (JPPFClientConnection c: allConnections)
+		{
+			if (c.getName().equals(name)) return c;
+		}
+		return null;
+	}
+
+	/**
 	 * Get an available connection with the highest possible priority.
 	 * @return a <code>JPPFClientConnection</code> with the highest possible priority.
 	 */

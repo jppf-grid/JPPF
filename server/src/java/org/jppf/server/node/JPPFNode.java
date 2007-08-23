@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.logging.*;
 import org.jppf.*;
 import org.jppf.comm.socket.SocketClient;
+import org.jppf.management.*;
 import org.jppf.node.*;
 import org.jppf.node.event.NodeEvent.EventType;
 import org.jppf.server.protocol.*;
@@ -41,13 +42,17 @@ import org.jppf.utils.*;
 public class JPPFNode extends AbstractMonitoredNode
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(JPPFNode.class);
 	/**
 	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Name of the admin MBean.
+	 */
+	private static final String MBEAN_NAME = "org.jppf:name=admin,type=node";
 	/**
 	 * Determines whether dumping byte arrays in the log is enabled.
 	 */
@@ -85,6 +90,10 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Used to determine when this node is busy or idle.
 	 */
 	private AtomicInteger executingCount = new AtomicInteger(0);
+	/**
+	 * The administration and monitoring MBean for this node.
+	 */
+	private JPPFNodeAdmin nodeAdmin = null;
 
 	/**
 	 * Main processing loop of this node.
@@ -143,8 +152,10 @@ public class JPPFNode extends AbstractMonitoredNode
 			{
 				if (debugEnabled) log.debug("setting initial bundle uuid");
 				bundle.setBundleUuid(uuid);
-				Map<BundleParameter, Object> params = getBundleTunningParameters();
+				Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
 				if (params != null) bundle.getParametersMap().putAll(params);
+				bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM,
+					JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198));
 			}
 			List<JPPFTask> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
@@ -164,8 +175,8 @@ public class JPPFNode extends AbstractMonitoredNode
 			writeResults(bundle, taskList);
 			if (notEmpty)
 			{
-				taskCount += taskList.size();
-				if (debugEnabled) log.debug("tasks executed: "+taskCount);
+				setTaskCount(getTaskCount() + taskList.size());
+				if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
 			}
 			int p = bundle.getBuildNumber();
 			if (buildNumber < p)
@@ -186,14 +197,13 @@ public class JPPFNode extends AbstractMonitoredNode
 	public synchronized void init() throws Exception
 	{
 		if (debugEnabled) log.debug("start node initialization");
-		boolean mustInit = false;
 		initHelper();
-		if (socketClient == null)
-		{
-			mustInit = true;
-			initSocketClient();
-		}
+		boolean mustInit = (socketClient == null);
+		if (mustInit)	initSocketClient();
 		initCredentials();
+		nodeAdmin = new JPPFNodeAdmin(JPPFNode.this);
+		addNodeListener(nodeAdmin);
+		NodeLauncher.getJmxServer().registerMbean(MBEAN_NAME, nodeAdmin, JPPFNodeAdminMBean.class);
 		if (notifying) fireNodeEvent(EventType.START_CONNECT);
 		if (mustInit)
 		{
@@ -246,7 +256,8 @@ public class JPPFNode extends AbstractMonitoredNode
 		Object[] result = readObjects(buf.getBuffer());
 		JPPFTaskBundle bundle = (JPPFTaskBundle) result[0];
 		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()) &&
+			(bundle.getParameter(NODE_EXCEPTION_PARAM) == null))
 		{
 			DataProvider dataProvider = (DataProvider) result[1];
 			for (int i = 0; i < bundle.getTaskCount(); i++)
@@ -309,13 +320,27 @@ public class JPPFNode extends AbstractMonitoredNode
 		List<Object> list = new ArrayList<Object>();
 		int pos = helper.fromBytes(bytes, 0, false, list, 1);
 		JPPFTaskBundle bundle = (JPPFTaskBundle) list.get(0);
-		
-		bundle.setNodeExecutionTime(System.currentTimeMillis());
-		int count = bundle.getTaskCount();
-		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+		try
 		{
-			JPPFContainer cont = getContainer(bundle.getUuidPath().getList());
-			pos = cont.deserializeObject(bytes, pos, true, list, 1+count);
+			bundle.setNodeExecutionTime(System.currentTimeMillis());
+			int count = bundle.getTaskCount();
+			if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+			{
+				JPPFContainer cont = getContainer(bundle.getUuidPath().getList());
+				pos = cont.deserializeObject(bytes, pos, true, list, 1+count);
+			}
+		}
+		catch(ClassNotFoundException e)
+		{
+			log.error("Exception occurred while deserializing the tasks", e);
+			bundle.setTaskCount(0);
+			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
+		}
+		catch(NoClassDefFoundError e)
+		{
+			log.error("Exception occurred while deserializing the tasks", e);
+			bundle.setTaskCount(0);
+			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
 		}
 		return list.toArray(new Object[0]);
 	}
@@ -420,8 +445,14 @@ public class JPPFNode extends AbstractMonitoredNode
 			}
 			socketClient = null;
 		}
-		//socketClient.setSocket(null);
-		//socketClient = null;
+		try
+		{
+			NodeLauncher.getJmxServer().unregisterMbean(MBEAN_NAME);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
 		classLoader = null;
 	}
 
@@ -451,30 +482,11 @@ public class JPPFNode extends AbstractMonitoredNode
 	}
 
 	/**
-	 * Get a configured bundle size tuning profile form the configuration file.
-	 * @return an <code>AnnealingTuneProfile</code> instance, or null if no profile was configured.
+	 * Get the administration and monitoring MBean for this node.
+	 * @return a <code>JPPFNodeAdmin</code>m instance.
 	 */
-	public static Map<BundleParameter, Object> getBundleTunningParameters()
+	public synchronized JPPFNodeAdmin getNodeAdmin()
 	{
-		TypedProperties cfg = JPPFConfiguration.getProperties();
-		String s = cfg.getString("task.bundle.strategy");
-		if (s == null) return null;
-		
-		Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
-		params.put(BUNDLE_TUNING_TYPE_PARAM, s);
-		params.put(BUNDLE_SIZE_PARAM, cfg.getInt("task.bundle.size", 10));
-		if ("autotuned".equalsIgnoreCase(s))
-		{
-			String profile = cfg.getString("task.bundle.autotuned.strategy", "smooth");
-			String prefix = "strategy." + profile + ".";
-			params.put(MIN_SAMPLES_TO_ANALYSE, cfg.getInt(prefix + "minSamplesToAnalyse", 500));
-			params.put(MIN_SAMPLES_TO_CHECK_CONVERGENCE, cfg.getInt(prefix + "minSamplesToCheckConvergence", 300));
-			params.put(MAX_DEVIATION, cfg.getDouble(prefix + "maxDeviation", 0.2d));
-			params.put(MAX_GUESS_TO_STABLE, cfg.getInt(prefix + "maxGuessToStable", 10));
-			params.put(SIZE_RATIO_DEVIATION, cfg.getFloat(prefix + "sizeRatioDeviation", 1.5f));
-			params.put(DECREASE_RATIO, cfg.getFloat(prefix + "decreaseRatio", 0.2f));
-		}
-		
-		return params;
+		return nodeAdmin;
 	}
 }

@@ -18,10 +18,9 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.*;
+import static org.jppf.client.JPPFClientConnectionStatus.FAILED;
 import static org.jppf.server.protocol.BundleParameter.*;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -30,14 +29,14 @@ import javax.crypto.SecretKey;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
-import org.jppf.client.event.TaskResultListener;
+import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
 import org.jppf.management.*;
 import org.jppf.security.CryptoUtils;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
-import org.jppf.utils.*;
+import org.jppf.utils.TypedProperties;
 
 /**
  * This class provides an API to submit execution requests and administration
@@ -108,6 +107,13 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 		{
 			initHelper();
 			delegate = new ClassServerDelegateImpl(this, appUuid, host, classServerPort);
+			delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
+			{
+				public void statusChanged(ClientConnectionStatusEvent event)
+				{
+					//setStatus(event.
+				}
+			});
 			delegate.init();
 			initCredentials();
 			if (!delegate.isClosed())
@@ -116,7 +122,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 				t.setName("[" + delegate.getName() + " : class delegate]");
 				t.start();
 				initConnection();
-				setStatus(ACTIVE);
+				//setStatus(delegate.getStatus());
 			}
 		}
 		catch(Exception e)
@@ -193,8 +199,9 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 				if (socketInitializer != null) socketInitializer.close();
 				if (socketClient != null) socketClient.close();
 				if (delegate != null) delegate.close();
+				if (jmxConnection != null) jmxConnection.close();
 			}
-			catch(IOException e)
+			catch(Exception e)
 			{
 				log.error("[" + name + "] "+ e.getMessage(), e);
 			}
@@ -267,7 +274,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 */
 	public Object processManagementRequest(Map<BundleParameter, Object> parameters) throws Exception
 	{
-		if (!READ_STATISTICS.equals(parameters.get(COMMAND_PARAM)))
+		if (!READ_STATISTICS.equals(parameters.get(COMMAND_PARAM)) && !REFRESH_NODE_INFO.equals(parameters.get(COMMAND_PARAM)))
 		{
 			String password = (String) parameters.get(PASSWORD_PARAM);
 			SecretKey tmpKey = CryptoUtils.generateSecretKey();
@@ -283,6 +290,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 			new JPPFManagementRequest<BundleParameter, Object>(parameters);
 		JPPFManagementResponse response = (JPPFManagementResponse) getJmxConnection().invoke(
 			MBEAN_NAME, "performAdminRequest", new Object[] {request}, MBEAN_SIGNATURE);
+		if (response == null) return null;
 		if (response.getException() == null) return response.getResult();
 		throw response.getException();
 	}

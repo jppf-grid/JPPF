@@ -93,6 +93,9 @@ public class JPPFClassLoader extends ClassLoader
 	public JPPFClassLoader(ClassLoader parent, List<String> uuidPath)
 	{
 		this(parent);
+		//super(parent);
+		//dynamic = true;
+		//if (socketClient == null) init();
 		this.uuidPath = uuidPath;
 	}
 

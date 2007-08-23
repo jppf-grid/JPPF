@@ -16,27 +16,24 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.nodeserver;
-
-import org.jppf.server.nio.NioState;
+package org.jppf.management;
 
 /**
- * Common abstract superclass for all states of a node that executes tasks. 
+ * Type safe enumeration of the parameters used for node administration requests.
  * @author Laurent Cohen
  */
-public abstract class NodeServerState extends NioState<NodeTransition>
+public enum NodeParameter
 {
 	/**
-	 * The server that handles this state.
+	 * Parameter for the node status (ie connected, executing, etc).
 	 */
-	protected NodeNioServer server = null;
-
+	NODE_STATUS_PARAM,
 	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
+	 * Parameter for the number of tasks executed by the node.
 	 */
-	public NodeServerState(NodeNioServer server)
-	{
-		this.server = server;
-	}
+	NB_TASKS_EXECUTED_PARAM,
+	/**
+	 * Parameter for the latest task event.
+	 */
+	TASK_EVENT_PARAM
 }

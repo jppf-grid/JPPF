@@ -23,6 +23,7 @@ import java.util.Hashtable;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFNodeReloadNotification;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.management.JMXServerImpl;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.utils.*;
 
@@ -54,6 +55,10 @@ public class NodeLauncher
 	 * Container for data stored at the JVM level.
 	 */
 	private static Hashtable<Object, Object> persistentData = new Hashtable<Object, Object>();
+	/**
+	 * The jmx server that handles administration and monitoring functions for this node.
+	 */
+	private static JMXServerImpl jmxServer = null;
 
 	/**
 	 * Run a node as a standalone application.
@@ -178,5 +183,26 @@ public class NodeLauncher
 	public static Object getPersistentData(Object key)
 	{
 		return persistentData.get(key);
+	}
+
+	/**
+	 * Get the jmx server that handles administration and monitoring functions for this node.
+	 * @return a <code>JMXServerImpl</code> instance.
+	 */
+	public static synchronized JMXServerImpl getJmxServer()
+	{
+		if ((jmxServer == null) || jmxServer.isStopped())
+		{
+			try
+			{
+				jmxServer = new JMXServerImpl();
+				jmxServer.start();
+			}
+			catch(Exception e)
+			{
+				log.error("Error creating the JMX server", e);
+			}
+		}
+		return jmxServer;
 	}
 }

@@ -282,14 +282,23 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		JPPFBuffer buf = socketClient.receiveBytes(0);
 		byte[] data = buf.getBuffer();
 		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-		int pos = 0;
-		int count = helper.readInt(data, pos);
-		pos += 4;
+		List<JPPFTaskBundle> bundleList = new ArrayList<JPPFTaskBundle>();
+		int pos = helper.fromBytes(data, 0, true, bundleList, 1);
+		JPPFTaskBundle bundle = bundleList.get(0);
+		int count = bundle.getTaskCount();
 		helper.fromBytes(data, pos, true, taskList, count);
 		int startIndex = (taskList.isEmpty()) ? -1 : taskList.get(0).getPosition();
+		// if an exception prevented the node from executing the tasks
+		Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
+		if (t != null)
+		{
+			Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
+			for (JPPFTask task: taskList) task.setException(e);
+		}
 		Pair<List<JPPFTask>, Integer> p = new Pair<List<JPPFTask>, Integer>(taskList, startIndex);
 		return p;
 	}
+
 	/**
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @throws Exception if an error occcurs while instantiating the class loader.
@@ -355,7 +364,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	protected synchronized void fireStatusChanged()
 	{
-		ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this);
+		ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, getStatus());
 		// to avoid ConcurrentModificationException
 		ClientConnectionStatusListener[] array = listeners.toArray(new ClientConnectionStatusListener[0]);
 		for (ClientConnectionStatusListener listener: array)

@@ -16,27 +16,25 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.nodeserver;
+package org.jppf.server.protocol;
 
-import org.jppf.server.nio.NioState;
+import java.io.Serializable;
+import java.util.EventObject;
 
 /**
- * Common abstract superclass for all states of a node that executes tasks. 
+ * Instances of this class represent events sent by a JPPF task.
+ * These events are notifications of things happening during a task's lifecycle,
+ * and can be used for user-defined monitoring of the tasks.
  * @author Laurent Cohen
  */
-public abstract class NodeServerState extends NioState<NodeTransition>
+public class JPPFTaskEvent extends EventObject
 {
 	/**
-	 * The server that handles this state.
+	 * Initialize this event with the specified source.
+	 * @param source an object describing the event, must be serializable.
 	 */
-	protected NodeNioServer server = null;
-
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public NodeServerState(NodeNioServer server)
+	public JPPFTaskEvent(Serializable source)
 	{
-		this.server = server;
+		super(source);
 	}
 }

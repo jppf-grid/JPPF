@@ -21,6 +21,10 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.net.SocketPermission;
 import java.security.*;
+import java.util.*;
+
+import javax.management.*;
+
 import org.jppf.utils.*;
 
 /**
@@ -32,7 +36,7 @@ public final class PermissionsFactory
 	/**
 	 * Encapsulates the set of all permissions granted to a node.
 	 */
-	private static Permissions permissions = null;
+	private static List<Permission> permList = null;
 	
 	/**
 	 * Instantiation of this class is not permitted.
@@ -45,9 +49,9 @@ public final class PermissionsFactory
 	 * Reset the current permissions to enable their reload.
 	 * @see java.security.Permissions
 	 */
-	public static void resetPermissions()
+	public synchronized static void resetPermissions()
 	{
-		permissions = null;
+		permList = null;
 	}
 	
 	/**
@@ -56,9 +60,9 @@ public final class PermissionsFactory
 	 * @return a Permissions object.
 	 * @see java.security.Permissions
 	 */
-	public static Permissions getPermissions(ClassLoader classLoader)
+	public static synchronized Permissions getPermissions(ClassLoader classLoader)
 	{
-		if (permissions == null)
+		if (permList == null)
 		{
 			if (classLoader == null)
 			{
@@ -66,6 +70,8 @@ public final class PermissionsFactory
 			}
 			createPermissions(classLoader);
 		}
+		Permissions permissions = new Permissions();
+		for (Permission p: permList) permissions.add(p);
 		return permissions;
 	}
 	
@@ -75,24 +81,45 @@ public final class PermissionsFactory
 	 */
 	private static synchronized void createPermissions(ClassLoader classLoader)
 	{
-		if (permissions != null) return;
-		permissions = new Permissions();
-		createDynamicPermissions(permissions);
+		if (permList != null) return;
+		permList = new ArrayList<Permission>(); 
+		createDynamicPermissions();
 		readStaticPermissions(classLoader);
+		createManagementPermissions();
 	}
 
 	/**
 	 * Initialize the permissions that depend on the JPPF configuration.
-	 * @param p the permissions collection to add the permissions to.
 	 */
-	private static void createDynamicPermissions(Permissions p)
+	private static void createDynamicPermissions()
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String host = props.getString("jppf.server.host", "localhost");
 		int port = props.getInt("class.server.port", 11111);
-		p.add(new SocketPermission(host + ":" + port, "connect,listen"));
+		permList.add(new SocketPermission(host + ":" + port, "connect,listen"));
 		port = props.getInt("node.server.port", 11113);
-		p.add(new SocketPermission(host + ":" + port, "connect,listen"));
+		permList.add(new SocketPermission(host + ":" + port, "connect,listen"));
+	}
+
+	/**
+	 * Initialize the permissions for the JMX-based management of the node.
+	 */
+	private static void createManagementPermissions()
+	{
+		TypedProperties props = JPPFConfiguration.getProperties();
+		String host = props.getString("jppf.server.host", "localhost");
+		int port = props.getInt("jppf.management.port", 11198);
+		permList.add(new SocketPermission(host + ":" + port, "accept,connect,listen"));
+		//p.add(new MBeanServerPermission("createMBeanServer"));
+		permList.add(new MBeanServerPermission("*"));
+		try
+		{
+			permList.add(new MBeanPermission("*", "*", new ObjectName("*:*"), "*"));
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -140,7 +167,7 @@ public final class PermissionsFactory
 				line = line.substring(0, line.length() - 1);
 				line = line.trim();
 				Permission p = parsePermission(line, file, count);
-				if (p != null) permissions.add(p);
+				if (p != null) permList.add(p);
 			}
 		}
 		catch(Exception e)

@@ -55,13 +55,14 @@ public class ApplicationResultSender extends AbstractResultSender
 	public void sendPartialResults(JPPFTaskBundle bundle) throws Exception
 	{
 		if (debugEnabled) log.debug("Sending bundle with "+bundle.getTaskCount()+" tasks");
-		int size = 4;
+		JPPFBuffer bundleBuffer = helper.toBytes(bundle, true);
+		int size = 4 + bundleBuffer.getLength();
 		for (byte[] task : bundle.getTasks())
 		{
 			size += 4 + task.length;
 		}
 		byte[] data = new byte[size];
-		int pos = helper.writeInt(bundle.getTaskCount(), data, 0);
+		int pos = helper.copyToBuffer(bundleBuffer.getBuffer(), data, 0, bundleBuffer.getLength());
 		for (byte[] task : bundle.getTasks())
 		{
 			pos = helper.copyToBuffer(task, data, pos, task.length);

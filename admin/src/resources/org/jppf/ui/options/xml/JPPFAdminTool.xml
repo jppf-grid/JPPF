@@ -58,12 +58,16 @@
 			var statsHandler = StatsHandler.getInstance();
 			var builder = JPPFChartBuilder.getInstance();
 			builder.createInitialCharts();
+			var nodePanel = new NodeDataPanel();
 			var monitor = new MonitoringPanel();
-			var BASE = "org.jppf.ui.i18n.StatsPage";
+			var BASE = "org.jppf.ui.i18n.NodeDataPage";
+			comp.insertTab(LocalizationUtils.getLocalized(BASE, "NodeDataPage.label"), null, new JScrollPane(nodePanel),
+				LocalizationUtils.getLocalized(BASE, "NodeDataPage.tooltip"), 0);
+			BASE = "org.jppf.ui.i18n.StatsPage";
 			comp.insertTab(LocalizationUtils.getLocalized(BASE, "StatsPage.label"), null, new JScrollPane(monitor),
-				LocalizationUtils.getLocalized(BASE, "StatsPage.tooltip"), 0);
+				LocalizationUtils.getLocalized(BASE, "StatsPage.tooltip"), 1);
 			comp.insertTab(LocalizationUtils.getLocalized(BASE, "ChartsPage.label"), null, builder.getTabbedPane(), 
-				LocalizationUtils.getLocalized(BASE, "ChartsPage.tooltip"), 1);
+				LocalizationUtils.getLocalized(BASE, "ChartsPage.tooltip"), 2);
 			comp.setSelectedIndex(0);
 			var ccPage = OptionsHandler.getPage("ChartsConfiguration");
 			ccPage.getInitializer().valueChanged(new ValueChangeEvent(ccPage));

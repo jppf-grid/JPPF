@@ -29,12 +29,19 @@ import org.jppf.client.*;
 public class ClientConnectionStatusEvent extends EventObject
 {
 	/**
+	 * The new status that was set.
+	 */
+	private JPPFClientConnectionStatus status = null;
+
+	/**
 	 * Initialize this event with a client connection as source.
 	 * @param source the event source.
+	 * @param status the new status that was set.
 	 */
-	public ClientConnectionStatusEvent(Object source)
+	public ClientConnectionStatusEvent(Object source, JPPFClientConnectionStatus status)
 	{
 		super(source);
+		this.status = status;
 	}
 
 	/**

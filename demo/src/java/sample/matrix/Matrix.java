@@ -40,7 +40,7 @@ public class Matrix implements Serializable
 	private double[][] values = null;
 	
 	/**
-	 * Initialize this amtrix with a specified size.
+	 * Initialize this matrix with a specified size.
 	 * @param newSize the size of this matrix.
 	 */
 	public Matrix(int newSize)

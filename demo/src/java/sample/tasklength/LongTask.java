@@ -50,6 +50,7 @@ public class LongTask extends JPPFTask
 	 */
 	public void run()
 	{
+		fireStatusChanged("Starting task with duration = "+ taskLength + " ms");
 		taskStart = System.currentTimeMillis();
 		double elapsed = 0L;
 		while (elapsed < taskLength)
@@ -60,5 +61,6 @@ public class LongTask extends JPPFTask
 			//s.replace("8", "$");
 			elapsed = System.currentTimeMillis() - taskStart;
 		}
+		fireStatusChanged("Task execution ended after " + elapsed + " ms");
 	}
 }

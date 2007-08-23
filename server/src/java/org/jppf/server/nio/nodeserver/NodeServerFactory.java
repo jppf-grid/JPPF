@@ -69,7 +69,7 @@ public final class NodeServerFactory extends NioServerFactory<NodeState, NodeTra
 		map.put(TO_WAITING, new NioTransition<NodeState>(WAITING_RESULTS, R));
 		map.put(TO_SEND_INITIAL, new NioTransition<NodeState>(SEND_INITIAL_BUNDLE, RW));
 		map.put(TO_WAIT_INITIAL, new NioTransition<NodeState>(WAIT_INITIAL_BUNDLE, R));
-		map.put(TO_IDLE, new NioTransition<NodeState>(SENDING_BUNDLE, 0));
+		map.put(TO_IDLE, new NioTransition<NodeState>(SENDING_BUNDLE, R));
 		return map;
 	}
 }
