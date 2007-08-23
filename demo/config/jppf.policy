@@ -36,6 +36,7 @@ permission java.lang.RuntimePermission "defineClassInPackage.*";
 permission java.lang.RuntimePermission "accessDeclaredMembers";
 permission java.lang.RuntimePermission "getStackTrace";
 permission java.lang.RuntimePermission "modifyThread";
+permission java.lang.RuntimePermission "getProtectionDomain";
 
 //------------------------------------------------------------------------------//
 // File permissions.                                                            //
@@ -59,6 +60,13 @@ permission java.util.PropertyPermission "log4j.*", "read";
 permission java.util.PropertyPermission "java.*", "read";
 permission java.util.PropertyPermission "line.separator", "read";
 permission java.util.PropertyPermission "os.name", "read";
+
+//------------------------------------------------------------------------------//
+// MBean server permissions.                                                    //
+// Please do not change these permissions. JPPF may not work any more if you do //
+//------------------------------------------------------------------------------//
+
+//permission javax.management.MBeanServerPermission "createMBeanServer";
 
 //------------------------------------------------------------------------------//
 // Permissions for running the node with the Java Wrapper.                      //
