@@ -23,21 +23,17 @@
 								new or updated code is automatically loaded.</li>
 								<li>built-in <b>failover and recovery</b> for all components of the framework (clients, servers and nodes)</li>
 								<li><b>opportunistic grid</b> capabilities with <b>JPPF@Home</b> (see <a href="http://www.jppf.org/screenshots/shot11.jpg">screenshot</a>)</li>
+								<li><b><a href="wiki/index.php/JPPF_And_J2EE">J2EE Integration</a></b>: JPPF grid services are available for market-leading application servers</li>
 								<li>fully <b>documented</b> APIs, administration guide and developer guide</li>
 								<li>runs on any platform supporting Java 2 Platform Standard Edition 5.0 (J2SE 1.5) or later</li>
 							</ul>
 						</td></tr>
 						<tr><td class="noborder_">
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.26.0 - beta</span></h4>
-						</td></tr>
-						<tr><td class="noborder_">
-							<h3>New: JPPF is looking for developers!</h3>
-							If you're interested, please take a look at the <a href="http://sourceforge.net/people/viewjob.php?group_id=135654&job_id=25512">
-							announcement</a> posted on <b>SF.net</b><br><br>
-						</td></tr>
-						<tr><td class="noborder_">
-							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the GNU Lesser General Public License (LGPL).
-							A copy of the licensing terms can be obtained <a href="http://www.opensource.org/licenses/lgpl-license.php"><b>here</b></a>.</span></h4>
+							<h3>Participate, contribute and stay informed:</h3>
+							<strong style="color: #8080FF">Browse our <a href="./wiki" target=_top>documentation</a></strong><br>
+							<strong style="color: #8080FF">Give your comments and advice, find support, on our <a href="./forums" target=_top>discussion forums</a></strong><br>
+							<strong style="color: #8080FF">Browse and update our <a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>bugs database</a></strong><br>
+							<strong style="color: #8080FF">Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>feature requests database</a></strong>
 						</td></tr>
 
 					</table>
@@ -66,36 +62,22 @@
 						</td></tr>
 
 						<tr><td class="noborder_">
-							<h3>JPPF articles on the Web</h3>
-							<table align="center">
-								<tr><td>
-									<p><a href="http://www.infoq.com/news/Grid-Computing-JPPF" target=_top>
-										<img src="http://www.infoq.com/styles/i/logo.gif" border="0" alternate="InfoQ"/>
-									</a>
-									</td>
-									<td>
-									<p><a href="http://lwn.net/Articles/156109" target=_top>
-										<img src="http://lwn.net/images/lcorner.png" border="0" alternate="LWN.net"/>
-									</a>
-								</td></tr>
-								<tr><td>
-									<p><a href="http://www.artima.com/forums/flat.jsp?forum=276&thread=153331" target=_top>
-										<img src="http://www.artima.com/images/ab_dev.gif" border="0" alternate="artima developer"/>
-									</a>
-								</td></tr>
-								<tr><td>
-									<p><a href="http://linux.softpedia.com/get/System/Clustering-and-Distributed-Networks/Java-Parallel-Processing-Framework-10529.shtml" target=_top>
-										<img src="http://www.softpedia.com/base_img/softpedia_logo.gif" border="0" alternate="Softpedia"/>
-									</a>
-								</td></tr>
-							</table>
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 1.0 beta 1</span></h4>
 						</td></tr>
 						<tr><td class="noborder_">
-							<h3>Feedback Wanted: <span style="color: #000060">help making JPPF a better open source product</span></h3>
-							Suggestions, bug reports, criticism and ideas are most welcome. We will do our best to answer promptly.<br>
-							<a href="./forums" target=_top>Discussion forums are available here</a><br>
-							<a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>The bugs tracking system is here</a><br>
-							<a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>The feature request tracking system is here</a><br>
+							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the Apache License, Version 2.0.<br>
+							A copy of the licensing terms can be obtained <a href="http://www.apache.org/licenses/LICENSE-2.0"><b>at this location</b></a>.</span></h4>
+						</td></tr>
+						<tr><td class="noborder_">
+							<h3>JPPF on the web:</h3>
+							<strong style="color: #8080FF"><a href="http://www.jroller.com/jppf/" target=_top>JPPF Blog</a></strong><br>
+							<strong style="color: #8080FF"><a href="http://www.jroller.com/gkorland/entry/jppf" target=_top>Guy Korland's Blog</a></strong><br>
+							<strong style="color: #8080FF"><a href="http://www.infoq.com/news/Grid-Computing-JPPF" target=_top>JPPF on InfoQ</a></strong><br>
+							<strong style="color: #8080FF"><a href="http://weblogs.java.net/blog/fabriziogiudici/archive/2006/11/parallel_comput_1.html" target=_top>Fabrizio Giudici's Blog</a></strong><br>
+							<strong style="color: #8080FF"><a href="http://wiki.cs.rit.edu/bin/view/Main/KarolPietrzakComputerGraphicsJPPF" target=_top> Karl Pietrzak's Parallelization of Ray Tracing</a></strong><br>
+							<strong style="color: #8080FF"><a href="http://www.oitos.it/opencms/opencms/oitos/modules/products/product_0033.html" target=_top>JPPF evaluation on OITOS</a> (in Italian)</strong><br>
+							
+							
 						</td></tr>
 					</table>
 				</td>
