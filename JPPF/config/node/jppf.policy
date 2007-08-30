@@ -29,13 +29,14 @@
 //------------------------------------------------------------------------------//
 
 permission java.lang.RuntimePermission "createClassLoader";
+permission java.lang.RuntimePermission "setContextClassLoader";
 permission java.lang.RuntimePermission "getClassLoader";
 permission java.lang.RuntimePermission "accessClassInPackage.*";
 permission java.lang.RuntimePermission "defineClassInPackage.*";
 permission java.lang.RuntimePermission "accessDeclaredMembers";
 permission java.lang.RuntimePermission "getStackTrace";
-permission java.lang.RuntimePermission "setContextClassLoader";
 permission java.lang.RuntimePermission "modifyThread";
+permission java.lang.RuntimePermission "getProtectionDomain";
 
 //------------------------------------------------------------------------------//
 // File permissions.                                                            //
@@ -48,6 +49,7 @@ permission java.io.FilePermission "${user.dir}/jppf-node2.log", "read,write,dele
 permission java.io.FilePermission "${user.dir}/config/log4j-node.properties", "read";
 permission java.io.FilePermission "${user.dir}/config/log4j-node1.properties", "read";
 permission java.io.FilePermission "${user.dir}/config/log4j-node2.properties", "read";
+permission java.io.FilePermission "C:/jdk1.5.0/jre/lib/xerces.properties", "read";
 
 //------------------------------------------------------------------------------//
 // Property permissions.                                                        //
@@ -55,8 +57,9 @@ permission java.io.FilePermission "${user.dir}/config/log4j-node2.properties", "
 //------------------------------------------------------------------------------//
 
 permission java.util.PropertyPermission "log4j.*", "read";
-permission java.util.PropertyPermission "java.version", "read";
+permission java.util.PropertyPermission "java.*", "read";
 permission java.util.PropertyPermission "line.separator", "read";
+permission java.util.PropertyPermission "os.name", "read";
 
 //------------------------------------------------------------------------------//
 // Permissions for running the node with the Java Wrapper.                      //
@@ -77,3 +80,28 @@ permission org.tanukisoftware.wrapper.security.WrapperPermission "signalStopped"
 //                                                                              //
 //permission java.net.SocketPermission "localhost:3306", "connect,listen";      //
 //------------------------------------------------------------------------------//
+
+//------------------------------------------------------------------------------//
+// Connection permissions.                                                      //
+//------------------------------------------------------------------------------//
+//permission java.net.SocketPermission "www.jppf.org:80", "connect,listen";
+//permission java.net.SocketPermission "127.0.0.1:21", "accept,connect,listen,resolve";
+permission java.net.SocketPermission "127.0.0.1:1024-", "accept,connect,listen,resolve";
+//------------------------------------------------------------------------------//
+// permissions for JBoss 4.0.x                                                  //
+//------------------------------------------------------------------------------//
+//permission java.lang.RuntimePermission "org.jboss.security.SecurityAssociation.getPrincipalInfo";
+//permission java.io.SerializablePermission "enableSubstitution";
+//------------------------------------------------------------------------------//
+// for Weblogic 9.2: security should be disabled                                //
+//------------------------------------------------------------------------------//
+
+//------------------------------------------------------------------------------//
+// permissions for WAS 6.1                                                      //
+//------------------------------------------------------------------------------//
+//permission java.util.PropertyPermission "com.ibm.*", "read";
+//permission java.util.PropertyPermission "ws.*", "read";
+//permission java.util.PropertyPermission "was.*", "read";
+//permission java.util.PropertyPermission "client.logsRedirected", "read";
+//permission java.util.PropertyPermission "disableLogs", "read";
+//permission java.util.PropertyPermission "db2.*", "read";
