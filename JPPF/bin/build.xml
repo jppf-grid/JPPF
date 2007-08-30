@@ -361,8 +361,10 @@
 		<copy tofile="${runtime.node}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.node}/config">
 			<fileset dir="${config}/node">
+				<!--
 				<exclude name="jppf.policy"/>
 				<exclude name="*.bat"/>
+				-->
 			</fileset>
 		</copy>
 		<copy todir="${runtime.node}">
