@@ -164,7 +164,7 @@ public class JPPFClient extends AbstractJPPFClient
 	/**
 	 * Wrapper class for the initialization of a client connection.
 	 */
-	private class ConnectionInitializer implements Runnable
+	private static class ConnectionInitializer implements Runnable
 	{
 		/**
 		 * The client connection to initialize.

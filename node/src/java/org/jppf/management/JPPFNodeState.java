@@ -20,7 +20,7 @@ package org.jppf.management;
 
 import java.io.Serializable;
 
-import org.jppf.node.event.NodeEvent;
+import org.jppf.node.event.NodeEventType;
 
 /**
  * Instances of this class represent the state of a node.
@@ -34,9 +34,13 @@ public class JPPFNodeState implements Serializable
 	 */
 	private Object taskEvent = "";
 	/**
-	 * Type of the latest life cycle event of the node.
+	 * Status of the connection between the node and the server.
 	 */
-	private NodeEvent.EventType nodeEventType = NodeEvent.EventType.UNKNOWN;
+	private String connectionStatus = NodeEventType.UNKNOWN.toString();
+	/**
+	 * Latest execution status of the node.
+	 */
+	private String executionStatus = NodeEventType.UNKNOWN.toString();
 	/**
 	 * The number of tasks executed by the node.
 	 */
@@ -61,24 +65,6 @@ public class JPPFNodeState implements Serializable
 	}
 
 	/**
-	 * Get the type of the latest life cycle event of the node.
-	 * @return a <code>NodeEvent.EventType</code> enum value.
-	 */
-	public synchronized NodeEvent.EventType getNodeEventType()
-	{
-		return nodeEventType;
-	}
-
-	/**
-	 * Set the type of the latest life cycle event of the node.
-	 * @param nodeEventType a <code>NodeEvent.EventType</code> enum value.
-	 */
-	public synchronized void setNodeEventType(NodeEvent.EventType nodeEventType)
-	{
-		this.nodeEventType = nodeEventType;
-	}
-
-	/**
 	 * Get the number of tasks executed by the node.
 	 * @return the number of tasks as an int.
 	 */
@@ -94,5 +80,41 @@ public class JPPFNodeState implements Serializable
 	public synchronized void setNbTasksExecuted(int nbTasksExecuted)
 	{
 		this.nbTasksExecuted = nbTasksExecuted;
+	}
+
+	/**
+	 * Get the status of the connection between the node and the server.
+	 * @return a string representing the connection status.
+	 */
+	public synchronized String getConnectionStatus()
+	{
+		return connectionStatus;
+	}
+
+	/**
+	 * Set the status of the connection between the node and the server.
+	 * @param connectionStatus a string representing the connection status.
+	 */
+	public synchronized void setConnectionStatus(String connectionStatus)
+	{
+		this.connectionStatus = connectionStatus;
+	}
+
+	/**
+	 * Get the latest execution status of the node.
+	 * @return a string representing the execution status.
+	 */
+	public synchronized String getExecutionStatus()
+	{
+		return executionStatus;
+	}
+
+	/**
+	 * Get the latest execution status of the node.
+	 * @param executionStatus a string representing the execution status.
+	 */
+	public synchronized void setExecutionStatus(String executionStatus)
+	{
+		this.executionStatus = executionStatus;
 	}
 }

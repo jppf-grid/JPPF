@@ -251,7 +251,7 @@ public final class StatsHandler implements StatsConstants
 	public String changeAdminPassword(String password, String newPassword)
 	{
 		String msg = null;
-		if (jppfClient == null) return "Not connected to the server";
+		if (getJppfClient() == null) return "Not connected to the server";
 		try
 		{
 			Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();

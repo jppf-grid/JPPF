@@ -66,6 +66,7 @@
 		<pathelement location="${basedir}/../server/classes"/>
 		<pathelement location="${basedir}/../demo/classes"/>
 		<pathelement location="${jppf.lib}/log4j/log4j-1.2.9.jar"/>
+		<pathelement location="${jppf.lib}/ApacheCommons/commons-logging-1.1.jar"/>
   </path>
 
 	<!-- ========================================================================= -->

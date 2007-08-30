@@ -21,7 +21,8 @@ package org.jppf.process;
 import java.util.Properties;
 
 /**
- * 
+ * Utility class used to generate the configuration properties of a JPPF client,
+ * to be used when executing a JPPF client process. 
  * @author Laurent Cohen
  */
 public class ClientPropertiesBuilder

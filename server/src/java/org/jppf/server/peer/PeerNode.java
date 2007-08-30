@@ -22,7 +22,7 @@ import java.util.*;
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.node.AbstractMonitoredNode;
-import org.jppf.node.event.NodeEvent.EventType;
+import org.jppf.node.event.NodeEventType;
 import org.jppf.server.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
@@ -103,7 +103,7 @@ public class PeerNode extends AbstractMonitoredNode
 			}
 		}
 		if (debugEnabled) log.debug(getName() + "End of peer node main loop");
-		if (notifying) fireNodeEvent(EventType.DISCONNECTED);
+		if (notifying) fireNodeEvent(NodeEventType.DISCONNECTED);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public class PeerNode extends AbstractMonitoredNode
 				boolean override = bundle.getParameter(BundleParameter.BUNDLE_TUNING_TYPE_PARAM) != null;
 				bundle.setParameter(BundleParameter.IS_PEER, true);
 			}
-			if (notifying) fireNodeEvent(EventType.START_EXEC);
+			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
 			boolean notEmpty = (bundle.getTasks() != null) && (bundle.getTaskCount() > 0);
 			if (notEmpty)
 			{
@@ -134,9 +134,7 @@ public class PeerNode extends AbstractMonitoredNode
 				bundle.setCompletionListener(resultSender);
 				JPPFDriver.getQueue().addBundle(bundle);
 				resultSender.run(n);
-				/*
-				resultSender.sendPartialResults(bundle);
-				*/
+				//resultSender.sendPartialResults(bundle);
 
 				setTaskCount(getTaskCount() + n);
 				if (debugEnabled) log.debug(getName() + "tasks executed: "+getTaskCount());
@@ -145,7 +143,7 @@ public class PeerNode extends AbstractMonitoredNode
 			{
 				resultSender.sendPartialResults(bundle);
 			}
-			if (notifying) fireNodeEvent(EventType.END_EXEC);
+			if (notifying) fireNodeEvent(NodeEventType.END_EXEC);
 		}
 		if (debugEnabled) log.debug(getName() + " End of peer node secondary loop");
 	}
@@ -164,7 +162,7 @@ public class PeerNode extends AbstractMonitoredNode
 			initSocketClient();
 		}
 		initCredentials();
-		if (notifying) fireNodeEvent(EventType.START_CONNECT);
+		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
 		if (mustInit)
 		{
 			if (debugEnabled) log.debug(getName() + "initializing socket");
@@ -172,7 +170,7 @@ public class PeerNode extends AbstractMonitoredNode
 			socketInitializer.initializeSocket(socketClient);
 			System.out.println(getName() + "PeerNode.init(): Reconnected to the JPPF driver");
 		}
-		if (notifying) fireNodeEvent(EventType.END_CONNECT);
+		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
 	}
 
 	/**
@@ -196,14 +194,6 @@ public class PeerNode extends AbstractMonitoredNode
 	 */
 	private void initCredentials()
 	{
-		/*
-		String uuid = new JPPFUuid().toString();
-		StringBuilder sb = new StringBuilder("Node:");
-		sb.append(VersionUtils.getLocalIpAddress()).append(":");
-		sb.append(socketClient.getPort());
-		// testing that the server throws a JPPFSecurityException
-		credentials = new JPPFSecurityContext(uuid, sb.toString(), new JPPFCredentials());
-		*/
 	}
 	
 	/**

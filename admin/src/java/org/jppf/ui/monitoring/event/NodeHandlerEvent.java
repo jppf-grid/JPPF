@@ -22,7 +22,7 @@ import java.util.EventObject;
 import org.jppf.ui.monitoring.data.*;
 
 /**
- * Event sent when the stats data has changed.
+ * Event sent when the state of a node has changed.
  * @author Laurent Cohen
  */
 public class NodeHandlerEvent extends EventObject
@@ -54,7 +54,7 @@ public class NodeHandlerEvent extends EventObject
 	/**
 	 * The node connection and state information
 	 */
-	private NodeInfoHolder infoHolder = null;
+	private transient NodeInfoHolder infoHolder = null;
 
 	/**
 	 * Initialize this event with a specified source <code>NodeHandler</code>.

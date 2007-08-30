@@ -19,6 +19,7 @@ package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
+import java.io.Serializable;
 import java.util.*;
 
 import org.apache.commons.logging.*;
@@ -97,7 +98,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public List<JPPFClientConnection> getAllConnections()
 	{
-		return allConnections;
+		return Collections.unmodifiableList(allConnections);
 	}
 
 	/**
@@ -287,7 +288,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	/**
 	 * Instances of this class manage a list of client connections with the same priority.
 	 */
-	public class ClientPool
+	public static class ClientPool
 	{
 		/**
 		 * The priority associated with this client pool.
@@ -316,7 +317,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	/**
 	 * This comparator defines a decending value order for integers.
 	 */
-	protected class DescendingIntegerComparator implements Comparator<Integer>
+	protected static class DescendingIntegerComparator implements Comparator<Integer>, Serializable
 	{
 		/**
 		 * Compare two integers.

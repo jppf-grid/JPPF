@@ -21,7 +21,8 @@ package org.jppf.process;
 import java.util.*;
 
 /**
- * 
+ * Utility class used to generate the configuration properties of a JPPF node,
+ * to be used when executing a JPPF node process. 
  * @author Laurent Cohen
  */
 public class NodePropertiesBuilder

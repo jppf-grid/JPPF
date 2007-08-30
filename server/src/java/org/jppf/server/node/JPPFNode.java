@@ -29,7 +29,7 @@ import org.jppf.*;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.management.*;
 import org.jppf.node.*;
-import org.jppf.node.event.NodeEvent.EventType;
+import org.jppf.node.event.NodeEventType;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
@@ -132,7 +132,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			}
 		}
 		if (debugEnabled) log.debug("End of node main loop");
-		if (notifying) fireNodeEvent(EventType.DISCONNECTED);
+		if (notifying) fireNodeEvent(NodeEventType.DISCONNECTED);
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		while (!stopped)
 		{
 			Pair<JPPFTaskBundle, List<JPPFTask>> pair = readTask();
-			if (notifying) fireNodeEvent(EventType.START_EXEC);
+			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
 			JPPFTaskBundle bundle = pair.first();
 			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 			{
@@ -201,10 +201,13 @@ public class JPPFNode extends AbstractMonitoredNode
 		boolean mustInit = (socketClient == null);
 		if (mustInit)	initSocketClient();
 		initCredentials();
-		nodeAdmin = new JPPFNodeAdmin(JPPFNode.this);
-		addNodeListener(nodeAdmin);
-		NodeLauncher.getJmxServer().registerMbean(MBEAN_NAME, nodeAdmin, JPPFNodeAdminMBean.class);
-		if (notifying) fireNodeEvent(EventType.START_CONNECT);
+		if (nodeAdmin == null)
+		{
+			nodeAdmin = new JPPFNodeAdmin(JPPFNode.this);
+			addNodeListener(nodeAdmin);
+			NodeLauncher.getJmxServer().registerMbean(MBEAN_NAME, nodeAdmin, JPPFNodeAdminMBean.class);
+		}
+		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
 		if (mustInit)
 		{
 			if (debugEnabled) log.debug("start socket initialization");
@@ -213,7 +216,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			System.out.println("PeerNode.init(): Reconnected to the JPPF driver");
 			if (debugEnabled) log.debug("end socket initialization");
 		}
-		if (notifying) fireNodeEvent(EventType.END_CONNECT);
+		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
 		TypedProperties props = JPPFConfiguration.getProperties();
 		int poolSize = props.getInt("processing.threads", 1);
 		threadPool = Executors.newFixedThreadPool(poolSize);
@@ -327,7 +330,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 			{
 				JPPFContainer cont = getContainer(bundle.getUuidPath().getList());
-				pos = cont.deserializeObject(bytes, pos, true, list, 1+count);
+				cont.deserializeObject(bytes, pos, true, list, 1+count);
 			}
 		}
 		catch(ClassNotFoundException e)
@@ -453,6 +456,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		{
 			log.error(e.getMessage(), e);
 		}
+		setNodeAdmin(null);
 		classLoader = null;
 	}
 
@@ -464,9 +468,9 @@ public class JPPFNode extends AbstractMonitoredNode
 	{
 		if (executingCount.decrementAndGet() == 0)
 		{
-			fireNodeEvent(EventType.END_EXEC);
+			fireNodeEvent(NodeEventType.END_EXEC);
 		}
-		fireNodeEvent(EventType.TASK_EXECUTED);
+		fireNodeEvent(NodeEventType.TASK_EXECUTED);
 	}
 	
 	/**
@@ -477,7 +481,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	{
 		if (executingCount.incrementAndGet() == 1)
 		{
-			fireNodeEvent(EventType.START_EXEC);
+			fireNodeEvent(NodeEventType.START_EXEC);
 		}
 	}
 
@@ -488,5 +492,14 @@ public class JPPFNode extends AbstractMonitoredNode
 	public synchronized JPPFNodeAdmin getNodeAdmin()
 	{
 		return nodeAdmin;
+	}
+
+	/**
+	 * Set the administration and monitoring MBean for this node.
+	 * @param nodeAdmin a <code>JPPFNodeAdmin</code>m instance.
+	 */
+	public synchronized void setNodeAdmin(JPPFNodeAdmin nodeAdmin)
+	{
+		this.nodeAdmin = nodeAdmin;
 	}
 }

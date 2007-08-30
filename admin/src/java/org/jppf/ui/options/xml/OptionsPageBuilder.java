@@ -278,6 +278,7 @@ public class OptionsPageBuilder
 		else if ("FileChooser".equals(desc.type)) elt = f.buildFileChooser(desc);
 		else if ("Label".equals(desc.type)) elt = f.buildLabel(desc);
 		else if ("import".equals(desc.type)) elt = f.loadImport(desc);
+		else if ("Java".equals(desc.type)) elt = f.buildJavaOption(desc);
 		return elt;
 	}
 

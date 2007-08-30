@@ -143,7 +143,6 @@ public class MatrixRunner
 		Matrix c = new Matrix(size);
 		// Get the matrix values from the tasks results
 		int rowIdx = 0;
-		long start2 = System.currentTimeMillis();
 		for (int i=0; i<results.size(); i++)
 		{
 			ExtMatrixTask matrixTask = (ExtMatrixTask) results.get(i);

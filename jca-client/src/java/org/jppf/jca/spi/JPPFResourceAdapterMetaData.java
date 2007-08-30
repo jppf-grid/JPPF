@@ -21,7 +21,8 @@ package org.jppf.jca.spi;
 import javax.resource.cci.ResourceAdapterMetaData;
 
 /**
- * 
+ * Implementation of the {@link javax.resource.spi.ResourceAdapterMetaData ResourceAdapterMetaData} interface for
+ * the JPPF resource adapter.
  * @author Laurent Cohen
  */
 public class JPPFResourceAdapterMetaData implements ResourceAdapterMetaData

@@ -84,11 +84,11 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 					break;
 	
 				case READ_STATISTICS:
-					response = readStatistics();
+					response = new JPPFManagementResponse(statistics(), null);
 					break;
 
 				case REFRESH_NODE_INFO:
-					response = readNodeInformation();
+					response = new JPPFManagementResponse(nodesInformation(), null);
 					break;
 			}
 		}
@@ -100,14 +100,25 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	}
 
 	/**
-	 * Get the latest server statistics.
-	 * Change the administration password.
-	 * @return the statistics encapsulated in a <code>JPPFManagementResponse</code> instance.
-	 * @throws Exception if the statistics could not be obtained.
+	 * Request the JMX connection information for all the nodes attached to the server.
+	 * @return a collection of <code>NodeManagementInfo</code> instances.
+	 * @see org.jppf.management.JPPFDriverAdminMBean#nodesInformation()
 	 */
-	private JPPFManagementResponse readStatistics() throws Exception
+	public Collection<NodeManagementInfo> nodesInformation()
 	{
-		return new JPPFManagementResponse(JPPFStatsUpdater.getStats(), null);
+		List<NodeManagementInfo> list = new ArrayList<NodeManagementInfo>();
+		list.addAll(JPPFDriver.getInstance().getNodeInformationMap().values());
+		return list;
+	}
+
+	/**
+	 * Get the latest statistics snapshot from the JPPF driver.
+	 * @return a <code>JPPFStats</code> instance.
+	 * @see org.jppf.management.JPPFDriverAdminMBean#statistics()
+	 */
+	public JPPFStats statistics()
+	{
+		return JPPFStatsUpdater.getStats();
 	}
 
 	/**
@@ -192,18 +203,5 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		byte[] b = (byte[]) request.getParameter(KEY_PARAM);
 		b = CryptoUtils.decrypt(b);
 		return CryptoUtils.getSecretKeyFromEncoded(b);
-	}
-
-	/**
-	 * Get the JMX information for the connected nodes.
-	 * @return a collection of <code>JPPFNodeManagementInformation</code> instances encapsulated
-	 * in a <code>JPPFManagementResponse</code> instance.
-	 * @throws Exception if the information could not be obtained.
-	 */
-	private JPPFManagementResponse readNodeInformation() throws Exception
-	{
-		List<NodeManagementInfo> list = new ArrayList<NodeManagementInfo>();
-		list.addAll(JPPFDriver.getInstance().getNodeInformationMap().values());
-		return new JPPFManagementResponse(list, null);
 	}
 }

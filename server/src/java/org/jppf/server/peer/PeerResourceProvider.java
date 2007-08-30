@@ -29,7 +29,7 @@ import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
 
 /**
- * 
+ * This class represents a connection to the class server of a remote JPPF driver (peer driver).
  * @author Laurent Cohen
  */
 public class PeerResourceProvider

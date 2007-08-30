@@ -60,7 +60,7 @@ public abstract class JPPFTask implements Runnable, Serializable
 	/**
 	 * List of listeners for this task.
 	 */
-	protected List<JPPFTaskListener> listeners = new ArrayList<JPPFTaskListener>();
+	protected transient List<JPPFTaskListener> listeners = null;
 
 	/**
 	 * Get the result of the task execution.
@@ -140,7 +140,7 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 */
 	public void addJPPFTaskListener(JPPFTaskListener listener)
 	{
-		listeners.add(listener);
+		getListeners().add(listener);
 	}
 
 	/**
@@ -149,18 +149,28 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 */
 	public void removeJPPFTaskListener(JPPFTaskListener listener)
 	{
-		listeners.remove(listener);
+		getListeners().remove(listener);
 	}
 
 	/**
 	 * Notify all listeners that an event has occurred within this task.
 	 * @param source an object describing the event, must be serializable.
 	 */
-	public void fireStatusChanged(Serializable source)
+	public void fireNotification(Serializable source)
 	{
 		JPPFTaskEvent event = new JPPFTaskEvent(source);
 		// to avoid ConcurrentModificationException
-		JPPFTaskListener[] array = listeners.toArray(new JPPFTaskListener[0]);
+		JPPFTaskListener[] array = getListeners().toArray(new JPPFTaskListener[0]);
 		for (JPPFTaskListener listener: array) listener.eventOccurred(event);
+	}
+
+	/**
+	 * Get the list of listeners for this task.
+	 * @return a list of <code>JPPFTaskListener</code> instances.
+	 */
+	protected synchronized List<JPPFTaskListener> getListeners()
+	{
+		if (listeners == null) listeners = new ArrayList<JPPFTaskListener>();
+		return listeners;
 	}
 }

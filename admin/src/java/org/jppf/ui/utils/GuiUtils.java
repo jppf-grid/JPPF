@@ -20,6 +20,8 @@ package org.jppf.ui.utils;
 import java.awt.*;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.*;
+
 import javax.swing.*;
 
 /**
@@ -32,6 +34,10 @@ public final class GuiUtils
 	 * A mapping of icons to their path, to use as an icon cache.
 	 */
 	private static Map<String, ImageIcon> iconMap = new Hashtable<String, ImageIcon>();
+	/**
+	 * Precompiled pattern for searching line breaks in a string.
+	 */
+	private static final Pattern TOOLTIP_PATTERN = Pattern.compile("\\n");
 
 	/**
 	 * Create a chartPanel with a box layout with the specified orientation.
@@ -77,7 +83,7 @@ public final class GuiUtils
 	}
 
 	/**
-	 * Create a filler component with the specified. The resulting component can be used as a
+	 * Create a filler component with the specified fixed size. The resulting component can be used as a
 	 * separator for layout purposes.
 	 * @param width the component's width.
 	 * @param height the component's height.
@@ -91,5 +97,18 @@ public final class GuiUtils
 		filler.setMaximumSize(d);
 		filler.setPreferredSize(d);
 		return filler;
+	}
+
+	/**
+	 * Format a possibly multi-line text into a a string that can be properly displayed as a tooltip..
+	 * @param tooltip the non-formatted text of the tooltip.
+	 * @return the input text if it does not contain any line break, otherwise the input text wrapped in
+	 * &lt;html&gt; ... &lt;/html&gt; tags, with the line breaks transformed into &lt;br&gt; tags.
+	 */
+	public static String formatToolTipText(String tooltip)
+	{
+		if (tooltip == null) return null;
+		String s = TOOLTIP_PATTERN.matcher(tooltip).replaceAll("<br>");
+		return "<html>" + s + "</html>";
 	}
 }

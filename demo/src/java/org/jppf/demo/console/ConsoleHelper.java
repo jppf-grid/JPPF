@@ -25,7 +25,7 @@ import org.jppf.ui.options.*;
 import org.jppf.utils.StringUtils;
 
 /**
- * 
+ * Collection of utility methods to start JPPF client, node and drivers processes from the demo console.
  * @author Laurent Cohen
  */
 public final class ConsoleHelper

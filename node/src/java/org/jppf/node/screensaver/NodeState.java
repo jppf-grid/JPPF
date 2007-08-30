@@ -23,7 +23,6 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import org.jppf.node.event.*;
-import org.jppf.node.event.NodeEvent.EventType;
 
 /**
  * Instances of this class represent information about a node.
@@ -152,35 +151,35 @@ public class NodeState implements NodeListener
 	 */
 	public void eventOccurred(NodeEvent event)
 	{
-		EventType type = event.getType();
-		if (EventType.START_CONNECT.equals(type))
+		NodeEventType type = event.getType();
+		if (NodeEventType.START_CONNECT.equals(type))
 		{
 			statusLabels[0][0].setIcon(NodePanel.DARK_GREEN);
 			statusLabels[0][1].setIcon(NodePanel.BRIGHT_RED);
 		}
-		else if (EventType.END_CONNECT.equals(type))
+		else if (NodeEventType.END_CONNECT.equals(type))
 		{
 			statusLabels[0][0].setIcon(NodePanel.BRIGHT_GREEN);
 			statusLabels[0][1].setIcon(NodePanel.DARK_RED);
 		}
-		else if (EventType.DISCONNECTED.equals(type))
+		else if (NodeEventType.DISCONNECTED.equals(type))
 		{
 			statusLabels[0][0].setIcon(NodePanel.DARK_GREEN);
 			statusLabels[0][1].setIcon(NodePanel.BRIGHT_RED);
 			statusLabels[1][0].setIcon(NodePanel.DARK_GREEN);
 			statusLabels[1][1].setIcon(NodePanel.DARK_RED);
 		}
-		else if (EventType.START_EXEC.equals(type))
+		else if (NodeEventType.START_EXEC.equals(type))
 		{
 			statusLabels[1][0].setIcon(NodePanel.BRIGHT_GREEN);
 			statusLabels[1][1].setIcon(NodePanel.DARK_RED);
 		}
-		else if (EventType.END_EXEC.equals(type))
+		else if (NodeEventType.END_EXEC.equals(type))
 		{
 			statusLabels[1][0].setIcon(NodePanel.DARK_GREEN);
 			statusLabels[1][1].setIcon(NodePanel.BRIGHT_RED);
 		}
-		else if (EventType.TASK_EXECUTED.equals(type))
+		else if (NodeEventType.TASK_EXECUTED.equals(type))
 		{
 			taskCount++;
 			countLabel.setText(""+taskCount);

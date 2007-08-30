@@ -25,13 +25,13 @@ import org.jppf.process.NodePropertiesBuilder.NodePermission;
 import org.jppf.utils.*;
 
 /**
- * 
+ * Utility class used to start external processes for JPPF clients, drivers or nodes.
  * @author Laurent Cohen
  */
 public class ProcessCommand
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(ProcessCommand.class);
 	/**
@@ -40,7 +40,7 @@ public class ProcessCommand
 	private static boolean debugEnabled = log.isDebugEnabled();
 
 	/**
-	 * 
+	 * Build and start a node process using the specified configuration properties.
 	 * @param mainClass the fully qualified name of the entry point class for the process to start.
 	 * @param jppfConfig the set of JPPF configuration properties.
 	 * @param log4jConfig the set of log4j configuration properties.
@@ -74,7 +74,7 @@ public class ProcessCommand
 	}
 
 	/**
-	 * Buidl and start a node process.
+	 * Build and start a node process.
 	 * @param mainClass the fully qualified name of the entry point class for the process to start.
 	 * @param jppfConfig the set of JPPF configuration properties.
 	 * @param permissions list of permissions granted to the node.

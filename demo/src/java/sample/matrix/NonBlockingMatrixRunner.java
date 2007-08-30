@@ -87,7 +87,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 	 * @param iterations the number of times the multiplication will be performed.
 	 * @throws JPPFException if an error is raised during the execution.
 	 */
-	public void perform(int size, int iterations) throws JPPFException
+	public synchronized void perform(int size, int iterations) throws JPPFException
 	{
 		try
 		{

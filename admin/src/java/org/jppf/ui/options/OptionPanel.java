@@ -26,7 +26,7 @@ import javax.swing.border.*;
 import org.jppf.ui.utils.GuiUtils;
 
 /**
- * 
+ * Instances of this page represent dynamic UI components representing a page (or panel) container. 
  * @author Laurent Cohen
  */
 public class OptionPanel extends AbstractOptionElement implements OptionsPage

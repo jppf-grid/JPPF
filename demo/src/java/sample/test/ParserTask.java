@@ -63,9 +63,11 @@ public class ParserTask extends JPPFTestTask
 	public void fileParser(String filetoParse) throws Exception
 	{
 		InputStream is = getClass().getClassLoader().getResourceAsStream(filetoParse);
-		InputSource src = new InputSource(is);
+		//InputSource src = new InputSource(is);
+		new InputSource(is);
 		// Creating XMLReader instance
-		XMLReader reader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+		//XMLReader reader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+		XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
 		/*
 		reader.setContentHandler(brsaxParser);
 		reader.setErrorHandler(brsaxParser);

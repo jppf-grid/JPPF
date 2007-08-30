@@ -27,7 +27,7 @@ import org.apache.commons.logging.*;
 import org.jppf.server.nio.*;
 
 /**
- * 
+ * ABstract superclass for all possible states of a class server connection.
  * @author Laurent Cohen
  */
 public abstract class ClassServerState extends NioState<ClassTransition>

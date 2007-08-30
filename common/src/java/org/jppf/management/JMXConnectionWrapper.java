@@ -26,7 +26,7 @@ import javax.management.remote.*;
 import org.apache.commons.logging.*;
 
 /**
- * Wrapper around a JMX client.
+ * Wrapper around a JMX connection, providing a thread-safe way of handling disconnections and recovery.
  * @author Laurent Cohen
  */
 public class JMXConnectionWrapper
@@ -103,8 +103,11 @@ public class JMXConnectionWrapper
 	 */
 	private void performConnection() throws Exception
 	{
-    jmxc = JMXConnectorFactory.connect(url, null);
-    mbeanConnection = jmxc.getMBeanServerConnection();
+    synchronized(this)
+    {
+      jmxc = JMXConnectorFactory.connect(url, null);
+    	mbeanConnection = jmxc.getMBeanServerConnection();
+    }
 		log.info(getId() + "RMI connection successfully established");
 	}
 
@@ -129,28 +132,16 @@ public class JMXConnectionWrapper
 	 */
 	public Object invoke(String name, String methodName, Object[] params, String[] signature) throws Exception
 	{
-		//while (connectionThread.isConnecting()) goToSleep();
 		if (connectionThread.isConnecting()) return null;
 		Object result = null;
 		try
 		{
 	    ObjectName mbeanName = new ObjectName(name);
-	    /*
-	    if (debugEnabled)
-	    {
-	    	StringBuilder sb = new StringBuilder();
-	    	sb.append("parameters: mbean name=").append(name).append(", method name=").append(methodName);
-	    	sb.append("\nparams=").append(StringUtils.arrayToString(params));
-	    	sb.append("\nsignature=").append(StringUtils.arrayToString(signature));
-	    	log.debug(sb.toString());
-	    }
-	    */
-	    result = mbeanConnection.invoke(mbeanName, methodName, params, signature);
+	    result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
 	    if (name.indexOf("node") >= 0)
 	    {
 	    	getClass();
 	    }
-	    //if (debugEnabled) log.debug(getId() + "result: " + result);
 		}
 		catch(IOException e)
 		{
@@ -210,7 +201,7 @@ public class JMXConnectionWrapper
 		{
 			while (!closed)
 			{
-				if (suspended)
+				if (isSuspended())
 				{
 					if (debugEnabled) log.debug(getId() + "about to go to sleep");
 					goToSleep();
@@ -303,6 +294,15 @@ public class JMXConnectionWrapper
 		{
 			this.connecting = connecting;
 		}
+
+		/**
+		 * Determines the suspended state of this connection thread.
+		 * @return true if the thread is suspended, false otherwise. 
+		 */
+		public synchronized boolean isSuspended()
+		{
+			return suspended;
+		}
 	}
 
 	/**
@@ -330,5 +330,14 @@ public class JMXConnectionWrapper
 	private String getId()
 	{
 		return id;
+	}
+
+	/**
+	 * Get the connection to the MBean server.
+	 * @return a <code>MBeanServerConnection</code> instance.
+	 */
+	public synchronized MBeanServerConnection getMbeanConnection()
+	{
+		return mbeanConnection;
 	}
 }

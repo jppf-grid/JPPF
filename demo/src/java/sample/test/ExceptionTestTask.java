@@ -36,8 +36,7 @@ public class ExceptionTestTask extends JPPFTestTask
 	 */
 	protected void testThrowNPE()
 	{
-		String s = null;
-		s.length();
+		throw new NullPointerException();
 	}
 	
 	/**
@@ -45,8 +44,7 @@ public class ExceptionTestTask extends JPPFTestTask
 	 */
 	protected void testThrowArrayIndexOutOfBoundsException()
 	{
-		int[] intArray = new int[2];
-		int n = intArray[3];
+		throw new ArrayIndexOutOfBoundsException();
 	}
 	
 	/**

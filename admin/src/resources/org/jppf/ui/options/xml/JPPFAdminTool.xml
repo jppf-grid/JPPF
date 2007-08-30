@@ -49,25 +49,14 @@
 			{
 				windowClosing: function(event)
 				{
-					JPPFChartBuilder.getInstance().getStorage().saveAll();
+					var builder = OptionsHandler.getPage("ChartsPage").findFirstWithName("/ChartsBuilder").getUIComponent();
+					builder.getStorage().saveAll();
 					OptionsHandler.savePreferences();
 					System.exit(0);
 				}
 			};
 			frame.addWindowListener(new WindowAdapter(wa));
 			var statsHandler = StatsHandler.getInstance();
-			var builder = JPPFChartBuilder.getInstance();
-			builder.createInitialCharts();
-			var nodePanel = new NodeDataPanel();
-			var monitor = new MonitoringPanel();
-			var BASE = "org.jppf.ui.i18n.NodeDataPage";
-			comp.insertTab(LocalizationUtils.getLocalized(BASE, "NodeDataPage.label"), null, new JScrollPane(nodePanel),
-				LocalizationUtils.getLocalized(BASE, "NodeDataPage.tooltip"), 0);
-			BASE = "org.jppf.ui.i18n.StatsPage";
-			comp.insertTab(LocalizationUtils.getLocalized(BASE, "StatsPage.label"), null, new JScrollPane(monitor),
-				LocalizationUtils.getLocalized(BASE, "StatsPage.tooltip"), 1);
-			comp.insertTab(LocalizationUtils.getLocalized(BASE, "ChartsPage.label"), null, builder.getTabbedPane(), 
-				LocalizationUtils.getLocalized(BASE, "ChartsPage.tooltip"), 2);
 			comp.setSelectedIndex(0);
 			var ccPage = OptionsHandler.getPage("ChartsConfiguration");
 			ccPage.getInitializer().valueChanged(new ValueChangeEvent(ccPage));
@@ -75,8 +64,6 @@
 			frame.getContentPane().add(option.getUIComponent());
 			frame.setSize(600, 730);
 			frame.setVisible(true);
-			statsHandler.addStatsHandlerListener(monitor);
-			statsHandler.addStatsHandlerListener(builder);
 			statsHandler.startRefreshTimer();
 		]]></script>
 	</initializer>
@@ -130,6 +117,9 @@
 		<property name="main" value="false"/>
 		<property name="tooltip" value="Perform the remote administration of the server"/>
 	
+		<import source="file" location="org/jppf/ui/options/xml/NodeDataPage.xml"/>
+		<import source="file" location="org/jppf/ui/options/xml/StatsPage.xml"/>
+		<import source="file" location="org/jppf/ui/options/xml/ServerChartsPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/ChartsConfigPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/AdminPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/BundleSizeTuningPage.xml"/>

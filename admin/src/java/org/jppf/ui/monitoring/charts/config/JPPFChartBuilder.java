@@ -41,12 +41,8 @@ import org.jvnet.substance.theme.*;
  * to all defined charts.
  * @author Laurent Cohen
  */
-public class JPPFChartBuilder implements StatsHandlerListener
+public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListener
 {
-	/**
-	 * Singleton instance of this chart builder.
-	 */
-	private static JPPFChartBuilder instance = null;
 	/**
 	 * Mapping of chart types to the chart handler used to create and update them.
 	 */
@@ -54,7 +50,7 @@ public class JPPFChartBuilder implements StatsHandlerListener
 	/**
 	 * The tabbed pane in which each pane contains user-defined charts.
 	 */
-	private JTabbedPane tabbedPane = new JTabbedPane();
+	//private JTabbedPane tabbedPane = new JTabbedPane();
 	/**
 	 * The list of tab names handled by this chart builder.
 	 */
@@ -71,9 +67,9 @@ public class JPPFChartBuilder implements StatsHandlerListener
 	/**
 	 * Initialize this charts builder.
 	 */
-	protected JPPFChartBuilder()
+	public JPPFChartBuilder()
 	{
-		storage = new PreferencesStorage();
+		storage = new PreferencesStorage(this);
 		initHandlerMap();
 		String s = System.getProperty("swing.defaultlaf");
 		if ((s == null) || SubstanceLookAndFeel.class.getName().equals(s))
@@ -90,7 +86,7 @@ public class JPPFChartBuilder implements StatsHandlerListener
 					return true;
 				}
 			};
-			tabbedPane.putClientProperty(LafWidget.TABBED_PANE_PREVIEW_PAINTER, p);
+			putClientProperty(LafWidget.TABBED_PANE_PREVIEW_PAINTER, p);
 			SubstanceLookAndFeel.registerThemeChangeListener(new ThemeChangeListener()
 			{
 				public void themeChanged()
@@ -109,6 +105,8 @@ public class JPPFChartBuilder implements StatsHandlerListener
 				}
 			});
 		}
+		createInitialCharts();
+		StatsHandler.getInstance().addStatsHandlerListener(this);
 	}
 	
 	/**
@@ -149,7 +147,7 @@ public class JPPFChartBuilder implements StatsHandlerListener
 	 */
 	public void removeTab(TabConfiguration tab)
 	{
-		tabbedPane.remove(tab.panel);
+		remove(tab.panel);
 		tabList.remove(tab);
 		tabMap.remove(tab.name);
 		for (int i=0; i<tabList.size(); i++) tabList.get(i).position = i;
@@ -164,12 +162,12 @@ public class JPPFChartBuilder implements StatsHandlerListener
 		tab.panel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
 		if (tab.position < 0)
 		{
-			tabbedPane.addTab(tab.name, tab.panel);
+			addTab(tab.name, tab.panel);
 			tabList.add(tab);
 		}
 		else
 		{
-			tabbedPane.insertTab(tab.name, null, tab.panel, null, tab.position);
+			insertTab(tab.name, null, tab.panel, null, tab.position);
 			tabList.add(tab.position, tab);
 		}
 		tabMap.put(tab.name, tab);
@@ -224,7 +222,7 @@ public class JPPFChartBuilder implements StatsHandlerListener
 	 */
 	public JTabbedPane getTabbedPane()
 	{
-		return tabbedPane;
+		return this;
 	}
 
 	/**
@@ -308,15 +306,5 @@ public class JPPFChartBuilder implements StatsHandlerListener
 	public PreferencesStorage getStorage()
 	{
 		return storage;
-	}
-
-	/**
-	 * Get tingleton instance of this chart builder.
-	 * @return a JPPFChartBuilder instance.
-	 */
-	public static JPPFChartBuilder getInstance()
-	{
-		if (instance == null) instance = new JPPFChartBuilder();
-		return instance;
 	}
 }

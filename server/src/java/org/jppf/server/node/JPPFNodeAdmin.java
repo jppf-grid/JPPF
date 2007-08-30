@@ -18,6 +18,9 @@
 
 package org.jppf.server.node;
 
+import static org.jppf.management.NodeParameter.COMMAND_PARAM;
+
+import org.apache.commons.logging.*;
 import org.jppf.management.*;
 import org.jppf.node.event.*;
 import org.jppf.server.protocol.*;
@@ -29,13 +32,21 @@ import org.jppf.server.protocol.*;
 public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, NodeListener
 {
 	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(JPPFNodeAdmin.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * The latest event that occurred within a task.
 	 */
 	private JPPFNodeState nodeState = new JPPFNodeState();
 	/**
 	 * The node whose state is monitored.
 	 */
-	private JPPFNode node = null;
+	private transient JPPFNode node = null;
 
 	/**
 	 * Initialize this node management bean with the specified node.
@@ -54,11 +65,38 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	 */
 	public JPPFManagementResponse performAdminRequest(JPPFManagementRequest<NodeParameter, Object> request)
 	{
-		JPPFNodeState state = new JPPFNodeState();
-		state.setNbTasksExecuted(nodeState.getNbTasksExecuted());
-		state.setNodeEventType(nodeState.getNodeEventType());
-		state.setTaskEvent(nodeState.getTaskEvent());
-		return new JPPFManagementResponse(state, null);
+		if (debugEnabled) log.debug("received request: " + request);
+		JPPFManagementResponse response = null;
+		try
+		{
+			NodeParameter command = (NodeParameter) request.getParameter(COMMAND_PARAM);
+			switch(command)
+			{
+				case REFRESH_STATE:
+					response = new JPPFManagementResponse(state(), null);
+					break;
+			}
+		}
+		catch(Exception e)
+		{
+			response = new JPPFManagementResponse(e);
+		}
+		return response;
+	}
+
+	/**
+	 * Get the latest state information from the node.
+	 * @return a <code>JPPFNodeState</code> information.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#state()
+	 */
+	public JPPFNodeState state()
+	{
+		JPPFNodeState s = new JPPFNodeState();
+		s.setNbTasksExecuted(nodeState.getNbTasksExecuted());
+		s.setConnectionStatus(nodeState.getConnectionStatus());
+		s.setExecutionStatus(nodeState.getExecutionStatus());
+		s.setTaskEvent(nodeState.getTaskEvent());
+		return s;
 	}
 
 	/**
@@ -78,7 +116,21 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	 */
 	public synchronized void eventOccurred(NodeEvent event)
 	{
-		nodeState.setNodeEventType(event.getType());
+		NodeEventType type = event.getType();
+		switch(type)
+		{
+			case START_CONNECT:
+			case END_CONNECT:
+			case DISCONNECTED:
+				nodeState.setConnectionStatus(type.toString());
+				break;
+
+			case START_EXEC:
+			case END_EXEC:
+			case TASK_EXECUTED:
+				nodeState.setExecutionStatus(type.toString());
+				break;
+		}
 		nodeState.setNbTasksExecuted(node.getTaskCount());
 	}
 }

@@ -55,7 +55,7 @@ public class HelloJPPF implements Serializable
 		public void test()
 		{
 			// ModelPackage a = ModelPackage.createPackage("x");
-			setResult("Hello World " + count);
+			setResult("Hello World " + count + " from inner class of "+HelloJPPF.this.getClass());
 		}
 	}
 

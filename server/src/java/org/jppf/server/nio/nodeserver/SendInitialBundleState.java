@@ -27,7 +27,7 @@ import java.nio.channels.*;
 import org.apache.commons.logging.*;
 
 /**
- * 
+ * This class represents the state of sending the initial hand-shaking data to a newly connected node.
  * @author Laurent Cohen
  */
 public class SendInitialBundleState extends NodeServerState

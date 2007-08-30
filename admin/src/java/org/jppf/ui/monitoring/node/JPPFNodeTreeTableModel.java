@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring;
+package org.jppf.ui.monitoring.node;
 
 import org.jdesktop.swingx.treetable.*;
 import org.jppf.management.JPPFNodeState;
@@ -41,13 +41,17 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 	 */
 	private static final int NODE_STATUS = 1;
 	/**
+	 * Column number for the node's last event.
+	 */
+	private static final int EXECUTION_STATUS = 2;
+	/**
 	 * Column number for the node's number of tasks executed.
 	 */
-	private static final int NB_TASKS = 2;
+	private static final int NB_TASKS = 3;
 	/**
 	 * Column number for the node's latest task event.
 	 */
-	private static final int TASK_EVENT = 3;
+	private static final int TASK_EVENT = 4;
 
 	/**
 	 * Initialize this model witht he specified tree.
@@ -65,7 +69,7 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 	 */
 	public int getColumnCount()
 	{
-		return 4;
+		return 5;
 	}
 
 	/**
@@ -91,7 +95,10 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 						res = info.toString();
 						break;
 					case NODE_STATUS:
-						res = state.getNodeEventType();
+						res = state.getConnectionStatus();
+						break;
+					case EXECUTION_STATUS:
+						res = state.getExecutionStatus();
 						break;
 					case NB_TASKS:
 						res = state.getNbTasksExecuted();
@@ -125,6 +132,9 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 				break;
 			case NODE_STATUS:
 				res = localize("column.node.status");
+				break;
+			case EXECUTION_STATUS:
+				res = localize("column.node.execution.status");
 				break;
 			case NB_TASKS:
 				res = localize("column.nb.tasks");

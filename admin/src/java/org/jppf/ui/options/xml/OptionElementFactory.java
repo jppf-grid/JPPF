@@ -374,4 +374,15 @@ public class OptionElementFactory
 		OptionsHandler.addPage(elt);
 		return elt;
 	}
+
+	/**
+	 * Build an option with a UI ocmponent created from a Java class.
+	 * @param desc the descriptor to get the properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public Option buildJavaOption(OptionDescriptor desc) throws Exception
+	{
+		return new JavaOption(desc.name, desc.getProperty("class"));
+	}
 }

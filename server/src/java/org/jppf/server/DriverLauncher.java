@@ -211,15 +211,20 @@ public class DriverLauncher
 		StringBuilder sb = new StringBuilder();
 		try
 		{
-			InputStream is = null;
-			if ("std".equals(streamType)) is = process.getInputStream();
-			else is = process.getErrorStream();
+			InputStream is = "std".equals(streamType) ? process.getInputStream() : process.getErrorStream();
 			LineNumberReader reader = new LineNumberReader(new InputStreamReader(is));
-			String s = "";
-			while (s != null)
+			try
 			{
-				s = reader.readLine();
-				if (s != null) sb.append(s).append("\n");
+				String s = "";
+				while (s != null)
+				{
+					s = reader.readLine();
+					if (s != null) sb.append(s).append("\n");
+				}
+			}
+			finally
+			{
+				reader.close();
 			}
 		}
 		catch(Exception e)

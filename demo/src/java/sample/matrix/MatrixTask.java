@@ -17,14 +17,14 @@
  */
 package sample.matrix;
 
-import org.jppf.server.protocol.JPPFTask;
+import sample.BaseDemoTask;
 
 /**
  * This task performs the multiplication of a matrix row by another matrix, as part of
  * the multiplication of 2 whole matrices.
  * @author Laurent Cohen
  */
-public class MatrixTask extends JPPFTask
+public class MatrixTask extends BaseDemoTask
 {
 	/**
 	 * Data provider key mapping to the second matrix operand in the multiplication.
@@ -60,9 +60,9 @@ public class MatrixTask extends JPPFTask
 
 	/**
 	 * Perform the multiplication of a matrix row by another matrix.
-	 * @see java.lang.Runnable#run()
+	 * @see sample.BaseDemoTask#doWork()
 	 */
-	public void run()
+	public void doWork()
 	{
 		try
 		{

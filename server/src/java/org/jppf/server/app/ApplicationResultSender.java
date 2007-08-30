@@ -24,7 +24,7 @@ import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.JPPFBuffer;
 
 /**
- * 
+ * Instances of this class are used to send task bundle execution results back to a JPPF client.
  * @author Laurent Cohen
  */
 public class ApplicationResultSender extends AbstractResultSender

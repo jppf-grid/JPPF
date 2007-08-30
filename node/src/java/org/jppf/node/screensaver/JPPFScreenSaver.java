@@ -75,6 +75,10 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	 * The image object for the flying logos.
 	 */
 	private Image logoImg = null;
+	/**
+	 * 
+	 */
+	private boolean initCalled = false;
 
 	/**
 	 * Default constructor.
@@ -114,6 +118,10 @@ public class JPPFScreenSaver extends SimpleScreensaver
 		for (int i=0; i<nbLogos; i++) data[i] = new ImageData();
 		parent = (Container) getContext().getComponent();
 		parent.setBackground(Color.BLACK);
+    Dimension fullSize = Toolkit.getDefaultToolkit().getScreenSize();
+    Dimension currentSize = parent.getSize();
+    //System.out.println("Screen size: "+fullSize+", current size: "+currentSize);
+
 		if (node == null) node = new NodePanel(getContext().isFullScreen());
 		node.setDoubleBuffered(true);
 		parent.add(node);
@@ -167,6 +175,7 @@ public class JPPFScreenSaver extends SimpleScreensaver
 		props.setProperty("class.server.port", settings.getProperty("classServerPort"));
 		props.setProperty("node.server.port", settings.getProperty("nodeServerPort"));
 		props.setProperty("processing.threads", settings.getProperty("nbThreads"));
+		props.setProperty("jppf.management.port", "12010");
 
 		collisions = settings.getProperty("collisions") != null;
 		nbLogos = getIntSetting("nbLogos", 5);

@@ -17,8 +17,6 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.awt.Dimension;
-import java.awt.event.*;
 import java.util.*;
 
 import javax.swing.*;
@@ -52,7 +50,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	/**
 	 * The stats formatter that provides the data.
 	 */
-	private StatsHandler statsHandler = null;
+	private transient StatsHandler statsHandler = null;
 	/**
 	 * Holds a list of table models to update wwhen new stats are received.
 	 */
@@ -66,8 +64,6 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		this.statsHandler = StatsHandler.getInstance();
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		add(Box.createVerticalStrut(5));
-		add(makeRefreshPanel());
-		add(Box.createVerticalStrut(5));
 		add(makeTablePanel(EXECUTION_PROPS, LocalizationUtils.getLocalized(BASE, "ExecutionTable.label")));
 		add(Box.createVerticalStrut(5));
 		add(makeTablePanel(NODE_EXECUTION_PROPS, LocalizationUtils.getLocalized(BASE, "NodeExecutionTable.label")));
@@ -78,6 +74,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		add(Box.createVerticalStrut(5));
 		add(makeTablePanel(CONNECTION_PROPS, LocalizationUtils.getLocalized(BASE, "ConnectionsTable.label")));
 		add(Box.createVerticalGlue());
+		statsHandler.addStatsHandlerListener(this);
 	}
 	
 	/**
@@ -98,26 +95,6 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		}
 	}
 	
-	/**
-	 * Create a chartPanel with a &quot;refresh now&quote; button.
-	 * @return a <code>JComponent</code> instance.
-	 */
-	private JComponent makeRefreshPanel()
-	{
-		JButton btn = new JButton(LocalizationUtils.getLocalized(BASE, "RefreshBtn.label"));
-		String s = LocalizationUtils.getLocalized(BASE, "RefreshBtn.tooltip");
-		if (s != null) btn.setToolTipText(s);
-		btn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent event)
-			{
-				statsHandler.requestUpdate();
-			}
-		});
-		btn.setPreferredSize(new Dimension(100, 20));
-		return btn;
-	}
-
 	/**
 	 * Create a chartPanel displaying a group of values.
 	 * @param props the names of the values to display.

@@ -75,13 +75,17 @@ public class WaitInitialBundleState extends NodeServerState
 			boolean override = bundle.getParameter(BUNDLE_TUNING_TYPE_PARAM) != null;
 			if (override) context.setBundler(BundlerFactory.createBundler(bundle.getParametersMap(), true));
 			else context.setBundler(server.getBundler().copy());
-			InetAddress addr = channel.socket().getInetAddress();
-			if (addr != null)
+			Boolean isPeer = (Boolean) bundle.getParameter(IS_PEER);
+			if ((isPeer == null) || !isPeer)
 			{
-				String host = addr.getHostName();
-				int port = (Integer) bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM);
-				NodeManagementInfo info = new NodeManagementInfo(host, port);
-				JPPFDriver.getInstance().addNodeInformation(channel, info);
+				InetAddress addr = channel.socket().getInetAddress();
+				if (addr != null)
+				{
+					String host = addr.getHostName();
+					int port = (Integer) bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM);
+					NodeManagementInfo info = new NodeManagementInfo(host, port);
+					JPPFDriver.getInstance().addNodeInformation(channel, info);
+				}
 			}
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setMessage(null);

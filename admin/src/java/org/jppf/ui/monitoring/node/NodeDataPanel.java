@@ -16,10 +16,8 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring;
+package org.jppf.ui.monitoring.node;
 
-import java.awt.*;
-import java.awt.event.*;
 import java.util.Map;
 
 import javax.swing.*;
@@ -27,7 +25,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.treetable.*;
+import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jppf.server.NodeManagementInfo;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
@@ -37,7 +35,7 @@ import org.jppf.utils.LocalizationUtils;
  * Panel displaying the tree of all driver connections and attached nodes.
  * @author Laurent Cohen
  */
-public class NodeDataPanel extends JPanel implements NodeHandlerListener
+public class NodeDataPanel extends JScrollPane implements NodeHandlerListener
 {
 	/**
 	 * Base name for localization bundle lookups.
@@ -50,11 +48,11 @@ public class NodeDataPanel extends JPanel implements NodeHandlerListener
 	/**
 	 * Contains all the data about the drivers and nodes.
 	 */
-	private NodeHandler handler = null;
+	private transient NodeHandler handler = null;
 	/**
 	 * The tree table model associated witht he tree table.
 	 */
-	JPPFNodeTreeTableModel model = null;
+	private transient JPPFNodeTreeTableModel model = null;
 	/**
 	 * Initialize this panel with the specified information.
 	 */
@@ -104,79 +102,8 @@ public class NodeDataPanel extends JPanel implements NodeHandlerListener
 	private void createUI()
 	{
 	  treeTable = new JXTreeTable(model);
-	  for (int i=0; i<4; i++) treeTable.sizeColumnsToFit(i);
-	  JScrollPane scrollpane = new JScrollPane(treeTable);
-	  //setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-	  JPanel panel = createButtons();
-
-	  GridBagLayout g = new GridBagLayout();
-	  GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(10, 0, 0, 0);
-		c.anchor = GridBagConstraints.LINE_START;
-   	c.gridx = 0;
-   	c.weighty = 0.0;
-  	c.gridheight = GridBagConstraints.HORIZONTAL;
-		setLayout(g);
-		add(panel, c);
- 		c.anchor = GridBagConstraints.SOUTHEAST;
-		c.fill = GridBagConstraints.BOTH;
-  	c.gridwidth = GridBagConstraints.REMAINDER;
-  	c.gridheight = GridBagConstraints.REMAINDER;
-   	c.weightx = 1.0;
-   	c.weighty = 1.0;
-	  add(scrollpane, c);
-	}
-
-	/**
-	 * Create the buttons panel at the top of the page.
-	 * @return a <b>JPanel</b> instance.
-	 */
-	private JPanel createButtons()
-	{
-	  JPanel panel = new JPanel();
-	  JButton refreshBtn = new JButton(localize("button.refresh.label"));
-	  refreshBtn.setToolTipText(localize("button.refresh.tooltip"));
-	  refreshBtn.addActionListener(new ActionListener()
-	  {
-	  	public void actionPerformed(ActionEvent event)
-	  	{
-	  		NodeDataPanel.this.handler.refresh(true);
-	  	}
-	  });
-	  JButton expandBtn = new JButton(localize("button.expand.label"));
-	  expandBtn.setToolTipText(localize("button.expand.tooltip"));
-	  expandBtn.addActionListener(new ActionListener()
-	  {
-	  	public void actionPerformed(ActionEvent event)
-	  	{
-	  		treeTable.expandAll();
-	  	}
-	  });
-	  JButton collapseBtn = new JButton(localize("button.collapse.label"));
-	  collapseBtn.setToolTipText(localize("button.collapse.tooltip"));
-	  collapseBtn.addActionListener(new ActionListener()
-	  {
-	  	public void actionPerformed(ActionEvent event)
-	  	{
-	  		treeTable.collapseAll();
-	  	}
-	  });
-
-	  GridBagLayout g = new GridBagLayout();
-	  GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(0, 5, 0, 5);
-		c.anchor = GridBagConstraints.LINE_START;
-   	c.gridx = 0;
-   	c.weighty = 0.0;
-  	c.gridheight = GridBagConstraints.HORIZONTAL;
-		panel.setLayout(g);
-	  panel.add(refreshBtn, c);
-   	c.gridx = GridBagConstraints.RELATIVE;
-	  panel.add(expandBtn, c);
-	  panel.add(collapseBtn, c);
-	  return panel;
+	  for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
+	  setViewportView(treeTable);
 	}
 
 	/**
@@ -293,5 +220,23 @@ public class NodeDataPanel extends JPanel implements NodeHandlerListener
 	private String localize(String message)
 	{
 		return LocalizationUtils.getLocalized(BASE, message);
+	}
+
+	/**
+	 * Get the container for all the data about the drivers and nodes.
+	 * @return a NodeHandler instance.
+	 */
+	public synchronized NodeHandler getHandler()
+	{
+		return handler;
+	}
+
+	/**
+	 * Get the tree table component displaying the driver and nodes information. 
+	 * @return a <code>JXTreeTable</code> instance.
+	 */
+	public synchronized JXTreeTable getTreeTable()
+	{
+		return treeTable;
 	}
 }

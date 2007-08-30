@@ -34,7 +34,7 @@ import org.jppf.server.protocol.JPPFTaskBundle;
 public class SendingBundleState extends NodeServerState
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	protected static final Log LOG = LogFactory.getLog(SendingBundleState.class);
 	/**

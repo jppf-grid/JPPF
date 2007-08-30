@@ -26,7 +26,7 @@ import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
 
 
 /**
- * 
+ * Base interface for all UI components dynamically created from XML descriptors.
  * @author Laurent Cohen
  */
 public interface OptionElement extends Serializable

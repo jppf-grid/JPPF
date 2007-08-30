@@ -87,7 +87,6 @@ public final class BundlerFactory {
 	 * @see org.jppf.server.scheduler.bundle.Bundler
 	 */
 	public static Bundler createBundler(AnnealingTuneProfile profile, boolean override, String algorithm) {
-		if ("resilient".equalsIgnoreCase(algorithm)) return new ResilientBundler(profile);
 		return new AutoTunedBundler(profile);
 	}
 

@@ -50,7 +50,6 @@ public class SchemaValidator
 		try
 		{
 			if ((args == null) || (args.length != 2)) usageAndExit();
-
 			List<String> docPaths = FileUtils.getFilePathList(args[1]);
 			for (String path: docPaths)
 			{

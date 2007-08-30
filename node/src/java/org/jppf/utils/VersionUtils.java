@@ -61,6 +61,7 @@ public final class VersionUtils
 			}
 			catch(Exception ignored)
 			{
+				buildNumber = 0;
 			}
 		}
 		return buildNumber;

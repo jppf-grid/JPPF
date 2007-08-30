@@ -21,7 +21,7 @@ package org.jppf.comm.socket;
 import java.util.Random;
 
 /**
- * 
+ * Common abstract superclass for objects that establish a connection with a remote socket.
  * @author Laurent Cohen
  */
 public abstract class AbstractSocketInitializer implements SocketInitializer

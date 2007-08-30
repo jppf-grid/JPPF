@@ -18,8 +18,7 @@
 package org.jppf.node;
 
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.node.event.NodeListener;
-import org.jppf.node.event.NodeEvent.EventType;
+import org.jppf.node.event.*;
 
 /**
  * Interface for a node that provides information about its activity.
@@ -51,7 +50,7 @@ public interface MonitoredNode extends Runnable
 	 * Notify all listeners that an event has occurred.
 	 * @param eventType the type of the event as an enumerated value.
 	 */
-	void fireNodeEvent(EventType eventType);
+	void fireNodeEvent(NodeEventType eventType);
 	/**
 	 * Create an event for the execution of a specified number of tasks.
 	 * @param nbTasks the number of tasks as an int.

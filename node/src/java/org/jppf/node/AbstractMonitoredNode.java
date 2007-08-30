@@ -22,7 +22,6 @@ import java.util.*;
 
 import org.jppf.comm.socket.*;
 import org.jppf.node.event.*;
-import org.jppf.node.event.NodeEvent.EventType;
 import org.jppf.utils.SerializationHelper;
 
 /**
@@ -91,9 +90,9 @@ public abstract class AbstractMonitoredNode implements MonitoredNode
 	/**
 	 * Notify all listeners that an event has occurred.
 	 * @param eventType the type of the event as an enumerated value.
-	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(org.jppf.node.event.NodeEvent.EventType)
+	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(org.jppf.node.event.NodeEvent.NodeEventType)
 	 */
-	public void fireNodeEvent(EventType eventType)
+	public void fireNodeEvent(NodeEventType eventType)
 	{
 		NodeEvent event = new NodeEvent(eventType);
 		for (NodeListener listener : listeners) listener.eventOccurred(event);

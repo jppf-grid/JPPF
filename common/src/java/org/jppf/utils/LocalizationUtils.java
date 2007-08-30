@@ -24,13 +24,13 @@ import java.util.ResourceBundle;
 import org.apache.commons.logging.*;
 
 /**
- * 
+ * Utility methods to localize messages in the JPPF components. 
  * @author Laurent Cohen
  */
 public final class LocalizationUtils
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(LocalizationUtils.class);
 
@@ -61,16 +61,26 @@ public final class LocalizationUtils
 	public static String getLocalized(String baseName, String key, String def)
 	{
 		if (baseName == null) return def;
+		ResourceBundle bundle = null;
+		try
+		{
+			bundle = ResourceBundle.getBundle(baseName);
+		}
+		catch (Exception e)
+		{
+			log.warn("Could not find resource bundle \""+baseName+"\"");
+			if (log.isDebugEnabled()) log.debug(e.getMessage(), e);
+			return def;
+		}
 		String result = null;
 		try
 		{
-			ResourceBundle bundle = ResourceBundle.getBundle(baseName);
 			result = bundle.getString(key);
 		}
 		catch (Exception e)
 		{
-			log.error(e.getMessage());
-			if (log.isDebugEnabled()) log.debug(e);
+			log.warn("Could not find key \""+key+"\" in resource bundle \""+baseName+"\"");
+			if (log.isDebugEnabled()) log.debug(e.getMessage(), e);
 		}
 		return result == null ? def : result;
 	}

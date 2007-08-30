@@ -18,6 +18,9 @@
 
 package org.jppf.management;
 
+import java.util.*;
+
+import org.jppf.server.*;
 import org.jppf.server.protocol.BundleParameter;
 
 /**
@@ -26,4 +29,14 @@ import org.jppf.server.protocol.BundleParameter;
  */
 public interface JPPFDriverAdminMBean extends JPPFAdminMBean<BundleParameter, Object>
 {
+	/**
+	 * Get the latest statistics snapshot from the JPPF driver.
+	 * @return a <code>JPPFStats</code> instance.
+	 */
+	JPPFStats statistics();
+	/**
+	 * Request the JMX connection information for all the nodes attached to the server.
+	 * @return a collection of <code>NodeManagementInfo</code> instances.
+	 */
+	Collection<NodeManagementInfo> nodesInformation();
 }

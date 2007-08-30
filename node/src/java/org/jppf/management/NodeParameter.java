@@ -25,6 +25,14 @@ package org.jppf.management;
 public enum NodeParameter
 {
 	/**
+	 * Parameter for the type of request sent to the JMX server.
+	 */
+	COMMAND_PARAM,
+	/**
+	 * Parameter for reading the state of the node.
+	 */
+	REFRESH_STATE,
+	/**
 	 * Parameter for the node status (ie connected, executing, etc).
 	 */
 	NODE_STATUS_PARAM,

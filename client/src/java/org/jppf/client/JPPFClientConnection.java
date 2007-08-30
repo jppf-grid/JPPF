@@ -30,7 +30,6 @@ import org.jppf.task.storage.DataProvider;
  */
 public interface JPPFClientConnection extends ClientConnectionStatusHandler
 {
-
 	/**
 	 * Initialize this client connection.
 	 */
@@ -63,5 +62,4 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
 	 * @return the name as a string.
 	 */
 	String getName();
-
 }

@@ -96,15 +96,15 @@ public class TestMultipleDrivers
 	public void test1() throws Exception
 	{
 		Properties log4jConfig = ProcessConfig.buildLog4jConfig("driver1.log", false, LOGGING_LEVEL);
-		ProcessWrapper driver1 = startDriverProcess(DriverPropertiesBuilder.DRIVER_1, log4jConfig);
+		startDriverProcess(DriverPropertiesBuilder.DRIVER_1, log4jConfig);
 		log4jConfig = ProcessConfig.buildLog4jConfig("driver2.log", false, LOGGING_LEVEL);
-		ProcessWrapper driver2 = startDriverProcess(DriverPropertiesBuilder.DRIVER_2, log4jConfig);
+		startDriverProcess(DriverPropertiesBuilder.DRIVER_2, log4jConfig);
 		log4jConfig = ProcessConfig.buildLog4jConfig("node1.log", false, LOGGING_LEVEL);
 		List<NodePermission> permissions = NodePropertiesBuilder.buildBasePermissions();
-		ProcessWrapper node1 = startNodeProcess(NodePropertiesBuilder.NODE_1, permissions, log4jConfig);
+		startNodeProcess(NodePropertiesBuilder.NODE_1, permissions, log4jConfig);
 		log4jConfig = ProcessConfig.buildLog4jConfig("node2.log", false, LOGGING_LEVEL);
-		ProcessWrapper node2 = startNodeProcess(NodePropertiesBuilder.NODE_3, permissions, log4jConfig);
-		ProcessWrapper client = startMatrixSampleProcess(10, 10, 300, 10);
+		startNodeProcess(NodePropertiesBuilder.NODE_3, permissions, log4jConfig);
+		startMatrixSampleProcess(10, 10, 300, 10);
 	}
 
 	/**
@@ -114,14 +114,14 @@ public class TestMultipleDrivers
 	public void test2() throws Exception
 	{
 		Properties log4jConfig = ProcessConfig.buildLog4jConfig("driver1.log", false, LOGGING_LEVEL);
-		ProcessWrapper driver1 = startDriverProcess(DriverPropertiesBuilder.DRIVER_1, log4jConfig);
+		startDriverProcess(DriverPropertiesBuilder.DRIVER_1, log4jConfig);
 		log4jConfig = ProcessConfig.buildLog4jConfig("driver2.log", false, LOGGING_LEVEL);
-		ProcessWrapper driver2 = startDriverProcess(DriverPropertiesBuilder.DRIVER_2, log4jConfig);
+		startDriverProcess(DriverPropertiesBuilder.DRIVER_2, log4jConfig);
 		log4jConfig = ProcessConfig.buildLog4jConfig("node1.log", false, LOGGING_LEVEL);
 		List<NodePermission> permissions = NodePropertiesBuilder.buildBasePermissions();
-		ProcessWrapper node1 = startNodeProcess(NodePropertiesBuilder.NODE_1, permissions, log4jConfig);
+		startNodeProcess(NodePropertiesBuilder.NODE_1, permissions, log4jConfig);
 		log4jConfig = ProcessConfig.buildLog4jConfig("node2.log", false, LOGGING_LEVEL);
-		ProcessWrapper node2 = startNodeProcess(NodePropertiesBuilder.NODE_3, permissions, log4jConfig);
-		ProcessWrapper client = startMatrixSampleProcess(10, 10, 300, 10);
+		startNodeProcess(NodePropertiesBuilder.NODE_3, permissions, log4jConfig);
+		startMatrixSampleProcess(10, 10, 300, 10);
 	}
 }

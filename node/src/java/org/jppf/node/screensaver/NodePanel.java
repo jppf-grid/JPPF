@@ -67,6 +67,7 @@ public class NodePanel extends JPanel
 	public NodePanel(boolean activate)
 	{
 		this.activate = activate;
+		//this.activate = true;
 		init();
 	}
 
@@ -87,6 +88,7 @@ public class NodePanel extends JPanel
 			TypedProperties props = JPPFConfiguration.getProperties();
 			props.remove("jppf.policy.file"); 
 			createUI();
+			if (activate) nodeState.startNode();
 		}
 		catch(Exception e)
 		{
@@ -110,7 +112,6 @@ public class NodePanel extends JPanel
 		addLayoutComp(this, g, c, Box.createVerticalStrut(10));
 		addLayoutComp(this, g, c, createNodePanel());
 		addLayoutComp(this, g, c, Box.createVerticalStrut(5));
-		if (activate) nodeState.startNode();
 	}
 
 	/**

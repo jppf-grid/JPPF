@@ -24,7 +24,7 @@ import org.jppf.ui.options.*;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
 
 /**
- * 
+ * This class handles the persistence of the dynamic UI com
  * @author Laurent Cohen
  */
 public final class OptionsHandler
@@ -170,7 +170,7 @@ public final class OptionsHandler
 
 
 	/**
-	 * L:oad the value of all persistent options in the preferences store.
+	 * Load the value of all persistent options in the preferences store.
 	 */
 	public static void loadPreferences()
 	{

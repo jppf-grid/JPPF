@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Java Parallel Processing Framework.
+	Copyright (C) 2005-2007 JPPF Team.
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeDataPage" type="page">
+	<!-- test comment for save -->
+	<property name="label" value="Node Data"/>
+	<property name="scrollable" value="false"/>
+	<property name="orientation" value="vertical"/>
+	<property name="bordered" value="false"/>
+	<property name="main" value="true"/>
+	<property name="tooltip" value=""/>
+	<script language="javascript"><![CDATA[
+		importPackage(java.lang);
+		importPackage(java.util);
+		importPackage(Packages.org.jppf.server.protocol);
+		importPackage(Packages.org.jppf.server.protocol);
+		importPackage(Packages.org.jppf.ui.monitoring.data);
+		importPackage(Packages.org.jppf.ui.monitoring.node);
+		importPackage(Packages.org.jppf.ui.options);
+		importPackage(Packages.org.jppf.ui.options.factory);
+		importPackage(Packages.org.jppf.ui.options.event);
+	]]></script>
+
+	<!-- ===================================================================== -->
+	<!--                        Buttons area                                   -->
+	<!-- ===================================================================== -->
+
+	<child name="Actions" type="page">
+		<property name="label" value="Actions"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+	
+		<child name="TreeStructureActions" type="page">
+			<property name="label" value="Tree Structure Actions"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="false"/>
+			<property name="main" value="false"/>
+			<property name="insets" value="5,5,5,5"/>
+	
+			<child name="Auto" type="Boolean">
+				<property name="label" value="Toggle automatic structure refresh"/>
+				<property name="tooltip" value="Toggles between automatic and manual refresh of the tree structure"/>
+				<property name="value" value="true"/>
+				<property name="persistent" value="true"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						b = option.getValue().booleanValue();
+						var handler = option.findFirstWithName("/Treetable").getUIComponent().getHandler();
+						if (b) handler.startRefreshDriverTimer();
+						else handler.stopRefreshDriverTimer();
+					]]></script>
+				</listener>
+			</child>
+	
+			<child name="RefreshButtonPanel" type="page">
+				<property name="label" value="RefreshButtonPanel"/>
+				<property name="scrollable" value="false"/>
+				<property name="orientation" value="horizontal"/>
+				<property name="bordered" value="false"/>
+				<property name="main" value="false"/>
+		
+				<child name="button.refresh" type="Button">
+					<property name="label" value=""/>
+					<property name="tooltip" value=""/>
+					<listener type="script">
+						<script language="javascript"><![CDATA[
+							option.findFirstWithName("/Treetable").getUIComponent().getHandler().refresh(true);
+						]]></script>
+					</listener>
+				</child>
+		
+				<child name="filler" type="Filler">
+					<property name="width" value="10"/>
+					<property name="height" value="10"/>
+				</child>
+
+			</child>
+
+		</child>
+
+		<child name="TreeDisplayActions" type="page">
+			<property name="label" value="Tree Display Actions"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="false"/>
+			<property name="main" value="false"/>
+			<property name="insets" value="5,5,5,5"/>
+	
+			<child name="button.expand" type="Button">
+				<property name="label" value=""/>
+				<property name="tooltip" value=""/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						option.findFirstWithName("/Treetable").getUIComponent().getTreeTable().expandAll();
+					]]></script>
+				</listener>
+			</child>
+	
+			<child name="button.collapse" type="Button">
+				<property name="label" value=""/>
+				<property name="tooltip" value=""/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						option.findFirstWithName("/Treetable").getUIComponent().getTreeTable().collapseAll();
+					]]></script>
+				</listener>
+			</child>
+
+			<child name="filler" type="Filler">
+				<property name="width" value="10"/>
+				<property name="height" value="10"/>
+			</child>
+	
+		</child>
+
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--                      Tree table area                                  -->
+	<!-- ===================================================================== -->
+
+	<child name="Treetable" type="Java">
+		<property name="class" value="org.jppf.ui.monitoring.node.NodeDataPanel"/>
+		<property name="label" value=""/>
+		<property name="tooltip" value=""/>
+		<property name="value" value=""/>
+	</child>
+
+</opt:main>

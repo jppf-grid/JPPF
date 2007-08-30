@@ -45,10 +45,6 @@ public class NodeRefreshTask extends TimerTask
 	 */
 	private static final String MBEAN_NAME = "org.jppf:name=admin,type=node";
 	/**
-	 * Signature of the method invoked on the MBean.
-	 */
-	private static final String[] MBEAN_SIGNATURE = new String[] {JPPFManagementRequest.class.getName()};
-	/**
 	 * The node handler.
 	 */
 	private NodeHandler handler = null;
@@ -90,21 +86,17 @@ public class NodeRefreshTask extends TimerTask
 	 */
 	private void updateNodeState(String driverName, NodeInfoHolder infoHolder)
 	{
-		JPPFManagementResponse response = null;
+		JPPFNodeState state = null;
 		try
 		{
-			Map<NodeParameter, Object> params = new HashMap<NodeParameter, Object>();
-			JPPFManagementRequest<NodeParameter, Object> request = new JPPFManagementRequest<NodeParameter, Object>(params);
-			response = (JPPFManagementResponse)
-				infoHolder.getJmxClient().invoke(MBEAN_NAME, "performAdminRequest", new Object[] {request}, MBEAN_SIGNATURE);
+			state = (JPPFNodeState) infoHolder.getJmxClient().invoke(MBEAN_NAME, "state", null, null);
 		}
 		catch(Exception ignored)
 		{
 			if (debugEnabled) log.debug(ignored.getMessage(), ignored);
 		}
 
-		if ((response == null) || (response.getResult() == null)) return;
-		JPPFNodeState state = (JPPFNodeState) response.getResult();
+		if (state == null) return;
 		infoHolder.setState(state);
 		handler.fireNodeHandlerEvent(driverName, infoHolder, NodeHandlerEvent.UPDATE_NODE);
 	}

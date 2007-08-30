@@ -179,11 +179,18 @@ public class TestProcess
 		if (is.available() > 0)
 		{
 			LineNumberReader reader = new LineNumberReader(new InputStreamReader(is));
-			String s = "";
-			while ((s != null) && (is.available() > 0))
+			try
 			{
-				s = reader.readLine();
-				if (s != null) sb.append(s).append("\n");
+				String s = "";
+				while ((s != null) && (is.available() > 0))
+				{
+					s = reader.readLine();
+					if (s != null) sb.append(s).append("\n");
+				}
+			}
+			finally
+			{
+				reader.close();
 			}
 		}
 		return sb.toString();

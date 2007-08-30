@@ -33,7 +33,7 @@ import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;
 
 /**
- * 
+ * Instances of this class serve task execution requests to the JPPF nodes.
  * @author Laurent Cohen
  */
 public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioServer>

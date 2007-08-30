@@ -19,7 +19,7 @@
 package org.jppf.comm.socket;
 
 /**
- * 
+ * Common interface for objects that establish a connection with a remote socket.
  * @author Laurent Cohen
  */
 public interface SocketInitializer

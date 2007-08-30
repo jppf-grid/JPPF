@@ -25,4 +25,9 @@ package org.jppf.management;
  */
 public interface JPPFNodeAdminMBean extends JPPFAdminMBean<NodeParameter, Object>
 {
+	/**
+	 * Get the latest state information from the node.
+	 * @return a <code>JPPFNodeState</code> information.
+	 */
+	JPPFNodeState state();
 }

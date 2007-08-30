@@ -60,7 +60,7 @@ public class MyLongTask extends JPPFTask
 			Random rand = new Random(System.currentTimeMillis());
 			String s = "";
 			for (int i=0; i<100; i++) s += "A"+rand.nextInt(10);
-			s.replace("8", "$");
+			s = s.replace("8", "$");
 		}
 		setResult("task '"+name+"' executed in "+duration+" ms");
 	}

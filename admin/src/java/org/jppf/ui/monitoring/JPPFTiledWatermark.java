@@ -150,7 +150,7 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 				dx -= (topParent.getWidth() / 2 - this.origImage.getWidth() / 2);
 				dy -= (topParent.getHeight() / 2 - this.origImage.getHeight() / 2);
 		}
-		graphics.drawImage(watermarkImage, x, y, x + width, y + height, x + dx, y + dy, x + dx + width, y + dy + height, null);
+		graphics.drawImage(getWatermarkImage(), x, y, x + width, y + height, x + dx, y + dy, x + dx + width, y + dy + height, null);
 	}
 
 	/**
@@ -184,8 +184,8 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 		int origImageHeight = this.origImage.getHeight();
 		if (getKind() == ImageWatermarkKind.SCREEN_CENTER_SCALE)
 		{
-			JPPFTiledWatermark.watermarkImage = SubstanceCoreUtilities.getBlankImage(screenWidth, screenHeight);
-			Graphics2D graphics = (Graphics2D) watermarkImage.getGraphics().create();
+			JPPFTiledWatermark.setWatermarkImage(SubstanceCoreUtilities.getBlankImage(screenWidth, screenHeight));
+			Graphics2D graphics = (Graphics2D) getWatermarkImage().getGraphics().create();
 			Composite comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity);
 			graphics.setComposite(comp);
 			boolean isWidthFits = (origImageWidth <= screenWidth);
@@ -223,8 +223,8 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 		}
 		if ((getKind() == ImageWatermarkKind.SCREEN_TILE) || (getKind() == ImageWatermarkKind.APP_TILE))
 		{
-			watermarkImage = SubstanceCoreUtilities.getBlankImage(screenWidth, screenHeight);
-			Graphics2D graphics = (Graphics2D) watermarkImage.getGraphics().create();
+			setWatermarkImage(SubstanceCoreUtilities.getBlankImage(screenWidth, screenHeight));
+			Graphics2D graphics = (Graphics2D) getWatermarkImage().getGraphics().create();
 			Composite comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity);
 			graphics.setComposite(comp);
 			int replicateX = 1 + screenWidth / origImageWidth;
@@ -239,8 +239,8 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 		}
 		if ((getKind() == ImageWatermarkKind.APP_ANCHOR) || (getKind() == ImageWatermarkKind.APP_CENTER))
 		{
-			watermarkImage = SubstanceCoreUtilities.getBlankImage(origImageWidth, origImageHeight);
-			Graphics2D graphics = (Graphics2D) watermarkImage.getGraphics().create();
+			setWatermarkImage(SubstanceCoreUtilities.getBlankImage(origImageWidth, origImageHeight));
+			Graphics2D graphics = (Graphics2D) getWatermarkImage().getGraphics().create();
 			Composite comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity);
 			graphics.setComposite(comp);
 			graphics.drawImage(this.origImage, 0, 0, null);
@@ -283,7 +283,7 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 	 */
 	public void dispose()
 	{
-		JPPFTiledWatermark.watermarkImage = null;
+		JPPFTiledWatermark.setWatermarkImage(null);
 	}
 
 	/**
@@ -332,5 +332,23 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 		if ((opacity < 0.0f) || (opacity > 1.0f)) { throw new IllegalArgumentException(
 				"SubstanceImageWatermark.setOpacity() can get value in 0.0-1.0 range, was passed value " + opacity); }
 		opacity = aOpacity;
+	}
+
+	/**
+	 * Set the Watermark image (screen-sized).
+	 * @param watermarkImage an <code>Image</code> instance.
+	 */
+	public static void setWatermarkImage(Image watermarkImage)
+	{
+		JPPFTiledWatermark.watermarkImage = watermarkImage;
+	}
+
+	/**
+	 * Get the Watermark image (screen-sized).
+	 * @return an <code>Image</code> instance.
+	 */
+	public static Image getWatermarkImage()
+	{
+		return watermarkImage;
 	}
 }

@@ -50,9 +50,13 @@ public class NodeHandler
 	 */
 	private Map<String, NodeInfoManager> nodeManagerMap = new HashMap<String, NodeInfoManager>();
 	/**
-	 * Timer used to query the stats from the server. 
+	 * Timer used to query the nodes states. 
 	 */
-	private Timer timer = null;
+	private Timer nodeTimer = null;
+	/**
+	 * Timer used to query the driver management data. 
+	 */
+	private Timer driverTimer = null;
 	/**
 	 * Interval, in milliseconds, between refreshes from the server.
 	 */
@@ -61,10 +65,6 @@ public class NodeHandler
 	 * List of listeners registered with this stats formatter.
 	 */
 	private List<NodeHandlerListener> listeners = new ArrayList<NodeHandlerListener>();
-	/**
-	 * Mapping of nodes to the timer tasks that fetch updates from them.
-	 */
-	private Map<NodeManagementInfo, TimerTask> taskMap = new HashMap<NodeManagementInfo, TimerTask>();
 
 	/**
 	 * Initialize this node handler with the specified jppf client.
@@ -73,16 +73,18 @@ public class NodeHandler
 	public NodeHandler(JPPFClient jppfClient)
 	{
 		this.jppfClient = jppfClient;
-		initialize();
+		initialize(false);
 	}
 
 	/**
 	 * Initialize the association of driver connections with the corresponding node managers.
+	 * @param triggerEvents specifies whether the listeners should be notified.
 	 */
-	private void initialize()
+	private void initialize(boolean triggerEvents)
 	{
-		refresh(false);
-		startRefreshTimer();
+		refresh(triggerEvents);
+		startRefreshNodeTimer();
+		startRefreshDriverTimer();
 	}
 
 	/**
@@ -215,24 +217,55 @@ public class NodeHandler
 	/**
 	 * Stop the automatic refresh of the nodes state through a timer.
 	 */
-	public void stopRefreshTimer()
+	public void stopRefreshNodeTimer()
 	{
-		if (timer != null)
+		if (nodeTimer != null)
 		{
-			timer.cancel();
-			timer = null;
+			nodeTimer.cancel();
+			nodeTimer = null;
 		}
 	}
 
 	/**
 	 * Start the automatic refresh of the nodes state through a timer.
 	 */
-	public void startRefreshTimer()
+	public void startRefreshNodeTimer()
 	{
+		if (nodeTimer != null) return;
 		if (refreshInterval <= 0L) return;
-		timer = new Timer("JPPF Nodes Update Timer");
+		nodeTimer = new Timer("JPPF Nodes Update Timer");
 		TimerTask task = new NodeRefreshTask(this);
-		timer.schedule(task, 1000L, refreshInterval);
+		nodeTimer.schedule(task, 1000L, refreshInterval);
+	}
+
+	/**
+	 * Stop the automatic refresh of the nodes state through a timer.
+	 */
+	public void stopRefreshDriverTimer()
+	{
+		if (driverTimer != null)
+		{
+			driverTimer.cancel();
+			driverTimer = null;
+		}
+	}
+
+	/**
+	 * Start the automatic refresh of the nodes state through a timer.
+	 */
+	public void startRefreshDriverTimer()
+	{
+		if (driverTimer != null) return;
+		if (refreshInterval <= 0L) return;
+		driverTimer = new Timer("JPPF Drivers Update Timer");
+		TimerTask task = new TimerTask()
+		{
+			public void run()
+			{
+				refresh(true);
+			}
+		};
+		driverTimer.schedule(task, 1000L, refreshInterval);
 	}
 
 	/**

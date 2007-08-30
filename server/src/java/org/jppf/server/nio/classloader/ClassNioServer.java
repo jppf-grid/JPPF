@@ -29,7 +29,7 @@ import org.jppf.classloader.*;
 import org.jppf.server.nio.*;
 
 /**
- * 
+ * Instances of this class serve class loading requests from the JPPF nodes.
  * @author Laurent Cohen
  */
 public class ClassNioServer extends NioServer<ClassState, ClassTransition, ClassNioServer>

@@ -26,43 +26,6 @@ import java.util.EventObject;
 public class NodeEvent extends EventObject
 {
 	/**
-	 * Enumeration of all possible event types.
-	 */
-	public enum EventType
-	{
-		/**
-		 * Event type to specify a node is about to attempt connecting to the server. 
-		 */
-		START_CONNECT,
-		/**
-		 * Event type to specify a node has successfully connected to the server. 
-		 */
-		END_CONNECT,
-		/**
-		 * Event type to specify a node is disconnected from the server. 
-		 */
-		DISCONNECTED,
-		/**
-		 * Event type to specify a node is starting to execute one or more tasks,
-		 * and is switching from idle to executing state. 
-		 */
-		START_EXEC,
-		/**
-		 * Event type to specify a node finished executing one or more tasks,
-		 * and is switching from executing to idle state. 
-		 */
-		END_EXEC,
-		/**
-		 * Event type to specify a task was executed. 
-		 */
-		TASK_EXECUTED,
-		/**
-		 * Event type to specify the state of the node is not known.
-		 */
-		UNKNOWN
-	}
-
-	/**
 	 * Holds the number of executed tasks.
 	 */
 	private int nbTasks = 0;
@@ -71,7 +34,7 @@ public class NodeEvent extends EventObject
 	 * Initialize this event with a specified event source.
 	 * @param source the source of the event.
 	 */
-	public NodeEvent(EventType source)
+	public NodeEvent(NodeEventType source)
 	{
 		super(source);
 	}
@@ -82,7 +45,7 @@ public class NodeEvent extends EventObject
 	 */
 	public NodeEvent(int nbTasks)
 	{
-		super(EventType.TASK_EXECUTED);
+		super(NodeEventType.TASK_EXECUTED);
 		this.nbTasks = nbTasks;
 	}
 	
@@ -90,9 +53,9 @@ public class NodeEvent extends EventObject
 	 * Get the type of this event.
 	 * @return the type of event as an enumerated value.
 	 */
-	public EventType getType()
+	public NodeEventType getType()
 	{
-		return (EventType) getSource();
+		return (NodeEventType) getSource();
 	}
 
 	/**

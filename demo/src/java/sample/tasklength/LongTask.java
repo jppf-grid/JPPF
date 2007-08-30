@@ -18,13 +18,14 @@
 package sample.tasklength;
 
 import java.util.Random;
-import org.jppf.server.protocol.JPPFTask;
+
+import sample.BaseDemoTask;
 
 /**
  * Instances of this class are defined as tasks with a predefined execution length, specified at their creation. 
  * @author Laurent Cohen
  */
-public class LongTask extends JPPFTask
+public class LongTask extends BaseDemoTask
 {
 	/**
 	 * Determines how long this task will run.
@@ -46,11 +47,11 @@ public class LongTask extends JPPFTask
 
 	/**
 	 * Perform the excution of this task.
-	 * @see java.lang.Runnable#run()
+	 * @see sample.BaseDemoTask#doWork()
 	 */
-	public void run()
+	public void doWork()
 	{
-		fireStatusChanged("Starting task with duration = "+ taskLength + " ms");
+		fireNotification("Starting task with duration = "+ taskLength + " ms");
 		taskStart = System.currentTimeMillis();
 		double elapsed = 0L;
 		while (elapsed < taskLength)
@@ -61,6 +62,6 @@ public class LongTask extends JPPFTask
 			//s.replace("8", "$");
 			elapsed = System.currentTimeMillis() - taskStart;
 		}
-		fireStatusChanged("Task execution ended after " + elapsed + " ms");
+		fireNotification("Task execution ended after " + elapsed + " ms");
 	}
 }
