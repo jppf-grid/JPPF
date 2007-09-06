@@ -90,7 +90,7 @@ public abstract class AbstractMonitoredNode implements MonitoredNode
 	/**
 	 * Notify all listeners that an event has occurred.
 	 * @param eventType the type of the event as an enumerated value.
-	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(org.jppf.node.event.NodeEvent.NodeEventType)
+	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(org.jppf.node.event.NodeEventType)
 	 */
 	public void fireNodeEvent(NodeEventType eventType)
 	{

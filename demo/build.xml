@@ -51,6 +51,7 @@
 		<pathelement location="${config.dir}"/>
 		<pathelement location="${basedir}/../node/classes"/>
 		<pathelement location="${jppf.lib}/log4j/log4j-1.2.9.jar"/>
+		<pathelement location="${jppf.lib}/ApacheCommons/commons-logging-1.1.jar"/>
   </path>
 
   <path id="gui.classpath">
@@ -176,6 +177,25 @@
 		</parallel>
 	</target>
 
+	<target name="run.demo5">
+		<parallel>
+			<antcall target="run.driver"/>
+			<sequential>
+				<sleep milliseconds="1000"/>
+				<antcall target="run.node1"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="2000"/>
+				<antcall target="run.ui"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="3000"/>
+				<antcall target="run.notification"/>
+				<fail status="1" message="Demo has ended normally."/>
+			</sequential>
+		</parallel>
+	</target>
+
 	<target name="run.long.task">
 		<echo message="starting the 'Long task' demo application"/>
 		<java fork="yes" classname="sample.tasklength.LongTaskRunner" classpathref="client.classpath">
@@ -189,6 +209,16 @@
 	<target name="run.matrix">
 		<echo message="starting the 'Matrix Multiplication' demo application"/>
 		<java fork="yes" classname="sample.matrix.MatrixRunner" classpathref="client.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-client.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+		</java>       
+	</target>
+
+	<target name="run.notification">
+		<echo message="starting the 'Matrix Multiplication' demo application"/>
+		<java fork="yes" classname="sample.notification.TaskNotificationRunner" classpathref="client.classpath">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx64m"/>
 			<jvmarg value="-Djppf.config=jppf-client.properties"/>

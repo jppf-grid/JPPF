@@ -33,6 +33,10 @@ public enum NodeParameter
 	 */
 	REFRESH_STATE,
 	/**
+	 * Parameter for reading the latest task notification.
+	 */
+	REFRESH_NOTIFICATION,
+	/**
 	 * Parameter for the node status (ie connected, executing, etc).
 	 */
 	NODE_STATUS_PARAM,
@@ -43,5 +47,5 @@ public enum NodeParameter
 	/**
 	 * Parameter for the latest task event.
 	 */
-	TASK_EVENT_PARAM
+	TASK_NOTIFICATION_PARAM
 }

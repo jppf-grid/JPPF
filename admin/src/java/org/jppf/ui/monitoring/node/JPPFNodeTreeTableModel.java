@@ -104,7 +104,7 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 						res = state.getNbTasksExecuted();
 						break;
 					case TASK_EVENT:
-						res = state.getTaskEvent();
+						res = state.getTaskNotification();
 						break;
 				}
 			}

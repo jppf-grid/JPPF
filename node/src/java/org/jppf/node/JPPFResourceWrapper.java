@@ -86,6 +86,10 @@ public class JPPFResourceWrapper implements Serializable
 	 * Determines whether the resource is to be loaded using <code>ClassLoader.getResource()</code>.
 	 */
 	private boolean asResource = false;
+	/**
+	 * The identifier for the driver's management (JMX) server.
+	 */
+	private String managementId = null;
 
 	/**
 	 * Add a uuid to the uuid path of this resource wrapper. 
@@ -222,5 +226,23 @@ public class JPPFResourceWrapper implements Serializable
 	public void setAsResource(boolean asResource)
 	{
 		this.asResource = asResource;
+	}
+
+	/**
+	 * Get the identifier for the driver's management (JMX) server.
+	 * @return the identifier as a string.
+	 */
+	public String getManagementId()
+	{
+		return managementId;
+	}
+
+	/**
+	 * Set the identifier for the driver's management (JMX) server.
+	 * @param managementId the identifier as a string.
+	 */
+	public void setManagementId(String managementId)
+	{
+		this.managementId = managementId;
 	}
 }

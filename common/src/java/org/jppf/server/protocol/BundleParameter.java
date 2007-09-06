@@ -121,7 +121,15 @@ public enum  BundleParameter
 	 */
 	NODE_EXCEPTION_PARAM,
 	/**
+	 * Parameter for the host the RMI registry for the node is running on.
+	 */
+	NODE_MANAGEMENT_HOST_PARAM,
+	/**
 	 * Parameter for the RMI port used by JMX in the node.
 	 */
-	NODE_MANAGEMENT_PORT_PARAM
+	NODE_MANAGEMENT_PORT_PARAM,
+	/**
+	 * Parameter for the RMI port used by JMX in the node.
+	 */
+	NODE_MANAGEMENT_ID_PARAM
 }

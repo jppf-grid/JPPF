@@ -23,7 +23,6 @@ import java.util.*;
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.server.NodeManagementInfo;
-import org.jppf.server.protocol.BundleParameter;
 import org.jppf.ui.monitoring.event.*;
 
 /**
@@ -115,13 +114,11 @@ public class NodeHandler
 		for (String name: list)
 		{
 			NodeInfoManager nodeMgr = nodeManagerMap.get(name);
-			Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
-			params.put(BundleParameter.COMMAND_PARAM, BundleParameter.REFRESH_NODE_INFO);
 			Collection<NodeManagementInfo> nodeList = null;
 			try
 			{
 				JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection(name);
-				nodeList = (Collection<NodeManagementInfo>) c.processManagementRequest(params);
+				nodeList = c.getNodeManagementInfo();
 				if (nodeList == null) continue;
 			}
 			catch(Exception e)

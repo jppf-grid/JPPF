@@ -18,6 +18,8 @@
 
 package org.jppf.management;
 
+import java.io.Serializable;
+
 
 /**
  * Exposed interface of the JPPF node management bean.
@@ -30,4 +32,9 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean<NodeParameter, Object
 	 * @return a <code>JPPFNodeState</code> information.
 	 */
 	JPPFNodeState state();
+	/**
+	 * Get the latest task notification from the node.
+	 * @return the notification as a <code>Serializable</code> object.
+	 */
+	Serializable notification();
 }

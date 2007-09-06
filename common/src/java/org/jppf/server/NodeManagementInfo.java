@@ -35,16 +35,22 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 	 * The port on which the node's JMX server is listening.
 	 */
 	private int port = 11198;
+	/**
+	 * Unique id for the node's mbean server. 
+	 */
+	private String id = null;
 
 	/**
 	 * Initialize this information with the specified parameters.
 	 * @param host the host on which the node is running.
 	 * @param port he port on which the node's JMX server is listening.
+	 * @param id unique id for the node's mbean server.
 	 */
-	public NodeManagementInfo(String host, int port)
+	public NodeManagementInfo(String host, int port, String id)
 	{
 		this.host = host;
 		this.port = port;
+		this.id = id;
 	}
 
 	/**
@@ -76,6 +82,7 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 		int result = 1;
 		result = prime * result + ((host == null) ? 0 : host.hashCode());
 		result = prime * result + port;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
 
@@ -96,6 +103,11 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 			if (other.host != null) return false;
 		}
 		else if (!host.equals(other.host)) return false;
+		if (id == null)
+		{
+			if (other.id != null) return false;
+		}
+		else if (!id.equals(other.id)) return false;
 		if (port != other.port) return false;
 		return true;
 	}
@@ -110,7 +122,8 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 	{
 		if (o == null) return 1;
 		if (this.equals(o)) return 0;
-		int n = host.compareTo(o.getHost());
+		// we want ascending alphabetical order
+		int n = -1 * host.compareTo(o.getHost());
 		if (n != 0) return n;
 		return port - o.getPort();
 	}
@@ -123,5 +136,14 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 	public String toString()
 	{
 		return host + ":" + port;
+	}
+
+	/**
+	 * Get the unique id for the node's mbean server. 
+	 * @return the id as a string.
+	 */
+	public synchronized String getId()
+	{
+		return id;
 	}
 }

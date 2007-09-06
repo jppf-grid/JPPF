@@ -31,7 +31,7 @@ import org.jppf.security.*;
 import org.jppf.server.*;
 import org.jppf.server.protocol.BundleParameter;
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.utils.LocalizationUtils;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class encapsulate the administration functionalities for a JPPF driver.
@@ -152,8 +152,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		JPPFDriver.getInstance().getNodeNioServer().setBundler(bundler);
 		boolean manual =
 			"manual".equalsIgnoreCase((String) request.getParameter(BUNDLE_TUNING_TYPE_PARAM));
-		return new JPPFManagementResponse(
-			LocalizationUtils.getLocalized(I18N_BASE, (manual ? "manual" : "automatic") + ".settings.changed"), null);
+		return new JPPFManagementResponse(localize((manual ? "manual" : "automatic") + ".settings.changed"), null);
 	}
 
 	/**
@@ -171,7 +170,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		boolean restart = !SHUTDOWN.equals(command);
 		long restartDelay = (Long) request.getParameter(RESTART_DELAY_PARAM);
 		JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay, restart, restartDelay);
-		return new JPPFManagementResponse(LocalizationUtils.getLocalized(I18N_BASE, "request.acknowledged"), null);
+		return new JPPFManagementResponse(localize("request.acknowledged"), null);
 	}
 
 	/**
@@ -189,7 +188,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		String localPwd = new String(CryptoUtils.decrypt(b));
 
 		if (!localPwd.equals(remotePwd))
-			throw new JPPFException(LocalizationUtils.getLocalized(I18N_BASE, "invalid.password"));
+			throw new JPPFException(localize("invalid.password"));
 	}
 
 	/**
@@ -203,5 +202,16 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		byte[] b = (byte[]) request.getParameter(KEY_PARAM);
 		b = CryptoUtils.decrypt(b);
 		return CryptoUtils.getSecretKeyFromEncoded(b);
+	}
+
+	/**
+	 * Get a localized message given its unique name and the current locale.
+	 * @param message the unique name of the localized message.
+	 * @return a message in the current locale, or the default locale 
+	 * if the localization for the current locale is not found. 
+	 */
+	private String localize(String message)
+	{
+		return LocalizationUtils.getLocalized(I18N_BASE, message);
 	}
 }

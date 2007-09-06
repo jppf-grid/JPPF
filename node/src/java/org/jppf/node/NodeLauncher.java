@@ -137,6 +137,9 @@ public class NodeLauncher
 			String s = props.getString("jppf.policy.file");
 			if (s != null)
 			{
+				//java.rmi.server.hostname
+				String rmiHostName = props.getString("jppf.management.host", "localhost");
+				System.setProperty("java.rmi.server.hostname", rmiHostName);
 				Policy.setPolicy(new JPPFPolicy(getJPPFClassLoader()));
 				System.setSecurityManager(new SecurityManager());
 				securityManagerSet = true;

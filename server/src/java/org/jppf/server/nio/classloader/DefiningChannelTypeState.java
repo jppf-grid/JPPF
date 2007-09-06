@@ -78,7 +78,9 @@ public class DefiningChannelTypeState extends ClassServerState
 				context.setUuid(uuid);
 				context.setPendingRequests(new Vector<SelectionKey>());
 				context.setMessage(null);
-				return TO_IDLE_PROVIDER;
+				resource.setManagementId(JPPFDriver.getInstance().getJmxServer().getId());
+				context.serializeResource();
+				return TO_SENDING_INITIAL_PROVIDER_RESPONSE;
 			}
 			else if (NODE_INITIATION.equals(resource.getState()))
 			{

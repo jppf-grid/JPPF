@@ -20,10 +20,13 @@ package org.jppf.server.node;
 
 import static org.jppf.management.NodeParameter.COMMAND_PARAM;
 
+import java.io.Serializable;
+
 import org.apache.commons.logging.*;
 import org.jppf.management.*;
 import org.jppf.node.event.*;
 import org.jppf.server.protocol.*;
+import org.jppf.utils.JPPFUuid;
 
 /**
  * Management bean for a JPPF node.
@@ -47,6 +50,10 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	 * The node whose state is monitored.
 	 */
 	private transient JPPFNode node = null;
+	/**
+	 * Unique id for this mbean.
+	 */
+	private String uuid = new JPPFUuid(JPPFUuid.ALPHA_NUM, 24).toString();
 
 	/**
 	 * Initialize this node management bean with the specified node.
@@ -95,8 +102,18 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 		s.setNbTasksExecuted(nodeState.getNbTasksExecuted());
 		s.setConnectionStatus(nodeState.getConnectionStatus());
 		s.setExecutionStatus(nodeState.getExecutionStatus());
-		s.setTaskEvent(nodeState.getTaskEvent());
+		s.setTaskEvent(nodeState.getTaskNotification());
 		return s;
+	}
+
+	/**
+	 * Get the latest state information from the node.
+	 * @return a <code>JPPFNodeState</code> information.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#state()
+	 */
+	public Serializable notification()
+	{
+		return nodeState.getTaskNotification();
 	}
 
 	/**
@@ -106,7 +123,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	 */
 	public synchronized void eventOccurred(JPPFTaskEvent event)
 	{
-		nodeState.setTaskEvent(event.getSource());
+		nodeState.setTaskEvent((Serializable) event.getSource());
 	}
 
 	/**

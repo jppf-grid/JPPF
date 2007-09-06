@@ -177,6 +177,8 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 			resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
 			resource.addUuid(appUuid);
 			socketClient.send(resource);
+			// receive the initial response from the server.
+			resource = (JPPFResourceWrapper) socketClient.receive();
 		}
 		finally
 		{

@@ -23,6 +23,7 @@ import java.rmi.registry.*;
 import javax.management.*;
 import javax.management.remote.*;
 
+import org.apache.commons.logging.*;
 import org.jppf.utils.*;
 
 /**
@@ -32,6 +33,14 @@ import org.jppf.utils.*;
  */
 public class JMXServerImpl
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(JMXServerImpl.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Reference to the embedded RMI registry.
 	 */
@@ -48,6 +57,10 @@ public class JMXServerImpl
 	 * Determines whether this JMX server is stopped.
 	 */
 	private boolean stopped = false;
+	/**
+	 * This server's unique id.
+	 */
+	private String id = new JPPFUuid(JPPFUuid.ALPHA_NUM, 24).toString();
 
 	/**
 	 * Start the MBean server and associated resources.
@@ -55,14 +68,33 @@ public class JMXServerImpl
 	 */
 	public void start() throws Exception
 	{
+		server = MBeanServerFactory.createMBeanServer();
+    if (getRegistry() == null) setRegistry(locateOrCreateRegistry());
 		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = props.getProperty("jppf.server.host", "localhost");
+		//String host = props.getProperty("jppf.server.host", "localhost");
+		String host = "localhost";
 		int port = props.getInt("jppf.management.port", 11198);
-    server = MBeanServerFactory.createMBeanServer();
-    if (getRegistry() == null) setRegistry(LocateRegistry.createRegistry(port));
-    JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+host+":"+port+"/server");
+    JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+host+":"+port+"/jppf");
     connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, null, server);
     connectorServer.start();
+
+    /*
+		server = MBeanServerFactory.createMBeanServer(); 
+    if (getRegistry() == null) setRegistry(locateOrCreateRegistry());
+		HashMap env = new HashMap(); 
+		SslRMIClientSocketFactory csf = new SslRMIClientSocketFactory(); 
+		SslRMIServerSocketFactory ssf =  new SslRMIServerSocketFactory(); 
+		env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,csf); 
+		env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE,ssf); 
+		env.put("jmx.remote.x.password.file","jmxconfig/password.properties"); 
+		env.put("jmx.remote.x.access.file", "jmxconfig/access.properties"); 
+		TypedProperties props = JPPFConfiguration.getProperties();
+		String host = "localhost";
+		int port = props.getInt("jppf.management.port", 11198);
+    JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+host+":"+port+"/jppf");
+		connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server); 
+		connectorServer.start(); 
+    */
 	}
 
 	/**
@@ -117,12 +149,42 @@ public class JMXServerImpl
 	}
 
 	/**
-	 * Set the embedded RMI registry.
-	 * @param registry a <code>Registry</code> instance.
+	 * Locate an RMI registry specified by the configuration properties,
+	 * or create an embedded one if it cannot be found.
+	 * @return a <code>Registry</code> instance.
+	 * @throws Exception if the registry could be neither located nor created. 
 	 */
-	private static synchronized void setRegistry(Registry registry)
+	private static synchronized Registry locateOrCreateRegistry() throws Exception
 	{
-		JMXServerImpl.registry = registry;
+		TypedProperties props = JPPFConfiguration.getProperties();
+		String host = props.getProperty("jppf.management.host", "localhost");
+		int port = props.getInt("jppf.management.port", 11198);
+		Registry reg = null;
+		/*
+		try
+		{
+			reg = LocateRegistry.getRegistry(host, port);
+			String uuid = new JPPFUuid(JPPFUuid.ALPHA_NUM, 24).toString();
+			reg.lookup(uuid);
+		}
+		catch(NotBoundException e)
+		{
+			// NotBoundException means the registry is there and we can use it. 
+			if (debugEnabled) log.debug("Found RMI registry at ["+host+":"+port+"]");
+			return reg;
+		}
+		catch(Exception e)
+		{
+			if (debugEnabled)
+			{
+				log.debug("specified RMI registry ["+host+":"+port+"] not found, creating an embedded one ...");
+				log.debug(e.getMessage(), e);
+			}
+		}
+		*/
+		reg = LocateRegistry.createRegistry(port);
+		//props.setProperty("jppf.management.host", "localhost");
+		return reg;
 	}
 
 	/**
@@ -132,5 +194,25 @@ public class JMXServerImpl
 	private static synchronized Registry getRegistry()
 	{
 		return registry;
+	}
+
+	/**
+	 * Set the embedded RMI registry.
+	 * @param registry a <code>Registry</code> instance.
+	 */
+	private static synchronized void setRegistry(Registry registry)
+	{
+		JMXServerImpl.registry = registry;
+	}
+
+
+	/**
+	 * Get a unique identitier for this management server. This id must be unique accross JPPF nodes and servers,
+	 * and is used to identify this server if multiple nodes or servers share the same RMI registry.
+	 * @return the id as a string.
+	 */
+	public String getId()
+	{
+		return id;
 	}
 }

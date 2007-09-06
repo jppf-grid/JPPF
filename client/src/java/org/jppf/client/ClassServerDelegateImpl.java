@@ -111,6 +111,8 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
 			resource.addUuid(appUuid);
 			socketClient.send(resource);
+			resource = (JPPFResourceWrapper) socketClient.receive();
+			((JPPFClientConnectionImpl) owner).initializeJmxConnection(resource.getManagementId());
 			while (!stop)
 			{
 				try

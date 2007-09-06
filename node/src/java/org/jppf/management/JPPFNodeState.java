@@ -32,7 +32,7 @@ public class JPPFNodeState implements Serializable
 	/**
 	 * The latest event received from a task.
 	 */
-	private Object taskEvent = "";
+	private Serializable taskEvent = "";
 	/**
 	 * Status of the connection between the node and the server.
 	 */
@@ -50,7 +50,7 @@ public class JPPFNodeState implements Serializable
 	 * Get the latest event received from a task.
 	 * @return the event as an object.
 	 */
-	public synchronized Object getTaskEvent()
+	public synchronized Serializable getTaskNotification()
 	{
 		return taskEvent;
 	}
@@ -59,7 +59,7 @@ public class JPPFNodeState implements Serializable
 	 * Set the latest event received from a task.
 	 * @param taskEvent the event as an object.
 	 */
-	public synchronized void setTaskEvent(Object taskEvent)
+	public synchronized void setTaskEvent(Serializable taskEvent)
 	{
 		this.taskEvent = taskEvent;
 	}

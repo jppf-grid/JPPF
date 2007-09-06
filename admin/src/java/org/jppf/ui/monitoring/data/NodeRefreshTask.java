@@ -41,10 +41,6 @@ public class NodeRefreshTask extends TimerTask
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Name of the JPPF node mbean.
-	 */
-	private static final String MBEAN_NAME = "org.jppf:name=admin,type=node";
-	/**
 	 * The node handler.
 	 */
 	private NodeHandler handler = null;
@@ -89,7 +85,7 @@ public class NodeRefreshTask extends TimerTask
 		JPPFNodeState state = null;
 		try
 		{
-			state = (JPPFNodeState) infoHolder.getJmxClient().invoke(MBEAN_NAME, "state", null, null);
+			state = (JPPFNodeState) infoHolder.getJmxClient().invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "state", null, null);
 		}
 		catch(Exception ignored)
 		{

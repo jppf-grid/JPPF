@@ -14,7 +14,7 @@
 			{
 				$_SESSION["defined"] = "true";
 				$_SESSION["first"] = 0;
-				$_SESSION["last"] = 20;
+				$_SESSION["last"] = 18;
 			}
 			$current = $_REQUEST["current"];
 			if (!$current)
@@ -23,8 +23,11 @@
 			}
 ?>
 
-			<table class="table_" cellspacing="0" cellpadding="0" width="80%">
-				<tr><td align="center">
+			<table align="center" cellspacing="0" cellpadding="0" width="70%">
+				$template{name="row-blank" span="2"}$
+				<tr>
+					<td width="12" class="bleft"/>
+					<td align="center" bgcolor="white">
 <?php
 					// Link to first page
 					if ($current > $_SESSION["first"])
@@ -73,14 +76,20 @@
 						echo '<img src="overview/last0.gif" border=0 alt="Last page"></a>';
 					}
 ?>
-				</td>
-				<td align="left">This presentation is available in <a href="documents/JPPF-Presentation.pdf">PDF Format</a></td>
+					</td>
+					<td align="left" bgcolor="white">This presentation is available in <a href="documents/JPPF-Presentation.pdf">PDF Format</a></td>
+					<td width="12" class="bright"/>
 				</tr>
-				<tr><td align="center" colspan="2">
+				<tr>
+					<td width="12" class="bleft"/>
+					<td align="center" colspan="2" bgcolor="white">
 <?php
 					echo '<img src="overview/img', $current, '.gif">';
 ?>
-				</td></tr>
+					</td>
+					<td width="12" class="bright"/>
+				</tr>
+				$template{name="row-bottom" span="2"}$
 			</table>
 		</div>
 	</body>

@@ -19,6 +19,7 @@
 package org.jppf.management;
 
 import java.io.IOException;
+import java.util.*;
 
 import javax.management.*;
 import javax.management.remote.*;
@@ -60,13 +61,21 @@ public class JMXConnectionWrapper
 	 */
 	private int port = 0;
 	/**
+	 * Contains the names of all MBeans registered with the remote MBean server.
+	 */
+	private Set<ObjectName> allNames = new HashSet();
+	/**
 	 * The connection thread that performs the connection to the management server.
 	 */
 	private JMXConnectionThread connectionThread = null;
 	/**
 	 * A string representing this connection, used for logging purposes.
 	 */
-	private String id = null;
+	private String idString = null;
+  /**
+   * Default credentials for authenticating with the MBean server.
+   */
+  private String[] credentials = { "username" , "password" }; 
 
 	/**
 	 * Initialize the connection to the remote MBean server.
@@ -77,10 +86,11 @@ public class JMXConnectionWrapper
 	{
 		this.host = host;
 		this.port = port;
-		id = "[" + (host == null ? "_" : host) + ":" + port + "] ";
+		
+		idString = "[" + (host == null ? "_" : host) + ":" + port + "] ";
 		try
 		{
-			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+host+":"+port+"/server");
+			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+host+":"+port+"/jppf");
 		}
 		catch(Exception e)
 		{
@@ -105,8 +115,14 @@ public class JMXConnectionWrapper
 	{
     synchronized(this)
     {
-      jmxc = JMXConnectorFactory.connect(url, null);
+      HashMap env = new HashMap(); 
+      env.put("jmx.remote.credentials", credentials); 
+      jmxc = JMXConnectorFactory.connect(url, env);
     	mbeanConnection = jmxc.getMBeanServerConnection();
+    	/*
+    	Set set = mbeanConnection.queryNames(null, null);
+    	for (Object o: set) allNames.add((ObjectName) o);
+    	*/
     }
 		log.info(getId() + "RMI connection successfully established");
 	}
@@ -137,11 +153,17 @@ public class JMXConnectionWrapper
 		try
 		{
 	    ObjectName mbeanName = new ObjectName(name);
-	    result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
-	    if (name.indexOf("node") >= 0)
+  		result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
+	    /*
+  		for (ObjectName objectName: allNames)
 	    {
-	    	getClass();
+	    	if (mbeanName.apply(objectName))
+	    	{
+	    		result = getMbeanConnection().invoke(objectName, methodName, params, signature);
+	    		break;
+	    	}
 	    }
+	    */
 		}
 		catch(IOException e)
 		{
@@ -327,9 +349,9 @@ public class JMXConnectionWrapper
 	 * Get a string describing this connection.
 	 * @return a string in the format host:port.
 	 */
-	private String getId()
+	public String getId()
 	{
-		return id;
+		return idString;
 	}
 
 	/**

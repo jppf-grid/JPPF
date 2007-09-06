@@ -84,8 +84,8 @@ public final class PermissionsFactory
 		if (permList != null) return;
 		permList = new ArrayList<Permission>(); 
 		createDynamicPermissions();
-		readStaticPermissions(classLoader);
 		createManagementPermissions();
+		readStaticPermissions(classLoader);
 	}
 
 	/**
@@ -107,9 +107,11 @@ public final class PermissionsFactory
 	private static void createManagementPermissions()
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = props.getString("jppf.server.host", "localhost");
+		String host = props.getString("jppf.management.host", "localhost");
 		int port = props.getInt("jppf.management.port", 11198);
-		permList.add(new SocketPermission(host + ":" + port, "accept,connect,listen"));
+		// TODO: find a way to be more restrictive on RMI permissions
+		permList.add(new SocketPermission(host + ":1024-", "accept,connect,listen,resolve"));
+		permList.add(new SocketPermission("localhost:" + port, "accept,connect,listen,resolve"));
 		//p.add(new MBeanServerPermission("createMBeanServer"));
 		permList.add(new MBeanServerPermission("*"));
 		try
@@ -120,6 +122,9 @@ public final class PermissionsFactory
 		{
 			e.printStackTrace();
 		}
+		// TODO: find a way to be more restrictive on RMI permissions
+		host = props.getString("jppf.server.host", "localhost");
+		permList.add(new SocketPermission("*:1024-", "accept,connect,listen,resolve"));
 	}
 
 	/**

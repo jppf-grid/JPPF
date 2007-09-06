@@ -4,20 +4,24 @@
 	<body>
 		<div align="center">
 		$template{name="jppf-header"}$
-		<table border="0" cellspacing="20" cellpadding="0" width="80%">
-			<tr>
-				<td width="50%" valign="top" rowspan="2">
+		<table border="0" cellspacing="0" cellpadding="0" width="70%">
+			$template{name="row-blank" span="3"}$
+   		<tr>
+				<td width="12" class="bleft"/>
+				<td valign="top" bgcolor="white" width="50%" style="max-width: 50%">
 					<table class="noborder_" cellspacing="0" cellpadding="5" width="100%">
 						<tr><td class="noborder_">
-							<h3>Project Description</h3>
-								JPPF is a grid toolkit for Java that makes it easy to run applications in parallel, and speed up their execution by orders of magnitude.
-								Write once, deploy once, execute everywhere!
+							$template{name="highlight-top" span="1" color="pblue"}$
+							<h3>About JPPF</h3>
+							<div style="text-align: justify">JPPF is a grid toolkit for Java that makes it easy to run your applications in parallel, and speed up their execution by orders of magnitude.
+							Write once, deploy once, execute everywhere!</div>
+							$template{name="highlight-bottom" span="1" color="pblue"}$
 						</td></tr>
 						<tr><td class="noborder_">
 							<h4>Features</h4>
-							<ul>
+							<ul type="square">
 								<li>an easy to use <b>API</b> to submit tasks for execution in parallel</li>
-								<li>a set of APIs and user interface tools to <b>administrate and monitor</b> the servers</li>
+								<li>a set of APIs and user interface tools to <b>administrate and monitor</b> the servers and nodes</li>
 								<li><b>scalability</b> up to an arbitrary number of processing nodes</li>
 								<li>the framework is <b>deployment-free</b>: no need to install your application code on a server, just connect to the server and any
 								new or updated code is automatically loaded.</li>
@@ -28,18 +32,24 @@
 								<li>runs on any platform supporting Java 2 Platform Standard Edition 5.0 (J2SE 1.5) or later</li>
 							</ul>
 						</td></tr>
-						<tr><td class="noborder_">
-							<h3>Participate, contribute and stay informed:</h3>
-							<strong style="color: #8080FF">Browse our <a href="./wiki" target=_top>documentation</a></strong><br>
-							<strong style="color: #8080FF">Give your comments and advice, find support, on our <a href="./forums" target=_top>discussion forums</a></strong><br>
-							<strong style="color: #8080FF">Browse and update our <a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>bugs database</a></strong><br>
-							<strong style="color: #8080FF">Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>feature requests database</a></strong>
+						<tr><td align="center" class="noborder_">
+							<a href="http://sourceforge.net/project/showfiles.php?group_id=135654">
+								<img src="images/downloadJPPF.jpg" border="0" alt="Download JPPF Now"/></a><br>&nbsp;
 						</td></tr>
+						<tr><td class="noborder_">
+							$template{name="highlight-top" span="1" color="pblue"}$
+								<h3>Participate and stay informed:</h3>
+								<strong style="color: #8080FF">Browse our <a href="./wiki" target=_top>documentation</a></strong><br>
+								<strong style="color: #8080FF">Give your comments and advice, find support, on our <a href="./forums" target=_top>discussion forums</a></strong><br>
+								<strong style="color: #8080FF">Browse and update our <a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>bugs database</a></strong><br>
+								<strong style="color: #8080FF">Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>feature requests database</a></strong>
+							$template{name="highlight-bottom" span="1" color="pblue"}$
 
+						</td></tr>
 					</table>
 				</td>
-
-				<td width="50%" valign="top">
+				<td width="10" bgcolor="white">
+				<td valign="top" bgcolor="white">
 					<table class="noborder_" cellspacing="0" cellpadding="5" width="100%">
 
 						<tr><td class="noborder_">
@@ -50,8 +60,15 @@
 							$query = 'SELECT * FROM news ORDER BY date DESC';
 							$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 							$line = mysql_fetch_array($result, MYSQL_ASSOC);
-							printf("<h3>Latest news: <span style='color: black'>%s %s</span></h3>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
-							printf("%s", $line["desc"]);
+						?>
+						$template{name="highlight-top" span="1" color="pblue"}$
+						<?php
+							printf("<span class='newsTitle'>Latest news: <span style='color: black'>%s %s</span></span><br>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
+							//printf("<h3>Latest news: <span style='color: black'>%s %s</span></h3>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
+						?>
+						$template{name="highlight-bottom" span="1" color="pblue"}$
+						<?php
+							printf("<br>%s", $line["desc"]);
 						?>
 						<p><u style="color: #8080FF"><strong style="color: #8080FF">Summary of changes:</strong></u>
 						<?php
@@ -59,6 +76,25 @@
 							mysql_free_result($result);
 							mysql_close($link);
 						?>
+						</td></tr>
+						<tr><td class="noborder_">
+							$template{name="highlight-top" span="1" color="pblue"}$
+							<table border="0" cellspacing="0" cellpadding="5">
+								<tr>
+									<td align="center" valign="center">
+										<strong style="color: #8080FF">JPPF feeds:</strong>
+									</td>
+									<td align="center" valign="center">
+										<a href="http://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1">
+											<img src="images/feed-16x16.gif" border="0"/>News</a>
+									</td>
+									<td align="center" valign="center">
+										<a href="http://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1">
+											<img src="images/feed-16x16.gif" border="0"/>Releases</a>
+									</td>
+								</tr>
+							</table>
+							$template{name="highlight-bottom" span="1" color="pblue"}$
 						</td></tr>
 
 						<tr><td class="noborder_">
@@ -76,12 +112,12 @@
 							<strong style="color: #8080FF"><a href="http://weblogs.java.net/blog/fabriziogiudici/archive/2006/11/parallel_comput_1.html" target=_top>Fabrizio Giudici's Blog</a></strong><br>
 							<strong style="color: #8080FF"><a href="http://wiki.cs.rit.edu/bin/view/Main/KarolPietrzakComputerGraphicsJPPF" target=_top> Karl Pietrzak's Parallelization of Ray Tracing</a></strong><br>
 							<strong style="color: #8080FF"><a href="http://www.oitos.it/opencms/opencms/oitos/modules/products/product_0033.html" target=_top>JPPF evaluation on OITOS</a> (in Italian)</strong><br>
-							
-							
 						</td></tr>
 					</table>
 				</td>
+				<td width="12" class="bright"/>
 			</tr>
+			$template{name="row-bottom" span="3"}$
 		</table>
 
 		</div>

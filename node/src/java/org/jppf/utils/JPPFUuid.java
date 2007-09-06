@@ -34,33 +34,59 @@ import java.util.Random;
 public class JPPFUuid implements Serializable
 {
 	/**
-	 * Set of characters used to compose a uuid.
+	 * Set of characters used to compose a uuid, including more than alphanumeric characters.
 	 */
-	private static final String[] ALPHABET =
+	public static final String[] ALPHABET_SUPERSET =
 	{
 		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
 	  "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H",
 	  "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "'", "!", "@", "#",
 	  "$", "%", "^", "&", "*", "(", ")", "_", "+", "|", "{", "}", "[", "]", "-", "=", "/", ",", ".", "?", ":", ";"
 	};
+	/**
+	 * Set of characters used to compose a uuid, including only alphanumeric characters.
+	 */
+	public static final String[] ALPHA_NUM =
+	{
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
+	  "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H",
+	  "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"	  
+	};
   /**
 	 * Random number generator, static to ensure generated uuid are unique.
 	 */
 	private static Random rand = new Random(System.currentTimeMillis());
 	/**
-	 * The IP address of the host the JVM is running on.
-	 */
-	private static String ipAddress = obtainIpAddress();
-	/**
 	 * String holding a generated unique identifier.
 	 */
 	private String uuid = null;
+	/**
+	 * The set of codes from which to choose randomly to build the uuid.
+	 */
+	private String[] codes = ALPHABET_SUPERSET;
+	/**
+	 * Number of codes to use to build the uuid.
+	 */
+	private int length = 16;
+	
 
 	/**
 	 * Instanciate this JPPFUuid with a generated unique identifier.
 	 */
 	public JPPFUuid()
 	{
+		this(ALPHABET_SUPERSET, 16);
+	}
+
+	/**
+	 * Instanciate this JPPFUuid with a generated unique identifier.
+	 * @param codes the set of codes from which to choose randomly to build the uuid.
+	 * @param length number of codes to use to build the uuid.
+	 */
+	public JPPFUuid(String[] codes, int length)
+	{
+		if ((codes != null) && (codes.length > 0)) this.codes = codes;
+		if (length > 0) this.length = length;
 		uuid = generateUuid();
 	}
 
@@ -68,53 +94,14 @@ public class JPPFUuid implements Serializable
 	 * Generate a unique uuid.
 	 * @return the uuid as a string.
 	 */
-	private static String generateUuid()
+	private String generateUuid()
 	{
-		int len = ALPHABET.length;
+		int len = codes.length;
 		StringBuilder sb = new StringBuilder();
-		for (int i=0; i<16; i++) sb.append(ALPHABET[rand.nextInt(len)]);
+		for (int i=0; i<length; i++) sb.append(codes[rand.nextInt(len)]);
 		return sb.toString();
 	}
 	
-	/**
-	 * Generate a unique uuid.
-	 * @return the uuid as a string.
-	 */
-	private static String generateUuid2()
-	{
-		int n = 2;
-		StringBuilder sb = new StringBuilder();
-		sb.append(ipAddress);
-		sb.append(StringUtils.padLeft("" + System.currentTimeMillis(), '0', 15));
-		synchronized(rand)
-		{
-			for (int i=0; i<n; i++)
-			{
-				sb.append(StringUtils.padLeft("" + rand.nextInt(Integer.MAX_VALUE), '0', 10));
-			}
-		}
-		return sb.toString();
-	}
-	
-	/**
-	 * Get the IP address of the current host.<br>
-	 * The address is formatted as <i>aaabbbcccddd</i>, where <i>aaa</i> is the first component of the address,
-	 * formatted on 3 characters and padded with zeroes on the left if required, <i>bbb</i> is the second component, etc...
-	 * @return the IP address as a string.
-	 */
-	private static String obtainIpAddress()
-	{
-		String ip = VersionUtils.getLocalIpAddress();
-		if (ip == null) return null;
-		String[] tokens = ip.split("\\.");
-		StringBuilder sb = new StringBuilder();
-		for (String token: tokens)
-		{
-			sb.append(StringUtils.padLeft(token, '0', 3));
-		}
-		return sb.toString();
-	}
-
 	/**
 	 * Get a string representaiton of the generated unique identifier.
 	 * @return a string containing the uuid.

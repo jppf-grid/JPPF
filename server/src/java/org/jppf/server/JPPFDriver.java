@@ -121,8 +121,9 @@ public class JPPFDriver
 
 		jmxServer = new JMXServerImpl();
 		jmxServer.start();
-		jmxServer.registerMbean("org.jppf:name=admin,type=driver",
-			new JPPFDriverAdmin(), JPPFDriverAdminMBean.class);
+		JPPFDriverAdmin admin = new JPPFDriverAdmin();
+		String mbeanName = JPPFAdminMBean.DRIVER_MBEAN_NAME;
+		jmxServer.registerMbean(mbeanName, admin, JPPFDriverAdminMBean.class);
 
 		initPeers();
 	}
@@ -189,6 +190,15 @@ public class JPPFDriver
 	public NodeNioServer getNodeNioServer()
 	{
 		return nodeNioServer;
+	}
+
+	/**
+	 * Get the jmx server used to manage and monitor this driver.
+	 * @return a <code>JMXServerImpl</code> instance.
+	 */
+	public synchronized JMXServerImpl getJmxServer()
+	{
+		return jmxServer;
 	}
 
 	/**

@@ -136,10 +136,13 @@ public class DriverLauncher
 		}
 
 		TypedProperties props = JPPFConfiguration.getProperties();
-		int debugPort = props.getInt("remote.debug.port", 8000);
-		boolean b = props.getBoolean("remote.debug.suspend", false);
-		command.add("-Xdebug");
-		command.add("-Xrunjdwp:transport=dt_socket,address=localhost:"+debugPort+",server=y,suspend="+(b?"y":"n"));		
+		if (props.getBoolean("remote.debug.enabled", false))
+		{
+			int debugPort = props.getInt("remote.debug.port", 8000);
+			boolean b = props.getBoolean("remote.debug.suspend", false);
+			command.add("-Xdebug");
+			command.add("-Xrunjdwp:transport=dt_socket,address=localhost:"+debugPort+",server=y,suspend="+(b?"y":"n"));
+		}
 
 		command.add("org.jppf.server.JPPFDriver");
 		command.add("" + driverPort);

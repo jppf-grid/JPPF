@@ -4,9 +4,8 @@
 	<body>
 		<div align="center">
 		$template{name="jppf-header"}$
-		<table cellspacing="0" cellpadding="5" width="80%">
-			$template{name="page-title" title="Related Links"}$
-		</table>
+		<table cellspacing="0" cellpadding="0" width="70%">
+			$template{name="page-title" title="Related Links" span="1"}$
 
 <?php
 		$link = mysql_connect('mysql4-j', 'j135654admin', 'Faz600er')
@@ -23,19 +22,25 @@
 		mysql_free_result($result);
 ?>
 
-		<table class="leftRightBottom_" cellspacing="0" cellpadding="5" width="80%">
 <?php
 		$count = 0;
 		foreach ($groups as $key => $value)
 		{
 ?>
+			$template{name="row-bottom" span="1"}$
+			$template{name="row-top" span="1"}$
 			<tr>
-				<td class="top_">
+				<td width="12" class="bleft"/>
+				<td bgcolor="white">
+					$template{name="highlight-top" span="1" color="pblue"}$
 <?php
-					printf("<h3><b><u>%s</u></b></h3>", $value);
+					printf("<span class='newsTitle'>%s</span>", $value);
 ?>
+					$template{name="highlight-bottom" span="1" color="pblue"}$
 				</td>
+				<td width="12" class="bright"/>
 			</tr>
+			$template{name="row-blank" span="1"}$
 <?php
 			$query = "SELECT * FROM links WHERE group_id = '$key' ORDER BY link_id ASC";
 			$result = mysql_query($query) or die('Query failed: ' . mysql_error());
@@ -43,7 +48,8 @@
 			{
 ?>
 			<tr>
-				<td>
+				<td width="12" class="bleft"/>
+				<td bgcolor="white">
 				<ul>
 <?php
 				$ref = $key . "." . $line["q_id"];
@@ -51,6 +57,7 @@
 ?>
 				</ul>
 				</td>
+				<td width="12" class="bright"/>
 			</tr>
 <?php
 			}
@@ -58,6 +65,7 @@
 		// Closing connection
 		mysql_close($link);
 ?>
+			$template{name="row-bottom" span="1"}$
 		</table>
 	</div>
 	</body>

@@ -102,8 +102,9 @@ public class NodeDataPanel extends JScrollPane implements NodeHandlerListener
 	private void createUI()
 	{
 	  treeTable = new JXTreeTable(model);
-	  for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
 	  setViewportView(treeTable);
+		treeTable.expandAll();
+	  for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
 	}
 
 	/**

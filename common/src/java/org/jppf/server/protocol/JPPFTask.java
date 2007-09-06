@@ -138,7 +138,7 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 * Add a connection status listener to this connection's list of listeners.
 	 * @param listener the listener to add to the list.
 	 */
-	public void addJPPFTaskListener(JPPFTaskListener listener)
+	public synchronized void addJPPFTaskListener(JPPFTaskListener listener)
 	{
 		getListeners().add(listener);
 	}
@@ -147,7 +147,7 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 * Remove a connection status listener from this connection's list of listeners.
 	 * @param listener the listener to remove from the list.
 	 */
-	public void removeJPPFTaskListener(JPPFTaskListener listener)
+	public synchronized void removeJPPFTaskListener(JPPFTaskListener listener)
 	{
 		getListeners().remove(listener);
 	}
@@ -156,7 +156,7 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 * Notify all listeners that an event has occurred within this task.
 	 * @param source an object describing the event, must be serializable.
 	 */
-	public void fireNotification(Serializable source)
+	public synchronized void fireNotification(Serializable source)
 	{
 		JPPFTaskEvent event = new JPPFTaskEvent(source);
 		// to avoid ConcurrentModificationException

@@ -50,10 +50,6 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Name of the admin MBean.
-	 */
-	private static final String MBEAN_NAME = "org.jppf:name=admin,type=node";
-	/**
 	 * Determines whether dumping byte arrays in the log is enabled.
 	 */
 	private boolean dumpEnabled = JPPFConfiguration.getProperties().getBoolean("byte.array.dump.enabled", false);
@@ -154,8 +150,11 @@ public class JPPFNode extends AbstractMonitoredNode
 				bundle.setBundleUuid(uuid);
 				Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
 				if (params != null) bundle.getParametersMap().putAll(params);
+				bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM,
+						JPPFConfiguration.getProperties().getString("jppf.management.host", "localhost"));
 				bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM,
-					JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198));
+						JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198));
+				bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeLauncher.getJmxServer().getId());
 			}
 			List<JPPFTask> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
@@ -204,8 +203,9 @@ public class JPPFNode extends AbstractMonitoredNode
 		if (nodeAdmin == null)
 		{
 			nodeAdmin = new JPPFNodeAdmin(JPPFNode.this);
+			String mbeanName = JPPFAdminMBean.NODE_MBEAN_NAME;
 			addNodeListener(nodeAdmin);
-			NodeLauncher.getJmxServer().registerMbean(MBEAN_NAME, nodeAdmin, JPPFNodeAdminMBean.class);
+			NodeLauncher.getJmxServer().registerMbean(mbeanName, nodeAdmin, JPPFNodeAdminMBean.class);
 		}
 		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
 		if (mustInit)
@@ -450,7 +450,8 @@ public class JPPFNode extends AbstractMonitoredNode
 		}
 		try
 		{
-			NodeLauncher.getJmxServer().unregisterMbean(MBEAN_NAME);
+			String mbeanName = JPPFAdminMBean.NODE_MBEAN_NAME;
+			NodeLauncher.getJmxServer().unregisterMbean(mbeanName);
 		}
 		catch(Exception e)
 		{

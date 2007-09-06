@@ -17,6 +17,8 @@
  */
 package org.jppf.ui.monitoring;
 
+import java.security.*;
+
 import javax.swing.*;
 
 import org.apache.commons.logging.*;
@@ -48,6 +50,7 @@ public class UILauncher
 	{
 		try
 		{
+			configureSecurity();
 			if ((args  == null) || (args.length < 2))
 				throw new Exception("Usage: UILauncher page_location location_source");
 			String s = System.getProperty("swing.defaultlaf");
@@ -77,5 +80,41 @@ public class UILauncher
 			log.error(e.getMessage(), e);
 			System.exit(1);
 		}
+	}
+
+	/**
+	 * 
+	 */
+	public static void configureSecurity()
+	{
+		Policy p = new Policy()
+		{
+			public PermissionCollection getPermissions(CodeSource codesource)
+			{
+				return makePermissions();
+			}
+			public PermissionCollection getPermissions(ProtectionDomain domain)
+			{
+				return makePermissions();
+			}
+			public boolean implies(ProtectionDomain domain, Permission permission)
+			{
+				return true;
+			}
+			public void refresh(){}
+		};
+		Policy.setPolicy(p);
+		System.setSecurityManager(new SecurityManager());
+	}
+
+	/**
+	 * 
+	 * @return a Permissions instance that contains AllPermission.
+	 */
+	private static Permissions makePermissions()
+	{
+		Permissions permissions = new Permissions();
+		permissions.add(new AllPermission());
+		return permissions;
 	}
 }

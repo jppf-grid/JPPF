@@ -33,7 +33,7 @@ import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
 import org.jppf.management.*;
 import org.jppf.security.CryptoUtils;
-import org.jppf.server.JPPFStats;
+import org.jppf.server.*;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.TypedProperties;
@@ -57,10 +57,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Name of the JPPF driver mbean.
-	 */
-	private static final String MBEAN_NAME = "org.jppf:name=admin,type=driver";
-	/**
 	 * Signature of the method invoked on the MBean.
 	 */
 	private static final String[] MBEAN_SIGNATURE = new String[] {JPPFManagementRequest.class.getName()};
@@ -77,6 +73,10 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * Provides access to the management functions of the driver.
 	 */
 	private JMXConnectionWrapper jmxConnection = null;
+	/**
+	 * Contains the configuration properties for this client connection.
+	 */
+	private TypedProperties props = null;
 
 	/**
 	 * Initialize this client with a specified application UUID.
@@ -86,15 +86,12 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 */
 	public JPPFClientConnectionImpl(String uuid, String name, TypedProperties props)
 	{
+		this.props = props;
 		String prefix = name + ".";
 		configure(uuid, name, props.getString(prefix + "jppf.server.host", "localhost"),
 			props.getInt(prefix + "app.server.port", 11112),
 			classServerPort = props.getInt(prefix + "class.server.port", 11111),
 			props.getInt(prefix + "priority", 0));
-		String mHost = props.getString(prefix + "jppf.management.host", "localhost");
-		int port = props.getInt(prefix + "jppf.management.port", 11198);
-		jmxConnection = new JMXConnectionWrapper(mHost, port);
-		jmxConnection.connect();
 	}
 
 	/**
@@ -107,13 +104,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 		{
 			initHelper();
 			delegate = new ClassServerDelegateImpl(this, appUuid, host, classServerPort);
-			delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
-			{
-				public void statusChanged(ClientConnectionStatusEvent event)
-				{
-					//setStatus(event.
-				}
-			});
 			delegate.init();
 			initCredentials();
 			if (!delegate.isClosed())
@@ -135,6 +125,19 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 			setStatus(FAILED);
 			throw e;
 		}
+	}
+
+	/**
+	 * Initialize the jmx connection using the specifed jmx server id.
+	 * @param id the unique id of the jmx server to connect to.
+	 */
+	public void initializeJmxConnection(String id)
+	{
+		String prefix = name + ".";
+		String mHost = props.getString(prefix + "jppf.management.host", "localhost");
+		int port = props.getInt(prefix + "jppf.management.port", 11198);
+		jmxConnection = new JMXConnectionWrapper(mHost, port);
+		jmxConnection.connect();
 	}
 
 	/**
@@ -274,7 +277,8 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 */
 	public Object processManagementRequest(Map<BundleParameter, Object> parameters) throws Exception
 	{
-		if (!READ_STATISTICS.equals(parameters.get(COMMAND_PARAM)) && !REFRESH_NODE_INFO.equals(parameters.get(COMMAND_PARAM)))
+		if (!READ_STATISTICS.equals(parameters.get(COMMAND_PARAM)) &&
+				!REFRESH_NODE_INFO.equals(parameters.get(COMMAND_PARAM)))
 		{
 			String password = (String) parameters.get(PASSWORD_PARAM);
 			SecretKey tmpKey = CryptoUtils.generateSecretKey();
@@ -289,9 +293,25 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 		JPPFManagementRequest<BundleParameter, Object> request =
 			new JPPFManagementRequest<BundleParameter, Object>(parameters);
 		JPPFManagementResponse response = (JPPFManagementResponse) getJmxConnection().invoke(
-			MBEAN_NAME, "performAdminRequest", new Object[] {request}, MBEAN_SIGNATURE);
+				JPPFAdminMBean.DRIVER_MBEAN_NAME, "performAdminRequest", new Object[] {request}, MBEAN_SIGNATURE);
 		if (response == null) return null;
 		if (response.getException() == null) return response.getResult();
 		throw response.getException();
+	}
+
+	/**
+	 * Get the information to connect to the JMX servers of the nodes attached to a driver.
+	 * This method works by querying the driver for the information, through a JMX request. 
+	 * @return a coolection of <code>NodeManagementInfo</code>, which encapsulate the nodes JMX
+	 * server connection information.
+	 * @throws Exception if the connection ot the drivers JMX failed.
+	 */
+	public Collection<NodeManagementInfo> getNodeManagementInfo() throws Exception
+	{
+		Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
+		params.put(BundleParameter.COMMAND_PARAM, BundleParameter.REFRESH_NODE_INFO);
+		Collection<NodeManagementInfo> nodeList =
+			(Collection<NodeManagementInfo>) processManagementRequest(params);
+		return nodeList;
 	}
 }

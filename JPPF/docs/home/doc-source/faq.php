@@ -4,9 +4,8 @@
 	<body>
 		<div align="center">
 		$template{name="jppf-header"}$
-		<table cellspacing="0" cellpadding="5" width="80%">
+		<table cellspacing="0" cellpadding="0" width="70%">
 			$template{name="page-title" title="Frequently Asked Questions"}$
-		</table>
 
 <?php
 		$link = mysql_connect('mysql4-j', 'j135654admin', 'Faz600er')
@@ -22,15 +21,15 @@
 		}
 		mysql_free_result($result);
 ?>
-		<table class="border_" cellspacing="0" cellpadding="5" width="80%">
 <?php
 		$count = 0;
 		foreach ($groups as $key => $value)
 		{
 ?>
-			<tr><td height="2px" colspan="0" style="background-color: #8080FF"/></tr>
+			$template{name="row-middle" span="1"}$
 			<tr>
-				<td>
+				<td width="12" class="bleft"/>
+				<td bgcolor="white">
 <?php
 			$query = "SELECT * FROM faq_questions WHERE group_id = '$key' ORDER BY q_id ASC";
 			$result = mysql_query($query) or die('Query failed: ' . mysql_error());
@@ -44,13 +43,14 @@
 			echo '</ul>';
 ?>
 				</td>
+				<td width="12" class="bright"/>
 			</tr>
 <?php
 			mysql_free_result($result);
 			$count++;
 		}
 ?>
-			<tr><td height="2px" colspan="0" style="background-color: #8080FF"/></tr>
+			$template{name="row-bottom" span="1"}$
 		</table>
 		<br>
 <?php
@@ -58,16 +58,18 @@
 		foreach ($groups as $key => $value)
 		{
 ?>
-		<table class="border_" cellspacing="0" cellpadding="5" width="80%">
+		<table cellspacing="0" cellpadding="0" width="70%">
 <?php
 ?>
-			<tr><td height="10" style="background-color: #8080FF"/></tr>
+			$template{name="row-top" span="1"}$
 			<tr>
-				<td>
+				<td width="12" class="bleft"/>
+				<td bgcolor="white">
 <?php
 					printf("<h3><b><u><a name=\"%s\">%s %s</a></u></b></h3>", $key, $key, $value);
 ?>
 				</td>
+				<td width="12" class="bright"/>
 			</tr>
 <?php
 			$query = "SELECT * FROM faq_questions WHERE group_id = '$key' ORDER BY q_id ASC";
@@ -76,32 +78,36 @@
 			while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
 			{
 ?>
+			$template{name="row-blank" span="1"}$
+			$template{name="row-middle" span="1"}$
+			$template{name="row-blank" span="1"}$
 			<tr>
-				<td style="border-top: 1px solid #8080FF">
+				<td width="12" class="bleft"/>
+				<td bgcolor="white">
 <?php
 				$ref = $key . "." . $line["q_id"];
 ?>
 				<div align="center">
-				<table width="97%" cellspacing="0" cellpadding="0" border="0"><tr><td>
+					<table width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td>
 <?php
-				printf("<a name=\"%s\" style=\"color: #8080FF\"><b>%s %s</b></a>", $ref, $ref, $line["desc"]);
+						printf("<a name=\"%s\" style=\"color: #8080FF\"><b>%s %s</b></a>", $ref, $ref, $line["desc"]);
 ?>
-				<div align="center">
-				<table width="95%" cellspacing="0" cellpadding="0" border="0"><tr><td>
+						<div align="center">
+						<table width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td>
 <?php
-				printf("<br>%s", $line["content"]);
+							printf("<br>%s", $line["content"]);
 ?>
-				</td></tr></table>
-				</td></tr></table>
-				</div>
+						</td></tr></table>
+					</td></tr></table>
 				</div>
 				</td>
+				<td width="12" class="bright"/>
 			</tr>
 <?php
 			}
 			//echo '</ul>';
 ?>
-			<tr><td height="10" style="background-color: #8080FF"/></tr>
+			$template{name="row-bottom" span="1"}$
 		</table>
 		<br>
 <?php

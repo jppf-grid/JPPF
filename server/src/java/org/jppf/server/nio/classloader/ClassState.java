@@ -28,6 +28,10 @@ public enum ClassState
 	 */
 	DEFINING_TYPE,
 	/**
+	 * State of sending the initial information to a client.
+	 */
+	SENDING_INITIAL_PROVIDER_RESPONSE,
+	/**
 	 * State of sending the initial information to a node classloader.
 	 */
 	SENDING_INITIAL_RESPONSE,
