@@ -64,7 +64,13 @@ public class ResourceProvider
 	{
 		try
 		{
-			InputStream is = getClass().getClassLoader().getResourceAsStream(resName);
+			if (resName.indexOf("DependencyTask") >= 0)
+			{
+				getClass();
+			}
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			if (cl == null) cl = getClass().getClassLoader();
+			InputStream is = cl.getResourceAsStream(resName);
 			if (is == null)
 			{
 				File file = new File(resName);
@@ -91,7 +97,21 @@ public class ResourceProvider
 	 */
 	public byte[] getResource(String resName)
 	{
-		URL url = getClass().getClassLoader().getResource(resName);
+		ClassLoader cl = getClass().getClassLoader();
+		/*
+		if (cl instanceof JPPFClassLoader)
+		{
+			try
+			{
+				InputStream is = ((JPPFClassLoader) cl).getSystemResourceAsStream(resName);
+				return null;
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		*/
+		URL url = cl.getResource(resName);
 		if (url != null)
 		{
 			try

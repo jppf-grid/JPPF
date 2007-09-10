@@ -89,11 +89,9 @@ public final class FileUtils
 	}
 
 	/**
-	 * Load a file from the specified path.
-	 * This method looks up the schema first in the file system, then in the classpath
-	 * if it is not found in the file system.
-	 * @param path the path to the file to load.
-	 * @return a <code>InputStream</code> instance, or null if the schema file could not be found.
+	 * Get an input stream given a file path.
+	 * @param path the path to the file to lookup.
+	 * @return a <code>InputStream</code> instance, or null if the file could not be found.
 	 * @throws IOException if an IO error occurs while looking up the file.
 	 */
 	public static InputStream getFileInputStream(String path) throws IOException
@@ -107,6 +105,17 @@ public final class FileUtils
 			is = (url == null) ? null : url.openStream();
 		}
 		return is;
+	}
+
+	/**
+	 * Get an output stream given a file path.
+	 * @param path the path to the file to lookup.
+	 * @return an <code>OutputStream</code> instance, or null if the file could not be created.
+	 * @throws IOException if an IO error occurs while looking up the file.
+	 */
+	public static OutputStream getFileOutputStream(String path) throws IOException
+	{
+		return new BufferedOutputStream(new FileOutputStream(path));
 	}
 
 	/**
