@@ -93,9 +93,6 @@ public class JPPFClassLoader extends ClassLoader
 	public JPPFClassLoader(ClassLoader parent, List<String> uuidPath)
 	{
 		this(parent);
-		//super(parent);
-		//dynamic = true;
-		//if (socketClient == null) init();
 		this.uuidPath = uuidPath;
 	}
 
@@ -207,46 +204,6 @@ public class JPPFClassLoader extends ClassLoader
 		if (debugEnabled) log.debug("definition for resource [" + name + "] : " + c);
 		return c;
 	}
-
-	/**
-	 * Load a class from the classpath.
-	 * @param name the name of the class to load.
-	 * @return a Class instance.
-	 * @throws ClassNotFoundException if the class could not be found.
-	 * @see java.lang.ClassLoader#loadClass(java.lang.String)
-	 */
-  /*
-	public synchronized Class<?> loadClass(String name) throws ClassNotFoundException
-  {
-		// First, check if the class has already been loaded
-		Class c = findLoadedClass(name);
-		ClassLoader parent = getParent();
-		if (c == null)
-		{
-			try
-			{
-				if (parent != null)
-				{
-					c = parent.loadClass(name);
-				}
-				else
-				{
-					c = findBootstrapClass0(name);
-				}
-			}
-			catch (ClassNotFoundException e)
-			{
-				// If still not found, then invoke findClass in order to find the class.
-				c = findClass(name);
-			}
-		}
-		if (resolve)
-		{
-			resolveClass(c);
-		}
-		return c;
-	}
-	*/
 
 	/**
 	 * Find a class in this class loader's classpath.
@@ -398,6 +355,7 @@ public class JPPFClassLoader extends ClassLoader
 					try
 					{
 						url = file.toURL();
+						if (debugEnabled) log.debug("resource [" + name + "] found with URL: "+url);
 					}
 					catch (Exception e)
 					{
