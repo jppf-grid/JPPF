@@ -70,7 +70,7 @@ public class WaitingProviderResponseState extends ClassServerState
 		catch(IOException e)
 		{
 			if (debugEnabled) log.debug("an exception occurred while reading response from provider: " + getRemoteHost(channel));
-			server.providerConnections.remove(context.getUuid());
+			server.removeProviderConnection(context.getUuid(), channel);
 			SelectionKey currentRequest = context.getCurrentRequest();
 			if ((currentRequest != null) || !context.getPendingRequests().isEmpty())
 			{

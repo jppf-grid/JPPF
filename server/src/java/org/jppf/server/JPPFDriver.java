@@ -106,8 +106,12 @@ public class JPPFDriver
 		taskQueue = new JPPFQueue();
 		TypedProperties props = JPPFConfiguration.getProperties();
 
-		int port = props.getInt("class.server.port", 11111);
-		classServer = new ClassNioServer(port);
+		String s = props.getString("class.server.port", "11111");
+		int[] ports = parsePorts(s);
+		int port = 0;
+		//int port = props.getInt("class.server.port", 11111);
+		//classServer = new ClassNioServer(port);
+		classServer = new ClassNioServer(ports);
 		classServer.start();
 
 		port = props.getInt("app.server.port", 11112);
@@ -126,6 +130,32 @@ public class JPPFDriver
 		jmxServer.registerMbean(mbeanName, admin, JPPFDriverAdminMBean.class);
 
 		initPeers();
+	}
+
+	/**
+	 * Parse an array of port numbers from a list of comma-separated port numbers.
+	 * @param s list of comma-separated port numbers
+	 * @return an array of int port numbers.
+	 */
+	private int[] parsePorts(String s)
+	{
+		String[] strPorts = s.split(",");
+		List<Integer> portList = new ArrayList<Integer>();
+		for (String sp: strPorts)
+		{
+			try
+			{
+				int n = Integer.valueOf(sp.trim());
+				portList.add(n);
+			}
+			catch(NumberFormatException e)
+			{
+				log.error("invalid port number format: " + sp);
+			}
+		}
+		int[] ports = new int[portList.size()];
+		for (int i=0; i<portList.size(); i++) ports[i] = portList.get(i);
+		return ports;
 	}
 
 	/**

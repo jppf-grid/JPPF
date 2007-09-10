@@ -22,6 +22,7 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.nio.channels.*;
+import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.node.JPPFResourceWrapper;
@@ -112,7 +113,7 @@ public class WaitingNodeRequestState extends ClassServerState
 				{
 					uuidPath.decPosition();
 					uuid = uuidPath.getCurrentElement();
-					SocketChannel provider = server.providerConnections.get(uuid);
+					SocketChannel provider = findProviderConnection(uuid);
 					if (provider != null)
 					{
 						if (debugEnabled) log.debug("request resource [" + name + "] from client: " +
@@ -137,6 +138,31 @@ public class WaitingNodeRequestState extends ClassServerState
 			return TO_SENDING_NODE_RESPONSE;
 		}
 		return TO_WAITING_NODE_REQUEST;
+	}
+
+	/**
+	 * Find a provider connection for the specified provider uuid.
+	 * @param uuid the uuid for which to find a conenction.
+	 * @return a <code>SocketChannel</code> instance.
+	 * @throws Exception if an error occurs while searching for a connection.
+	 */
+	private SocketChannel findProviderConnection(String uuid) throws Exception
+	{
+		SocketChannel result = null;
+		List<SocketChannel> connections = server.providerConnections.get(uuid);
+		int minRequests = Integer.MAX_VALUE;
+		Selector selector = server.getSelector();
+		for (SocketChannel channel: connections)
+		{
+			ClassContext ctx = (ClassContext) channel.keyFor(selector).attachment();
+			int size = ctx.getNbPendingRequests();
+			if (size < minRequests)
+			{
+				minRequests = size;
+				result = channel;
+			}
+		}
+		return result;
 	}
 }
 

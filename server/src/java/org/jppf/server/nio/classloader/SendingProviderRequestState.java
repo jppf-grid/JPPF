@@ -64,7 +64,7 @@ public class SendingProviderRequestState extends ClassServerState
 		ClassContext context = (ClassContext) key.attachment();
 		if (key.isReadable())
 		{
-			server.providerConnections.remove(context.getUuid());
+			server.removeProviderConnection(context.getUuid(), channel);
 			SelectionKey currentRequest = context.getCurrentRequest();
 			if (debugEnabled) log.debug("provider: " + getRemoteHost(channel) + " sending null response for disconnected provider");
 			if ((currentRequest != null) || !context.getPendingRequests().isEmpty())

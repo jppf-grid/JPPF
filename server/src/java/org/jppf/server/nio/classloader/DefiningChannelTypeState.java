@@ -74,7 +74,7 @@ public class DefiningChannelTypeState extends ClassServerState
 				if (debugEnabled) log.debug("initiating provider: " + getRemoteHost(channel));
 				String uuid = resource.getUuidPath().getFirst();
 				// it is a provider
-				server.providerConnections.put(uuid, channel);
+				server.addProviderConnection(uuid, channel);
 				context.setUuid(uuid);
 				context.setPendingRequests(new Vector<SelectionKey>());
 				context.setMessage(null);

@@ -43,7 +43,8 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition, Class
 	 * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine in
 	 * which application classpath to look for the requested resources.
 	 */
-	protected Map<String, SocketChannel> providerConnections = new Hashtable<String, SocketChannel>();
+	//protected Map<String, SocketChannel> providerConnections = new Hashtable<String, SocketChannel>();
+	protected Map<String, List<SocketChannel>> providerConnections = new Hashtable<String, List<SocketChannel>>();
 	/**
 	 * The cache of class definition, this is done to not flood the provider when it dispatch many tasks. it use
 	 * WeakHashMap to minimize the OutOfMemory.
@@ -57,7 +58,17 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition, Class
 	 */
 	public ClassNioServer(int port) throws JPPFException
 	{
-		super(port, "ClassServer Thread");
+		this(new int[] { port });
+	}
+
+	/**
+	 * Initialize this class server with a specified list of port numbers.
+	 * @param ports the list of port this server accepts connections from.
+	 * @throws JPPFException if the underlying server socket can't be opened.
+	 */
+	public ClassNioServer(final int[] ports) throws JPPFException
+	{
+		super(ports, "ClassServer Thread");
 		selectTimeout = 1L;
 	}
 
@@ -128,7 +139,25 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition, Class
 	 */
 	public void addProviderConnection(String uuid, SocketChannel channel)
 	{
-		providerConnections.put(uuid, channel);
+		List<SocketChannel> list = providerConnections.get(uuid);
+		if (list == null)
+		{
+			list = new ArrayList<SocketChannel>();
+			providerConnections.put(uuid, list);
+		}
+		list.add(channel);
+	}
+
+	/**
+	 * Add a provider connection to the map of existing available providers.
+	 * @param uuid the provider uuid as a string.
+	 * @param channel the provider's communication channel.
+	 */
+	public void removeProviderConnection(String uuid, SocketChannel channel)
+	{
+		List<SocketChannel> list = providerConnections.get(uuid);
+		if (list == null) return;
+		list.remove(channel);
 	}
 
 	/**

@@ -21,7 +21,6 @@ package org.jppf.server.nio.classloader;
 import static org.jppf.server.nio.classloader.ClassState.*;
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
-import java.nio.channels.SelectionKey;
 import java.util.*;
 
 import org.jppf.server.nio.*;
@@ -60,13 +59,7 @@ public final class ClassServerFactory
 		map.put(SENDING_PROVIDER_REQUEST, new SendingProviderRequestState(server));
 		map.put(WAITING_NODE_REQUEST, new WaitingNodeRequestState(server));
 		map.put(WAITING_PROVIDER_RESPONSE, new WaitingProviderResponseState(server));
-		map.put(IDLE_PROVIDER, new ClassServerState(server)
-		{
-			public ClassTransition performTransition(SelectionKey key) throws Exception
-			{
-				return TO_IDLE_PROVIDER;
-			}
-		});
+		map.put(IDLE_PROVIDER, new IdleProviderState(server));
 		return map;
 	}
 
@@ -87,8 +80,7 @@ public final class ClassServerFactory
 		map.put(TO_SENDING_PROVIDER_REQUEST, new NioTransition<ClassState>(SENDING_PROVIDER_REQUEST, RW));
 		map.put(TO_WAITING_PROVIDER_RESPONSE, new NioTransition<ClassState>(WAITING_PROVIDER_RESPONSE, R));
 		map.put(TO_IDLE_NODE, new NioTransition<ClassState>(SENDING_NODE_RESPONSE, 0));
-		//map.put(TO_IDLE_PROVIDER, new NioTransition<ClassState>(SENDING_PROVIDER_REQUEST, 0));
-		map.put(TO_IDLE_PROVIDER, new NioTransition<ClassState>(IDLE_PROVIDER, 0));
+		map.put(TO_IDLE_PROVIDER, new NioTransition<ClassState>(IDLE_PROVIDER, R));
 		return map;
 	}
 }

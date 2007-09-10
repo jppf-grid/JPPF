@@ -147,6 +147,16 @@ public class ClassContext extends NioContext<ClassState>
 	}
 
 	/**
+	 * Get the number of pending resource requests for a resource provider.
+	 * @return a the number of requests as an int. 
+	 */
+	public synchronized int getNbPendingRequests()
+	{
+		List<SelectionKey> reqs = getPendingRequests();
+		return (reqs == null ? 0 : reqs.size()) + (getCurrentRequest() == null ? 0 : 1);
+	}
+
+	/**
 	 * Get the list of pending resource requests for a resource provider.
 	 * @return a <code>List</code> of <code>SelectionKey</code> instances. 
 	 */
