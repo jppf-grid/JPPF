@@ -69,4 +69,8 @@ public interface Bundler {
 	 * @return true if the settings were overriden by the node, false otherwise.
 	 */
 	boolean isOverride();
+	/**
+	 * Release the resources used by this bundler.
+	 */
+	void dispose();
 }

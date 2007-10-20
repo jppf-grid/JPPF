@@ -17,8 +17,6 @@
  */
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.*;
-
 import java.io.Serializable;
 import java.util.*;
 
@@ -130,40 +128,32 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * Get an available connection with the highest possible priority.
 	 * @return a <code>JPPFClientConnection</code> with the highest possible priority.
 	 */
-	protected JPPFClientConnection getClientConnection()
+	public JPPFClientConnection getClientConnection()
 	{
 		JPPFClientConnection client = null;
 		while ((client == null) && !pools.isEmpty())
 		{
 			Iterator<Integer> poolIterator = pools.keySet().iterator();
-			while (poolIterator.hasNext())
+			while ((client == null) && poolIterator.hasNext())
 			{
 				int priority = poolIterator.next();
 				ClientPool pool = pools.get(priority);
 				int size = pool.clientList.size();
 				int count = 0;
-				while (count < size)
+				while ((client == null) && (count < size))
 				{
 					JPPFClientConnection c = pool.nextClient();
-					if (ACTIVE.equals(c.getStatus()))
+					switch(c.getStatus())
 					{
-						client = c;
-						break;
-					}
-					else if (FAILED.equals(c.getStatus()))
-					{
-						pool.clientList.remove(c);
-						size--;
-						if (pool.lastUsedIndex >= size) pool.lastUsedIndex--;
-						if (pool.clientList.isEmpty())
-						{
-							poolIterator.remove();
-						}
-					}
-					else if (CONNECTING.equals(c.getStatus()))
-					{
-						// nothing to do, just continue to the next connection or next pool
-						// with a lower priority.
+						case ACTIVE:
+							client = c;
+							break;
+						case FAILED:
+							pool.clientList.remove(c);
+							size--;
+							if (pool.lastUsedIndex >= size) pool.lastUsedIndex--;
+							if (pool.clientList.isEmpty()) poolIterator.remove();
+							break;
 					}
 					count++;
 				}
@@ -225,7 +215,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	}
 
 	/**
-	 * Invoked the status of a client connection has changed.
+	 * Invoked when the status of a client connection has changed.
 	 * @param event the event to notify of.
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
@@ -241,14 +231,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 			if (pool != null)
 			{
 				pool.clientList.remove(c);
-				if (pool.clientList.isEmpty())
-				{
-					pools.remove(priority);
-				}
-				if (pools.isEmpty())
-				{
-					throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
-				}
+				if (pool.clientList.isEmpty()) pools.remove(priority);
+				if (pools.isEmpty()) throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
 			}
 			List<ClientExecution> toResubmit = c.close();
 			int taskCount = 0;
@@ -265,16 +249,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 			{
 				try
 				{
-					for (ClientExecution execution: toResubmit)
+					for (ClientExecution exec: toResubmit)
 					{
-						if (execution.isBlocking)
-						{
-							submit(execution.tasks, execution.dataProvider);
-						}
-						else
-						{
-							submitNonBlocking(execution.tasks, execution.dataProvider, execution.listener);
-						}
+						if (exec.isBlocking) submit(exec.tasks, exec.dataProvider);
+						else submitNonBlocking(exec.tasks, exec.dataProvider, exec.listener);
 					}
 				}
 				catch(Exception e)

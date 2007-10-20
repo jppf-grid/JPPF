@@ -45,7 +45,7 @@ import org.jppf.server.JPPFDriver;
 public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends NioServer> extends Thread
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(NioServer.class);
 	/**
@@ -67,7 +67,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	/**
 	 * The pool of threads used for submitting channel state transitions.
 	 */
-	protected ExecutorService executor = Executors.newFixedThreadPool(1);
+	protected ExecutorService executor = null;
 	/**
 	 * Timeout for the select() operations. A value of 0 means no timeout, i.e.
 	 * the <code>Selector.select()</code> will be invoked without parameters.
@@ -90,6 +90,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	protected NioServer(String name) throws JPPFException
 	{
 		super(name);
+		int n = Runtime.getRuntime().availableProcessors();
+		executor = Executors.newFixedThreadPool(n);
 	}
 
 	/**
@@ -100,8 +102,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	 */
 	public NioServer(int port, String name) throws JPPFException
 	{
-		super(name);
-		
+		this(name);
 		this.ports = new int[] { port };
 		factory = createFactory();
 		init(ports);
@@ -115,9 +116,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	 */
 	public NioServer(final int[] ports, String name) throws JPPFException
 	{
-		super(name);
-		
-		
+		this(name);
 		this.ports = new int[ports.length];
 		System.arraycopy(ports, 0, this.ports, 0, ports.length);
 		factory = createFactory();

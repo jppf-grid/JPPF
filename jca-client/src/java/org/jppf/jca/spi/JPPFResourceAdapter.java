@@ -29,6 +29,7 @@ import javax.transaction.xa.XAResource;
 import org.apache.commons.logging.*;
 import org.jppf.jca.util.JPPFAccessor;
 import org.jppf.jca.work.*;
+import org.jppf.jca.work.submission.JPPFSubmissionManager;
 import org.jppf.utils.JPPFUuid;
 
 /**
@@ -58,38 +59,55 @@ public class JPPFResourceAdapter extends JPPFAccessor implements ResourceAdapter
 	 * Number of JPPF driver connections.
 	 */
 	private int connectionPoolSize = 5;
+	/**
+	 * Bootstrap context provided by the application server.
+	 */
+	private BootstrapContext ctx = null;
+	/**
+	 * Manages asynchronous work submission to the JPPF driver.
+	 */
+	private JPPFSubmissionManager submissionManager = null;
 
 	/**
 	 * Start this resource adapater with the specified bootstrap context.
 	 * This method is invoked by the application server exactly once for each resource adapter instance. 
 	 * @param ctx bootstrap context provided by the application server.
-	 * @throws ResourceAdapterInternalException if an error occurred while starting this resourtce adapter.
+	 * @throws ResourceAdapterInternalException if an error occurred while starting this resource adapter.
 	 * @see javax.resource.spi.ResourceAdapter#start(javax.resource.spi.BootstrapContext)
 	 */
 	public void start(BootstrapContext ctx) throws ResourceAdapterInternalException
 	{
-		System.out.println("Starting JPPF resource adapter");
+		this.ctx = ctx;
+		log.info("Starting JPPF resource adapter");
 		WorkManager workManager = ctx.getWorkManager();
 		jppfClient =
 			new JPPFJcaClient(new JPPFUuid().toString(), connectionPoolSize, serverHost, classServerPort, appServerPort);
 		log.info("Starting JPPF resource adapter: jppf client="+jppfClient);
+		submissionManager = new JPPFSubmissionManager(jppfClient, workManager);
+		jppfClient.setSubmissionManager(submissionManager);
 		try
 		{
-			//workManager.startWork((JcaClassServerDelegate) jppfClient.getDelegate());
 			workManager.scheduleWork((JcaClassServerDelegate) jppfClient.getDelegate());
 		}
 		catch(WorkException e)
 		{
-			log.error(e);
+			log.error(e.getMessage(), e);
 		}
 		try
 		{
-			//workManager.startWork(new JPPFJcaJob(jppfClient.getInitialWorkList(), 1000));
 			workManager.scheduleWork(new JPPFJcaJob(jppfClient.getInitialWorkList(), 1000));
 		}
 		catch(WorkException e)
 		{
-			log.error(e);
+			log.error(e.getMessage(), e);
+		}
+		try
+		{
+			workManager.scheduleWork(submissionManager);
+		}
+		catch(WorkException e)
+		{
+			log.error(e.getMessage(), e);
 		}
 		log.info("JPPF resource adapter started");
 	}

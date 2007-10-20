@@ -21,6 +21,8 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
+import org.jppf.client.event.ClientConnectionStatusEvent;
+import org.jppf.jca.work.submission.JPPFSubmissionManager;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 
@@ -62,6 +64,14 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	 * The unique class server delegate for all connections.
 	 */
 	private ClassServerDelegate delegate = null;
+	/**
+	 * Keeps a list of the valid connections not currently executring tasks.
+	 */
+	private Vector<JPPFClientConnection> availableConnections = new Vector<JPPFClientConnection>();
+	/**
+	 * Manages asynchronous work submission to the JPPF driver.
+	 */
+	private JPPFSubmissionManager submissionManager = null;
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -98,7 +108,6 @@ public class JPPFJcaClient extends AbstractJPPFClient
 		try
 		{
 			delegate = new JcaClassServerDelegate("ra_driver", uuid, host, classPort);
-			//initialWorkList.add((JcaClassServerDelegate) delegate);
 			if (poolSize <= 0) poolSize = 1;
 			String[] names = new String[poolSize];
 			for (int i=0; i<poolSize; i++) names[i] = "driver_" + (i + 1);
@@ -173,7 +182,7 @@ public class JPPFJcaClient extends AbstractJPPFClient
 
 	/**
 	 * Get the initial list of connections to initialize.
-	 * @return a lsit of <code>Work</code> instances.
+	 * @return a list of <code>Work</code> instances.
 	 */
 	public List<Runnable> getInitialWorkList()
 	{
@@ -187,5 +196,52 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	public ClassServerDelegate getDelegate()
 	{
 		return delegate;
+	}
+
+	/**
+	 * Invoked when the status of a client connection has changed.
+	 * @param event the event to notify of.
+	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+	 */
+	public void statusChanged(ClientConnectionStatusEvent event)
+	{
+		super.statusChanged(event);
+		JPPFClientConnection c = event.getJPPFClientConnection();
+		switch(c.getStatus())
+		{
+			case ACTIVE:
+				availableConnections.add(c);
+				break;
+			default:
+				availableConnections.remove(c);
+				break;
+		}
+	}
+
+	/**
+	 * Determine whether there is a client connection available for execution.
+	 * @return true if at least one ocnnection is available, false otherwise.
+	 */
+	public boolean hasAvailableConnection()
+	{
+		return !availableConnections.isEmpty();
+	}
+
+	/**
+	 * Get the submission manager for thsi JPPF client.
+	 * @return a <code>JPPFSubmissionManager</code> instance.
+	 */
+	public JPPFSubmissionManager getSubmissionManager()
+	{
+		return submissionManager;
+	}
+
+	/**
+	 * Set the submission manager for thsi JPPF client.
+	 * @param submissionManager a <code>JPPFSubmissionManager</code> instance.
+	 */
+	public void setSubmissionManager(JPPFSubmissionManager submissionManager)
+	{
+		this.submissionManager = submissionManager;
 	}
 }

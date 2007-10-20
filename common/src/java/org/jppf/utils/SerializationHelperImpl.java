@@ -47,7 +47,7 @@ public class SerializationHelperImpl implements SerializationHelper
 	private ObjectSerializer serializer = null;
 
 	/**
-	 * Instantiation of this class is not permitted.
+	 * Default constructor.
 	 */
 	public SerializationHelperImpl()
 	{

@@ -36,7 +36,7 @@ import org.jppf.server.*;
 public class AutoTunedBundler extends AbstractBundler
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(AutoTunedBundler.class);
 	/**

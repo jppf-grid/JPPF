@@ -339,4 +339,16 @@
 		</java>       
 	</target>
 
+	<target name="run.crash">
+		<echo message="starting the second demo application"/>
+		<java fork="yes" classname="test.crash.StandaloneMatrixRunner" classpathref="client.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<!--
+			<jvmarg value="-Xloggc:gc.txt"/>
+			<jvmarg value="-XX:+UseConcMarkSweepGC"/>
+			-->
+		</java>       
+	</target>
+
 </project> 

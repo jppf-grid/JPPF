@@ -21,7 +21,7 @@ package org.jppf.server.scheduler.bundle;
  * This is a utility class to be used to store the pair of mean and the
  * number of samples this mean is based on.
  */
-class BundlePerformanceSample
+public class BundlePerformanceSample
 {
 	/**
 	 * Mean compute time for server to node round trip.
@@ -32,4 +32,23 @@ class BundlePerformanceSample
 	 * Number of samples used to compute the mean value.
 	 */
 	public long samples;
+
+	/**
+	 * Default constructor.
+	 */
+	public BundlePerformanceSample()
+	{
+	}
+
+	/**
+	 * Initialize this sample witht he specified mean execute time and number of samples.
+	 * @param mean Mean compute time for server to node round trip.
+	 * @param samples Number of samples used to compute the mean value.
+	 */
+	public BundlePerformanceSample(double mean, long samples)
+	{
+		super();
+		this.mean = mean;
+		this.samples = samples;
+	}
 }

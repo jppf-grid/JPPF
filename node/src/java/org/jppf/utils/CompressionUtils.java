@@ -18,7 +18,7 @@
 package org.jppf.utils;
 
 import java.io.*;
-import java.util.zip.*;
+
 import org.apache.commons.logging.*;
 
 /**
@@ -28,7 +28,7 @@ import org.apache.commons.logging.*;
 public final class CompressionUtils
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(CompressionUtils.class);
 	/**
@@ -54,8 +54,13 @@ public final class CompressionUtils
 	public static byte[] zip(byte[] bytes, int start, int length) throws Exception
 	{
 		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		GZIPOutputStream gzos = new GZIPOutputStream(baos);
-		DataOutputStream dos = new DataOutputStream(gzos);
+		//GZIPOutputStream gzos = new GZIPOutputStream(baos);
+		DataOutputStream dos = null;
+		/*
+		DeflaterOutputStream gzos = new DeflaterOutputStream(baos);
+		dos = new DataOutputStream(gzos);
+		*/
+		dos = new DataOutputStream(baos);
 		dos.writeInt(length);
 		dos.write(bytes, start, length);
 		dos.flush();
@@ -76,8 +81,13 @@ public final class CompressionUtils
 	{
 		int count = 0;
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes, start, length);
-		GZIPInputStream gzis = new GZIPInputStream(bais);
-		DataInputStream dis = new DataInputStream(gzis);
+		//GZIPInputStream gzis = new GZIPInputStream(bais);
+		DataInputStream dis = null;
+		/*
+		InflaterInputStream gzis = new InflaterInputStream(bais);
+		dis = new DataInputStream(gzis);
+		*/
+		dis = new DataInputStream(bais);
 		int len = dis.readInt();
 		byte[] result = new byte[len];
 		while (count < len)

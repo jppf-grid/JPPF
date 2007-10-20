@@ -15,33 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package sample.test.profiling;
 
-package org.jppf.client;
+import org.jppf.server.protocol.JPPFTask;
 
 /**
- * Connection status of a JPPFClientConnection instance.
+ * Instances of this class do nothing and are intented for node profiling purposes,
+ * to analyse the JPPF overhead for task execution. 
  * @author Laurent Cohen
  */
-public enum JPPFClientConnectionStatus
+public class EmptyTask extends JPPFTask
 {
 	/**
-	 * Indicates that the connection instance is currently attempting to connect to the driver.
+	 * Perform the excution of this task.
+	 * @see java.lang.Runnable#run()
 	 */
-	CONNECTING,
-	/**
-	 * Indicates that the connection instance has successfully connected to the driver.
-	 */
-	ACTIVE,
-	/**
-	 * Indicates that the connection instance has is currently executing tasks.
-	 */
-	EXECUTING,
-	/**
-	 * Indicates that the connection instance has failed to connect to the driver.
-	 */
-	FAILED,
-	/**
-	 * Indicates that the connection instance is disconnected from the driver.
-	 */
-	DISCONNECTED
+	public void run()
+	{
+	}
 }

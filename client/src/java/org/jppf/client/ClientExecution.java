@@ -52,6 +52,17 @@ public class ClientExecution
 	 * @param tasks list of tasks for this execution.
 	 * @param dataProvider data provider for this execution.
 	 * @param isBlocking flag to determine whether the execution is blocking or not.
+	 */
+	public ClientExecution(List<JPPFTask> tasks, DataProvider dataProvider, boolean isBlocking)
+	{
+		this(tasks, dataProvider, isBlocking, null);
+	}
+
+	/**
+	 * Initialize this execution with the specified parameters.
+	 * @param tasks list of tasks for this execution.
+	 * @param dataProvider data provider for this execution.
+	 * @param isBlocking flag to determine whether the execution is blocking or not.
 	 * @param listener listener to notify whenever a set of results have been received.
 	 */
 	public ClientExecution(List<JPPFTask> tasks, DataProvider dataProvider, boolean isBlocking, TaskResultListener listener)

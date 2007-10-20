@@ -116,6 +116,10 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * Determines whether this connection has been shut down;
 	 */
 	protected boolean isShutdown = false;
+	/**
+	 * This connection's UUID.
+	 */
+	private String connectionId = new JPPFUuid().toString();
 
 	/**
 	 * Default instantiation of this class is not allowed.
@@ -422,5 +426,14 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	public void setCurrentExecution(ClientExecution currentExecution)
 	{
 		this.currentExecution = currentExecution;
+	}
+
+	/**
+	 * Get this connection's UUID.
+	 * @return the uuid as a string.
+	 */
+	public String getConnectionId()
+	{
+		return connectionId;
 	}
 }

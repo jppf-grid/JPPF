@@ -25,12 +25,13 @@ import javax.management.*;
 import javax.management.remote.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.utils.ThreadSynchronization;
 
 /**
  * Wrapper around a JMX connection, providing a thread-safe way of handling disconnections and recovery.
  * @author Laurent Cohen
  */
-public class JMXConnectionWrapper
+public class JMXConnectionWrapper extends ThreadSynchronization
 {
 	/**
 	 * Logger for this class.
@@ -175,37 +176,11 @@ public class JMXConnectionWrapper
 	}
 
 	/**
-	 * Cause the current thread to wait until notified.
-	 */
-	private synchronized void goToSleep()
-	{
-		try
-		{
-			wait();
-		}
-		catch(InterruptedException ignored)
-		{
-		}
-	}
-
-	/**
-	 * Cause the current thread to wait until notified.
-	 */
-	private synchronized void wakeUp()
-	{
-		notifyAll();
-	}
-
-	/**
 	 * This class is intended to be used as a thread that attempts to (re-)connect to
 	 * the management server.
 	 */
-	public class JMXConnectionThread implements Runnable
+	public class JMXConnectionThread extends ThreadSynchronization implements Runnable
 	{
-		/**
-		 * Determines the closed state of this connection thread.
-		 */
-		private boolean closed = false;
 		/**
 		 * Determines the suspended state of this connection thread.
 		 */
@@ -221,7 +196,7 @@ public class JMXConnectionWrapper
 		 */
 		public void run()
 		{
-			while (!closed)
+			while (!isStopped())
 			{
 				if (isSuspended())
 				{
@@ -256,20 +231,6 @@ public class JMXConnectionWrapper
 		}
 
 		/**
-		 * Cause the current thread to wait until notified.
-		 */
-		private synchronized void goToSleep()
-		{
-			try
-			{
-				wait();
-			}
-			catch(InterruptedException ignored)
-			{
-			}
-		}
-
-		/**
 		 * Suspend the current thread.
 		 */
 		public synchronized void suspend()
@@ -287,7 +248,7 @@ public class JMXConnectionWrapper
 			if (debugEnabled) log.debug(getId() + "resuming RMI connection attempts");
 			setConnecting(true);
 			suspended = false;
-			notifyAll();
+			wakeUp();
 		}
 
 		/**
@@ -296,7 +257,7 @@ public class JMXConnectionWrapper
 		public synchronized void close()
 		{
 			setConnecting(false);
-			closed = true;
+			setStopped(true);
 		}
 
 		/**

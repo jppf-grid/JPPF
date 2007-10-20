@@ -16,32 +16,39 @@
  * limitations under the License.
  */
 
-package org.jppf.client;
+package sample.test.junit;
+
+import java.io.Serializable;
+import java.util.Arrays;
+
+import junit.framework.TestCase;
+
+import org.jppf.client.JPPFClient;
+import org.jppf.server.protocol.JPPFTask;
 
 /**
- * Connection status of a JPPFClientConnection instance.
+ * 
  * @author Laurent Cohen
  */
-public enum JPPFClientConnectionStatus
+public class TestJUnit extends TestCase implements Serializable
 {
 	/**
-	 * Indicates that the connection instance is currently attempting to connect to the driver.
+	 * First test.
+	 * @throws Exception if the test fails.
 	 */
-	CONNECTING,
-	/**
-	 * Indicates that the connection instance has successfully connected to the driver.
-	 */
-	ACTIVE,
-	/**
-	 * Indicates that the connection instance has is currently executing tasks.
-	 */
-	EXECUTING,
-	/**
-	 * Indicates that the connection instance has failed to connect to the driver.
-	 */
-	FAILED,
-	/**
-	 * Indicates that the connection instance is disconnected from the driver.
-	 */
-	DISCONNECTED
+	public void test1() throws Exception
+	{
+		JPPFClient client = new JPPFClient();
+		client.submit(Arrays.<JPPFTask>asList(new JPPFTask()
+		{
+      private static final long serialVersionUID = 1L;
+      public void run()
+      {
+    		System.out.println("executing task");
+      }
+		}), null);
+		System.out.println("before close");
+		client.close();
+		System.out.println("after close");
+ 	}
 }

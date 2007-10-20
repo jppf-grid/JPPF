@@ -90,4 +90,21 @@ public abstract class AbstractBundler implements Bundler
 	{
 		this.override = override;
 	}
+
+	/**
+	 * Get the bundler number for this bundler.
+	 * @return the bundler number as an int.
+	 */
+	public int getBundlerNumber()
+	{
+		return bundlerNumber;
+	}
+
+	/**
+	 * Release the resources used by this bundler.
+	 * @see org.jppf.server.scheduler.bundle.Bundler#dispose()
+	 */
+	public void dispose()
+	{
+	}
 }

@@ -20,17 +20,19 @@ package org.jppf.jca.work;
 import java.io.NotSerializableException;
 import java.util.List;
 
+import javax.resource.spi.work.Work;
+
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
+import org.jppf.jca.work.submission.JPPFSubmissionResult;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.Pair;
 
 /**
- * This class encapsulates a pool of threads that submit the tasks to a driver
- * and listen for the results.
+ * Instances of this class send tasks to a JPPF driver and collect the results.
  */
-public class JcaResultProcessor implements Runnable
+public class JcaResultProcessor implements Work
 {
 	/**
 	 * Logger for this class.
@@ -43,7 +45,7 @@ public class JcaResultProcessor implements Runnable
 	/**
 	 * Client connection owning this results processor.
 	 */
-	private final AbstractJPPFClientConnection connection;
+	private final JPPFJcaClientConnection connection;
 	/**
 	 * The execution processed by this task.
 	 */
@@ -54,7 +56,7 @@ public class JcaResultProcessor implements Runnable
 	 * @param connection the client connection owning this results processor.
 	 * @param execution the execution processed by this task.
 	 */
-	public JcaResultProcessor(AbstractJPPFClientConnection connection, ClientExecution execution)
+	public JcaResultProcessor(JPPFJcaClientConnection connection, ClientExecution execution)
 	{
 		this.connection = connection;
 		this.execution = execution;
@@ -67,6 +69,7 @@ public class JcaResultProcessor implements Runnable
 	public void run()
 	{
 		boolean error = false;
+		JPPFSubmissionResult result = (JPPFSubmissionResult) execution.listener;
 		try
 		{
 			connection.setCurrentExecution(execution);
@@ -83,12 +86,14 @@ public class JcaResultProcessor implements Runnable
 					{
 						Pair<List<JPPFTask>, Integer> p = connection.receiveResults();
 						count += p.first().size();
-						if (execution.listener != null)
+						if (result != null)
 						{
-							execution.listener.resultsReceived(new TaskResultEvent(p.first(), p.second()));
+							result.resultsReceived(new TaskResultEvent(p.first(), p.second()));
 						}
 					}
 					completed = true;
+					result.setStatus(JPPFSubmissionResult.Status.COMPLETE);
+					connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
 				}
 				catch(NotSerializableException e)
 				{
@@ -102,7 +107,6 @@ public class JcaResultProcessor implements Runnable
 				{
 					if (debugEnabled) log.debug("["+connection.getName()+"] "+e.getMessage(), e);
 					connection.setStatus(JPPFClientConnectionStatus.DISCONNECTED);
-					//connection.initConnection();
 				}
 			}
 		}
@@ -114,6 +118,7 @@ public class JcaResultProcessor implements Runnable
 		finally
 		{
 			if (!error) connection.setCurrentExecution(null);
+			else result.setStatus(JPPFSubmissionResult.Status.FAILED);
 		}
 	}
 
@@ -124,5 +129,13 @@ public class JcaResultProcessor implements Runnable
 	public ClientExecution getExecution()
 	{
 		return execution;
+	}
+
+	/**
+	 * Stop this result processor.
+	 * @see javax.resource.spi.work.Work#release()
+	 */
+	public void release()
+	{
 	}
 }

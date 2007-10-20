@@ -52,6 +52,20 @@ public class JPPFUuid implements Serializable
 	  "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H",
 	  "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"	  
 	};
+	/**
+	 * Set of characters used to compose a uuid, including only hexadecimal digits.
+	 */
+	public static final String[] HEXADECIMAL =
+	{
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"	  
+	};
+	/**
+	 * Set of characters used to compose a uuid, including only decimal digits.
+	 */
+	public static final String[] DECIMAL =
+	{
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"	  
+	};
   /**
 	 * Random number generator, static to ensure generated uuid are unique.
 	 */

@@ -38,6 +38,10 @@ public class DemoTest implements Serializable
 	 * JNDI name of the JPPFConnectionFactory.
 	 */
 	private String jndiBinding = null;
+	/**
+	 * Reference ot the initial context.
+	 */
+	private InitialContext ctx = null;
 
 	/**
 	 * Initialize this test object with a specified jndi location for the connection factory.
@@ -55,26 +59,47 @@ public class DemoTest implements Serializable
 	 */
 	public String testConnector() throws Exception
 	{
-		JPPFConnection test = null;
+		JPPFConnection connection = null;
 		String msg = null;
 		try
 		{
-	  	InitialContext ctx = new InitialContext();
-			Object objref = ctx.lookup(jndiBinding);
-			ConnectionFactory cf = (ConnectionFactory) PortableRemoteObject.narrow(objref, ConnectionFactory.class);
-			test = (JPPFConnection) cf.getConnection();
+			connection = getConnection();
 			JPPFTask task = new DemoTask();
 			List list = new ArrayList();
 			list.add(task);
-			list = test.submit(list, null);
+			list = connection.submit(list, null);
 			task = (JPPFTask) list.get(0);
 			if (task.getException() != null) msg = task.getException().getMessage();
 			else msg = (String) task.getResult();
 		}
 		finally
 		{
-			if (test != null) test.close();
+			if (connection != null) connection.close();
 		}
 		return msg;
+	}
+
+	/**
+	 * Get the initial context.
+	 * @return an <code>InitialContext</code> instance.
+	 * @throws Exception if the context could not be obtained.
+	 */
+	public InitialContext getInitialContext() throws Exception
+	{
+		if (ctx == null) ctx = new InitialContext();
+		return ctx;
+	}
+
+	/**
+	 * Obtain a JPPF connection from the resource adaper's connection pool.
+	 * The obtained connection must be closed by the caller of this method, once it is done using it.
+	 * @return a <code>JPPFConnection</code> instance.
+	 * @throws Exception if the connection could not be obtained.
+	 */
+	public JPPFConnection getConnection() throws Exception
+	{
+		Object objref = getInitialContext().lookup(jndiBinding);
+		ConnectionFactory cf = (ConnectionFactory) PortableRemoteObject.narrow(objref, ConnectionFactory.class);
+		return (JPPFConnection) cf.getConnection();
 	}
 }

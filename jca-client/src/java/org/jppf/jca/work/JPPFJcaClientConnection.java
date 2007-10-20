@@ -48,7 +48,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	/**
 	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 
 	/**
 	 * Initialize this client with a specified application UUID.
@@ -129,6 +129,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
 			throws Exception
 	{
+		setStatus(EXECUTING);
 		ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener);
 		
 		JcaResultProcessor proc = new JcaResultProcessor(this, exec);
