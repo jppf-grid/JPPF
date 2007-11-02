@@ -22,7 +22,7 @@ import java.util.*;
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.client.event.ClientConnectionStatusEvent;
-import org.jppf.jca.work.submission.JPPFSubmissionManager;
+import org.jppf.jca.work.submission.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 
@@ -155,7 +155,8 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
 	{
-		JPPFJcaResultCollector collector = new JPPFJcaResultCollector();
+		//JPPFJcaResultCollector collector = new JPPFJcaResultCollector();
+		JPPFSubmissionResult collector = new JPPFSubmissionResult(taskList.size());
 		List<JPPFTask> result = null;
 		while ((result == null) && !pools.isEmpty())
 		{
@@ -166,7 +167,9 @@ public class JPPFJcaClient extends AbstractJPPFClient
 			}
 			catch(Exception e)
 			{
-				if (pools.isEmpty()) throw e;
+				//if (pools.isEmpty()) throw e;
+				//log.error(e.getMessage(), e);
+				throw e;
 			}
 		}
 		return result;

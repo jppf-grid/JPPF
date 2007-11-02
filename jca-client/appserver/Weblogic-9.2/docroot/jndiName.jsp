@@ -2,4 +2,4 @@
 <%
 	String jndiName = "eis/JPPFConnectionFactory";
 %>
-<%@ include file="include.jsp"%>
+

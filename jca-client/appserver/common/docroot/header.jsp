@@ -1,5 +1,4 @@
-<%@ page language="java" %>
-<%@ page import="org.jppf.jca.demo.*" %>
+<%@ include file="jndiName.jsp"%>
 <html>
 	<head>
 		<title>Java Parallel Processing Framework Home Page</title>
@@ -22,41 +21,6 @@
 				</td>
 			</tr>
 			<tr><td height="5"></td></tr>
-		</table>
-<%
-	  String perform = request.getParameter("perform");
-	  if (perform != null)
-	  {
-			String msg = new DemoTest(jndiName).testConnector();
-			response.sendRedirect(request.getContextPath()+"/index.jsp?msg="+msg);
-	  }
-		else
-		{
-%>
-		<table align="center" width="80%" cellspacing="0" cellpadding="5" class="table_">
-			<tr><td height="5"></td></tr>
-			<tr><td width="50%" align="center">
-				<h3>Click on this button to submit a task to JPPF&nbsp;</h3>
-			</td></tr>
-	
-			<tr><td width="50%" align="center">
-				<form name="jppftest" action="<%=request.getContextPath()%>/index.jsp" method="get">
-					<input type="hidden" value="true" name="perform">
-					<input type="submit" value="Submit">
-				</form>
-			</td></tr>
-<%
-			String msg = request.getParameter("msg");
-			if (msg != null)
-			{
-%>
-			<tr><td width="50%" align="center">
-		    <h3>Result : <%= msg %></h3>
-			</td></tr>
-<%
-			}
-		}
-%>
 		</table>
 	</body>
 </html>

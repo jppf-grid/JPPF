@@ -26,6 +26,7 @@ import javax.resource.cci.ConnectionFactory;
 import javax.rmi.PortableRemoteObject;
 
 import org.jppf.jca.cci.JPPFConnection;
+import org.jppf.jca.work.submission.JPPFSubmissionResult;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -60,23 +61,52 @@ public class DemoTest implements Serializable
 	public String testConnector() throws Exception
 	{
 		JPPFConnection connection = null;
-		String msg = null;
+		String id = null;
 		try
 		{
 			connection = getConnection();
 			JPPFTask task = new DemoTask();
 			List list = new ArrayList();
 			list.add(task);
+			id = connection.submitNonBlocking(list, null);
+			
+			/*
 			list = connection.submit(list, null);
 			task = (JPPFTask) list.get(0);
-			if (task.getException() != null) msg = task.getException().getMessage();
-			else msg = (String) task.getResult();
+			if (task.getException() != null) id = task.getException().getMessage();
+			else id = (String) task.getResult();
+			*/
 		}
 		finally
 		{
 			if (connection != null) connection.close();
 		}
-		return msg;
+		return id;
+	}
+
+	/**
+	 * Perform a simple call to the JPPF resource adapter.
+	 * @param duration the duration of the task to submit.
+	 * @return a string reporting either the task execution result or an error message.
+	 * @throws Exception if the call to JPPF failed.
+	 */
+	public String testConnector(int duration) throws Exception
+	{
+		JPPFConnection connection = null;
+		String id = null;
+		try
+		{
+			connection = getConnection();
+			JPPFTask task = new DurationTask(duration);
+			List list = new ArrayList();
+			list.add(task);
+			id = connection.submitNonBlocking(list, null);
+		}
+		finally
+		{
+			if (connection != null) connection.close();
+		}
+		return id;
 	}
 
 	/**
@@ -88,6 +118,56 @@ public class DemoTest implements Serializable
 	{
 		if (ctx == null) ctx = new InitialContext();
 		return ctx;
+	}
+
+	/**
+	 * Get the map of submissions ids to their corresponding submission status.
+	 * @return a map of ids to statuses as strings.
+	 * @throws Exception if the call to JPPF failed.
+	 */
+	public Map getStatusMap() throws Exception
+	{
+		Map<String, String> map = new HashMap<String, String>();
+		JPPFConnection connection = null;
+		try
+		{
+			connection = getConnection();
+			Collection<String> coll = connection.getAllSubmissionIds();
+			for (String id: coll)
+			{
+				JPPFSubmissionResult.Status status = connection.getSubmissionStatus(id);
+				String s = (status == null) ? "Unknown" : status.toString();
+				map.put(id, s);
+			}
+		}
+		finally
+		{
+			if (connection != null) connection.close();
+		}
+		return map;
+	}
+
+	/**
+	 * Get the resulting message from a submission.
+	 * @param id the id of the submission to retrieve.
+	 * @return a string reporting either the task execution result or an error message.
+	 * @throws Exception if the call to JPPF failed.
+	 */
+	public String getMessage(String id) throws Exception
+	{
+		JPPFConnection connection = null;
+		String msg = null;
+		try
+		{
+			connection = getConnection();
+			List<JPPFTask> results = connection.getSubmissionResults(id);
+			msg = (results == null) ? "submission is not in queue anymore" : (String) results.get(0).getResult();
+		}
+		finally
+		{
+			if (connection != null) connection.close();
+		}
+		return msg;
 	}
 
 	/**
