@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.jppf.server.*;
 import org.jppf.server.protocol.BundleParameter;
-import org.jppf.server.scheduler.bundle.simple.DelegatingSimpleBundler;
+import org.jppf.server.scheduler.bundle.simple.DelegatingBundler;
 import org.jppf.utils.*;
 
 /**
@@ -97,7 +97,7 @@ public final class BundlerFactory {
 	 * @see org.jppf.server.scheduler.bundle.Bundler
 	 */
 	public static Bundler createBundler(AnnealingTuneProfile profile, boolean override, String algorithm) {
-		if ("simple".equals(algorithm)) return new DelegatingSimpleBundler(profile, override);
+		if ("simple".equals(algorithm)) return new DelegatingBundler(profile, override);
 		return new AutoTunedBundler(profile);
 	}
 

@@ -150,10 +150,11 @@ public class JPPFNode extends AbstractMonitoredNode
 				bundle.setBundleUuid(uuid);
 				Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
 				if (params != null) bundle.getParametersMap().putAll(params);
-				bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM,
-						JPPFConfiguration.getProperties().getString("jppf.management.host", "localhost"));
-				bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM,
-						JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198));
+				TypedProperties props = JPPFConfiguration.getProperties();
+				String host = NetworkUtils.getNonLocalHostAddress();
+				if (host == null) host = "localhost";
+				bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, props.getString("jppf.management.host", host));
+				bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
 				bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeLauncher.getJmxServer().getId());
 			}
 			List<JPPFTask> taskList = pair.second();
@@ -219,6 +220,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
 		TypedProperties props = JPPFConfiguration.getProperties();
 		int poolSize = props.getInt("processing.threads", 1);
+		log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
 		threadPool = Executors.newFixedThreadPool(poolSize);
 		if (debugEnabled) log.debug("end node initialization");
 	}

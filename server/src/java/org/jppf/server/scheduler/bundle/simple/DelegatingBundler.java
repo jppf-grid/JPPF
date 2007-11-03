@@ -25,15 +25,16 @@ import org.jppf.server.JPPFStatsUpdater;
 import org.jppf.server.scheduler.bundle.*;
 
 /**
- * 
+ * Instances of this bundler delegate their operations to a singleton instance of a
+ * {@link org.jppf.server.scheduler.bundle.simple.PropertionalBundler PropertionalBundler}.
  * @author Laurent Cohen
  */
-public class DelegatingSimpleBundler extends AbstractBundler
+public class DelegatingBundler extends AbstractBundler
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(DelegatingSimpleBundler.class);
+	private static Log log = LogFactory.getLog(DelegatingBundler.class);
 	/**
 	 * Determines whether debugging level is set for logging.
 	 */
@@ -41,7 +42,7 @@ public class DelegatingSimpleBundler extends AbstractBundler
 	/**
 	 * The global bundler to which bundle size calculations are delegated. 
 	 */
-	private static SimpleBundler simpleBundler = null;
+	private static ProportionalBundler simpleBundler = null;
 	/**
 	 * Used to synchronize multiple threads when creating the simple bundler.
 	 */
@@ -61,7 +62,7 @@ public class DelegatingSimpleBundler extends AbstractBundler
 	 * @param override true if the settings were overriden by the node, false otherwise.
 	 * grouped as a performance analysis profile.
 	 */
-	public DelegatingSimpleBundler(AutoTuneProfile profile, boolean override)
+	public DelegatingBundler(AutoTuneProfile profile, boolean override)
 	{
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		this.override = override;
@@ -77,7 +78,7 @@ public class DelegatingSimpleBundler extends AbstractBundler
 		{
 			if (simpleBundler == null)
 			{
-				simpleBundler = new SimpleBundler(profile, override);
+				simpleBundler = new ProportionalBundler(profile, override);
 			}
 		}
 		finally
@@ -93,7 +94,7 @@ public class DelegatingSimpleBundler extends AbstractBundler
 	 */
 	public Bundler copy()
 	{
-		return new DelegatingSimpleBundler(profile, override);
+		return new DelegatingBundler(profile, override);
 	}
 
 	/**

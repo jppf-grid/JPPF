@@ -25,15 +25,23 @@ import org.jppf.server.*;
 import org.jppf.server.scheduler.bundle.*;
 
 /**
- * 
+ * This bundler implementation computes bundle sizes propertional to the mean execution
+ * time for each node.<br>
+ * The scope of this bundler is all nodes, which means that it computes the size for all nodes,
+ * unless an override is specified by the nodes.<br>
+ * The mean execution time is computed as a moving average over a number of tasks, specified in the bundling
+ * algorithm profile configuration as &quot;minSamplesToAnalyse&quot;<br>
+ * This algorithm is well suited for relatively small networks (a few dozen nodes at most). It generates an overhead
+ * everytime the performance data for a node is updated. In the case of a small network, this overhead is not
+ * large enough to impact the overall performance significantly.
  * @author Laurent Cohen
  */
-public class SimpleBundler extends AbstractBundler
+public class ProportionalBundler extends AbstractBundler
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SimpleBundler.class);
+	private static Log log = LogFactory.getLog(ProportionalBundler.class);
 	/**
 	 * Determines whether debugging level is set for logging.
 	 */
@@ -45,8 +53,8 @@ public class SimpleBundler extends AbstractBundler
 	/**
 	 * Mapping of individual bundler to corresponding performance data.
 	 */
-	protected Map<DelegatingSimpleBundler, BundleDataHolder> map = 
-		new HashMap<DelegatingSimpleBundler, BundleDataHolder>();
+	protected Map<DelegatingBundler, BundleDataHolder> map = 
+		new HashMap<DelegatingBundler, BundleDataHolder>();
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
@@ -54,7 +62,7 @@ public class SimpleBundler extends AbstractBundler
 	 * @param override true if the settings were overriden by the node, false otherwise.
 	 * grouped as a performance analysis profile.
 	 */
-	public SimpleBundler(AutoTuneProfile profile, boolean override)
+	public ProportionalBundler(AutoTuneProfile profile, boolean override)
 	{
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		this.override = override;
@@ -72,7 +80,7 @@ public class SimpleBundler extends AbstractBundler
 	 * @param bundler the bundler the sample applies to.
 	 * @param sample the performance sample to process.
 	 */
-	public synchronized void feedback(DelegatingSimpleBundler bundler, BundlePerformanceSample sample)
+	public synchronized void feedback(DelegatingBundler bundler, BundlePerformanceSample sample)
 	{
 		BundleDataHolder holder = getDataHolder(bundler);
 		holder.addSample(sample);
@@ -86,13 +94,13 @@ public class SimpleBundler extends AbstractBundler
 		//for (BundleDataHolder h: map.values()) diffSum += 1d + maxMean - h.getMean();
 		for (BundleDataHolder h: map.values()) diffSum += maxMean / h.getMean();
 		int max = JPPFDriver.getQueue().getMaxBundleSize();
-		for (DelegatingSimpleBundler b: map.keySet())
+		for (DelegatingBundler b: map.keySet())
 		{
 			BundleDataHolder h = map.get(b);
 			double m = h.getMean();
 			//double diff = 1d + maxMean - m;
 			double diff = maxMean / m;
-			int size = (int) (max * (diff / diffSum));
+			int size = Math.max(1, (int) (max * (diff / diffSum)));
 			h.setBundleSize(size);
 			if (debugEnabled) log.debug("bundler #"+b.getBundlerNumber()+" new size="+size);
 		}
@@ -124,7 +132,7 @@ public class SimpleBundler extends AbstractBundler
 	 * @return  the bundle size as an int value.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
-	public synchronized int getBundleSize(DelegatingSimpleBundler bundler)
+	public synchronized int getBundleSize(DelegatingBundler bundler)
 	{
 		return getDataHolder(bundler).getBundleSize();
 	}
@@ -134,7 +142,7 @@ public class SimpleBundler extends AbstractBundler
 	 * @param bundler the bundler for which to get the data holder.
 	 * @return a <code>BundleDataHolder</code> instance.
 	 */
-	private BundleDataHolder getDataHolder(DelegatingSimpleBundler bundler)
+	private BundleDataHolder getDataHolder(DelegatingBundler bundler)
 	{
 		BundleDataHolder holder = map.get(bundler);
 		if (holder == null)
@@ -149,7 +157,7 @@ public class SimpleBundler extends AbstractBundler
 	 * Remove the specified bundler from the list of bundler in this object.
 	 * @param bundler the bundler to remove.
 	 */
-	public synchronized void removeBundler(DelegatingSimpleBundler bundler)
+	public synchronized void removeBundler(DelegatingBundler bundler)
 	{
 		map.remove(bundler);
 	}

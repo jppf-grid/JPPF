@@ -176,7 +176,7 @@ public class AutoTunedBundler extends AbstractBundler
 				counter++;
 			}
 
-			currentSize = bestSize;
+			currentSize = Math.max(1, bestSize);
 			if (samplesMap.get(currentSize) != null)
 			{
 				stableMean = samplesMap.get(currentSize).mean;
