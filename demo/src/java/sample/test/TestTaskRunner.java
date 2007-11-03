@@ -56,7 +56,6 @@ public class TestTaskRunner
 		{
 			jppfClient = new JPPFClient();
 			/*
-			*/
 			performEmptyTaskListTest();
 			performExceptionTest();
 			performURLTest();
@@ -67,6 +66,8 @@ public class TestTaskRunner
 			performDB2LoadingTaskTest();
 			performXMLParsingTaskTest();
 			performMyTaskTest();
+			*/
+			performTimeoutTaskTest();
 			System.exit(0);
 		}
 		catch(Exception e)
@@ -392,6 +393,39 @@ public class TestTaskRunner
 		finally
 		{
 			System.out.println("My task testing complete.");
+		}
+	}
+	
+	/**
+	 * Check that correct results are returned by the framework.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void performTimeoutTaskTest() throws JPPFException
+	{
+		System.out.println(banner);
+		System.out.println("Starting timeout testing...");
+		try
+		{
+			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+			tasks.add(new TimeoutTask());
+			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			JPPFTask resultTask = results.get(0);
+			if (resultTask.getException() != null)
+			{
+				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
+			}
+			else
+			{
+				System.out.println("Result is: "+resultTask.getResult());
+			}
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e);
+		}
+		finally
+		{
+			System.out.println("Timeout testing complete.");
 		}
 	}
 	

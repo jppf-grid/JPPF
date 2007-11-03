@@ -21,7 +21,6 @@ import static org.jppf.server.protocol.BundleParameter.*;
 
 import java.io.InvalidClassException;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.*;
@@ -78,9 +77,9 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	private int buildNumber = -1;
 	/**
-	 * The Thread Pool that really process the tasks
+	 * The task execution manager for this node.
 	 */
-	private ExecutorService threadPool;
+	private NodeExecutionManager execManager = null;
 	/**
 	 * Holds the count of currently executing tasks.
 	 * Used to determine when this node is busy or idle.
@@ -160,18 +159,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			List<JPPFTask> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
 			if (debugEnabled) log.debug("received " + (notEmpty ? "a non-" : "an ") + "empty bundle");
-			if (notEmpty)
-			{
-				//if (debugEnabled) log.debug("End of node secondary loop");
-				if (debugEnabled) log.debug("node["+socketClient.getSocket().getLocalPort()+"] executing "+taskList.size()+" tasks");
-				List<Future<?>> futureList = new ArrayList<Future<?>>(taskList.size());
-				for (JPPFTask task : taskList)
-				{
-					NodeTaskWrapper taskWrapper = new NodeTaskWrapper(this, task, bundle.getUuidPath().getList());
-					futureList.add(threadPool.submit(taskWrapper));
-				}
-				for (Future<?> future : futureList) future.get();
-			}
+			if (notEmpty) execManager.execute(bundle, taskList);
 			writeResults(bundle, taskList);
 			if (notEmpty)
 			{
@@ -218,10 +206,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			if (debugEnabled) log.debug("end socket initialization");
 		}
 		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
-		TypedProperties props = JPPFConfiguration.getProperties();
-		int poolSize = props.getInt("processing.threads", 1);
-		log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
-		threadPool = Executors.newFixedThreadPool(poolSize);
+		execManager = new NodeExecutionManager(this);
 		if (debugEnabled) log.debug("end node initialization");
 	}
 
@@ -437,7 +422,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	{
 		if (debugEnabled) log.debug("stopping node");
 		stopped = true;
-		threadPool.shutdownNow();
+		execManager.shutdown();
 		if (closeSocket)
 		{
 			try
