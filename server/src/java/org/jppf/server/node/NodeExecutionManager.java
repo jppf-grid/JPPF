@@ -97,7 +97,7 @@ public class NodeExecutionManager
 		{
 			try
 			{
-				future.get();
+				if (!future.isDone()) future.get();
 			}
 			catch(CancellationException ignored)
 			{
@@ -144,6 +144,8 @@ public class NodeExecutionManager
 	public void shutdown()
 	{
 		threadPool.shutdownNow();
+		if (timeoutTimer != null) timeoutTimer.cancel();
+		timerTaskMap.clear();
 	}
 
 	/**
