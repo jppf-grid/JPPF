@@ -150,7 +150,7 @@ public class JPPFConnection extends JPPFAccessor implements Connection
 	}
 
 	/**
-	 * Get the results of an execution requests.<br>
+	 * Get the results of an execution request.<br>
 	 * This method should be called only once a call to
 	 * {@link #getSubmissionStatus(java.lang.String submissionId) getSubmissionStatus(submissionId)} has returned
 	 * either {@link org.jppf.jca.work.submission.JPPFSubmissionResult.Status#COMPLETE COMPLETE} or
