@@ -103,6 +103,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 		s.setConnectionStatus(nodeState.getConnectionStatus());
 		s.setExecutionStatus(nodeState.getExecutionStatus());
 		s.setTaskEvent(nodeState.getTaskNotification());
+		s.setTaskIdSet(nodeState.getAllTaskIds());
 		return s;
 	}
 
@@ -149,5 +150,46 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 				break;
 		}
 		nodeState.setNbTasksExecuted(node.getTaskCount());
+	}
+
+	/**
+	 * Cancel the execution of the tasks with the specified id.
+	 * @param id the id of the tasks to cancel.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#cancelTask(java.lang.String)
+	 */
+	public void cancelTask(String id)
+	{
+		node.getExecutionManager().cancelTask(id);
+	}
+
+	/**
+	 * Restart the execution of the tasks with the specified id.<br>
+	 * The task(s) will be restarted even if their execution has already completed.
+	 * @param id the id of the task or tasks to restart.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#restartTask(java.lang.String)
+	 */
+	public void restartTask(String id)
+	{
+		node.getExecutionManager().restartTask(id);
+	}
+
+	/**
+	 * Notification that a task witht the specified id has started.
+	 * @param id the id of the task.
+	 */
+	public void taskStarted(String id)
+	{
+		if (debugEnabled) log.debug("task id#" + id + " started");
+		nodeState.taskStarted(id);
+	}
+
+	/**
+	 * Notification that a task witht the specified id has ended.
+	 * @param id the id of the task.
+	 */
+	public void taskEnded(String id)
+	{
+		if (debugEnabled) log.debug("task id#" + id + " ended");
+		nodeState.taskEnded(id);
 	}
 }

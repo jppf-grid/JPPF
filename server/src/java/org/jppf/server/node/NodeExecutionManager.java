@@ -23,7 +23,6 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.JPPFException;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 
@@ -38,7 +37,7 @@ public class NodeExecutionManager
 	 */
 	private static Log log = LogFactory.getLog(NodeExecutionManager.class);
 	/**
-	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
@@ -57,6 +56,15 @@ public class NodeExecutionManager
 	 * Map of futures to corresponding timeout timer tasks.
 	 */
 	private Map<Future<?>, TimerTask> timerTaskMap = new HashMap<Future<?>, TimerTask>();
+	/**
+	 * List of tasks to restart.
+	 */
+	private List<JPPFTask> toResubmit = new ArrayList<JPPFTask>();
+	/**
+	 * 
+	 */
+	private Map<String, List<Pair<Future<?>, JPPFTask>>> idMap =
+		new HashMap<String, List<Pair<Future<?>, JPPFTask>>>();
 
 	/**
 	 * Initialize this execution manager with the specified node.
@@ -82,15 +90,57 @@ public class NodeExecutionManager
 	{
 		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
 		List<String> uuidList = bundle.getUuidPath().getList();
-		List<Future<?>> futureList = new ArrayList<Future<?>>(taskList.size());
-		for (JPPFTask task : taskList)
+		perform(uuidList, taskList);
+		List<JPPFTask> tempList = new ArrayList<JPPFTask>();
+		boolean done = false;
+		while (!done)
 		{
-			NodeTaskWrapper taskWrapper = new NodeTaskWrapper(node, task, uuidList);
-			Future<?> f = threadPool.submit(taskWrapper);
-			futureList.add(f);
-			if ((task.getTimeout() > 0L) || (task.getTimeoutDate() != null))
+			synchronized(this)
 			{
-				processTaskTimeout(task, f);
+				idMap.clear();
+				done = toResubmit.isEmpty();
+				if (!done)
+				{
+					tempList = toResubmit;
+					if (debugEnabled) log.debug("restarting " + tempList.size() + " tasks");
+				}
+				toResubmit = new ArrayList<JPPFTask>();
+			}
+			if (!done) perform(uuidList, tempList);
+		}
+	}
+
+	/**
+	 * Execute the specified tasks.
+	 * @param uuidList the uuid path for the classloader providers.
+	 * @param taskList the lsit of tasks to execute.
+	 * @throws Exception if the execution failed.
+	 */
+	private void perform(List<String> uuidList, List<JPPFTask> taskList) throws Exception
+	{
+		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
+		List<Future<?>> futureList = new ArrayList<Future<?>>(taskList.size());
+		synchronized(this)
+		{
+			for (JPPFTask task : taskList)
+			{
+				Future<?> f = threadPool.submit(new NodeTaskWrapper(node, task, uuidList));
+				futureList.add(f);
+				String id = task.getId();
+				if (id != null)
+				{
+					List<Pair<Future<?>, JPPFTask>> pairList = idMap.get(id);
+					if (pairList == null)
+					{
+						pairList = new ArrayList<Pair<Future<?>, JPPFTask>>();
+						idMap.put(id, pairList);
+					}
+					pairList.add(new Pair<Future<?>, JPPFTask>(f, task));
+				}
+				if ((task.getTimeout() > 0L) || (task.getTimeoutDate() != null))
+				{
+					processTaskTimeout(task, f);
+				}
 			}
 		}
 		for (Future<?> future : futureList)
@@ -106,6 +156,56 @@ public class NodeExecutionManager
 			if (tt != null) tt.cancel();
 		}
 		timerTaskMap.clear();
+	}
+
+	/**
+	 * Cancel the execution of the tasks with the specified id.
+	 * @param id the id of the tasks to cancel.
+	 */
+	public void cancelTask(String id)
+	{
+		synchronized(this)
+		{
+			if (debugEnabled) log.debug("cancelling tasks with id = " + id);
+			List<Pair<Future<?>, JPPFTask>> pairList = idMap.get(id);
+			if (pairList == null) return;
+			idMap.remove(id);
+			if (debugEnabled) log.debug("number of tasks to cancel: " + pairList.size());
+			for (Pair<Future<?>, JPPFTask> pair: pairList)
+			{
+				Future<?> future = pair.first();
+				if (!future.isDone())
+				{
+					future.cancel(true);
+					pair.second().onCancel();
+					//pair.second().setException(new JPPFException("This task was cancelled"));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Restart the execution of the tasks with the specified id.<br>
+	 * The task(s) will be restarted even if their execution has already completed.
+	 * @param id the id of the task or tasks to restart.
+	 */
+	public void restartTask(String id)
+	{
+		synchronized(this)
+		{
+			if (debugEnabled) log.debug("restarting tasks with id = " + id);
+			List<Pair<Future<?>, JPPFTask>> pairList = idMap.get(id);
+			if (pairList == null) return;
+			idMap.remove(id);
+			if (debugEnabled) log.debug("number of tasks to restart: " + pairList.size());
+			for (Pair<Future<?>, JPPFTask> pair: pairList)
+			{
+				Future<?> future = pair.first();
+				if (!future.isDone()) future.cancel(true);
+				toResubmit.add(pair.second());
+				pair.second().onRestart();
+			}
+		}
 	}
 
 	/**
@@ -127,7 +227,7 @@ public class NodeExecutionManager
 			}
 			catch(ParseException e)
 			{
-				log.error("Unparseable timeout date: " + date + ", format = " + sdf.toPattern());
+				log.error("Unparseable timeout date: " + date + ", format = " + sdf.toPattern(), e);
 			}
 		}
 		if (time > 0L)
@@ -146,45 +246,5 @@ public class NodeExecutionManager
 		threadPool.shutdownNow();
 		if (timeoutTimer != null) timeoutTimer.cancel();
 		timerTaskMap.clear();
-	}
-
-	/**
-	 * Instances of this class are scheduled by a timer to execute one time, check whether the corresponding
-	 * JPPF task timeout has been reached, and asbort the task if necessary.
-	 */
-	public class TimeoutTimerTask extends TimerTask
-	{
-		/**
-		 * The future on which to call the cancel() method.
-		 */
-		private Future<?> future = null;
-		/**
-		 * The task to cancel.
-		 */
-		private JPPFTask task = null;
-
-		/**
-		 * Initialize this timer task with the specified future.
-		 * @param future the future used to cancel the underlying JPPF task.
-		 * @param task the task to cancel.
-		 */
-		public TimeoutTimerTask(Future<?> future, JPPFTask task)
-		{
-			this.future = future;
-			this.task = task;
-		}
-
-		/**
-		 * Execute this task.
-		 * @see java.util.TimerTask#run()
-		 */
-		public void run()
-		{
-			if (!future.isDone())
-			{
-				future.cancel(true);
-				task.setException(new JPPFException("This task has timed out"));
-			}
-		}
 	}
 }

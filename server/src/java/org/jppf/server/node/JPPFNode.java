@@ -45,7 +45,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	private static Log log = LogFactory.getLog(JPPFNode.class);
 	/**
-	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
@@ -79,7 +79,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	/**
 	 * The task execution manager for this node.
 	 */
-	private NodeExecutionManager execManager = null;
+	private NodeExecutionManager executionManager = null;
 	/**
 	 * Holds the count of currently executing tasks.
 	 * Used to determine when this node is busy or idle.
@@ -150,16 +150,14 @@ public class JPPFNode extends AbstractMonitoredNode
 				Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
 				if (params != null) bundle.getParametersMap().putAll(params);
 				TypedProperties props = JPPFConfiguration.getProperties();
-				String host = NetworkUtils.getNonLocalHostAddress();
-				if (host == null) host = "localhost";
-				bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, props.getString("jppf.management.host", host));
+				bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
 				bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
 				bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeLauncher.getJmxServer().getId());
 			}
 			List<JPPFTask> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
 			if (debugEnabled) log.debug("received " + (notEmpty ? "a non-" : "an ") + "empty bundle");
-			if (notEmpty) execManager.execute(bundle, taskList);
+			if (notEmpty) executionManager.execute(bundle, taskList);
 			writeResults(bundle, taskList);
 			if (notEmpty)
 			{
@@ -206,7 +204,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			if (debugEnabled) log.debug("end socket initialization");
 		}
 		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
-		execManager = new NodeExecutionManager(this);
+		executionManager = new NodeExecutionManager(this);
 		if (debugEnabled) log.debug("end node initialization");
 	}
 
@@ -422,7 +420,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	{
 		if (debugEnabled) log.debug("stopping node");
 		stopped = true;
-		execManager.shutdown();
+		executionManager.shutdown();
 		if (closeSocket)
 		{
 			try
@@ -489,5 +487,14 @@ public class JPPFNode extends AbstractMonitoredNode
 	public synchronized void setNodeAdmin(JPPFNodeAdmin nodeAdmin)
 	{
 		this.nodeAdmin = nodeAdmin;
+	}
+
+	/**
+	 * Get the task execution manager for this node.
+	 * @return a <code>NodeExecutionManager</code> instance.
+	 */
+	public NodeExecutionManager getExecutionManager()
+	{
+		return executionManager;
 	}
 }

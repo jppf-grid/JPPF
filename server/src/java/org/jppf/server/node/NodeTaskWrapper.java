@@ -66,6 +66,7 @@ class NodeTaskWrapper implements Runnable
 		try
 		{
 			nodeAdmin = node.getNodeAdmin();
+			nodeAdmin.taskStarted(task.getId());
 			task.addJPPFTaskListener(nodeAdmin);
 			Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
 			task.run();
@@ -77,6 +78,7 @@ class NodeTaskWrapper implements Runnable
 		}
 		finally
 		{
+			if (nodeAdmin != null) nodeAdmin.taskEnded(task.getId());
 			task.removeJPPFTaskListener(nodeAdmin);
 		}
 		if (node.isNotifying()) node.decrementExecutingCount();
