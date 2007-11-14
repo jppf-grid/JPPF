@@ -18,6 +18,7 @@
 package org.jppf.server.protocol;
 
 import java.io.Serializable;
+import java.text.*;
 import java.util.*;
 
 import org.jppf.task.storage.DataProvider;
@@ -61,6 +62,25 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 * List of listeners for this task.
 	 */
 	protected transient List<JPPFTaskListener> listeners = null;
+	/**
+	 * Time in milliseconds, after which this task will be aborted.<br>
+	 * A value of 0 or less indicates this task never times out.
+	 */
+	private long timeout = 0L;
+	/**
+	 * Timeout date as a string.
+	 */
+	private String timeoutDate = null;
+	/**
+	 * Format describing the timeout date.
+	 */
+	private SimpleDateFormat timeoutDateFormat = null;
+	/**
+	 * A user-assigned id for this task.<br>
+	 * This id is used as a task identifier when cancelling or restarting a task
+	 * using the remote management functionalities.
+	 */
+	private String id = null;
 
 	/**
 	 * Get the result of the task execution.
@@ -172,5 +192,103 @@ public abstract class JPPFTask implements Runnable, Serializable
 	{
 		if (listeners == null) listeners = new ArrayList<JPPFTaskListener>();
 		return listeners;
+	}
+
+	/**
+	 * Get the timeout for this task.
+	 * @return the timeout in milliseconds.
+	 */
+	public long getTimeout()
+	{
+		return timeout;
+	}
+
+	/**
+	 * Set the timeout for this task.
+	 * @param timeout the timeout in milliseconds.
+	 */
+	public void setTimeout(long timeout)
+	{
+		this.timeout = timeout;
+		this.timeoutDate = null;
+		this.timeoutDateFormat = null;
+	}
+
+	/**
+	 * Get the timeout date for this task.
+	 * @return the date in string format.
+	 */
+	public String getTimeoutDate()
+	{
+		return timeoutDate;
+	}
+
+	/**
+	 * Get the format of timeout date for this task.
+	 * @return a <code>SimpleDateFormat</code> instance.
+	 */
+	public SimpleDateFormat getTimeoutDateFormat()
+	{
+		return timeoutDateFormat;
+	}
+
+	/**
+	 * Set the timeout date for this task.<br>
+	 * Calling this method will reset the timeout value, as both timeout duration and timeout date
+	 * are mutually exclusive.
+	 * @param timeoutDate the date to set in string representation.
+	 * @param timeoutDateFormat the format of of the date to set.
+	 * @see java.text.SimpleDateFormat
+	 */
+	public void setTimeoutDate(String timeoutDate, SimpleDateFormat timeoutDateFormat)
+	{
+		this.timeout = 0L;
+		this.timeoutDate = timeoutDate;
+		this.timeoutDateFormat = timeoutDateFormat;
+	}
+
+	/**
+	 * Get the user-assigned id for this task.
+	 * @return the id as a string.
+	 */
+	public String getId()
+	{
+		return id;
+	}
+
+	/**
+	 * Set the user-assigned id for this task.
+	 * @param id the id as a string.
+	 */
+	public void setId(String id)
+	{
+		this.id = id;
+	}
+
+	/**
+	 * Callback invoked when this task is cancelled.
+	 * The default implementation does nothing and should be overriden by
+	 * subclasses that desire to implement a specific behaviour on cancellation.
+	 */
+	public void onCancel()
+	{
+	}
+
+	/**
+	 * Callback invoked when this task is restarted.
+	 * The default implementation does nothing and should be overriden by
+	 * subclasses that desire to implement a specific behaviour on restart.
+	 */
+	public void onRestart()
+	{
+	}
+
+	/**
+	 * Callback invoked when this task times out.
+	 * The default implementation does nothing and should be overriden by
+	 * subclasses that desire to implement a specific behaviour on timeout.
+	 */
+	public void onTimeout()
+	{
 	}
 }

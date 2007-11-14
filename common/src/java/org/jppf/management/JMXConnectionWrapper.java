@@ -76,8 +76,12 @@ public class JMXConnectionWrapper extends ThreadSynchronization
   /**
    * Default credentials for authenticating with the MBean server.
    */
-  private String[] credentials = { "username" , "password" }; 
-
+  private String[] credentials = { "username" , "password" };
+  /**
+   * Determines whether the connection to the JMX server has been established.
+   */
+  private boolean connected = false;
+ 
 	/**
 	 * Initialize the connection to the remote MBean server.
 	 * @param host the host the server is running on.
@@ -116,14 +120,13 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	{
     synchronized(this)
     {
+    	connected = false;
       HashMap env = new HashMap(); 
-      env.put("jmx.remote.credentials", credentials); 
+      //env.put("jmx.remote.credentials", credentials);
+      //System.setProperty("java.rmi.server.hostname", host);
       jmxc = JMXConnectorFactory.connect(url, env);
     	mbeanConnection = jmxc.getMBeanServerConnection();
-    	/*
-    	Set set = mbeanConnection.queryNames(null, null);
-    	for (Object o: set) allNames.add((ObjectName) o);
-    	*/
+    	connected = true;
     }
 		log.info(getId() + "RMI connection successfully established");
 	}
@@ -216,7 +219,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 					}
 					catch(Exception ignored)
 					{
-						if (debugEnabled) log.debug(getId(), ignored);
+						if (debugEnabled) log.debug(getId()+ "JMX URL = "+url, ignored);
 						try
 						{
 							Thread.sleep(100);
@@ -258,6 +261,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		{
 			setConnecting(false);
 			setStopped(true);
+			wakeUp();
 		}
 
 		/**
@@ -322,5 +326,14 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	public synchronized MBeanServerConnection getMbeanConnection()
 	{
 		return mbeanConnection;
+	}
+
+	/**
+   * Determines whether the connection to the JMX server has been established.
+	 * @return true if the connection is established, false otherwise.
+	 */
+	public synchronized boolean isConnected()
+	{
+		return connected;
 	}
 }
