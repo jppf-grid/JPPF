@@ -32,7 +32,7 @@ public class NodeInfoHolder
 	/**
 	 * The JMX client for the node.
 	 */
-	private JMXConnectionWrapper jmxClient = null;
+	private JMXNodeConnectionWrapper jmxClient = null;
 	/**
 	 * Determines whether the automatic refresh for the node is active. 
 	 */
@@ -43,7 +43,7 @@ public class NodeInfoHolder
 	 * @param state holds state information about the node.
 	 * @param jmxClient the JMX client for the node.
 	 */
-	public NodeInfoHolder(JPPFNodeState state, JMXConnectionWrapper jmxClient)
+	public NodeInfoHolder(JPPFNodeState state, JMXNodeConnectionWrapper jmxClient)
 	{
 		this.state = state;
 		this.jmxClient = jmxClient;
@@ -71,7 +71,7 @@ public class NodeInfoHolder
 	 * Get the JMX client for the node.
 	 * @return a <code>JMXConnectionWrapper</code> instance.
 	 */
-	public JMXConnectionWrapper getJmxClient()
+	public JMXNodeConnectionWrapper getJmxClient()
 	{
 		return jmxClient;
 	}

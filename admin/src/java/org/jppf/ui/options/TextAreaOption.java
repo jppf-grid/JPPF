@@ -17,9 +17,12 @@
  */
 package org.jppf.ui.options;
 
+import java.awt.Dimension;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.Document;
+
 import org.jppf.ui.utils.GuiUtils;
 
 /**
@@ -66,7 +69,7 @@ public class TextAreaOption extends AbstractOption
 		textArea.setBorder(BorderFactory.createEmptyBorder());
 		if (toolTipText != null) textArea.setToolTipText(toolTipText);
 		textArea.setEditable(false);
-		textArea.setOpaque(false);
+		//textArea.setOpaque(false);
 		if (scrollable)
 		{
 			JScrollPane scrollPane = new JScrollPane(textArea);
@@ -79,6 +82,13 @@ public class TextAreaOption extends AbstractOption
 			mainPanel.setBorder(BorderFactory.createTitledBorder(label));
 			mainPanel.add(textArea);
 			UIComponent = mainPanel;
+		}
+		if ((width > 0) && (height > 0))
+		{
+			Dimension d = new Dimension(width, height);
+			textArea.setPreferredSize(d);
+			textArea.setMinimumSize(d);
+			textArea.setMaximumSize(d);
 		}
 		setupValueChangeNotifications();
 	}
@@ -154,12 +164,30 @@ public class TextAreaOption extends AbstractOption
 	}
 
 	/**
+	 * Determine whether the text area is editable.
+	 * @return true if the text area is editable, false otherwise.
+	 */
+	public boolean isEditable()
+	{
+		return textArea.isEditable();
+	}
+
+	/**
+	 * Specifiy whether the text area is editable.
+	 * @param editable true if the text area is editable, false otherwise.
+	 */
+	public void setEditable(boolean editable)
+	{
+		textArea.setEditable(editable);
+	}
+
+	/**
 	 * Enable or disable this option.
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
 	public void setEnabled(boolean enabled)
 	{
-		((JTextArea) UIComponent).setEnabled(enabled);
+		textArea.setEnabled(enabled);
 	}
 }

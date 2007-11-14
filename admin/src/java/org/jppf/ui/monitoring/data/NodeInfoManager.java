@@ -63,7 +63,7 @@ public class NodeInfoManager
 	public synchronized void addNode(NodeManagementInfo nodeInfo)
 	{
 		NodeInfoHolder mgr = new NodeInfoHolder(new JPPFNodeState(),
-			new JMXConnectionWrapper(nodeInfo.getHost(), nodeInfo.getPort()));
+			new JMXNodeConnectionWrapper(nodeInfo.getHost(), nodeInfo.getPort()));
 		nodeMap.put(nodeInfo, mgr);
 	}
 

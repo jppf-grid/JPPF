@@ -18,7 +18,10 @@
 package org.jppf.ui.options.xml;
 
 import java.util.*;
+
 import javax.swing.ListSelectionModel;
+
+import org.jppf.ui.monitoring.node.NodeDataPanel;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.options.xml.OptionDescriptor.ItemDescriptor;
@@ -107,7 +110,9 @@ public class OptionElementFactory
 		TextAreaOption option = new TextAreaOption();
 		option.setEventsEnabled(false);
 		builder.initCommonOptionAttributes(option, desc);
+		//option.setBordered(desc.getBoolean("bordered", true));
 		option.createUI();
+		option.setEditable(desc.getBoolean("editable", false));
 		option.setEventsEnabled(true);
 		return option;
 	}
@@ -376,13 +381,31 @@ public class OptionElementFactory
 	}
 
 	/**
-	 * Build an option with a UI ocmponent created from a Java class.
+	 * Build an option with a UI component created from a Java class.
 	 * @param desc the descriptor to get the properties from.
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
 	public Option buildJavaOption(OptionDescriptor desc) throws Exception
 	{
-		return new JavaOption(desc.name, desc.getProperty("class"));
+		JavaOption option = new JavaOption();
+		builder.initCommonOptionAttributes(option, desc);
+		option.setClassName(desc.getProperty("class"));
+		option.setMouseListenerClassName(desc.getProperty("mouseListenerClass"));
+		option.createUI();
+		return option;
+	}
+
+	/**
+	 * Build a NodeDataPanel from the specified descriptor.
+	 * @param desc the descriptor to get the properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public Option buildNodeDataPanel(OptionDescriptor desc) throws Exception
+	{
+		NodeDataPanel option = new NodeDataPanel();
+		builder.initCommonOptionAttributes(option, desc);
+		return option;
 	}
 }

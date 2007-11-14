@@ -85,7 +85,7 @@ public class NodeRefreshTask extends TimerTask
 		JPPFNodeState state = null;
 		try
 		{
-			state = (JPPFNodeState) infoHolder.getJmxClient().invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "state", null, null);
+			state = infoHolder.getJmxClient().state();
 		}
 		catch(Exception ignored)
 		{

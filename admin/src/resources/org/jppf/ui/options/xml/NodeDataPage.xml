@@ -64,7 +64,7 @@
 				<listener type="script">
 					<script language="javascript"><![CDATA[
 						b = option.getValue().booleanValue();
-						var handler = option.findFirstWithName("/Treetable").getUIComponent().getHandler();
+						var handler = option.findFirstWithName("/Treetable").getHandler();
 						if (b) handler.startRefreshDriverTimer();
 						else handler.stopRefreshDriverTimer();
 					]]></script>
@@ -83,7 +83,7 @@
 					<property name="tooltip" value=""/>
 					<listener type="script">
 						<script language="javascript"><![CDATA[
-							option.findFirstWithName("/Treetable").getUIComponent().getHandler().refresh(true);
+							option.findFirstWithName("/Treetable").getHandler().refresh(true);
 						]]></script>
 					</listener>
 				</child>
@@ -110,7 +110,7 @@
 				<property name="tooltip" value=""/>
 				<listener type="script">
 					<script language="javascript"><![CDATA[
-						option.findFirstWithName("/Treetable").getUIComponent().getTreeTable().expandAll();
+						option.findFirstWithName("/Treetable").getTreeTable().expandAll();
 					]]></script>
 				</listener>
 			</child>
@@ -120,7 +120,7 @@
 				<property name="tooltip" value=""/>
 				<listener type="script">
 					<script language="javascript"><![CDATA[
-						option.findFirstWithName("/Treetable").getUIComponent().getTreeTable().collapseAll();
+						option.findFirstWithName("/Treetable").getTreeTable().collapseAll();
 					]]></script>
 				</listener>
 			</child>
@@ -138,11 +138,10 @@
 	<!--                      Tree table area                                  -->
 	<!-- ===================================================================== -->
 
-	<child name="Treetable" type="Java">
-		<property name="class" value="org.jppf.ui.monitoring.node.NodeDataPanel"/>
+	<child name="Treetable" type="NodeDataPanel">
 		<property name="label" value=""/>
 		<property name="tooltip" value=""/>
 		<property name="value" value=""/>
 	</child>
-
+	
 </opt:main>

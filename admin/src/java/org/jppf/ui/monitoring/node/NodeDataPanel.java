@@ -29,13 +29,14 @@ import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jppf.server.NodeManagementInfo;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
+import org.jppf.ui.options.AbstractOption;
 import org.jppf.utils.LocalizationUtils;
 
 /**
  * Panel displaying the tree of all driver connections and attached nodes.
  * @author Laurent Cohen
  */
-public class NodeDataPanel extends JScrollPane implements NodeHandlerListener
+public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 {
 	/**
 	 * Base name for localization bundle lookups.
@@ -53,6 +54,7 @@ public class NodeDataPanel extends JScrollPane implements NodeHandlerListener
 	 * The tree table model associated witht he tree table.
 	 */
 	private transient JPPFNodeTreeTableModel model = null;
+
 	/**
 	 * Initialize this panel with the specified information.
 	 */
@@ -99,12 +101,14 @@ public class NodeDataPanel extends JScrollPane implements NodeHandlerListener
 	/**
 	 * Create, initialize and layout the GUI components displayed in this panel.
 	 */
-	private void createUI()
+	public void createUI()
 	{
 	  treeTable = new JXTreeTable(model);
-	  setViewportView(treeTable);
+	  //setViewportView(treeTable);
 		treeTable.expandAll();
-	  for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
+	  //for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
+		setUIComponent(new JScrollPane(treeTable));
+		treeTable.addMouseListener(new TreeTableMouseListener());
 	}
 
 	/**
@@ -239,5 +243,31 @@ public class NodeDataPanel extends JScrollPane implements NodeHandlerListener
 	public synchronized JXTreeTable getTreeTable()
 	{
 		return treeTable;
+	}
+
+	/**
+	 * Not implemented.
+	 * @param enabled not used.
+	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
+	 */
+	public void setEnabled(boolean enabled)
+	{
+	}
+
+	/**
+	 * Not implemented.
+	 * @param enabled not used.
+	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
+	 */
+	public void setEventsEnabled(boolean enabled)
+	{
+	}
+
+	/**
+	 * Not implemented.
+	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
+	 */
+	protected void setupValueChangeNotifications()
+	{
 	}
 }

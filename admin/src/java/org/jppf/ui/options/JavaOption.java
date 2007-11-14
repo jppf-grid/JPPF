@@ -17,6 +17,8 @@
  */
 package org.jppf.ui.options;
 
+import java.awt.event.*;
+
 import javax.swing.JComponent;
 
 /**
@@ -29,6 +31,10 @@ public class JavaOption extends AbstractOption
 	 * The fully qualified class name of the UI component to instantiate.
 	 */
 	protected String className = null;
+	/**
+	 * Name of the mouseListener to set on this element.
+	 */
+	protected String mouseListenerClassName = null;
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -39,18 +45,6 @@ public class JavaOption extends AbstractOption
 	}
 
 	/**
-	 * Initialize this boolean option with the specified parameters.
-	 * @param name this component's name.
-	 * @param className the fully qualified class name of the UI component to instantiate.
-	 */
-	public JavaOption(String name, String className)
-	{
-		this.name = name;
-		this.className = className;
-		createUI();
-	}
-
-	/**
 	 * Create the UI components for this option.
 	 */
 	public void createUI()
@@ -58,6 +52,13 @@ public class JavaOption extends AbstractOption
 		try
 		{
 			UIComponent = (JComponent) Class.forName(className).newInstance();
+			if (mouseListenerClassName != null)
+			{
+				JavaOptionMouseListener ml =
+					(JavaOptionMouseListener) Class.forName(mouseListenerClassName).newInstance();
+				ml.setOption(this);
+				UIComponent.addMouseListener(ml);
+			}
 		}
 		catch(Exception e)
 		{
@@ -99,5 +100,53 @@ public class JavaOption extends AbstractOption
 	public synchronized void setClassName(String className)
 	{
 		this.className = className;
+	}
+
+	/**
+	 * Abstract superclass for mouse listeners set on this type of option.
+	 */
+	public static abstract class JavaOptionMouseListener extends MouseAdapter
+	{
+		/**
+		 * The option on which this listener is set.
+		 */
+		protected JavaOption option = null;
+
+		/**
+		 * Get the option on which this listener is set.
+		 * @return a <code>JavaOption</code> instance.
+		 */
+		public JavaOption getOption()
+		{
+			return option;
+		}
+
+		/**
+		 * Set the option on which this listener is set.
+		 * @param option a <code>JavaOption</code> instance.
+		 */
+		public void setOption(JavaOption option)
+		{
+			this.option = option;
+		}
+	}
+
+	/**
+	 * Get the class name of the mouseListener to set on this element.
+	 * @return the class name as a string.
+	 */
+	public String getMouseListenerClassName()
+	{
+		return mouseListenerClassName;
+	}
+
+	/**
+	 * Set the class name of the mouseListener to set on this element.
+	 * @param mouseListenerClassName the class name as a string.
+	 */
+	public void setMouseListenerClassName(String mouseListenerClassName)
+	{
+		this.mouseListenerClassName = mouseListenerClassName;
+		
 	}
 }
