@@ -178,4 +178,54 @@ public final class FileUtils
 		if (idx >=0) return filePath.substring(idx+1);
 		return null;
 	}
+
+	/**
+	 * Split a file into multiple files whose size is as close as possible to the specified split size.
+	 * @param file the etxt file to split.
+	 * @param splitSize the maximum file of each split file.
+	 * @throws IOException if an IO error occurs.
+	 */
+	public static void splitTextFile(String file, int splitSize) throws IOException
+	{
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		StringBuilder sb = new StringBuilder();
+		String s = "";
+		int count = 0;
+		while (s != null)
+		{
+			s = reader.readLine();
+			if (s == null) break;
+			sb.append(s).append("\n");
+			if (sb.length() >= splitSize)
+			{
+				count++;
+				writeTextFile(file +"." + count, sb.toString());
+				sb = new StringBuilder();
+			}
+		}
+		if (sb.length() > 0)
+		{
+			count++;
+			writeTextFile(file +"." + count, sb.toString());
+		}
+		reader.close();
+	}
+
+	/**
+	 * Entry point for the splitTextFile() method.
+	 * @param args contains the arguments for the splitTextFile() method.
+	 */
+	public static void main(String...args)
+	{
+		try
+		{
+			int size = Integer.valueOf(args[1]).intValue();
+			splitTextFile(args[0], size);
+			System.out.println("Done");
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 }
