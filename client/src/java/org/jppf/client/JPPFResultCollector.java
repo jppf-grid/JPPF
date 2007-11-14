@@ -33,7 +33,7 @@ import org.jppf.server.protocol.JPPFTask;
 public class JPPFResultCollector implements TaskResultListener
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(JPPFResultCollector.class);
 	/**
