@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src/resources"/>
+	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src/resources"/>
+	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src/java"/>
+	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src/java"/>
+	<classpathentry kind="lib" path="shared/lib/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jaligner.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-admin.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-client.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-common-node.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-common.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-server.jar"/>
+	<classpathentry kind="lib" path="shared/lib/log4j-1.2.9.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="shared/lib/js.jar"/>
+	<classpathentry kind="lib" path="shared/lib/substance-3.1.jar"/>
+	<classpathentry kind="output" path="shared/classes"/>
+</classpath>
