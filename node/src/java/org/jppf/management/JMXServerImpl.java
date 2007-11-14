@@ -18,10 +18,15 @@
 
 package org.jppf.management;
 
+import java.io.*;
+import java.net.*;
 import java.rmi.registry.*;
+import java.rmi.server.RMISocketFactory;
+import java.util.HashMap;
 
 import javax.management.*;
 import javax.management.remote.*;
+import javax.management.remote.rmi.RMIConnectorServer;
 
 import org.apache.commons.logging.*;
 import org.jppf.utils.*;
@@ -71,11 +76,15 @@ public class JMXServerImpl
 		server = MBeanServerFactory.createMBeanServer();
     if (getRegistry() == null) setRegistry(locateOrCreateRegistry());
 		TypedProperties props = JPPFConfiguration.getProperties();
-		//String host = props.getProperty("jppf.server.host", "localhost");
-		String host = "localhost";
+		String host = NetworkUtils.getManagementHost();
 		int port = props.getInt("jppf.management.port", 11198);
+		InetAddress addr = InetAddress.getByName(host);
+		JSESocketFactory factory = new JSESocketFactory(addr);
+		HashMap env = new HashMap(); 
+		env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, factory);
+		env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, factory); 
     JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+host+":"+port+"/jppf");
-    connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, null, server);
+    connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
     connectorServer.start();
 
     /*
@@ -84,7 +93,7 @@ public class JMXServerImpl
 		HashMap env = new HashMap(); 
 		SslRMIClientSocketFactory csf = new SslRMIClientSocketFactory(); 
 		SslRMIServerSocketFactory ssf =  new SslRMIServerSocketFactory(); 
-		env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,csf); 
+		env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,csf);
 		env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE,ssf); 
 		env.put("jmx.remote.x.password.file","jmxconfig/password.properties"); 
 		env.put("jmx.remote.x.access.file", "jmxconfig/access.properties"); 
@@ -157,33 +166,11 @@ public class JMXServerImpl
 	private static synchronized Registry locateOrCreateRegistry() throws Exception
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = props.getProperty("jppf.management.host", "localhost");
+		String host = NetworkUtils.getManagementHost();
 		int port = props.getInt("jppf.management.port", 11198);
-		Registry reg = null;
-		/*
-		try
-		{
-			reg = LocateRegistry.getRegistry(host, port);
-			String uuid = new JPPFUuid(JPPFUuid.ALPHA_NUM, 24).toString();
-			reg.lookup(uuid);
-		}
-		catch(NotBoundException e)
-		{
-			// NotBoundException means the registry is there and we can use it. 
-			if (debugEnabled) log.debug("Found RMI registry at ["+host+":"+port+"]");
-			return reg;
-		}
-		catch(Exception e)
-		{
-			if (debugEnabled)
-			{
-				log.debug("specified RMI registry ["+host+":"+port+"] not found, creating an embedded one ...");
-				log.debug(e.getMessage(), e);
-			}
-		}
-		*/
-		reg = LocateRegistry.createRegistry(port);
-		//props.setProperty("jppf.management.host", "localhost");
+		InetAddress addr = InetAddress.getByName(host);
+		JSESocketFactory factory = new JSESocketFactory(addr);
+		Registry reg = LocateRegistry.createRegistry(port, factory, factory);
 		return reg;
 	}
 
@@ -214,5 +201,51 @@ public class JMXServerImpl
 	public String getId()
 	{
 		return id;
+	}
+
+	/**
+	 * Custom socket factory used to force the binding of the RMI connector
+	 * to the host address specified in the configuration.
+	 */
+	static class JSESocketFactory extends RMISocketFactory implements Serializable
+	{
+	  /**
+	   * The host address to bind to.
+	   */
+	  private InetAddress bindAddress;
+
+	  /**
+	   * Initialize this socket factory with the specified address.
+	   * @param bindAddress the host address to bind to.
+	   */
+	  public JSESocketFactory(InetAddress bindAddress)
+	  {
+	    this.bindAddress = bindAddress;
+	  }
+
+	  /**
+	   * Create a server socket.
+	   * @param port the prot to bind to.
+	   * @return a <code>ServerSocket</code> instance.
+	   * @throws IOException if the socket could not be created.
+	   * @see java.rmi.server.RMISocketFactory#createServerSocket(int)
+	   */
+	  public ServerSocket createServerSocket(int port) throws IOException
+	  {
+	    return new ServerSocket(port, 50, bindAddress);
+	  }
+
+	  /**
+	   * Create a client socket.
+	   * @param host not used, replaced with the host address specified in the constructor. 
+	   * @param port the port to bind to.
+	   * @return a <code>Socket</code> instance.
+	   * @throws IOException if the socket could not be created.
+	   * @see java.rmi.server.RMISocketFactory#createSocket(java.lang.String, int)
+	   */
+	  public Socket createSocket(String host, int port)  throws IOException
+	  {
+	    return new Socket(bindAddress, port);
+	  }
 	}
 }

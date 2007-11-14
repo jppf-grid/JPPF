@@ -37,4 +37,15 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean<NodeParameter, Object
 	 * @return the notification as a <code>Serializable</code> object.
 	 */
 	Serializable notification();
+	/**
+	 * Cancel the execution of the tasks with the specified id.
+	 * @param id the id of the tasks to cancel.
+	 */
+	void cancelTask(String id);
+	/**
+	 * Restart the execution of the tasks with the specified id.<br>
+	 * The task(s) will be restarted even if their execution has already completed.
+	 * @param id the id of the task or tasks to restart.
+	 */
+	void restartTask(String id);
 }

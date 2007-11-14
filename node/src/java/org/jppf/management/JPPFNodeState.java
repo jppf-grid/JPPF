@@ -19,6 +19,7 @@
 package org.jppf.management;
 
 import java.io.Serializable;
+import java.util.*;
 
 import org.jppf.node.event.NodeEventType;
 
@@ -45,6 +46,14 @@ public class JPPFNodeState implements Serializable
 	 * The number of tasks executed by the node.
 	 */
 	private int nbTasksExecuted = 0;
+	/**
+	 * Holder for all latest task notifications issued from multiple execution threads. 
+	 */
+	private transient Map<String, Integer> taskIdMap = new HashMap<String, Integer>();
+	/**
+	 * List of the ids of all tasks currently executing.
+	 */
+	private Set<String> taskIdSet = new HashSet<String>();
 
 	/**
 	 * Get the latest event received from a task.
@@ -116,5 +125,55 @@ public class JPPFNodeState implements Serializable
 	public synchronized void setExecutionStatus(String executionStatus)
 	{
 		this.executionStatus = executionStatus;
+	}
+
+	/**
+	 * Notification that a task with the specified id has started.
+	 * @param id the id of the task.
+	 */
+	public synchronized void taskStarted(String id)
+	{
+		if (id == null) return;
+		Integer n = taskIdMap.get(id);
+		if (n == null) n = 1;
+		else n = n + 1;
+		if (!taskIdSet.contains(id)) taskIdSet.add(id);
+		taskIdMap.put(id, n);
+	}
+
+	/**
+	 * Notification that a task with the specified id has ended.
+	 * @param id the id of the task.
+	 */
+	public synchronized void taskEnded(String id)
+	{
+		if (id == null) return;
+		Integer n = taskIdMap.get(id);
+		if (n == null) return;
+		n = n - 1;
+		if (n <= 0)
+		{
+			taskIdMap.remove(id);
+			taskIdSet.remove(id);
+		}
+		else taskIdMap.put(id, n);
+	}
+
+	/**
+	 * Get the ids of all currently executing tasks.
+	 * @return the ids as a set of strings.
+	 */
+	public synchronized Set<String> getAllTaskIds()
+	{
+		return Collections.unmodifiableSet(taskIdSet);
+	}
+
+	/**
+	 * Set the ids of all currently executing tasks.
+	 * @param taskIdSet the ids as a set of strings.
+	 */
+	public synchronized void setTaskIdSet(Set<String> taskIdSet)
+	{
+		this.taskIdSet = taskIdSet;
 	}
 }

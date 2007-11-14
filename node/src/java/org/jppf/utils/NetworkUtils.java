@@ -21,12 +21,30 @@ package org.jppf.utils;
 import java.net.*;
 import java.util.Enumeration;
 
+import org.apache.commons.logging.*;
+
 /**
  * 
  * @author Laurent Cohen
  */
 public final class NetworkUtils
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(NetworkUtils.class);
+	/**
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+
+	/**
+	 * Instantiation opf this class is not permitted.
+	 */
+	private NetworkUtils()
+	{
+	}
+
 	/**
 	 * Get the non local (meaning neither localhost or loopback address) of the current host.
 	 * @return the ip address as a string.
@@ -53,6 +71,21 @@ public final class NetworkUtils
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	/**
+	 * Get the management host specifieed in the configuration file.
+	 * @return the host as a string.
+	 */
+	public static String getManagementHost()
+	{
+		TypedProperties props = JPPFConfiguration.getProperties();
+		String host = NetworkUtils.getNonLocalHostAddress();
+		if (debugEnabled) log.debug("JMX host from NetworkUtils: "+host);
+		if (host == null) host = "localhost";
+		host = props.getString("jppf.management.host", host);
+		if (debugEnabled) log.debug("computed JMX host: "+host);
+		return host;
 	}
 
 	/**

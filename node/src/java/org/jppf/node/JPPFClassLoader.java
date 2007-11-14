@@ -35,11 +35,11 @@ import org.jppf.utils.*;
 public class JPPFClassLoader extends ClassLoader
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(JPPFClassLoader.class);
 	/**
-	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
@@ -354,7 +354,8 @@ public class JPPFClassLoader extends ClassLoader
 				{
 					try
 					{
-						url = file.toURL();
+						//url = file.toURL();
+						url = file.toURI().toURL();
 						if (debugEnabled) log.debug("resource [" + name + "] found with URL: "+url);
 					}
 					catch (Exception e)
