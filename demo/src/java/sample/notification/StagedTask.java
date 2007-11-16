@@ -48,6 +48,7 @@ public class StagedTask extends JPPFTask
 	public StagedTask(int taskId, int nbStages, long interval)
 	{
 		this.taskId = taskId;
+		setId(""+taskId);
 		this.nbStages = nbStages;
 		this.interval = interval;
 	}

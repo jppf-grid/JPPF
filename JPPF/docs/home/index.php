@@ -8,8 +8,14 @@
 		<link rel="stylesheet" type="text/css" href="./jppf.css" title="Style">
 	</head>
 	<body>
+		<script type="text/javascript">
+			function setImage(id, image)
+			{
+				document.getElementById(id).src=image;
+			}
+		</script>
 		<div align="center">
-				<table align="center" width="80%" cellspacing="0" cellpadding="5"
+				<table align="center" width="70%" cellspacing="0" cellpadding="5"
 			class="table_" style="background: url('images/grid.gif'); background-repeat: repeat; background-attachment: fixed">
 			<tr><td height="5"></td></tr>
 			<tr>
@@ -21,8 +27,8 @@
 				</td>
 				<td width="30%" align="right">
 					<a href="http://sourceforge.net" target="_top">
-						<img src="http://sourceforge.net/sflogo.php?group_id=135654&amp;type=4"
-							width="125" height="37" border="0" alt="SourceForge.net Logo" />
+						<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&amp;type=1"
+							width="88" height="31" border="0" alt="SourceForge.net Logo" />
 					</a>
 				</td>
 			</tr>
@@ -30,20 +36,21 @@
 		</table>
 		<!--<table border="0" style="background-color: #8080FF" cellspacing="0" cellpadding="0" width="80%">-->
 		<table style="background: url('images/bkg-menu.gif'); background-repeat: repeat; background-attachment: fixed"
-			cellspacing="0" cellpadding="0" width="80%">
+			cellspacing="0" cellpadding="0" width="70%">
 			<tr>
 				<td>
 					<table border="0" cellspacing="0" cellpadding="5">
 						<tr>
-							<td class="menu_first"><a href="index.html">Home</a></td>
-							<!--<td class="menu"><a href="JPPF-Overview.html">Overview</a></td>-->
+							<td class="menu_first"><a href="index.php">Home</a></td>
 							<td class="menu"><a href="presentation.php?current=0">Overview</a></td>
 							<td class="menu"><a href="http://sourceforge.net/project/showfiles.php?group_id=135654">Download</a></td>
 							<td class="menu"><a href="./wiki">Documentation</a></td>
 							<td class="menu"><a href="./forums">Forums</a></td>
 							<td class="menu"><a href="screenshots.html">Screenshots</a></td >
+							<!--
 							<td class="menu"><a href="api/index.html">API Doc</a></td >
 							<td class="menu"><a href="faq.php">Faqs</a></td>
+							-->
 							<td class="menu"><a href="news.php">News</a></td>
 							<td class="menu"><a href="http://sourceforge.net/projects/jppf-project">Project</a></td>
 							<td class="menu"><a href="links.php">Links</a></td>
@@ -53,44 +60,92 @@
 				</td>
 			</tr>
 		</table>
-		<table border="0" cellspacing="20" cellpadding="0" width="80%">
-			<tr>
-				<td width="50%" valign="top" rowspan="2">
+		<table border="0" cellspacing="0" cellpadding="0" width="70%">
+						<tr>
+				<td width="12" height="12" class="bleft"/>
+				<td colspan="3" bgcolor="white"/>
+				<td width="12" height="12" class="bright"/>
+			</tr>
+   		<tr>
+				<td width="12" class="bleft"/>
+				<td valign="top" bgcolor="white" width="50%" style="max-width: 50%">
 					<table class="noborder_" cellspacing="0" cellpadding="5" width="100%">
 						<tr><td class="noborder_">
-							<h3>Project Description</h3>
-								JPPF is a grid toolkit for Java that makes it easy to run applications in parallel, and speed up their execution by orders of magnitude.
-								Write once, deploy once, execute everywhere!
+									<table border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<td width="12" height="12" style="background-image: url(images/pblueNW.gif); background-repeat: no-repeat; background-position: 1000% 1000%"/>
+				<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
+				<td width="12" height="12" style="background-image: url(images/pblueNE.gif); background-repeat: no-repeat; background-position: 0% 100%"/>
+			</tr>
+			<tr>
+				<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
+				<td style="background-image: url(images/pblueFiller.gif); background-repeat: repeat; background-position: 0% 0%">
+							<h3>About JPPF</h3>
+							<div style="text-align: justify">JPPF is a grid toolkit for Java that makes it easy to run your applications in parallel, and speed up their execution by orders of magnitude.
+							Write once, deploy once, execute everywhere!</div>
+												</td>
+					<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
+				</tr>
+				<tr>
+					<td width="12" height="12" style="background-image: url(images/pblueSW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
+					<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
+					<td width="12" height="12" style="background-image: url(images/pblueSE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
+				</tr>
+			</table>
 						</td></tr>
 						<tr><td class="noborder_">
 							<h4>Features</h4>
-							<ul>
-								<li>an easy to use <b>API</b> to submit tasks for execution in parallel</li>
-								<li>a set of APIs and user interface tools to <b>administrate and monitor</b> the servers</li>
-								<li><b>scalability</b> up to an arbitrary number of processing nodes</li>
-								<li>the framework is <b>deployment-free</b>: no need to install your application code on a server, just connect to the server and any
-								new or updated code is automatically loaded.</li>
-								<li>built-in <b>failover and recovery</b> for all components of the framework (clients, servers and nodes)</li>
-								<li><b>opportunistic grid</b> capabilities with <b>JPPF@Home</b> (see <a href="http://www.jppf.org/screenshots/shot11.jpg">screenshot</a>)</li>
-								<li>fully <b>documented</b> APIs, administration guide and developer guide</li>
-								<li>runs on any platform supporting Java 2 Platform Standard Edition 5.0 (J2SE 1.5) or later</li>
+							<ul type="square">
+								<li>a JPPF grid can be up and running in minutes</li>
+								<li>full platform independance
+								<li>highly scalable, distributed framework for the execution of Java tasks</li>
+								<li>leverages JCA 1.5 to integrate with leading J2EE application servers</li>
+								<li>easy programming model that abstracts the complexity of distributed and parallel processing</li>
+								<li>graphical and programmatic tools for fine-grained monitoring and administration</li>
+								<li>reliability through redundancy, recovery and failover capabilities</li>
+								<li>a set of fully documented sample applications, applying JPPF to real-life problems</li>
+								<li>a JPPF screensaver node enables the automatic use of idle computers</li>
+								<li>very flexible and non-constraining open-source licensing</li>
 							</ul>
 						</td></tr>
-						<tr><td class="noborder_">
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 0.26.0 - beta</span></h4>
+						<tr><td align="center" class="noborder_">
+							<a href="http://sourceforge.net/project/showfiles.php?group_id=135654"
+								onmouseover="setImage('dl_jppf', 'images/downloadJPPF2.jpg')"
+								onmouseout="setImage('dl_jppf', 'images/downloadJPPF.jpg')">
+								<img id="dl_jppf" src="images/downloadJPPF.jpg" border="0" alt="Download JPPF Now"/></a><br>&nbsp;
 						</td></tr>
 						<tr><td class="noborder_">
-							<h3>New: JPPF is looking for developers!</h3>
-							If you're interested, please take a look at the <a href="http://sourceforge.net/people/viewjob.php?group_id=135654&job_id=25512">
-							announcement</a> posted on <b>SF.net</b><br><br>
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 1.0 release candidate 1</span></h4>
 						</td></tr>
 						<tr><td class="noborder_">
-							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the GNU Lesser General Public License (LGPL).
-							A copy of the licensing terms can be obtained <a href="http://www.opensource.org/licenses/lgpl-license.php"><b>here</b></a>.</span></h4>
+									<table border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<td width="12" height="12" style="background-image: url(images/pblueNW.gif); background-repeat: no-repeat; background-position: 1000% 1000%"/>
+				<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
+				<td width="12" height="12" style="background-image: url(images/pblueNE.gif); background-repeat: no-repeat; background-position: 0% 100%"/>
+			</tr>
+			<tr>
+				<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
+				<td style="background-image: url(images/pblueFiller.gif); background-repeat: repeat; background-position: 0% 0%">
+								<h3>Participate and stay informed:</h3>
+								<strong style="color: #8080FF">Browse our <a href="./wiki" target=_top>documentation</a></strong><br>
+								<strong style="color: #8080FF">Give your comments and advice, find support, on our <a href="./forums" target=_top>discussion forums</a></strong><br>
+								<strong style="color: #8080FF">Browse and update our <a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>bugs database</a></strong><br>
+								<strong style="color: #8080FF">Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>feature requests database</a></strong>
+												</td>
+					<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
+				</tr>
+				<tr>
+					<td width="12" height="12" style="background-image: url(images/pblueSW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
+					<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
+					<td width="12" height="12" style="background-image: url(images/pblueSE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
+				</tr>
+			</table>
 						</td></tr>
 					</table>
 				</td>
-				<td width="50%" valign="top">
+				<td width="10" bgcolor="white">
+				<td valign="top" bgcolor="white">
 					<table class="noborder_" cellspacing="0" cellpadding="5" width="100%">
 						<tr><td class="noborder_">
 						<?php
@@ -100,8 +155,31 @@
 							$query = 'SELECT * FROM news ORDER BY date DESC';
 							$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 							$line = mysql_fetch_array($result, MYSQL_ASSOC);
-							printf("<h3>Latest news: <span style='color: black'>%s %s</span></h3>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
-							printf("%s", $line["desc"]);
+						?>
+								<table border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<td width="12" height="12" style="background-image: url(images/pblueNW.gif); background-repeat: no-repeat; background-position: 1000% 1000%"/>
+				<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
+				<td width="12" height="12" style="background-image: url(images/pblueNE.gif); background-repeat: no-repeat; background-position: 0% 100%"/>
+			</tr>
+			<tr>
+				<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
+				<td style="background-image: url(images/pblueFiller.gif); background-repeat: repeat; background-position: 0% 0%">
+						<?php
+							printf("<span class='newsTitle'>Latest news: <span style='color: black'>%s %s</span></span><br>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
+							//printf("<h3>Latest news: <span style='color: black'>%s %s</span></h3>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
+						?>
+											</td>
+					<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
+				</tr>
+				<tr>
+					<td width="12" height="12" style="background-image: url(images/pblueSW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
+					<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
+					<td width="12" height="12" style="background-image: url(images/pblueSE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
+				</tr>
+			</table>
+						<?php
+							printf("<br>%s", $line["desc"]);
 						?>
 						<p><u style="color: #8080FF"><strong style="color: #8080FF">Summary of changes:</strong></u>
 						<?php
@@ -111,39 +189,61 @@
 						?>
 						</td></tr>
 						<tr><td class="noborder_">
-							<h3>JPPF articles on the Web</h3>
-							<table align="center">
-								<tr><td>
-									<p><a href="http://www.infoq.com/news/Grid-Computing-JPPF" target=_top>
-										<img src="http://www.infoq.com/styles/i/logo.gif" border="0" alternate="InfoQ"/>
-									</a>
+									<table border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<td width="12" height="12" style="background-image: url(images/pblueNW.gif); background-repeat: no-repeat; background-position: 1000% 1000%"/>
+				<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
+				<td width="12" height="12" style="background-image: url(images/pblueNE.gif); background-repeat: no-repeat; background-position: 0% 100%"/>
+			</tr>
+			<tr>
+				<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
+				<td style="background-image: url(images/pblueFiller.gif); background-repeat: repeat; background-position: 0% 0%">
+							<table border="0" cellspacing="0" cellpadding="5">
+								<tr>
+									<td align="center" valign="center">
+										<strong style="color: #8080FF">JPPF feeds:</strong>
 									</td>
-									<td>
-									<p><a href="http://lwn.net/Articles/156109" target=_top>
-										<img src="http://lwn.net/images/lcorner.png" border="0" alternate="LWN.net"/>
-									</a>
-								</td></tr>
-								<tr><td>
-									<p><a href="http://www.artima.com/forums/flat.jsp?forum=276&thread=153331" target=_top>
-										<img src="http://www.artima.com/images/ab_dev.gif" border="0" alternate="artima developer"/>
-									</a>
-								</td></tr>
-								<tr><td>
-									<p><a href="http://linux.softpedia.com/get/System/Clustering-and-Distributed-Networks/Java-Parallel-Processing-Framework-10529.shtml" target=_top>
-										<img src="http://www.softpedia.com/base_img/softpedia_logo.gif" border="0" alternate="Softpedia"/>
-									</a>
-								</td></tr>
+									<td align="center" valign="center">
+										<a href="http://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1">
+											<img src="images/feed-16x16.gif" border="0"/>News</a>
+									</td>
+									<td align="center" valign="center">
+										<a href="http://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1">
+											<img src="images/feed-16x16.gif" border="0"/>Releases</a>
+									</td>
+								</tr>
 							</table>
+												</td>
+					<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
+				</tr>
+				<tr>
+					<td width="12" height="12" style="background-image: url(images/pblueSW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
+					<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
+					<td width="12" height="12" style="background-image: url(images/pblueSE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
+				</tr>
+			</table>
 						</td></tr>
 						<tr><td class="noborder_">
-							<h3>Feedback Wanted: <span style="color: #000060">help making JPPF a better open source product</span></h3>
-							Suggestions, bug reports, criticism and ideas are most welcome. We will do our best to answer promptly.<br>
-							<a href="./forums" target=_top>Discussion forums are available here</a><br>
-							<a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>The bugs tracking system is here</a><br>
-							<a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>The feature request tracking system is here</a><br>
+							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the Apache License, Version 2.0.<br>
+							A copy of the licensing terms can be obtained <a href="http://www.apache.org/licenses/LICENSE-2.0"><b>at this location</b></a>.</span></h4>
+						</td></tr>
+						<tr><td class="noborder_">
+							<h3>JPPF on the web:</h3>
+							<strong style="color: #8080FF"><a href="http://www.jroller.com/jppf/" target=_top>JPPF Blog</a></strong><br>
+							<strong style="color: #8080FF"><a href="http://www.jroller.com/gkorland/entry/jppf" target=_top>Guy Korland's Blog</a></strong><br>
+							<strong style="color: #8080FF"><a href="http://www.infoq.com/news/Grid-Computing-JPPF" target=_top>JPPF on InfoQ</a></strong><br>
+							<strong style="color: #8080FF"><a href="http://weblogs.java.net/blog/fabriziogiudici/archive/2006/11/parallel_comput_1.html" target=_top>Fabrizio Giudici's Blog</a></strong><br>
+							<strong style="color: #8080FF"><a href="http://wiki.cs.rit.edu/bin/view/Main/KarolPietrzakComputerGraphicsJPPF" target=_top> Karl Pietrzak's Parallelization of Ray Tracing</a></strong><br>
+							<strong style="color: #8080FF"><a href="http://www.oitos.it/opencms/opencms/oitos/modules/products/product_0033.html" target=_top>JPPF evaluation on OITOS</a> (in Italian)</strong><br>
 						</td></tr>
 					</table>
 				</td>
+				<td width="12" class="bright"/>
+			</tr>
+						<tr>
+				<td width="12" height="12" style="background-image: url(images/roundCorner_SW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
+				<td width="12" height="12" colspan="3" class="bbottom"/>
+				<td width="12" height="12" style="background-image: url(images/roundCorner_SE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
 			</tr>
 		</table>
 		</div>

@@ -97,20 +97,8 @@ public class ResourceProvider
 	 */
 	public byte[] getResource(String resName)
 	{
-		ClassLoader cl = getClass().getClassLoader();
-		/*
-		if (cl instanceof JPPFClassLoader)
-		{
-			try
-			{
-				InputStream is = ((JPPFClassLoader) cl).getSystemResourceAsStream(resName);
-				return null;
-			}
-			catch(Exception e)
-			{
-			}
-		}
-		*/
+		//ClassLoader cl = getClass().getClassLoader();
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		URL url = cl.getResource(resName);
 		if (url != null)
 		{

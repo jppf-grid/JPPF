@@ -85,7 +85,7 @@ public class TaskNotificationRunner
 			for (int iter=0; iter<iterations; iter++)
 			{
 				long start = System.currentTimeMillis();
-				// create a the tasks tasks
+				// create the tasks
 				List<JPPFTask> tasks = new ArrayList<JPPFTask>();
 				for (int i=0; i<nbTasks; i++) tasks.add(new StagedTask(i, nbStages, duration));
 				// submit the tasks for execution
@@ -123,10 +123,10 @@ public class TaskNotificationRunner
 		Collection<NodeManagementInfo> nodeList = c.getNodeManagementInfo();
 		if (nodeList == null) return;
 		// establish the connection to every node
-		final List<JMXConnectionWrapper> jmxConnections = new ArrayList<JMXConnectionWrapper>();
+		final List<JMXNodeConnectionWrapper> jmxConnections = new ArrayList<JMXNodeConnectionWrapper>();
 		for (NodeManagementInfo info: nodeList)
 		{
-			JMXConnectionWrapper jmxClient = new JMXConnectionWrapper(info.getHost(), info.getPort());
+			JMXNodeConnectionWrapper jmxClient = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());
 			jmxClient.connect();
 			jmxConnections.add(jmxClient);
 		}
@@ -135,7 +135,7 @@ public class TaskNotificationRunner
 		{
 			public void run()
 			{
-				for (JMXConnectionWrapper jmxClient: jmxConnections)
+				for (JMXNodeConnectionWrapper jmxClient: jmxConnections)
 				{
 					queryTaskNotification(jmxClient);
 				}
@@ -150,14 +150,12 @@ public class TaskNotificationRunner
 	 * Get the latest task notification from a node.
 	 * @param jmxClient the JMX connection to the node.
 	 */
-	public static void queryTaskNotification(JMXConnectionWrapper jmxClient)
+	public static void queryTaskNotification(JMXNodeConnectionWrapper jmxClient)
 	{
 		try
 		{
-			String mbeanName = JPPFAdminMBean.NODE_MBEAN_NAME;
-			// invoke the method "state" on the node's MBean
-			TaskNotification notif = (TaskNotification)
-				jmxClient.invoke(mbeanName, "notification", null, null);
+			// invoke the method "notification" on the node's MBean
+			TaskNotification notif = (TaskNotification) jmxClient.notification();
 			// display the resulting notification
 			System.out.println("Monitored node " + jmxClient.getId() +
 				" received notification: " + notif);

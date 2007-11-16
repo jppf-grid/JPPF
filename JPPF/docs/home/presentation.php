@@ -12,7 +12,7 @@
 	</head>
 	<body>
 		<div align="center">
-				<table align="center" width="80%" cellspacing="0" cellpadding="5"
+				<table align="center" width="70%" cellspacing="0" cellpadding="5"
 			class="table_" style="background: url('images/grid.gif'); background-repeat: repeat; background-attachment: fixed">
 			<tr><td height="5"></td></tr>
 			<tr>
@@ -24,8 +24,8 @@
 				</td>
 				<td width="30%" align="right">
 					<a href="http://sourceforge.net" target="_top">
-						<img src="http://sourceforge.net/sflogo.php?group_id=135654&amp;type=4"
-							width="125" height="37" border="0" alt="SourceForge.net Logo" />
+						<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&amp;type=1"
+							width="88" height="31" border="0" alt="SourceForge.net Logo" />
 					</a>
 				</td>
 			</tr>
@@ -33,20 +33,21 @@
 		</table>
 		<!--<table border="0" style="background-color: #8080FF" cellspacing="0" cellpadding="0" width="80%">-->
 		<table style="background: url('images/bkg-menu.gif'); background-repeat: repeat; background-attachment: fixed"
-			cellspacing="0" cellpadding="0" width="80%">
+			cellspacing="0" cellpadding="0" width="70%">
 			<tr>
 				<td>
 					<table border="0" cellspacing="0" cellpadding="5">
 						<tr>
-							<td class="menu_first"><a href="index.html">Home</a></td>
-							<!--<td class="menu"><a href="JPPF-Overview.html">Overview</a></td>-->
+							<td class="menu_first"><a href="index.php">Home</a></td>
 							<td class="menu"><a href="presentation.php?current=0">Overview</a></td>
 							<td class="menu"><a href="http://sourceforge.net/project/showfiles.php?group_id=135654">Download</a></td>
 							<td class="menu"><a href="./wiki">Documentation</a></td>
 							<td class="menu"><a href="./forums">Forums</a></td>
 							<td class="menu"><a href="screenshots.html">Screenshots</a></td >
+							<!--
 							<td class="menu"><a href="api/index.html">API Doc</a></td >
 							<td class="menu"><a href="faq.php">Faqs</a></td>
+							-->
 							<td class="menu"><a href="news.php">News</a></td>
 							<td class="menu"><a href="http://sourceforge.net/projects/jppf-project">Project</a></td>
 							<td class="menu"><a href="links.php">Links</a></td>
@@ -62,7 +63,7 @@
 			{
 				$_SESSION["defined"] = "true";
 				$_SESSION["first"] = 0;
-				$_SESSION["last"] = 20;
+				$_SESSION["last"] = 18;
 			}
 			$current = $_REQUEST["current"];
 			if (!$current)
@@ -70,8 +71,15 @@
 				$currrent = 0;
 			}
 ?>
-			<table class="table_" cellspacing="0" cellpadding="0" width="80%">
-				<tr><td align="center">
+			<table align="center" cellspacing="0" cellpadding="0" width="70%">
+							<tr>
+				<td width="12" height="12" class="bleft"/>
+				<td colspan="2" bgcolor="white"/>
+				<td width="12" height="12" class="bright"/>
+			</tr>
+				<tr>
+					<td width="12" class="bleft"/>
+					<td align="center" bgcolor="white">
 <?php
 					// Link to first page
 					if ($current > $_SESSION["first"])
@@ -117,14 +125,24 @@
 						echo '<img src="overview/last0.gif" border=0 alt="Last page"></a>';
 					}
 ?>
-				</td>
-				<td align="left">This presentation is available in <a href="documents/JPPF-Presentation.pdf">PDF Format</a></td>
+					</td>
+					<td align="left" bgcolor="white">This presentation is available in <a href="documents/JPPF-Presentation.pdf">PDF Format</a></td>
+					<td width="12" class="bright"/>
 				</tr>
-				<tr><td align="center" colspan="2">
+				<tr>
+					<td width="12" class="bleft"/>
+					<td align="center" colspan="2" bgcolor="white">
 <?php
 					echo '<img src="overview/img', $current, '.gif">';
 ?>
-				</td></tr>
+					</td>
+					<td width="12" class="bright"/>
+				</tr>
+							<tr>
+				<td width="12" height="12" style="background-image: url(images/roundCorner_SW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
+				<td width="12" height="12" colspan="2" class="bbottom"/>
+				<td width="12" height="12" style="background-image: url(images/roundCorner_SE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
+			</tr>
 			</table>
 		</div>
 	</body>

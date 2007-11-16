@@ -66,7 +66,7 @@ public class JPPFResourceAdapter extends JPPFAccessor implements ResourceAdapter
 	/**
 	 * Manages asynchronous work submission to the JPPF driver.
 	 */
-	private JPPFSubmissionManager submissionManager = null;
+	//private JPPFSubmissionManager submissionManager = null;
 
 	/**
 	 * Start this resource adapater with the specified bootstrap context.
@@ -83,7 +83,7 @@ public class JPPFResourceAdapter extends JPPFAccessor implements ResourceAdapter
 		jppfClient =
 			new JPPFJcaClient(new JPPFUuid().toString(), connectionPoolSize, serverHost, classServerPort, appServerPort);
 		log.info("Starting JPPF resource adapter: jppf client="+jppfClient);
-		submissionManager = new JPPFSubmissionManager(jppfClient, workManager);
+		JPPFSubmissionManager submissionManager = new JPPFSubmissionManager(jppfClient, workManager);
 		jppfClient.setSubmissionManager(submissionManager);
 		try
 		{

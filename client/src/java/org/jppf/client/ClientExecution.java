@@ -46,6 +46,10 @@ public class ClientExecution
 	 * Listener to notify whenever a set of results have been received.
 	 */
 	public TaskResultListener listener = null;
+	/**
+	 * The context class loader for the execution.
+	 */
+	public ClassLoader classLoader = null;
 
 	/**
 	 * Initialize this execution with the specified parameters.
@@ -71,5 +75,13 @@ public class ClientExecution
 		this.dataProvider = dataProvider;
 		this.isBlocking = isBlocking;
 		this.listener = listener;
+		if (!tasks.isEmpty())
+		{
+			this.classLoader = tasks.get(0).getClass().getClassLoader();
+		}
+		else
+		{
+			this.classLoader = Thread.currentThread().getContextClassLoader();
+		}
 	}
 }

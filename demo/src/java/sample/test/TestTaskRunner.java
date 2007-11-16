@@ -55,7 +55,6 @@ public class TestTaskRunner
 		try
 		{
 			jppfClient = new JPPFClient();
-			/*
 			performEmptyTaskListTest();
 			performExceptionTest();
 			performURLTest();
@@ -66,7 +65,6 @@ public class TestTaskRunner
 			performDB2LoadingTaskTest();
 			performXMLParsingTaskTest();
 			performMyTaskTest();
-			*/
 			performTimeoutTaskTest();
 			System.exit(0);
 		}

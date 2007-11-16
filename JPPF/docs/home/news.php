@@ -9,7 +9,7 @@
 	</head>
 	<body>
 		<div align="center">
-				<table align="center" width="80%" cellspacing="0" cellpadding="5"
+				<table align="center" width="70%" cellspacing="0" cellpadding="5"
 			class="table_" style="background: url('images/grid.gif'); background-repeat: repeat; background-attachment: fixed">
 			<tr><td height="5"></td></tr>
 			<tr>
@@ -21,8 +21,8 @@
 				</td>
 				<td width="30%" align="right">
 					<a href="http://sourceforge.net" target="_top">
-						<img src="http://sourceforge.net/sflogo.php?group_id=135654&amp;type=4"
-							width="125" height="37" border="0" alt="SourceForge.net Logo" />
+						<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&amp;type=1"
+							width="88" height="31" border="0" alt="SourceForge.net Logo" />
 					</a>
 				</td>
 			</tr>
@@ -30,20 +30,21 @@
 		</table>
 		<!--<table border="0" style="background-color: #8080FF" cellspacing="0" cellpadding="0" width="80%">-->
 		<table style="background: url('images/bkg-menu.gif'); background-repeat: repeat; background-attachment: fixed"
-			cellspacing="0" cellpadding="0" width="80%">
+			cellspacing="0" cellpadding="0" width="70%">
 			<tr>
 				<td>
 					<table border="0" cellspacing="0" cellpadding="5">
 						<tr>
-							<td class="menu_first"><a href="index.html">Home</a></td>
-							<!--<td class="menu"><a href="JPPF-Overview.html">Overview</a></td>-->
+							<td class="menu_first"><a href="index.php">Home</a></td>
 							<td class="menu"><a href="presentation.php?current=0">Overview</a></td>
 							<td class="menu"><a href="http://sourceforge.net/project/showfiles.php?group_id=135654">Download</a></td>
 							<td class="menu"><a href="./wiki">Documentation</a></td>
 							<td class="menu"><a href="./forums">Forums</a></td>
 							<td class="menu"><a href="screenshots.html">Screenshots</a></td >
+							<!--
 							<td class="menu"><a href="api/index.html">API Doc</a></td >
 							<td class="menu"><a href="faq.php">Faqs</a></td>
+							-->
 							<td class="menu"><a href="news.php">News</a></td>
 							<td class="menu"><a href="http://sourceforge.net/projects/jppf-project">Project</a></td>
 							<td class="menu"><a href="links.php">Links</a></td>
@@ -53,19 +54,7 @@
 				</td>
 			</tr>
 		</table>
-		<table cellspacing="0" cellpadding="0" width="80%">
-			<tr>
-				<td>
-								<tr>
-				<td class="leftRightBottom_">
-					<br>
-					<h1 align="center" style="color: #8080FF"><b><a style="color: #8080FF" href="http://sourceforge.net/news/?group_id=135654">Latest news on project pages</a>
-</b></h1>
-				</td>
-			</tr>
-				</td>
-			</tr>
-		</table>
+		<table cellspacing="0" cellpadding="0" width="70%">
 		<?php
 		// Connecting, selecting database
 		$link = mysql_connect('mysql4-j', 'j135654admin', 'Faz600er')
@@ -74,23 +63,67 @@
 		// Performing SQL query
 		$query = 'SELECT * FROM news ORDER BY date DESC';
 		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+		$i = 0;
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
 		{
 		?>
-		<table class="border_" cellspacing="0" cellpadding="5" width="80%">
+			<?php
+			if ($i > 0)
+			{
+			?>
+							<tr>
+				<td width="12" height="12" style="background-image: url(images/roundCorner_SW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
+				<td width="12" height="12" colspan="1" class="bbottom"/>
+				<td width="12" height="12" style="background-image: url(images/roundCorner_SE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
+			</tr>
+							<tr>
+				<td width="12" height="12" style="background-image: url(images/roundCorner_NW.gif); background-repeat: no-repeat; background-position: 1000% 1000%"/>
+				<td width="12" height="12" colspan="1" class="btop"/>
+				<td width="12" height="12" style="background-image: url(images/roundCorner_NE.gif); background-repeat: no-repeat; background-position: 0% 100%"/>
+			</tr>
+			<?php
+			}
+			$i = $i + 1;
+			?>
+						<tr>
+				<td width="12" height="12" class="bleft"/>
+				<td colspan="1" bgcolor="white"/>
+				<td width="12" height="12" class="bright"/>
+			</tr>
 			<tr>
-				<td>
+				<td width="12" class="bleft"/>
+				<td bgcolor="white">
+							<table border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<td width="12" height="12" style="background-image: url(images/pblueNW.gif); background-repeat: no-repeat; background-position: 1000% 1000%"/>
+				<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
+				<td width="12" height="12" style="background-image: url(images/pblueNE.gif); background-repeat: no-repeat; background-position: 0% 100%"/>
+			</tr>
+			<tr>
+				<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
+				<td style="background-image: url(images/pblueFiller.gif); background-repeat: repeat; background-position: 0% 0%">
 					<?php
-						printf("<h3>%s %s</h3>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
-						printf("%s", $line["desc"]);
+						printf("<span class='newsTitle'>%s %s</span>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
+					?>
+										</td>
+					<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
+				</tr>
+				<tr>
+					<td width="12" height="12" style="background-image: url(images/pblueSW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
+					<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
+					<td width="12" height="12" style="background-image: url(images/pblueSE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
+				</tr>
+			</table>
+					<?php
+						printf("<br>%s", $line["desc"]);
 					?>
 						<p><u style="color: #8080FF"><strong style="color: #8080FF">Summary of changes:</strong></u>
 					<?php
 						printf("%s", $line["content"]);
 					?>
 				</td>
+				<td width="12" class="bright"/>
 			</tr>
-		</table>
 		<?php
 		}
 		// Free resultset
@@ -98,5 +131,16 @@
 		// Closing connection
 		mysql_close($link);
 		?>
+						<tr>
+				<td width="12" height="12" class="bleft"/>
+				<td colspan="1" bgcolor="white"/>
+				<td width="12" height="12" class="bright"/>
+			</tr>
+						<tr>
+				<td width="12" height="12" style="background-image: url(images/roundCorner_SW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
+				<td width="12" height="12" colspan="1" class="bbottom"/>
+				<td width="12" height="12" style="background-image: url(images/roundCorner_SE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
+			</tr>
+		</table>
 	</body>
 </html>
