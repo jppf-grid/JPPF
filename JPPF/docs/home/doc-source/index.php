@@ -2,6 +2,12 @@
 	$template{name="head-section" title="Home Page"}$
 
 	<body>
+		<script type="text/javascript">
+			function setImage(id, image)
+			{
+				document.getElementById(id).src=image;
+			}
+		</script>
 		<div align="center">
 		$template{name="jppf-header"}$
 		<table border="0" cellspacing="0" cellpadding="0" width="70%">
@@ -20,21 +26,26 @@
 						<tr><td class="noborder_">
 							<h4>Features</h4>
 							<ul type="square">
-								<li>an easy to use <b>API</b> to submit tasks for execution in parallel</li>
-								<li>a set of APIs and user interface tools to <b>administrate and monitor</b> the servers and nodes</li>
-								<li><b>scalability</b> up to an arbitrary number of processing nodes</li>
-								<li>the framework is <b>deployment-free</b>: no need to install your application code on a server, just connect to the server and any
-								new or updated code is automatically loaded.</li>
-								<li>built-in <b>failover and recovery</b> for all components of the framework (clients, servers and nodes)</li>
-								<li><b>opportunistic grid</b> capabilities with <b>JPPF@Home</b> (see <a href="http://www.jppf.org/screenshots/shot11.jpg">screenshot</a>)</li>
-								<li><b><a href="wiki/index.php/JPPF_And_J2EE">J2EE Integration</a></b>: JPPF grid services are available for market-leading application servers</li>
-								<li>fully <b>documented</b> APIs, administration guide and developer guide</li>
-								<li>runs on any platform supporting Java 2 Platform Standard Edition 5.0 (J2SE 1.5) or later</li>
+								<li>a JPPF grid can be up and running in minutes</li>
+								<li>full platform independance
+								<li>highly scalable, distributed framework for the execution of Java tasks</li>
+								<li>leverages JCA 1.5 to integrate with leading J2EE application servers</li>
+								<li>easy programming model that abstracts the complexity of distributed and parallel processing</li>
+								<li>graphical and programmatic tools for fine-grained monitoring and administration</li>
+								<li>reliability through redundancy, recovery and failover capabilities</li>
+								<li>a set of fully documented sample applications, applying JPPF to real-life problems</li>
+								<li>a JPPF screensaver node enables the automatic use of idle computers</li>
+								<li>very flexible and non-constraining open-source licensing</li>
 							</ul>
 						</td></tr>
 						<tr><td align="center" class="noborder_">
-							<a href="http://sourceforge.net/project/showfiles.php?group_id=135654">
-								<img src="images/downloadJPPF.jpg" border="0" alt="Download JPPF Now"/></a><br>&nbsp;
+							<a href="http://sourceforge.net/project/showfiles.php?group_id=135654"
+								onmouseover="setImage('dl_jppf', 'images/downloadJPPF2.jpg')"
+								onmouseout="setImage('dl_jppf', 'images/downloadJPPF.jpg')">
+								<img id="dl_jppf" src="images/downloadJPPF.jpg" border="0" alt="Download JPPF Now"/></a><br>&nbsp;
+						</td></tr>
+						<tr><td class="noborder_">
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 1.0 release candidate 1</span></h4>
 						</td></tr>
 						<tr><td class="noborder_">
 							$template{name="highlight-top" span="1" color="pblue"}$
@@ -97,9 +108,6 @@
 							$template{name="highlight-bottom" span="1" color="pblue"}$
 						</td></tr>
 
-						<tr><td class="noborder_">
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 1.0 beta 1</span></h4>
-						</td></tr>
 						<tr><td class="noborder_">
 							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the Apache License, Version 2.0.<br>
 							A copy of the licensing terms can be obtained <a href="http://www.apache.org/licenses/LICENSE-2.0"><b>at this location</b></a>.</span></h4>

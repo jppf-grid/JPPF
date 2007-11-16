@@ -101,6 +101,7 @@
 	<target name="init" description="Initialize ressources">
  		<mkdir dir="${build}"/>
 		<available file="${NSIS.home}/makensis.exe" property="NSIS.present"/>
+		<available type="dir" file="${basedir}/../samples-pack" property="samples.pack.present"/>
 	</target>
 
 	<target name="init.deploy" description="Initialize ressources">
@@ -115,7 +116,8 @@
   <target name="build" depends="init, compile, jar"/>
 	<target name="rebuild" depends="clean, init, compile, jar"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
-	<target name="deploy" depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver"/>
+	<target name="deploy"
+		depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver, samples.pack"/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/screenshots/shot11.jpg"/>
   	<antcall target="deploy"/>
@@ -160,11 +162,34 @@
   </target>
 
 	<!-- ========================================================================= -->
-	<!--                         Generate the screensaver                          -->
+	<!--                     Generate the JCA resource adapter                     -->
 	<!-- ========================================================================= -->
 
 	<target name="jca" description="Generate resource adapter for various application servers" depends="init">
 		<ant antfile="${basedir}/../jca-client/build.xml" inheritall="false"/>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--                         Generate the samples pack                         -->
+	<!-- ========================================================================= -->
+
+	<target name="samples.pack" description="Generate the screen saver packaging for the nodes"
+		depends="init, build" if="samples.pack.present">
+		<copy todir="${basedir}/../samples-pack/shared/lib">
+			<fileset dir="${build}">
+				<include name="jppf*.jar"/>
+			</fileset>
+		</copy>
+		<ant antfile="${basedir}/../samples-pack/Fractals/build.xml" target="compile" inheritall="false"/>
+		<ant antfile="${basedir}/../samples-pack/SequenceAlignment/build.xml" target="compile" inheritall="false"/>
+		<property name="samples.pack.file"
+			value="${build}/${ant.project.name}-samples-pack-${version.number}.${build.number}-${now}.zip"/>
+		<delete file="samples.pack.file" quiet="true"/>
+		<zip destfile="${samples.pack.file}">
+			<zipfileset dir="${basedir}/../samples-pack" prefix="samples-pack">
+				<exclude name="**/*.log"/>
+			</zipfileset>
+		</zip>
   </target>
 
 	<!-- ========================================================================= -->
