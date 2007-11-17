@@ -90,6 +90,10 @@ public class JPPFResourceWrapper implements Serializable
 	 * The identifier for the driver's management (JMX) server.
 	 */
 	private String managementId = null;
+	/**
+	 * Uuid of the orignal task bundle that triggered this resource request. 
+	 */
+	private String requestUuid = null;
 
 	/**
 	 * Add a uuid to the uuid path of this resource wrapper. 
@@ -244,5 +248,23 @@ public class JPPFResourceWrapper implements Serializable
 	public void setManagementId(String managementId)
 	{
 		this.managementId = managementId;
+	}
+
+	/**
+	 * Get the uuid for the orignal task bundle that triggered this resource request. 
+	 * @return the uuid as a string.
+	 */
+	public String getRequestUuid()
+	{
+		return requestUuid;
+	}
+
+	/**
+	 * Set the uuid for the orignal task bundle that triggered this resource request. 
+	 * @param requestUuid the uuid as a string.
+	 */
+	public void setRequestUuid(String requestUuid)
+	{
+		this.requestUuid = requestUuid;
 	}
 }

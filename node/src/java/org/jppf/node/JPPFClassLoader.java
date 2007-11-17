@@ -66,6 +66,10 @@ public class JPPFClassLoader extends ClassLoader
 	 * Determines whether this class loader should handle dynamic class updating.
 	 */
 	private static boolean initializing = false;
+	/**
+	 * Uuid of the orignal task bundle that triggered a resource loading request. 
+	 */
+	private String requestUuid = null;
 
 	/**
 	 * Default instanciation of this class is not permitted, a valid host name and port number MUST be provided.
@@ -277,7 +281,7 @@ public class JPPFClassLoader extends ClassLoader
 		byte[] b = null;
 		try
 		{
-			if (debugEnabled) log.debug("loading remote definition for resource [" + name + "]");
+			if (debugEnabled) log.debug("loading remote definition for resource [" + name + "], requestUuid = " + requestUuid);
 			lock.lock();
 			JPPFResourceWrapper resource = new JPPFResourceWrapper();
 			resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
@@ -287,6 +291,7 @@ public class JPPFClassLoader extends ClassLoader
 			if (list.size() > 0) list.setPosition(uuidPath.size()-1);
 			resource.setName(name);
 			resource.setAsResource(asResource);
+			resource.setRequestUuid(requestUuid);
 			
 			socketClient.send(resource);
 			resource = (JPPFResourceWrapper) socketClient.receive();
@@ -417,5 +422,23 @@ public class JPPFClassLoader extends ClassLoader
 	private static synchronized void setInitializing(boolean initFlag)
 	{
 		initializing = initFlag;
+	}
+
+	/**
+	 * Get the uuid for the orignal task bundle that triggered this resource request. 
+	 * @return the uuid as a string.
+	 */
+	public String getRequestUuid()
+	{
+		return requestUuid;
+	}
+
+	/**
+	 * Set the uuid for the orignal task bundle that triggered this resource request. 
+	 * @param requestUuid the uuid as a string.
+	 */
+	public void setRequestUuid(String requestUuid)
+	{
+		this.requestUuid = requestUuid;
 	}
 }

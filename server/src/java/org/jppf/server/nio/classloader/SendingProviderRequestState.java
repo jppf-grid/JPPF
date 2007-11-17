@@ -106,7 +106,7 @@ public class SendingProviderRequestState extends ClassServerState
 		{
 			if (debugEnabled) log.debug("request sent to the provider " + getRemoteHost(channel) + " from node " + 
 				getRemoteHost((SocketChannel) context.getCurrentRequest().channel()) + 
-				", resource: " + context.getResource().getName());
+				", resource: " + context.getResource().getName() + ", requestUuid = " + context.getResource().getRequestUuid());
 			context.setMessage(new NioMessage());
 			return TO_WAITING_PROVIDER_RESPONSE;
 		}

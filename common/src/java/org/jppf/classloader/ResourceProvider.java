@@ -36,9 +36,10 @@ public class ResourceProvider
 	 */
 	private static Log log = LogFactory.getLog(ResourceProvider.class);
 	/**
-	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = log.isDebugEnabled();
+	private boolean debugEnabled = true;
+	//private boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Maximum buffer size for reading class files.
 	 */
@@ -56,19 +57,28 @@ public class ResourceProvider
 	}
 
 	/**
-	 * Load a resource file (including class files) from the class path into an array of byte.
+	 * Load a resource file (including class files) from the class path into an array of byte.<br>
+	 * This method simply calls {@link getResourceAsBytes(java.lang.String, java.lang.ClassLoader) getResourceAsBytes(String, ClassLoader)}
+	 * with a null class loader.
 	 * @param resName the name of the resource to load.
 	 * @return an array of bytes, or nll if the resource could not be found.
 	 */
 	public byte[] getResourceAsBytes(String resName)
 	{
+		return getResourceAsBytes(resName, null);
+	}
+
+	/**
+	 * Load a resource file (including class files) from the class path into an array of byte.
+	 * @param resName the name of the resource to load.
+	 * @param cl the class loader to use to load the request resource.
+	 * @return an array of bytes, or nll if the resource could not be found.
+	 */
+	public byte[] getResourceAsBytes(String resName, ClassLoader cl)
+	{
 		try
 		{
-			if (resName.indexOf("DependencyTask") >= 0)
-			{
-				getClass();
-			}
-			ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			if (cl == null) cl = Thread.currentThread().getContextClassLoader();
 			if (cl == null) cl = getClass().getClassLoader();
 			InputStream is = cl.getResourceAsStream(resName);
 			if (is == null)
@@ -97,8 +107,21 @@ public class ResourceProvider
 	 */
 	public byte[] getResource(String resName)
 	{
-		//ClassLoader cl = getClass().getClassLoader();
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		return getResource(resName, null);
+	}
+
+	/**
+	 * Get a resource as an array of byte using a call to <b>ClassLoader#getResource()</b>.
+	 * This method simply calls {@link getResource(java.lang.String, java.lang.ClassLoader) getResource(String, ClassLoader)}
+	 * with a null class loader.
+	 * @param resName  the name of the resource to find.
+	 * @param cl the class loader to use to load the request resource.
+	 * @return the content of the resource as an array of bytes.
+	 */
+	public byte[] getResource(String resName, ClassLoader cl)
+	{
+		if (cl == null) cl = Thread.currentThread().getContextClassLoader();
+		if (cl == null) cl = getClass().getClassLoader();
 		URL url = cl.getResource(resName);
 		if (url != null)
 		{

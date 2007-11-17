@@ -315,6 +315,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 			{
 				JPPFContainer cont = getContainer(bundle.getUuidPath().getList());
+				cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
 				cont.deserializeObject(bytes, pos, true, list, 1+count);
 			}
 		}

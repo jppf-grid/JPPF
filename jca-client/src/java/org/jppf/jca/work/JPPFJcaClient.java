@@ -107,7 +107,7 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	{
 		try
 		{
-			delegate = new JcaClassServerDelegate("ra_driver", uuid, host, classPort);
+			delegate = new JcaClassServerDelegate("ra_driver", uuid, host, classPort, this);
 			if (poolSize <= 0) poolSize = 1;
 			String[] names = new String[poolSize];
 			for (int i=0; i<poolSize; i++) names[i] = "driver_" + (i + 1);
@@ -115,7 +115,7 @@ public class JPPFJcaClient extends AbstractJPPFClient
 			for (String name: names)
 			{
 				int priority = 0;
-				JPPFClientConnection c = new JPPFJcaClientConnection(uuid, name, host, appPort, classPort, priority);
+				JPPFClientConnection c = new JPPFJcaClientConnection(uuid, name, host, appPort, classPort, priority, this);
 				c.addClientConnectionStatusListener(this);
 				ClientPool pool = pools.get(priority);
 				if (pool == null)
@@ -142,7 +142,7 @@ public class JPPFJcaClient extends AbstractJPPFClient
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 	}
 

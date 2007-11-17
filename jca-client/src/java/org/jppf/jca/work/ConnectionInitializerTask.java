@@ -54,7 +54,7 @@ public class ConnectionInitializerTask implements Runnable
 	 */
 	public void run()
 	{
-		if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
+		//if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
 		if (c.getStatus().equals(DISCONNECTED)) c.init();
 	}
 }

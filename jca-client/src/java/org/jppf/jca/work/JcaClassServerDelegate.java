@@ -45,6 +45,10 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
 	 */
 	private boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * The JPPF client that owns this class server delegate.
+	 */
+	private JPPFJcaClient client = null;
 
 	/**
 	 * Default instantiation of this class is not permitted.
@@ -59,13 +63,15 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * @param uuid the unique identifier for the local JPPF client.
 	 * @param host the name or IP address of the host the class server is running on.
 	 * @param port the TCP port the class server is listening to.
+	 * @param client the JPPF client that owns this class server delegate.
 	 * @throws Exception if the connection could not be opended.
 	 */
-	public JcaClassServerDelegate(String name, String uuid, String host, int port) throws Exception
+	public JcaClassServerDelegate(String name, String uuid, String host, int port, JPPFJcaClient client) throws Exception
 	{
 		this.appUuid = uuid;
 		this.host = host;
 		this.port = port;
+		this.client = client;
 		setName(name);
 		socketInitializer.setName("[" + getName() + " - delegate] ");
 	}
@@ -126,10 +132,11 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 						boolean found = true;
 						JPPFResourceWrapper resource = (JPPFResourceWrapper) socketClient.receive();
 						String name = resource.getName();
+						ClassLoader cl = getClassLoader(resource.getRequestUuid());
 						if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name);
 						byte[] b = null;
-						if (resource.isAsResource()) b = resourceProvider.getResource(name);
-						else b = resourceProvider.getResourceAsBytes(name);
+						if (resource.isAsResource()) b = resourceProvider.getResource(name, cl);
+						else b = resourceProvider.getResourceAsBytes(name, cl);
 						if (b == null) found = false;
 						resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
 						if (b != null) resource.setDefinition(CompressionUtils.zip(b, 0, b.length));
@@ -148,6 +155,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					if (!closed)
 					{
 						if (debugEnabled) log.debug("["+getName()+"] caught " + e + ", will re-initialise ...", e);
@@ -228,5 +236,15 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 */
 	public void release()
 	{
+	}
+
+	/**
+	 * Retrieve the class laoder to use form the submission manager.
+	 * @param uuid the uuid of the request from which the class loader was obtained.
+	 * @return a <code>ClassLoader</code> instance, or null if none could be found.
+	 */
+	private ClassLoader getClassLoader(String uuid)
+	{
+		return client.getSubmissionManager().getRequestClassLoader(uuid);
 	}
 }

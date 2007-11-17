@@ -241,9 +241,19 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	public void sendTasks(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
 	{
-		JPPFTaskBundle header = new JPPFTaskBundle();
+		sendTasks(new JPPFTaskBundle(), taskList, dataProvider);
+	}
+
+	/**
+	 * Send tasks to the server for execution.
+	 * @param header the task bundle to send to the driver.
+	 * @param taskList the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @throws Exception if an error occurs while sending the request.
+	 */
+	public void sendTasks(JPPFTaskBundle header, List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
+	{
 		header.setRequestType(JPPFTaskBundle.Type.EXECUTION);
-		header.setRequestUuid(new JPPFUuid().toString());
 		TraversalList<String> uuidPath = new TraversalList<String>();
 		uuidPath.add(appUuid);
 		header.setUuidPath(uuidPath);

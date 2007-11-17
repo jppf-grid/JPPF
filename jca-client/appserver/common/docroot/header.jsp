@@ -1,7 +1,7 @@
 <%@ include file="jndiName.jsp"%>
 <html>
 	<head>
-		<title>Java Parallel Processing Framework Home Page</title>
+		<title>Java Parallel Processing Framework J2EE Demo</title>
 		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
 		<meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
 		<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">

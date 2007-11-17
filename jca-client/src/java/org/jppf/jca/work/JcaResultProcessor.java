@@ -25,9 +25,9 @@ import javax.resource.spi.work.Work;
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
-import org.jppf.jca.work.submission.JPPFSubmissionResult;
-import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.Pair;
+import org.jppf.jca.work.submission.*;
+import org.jppf.server.protocol.*;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class send tasks to a JPPF driver and collect the results.
@@ -81,7 +81,16 @@ public class JcaResultProcessor implements Work
 			{
 				try
 				{
-					connection.sendTasks(execution.tasks, execution.dataProvider);
+					JPPFTaskBundle bundle = new JPPFTaskBundle();
+					bundle.setRequestUuid(new JPPFUuid().toString());
+					JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
+					String requestUuid = bundle.getRequestUuid();
+					if (!execution.tasks.isEmpty())
+					{
+						JPPFTask task = execution.tasks.get(0);
+						mgr.addRequestClassLoader(requestUuid, task.getClass().getClassLoader());
+					}
+					connection.sendTasks(bundle, execution.tasks, execution.dataProvider);
 					while (count < execution.tasks.size())
 					{
 						Pair<List<JPPFTask>, Integer> p = connection.receiveResults();
@@ -92,6 +101,7 @@ public class JcaResultProcessor implements Work
 						}
 					}
 					completed = true;
+					mgr.removeRequestClassLoader(requestUuid);
 					result.setStatus(JPPFSubmissionResult.Status.COMPLETE);
 					connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
 				}

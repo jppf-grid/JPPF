@@ -28,7 +28,7 @@ import org.jppf.*;
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultListener;
 import org.jppf.comm.socket.SocketInitializer;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 
 /**
@@ -49,6 +49,10 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * The JPPF client that manages connections to the JPPF drivers.
+	 */
+	private JPPFJcaClient client = null;
 
 	/**
 	 * Initialize this client with a specified application UUID.
@@ -58,11 +62,14 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
 	 * @param classServerPort the TCP port the class server is listening to.
 	 * @param priority the assigned to this client connection.
+	 * @param client the JPPF client that owns this connection.
 	 */
-	public JPPFJcaClientConnection(String uuid, String name, String host, int driverPort, int classServerPort, int priority)
+	public JPPFJcaClientConnection(String uuid, String name, String host, int driverPort,
+		int classServerPort, int priority, JPPFJcaClient client)
 	{
 		super(uuid, name, host, driverPort, classServerPort, priority);
 		status = DISCONNECTED;
+		this.client = client;
 	}
 
 	/**
@@ -192,5 +199,14 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	protected SocketInitializer createSocketInitializer()
 	{
 		return new JcaSocketInitializer();
+	}
+
+	/**
+	 * Get the JPPF client that manages connections to the JPPF drivers.
+	 * @return a <code>JPPFJcaClient</code> instance.
+	 */
+	public JPPFJcaClient getClient()
+	{
+		return client;
 	}
 }
