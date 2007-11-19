@@ -39,10 +39,6 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	 */
 	protected java.util.List<ValueChangeListener> listeners = new ArrayList<ValueChangeListener>();
 	/**
-	 * Determines whether firing events is enabled or not.
-	 */
-	protected boolean eventsEnabled = true;
-	/**
 	 * Determines whether the value of this option should be saved in the user preferences.
 	 */
 	protected boolean persistent = false;
@@ -180,16 +176,6 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 		}
 
 		return panel;
-	}
-
-	/**
-	 * Enable or disable the events firing in this otpion and/or its children.
-	 * @param enabled true to enable the events, false to disable them.
-	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
-	 */
-	public void setEventsEnabled(boolean enabled)
-	{
-		eventsEnabled = enabled;
 	}
 
 	/**

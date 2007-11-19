@@ -73,6 +73,7 @@ public class UILauncher
 			}
 			if ("url".equalsIgnoreCase(args[1])) OptionsHandler.addPageFromURL(args[0], null);
 			else OptionsHandler.addPageFromXml(args[0]);
+			OptionsHandler.loadPreferences();
 		}
 		catch(Exception e)
 		{

@@ -42,6 +42,7 @@
 	<script language="javascript"><![CDATA[
 		function populateTargetSequence()
 		{
+			System.out.println("in populateTargetSequence()");
 			var file = option.findFirstWithName("/loadSequenceBtn").getValue();
 			if ((file != null) && !"".equals(file.trim()))
 			{
@@ -66,7 +67,6 @@
 			var BASE = "org.jppf.samples.i18n.SequenceAlignment";
 			frame.getContentPane().add(option.getUIComponent());
 			frame.setSize(720, 700);
-			OptionsHandler.loadPreferences();
 			frame.setVisible(true);
 		]]></script>
 	</initializer>
@@ -119,10 +119,12 @@
 				<property name="tooltip" value="Reset to the default values"/>
 				<listener type="script">
 					<script language="javascript"><![CDATA[
+						var b = option.getRoot().isEventsEnabled();
+						option.getRoot().setEventsEnabled(false);
 						option.findFirstWithName("/matrix").setValue("PAM120");
 						option.findFirstWithName("/databaseFile").setValue("data/ecoli.aa");
-						option.findFirstWithName("/databaseFile").setValue("data/ecoli.aa");
 						populateTargetSequence();
+						option.getRoot().setEventsEnabled(b);
 					]]></script>
 				</listener>
 			</child>
@@ -309,7 +311,6 @@
 						<property name="label" value=""/>
 						<property name="tooltip" value="DNA or protein sequence to compare with those in the database"/>
 						<property name="scrollable" value="false"/>
-						<property name="value" value=""/>
 						<property name="persistent" value="true"/>
 						<property name="editable" value="true"/>
 						<property name="bordered" value="false"/>
@@ -377,12 +378,6 @@
 			<property name="persistent" value="false"/>
 			<property name="editable" value="true"/>
 			<property name="bordered" value="false"/>
-			<initializer type="script">
-				<script language="javascript"><![CDATA[
-					var value = option.getValue();
-					if ((value == null) || "".equals(value.trim())) populateTargetSequence();
-				]]></script>
-			</initializer>
 		</child>
 
 	</child>

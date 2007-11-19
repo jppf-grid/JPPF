@@ -81,6 +81,11 @@ public interface OptionElement extends Serializable
 	 */
 	void setEnabled(boolean enabled);
 	/**
+	 * Determine whether the events firing in this option and/or its children are enabled.
+	 * @return enabled true if the events are enabled, false otherwise.
+	 */
+	boolean isEventsEnabled();
+	/**
 	 * Enable or disable the events firing in this option and/or its children.
 	 * @param enabled true to enable the events, false to disable them.
 	 */

@@ -6,7 +6,7 @@
 	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src/java"/>
 	<classpathentry kind="lib" path="shared/lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jaligner.jar"/>
-	<classpathentry kind="lib" path="shared/lib/jppf-admin.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-admin.jar" sourcepath="/admin/src/java"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-client.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-common-node.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-common.jar"/>

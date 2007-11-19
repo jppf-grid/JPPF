@@ -92,6 +92,10 @@ public abstract class AbstractOptionElement implements OptionElement
 	 * perform initializations before the page is displayed and used.
 	 */
 	protected ValueChangeListener initializer = null;
+	/**
+	 * Determines whether firing events is enabled or not.
+	 */
+	protected boolean eventsEnabled = true;
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -218,15 +222,9 @@ public abstract class AbstractOptionElement implements OptionElement
 	 */
 	public void setToolTipText(String tooltip)
 	{
-		if (((tooltip == null) || "".equals(tooltip.trim())))
-		{
-			tooltip = null;
-		}
+		if (((tooltip == null) || "".equals(tooltip.trim()))) tooltip = null;
 		else if (tooltip.indexOf("\\n") >= 0)
-		{
-			String s = tooltip.replace("\\n", "<br>");
-			tooltip = "<html>"+s+"</html>";
-		}
+			tooltip = "<html>"+tooltip.replace("\\n", "<br>")+"</html>";
 		this.toolTipText = tooltip;
 	}
 
@@ -316,30 +314,22 @@ public abstract class AbstractOptionElement implements OptionElement
 			elt = elt.getParent();
 		}
 		StringBuilder sb = new StringBuilder();
-		for (int i=0; i<list.size(); i++)
-		{
-			sb.append("/").append(list.get(i));
-		}
+		for (int i=0; i<list.size(); i++) sb.append("/").append(list.get(i));
 		return sb.toString();
 	}
 
 	/**
-	 * Find the element with the specified path in the options tree.
-	 * The path can be absolute, in which case it starts with a &quote;/&quote, otherwise it
-	 * is considered relative to the requesting element.
+	 * Find the element with the specified path in the options tree. The path can be absolute,
+	 * in which case it starts with a &quote;/&quote, otherwise it is considered relative to the requesting element.
 	 * @param path the path of the element to find.
-	 * @return an <code>OptionElement</code> instance, or null if no element could be found with
-	 * the specfied path. 
+	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specfied path. 
 	 * @see org.jppf.ui.options.OptionElement#findElement(java.lang.String)
 	 */
 	public OptionElement findElement(String path)
 	{
 		if (path == null) return null;
 		else if ("".equals(path)) return this;
-		if (path.startsWith("/"))
-		{
-			return getRoot().findElement(path.substring(1));
-		}
+		if (path.startsWith("/")) return getRoot().findElement(path.substring(1));
 		if (path.startsWith(".."))
 		{
 			int idx = path.indexOf('/');
@@ -377,8 +367,7 @@ public abstract class AbstractOptionElement implements OptionElement
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		if (this instanceof OptionsPage)
-			sb.append("[Page] ");
+		if (this instanceof OptionsPage) sb.append("[Page] ");
 		else sb.append("[Option : ").append(getClass().getName()).append("] ");
 		sb.append("name=").append(name);
 		sb.append("; label=").append(label);
@@ -386,8 +375,7 @@ public abstract class AbstractOptionElement implements OptionElement
 	}
 
 	/**
-	 * Find all the elements with the specified name in the subtree of which
-	 * this element is the root. 
+	 * Find all the elements with the specified name in the subtree of which this element is the root. 
 	 * @param name the name of the elements to find.
 	 * @return a list of <code>OptionElement</code> instances, or null if no element
 	 * could be found with the specfied name. The resulting list can be empty, but never null.
@@ -406,11 +394,9 @@ public abstract class AbstractOptionElement implements OptionElement
 	}
 
 	/**
-	 * Find the first element with the specified name in the subtree of which
-	 * this element is the root. 
+	 * Find the first element with the specified name in the subtree of which this element is the root. 
 	 * @param name the name of the element to find.
-	 * @return an <code>OptionElement</code> instance, or null if no element
-	 * could be found with the specfied name.
+	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specfied name.
 	 * @see org.jppf.ui.options.OptionElement#findFirstWithName(java.lang.String)
 	 */
 	public OptionElement findFirstWithName(String name)
@@ -420,12 +406,10 @@ public abstract class AbstractOptionElement implements OptionElement
 	}
 
 	/**
-	 * Find the last element with the specified name in the subtree of which
-	 * this element is the root. 
+	 * Find the last element with the specified name in the subtree of which this element is the root. 
 	 * The notion of last element relates to a depth-first search in the tree. 
 	 * @param name the name of the element to find.
-	 * @return an <code>OptionElement</code> instance, or null if no element
-	 * could be found with the specfied name.
+	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specfied name.
 	 * @see org.jppf.ui.options.OptionElement#findLastWithName(java.lang.String)
 	 */
 	public OptionElement findLastWithName(String name)
@@ -560,5 +544,25 @@ public abstract class AbstractOptionElement implements OptionElement
 	public void setIconPath(String iconPath)
 	{
 		this.iconPath = iconPath;
+	}
+
+	/**
+	 * Determine whether the events firing in this option and/or its children are enabled.
+	 * @return enabled true if the events are enabled, false otherwise.
+	 * @see org.jppf.ui.options.OptionElement#isEventsEnabled()
+	 */
+	public boolean isEventsEnabled()
+	{
+		return eventsEnabled;
+	}
+
+	/**
+	 * Enable or disable the events firing in this otpion and/or its children.
+	 * @param enabled true to enable the events, false to disable them.
+	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
+	 */
+	public void setEventsEnabled(boolean enabled)
+	{
+		eventsEnabled = enabled;
 	}
 }
