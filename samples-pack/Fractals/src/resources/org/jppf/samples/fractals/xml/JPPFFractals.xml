@@ -55,7 +55,7 @@
 			comp.setSelectedIndex(0);
 			OptionsHandler.loadPreferences();
 			frame.getContentPane().add(option.getUIComponent());
-			frame.setSize(850, 768);
+			frame.setSize(820, 768);
 			frame.setVisible(true);
 		]]></script>
 	</initializer>

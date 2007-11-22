@@ -43,9 +43,9 @@ public class ImagePanel extends JPanel
 	 */
 	protected void paintComponent(Graphics g)
 	{
-		if (image != null) g.drawImage(image, 0, 0, null);
 		// Now call the superclass behavior to paint the foreground.
-		else super.paintComponent(g);
+		super.paintComponent(g);
+		if (image != null) g.drawImage(image, 0, 0, null);
 	}
 
 	/**
