@@ -49,10 +49,6 @@ public class JPPFQueue
 	 */
 	private ReentrantLock lock = new ReentrantLock();
 	/**
-	 * The maximum bundle size for the bundles present in the queue.
-	 */
-	private int maxBundleSize = 0;
-	/**
 	 * An ordered map of bundle sizes, mapping to a list of bundles of this size.
 	 */
 	private TreeMap<Integer, List<JPPFTaskBundle>> sizeMap = new TreeMap<Integer, List<JPPFTaskBundle>>(); 
@@ -76,10 +72,8 @@ public class JPPFQueue
 			lock.lock();
 			if (debugEnabled) log.debug("adding bundle with [initialTasksCount=" + bundle.getInitialTaskCount() +
 				", taskCount=" + bundle.getTaskCount() + "]");
-			if (queue.isEmpty()) setMaxBundleSize(0);
 			queue.add(bundle);
-			int size = bundle.getInitialTaskCount();
-			if (size > getMaxBundleSize()) setMaxBundleSize(size);
+			int size = getSize(bundle);
 			List<JPPFTaskBundle> list = sizeMap.get(size);
 			if (list == null)
 			{
@@ -112,25 +106,32 @@ public class JPPFQueue
 			JPPFTaskBundle bundle = queue.peek();
 			if (bundle == null) return null;
 			if (debugEnabled) log.debug("next bundle has " + bundle.getTaskCount() + " tasks");
+			int size = getSize(bundle);
+			List<JPPFTaskBundle> list = sizeMap.get(size);
+			if (list != null)
+			{
+				list.remove(bundle);
+				if (list.isEmpty()) sizeMap.remove(size);
+			}
 			if (nbTasks >= bundle.getTaskCount())
 			{
 				if (debugEnabled) log.debug("removing bundle from queue");
 				result = bundle;
 				queue.remove(bundle);
-				int size = bundle.getInitialTaskCount();
-				List<JPPFTaskBundle> list = sizeMap.get(size);
-				if (list != null)
-				{
-					list.remove(bundle);
-					if (list.isEmpty()) sizeMap.remove(size);
-					//if (sizeMap.isEmpty()) setMaxBundleSize(0);
-				}
-				if (!sizeMap.isEmpty()) setMaxBundleSize(sizeMap.lastKey());
 			}
 			else
 			{
 				if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle");
 				result = bundle.copy(nbTasks);
+				int newSize = bundle.getTaskCount();
+				list = sizeMap.get(newSize);
+				if (list == null)
+				{
+					list = new ArrayList<JPPFTaskBundle>();
+					//sizeMap.put(newSize, list);
+					sizeMap.put(size, list);
+				}
+				list.add(bundle);
 			}
 			result.setExecutionStartTime(System.currentTimeMillis());
 		}
@@ -148,7 +149,18 @@ public class JPPFQueue
 		taskOutOfQueue(result.getTaskCount(), System.currentTimeMillis() - result.getQueueEntryTime());
 		return result;
 	}
-	
+
+	/**
+	 * Get the bundle size to use for bundle size tuning.
+	 * @param bundle the bundle to get the size from.
+	 * @return the bundle size as an int.
+	 */
+	private int getSize(JPPFTaskBundle bundle)
+	{
+		//return bundle.getTaskCount();
+		return bundle.getInitialTaskCount();
+	}
+
 	/**
 	 * Add a listener to the current list of listeners to this queue.
 	 * @param listener the listener to add.
@@ -202,15 +214,6 @@ public class JPPFQueue
 	 */
 	public synchronized int getMaxBundleSize()
 	{
-		return maxBundleSize;
-	}
-
-	/**
-	 * Set the maximum bundle size for the bundles present in the queue.
-	 * @param maxBundleSize the bundle size as an int.
-	 */
-	public synchronized void setMaxBundleSize(int maxBundleSize)
-	{
-		this.maxBundleSize = maxBundleSize;
+		return sizeMap.isEmpty() ? 0 : sizeMap.lastKey();
 	}
 }

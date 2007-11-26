@@ -90,8 +90,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	protected NioServer(String name) throws JPPFException
 	{
 		super(name);
-		int n = Runtime.getRuntime().availableProcessors();
-		executor = Executors.newFixedThreadPool(n);
+		executor = Executors.newFixedThreadPool(1);
 	}
 
 	/**

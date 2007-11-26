@@ -39,7 +39,7 @@ import org.jppf.utils.*;
 public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioServer>
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	protected static final Log LOG = LogFactory.getLog(NodeNioServer.class);
 	/**
@@ -63,11 +63,15 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 	/**
 	 * Holds the currently idle channels.
 	 */
-	private Set<SocketChannel> idleChannels = new HashSet<SocketChannel>();
+	private List<SocketChannel> idleChannels = new ArrayList<SocketChannel>();
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
 	private JPPFQueue queue = null;
+	/**
+	 * Random number generator used to randomize the choice of idle channel.
+	 */
+	private Random random = new Random(System.currentTimeMillis());
 
 	/**
 	 * Initialize this server with a specified port number and name.
@@ -137,14 +141,13 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 			{
 				if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
 				if (DEBUG_ENABLED) LOG.debug(""+idleChannels.size()+" channels idle");
-				Iterator<SocketChannel> it = idleChannels.iterator();
-				while (!getQueue().isEmpty() && it.hasNext())
+				while (!getQueue().isEmpty() && !idleChannels.isEmpty())
 				{
 					try
 					{
 						lock.lock();
-						SocketChannel channel = it.next();
-						it.remove();
+						int n = random.nextInt(idleChannels.size());
+						SocketChannel channel = idleChannels.remove(n);
 						SelectionKey key = channel.keyFor(selector);
 						selector.wakeup();
 						key.interestOps(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
