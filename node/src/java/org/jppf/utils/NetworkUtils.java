@@ -46,8 +46,8 @@ public final class NetworkUtils
 	}
 
 	/**
-	 * Get the non local (meaning neither localhost or loopback address) of the current host.
-	 * @return the ip address as a string.
+	 * Get the non local (meaning neither localhost or loopback) address of the current host.
+	 * @return the ipv4 address as a string.
 	 */
 	public static String getNonLocalHostAddress()
 	{
@@ -61,6 +61,7 @@ public final class NetworkUtils
 				while (addresses.hasMoreElements())
 				{
 					InetAddress addr = addresses.nextElement();
+					if (addr instanceof Inet6Address) continue;
 					String host = addr.getHostAddress();
 					if (!"127.0.0.1".equals(host)) return host;
 				}
