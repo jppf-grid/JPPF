@@ -31,7 +31,7 @@ import java.util.concurrent.*;
 import javax.swing.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.ui.options.*;

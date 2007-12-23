@@ -136,6 +136,7 @@
 		<copy todir="${javadoc}/resources" overwrite="true">
 			<fileset dir="${shared.img}">
 				<include name="*.gif"/>
+				<size value="10" units="Ki" when="less"/>
 			</fileset>
 		</copy>
 	</target>

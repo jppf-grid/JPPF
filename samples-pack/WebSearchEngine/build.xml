@@ -16,7 +16,7 @@
 	limitations under the License.
 -->
 
-<project name='SequenceAlignment' basedir="." default="run">
+<project name='WebSearchEngine' basedir="." default="run">
 
 	<!-- ========================================================================= -->
 	<!--                          Property definitions                             -->
@@ -88,7 +88,7 @@
 	<!-- ========================================================================= -->
 
 	<target name="run">
-		<echo message="starting the JPPF Sequebce Alignment application"/>
+		<echo message="starting the JPPF Web Search Engine application"/>
 		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="project.classpath">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx256m"/>

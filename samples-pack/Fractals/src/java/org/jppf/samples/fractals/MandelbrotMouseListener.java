@@ -18,7 +18,7 @@
 
 package org.jppf.samples.fractals;
 
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.MouseEvent;
 
 import org.jppf.ui.options.*;
