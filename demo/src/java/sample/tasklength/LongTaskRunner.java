@@ -79,6 +79,7 @@ public class LongTaskRunner
 		try
 		{
 			// perform "iteration" times
+			long totalTime = 0L;
 			for (int iter=0; iter<iterations; iter++)
 			{
 				long start = System.currentTimeMillis();
@@ -94,7 +95,9 @@ public class LongTaskRunner
 				}
 				long elapsed = System.currentTimeMillis() - start;
 				System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
+				totalTime += elapsed;
 			}
+			System.out.println("Average iteration time: "+StringUtils.toStringDuration(totalTime/iterations));
 			JPPFStats stats = jppfClient.requestStatistics();
 			System.out.println("End statistics :\n"+stats.toString());
 		}

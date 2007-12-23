@@ -113,7 +113,7 @@ public class SpinnerNumberOption extends AbstractOption
 		{
 			try
 			{
-				value = new Integer((String) value);
+				value = Integer.valueOf((String) value);
 			}
 			catch(NumberFormatException e)
 			{

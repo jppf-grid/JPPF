@@ -28,6 +28,11 @@ import java.util.*;
 public final class FileUtils
 {
 	/**
+	 * Maximum buffer size for reading class files.
+	 */
+	private static final int BUFFER_SIZE = 32*1024;
+
+	/**
 	 * Instantiation of this class is not permitted.
 	 */
 	private FileUtils()
@@ -227,5 +232,52 @@ public final class FileUtils
 		{
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Get the content of a file as an array of bytes.
+	 * @param path the path of the file to read from as a string.
+	 * @return a byte array.
+	 * @throws IOException if an IO error occurs.
+	 */
+	public static byte[] getFileAsByte(String path) throws IOException
+	{
+		return getInputStreamAsByte(new BufferedInputStream(new FileInputStream(path)));
+	}
+
+	/**
+	 * Get the content of a file as an array of bytes.
+	 * @param file the abstract path of the file to read from.
+	 * @return a byte array.
+	 * @throws IOException if an IO error occurs.
+	 */
+	public static byte[] getFileAsByte(File file) throws IOException
+	{
+		return getInputStreamAsByte(new BufferedInputStream(new FileInputStream(file)));
+	}
+
+	/**
+	 * Get the content of an input stream as an array of bytes.
+	 * @param is the input stream to read from.
+	 * @return a byte array.
+	 * @throws IOException if an IO error occurs.
+	 */
+	public static byte[] getInputStreamAsByte(InputStream is) throws IOException
+	{
+		byte[] buffer = new byte[BUFFER_SIZE];
+		byte[] b = null;
+		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
+		boolean end = false;
+		while (!end)
+		{
+			int n = is.read(buffer, 0, BUFFER_SIZE);
+			if (n < 0) end = true;
+			else baos.write(buffer, 0, n);
+		}
+		is.close();
+		baos.flush();
+		b = baos.toByteArray();
+		baos.close();
+		return b;
 	}
 }

@@ -147,6 +147,7 @@ public class OptionElementFactory
 		builder.initCommonOptionAttributes(option, desc);
 		option.setValue(desc.getProperty("value"));
 		option.createUI();
+		option.setColumns(desc.getInt("columns", 16));
 		option.setEventsEnabled(true);
 		return option;
 	}

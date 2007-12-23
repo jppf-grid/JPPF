@@ -103,34 +103,31 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 			try
 			{
 				wait();
-				//synchronized (resultList)
+				if (debugEnabled) log.debug(""+getResultList().size()+" in result list");
+				if (asynch)
 				{
-					if (debugEnabled) log.debug(""+getResultList().size()+" in result list");
-					if (asynch)
-					{
-						for (JPPFTaskBundle bundle : getResultList()) sendPartialResults(bundle);
-					}
-					else if (!getResultList().isEmpty())
-					{
-						JPPFTaskBundle first = getResultList().remove(0);
-						List<byte[]> taskList = first.getTasks();
-						int count = first.getTasks().size();
-						int size = getResultList().size();
-						for (int i=0; i<size; i++)
-						{
-							JPPFTaskBundle bundle = getResultList().remove(0);
-							for (byte[] task: bundle.getTasks())
-							{
-								taskList.add(task);
-								count++;
-							}
-							bundle.getTasks().clear();
-						}
-						first.setTaskCount(count);
-						sendPartialResults(first);
-					}
-					getResultList().clear();
+					for (JPPFTaskBundle bundle : getResultList()) sendPartialResults(bundle);
 				}
+				else if (!getResultList().isEmpty())
+				{
+					JPPFTaskBundle first = getResultList().remove(0);
+					List<byte[]> taskList = first.getTasks();
+					int count = first.getTasks().size();
+					int size = getResultList().size();
+					for (int i=0; i<size; i++)
+					{
+						JPPFTaskBundle bundle = getResultList().remove(0);
+						for (byte[] task: bundle.getTasks())
+						{
+							taskList.add(task);
+							count++;
+						}
+						bundle.getTasks().clear();
+					}
+					first.setTaskCount(count);
+					sendPartialResults(first);
+				}
+				getResultList().clear();
 			}
 			catch (InterruptedException e)
 			{

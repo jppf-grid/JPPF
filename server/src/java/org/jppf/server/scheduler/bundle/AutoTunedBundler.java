@@ -141,7 +141,11 @@ public class AutoTunedBundler extends AbstractBundler
 			bundleSample.mean = (time + bundleSample.samples * bundleSample.mean) / samples;
 			bundleSample.samples = samples;
 		}
-		if (samples > profile.getMinSamplesToAnalyse()) performAnalysis();
+		if (samples > profile.getMinSamplesToAnalyse())
+		{
+			performAnalysis();
+			if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": bundle size = " + currentSize);
+		}
 	}
 
 	/**
@@ -177,10 +181,12 @@ public class AutoTunedBundler extends AbstractBundler
 			}
 
 			currentSize = Math.max(1, bestSize);
-			if (samplesMap.get(currentSize) != null)
+			BundlePerformanceSample sample = samplesMap.get(currentSize);
+			if (sample != null)
 			{
-				stableMean = samplesMap.get(currentSize).mean;
+				stableMean = sample.mean;
 				samplesMap.clear();
+				samplesMap.put(currentSize, sample);
 			}
 		}
 		log.info("Bundler#" + bundlerNumber + ": The bundle size converged to " + currentSize

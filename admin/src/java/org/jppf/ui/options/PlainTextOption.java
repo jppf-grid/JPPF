@@ -26,6 +26,11 @@ import javax.swing.JTextField;
 public class PlainTextOption extends TextOption
 {
 	/**
+	 * Number of columns (characters) displayed in the text field.
+	 */
+	private int columns = 16;
+
+	/**
 	 * Constructor provided as a convenience to facilitate the creation of
 	 * option elements through reflexion.
 	 */
@@ -65,5 +70,27 @@ public class PlainTextOption extends TextOption
 	{
 		this.value = value;
 		if ((value != null) && (field != null)) field.setText(value.toString());
+	}
+
+	/**
+	 * Get the number of columns displayed in the text field.
+	 * @return the number of columns as an int.
+	 */
+	public int getColumns()
+	{
+		return columns;
+	}
+
+	/**
+	 * Set the number of columns displayed in the text field.
+	 * @param columns the number of columns as an int.
+	 */
+	public void setColumns(int columns)
+	{
+		this.columns = columns;
+		if (field != null)
+		{
+			field.setColumns(columns);
+		}
 	}
 }

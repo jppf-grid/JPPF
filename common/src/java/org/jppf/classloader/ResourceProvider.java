@@ -21,7 +21,7 @@ import java.io.*;
 import java.net.URL;
 
 import org.apache.commons.logging.*;
-import org.jppf.utils.JPPFByteArrayOutputStream;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class are dedicated to reading resource files form the JVM's classpath and converting them into
@@ -38,16 +38,7 @@ public class ResourceProvider
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = true;
-	//private boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Maximum buffer size for reading class files.
-	 */
-	private static final int BUFFER_SIZE = 32*1024;
-	/**
-	 * Temporary buffer used to read class files.
-	 */
-	protected byte[] buffer = new byte[BUFFER_SIZE];
+	private boolean debugEnabled = log.isDebugEnabled();
 
 	/**
 	 * Default constructor.
@@ -89,7 +80,7 @@ public class ResourceProvider
 			if (is != null)
 			{
 				if (debugEnabled) log.debug("resource [" + resName + "] found");
-				return getInputStreamAsByte(is);
+				return FileUtils.getInputStreamAsByte(is);
 			}
 		}
 		catch (Exception e)
@@ -128,7 +119,7 @@ public class ResourceProvider
 			try
 			{
 				if (debugEnabled) log.debug("resource [" + resName + "] found, url = " + url);
-				return getInputStreamAsByte(url.openStream());
+				return FileUtils.getInputStreamAsByte(url.openStream());
 			}
 			catch (Exception e)
 			{
@@ -145,7 +136,7 @@ public class ResourceProvider
 				if (is != null)
 				{
 					if (debugEnabled) log.debug("resource [" + resName + "] found");
-					return getInputStreamAsByte(is);
+					return FileUtils.getInputStreamAsByte(is);
 				}
 			}
 			catch (Exception e)
@@ -155,36 +146,5 @@ public class ResourceProvider
 		}
 		if (debugEnabled) log.debug("resource [" + resName + "] not found");
 		return null;
-	}
-
-	/**
-	 * Get the content of an input stream as an array of byte.
-	 * @param is the input stream to read from.
-	 * @return a byte array.
-	 */
-	private byte[] getInputStreamAsByte(InputStream is)
-	{
-		byte[] b = null;
-		try
-		{
-			ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-			boolean end = false;
-			while (!end)
-			{
-				int n = is.read(buffer, 0, BUFFER_SIZE);
-				// by contract instances of InputStream are not require to fill the entire byte[]
-				if (n < 0) end = true;
-				else baos.write(buffer, 0, n);
-			}
-			is.close();
-			baos.flush();
-			b = baos.toByteArray();
-			baos.close();
-		}
-		catch (Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		return b;
 	}
 }

@@ -17,8 +17,6 @@
  */
 package sample.tasklength;
 
-import java.util.Random;
-
 import sample.BaseDemoTask;
 
 /**
@@ -51,6 +49,7 @@ public class LongTask extends BaseDemoTask
 	 */
 	public void doWork()
 	{
+		/*
 		fireNotification("Starting task with duration = "+ taskLength + " ms");
 		taskStart = System.currentTimeMillis();
 		double elapsed = 0L;
@@ -63,5 +62,13 @@ public class LongTask extends BaseDemoTask
 			elapsed = System.currentTimeMillis() - taskStart;
 		}
 		fireNotification("Task execution ended after " + elapsed + " ms");
+		*/
+		try
+		{
+			Thread.sleep(taskLength);
+		}
+		catch(InterruptedException e)
+		{
+		}
 	}
 }

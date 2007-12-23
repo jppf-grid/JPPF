@@ -123,6 +123,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		rend0.setHorizontalAlignment(JLabel.LEFT);
 		rend0.setOpaque(true);
 		table.getColumnModel().getColumn(0).setCellRenderer(rend0);
+	  for (int i=0; i<model.getColumnCount(); i++) table.sizeColumnsToFit(i);
 		tableModels.add(model);
 		panel.add(table);
 		table.setShowGrid(false);

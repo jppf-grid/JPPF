@@ -59,15 +59,6 @@ public final class BundlerFactory {
 	}
 
 	/**
-	 * Instantiate a fixed size bundler, based on a user-defined bundle size.
-	 * @return a <code>Bundler</code> instance.
-	 * @see org.jppf.server.scheduler.bundle.Bundler
-	 */
-	public static Bundler createSimpleBundler() {
-		return new FixedSizedBundler();
-	}
-
-	/**
 	 * Instantiate a fixed size bundler, based on a node-defined bundle size.
 	 * @param overrideSize the node-defined (override) size.
 	 * @return a <code>Bundler</code> instance.
@@ -99,6 +90,8 @@ public final class BundlerFactory {
 	public static Bundler createBundler(AnnealingTuneProfile profile, boolean override, String algorithm) {
 		if ("simple".equals(algorithm)) return new DelegatingBundler(profile, override);
 		return new AutoTunedBundler(profile);
+		//return new AutotunedDelegatingBundler(profile, override);
+		//return new DelegatingBundler(profile, override);
 	}
 
 	/**

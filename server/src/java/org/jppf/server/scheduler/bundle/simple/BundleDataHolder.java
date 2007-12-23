@@ -31,6 +31,10 @@ import org.jppf.server.scheduler.bundle.BundlePerformanceSample;
 public class BundleDataHolder
 {
 	/**
+	 * 
+	 */
+	public static int INITIAL_MA_LENGTH = 5000;
+	/**
 	 * Holds the samples required for calculating the moving average.
 	 */
 	private LinkedList<BundlePerformanceSample> samples = new LinkedList<BundlePerformanceSample>();
@@ -61,23 +65,31 @@ public class BundleDataHolder
 	 */
 	public BundleDataHolder(int maLength)
 	{
-		this.maLength = maLength;
+		//this.maLength = maLength;
+		this.maLength = INITIAL_MA_LENGTH;
 	}
 
 	/**
 	 * Add the specified sample to the list of samples.
 	 * @param sample the sample to add.
+	 * @return true if the new performance sample triggers a new analysis, false otherwise.
 	 */
-	public void addSample(BundlePerformanceSample sample)
+	public boolean addSample(BundlePerformanceSample sample)
 	{
-		while ((sample.samples + nbSamples > maLength) && !samples.isEmpty())
+		boolean b = (sample.samples + nbSamples > maLength) || samples.isEmpty();
+		if (b)
 		{
-			removeHeadSample();
+			while ((sample.samples + nbSamples > maLength) && !samples.isEmpty())
+			{
+				removeHeadSample();
+			}
 		}
 		samples.add(sample);
 		totalTime += sample.samples * sample.mean;
 		nbSamples += sample.samples;
+
 		computeMean();
+		return b;
 	}
 
 	/**
@@ -88,7 +100,6 @@ public class BundleDataHolder
 		BundlePerformanceSample sample = samples.removeFirst();
 		nbSamples -= sample.samples;
 		totalTime -= sample.samples * sample.mean;
-		computeMean();
 	}
 
 	/**
@@ -124,5 +135,23 @@ public class BundleDataHolder
 	public double getMean()
 	{
 		return mean;
+	}
+
+	/**
+	 * Get the number of samples required to compute the moving average.
+	 * @return the number of samples as an int.
+	 */
+	public int getMaLength()
+	{
+		return maLength;
+	}
+
+	/**
+	 * Set the number of samples required to compute the moving average.
+	 * @param maLength the number of samples as an int.
+	 */
+	public void setMaLength(int maLength)
+	{
+		this.maLength = maLength;
 	}
 }

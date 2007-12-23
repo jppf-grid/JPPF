@@ -64,14 +64,13 @@ public class ProportionalBundler extends AbstractBundler
 	 */
 	public ProportionalBundler(AutoTuneProfile profile, boolean override)
 	{
-		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		this.override = override;
 		int currentSize = JPPFStatsUpdater.getStaticBundleSize();
 		if (currentSize < 1)
 		{
 			currentSize = 1;
 		}
-		log.info("Bundler#" + bundlerNumber + ": The initial size is " + currentSize);
+		log.info("Bundler #" + bundlerNumber + ": The initial size is " + currentSize);
 		this.profile = profile;
 	}
 
@@ -84,6 +83,59 @@ public class ProportionalBundler extends AbstractBundler
 	{
 		BundleDataHolder holder = getDataHolder(bundler);
 		holder.addSample(sample);
+		double maxMean = Double.NEGATIVE_INFINITY;
+		double minMean = Double.POSITIVE_INFINITY;
+		BundleDataHolder minHolder = null;
+		for (BundleDataHolder h: map.values())
+		{
+			double m = h.getMean();
+			if (m > maxMean) maxMean = m;
+			if (m < minMean)
+			{
+				minMean = m;
+				minHolder = h;
+			}
+		}
+		double diffSum = 0d;
+		for (BundleDataHolder h: map.values())
+		{
+			double diff = maxMean / h.getMean();
+			diffSum += diff*diff;
+		}
+		int max = JPPFDriver.getQueue().getMaxBundleSize();
+		int sum = 0;
+		for (BundleDataHolder h: map.values())
+		{
+			double diff = maxMean / h.getMean();
+			int size = Math.max(1, (int) (max * (diff*diff / diffSum)));
+			h.setBundleSize(size);
+			sum += size;
+			//h.setMaLength((int) (BundleDataHolder.INITIAL_MA_LENGTH/diff));
+		}
+		if (sum < max)
+		{
+			int size = minHolder.getBundleSize();
+			minHolder.setBundleSize(size + (max - sum));
+		}
+		if (debugEnabled)
+		{
+			for (DelegatingBundler b: map.keySet())
+			{
+				BundleDataHolder h = map.get(b);
+				log.debug("bundler #"+b.getBundlerNumber()+" new size="+h.getBundleSize()+", maLength="+h.getMaLength());
+			}
+		}
+	}
+
+	/**
+	 * Process a new performance sample for the specified bundler.
+	 * @param bundler the bundler the sample applies to.
+	 * @param sample the performance sample to process.
+	 */
+	public synchronized void feedback2(DelegatingBundler bundler, BundlePerformanceSample sample)
+	{
+		BundleDataHolder holder = getDataHolder(bundler);
+		holder.addSample(sample);
 		double maxMean = 0d;
 		for (BundleDataHolder h: map.values())
 		{
@@ -91,18 +143,18 @@ public class ProportionalBundler extends AbstractBundler
 			if (m > maxMean) maxMean = m;
 		}
 		double diffSum = 0d;
-		//for (BundleDataHolder h: map.values()) diffSum += 1d + maxMean - h.getMean();
 		for (BundleDataHolder h: map.values()) diffSum += maxMean / h.getMean();
 		int max = JPPFDriver.getQueue().getMaxBundleSize();
 		for (DelegatingBundler b: map.keySet())
 		{
 			BundleDataHolder h = map.get(b);
-			double m = h.getMean();
-			//double diff = 1d + maxMean - m;
-			double diff = maxMean / m;
+			double diff = maxMean / h.getMean();
 			int size = Math.max(1, (int) (max * (diff / diffSum)));
 			h.setBundleSize(size);
-			if (debugEnabled) log.debug("bundler #"+b.getBundlerNumber()+" new size="+size);
+			if (debugEnabled)
+			{
+				log.debug("bundler #"+b.getBundlerNumber()+" new size="+size+", maLength="+h.getMaLength());
+			}
 		}
 	}
 

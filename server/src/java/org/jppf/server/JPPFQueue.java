@@ -51,7 +51,11 @@ public class JPPFQueue
 	/**
 	 * An ordered map of bundle sizes, mapping to a list of bundles of this size.
 	 */
-	private TreeMap<Integer, List<JPPFTaskBundle>> sizeMap = new TreeMap<Integer, List<JPPFTaskBundle>>(); 
+	private TreeMap<Integer, List<JPPFTaskBundle>> sizeMap = new TreeMap<Integer, List<JPPFTaskBundle>>();
+	/**
+	 * 
+	 */
+	private int latestMaxSize = 0;
 	
 	/**
 	 * Executable tasks queue, available for execution nodes to pick from. This
@@ -214,6 +218,7 @@ public class JPPFQueue
 	 */
 	public synchronized int getMaxBundleSize()
 	{
-		return sizeMap.isEmpty() ? 0 : sizeMap.lastKey();
+		latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
+		return latestMaxSize;
 	}
 }

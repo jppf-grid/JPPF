@@ -69,23 +69,20 @@ public class WaitingResultsState extends NodeServerState
 		{
 			if (DEBUG_ENABLED) LOG.debug("read bundle from node " + getRemoteHost(channel) + " done");
 			JPPFTaskBundle bundle = context.getBundle();
-			long elapsed = System.currentTimeMillis() - bundle.getExecutionStartTime();
 			TaskCompletionListener listener = bundle.getCompletionListener();
 			JPPFTaskBundle newBundle = context.deserializeBundle();
+			long elapsed = System.currentTimeMillis() - bundle.getExecutionStartTime();
 			// if an exception prevented the node from executing the tasks
 			if (newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM) != null)
 			{
 				newBundle.setTasks(bundle.getTasks());
 				newBundle.setTaskCount(bundle.getTaskCount());
 			}
-			else
+			// updating stats
+			else if (isStatsEnabled())
 			{
-				// updating stats
-				if (isStatsEnabled())
-				{
-					taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getMessage().length);
-					context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
-				}
+				taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getMessage().length);
+				context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 			}
 			// notifing the client thread about the end of a bundle
 			if (listener != null) listener.taskCompleted(newBundle);
