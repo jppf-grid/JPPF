@@ -123,7 +123,6 @@ public final class PermissionsFactory
 			e.printStackTrace();
 		}
 		// TODO: find a way to be more restrictive on RMI permissions
-		host = props.getString("jppf.server.host", "localhost");
 		permList.add(new SocketPermission("*:1024-", "accept,connect,listen,resolve"));
 	}
 

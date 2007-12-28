@@ -51,7 +51,7 @@ public class JavaOption extends AbstractOption
 	{
 		try
 		{
-			UIComponent = (JComponent) Class.forName(className).newInstance();
+			UIComponent = (JComponent) Class.forName(getClassName()).newInstance();
 			if (mouseListenerClassName != null)
 			{
 				JavaOptionMouseListener ml =

@@ -62,10 +62,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 */
 	private int port = 0;
 	/**
-	 * Contains the names of all MBeans registered with the remote MBean server.
-	 */
-	private Set<ObjectName> allNames = new HashSet();
-	/**
 	 * The connection thread that performs the connection to the management server.
 	 */
 	private JMXConnectionThread connectionThread = null;
@@ -73,10 +69,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 * A string representing this connection, used for logging purposes.
 	 */
 	private String idString = null;
-  /**
-   * Default credentials for authenticating with the MBean server.
-   */
-  private String[] credentials = { "username" , "password" };
   /**
    * Determines whether the connection to the JMX server has been established.
    */

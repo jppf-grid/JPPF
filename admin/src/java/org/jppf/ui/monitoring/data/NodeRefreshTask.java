@@ -63,13 +63,12 @@ public class NodeRefreshTask extends TimerTask
 		synchronized(handler)
 		{
 			Map<String, NodeInfoManager> nodeManagerMap = handler.getNodeManagerMap();
-			for (String name: nodeManagerMap.keySet())
+			for (Map.Entry<String, NodeInfoManager> mgrEntry: nodeManagerMap.entrySet())
 			{
-				NodeInfoManager nodeMgr = nodeManagerMap.get(name);
-				Map<NodeManagementInfo, NodeInfoHolder> nodesMap = nodeMgr.getNodeMap();
-				for (NodeManagementInfo info: nodesMap.keySet())
+				Map<NodeManagementInfo, NodeInfoHolder> nodesMap = mgrEntry.getValue().getNodeMap();
+				for (Map.Entry<NodeManagementInfo, NodeInfoHolder> infoEntry: nodesMap.entrySet())
 				{
-					updateNodeState(name, nodesMap.get(info));
+					updateNodeState(mgrEntry.getKey(), infoEntry.getValue());
 				}
 			}
 		}

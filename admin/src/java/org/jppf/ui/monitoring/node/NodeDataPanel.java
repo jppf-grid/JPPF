@@ -83,16 +83,14 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 		DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode(localize("tree.root.name"));
 		model = new JPPFNodeTreeTableModel(root);
 		Map<String, NodeInfoManager> nodeManagerMap = handler.getNodeManagerMap();
-		for (String name: nodeManagerMap.keySet())
+		for (Map.Entry<String, NodeInfoManager> mgrEntry: nodeManagerMap.entrySet())
 		{
-			DefaultMutableTreeTableNode driverNode = new DefaultMutableTreeTableNode(name);
+			DefaultMutableTreeTableNode driverNode = new DefaultMutableTreeTableNode(mgrEntry.getKey());
 			model.insertNodeInto(driverNode, root, root.getChildCount());
-			NodeInfoManager nodeMgr = nodeManagerMap.get(name);
-			Map<NodeManagementInfo, NodeInfoHolder> driverNodeMap = nodeMgr.getNodeMap();
-			for (NodeManagementInfo info: driverNodeMap.keySet())
+			Map<NodeManagementInfo, NodeInfoHolder> driverNodeMap = mgrEntry.getValue().getNodeMap();
+			for (Map.Entry<NodeManagementInfo, NodeInfoHolder> infoEntry: driverNodeMap.entrySet())
 			{
-				NodeInfoHolder nodeInfoHolder = driverNodeMap.get(info);
-				DefaultMutableTreeTableNode nodeNode = new DefaultMutableTreeTableNode(nodeInfoHolder);
+				DefaultMutableTreeTableNode nodeNode = new DefaultMutableTreeTableNode(infoEntry.getValue());
 				model.insertNodeInto(nodeNode, driverNode, driverNode.getChildCount());
 			}
 		}

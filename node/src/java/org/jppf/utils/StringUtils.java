@@ -31,11 +31,11 @@ public final class StringUtils
 	/**
 	 * Keywords to look for and replace in the legend items of the charts.
 	 */
-	private static final String[] KEYWORDS = new String[] { "Execution", "Maximum", "Minimum", "Average" };
+	private static final String[] KEYWORDS = new String[] { "Execution", "Maximum", "Minimum", "Average", "Cumulated" };
 	/**
 	 * The the replacements words for the keywords in the legend items. Used to shorten the legend labels.
 	 */
-	private static final String[] REPLACEMENTS = new String[] { "Exec", "Max", "Min", "Avg" };
+	private static final String[] REPLACEMENTS = new String[] { "Exec", "Max", "Min", "Avg", "Cumul" };
 
 	/**
 	 * Instantiation of this class is not permitted.

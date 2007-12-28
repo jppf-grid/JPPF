@@ -59,10 +59,10 @@ public class RhinoScriptRunner implements ScriptRunner
 		init();
 		errorHandler.errors.clear();
 		Object result = null;
-		for (String key: variables.keySet())
+		for (Map.Entry<String, Object> entry: variables.entrySet())
 		{
-			Object wrapped = Context.javaToJS(variables.get(key), scope);
-			ScriptableObject.putProperty(scope, key, wrapped);
+			Object wrapped = Context.javaToJS(entry.getValue(), scope);
+			ScriptableObject.putProperty(scope, entry.getKey(), wrapped);
 		}
 		try
 		{

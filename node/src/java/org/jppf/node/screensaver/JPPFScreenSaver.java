@@ -75,10 +75,6 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	 * The image object for the flying logos.
 	 */
 	private Image logoImg = null;
-	/**
-	 * 
-	 */
-	private boolean initCalled = false;
 
 	/**
 	 * Default constructor.
@@ -119,8 +115,6 @@ public class JPPFScreenSaver extends SimpleScreensaver
 		parent = (Container) getContext().getComponent();
 		parent.setBackground(Color.BLACK);
     Dimension fullSize = Toolkit.getDefaultToolkit().getScreenSize();
-    Dimension currentSize = parent.getSize();
-    //System.out.println("Screen size: "+fullSize+", current size: "+currentSize);
 
 		if (node == null) node = new NodePanel(getContext().isFullScreen());
 		node.setDoubleBuffered(true);

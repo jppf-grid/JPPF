@@ -213,15 +213,10 @@ public class HtmlDocGenerator
 		}
 		reader.close();
 		String template = sb.toString();
-		for (String name: parameterMap.keySet())
+		for (Map.Entry<String, String> entry: parameterMap.entrySet())
 		{
-			if ("content".equals(name))
-			{
-				name.getClass();
-			}
-			String value = parameterMap.get(name);
-			String param = PARAM_START + name + PARAM_END;
-			template = template.replace(param, value);
+			String param = PARAM_START + entry.getKey() + PARAM_END;
+			template = template.replace(param, entry.getValue());
 		}
 		return template;
 	}

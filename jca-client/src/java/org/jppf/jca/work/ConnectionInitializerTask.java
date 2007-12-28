@@ -32,10 +32,6 @@ public class ConnectionInitializerTask implements Runnable
 	 */
 	private static Log log = LogFactory.getLog(ConnectionInitializerTask.class);
 	/**
-	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
-	 */
-	private boolean debugEnabled = log.isDebugEnabled();
-	/**
 	 * The client connection to initialize.
 	 */
 	private JPPFClientConnection c = null;

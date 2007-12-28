@@ -43,10 +43,6 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 */
 	private static Log log = LogFactory.getLog(JPPFSubmissionManager.class);
 	/**
-	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-	 */
-	private boolean debugEnabled = log.isDebugEnabled();
-	/**
 	 * The queue of submissions pending execution.
 	 */
 	private ConcurrentLinkedQueue<ClientExecution> execQueue = new ConcurrentLinkedQueue<ClientExecution>();
