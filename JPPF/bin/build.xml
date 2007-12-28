@@ -188,6 +188,7 @@
 		<zip destfile="${samples.pack.file}">
 			<zipfileset dir="${basedir}/../samples-pack" prefix="samples-pack">
 				<exclude name="**/*.log"/>
+				<exclude name="**/javadoc/**/*.*"/>
 			</zipfileset>
 		</zip>
   </target>

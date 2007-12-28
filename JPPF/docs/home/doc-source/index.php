@@ -28,12 +28,12 @@
 							<ul type="square">
 								<li>a JPPF grid can be up and running in minutes</li>
 								<li>full platform independance
-								<li>highly scalable, distributed framework for the execution of Java tasks</li>
-								<li>leverages JCA 1.5 to integrate with leading J2EE application servers</li>
+								<li>highly scalable, distributed framework for the execution of tasks</li>
+								<li>integrates with leading J2EE application servers</li>
 								<li>easy programming model that abstracts the complexity of distributed and parallel processing</li>
 								<li>graphical and programmatic tools for fine-grained monitoring and administration</li>
 								<li>reliability through redundancy, recovery and failover capabilities</li>
-								<li>a set of fully documented sample applications, applying JPPF to real-life problems</li>
+								<li>a set of fully documented sample applications of JPPF to real-life problems</li>
 								<li>a JPPF screensaver node enables the automatic use of idle computers</li>
 								<li>very flexible and non-constraining open-source licensing</li>
 							</ul>
@@ -43,9 +43,6 @@
 								onmouseover="setImage('dl_jppf', 'images/downloadJPPF2.jpg')"
 								onmouseout="setImage('dl_jppf', 'images/downloadJPPF.jpg')">
 								<img id="dl_jppf" src="images/downloadJPPF.jpg" border="0" alt="Download JPPF Now"/></a><br>&nbsp;
-						</td></tr>
-						<tr><td class="noborder_">
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 1.0 release candidate 1</span></h4>
 						</td></tr>
 						<tr><td class="noborder_">
 							$template{name="highlight-top" span="1" color="pblue"}$
@@ -95,13 +92,17 @@
 									<td align="center" valign="center">
 										<strong style="color: #8080FF">JPPF feeds:</strong>
 									</td>
+									<td width="10"/>
 									<td align="center" valign="center">
 										<a href="http://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1">
-											<img src="images/feed-16x16.gif" border="0"/>News</a>
+											<img src="images/feed-16x16.gif" border="0"/></a>&nbsp;
+										<a href="http://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1">News</a>
 									</td>
+									<td width="10"/>
 									<td align="center" valign="center">
 										<a href="http://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1">
-											<img src="images/feed-16x16.gif" border="0"/>Releases</a>
+											<img src="images/feed-16x16.gif" border="0"/></a>&nbsp;
+										<a href="http://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1">Releases</a>
 									</td>
 								</tr>
 							</table>
@@ -111,6 +112,9 @@
 						<tr><td class="noborder_">
 							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the Apache License, Version 2.0.<br>
 							A copy of the licensing terms can be obtained <a href="http://www.apache.org/licenses/LICENSE-2.0"><b>at this location</b></a>.</span></h4>
+						</td></tr>
+						<tr><td class="noborder_">
+							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 1.0 Generally Available</span></h4>
 						</td></tr>
 						<tr><td class="noborder_">
 							<h3>JPPF on the web:</h3>

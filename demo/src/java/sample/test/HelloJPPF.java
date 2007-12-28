@@ -102,6 +102,9 @@ public class HelloJPPF implements Serializable
 		{
 			e.printStackTrace();
 		}
-		System.exit(0);
+		finally
+		{
+			client.close();
+		}
 	}
 }

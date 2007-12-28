@@ -163,6 +163,7 @@ public class TaskNotificationRunner
 		catch (Exception e)
 		{
 			// ... handle the exception ...
+			System.out.println(e.getMessage());
 		}
 	}
 }

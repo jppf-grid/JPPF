@@ -69,6 +69,7 @@ public class LongTask extends BaseDemoTask
 		}
 		catch(InterruptedException e)
 		{
+			setException(e);
 		}
 	}
 }

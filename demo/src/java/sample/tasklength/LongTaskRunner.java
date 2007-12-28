@@ -33,7 +33,7 @@ import org.jppf.utils.*;
 public class LongTaskRunner
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	static Log log = LogFactory.getLog(LongTaskRunner.class);
 	/**
@@ -54,7 +54,7 @@ public class LongTaskRunner
 			int length = props.getInt("longtask.length");
 			int nbTask = props.getInt("longtask.number");
 			int iterations = props.getInt("longtask.iterations");
-			System.out.println("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
+			print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
 			perform(nbTask, length, iterations);
 			//performLong(size, iterations);
 			System.exit(0);
@@ -71,10 +71,10 @@ public class LongTaskRunner
 	 * @param nbTask the number of tasks to send at each iteration.
 	 * @param length the executionlength of each task.
 	 * @param iterations the number of times the the tasks will be sent.
-	 * @throws JPPFException if an error is raised during the execution.
+	 * @throws Exception if an error is raised during the execution.
 	 */
 	@SuppressWarnings("unused")
-	private static void perform(int nbTask, int length, int iterations) throws JPPFException
+	private static void perform(int nbTask, int length, int iterations) throws Exception
 	{
 		try
 		{
@@ -94,12 +94,12 @@ public class LongTaskRunner
 					if (e != null) throw e;
 				}
 				long elapsed = System.currentTimeMillis() - start;
-				System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
+				print("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
 				totalTime += elapsed;
 			}
-			System.out.println("Average iteration time: "+StringUtils.toStringDuration(totalTime/iterations));
+			print("Average iteration time: "+StringUtils.toStringDuration(totalTime/iterations));
 			JPPFStats stats = jppfClient.requestStatistics();
-			System.out.println("End statistics :\n"+stats.toString());
+			print("End statistics :\n"+stats.toString());
 		}
 		catch(Exception e)
 		{
@@ -107,4 +107,13 @@ public class LongTaskRunner
 		}
 	}
 
+	/**
+	 * Print a message tot he log and to the console.
+	 * @param msg the message to print.
+	 */
+	private static void print(String msg)
+	{
+		log.info(msg);
+		System.out.println(msg);
+	}
 }
