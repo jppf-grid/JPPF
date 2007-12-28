@@ -59,14 +59,14 @@ public class AutoTunedBundler extends AbstractBundler
 	/**
 	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
 	 */
-	protected AutoTuneProfile profile;
+	protected AnnealingTuneProfile profile;
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
 	 * @param profile the parameters of the auto-tuning algorithm,
 	 * grouped as a performance analysis profile.
 	 */
-	public AutoTunedBundler(AutoTuneProfile profile)
+	public AutoTunedBundler(AnnealingTuneProfile profile)
 	{
 		this(profile, false);
 	}
@@ -77,7 +77,7 @@ public class AutoTunedBundler extends AbstractBundler
 	 * @param override true if the settings were overriden by the node, false otherwise.
 	 * grouped as a performance analysis profile.
 	 */
-	public AutoTunedBundler(AutoTuneProfile profile, boolean override)
+	public AutoTunedBundler(AnnealingTuneProfile profile, boolean override)
 	{
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		this.override = override;
@@ -224,7 +224,7 @@ public class AutoTunedBundler extends AbstractBundler
 	 */
 	public Bundler copy()
 	{
-		AutoTunedBundler b = new AutoTunedBundler(profile.copy());
+		AutoTunedBundler b = new AutoTunedBundler((AnnealingTuneProfile) profile.copy());
 		return b;
 	}
 }

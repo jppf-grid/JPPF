@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.scheduler.bundle.simple;
+package org.jppf.server.scheduler.bundle.proportional;
 
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -26,7 +26,7 @@ import org.jppf.server.scheduler.bundle.*;
 
 /**
  * Instances of this bundler delegate their operations to a singleton instance of a
- * {@link org.jppf.server.scheduler.bundle.simple.PropertionalBundler PropertionalBundler}.
+ * {@link org.jppf.server.scheduler.bundle.proportional.PropertionalBundler PropertionalBundler}.
  * @author Laurent Cohen
  */
 public class DelegatingBundler extends AbstractBundler
@@ -51,10 +51,6 @@ public class DelegatingBundler extends AbstractBundler
 	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
 	 */
 	protected AutoTuneProfile profile;
-	/**
-	 * The current bunlde size.
-	 */
-	private int bundleSize = 1;
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
@@ -67,10 +63,7 @@ public class DelegatingBundler extends AbstractBundler
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		this.override = override;
 		int bundleSize = JPPFStatsUpdater.getStaticBundleSize();
-		if (bundleSize < 1)
-		{
-			bundleSize = 1;
-		}
+		if (bundleSize < 1) bundleSize = 1;
 		log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize);
 		this.profile = profile;
 		lock.lock();
@@ -78,7 +71,7 @@ public class DelegatingBundler extends AbstractBundler
 		{
 			if (simpleBundler == null)
 			{
-				simpleBundler = new ProportionalBundler(profile, override);
+				simpleBundler = new ProportionalBundler((ProportionalTuneProfile) profile, override);
 			}
 		}
 		finally
@@ -94,7 +87,7 @@ public class DelegatingBundler extends AbstractBundler
 	 */
 	public Bundler copy()
 	{
-		return new DelegatingBundler(profile, override);
+		return new DelegatingBundler((ProportionalTuneProfile) profile, override);
 	}
 
 	/**

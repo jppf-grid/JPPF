@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.scheduler.bundle.simple;
+package org.jppf.server.scheduler.bundle.proportional;
 
 import java.util.*;
 
@@ -26,7 +26,7 @@ import org.jppf.server.scheduler.bundle.*;
 
 /**
  * This bundler implementation computes bundle sizes propertional to the mean execution
- * time for each node.<br>
+ * time for each node to the oiwer of 4.<br>
  * The scope of this bundler is all nodes, which means that it computes the size for all nodes,
  * unless an override is specified by the nodes.<br>
  * The mean execution time is computed as a moving average over a number of tasks, specified in the bundling
@@ -49,12 +49,16 @@ public class ProportionalBundler extends AbstractBundler
 	/**
 	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
 	 */
-	protected AutoTuneProfile profile;
+	protected ProportionalTuneProfile profile;
 	/**
 	 * Mapping of individual bundler to corresponding performance data.
 	 */
-	protected Map<DelegatingBundler, BundleDataHolder> map = 
+	private Map<DelegatingBundler, BundleDataHolder> map = 
 		new HashMap<DelegatingBundler, BundleDataHolder>();
+	/**
+	 * Initial bundle size.
+	 */
+	private int currentSize = 10;
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
@@ -62,14 +66,11 @@ public class ProportionalBundler extends AbstractBundler
 	 * @param override true if the settings were overriden by the node, false otherwise.
 	 * grouped as a performance analysis profile.
 	 */
-	public ProportionalBundler(AutoTuneProfile profile, boolean override)
+	public ProportionalBundler(ProportionalTuneProfile profile, boolean override)
 	{
 		this.override = override;
-		int currentSize = JPPFStatsUpdater.getStaticBundleSize();
-		if (currentSize < 1)
-		{
-			currentSize = 1;
-		}
+		currentSize = JPPFStatsUpdater.getStaticBundleSize();
+		if (currentSize < 1) currentSize = 1;
 		log.info("Bundler #" + bundlerNumber + ": The initial size is " + currentSize);
 		this.profile = profile;
 	}
@@ -100,17 +101,17 @@ public class ProportionalBundler extends AbstractBundler
 		for (BundleDataHolder h: map.values())
 		{
 			double diff = maxMean / h.getMean();
-			diffSum += diff*diff;
+			diffSum += computeDiff(diff);
 		}
 		int max = JPPFDriver.getQueue().getMaxBundleSize();
 		int sum = 0;
 		for (BundleDataHolder h: map.values())
 		{
 			double diff = maxMean / h.getMean();
-			int size = Math.max(1, (int) (max * (diff*diff / diffSum)));
+			double d = computeDiff(diff) / diffSum;
+			int size = Math.max(1, (int) (max * d));
 			h.setBundleSize(size);
 			sum += size;
-			//h.setMaLength((int) (BundleDataHolder.INITIAL_MA_LENGTH/diff));
 		}
 		if (sum < max)
 		{
@@ -128,34 +129,15 @@ public class ProportionalBundler extends AbstractBundler
 	}
 
 	/**
-	 * Process a new performance sample for the specified bundler.
-	 * @param bundler the bundler the sample applies to.
-	 * @param sample the performance sample to process.
+	 * 
+	 * @param x .
+	 * @return ,
 	 */
-	public synchronized void feedback2(DelegatingBundler bundler, BundlePerformanceSample sample)
+	private double computeDiff(double x)
 	{
-		BundleDataHolder holder = getDataHolder(bundler);
-		holder.addSample(sample);
-		double maxMean = 0d;
-		for (BundleDataHolder h: map.values())
-		{
-			double m = h.getMean();
-			if (m > maxMean) maxMean = m;
-		}
-		double diffSum = 0d;
-		for (BundleDataHolder h: map.values()) diffSum += maxMean / h.getMean();
-		int max = JPPFDriver.getQueue().getMaxBundleSize();
-		for (DelegatingBundler b: map.keySet())
-		{
-			BundleDataHolder h = map.get(b);
-			double diff = maxMean / h.getMean();
-			int size = Math.max(1, (int) (max * (diff / diffSum)));
-			h.setBundleSize(size);
-			if (debugEnabled)
-			{
-				log.debug("bundler #"+b.getBundlerNumber()+" new size="+size+", maLength="+h.getMaLength());
-			}
-		}
+		double r = 1d;
+		for (int i=0; i<profile.getPropertionalityFactor(); i++) r *= x;
+		return r;
 	}
 
 	/**
@@ -199,14 +181,14 @@ public class ProportionalBundler extends AbstractBundler
 		BundleDataHolder holder = map.get(bundler);
 		if (holder == null)
 		{
-			holder = new BundleDataHolder((int) profile.getMinSamplesToAnalyse());
+			holder = new BundleDataHolder(profile.getPerformanceCacheSize());
 			map.put(bundler, holder);
 		}
 		return holder;
 	}
 
 	/**
-	 * Remove the specified bundler from the list of bundler in this object.
+	 * Remove the specified bundler from the list of bundlers in this object.
 	 * @param bundler the bundler to remove.
 	 */
 	public synchronized void removeBundler(DelegatingBundler bundler)

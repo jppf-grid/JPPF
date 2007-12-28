@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.scheduler.bundle.simple;
+package org.jppf.server.scheduler.bundle.proportional;
 
 import java.util.*;
 
@@ -25,15 +25,11 @@ import org.jppf.server.scheduler.bundle.BundlePerformanceSample;
 /**
  * Each instance of this class acts as a container for the performance data related to a node,
  * and is used for the global computations of the
- * {@link org.jppf.server.scheduler.bundle.simple.PropertionalBundler PropertionalBundler}. 
+ * {@link org.jppf.server.scheduler.bundle.proportional.PropertionalBundler PropertionalBundler}. 
  * @author Laurent Cohen
  */
 public class BundleDataHolder
 {
-	/**
-	 * 
-	 */
-	public static int INITIAL_MA_LENGTH = 5000;
 	/**
 	 * Holds the samples required for calculating the moving average.
 	 */
@@ -65,8 +61,7 @@ public class BundleDataHolder
 	 */
 	public BundleDataHolder(int maLength)
 	{
-		//this.maLength = maLength;
-		this.maLength = INITIAL_MA_LENGTH;
+		this.maLength = maLength;
 	}
 
 	/**

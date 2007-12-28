@@ -26,7 +26,7 @@ import org.jppf.server.scheduler.bundle.*;
 
 /**
  * Instances of this bundler delegate their operations to a singleton instance of a
- * {@link org.jppf.server.scheduler.bundle.simple.PropertionalBundler PropertionalBundler}.
+ * {@link org.jppf.server.scheduler.bundle.proportional.PropertionalBundler PropertionalBundler}.
  * @author Laurent Cohen
  */
 public class AutotunedDelegatingBundler extends AbstractBundler
@@ -50,11 +50,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	/**
 	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
 	 */
-	protected AutoTuneProfile profile;
-	/**
-	 * The current bunlde size.
-	 */
-	private int bundleSize = 1;
+	protected AnnealingTuneProfile profile;
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
@@ -62,7 +58,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	 * @param override true if the settings were overriden by the node, false otherwise.
 	 * grouped as a performance analysis profile.
 	 */
-	public AutotunedDelegatingBundler(AutoTuneProfile profile, boolean override)
+	public AutotunedDelegatingBundler(AnnealingTuneProfile profile, boolean override)
 	{
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		this.override = override;
