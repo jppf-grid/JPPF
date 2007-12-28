@@ -89,29 +89,37 @@ public enum  BundleParameter
 	 */
 	BUNDLE_TUNING_TYPE_PARAM,
 	/**
-	 * Autotuning parameter: minimum number of samples to analyse
+	 * Heuristic autotuning parameter: minimum number of samples to analyse
 	 */
 	MIN_SAMPLES_TO_ANALYSE,
 	/**
-	 * Autotuning parameter: minimum number of samples to check algorithm convergence
+	 * Heuristic autotuning parameter: minimum number of samples to check algorithm convergence
 	 */
 	MIN_SAMPLES_TO_CHECK_CONVERGENCE,
 	/**
-	 * Autotuning parameter: maximum allowed deviation.
+	 * Heuristic autotuning parameter: maximum allowed deviation.
 	 */
 	MAX_DEVIATION,
 	/**
-	 * Autotuning parameter: maximum number of guesses before best size is deemed stable.
+	 * Heuristic autotuning parameter: maximum number of guesses before best size is deemed stable.
 	 */
 	MAX_GUESS_TO_STABLE,
 	/**
-	 * Autotuning parameter: size ration deviation.
+	 * Heuristic autotuning parameter: size ration deviation.
 	 */
 	SIZE_RATIO_DEVIATION,
 	/**
-	 * Autotuning parameter: decrease ratio.
+	 * Heuristic autotuning parameter: decrease ratio.
 	 */
 	DECREASE_RATIO,
+	/**
+	 * Deterministic autotuning parameter: mazimum size of the performance samples cache for each node.
+	 */
+	PERFORMANCE_CACHE_SIZE,
+	/**
+	 * Deterministic autotuning parameter: proportionality factor.
+	 */
+	PROPORTIONALITY_FACTOR,
 	/**
 	 * To determine whether a node connection is for a peer driver or an actual execution node.
 	 */

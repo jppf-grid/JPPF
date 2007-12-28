@@ -38,25 +38,59 @@
 	]]></script>
 	<initializer type="script">
 		<script language="javascript"><![CDATA[
-			option.findFirstWithName("/ManualConfig").setEnabled(true);
-			option.findFirstWithName("/AutoConfig").setEnabled(false);
+			option.findFirstWithName("/ManualConfig").setEnabled(false);
+			option.findFirstWithName("/ProportionalConfig").setEnabled(false);
+			option.findFirstWithName("/AutoConfig").setEnabled(true);
 		]]></script>
 	</initializer>
 
-	<child name="Manual" type="Boolean">
-		<property name="label" value="Use manual settings"/>
-		<property name="tooltip" value="Toggles between manual and automatic tuning of the bundle size"/>
-		<property name="value" value="true"/>
-		<property name="persistent" value="true"/>
-		<listener type="script">
-			<script language="javascript"><![CDATA[
-				b = option.getValue().booleanValue();
-				option.findElement("../ManualConfig").setEnabled(b);
-				option.findElement("../AutoConfig").setEnabled(!b);
-			]]></script>
-		</listener>
-	</child>
+	<child name="AlgorithmPanel" type="page">
+		<property name="label" value=""/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
 
+		<child name="Algorithm" type="ComboBox">
+			<property name="label" value="Algorithm"/>
+			<property name="tooltip" value="Bundle size computation algorithm"/>
+			<property name="value" value="PAM120"/>
+			<property name="orientation" value="horizontal"/>
+			<property name="persistent" value="true"/>
+			<item name="manual" selected="false"/>
+			<item name="autotuned" selected="true"/>
+			<item name="proportional" selected="false"/>
+			<listener type="script">
+				<script language="javascript"><![CDATA[
+					var algo = option.getValue();
+					if (algo.equals("manual"))
+					{
+						option.findFirstWithName("/ManualConfig").setEnabled(true);
+						option.findFirstWithName("/ProportionalConfig").setEnabled(false);
+						option.findFirstWithName("/AutoConfig").setEnabled(false);
+					}
+					else if (algo.equals("proportional"))
+					{
+						option.findFirstWithName("/ManualConfig").setEnabled(false);
+						option.findFirstWithName("/ProportionalConfig").setEnabled(true);
+						option.findFirstWithName("/AutoConfig").setEnabled(false);
+					}
+					else
+					{
+						option.findFirstWithName("/ManualConfig").setEnabled(false);
+						option.findFirstWithName("/ProportionalConfig").setEnabled(false);
+						option.findFirstWithName("/AutoConfig").setEnabled(true);
+					}
+				]]></script>
+			</listener>
+		</child>
+
+		<child name="filler1" type="Filler">
+			<property name="width" value="1"/>
+			<property name="height" value="1"/>
+		</child>
+
+	</child>
 
 	<!-- ===================================================================== -->
 	<!--           Server bundle size manual configuration area                -->
@@ -152,14 +186,13 @@
 						page = OptionsHandler.getPage("Admin");
 						pwd = page.findFirstWithName("actualPwd").getValue();
 						params = new HashMap();
-						params.put(BundleParameter.BUNDLE_TUNING_TYPE_PARAM, "auto");
+						params.put(BundleParameter.BUNDLE_TUNING_TYPE_PARAM, "autotuned");
 						params.put(BundleParameter.MIN_SAMPLES_TO_ANALYSE, option.findFirstWithName("/MinSamplesToAnalyse").getValue());
 						params.put(BundleParameter.MIN_SAMPLES_TO_CHECK_CONVERGENCE, option.findFirstWithName("/MinSamplesToCheckConvergence").getValue());
 						params.put(BundleParameter.MAX_DEVIATION, option.findFirstWithName("/MaxDeviation").getValue());
 						params.put(BundleParameter.MAX_GUESS_TO_STABLE, option.findFirstWithName("/MaxGuessToStable").getValue());
 						params.put(BundleParameter.SIZE_RATIO_DEVIATION, option.findFirstWithName("/SizeRatioDeviation").getValue());
 						params.put(BundleParameter.DECREASE_RATIO, option.findFirstWithName("/DecreaseRatio").getValue());
-						params.put(BundleParameter.BUNDLE_TUNING_TYPE_PARAM, "autotuned");
 						msg = StatsHandler.getInstance().changeSettings(pwd, params);
 						if (msg != null) option.findFirstWithName("/TuningMessages").setValue(msg);
 					]]></script>
@@ -224,6 +257,80 @@
 			<property name="value" value="0.2"/>
 			<property name="pattern" value="###,###,##0"/>
 			<property name="orientation" value="horizontal"/>
+			<property name="persistent" value="true"/>
+		</child>
+
+		<child name="filler" type="Filler">
+			<property name="width" value="1"/>
+			<property name="height" value="1"/>
+		</child>
+
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--         Proportional auto-tuning configuration area                   -->
+	<!-- ===================================================================== -->
+
+	<child name="ProportionalConfig" type="page">
+
+		<property name="label" value="Bundle size proportional profile"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="vertical"/>
+		<property name="bordered" value="true"/>
+		<property name="main" value="false"/>
+		<property name="tooltip" value="Configure a profile based on a deterministic algortihm."/>
+
+		<child name="ProportionalButtonPanel" type="page">
+			<property name="label" value="ButtonPanel"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="horizontal"/>
+			<property name="bordered" value="false"/>
+			<property name="main" value="false"/>
+
+			<child name="filler1" type="Filler">
+				<property name="width" value="1"/>
+				<property name="height" value="1"/>
+			</child>
+
+			<child name="ApplyProportional" type="Button">
+				<property name="label" value="Apply"/>
+				<property name="tooltip" value="Apply the current settings to the server immediately"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						page = OptionsHandler.getPage("Admin");
+						pwd = page.findFirstWithName("actualPwd").getValue();
+						params = new HashMap();
+						params.put(BundleParameter.BUNDLE_TUNING_TYPE_PARAM, "proportional");
+						params.put(BundleParameter.PERFORMANCE_CACHE_SIZE, option.findFirstWithName("/PerformanceCacheSize").getValue());
+						params.put(BundleParameter.PROPORTIONALITY_FACTOR, option.findFirstWithName("/ProportionalityFactor").getValue());
+						msg = StatsHandler.getInstance().changeSettings(pwd, params);
+						if (msg != null) option.findFirstWithName("/TuningMessages").setValue(msg);
+					]]></script>
+				</listener>
+			</child>
+
+			<child name="filler2" type="Filler">
+				<property name="width" value="1"/>
+				<property name="height" value="1"/>
+			</child>
+
+		</child>
+
+		<child name="PerformanceCacheSize" type="SpinnerNumber">
+			<property name="label" value="Task bundle size"/>
+			<property name="tooltip" value="Size of performance samples cache for each node"/>
+			<property name="value" value="2000"/>
+			<property name="minValue" value="1"/>
+			<property name="maxValue" value="99999"/>
+			<property name="persistent" value="true"/>
+		</child>
+
+		<child name="ProportionalityFactor" type="SpinnerNumber">
+			<property name="label" value="Proportionality factor"/>
+			<property name="tooltip" value="Proportionality factor"/>
+			<property name="value" value="2"/>
+			<property name="minValue" value="1"/>
+			<property name="maxValue" value="99"/>
 			<property name="persistent" value="true"/>
 		</child>
 
