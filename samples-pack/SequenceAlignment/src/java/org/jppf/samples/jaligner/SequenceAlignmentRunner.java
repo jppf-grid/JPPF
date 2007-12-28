@@ -182,14 +182,21 @@ public class SequenceAlignmentRunner
 	private static String loadSampleSequence(String path) throws IOException
 	{
 		InputStream is = null;
-		is = SequenceAlignmentRunner.class.getClassLoader().getResourceAsStream(path);
-		if (is == null) is = new BufferedInputStream(new FileInputStream(path));
-		
 		StringBuffer buffer = new StringBuffer();
-		int ch;
-		while ((ch = is.read()) != -1)
+		try
 		{
-			buffer.append((char) ch);
+			is = SequenceAlignmentRunner.class.getClassLoader().getResourceAsStream(path);
+			if (is == null) is = new BufferedInputStream(new FileInputStream(path));
+			
+			int ch;
+			while ((ch = is.read()) != -1)
+			{
+				buffer.append((char) ch);
+			}
+		}
+		finally
+		{
+			if (is != null) is.close();
 		}
 		return buffer.toString();
 	}

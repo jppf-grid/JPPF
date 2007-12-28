@@ -41,10 +41,6 @@ public class CrawlerResultCollector implements TaskResultListener
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Totak number of expected results.
-	 */
-	private int initialCount = 0;
-	/**
 	 * Count of results not yet received.
 	 */
 	private int pendingCount = 0;
@@ -65,7 +61,6 @@ public class CrawlerResultCollector implements TaskResultListener
 	public CrawlerResultCollector(int count)
 	{
 		this.pendingCount = count;
-		this.initialCount = count;
 	}
 
 	/**

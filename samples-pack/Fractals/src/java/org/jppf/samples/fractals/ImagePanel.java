@@ -33,7 +33,7 @@ public class ImagePanel extends JPanel
 	/**
 	 * The image to draw in this panel.
 	 */
-	private Image image = null;
+	private transient Image image = null;
 
 	/**
 	 * Paints this panel. Overriden to allow for a color gradient in the background and

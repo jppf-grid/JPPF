@@ -41,7 +41,6 @@ public class MandelbrotMouseListener extends JavaOptionMouseListener
 		Component comp = event.getComponent();
 		if (!(comp instanceof ImagePanel)) return;
 
-		ImagePanel panel = (ImagePanel) comp;
 		int button = event.getButton();
 		if ((button == MouseEvent.BUTTON1) || (button == MouseEvent.BUTTON3))
 		{

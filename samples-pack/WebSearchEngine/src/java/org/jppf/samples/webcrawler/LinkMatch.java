@@ -78,7 +78,7 @@ public class LinkMatch implements Serializable
 	 * A comparator for <code>LinkMatch</code> instances, used to sort them in descending
 	 * order of their relevance score.
 	 */
-	public static class Comparator implements java.util.Comparator<LinkMatch>
+	public static class Comparator implements java.util.Comparator<LinkMatch>, Serializable
 	{
 		/**
 		 * Compare 2 LinkMatch objects in descending order of their relevance.
@@ -91,7 +91,7 @@ public class LinkMatch implements Serializable
 		public int compare(LinkMatch lm1, LinkMatch lm2)
 		{
 			if (lm1 == null) return (lm2 == null) ? 0 : -1;
-			else if (lm2 == null) return (lm1 == null) ? 0 : 1;
+			else if (lm2 == null) return 1;
 			return lm1.relevance > lm2.relevance ? -1 : (lm1.relevance < lm2.relevance ? 1 : 0);
 		}
 	}
