@@ -18,7 +18,7 @@
 package org.jppf.utils;
 
 import java.net.Socket;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.*;
 
 
@@ -182,11 +182,20 @@ public final class StringUtils
 	 * @param channel the channel to get the host from.
 	 * @return an IP address as a string.
 	 */
-	public static String getRemoteHost(SocketChannel channel)
+	public static String getRemoteHost(Channel channel)
 	{
 		StringBuilder sb = new StringBuilder();
-		Socket s = channel.socket();
-		sb.append("[").append(s.getInetAddress().getHostAddress()).append(":").append(s.getPort()).append("]");
+		sb.append("[");
+		if (channel instanceof SocketChannel)
+		{
+			Socket s = ((SocketChannel)channel).socket();
+			sb.append(s.getInetAddress().getHostAddress()).append(":").append(s.getPort());
+		}
+		else
+		{
+			sb.append("JVM-local");
+		}
+		sb.append("]");
 		return sb.toString();
 	}
 
