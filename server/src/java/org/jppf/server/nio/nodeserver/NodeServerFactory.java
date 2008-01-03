@@ -66,11 +66,23 @@ public final class NodeServerFactory extends NioServerFactory<NodeState, NodeTra
 	{
 		Map<NodeTransition, NioTransition<NodeState>> map =
 			new EnumMap<NodeTransition, NioTransition<NodeState>>(NodeTransition.class);
-		map.put(TO_SENDING, new NioTransition<NodeState>(SENDING_BUNDLE, RW));
-		map.put(TO_WAITING, new NioTransition<NodeState>(WAITING_RESULTS, R));
-		map.put(TO_SEND_INITIAL, new NioTransition<NodeState>(SEND_INITIAL_BUNDLE, RW));
-		map.put(TO_WAIT_INITIAL, new NioTransition<NodeState>(WAIT_INITIAL_BUNDLE, R));
-		map.put(TO_IDLE, new NioTransition<NodeState>(SENDING_BUNDLE, R));
+		map.put(TO_SENDING, transition(SENDING_BUNDLE, RW));
+		map.put(TO_WAITING, transition(WAITING_RESULTS, R));
+		map.put(TO_SEND_INITIAL, transition(SEND_INITIAL_BUNDLE, RW));
+		map.put(TO_WAIT_INITIAL, transition(WAIT_INITIAL_BUNDLE, R));
+		map.put(TO_IDLE, transition(SENDING_BUNDLE, R));
 		return map;
+	}
+
+
+	/**
+	 * Create a transition to the specified state for the specified IO operations.
+	 * @param state resulting state of the transition.
+	 * @param ops the operations allowed.
+	 * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
+	 */
+	private NioTransition<NodeState> transition(NodeState state, int ops)
+	{
+		return new NioTransition<NodeState>(state, ops);
 	}
 }

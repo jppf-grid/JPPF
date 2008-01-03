@@ -28,6 +28,7 @@ import org.apache.commons.logging.*;
 import org.jppf.server.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.BundlerFactory;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * This class implements the state of receiving information from the node as a
@@ -37,7 +38,7 @@ import org.jppf.server.scheduler.bundle.BundlerFactory;
 public class WaitInitialBundleState extends NodeServerState
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	protected static final Log LOG = LogFactory.getLog(WaitInitialBundleState.class);
 	/**
@@ -63,10 +64,10 @@ public class WaitInitialBundleState extends NodeServerState
 	 */
 	public NodeTransition performTransition(SelectionKey key) throws Exception
 	{
-		SocketChannel channel = (SocketChannel) key.channel();
+		SelectableChannel channel = key.channel();
 		NodeContext context = (NodeContext) key.attachment();
 		if (DEBUG_ENABLED) LOG.debug("exec() for " + getRemoteHost(channel));
-		if (context.readMessage(channel))
+		if (context.readMessage((ReadableByteChannel) channel))
 		{
 			if (DEBUG_ENABLED) LOG.debug("read bundle for " + getRemoteHost(channel) + " done");
 			JPPFTaskBundle bundle = context.deserializeBundle();
@@ -75,13 +76,16 @@ public class WaitInitialBundleState extends NodeServerState
 			if (override) context.setBundler(BundlerFactory.createBundler(bundle.getParametersMap(), true));
 			else context.setBundler(server.getBundler().copy());
 			Boolean isPeer = (Boolean) bundle.getParameter(IS_PEER);
-			if ((isPeer == null) || !isPeer)
+			if (((isPeer == null) || !isPeer) && JPPFConfiguration.getProperties().getBoolean("management.enabled", true))
 			{
-				String host = (String) bundle.getParameter(NODE_MANAGEMENT_HOST_PARAM);
-				int port = (Integer) bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM);
 				String id = (String) bundle.getParameter(NODE_MANAGEMENT_ID_PARAM);
-				NodeManagementInfo info = new NodeManagementInfo(host, port, id);
-				JPPFDriver.getInstance().addNodeInformation(channel, info);
+				if (id != null)
+				{
+					String host = (String) bundle.getParameter(NODE_MANAGEMENT_HOST_PARAM);
+					int port = (Integer) bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM);
+					NodeManagementInfo info = new NodeManagementInfo(host, port, id);
+					JPPFDriver.getInstance().addNodeInformation(channel, info);
+				}
 			}
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setMessage(null);

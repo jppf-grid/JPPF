@@ -60,7 +60,7 @@ public class SendingProviderRequestState extends ClassServerState
 	 */
 	public ClassTransition performTransition(SelectionKey key) throws Exception
 	{
-		SocketChannel channel = (SocketChannel) key.channel();
+		SelectableChannel channel = key.channel();
 		ClassContext context = (ClassContext) key.attachment();
 		if (key.isReadable())
 		{
@@ -102,7 +102,7 @@ public class SendingProviderRequestState extends ClassServerState
 			context.setMessage(null);
 			return TO_IDLE_PROVIDER;
 		}
-		if (context.writeMessage(channel))
+		if (context.writeMessage((WritableByteChannel) channel))
 		{
 			if (debugEnabled) log.debug("request sent to the provider " + getRemoteHost(channel) + " from node " + 
 				getRemoteHost((SocketChannel) context.getCurrentRequest().channel()) + 

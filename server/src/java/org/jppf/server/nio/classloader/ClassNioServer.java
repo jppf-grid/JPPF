@@ -26,6 +26,7 @@ import java.util.*;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.classloader.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 
 /**
@@ -35,7 +36,7 @@ import org.jppf.server.nio.*;
 public class ClassNioServer extends NioServer<ClassState, ClassTransition, ClassNioServer>
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(ClassNioServer.class);
 	/**
@@ -44,7 +45,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition, Class
 	 * which application classpath to look for the requested resources.
 	 */
 	//protected Map<String, SocketChannel> providerConnections = new Hashtable<String, SocketChannel>();
-	protected Map<String, List<SocketChannel>> providerConnections = new Hashtable<String, List<SocketChannel>>();
+	protected Map<String, List<SelectableChannel>> providerConnections = new Hashtable<String, List<SelectableChannel>>();
 	/**
 	 * The cache of class definition, this is done to not flood the provider when it dispatch many tasks. it use
 	 * WeakHashMap to minimize the OutOfMemory.
@@ -80,6 +81,16 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition, Class
 	protected NioServerFactory<ClassState, ClassTransition, ClassNioServer> createFactory()
 	{
 		return new ClassServerFactory(this);
+	}
+
+	/**
+	 * Determine whether a stop condition external to this server has been reached.
+	 * @return true if the driver is shutting down, false otherwise.
+	 * @see org.jppf.server.nio.NioServer#externalStopCondition()
+	 */
+	protected boolean externalStopCondition()
+	{
+		return JPPFDriver.getInstance().isShuttingDown();
 	}
 
 	/**
@@ -137,12 +148,12 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition, Class
 	 * @param uuid the provider uuid as a string.
 	 * @param channel the provider's communication channel.
 	 */
-	public void addProviderConnection(String uuid, SocketChannel channel)
+	public void addProviderConnection(String uuid, SelectableChannel channel)
 	{
-		List<SocketChannel> list = providerConnections.get(uuid);
+		List<SelectableChannel> list = providerConnections.get(uuid);
 		if (list == null)
 		{
-			list = new ArrayList<SocketChannel>();
+			list = new ArrayList<SelectableChannel>();
 			providerConnections.put(uuid, list);
 		}
 		list.add(channel);
@@ -153,9 +164,9 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition, Class
 	 * @param uuid the provider uuid as a string.
 	 * @param channel the provider's communication channel.
 	 */
-	public void removeProviderConnection(String uuid, SocketChannel channel)
+	public void removeProviderConnection(String uuid, SelectableChannel channel)
 	{
-		List<SocketChannel> list = providerConnections.get(uuid);
+		List<SelectableChannel> list = providerConnections.get(uuid);
 		if (list == null) return;
 		list.remove(channel);
 	}

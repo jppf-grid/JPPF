@@ -59,13 +59,13 @@ public class SendingProviderInitialResponseState extends ClassServerState
 	 */
 	public ClassTransition performTransition(SelectionKey key) throws Exception
 	{
-		SocketChannel channel = (SocketChannel) key.channel();
+		SelectableChannel channel = (SocketChannel) key.channel();
 		ClassContext context = (ClassContext) key.attachment();
 		if (key.isReadable())
 		{
 			throw new ConnectException("provider " + getRemoteHost(channel) + " has been disconnected");
 		}
-		if (context.writeMessage(channel))
+		if (context.writeMessage((WritableByteChannel) channel))
 		{
 			if (debugEnabled) log.debug("sent management to provider: " + getRemoteHost(channel));
 			context.setMessage(null);

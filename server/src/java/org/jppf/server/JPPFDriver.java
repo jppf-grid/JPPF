@@ -18,7 +18,7 @@
 package org.jppf.server;
 
 import java.net.Socket;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.*;
 
 import org.apache.commons.logging.*;
@@ -26,7 +26,7 @@ import org.jppf.*;
 import org.jppf.management.*;
 import org.jppf.security.*;
 import org.jppf.server.app.JPPFApplicationServer;
-import org.jppf.server.management.*;
+import org.jppf.server.management.JPPFDriverAdmin;
 import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.peer.JPPFPeerInitializer;
@@ -86,8 +86,8 @@ public class JPPFDriver
 	/**
 	 * A list of objects containing the information required to connect to the nodes JMX servers.
 	 */
-	private Map<SocketChannel, NodeManagementInfo> nodeInfo =
-		new HashMap<SocketChannel, NodeManagementInfo>();
+	private Map<SelectableChannel, NodeManagementInfo> nodeInfo =
+		new HashMap<SelectableChannel, NodeManagementInfo>();
 
 	/**
 	 * Initialize this JPPFDriver.
@@ -108,26 +108,27 @@ public class JPPFDriver
 
 		String s = props.getString("class.server.port", "11111");
 		int[] ports = parsePorts(s);
-		int port = 0;
-		//int port = props.getInt("class.server.port", 11111);
-		//classServer = new ClassNioServer(port);
 		classServer = new ClassNioServer(ports);
 		classServer.start();
 
+		int port = 0;
 		port = props.getInt("app.server.port", 11112);
 		applicationServer = new JPPFApplicationServer(port);
 		applicationServer.start();
 
-		port = props.getInt("node.server.port", 11113);
-		Bundler bundler = BundlerFactory.createBundler();
-		nodeNioServer = new NodeNioServer(port, bundler);
+		s = props.getString("node.server.port", "11113");
+		ports = parsePorts(s);
+		nodeNioServer = new NodeNioServer(ports, BundlerFactory.createBundler());
 		nodeNioServer.start();
 
-		jmxServer = new JMXServerImpl();
-		jmxServer.start();
-		JPPFDriverAdmin admin = new JPPFDriverAdmin();
-		String mbeanName = JPPFAdminMBean.DRIVER_MBEAN_NAME;
-		jmxServer.registerMbean(mbeanName, admin, JPPFDriverAdminMBean.class);
+		if (props.getBoolean("management.enabled", true))
+		{
+			jmxServer = new JMXServerImpl();
+			jmxServer.start();
+			JPPFDriverAdmin admin = new JPPFDriverAdmin();
+			String mbeanName = JPPFAdminMBean.DRIVER_MBEAN_NAME;
+			jmxServer.registerMbean(mbeanName, admin, JPPFDriverAdminMBean.class);
+		}
 
 		initPeers();
 	}
@@ -297,7 +298,7 @@ public class JPPFDriver
 	 * @param channel a <code>SocketChannel</code> instance.
 	 * @param info a <code>JPPFNodeManagementInformation</code> instance.
 	 */
-	public synchronized void addNodeInformation(SocketChannel channel, NodeManagementInfo info)
+	public synchronized void addNodeInformation(SelectableChannel channel, NodeManagementInfo info)
 	{
 		nodeInfo.put(channel, info);
 	}
@@ -315,7 +316,7 @@ public class JPPFDriver
 	 * Remove a node information object from the map of node information.
 	 * @return channel a <code>SocketChannel</code> instance.
 	 */
-	public synchronized Map<SocketChannel, NodeManagementInfo> getNodeInformationMap()
+	public synchronized Map<SelectableChannel, NodeManagementInfo> getNodeInformationMap()
 	{
 		return Collections.unmodifiableMap(nodeInfo);
 	}

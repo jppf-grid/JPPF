@@ -58,7 +58,7 @@ public class SendInitialBundleState extends NodeServerState
 	 */
 	public NodeTransition performTransition(SelectionKey key) throws Exception
 	{
-		SocketChannel channel = (SocketChannel) key.channel();
+		SelectableChannel channel = key.channel();
 		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		if (key.isReadable())
 		{
@@ -71,7 +71,7 @@ public class SendInitialBundleState extends NodeServerState
 			if (DEBUG_ENABLED) LOG.debug("serializing initial bundle for " + getRemoteHost(channel));
 			context.serializeBundle();
 		}
-		if (context.writeMessage(channel))
+		if (context.writeMessage((WritableByteChannel) channel))
 		{
 			if (DEBUG_ENABLED) LOG.debug("sent entire initial bundle for " + getRemoteHost(channel));
 			context.setMessage(null);

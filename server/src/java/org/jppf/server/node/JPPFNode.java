@@ -150,9 +150,12 @@ public class JPPFNode extends AbstractMonitoredNode
 				Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
 				if (params != null) bundle.getParametersMap().putAll(params);
 				TypedProperties props = JPPFConfiguration.getProperties();
-				bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
-				bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
-				bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeLauncher.getJmxServer().getId());
+				if (props.getBoolean("management.enabled", true))
+				{
+					bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
+					bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
+					bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeLauncher.getJmxServer().getId());
+				}
 			}
 			List<JPPFTask> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
@@ -187,7 +190,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		boolean mustInit = (socketClient == null);
 		if (mustInit)	initSocketClient();
 		initCredentials();
-		if (nodeAdmin == null)
+		if ((nodeAdmin == null) && JPPFConfiguration.getProperties().getBoolean("management.enabled", true))
 		{
 			nodeAdmin = new JPPFNodeAdmin(JPPFNode.this);
 			String mbeanName = JPPFAdminMBean.NODE_MBEAN_NAME;

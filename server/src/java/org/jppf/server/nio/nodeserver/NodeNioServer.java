@@ -63,7 +63,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 	/**
 	 * Holds the currently idle channels.
 	 */
-	private List<SocketChannel> idleChannels = new ArrayList<SocketChannel>();
+	//private List<SocketChannel> idleChannels = new ArrayList<SocketChannel>();
+	private List<SelectableChannel> idleChannels = new ArrayList<SelectableChannel>();
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
@@ -81,7 +82,18 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 	 */
 	public NodeNioServer(int port, Bundler bundler) throws JPPFException
 	{
-		super(port, "NodeServer Thread");
+		this(new int[] { port }, bundler);
+	}
+
+	/**
+	 * Initialize this server with the specified port numbers and name.
+	 * @param ports the ports this socket server is listening to.
+	 * @param bundler the bundler used to compute the size of the bundles sent for execution..
+	 * @throws JPPFException if the underlying server socket can't be opened.
+	 */
+	public NodeNioServer(int[] ports, Bundler bundler) throws JPPFException
+	{
+		super(ports, "NodeServer Thread");
 		//this.selectTimeout = 1L;
 		this.bundler = bundler;
 		getQueue().addListener(new QueueListener()
@@ -104,8 +116,19 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 	}
 
 	/**
+	 * Determine whether a stop condition external to this server has been reached.
+	 * @return true if the driver is shutting down, false otherwise.
+	 * @see org.jppf.server.nio.NioServer#externalStopCondition()
+	 */
+	protected boolean externalStopCondition()
+	{
+		return JPPFDriver.getInstance().isShuttingDown();
+	}
+
+	/**
 	 * Process a channel that was accepted by the server socket channel.
 	 * @param key the selection key for the socket channel to process.
+	 * @see org.jppf.server.nio.NioServer#postAccept(java.nio.channels.SelectionKey)
 	 */
 	public void postAccept(SelectionKey key)
 	{
@@ -147,7 +170,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 					{
 						lock.lock();
 						int n = random.nextInt(idleChannels.size());
-						SocketChannel channel = idleChannels.remove(n);
+						SelectableChannel channel = idleChannels.remove(n);
 						SelectionKey key = channel.keyFor(selector);
 						selector.wakeup();
 						key.interestOps(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
@@ -179,7 +202,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 	 * Add a channel to the list of idle channels.
 	 * @param channel the channel to add to the list.
 	 */
-	public void addIdleChannel(SocketChannel channel)
+	public void addIdleChannel(SelectableChannel channel)
 	{
 		synchronized(idleChannels)
 		{

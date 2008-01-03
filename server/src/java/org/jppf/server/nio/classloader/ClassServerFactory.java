@@ -72,15 +72,26 @@ public final class ClassServerFactory
 	{
 		Map<ClassTransition, NioTransition<ClassState>> map =
 			new EnumMap<ClassTransition, NioTransition<ClassState>>(ClassTransition.class);
-		map.put(TO_DEFINING_TYPE, new NioTransition<ClassState>(DEFINING_TYPE, R));
-		map.put(TO_SENDING_INITIAL_PROVIDER_RESPONSE, new NioTransition<ClassState>(SENDING_INITIAL_PROVIDER_RESPONSE, RW));
-		map.put(TO_SENDING_INITIAL_RESPONSE, new NioTransition<ClassState>(SENDING_INITIAL_RESPONSE, RW));
-		map.put(TO_WAITING_NODE_REQUEST, new NioTransition<ClassState>(WAITING_NODE_REQUEST, R));
-		map.put(TO_SENDING_NODE_RESPONSE, new NioTransition<ClassState>(SENDING_NODE_RESPONSE, RW));
-		map.put(TO_SENDING_PROVIDER_REQUEST, new NioTransition<ClassState>(SENDING_PROVIDER_REQUEST, RW));
-		map.put(TO_WAITING_PROVIDER_RESPONSE, new NioTransition<ClassState>(WAITING_PROVIDER_RESPONSE, R));
-		map.put(TO_IDLE_NODE, new NioTransition<ClassState>(SENDING_NODE_RESPONSE, 0));
-		map.put(TO_IDLE_PROVIDER, new NioTransition<ClassState>(IDLE_PROVIDER, R));
+		map.put(TO_DEFINING_TYPE, transition(DEFINING_TYPE, R));
+		map.put(TO_SENDING_INITIAL_PROVIDER_RESPONSE, transition(SENDING_INITIAL_PROVIDER_RESPONSE, RW));
+		map.put(TO_SENDING_INITIAL_RESPONSE, transition(SENDING_INITIAL_RESPONSE, RW));
+		map.put(TO_WAITING_NODE_REQUEST, transition(WAITING_NODE_REQUEST, R));
+		map.put(TO_SENDING_NODE_RESPONSE, transition(SENDING_NODE_RESPONSE, RW));
+		map.put(TO_SENDING_PROVIDER_REQUEST, transition(SENDING_PROVIDER_REQUEST, RW));
+		map.put(TO_WAITING_PROVIDER_RESPONSE, transition(WAITING_PROVIDER_RESPONSE, R));
+		map.put(TO_IDLE_NODE, transition(SENDING_NODE_RESPONSE, 0));
+		map.put(TO_IDLE_PROVIDER, transition(IDLE_PROVIDER, R));
 		return map;
+	}
+
+	/**
+	 * Create a transition to the specified state for the specified IO operations.
+	 * @param state resulting state of the transition.
+	 * @param ops the operations allowed.
+	 * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
+	 */
+	private NioTransition<ClassState> transition(ClassState state, int ops)
+	{
+		return new NioTransition<ClassState>(state, ops);
 	}
 }

@@ -62,9 +62,9 @@ public class WaitingNodeRequestState extends ClassServerState
 	 */
 	public ClassTransition performTransition(SelectionKey key) throws Exception
 	{
-		SocketChannel channel = (SocketChannel) key.channel();
+		SelectableChannel channel = key.channel();
 		ClassContext context = (ClassContext) key.attachment();
-		if (context.readMessage(channel))
+		if (context.readMessage((ReadableByteChannel) channel))
 		{
 			if (debugEnabled) log.debug("read resource request from node: " + getRemoteHost(channel));
 			JPPFResourceWrapper resource = context.deserializeResource();
@@ -113,7 +113,7 @@ public class WaitingNodeRequestState extends ClassServerState
 				{
 					uuidPath.decPosition();
 					uuid = uuidPath.getCurrentElement();
-					SocketChannel provider = findProviderConnection(uuid);
+					SelectableChannel provider = findProviderConnection(uuid);
 					if (provider != null)
 					{
 						if (debugEnabled) log.debug("request resource [" + name + "] from client: " +
@@ -143,16 +143,16 @@ public class WaitingNodeRequestState extends ClassServerState
 	/**
 	 * Find a provider connection for the specified provider uuid.
 	 * @param uuid the uuid for which to find a conenction.
-	 * @return a <code>SocketChannel</code> instance.
+	 * @return a <code>SelectableChannel</code> instance.
 	 * @throws Exception if an error occurs while searching for a connection.
 	 */
-	private SocketChannel findProviderConnection(String uuid) throws Exception
+	private SelectableChannel findProviderConnection(String uuid) throws Exception
 	{
-		SocketChannel result = null;
-		List<SocketChannel> connections = server.providerConnections.get(uuid);
+		SelectableChannel result = null;
+		List<SelectableChannel> connections = server.providerConnections.get(uuid);
 		int minRequests = Integer.MAX_VALUE;
 		Selector selector = server.getSelector();
-		for (SocketChannel channel: connections)
+		for (SelectableChannel channel: connections)
 		{
 			ClassContext ctx = (ClassContext) channel.keyFor(selector).attachment();
 			int size = ctx.getNbPendingRequests();

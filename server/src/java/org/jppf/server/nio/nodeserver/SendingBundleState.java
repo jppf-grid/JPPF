@@ -59,7 +59,8 @@ public class SendingBundleState extends NodeServerState
 	 */
 	public NodeTransition performTransition(SelectionKey key) throws Exception
 	{
-		SocketChannel channel = (SocketChannel) key.channel();
+		//SocketChannel channel = (SocketChannel) key.channel();
+		SelectableChannel channel = key.channel();
 		//if (debugEnabled) log.debug("exec() for " + getRemostHost(channel));
 		if (key.isReadable())
 		{
@@ -97,7 +98,7 @@ public class SendingBundleState extends NodeServerState
 				return TO_IDLE;
 			}
 		}
-		if (context.writeMessage(channel))
+		if (context.writeMessage((WritableByteChannel) channel))
 		{
 			if (DEBUG_ENABLED) LOG.debug("sent entire bundle to node " + getRemoteHost(channel));
 			context.setMessage(null);

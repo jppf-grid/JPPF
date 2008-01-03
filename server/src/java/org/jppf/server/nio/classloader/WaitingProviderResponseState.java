@@ -34,7 +34,7 @@ import org.jppf.node.JPPFResourceWrapper;
 public class WaitingProviderResponseState extends ClassServerState
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(WaitingProviderResponseState.class);
 	/**
@@ -60,12 +60,12 @@ public class WaitingProviderResponseState extends ClassServerState
 	 */
 	public ClassTransition performTransition(SelectionKey key) throws Exception
 	{
-		SocketChannel channel = (SocketChannel) key.channel();
+		SelectableChannel channel = key.channel();
 		ClassContext context = (ClassContext) key.attachment();
 		boolean messageRead = false;
 		try
 		{
-			messageRead = context.readMessage(channel);
+			messageRead = context.readMessage((ReadableByteChannel) channel);
 		}
 		catch(IOException e)
 		{

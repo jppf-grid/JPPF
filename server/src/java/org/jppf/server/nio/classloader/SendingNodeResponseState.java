@@ -33,7 +33,7 @@ import org.apache.commons.logging.*;
 public class SendingNodeResponseState extends ClassServerState
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(SendingNodeResponseState.class);
 	/**
@@ -59,13 +59,13 @@ public class SendingNodeResponseState extends ClassServerState
 	 */
 	public ClassTransition performTransition(SelectionKey key) throws Exception
 	{
-		SocketChannel channel = (SocketChannel) key.channel();
+		SelectableChannel channel = key.channel();
 		if (key.isReadable())
 		{
 			throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");
 		}
 		ClassContext context = (ClassContext) key.attachment();
-		if (context.writeMessage(channel))
+		if (context.writeMessage((WritableByteChannel) channel))
 		{
 			if (debugEnabled) log.debug("node: " + getRemoteHost(channel) + ", response [" +
 				context.getResource().getName() + "] sent to the node");

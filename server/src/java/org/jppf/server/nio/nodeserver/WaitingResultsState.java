@@ -59,13 +59,13 @@ public class WaitingResultsState extends NodeServerState
 	 */
 	public NodeTransition performTransition(SelectionKey key) throws Exception
 	{
-		SocketChannel channel = (SocketChannel) key.channel();
+		SelectableChannel channel = key.channel();
 		NodeContext context = (NodeContext) key.attachment();
 		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 
 		// Wait the full byte[] of the bundle come to start processing.
 		// This makes the integration of non-blocking with ObjectInputStream easier.
-		if (context.readMessage(channel))
+		if (context.readMessage((ReadableByteChannel) channel))
 		{
 			if (DEBUG_ENABLED) LOG.debug("read bundle from node " + getRemoteHost(channel) + " done");
 			JPPFTaskBundle bundle = context.getBundle();

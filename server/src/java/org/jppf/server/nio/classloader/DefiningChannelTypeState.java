@@ -63,9 +63,9 @@ public class DefiningChannelTypeState extends ClassServerState
 	public ClassTransition performTransition(SelectionKey key) throws Exception
 	{
 		// we don't know yet which whom we are talking, is it a node or a provider?
-		SocketChannel channel = (SocketChannel) key.channel();
+		SelectableChannel channel = (SocketChannel) key.channel();
 		ClassContext context = (ClassContext) key.attachment();
-		if (context.readMessage(channel))
+		if (context.readMessage((ReadableByteChannel) channel))
 		{
 			JPPFResourceWrapper resource = context.deserializeResource();
 			if (debugEnabled) log.debug("channel: " + getRemoteHost(channel) + " read resource [" + resource.getName() + "] done");

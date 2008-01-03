@@ -61,7 +61,7 @@ public class IdleProviderState extends ClassServerState
 	{
 		if (key.isReadable())
 		{
-			SocketChannel channel = (SocketChannel) key.channel();
+			SelectableChannel channel = key.channel();
 			ClassContext context = (ClassContext) key.attachment();
 			server.removeProviderConnection(context.getUuid(), channel);
 			throw new ConnectException("provider " + getRemoteHost(channel) + " has been disconnected");
