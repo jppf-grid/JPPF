@@ -34,7 +34,7 @@ import org.jppf.utils.*;
 public class NodeLauncher
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(NodeLauncher.class);
 	/**
@@ -170,7 +170,7 @@ public class NodeLauncher
 
 	/**
 	 * Set a persistent object with the specified key.
-	 * @param key the key used to retrieve the object.
+	 * @param key the key associated with the object's value.
 	 * @param value the object to persist.
 	 */
 	public static void setPersistentData(Object key, Object value)
@@ -180,12 +180,22 @@ public class NodeLauncher
 
 	/**
 	 * Get a persistent object given its key.
-	 * @param key the used to find a persistent object.
+	 * @param key the key used to retrieve the persistent object.
 	 * @return the value associated with the key.
 	 */
 	public static Object getPersistentData(Object key)
 	{
 		return persistentData.get(key);
+	}
+
+	/**
+	 * Remove a persistent object.
+	 * @param key the key associated with the object to remove.
+	 * @return the value associated with the key, or null if the key was not found.
+	 */
+	public static Object removePersistentData(Object key)
+	{
+		return persistentData.remove(key);
 	}
 
 	/**
