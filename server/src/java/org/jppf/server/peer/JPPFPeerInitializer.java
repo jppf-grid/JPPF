@@ -18,6 +18,7 @@
 package org.jppf.server.peer;
 
 import org.apache.commons.logging.*;
+import org.jppf.server.JPPFDriver;
 
 
 /**
@@ -28,7 +29,7 @@ import org.apache.commons.logging.*;
 public class JPPFPeerInitializer extends Thread
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(JPPFPeerInitializer.class);
 	/**
@@ -55,7 +56,7 @@ public class JPPFPeerInitializer extends Thread
 		log.info("start initialization of peer ["+peerName+"]");
 		try
 		{
-			new PeerResourceProvider(peerName).init();
+			new PeerResourceProvider(peerName, JPPFDriver.getInstance().getClassServer()).init();
 			new PeerNode(peerName).run();
 		}
 		catch(Exception e)

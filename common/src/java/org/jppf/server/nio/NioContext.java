@@ -90,15 +90,7 @@ public abstract class NioContext<S extends Enum>
 		if (message == null) message = new NioMessage();
 		if (message.length <= 0)
 		{
-			ByteBuffer buf = ByteBuffer.wrap(new byte[4]);
-			int count = 0;
-			while (count < 4)
-			{
-				count += channel.read(buf);
-				if (count < 0) throw new ClosedChannelException();
-			}
-			buf.flip();
-			message.length = buf.getInt();
+			message.length = readInt(channel);
 			message.buffer = ByteBuffer.wrap(new byte[message.length]);
 			readByteCount = 0;
 		}
@@ -112,6 +104,25 @@ public abstract class NioContext<S extends Enum>
 	}
 
 	/**
+	 * Read an integer value from a channel.
+	 * @param channel the channel to read from.
+	 * @return the value read from the channel.
+	 * @throws IOException if an error occurs while reading the data.
+	 */
+	public int readInt(ReadableByteChannel channel) throws IOException
+	{
+		ByteBuffer buf = ByteBuffer.wrap(new byte[4]);
+		int count = 0;
+		while (count < 4)
+		{
+			count += channel.read(buf);
+			if (count < 0) throw new ClosedChannelException();
+		}
+		buf.flip();
+		return buf.getInt();
+	}
+
+	/**
 	 * Write data to a channel.
 	 * @param channel the channel to write the data to.
 	 * @return true if all the data has been written, false otherwise.
@@ -121,15 +132,7 @@ public abstract class NioContext<S extends Enum>
 	{
 		if (!message.lengthWritten)
 		{
-			ByteBuffer buf = ByteBuffer.wrap(new byte[4]);
-			buf.putInt(message.length);
-			buf.flip();
-			int count = 0;
-			while (count < 4)
-			{
-				count += channel.write(buf);
-				if (count < 0) throw new ClosedChannelException();
-			}
+			writeInt(channel, message.length);
 			message.lengthWritten = true;
 			writeByteCount = 0;
 		}
@@ -140,6 +143,25 @@ public abstract class NioContext<S extends Enum>
 				message.length + " for " + StringUtils.getRemoteHost((SelectableChannel) channel));
 		}
 		return writeByteCount >= message.length;
+	}
+
+	/**
+	 * Wrtie an integer value to a channel.
+	 * @param channel the channel to write to.
+	 * @param value the value to write.
+	 * @throws IOException if an error occurs while writing the data.
+	 */
+	public void writeInt(WritableByteChannel channel, int value) throws IOException
+	{
+		ByteBuffer buf = ByteBuffer.wrap(new byte[4]);
+		buf.putInt(value);
+		buf.flip();
+		int count = 0;
+		while (count < 4)
+		{
+			count += channel.write(buf);
+			if (count < 0) throw new ClosedChannelException();
+		}
 	}
 
 	/**

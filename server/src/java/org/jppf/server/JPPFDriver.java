@@ -107,7 +107,7 @@ public class JPPFDriver
 		TypedProperties props = JPPFConfiguration.getProperties();
 
 		String s = props.getString("class.server.port", "11111");
-		int[] ports = parsePorts(s);
+		int[] ports = StringUtils.parsePorts(s);
 		classServer = new ClassNioServer(ports);
 		classServer.start();
 
@@ -117,7 +117,7 @@ public class JPPFDriver
 		applicationServer.start();
 
 		s = props.getString("node.server.port", "11113");
-		ports = parsePorts(s);
+		ports = StringUtils.parsePorts(s);
 		nodeNioServer = new NodeNioServer(ports, BundlerFactory.createBundler());
 		nodeNioServer.start();
 
@@ -131,32 +131,6 @@ public class JPPFDriver
 		}
 
 		initPeers();
-	}
-
-	/**
-	 * Parse an array of port numbers from a list of comma-separated port numbers.
-	 * @param s list of comma-separated port numbers
-	 * @return an array of int port numbers.
-	 */
-	private int[] parsePorts(String s)
-	{
-		String[] strPorts = s.split(",");
-		List<Integer> portList = new ArrayList<Integer>();
-		for (String sp: strPorts)
-		{
-			try
-			{
-				int n = Integer.valueOf(sp.trim());
-				portList.add(n);
-			}
-			catch(NumberFormatException e)
-			{
-				log.error("invalid port number format: " + sp);
-			}
-		}
-		int[] ports = new int[portList.size()];
-		for (int i=0; i<portList.size(); i++) ports[i] = portList.get(i);
-		return ports;
 	}
 
 	/**

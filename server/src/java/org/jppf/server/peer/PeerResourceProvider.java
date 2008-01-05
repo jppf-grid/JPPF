@@ -24,7 +24,7 @@ import java.util.Vector;
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.*;
 import org.jppf.node.JPPFResourceWrapper;
-import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
 
@@ -32,35 +32,29 @@ import org.jppf.utils.*;
  * This class represents a connection to the class server of a remote JPPF driver (peer driver).
  * @author Laurent Cohen
  */
-public class PeerResourceProvider
+public class PeerResourceProvider extends AbstractSocketChannelHandler
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(PeerResourceProvider.class);
 	/**
-	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The name of the peer in the configuration file.
 	 */
 	private String peerName = null;
-	/**
-	 * Wrapper around the underlying server connection.
-	 */
-	private SocketChannelClient socketClient = null;
-	/**
-	 * Used to synchronize access to the underlying socket from multiple threads.
-	 */
-	private SocketInitializer socketInitializer = new SocketInitializerImpl();
 
 	/**
 	 * Initialize this peer provider with the specified configuration name.
 	 * @param peerName the name of the peer in the configuration file.
+	 * @param server the NioServer to which the channel is registred.
 	 */
-	public PeerResourceProvider(String peerName)
+	public PeerResourceProvider(String peerName, NioServer server)
 	{
+		super(server);
 		this.peerName = peerName;
 	}
 
@@ -68,12 +62,8 @@ public class PeerResourceProvider
 	 * Initialize this node's resources.
 	 * @throws Exception if an error is raised during initialization.
 	 */
-	public synchronized void init() throws Exception
+	public synchronized void postInit() throws Exception
 	{
-		if (socketClient == null) initSocketChannel();
-		if (debugEnabled) log.debug("Attempting connection to the class server");
-		socketInitializer.initializeSocket(socketClient);
-		if (debugEnabled) log.debug("Connected to the class server");
 		try
 		{
 			JPPFResourceWrapper resource = new JPPFResourceWrapper();
@@ -83,21 +73,18 @@ public class PeerResourceProvider
 			// get a response containing the uuid of the contacted peer
 			resource = (JPPFResourceWrapper) socketClient.receive();
 			if (debugEnabled) log.debug("received node initiation response");
-			ClassNioServer server = JPPFDriver.getInstance().getClassServer();
 			Selector selector = server.getSelector();
 
 			SocketChannel channel = socketClient.getChannel();
 			socketClient.setChannel(null);
 			ClassContext context = (ClassContext) server.createNioContext();
-			//context.setState(server.WAITING_NODE_REQUEST);
 			context.setState(ClassState.SENDING_PROVIDER_REQUEST);
 			context.setPendingRequests(new Vector<SelectionKey>());
 			context.setUuid(resource.getProviderUuid());
 			try
 			{
 				channel.register(selector, 0, context);
-				server.addProviderConnection(resource.getProviderUuid(), channel);
-				//channel.register(selector, SelectionKey.OP_READ, context);
+				((ClassNioServer) server).addProviderConnection(resource.getProviderUuid(), channel);
 				if (debugEnabled) log.debug("registered class server channel");
 			}
 			catch (ClosedChannelException ignored)
@@ -113,14 +100,16 @@ public class PeerResourceProvider
 	}
 
 	/**
-	 * Initialize this node's resources.
+	 * Initialize the socket channel client.
+	 * @return a non-connected <code>SocketChannelClient</code> instance.
 	 * @throws Exception if an error is raised during initialization.
 	 */
-	public void initSocketChannel() throws Exception
+	public SocketChannelClient initSocketChannel() throws Exception
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String host = props.getString("jppf.peer." + peerName + ".server.host", "localhost");
 		int port = props.getInt("class.peer." + peerName + ".server.port", 11111);
-		socketClient = new SocketChannelClient(host, port, false);
+		SocketChannelClient client = new SocketChannelClient(host, port, false);
+		return client;
 	}
 }

@@ -18,75 +18,28 @@
 
 package org.jppf.server.nio.multiplexer;
 
-import java.io.*;
-import java.nio.ByteBuffer;
 import java.nio.channels.*;
-import java.util.*;
 
-import org.jppf.node.JPPFResourceWrapper;
-import org.jppf.server.nio.*;
-import org.jppf.utils.JPPFByteArrayOutputStream;
+import org.jppf.server.nio.NioContext;
 
 /**
- * Context obect associated with a socket channel used by the class server of the JPPF driver. 
+ * Context obect associated with a socket channel used by the multiplexer. 
  * @author Laurent Cohen
  */
 public class MultiplexerContext extends NioContext<MultiplexerState>
 {
 	/**
-	 * The resource read from or written to the associated channel.
-	 */
-	private JPPFResourceWrapper resource = null;
-	/**
-	 * The list of pending resource requests for a resource provider.
-	 */
-	private List<SelectionKey> pendingRequests = null;
-	/**
 	 * The request currently processed.
 	 */
-	private SelectionKey currentRequest = null;
+	private SelectionKey linkedKey = null;
 	/**
 	 * Port on which the connection was initially established.
 	 */
-	private int boundPort = 0;
-
+	private int boundPort = -1;
 	/**
-	 * Deserialize a resource wrapper from an array of bytes.
-	 * @return a <code>JPPFResourceWrapper</code> instance.
-	 * @throws Exception if an error occurs while deserializing.
+	 * Port on which the connection was initially established.
 	 */
-	public JPPFResourceWrapper deserializeResource() throws Exception
-	{
-		ByteArrayInputStream bais = new ByteArrayInputStream(message.buffer.array());
-		ObjectInputStream ois = new ObjectInputStream(bais);
-		resource = (JPPFResourceWrapper) ois.readObject();
-		ois.close();
-		return resource;
-	}
-
-	/**
-	 * Serialize a resource wrapper to an array of bytes.
-	 * @throws Exception if an error occurs while serializing.
-	 */
-	public void serializeResource() throws Exception
-	{
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(baos);
-		try
-		{
-			oos.writeObject(resource);
-		}
-		catch (Exception e)
-		{
-			if (e instanceof IOException) throw (IOException) e;
-			else throw new IOException(e.getMessage());
-		}
-		oos.close();
-		byte[] data = baos.toByteArray();
-		if (message == null) message = new NioMessage();
-		message.length = data.length;
-		message.buffer = ByteBuffer.wrap(data);
-	}
+	private int multiplexerPort = -1;
 
 	/**
 	 * Handle the cleanup when an exception occurs on the channel.
@@ -106,75 +59,20 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	}
 
 	/**
-	 * Get the resource read from or written to the associated channel.
-	 * @return the resource a <code>JPPFResourceWrapper</code> instance.
-	 */
-	public JPPFResourceWrapper getResource()
-	{
-		return resource;
-	}
-
-	/**
-	 * Set the resource read from or written to the associated channel.
-	 * @param resource a <code>JPPFResourceWrapper</code> instance.
-	 */
-	public void setResource(JPPFResourceWrapper resource)
-	{
-		this.resource = resource;
-	}
-
-	/**
-	 * Add a new pending request to this resource provider.
-	 * @param request the request as a <code>SelectionKey</code> instance. 
-	 */
-	public synchronized void addRequest(SelectionKey request)
-	{
-		pendingRequests.add(request);
-	}
-
-	/**
 	 * Get the request currently processed.
 	 * @return a <code>SelectionKey</code> instance.
 	 */
-	public synchronized SelectionKey getCurrentRequest()
+	public synchronized SelectionKey getLinkedKey()
 	{
-		return currentRequest;
+		return linkedKey;
 	}
 
 	/**
 	 * Set the request currently processed.
-	 * @param currentRequest a <code>SelectionKey</code> instance. 
+	 * @param key a <code>SelectionKey</code> instance. 
 	 */
-	public synchronized void setCurrentRequest(SelectionKey currentRequest)
+	public synchronized void setLinkedKey(SelectionKey key)
 	{
-		this.currentRequest = currentRequest;
-	}
-
-	/**
-	 * Get the number of pending resource requests for a resource provider.
-	 * @return a the number of requests as an int. 
-	 */
-	public synchronized int getNbPendingRequests()
-	{
-		List<SelectionKey> reqs = getPendingRequests();
-		return (reqs == null ? 0 : reqs.size()) + (getCurrentRequest() == null ? 0 : 1);
-	}
-
-	/**
-	 * Get the list of pending resource requests for a resource provider.
-	 * @return a <code>List</code> of <code>SelectionKey</code> instances. 
-	 */
-	public List<SelectionKey> getPendingRequests()
-	{
-		return pendingRequests;
-	}
-
-	/**
-	 * Set the list of pending resource requests for a resource provider.
-	 * @param pendingRequests a <code>List</code> of <code>SelectionKey</code> instances. 
-	 */
-	public void setPendingRequests(List<SelectionKey> pendingRequests)
-	{
-		this.pendingRequests = pendingRequests;
+		this.linkedKey = key;
 	}
 }

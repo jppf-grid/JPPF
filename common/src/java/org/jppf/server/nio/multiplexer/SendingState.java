@@ -67,8 +67,7 @@ public class SendingState extends MultiplexerServerState
 		MultiplexerContext context = (MultiplexerContext) key.attachment();
 		if (context.writeMessage((WritableByteChannel) channel))
 		{
-			if (debugEnabled) log.debug("node: " + getRemoteHost(channel) + ", response [" +
-				context.getResource().getName() + "] sent to the node");
+			if (debugEnabled) log.debug("node: " + getRemoteHost(channel) + ", response sent to the node");
 			context.setMessage(null);
 			return TO_IDLE;
 		}

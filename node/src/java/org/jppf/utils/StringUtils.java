@@ -21,6 +21,8 @@ import java.net.Socket;
 import java.nio.channels.*;
 import java.util.*;
 
+import org.apache.commons.logging.*;
+
 
 /**
  * This class provides a set of utility methods for manipulating strings. 
@@ -28,6 +30,10 @@ import java.util.*;
  */
 public final class StringUtils
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(StringUtils.class);
 	/**
 	 * Keywords to look for and replace in the legend items of the charts.
 	 */
@@ -220,5 +226,51 @@ public final class StringUtils
   		sb.append("]");
   	}
   	return sb.toString();
+	}
+
+	/**
+	 * Parse an array of port numbers from a string containing a list of space-separated port numbers.
+	 * @param s list of space-separated port numbers
+	 * @return an array of int port numbers.
+	 */
+	public static int[] parsePorts(String s)
+	{
+		String[] strPorts = s.split("\\s");
+		List<Integer> portList = new ArrayList<Integer>();
+		for (String sp: strPorts)
+		{
+			try
+			{
+				int n = Integer.valueOf(sp.trim());
+				portList.add(n);
+			}
+			catch(NumberFormatException e)
+			{
+				log.error("invalid port number format: " + sp);
+			}
+		}
+		int[] ports = new int[portList.size()];
+		for (int i=0; i<portList.size(); i++) ports[i] = portList.get(i);
+		return ports;
+	}
+
+	/**
+	 * Parse a host:port string into a pair made of a host string and an integer port.
+	 * @param s a host:port string.
+	 * @return a <code>Pair&lt;String, Integer&gt;</code> instance.
+	 */
+	public static HostPort parseHostPort(String s)
+	{
+		String[] comps = s.split(":");
+		int port = -1;
+		try
+		{
+			port = Integer.valueOf(comps[1].trim());
+		}
+		catch(NumberFormatException e)
+		{
+			log.error("invalid port number format: " + comps[1]);
+		}
+		return new HostPort(comps[0], port);
 	}
 }

@@ -91,6 +91,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 		super(name);
 		//int n = Runtime.getRuntime().availableProcessors();
 		executor = Executors.newFixedThreadPool(1);
+		factory = createFactory();
 	}
 
 	/**
@@ -115,7 +116,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 		this(name);
 		this.ports = new int[ports.length];
 		System.arraycopy(ports, 0, this.ports, 0, ports.length);
-		factory = createFactory();
 		init(ports);
 	}
 
@@ -135,6 +135,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 		Exception e = null;
 		try
 		{
+			selector = Selector.open();
 			for (int port: ports)
 			{
 				ServerSocketChannel server = ServerSocketChannel.open();
@@ -142,7 +143,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 				server.socket().setReceiveBufferSize(size);
 				server.socket().bind(new InetSocketAddress(port));
 				server.configureBlocking(false);
-				selector = Selector.open();
 				server.register(selector, SelectionKey.OP_ACCEPT);
 			}
 		}
@@ -196,7 +196,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	/**
 	 * Determine whether a stop condition external to this server has been reached.
 	 * The default implementation always returns false.<br>
-	 * Subclasses shall override this behavior.
+	 * Subclasses may override this behavior.
 	 * @return true if this server should be stopped, false otherwise.
 	 */
 	protected boolean externalStopCondition()

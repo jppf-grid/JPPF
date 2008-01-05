@@ -19,9 +19,11 @@
 package org.jppf.server.nio.multiplexer;
 
 import java.nio.channels.*;
+import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.server.nio.*;
+import org.jppf.utils.*;
 
 /**
  * 
@@ -33,6 +35,23 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 * Name given to this thread.
 	 */
 	private static final String THIS_NAME = "MultiplexerServer Thread";
+	/**
+	 * The list of locally-bound multiplexer ports. 
+	 */
+	private Set<Integer> multiplexerPorts = new HashSet<Integer>();
+	/**
+	 * Mapping of this multiplexer to remote ones.
+	 * Each local multiplexer port is mapped to a <i>host:port</i> combination.
+	 */
+	private Map<Integer, HostPort> remoteMultiplexerMap = new HashMap<Integer, HostPort>();
+	/**
+	 * The list of application ports this multiplexer listens to. 
+	 */
+	private Set<Integer> boundPorts = new HashSet<Integer>();
+	/**
+	 * Mapping of local application ports to outbound multiplexer ports.
+	 */
+	private Map<Integer, Integer> boundToMultiplexerMap = new HashMap<Integer, Integer>();
 
 	/**
 	 * Initialize this server.
@@ -41,26 +60,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	public MultiplexerNioServer() throws JPPFException
 	{
 		super(THIS_NAME);
-	}
-
-	/**
-	 * Initialize this server with a specified port number and name.
-	 * @param port the port this socket server is listening to.
-	 * @throws JPPFException if the underlying server socket can't be opened.
-	 */
-	public MultiplexerNioServer(int port) throws JPPFException
-	{
-		this(new int[] { port });
-	}
-
-	/**
-	 * Initialize this server with the specified port numbers and name.
-	 * @param ports the ports this socket server is listening to.
-	 * @throws JPPFException if the underlying server socket can't be opened.
-	 */
-	public MultiplexerNioServer(int[] ports) throws JPPFException
-	{
-		super(ports, THIS_NAME);
+		configure();
 	}
 
 	/**
@@ -71,6 +71,38 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	protected NioServerFactory<MultiplexerState, MultiplexerTransition, MultiplexerNioServer> createFactory()
 	{
 		return new MultiplexerServerFactory(this);
+	}
+
+	/**
+	 * Configure this server from the configuration file.
+	 * @throws JPPFException if the configuration failed.
+	 */
+	private void configure() throws JPPFException
+	{
+		TypedProperties props = JPPFConfiguration.getProperties();
+		String s = props.getString("multiplexer.ports");
+		int[] ports = StringUtils.parsePorts(s);
+		for (int port: ports)
+		{
+			multiplexerPorts.add(port);
+			s = props.getString("remote.multiplexer." + port);
+			if (s != null) remoteMultiplexerMap.put(port, StringUtils.parseHostPort(s));
+		}
+		s = props.getString("bound.ports");
+		if (s == null) return;
+		ports = StringUtils.parsePorts(s);
+		for (int port: ports)
+		{
+			boundPorts.add(port);
+			int n = props.getInt("mapping." + port, -1);
+			if (n > 0) boundToMultiplexerMap.put(port, n);
+		}
+		int n = multiplexerPorts.size() + boundPorts.size();
+		ports = new int[n];
+		int count = 0;
+		for (Integer port: multiplexerPorts) ports[count++] = port;
+		for (Integer port: boundPorts) ports[count++] = port;
+		init(ports);
 	}
 
 	/**
@@ -104,6 +136,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	{
 		int port = serverChannel.socket().getLocalPort();
 		MultiplexerContext context = (MultiplexerContext) key.attachment();
+		
 		postAccept(key);
 	}
 
