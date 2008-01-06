@@ -18,7 +18,7 @@
 
 package org.jppf.jca.work.submission;
 
-import static org.jppf.jca.work.submission.JPPFSubmissionResult.Status.*;
+import static org.jppf.jca.work.submission.SubmissionStatus.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -108,7 +108,6 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 				c.setStatus(JPPFClientConnectionStatus.EXECUTING);
 			}
 			JPPFSubmissionResult submission = (JPPFSubmissionResult) exec.listener;
-			submission.setStatus(EXECUTING);
 			try
 			{
 				workManager.scheduleWork(new JcaResultProcessor(c, exec));
@@ -129,15 +128,23 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 */
 	public String addSubmission(ClientExecution exec)
 	{
-		JPPFSubmissionResult submission = (JPPFSubmissionResult) exec.listener;
-		if (submission == null)
-		{
-			submission = new JPPFSubmissionResult(exec.tasks.size());
-			exec.listener = submission;
-		}
+		return addSubmission(exec, null);
+	}
+
+	/**
+	 * Add a task submission to the execution queue.
+	 * @param exec encapsulation of the execution data.
+	 * @param listener an optional listener to receive submission status change notifications, may be null.
+	 * @return the unique id of the submission.
+	 */
+	public String addSubmission(ClientExecution exec, SubmissionStatusListener listener)
+	{
+		JPPFSubmissionResult submission = new JPPFSubmissionResult(exec.tasks.size());
+		if (listener != null) submission.addSubmissionStatusListener(listener);
+		exec.listener = submission;
+		submission.setStatus(PENDING);
 		execQueue.add(exec);
 		submissionMap.put(submission.getId(), submission);
-		submission.setStatus(PENDING);
 		wakeUp();
 		return submission.getId();
 	}
@@ -168,8 +175,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 */
 	public Collection<String> getAllSubmissionIds()
 	{
-		Set<String> set = submissionMap.keySet();
-		return Collections.unmodifiableSet(set);
+		return Collections.unmodifiableSet(submissionMap.keySet());
 	}
 
 	/**

@@ -17,6 +17,8 @@
  */
 package org.jppf.jca.work;
 
+import static org.jppf.jca.work.submission.SubmissionStatus.*;
+
 import java.io.NotSerializableException;
 import java.util.List;
 
@@ -70,6 +72,7 @@ public class JcaResultProcessor implements Work
 	{
 		boolean error = false;
 		JPPFSubmissionResult result = (JPPFSubmissionResult) execution.listener;
+		result.setStatus(EXECUTING);
 		try
 		{
 			connection.setCurrentExecution(execution);
@@ -102,7 +105,7 @@ public class JcaResultProcessor implements Work
 					}
 					completed = true;
 					mgr.removeRequestClassLoader(requestUuid);
-					result.setStatus(JPPFSubmissionResult.Status.COMPLETE);
+					result.setStatus(COMPLETE);
 					connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
 				}
 				catch(NotSerializableException e)
@@ -128,7 +131,7 @@ public class JcaResultProcessor implements Work
 		finally
 		{
 			if (!error) connection.setCurrentExecution(null);
-			else result.setStatus(JPPFSubmissionResult.Status.FAILED);
+			else result.setStatus(FAILED);
 		}
 	}
 

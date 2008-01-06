@@ -27,7 +27,7 @@ import javax.resource.spi.ConnectionEvent;
 import org.jppf.client.ClientExecution;
 import org.jppf.jca.spi.JPPFManagedConnection;
 import org.jppf.jca.util.JPPFAccessor;
-import org.jppf.jca.work.submission.JPPFSubmissionResult;
+import org.jppf.jca.work.submission.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 
@@ -132,8 +132,46 @@ public class JPPFConnection extends JPPFAccessor implements Connection
 	 */
 	public String submitNonBlocking(List<JPPFTask> tasks, DataProvider dataProvider) throws Exception
 	{
+		return submitNonBlocking(tasks, dataProvider, null);
+	}
+
+	/**
+	 * Submit an asynchronous execution request to the JPPF client.<br>
+	 * This method exits immediately after adding the request to the requests queue.<br>
+	 * The returned id is used to later retieve the results and sttaus of the execution. 
+	 * @param tasks the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param listener an optional listener to receive submission status change notifications, may be null.
+	 * @return the id of the submission, to use for later retrieval of the results and status of the submission.
+	 * @throws Exception if an error occurs while submitting the request.
+	 */
+	public String submitNonBlocking(List<JPPFTask> tasks, DataProvider dataProvider,
+		SubmissionStatusListener listener) throws Exception
+	{
 		ClientExecution exec = new ClientExecution(tasks, dataProvider, true);
-		return getJppfClient().getSubmissionManager().addSubmission(exec);
+		return getJppfClient().getSubmissionManager().addSubmission(exec, listener);
+	}
+
+	/**
+	 * Add a listener to the submission with the specified id.
+	 * @param submissionId the id of the submission.
+	 * @param listener the listener to add.
+	 */
+	public void addSubmissionStatusListener(String submissionId, SubmissionStatusListener listener)
+	{
+		JPPFSubmissionResult res = getSubmissionResult(submissionId);
+		if (res != null) res.addSubmissionStatusListener(listener);
+	}
+
+	/**
+	 * Remove a listener from the submission with the specified id.
+	 * @param submissionId the id of the submission.
+	 * @param listener the listener to remove.
+	 */
+	public void removeSubmissionStatusListener(String submissionId, SubmissionStatusListener listener)
+	{
+		JPPFSubmissionResult res = getSubmissionResult(submissionId);
+		if (res != null) res.removeSubmissionStatusListener(listener);
 	}
 
 	/**
@@ -142,9 +180,9 @@ public class JPPFConnection extends JPPFAccessor implements Connection
 	 * @return the submission status.
 	 * @throws Exception if an error occurs while submitting the request.
 	 */
-	public JPPFSubmissionResult.Status getSubmissionStatus(String submissionId) throws Exception
+	public SubmissionStatus getSubmissionStatus(String submissionId) throws Exception
 	{
-		JPPFSubmissionResult res = getJppfClient().getSubmissionManager().peekSubmission(submissionId);
+		JPPFSubmissionResult res = getSubmissionResult(submissionId);
 		if (res == null) return null;
 		return res.getStatus();
 	}
@@ -153,17 +191,29 @@ public class JPPFConnection extends JPPFAccessor implements Connection
 	 * Get the results of an execution request.<br>
 	 * This method should be called only once a call to
 	 * {@link #getSubmissionStatus(java.lang.String submissionId) getSubmissionStatus(submissionId)} has returned
-	 * either {@link org.jppf.jca.work.submission.JPPFSubmissionResult.Status#COMPLETE COMPLETE} or
-	 * {@link org.jppf.jca.work.submission.JPPFSubmissionResult.Status#FAILED FAILED}
+	 * either {@link org.jppf.jca.work.submission.SubmissionStatus#COMPLETE COMPLETE} or
+	 * {@link org.jppf.jca.work.submission.SubmissionStatus#FAILED FAILED}
 	 * @param submissionId the id of the submission for which to get the execution results.
 	 * @return the list of resulting JPPF tasks, or null if the execution failed.
 	 * @throws Exception if an error occurs while submitting the request.
 	 */
 	public List<JPPFTask> getSubmissionResults(String submissionId) throws Exception
 	{
-		JPPFSubmissionResult res = getJppfClient().getSubmissionManager().pollSubmission(submissionId);
+		JPPFSubmissionManager mgr = getJppfClient().getSubmissionManager();
+		JPPFSubmissionResult res = mgr.peekSubmission(submissionId);
 		if (res == null) return null;
+		res = mgr.pollSubmission(submissionId);
 		return res.getResults();
+	}
+
+	/**
+	 * Get the submission result with the specified id.
+	 * @param submissionId the id of the submission to find.
+	 * @return a <code>JPPFSubmissionResult</code> instance, or null if no submission can be found for the specified id.
+	 */
+	private JPPFSubmissionResult getSubmissionResult(String submissionId)
+	{
+		return getJppfClient().getSubmissionManager().peekSubmission(submissionId);
 	}
 
 	/**

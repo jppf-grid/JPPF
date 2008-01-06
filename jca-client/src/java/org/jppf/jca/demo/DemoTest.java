@@ -26,7 +26,7 @@ import javax.resource.cci.ConnectionFactory;
 import javax.rmi.PortableRemoteObject;
 
 import org.jppf.jca.cci.JPPFConnection;
-import org.jppf.jca.work.submission.JPPFSubmissionResult;
+import org.jppf.jca.work.submission.*;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -68,8 +68,21 @@ public class DemoTest implements Serializable
 			JPPFTask task = new DemoTask();
 			List list = new ArrayList();
 			list.add(task);
-			id = connection.submitNonBlocking(list, null);
+			id = connection.submitNonBlocking(list, null, new SubmissionStatusListener()
+			{
+				public void submissionStatusChanged(SubmissionStatusEvent event)
+				{
+					System.out.println("*** 1 *** submission ["+event.getSubmissionId()+"] changed to '"+event.getStatus()+"'");
+				}
+			});
 			
+			connection.addSubmissionStatusListener(id, new SubmissionStatusListener()
+			{
+				public void submissionStatusChanged(SubmissionStatusEvent event)
+				{
+					System.out.println("*** 2 *** submission ["+event.getSubmissionId()+"] changed to '"+event.getStatus()+"'");
+				}
+			});
 			/*
 			list = connection.submit(list, null);
 			task = (JPPFTask) list.get(0);
@@ -100,7 +113,25 @@ public class DemoTest implements Serializable
 			JPPFTask task = new DurationTask(duration);
 			List list = new ArrayList();
 			list.add(task);
-			id = connection.submitNonBlocking(list, null);
+			id = connection.submitNonBlocking(list, null, null);
+			
+			/*
+			id = connection.submitNonBlocking(list, null, new SubmissionStatusListener()
+			{
+				public void submissionStatusChanged(SubmissionStatusEvent event)
+				{
+					System.out.println("*** 1 *** submission ["+event.getSubmissionId()+"] changed to '"+event.getStatus()+"'");
+				}
+			});
+			
+			connection.addSubmissionStatusListener(id, new SubmissionStatusListener()
+			{
+				public void submissionStatusChanged(SubmissionStatusEvent event)
+				{
+					System.out.println("*** 2 *** submission ["+event.getSubmissionId()+"] changed to '"+event.getStatus()+"'");
+				}
+			});
+			*/
 		}
 		finally
 		{
@@ -135,7 +166,7 @@ public class DemoTest implements Serializable
 			Collection<String> coll = connection.getAllSubmissionIds();
 			for (String id: coll)
 			{
-				JPPFSubmissionResult.Status status = connection.getSubmissionStatus(id);
+				SubmissionStatus status = connection.getSubmissionStatus(id);
 				String s = (status == null) ? "Unknown" : status.toString();
 				map.put(id, s);
 			}

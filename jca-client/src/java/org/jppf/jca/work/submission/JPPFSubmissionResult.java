@@ -32,33 +32,6 @@ import org.jppf.utils.JPPFUuid;
 public class JPPFSubmissionResult implements TaskResultListener
 {
 	/**
-	 * The status of a submission. 
-	 */
-	public enum Status
-	{
-		/**
-		 * The set of tasks was just submitted.
-		 */
-		SUBMITTED,
-		/**
-		 * The set of tasks is currently in the submission queue.
-		 */
-		PENDING,
-		/**
-		 * The set of tasks is being executed.
-		 */
-		EXECUTING,
-		/**
-		 * The execution of the set of tasks is complete.
-		 */
-		COMPLETE,
-		/**
-		 * The execution of the set of tasks has failed.
-		 */
-		FAILED,
-	}
-
-	/**
 	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(JPPFSubmissionResult.class);
@@ -78,7 +51,7 @@ public class JPPFSubmissionResult implements TaskResultListener
 	/**
 	 * The status of this submission.
 	 */
-	private Status status = Status.SUBMITTED;
+	private SubmissionStatus status = SubmissionStatus.SUBMITTED;
 	/**
 	 * Number of tasks not yet completed.
 	 */
@@ -87,6 +60,10 @@ public class JPPFSubmissionResult implements TaskResultListener
 	 * The unique id of this submission.
 	 */
 	private String id = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
+	/**
+	 * List of listeners registered to receive this submission's status change notifications.
+	 */
+	private List<SubmissionStatusListener> listeners = new ArrayList<SubmissionStatusListener>();
 
 	/**
 	 * Initialize this collector. 
@@ -132,20 +109,22 @@ public class JPPFSubmissionResult implements TaskResultListener
 
 	/**
 	 * Get the status of this submission.
-	 * @return a {@link Status} enumerated value.
+	 * @return a {@link SubmissionStatus} enumerated value.
 	 */
-	public Status getStatus()
+	public SubmissionStatus getStatus()
 	{
 		return status;
 	}
 
 	/**
 	 * Set the status of this submission.
-	 * @param status a {@link Status} enumerated value.
+	 * @param status a {@link SubmissionStatus} enumerated value.
 	 */
-	public void setStatus(Status status)
+	public void setStatus(SubmissionStatus status)
 	{
+		if (debugEnabled) log.debug("submission [" + id + "] status changing from '" + this.status + "' to '" + status + "'");
 		this.status = status;
+		fireStatusChangeEvent();
 	}
 
 	/**
@@ -155,5 +134,39 @@ public class JPPFSubmissionResult implements TaskResultListener
 	public String getId()
 	{
 		return id;
+	}
+
+	/**
+	 * Add a listener to the list of status listeners.
+	 * @param listener the listener to add.
+	 */
+	public void addSubmissionStatusListener(SubmissionStatusListener listener)
+	{
+		if (debugEnabled) log.debug("submission [" + id + "] adding status listener " + listener);
+		if (listener != null) listeners.add(listener);
+	}
+
+	/**
+	 * Remove a listener from the list of status listeners.
+	 * @param listener the listener to remove.
+	 */
+	public void removeSubmissionStatusListener(SubmissionStatusListener listener)
+	{
+		if (debugEnabled) log.debug("submission [" + id + "] removing status listener " + listener);
+		if (listener != null) listeners.remove(listener);
+	}
+
+	/**
+	 * Notify all listeners of a change of status for this submision.
+	 */
+	protected void fireStatusChangeEvent()
+	{
+		if (listeners.isEmpty()) return;
+		if (debugEnabled) log.debug("submission [" + id + "] firng status changed event for '" + status + "'");
+		SubmissionStatusEvent event = new SubmissionStatusEvent(id, status);
+		for (SubmissionStatusListener listener: listeners)
+		{
+			listener.submissionStatusChanged(event);
+		}
 	}
 }
