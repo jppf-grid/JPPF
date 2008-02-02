@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -76,7 +76,7 @@ public class WaitInitialBundleState extends NodeServerState
 			if (override) context.setBundler(BundlerFactory.createBundler(bundle.getParametersMap(), true));
 			else context.setBundler(server.getBundler().copy());
 			Boolean isPeer = (Boolean) bundle.getParameter(IS_PEER);
-			if (((isPeer == null) || !isPeer) && JPPFConfiguration.getProperties().getBoolean("management.enabled", true))
+			if (((isPeer == null) || !isPeer) && JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
 			{
 				String id = (String) bundle.getParameter(NODE_MANAGEMENT_ID_PARAM);
 				if (id != null)

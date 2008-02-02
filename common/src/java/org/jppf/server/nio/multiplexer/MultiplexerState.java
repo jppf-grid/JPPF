@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,11 +24,19 @@ package org.jppf.server.nio.multiplexer;
 public enum MultiplexerState
 {
 	/**
+	 * IDLE state, when a channel has nothing to do.
+	 */
+	IDLE,
+	/**
 	 * State of sending data.
 	 */
 	SENDING,
 	/**
 	 * State of receiving data.
 	 */
-	RECEIVING
+	RECEIVING,
+	/**
+	 * State if identifying an inbound connection from a remote multiplexer
+	 */
+	IDENTIFYING_INBOUND_CHANNEL
 }

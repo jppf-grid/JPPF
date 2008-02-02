@@ -10,22 +10,22 @@
 		</script>
 		<div align="center">
 		$template{name="jppf-header"}$
-		<table border="0" cellspacing="0" cellpadding="0" width="70%">
-			$template{name="row-blank" span="3"}$
+		<table border="0" cellspacing="0" cellpadding="0" width="80%">
+   		<tr><td height="10"/></tr>
    		<tr>
-				<td width="12" class="bleft"/>
-				<td valign="top" bgcolor="white" width="50%" style="max-width: 50%">
+				<td valign="top" width="50%" style="max-width: 50%">
 					<table class="noborder_" cellspacing="0" cellpadding="5" width="100%">
 						<tr><td class="noborder_">
-							$template{name="highlight-top" span="1" color="pblue"}$
-							<h3>About JPPF</h3>
-							<div style="text-align: justify">JPPF is a grid toolkit for Java that makes it easy to run your applications in parallel, and speed up their execution by orders of magnitude.
+							$template{name="highlight-header" span="1" title="About JPPF"}$
+							<br><div style="text-align: justify">JPPF is a grid toolkit for Java that makes it easy to run your applications in parallel, and speed up their execution by orders of magnitude.
 							Write once, deploy once, execute everywhere!</div>
-							$template{name="highlight-bottom" span="1" color="pblue"}$
+							$template{name="highlight-bottom" span="1"}$
 						</td></tr>
+
+						<tr><td class="noborder_" height="10"/><tr>
 						<tr><td class="noborder_">
-							<h4>Features</h4>
-							<ul type="square">
+							$template{name="highlight-header" span="1" title="Features"}$
+							<br><ul type="square">
 								<li>a JPPF grid can be up and running in minutes</li>
 								<li>full platform independance
 								<li>highly scalable, distributed framework for the execution of tasks</li>
@@ -37,27 +37,34 @@
 								<li>a JPPF screensaver node enables the automatic use of idle computers</li>
 								<li>very flexible and non-constraining open-source licensing</li>
 							</ul>
+							$template{name="highlight-bottom" span="1"}$
 						</td></tr>
-						<tr><td align="center" class="noborder_">
-							<a href="http://sourceforge.net/project/showfiles.php?group_id=135654"
-								onmouseover="setImage('dl_jppf', 'images/downloadJPPF2.jpg')"
-								onmouseout="setImage('dl_jppf', 'images/downloadJPPF.jpg')">
-								<img id="dl_jppf" src="images/downloadJPPF.jpg" border="0" alt="Download JPPF Now"/></a><br>&nbsp;
-						</td></tr>
-						<tr><td class="noborder_">
-							$template{name="highlight-top" span="1" color="pblue"}$
-								<h3>Participate and stay informed:</h3>
-								<strong style="color: #8080FF">Browse our <a href="./wiki" target=_top>documentation</a></strong><br>
-								<strong style="color: #8080FF">Give your comments and advice, find support, on our <a href="./forums" target=_top>discussion forums</a></strong><br>
-								<strong style="color: #8080FF">Browse and update our <a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>bugs database</a></strong><br>
-								<strong style="color: #8080FF">Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>feature requests database</a></strong>
-							$template{name="highlight-bottom" span="1" color="pblue"}$
 
+						<tr><td class="noborder_" height="10"/><tr>
+						<tr><td class="noborder_">
+							$template{name="highlight-header" span="1" title="Participate and stay informed"}$
+								<br>
+								<strong>Browse our <a href="./wiki" target=_top>documentation</a></strong><br>
+								<strong>Give your comments and advice, find support, on our <a href="./forums" target=_top>discussion forums</a></strong><br>
+								<strong>Browse and update our <a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>bugs database</a></strong><br>
+								<strong>Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>feature requests database</a></strong>
+							$template{name="highlight-bottom" span="1"}$
 						</td></tr>
+
+						<tr><td class="noborder_" height="10"/><tr>
+						<tr><td class="noborder_">
+							$template{name="highlight-header" span="1" title="Licensing & Status"}$
+							<br>JPPF is licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0"><b>Apache License, Version 2.0</b></a>
+							<br>Latest stable version: Version 1.0.1
+							$template{name="highlight-bottom" span="1"}$
+						</td></tr>
+
 					</table>
 				</td>
-				<td width="10" bgcolor="white">
-				<td valign="top" bgcolor="white">
+
+				<td width="10"/>
+
+				<td valign="top">
 					<table class="noborder_" cellspacing="0" cellpadding="5" width="100%">
 
 						<tr><td class="noborder_">
@@ -69,12 +76,10 @@
 							$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 							$line = mysql_fetch_array($result, MYSQL_ASSOC);
 						?>
-						$template{name="highlight-top" span="1" color="pblue"}$
+						$template{name="highlight-header" span="1" title="Latest news"}$
 						<?php
-							printf("<span class='newsTitle'>Latest news: <span style='color: black'>%s %s</span></span><br>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
-							//printf("<h3>Latest news: <span style='color: black'>%s %s</span></h3>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
+							printf("<br><span class='newsTitle' style='color: black'>%s %s</span><br>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
 						?>
-						$template{name="highlight-bottom" span="1" color="pblue"}$
 						<?php
 							printf("<br>%s", $line["desc"]);
 						?>
@@ -84,10 +89,8 @@
 							mysql_free_result($result);
 							mysql_close($link);
 						?>
-						</td></tr>
-						<tr><td class="noborder_">
-							$template{name="highlight-top" span="1" color="pblue"}$
 							<table border="0" cellspacing="0" cellpadding="5">
+								<tr><td colspan="*" height="10"/></tr>
 								<tr>
 									<td align="center" valign="center">
 										<strong style="color: #8080FF">JPPF feeds:</strong>
@@ -106,32 +109,36 @@
 									</td>
 								</tr>
 							</table>
-							$template{name="highlight-bottom" span="1" color="pblue"}$
+
+							<div align="center">
+								<a class="download" href="http://sourceforge.net/project/showfiles.php?group_id=135654">
+								<span class="download">Download JPPF Now</span>
+								<!--
+								<img src="images/download.gif" border="0"/>
+								-->
+								</a>
+							</div>
+						$template{name="highlight-bottom" span="1"}$
 						</td></tr>
 
-						<tr><td class="noborder_">
-							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the Apache License, Version 2.0.<br>
-							A copy of the licensing terms can be obtained <a href="http://www.apache.org/licenses/LICENSE-2.0"><b>at this location</b></a>.</span></h4>
-						</td></tr>
-						<tr><td class="noborder_">
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 1.0 Generally Available</span></h4>
-						</td></tr>
-						<tr><td class="noborder_">
-							<h3>JPPF on the web:</h3>
-							<strong style="color: #8080FF"><a href="http://www.jroller.com/jppf/" target=_top>JPPF Blog</a></strong><br>
+						<tr><td class="noborder_" height="10"/><tr>
+						<tr><td class="noborder_" align = "center">
+							$template{name="highlight-header" span="1" title="JPPF on the web"}$
+							<br><strong style="color: #8080FF"><a href="http://www.jroller.com/jppf/" target=_top>JPPF Blog</a></strong><br>
 							<strong style="color: #8080FF"><a href="http://www.jroller.com/gkorland/entry/jppf" target=_top>Guy Korland's Blog</a></strong><br>
+							<strong style="color: #8080FF"><a href="http://www.theserverside.com/news/thread.tss?thread_id=47941" target=_top>JPPF 1.0 on TheServerSide.com</a></strong><br>
 							<strong style="color: #8080FF"><a href="http://www.infoq.com/news/Grid-Computing-JPPF" target=_top>JPPF on InfoQ</a></strong><br>
+							<strong style="color: #8080FF"><a href="http://artemis.ms.mff.cuni.cz/pogamut/tiki-index.php?page=Pogamut+GRID" target=_top>Pogamut GRID</a></strong><br>
 							<strong style="color: #8080FF"><a href="http://weblogs.java.net/blog/fabriziogiudici/archive/2006/11/parallel_comput_1.html" target=_top>Fabrizio Giudici's Blog</a></strong><br>
 							<strong style="color: #8080FF"><a href="http://wiki.cs.rit.edu/bin/view/Main/KarolPietrzakComputerGraphicsJPPF" target=_top> Karl Pietrzak's Parallelization of Ray Tracing</a></strong><br>
 							<strong style="color: #8080FF"><a href="http://www.oitos.it/opencms/opencms/oitos/modules/products/product_0033.html" target=_top>JPPF evaluation on OITOS</a> (in Italian)</strong><br>
+							$template{name="highlight-bottom" span="1"}$
 						</td></tr>
 					</table>
 				</td>
-				<td width="12" class="bright"/>
 			</tr>
-			$template{name="row-bottom" span="3"}$
 		</table>
-
 		</div>
+		$template{name="jppf-footer"}$
 	</body>
 </html>

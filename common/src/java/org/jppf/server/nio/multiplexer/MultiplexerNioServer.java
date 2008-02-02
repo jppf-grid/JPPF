@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,12 +38,12 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	/**
 	 * The list of locally-bound multiplexer ports. 
 	 */
-	private Set<Integer> multiplexerPorts = new HashSet<Integer>();
+	private Set<String> remoteMultiplexers = new HashSet<String>();
 	/**
 	 * Mapping of this multiplexer to remote ones.
 	 * Each local multiplexer port is mapped to a <i>host:port</i> combination.
 	 */
-	private Map<Integer, HostPort> remoteMultiplexerMap = new HashMap<Integer, HostPort>();
+	private Map<String, HostPort> remoteMultiplexerMap = new HashMap<String, HostPort>();
 	/**
 	 * The list of application ports this multiplexer listens to. 
 	 */
@@ -51,7 +51,11 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	/**
 	 * Mapping of local application ports to outbound multiplexer ports.
 	 */
-	private Map<Integer, Integer> boundToMultiplexerMap = new HashMap<Integer, Integer>();
+	private Map<Integer, String> boundToMultiplexerMap = new HashMap<Integer, String>();
+	/**
+	 * The list of multiplexer ports this multiplexer listens to. 
+	 */
+	private Set<Integer> multiplexerPorts = new HashSet<Integer>();
 
 	/**
 	 * Initialize this server.
@@ -81,22 +85,33 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String s = props.getString("multiplexer.ports");
-		int[] ports = StringUtils.parsePorts(s);
-		for (int port: ports)
+		if (s != null)
 		{
-			multiplexerPorts.add(port);
-			s = props.getString("remote.multiplexer." + port);
-			if (s != null) remoteMultiplexerMap.put(port, StringUtils.parseHostPort(s));
+			int[] ports = StringUtils.parsePorts(s);
+			for (int port: ports) multiplexerPorts.add(port);
 		}
-		s = props.getString("bound.ports");
-		if (s == null) return;
-		ports = StringUtils.parsePorts(s);
-		for (int port: ports)
+
+		s = props.getString("remote.multiplexers");
+		if (s != null)
 		{
-			boundPorts.add(port);
-			int n = props.getInt("mapping." + port, -1);
-			if (n > 0) boundToMultiplexerMap.put(port, n);
+			String[] names = s.split("\\s");
+			for (String name: names)
+			{
+				remoteMultiplexers.add(name);
+				s = props.getString("remote.multiplexer." + name);
+				if (s != null) remoteMultiplexerMap.put(name, StringUtils.parseHostPort(s));
+			}
+			s = props.getString("bound.ports");
+			if (s == null) return;
+			ports = StringUtils.parsePorts(s);
+			for (int port: ports)
+			{
+				boundPorts.add(port);
+				String name = props.getString("mapping." + port, null);
+				if (name != null) boundToMultiplexerMap.put(port, name);
+			}
 		}
+
 		int n = multiplexerPorts.size() + boundPorts.size();
 		ports = new int[n];
 		int count = 0;
@@ -136,7 +151,8 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	{
 		int port = serverChannel.socket().getLocalPort();
 		MultiplexerContext context = (MultiplexerContext) key.attachment();
-		
+		if (multiplexerPorts.contains(port)) context.setMultiplexerPort(port);
+		else if (boundPorts.contains(port)) context.setBoundPort(port);
 		postAccept(key);
 	}
 
@@ -147,5 +163,25 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 */
 	public void postAccept(SelectionKey key)
 	{
+		MultiplexerContext context = (MultiplexerContext) key.attachment();
+		if (context.isApplicationPort())
+		{
+			HostPort mult = getHostPortForBoundPort(context.getBoundPort());
+			MultiplexerChannelHandler handler = new MultiplexerChannelHandler(this, mult.host(), mult.port());
+			MultiplexerChannelInitializer init = new MultiplexerChannelInitializer(key, handler);
+			new Thread(init).start();
+		}
+	}
+
+	/**
+	 * Get the outbound remote multiplexer associated with an inbound application port. 
+	 * @param port the application port to lookup.
+	 * @return a <code>HostPort</code> instannce, or null if no remote multiplexer could be found.
+	 */
+	public HostPort getHostPortForBoundPort(int port)
+	{
+		String name = boundToMultiplexerMap.get(port);
+		if (name == null) return null;
+		return remoteMultiplexerMap.get(name);
 	}
 }

@@ -14,7 +14,7 @@
 			{
 				$_SESSION["defined"] = "true";
 				$_SESSION["first"] = 0;
-				$_SESSION["last"] = 18;
+				$_SESSION["last"] = 12;
 			}
 			$current = $_REQUEST["current"];
 			if (!$current)
@@ -23,11 +23,10 @@
 			}
 ?>
 
-			<table align="center" cellspacing="0" cellpadding="0" width="70%">
-				$template{name="row-blank" span="2"}$
+			<table align="center" cellspacing="0" cellpadding="0" width="80%">
+				<tr><td height="12" colspan="*"/></tr>
 				<tr>
-					<td width="12" class="bleft"/>
-					<td align="center" bgcolor="white">
+					<td align="center">
 <?php
 					// Link to first page
 					if ($current > $_SESSION["first"])
@@ -77,20 +76,18 @@
 					}
 ?>
 					</td>
-					<td align="left" bgcolor="white">This presentation is available in <a href="documents/JPPF-Presentation.pdf">PDF Format</a></td>
-					<td width="12" class="bright"/>
+					<td align="left">This presentation is available in <a href="documents/JPPF-Presentation.pdf">PDF Format</a></td>
 				</tr>
+				<tr><td height="12"/></tr>
 				<tr>
-					<td width="12" class="bleft"/>
-					<td align="center" colspan="2" bgcolor="white">
+					<td align="center" colspan="2">
 <?php
 					echo '<img src="overview/img', $current, '.gif">';
 ?>
 					</td>
-					<td width="12" class="bright"/>
 				</tr>
-				$template{name="row-bottom" span="2"}$
 			</table>
 		</div>
+		$template{name="jppf-footer"}$
 	</body>
 </html>

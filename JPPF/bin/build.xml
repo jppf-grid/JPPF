@@ -1,6 +1,6 @@
 <!--
 	Java Parallel Processing Framework.
-	Copyright (C) 2005-2007 JPPF Team.
+	Copyright (C) 2005-2008 JPPF Team.
 	http://www.jppf.org
 
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -468,23 +468,23 @@
 					<tr>
 						<td valign="center">
 							<a href="http://www.jppf.org" target="_top">
-								<img src="http://jppf-project.sourceforge.net/images/logo-small.gif" border="0" width="66" height="26"/>
+								<img src="http://jppf-project.sourceforge.net/images/logo2.gif" border="0"/>
 							</a>
 						</td>
-						<td valign="center"><font face="Arial" color="#000000">&nbsp;&nbsp;Java Parallel Processing Framework</font></td>
 					</tr>
 					</table>
 				]]>
 			</header>
 			<bottom>
 				<![CDATA[
-					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2006 JPPF Team.</i></font>
+					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2008 JPPF Team.</i></font>
 				]]>
 			</bottom>
 		</javadoc>
 		<copy todir="${docs}/api/resources" overwrite="true">
 			<fileset dir="${bin}">
 				<include name="*.gif"/>
+				<include name="*.jpg"/>
 			</fileset>
 		</copy>
 	</target>

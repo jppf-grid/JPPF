@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,6 +55,7 @@ public class TestTaskRunner
 		try
 		{
 			jppfClient = new JPPFClient();
+			/*
 			performEmptyTaskListTest();
 			performExceptionTest();
 			performURLTest();
@@ -66,11 +67,16 @@ public class TestTaskRunner
 			performXMLParsingTaskTest();
 			performMyTaskTest();
 			performTimeoutTaskTest();
-			System.exit(0);
+			*/
+			performAnonymousInnerClassTaskTest();
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
+		}
+		finally
+		{
+			jppfClient.close();
 		}
 	}
 	
@@ -446,5 +452,31 @@ public class TestTaskRunner
 			e.printStackTrace();
 		}
 		return "";
+	}
+
+	/**
+	 * Check that an anonymous inner class fails with a NotSerializableException on the client side.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void performAnonymousInnerClassTaskTest() throws JPPFException
+	{
+		System.out.println(banner);
+		System.out.println("Starting anonymous inner class task testing...");
+		try
+		{
+			int n = 50;
+			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+			tasks.add(new AnonymousInnerClassTask());
+			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			System.out.println("result is : "+results.get(0).getResult());
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e);
+		}
+		finally
+		{
+			System.out.println("Anonymous inner class task testing complete.");
+		}
 	}
 }

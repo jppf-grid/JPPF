@@ -4,8 +4,8 @@
 	<body>
 		<div align="center">
 		$template{name="jppf-header"}$
-		<table cellspacing="0" cellpadding="0" width="70%">
-			$template{name="page-title" title="Related Links" span="1"}$
+		<h1 align="center" style="color: blue">Related Links</h1>
+		<table cellspacing="0" cellpadding="0" width="80%">
 
 <?php
 		$link = mysql_connect('mysql4-j', 'j135654admin', 'Faz600er')
@@ -27,46 +27,33 @@
 		foreach ($groups as $key => $value)
 		{
 ?>
-			$template{name="row-bottom" span="1"}$
-			$template{name="row-top" span="1"}$
-			<tr>
-				<td width="12" class="bleft"/>
-				<td bgcolor="white">
-					$template{name="highlight-top" span="1" color="pblue"}$
-<?php
-					printf("<span class='newsTitle'>%s</span>", $value);
-?>
-					$template{name="highlight-bottom" span="1" color="pblue"}$
-				</td>
-				<td width="12" class="bright"/>
-			</tr>
-			$template{name="row-blank" span="1"}$
+			<tr><td colspan="*">
+			<br>$template{name="highlight-header" span="1" title="<?php printf('%s', $value); ?>"}$
+			<br>
 <?php
 			$query = "SELECT * FROM links WHERE group_id = '$key' ORDER BY link_id ASC";
 			$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 			while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
 			{
 ?>
-			<tr>
-				<td width="12" class="bleft"/>
-				<td bgcolor="white">
 				<ul>
 <?php
 				$ref = $key . "." . $line["q_id"];
 				printf("<li><span class=\"linksub\"><a href=\"%s\">%s</a>:</span> %s</li>", $line["url"], $line["title"], $line["desc"]);
 ?>
 				</ul>
-				</td>
-				<td width="12" class="bright"/>
-			</tr>
 <?php
 			}
+?>
+			$template{name="highlight-bottom" span="1" color="yellow"}$
+			</td></tr>
+<?php
 		}
 		// Closing connection
 		mysql_close($link);
 ?>
-			$template{name="row-bottom" span="1"}$
 		</table>
 	</div>
+	$template{name="jppf-footer"}$
 	</body>
 </html>

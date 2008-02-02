@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,8 @@ import org.jppf.comm.socket.SocketChannelClient;
 import org.jppf.server.nio.*;
 
 /**
- * 
+ * Instances of this class act as wrapper for a multiplexer connection.<br>
+ * They handle (re)connection services wen needed.
  * @author Laurent Cohen
  */
 public class MultiplexerChannelHandler extends AbstractSocketChannelHandler

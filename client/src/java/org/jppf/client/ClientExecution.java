@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 
 /**
- * Instances of this class encapsulate
+ * Instances of this class encapsulate a submission of tasks by the client application.
  * @author Laurent Cohen
  */
 public class ClientExecution

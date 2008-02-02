@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -150,7 +150,7 @@ public class JPPFNode extends AbstractMonitoredNode
 				Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
 				if (params != null) bundle.getParametersMap().putAll(params);
 				TypedProperties props = JPPFConfiguration.getProperties();
-				if (props.getBoolean("management.enabled", true))
+				if (props.getBoolean("jppf.management.enabled", true))
 				{
 					bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
 					bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
@@ -190,7 +190,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		boolean mustInit = (socketClient == null);
 		if (mustInit)	initSocketClient();
 		initCredentials();
-		if ((nodeAdmin == null) && JPPFConfiguration.getProperties().getBoolean("management.enabled", true))
+		if ((nodeAdmin == null) && JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
 		{
 			nodeAdmin = new JPPFNodeAdmin(JPPFNode.this);
 			String mbeanName = JPPFAdminMBean.NODE_MBEAN_NAME;

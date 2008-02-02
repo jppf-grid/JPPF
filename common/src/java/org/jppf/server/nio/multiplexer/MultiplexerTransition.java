@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +33,10 @@ public enum MultiplexerTransition
 	 * Transition from a state to RECEIVING.
 	 */
 	TO_RECEIVING,
+	/**
+	 * Transition from a state to IDENTIFYING_INBOUND_CHANNEL.
+	 */
+	TO_IDENTIFYING_INBOUND_CHANNEL,
 	/**
 	 * Transition from a state to SENDING in idle mode.
 	 */

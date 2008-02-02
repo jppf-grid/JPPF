@@ -4,7 +4,7 @@
 	<body>
 		<div align="center">
 		$template{name="jppf-header"}$
-		<table cellspacing="0" cellpadding="0" width="70%">
+		<table cellspacing="0" cellpadding="0" width="80%">
 		<?php
 		// Connecting, selecting database
 		$link = mysql_connect('mysql4-j', 'j135654admin', 'Faz600er')
@@ -18,25 +18,18 @@
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
 		{
 		?>
-			<?php
-			if ($i > 0)
-			{
-			?>
-				$template{name="row-bottom" span="1"}$
-				$template{name="row-top" span="1"}$
-			<?php
-			}
-			$i = $i + 1;
-			?>
-			$template{name="row-blank" span="1"}$
 			<tr>
-				<td width="12" class="bleft"/>
-				<td bgcolor="white">
-					$template{name="highlight-top" span="1" color="pblue"}$
+				<td>
 					<?php
-						printf("<span class='newsTitle'>%s %s</span>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
+					$title = date("n/j/Y", strtotime($line["date"])) . " " . $line["title"];
+					if ($i == 0)
+					{
 					?>
-					$template{name="highlight-bottom" span="1" color="pblue"}$
+					<br>
+					<?php
+					}
+					?>
+					$template{name="highlight-header" span="1" color="blue" color2="yellow" title="<?php printf('%s', $title); ?>"}$
 					<?php
 						printf("<br>%s", $line["desc"]);
 					?>
@@ -44,8 +37,9 @@
 					<?php
 						printf("%s", $line["content"]);
 					?>
+					$template{name="highlight-bottom" span="1" color="yellow"}$
+					<br>
 				</td>
-				<td width="12" class="bright"/>
 			</tr>
 		<?php
 		}
@@ -54,9 +48,8 @@
 		// Closing connection
 		mysql_close($link);
 		?>
-			$template{name="row-blank" span="1"}$
-			$template{name="row-bottom" span="1"}$
 		</table>
 
+		$template{name="jppf-footer"}$
 	</body>
 </html>

@@ -18,7 +18,7 @@
 
 /*body { background-color: #FFFFC0 }*/
 /*body { background-color: #FFFFFF }*/
-body { font-size=10pt; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
+body { font-size=10pt; background: url("images/bkg_new2.jpg"); background-repeat: repeat; background-attachment: fixed }
  
 .pageTitle { font-family: Arial, Helvetica, sans-serif; font-size: 24pt; font-weight: bold; text-align: center;
             color: #9B9DFD; background-color: #FFFFC0 } /* (155, 157, 253); (255, 255, 192) */
@@ -28,16 +28,13 @@ body { font-size=10pt; background: url("images/bkg.gif"); background-repeat: rep
 .centeredCell {font-size: 12pt; font-family: Arial, Helvetica, sans-serif; text-align: center; valign: middle }
 .nonCenteredCell {font-size: 12pt; font-family: Arial, Helvetica, sans-serif  }
 
- /*.menu_first { background-color: #8080FF; color: #FFFFC0; font-weight: bold }
-.menu { background-color: #8080FF; color: #FFFFC0; border-left: 1px solid #FFFFC0; font-weight: bold }*/
 .menu_first { background: url("images/bkg-menu.gif"); background-repeat: repeat; background-attachment: fixed; color: #FFFFC0; font-weight: bold }
 .menu { background: url("images/bkg-menu.gif"); background-repeat: repeat; background-attachment: fixed; color: #FFFFC0; border-left: 1px solid #FFFFC0; font-weight: bold }
 .docmenu_first { background-color: #FFFFC0; color: #8080FF; font-weight: bold }
 .docmenu { background-color: #FFFFC0; color: #8080FF; border-left: 1px solid #8080FF; font-weight: bold }
-/*.table_ { border: 2px solid #8080FF; background-color: #FFFFFF }*/
-.table_ { border: 2px solid #8080FF; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
-.noBorderTable_ { background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
-.table2_ { border-right: 2px solid #8080FF; border-top: 2px solid #8080FF; border-bottom: 2px solid #8080FF; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
+.table_ { border: 2px solid #8080FF; background: url("images/bkg_new2.jpg"); background-repeat: repeat; background-attachment: fixed }
+.noBorderTable_ { background: url("images/bkg_new2.jpg"); background-repeat: repeat; background-attachment: fixed }
+.table2_ { border-right: 2px solid #8080FF; border-top: 2px solid #8080FF; border-bottom: 2px solid #8080FF; background: url("images/bkg_new2.jpg"); background-repeat: repeat; background-attachment: fixed }
 
 .border_          { border: 2px solid #8080FF }
 .left_            { border-left: 2px solid #8080FF }
@@ -77,5 +74,5 @@ table  {font-size: 10pt; font-family: Arial, Helvetica, sans-serif }
 .ackTitle { color: #000060; font-size: 16pt; font-family: Comic Sans MS, Arial, sans-serif; font-weight: bold }
 .ackText { text-align: center; color: #000060; font-size: 12pt; font-family: Comic Sans MS, Arial, sans-serif; /*font-weight: bold*/ }
 .archiHeader { color: #FFFF00; background-color: #8080FF; font-weight: bold; font-size: 20 }
-.archiContent { color: #000060; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
+.archiContent { color: #000060; background: url("images/bkg_new2.jpg"); background-repeat: repeat; background-attachment: fixed }
 /*.archiHeader { border: 1px solid #000060; color: #FFFF00; background-color: #8080FF; font-weight: bold; font-size: 20 }*/

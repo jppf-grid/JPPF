@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,11 +33,11 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	private SelectionKey linkedKey = null;
 	/**
-	 * Port on which the connection was initially established.
+	 * The application port to which the channel may be bound.
 	 */
 	private int boundPort = -1;
 	/**
-	 * Port on which the connection was initially established.
+	 * The multiplexer port to which the channel may be bound.
 	 */
 	private int multiplexerPort = -1;
 
@@ -74,5 +74,69 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	public synchronized void setLinkedKey(SelectionKey key)
 	{
 		this.linkedKey = key;
+	}
+
+	/**
+	 * Get the application port to which the channel may be bound.
+	 * @return the port as an int value, or a negative value if the channel is not bound to an application port.
+	 */
+	public int getBoundPort()
+	{
+		return boundPort;
+	}
+
+	/**
+	 * Set the application port to which the channel may be bound.
+	 * @param boundPort the port as an int value, or a negative value if the channel is not bound to an application port.
+	 */
+	public void setBoundPort(int boundPort)
+	{
+		this.boundPort = boundPort;
+	}
+
+	/**
+	 * Get the multiplexer port to which the channel may be bound.
+	 * @return the port as an int value, or a negative value if the channel is not bound to a multiplexer port.
+	 */
+	public int getMultiplexerPort()
+	{
+		return multiplexerPort;
+	}
+
+	/**
+	 * Set the multiplexer port to which the channel may be bound.
+	 * @param multiplexerPort the port as an int value, or a negative value if the channel is not bound to a multiplexer port.
+	 */
+	public void setMultiplexerPort(int multiplexerPort)
+	{
+		this.multiplexerPort = multiplexerPort;
+	}
+
+	/**
+	 * Determine whether the associated channel is connected to an application port.
+	 * @return true if the channel is bound to an application port, false otherwise.
+	 */
+	public boolean isApplicationPort()
+	{
+		return boundPort > 0;
+	}
+
+	/**
+	 * Determine whether the associated channel is connected to a multiplexer port.
+	 * @return true if the channel is bound to a multiplexer port, false otherwise.
+	 */
+	public boolean isMultiplexerPort()
+	{
+		return multiplexerPort > 0;
+	}
+
+	/**
+	 * Get the port outbound port number for this channel, sent as the initial message.
+	 * @return the port number as an int, or -1 if it could not be read.
+	 */
+	public int readOutBoundPort()
+	{
+		if (message == null) return -1;
+		return message.buffer.getInt();
 	}
 }

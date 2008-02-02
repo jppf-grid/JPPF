@@ -1,6 +1,6 @@
 <!--
 	Java Parallel Processing Framework.
-	Copyright (C) 2005-2007 JPPF Team.
+	Copyright (C) 2005-2008 JPPF Team.
 	http://www.jppf.org
 
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -348,6 +348,35 @@
 			<jvmarg value="-Xloggc:gc.txt"/>
 			<jvmarg value="-XX:+UseConcMarkSweepGC"/>
 			-->
+		</java>       
+	</target>
+
+	<target name="do.replacements">
+		<property name="findOnly" value="false"/>
+		<antcall target="file.replacer"><param name="ext" value="java"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="properties"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="xml"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="xsd"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="bat"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="cmd"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="sh"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="txt"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="html"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="php"/><param name="find" value="${findOnly}"/></antcall>
+	</target>
+
+	<target name="file.replacer">
+		<echo message="starting the file replacement for extensions = ${ext}, find only: ${find}"/>
+		<java fork="yes" classname="org.jppf.utils.FileReplacer" classpathref="client.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx256m"/>
+			<jvmarg value="-Djppf.config=jppf-client.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-FileReplacer.properties"/>
+			<arg value="C:/Workspaces/SourceForge"/>
+			<arg value="C:/temp/src.txt"/>
+			<arg value="C:/temp/dest.txt"/>
+			<arg value="${ext}"/>
+			<arg value="${find}"/>
 		</java>       
 	</target>
 

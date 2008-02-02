@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -128,7 +128,21 @@ public class DemoTest implements Serializable
 			{
 				public void submissionStatusChanged(SubmissionStatusEvent event)
 				{
-					System.out.println("*** 2 *** submission ["+event.getSubmissionId()+"] changed to '"+event.getStatus()+"'");
+					String id = event.getSubmissionId();
+					SubmissionStatus status = event.getStatus();
+					switch(status)
+					{
+						case COMPLETE:
+							// process successfull completion
+							break;
+						case FAILED:
+							// process failure
+							break;
+						default:
+							System.out.println("submission [" + id +
+								"] changed to '" + status + "'");
+							break;
+					}
 				}
 			});
 			*/

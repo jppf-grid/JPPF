@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,6 +54,7 @@ public final class MultiplexerServerFactory
 			new EnumMap<MultiplexerState, NioState<MultiplexerTransition>>(MultiplexerState.class);
 		map.put(SENDING, new SendingState(server));
 		map.put(RECEIVING, new ReceivingState(server));
+		map.put(IDENTIFYING_INBOUND_CHANNEL, new IdentifyingInboundChannelState(server));
 		return map;
 	}
 
@@ -68,10 +69,10 @@ public final class MultiplexerServerFactory
 			new EnumMap<MultiplexerTransition, NioTransition<MultiplexerState>>(MultiplexerTransition.class);
 		map.put(TO_SENDING, transition(SENDING, RW));
 		map.put(TO_RECEIVING, transition(RECEIVING, R));
-		map.put(TO_IDLE, transition(SENDING, R));
+		map.put(TO_IDENTIFYING_INBOUND_CHANNEL, transition(IDENTIFYING_INBOUND_CHANNEL, R));
+		map.put(TO_IDLE, transition(IDLE, R));
 		return map;
 	}
-
 
 	/**
 	 * Create a transition to the specified state for the specified IO operations.

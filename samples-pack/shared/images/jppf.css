@@ -18,7 +18,7 @@
 
 /*body { background-color: #FFFFC0 }*/
 /*body { background-color: #FFFFFF }*/
-body { font-size=10pt; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
+body { font-size=10pt; background: url("bkg_new2.jpg"); background-repeat: repeat; background-attachment: fixed }
  
 .pageTitle { font-family: Arial, Helvetica, sans-serif; font-size: 24pt; font-weight: bold; text-align: center;
             color: #9B9DFD; background-color: #FFFFC0 } /* (155, 157, 253); (255, 255, 192) */
@@ -34,8 +34,8 @@ body { font-size=10pt; background: url("images/bkg.gif"); background-repeat: rep
 .menu { background: url("images/bkg-menu.gif"); background-repeat: repeat; background-attachment: fixed; color: #FFFFC0; border-left: 1px solid #FFFFC0; font-weight: bold }
 .docmenu_first { background-color: #FFFFC0; color: #8080FF; font-weight: bold }
 .docmenu { background-color: #FFFFC0; color: #8080FF; border-left: 1px solid #8080FF; font-weight: bold }
-/*.table_ { border: 2px solid #8080FF; background-color: #FFFFFF }*/
-.table_ { border: 2px solid #8080FF; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
+.table_ { border: 2px solid #8080FF; background: transparent }
+/*.table_ { border: 2px solid #8080FF; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }*/
 .noBorderTable_ { background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
 .table2_ { border-right: 2px solid #8080FF; border-top: 2px solid #8080FF; border-bottom: 2px solid #8080FF; background: url("images/bkg.gif"); background-repeat: repeat; background-attachment: fixed }
 
@@ -61,9 +61,11 @@ body { font-size=10pt; background: url("images/bkg.gif"); background-repeat: rep
 
 .completed_cell { background-image: url("images/completed.gif"); background-repeat: no-repeat; background-position: center }
 
-h1, h2, h3 {font-family: Arial, Helvetica, sans-serif }
-h3 { font-size: 14pt; color: #8080FF }
-h4 { font-size: 12pt; color: #8080FF; font-weight: bold }
+h1, h2, h3, h4 { color: #8080FF }
+h1 {font-family: Arial Black }
+h2, h3, h4 {font-family: Arial, Helvetica, sans-serif }
+h3 { font-size: 14pt; }
+h4 { font-size: 12pt; font-weight: bold }
 table  {font-size: 10pt; font-family: Arial, Helvetica, sans-serif }
 .comic     {font-size: 10pt; font-family: Comic Sans MS, Arial, Helvetica, sans-serif }
 

@@ -12,7 +12,7 @@
 	<classpathentry kind="lib" path="shared/lib/jppf-client.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-common-node.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-common.jar"/>
-	<classpathentry kind="lib" path="shared/lib/jppf-server.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-server.jar" sourcepath="/server/src/java"/>
 	<classpathentry kind="lib" path="shared/lib/log4j-1.2.9.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="shared/lib/js.jar"/>

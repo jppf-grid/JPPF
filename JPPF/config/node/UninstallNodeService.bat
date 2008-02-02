@@ -1,5 +1,5 @@
 rem Java Parallel Processing Framework.
-rem Copyright (C) 2005-2007 JPPF Team.
+rem Copyright (C) 2005-2008 JPPF Team.
 rem http://www.jppf.org
 rem 
 rem Licensed under the Apache License, Version 2.0 (the "License");

@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,15 +51,15 @@ public abstract class NioContext<S extends Enum>
 	/**
 	 * Count of bytes read.
 	 */
-	int readByteCount = 0;
+	protected int readByteCount = 0;
 	/**
 	 * Count of bytes written.
 	 */
-	int writeByteCount = 0;
+	protected int writeByteCount = 0;
 	/**
 	 * Uuid for this node context.
 	 */
-	private String uuid = null;
+	protected String uuid = null;
 
 	/**
 	 * Get the current state of the channel this context is associated with.
@@ -204,7 +204,7 @@ public abstract class NioContext<S extends Enum>
 	 * Give the non qualified name of the class of this instance.
 	 * @return a class name as a string.
 	 */
-	private String getShortClassName()
+	protected String getShortClassName()
 	{
 		String fqn = getClass().getName();
 		int idx = fqn.lastIndexOf(".");

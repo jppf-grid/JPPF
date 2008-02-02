@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,7 +35,7 @@ public class ConstantTask extends JPPFTestTask
 	}
 
 	/**
-	 * Execute ther task
+	 * Execute the task
 	 * @see java.lang.Runnable#run()
 	 */
 	public void test()

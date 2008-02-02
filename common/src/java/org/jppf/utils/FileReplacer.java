@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,6 +39,7 @@ public class FileReplacer
 	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
 	 */
 	private boolean debugEnabled = log.isDebugEnabled();
+	//private boolean debugEnabled = true;
 	/**
 	 * File containing the content to replace.
 	 */
@@ -81,6 +82,11 @@ public class FileReplacer
 	{
 		src = FileUtils.readTextFile(srcFile);
 		dest = FileUtils.readTextFile(destFile);
+		if (src.endsWith("\n") && dest.endsWith("\n"))
+		{
+			src = src.substring(0, src.length() - 1);
+			dest = dest.substring(0, dest.length() - 1);
+		}
 		this.searchOnly = searchOnly;
 		pattern = Pattern.compile(src, Pattern.LITERAL);
 		filter = new ReplacerFiler(ext);
@@ -90,7 +96,8 @@ public class FileReplacer
 		if (f.isDirectory()) replaceFolder(f);
 		else replaceFile(f);
 		log.info("Total number of occurences found: " + nbReplacements);
-		log.info("Total number of files changed: " + nbFilesChanged);
+		log.info("Total number of files" + (searchOnly ? " would have been" : "") +
+			" changed: " + nbFilesChanged);
 	}
 
 	/**
@@ -100,6 +107,7 @@ public class FileReplacer
 	 */
 	private void replaceFolder(File folder) throws Exception
 	{
+		if (debugEnabled) log.info("Processing folder " + folder.getAbsolutePath());
 		File[] fileList = folder.listFiles(filter);
 		List<File> folders = new ArrayList<File>();
 		List<File> files = new ArrayList<File>();
@@ -143,7 +151,7 @@ public class FileReplacer
 			if (debugEnabled) log.debug("Content with replacements performed:\n" + s);
 			if (!searchOnly) FileUtils.writeTextFile(file.getPath(), s);
 		}
-		else if (debugEnabled) log.info("Sequence not found in file '"+file+"'");
+		else if (debugEnabled) log.debug("Sequence not found in file '"+file+"'");
 	}
 
 	/**
@@ -154,8 +162,13 @@ public class FileReplacer
 	{
 		try
 		{
+			String rootFolder = args[0];
+			String find = args[1];
+			String replace = args[2];
+			String ext = args[3];
+			boolean searchOnly = Boolean.valueOf(args[4]);
 			FileReplacer replacer = new FileReplacer();
-			replacer.replace("D:/Workspaces/SourceForge", "D:/temp/src.txt", "D:/temp/dest.txt", "java", true); 
+			replacer.replace(rootFolder, find, replace, ext, searchOnly); 
 		}
 		catch(Exception e)
 		{

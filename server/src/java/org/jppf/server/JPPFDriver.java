@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2007 JPPF Team.
+ * Copyright (C) 2005-2008 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -121,7 +121,7 @@ public class JPPFDriver
 		nodeNioServer = new NodeNioServer(ports, BundlerFactory.createBundler());
 		nodeNioServer.start();
 
-		if (props.getBoolean("management.enabled", true))
+		if (props.getBoolean("jppf.management.enabled", true))
 		{
 			jmxServer = new JMXServerImpl();
 			jmxServer.start();
