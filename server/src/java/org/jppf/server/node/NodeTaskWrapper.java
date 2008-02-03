@@ -65,9 +65,15 @@ class NodeTaskWrapper implements Runnable
 		JPPFNodeAdmin nodeAdmin = null;
 		try
 		{
-			nodeAdmin = node.getNodeAdmin();
-			nodeAdmin.taskStarted(task.getId());
-			task.addJPPFTaskListener(nodeAdmin);
+			if (node.isJmxEnabled())
+			{
+				nodeAdmin = node.getNodeAdmin();
+				if (nodeAdmin != null)
+				{
+					nodeAdmin.taskStarted(task.getId());
+					task.addJPPFTaskListener(nodeAdmin);
+				}
+			}
 			Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
 			task.run();
 		}

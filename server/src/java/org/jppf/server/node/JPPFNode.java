@@ -89,6 +89,10 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * The administration and monitoring MBean for this node.
 	 */
 	private JPPFNodeAdmin nodeAdmin = null;
+	/**
+	 * Determines whether JMX management and monitoring is enabled for this node.
+	 */
+	private boolean jmxEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true);
 
 	/**
 	 * Main processing loop of this node.
@@ -149,9 +153,9 @@ public class JPPFNode extends AbstractMonitoredNode
 				bundle.setBundleUuid(uuid);
 				Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
 				if (params != null) bundle.getParametersMap().putAll(params);
-				TypedProperties props = JPPFConfiguration.getProperties();
-				if (props.getBoolean("jppf.management.enabled", true))
+				if (isJmxEnabled())
 				{
+					TypedProperties props = JPPFConfiguration.getProperties();
 					bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
 					bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
 					bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeLauncher.getJmxServer().getId());
@@ -190,7 +194,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		boolean mustInit = (socketClient == null);
 		if (mustInit)	initSocketClient();
 		initCredentials();
-		if ((nodeAdmin == null) && JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
+		if ((nodeAdmin == null) && isJmxEnabled())
 		{
 			nodeAdmin = new JPPFNodeAdmin(JPPFNode.this);
 			String mbeanName = JPPFAdminMBean.NODE_MBEAN_NAME;
@@ -500,5 +504,14 @@ public class JPPFNode extends AbstractMonitoredNode
 	public NodeExecutionManager getExecutionManager()
 	{
 		return executionManager;
+	}
+
+	/**
+	 * Determines whether JMX management and monitoring is enabled for this node.
+	 * @return true if JMX is enabled, false otherwise. 
+	 */
+	public boolean isJmxEnabled()
+	{
+		return jmxEnabled;
 	}
 }
