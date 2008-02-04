@@ -126,6 +126,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	  for (int i=0; i<model.getColumnCount(); i++) table.sizeColumnsToFit(i);
 		tableModels.add(model);
 		panel.add(table);
+		//panel.add(Box.createGlue());
 		table.setShowGrid(false);
 		return panel;
 	}

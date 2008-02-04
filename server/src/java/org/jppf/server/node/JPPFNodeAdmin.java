@@ -104,6 +104,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 		s.setExecutionStatus(nodeState.getExecutionStatus());
 		s.setTaskEvent(nodeState.getTaskNotification());
 		s.setTaskIdSet(nodeState.getAllTaskIds());
+		s.setThreadPoolSize(node.getExecutionManager().getThreadPoolSize());
 		return s;
 	}
 
@@ -191,5 +192,15 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	{
 		if (debugEnabled) log.debug("task id#" + id + " ended");
 		nodeState.taskEnded(id);
+	}
+
+	/**
+	 * Set the size of the node's thread pool.
+	 * @param size the size as an int.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadPoolSize(int)
+	 */
+	public void updateThreadPoolSize(Integer size)
+	{
+		node.getExecutionManager().setThreadPoolSize(size);
 	}
 }

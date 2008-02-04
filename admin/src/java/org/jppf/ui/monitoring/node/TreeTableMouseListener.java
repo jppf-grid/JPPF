@@ -80,20 +80,25 @@ public class TreeTableMouseListener extends MouseAdapter
 		{
 			Set<String> idSet = infoHolder.getState().getAllTaskIds();
 			log.info("set of ids: " + idSet);
-			if (idSet.isEmpty()) return;
 			final JMXNodeConnectionWrapper jmx = infoHolder.getJmxClient();
 			JPopupMenu menu = new JPopupMenu();
-			JMenu cancel = new JMenu("Cancel");
-			cancel.setIcon(GuiUtils.loadIcon(CANCEL_ICON));
-			JMenu restart = new JMenu("Restart");
-			restart.setIcon(GuiUtils.loadIcon(RESTART_ICON));
-			for (String id: idSet)
+			JMenuItem item = new JMenuItem("Set thread pool size");
+			item.addActionListener(new NodeThreadPoolSizeAction(jmx));
+			menu.add(item);
+			if (!idSet.isEmpty())
 			{
-				cancel.add(createMenuItem(id, true, jmx));
-				restart.add(createMenuItem(id, false, jmx));
+				JMenu cancel = new JMenu("Cancel");
+				cancel.setIcon(GuiUtils.loadIcon(CANCEL_ICON));
+				JMenu restart = new JMenu("Restart");
+				restart.setIcon(GuiUtils.loadIcon(RESTART_ICON));
+				for (String id: idSet)
+				{
+					cancel.add(createMenuItem(id, true, jmx));
+					restart.add(createMenuItem(id, false, jmx));
+				}
+				menu.add(cancel);
+				menu.add(restart);
 			}
-			menu.add(cancel);
-			menu.add(restart);
 			menu.show(treeTable, x, y);
 		}
 	}
@@ -137,5 +142,50 @@ public class TreeTableMouseListener extends MouseAdapter
 			}
 		});
 		return item;
+	}
+
+	/**
+	 * This action displays an input panel for the user to type a new
+	 * thread pool size for a node, and updates the node with it.
+	 */
+	public class NodeThreadPoolSizeAction implements ActionListener
+	{
+		/**
+		 * The jmx client used to update the thread pool size.
+		 */
+		private JMXNodeConnectionWrapper jmx = null;
+		/**
+		 * Initialize this action.
+		 * @param jmx the jmx client used to update the thread pool size.
+		 */
+		public NodeThreadPoolSizeAction(JMXNodeConnectionWrapper jmx)
+		{
+			this.jmx = jmx;
+		}
+
+		/**
+		 * Perform the action.
+		 * @param event not used.
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		public void actionPerformed(ActionEvent event)
+		{
+			try
+			{
+				String s = JOptionPane.showInputDialog("Enter the number of threads");
+				if ((s == null) || ("".equals(s.trim()))) return;
+				try
+				{
+					int n = Integer.valueOf(s);
+					jmx.updateThreadPoolSize(n);
+				}
+				catch(NumberFormatException ignored)
+				{
+				}
+			}
+			catch(Exception ignored)
+			{
+			}
+		}
 	}
 }

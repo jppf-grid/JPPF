@@ -61,7 +61,7 @@ public class NodeExecutionManager
 	 */
 	private List<JPPFTask> toResubmit = new ArrayList<JPPFTask>();
 	/**
-	 * 
+	 * Mapping of tasks to their id.
 	 */
 	private Map<String, List<Pair<Future<?>, JPPFTask>>> idMap =
 		new HashMap<String, List<Pair<Future<?>, JPPFTask>>>();
@@ -76,7 +76,9 @@ public class NodeExecutionManager
 		TypedProperties props = JPPFConfiguration.getProperties();
 		int poolSize = props.getInt("processing.threads", 1);
 		log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
-		threadPool = Executors.newFixedThreadPool(poolSize);
+		LinkedBlockingQueue queue = new LinkedBlockingQueue();
+		//threadPool = Executors.newFixedThreadPool(poolSize);
+		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue);
 		timeoutTimer = new Timer("Node Task Timeout Timer");
 	}
 
@@ -246,5 +248,37 @@ public class NodeExecutionManager
 		threadPool.shutdownNow();
 		if (timeoutTimer != null) timeoutTimer.cancel();
 		timerTaskMap.clear();
+	}
+
+	/**
+	 * Set the size of the node's thread pool.
+	 * @param size the size as an int.
+	 */
+	public void setThreadPoolSize(int size)
+	{
+		if (size <= 0) return;
+		ThreadPoolExecutor tpe = (ThreadPoolExecutor) threadPool;
+		if (size > tpe.getCorePoolSize())
+		{
+			tpe.setMaximumPoolSize(size);
+			tpe.setCorePoolSize(size);
+			log.info("Node thread pool size increased to " + size);
+		}
+		else if (size < tpe.getCorePoolSize())
+		{
+			tpe.setCorePoolSize(size);
+			tpe.setMaximumPoolSize(size);
+			log.info("Node thread pool size reduced to " + size);
+		}
+	}
+
+	/**
+	 * Get the size of the node's thread pool.
+	 * @return the size as an int.
+	 */
+	public int getThreadPoolSize()
+	{
+		if (threadPool == null) return 0;
+		return ((ThreadPoolExecutor) threadPool).getCorePoolSize();
 	}
 }

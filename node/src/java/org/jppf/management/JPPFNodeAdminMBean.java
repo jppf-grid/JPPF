@@ -48,4 +48,9 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean<NodeParameter, Object
 	 * @param id the id of the task or tasks to restart.
 	 */
 	void restartTask(String id);
+	/**
+	 * Set the size of the node's thread pool.
+	 * @param size the size as an int.
+	 */
+	void updateThreadPoolSize(Integer size);
 }

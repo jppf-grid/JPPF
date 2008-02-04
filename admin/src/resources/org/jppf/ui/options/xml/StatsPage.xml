@@ -78,11 +78,25 @@
 	<!--                      Tree table area                                  -->
 	<!-- ===================================================================== -->
 
-	<child name="Tables" type="Java">
-		<property name="class" value="org.jppf.ui.monitoring.MonitoringPanel"/>
+	<child name="TablesPanel" type="page">
 		<property name="label" value=""/>
-		<property name="tooltip" value=""/>
-		<property name="value" value=""/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+
+		<child name="filler" type="Filler">
+			<property name="width" value="0"/>
+			<property name="height" value="0"/>
+		</child>
+
+		<child name="Tables" type="Java">
+			<property name="class" value="org.jppf.ui.monitoring.MonitoringPanel"/>
+			<property name="label" value=""/>
+			<property name="tooltip" value=""/>
+			<property name="value" value=""/>
+		</child>
+
 	</child>
 
 </opt:main>

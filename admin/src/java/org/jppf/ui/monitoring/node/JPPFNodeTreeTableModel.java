@@ -37,21 +37,25 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 	 */
 	private static final int NODE_URL = 0;
 	/**
-	 * Column number for the node's last event.
+	 * Column number for the node's thread pool size.
 	 */
-	private static final int NODE_STATUS = 1;
+	private static final int NODE_THREADS = 1;
 	/**
 	 * Column number for the node's last event.
 	 */
-	private static final int EXECUTION_STATUS = 2;
+	private static final int NODE_STATUS = 2;
+	/**
+	 * Column number for the node's last event.
+	 */
+	private static final int EXECUTION_STATUS = 3;
 	/**
 	 * Column number for the node's number of tasks executed.
 	 */
-	private static final int NB_TASKS = 3;
+	private static final int NB_TASKS = 4;
 	/**
 	 * Column number for the node's latest task event.
 	 */
-	private static final int TASK_EVENT = 4;
+	private static final int TASK_EVENT = 5;
 
 	/**
 	 * Initialize this model witht he specified tree.
@@ -69,7 +73,7 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 	 */
 	public int getColumnCount()
 	{
-		return 5;
+		return 6;
 	}
 
 	/**
@@ -93,6 +97,9 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 				{
 					case NODE_URL:
 						res = info.toString();
+						break;
+					case NODE_THREADS:
+						res = state.getThreadPoolSize();
 						break;
 					case NODE_STATUS:
 						res = state.getConnectionStatus();
@@ -129,6 +136,9 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 		{
 			case NODE_URL:
 				res = localize("column.node.url");
+				break;
+			case NODE_THREADS:
+				res = localize("column.node.threads");
 				break;
 			case NODE_STATUS:
 				res = localize("column.node.status");

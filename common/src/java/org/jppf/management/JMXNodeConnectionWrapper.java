@@ -81,4 +81,15 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper
 		return (Serializable) invoke(JPPFAdminMBean.NODE_MBEAN_NAME,
 			"notification", (Object[]) null, (String[]) null); 
 	}
+
+	/**
+	 * Set the size of the node's thread pool.
+	 * @param size the size as an int.
+	 * @throws Exception if an error occurs while invoking the Node MBean.
+	 */
+	public void updateThreadPoolSize(int size) throws Exception
+	{
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateThreadPoolSize",
+			new Object[] { size }, new String[] { "java.lang.Integer" }); 
+	}
 }

@@ -54,6 +54,10 @@ public class JPPFNodeState implements Serializable
 	 * List of the ids of all tasks currently executing.
 	 */
 	private Set<String> taskIdSet = new HashSet<String>();
+	/**
+	 * Size of the node's thread pool.
+	 */
+	private int threadPoolSize = 1;
 
 	/**
 	 * Get the latest event received from a task.
@@ -175,5 +179,23 @@ public class JPPFNodeState implements Serializable
 	public synchronized void setTaskIdSet(Set<String> taskIdSet)
 	{
 		this.taskIdSet = taskIdSet;
+	}
+
+	/**
+	 * Get the size of the node's thread pool.
+	 * @return the size as an int.
+	 */
+	public int getThreadPoolSize()
+	{
+		return threadPoolSize;
+	}
+
+	/**
+	 * Set the size of the node's thread pool.
+	 * @param threadPoolSize the size as an int.
+	 */
+	public void setThreadPoolSize(int threadPoolSize)
+	{
+		this.threadPoolSize = threadPoolSize;
 	}
 }
