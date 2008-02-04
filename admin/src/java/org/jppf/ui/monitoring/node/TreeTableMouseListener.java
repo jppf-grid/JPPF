@@ -172,7 +172,8 @@ public class TreeTableMouseListener extends MouseAdapter
 		{
 			try
 			{
-				String s = JOptionPane.showInputDialog("Enter the number of threads");
+				String s = JOptionPane.showInputDialog(null, "Enter the number of threads",
+					"Enter the number of threads", JOptionPane.PLAIN_MESSAGE);
 				if ((s == null) || ("".equals(s.trim()))) return;
 				try
 				{

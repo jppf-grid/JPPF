@@ -43,7 +43,7 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 	/**
 	 * 
 	 */
-	private static float opacity = 0.2f;
+	private static float opacity = 0.5f;
 	/**
 	 * The original image (as read from the disk / HTTP connection).
 	 */
@@ -58,7 +58,8 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 	 */
 	public JPPFTiledWatermark()
 	{
-		String imageLocation = "org/jppf/ui/resources/GridWatermark.gif";
+		//String imageLocation = "org/jppf/ui/resources/GridWatermark.gif";
+		String imageLocation = "org/jppf/ui/resources/bkg_new.jpg";
 		try
 		{
 			ClassLoader cl = JPPFTiledWatermark.class.getClassLoader();
@@ -106,51 +107,57 @@ public class JPPFTiledWatermark implements SubstanceWatermark
 		int dx = 0;
 		int dy = 0;
 		Component topParent = null;
-		switch (getKind())
+		try
 		{
-			case SCREEN_CENTER_SCALE:
-			case SCREEN_TILE:
-				dx = c.getLocationOnScreen().x;
-				dy = c.getLocationOnScreen().y;
-				break;
-			case APP_ANCHOR:
-			case APP_TILE:
-				if (c instanceof JComponent)
-				{
-					topParent = ((JComponent) c).getTopLevelAncestor();
-				}
-				else
-				{
-					Component comp = c;
-					while (comp.getParent() != null)
+			switch (getKind())
+			{
+				case SCREEN_CENTER_SCALE:
+				case SCREEN_TILE:
+					dx = c.getLocationOnScreen().x;
+					dy = c.getLocationOnScreen().y;
+					break;
+				case APP_ANCHOR:
+				case APP_TILE:
+					if (c instanceof JComponent)
 					{
-						comp = comp.getParent();
+						topParent = ((JComponent) c).getTopLevelAncestor();
 					}
-					topParent = comp;
-				}
-				dx = c.getLocationOnScreen().x - topParent.getLocationOnScreen().x;
-				dy = c.getLocationOnScreen().y - topParent.getLocationOnScreen().y;
-				break;
-			case APP_CENTER:
-				if (c instanceof JComponent)
-				{
-					topParent = ((JComponent) c).getTopLevelAncestor();
-				}
-				else
-				{
-					Component comp = c;
-					while (comp.getParent() != null)
+					else
 					{
-						comp = comp.getParent();
+						Component comp = c;
+						while (comp.getParent() != null)
+						{
+							comp = comp.getParent();
+						}
+						topParent = comp;
 					}
-					topParent = comp;
-				}
-				dx = c.getLocationOnScreen().x - topParent.getLocationOnScreen().x;
-				dy = c.getLocationOnScreen().y - topParent.getLocationOnScreen().y;
-				dx -= (topParent.getWidth() / 2 - this.origImage.getWidth() / 2);
-				dy -= (topParent.getHeight() / 2 - this.origImage.getHeight() / 2);
+					dx = c.getLocationOnScreen().x - topParent.getLocationOnScreen().x;
+					dy = c.getLocationOnScreen().y - topParent.getLocationOnScreen().y;
+					break;
+				case APP_CENTER:
+					if (c instanceof JComponent)
+					{
+						topParent = ((JComponent) c).getTopLevelAncestor();
+					}
+					else
+					{
+						Component comp = c;
+						while (comp.getParent() != null)
+						{
+							comp = comp.getParent();
+						}
+						topParent = comp;
+					}
+					dx = c.getLocationOnScreen().x - topParent.getLocationOnScreen().x;
+					dy = c.getLocationOnScreen().y - topParent.getLocationOnScreen().y;
+					dx -= (topParent.getWidth() / 2 - this.origImage.getWidth() / 2);
+					dy -= (topParent.getHeight() / 2 - this.origImage.getHeight() / 2);
+			}
+			graphics.drawImage(getWatermarkImage(), x, y, x + width, y + height, x + dx, y + dy, x + dx + width, y + dy + height, null);
 		}
-		graphics.drawImage(getWatermarkImage(), x, y, x + width, y + height, x + dx, y + dy, x + dx + width, y + dy + height, null);
+		catch(Exception ignored)
+		{
+		}
 	}
 
 	/**

@@ -100,7 +100,18 @@
 			{
 				if ((file != null) && !"".equals(file.trim()))
 				{
-					var text = option.findLastWithName("/Editor").getValue();
+					if (file.endsWith(".")) file = file + "csf";
+					else if (!file.endsWith(".csf")) file = file + ".csf";
+					var list = option.findLastWithName("/ColorList").getList();
+					var text = "";
+					var size = list.getModel().getSize();
+					var i = 0;
+					while (i < size)
+					{
+						var item = list.getModel().getElementAt(i);
+						text = text + item.name + " = " + item.colorValue() + "\n";
+						i = i + 1;
+					}
 					FileUtils.writeTextFile(file, text);
 				}
 			}

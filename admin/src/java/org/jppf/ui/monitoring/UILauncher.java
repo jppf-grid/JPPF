@@ -27,7 +27,6 @@ import org.jvnet.lafwidget.LafWidget;
 import org.jvnet.lafwidget.tabbed.DefaultTabPreviewPainter;
 import org.jvnet.substance.SubstanceLookAndFeel;
 import org.jvnet.substance.theme.ThemeChangeListener;
-import org.jvnet.substance.watermark.SubstanceNullWatermark;
 
 /**
  * This class provides a graphical interface for monitoring the status and health 
@@ -61,7 +60,9 @@ public class UILauncher
 				JFrame.setDefaultLookAndFeelDecorated(true);
 				UIManager.setLookAndFeel(new SubstanceLookAndFeel());
 				SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme());
-				SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
+				//SubstanceLookAndFeel.setCurrentTheme(new SubstanceAquaTheme());
+				//SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
+				SubstanceLookAndFeel.setCurrentWatermark(new JPPFTiledWatermark());
 				SubstanceLookAndFeel.registerThemeChangeListener(new ThemeChangeListener()
 				{
 					public void themeChanged()

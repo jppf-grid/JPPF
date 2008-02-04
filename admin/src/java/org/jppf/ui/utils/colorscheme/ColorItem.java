@@ -55,4 +55,16 @@ public class ColorItem
 	{
 		return name == null ? "[no name]" : name;
 	}
+
+	/**
+	 * Return a string representation of this item's color.
+	 * @return a space-separated list of rgb values. 
+	 */
+	public String colorValue()
+	{
+		if (color == null) return "255 255 255";
+		StringBuffer sb = new StringBuffer();
+		sb.append(color.getRed()).append(" ").append(color.getGreen()).append(" ").append(color.getBlue());
+		return sb.toString();
+	}
 }
