@@ -34,7 +34,7 @@ public class JPPFColorScheme implements ColorScheme
 	public Color getForegroundColor()
 	{
 		//return new Color(0, 0, 96);
-		return new Color(0, 0, 0);
+		return new Color(0, 0, 60);
 	}
 
 	/**

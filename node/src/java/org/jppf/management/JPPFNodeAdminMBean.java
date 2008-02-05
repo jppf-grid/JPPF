@@ -53,4 +53,10 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean<NodeParameter, Object
 	 * @param size the size as an int.
 	 */
 	void updateThreadPoolSize(Integer size);
+	/**
+	 * Get detailed information about the node's JVM properties, environment variables
+	 * and runtime information such as memory usage and available processors.
+	 * @return a <code>JPPFSystemInformation</code> instance.
+	 */
+	JPPFSystemInformation systemInformation();
 }

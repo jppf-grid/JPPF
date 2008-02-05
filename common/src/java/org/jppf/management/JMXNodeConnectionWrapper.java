@@ -92,4 +92,17 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper
 		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateThreadPoolSize",
 			new Object[] { size }, new String[] { "java.lang.Integer" }); 
 	}
+
+	/**
+	 * Get detailed information about the node's JVM properties, environment variables
+	 * and runtime information such as memory usage and available processors.
+	 * @return a <code>JPPFSystemInformation</code> instance.
+	 * @throws Exception if an error occurs while invoking the Node MBean.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#systemInformation()
+	 */
+	public JPPFSystemInformation systemInformation() throws Exception
+	{
+		return (JPPFSystemInformation) invoke(JPPFAdminMBean.NODE_MBEAN_NAME,
+			"systemInformation", (Object[]) null, (String[]) null); 
+	}
 }

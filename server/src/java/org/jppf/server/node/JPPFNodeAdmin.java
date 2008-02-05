@@ -203,4 +203,17 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	{
 		node.getExecutionManager().setThreadPoolSize(size);
 	}
+
+	/**
+	 * Get detailed information about the node's JVM properties, environment variables
+	 * and runtime information such as memory usage and available processors.
+	 * @return a <code>JPPFSystemInformation</code> instance.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#systemInformation()
+	 */
+	public JPPFSystemInformation systemInformation()
+	{
+		JPPFSystemInformation info = new JPPFSystemInformation();
+		info.populate();
+		return info;
+	}
 }

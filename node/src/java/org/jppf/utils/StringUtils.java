@@ -17,6 +17,7 @@
  */
 package org.jppf.utils;
 
+import java.io.*;
 import java.net.Socket;
 import java.nio.channels.*;
 import java.util.*;
@@ -272,5 +273,19 @@ public final class StringUtils
 			log.error("invalid port number format: " + comps[1]);
 		}
 		return new HostPort(comps[0], port);
+	}
+
+	/**
+	 * Get a throwable's stack trace.
+	 * @param t the throwable to get the stack trace from.
+	 * @return the stack trace as astring.
+	 */
+	public static String getStackTrace(Throwable t)
+	{
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		t.printStackTrace(pw);
+		pw.close();
+		return sw.toString();
 	}
 }

@@ -82,7 +82,10 @@ public class TreeTableMouseListener extends MouseAdapter
 			log.info("set of ids: " + idSet);
 			final JMXNodeConnectionWrapper jmx = infoHolder.getJmxClient();
 			JPopupMenu menu = new JPopupMenu();
-			JMenuItem item = new JMenuItem("Set thread pool size");
+			JMenuItem item = new JMenuItem("Node System Information");
+			item.addActionListener(new NodeInformationAction(jmx));
+			menu.add(item);
+			item = new JMenuItem("Set thread pool size");
 			item.addActionListener(new NodeThreadPoolSizeAction(jmx));
 			menu.add(item);
 			if (!idSet.isEmpty())
@@ -142,51 +145,5 @@ public class TreeTableMouseListener extends MouseAdapter
 			}
 		});
 		return item;
-	}
-
-	/**
-	 * This action displays an input panel for the user to type a new
-	 * thread pool size for a node, and updates the node with it.
-	 */
-	public class NodeThreadPoolSizeAction implements ActionListener
-	{
-		/**
-		 * The jmx client used to update the thread pool size.
-		 */
-		private JMXNodeConnectionWrapper jmx = null;
-		/**
-		 * Initialize this action.
-		 * @param jmx the jmx client used to update the thread pool size.
-		 */
-		public NodeThreadPoolSizeAction(JMXNodeConnectionWrapper jmx)
-		{
-			this.jmx = jmx;
-		}
-
-		/**
-		 * Perform the action.
-		 * @param event not used.
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		 */
-		public void actionPerformed(ActionEvent event)
-		{
-			try
-			{
-				String s = JOptionPane.showInputDialog(null, "Enter the number of threads",
-					"Enter the number of threads", JOptionPane.PLAIN_MESSAGE);
-				if ((s == null) || ("".equals(s.trim()))) return;
-				try
-				{
-					int n = Integer.valueOf(s);
-					jmx.updateThreadPoolSize(n);
-				}
-				catch(NumberFormatException ignored)
-				{
-				}
-			}
-			catch(Exception ignored)
-			{
-			}
-		}
 	}
 }
