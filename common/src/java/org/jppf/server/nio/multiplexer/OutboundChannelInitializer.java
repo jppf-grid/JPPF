@@ -58,6 +58,7 @@ public class OutboundChannelInitializer implements Runnable
 	 */
 	public OutboundChannelInitializer(NioServer server, SelectionKey initialKey, AbstractSocketChannelHandler channelHandler)
 	{
+		this.server = server;
 		this.initialKey = initialKey;
 		this.channelHandler = channelHandler;
 	}

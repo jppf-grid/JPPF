@@ -26,10 +26,9 @@ import java.util.Map;
  * transitions to the actual corresponding objects.
  * @param <S> the type safe enumeration of the states.
  * @param <T> the type safe enumeration of the state transitions.
- * @param <U> the type of tserver this factory is for.
  * @author Laurent Cohen
  */
-public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>, U extends NioServer>
+public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
 {
 	/**
 	 * A short name for read and write channel operations.
@@ -55,25 +54,24 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>, U e
 	/**
 	 * The server for which this factory is intended.
 	 */
-	protected U server = null;
+	protected NioServer<S, T> server = null;
 
 	/**
 	 * Initialize this factory with the specified server.
 	 * @param server the server for which to initialize.
 	 */
-	protected NioServerFactory(U server)
+	protected NioServerFactory(NioServer<S, T> server)
 	{
 		this.server = server;
-		stateMap = createStateMap(server);
+		stateMap = createStateMap();
 		transitionMap = createTransitionMap();
 	}
 
 	/**
 	 * Create the map of all possible states.
-	 * @param server the server to which the states refer.
 	 * @return a mapping of the states enumeration to the corresponding NioStateInstances.
 	 */
-	public abstract Map<S, NioState<T>> createStateMap(U server);
+	public abstract Map<S, NioState<T>> createStateMap();
 
 	/**
 	 * Create the map of all possible states.
@@ -105,7 +103,7 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>, U e
 	 * Get the server for which this factory is intended.
 	 * @return an <code>NioServer</code> instance.
 	 */
-	public U getServer()
+	public NioServer<S, T> getServer()
 	{
 		return server;
 	}

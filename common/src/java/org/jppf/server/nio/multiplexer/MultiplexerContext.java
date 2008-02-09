@@ -50,11 +50,25 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	{
 		try
 		{
+			if (linkedKey != null)
+			{
+				if (linkedKey.channel() != null)
+				{
+					try
+					{
+						linkedKey.channel().close();
+					}
+					catch(Exception e)
+					{
+						LOG.error(e.getMessage(), e);
+					}
+				}
+			}
 			channel.close();
 		}
-		catch(Exception ignored)
+		catch(Exception e)
 		{
-			LOG.error(ignored.getMessage(), ignored);
+			LOG.error(e.getMessage(), e);
 		}
 	}
 
@@ -137,6 +151,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	public int readOutBoundPort()
 	{
 		if (message == null) return -1;
+		message.buffer.flip();
 		return message.buffer.getInt();
 	}
 }

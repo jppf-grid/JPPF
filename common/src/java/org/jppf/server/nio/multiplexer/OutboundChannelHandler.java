@@ -23,18 +23,19 @@ import java.nio.channels.*;
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketChannelClient;
 import org.jppf.server.nio.*;
+import org.jppf.utils.StringUtils;
 
 /**
  * Instances of this class act as wrapper for a multiplexer connection.<br>
  * They handle (re)connection services when needed.
  * @author Laurent Cohen
  */
-public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
+public class OutboundChannelHandler extends AbstractSocketChannelHandler
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(MultiplexerChannelHandler.class);
+	private static Log log = LogFactory.getLog(OutboundChannelHandler.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
@@ -51,7 +52,7 @@ public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
 	 * @param port the port to connect to on the remote host.
 	 * @param initialKey the key associated with the initial connection.
 	 */
-	public MultiplexerChannelHandler(NioServer server, String host, int port,
+	public OutboundChannelHandler(NioServer server, String host, int port,
 		SelectionKey initialKey)
 	{
 		super(server, host, port);
@@ -81,12 +82,12 @@ public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
 		socketClient.setChannel(null);
 		MultiplexerContext context = (MultiplexerContext) server.createNioContext();
 		context.setLinkedKey(initialKey);
-		context.setState(MultiplexerState.SENDING_MULTIPLEXING_INFO);
+		context.setState(MultiplexerState.SENDING_OR_RECEIVING);
 		MultiplexerContext initialContext = (MultiplexerContext ) initialKey.attachment();
 		SelectionKey key = server.registerChannel(channel, SelectionKey.OP_READ | SelectionKey.OP_WRITE, context);
-		if (debugEnabled) log.debug("registered multiplexer channel");
 		initialContext.setLinkedKey(key);
 		initialContext.setState(MultiplexerState.SENDING_OR_RECEIVING);
 		server.setKeyOps(initialKey, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+		if (debugEnabled) log.debug("registered multiplexer channel " + StringUtils.getRemoteHost(channel));
 	}
 }

@@ -37,7 +37,7 @@ public class MultiplexerChannelInitializer implements Runnable
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private boolean debugEnabled = log.isDebugEnabled();
-	/** 
+	/**
 	 * The key associated with the initial connection.
 	 */
 	private SelectionKey initialKey = null;

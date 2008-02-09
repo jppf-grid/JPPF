@@ -33,7 +33,7 @@ import org.jppf.server.nio.*;
  * Instances of this class serve class loading requests from the JPPF nodes.
  * @author Laurent Cohen
  */
-public class ClassNioServer extends NioServer<ClassState, ClassTransition, ClassNioServer>
+public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 {
 	/**
 	 * Logger for this class.
@@ -69,7 +69,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition, Class
 	 */
 	public ClassNioServer(final int[] ports) throws JPPFException
 	{
-		super(ports, "ClassServer Thread");
+		super(ports, "ClassServer Thread", false);
 		selectTimeout = 1L;
 	}
 
@@ -78,7 +78,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition, Class
 	 * @return an <code>NioServerFactory</code> instance.
 	 * @see org.jppf.server.nio.NioServer#createFactory()
 	 */
-	protected NioServerFactory<ClassState, ClassTransition, ClassNioServer> createFactory()
+	protected NioServerFactory<ClassState, ClassTransition> createFactory()
 	{
 		return new ClassServerFactory(this);
 	}

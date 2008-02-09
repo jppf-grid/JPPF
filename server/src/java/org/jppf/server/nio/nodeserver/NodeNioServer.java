@@ -36,7 +36,7 @@ import org.jppf.utils.*;
  * Instances of this class serve task execution requests to the JPPF nodes.
  * @author Laurent Cohen
  */
-public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioServer>
+public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 {
 	/**
 	 * Logger for this class.
@@ -93,7 +93,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 	 */
 	public NodeNioServer(int[] ports, Bundler bundler) throws JPPFException
 	{
-		super(ports, "NodeServer Thread");
+		super(ports, "NodeServer Thread", false);
 		//this.selectTimeout = 1L;
 		this.bundler = bundler;
 		getQueue().addListener(new QueueListener()
@@ -110,7 +110,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition, NodeNioS
 	 * @return an <code>NioServerFactory</code> instance.
 	 * @see org.jppf.server.nio.NioServer#createFactory()
 	 */
-	protected NioServerFactory<NodeState, NodeTransition, NodeNioServer> createFactory()
+	protected NioServerFactory<NodeState, NodeTransition> createFactory()
 	{
 		return new NodeServerFactory(this);
 	}

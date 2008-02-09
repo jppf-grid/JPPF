@@ -27,13 +27,12 @@ import org.apache.commons.logging.*;
  * They extend the Runnable interface so they can be executed concurrently by a pool of threads.
  * @param <S> the type of the states to use.
  * @param <T> the type of the transitions to use.
- * @param <U> the type of server running this task.
  * @author Laurent Cohen
  */
-public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>, U extends NioServer> implements Runnable
+public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implements Runnable
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(StateTransitionTask.class);
 	/**
@@ -47,15 +46,14 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>, U extends
 	/**
 	 * The factory ofr the server that runs this task.
 	 */
-	private NioServerFactory<S, T, U> factory = null;
+	private NioServerFactory<S, T> factory = null;
 
 	/**
 	 * Initialize this task with the specified key and factory.
 	 * @param key the selection key corresponding to the channel whose state is changing.
 	 * @param factory the factory for the server that runs this task.
 	 */
-	@SuppressWarnings("unchecked")
-	public StateTransitionTask(SelectionKey key, NioServerFactory<S, T, U> factory)
+	public StateTransitionTask(SelectionKey key, NioServerFactory<S, T> factory)
 	{
 		this.key = key;
 		this.factory = factory;

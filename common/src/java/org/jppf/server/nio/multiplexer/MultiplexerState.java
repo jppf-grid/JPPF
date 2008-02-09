@@ -28,6 +28,10 @@ public enum MultiplexerState
 	 */
 	IDLE,
 	/**
+	 * State of sending or receiving data.
+	 */
+	SENDING_OR_RECEIVING,
+	/**
 	 * State of sending data.
 	 */
 	SENDING,
@@ -36,7 +40,11 @@ public enum MultiplexerState
 	 */
 	RECEIVING,
 	/**
-	 * State if identifying an inbound connection from a remote multiplexer
+	 * State of identifying an inbound connection from a remote multiplexer.
 	 */
-	IDENTIFYING_INBOUND_CHANNEL
+	IDENTIFYING_INBOUND_CHANNEL,
+	/**
+	 * State of sending outbound port information to a remote multiplexer.
+	 */
+	SENDING_MULTIPLEXING_INFO
 }

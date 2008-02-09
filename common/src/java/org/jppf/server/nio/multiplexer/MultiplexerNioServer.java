@@ -21,20 +21,29 @@ package org.jppf.server.nio.multiplexer;
 import java.nio.channels.*;
 import java.util.*;
 
+import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.server.nio.*;
 import org.jppf.utils.*;
 
 /**
- * 
+ * .
  * @author Laurent Cohen
  */
-public class MultiplexerNioServer extends NioServer<MultiplexerState, MultiplexerTransition, MultiplexerNioServer>
+public class MultiplexerNioServer extends NioServer<MultiplexerState, MultiplexerTransition>
 {
 	/**
 	 * Name given to this thread.
 	 */
 	private static final String THIS_NAME = "MultiplexerServer Thread";
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(MultiplexerNioServer.class);
+	/**
+	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The list of locally-bound multiplexer ports. 
 	 */
@@ -64,6 +73,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	public MultiplexerNioServer() throws JPPFException
 	{
 		super(THIS_NAME);
+		selectTimeout = 1L;
 		configure();
 	}
 
@@ -72,7 +82,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 * @return an <code>NioServerFactory</code> instance.
 	 * @see org.jppf.server.nio.NioServer#createFactory()
 	 */
-	protected NioServerFactory<MultiplexerState, MultiplexerTransition, MultiplexerNioServer> createFactory()
+	protected NioServerFactory<MultiplexerState, MultiplexerTransition> createFactory()
 	{
 		return new MultiplexerServerFactory(this);
 	}
@@ -83,6 +93,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 */
 	private void configure() throws JPPFException
 	{
+		if (debugEnabled) log.debug("configuring the multiplexer");
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String s = props.getString("multiplexer.ports");
 		if (s != null)
@@ -117,6 +128,14 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 		int count = 0;
 		for (Integer port: multiplexerPorts) ports[count++] = port;
 		for (Integer port: boundPorts) ports[count++] = port;
+		if (debugEnabled)
+		{
+			log.debug("multiplexerPorts: " + multiplexerPorts);
+			log.debug("boundPorts: " + boundPorts);
+			log.debug("remoteMultiplexers: " + remoteMultiplexers);
+			log.debug("remoteMultiplexerMap: " + remoteMultiplexerMap);
+			log.debug("boundToMultiplexerMap: " + boundToMultiplexerMap);
+		}
 		init(ports);
 	}
 
@@ -138,7 +157,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 */
 	public int getInitialInterest()
 	{
-		return 0;
+		return SelectionKey.OP_READ | SelectionKey.OP_WRITE;
 	}
 
 	/**
@@ -150,6 +169,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	public void postAccept(SelectionKey key, ServerSocketChannel serverChannel)
 	{
 		int port = serverChannel.socket().getLocalPort();
+		if (debugEnabled) log.debug("accepting on port " + port);
 		MultiplexerContext context = (MultiplexerContext) key.attachment();
 		if (multiplexerPorts.contains(port)) context.setMultiplexerPort(port);
 		else if (boundPorts.contains(port)) context.setBoundPort(port);
@@ -166,10 +186,19 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 		MultiplexerContext context = (MultiplexerContext) key.attachment();
 		if (context.isApplicationPort())
 		{
+			if (debugEnabled) log.debug("initializing outbound port " + context.getBoundPort());
+			context.setState(MultiplexerState.IDLE);
+			setKeyOps(key, 0);
 			HostPort mult = getHostPortForBoundPort(context.getBoundPort());
-			MultiplexerChannelHandler handler = new MultiplexerChannelHandler(this, mult.host(), mult.port());
+			MultiplexerChannelHandler handler = new MultiplexerChannelHandler(this, mult.host(), mult.port(), key);
 			MultiplexerChannelInitializer init = new MultiplexerChannelInitializer(key, handler);
 			new Thread(init).start();
+		}
+		else if (context.isMultiplexerPort())
+		{
+			if (debugEnabled) log.debug("initializing multiplexing port " + context.getMultiplexerPort());
+			context.setState(MultiplexerState.IDENTIFYING_INBOUND_CHANNEL);
+			setKeyOps(key, SelectionKey.OP_READ);
 		}
 	}
 
@@ -183,5 +212,24 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 		String name = boundToMultiplexerMap.get(port);
 		if (name == null) return null;
 		return remoteMultiplexerMap.get(name);
+	}
+
+	/**
+	 * Entry point for the multiplexer application.
+	 * @param args not used.
+	 */
+	public static void main(String...args)
+	{
+		try
+		{
+			MultiplexerNioServer svr = new MultiplexerNioServer();
+			svr.start();
+			svr.join();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+			e.printStackTrace();
+		}
 	}
 }

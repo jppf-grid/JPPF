@@ -22,9 +22,11 @@ import static org.jppf.server.nio.multiplexer.MultiplexerTransition.*;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.net.ConnectException;
+import java.nio.ByteBuffer;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.server.nio.NioMessage;
 
 /**
  * 
@@ -64,13 +66,24 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 		{
 			throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");
 		}
+		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		MultiplexerContext context = (MultiplexerContext) key.attachment();
+		if (context.getMessage() == null)
+		{
+			MultiplexerContext linkedContext = (MultiplexerContext) context.getLinkedKey().attachment();
+			NioMessage msg = new NioMessage();
+			msg.length = 4;
+			msg.buffer = ByteBuffer.wrap(new byte[4]);
+			msg.buffer.putInt(linkedContext.getBoundPort());
+			msg.buffer.flip();
+			context.setMessage(msg);
+		}
 		if (context.writeMessage((WritableByteChannel) channel))
 		{
 			if (debugEnabled) log.debug("node: " + getRemoteHost(channel) + ", response sent to the node");
 			context.setMessage(null);
-			return TO_IDLE;
+			return TO_SENDING_OR_RECEIVING;
 		}
-		return TO_SENDING;
+		return TO_SENDING_MULTIPLEXING_INFO;
 	}
 }

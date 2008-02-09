@@ -19,23 +19,21 @@
 package org.jppf.server.nio.multiplexer;
 
 import static org.jppf.server.nio.multiplexer.MultiplexerTransition.*;
-import static org.jppf.utils.StringUtils.getRemoteHost;
 
-import java.net.ConnectException;
-import java.nio.channels.*;
+import java.nio.channels.SelectionKey;
 
 import org.apache.commons.logging.*;
 
 /**
- * State of sending data on a channel.
+ * 
  * @author Laurent Cohen
  */
-public class SendingState extends MultiplexerServerState
+public class SendingOrReceivingState extends MultiplexerServerState
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SendingState.class);
+	private static Log log = LogFactory.getLog(SendingOrReceivingState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
@@ -45,7 +43,7 @@ public class SendingState extends MultiplexerServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public SendingState(MultiplexerNioServer server)
+	public SendingOrReceivingState(MultiplexerNioServer server)
 	{
 		super(server);
 	}
@@ -59,19 +57,9 @@ public class SendingState extends MultiplexerServerState
 	 */
 	public MultiplexerTransition performTransition(SelectionKey key) throws Exception
 	{
-		SelectableChannel channel = key.channel();
-		if (key.isReadable())
-		{
-			throw new ConnectException("multiplexer " + getRemoteHost(channel) + " has been disconnected");
-		}
 		MultiplexerContext context = (MultiplexerContext) key.attachment();
-		if (context.writeMessage((WritableByteChannel) channel))
-		{
-			if (debugEnabled) log.debug(getRemoteHost(channel) + " message sent");
-			SelectionKey linkedKey = context.getLinkedKey();
-			context.setMessage(null);
-			return TO_SENDING_OR_RECEIVING;
-		}
-		return TO_SENDING;
+		if (key.isWritable() && (context.getMessage() != null)) return TO_SENDING;
+		else if (key.isReadable()) return TO_RECEIVING;
+		return TO_SENDING_OR_RECEIVING;
 	}
 }

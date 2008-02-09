@@ -64,14 +64,16 @@ public class IdentifyingInboundChannelState extends MultiplexerServerState
 		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		if (context.readMessage((ReadableByteChannel) channel))
 		{
-			if (debugEnabled) log.debug("read bundle for " + getRemoteHost(channel) + " done");
 			int port = context.readOutBoundPort();
+			if (debugEnabled) log.debug("read port number for " + getRemoteHost(channel) + ": " + port);
 			if (port <= 0)
 			{
 				throw new IOException("outbound port could not be read from this channel");
 			}
-			MultiplexerChannelHandler handler = new MultiplexerChannelHandler(server, "localhost", port);
+			OutboundChannelHandler handler = new OutboundChannelHandler(server, "localhost", port, key);
 			OutboundChannelInitializer init = new OutboundChannelInitializer(server, key, handler);
+			context.setMessage(null);
+			server.setKeyOps(key, 0);
 			new Thread(init).start();
 			return TO_IDLE;
 		}

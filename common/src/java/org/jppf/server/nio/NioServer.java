@@ -28,6 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.classloader.ResourceProvider;
+import org.jppf.server.nio.multiplexer.MultiplexerContext;
 
 /**
  * Generic server for non-blocking asynchronous socket channel based communications.<br>
@@ -38,10 +39,9 @@ import org.jppf.classloader.ResourceProvider;
  * as a state machine.
  * @param <S> the type of the states to use.
  * @param <T> the type of the transitions to use.
- * @param <U> the type of this server.
  * @author Laurent Cohen
  */
-public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends NioServer> extends Thread
+public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Thread
 {
 	/**
 	 * Logger for this class.
@@ -75,11 +75,16 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	/**
 	 * The factory for this server.
 	 */
-	protected NioServerFactory<S, T, U> factory = null;
+	protected NioServerFactory<S, T> factory = null;
 	/**
 	 * Lock used to synchronize selector operations.
 	 */
 	protected ReentrantLock lock = new ReentrantLock();
+	/**
+	 * Determines whether the submission of state transitions should be
+	 * performed sequentially or through the executor thread pool.
+	 */
+	protected boolean sequential = false;
 
 	/**
 	 * Initialize this server with a specified port number and name.
@@ -88,9 +93,22 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	 */
 	protected NioServer(String name) throws JPPFException
 	{
+		this(name, false);
+	}
+
+	/**
+	 * Initialize this server with a specified port number and name.
+	 * @param name the name given to this thread.
+	 * @param sequential Determines whether the submission of state transitions should be
+	 * performed sequentially or through the executor thread pool.
+	 * @throws JPPFException if the underlying server socket can't be opened.
+	 */
+	protected NioServer(String name, boolean sequential) throws JPPFException
+	{
 		super(name);
+		this.sequential = sequential;
 		//int n = Runtime.getRuntime().availableProcessors();
-		executor = Executors.newFixedThreadPool(1);
+		if (!sequential) executor = Executors.newFixedThreadPool(1);
 		factory = createFactory();
 	}
 
@@ -102,18 +120,20 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	 */
 	public NioServer(int port, String name) throws JPPFException
 	{
-		this(new int[] { port }, name);
+		this(new int[] { port }, name, false);
 	}
 
 	/**
 	 * Initialize this server with a specified list of port numbers and name.
 	 * @param ports the list of port this server accepts connections from.
 	 * @param name the name given to this thread.
+	 * @param sequential Determines whether the submission of state transitions should be
+	 * performed sequentially or through the executor thread pool.
 	 * @throws JPPFException if the underlying server socket can't be opened.
 	 */
-	public NioServer(final int[] ports, String name) throws JPPFException
+	public NioServer(final int[] ports, String name, boolean sequential) throws JPPFException
 	{
-		this(name);
+		this(name, sequential);
 		this.ports = new int[ports.length];
 		System.arraycopy(ports, 0, this.ports, 0, ports.length);
 		init(ports);
@@ -123,7 +143,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	 * Create the factory holding all the states and transition mappings.
 	 * @return an <code>NioServerFactory</code> instance.
 	 */
-	protected abstract NioServerFactory<S, T, U> createFactory();
+	protected abstract NioServerFactory<S, T> createFactory();
 
 	/**
 	 * Initialize the underlying server socket with a specified port.
@@ -219,7 +239,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 			try
 			{
 				if (key.isAcceptable()) doAccept(key);
-				else submitTransition(key, false);
+				else submitTransition(key);
 			}
 			catch (Exception e)
 			{
@@ -250,13 +270,13 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 	/**
 	 * Submit the next state transition for a specified channel.
 	 * @param key the selection key that references the channel.
-	 * @param sequential determines whether the execution should be sequential or parallel.
 	 */
-	protected void submitTransition(SelectionKey key, boolean sequential)
+	protected void submitTransition(SelectionKey key)
 	{
 		setKeyOps(key, 0);
-		if (sequential) new StateTransitionTask<S, T, U>(key, factory).run();
-		else executor.submit(new StateTransitionTask<S, T, U>(key, factory));
+		StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, factory);
+		if (sequential) transition.run();
+		else executor.submit(transition);
 	}
 
 	/**
@@ -361,9 +381,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 			{
 				connection.channel().close();
 			}
-			catch (IOException ignored)
+			catch (IOException e)
 			{
-				log.error(ignored.getMessage(), ignored);
+				log.error(e.getMessage(), e);
 			}
 		}
 	}
@@ -413,6 +433,36 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>, U extends 
 		{
 			lock.unlock();
 		}
+	}
+
+	/**
+	 * Register a channel not opened through this server.
+	 * @param channel the channel to register.
+	 * @param ops the operations the channel is initially interested in.
+	 * @param context the context attached to the channel.
+	 * @return a <code>SelectionKey</code> instance.
+	 */
+	public SelectionKey registerChannel(SocketChannel channel, int ops, MultiplexerContext context)
+	{
+		SelectionKey key = null;
+		try
+		{
+			lock.lock();
+			try
+			{
+				selector.wakeup();
+				key = channel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE, context);
+			}
+			finally
+			{
+				lock.unlock();
+			}
+		}
+		catch (ClosedChannelException e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		return key;
 	}
 
 	/**
