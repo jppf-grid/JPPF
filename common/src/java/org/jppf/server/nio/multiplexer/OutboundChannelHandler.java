@@ -82,11 +82,11 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 		socketClient.setChannel(null);
 		MultiplexerContext context = (MultiplexerContext) server.createNioContext();
 		context.setLinkedKey(initialKey);
-		context.setState(MultiplexerState.RECEIVING);
+		context.setState(MultiplexerState.SENDING_OR_RECEIVING);
 		MultiplexerContext initialContext = (MultiplexerContext ) initialKey.attachment();
 		SelectionKey key = server.registerChannel(channel, SelectionKey.OP_READ, context);
 		initialContext.setLinkedKey(key);
-		initialContext.setState(MultiplexerState.RECEIVING);
+		initialContext.setState(MultiplexerState.SENDING_OR_RECEIVING);
 		server.setKeyOps(initialKey, SelectionKey.OP_READ);
 		if (debugEnabled) log.debug("registered multiplexer channel " + StringUtils.getRemoteHost(channel));
 	}

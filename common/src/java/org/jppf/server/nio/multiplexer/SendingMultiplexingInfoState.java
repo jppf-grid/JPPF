@@ -82,7 +82,7 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 		{
 			if (debugEnabled) log.debug("node: " + getRemoteHost(channel) + ", response sent to the node");
 			context.setMessage(null);
-			return TO_RECEIVING;
+			return TO_SENDING_OR_RECEIVING;
 		}
 		return TO_SENDING_MULTIPLEXING_INFO;
 	}
