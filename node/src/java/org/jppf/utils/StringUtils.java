@@ -195,8 +195,15 @@ public final class StringUtils
 		sb.append("[");
 		if (channel instanceof SocketChannel)
 		{
-			Socket s = ((SocketChannel)channel).socket();
-			sb.append(s.getInetAddress().getHostAddress()).append(":").append(s.getPort());
+			if (channel.isOpen())
+			{
+				Socket s = ((SocketChannel)channel).socket();
+				sb.append(s.getInetAddress().getHostAddress()).append(":").append(s.getPort());
+			}
+			else
+			{
+				sb.append("channel closed");
+			}
 		}
 		else
 		{
