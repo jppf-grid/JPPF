@@ -86,7 +86,7 @@ public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
 		SelectionKey key = server.registerChannel(channel, SelectionKey.OP_READ | SelectionKey.OP_WRITE, context);
 		if (debugEnabled) log.debug("registered multiplexer channel");
 		initialContext.setLinkedKey(key);
-		initialContext.setState(MultiplexerState.SENDING_OR_RECEIVING);
-		server.setKeyOps(initialKey, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+		initialContext.setState(MultiplexerState.RECEIVING);
+		server.setKeyOps(initialKey, SelectionKey.OP_READ);
 	}
 }

@@ -19,6 +19,7 @@
 package org.jppf.server.nio.multiplexer;
 
 import static org.jppf.server.nio.multiplexer.MultiplexerTransition.*;
+import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.nio.channels.SelectionKey;
 
@@ -57,8 +58,10 @@ public class SendingOrReceivingState extends MultiplexerServerState
 	 */
 	public MultiplexerTransition performTransition(SelectionKey key) throws Exception
 	{
+		if (debugEnabled) log.debug("exec() for " + getRemoteHost(key.channel()));
 		MultiplexerContext context = (MultiplexerContext) key.attachment();
-		if (key.isWritable() && (context.getMessage() != null)) return TO_SENDING;
+		//if (key.isWritable() && (context.getMessage() != null)) return TO_SENDING;
+		if (context.getMessage() != null) return TO_SENDING;
 		else if (key.isReadable()) return TO_RECEIVING;
 		return TO_SENDING_OR_RECEIVING;
 	}

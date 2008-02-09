@@ -75,7 +75,7 @@ public class IdentifyingInboundChannelState extends MultiplexerServerState
 			context.setMessage(null);
 			server.setKeyOps(key, 0);
 			new Thread(init).start();
-			return TO_IDLE;
+			return TO_RECEIVING;
 		}
 		return TO_IDENTIFYING_INBOUND_CHANNEL;
 	}

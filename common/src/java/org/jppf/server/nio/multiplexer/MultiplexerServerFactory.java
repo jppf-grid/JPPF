@@ -69,7 +69,7 @@ public final class MultiplexerServerFactory
 	{
 		Map<MultiplexerTransition, NioTransition<MultiplexerState>> map =
 			new EnumMap<MultiplexerTransition, NioTransition<MultiplexerState>>(MultiplexerTransition.class);
-		map.put(TO_SENDING_OR_RECEIVING, transition(SENDING_OR_RECEIVING, RW));
+		map.put(TO_SENDING_OR_RECEIVING, transition(SENDING_OR_RECEIVING, R));
 		map.put(TO_SENDING, transition(SENDING, RW));
 		map.put(TO_RECEIVING, transition(RECEIVING, R));
 		map.put(TO_IDENTIFYING_INBOUND_CHANNEL, transition(IDENTIFYING_INBOUND_CHANNEL, R));

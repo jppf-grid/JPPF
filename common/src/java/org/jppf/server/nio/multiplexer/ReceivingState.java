@@ -73,7 +73,7 @@ public class ReceivingState extends MultiplexerServerState
 			linkedContext.setState(MultiplexerState.SENDING);
 			server.setKeyOps(linkedKey, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
 			context.setMessage(null);
-			return TO_SENDING_OR_RECEIVING;
+			return TO_RECEIVING;
 		}
 		return TO_RECEIVING;
 	}
