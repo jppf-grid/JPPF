@@ -34,7 +34,7 @@ import org.jppf.utils.*;
 public class SocketInitializerImpl extends AbstractSocketInitializer
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(SocketInitializerImpl.class);
 	/**
