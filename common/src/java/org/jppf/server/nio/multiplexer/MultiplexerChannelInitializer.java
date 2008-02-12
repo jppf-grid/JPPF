@@ -24,7 +24,7 @@ import org.apache.commons.logging.*;
 import org.jppf.server.nio.AbstractSocketChannelHandler;
 
 /**
- * 
+ * Instances of this class act as a separate thread wrapper around a channel handler.
  * @author Laurent Cohen
  */
 public class MultiplexerChannelInitializer implements Runnable 

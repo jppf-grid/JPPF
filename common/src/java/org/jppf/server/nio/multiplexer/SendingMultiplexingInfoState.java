@@ -29,7 +29,8 @@ import org.apache.commons.logging.*;
 import org.jppf.server.nio.NioMessage;
 
 /**
- * 
+ * This state is for sending a port number to a remote multiplexer, which will then establish
+ * a local connection (to a JPPF driver) using this port.
  * @author Laurent Cohen
  */
 public class SendingMultiplexingInfoState extends MultiplexerServerState

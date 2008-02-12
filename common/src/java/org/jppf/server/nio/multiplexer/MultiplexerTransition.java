@@ -20,7 +20,7 @@ package org.jppf.server.nio.multiplexer;
 
 
 /**
- * Enumeration of the possible state transitions for a Node server channel.
+ * Enumeration of the possible state transitions for a multiplexer channel.
  * @author Laurent Cohen
  */
 public enum MultiplexerTransition

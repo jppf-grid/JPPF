@@ -21,7 +21,8 @@ import org.apache.commons.logging.*;
 import org.jppf.comm.socket.*;
 
 /**
- * This class represents a connection to the class server of a remote JPPF driver (peer driver).
+ * Instances of this class act as wrapper for a connection to a JPPF component.<br>
+ * They handle (re)connection services when needed.
  * @author Laurent Cohen
  */
 public abstract class AbstractSocketChannelHandler

@@ -26,8 +26,8 @@ import org.jppf.server.nio.*;
 import org.jppf.utils.StringUtils;
 
 /**
- * Instances of this class act as wrapper for a multiplexer connection.<br>
  * They handle (re)connection services when needed.
+ * Instances of this class are used when a multiplexer needs to connect to a remote multiplexer.
  * @author Laurent Cohen
  */
 public class OutboundChannelHandler extends AbstractSocketChannelHandler

@@ -26,7 +26,7 @@ import java.util.*;
 import org.jppf.server.nio.*;
 
 /**
- * Utility class used to specify the possible states of a node server connection, as well as the possible
+ * Utility class used to specify the possible states of a multiplexer connection, as well as the possible
  * transitions between those states.
  * @author Laurent Cohen
  */

@@ -28,6 +28,8 @@ import org.jppf.server.nio.NioMessage;
 
 /**
  * State of receiving data on a channel.
+ * When data is received, it is forwarded to the linked channel, so that it can be
+ * sent to the other side of the multiplexer connection.
  * @author Laurent Cohen
  */
 public class ReceivingState extends MultiplexerServerState

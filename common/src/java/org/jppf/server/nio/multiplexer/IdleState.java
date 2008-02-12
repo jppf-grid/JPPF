@@ -61,7 +61,6 @@ public class IdleState extends MultiplexerServerState
 		if (debugEnabled)
 		{
 			SelectableChannel channel = key.channel();
-			MultiplexerContext context = (MultiplexerContext) key.attachment();
 			log.debug("channel " + getRemoteHost(channel) + " in idle mode");
 		}
 		return TO_IDLE;

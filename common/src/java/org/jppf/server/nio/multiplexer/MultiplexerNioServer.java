@@ -27,7 +27,7 @@ import org.jppf.server.nio.*;
 import org.jppf.utils.*;
 
 /**
- * .
+ * Nio server managing connections to and from the multiplexer.
  * @author Laurent Cohen
  */
 public class MultiplexerNioServer extends NioServer<MultiplexerState, MultiplexerTransition>

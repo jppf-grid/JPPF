@@ -25,8 +25,9 @@ import org.jppf.comm.socket.SocketChannelClient;
 import org.jppf.server.nio.*;
 
 /**
- * Instances of this class act as wrapper for a multiplexer connection.<br>
- * They handle (re)connection services when needed.
+ * Instances of this class are used when a client or node is connecting to the multiplexer.
+ * They create a connection to the corresponding JPPF driver that will forward any data received or sent
+ * on either side.
  * @author Laurent Cohen
  */
 public class MultiplexerChannelHandler extends AbstractSocketChannelHandler

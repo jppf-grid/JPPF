@@ -71,10 +71,9 @@ public class IdentifyingInboundChannelState extends MultiplexerServerState
 				throw new IOException("outbound port could not be read from this channel");
 			}
 			OutboundChannelHandler handler = new OutboundChannelHandler(server, "localhost", port, key);
-			OutboundChannelInitializer init = new OutboundChannelInitializer(server, key, handler);
+			MultiplexerChannelInitializer init = new MultiplexerChannelInitializer(key, handler);
 			context.setMessage(null);
 			server.transitionChannel(key, TO_IDLE);
-			//server.setKeyOps(key, 0);
 			new Thread(init).start();
 			return TO_IDLE;
 		}

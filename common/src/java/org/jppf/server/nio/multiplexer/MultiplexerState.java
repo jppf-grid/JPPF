@@ -18,7 +18,7 @@
 package org.jppf.server.nio.multiplexer;
 
 /**
- * Enumeration of the possible states for a class server channel.
+ * Enumeration of the possible states for a multiplexer channel.
  * @author Laurent Cohen
  */
 public enum MultiplexerState

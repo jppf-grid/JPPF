@@ -26,7 +26,8 @@ import java.nio.channels.SelectionKey;
 import org.apache.commons.logging.*;
 
 /**
- * 
+ * This state is for determining whether a channel should be sending data,
+ * receiving data, or doing nothing.
  * @author Laurent Cohen
  */
 public class SendingOrReceivingState extends MultiplexerServerState
