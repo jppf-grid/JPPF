@@ -403,6 +403,13 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 */
 	public NioServerFactory getFactory()
 	{
+		if (factory == null)
+		{
+			synchronized(this)
+			{
+				if (factory == null) factory = createFactory();
+			}
+		}
 		return factory;
 	}
 
@@ -451,7 +458,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 			try
 			{
 				selector.wakeup();
-				key = channel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE, context);
+				key = channel.register(selector, ops, context);
 			}
 			finally
 			{
@@ -463,6 +470,19 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 			log.error(e.getMessage(), e);
 		}
 		return key;
+	}
+
+	/**
+	 * Transition the specified channel to the specified state.
+	 * @param key the key holding the channel and associated context. 
+	 * @param transition holds the new state of the channel and associated key ops.
+	 */
+	public void transitionChannel(SelectionKey key, T transition)
+	{
+		NioContext<S> context = (NioContext<S>) key.attachment();
+		NioTransition<S> t = factory.getTransition(transition);
+		context.setState(t.getState());
+		setKeyOps(key, t.getInterestOps());
 	}
 
 	/**

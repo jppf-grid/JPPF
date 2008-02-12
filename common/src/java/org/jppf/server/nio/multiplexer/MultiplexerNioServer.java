@@ -187,8 +187,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 		if (context.isApplicationPort())
 		{
 			if (debugEnabled) log.debug("initializing outbound port " + context.getBoundPort());
-			context.setState(MultiplexerState.IDLE);
-			setKeyOps(key, 0);
+			transitionChannel(key, MultiplexerTransition.TO_IDLE);
 			HostPort mult = getHostPortForBoundPort(context.getBoundPort());
 			MultiplexerChannelHandler handler = new MultiplexerChannelHandler(this, mult.host(), mult.port(), key);
 			MultiplexerChannelInitializer init = new MultiplexerChannelInitializer(key, handler);
@@ -197,8 +196,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 		else if (context.isMultiplexerPort())
 		{
 			if (debugEnabled) log.debug("initializing multiplexing port " + context.getMultiplexerPort());
-			context.setState(MultiplexerState.IDENTIFYING_INBOUND_CHANNEL);
-			setKeyOps(key, SelectionKey.OP_READ);
+			transitionChannel(key, MultiplexerTransition.TO_IDENTIFYING_INBOUND_CHANNEL);
 		}
 	}
 

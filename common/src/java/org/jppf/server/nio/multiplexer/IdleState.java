@@ -18,23 +18,23 @@
 
 package org.jppf.server.nio.multiplexer;
 
-import static org.jppf.server.nio.multiplexer.MultiplexerTransition.*;
+import static org.jppf.server.nio.multiplexer.MultiplexerTransition.TO_IDLE;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
-import java.nio.channels.SelectionKey;
+import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
 
 /**
- * 
+ * State of doing nothing.
  * @author Laurent Cohen
  */
-public class SendingOrReceivingState extends MultiplexerServerState
+public class IdleState extends MultiplexerServerState
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SendingOrReceivingState.class);
+	private static Log log = LogFactory.getLog(IdleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
@@ -44,7 +44,7 @@ public class SendingOrReceivingState extends MultiplexerServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public SendingOrReceivingState(MultiplexerNioServer server)
+	public IdleState(MultiplexerNioServer server)
 	{
 		super(server);
 	}
@@ -58,19 +58,12 @@ public class SendingOrReceivingState extends MultiplexerServerState
 	 */
 	public MultiplexerTransition performTransition(SelectionKey key) throws Exception
 	{
-		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(key.channel()));
-		MultiplexerContext context = (MultiplexerContext) key.attachment();
-		if (context.getMessage() != null)
+		if (debugEnabled)
 		{
-			if (debugEnabled) log.debug("returning TO_SENDING for " + getRemoteHost(key.channel()));
-			return TO_SENDING;
+			SelectableChannel channel = key.channel();
+			MultiplexerContext context = (MultiplexerContext) key.attachment();
+			log.debug("channel " + getRemoteHost(channel) + " in idle mode");
 		}
-		else if (key.isReadable())
-		{
-			if (debugEnabled) log.debug("returning TO_RECEIVING for " + getRemoteHost(key.channel()));
-			return TO_RECEIVING;
-		}
-		if (debugEnabled) log.debug("returning TO_SENDING_OR_RECEIVING for " + getRemoteHost(key.channel()));
-		return TO_SENDING_OR_RECEIVING;
+		return TO_IDLE;
 	}
 }

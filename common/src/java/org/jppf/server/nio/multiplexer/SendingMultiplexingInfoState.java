@@ -64,7 +64,7 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 		SelectableChannel channel = key.channel();
 		if (key.isReadable())
 		{
-			throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");
+			throw new ConnectException("multiplexer channel " + getRemoteHost(channel) + " has been disconnected");
 		}
 		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		MultiplexerContext context = (MultiplexerContext) key.attachment();
@@ -80,7 +80,7 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 		}
 		if (context.writeMessage((WritableByteChannel) channel))
 		{
-			if (debugEnabled) log.debug("node: " + getRemoteHost(channel) + ", response sent to the node");
+			if (debugEnabled) log.debug("message sent to remote multiplexer " + getRemoteHost(channel));
 			context.setMessage(null);
 			return TO_SENDING_OR_RECEIVING;
 		}

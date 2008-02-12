@@ -68,12 +68,11 @@ public class ReceivingState extends MultiplexerServerState
 			SelectionKey linkedKey = context.getLinkedKey();
 			NioMessage msg = context.getMessage();
 			msg.buffer.flip();
+			context.setMessage(null);
 			MultiplexerContext linkedContext = (MultiplexerContext) linkedKey.attachment();
 			linkedContext.setMessage(msg);
-			linkedContext.setState(MultiplexerState.SENDING);
-			server.setKeyOps(linkedKey, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
-			context.setMessage(null);
-			return TO_RECEIVING;
+			server.transitionChannel(linkedKey, MultiplexerTransition.TO_SENDING);
+			return TO_SENDING_OR_RECEIVING;
 		}
 		return TO_RECEIVING;
 	}

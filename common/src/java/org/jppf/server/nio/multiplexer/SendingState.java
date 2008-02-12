@@ -68,7 +68,6 @@ public class SendingState extends MultiplexerServerState
 		if (context.writeMessage((WritableByteChannel) channel))
 		{
 			if (debugEnabled) log.debug(getRemoteHost(channel) + " message sent");
-			SelectionKey linkedKey = context.getLinkedKey();
 			context.setMessage(null);
 			return TO_SENDING_OR_RECEIVING;
 		}

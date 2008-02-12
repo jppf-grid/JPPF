@@ -49,14 +49,15 @@ public final class MultiplexerServerFactory
 	 */
 	public Map<MultiplexerState, NioState<MultiplexerTransition>> createStateMap()
 	{
+		MultiplexerNioServer server = (MultiplexerNioServer) this.server;
 		Map<MultiplexerState, NioState<MultiplexerTransition>> map =
 			new EnumMap<MultiplexerState, NioState<MultiplexerTransition>>(MultiplexerState.class);
-		map.put(SENDING_OR_RECEIVING, new SendingOrReceivingState((MultiplexerNioServer) server));
-		map.put(SENDING, new SendingState((MultiplexerNioServer) server));
-		map.put(IDLE, new ReceivingState((MultiplexerNioServer) server));
-		map.put(RECEIVING, new ReceivingState((MultiplexerNioServer) server));
-		map.put(IDENTIFYING_INBOUND_CHANNEL, new IdentifyingInboundChannelState((MultiplexerNioServer) server));
-		map.put(SENDING_MULTIPLEXING_INFO, new SendingMultiplexingInfoState((MultiplexerNioServer) server));
+		map.put(SENDING_OR_RECEIVING, new SendingOrReceivingState(server));
+		map.put(SENDING, new SendingState(server));
+		map.put(IDLE, new IdleState(server));
+		map.put(RECEIVING, new ReceivingState(server));
+		map.put(IDENTIFYING_INBOUND_CHANNEL, new IdentifyingInboundChannelState(server));
+		map.put(SENDING_MULTIPLEXING_INFO, new SendingMultiplexingInfoState(server));
 		return map;
 	}
 

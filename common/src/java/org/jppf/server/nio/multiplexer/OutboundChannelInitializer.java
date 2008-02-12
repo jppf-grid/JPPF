@@ -72,12 +72,14 @@ public class OutboundChannelInitializer implements Runnable
 		try
 		{
 			channelHandler.init();
+			/*
 			MultiplexerContext ctx = (MultiplexerContext) initialKey.attachment();
 			if (!MultiplexerState.IDLE.equals(ctx.getState()))
 			{
 				ctx.setState(MultiplexerState.RECEIVING);
 				server.setKeyOps(initialKey, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
 			}
+			*/
 		}
 		catch(Exception e)
 		{
