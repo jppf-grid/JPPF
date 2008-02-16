@@ -31,7 +31,7 @@ import org.jppf.ui.options.factory.OptionsHandler;
 public abstract class AbstractActionsHolder  implements ValueChangeListener
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(OptionsHandler.class);
 	/**

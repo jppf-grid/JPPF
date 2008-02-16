@@ -43,7 +43,7 @@ public final class ConsoleHelper
 	 */
 	private static final String LONG_TASK = "LongTask";
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	static Log log = LogFactory.getLog(ConsoleHelper.class);
 	/**

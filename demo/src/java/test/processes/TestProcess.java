@@ -42,7 +42,7 @@ public class TestProcess
 	 */
 	public static final String ERROR_OUTPUT = "err";
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	static Log log = LogFactory.getLog(TestProcess.class);
 

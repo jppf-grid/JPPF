@@ -73,7 +73,6 @@ public class LongTaskRunner
 	 * @param iterations the number of times the the tasks will be sent.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	@SuppressWarnings("unused")
 	private static void perform(int nbTask, int length, int iterations) throws Exception
 	{
 		try
@@ -85,7 +84,12 @@ public class LongTaskRunner
 				long start = System.currentTimeMillis();
 				// create a task for each row in matrix a
 				List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-				for (int i=0; i<nbTask; i++) tasks.add(new LongTask(length));
+				for (int i=0; i<nbTask; i++)
+				{
+					LongTask task = new LongTask(length);
+					task.setId("" + (iter+1) + ":" + (i+1));
+					tasks.add(task);
+				}
 				// submit the tasks for execution
 				List<JPPFTask> results = jppfClient.submit(tasks, null);
 				for (JPPFTask task: results)

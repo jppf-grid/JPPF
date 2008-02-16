@@ -38,7 +38,7 @@ import org.jvnet.substance.theme.ThemeChangeListener;
 public class UILauncher
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	static Log log = LogFactory.getLog(UILauncher.class);
 	/**

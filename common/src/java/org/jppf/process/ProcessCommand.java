@@ -43,7 +43,7 @@ public class ProcessCommand
 	 * Build and start a node process using the specified configuration properties.
 	 * @param mainClass the fully qualified name of the entry point class for the process to start.
 	 * @param jppfConfig the set of JPPF configuration properties.
-	 * @param log4jConfig the set of log4j configuration properties.
+	 * @param log4jConfig the set of logging configuration properties.
 	 * @param maxMem the maximum heap size for the process, in megabytes.
 	 * @return a <code>ProcessWrapper</code> instance encapsualting the started process.
 	 * @throws Exception if the process failed to start.
@@ -54,7 +54,7 @@ public class ProcessCommand
 		List<String> command = new ArrayList<String>();
 		command.add(System.getProperty("java.home")+"/bin/java");
 		command.add("-cp");
-		// add "." to the classpath so the process can access the log4j configuration file
+		// add "." to the classpath so the process can access the logging configuration file
 		command.add("."+System.getProperty("path.separator")+System.getProperty("java.class.path"));
 		command.add("-D"+JPPFConfiguration.CONFIG_PROPERTY+"="+createTempFile(jppfConfig, null)+"");
 		command.add("-Dlog4j.configuration="+createTempFile(log4jConfig, null)+"");
@@ -78,7 +78,7 @@ public class ProcessCommand
 	 * @param mainClass the fully qualified name of the entry point class for the process to start.
 	 * @param jppfConfig the set of JPPF configuration properties.
 	 * @param permissions list of permissions granted to the node.
-	 * @param log4jConfig the set of log4j configuration properties.
+	 * @param log4jConfig the set of logging configuration properties.
 	 * @param maxMem the maximum heap size for the process, in megabytes.
 	 * @return a <code>ProcessWrapper</code> instance encapsulating the started process.
 	 * @throws Exception if the process failed to start.

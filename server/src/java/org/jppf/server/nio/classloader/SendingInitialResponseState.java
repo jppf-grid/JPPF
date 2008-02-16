@@ -33,7 +33,7 @@ import org.apache.commons.logging.*;
 public class SendingInitialResponseState extends ClassServerState
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(SendingInitialResponseState.class);
 	/**

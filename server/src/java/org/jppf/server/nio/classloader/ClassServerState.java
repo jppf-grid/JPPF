@@ -33,7 +33,7 @@ import org.jppf.server.nio.*;
 public abstract class ClassServerState extends NioState<ClassTransition>
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(ClassServerState.class);
 	/**

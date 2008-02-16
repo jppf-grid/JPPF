@@ -33,7 +33,7 @@ import org.apache.commons.logging.*;
 public class IdleProviderState extends ClassServerState
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(IdleProviderState.class);
 	/**

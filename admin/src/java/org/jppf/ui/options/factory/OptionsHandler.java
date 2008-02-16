@@ -30,7 +30,7 @@ import org.jppf.ui.options.xml.OptionsPageBuilder;
 public final class OptionsHandler
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(OptionsHandler.class);
 	/**

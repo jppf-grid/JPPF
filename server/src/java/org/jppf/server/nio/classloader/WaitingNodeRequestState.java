@@ -36,7 +36,7 @@ import org.jppf.utils.*;
 public class WaitingNodeRequestState extends ClassServerState
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(WaitingNodeRequestState.class);
 	/**

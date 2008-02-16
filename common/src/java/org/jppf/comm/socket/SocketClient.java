@@ -31,7 +31,7 @@ import org.jppf.utils.*;
 public class SocketClient extends AbstractSocketWrapper
 {
     /**
-     * Log4j logger for this class.
+     * Logger for this class.
      */
     private static Log log = LogFactory.getLog(SocketClient.class);
 

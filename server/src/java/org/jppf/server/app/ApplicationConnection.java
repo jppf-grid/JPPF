@@ -39,7 +39,7 @@ import org.jppf.utils.*;
 public class ApplicationConnection extends JPPFConnection
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(ApplicationConnection.class);
 

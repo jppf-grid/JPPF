@@ -32,7 +32,7 @@ import org.jppf.ui.monitoring.data.Fields;
 public class PreferencesStorage
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(PreferencesStorage.class);
 	/**

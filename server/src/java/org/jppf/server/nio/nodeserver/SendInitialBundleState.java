@@ -33,7 +33,7 @@ import org.apache.commons.logging.*;
 public class SendInitialBundleState extends NodeServerState
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	protected static final Log LOG = LogFactory.getLog(SendInitialBundleState.class);
 	/**

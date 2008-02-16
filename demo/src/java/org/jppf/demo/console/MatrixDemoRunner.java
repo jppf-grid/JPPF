@@ -35,7 +35,7 @@ import sample.matrix.*;
 public class MatrixDemoRunner
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	static Log log = LogFactory.getLog(MatrixDemoRunner.class);
 	/**

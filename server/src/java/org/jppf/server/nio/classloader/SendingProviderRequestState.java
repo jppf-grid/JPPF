@@ -34,7 +34,7 @@ import org.jppf.server.nio.NioMessage;
 public class SendingProviderRequestState extends ClassServerState
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(SendingProviderRequestState.class);
 	/**

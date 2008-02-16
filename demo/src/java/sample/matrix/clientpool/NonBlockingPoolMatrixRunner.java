@@ -36,7 +36,7 @@ import sample.matrix.*;
 public class NonBlockingPoolMatrixRunner
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	static Log log = LogFactory.getLog(NonBlockingPoolMatrixRunner.class);
 	/**

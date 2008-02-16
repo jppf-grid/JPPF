@@ -32,7 +32,7 @@ import org.jppf.utils.Pair;
 public class AsynchronousResultProcessor implements Runnable
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(AsynchronousResultProcessor.class);
 	/**

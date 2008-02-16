@@ -21,7 +21,7 @@ import java.util.Properties;
 
 /**
  * Utility class used to create sets of configuration properties for JPPF clients,
- * drivers and nodes, as well as log4j configuration properties.
+ * drivers and nodes, as well as logging configuration properties.
  * The created properties objects are intended to be stored into temporary files,
  * to which corresponding processes will then refer.
  * @author Laurent Cohen
@@ -137,7 +137,7 @@ public class ProcessConfig
 	}
 
 	/**
-	 * Build the set of log4j configuration properties for a process.
+	 * Build the set of logging configuration properties for a process.
 	 * @param logFile the name of the log file.
 	 * @param append determines whether the log file should be re-created or appended to.
 	 * @param logLevel the logging level to use.

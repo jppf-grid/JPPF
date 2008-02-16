@@ -38,7 +38,7 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
 	 */
 	private static Log log = LogFactory.getLog(SocketInitializerImpl.class);
 	/**
-	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private boolean debugEnabled = log.isDebugEnabled();
 	/**

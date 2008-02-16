@@ -39,7 +39,7 @@ public class TestMultipleDrivers
 	 * Create a new node process using default values.
 	 * @param nodeConfig JPPF configuration properties for the node.
 	 * @param permissions a list of descriptions of the permissions granted to the node.
-	 * @param log4jConfig log4j configuration properties for the node.
+	 * @param log4jConfig logging configuration properties for the node.
 	 * @return the started node process.
 	 * @throws Exception if an error occurs while building the process.
 	 */
@@ -52,7 +52,7 @@ public class TestMultipleDrivers
 	/**
 	 * Create a new driver process using default values.
 	 * @param driverConfig JPPF configuration properties for the driver.
-	 * @param log4jConfig log4j configuration properties for the driver.
+	 * @param log4jConfig logging configuration properties for the driver.
 	 * @return the started node process.
 	 * @throws Exception if an error occurs while building the process.
 	 */

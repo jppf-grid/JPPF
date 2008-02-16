@@ -28,7 +28,7 @@ import java.io.*;
 public class ObjectSerializerImpl implements ObjectSerializer
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	//private static Log log = LogFactory.getLog(ObjectSerializerImpl.class);
 

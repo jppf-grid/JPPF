@@ -32,7 +32,7 @@ import org.jppf.utils.JPPFBuffer;
 public class PeerNodeResultSender extends AbstractResultSender
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(PeerNodeResultSender.class);
 	/**

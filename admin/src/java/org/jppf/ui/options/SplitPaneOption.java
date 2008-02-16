@@ -29,7 +29,7 @@ import org.apache.commons.logging.*;
 public class SplitPaneOption extends AbstractOptionElement implements OptionsPage
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(SplitPaneOption.class);
 	/**

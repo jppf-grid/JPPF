@@ -29,7 +29,7 @@ import org.apache.commons.logging.*;
 public interface Bundler {
 	
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	Log LOG = LogFactory.getLog(Bundler.class);
 	/**

@@ -30,7 +30,7 @@ import org.jppf.utils.*;
 public abstract class AbstractResultSender implements TaskCompletionListener
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(AbstractResultSender.class);
 	/**

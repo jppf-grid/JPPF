@@ -40,7 +40,7 @@ import org.jvnet.substance.SubstanceDefaultTableCellRenderer;
 public class MonitoringPanel extends JPanel implements StatsHandlerListener, StatsConstants
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	static Log log = LogFactory.getLog(MonitoringPanel.class);
 	/**

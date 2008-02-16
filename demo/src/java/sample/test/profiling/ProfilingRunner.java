@@ -32,7 +32,7 @@ import org.jppf.utils.*;
 public class ProfilingRunner
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	static Log log = LogFactory.getLog(ProfilingRunner.class);
 	/**

@@ -84,7 +84,6 @@ public class NodePanel extends JPanel
 		{
 			String log4jCfg = "log4j-node.properties";
 			System.setProperty("log4j.configuration", log4jCfg);
-			//Log4jInitializer.configureFromClasspath(log4jCfg);
 			TypedProperties props = JPPFConfiguration.getProperties();
 			props.remove("jppf.policy.file"); 
 			createUI();

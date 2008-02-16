@@ -37,7 +37,7 @@ import org.jppf.utils.JPPFConfiguration;
 public class DefiningChannelTypeState extends ClassServerState
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(DefiningChannelTypeState.class);
 	/**

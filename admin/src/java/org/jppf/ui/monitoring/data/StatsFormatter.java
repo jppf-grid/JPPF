@@ -31,7 +31,7 @@ import org.jppf.utils.StringUtils;
 public final class StatsFormatter implements StatsConstants
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	static Log log = LogFactory.getLog(StatsFormatter.class);
 	/**

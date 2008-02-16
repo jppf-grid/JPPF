@@ -46,7 +46,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 */
 	private static Log log = LogFactory.getLog(JPPFJcaClient.class);
 	/**
-	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**

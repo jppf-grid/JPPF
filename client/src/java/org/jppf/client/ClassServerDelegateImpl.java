@@ -36,11 +36,11 @@ import org.jppf.utils.CompressionUtils;
 public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(ClassServerDelegateImpl.class);
 	/**
-	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private boolean debugEnabled = log.isDebugEnabled();
 

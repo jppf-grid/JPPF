@@ -37,7 +37,7 @@ public class JPPFJcaResultCollector implements TaskResultListener
 	 */
 	private static Log log = LogFactory.getLog(JcaResultProcessor.class);
 	/**
-	 * Determines whether the debug level is enabled in the log4j configuration, without the cost of a method call.
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private boolean debugEnabled = log.isDebugEnabled();
 	/**

@@ -40,7 +40,7 @@ import org.jppf.utils.*;
 public class DriverLauncher
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(DriverLauncher.class);
 	/**

@@ -35,7 +35,7 @@ import sample.tasklength.LongTask;
 public class LongTaskDemoRunner
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	static Log log = LogFactory.getLog(LongTaskDemoRunner.class);
 	/**

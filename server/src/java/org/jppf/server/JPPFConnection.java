@@ -33,7 +33,7 @@ import org.jppf.comm.socket.*;
 public abstract class JPPFConnection extends Thread
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(JPPFConnection.class);
 	/**

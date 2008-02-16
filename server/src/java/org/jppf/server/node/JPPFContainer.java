@@ -34,7 +34,7 @@ import org.jppf.utils.SerializationHelper;
 public class JPPFContainer
 {
 	/**
-	 * Log4j logger for this class.
+	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(JPPFContainer.class);
 	/**
