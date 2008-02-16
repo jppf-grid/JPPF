@@ -28,6 +28,7 @@ import java.util.Vector;
 import org.apache.commons.logging.*;
 import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.server.JPPFDriver;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * This class represents the state of a new class server connection, whose type is yet undetermined.
@@ -43,6 +44,11 @@ public class DefiningChannelTypeState extends ClassServerState
 	 * Determines whether DEBUG logging level is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Determines whether management features are enabled for this driver.
+	 */
+	private static boolean managementEnabled =
+		JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true);
 
 	/**
 	 * Initialize this state with a specified NioServer.
@@ -78,7 +84,10 @@ public class DefiningChannelTypeState extends ClassServerState
 				context.setUuid(uuid);
 				context.setPendingRequests(new Vector<SelectionKey>());
 				context.setMessage(null);
-				resource.setManagementId(JPPFDriver.getInstance().getJmxServer().getId());
+				if (managementEnabled)
+				{
+					resource.setManagementId(JPPFDriver.getInstance().getJmxServer().getId());
+				}
 				context.serializeResource();
 				return TO_SENDING_INITIAL_PROVIDER_RESPONSE;
 			}
