@@ -52,6 +52,7 @@
 	<property name="license.file" value="LICENSE.txt"/>
 	<property name="runtime" value="${build}/runtime"/>
 	<property name="runtime.driver" value="${build}/runtime/driver"/>
+	<property name="runtime.multiplexer" value="${build}/runtime/multiplexer"/>
 	<property name="runtime.node" value="${build}/runtime/node"/>
 
 	<!-- ========================================================================= -->
@@ -290,6 +291,8 @@
 		</condition>
 		<antcall target="runtime.driver"/>
 		<antcall target="runtime.node"/>
+		<antcall target="runtime.node"/>
+		<antcall target="runtime.multiplexer"/>
     <delete dir="${runtime}" quiet="true"/>
 	</target>
 
@@ -410,11 +413,61 @@
     <delete dir="${runtime.node}" quiet="true"/>
 	</target>
 
+	<!-- =========== Multiplexer packaging =========== -->
+
+	<target name="runtime.multiplexer" depends="runtime.multiplexer.single.jar,runtime.multiplexer.multiple.jar"/>
+
+	<target name="runtime.multiplexer.single.jar" if="isSingleJar">
+		<mkdir dir="${runtime.driver}/lib"/>
+		<mkdir dir="${build}/jar" />
+  	<unjar src="${build}/${ant.project.name}-common-node.jar" dest="${build}/jar"/>
+  	<unjar src="${build}/${ant.project.name}-common.jar" dest="${build}/jar"/>
+  	<unjar src="${lib}/log4j/log4j-1.2.9.jar" dest="${build}/jar"/>
+  	<unjar src="${lib}/ApacheCommons/commons-logging-1.1.jar" dest="${build}/jar"/>
+    <jar jarfile="${runtime.multiplexer}/lib/jppf-multiplexer.jar">
+			<fileset dir="${build}/jar"/>
+		</jar>
+    <delete dir="${build}/jar" quiet="true"/>
+		<antcall target="runtime.multiplexer.common"/>
+	</target>
+
+	<target name="runtime.multiplexer.multiple.jar" unless="isSingleJar">
+		<mkdir dir="${runtime.multiplexer}/lib"/>
+		<copy todir="${runtime.multiplexer}/lib">
+			<fileset dir="${build}">
+				<include name="${ant.project.name}-common-node.jar"/>
+				<include name="${ant.project.name}-common.jar"/>
+			</fileset>
+			<fileset dir="${lib}/log4j">
+				<include name="*.*"/>
+			</fileset>
+			<fileset dir="${lib}/ApacheCommons">
+				<include name="commons-logging*.jar"/>
+			</fileset>
+		</copy>
+		<antcall target="runtime.multiplexer.common"/>
+	</target>
+
+	<target name="runtime.multiplexer.common">
+		<copy tofile="${runtime.multiplexer}/${license.file}" file="${basedir}/${license.file}"/>
+		<copy todir="${runtime.multiplexer}/config">
+			<fileset dir="${config}/multiplexer"/>
+		</copy>
+		<copy tofile="${runtime.multiplexer}/build.xml" file="${bin}/ant-driver.xml"/>
+		<property name="runtime.multiplexer.file"
+			value="${build}/${ant.project.name}-multiplexer-bin-${version.number}.${build.number}-${now}.zip"/>
+		<delete file="${runtime.multiplexer.file}" quiet="true"/>
+		<zip destfile="${runtime.multiplexer.file}">
+			<zipfileset dir="${runtime.multiplexer}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-multiplexer"/>
+		</zip>
+    <delete dir="${runtime.multiplexer}" quiet="true"/>
+	</target>
+
 	<!-- ========================================================================= -->
 	<!--                     Build the web site content                            -->
 	<!-- ========================================================================= -->
 
-  <target name="doc" depends="doc.home, doc.overview">
+  <target name="doc" depends="doc.screenshots, doc.home, doc.overview">
 	</target>
 
   <target name="doc.home" description="generates the project web site pages">
@@ -439,6 +492,16 @@
 			<arg value="${source}"/>
 			<arg value="${dest}"/>
 			<arg value="${templates}"/>
+		</java>       
+	</target>
+
+	<target name="doc.screenshots" description="generates the project web site pages">
+		<java fork="yes" classname="org.jppf.utils.ThumbnailGenerator" classpathref="run.classpath">
+			<jvmarg value="-Xmx128m" />
+			<arg value="${home}/screenshots"/>
+			<arg value="72"/>
+			<arg value="72"/>
+			<arg value="${home}/templates"/>
 		</java>       
 	</target>
 
