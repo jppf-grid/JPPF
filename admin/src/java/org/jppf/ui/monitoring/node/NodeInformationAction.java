@@ -61,6 +61,7 @@ public class NodeInformationAction implements ActionListener
 			format.formatTable(info.getEnv(), "Environment Variables");
 			format.formatTable(info.getRuntime(), "Runtime Information");
 			format.formatTable(info.getJppf(), "JPPF configuration");
+			format.formatTable(info.getNetwork(), "Network configuration");
 			format.end();
 			s = format.getText();
 		}
