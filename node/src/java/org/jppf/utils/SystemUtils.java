@@ -18,6 +18,7 @@
 
 package org.jppf.utils;
 
+import java.net.*;
 import java.util.*;
 
 import org.apache.commons.logging.*;
@@ -45,6 +46,10 @@ public final class SystemUtils
 	 * A map of the environment properties.
 	 */
 	private static TypedProperties env = null;
+	/**
+	 * A map of the network configuration.
+	 */
+	private static TypedProperties network = null;
 
 	/**
 	 * Instantiation of this class is not permitted.
@@ -197,6 +202,7 @@ public final class SystemUtils
 			if (debugEnabled) log.debug(e.getMessage(), e);
 		}
 		props.setProperty("maxMemory", s);
+
 		return props;
 	}
 
@@ -223,5 +229,45 @@ public final class SystemUtils
 			}
 		}
 		return env;
+	}
+
+	/**
+	 * Get a map of the environment variables.
+	 * @return a mapping of environment variables to their value.
+	 */
+	public static synchronized TypedProperties getNetwork()
+	{
+		if (network == null)
+		{
+			network = new TypedProperties();
+			try
+			{
+				network.setProperty("ipv4.addresses", formatAddresses(NetworkUtils.getIPV4Addresses()));
+				network.setProperty("ipv6.addresses", formatAddresses(NetworkUtils.getIPV6Addresses()));
+			}
+			catch(SecurityException e)
+			{
+				if (debugEnabled) log.debug(e.getMessage(), e);
+			}
+		}
+		return network;
+	}
+
+	/**
+	 * Format a list of InetAddress.
+	 * @param addresses a List of <code>InetAddress</code> instances.
+	 * @return a string containing a space-separated list of <i>hostname</i>|<i>ip_address</i> pairs.
+	 */
+	private static String formatAddresses(List<? extends InetAddress> addresses)
+	{
+		StringBuffer sb = new StringBuffer();
+		for (InetAddress addr: addresses)
+		{
+			String name = addr.getHostName();
+			String ip = addr.getHostAddress();
+			if (sb.length() > 0) sb.append(" ");
+			sb.append(name).append("|").append(ip);
+		}
+		return sb.toString();
 	}
 }

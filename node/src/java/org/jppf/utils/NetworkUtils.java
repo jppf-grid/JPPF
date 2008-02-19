@@ -19,7 +19,7 @@
 package org.jppf.utils;
 
 import java.net.*;
-import java.util.Enumeration;
+import java.util.*;
 
 import org.apache.commons.logging.*;
 
@@ -53,6 +53,29 @@ public final class NetworkUtils
 	{
 		try
 		{
+			List<Inet4Address> allAddresses = getIPV4Addresses();
+			for (Inet4Address addr: allAddresses)
+			{
+				String host = addr.getHostAddress();
+				if (!"127.0.0.1".equals(host)) return host;
+			}
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		return null;
+	}
+
+	/**
+	 * Get a list of all known IP v4 addresses for the current host.
+	 * @return a List of <code>Inet4Address</code> instances, may be empty but never null.
+	 */
+	public static List<Inet4Address> getIPV4Addresses()
+	{
+		List<Inet4Address> list = new ArrayList<Inet4Address>();
+		try
+		{
 			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
 			while (interfaces.hasMoreElements())
 			{
@@ -61,17 +84,43 @@ public final class NetworkUtils
 				while (addresses.hasMoreElements())
 				{
 					InetAddress addr = addresses.nextElement();
-					if (addr instanceof Inet6Address) continue;
-					String host = addr.getHostAddress();
-					if (!"127.0.0.1".equals(host)) return host;
+					if (addr instanceof Inet4Address) list.add((Inet4Address) addr);
 				}
 			}
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
-		return null;
+		return list;
+	}
+
+	/**
+	 * Get a list of all known IP v6 addresses for the current host.
+	 * @return a List of <code>Inet6Address</code> instances, may be empty but never null.
+	 */
+	public static List<Inet6Address> getIPV6Addresses()
+	{
+		List<Inet6Address> list = new ArrayList<Inet6Address>();
+		try
+		{
+			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+			while (interfaces.hasMoreElements())
+			{
+				NetworkInterface ni = interfaces.nextElement();
+				Enumeration<InetAddress> addresses = ni.getInetAddresses();
+				while (addresses.hasMoreElements())
+				{
+					InetAddress addr = addresses.nextElement();
+					if (addr instanceof Inet6Address) list.add((Inet6Address) addr);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		return list;
 	}
 
 	/**
