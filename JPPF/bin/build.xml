@@ -453,7 +453,7 @@
 		<copy todir="${runtime.multiplexer}/config">
 			<fileset dir="${config}/multiplexer"/>
 		</copy>
-		<copy tofile="${runtime.multiplexer}/build.xml" file="${bin}/ant-driver.xml"/>
+		<copy tofile="${runtime.multiplexer}/build.xml" file="${bin}/ant-multiplexer.xml"/>
 		<property name="runtime.multiplexer.file"
 			value="${build}/${ant.project.name}-multiplexer-bin-${version.number}.${build.number}-${now}.zip"/>
 		<delete file="${runtime.multiplexer.file}" quiet="true"/>
