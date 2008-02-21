@@ -18,9 +18,10 @@
 
 package org.jppf.server.nio.multiplexer.generic;
 
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.jppf.server.nio.NioContext;
@@ -60,6 +61,10 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * Determines whether end of stream was reached during the last read operation.
 	 */
 	public boolean eof = false;
+	/**
+	 * Pool of IO buffers to pick from.
+	 */
+	private static LinkedList<WeakReference> bufferPool = new LinkedList<WeakReference>();
 
 	/**
 	 * Handle the cleanup when an exception occurs on the channel.
@@ -184,7 +189,8 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	public ByteBuffer readMultiplexerMessage(ReadableByteChannel channel) throws Exception
 	{
 		//ByteBuffer msg = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
-		ByteBuffer msg = ByteBuffer.allocateDirect(MAX_BUFFER_SIZE);
+		//ByteBuffer msg = ByteBuffer.allocateDirect(MAX_BUFFER_SIZE);
+		ByteBuffer msg = pickBuffer();
 		
 		int count = channel.read(msg);
 		if (DEBUG_ENABLED)
@@ -261,6 +267,10 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public synchronized void setCurrentMessage(ByteBuffer currentMessage)
 	{
+		if ((currentMessage == null) && (this.currentMessage != null))
+		{
+			releaseBuffer(this.currentMessage);
+		}
 		this.currentMessage = currentMessage;
 	}
 
@@ -280,5 +290,28 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	public void setEof(boolean eof)
 	{
 		this.eof = eof;
+	}
+
+	/**
+	 * Get a buffer from the pool.
+	 * @return a <code>ByteBuffer</code> instance.
+	 */
+	public static synchronized ByteBuffer pickBuffer()
+	{
+		if (bufferPool.isEmpty())
+		{
+			return ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
+		}
+		WeakReference ref = bufferPool.remove();
+		return (ByteBuffer) ref.get();
+	}
+
+	/**
+	 * Release a buffer into the pool.
+	 * @param buffer the buffer to release.
+	 */
+	public static synchronized void releaseBuffer(ByteBuffer buffer)
+	{
+		bufferPool.add(new WeakReference(buffer));
 	}
 }
