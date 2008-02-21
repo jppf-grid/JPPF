@@ -183,7 +183,9 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public ByteBuffer readMultiplexerMessage(ReadableByteChannel channel) throws Exception
 	{
-		ByteBuffer msg = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
+		//ByteBuffer msg = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
+		ByteBuffer msg = ByteBuffer.allocateDirect(MAX_BUFFER_SIZE);
+		
 		int count = channel.read(msg);
 		if (DEBUG_ENABLED)
 		{
