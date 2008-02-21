@@ -63,7 +63,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	/**
 	 * Pool of IO buffers to pick from.
 	 */
-	private static LinkedList<ByteBuffer> bufferPool = new LinkedList<ByteBuffer>();
+	private static LinkedList<byte[]> bufferPool = new LinkedList<byte[]>();
 
 	/**
 	 * Handle the cleanup when an exception occurs on the channel.
@@ -302,7 +302,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 		{
 			return ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
 		}
-		return bufferPool.remove();
+		return ByteBuffer.wrap(bufferPool.remove());
 	}
 
 	/**
@@ -311,6 +311,6 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public static synchronized void releaseBuffer(ByteBuffer buffer)
 	{
-		bufferPool.add(buffer);
+		bufferPool.add(buffer.array());
 	}
 }
