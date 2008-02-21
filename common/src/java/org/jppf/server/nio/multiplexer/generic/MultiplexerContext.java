@@ -209,13 +209,14 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public boolean writeMultiplexerMessage(WritableByteChannel channel) throws Exception
 	{
-		int count = channel.write(getCurrentMessage());
+		ByteBuffer msg = getCurrentMessage();
+		int count = channel.write(msg);
 		if (DEBUG_ENABLED)
 		{
 			LOG.debug("[" + getShortClassName() + "] " + "written " + count + " bytes to " +
 				StringUtils.getRemoteHost((SocketChannel) channel));
 		}
-		return getCurrentMessage().remaining() <= 0;
+		return msg.remaining() <= 0;
 	}
 
 	/**
