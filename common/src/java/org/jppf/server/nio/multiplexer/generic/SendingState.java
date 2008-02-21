@@ -21,7 +21,6 @@ package org.jppf.server.nio.multiplexer.generic;
 import static org.jppf.server.nio.multiplexer.generic.MultiplexerTransition.*;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
-import java.net.ConnectException;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
@@ -62,7 +61,7 @@ public class SendingState extends MultiplexerServerState
 		SelectableChannel channel = key.channel();
 		if (key.isReadable())
 		{
-			throw new ConnectException("multiplexer " + getRemoteHost(channel) + " has been disconnected");
+			//throw new ConnectException("multiplexer " + getRemoteHost(channel) + " has been disconnected");
 		}
 		MultiplexerContext context = (MultiplexerContext) key.attachment();
 		if (context.hasPendingMessage() && (context.getCurrentMessage() == null))
