@@ -208,7 +208,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 			LOG.debug("[" + getShortClassName() + "] " + "written " + count + " bytes to " +
 				StringUtils.getRemoteHost((SocketChannel) channel));
 		}
-		return getCurrentMessage().remaining() > 0;
+		return getCurrentMessage().remaining() <= 0;
 	}
 
 	/**
