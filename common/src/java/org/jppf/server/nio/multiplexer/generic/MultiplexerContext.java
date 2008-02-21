@@ -268,6 +268,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	{
 		if ((currentMessage == null) && (this.currentMessage != null))
 		{
+			this.currentMessage.rewind();
 			releaseBuffer(this.currentMessage);
 		}
 		this.currentMessage = currentMessage;
