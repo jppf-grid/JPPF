@@ -75,6 +75,11 @@ public class ReceivingState extends MultiplexerServerState
 				server.transitionChannel(linkedKey, MultiplexerTransition.TO_SENDING);
 			return TO_SENDING_OR_RECEIVING;
 		}
+		if (context.isEof())
+		{
+			context.setEof(false);
+			return TO_IDLE;
+		}
 		return TO_RECEIVING;
 	}
 }
