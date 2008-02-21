@@ -268,6 +268,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	{
 		if ((currentMessage == null) && (this.currentMessage != null))
 		{
+			this.currentMessage.clear();
 			releaseBuffer(this.currentMessage);
 		}
 		this.currentMessage = currentMessage;
@@ -310,7 +311,6 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public static synchronized void releaseBuffer(ByteBuffer buffer)
 	{
-		buffer.clear();
 		bufferPool.add(buffer);
 	}
 }
