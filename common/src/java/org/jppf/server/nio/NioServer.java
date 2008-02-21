@@ -28,7 +28,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.classloader.ResourceProvider;
-import org.jppf.server.nio.multiplexer.MultiplexerContext;
 
 /**
  * Generic server for non-blocking asynchronous socket channel based communications.<br>
@@ -449,7 +448,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * @param context the context attached to the channel.
 	 * @return a <code>SelectionKey</code> instance.
 	 */
-	public SelectionKey registerChannel(SocketChannel channel, int ops, MultiplexerContext context)
+	public SelectionKey registerChannel(SocketChannel channel, int ops, NioContext context)
 	{
 		SelectionKey key = null;
 		try
