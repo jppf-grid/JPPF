@@ -62,14 +62,8 @@ public class SendingOrReceivingState extends MultiplexerServerState
 		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(key.channel()));
 		MultiplexerContext context = (MultiplexerContext) key.attachment();
 		MultiplexerTransition trans = TO_SENDING_OR_RECEIVING;
-		if (context.hasPendingMessage() || (context.getCurrentMessage() != null))
-		{
-			trans = TO_SENDING;
-		}
-		else if (key.isReadable())
-		{
-			trans = TO_RECEIVING;
-		}
+		if (context.hasPendingMessage() || (context.getCurrentMessage() != null)) trans = TO_SENDING;
+		else if (key.isReadable()) trans = TO_RECEIVING;
 		if (debugEnabled) log.debug("returning "+ trans + " for " + getRemoteHost(key.channel()));
 		return trans;
 	}
