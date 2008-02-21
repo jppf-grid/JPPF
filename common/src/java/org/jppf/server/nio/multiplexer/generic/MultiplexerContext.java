@@ -18,7 +18,6 @@
 
 package org.jppf.server.nio.multiplexer.generic;
 
-import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
@@ -64,7 +63,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	/**
 	 * Pool of IO buffers to pick from.
 	 */
-	private static LinkedList<WeakReference> bufferPool = new LinkedList<WeakReference>();
+	private static LinkedList<ByteBuffer> bufferPool = new LinkedList<ByteBuffer>();
 
 	/**
 	 * Handle the cleanup when an exception occurs on the channel.
@@ -302,8 +301,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 		{
 			return ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
 		}
-		WeakReference ref = bufferPool.remove();
-		return (ByteBuffer) ref.get();
+		return bufferPool.remove();
 	}
 
 	/**
@@ -312,6 +310,6 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public static synchronized void releaseBuffer(ByteBuffer buffer)
 	{
-		bufferPool.add(new WeakReference(buffer));
+		bufferPool.add(buffer);
 	}
 }
