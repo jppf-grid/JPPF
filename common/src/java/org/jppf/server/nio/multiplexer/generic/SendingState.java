@@ -74,7 +74,7 @@ public class SendingState extends MultiplexerServerState
 			{
 				if (debugEnabled) log.debug(getRemoteHost(channel) + " message sent");
 				context.setCurrentMessage(null);
-				return TO_SENDING_OR_RECEIVING;
+				return context.hasPendingMessage() ? TO_SENDING : TO_SENDING_OR_RECEIVING;
 			}
 			return TO_SENDING;
 		}

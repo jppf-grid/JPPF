@@ -195,6 +195,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 			msg.flip();
 			return msg;
 		}
+		if (count < 0) setEof(true);
 		return null;
 	}
 
