@@ -56,6 +56,10 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * The message currently being sent.
 	 */
 	private ByteBuffer currentMessage = null;
+	/**
+	 * Determines whether end of stream was reached during the last read operation.
+	 */
+	public boolean eof = false;
 
 	/**
 	 * Handle the cleanup when an exception occurs on the channel.
@@ -254,5 +258,23 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	public synchronized void setCurrentMessage(ByteBuffer currentMessage)
 	{
 		this.currentMessage = currentMessage;
+	}
+
+	/**
+	 * Determine whether end of stream was reached during the last read operation.
+	 * @return true if EOF was reached, false otherwise.
+	 */
+	public boolean isEof()
+	{
+		return eof;
+	}
+
+	/**
+	 * Specifiy whether end of stream was reached during the last read operation.
+	 * @param eof true to specify that EOF was reached, false otherwise.
+	 */
+	public void setEof(boolean eof)
+	{
+		this.eof = eof;
 	}
 }
