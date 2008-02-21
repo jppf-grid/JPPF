@@ -18,13 +18,12 @@
 
 package org.jppf.server.nio.multiplexer.generic;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.jppf.server.nio.*;
+import org.jppf.server.nio.NioContext;
 import org.jppf.utils.StringUtils;
 
 /**
@@ -176,9 +175,9 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * Read data from a channel.
 	 * @param channel the channel to read the data from.
 	 * @return a ByteBuffer containing the data read from the channel, or null if no data was read.
-	 * @throws IOException if an error occurs while reading the data.
+	 * @throws Exception if an error occurs while reading the data.
 	 */
-	public ByteBuffer readMultiplexerMessage(ReadableByteChannel channel) throws IOException
+	public ByteBuffer readMultiplexerMessage(ReadableByteChannel channel) throws Exception
 	{
 		ByteBuffer msg = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
 		int count = channel.read(msg);
@@ -199,9 +198,9 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * Write the current message to a channel.
 	 * @param channel the channel to write the data to.
 	 * @return true if the current message was completely written, false otherwise.
-	 * @throws IOException if an error occurs while reading the data.
+	 * @throws Exception if an error occurs while reading the data.
 	 */
-	public boolean writeMultiplexerMessage(WritableByteChannel channel) throws IOException
+	public boolean writeMultiplexerMessage(WritableByteChannel channel) throws Exception
 	{
 		int count = channel.write(getCurrentMessage());
 		if (DEBUG_ENABLED)
