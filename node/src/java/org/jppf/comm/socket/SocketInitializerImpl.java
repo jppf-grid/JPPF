@@ -90,7 +90,8 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
 			// random delay between 0 and 1 second , to avoid overloading the server with simultaneous connection requests.
 			TypedProperties props = JPPFConfiguration.getProperties();
 			long delay = 1000L * props.getLong("reconnect.initial.delay", 0L);
-			if (delay == 0L) delay = rand.nextInt(1000);
+			//if (delay == 0L) delay = rand.nextInt(1000);
+			if (delay == 0L) delay = rand.nextInt(10);
 			long maxTime = props.getLong("reconnect.max.time", 60L);
 			long maxDuration = (maxTime <= 0) ? -1L : 1000L * maxTime;
 			long period = 1000L * props.getLong("reconnect.interval", 1L);
