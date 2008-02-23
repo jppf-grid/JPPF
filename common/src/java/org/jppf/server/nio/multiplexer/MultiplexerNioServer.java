@@ -230,14 +230,4 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 			e.printStackTrace();
 		}
 	}
-
-	/**
-	 * Get the size of the state transition's thread pool.
-	 * @return 10.
-	 * @see org.jppf.server.nio.NioServer#threadPoolSize()
-	 */
-	protected int threadPoolSize()
-	{
-		return 10;
-	}
 }
