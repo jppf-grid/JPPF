@@ -191,7 +191,6 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public ByteBuffer readMultiplexerMessage(ReadableByteChannel channel) throws Exception
 	{
-		/*
 		ByteBuffer msg = pickBuffer();
 		int count = channel.read(msg);
 		if (DEBUG_ENABLED)
@@ -203,6 +202,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 		{
 			if (currentData == null) currentData = new JPPFByteArrayOutputStream();
 			currentData.write(msg.array());
+			releaseBuffer(msg);
 		}
 		else if (count < 0)
 		{
@@ -212,8 +212,8 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 			currentData = null;
 			return result;
 		}
-		*/
 
+		/*
 		//ByteBuffer msg = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
 		//ByteBuffer msg = ByteBuffer.allocateDirect(MAX_BUFFER_SIZE);
 		ByteBuffer msg = pickBuffer();
@@ -232,6 +232,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 		{
 			setEof(true);
 		}
+		*/
 		return null;
 	}
 
