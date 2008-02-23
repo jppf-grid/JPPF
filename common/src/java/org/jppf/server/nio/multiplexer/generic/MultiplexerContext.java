@@ -35,7 +35,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	/**
 	 * Maximum number of bytes that can be written or read in one shot.
 	 */
-	private static final int MAX_BUFFER_SIZE = 1024 * 1024;
+	private static final int MAX_BUFFER_SIZE = 32 * 1024;
 	/**
 	 * The request currently processed.
 	 */
