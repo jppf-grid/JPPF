@@ -35,7 +35,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	/**
 	 * Maximum number of bytes that can be written or read in one shot.
 	 */
-	private static final int MAX_BUFFER_SIZE = 64 * 1024;
+	private static final int MAX_BUFFER_SIZE = 1024 * 1024;
 	/**
 	 * The request currently processed.
 	 */
@@ -191,6 +191,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public ByteBuffer readMultiplexerMessage(ReadableByteChannel channel) throws Exception
 	{
+		/*
 		ByteBuffer msg = pickBuffer();
 		int count = channel.read(msg);
 		if (DEBUG_ENABLED)
@@ -212,18 +213,22 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 			currentData = null;
 			return result;
 		}
+		*/
 
-		/*
-		//ByteBuffer msg = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
-		//ByteBuffer msg = ByteBuffer.allocateDirect(MAX_BUFFER_SIZE);
 		ByteBuffer msg = pickBuffer();
-		int count = channel.read(msg);
+		int count = 0;
+		do
+		{
+			count = channel.read(msg);
+		}
+		while ((count > 0) && msg.hasRemaining());
 		if (DEBUG_ENABLED)
 		{
 			LOG.debug("[" + getShortClassName() + "] " + "read " + count + " bytes from " +
 				StringUtils.getRemoteHost((SocketChannel) channel));
 		}
-		if (count > 0)
+		//if (count > 0)
+		if (msg.position() > 0)
 		{
 			msg.flip();
 			return msg;
@@ -232,7 +237,6 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 		{
 			setEof(true);
 		}
-		*/
 		return null;
 	}
 
