@@ -207,7 +207,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 		else if (count < 0)
 		{
 			setEof(true);
-			ByteBuffer result = ByteBuffer.wrap(currentData.toByteArray());
+			ByteBuffer result = ByteBuffer.wrap(currentData.toByteArray(), 0, currentData.size());
 			currentData.close();
 			currentData = null;
 			return result;
@@ -330,8 +330,8 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	{
 		if (bufferPool.isEmpty())
 		{
-			//return ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
-			return ByteBuffer.allocateDirect(MAX_BUFFER_SIZE);
+			return ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
+			//return ByteBuffer.allocateDirect(MAX_BUFFER_SIZE);
 		}
 		return bufferPool.remove();
 	}
