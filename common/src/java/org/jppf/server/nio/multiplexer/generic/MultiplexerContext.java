@@ -191,30 +191,6 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public ByteBuffer readMultiplexerMessage(ReadableByteChannel channel) throws Exception
 	{
-		/*
-		ByteBuffer msg = pickBuffer();
-		int count = channel.read(msg);
-		if (DEBUG_ENABLED)
-		{
-			LOG.debug("[" + getShortClassName() + "] " + "read " + count + " bytes from " +
-				StringUtils.getRemoteHost((SocketChannel) channel));
-		}
-		if (count > 0)
-		{
-			if (currentData == null) currentData = new JPPFByteArrayOutputStream();
-			currentData.write(msg.array());
-			releaseBuffer(msg);
-		}
-		else if (count < 0)
-		{
-			setEof(true);
-			ByteBuffer result = ByteBuffer.wrap(currentData.toByteArray(), 0, currentData.size());
-			currentData.close();
-			currentData = null;
-			return result;
-		}
-		*/
-
 		ByteBuffer msg = pickBuffer();
 		int count = 0;
 		do
@@ -249,13 +225,18 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	public boolean writeMultiplexerMessage(WritableByteChannel channel) throws Exception
 	{
 		ByteBuffer msg = getCurrentMessage();
-		int count = channel.write(msg);
+		int count = 0;
+		do
+		{
+			count = channel.write(msg);
+		}
+		while ((count > 0) && msg.hasRemaining());
 		if (DEBUG_ENABLED)
 		{
 			LOG.debug("[" + getShortClassName() + "] " + "written " + count + " bytes to " +
 				StringUtils.getRemoteHost((SocketChannel) channel));
 		}
-		return msg.remaining() <= 0;
+		return !msg.hasRemaining();
 	}
 
 	/**
