@@ -238,6 +238,6 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 */
 	protected int threadPoolSize()
 	{
-		return 10;
+		return 1;
 	}
 }
