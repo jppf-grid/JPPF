@@ -107,7 +107,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 		super(name);
 		this.sequential = sequential;
 		//int n = Runtime.getRuntime().availableProcessors();
-		if (!sequential) executor = Executors.newFixedThreadPool(1);
+		if (!sequential) executor = Executors.newFixedThreadPool(threadPoolSize());
 		factory = createFactory();
 	}
 
@@ -500,5 +500,15 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	protected synchronized boolean isStopped()
 	{
 		return stopped;
+	}
+
+	/**
+	 * Get the size of the state transition's thread pool.<br>
+	 * Subclasses should override this method if they want a size greater than 1.
+	 * @return the default size is 1.
+	 */
+	protected int threadPoolSize()
+	{
+		return 1;
 	}
 }
