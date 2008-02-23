@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.jppf.server.nio.NioContext;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 
 /**
  * Context obect associated with a socket channel used by the multiplexer. 
@@ -64,6 +64,10 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * Pool of IO buffers to pick from.
 	 */
 	private static LinkedList<ByteBuffer> bufferPool = new LinkedList<ByteBuffer>();
+	/**
+	 * Contains the data currently being read.
+	 */
+	private JPPFByteArrayOutputStream currentData = null;
 
 	/**
 	 * Handle the cleanup when an exception occurs on the channel.
@@ -187,10 +191,32 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public ByteBuffer readMultiplexerMessage(ReadableByteChannel channel) throws Exception
 	{
+		/*
+		ByteBuffer msg = pickBuffer();
+		int count = channel.read(msg);
+		if (DEBUG_ENABLED)
+		{
+			LOG.debug("[" + getShortClassName() + "] " + "read " + count + " bytes from " +
+				StringUtils.getRemoteHost((SocketChannel) channel));
+		}
+		if (count > 0)
+		{
+			if (currentData == null) currentData = new JPPFByteArrayOutputStream();
+			currentData.write(msg.array());
+		}
+		else if (count < 0)
+		{
+			setEof(true);
+			ByteBuffer result = ByteBuffer.wrap(currentData.toByteArray());
+			currentData.close();
+			currentData = null;
+			return result;
+		}
+		*/
+
 		//ByteBuffer msg = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
 		//ByteBuffer msg = ByteBuffer.allocateDirect(MAX_BUFFER_SIZE);
 		ByteBuffer msg = pickBuffer();
-		
 		int count = channel.read(msg);
 		if (DEBUG_ENABLED)
 		{
@@ -202,7 +228,10 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 			msg.flip();
 			return msg;
 		}
-		if (count < 0) setEof(true);
+		if (count < 0)
+		{
+			setEof(true);
+		}
 		return null;
 	}
 
@@ -300,7 +329,8 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	{
 		if (bufferPool.isEmpty())
 		{
-			return ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
+			//return ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
+			return ByteBuffer.allocateDirect(MAX_BUFFER_SIZE);
 		}
 		return bufferPool.remove();
 	}
