@@ -209,8 +209,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 			count = channel.read(msg);
 			n += count;
 		}
-		while ((count >= 0) && msg.hasRemaining());
-		//while ((count > 0) && msg.hasRemaining());
+		while ((count > 0) && msg.hasRemaining());
 		if (debugEnabled)
 		{
 			log.debug("[" + getShortClassName() + "] " + "read " + n + " bytes from " +
@@ -241,8 +240,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 		{
 			count = channel.write(msg);
 		}
-		while ((count >= 0) && msg.hasRemaining());
-		//while ((count > 0) && msg.hasRemaining());
+		while ((count > 0) && msg.hasRemaining());
 		if (debugEnabled)
 		{
 			log.debug("[" + getShortClassName() + "] " + "written " + count + " bytes to " +
