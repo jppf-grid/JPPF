@@ -28,6 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.classloader.ResourceProvider;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * Generic server for non-blocking asynchronous socket channel based communications.<br>
@@ -46,6 +47,13 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(NioServer.class);
+	/**
+	 * Size of the pool of threads for the state transition executor.
+	 * It is defined as the value of the configuration property 
+	 * &quot;transition.thread.pool.size&quot;, with a default value of 1.
+	 */
+	private static final int THREAD_POOL_SIZE =
+		JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", 1);
 	/**
 	 * the selector of all socket channels open with providers or nodes.
 	 */
@@ -503,12 +511,11 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	}
 
 	/**
-	 * Get the size of the state transition's thread pool.<br>
-	 * Subclasses should override this method if they want a size greater than 1.
-	 * @return the default size is 1.
+	 * Get the size of the state transition's thread pool.
+	 * @return the value of the constant {@link #THREAD_POOL_SIZE THREAD_POOL_SIZE}.
 	 */
 	protected int threadPoolSize()
 	{
-		return 1;
+		return THREAD_POOL_SIZE;
 	}
 }

@@ -193,14 +193,16 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	{
 		ByteBuffer msg = pickBuffer();
 		int count = 0;
+		int n = 0;
 		do
 		{
 			count = channel.read(msg);
+			n += count;
 		}
 		while ((count > 0) && msg.hasRemaining());
 		if (DEBUG_ENABLED)
 		{
-			LOG.debug("[" + getShortClassName() + "] " + "read " + count + " bytes from " +
+			LOG.debug("[" + getShortClassName() + "] " + "read " + n + " bytes from " +
 				StringUtils.getRemoteHost((SocketChannel) channel));
 		}
 		//if (count > 0)
@@ -277,16 +279,16 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 
 	/**
 	 * Set the message currently being sent.
-	 * @param currentMessage a <code>ByteBuffer</code> instance.
+	 * @param message a <code>ByteBuffer</code> instance.
 	 */
-	public synchronized void setCurrentMessage(ByteBuffer currentMessage)
+	public synchronized void setCurrentMessage(ByteBuffer message)
 	{
-		if ((currentMessage == null) && (this.currentMessage != null))
+		if ((message == null) && (currentMessage != null))
 		{
-			this.currentMessage.clear();
-			releaseBuffer(this.currentMessage);
+			currentMessage.clear();
+			releaseBuffer(currentMessage);
 		}
-		this.currentMessage = currentMessage;
+		currentMessage = message;
 	}
 
 	/**

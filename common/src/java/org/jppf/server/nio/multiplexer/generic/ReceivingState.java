@@ -78,7 +78,7 @@ public class ReceivingState extends MultiplexerServerState
 		if (context.isEof())
 		{
 			context.setEof(false);
-			return TO_IDLE;
+			return TO_SENDING_OR_RECEIVING;
 		}
 		return TO_RECEIVING;
 	}
