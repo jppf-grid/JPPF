@@ -23,6 +23,7 @@ import java.nio.channels.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.commons.logging.*;
 import org.jppf.server.nio.NioContext;
 import org.jppf.utils.*;
 
@@ -32,6 +33,14 @@ import org.jppf.utils.*;
  */
 public class MultiplexerContext extends NioContext<MultiplexerState>
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(ReceivingState.class);
+	/**
+	 * Determines whether DEBUG logging level is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Maximum number of bytes that can be written or read in one shot.
 	 */
@@ -88,7 +97,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 					}
 					catch(Exception e)
 					{
-						LOG.error(e.getMessage(), e);
+						log.error(e.getMessage(), e);
 					}
 				}
 			}
@@ -96,7 +105,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 		}
 		catch(Exception e)
 		{
-			LOG.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -200,21 +209,19 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 			n += count;
 		}
 		while ((count > 0) && msg.hasRemaining());
-		if (DEBUG_ENABLED)
+		if (debugEnabled)
 		{
-			LOG.debug("[" + getShortClassName() + "] " + "read " + n + " bytes from " +
+			log.debug("[" + getShortClassName() + "] " + "read " + n + " bytes from " +
 				StringUtils.getRemoteHost((SocketChannel) channel));
 		}
-		//if (count > 0)
+		if (count < 0) setEof(true);
 		if (msg.position() > 0)
 		{
 			msg.flip();
 			return msg;
 		}
-		if (count < 0)
-		{
-			setEof(true);
-		}
+		msg.clear();
+		releaseBuffer(msg);
 		return null;
 	}
 
@@ -233,9 +240,9 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 			count = channel.write(msg);
 		}
 		while ((count > 0) && msg.hasRemaining());
-		if (DEBUG_ENABLED)
+		if (debugEnabled)
 		{
-			LOG.debug("[" + getShortClassName() + "] " + "written " + count + " bytes to " +
+			log.debug("[" + getShortClassName() + "] " + "written " + count + " bytes to " +
 				StringUtils.getRemoteHost((SocketChannel) channel));
 		}
 		return !msg.hasRemaining();
