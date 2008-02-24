@@ -245,7 +245,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * Add a message to the list of pending messages.
 	 * @param message the message to add to the list.
 	 */
-	public void addPendingMessage(ByteBuffer message)
+	public synchronized void addPendingMessage(ByteBuffer message)
 	{
 		pendingMessages.add(message);
 	}
@@ -254,7 +254,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * Retrieve, and remove from the list, the next pending message.
 	 * @return the next message, or null if there is no message.
 	 */
-	public ByteBuffer nextPendingMessage()
+	public synchronized ByteBuffer nextPendingMessage()
 	{
 		return pendingMessages.poll();
 	}
@@ -263,7 +263,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * Determine if this context has any pending message waiting to be sent.
 	 * @return true if there is at least one pending message, false otherwise.
 	 */
-	public boolean hasPendingMessage()
+	public synchronized boolean hasPendingMessage()
 	{
 		return pendingMessages.peek() != null;
 	}
