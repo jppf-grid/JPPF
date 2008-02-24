@@ -44,7 +44,8 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	/**
 	 * Maximum number of bytes that can be written or read in one shot.
 	 */
-	private static final int MAX_BUFFER_SIZE = 128 * 1024;
+	private static final int MAX_BUFFER_SIZE =
+		1024 * JPPFConfiguration.getProperties().getInt("io.buffer.size", 128);
 	/**
 	 * The request currently processed.
 	 */

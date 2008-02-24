@@ -57,7 +57,6 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 	{
 		this.key = key;
 		this.factory = factory;
-		this.ctx = (NioContext<S>) key.attachment();
 	}
 
 	/**
@@ -68,6 +67,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 	{
 		try
 		{
+			this.ctx = (NioContext<S>) key.attachment();
 			NioState<T> state = factory.getState(ctx.getState());
 			NioTransition<S> transition = factory.getTransition(state.performTransition(key));
 			ctx.setState(transition.getState());
