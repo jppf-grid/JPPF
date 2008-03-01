@@ -59,27 +59,21 @@ public class SendingState extends MultiplexerServerState
 	public MultiplexerTransition performTransition(SelectionKey key) throws Exception
 	{
 		SelectableChannel channel = key.channel();
-		if (key.isReadable())
-		{
-			//throw new ConnectException("multiplexer " + getRemoteHost(channel) + " has been disconnected");
-		}
 		MultiplexerContext context = (MultiplexerContext) key.attachment();
 		if (context.hasPendingMessage() && (context.getCurrentMessage() == null))
 		{
 			ByteBufferWrapper message = context.nextPendingMessage();
 			context.setCurrentMessage(message.buffer);
-			if (debugEnabled) log.debug(getRemoteHost(channel) + " about to send message #" + message.order);
+			if (debugEnabled) log.debug(getRemoteHost(channel) + " about to send message #" + message.order +
+				": " + (message.buffer.position()+1) + " bytes");
 		}
-		if (context.getCurrentMessage() != null)
+		if (context.getCurrentMessage() == null) return TO_SENDING_OR_RECEIVING;
+		if (context.writeMultiplexerMessage((WritableByteChannel) channel))
 		{
-			if (context.writeMultiplexerMessage((WritableByteChannel) channel))
-			{
-				if (debugEnabled) log.debug(getRemoteHost(channel) + " message sent");
-				context.setCurrentMessage(null);
-				return context.hasPendingMessage() ? TO_SENDING : TO_SENDING_OR_RECEIVING;
-			}
-			return TO_SENDING;
+			if (debugEnabled) log.debug(getRemoteHost(channel) + " message sent");
+			context.setCurrentMessage(null);
+			return context.hasPendingMessage() ? TO_SENDING : TO_SENDING_OR_RECEIVING;
 		}
-		return TO_SENDING_OR_RECEIVING;
+		return TO_SENDING;
 	}
 }

@@ -42,11 +42,6 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Maximum number of bytes that can be written or read in one shot.
-	 */
-	private static final int MAX_BUFFER_SIZE =
-		1024 * JPPFConfiguration.getProperties().getInt("io.buffer.size", 128);
-	/**
 	 * The request currently processed.
 	 */
 	private SelectionKey linkedKey = null;
@@ -70,10 +65,6 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * Determines whether end of stream was reached during the last read operation.
 	 */
 	public boolean eof = false;
-	/**
-	 * Pool of IO buffers to pick from.
-	 */
-	private static LinkedList<ByteBuffer> bufferPool = new LinkedList<ByteBuffer>();
 	/**
 	 * Contains the data currently being read.
 	 */
@@ -205,7 +196,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public ByteBuffer readMultiplexerMessage(ReadableByteChannel channel) throws Exception
 	{
-		ByteBuffer msg = pickBuffer();
+		ByteBuffer msg = BufferPool.pickBuffer();
 		int count = 0;
 		int n = 0;
 		do
@@ -225,8 +216,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 			msg.flip();
 			return msg;
 		}
-		msg.clear();
-		releaseBuffer(msg);
+		BufferPool.releaseBuffer(msg);
 		return null;
 	}
 
@@ -295,11 +285,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public synchronized void setCurrentMessage(ByteBuffer message)
 	{
-		if ((message == null) && (currentMessage != null))
-		{
-			currentMessage.clear();
-			releaseBuffer(currentMessage);
-		}
+		if ((message == null) && (currentMessage != null)) BufferPool.releaseBuffer(currentMessage);
 		currentMessage = message;
 	}
 
@@ -319,29 +305,6 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	public void setEof(boolean eof)
 	{
 		this.eof = eof;
-	}
-
-	/**
-	 * Get a buffer from the pool.
-	 * @return a <code>ByteBuffer</code> instance.
-	 */
-	public static synchronized ByteBuffer pickBuffer()
-	{
-		if (bufferPool.isEmpty())
-		{
-			return ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
-			//return ByteBuffer.allocateDirect(MAX_BUFFER_SIZE);
-		}
-		return bufferPool.remove();
-	}
-
-	/**
-	 * Release a buffer into the pool.
-	 * @param buffer the buffer to release.
-	 */
-	public static synchronized void releaseBuffer(ByteBuffer buffer)
-	{
-		bufferPool.add(buffer);
 	}
 
 	/**
