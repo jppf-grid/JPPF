@@ -18,6 +18,8 @@
 
 package org.jppf.server.nio;
 
+import static org.jppf.utils.StringUtils.getRemoteHost;
+
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
@@ -35,6 +37,10 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(StateTransitionTask.class);
+	/**
+	 * Determines whether DEBUG logging level is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The selection key corresponding to the channel whose state is changing.
 	 */
@@ -68,6 +74,13 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 		try
 		{
 			this.ctx = (NioContext<S>) key.attachment();
+			if (debugEnabled)
+			{
+				synchronized(factory)
+				{
+					log.debug(getRemoteHost(key.channel()) + " transition from " + ctx.getState());
+				}
+			}
 			NioState<T> state = factory.getState(ctx.getState());
 			NioTransition<S> transition = factory.getTransition(state.performTransition(key));
 			ctx.setState(transition.getState());
