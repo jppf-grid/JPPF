@@ -70,7 +70,7 @@ public class ReceivingState extends MultiplexerServerState
 			if (debugEnabled) log.debug("read message for " + getRemoteHost(channel) + " done");
 			SelectionKey linkedKey = context.getLinkedKey();
 			MultiplexerContext linkedContext = (MultiplexerContext) linkedKey.attachment();
-			linkedContext.addPendingMessage(message);
+			linkedContext.addPendingMessage(new ByteBufferWrapper(message, context.newReadMessageCount()));
 			if (!MultiplexerTransition.TO_SENDING.equals(linkedContext.getState()))
 				server.transitionChannel(linkedKey, MultiplexerTransition.TO_SENDING);
 			if (!context.isEof()) return TO_SENDING_OR_RECEIVING;

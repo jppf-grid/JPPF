@@ -61,7 +61,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	/**
 	 * A list of messages waiting to be sent.
 	 */
-	private Queue<ByteBuffer> pendingMessages = new ConcurrentLinkedQueue<ByteBuffer>();
+	private Queue<ByteBufferWrapper> pendingMessages = new ConcurrentLinkedQueue<ByteBufferWrapper>();
 	/**
 	 * The message currently being sent.
 	 */
@@ -78,6 +78,10 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * Contains the data currently being read.
 	 */
 	private JPPFByteArrayOutputStream currentData = null;
+	/**
+	 * 
+	 */
+	private int readMessageCount = 0; 
 
 	/**
 	 * Handle the cleanup when an exception occurs on the channel.
@@ -253,7 +257,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * Add a message to the list of pending messages.
 	 * @param message the message to add to the list.
 	 */
-	public synchronized void addPendingMessage(ByteBuffer message)
+	public synchronized void addPendingMessage(ByteBufferWrapper message)
 	{
 		pendingMessages.add(message);
 	}
@@ -262,7 +266,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * Retrieve, and remove from the list, the next pending message.
 	 * @return the next message, or null if there is no message.
 	 */
-	public synchronized ByteBuffer nextPendingMessage()
+	public synchronized ByteBufferWrapper nextPendingMessage()
 	{
 		return pendingMessages.poll();
 	}
@@ -338,5 +342,14 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	public static synchronized void releaseBuffer(ByteBuffer buffer)
 	{
 		bufferPool.add(buffer);
+	}
+
+	/**
+	 * Generate a new read meessage count value.
+	 * @return the read message count incremented by one.
+	 */
+	public synchronized int newReadMessageCount()
+	{
+		return ++readMessageCount;
 	}
 }

@@ -66,7 +66,9 @@ public class SendingState extends MultiplexerServerState
 		MultiplexerContext context = (MultiplexerContext) key.attachment();
 		if (context.hasPendingMessage() && (context.getCurrentMessage() == null))
 		{
-			context.setCurrentMessage(context.nextPendingMessage());
+			ByteBufferWrapper message = context.nextPendingMessage();
+			context.setCurrentMessage(message.buffer);
+			if (debugEnabled) log.debug(getRemoteHost(channel) + " about to send message #" + message.order);
 		}
 		if (context.getCurrentMessage() != null)
 		{
