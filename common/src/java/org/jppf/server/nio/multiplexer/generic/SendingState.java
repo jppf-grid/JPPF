@@ -65,7 +65,7 @@ public class SendingState extends MultiplexerServerState
 			ByteBufferWrapper message = context.nextPendingMessage();
 			context.setCurrentMessage(message.buffer);
 			if (debugEnabled) log.debug(getRemoteHost(channel) + " about to send message #" + message.order +
-				": " + (message.buffer.position()+1) + " bytes");
+				": " + (message.buffer.limit()+1) + " bytes");
 		}
 		if (context.getCurrentMessage() == null) return TO_SENDING_OR_RECEIVING;
 		if (context.writeMultiplexerMessage((WritableByteChannel) channel))
