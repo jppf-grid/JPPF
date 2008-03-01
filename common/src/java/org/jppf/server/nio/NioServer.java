@@ -92,6 +92,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * performed sequentially or through the executor thread pool.
 	 */
 	protected boolean sequential = false;
+	/**
+	 * Determines whether the selector is currently performing a selection operation. 
+	 */
+	private Boolean selecting = Boolean.FALSE; 
 
 	/**
 	 * Initialize this server with a specified port number and name.
@@ -207,7 +211,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 					lock.unlock();
 				}
 				int n = 0;
+				setSelecting(true);
 				n =  hasTimeout ? selector.select(selectTimeout) : selector.select();
+				setSelecting(false);
 				if (n > 0) go(selector.selectedKeys());
 				postSelect();
 			}
@@ -440,7 +446,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 		lock.lock();
 		try
 		{
-			selector.wakeup();
+			if (isSelecting()) selector.wakeup();
 			key.interestOps(ops);
 		}
 		finally
@@ -464,7 +470,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 			lock.lock();
 			try
 			{
-				selector.wakeup();
+				if (isSelecting()) selector.wakeup();
 				key = channel.register(selector, ops, context);
 			}
 			finally
@@ -517,5 +523,23 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	protected int threadPoolSize()
 	{
 		return THREAD_POOL_SIZE;
+	}
+
+	/**
+	 * Determine whether the selector is currently performing a selection operation. 
+	 * @return true if the selector is selecting, false otherwise.
+	 */
+	public synchronized boolean isSelecting()
+	{
+		return selecting;
+	}
+
+	/**
+	 * Specify whether the selector is currently performing a selection operation. 
+	 * @param selecting true if the selector is selecting, false otherwise.
+	 */
+	public synchronized void setSelecting(boolean selecting)
+	{
+		this.selecting = selecting;
 	}
 }
