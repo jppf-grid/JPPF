@@ -126,7 +126,7 @@ public class WaitingNodeRequestState extends ClassServerState
 							if (debugEnabled) log.debug("node " + getRemoteHost(channel) +
 								" changing key ops for provider " + getRemoteHost(provider));
 							providerContext.setState(ClassState.SENDING_PROVIDER_REQUEST);
-							server.setKeyOps(providerKey, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+							server.getTransitionManager().setKeyOps(providerKey, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
 						}
 						return TO_IDLE_NODE;
 					}

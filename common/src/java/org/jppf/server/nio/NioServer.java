@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
@@ -71,10 +70,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 */
 	protected int[] ports = null;
 	/**
-	 * The pool of threads used for submitting channel state transitions.
-	 */
-	protected ExecutorService executor = null;
-	/**
 	 * Timeout for the select() operations. A value of 0 means no timeout, i.e.
 	 * the <code>Selector.select()</code> will be invoked without parameters.
 	 */
@@ -88,14 +83,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 */
 	protected ReentrantLock lock = new ReentrantLock();
 	/**
-	 * Determines whether the submission of state transitions should be
-	 * performed sequentially or through the executor thread pool.
+	 * Performs all operations that relate to channel states.
 	 */
-	protected boolean sequential = false;
-	/**
-	 * Determines whether the selector is currently performing a selection operation. 
-	 */
-	private Boolean selecting = Boolean.FALSE; 
+	protected StateTransitionManager<S, T> transitionManager = null;
 
 	/**
 	 * Initialize this server with a specified port number and name.
@@ -110,17 +100,15 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	/**
 	 * Initialize this server with a specified port number and name.
 	 * @param name the name given to this thread.
-	 * @param sequential Determines whether the submission of state transitions should be
+	 * @param sequential determines whether the submission of state transitions should be
 	 * performed sequentially or through the executor thread pool.
 	 * @throws JPPFException if the underlying server socket can't be opened.
 	 */
 	protected NioServer(String name, boolean sequential) throws JPPFException
 	{
 		super(name);
-		this.sequential = sequential;
-		//int n = Runtime.getRuntime().availableProcessors();
-		if (!sequential) executor = Executors.newFixedThreadPool(threadPoolSize());
 		factory = createFactory();
+		transitionManager = new StateTransitionManager(this, sequential);
 	}
 
 	/**
@@ -210,10 +198,12 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 				{
 					lock.unlock();
 				}
-				int n = 0;
-				setSelecting(true);
-				n =  hasTimeout ? selector.select(selectTimeout) : selector.select();
-				setSelecting(false);
+				/*
+				transitionManager.performChannelRegistrations();
+				transitionManager.performKeyOpsSettings();
+				*/
+				int n = selector.selectNow();
+				if (n <= 0) n = hasTimeout ? selector.select(selectTimeout) : selector.select();
 				if (n > 0) go(selector.selectedKeys());
 				postSelect();
 			}
@@ -252,7 +242,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 			try
 			{
 				if (key.isAcceptable()) doAccept(key);
-				else submitTransition(key);
+				else transitionManager.submitTransition(key);
 			}
 			catch (Exception e)
 			{
@@ -278,18 +268,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 */
 	protected void postSelect()
 	{
-	}
-
-	/**
-	 * Submit the next state transition for a specified channel.
-	 * @param key the selection key that references the channel.
-	 */
-	protected void submitTransition(SelectionKey key)
-	{
-		setKeyOps(key, 0);
-		StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, factory);
-		if (sequential) transition.run();
-		else executor.submit(transition);
 	}
 
 	/**
@@ -331,8 +309,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 		NioContext context = createNioContext();
 		try
 		{
-			SelectionKey selKey = channel.register(selector,	SelectionKey.OP_READ | SelectionKey.OP_WRITE, context);
-			selKey.interestOps(getInitialInterest());
+			SelectionKey selKey = channel.register(selector,	getInitialInterest(), context);
 			postAccept(selKey, serverSocketChannel);
 		}
 		catch (ClosedChannelException e)
@@ -436,69 +413,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	}
 
 	/**
-	 * Set the interest ops of a specified selection key, ensuring no blocking occurs while doing so.
-	 * This method is proposed as a convenience, to encapsulate the inner locking mechanism. 
-	 * @param key the key on which to set the interest operations.
-	 * @param ops the operations to set on the key.
-	 */
-	public void setKeyOps(SelectionKey key, int ops)
-	{
-		lock.lock();
-		try
-		{
-			if (isSelecting()) selector.wakeup();
-			key.interestOps(ops);
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
-
-	/**
-	 * Register a channel not opened through this server.
-	 * @param channel the channel to register.
-	 * @param ops the operations the channel is initially interested in.
-	 * @param context the context attached to the channel.
-	 * @return a <code>SelectionKey</code> instance.
-	 */
-	public SelectionKey registerChannel(SocketChannel channel, int ops, NioContext context)
-	{
-		SelectionKey key = null;
-		try
-		{
-			lock.lock();
-			try
-			{
-				if (isSelecting()) selector.wakeup();
-				key = channel.register(selector, ops, context);
-			}
-			finally
-			{
-				lock.unlock();
-			}
-		}
-		catch (ClosedChannelException e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		return key;
-	}
-
-	/**
-	 * Transition the specified channel to the specified state.
-	 * @param key the key holding the channel and associated context. 
-	 * @param transition holds the new state of the channel and associated key ops.
-	 */
-	public void transitionChannel(SelectionKey key, T transition)
-	{
-		NioContext<S> context = (NioContext<S>) key.attachment();
-		NioTransition<S> t = factory.getTransition(transition);
-		context.setState(t.getState());
-		setKeyOps(key, t.getInterestOps());
-	}
-
-	/**
 	 * Set this server in the specified stopped state.
 	 * @param stopped true if this server is stopped, false otherwise.
 	 */
@@ -517,29 +431,11 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	}
 
 	/**
-	 * Get the size of the state transition's thread pool.
-	 * @return the value of the constant {@link #THREAD_POOL_SIZE THREAD_POOL_SIZE}.
+	 * Get the manager that performs all operations that relate to channel states.
+	 * @return a <code>StateTransitionManager</code> instance.
 	 */
-	protected int threadPoolSize()
+	public synchronized StateTransitionManager<S, T> getTransitionManager()
 	{
-		return THREAD_POOL_SIZE;
-	}
-
-	/**
-	 * Determine whether the selector is currently performing a selection operation. 
-	 * @return true if the selector is selecting, false otherwise.
-	 */
-	public synchronized boolean isSelecting()
-	{
-		return selecting;
-	}
-
-	/**
-	 * Specify whether the selector is currently performing a selection operation. 
-	 * @param selecting true if the selector is selecting, false otherwise.
-	 */
-	public synchronized void setSelecting(boolean selecting)
-	{
-		this.selecting = selecting;
+		return transitionManager;
 	}
 }

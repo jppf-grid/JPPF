@@ -42,7 +42,6 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
 	 * A short name for wirte channel operations.
 	 */
 	public static final int W = SelectionKey.OP_WRITE;
-
 	/**
 	 * Map of all states for a class server.
 	 */

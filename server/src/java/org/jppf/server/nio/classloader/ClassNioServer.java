@@ -70,7 +70,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 	public ClassNioServer(final int[] ports) throws JPPFException
 	{
 		super(ports, "ClassServer Thread", false);
-		selectTimeout = 1L;
+		//selectTimeout = 1L;
 	}
 
 	/**

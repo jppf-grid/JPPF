@@ -73,7 +73,6 @@ public class PeerResourceProvider extends AbstractSocketChannelHandler
 			// get a response containing the uuid of the contacted peer
 			resource = (JPPFResourceWrapper) socketClient.receive();
 			if (debugEnabled) log.debug("received node initiation response");
-			Selector selector = server.getSelector();
 
 			SocketChannel channel = socketClient.getChannel();
 			socketClient.setChannel(null);
@@ -81,16 +80,9 @@ public class PeerResourceProvider extends AbstractSocketChannelHandler
 			context.setState(ClassState.SENDING_PROVIDER_REQUEST);
 			context.setPendingRequests(new Vector<SelectionKey>());
 			context.setUuid(resource.getProviderUuid());
-			try
-			{
-				channel.register(selector, 0, context);
-				((ClassNioServer) server).addProviderConnection(resource.getProviderUuid(), channel);
-				if (debugEnabled) log.debug("registered class server channel");
-			}
-			catch (ClosedChannelException ignored)
-			{
-				log.error(ignored.getMessage(), ignored);
-			}
+			server.getTransitionManager().registerChannel(channel, 0, context);
+			((ClassNioServer) server).addProviderConnection(resource.getProviderUuid(), channel);
+			if (debugEnabled) log.debug("registered class server channel");
 		}
 		catch (IOException e)
 		{

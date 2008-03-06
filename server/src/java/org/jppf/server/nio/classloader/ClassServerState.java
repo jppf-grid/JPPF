@@ -68,6 +68,6 @@ public abstract class ClassServerState extends NioState<ClassTransition>
 		requestContext.getResource().setDefinition(null);
 		requestContext.serializeResource();
 		requestContext.setState(SENDING_NODE_RESPONSE);
-		server.setKeyOps(request, SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+		server.getTransitionManager().setKeyOps(request, SelectionKey.OP_WRITE|SelectionKey.OP_READ);
 	}
 }

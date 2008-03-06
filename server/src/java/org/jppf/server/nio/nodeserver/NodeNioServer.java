@@ -41,11 +41,11 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	/**
 	 * Logger for this class.
 	 */
-	protected static final Log LOG = LogFactory.getLog(NodeNioServer.class);
+	private static Log log = LogFactory.getLog(NodeNioServer.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
-	protected static final boolean DEBUG_ENABLED = LOG.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The algorithm that dynamically computes the task bundle size.
 	 */
@@ -139,12 +139,11 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 		{
 			context.setBundle(getInitialBundle());
 			//context.setBundler(bundler.copy());
-			context.setState(NodeState.SEND_INITIAL_BUNDLE);
-			key.interestOps(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+			transitionManager.transitionChannel(key, NodeTransition.TO_SEND_INITIAL);
 		}
 		catch (Exception e)
 		{
-			LOG.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			closeNode(channel);
 		}
 	}
@@ -163,7 +162,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 			synchronized(idleChannels)
 			{
 				if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
-				if (DEBUG_ENABLED) LOG.debug(""+idleChannels.size()+" channels idle");
+				if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
 				while (!getQueue().isEmpty() && !idleChannels.isEmpty())
 				{
 					try
@@ -172,8 +171,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 						int n = random.nextInt(idleChannels.size());
 						SelectableChannel channel = idleChannels.remove(n);
 						SelectionKey key = channel.keyFor(selector);
-						selector.wakeup();
-						key.interestOps(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+						transitionManager.transitionChannel(key, NodeTransition.TO_SENDING);
 					}
 					finally
 					{
@@ -195,7 +193,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	protected void postSelect()
 	{
 		if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
-		executor.submit(r);
+		transitionManager.submit(r);
 	}
 
 	/**
@@ -261,7 +259,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 			}
 			catch(Exception e)
 			{
-				LOG.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 		return initialBundle;
@@ -281,7 +279,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 		}
 		catch (IOException ignored)
 		{
-			LOG.error(ignored.getMessage(), ignored);
+			log.error(ignored.getMessage(), ignored);
 		}
 	}
 

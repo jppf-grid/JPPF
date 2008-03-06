@@ -197,24 +197,32 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	public ByteBuffer readMultiplexerMessage(ReadableByteChannel channel) throws Exception
 	{
 		ByteBuffer msg = BufferPool.pickBuffer();
-		int count = 0;
-		int n = 0;
-		do
+		try
 		{
-			count = channel.read(msg);
-			n += count;
+			int count = 0;
+			int n = 0;
+			do
+			{
+				count = channel.read(msg);
+				n += count;
+			}
+			while ((count > 0) && msg.hasRemaining());
+			if (debugEnabled)
+			{
+				log.debug("[" + getShortClassName() + "] " + "read " + n + " bytes from " +
+					StringUtils.getRemoteHost((SocketChannel) channel));
+			}
+			if (count < 0) setEof(true);
+			if (msg.position() > 0)
+			{
+				msg.flip();
+				return msg;
+			}
 		}
-		while ((count > 0) && msg.hasRemaining());
-		if (debugEnabled)
+		catch(Exception e)
 		{
-			log.debug("[" + getShortClassName() + "] " + "read " + n + " bytes from " +
-				StringUtils.getRemoteHost((SocketChannel) channel));
-		}
-		if (count < 0) setEof(true);
-		if (msg.position() > 0)
-		{
-			msg.flip();
-			return msg;
+			BufferPool.releaseBuffer(msg);
+			throw e;
 		}
 		BufferPool.releaseBuffer(msg);
 		return null;
@@ -229,18 +237,26 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	public boolean writeMultiplexerMessage(WritableByteChannel channel) throws Exception
 	{
 		ByteBuffer msg = getCurrentMessage();
-		int count = 0;
-		do
+		try
 		{
-			count = channel.write(msg);
+			int count = 0;
+			do
+			{
+				count = channel.write(msg);
+			}
+			while ((count > 0) && msg.hasRemaining());
+			if (debugEnabled)
+			{
+				log.debug("[" + getShortClassName() + "] " + "written " + count + " bytes to " +
+					StringUtils.getRemoteHost((SocketChannel) channel));
+			}
+			return !msg.hasRemaining();
 		}
-		while ((count > 0) && msg.hasRemaining());
-		if (debugEnabled)
+		catch(Exception e)
 		{
-			log.debug("[" + getShortClassName() + "] " + "written " + count + " bytes to " +
-				StringUtils.getRemoteHost((SocketChannel) channel));
+			BufferPool.releaseBuffer(msg);
+			throw e;
 		}
-		return !msg.hasRemaining();
 	}
 
 	/**

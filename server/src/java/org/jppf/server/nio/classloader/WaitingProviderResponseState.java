@@ -102,7 +102,7 @@ public class WaitingProviderResponseState extends ClassServerState
 			destinationContext.setResource(resource);
 			destinationContext.serializeResource();
 			destinationContext.setState(SENDING_NODE_RESPONSE);
-			server.setKeyOps(destinationKey, SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+			server.getTransitionManager().setKeyOps(destinationKey, SelectionKey.OP_WRITE|SelectionKey.OP_READ);
 			context.setMessage(null);
 			context.setCurrentRequest(null);
 			return TO_SENDING_PROVIDER_REQUEST;

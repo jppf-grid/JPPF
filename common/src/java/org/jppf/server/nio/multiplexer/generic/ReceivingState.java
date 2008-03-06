@@ -72,7 +72,7 @@ public class ReceivingState extends MultiplexerServerState
 			MultiplexerContext linkedContext = (MultiplexerContext) linkedKey.attachment();
 			linkedContext.addPendingMessage(new ByteBufferWrapper(message, context.newReadMessageCount()));
 			if (!MultiplexerState.SENDING.equals(linkedContext.getState()))
-				server.transitionChannel(linkedKey, MultiplexerTransition.TO_SENDING);
+				server.getTransitionManager().transitionChannel(linkedKey, MultiplexerTransition.TO_SENDING);
 			if (!context.isEof()) return TO_SENDING_OR_RECEIVING;
 		}
 		if (context.isEof())

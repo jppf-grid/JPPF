@@ -84,7 +84,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 			NioState<T> state = factory.getState(ctx.getState());
 			NioTransition<S> transition = factory.getTransition(state.performTransition(key));
 			ctx.setState(transition.getState());
-			factory.getServer().setKeyOps(key, transition.getInterestOps());
+			factory.getServer().getTransitionManager().setKeyOps(key, transition.getInterestOps());
 		}
 		catch(Exception e)
 		{
