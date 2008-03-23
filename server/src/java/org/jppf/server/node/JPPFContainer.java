@@ -82,7 +82,16 @@ public class JPPFContainer
 	 */
 	public int deserializeObject(byte[] data, int offset, boolean compressed, List<Object> list, int count) throws Exception
 	{
-		return helper.fromBytes(data, offset, compressed, list, count);
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		try
+		{
+			Thread.currentThread().setContextClassLoader(classLoader);
+			return helper.fromBytes(data, offset, compressed, list, count);
+		}
+		finally
+		{
+			Thread.currentThread().setContextClassLoader(cl);
+		}
 	}
 
 	/**

@@ -18,8 +18,6 @@
 
 package org.jppf.jca.work;
 
-import java.io.IOException;
-
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.*;
 
@@ -72,7 +70,7 @@ public class JcaSocketInitializer extends AbstractSocketInitializer
 				socketWrapper.open();
 				successfull = true;
 			}
-			catch (IOException e)
+			catch (Exception e)
 			{
 				attemptCount++;
 				if (attemptCount < maxAttempts)

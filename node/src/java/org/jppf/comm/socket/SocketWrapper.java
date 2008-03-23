@@ -17,8 +17,8 @@
  */
 package org.jppf.comm.socket;
 
-import java.io.IOException;
-import java.net.*;
+import java.net.Socket;
+
 import org.jppf.utils.*;
 
 /**
@@ -36,58 +36,54 @@ public interface SocketWrapper
 	/**
 	 * Send an object over a TCP socket connection.
 	 * @param o the object to send.
-	 * @throws IOException if the underlying output stream throws an exception.
+	 * @throws Exception if the underlying output stream throws an exception.
 	 */
-	void send(Object o) throws IOException;
+	void send(Object o) throws Exception;
 
 	/**
 	 * Send an array of bytes over a TCP socket connection.
 	 * @param buf the buffer container for the data to send.
-	 * @throws IOException if the underlying output stream throws an exception.
+	 * @throws Exception if the underlying output stream throws an exception.
 	 */
-	void sendBytes(JPPFBuffer buf) throws IOException;
+	void sendBytes(JPPFBuffer buf) throws Exception;
 
 	/**
 	 * Read an object from a TCP socket connection.
 	 * This method blocks until an object is received.
 	 * @return the object that was read from the underlying input stream.
-	 * @throws ClassNotFoundException if the socket connection is closed.
-	 * @throws IOException if the underlying input stream throws an exception.
+	 * @throws Exception if the underlying input stream throws an exception.
 	 */
-	Object receive() throws ClassNotFoundException, IOException;
+	Object receive() throws Exception;
 
 	/**
 	 * Read an object from a TCP socket connection.
 	 * This method blocks until an object is received or the specified timeout has expired, whichever happens first.
 	 * @param timeout timeout after which the operation is aborted. A timeout of zero is interpreted as an infinite timeout.
 	 * @return the object that was read from the underlying input stream or null if the operation timed out.
-	 * @throws ClassNotFoundException if the socket connection is closed.
-	 * @throws IOException if the underlying input stream throws an exception.
+	 * @throws Exception if the underlying input stream throws an exception.
 	 */
-	Object receive(int timeout) throws ClassNotFoundException, IOException;
+	Object receive(int timeout) throws Exception;
 
 	/**
 	 * Read an object from a TCP socket connection.
 	 * This method blocks until an object is received or the specified timeout has expired, whichever happens first.
 	 * @param timeout timeout after which the operation is aborted. A timeout of zero is interpreted as an infinite timeout.
 	 * @return an array of bytes containing the serialized object to receive.
-	 * @throws IOException if the underlying input stream throws an exception.
+	 * @throws Exception if the underlying input stream throws an exception.
 	 */
-	JPPFBuffer receiveBytes(int timeout) throws IOException;
+	JPPFBuffer receiveBytes(int timeout) throws Exception;
 
 	/**
 	 * Open the underlying socket connection.
-	 * @throws ConnectException if the socket fails to connect.
-	 * @throws IOException if the underlying input and output streams raise an error.
+	 * @throws Exception if the underlying input and output streams raise an error.
 	 */
-	void open() throws ConnectException, IOException;
+	void open() throws Exception;
 
 	/**
 	 * Close the underlying socket connection.
-	 * @throws ConnectException if the socket connection is not opened.
-	 * @throws IOException if the underlying input and output streams raise an error.
+	 * @throws Exception if the underlying input and output streams raise an error.
 	 */
-	void close() throws ConnectException, IOException;
+	void close() throws Exception;
 
 	/**
 	 * Determine whether this socket client is opened or not.

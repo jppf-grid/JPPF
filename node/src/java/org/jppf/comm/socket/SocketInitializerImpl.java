@@ -17,7 +17,6 @@
  */
 package org.jppf.comm.socket;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.locks.*;
 
@@ -84,7 +83,7 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
 				if (debugEnabled) log.debug(name + "about to close socket wrapper");
 				socketWrapper.close();
 			}
-			catch(IOException e)
+			catch(Exception e)
 			{
 			}
 			// random delay between 0 and 1 second , to avoid overloading the server with simultaneous connection requests.

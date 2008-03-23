@@ -87,10 +87,10 @@ public class SocketChannelClient implements SocketWrapper
 	/**
 	 * Send an object over a TCP socket connection.
 	 * @param o the object to send.
-	 * @throws IOException if the underlying output stream throws an exception.
+	 * @throws Exception if the underlying output stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#send(java.lang.Object)
 	 */
-	public void send(Object o) throws IOException
+	public void send(Object o) throws Exception
 	{
 		JPPFBuffer buf = getSerializer().serialize(o);
 		sendBytes(buf);
@@ -119,11 +119,10 @@ public class SocketChannelClient implements SocketWrapper
 	 * Read an object from a TCP socket connection.
 	 * This method blocks until an object is received.
 	 * @return the object that was read from the underlying input stream.
-	 * @throws ClassNotFoundException if the socket connection is closed.
-	 * @throws IOException if the underlying input stream throws an exception.
+	 * @throws Exception if the underlying input stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#receive()
 	 */
-	public Object receive() throws ClassNotFoundException, IOException
+	public Object receive() throws Exception
 	{
 		return receive(0);
 	}
@@ -133,11 +132,10 @@ public class SocketChannelClient implements SocketWrapper
 	 * This method blocks until an object is received or the specified timeout has expired, whichever happens first.
 	 * @param timeout timeout after which the operation is aborted. A timeout of zero is interpreted as an infinite timeout.
 	 * @return the object that was read from the underlying input stream or null if the operation timed out.
-	 * @throws ClassNotFoundException if the socket connection is closed.
-	 * @throws IOException if the underlying input stream throws an exception.
+	 * @throws Exception if the underlying input stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#receive(int)
 	 */
-	public Object receive(int timeout) throws ClassNotFoundException, IOException
+	public Object receive(int timeout) throws Exception
 	{
 		Object o = null;
 		try

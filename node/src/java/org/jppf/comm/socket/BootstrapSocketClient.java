@@ -19,8 +19,10 @@ package org.jppf.comm.socket;
 
 import java.io.*;
 import java.net.*;
+
 import org.jppf.JPPFException;
-import org.jppf.utils.*;
+import org.jppf.serialization.JPPFObjectStreamFactory;
+import org.jppf.utils.JPPFBuffer;
 
 /**
  * This class provides a simple API to transfer objects over a TCP socket connection.
@@ -69,9 +71,9 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 	/**
 	 * Send an object over a TCP socket connection.
 	 * @param o the object to send.
-	 * @throws IOException if the underlying output stream throws an exception.
+	 * @throws Exception if the underlying output stream throws an exception.
 	 */
-	public void send(Object o) throws IOException
+	public void send(Object o) throws Exception
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream()
 		{
@@ -80,14 +82,14 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 				return buf;
 			}
 		};
-		ObjectOutputStream oos = new ObjectOutputStream(baos);
+		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(baos);
 		oos.writeObject(o);
 		oos.flush();
+		oos.close();
 		// Remove references kept by the stream, otherwise leads to OutOfMemory.
 		JPPFBuffer buffer = new JPPFBuffer();
 		buffer.setBuffer(baos.toByteArray());
 		buffer.setLength(baos.size());
-		oos.close();
 		sendBytes(buffer);
 	}
 
@@ -96,10 +98,9 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 	 * This method blocks until an object is received or the specified timeout has expired, whichever happens first.
 	 * @param timeout timeout after which the operation is aborted. A timeout of zero is interpreted as an infinite timeout.
 	 * @return the object that was read from the underlying input stream or null if the operation timed out.
-	 * @throws ClassNotFoundException if the socket connection is closed.
-	 * @throws IOException if the underlying input stream throws an exception.
+	 * @throws Exception if the underlying input stream throws an exception.
 	 */
-	public Object receive(int timeout) throws ClassNotFoundException, IOException
+	public Object receive(int timeout) throws Exception
 	{
 		checkOpened();
 		Object o = null;
@@ -108,7 +109,7 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 			if (timeout >= 0) socket.setSoTimeout(timeout);
 			JPPFBuffer buf = receiveBytes(timeout);
 			ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
-			ObjectInputStream ois = new ObjectInputStream(bais);
+			ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(bais);
 			o = ois.readObject();
 			ois.close();
 		}

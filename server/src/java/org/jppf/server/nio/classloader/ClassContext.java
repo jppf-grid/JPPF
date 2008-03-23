@@ -21,9 +21,10 @@ package org.jppf.server.nio.classloader;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
-import java.util.*;
+import java.util.List;
 
 import org.jppf.node.JPPFResourceWrapper;
+import org.jppf.serialization.JPPFObjectStreamFactory;
 import org.jppf.server.nio.*;
 import org.jppf.utils.JPPFByteArrayOutputStream;
 
@@ -54,7 +55,7 @@ public class ClassContext extends NioContext<ClassState>
 	public JPPFResourceWrapper deserializeResource() throws Exception
 	{
 		ByteArrayInputStream bais = new ByteArrayInputStream(message.buffer.array());
-		ObjectInputStream ois = new ObjectInputStream(bais);
+		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(bais);
 		resource = (JPPFResourceWrapper) ois.readObject();
 		ois.close();
 		return resource;
@@ -67,7 +68,7 @@ public class ClassContext extends NioContext<ClassState>
 	public void serializeResource() throws Exception
 	{
 		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(baos);
+		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(baos);
 		try
 		{
 			oos.writeObject(resource);

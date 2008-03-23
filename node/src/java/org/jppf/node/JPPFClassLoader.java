@@ -150,6 +150,10 @@ public class JPPFClassLoader extends ClassLoader
 			{
 				throw new RuntimeException(e);
 			}
+			catch (Exception e)
+			{
+				throw new RuntimeException(e);
+			}
 			System.out.println("JPPFClassLoader.init(): Reconnected to the class server");
 		}
 		finally
@@ -264,6 +268,20 @@ public class JPPFClassLoader extends ClassLoader
 			catch(IOException ex)
 			{
 			}
+			catch(ClassNotFoundException ex)
+			{
+				throw ex;
+			}
+			catch(Exception ex)
+			{
+			}
+		}
+		catch(ClassNotFoundException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
 		}
 		return b;
 	}
@@ -273,10 +291,9 @@ public class JPPFClassLoader extends ClassLoader
 	 * @param name the binary name of the class to load, such as specified in the JLS.
 	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
 	 * @return an array of bye containing the class' byte code.
-	 * @throws ClassNotFoundException if the class could not be loaded from the remote server.
-	 * @throws IOException if the connection was lost and could not be reestablished.
+	 * @throws Exception if the connection was lost and could not be reestablished.
 	 */
-	private byte[] loadResourceData0(String name, boolean asResource) throws ClassNotFoundException, IOException
+	private byte[] loadResourceData0(String name, boolean asResource) throws Exception
 	{
 		byte[] b = null;
 		try

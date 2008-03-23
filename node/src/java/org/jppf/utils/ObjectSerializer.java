@@ -17,7 +17,6 @@
  */
 package org.jppf.utils;
 
-import java.io.IOException;
 
 /**
  * Instances of this class are used to serialize or deserialize objects to or from an array of bytes.<br>
@@ -31,27 +30,25 @@ public interface ObjectSerializer
 	 * Serialize an object into an array of bytes.
 	 * @param o the object to Serialize.
 	 * @return a <code>JPPFBuffer</code> instance holding the serialized object.
-	 * @throws IOException if the object can't be serialized.
+	 * @throws Exception if the object can't be serialized.
 	 */
-	JPPFBuffer serialize(Object o) throws IOException;
+	JPPFBuffer serialize(Object o) throws Exception;
 
 	/**
 	 * Read an object from an array of bytes.
 	 * @param buf buffer holding the array of bytes to deserialize from.
 	 * @return the object that was deserialized from the array of bytes.
-	 * @throws ClassNotFoundException the class of the deserialized object could not be found.
-	 * @throws IOException if the ObjectInputStream used for deserialization raises an error.
+	 * @throws Exception the class of the deserialized object could not be found.
 	 */
-	Object deserialize(JPPFBuffer buf) throws ClassNotFoundException, IOException;
+	Object deserialize(JPPFBuffer buf) throws Exception;
 
 	/**
 	 * Read an object from an array of bytes.
 	 * @param bytes buffer holding the array of bytes to deserialize from.
 	 * @return the object that was deserialized from the array of bytes.
-	 * @throws ClassNotFoundException the class of the deserialized object could not be found.
-	 * @throws IOException if the ObjectInputStream used for deserialization raises an error.
+	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
 	 */
-	Object deserialize(byte[] bytes) throws ClassNotFoundException, IOException;
+	Object deserialize(byte[] bytes) throws Exception;
 
 	/**
 	 * Read an object from an array of bytes.
@@ -59,8 +56,7 @@ public interface ObjectSerializer
 	 * @param offset position at which to start reading the bytes from.
 	 * @param length the number of bytes to read.
 	 * @return the object that was deserialized from the array of bytes.
-	 * @throws ClassNotFoundException the class of the deserialized object could not be found.
-	 * @throws IOException if the ObjectInputStream used for deserialization raises an error.
+	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
 	 */
-	Object deserialize(byte[] bytes, int offset, int length) throws ClassNotFoundException, IOException;
+	Object deserialize(byte[] bytes, int offset, int length) throws Exception;
 }

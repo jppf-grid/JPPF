@@ -126,11 +126,10 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * Read an object from a TCP socket connection.
 	 * This method blocks until an object is received.
 	 * @return the object that was read from the underlying input stream.
-	 * @throws ClassNotFoundException if the socket connection is closed.
-	 * @throws IOException if the underlying input stream throws an exception.
+	 * @throws Exception if the underlying input stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#receive()
 	 */
-	public Object receive() throws ClassNotFoundException, IOException
+	public Object receive() throws Exception
 	{
 		return receive(0);
 	}

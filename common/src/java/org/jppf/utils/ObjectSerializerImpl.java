@@ -19,6 +19,8 @@ package org.jppf.utils;
 
 import java.io.*;
 
+import org.jppf.serialization.JPPFObjectStreamFactory;
+
 /**
  * Instances of this class are used to serialize or deserialize objects to or from an array of bytes.<br>
  * A specific use of this class is that it can be loaded by a new classloader, making the execution transparent
@@ -43,13 +45,13 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * Serialize an object into an array of bytes.
 	 * @param o the object to Serialize.
 	 * @return a <code>JPPFBuffer</code> instance holding the serialized object.
-	 * @throws IOException if the object can't be serialized.
+	 * @throws Exception if the object can't be serialized.
 	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object)
 	 */
-	public JPPFBuffer serialize(Object o) throws IOException
+	public JPPFBuffer serialize(Object o) throws Exception
 	{
 		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(baos);
+		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(baos);
 		oos.writeObject(o);
 		oos.flush();
 		oos.close();
@@ -61,11 +63,10 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * Read an object from an array of bytes.
 	 * @param buf buffer holding the array of bytes to deserialize from.
 	 * @return the object that was deserialized from the array of bytes.
-	 * @throws ClassNotFoundException the class of the deserialized object could not be found.
-	 * @throws IOException if the ObjectInputStream used for deserialization raises an error.
+	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(org.jppf.utils.JPPFBuffer)
 	 */
-	public Object deserialize(JPPFBuffer buf) throws ClassNotFoundException, IOException
+	public Object deserialize(JPPFBuffer buf) throws Exception
 	{
 		return deserialize(buf.getBuffer(), 0, buf.getLength());
 	}
@@ -74,11 +75,10 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * Read an object from an array of bytes.
 	 * @param bytes buffer holding the array of bytes to deserialize from.
 	 * @return the object that was deserialized from the array of bytes.
-	 * @throws ClassNotFoundException the class of the deserialized object could not be found.
-	 * @throws IOException if the ObjectInputStream used for deserialization raises an error.
+	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(byte[])
 	 */
-	public Object deserialize(byte[] bytes) throws ClassNotFoundException, IOException
+	public Object deserialize(byte[] bytes) throws Exception
 	{
 		return deserialize(bytes, 0, bytes.length);
 	}
@@ -89,16 +89,14 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @param offset position at which to start reading the bytes from.
 	 * @param length the number of bytes to read.
 	 * @return the object that was deserialized from the array of bytes.
-	 * @throws ClassNotFoundException the class of the deserialized object could not be found.
-	 * @throws IOException if the ObjectInputStream used for deserialization raises an error.
+	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(byte[], int, int)
 	 */
-	public Object deserialize(byte[] bytes, int offset, int length)
-		throws ClassNotFoundException, IOException
+	public Object deserialize(byte[] bytes, int offset, int length) throws Exception
 	{
 		Object o = null;
 		ByteArrayInputStream bis = new ByteArrayInputStream(bytes, offset, length);
-		ObjectInputStream ois = new ObjectInputStream(bis);
+		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(bis);
 		o = ois.readObject();
 		ois.close();
 		return o;

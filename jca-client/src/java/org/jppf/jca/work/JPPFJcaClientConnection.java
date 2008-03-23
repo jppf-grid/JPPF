@@ -20,7 +20,6 @@ package org.jppf.jca.work;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
-import java.io.IOException;
 import java.util.*;
 
 import org.apache.commons.logging.*;
@@ -28,7 +27,7 @@ import org.jppf.*;
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultListener;
 import org.jppf.comm.socket.SocketInitializer;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 
 /**
@@ -160,7 +159,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 				if (socketClient != null) socketClient.close();
 				if (delegate != null) delegate.close();
 			}
-			catch(IOException e)
+			catch(Exception e)
 			{
 				log.error("[" + name + "] "+ e.getMessage(), e);
 			}
