@@ -66,7 +66,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 */
 	private boolean stopped = false;
 	/**
-	 * The port this socket server is listening to.
+	 * The ports this server is listening to.
 	 */
 	protected int[] ports = null;
 	/**
@@ -437,5 +437,14 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	public synchronized StateTransitionManager<S, T> getTransitionManager()
 	{
 		return transitionManager;
+	}
+
+	/**
+	 * Get the ports this server is listening to.
+	 * @return an array of int values.
+	 */
+	public synchronized int[] getPorts()
+	{
+		return ports;
 	}
 }
