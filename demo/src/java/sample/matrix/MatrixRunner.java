@@ -52,8 +52,7 @@ public class MatrixRunner
 	{
 		try
 		{
-			if ((args != null) && (args.length > 0)) 
-				jppfClient = new JPPFClient(args[0]);
+			if ((args != null) && (args.length > 0)) jppfClient = new JPPFClient(args[0]);
 			else jppfClient = new JPPFClient();
 			TypedProperties props = JPPFConfiguration.getProperties();
 			int size = props.getInt("matrix.size", 300);
