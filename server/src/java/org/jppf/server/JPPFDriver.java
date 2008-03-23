@@ -110,16 +110,19 @@ public class JPPFDriver
 		int[] ports = StringUtils.parsePorts(s);
 		classServer = new ClassNioServer(ports);
 		classServer.start();
+		printInitializedMessage(ports, "Class Server");
 
 		int port = 0;
 		port = props.getInt("app.server.port", 11112);
 		applicationServer = new JPPFApplicationServer(port);
 		applicationServer.start();
+		printInitializedMessage(new int[] {port}, "Client Server");
 
 		s = props.getString("node.server.port", "11113");
 		ports = StringUtils.parsePorts(s);
 		nodeNioServer = new NodeNioServer(ports, BundlerFactory.createBundler());
 		nodeNioServer.start();
+		printInitializedMessage(ports, "Tasks Server");
 
 		if (props.getBoolean("jppf.management.enabled", true))
 		{
@@ -131,6 +134,21 @@ public class JPPFDriver
 		}
 
 		initPeers();
+		System.out.println("JPPF Driver initialization complete");
+	}
+
+	/**
+	 * Print a message to the console to signify that the initialization of a server was succesfull.
+	 * @param ports the ports on which the server is listening.
+	 * @param name the name to use for the server.
+	 */
+	protected void printInitializedMessage(int[] ports, String name)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(name).append(" initialized - listening on port");
+		if (ports.length > 1) sb.append("s");
+		for (int n: ports) sb.append(" ").append(n);
+		System.out.println(sb.toString());
 	}
 
 	/**
