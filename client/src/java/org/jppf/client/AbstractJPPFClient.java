@@ -131,36 +131,42 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	public JPPFClientConnection getClientConnection()
 	{
 		JPPFClientConnection client = null;
-		while ((client == null) && !pools.isEmpty())
+		synchronized(pools)
 		{
-			Iterator<Integer> poolIterator = pools.keySet().iterator();
-			while ((client == null) && poolIterator.hasNext())
+			while ((client == null) && !pools.isEmpty())
 			{
-				int priority = poolIterator.next();
-				ClientPool pool = pools.get(priority);
-				int size = pool.clientList.size();
-				int count = 0;
-				while ((client == null) && (count < size))
+				Set<Integer> toRemove = new HashSet<Integer>();
+				Iterator<Integer> poolIterator = pools.keySet().iterator();
+				while ((client == null) && poolIterator.hasNext())
 				{
-					JPPFClientConnection c = pool.nextClient();
-					switch(c.getStatus())
+					int priority = poolIterator.next();
+					ClientPool pool = pools.get(priority);
+					int size = pool.clientList.size();
+					int count = 0;
+					while ((client == null) && (count < pool.size()))
 					{
-						case ACTIVE:
-							client = c;
-							break;
-						case FAILED:
-							pool.clientList.remove(c);
-							size--;
-							if (pool.lastUsedIndex >= size) pool.lastUsedIndex--;
-							if (pool.clientList.isEmpty()) poolIterator.remove();
-							break;
+						JPPFClientConnection c = pool.nextClient();
+						if (c == null) break;
+						switch(c.getStatus())
+						{
+							case ACTIVE:
+								client = c;
+								break;
+							case FAILED:
+								pool.clientList.remove(c);
+								size--;
+								if (pool.lastUsedIndex >= size) pool.lastUsedIndex--;
+								if (pool.clientList.isEmpty()) toRemove.add(priority);
+								break;
+						}
+						count++;
 					}
-					count++;
 				}
-			}
-			if (pools.isEmpty())
-			{
-				throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
+				for (Integer n: toRemove) pools.remove(n);
+				if (pools.isEmpty())
+				{
+					throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
+				}
 			}
 		}
 		if (debugEnabled) log.debug("found client connection \"" + client + "\"");
@@ -287,8 +293,18 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		 */
 		public JPPFClientConnection nextClient()
 		{
+			if (clientList.isEmpty()) return null;
 			lastUsedIndex = ++lastUsedIndex % clientList.size();
 			return clientList.get(lastUsedIndex);
+		}
+
+		/**
+		 * Get the current size of this pool.
+		 * @return the size as an int.
+		 */
+		public int size()
+		{
+			return clientList.size();
 		}
 	}
 
