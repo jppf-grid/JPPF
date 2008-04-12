@@ -24,11 +24,13 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
+import org.jppf.management.*;
+import org.jppf.node.policy.*;
 import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.*;
-import org.jppf.server.JPPFQueue.QueueListener;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.queue.*;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;
 
@@ -163,20 +165,48 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 			{
 				if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
 				if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
-				while (!getQueue().isEmpty() && !idleChannels.isEmpty())
+				boolean found = false;
+				SelectableChannel channel = null;
+				JPPFTaskBundle selectedBundle = null;
+				Iterator<JPPFTaskBundle> it = getQueue().iterator();
+				while (!found && it.hasNext() && !idleChannels.isEmpty())
 				{
-					try
+					JPPFTaskBundle bundle = it.next();
+					int n = -1;
+					ExecutionPolicy rule = bundle.getExecutionPolicy();
+					if (rule != null)
 					{
-						lock.lock();
-						int n = random.nextInt(idleChannels.size());
-						SelectableChannel channel = idleChannels.remove(n);
-						SelectionKey key = channel.keyFor(selector);
-						transitionManager.transitionChannel(key, NodeTransition.TO_SENDING);
+						if (debugEnabled) log.debug("Bundle has an execution policy:\n" + rule);
+						List<Integer> acceptableChannels = new ArrayList<Integer>();
+						for (int i=0; i<idleChannels.size(); i++)
+						{
+							SelectableChannel ch = idleChannels.get(i);
+							NodeManagementInfo mgtInfo = JPPFDriver.getInstance().getNodeInformation(ch);
+							JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
+							if (rule.accepts(info)) acceptableChannels.add(i);
+						}
+						if (debugEnabled) log.debug("found " + acceptableChannels.size() + " acceptable channels");
+						if (!acceptableChannels.isEmpty())
+						{
+							int rnd = random.nextInt(acceptableChannels.size());
+							n = acceptableChannels.get(rnd);
+						}
 					}
-					finally
+					else n = random.nextInt(idleChannels.size());
+					if (n >= 0)
 					{
-						lock.unlock();
+						channel = idleChannels.remove(n);
+						selectedBundle = bundle;
+						found = true;
 					}
+				}
+				if (channel != null)
+				{
+					SelectionKey key = channel.keyFor(selector);
+					NodeContext context = (NodeContext) key.attachment();
+					JPPFTaskBundle bundle = getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
+					context.setBundle(bundle);
+					transitionManager.transitionChannel(key, NodeTransition.TO_SENDING);
 				}
 			}
 		}

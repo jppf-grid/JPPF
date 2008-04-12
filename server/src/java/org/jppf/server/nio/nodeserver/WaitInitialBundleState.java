@@ -25,6 +25,7 @@ import static org.jppf.utils.StringUtils.getRemoteHost;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.management.*;
 import org.jppf.server.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.BundlerFactory;
@@ -40,11 +41,11 @@ public class WaitInitialBundleState extends NodeServerState
 	/**
 	 * Logger for this class.
 	 */
-	protected static final Log LOG = LogFactory.getLog(WaitInitialBundleState.class);
+	protected static Log log = LogFactory.getLog(WaitInitialBundleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
-	protected static final boolean DEBUG_ENABLED = LOG.isDebugEnabled();
+	protected static boolean debugEnabled = log.isDebugEnabled();
 
 	/**
 	 * Initialize this state.
@@ -66,10 +67,10 @@ public class WaitInitialBundleState extends NodeServerState
 	{
 		SelectableChannel channel = key.channel();
 		NodeContext context = (NodeContext) key.attachment();
-		if (DEBUG_ENABLED) LOG.debug("exec() for " + getRemoteHost(channel));
+		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		if (context.readMessage((ReadableByteChannel) channel))
 		{
-			if (DEBUG_ENABLED) LOG.debug("read bundle for " + getRemoteHost(channel) + " done");
+			if (debugEnabled) log.debug("read bundle for " + getRemoteHost(channel) + " done");
 			JPPFTaskBundle bundle = context.deserializeBundle();
 			context.setUuid(bundle.getBundleUuid());
 			boolean override = bundle.getParameter(BUNDLE_TUNING_TYPE_PARAM) != null;
@@ -84,6 +85,8 @@ public class WaitInitialBundleState extends NodeServerState
 					String host = (String) bundle.getParameter(NODE_MANAGEMENT_HOST_PARAM);
 					int port = (Integer) bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM);
 					NodeManagementInfo info = new NodeManagementInfo(host, port, id);
+					JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(NODE_SYSTEM_INFO_PARAM);
+					if (systemInfo != null) info.setSystemInfo(systemInfo);
 					JPPFDriver.getInstance().addNodeInformation(channel, info);
 				}
 			}

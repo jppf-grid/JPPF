@@ -76,7 +76,8 @@ public class SendingBundleState extends NodeServerState
 			{
 				context.setBundler(server.getBundler().copy());
 			}
-			JPPFTaskBundle bundle = server.getQueue().nextBundle(context.getBundler().getBundleSize());
+			//JPPFTaskBundle bundle = server.getQueue().nextBundle(context.getBundler().getBundleSize());
+			JPPFTaskBundle bundle = context.getBundle();
 			if (bundle != null)
 			{
 				if (DEBUG_ENABLED) LOG.debug("got bundle from the queue for " + getRemoteHost(channel));
@@ -89,7 +90,7 @@ public class SendingBundleState extends NodeServerState
 					server.addIdleChannel(channel);
 					return TO_IDLE;
 				}
-				context.setBundle(bundle);
+				//context.setBundle(bundle);
 				context.serializeBundle();
 			}
 			else

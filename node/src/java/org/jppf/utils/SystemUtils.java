@@ -60,7 +60,7 @@ public final class SystemUtils
 
 	/**
 	 * Return a set of properties guaranteed to always be part of those returned by 
-	 * {@link java.lang.System.getProperties() System.getProperties()}.
+	 * {@link java.lang.System#getProperties() System.getProperties()}.
 	 * @return the properties as a <code>TypedProperties</code> instance.
 	 */
 	public synchronized static TypedProperties getSystemProperties()
@@ -68,36 +68,6 @@ public final class SystemUtils
 		if (systemProps == null)
 		{
 			TypedProperties props = new TypedProperties();
-			addSystemProperty("java.version", props);
-			addSystemProperty("java.vendor", props);
-			addSystemProperty("java.vendor.url", props);
-			addSystemProperty("java.home", props);
-			addSystemProperty("java.vm.specification.version", props);
-			addSystemProperty("java.vm.specification.vendor", props);
-			addSystemProperty("java.vm.specification.name", props);
-			addSystemProperty("java.vm.version", props);
-			addSystemProperty("java.vm.vendor", props);
-			addSystemProperty("java.vm.name", props);
-			addSystemProperty("java.specification.version", props);
-			addSystemProperty("java.specification.vendor", props);
-			addSystemProperty("java.specification.name", props);
-			addSystemProperty("java.class.version", props);
-			addSystemProperty("java.class.path", props);
-			addSystemProperty("java.library.path", props);
-			addSystemProperty("java.io.tmpdir", props);
-			addSystemProperty("java.compiler", props);
-			addSystemProperty("java.ext.dirs", props);
-			addSystemProperty("os.name", props);
-			addSystemProperty("os.arch", props);
-			addSystemProperty("os.version", props);
-			addSystemProperty("file.separator", props);
-			addSystemProperty("path.separator", props);
-			addSystemProperty("line.separator", props);
-			addSystemProperty("user.name", props);
-			addSystemProperty("user.home", props);
-			addSystemProperty("user.dir", props);
-			addSystemProperty("jppf.config", props);
-			addSystemProperty("log4j.configuration", props);
 			addOtherSystemProperties(props);
 			systemProps = props;
 		}
@@ -110,11 +80,9 @@ public final class SystemUtils
 	 */
 	private static void addOtherSystemProperties(TypedProperties props)
 	{
-		Properties systemProps = null;
 		try
 		{
-			systemProps = System.getProperties();
-			Enumeration en = systemProps.propertyNames();
+			Enumeration en = System.getProperties().propertyNames();
 			while (en.hasMoreElements())
 			{
 				String name = (String) en.nextElement();

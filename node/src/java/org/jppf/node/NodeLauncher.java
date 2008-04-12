@@ -23,7 +23,7 @@ import java.util.Hashtable;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFNodeReloadNotification;
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.management.JMXServerImpl;
+import org.jppf.management.*;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.utils.*;
 
@@ -208,7 +208,7 @@ public class NodeLauncher
 		{
 			try
 			{
-				jmxServer = new JMXServerImpl();
+				jmxServer = new JMXServerImpl(JPPFAdminMBean.NODE_SUFFIX);
 				jmxServer.start();
 			}
 			catch(Exception e)

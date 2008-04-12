@@ -45,7 +45,7 @@ public final class ClassServerFactory
 	/**
 	 * Create the map of all possible states.
 	 * @return a mapping of the states enumeration to the corresponding NioStateInstances.
-	 * @see org.jppf.server.nio.NioServerFactory#createStateMap(org.jppf.server.nio.NioServer)
+	 * @see org.jppf.server.nio.NioServerFactory#createStateMap()
 	 */
 	public Map<ClassState, NioState<ClassTransition>> createStateMap()
 	{

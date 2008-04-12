@@ -127,8 +127,10 @@ public final class BundlerFactory
 			{
 				ProportionalTuneProfile prof = new ProportionalTuneProfile();
 				Number n = (Number) map.get(PERFORMANCE_CACHE_SIZE);
+				if (n == null) n = ProportionalTuneProfile.getDefaultProfile().getPerformanceCacheSize();
 				prof.setPerformanceCacheSize(n.intValue());
 				n = (Number) map.get(PROPORTIONALITY_FACTOR);
+				if (n == null) n = ProportionalTuneProfile.getDefaultProfile().getPropertionalityFactor();
 				prof.setPropertionalityFactor(n.intValue());
 				profile = prof;
 			}
@@ -136,16 +138,22 @@ public final class BundlerFactory
 			{
 				AnnealingTuneProfile prof = new AnnealingTuneProfile();
 				Number n = (Number) map.get(MIN_SAMPLES_TO_ANALYSE);
+				if (n == null) n = AnnealingTuneProfile.getDefaultProfile().getMinSamplesToAnalyse();
 				prof.setMinSamplesToAnalyse(n.longValue());
 				n = (Number) map.get(MIN_SAMPLES_TO_CHECK_CONVERGENCE);
+				if (n == null) n = AnnealingTuneProfile.getDefaultProfile().getMinSamplesToCheckConvergence();
 				prof.setMinSamplesToCheckConvergence(n.longValue());
 				n = (Number) map.get(MAX_DEVIATION);
+				if (n == null) n = AnnealingTuneProfile.getDefaultProfile().getMaxDeviation();
 				prof.setMaxDeviation(n.doubleValue());
 				n = (Number) map.get(MAX_GUESS_TO_STABLE);
+				if (n == null) n = AnnealingTuneProfile.getDefaultProfile().getMaxGuessToStable();
 				prof.setMaxGuessToStable(n.intValue());
 				n = (Number) map.get(SIZE_RATIO_DEVIATION);
+				if (n == null) n = AnnealingTuneProfile.getDefaultProfile().getSizeRatioDeviation();
 				prof.setSizeRatioDeviation(n.floatValue());
 				n = (Number) map.get(DECREASE_RATIO);
+				if (n == null) n = AnnealingTuneProfile.getDefaultProfile().getDecreaseRatio();
 				prof.setDecreaseRatio(n.floatValue());
 				profile = prof;
 			}

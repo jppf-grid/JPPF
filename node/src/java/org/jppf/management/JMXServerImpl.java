@@ -66,6 +66,19 @@ public class JMXServerImpl
 	 * This server's unique id.
 	 */
 	private String id = new JPPFUuid(JPPFUuid.ALPHA_NUM, 24).toString();
+	/**
+	 * Used to distinguish between driver and node RMI registries.
+	 */
+	private String namespaceSuffix = null;
+
+	/**
+	 * Initialize this JMX server with the specified namespace suffix.
+	 * @param namespaceSuffix used to distinguish between driver and node RMI registries.
+	 */
+	public JMXServerImpl(String namespaceSuffix)
+	{
+		this.namespaceSuffix = namespaceSuffix;
+	}
 
 	/**
 	 * Start the MBean server and associated resources.
@@ -74,7 +87,7 @@ public class JMXServerImpl
 	public void start() throws Exception
 	{
 		server = MBeanServerFactory.createMBeanServer();
-    if (getRegistry() == null) setRegistry(locateOrCreateRegistry());
+    locateOrCreateRegistry();
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String host = NetworkUtils.getManagementHost();
 		int port = props.getInt("jppf.management.port", 11198);
@@ -83,27 +96,10 @@ public class JMXServerImpl
 		HashMap env = new HashMap(); 
 		env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, factory);
 		env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, factory); 
-    JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+host+":"+port+"/jppf");
+    JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + "/jppf" + namespaceSuffix);
     connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
     connectorServer.start();
-
-    /*
-		server = MBeanServerFactory.createMBeanServer(); 
-    if (getRegistry() == null) setRegistry(locateOrCreateRegistry());
-		HashMap env = new HashMap(); 
-		SslRMIClientSocketFactory csf = new SslRMIClientSocketFactory(); 
-		SslRMIServerSocketFactory ssf =  new SslRMIServerSocketFactory(); 
-		env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,csf);
-		env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE,ssf); 
-		env.put("jmx.remote.x.password.file","jmxconfig/password.properties"); 
-		env.put("jmx.remote.x.access.file", "jmxconfig/access.properties"); 
-		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = "localhost";
-		int port = props.getInt("jppf.management.port", 11198);
-    JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+host+":"+port+"/jppf");
-		connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server); 
-		connectorServer.start(); 
-    */
+    if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);
 	}
 
 	/**
@@ -160,38 +156,18 @@ public class JMXServerImpl
 	/**
 	 * Locate an RMI registry specified by the configuration properties,
 	 * or create an embedded one if it cannot be found.
-	 * @return a <code>Registry</code> instance.
 	 * @throws Exception if the registry could be neither located nor created. 
 	 */
-	private static synchronized Registry locateOrCreateRegistry() throws Exception
+	private static synchronized void locateOrCreateRegistry() throws Exception
 	{
+		if (registry != null) return;
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String host = NetworkUtils.getManagementHost();
 		int port = props.getInt("jppf.management.port", 11198);
 		InetAddress addr = InetAddress.getByName(host);
 		JSESocketFactory factory = new JSESocketFactory(addr);
-		Registry reg = LocateRegistry.createRegistry(port, factory, factory);
-		return reg;
+		registry = LocateRegistry.createRegistry(port, factory, factory);
 	}
-
-	/**
-	 * Get the embedded RMI registry.
-	 * @return a <code>Registry</code> instance. 
-	 */
-	private static synchronized Registry getRegistry()
-	{
-		return registry;
-	}
-
-	/**
-	 * Set the embedded RMI registry.
-	 * @param registry a <code>Registry</code> instance.
-	 */
-	private static synchronized void setRegistry(Registry registry)
-	{
-		JMXServerImpl.registry = registry;
-	}
-
 
 	/**
 	 * Get a unique identitier for this management server. This id must be unique accross JPPF nodes and servers,

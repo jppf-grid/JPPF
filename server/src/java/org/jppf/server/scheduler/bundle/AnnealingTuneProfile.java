@@ -18,6 +18,7 @@
 package org.jppf.server.scheduler.bundle;
 
 import java.util.Random;
+
 import org.jppf.utils.*;
 
 
@@ -26,7 +27,7 @@ import org.jppf.utils.*;
  * strategy. The possible move from the best known solution get smaller each
  * time it make a move.
  * This strategy let the algorithm explore the universe of bundle size with 
- * a almost known end. Check method getDecreaseRatio about the maximum number
+ * an almost known end. Check method getDecreaseRatio about the maximum number
  * of changes.
  *  
  * @author Domingos Creado
@@ -34,28 +35,32 @@ import org.jppf.utils.*;
 public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 {
 	/**
+	 * A default profile with default parameter values.
+	 */
+	private static AnnealingTuneProfile defaultProfile = new AnnealingTuneProfile();
+	/**
 	 * The minimum number of samples that must be collected before an analysis is triggered.
 	 */
-	protected long minSamplesToAnalyse = 0L;
+	protected long minSamplesToAnalyse = 500L;
 	/**
 	 * The minimum number of samples to be collected before checking if the performance profile has changed. 
 	 */
-	protected long minSamplesToCheckConvergence = 0L;
+	protected long minSamplesToCheckConvergence = 300L;
 	/**
 	 * The percentage of deviation of the current mean to the mean 
 	 * when the system was considered stable. 
 	 */
-	protected double maxDeviation = 0d;
+	protected double maxDeviation = 0.2d;
 	/**
 	 * The maximum number of guesses of number generated that were already tested
 	 * for the algorithm to consider the current best solution stable.
 	 */
-	protected int maxGuessToStable = 0;
+	protected int maxGuessToStable = 10;
 	/**
 	 * This parameter defines the multiplicity used to define the range available to
 	 * random generator, as the maximum.
 	 */
-	protected float sizeRatioDeviation = 1f;
+	protected float sizeRatioDeviation = 1.5f;
 	/**
 	 * This parameter defines how fast does it will stop generating random numbers. 
 	 * This is essential to define what is the size of the universe will be explored. 
@@ -72,7 +77,7 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * This expected number of guesses might not occur if the number of getMaxGuessToStable()
 	 * is short.
 	 */
-	protected float decreaseRatio = 1f;
+	protected float decreaseRatio = 0.2f;
 
 	/**
 	 * Initialize this profile with default values.
@@ -141,7 +146,6 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * @param collectedSamples the number of samples that were already collected.
 	 * @param rnd a pseudo-random number generator.
 	 * @return an always positive diff to be applied to bundle size
-	 * @see org.jppf.server.scheduler.bundle.AutoTuneProfile#createDiff(int, int, java.util.Random)
 	 */
 	public int createDiff(int bestSize, int collectedSamples, Random rnd)
 	{
@@ -169,7 +173,6 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	/**
 	 * Get the minimum number of samples that must be collected before an analysis is triggered.
 	 * @return the number of samples as a long value.
-	 * @see org.jppf.server.scheduler.bundle.AutoTuneProfile#getMinSamplesToAnalyse()
 	 */
 	public long getMinSamplesToAnalyse()
 	{
@@ -189,7 +192,6 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * Get the the minimum number of samples to be collected before
 	 * checking if the performance profile has changed. 
 	 * @return the number of samples as a long value. 
-	 * @see org.jppf.server.scheduler.bundle.AutoTuneProfile#getMinSamplesToCheckConvergence()
 	 */
 	public long getMinSamplesToCheckConvergence()
 	{
@@ -210,7 +212,6 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * Get the percentage of deviation of the current mean to the mean 
 	 * when the system was considered stable. 
 	 * @return the percentage of deviation as a double value.
-	 * @see org.jppf.server.scheduler.bundle.AutoTuneProfile#getMaxDeviation()
 	 */
 	public double getMaxDeviation()
 	{
@@ -231,7 +232,6 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * Get the maximum number of guesses of number generated that were already tested
 	 * for the algorithm to consider the current best solution stable.
 	 * @return the number of guesses as an int value.
-	 * @see org.jppf.server.scheduler.bundle.AutoTuneProfile#getMaxGuessToStable()
 	 */
 	public int getMaxGuessToStable()
 	{
@@ -263,5 +263,14 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 		p.sizeRatioDeviation = sizeRatioDeviation;
 		p.decreaseRatio = decreaseRatio;
 		return p;
+	}
+
+	/**
+	 * Get the default profile with default parameter values.
+	 * @return a <code>AnnealingTuneProfile</code> singleton instance.
+	 */
+	public static synchronized AnnealingTuneProfile getDefaultProfile()
+	{
+		return defaultProfile;
 	}
 }

@@ -25,7 +25,7 @@ import org.jppf.server.scheduler.bundle.BundlePerformanceSample;
 /**
  * Each instance of this class acts as a container for the performance data related to a node,
  * and is used for the global computations of the
- * {@link org.jppf.server.scheduler.bundle.proportional.PropertionalBundler PropertionalBundler}. 
+ * {@link org.jppf.server.scheduler.bundle.proportional.ProportionalBundler ProportionalBundler}. 
  * @author Laurent Cohen
  */
 public class BundleDataHolder

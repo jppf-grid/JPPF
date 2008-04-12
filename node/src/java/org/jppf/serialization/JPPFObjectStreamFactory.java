@@ -97,7 +97,8 @@ public class JPPFObjectStreamFactory
 			catch(Exception e)
 			{
 				StringBuilder sb = new StringBuilder();
-				sb.append("Could not instantiate object stream builder for [").append(BUILDER_CLASS).append(" = ").append(builderName).append("]\nTerminating this application\n");
+				sb.append("Could not instantiate object stream builder for [").append(BUILDER_CLASS).append(" = ");
+				sb.append(builderName).append("]\nTerminating this application\n");
 				log.fatal(sb.toString() + e.getMessage(), e);
 				throw new JPPFError(sb.toString() + e.getMessage(), e);
 			}

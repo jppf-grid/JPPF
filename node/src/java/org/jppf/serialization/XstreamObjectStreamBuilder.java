@@ -63,7 +63,7 @@ public class XstreamObjectStreamBuilder implements JPPFObjectStreamBuilder
    * @param	in input stream to read from.
 	 * @return an <code>ObjectInputStream</code>
 	 * @throws Exception if an error is raised while creating the stream.
-	 * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectInputStream()
+	 * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectInputStream(java.io.InputStream)
 	 */
 	public ObjectInputStream newObjectInputStream(InputStream in) throws Exception
 	{
@@ -75,7 +75,7 @@ public class XstreamObjectStreamBuilder implements JPPFObjectStreamBuilder
    * @param	out output stream to write to.
 	 * @return an <code>ObjectOutputStream</code>
 	 * @throws Exception if an error is raised while creating the stream.
-	 * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectOutputStream()
+	 * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectOutputStream(java.io.OutputStream)
 	 */
 	public ObjectOutputStream newObjectOutputStream(OutputStream out) throws Exception
 	{

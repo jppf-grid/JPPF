@@ -197,7 +197,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	/**
 	 * Set the size of the node's thread pool.
 	 * @param size the size as an int.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadPoolSize(int)
+	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadPoolSize(java.lang.Integer)
 	 */
 	public void updateThreadPoolSize(Integer size)
 	{

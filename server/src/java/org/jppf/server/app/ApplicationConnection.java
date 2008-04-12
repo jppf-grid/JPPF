@@ -27,6 +27,7 @@ import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.server.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.queue.JPPFQueue;
 import org.jppf.utils.*;
 
 /**

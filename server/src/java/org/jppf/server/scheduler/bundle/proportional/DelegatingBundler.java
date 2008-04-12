@@ -26,7 +26,7 @@ import org.jppf.server.scheduler.bundle.*;
 
 /**
  * Instances of this bundler delegate their operations to a singleton instance of a
- * {@link org.jppf.server.scheduler.bundle.proportional.PropertionalBundler PropertionalBundler}.
+ * {@link org.jppf.server.scheduler.bundle.proportional.ProportionalBundler ProportionalBundler}.
  * @author Laurent Cohen
  */
 public class DelegatingBundler extends AbstractBundler

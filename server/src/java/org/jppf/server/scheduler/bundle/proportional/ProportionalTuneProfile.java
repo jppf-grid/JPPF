@@ -22,11 +22,15 @@ import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
 
 /**
- * 
+ * Paremeters profile for a proportional bundler. 
  * @author Laurent Cohen
  */
 public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 {
+	/**
+	 * A default profile with default parameter values.
+	 */
+	private static ProportionalTuneProfile defaultProfile = new ProportionalTuneProfile();
 	/**
 	 * The maximum szie of the performance samples cache.
 	 */
@@ -102,5 +106,14 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	public void setPropertionalityFactor(int propertionalityFactor)
 	{
 		this.propertionalityFactor = propertionalityFactor;
+	}
+
+	/**
+	 * Get the default profile with default parameter values.
+	 * @return a <code>ProportionalTuneProfile</code> singleton instance.
+	 */
+	public static synchronized ProportionalTuneProfile getDefaultProfile()
+	{
+		return defaultProfile;
 	}
 }

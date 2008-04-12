@@ -30,6 +30,7 @@ import org.jppf.server.management.JPPFDriverAdmin;
 import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.peer.JPPFPeerInitializer;
+import org.jppf.server.queue.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
 
@@ -103,7 +104,8 @@ public class JPPFDriver
 	 */
 	public void run() throws Exception
 	{
-		taskQueue = new JPPFQueue();
+		//taskQueue = new JPPFQueueImpl();
+		taskQueue = new JPPFPriorityQueue();
 		TypedProperties props = JPPFConfiguration.getProperties();
 
 		String s = props.getString("class.server.port", "11111");
@@ -126,7 +128,7 @@ public class JPPFDriver
 
 		if (props.getBoolean("jppf.management.enabled", true))
 		{
-			jmxServer = new JMXServerImpl();
+			jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX);
 			jmxServer.start();
 			JPPFDriverAdmin admin = new JPPFDriverAdmin();
 			String mbeanName = JPPFAdminMBean.DRIVER_MBEAN_NAME;
@@ -311,6 +313,16 @@ public class JPPFDriver
 	public synchronized Map<SelectableChannel, NodeManagementInfo> getNodeInformationMap()
 	{
 		return Collections.unmodifiableMap(nodeInfo);
+	}
+
+	/**
+	 * Get the system information for the specified node.
+	 * @param channel the node for which ot get the information.
+	 * @return a <code>NodeManagementInfo</code> instance, or null if no informaiton is recorded for the node.
+	 */
+	public synchronized NodeManagementInfo getNodeInformation(SelectableChannel channel)
+	{
+		return nodeInfo.get(channel);
 	}
 
 	/**

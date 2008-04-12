@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	Java Parallel Processing Framework.
+	Copyright (C) 2005-2008 JPPF Team.
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified"
+	targetNamespace="http://www.jppf.org/schemas/ExecutionPolicy.xsd"
+	xmlns:jppf="http://www.jppf.org/schemas/ExecutionPolicy.xsd"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="ExecutionPolicy" type="jppf:ExecutionPolicyType"/>
+
+	<xs:complexType name="ExecutionPolicyType">
+		<xs:choice>
+			<xs:group ref="jppf:Rule"/>
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:group name="Rule">
+		<xs:choice>
+			<xs:element name="NOT" type="jppf:NOTType"/>
+			<xs:element name="AND" type="jppf:ANDType"/>
+			<xs:element name="OR" type="jppf:ORType"/>
+			<xs:element name="XOR" type="jppf:XORType"/>
+			<xs:element name="LessThan" type="jppf:LessThanType"/>
+			<xs:element name="AtMost" type="jppf:AtMostType"/>
+			<xs:element name="MoreThan" type="jppf:MoreThanType"/>
+			<xs:element name="AtLeast" type="jppf:AtLeastType"/>
+			<xs:element name="BetweenII" type="jppf:BetweenIIType"/>
+			<xs:element name="BetweenIE" type="jppf:BetweenIEType"/>
+			<xs:element name="BetweenEI" type="jppf:BetweenEIType"/>
+			<xs:element name="BetweenEE" type="jppf:BetweenEEType"/>
+			<xs:element name="Equal" type="jppf:EqualType"/>
+			<xs:element name="Contains" type="jppf:ContainsType"/>
+			<xs:element name="OneOf" type="jppf:OneOfType"/>
+			<xs:element name="RegExp" type="jppf:RegExpType"/>
+		</xs:choice>
+	</xs:group>
+
+	<!-- negation of a test -->
+	<xs:complexType name="NOTType">
+		<xs:sequence>
+			<xs:group ref="jppf:Rule"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- logical "AND" combination of multiple tests -->
+	<xs:complexType name="ANDType">
+		<xs:sequence minOccurs="2" maxOccurs="unbounded">
+			<xs:group ref="jppf:Rule"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- logical "OR" combination of multiple tests -->
+	<xs:complexType name="ORType">
+		<xs:sequence minOccurs="2" maxOccurs="unbounded">
+			<xs:group ref="jppf:Rule"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- logical "XOR" combination of multiple tests -->
+	<xs:complexType name="XORType">
+		<xs:sequence minOccurs="2" maxOccurs="unbounded">
+			<xs:group ref="jppf:Rule"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- test of type "property_value is less than value" -->
+	<xs:complexType name="LessThanType">
+		<xs:sequence>
+			<xs:group ref="jppf:Numeric2"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- test of type "property_value is less than or equal to value" -->
+	<xs:complexType name="AtMostType">
+		<xs:sequence>
+			<xs:group ref="jppf:Numeric2"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- test of type "property_value is more than value" -->
+	<xs:complexType name="MoreThanType">
+		<xs:sequence>
+			<xs:group ref="jppf:Numeric2"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- test of type "property_value is more than or equal to value" -->
+	<xs:complexType name="AtLeastType">
+		<xs:sequence>
+			<xs:group ref="jppf:Numeric2"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- test of type "property_value is in range [a, b]" -->
+	<xs:complexType name="BetweenIIType">
+		<xs:sequence>
+			<xs:group ref="jppf:Numeric3"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- test of type "property_value is in range [a, b[" -->
+	<xs:complexType name="BetweenIEType">
+		<xs:sequence>
+			<xs:group ref="jppf:Numeric3"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- test of type "property_value is in range ]a, b]" -->
+	<xs:complexType name="BetweenEIType">
+		<xs:sequence>
+			<xs:group ref="jppf:Numeric3"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- test of type "property_value is in range ]a, b[" -->
+	<xs:complexType name="BetweenEEType">
+		<xs:sequence>
+			<xs:group ref="jppf:Numeric3"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- Parameters for numeric tests with 2 operands (including the property value) -->
+	<xs:group name="Numeric2">
+		<xs:sequence>
+			<xs:element name="Property" type="xs:string"/>
+			<xs:element name="Value" type="xs:double"/>
+		</xs:sequence>
+	</xs:group>
+
+	<!-- Parameters for numeric tests with 3 operands (including the property value) -->
+	<xs:group name="Numeric3">
+		<xs:sequence>
+			<xs:element name="Property" type="xs:string"/>
+			<xs:element name="Value" type="xs:double" minOccurs="2" maxOccurs="2"/>
+		</xs:sequence>
+	</xs:group>
+
+	<!-- test of type "property_value is equal to value" -->
+	<xs:complexType name="EqualType">
+		<xs:sequence>
+			<xs:element name="Property" type="xs:string"/>
+			<xs:element name="Value" type="xs:string"/>
+		</xs:sequence>
+		<xs:attribute name="valueType" use="optional" default="string">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="string"/>
+					<xs:enumeration value="numeric"/>
+					<xs:enumeration value="boolean"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ignoreCase" type="jppf:TrueFalse" use="optional" default="false"/>
+	</xs:complexType>
+
+	<!-- test of type "property_value contains substring" -->
+	<xs:complexType name="ContainsType">
+		<xs:sequence>
+			<xs:element name="Property" type="xs:string"/>
+			<xs:element name="Value" type="xs:string"/>
+		</xs:sequence>
+		<xs:attribute name="ignoreCase" type="jppf:TrueFalse" use="optional" default="false"/>
+	</xs:complexType>
+
+	<!-- test of type "property_value is one of { value1, ... , valueN } " -->
+	<xs:complexType name="OneOfType">
+		<xs:sequence>
+			<xs:element name="Property" type="xs:string"/>
+			<xs:element name="Value" type="xs:string" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="valueType" use="optional" default="string">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="string"/>
+					<xs:enumeration value="numeric"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ignoreCase" type="jppf:TrueFalse" use="optional" default="false"/>
+	</xs:complexType>
+
+	<!-- test of type "property_value matches regular_expression " -->
+	<xs:complexType name="RegExpType">
+		<xs:sequence>
+			<xs:element name="Property" type="xs:string"/>
+			<xs:element name="Value" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="TrueFalse">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="true"/>
+			<xs:enumeration value="false"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+</schema>

@@ -44,7 +44,7 @@ public final class NodeServerFactory extends NioServerFactory<NodeState, NodeTra
 	/**
 	 * Create the map of all possible states.
 	 * @return a mapping of the states enumeration to the corresponding NioState instances.
-	 * @see org.jppf.server.nio.NioServerFactory#createStateMap(org.jppf.server.nio.NioServer)
+	 * @see org.jppf.server.nio.NioServerFactory#createStateMap()
 	 */
 	public Map<NodeState, NioState<NodeTransition>> createStateMap()
 	{

@@ -166,6 +166,9 @@ public class JPPFNode extends AbstractMonitoredNode
 					bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
 					bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeLauncher.getJmxServer().getId());
 				}
+				JPPFSystemInformation info = new JPPFSystemInformation();
+				info.populate();
+				bundle.setParameter(NODE_SYSTEM_INFO_PARAM, info);
 			}
 			List<JPPFTask> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
@@ -175,7 +178,8 @@ public class JPPFNode extends AbstractMonitoredNode
 			if (notEmpty)
 			{
 				setTaskCount(getTaskCount() + taskList.size());
-				if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
+				//if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
+				log.info("tasks executed: "+getTaskCount());
 			}
 			int p = bundle.getBuildNumber();
 			if (buildNumber < p)
