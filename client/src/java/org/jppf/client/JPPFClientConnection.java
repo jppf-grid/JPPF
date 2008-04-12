@@ -21,6 +21,7 @@ package org.jppf.client;
 import java.util.List;
 
 import org.jppf.client.event.*;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 
@@ -43,6 +44,17 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
 	 * @throws Exception if an error occurs while sending the request.
 	 */
 	void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
+			throws Exception;
+
+	/**
+	 * Submit the request to the server.
+	 * @param taskList the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param listener listener to notify whenever a set of results have been received.
+	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
+	 * @throws Exception if an error occurs while sending the request.
+	 */
+	void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
 			throws Exception;
 
 	/**

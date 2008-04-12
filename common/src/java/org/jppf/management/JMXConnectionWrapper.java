@@ -81,13 +81,24 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 */
 	public JMXConnectionWrapper(String host, int port)
 	{
+		this(host, port, JPPFAdminMBean.DRIVER_SUFFIX);
+	}
+
+	/**
+	 * Initialize the connection to the remote MBean server.
+	 * @param host the host the server is running on.
+	 * @param port the RMI port used by the server.
+	 * @param rmiSuffix	RMI registry namespace suffix. 
+	 */
+	public JMXConnectionWrapper(String host, int port, String rmiSuffix)
+	{
 		this.host = host;
 		this.port = port;
 		
 		idString = "[" + (host == null ? "_" : host) + ":" + port + "] ";
 		try
 		{
-			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+host+":"+port+"/jppf");
+			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + "/jppf" + rmiSuffix);
 		}
 		catch(Exception e)
 		{

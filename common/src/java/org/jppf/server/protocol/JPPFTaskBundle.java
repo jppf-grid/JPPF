@@ -20,6 +20,7 @@ package org.jppf.server.protocol;
 import java.io.Serializable;
 import java.util.*;
 
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.security.JPPFSecurityContext;
 import org.jppf.utils.*;
 
@@ -135,6 +136,10 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * Map holding the parameters of the request.
 	 */
 	private Map<BundleParameter, Object> parameters = new HashMap<BundleParameter, Object>();
+	/**
+	 * The execution policy for this bundle, which determines on which nodes the tasks can be run.
+	 */
+	private ExecutionPolicy executionPolicy = null;
 
 	/**
 	 * Initialize this task bundle and set its build number.
@@ -486,5 +491,23 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	public Map<BundleParameter, Object> getParametersMap()
 	{
 		return parameters;
+	}
+
+	/**
+	 * Get the execution policy for this bundle.
+	 * @return an <code>ExecutionPolicy</code> instance.
+	 */
+	public synchronized ExecutionPolicy getExecutionPolicy()
+	{
+		return executionPolicy;
+	}
+
+	/**
+	 * Set the execution policy for this bundle.
+	 * @param executionPolicy an <code>ExecutionPolicy</code> instance.
+	 */
+	public synchronized void setExecutionPolicy(ExecutionPolicy executionPolicy)
+	{
+		this.executionPolicy = executionPolicy;
 	}
 }

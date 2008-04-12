@@ -26,6 +26,7 @@ import org.apache.commons.logging.*;
 import org.jppf.*;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
+import org.jppf.node.policy.*;
 import org.jppf.security.*;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
@@ -230,18 +231,24 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener)
 	 */
-	public abstract void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
-			throws Exception;
+	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
+			throws Exception
+	{
+		submit(taskList, dataProvider, listener, null);
+	}
 
 	/**
 	 * Send tasks to the server for execution.
 	 * @param taskList the list of tasks to execute remotely.
 	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
-	public void sendTasks(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
+	public void sendTasks(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy) throws Exception
 	{
-		sendTasks(new JPPFTaskBundle(), taskList, dataProvider);
+		JPPFTaskBundle bundle = new JPPFTaskBundle();
+		bundle.setExecutionPolicy(policy);
+		sendTasks(bundle, taskList, dataProvider);
 	}
 
 	/**

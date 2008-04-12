@@ -22,7 +22,6 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.management.*;
-import org.jppf.server.NodeManagementInfo;
 import org.jppf.ui.monitoring.event.NodeHandlerEvent;
 
 /**

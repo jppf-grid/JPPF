@@ -49,7 +49,7 @@ public class ResourceProvider
 
 	/**
 	 * Load a resource file (including class files) from the class path into an array of byte.<br>
-	 * This method simply calls {@link getResourceAsBytes(java.lang.String, java.lang.ClassLoader) getResourceAsBytes(String, ClassLoader)}
+	 * This method simply calls {@link #getResourceAsBytes(java.lang.String, java.lang.ClassLoader) getResourceAsBytes(String, ClassLoader)}
 	 * with a null class loader.
 	 * @param resName the name of the resource to load.
 	 * @return an array of bytes, or nll if the resource could not be found.
@@ -93,6 +93,8 @@ public class ResourceProvider
 
 	/**
 	 * Get a resource as an array of byte using a call to <b>ClassLoader#getResource()</b>.
+	 * This method simply calls {@link #getResource(java.lang.String, java.lang.ClassLoader) getResource(String, ClassLoader)}
+	 * with a null class loader.
 	 * @param resName  the name of the resource to find.
 	 * @return the content of the resource as an array of bytes.
 	 */
@@ -103,8 +105,6 @@ public class ResourceProvider
 
 	/**
 	 * Get a resource as an array of byte using a call to <b>ClassLoader#getResource()</b>.
-	 * This method simply calls {@link getResource(java.lang.String, java.lang.ClassLoader) getResource(String, ClassLoader)}
-	 * with a null class loader.
 	 * @param resName  the name of the resource to find.
 	 * @param cl the class loader to use to load the request resource.
 	 * @return the content of the resource as an array of bytes.

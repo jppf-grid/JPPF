@@ -88,6 +88,7 @@ public class JcaResultProcessor implements Work
 					bundle.setRequestUuid(new JPPFUuid().toString());
 					JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
 					String requestUuid = bundle.getRequestUuid();
+					bundle.setExecutionPolicy(execution.policy);
 					if (!execution.tasks.isEmpty())
 					{
 						JPPFTask task = execution.tasks.get(0);

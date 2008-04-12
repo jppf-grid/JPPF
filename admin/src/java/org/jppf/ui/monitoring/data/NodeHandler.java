@@ -22,7 +22,7 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
-import org.jppf.server.NodeManagementInfo;
+import org.jppf.management.NodeManagementInfo;
 import org.jppf.ui.monitoring.event.*;
 
 /**

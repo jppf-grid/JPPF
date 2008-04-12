@@ -22,7 +22,6 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.management.*;
-import org.jppf.server.NodeManagementInfo;
 
 /**
  * Instances of this class hold and manage the state of the nodes attached to a specific JPPF driver.

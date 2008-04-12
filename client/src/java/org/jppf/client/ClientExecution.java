@@ -21,6 +21,7 @@ package org.jppf.client;
 import java.util.List;
 
 import org.jppf.client.event.TaskResultListener;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 
@@ -46,7 +47,10 @@ public class ClientExecution
 	 * Listener to notify whenever a set of results have been received.
 	 */
 	public TaskResultListener listener = null;
-
+	/**
+	 * An execution policy that deternmines on which node(s) the tasks will be permitted to run.
+	 */
+	public ExecutionPolicy policy = null;
 	/**
 	 * Initialize this execution with the specified parameters.
 	 * @param tasks list of tasks for this execution.
@@ -55,7 +59,7 @@ public class ClientExecution
 	 */
 	public ClientExecution(List<JPPFTask> tasks, DataProvider dataProvider, boolean isBlocking)
 	{
-		this(tasks, dataProvider, isBlocking, null);
+		this(tasks, dataProvider, isBlocking, null, null);
 	}
 
 	/**
@@ -67,9 +71,24 @@ public class ClientExecution
 	 */
 	public ClientExecution(List<JPPFTask> tasks, DataProvider dataProvider, boolean isBlocking, TaskResultListener listener)
 	{
+		this(tasks, dataProvider, isBlocking, listener, null);
+	}
+
+	/**
+	 * Initialize this execution with the specified parameters.
+	 * @param tasks list of tasks for this execution.
+	 * @param dataProvider data provider for this execution.
+	 * @param isBlocking flag to determine whether the execution is blocking or not.
+	 * @param listener listener to notify whenever a set of results have been received.
+	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
+	 */
+	public ClientExecution(List<JPPFTask> tasks, DataProvider dataProvider, boolean isBlocking, TaskResultListener listener,
+		ExecutionPolicy policy)
+	{
 		this.tasks = tasks;
 		this.dataProvider = dataProvider;
 		this.isBlocking = isBlocking;
 		this.listener = listener;
+		this.policy = policy;
 	}
 }

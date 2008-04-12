@@ -21,7 +21,7 @@ import java.io.NotSerializableException;
 import java.util.List;
 
 import org.apache.commons.logging.*;
-import org.jppf.client.event.*;
+import org.jppf.client.event.TaskResultEvent;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.Pair;
 
@@ -78,7 +78,7 @@ public class AsynchronousResultProcessor implements Runnable
 			{
 				try
 				{
-					connection.sendTasks(execution.tasks, execution.dataProvider);
+					connection.sendTasks(execution.tasks, execution.dataProvider, execution.policy);
 					while (count < execution.tasks.size())
 					{
 						Pair<List<JPPFTask>, Integer> p = connection.receiveResults();

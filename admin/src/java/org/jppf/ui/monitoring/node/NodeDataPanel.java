@@ -26,7 +26,7 @@ import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
-import org.jppf.server.NodeManagementInfo;
+import org.jppf.management.NodeManagementInfo;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.options.AbstractOption;

@@ -65,7 +65,7 @@ public final class CollectionUtils
 	 * @param <T> the element type of the arrays to concatenate.
 	 * @param arrays the arrays to concatenate.
 	 * @return an array whose size is the sum of the sizes of all the input arrays, and whose elements are all the
-	 * elemetns found in all the input arrays.
+	 * elements found in all the input arrays.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T[] concatArrays(T[]...arrays)
@@ -77,5 +77,40 @@ public final class CollectionUtils
 			for (T t: array) result.add(t);
 		}
 		return result.toArray((T[]) Array.newInstance(arrays[0][0].getClass(), 0));
+	}
+
+	/**
+	 * Add an element in a map whose values are lists of elements.
+	 * @param <T> the type of the keys in the map.
+	 * @param <U> the type of the elements in the lists.
+	 * @param key the key for the value to add.
+	 * @param value the value to add.
+	 * @param map the map in which ot add the key/value pair.
+	 */
+	public static <T, U> void putInListMap(T key, U value, Map<T, List<U>> map)
+	{
+		List<U> list = map.get(key);
+		if (list == null)
+		{
+			list = new ArrayList<U>();
+			map.put(key, list);
+		}
+		list.add(value);
+	}
+
+	/**
+	 * Remove an element from a map whose values are lists of elements.
+	 * @param <T> the type of the keys in the map.
+	 * @param <U> the type of the elements in the lists.
+	 * @param key the key for the value to remove.
+	 * @param value the value to remove.
+	 * @param map the map from which to remove the key/value pair.
+	 */
+	public static <T, U> void removeFromListMap(T key, U value, Map<T, List<U>> map)
+	{
+		List<U> list = map.get(key);
+		if (list == null) return;
+		list.remove(value);
+		if (list.isEmpty()) map.remove(key);
 	}
 }

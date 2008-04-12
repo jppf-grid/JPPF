@@ -34,7 +34,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper
 	 */
 	public JMXNodeConnectionWrapper(String host, int port)
 	{
-		super(host, port);
+		super(host, port, JPPFAdminMBean.NODE_SUFFIX);
 	}
 
 	/**

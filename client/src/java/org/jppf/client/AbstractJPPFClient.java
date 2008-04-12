@@ -23,6 +23,7 @@ import java.util.*;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
 import org.jppf.client.event.*;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
@@ -190,13 +191,26 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
 	{
+		return submit(taskList, dataProvider, null);
+	}
+
+	/**
+	 * Submit the request to the server.
+	 * @param taskList the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
+	 * @return the list of executed tasks with their results.
+	 * @throws Exception if an error occurs while sending the request.
+	 */
+	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy) throws Exception
+	{
 		JPPFResultCollector collector = new JPPFResultCollector(taskList.size());
 		List<JPPFTask> result = null;
 		while ((result == null) && !pools.isEmpty())
 		{
 			try
 			{
-				getClientConnection().submit(taskList, dataProvider, collector);
+				getClientConnection().submit(taskList, dataProvider, collector, policy);
 				result = collector.waitForResults();
 			}
 			catch(Exception e)
@@ -208,13 +222,27 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	}
 
 	/**
-	 * Submit the request to the server.
+	 * Submit a non-blocking request to the server.
 	 * @param taskList the list of tasks to execute remotely.
 	 * @param dataProvider the provider of the data shared among tasks, may be null.
 	 * @param listener listener to notify whenever a set of results have been received.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
 	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
+		throws Exception
+	{
+		submitNonBlocking(taskList, dataProvider, listener, null);
+	}
+
+	/**
+	 * Submit a non-blocking request to the server.
+	 * @param taskList the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param listener listener to notify whenever a set of results have been received.
+	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
+	 * @throws Exception if an error occurs while sending the request.
+	 */
+	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
 		throws Exception
 	{
 		getClientConnection().submit(taskList, dataProvider, listener);

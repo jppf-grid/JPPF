@@ -139,5 +139,9 @@ public enum  BundleParameter
 	/**
 	 * Parameter for the RMI port used by JMX in the node.
 	 */
-	NODE_MANAGEMENT_ID_PARAM
+	NODE_MANAGEMENT_ID_PARAM,
+	/**
+	 * Parameter for the node's available system information.
+	 */
+	NODE_SYSTEM_INFO_PARAM
 }

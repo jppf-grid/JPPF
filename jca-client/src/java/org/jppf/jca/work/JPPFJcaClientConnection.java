@@ -27,6 +27,7 @@ import org.jppf.*;
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultListener;
 import org.jppf.comm.socket.SocketInitializer;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 
@@ -135,8 +136,23 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
 			throws Exception
 	{
+		submit(taskList, dataProvider, listener, null);
+	}
+
+	/**
+	 * Submit the request to the server.
+	 * @param taskList the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param listener listener to notify whenever a set of results have been received.
+	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
+	 * @throws Exception if an error occurs while sending the request.
+	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener)
+	 */
+	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
+			throws Exception
+	{
 		setStatus(EXECUTING);
-		ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener);
+		ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener, policy);
 		
 		JcaResultProcessor proc = new JcaResultProcessor(this, exec);
 		proc.run();

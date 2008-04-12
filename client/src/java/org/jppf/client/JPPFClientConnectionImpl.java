@@ -29,11 +29,12 @@ import javax.crypto.SecretKey;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
-import org.jppf.client.event.*;
+import org.jppf.client.event.TaskResultListener;
 import org.jppf.comm.socket.*;
 import org.jppf.management.*;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.security.CryptoUtils;
-import org.jppf.server.*;
+import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.TypedProperties;
@@ -145,13 +146,14 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * @param taskList the list of tasks to execute remotely.
 	 * @param dataProvider the provider of the data shared among tasks, may be null.
 	 * @param listener listener to notify whenever a set of results have been received.
+	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener)
 	 */
-	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
+	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
 			throws Exception
 	{
-		ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener);
+		ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener, policy);
 		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(this, exec);
 		executor.submit(proc);
 		if (debugEnabled) log.debug("["+name+"] submitted " + taskList.size() + " tasks");
