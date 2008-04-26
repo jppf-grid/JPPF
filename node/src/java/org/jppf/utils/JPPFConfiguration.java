@@ -29,9 +29,13 @@ import java.io.*;
 public class JPPFConfiguration
 {
 	/**
-	 * Prefix for execution services configuration properties names.
+	 * Name of the system property holding the location of the JPPF configuration file.
 	 */
 	public static final String CONFIG_PROPERTY = "jppf.config";
+	/**
+	 * Default location of the JPPF configuration file.
+	 */
+	public static final String DEFAULT_FILE = "jppf.properties";
 	/**
 	 * Holds the JPPF configuration properties.
 	 */
@@ -52,7 +56,7 @@ public class JPPFConfiguration
 	 */
 	private static void loadProperties()
 	{
-		String filename = System.getProperty(CONFIG_PROPERTY, "node.properties");
+		String filename = System.getProperty(CONFIG_PROPERTY, DEFAULT_FILE);
 		props = new TypedProperties();
 		try
 		{
