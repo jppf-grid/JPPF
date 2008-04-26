@@ -74,7 +74,7 @@ public class TypedProperties extends Properties
 		{
 			try
 			{
-				intVal = Integer.parseInt(val);
+				intVal = Integer.parseInt(val.trim());
 			}
 			catch(NumberFormatException e)
 			{
@@ -107,7 +107,7 @@ public class TypedProperties extends Properties
 		{
 			try
 			{
-				longVal = Long.parseLong(val);
+				longVal = Long.parseLong(val.trim());
 			}
 			catch(NumberFormatException e)
 			{
@@ -130,7 +130,7 @@ public class TypedProperties extends Properties
 		{
 			try
 			{
-				floatVal = Float.parseFloat(val);
+				floatVal = Float.parseFloat(val.trim());
 			}
 			catch(NumberFormatException e)
 			{
@@ -163,7 +163,7 @@ public class TypedProperties extends Properties
 		{
 			try
 			{
-				doubleVal = Double.parseDouble(val);
+				doubleVal = Double.parseDouble(val.trim());
 			}
 			catch(NumberFormatException e)
 			{
@@ -192,7 +192,7 @@ public class TypedProperties extends Properties
 	{
 		boolean booleanVal = defValue;
 		String val = getProperty(key, null);
-		if (val != null) booleanVal = Boolean.valueOf(val).booleanValue();
+		if (val != null) booleanVal = Boolean.valueOf(val.trim()).booleanValue();
 		return booleanVal;
 	}
 	
