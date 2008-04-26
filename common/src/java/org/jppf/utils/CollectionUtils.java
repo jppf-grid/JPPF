@@ -113,4 +113,34 @@ public final class CollectionUtils
 		list.remove(value);
 		if (list.isEmpty()) map.remove(key);
 	}
+
+	/**
+	 * Get the total number of elements in a map whose values are lists of elements.
+	 * @param <T> the type of the keys in the map.
+	 * @param <U> the type of the elements in the lists.
+	 * @param map the map of which to get the size.
+	 * @return the size of the map as an int value.
+	 */
+	public static <T, U> int sizeOfListMap(Map<T, List<U>> map)
+	{
+		int result = 0;
+		for (Map.Entry<T, List<U>> entry: map.entrySet()) result += entry.getValue().size();
+		return result;
+	}
+
+	/**
+	 * Format a string with size information about a map whose values are lists of elements.
+	 * @param <T> the type of the keys in the map.
+	 * @param <U> the type of the values in the map.
+	 * @param name an arbitrary name given to the map.
+	 * @param map the map from which to get size information.
+	 * @return a string containing information about the number of elements in the map. 
+	 */
+	public static <T, U> String formatSizeMapInfo(String name, Map<T, List<U>> map)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(name).append(": shallow size = ").append(map.size());
+		sb.append(", total elements = ").append(sizeOfListMap(map));
+		return sb.toString();
+	}
 }
