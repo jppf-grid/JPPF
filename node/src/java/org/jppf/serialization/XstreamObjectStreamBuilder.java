@@ -26,9 +26,10 @@ import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
 
 /**
- * Standard object stream factory.
- * This factory creates instances of {@link java.io.ObjectInputStream ObjectInputStream}
- * and {@link java.io.ObjectOutputStream ObjectOutputStream}
+ * Object stream factory that creates streams from the XStream framework.
+ * This enables serialization to and deserialization from XML streams, and allows non-serializable classes to be processed.
+ * If you do not use it, it will not generate compile time errors, even if the XStream libraries are not in the classpath,
+ * as this class relies entirely on reflection to instantiate the required objects.
  * @author Laurent Cohen
  */
 public class XstreamObjectStreamBuilder implements JPPFObjectStreamBuilder
@@ -107,7 +108,7 @@ public class XstreamObjectStreamBuilder implements JPPFObjectStreamBuilder
 					Constructor c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
 					Object o = c.newInstance(domDriverClass.newInstance());
 					*/
-					// use this code to use the XStream XPP driver (XPPDriver)
+					// use this code to use the XStream XPP driver (XPPDriver), which is a lot faster.
 					createOisMethod = xstreamClass.getMethod("createObjectInputStream", new Class[] {InputStream.class});
 					createOosMethod = xstreamClass.getMethod("createObjectOutputStream", new Class[] {OutputStream.class});
 					xstream = o;
