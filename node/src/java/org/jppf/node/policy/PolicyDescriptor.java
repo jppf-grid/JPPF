@@ -40,10 +40,18 @@ public class PolicyDescriptor
 	 */
 	public String ignoreCase = null;
 	/**
+	 * The fullyqualified class name of a custom policy class.
+	 */
+	public String className = null;
+	/**
 	 * The operands for this element, applies to non-logical rules (ie not AND, OR, XOR, NOT).
 	 * The first operand is always a property name.
 	 */
 	public List<String> operands = new ArrayList<String>();
+	/**
+	 * List of arguments used in a custom (user-defined policy).
+	 */
+	public List<String> arguments = new ArrayList<String>();
 	/**
 	 * The children of this element, if any.
 	 */

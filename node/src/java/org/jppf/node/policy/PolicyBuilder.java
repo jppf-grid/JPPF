@@ -29,8 +29,9 @@ public class PolicyBuilder
 	 * Build an execution policy from a parsed policy descriptor.
 	 * @param desc the descriptor parsed from an XML document.
 	 * @return an <code>ExecutionPolicy</code> instance.
+	 * @throws Exception if an error occurs while generating a policy object.
 	 */
-	public ExecutionPolicy buildPolicy(PolicyDescriptor desc)
+	public ExecutionPolicy buildPolicy(PolicyDescriptor desc) throws Exception
 	{
 		String type = desc.type;
 		if ("NOT".equals(type)) return buildNotPolicy(desc);
@@ -49,6 +50,7 @@ public class PolicyBuilder
 		else if ("Contains".equals(type)) return buildContainsPolicy(desc);
 		else if ("OneOf".equals(type)) return buildOneOfPolicy(desc);
 		else if ("RegExp".equals(type)) return buildRegExpPolicy(desc);
+		else if ("CustomRule".equals(type)) return buildCustomPolicy(desc);
 		return null;
 	}
 
@@ -56,8 +58,9 @@ public class PolicyBuilder
 	 * Build a NOT policy from a descriptor.
 	 * @param desc the descriptor to use.
 	 * @return an <code>ExecutionPolicy</code> instance.
+	 * @throws Exception if an error occurs while generating the policy object.
 	 */
-	private ExecutionPolicy buildNotPolicy(PolicyDescriptor desc)
+	private ExecutionPolicy buildNotPolicy(PolicyDescriptor desc) throws Exception
 	{
 		return new ExecutionPolicy.NotRule(buildPolicy(desc.children.get(0)));
 	}
@@ -66,8 +69,9 @@ public class PolicyBuilder
 	 * Build an AND policy from a descriptor.
 	 * @param desc the descriptor to use.
 	 * @return an <code>ExecutionPolicy</code> instance.
+	 * @throws Exception if an error occurs while generating the policy object.
 	 */
-	private ExecutionPolicy buildAndPolicy(PolicyDescriptor desc)
+	private ExecutionPolicy buildAndPolicy(PolicyDescriptor desc) throws Exception
 	{
 		ExecutionPolicy[] rules = new ExecutionPolicy[desc.children.size()];
 		int count = 0;
@@ -79,8 +83,9 @@ public class PolicyBuilder
 	 * Build an OR policy from a descriptor.
 	 * @param desc the descriptor to use.
 	 * @return an <code>ExecutionPolicy</code> instance.
+	 * @throws Exception if an error occurs while generating the policy object.
 	 */
-	private ExecutionPolicy buildOrPolicy(PolicyDescriptor desc)
+	private ExecutionPolicy buildOrPolicy(PolicyDescriptor desc) throws Exception
 	{
 		ExecutionPolicy[] rules = new ExecutionPolicy[desc.children.size()];
 		int count = 0;
@@ -92,8 +97,9 @@ public class PolicyBuilder
 	 * Build an XOR policy from a descriptor.
 	 * @param desc the descriptor to use.
 	 * @return an <code>ExecutionPolicy</code> instance.
+	 * @throws Exception if an error occurs while generating the policy object.
 	 */
-	private ExecutionPolicy buildXorPolicy(PolicyDescriptor desc)
+	private ExecutionPolicy buildXorPolicy(PolicyDescriptor desc) throws Exception
 	{
 		ExecutionPolicy[] rules = new ExecutionPolicy[desc.children.size()];
 		int count = 0;
@@ -344,12 +350,27 @@ public class PolicyBuilder
 	}
 
 	/**
-	 * Build a Contains policy from a descriptor.
+	 * Build a RegExp policy from a descriptor.
 	 * @param desc the descriptor to use.
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 */
 	private ExecutionPolicy buildRegExpPolicy(PolicyDescriptor desc)
 	{
 		return new RegExp(desc.operands.get(0), desc.operands.get(1));
+	}
+
+	/**
+	 * Build a custom policy from a descriptor.
+	 * @param desc the descriptor to use.
+	 * @return an <code>ExecutionPolicy</code> instance.
+	 * @throws Exception if an error occurs while generating the custom policy object.
+	 */
+	private ExecutionPolicy buildCustomPolicy(PolicyDescriptor desc) throws Exception
+	{
+		Class clazz = Class.forName(desc.className);
+		CustomPolicy policy = (CustomPolicy) clazz.newInstance();
+		policy.setArgs(desc.arguments.toArray(new String[0]));
+		policy.initialize();
+		return policy;
 	}
 }

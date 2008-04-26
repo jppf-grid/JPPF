@@ -37,9 +37,9 @@ public class PolicyParser
 	/**
 	 * List of possible rule names.
 	 */
-	private static final List<String> RULE_NAMES =Arrays.asList(new String[] {
+	private static final List<String> RULE_NAMES = Arrays.asList(new String[] {
 		"NOT", "AND", "OR", "XOR", "LessThan", "AtMost", "AtLeast", "MoreThan",
-		"BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf"});
+		"BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule"});
 	/**
 	 * The DOM parser used to build the descriptor tree.
 	 */
@@ -115,6 +115,8 @@ public class PolicyParser
 		if (attrNode != null) desc.valueType = attrNode.getNodeValue();
 		attrNode = attrMap.getNamedItem("ignoreCase");
 		if (attrNode != null) desc.ignoreCase = attrNode.getNodeValue();
+		attrNode = attrMap.getNamedItem("class");
+		if (attrNode != null) desc.className = attrNode.getNodeValue();
 		NodeList list = node.getChildNodes();
 		for (int i=0; i<list.getLength(); i++)
 		{
@@ -125,6 +127,8 @@ public class PolicyParser
 				if (RULE_NAMES.contains(name)) desc.children.add(generateTree(childNode));
 				else if ("Property".equals(name) || "Value".equals(name))
 					desc.operands.add(getTextNodeValue(childNode));
+				else if ("Arg".equals(name))
+					desc.arguments.add(getTextNodeValue(childNode));
 			}
 		}
 		return desc;
@@ -140,10 +144,11 @@ public class PolicyParser
 		NodeList children = node.getChildNodes();
 		for (int j=0; j<children.getLength(); j++)
 		{
-			Node tmpNode = children.item(j);
-			if (tmpNode.getNodeType() == Node.TEXT_NODE)
+			Node childNode = children.item(j);
+			int type = childNode.getNodeType();
+			if ((type == Node.TEXT_NODE) || (type == Node.CDATA_SECTION_NODE))
 			{
-				return tmpNode.getNodeValue();
+				return childNode.getNodeValue();
 			}
 		}
 		return null;
@@ -184,56 +189,81 @@ public class PolicyParser
 	/**
 	 * Parse an XML document representing an execution policy.
 	 * @param docPath path to the XML document file.
-	 * @param validate determines whether the XML document should be validated against the
-	 * <a href="http://www.jppf.org/schemas/ExecutionPolicy.xsd">JPPF Execution Policy schema</a>.
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 * @throws Exception if an error occurs during the validation or parsing.
 	 */
-	public static ExecutionPolicy parsePolicy(String docPath, boolean validate) throws Exception
+	public static ExecutionPolicy parsePolicy(String docPath) throws Exception
 	{
-		return parsePolicy(FileUtils.getFileReader(docPath), validate);
+		return parsePolicy(FileUtils.getFileReader(docPath));
 	}
 
 	/**
 	 * Parse an XML document representing an execution policy.
 	 * @param stream an input stream from which the XML representation of the policy is read.
-	 * @param validate determines whether the XML document should be validated against the
-	 * <a href="http://www.jppf.org/schemas/ExecutionPolicy.xsd">JPPF Execution Policy schema</a>.
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 * @throws Exception if an error occurs during the validation or parsing.
 	 */
-	public static ExecutionPolicy parsePolicy(InputStream stream, boolean validate) throws Exception
+	public static ExecutionPolicy parsePolicy(InputStream stream) throws Exception
 	{
-		return parsePolicy(new InputStreamReader(stream), validate);
+		return parsePolicy(new InputStreamReader(stream));
 	}
 
 	/**
 	 * Parse an XML document representing an execution policy.
 	 * @param reader reader from which the XML representation of the policy is read.
-	 * @param validate determines whether the XML document should be validated against the
-	 * <a href="http://www.jppf.org/schemas/ExecutionPolicy.xsd">JPPF Execution Policy schema</a>.
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 * @throws Exception if an error occurs during the validation or parsing.
 	 */
-	public static ExecutionPolicy parsePolicy(Reader reader, boolean validate) throws Exception
+	public static ExecutionPolicy parsePolicy(Reader reader) throws Exception
+	{
+		PolicyDescriptor desc = new PolicyParser().parse(reader);
+		return new PolicyBuilder().buildPolicy(desc.children.get(0));
+	}
+
+	/**
+	 * Validate an XML document representing an execution policy against the
+	 * <a href="http://www.jppf.org/schemas/ExecutionPolicy.xsd">JPPF Execution Policy schema</a>.
+	 * @param docPath path to the XML document file.
+	 * @throws JPPFException if there is a validation error. The details of the errors are included in the exception message.
+	 * @throws Exception if an error occurs during the validation.
+	 */
+	public static void validatePolicy(String docPath) throws JPPFException, Exception
+	{
+		validatePolicy(FileUtils.getFileReader(docPath));
+	}
+
+	/**
+	 * Validate an XML document representing an execution policy against the
+	 * <a href="http://www.jppf.org/schemas/ExecutionPolicy.xsd">JPPF Execution Policy schema</a>.
+	 * @param stream an input stream from which the XML representation of the policy is read.
+	 * @throws JPPFException if there is a validation error. The details of the errors are included in the exception message.
+	 * @throws Exception if an error occurs during the validation or parsing.
+	 */
+	public static void validatePolicy(InputStream stream) throws JPPFException, Exception
+	{
+		validatePolicy(new InputStreamReader(stream));
+	}
+
+	/**
+	 * Validate an XML document representing an execution policy against the
+	 * <a href="http://www.jppf.org/schemas/ExecutionPolicy.xsd">JPPF Execution Policy schema</a>.
+	 * @param reader reader from which the XML representation of the policy is read.
+	 * @throws JPPFException if there is a validation error. The details of the errors are included in the exception message.
+	 * @throws Exception if an error occurs during the validation or parsing.
+	 */
+	public static void validatePolicy(Reader reader) throws JPPFException, Exception
 	{
 		JPPFErrorReporter reporter = new JPPFErrorReporter("XML validator");
-		if (validate)
+		String schemaPath = "org/jppf/schemas/ExecutionPolicy.xsd";
+		SchemaValidator validator = new SchemaValidator(reporter);
+		if (!validator.validate(reader, FileUtils.getFileReader(schemaPath)))
 		{
-			String schemaPath = "org/jppf/schemas/ExecutionPolicy.xsd";
-			SchemaValidator validator = new SchemaValidator(reporter);
-			if (!validator.validate(reader, FileUtils.getFileReader(schemaPath)))
-			{
-				StringBuilder sb = new StringBuilder();
-				sb.append("The XML document has errors:\n");
-				if (!reporter.fatalErrors.isEmpty()) sb.append("fatal errors: ").append(reporter.allFatalErrorsAsStrings()).append("\n");
-				if (!reporter.errors.isEmpty())      sb.append("errors      : ").append(reporter.allErrorsAsStrings()).append("\n");
-				if (!reporter.warnings.isEmpty())    sb.append("warnings    : ").append(reporter.allWarningsAsStrings()).append("\n");
-				throw new JPPFException(sb.toString());
-			}
+			StringBuilder sb = new StringBuilder();
+			sb.append("The XML document has errors:\n");
+			if (!reporter.fatalErrors.isEmpty()) sb.append("fatal errors: ").append(reporter.allFatalErrorsAsStrings()).append("\n");
+			if (!reporter.errors.isEmpty())      sb.append("errors      : ").append(reporter.allErrorsAsStrings()).append("\n");
+			if (!reporter.warnings.isEmpty())    sb.append("warnings    : ").append(reporter.allWarningsAsStrings()).append("\n");
+			throw new JPPFException(sb.toString());
 		}
-		PolicyParser parser = new PolicyParser();
-		PolicyDescriptor desc = parser.parse(reader);
-		return new PolicyBuilder().buildPolicy(desc.children.get(0));
 	}
 }
