@@ -155,22 +155,12 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
 	{
-		//JPPFJcaResultCollector collector = new JPPFJcaResultCollector();
 		JPPFSubmissionResult collector = new JPPFSubmissionResult(taskList.size());
 		List<JPPFTask> result = null;
 		while ((result == null) && !pools.isEmpty())
 		{
-			try
-			{
-				getClientConnection().submit(taskList, dataProvider, collector);
-				result = collector.getResults();
-			}
-			catch(Exception e)
-			{
-				//if (pools.isEmpty()) throw e;
-				//log.error(e.getMessage(), e);
-				throw e;
-			}
+			getClientConnection().submit(taskList, dataProvider, collector);
+			result = collector.getResults();
 		}
 		return result;
 	}

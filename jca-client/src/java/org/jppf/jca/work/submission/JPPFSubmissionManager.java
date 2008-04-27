@@ -150,7 +150,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	}
 
 	/**
-	 * Get a submission given its id, without removing it from this submisison manager.
+	 * Get a submission given its id, without removing it from this submissison manager.
 	 * @param id the id of the submission to find.
 	 * @return the submisison corresponding to the id, or null if the submission could not be found.
 	 */
@@ -160,7 +160,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	}
 
 	/**
-	 * Get a submission given its id, and remove it from this submisison manager.
+	 * Get a submission given its id, and remove it from this submissison manager.
 	 * @param id the id of the submission to find.
 	 * @return the submisison corresponding to the id, or null if the submission could not be found.
 	 */

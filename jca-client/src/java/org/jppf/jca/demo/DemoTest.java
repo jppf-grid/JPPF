@@ -26,7 +26,7 @@ import javax.resource.cci.ConnectionFactory;
 import javax.rmi.PortableRemoteObject;
 
 import org.jppf.jca.cci.JPPFConnection;
-import org.jppf.jca.work.submission.*;
+import org.jppf.jca.work.submission.SubmissionStatus;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -55,50 +55,6 @@ public class DemoTest implements Serializable
 
 	/**
 	 * Perform a simple call to the JPPF resource adapter.
-	 * @return a string reporting either the task execution result or an error message.
-	 * @throws Exception if the call to JPPF failed.
-	 */
-	public String testConnector() throws Exception
-	{
-		JPPFConnection connection = null;
-		String id = null;
-		try
-		{
-			connection = getConnection();
-			JPPFTask task = new DemoTask();
-			List list = new ArrayList();
-			list.add(task);
-			id = connection.submitNonBlocking(list, null, new SubmissionStatusListener()
-			{
-				public void submissionStatusChanged(SubmissionStatusEvent event)
-				{
-					System.out.println("*** 1 *** submission ["+event.getSubmissionId()+"] changed to '"+event.getStatus()+"'");
-				}
-			});
-			
-			connection.addSubmissionStatusListener(id, new SubmissionStatusListener()
-			{
-				public void submissionStatusChanged(SubmissionStatusEvent event)
-				{
-					System.out.println("*** 2 *** submission ["+event.getSubmissionId()+"] changed to '"+event.getStatus()+"'");
-				}
-			});
-			/*
-			list = connection.submit(list, null);
-			task = (JPPFTask) list.get(0);
-			if (task.getException() != null) id = task.getException().getMessage();
-			else id = (String) task.getResult();
-			*/
-		}
-		finally
-		{
-			if (connection != null) connection.close();
-		}
-		return id;
-	}
-
-	/**
-	 * Perform a simple call to the JPPF resource adapter.
 	 * @param duration the duration of the task to submit.
 	 * @return a string reporting either the task execution result or an error message.
 	 * @throws Exception if the call to JPPF failed.
@@ -113,8 +69,15 @@ public class DemoTest implements Serializable
 			JPPFTask task = new DurationTask(duration);
 			List list = new ArrayList();
 			list.add(task);
+
 			id = connection.submitNonBlocking(list, null, null);
-			
+
+			/*
+			// submit with an execution policy
+			ExecutionPolicy policy = PolicyParser.parsePolicy("ExecutionPolicy.xml");
+			id = connection.submitNonBlocking(policy, list, null, null);
+			*/
+
 			/*
 			id = connection.submitNonBlocking(list, null, new SubmissionStatusListener()
 			{

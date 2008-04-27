@@ -155,7 +155,6 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
 					if (!closed)
 					{
 						if (debugEnabled) log.debug("["+getName()+"] caught " + e + ", will re-initialise ...", e);

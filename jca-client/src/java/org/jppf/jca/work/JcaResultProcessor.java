@@ -94,6 +94,7 @@ public class JcaResultProcessor implements Work
 						JPPFTask task = execution.tasks.get(0);
 						mgr.addRequestClassLoader(requestUuid, task.getClass().getClassLoader());
 					}
+					log.info("submitting with policy = "+execution.policy);
 					connection.sendTasks(bundle, execution.tasks, execution.dataProvider);
 					while (count < execution.tasks.size())
 					{
