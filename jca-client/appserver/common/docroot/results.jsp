@@ -1,9 +1,13 @@
 <%@ page language="java" %>
 <%@ page import="java.util.*" %>
 <%@ page import="org.jppf.jca.demo.*" %>
+<%@ include file="jndiName.jsp"%>
 <%@ include file="header.jsp"%>
-<%@ include file="menu.jsp"%>
-		<table align="center" width="80%" cellspacing="0" cellpadding="5">
+<%
+			String title = "Results";
+%>
+<%@ include file="block_header.jsp"%>
+		<table align="center" cellspacing="0" cellpadding="5">
 			<tr><td height="5"></td></tr>
 			<tr><td align="center">
 				<h4>To refresh the list, please click on the &quot;Results&quot; button again
@@ -60,4 +64,5 @@
 			}
 %>
 		</table>
+<%@ include file="block_footer.jsp"%>
 <%@ include file="footer.jsp"%>

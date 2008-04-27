@@ -1,17 +1,21 @@
 <%@ page language="java" %>
 <%@ page import="org.jppf.jca.demo.*" %>
+<%@ include file="jndiName.jsp"%>
 <%@ include file="header.jsp"%>
-<%@ include file="menu.jsp"%>
 
-	<table align="center" width="80%" cellspacing="0" cellpadding="5" class="table_">
-		<tr><td align="center "style="background-color: #8080FF"><span style="font-size: 14pt; font-weight: bold; color: #FFFFC0">About JPPF</span></td></tr>
+<%
+	String title = "About JPPF";
+%>
+<%@ include file="block_header.jsp"%>
+	<br>
+	<table align="center" cellspacing="0" cellpadding="5">
 		<tr><td height="5"></td></tr>
-		<tr><td width="50%">
+		<tr><td>
 			JPPF is a grid toolkit for Java that makes it easy to run applications in parallel,
 			and speed up their execution by orders of magnitude.
 		</td></tr>
 		<tr><td height="5"></td></tr>
-		<tr><td width="50%">
+		<tr><td">
 			JPPF has many outstanding features:<br>
 			<ul>
 				<li>a JPPF grid can be up and running in minutes</li>
@@ -24,11 +28,12 @@
 				<li>and more ....</li>
 			</ul>
 		</td></tr>
-		<tr><td width="50%">
+		<tr><td>
 			Visit us on the <a href="http://www.jppf.org">JPPF Web Site</a><br>
 			Participate and find help in the <a href="http://www.jppf.org/forums">JPPF Forums</a><br>
 			Find the information you need on the <a href="http://www.jppf.org/wiki">JPPF Documentation Pages</a><br>
 		</td></tr>
 	</table>
 
+<%@ include file="block_footer.jsp"%>
 <%@ include file="footer.jsp"%>

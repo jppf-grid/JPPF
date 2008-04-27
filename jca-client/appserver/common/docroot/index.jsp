@@ -1,7 +1,7 @@
 <%@ page language="java" %>
 <%@ page import="org.jppf.jca.demo.*" %>
+<%@ include file="jndiName.jsp"%>
 <%@ include file="header.jsp"%>
-<%@ include file="menu.jsp"%>
 <%
 	  int duration = 5;
 	  String perform = request.getParameter("perform");
@@ -33,14 +33,18 @@
 			  }
 			}
 %>
-		<table align="center" width="80%" cellspacing="0" cellpadding="5" class="table_">
+<%
+			String title = "Submit a task";
+%>
+<%@ include file="block_header.jsp"%>
+		<table align="center" cellspacing="0" cellpadding="5">
 			<tr><td height="5"></td></tr>
-			<tr><td width="50%" align="center">
+			<tr><td align="center">
 				<h3>Click on the button to submit a task to JPPF</h3>
 				<h4>This will submit a task that will be executed for the specified duration</h4>
 			</td></tr>
 	
-			<tr><td width="50%" align="center">
+			<tr><td align="center">
 				<form name="jppftest" action="<%=request.getContextPath()%>/index.jsp" method="post">
 					<input type="hidden" value="true" name="perform">
 					Duration in seconds: <input type="text" value="<%= duration %>" name="duration" maxLength="3">&nbsp;&nbsp;
@@ -52,7 +56,7 @@
 			if (msg != null)
 			{
 %>
-			<tr><td width="50%" align="center">
+			<tr><td align="center">
 		    <h3>Result : <%= msg %></h3>
 			</td></tr>
 <%
@@ -60,4 +64,5 @@
 		}
 %>
 		</table>
+<%@ include file="block_footer.jsp"%>
 <%@ include file="footer.jsp"%>
