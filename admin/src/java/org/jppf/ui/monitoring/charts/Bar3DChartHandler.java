@@ -73,13 +73,13 @@ public class Bar3DChartHandler implements ChartHandler
 		Color c3 = new Color(255, 255, 192, 255);
 		rend.setWallPaint(c3);
 		rend.setSeriesPaint(0, c1);
-		rend.setItemLabelGenerator(new LabelGenerator(config.unit, config.precision));
+		rend.setBaseItemLabelGenerator(new LabelGenerator(config.unit, config.precision));
 
     ItemLabelPosition labelPos = new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.BOTTOM_CENTER);
-		rend.setPositiveItemLabelPosition(labelPos);
+		rend.setBasePositiveItemLabelPosition(labelPos);
     ItemLabelPosition labelPos2 = new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.BOTTOM_LEFT);
 		rend.setPositiveItemLabelPositionFallback(labelPos2);
-		rend.setItemLabelsVisible(true);
+		rend.setBaseItemLabelsVisible(true);
 		config.chart = chart;
 		return config;
 	}

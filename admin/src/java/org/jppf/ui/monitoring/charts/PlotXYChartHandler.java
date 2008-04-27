@@ -63,9 +63,9 @@ public class PlotXYChartHandler implements ChartHandler
 		JFreeChart chart = ChartFactory.createXYLineChart(s, null, null, ds, PlotOrientation.VERTICAL, true, true, false);
 		XYPlot plot = chart.getXYPlot();
 		XYItemRenderer rend = plot.getRenderer();
-		rend.setSeriesVisibleInLegend(true);
+		rend.setBaseSeriesVisibleInLegend(true);
 		rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
-		rend.setStroke(new BasicStroke(2f));
+		rend.setBaseStroke(new BasicStroke(2f));
 		config.chart = chart;
 		return config;
 	}

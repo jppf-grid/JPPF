@@ -68,7 +68,7 @@
 			function refresh(text)
 			{
 				var builder = new OptionsPageBuilder();
-				var bundlePath = StringUtils.getLocalisationBase(base, option.findLastWithName("/OpenBtn").getValue());
+				var bundlePath = LocalizationUtils.getLocalisationBase(base, option.findLastWithName("/OpenBtn").getValue());
 				var page = builder.buildPageFromContent(text, bundlePath);
 				var pp = option.findLastWithName("/PreviewPanel");
 				var list = new ArrayList(pp.getChildren());
