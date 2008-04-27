@@ -89,9 +89,9 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	{
 		this.props = props;
 		String prefix = name + ".";
+		classServerPort = props.getInt(prefix + "class.server.port", 11111);
 		configure(uuid, name, props.getString(prefix + "jppf.server.host", "localhost"),
-			props.getInt(prefix + "app.server.port", 11112),
-			classServerPort = props.getInt(prefix + "class.server.port", 11111),
+			props.getInt(prefix + "app.server.port", 11112), classServerPort,
 			props.getInt(prefix + "priority", 0));
 	}
 
