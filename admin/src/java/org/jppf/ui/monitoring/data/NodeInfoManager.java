@@ -157,7 +157,7 @@ public class NodeInfoManager
 		if (this == obj) return true;
 		if (!(obj instanceof NodeInfoManager)) return false;
 		NodeInfoManager other = (NodeInfoManager) obj;
-		if ((driverName == null) && (other.getDriverName() == null)) return true;
+		if (driverName == null) return other.getDriverName() == null;
 		return driverName.equals(other.getDriverName());
 	}
 

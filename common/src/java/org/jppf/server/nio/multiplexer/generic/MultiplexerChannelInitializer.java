@@ -18,8 +18,6 @@
 
 package org.jppf.server.nio.multiplexer.generic;
 
-import java.nio.channels.SelectionKey;
-
 import org.apache.commons.logging.*;
 import org.jppf.server.nio.AbstractSocketChannelHandler;
 
@@ -34,26 +32,16 @@ public class MultiplexerChannelInitializer implements Runnable
 	 */
 	private static Log log = LogFactory.getLog(MultiplexerChannelInitializer.class);
 	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The key associated with the initial connection.
-	 */
-	private SelectionKey initialKey = null;
-	/**
 	 * Wrapper for the new connection to establish.
 	 */
 	private AbstractSocketChannelHandler channelHandler = null;
 
 	/**
 	 * Instantiate this initializer with the specified parameters.
-	 * @param initialKey the key associated with the initial connection.
 	 * @param channelHandler wrapper for the new connection to establish.
 	 */
-	public MultiplexerChannelInitializer(SelectionKey initialKey, AbstractSocketChannelHandler channelHandler)
+	public MultiplexerChannelInitializer(AbstractSocketChannelHandler channelHandler)
 	{
-		this.initialKey = initialKey;
 		this.channelHandler = channelHandler;
 	}
 

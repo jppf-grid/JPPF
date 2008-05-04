@@ -130,7 +130,7 @@ public class CommandLineTask extends JPPFTask
 				for (Map.Entry e: env.entrySet()) map.put(e.getKey(), e.getValue());
 			}
 			Process p = builder.start();
-			ProcessWrapper wrapper = new ProcessWrapper(p, captureOutput);
+			ProcessWrapper wrapper = new ProcessWrapper(p);
 			p.waitFor();
 			if (captureOutput)
 			{

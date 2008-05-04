@@ -190,7 +190,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 			transitionManager.transitionChannel(key, MultiplexerTransition.TO_IDLE);
 			HostPort mult = getHostPortForBoundPort(context.getBoundPort());
 			MultiplexerChannelHandler handler = new MultiplexerChannelHandler(this, mult.host(), mult.port(), key);
-			MultiplexerChannelInitializer init = new MultiplexerChannelInitializer(key, handler);
+			MultiplexerChannelInitializer init = new MultiplexerChannelInitializer(handler);
 			new Thread(init).start();
 		}
 		else if (context.isMultiplexerPort())

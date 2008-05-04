@@ -19,8 +19,9 @@
 package org.jppf.server.nio;
 
 import java.nio.channels.*;
-import java.util.*;
+import java.util.LinkedList;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.commons.logging.*;
 import org.jppf.utils.*;
@@ -100,7 +101,8 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	public void setKeyOps(SelectionKey key, int ops)
 	{
-		server.getLock().lock();
+		Lock lock = server.getLock();
+		lock.lock();
 		try
 		{
 			server.getSelector().wakeup();
@@ -108,7 +110,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		}
 		finally
 		{
-			server.getLock().unlock();
+			lock.unlock();
 		}
 		/*
 		synchronized(keyOpsList)

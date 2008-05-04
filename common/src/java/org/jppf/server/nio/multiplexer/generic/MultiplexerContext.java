@@ -20,12 +20,12 @@ package org.jppf.server.nio.multiplexer.generic;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
-import java.util.*;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.logging.*;
 import org.jppf.server.nio.NioContext;
-import org.jppf.utils.*;
+import org.jppf.utils.StringUtils;
 
 /**
  * Context obect associated with a socket channel used by the multiplexer. 
@@ -65,10 +65,6 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * Determines whether end of stream was reached during the last read operation.
 	 */
 	public boolean eof = false;
-	/**
-	 * Contains the data currently being read.
-	 */
-	private JPPFByteArrayOutputStream currentData = null;
 	/**
 	 * 
 	 */

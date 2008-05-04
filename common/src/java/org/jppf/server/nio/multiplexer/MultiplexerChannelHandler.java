@@ -77,7 +77,6 @@ public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
 	 */
 	protected void postInit() throws Exception
 	{
-		Selector selector = server.getSelector();
 		SocketChannel channel = socketClient.getChannel();
 		socketClient.setChannel(null);
 		MultiplexerContext context = (MultiplexerContext) server.createNioContext();

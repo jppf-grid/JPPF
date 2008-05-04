@@ -46,10 +46,6 @@ public final class ProcessWrapper
 	 * List of listeners to this wrapper's output and error stream events.
 	 */
 	private List<ProcessWrapperEventListener> listeners = new ArrayList<ProcessWrapperEventListener>();
-	/**
-	 * Determines whether the process output should be captured.
-	 */
-	private boolean captureOutput = true;
 
 	/**
 	 * Initialize this process handler with the specified process. 
@@ -57,23 +53,9 @@ public final class ProcessWrapper
 	 */
 	public ProcessWrapper(Process process)
 	{
-		this(process, true);
-	}
-
-	/**
-	 * Initialize this process handler with the specified process. 
-	 * @param process the process to handle.
-	 * @param captureOutput specifies whether the process output should be captured.
-	 */
-	public ProcessWrapper(Process process, boolean captureOutput)
-	{
 		this.process = process;
-		this.captureOutput = true;
-		if (captureOutput)
-		{
-			standardOutput = new StringBuilder();
-			errorOutput = new StringBuilder();
-		}
+		standardOutput = new StringBuilder();
+		errorOutput = new StringBuilder();
 		new StreamHandler(process.getInputStream(), standardOutput, true).start();
 		new StreamHandler(process.getErrorStream(), errorOutput, false).start();
 	}

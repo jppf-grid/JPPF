@@ -62,7 +62,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 	/**
 	 * Used to store and retrieve the configuration, to and from the preferences tree.
 	 */
-	private PreferencesStorage storage = null;
+	private transient PreferencesStorage storage = null;
 
 	/**
 	 * Initialize this charts builder.
