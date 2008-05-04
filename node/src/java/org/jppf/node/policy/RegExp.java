@@ -54,7 +54,7 @@ public class RegExp extends ExecutionPolicy
 		this.propertyName = propertyName;
 		// compiled at creation time to ensure any syntax problem in the expression
 		// is known on the client side.
-		Pattern pattern = Pattern.compile(regExp);
+		Pattern.compile(regExp);
 		this.regExp = regExp;
 	}
 

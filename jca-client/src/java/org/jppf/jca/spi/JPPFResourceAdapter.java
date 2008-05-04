@@ -62,7 +62,7 @@ public class JPPFResourceAdapter extends JPPFAccessor implements ResourceAdapter
 	/**
 	 * Bootstrap context provided by the application server.
 	 */
-	private BootstrapContext ctx = null;
+	private transient BootstrapContext ctx = null;
 	/**
 	 * Manages asynchronous work submission to the JPPF driver.
 	 */

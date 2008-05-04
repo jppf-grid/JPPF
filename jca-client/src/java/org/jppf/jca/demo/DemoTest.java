@@ -42,7 +42,7 @@ public class DemoTest implements Serializable
 	/**
 	 * Reference ot the initial context.
 	 */
-	private InitialContext ctx = null;
+	private transient InitialContext ctx = null;
 
 	/**
 	 * Initialize this test object with a specified jndi location for the connection factory.
