@@ -35,11 +35,11 @@ public class SendInitialBundleState extends NodeServerState
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(SendInitialBundleState.class);
+	private static Log log = LogFactory.getLog(SendInitialBundleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Initialize this state.
 	 * @param server the server that handles this state.

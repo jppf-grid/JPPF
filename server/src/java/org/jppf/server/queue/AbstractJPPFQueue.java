@@ -87,17 +87,6 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	}
 
 	/**
-	 * Compute and log information about the sizeMap as a debug statement. 
-	 */
-	protected void logSizeMapInfo()
-	{
-		log.debug("sizeMap size = " + sizeMap.size());
-		int count = 0;
-		for (List<JPPFTaskBundle> list: sizeMap.values()) count += list.size();
-		log.debug("total bundles in sizeMap = " + count);
-	}
-
-	/**
 	 * Get the next object in the queue.
 	 * This method only returns null and must be overriden by subclasses that want to use it.
 	 * @param nbTasks the maximum number of tasks to get out of the bundle.

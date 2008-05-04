@@ -30,14 +30,13 @@ public class JPPFPriority implements Comparable<JPPFPriority>, Serializable
 	/**
 	 * The actual value of the priority.
 	 */
-	private Integer value = null;
+	private Integer value = Integer.valueOf(0);
 
 	/**
 	 * Initialize this priority witht he specified object.
 	 * @param value the object used as priority.
-	 * @throws IllegalArgumentException if value is not an instance of <code>Comparable</code>.
 	 */
-	public JPPFPriority(int value) throws IllegalArgumentException
+	public JPPFPriority(int value)
 	{
 		this.value = value;
 	}
@@ -52,14 +51,15 @@ public class JPPFPriority implements Comparable<JPPFPriority>, Serializable
 	public int compareTo(JPPFPriority o)
 	{
 		if (o == null) return 1;
-		return o.getValue().compareTo(value);
+		int v2 = o.getValue();
+		return value > v2 ? -1 : (value < v2 ? 1 : 0);
 	}
 
 	/**
 	 * Get the actual value of the priority.
 	 * @return the priority as an integer value.
 	 */
-	public Integer getValue()
+	public int getValue()
 	{
 		return value;
 	}

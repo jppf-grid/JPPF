@@ -142,7 +142,14 @@ public class NodeContext extends NioContext<NodeState>
 	 */
 	public JPPFTaskBundle deserializeBundle() throws Exception
 	{
-		byte[] data = message.buffer.array();
+		byte[] data = null;
+		if (message.buffer.isDirect())
+		{
+			message.buffer.flip();
+			data = new byte[message.buffer.limit()];
+			message.buffer.get(data);
+		}
+		else data = message.buffer.array();
 		// reading the bundle as an object
 		SerializationHelper helper = new SerializationHelperImpl();
 		List<JPPFTaskBundle> list = new ArrayList<JPPFTaskBundle>();

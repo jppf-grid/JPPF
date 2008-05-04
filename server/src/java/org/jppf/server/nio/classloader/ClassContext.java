@@ -54,7 +54,16 @@ public class ClassContext extends NioContext<ClassState>
 	 */
 	public JPPFResourceWrapper deserializeResource() throws Exception
 	{
-		ByteArrayInputStream bais = new ByteArrayInputStream(message.buffer.array());
+		byte[] data = null;
+		if (message.buffer.isDirect())
+		{
+			message.buffer.flip();
+			data = new byte[message.buffer.limit()];
+			message.buffer.get(data);
+		}
+		else data = message.buffer.array();
+		ByteArrayInputStream bais = new ByteArrayInputStream(data);
+		
 		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(bais);
 		resource = (JPPFResourceWrapper) ois.readObject();
 		ois.close();

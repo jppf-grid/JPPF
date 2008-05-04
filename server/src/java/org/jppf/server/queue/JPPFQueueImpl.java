@@ -117,7 +117,7 @@ public class JPPFQueueImpl extends AbstractJPPFQueue
 		{
 			lock.unlock();
 		}
-		if (debugEnabled) logSizeMapInfo();
+		if (debugEnabled) log.debug(formatSizeMapInfo("sizeMap", sizeMap));
 		taskOutOfQueue(result.getTaskCount(), System.currentTimeMillis() - result.getQueueEntryTime());
 		return result;
 	}

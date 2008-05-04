@@ -270,6 +270,7 @@ public class NodeExecutionManager
 			tpe.setMaximumPoolSize(size);
 			log.info("Node thread pool size reduced to " + size);
 		}
+		JPPFConfiguration.getProperties().setProperty("processing.threads", "" + size);
 	}
 
 	/**

@@ -65,7 +65,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		{
 			lock.unlock();
 		}
-		if (debugEnabled) log.debug("sizeMap size = " + sizeMap.size());
+		if (debugEnabled) log.debug("Maps size information:\n" + formatSizeMapInfo("priorityMap", priorityMap) + "\n" +
+			formatSizeMapInfo("sizeMap", sizeMap));
 		taskInQueue(bundle.getTaskCount());
 		for (QueueListener listener : listeners) listener.newBundle(this);
 	}
@@ -127,7 +128,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		{
 			lock.unlock();
 		}
-		if (debugEnabled) logSizeMapInfo();
+		if (debugEnabled) log.debug("Maps size information:\n" + formatSizeMapInfo("priorityMap", priorityMap) + "\n" +
+			formatSizeMapInfo("sizeMap", sizeMap));
 		taskOutOfQueue(result.getTaskCount(), System.currentTimeMillis() - result.getQueueEntryTime());
 		return result;
 	}
@@ -226,9 +228,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 
 		/**
 		 * This operation is not supported and throws an <code>UnsupportedOperationException</code>.
+		 * @throws UnsupportedOperationException as this operation is not supported.
 		 * @see java.util.Iterator#remove()
 		 */
-		public void remove()
+		public void remove() throws UnsupportedOperationException
 		{
 			throw new UnsupportedOperationException("remove() is not supported on a BundleIterator");
 		}
