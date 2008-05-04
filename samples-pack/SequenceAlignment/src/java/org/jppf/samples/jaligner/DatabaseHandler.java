@@ -94,7 +94,13 @@ public class DatabaseHandler
 			buffSize = length;
 			buffer = new char[buffSize];
 		}
-		reader.read(buffer, 0, length);
+		int count = 0;
+		while (count < length)
+		{
+			int n = reader.read(buffer, 0, length);
+			if (n < 0) break;
+			count += n;
+		}
 		return new String(buffer, 0, length);
 	}
 
