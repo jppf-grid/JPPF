@@ -56,6 +56,7 @@ public class TestTaskRunner
 		{
 			jppfClient = new JPPFClient();
 			/*
+			*/
 			performEmptyTaskListTest();
 			performExceptionTest();
 			performURLTest();
@@ -67,7 +68,6 @@ public class TestTaskRunner
 			performXMLParsingTaskTest();
 			performMyTaskTest();
 			performTimeoutTaskTest();
-			*/
 			performAnonymousInnerClassTaskTest();
 		}
 		catch(Exception e)

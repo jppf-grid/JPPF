@@ -70,6 +70,8 @@ public class LongTask extends BaseDemoTask
 		catch(InterruptedException e)
 		{
 			setException(e);
+			setResult(e.getMessage());
 		}
+		setResult("task has run for " + taskLength + " ms");
 	}
 }

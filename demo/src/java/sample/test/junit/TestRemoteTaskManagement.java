@@ -47,7 +47,7 @@ public class TestRemoteTaskManagement extends TestCase implements Serializable
 	/**
 	 * The JPPF client.
 	 */
-	private JPPFClient client = null;
+	private transient JPPFClient client = null;
 
 	/**
 	 * Test the cancellation of a task.

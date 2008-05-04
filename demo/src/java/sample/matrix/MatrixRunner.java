@@ -22,6 +22,7 @@ import java.util.*;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFClient;
+import org.jppf.node.policy.*;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
@@ -136,8 +137,16 @@ public class MatrixRunner
 		// create a data provider to share matrix b among all tasks
 		DataProvider dataProvider = new MemoryMapDataProvider();
 		dataProvider.setValue(MatrixTask.DATA_KEY, b);
+		// determine if an optional execution policy is to be used.
+		ExecutionPolicy policy = null;
+		String s = JPPFConfiguration.getProperties().getString("jppf.execution.policy");
+		if (s != null)
+		{
+			PolicyParser.validatePolicy(s);
+			policy = PolicyParser.parsePolicy(s);
+		}
 		// submit the tasks for execution
-		List<JPPFTask> results = jppfClient.submit(tasks, dataProvider);
+		List<JPPFTask> results = jppfClient.submit(tasks, dataProvider, policy);
 		// initialize the resulting matrix
 		Matrix c = new Matrix(size);
 		// Get the matrix values from the tasks results
