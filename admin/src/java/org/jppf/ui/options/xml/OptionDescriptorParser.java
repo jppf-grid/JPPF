@@ -18,7 +18,11 @@
 package org.jppf.ui.options.xml;
 
 import java.io.*;
+import java.net.URL;
+
 import javax.xml.parsers.*;
+
+import org.apache.commons.logging.*;
 import org.jppf.ui.options.xml.OptionDescriptor.*;
 import org.jppf.utils.FileUtils;
 import org.w3c.dom.*;
@@ -31,6 +35,14 @@ import org.xml.sax.InputSource;
  */
 public class OptionDescriptorParser
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(OptionDescriptorParser.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The DOM parser used to build the descriptor tree.
 	 */
@@ -208,14 +220,54 @@ public class OptionDescriptorParser
 	{
 		ScriptDescriptor desc = new ScriptDescriptor();
 		NodeList children = node.getChildNodes();
-		for (int j=0; j<children.getLength(); j++)
+		NamedNodeMap attrs = node.getAttributes();
+		desc.language = attrs.getNamedItem("language").getNodeValue();
+		Node source = attrs.getNamedItem("source");
+		if (source != null)
 		{
-			Node tmpNode = children.item(j);
-			if (tmpNode.getNodeType() == Node.CDATA_SECTION_NODE)
+			desc.source = source.getNodeValue();
+		}
+		if ((desc.source == null) || "inline".equalsIgnoreCase(desc.source))
+		{
+			for (int j=0; j<children.getLength(); j++)
 			{
-				desc.language = node.getAttributes().getNamedItem("language").getNodeValue();
-				desc.source = tmpNode.getNodeValue();
-				break;
+				Node tmpNode = children.item(j);
+				if ((tmpNode.getNodeType() == Node.CDATA_SECTION_NODE) || (tmpNode.getNodeType() == Node.TEXT_NODE))
+				{
+					desc.content = tmpNode.getNodeValue();
+					break;
+				}
+			}
+		}
+		else
+		{
+			InputStream is = null;
+			try
+			{
+				try
+				{
+					is = new URL(desc.source).openStream();
+				}
+				catch(Exception e)
+				{
+					if (debugEnabled) log.debug(e);
+				}
+				try
+				{
+					if (is == null) is = FileUtils.getFileInputStream(desc.source);
+				}
+				catch(Exception e)
+				{
+					if (debugEnabled) log.debug(e.getMessage(), e);
+				}
+				if (is != null)
+				{
+					desc.content = FileUtils.readTextFile(new InputStreamReader(is));
+					is.close();
+				}
+			}
+			catch(Exception e)
+			{
 			}
 		}
 		return desc;

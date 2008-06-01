@@ -188,17 +188,39 @@ public class PolicyParser
 
 	/**
 	 * Parse an XML document representing an execution policy.
+	 * @param policyContent an XML string containing the policy.
+	 * @return an <code>ExecutionPolicy</code> instance.
+	 * @throws Exception if an error occurs during the validation or parsing.
+	 */
+	public static ExecutionPolicy parsePolicy(String policyContent) throws Exception
+	{
+		return parsePolicy(new StringReader(policyContent));
+	}
+
+	/**
+	 * Parse an XML document representing an execution policy from a file path.
 	 * @param docPath path to the XML document file.
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 * @throws Exception if an error occurs during the validation or parsing.
 	 */
-	public static ExecutionPolicy parsePolicy(String docPath) throws Exception
+	public static ExecutionPolicy parsePolicyFile(String docPath) throws Exception
 	{
 		return parsePolicy(FileUtils.getFileReader(docPath));
 	}
 
 	/**
-	 * Parse an XML document representing an execution policy.
+	 * Parse an XML document representing an execution policy from a file path.
+	 * @param policyFile abstract path of the XML document file.
+	 * @return an <code>ExecutionPolicy</code> instance.
+	 * @throws Exception if an error occurs during the validation or parsing.
+	 */
+	public static ExecutionPolicy parsePolicy(File policyFile) throws Exception
+	{
+		return parsePolicy(new BufferedReader(new FileReader(policyFile)));
+	}
+
+	/**
+	 * Parse an XML document representing an execution policy from an input stream.
 	 * @param stream an input stream from which the XML representation of the policy is read.
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 * @throws Exception if an error occurs during the validation or parsing.
@@ -209,7 +231,7 @@ public class PolicyParser
 	}
 
 	/**
-	 * Parse an XML document representing an execution policy.
+	 * Parse an XML document representing an execution policy from a reader.
 	 * @param reader reader from which the XML representation of the policy is read.
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 * @throws Exception if an error occurs during the validation or parsing.
@@ -223,13 +245,37 @@ public class PolicyParser
 	/**
 	 * Validate an XML document representing an execution policy against the
 	 * <a href="http://www.jppf.org/schemas/ExecutionPolicy.xsd">JPPF Execution Policy schema</a>.
+	 * @param policyContent the XML content of the policy document.
+	 * @throws JPPFException if there is a validation error. The details of the errors are included in the exception message.
+	 * @throws Exception if an error occurs during the validation.
+	 */
+	public static void validatePolicy(String policyContent) throws JPPFException, Exception
+	{
+		validatePolicy(FileUtils.getFileReader(policyContent));
+	}
+
+	/**
+	 * Validate an XML document representing an execution policy against the
+	 * <a href="http://www.jppf.org/schemas/ExecutionPolicy.xsd">JPPF Execution Policy schema</a>.
 	 * @param docPath path to the XML document file.
 	 * @throws JPPFException if there is a validation error. The details of the errors are included in the exception message.
 	 * @throws Exception if an error occurs during the validation.
 	 */
-	public static void validatePolicy(String docPath) throws JPPFException, Exception
+	public static void validatePolicyFile(String docPath) throws JPPFException, Exception
 	{
 		validatePolicy(FileUtils.getFileReader(docPath));
+	}
+
+	/**
+	 * Validate an XML document representing an execution policy against the
+	 * <a href="http://www.jppf.org/schemas/ExecutionPolicy.xsd">JPPF Execution Policy schema</a>.
+	 * @param docPath abstract path of the XML document file.
+	 * @throws JPPFException if there is a validation error. The details of the errors are included in the exception message.
+	 * @throws Exception if an error occurs during the validation.
+	 */
+	public static void validatePolicy(File docPath) throws JPPFException, Exception
+	{
+		validatePolicy(new BufferedReader(new FileReader(docPath)));
 	}
 
 	/**

@@ -18,12 +18,14 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import java.nio.ByteBuffer;
+import java.io.*;
 import java.nio.channels.SocketChannel;
 import java.util.*;
 
-import org.jppf.server.*;
+import org.jppf.serialization.JPPFObjectStreamFactory;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
+import org.jppf.server.nio.message.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;
@@ -112,27 +114,39 @@ public class NodeContext extends NioContext<NodeState>
 	public void serializeBundle() throws Exception
 	{
 		SerializationHelper helper = new SerializationHelperImpl();
-		byte[] dataProvider = bundle.getDataProvider();
 		JPPFBuffer buf = helper.toBytes(bundle, false);
 		int size = 4 + buf.getLength();
+		byte[] dataProvider = bundle.getDataProvider();
 		if (dataProvider != null) size += 4 + dataProvider.length;
 		if (bundle.getTasks() != null)
 		{
 			for (byte[] task : bundle.getTasks()) size += 4 + task.length;
 		}
-		byte[] data = new byte[size];
-		int pos = helper.copyToBuffer(buf.getBuffer(), data, 0, buf.getLength()); 
+		ByteBufferOutputStream bbos = new ByteBufferOutputStream(size);
+		byte[] intBytes = new byte[4];
+		helper.writeInt(buf.getLength(), intBytes, 0);
+		bbos.write(intBytes);
+		bbos.write(buf.getBuffer(), 0, buf.getLength());
 		if (dataProvider != null)
 		{
-			pos = helper.copyToBuffer(dataProvider, data, pos, dataProvider.length);
+			helper.writeInt(dataProvider.length, intBytes, 0);
+			bbos.write(intBytes);
+			bbos.write(dataProvider, 0, dataProvider.length);
 		}
 		if (bundle.getTasks() != null)
 		{
-			for (byte[] task : bundle.getTasks()) pos = helper.copyToBuffer(task, data, pos, task.length);
+			for (byte[] task : bundle.getTasks())
+			{
+				helper.writeInt(task.length, intBytes, 0);
+				bbos.write(intBytes);
+				bbos.write(task, 0, task.length);
+			}
 		}
 		if (message == null) message = new NioMessage();
-		message.length = data.length;
-		message.buffer = ByteBuffer.wrap(data);
+		message.buffer = bbos.toByteBuffer();
+		message.length = size;
+		bbos.close();
+		message.buffer.flip();
 	}
 
 	/**
@@ -142,26 +156,26 @@ public class NodeContext extends NioContext<NodeState>
 	 */
 	public JPPFTaskBundle deserializeBundle() throws Exception
 	{
-		byte[] data = null;
-		if (message.buffer.isDirect())
-		{
-			message.buffer.flip();
-			data = new byte[message.buffer.limit()];
-			message.buffer.get(data);
-		}
-		else data = message.buffer.array();
-		// reading the bundle as an object
+		ByteBufferInputStream bbis = new ByteBufferInputStream(message.buffer, true);
 		SerializationHelper helper = new SerializationHelperImpl();
-		List<JPPFTaskBundle> list = new ArrayList<JPPFTaskBundle>();
-		int pos = helper.fromBytes(data, 0, false, list, 1);
-		JPPFTaskBundle bundle = list.get(0);
+		byte[] intBytes = new byte[4];
+		bbis.read(intBytes, 0, 4);
+		int n = helper.readInt(intBytes, 0);
+		byte[] data = new byte[n];
+		bbis.read(data, 0, n);
+		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(new ByteArrayInputStream(data));
+		JPPFTaskBundle bundle = (JPPFTaskBundle) ois.readObject();
+		ois.close();
 		List<byte[]> taskList = new ArrayList<byte[]>();
-		for (int i = 0; i < bundle.getTaskCount(); i++)
+		for (int i=0; i < bundle.getTaskCount(); i++)
 		{
-			byte[] task = helper.copyFromBuffer(data, pos);
-			pos += 4 + task.length;
-			taskList.add(task);
+			bbis.read(intBytes, 0, 4);
+			n = helper.readInt(intBytes, 0);
+			data = new byte[n];
+			bbis.read(data, 0, n);
+			taskList.add(data);
 		}
+		bbis.close();
 		bundle.setTasks(taskList);
 		return bundle;
 	}

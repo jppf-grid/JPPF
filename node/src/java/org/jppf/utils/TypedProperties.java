@@ -144,7 +144,7 @@ public class TypedProperties extends Properties
 	 * @param key the name of the property to look for.
 	 * @return the value of the property as a float, or zero if it is not found.
 	 */
-	public double getFloat(String key)
+	public float getFloat(String key)
 	{
 		return getFloat(key, 0f);
 	}

@@ -100,13 +100,17 @@ public class OptionDescriptor extends TypedProperties
 	public static class ScriptDescriptor implements Serializable
 	{
 		/**
-		 * The source of the script to execute if this listener is script-based.
+		 * The content of the script to execute if this listener is script-based.
 		 */
-		public String source = null;
+		public String content = null;
 		/**
 		 * The language in which the script is written, for instancew JavaScript, Groovy, etc.
 		 */
 		public String language = null;
+		/**
+		 * The source of the script content, can be either a file path or a url, or null if the script is inlined.
+		 */
+		public String source = null;
 	}
 
 	/**

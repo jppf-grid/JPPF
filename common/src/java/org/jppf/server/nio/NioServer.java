@@ -202,8 +202,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 				transitionManager.performChannelRegistrations();
 				transitionManager.performKeyOpsSettings();
 				*/
-				int n = selector.selectNow();
-				if (n <= 0) n = hasTimeout ? selector.select(selectTimeout) : selector.select();
+				int n = hasTimeout ? selector.select(selectTimeout) : selector.select();
 				if (n > 0) go(selector.selectedKeys());
 				postSelect();
 			}

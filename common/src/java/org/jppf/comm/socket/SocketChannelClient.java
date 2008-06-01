@@ -355,4 +355,33 @@ public class SocketChannelClient implements SocketWrapper
 	{
 		this.channel = channel;
 	}
+
+	/**
+	 * Skip <code>n</code> bytes of data from the sokcet of channel input stream.
+	 * @param n the number of bytes to skip.
+	 * @return the actual number of bytes skipped, or -1 if the end of file is reached..
+	 * @throws Exception if an IO error occurs.
+	 * @see org.jppf.comm.socket.SocketWrapper#skip(int)
+	 */
+	public int skip(int n) throws Exception
+	{
+		if (n < 0) throw new IllegalArgumentException("number of bytes to skip must be >= 0");
+		else if (n == 0) return 0;
+		ByteBuffer buf = ByteBuffer.allocate(4);
+		while (buf.hasRemaining()) channel.read(buf);
+		return buf.position();
+	}
+
+	/**
+	 * Send an array of bytes over a TCP socket connection.
+	 * @param data the data to send.
+	 * @throws Exception if the underlying output stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#write(byte[])
+	 */
+	public void write(byte[] data) throws Exception
+	{
+		int count = 0;
+		ByteBuffer buffer = ByteBuffer.wrap(data);
+		while (count < data.length) count += channel.write(buffer);
+	}
 }

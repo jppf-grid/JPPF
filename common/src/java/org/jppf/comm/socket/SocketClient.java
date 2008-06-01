@@ -17,7 +17,7 @@
  */
 package org.jppf.comm.socket;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
 
 import org.apache.commons.logging.*;

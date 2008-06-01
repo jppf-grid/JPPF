@@ -21,8 +21,9 @@ import java.security.*;
 import java.util.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.node.*;
-import org.jppf.utils.SerializationHelper;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class represent dynamic class loading, and serialization/deserialization, capabilities, associated
@@ -72,7 +73,7 @@ public class JPPFContainer
 	
 	/**
 	 * Deserialize a number of objects from an array of bytes.
-	 * @param data the array pf bytes from which to deserialize.
+	 * @param data the array of bytes from which to deserialize.
 	 * @param offset the position in the source data at whcih to start reading.
 	 * @param compressed deternines whether the source data is comprssed or not.
 	 * @param list a list holding the resulting deserialized objects.
@@ -87,6 +88,34 @@ public class JPPFContainer
 		{
 			Thread.currentThread().setContextClassLoader(classLoader);
 			return helper.fromBytes(data, offset, compressed, list, count);
+		}
+		finally
+		{
+			Thread.currentThread().setContextClassLoader(cl);
+		}
+	}
+
+	/**
+	 * Deserialize a number of objects from a socket client.
+	 * @param wrapper the socket client from which to read the objects to deserialize.
+	 * @param list a list holding the resulting deserialized objects.
+	 * @param count the number of objects to deserialize.
+	 * @return the new position in the source data after deserialization.
+	 * @throws Exception if an error occurs while deserializing.
+	 */
+	public int deserializeObject(SocketWrapper wrapper, List<Object> list, int count) throws Exception
+	{
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		try
+		{
+			Thread.currentThread().setContextClassLoader(classLoader);
+			for (int i=0; i<count; i++)
+			{
+				JPPFBuffer buf = wrapper.receiveBytes(0);
+				byte[] data = buf.getBuffer();
+				list.add(helper.getSerializer().deserialize(data));
+			}
+			return 0;
 		}
 		finally
 		{

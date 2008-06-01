@@ -56,7 +56,6 @@ public class TestTaskRunner
 		{
 			jppfClient = new JPPFClient();
 			/*
-			*/
 			performEmptyTaskListTest();
 			performExceptionTest();
 			performURLTest();
@@ -69,6 +68,8 @@ public class TestTaskRunner
 			performMyTaskTest();
 			performTimeoutTaskTest();
 			performAnonymousInnerClassTaskTest();
+			*/
+			performOutOfMemoryTest();
 		}
 		catch(Exception e)
 		{
@@ -479,4 +480,33 @@ public class TestTaskRunner
 			System.out.println("Anonymous inner class task testing complete.");
 		}
 	}
+
+	/**
+	 * Check that an anonymous inner class fails with a NotSerializableException on the client side.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void 	performOutOfMemoryTest() throws JPPFException
+	{
+		System.out.println(banner);
+		System.out.println("Starting OOM testing...");
+		try
+		{
+			int n = 50;
+			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+			tasks.add(new OutOfMemoryTestTask());
+			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			JPPFTask res = results.get(0);
+			if (res.getException() != null) throw res.getException();
+			System.out.println("result is : "+res.getResult());
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e);
+		}
+		finally
+		{
+			System.out.println("OOM testing complete.");
+		}
+	}
+
 }

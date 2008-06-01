@@ -71,7 +71,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	/**
 	 * A list retaining the container in chronological order of their creation.
 	 */
-	private List<JPPFContainer> containerList = new LinkedList<JPPFContainer>();
+	private LinkedList<JPPFContainer> containerList = new LinkedList<JPPFContainer>();
 	/**
 	 * Current build number for this node.
 	 */
@@ -178,8 +178,8 @@ public class JPPFNode extends AbstractMonitoredNode
 			if (notEmpty)
 			{
 				setTaskCount(getTaskCount() + taskList.size());
-				//if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
-				log.info("tasks executed: "+getTaskCount());
+				if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
+				//log.info("tasks executed: "+getTaskCount());
 			}
 			int p = bundle.getBuildNumber();
 			if (buildNumber < p)
@@ -252,20 +252,18 @@ public class JPPFNode extends AbstractMonitoredNode
 	/**
 	 * Read a task from the socket connection, along with its header information.
 	 * @return a pair of <code>JPPFTaskBundle</code> and a <code>List</code> of <code>JPPFTask</code> instances.
-	 * @throws Exception if a error is raised while reading the task data.
+	 * @throws Exception if an error is raised while reading the task data.
 	 */
 	private Pair<JPPFTaskBundle, List<JPPFTask>> readTask() throws Exception
 	{
-		JPPFBuffer buf = socketClient.receiveBytes(0);
-		if (debugEnabled) log.debug("Total length read is " + buf.getLength() + " bytes");
-		Object[] result = readObjects(buf.getBuffer());
+		Object[] result = readObjects();
 		JPPFTaskBundle bundle = (JPPFTaskBundle) result[0];
 		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
 		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()) &&
 			(bundle.getParameter(NODE_EXCEPTION_PARAM) == null))
 		{
 			DataProvider dataProvider = (DataProvider) result[1];
-			for (int i = 0; i < bundle.getTaskCount(); i++)
+			for (int i=0; i<bundle.getTaskCount(); i++)
 			{
 				JPPFTask task = (JPPFTask) result[2 + i];
 				task.setDataProvider(dataProvider);
@@ -279,17 +277,16 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Deseralize the objects read from the socket, and reload the appropriate classes if any class change is detected.<br>
 	 * A class change is triggered when an <code>InvalidClassException</code> is caught. Upon catching this exception,
 	 * the class loader is reinitialized and the class are reloaded.
-	 * @param bytes the array of bytes from which the objects are deserialized.
-	 * @return an array of 3 objects desrialied from the byte array.
+	 * @return an array of objects deserialized from the socket stream.
 	 * @throws Exception if the classes could not be reloaded or an error occurred during deserialization.
 	 */
-	private Object[] readObjects(byte[] bytes) throws Exception
+	private Object[] readObjects() throws Exception
 	{
 		Object[] result = null;
 		boolean reload = false;
 		try
 		{
-			result = deserializeObjects(bytes);
+			result = deserializeObjects();
 		}
 		catch(IncompatibleClassChangeError err)
 		{
@@ -307,24 +304,23 @@ public class JPPFNode extends AbstractMonitoredNode
 			classLoader = null;
 			initHelper();
 			socketClient.setSerializer(serializer);
-			result = deserializeObjects(bytes);
+			result = deserializeObjects();
 		}
 		return result;
 	}
 
 	/**
 	 * Perform the deserialization of the objects received through the socket connection.
-	 * @param bytes the buffer containing the serialized objects.
-	 * @return an array of deserialized objects.
+	 * @return an array of objects deserialized from the socket stream.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	private Object[] deserializeObjects(byte[] bytes) throws Exception
+	private Object[] deserializeObjects() throws Exception
 	{
-		if (dumpEnabled)
-			log.debug("Deserializing " + bytes.length + " bytes :\n" + StringUtils.dumpBytes(bytes, 0, bytes.length));
+		socketClient.skip(4);
 		List<Object> list = new ArrayList<Object>();
-		int pos = helper.fromBytes(bytes, 0, false, list, 1);
-		JPPFTaskBundle bundle = (JPPFTaskBundle) list.get(0);
+		byte[] data = socketClient.receiveBytes(0).getBuffer();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
+		list.add(bundle);
 		try
 		{
 			bundle.setNodeExecutionTime(System.currentTimeMillis());
@@ -333,7 +329,12 @@ public class JPPFNode extends AbstractMonitoredNode
 			{
 				JPPFContainer cont = getContainer(bundle.getUuidPath().getList());
 				cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
-				cont.deserializeObject(bytes, pos, true, list, 1+count);
+				cont.deserializeObject(socketClient, list, 1+count);
+			}
+			else
+			{
+				// skip null data provider
+				socketClient.receiveBytes(0);
 			}
 		}
 		catch(ClassNotFoundException e)
@@ -355,7 +356,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Write the execution results to the socket stream.
 	 * @param bundle the task wrapper to send along.
 	 * @param tasks the list of tasks with their result field updated.
-	 * @throws Exception if an error occurs while writitng to the socket stream.
+	 * @throws Exception if an error occurs while writtng to the socket stream.
 	 */
 	private void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
 	{
@@ -363,16 +364,14 @@ public class JPPFNode extends AbstractMonitoredNode
 		bundle.setNodeExecutionTime(elapsed);
 		List<JPPFBuffer> list = new ArrayList<JPPFBuffer>();
 		list.add(helper.toBytes(bundle, false));
-		for (JPPFTask task : tasks) list.add(helper.toBytes(task, true));
+		for (JPPFTask task : tasks) list.add(helper.toBytes(task, false));
 		int size = 0;
 		for (JPPFBuffer buf: list) size += 4 + buf.getLength();
-		byte[] data = new byte[size];
-		int pos = 0;
-		for (JPPFBuffer buf: list) pos = helper.copyToBuffer(buf.getBuffer(), data, pos, buf.getLength());
-		JPPFBuffer buf = new JPPFBuffer(data, size);
-		if (dumpEnabled)
-			log.debug("Serialized " + buf.getLength() + " bytes :\n" + StringUtils.dumpBytes(buf.getBuffer(), 0, buf.getLength()));
-		socketClient.sendBytes(buf);
+
+		byte[] intBytes = new byte[4];
+		helper.writeInt(size, intBytes, 0);
+		socketClient.write(intBytes);
+		for (JPPFBuffer buf: list) socketClient.sendBytes(buf);
 	}
 
 	/**
@@ -420,7 +419,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			container = new JPPFContainer(uuidPath);
 			if (containerList.size() >= MAX_CONTAINERS)
 			{
-				JPPFContainer toRemove = containerList.remove(0);
+				JPPFContainer toRemove = containerList.removeFirst();
 				containerMap.remove(toRemove.getAppUuid());
 			}
 			containerList.add(container);

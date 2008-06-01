@@ -26,7 +26,6 @@ import org.jppf.server.protocol.JPPFTaskBundle;
  */
 public interface JPPFQueue extends Iterable<JPPFTaskBundle>
 {
-
 	/**
 	 * Add an object to the queue, and notify all listeners about it.
 	 * @param bundle the object to add to the queue.
@@ -71,5 +70,4 @@ public interface JPPFQueue extends Iterable<JPPFTaskBundle>
 	 * @return the bundle size as an int.
 	 */
 	int getMaxBundleSize();
-
 }

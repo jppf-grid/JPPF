@@ -73,7 +73,7 @@ public class JPPFClient extends AbstractJPPFClient
 	 */
 	public void initPools()
 	{
-		System.out.println("in initPool()");
+		//System.out.println("in initPool()");
 		try
 		{
 			TypedProperties props = JPPFConfiguration.getProperties();
@@ -109,7 +109,7 @@ public class JPPFClient extends AbstractJPPFClient
 				ClientPool pool = pools.get(priority);
 				for (JPPFClientConnection c: pool.clientList) allConnections.add(c);
 			}
-			executor = Executors.newFixedThreadPool(Math.max(1, allConnections.size()));
+			executor = Executors.newFixedThreadPool(Math.max(1, allConnections.size()), new JPPFThreadFactory("JPPF Client"));
 			for (Integer priority: pools.keySet())
 			{
 				ClientPool pool = pools.get(priority);

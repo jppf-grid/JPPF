@@ -66,6 +66,10 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * The list of channel registrations to perform.
 	 */
 	private LinkedList<ChannelRegistration> registrationList = new LinkedList<ChannelRegistration>();
+	/**
+	 * A reentrant lock on the nio server.
+	 */
+	private Lock lock = null;
 
 	/**
 	 * Initialize this transition manager with the specified server and sequential flag.
@@ -77,7 +81,8 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	{
 		this.server = server;
 		this.sequential = sequential;
-		if (!sequential) executor = Executors.newFixedThreadPool(threadPoolSize());
+		this.lock = server.getLock();
+		if (!sequential) executor = Executors.newFixedThreadPool(threadPoolSize(), new JPPFThreadFactory(server.getName()));
 	}
 
 	/**
@@ -86,8 +91,8 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	protected void submitTransition(SelectionKey key)
 	{
-		//setKeyOps(key, 0);
-		key.interestOps(0);
+		setKeyOps(key, 0);
+		//key.interestOps(0);
 		StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, server.getFactory());
 		if (sequential) transition.run();
 		else executor.submit(transition);
@@ -101,7 +106,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	public void setKeyOps(SelectionKey key, int ops)
 	{
-		Lock lock = server.getLock();
 		lock.lock();
 		try
 		{

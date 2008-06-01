@@ -26,8 +26,8 @@
 	<property name="classes.dir"     value="${basedir}/classes"/>	
 	<property name="src.dir"         value="${basedir}/src/java"/>
 	<property name="build.dir"       value="${basedir}/build"/>
-	<property name="web.inf.dir"     value="${basedir}/WEB-INF"/>
 	<property name="docroot.dir"     value="${basedir}/src/resources"/>
+	<property name="web.inf.dir"     value="${docroot.dir}/WEB-INF"/>
 	<property name="war.file"        value="jppftest-tomcat.war"/>
 	<property name="tomcat.home"     value="C:/Tools/apache/apache-tomcat-6.0.16"/>
 

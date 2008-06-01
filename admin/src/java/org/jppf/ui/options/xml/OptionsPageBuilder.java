@@ -20,6 +20,7 @@ package org.jppf.ui.options.xml;
 import java.awt.Insets;
 import java.io.*;
 import java.net.*;
+
 import org.apache.commons.logging.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.event.*;
@@ -36,6 +37,10 @@ public class OptionsPageBuilder
 	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(OptionsPageBuilder.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Base name used to localize labels and tooltips.
 	 */
@@ -160,8 +165,9 @@ public class OptionsPageBuilder
 	 * Initialize the attributes common to all option elements from an option descriptor. 
 	 * @param elt the element whose attributes are to be initialized.
 	 * @param desc the descriptor to get the attribute values from.
+	 * @throws Exception if an error was raised while building the page.
 	 */
-	public void initCommonAttributes(AbstractOptionElement elt, OptionDescriptor desc)
+	public void initCommonAttributes(AbstractOptionElement elt, OptionDescriptor desc) throws Exception
 	{
 		elt.setName(desc.name);
 		elt.setLabel(LocalizationUtils.getLocalized(baseName, desc.name+".label", desc.getProperty("label")));
@@ -205,8 +211,9 @@ public class OptionsPageBuilder
 	 * Initialize the attributes common to all options from an option descriptor. 
 	 * @param option the option whose attributes are to be initialized.
 	 * @param desc the descriptor to get the attribute values from.
+	 * @throws Exception if an error was raised while building the page.
 	 */
-	public void initCommonOptionAttributes(AbstractOption option, OptionDescriptor desc)
+	public void initCommonOptionAttributes(AbstractOption option, OptionDescriptor desc) throws Exception
 	{
 		initCommonAttributes(option, desc);
 		option.setPersistent(desc.getBoolean("persistent", false));
@@ -221,29 +228,23 @@ public class OptionsPageBuilder
 	 * Create a value change listener from a listener descriptor.
 	 * @param listenerDesc the listener descriptor to get the listener properties from.
 	 * @return a ValueChangeListener instance.
+	 * @throws Exception if an error was raised while building the page.
 	 */
-	public ValueChangeListener createListener(ListenerDescriptor listenerDesc)
+	public ValueChangeListener createListener(ListenerDescriptor listenerDesc) throws Exception
 	{
 		ValueChangeListener listener = null;
-		try
+		if (listenerDesc != null)
 		{
-			if (listenerDesc != null)
+			if ("java".equals(listenerDesc.type))
 			{
-				if ("java".equals(listenerDesc.type))
-				{
-					Class clazz = Class.forName(listenerDesc.className);
-					listener = (ValueChangeListener) clazz.newInstance();
-				}
-				else
-				{
-					ScriptDescriptor script = listenerDesc.script;
-					listener = new ScriptedValueChangeListener(script.language, script.source);
-				}
+				Class clazz = Class.forName(listenerDesc.className);
+				listener = (ValueChangeListener) clazz.newInstance();
 			}
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
+			else
+			{
+				ScriptDescriptor script = listenerDesc.script;
+				listener = new ScriptedValueChangeListener(script.language, script.content);
+			}
 		}
 		return listener;
 	}

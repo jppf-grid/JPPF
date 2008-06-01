@@ -26,16 +26,6 @@
 	<property name="bordered" value="false"/>
 	<property name="main" value="true"/>
 	<property name="tooltip" value=""/>
-	<script language="javascript"><![CDATA[
-		importPackage(java.lang);
-		importPackage(java.util);
-		importPackage(Packages.org.jppf.server.protocol);
-		importPackage(Packages.org.jppf.server.protocol);
-		importPackage(Packages.org.jppf.ui.monitoring.data);
-		importPackage(Packages.org.jppf.ui.options);
-		importPackage(Packages.org.jppf.ui.options.factory);
-		importPackage(Packages.org.jppf.ui.options.event);
-	]]></script>
 	<initializer type="script">
 		<script language="javascript"><![CDATA[
 			option.findFirstWithName("/ManualConfig").setEnabled(false);

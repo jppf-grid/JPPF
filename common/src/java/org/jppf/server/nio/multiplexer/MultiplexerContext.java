@@ -60,7 +60,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 					}
 					catch(Exception e)
 					{
-						LOG.error(e.getMessage(), e);
+						log.error(e.getMessage(), e);
 					}
 				}
 			}
@@ -68,7 +68,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 		}
 		catch(Exception e)
 		{
-			LOG.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 

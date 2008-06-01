@@ -96,7 +96,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	public NodeNioServer(int[] ports, Bundler bundler) throws JPPFException
 	{
 		super(ports, "NodeServer Thread", false);
-		//this.selectTimeout = 1L;
+		this.selectTimeout = 1L;
 		this.bundler = bundler;
 		getQueue().addListener(new QueueListener()
 		{
@@ -151,7 +151,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	}
 
 	/**
-	 * This class ensures that idle node get assigned pending tasks in the queue.
+	 * This class ensures that idle nodes get assigned pending tasks in the queue.
 	 */
 	private class TaskQueueChecker implements Runnable
 	{
@@ -172,27 +172,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				while (!found && it.hasNext() && !idleChannels.isEmpty())
 				{
 					JPPFTaskBundle bundle = it.next();
-					int n = -1;
-					ExecutionPolicy rule = bundle.getExecutionPolicy();
-					if (rule != null)
-					{
-						if (debugEnabled) log.debug("Bundle has an execution policy:\n" + rule);
-						List<Integer> acceptableChannels = new ArrayList<Integer>();
-						for (int i=0; i<idleChannels.size(); i++)
-						{
-							SelectableChannel ch = idleChannels.get(i);
-							NodeManagementInfo mgtInfo = JPPFDriver.getInstance().getNodeInformation(ch);
-							JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
-							if (rule.accepts(info)) acceptableChannels.add(i);
-						}
-						if (debugEnabled) log.debug("found " + acceptableChannels.size() + " acceptable channels");
-						if (!acceptableChannels.isEmpty())
-						{
-							int rnd = random.nextInt(acceptableChannels.size());
-							n = acceptableChannels.get(rnd);
-						}
-					}
-					else n = random.nextInt(idleChannels.size());
+					int n = findIdleChannelIndex(bundle);
 					if (n >= 0)
 					{
 						channel = idleChannels.remove(n);
@@ -200,6 +180,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 						found = true;
 					}
 				}
+				if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "found channel for bundle");
 				if (channel != null)
 				{
 					SelectionKey key = channel.keyFor(selector);
@@ -209,6 +190,44 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 					transitionManager.transitionChannel(key, NodeTransition.TO_SENDING);
 				}
 			}
+		}
+
+		/**
+		 * Find a channel that can send the specified task bundle for execution.
+		 * @param bundle the bundle to execute.
+		 * @return the index of an available and acceptable channel, or -1 if no channel could be found.
+		 */
+		private int findIdleChannelIndex(JPPFTaskBundle bundle)
+		{
+			ExecutionPolicy rule = bundle.getExecutionPolicy();
+			int n = -1;
+			if (rule != null)
+			{
+				if (debugEnabled) log.debug("Bundle has an execution policy:\n" + rule);
+				List<Integer> acceptableChannels = new ArrayList<Integer>();
+				List<Integer> channelsToRemove =  new ArrayList<Integer>();
+				for (int i=0; i<idleChannels.size(); i++)
+				{
+					SelectableChannel ch = idleChannels.get(i);
+					if (!ch.isOpen())
+					{
+						channelsToRemove.add(i);
+						continue;
+					}
+					NodeManagementInfo mgtInfo = JPPFDriver.getInstance().getNodeInformation(ch);
+					JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
+					if (rule.accepts(info)) acceptableChannels.add(i);
+				}
+				for (Integer i: channelsToRemove) idleChannels.remove(i);
+				if (debugEnabled) log.debug("found " + acceptableChannels.size() + " acceptable channels");
+				if (!acceptableChannels.isEmpty())
+				{
+					int rnd = random.nextInt(acceptableChannels.size());
+					n = acceptableChannels.get(rnd);
+				}
+			}
+			else n = random.nextInt(idleChannels.size());
+			return n;
 		}
 	}
 
@@ -222,7 +241,11 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	protected void postSelect()
 	{
-		if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
+		if (idleChannels.isEmpty() || getQueue().isEmpty())
+		{
+			//try { Thread.sleep(5); } catch(Exception e) { }
+			return;
+		}
 		transitionManager.submit(r);
 	}
 
@@ -234,7 +257,21 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	{
 		synchronized(idleChannels)
 		{
+			if (debugEnabled) log.debug("Adding idle chanel " + channel);
 			idleChannels.add(channel);
+		}
+	}
+
+	/**
+	 * Remove a channel from the list of idle channels.
+	 * @param channel the channel to remove from the list.
+	 */
+	public void removeIdleChannel(SelectableChannel channel)
+	{
+		synchronized(idleChannels)
+		{
+			if (debugEnabled) log.debug("Removing idle chanel " + channel);
+			idleChannels.remove(channel);
 		}
 	}
 
@@ -273,7 +310,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 			{
 				JPPFSecurityContext cred = JPPFDriver.getInstance().getCredentials();
 				SerializationHelper helper = new SerializationHelperImpl();
-				JPPFBuffer buf = helper.toBytes(null, true);
+				JPPFBuffer buf = helper.toBytes(null, false);
 				byte[] dpBytes = new byte[4 + buf.getLength()];
 				helper.copyToBuffer(buf.getBuffer(), dpBytes, 0, buf.getLength());
 				JPPFTaskBundle bundle = new JPPFTaskBundle();
@@ -281,7 +318,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				bundle.setRequestUuid("0");
 				bundle.getUuidPath().add(JPPFDriver.getInstance().getUuid());
 				bundle.setTaskCount(0);
-				bundle.setTasks(new ArrayList<byte[]>());
+				//bundle.setTasks(new ArrayList<byte[]>());
 				bundle.setDataProvider(dpBytes);
 				bundle.setCredentials(cred);
 				bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
@@ -303,9 +340,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	{
 		try
 		{
+			channel.close();
 			JPPFStatsUpdater.nodeConnectionClosed();
 			JPPFDriver.getInstance().removeNodeInformation(channel);
-			channel.close();
+			JPPFDriver.getInstance().getNodeNioServer().removeIdleChannel(channel);
 		}
 		catch (IOException ignored)
 		{

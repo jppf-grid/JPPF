@@ -48,6 +48,13 @@ public interface SocketWrapper
 	void sendBytes(JPPFBuffer buf) throws Exception;
 
 	/**
+	 * Send an array of bytes over a TCP socket connection.
+	 * @param data the data to send.
+	 * @throws Exception if the underlying output stream throws an exception.
+	 */
+	void write(byte[] data) throws Exception;
+
+	/**
 	 * Read an object from a TCP socket connection.
 	 * This method blocks until an object is received.
 	 * @return the object that was read from the underlying input stream.
@@ -72,6 +79,13 @@ public interface SocketWrapper
 	 * @throws Exception if the underlying input stream throws an exception.
 	 */
 	JPPFBuffer receiveBytes(int timeout) throws Exception;
+	/**
+	 * Skip <code>n</code> bytes of data from the sokcet of channel input stream.
+	 * @param n the number of bytes to skip.
+	 * @return the actual number of bytes skipped.
+	 * @throws Exception if an IO error occurs.
+	 */
+	int skip(int n) throws Exception;
 
 	/**
 	 * Open the underlying socket connection.

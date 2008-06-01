@@ -26,6 +26,7 @@ import java.util.List;
 import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.serialization.JPPFObjectStreamFactory;
 import org.jppf.server.nio.*;
+import org.jppf.server.nio.message.ByteBufferInputStream;
 import org.jppf.utils.JPPFByteArrayOutputStream;
 
 /**
@@ -54,17 +55,8 @@ public class ClassContext extends NioContext<ClassState>
 	 */
 	public JPPFResourceWrapper deserializeResource() throws Exception
 	{
-		byte[] data = null;
-		if (message.buffer.isDirect())
-		{
-			message.buffer.flip();
-			data = new byte[message.buffer.limit()];
-			message.buffer.get(data);
-		}
-		else data = message.buffer.array();
-		ByteArrayInputStream bais = new ByteArrayInputStream(data);
-		
-		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(bais);
+		ByteBufferInputStream bbis = new ByteBufferInputStream(message.buffer, true);
+		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(bbis);
 		resource = (JPPFResourceWrapper) ois.readObject();
 		ois.close();
 		return resource;
@@ -107,7 +99,7 @@ public class ClassContext extends NioContext<ClassState>
 		}
 		catch(Exception ignored)
 		{
-			LOG.error(ignored.getMessage(), ignored);
+			log.error(ignored.getMessage(), ignored);
 		}
 	}
 

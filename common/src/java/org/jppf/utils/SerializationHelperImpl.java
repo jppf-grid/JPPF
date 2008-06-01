@@ -88,25 +88,26 @@ public class SerializationHelperImpl implements SerializationHelper
 	 */
 	public JPPFBuffer toBytes(Object o, boolean isCompressed) throws Exception
 	{
-		byte[] actual = null;
-		JPPFBuffer buf = new ObjectSerializerImpl().serialize(o);
+		JPPFBuffer buf = getSerializer().serialize(o);
 		if (debugEnabled)
 		{
 			log.debug(""+buf.getLength()+" bytes to serialize");
 			if (dumpEnabled) log.debug("dump of bytes to serialize:\n"+ StringUtils.dumpBytes(buf.getBuffer(), 0, buf.getLength()));
 		}
-		int len = 0;
 		if (isCompressed)
 		{
-			actual = CompressionUtils.zip(buf.getBuffer(), 0, buf.getLength());
-			len = actual.length;
+			byte[] actual = CompressionUtils.zip(buf.getBuffer(), 0, buf.getLength());
+			buf = new JPPFBuffer(actual, actual.length);
 		}
+		/*
 		else
 		{
 			actual = buf.getBuffer();
 			len = buf.getLength();
 		}
 		return new JPPFBuffer(actual, len);
+		*/
+		return buf;
 	}
 
 	/**
@@ -153,9 +154,6 @@ public class SerializationHelperImpl implements SerializationHelper
 	public int readInt(byte[] data, int offset)
 	{
 		int pos = offset;
-		//ByteArrayInputStream dis = null;
-		//dis.read();
-		
     int result = convertByte(data[pos++]) << 24;
     result += convertByte(data[pos++]) << 16;
     result += convertByte(data[pos++]) << 8;
@@ -191,7 +189,7 @@ public class SerializationHelperImpl implements SerializationHelper
 	/**
 	 * Deserialize a number of objects from an array of bytes.
 	 * @param <T> the type of the objects to deserialize.
-	 * @param source the array pf bytes from which to deserialize.
+	 * @param source the array of bytes from which to deserialize.
 	 * @param offset the position in the source data at whcih to start reading.
 	 * @param compressed determines whether the source data is comprssed or not.
 	 * @param result a list holding the resulting deserialized objects.
@@ -200,7 +198,6 @@ public class SerializationHelperImpl implements SerializationHelper
 	 * @throws Exception if an error occurs while deserializing.
 	 * @see org.jppf.utils.SerializationHelper#fromBytes(byte[], int, boolean, java.util.List, int)
 	 */
-	@SuppressWarnings("unchecked")
 	public <T> int fromBytes(byte[] source, int offset, boolean compressed, List<T> result, int count) throws Exception
 	{
 		int pos = offset;

@@ -19,10 +19,9 @@ package org.jppf.comm.socket;
 
 import java.io.*;
 import java.net.*;
-import java.net.Socket;
+
 import org.jppf.JPPFException;
 import org.jppf.utils.*;
-import org.jppf.utils.JPPFBuffer;
 
 
 /**
@@ -322,5 +321,39 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	public void setSocket(Socket socket)
 	{
 		this.socket = socket;
+	}
+
+	/**
+	 * Skip <code>n</code> bytes of data from the sokcet of channel input stream.
+	 * @param n the number of bytes to skip.
+	 * @return the actual number of bytes skipped, or -1 if the end of file is reached..
+	 * @throws Exception if an IO error occurs.
+	 * @see org.jppf.comm.socket.SocketWrapper#skip(int)
+	 */
+	public int skip(int n) throws Exception
+	{
+		if (n < 0) throw new IllegalArgumentException("number of bytes to skip must be >= 0");
+		else if (n == 0) return 0;
+		int count = 0;
+		while (count < n)
+		{
+			long p = dis.skip(n-count);
+			if (p < 0) break;
+			else count += p;
+		}
+		return count;
+	}
+
+	/**
+	 * Send an array of bytes over a TCP socket connection.
+	 * @param data the data to send.
+	 * @throws Exception if the underlying output stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#write(byte[])
+	 */
+	public void write(byte[] data) throws Exception
+	{
+		checkOpened();
+		dos.write(data, 0, data.length);
+		dos.flush();
 	}
 }

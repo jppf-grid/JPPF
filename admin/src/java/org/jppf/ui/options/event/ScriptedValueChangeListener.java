@@ -75,7 +75,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 			{
 				if (language.equals(desc.language))
 				{
-					sb.append(desc.source).append("\n");
+					sb.append(desc.content).append("\n");
 				}
 			}
 		}

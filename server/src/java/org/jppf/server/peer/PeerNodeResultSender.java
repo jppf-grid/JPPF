@@ -62,15 +62,15 @@ public class PeerNodeResultSender extends AbstractResultSender
 
 		JPPFBuffer buf = helper.toBytes(bundle, false);
 		int size = 4 + buf.getLength();
-		for (int i = 0; i < bundle.getTaskCount(); i++) size += 4 + bundle.getTasks().get(i).length;
-		byte[] data = new byte[size];
-		int pos = helper.copyToBuffer(buf.getBuffer(), data, 0, buf.getLength());
-		for (int i = 0; i < bundle.getTaskCount(); i++) 
+		for (byte[] task : bundle.getTasks()) size += 4 + task.length;
+
+		byte[] intBytes = new byte[4];
+		helper.writeInt(size, intBytes, 0);
+		socketClient.write(intBytes);
+		socketClient.sendBytes(buf);
+		for (byte[] task : bundle.getTasks())
 		{
-			byte[] task = bundle.getTasks().get(i);
-			pos = helper.copyToBuffer(task, data, pos, task.length);
+			socketClient.sendBytes(new JPPFBuffer(task, task.length));
 		}
-		JPPFBuffer buffer = new JPPFBuffer(data, size);
-		socketClient.sendBytes(buffer);
 	}
 }

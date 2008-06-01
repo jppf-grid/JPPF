@@ -66,7 +66,7 @@ public final class FileUtils
 	 */
 	public static String readTextFile(String filename) throws IOException
 	{
-		return readTextFile(new FileReader(filename));
+		return readTextFile(new BufferedReader(new FileReader(filename)));
 	}
 
 	/**

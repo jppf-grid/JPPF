@@ -18,7 +18,6 @@
 package org.jppf.server.app;
 
 import static org.jppf.server.JPPFStatsUpdater.*;
-import static org.jppf.server.protocol.JPPFTaskBundle.Type.EXECUTION;
 
 import java.net.*;
 import java.util.*;
@@ -118,44 +117,35 @@ public class ApplicationConnection extends JPPFConnection
 	 */
 	public void perform() throws Exception
 	{
-		JPPFBuffer buffer = socketClient.receiveBytes(0);
 		// Read the request header - with tasks count information
-		List<JPPFTaskBundle> list = new ArrayList<JPPFTaskBundle>();
-		int pos = helper.fromBytes(buffer.getBuffer(), 0, false, list, 1);
-		header = list.get(0);
-		JPPFTaskBundle.Type type = header.getRequestType();
-		if (EXECUTION.equals(type))
-		{
-			executeTasks(buffer.getBuffer(), pos);
-		}
+		socketClient.skip(4);
+		byte bytes[] = socketClient.receiveBytes(0).getBuffer();
+		header = (JPPFTaskBundle) helper.getSerializer().deserialize(bytes);
+		bytes = null;
+		executeTasks();
 	}
 
 	/**
 	 * Execute the tasks received from a client.
-	 * @param data the source data from where to read the data provider and task data.
-	 * @param offset the position at which to start reading in the source data.
 	 * @throws Exception if the tasks could not be read.
 	 */
-	protected void executeTasks(byte[] data, int offset) throws Exception
+	protected void executeTasks() throws Exception
 	{
 		int count = header.getTaskCount();
 		if (debugEnabled) log.debug("Received " + count + " tasks");
-		
-		int pos = offset;
-		byte[] dataProvider = helper.copyFromBuffer(data, pos);
-		pos += 4 + dataProvider.length;
+
+		byte[] dataProvider = socketClient.receiveBytes(0).getBuffer();
 		List<byte[]> taskList = new ArrayList<byte[]>();
-		for (int i = 0; i < count; i++)
+		for (int i=0; i<count; i++)
 		{
-			byte[] taskBytes = helper.copyFromBuffer(data, pos);
-			pos += 4 + taskBytes.length; 
+			byte[] task = socketClient.receiveBytes(0).getBuffer();
 			if (debugEnabled)
 			{
-				log.debug(new StringBuilder("deserialized task in ").append(taskBytes.length).append(" bytes").toString());
+				log.debug(new StringBuilder("read task data in ").append(task.length).append(" bytes").toString());
 				if (dumpEnabled)
-					log.debug(new StringBuilder("bytes: ").append(StringUtils.dumpBytes(taskBytes, 0, taskBytes.length)).toString());
+					log.debug(new StringBuilder("bytes: ").append(StringUtils.dumpBytes(task, 0, task.length)).toString());
 			}
-			taskList.add(taskBytes);
+			taskList.add(task);
 		}
 		header.setDataProvider(dataProvider);
 		header.getUuidPath().add(JPPFDriver.getInstance().getUuid());

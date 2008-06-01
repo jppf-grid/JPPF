@@ -38,6 +38,8 @@ public final class ScriptRunnerFactory
 	 */
 	public static ScriptRunner makeScriptRunner(String language)
 	{
-		return new RhinoScriptRunner();
+		if ("javascript".equalsIgnoreCase(language)) return new RhinoScriptRunner();
+		else if ("groovy".equalsIgnoreCase(language)) return new GroovyScriptRunner();
+		return null;
 	}
 }

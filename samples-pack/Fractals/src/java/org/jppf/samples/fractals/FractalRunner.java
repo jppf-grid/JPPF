@@ -29,7 +29,6 @@ import javax.swing.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.client.JPPFClient;
-import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.ui.options.Option;
@@ -112,8 +111,8 @@ public class FractalRunner
 		List<JPPFTask> results = jppfClient.submit(tasks, dp);
 		long elapsed = System.currentTimeMillis() - start;
 		log.info("Computation performed in "+StringUtils.toStringDuration(elapsed));
-		JPPFStats stats = jppfClient.requestStatistics();
-		log.info("End statistics :\n"+stats.toString());
+		//JPPFStats stats = jppfClient.requestStatistics();
+		//if (stats != null) log.info("End statistics :\n"+stats.toString());
 		
 		final Image image = doMandelbrot ? generateMandelbrotImage(results, config) : generateLyapunovImage(results, config);
 		SwingUtilities.invokeLater(new Runnable()

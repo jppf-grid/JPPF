@@ -24,23 +24,7 @@
 	<property name="orientation" value="vertical"/>
 	<property name="bordered" value="false"/>
 	<property name="main" value="true"/>
-	<script language="javascript"><![CDATA[
-		importPackage(Packages.java.lang);
-		importPackage(Packages.java.util);
-		importPackage(Packages.java.awt);
-		importPackage(Packages.java.awt.event);
-		importPackage(Packages.javax.swing);
-		importPackage(Packages.org.jppf.client);
-		importPackage(Packages.org.jppf.utils);
-		importPackage(Packages.org.jppf.server.protocol);
-		importPackage(Packages.org.jppf.ui.monitoring);
-		importPackage(Packages.org.jppf.ui.monitoring.event);
-		importPackage(Packages.org.jppf.ui.monitoring.charts.config);
-		importPackage(Packages.org.jppf.ui.monitoring.data);
-		importPackage(Packages.org.jppf.ui.options);
-		importPackage(Packages.org.jppf.ui.options.event);
-		importPackage(Packages.org.jppf.ui.options.factory);
-	]]></script>
+	<script language="javascript" source="org/jppf/ui/options/xml/imports.js"/>
 	<initializer type="script">
 		<script language="javascript"><![CDATA[
 			var comp = option.findFirstWithName("/AdminPanels").getUIComponent();
@@ -72,8 +56,6 @@
 	<!--                    Server Chooser Panel                               -->
 	<!-- ===================================================================== -->
 	
-	<!--
-	-->
 	<child name="Tabs" type="page">
 		<property name="label" value=""/>
 		<property name="scrollable" value="false"/>
@@ -95,9 +77,7 @@
 				]]></script>
 			</initializer>
 			<listener type="script">
-				<script language="javascript"><![CDATA[
-					StatsHandler.getInstance().setCurrentConnection(option.getValue());
-				]]></script>
+				<script language="javascript">StatsHandler.getInstance().setCurrentConnection(option.getValue());</script>
 			</listener>
 		</child>
 	

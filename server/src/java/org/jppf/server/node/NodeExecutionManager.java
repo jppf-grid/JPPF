@@ -78,7 +78,7 @@ public class NodeExecutionManager
 		log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
 		LinkedBlockingQueue queue = new LinkedBlockingQueue();
 		//threadPool = Executors.newFixedThreadPool(poolSize);
-		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue);
+		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("node processing thread"));
 		timeoutTimer = new Timer("Node Task Timeout Timer");
 	}
 

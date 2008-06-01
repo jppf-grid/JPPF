@@ -121,7 +121,6 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 		handlerMap.put(CHART_3DPIE, new Pie3DChartHandler(statsHandler));
 		handlerMap.put(CHART_RING, new RingChartHandler(statsHandler));
 		handlerMap.put(CHART_DIFFERENCE, new DifferenceChartHandler(statsHandler));
-		//handlerMap.put(CHART_THERMOMETER, new ThermometerChartHandler(statsHandler));
 	}
 
 	/**

@@ -35,11 +35,11 @@ public abstract class NioContext<S extends Enum>
 	/**
 	 * Logger for this class.
 	 */
-	protected static final Log LOG = LogFactory.getLog(NioContext.class);
+	protected static Log log = LogFactory.getLog(NioContext.class);
 	/**
 	 * Determines whther DEBUG logging level is enabled.
 	 */
-	protected static final boolean DEBUG_ENABLED = LOG.isDebugEnabled();
+	protected static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The current state of the channel this context is associated with.
 	 */
@@ -91,14 +91,13 @@ public abstract class NioContext<S extends Enum>
 		if (message.length <= 0)
 		{
 			message.length = readInt(channel);
-			//message.buffer = ByteBuffer.wrap(new byte[message.length]);
 			message.buffer = ByteBuffer.allocateDirect(message.length);
 			readByteCount = 0;
 		}
 		readByteCount += channel.read(message.buffer);
-		if (DEBUG_ENABLED)
+		if (debugEnabled)
 		{
-			LOG.debug("[" + getShortClassName() + "] " + "read " + readByteCount + " bytes out of " +
+			log.debug("[" + getShortClassName() + "] " + "read " + readByteCount + " bytes out of " +
 				message.length + " for " + StringUtils.getRemoteHost((SocketChannel) channel));
 		}
 		return readByteCount >= message.length;
@@ -112,7 +111,7 @@ public abstract class NioContext<S extends Enum>
 	 */
 	public int readInt(ReadableByteChannel channel) throws IOException
 	{
-		ByteBuffer buf = ByteBuffer.wrap(new byte[4]);
+		ByteBuffer buf = ByteBuffer.allocateDirect(4);
 		int count = 0;
 		while (count < 4)
 		{
@@ -138,9 +137,9 @@ public abstract class NioContext<S extends Enum>
 			writeByteCount = 0;
 		}
 		writeByteCount += channel.write(message.buffer);
-		if (DEBUG_ENABLED)
+		if (debugEnabled)
 		{
-			LOG.debug("[" + getShortClassName() + "] " + "written " + writeByteCount + " bytes out of " +
+			log.debug("[" + getShortClassName() + "] " + "written " + writeByteCount + " bytes out of " +
 				message.length + " for " + StringUtils.getRemoteHost((SelectableChannel) channel));
 		}
 		return writeByteCount >= message.length;
@@ -154,7 +153,8 @@ public abstract class NioContext<S extends Enum>
 	 */
 	public void writeInt(WritableByteChannel channel, int value) throws IOException
 	{
-		ByteBuffer buf = ByteBuffer.wrap(new byte[4]);
+		//ByteBuffer buf = ByteBuffer.wrap(new byte[4]);
+		ByteBuffer buf = ByteBuffer.allocateDirect(4);
 		buf.putInt(value);
 		buf.flip();
 		int count = 0;

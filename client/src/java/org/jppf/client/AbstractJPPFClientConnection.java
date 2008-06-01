@@ -260,36 +260,24 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	public void sendTasks(JPPFTaskBundle header, List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
 	{
-		header.setRequestType(JPPFTaskBundle.Type.EXECUTION);
 		TraversalList<String> uuidPath = new TraversalList<String>();
 		uuidPath.add(appUuid);
 		header.setUuidPath(uuidPath);
 		header.setCredentials(credentials);
 		int count = taskList.size();
 		header.setTaskCount(count);
-		List<JPPFBuffer> bufList = new ArrayList<JPPFBuffer>();
-		JPPFBuffer buffer = helper.toBytes(header, false);
-		int size = 4 + buffer.getLength();
-		bufList.add(buffer);
-		buffer = helper.toBytes(dataProvider, true); 
-		size += 4 + buffer.getLength();
-		bufList.add(buffer);
-		for (JPPFTask task : taskList)
-		{
-			buffer = helper.toBytes(task, true); 
-			size += 4 + buffer.getLength();
-			bufList.add(buffer);
-		}
-		byte[] data = new byte[size];
-		int pos = 0;
-		for (JPPFBuffer buf: bufList)
-		{
-			//pos = helper.writeInt(buf.getLength(), data, pos);
-			pos = helper.copyToBuffer(buf.getBuffer(), data, pos, buf.getLength());
-		}
 
-		buffer = new JPPFBuffer(data, size);
-		socketClient.sendBytes(buffer);
+		List<JPPFBuffer> bufList = new ArrayList<JPPFBuffer>();
+		bufList.add(helper.toBytes(header, false));
+		bufList.add(helper.toBytes(dataProvider, false));
+		for (JPPFTask task : taskList) bufList.add(helper.toBytes(task, false));
+
+		int size = 0;
+		for (JPPFBuffer buf: bufList) size += 4 + buf.getLength();
+		byte[] intBytes = new byte[4];
+		helper.writeInt(size, intBytes, 0);
+		socketClient.write(intBytes);
+		for (JPPFBuffer buf: bufList) socketClient.sendBytes(buf);
 	}
 
 	/**
@@ -300,14 +288,17 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	public Pair<List<JPPFTask>, Integer> receiveResults() throws Exception
 	{
-		JPPFBuffer buf = socketClient.receiveBytes(0);
-		byte[] data = buf.getBuffer();
-		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-		List<JPPFTaskBundle> bundleList = new ArrayList<JPPFTaskBundle>();
-		int pos = helper.fromBytes(data, 0, true, bundleList, 1);
-		JPPFTaskBundle bundle = bundleList.get(0);
+		socketClient.skip(4);
+		byte[] data = socketClient.receiveBytes(0).getBuffer();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
 		int count = bundle.getTaskCount();
-		helper.fromBytes(data, pos, true, taskList, count);
+		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
+		for (int i=0; i<count; i++)
+		{
+			data = socketClient.receiveBytes(0).getBuffer();
+			taskList.add((JPPFTask) helper.getSerializer().deserialize(data));
+		}
+
 		int startIndex = (taskList.isEmpty()) ? -1 : taskList.get(0).getPosition();
 		// if an exception prevented the node from executing the tasks
 		Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
