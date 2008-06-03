@@ -274,9 +274,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 
 		int size = 0;
 		for (JPPFBuffer buf: bufList) size += 4 + buf.getLength();
-		byte[] intBytes = new byte[4];
-		helper.writeInt(size, intBytes, 0);
-		socketClient.write(intBytes);
+		socketClient.writeInt(size);
 		for (JPPFBuffer buf: bufList) socketClient.sendBytes(buf);
 	}
 

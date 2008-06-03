@@ -50,9 +50,18 @@ public interface SocketWrapper
 	/**
 	 * Send an array of bytes over a TCP socket connection.
 	 * @param data the data to send.
+	 * @param offset the position where to start reading data from the input array.
+	 * @param len the length of data to write.
 	 * @throws Exception if the underlying output stream throws an exception.
 	 */
-	void write(byte[] data) throws Exception;
+	void write(byte[] data, int offset, int len) throws Exception;
+
+	/**
+	 * Write an int value over a socket connection.
+	 * @param n the value to write.
+	 * @throws Exception if the underlying output stream throws an exception.
+	 */
+	void writeInt(int n) throws Exception;
 
 	/**
 	 * Read an object from a TCP socket connection.
@@ -72,13 +81,34 @@ public interface SocketWrapper
 	Object receive(int timeout) throws Exception;
 
 	/**
-	 * Read an object from a TCP socket connection.
-	 * This method blocks until an object is received or the specified timeout has expired, whichever happens first.
+	 * Read <code>len</code> bytes from a TCP connection into a byte array, starting
+	 * at position <code>offset</code> in that array.
+	 * This method blocks until at least one byte of data is received.
+	 * @param data an array of bytes into which the data is stored.
+	 * @param offset the position where to start storing data read from the socket.
+	 * @param len the length of data to read.
+	 * @return the number of bytes actually read or -1 if the end of stream was reached.
+	 * @throws Exception if the underlying input stream throws an exception.
+	 */
+	int read(byte[] data, int offset, int len) throws Exception;
+
+	/**
+	 * Read an int value from a socket connection.
+	 * @return n the value to read from the socket, or -1 if end of stream was reached.
+	 * @throws Exception if the underlying input stream throws an exception.
+	 */
+	int readInt() throws Exception;
+
+	/**
+	 * Read an array of bytes from a TCP socket connection.
+	 * The data read is prefixed by an int header whose value is the actual length of data to read.
+	 * This method blocks until data is received or the specified timeout has expired, whichever happens first.
 	 * @param timeout timeout after which the operation is aborted. A timeout of zero is interpreted as an infinite timeout.
-	 * @return an array of bytes containing the serialized object to receive.
+	 * @return a buffer holding the length of data and the data itself.
 	 * @throws Exception if the underlying input stream throws an exception.
 	 */
 	JPPFBuffer receiveBytes(int timeout) throws Exception;
+
 	/**
 	 * Skip <code>n</code> bytes of data from the sokcet of channel input stream.
 	 * @param n the number of bytes to skip.

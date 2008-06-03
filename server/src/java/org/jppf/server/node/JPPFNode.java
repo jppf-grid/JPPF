@@ -368,9 +368,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		int size = 0;
 		for (JPPFBuffer buf: list) size += 4 + buf.getLength();
 
-		byte[] intBytes = new byte[4];
-		helper.writeInt(size, intBytes, 0);
-		socketClient.write(intBytes);
+		socketClient.writeInt(size);
 		for (JPPFBuffer buf: list) socketClient.sendBytes(buf);
 	}
 

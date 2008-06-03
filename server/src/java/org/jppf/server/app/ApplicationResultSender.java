@@ -59,9 +59,7 @@ public class ApplicationResultSender extends AbstractResultSender
 		int size = 4 + bundleBuffer.getLength();
 		for (byte[] task : bundle.getTasks()) size += 4 + task.length;
 
-		byte[] intBytes = new byte[4];
-		helper.writeInt(size, intBytes, 0);
-		socketClient.write(intBytes);
+		socketClient.writeInt(size);
 		socketClient.sendBytes(bundleBuffer);
 		for (byte[] task : bundle.getTasks())
 		{

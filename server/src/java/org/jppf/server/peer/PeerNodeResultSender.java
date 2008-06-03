@@ -64,9 +64,7 @@ public class PeerNodeResultSender extends AbstractResultSender
 		int size = 4 + buf.getLength();
 		for (byte[] task : bundle.getTasks()) size += 4 + task.length;
 
-		byte[] intBytes = new byte[4];
-		helper.writeInt(size, intBytes, 0);
-		socketClient.write(intBytes);
+		socketClient.writeInt(size);
 		socketClient.sendBytes(buf);
 		for (byte[] task : bundle.getTasks())
 		{

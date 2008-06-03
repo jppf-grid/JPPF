@@ -99,14 +99,6 @@ public class SerializationHelperImpl implements SerializationHelper
 			byte[] actual = CompressionUtils.zip(buf.getBuffer(), 0, buf.getLength());
 			buf = new JPPFBuffer(actual, actual.length);
 		}
-		/*
-		else
-		{
-			actual = buf.getBuffer();
-			len = buf.getLength();
-		}
-		return new JPPFBuffer(actual, len);
-		*/
 		return buf;
 	}
 
@@ -119,12 +111,8 @@ public class SerializationHelperImpl implements SerializationHelper
 	 */
 	public int writeInt(int value, byte[] data, int offset)
 	{
-		int pos = offset;
-    data[pos++] = (byte) ((value >>> 24) & 0xFF);
-    data[pos++] = (byte) ((value >>> 16) & 0xFF);
-    data[pos++] = (byte) ((value >>>  8) & 0xFF);
-    data[pos++] = (byte) ((value >>>  0) & 0xFF);
-    return pos;
+		SerializationUtils.writeInt(value, data, offset);
+    return 0;
 	}
 
 	/**
@@ -153,12 +141,7 @@ public class SerializationHelperImpl implements SerializationHelper
 	 */
 	public int readInt(byte[] data, int offset)
 	{
-		int pos = offset;
-    int result = convertByte(data[pos++]) << 24;
-    result += convertByte(data[pos++]) << 16;
-    result += convertByte(data[pos++]) << 8;
-    result += convertByte(data[pos++]) << 0;
-    return result;
+		return SerializationUtils.readInt(data, offset);
 	}
 
 	/**

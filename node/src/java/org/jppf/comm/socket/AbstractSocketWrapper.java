@@ -122,6 +122,35 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	}
 
 	/**
+	 * Send an array of bytes over a TCP socket connection.
+	 * @param data the data to send.
+	 * @param offset the position where to start reading data from the input array.
+	 * @param len the length of data to write.
+	 * @throws Exception if the underlying output stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#write(byte[], int, int)
+	 */
+	public void write(byte[] data, int offset, int len) throws Exception
+	{
+		checkOpened();
+		dos.write(data, offset, len);
+		dos.flush();
+	}
+
+	/**
+	 * Write an int value over a socket connection.
+	 * @param n the value to write.
+	 * @throws Exception if the underlying output stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#writeInt(int)
+	 */
+	public void writeInt(int n) throws Exception
+	{
+		checkOpened();
+		byte[] bytes = SerializationUtils.writeInt(n);
+		for (byte b: bytes) dos.write(b);
+		dos.flush();
+	}
+
+	/**
 	 * Read an object from a TCP socket connection.
 	 * This method blocks until an object is received.
 	 * @return the object that was read from the underlying input stream.
@@ -169,6 +198,43 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			if (timeout > 0) socket.setSoTimeout(0);
 		}
 		return buf;
+	}
+
+	/**
+	 * Read <code>len</code> bytes from a TCP connection into a byte array, starting
+	 * at position <code>offset</code> in that array.
+	 * This method blocks until at least one byte of data is received.
+	 * @param data an array of bytes into which the data is stored.
+	 * @param offset the position where to start storing data read from the socket.
+	 * @param len the length of data to read.
+	 * @return the number of bytes actually read or -1 if the end of stream was reached.
+	 * @throws Exception if the underlying input stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#read(byte[], int, int)
+	 */
+	public int read(byte[] data, int offset, int len) throws Exception
+	{
+		checkOpened();
+		int count = 0;
+		while (count < len)
+		{
+			int n = dis.read(data, count + offset, len - count);
+			if (n < 0) return -1;
+			else count += n;
+		}
+		return count;
+	}
+
+	/**
+	 * Read an int value from a socket connection.
+	 * @return n the value to read from the socket, or -1 if end of stream was reached.
+	 * @throws Exception if the underlying input stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#readInt()
+	 */
+	public int readInt() throws Exception
+	{
+		byte[] intBytes = new byte[4];
+		for (int i=0; i<4; i++) intBytes[i] = (byte) dis.read();
+    return SerializationUtils.readInt(intBytes, 0);
 	}
 
 	/**
@@ -342,18 +408,5 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			else count += p;
 		}
 		return count;
-	}
-
-	/**
-	 * Send an array of bytes over a TCP socket connection.
-	 * @param data the data to send.
-	 * @throws Exception if the underlying output stream throws an exception.
-	 * @see org.jppf.comm.socket.SocketWrapper#write(byte[])
-	 */
-	public void write(byte[] data) throws Exception
-	{
-		checkOpened();
-		dos.write(data, 0, data.length);
-		dos.flush();
 	}
 }
