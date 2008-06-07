@@ -25,6 +25,7 @@ import java.util.*;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.server.*;
+import org.jppf.server.nio.message.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.queue.JPPFQueue;
 import org.jppf.utils.*;
@@ -130,6 +131,76 @@ public class ApplicationConnection extends JPPFConnection
 	 * @throws Exception if the tasks could not be read.
 	 */
 	protected void executeTasks() throws Exception
+	{
+		BundleWrapper headerWrapper = new BundleWrapper(header);
+		int count = header.getTaskCount();
+		if (debugEnabled) log.debug("Received " + count + " tasks");
+
+		InputSource is = new SocketWrapperInputSource(socketClient);
+		for (int i=0; i<count + 1; i++)
+		{
+			int n = is.readInt();
+			DataLocation dl = new ByteBufferLocation(n);
+			n = dl.transferFrom(is, true);
+			if (i == 0) headerWrapper.setDataProvider(dl);
+			else headerWrapper.addTask(dl);
+		}
+
+		DataLocation dl = headerWrapper.getDataProvider();
+		byte[] data = new byte[dl.getSize()];
+		OutputDestination od = new ByteOutputDestination(data, 0, dl.getSize());
+		dl.transferTo(od, true);
+		header.setDataProvider(data);
+
+		List<byte[]> taskList = new ArrayList<byte[]>();
+		for (int i=0; i<count; i++)
+		{
+			dl = headerWrapper.getTasks().get(i);
+			data = new byte[dl.getSize()];
+			od = new ByteOutputDestination(data, 0, dl.getSize());
+			dl.transferTo(od, true);
+			if (debugEnabled)
+			{
+				log.debug(new StringBuilder("read task data in ").append(data.length).append(" bytes").toString());
+				if (dumpEnabled)
+					log.debug(new StringBuilder("bytes: ").append(StringUtils.dumpBytes(data, 0, data.length)).toString());
+			}
+			taskList.add(data);
+		}
+		/*
+		byte[] dataProvider = socketClient.receiveBytes(0).getBuffer();
+		List<byte[]> taskList = new ArrayList<byte[]>();
+		for (int i=0; i<count; i++)
+		{
+			byte[] task = socketClient.receiveBytes(0).getBuffer();
+			if (debugEnabled)
+			{
+				log.debug(new StringBuilder("read task data in ").append(task.length).append(" bytes").toString());
+				if (dumpEnabled)
+					log.debug(new StringBuilder("bytes: ").append(StringUtils.dumpBytes(task, 0, task.length)).toString());
+			}
+			taskList.add(task);
+		}
+		*/
+		header.getUuidPath().add(JPPFDriver.getInstance().getUuid());
+		header.setTasks(taskList);
+		header.setCompletionListener(resultSender);
+		getQueue().addBundle(header);
+		if (count > 0)
+		{
+			totalTaskCount += count;
+			if (debugEnabled) log.debug("Queued " + totalTaskCount + " tasks");
+		}
+		if (count <= 0) resultSender.sendPartialResults(header);
+		else resultSender.run(count);
+		return;
+	}
+
+	/**
+	 * Execute the tasks received from a client.
+	 * @throws Exception if the tasks could not be read.
+	 */
+	protected void executeTasks2() throws Exception
 	{
 		int count = header.getTaskCount();
 		if (debugEnabled) log.debug("Received " + count + " tasks");

@@ -18,6 +18,10 @@
 
 package org.jppf.utils;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.*;
+
 /**
  * 
  * @author Laurent Cohen
@@ -56,6 +60,44 @@ public final class SerializationUtils
     data[pos++] = (byte) ((value >>>  8) & 0xFF);
     data[pos++] = (byte) ((value >>>  0) & 0xFF);
     return data;
+	}
+
+	/**
+	 * Wrtie an integer value to a channel.
+	 * @param channel the channel to write to.
+	 * @param value the value to write.
+	 * @throws IOException if an error occurs while writing the data.
+	 */
+	public static void writeInt(WritableByteChannel channel, int value) throws IOException
+	{
+		ByteBuffer buf = ByteBuffer.allocateDirect(4);
+		buf.putInt(value);
+		buf.flip();
+		int count = 0;
+		while (count < 4)
+		{
+			count += channel.write(buf);
+			if (count < 0) throw new ClosedChannelException();
+		}
+	}
+
+	/**
+	 * Read an integer value from a channel.
+	 * @param channel the channel to read from.
+	 * @return the value read from the channel.
+	 * @throws IOException if an error occurs while reading the data.
+	 */
+	public static int readInt(ReadableByteChannel channel) throws IOException
+	{
+		ByteBuffer buf = ByteBuffer.allocateDirect(4);
+		int count = 0;
+		while (count < 4)
+		{
+			count += channel.read(buf);
+			if (count < 0) throw new ClosedChannelException();
+		}
+		buf.flip();
+		return buf.getInt();
 	}
 
 	/**

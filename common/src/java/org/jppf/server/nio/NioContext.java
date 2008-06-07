@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 
 /**
  * Context associated with an open socket channel.
@@ -90,7 +90,7 @@ public abstract class NioContext<S extends Enum>
 		if (message == null) message = new NioMessage();
 		if (message.length <= 0)
 		{
-			message.length = readInt(channel);
+			message.length = SerializationUtils.readInt(channel);
 			message.buffer = ByteBuffer.allocateDirect(message.length);
 			readByteCount = 0;
 		}
@@ -108,18 +108,11 @@ public abstract class NioContext<S extends Enum>
 	 * @param channel the channel to read from.
 	 * @return the value read from the channel.
 	 * @throws IOException if an error occurs while reading the data.
+	 * @deprecated this method merely invokes {@link org.jppf.utils.SerializationUtils#readInt(java.nio.channels.ReadableByteChannel) SerializationUtils.readInt(ReadableByteChannel)}.
 	 */
 	public int readInt(ReadableByteChannel channel) throws IOException
 	{
-		ByteBuffer buf = ByteBuffer.allocateDirect(4);
-		int count = 0;
-		while (count < 4)
-		{
-			count += channel.read(buf);
-			if (count < 0) throw new ClosedChannelException();
-		}
-		buf.flip();
-		return buf.getInt();
+		return SerializationUtils.readInt(channel);
 	}
 
 	/**
@@ -132,7 +125,7 @@ public abstract class NioContext<S extends Enum>
 	{
 		if (!message.lengthWritten)
 		{
-			writeInt(channel, message.length);
+			SerializationUtils.writeInt(channel, message.length);
 			message.lengthWritten = true;
 			writeByteCount = 0;
 		}
@@ -150,19 +143,11 @@ public abstract class NioContext<S extends Enum>
 	 * @param channel the channel to write to.
 	 * @param value the value to write.
 	 * @throws IOException if an error occurs while writing the data.
+	 * @deprecated this method merely invokes {@link org.jppf.utils.SerializationUtils#writeInt(java.nio.channels.WritableByteChannel,int) SerializationUtils.writeInt(WritableByteChannel, int)}.
 	 */
 	public void writeInt(WritableByteChannel channel, int value) throws IOException
 	{
-		//ByteBuffer buf = ByteBuffer.wrap(new byte[4]);
-		ByteBuffer buf = ByteBuffer.allocateDirect(4);
-		buf.putInt(value);
-		buf.flip();
-		int count = 0;
-		while (count < 4)
-		{
-			count += channel.write(buf);
-			if (count < 0) throw new ClosedChannelException();
-		}
+		SerializationUtils.writeInt(channel, value);
 	}
 
 	/**

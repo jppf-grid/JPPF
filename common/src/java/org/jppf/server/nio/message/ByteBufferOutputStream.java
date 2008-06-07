@@ -39,7 +39,15 @@ public class ByteBufferOutputStream extends OutputStream
 	public ByteBufferOutputStream(int capacity)
 	{
 		buffer = ByteBuffer.allocateDirect(capacity);
-		//buffer = ByteBuffer.allocate(capacity);
+	}
+
+	/**
+	 * Initialize this output stream with the specified backing ByteBuffer.
+	 * @param buffer the backing byte buffer.
+	 */
+	public ByteBufferOutputStream(ByteBuffer buffer)
+	{
+		this.buffer = buffer;
 	}
 
 	/**

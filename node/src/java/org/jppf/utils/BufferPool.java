@@ -16,16 +16,19 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.multiplexer.generic;
+package org.jppf.utils;
 
+import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
 import org.apache.commons.logging.*;
-import org.jppf.utils.JPPFConfiguration;
 
 /**
- * Utility class implemented as a singleton, manages a pool of IO buffers. 
+ * Utility class implemented as a singleton, manages a pool of IO buffers.<br>
+ * All buffers created by this pool are backed by an array of bytes.<br>
+ * The pool is implemented as a soft cache, meaning that all buffers in it are softly-referenced
+ * and are guaranteed to be reclaimed by the garbage collector before an OutOfMemoryError is thrown.
  * @author Laurent Cohen
  */
 public final class BufferPool
@@ -46,7 +49,7 @@ public final class BufferPool
 	/**
 	 * Pool of IO buffers to pick from.
 	 */
-	private static LinkedList<ByteBuffer> bufferPool = new LinkedList<ByteBuffer>();
+	private static LinkedList<BufferReference> bufferPool = new LinkedList<BufferReference>();
 	/**
 	 * Total number of allocated buffers.
 	 */
@@ -64,7 +67,7 @@ public final class BufferPool
 	}
 
 	/**
-	 * Get a buffer from the pool. If the pool is emopty, a new buffer is created.
+	 * Get a buffer from the pool. If the pool is empty, a new buffer is created.
 	 * @return a <code>ByteBuffer</code> instance.
 	 */
 	public static ByteBuffer pickBuffer()
@@ -80,7 +83,9 @@ public final class BufferPool
 			}
 			else
 			{
-				result = bufferPool.remove();
+				BufferReference ref = bufferPool.remove();
+				result = ref.get();
+				ref.clear();
 				nbBuffersInPool--;
 				if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
 			}
@@ -97,7 +102,7 @@ public final class BufferPool
 		buffer.clear();
 		synchronized(bufferPool)
 		{
-			bufferPool.add(buffer);
+			bufferPool.add(new BufferReference(buffer));
 			nbBuffersInPool++;
 			if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
 		}
@@ -109,5 +114,45 @@ public final class BufferPool
 	private static void logStats()
 	{
 		log.debug("allocated buffers: " + nbAllocatedBuffers + ", buffers in pool: " + nbBuffersInPool);
+	}
+
+	/**
+	 * Implementation of a soft reference wrapping a byte buffer from the pool.
+	 */
+	private static class BufferReference extends SoftReference<ByteBuffer>
+	{
+		/**
+		 * Determines whether this reference was already removed from the pool.
+		 */
+		boolean removedFromPool = false; 
+
+		/**
+     * Creates a new soft reference that refers to the given object. The new
+     * reference is not registered with any queue.
+     * @param referent object the new soft reference will refer to
+		 */
+		public BufferReference(ByteBuffer referent)
+		{
+			super(referent);
+		}
+
+		/**
+		 * Clear this reference and remove it from the buffer pool.
+		 * @see java.lang.ref.Reference#clear()
+		 */
+		public void clear()
+		{
+			if (!removedFromPool)
+			{
+				synchronized(bufferPool)
+				{
+					bufferPool.remove(get());
+					nbBuffersInPool--;
+					if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
+				}
+				removedFromPool = true;
+			}
+			super.clear();
+		}
 	}
 }

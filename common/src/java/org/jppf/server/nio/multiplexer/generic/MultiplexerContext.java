@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.logging.*;
 import org.jppf.server.nio.NioContext;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 
 /**
  * Context obect associated with a socket channel used by the multiplexer. 

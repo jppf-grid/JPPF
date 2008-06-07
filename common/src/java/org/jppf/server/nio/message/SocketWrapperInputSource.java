@@ -1,0 +1,104 @@
+/*
+ * Java Parallel Processing Framework.
+ * Copyright (C) 2005-2008 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jppf.server.nio.message;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
+import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.utils.BufferPool;
+
+/**
+ * Input source backed by a {@link org.jppf.comm.socket.SocketWrapper SocketWrapper}.
+ * @author Laurent Cohen
+ */
+public class SocketWrapperInputSource implements InputSource
+{
+	/**
+	 * The backing <code>SocketWrapper</code>.
+	 */
+	private SocketWrapper socketWrapper = null;
+
+	/**
+	 * Initialize this input source with the specified <code>SocketWrapper</code>.
+	 * @param socketWrapper the backing <code>SocketWrapper</code>.
+	 */
+	public SocketWrapperInputSource(SocketWrapper socketWrapper)
+	{
+		this.socketWrapper = socketWrapper;
+	}
+
+	/**
+	 * Read data from this input source into an array of bytes.
+	 * @param data the buffer into which to write.
+	 * @param offset the position in the buffer where to start storing the data.
+	 * @param len the size in bytes of the data to read.
+	 * @return the number of bytes actually read, or -1 if end of stream was reached.
+	 * @throws Exception if an IO error occurs.
+	 * @see org.jppf.server.nio.message.InputSource#read(byte[], int, int)
+	 */
+	public int read(byte[] data, int offset, int len) throws Exception
+	{
+		return socketWrapper.read(data, offset, len);
+	}
+
+	/**
+	 * Read data from this input source into a byte buffer.
+	 * @param data the buffer into which to write.
+	 * @return the number of bytes actually read, or -1 if end of stream was reached.
+	 * @throws Exception if an IO error occurs.
+	 * @see org.jppf.server.nio.message.InputSource#read(java.nio.ByteBuffer)
+	 */
+	public int read(ByteBuffer data) throws Exception
+	{
+		ByteBuffer tmp = BufferPool.pickBuffer();
+		try
+		{
+			byte[] buf = tmp.array();
+			int size = Math.min(buf.length, data.remaining());
+			int n = socketWrapper.read(buf, 0, size);
+			if (n > 0) data.put(buf, 0, n);
+			return n;
+		}
+		finally
+		{
+			BufferPool.releaseBuffer(tmp);
+		}
+	}
+
+	/**
+	 * Read an int value from this input source.
+	 * @return the value read, or -1 if an end of file condition was reached. 
+	 * @throws Exception if an IO error occurs.
+	 * @see org.jppf.server.nio.message.InputSource#readInt()
+	 */
+	public int readInt() throws Exception
+	{
+		return socketWrapper.readInt();
+	}
+
+	/**
+	 * This method does nothing.
+	 * @throws IOException if an IO error occurs.
+	 * @see java.io.Closeable#close()
+	 */
+	public void close() throws IOException
+	{
+	}
+}

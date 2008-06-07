@@ -19,6 +19,7 @@ package org.jppf.utils;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 /**
@@ -264,6 +265,30 @@ public final class FileUtils
 	 */
 	public static byte[] getInputStreamAsByte(InputStream is) throws IOException
 	{
+		ByteBuffer tmp = BufferPool.pickBuffer();
+		try
+		{
+			byte[] buffer = tmp.array();
+			byte[] b = null;
+			ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
+			boolean end = false;
+			while (!end)
+			{
+				int n = is.read(buffer, 0, buffer.length);
+				if (n < 0) end = true;
+				else baos.write(buffer, 0, n);
+			}
+			is.close();
+			baos.flush();
+			b = baos.toByteArray();
+			baos.close();
+			return b;
+		}
+		finally
+		{
+			BufferPool.releaseBuffer(tmp);
+		}
+		/*
 		byte[] buffer = new byte[BUFFER_SIZE];
 		byte[] b = null;
 		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
@@ -279,5 +304,6 @@ public final class FileUtils
 		b = baos.toByteArray();
 		baos.close();
 		return b;
+		*/
 	}
 }

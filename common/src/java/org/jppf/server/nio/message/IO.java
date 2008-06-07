@@ -18,11 +18,16 @@
 
 package org.jppf.server.nio.message;
 
+import java.io.Closeable;
+
 /**
  * 
  * @author Laurent Cohen
  */
-public interface NioDataWrapper
+public interface IO extends Closeable
 {
-
+	/**
+	 * Size of buffer to use when transferring data to/from an IO object.
+	 */
+	int BUFFER_SIZE = 128 * 1024;
 }
