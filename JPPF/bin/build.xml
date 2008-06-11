@@ -54,6 +54,7 @@
 	<property name="runtime.driver" value="${build}/runtime/driver"/>
 	<property name="runtime.multiplexer" value="${build}/runtime/multiplexer"/>
 	<property name="runtime.node" value="${build}/runtime/node"/>
+	<property name="runtime.gui" value="${build}/runtime/gui"/>
 
 	<!-- ========================================================================= -->
 	<!--                           Classpath definitions                           -->
@@ -103,6 +104,16 @@
  		<mkdir dir="${build}"/>
 		<available file="${NSIS.home}/makensis.exe" property="NSIS.present"/>
 		<available type="dir" file="${basedir}/../samples-pack" property="samples.pack.present"/>
+		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
+		<!-- The build number is also incremented by 1                                      -->
+		<propertyfile file="${build.number.file}">
+			<entry key="build.number" type="int" default="0000" operation="+" pattern="0000" />
+		</propertyfile>
+		<!-- Read the build number -->
+	  <property file="${build.number.file}"/>
+		<tstamp>
+			<format property="now" pattern="yyyyMMdd"/>
+		</tstamp>
 	</target>
 
 	<target name="init.deploy" description="Initialize ressources">
@@ -213,10 +224,18 @@
 				<isset property="jar"/>
 			</not>
 		</condition>
+		<tstamp>
+			<format property="readable.now" pattern="d-MMMM-yyyy hh:mm"/>
+		</tstamp>
     <jar jarfile="${build}/jppf-${jar}.jar">
 			<fileset dir="${basedir}/../${module}/classes"/>
 			<fileset file="${bin}/build.number"/>
-		</jar>
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+      </manifest>
+    </jar>
   </target>
 
 	<!-- ========================================================================= -->
@@ -224,20 +243,9 @@
 	<!-- ========================================================================= -->
 
 	<target name="package" description="package the application into a release zip file" depends="rebuild">
-		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
-		<!-- The build number is also incremented by 1                                      -->
-		<propertyfile file="${build.number.file}">
-			<entry key="build.number" type="int" default="0000" operation="+" pattern="0000" />
-		</propertyfile>
-		<!-- Read the build number -->
-	  <property file="${build.number.file}"/>
-		<tstamp>
-			<format property="now" pattern="yyyyMMdd"/>
-		</tstamp>
-
 		<property name="zip.prefix" value="${ant.project.name}-${version.number}"/>
 		<property name="release.file"
-			value="${build}/${ant.project.name}-full-src-${version.number}.${build.number}-${now}.zip"/>
+			value="${build}/${ant.project.name}-full-src-${version.number}-${build.number}-${now}.zip"/>
 		<delete file="${release.file}" quiet="true"/>
 		<zip destfile="${release.file}">
 			<zipfileset dir="${basedir}" prefix="${ant.project.name}-${version.number}/JPPF">
@@ -259,7 +267,7 @@
 		</zip>
 
 		<property name="lite.release.file"
-			value="${build}/${ant.project.name}-lite-src-${version.number}.${build.number}-${now}.zip"/>
+			value="${build}/${ant.project.name}-lite-src-${version.number}-${build.number}-${now}.zip"/>
 		<delete file="${lite.release.file}" quiet="true"/>
 		<zip destfile="${lite.release.file}">
 			<zipfileset dir="${basedir}" prefix="${ant.project.name}-${version.number}/JPPF">
@@ -286,15 +294,9 @@
 	<!-- ========================================================================= -->
 
 	<target name="jppf.connector" description="" depends="rebuild">
-		<!-- Read the build number -->
-	  <property file="${build.number.file}"/>
-		<tstamp>
-			<format property="now" pattern="yyyyMMdd"/>
-		</tstamp>
-
 		<property name="zip.prefix" value="${ant.project.name}-${version.number}"/>
 		<property name="connector.release.file"
-			value="${build}/${ant.project.name}-j2ee-connector-${version.number}.${build.number}-${now}.zip"/>
+			value="${build}/${ant.project.name}-j2ee-connector-${version.number}-${build.number}-${now}.zip"/>
 		<delete file="${connector.release.file}" quiet="true"/>
 		<zip destfile="${connector.release.file}">
 			<zipfileset dir="${jca-client}" prefix="${ant.project.name}-j2ee-connector-${version.number}"/>
@@ -311,7 +313,7 @@
 		</condition>
 		<antcall target="runtime.driver"/>
 		<antcall target="runtime.node"/>
-		<antcall target="runtime.node"/>
+		<antcall target="runtime.gui"/>
 		<antcall target="runtime.multiplexer"/>
     <delete dir="${runtime}" quiet="true"/>
 	</target>
@@ -365,7 +367,7 @@
 		</copy>
 		<copy tofile="${runtime.driver}/build.xml" file="${bin}/ant-driver.xml"/>
 		<property name="runtime.driver.file"
-			value="${build}/${ant.project.name}-driver-bin-${version.number}.${build.number}-${now}.zip"/>
+			value="${build}/${ant.project.name}-driver-bin-${version.number}-${build.number}-${now}.zip"/>
 		<delete file="${runtime.driver.file}" quiet="true"/>
 		<zip destfile="${runtime.driver.file}">
 			<zipfileset dir="${runtime.driver}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-driver"/>
@@ -425,12 +427,85 @@
 		</copy>
 		<copy tofile="${runtime.node}/build.xml" file="${bin}/ant-node.xml"/>
 		<property name="runtime.node.file"
-			value="${build}/${ant.project.name}-node-bin-${version.number}.${build.number}-${now}.zip"/>
+			value="${build}/${ant.project.name}-node-bin-${version.number}-${build.number}-${now}.zip"/>
 		<delete file="${runtime.node.file}" quiet="true"/>
 		<zip destfile="${runtime.node.file}">
 			<zipfileset dir="${runtime.node}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-node"/>
 		</zip>
     <delete dir="${runtime.node}" quiet="true"/>
+	</target>
+
+	<!-- =========== GUI packaging =========== -->
+
+	<target name="runtime.gui" depends="runtime.driver.single.jar,runtime.gui.multiple.jar"/>
+
+	<target name="runtime.gui.single.jar" if="isSingleJar">
+		<mkdir dir="${runtime.gui}/lib"/>
+		<mkdir dir="${build}/jar" />
+  	<unjar src="${build}/${ant.project.name}-common-node.jar" dest="${build}/jar"/>
+  	<unjar src="${build}/${ant.project.name}-common.jar" dest="${build}/jar"/>
+  	<unjar src="${build}/${ant.project.name}-server.jar" dest="${build}/jar"/>
+  	<unjar src="${build}/${ant.project.name}-client.jar" dest="${build}/jar"/>
+   	<unjar src="${build}/${ant.project.name}-admin.jar" dest="${build}/jar"/>
+  	<unjar src="${lib}/log4j/log4j-1.2.9.jar" dest="${build}/jar"/>
+  	<unjar src="${lib}/ApacheCommons/commons-logging-1.1.jar" dest="${build}/jar"/>
+  	<unjar src="${lib}/JDesktop/swingx.jar" dest="${build}/jar"/>
+  	<unjar src="${lib}/JFreeChart/jcommon-1.0.12.jar" dest="${build}/jar"/>
+  	<unjar src="${lib}/JFreeChart/jfreechart-1.0.9.jar" dest="${build}/jar"/>
+   	<unjar src="${lib}/Rhino/js.jar" dest="${build}/jar"/>
+  	<unjar src="${lib}/Substance/substance-4.3.jar" dest="${build}/jar"/>
+    <jar jarfile="${runtime.gui}/lib/jppf-gui.jar">
+			<fileset dir="${build}/jar"/>
+		</jar>
+    <delete dir="${build}/jar" quiet="true"/>
+		<antcall target="runtime.gui.common"/>
+	</target>
+
+	<target name="runtime.gui.multiple.jar" unless="isSingleJar">
+		<mkdir dir="${runtime.gui}/lib"/>
+		<copy todir="${runtime.gui}/lib">
+			<fileset dir="${build}">
+				<include name="${ant.project.name}-common-node.jar"/>
+				<include name="${ant.project.name}-common.jar"/>
+				<include name="${ant.project.name}-server.jar"/>
+				<include name="${ant.project.name}-client.jar"/>
+				<include name="${ant.project.name}-admin.jar"/>
+			</fileset>
+			<fileset dir="${lib}/log4j">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/ApacheCommons">
+				<include name="commons-logging*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/JDesktop">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/JFreeChart">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/Rhino">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/Substance">
+				<include name="*.jar"/>
+			</fileset>
+		</copy>
+		<antcall target="runtime.gui.common"/>
+	</target>
+
+	<target name="runtime.gui.common">
+		<copy tofile="${runtime.gui}/${license.file}" file="${basedir}/${license.file}"/>
+		<copy todir="${runtime.gui}/config">
+			<fileset dir="${config}/gui"/>
+		</copy>
+		<copy tofile="${runtime.gui}/build.xml" file="${bin}/ant-gui.xml"/>
+		<property name="runtime.gui.file"
+			value="${build}/${ant.project.name}-gui-bin-${version.number}-${build.number}-${now}.zip"/>
+		<delete file="${runtime.gui.file}" quiet="true"/>
+		<zip destfile="${runtime.gui.file}">
+			<zipfileset dir="${runtime.gui}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-gui"/>
+		</zip>
+    <delete dir="${runtime.gui}" quiet="true"/>
 	</target>
 
 	<!-- =========== Multiplexer packaging =========== -->
