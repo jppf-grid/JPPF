@@ -260,22 +260,35 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	public void sendTasks(JPPFTaskBundle header, List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
 	{
-		TraversalList<String> uuidPath = new TraversalList<String>();
-		uuidPath.add(appUuid);
-		header.setUuidPath(uuidPath);
-		header.setCredentials(credentials);
-		int count = taskList.size();
-		header.setTaskCount(count);
-
-		List<JPPFBuffer> bufList = new ArrayList<JPPFBuffer>();
-		bufList.add(helper.toBytes(header, false));
-		bufList.add(helper.toBytes(dataProvider, false));
-		for (JPPFTask task : taskList) bufList.add(helper.toBytes(task, false));
-
-		int size = 0;
-		for (JPPFBuffer buf: bufList) size += 4 + buf.getLength();
-		socketClient.writeInt(size);
-		for (JPPFBuffer buf: bufList) socketClient.sendBytes(buf);
+		try
+		{
+			TraversalList<String> uuidPath = new TraversalList<String>();
+			uuidPath.add(appUuid);
+			header.setUuidPath(uuidPath);
+			header.setCredentials(credentials);
+			int count = taskList.size();
+			header.setTaskCount(count);
+	
+			List<JPPFBuffer> bufList = new ArrayList<JPPFBuffer>();
+			bufList.add(helper.toBytes(header, false));
+			bufList.add(helper.toBytes(dataProvider, false));
+			for (JPPFTask task : taskList) bufList.add(helper.toBytes(task, false));
+	
+			int size = 0;
+			for (JPPFBuffer buf: bufList) size += 4 + buf.getLength();
+			socketClient.writeInt(size);
+			for (JPPFBuffer buf: bufList) socketClient.sendBytes(buf);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+			throw e;
+		}
+		catch(Error e)
+		{
+			log.error(e.getMessage(), e);
+			throw e;
+		}
 	}
 
 	/**
