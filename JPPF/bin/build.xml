@@ -194,6 +194,8 @@
 		</copy>
 		<ant antfile="${basedir}/../samples-pack/Fractals/build.xml" target="compile" inheritall="false"/>
 		<ant antfile="${basedir}/../samples-pack/SequenceAlignment/build.xml" target="compile" inheritall="false"/>
+		<ant antfile="${basedir}/../samples-pack/WebSearchEngine/build.xml" target="compile" inheritall="false"/>
+		<ant antfile="${basedir}/../samples-pack/TomcatPort/build.xml" target="build" inheritall="false"/>
 		<property name="samples.pack.file"
 			value="${build}/${ant.project.name}-samples-pack-${version.number}.${build.number}-${now}.zip"/>
 		<delete file="samples.pack.file" quiet="true"/>
