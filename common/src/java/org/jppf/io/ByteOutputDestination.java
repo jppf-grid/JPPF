@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.message;
+package org.jppf.io;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -72,7 +72,7 @@ public class ByteOutputDestination implements OutputDestination
 	 * @param len the size in bvytes of the data to write.
 	 * @return the number of bytes actually written, or -1 if end of stream was reached.
 	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.server.nio.message.OutputDestination#write(byte[], int, int)
+	 * @see org.jppf.io.OutputDestination#write(byte[], int, int)
 	 */
 	public int write(byte[] buffer, int offset, int len) throws Exception
 	{
@@ -86,7 +86,7 @@ public class ByteOutputDestination implements OutputDestination
 	 * @param buffer the buffer containing the data to write.
 	 * @return the number of bytes actually written, or -1 if end of stream was reached.
 	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.server.nio.message.OutputDestination#write(java.nio.ByteBuffer)
+	 * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
 	 */
 	public int write(ByteBuffer buffer) throws Exception
 	{
@@ -99,7 +99,7 @@ public class ByteOutputDestination implements OutputDestination
 	 * Write an int value to this output destination.
 	 * @param value the value to write. 
 	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.server.nio.message.OutputDestination#writeInt(int)
+	 * @see org.jppf.io.OutputDestination#writeInt(int)
 	 */
 	public void writeInt(int value) throws Exception
 	{

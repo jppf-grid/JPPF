@@ -16,32 +16,32 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.message;
+package org.jppf.io;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ReadableByteChannel;
 
-import org.jppf.utils.SerializationUtils;
+import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.utils.BufferPool;
 
 /**
- * Input source backed by a {@link java.nio.channels.ReadableByteChannel ReadableByteChannel}.
+ * Input source backed by a {@link org.jppf.comm.socket.SocketWrapper SocketWrapper}.
  * @author Laurent Cohen
  */
-public class ChannelInputSource implements InputSource
+public class SocketWrapperInputSource implements InputSource
 {
 	/**
-	 * The backing <code>ReadableByteChannel</code>.
+	 * The backing <code>SocketWrapper</code>.
 	 */
-	private ReadableByteChannel channel = null;
+	private SocketWrapper socketWrapper = null;
 
 	/**
 	 * Initialize this input source with the specified <code>SocketWrapper</code>.
-	 * @param channel the backing <code>SocketWrapper</code>.
+	 * @param socketWrapper the backing <code>SocketWrapper</code>.
 	 */
-	public ChannelInputSource(ReadableByteChannel channel)
+	public SocketWrapperInputSource(SocketWrapper socketWrapper)
 	{
-		this.channel = channel;
+		this.socketWrapper = socketWrapper;
 	}
 
 	/**
@@ -51,12 +51,11 @@ public class ChannelInputSource implements InputSource
 	 * @param len the size in bytes of the data to read.
 	 * @return the number of bytes actually read, or -1 if end of stream was reached.
 	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.server.nio.message.InputSource#read(byte[], int, int)
+	 * @see org.jppf.io.InputSource#read(byte[], int, int)
 	 */
 	public int read(byte[] data, int offset, int len) throws Exception
 	{
-		ByteBuffer buffer = ByteBuffer.wrap(data, offset, len);
-		return channel.read(buffer);
+		return socketWrapper.read(data, offset, len);
 	}
 
 	/**
@@ -64,22 +63,46 @@ public class ChannelInputSource implements InputSource
 	 * @param data the buffer into which to write.
 	 * @return the number of bytes actually read, or -1 if end of stream was reached.
 	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.server.nio.message.InputSource#read(java.nio.ByteBuffer)
+	 * @see org.jppf.io.InputSource#read(java.nio.ByteBuffer)
 	 */
 	public int read(ByteBuffer data) throws Exception
 	{
-		return channel.read(data);
+		ByteBuffer tmp = BufferPool.pickBuffer();
+		try
+		{
+			byte[] buf = tmp.array();
+			int size = Math.min(buf.length, data.remaining());
+			int n = socketWrapper.read(buf, 0, size);
+			if (n > 0) data.put(buf, 0, n);
+			return n;
+		}
+		finally
+		{
+			BufferPool.releaseBuffer(tmp);
+		}
 	}
 
 	/**
 	 * Read an int value from this input source.
 	 * @return the value read, or -1 if an end of file condition was reached. 
 	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.server.nio.message.InputSource#readInt()
+	 * @see org.jppf.io.InputSource#readInt()
 	 */
 	public int readInt() throws Exception
 	{
-		return SerializationUtils.readInt(channel);
+		return socketWrapper.readInt();
+	}
+
+	/**
+	 * Skip <code>n</code> bytes of data form this input source.
+	 * @param n the number of bytes to skip.
+	 * @return the number of bytes actually skipped.
+	 * @throws Exception if an IO error occurs.
+	 * @see org.jppf.io.InputSource#skip(int)
+	 */
+	public int skip(int n) throws Exception
+	{
+		return socketWrapper.skip(n);
 	}
 
 	/**

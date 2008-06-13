@@ -16,47 +16,58 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.message;
+package org.jppf.io;
+
+import java.nio.channels.*;
 
 /**
- * This interface represents an abstraction of a task bundle's piece of data, regardless of where it is stored.
+ * 
  * @author Laurent Cohen
  */
-public interface DataLocation
+public abstract class AbstractDataLocation implements DataLocation
 {
 	/**
-	 * Get an input source from this data location.
-	 * @return an <code>InputSource</code> instance.
+	 * The capacity of the underlying buffer.
 	 */
-	InputSource getInputSource();
-
+	protected int size = 0;
 	/**
-	 * Get an output destination from this data location.
-	 * @return an <code>OutputDestination</code> instance.
+	 * Determines whether a transfer has been started.
 	 */
+	protected boolean transferring = false;
 
-	OutputDestination getOutputDestination();
 	/**
 	 * Get the size of the data referenced by this data location.
 	 * @return the data size as an int.
+	 * @see org.jppf.io.DataLocation#getSize()
 	 */
-	int getSize();
+	public int getSize()
+	{
+		return size;
+	}
 
 	/**
-	 * Transfer the content of this data location from the specified input source.
-	 * @param source the input source to transfer to.
+	 * Transfer the content of this data location from the specified channel.
+	 * @param source the channel to transfer to.
 	 * @param blocking if true, the method will block until the entire content has been transferred.
 	 * @return the number of bytes actually transferred. 
 	 * @throws Exception if an IO error occurs.
+	 * @see org.jppf.io.DataLocation#transferFrom(java.nio.channels.ReadableByteChannel, boolean)
 	 */
-	int transferFrom(InputSource source, boolean blocking) throws Exception;
+	public int transferFrom(ReadableByteChannel source, boolean blocking) throws Exception
+	{
+		return transferFrom(new ChannelInputSource(source), blocking);
+	}
 
 	/**
-	 * Transfer the content of this data location to the specified output destination.
-	 * @param dest the output destination to transfer to.
+	 * Transfer the content of this data location to the specified channel.
+	 * @param dest the channel to transfer to.
 	 * @param blocking if true, the method will block until the entire content has been transferred. 
 	 * @return the number of bytes actually transferred. 
 	 * @throws Exception if an IO error occurs.
+	 * @see org.jppf.io.DataLocation#transferTo(java.nio.channels.WritableByteChannel, boolean)
 	 */
-	int transferTo(OutputDestination dest, boolean blocking) throws Exception;
+	public int transferTo(WritableByteChannel dest, boolean blocking) throws Exception
+	{
+		return transferTo(new ChannelOutputDestination(dest), blocking);
+	}
 }

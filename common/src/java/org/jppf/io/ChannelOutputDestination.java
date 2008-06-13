@@ -16,32 +16,32 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.message;
+package org.jppf.io;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
 
-import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.utils.BufferPool;
+import org.jppf.utils.SerializationUtils;
 
 /**
- * Output destination backed by a {@link org.jppf.comm.socket.SocketWrapper SocketWrapper}.
+ * Output destination backed by a {@link java.nio.channels.WritableByteChannel WritableByteChannel}.
  * @author Laurent Cohen
  */
-public class SocketWrapperOutputDestination implements OutputDestination
+public class ChannelOutputDestination implements OutputDestination
 {
 	/**
-	 * The backing <code>SocketWrapper</code>.
+	 * The backing <code>WritableByteChannel</code>.
 	 */
-	private SocketWrapper socketWrapper = null;
+	protected WritableByteChannel channel = null;
 
 	/**
 	 * Initialize this output destination with the specified <code>SocketWrapper</code>.
-	 * @param socketWrapper the backing <code>SocketWrapper</code>.
+	 * @param channel the backing <code>SocketWrapper</code>.
 	 */
-	public SocketWrapperOutputDestination(SocketWrapper socketWrapper)
+	public ChannelOutputDestination(WritableByteChannel channel)
 	{
-		this.socketWrapper = socketWrapper;
+		this.channel = channel;
 	}
 
 	/**
@@ -51,12 +51,11 @@ public class SocketWrapperOutputDestination implements OutputDestination
 	 * @param len the size in bytes of the data to write.
 	 * @return the number of bytes actually written, or -1 if end of stream was reached.
 	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.server.nio.message.OutputDestination#write(byte[], int, int)
+	 * @see org.jppf.io.OutputDestination#write(byte[], int, int)
 	 */
 	public int write(byte[] data, int offset, int len) throws Exception
 	{
-		socketWrapper.write(data, offset, len);
-		return len;
+		return channel.write(ByteBuffer.wrap(data, offset, len));
 	}
 
 	/**
@@ -64,33 +63,22 @@ public class SocketWrapperOutputDestination implements OutputDestination
 	 * @param data the buffer containing the data to write.
 	 * @return the number of bytes actually written, or -1 if end of stream was reached.
 	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.server.nio.message.OutputDestination#write(java.nio.ByteBuffer)
+	 * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
 	 */
 	public int write(ByteBuffer data) throws Exception
 	{
-		ByteBuffer tmp = BufferPool.pickBuffer();
-		try
-		{
-			byte[] buf = tmp.array();
-			int size = Math.min(buf.length, data.remaining());
-			data.get(buf, 0, size);
-			return socketWrapper.read(buf, 0, size);
-		}
-		finally
-		{
-			BufferPool.releaseBuffer(tmp);
-		}
+		return channel.write(data);
 	}
 
 	/**
 	 * Write an int value to this output destination.
 	 * @param value the value to write. 
 	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.server.nio.message.OutputDestination#writeInt(int)
+	 * @see org.jppf.io.OutputDestination#writeInt(int)
 	 */
 	public void writeInt(int value) throws Exception
 	{
-		socketWrapper.writeInt(value);
+		SerializationUtils.writeInt(channel, value);
 	}
 
 	/**

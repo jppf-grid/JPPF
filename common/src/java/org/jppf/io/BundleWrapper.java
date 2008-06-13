@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.message;
+package org.jppf.io;
 
 import java.util.*;
 
@@ -109,5 +109,18 @@ public class BundleWrapper
 	public List<DataLocation> getTasks()
 	{
 		return tasks;
+	}
+
+	/**
+	 * Make a copy of this bundle wrapper containing only the first nbTasks tasks it contains.
+	 * @param nbTasks the number of tasks to include in the copy.
+	 * @return a new <code>BundleWrapper</code> instance.
+	 */
+	public BundleWrapper copy(int nbTasks)
+	{
+		BundleWrapper wrapper = new BundleWrapper(bundle.copy(nbTasks));
+		wrapper.setDataProvider(dataProvider);
+		for (int i=0; i<nbTasks; i++) wrapper.addTask(tasks.remove(0));
+		return wrapper;
 	}
 }

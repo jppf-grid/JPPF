@@ -88,8 +88,8 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 		}
 		catch(Exception e)
 		{
-			ctx.handleException((SocketChannel) key.channel());
 			log.error(e.getMessage(), e);
+			ctx.handleException((SocketChannel) key.channel());
 		}
 	}
 }

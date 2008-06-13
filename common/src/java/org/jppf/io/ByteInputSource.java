@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.message;
+package org.jppf.io;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -59,7 +59,7 @@ public class ByteInputSource implements InputSource
 	 * @param len the size in bvytes of the data to read. 
 	 * @return the number of bytes actually read, or -1 if end of stream was reached. 
 	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.server.nio.message.InputSource#read(byte[], int, int)
+	 * @see org.jppf.io.InputSource#read(byte[], int, int)
 	 */
 	public int read(byte[] buffer, int offset, int len) throws Exception
 	{
@@ -73,7 +73,7 @@ public class ByteInputSource implements InputSource
 	 * @param buffer the buffer into which to write.
 	 * @return the number of bytes actually read, or -1 if end of stream was reached.
 	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.server.nio.message.InputSource#read(java.nio.ByteBuffer)
+	 * @see org.jppf.io.InputSource#read(java.nio.ByteBuffer)
 	 */
 	public int read(ByteBuffer buffer) throws Exception
 	{
@@ -86,7 +86,7 @@ public class ByteInputSource implements InputSource
 	 * Read an int value from this input source.
 	 * @return the value read, or -1 if an end of file condition was reached. 
 	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.server.nio.message.InputSource#readInt()
+	 * @see org.jppf.io.InputSource#readInt()
 	 */
 	public int readInt() throws Exception
 	{
@@ -94,13 +94,18 @@ public class ByteInputSource implements InputSource
 	}
 
 	/**
-	 * Transfer the content of this input source to the specified output destination.
-	 * @param dest the output destination to transfer to.
+	 * Skip <code>n</code> bytes of data form this input source.
+	 * @param n the number of bytes to skip.
+	 * @return the number of bytes actually skipped.
 	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.server.nio.message.InputSource#transferTo(org.jppf.server.nio.message.OutputDestination)
+	 * @see org.jppf.io.InputSource#skip(int)
 	 */
-	public void transferTo(OutputDestination dest) throws Exception
+	public int skip(int n) throws Exception
 	{
+		if (!data.hasRemaining()) return -1;
+		int count = Math.min(n, data.remaining());
+		data.position(count);
+		return count;
 	}
 
 	/**

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.message;
+package org.jppf.io;
 
 import java.nio.ByteBuffer;
 
@@ -50,4 +50,11 @@ public interface InputSource extends IO
 	 * @throws Exception if an IO error occurs.
 	 */
 	int readInt() throws Exception;
+	/**
+	 * Skip <cpde>n</copde> bytes of data form this input source.
+	 * @param n the number of bytes to skip.
+	 * @return the number of bytes actually skipped.
+	 * @throws Exception if an IO error occurs.
+	 */
+	int skip(int n) throws Exception;
 }
