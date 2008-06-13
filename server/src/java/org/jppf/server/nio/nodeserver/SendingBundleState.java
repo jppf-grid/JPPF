@@ -25,6 +25,7 @@ import java.net.ConnectException;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.io.BundleWrapper;
 import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**
@@ -36,11 +37,11 @@ public class SendingBundleState extends NodeServerState
 	/**
 	 * Logger for this class.
 	 */
-	protected static final Log LOG = LogFactory.getLog(SendingBundleState.class);
+	private static Log log = LogFactory.getLog(SendingBundleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
-	protected static final boolean DEBUG_ENABLED = LOG.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Initialize this state.
 	 * @param server the server that handles this state.
@@ -59,7 +60,6 @@ public class SendingBundleState extends NodeServerState
 	 */
 	public NodeTransition performTransition(SelectionKey key) throws Exception
 	{
-		//SocketChannel channel = (SocketChannel) key.channel();
 		SelectableChannel channel = key.channel();
 		//if (debugEnabled) log.debug("exec() for " + getRemostHost(channel));
 		if (key.isReadable())
@@ -68,7 +68,7 @@ public class SendingBundleState extends NodeServerState
 		}
 
 		NodeContext context = (NodeContext) key.attachment();
-		if (context.getMessage() == null)
+		if (context.getNodeMessage() == null)
 		{
 			// check whether the bundler settings have changed.
 			if (!context.getBundler().isOverride() &&
@@ -76,21 +76,20 @@ public class SendingBundleState extends NodeServerState
 			{
 				context.setBundler(server.getBundler().copy());
 			}
-			//JPPFTaskBundle bundle = server.getQueue().nextBundle(context.getBundler().getBundleSize());
-			JPPFTaskBundle bundle = context.getBundle();
+			BundleWrapper bundleWrapper = context.getBundle();
+			JPPFTaskBundle bundle = (bundleWrapper == null) ? null : bundleWrapper.getBundle();
 			if (bundle != null)
 			{
-				if (DEBUG_ENABLED) LOG.debug("got bundle from the queue for " + getRemoteHost(channel));
+				if (debugEnabled) log.debug("got bundle from the queue for " + getRemoteHost(channel));
 				// to avoid cycles in peer-to-peer routing of jobs.
 				if (bundle.getUuidPath().contains(context.getUuid()))
 				{
-					if (DEBUG_ENABLED) LOG.debug("cycle detected in peer-to-peer bundle routing: "+bundle.getUuidPath().getList());
-					context.resubmitBundle(bundle);
+					if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: "+bundle.getUuidPath().getList());
+					context.resubmitBundle(bundleWrapper);
 					context.setBundle(null);
 					server.addIdleChannel(channel);
 					return TO_IDLE;
 				}
-				//context.setBundle(bundle);
 				context.serializeBundle();
 			}
 			else
@@ -99,13 +98,13 @@ public class SendingBundleState extends NodeServerState
 				return TO_IDLE;
 			}
 		}
-		if (context.writeMessage((WritableByteChannel) channel))
+		if (context.getNodeMessage().write((WritableByteChannel) channel))
 		{
-			if (DEBUG_ENABLED) LOG.debug("sent entire bundle to node " + getRemoteHost(channel));
-			context.setMessage(null);
+			if (debugEnabled) log.debug("sent entire bundle to node " + getRemoteHost(channel));
+			context.setNodeMessage(null);
 			return TO_WAITING;
 		}
-		if (DEBUG_ENABLED) LOG.debug("part yet to send to node " + getRemoteHost(channel));
+		if (debugEnabled) log.debug("part yet to send to node " + getRemoteHost(channel));
 		return TO_SENDING;
 	}
 }

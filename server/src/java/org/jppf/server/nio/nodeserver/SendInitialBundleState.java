@@ -66,15 +66,15 @@ public class SendInitialBundleState extends NodeServerState
 		}
 
 		NodeContext context = (NodeContext) key.attachment();
-		if (context.getMessage() == null)
+		if (context.getNodeMessage() == null)
 		{
 			if (debugEnabled) log.debug("serializing initial bundle for " + getRemoteHost(channel));
 			context.serializeBundle();
 		}
-		if (context.writeMessage((WritableByteChannel) channel))
+		if (context.getNodeMessage().write((WritableByteChannel) channel))
 		{
 			if (debugEnabled) log.debug("sent entire initial bundle for " + getRemoteHost(channel));
-			context.setMessage(null);
+			context.setNodeMessage(null);
 			context.setBundle(null);
 			return TO_WAIT_INITIAL;
 		}

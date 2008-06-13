@@ -238,4 +238,14 @@ public final class SystemUtils
 		}
 		return sb.toString();
 	}
+
+	/**
+	 * Compute the maximum memory currently available for the Java heap. 
+	 * @return the maximum number of free bytes in the heap.
+	 */
+	public static long maxFreeHeap()
+	{
+		Runtime rt = Runtime.getRuntime();
+		return rt.maxMemory() - (rt.totalMemory() - rt.freeMemory());
+	}
 }

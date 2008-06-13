@@ -132,7 +132,7 @@ public class PeerNode extends AbstractMonitoredNode
 
 				bundle.getUuidPath().add(driver.getUuid());
 				bundle.setCompletionListener(resultSender);
-				JPPFDriver.getQueue().addBundle(bundle);
+				//JPPFDriver.getQueue().addBundle(bundle);
 				resultSender.run(n);
 				//resultSender.sendPartialResults(bundle);
 
@@ -141,7 +141,7 @@ public class PeerNode extends AbstractMonitoredNode
 			}
 			else
 			{
-				resultSender.sendPartialResults(bundle);
+				//resultSender.sendPartialResults(bundle);
 			}
 			if (notifying) fireNodeEvent(NodeEventType.END_EXEC);
 		}

@@ -25,6 +25,7 @@ import static org.jppf.utils.StringUtils.getRemoteHost;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.io.BundleWrapper;
 import org.jppf.server.protocol.*;
 
 /**
@@ -36,11 +37,11 @@ public class WaitingResultsState extends NodeServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static final Log LOG = LogFactory.getLog(WaitingResultsState.class);
+	private static Log log = LogFactory.getLog(WaitingResultsState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
-	private static final boolean DEBUG_ENABLED = LOG.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Initialize this state.
 	 * @param server the server that handles this state.
@@ -65,12 +66,15 @@ public class WaitingResultsState extends NodeServerState
 
 		// Wait the full byte[] of the bundle come to start processing.
 		// This makes the integration of non-blocking with ObjectInputStream easier.
-		if (context.readMessage((ReadableByteChannel) channel))
+		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
+		if (context.getNodeMessage().read((ReadableByteChannel) channel))
 		{
-			if (DEBUG_ENABLED) LOG.debug("read bundle from node " + getRemoteHost(channel) + " done");
-			JPPFTaskBundle bundle = context.getBundle();
+			if (debugEnabled) log.debug("read bundle from node " + getRemoteHost(channel) + " done");
+			BundleWrapper bundleWrapper = context.getBundle();
+			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			TaskCompletionListener listener = bundle.getCompletionListener();
-			JPPFTaskBundle newBundle = context.deserializeBundle();
+			BundleWrapper newBundleWrapper = context.deserializeBundle();
+			JPPFTaskBundle newBundle = newBundleWrapper.getBundle();
 			long elapsed = System.currentTimeMillis() - bundle.getExecutionStartTime();
 			// if an exception prevented the node from executing the tasks
 			if (newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM) != null)
@@ -81,14 +85,14 @@ public class WaitingResultsState extends NodeServerState
 			// updating stats
 			else if (isStatsEnabled())
 			{
-				taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getMessage().length);
+				taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getNodeMessage().getLength());
 				context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 			}
 			// notifing the client thread about the end of a bundle
-			if (listener != null) listener.taskCompleted(newBundle);
+			if (listener != null) listener.taskCompleted(newBundleWrapper);
 			// there is nothing to do, so this instance will wait for a task bundle
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
-			context.setMessage(null);
+			context.setNodeMessage(null);
 			context.setBundle(null);
 			server.addIdleChannel(channel);
 			return TO_IDLE;

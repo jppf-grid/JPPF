@@ -18,14 +18,12 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import java.io.*;
 import java.nio.channels.SocketChannel;
-import java.util.*;
+import java.util.List;
 
-import org.jppf.serialization.JPPFObjectStreamFactory;
+import org.jppf.io.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.*;
-import org.jppf.server.nio.message.*;
+import org.jppf.server.nio.NioContext;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;
@@ -37,19 +35,27 @@ import org.jppf.utils.*;
 public class NodeContext extends NioContext<NodeState>
 {
 	/**
+	 * The message wrapping the data sent or received over the socket channel.
+	 */
+	private NodeMessage nodeMessage = null;
+	/**
 	 * The task bundle to send or receive.
 	 */
-	private JPPFTaskBundle bundle = null;
+	private BundleWrapper bundle = null;
 	/**
 	 * Bundler used to schedule tasks for the corresponding node.
 	 */
 	private Bundler bundler = null;
+	/**
+	 * Helper used to serialize the bundle objects.
+	 */
+	private SerializationHelper helper = new SerializationHelperImpl();
 
 	/**
 	 * Get the task bundle to send or receive.
-	 * @return a <code>JPPFTaskBundle</code> instance.
+	 * @return a <code>BundleWrapper</code> instance.
 	 */
-	public JPPFTaskBundle getBundle()
+	public BundleWrapper getBundle()
 	{
 		return bundle;
 	}
@@ -58,7 +64,7 @@ public class NodeContext extends NioContext<NodeState>
 	 * Set the task bundle to send or receive.
 	 * @param bundle a <code>JPPFTaskBundle</code> instance.
 	 */
-	public void setBundle(JPPFTaskBundle bundle)
+	public void setBundle(BundleWrapper bundle)
 	{
 		this.bundle = bundle;
 	}
@@ -86,9 +92,9 @@ public class NodeContext extends NioContext<NodeState>
 	 * when a node is disconnected while it was executing a task bundle.
 	 * @param bundle the task bundle to resubmit.
 	 */
-	public void resubmitBundle(JPPFTaskBundle bundle)
+	public void resubmitBundle(BundleWrapper bundle)
 	{
-		bundle.setPriority(10);
+		bundle.getBundle().setPriority(10);
 		JPPFDriver.getQueue().addBundle(bundle);
 	}
 
@@ -101,7 +107,7 @@ public class NodeContext extends NioContext<NodeState>
 	{
 		getBundler().dispose();
 		NodeNioServer.closeNode(channel);
-		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getBundle().getState()))
 		{
 			resubmitBundle(bundle);
 		}
@@ -113,70 +119,50 @@ public class NodeContext extends NioContext<NodeState>
 	 */
 	public void serializeBundle() throws Exception
 	{
-		SerializationHelper helper = new SerializationHelperImpl();
-		JPPFBuffer buf = helper.toBytes(bundle, false);
-		int size = 4 + buf.getLength();
-		byte[] dataProvider = bundle.getDataProvider();
-		if (dataProvider != null) size += 4 + dataProvider.length;
-		if (bundle.getTasks() != null)
-		{
-			for (byte[] task : bundle.getTasks()) size += 4 + task.length;
-		}
-		ByteBufferOutputStream bbos = new ByteBufferOutputStream(size);
-		byte[] intBytes = new byte[4];
-		helper.writeInt(buf.getLength(), intBytes, 0);
-		bbos.write(intBytes);
-		bbos.write(buf.getBuffer(), 0, buf.getLength());
-		if (dataProvider != null)
-		{
-			helper.writeInt(dataProvider.length, intBytes, 0);
-			bbos.write(intBytes);
-			bbos.write(dataProvider, 0, dataProvider.length);
-		}
-		if (bundle.getTasks() != null)
-		{
-			for (byte[] task : bundle.getTasks())
-			{
-				helper.writeInt(task.length, intBytes, 0);
-				bbos.write(intBytes);
-				bbos.write(task, 0, task.length);
-			}
-		}
-		if (message == null) message = new NioMessage();
-		message.buffer = bbos.toByteBuffer();
-		message.length = size;
-		bbos.close();
-		message.buffer.flip();
+		if (nodeMessage == null) nodeMessage = new NodeMessage();
+		JPPFBuffer buf = helper.toBytes(bundle.getBundle(), false);
+		nodeMessage.addLocation(new ByteBufferLocation(buf.getBuffer(), 0, buf.getLength()));
+		nodeMessage.addLocation(bundle.getDataProvider());
+		for (DataLocation dl: bundle.getTasks()) nodeMessage.addLocation(dl);
 	}
 
 	/**
 	 * Deserialize a task bundle from the message read into this buffer.
-	 * @return a <code>JPPFTaskBundle</code> instance.
+	 * @return a <code>BundleWrapper</code> instance.
 	 * @throws Exception if an error occurs during the deserialization.
 	 */
-	public JPPFTaskBundle deserializeBundle() throws Exception
+	public BundleWrapper deserializeBundle() throws Exception
 	{
-		ByteBufferInputStream bbis = new ByteBufferInputStream(message.buffer, true);
-		SerializationHelper helper = new SerializationHelperImpl();
-		byte[] intBytes = new byte[4];
-		bbis.read(intBytes, 0, 4);
-		int n = helper.readInt(intBytes, 0);
-		byte[] data = new byte[n];
-		bbis.read(data, 0, n);
-		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(new ByteArrayInputStream(data));
-		JPPFTaskBundle bundle = (JPPFTaskBundle) ois.readObject();
-		ois.close();
-		List<byte[]> taskList = new ArrayList<byte[]>();
-		for (int i=0; i < bundle.getTaskCount(); i++)
+		List<DataLocation> locations = nodeMessage.getLocations();
+		DataLocation location = locations.get(0);
+		byte[] data = new byte[location.getSize()];
+		OutputDestination dest = new ByteOutputDestination(data, 0, data.length);
+		location.transferTo(dest, true);
+		JPPFTaskBundle bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
+		BundleWrapper wrapper = new BundleWrapper(bundle);
+		if (locations.size() > 1)
 		{
-			bbis.read(intBytes, 0, 4);
-			n = helper.readInt(intBytes, 0);
-			data = new byte[n];
-			bbis.read(data, 0, n);
-			taskList.add(data);
+			//wrapper.setDataProvider(locations.get(1));
+			for (int i=1; i<locations.size(); i++) wrapper.addTask(locations.get(i));
 		}
-		bbis.close();
-		bundle.setTasks(taskList);
-		return bundle;
+		return wrapper;
+	}
+
+	/**
+	 * Get the message wrapping the data sent or received over the socket channel.
+	 * @return a <code>NodeMessage</code> instance.
+	 */
+	public NodeMessage getNodeMessage()
+	{
+		return nodeMessage;
+	}
+
+	/**
+	 * Set the message wrapping the data sent or received over the socket channel.
+	 * @param nodeMessage a <code>NodeMessage</code> instance.
+	 */
+	public void setNodeMessage(NodeMessage nodeMessage)
+	{
+		this.nodeMessage = nodeMessage;
 	}
 }

@@ -23,10 +23,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.List;
 
+import org.jppf.io.ByteBufferInputStream;
 import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.serialization.JPPFObjectStreamFactory;
 import org.jppf.server.nio.*;
-import org.jppf.server.nio.message.ByteBufferInputStream;
 import org.jppf.utils.JPPFByteArrayOutputStream;
 
 /**

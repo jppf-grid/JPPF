@@ -24,6 +24,7 @@ import static org.jppf.utils.CollectionUtils.*;
 import java.util.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.io.BundleWrapper;
 import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**
@@ -43,23 +44,24 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	/**
 	 * An of task bundles, ordered by descending priority.
 	 */
-	private TreeMap<JPPFPriority, List<JPPFTaskBundle>> priorityMap = new TreeMap<JPPFPriority, List<JPPFTaskBundle>>();
+	private TreeMap<JPPFPriority, List<BundleWrapper>> priorityMap = new TreeMap<JPPFPriority, List<BundleWrapper>>();
 
 	/**
 	 * Add an object to the queue, and notify all listeners about it.
-	 * @param bundle the object to add to the queue.
+	 * @param bundleWrapper the object to add to the queue.
 	 * @see org.jppf.server.queue.JPPFQueue#addBundle(org.jppf.server.protocol.JPPFTaskBundle)
 	 */
-	public void addBundle(JPPFTaskBundle bundle)
+	public void addBundle(BundleWrapper bundleWrapper)
 	{
+		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		bundle.setQueueEntryTime(System.currentTimeMillis());
 		try
 		{
 			lock.lock();
 			if (debugEnabled) log.debug("adding bundle with [initialTasksCount=" + bundle.getInitialTaskCount() +
 				", taskCount=" + bundle.getTaskCount() + "]");
-			putInListMap(new JPPFPriority(bundle.getPriority()), bundle, priorityMap);
-			putInListMap(getSize(bundle), bundle, sizeMap);
+			putInListMap(new JPPFPriority(bundle.getPriority()), bundleWrapper, priorityMap);
+			putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
 		}
 		finally
 		{
@@ -77,52 +79,52 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @return the most recent object that was added to the queue.
 	 * @see org.jppf.server.queue.JPPFQueue#nextBundle(JPPFTaskBundle, int)
 	 */
-	public JPPFTaskBundle nextBundle(int nbTasks)
+	public BundleWrapper nextBundle(int nbTasks)
 	{
-		Iterator<JPPFTaskBundle> it = iterator();
+		Iterator<BundleWrapper> it = iterator();
 		if (it.hasNext()) return nextBundle(it.next(),  nbTasks);
 		return null;
 	}
 
 	/**
 	 * Get the next object in the queue.
-	 * @param queuedBundle the bundle to either remove or extract a sub-bundle from.
+	 * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
 	 * @param nbTasks the maximum number of tasks to get out of the bundle.
 	 * @return the most recent object that was added to the queue.
 	 * @see org.jppf.server.queue.JPPFQueue#nextBundle(JPPFTaskBundle, int)
 	 */
-	public JPPFTaskBundle nextBundle(JPPFTaskBundle queuedBundle, int nbTasks)
+	public BundleWrapper nextBundle(BundleWrapper bundleWrapper, int nbTasks)
 	{
-		JPPFTaskBundle result = null;
+		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		BundleWrapper result = null;
 		try
 		{
 			lock.lock();
 			if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks");
-			JPPFTaskBundle bundle = queuedBundle;
 			if (debugEnabled) log.debug("next bundle has " + bundle.getTaskCount() + " tasks");
-			int size = getSize(bundle);
-			removeFromListMap(size, bundle, sizeMap);
+			int size = getSize(bundleWrapper);
+			removeFromListMap(size, bundleWrapper, sizeMap);
 			if (nbTasks >= bundle.getTaskCount())
 			{
 				if (debugEnabled) log.debug("removing bundle from queue");
-				result = bundle;
-				removeFromListMap(new JPPFPriority(bundle.getPriority()), bundle, priorityMap);
+				result = bundleWrapper;
+				removeFromListMap(new JPPFPriority(bundle.getPriority()), bundleWrapper, priorityMap);
 			}
 			else
 			{
 				if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle");
-				result = bundle.copy(nbTasks);
+				result = bundleWrapper.copy(nbTasks);
 				int newSize = bundle.getTaskCount();
-				List<JPPFTaskBundle> list = sizeMap.get(newSize);
+				List<BundleWrapper> list = sizeMap.get(newSize);
 				if (list == null)
 				{
-					list = new ArrayList<JPPFTaskBundle>();
+					list = new ArrayList<BundleWrapper>();
 					//sizeMap.put(newSize, list);
 					sizeMap.put(size, list);
 				}
-				list.add(bundle);
+				list.add(bundleWrapper);
 			}
-			result.setExecutionStartTime(System.currentTimeMillis());
+			result.getBundle().setExecutionStartTime(System.currentTimeMillis());
 		}
 		finally
 		{
@@ -130,7 +132,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		}
 		if (debugEnabled) log.debug("Maps size information:\n" + formatSizeMapInfo("priorityMap", priorityMap) + "\n" +
 			formatSizeMapInfo("sizeMap", sizeMap));
-		taskOutOfQueue(result.getTaskCount(), System.currentTimeMillis() - result.getQueueEntryTime());
+		taskOutOfQueue(result.getBundle().getTaskCount(), System.currentTimeMillis() - result.getBundle().getQueueEntryTime());
 		return result;
 	}
 
@@ -168,7 +170,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @return an iterator.
 	 * @see java.lang.Iterable#iterator()
 	 */
-	public Iterator<JPPFTaskBundle> iterator()
+	public Iterator<BundleWrapper> iterator()
 	{
 		return new BundleIterator();
 	}
@@ -177,16 +179,16 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * Iterator that traverses the collection of task bundles in descending order of their priority.
 	 * This iterator is read-only and does not support the <code>remove()</code> operation.
 	 */
-	private class BundleIterator implements Iterator<JPPFTaskBundle>
+	private class BundleIterator implements Iterator<BundleWrapper>
 	{
 		/**
 		 * Iterator over the entries in the priority map.
 		 */
-		private Iterator<Map.Entry<JPPFPriority, List<JPPFTaskBundle>>> entryIterator = null;
+		private Iterator<Map.Entry<JPPFPriority, List<BundleWrapper>>> entryIterator = null;
 		/**
 		 * Iterator over the task bundles in the map entry specified by <code>entryIterator</code>.
 		 */
-		private Iterator<JPPFTaskBundle> listIterator = null;
+		private Iterator<BundleWrapper> listIterator = null;
 
 		/**
 		 * Initialize this iterator.
@@ -212,7 +214,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		 * @return the next element as a <code>JPPFTaskBundle</code> instance.
 		 * @see java.util.Iterator#next()
 		 */
-		public JPPFTaskBundle next()
+		public BundleWrapper next()
 		{
 			if (listIterator != null)
 			{

@@ -19,8 +19,8 @@ package org.jppf.server.app;
 
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.io.*;
 import org.jppf.server.AbstractResultSender;
-import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.JPPFBuffer;
 
 /**
@@ -38,12 +38,18 @@ public class ApplicationResultSender extends AbstractResultSender
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Output destination wrapping all write operations on the socket client.
+	 */
+	private OutputDestination destination = null;
+
+	/**
 	 * Initialize this result sender with a specified socket client.
 	 * @param socketClient the socket client used to send results back.
 	 */
 	public ApplicationResultSender(SocketWrapper socketClient)
 	{
 		super(socketClient, true);
+		destination = new SocketWrapperOutputDestination(socketClient);
 	}
 
 	/**
@@ -52,18 +58,19 @@ public class ApplicationResultSender extends AbstractResultSender
 	 * @param bundle the bundle to get the task results from.
 	 * @throws Exception if an IO exception occurred while sending the results back.
 	 */
-	public void sendPartialResults(JPPFTaskBundle bundle) throws Exception
+	public void sendPartialResults(BundleWrapper bundle) throws Exception
 	{
-		if (debugEnabled) log.debug("Sending bundle with "+bundle.getTaskCount()+" tasks");
-		JPPFBuffer bundleBuffer = helper.toBytes(bundle, false);
+		if (debugEnabled) log.debug("Sending bundle with "+bundle.getBundle().getTaskCount()+" tasks");
+		JPPFBuffer bundleBuffer = helper.toBytes(bundle.getBundle(), false);
 		int size = 4 + bundleBuffer.getLength();
-		for (byte[] task : bundle.getTasks()) size += 4 + task.length;
+		for (DataLocation task : bundle.getTasks()) size += 4 + task.getSize();
 
 		socketClient.writeInt(size);
 		socketClient.sendBytes(bundleBuffer);
-		for (byte[] task : bundle.getTasks())
+		for (DataLocation task : bundle.getTasks())
 		{
-			socketClient.sendBytes(new JPPFBuffer(task, task.length));
+			destination.writeInt(task.getSize());
+			task.transferTo(destination, true);
 		}
 	}
 }

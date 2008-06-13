@@ -18,9 +18,11 @@
 package org.jppf.server;
 
 import java.util.*;
+
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.server.protocol.*;
+import org.jppf.io.*;
+import org.jppf.server.protocol.TaskCompletionListener;
 import org.jppf.utils.*;
 
 /**
@@ -40,7 +42,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	/**
 	 * The list of task bundles whose execution has been completed.
 	 */
-	private List<JPPFTaskBundle> resultList = new ArrayList<JPPFTaskBundle>();
+	private List<BundleWrapper> resultList = new ArrayList<BundleWrapper>();
 	/**
 	 * Number of tasks that haven't yet been executed.
 	 */
@@ -79,7 +81,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	public void run(int count) throws Exception
 	{
 		if (debugEnabled) log.debug("Pending tasks: "+count);
-		setResultList(new ArrayList<JPPFTaskBundle>());
+		setResultList(new ArrayList<BundleWrapper>());
 		setPendingTasksCount(count);
 		waitForExecution();
 	}
@@ -90,7 +92,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 * @param bundle the bundle to get the task results from.
 	 * @throws Exception if an IO exception occurred while sending the results back.
 	 */
-	public abstract void sendPartialResults(JPPFTaskBundle bundle) throws Exception;
+	public abstract void sendPartialResults(BundleWrapper bundle) throws Exception;
 
 	/**
 	 * This method waits until all tasks of a request have been completed.
@@ -106,25 +108,24 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 				if (debugEnabled) log.debug(""+getResultList().size()+" in result list");
 				if (asynch)
 				{
-					for (JPPFTaskBundle bundle : getResultList()) sendPartialResults(bundle);
+					for (BundleWrapper bundle : getResultList()) sendPartialResults(bundle);
 				}
 				else if (!getResultList().isEmpty())
 				{
-					JPPFTaskBundle first = getResultList().remove(0);
-					List<byte[]> taskList = first.getTasks();
+					BundleWrapper first = getResultList().remove(0);
 					int count = first.getTasks().size();
 					int size = getResultList().size();
 					for (int i=0; i<size; i++)
 					{
-						JPPFTaskBundle bundle = getResultList().remove(0);
-						for (byte[] task: bundle.getTasks())
+						BundleWrapper bundle = getResultList().remove(0);
+						for (DataLocation task: bundle.getTasks())
 						{
-							taskList.add(task);
+							first.addTask(task);
 							count++;
 						}
 						bundle.getTasks().clear();
 					}
-					first.setTaskCount(count);
+					first.getBundle().setTaskCount(count);
 					sendPartialResults(first);
 				}
 				getResultList().clear();
@@ -142,10 +143,10 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 * have completed, this connection sends all results back.
 	 * @param result the result of the task's execution.
 	 */
-	public synchronized void taskCompleted(JPPFTaskBundle result)
+	public synchronized void taskCompleted(BundleWrapper result)
 	{
-		setPendingTasksCount(getPendingTasksCount() - result.getTaskCount());
-		if (debugEnabled) log.debug("Received results for : " + result.getTaskCount() + " [size=" +
+		setPendingTasksCount(getPendingTasksCount() - result.getBundle().getTaskCount());
+		if (debugEnabled) log.debug("Received results for : " + result.getBundle().getTaskCount() + " [size=" +
 			result.getTasks().size() + "] tasks");
 		if (debugEnabled) log.debug("Pending tasks: " + getPendingTasksCount());
 		getResultList().add(result);
@@ -172,9 +173,9 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 
 	/**
 	 * Set the list of task bundles whose execution has been completed.
-	 * @param resultList a list of <code>JPPFTaskBundle</code> instances.
+	 * @param resultList a list of <code>BundleWrapper</code> instances.
 	 */
-	protected synchronized void setResultList(List<JPPFTaskBundle> resultList)
+	protected synchronized void setResultList(List<BundleWrapper> resultList)
 	{
 		this.resultList = resultList;
 	}
@@ -183,7 +184,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 * Get the list of task bundles whose execution has been completed.
 	 * @return a list of <code>JPPFTaskBundle</code> instances.
 	 */
-	protected synchronized List<JPPFTaskBundle> getResultList()
+	protected synchronized List<BundleWrapper> getResultList()
 	{
 		return resultList;
 	}

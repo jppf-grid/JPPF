@@ -20,14 +20,12 @@ package org.jppf.server.app;
 import static org.jppf.server.JPPFStatsUpdater.*;
 
 import java.net.*;
-import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
+import org.jppf.io.*;
 import org.jppf.server.*;
-import org.jppf.server.nio.message.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.server.queue.JPPFQueue;
 import org.jppf.utils.*;
 
 /**
@@ -43,42 +41,34 @@ public class ApplicationConnection extends JPPFConnection
 	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(ApplicationConnection.class);
-
 	/**
 	 * Base name used for localization lookups";
 	 */
 	private static final String I18N_BASE = "org.jppf.server.i18n.messages";
-
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-
 	/**
 	 * Determines whether dumping byte arrays in the log is enabled.
 	 */
 	private boolean dumpEnabled = JPPFConfiguration.getProperties().getBoolean("byte.array.dump.enabled", false);
-
 	/**
-	 * A reference to the driver's tasks queue.
+	 * IO wrapper for the header.
 	 */
-	private JPPFQueue queue = null;
-
+	private BundleWrapper headerWrapper = null;
 	/**
-	 * Used to serialize and deserialize the tasks data.
+	 * Helper used to serialize or deserialize task bundles.
 	 */
 	private SerializationHelper helper = new SerializationHelperImpl();
-
 	/**
-	 * The header describing the current client request.
+	 * Input source for the socket client.
 	 */
-	private JPPFTaskBundle header = null;
-
+	private InputSource is = null;
 	/**
 	 * Total number of tasks submitted to this application connection.
 	 */
 	private int totalTaskCount = 0;
-
 	/**
 	 * Used to send the task results back to the requester.
 	 */
@@ -95,6 +85,7 @@ public class ApplicationConnection extends JPPFConnection
 			throws JPPFException
 	{
 		super(server, socket);
+		is = new SocketWrapperInputSource(socketClient);
 		resultSender = new ApplicationResultSender(socketClient);
 		InetAddress addr = socket.getInetAddress();
 		setName("appl [" + addr.getHostAddress() + ":" + socket.getPort() + "]");
@@ -119,10 +110,12 @@ public class ApplicationConnection extends JPPFConnection
 	public void perform() throws Exception
 	{
 		// Read the request header - with tasks count information
-		socketClient.skip(4);
+		int n = is.readInt();
 		byte bytes[] = socketClient.receiveBytes(0).getBuffer();
-		header = (JPPFTaskBundle) helper.getSerializer().deserialize(bytes);
+		JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(bytes);
+		if (debugEnabled) log.debug("received header from client, data length = " + bytes.length);
 		bytes = null;
+		headerWrapper = new BundleWrapper(header);
 		executeTasks();
 	}
 
@@ -132,115 +125,39 @@ public class ApplicationConnection extends JPPFConnection
 	 */
 	protected void executeTasks() throws Exception
 	{
-		BundleWrapper headerWrapper = new BundleWrapper(header);
+		JPPFTaskBundle header = headerWrapper.getBundle();
 		int count = header.getTaskCount();
 		if (debugEnabled) log.debug("Received " + count + " tasks");
 
-		InputSource is = new SocketWrapperInputSource(socketClient);
-		for (int i=0; i<count + 1; i++)
+		for (int i=0; i<count+1; i++)
 		{
 			int n = is.readInt();
-			DataLocation dl = new ByteBufferLocation(n);
+			//DataLocation dl = new ByteBufferLocation(n);
+			DataLocation dl = IOHelper.createDataLocationMemorySensitive(n);
 			n = dl.transferFrom(is, true);
-			if (i == 0) headerWrapper.setDataProvider(dl);
-			else headerWrapper.addTask(dl);
+			if (i == 0)
+			{
+				headerWrapper.setDataProvider(dl);
+				if (debugEnabled) log.debug("received data provider from client, data length = " + n);
+			}
+			else
+			{
+				headerWrapper.addTask(dl);
+				if (debugEnabled) log.debug("received task #"+ i + " from client, data length = " + n);
+			}
 		}
 
-		DataLocation dl = headerWrapper.getDataProvider();
-		byte[] data = new byte[dl.getSize()];
-		OutputDestination od = new ByteOutputDestination(data, 0, dl.getSize());
-		dl.transferTo(od, true);
-		header.setDataProvider(data);
-
-		List<byte[]> taskList = new ArrayList<byte[]>();
-		for (int i=0; i<count; i++)
-		{
-			dl = headerWrapper.getTasks().get(i);
-			data = new byte[dl.getSize()];
-			od = new ByteOutputDestination(data, 0, dl.getSize());
-			dl.transferTo(od, true);
-			if (debugEnabled)
-			{
-				log.debug(new StringBuilder("read task data in ").append(data.length).append(" bytes").toString());
-				if (dumpEnabled)
-					log.debug(new StringBuilder("bytes: ").append(StringUtils.dumpBytes(data, 0, data.length)).toString());
-			}
-			taskList.add(data);
-		}
-		/*
-		byte[] dataProvider = socketClient.receiveBytes(0).getBuffer();
-		List<byte[]> taskList = new ArrayList<byte[]>();
-		for (int i=0; i<count; i++)
-		{
-			byte[] task = socketClient.receiveBytes(0).getBuffer();
-			if (debugEnabled)
-			{
-				log.debug(new StringBuilder("read task data in ").append(task.length).append(" bytes").toString());
-				if (dumpEnabled)
-					log.debug(new StringBuilder("bytes: ").append(StringUtils.dumpBytes(task, 0, task.length)).toString());
-			}
-			taskList.add(task);
-		}
-		*/
 		header.getUuidPath().add(JPPFDriver.getInstance().getUuid());
-		header.setTasks(taskList);
 		header.setCompletionListener(resultSender);
-		getQueue().addBundle(header);
+		JPPFDriver.getQueue().addBundle(headerWrapper);
 		if (count > 0)
 		{
 			totalTaskCount += count;
 			if (debugEnabled) log.debug("Queued " + totalTaskCount + " tasks");
 		}
-		if (count <= 0) resultSender.sendPartialResults(header);
+		if (count <= 0) resultSender.sendPartialResults(headerWrapper);
 		else resultSender.run(count);
 		return;
-	}
-
-	/**
-	 * Execute the tasks received from a client.
-	 * @throws Exception if the tasks could not be read.
-	 */
-	protected void executeTasks2() throws Exception
-	{
-		int count = header.getTaskCount();
-		if (debugEnabled) log.debug("Received " + count + " tasks");
-
-		byte[] dataProvider = socketClient.receiveBytes(0).getBuffer();
-		List<byte[]> taskList = new ArrayList<byte[]>();
-		for (int i=0; i<count; i++)
-		{
-			byte[] task = socketClient.receiveBytes(0).getBuffer();
-			if (debugEnabled)
-			{
-				log.debug(new StringBuilder("read task data in ").append(task.length).append(" bytes").toString());
-				if (dumpEnabled)
-					log.debug(new StringBuilder("bytes: ").append(StringUtils.dumpBytes(task, 0, task.length)).toString());
-			}
-			taskList.add(task);
-		}
-		header.setDataProvider(dataProvider);
-		header.getUuidPath().add(JPPFDriver.getInstance().getUuid());
-		header.setTasks(taskList);
-		header.setCompletionListener(resultSender);
-		getQueue().addBundle(header);
-		if (count > 0)
-		{
-			totalTaskCount += count;
-			if (debugEnabled) log.debug("Queued " + totalTaskCount + " tasks");
-		}
-		if (count <= 0) resultSender.sendPartialResults(header);
-		else resultSender.run(count);
-		return;
-	}
-
-	/**
-	 * Get a reference to the driver's tasks queue.
-	 * @return a <code>JPPFQueue</code> instance.
-	 */
-	protected JPPFQueue getQueue()
-	{
-		if (queue == null) queue = JPPFDriver.getQueue();
-		return queue;
 	}
 
 	/**

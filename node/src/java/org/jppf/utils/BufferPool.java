@@ -37,7 +37,7 @@ public final class BufferPool
 	 * Maximum number of bytes that can be written or read in one shot.
 	 */
 	private static final int MAX_BUFFER_SIZE =
-		1024 * JPPFConfiguration.getProperties().getInt("io.buffer.size", 128);
+		1024 * JPPFConfiguration.getProperties().getInt("io.buffer.size", 32);
 	/**
 	 * Logger for this class.
 	 */
@@ -84,8 +84,9 @@ public final class BufferPool
 			else
 			{
 				BufferReference ref = bufferPool.remove();
+				ref.setRemovedFromPool(true);
 				result = ref.get();
-				ref.clear();
+				//ref.clear();
 				nbBuffersInPool--;
 				if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
 			}
@@ -142,17 +143,35 @@ public final class BufferPool
 		 */
 		public void clear()
 		{
-			if (!removedFromPool)
+			if (!isRemovedFromPool())
 			{
+				setRemovedFromPool(true);
 				synchronized(bufferPool)
 				{
 					bufferPool.remove(get());
 					nbBuffersInPool--;
 					if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
 				}
-				removedFromPool = true;
 			}
 			super.clear();
+		}
+
+		/**
+		 * Determine whether this reference was removed from the pool.
+		 * @return true if the reference was removed from the pool, false otherwise.
+		 */
+		public synchronized boolean isRemovedFromPool()
+		{
+			return removedFromPool;
+		}
+
+		/**
+		 * Specify whether this reference is removed from the pool.
+		 * @param removedFromPool true if the reference is removed from the pool, false otherwise.
+		 */
+		public synchronized void setRemovedFromPool(boolean removedFromPool)
+		{
+			this.removedFromPool = removedFromPool;
 		}
 	}
 }

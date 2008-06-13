@@ -25,6 +25,7 @@ import static org.jppf.utils.StringUtils.getRemoteHost;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.io.BundleWrapper;
 import org.jppf.management.*;
 import org.jppf.server.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
@@ -68,10 +69,12 @@ public class WaitInitialBundleState extends NodeServerState
 		SelectableChannel channel = key.channel();
 		NodeContext context = (NodeContext) key.attachment();
 		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
-		if (context.readMessage((ReadableByteChannel) channel))
+		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
+		if (context.getNodeMessage().read((ReadableByteChannel) channel))
 		{
 			if (debugEnabled) log.debug("read bundle for " + getRemoteHost(channel) + " done");
-			JPPFTaskBundle bundle = context.deserializeBundle();
+			BundleWrapper bundleWrapper = context.deserializeBundle();
+			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			context.setUuid(bundle.getBundleUuid());
 			boolean override = bundle.getParameter(BUNDLE_TUNING_TYPE_PARAM) != null;
 			if (override) context.setBundler(BundlerFactory.createBundler(bundle.getParametersMap(), true));
@@ -91,7 +94,7 @@ public class WaitInitialBundleState extends NodeServerState
 				}
 			}
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
-			context.setMessage(null);
+			context.setNodeMessage(null);
 			context.setBundle(null);
 			server.addIdleChannel(channel);
 			return TO_IDLE;

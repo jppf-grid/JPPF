@@ -18,34 +18,34 @@
 
 package org.jppf.server.queue;
 
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.io.BundleWrapper;
 
 /**
  * Implementation of a generic non-blocking queue, to allow asynchronous access from a large number of threads.
  * @author Laurent Cohen
  */
-public interface JPPFQueue extends Iterable<JPPFTaskBundle>
+public interface JPPFQueue extends Iterable<BundleWrapper>
 {
 	/**
 	 * Add an object to the queue, and notify all listeners about it.
-	 * @param bundle the object to add to the queue.
+	 * @param bundleWrapper the object to add to the queue.
 	 */
-	void addBundle(JPPFTaskBundle bundle);
+	void addBundle(BundleWrapper bundleWrapper);
 
 	/**
 	 * Get the next object in the queue.
 	 * @param nbTasks the maximum number of tasks to get out of the bundle.
 	 * @return the most recent object that was added to the queue.
 	 */
-	JPPFTaskBundle nextBundle(int nbTasks);
+	BundleWrapper nextBundle(int nbTasks);
 
 	/**
 	 * Get the next object in the queue.
-	 * @param bundle the bundle to either remove or extract a sub-bundle from.
+	 * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
 	 * @param nbTasks the maximum number of tasks to get out of the bundle.
 	 * @return the most recent object that was added to the queue.
 	 */
-	JPPFTaskBundle nextBundle(JPPFTaskBundle bundle, int nbTasks);
+	BundleWrapper nextBundle(BundleWrapper bundleWrapper, int nbTasks);
 
 	/**
 	 * Add a listener to the current list of listeners to this queue.

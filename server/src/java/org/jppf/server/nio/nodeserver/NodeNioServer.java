@@ -24,8 +24,9 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
+import org.jppf.io.*;
 import org.jppf.management.*;
-import org.jppf.node.policy.*;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.*;
 import org.jppf.server.nio.*;
@@ -60,7 +61,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	/**
 	 * The the task bundle sent to a newly connected node.
 	 */
-	private JPPFTaskBundle initialBundle = null;
+	private BundleWrapper initialBundle = null;
 
 	/**
 	 * Holds the currently idle channels.
@@ -167,16 +168,17 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
 				boolean found = false;
 				SelectableChannel channel = null;
-				JPPFTaskBundle selectedBundle = null;
-				Iterator<JPPFTaskBundle> it = getQueue().iterator();
+				BundleWrapper selectedBundle = null;
+				Iterator<BundleWrapper> it = getQueue().iterator();
 				while (!found && it.hasNext() && !idleChannels.isEmpty())
 				{
-					JPPFTaskBundle bundle = it.next();
+					BundleWrapper bundleWrapper = it.next();
+					JPPFTaskBundle bundle = bundleWrapper.getBundle();
 					int n = findIdleChannelIndex(bundle);
 					if (n >= 0)
 					{
 						channel = idleChannels.remove(n);
-						selectedBundle = bundle;
+						selectedBundle = bundleWrapper;
 						found = true;
 					}
 				}
@@ -185,8 +187,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				{
 					SelectionKey key = channel.keyFor(selector);
 					NodeContext context = (NodeContext) key.attachment();
-					JPPFTaskBundle bundle = getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
-					context.setBundle(bundle);
+					BundleWrapper bundleWrapper = getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
+					context.setBundle(bundleWrapper);
 					transitionManager.transitionChannel(key, NodeTransition.TO_SENDING);
 				}
 			}
@@ -300,9 +302,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * Get the task bundle sent to a newly connected node,
 	 * so that it can check whether it is up to date, without having
 	 * to wait for an actual request to be sent.
-	 * @return a <code>JPPFTaskBundle</code> instance, with no task in it.
+	 * @return a <code>BundleWrapper</code> instance, with no task in it.
 	 */
-	private JPPFTaskBundle getInitialBundle()
+	private BundleWrapper getInitialBundle()
 	{
 		if (initialBundle == null)
 		{
@@ -311,18 +313,19 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				JPPFSecurityContext cred = JPPFDriver.getInstance().getCredentials();
 				SerializationHelper helper = new SerializationHelperImpl();
 				JPPFBuffer buf = helper.toBytes(null, false);
-				byte[] dpBytes = new byte[4 + buf.getLength()];
-				helper.copyToBuffer(buf.getBuffer(), dpBytes, 0, buf.getLength());
+				byte[] dataProvider = new byte[4 + buf.getLength()];
+				helper.copyToBuffer(buf.getBuffer(), dataProvider, 0, buf.getLength());
 				JPPFTaskBundle bundle = new JPPFTaskBundle();
 				bundle.setBundleUuid(INITIAL_BUNDLE_UUID);
 				bundle.setRequestUuid("0");
 				bundle.getUuidPath().add(JPPFDriver.getInstance().getUuid());
 				bundle.setTaskCount(0);
 				//bundle.setTasks(new ArrayList<byte[]>());
-				bundle.setDataProvider(dpBytes);
+				//bundle.setDataProvider(dataProvider);
 				bundle.setCredentials(cred);
 				bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
-				initialBundle =  bundle;
+				initialBundle = new BundleWrapper(bundle);
+				initialBundle.setDataProvider(new ByteBufferLocation(dataProvider, 0, dataProvider.length));
 			}
 			catch(Exception e)
 			{

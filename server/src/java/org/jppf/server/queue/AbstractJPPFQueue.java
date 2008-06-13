@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.io.BundleWrapper;
 
 /**
  * Abstract superclass for all JPPFQueue implementations.
@@ -49,7 +49,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	/**
 	 * An ordered map of bundle sizes, mapping to a list of bundles of this size.
 	 */
-	protected TreeMap<Integer, List<JPPFTaskBundle>> sizeMap = new TreeMap<Integer, List<JPPFTaskBundle>>();
+	protected TreeMap<Integer, List<BundleWrapper>> sizeMap = new TreeMap<Integer, List<BundleWrapper>>();
 	/**
 	 * 
 	 */
@@ -57,13 +57,13 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 
 	/**
 	 * Get the bundle size to use for bundle size tuning.
-	 * @param bundle the bundle to get the size from.
+	 * @param bundleWrapper the bundle to get the size from.
 	 * @return the bundle size as an int.
 	 */
-	protected int getSize(JPPFTaskBundle bundle)
+	protected int getSize(BundleWrapper bundleWrapper)
 	{
 		//return bundle.getTaskCount();
-		return bundle.getInitialTaskCount();
+		return bundleWrapper.getBundle().getInitialTaskCount();
 	}
 
 	/**
@@ -93,7 +93,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	 * @return the most recent object that was added to the queue.
 	 * @see org.jppf.server.queue.JPPFQueue#nextBundle(int)
 	 */
-	public JPPFTaskBundle nextBundle(int nbTasks)
+	public BundleWrapper nextBundle(int nbTasks)
 	{
 		return null;
 	}
@@ -101,12 +101,12 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	/**
 	 * Get the next object in the queue.
 	 * This method only returns null and must be overriden by subclasses that want to use it.
-	 * @param bundle the bundle to either remove or extract a sub-bundle from.
+	 * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
 	 * @param nbTasks the maximum number of tasks to get out of the bundle.
 	 * @return the most recent object that was added to the queue.
 	 * @see org.jppf.server.queue.JPPFQueue#nextBundle(int)
 	 */
-	public JPPFTaskBundle nextBundle(JPPFTaskBundle bundle, int nbTasks)
+	public BundleWrapper nextBundle(BundleWrapper bundleWrapper, int nbTasks)
 	{
 		return null;
 	}
