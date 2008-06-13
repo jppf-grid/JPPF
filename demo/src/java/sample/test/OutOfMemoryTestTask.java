@@ -27,7 +27,7 @@ import org.jppf.server.protocol.JPPFTask;
 public class OutOfMemoryTestTask extends JPPFTask
 {
 	/**
-	 * Default constructor - the method that throws an NPE will be invoked.
+	 * Default constructor .
 	 */
 	public OutOfMemoryTestTask()
 	{
