@@ -299,27 +299,40 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	public Pair<List<JPPFTask>, Integer> receiveResults() throws Exception
 	{
-		socketClient.skip(4);
-		byte[] data = socketClient.receiveBytes(0).getBuffer();
-		JPPFTaskBundle bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
-		int count = bundle.getTaskCount();
-		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-		for (int i=0; i<count; i++)
+		try
 		{
-			data = socketClient.receiveBytes(0).getBuffer();
-			taskList.add((JPPFTask) helper.getSerializer().deserialize(data));
+			socketClient.skip(4);
+			byte[] data = socketClient.receiveBytes(0).getBuffer();
+			JPPFTaskBundle bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
+			int count = bundle.getTaskCount();
+			List<JPPFTask> taskList = new ArrayList<JPPFTask>();
+			for (int i=0; i<count; i++)
+			{
+				data = socketClient.receiveBytes(0).getBuffer();
+				taskList.add((JPPFTask) helper.getSerializer().deserialize(data));
+			}
+	
+			int startIndex = (taskList.isEmpty()) ? -1 : taskList.get(0).getPosition();
+			// if an exception prevented the node from executing the tasks
+			Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
+			if (t != null)
+			{
+				Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
+				for (JPPFTask task: taskList) task.setException(e);
+			}
+			Pair<List<JPPFTask>, Integer> p = new Pair<List<JPPFTask>, Integer>(taskList, startIndex);
+			return p;
 		}
-
-		int startIndex = (taskList.isEmpty()) ? -1 : taskList.get(0).getPosition();
-		// if an exception prevented the node from executing the tasks
-		Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
-		if (t != null)
+		catch(Exception e)
 		{
-			Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-			for (JPPFTask task: taskList) task.setException(e);
+			log.error(e.getMessage(), e);
+			throw e;
 		}
-		Pair<List<JPPFTask>, Integer> p = new Pair<List<JPPFTask>, Integer>(taskList, startIndex);
-		return p;
+		catch(Error e)
+		{
+			log.error(e.getMessage(), e);
+			throw e;
+		}
 	}
 
 	/**
