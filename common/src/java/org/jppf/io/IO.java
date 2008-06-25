@@ -21,13 +21,9 @@ package org.jppf.io;
 import java.io.Closeable;
 
 /**
- * 
+ * Super interface for all input source and output destination implementations.
  * @author Laurent Cohen
  */
 public interface IO extends Closeable
 {
-	/**
-	 * Size of buffer to use when transferring data to/from an IO object.
-	 */
-	int BUFFER_SIZE = 128 * 1024;
 }

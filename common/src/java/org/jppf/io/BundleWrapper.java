@@ -23,7 +23,8 @@ import java.util.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**
- * 
+ * This class wraps a task bundle to express it in terms of {@link org.jppf.io.DataLocation DataLocation}.
+ * This allows the tasks data to be processed with the same semantics no matter where it is stored, comes from or goes to. 
  * @author Laurent Cohen
  */
 public class BundleWrapper

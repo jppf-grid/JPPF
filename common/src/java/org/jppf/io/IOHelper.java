@@ -58,4 +58,18 @@ public final class IOHelper
 		file.deleteOnExit();
 		return new FileLocation(file, size);
 	}
+
+	/**
+	 * Read a provider or task data from an input source.
+	 * @param source the input source from which to read the data.
+	 * @return A data location containing the data provider or task data.
+	 * @throws Exception if an error occurs while deserializing.
+	 */
+	public static DataLocation readData(InputSource source) throws Exception
+	{
+		int n = source.readInt();
+		DataLocation dl = createDataLocationMemorySensitive(n);
+		dl.transferFrom(source, true);
+		return dl;
+	}
 }

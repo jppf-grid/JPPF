@@ -22,15 +22,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
- * 
+ * Output destination backed by a {@link java.nio.ByteBuffer ByteBuffer}.
  * @author Laurent Cohen
  */
 public class ByteOutputDestination implements OutputDestination
 {
-	/**
-	 * An output stream wrapping the data.
-	 */
-	//private ByteBufferOutputStream os = null;
 	/**
 	 * The buffer that backs this output destination.
 	 */

@@ -21,7 +21,9 @@ package org.jppf.io;
 import java.nio.channels.*;
 
 /**
- * 
+ * Abstract implementation of the <code>DataLocation</code> interface.>br>
+ * This class provides default implementations for the <code>transferFrom(ReadableByteChannel, boolean)</code> and
+ * <code>transferTo(WritableByteChannel, boolean)</code> methods.
  * @author Laurent Cohen
  */
 public abstract class AbstractDataLocation implements DataLocation

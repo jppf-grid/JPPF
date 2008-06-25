@@ -21,7 +21,7 @@ package org.jppf.io;
 import java.nio.channels.*;
 
 /**
- * This interface represents an abstraction of a task bundle's piece of data, regardless of where it is stored.
+ * This interface represents an abstraction of a block of data, regardless of where it is stored.
  * @author Laurent Cohen
  */
 public interface DataLocation

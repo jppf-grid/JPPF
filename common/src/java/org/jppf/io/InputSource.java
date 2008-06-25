@@ -21,7 +21,7 @@ package org.jppf.io;
 import java.nio.ByteBuffer;
 
 /**
- * 
+ * This interface represents an abstraction of any source of incoming data.
  * @author Laurent Cohen
  */
 public interface InputSource extends IO

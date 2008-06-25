@@ -21,7 +21,7 @@ package org.jppf.io;
 import java.nio.ByteBuffer;
 
 /**
- * 
+ * This interface represents an abstraction of any destination for outgoing data.
  * @author Laurent Cohen
  */
 public interface OutputDestination extends IO
