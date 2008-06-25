@@ -137,7 +137,6 @@ public class JPPFContainer
 				public Object run()
 				{
 					classLoader = new JPPFClassLoader(NodeLauncher.getJPPFClassLoader(), uuidPath);
-					//classLoader = new JPPFClassLoader(NodeLauncher.class.getClassLoader(), uuidPath);
 					return null;
 				}
 			});

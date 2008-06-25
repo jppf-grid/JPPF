@@ -180,7 +180,6 @@ public class NodeExecutionManager
 				{
 					future.cancel(true);
 					pair.second().onCancel();
-					//pair.second().setException(new JPPFException("This task was cancelled"));
 				}
 			}
 		}

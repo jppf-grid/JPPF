@@ -131,19 +131,16 @@ public class ApplicationConnection extends JPPFConnection
 
 		for (int i=0; i<count+1; i++)
 		{
-			int n = is.readInt();
-			//DataLocation dl = new ByteBufferLocation(n);
-			DataLocation dl = IOHelper.createDataLocationMemorySensitive(n);
-			n = dl.transferFrom(is, true);
+			DataLocation dl = IOHelper.readData(is);
 			if (i == 0)
 			{
 				headerWrapper.setDataProvider(dl);
-				if (debugEnabled) log.debug("received data provider from client, data length = " + n);
+				if (debugEnabled) log.debug("received data provider from client, data length = " + dl.getSize());
 			}
 			else
 			{
 				headerWrapper.addTask(dl);
-				if (debugEnabled) log.debug("received task #"+ i + " from client, data length = " + n);
+				if (debugEnabled) log.debug("received task #"+ i + " from client, data length = " + dl.getSize());
 			}
 		}
 
