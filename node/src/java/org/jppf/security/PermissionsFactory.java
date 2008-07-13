@@ -25,6 +25,7 @@ import java.util.*;
 
 import javax.management.*;
 
+import org.apache.commons.logging.*;
 import org.jppf.utils.*;
 
 /**
@@ -33,6 +34,14 @@ import org.jppf.utils.*;
  */
 public final class PermissionsFactory
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(PermissionsFactory.class);
+	/**
+	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Encapsulates the set of all permissions granted to a node.
 	 */
@@ -79,7 +88,7 @@ public final class PermissionsFactory
 	 * Initialize the permissions granted to a node.
 	 * @param classLoader the ClassLoader used to retrieve the policy file.
 	 */
-	private static synchronized void createPermissions(ClassLoader classLoader)
+	private static void createPermissions(ClassLoader classLoader)
 	{
 		if (permList != null) return;
 		permList = new ArrayList<Permission>(); 
@@ -93,12 +102,19 @@ public final class PermissionsFactory
 	 */
 	private static void createDynamicPermissions()
 	{
-		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = props.getString("jppf.server.host", "localhost");
-		int port = props.getInt("class.server.port", 11111);
-		permList.add(new SocketPermission(host + ":" + port, "connect,listen"));
-		port = props.getInt("node.server.port", 11113);
-		permList.add(new SocketPermission(host + ":" + port, "connect,listen"));
+		try
+		{
+			TypedProperties props = JPPFConfiguration.getProperties();
+			String host = props.getString("jppf.server.host", "localhost");
+			int port = props.getInt("class.server.port", 11111);
+			addPermission(new SocketPermission(host + ":" + port, "connect,listen"), "dynamic");
+			port = props.getInt("node.server.port", 11113);
+			addPermission(new SocketPermission(host + ":" + port, "connect,listen"), "dynamic");
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -106,24 +122,24 @@ public final class PermissionsFactory
 	 */
 	private static void createManagementPermissions()
 	{
-		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = props.getString("jppf.management.host", "localhost");
-		int port = props.getInt("jppf.management.port", 11198);
-		// TODO: find a way to be more restrictive on RMI permissions
-		permList.add(new SocketPermission(host + ":1024-", "accept,connect,listen,resolve"));
-		permList.add(new SocketPermission("localhost:" + port, "accept,connect,listen,resolve"));
-		//p.add(new MBeanServerPermission("createMBeanServer"));
-		permList.add(new MBeanServerPermission("*"));
 		try
 		{
-			permList.add(new MBeanPermission("*", "*", new ObjectName("*:*"), "*"));
+			TypedProperties props = JPPFConfiguration.getProperties();
+			String host = props.getString("jppf.management.host", "localhost");
+			int port = props.getInt("jppf.management.port", 11198);
+			// TODO: find a way to be more restrictive on RMI permissions
+			addPermission(new SocketPermission(host + ":1024-", "accept,connect,listen,resolve"), "management");
+			addPermission(new SocketPermission("localhost:" + port, "accept,connect,listen,resolve"), "management");
+			//p.add(new MBeanServerPermission("createMBeanServer"));
+			addPermission(new MBeanServerPermission("*"), "management");
+			addPermission(new MBeanPermission("*", "*", new ObjectName("*:*"), "*"), "management");
+			// TODO: find a way to be more restrictive on RMI permissions
+			addPermission(new SocketPermission("*:1024-", "accept,connect,listen,resolve"), "management");
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
-		// TODO: find a way to be more restrictive on RMI permissions
-		permList.add(new SocketPermission("*:1024-", "accept,connect,listen,resolve"));
 	}
 
 	/**
@@ -144,9 +160,14 @@ public final class PermissionsFactory
 			}
 			catch(FileNotFoundException e)
 			{
+				if (debugEnabled) log.debug("jppf policy file '" + file + "' not found locally"); 
 			}
 			if (is == null) is = classLoader.getResourceAsStream(file);
-			if (is == null) return;
+			if (is == null)
+			{
+				if (debugEnabled) log.debug("jppf policy file '" + file + "' not found on the driver side"); 
+				return;
+			}
 			reader = new LineNumberReader(new InputStreamReader(is));
 			int count = 0;
 			boolean end = false;
@@ -171,12 +192,12 @@ public final class PermissionsFactory
 				line = line.substring(0, line.length() - 1);
 				line = line.trim();
 				Permission p = parsePermission(line, file, count);
-				if (p != null) permList.add(p);
+				if (p != null) addPermission(p, "static");
 			}
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		finally
 		{
@@ -189,6 +210,18 @@ public final class PermissionsFactory
 				catch(Exception ignored){}
 			}
 		}
+	}
+
+	/**
+	 * Convenience method used to log information when permission are added tothe list of permissions
+	 * @param p the oermission to add.
+	 * @param type the type of permission, static, dynamic or mbean.
+	 * @throws Exception if an error is raised when adding the permission.
+	 */
+	private static void addPermission(Permission p, String type) throws Exception
+	{
+		if (debugEnabled) log.debug("adding " + type + " permission: " + p);
+		permList.add(p);
 	}
 	
 	/**

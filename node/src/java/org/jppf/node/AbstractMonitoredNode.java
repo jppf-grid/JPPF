@@ -92,7 +92,7 @@ public abstract class AbstractMonitoredNode implements MonitoredNode
 	 * @param eventType the type of the event as an enumerated value.
 	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(org.jppf.node.event.NodeEventType)
 	 */
-	public void fireNodeEvent(NodeEventType eventType)
+	public synchronized void fireNodeEvent(NodeEventType eventType)
 	{
 		NodeEvent event = new NodeEvent(eventType);
 		for (NodeListener listener : listeners) listener.eventOccurred(event);
@@ -103,7 +103,7 @@ public abstract class AbstractMonitoredNode implements MonitoredNode
 	 * @param nbTasks the number of tasks as an int.
 	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(int)
 	 */
-	public void fireNodeEvent(int nbTasks)
+	public synchronized void fireNodeEvent(int nbTasks)
 	{
 		NodeEvent event = new NodeEvent(nbTasks);
 		for (NodeListener listener : listeners) listener.eventOccurred(event);
@@ -160,5 +160,14 @@ public abstract class AbstractMonitoredNode implements MonitoredNode
 	{
 		this.taskCount = taskCount;
 		fireNodeEvent(taskCount);
+	}
+
+	/**
+	 * Get the utility for deserialization and serialization.
+	 * @return a <code>SerializationHelper</code> instance.
+	 */
+	public SerializationHelper getHelper()
+	{
+		return helper;
 	}
 }

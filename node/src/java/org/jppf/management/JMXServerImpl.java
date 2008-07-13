@@ -61,7 +61,7 @@ public class JMXServerImpl
 	/**
 	 * Determines whether this JMX server is stopped.
 	 */
-	private boolean stopped = false;
+	private boolean stopped = true;
 	/**
 	 * This server's unique id.
 	 */
@@ -99,6 +99,7 @@ public class JMXServerImpl
     JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + "/jppf" + namespaceSuffix);
     connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
     connectorServer.start();
+    stopped = false;
     if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);
 	}
 

@@ -21,6 +21,7 @@ import java.io.*;
 import java.net.URL;
 import java.security.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
@@ -65,7 +66,7 @@ public class JPPFClassLoader extends ClassLoader
 	/**
 	 * Determines whether this class loader should handle dynamic class updating.
 	 */
-	private static boolean initializing = false;
+	private static AtomicBoolean initializing = new AtomicBoolean(false);
 	/**
 	 * Uuid of the orignal task bundle that triggered a resource loading request. 
 	 */
@@ -427,18 +428,18 @@ public class JPPFClassLoader extends ClassLoader
 	 * Determine whether the socket client is being initialized.
 	 * @return true if the socket client is being initialized, false otherwise.
 	 */
-	private static synchronized boolean isInitializing()
+	private static boolean isInitializing()
 	{
-		return initializing;
+		return initializing.get();
 	}
 
 	/**
 	 * Set the socket client initialization status.
 	 * @param initFlag true if the socket client is being initialized, false otherwise.
 	 */
-	private static synchronized void setInitializing(boolean initFlag)
+	private static void setInitializing(boolean initFlag)
 	{
-		initializing = initFlag;
+		initializing.set(initFlag);
 	}
 
 	/**

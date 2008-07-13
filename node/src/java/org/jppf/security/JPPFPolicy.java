@@ -19,12 +19,22 @@ package org.jppf.security;
 
 import java.security.*;
 
+import org.apache.commons.logging.*;
+
 /**
  * Security policy for JPPF Nodes.
  * @author Laurent Cohen
  */
 public class JPPFPolicy extends Policy
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(JPPFPolicy.class);
+	/**
+	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * ClassLoader used to retrieve the policy file.
 	 */

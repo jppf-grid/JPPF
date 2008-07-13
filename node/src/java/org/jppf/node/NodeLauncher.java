@@ -202,7 +202,7 @@ public class NodeLauncher
 	 * Get the jmx server that handles administration and monitoring functions for this node.
 	 * @return a <code>JMXServerImpl</code> instance.
 	 */
-	public static synchronized JMXServerImpl getJmxServer()
+	public static JMXServerImpl getJmxServer()
 	{
 		if ((jmxServer == null) || jmxServer.isStopped())
 		{
