@@ -18,6 +18,7 @@
 package org.jppf.server.scheduler.bundle;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.utils.*;
 
@@ -37,7 +38,7 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	/**
 	 * A default profile with default parameter values.
 	 */
-	private static AnnealingTuneProfile defaultProfile = new AnnealingTuneProfile();
+	private static AtomicReference<AnnealingTuneProfile> defaultProfile = new AtomicReference<AnnealingTuneProfile>(new AnnealingTuneProfile());
 	/**
 	 * The minimum number of samples that must be collected before an analysis is triggered.
 	 */
@@ -269,8 +270,8 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * Get the default profile with default parameter values.
 	 * @return a <code>AnnealingTuneProfile</code> singleton instance.
 	 */
-	public static synchronized AnnealingTuneProfile getDefaultProfile()
+	public static AnnealingTuneProfile getDefaultProfile()
 	{
-		return defaultProfile;
+		return defaultProfile.get();
 	}
 }

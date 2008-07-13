@@ -18,6 +18,8 @@
 
 package org.jppf.server.scheduler.bundle.proportional;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
 
@@ -30,7 +32,7 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	/**
 	 * A default profile with default parameter values.
 	 */
-	private static ProportionalTuneProfile defaultProfile = new ProportionalTuneProfile();
+	private static AtomicReference<ProportionalTuneProfile> defaultProfile = new AtomicReference<ProportionalTuneProfile>(new ProportionalTuneProfile());
 	/**
 	 * The maximum szie of the performance samples cache.
 	 */
@@ -112,8 +114,8 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	 * Get the default profile with default parameter values.
 	 * @return a <code>ProportionalTuneProfile</code> singleton instance.
 	 */
-	public static synchronized ProportionalTuneProfile getDefaultProfile()
+	public static ProportionalTuneProfile getDefaultProfile()
 	{
-		return defaultProfile;
+		return defaultProfile.get();
 	}
 }

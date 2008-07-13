@@ -18,6 +18,8 @@
 
 package org.jppf.server.scheduler.bundle;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Abstract implementation of the bundler interface.
  * @author Laurent Cohen
@@ -27,7 +29,7 @@ public abstract class AbstractBundler implements Bundler
 	/**
 	 * Count of the bundlers used to generate a readable unique id.
 	 */
-	private static int bundlerCount = 0;
+	private static AtomicInteger bundlerCount = new AtomicInteger(0);
 	/**
 	 * The bundler number for this bundler.
 	 */
@@ -46,9 +48,9 @@ public abstract class AbstractBundler implements Bundler
 	 * Increment the bundlers count by one.
 	 * @return the new count as an int value.
 	 */
-	private static synchronized int incBundlerCount()
+	private static int incBundlerCount()
 	{
-		return ++bundlerCount;
+		return bundlerCount.incrementAndGet();
 	}
 
 	/**

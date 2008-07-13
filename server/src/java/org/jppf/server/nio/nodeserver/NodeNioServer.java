@@ -21,6 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import java.io.IOException;
 import java.nio.channels.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
@@ -52,7 +53,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	/**
 	 * The algorithm that dynamically computes the task bundle size.
 	 */
-	private Bundler bundler;
+	private AtomicReference<Bundler> bundlerRef;
 
 	/**
 	 * The uuid for the task bundle sent to a newly connected node.
@@ -98,7 +99,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	{
 		super(ports, "NodeServer Thread", false);
 		this.selectTimeout = 1L;
-		this.bundler = bundler;
+		this.bundlerRef = new AtomicReference<Bundler>(bundler);
 		getQueue().addListener(new QueueListener()
 		{
 			public void newBundle(JPPFQueue queue)
@@ -243,11 +244,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	protected void postSelect()
 	{
-		if (idleChannels.isEmpty() || getQueue().isEmpty())
-		{
-			//try { Thread.sleep(5); } catch(Exception e) { }
-			return;
-		}
+		if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
 		transitionManager.submit(r);
 	}
 
@@ -257,9 +254,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	public void addIdleChannel(SelectableChannel channel)
 	{
+		if (debugEnabled) log.debug("Adding idle chanel " + channel);
 		synchronized(idleChannels)
 		{
-			if (debugEnabled) log.debug("Adding idle chanel " + channel);
 			idleChannels.add(channel);
 		}
 	}
@@ -270,9 +267,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	public void removeIdleChannel(SelectableChannel channel)
 	{
+		if (debugEnabled) log.debug("Removing idle chanel " + channel);
 		synchronized(idleChannels)
 		{
-			if (debugEnabled) log.debug("Removing idle chanel " + channel);
 			idleChannels.remove(channel);
 		}
 	}
@@ -320,8 +317,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				bundle.setRequestUuid("0");
 				bundle.getUuidPath().add(JPPFDriver.getInstance().getUuid());
 				bundle.setTaskCount(0);
-				//bundle.setTasks(new ArrayList<byte[]>());
-				//bundle.setDataProvider(dataProvider);
 				bundle.setCredentials(cred);
 				bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
 				initialBundle = new BundleWrapper(bundle);
@@ -358,18 +353,18 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * Get the algorithm that dynamically computes the task bundle size.
 	 * @return a <code>Bundler</code> instance.
 	 */
-	public synchronized Bundler getBundler()
+	public Bundler getBundler()
 	{
-		return bundler;
+		return bundlerRef.get();
 	}
 
 	/**
 	 * Set the algorithm that dynamically computes the task bundle size.
 	 * @param bundler a <code>Bundler</code> instance.
 	 */
-	public synchronized void setBundler(Bundler bundler)
+	public void setBundler(Bundler bundler)
 	{
-		this.bundler = bundler;
+		bundlerRef.set(bundler);
 	}
 
 	/**

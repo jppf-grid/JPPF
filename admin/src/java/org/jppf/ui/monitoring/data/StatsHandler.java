@@ -20,6 +20,7 @@ package org.jppf.ui.monitoring.data;
 import static org.jppf.server.protocol.BundleParameter.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
@@ -47,7 +48,8 @@ public final class StatsHandler implements StatsConstants
 	/**
 	 * Singleton instance of this class.
 	 */
-	private static StatsHandler instance = null;
+	//private static StatsHandler instance = null;
+	private static AtomicReference<StatsHandler> instance = new AtomicReference<StatsHandler>();
 	/**
 	 * JPPF client used to submit execution requests.
 	 */
@@ -93,10 +95,10 @@ public final class StatsHandler implements StatsConstants
 	 * Get the singleton instance of this class.
 	 * @return a <code>StatsHandler</code> instance.
 	 */
-	public static synchronized StatsHandler getInstance()
+	public static StatsHandler getInstance()
 	{
-		if (instance == null) instance = new StatsHandler();
-		return instance;
+		if (instance.get() == null) instance.set(new StatsHandler());
+		return instance.get();
 	}
 
 	/**
