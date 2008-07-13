@@ -41,18 +41,24 @@ class NodeTaskWrapper implements Runnable
 	 * The key to the JPPFContainer for the task's classloader.
 	 */
 	private List<String> uuidPath = null;
+	/**
+	 * The number identifying the task.
+	 */
+	private long number = 0L;
 
 	/**
 	 * Initialize this task wrapper with a specified JPPF task.
 	 * @param node the JPPF node that runs this task.
 	 * @param task the task to execute within a try/catch block.
 	 * @param uuidPath the key to the JPPFContainer for the task's classloader.
+	 * @param number the internal number identifying the task for the thread pool.
 	 */
-	public NodeTaskWrapper(JPPFNode node, JPPFTask task, List<String> uuidPath)
+	public NodeTaskWrapper(JPPFNode node, JPPFTask task, List<String> uuidPath, long number)
 	{
 		this.node = node;
 		this.task = task;
 		this.uuidPath = uuidPath;
+		this.number = number;
 	}
 
 	/**
@@ -61,10 +67,10 @@ class NodeTaskWrapper implements Runnable
 	 */
 	public void run()
 	{
-		if (node.isNotifying()) node.incrementExecutingCount();
 		JPPFNodeAdmin nodeAdmin = null;
 		try
 		{
+			if (node.isNotifying()) node.incrementExecutingCount();
 			if (node.isJmxEnabled())
 			{
 				nodeAdmin = node.getNodeAdmin();
@@ -86,8 +92,9 @@ class NodeTaskWrapper implements Runnable
 		{
 			if (nodeAdmin != null) nodeAdmin.taskEnded(task.getId());
 			task.removeJPPFTaskListener(nodeAdmin);
+			if (node.isNotifying()) node.decrementExecutingCount();
+			node.getExecutionManager().taskEnded(number);
 		}
-		if (node.isNotifying()) node.decrementExecutingCount();
 	}
 
 	/**

@@ -72,30 +72,6 @@ public class JPPFContainer
 	}
 	
 	/**
-	 * Deserialize a number of objects from an array of bytes.
-	 * @param data the array of bytes from which to deserialize.
-	 * @param offset the position in the source data at whcih to start reading.
-	 * @param compressed deternines whether the source data is comprssed or not.
-	 * @param list a list holding the resulting deserialized objects.
-	 * @param count the number of objects to deserialize.
-	 * @return the new position in the source data after deserialization.
-	 * @throws Exception if an error occurs while deserializing.
-	 */
-	public int deserializeObject(byte[] data, int offset, boolean compressed, List<Object> list, int count) throws Exception
-	{
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		try
-		{
-			Thread.currentThread().setContextClassLoader(classLoader);
-			return helper.fromBytes(data, offset, compressed, list, count);
-		}
-		finally
-		{
-			Thread.currentThread().setContextClassLoader(cl);
-		}
-	}
-
-	/**
 	 * Deserialize a number of objects from a socket client.
 	 * @param wrapper the socket client from which to read the objects to deserialize.
 	 * @param list a list holding the resulting deserialized objects.
@@ -116,6 +92,37 @@ public class JPPFContainer
 				list.add(helper.getSerializer().deserialize(data));
 			}
 			return 0;
+		}
+		finally
+		{
+			Thread.currentThread().setContextClassLoader(cl);
+		}
+	}
+
+	/**
+	 * Deserialize an object from a socket client.
+	 * @param wrapper the socket client from which to read the objects to deserialize.
+	 * @return the new position in the source data after deserialization.
+	 * @throws Exception if an error occurs while deserializing.
+	 */
+	public Object deserializeObject(SocketWrapper wrapper) throws Exception
+	{
+		return deserializeObject(wrapper.receiveBytes(0).getBuffer());
+	}
+
+	/**
+	 * Deserialize an object from a socket client.
+	 * @param data the array of bytes to deserialize into an object.
+	 * @return the new position in the source data after deserialization.
+	 * @throws Exception if an error occurs while deserializing.
+	 */
+	public Object deserializeObject(byte[] data) throws Exception
+	{
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		try
+		{
+			Thread.currentThread().setContextClassLoader(classLoader);
+			return helper.getSerializer().deserialize(data);
 		}
 		finally
 		{

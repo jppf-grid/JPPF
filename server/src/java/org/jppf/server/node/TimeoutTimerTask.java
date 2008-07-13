@@ -30,6 +30,10 @@ import org.jppf.server.protocol.JPPFTask;
 public class TimeoutTimerTask extends TimerTask
 {
 	/**
+	 * The number identifying the task.
+	 */
+	private long number = 0L;
+	/**
 	 * The future on which to call the cancel() method.
 	 */
 	private Future<?> future = null;
@@ -37,15 +41,21 @@ public class TimeoutTimerTask extends TimerTask
 	 * The task to cancel.
 	 */
 	private JPPFTask task = null;
+	/**
+	 * The execution manager that started this task.
+	 */
+	private NodeExecutionManager executionManager = null;
 
 	/**
 	 * Initialize this timer task with the specified future.
-	 * @param future the future used to cancel the underlying JPPF task.
+	 * @param executionManager the execution manager that started this task.
+	 * @param number the number identifying the task.
 	 * @param task the task to cancel.
 	 */
-	public TimeoutTimerTask(Future<?> future, JPPFTask task)
+	public TimeoutTimerTask(NodeExecutionManager executionManager, long number, JPPFTask task)
 	{
-		this.future = future;
+		this.number = number;
+		this.future = executionManager.getFutureFromNumber(number);
 		this.task = task;
 	}
 
@@ -59,7 +69,7 @@ public class TimeoutTimerTask extends TimerTask
 		{
 			future.cancel(true);
 			task.onTimeout();
-			//task.setException(new JPPFException("This task has timed out"));
+			executionManager.removeFuture(number);
 		}
 	}
 }

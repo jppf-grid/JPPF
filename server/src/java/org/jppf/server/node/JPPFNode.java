@@ -367,7 +367,6 @@ public class JPPFNode extends AbstractMonitoredNode
 		for (JPPFTask task : tasks) list.add(helper.toBytes(task, false));
 		int size = 0;
 		for (JPPFBuffer buf: list) size += 4 + buf.getLength();
-
 		socketClient.writeInt(size);
 		for (JPPFBuffer buf: list) socketClient.sendBytes(buf);
 	}
@@ -465,7 +464,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Decrement the count of currently executing tasks and determine whether
 	 * an idle notification should be sent.
 	 */
-	synchronized void decrementExecutingCount()
+	void decrementExecutingCount()
 	{
 		if (executingCount.decrementAndGet() == 0)
 		{
@@ -478,7 +477,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Increment the count of currently executing tasks and determine whether
 	 * a busy notification should be sent.
 	 */
-	synchronized void incrementExecutingCount()
+	void incrementExecutingCount()
 	{
 		if (executingCount.incrementAndGet() == 1)
 		{
