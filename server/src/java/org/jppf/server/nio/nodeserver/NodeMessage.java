@@ -84,13 +84,6 @@ public class NodeMessage
 	 */
 	public boolean read(ReadableByteChannel channel) throws Exception
 	{
-		/*
-		if (is == null)
-		{
-			is = new ChannelInputSource(channel);
-			length = is.readInt();
-		}
-		*/
 		if (!started)
 		{
 			started = true;
@@ -131,15 +124,6 @@ public class NodeMessage
 	 */
 	public boolean write(WritableByteChannel channel) throws Exception
 	{
-		/*
-		if (od == null)
-		{
-			od = new ChannelOutputDestination(channel);
-			for (DataLocation dl: locations) length += 4 + dl.getSize();
-			od.writeInt(length);
-			position = 0;
-		}
-		*/
 		if (!started)
 		{
 			started = true;

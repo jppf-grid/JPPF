@@ -204,9 +204,12 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	public void initSocketClient() throws Exception
 	{
+		socketClient = new SocketChannelClient(host, port, true);
+		/*
 		socketClient = new SocketClient();
 		socketClient.setHost(host);
 		socketClient.setPort(port);
+		*/
 	}
 
 	/**

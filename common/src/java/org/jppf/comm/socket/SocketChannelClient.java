@@ -99,20 +99,14 @@ public class SocketChannelClient implements SocketWrapper
 	/**
 	 * Send an array of bytes over a TCP socket connection.
 	 * @param buf the buffer container for the data to send.
-	 * @throws IOException if the underlying output stream throws an exception.
+	 * @throws Exception if the underlying output stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#sendBytes(org.jppf.utils.JPPFBuffer)
 	 */
-	public void sendBytes(JPPFBuffer buf) throws IOException
+	public void sendBytes(JPPFBuffer buf) throws Exception
 	{
-		ByteBuffer buffer = ByteBuffer.allocate(4);
 		int length = buf.getLength();
-		buffer.putInt(length);
-		buffer.rewind();
-		int count = 0;
-		while (count < 4) count += channel.write(buffer);
-		count = 0;
-		buffer = ByteBuffer.wrap(buf.getBuffer(), 0, length);
-		while (count < length) count += channel.write(buffer);
+		writeInt(length);
+		write(buf.getBuffer(), 0, length);
 	}
 
 	/**
@@ -126,8 +120,11 @@ public class SocketChannelClient implements SocketWrapper
 	public void write(byte[] data, int offset, int len) throws Exception
 	{
 		ByteBuffer buffer = ByteBuffer.wrap(data, offset, len);
+		for (int count=0; count < len;) count += channel.write(buffer);
+		/*
 		int count = 0;
 		while (count < len) count += channel.write(buffer);
+		*/
 	}
 
 	/**
@@ -139,9 +136,11 @@ public class SocketChannelClient implements SocketWrapper
 	public void writeInt(int n) throws Exception
 	{
 		ByteBuffer buffer = ByteBuffer.wrap(SerializationUtils.writeInt(n));
-		byte[] bytes = SerializationUtils.writeInt(n);
+		for (int count=0; count < 4;) count += channel.write(buffer);
+		/*
 		int count = 0;
-		while (count < 4) count += channel.write(buffer);
+		while (count < len) count += channel.write(buffer);
+		*/
 	}
 
 	/**
@@ -194,24 +193,15 @@ public class SocketChannelClient implements SocketWrapper
 	 * This method blocks until an object is received or the specified timeout has expired, whichever happens first.
 	 * @param timeout timeout after which the operation is aborted. A timeout of zero is interpreted as an infinite timeout.
 	 * @return an array of bytes containing the serialized object to receive.
-	 * @throws IOException if the underlying input stream throws an exception.
+	 * @throws Exception if the underlying input stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#receiveBytes(int)
 	 */
-	public JPPFBuffer receiveBytes(int timeout) throws IOException
+	public JPPFBuffer receiveBytes(int timeout) throws Exception
 	{
-		ByteBuffer byteBuffer = ByteBuffer.allocate(4);
-		int count = 0;
-		while (count < 4)
-		{
-			count += channel.read(byteBuffer);
-		}
-		byteBuffer.flip();
-		int length = byteBuffer.getInt();
-		JPPFBuffer buf = new JPPFBuffer(new byte[length], length);
-		byteBuffer = ByteBuffer.wrap(buf.getBuffer());
-		count = 0;
-		while (count < length) count += channel.read(byteBuffer);
-		return buf;
+		int length = readInt();
+		byte[] data = new byte[length];
+		read(data, 0, length);
+		return new JPPFBuffer(data, length);
 	}
 
 	/**
@@ -422,7 +412,7 @@ public class SocketChannelClient implements SocketWrapper
 	/**
 	 * Skip <code>n</code> bytes of data from the sokcet of channel input stream.
 	 * @param n the number of bytes to skip.
-	 * @return the actual number of bytes skipped, or -1 if the end of file is reached..
+	 * @return the actual number of bytes skipped, or -1 if the end of sream is reached.
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.comm.socket.SocketWrapper#skip(int)
 	 */
@@ -430,7 +420,7 @@ public class SocketChannelClient implements SocketWrapper
 	{
 		if (n < 0) throw new IllegalArgumentException("number of bytes to skip must be >= 0");
 		else if (n == 0) return 0;
-		ByteBuffer buf = ByteBuffer.allocate(4);
+		ByteBuffer buf = ByteBuffer.allocateDirect(n);
 		while (buf.hasRemaining()) channel.read(buf);
 		return buf.position();
 	}
@@ -443,8 +433,6 @@ public class SocketChannelClient implements SocketWrapper
 	 */
 	public void write(byte[] data) throws Exception
 	{
-		int count = 0;
-		ByteBuffer buffer = ByteBuffer.wrap(data);
-		while (count < data.length) count += channel.write(buffer);
+		write(data, 0, data.length);
 	}
 }

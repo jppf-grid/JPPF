@@ -104,18 +104,6 @@ public abstract class NioContext<S extends Enum>
 	}
 
 	/**
-	 * Read an integer value from a channel.
-	 * @param channel the channel to read from.
-	 * @return the value read from the channel.
-	 * @throws IOException if an error occurs while reading the data.
-	 * @deprecated this method merely invokes {@link org.jppf.utils.SerializationUtils#readInt(java.nio.channels.ReadableByteChannel) SerializationUtils.readInt(ReadableByteChannel)}.
-	 */
-	public int readInt(ReadableByteChannel channel) throws IOException
-	{
-		return SerializationUtils.readInt(channel);
-	}
-
-	/**
 	 * Write data to a channel.
 	 * @param channel the channel to write the data to.
 	 * @return true if all the data has been written, false otherwise.
@@ -136,18 +124,6 @@ public abstract class NioContext<S extends Enum>
 				message.length + " for " + StringUtils.getRemoteHost((SelectableChannel) channel));
 		}
 		return writeByteCount >= message.length;
-	}
-
-	/**
-	 * Wrtie an integer value to a channel.
-	 * @param channel the channel to write to.
-	 * @param value the value to write.
-	 * @throws IOException if an error occurs while writing the data.
-	 * @deprecated this method merely invokes {@link org.jppf.utils.SerializationUtils#writeInt(java.nio.channels.WritableByteChannel,int) SerializationUtils.writeInt(WritableByteChannel, int)}.
-	 */
-	public void writeInt(WritableByteChannel channel, int value) throws IOException
-	{
-		SerializationUtils.writeInt(channel, value);
 	}
 
 	/**

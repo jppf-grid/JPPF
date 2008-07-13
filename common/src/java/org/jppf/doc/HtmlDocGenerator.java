@@ -249,8 +249,8 @@ public class HtmlDocGenerator
 					String s = pathname.getPath();
 					int idx = s.lastIndexOf(".");
 					if (idx < 0) return false;
-					s = s.substring(idx);
-					return ".html".equalsIgnoreCase(s) || ".htm".equalsIgnoreCase(s) || ".php".equalsIgnoreCase(s);
+					s = s.substring(idx).toLowerCase();
+					return ".html".equals(s) || ".htm".equals(s) || ".php".equals(s);
 				}
 			};
 			HtmlDocGenerator docGen = new HtmlDocGenerator();
