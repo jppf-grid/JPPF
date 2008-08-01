@@ -136,7 +136,7 @@ public class OptionsPageBuilder
 		OptionDescriptor desc = new OptionDescriptorParser().parse(xmlPath);
 		if (desc == null) return null;
 		OptionElement page = build(desc);
-		if (eventEnabled) triggerInitialEvents(page);
+		//if (eventEnabled) triggerInitialEvents(page);
 		return page;
 	}
 
@@ -145,7 +145,7 @@ public class OptionsPageBuilder
 	 * This ensures the consistence of the UI's initial state.
 	 * @param elt the root element of the options on which to trigger the events.
 	 */
-	private void triggerInitialEvents(OptionElement elt)
+	public void triggerInitialEvents(OptionElement elt)
 	{
 		if (elt == null) return;
 		if (elt.getInitializer() != null)

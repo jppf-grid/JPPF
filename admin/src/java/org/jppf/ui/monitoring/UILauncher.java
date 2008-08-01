@@ -22,6 +22,7 @@ import java.security.*;
 import javax.swing.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jvnet.lafwidget.LafWidget;
 import org.jvnet.lafwidget.tabbed.DefaultTabPreviewPainter;
@@ -72,9 +73,11 @@ public class UILauncher
 					}
 				});
 			}
-			if ("url".equalsIgnoreCase(args[1])) OptionsHandler.addPageFromURL(args[0], null);
-			else OptionsHandler.addPageFromXml(args[0]);
+			OptionElement elt = null;
+			if ("url".equalsIgnoreCase(args[1])) elt = OptionsHandler.addPageFromURL(args[0], null);
+			else elt = OptionsHandler.addPageFromXml(args[0]);
 			OptionsHandler.loadPreferences();
+			OptionsHandler.getBuilder().triggerInitialEvents(elt);
 		}
 		catch(Exception e)
 		{

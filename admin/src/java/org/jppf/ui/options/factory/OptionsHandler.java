@@ -19,6 +19,7 @@ package org.jppf.ui.options.factory;
 
 import java.util.*;
 import java.util.prefs.Preferences;
+
 import org.apache.commons.logging.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
@@ -36,7 +37,7 @@ public final class OptionsHandler
 	/**
 	 * The root of the preferences subtree in which the chart configurations are saved.
 	 */
-	private static Preferences PREFERENCES = Preferences.userRoot().node("jppf/AdminTool");
+	private static Preferences PREFERENCES = Preferences.userRoot().node("jppf");
 	/**
 	 * The list of option pages managed by this handler.
 	 */
@@ -137,9 +138,8 @@ public final class OptionsHandler
 		{
 			for (OptionElement elt: pageList)
 			{
-				Preferences prefs = PREFERENCES.node(elt.getName());
-				prefs.clear();
-				savePreferences(elt, prefs);
+				OptionNode node = buildPersistenceGraph(elt);
+				savePreferences(node, PREFERENCES);
 			}
 			PREFERENCES.flush();
 		}
@@ -151,23 +151,22 @@ public final class OptionsHandler
 
 	/**
 	 * Save the value of all persistent options in the preferences store.
-	 * @param elt the root of the options subtree to save.
+	 * @param node the root of the options subtree to save.
 	 * @param prefs the preferences node in which to save the vaues.
 	 */
-	public static void savePreferences(OptionElement elt, Preferences prefs)
+	public static void savePreferences(OptionNode node, Preferences prefs)
 	{
-		if (elt instanceof OptionsPage)
+		if (!node.children.isEmpty())
 		{
-			for (OptionElement child: ((OptionsPage) elt).getChildren())
-				savePreferences(child, prefs);
+			Preferences p = prefs.node(node.elt.getName());
+			for (OptionNode child: node.children) savePreferences(child, p);
 		}
-		else if (elt instanceof Option)
+		else
 		{
-			Option option = (Option) elt;
+			Option option = (Option) node.elt;
 			if (option.isPersistent()) prefs.put(option.getName(), ""+option.getValue());
 		}
 	}
-
 
 	/**
 	 * Load the value of all persistent options in the preferences store.
@@ -176,32 +175,90 @@ public final class OptionsHandler
 	{
 		for (OptionElement elt: pageList)
 		{
-			Preferences prefs = PREFERENCES.node(elt.getName());
-			loadPreferences(elt, prefs);
+			OptionNode node = buildPersistenceGraph(elt);
+			loadPreferences(node, PREFERENCES);
 		}
 	}
 
 	/**
 	 * Save the value of all persistent options in the preferences store.
-	 * @param elt the root of the options subtree to save.
+	 * @param node the root of the options subtree to save.
 	 * @param prefs the preferences node in which to save the vaues.
 	 */
-	public static void loadPreferences(OptionElement elt, Preferences prefs)
+	public static void loadPreferences(OptionNode node, Preferences prefs)
 	{
+		if (!node.children.isEmpty())
+		{
+			Preferences p = prefs.node(node.elt.getName());
+			for (OptionNode child: node.children) loadPreferences(child, p);
+		}
+		else
+		{
+			AbstractOption option = (AbstractOption) node.elt;
+			Object def = option.getValue();
+			String val = prefs.get(option.getName(), def == null ? null : def.toString());
+			option.setValue(val);
+		}
+	}
+
+	/**
+	 * Get the page builder used to instantiate pages from XML descriptors.
+	 * @return an <code>OptionsPageBuilder</code> instance.
+	 */
+	public static OptionsPageBuilder getBuilder()
+	{
+		return builder;
+	}
+
+	/**
+	 * Build a graph of the persistent elements.
+	 * @param elt the root of the current subgraph.
+	 * @return an <code>OptionNode</code> instance.
+	 */
+	private static OptionNode buildPersistenceGraph(OptionElement elt)
+	{
+		OptionNode node = null;
 		if (elt instanceof OptionsPage)
 		{
-			for (OptionElement child: ((OptionsPage) elt).getChildren())
-				loadPreferences(child, prefs);
+			OptionsPage page = (OptionsPage) elt;
+			for (OptionElement child: page.getChildren())
+			{
+				OptionNode childNode = buildPersistenceGraph(child);
+				if (childNode != null)
+				{
+					if (node == null) node = new OptionNode(elt);
+					node.children.add(childNode);
+				}
+			}
 		}
 		else if (elt instanceof AbstractOption)
 		{
-			AbstractOption option = (AbstractOption) elt;
-			if (option.isPersistent())
-			{
-				Object def = option.getValue();
-				String val = prefs.get(option.getName(), def == null ? null : def.toString());
-				option.setValue(val);
-			}
+			if (((AbstractOption) elt).isPersistent()) node = new OptionNode(elt);
+		}
+		return node;
+	}
+
+	/**
+	 * A graph of the persistent options. 
+	 */
+	private static class OptionNode
+	{
+		/**
+		 * The correponding option element.
+		 */
+		public OptionElement elt = null;
+		/**
+		 * The children of the corresponding option element.
+		 */
+		public List<OptionNode> children = new ArrayList<OptionNode>();
+
+		/**
+		 * Initilaize this node.
+		 * @param elt the correponding option element.
+		 */
+		public OptionNode(OptionElement elt)
+		{
+			this.elt = elt;
 		}
 	}
 }

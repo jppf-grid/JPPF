@@ -1,5 +1,5 @@
 var builder = null;
-var page = OptionsHandler.getPage("ChartsPage");
+var page = option.findFirstWithName("/ChartsPage");
 if (page != null)
 {
 	builder = page.findFirstWithName("/ChartsBuilder").getUIComponent();
@@ -177,7 +177,7 @@ function doTabNew()
 {
 	root.setEventsEnabled(false);
 	var BASE_NAME = "org/jppf/ui/options/xml/ChartsConfigPage";
-	var s = JOptionPane.showInputDialog(option.getUIComponent(), StringUtils.getLocalized(BASE_NAME, "new.tab.name"), 
+	var s = JOptionPane.showInputDialog(option.getUIComponent(), StringUtils.getLocalized(BASE_NAME, "new.tab.name"),
 		StringUtils.getLocalized(BASE_NAME, "new.tab.title"), JOptionPane.PLAIN_MESSAGE, null, null, null);
 	if ((s != null) && !"".equals(s.trim()))
 	{

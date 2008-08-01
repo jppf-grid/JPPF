@@ -23,7 +23,6 @@ import javax.swing.ListSelectionModel;
 
 import org.jppf.ui.monitoring.node.NodeDataPanel;
 import org.jppf.ui.options.*;
-import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.options.xml.OptionDescriptor.ItemDescriptor;
 
 /**
@@ -377,7 +376,7 @@ public class OptionElementFactory
 		if ("url".equalsIgnoreCase(desc.getProperty("source")))
 			elt = builder.buildPageFromURL(desc.getProperty("location"), builder.getBaseName());
 		else elt = builder.buildPage(desc.getProperty("location"), null);
-		OptionsHandler.addPage(elt);
+		//OptionsHandler.addPage(elt);
 		return elt;
 	}
 

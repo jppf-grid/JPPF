@@ -33,7 +33,7 @@
 			{
 				windowClosing: function(event)
 				{
-					var builder = OptionsHandler.getPage("ChartsPage").findFirstWithName("/ChartsBuilder").getUIComponent();
+					var builder = OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("/ChartsBuilder").getUIComponent();
 					builder.getStorage().saveAll();
 					OptionsHandler.savePreferences();
 					System.exit(0);
@@ -42,9 +42,6 @@
 			frame.addWindowListener(new WindowAdapter(wa));
 			var statsHandler = StatsHandler.getInstance();
 			comp.setSelectedIndex(0);
-			var ccPage = OptionsHandler.getPage("ChartsConfiguration");
-			ccPage.getInitializer().valueChanged(new ValueChangeEvent(ccPage));
-			OptionsHandler.loadPreferences();
 			frame.getContentPane().add(option.getUIComponent());
 			frame.setSize(600, 730);
 			frame.setVisible(true);
