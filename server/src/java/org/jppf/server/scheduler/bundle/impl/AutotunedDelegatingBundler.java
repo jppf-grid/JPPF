@@ -16,25 +16,26 @@
  * limitations under the License.
  */
 
-package org.jppf.server.scheduler.bundle.proportional;
+package org.jppf.server.scheduler.bundle.impl;
 
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
 import org.jppf.server.JPPFStatsUpdater;
 import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.autotuned.AnnealingTuneProfile;
 
 /**
  * Instances of this bundler delegate their operations to a singleton instance of a
- * {@link org.jppf.server.scheduler.bundle.proportional.ProportionalBundler ProportionalBundler}.
+ * {@link org.jppf.server.scheduler.bundle.autotuned.AbstractAutoTunedBundler AutoTunedBundler}.
  * @author Laurent Cohen
  */
-public class DelegatingBundler extends AbstractBundler
+public class AutotunedDelegatingBundler extends AbstractBundler
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(DelegatingBundler.class);
+	private static Log log = LogFactory.getLog(AutotunedDelegatingBundler.class);
 	/**
 	 * Determines whether debugging level is set for logging.
 	 */
@@ -42,7 +43,7 @@ public class DelegatingBundler extends AbstractBundler
 	/**
 	 * The global bundler to which bundle size calculations are delegated. 
 	 */
-	private static ProportionalBundler simpleBundler = null;
+	private static AutoTunedBundler simpleBundler = null;
 	/**
 	 * Used to synchronize multiple threads when creating the simple bundler.
 	 */
@@ -50,7 +51,7 @@ public class DelegatingBundler extends AbstractBundler
 	/**
 	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
 	 */
-	protected AutoTuneProfile profile;
+	protected AnnealingTuneProfile profile;
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
@@ -58,12 +59,15 @@ public class DelegatingBundler extends AbstractBundler
 	 * @param override true if the settings were overriden by the node, false otherwise.
 	 * grouped as a performance analysis profile.
 	 */
-	public DelegatingBundler(AutoTuneProfile profile, boolean override)
+	public AutotunedDelegatingBundler(AnnealingTuneProfile profile, boolean override)
 	{
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		this.override = override;
 		int bundleSize = JPPFStatsUpdater.getStaticBundleSize();
-		if (bundleSize < 1) bundleSize = 1;
+		if (bundleSize < 1)
+		{
+			bundleSize = 1;
+		}
 		log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize);
 		this.profile = profile;
 		lock.lock();
@@ -71,7 +75,7 @@ public class DelegatingBundler extends AbstractBundler
 		{
 			if (simpleBundler == null)
 			{
-				simpleBundler = new ProportionalBundler((ProportionalTuneProfile) profile, override);
+				simpleBundler = new AutoTunedBundler(profile, override);
 			}
 		}
 		finally
@@ -87,7 +91,7 @@ public class DelegatingBundler extends AbstractBundler
 	 */
 	public Bundler copy()
 	{
-		return new DelegatingBundler((ProportionalTuneProfile) profile, override);
+		return new AutotunedDelegatingBundler(profile, override);
 	}
 
 	/**
@@ -97,7 +101,7 @@ public class DelegatingBundler extends AbstractBundler
 	 */
 	public int getBundleSize()
 	{
-		return simpleBundler.getBundleSize(this);
+		return simpleBundler.getBundleSize();
 	}
 
 	/**
@@ -108,15 +112,21 @@ public class DelegatingBundler extends AbstractBundler
 	 */
 	public void feedback(int bundleSize, double totalTime)
 	{
-		simpleBundler.feedback(this, new BundlePerformanceSample(totalTime, bundleSize));
+		simpleBundler.feedback(bundleSize, totalTime);
 	}
 
 	/**
-	 * Release the resources used by this bundler.
-	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#dispose()
+	 * Get the max bundle size that can be used for this bundler.
+	 * @return the bundle size as an int.
+	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
-	public void dispose()
+	protected int maxSize()
 	{
-		simpleBundler.removeBundler(this);
+		int max = 0;
+		synchronized(simpleBundler)
+		{
+			max = simpleBundler.maxSize();
+		}
+		return max;
 	}
 }

@@ -31,7 +31,7 @@ import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.peer.JPPFPeerInitializer;
 import org.jppf.server.queue.*;
-import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.impl.*;
 import org.jppf.utils.*;
 
 /**

@@ -30,7 +30,8 @@ import org.jppf.management.*;
 import org.jppf.security.*;
 import org.jppf.server.*;
 import org.jppf.server.protocol.BundleParameter;
-import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.impl.*;
 import org.jppf.utils.*;
 
 /**

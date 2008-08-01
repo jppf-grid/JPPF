@@ -27,9 +27,10 @@ import java.nio.channels.*;
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
 import org.jppf.management.*;
-import org.jppf.server.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.server.scheduler.bundle.BundlerFactory;
+import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.impl.*;
 import org.jppf.utils.JPPFConfiguration;
 
 /**
@@ -77,8 +78,9 @@ public class WaitInitialBundleState extends NodeServerState
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			context.setUuid(bundle.getBundleUuid());
 			boolean override = bundle.getParameter(BUNDLE_TUNING_TYPE_PARAM) != null;
-			if (override) context.setBundler(BundlerFactory.createBundler(bundle.getParametersMap(), true));
-			else context.setBundler(server.getBundler().copy());
+			Bundler bundler = override ? BundlerFactory.createBundler(bundle.getParametersMap(), true) : server.getBundler().copy();
+			bundler.setup();
+			context.setBundler(bundler);
 			Boolean isPeer = (Boolean) bundle.getParameter(IS_PEER);
 			if (((isPeer == null) || !isPeer) && JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
 			{

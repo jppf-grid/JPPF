@@ -11,9 +11,9 @@
 	<classpathentry kind="lib" path="shared/lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jaligner.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-admin.jar" sourcepath="/admin/src/java"/>
-	<classpathentry kind="lib" path="shared/lib/jppf-client.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-client.jar" sourcepath="/client/src/java"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-common-node.jar"/>
-	<classpathentry kind="lib" path="shared/lib/jppf-common.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-common.jar" sourcepath="/common/src/java"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-server.jar" sourcepath="/server/src/java"/>
 	<classpathentry kind="lib" path="shared/lib/log4j-1.2.9.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>

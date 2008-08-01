@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.scheduler.bundle;
+package org.jppf.server.scheduler.bundle.impl;
 
 import static org.jppf.server.protocol.BundleParameter.*;
 
@@ -23,7 +23,10 @@ import java.util.Map;
 
 import org.jppf.server.*;
 import org.jppf.server.protocol.BundleParameter;
+import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.autotuned.*;
 import org.jppf.server.scheduler.bundle.proportional.*;
+import org.jppf.server.scheduler.bundle.rl.*;
 import org.jppf.utils.*;
 
 /**
@@ -46,6 +49,10 @@ public final class BundlerFactory
 	 * Value for the autotuned tuning algorithm.
 	 */
 	private static final String AUTOTUNED_ALGORITHM = "autotuned";
+	/**
+	 * Value for the reinforcement learning-based algorithm.
+	 */
+	private static final String RL_ALGORITHM = "rl";
 
 	/**
 	 * Instantiate a bundler, based on theJPPF driver configuration properties.
@@ -60,7 +67,9 @@ public final class BundlerFactory
 		{
 			String profile = props.getProperty("task.bundle.autotuned.strategy");
 			if (PROPORTIONAL_ALGORITHM.equalsIgnoreCase(algorithm))
-				return new DelegatingBundler(new ProportionalTuneProfile(profile), false);
+				return new ProportionalBundler(new ProportionalTuneProfile(profile), false);
+			else if (RL_ALGORITHM.equalsIgnoreCase(algorithm))
+				return new RLBundler(new RLProfile(profile), false);
 			return createBundler(new AnnealingTuneProfile(profile), false, algorithm);
 		} 
 		return new FixedSizedBundler();
@@ -98,7 +107,7 @@ public final class BundlerFactory
 	public static Bundler createBundler(AutoTuneProfile profile, boolean override, String algorithm)
 	{
 		if (PROPORTIONAL_ALGORITHM.equalsIgnoreCase(algorithm))
-			return new DelegatingBundler((ProportionalTuneProfile) profile, override);
+			return new ProportionalBundler((ProportionalTuneProfile) profile, override);
 		return new AutoTunedBundler((AnnealingTuneProfile) profile, override);
 		//return new AutotunedDelegatingBundler(profile, override);
 	}
@@ -130,8 +139,8 @@ public final class BundlerFactory
 				if (n == null) n = ProportionalTuneProfile.getDefaultProfile().getPerformanceCacheSize();
 				prof.setPerformanceCacheSize(n.intValue());
 				n = (Number) map.get(PROPORTIONALITY_FACTOR);
-				if (n == null) n = ProportionalTuneProfile.getDefaultProfile().getPropertionalityFactor();
-				prof.setPropertionalityFactor(n.intValue());
+				if (n == null) n = ProportionalTuneProfile.getDefaultProfile().getProportionalityFactor();
+				prof.setProportionalityFactor(n.intValue());
 				profile = prof;
 			}
 			else

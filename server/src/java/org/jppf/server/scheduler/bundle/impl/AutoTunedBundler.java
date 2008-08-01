@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.scheduler.bundle;
-
-import java.util.*;
+package org.jppf.server.scheduler.bundle.impl;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.*;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.autotuned.*;
 
 /**
  * This class implements a self tuned bundle size algorithm. It starts using the
@@ -33,7 +33,7 @@ import org.jppf.server.*;
  * @author Domingos Creado
  * 
  */
-public class AutoTunedBundler extends AbstractBundler
+public class AutoTunedBundler extends AbstractAutoTunedBundler
 {
 	/**
 	 * Logger for this class.
@@ -43,23 +43,6 @@ public class AutoTunedBundler extends AbstractBundler
 	 * Determines whether debugging level is set for logging.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The currrent bundle size.
-	 */
-	protected int currentSize;
-	/**
-	 * Used to compute a pseudo-random increment to the bundle size, as part of a Monte Carlo random walk
-	 * towards a good solution.
-	 */
-	protected Random rnd = new Random(System.currentTimeMillis());
-	/**
-	 * A map of performance samples, aorted by increasing bundle size.
-	 */
-	protected Map<Integer, BundlePerformanceSample> samplesMap = new HashMap<Integer, BundlePerformanceSample>();
-	/**
-	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
-	 */
-	protected AnnealingTuneProfile profile;
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
@@ -79,15 +62,7 @@ public class AutoTunedBundler extends AbstractBundler
 	 */
 	public AutoTunedBundler(AnnealingTuneProfile profile, boolean override)
 	{
-		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
-		this.override = override;
-		currentSize = JPPFStatsUpdater.getStaticBundleSize();
-		if (currentSize < 1)
-		{
-			currentSize = 1;
-		}
-		log.info("Bundler#" + bundlerNumber + ": The initial size is " + currentSize);
-		this.profile = profile;
+		super(profile, override);
 	}
 
 	/**
@@ -157,7 +132,7 @@ public class AutoTunedBundler extends AbstractBundler
 		synchronized (samplesMap)
 		{
 			int bestSize = searchBestSize();
-			int max = JPPFDriver.getQueue().getMaxBundleSize()/2;
+			int max = maxSize();
 			if ((max > 0) && (bestSize > max)) bestSize = max;
 			int counter = 0;
 			while (counter < profile.getMaxGuessToStable())
@@ -226,5 +201,15 @@ public class AutoTunedBundler extends AbstractBundler
 	{
 		AutoTunedBundler b = new AutoTunedBundler((AnnealingTuneProfile) profile.copy());
 		return b;
+	}
+
+	/**
+	 * Get the max bundle size that can be used for this bundler.
+	 * @return the bundle size as an int.
+	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
+	 */
+	protected int maxSize()
+	{
+		return JPPFDriver.getQueue().getMaxBundleSize()/2;
 	}
 }
