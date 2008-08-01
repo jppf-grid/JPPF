@@ -18,12 +18,9 @@
 package org.jppf.client;
 
 import java.io.NotSerializableException;
-import java.util.List;
 
 import org.apache.commons.logging.*;
-import org.jppf.client.event.TaskResultEvent;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.Pair;
 
 /**
  * This class encapsulates a pool of threads that submit the tasks to a driver
@@ -74,10 +71,11 @@ public class AsynchronousResultProcessor implements Runnable
 			for (JPPFTask task : execution.tasks) task.setPosition(count++);
 			count = 0;
 			boolean completed = false;
-			while (!completed)
+			//while (!completed)
 			{
 				try
 				{
+					/*
 					connection.sendTasks(execution.tasks, execution.dataProvider, execution.policy);
 					while (count < execution.tasks.size())
 					{
@@ -89,6 +87,8 @@ public class AsynchronousResultProcessor implements Runnable
 						}
 					}
 					completed = true;
+					*/
+					JPPFClient.getLoadBalancer().execute(execution, connection);
 				}
 				catch(NotSerializableException e)
 				{

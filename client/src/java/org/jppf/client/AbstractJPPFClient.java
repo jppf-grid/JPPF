@@ -131,6 +131,18 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public JPPFClientConnection getClientConnection()
 	{
+		return getClientConnection(false);
+	}
+
+	/**
+	 * Get an available connection with the highest possible priority.
+	 * @param oneAttempt determines whether this method should wait until a connection
+	 * becomes available (ACTIVE status) or fail immeditately if no available connection is found.<br>
+	 * This enables the excution to be performed locally if the client is not connected to a server.
+	 * @return a <code>JPPFClientConnection</code> with the highest possible priority.
+	 */
+	public JPPFClientConnection getClientConnection(boolean oneAttempt)
+	{
 		JPPFClientConnection client = null;
 		synchronized(pools)
 		{
@@ -166,8 +178,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 				for (Integer n: toRemove) pools.remove(n);
 				if (pools.isEmpty())
 				{
-					throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
+					//throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
+					log.warn("No more driver connection available for this client");
 				}
+				if (oneAttempt) break;
 			}
 		}
 		if (debugEnabled) log.debug("found client connection \"" + client + "\"");
@@ -210,7 +224,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		{
 			try
 			{
-				getClientConnection().submit(taskList, dataProvider, collector, policy);
+				JPPFClientConnection c = getClientConnection();
+				c.submit(taskList, dataProvider, collector, policy);
 				result = collector.waitForResults();
 			}
 			catch(Exception e)

@@ -17,12 +17,17 @@
  */
 package org.jppf.client;
 
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.JPPFException;
+import org.jppf.client.event.TaskResultListener;
+import org.jppf.client.loadbalancer.LoadBalancer;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFStats;
-import org.jppf.server.protocol.BundleParameter;
+import org.jppf.server.protocol.*;
+import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 
 /**
@@ -47,6 +52,22 @@ public class JPPFClient extends AbstractJPPFClient
 	 * The pool of threads used for submitting execution requests.
 	 */
 	private ExecutorService executor = null;
+	/**
+	 * The load balancer for local versus remote execution.
+	 */
+	private static LoadBalancer loadBalancer = new LoadBalancer();
+	/**
+	 * The JPPF configuration properties.
+	 */
+	private static TypedProperties config = JPPFConfiguration.getProperties();
+	/**
+	 * Determines whether local execution is enabled.
+	 */
+	public static final boolean LOCAL_EXEC_ENABLED = config.getBoolean("jppf.local.execution.enabled", true);
+	/**
+	 * Determines whether remote execution is enabled.
+	 */
+	public static final boolean REMOTE_EXEC_ENABLED = config.getBoolean("jppf.remote.execution.enabled", true);
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -73,17 +94,17 @@ public class JPPFClient extends AbstractJPPFClient
 	 */
 	public void initPools()
 	{
-		//System.out.println("in initPool()");
 		try
 		{
-			TypedProperties props = JPPFConfiguration.getProperties();
-			String driverNames = props.getString("jppf.drivers");
-			if (debugEnabled) log.debug("list of drivers: "+driverNames);
+			if (!REMOTE_EXEC_ENABLED) return;
+			String driverNames = config.getString("jppf.drivers");
+			if (debugEnabled) log.debug("list of drivers: " + driverNames);
 			String[] names = null;
 			// if config file is still used as with single client version
 			if ((driverNames == null) || "".equals(driverNames.trim()))
 			{
-				names = new String[] { "" };
+				//names = new String[] { "" };
+				return;
 			}
 			else
 			{
@@ -92,7 +113,7 @@ public class JPPFClient extends AbstractJPPFClient
 			for (String s: names)
 			{
 				String name = "".equals(s) ? "default" : s;
-				JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, name, props);
+				JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, name, config);
 				int priority = c.getPriority();
 				c.addClientConnectionStatusListener(this);
 				ClientPool pool = pools.get(priority);
@@ -126,14 +147,65 @@ public class JPPFClient extends AbstractJPPFClient
 	}
 
 	/**
+	 * Submit the request to the server.
+	 * @param taskList the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
+	 * @return the list of executed tasks with their results.
+	 * @throws Exception if an error occurs while sending the request.
+	 * @see org.jppf.client.AbstractJPPFClient#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.node.policy.ExecutionPolicy)
+	 */
+	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy) throws Exception
+	{
+		if (!pools.isEmpty() || LOCAL_EXEC_ENABLED)
+		{
+			if (LOCAL_EXEC_ENABLED)
+			{
+				JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getClientConnection(true);
+				JPPFResultCollector collector = new JPPFResultCollector(taskList.size());
+				ClientExecution exec = new ClientExecution(taskList, dataProvider, true, collector, policy);
+				JPPFClient.getLoadBalancer().execute(exec, c);
+				return collector.waitForResults();
+			}
+			return super.submit(taskList, dataProvider, policy);
+		}
+		throw new JPPFException("Cannot execute: no driver connection available and local execution is disabled");
+	}
+
+	/**
+	 * Submit a non-blocking request to the server.
+	 * @param taskList the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param listener listener to notify whenever a set of results have been received.
+	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
+	 * @throws Exception if an error occurs while sending the request.
+	 * @see org.jppf.client.AbstractJPPFClient#submitNonBlocking(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener, org.jppf.node.policy.ExecutionPolicy)
+	 */
+	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
+		throws Exception
+	{
+		if (!pools.isEmpty() || LOCAL_EXEC_ENABLED)
+		{
+			if (LOCAL_EXEC_ENABLED)
+			{
+				JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getClientConnection(true);
+				ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener, policy);
+				JPPFClient.getLoadBalancer().execute(exec, c);
+			}
+			else super.submitNonBlocking(taskList, dataProvider, listener, policy);
+		}
+		else throw new JPPFException("Cannot execute: no driver connection available and local execution is disabled");
+	}
+
+	/**
 	 * Send a request to get the statistics collected by the JPPF server.
 	 * @return a <code>JPPFStats</code> instance.
 	 * @throws Exception if an error occurred while trying to get the server statistics.
 	 */
 	public JPPFStats requestStatistics() throws Exception
 	{
-		JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) getClientConnection(); 
-		return conn.requestStatistics();
+		JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) getClientConnection();
+		return (conn == null) ? null : conn.requestStatistics();
 	}
 
 	/**
@@ -188,5 +260,14 @@ public class JPPFClient extends AbstractJPPFClient
 			if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
 			c.init();
 		}
+	}
+
+	/**
+	 * Get the load balancer for local versus remote execution.
+	 * @return a <code>LoadBalancer</code> instance.
+	 */
+	public static LoadBalancer getLoadBalancer()
+	{
+		return loadBalancer;
 	}
 }
