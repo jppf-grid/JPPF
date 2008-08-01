@@ -18,9 +18,9 @@
 package sample.matrix;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.JPPFException;
 import org.jppf.client.JPPFClient;
 import org.jppf.node.policy.*;
 import org.jppf.server.JPPFStats;
@@ -76,9 +76,9 @@ public class MatrixRunner
 	 * @param size the size of the matrices.
 	 * @param iterations the number of times the multiplication will be performed.
 	 * @param nbRows number of rows of matrix a per task.
-	 * @throws JPPFException if an error is raised during the execution.
+	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static void perform(int size, int iterations, int nbRows) throws JPPFException
+	private static void perform(int size, int iterations, int nbRows) throws Exception
 	{
 		try
 		{
@@ -98,13 +98,15 @@ public class MatrixRunner
 				output("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
 			}
 			output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations));
-			JPPFStats stats = jppfClient.requestStatistics();
 			if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled"))
+			{
+				JPPFStats stats = jppfClient.requestStatistics();
 				output("End statistics :\n"+stats.toString());
+			}
 		}
 		catch(Exception e)
 		{
-			throw new JPPFException(e.getMessage(), e);
+			throw e;
 		}
 	}
 
@@ -148,6 +150,7 @@ public class MatrixRunner
 		}
 		// submit the tasks for execution
 		List<JPPFTask> results = jppfClient.submit(tasks, dataProvider, policy);
+		//List<JPPFTask> results = performLocalExecution(tasks, dataProvider);
 		// initialize the resulting matrix
 		Matrix c = new Matrix(size);
 		// Get the matrix values from the tasks results
@@ -164,6 +167,38 @@ public class MatrixRunner
 			rowIdx += rows.length;
 		}
 		return System.currentTimeMillis() - start;
+	}
+
+	/**
+	 * The Thread Pool that really processes the tasks.
+	 */
+	private static ExecutorService threadPool = null;
+	
+	/**
+	 * Execute the tasks using a local thread pool.
+	 * @param tasks the tasks to execute.
+	 * @param dataProvider data shared by the tasks.
+	 * @return the execution result.
+	 * @throws Exception if an error is raised during the execution.
+	 */
+	private static List<JPPFTask> performLocalExecution(List<JPPFTask> tasks, DataProvider dataProvider) throws Exception
+	{
+		if (threadPool == null)
+		{
+			int poolSize = 4;
+			LinkedBlockingQueue queue = new LinkedBlockingQueue();
+			threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("client processing thread"));
+		}
+
+		List<Future<?>> futureList = new ArrayList<Future<?>>();
+		for (JPPFTask task: tasks)
+		{
+			if (dataProvider != null) task.setDataProvider(dataProvider);
+			futureList.add(threadPool.submit(task));
+		}
+		for (Future<?> f: futureList) f.get();
+
+		return tasks;
 	}
 
 	/**

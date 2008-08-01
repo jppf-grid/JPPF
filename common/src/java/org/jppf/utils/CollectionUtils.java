@@ -143,4 +143,20 @@ public final class CollectionUtils
 		sb.append(", total elements = ").append(sizeOfListMap(map));
 		return sb.toString();
 	}
+
+	/**
+	 * Generate a list that contains the specified number of elements of the specified list,
+	 * starting at the specified position in the specified list.
+	 * @param <T> the type of the elements in the list.
+	 * @param source the list from which to get the elements.
+	 * @param start the start position in the source list. 
+	 * @param size the number of elements to get from the source list.
+	 * @return the resulting list.
+	 */
+	public static <T> List<T> getAllElements(List<T> source, int start, int size)
+	{
+		List<T> result = new ArrayList<T>();
+		for (int i=0; i<size; i++) result.add(source.get(i+start));
+		return result;
+	}
 }

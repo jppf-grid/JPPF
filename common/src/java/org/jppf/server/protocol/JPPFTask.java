@@ -142,7 +142,7 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 * Returns the position of this task at the submission.
 	 * @return Returns the position of this task at the submission.
 	 */
-	public int getPosition() {
+	public final int getPosition() {
 		return position;
 	}
 
@@ -150,7 +150,7 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 * Sets the position of this task into the submission.
 	 * @param position The position of this task into the submission.
 	 */
-	public void setPosition(int position) {
+	public final void setPosition(int position) {
 		this.position = position;
 	}
 

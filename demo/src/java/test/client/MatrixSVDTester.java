@@ -19,14 +19,15 @@
 package test.client;
 
 //MatrixSVDTester.java:
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Date;
-import Jama.*;
+import java.io.*;
+import java.lang.reflect.Method;
+import java.util.*;
 
-import org.jppf.client.JPPFClient; // for JPPFClient interface
-import org.jppf.server.protocol.JPPFTask; //for JPPFTask interface
-import org.jppf.client.event.*; //for TaskResultListener interface, and TaskResultEvent
+import org.jppf.client.JPPFClient;
+import org.jppf.client.event.*;
+import org.jppf.server.protocol.JPPFTask;
+
+import Jama.*;
 
 /*  This example does singular value decomposition of N random MxM matrices in parallel, on pelican.
  *    The code that submits the tasks to pelican does not block.
@@ -35,8 +36,14 @@ import org.jppf.client.event.*; //for TaskResultListener interface, and TaskResu
 public class MatrixSVDTester {
 
   // parameters of experiment.
-  final static private int N = 50;
-  final static private int M = 300;
+  static private int N = 50;
+  static private int M = 300;
+  final static private int[] N_VALUES = { 5, 20, 35 };
+  final static private int[] M_VALUES = { 100, 300, 500 };
+  
+  // initialise a connection to pelican.
+  static JPPFClient client = null;
+  private static PrintWriter log = null;
 
   // subclass for specifying SVD tasks:
   private static class MatrixSVD extends JPPFTask
@@ -57,9 +64,9 @@ public class MatrixSVDTester {
     }
     public void run()
     {
-    	System.out.println("starting SVD");
+    	//System.out.println("starting SVD");
       setResult(M.svd());
-    	System.out.println("SVD end");
+    	//System.out.println("SVD end");
     }
   }
 
@@ -73,9 +80,9 @@ public class MatrixSVDTester {
     private Date start_time;
 
     // list of results returned from the server
-    private JPPFTask []results;
+    private JPPFTask[] results;
 
-    public JPPFTask []getResults()
+    public JPPFTask[] getResults()
     {
       return results;
     }
@@ -114,10 +121,10 @@ public class MatrixSVDTester {
     }
   }
 
-
   // these will be the results of applying SVD to the above N matrices
   private static SingularValueDecomposition[] SVDsCluster;
   private static SingularValueDecomposition[] SVDsLocal;
+  private static Matrix[] matrices = null;
 
   // compare two arrays of doubles
   private static boolean compareDoubleArrays(double[] A, double []B, double precision)
@@ -137,41 +144,83 @@ public class MatrixSVDTester {
     return result;
   }
 
-  public static void main(String []args)
+  public static void main(String[] args)
   {
-
-    Date start_time;
-
-    // allocate space for the matrices:
-    Matrix[] matrices = new Matrix[N];
-
-    // create N MxM matrices with random enteries.
-    for(int i=0;i<N;i++)
+  	try
+  	{
+			client = new JPPFClient();
+    	log = new PrintWriter(new BufferedWriter(new FileWriter("performance.csv")));
+    	//perform("Sequential");
+    	perform("Parallel");
+  	}
+  	catch(Exception e)
+  	{
+  		e.printStackTrace();
+  	}
+    finally
     {
-      matrices[i] = Matrix.random(M,M);
+    	if (client != null) client.close();
+    	if (log != null) log.close();
     }
+  }
 
+  public static void perform(String name) throws Exception
+  {
+  	Method method = MatrixSVDTester.class.getMethod("perform" + name, (Class[]) null);
+  	log.println(name + " test");
+  	for (int i=0; i<N_VALUES.length; i++)
+  	{
+  		N = N_VALUES[i];
+    	log.println("N = " + N);
+    	log.flush();
+	  	for (int j=0; j<M_VALUES.length; j++)
+	  	{
+	  		M = M_VALUES[j];
+	      matrices = new Matrix[N];
+	      for(int k=0; k<N; k++) matrices[k] = Matrix.random(M,M);
+	      method.invoke(null, (Object[]) null);
+    	}
+  	}
+  }
+
+  public static void performSequential()
+  {
+    long start_time;
+    long elapsed;
     try
     {
       // solve the matrices on the laptop:
-
       SVDsLocal = new SingularValueDecomposition[N];
 
-      start_time = new Date();
+      start_time = System.currentTimeMillis();
       System.out.println("Performing SVD of "+N+" "+M+"x"+M+" matrices on the laptop ... ");
-      for(int i=0;i<N;i++)
+      for(int i=0; i<N; i++)
       {
         System.out.print("Solving matrix "+i+" ... ");
         System.out.flush();
         SVDsLocal[i] = matrices[i].svd();
-        System.out.println("DONE! (took "+(((new Date()).getTime() - start_time.getTime())/1000.0)+" seconds)");
+        System.out.println("DONE! (took "+((System.currentTimeMillis() - start_time)/1000.0)+" seconds)");
       }
-      System.out.println("DONE! (total time was "+(((new Date()).getTime() - start_time.getTime())/1000.0)+" seconds)");
+      elapsed = System.currentTimeMillis() - start_time;
+      System.out.println("DONE! (total time was " + (elapsed/1000.0) + " seconds)");
+    	log.println("" + N + ", " + elapsed);
+    	log.flush();
 
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+  public static void performParallel()
+  {
+    long start_time;
+    long elapsed;
+
+    try
+    {
       // solve the matrices on pelican:
-
-      // initialise a connection to pelican.
-      JPPFClient client = new JPPFClient();
 
       // objects added to this list will be executed in parallel on pelican.  (the object must extend JPPFTask)
       List<JPPFTask> SVDTasks = new ArrayList<JPPFTask>();
@@ -182,43 +231,41 @@ public class MatrixSVDTester {
       System.out.flush();
 
       // add the N SVD tasks as new tasks to the list of things to be executed in parallel on pelican.
-      for(int i=0;i<N;i++)
-      {
-        SVDTasks.add(new MatrixSVD(matrices[i]));
-      }
+      for(int i=0;i<N;i++) SVDTasks.add(new MatrixSVD(matrices[i]));
       // this object will collect the results, and unblock the main thread.
       TaskResultListener listener = new BlockingListener(N);
 
-      start_time = new Date();
+      start_time = System.currentTimeMillis();
 
-      /*
       // this method submits the tasks to pelican without blocking.
       client.submitNonBlocking(
         SVDTasks, //list of tasks.
         null, //data shared by the tasks.
         listener //this will let us check on the status of the tasks.
-        );
-  
+      );
       // this will block until all the tasks are completed.
       synchronized(listener)
       {
         listener.wait();
       }
-
       // cast the results to SingularValueDecomposition class
-      JPPFTask []ClusterResults = ((BlockingListener)listener).getResults();
-      */
+      JPPFTask[] ClusterResults = ((BlockingListener)listener).getResults();
+
+      /*
       JPPFTask[] ClusterResults = client.submit(SVDTasks, null).toArray(new JPPFTask[0]);
+      */
       SVDsCluster = new SingularValueDecomposition[N];
       for(int i=0;i<N;i++)
       {
         SVDsCluster[i] = (SingularValueDecomposition)ClusterResults[i].getResult();
       }
+      elapsed = System.currentTimeMillis() - start_time;
+      System.out.println("DONE! (total time was " + (elapsed/1000.0) + " seconds)");
+    	log.println("" + N + ", " + elapsed);
+    	log.flush();
 
-      System.out.println("DONE! (total time was "+(((new Date()).getTime() - start_time.getTime())/1000.0)+" seconds)");
-
-      client.close();
-      System.out.print("Comparing results ... ");
+      /*
+    	System.out.print("Comparing results ... ");
       System.out.flush();
       boolean same=true;
       for(int i=0;i<SVDTasks.size()&&same;i++)
@@ -239,6 +286,7 @@ public class MatrixSVDTester {
       {
         System.out.println("RESULTS WERE _NOT_ THE SAME!");
       }
+      */
     }
     catch (Exception e)
     {

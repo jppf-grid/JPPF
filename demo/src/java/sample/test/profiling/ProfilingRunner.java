@@ -21,7 +21,6 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.client.JPPFClient;
-import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 
@@ -39,6 +38,10 @@ public class ProfilingRunner
 	 * JPPF client used to submit execution requests.
 	 */
 	private static JPPFClient jppfClient = null;
+	/**
+	 * Size of the data in each task, in KB.
+	 */
+	private static int dataSize = JPPFConfiguration.getProperties().getInt("profiling.data.size");
 
 	/**
 	 * Entry point for this class, submits the tasks with a set duration to the server.
@@ -78,14 +81,16 @@ public class ProfilingRunner
 		{
 			long start = System.currentTimeMillis();
 			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			for (int i=0; i<nbTask; i++) tasks.add(new EmptyTask());
+			for (int i=0; i<nbTask; i++) tasks.add(new EmptyTask(dataSize));
 			// submit the tasks for execution
 			List<JPPFTask> results = jppfClient.submit(tasks, null);
 			long elapsed = System.currentTimeMillis() - start;
 			System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
 		}
+		/*
 		JPPFStats stats = jppfClient.requestStatistics();
 		System.out.println("End statistics :\n"+stats.toString());
+		*/
 	}
 
 	/**
@@ -98,7 +103,7 @@ public class ProfilingRunner
 	{
 		long start = System.currentTimeMillis();
 		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-		for (int i=0; i<nbTask; i++) tasks.add(new EmptyTask());
+		for (int i=0; i<nbTask; i++) tasks.add(new EmptyTask(dataSize));
 		// submit the tasks for execution
 		for (JPPFTask task: tasks) task.run();
 		long elapsed = System.currentTimeMillis() - start;

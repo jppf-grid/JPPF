@@ -59,8 +59,8 @@ public class NBodyTask extends JPPFTask
 				for (int i=0; i<positions.length; i++)
 				{
 					if (i == body.number) continue;
-					double d = distance(body.position, positions[i]);
-					temp.set(body.position);
+					double d = distance(body.pos, positions[i]);
+					temp.set(body.pos);
 					temp.subtract(positions[i]);
 					temp.multiply(qp_qp / (d*d*d));
 					body.acceleration.add(temp);
@@ -71,9 +71,9 @@ public class NBodyTask extends JPPFTask
 				body.acceleration.add(temp);
 				// Update antiproton's position and velocity.
 				temp.set(body.velocity);
-				body.position.add(temp.multiply(dt));
+				body.pos.add(temp.multiply(dt));
 				temp.set(body.acceleration);
-				body.position.add(temp.multiply(Math.sqrt(dt)/2d));
+				body.pos.add(temp.multiply(Math.sqrt(dt)/2d));
 				temp.set(body.acceleration);
 				body.velocity.add(temp.multiply(dt));
 	

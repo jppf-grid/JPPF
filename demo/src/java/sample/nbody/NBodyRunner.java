@@ -139,7 +139,7 @@ public class NBodyRunner
 			for (int i=0; i<nbTasks; i++)
 			{
 				NBody[] bodies = ((NBodyTask) tasks.get(i)).getBodies();
-				for (NBody body: bodies) positions[body.number] = body.position;
+				for (NBody body: bodies) positions[body.number] = body.pos;
 			}
 			long elapsed = System.currentTimeMillis() - start;
 			totalTime += elapsed;

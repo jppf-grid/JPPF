@@ -15,40 +15,65 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sample.test.profiling;
+
+package test.client.nissalia;
 
 import org.jppf.server.protocol.JPPFTask;
 
-/**
- * Instances of this class do nothing and are intented for node profiling purposes,
- * to analyse the JPPF overhead for task execution. 
- * @author Laurent Cohen
- */
-public class EmptyTask extends JPPFTask
+public class TestMatrixTask2 extends JPPFTask
 {
-	/**
-	 * The data size in KB.
-	 */
-	private int dataSizeKB = 0;
-	/**
-	 * The data in this task.
-	 */
-	private byte[] data = null;
-	/**
-	 * Initialize with the specified data size.
-	 * @param dataSizeKB the data size in KB.
-	 */
-	public EmptyTask(int dataSizeKB)
+
+	private double[][] mA;
+
+	private int result;
+
+	public TestMatrixTask2(int i)
 	{
-		this.dataSizeKB = dataSizeKB;
-		data = new byte[1024*dataSizeKB];
+		result = i;
 	}
 
-	/**
-	 * Perform the excution of this task.
-	 * @see java.lang.Runnable#run()
-	 */
+	void init(int tailleMatrix)
+	{
+		mA = new double[tailleMatrix][tailleMatrix];
+
+		for (int i = 0; i < tailleMatrix; i++)
+		{
+			for (int j = 0; j < tailleMatrix; j++)
+			{
+				mA[i][j] = Math.random();
+			}
+		}
+	}
+
+	public Object getResult()
+	{
+		return result;
+	}
+
 	public void run()
 	{
+		fireNotification("start exec");
+		try
+		{
+			doWork();
+		}
+		finally
+		{
+			fireNotification("end exec");
+		}
+	}
+
+	public void doWork()
+	{
+		try
+		{
+			System.out.println("start " + result);
+			init(1500);
+			System.out.println("end " + result);
+		}
+		catch (Exception e)
+		{
+			setException(e);
+		}
 	}
 }

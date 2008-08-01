@@ -15,40 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sample.test.profiling;
+package org.jppf.server.scheduler.bundle.autotuned;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.scheduler.bundle.AutoTuneProfile;
+
 
 /**
- * Instances of this class do nothing and are intented for node profiling purposes,
- * to analyse the JPPF overhead for task execution. 
+ * Default abstract implementation of the {@link AutoTuneProfile} interface,
+ * providing an encapsulation of the parameters as Java properties.
+ * @author Domingos Creado
  * @author Laurent Cohen
  */
-public class EmptyTask extends JPPFTask
+public abstract class AbstractAutoTuneProfile implements AutoTuneProfile
 {
-	/**
-	 * The data size in KB.
-	 */
-	private int dataSizeKB = 0;
-	/**
-	 * The data in this task.
-	 */
-	private byte[] data = null;
-	/**
-	 * Initialize with the specified data size.
-	 * @param dataSizeKB the data size in KB.
-	 */
-	public EmptyTask(int dataSizeKB)
-	{
-		this.dataSizeKB = dataSizeKB;
-		data = new byte[1024*dataSizeKB];
-	}
-
-	/**
-	 * Perform the excution of this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	public void run()
-	{
-	}
 }

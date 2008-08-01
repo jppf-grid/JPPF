@@ -37,7 +37,7 @@ public class NBody implements Serializable
 	/**
 	 * The current position of the body.
 	 */
-	public Vector2d position = null;
+	public Vector2d pos = null;
 	/**
 	 * Identifier for the body.
 	 */
@@ -51,6 +51,6 @@ public class NBody implements Serializable
 	public NBody(int number, Vector2d position)
 	{
 		this.number = number;
-		this.position = position;
+		this.pos = position;
 	}
 }
