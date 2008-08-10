@@ -51,6 +51,7 @@ public class ClientExecution
 	 * An execution policy that deternmines on which node(s) the tasks will be permitted to run.
 	 */
 	public ExecutionPolicy policy = null;
+
 	/**
 	 * Initialize this execution with the specified parameters.
 	 * @param tasks list of tasks for this execution.

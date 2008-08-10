@@ -260,7 +260,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
 		throws Exception
 	{
-		getClientConnection().submit(taskList, dataProvider, listener);
+		getClientConnection().submit(taskList, dataProvider, listener, policy);
 	}
 
 	/**

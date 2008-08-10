@@ -148,7 +148,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * @param listener listener to notify whenever a set of results have been received.
 	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
 	 * @throws Exception if an error occurs while sending the request.
-	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener)
+	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener, org.jppf.node.policy.ExecutionPolicy)
 	 */
 	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
 			throws Exception

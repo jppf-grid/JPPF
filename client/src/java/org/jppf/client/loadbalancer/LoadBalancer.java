@@ -20,6 +20,7 @@ package org.jppf.client.loadbalancer;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
@@ -55,9 +56,9 @@ public class LoadBalancer
 	 */
 	private static final int REMOTE = 1;
 	/**
-	 * Determines whetehr local execution is enabled on this client.
+	 * Determines whether local execution is enabled on this client.
 	 */
-	private boolean localEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.local.execution.enabled", true);
+	private boolean localEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.local.execution.enabled", false);
 	/**
 	 * Thread pool for local execution.
 	 */
@@ -66,6 +67,10 @@ public class LoadBalancer
 	 * The bundlers used to split the tasks between local and remote execution.
 	 */
 	private ClientProportionalBundler[] bundlers = null;
+	/**
+	 * Determines whether this load balancer is currently executing tasks locally.
+	 */
+	private AtomicBoolean locallyExecuting = new AtomicBoolean(false);
 
 	/**
 	 * Default constructor.
@@ -99,161 +104,120 @@ public class LoadBalancer
 		int count = 0;
 		List<JPPFTask> tasks = execution.tasks;
 		for (JPPFTask task : tasks) task.setPosition(count++);
-		if (localEnabled)
+		if (localEnabled && locallyExecuting.compareAndSet(false, true))
 		{
-			if (connection != null)
+			try
 			{
-				bundlers[LOCAL].setMaxSize(tasks.size());
-				bundlers[REMOTE].setMaxSize(tasks.size());
-				int n = bundlers[LOCAL].getBundleSize();
-				if (n > tasks.size()) n = tasks.size() - 1;
-				int n2 = bundlers[REMOTE].getBundleSize();
-				if (n2 + n > tasks.size()) n2 = tasks.size() - n;
-				int diff = tasks.size() - (n + n2);
-				if (diff > 0)
+				if (connection != null)
 				{
-					n += diff/2;
-					n2 += diff/2;
-					if (tasks.size() > n + n2) n++;
+					int bundleSize[] = new int[2];
+					synchronized(bundlers)
+					{
+						for (int i=LOCAL; i<=REMOTE; i++)
+						{
+							bundlers[i].setMaxSize(tasks.size());
+							bundleSize[i] = bundlers[i].getBundleSize();
+						}
+					}
+					if (bundleSize[LOCAL] > tasks.size()) bundleSize[LOCAL] = tasks.size() - 1;
+					if (sum(bundleSize) > tasks.size()) bundleSize[REMOTE] = tasks.size() - bundleSize[LOCAL];
+					int diff = tasks.size() - sum(bundleSize);
+					if (diff > 0)
+					{
+						for (int i=LOCAL; i<=REMOTE; i++) bundleSize[i] += diff/2;
+						if (tasks.size() > sum(bundleSize)) bundleSize[LOCAL]++;
+					}
+					if (debugEnabled) log.debug("bundlers[local=" + bundleSize[LOCAL] + ", remote=" + bundleSize[REMOTE] + "]");
+					List<List<JPPFTask>> list = new ArrayList<List<JPPFTask>>();
+					int idx = 0;
+					for (int i=LOCAL; i<=REMOTE; i++)
+					{
+						list.add(CollectionUtils.getAllElements(tasks, idx, bundleSize[i]));
+						idx += bundleSize[i];
+					}
+					ExecutionThread[] threads = { new LocalExecutionThread(list.get(LOCAL), execution), new RemoteExecutionThread(list.get(REMOTE), execution, connection) };
+					for (int i=LOCAL; i<=REMOTE; i++) threads[i].start();
+					if (execution.isBlocking)
+					{
+						for (int i=LOCAL; i<=REMOTE; i++) threads[i].join();
+						for (int i=LOCAL; i<=REMOTE; i++) if (threads[i].getException() != null) throw threads[i].getException();
+					}
 				}
-				if (debugEnabled) log.debug("bundlers[local="+n+", remote="+n2+"]");
-				List<List<JPPFTask>> list = new ArrayList<List<JPPFTask>>();
-				list.add(CollectionUtils.getAllElements(tasks, 0, n));
-				list.add(CollectionUtils.getAllElements(tasks, n, n2));
-				ExecutionThread[] threads = new ExecutionThread[2];
-				threads[0] = new ExecutionThread(list.get(0), execution);
-				threads[1] = new ExecutionThread(list.get(1), execution, connection);
-				for (int i=0; i<2; i++) threads[i].start();
-				if (!execution.isBlocking) for (int i=0; i<2; i++) threads[i].join();
+				else
+				{
+					ExecutionThread localThread = new LocalExecutionThread(tasks, execution);
+					if (!execution.isBlocking) localThread.start();
+					else
+					{
+						localThread.run();
+						if (localThread.getException() != null) throw localThread.getException();
+					}
+				}
 			}
+			finally
+			{
+				locallyExecuting.set(false);
+			}
+		}
+		else if (connection != null)
+		{
+			ExecutionThread remoteThread = new RemoteExecutionThread(tasks, execution, connection);
+			if (!execution.isBlocking) remoteThread.start();
 			else
 			{
-				ExecutionThread localThread = new ExecutionThread(tasks, execution);
-				if (!execution.isBlocking) localThread.start();
-				else localThread.run();
+				remoteThread.run();
+				if (remoteThread.getException() != null) throw remoteThread.getException();
 			}
 		}
-		else
-		{
-			ExecutionThread remoteThread = new ExecutionThread(tasks, execution, connection);
-			if (!execution.isBlocking) remoteThread.start();
-			else remoteThread.run();
-		}
+		else throw new JPPFException("Null driver connection and local executor is "  + (localEnabled ? "busy" : "disabled"));
+	}
+
+	/**
+	 * Compute the sum of the elements of an int array.
+	 * @param array the input array. 
+	 * @return the result sum as an int value.
+	 */
+	private int sum(int array[])
+	{
+		int sum = 0;
+		for (int i=0; i<array.length; i++) sum += array[i];
+		return sum;
 	}
 
 	/**
 	 * Instances of this class are intended to perform local and remote task executions concurrently.
 	 */
-	public class ExecutionThread extends Thread
+	public abstract class ExecutionThread extends Thread
 	{
-		/**
-		 * Determines whether execution is local or remote.
-		 */
-		private boolean local = true;
 		/**
 		 * The tasks to execute.
 		 */
-		private List<JPPFTask> tasks = null;
-		/**
-		 * The connection to the driver to use.
-		 */
-		private JPPFClientConnectionImpl connection = null;
+		protected List<JPPFTask> tasks = null;
 		/**
 		 * Exception that may result from the execution.
 		 */
-		private Exception exception = null;
+		protected Exception exception = null;
 		/**
 		 * The execution to perform.
 		 */
-		private ClientExecution execution = null;
-
-		/**
-		 * Initialize this execution thread for local execution.
-		 * @param tasks the tasks to execute.
-		 * @param execution the execution to perform.
-		 */
-		public ExecutionThread(List<JPPFTask> tasks, ClientExecution execution)
-		{
-			local = true;
-			this.tasks = tasks;
-			this.execution = execution;
-		}
+		protected ClientExecution execution = null;
 
 		/**
 		 * Initialize this execution thread for remote excution.
 		 * @param tasks the tasks to execute.
 		 * @param execution the execution to perform.
-		 * @param connection the connection to the driver to use.
 		 */
-		public ExecutionThread(List<JPPFTask> tasks, ClientExecution execution, JPPFClientConnectionImpl connection)
+		public ExecutionThread(List<JPPFTask> tasks, ClientExecution execution)
 		{
-			local = false;
 			this.tasks = tasks;
 			this.execution = execution;
-			this.connection = connection;
 		}
 
 		/**
 		 * Perform the execution.
 		 * @see java.lang.Runnable#run()
 		 */
-		public void run()
-		{
-			try
-			{
-				long start = System.currentTimeMillis();
-				if (local)
-				{
-					List<Future<?>> futures = new ArrayList<Future<?>>();
-					for (JPPFTask task: tasks)
-					{
-						task.setDataProvider(execution.dataProvider);
-						futures.add(threadPool.submit(new TaskWrapper(task)));
-					}
-					for (Future<?> f: futures) f.get();
-					if (execution.listener != null)
-					{
-						synchronized(execution.listener)
-						{
-							execution.listener.resultsReceived(new TaskResultEvent(tasks, tasks.get(0).getPosition()));
-						}
-					}
-				}
-				else
-				{
-					int count = 0;
-					boolean completed = false;
-					while (!completed)
-					{
-						connection.sendTasks(tasks, execution.dataProvider, execution.policy);
-						while (count < tasks.size())
-						{
-							Pair<List<JPPFTask>, Integer> p = connection.receiveResults();
-							count += p.first().size();
-							if (execution.listener != null)
-							{
-								synchronized(execution.listener)
-								{
-									execution.listener.resultsReceived(new TaskResultEvent(p.first(), p.second()));
-								}
-							}
-						}
-						completed = true;
-					}
-				}
-
-				if (localEnabled)
-				{
-					double elapsed = System.currentTimeMillis() - start;
-					bundlers[local ? LOCAL : REMOTE].feedback(tasks.size(), elapsed);
-				}
-			}
-			catch(Exception e)
-			{
-				if (debugEnabled) log.debug(e.getMessage(), e);
-				exception = e;
-			}
-		}
+		public abstract void run();
 
 		/**
 		 * Get the resulting exception.
@@ -266,38 +230,115 @@ public class LoadBalancer
 	}
 
 	/**
-	 * JPPF task wrapper used to catch unhandled exceptions.
+	 * Instances of this class are intended to perform local task executions concurrently.
 	 */
-	private static class TaskWrapper implements Runnable
+	public class LocalExecutionThread extends ExecutionThread
 	{
 		/**
-		 * The JPPF task to run.
+		 * Initialize this execution thread for local excution.
+		 * @param tasks the tasks to execute.
+		 * @param execution the execution to perform.
 		 */
-		private JPPFTask task = null;
-
-		/**
-		 * Initialize this task wrapper with the specified JPPF task.
-		 * @param task the JPPF task to execute.
-		 */
-		public TaskWrapper(JPPFTask task)
+		public LocalExecutionThread(List<JPPFTask> tasks, ClientExecution execution)
 		{
-			this.task = task;
+			super(tasks, execution);
 		}
 
 		/**
-		 * Run the task and handle uncaught exceptions.
+		 * Perform the execution.
 		 * @see java.lang.Runnable#run()
 		 */
 		public void run()
 		{
 			try
 			{
-				task.run();
+				long start = System.currentTimeMillis();
+				List<Future<?>> futures = new ArrayList<Future<?>>();
+				for (JPPFTask task: tasks)
+				{
+					task.setDataProvider(execution.dataProvider);
+					futures.add(threadPool.submit(new TaskWrapper(task)));
+				}
+				for (Future<?> f: futures) f.get();
+				if (execution.listener != null)
+				{
+					synchronized(execution.listener)
+					{
+						execution.listener.resultsReceived(new TaskResultEvent(tasks, tasks.get(0).getPosition()));
+					}
+				}
+				double elapsed = System.currentTimeMillis() - start;
+				bundlers[LOCAL].feedback(tasks.size(), elapsed);
 			}
-			catch(Throwable t)
+			catch(Exception e)
 			{
-				if (t instanceof Exception) task.setException((Exception) t);
-				else task.setException(new JPPFException(t));
+				if (debugEnabled) log.debug(e.getMessage(), e);
+				exception = e;
+			}
+		}
+	}
+
+	/**
+	 * Instances of this class are intended to perform remote task executions concurrently.
+	 */
+	public class RemoteExecutionThread extends ExecutionThread
+	{
+		/**
+		 * The connection to the driver to use.
+		 */
+		private JPPFClientConnectionImpl connection = null;
+
+		/**
+		 * Initialize this execution thread for remote excution.
+		 * @param tasks the tasks to execute.
+		 * @param execution the execution to perform.
+		 * @param connection the connection to the driver to use.
+		 */
+		public RemoteExecutionThread(List<JPPFTask> tasks, ClientExecution execution, JPPFClientConnectionImpl connection)
+		{
+			super(tasks, execution);
+			this.connection = connection;
+		}
+
+		/**
+		 * Perform the execution.
+		 * @see java.lang.Runnable#run()
+		 */
+		public void run()
+		{
+			try
+			{
+				long start = System.currentTimeMillis();
+				int count = 0;
+				boolean completed = false;
+				while (!completed)
+				{
+					connection.sendTasks(tasks, execution.dataProvider, execution.policy);
+					while (count < tasks.size())
+					{
+						Pair<List<JPPFTask>, Integer> p = connection.receiveResults();
+						count += p.first().size();
+						if (execution.listener != null)
+						{
+							synchronized(execution.listener)
+							{
+								execution.listener.resultsReceived(new TaskResultEvent(p.first(), p.second()));
+							}
+						}
+					}
+					completed = true;
+				}
+
+				if (localEnabled)
+				{
+					double elapsed = System.currentTimeMillis() - start;
+					bundlers[REMOTE].feedback(tasks.size(), elapsed);
+				}
+			}
+			catch(Exception e)
+			{
+				if (debugEnabled) log.debug(e.getMessage(), e);
+				exception = e;
 			}
 		}
 	}
