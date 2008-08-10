@@ -18,7 +18,9 @@
 
 package org.jppf.utils;
 
+import java.util.*;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Custom thread factory used mostly to specifiy th enames of created threads. 
@@ -33,7 +35,15 @@ public class JPPFThreadFactory implements ThreadFactory
 	/**
 	 * Count of created threads.
 	 */
-	private int count = 0;
+	private AtomicInteger count = new AtomicInteger(0);
+	/**
+	 * Determines whether the threads created by this factory can be monitored.
+	 */
+	private boolean monitoringEnabled = false;
+	/**
+	 * List of monitored thread IDs.
+	 */
+	private List<Long> threadIDs = null;
 
 	/**
 	 * Initialize this thread factory with the specified name.
@@ -45,6 +55,18 @@ public class JPPFThreadFactory implements ThreadFactory
 	}
 
 	/**
+	 * Initialize this thread factory with the specified name.
+	 * @param name the name used as prefix for the constructed threads name.
+	 * @param monitoringEnabled determines whether the threads created by this factory can be monitored.
+	 */
+	public JPPFThreadFactory(String name, boolean monitoringEnabled)
+	{
+		this(name);
+		this.monitoringEnabled = monitoringEnabled;
+		if (monitoringEnabled) threadIDs = new ArrayList<Long>();
+	}
+
+	/**
 	 * Constructs a new Thread.
 	 * @param r a runnable to be executed by the new thread instance.
 	 * @return the constructed thread.
@@ -52,15 +74,43 @@ public class JPPFThreadFactory implements ThreadFactory
 	 */
 	public Thread newThread(Runnable r)
 	{
-		return new Thread(r, name + "-thread-" + incrementCount());
+		Thread thread = new Thread(r, name + "-thread-" + incrementCount());
+		if (monitoringEnabled) threadIDs.add(thread.getId());
+		return thread;
+	}
+
+	/**
+	 * Get the ids of the monitored threads.
+	 * @return a list of long values.
+	 */
+	public List<Long> getThreadIDs()
+	{
+		if (!monitoringEnabled) return null;
+		return Collections.unmodifiableList(threadIDs);
 	}
 
 	/**
 	 * Increment and return the vreated thread count.
 	 * @return the created thread count.
 	 */
-	private synchronized int incrementCount()
+	private int incrementCount()
 	{
-		return ++count;
+		return count.incrementAndGet();
+	}
+
+	/**
+	 * 
+	 */
+	private class JPPFThread extends Thread
+	{
+		/**
+		 * Initialize this thread with the specified target and name. 
+		 * @param target this thread's runnable target.
+		 * @param name the name of this thread.
+		 */
+		public JPPFThread(Runnable target, String name)
+		{
+			super(target, name);
+		}
 	}
 }

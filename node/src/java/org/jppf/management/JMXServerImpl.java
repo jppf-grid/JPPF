@@ -19,6 +19,7 @@
 package org.jppf.management;
 
 import java.io.*;
+import java.lang.management.ManagementFactory;
 import java.net.*;
 import java.rmi.registry.*;
 import java.rmi.server.RMISocketFactory;
@@ -86,7 +87,8 @@ public class JMXServerImpl
 	 */
 	public void start() throws Exception
 	{
-		server = MBeanServerFactory.createMBeanServer();
+		//server = MBeanServerFactory.createMBeanServer();
+		server = ManagementFactory.getPlatformMBeanServer();
     locateOrCreateRegistry();
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String host = NetworkUtils.getManagementHost();

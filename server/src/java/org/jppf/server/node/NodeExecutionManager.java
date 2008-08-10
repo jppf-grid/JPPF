@@ -18,6 +18,7 @@
 
 package org.jppf.server.node;
 
+import java.lang.management.*;
 import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -44,7 +45,11 @@ public class NodeExecutionManager extends ThreadSynchronization
 	/**
 	 * The Thread Pool that really process the tasks
 	 */
-	private ExecutorService threadPool = null;
+	private ThreadPoolExecutor threadPool = null;
+	/**
+	 * The factory used to create thread in the pool.
+	 */
+	private JPPFThreadFactory threadFactory = new JPPFThreadFactory("node processing thread", true);
 	/**
 	 * The node that uses this excecution manager.
 	 */
@@ -78,6 +83,14 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 * including tasks that were completed normally, were cancelled or timed out. 
 	 */
 	private AtomicLong taskCount = new AtomicLong(0L);
+	/**
+	 * The platform MBean used to gather statistics about the JVM threads.
+	 */
+	private ThreadMXBean threadMXBean = null;
+	/**
+	 * Determines wheather the thread cpu time measurement is supported and enabled.
+	 */
+	private boolean cpuTimeEnabled = false;
 
 	/**
 	 * Initialize this execution manager with the specified node.
@@ -90,8 +103,14 @@ public class NodeExecutionManager extends ThreadSynchronization
 		int poolSize = props.getInt("processing.threads", 1);
 		log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
 		LinkedBlockingQueue queue = new LinkedBlockingQueue();
-		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("node processing thread"));
+		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory);
+		threadPool.prestartAllCoreThreads();
 		timeoutTimer = new Timer("Node Task Timeout Timer");
+		threadMXBean = ManagementFactory.getThreadMXBean();
+		cpuTimeEnabled = threadMXBean.isThreadCpuTimeSupported();
+		//cpuTimeEnabled = false;
+		if (debugEnabled) log.debug("thread cpu time supported = " + cpuTimeEnabled);
+		if (cpuTimeEnabled) threadMXBean.setThreadCpuTimeEnabled(true);
 	}
 
 	/**
@@ -103,10 +122,17 @@ public class NodeExecutionManager extends ThreadSynchronization
 	public void execute(JPPFTaskBundle bundle, List<JPPFTask> taskList) throws Exception
 	{
 		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
+		NodeExecutionInfo info1 = null;
+		if (cpuTimeEnabled) info1 = computeExecutionInfo();
 		setup(bundle);
 		for (JPPFTask task : taskList) performTask(task);
 		waitForResults();
 		cleanup();
+		if (cpuTimeEnabled)
+		{
+			NodeExecutionInfo info2 = computeExecutionInfo();
+			if (debugEnabled) log.debug("total cpu time used: " + (info2.cpuTime - info1.cpuTime) + " ms, user time: " + (info2.userTime - info1.userTime));
+		}
 	}
 
 	/**
@@ -119,7 +145,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	{
 		String id = task.getId();
 		long number = incTaskCount();
-		if (debugEnabled) log.debug("submitting task with number " + number);
+		//if (debugEnabled) log.debug("submitting task with number " + number);
 		Future<?> f = threadPool.submit(new NodeTaskWrapper(node, task, uuidList, number));
 		synchronized(this)
 		{
@@ -317,7 +343,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	public synchronized void removeFuture(long number)
 	{
 		Future<?> future = futureMap.remove(number);
-		if (debugEnabled) log.debug("removing task with number " + number + ", future = " + future);
+		//if (debugEnabled) log.debug("removing task with number " + number + ", future = " + future);
 		TimerTask tt = timerTaskMap.remove(future);
 		if (tt != null) tt.cancel();
 		wakeUp();
@@ -349,5 +375,24 @@ public class NodeExecutionManager extends ThreadSynchronization
 	public synchronized Future<?> getFutureFromNumber(long number)
 	{
 		return futureMap.get(number);
+	}
+
+	/**
+	 * Computes the total CPU time used by the execution threads.
+	 * @return a <code>NodeExecutionInfo</code> instance.
+	 */
+	private NodeExecutionInfo computeExecutionInfo()
+	{
+		if (!cpuTimeEnabled) return null;
+		NodeExecutionInfo info = new NodeExecutionInfo();
+		List<Long> ids = threadFactory.getThreadIDs();
+		for (Long id: ids)
+		{
+			info.cpuTime += threadMXBean.getThreadCpuTime(id);
+			info.userTime += threadMXBean.getThreadUserTime(id);
+		}
+		info.cpuTime /= 1e6;
+		info.userTime /= 1e6;
+		return info;
 	}
 }
