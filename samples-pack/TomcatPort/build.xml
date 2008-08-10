@@ -103,7 +103,6 @@
 	<target name="build.war">
     <war warfile="${build.dir}/${war.file}" webxml="${web.inf.dir}/web.xml">
 			<zipfileset dir="${docroot.dir}" includes="**/*.*"/>
-			<zipfileset dir="${classes.dir}" prefix="WEB-INF/lib/classes"/>
 			<lib dir="${lib.dir}">
 				<include name="jppf-common-node.jar"/>
 				<include name="jppf-common.jar"/>
@@ -112,6 +111,7 @@
 				<include name="commons-logging-1.1.jar"/>
 				<include name="log4j-1.2.9.jar"/>
 			</lib>
+			<classes dir="${classes.dir}"/>
     </war>
 	</target>
 
