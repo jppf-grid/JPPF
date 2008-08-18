@@ -47,6 +47,10 @@ public class JPPFNodeState implements Serializable
 	 */
 	private int nbTasksExecuted = 0;
 	/**
+	 * The total cpu time used by the task processing threads.
+	 */
+	private long cpuTime = 0L;
+	/**
 	 * Holder for all latest task notifications issued from multiple execution threads. 
 	 */
 	private transient Map<String, Integer> taskIdMap = new HashMap<String, Integer>();
@@ -197,5 +201,23 @@ public class JPPFNodeState implements Serializable
 	public void setThreadPoolSize(int threadPoolSize)
 	{
 		this.threadPoolSize = threadPoolSize;
+	}
+
+	/**
+	 * Get the total cpu time used by the task processing threads.
+	 * @return the cpu time in milliseconds.
+	 */
+	public synchronized long getCpuTime()
+	{
+		return cpuTime;
+	}
+
+	/**
+	 * Set the total cpu time used by the task processing threads.
+	 * @param cpuTime the cpu time in milliseconds.
+	 */
+	public synchronized void setCpuTime(long cpuTime)
+	{
+		this.cpuTime = cpuTime;
 	}
 }

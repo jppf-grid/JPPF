@@ -15,31 +15,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.node;
 
-import org.jppf.process.ProcessLauncher;
+package org.jppf.process.event;
+
+import java.util.EventObject;
 
 /**
- * Bootstrap class for lauching a JPPF node. The node class is dynamically loaded from a remote server.
+ * Instances of this class encapsulate an event occurring when a process wrties to
+ * its output or error stream. 
  * @author Laurent Cohen
  */
-public class NodeLauncher
+public class ProcessWrapperEvent extends EventObject
 {
 	/**
-	 * Start this application, then the JPPF driver a subprocess.
-	 * @param args not used.
+	 * Initialize this event with the specified source.
+	 * @param content the source of this event, in effect the content of the corresponding process stream.
 	 */
-	public static void main(String...args)
+	public ProcessWrapperEvent(String content)
 	{
-		try
-		{
-			ProcessLauncher launcher = new ProcessLauncher("org.jppf.node.NodeRunner");
-			launcher.start();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		System.exit(0);
+		super(content);
+	}
+
+	/**
+	 * Get the content of this event.
+	 * @return the content encapsualted in a <code>StringBuilder</code> instance.
+	 */
+	public String getContent()
+	{
+		return (String) getSource();
 	}
 }

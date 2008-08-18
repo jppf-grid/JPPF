@@ -59,4 +59,12 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean<NodeParameter, Object
 	 * @return a <code>JPPFSystemInformation</code> instance.
 	 */
 	JPPFSystemInformation systemInformation();
+	/**
+	 * Restart the node.
+	 */
+	void restart();
+	/**
+	 * Shutdown the node.
+	 */
+	void shutdown();
 }

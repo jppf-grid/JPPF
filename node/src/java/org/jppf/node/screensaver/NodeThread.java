@@ -58,7 +58,7 @@ public class NodeThread extends Thread
 			{
 				try
 				{
-					node = NodeLauncher.createNode();
+					node = NodeRunner.createNode();
 					node.addNodeListener(listener);
 					while (true)
 					{

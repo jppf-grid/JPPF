@@ -15,31 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.node;
 
-import org.jppf.process.ProcessLauncher;
+package org.jppf.process.event;
+
+import java.util.EventListener;
 
 /**
- * Bootstrap class for lauching a JPPF node. The node class is dynamically loaded from a remote server.
+ * Listener interface for receiving veent notifications from a process wrapper.
  * @author Laurent Cohen
  */
-public class NodeLauncher
+public interface ProcessWrapperEventListener extends EventListener
 {
 	/**
-	 * Start this application, then the JPPF driver a subprocess.
-	 * @param args not used.
+	 * Notification that the process has written to its output stream.
+	 * @param event encapsulate the output stream's content.
 	 */
-	public static void main(String...args)
-	{
-		try
-		{
-			ProcessLauncher launcher = new ProcessLauncher("org.jppf.node.NodeRunner");
-			launcher.start();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		System.exit(0);
-	}
+	void outputStreamAltered(ProcessWrapperEvent event);
+	/**
+	 * Notification that the process has written to its error stream.
+	 * @param event encapsulate the error stream's content.
+	 */
+	void errorStreamAltered(ProcessWrapperEvent event);
 }
