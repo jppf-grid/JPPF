@@ -21,7 +21,7 @@ package org.jppf.ui.monitoring.node;
 import java.util.*;
 
 /**
- * 
+ * Abstract class for formatters that print the contents of a {@link java.util.Properties Properties} object as a string.
  * @author Laurent Cohen
  */
 public abstract class PropertiesTableFormat

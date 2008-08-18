@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.node;
 
 
 /**
- * 
+ * Implementation of a formatter that print the contents of a {@link java.util.Properties Properties} object as HTML.
  * @author Laurent Cohen
  */
 public class HTMLPropertiesTableFormat extends PropertiesTableFormat

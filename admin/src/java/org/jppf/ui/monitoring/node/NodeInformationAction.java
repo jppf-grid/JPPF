@@ -17,7 +17,9 @@
  */
 package org.jppf.ui.monitoring.node;
 
+import java.awt.*;
 import java.awt.event.*;
+import java.net.URL;
 
 import javax.swing.*;
 
@@ -34,6 +36,26 @@ public class NodeInformationAction implements ActionListener
 	 * The jmx client used to update the thread pool size.
 	 */
 	private JMXNodeConnectionWrapper jmx = null;
+	/**
+	 * Icon for the frame.
+	 */
+	private static Image iconImage = null;
+
+	/**
+	 * Iniotializer the icon for the frame.
+	 */
+	private static synchronized void initIconImage()
+	{
+		if (iconImage != null) return;
+		try
+		{
+			URL url = NodeInformationAction.class.getResource("/org/jppf/ui/resources/info.gif");
+			iconImage = Toolkit.getDefaultToolkit().getImage(url);
+		}
+		catch(Exception ignore)
+		{
+		}
+	}
 
 	/**
 	 * Initialize this action.
@@ -42,6 +64,7 @@ public class NodeInformationAction implements ActionListener
 	public NodeInformationAction(JMXNodeConnectionWrapper jmx)
 	{
 		this.jmx = jmx;
+		if (iconImage == null) initIconImage();
 	}
 
 	/**
@@ -70,6 +93,7 @@ public class NodeInformationAction implements ActionListener
 			s = StringUtils.getStackTrace(e);
 		}
 		final JFrame frame = new JFrame("Node System Information");
+		if (iconImage != null) frame.setIconImage(iconImage);
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter()
 		{

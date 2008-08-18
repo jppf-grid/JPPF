@@ -105,4 +105,22 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper
 		return (JPPFSystemInformation) invoke(JPPFAdminMBean.NODE_MBEAN_NAME,
 			"systemInformation", (Object[]) null, (String[]) null); 
 	}
+
+	/**
+	 * Shutdown the node.
+	 * @throws Exception if an error is raised when invoking the node mbean.
+	 */
+	public void shutdown() throws Exception
+	{
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "shutdown", (Object[]) null, (String[]) null); 
+	}
+
+	/**
+	 * Restart the node.
+	 * @throws Exception if an error is raised when invoking the node mbean.
+	 */
+	public void restart() throws Exception
+	{
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "restart", (Object[]) null, (String[]) null); 
+	}
 }

@@ -48,6 +48,14 @@ public class TreeTableMouseListener extends MouseAdapter
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Path to the node threads icon resource.
+	 */
+	private static final String THREADS_ICON = "/org/jppf/ui/resources/threads.gif";
+	/**
+	 * Path to the node system information icon resource.
+	 */
+	private static final String INFO_ICON = "/org/jppf/ui/resources/info.gif";
+	/**
 	 * Path to the cancel icon resource.
 	 */
 	private static final String CANCEL_ICON = "/org/jppf/ui/resources/stop.gif";
@@ -55,6 +63,14 @@ public class TreeTableMouseListener extends MouseAdapter
 	 * Path to the restart icon resource.
 	 */
 	private static final String RESTART_ICON = "/org/jppf/ui/resources/restart.gif";
+	/**
+	 * Path to the restart node icon resource.
+	 */
+	private static final String RESTART_NODE_ICON = "/org/jppf/ui/resources/traffic_light_red_green.gif";
+	/**
+	 * Path to the shutdown node icon resource.
+	 */
+	private static final String SHUTDOWN_NODE_ICON = "/org/jppf/ui/resources/traffic_light_red.gif";
 
 	/**
 	 * Processes right-click events to display popup menus.
@@ -84,9 +100,11 @@ public class TreeTableMouseListener extends MouseAdapter
 			JPopupMenu menu = new JPopupMenu();
 			JMenuItem item = new JMenuItem("Node System Information");
 			item.addActionListener(new NodeInformationAction(jmx));
+			item.setIcon(GuiUtils.loadIcon(INFO_ICON));
 			menu.add(item);
 			item = new JMenuItem("Set thread pool size");
 			item.addActionListener(new NodeThreadPoolSizeAction(jmx));
+			item.setIcon(GuiUtils.loadIcon(THREADS_ICON));
 			menu.add(item);
 			if (!idSet.isEmpty())
 			{
@@ -96,27 +114,31 @@ public class TreeTableMouseListener extends MouseAdapter
 				restart.setIcon(GuiUtils.loadIcon(RESTART_ICON));
 				for (String id: idSet)
 				{
-					cancel.add(createMenuItem(id, true, jmx));
-					restart.add(createMenuItem(id, false, jmx));
+					cancel.add(createTaskMenuItem(id, true, jmx));
+					restart.add(createTaskMenuItem(id, false, jmx));
 				}
 				menu.add(cancel);
 				menu.add(restart);
 			}
+			//JMenu nodeMenu = new JMenu("Node");
+			menu.add(createNodeMenuItem("Node Restart", false, jmx));
+			menu.add(createNodeMenuItem("Node Shutdown", true, jmx));
+			//menu.add(nodeMenu);
 			menu.show(treeTable, x, y);
 		}
 	}
 
 	/**
 	 * Create a menu item for the specified text and type of action.
-	 * @param id the id of the task to whihc the menu item applies.
+	 * @param label the id of the task to whihc the menu item applies.
 	 * @param isCancel cancel action if true, restart action otherwise.
 	 * @param jmx the JMX ocnnection to the corresponding node..
 	 * @return a <code>JMenuItem</code> instance.
 	 */
-	private JMenuItem createMenuItem(final String id, boolean isCancel, final JMXNodeConnectionWrapper jmx)
+	private JMenuItem createTaskMenuItem(final String label, boolean isCancel, final JMXNodeConnectionWrapper jmx)
 	{
 		Icon icon = GuiUtils.loadIcon(isCancel ? CANCEL_ICON : RESTART_ICON);
-		String text = "Task id " + id;
+		String text = "Task id " + label;
 		JMenuItem item = new JMenuItem(text, icon);
 		if (isCancel) item.addActionListener(new ActionListener()
 		{
@@ -124,7 +146,7 @@ public class TreeTableMouseListener extends MouseAdapter
 			{
 				try
 				{
-					jmx.cancelTask(id);
+					jmx.cancelTask(label);
 				}
 				catch(Exception ignored)
 				{
@@ -137,7 +159,48 @@ public class TreeTableMouseListener extends MouseAdapter
 			{
 				try
 				{
-					jmx.restartTask(id);
+					jmx.restartTask(label);
+				}
+				catch(Exception ignored)
+				{
+				}
+			}
+		});
+		return item;
+	}
+
+
+	/**
+	 * Create a menu item for the specified text and type of action.
+	 * @param label the id of the task to whihc the menu item applies.
+	 * @param isShutdown cancel action if true, restart action otherwise.
+	 * @param jmx the JMX ocnnection to the corresponding node..
+	 * @return a <code>JMenuItem</code> instance.
+	 */
+	private JMenuItem createNodeMenuItem(final String label, boolean isShutdown, final JMXNodeConnectionWrapper jmx)
+	{
+		Icon icon = GuiUtils.loadIcon(isShutdown ? SHUTDOWN_NODE_ICON : RESTART_NODE_ICON);
+		JMenuItem item = new JMenuItem(label, icon);
+		if (isShutdown) item.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent event)
+			{
+				try
+				{
+					jmx.shutdown();
+				}
+				catch(Exception ignored)
+				{
+				}
+			}
+		});
+		else item.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent event)
+			{
+				try
+				{
+					jmx.restart();
 				}
 				catch(Exception ignored)
 				{
