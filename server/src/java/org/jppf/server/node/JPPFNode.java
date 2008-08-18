@@ -164,7 +164,7 @@ public class JPPFNode extends AbstractMonitoredNode
 					TypedProperties props = JPPFConfiguration.getProperties();
 					bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
 					bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
-					bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeLauncher.getJmxServer().getId());
+					bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeRunner.getJmxServer().getId());
 				}
 				JPPFSystemInformation info = new JPPFSystemInformation();
 				info.populate();
@@ -209,7 +209,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			nodeAdmin = new JPPFNodeAdmin(JPPFNode.this);
 			String mbeanName = JPPFAdminMBean.NODE_MBEAN_NAME;
 			addNodeListener(nodeAdmin);
-			NodeLauncher.getJmxServer().registerMbean(mbeanName, nodeAdmin, JPPFNodeAdminMBean.class);
+			NodeRunner.getJmxServer().registerMbean(mbeanName, nodeAdmin, JPPFNodeAdminMBean.class);
 		}
 		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
 		if (mustInit)
@@ -380,7 +380,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		if (classLoader == null)
 		{
 			if (debugEnabled) log.debug("Initializing classloader");
-			classLoader = new JPPFClassLoader(NodeLauncher.getJPPFClassLoader());
+			classLoader = new JPPFClassLoader(NodeRunner.getJPPFClassLoader());
 		}
 		return classLoader;
 	}
@@ -450,7 +450,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		try
 		{
 			String mbeanName = JPPFAdminMBean.NODE_MBEAN_NAME;
-			NodeLauncher.getJmxServer().unregisterMbean(mbeanName);
+			NodeRunner.getJmxServer().unregisterMbean(mbeanName);
 		}
 		catch(Exception e)
 		{
@@ -519,5 +519,15 @@ public class JPPFNode extends AbstractMonitoredNode
 	public boolean isJmxEnabled()
 	{
 		return jmxEnabled;
+	}
+
+	/**
+	 * Shutdown and evenetually restart the node.
+	 * @param restart determines whether this node should be restarted by the node launcher.
+	 */
+	public void shutdown(boolean restart)
+	{
+		stopNode(true);
+		System.exit(restart ? 2 : 0);
 	}
 }

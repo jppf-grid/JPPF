@@ -304,6 +304,16 @@ public class NodeExecutionManager extends ThreadSynchronization
 	}
 
 	/**
+	 * Get the total cpu time used by the task processing threads.
+	 * @return the cpu time on milliseconds.
+	 */
+	public long getCpuTime()
+	{
+		if (!cpuTimeEnabled) return 0L;
+		return computeExecutionInfo().cpuTime;
+	}
+
+	/**
 	 * Prepare this execution manager for executing the tasks of a bundle.
 	 * @param bundle the bundle whose tasks are to be executed.
 	 */

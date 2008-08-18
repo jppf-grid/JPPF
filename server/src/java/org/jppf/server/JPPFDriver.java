@@ -63,7 +63,7 @@ public class JPPFDriver
 	/**
 	 * Serves the execution requests coming from client applications.
 	 */
-	private JPPFApplicationServer applicationServer = null;
+	private JPPFApplicationServer[] applicationServers = null;
 	/**
 	 * Serves the JPPF nodes.
 	 */
@@ -114,11 +114,15 @@ public class JPPFDriver
 		classServer.start();
 		printInitializedMessage(ports, "Class Server");
 
-		int port = 0;
-		port = props.getInt("app.server.port", 11112);
-		applicationServer = new JPPFApplicationServer(port);
-		applicationServer.start();
-		printInitializedMessage(new int[] {port}, "Client Server");
+		s = props.getString("app.server.port", "11112");
+		ports = StringUtils.parsePorts(s);
+		applicationServers = new JPPFApplicationServer[ports.length];
+		for (int i=0; i<ports.length; i++)
+		{
+			applicationServers[i] = new JPPFApplicationServer(ports[i]);
+			applicationServers[i].start();
+		}
+		printInitializedMessage(ports, "Client Server");
 
 		s = props.getString("node.server.port", "11113");
 		ports = StringUtils.parsePorts(s);
@@ -283,8 +287,12 @@ public class JPPFDriver
 		classServer = null;
 		nodeNioServer.end();
 		nodeNioServer = null;
-		applicationServer.end();
-		applicationServer = null;
+		for (int i=0; i<applicationServers.length; i++)
+		{
+			applicationServers[i].end();
+			applicationServers[i] = null;
+		}
+		applicationServers = null;
 	}
 
 	/**
@@ -331,7 +339,7 @@ public class JPPFDriver
 	 * In that situation, the connection is broken and this driver knows that it must exit.
 	 * @param port the port to listen to.
 	 */
-	private static void runDriverListener(final int port)
+	private static void runLauncherListener(final int port)
 	{
 		Runnable r = new Runnable()
 		{
@@ -367,7 +375,7 @@ public class JPPFDriver
 			if (!"noLauncher".equals(args[0]))
 			{
 				int port = Integer.parseInt(args[0]);
-				runDriverListener(port);
+				runLauncherListener(port);
 			}
 
 			JPPFDriver driver = getInstance();

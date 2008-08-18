@@ -37,7 +37,7 @@ public class JPPFApplicationServer extends JPPFServer
 	 */
 	public JPPFApplicationServer(int port) throws JPPFException
 	{
-		super(port,"Application Server Thread");
+		super(port, "Application Server Thread on port " + port);
 	}
 	
 	/**

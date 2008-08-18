@@ -105,6 +105,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 		s.setTaskEvent(nodeState.getTaskNotification());
 		s.setTaskIdSet(nodeState.getAllTaskIds());
 		s.setThreadPoolSize(node.getExecutionManager().getThreadPoolSize());
+		s.setCpuTime(node.getExecutionManager().getCpuTime());
 		return s;
 	}
 
@@ -214,6 +215,25 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	{
 		JPPFSystemInformation info = new JPPFSystemInformation();
 		info.populate();
+		info.getRuntime().setProperty("cpuTime", ""+node.getExecutionManager().getCpuTime());
 		return info;
+	}
+
+	/**
+	 * Restart the node.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#restart()
+	 */
+	public void restart()
+	{
+		node.shutdown(true);
+	}
+
+	/**
+	 * Shutdown the node.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#shutdown()
+	 */
+	public void shutdown()
+	{
+		node.shutdown(false);
 	}
 }
