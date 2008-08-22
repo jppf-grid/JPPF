@@ -44,7 +44,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFJcaClient.class);
+	private static Log log = LogFactory.getLog(JPPFJcaClientConnection.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
@@ -88,7 +88,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 		}
 		catch(Exception e)
 		{
-			log.error(e);
+			log.debug(e);
 			setStatus(DISCONNECTED);
 		}
 		catch(JPPFError e)

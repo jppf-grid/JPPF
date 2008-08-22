@@ -72,6 +72,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 			System.out.println("Running Matrix demo with matrix size = "+size+"*"+size+" for "+iterations+" iterations");
 			NonBlockingMatrixRunner runner = new NonBlockingMatrixRunner();
 			runner.perform(size, iterations);
+			jppfClient.close();
 			System.exit(0);
 		}
 		catch(Exception e)
@@ -128,7 +129,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 				System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
 			}
 			JPPFStats stats = jppfClient.requestStatistics();
-			System.out.println("End statistics :\n"+stats.toString());
+			if (stats != null) System.out.println("End statistics :\n"+stats.toString());
 		}
 		catch(Exception e)
 		{

@@ -120,7 +120,13 @@ public class TaskNotificationRunner
 		while (!c.getStatus().equals(JPPFClientConnectionStatus.ACTIVE))
 			Thread.sleep(100L);
 		// query the driver's JMX server for the attached nodes
-		Collection<NodeManagementInfo> nodeList = c.getNodeManagementInfo();
+		Collection<NodeManagementInfo> nodeList = null;
+		int count = 20;
+		while ((count-- > 0) && (nodeList == null))
+		{
+			nodeList = c.getNodeManagementInfo();
+			if (nodeList == null) Thread.sleep(100L);
+		}
 		if (nodeList == null) return;
 		// establish the connection to every node
 		final List<JMXNodeConnectionWrapper> jmxConnections = new ArrayList<JMXNodeConnectionWrapper>();

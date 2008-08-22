@@ -18,6 +18,8 @@
 package org.jppf.scripting;
 
 import java.util.*;
+
+import org.apache.commons.logging.*;
 import org.mozilla.javascript.*;
 
 /**
@@ -26,6 +28,14 @@ import org.mozilla.javascript.*;
  */
 public class RhinoScriptRunner implements ScriptRunner
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(RhinoScriptRunner.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Contains information about the scripts execution environment.
 	 */
@@ -70,6 +80,7 @@ public class RhinoScriptRunner implements ScriptRunner
 		}
 		catch(EvaluatorException e)
 		{
+			if (debugEnabled) log.debug(e.getMessage(), e);
 		}
 		finally
 		{

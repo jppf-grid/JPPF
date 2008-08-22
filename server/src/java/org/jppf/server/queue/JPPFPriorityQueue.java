@@ -28,7 +28,7 @@ import org.jppf.io.BundleWrapper;
 import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**
- * 
+ * A JPPF queue whose elements are ordered by decreasing priority.
  * @author Laurent Cohen
  */
 public class JPPFPriorityQueue extends AbstractJPPFQueue
@@ -49,7 +49,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	/**
 	 * Add an object to the queue, and notify all listeners about it.
 	 * @param bundleWrapper the object to add to the queue.
-	 * @see org.jppf.server.queue.JPPFQueue#addBundle(org.jppf.server.protocol.JPPFTaskBundle)
+	 * @see org.jppf.server.queue.JPPFQueue#addBundle(org.jppf.io.BundleWrapper)
 	 */
 	public void addBundle(BundleWrapper bundleWrapper)
 	{
@@ -77,7 +77,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * Get the next object in the queue.
 	 * @param nbTasks the maximum number of tasks to get out of the bundle.
 	 * @return the most recent object that was added to the queue.
-	 * @see org.jppf.server.queue.JPPFQueue#nextBundle(JPPFTaskBundle, int)
+	 * @see org.jppf.server.queue.AbstractJPPFQueue#nextBundle(int)
 	 */
 	public BundleWrapper nextBundle(int nbTasks)
 	{
@@ -91,7 +91,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
 	 * @param nbTasks the maximum number of tasks to get out of the bundle.
 	 * @return the most recent object that was added to the queue.
-	 * @see org.jppf.server.queue.JPPFQueue#nextBundle(JPPFTaskBundle, int)
+	 * @see org.jppf.server.queue.AbstractJPPFQueue#nextBundle(org.jppf.io.BundleWrapper, int)
 	 */
 	public BundleWrapper nextBundle(BundleWrapper bundleWrapper, int nbTasks)
 	{

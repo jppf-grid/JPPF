@@ -20,6 +20,7 @@ package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
+import java.nio.channels.AsynchronousCloseException;
 import java.util.*;
 
 import org.apache.commons.logging.*;
@@ -265,11 +266,12 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	{
 		try
 		{
+			int count = taskList.size();
+			if (debugEnabled) log.debug("[client: "+name+"] sending "+count+" tasks");
 			TraversalList<String> uuidPath = new TraversalList<String>();
 			uuidPath.add(appUuid);
 			header.setUuidPath(uuidPath);
 			header.setCredentials(credentials);
-			int count = taskList.size();
 			header.setTaskCount(count);
 	
 			List<JPPFBuffer> bufList = new ArrayList<JPPFBuffer>();
@@ -325,6 +327,11 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			}
 			Pair<List<JPPFTask>, Integer> p = new Pair<List<JPPFTask>, Integer>(taskList, startIndex);
 			return p;
+		}
+		catch(AsynchronousCloseException e)
+		{
+			log.debug(e.getMessage(), e);
+			throw e;
 		}
 		catch(Exception e)
 		{

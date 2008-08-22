@@ -93,6 +93,7 @@ public class NonBlockingPoolMatrixRunner
 	
 			collector = new JPPFResultCollector[nbSubmissions];
 			// perform "iteration" times
+			long totalTime = 0L;
 			for (int iter=0; iter<iterations; iter++)
 			{
 				long start = System.currentTimeMillis();
@@ -128,10 +129,12 @@ public class NonBlockingPoolMatrixRunner
 					}
 				}
 				long elapsed = System.currentTimeMillis() - start;
+				totalTime += elapsed;
 				System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
 			}
+			System.out.println("Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
 			JPPFStats stats = jppfClient.requestStatistics();
-			System.out.println("End statistics :\n"+stats.toString());
+			if (stats != null) System.out.println("End statistics :\n"+stats.toString());
 		}
 		catch(Exception e)
 		{

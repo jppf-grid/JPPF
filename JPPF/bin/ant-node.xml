@@ -44,7 +44,7 @@
 	<target name="run.node">
 		<java fork="yes" classname="org.jppf.node.NodeLauncher" classpathref="run.classpath">
 			<jvmarg value="-server" />
-			<jvmarg value="-Xmx128m" />
+			<jvmarg value="-Xmx16m" />
 			<jvmarg value="-Dlog4j.configuration=log4j-node.properties" />
 			<jvmarg value="-Djppf.config=jppf-node.properties" />
 		</java>       

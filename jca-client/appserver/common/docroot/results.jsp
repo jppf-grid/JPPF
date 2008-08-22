@@ -7,15 +7,16 @@
 			String title = "Results";
 %>
 <%@ include file="block_header.jsp"%>
-		<table align="center" cellspacing="0" cellpadding="5">
+		<table width="500" cellspacing="0" cellpadding="5">
 			<tr><td height="5"></td></tr>
 			<tr><td align="center">
-				<h4>To refresh the list, please click on the &quot;Results&quot; button again
-				<h4>Clicking on one of the &quot;Submission ID&quot; links, this will also remove the submission from the queue
+				<h4>To refresh the list, please click on the &quot;Results&quot; button again</h4>
+				<h4>Clicking on one of the &quot;Submission ID&quot; links, this will also remove the submission from the queue</h4>
 			</td></tr>
 		</table>
 
-		<table align="center" cellspacing="0" cellpadding="5" border="1">
+		<div align="center">
+		<table cellspacing="0" cellpadding="5" border="1">
 			<tr>
 				<th colspan="2">Submissions Queue</th>
 			</tr>
@@ -64,5 +65,6 @@
 			}
 %>
 		</table>
+		</div>
 <%@ include file="block_footer.jsp"%>
 <%@ include file="footer.jsp"%>

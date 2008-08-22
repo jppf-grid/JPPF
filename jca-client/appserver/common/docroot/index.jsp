@@ -37,7 +37,7 @@
 			String title = "Submit a task";
 %>
 <%@ include file="block_header.jsp"%>
-		<table align="center" cellspacing="0" cellpadding="5">
+		<table width="600" align="center" cellspacing="0" cellpadding="5">
 			<tr><td height="5"></td></tr>
 			<tr><td align="center">
 				<h3>Click on the button to submit a task to JPPF</h3>

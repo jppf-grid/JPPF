@@ -12,11 +12,11 @@
 								</tr>
 								<tr>
 									<td width="10" style="background-image: url(images/blocks/filler.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
-									<td colspan="1" style="background-image: url(images/blocks/filler.gif); background-repeat: repeat; background-position: 0% 0%">
+									<td style="background-image: url(images/blocks/filler.gif); background-repeat: repeat; background-position: 0% 0%">
 										<span class='blockHeader'><%= title %></span><span style="font-size: 6pt"><br>&nbsp;</span>
 									</td>
 									<td width="10" style="background-image: url(images/blocks/filler.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
 								</tr>
 								<tr>
 									<td width="12" style="background-image: url(images/blocks/filler2.png); background-repeat: repeat-y; background-position: 0% 0%"/>
-									<td colspan="1" style="background-image: url(images/blocks/filler2.png); background-repeat: repeat; background-position: 0% 0%">
+									<td style="background-image: url(images/blocks/filler2.png); background-repeat: repeat; background-position: 0% 0%">

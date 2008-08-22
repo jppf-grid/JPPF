@@ -429,7 +429,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * Send an array of bytes over a TCP socket connection.
 	 * @param data the data to send.
 	 * @throws Exception if the underlying output stream throws an exception.
-	 * @see org.jppf.comm.socket.SocketWrapper#write(byte[])
+	 * @see org.jppf.comm.socket.SocketChannelClient#write(byte[],int,int)
 	 */
 	public void write(byte[] data) throws Exception
 	{

@@ -162,12 +162,8 @@ public class LoadBalancer
 		else if (connection != null)
 		{
 			ExecutionThread remoteThread = new RemoteExecutionThread(tasks, execution, connection);
-			if (!execution.isBlocking) remoteThread.start();
-			else
-			{
-				remoteThread.run();
-				if (remoteThread.getException() != null) throw remoteThread.getException();
-			}
+			remoteThread.run();
+			if (remoteThread.getException() != null) throw remoteThread.getException();
 		}
 		else throw new JPPFException("Null driver connection and local executor is "  + (localEnabled ? "busy" : "disabled"));
 	}

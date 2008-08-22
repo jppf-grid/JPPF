@@ -8,7 +8,7 @@
 %>
 <%@ include file="block_header.jsp"%>
 	<br>
-	<table align="center" cellspacing="0" cellpadding="5">
+	<table width="600" align="center" cellspacing="0" cellpadding="5">
 		<tr><td height="5"></td></tr>
 		<tr><td>
 			JPPF is a grid toolkit for Java that makes it easy to run applications in parallel,

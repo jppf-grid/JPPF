@@ -11,8 +11,7 @@
 						<tr><td class="noborder_">
 							$template{name="highlight-header" span="1" title="Grid Computing has never been easier"}$
 							<br><div style="text-align: justify">
-								JPPF is a grid computing framework for Java that makes it easy to run your applications in parallel, and speed up their execution by orders of magnitude.
-								Write once, deploy once, execute everywhere!
+								JPPF is an open source Grid Computing platform written in Java that makes it easy to run applications in parallel, and speed up their execution by orders of magnitude. Write once, deploy once, execute everywhere!
 							</div>
 							<br>
 							$template{name="highlight-bottom" span="1"}$
@@ -51,7 +50,7 @@
 						<tr><td class="noborder_">
 							$template{name="highlight-header" span="1" title="Licensing & Status"}$
 							<br>JPPF is licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0"><b>Apache License, Version 2.0</b></a>
-							<br>Latest stable version: Version 1.3
+							<br>Latest stable version: Version 1.4
 							$template{name="highlight-bottom" span="1"}$
 						</td></tr>
 
