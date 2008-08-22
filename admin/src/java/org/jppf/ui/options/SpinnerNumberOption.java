@@ -113,18 +113,18 @@ public class SpinnerNumberOption extends AbstractOption
 		{
 			try
 			{
-				value = Integer.valueOf((String) value);
+				this.value = Integer.valueOf((String) value);
 			}
 			catch(NumberFormatException e)
 			{
-				value = Integer.valueOf(min);
+				this.value = Integer.valueOf(min);
 			}
 		}
-		else if (value == null) value = Integer.valueOf(min);
-		this.value = value;
+		else if (!(value instanceof Number)) this.value = Integer.valueOf(min);
+		else this.value = Integer.valueOf(((Number) value).intValue());
 		if (spinner != null)
 		{
-			((SpinnerNumberModel) spinner.getModel()).setValue(value);
+			((SpinnerNumberModel) spinner.getModel()).setValue(this.value);
 		}
 	}
 
