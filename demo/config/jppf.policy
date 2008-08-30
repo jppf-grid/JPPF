@@ -81,6 +81,14 @@ permission java.util.PropertyPermission "os.name", "read";
 //permission javax.management.MBeanServerPermission "createMBeanServer";
 
 //------------------------------------------------------------------------------//
+// Management permissions.                                                      //
+// Please do not change these permissions. JPPF may not work any more if you do //
+//------------------------------------------------------------------------------//
+
+permission java.lang.management.ManagementPermission "control";
+permission java.lang.management.ManagementPermission "monitor";
+
+//------------------------------------------------------------------------------//
 // Permissions for running the node with the Java Wrapper.                      //
 // These permissions are required to run a JPPF node as service with the Java   //
 // Service Wrapper (see http://wrapper.tanukisoftware.org/ ).                   //
