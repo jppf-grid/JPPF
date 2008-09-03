@@ -143,7 +143,8 @@ public class JPPFClient extends AbstractJPPFClient
 	}
 
 	/**
-	 * Wait a maximum time specified in the configuration until the connections are initialized.
+	 * Wait a maximum time specified in the configuration until at least one connection is initialized.
+	 * After this time, control is returned to the main application, no matter how many connections are initialized. 
 	 */
 	private void waitForPools()
 	{
@@ -160,6 +161,7 @@ public class JPPFClient extends AbstractJPPFClient
 			}
 			catch(Exception ignored)
 			{
+				if (debugEnabled) log.debug(ignored.getMessage(), ignored);
 			}
 			elapsed += System.currentTimeMillis() - start;
 		}
@@ -179,7 +181,6 @@ public class JPPFClient extends AbstractJPPFClient
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getClientConnection(true);
 		if (c != null)
 		{
-			//return super.submit(taskList, dataProvider, policy);
 			JPPFResultCollector collector = new JPPFResultCollector(taskList.size());
 			c.submit(taskList, dataProvider, collector, policy);
 			return collector.waitForResults();
@@ -191,20 +192,6 @@ public class JPPFClient extends AbstractJPPFClient
 			JPPFClient.getLoadBalancer().execute(exec, c);
 			return collector.waitForResults();
 		}
-		/*
-		if (!pools.isEmpty() || LOCAL_EXEC_ENABLED)
-		{
-			if (LOCAL_EXEC_ENABLED)
-			{
-				JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getClientConnection(true);
-				JPPFResultCollector collector = new JPPFResultCollector(taskList.size());
-				ClientExecution exec = new ClientExecution(taskList, dataProvider, true, collector, policy);
-				JPPFClient.getLoadBalancer().execute(exec, c);
-				return collector.waitForResults();
-			}
-			return super.submit(taskList, dataProvider, policy);
-		}
-		*/
 		throw new JPPFException("Cannot execute: no driver connection available and local execution is disabled");
 	}
 
@@ -223,7 +210,6 @@ public class JPPFClient extends AbstractJPPFClient
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getClientConnection(true);
 		if (c != null)
 		{
-			//super.submitNonBlocking(taskList, dataProvider, listener, policy);
 			c.submit(taskList, dataProvider, listener, policy);
 			return;
 		}
@@ -234,19 +220,6 @@ public class JPPFClient extends AbstractJPPFClient
 			return;
 		}
 		throw new JPPFException("Cannot execute: no driver connection available and local execution is disabled");
-		/*
-		if (!pools.isEmpty() || LOCAL_EXEC_ENABLED)
-		{
-			if (LOCAL_EXEC_ENABLED)
-			{
-				JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getClientConnection(true);
-				ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener, policy);
-				JPPFClient.getLoadBalancer().execute(exec, c);
-			}
-			else super.submitNonBlocking(taskList, dataProvider, listener, policy);
-		}
-		else throw new JPPFException("Cannot execute: no driver connection available and local execution is disabled");
-		*/
 	}
 
 	/**

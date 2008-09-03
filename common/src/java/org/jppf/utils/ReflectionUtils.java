@@ -17,8 +17,11 @@
  */
  package org.jppf.utils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
+
+import org.jppf.server.protocol.JPPFRunnable;
 
 /**
  * Collection of static utility methods for dealing with reflection-based APIs.
@@ -226,5 +229,37 @@ public class ReflectionUtils
 	{
 		
 		return null;
+	}
+
+	/**
+	 * Determines whether a class has a JPPF-annotated method and can be executed as a task.
+	 * @param clazz the class to check.
+	 * @return true if the class can be executed as a task, false otherwise.
+	 */
+	public static boolean isJPPFAnnotated(Class<?> clazz)
+	{
+		if (clazz == null) return false;
+		for (Method m: clazz.getDeclaredMethods())
+		{
+			if (isJPPFAnnotated(m)) return true;
+		}
+		return false;
+	}
+
+
+	/**
+	 * Determines whether a method is JPPF-annotated and can be executed as a task.
+	 * @param method the method to check.
+	 * @return true if the method can be executed as a task, false otherwise.
+	 */
+	public static boolean isJPPFAnnotated(Method method)
+	{
+		if (method == null) return false;
+		Annotation[] annotations = method.getDeclaredAnnotations();
+		for (Annotation a: annotations)
+		{
+			if (JPPFRunnable.class.equals(a.annotationType())) return true;
+		}
+		return false;
 	}
 }

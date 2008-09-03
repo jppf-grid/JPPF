@@ -22,7 +22,7 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.client.event.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 
 /**
  * Implementation of the {@link org.jppf.client.event.TaskResultListener TaskResultListener} interface
@@ -50,9 +50,13 @@ public class JPPFResultCollector implements TaskResultListener
 	 */
 	private Map<Integer, List<JPPFTask>> resultMap = new TreeMap<Integer, List<JPPFTask>>();
 	/**
-	 * The list of final results.
+	 * The list of final resulting taskss.
 	 */
 	private List<JPPFTask> results = null;
+	/**
+	 * The list of final result objects.
+	 */
+	private List<Object> resultObjects = null;
 
 	/**
 	 * Initialize this collector with a specified number of tasks. 
@@ -105,11 +109,39 @@ public class JPPFResultCollector implements TaskResultListener
 	}
 
 	/**
+	 * Wait until all result objects of a request have been collected.
+	 * @return the list of resulting objects, either tasks or JPPF-annotated objects.
+	 */
+	public synchronized List<Object> waitForResultObjects()
+	{
+		if (resultObjects == null)
+		{
+			waitForResults();
+			resultObjects = new ArrayList<Object>();
+			for (JPPFTask t: results)
+			{
+				resultObjects.add(
+					t instanceof JPPFAnnotatedTask ? ((JPPFAnnotatedTask) t).getResult() : t);
+			}
+		}
+		return resultObjects;
+	}
+
+	/**
 	 * Get the list of final results.
 	 * @return a list of results as tasks, or null if not all tasks have been executed.
 	 */
 	public List<JPPFTask> getResults()
 	{
 		return results;
+	}
+
+	/**
+	 * Get the list of final result objects.
+	 * @return a list of results as tasks, or null if not all tasks have been executed.
+	 */
+	public List<Object> getObjectResults()
+	{
+		return resultObjects;
 	}
 }

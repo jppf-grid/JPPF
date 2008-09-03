@@ -19,7 +19,7 @@ package org.jppf.client.event;
 
 import java.util.*;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 
 /**
  * Event object used to notify interested listeners that a list of task results
@@ -28,6 +28,10 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class TaskResultEvent extends EventObject
 {
+	/**
+	 * The list of task objects, including those wrapped as <code>JPPFAnnotatedTask</code>.
+	 */
+	private List<Object> results = null;
 	/**
 	 * Index of the first task in the list, relative to the initial execution request.
 	 */
@@ -49,10 +53,27 @@ public class TaskResultEvent extends EventObject
 	 * Get the list of tasks whose results have been received from the server.
 	 * @return a list of <code>JPPFTask</code> instances.
 	 */
-	@SuppressWarnings("unchecked")
 	public List<JPPFTask> getTaskList()
 	{
 		return (List<JPPFTask>) getSource();
+	}
+
+	/**
+	 * Get the list of task objects, including those wrapped as <code>JPPFAnnotatedTask</code>.
+	 * @return a list of objects.
+	 */
+	public List<Object> getResults()
+	{
+		if (results == null)
+		{
+			results = new ArrayList<Object>();
+			List<JPPFTask> tasks = (List<JPPFTask>) getSource();
+			for (JPPFTask t: tasks)
+			{
+				results.add(t instanceof JPPFAnnotatedTask ? ((JPPFAnnotatedTask) t).getResult() : t);
+			}
+		}
+		return results;
 	}
 
 	/**

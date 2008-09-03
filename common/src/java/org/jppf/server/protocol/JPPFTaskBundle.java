@@ -49,26 +49,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	}
 
 	/**
-	 * Type safe enum for the type of request.
-	 * @deprecated statistics and admin command are now provided via JMX.
-	 */
-	public enum Type
-	{ 
-		/**
-		 * Task execution request.
-		 */
-		EXECUTION,
-		/**
-		 * Administration request.
-		 */
-		ADMIN,
-		/**
-		 * Statistics collection request.
-		 */
-		STATISTICS
-	};
-
-	/**
 	 * The unique identifier for this task bundle.
 	 */
 	private String uuid = null;
@@ -129,11 +109,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * the server or for transporting tasks to execute.
 	 */
 	private State state = State.EXECUTION_BUNDLE;
-	/**
-	 * The type of this request.
-	 * @deprecated since JMX is used for monitoring and admin, task bundles are only used for execution.
-	 */
-	private Type requestType = Type.EXECUTION;
 	/**
 	 * Map holding the parameters of the request.
 	 */
@@ -448,27 +423,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	{
 		return initialTaskCount;
 	}
-
-	/**
-	 * Get the type of this request.
-	 * @return the type as a string.
-	 * @deprecated since JMX is used for monitoring and admin, task bundles are only used for execution.
-	 */
-	public Type getRequestType()
-	{
-		return requestType;
-	}
-
-	/**
-	 * Set the type of this request.
-	 * @param requestType the type as a string.
-	 * @deprecated since JMX is used for monitoring and admin, task bundles are only used for execution.
-	 */
-	public void setRequestType(Type requestType)
-	{
-		this.requestType = requestType;
-	}
-
 
 	/**
 	 * Set a parameter of this request.

@@ -22,8 +22,8 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
-import org.jppf.client.JPPFClient;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.client.*;
+import org.jppf.server.protocol.*;
 import org.jppf.task.storage.*;
 import org.jppf.utils.StringUtils;
 
@@ -69,8 +69,9 @@ public class TestTaskRunner
 			performTimeoutTaskTest();
 			performAnonymousInnerClassTaskTest();
 			performOutOfMemoryTest();
-			*/
 			performLargeDataTest();
+			*/
+			performAnnotatedTaskTest();
 		}
 		catch(Exception e)
 		{
@@ -538,6 +539,33 @@ public class TestTaskRunner
 		finally
 		{
 			System.out.println("OOM testing complete.");
+		}
+	}
+
+	/**
+	 * Test an annotated task.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void performAnnotatedTaskTest() throws JPPFException
+	{
+		System.out.println(banner);
+		System.out.println("Starting annotation testing...");
+		try
+		{
+			JPPFJob job = new JPPFJob();
+			job.addTask(new TestAnnotatedTask(), 11, "test string");
+			List<JPPFTask> results = jppfClient.submit(job);
+			JPPFTask res = results.get(0);
+			if (res.getException() != null) throw res.getException();
+			System.out.println("result is : " + res.getResult());
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e);
+		}
+		finally
+		{
+			System.out.println("annotation testing complete.");
 		}
 	}
 }

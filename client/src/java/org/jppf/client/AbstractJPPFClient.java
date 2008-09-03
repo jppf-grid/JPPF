@@ -25,7 +25,7 @@ import org.jppf.JPPFError;
 import org.jppf.client.event.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.security.JPPFSecurityContext;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.JPPFUuid;
 
@@ -261,6 +261,23 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		throws Exception
 	{
 		getClientConnection().submit(taskList, dataProvider, listener, policy);
+	}
+
+	/**
+	 * Submit a JPPFJob for execution.
+	 * @param job the job to execute.
+	 * @return the results of the tasks' execution, as a list of <code>JPPFTask</code> instances.
+	 * @throws Exception if an error occurs while sending the job for execution.
+	 */
+	public List<JPPFTask> submit(JPPFJob job) throws Exception
+	{
+		if (job.isBlocking())
+		{
+			List<JPPFTask> results = submit(job.getTasks(), job.getDataProvider(), job.getExecutionPolicy());
+			return results;
+		}
+		submitNonBlocking(job.getTasks(), job.getDataProvider(), job.getResultListener(), job.getExecutionPolicy());
+		return null;
 	}
 
 	/**

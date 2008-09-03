@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.client.JPPFClient;
+import org.jppf.client.*;
 import org.jppf.node.policy.*;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
@@ -123,7 +123,7 @@ public class MatrixRunner
 		long start = System.currentTimeMillis();
 		int size = a.getSize();
 		// create a task for each row in matrix a
-		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+		JPPFJob job = new JPPFJob();
 		int remaining = size;
 		for (int i=0; i<size; i+= nbRows)
 		{
@@ -135,22 +135,21 @@ public class MatrixRunner
 			}
 			else rows = new double[remaining][];
 			for (int j=0; j<rows.length; j++) rows[j] = a.getRow(i + j);
-			tasks.add(new ExtMatrixTask(rows));
+			job.addTask(new ExtMatrixTask(rows));
 		}
 		// create a data provider to share matrix b among all tasks
-		DataProvider dataProvider = new MemoryMapDataProvider();
-		dataProvider.setValue(MatrixTask.DATA_KEY, b);
+		job.setDataProvider(new MemoryMapDataProvider());
+		job.getDataProvider().setValue(MatrixTask.DATA_KEY, b);
 		// determine if an optional execution policy is to be used.
 		ExecutionPolicy policy = null;
 		String s = JPPFConfiguration.getProperties().getString("jppf.execution.policy");
 		if (s != null)
 		{
 			PolicyParser.validatePolicy(s);
-			policy = PolicyParser.parsePolicy(s);
+			job.setExecutionPolicy(PolicyParser.parsePolicy(s));
 		}
 		// submit the tasks for execution
-		List<JPPFTask> results = jppfClient.submit(tasks, dataProvider, policy);
-		//List<JPPFTask> results = performLocalExecution(tasks, dataProvider);
+		List<JPPFTask> results = jppfClient.submit(job);
 		// initialize the resulting matrix
 		Matrix c = new Matrix(size);
 		// Get the matrix values from the tasks results
