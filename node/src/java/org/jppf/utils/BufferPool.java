@@ -75,20 +75,23 @@ public final class BufferPool
 		ByteBuffer result = null;
 		synchronized(bufferPool)
 		{
-			if (bufferPool.isEmpty())
+			while (result == null)
 			{
-				result = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
-				nbAllocatedBuffers++;
-				if (debugEnabled) log.debug("allocated buffers: " + nbAllocatedBuffers);
-			}
-			else
-			{
-				BufferReference ref = bufferPool.remove();
-				ref.setRemovedFromPool(true);
-				result = ref.get();
-				//ref.clear();
-				nbBuffersInPool--;
-				if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
+				if (bufferPool.isEmpty())
+				{
+					result = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
+					nbAllocatedBuffers++;
+					if (debugEnabled) log.debug("allocated buffers: " + nbAllocatedBuffers);
+				}
+				else
+				{
+					BufferReference ref = bufferPool.remove();
+					ref.setRemovedFromPool(true);
+					result = ref.get();
+					//ref.clear();
+					nbBuffersInPool--;
+					if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
+				}
 			}
 		}
 		return result;
@@ -100,6 +103,7 @@ public final class BufferPool
 	 */
 	public static void releaseBuffer(ByteBuffer buffer)
 	{
+		if (buffer == null) return;
 		buffer.clear();
 		synchronized(bufferPool)
 		{
