@@ -414,10 +414,8 @@
 		<copy tofile="${runtime.node}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.node}/config">
 			<fileset dir="${config}/node">
-				<!--
-				<exclude name="jppf.policy"/>
 				<exclude name="*.bat"/>
-				-->
+				<exclude name="JPPFNode"/>
 			</fileset>
 		</copy>
 		<copy todir="${runtime.node}">
@@ -425,6 +423,7 @@
 				<exclude name="*.properties"/>
 				<exclude name="*.policy"/>
 				<include name="*.bat"/>
+				<include name="JPPFNode"/>
 			</fileset>
 		</copy>
 		<copy tofile="${runtime.node}/build.xml" file="${bin}/ant-node.xml"/>
@@ -432,7 +431,7 @@
 			value="${build}/${ant.project.name}-node-bin-${version.number}-${build.number}-${now}.zip"/>
 		<delete file="${runtime.node.file}" quiet="true"/>
 		<zip destfile="${runtime.node.file}">
-			<zipfileset dir="${runtime.node}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-node"/>
+			<zipfileset dir="${runtime.node}" prefix="${ant.project.name}-${version.number}-node"/>
 		</zip>
     <delete dir="${runtime.node}" quiet="true"/>
 	</target>

@@ -1,3 +1,4 @@
+@echo off
 rem Java Parallel Processing Framework.
 rem Copyright (C) 2005-2008 JPPF Team.
 rem http://www.jppf.org
@@ -14,7 +15,6 @@ rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 rem See the License for the specific language governing permissions and
 rem limitations under the License.
 
-@echo off
 setlocal
 
 rem Copyright (c) 1999, 2006 Tanuki Software Inc.
