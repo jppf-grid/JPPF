@@ -112,7 +112,7 @@ public class ProcessLauncher
 		command.add(System.getProperty("java.class.path"));
 		command.add("-D"+JPPFConfiguration.CONFIG_PROPERTY+"="+System.getProperty(JPPFConfiguration.CONFIG_PROPERTY));
 		command.add("-Dlog4j.configuration="+System.getProperty("log4j.configuration"));
-		command.add("-server");
+		//command.add("-server");
 		int n = JPPFConfiguration.getProperties().getInt("max.memory.option", 128);
 		command.add("-Xmx" + n + "m");
 		String s = JPPFConfiguration.getProperties().getString("other.jvm.options");
