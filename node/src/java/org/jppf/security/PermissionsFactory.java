@@ -184,6 +184,10 @@ public final class PermissionsFactory
 					continue;
 				}
 				line = line.substring("permission".length());
+				if (line.indexOf("PropertyPermission") >= 0)
+				{
+					String breakpoint = "pause here";
+				}
 				if (!line.endsWith(";"))
 				{
 					err(file, count, " should end with \";\"");
@@ -363,7 +367,7 @@ public final class PermissionsFactory
 			int idx = source.indexOf("${", pos);
 			if (idx < 0)
 			{
-				if (pos < length - 1) sb.append(source.substring(pos));
+				if (pos <= length - 1) sb.append(source.substring(pos));
 				break;
 			}
 			if (idx > pos) sb.append(source.substring(pos, idx));
