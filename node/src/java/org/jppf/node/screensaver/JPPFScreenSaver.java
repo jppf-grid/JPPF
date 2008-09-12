@@ -28,6 +28,7 @@ import org.jppf.utils.*;
 /**
  * A panel that serves as a GUI on top of a JPPF node, displayed as a screen saver.
  * @author Laurent Cohen
+ * @author nissalia
  */
 public class JPPFScreenSaver extends SimpleScreensaver
 {
@@ -75,6 +76,14 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	 * The image object for the flying logos.
 	 */
 	private Image logoImg = null;
+	/**
+	 * Buffer used for offline rpainting of the background and drawing of the logos.
+	 */
+	private Image buffer = null;
+	/**
+	 * Graphics object associated with the buffer.
+	 */
+	private Graphics bufferGraphics = null;
 
 	/**
 	 * Default constructor.
@@ -104,6 +113,8 @@ public class JPPFScreenSaver extends SimpleScreensaver
 					}
 				});
 			}
+			Frame frame = Frame.getFrames()[0];
+			frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		}
 		catch(Exception e)
 		{
@@ -250,7 +261,7 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	/**
 	 * Data structure holding the position and direction of a flying logo.
 	 */
-	private static class ImageData
+	private static class ImageData implements Cloneable
 	{
 		/**
 		 * The previous position on the x axis.
@@ -444,19 +455,30 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	public void updateLogos()
 	{
 		Graphics g = parent.getGraphics();
-		Shape clip = g.getClip();
+    if (buffer == null)
+    {
+			buffer = parent.createImage(parent.getWidth(),parent.getHeight());
+			bufferGraphics = buffer.getGraphics();
+    }
+		Shape clip = bufferGraphics.getClip();
 		for (ImageData d: data)
 		{
 			synchronized(d)
 			{
-				g.setClip(d.prevx, d.prevy, imgw, imgh);
-				parent.paint(g);
-				node.paint(g);
-				g.drawImage(logoImg, d.x, d.y, node);
+				int minx = Math.min(d.prevx, d.x);
+				int maxx = Math.max(d.prevx, d.x);
+				int miny = Math.min(d.prevy, d.y);
+				int maxy = Math.max(d.prevy, d.y);
+				int w = maxx - minx + imgw;
+				int h = maxy - miny + imgh;
+				bufferGraphics.setClip(minx, miny, w, h);
+				parent.paint(bufferGraphics);
+				bufferGraphics.drawImage(logoImg, d.x, d.y, parent);
 				d.prevx = d.x;
 				d.prevy = d.y;
+				g.drawImage(buffer, minx, miny, minx + w, miny + h, minx, miny, minx + w, miny + h, parent);
 			}
 		}
-		g.setClip(clip);
+		bufferGraphics.setClip(clip);
 	}
 }
