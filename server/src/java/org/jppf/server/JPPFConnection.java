@@ -37,6 +37,10 @@ public abstract class JPPFConnection extends Thread
 	 */
 	private static Log log = LogFactory.getLog(JPPFConnection.class);
 	/**
+	 * Determines whether DEBUG logging level is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * The socket client used to communicate over a socket connection.
 	 */
 	protected SocketWrapper socketClient = null;
@@ -92,7 +96,8 @@ public abstract class JPPFConnection extends Thread
 		}
 		catch (Exception e)
 		{
-			log.error(e.getMessage(), e);
+			if (debugEnabled) log.debug(e.getMessage(), e);
+			else log.warn(e);
 			setClosed();
 			server.removeConnection(this);
 		}
