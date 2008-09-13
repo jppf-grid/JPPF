@@ -90,7 +90,7 @@ public class NodeInformationAction implements ActionListener
 		}
 		catch(Exception e)
 		{
-			s = StringUtils.getStackTrace(e);
+			s = StringUtils.getStackTrace(e).replace("\n", "<br>");
 		}
 		final JFrame frame = new JFrame("Node System Information");
 		if (iconImage != null) frame.setIconImage(iconImage);
