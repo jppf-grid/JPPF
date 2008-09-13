@@ -26,7 +26,7 @@ import org.jppf.process.ProcessLauncher;
 public class NodeLauncher
 {
 	/**
-	 * Start this application, then the JPPF driver a subprocess.
+	 * Start this application, then the JPPF driver as a subprocess.
 	 * @param args not used.
 	 */
 	public static void main(String...args)
