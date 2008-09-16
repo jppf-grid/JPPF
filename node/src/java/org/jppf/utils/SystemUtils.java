@@ -19,6 +19,7 @@
 package org.jppf.utils;
 
 import java.net.*;
+import java.security.*;
 import java.util.*;
 
 import org.apache.commons.logging.*;
@@ -82,7 +83,16 @@ public final class SystemUtils
 	{
 		try
 		{
-			Enumeration en = System.getProperties().propertyNames();
+			// run as priviledged so we don't have to set write access on all propeorties
+			// in the security policy file. 
+			Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>()
+			{
+				public Properties run()
+				{
+					return System.getProperties();
+				}
+			});
+			Enumeration en = sysProps.propertyNames();
 			while (en.hasMoreElements())
 			{
 				String name = (String) en.nextElement();
@@ -93,12 +103,14 @@ public final class SystemUtils
 				catch(SecurityException e)
 				{
 					if (debugEnabled) log.debug(e.getMessage(), e);
+					else log.info(e);
 				}
 			}
 		}
 		catch(SecurityException e)
 		{
 			if (debugEnabled) log.debug(e.getMessage(), e);
+			else log.info(e);
 		}
 	}
 
@@ -118,6 +130,7 @@ public final class SystemUtils
 		{
 			s = e.getMessage();
 			if (debugEnabled) log.debug(e.getMessage(), e);
+			else log.info(e);
 		}
 		if (s != null) props.setProperty(name, s);
 	}
@@ -138,6 +151,7 @@ public final class SystemUtils
 		{
 			s = e.getMessage();
 			if (debugEnabled) log.debug(e.getMessage(), e);
+			else log.info(e);
 		}
 		props.setProperty("availableProcessors", s);
 		try
@@ -148,6 +162,7 @@ public final class SystemUtils
 		{
 			s = e.getMessage();
 			if (debugEnabled) log.debug(e.getMessage(), e);
+			else log.info(e);
 		}
 		props.setProperty("freeMemory", s);
 		try
@@ -158,6 +173,7 @@ public final class SystemUtils
 		{
 			s = e.getMessage();
 			if (debugEnabled) log.debug(e.getMessage(), e);
+			else log.info(e);
 		}
 		props.setProperty("totalMemory", s);
 		try
@@ -168,6 +184,7 @@ public final class SystemUtils
 		{
 			s = e.getMessage();
 			if (debugEnabled) log.debug(e.getMessage(), e);
+			else log.info(e);
 		}
 		props.setProperty("maxMemory", s);
 
@@ -194,6 +211,7 @@ public final class SystemUtils
 			catch(SecurityException e)
 			{
 				if (debugEnabled) log.debug(e.getMessage(), e);
+				else log.info(e);
 			}
 		}
 		return env;
@@ -216,6 +234,7 @@ public final class SystemUtils
 			catch(SecurityException e)
 			{
 				if (debugEnabled) log.debug(e.getMessage(), e);
+				else log.info(e);
 			}
 		}
 		return network;
