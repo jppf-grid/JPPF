@@ -159,7 +159,6 @@ public abstract class AbstractMonitoredNode implements MonitoredNode
 	public synchronized void setTaskCount(int taskCount)
 	{
 		this.taskCount = taskCount;
-		fireNodeEvent(taskCount);
 	}
 
 	/**

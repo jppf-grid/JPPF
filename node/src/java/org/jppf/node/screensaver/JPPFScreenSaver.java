@@ -127,7 +127,9 @@ public class JPPFScreenSaver extends SimpleScreensaver
 		parent.setBackground(Color.BLACK);
     Dimension fullSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-		if (node == null) node = new NodePanel(getContext().isFullScreen());
+		//boolean activate = getContext().isFullScreen() || ((Frame.getFrames()[0].getExtendedState() & Frame.MAXIMIZED_BOTH) > 0);
+		boolean activate = getContext().isFullScreen();
+		if (node == null) node = new NodePanel(activate);
 		node.setDoubleBuffered(true);
 		parent.add(node);
 		initializeFlyingLogos();

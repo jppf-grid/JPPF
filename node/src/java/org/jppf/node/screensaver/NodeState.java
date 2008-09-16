@@ -19,6 +19,7 @@ package org.jppf.node.screensaver;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.*;
 
@@ -36,7 +37,7 @@ public class NodeState implements NodeListener
 	/**
 	 * Number of tasks executed by the node.
 	 */
-	public int taskCount = 0;
+	public AtomicInteger taskCount = new AtomicInteger(0);
 	/**
 	 * Holds the statuses for the node connection and tasks execution.
 	 */
@@ -88,7 +89,7 @@ public class NodeState implements NodeListener
 				statusLabels[i][j].setBackground(Color.BLACK);
 			}
 		}
-		countLabel = new JLabel(""+taskCount);
+		countLabel = new JLabel("" + taskCount);
 		d = new Dimension(60, 20);
 		countLabel.setMinimumSize(d);
 		countLabel.setMaximumSize(d);
@@ -152,37 +153,39 @@ public class NodeState implements NodeListener
 	public void eventOccurred(NodeEvent event)
 	{
 		NodeEventType type = event.getType();
-		if (NodeEventType.START_CONNECT.equals(type))
+		switch (event.getType())
 		{
-			statusLabels[0][0].setIcon(NodePanel.DARK_GREEN);
-			statusLabels[0][1].setIcon(NodePanel.BRIGHT_RED);
-		}
-		else if (NodeEventType.END_CONNECT.equals(type))
-		{
-			statusLabels[0][0].setIcon(NodePanel.BRIGHT_GREEN);
-			statusLabels[0][1].setIcon(NodePanel.DARK_RED);
-		}
-		else if (NodeEventType.DISCONNECTED.equals(type))
-		{
-			statusLabels[0][0].setIcon(NodePanel.DARK_GREEN);
-			statusLabels[0][1].setIcon(NodePanel.BRIGHT_RED);
-			statusLabels[1][0].setIcon(NodePanel.DARK_GREEN);
-			statusLabels[1][1].setIcon(NodePanel.DARK_RED);
-		}
-		else if (NodeEventType.START_EXEC.equals(type))
-		{
-			statusLabels[1][0].setIcon(NodePanel.BRIGHT_GREEN);
-			statusLabels[1][1].setIcon(NodePanel.DARK_RED);
-		}
-		else if (NodeEventType.END_EXEC.equals(type))
-		{
-			statusLabels[1][0].setIcon(NodePanel.DARK_GREEN);
-			statusLabels[1][1].setIcon(NodePanel.BRIGHT_RED);
-		}
-		else if (NodeEventType.TASK_EXECUTED.equals(type))
-		{
-			taskCount++;
-			countLabel.setText(""+taskCount);
+			case START_CONNECT:
+				statusLabels[0][0].setIcon(NodePanel.DARK_GREEN);
+				statusLabels[0][1].setIcon(NodePanel.BRIGHT_RED);
+				break;
+
+			case END_CONNECT:
+				statusLabels[0][0].setIcon(NodePanel.BRIGHT_GREEN);
+				statusLabels[0][1].setIcon(NodePanel.DARK_RED);
+				break;
+
+			case DISCONNECTED:
+				statusLabels[0][0].setIcon(NodePanel.DARK_GREEN);
+				statusLabels[0][1].setIcon(NodePanel.BRIGHT_RED);
+				statusLabels[1][0].setIcon(NodePanel.DARK_GREEN);
+				statusLabels[1][1].setIcon(NodePanel.DARK_RED);
+				break;
+
+			case START_EXEC:
+				statusLabels[1][0].setIcon(NodePanel.BRIGHT_GREEN);
+				statusLabels[1][1].setIcon(NodePanel.DARK_RED);
+				break;
+
+			case END_EXEC:
+				statusLabels[1][0].setIcon(NodePanel.DARK_GREEN);
+				statusLabels[1][1].setIcon(NodePanel.BRIGHT_RED);
+				break;
+
+			case TASK_EXECUTED:
+				int n = taskCount.incrementAndGet();
+				countLabel.setText("" + n);
+				break;
 		}
 	}
 }
