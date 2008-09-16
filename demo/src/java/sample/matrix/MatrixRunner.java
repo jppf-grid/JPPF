@@ -95,13 +95,13 @@ public class MatrixRunner
 			{
 				long elapsed = performParallelMultiplication(a, b, nbRows);
 				totalIterationTime += elapsed;
-				output("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
+				output("Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
 			}
 			output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations));
 			if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled"))
 			{
 				JPPFStats stats = jppfClient.requestStatistics();
-				output("End statistics :\n"+stats.toString());
+				output("End statistics :\n" + stats.toString());
 			}
 		}
 		catch(Exception e)
