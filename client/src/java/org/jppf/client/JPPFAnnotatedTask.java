@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
+package org.jppf.client;
 
 import java.lang.reflect.*;
 import java.security.*;
 
+import org.jppf.server.protocol.*;
 import org.jppf.utils.ReflectionUtils;
 
 
@@ -39,13 +40,23 @@ public class JPPFAnnotatedTask extends JPPFTask
 	 */
 	private Object[] args = null;
 	/**
+	 * Specifies whether the object task is was specified as a class.
+	 */
+	private boolean isClass = false;
+
+	/**
 	 * Initialize this task with an object whose class is annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}.
 	 * @param taskObject a <code>JPPFRunnable</code>-annotated object.
 	 * @param args a <code>JPPFRunnable</code>-annotated object.
 	 */
 	public JPPFAnnotatedTask(Object taskObject, Object...args)
 	{
-		this.taskObject = taskObject;
+		if (taskObject instanceof Class)
+		{
+			this.taskObject = ((Class) taskObject).getName();
+			isClass = true;
+		}
+		else this.taskObject = taskObject;
 		this.args = args;
 	}
 
@@ -58,7 +69,9 @@ public class JPPFAnnotatedTask extends JPPFTask
 		try
 		{
 			if (taskObject == null) return;
-			Class clazz = taskObject.getClass();
+			Class clazz = null;
+			if (isClass) clazz = Class.forName((String) taskObject);
+			else clazz = taskObject.getClass();
 			Method[] methods = clazz.getDeclaredMethods();
 			for (Method m: methods)
 			{
@@ -110,5 +123,14 @@ public class JPPFAnnotatedTask extends JPPFTask
 			}
 		});
 		return result;
+	}
+
+	/**
+	 * Get the <code>JPPFRunnable</code>-annotated object wrapped by this task.
+	 * @return an objet or class that is JPPF-annotated.
+	 */
+	public Object getTaskObject()
+	{
+		return taskObject;
 	}
 }

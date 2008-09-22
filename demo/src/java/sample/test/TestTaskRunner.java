@@ -554,6 +554,7 @@ public class TestTaskRunner
 		{
 			JPPFJob job = new JPPFJob();
 			job.addTask(new TestAnnotatedTask(), 11, "test string");
+			job.addTask(TestAnnotatedStaticTask.class, 22, "test string (static method)");
 			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask res = results.get(0);
 			if (res.getException() != null) throw res.getException();

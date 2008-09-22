@@ -19,6 +19,7 @@ package org.jppf.client.event;
 
 import java.util.*;
 
+import org.jppf.client.JPPFAnnotatedTask;
 import org.jppf.server.protocol.*;
 
 /**

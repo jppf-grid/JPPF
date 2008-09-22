@@ -28,7 +28,9 @@ import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.ReflectionUtils;
 
 /**
- * 
+ * Instances of this class represent a JPPF submission and hold all the required eleemnts:
+ * tasks, execution policy, task listenr, data provider.<br>
+ * This class also provides the API for handling JPPF-annotated tasks.
  * @author Laurent Cohen
  */
 public class JPPFJob
@@ -63,85 +65,51 @@ public class JPPFJob
 
 	/**
 	 * Initialize a blocking job with the specified parameters.
-	 * @param tasks the list of tasks to execute.
-	 * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
-	 */
-	public JPPFJob(List<Object> tasks) throws JPPFException
-	{
-		this(tasks, null, (ExecutionPolicy) null);
-	}
-
-	/**
-	 * Initialize a blocking job with the specified parameters.
-	 * @param tasks the list of tasks to execute.
 	 * @param dataProvider the container for data shared between tasks.
-	 * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
 	 */
-	public JPPFJob(List<Object> tasks, DataProvider dataProvider) throws JPPFException
+	public JPPFJob(DataProvider dataProvider)
 	{
-		this(tasks, dataProvider, (ExecutionPolicy) null);
+		this(dataProvider, (ExecutionPolicy) null);
 	}
 
 	/**
 	 * Initialize a blocking job with the specified parameters.
-	 * @param tasks the list of tasks to execute.
 	 * @param dataProvider the container for data shared between tasks.
 	 * @param executionPolicy the tasks execution policy.
-	 * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
 	 */
-	public JPPFJob(List<Object> tasks, DataProvider dataProvider, ExecutionPolicy executionPolicy)
-		throws JPPFException
+	public JPPFJob(DataProvider dataProvider, ExecutionPolicy executionPolicy)
 	{
-		this(tasks, dataProvider, executionPolicy, null);
+		this(dataProvider, executionPolicy, null);
 		blocking = true;
 	}
 
 	/**
 	 * Initialize a non-blocking job with the specified parameters.
-	 * @param tasks the list of tasks to execute.
 	 * @param resultsListener the listener that receives notifications of completed tasks.
-	 * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
 	 */
-	public JPPFJob(List<Object> tasks, TaskResultListener resultsListener) throws JPPFException
+	public JPPFJob(TaskResultListener resultsListener)
 	{
-		this(tasks, null, null, resultsListener);
+		this(null, null, resultsListener);
 	}
 
 	/**
 	 * Initialize a non-blocking job with the specified parameters.
-	 * @param tasks the list of tasks to execute.
 	 * @param dataProvider the container for data shared between tasks.
 	 * @param resultsListener the listener that receives notifications of completed tasks.
-	 * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
 	 */
-	public JPPFJob(List<Object> tasks, DataProvider dataProvider, TaskResultListener resultsListener)
-		throws JPPFException
+	public JPPFJob(DataProvider dataProvider, TaskResultListener resultsListener)
 	{
-		this(tasks, dataProvider, null, resultsListener);
+		this(dataProvider, null, resultsListener);
 	}
 
 	/**
 	 * Initialize a non-blocking job with the specified parameters.
-	 * @param tasks the list of tasks to execute.
 	 * @param dataProvider the container for data shared between tasks.
 	 * @param executionPolicy the tasks execution policy.
 	 * @param resultsListener the listener that receives notifications of completed tasks.
-	 * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
 	 */
-	public JPPFJob(List<Object> tasks, DataProvider dataProvider, ExecutionPolicy executionPolicy, TaskResultListener resultsListener)
-		throws JPPFException
+	public JPPFJob(DataProvider dataProvider, ExecutionPolicy executionPolicy, TaskResultListener resultsListener)
 	{
-		if (tasks != null)
-		{
-			for (int i=0; i<tasks.size(); i++)
-			{
-				Object o = tasks.get(i);
-				if (o instanceof JPPFTask) continue;
-				if ((o == null) || !ReflectionUtils.isJPPFAnnotated(o.getClass()))
-					throw new JPPFException("object '" + o + "' at index " + i + " is not a JPPFTask nor JPPF-annotated");
-			}
-			setTasks(tasks);
-		}
 		this.dataProvider = dataProvider;
 		this.executionPolicy = executionPolicy;
 		this.resultsListener = resultsListener;
@@ -158,21 +126,6 @@ public class JPPFJob
 	}
 
 	/**
-	 * Set the list of tasks to execute.
-	 * @param tasks a list of objects.
-	 * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
-	 */
-	public void setTasks(List<Object> tasks) throws JPPFException
-	{
-		if (this.tasks == null) this.tasks = new ArrayList<JPPFTask>();
-		for (Object o: tasks)
-		{
-			if (o instanceof JPPFTask) this.tasks.add((JPPFTask) o);
-			else this.tasks.add(new JPPFAnnotatedTask(o));
-		}
-	}
-
-	/**
 	 * Add a task to this job.
 	 * @param taskObject the task to add to this job.
 	 * @param args arguments to use with a JPPF-annotated class.
@@ -180,10 +133,19 @@ public class JPPFJob
 	 */
 	public void addTask(Object taskObject, Object...args) throws JPPFException
 	{
+		JPPFTask tmp = null;
 		if (taskObject == null) throw new JPPFException("null tasks are not accepted");
-		if (tasks == null) tasks = new ArrayList();
-		if (ReflectionUtils.isJPPFAnnotated(taskObject.getClass())) tasks.add(new JPPFAnnotatedTask(taskObject, args));
-		else if (taskObject instanceof JPPFTask) tasks.add((JPPFTask) taskObject);
+		if (taskObject instanceof Class)
+		{
+			if (ReflectionUtils.isJPPFAnnotated((Class) taskObject)) tmp = new JPPFAnnotatedTask(taskObject, args);
+		}
+		else if (ReflectionUtils.isJPPFAnnotated(taskObject.getClass())) tmp = new JPPFAnnotatedTask(taskObject, args);
+		else if (taskObject instanceof JPPFTask) tmp = (JPPFTask) taskObject;
+		if (tmp != null)
+		{
+			if (tasks == null) tasks = new ArrayList();
+			tasks.add(tmp);
+		}
 		else throw new JPPFException("object '" + taskObject + "' is not a JPPFTask nor JPPF-annotated");
 	}
 

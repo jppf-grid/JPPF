@@ -22,7 +22,7 @@
 
 /* Page background color */
 /*body { background-color: #FFFFC0 !important }*/
-body { background: url("resources/bkg_new2.jpg"); background-repeat: repeat; background-attachment: fixed }
+body { background: url("resources/bkg_new2.jpg"); background-repeat: repeat; background-attachment: scroll }
 
 /* Table colors */
 /*.TableHeadingColor     { background-color: #FCCF62; color: #000060 }
@@ -35,7 +35,7 @@ body { background: url("resources/bkg_new2.jpg"); background-repeat: repeat; bac
 /*.TableRowColor         { background: url("resources/bkg.gif"); background-repeat: repeat; background-attachment: fixed }*/
 .TableRowColor         { background: transparent }
 
-table, td {font-size: 10pt; font-family: Arial, Helvetica, sans-serif }
+table, td {font-size: 10pt; font-family: Arial, Helvetica, sans-serif; background: transparent }
 h1, h2, h3 {font-family: Arial, Helvetica, sans-serif; color: #000060 }
 
 /* Font used in left-hand frame lists */

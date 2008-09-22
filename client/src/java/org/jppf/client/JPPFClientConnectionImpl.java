@@ -297,7 +297,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 		JMXConnectionWrapper wrapper = getJmxConnection();
 		if (wrapper == null) return null;
 		JPPFManagementResponse response = (JPPFManagementResponse) wrapper.invoke(
-				JPPFAdminMBean.DRIVER_MBEAN_NAME, "performAdminRequest", new Object[] {request}, MBEAN_SIGNATURE);
+			JPPFAdminMBean.DRIVER_MBEAN_NAME, "performAdminRequest", new Object[] {request}, MBEAN_SIGNATURE);
 		if (response == null) return null;
 		if (response.getException() == null) return response.getResult();
 		throw response.getException();
