@@ -24,7 +24,7 @@ APP_LONG_NAME="JPPF Node Service"
 
 # Wrapper
 WRAPPER_CMD="./wrapper"
-WRAPPER_CONF="./wrapper.conf"
+WRAPPER_CONF="./config/wrapper-node.conf"
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
 #  nice is only used if a priority is specified.
