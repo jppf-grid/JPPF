@@ -598,6 +598,7 @@
 			<arg value="72"/>
 			<arg value="72"/>
 			<arg value="${home}/templates"/>
+			<arg value="10"/>
 		</java>       
 	</target>
 
@@ -658,6 +659,28 @@
 		<copy todir="${home}/api">
 			<fileset dir="${javadoc}"/>
 		</copy>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                        Zip the whole workspace                            -->
+	<!-- ========================================================================= -->
+
+	<target name="zip.workspace" description="Zip the whole workspace">
+    <delete file="${basedir}/../../JPPF.zip" quiet="true"/>
+		<zip destfile="${basedir}/../../JPPF.zip">
+			<zipfileset dir="${basedir}/.." prefix="JPPF">
+				<exclude name="**/*.lock"/>
+				<exclude name="**/JPPF/docs/home/**/*.*"/>
+				<exclude name="**/.history/"/>
+				<exclude name="**/JPPF/build/"/>
+				<exclude name="**/.metadata/.plugins/net.sf.eclipsensis/help/**/*.*"/>
+				<exclude name="**/*.history"/>
+				<exclude name="**/*.index"/>
+				<exclude name="**/*.ear"/>
+				<exclude name="**/*.rar"/>
+				<exclude name="**/*.war"/>
+			</zipfileset>
+		</zip>
 	</target>
 
 </project> 
