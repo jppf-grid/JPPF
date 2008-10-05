@@ -120,8 +120,7 @@
 				<property name="tooltip" value="Apply new settings by sending them to the server"/>
 				<listener type="script">
 					<script language="javascript"><![CDATA[
-						//page = OptionsHandler.getPage("Admin");
-						page = option.findFirstWithName("Admin");
+						page = option.findFirstWithName("/Admin");
 						pwd = page.findFirstWithName("/actualPwd").getValue();
 						params = new HashMap();
 						params.put(BundleParameter.BUNDLE_SIZE_PARAM, option.findFirstWithName("/bundleSize").getValue());
@@ -174,8 +173,7 @@
 				<property name="tooltip" value="Apply the current settings to the server immediately"/>
 				<listener type="script">
 					<script language="javascript"><![CDATA[
-						//page = OptionsHandler.getPage("Admin");
-						page = option.findFirstWithName("Admin");
+						page = option.findFirstWithName("/Admin");
 						pwd = page.findFirstWithName("actualPwd").getValue();
 						params = new HashMap();
 						params.put(BundleParameter.BUNDLE_TUNING_TYPE_PARAM, "autotuned");
@@ -289,7 +287,7 @@
 				<property name="tooltip" value="Apply the current settings to the server immediately"/>
 				<listener type="script">
 					<script language="javascript"><![CDATA[
-						page = option.findFirstWithName("Admin");
+						page = option.findFirstWithName("/Admin");
 						pwd = page.findFirstWithName("actualPwd").getValue();
 						params = new HashMap();
 						params.put(BundleParameter.BUNDLE_TUNING_TYPE_PARAM, "proportional");

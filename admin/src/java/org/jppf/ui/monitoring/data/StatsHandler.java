@@ -257,7 +257,7 @@ public final class StatsHandler implements StatsConstants
 		try
 		{
 			Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
-			params.put(COMMAND_PARAM, CHANGE_SETTINGS);
+			params.put(COMMAND_PARAM, CHANGE_PASSWORD);
 			params.put(PASSWORD_PARAM, password);
 			params.put(NEW_PASSWORD_PARAM, newPassword);
 			if (debugEnabled) log.debug("command: CHANGE_SETTINGS, parameters: " + params);
