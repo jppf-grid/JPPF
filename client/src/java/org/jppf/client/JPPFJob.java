@@ -23,9 +23,8 @@ import java.util.*;
 import org.jppf.JPPFException;
 import org.jppf.client.event.TaskResultListener;
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
-import org.jppf.utils.ReflectionUtils;
 
 /**
  * Instances of this class represent a JPPF submission and hold all the required eleemnts:
@@ -135,18 +134,24 @@ public class JPPFJob
 	{
 		JPPFTask tmp = null;
 		if (taskObject == null) throw new JPPFException("null tasks are not accepted");
-		if (taskObject instanceof Class)
-		{
-			if (ReflectionUtils.isJPPFAnnotated((Class) taskObject)) tmp = new JPPFAnnotatedTask(taskObject, args);
-		}
-		else if (ReflectionUtils.isJPPFAnnotated(taskObject.getClass())) tmp = new JPPFAnnotatedTask(taskObject, args);
-		else if (taskObject instanceof JPPFTask) tmp = (JPPFTask) taskObject;
-		if (tmp != null)
-		{
-			if (tasks == null) tasks = new ArrayList();
-			tasks.add(tmp);
-		}
-		else throw new JPPFException("object '" + taskObject + "' is not a JPPFTask nor JPPF-annotated");
+		if (taskObject instanceof JPPFTask) tmp = (JPPFTask) taskObject;
+		else tmp = new JPPFAnnotatedTask(taskObject, args);
+		if (tasks == null) tasks = new ArrayList<JPPFTask>();
+		tasks.add(tmp);
+	}
+
+	/**
+	 * Add a task to this job.
+	 * @param taskObject the task to add to this job.
+	 * @param method the name of the method to execute.
+	 * @param args arguments to use with a JPPF-annotated class.
+	 * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
+	 */
+	public void addTask(String method, Object taskObject, Object...args) throws JPPFException
+	{
+		if (taskObject == null) throw new JPPFException("null tasks are not accepted");
+		if (tasks == null) tasks = new ArrayList<JPPFTask>();
+		tasks.add(new JPPFAnnotatedTask(taskObject, method, args));
 	}
 
 	/**

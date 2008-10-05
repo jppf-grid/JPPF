@@ -18,11 +18,11 @@
 
 package org.jppf.client;
 
-import java.lang.reflect.*;
-import java.security.*;
+import java.util.concurrent.Callable;
 
-import org.jppf.server.protocol.*;
-import org.jppf.utils.ReflectionUtils;
+import org.jppf.JPPFException;
+import org.jppf.client.taskwrapper.*;
+import org.jppf.server.protocol.JPPFTask;
 
 
 /**
@@ -32,32 +32,33 @@ import org.jppf.utils.ReflectionUtils;
 public class JPPFAnnotatedTask extends JPPFTask
 {
 	/**
-	 * A <code>JPPFRunnable</code>-annotated object.
+	 * 
 	 */
-	private Object taskObject = null;
-	/**
-	 * The methods arguments to pass on when it is invoked.
-	 */
-	private Object[] args = null;
-	/**
-	 * Specifies whether the object task is was specified as a class.
-	 */
-	private boolean isClass = false;
+	protected TaskObjectWrapper taskObjectWrapper = null;
 
 	/**
 	 * Initialize this task with an object whose class is annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}.
 	 * @param taskObject a <code>JPPFRunnable</code>-annotated object.
 	 * @param args a <code>JPPFRunnable</code>-annotated object.
+	 * @throws JPPFException if an error is raised while initializing this task.
 	 */
-	public JPPFAnnotatedTask(Object taskObject, Object...args)
+	public JPPFAnnotatedTask(Object taskObject, Object...args) throws JPPFException
 	{
-		if (taskObject instanceof Class)
-		{
-			this.taskObject = ((Class) taskObject).getName();
-			isClass = true;
-		}
-		else this.taskObject = taskObject;
-		this.args = args;
+		if (taskObject instanceof Runnable) taskObjectWrapper = new RunnableTaskWrapper((Runnable) taskObject);
+		else if (taskObject instanceof Callable) taskObjectWrapper = new CallableTaskWrapper((Callable) taskObject);
+		else taskObjectWrapper = new AnnotatedTaskWrapper(taskObject, args);
+	}
+
+	/**
+	 * Initialize this task with an object whose class is annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}.
+	 * @param taskObject a <code>JPPFRunnable</code>-annotated object.
+	 * @param method the name of the method to execute.
+	 * @param args a <code>JPPFRunnable</code>-annotated object.
+	 * @throws JPPFException if an error is raised while initializing this task.
+	 */
+	public JPPFAnnotatedTask(Object taskObject, String method, Object...args) throws JPPFException
+	{
+		taskObjectWrapper = new PojoTaskWrapper(method, taskObject, args);
 	}
 
 	/**
@@ -68,20 +69,8 @@ public class JPPFAnnotatedTask extends JPPFTask
 	{
 		try
 		{
-			if (taskObject == null) return;
-			Class clazz = null;
-			if (isClass) clazz = Class.forName((String) taskObject);
-			else clazz = taskObject.getClass();
-			Method[] methods = clazz.getDeclaredMethods();
-			for (Method m: methods)
-			{
-				if (ReflectionUtils.isJPPFAnnotated(m))
-				{
-					Object o = executeMethod(m);
-					setResult(o);
-					break;
-				}
-			}
+			Object result = taskObjectWrapper.execute();
+			setResult(result);
 		}
 		catch(Exception e)
 		{
@@ -90,47 +79,12 @@ public class JPPFAnnotatedTask extends JPPFTask
 	}
 
 	/**
-	 * Execute a JPPF-annotated method.
-	 * @param m the method to execute.
-	 * @return the result of the method invocation.
-	 * @throws Exception if an error is raised while invoking the method.
-	 */
-	private Object executeMethod(final Method m) throws Exception
-	{
-		int mod = m.getModifiers();
-		final Object invoker = Modifier.isStatic(mod) ? null : taskObject;
-		int n = m.getParameterTypes().length;
-		final Object[] params = new Object[n];
-		for (int i=0; i<n; i++)
-		{
-			if ((args == null) || (i > args.length)) params[i] = null;
-			else params[i] = args[i];
-		}
-		Object result = AccessController.doPrivileged(new PrivilegedAction<Object>()
-		{
-			public Object run()
-			{
-				Object o = null;
-				try
-				{
-					o = m.invoke(invoker, params);
-				}
-				catch(Exception e)
-				{
-					setException(e);
-				}
-				return o;
-			}
-		});
-		return result;
-	}
-
-	/**
-	 * Get the <code>JPPFRunnable</code>-annotated object wrapped by this task.
+	 * Get the <code>JPPFRunnable</code>-annotated object or POJO wrapped by this task.
 	 * @return an objet or class that is JPPF-annotated.
+	 * @see org.jppf.server.protocol.JPPFTask#getTaskObject()
 	 */
 	public Object getTaskObject()
 	{
-		return taskObject;
+		return taskObjectWrapper.getTaskObject();
 	}
 }
