@@ -15,22 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package sample.helloworld;
 
-package org.jppf.server.protocol;
-
-import java.lang.annotation.*;
+import java.io.Serializable;
 
 /**
- * 
+ * A simple hello world JPPF task impleemnted as a POJO with a static method.
  * @author Laurent Cohen
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD, ElementType.CONSTRUCTOR } )
-public @interface JPPFRunnable
+public class HelloWorldPojoStatic implements Serializable
 {
 	/**
-	 * Specifies the execution order, in the case where multiple methods are annotated in the same class.<br>
-	 * When specified orders are the same, the ordering is the same as the one used in {@link java.lang.Class#getDeclaredMethods() Class.getDeclaredMethods()}
+	 * Execute the task.
+	 * @param message a message to print.
+	 * @param number an example primitive argument.
+	 * @return a string hello message.
 	 */
-	int value() default 0;
+	public static String helloPojoStaticMethod(String message, int number)
+	{
+		String hello = "Hello, World (pojo static, " + message + ", " + number + ")";
+		System.out.println(hello);
+		return hello;
+	}
 }

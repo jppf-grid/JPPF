@@ -75,6 +75,14 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 * Format describing the timeout date.
 	 */
 	private SimpleDateFormat timeoutDateFormat = null;
+
+	/**
+	 * Default constructor.
+	 */
+	public JPPFTask()
+	{
+	}
+
 	/**
 	 * A user-assigned id for this task.<br>
 	 * This id is used as a task identifier when cancelling or restarting a task
@@ -290,5 +298,15 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 */
 	public void onTimeout()
 	{
+	}
+
+
+	/**
+	 * Get the <code>JPPFRunnable</code>-annotated object or POJO wrapped by this task.
+	 * @return an objet or class that is JPPF-annotated.
+	 */
+	public Object getTaskObject()
+	{
+		return null;
 	}
 }

@@ -18,7 +18,7 @@
  package org.jppf.utils;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.*;
 
 import org.jppf.server.protocol.JPPFRunnable;
@@ -227,7 +227,6 @@ public class ReflectionUtils
 	 */
 	public static Object deepCopy(Object o)
 	{
-		
 		return null;
 	}
 
@@ -238,28 +237,134 @@ public class ReflectionUtils
 	 */
 	public static boolean isJPPFAnnotated(Class<?> clazz)
 	{
-		if (clazz == null) return false;
-		for (Method m: clazz.getDeclaredMethods())
-		{
-			if (isJPPFAnnotated(m)) return true;
-		}
-		return false;
+		return getJPPFAnnotatedElement(clazz) != null;
 	}
 
+	/**
+	 * Determines whether a class has a JPPF-annotated method and can be executed as a task.
+	 * @param clazz the class to check.
+	 * @return true if the class can be executed as a task, false otherwise.
+	 */
+	public static AnnotatedElement getJPPFAnnotatedElement(Class<?> clazz)
+	{
+		if (clazz == null) return null;
+		for (Method m: clazz.getDeclaredMethods())
+		{
+			if (isJPPFAnnotated(m)) return m;
+		}
+		for (Constructor c: clazz.getDeclaredConstructors())
+		{
+			if (isJPPFAnnotated(c)) return c;
+		}
+		return null;
+	}
 
 	/**
 	 * Determines whether a method is JPPF-annotated and can be executed as a task.
-	 * @param method the method to check.
+	 * @param annotatedElement the method to check.
 	 * @return true if the method can be executed as a task, false otherwise.
 	 */
-	public static boolean isJPPFAnnotated(Method method)
+	public static boolean isJPPFAnnotated(AnnotatedElement annotatedElement)
 	{
-		if (method == null) return false;
-		Annotation[] annotations = method.getDeclaredAnnotations();
+		if (annotatedElement == null) return false;
+		Annotation[] annotations = annotatedElement.getDeclaredAnnotations();
 		for (Annotation a: annotations)
 		{
 			if (JPPFRunnable.class.equals(a.annotationType())) return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Get the method with the specified name, in the specified declaring class, that matches
+	 * the number, order and types of the specified arguments.
+	 * @param clazz the class in which to look for the method.
+	 * @param name the name of the method to look for.
+	 * @param args the argments of the method.
+	 * @return a matching <code>Method</code> instance, or null if no match could be found.
+	 */
+	public static Method getMatchingMethod(Class clazz, String name, Object[] args)
+	{
+		Class[] argTypes = createTypeArray(args);
+		Method[] methods = clazz.getDeclaredMethods();
+		for (Method m: methods)
+		{
+			if (!m.getName().equals(name)) continue;
+			if (matchingTypes(argTypes, m.getParameterTypes())) return m;
+		}
+		return null;
+	}
+
+	/**
+	 * Get the constructor with in the specified declaring class, that matches
+	 * the number, order and types of the specified arguments.
+	 * @param clazz the class in which to look for the contructor.
+	 * @param args the argments of the method.
+	 * @return a matching <code>Constructor</code> instance, or null if no match could be found.
+	 */
+	public static Constructor getMatchingConstructor(Class clazz, Object[] args)
+	{
+		Class[] argTypes = createTypeArray(args);
+		Constructor[] constructors = clazz.getDeclaredConstructors();
+		for (Constructor c: constructors)
+		{
+			if (matchingTypes(argTypes, c.getParameterTypes())) return c;
+		}
+		return null;
+	}
+
+	/**
+	 * Determine whether a set of (possibly null) types looseley matches another set of types.
+	 * @param argTypes the types to match, null values are considered wildcards (matching any type).
+	 * @param types the set of types to match. 
+	 * @return true if the methods match, false otherwise.
+	 */
+	public static boolean matchingTypes(Class[] argTypes, Class[] types)
+	{
+		if (argTypes.length != types.length) return false;
+		for (int i=0; i<types.length; i++)
+		{
+			if (argTypes[i] != null)
+			{
+				Class c = types[i].isPrimitive() ? mapPrimitveType(types[i]) :  types[i];
+				if (!c.isAssignableFrom(argTypes[i])) return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Map a primitive type to itsa corresponding wrapper type.
+	 * @param type a primtive type.
+	 * @return a <code>Class</code> instance.
+	 */
+	public static Class mapPrimitveType(Class type)
+	{
+		if (Boolean.TYPE.equals(type)) return Boolean.class;
+		else if (Byte.TYPE.equals(type)) return Byte.class;
+		else if (Byte.TYPE.equals(type)) return Byte.class;
+		else if (Short.TYPE.equals(type)) return Short.class;
+		else if (Integer.TYPE.equals(type)) return Integer.class;
+		else if (Long.TYPE.equals(type)) return Long.class;
+		else if (Float.TYPE.equals(type)) return Float.class;
+		else if (Double.TYPE.equals(type)) return Double.class;
+		return type;
+	}
+
+	/**
+	 * Generate an array of the types of the specified arguments.
+	 * If they array of arguments is null this method will return an empty array.
+	 * @param args the arguments to get the types from.
+	 * @return an array of <code>Class</code> instances.
+	 */
+	public static Class[] createTypeArray(Object[] args)
+	{
+		if ((args == null) || (args.length == 0)) return new Class[0];
+		Class[] argTypes = new Class[args.length];
+		for (int i=0; i<args.length; i++)
+		{
+			argTypes[i] = (args[i] != null) ? args[i].getClass() : null;
+		}
+		return argTypes;
 	}
 }

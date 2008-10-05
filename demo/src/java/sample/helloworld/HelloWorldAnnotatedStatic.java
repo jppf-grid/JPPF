@@ -15,22 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package sample.helloworld;
 
-package org.jppf.server.protocol;
+import java.io.Serializable;
 
-import java.lang.annotation.*;
+import org.jppf.server.protocol.JPPFRunnable;
 
 /**
- * 
+ * A simple hello world JPPF task with a JPPF-annotated static method.
  * @author Laurent Cohen
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD, ElementType.CONSTRUCTOR } )
-public @interface JPPFRunnable
+public class HelloWorldAnnotatedStatic implements Serializable
 {
 	/**
-	 * Specifies the execution order, in the case where multiple methods are annotated in the same class.<br>
-	 * When specified orders are the same, the ordering is the same as the one used in {@link java.lang.Class#getDeclaredMethods() Class.getDeclaredMethods()}
+	 * Execute the task.
+	 * @param message a message to print.
+	 * @param number an example primitive argument.
+	 * @return a string hello message.
 	 */
-	int value() default 0;
+	@JPPFRunnable
+	public static String helloStaticMethod(String message, int number)
+	{
+		String hello = "Hello, World (annotated static, " + message + ", " + number + ")";
+		System.out.println(hello);
+		return hello;
+	}
 }

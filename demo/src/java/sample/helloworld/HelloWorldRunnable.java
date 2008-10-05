@@ -15,22 +15,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package sample.helloworld;
 
-package org.jppf.server.protocol;
-
-import java.lang.annotation.*;
+import java.io.Serializable;
 
 /**
- * 
+ * A simple hello world JPPF task implemented as a <code>Runnable</code>.
  * @author Laurent Cohen
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD, ElementType.CONSTRUCTOR } )
-public @interface JPPFRunnable
+public class HelloWorldRunnable implements Runnable, Serializable
 {
 	/**
-	 * Specifies the execution order, in the case where multiple methods are annotated in the same class.<br>
-	 * When specified orders are the same, the ordering is the same as the one used in {@link java.lang.Class#getDeclaredMethods() Class.getDeclaredMethods()}
+	 * The string resulting from the task execution.
 	 */
-	int value() default 0;
+	private String hello = null;
+
+	/**
+	 * Execute the task.
+	 * @see java.lang.Runnable#run()
+	 */
+	public void run()
+	{
+		this.hello = "Hello, World (runnable)";
+		System.out.println(this.hello);
+	}
+
+	/**
+	 * Get the string resulting from the task execution.
+	 * @return a string. 
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
+	{
+		return hello;
+	}
 }

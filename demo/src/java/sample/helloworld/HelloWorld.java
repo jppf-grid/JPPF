@@ -16,21 +16,24 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
+package sample.helloworld;
 
-import java.lang.annotation.*;
+import org.jppf.server.protocol.JPPFTask;
 
 /**
- * 
+ * A simple hello world JPPF task.
  * @author Laurent Cohen
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD, ElementType.CONSTRUCTOR } )
-public @interface JPPFRunnable
+public class HelloWorld extends JPPFTask
 {
 	/**
-	 * Specifies the execution order, in the case where multiple methods are annotated in the same class.<br>
-	 * When specified orders are the same, the ordering is the same as the one used in {@link java.lang.Class#getDeclaredMethods() Class.getDeclaredMethods()}
+	 * Execute the task.
+	 * @see java.lang.Runnable#run()
 	 */
-	int value() default 0;
+	public void run()
+	{
+		String hello = "Hello, World";
+		System.out.println(hello);
+		setResult(hello);
+	}
 }

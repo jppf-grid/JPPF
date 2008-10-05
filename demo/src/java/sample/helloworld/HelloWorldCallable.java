@@ -15,22 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package sample.helloworld;
 
-package org.jppf.server.protocol;
+import java.io.Serializable;
+import java.util.concurrent.Callable;
 
-import java.lang.annotation.*;
 
 /**
- * 
+ * A simple hello world JPPF task implemented as a <code>Callable</code>.
  * @author Laurent Cohen
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD, ElementType.CONSTRUCTOR } )
-public @interface JPPFRunnable
+public class HelloWorldCallable implements Callable<String>, Serializable
 {
 	/**
-	 * Specifies the execution order, in the case where multiple methods are annotated in the same class.<br>
-	 * When specified orders are the same, the ordering is the same as the one used in {@link java.lang.Class#getDeclaredMethods() Class.getDeclaredMethods()}
+	 * Execute the task.
+	 * @return a string
+	 * @see java.util.concurrent.Callable#call()
 	 */
-	int value() default 0;
+	public String call()
+	{
+		String hello = "Hello, World (callable)";
+		System.out.println(hello);
+		return hello;
+	}
 }

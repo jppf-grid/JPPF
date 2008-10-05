@@ -40,9 +40,13 @@ public class ThumbnailGenerator
 	 */
 	private  static final String DEFAULT_INCLUDE_PATH = "C:/Workspaces/SourceForge/JPPF/docs/home/templates";
 	/**
+	 * Default number of thumbnails per row.
+	 */
+	private  static final int DEFAULT_ROW_LENGTH = 10;
+	/**
 	 * Number of thumbnails per row.
 	 */
-	private  static final int ROW_LENGTH = 8;
+	private  int rowLength = 10;
 	/**
 	 * The path to the directory in which to find the images.
 	 */
@@ -72,22 +76,38 @@ public class ThumbnailGenerator
 	 */
 	public ThumbnailGenerator(String path, int width, int height)
 	{
-		this(path, width, height, DEFAULT_INCLUDE_PATH);
+		this(path, width, height, DEFAULT_INCLUDE_PATH, DEFAULT_ROW_LENGTH);
 	}
 
 	/**
-	 * Initialize this thumbnail generator with the psecified root dir, width and height.
+	 * Initialize this thumbnail generator with the psecified root dir, width, height
+	 * and default number of thumbnails per row.
+	 * @param path the path to the directory in which to find the images.
+	 * @param width the width of the generated thumbnails.
+	 * @param height the height of the generated thumbnails.
+	 * @param rowLength the number of thumbnails per row.
+	 */
+	public ThumbnailGenerator(String path, int width, int height, int rowLength)
+	{
+		this(path, width, height, DEFAULT_INCLUDE_PATH, rowLength);
+	}
+
+	/**
+	 * Initialize this thumbnail generator with the psecified root dir, width, height
+	 * and default number of thumbnails per row.
 	 * @param path the path to the directory in which to find the images.
 	 * @param width the width of the generated thumbnails.
 	 * @param height the height of the generated thumbnails.
 	 * @param includePath the generated file to include in the screenshots php page.
+	 * @param rowLength the number of thumbnails per row..
 	 */
-	public ThumbnailGenerator(String path, int width, int height, String includePath)
+	public ThumbnailGenerator(String path, int width, int height, String includePath, int rowLength)
 	{
 		this.path = path;
 		this.width = width;
 		this.height = height;
 		this.includePath = includePath;
+		this.rowLength = rowLength;
 	}
 
 	/**
@@ -127,7 +147,7 @@ public class ThumbnailGenerator
 		sb.append(indent).append("<table align=\"center\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\n");
 		for (Map.Entry<File, File> entry: fileMap.entrySet())
 		{
-			if (count % ROW_LENGTH == 0)
+			if (count % rowLength == 0)
 			{
 				if (count > 0) sb.append(indent).append("\t</tr>\n");
 				sb.append(indent).append("\t<tr>\n");
@@ -233,10 +253,11 @@ public class ThumbnailGenerator
 			String path = args[0];
 			int width = Integer.valueOf(args[1]);
 			int height = Integer.valueOf(args[2]);
-			String includePath = (args.length < 4) ? DEFAULT_INCLUDE_PATH : args[3]; 
+			String includePath = args[3]; 
+			int rowLength = Integer.valueOf(args[4]);
 			System.out.println("Using folder = " + path + ", max width = " + width + ", max height = " + height +
-				", include file path = " + includePath);
-			ThumbnailGenerator tg = new ThumbnailGenerator(path, width, height);
+				", include file path = " + includePath + ", thumbnails per row = " + rowLength);
+			ThumbnailGenerator tg = new ThumbnailGenerator(path, width, height, includePath, rowLength);
 			tg.generate();
 			System.out.println("finished");
 		}
