@@ -146,9 +146,11 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	public synchronized void taskCompleted(BundleWrapper result)
 	{
 		setPendingTasksCount(getPendingTasksCount() - result.getBundle().getTaskCount());
-		if (debugEnabled) log.debug("Received results for : " + result.getBundle().getTaskCount() + " [size=" +
-			result.getTasks().size() + "] tasks");
-		if (debugEnabled) log.debug("Pending tasks: " + getPendingTasksCount());
+		if (debugEnabled)
+		{
+			log.debug("Received results for : " + result.getBundle().getTaskCount() + " [size=" + result.getTasks().size() + "] tasks");
+			log.debug("Pending tasks: " + getPendingTasksCount());
+		}
 		getResultList().add(result);
 		if (asynch || (getPendingTasksCount() <= 0)) notify();
 	}

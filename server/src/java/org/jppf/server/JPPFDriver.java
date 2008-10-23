@@ -180,7 +180,7 @@ public class JPPFDriver
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String peerNames = props.getString("jppf.peers");
 		if ((peerNames == null) || "".equals(peerNames.trim())) return;
-		String[] names = peerNames.split(" ");
+		String[] names = peerNames.split("\\s");
 		for (String peerName: names) new JPPFPeerInitializer(peerName).start();
 	}
 	

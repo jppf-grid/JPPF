@@ -17,10 +17,9 @@
  */
 package org.jppf.server.peer;
 
-import java.util.*;
-
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketClient;
+import org.jppf.io.*;
 import org.jppf.node.AbstractMonitoredNode;
 import org.jppf.node.event.NodeEventType;
 import org.jppf.server.*;
@@ -50,6 +49,10 @@ public class PeerNode extends AbstractMonitoredNode
 	 * The name of the peer in the configuration file.
 	 */
 	private String peerName = null;
+	/**
+	 * Input source for the socket client.
+	 */
+	private InputSource is = null;
 	/**
 	 * Security credentials associated with this JPPF node.
 	 */
@@ -117,7 +120,8 @@ public class PeerNode extends AbstractMonitoredNode
 		if (debugEnabled) log.debug(getName() + "Start of peer node secondary loop");
 		while (!stopped)
 		{
-			JPPFTaskBundle bundle = readBundle();
+			BundleWrapper bundleWrapper = readBundle();
+			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 			{
 				bundle.setBundleUuid(uuid);
@@ -125,23 +129,22 @@ public class PeerNode extends AbstractMonitoredNode
 				bundle.setParameter(BundleParameter.IS_PEER, true);
 			}
 			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
-			boolean notEmpty = (bundle.getTasks() != null) && (bundle.getTaskCount() > 0);
+			//boolean notEmpty = (bundle.getTasks() != null) && (bundle.getTaskCount() > 0);
+			boolean notEmpty = !bundleWrapper.getTasks().isEmpty();
 			if (notEmpty)
 			{
 				int n = bundle.getTaskCount();
-
 				bundle.getUuidPath().add(driver.getUuid());
 				bundle.setCompletionListener(resultSender);
-				//JPPFDriver.getQueue().addBundle(bundle);
+				JPPFDriver.getQueue().addBundle(bundleWrapper);
 				resultSender.run(n);
-				//resultSender.sendPartialResults(bundle);
-
+				//resultSender.sendPartialResults(bundleWrapper);
 				setTaskCount(getTaskCount() + n);
 				if (debugEnabled) log.debug(getName() + "tasks executed: "+getTaskCount());
 			}
 			else
 			{
-				//resultSender.sendPartialResults(bundle);
+				resultSender.sendPartialResults(bundleWrapper);
 			}
 			if (notifying) fireNodeEvent(NodeEventType.END_EXEC);
 		}
@@ -169,6 +172,7 @@ public class PeerNode extends AbstractMonitoredNode
 			System.out.println(getName() + "PeerNode.init(): Attempting connection to the JPPF driver");
 			socketInitializer.initializeSocket(socketClient);
 			System.out.println(getName() + "PeerNode.init(): Reconnected to the JPPF driver");
+			is = new SocketWrapperInputSource(socketClient);
 		}
 		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
 	}
@@ -201,34 +205,34 @@ public class PeerNode extends AbstractMonitoredNode
 	 * @return an array of deserialized objects.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	private JPPFTaskBundle readBundle() throws Exception
+	private BundleWrapper readBundle() throws Exception
 	{
-		JPPFBuffer buf = socketClient.receiveBytes(0);
-		byte[] data = buf.getBuffer();
-		if (debugEnabled) log.debug(getName() + "read " + buf.getLength() + " bytes");
+		// Read the request header - with tasks count information
+		int n = is.readInt();
+		byte bytes[] = socketClient.receiveBytes(0).getBuffer();
+		JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(bytes);
+		if (debugEnabled) log.debug("received header from peer driver, data length = " + bytes.length);
+		bytes = null;
+		BundleWrapper headerWrapper = new BundleWrapper(header);
 
-		List<JPPFTaskBundle> list = new ArrayList<JPPFTaskBundle>();
-		int pos = helper.fromBytes(data, 0, false, list, 1);
-		JPPFTaskBundle bundle = list.get(0);
-		bundle.setNodeExecutionTime(System.currentTimeMillis());
-		int count = bundle.getTaskCount();
-		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+		int count = header.getTaskCount();
+		if (debugEnabled) log.debug("Received " + count + " tasks");
+
+		for (int i=0; i<count+1; i++)
 		{
-			List<byte[]> taskList = new ArrayList<byte[]>();
-			byte[] dataProvider = helper.copyFromBuffer(data, pos);
-			pos += 4 + dataProvider.length;
-			bundle.setDataProvider(dataProvider);
-			for (int i = 0; i < count; i++)
+			DataLocation dl = IOHelper.readData(is);
+			if (i == 0)
 			{
-				byte[] task = helper.copyFromBuffer(data, pos);
-				pos += 4 + task.length;
-				taskList.add(task);
+				headerWrapper.setDataProvider(dl);
+				if (debugEnabled) log.debug("received data provider from peer driver, data length = " + dl.getSize());
 			}
-			bundle.setTasks(taskList);
+			else
+			{
+				headerWrapper.addTask(dl);
+				if (debugEnabled) log.debug("received task #"+ i + " from peer driver, data length = " + dl.getSize());
+			}
 		}
-		
-		if (debugEnabled) log.debug(getName() + "read bundle with " + count + " tasks");
-		return bundle;
+		return headerWrapper;
 	}
 
 	/**

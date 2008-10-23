@@ -52,6 +52,7 @@ public class PeerNodeResultSender extends AbstractResultSender
 	public PeerNodeResultSender(SocketWrapper socketClient)
 	{
 		super(socketClient, false);
+		destination = new SocketWrapperOutputDestination(socketClient);
 	}
 
 	/**
