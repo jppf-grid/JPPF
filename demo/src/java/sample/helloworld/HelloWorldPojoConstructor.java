@@ -37,7 +37,7 @@ public class HelloWorldPojoConstructor implements Serializable
 	 */
 	public HelloWorldPojoConstructor(String message, int number)
 	{
-		this.hello = "Hello, World (pojo constructor ," + message + ", " + number + ")";
+		this.hello = "Hello, World (pojo constructor, " + message + ", " + number + ")";
 		System.out.println(this.hello);
 	}
 

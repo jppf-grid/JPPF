@@ -105,7 +105,7 @@ public abstract class AbstractSocketChannelHandler
 	protected abstract SocketChannelClient initSocketChannel() throws Exception;
 
 	/**
-	 * Get the rapper around the underlying socket connection.
+	 * Get the wrapper around the underlying socket connection.
 	 * @return a <code>SocketChannelClient</code> instance.
 	 */
 	public SocketChannelClient getSocketClient()
