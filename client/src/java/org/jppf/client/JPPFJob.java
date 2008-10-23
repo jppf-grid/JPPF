@@ -25,6 +25,7 @@ import org.jppf.client.event.TaskResultListener;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
+import org.jppf.utils.JPPFUuid;
 
 /**
  * Instances of this class represent a JPPF submission and hold all the required eleemnts:
@@ -54,12 +55,17 @@ public class JPPFJob
 	 * Determines whether the execution of this job is blocking on the client side.
 	 */
 	private boolean blocking = true;
+	/**
+	 * The universal unique id for this job.
+	 */
+	private String uuid = null;
 
 	/**
 	 * Default constructor.
 	 */
 	public JPPFJob()
 	{
+		uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
 	}
 
 	/**
@@ -109,10 +115,20 @@ public class JPPFJob
 	 */
 	public JPPFJob(DataProvider dataProvider, ExecutionPolicy executionPolicy, TaskResultListener resultsListener)
 	{
+		this();
 		this.dataProvider = dataProvider;
 		this.executionPolicy = executionPolicy;
 		this.resultsListener = resultsListener;
 		blocking = false;
+	}
+
+	/**
+	 * Get the universal unique id for this job.
+	 * @return the uuid as a string. 
+	 */
+	public String getUuid()
+	{
+		return uuid;
 	}
 
 	/**
