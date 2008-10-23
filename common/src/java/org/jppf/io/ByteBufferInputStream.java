@@ -20,22 +20,12 @@ package org.jppf.io;
 import java.io.*;
 import java.nio.ByteBuffer;
 
-import org.apache.commons.logging.*;
-
 /**
  * Implementation of an input stream backed by a <code>ByteBuffer</code>.
  * @author Laurent Cohen
  */
 public class ByteBufferInputStream extends InputStream
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Log log = LogFactory.getLog(ByteBufferInputStream.class);
-	/**
-	 * Determines whther DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The underlying byte buffer for this input stream.
 	 */
@@ -125,7 +115,6 @@ public class ByteBufferInputStream extends InputStream
 	 */
 	public int read(byte[] b, int off, int len) throws IOException
 	{
-		if (debugEnabled) log.debug("requesting "+len+", remaining = "+buffer.remaining());
 		if (b == null) throw new NullPointerException();
 		else if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0))
 	    throw new IndexOutOfBoundsException();
