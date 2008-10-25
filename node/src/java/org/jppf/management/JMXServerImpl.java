@@ -88,17 +88,21 @@ public class JMXServerImpl
 	public void start() throws Exception
 	{
 		//server = MBeanServerFactory.createMBeanServer();
+    if (debugEnabled) log.debug("starting remote connector server");
 		server = ManagementFactory.getPlatformMBeanServer();
     locateOrCreateRegistry();
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String host = NetworkUtils.getManagementHost();
 		int port = props.getInt("jppf.management.port", 11198);
+		int rmiPort = props.getInt("jppf.management.rmi.port", 12198);
+    if (debugEnabled) log.debug("starting connector server with RMI registry port = " + port + " and RMI server port = " + rmiPort);
 		InetAddress addr = InetAddress.getByName(host);
 		JSESocketFactory factory = new JSESocketFactory(addr);
-		HashMap env = new HashMap(); 
+		HashMap env = new HashMap();
 		env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, factory);
 		env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, factory); 
-    JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + "/jppf" + namespaceSuffix);
+    //JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + "/jppf" + namespaceSuffix);
+    JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://localhost:" + rmiPort + "/jndi/rmi://" + host + ":" + port + "/jppf" + namespaceSuffix);
     connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
     connectorServer.start();
     stopped = false;
@@ -164,9 +168,11 @@ public class JMXServerImpl
 	private static synchronized void locateOrCreateRegistry() throws Exception
 	{
 		if (registry != null) return;
+    if (debugEnabled) log.debug("starting RMI registry ");
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String host = NetworkUtils.getManagementHost();
 		int port = props.getInt("jppf.management.port", 11198);
+    if (debugEnabled) log.debug("starting RMI registry on port " + port);
 		InetAddress addr = InetAddress.getByName(host);
 		JSESocketFactory factory = new JSESocketFactory(addr);
 		registry = LocateRegistry.createRegistry(port, factory, factory);
@@ -211,6 +217,7 @@ public class JMXServerImpl
 	   */
 	  public ServerSocket createServerSocket(int port) throws IOException
 	  {
+	  	if (debugEnabled) log.debug("creating server socket on [" + bindAddress + ":" + port +"]"); 
 	    return new ServerSocket(port, 50, bindAddress);
 	  }
 

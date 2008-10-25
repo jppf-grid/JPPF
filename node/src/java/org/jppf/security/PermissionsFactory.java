@@ -127,9 +127,11 @@ public final class PermissionsFactory
 			TypedProperties props = JPPFConfiguration.getProperties();
 			String host = props.getString("jppf.management.host", "localhost");
 			int port = props.getInt("jppf.management.port", 11198);
+			int rmiPort = props.getInt("jppf.management.rmi.port", 12198);
 			// TODO: find a way to be more restrictive on RMI permissions
-			addPermission(new SocketPermission(host + ":1024-", "accept,connect,listen,resolve"), "management");
+			//addPermission(new SocketPermission(host + ":1024-", "accept,connect,listen,resolve"), "management");
 			addPermission(new SocketPermission("localhost:" + port, "accept,connect,listen,resolve"), "management");
+			addPermission(new SocketPermission("localhost:" + rmiPort, "accept,connect,listen,resolve"), "management");
 			//p.add(new MBeanServerPermission("createMBeanServer"));
 			addPermission(new MBeanServerPermission("*"), "management");
 			addPermission(new MBeanPermission("*", "*", new ObjectName("*:*"), "*"), "management");
