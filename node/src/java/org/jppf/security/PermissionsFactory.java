@@ -53,7 +53,7 @@ public final class PermissionsFactory
 	private PermissionsFactory()
 	{
 	}
-	
+
 	/**
 	 * Reset the current permissions to enable their reload.
 	 * @see java.security.Permissions

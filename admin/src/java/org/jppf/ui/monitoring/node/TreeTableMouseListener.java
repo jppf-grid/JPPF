@@ -71,6 +71,10 @@ public class TreeTableMouseListener extends MouseAdapter
 	 * Path to the shutdown node icon resource.
 	 */
 	private static final String SHUTDOWN_NODE_ICON = "/org/jppf/ui/resources/traffic_light_red.gif";
+	/**
+	 * Path to the reset tasks counter icon resource.
+	 */
+	private static final String RESET_ICON = "/org/jppf/ui/resources/reset.gif";
 
 	/**
 	 * Processes right-click events to display popup menus.
@@ -123,6 +127,23 @@ public class TreeTableMouseListener extends MouseAdapter
 			//JMenu nodeMenu = new JMenu("Node");
 			menu.add(createNodeMenuItem("Node Restart", false, jmx));
 			menu.add(createNodeMenuItem("Node Shutdown", true, jmx));
+
+			item = new JMenuItem("Reset task counter", GuiUtils.loadIcon(RESET_ICON));
+			item.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent event)
+				{
+					try
+					{
+						jmx.resetTaskCounter();
+					}
+					catch(Exception ignored)
+					{
+					}
+				}
+			});
+			menu.add(item);
+
 			//menu.add(nodeMenu);
 			menu.show(treeTable, x, y);
 		}

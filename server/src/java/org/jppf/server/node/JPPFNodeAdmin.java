@@ -236,4 +236,14 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	{
 		node.shutdown(false);
 	}
+
+	/**
+	 * Reset the node's executed tasks counter to zero. 
+	 * @see org.jppf.management.JPPFNodeAdminMBean#resetTaskCounter()
+	 */
+	public void resetTaskCounter()
+	{
+		node.setTaskCount(0);
+		nodeState.setNbTasksExecuted(node.getTaskCount());
+	}
 }

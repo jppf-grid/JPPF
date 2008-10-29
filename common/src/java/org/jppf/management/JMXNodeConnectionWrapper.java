@@ -123,4 +123,13 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper
 	{
 		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "restart", (Object[]) null, (String[]) null); 
 	}
+
+	/**
+	 * Reset the node's executed tasks counter to zero. 
+	 * @throws Exception if an error is raised when invoking the node mbean.
+	 */
+	public void resetTaskCounter() throws Exception
+	{
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "resetTaskCounter", (Object[]) null, (String[]) null); 
+	}
 }
