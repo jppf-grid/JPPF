@@ -18,6 +18,7 @@
 
 package org.jppf.client;
 
+import java.io.Serializable;
 import java.util.*;
 
 import org.jppf.JPPFException;
@@ -33,7 +34,7 @@ import org.jppf.utils.JPPFUuid;
  * This class also provides the API for handling JPPF-annotated tasks.
  * @author Laurent Cohen
  */
-public class JPPFJob
+public class JPPFJob implements Serializable
 {
 	/**
 	 * The list of tasks to execute.
@@ -50,7 +51,7 @@ public class JPPFJob
 	/**
 	 * The listener that receives notifications of completed tasks.
 	 */
-	private TaskResultListener resultsListener = null;
+	private transient TaskResultListener resultsListener = null;
 	/**
 	 * Determines whether the execution of this job is blocking on the client side.
 	 */
@@ -59,6 +60,10 @@ public class JPPFJob
 	 * The universal unique id for this job.
 	 */
 	private String uuid = null;
+	/**
+	 * The list of tasks to execute.
+	 */
+	private List<JPPFTask> results = null;
 
 	/**
 	 * Default constructor.
@@ -129,6 +134,15 @@ public class JPPFJob
 	public String getUuid()
 	{
 		return uuid;
+	}
+
+	/**
+	 * Set the universal unique id for this job.
+	 * @param uuid the uuid as a string. 
+	 */
+	public void setUuid(String uuid)
+	{
+		this.uuid = uuid;
 	}
 
 	/**
