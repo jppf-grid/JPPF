@@ -24,15 +24,19 @@
 
 	<property name="build.properties.file" value="${basedir}/build.properties"/>
   <property file="${build.properties.file}"/>
-	<property name="jppf.build.dir"  value="${basedir}/../JPPF/build"/>
-	<property name="jppf.lib.dir"    value="${basedir}/../JPPF/lib"/>
-	<property name="config.dir"      value="${basedir}/config"/>
-	<property name="classes.dir"     value="${basedir}/classes"/>	
-	<property name="src.dir"         value="${basedir}/src"/>
-	<property name="build.dir"       value="${basedir}/build"/>
-	<property name="meta.inf.dir"    value="${basedir}/appserver"/>
-	<property name="ejb.client.jar"  value="${build.dir}/JPPFServer-Client.jar"/>
-	<property name="ear.prefix"      value="JPPF_J2EE_Demo"/>
+	<property name="jppf.build.dir"        value="${basedir}/../JPPF/build"/>
+	<property name="jppf.lib.dir"          value="${basedir}/../JPPF/lib"/>
+	<property name="config.dir"            value="${basedir}/config"/>
+	<property name="classes.dir"           value="${basedir}/classes"/>	
+	<property name="src.dir"               value="${basedir}/src"/>
+	<property name="build.dir"             value="${basedir}/build"/>
+	<property name="meta.inf.dir"          value="${basedir}/appserver"/>
+	<property name="ejb.client.jar"        value="${build.dir}/JPPFServer-Client.jar"/>
+	<property name="ear.prefix"            value="JPPF_J2EE_Demo"/>
+	<property name="jppf.build.properties.file" value="${basedir}/../JPPF/bin/build.properties"/>
+  <property file="${jppf.build.properties.file}"/>
+	<property name="build.number.file"     value="${basedir}/../JPPF/bin/build.number"/>
+  <property file="${build.number.file}"/>
 
 	<!-- ========================================================================= -->
 	<!-- definition of application server-specific properties                      -->
@@ -50,7 +54,8 @@
 
 	<path id="client.classpath">
 		<pathelement location="${config.dir}"/>
-		<pathelement location="${classes.dir}"/>
+		<pathelement location="${classes.dir}/jca"/>
+		<pathelement location="${classes.dir}/j2eeclient"/>
 		<pathelement location="${ejb.client.jar}"/>
 		<fileset dir="${jppf.build.dir}">
 			<include name="jppf-common-node.jar"/>
@@ -61,7 +66,8 @@
 	</path>
 
 	<path id="project.classpath">
-		<pathelement location="${classes.dir}"/>
+		<pathelement location="${classes.dir}/jca"/>
+		<pathelement location="${classes.dir}/j2eeclient"/>
 		<pathelement location="${config.dir}"/>
 		<fileset dir="${jppf.lib.dir}">
 			<include name="**/*.jar"/>
@@ -84,6 +90,8 @@
 
 	<target name="init" depends="clean" description="Initialize ressources">
  		<mkdir dir="${classes.dir}"/>
+ 		<mkdir dir="${classes.dir}/jca"/>
+ 		<mkdir dir="${classes.dir}/j2eeclient"/>
  		<mkdir dir="${build.dir}"/>
 	</target>
 
@@ -99,28 +107,50 @@
 
 	<target name="compile" depends="init">
 		<echo message="compiling the project..."/>
-		<javac srcdir="" destdir="${classes.dir}"
+		<javac srcdir="" destdir="${classes.dir}/jca"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 	    <classpath refid="project.classpath"/>
 	    <compilerarg line="-Xlint:unchecked"/>
 			<src path="${src.dir}/java"/>
 		</javac>
-		<copy todir="${classes.dir}">
+		<copy todir="${classes.dir}/jca">
 			<fileset dir="${src.dir}/java">
 				<exclude name="**/*.java"/>
+				<exclude name="**/package.html"/>
 			</fileset>
 			<fileset dir="${src.dir}/resources">
 				<exclude name="**/*.java"/>
 			</fileset>
 		</copy>
+		<javac srcdir="" destdir="${classes.dir}/j2eeclient"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+			<src path="${src.dir}/j2eeclient"/>
+		</javac>
   </target>
 
 	<target name="build.util.jar" depends="compile">
 		<echo message="Building the utility jar file ..."/>
 		<delete dir="${build.dir}/lib" quiet="true"/>
  		<mkdir dir="${build.dir}/lib"/>
-    <jar jarfile="${build.dir}/lib/jppf-jca.jar">
-			<fileset dir="${classes.dir}"/>
+	  <property file="${build.number.file}"/>
+		<tstamp>
+			<format property="readable.now" pattern="d-MMMM-yyyy hh:mm"/>
+		</tstamp>
+    <jar jarfile="${build.dir}/lib/jppf-jca.jar" basedir="${classes.dir}/jca">
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+      </manifest>
+		</jar>
+    <jar jarfile="${build.dir}/lib/jppf-j2ee-client.jar" basedir="${classes.dir}/j2eeclient">
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+      </manifest>
 		</jar>
 	</target>
 
@@ -199,11 +229,15 @@
 			<zipfileset dir="${meta.inf.dir}/${appserver}/WEB-INF" excludes="web.xml" prefix="WEB-INF"/>
 			<zipfileset dir="${meta.inf.dir}/${appserver}/docroot" includes="**/*.*"/>
 			<zipfileset dir="${meta.inf.dir}/common/docroot" includes="**/*.*"/>
+    	<classes dir="${classes.dir}">
+    		<include name="**/org/jppf/jca/demo/*.class"/>
+    	</classes>
     </war>
 
 		<ear destfile="${build.dir}/${ear.prefix}_${appserver}.ear"
 			appxml="${build.dir}/${appserver}/application.xml">
 			<fileset dir="${build.dir}/${appserver}" includes="jppftest.war"/>
+			<zipfileset dir="${build.dir}/lib" prefix="lib" includes="jppf-j2ee-client.jar"/>
 		</ear>
 	</target>
 
@@ -214,6 +248,9 @@
 			<zipfileset dir="${meta.inf.dir}/${appserver}/WEB-INF" excludes="web.xml" prefix="WEB-INF"/>
 			<zipfileset dir="${meta.inf.dir}/${appserver}/docroot" includes="*.*"/>
 			<zipfileset dir="${meta.inf.dir}/common/docroot" includes="**/*.*"/>
+    	<classes dir="${classes.dir}">
+    		<include name="**/org/jppf/jca/demo/*.class"/>
+    	</classes>
     </war>
 
 		<ear destfile="${build.dir}/${ear.prefix}_${appserver}.ear" appxml="${build.dir}/${appserver}/application.xml">

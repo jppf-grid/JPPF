@@ -89,16 +89,18 @@ public class JcaResultProcessor implements Work
 					JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
 					String requestUuid = bundle.getRequestUuid();
 					bundle.setExecutionPolicy(execution.policy);
+					ClassLoader cl = null;
 					if (!execution.tasks.isEmpty())
 					{
 						JPPFTask task = execution.tasks.get(0);
-						mgr.addRequestClassLoader(requestUuid, task.getClass().getClassLoader());
+						cl = task.getClass().getClassLoader();
+						mgr.addRequestClassLoader(requestUuid, cl);
 					}
 					log.info("submitting with policy = "+execution.policy);
 					connection.sendTasks(bundle, execution.tasks, execution.dataProvider);
 					while (count < execution.tasks.size())
 					{
-						Pair<List<JPPFTask>, Integer> p = connection.receiveResults();
+						Pair<List<JPPFTask>, Integer> p = connection.receiveResults(cl);
 						count += p.first().size();
 						if (result != null)
 						{
@@ -115,6 +117,10 @@ public class JcaResultProcessor implements Work
 					throw e;
 				}
 				catch(InterruptedException e)
+				{
+					throw e;
+				}
+				catch(ClassNotFoundException e)
 				{
 					throw e;
 				}

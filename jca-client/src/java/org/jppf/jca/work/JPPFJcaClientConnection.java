@@ -30,6 +30,7 @@ import org.jppf.comm.socket.SocketInitializer;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
+import org.jppf.utils.Pair;
 
 /**
  * This class provides an API to submit execution requests and administration
@@ -81,7 +82,6 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 		try
 		{
 			setStatus(CONNECTING);
-			initHelper();
 			initCredentials();
 			initConnection();
 			setStatus(ACTIVE);
@@ -157,6 +157,40 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 		proc.run();
 		if (debugEnabled) log.debug("["+name+"] submitted " + taskList.size() + " tasks");
 	}
+
+	/**
+	 * Receive results of tasks execution.
+	 * @return a pair of objects representing the executed tasks results, and the index
+	 * of the first result within the initial task execution request.
+	 * @param cl the cintext classloader to use to deserialize the results.
+	 * @throws Exception if an error is raised while reading the results from the server.
+	 */
+	public Pair<List<JPPFTask>, Integer> receiveResults(ClassLoader cl) throws Exception
+	{
+		ClassLoader prevCl = Thread.currentThread().getContextClassLoader();
+		if (cl != null) Thread.currentThread().setContextClassLoader(cl);
+		Pair<List<JPPFTask>, Integer> results = null;
+		try
+		{
+			results = super.receiveResults();
+		}
+		finally
+		{
+			if (cl != null) Thread.currentThread().setContextClassLoader(prevCl);
+		}
+		return results;
+	}
+
+	/**
+	 * Get the name of the serialization helper implementation class name to use.
+	 * @return the fully qualified class name of a <code>SerializationHelper</code> implementation.
+	 * @see org.jppf.client.AbstractJPPFClientConnection#getSerializationHelperClassName()
+	 */
+	protected String getSerializationHelperClassName()
+	{
+		return "org.jppf.jca.serialization.JcaSerializationHelperImpl";
+	}
+
 
 	/**
 	 * Shutdown this client and retrieve all pending executions for resubmission.

@@ -44,7 +44,7 @@ public class SerializationHelperImpl implements SerializationHelper
 	/**
 	 * Used to serialize and deserialize objects to and from object streams.
 	 */
-	private ObjectSerializer serializer = null;
+	protected ObjectSerializer serializer = null;
 
 	/**
 	 * Default constructor.

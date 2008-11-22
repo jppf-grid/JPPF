@@ -191,7 +191,6 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 		{
 			if (getStatus().equals(DISCONNECTED))
 			{
-				//System.out.println("");
 				Thread.sleep(100);
 			}
 		}

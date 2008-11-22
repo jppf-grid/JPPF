@@ -103,7 +103,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	{
 		try
 		{
-			initHelper();
 			delegate = new ClassServerDelegateImpl(this, appUuid, host, classServerPort);
 			delegate.init();
 			initCredentials();

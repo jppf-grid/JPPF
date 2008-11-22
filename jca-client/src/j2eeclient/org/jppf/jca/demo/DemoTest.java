@@ -23,9 +23,8 @@ import java.util.*;
 
 import javax.naming.InitialContext;
 import javax.resource.cci.ConnectionFactory;
-import javax.rmi.PortableRemoteObject;
 
-import org.jppf.jca.cci.JPPFConnection;
+import org.jppf.jca.cci.*;
 import org.jppf.jca.work.submission.SubmissionStatus;
 import org.jppf.server.protocol.JPPFTask;
 
@@ -187,7 +186,8 @@ public class DemoTest implements Serializable
 	public JPPFConnection getConnection() throws Exception
 	{
 		Object objref = getInitialContext().lookup(jndiBinding);
-		ConnectionFactory cf = (ConnectionFactory) PortableRemoteObject.narrow(objref, ConnectionFactory.class);
+		//ConnectionFactory cf = (ConnectionFactory) PortableRemoteObject.narrow(objref, ConnectionFactory.class);
+		JPPFConnectionFactory cf = (JPPFConnectionFactory) javax.rmi.PortableRemoteObject.narrow(objref, ConnectionFactory.class);
 		return (JPPFConnection) cf.getConnection();
 	}
 }

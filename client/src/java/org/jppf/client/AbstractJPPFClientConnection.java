@@ -24,10 +24,10 @@ import java.nio.channels.AsynchronousCloseException;
 import java.util.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.*;
+import org.jppf.JPPFException;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
-import org.jppf.node.policy.*;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.security.*;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
@@ -50,7 +50,11 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Name of the SerializationHelper implementation class.
+	 */
+	private static String SERIALIZATION_HELPER_IMPL = "org.jppf.utils.SerializationHelperImpl";
 	/**
 	 * The socket client used to communicate over a socket connection.
 	 */
@@ -61,8 +65,9 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	protected ClassServerDelegate delegate = null;
 	/**
 	 * Utility for deserialization and serialization.
+	 * @deprecated replaced with {@link #makeHelper() makeHelper()}
 	 */
-	protected SerializationHelper helper = null;
+	private SerializationHelper helper = null;
 	/**
 	 * Unique identifier for this JPPF client.
 	 */
@@ -266,6 +271,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	{
 		try
 		{
+			SerializationHelper helper = makeHelper();
 			int count = taskList.size();
 			if (debugEnabled) log.debug("[client: "+name+"] sending "+count+" tasks");
 			TraversalList<String> uuidPath = new TraversalList<String>();
@@ -306,6 +312,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	{
 		try
 		{
+			SerializationHelper helper = makeHelper();
 			socketClient.skip(4);
 			byte[] data = socketClient.receiveBytes(0).getBuffer();
 			JPPFTaskBundle bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
@@ -348,10 +355,48 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	/**
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @throws Exception if an error occcurs while instantiating the class loader.
+	 * @deprecated replaced with {@link #makeHelper() makeHelper()}
 	 */
 	protected void initHelper() throws Exception
 	{
-		if (helper == null) helper = new SerializationHelperImpl();
+		//if (helper == null) helper = new SerializationHelperImpl();
+	}
+
+	/**
+	 * Instantiate a <code>SerializationHelper</code> using the current context class loader.
+	 * @return a <code>SerializationHelper</code> instance.
+	 * @throws Exception if the serialiozation helper could not be instantiated.
+	 */
+	protected SerializationHelper makeHelper() throws Exception
+	{
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		Class clazz = null;
+		if (cl != null)
+		{
+			try
+			{
+				clazz = cl.loadClass(getSerializationHelperClassName());
+			}
+			catch(ClassNotFoundException e)
+			{
+			}
+		}
+		if (clazz == null)
+		{
+			cl = this.getClass().getClassLoader();
+			clazz = cl.loadClass(getSerializationHelperClassName());
+		}
+		SerializationHelper helper = (SerializationHelper) clazz.newInstance();
+		return helper;
+	}
+
+	/**
+	 * Get the name of the serialization helper implementation class name to use.
+	 * @return the fully qualified class name of a <code>SerializationHelper</code> implementation.
+	 */
+	protected String getSerializationHelperClassName()
+	{
+		return SERIALIZATION_HELPER_IMPL;
 	}
 
 	/**
