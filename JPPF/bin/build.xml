@@ -22,13 +22,14 @@
 	<!--                          Property definitions                             -->
 	<!-- ========================================================================= -->
 
-	<property name="common" value="${basedir}/../common"/>	
-	<property name="admin" value="${basedir}/../admin"/>	
-	<property name="client" value="${basedir}/../client"/>	
-	<property name="node" value="${basedir}/../node"/>	
-	<property name="server" value="${basedir}/../server"/>	
-	<property name="demo" value="${basedir}/../demo"/>	
-	<property name="jca-client" value="${basedir}/../jca-client"/>	
+	<property name="common" value="${basedir}/../common"/>
+	<property name="admin" value="${basedir}/../admin"/>
+	<property name="client" value="${basedir}/../client"/>
+	<property name="node" value="${basedir}/../node"/>
+	<property name="server" value="${basedir}/../server"/>
+	<property name="demo" value="${basedir}/../demo"/>
+	<property name="jca-client" value="${basedir}/../jca-client"/>
+	<property name="jppfQuickStart" value="${basedir}/../JPPFQuickStart"/>
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${build.properties.file}"/>
@@ -104,6 +105,7 @@
  		<mkdir dir="${build}"/>
 		<available file="${NSIS.home}/makensis.exe" property="NSIS.present"/>
 		<available type="dir" file="${basedir}/../samples-pack" property="samples.pack.present"/>
+		<available type="dir" file="${basedir}/../JPPFQuickStart" property="jppfQuickStart.present"/>
 		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
 		<!-- The build number is also incremented by 1                                      -->
 		<propertyfile file="${build.number.file}">
@@ -129,9 +131,9 @@
 	<target name="rebuild" depends="clean, init, compile, jar"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
-		depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver, samples.pack"/>
+		depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start"/>
   <target name="deploy.splash">
-  	<splash showduration="500" imageurl="http://www.jppf.org/screenshots/shot11.jpg"/>
+  	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
   </target>
 
@@ -205,6 +207,46 @@
 				<exclude name="**/javadoc/**/*.*"/>
 			</zipfileset>
 		</zip>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--                      Generate the Quick Start Guide                       -->
+	<!-- ========================================================================= -->
+
+	<target name="jppf.quick.start" description="Generate the JPPF Quick Start Guide"
+		depends="init, build" if="jppfQuickStart.present">
+		<copy todir="${jppfQuickStart}/lib">
+			<fileset dir="${build}">
+				<include name="jppf-client.jar"/>
+				<include name="jppf-common*.jar"/>
+			</fileset>
+		</copy>
+		<ant antfile="${jppfQuickStart}/build.xml" target="compile" inheritall="false"/>
+		<echo message="quick start destination: ${jppfQuickStart}/docs"/>
+		<antcall target="doc.gen">
+			<param name="source" value="${jppfQuickStart}/docs/doc-source"/>
+			<param name="dest" value="${jppfQuickStart}/docs/"/>
+			<param name="templates" value="${jppfQuickStart}/docs/templates/"/>
+		</antcall>
+		<property name="jppfQuickStart.file"
+			value="${build}/JPPFQuickStart-${version.number}.${build.number}-${now}.zip"/>
+		<delete file="jppfQuickStart.file" quiet="true"/>
+		<zip destfile="${jppfQuickStart.file}">
+			<zipfileset dir="${jppfQuickStart}" prefix="JPPFQuickStart">
+				<exclude name="**/*.log"/>
+				<exclude name="**/doc-source/**/*.*"/>
+				<exclude name="**/templates/**/*.*"/>
+			</zipfileset>
+		</zip>
+	  <delete dir="${home}/JPPFQuickStart" quiet="true"/>
+ 		<mkdir dir="${home}/JPPFQuickStart"/>
+		<copy todir="${home}/JPPFQuickStart">
+			<fileset dir="${jppfQuickStart}">
+				<exclude name="**/*.log"/>
+				<exclude name="**/doc-source/**/*.*"/>
+				<exclude name="**/templates/**/*.*"/>
+			</fileset>
+		</copy>
   </target>
 
 	<!-- ========================================================================= -->
