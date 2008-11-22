@@ -96,6 +96,23 @@ public final class NetworkUtils
 	}
 
 	/**
+	 * Get a list of all known non-local IP v4 addresses for the current host.
+	 * @return a List of <code>Inet4Address</code> instances, may be empty but never null.
+	 */
+	public static List<Inet4Address> getNonLocalIPV4Addresses()
+	{
+		List<Inet4Address> addresses = getIPV4Addresses();
+		Iterator<Inet4Address> it = addresses.iterator();
+		while (it.hasNext())
+		{
+			Inet4Address ad = it.next();
+			String host = ad.getHostAddress();
+			if ("127.0.0.1".equals(host) || "localhost".equals(host)) it.remove();
+		}
+		return addresses;
+	}
+
+	/**
 	 * Get a list of all known IP v6 addresses for the current host.
 	 * @return a List of <code>Inet6Address</code> instances, may be empty but never null.
 	 */

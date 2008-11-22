@@ -241,7 +241,7 @@ public final class StringUtils
 	 * @param s list of space-separated port numbers
 	 * @return an array of int port numbers.
 	 */
-	public static int[] parsePorts(String s)
+	public static int[] parseIntValues(String s)
 	{
 		String[] strPorts = s.split("\\s");
 		List<Integer> portList = new ArrayList<Integer>();
@@ -260,6 +260,23 @@ public final class StringUtils
 		int[] ports = new int[portList.size()];
 		for (int i=0; i<portList.size(); i++) ports[i] = portList.get(i);
 		return ports;
+	}
+
+	/**
+	 * COnvert an array of int values into a space-separated string.
+	 * @param ports list of port numbers
+	 * @return a space-separated list of ports.
+	 */
+	public static String buildString(int[] ports)
+	{
+		if ((ports == null) || (ports.length == 0)) return "";
+		StringBuilder sb = new StringBuilder();
+		for (int i=0; i<ports.length; i++)
+		{
+			if (i > 0) sb.append(" ");
+			sb.append(ports[i]);
+		}
+		return sb.toString();
 	}
 
 	/**

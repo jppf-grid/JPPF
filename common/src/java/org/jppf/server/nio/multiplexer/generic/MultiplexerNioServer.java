@@ -98,7 +98,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 		String s = props.getString("multiplexer.ports");
 		if (s != null)
 		{
-			int[] ports = StringUtils.parsePorts(s);
+			int[] ports = StringUtils.parseIntValues(s);
 			for (int port: ports) multiplexerPorts.add(port);
 		}
 
@@ -114,7 +114,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 			}
 			s = props.getString("bound.ports");
 			if (s == null) return;
-			ports = StringUtils.parsePorts(s);
+			ports = StringUtils.parseIntValues(s);
 			for (int port: ports)
 			{
 				boundPorts.add(port);

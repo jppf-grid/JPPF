@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.*;
+import org.jppf.comm.discovery.*;
 import org.jppf.management.*;
 import org.jppf.security.*;
 import org.jppf.server.app.JPPFApplicationServer;
@@ -106,41 +107,54 @@ public class JPPFDriver
 	{
 		//taskQueue = new JPPFQueueImpl();
 		taskQueue = new JPPFPriorityQueue();
-		TypedProperties props = JPPFConfiguration.getProperties();
-
-		String s = props.getString("class.server.port", "11111");
-		int[] ports = StringUtils.parsePorts(s);
-		classServer = new ClassNioServer(ports);
+		JPPFConnectionInformation info = createConnectionInformation();
+		classServer = new ClassNioServer(info.classServerPorts);
 		classServer.start();
-		printInitializedMessage(ports, "Class Server");
+		printInitializedMessage(info.classServerPorts, "Class Server");
 
-		s = props.getString("app.server.port", "11112");
-		ports = StringUtils.parsePorts(s);
-		applicationServers = new JPPFApplicationServer[ports.length];
-		for (int i=0; i<ports.length; i++)
+		applicationServers = new JPPFApplicationServer[info.applicationServerPorts.length];
+		for (int i=0; i<info.applicationServerPorts.length; i++)
 		{
-			applicationServers[i] = new JPPFApplicationServer(ports[i]);
+			applicationServers[i] = new JPPFApplicationServer(info.applicationServerPorts[i]);
 			applicationServers[i].start();
 		}
-		printInitializedMessage(ports, "Client Server");
+		printInitializedMessage(info.applicationServerPorts, "Client Server");
 
-		s = props.getString("node.server.port", "11113");
-		ports = StringUtils.parsePorts(s);
-		nodeNioServer = new NodeNioServer(ports, BundlerFactory.createBundler());
+		nodeNioServer = new NodeNioServer(info.nodeServerPorts, BundlerFactory.createBundler());
 		nodeNioServer.start();
-		printInitializedMessage(ports, "Tasks Server");
+		printInitializedMessage(info.nodeServerPorts, "Tasks Server");
 
-		if (props.getBoolean("jppf.management.enabled", true))
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
 		{
 			jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX);
 			jmxServer.start();
-			JPPFDriverAdmin admin = new JPPFDriverAdmin();
-			String mbeanName = JPPFAdminMBean.DRIVER_MBEAN_NAME;
-			jmxServer.registerMbean(mbeanName, admin, JPPFDriverAdminMBean.class);
+			jmxServer.registerMbean(JPPFAdminMBean.DRIVER_MBEAN_NAME, new JPPFDriverAdmin(), JPPFDriverAdminMBean.class);
+			System.out.println("JPPF Driver management initialized");
 		}
+
+		JPPFBroadcaster broadcaster = new JPPFBroadcaster(info);
+		new Thread(broadcaster, "JPPF Broadcaster").start();
 
 		initPeers();
 		System.out.println("JPPF Driver initialization complete");
+	}
+
+	/**
+	 * Read configuration for the host name and ports used to conenct to this driver.
+	 * @return a <code>DriverConnectionInformation</code> instance.
+	 */
+	private JPPFConnectionInformation createConnectionInformation()
+	{
+		TypedProperties props = JPPFConfiguration.getProperties();
+		JPPFConnectionInformation info = new JPPFConnectionInformation();
+		String s = props.getString("class.server.port", "11111");
+		info.classServerPorts = StringUtils.parseIntValues(s);
+		s = props.getString("app.server.port", "11112");
+		info.applicationServerPorts = StringUtils.parseIntValues(s);
+		s = props.getString("node.server.port", "11113");
+		info.nodeServerPorts = StringUtils.parseIntValues(s);
+		info.host = NetworkUtils.getManagementHost();
+		return info;
 	}
 
 	/**

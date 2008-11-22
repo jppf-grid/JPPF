@@ -23,6 +23,7 @@ import java.util.Hashtable;
 
 import org.apache.commons.logging.*;
 import org.jppf.*;
+import org.jppf.comm.discovery.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.management.*;
 import org.jppf.security.JPPFPolicy;
@@ -38,6 +39,10 @@ public class NodeRunner
 	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(NodeRunner.class);
+	/**
+	 * Determines whether debug-level logging is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The ClassLoader used for loading the classes of the framework.
 	 */
@@ -132,6 +137,7 @@ public class NodeRunner
 	{
 		try
 		{
+			discoverDriver();
 			setSecurity();
 			Class clazz = getJPPFClassLoader().loadClass("org.jppf.server.node.JPPFNode");
 			MonitoredNode node = (MonitoredNode) clazz.newInstance();
@@ -142,6 +148,27 @@ public class NodeRunner
 		{
 			throw e;
 		}
+	}
+
+	/**
+	 * Automatically discover the server connection information using a datagram multicast.
+	 * Upon receiving the connection information, the JPPF configuration is modified to take into
+	 * account the discovered information. If no information could be received, the node relies on
+	 * the static information in the configuration file. 
+	 */
+	public static void discoverDriver()
+	{
+		JPPFMulticastReceiver receiver = new JPPFMulticastReceiver();
+		JPPFConnectionInformation info = receiver.receive();
+		if (info == null)
+		{
+			if (debugEnabled) log.debug("Could not auto-discover the driver connection information");
+			return;
+		}
+		TypedProperties props = JPPFConfiguration.getProperties();
+		props.setProperty("jppf.server.host", info.host);
+		props.setProperty("class.server.port", StringUtils.buildString(info.classServerPorts));
+		props.setProperty("node.server.port", StringUtils.buildString(info.nodeServerPorts));
 	}
 
 	/**
