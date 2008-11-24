@@ -132,8 +132,11 @@ public class JPPFDriver
 			System.out.println("JPPF Driver management initialized");
 		}
 
-		JPPFBroadcaster broadcaster = new JPPFBroadcaster(info);
-		new Thread(broadcaster, "JPPF Broadcaster").start();
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.broadcast.enabled", true))
+		{
+			JPPFBroadcaster broadcaster = new JPPFBroadcaster(info);
+			new Thread(broadcaster, "JPPF Broadcaster").start();
+		}
 
 		initPeers();
 		System.out.println("JPPF Driver initialization complete");

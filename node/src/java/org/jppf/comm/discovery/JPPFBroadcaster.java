@@ -141,7 +141,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 				{
 					Thread.sleep(broadcastInterval);
 				}
-				catch(Exception e)
+				catch(InterruptedException e)
 				{
 					log.error(e.getMessage(), e);
 				}

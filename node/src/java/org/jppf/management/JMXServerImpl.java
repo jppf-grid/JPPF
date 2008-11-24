@@ -18,16 +18,12 @@
 
 package org.jppf.management;
 
-import java.io.*;
 import java.lang.management.ManagementFactory;
-import java.net.*;
+import java.net.InetAddress;
 import java.rmi.registry.*;
-import java.rmi.server.RMISocketFactory;
-import java.util.HashMap;
 
 import javax.management.*;
 import javax.management.remote.*;
-import javax.management.remote.rmi.RMIConnectorServer;
 
 import org.apache.commons.logging.*;
 import org.jppf.utils.*;
@@ -87,7 +83,6 @@ public class JMXServerImpl
 	 */
 	public void start() throws Exception
 	{
-		//server = MBeanServerFactory.createMBeanServer();
     if (debugEnabled) log.debug("starting remote connector server");
 		server = ManagementFactory.getPlatformMBeanServer();
     locateOrCreateRegistry();
@@ -97,13 +92,8 @@ public class JMXServerImpl
 		int rmiPort = props.getInt("jppf.management.rmi.port", 12198);
     if (debugEnabled) log.debug("starting connector server with RMI registry port = " + port + " and RMI server port = " + rmiPort);
 		InetAddress addr = InetAddress.getByName(host);
-		JSESocketFactory factory = new JSESocketFactory(addr);
-		HashMap env = new HashMap();
-		env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, factory);
-		env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, factory); 
-    //JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + "/jppf" + namespaceSuffix);
     JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://localhost:" + rmiPort + "/jndi/rmi://" + host + ":" + port + "/jppf" + namespaceSuffix);
-    connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
+    connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, null, server);
     connectorServer.start();
     stopped = false;
     if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);
@@ -170,12 +160,9 @@ public class JMXServerImpl
 		if (registry != null) return;
     if (debugEnabled) log.debug("starting RMI registry ");
 		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = NetworkUtils.getManagementHost();
 		int port = props.getInt("jppf.management.port", 11198);
     if (debugEnabled) log.debug("starting RMI registry on port " + port);
-		InetAddress addr = InetAddress.getByName(host);
-		JSESocketFactory factory = new JSESocketFactory(addr);
-		registry = LocateRegistry.createRegistry(port, factory, factory);
+		registry = LocateRegistry.createRegistry(port);
 	}
 
 	/**
@@ -186,52 +173,5 @@ public class JMXServerImpl
 	public String getId()
 	{
 		return id;
-	}
-
-	/**
-	 * Custom socket factory used to force the binding of the RMI connector
-	 * to the host address specified in the configuration.
-	 */
-	static class JSESocketFactory extends RMISocketFactory implements Serializable
-	{
-	  /**
-	   * The host address to bind to.
-	   */
-	  private InetAddress bindAddress;
-
-	  /**
-	   * Initialize this socket factory with the specified address.
-	   * @param bindAddress the host address to bind to.
-	   */
-	  public JSESocketFactory(InetAddress bindAddress)
-	  {
-	    this.bindAddress = bindAddress;
-	  }
-
-	  /**
-	   * Create a server socket.
-	   * @param port the prot to bind to.
-	   * @return a <code>ServerSocket</code> instance.
-	   * @throws IOException if the socket could not be created.
-	   * @see java.rmi.server.RMISocketFactory#createServerSocket(int)
-	   */
-	  public ServerSocket createServerSocket(int port) throws IOException
-	  {
-	  	if (debugEnabled) log.debug("creating server socket on [" + bindAddress + ":" + port +"]"); 
-	    return new ServerSocket(port, 50, bindAddress);
-	  }
-
-	  /**
-	   * Create a client socket.
-	   * @param host not used, replaced with the host address specified in the constructor. 
-	   * @param port the port to bind to.
-	   * @return a <code>Socket</code> instance.
-	   * @throws IOException if the socket could not be created.
-	   * @see java.rmi.server.RMISocketFactory#createSocket(java.lang.String, int)
-	   */
-	  public Socket createSocket(String host, int port)  throws IOException
-	  {
-	    return new Socket(bindAddress, port);
-	  }
 	}
 }
