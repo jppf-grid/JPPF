@@ -177,9 +177,9 @@ public class JPPFNode extends AbstractMonitoredNode
 			writeResults(bundle, taskList);
 			if (notEmpty)
 			{
-				setTaskCount(getTaskCount() + taskList.size());
+				if (isJmxEnabled()) getNodeAdmin().setTaskCounter(getTaskCount() + taskList.size());
+				else setTaskCount(getTaskCount() + taskList.size());
 				if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
-				//log.info("tasks executed: "+getTaskCount());
 			}
 			int p = bundle.getBuildNumber();
 			if (buildNumber < p)

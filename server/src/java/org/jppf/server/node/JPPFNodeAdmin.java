@@ -151,7 +151,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 				nodeState.setExecutionStatus(type.toString());
 				break;
 		}
-		nodeState.setNbTasksExecuted(node.getTaskCount());
+		//nodeState.setNbTasksExecuted(node.getTaskCount());
 	}
 
 	/**
@@ -243,7 +243,16 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	 */
 	public void resetTaskCounter()
 	{
-		node.setTaskCount(0);
-		nodeState.setNbTasksExecuted(node.getTaskCount());
+		setTaskCounter(0);
+	}
+
+	/**
+	 * Set the node's executed tasks counter to the specified value.
+	 * @param n the new value of the task counter.
+	 */
+	public void setTaskCounter(int n)
+	{
+		node.setTaskCount(n);
+		nodeState.setNbTasksExecuted(n);
 	}
 }
