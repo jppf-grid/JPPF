@@ -219,7 +219,7 @@ public class NodeRunner
 	 * @param key the key associated with the object's value.
 	 * @param value the object to persist.
 	 */
-	public static void setPersistentData(Object key, Object value)
+	public static synchronized void setPersistentData(Object key, Object value)
 	{
 		persistentData.put(key, value);
 	}
@@ -229,7 +229,7 @@ public class NodeRunner
 	 * @param key the key used to retrieve the persistent object.
 	 * @return the value associated with the key.
 	 */
-	public static Object getPersistentData(Object key)
+	public static synchronized Object getPersistentData(Object key)
 	{
 		return persistentData.get(key);
 	}
@@ -239,7 +239,7 @@ public class NodeRunner
 	 * @param key the key associated with the object to remove.
 	 * @return the value associated with the key, or null if the key was not found.
 	 */
-	public static Object removePersistentData(Object key)
+	public static synchronized Object removePersistentData(Object key)
 	{
 		return persistentData.remove(key);
 	}
