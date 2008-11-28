@@ -93,15 +93,44 @@ public final class OptionsHandler
 	}
 
 	/**
+	 * Load a page built from an xml document.
+	 * @param xmlPath the path to the xml document.
+	 * @return the page that was added.
+	 */
+	public static synchronized OptionElement loadPageFromXml(String xmlPath)
+	{
+		try
+		{
+			return builder.buildPage(xmlPath, null);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		return null;
+	}
+
+	/**
 	 * Add a page built from an xml document.
 	 * @param xmlPath the path to the xml document.
 	 * @return the page that was added.
 	 */
 	public static synchronized OptionElement addPageFromXml(String xmlPath)
 	{
+		return addPage(loadPageFromXml(xmlPath));
+	}
+
+	/**
+	 * Load a page built from an xml document.
+	 * @param xmlPath the path to the xml document.
+	 * @param baseName base name for resource bundle lookup.
+	 * @return the page that was added.
+	 */
+	public static synchronized OptionElement loadPageFromURL(String xmlPath, String baseName)
+	{
 		try
 		{
-			return addPage(builder.buildPage(xmlPath, null));
+			return builder.buildPageFromURL(xmlPath, baseName);
 		}
 		catch(Exception e)
 		{
@@ -118,15 +147,7 @@ public final class OptionsHandler
 	 */
 	public static synchronized OptionElement addPageFromURL(String xmlPath, String baseName)
 	{
-		try
-		{
-			return addPage(builder.buildPageFromURL(xmlPath, baseName));
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		return null;
+			return addPage(loadPageFromURL(xmlPath, baseName));
 	}
 
 	/**

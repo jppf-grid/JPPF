@@ -49,7 +49,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	/**
 	 * The factory used to create thread in the pool.
 	 */
-	private JPPFThreadFactory threadFactory = new JPPFThreadFactory("node processing thread", true);
+	private JPPFThreadFactory threadFactory = null;
 	/**
 	 * The node that uses this excecution manager.
 	 */
@@ -101,7 +101,9 @@ public class NodeExecutionManager extends ThreadSynchronization
 		this.node = node;
 		TypedProperties props = JPPFConfiguration.getProperties();
 		int poolSize = props.getInt("processing.threads", 1);
+		int priority = props.getInt("processing.threads.priority", Thread.NORM_PRIORITY);
 		log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
+		threadFactory = new JPPFThreadFactory("node processing thread", true);
 		LinkedBlockingQueue queue = new LinkedBlockingQueue();
 		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory);
 		threadPool.prestartAllCoreThreads();
@@ -404,5 +406,23 @@ public class NodeExecutionManager extends ThreadSynchronization
 		info.cpuTime /= 1e6;
 		info.userTime /= 1e6;
 		return info;
+	}
+
+	/**
+	 * Get the priority assigned to the execution threads.
+	 * @return the priority as an int value.
+	 */
+	public int getThreadsPriority()
+	{
+		return threadFactory.getPriority();
+	}
+
+	/**
+	 * Update the priority of all execution threads.
+	 * @param newPriority the new priority to set.
+	 */
+	public void updateThreadsPriority(int newPriority)
+	{
+		threadFactory.updatePriority(newPriority);
 	}
 }

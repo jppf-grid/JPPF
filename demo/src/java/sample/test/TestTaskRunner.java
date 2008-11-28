@@ -55,11 +55,11 @@ public class TestTaskRunner
 		try
 		{
 			jppfClient = new JPPFClient();
+			performSecurityTest();
 			/*
 			performEmptyTaskListTest();
 			performExceptionTest();
 			performURLTest();
-			performSecurityTest();
 			performEmptyConstantTaskTest();
 			performClassNotFoundTaskTest();
 			performInnerTask();
@@ -70,8 +70,8 @@ public class TestTaskRunner
 			performAnonymousInnerClassTaskTest();
 			performOutOfMemoryTest();
 			performLargeDataTest();
-			*/
 			performAnnotatedTaskTest();
+			*/
 		}
 		catch(Exception e)
 		{

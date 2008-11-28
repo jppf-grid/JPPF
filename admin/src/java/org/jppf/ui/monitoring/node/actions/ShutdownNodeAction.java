@@ -15,31 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.ui.monitoring.node;
+package org.jppf.ui.monitoring.node.actions;
 
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
 
-import javax.swing.JOptionPane;
-
-import org.jppf.management.JMXNodeConnectionWrapper;
+import org.jppf.ui.monitoring.data.NodeInfoHolder;
 
 /**
- * This action displays an input panel for the user to type a new
- * thread pool size for a node, and updates the node with it.
+ * This action stops a node.
  */
-public class NodeThreadPoolSizeAction implements ActionListener
+public class ShutdownNodeAction extends JPPFAbstractNodeAction
 {
 	/**
-	 * The jmx client used to update the thread pool size.
-	 */
-	private JMXNodeConnectionWrapper jmx = null;
-	/**
 	 * Initialize this action.
-	 * @param jmx the jmx client used to update the thread pool size.
+	 * @param nodeInfoHolders the jmx client used to update the thread pool size.
 	 */
-	public NodeThreadPoolSizeAction(JMXNodeConnectionWrapper jmx)
+	public ShutdownNodeAction(NodeInfoHolder...nodeInfoHolders)
 	{
-		this.jmx = jmx;
+		super(nodeInfoHolders);
+		setupIcon("/org/jppf/ui/resources/traffic_light_red.gif");
+		putValue(NAME, "Node Shutdown");
 	}
 
 	/**
@@ -51,19 +46,19 @@ public class NodeThreadPoolSizeAction implements ActionListener
 	{
 		try
 		{
-			String s = JOptionPane.showInputDialog(null, "Enter the number of threads",
-				"Enter the number of threads", JOptionPane.PLAIN_MESSAGE);
-			if ((s == null) || ("".equals(s.trim()))) return;
-			try
+			for (NodeInfoHolder connection: nodeInfoHolders)
 			{
-				int n = Integer.valueOf(s);
-				jmx.updateThreadPoolSize(n);
-			}
-			catch(NumberFormatException ignored)
-			{
+				try
+				{
+					connection.getJmxClient().shutdown();
+				}
+				catch(Exception e)
+				{
+					log.error(e.getMessage(), e);
+				}
 			}
 		}
-		catch(Exception ignored)
+		catch(NumberFormatException ignored)
 		{
 		}
 	}

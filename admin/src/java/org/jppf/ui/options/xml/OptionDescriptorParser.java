@@ -68,6 +68,7 @@ public class OptionDescriptorParser
 	public OptionDescriptor parse(String docPath) throws Exception
 	{
 		InputStream is = FileUtils.getFileInputStream(docPath);
+		if (is == null) is = this.getClass().getClassLoader().getResourceAsStream(docPath);
 		if (is == null) return null;
 		Document doc = parser.parse(is);
 		return generateTree(findFirstElement(doc));

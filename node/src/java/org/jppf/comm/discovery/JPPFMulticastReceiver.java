@@ -68,8 +68,8 @@ public class JPPFMulticastReceiver
 		try
 		{
 			groupInetAddress = InetAddress.getByName(group);
-			//List<Inet4Address> addresses = NetworkUtils.getNonLocalIPV4Addresses();
-			List<Inet4Address> addresses = NetworkUtils.getIPV4Addresses();
+			List<Inet4Address> addresses = NetworkUtils.getNonLocalIPV4Addresses();
+			//List<Inet4Address> addresses = NetworkUtils.getIPV4Addresses();
 			if (addresses.isEmpty()) addresses.add((Inet4Address) InetAddress.getByName("127.0.0.1"));
 			int len = addresses.size();
 			if (debugEnabled)
@@ -158,11 +158,7 @@ public class JPPFMulticastReceiver
 			}
 			catch(SocketTimeoutException e)
 			{
-				if (debugEnabled)
-				{
-					//log.debug("Error occurred receiving from " + socket.
-					log.debug(e.getMessage(), e);
-				}
+				if (debugEnabled) log.debug(e.getMessage(), e);
 			}
 			catch(Exception e)
 			{

@@ -71,4 +71,9 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean<NodeParameter, Object
 	 * Reset the node's executed tasks counter to zero. 
 	 */
 	void resetTaskCounter();
+	/**
+	 * Update the priority of all execution threads.
+	 * @param newPriority the new priority to set.
+	 */
+	void updateThreadsPriority(Integer newPriority);
 }

@@ -390,7 +390,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	}
 
 	/**
-	 * Skip <code>n</code> bytes of data from the sokcet of channel input stream.
+	 * Skip <code>n</code> bytes of data from the socket or channel input stream.
 	 * @param n the number of bytes to skip.
 	 * @return the actual number of bytes skipped, or -1 if the end of file is reached..
 	 * @throws Exception if an IO error occurs.

@@ -15,56 +15,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.ui.monitoring.node;
+package org.jppf.ui.monitoring.node.actions;
 
-import java.awt.*;
 import java.awt.event.*;
-import java.net.URL;
 
 import javax.swing.*;
 
 import org.jppf.management.*;
+import org.jppf.ui.monitoring.data.NodeInfoHolder;
+import org.jppf.ui.monitoring.node.*;
 import org.jppf.utils.StringUtils;
 
 /**
- * This action displays an input panel for the user to type a new
- * thread pool size for a node, and updates the node with it.
+ * This action displays the node environment information in a spearate frame.
  */
-public class NodeInformationAction implements ActionListener
+public class NodeInformationAction extends JPPFAbstractNodeAction
 {
 	/**
-	 * The jmx client used to update the thread pool size.
-	 */
-	private JMXNodeConnectionWrapper jmx = null;
-	/**
-	 * Icon for the frame.
-	 */
-	private static Image iconImage = null;
-
-	/**
-	 * Iniotializer the icon for the frame.
-	 */
-	private static synchronized void initIconImage()
-	{
-		if (iconImage != null) return;
-		try
-		{
-			URL url = NodeInformationAction.class.getResource("/org/jppf/ui/resources/info.gif");
-			iconImage = Toolkit.getDefaultToolkit().getImage(url);
-		}
-		catch(Exception ignore)
-		{
-		}
-	}
-
-	/**
 	 * Initialize this action.
-	 * @param jmx the jmx client used to update the thread pool size.
+	 * @param nodeInfoHolders the jmx client used to update the thread pool size.
 	 */
-	public NodeInformationAction(JMXNodeConnectionWrapper jmx)
+	public NodeInformationAction(NodeInfoHolder...nodeInfoHolders)
 	{
-		this.jmx = jmx;
-		if (iconImage == null) initIconImage();
+		super(nodeInfoHolders);
+		setupIcon("/org/jppf/ui/resources/info.gif");
+		putValue(NAME, "Node System Information");
+		if (nodeInfoHolders.length > 1) setEnabled(false);
 	}
 
 	/**
@@ -77,8 +53,9 @@ public class NodeInformationAction implements ActionListener
 		String s = null;
 		try
 		{
-			JPPFSystemInformation info = jmx.systemInformation();
-			PropertiesTableFormat format = new HTMLPropertiesTableFormat("information for node " + jmx.getId());
+			JMXNodeConnectionWrapper connection = nodeInfoHolders[0].getJmxClient();
+			JPPFSystemInformation info = connection.systemInformation();
+			PropertiesTableFormat format = new HTMLPropertiesTableFormat("information for node " + connection.getId());
 			format.start();
 			format.formatTable(info.getSystem(), "System Properties");
 			format.formatTable(info.getEnv(), "Environment Variables");
@@ -93,7 +70,7 @@ public class NodeInformationAction implements ActionListener
 			s = StringUtils.getStackTrace(e).replace("\n", "<br>");
 		}
 		final JFrame frame = new JFrame("Node System Information");
-		if (iconImage != null) frame.setIconImage(iconImage);
+		frame.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter()
 		{

@@ -44,6 +44,14 @@ public class JPPFThreadFactory implements ThreadFactory
 	 * List of monitored thread IDs.
 	 */
 	private List<Long> threadIDs = null;
+	/**
+	 * The thread group that contains the threads of this factory.
+	 */
+	private ThreadGroup threadGroup = null;
+	/**
+	 * Priority assigned to the threads created by this factory.
+	 */
+	private int priority = Thread.NORM_PRIORITY;
 
 	/**
 	 * Initialize this thread factory with the specified name.
@@ -51,7 +59,17 @@ public class JPPFThreadFactory implements ThreadFactory
 	 */
 	public JPPFThreadFactory(String name)
 	{
-		this.name = name == null ? "JPPFThreadFactory" : name;
+		this(name, false, Thread.NORM_PRIORITY);
+	}
+
+	/**
+	 * Initialize this thread factory with the specified name.
+	 * @param name the name used as prefix for the constructed threads name.
+	 * @param priority priority assigned to the threads created by this factory.
+	 */
+	public JPPFThreadFactory(String name, int priority)
+	{
+		this(name, false, priority);
 	}
 
 	/**
@@ -61,7 +79,20 @@ public class JPPFThreadFactory implements ThreadFactory
 	 */
 	public JPPFThreadFactory(String name, boolean monitoringEnabled)
 	{
-		this(name);
+		this(name, monitoringEnabled, Thread.NORM_PRIORITY);
+	}
+
+	/**
+	 * Initialize this thread factory with the specified name.
+	 * @param name the name used as prefix for the constructed threads name.
+	 * @param monitoringEnabled determines whether the threads created by this factory can be monitored.
+	 * @param priority priority assigned to the threads created by this factory.
+	 */
+	public JPPFThreadFactory(String name, boolean monitoringEnabled, int priority)
+	{
+		this.name = name == null ? "JPPFThreadFactory" : name;
+		threadGroup = new ThreadGroup(this.name + " thread group");
+		threadGroup.setMaxPriority(Thread.MAX_PRIORITY);
 		this.monitoringEnabled = monitoringEnabled;
 		if (monitoringEnabled) threadIDs = new ArrayList<Long>();
 	}
@@ -74,8 +105,9 @@ public class JPPFThreadFactory implements ThreadFactory
 	 */
 	public Thread newThread(Runnable r)
 	{
-		Thread thread = new Thread(r, name + "-thread-" + incrementCount());
+		Thread thread = new Thread(threadGroup, r, name + "-thread-" + incrementCount());
 		if (monitoringEnabled) threadIDs.add(thread.getId());
+		thread.setPriority(priority);
 		return thread;
 	}
 
@@ -99,18 +131,26 @@ public class JPPFThreadFactory implements ThreadFactory
 	}
 
 	/**
-	 * 
+	 * Update the priority of all threads created by this factory.
+	 * @param newPriority the new priority to set.
 	 */
-	private class JPPFThread extends Thread
+	public synchronized void updatePriority(int newPriority)
 	{
-		/**
-		 * Initialize this thread with the specified target and name. 
-		 * @param target this thread's runnable target.
-		 * @param name the name of this thread.
-		 */
-		public JPPFThread(Runnable target, String name)
-		{
-			super(target, name);
-		}
+		if ((newPriority < Thread.MIN_PRIORITY) || (newPriority > Thread.MAX_PRIORITY) || (priority == newPriority)) return;
+		int count = threadGroup.activeCount();
+		// count is an estimate only, so we play it safe and take 2x its value.
+		Thread[] threads = new Thread[2 * count];
+		int n = threadGroup.enumerate(threads);
+		for (int i=0; i<n; i++) threads[i].setPriority(newPriority);
+		priority = newPriority;
+	}
+
+	/**
+	 * Get the priority assigned to the threads created by this factory.
+	 * @return the priority as an int value.
+	 */
+	public synchronized int getPriority()
+	{
+		return priority;
 	}
 }

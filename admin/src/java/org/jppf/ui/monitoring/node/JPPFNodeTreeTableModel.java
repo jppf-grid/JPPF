@@ -99,7 +99,7 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 						res = info.toString();
 						break;
 					case NODE_THREADS:
-						res = state.getThreadPoolSize();
+						res = "" + state.getThreadPoolSize() + " / " + state.getThreadPriority();
 						break;
 					case NODE_STATUS:
 						res = state.getConnectionStatus();
@@ -169,7 +169,7 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 	}
 
 	/**
-	 * Called when done editing a cell.
+	 * Called when done editing a cell. This method has an empty implementation and does nothing.
 	 * @param value not used.
 	 * @param node not used.
 	 * @param column not used.

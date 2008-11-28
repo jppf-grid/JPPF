@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Java Parallel Processing Framework.
+	Copyright (C) 2005-2008 JPPF Team.
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeThreadPoolPanel" type="page">
+
+	<property name="label" value="Update number of threads and priority"/>
+	<property name="scrollable" value="false"/>
+	<property name="orientation" value="vertical"/>
+	<property name="bordered" value="false"/>
+	<property name="main" value="true"/>
+	<script language="javascript" source="org/jppf/ui/options/xml/imports.js"/>
+	<initializer type="script">
+		<script language="javascript"><![CDATA[
+			var comp = option.findFirstWithName("/AdminPanels").getUIComponent();
+			var frame = new JFrame(option.getLabel());
+			wa = 
+			{
+				windowClosing: function(event)
+				{
+					var builder = OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("/ChartsBuilder").getUIComponent();
+					builder.getStorage().saveAll();
+					OptionsHandler.savePreferences();
+					System.exit(0);
+				}
+			};
+			frame.addWindowListener(new WindowAdapter(wa));
+			var statsHandler = StatsHandler.getInstance();
+			comp.setSelectedIndex(0);
+			frame.getContentPane().add(option.getUIComponent());
+			frame.setSize(600, 730);
+			frame.setVisible(true);
+			statsHandler.startRefreshTimer();
+		]]></script>
+	</initializer>
+
+	<!-- ===================================================================== -->
+	<!--                    Server Chooser Panel                               -->
+	<!-- ===================================================================== -->
+	
+	<child name="threadFields" type="page">
+		<property name="label" value=""/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="vertical"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+		<property name="tooltip" value="The list of drivers to connect to"/>
+
+		<child name="nbThreads" type="SpinnerNumber">
+			<property name="label" value="Number of threads"/>
+			<property name="tooltip" value="Number of threads in the node's execution thread pool"/>
+			<property name="value" value="1"/>
+			<property name="minValue" value="1"/>
+			<property name="maxValue" value="10000"/>
+			<property name="persistent" value="true"/>
+		</child>
+
+		<child name="threadPriority" type="SpinnerNumber">
+			<property name="label" value="Threads priority (1 - 10)"/>
+			<property name="tooltip" value="Number of threads in the node's execution thread pool"/>
+			<property name="value" value="1"/>
+			<property name="minValue" value="1"/>
+			<property name="maxValue" value="10"/>
+			<property name="persistent" value="true"/>
+		</child>
+
+		<child name="filler" type="Filler">
+			<property name="width" value="1"/>
+			<property name="height" value="1"/>
+		</child>
+
+	</child>
+
+	<child name="threadButtons" type="page">
+		<property name="label" value=""/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+		<property name="tooltip" value="The list of drivers to connect to"/>
+
+		<child name="filler" type="Filler">
+			<property name="width" value="1"/>
+			<property name="height" value="1"/>
+		</child>
+
+		<child name="nodeThreadsOK" type="Button">
+			<property name="label" value="OK"/>
+			<property name="tooltip" value="Apply new settings by sending them to the node"/>
+			<listener type="script">
+				<script language="javascript"><![CDATA[
+				]]></script>
+			</listener>
+		</child>
+
+		<child name="nodeThreadsCancel" type="Button">
+			<property name="label" value="Cancel"/>
+			<property name="tooltip" value="Close this dialog without applying any settings"/>
+			<listener type="script">
+				<script language="javascript"><![CDATA[
+				]]></script>
+			</listener>
+		</child>
+
+		<child name="filler" type="Filler">
+			<property name="width" value="1"/>
+			<property name="height" value="1"/>
+		</child>
+
+	</child>
+
+	<child name="filler" type="Filler">
+		<property name="width" value="1"/>
+		<property name="height" value="1"/>
+	</child>
+
+</opt:main>

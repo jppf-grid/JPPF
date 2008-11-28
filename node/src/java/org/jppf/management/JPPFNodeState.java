@@ -62,6 +62,10 @@ public class JPPFNodeState implements Serializable
 	 * Size of the node's thread pool.
 	 */
 	private int threadPoolSize = 1;
+	/**
+	 * Priority of the threads in the pool.
+	 */
+	private int threadPriority = Thread.NORM_PRIORITY;
 
 	/**
 	 * Get the latest event received from a task.
@@ -219,5 +223,23 @@ public class JPPFNodeState implements Serializable
 	public synchronized void setCpuTime(long cpuTime)
 	{
 		this.cpuTime = cpuTime;
+	}
+
+	/**
+	 * Get the priority of the threads in the pool.
+	 * @return the priority as an int value.
+	 */
+	public int getThreadPriority()
+	{
+		return threadPriority;
+	}
+
+	/**
+	 * Set the priority of the threads in the pool.
+	 * @param threadPriority the priority as an int value.
+	 */
+	public void setThreadPriority(int threadPriority)
+	{
+		this.threadPriority = threadPriority;
 	}
 }

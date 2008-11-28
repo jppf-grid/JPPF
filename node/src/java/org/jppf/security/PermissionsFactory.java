@@ -46,6 +46,14 @@ public final class PermissionsFactory
 	 * Encapsulates the set of all permissions granted to a node.
 	 */
 	private static List<Permission> permList = null;
+	/**
+	 * Permissions granted to the executed task code.
+	 */
+	private static JPPFPermissions normalPermissions = null;
+	/**
+	 * Permissions granted to the JPPF node code.
+	 */
+	private static JPPFPermissions extendedPermissions = null;
 	
 	/**
 	 * Instantiation of this class is not permitted.
@@ -69,7 +77,7 @@ public final class PermissionsFactory
 	 * @return a Permissions object.
 	 * @see java.security.Permissions
 	 */
-	public static synchronized Permissions getPermissions(ClassLoader classLoader)
+	public static synchronized PermissionCollection getPermissions(ClassLoader classLoader)
 	{
 		if (permList == null)
 		{
@@ -78,10 +86,31 @@ public final class PermissionsFactory
 				classLoader = PermissionsFactory.class.getClassLoader();
 			}
 			createPermissions(classLoader);
+			if (debugEnabled) log.debug("created normal permissions");
 		}
-		Permissions permissions = new Permissions();
-		for (Permission p: permList) permissions.add(p);
-		return permissions;
+		if (debugEnabled) log.debug("getting normal permissions");
+		return normalPermissions;
+	}
+	
+	/**
+	 * Get the set of permissions granted to a node.
+	 * @param classLoader the ClassLoader used to retrieve the policy file.
+	 * @return a Permissions object.
+	 * @see java.security.Permissions
+	 */
+	public static synchronized PermissionCollection getExtendedPermissions(ClassLoader classLoader)
+	{
+		if (permList == null)
+		{
+			if (classLoader == null)
+			{
+				classLoader = PermissionsFactory.class.getClassLoader();
+			}
+			createPermissions(classLoader);
+			if (debugEnabled) log.debug("created extended permissions");
+		}
+		if (debugEnabled) log.debug("getting extended permissions");
+		return extendedPermissions;
 	}
 	
 	/**
@@ -95,6 +124,14 @@ public final class PermissionsFactory
 		createDynamicPermissions();
 		createManagementPermissions();
 		readStaticPermissions(classLoader);
+		normalPermissions = new JPPFPermissions();
+		extendedPermissions = new JPPFPermissions();
+		for (Permission p: permList)
+		{
+			normalPermissions.add(p);
+			extendedPermissions.add(p);
+		}
+		extendedPermissions.add(new RuntimePermission("exitVM"));
 	}
 
 	/**

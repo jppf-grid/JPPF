@@ -105,6 +105,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 		s.setTaskEvent(nodeState.getTaskNotification());
 		s.setTaskIdSet(nodeState.getAllTaskIds());
 		s.setThreadPoolSize(node.getExecutionManager().getThreadPoolSize());
+		s.setThreadPriority(node.getExecutionManager().getThreadsPriority());
 		s.setCpuTime(node.getExecutionManager().getCpuTime());
 		return s;
 	}
@@ -254,5 +255,15 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	{
 		node.setTaskCount(n);
 		nodeState.setNbTasksExecuted(n);
+	}
+
+	/**
+	 * Update the priority of all execution threads.
+	 * @param newPriority the new priority to set.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadsPriority(int)
+	 */
+	public void updateThreadsPriority(Integer newPriority)
+	{
+		node.getExecutionManager().updateThreadsPriority(newPriority);
 	}
 }

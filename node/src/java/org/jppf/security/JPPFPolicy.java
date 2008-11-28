@@ -20,6 +20,7 @@ package org.jppf.security;
 import java.security.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.node.JPPFClassLoader;
 
 /**
  * Security policy for JPPF Nodes.
@@ -60,6 +61,12 @@ public class JPPFPolicy extends Policy
 	 */
 	public PermissionCollection getPermissions(CodeSource codesource)
 	{
+		/*
+		*/
+		if (debugEnabled) log.debug("in getPermissions(CodeSource)");
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if ((cl == classLoader) || !(cl instanceof JPPFClassLoader))
+			return PermissionsFactory.getExtendedPermissions(classLoader);
 		return PermissionsFactory.getPermissions(classLoader);
 	}
 
@@ -79,6 +86,12 @@ public class JPPFPolicy extends Policy
 	 */
 	public PermissionCollection getPermissions(ProtectionDomain domain)
 	{
+		/*
+		*/
+		if (debugEnabled) log.debug("in getPermissions(ProtectionDomain)");
+		ClassLoader cl = domain.getClassLoader();
+		if ((cl == classLoader) || !(cl instanceof JPPFClassLoader))
+			return PermissionsFactory.getExtendedPermissions(classLoader);
 		return PermissionsFactory.getPermissions(classLoader);
 	}
 }

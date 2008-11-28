@@ -132,4 +132,15 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper
 	{
 		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "resetTaskCounter", (Object[]) null, (String[]) null); 
 	}
+
+	/**
+	 * Update the priority of all execution threads.
+	 * @param newPriority the new priority to set.
+	 * @throws Exception if an error is raised when invoking the node mbean.
+	 */
+	public void updateThreadsPriority(int newPriority) throws Exception
+	{
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateThreadsPriority",
+			new Object[] { newPriority }, new String[] { "java.lang.Integer" }); 
+	}
 }
