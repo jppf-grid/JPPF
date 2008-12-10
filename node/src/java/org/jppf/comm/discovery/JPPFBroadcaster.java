@@ -70,11 +70,10 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 	private void init() throws Exception
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
-		String group = props.getString("jppf.broadcast.group", "230.0.0.1");
-		int port = props.getInt("jppf.broadcast.port", 44446);
+		String group = props.getString("jppf.discovery.group", "230.0.0.1");
+		int port = props.getInt("jppf.discovery.port", 11111);
 
-		//List<Inet4Address> addresses = NetworkUtils.getNonLocalIPV4Addresses();
-		List<Inet4Address> addresses = NetworkUtils.getIPV4Addresses();
+		List<Inet4Address> addresses = NetworkUtils.getNonLocalIPV4Addresses();
 		if (addresses.isEmpty()) addresses.add((Inet4Address) InetAddress.getByName("127.0.0.1"));
 		if (debugEnabled)
 		{
@@ -92,6 +91,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 			ci.classServerPorts = info.classServerPorts;
 			ci.applicationServerPorts = info.applicationServerPorts;
 			ci.nodeServerPorts = info.nodeServerPorts;
+			ci.managementPort = info.managementPort;
 			byte[] infoBytes = JPPFConnectionInformation.toBytes(info);
 			ByteBuffer buffer = ByteBuffer.wrap(new byte[512]);
 			buffer.putInt(infoBytes.length);

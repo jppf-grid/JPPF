@@ -137,7 +137,7 @@ public class NodeRunner
 	{
 		try
 		{
-			discoverDriver();
+			if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true)) discoverDriver();
 			setSecurity();
 			Class clazz = getJPPFClassLoader().loadClass("org.jppf.server.node.JPPFNode");
 			MonitoredNode node = (MonitoredNode) clazz.newInstance();

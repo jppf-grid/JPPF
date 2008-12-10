@@ -40,14 +40,14 @@ public class JPPFPermissions extends PermissionCollection
 	/**
 	 * The list of permissions in this collection.
 	 */
-	private List<Permission> permissions = new ArrayList<Permission>();
+	private List<Permission> permissions = new Vector<Permission>();
 
 	/**
 	 * Adds a permission object to the current collection of permission objects.
 	 * @param permission the Permission object to add.
 	 * @see java.security.PermissionCollection#add(java.security.Permission)
 	 */
-	public void add(Permission permission)
+	public synchronized void add(Permission permission)
 	{
 		if (permission == null) return;
 		permissions.add(permission);
@@ -58,7 +58,7 @@ public class JPPFPermissions extends PermissionCollection
 	 * @return an enumeration of all the Permissions.
 	 * @see java.security.PermissionCollection#elements()
 	 */
-	public Enumeration<Permission> elements()
+	public synchronized Enumeration<Permission> elements()
 	{
 		return new Enumerator();
 	}
@@ -69,14 +69,12 @@ public class JPPFPermissions extends PermissionCollection
 	 * @return true if "permission" is implied by the permissions in the collection, false if not.
 	 * @see java.security.PermissionCollection#implies(java.security.Permission)
 	 */
-	public boolean implies(Permission permission)
+	public synchronized boolean implies(Permission permission)
 	{
-		synchronized(permissions)
+		List<Permission> perms = Collections.unmodifiableList(permissions);
+		for (Permission p: perms)
 		{
-			for (Permission p: permissions)
-			{
-				if (p.implies(permission)) return true;
-			}
+			if (p.implies(permission)) return true;
 		}
 		return false;
 	}
@@ -103,7 +101,25 @@ public class JPPFPermissions extends PermissionCollection
 		/**
 		 * Total number of elements.
 		 */
-		private final int count = permissions.size();
+		private int count = 0;
+		/**
+		 * The list of permissions in this collection.
+		 */
+		private List<Permission> enumPermissions = null;
+
+		/**
+		 * Default constructor.
+		 */
+		public Enumerator()
+		{
+			synchronized(JPPFPermissions.this)
+			{
+				enumPermissions = new Vector<Permission>();
+				enumPermissions.addAll(permissions);
+			}
+			//enumPermissions = permissions;
+			count = enumPermissions.size();
+		}
 
 		/**
 		 * Test if this enumeration contains more elements. 
@@ -124,7 +140,7 @@ public class JPPFPermissions extends PermissionCollection
 		public Permission nextElement() throws NoSuchElementException
 		{
 			if (!hasMoreElements()) throw new NoSuchElementException("no more element in this enumeration");
-			return permissions.get(index++);
+			return enumPermissions.get(index++);
 		}
 	}
 }

@@ -21,6 +21,7 @@ package org.jppf.comm.discovery;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.logging.*;
 import org.jppf.utils.*;
@@ -30,7 +31,7 @@ import org.jppf.utils.*;
  * to get the driver connection host and ports.
  * @author Laurent Cohen
  */
-public class JPPFMulticastReceiver
+public class JPPFMulticastReceiver extends ThreadSynchronization
 {
 	/**
 	 * Logger for this class.
@@ -47,52 +48,60 @@ public class JPPFMulticastReceiver
 	/**
 	 * Multicast group to join.
 	 */
-	private	static String group = props.getString("jppf.broadcast.group", "230.0.0.1");
+	private	static String group = props.getString("jppf.discovery.group", "230.0.0.1");
 	/**
 	 * Multicast port to listen to.
 	 */
-	private	static int port = props.getInt("jppf.broadcast.port", 44446);
+	private	static int port = props.getInt("jppf.discovery.port", 11111);
+	/**
+	 * Timeout for UDP socket read operations.
+	 */
+	private	static int timeout = props.getInt("jppf.discovery.timeout", 5000);
 	/**
 	 * Multicast group to join.
 	 */
 	private static InetAddress groupInetAddress = null;
+	/**
+	 * List of retrieved connection information.
+	 */
+	private LinkedList<JPPFConnectionInformation> infoList = new LinkedList<JPPFConnectionInformation>();
+	/**
+	 * Count of connection information objects used for ordering.
+	 */
+	private AtomicLong count = new AtomicLong(0L);
 
 	/**
 	 * Retrieve the driver connection information broadcast by the driver.
 	 * @return a <code>DriverConnectionInformation</code> instance, or null
 	 * if no broadcast information could be retrieved.
 	 */
-	public JPPFConnectionInformation receive()
+	public synchronized JPPFConnectionInformation receive()
 	{
 		JPPFConnectionInformation info = null;
 		try
 		{
-			groupInetAddress = InetAddress.getByName(group);
-			List<Inet4Address> addresses = NetworkUtils.getNonLocalIPV4Addresses();
-			//List<Inet4Address> addresses = NetworkUtils.getIPV4Addresses();
-			if (addresses.isEmpty()) addresses.add((Inet4Address) InetAddress.getByName("127.0.0.1"));
-			int len = addresses.size();
-			if (debugEnabled)
+			if (groupInetAddress == null)
 			{
-				StringBuilder sb = new StringBuilder();
-				sb.append("Found ").append(len).append(" address");
-				if (len > 1) sb.append("es");
-				sb.append(":");
-				for (Inet4Address addr: addresses) sb.append(" ").append(addr.getHostAddress());
-				log.debug(sb.toString());
-			}
-			Receiver[] receivers = new Receiver[len];
-			for (int i=0; i<len; i++) receivers[i] = new Receiver(addresses.get(i), port);
-			for (Receiver r: receivers) r.start();
-			for (Receiver r: receivers)
-			{
-				r.join();
-				if (r.getInfo() != null)
+				groupInetAddress = InetAddress.getByName(group);
+				List<Inet4Address> addresses = NetworkUtils.getNonLocalIPV4Addresses();
+				if (addresses.isEmpty()) addresses.add((Inet4Address) InetAddress.getByName("127.0.0.1"));
+				int len = addresses.size();
+				if (debugEnabled)
 				{
-					info = r.getInfo();
-					break;
+					StringBuilder sb = new StringBuilder();
+					sb.append("Found ").append(len).append(" address");
+					if (len > 1) sb.append("es");
+					sb.append(":");
+					for (Inet4Address addr: addresses) sb.append(" ").append(addr.getHostAddress());
+					log.debug(sb.toString());
 				}
+				Receiver[] receivers = new Receiver[len];
+				for (int i=0; i<len; i++) receivers[i] = new Receiver(addresses.get(i), port);
+				for (Receiver r: receivers) r.start();
 			}
+			if (!hasConnectionInfo()) wait(timeout);
+			else Thread.sleep(50);
+			info = getMostRecent();
 		}
 		catch(Exception e)
 		{
@@ -103,10 +112,42 @@ public class JPPFMulticastReceiver
 	}
 
 	/**
+	 * Add the specified connection information to the set of retrieved ones.
+	 * If the connection information already exists, nothing is added.
+	 * @param info the connection information to add.
+	 */
+	private synchronized void addConnectionInfo(JPPFConnectionInformation info)
+	{
+		infoList.remove(info);
+		infoList.addFirst(info);
+		if (debugEnabled) log.debug("nb connections: " + infoList.size());
+		notifyAll();
+	}
+
+	/**
+	 * Get the most recently received connection information.
+	 * @return a <code>JPPFConnectionInformation</code> instance, or null if none was received.
+	 */
+	private synchronized JPPFConnectionInformation getMostRecent()
+	{
+		if (infoList.isEmpty()) return null;
+		return infoList.getFirst();
+	}
+
+	/**
+	 * Determine whether at least one connection information object has been retrieved.
+	 * @return true if at least one connection information object has been retrieved, false otherwise.
+	 */
+	private synchronized boolean hasConnectionInfo()
+	{
+		return !infoList.isEmpty();
+	}
+
+	/**
 	 * Instances of this class attempt to receive broadcast connection information
 	 * from a multicast socket bound to a specified address.
 	 */
-	public static class Receiver extends Thread
+	public class Receiver extends Thread
 	{
 		/**
 		 * Address the multicast socket is bound to.
@@ -141,24 +182,41 @@ public class JPPFMulticastReceiver
 			MulticastSocket socket = null;
 			try
 			{
+				int t = 1000;
 				socket = new MulticastSocket(new InetSocketAddress(addr, port));
 				socket.setInterface(addr);
 				socket.joinGroup(groupInetAddress);
+				socket.setSoTimeout(1000);
 				byte[] buf = new byte[512];
 				DatagramPacket packet = new DatagramPacket(buf, buf.length);
-				int timeout = props.getInt("jppf.broadcast.timeout", 5000);
-				socket.setSoTimeout(timeout);
-				socket.receive(packet);
-				ByteBuffer buffer = ByteBuffer.wrap(buf);
-				int len = buffer.getInt();
-				byte[] bytes = new byte[len];
-				buffer.get(bytes);
-				info = JPPFConnectionInformation.fromBytes(bytes);
+				while (!isStopped())
+				{
+					long start = System.currentTimeMillis();
+					while (System.currentTimeMillis() - start < t)
+					{
+						boolean hasTimedOut = false;
+						try
+						{
+							socket.receive(packet);
+						}
+						catch(SocketTimeoutException e)
+						{
+							hasTimedOut = true;
+							if (debugEnabled) log.debug(e.getMessage(), e);
+						}
+						if (!hasTimedOut)
+						{
+							ByteBuffer buffer = ByteBuffer.wrap(buf);
+							int len = buffer.getInt();
+							byte[] bytes = new byte[len];
+							buffer.get(bytes);
+							info = JPPFConnectionInformation.fromBytes(bytes);
+							addConnectionInfo(info);
+						}
+						if (System.currentTimeMillis() - start < t) Thread.sleep(50L);
+					}
+				}
 				socket.leaveGroup(groupInetAddress);
-			}
-			catch(SocketTimeoutException e)
-			{
-				if (debugEnabled) log.debug(e.getMessage(), e);
 			}
 			catch(Exception e)
 			{

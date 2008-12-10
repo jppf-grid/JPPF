@@ -65,7 +65,8 @@ public final class StringUtils
 		StringBuilder sb = new StringBuilder();
 		if (source == null) source = "";
 		int length = source.length();
-		if (length > maxLen) sb.append(source, length-maxLen, maxLen);
+		//if (length > maxLen) sb.append(source, length-maxLen, maxLen);
+		if (length > maxLen) return source;
 		else
 		{
 			for (int i=0; i<maxLen-length; i++) sb.append(padChar);
