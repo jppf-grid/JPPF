@@ -179,6 +179,7 @@ public class JPPFClient extends AbstractJPPFClient
 	public void newConnection(JPPFClientConnection c)
 	{
 		log.info("Connection [" + c.getName() + "] created");
+		super.newConnection(c);
 		c.addClientConnectionStatusListener(this);
 		c.setStatus(JPPFClientConnectionStatus.NEW);
 		int priority = c.getPriority();
@@ -198,7 +199,6 @@ public class JPPFClient extends AbstractJPPFClient
 			executor.setCorePoolSize(n);
 		}
 		executor.submit(new ConnectionInitializer(c));
-		super.newConnection(c);
 	}
 
 	/**

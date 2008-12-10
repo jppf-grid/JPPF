@@ -67,10 +67,12 @@
 			<property name="value" value=""/>
 			<initializer type="script">
 				<script language="javascript"><![CDATA[
+					StatsHandler.getInstance().setServerListOption(option);
+					/*
 					var list = StatsHandler.getInstance().getJppfClient().getAllConnections();
 					option.setItems(list);
 					if (!list.isEmpty()) option.setValue(list.get(0));
-					StatsHandler.getInstance().setServerListOption(option);
+					*/
 				]]></script>
 			</initializer>
 			<listener type="script">

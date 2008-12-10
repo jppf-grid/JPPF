@@ -520,7 +520,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	 * Set the option containing the combobox with the list of driver connections. 
 	 * @param serverListOption an <code>OptionElement</code> instance.
 	 */
-	public void setServerListOption(OptionElement serverListOption)
+	public synchronized void setServerListOption(OptionElement serverListOption)
 	{
 		this.serverListOption = serverListOption;
 		notifyAll();
@@ -561,25 +561,22 @@ public final class StatsHandler implements StatsConstants, ClientListener
 				timer.schedule(task, 1000L, refreshInterval);
 			}
 			JComboBox box = null;
-			if (serverListOption == null) goToSleep();
-			else
+			while (serverListOption == null) goToSleep(50L);
+			box = ((ComboBoxOption) serverListOption).getComboBox();
+			box.addItem(c);
+			int maxLen = 0;
+			Object proto = null;
+			for (int i=0; i<box.getItemCount(); i++)
 			{
-				box = ((ComboBoxOption) serverListOption).getComboBox();
-				box.addItem(c);
-				int maxLen = 0;
-				Object proto = null;
-				for (int i=0; i<box.getItemCount(); i++)
+				Object o = box.getItemAt(i);
+				int n = o.toString().length();
+				if (n > maxLen)
 				{
-					Object o = box.getItemAt(i);
-					int n = o.toString().length();
-					if (n > maxLen)
-					{
-						maxLen = n;
-						proto = o;
-					}
+					maxLen = n;
+					proto = o;
 				}
-				if (proto != null) box.setPrototypeDisplayValue(proto);
 			}
+			if (proto != null) box.setPrototypeDisplayValue(proto);
 			if (currentConnection == null)
 			{
 				currentConnection = (JPPFClientConnectionImpl) c;

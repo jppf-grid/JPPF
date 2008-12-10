@@ -188,7 +188,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 				if (oneAttempt) break;
 			}
 		}
-		if (debugEnabled) log.debug("found client connection \"" + client + "\"");
+		if (debugEnabled && (client != null)) log.debug("found client connection \"" + client + "\"");
 		return client;
 	}
 

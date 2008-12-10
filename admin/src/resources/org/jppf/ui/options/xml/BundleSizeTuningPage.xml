@@ -21,7 +21,7 @@
 
 	<!-- test comment for save -->
 	<property name="label" value="Bundle Size Tuning"/>
-	<property name="scrollable" value="false"/>
+	<property name="scrollable" value="true"/>
 	<property name="orientation" value="vertical"/>
 	<property name="bordered" value="false"/>
 	<property name="main" value="true"/>
