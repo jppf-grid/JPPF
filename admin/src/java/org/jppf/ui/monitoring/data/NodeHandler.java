@@ -67,6 +67,15 @@ public class NodeHandler implements ClientListener
 	private List<NodeHandlerListener> listeners = new ArrayList<NodeHandlerListener>();
 
 	/**
+	 * Initialize this node handler.
+	 */
+	public NodeHandler()
+	{
+		this.jppfClient = StatsHandler.getInstance().getJppfClient(this);
+		initialize(true);
+	}
+
+	/**
 	 * Initialize this node handler with the specified jppf client.
 	 * @param jppfClient the client that manages the connections to all configured JPPF drivers.
 	 */
@@ -74,7 +83,7 @@ public class NodeHandler implements ClientListener
 	{
 		this.jppfClient = jppfClient;
 		jppfClient.addClientListener(this);
-		initialize(false);
+		initialize(true);
 	}
 
 	/**
@@ -83,9 +92,9 @@ public class NodeHandler implements ClientListener
 	 */
 	private void initialize(boolean triggerEvents)
 	{
-		//refresh(triggerEvents);
-		startRefreshNodeTimer();
+		refresh(triggerEvents);
 		startRefreshDriverTimer();
+		startRefreshNodeTimer();
 	}
 
 	/**
@@ -109,7 +118,10 @@ public class NodeHandler implements ClientListener
 		driversToProcess = new ArrayList<String>();
 		for (String name: list)
 		{
-			if (!nodeManagerMap.containsKey(name)) driversToProcess.add(name);
+			if (!nodeManagerMap.containsKey(name))
+			{
+				driversToProcess.add(name);
+			}
 		}
 		for (String name: driversToProcess) addDriver(name, triggerEvents);
 

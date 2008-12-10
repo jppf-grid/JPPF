@@ -251,7 +251,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	public String changeAdminPassword(String password, String newPassword)
 	{
 		String msg = null;
-		if (getJppfClient() == null) return "Not connected to the server";
+		if (getJppfClient(null) == null) return "Not connected to the server";
 		if (getCurrentConnection() == null) return "No active server connection";
 		try
 		{
@@ -280,9 +280,9 @@ public final class StatsHandler implements StatsConstants, ClientListener
 		if (stats == null) return;
 		if (connection == null)
 		{
-			List<JPPFClientConnection> list = getJppfClient().getAllConnections();
+			List<JPPFClientConnection> list = getJppfClient(null).getAllConnections();
 			if ((list == null) || list.isEmpty()) return;
-			else connection = getJppfClient().getAllConnections().get(0);
+			else connection = getJppfClient(null).getAllConnections().get(0);
 		}
 		ConnectionDataHolder dataHolder = dataHolderMap.get(connection.getName());
 		tickCount++;
@@ -489,11 +489,15 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * JPPF client used to submit data udpate and administration requests.
+	 * @param clientListener a listener to register with the JPPF client.
 	 * @return a <code>JPPFClient</code> instance.
 	 */
-	public synchronized JPPFClient getJppfClient()
+	public synchronized JPPFClient getJppfClient(ClientListener clientListener)
 	{
-		if (jppfClient == null) jppfClient = new JPPFClient(this);
+		if (jppfClient == null)
+		{
+			jppfClient = (clientListener == null) ? new JPPFClient(this) : new JPPFClient(this, clientListener);
+		}
 		return jppfClient;
 	}
 

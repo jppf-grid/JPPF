@@ -69,7 +69,7 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	public NodeDataPanel()
 	{
-		this(new NodeHandler(StatsHandler.getInstance().getJppfClient()));
+		this(new NodeHandler());
 	}
 
 	/**
