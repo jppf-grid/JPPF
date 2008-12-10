@@ -67,6 +67,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * A list of all the connections initially created. 
 	 */
 	protected List<JPPFClientConnection> allConnections = new ArrayList<JPPFClientConnection>();
+	/**
+	 * List of listeners to this JPPF client.
+	 */
+	protected List<ClientListener> listeners = new ArrayList<ClientListener>();
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -287,44 +291,50 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public void statusChanged(ClientConnectionStatusEvent event)
 	{
-		JPPFClientConnection c = event.getJPPFClientConnection();
-		if (c.getStatus().equals(JPPFClientConnectionStatus.FAILED))
+		JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
+		if (c.getStatus().equals(JPPFClientConnectionStatus.FAILED)) connectionFailed(c);
+	}
+
+	/**
+	 * Invoked when the status of a connection has changed to <code>JPPFClientConnectionStatus.FAILED</code>.
+	 * @param c the connection that failed.
+	 */
+	protected void connectionFailed(JPPFClientConnection c)
+	{
+		log.info("Connection [" + c.getName() + "] failed");
+		c.removeClientConnectionStatusListener(this);
+		int priority = c.getPriority();
+		ClientPool pool = pools.get(priority);
+		if (pool != null)
 		{
-			log.info("Connection [" + c.getName() + "] failed");
-			c.removeClientConnectionStatusListener(this);
-			int priority = c.getPriority();
-			ClientPool pool = pools.get(priority);
-			if (pool != null)
+			pool.clientList.remove(c);
+			if (pool.clientList.isEmpty()) pools.remove(priority);
+			if (pools.isEmpty()) throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
+		}
+		List<ClientExecution> toResubmit = c.close();
+		int taskCount = 0;
+		int execCount = toResubmit.size();
+		for (ClientExecution exec: toResubmit)
+		{
+			if (exec.tasks != null) taskCount += exec.tasks.size();
+		}
+		if (taskCount > 0)
+		{
+			log.info("Connection [" + c.getName() + "] : resubmitting " + taskCount + "tasks for " + execCount + " executions");
+		}
+		if (c != null)
+		{
+			try
 			{
-				pool.clientList.remove(c);
-				if (pool.clientList.isEmpty()) pools.remove(priority);
-				if (pools.isEmpty()) throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
-			}
-			List<ClientExecution> toResubmit = c.close();
-			int taskCount = 0;
-			int execCount = toResubmit.size();
-			for (ClientExecution exec: toResubmit)
-			{
-				if (exec.tasks != null) taskCount += exec.tasks.size();
-			}
-			if (taskCount > 0)
-			{
-				log.info("Connection [" + c.getName() + "] : resubmitting " + taskCount + "tasks for " + execCount + " executions");
-			}
-			if (c != null)
-			{
-				try
+				for (ClientExecution exec: toResubmit)
 				{
-					for (ClientExecution exec: toResubmit)
-					{
-						if (exec.isBlocking) submit(exec.tasks, exec.dataProvider);
-						else submitNonBlocking(exec.tasks, exec.dataProvider, exec.listener);
-					}
+					if (exec.isBlocking) submit(exec.tasks, exec.dataProvider);
+					else submitNonBlocking(exec.tasks, exec.dataProvider, exec.listener);
 				}
-				catch(Exception e)
-				{
-					log.error(e);
-				}
+			}
+			catch(Exception e)
+			{
+				log.error(e);
 			}
 		}
 	}
@@ -402,6 +412,36 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 			{
 				log.error(e);
 			}
+		}
+	}
+
+	/**
+	 * Add a listener to the list of listeners to this client.
+	 * @param listener the listener to add.
+	 */
+	public synchronized void addClientListener(ClientListener listener)
+	{
+		listeners.add(listener);
+	}
+
+	/**
+	 * Remove a listener from the list of listeners to this client.
+	 * @param listener the listener to remove.
+	 */
+	public synchronized void removeClientListener(ClientListener listener)
+	{
+		listeners.remove(listener);
+	}
+
+	/**
+	 * Notify all listeners that a new connection was created.
+	 * @param c the connection that was created.
+	 */
+	public synchronized void newConnection(JPPFClientConnection c)
+	{
+		for (ClientListener listener: listeners)
+		{
+			listener.newConnection(new ClientEvent(c));
 		}
 	}
 }

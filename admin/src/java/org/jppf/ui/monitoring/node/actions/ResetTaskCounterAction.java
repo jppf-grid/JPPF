@@ -35,6 +35,7 @@ public class ResetTaskCounterAction extends JPPFAbstractNodeAction
 		super(nodeInfoHolders);
 		setupIcon("/org/jppf/ui/resources/reset.gif");
 		putValue(NAME, "Reset task counter");
+		if (nodeInfoHolders.length < 1) setEnabled(false);
 	}
 
 	/**

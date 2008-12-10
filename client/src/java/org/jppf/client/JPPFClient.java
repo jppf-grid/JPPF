@@ -19,11 +19,13 @@ package org.jppf.client;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
-import org.jppf.client.event.TaskResultListener;
+import org.jppf.client.event.*;
 import org.jppf.client.loadbalancer.LoadBalancer;
+import org.jppf.comm.discovery.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.*;
@@ -51,7 +53,7 @@ public class JPPFClient extends AbstractJPPFClient
 	/**
 	 * The pool of threads used for submitting execution requests.
 	 */
-	private ExecutorService executor = null;
+	private ThreadPoolExecutor executor = null;
 	/**
 	 * The load balancer for local versus remote execution.
 	 */
@@ -64,6 +66,10 @@ public class JPPFClient extends AbstractJPPFClient
 	 * Determines whether local execution is enabled.
 	 */
 	public static final boolean LOCAL_EXEC_ENABLED = config.getBoolean("jppf.local.execution.enabled", true);
+	/**
+	 * 
+	 */
+	private JPPFMulticastReceiverThread receiverThread = null;
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -71,6 +77,19 @@ public class JPPFClient extends AbstractJPPFClient
 	public JPPFClient()
 	{
 		super();
+		if (debugEnabled) log.debug("********** in JPPFClient() **********");
+		initPools();
+	}
+
+	/**
+	 * Initialize this client with an automatically generated application UUID.
+	 * @param listeners listenrs to add to this JPPF client.
+	 */
+	public JPPFClient(ClientListener...listeners)
+	{
+		super();
+		if (debugEnabled) log.debug("**********  in JPPFClient(ClientListener[]) **********");
+		for (ClientListener listener: listeners) addClientListener(listener);
 		initPools();
 	}
 
@@ -81,6 +100,7 @@ public class JPPFClient extends AbstractJPPFClient
 	public JPPFClient(String uuid)
 	{
 		super(uuid);
+		if (debugEnabled) log.debug("********** in JPPFClient(uuid) **********");
 		initPools();
 	}
 
@@ -90,8 +110,20 @@ public class JPPFClient extends AbstractJPPFClient
 	 */
 	public void initPools()
 	{
+		if (config.getBoolean("jppf.discovery.enabled", true)) initPoolsFromAutoDiscovery();
+		else initPoolsFromConfig();
+	}
+
+	/**
+	 * Read all client connection information from the configuration and initialize
+	 * the connection pools accordingly.
+	 */
+	public void initPoolsFromConfig()
+	{
 		try
 		{
+			LinkedBlockingQueue queue = new LinkedBlockingQueue();
+			executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("JPPF Client"));
 			String driverNames = config.getString("jppf.drivers");
 			if (debugEnabled) log.debug("list of drivers: " + driverNames);
 			String[] names = null;
@@ -109,32 +141,9 @@ public class JPPFClient extends AbstractJPPFClient
 			{
 				String name = "".equals(s) ? "default" : s;
 				JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, name, config);
-				int priority = c.getPriority();
-				c.addClientConnectionStatusListener(this);
-				ClientPool pool = pools.get(priority);
-				if (pool == null)
-				{
-					pool = new ClientPool();
-					pool.priority = priority;
-					pools.put(priority, pool);
-				}
-				pool.clientList.add(c);
+				newConnection(c);
 			}
-			for (int priority: pools.keySet())
-			{
-				ClientPool pool = pools.get(priority);
-				for (JPPFClientConnection c: pool.clientList) allConnections.add(c);
-			}
-			executor = Executors.newFixedThreadPool(Math.max(1, allConnections.size()), new JPPFThreadFactory("JPPF Client"));
-			for (Integer priority: pools.keySet())
-			{
-				ClientPool pool = pools.get(priority);
-				for (JPPFClientConnection c: pool.clientList)
-				{
-					executor.submit(new ConnectionInitializer(c));
-				}
-			}
-			waitForPools();
+			waitForPools(true);
 		}
 		catch(Exception e)
 		{
@@ -143,13 +152,65 @@ public class JPPFClient extends AbstractJPPFClient
 	}
 
 	/**
+	 * Read connection information from the information and broadcasted 
+	 * by the server and initialize the connection pools accordingly.
+	 */
+	public void initPoolsFromAutoDiscovery()
+	{
+		try
+		{
+			LinkedBlockingQueue queue = new LinkedBlockingQueue();
+			executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("JPPF Client"));
+			receiverThread = new JPPFMulticastReceiverThread();
+			new Thread(receiverThread).start();
+			waitForPools(false);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Invoked when a new connection is created.
+	 * @param c the connection that failed.
+	 * @see org.jppf.client.AbstractJPPFClient#newConnection(org.jppf.client.JPPFClientConnection)
+	 */
+	public void newConnection(JPPFClientConnection c)
+	{
+		log.info("Connection [" + c.getName() + "] created");
+		c.addClientConnectionStatusListener(this);
+		c.setStatus(JPPFClientConnectionStatus.NEW);
+		int priority = c.getPriority();
+		ClientPool pool = pools.get(priority);
+		if (pool == null)
+		{
+			pool = new ClientPool();
+			pool.priority = priority;
+			pools.put(priority, pool);
+		}
+		pool.clientList.add(c);
+		allConnections.add(c);
+		int n = allConnections.size();
+		if (executor.getCorePoolSize() < n)
+		{
+			executor.setMaximumPoolSize(n);
+			executor.setCorePoolSize(n);
+		}
+		executor.submit(new ConnectionInitializer(c));
+		super.newConnection(c);
+	}
+
+	/**
 	 * Wait a maximum time specified in the configuration until at least one connection is initialized.
 	 * After this time, control is returned to the main application, no matter how many connections are initialized. 
+	 * @param returnOnEmptyPool determines whether this method should return immediately when the pool of connections is empty.
 	 */
-	private void waitForPools()
+	private void waitForPools(boolean returnOnEmptyPool)
 	{
-		long maxWait = JPPFConfiguration.getProperties().getLong("jppf.client.max.init.time", 1000L);
-		if (pools.isEmpty() || (maxWait <= 0)) return;
+		if (returnOnEmptyPool && pools.isEmpty()) return;
+		long maxWait = JPPFConfiguration.getProperties().getLong("jppf.client.max.init.time", 5000L);
+		if (maxWait <= 0) return;
 		long elapsed = 0;
 		while (elapsed < maxWait)
 		{
@@ -255,6 +316,7 @@ public class JPPFClient extends AbstractJPPFClient
 	public void close()
 	{
 		super.close();
+		if (receiverThread != null) receiverThread.setStopped(true);
 		if (executor != null) executor.shutdownNow();
 	}
 
@@ -294,5 +356,48 @@ public class JPPFClient extends AbstractJPPFClient
 	public static LoadBalancer getLoadBalancer()
 	{
 		return loadBalancer;
+	}
+
+	/**
+	 * 
+	 */
+	private class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runnable
+	{
+		/**
+		 * Contains the set of retrieved connection information objects.
+		 */
+		private Set<JPPFConnectionInformation> infoSet = new HashSet<JPPFConnectionInformation>();
+		/**
+		 * Count of distinct retrieved connection informaiton objects.
+		 */
+		private AtomicInteger count = new AtomicInteger(0);
+
+		/**
+		 * Lookup server configurations from UDP multicasts.
+		 * @see java.lang.Runnable#run()
+		 */
+		public void run()
+		{
+			try
+			{
+				JPPFMulticastReceiver receiver = new JPPFMulticastReceiver();
+				while (!isStopped())
+				{
+					JPPFConnectionInformation info = receiver.receive();
+					if ((info != null) && !infoSet.contains(info))
+					{
+						if (debugEnabled) log.debug("Found connection information: " + info);
+						infoSet.add(info);
+						JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, "driver-"+count.incrementAndGet(), info);
+						newConnection(c);
+					}
+				}
+				Thread.sleep(50L);
+			}
+			catch(Exception e)
+			{
+				log.error(e.getMessage(), e);
+			}
+		}
 	}
 }

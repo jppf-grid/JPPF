@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.jppf.management.NodeManagementInfo;
 import org.jppf.ui.monitoring.event.*;
 
@@ -30,7 +31,7 @@ import org.jppf.ui.monitoring.event.*;
  * their attached nodes, for management and monitoring purposes. 
  * @author Laurent Cohen
  */
-public class NodeHandler
+public class NodeHandler implements ClientListener
 {
 	/**
 	 * Logger for this class.
@@ -72,6 +73,7 @@ public class NodeHandler
 	public NodeHandler(JPPFClient jppfClient)
 	{
 		this.jppfClient = jppfClient;
+		jppfClient.addClientListener(this);
 		initialize(false);
 	}
 
@@ -81,7 +83,7 @@ public class NodeHandler
 	 */
 	private void initialize(boolean triggerEvents)
 	{
-		refresh(triggerEvents);
+		//refresh(triggerEvents);
 		startRefreshNodeTimer();
 		startRefreshDriverTimer();
 	}
@@ -157,7 +159,7 @@ public class NodeHandler
 		nodeManagerMap.put(driverName, nodeMgr);
 		if (triggerEvent)
 		{
-			fireNodeHandlerEvent(driverName, null, NodeHandlerEvent.REMOVE_DRIVER);
+			fireNodeHandlerEvent(driverName, null, NodeHandlerEvent.ADD_DRIVER);
 		}
 		return nodeMgr;
 	}
@@ -172,7 +174,7 @@ public class NodeHandler
 		nodeManagerMap.remove(driverName);
 		if (triggerEvent)
 		{
-			fireNodeHandlerEvent(driverName, null, NodeHandlerEvent.ADD_DRIVER);
+			fireNodeHandlerEvent(driverName, null, NodeHandlerEvent.REMOVE_DRIVER);
 		}
 	}
 
@@ -322,5 +324,15 @@ public class NodeHandler
 					break;
 			}
 		}
+	}
+
+	/**
+	 * Notifiy this listener that a new driver connection was created.
+	 * @param event the event to notify this listener of.
+	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
+	 */
+	public synchronized void newConnection(ClientEvent event)
+	{
+		refresh(true);
 	}
 }

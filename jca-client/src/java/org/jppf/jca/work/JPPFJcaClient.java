@@ -199,7 +199,7 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	public void statusChanged(ClientConnectionStatusEvent event)
 	{
 		super.statusChanged(event);
-		JPPFClientConnection c = event.getJPPFClientConnection();
+		JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
 		switch(c.getStatus())
 		{
 			case ACTIVE:

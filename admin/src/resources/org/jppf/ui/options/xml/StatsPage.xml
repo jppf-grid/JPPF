@@ -20,7 +20,7 @@
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="StatsPage" type="page">
 	<!-- test comment for save -->
 	<property name="label" value="Node Data"/>
-	<property name="scrollable" value="false"/>
+	<property name="scrollable" value="true"/>
 	<property name="orientation" value="vertical"/>
 	<property name="bordered" value="false"/>
 	<property name="main" value="true"/>

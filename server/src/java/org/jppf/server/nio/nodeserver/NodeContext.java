@@ -50,6 +50,10 @@ public class NodeContext extends NioContext<NodeState>
 	 * Helper used to serialize the bundle objects.
 	 */
 	private SerializationHelper helper = new SerializationHelperImpl();
+	/**
+	 * Determines whether this context is attached to a peer node.
+	 */
+	private boolean peer = false;
 
 	/**
 	 * Get the task bundle to send or receive.
@@ -164,5 +168,23 @@ public class NodeContext extends NioContext<NodeState>
 	public void setNodeMessage(NodeMessage nodeMessage)
 	{
 		this.nodeMessage = nodeMessage;
+	}
+
+	/**
+	 * Determine whether this context is attached to a peer node.
+	 * @return true if the context is attached to a peer node, false otherwise.
+	 */
+	public boolean isPeer()
+	{
+		return peer;
+	}
+
+	/**
+	 * Specifiy whether this context is attached to a peer node.
+	 * @param peer true if the context is to be attached to a peer node, false otherwise.
+	 */
+	public void setPeer(boolean peer)
+	{
+		this.peer = peer;
 	}
 }

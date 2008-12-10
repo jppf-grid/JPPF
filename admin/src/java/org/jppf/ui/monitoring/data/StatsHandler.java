@@ -20,22 +20,26 @@ package org.jppf.ui.monitoring.data;
 import static org.jppf.server.protocol.BundleParameter.*;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
+
+import javax.swing.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.jppf.management.JMXConnectionWrapper;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.BundleParameter;
 import org.jppf.ui.monitoring.event.*;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.ui.options.*;
+import org.jppf.utils.*;
 
 /**
  * This class provides a convenient access to the statistics obtained from the JPPF server.
  * @author Laurent Cohen
  */
-public final class StatsHandler implements StatsConstants
+public final class StatsHandler implements StatsConstants, ClientListener
 {
 	/**
 	 * Logger for this class.
@@ -69,7 +73,7 @@ public final class StatsHandler implements StatsConstants
 	/**
 	 * Timer used to query the stats from the server. 
 	 */
-	private Timer timer = null;
+	private java.util.Timer timer = null;
 	/**
 	 * Interval, in milliseconds, between refreshes from the server.
 	 */
@@ -82,15 +86,19 @@ public final class StatsHandler implements StatsConstants
 	 * Contains all the data and its converted values received from the server.
 	 */
 	private Map<String, ConnectionDataHolder> dataHolderMap = new HashMap<String, ConnectionDataHolder>();
-	
 	/**
 	 * Number of data updates so far.
 	 */
 	private int tickCount = 0;
 	/**
-	 * Used to synchronize concurrent access to the data.
+	 * Option containing the combobox with the list of driver connections. 
 	 */
-	private ReentrantLock lock = new ReentrantLock();
+	private OptionElement serverListOption = null;
+	/**
+	 * Thread pool used to process new conneciton events.
+	 */
+	private ExecutorService executor = Executors.newFixedThreadPool(1);
+
 	/**
 	 * Get the singleton instance of this class.
 	 * @return a <code>StatsHandler</code> instance.
@@ -107,6 +115,7 @@ public final class StatsHandler implements StatsConstants
 	private StatsHandler()
 	{
 		refreshInterval = JPPFConfiguration.getProperties().getLong("default.refresh.interval", 2000L);
+		if (refreshInterval > 0L) timer = new java.util.Timer("JPPF Driver Statistics Update Timer");
 		update(null, stats);
 	}
 
@@ -119,20 +128,6 @@ public final class StatsHandler implements StatsConstants
 		{
 			timer.cancel();
 			timer = null;
-		}
-	}
-
-	/**
-	 * Start the automatic refresh of the stats through a timer.
-	 */
-	public void startRefreshTimer()
-	{
-		if (refreshInterval <= 0L) return;
-		timer = new Timer("JPPF Driver Statistics Update Timer");
-		for (JPPFClientConnection c: getJppfClient().getAllConnections())
-		{
-			TimerTask task = new StatsRefreshTask((JPPFClientConnectionImpl) c);
-			timer.schedule(task, 1000L, refreshInterval);
 		}
 	}
 
@@ -169,7 +164,8 @@ public final class StatsHandler implements StatsConstants
 	 */
 	public void requestUpdate()
 	{
-		requestUpdate(currentConnection);
+		if (getCurrentConnection() == null) return;
+		requestUpdate((JPPFClientConnectionImpl) getCurrentConnection());
 	}
 
 	/**
@@ -199,13 +195,14 @@ public final class StatsHandler implements StatsConstants
 	 */
 	public String changeSettings(String password, Map<BundleParameter, Object> params)
 	{
+		if (getCurrentConnection() == null) return "No active server connection";
 		String msg = null;
 		try
 		{
 			params.put(COMMAND_PARAM, CHANGE_SETTINGS);
 			params.put(PASSWORD_PARAM, password);
 			if (debugEnabled) log.debug("command: CHANGE_SETTINGS, parameters: " + params);
-			msg = (String) currentConnection.processManagementRequest(params);
+			msg = (String) ((JPPFClientConnectionImpl) getCurrentConnection()).processManagementRequest(params);
 		}
 		catch(Exception e)
 		{
@@ -225,6 +222,7 @@ public final class StatsHandler implements StatsConstants
 	 */
 	public String requestShutdownRestart(String password, BundleParameter command, long shutdownDelay, long restartDelay)
 	{
+		if (getCurrentConnection() == null) return "No active server connection";
 		String msg = null;
 		try
 		{
@@ -234,7 +232,7 @@ public final class StatsHandler implements StatsConstants
 			params.put(COMMAND_PARAM, command);
 			params.put(PASSWORD_PARAM, password);
 			if (debugEnabled) log.debug("command: " + command + ", parameters: " + params);
-			msg = (String) currentConnection.processManagementRequest(params);
+			msg = (String) ((JPPFClientConnectionImpl) getCurrentConnection()).processManagementRequest(params);
 		}
 		catch(Exception e)
 		{
@@ -254,6 +252,7 @@ public final class StatsHandler implements StatsConstants
 	{
 		String msg = null;
 		if (getJppfClient() == null) return "Not connected to the server";
+		if (getCurrentConnection() == null) return "No active server connection";
 		try
 		{
 			Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
@@ -261,7 +260,7 @@ public final class StatsHandler implements StatsConstants
 			params.put(PASSWORD_PARAM, password);
 			params.put(NEW_PASSWORD_PARAM, newPassword);
 			if (debugEnabled) log.debug("command: CHANGE_SETTINGS, parameters: " + params);
-			msg = (String) currentConnection.processManagementRequest(params);
+			msg = (String) ((JPPFClientConnectionImpl) getCurrentConnection()).processManagementRequest(params);
 		}
 		catch(Exception e)
 		{
@@ -276,38 +275,33 @@ public final class StatsHandler implements StatsConstants
 	 * @param connection the client connection from which the data is obtained.
 	 * @param stats the object holding the new statistics values.
 	 */
-	public void update(JPPFClientConnection connection, JPPFStats stats)
+	public synchronized void update(JPPFClientConnection connection, JPPFStats stats)
 	{
 		if (stats == null) return;
-		try
+		if (connection == null)
 		{
-			lock.lock();
-			if (connection == null)
-			{
-				connection = getJppfClient().getAllConnections().get(0);
-			}
-			ConnectionDataHolder dataHolder = dataHolderMap.get(connection.getName());
-			tickCount++;
-			stats.avgTransportPerByte = (stats.footprint > 0)
-				? 1024d * 1024d * stats.transport.totalTime / stats.footprint : 0d;
-			dataHolder.getDataList().add(stats);
-			dataHolder.getStringValuesMaps().add(StatsFormatter.getStringValuesMap(stats));
-			dataHolder.getDoubleValuesMaps().add(StatsFormatter.getDoubleValuesMap(stats));
-			int diff = dataHolder.getDataList().size() - rolloverPosition;
-			for (int i=0; i<diff; i++)
-			{
-				dataHolder.getDataList().remove(0);
-				dataHolder.getStringValuesMaps().remove(0);
-				dataHolder.getDoubleValuesMaps().remove(0);
-			}
-			if (connection.getName().equals(currentConnection.getName()))
-			{
-				fireStatsHandlerEvent(StatsHandlerEvent.Type.UPDATE);
-			}
+			List<JPPFClientConnection> list = getJppfClient().getAllConnections();
+			if ((list == null) || list.isEmpty()) return;
+			else connection = getJppfClient().getAllConnections().get(0);
 		}
-		finally
+		ConnectionDataHolder dataHolder = dataHolderMap.get(connection.getName());
+		tickCount++;
+		if (dataHolder == null) return;
+		stats.avgTransportPerByte = (stats.footprint > 0)
+			? 1024d * 1024d * stats.transport.totalTime / stats.footprint : 0d;
+		dataHolder.getDataList().add(stats);
+		dataHolder.getStringValuesMaps().add(StatsFormatter.getStringValuesMap(stats));
+		dataHolder.getDoubleValuesMaps().add(StatsFormatter.getDoubleValuesMap(stats));
+		int diff = dataHolder.getDataList().size() - rolloverPosition;
+		for (int i=0; i<diff; i++)
 		{
-			lock.unlock();
+			dataHolder.getDataList().remove(0);
+			dataHolder.getStringValuesMaps().remove(0);
+			dataHolder.getDoubleValuesMaps().remove(0);
+		}
+		if ((getCurrentConnection() != null) && connection.getName().equals(getCurrentConnection().getName()))
+		{
+			fireStatsHandlerEvent(StatsHandlerEvent.Type.UPDATE);
 		}
 	}
 
@@ -353,26 +347,18 @@ public final class StatsHandler implements StatsConstants
 	 * older, data snapshots will be deleted. 
 	 * @param rolloverPosition the rollover position as an int value.
 	 */
-	public void setRolloverPosition(int rolloverPosition)
+	public synchronized void setRolloverPosition(int rolloverPosition)
 	{
-		lock.lock();
-		try
+		if (rolloverPosition <= 0) throw new IllegalArgumentException("zero or less not accepted: "+rolloverPosition);
+		ConnectionDataHolder dataHolder = dataHolderMap.get(getCurrentConnection().getName());
+		int diff = dataHolder.getDataList().size() - rolloverPosition;
+		for (int i=0; i<diff; i++)
 		{
-			if (rolloverPosition <= 0) throw new IllegalArgumentException("zero or less not accepted: "+rolloverPosition);
-			ConnectionDataHolder dataHolder = dataHolderMap.get(currentConnection.getName());
-			int diff = dataHolder.getDataList().size() - rolloverPosition;
-			for (int i=0; i<diff; i++)
-			{
-				dataHolder.getDataList().remove(0);
-				dataHolder.getStringValuesMaps().remove(0);
-				dataHolder.getDoubleValuesMaps().remove(0);
-			}
-			this.rolloverPosition = rolloverPosition;
+			dataHolder.getDataList().remove(0);
+			dataHolder.getStringValuesMaps().remove(0);
+			dataHolder.getDoubleValuesMaps().remove(0);
 		}
-		finally
-		{
-			lock.unlock();
-		}
+		this.rolloverPosition = rolloverPosition;
 	}
 
 	/**
@@ -381,7 +367,8 @@ public final class StatsHandler implements StatsConstants
 	 */
 	public int getStatsCount()
 	{
-		ConnectionDataHolder dataHolder = dataHolderMap.get(currentConnection.getName());
+		if (getCurrentConnection() == null) return 0;
+		ConnectionDataHolder dataHolder = dataHolderMap.get(getCurrentConnection().getName());
 		return dataHolder.getDataList().size();
 	}
 
@@ -390,18 +377,11 @@ public final class StatsHandler implements StatsConstants
 	 * @param position the position to get the data at.
 	 * @return a <code>JPPFStats</code> instance.
 	 */
-	public JPPFStats getStats(int position)
+	public synchronized JPPFStats getStats(int position)
 	{
-		lock.lock();
-		try
-		{
-			ConnectionDataHolder dataHolder = dataHolderMap.get(currentConnection.getName());
-			return dataHolder.getDataList().get(position);
-		}
-		finally
-		{
-			lock.unlock();
-		}
+		if (getCurrentConnection() == null) return stats;
+		ConnectionDataHolder dataHolder = dataHolderMap.get(getCurrentConnection().getName());
+		return dataHolder.getDataList().get(position);
 	}
 
 	/**
@@ -418,18 +398,11 @@ public final class StatsHandler implements StatsConstants
 	 * @param position the position to get the data at.
 	 * @return a map of field names to their values represented as strings.
 	 */
-	public Map<Fields, String> getStringValues(int position)
+	public synchronized Map<Fields, String> getStringValues(int position)
 	{
-		lock.lock();
-		try
-		{
-			ConnectionDataHolder dataHolder = dataHolderMap.get(currentConnection.getName());
-			return dataHolder.getStringValuesMaps().get(position);
-		}
-		finally
-		{
-			lock.unlock();
-		}
+		if (getCurrentConnection() == null) return null;
+		ConnectionDataHolder dataHolder = dataHolderMap.get(getCurrentConnection().getName());
+		return dataHolder.getStringValuesMaps().get(position);
 	}
 
 	/**
@@ -438,9 +411,10 @@ public final class StatsHandler implements StatsConstants
 	 */
 	public Map<Fields, String> getLatestStringValues()
 	{
+		if (getCurrentConnection() == null) return null;
 		int n = getStatsCount() - 1;
 		if (n < 0) return null;
-		ConnectionDataHolder dataHolder = dataHolderMap.get(currentConnection.getName());
+		ConnectionDataHolder dataHolder = dataHolderMap.get(getCurrentConnection().getName());
 		List<Map<Fields, String>> list = dataHolder.getStringValuesMaps();
 		if (n < list.size()) return list.get(n);
 		return list.get(list.size()-1);
@@ -451,18 +425,11 @@ public final class StatsHandler implements StatsConstants
 	 * @param position the position to get the data at.
 	 * @return a map of field names to their values represented as double values.
 	 */
-	public Map<Fields, Double> getDoubleValues(int position)
+	public synchronized Map<Fields, Double> getDoubleValues(int position)
 	{
-		lock.lock();
-		try
-		{
-			ConnectionDataHolder dataHolder = dataHolderMap.get(currentConnection.getName());
-			return dataHolder.getDoubleValuesMaps().get(position);
-		}
-		finally
-		{
-			lock.unlock();
-		}
+		if (getCurrentConnection() == null) return null;
+		ConnectionDataHolder dataHolder = dataHolderMap.get(getCurrentConnection().getName());
+		return dataHolder.getDoubleValuesMaps().get(position);
 	}
 
 	/**
@@ -471,9 +438,10 @@ public final class StatsHandler implements StatsConstants
 	 */
 	public Map<Fields, Double> getLatestDoubleValues()
 	{
+		if (getCurrentConnection() == null) return null;
 		int n = getStatsCount() - 1;
 		if (n < 0) return null;
-		ConnectionDataHolder dataHolder = dataHolderMap.get(currentConnection.getName());
+		ConnectionDataHolder dataHolder = dataHolderMap.get(getCurrentConnection().getName());
 		List<Map<Fields, Double>> list = dataHolder.getDoubleValuesMaps();
 		if (n < list.size()) return list.get(n);
 		return list.get(list.size()-1);
@@ -492,7 +460,7 @@ public final class StatsHandler implements StatsConstants
 	 * Get the current client connection for which statistics and charts are displayed.
 	 * @return a <code>JPPFClientConnection</code> instance.
 	 */
-	public JPPFClientConnection getCurrentConnection()
+	public synchronized JPPFClientConnection getCurrentConnection()
 	{
 		return currentConnection;
 	}
@@ -501,15 +469,21 @@ public final class StatsHandler implements StatsConstants
 	 * Set the current client connection for which statistics and charts are displayed.
 	 * @param connection a <code>JPPFClientConnection</code> instance.
 	 */
-	public void setCurrentConnection(JPPFClientConnectionImpl connection)
+	public synchronized void setCurrentConnection(final JPPFClientConnectionImpl connection)
 	{
-		if ((connection != null) && !connection.getName().equals(currentConnection.getName()))
+		if ((currentConnection == null) || ((connection != null) && !connection.getName().equals(currentConnection.getName())))
 		{
-			this.currentConnection = connection;
-			if (JPPFClientConnectionStatus.ACTIVE.equals(connection.getStatus()))
+			SwingUtilities.invokeLater(new Runnable()
 			{
-				fireStatsHandlerEvent(StatsHandlerEvent.Type.RESET);
-			}
+				public void run()
+				{
+					currentConnection = connection;
+					if (JPPFClientConnectionStatus.ACTIVE.equals(connection.getStatus()))
+					{
+						fireStatsHandlerEvent(StatsHandlerEvent.Type.RESET);
+					}
+				}
+			});
 		}
 	}
 
@@ -519,13 +493,98 @@ public final class StatsHandler implements StatsConstants
 	 */
 	public synchronized JPPFClient getJppfClient()
 	{
-		if (jppfClient == null)
-		{
-			jppfClient = new JPPFClient();
-			List<JPPFClientConnection> list = jppfClient.getAllConnections();
-			for (JPPFClientConnection c: list) dataHolderMap.put(c.getName(), new ConnectionDataHolder());
-			if (!list.isEmpty()) currentConnection = (JPPFClientConnectionImpl) list.get(0);
-		}
+		if (jppfClient == null) jppfClient = new JPPFClient(this);
 		return jppfClient;
+	}
+
+	/**
+	 * Notifiy this listener that a new driver connection was created.
+	 * @param event the event to notify this listener of.
+	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
+	 */
+	public synchronized void newConnection(ClientEvent event)
+	{
+		executor.submit(new NewConnectionTask(event.getConnection()));
+	}
+
+	/**
+	 * Get the option containing the combobox with the list of driver connections. 
+	 * @return an <code>OptionElement</code> instance.
+	 */
+	public OptionElement getServerListOption()
+	{
+		return serverListOption;
+	}
+
+	/**
+	 * Set the option containing the combobox with the list of driver connections. 
+	 * @param serverListOption an <code>OptionElement</code> instance.
+	 */
+	public void setServerListOption(OptionElement serverListOption)
+	{
+		this.serverListOption = serverListOption;
+		notifyAll();
+	}
+
+	/**
+	 * Task executed when a new driver connection is created.
+	 */
+	private class NewConnectionTask extends ThreadSynchronization implements Runnable
+	{
+		/**
+		 * The new connection that was created.
+		 */
+		private JPPFClientConnection c = null;
+
+		/**
+		 * Initialized this task with the specified client connection.
+		 * @param c the new connection that was created.
+		 */
+		public NewConnectionTask(JPPFClientConnection c)
+		{
+			this.c = c;
+		}
+
+		/**
+		 * Perform the task.
+		 * @see java.lang.Runnable#run()
+		 */
+		public void run()
+		{
+			if (dataHolderMap.get(c.getName()) == null)
+			{
+				dataHolderMap.put(c.getName(), new ConnectionDataHolder());
+			}
+			if (timer != null)
+			{
+				TimerTask task = new StatsRefreshTask((JPPFClientConnectionImpl) c);
+				timer.schedule(task, 1000L, refreshInterval);
+			}
+			JComboBox box = null;
+			if (serverListOption == null) goToSleep();
+			else
+			{
+				box = ((ComboBoxOption) serverListOption).getComboBox();
+				box.addItem(c);
+				int maxLen = 0;
+				Object proto = null;
+				for (int i=0; i<box.getItemCount(); i++)
+				{
+					Object o = box.getItemAt(i);
+					int n = o.toString().length();
+					if (n > maxLen)
+					{
+						maxLen = n;
+						proto = o;
+					}
+				}
+				if (proto != null) box.setPrototypeDisplayValue(proto);
+			}
+			if (currentConnection == null)
+			{
+				currentConnection = (JPPFClientConnectionImpl) c;
+				if (box != null) box.setSelectedItem(c);
+			}
+		}
 	}
 }

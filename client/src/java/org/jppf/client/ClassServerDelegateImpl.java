@@ -45,13 +45,6 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	private boolean debugEnabled = log.isDebugEnabled();
 
 	/**
-	 * Default instantiation of this class is not permitted.
-	 */
-	private ClassServerDelegateImpl()
-	{
-	}
-
-	/**
 	 * Initialize class server delegate with a spceified application uuid.
 	 * @param owner the client connection which owns this delegate.
 	 * @param uuid the unique identifier for the local JPPF client.
@@ -61,10 +54,10 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 */
 	public ClassServerDelegateImpl(JPPFClientConnection owner, String uuid, String host, int port) throws Exception
 	{
+		super(owner);
 		this.appUuid = uuid;
 		this.host = host;
 		this.port = port;
-		this.owner = owner;
 		setName(owner.getName());
 	}
 

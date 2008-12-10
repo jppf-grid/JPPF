@@ -65,6 +65,7 @@ public class NodeThreadsAction extends JPPFAbstractNodeAction
 		this.location = location;
 		setupIcon("/org/jppf/ui/resources/threads.gif");
 		putValue(NAME, "Set thread pool size");
+		if (nodeInfoHolders.length < 1) setEnabled(false);
 	}
 
 	/**

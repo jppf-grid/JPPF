@@ -18,24 +18,15 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.DISCONNECTED;
-
-import java.util.*;
-
 import org.jppf.classloader.ResourceProvider;
-import org.jppf.client.event.*;
-import org.jppf.comm.socket.*;
+import org.jppf.comm.socket.SocketClient;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public abstract class AbstractClassServerDelegate implements ClassServerDelegate
+public abstract class AbstractClassServerDelegate extends AbstractClientConnectionHandler implements ClassServerDelegate
 {
-	/**
-	 * The socket client uses to communicate over a socket connection.
-	 */
-	protected SocketWrapper socketClient = null;
 	/**
 	 * Indicates whether this socket handler should be terminated and stop processing.
 	 */
@@ -52,40 +43,14 @@ public abstract class AbstractClassServerDelegate implements ClassServerDelegate
 	 * Unique identifier for this class server delegate, obtained from the local JPPF client.
 	 */
 	protected String appUuid = null;
-	/**
-	 * Used to synchronize access to the underlying socket from multiple threads.
-	 */
-	protected SocketInitializer socketInitializer = createSocketInitializer();
-	/**
-	 * The name or IP address of the host the class server is running on.
-	 */
-	protected String host = null;
-	/**
-	 * The TCP port the class server is listening to.
-	 */
-	protected int port = -1;
-	/**
-	 * The client connection which owns this delegate.
-	 */
-	protected JPPFClientConnection owner = null;
-	/**
-	 * The name given to this delegate.
-	 */
-	protected String name = null;
-	/**
-	 * Status of the connection.
-	 */
-	protected JPPFClientConnectionStatus status = DISCONNECTED;
-	/**
-	 * List of status listeners for this connection.
-	 */
-	protected List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
 
 	/**
 	 * Default instantiation of this class is not permitted.
+	 * @param owner the client connection which owns this connection delegate.
 	 */
-	protected AbstractClassServerDelegate()
+	protected AbstractClassServerDelegate(JPPFClientConnection owner)
 	{
+		super(owner);
 	}
 
 	/**
@@ -128,65 +93,5 @@ public abstract class AbstractClassServerDelegate implements ClassServerDelegate
 		socketClient = new SocketClient();
 		socketClient.setHost(host);
 		socketClient.setPort(port);
-	}
-
-	/**
-	 * Create a socket initializer for this delegate.
-	 * @return a <code>SocketInitializer</code> instance.
-	 */
-	protected abstract SocketInitializer createSocketInitializer();
-
-	/**
-	 * Get the status of this delegate.
-	 * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
-	 * @see org.jppf.client.event.ClientConnectionStatusHandler#getStatus()
-	 */
-	public JPPFClientConnectionStatus getStatus()
-	{
-		return status;
-	}
-
-	/**
-	 * Set the status of this delegate.
-	 * @param status  a <code>JPPFClientConnectionStatus</code> enumerated value.
-	 * @see org.jppf.client.event.ClientConnectionStatusHandler#setStatus(org.jppf.client.JPPFClientConnectionStatus)
-	 */
-	public void setStatus(JPPFClientConnectionStatus status)
-	{
-		this.status = status;
-	}
-
-	/**
-	 * Add a connection status listener to this connection's list of listeners.
-	 * @param listener the listener to add to the list.
-	 * @see org.jppf.client.event.ClientConnectionStatusHandler#addClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
-	 */
-	public void addClientConnectionStatusListener(ClientConnectionStatusListener listener)
-	{
-		listeners.add(listener);
-	}
-
-	/**
-	 * Remove a connection status listener from this connection's list of listeners.
-	 * @param listener the listener to remove from the list.
-	 * @see org.jppf.client.event.ClientConnectionStatusHandler#removeClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
-	 */
-	public void removeClientConnectionStatusListener(ClientConnectionStatusListener listener)
-	{
-		listeners.remove(listener);
-	}
-
-	/**
-	 * Notify all listeners that the status of this connection has changed.
-	 */
-	protected synchronized void fireStatusChanged()
-	{
-		ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, getStatus());
-		// to avoid ConcurrentModificationException
-		ClientConnectionStatusListener[] array = listeners.toArray(new ClientConnectionStatusListener[0]);
-		for (ClientConnectionStatusListener listener: array)
-		{
-			listener.statusChanged(event);
-		}
 	}
 }

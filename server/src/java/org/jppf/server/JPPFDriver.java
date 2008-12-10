@@ -30,7 +30,7 @@ import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.management.JPPFDriverAdmin;
 import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
-import org.jppf.server.peer.JPPFPeerInitializer;
+import org.jppf.server.peer.*;
 import org.jppf.server.queue.*;
 import org.jppf.server.scheduler.bundle.impl.*;
 import org.jppf.utils.*;
@@ -132,7 +132,7 @@ public class JPPFDriver
 			System.out.println("JPPF Driver management initialized");
 		}
 
-		if (JPPFConfiguration.getProperties().getBoolean("jppf.broadcast.enabled", true))
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true))
 		{
 			JPPFBroadcaster broadcaster = new JPPFBroadcaster(info);
 			new Thread(broadcaster, "JPPF Broadcaster").start();
@@ -146,7 +146,7 @@ public class JPPFDriver
 	 * Read configuration for the host name and ports used to conenct to this driver.
 	 * @return a <code>DriverConnectionInformation</code> instance.
 	 */
-	private JPPFConnectionInformation createConnectionInformation()
+	public JPPFConnectionInformation createConnectionInformation()
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
 		JPPFConnectionInformation info = new JPPFConnectionInformation();
@@ -157,6 +157,7 @@ public class JPPFDriver
 		s = props.getString("node.server.port", "11113");
 		info.nodeServerPorts = StringUtils.parseIntValues(s);
 		info.host = NetworkUtils.getManagementHost();
+		if (props.getBoolean("jppf.management.enabled", true)) info.managementPort = props.getInt("jppf.management.port", 11198);
 		return info;
 	}
 
@@ -195,10 +196,17 @@ public class JPPFDriver
 	private void initPeers()
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
-		String peerNames = props.getString("jppf.peers");
-		if ((peerNames == null) || "".equals(peerNames.trim())) return;
-		String[] names = peerNames.split("\\s");
-		for (String peerName: names) new JPPFPeerInitializer(peerName).start();
+		if (props.getBoolean("jppf.discovery.enabled", true))
+		{
+			new Thread(new PeerDiscoveryThread()).start();
+		}
+		else
+		{
+			String peerNames = props.getString("jppf.peers");
+			if ((peerNames == null) || "".equals(peerNames.trim())) return;
+			String[] names = peerNames.split("\\s");
+			for (String peerName: names) new JPPFPeerInitializer(peerName).start();
+		}
 	}
 	
 	/**

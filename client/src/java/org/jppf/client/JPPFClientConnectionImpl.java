@@ -18,7 +18,7 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.FAILED;
+import static org.jppf.client.JPPFClientConnectionStatus.*;
 import static org.jppf.server.protocol.BundleParameter.*;
 
 import java.util.*;
@@ -29,7 +29,8 @@ import javax.crypto.SecretKey;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
-import org.jppf.client.event.TaskResultListener;
+import org.jppf.client.event.*;
+import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
@@ -75,6 +76,10 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 */
 	private JMXConnectionWrapper jmxConnection = null;
 	/**
+	 * 
+	 */
+	private int jmxPort = -1;
+	/**
 	 * Contains the configuration properties for this client connection.
 	 */
 	private TypedProperties props = null;
@@ -96,6 +101,19 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	}
 
 	/**
+	 * Initialize this client with a specified application UUID.
+	 * @param uuid the unique identifier for this local client.
+	 * @param name configuration name for this local client.
+	 * @param info the connection properties for this connection.
+	 */
+	public JPPFClientConnectionImpl(String uuid, String name, JPPFConnectionInformation info)
+	{
+		classServerPort = info.classServerPorts[0];
+		jmxPort = info.managementPort;
+		configure(uuid, name + " (" + info.host + ":" + info.managementPort + ")", info.host, info.applicationServerPorts[0], classServerPort, 0);
+	}
+
+	/**
 	 * Initialize this client connection.
 	 * @see org.jppf.client.JPPFClientConnection#init()
 	 */
@@ -104,6 +122,20 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 		try
 		{
 			delegate = new ClassServerDelegateImpl(this, appUuid, host, classServerPort);
+			delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
+			{
+				public void statusChanged(ClientConnectionStatusEvent event)
+				{
+					delegateStatusChanged(event);
+				}
+			});
+			taskServerConnection.addClientConnectionStatusListener(new ClientConnectionStatusListener()
+			{
+				public void statusChanged(ClientConnectionStatusEvent event)
+				{
+					taskServerConnectionStatusChanged(event);
+				}
+			});
 			delegate.init();
 			initCredentials();
 			if (!delegate.isClosed())
@@ -111,7 +143,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 				Thread t = new Thread(delegate);
 				t.setName("[" + delegate.getName() + " : class delegate]");
 				t.start();
-				initConnection();
+				taskServerConnection.init();
 				//setStatus(delegate.getStatus());
 			}
 		}
@@ -133,9 +165,20 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 */
 	public void initializeJmxConnection(String id)
 	{
-		String prefix = name + ".";
-		String mHost = props.getString(prefix + "jppf.management.host", "localhost");
-		int port = props.getInt(prefix + "jppf.management.port", 11198);
+		String mHost = null;
+		int port = -1;
+		if (props != null)
+		{
+			String prefix = name + ".";
+			mHost = props.getString(prefix + "jppf.management.host", "localhost");
+			port = props.getInt(prefix + "jppf.management.port", 11198);
+		}
+		else
+		{
+			if (jmxPort < 0) return;
+			mHost = host;
+			port = jmxPort;
+		}
 		jmxConnection = new JMXConnectionWrapper(mHost, port);
 		jmxConnection.connect();
 	}
@@ -200,8 +243,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 			isShutdown = true;
 			try
 			{
-				if (socketInitializer != null) socketInitializer.close();
-				if (socketClient != null) socketClient.close();
+				if (taskServerConnection != null) taskServerConnection.close();
 				if (delegate != null) delegate.close();
 				if (jmxConnection != null) jmxConnection.close();
 			}
@@ -316,5 +358,50 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 		Collection<NodeManagementInfo> nodeList =
 			(Collection<NodeManagementInfo>) processManagementRequest(params);
 		return nodeList;
+	}
+
+	/**
+	 * Invoked to notify of a status change event on a client connection.
+	 * @param event the event to notify of.
+	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+	 */
+	public void delegateStatusChanged(ClientConnectionStatusEvent event)
+	{
+		JPPFClientConnectionStatus s1 = event.getClientConnectionStatusHandler().getStatus();
+		JPPFClientConnectionStatus s2 = taskServerConnection.getStatus();
+		processStatusChanged(s1, s2);
+	}
+
+	/**
+	 * Invoked to notify of a status change event on a client connection.
+	 * @param event the event to notify of.
+	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+	 */
+	public void taskServerConnectionStatusChanged(ClientConnectionStatusEvent event)
+	{
+		JPPFClientConnectionStatus s1 = event.getClientConnectionStatusHandler().getStatus();
+		JPPFClientConnectionStatus s2 = delegate.getStatus();
+		processStatusChanged(s2, s1);
+	}
+
+	/**
+	 * Handle a stayus change from either the class server delegate or the task server connection
+	 * and determine whether it triggers a status change for the client connection.
+	 * @param delegateStatus status of the class server delegate conneciton.
+	 * @param taskConnectionStatus status of the task server connection.
+	 */
+	protected void processStatusChanged(JPPFClientConnectionStatus delegateStatus, JPPFClientConnectionStatus taskConnectionStatus)
+	{
+		if (FAILED.equals(delegateStatus)) setStatus(FAILED);
+		else if (ACTIVE.equals(delegateStatus))
+		{
+			if (ACTIVE.equals(taskConnectionStatus) && !ACTIVE.equals(this.getStatus())) setStatus(ACTIVE);
+		}
+		else
+		{
+			int n = delegateStatus.compareTo(taskConnectionStatus);
+			if ((n < 0) && !delegateStatus.equals(this.getStatus())) setStatus(delegateStatus);
+			else if (!taskConnectionStatus.equals(this.getStatus())) setStatus(taskConnectionStatus);
+		}
 	}
 }

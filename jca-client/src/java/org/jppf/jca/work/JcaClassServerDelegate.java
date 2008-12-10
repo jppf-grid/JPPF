@@ -51,13 +51,6 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	private JPPFJcaClient client = null;
 
 	/**
-	 * Default instantiation of this class is not permitted.
-	 */
-	private JcaClassServerDelegate()
-	{
-	}
-
-	/**
 	 * Initialize class server delegate with a spceified application uuid.
 	 * @param name the name given to this this delegate.
 	 * @param uuid the unique identifier for the local JPPF client.
@@ -68,6 +61,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 */
 	public JcaClassServerDelegate(String name, String uuid, String host, int port, JPPFJcaClient client) throws Exception
 	{
+		super(null);
 		this.appUuid = uuid;
 		this.host = host;
 		this.port = port;

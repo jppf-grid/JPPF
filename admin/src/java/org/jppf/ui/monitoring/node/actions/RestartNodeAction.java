@@ -35,6 +35,7 @@ public class RestartNodeAction extends JPPFAbstractNodeAction
 		super(nodeInfoHolders);
 		setupIcon("/org/jppf/ui/resources/traffic_light_red_green.gif");
 		putValue(NAME, "Node Restart");
+		if (nodeInfoHolders.length < 1) setEnabled(false);
 	}
 
 	/**
@@ -50,7 +51,24 @@ public class RestartNodeAction extends JPPFAbstractNodeAction
 			{
 				try
 				{
-					connection.getJmxClient().restart();
+					Runnable r = new Runnable()
+					{
+						public void run()
+						{
+							for (NodeInfoHolder connection: nodeInfoHolders)
+							{
+								try
+								{
+									connection.getJmxClient().restart();
+								}
+								catch(Exception e)
+								{
+									log.error(e.getMessage(), e);
+								}
+							}
+						}
+					};
+					new Thread(r).start();
 				}
 				catch(Exception e)
 				{

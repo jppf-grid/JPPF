@@ -56,6 +56,49 @@ public class PeerNodeResultSender extends AbstractResultSender
 	}
 
 	/**
+	 * This method waits until all tasks of a request have been completed.
+	 * @throws Exception if handing of the results fails.
+	 * @see org.jppf.server.AbstractResultSender#waitForExecution()
+	 */
+	public synchronized void waitForExecution() throws Exception
+	{
+		long start = System.currentTimeMillis();
+		while (getPendingTasksCount() > 0)
+		{
+			try
+			{
+				wait();
+				if (debugEnabled) log.debug(""+getResultList().size()+" in result list");
+				if (!getResultList().isEmpty())
+				{
+					BundleWrapper first = getResultList().remove(0);
+					int count = first.getTasks().size();
+					int size = getResultList().size();
+					for (int i=0; i<size; i++)
+					{
+						BundleWrapper bundle = getResultList().remove(0);
+						for (DataLocation task: bundle.getTasks())
+						{
+							first.addTask(task);
+							count++;
+						}
+						bundle.getTasks().clear();
+					}
+					first.getBundle().setTaskCount(count);
+					long elapsed = System.currentTimeMillis() - start;
+					first.getBundle().setNodeExecutionTime(elapsed);
+					sendPartialResults(first);
+				}
+				getResultList().clear();
+			}
+			catch (InterruptedException e)
+			{
+				log.error(e.getMessage(), e);
+			}
+		}
+	}
+
+	/**
 	 * Send the results of the tasks in a bundle back to the client who
 	 * submitted the request.
 	 * @param bundleWrapper the bundle to get the task results from.
@@ -65,8 +108,8 @@ public class PeerNodeResultSender extends AbstractResultSender
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		if (debugEnabled) log.debug("Sending bundle with "+bundle.getTaskCount()+" tasks");
-		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
-		bundle.setNodeExecutionTime(elapsed);
+		//long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
+		//bundle.setNodeExecutionTime(elapsed);
 
 		JPPFBuffer buf = helper.toBytes(bundle, false);
 		int size = 4 + buf.getLength();

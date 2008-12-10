@@ -81,8 +81,10 @@ public class WaitInitialBundleState extends NodeServerState
 			Bundler bundler = override ? BundlerFactory.createBundler(bundle.getParametersMap(), true) : server.getBundler().copy();
 			bundler.setup();
 			context.setBundler(bundler);
-			Boolean isPeer = (Boolean) bundle.getParameter(IS_PEER);
-			if (((isPeer == null) || !isPeer) && JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
+			Boolean b = (Boolean) bundle.getParameter(IS_PEER);
+			boolean isPeer = (b != null) && b;
+			context.setPeer(isPeer);
+			if (!isPeer && JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
 			{
 				String id = (String) bundle.getParameter(NODE_MANAGEMENT_ID_PARAM);
 				if (id != null)

@@ -182,4 +182,13 @@ public class ComboBoxOption extends AbstractOption
 			for (Object o: items) combo.addItem(o);
 		}
 	}
+
+	/**
+	 * Get the combo box used to select one among several items.
+	 * @return a <code>JComboBox</code> instance.
+	 */
+	public JComboBox getComboBox()
+	{
+		return combo;
+	}
 }

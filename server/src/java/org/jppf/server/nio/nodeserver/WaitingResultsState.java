@@ -85,6 +85,10 @@ public class WaitingResultsState extends NodeServerState
 			// updating stats
 			else if (isStatsEnabled())
 			{
+				if (newBundle.getNodeExecutionTime() > 1000000)
+				{
+					int breakpoint = 0;
+				}
 				taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getNodeMessage().getLength());
 				context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 			}

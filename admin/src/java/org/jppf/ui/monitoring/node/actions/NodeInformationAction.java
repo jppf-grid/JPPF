@@ -40,7 +40,7 @@ public class NodeInformationAction extends JPPFAbstractNodeAction
 		super(nodeInfoHolders);
 		setupIcon("/org/jppf/ui/resources/info.gif");
 		putValue(NAME, "Node System Information");
-		if (nodeInfoHolders.length > 1) setEnabled(false);
+		if (nodeInfoHolders.length != 1) setEnabled(false);
 	}
 
 	/**

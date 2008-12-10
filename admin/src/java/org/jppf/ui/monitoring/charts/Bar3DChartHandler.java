@@ -119,7 +119,7 @@ public class Bar3DChartHandler implements ChartHandler
 	{
 		DefaultCategoryDataset dataset = (DefaultCategoryDataset) config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
-		for (Fields key: config.fields) dataset.setValue(valueMap.get(key), "0", key);
+		if (valueMap != null) for (Fields key: config.fields) dataset.setValue(valueMap.get(key), "0", key);
 		return config;
 	}
 

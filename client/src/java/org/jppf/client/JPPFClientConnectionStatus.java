@@ -25,6 +25,14 @@ package org.jppf.client;
 public enum JPPFClientConnectionStatus
 {
 	/**
+	 * Indicates a new connection.
+	 */
+	NEW,
+	/**
+	 * Indicates that the connection instance is disconnected from the driver.
+	 */
+	DISCONNECTED,
+	/**
 	 * Indicates that the connection instance is currently attempting to connect to the driver.
 	 */
 	CONNECTING,
@@ -39,9 +47,5 @@ public enum JPPFClientConnectionStatus
 	/**
 	 * Indicates that the connection instance has failed to connect to the driver.
 	 */
-	FAILED,
-	/**
-	 * Indicates that the connection instance is disconnected from the driver.
-	 */
-	DISCONNECTED
+	FAILED
 }

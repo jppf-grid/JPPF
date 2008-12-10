@@ -364,16 +364,23 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	public synchronized void removeAllConnections()
 	{
 		if (!isStopped()) return;
-		for (SelectionKey connection: selector.keys())
+		try
 		{
-			try
+			for (SelectionKey connection: selector.keys())
 			{
-				connection.channel().close();
+				try
+				{
+					connection.channel().close();
+				}
+				catch (IOException e)
+				{
+					log.error(e.getMessage(), e);
+				}
 			}
-			catch (IOException e)
-			{
-				log.error(e.getMessage(), e);
-			}
+		}
+		catch (Exception e)
+		{
+			log.error(e.getMessage(), e);
 		}
 	}
 

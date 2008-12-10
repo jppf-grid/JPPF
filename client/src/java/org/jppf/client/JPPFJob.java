@@ -29,9 +29,9 @@ import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.JPPFUuid;
 
 /**
- * Instances of this class represent a JPPF submission and hold all the required eleemnts:
- * tasks, execution policy, task listenr, data provider.<br>
- * This class also provides the API for handling JPPF-annotated tasks.
+ * Instances of this class represent a JPPF submission and hold all the required elements:
+ * tasks, execution policy, task listener, data provider.<br>
+ * This class also provides the API for handling JPPF-annotated tasks and POJO tasks.
  * @author Laurent Cohen
  */
 public class JPPFJob implements Serializable
@@ -146,7 +146,7 @@ public class JPPFJob implements Serializable
 	}
 
 	/**
-	 * Get the list of takss to execute.
+	 * Get the list of tasks to execute.
 	 * @return a list of objects.
 	 */
 	public List<JPPFTask> getTasks()

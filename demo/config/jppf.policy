@@ -115,7 +115,7 @@ permission org.tanukisoftware.wrapper.security.WrapperPermission "signalStopped"
 //------------------------------------------------------------------------------//
 permission java.net.SocketPermission "www.jppf.org:80", "connect,listen";
 permission java.net.SocketPermission "127.0.0.1:21", "accept,connect,listen,resolve";
-permission java.net.SocketPermission "127.0.0.1:1024-", "accept,connect,listen,resolve";
+//permission java.net.SocketPermission "127.0.0.1:1024-", "accept,connect,listen,resolve";
 //------------------------------------------------------------------------------//
 // permissions for JBoss 4.0.x                                                  //
 //------------------------------------------------------------------------------//

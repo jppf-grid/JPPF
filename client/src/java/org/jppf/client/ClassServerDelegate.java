@@ -18,26 +18,13 @@
 
 package org.jppf.client;
 
-import org.jppf.client.event.ClientConnectionStatusHandler;
 
 /**
  * Interface for all class server clients.
  * @author Laurent Cohen
  */
-public interface ClassServerDelegate extends Runnable, ClientConnectionStatusHandler
+public interface ClassServerDelegate extends Runnable, ClientConnectionHandler
 {
-	/**
-	 * Initialize this node's resources.
-	 * @throws Exception if an error is raised during initialization.
-	 */
-	void init() throws Exception;
-
-	/**
-	 * Initialize this delegate's resources.
-	 * @throws Exception if an error is raised during initialization.
-	 */
-	void initSocketClient() throws Exception;
-
 	/**
 	 * Determine whether the socket connection is closed
 	 * @return true if the socket connection is closed, false otherwise

@@ -56,9 +56,9 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	private static String SERIALIZATION_HELPER_IMPL = "org.jppf.utils.SerializationHelperImpl";
 	/**
-	 * The socket client used to communicate over a socket connection.
+	 * Handler for the connection to the task server.
 	 */
-	protected SocketWrapper socketClient = null;
+	protected TaskServerConnectionHandler taskServerConnection = null;
 	/**
 	 * Enables loading local classes onto remote nodes.
 	 */
@@ -72,10 +72,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * Unique identifier for this JPPF client.
 	 */
 	protected String appUuid = null;
-	/**
-	 * Used to synchronize access to the underlying socket from multiple threads.
-	 */
-	protected SocketInitializer socketInitializer = createSocketInitializer();
 	/**
 	 * The name or IP address of the host the JPPF driver is running on.
 	 */
@@ -166,6 +162,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		this.priority = priority;
 		this.classServerPort = classServerPort;
 		this.name = name;
+		this.taskServerConnection = new TaskServerConnectionHandler(this, host, port);
 	}
 
 	/**
@@ -173,50 +170,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @see org.jppf.client.JPPFClientConnection#init()
 	 */
 	public abstract void init();
-
-	/**
-	 * Initialize this node's resources.
-	 * @throws Exception if an error is raised during initialization.
-	 */
-	public synchronized void initConnection() throws Exception
-	{
-		try
-		{
-			setStatus(CONNECTING);
-			if (socketClient == null) initSocketClient();
-			String msg = "[client: "+name+"] JPPFClient.init(): Attempting connection to the JPPF driver";
-			System.out.println(msg);
-			if (debugEnabled) log.debug(msg);
-			socketInitializer.initializeSocket(socketClient);
-			if (!socketInitializer.isSuccessfull())
-			{
-				throw new JPPFException("["+name+"] Could not reconnect to the JPPF Driver");
-			}
-			msg = "[client: "+name+"] JPPFClient.init(): Reconnected to the JPPF driver";
-			System.out.println(msg);
-			if (debugEnabled) log.debug(msg);
-			setStatus(ACTIVE);
-		}
-		catch(Exception e)
-		{
-			setStatus(FAILED);
-			throw e;
-		}
-	}
-
-	/**
-	 * Initialize this node's resources.
-	 * @throws Exception if an error is raised during initialization.
-	 */
-	public void initSocketClient() throws Exception
-	{
-		socketClient = new SocketChannelClient(host, port, true);
-		/*
-		socketClient = new SocketClient();
-		socketClient.setHost(host);
-		socketClient.setPort(port);
-		*/
-	}
 
 	/**
 	 * Initialize this client's security credentials.
@@ -285,6 +238,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			bufList.add(helper.toBytes(dataProvider, false));
 			for (JPPFTask task : taskList) bufList.add(helper.toBytes(task, false));
 	
+			SocketWrapper socketClient = taskServerConnection.getSocketClient();
 			int size = 0;
 			for (JPPFBuffer buf: bufList) size += 4 + buf.getLength();
 			socketClient.writeInt(size);
@@ -312,6 +266,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	{
 		try
 		{
+			SocketWrapper socketClient = taskServerConnection.getSocketClient();
 			SerializationHelper helper = makeHelper();
 			socketClient.skip(4);
 			byte[] data = socketClient.receiveBytes(0).getBuffer();
@@ -455,7 +410,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	protected synchronized void fireStatusChanged()
 	{
-		ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, getStatus());
+		ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this);
 		// to avoid ConcurrentModificationException
 		ClientConnectionStatusListener[] array = listeners.toArray(new ClientConnectionStatusListener[0]);
 		for (ClientConnectionStatusListener listener: array)
@@ -522,5 +477,14 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	public String getConnectionId()
 	{
 		return connectionId;
+	}
+
+	/**
+	 * Get the handler for the connection to the task server.
+	 * @return a <code>TaskServerConnectionHandler</code> instance.
+	 */
+	public TaskServerConnectionHandler getTaskServerConnection()
+	{
+		return taskServerConnection;
 	}
 }

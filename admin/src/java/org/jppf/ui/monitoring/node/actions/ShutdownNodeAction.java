@@ -35,6 +35,7 @@ public class ShutdownNodeAction extends JPPFAbstractNodeAction
 		super(nodeInfoHolders);
 		setupIcon("/org/jppf/ui/resources/traffic_light_red.gif");
 		putValue(NAME, "Node Shutdown");
+		if (nodeInfoHolders.length < 1) setEnabled(false);
 	}
 
 	/**
@@ -50,7 +51,24 @@ public class ShutdownNodeAction extends JPPFAbstractNodeAction
 			{
 				try
 				{
-					connection.getJmxClient().shutdown();
+					Runnable r = new Runnable()
+					{
+						public void run()
+						{
+							for (NodeInfoHolder connection: nodeInfoHolders)
+							{
+								try
+								{
+									connection.getJmxClient().shutdown();
+								}
+								catch(Exception e)
+								{
+									log.error(e.getMessage(), e);
+								}
+							}
+						}
+					};
+					new Thread(r).start();
 				}
 				catch(Exception e)
 				{

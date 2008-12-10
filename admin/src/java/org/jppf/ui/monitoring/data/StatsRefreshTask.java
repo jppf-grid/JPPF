@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.data;
 
 import java.util.TimerTask;
 
-import org.jppf.client.JPPFClientConnectionImpl;
+import org.jppf.client.*;
 
 /**
  * Instances of this class are tasks run periodically from a timer thread, requesting the latest
@@ -49,6 +49,7 @@ public class StatsRefreshTask extends TimerTask
 	 */
 	public void run()
 	{
-		StatsHandler.getInstance().requestUpdate(connection);
+		if (JPPFClientConnectionStatus.ACTIVE.equals(connection.getStatus()))
+			StatsHandler.getInstance().requestUpdate(connection);
 	}
 }

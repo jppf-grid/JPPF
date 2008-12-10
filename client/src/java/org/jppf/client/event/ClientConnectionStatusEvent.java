@@ -20,8 +20,6 @@ package org.jppf.client.event;
 
 import java.util.EventObject;
 
-import org.jppf.client.*;
-
 /**
  * Event sent to notify of a status chnage for a client connection.
  * @author Laurent Cohen
@@ -29,38 +27,20 @@ import org.jppf.client.*;
 public class ClientConnectionStatusEvent extends EventObject
 {
 	/**
-	 * The new status that was set.
-	 */
-	private JPPFClientConnectionStatus status = null;
-
-	/**
 	 * Initialize this event with a client connection as source.
 	 * @param source the event source.
-	 * @param status the new status that was set.
 	 */
-	public ClientConnectionStatusEvent(Object source, JPPFClientConnectionStatus status)
+	public ClientConnectionStatusEvent(ClientConnectionStatusHandler source)
 	{
 		super(source);
-		this.status = status;
 	}
 
 	/**
 	 * Get the source of this event.
 	 * @return the event as a <code>JPPFClientConnection</code> instance.
 	 */
-	public JPPFClientConnection getJPPFClientConnection()
+	public ClientConnectionStatusHandler getClientConnectionStatusHandler()
 	{
-		if (getSource() instanceof JPPFClientConnection) return (JPPFClientConnection) getSource();
-		return null;
-	}
-
-	/**
-	 * Get the source of this event.
-	 * @return the event as a <code>JPPFClientConnection</code> instance.
-	 */
-	public ClassServerDelegate getClassServerDelegate()
-	{
-		if (getSource() instanceof ClassServerDelegate) return (ClassServerDelegate) getSource();
-		return null;
+		return (ClientConnectionStatusHandler) getSource();
 	}
 }

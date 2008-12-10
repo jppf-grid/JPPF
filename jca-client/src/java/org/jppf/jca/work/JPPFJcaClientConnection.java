@@ -83,7 +83,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 		{
 			setStatus(CONNECTING);
 			initCredentials();
-			initConnection();
+			taskServerConnection.init();
 			setStatus(ACTIVE);
 		}
 		catch(Exception e)
@@ -94,33 +94,6 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 		catch(JPPFError e)
 		{
 			setStatus(FAILED);
-			throw e;
-		}
-	}
-
-	/**
-	 * Initialize this node's resources.
-	 * @throws Exception if an error is raised during initialization.
-	 * @see org.jppf.client.AbstractJPPFClientConnection#initConnection()
-	 */
-	public synchronized void initConnection() throws Exception
-	{
-		try
-		{
-			setStatus(CONNECTING);
-			if (socketClient == null) initSocketClient();
-			if (debugEnabled) log.debug("[client: "+name+"] Attempting connection to the JPPF driver");
-			socketInitializer.initializeSocket(socketClient);
-			if (!socketInitializer.isSuccessfull())
-			{
-				throw new JPPFException("[client: "+name+"] Could not reconnect to the JPPF Driver");
-			}
-			log.info("[client: "+name+"] Reconnected to the JPPF driver");
-			setStatus(ACTIVE);
-		}
-		catch(Exception e)
-		{
-			setStatus(DISCONNECTED);
 			throw e;
 		}
 	}
@@ -204,8 +177,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 			isShutdown = true;
 			try
 			{
-				if (socketInitializer != null) socketInitializer.close();
-				if (socketClient != null) socketClient.close();
+				if (taskServerConnection != null) taskServerConnection.close();
 				if (delegate != null) delegate.close();
 			}
 			catch(Exception e)

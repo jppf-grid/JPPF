@@ -45,7 +45,6 @@
 			frame.getContentPane().add(option.getUIComponent());
 			frame.setSize(600, 730);
 			frame.setVisible(true);
-			statsHandler.startRefreshTimer();
 		]]></script>
 	</initializer>
 
@@ -70,7 +69,8 @@
 				<script language="javascript"><![CDATA[
 					var list = StatsHandler.getInstance().getJppfClient().getAllConnections();
 					option.setItems(list);
-					option.setValue(list.get(0));
+					if (!list.isEmpty()) option.setValue(list.get(0));
+					StatsHandler.getInstance().setServerListOption(option);
 				]]></script>
 			</initializer>
 			<listener type="script">

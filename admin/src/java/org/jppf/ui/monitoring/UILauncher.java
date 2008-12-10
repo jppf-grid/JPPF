@@ -27,7 +27,7 @@ import org.jppf.ui.options.factory.OptionsHandler;
 import org.jvnet.lafwidget.LafWidget;
 import org.jvnet.lafwidget.tabbed.DefaultTabPreviewPainter;
 import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.theme.ThemeChangeListener;
+import org.jvnet.substance.watermark.SubstanceNoneWatermark;
 
 /**
  * This class provides a graphical interface for monitoring the status and health 
@@ -63,15 +63,7 @@ public class UILauncher
 				SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme());
 				//SubstanceLookAndFeel.setCurrentTheme(new SubstanceAquaTheme());
 				//SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
-				SubstanceLookAndFeel.setCurrentWatermark(new JPPFTiledWatermark());
-				SubstanceLookAndFeel.registerThemeChangeListener(new ThemeChangeListener()
-				{
-					public void themeChanged()
-					{
-						//SubstanceTheme th = SubstanceLookAndFeel.getTheme();
-						//ColorScheme scheme = th.getColorScheme();
-					}
-				});
+				SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNoneWatermark());
 			}
 			OptionElement elt = null;
 			if ("url".equalsIgnoreCase(args[1])) elt = OptionsHandler.addPageFromURL(args[0], null);

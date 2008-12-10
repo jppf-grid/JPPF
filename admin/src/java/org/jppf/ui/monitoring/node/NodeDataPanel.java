@@ -24,6 +24,7 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.tree.TreePath;
 
+import org.apache.commons.logging.*;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jppf.management.NodeManagementInfo;
@@ -38,6 +39,14 @@ import org.jppf.utils.LocalizationUtils;
  */
 public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(NodeDataPanel.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Base name for localization bundle lookups.
 	 */
@@ -140,7 +149,9 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	{
 		final DefaultMutableTreeTableNode root = (DefaultMutableTreeTableNode) model.getRoot();
 		final DefaultMutableTreeTableNode driverNode = new DefaultMutableTreeTableNode(event.getDriverName());
+		if (debugEnabled) log.debug("adding driver: " + event.getDriverName());
 		model.insertNodeInto(driverNode, root, root.getChildCount());
+		if (root.getChildCount() == 1) expandAndResizeColumns();
 	}
 
 	/**
@@ -151,6 +162,7 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	public void driverRemoved(NodeHandlerEvent event)
 	{
 		final DefaultMutableTreeTableNode driverNode = findDriver(event.getDriverName());
+		if (debugEnabled) log.debug("removing driver: " + event.getDriverName());
 		if (driverNode != null) model.removeNodeFromParent(driverNode);
 	}
 
@@ -164,7 +176,10 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 		final DefaultMutableTreeTableNode driverNode = findDriver(event.getDriverName());
 		if (driverNode == null) return;
 		final DefaultMutableTreeTableNode node = new DefaultMutableTreeTableNode(event.getInfoHolder());
+		if (debugEnabled) log.debug("adding node: " + event.getInfoHolder());
 		model.insertNodeInto(node, driverNode, driverNode.getChildCount());
+		final DefaultMutableTreeTableNode root = (DefaultMutableTreeTableNode) model.getRoot();
+		if (root.getChildCount() == 1) expandAndResizeColumns();
 	}
 
 	/**
@@ -177,7 +192,11 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 		DefaultMutableTreeTableNode driverNode = findDriver(event.getDriverName());
 		if (driverNode == null) return;
 		final DefaultMutableTreeTableNode node = findNode(driverNode, event.getInfoHolder());
-		if (node != null) model.removeNodeFromParent(node);
+		if (node != null)
+		{
+			if (debugEnabled) log.debug("removing node: " + event.getInfoHolder());
+			model.removeNodeFromParent(node);
+		}
 	}
 
 	/**
@@ -267,5 +286,17 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	protected void setupValueChangeNotifications()
 	{
+	}
+
+	/**
+	 * Create, initialize and layout the GUI components displayed in this panel.
+	 */
+	private void expandAndResizeColumns()
+	{
+		treeTable.expandAll();
+	  //for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
+	  //for (int i=model.getColumnCount()-1; i<=0; i--) treeTable.sizeColumnsToFit(i);
+	  treeTable.doLayout();
+	  treeTable.sizeColumnsToFit(0);
 	}
 }

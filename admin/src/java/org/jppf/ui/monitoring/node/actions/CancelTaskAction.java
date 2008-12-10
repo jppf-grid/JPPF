@@ -53,7 +53,21 @@ public class CancelTaskAction extends JPPFAbstractNodeAction
 	{
 		try
 		{
-			nodeInfoHolders[0].getJmxClient().cancelTask(taskId);
+			Runnable r = new Runnable()
+			{
+				public void run()
+				{
+					try
+					{
+						nodeInfoHolders[0].getJmxClient().cancelTask(taskId);
+					}
+					catch(Exception e)
+					{
+						log.error(e.getMessage(), e);
+					}
+				}
+			};
+			new Thread(r).start();
 		}
 		catch(Exception e)
 		{

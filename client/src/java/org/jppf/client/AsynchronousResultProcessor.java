@@ -101,7 +101,7 @@ public class AsynchronousResultProcessor implements Runnable
 				catch(Exception e)
 				{
 					log.error("["+connection.getName()+"] "+e.getMessage(), e);
-					connection.initConnection();
+					connection.getTaskServerConnection().init();
 				}
 			}
 		}
