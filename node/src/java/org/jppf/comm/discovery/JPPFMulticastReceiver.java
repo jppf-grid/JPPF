@@ -211,6 +211,9 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 							byte[] bytes = new byte[len];
 							buffer.get(bytes);
 							info = JPPFConnectionInformation.fromBytes(bytes);
+							String host = props.getString("jppf.management.host", null);
+							if (host == null) host = addr.getHostAddress();
+							info.managementHost = host;
 							addConnectionInfo(info);
 						}
 						if (System.currentTimeMillis() - start < t) Thread.sleep(50L);

@@ -47,9 +47,13 @@ public class JPPFConnectionInformation implements Serializable
 	 */
 	public int[] applicationServerPorts = null;
 	/**
-	 * Port numbere used for JMX management and monitoring.
+	 * Port number used for JMX management and monitoring.
 	 */
 	public int managementPort = -1;
+	/**
+	 * Host address used for JMX management and monitoring.
+	 */
+	public transient String managementHost = null;
 	/**
 	 * Identifier for this object.
 	 */

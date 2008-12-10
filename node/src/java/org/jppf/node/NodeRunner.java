@@ -169,6 +169,7 @@ public class NodeRunner
 		props.setProperty("jppf.server.host", info.host);
 		props.setProperty("class.server.port", StringUtils.buildString(info.classServerPorts));
 		props.setProperty("node.server.port", StringUtils.buildString(info.nodeServerPorts));
+		if (info.managementHost != null) props.setProperty("jppf.management.host", info.managementHost);
 	}
 
 	/**
