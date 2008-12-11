@@ -1,2 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<weblogic-application xmlns="http://www.bea.com/ns/weblogic/90"></weblogic-application>
+<weblogic-application xmlns="http://www.bea.com/ns/weblogic/90">
+	<!--
+	<prefer-application-packages>
+	  <package-name>org.jppf.*</package-name>
+	</prefer-application-packages>
+	-->
+</weblogic-application>

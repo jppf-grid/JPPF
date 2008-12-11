@@ -78,39 +78,12 @@ public class JcaResultProcessor implements Work
 			connection.setCurrentExecution(execution);
 			int count = 0;
 			for (JPPFTask task : execution.tasks) task.setPosition(count++);
-			count = 0;
 			boolean completed = false;
 			while (!completed)
 			{
 				try
 				{
-					JPPFTaskBundle bundle = new JPPFTaskBundle();
-					bundle.setRequestUuid(new JPPFUuid().toString());
-					JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
-					String requestUuid = bundle.getRequestUuid();
-					bundle.setExecutionPolicy(execution.policy);
-					ClassLoader cl = null;
-					if (!execution.tasks.isEmpty())
-					{
-						JPPFTask task = execution.tasks.get(0);
-						cl = task.getClass().getClassLoader();
-						mgr.addRequestClassLoader(requestUuid, cl);
-					}
-					log.info("submitting with policy = "+execution.policy);
-					connection.sendTasks(bundle, execution.tasks, execution.dataProvider);
-					while (count < execution.tasks.size())
-					{
-						Pair<List<JPPFTask>, Integer> p = connection.receiveResults(cl);
-						count += p.first().size();
-						if (result != null)
-						{
-							result.resultsReceived(new TaskResultEvent(p.first(), p.second()));
-						}
-					}
-					completed = true;
-					mgr.removeRequestClassLoader(requestUuid);
-					result.setStatus(COMPLETE);
-					connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
+					completed = performSubmission(result);
 				}
 				catch(NotSerializableException e)
 				{
@@ -141,6 +114,57 @@ public class JcaResultProcessor implements Work
 			if (!error) connection.setCurrentExecution(null);
 			else result.setStatus(FAILED);
 		}
+	}
+
+	/**
+	 * Perform the actual tasks submission.
+	 * @param result the submission result.
+	 * @return true if the submission is successfull.
+	 * @throws Exception if an error is raised while submitting the tasks or receiving the results.
+	 */
+	private boolean performSubmission(JPPFSubmissionResult result) throws Exception
+	{
+		int count = 0;
+		JPPFTaskBundle bundle = new JPPFTaskBundle();
+		bundle.setRequestUuid(new JPPFUuid().toString());
+		JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
+		String requestUuid = bundle.getRequestUuid();
+		bundle.setExecutionPolicy(execution.policy);
+		ClassLoader cl = null;
+		ClassLoader oldCl = null;
+		if (!execution.tasks.isEmpty())
+		{
+			JPPFTask task = execution.tasks.get(0);
+			cl = task.getClass().getClassLoader();
+			mgr.addRequestClassLoader(requestUuid, cl);
+		}
+		try
+		{
+			if (cl != null)
+			{
+				oldCl = Thread.currentThread().getContextClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+			}
+			//log.debug("submitting with policy = " + execution.policy);
+			connection.sendTasks(cl, bundle, execution.tasks, execution.dataProvider);
+			while (count < execution.tasks.size())
+			{
+				Pair<List<JPPFTask>, Integer> p = connection.receiveResults(cl);
+				count += p.first().size();
+				if (result != null)
+				{
+					result.resultsReceived(new TaskResultEvent(p.first(), p.second()));
+				}
+			}
+			mgr.removeRequestClassLoader(requestUuid);
+			result.setStatus(COMPLETE);
+			connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
+		}
+		finally
+		{
+			if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
+		}
+		return true;
 	}
 
 	/**

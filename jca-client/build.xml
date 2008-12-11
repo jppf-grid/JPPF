@@ -186,7 +186,7 @@
 		</antcall>
 		<antcall target="ear">
 			<param name="appserver" value="${sunas90}"/>
-			<param name="include.client.classes" value="true"/>
+			<param name="include.client.classes" value="false"/>
 		</antcall>
 		<antcall target="ear">
 			<param name="appserver" value="${was61}"/>
@@ -194,7 +194,7 @@
 		</antcall>
 		<antcall target="ear">
 			<param name="appserver" value="${weblogic92}"/>
-			<param name="include.client.classes" value="true"/>
+			<param name="include.client.classes" value="false"/>
 		</antcall>
   	<!-- ***** add EAR generation for other application servers here ***** -->
   	<!-- ***** end of add other                                      ***** -->
@@ -225,17 +225,15 @@
 
 	<!-- Build the WAR and EAR, wihtout any client classes in the application -->
 	<target name="ear.noclient.classes" if="noclient.classes">
-    <war warfile="${build.dir}/${appserver}/jppftest.war" webxml="${meta.inf.dir}/${appserver}/WEB-INF/web.xml">
+    <war warfile="${build.dir}/${appserver}/jppftest.war" webxml="${meta.inf.dir}/${appserver}/WEB-INF/web.xml" manifest="${basedir}/docroot/META-INF/manifest1.mf">
 			<zipfileset dir="${meta.inf.dir}/${appserver}/WEB-INF" excludes="web.xml" prefix="WEB-INF"/>
 			<zipfileset dir="${meta.inf.dir}/${appserver}/docroot" includes="**/*.*"/>
 			<zipfileset dir="${meta.inf.dir}/common/docroot" includes="**/*.*"/>
-    	<classes dir="${classes.dir}">
-    		<include name="**/org/jppf/jca/demo/*.class"/>
-    	</classes>
     </war>
 
 		<ear destfile="${build.dir}/${ear.prefix}_${appserver}.ear"
 			appxml="${build.dir}/${appserver}/application.xml">
+			<zipfileset dir="${meta.inf.dir}/${appserver}/application" prefix="META-INF"/>
 			<fileset dir="${build.dir}/${appserver}" includes="jppftest.war"/>
 			<zipfileset dir="${build.dir}/lib" prefix="lib" includes="jppf-j2ee-client.jar"/>
 		</ear>
@@ -244,17 +242,15 @@
 	<!-- Build the WAR and EAR, including the client classes in the application -->
 	<target name="ear.client.classes" unless="noclient.classes">
     <war warfile="${build.dir}/${appserver}/jppftest.war" webxml="${meta.inf.dir}/${appserver}/WEB-INF/web.xml"
-    	manifest="${basedir}/docroot/META-INF/manifest.mf">
+    	manifest="${basedir}/docroot/META-INF/manifest2.mf">
 			<zipfileset dir="${meta.inf.dir}/${appserver}/WEB-INF" excludes="web.xml" prefix="WEB-INF"/>
 			<zipfileset dir="${meta.inf.dir}/${appserver}/docroot" includes="*.*"/>
 			<zipfileset dir="${meta.inf.dir}/common/docroot" includes="**/*.*"/>
-    	<classes dir="${classes.dir}">
-    		<include name="**/org/jppf/jca/demo/*.class"/>
-    	</classes>
     </war>
 
 		<ear destfile="${build.dir}/${ear.prefix}_${appserver}.ear" appxml="${build.dir}/${appserver}/application.xml">
 			<fileset dir="${build.dir}/${appserver}" includes="jppftest.war"/>
+			<!--<zipfileset dir="${meta.inf.dir}/${appserver}/application" prefix="META-INF"/>-->
 			<zipfileset dir="${build.dir}/lib" prefix="lib"/>
 			<zipfileset dir="${jppf.build.dir}" prefix="lib">
 				<include name="jppf-common-node.jar"/>
@@ -287,7 +283,7 @@
 		<antcall target="rar"><param name="appserver" value="${was61}"/></antcall>
 		<antcall target="rar"><param name="appserver" value="${weblogic92}"/></antcall>
 		<antcall target="rar"><param name="appserver" value="${oracle10}"/></antcall>
-  	<!-- ***** add RAR genaration for other application servers here ***** -->
+  	<!-- ***** add RAR generation for other application servers here ***** -->
   	<!-- ***** end of add other                                      ***** -->
 		<echo message="RAR files created"/>
 	</target>
@@ -318,7 +314,9 @@
 			<zipfileset dir="${build.dir}/${appserver}/ra" prefix="META-INF">
 				<include name="*.*"/>
 			</zipfileset>
-			<zipfileset dir="${build.dir}/lib"/>
+			<zipfileset dir="${build.dir}/lib">
+				<include name="jppf-jca.jar"/>
+			</zipfileset>
 			<zipfileset dir="${jppf.build.dir}">
 				<include name="jppf-common-node.jar"/>
 				<include name="jppf-common.jar"/>
@@ -339,6 +337,14 @@
 
 	<target name="deploy.ear.jboss">
 		<copy todir="C:/Tools/jboss-4.0.5.GA/server/default/deploy" file="${build.dir}/${ear.prefix}_${jboss40}.ear"/>
+	</target>
+
+	<target name="deploy.rar.weblogic">
+		<copy todir="C:/bea/user_projects/domains/jppf_domain/autodeploy" file="${build.dir}/jppf_ra_${weblogic92}.rar"/>
+	</target>
+
+	<target name="deploy.ear.weblogic">
+		<copy todir="C:/bea/user_projects/domains/jppf_domain/autodeploy" file="${build.dir}/${ear.prefix}_${weblogic92}.ear"/>
 	</target>
 
 </project> 

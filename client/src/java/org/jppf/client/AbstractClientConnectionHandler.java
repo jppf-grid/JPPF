@@ -71,7 +71,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	protected AbstractClientConnectionHandler(JPPFClientConnection owner)
 	{
 		this.owner = owner;
-		this.name = owner.getName();
+		if (owner != null) this.name = owner.getName();
 	}
 
 	/**

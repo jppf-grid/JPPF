@@ -28,7 +28,7 @@ import org.jppf.client.*;
 import org.jppf.client.event.TaskResultListener;
 import org.jppf.comm.socket.SocketInitializer;
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.Pair;
 
@@ -129,6 +129,28 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 		JcaResultProcessor proc = new JcaResultProcessor(this, exec);
 		proc.run();
 		if (debugEnabled) log.debug("["+name+"] submitted " + taskList.size() + " tasks");
+	}
+
+	/**
+	 * Send tasks to the server for execution.
+	 * @param cl classloader used for serialization.
+	 * @param header the task bundle to send to the driver.
+	 * @param taskList the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @throws Exception if an error occurs while sending the request.
+	 */
+	public void sendTasks(ClassLoader cl, JPPFTaskBundle header, List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
+	{
+		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+		try
+		{
+			if (cl != null) Thread.currentThread().setContextClassLoader(cl);
+			sendTasks(header, taskList, dataProvider);
+		}
+		finally
+		{
+			if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
+		}
 	}
 
 	/**

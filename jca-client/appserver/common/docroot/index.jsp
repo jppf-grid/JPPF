@@ -17,6 +17,8 @@
 		  {
 		  }
 			String msg = new DemoTest(jndiName).testConnector(duration);
+			//SomeTestClass stc = new SomeTestClass();
+			//String msg = "something";
 			response.sendRedirect(request.getContextPath()+"/index.jsp?msg="+msg);
 	  }
 		else

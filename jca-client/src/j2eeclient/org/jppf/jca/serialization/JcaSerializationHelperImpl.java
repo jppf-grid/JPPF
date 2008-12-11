@@ -27,6 +27,18 @@ import org.jppf.utils.*;
 public class JcaSerializationHelperImpl extends SerializationHelperImpl
 {
 	/**
+	 * Fully qualified name of the ObjectSerializer implementation class to use.
+	 */
+	private static String SERIALIZER_CLASS_NAME = "org.jppf.jca.serialization.JcaObjectSerializerImpl";
+
+	/**
+	 * Default constructor.
+	 */
+	public JcaSerializationHelperImpl()
+	{
+	}
+
+	/**
 	 * Get the object serializer for this helper.
 	 * @return an <code>ObjectSerializer</code> instance.
 	 * @throws Exception if the object serializer could not be instantiated.
@@ -36,8 +48,24 @@ public class JcaSerializationHelperImpl extends SerializationHelperImpl
 	{
 		if (serializer == null)
 		{
-			ClassLoader cl = getClass().getClassLoader();
-			serializer = (ObjectSerializer) cl.loadClass("org.jppf.jca.serialization.JcaObjectSerializerImpl").newInstance();
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			Class clazz = null;
+			if (cl != null)
+			{
+				try
+				{
+					clazz = cl.loadClass(SERIALIZER_CLASS_NAME);
+				}
+				catch(ClassNotFoundException ignore)
+				{
+				}
+			}
+			if (clazz == null)
+			{
+				cl = getClass().getClassLoader();
+				clazz = cl.loadClass(SERIALIZER_CLASS_NAME);
+			}
+			serializer = (ObjectSerializer) clazz.newInstance();
 		}
 		return serializer;
 	}

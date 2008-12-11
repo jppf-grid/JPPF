@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <weblogic-connector xmlns="http://www.bea.com/ns/weblogic/90"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.bea.com/ns/weblogic/90
-                    http://www.bea.com/ns/weblogic/90/weblogic-ra.xsd">
+	http://www.bea.com/ns/weblogic/90/weblogic-ra.xsd">
 
 	<jndi-name>eis/JPPFResourceAdapter</jndi-name>
 

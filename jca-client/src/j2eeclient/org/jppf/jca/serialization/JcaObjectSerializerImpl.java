@@ -18,6 +18,9 @@
 
 package org.jppf.jca.serialization;
 
+import java.io.*;
+
+import org.jppf.serialization.JPPFObjectStreamFactory;
 import org.jppf.utils.ObjectSerializerImpl;
 
 /**
@@ -26,4 +29,29 @@ import org.jppf.utils.ObjectSerializerImpl;
  */
 public class JcaObjectSerializerImpl extends ObjectSerializerImpl
 {
+	/**
+	 * The default constructor must be public to allow for instantiation through Java reflection.
+	 */
+	public JcaObjectSerializerImpl()
+	{
+	}
+
+	/**
+	 * Read an object from an array of bytes.
+	 * @param bytes buffer holding the array of bytes to deserialize from.
+	 * @param offset position at which to start reading the bytes from.
+	 * @param length the number of bytes to read.
+	 * @return the object that was deserialized from the array of bytes.
+	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
+	 * @see org.jppf.utils.ObjectSerializerImpl#deserialize(byte[], int, int)
+	 */
+	public Object deserialize(byte[] bytes, int offset, int length) throws Exception
+	{
+		Object o = null;
+		ByteArrayInputStream bis = new ByteArrayInputStream(bytes, offset, length);
+		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(bis);
+		o = ois.readObject();
+		ois.close();
+		return o;
+	}
 }
