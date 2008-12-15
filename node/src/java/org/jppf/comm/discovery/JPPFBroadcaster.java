@@ -70,6 +70,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 	private void init() throws Exception
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
+		broadcastInterval = props.getLong("jppf.discovery.broadcast.interval", 1000L);
 		String group = props.getString("jppf.discovery.group", "230.0.0.1");
 		int port = props.getInt("jppf.discovery.port", 11111);
 

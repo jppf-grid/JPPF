@@ -459,4 +459,23 @@ public class JPPFClassLoader extends ClassLoader
 	{
 		this.requestUuid = requestUuid;
 	}
+
+	/**
+	 * Terminate this classloader and clean the resources it uses.
+	 */
+	public void close()
+	{
+		if (socketInitializer != null) socketInitializer.close();
+		if (socketClient != null)
+		{
+			try
+			{
+				socketClient.close();
+			}
+			catch(Exception ignore)
+			{
+			}
+			socketClient = null;
+		}
+	}
 }

@@ -77,9 +77,7 @@ public class NodeRunner
 		{
 			log.debug("launching the JPPF node");
 			if ((args == null) || (args.length <= 0))
-			{
 				throw new JPPFException("The node should be run with an argument representing a valid TCP port or 'noLauncher'");
-			}
 			if (!"noLauncher".equals(args[0]))
 			{
 				int port = Integer.parseInt(args[0]);
@@ -108,17 +106,17 @@ public class NodeRunner
 					nodeSocket = node.getSocketWrapper();
 					System.out.println(notif.getMessage());
 					System.out.println("Reloading this node");
+					classLoader.close();
 					classLoader = null;
 					node.stopNode(false);
-					AccessController.doPrivileged(new PrivilegedAction<Object>()
-					{
-						public Object run()
-						{
-							System.setSecurityManager(null);
-							return null;
-						}
-					});
-					securityManagerSet = false;
+					unsetSecurity();
+				}
+				catch(JPPFNodeReconnectionNotification e)
+				{
+					classLoader.close();
+					classLoader = null;
+					node.stopNode(true);
+					unsetSecurity();
 				}
 			}
 		}
@@ -160,6 +158,7 @@ public class NodeRunner
 	{
 		JPPFMulticastReceiver receiver = new JPPFMulticastReceiver();
 		JPPFConnectionInformation info = receiver.receive();
+		receiver.setStopped(true);
 		if (info == null)
 		{
 			if (debugEnabled) log.debug("Could not auto-discover the driver connection information");
@@ -191,6 +190,25 @@ public class NodeRunner
 				System.setSecurityManager(new SecurityManager());
 				securityManagerSet = true;
 			}
+		}
+	}
+
+	/**
+	 * Set the security manager with the permission granted in the policy file.
+	 */
+	public static void unsetSecurity()
+	{
+		if (securityManagerSet)
+		{
+			AccessController.doPrivileged(new PrivilegedAction<Object>()
+			{
+				public Object run()
+				{
+					System.setSecurityManager(null);
+					return null;
+				}
+			});
+			securityManagerSet = false;
 		}
 	}
 

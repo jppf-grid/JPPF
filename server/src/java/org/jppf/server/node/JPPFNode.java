@@ -104,6 +104,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		buildNumber = VersionUtils.getBuildNumber();
 		stopped = false;
 		int n = 0;
+		Throwable error = null;
 		if (debugEnabled) log.debug("Start of node main loop");
 		while (!stopped)
 		{
@@ -217,6 +218,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			if (debugEnabled) log.debug("start socket initialization");
 			System.out.println("PeerNode.init(): Attempting connection to the JPPF driver");
 			socketInitializer.initializeSocket(socketClient);
+			if (!socketInitializer.isSuccessfull()) throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
 			System.out.println("PeerNode.init(): Reconnected to the JPPF driver");
 			if (debugEnabled) log.debug("end socket initialization");
 		}

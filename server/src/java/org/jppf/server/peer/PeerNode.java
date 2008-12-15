@@ -18,6 +18,7 @@
 package org.jppf.server.peer;
 
 import org.apache.commons.logging.*;
+import org.jppf.JPPFException;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.io.*;
 import org.jppf.node.AbstractMonitoredNode;
@@ -82,27 +83,42 @@ public class PeerNode extends AbstractMonitoredNode
 			try
 			{
 				init();
-				resultSender = new PeerNodeResultSender(socketClient);
-				perform();
 			}
 			catch(Exception e)
 			{
-				log.error(e.getMessage(), e);
+				stopped = true;
+				if (socketInitializer != null) socketInitializer.close();
+				TypedProperties props = JPPFConfiguration.getProperties();
+				if (props.getBoolean("jppf.discovery.enabled", true) && props.getBoolean("jppf.peer.discovery.enabled", true))
+					JPPFDriver.getInstance().getPeerDiscoveryThread().removePeer(peerName);
+				if (debugEnabled) log.debug(getName() + " : " + e.getMessage(), e);
+			}
+			if (!stopped)
+			{
 				try
 				{
-					socketClient.close();
-					socketClient = null;
+					resultSender = new PeerNodeResultSender(socketClient);
+					perform();
 				}
-				catch(Exception ex)
+				catch(Exception e)
 				{
-					log.error(ex.getMessage(), ex);
+					log.error(e.getMessage(), e);
+					try
+					{
+						socketClient.close();
+						socketClient = null;
+					}
+					catch(Exception ex)
+					{
+						log.error(ex.getMessage(), ex);
+					}
 				}
-			}
-			catch(Error e)
-			{
-				log.error(e.getMessage(), e);
-				e.printStackTrace();
-				throw e;
+				catch(Error e)
+				{
+					log.error(e.getMessage(), e);
+					e.printStackTrace();
+					throw e;
+				}
 			}
 		}
 		if (debugEnabled) log.debug(getName() + "End of peer node main loop");
@@ -171,6 +187,7 @@ public class PeerNode extends AbstractMonitoredNode
 			if (debugEnabled) log.debug(getName() + "initializing socket");
 			System.out.println(getName() + "PeerNode.init(): Attempting connection to the JPPF driver");
 			socketInitializer.initializeSocket(socketClient);
+			if (!socketInitializer.isSuccessfull()) throw new JPPFException(getName() + " : Unable to reconnect to peer server");
 			System.out.println(getName() + "PeerNode.init(): Reconnected to the JPPF driver");
 			is = new SocketWrapperInputSource(socketClient);
 		}

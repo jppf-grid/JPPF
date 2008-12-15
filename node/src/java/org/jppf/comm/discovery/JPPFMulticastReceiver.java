@@ -60,7 +60,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 	/**
 	 * Multicast group to join.
 	 */
-	private static InetAddress groupInetAddress = null;
+	private InetAddress groupInetAddress = null;
 	/**
 	 * List of retrieved connection information.
 	 */
@@ -182,11 +182,11 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 			MulticastSocket socket = null;
 			try
 			{
-				int t = 1000;
+				int t = (int) 1000;
 				socket = new MulticastSocket(new InetSocketAddress(addr, port));
 				socket.setInterface(addr);
 				socket.joinGroup(groupInetAddress);
-				socket.setSoTimeout(1000);
+				socket.setSoTimeout(timeout);
 				byte[] buf = new byte[512];
 				DatagramPacket packet = new DatagramPacket(buf, buf.length);
 				while (!isStopped())

@@ -90,6 +90,10 @@ public class JPPFDriver
 	 */
 	private Map<SelectableChannel, NodeManagementInfo> nodeInfo =
 		new HashMap<SelectableChannel, NodeManagementInfo>();
+	/**
+	 * The thread that performs the peer servers discovery.
+	 */
+	private PeerDiscoveryThread peerDiscoveryThread = null;
 
 	/**
 	 * Initialize this JPPFDriver.
@@ -198,7 +202,8 @@ public class JPPFDriver
 		TypedProperties props = JPPFConfiguration.getProperties();
 		if (props.getBoolean("jppf.discovery.enabled", true))
 		{
-			new Thread(new PeerDiscoveryThread()).start();
+			peerDiscoveryThread = new PeerDiscoveryThread();
+			new Thread(peerDiscoveryThread).start();
 		}
 		else
 		{
@@ -253,6 +258,15 @@ public class JPPFDriver
 	public synchronized JMXServerImpl getJmxServer()
 	{
 		return jmxServer;
+	}
+
+	/**
+	 * Get the thread that performs the peer servers discovery.
+	 * @return a <code>PeerDiscoveryThread</code> instance.
+	 */
+	public PeerDiscoveryThread getPeerDiscoveryThread()
+	{
+		return peerDiscoveryThread;
 	}
 
 	/**
