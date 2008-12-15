@@ -20,9 +20,7 @@ package org.jppf.ui.monitoring.node;
 
 import java.util.Map;
 
-import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import javax.swing.tree.TreePath;
+import javax.swing.JScrollPane;
 
 import org.apache.commons.logging.*;
 import org.jdesktop.swingx.JXTreeTable;
@@ -114,6 +112,8 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	  //setViewportView(treeTable);
 		treeTable.expandAll();
 	  //for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
+		treeTable.setHorizontalScrollEnabled(false);
+		treeTable.setAutoResizeMode(JXTreeTable.AUTO_RESIZE_OFF);
 		setUIComponent(new JScrollPane(treeTable));
 		treeTable.addMouseListener(new TreeTableMouseListener());
 	}
@@ -130,14 +130,7 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 		if (driverNode == null) return;
 		final DefaultMutableTreeTableNode node = findNode(driverNode, event.getInfoHolder());
 		if (node == null) return;
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				TreePath path = new TreePath(new Object[] { root, driverNode, node });
-				treeTable.tableChanged(new TableModelEvent(treeTable.getModel(), treeTable.getRowForPath(path)));
-			}
-		});
+		treeTable.repaint();
 	}
 
 	/**
@@ -294,9 +287,5 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	private void expandAndResizeColumns()
 	{
 		treeTable.expandAll();
-	  //for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
-	  //for (int i=model.getColumnCount()-1; i<=0; i--) treeTable.sizeColumnsToFit(i);
-	  treeTable.doLayout();
-	  treeTable.sizeColumnsToFit(0);
 	}
 }
