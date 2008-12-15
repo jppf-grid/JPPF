@@ -22,13 +22,13 @@ import java.util.*;
 
 import org.jppf.comm.socket.*;
 import org.jppf.node.event.*;
-import org.jppf.utils.SerializationHelper;
+import org.jppf.utils.*;
 
 /**
  * Abstract implementation of the <code>MonitoredNode</code> interface.
  * @author Laurent Cohen
  */
-public abstract class AbstractMonitoredNode implements MonitoredNode
+public abstract class AbstractMonitoredNode extends ThreadSynchronization implements MonitoredNode
 {
 	/**
 	 * Utility for deserialization and serialization.
@@ -50,10 +50,6 @@ public abstract class AbstractMonitoredNode implements MonitoredNode
 	 * This flag is true if there is at least one listener, and false otherwise.
 	 */
 	protected boolean notifying = false;
-	/**
-	 * Used to programmatically stop this node.
-	 */
-	protected boolean stopped = false;
 	/**
 	 * Total number of tasks executed.
 	 */

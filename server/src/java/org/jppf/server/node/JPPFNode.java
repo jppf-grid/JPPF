@@ -102,11 +102,11 @@ public class JPPFNode extends AbstractMonitoredNode
 	{
 		uuid = new JPPFUuid().toString();
 		buildNumber = VersionUtils.getBuildNumber();
-		stopped = false;
+		setStopped(false);
 		int n = 0;
 		Throwable error = null;
 		if (debugEnabled) log.debug("Start of node main loop");
-		while (!stopped)
+		while (!isStopped())
 		{
 			try
 			{
@@ -128,8 +128,11 @@ public class JPPFNode extends AbstractMonitoredNode
 				log.error(e.getMessage(), e);
 				try
 				{
-					socketClient.close();
-					socketClient = null;
+					synchronized(this)
+					{
+						if (socketClient != null) socketClient.close();
+						socketClient = null;
+					}
 				}
 				catch(Exception ex)
 				{
@@ -149,7 +152,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	public void perform() throws Exception
 	{
 		if (debugEnabled) log.debug("Start of node secondary loop");
-		while (!stopped)
+		while (!isStopped())
 		{
 			Pair<JPPFTaskBundle, List<JPPFTask>> pair = readTask();
 			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
@@ -432,16 +435,16 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * @param closeSocket determines whether the underlying socket should be closed.
 	 * @see org.jppf.node.MonitoredNode#stopNode(boolean)
 	 */
-	public void stopNode(boolean closeSocket)
+	public synchronized void stopNode(boolean closeSocket)
 	{
 		if (debugEnabled) log.debug("stopping node");
-		stopped = true;
+		setStopped(true);
 		executionManager.shutdown();
 		if (closeSocket)
 		{
 			try
 			{
-				socketClient.close();
+					socketClient.close();
 			}
 			catch(Exception ex)
 			{
