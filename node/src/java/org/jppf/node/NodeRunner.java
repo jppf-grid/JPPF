@@ -308,4 +308,15 @@ public class NodeRunner
 		};
 		new Thread(r).start();
 	}
+
+	/**
+	 * Shutdown and evenetually restart the node.
+	 * @param node the node to shutdown or restart.
+	 * @param restart determines whether this node should be restarted by the node launcher.
+	 */
+	public static void shutdown(MonitoredNode node, boolean restart)
+	{
+		node.stopNode(true);
+		System.exit(restart ? 2 : 0);
+	}
 }

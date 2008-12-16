@@ -71,6 +71,15 @@ public class JPPFPermissions extends PermissionCollection
 	 */
 	public synchronized boolean implies(Permission permission)
 	{
+		if (permission instanceof RuntimePermission)
+		{
+			RuntimePermission rtp = (RuntimePermission) permission;
+			String actions = rtp.getActions();
+			if ((actions != null) && (actions.indexOf("exitVM") >= 0))
+			{
+				int breakpoint = 0;
+			}
+		}
 		List<Permission> perms = Collections.unmodifiableList(permissions);
 		for (Permission p: perms)
 		{

@@ -532,7 +532,10 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	public void shutdown(boolean restart)
 	{
+		/*
 		stopNode(true);
 		System.exit(restart ? 2 : 0);
+		*/
+		NodeRunner.shutdown(this, restart);
 	}
 }
