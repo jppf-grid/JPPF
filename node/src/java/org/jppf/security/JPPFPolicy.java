@@ -59,12 +59,26 @@ public class JPPFPolicy extends Policy
 	 * @return a collection of permissions.
 	 * @see java.security.Policy#getPermissions(java.security.CodeSource)
 	 */
-	public PermissionCollection getPermissions(CodeSource codesource)
+	public PermissionCollection getPermissions(final CodeSource codesource)
 	{
-		/*
-		*/
-		if (debugEnabled) log.debug("in getPermissions(CodeSource)");
+		if (debugEnabled) log.debug("in getPermissions(CodeSource) : " + toString(codesource));
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if ((cl == classLoader) || !(cl instanceof JPPFClassLoader))
+			return PermissionsFactory.getExtendedPermissions(classLoader);
+		return PermissionsFactory.getPermissions(classLoader);
+	}
+
+	/**
+	 * Get the permissions for a specified protection domain.
+	 * @param domain the protection domain to get the permissions for.
+	 * @return a <code>PermissionCollection</code> instance.
+	 * @see java.security.Policy#getPermissions(java.security.ProtectionDomain)
+	 */
+	public PermissionCollection getPermissions(final ProtectionDomain domain)
+	{
+		// domain.toString() causes a StackOverflowException - because it makes its own security checks that invoke this policy
+		if (debugEnabled) log.debug("in getPermissions(ProtectionDomain) : " + toString(domain));
+		ClassLoader cl = domain.getClassLoader();
 		if ((cl == classLoader) || !(cl instanceof JPPFClassLoader))
 			return PermissionsFactory.getExtendedPermissions(classLoader);
 		return PermissionsFactory.getPermissions(classLoader);
@@ -79,19 +93,50 @@ public class JPPFPolicy extends Policy
 	}
 
 	/**
-	 * Get the permissions for a specified protection domain.
-	 * @param domain the protection domain to get the permissions for.
-	 * @return a <code>PermissionCollection</code> instance.
-	 * @see java.security.Policy#getPermissions(java.security.ProtectionDomain)
+	 * Get a string representation of a <code>CodeSource</code> object.
+	 * @param code the code source to print.
+	 * @return a string representing the specified code source.
 	 */
-	public PermissionCollection getPermissions(ProtectionDomain domain)
+	private String toString(CodeSource code)
 	{
-		/*
-		*/
-		if (debugEnabled) log.debug("in getPermissions(ProtectionDomain)");
-		ClassLoader cl = domain.getClassLoader();
-		if ((cl == classLoader) || !(cl instanceof JPPFClassLoader))
-			return PermissionsFactory.getExtendedPermissions(classLoader);
-		return PermissionsFactory.getPermissions(classLoader);
+		if (code == null) return "null";
+		StringBuilder sb = new StringBuilder().append("location = ").append(code.getLocation());
+		return sb.toString();
+	}
+
+	/**
+	 * Get a string representation of a <code>ProtectionDomain</code> object.
+	 * @param domain the protection domain to print.
+	 * @return a string representing the specified protection domain.
+	 */
+	private String toString(ProtectionDomain domain)
+	{
+		StringBuilder sb = new StringBuilder().append("class loader = ").append(domain.getClassLoader());
+		sb.append(", code source = [").append(toString(domain.getCodeSource())).append("]");
+		return sb.toString();
+	}
+
+	/**
+	 * .
+	 * @param domain .
+	 * @param permission .
+	 * @return .
+	 * @see java.security.Policy#implies(java.security.ProtectionDomain, java.security.Permission)
+	 */
+	public boolean implies(ProtectionDomain domain, Permission permission)
+	{
+		if (debugEnabled)
+		{
+			if (permission instanceof RuntimePermission)
+			{
+				RuntimePermission rp = (RuntimePermission) permission;
+				String action = rp.getActions();
+				if ((action != null) && (action.indexOf("exitVM") >= 0))
+				{
+					log.debug("in implies(exitVM)", new Exception());
+				}
+			}
+		}
+		return super.implies(domain, permission);
 	}
 }

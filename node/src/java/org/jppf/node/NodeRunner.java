@@ -20,6 +20,7 @@ package org.jppf.node;
 import java.net.Socket;
 import java.security.*;
 import java.util.Hashtable;
+import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.*;
@@ -65,6 +66,18 @@ public class NodeRunner
 	 * The jmx server that handles administration and monitoring functions for this node.
 	 */
 	private static JMXServerImpl jmxServer = null;
+	/**
+	 * Used to executed a JVM termination task;
+	 */
+	private static ExecutorService executor = Executors.newFixedThreadPool(1);
+	/**
+	 * Task used to shutdown the node.
+	 */
+	private static final ShutdownOrRestart SHUTDOWN_TASK = new ShutdownOrRestart(false); 
+	/**
+	 * Task used to restart the node.
+	 */
+	private static final ShutdownOrRestart RESTART_TASK = new ShutdownOrRestart(true); 
 
 	/**
 	 * Run a node as a standalone application.
@@ -314,9 +327,45 @@ public class NodeRunner
 	 * @param node the node to shutdown or restart.
 	 * @param restart determines whether this node should be restarted by the node launcher.
 	 */
-	public static void shutdown(MonitoredNode node, boolean restart)
+	public static void shutdown(MonitoredNode node, final boolean restart)
 	{
 		node.stopNode(true);
-		System.exit(restart ? 2 : 0);
+		executor.submit(restart ? RESTART_TASK : SHUTDOWN_TASK);
+	}
+
+	/**
+	 * Task used to terminate the JVM.
+	 */
+	public static class ShutdownOrRestart implements Runnable
+	{
+		/**
+		 * True if the node is to be restarted, false to only shut it down.
+		 */
+		private boolean restart = false;
+
+		/**
+		 * Initialize this task.
+		 * @param restart true if the node is to be restarted, false to only shut it down.
+		 */
+		public ShutdownOrRestart(boolean restart)
+		{
+			this.restart = restart;
+		}
+
+		/**
+		 * Execute this task.
+		 * @see java.lang.Runnable#run()
+		 */
+		public void run()
+		{
+			AccessController.doPrivileged(new PrivilegedAction<Object>()
+			{
+				public Object run()
+				{
+					System.exit(restart ? 2 : 0);
+					return null;
+				}
+			});
+		}
 	}
 }
