@@ -93,7 +93,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 			ci.applicationServerPorts = info.applicationServerPorts;
 			ci.nodeServerPorts = info.nodeServerPorts;
 			ci.managementPort = info.managementPort;
-			byte[] infoBytes = JPPFConnectionInformation.toBytes(info);
+			byte[] infoBytes = JPPFConnectionInformation.toBytes(ci);
 			ByteBuffer buffer = ByteBuffer.wrap(new byte[512]);
 			buffer.putInt(infoBytes.length);
 			buffer.put(infoBytes);
