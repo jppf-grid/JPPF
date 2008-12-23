@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
+import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
 
@@ -149,7 +150,7 @@ public class JPPFClassLoader extends ClassLoader
 			}
 			catch (IOException e)
 			{
-				throw new RuntimeException(e);
+				throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
 			}
 			catch (Exception e)
 			{

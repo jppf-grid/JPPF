@@ -440,11 +440,11 @@ public class JPPFNode extends AbstractMonitoredNode
 		if (debugEnabled) log.debug("stopping node");
 		setStopped(true);
 		executionManager.shutdown();
-		if (closeSocket)
+		if (closeSocket && (socketClient != null))
 		{
 			try
 			{
-					socketClient.close();
+				socketClient.close();
 			}
 			catch(Exception ex)
 			{

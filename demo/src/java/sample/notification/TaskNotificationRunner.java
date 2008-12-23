@@ -115,7 +115,7 @@ public class TaskNotificationRunner
 	public static void initializeJmxNotifications() throws Exception
 	{
 		// get a handle to the driver connection
-		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection("driver1");
+		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
 		// wait until the connection to the driver is active
 		while (!c.getStatus().equals(JPPFClientConnectionStatus.ACTIVE))
 			Thread.sleep(100L);

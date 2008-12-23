@@ -51,7 +51,7 @@ public class SecurityTestTask extends JPPFTestTask
 	{
 		try
 		{
-			Socket s = new Socket("www.jppf.org", 8000);
+			Socket s = new Socket("www.apache.org", 8000);
 			s.close();
 		}
 		catch(IOException e)

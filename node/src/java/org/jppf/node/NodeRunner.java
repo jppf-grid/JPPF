@@ -116,6 +116,7 @@ public class NodeRunner
 				}
 				catch(JPPFNodeReloadNotification notif)
 				{
+					if (debugEnabled) log.debug("received reload notfication");
 					nodeSocket = node.getSocketWrapper();
 					System.out.println(notif.getMessage());
 					System.out.println("Reloading this node");
@@ -126,6 +127,7 @@ public class NodeRunner
 				}
 				catch(JPPFNodeReconnectionNotification e)
 				{
+					if (debugEnabled) log.debug("received reconnection notfication");
 					classLoader.close();
 					classLoader = null;
 					node.stopNode(true);

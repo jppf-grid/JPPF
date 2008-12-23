@@ -18,6 +18,7 @@
 
 package org.jppf.server.peer;
 
+import java.net.Inet4Address;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -77,7 +78,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 			while (!isStopped())
 			{
 				JPPFConnectionInformation info = receiver.receive();
-				if ((info != null) && !infoSet.contains(info) && !info.equals(localInfo)) addPeer(info);
+				if ((info != null) && !infoSet.contains(info) && !info.equals(localInfo) && !isSelf(info)) addPeer(info);
 			}
 		}
 		catch(Exception e)
@@ -114,6 +115,28 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 		props.setProperty("class.peer."+name+".server.port", "" + info.classServerPorts[0]);
 		props.setProperty("node.peer."+name+".server.port", "" + info.nodeServerPorts[0]);
 		new JPPFPeerInitializer(name).start();
+	}
+
+	/**
+	 * Determine whether the specified connection information refers to this driver.
+	 * This situation may arise if the host has multiple network interfaces, each with its own IP address.
+	 * Making thios distinction is important to prevent a driver from connecting to itself.
+	 * @param info the peer's connection information.
+	 * @return true if the host/port combination in the connection information can be resolved
+	 * as the configuration for this driver.
+	 */
+	private boolean isSelf(JPPFConnectionInformation info)
+	{
+		List<Inet4Address> ipv4Addresses = NetworkUtils.getIPV4Addresses();
+		for (Inet4Address addr: ipv4Addresses)
+		{
+			String ip = addr.getHostAddress();
+			if (info.host.equals(ip) && Arrays.equals(info.classServerPorts, localInfo.classServerPorts))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

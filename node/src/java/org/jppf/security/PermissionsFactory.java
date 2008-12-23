@@ -132,6 +132,7 @@ public final class PermissionsFactory
 			extendedPermissions.add(p);
 		}
 		extendedPermissions.add(new RuntimePermission("exitVM"));
+		extendedPermissions.add(new RuntimePermission("setSecurityManager"));
 	}
 
 	/**

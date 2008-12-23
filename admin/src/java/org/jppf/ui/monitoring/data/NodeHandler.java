@@ -71,6 +71,7 @@ public class NodeHandler implements ClientListener
 	 */
 	public NodeHandler()
 	{
+		if (debugEnabled) log.debug("initializing NodeHandler");
 		this.jppfClient = StatsHandler.getInstance().getJppfClient(this);
 		initialize(true);
 	}

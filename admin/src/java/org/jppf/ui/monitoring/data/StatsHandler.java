@@ -114,6 +114,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	 */
 	private StatsHandler()
 	{
+		if (debugEnabled) log.debug("initializing StatsHandler");
 		refreshInterval = JPPFConfiguration.getProperties().getLong("default.refresh.interval", 2000L);
 		if (refreshInterval > 0L) timer = new java.util.Timer("JPPF Driver Statistics Update Timer");
 		update(null, stats);
@@ -515,7 +516,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	 * Get the option containing the combobox with the list of driver connections. 
 	 * @return an <code>OptionElement</code> instance.
 	 */
-	public OptionElement getServerListOption()
+	public synchronized OptionElement getServerListOption()
 	{
 		return serverListOption;
 	}
@@ -565,8 +566,8 @@ public final class StatsHandler implements StatsConstants, ClientListener
 				timer.schedule(task, 1000L, refreshInterval);
 			}
 			JComboBox box = null;
-			while (serverListOption == null) goToSleep(50L);
-			box = ((ComboBoxOption) serverListOption).getComboBox();
+			while (getServerListOption() == null) goToSleep(50L);
+			box = ((ComboBoxOption) getServerListOption()).getComboBox();
 			box.addItem(c);
 			int maxLen = 0;
 			Object proto = null;

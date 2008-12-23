@@ -76,6 +76,7 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	public NodeDataPanel(NodeHandler handler)
 	{
+		if (debugEnabled) log.debug("initializing NodeDataPanel");
 		this.handler = handler;
 		createTreeTableModel();
 		createUI();
@@ -287,5 +288,7 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	private void expandAndResizeColumns()
 	{
 		treeTable.expandAll();
+		treeTable.sizeColumnsToFit(0);
+	  //for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
 	}
 }
