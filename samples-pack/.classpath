@@ -16,7 +16,6 @@
 	<classpathentry kind="lib" path="shared/lib/jppf-common.jar" sourcepath="/common/src/java"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-server.jar" sourcepath="/server/src/java"/>
 	<classpathentry kind="lib" path="shared/lib/log4j-1.2.9.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="shared/lib/js.jar"/>
 	<classpathentry kind="lib" path="shared/lib/crawler-1.0.0.jar"/>
 	<classpathentry kind="lib" path="shared/lib/commons-codec-1.3.jar"/>
@@ -25,5 +24,6 @@
 	<classpathentry kind="lib" path="shared/lib/lucene-demos-2.2.0.jar"/>
 	<classpathentry kind="lib" path="shared/lib/lucene-memory-2.2.0.jar"/>
 	<classpathentry kind="lib" path="shared/lib/substance-4.3.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="shared/classes"/>
 </classpath>
