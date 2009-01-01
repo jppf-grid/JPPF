@@ -8,9 +8,9 @@
 		<table cellspacing="0" cellpadding="0" width="80%">
 
 <?php
-		$link = mysql_connect('mysql4-j', 'j135654admin', 'Faz600er')
+		$link = mysql_connect('localhost', 'pervasiv_jppfadm', 'tri75den')
 			 or die('Could not connect: ' . mysql_error());
-		mysql_select_db('j135654_web') or die('Could not select database');
+		mysql_select_db('pervasiv_jppfweb') or die('Could not select database');
 
 		$query = 'SELECT * FROM links_groups ORDER BY group_id ASC';
 		$result = mysql_query($query) or die('Query failed: ' . mysql_error());

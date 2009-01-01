@@ -1,6 +1,6 @@
 /*
  * Java Parallel Processing Framework.
- * Copyright (C) 2005-2008 JPPF Team.
+ *  Copyright (C) 2005-2009 JPPF Team. 
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -351,7 +351,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	protected String getSerializationHelperClassName()
 	{
-		return SERIALIZATION_HELPER_IMPL;
+		return JPPFConfiguration.getProperties().getString("jppf.serialization.helper.class", SERIALIZATION_HELPER_IMPL);
 	}
 
 	/**

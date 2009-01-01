@@ -7,9 +7,9 @@
 		<table cellspacing="0" cellpadding="0" width="80%">
 		<?php
 		// Connecting, selecting database
-		$link = mysql_connect('mysql4-j', 'j135654admin', 'Faz600er')
+		$link = mysql_connect('localhost', 'pervasiv_jppfadm', 'tri75den')
 			 or die('Could not connect: ' . mysql_error());
-		mysql_select_db('j135654_web') or die('Could not select database');
+		mysql_select_db('pervasiv_jppfweb') or die('Could not select database');
 
 		// Performing SQL query
 		$query = 'SELECT * FROM news ORDER BY date DESC';
@@ -21,14 +21,11 @@
 			<tr>
 				<td>
 					<?php
+					$i++;
 					$title = date("n/j/Y", strtotime($line["date"])) . " " . $line["title"];
-					if ($i == 0)
-					{
 					?>
 					<br>
-					<?php
-					}
-					?>
+					<?php printf("<a name='news%d'/>", $i); ?>
 					$template{name="highlight-header" span="1" color="blue" color2="yellow" title="<?php printf('%s', $title); ?>"}$
 					<?php
 						printf("<br>%s", $line["desc"]);
