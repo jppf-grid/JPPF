@@ -16,59 +16,64 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol.commandline;
+package org.jppf.server.protocol;
 
-import java.io.Serializable;
+import java.io.*;
+import java.nio.ByteBuffer;
+
+import org.jppf.utils.BufferPool;
 
 /**
  * Instances of this class represent the location of an artifact, generally a file or the data found at a url.
+ * @param <T> the type of this location.
  * @author Laurent Cohen
  */
-public class Location implements Serializable
+public abstract class AbstractLocation<T> implements Serializable, Location<T>
 {
-	/**
-	 * This type of location indicates that the path is a file path.
-	 */
-	public static final int FILE = 0;
-	/**
-	 * This type of location indicates that the path is a url path.
-	 */
-	public static final int URL = 1;
-	/**
-	 * The type of this location.
-	 */
-	private int type = 0;
 	/**
 	 * The path for this location.
 	 */
-	private String path = null;
+	protected T path = null;
 
 	/**
 	 * Initialize this location with the specified type and path.
-	 * @param type the type of this location.
 	 * @param path the path for this location.
 	 */
-	public Location(int type, String path)
+	public AbstractLocation(T path)
 	{
-		this.type = type;
 		this.path = path;
 	}
 
 	/**
-	 * Get the type of this location.
-	 * @return  the type as an int value, either FILE or URL.
+	 * Return the path to this location.
+	 * @return the path.
+	 * @see org.jppf.server.protocol.Location#getPath()
 	 */
-	public int getType()
+	public T getPath()
 	{
-		return type;
+		return path;
 	}
 
 	/**
-	 * Get the path for this location.
-	 * @return the path as a string.
+	 * Copy the content at this location to another location.
+	 * @param location the location to copy to.
+	 * @throws Exception if an I/O error occurs.
 	 */
-	public String getPath()
+	public void copyTo(Location location) throws Exception
 	{
-		return path;
+		InputStream is = getInputStream();
+		OutputStream os = location.getOutputStream();
+		ByteBuffer tmp = BufferPool.pickBuffer();
+		byte[] bytes = tmp.array();
+		while(true)
+		{
+			int n = is.read(bytes);
+			if (n <= 0) break;
+			os.write(bytes, 0, n);
+		}
+		BufferPool.releaseBuffer(tmp);
+		is.close();
+		os.flush();
+		os.close();
 	}
 }
