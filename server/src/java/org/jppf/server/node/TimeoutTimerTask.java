@@ -67,9 +67,15 @@ public class TimeoutTimerTask extends TimerTask
 	{
 		if (!future.isDone())
 		{
-			future.cancel(true);
-			task.onTimeout();
-			executionManager.removeFuture(number);
+			try
+			{
+				future.cancel(true);
+				task.onTimeout();
+				executionManager.removeFuture(number);
+			}
+			catch(Exception ignore)
+			{
+			}
 		}
 	}
 }
