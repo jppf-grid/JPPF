@@ -231,8 +231,7 @@
 			<zipfileset dir="${meta.inf.dir}/common/docroot" includes="**/*.*"/>
     </war>
 
-		<ear destfile="${build.dir}/${ear.prefix}_${appserver}.ear"
-			appxml="${build.dir}/${appserver}/application.xml">
+		<ear destfile="${build.dir}/${ear.prefix}_${appserver}.ear" appxml="${meta.inf.dir}/application.xml">
 			<zipfileset dir="${meta.inf.dir}/${appserver}/application" prefix="META-INF"/>
 			<fileset dir="${build.dir}/${appserver}" includes="jppftest.war"/>
 			<zipfileset dir="${build.dir}/lib" prefix="lib" includes="jppf-j2ee-client.jar"/>
@@ -345,6 +344,14 @@
 
 	<target name="deploy.ear.weblogic">
 		<copy todir="C:/bea/user_projects/domains/jppf_domain/autodeploy" file="${build.dir}/${ear.prefix}_${weblogic92}.ear"/>
+	</target>
+
+	<target name="deploy.rar.sunas">
+		<copy todir="C:/Tools/Sun/AppServer/domains/domain1/autodeploy" file="${build.dir}/jppf_ra_${sunas90}.rar"/>
+	</target>
+
+	<target name="deploy.ear.sunsas">
+		<copy todir="C:/Tools/Sun/AppServer/domains/domain1/autodeploy" file="${build.dir}/${ear.prefix}_${sunas90}.ear"/>
 	</target>
 
 </project> 
