@@ -140,8 +140,14 @@ public class JPPFClient extends AbstractJPPFClient
 			for (String s: names)
 			{
 				String name = "".equals(s) ? "default" : s;
-				JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, name, config);
-				newConnection(c);
+				int n = config.getInt(name + ".jppf.pool.size", 1);
+				if (n <= 0) n = 1;
+				for (int i=1; i<=n; i++)
+				{
+					JPPFClientConnection c =
+						new JPPFClientConnectionImpl(uuid, (n > 1) ? name + "-" + i : name, config);
+					newConnection(c);
+				}
 			}
 			waitForPools(true);
 		}
