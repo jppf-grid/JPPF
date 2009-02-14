@@ -143,5 +143,9 @@ public enum  BundleParameter
 	/**
 	 * Parameter for the node's available system information.
 	 */
-	NODE_SYSTEM_INFO_PARAM
+	NODE_SYSTEM_INFO_PARAM,
+	/**
+	 * Parameter for the node's uuid.
+	 */
+	NODE_UUID_PARAM
 }
