@@ -18,10 +18,9 @@
 
 package sample.xstream;
 
-import org.jppf.server.protocol.JPPFTask;
+import java.lang.reflect.*;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.jppf.server.protocol.JPPFTask;
 
 /**
  * Sample task using XStream to serialize/deserialize objects.
@@ -44,9 +43,17 @@ public class XstreamTask extends JPPFTask
 	 */
 	public XstreamTask(Person person)
 	{
-		this.person = person;
-		XStream xstream = new XStream(new DomDriver());
-		personXml = xstream.toXML(person);
+		try
+		{
+			this.person = person;
+			Object xstream = instantiateXStream();
+			Method m = xstream.getClass().getDeclaredMethod("toXML", Object.class);
+			this.personXml = (String) m.invoke(xstream, person);
+		}
+		catch(Exception e)
+		{
+			setException(e);
+		}
 	}
 
 	/**
@@ -55,10 +62,34 @@ public class XstreamTask extends JPPFTask
 	 */
 	public void run()
 	{
-		XStream xstream = new XStream(new DomDriver());
-		person = (Person) xstream.fromXML(personXml);
-		String s = person.toString();
-		System.out.println("deserialized this person: " + s);
-		setResult(s);
+		try
+		{
+			Object xstream = instantiateXStream();
+			Method m = xstream.getClass().getDeclaredMethod("fromXML", String.class);
+			this.person = (Person) m.invoke(xstream, personXml);
+			String s = this.person.toString();
+			System.out.println("deserialized this person: " + s);
+			setResult(s);
+		}
+		catch(Exception e)
+		{
+			setException(e);
+		}
+	}
+
+	/**
+	 * Instantiates an <code>XStream</code> instance through reflection.
+	 * This avoids compile errors if the XStream jars are not in the classpath.
+	 * @return an XStream object.
+	 * @throws Exception if an insantiation error occurs or the required classes are not in the classpath.
+	 */
+	private Object instantiateXStream() throws Exception
+	{
+		Class xstreamClass = Class.forName("com.thoughtworks.xstream.XStream");
+		Class hierarchicalStreamDriverClass = Class.forName("com.thoughtworks.xstream.io.HierarchicalStreamDriver");
+		Constructor c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
+		Class domDriverClass = Class.forName("com.thoughtworks.xstream.io.xml.DomDriver");
+		Object driver = domDriverClass.newInstance();
+		return c.newInstance(driver);
 	}
 }
