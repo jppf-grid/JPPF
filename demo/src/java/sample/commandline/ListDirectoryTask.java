@@ -54,7 +54,6 @@ public class ListDirectoryTask extends CommandLineTask
 		{
 			// get the name of the node's operating system
 			String os = System.getProperty("os.name").toLowerCase();
-			System.out.println("os: " + os);
 			// the type of OS determines which command to execute
 			if (os.indexOf("linux") >= 0) setCommandList("ls", "-a", dir, ">", "dirlist.txt");
 			else setCommandList("cmd", "/C", "dir", dir, ">", "dirlist.txt");
@@ -64,10 +63,9 @@ public class ListDirectoryTask extends CommandLineTask
 			launchProcess();
 			// copy the resulting file in memory and set it as a result
 			FileLocation fl = new FileLocation("dirlist.txt");
-			byte[] buffer = new byte[(int) fl.size()];
-			MemoryLocation ml = new MemoryLocation(buffer);
+			MemoryLocation ml = new MemoryLocation((int) fl.size());
 			fl.copyTo(ml);
-			setResult(new String(buffer));
+			setResult(new String(ml.toByteArray()));
 		}
 		catch(Exception e)
 		{
