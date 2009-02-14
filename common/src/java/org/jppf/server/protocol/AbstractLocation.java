@@ -21,7 +21,7 @@ package org.jppf.server.protocol;
 import java.io.*;
 import java.nio.ByteBuffer;
 
-import org.jppf.utils.BufferPool;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class represent the location of an artifact, generally a file or the data found at a url.
@@ -63,6 +63,37 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	{
 		InputStream is = getInputStream();
 		OutputStream os = location.getOutputStream();
+		copy(is, os);
+		is.close();
+		os.flush();
+		os.close();
+	}
+
+	/**
+	 * Get the content at this location as an array of bytes.
+	 * @return a byte array.
+	 * @throws Exception if an I/O error occurs.
+	 * @see org.jppf.server.protocol.Location#toByteArray()
+	 */
+	public byte[] toByteArray() throws Exception
+	{
+		InputStream is = getInputStream();
+		JPPFByteArrayOutputStream os = new JPPFByteArrayOutputStream();
+		copy(is, os);
+		is.close();
+		os.flush();
+		os.close();
+		return os.toByteArray();
+	}
+
+	/**
+	 * Copy the data read from the specified input stream to the specified output stream. 
+	 * @param is the input stream to read from.
+	 * @param os the output stream to write to.
+	 * @throws Exception if an I/O error occurs.
+	 */
+	private void copy(InputStream is, OutputStream os) throws Exception
+	{
 		ByteBuffer tmp = BufferPool.pickBuffer();
 		byte[] bytes = tmp.array();
 		while(true)
@@ -72,8 +103,5 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 			os.write(bytes, 0, n);
 		}
 		BufferPool.releaseBuffer(tmp);
-		is.close();
-		os.flush();
-		os.close();
 	}
 }

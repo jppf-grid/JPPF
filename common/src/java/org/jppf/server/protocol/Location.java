@@ -55,4 +55,10 @@ public interface Location<T>
 	 * @return the size as a long value, or -1 if the size is not available.
 	 */
 	long size();
+	/**
+	 * Get the content at this location as an array of bytes.
+	 * @return a byte array.
+	 * @throws Exception if an I/O error occurs.
+	 */
+	byte[] toByteArray() throws Exception;
 }

@@ -39,7 +39,17 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	private int len = -1;
 
 	/**
-	 * Initialize this location with the specified file path.
+	 * Initialize this location and create a buffer of the specified size.
+	 * @param size the size of the buffer handled by this memory location.
+	 */
+	public MemoryLocation(int size)
+	{
+		super(new byte[size]);
+		len = size;
+	}
+
+	/**
+	 * Initialize this location with the specified buffer.
 	 * @param buffer an array of bytes.
 	 */
 	public MemoryLocation(byte[] buffer)
@@ -91,5 +101,17 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	public long size()
 	{
 		return len;
+	}
+
+	/**
+	 * Get the content at this location as an array of bytes. This method is
+	 * overriden from {@link org.jppf.server.protocol.AbstractLocation#toByteArray() AbstractLocation.toByteArray()} for improved performance.
+	 * @return a byte array.
+	 * @throws Exception if an I/O error occurs.
+	 * @see org.jppf.server.protocol.AbstractLocation#toByteArray()
+	 */
+	public byte[] toByteArray() throws Exception
+	{
+		return path;
 	}
 }
