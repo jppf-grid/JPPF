@@ -167,6 +167,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 			{
 				if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
 				if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
+				List<SelectableChannel> channelList = new ArrayList<SelectableChannel>();
+				channelList.addAll(idleChannels);
 				boolean found = false;
 				SelectableChannel channel = null;
 				BundleWrapper selectedBundle = null;
@@ -202,34 +204,37 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 		 */
 		private int findIdleChannelIndex(JPPFTaskBundle bundle)
 		{
-			ExecutionPolicy rule = bundle.getExecutionPolicy();
 			int n = -1;
-			if (rule != null)
+			ExecutionPolicy rule = bundle.getExecutionPolicy();
+			if (debugEnabled && (rule != null)) log.debug("Bundle has an execution policy:\n" + rule);
+			List<Integer> acceptableChannels = new ArrayList<Integer>();
+			List<Integer> channelsToRemove =  new ArrayList<Integer>();
+			List<String> uuidPath = bundle.getUuidPath().getList();
+			for (int i=0; i<idleChannels.size(); i++)
 			{
-				if (debugEnabled) log.debug("Bundle has an execution policy:\n" + rule);
-				List<Integer> acceptableChannels = new ArrayList<Integer>();
-				List<Integer> channelsToRemove =  new ArrayList<Integer>();
-				for (int i=0; i<idleChannels.size(); i++)
+				SelectableChannel ch = idleChannels.get(i);
+				if (!ch.isOpen())
 				{
-					SelectableChannel ch = idleChannels.get(i);
-					if (!ch.isOpen())
-					{
-						channelsToRemove.add(i);
-						continue;
-					}
+					channelsToRemove.add(i);
+					continue;
+				}
+				NodeContext context = (NodeContext) ch.keyFor(selector).attachment();
+				if (uuidPath.contains(context.getNodeUuid())) continue;
+				if (rule != null)
+				{
 					NodeManagementInfo mgtInfo = JPPFDriver.getInstance().getNodeInformation(ch);
 					JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
-					if (rule.accepts(info)) acceptableChannels.add(i);
+					if (!rule.accepts(info)) continue;
 				}
-				for (Integer i: channelsToRemove) idleChannels.remove(i);
-				if (debugEnabled) log.debug("found " + acceptableChannels.size() + " acceptable channels");
-				if (!acceptableChannels.isEmpty())
-				{
-					int rnd = random.nextInt(acceptableChannels.size());
-					n = acceptableChannels.get(rnd);
-				}
+				acceptableChannels.add(i);
 			}
-			else n = random.nextInt(idleChannels.size());
+			for (Integer i: channelsToRemove) idleChannels.remove(i);
+			if (debugEnabled) log.debug("found " + acceptableChannels.size() + " acceptable channels");
+			if (!acceptableChannels.isEmpty())
+			{
+				int rnd = random.nextInt(acceptableChannels.size());
+				n = acceptableChannels.remove(rnd);
+			}
 			return n;
 		}
 	}

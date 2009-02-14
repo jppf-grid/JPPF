@@ -54,6 +54,10 @@ public class NodeContext extends NioContext<NodeState>
 	 * Determines whether this context is attached to a peer node.
 	 */
 	private boolean peer = false;
+	/**
+	 * The uuid of the corresponding node.
+	 */
+	private String nodeUuid = null;
 
 	/**
 	 * Get the task bundle to send or receive.
@@ -186,5 +190,23 @@ public class NodeContext extends NioContext<NodeState>
 	public void setPeer(boolean peer)
 	{
 		this.peer = peer;
+	}
+
+	/**
+	 * Get the uuid of the corresponding node.
+	 * @return the uuid as a string.
+	 */
+	public String getNodeUuid()
+	{
+		return nodeUuid;
+	}
+
+	/**
+	 * Set the uuid of the corresponding node.
+	 * @param nodeUuid the uuid as a string.
+	 */
+	public void setNodeUuid(String nodeUuid)
+	{
+		this.nodeUuid = nodeUuid;
 	}
 }

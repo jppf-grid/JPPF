@@ -77,6 +77,7 @@ public class WaitInitialBundleState extends NodeServerState
 			BundleWrapper bundleWrapper = context.deserializeBundle();
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			context.setUuid(bundle.getBundleUuid());
+			context.setNodeUuid((String) bundle.getParameter(NODE_UUID_PARAM));
 			boolean override = bundle.getParameter(BUNDLE_TUNING_TYPE_PARAM) != null;
 			Bundler bundler = override ? BundlerFactory.createBundler(bundle.getParametersMap(), true) : server.getBundler().copy();
 			bundler.setup();

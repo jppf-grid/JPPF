@@ -163,6 +163,7 @@ public class JPPFNode extends AbstractMonitoredNode
 				bundle.setBundleUuid(uuid);
 				Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
 				if (params != null) bundle.getParametersMap().putAll(params);
+				bundle.setParameter(NODE_UUID_PARAM, uuid);
 				if (isJmxEnabled())
 				{
 					TypedProperties props = JPPFConfiguration.getProperties();
