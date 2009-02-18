@@ -239,23 +239,25 @@ public class JPPFClient extends AbstractJPPFClient
 	 * @param taskList the list of tasks to execute remotely.
 	 * @param dataProvider the provider of the data shared among tasks, may be null.
 	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
+	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
 	 * @return the list of executed tasks with their results.
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.AbstractJPPFClient#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.node.policy.ExecutionPolicy)
 	 */
-	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy) throws Exception
+	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy, int priority) throws Exception
 	{
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getClientConnection(true);
 		if (c != null)
 		{
 			JPPFResultCollector collector = new JPPFResultCollector(taskList.size());
-			c.submit(taskList, dataProvider, collector, policy);
+			c.submit(taskList, dataProvider, collector, policy, priority);
 			return collector.waitForResults();
 		}
 		if (LOCAL_EXEC_ENABLED)
 		{
 			JPPFResultCollector collector = new JPPFResultCollector(taskList.size());
 			ClientExecution exec = new ClientExecution(taskList, dataProvider, true, collector, policy);
+			exec.priority = priority;
 			JPPFClient.getLoadBalancer().execute(exec, c);
 			return collector.waitForResults();
 		}
@@ -268,21 +270,23 @@ public class JPPFClient extends AbstractJPPFClient
 	 * @param dataProvider the provider of the data shared among tasks, may be null.
 	 * @param listener listener to notify whenever a set of results have been received.
 	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
+	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.AbstractJPPFClient#submitNonBlocking(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener, org.jppf.node.policy.ExecutionPolicy)
 	 */
-	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
+	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
 		throws Exception
 	{
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getClientConnection(true);
 		if (c != null)
 		{
-			c.submit(taskList, dataProvider, listener, policy);
+			c.submit(taskList, dataProvider, listener, policy, priority);
 			return;
 		}
 		if (LOCAL_EXEC_ENABLED)
 		{
 			ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener, policy);
+			exec.priority = priority;
 			JPPFClient.getLoadBalancer().execute(exec, c);
 			return;
 		}

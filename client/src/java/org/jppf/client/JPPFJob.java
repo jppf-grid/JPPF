@@ -64,6 +64,10 @@ public class JPPFJob implements Serializable
 	 * The list of tasks to execute.
 	 */
 	private List<JPPFTask> results = null;
+	/**
+	 * The priority of this job, used by the server to prioritize queued jobs.
+	 */
+	private int priority = 0;
 
 	/**
 	 * Default constructor.
@@ -255,5 +259,23 @@ public class JPPFJob implements Serializable
 	public void setBlocking(boolean blocking)
 	{
 		this.blocking = blocking;
+	}
+
+	/**
+	 * Get the priority of this job.
+	 * @return the priority as an int.
+	 */
+	public int getPriority()
+	{
+		return priority;
+	}
+
+	/**
+	 * Set the priority of this job.
+	 * @param priority the priority as an int.
+	 */
+	public void setPriority(int priority)
+	{
+		this.priority = priority;
 	}
 }

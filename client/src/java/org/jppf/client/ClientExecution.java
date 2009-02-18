@@ -51,6 +51,10 @@ public class ClientExecution
 	 * An execution policy that deternmines on which node(s) the tasks will be permitted to run.
 	 */
 	public ExecutionPolicy policy = null;
+	/**
+	 * The priority of the job, used by the server to prioritize queued jobs.
+	 */
+	public int priority = 0;
 
 	/**
 	 * Initialize this execution with the specified parameters.

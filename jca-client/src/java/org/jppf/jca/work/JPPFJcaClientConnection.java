@@ -103,29 +103,17 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @param taskList the list of tasks to execute remotely.
 	 * @param dataProvider the provider of the data shared among tasks, may be null.
 	 * @param listener listener to notify whenever a set of results have been received.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener)
-	 */
-	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
-			throws Exception
-	{
-		submit(taskList, dataProvider, listener, null);
-	}
-
-	/**
-	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param listener listener to notify whenever a set of results have been received.
 	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
+	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener)
 	 */
-	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
+	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
 			throws Exception
 	{
 		setStatus(EXECUTING);
 		ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener, policy);
+		exec.priority = priority;
 		JcaResultProcessor proc = new JcaResultProcessor(this, exec);
 		proc.run();
 		if (debugEnabled) log.debug("["+name+"] submitted " + taskList.size() + " tasks");

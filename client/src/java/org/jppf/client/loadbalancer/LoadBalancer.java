@@ -309,7 +309,7 @@ public class LoadBalancer
 				boolean completed = false;
 				while (!completed)
 				{
-					connection.sendTasks(tasks, execution.dataProvider, execution.policy);
+					connection.sendTasks(tasks, execution.dataProvider, execution.policy, execution.priority);
 					while (count < tasks.size())
 					{
 						Pair<List<JPPFTask>, Integer> p = connection.receiveResults();

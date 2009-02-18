@@ -196,7 +196,22 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
 			throws Exception
 	{
-		submit(taskList, dataProvider, listener, null);
+		submit(taskList, dataProvider, listener, null, 0);
+	}
+
+	/**
+	 * Submit the request to the server.
+	 * @param taskList the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param listener listener to notify whenever a set of results have been received.
+	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
+	 * @throws Exception if an error occurs while sending the request.
+	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener, org.jppf.node.policy.ExecutionPolicy)
+	 */
+	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
+			throws Exception
+	{
+		submit(taskList, dataProvider, listener, policy, 0);
 	}
 
 	/**
@@ -204,12 +219,14 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @param taskList the list of tasks to execute remotely.
 	 * @param dataProvider the provider of the data shared among tasks, may be null.
 	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
+	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
-	public void sendTasks(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy) throws Exception
+	public void sendTasks(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy, int priority) throws Exception
 	{
 		JPPFTaskBundle bundle = new JPPFTaskBundle();
 		bundle.setExecutionPolicy(policy);
+		bundle.setPriority(priority);
 		sendTasks(bundle, taskList, dataProvider);
 	}
 

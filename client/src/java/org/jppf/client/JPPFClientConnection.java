@@ -58,6 +58,18 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
 			throws Exception;
 
 	/**
+	 * Submit the request to the server with the specified priority.
+	 * @param taskList the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param listener listener to notify whenever a set of results have been received.
+	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
+	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
+	 * @throws Exception if an error occurs while sending the request.
+	 */
+	void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
+			throws Exception;
+
+	/**
 	 * Get the priority assigned to this connection.
 	 * @return a priority as an int value.
 	 */

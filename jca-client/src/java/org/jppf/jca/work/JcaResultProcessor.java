@@ -130,6 +130,7 @@ public class JcaResultProcessor implements Work
 		JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
 		String requestUuid = bundle.getRequestUuid();
 		bundle.setExecutionPolicy(execution.policy);
+		bundle.setPriority(execution.priority);
 		ClassLoader cl = null;
 		ClassLoader oldCl = null;
 		if (!execution.tasks.isEmpty())

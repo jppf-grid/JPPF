@@ -189,13 +189,15 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * @param dataProvider the provider of the data shared among tasks, may be null.
 	 * @param listener listener to notify whenever a set of results have been received.
 	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
+	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
 	 * @throws Exception if an error occurs while sending the request.
-	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener, org.jppf.node.policy.ExecutionPolicy)
+	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener, org.jppf.node.policy.ExecutionPolicy, int)
 	 */
-	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
+	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
 			throws Exception
 	{
 		ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener, policy);
+		exec.priority = priority;
 		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(this, exec);
 		executor.submit(proc);
 		if (debugEnabled) log.debug("["+name+"] submitted " + taskList.size() + " tasks");

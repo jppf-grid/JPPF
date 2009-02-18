@@ -209,7 +209,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
 	{
-		return submit(taskList, dataProvider, null);
+		return submit(taskList, dataProvider, null, 0);
 	}
 
 	/**
@@ -222,6 +222,20 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy) throws Exception
 	{
+		return submit(taskList, dataProvider, policy, 0);
+	}
+
+	/**
+	 * Submit the request to the server.
+	 * @param taskList the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
+	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
+	 * @return the list of executed tasks with their results.
+	 * @throws Exception if an error occurs while sending the request.
+	 */
+	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy, int priority) throws Exception
+	{
 		JPPFResultCollector collector = new JPPFResultCollector(taskList.size());
 		List<JPPFTask> result = null;
 		while ((result == null) && !pools.isEmpty())
@@ -229,7 +243,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 			try
 			{
 				JPPFClientConnection c = getClientConnection();
-				c.submit(taskList, dataProvider, collector, policy);
+				c.submit(taskList, dataProvider, collector, policy, priority);
 				result = collector.waitForResults();
 			}
 			catch(Exception e)
@@ -250,7 +264,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
 		throws Exception
 	{
-		submitNonBlocking(taskList, dataProvider, listener, null);
+		getClientConnection().submit(taskList, dataProvider, listener, null, 0);
 	}
 
 	/**
@@ -264,23 +278,38 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
 		throws Exception
 	{
-		getClientConnection().submit(taskList, dataProvider, listener, policy);
+		getClientConnection().submit(taskList, dataProvider, listener, policy, 0);
+	}
+
+	/**
+	 * Submit a non-blocking request to the server.
+	 * @param taskList the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param listener listener to notify whenever a set of results have been received.
+	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
+	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
+	 * @throws Exception if an error occurs while sending the request.
+	 */
+	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
+		throws Exception
+	{
+		getClientConnection().submit(taskList, dataProvider, listener, policy, priority);
 	}
 
 	/**
 	 * Submit a JPPFJob for execution.
 	 * @param job the job to execute.
-	 * @return the results of the tasks' execution, as a list of <code>JPPFTask</code> instances.
+	 * @return the results of the tasks' execution, as a list of <code>JPPFTask</code> instances for a blocking job, or null if the job is non-blocking.
 	 * @throws Exception if an error occurs while sending the job for execution.
 	 */
 	public List<JPPFTask> submit(JPPFJob job) throws Exception
 	{
 		if (job.isBlocking())
 		{
-			List<JPPFTask> results = submit(job.getTasks(), job.getDataProvider(), job.getExecutionPolicy());
+			List<JPPFTask> results = submit(job.getTasks(), job.getDataProvider(), job.getExecutionPolicy(), job.getPriority());
 			return results;
 		}
-		submitNonBlocking(job.getTasks(), job.getDataProvider(), job.getResultListener(), job.getExecutionPolicy());
+		submitNonBlocking(job.getTasks(), job.getDataProvider(), job.getResultListener(), job.getExecutionPolicy(), job.getPriority());
 		return null;
 	}
 
