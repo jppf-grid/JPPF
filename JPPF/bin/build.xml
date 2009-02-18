@@ -30,6 +30,7 @@
 	<property name="demo" value="${basedir}/../demo"/>
 	<property name="jca-client" value="${basedir}/../jca-client"/>
 	<property name="jppfQuickStart" value="${basedir}/../JPPFQuickStart"/>
+	<property name="gigaspaces" value="${basedir}/../JPPF-GigaSpaces"/>
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${build.properties.file}"/>
@@ -131,7 +132,7 @@
 	<target name="rebuild" depends="clean, init, compile, jar"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
-		depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start"/>
+		depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces"/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
@@ -247,6 +248,30 @@
 				<exclude name="**/templates/**/*.*"/>
 			</fileset>
 		</copy>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--                 Generate the JPPF-GigaSpaces integration                  -->
+	<!-- ========================================================================= -->
+
+	<target name="jppf.gigaspaces" description="Generate the JPPF-GigaSpaces integration package" depends="init, build">
+		<copy todir="${gigaspaces}/JPPF-GigaSpaces-Common/lib">
+			<fileset dir="${build}">
+				<include name="jppf-client.jar"/>
+				<include name="jppf-common*.jar"/>
+			</fileset>
+		</copy>
+		<ant antfile="${gigaspaces}/build.xml" target="build" inheritall="false"/>
+		<property name="gigaspaces.file"
+			value="${build}/JPPF-GigaSpaces-${version.number}.${build.number}-${now}.zip"/>
+		<delete file="gigaspaces.file" quiet="true"/>
+		<zip destfile="${gigaspaces.file}">
+			<zipfileset dir="${gigaspaces}" prefix="JPPF-GigaSpaces">
+				<exclude name="**/*.log"/>
+				<exclude name="**/*.classpath"/>
+				<exclude name="**/*.project"/>
+		</zipfileset>
+		</zip>
   </target>
 
 	<!-- ========================================================================= -->
@@ -605,7 +630,7 @@
 	<!--                     Build the web site content                            -->
 	<!-- ========================================================================= -->
 
-  <target name="doc" depends="doc.screenshots, doc.home, doc.overview">
+  <target name="doc" depends="doc.screenshots, doc.home">
 	</target>
 
   <target name="doc.home" description="generates the project web site pages">
