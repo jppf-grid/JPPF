@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="JPPF-GigaSpaces-Client/classes" path="JPPF-GigaSpaces-Client/src"/>
+	<classpathentry kind="src" output="JPPF-GigaSpaces-Common/classes" path="JPPF-GigaSpaces-Common/src"/>
+	<classpathentry kind="src" output="JPPF-GigaSpaces-ProcessingUnit/classes" path="JPPF-GigaSpaces-ProcessingUnit/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/client"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JPPF"/>
+	<classpathentry exported="true" kind="var" path="GS_HOME/lib/common/commons-logging.jar"/>
+	<classpathentry exported="true" kind="var" path="GS_HOME/lib/jini/jsk-lib.jar"/>
+	<classpathentry exported="true" kind="var" path="GS_HOME/lib/jini/jsk-platform.jar"/>
+	<classpathentry exported="true" kind="var" path="GS_HOME/lib/openspaces/openspaces.jar" sourcepath="/GS_HOME/lib/openspaces/openspaces-src.zip"/>
+	<classpathentry exported="true" kind="var" path="GS_HOME/lib/spring/spring.jar"/>
+	<classpathentry exported="true" kind="var" path="GS_HOME/lib/JSpaces.jar"/>
+	<classpathentry kind="output" path="JPPF-GigaSpaces-ProcessingUnit/classes"/>
+</classpath>
