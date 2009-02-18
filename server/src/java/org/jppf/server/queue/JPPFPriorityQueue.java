@@ -58,8 +58,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		try
 		{
 			lock.lock();
-			if (debugEnabled) log.debug("adding bundle with [initialTasksCount=" + bundle.getInitialTaskCount() +
-				", taskCount=" + bundle.getTaskCount() + "]");
+			if (debugEnabled) log.debug("adding bundle with [priority=" + bundle.getPriority()+", initialTasksCount=" +
+				bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + "]");
 			putInListMap(new JPPFPriority(bundle.getPriority()), bundleWrapper, priorityMap);
 			putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
 		}
