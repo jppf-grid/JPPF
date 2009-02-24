@@ -128,7 +128,7 @@ public class NodeRunner
 				catch(JPPFNodeReconnectionNotification e)
 				{
 					if (debugEnabled) log.debug("received reconnection notfication");
-					classLoader.close();
+					if (classLoader != null) classLoader.close();
 					classLoader = null;
 					node.stopNode(true);
 					unsetSecurity();
