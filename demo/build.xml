@@ -196,6 +196,25 @@
 		</parallel>
 	</target>
 
+	<target name="run.demo6">
+		<parallel>
+			<antcall target="run.driver"/>
+			<sequential>
+				<sleep milliseconds="1000"/>
+				<antcall target="run.node1"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="2000"/>
+				<antcall target="run.ui"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="3000"/>
+				<antcall target="run.commandline"/>
+				<fail status="1" message="Demo has ended normally."/>
+			</sequential>
+		</parallel>
+	</target>
+
 	<target name="run.long.task">
 		<echo message="starting the 'Long task' demo application"/>
 		<java fork="yes" classname="sample.tasklength.LongTaskRunner" classpathref="client.classpath">
@@ -253,6 +272,16 @@
 			<jvmarg value="-Xmx64m"/>
 			<jvmarg value="-Djppf.config=jppf-client-pool.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-client-pool.properties"/>
+		</java>       
+	</target>
+
+	<target name="run.commandline">
+		<echo message="starting the 'Command Line' demo application"/>
+		<java fork="yes" classname="sample.commandline.CommandLineTaskRunner" classpathref="client.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-client.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
 		</java>       
 	</target>
 

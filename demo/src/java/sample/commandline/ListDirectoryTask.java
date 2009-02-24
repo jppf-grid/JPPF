@@ -52,11 +52,26 @@ public class ListDirectoryTask extends CommandLineTask
 	{
 		try
 		{
+			String[] nix_oses = { "linux", "unix", "aix", "solaris" };
 			// get the name of the node's operating system
 			String os = System.getProperty("os.name").toLowerCase();
 			// the type of OS determines which command to execute
-			if (os.indexOf("linux") >= 0) setCommandList("ls", "-a", dir, ">", "dirlist.txt");
-			else setCommandList("cmd", "/C", "dir", dir, ">", "dirlist.txt");
+			boolean found = false;
+			for (String s: nix_oses)
+			{
+				if (os.indexOf(s) >= 0)
+				{
+					found = true;
+					break;
+				}
+			}
+			if (found) setCommandList("ls", "-a", dir, ">", "dirlist.txt");
+			else if (os.indexOf("windows") >= 0) setCommandList("cmd", "/C", "dir", dir, ">", "dirlist.txt");
+			else
+			{
+				setResult("OS '" + os + "' not recognized");
+				return;
+			}
 			// set wehether the script output is captured
 			setCaptureOutput(false);
 			// execute the script/command
