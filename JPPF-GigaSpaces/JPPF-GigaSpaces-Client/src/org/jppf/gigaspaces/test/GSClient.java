@@ -43,7 +43,7 @@ public class GSClient implements InitializingBean
 
 	/**
 	 * Initialize the Spring context, invoke the appropriate bean method,
-	 * and srtore the results of the JPPF execution.
+	 * and store the results of the JPPF execution.
 	 * @return the results as a <code>JPPFJob</code> instance.
 	 */
 	public static JPPFJob execute()
@@ -62,23 +62,15 @@ public class GSClient implements InitializingBean
 	}
 
 	/**
-	 * Called after the Spring bean initialization and submits a JPPF job to the JPPF spase.
+	 * Called after the Spring bean initialization and submits a JPPF job to the JPPF space.
 	 * @throws Exception if any error occurs.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception
 	{
-		try
-		{
-			JPPFJob newJob = new JPPFJob();
-			newJob.setUuid("1");
-			newJob.addTask(new HelloTask());
-			this.job = jppfService.submitJob(newJob);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+		JPPFJob newJob = new JPPFJob();
+		newJob.addTask(new HelloTask());
+		this.job = jppfService.submitJob(newJob);
 	}
 
 	/**
