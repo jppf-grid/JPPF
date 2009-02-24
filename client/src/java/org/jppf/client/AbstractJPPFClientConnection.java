@@ -224,42 +224,12 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	public void sendTasks(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy, int priority) throws Exception
 	{
-		JPPFTaskBundle bundle = new JPPFTaskBundle();
-		bundle.setExecutionPolicy(policy);
-		bundle.setPriority(priority);
-		sendTasks(bundle, taskList, dataProvider);
-	}
-
-	/**
-	 * Send tasks to the server for execution.
-	 * @param header the task bundle to send to the driver.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @throws Exception if an error occurs while sending the request.
-	 */
-	public void sendTasks(JPPFTaskBundle header, List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
-	{
 		try
 		{
-			SerializationHelper helper = makeHelper();
-			int count = taskList.size();
-			if (debugEnabled) log.debug("[client: "+name+"] sending "+count+" tasks");
-			TraversalList<String> uuidPath = new TraversalList<String>();
-			uuidPath.add(appUuid);
-			header.setUuidPath(uuidPath);
-			header.setCredentials(credentials);
-			header.setTaskCount(count);
-	
-			List<JPPFBuffer> bufList = new ArrayList<JPPFBuffer>();
-			bufList.add(helper.toBytes(header, false));
-			bufList.add(helper.toBytes(dataProvider, false));
-			for (JPPFTask task : taskList) bufList.add(helper.toBytes(task, false));
-	
-			SocketWrapper socketClient = taskServerConnection.getSocketClient();
-			int size = 0;
-			for (JPPFBuffer buf: bufList) size += 4 + buf.getLength();
-			socketClient.writeInt(size);
-			for (JPPFBuffer buf: bufList) socketClient.sendBytes(buf);
+			JPPFTaskBundle bundle = new JPPFTaskBundle();
+			bundle.setExecutionPolicy(policy);
+			bundle.setPriority(priority);
+			sendTasks(bundle, taskList, dataProvider);
 		}
 		catch(Exception e)
 		{
@@ -271,6 +241,36 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			log.error(e.getMessage(), e);
 			throw e;
 		}
+	}
+
+	/**
+	 * Send tasks to the server for execution.
+	 * @param header the task bundle to send to the driver.
+	 * @param taskList the list of tasks to execute remotely.
+	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @throws Exception if an error occurs while sending the request.
+	 */
+	public void sendTasks(JPPFTaskBundle header, List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
+	{
+		SerializationHelper helper = makeHelper();
+		int count = taskList.size();
+		if (debugEnabled) log.debug("[client: "+name+"] sending "+count+" tasks");
+		TraversalList<String> uuidPath = new TraversalList<String>();
+		uuidPath.add(appUuid);
+		header.setUuidPath(uuidPath);
+		header.setCredentials(credentials);
+		header.setTaskCount(count);
+
+		List<JPPFBuffer> bufList = new ArrayList<JPPFBuffer>();
+		bufList.add(helper.toBytes(header, false));
+		bufList.add(helper.toBytes(dataProvider, false));
+		for (JPPFTask task : taskList) bufList.add(helper.toBytes(task, false));
+
+		SocketWrapper socketClient = taskServerConnection.getSocketClient();
+		int size = 0;
+		for (JPPFBuffer buf: bufList) size += 4 + buf.getLength();
+		socketClient.writeInt(size);
+		for (JPPFBuffer buf: bufList) socketClient.sendBytes(buf);
 	}
 
 	/**

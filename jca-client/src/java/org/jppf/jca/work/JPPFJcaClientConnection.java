@@ -135,6 +135,16 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 			if (cl != null) Thread.currentThread().setContextClassLoader(cl);
 			sendTasks(header, taskList, dataProvider);
 		}
+		catch(Exception e)
+		{
+			if (debugEnabled) log.debug(e.getMessage(), e);
+			throw e;
+		}
+		catch(Error e)
+		{
+			if (debugEnabled) log.debug(e.getMessage(), e);
+			throw e;
+		}
 		finally
 		{
 			if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
