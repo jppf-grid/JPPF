@@ -404,7 +404,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 		while (count < n)
 		{
 			long p = dis.skip(n-count);
-			if (p < 0) break;
+			//if (p < 0) break;
+			if (p <= 0) break;
 			else count += p;
 		}
 		return count;

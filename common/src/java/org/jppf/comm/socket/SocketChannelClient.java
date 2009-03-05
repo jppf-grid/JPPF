@@ -421,7 +421,12 @@ public class SocketChannelClient implements SocketWrapper
 		if (n < 0) throw new IllegalArgumentException("number of bytes to skip must be >= 0");
 		else if (n == 0) return 0;
 		ByteBuffer buf = ByteBuffer.allocateDirect(n);
-		while (buf.hasRemaining()) channel.read(buf);
+		while (buf.hasRemaining())
+		{
+			int r = channel.read(buf);
+			if ((r == 0) && blocking) break;
+			else if (r < 0) break;
+		}
 		return buf.position();
 	}
 

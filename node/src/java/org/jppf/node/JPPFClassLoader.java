@@ -132,8 +132,10 @@ public class JPPFClassLoader extends ClassLoader
 			System.out.println("JPPFClassLoader.init(): attempting connection to the class server");
 			if (socketClient == null) initSocketClient();
 			socketInitializer.initializeSocket(socketClient);
+			if (!socketInitializer.isSuccessfull())
+				throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
 
-			// we need to do this in order to dramaticaly simplify the 
+			// we need to do this in order to dramatically simplify the 
 			// state machine of ClassServer
 			try
 			{
@@ -142,12 +144,14 @@ public class JPPFClassLoader extends ClassLoader
 				resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
 				socketClient.send(resource);
 				socketClient.receive();
-				if (debugEnabled) log.debug("received sending node initiation response");
+				if (debugEnabled) log.debug("received node initiation response");
 			}
+			/*
 			catch(ClassNotFoundException e)
 			{
 				throw new RuntimeException(e);
 			}
+			*/
 			catch (IOException e)
 			{
 				throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
@@ -338,6 +342,7 @@ public class JPPFClassLoader extends ClassLoader
 
 	/**
 	 * Finds the resource with the specified name.
+	 * The resource lookup order is the same as the one specified by {@link #getResourceAsStream(String)} 
 	 * @param name the name of the resource to find.
 	 * @return the URL of the resource.
 	 * @see java.lang.ClassLoader#getResource(java.lang.String)
@@ -397,8 +402,20 @@ public class JPPFClassLoader extends ClassLoader
 	}
 
 	/**
-	 * Get a stream from a resource file in the classpath of this class loader.
-	 * @param name name of the resource to obtain a stram from. 
+	 * Get a stream from a resource file accessible form this class loader.
+	 * The lookup order is defined as follows:
+	 * <ul>
+	 * <li>locally, in the classpath for this class loader, such as specified by {@link java.lang.ClassLoader#getResourceAsStream(java.lang.String) ClassLoader.getResourceAsStream(String)}<br>
+	 * <li>if the parent of this class loader is NOT an instance of {@link JPPFClassLoader},
+	 * in the classpath of the <i>JPPF driver</i>, such as specified by
+	 * {@link org.jppf.classloader.ResourceProvider#getResourceAsBytes(java.lang.String, java.lang.ClassLoader) ResourceProvider.getResourceAsBytes(String, ClassLoader)}</li>
+	 * (the search may eventually be sped up by looking up the driver's resource cache first)</li>
+	 * <li>if the parent of this class loader IS an instance of {@link JPPFClassLoader},
+	 * in the <i>classpath of the JPPF client</i>, such as specified by
+	 * {@link org.jppf.classloader.ResourceProvider#getResourceAsBytes(java.lang.String, java.lang.ClassLoader) ResourceProvider.getResourceAsBytes(String, ClassLoader)}
+	 * (the search may eventually be sped up by looking up the driver's resource cache first)</li>
+	 * </ul>
+	 * @param name name of the resource to obtain a stream from. 
 	 * @return an <code>InputStream</code> instance, or null if the resource was not found.
 	 * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
 	 */

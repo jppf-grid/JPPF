@@ -116,7 +116,7 @@ public class NodeRunner
 				}
 				catch(JPPFNodeReloadNotification notif)
 				{
-					if (debugEnabled) log.debug("received reload notfication");
+					if (debugEnabled) log.debug("received reload notification");
 					nodeSocket = node.getSocketWrapper();
 					System.out.println(notif.getMessage());
 					System.out.println("Reloading this node");
@@ -127,10 +127,10 @@ public class NodeRunner
 				}
 				catch(JPPFNodeReconnectionNotification e)
 				{
-					if (debugEnabled) log.debug("received reconnection notfication");
+					if (debugEnabled) log.debug("received reconnection notification");
 					if (classLoader != null) classLoader.close();
 					classLoader = null;
-					node.stopNode(true);
+					if (node != null) node.stopNode(true);
 					unsetSecurity();
 				}
 			}
@@ -148,19 +148,13 @@ public class NodeRunner
 	 */
 	public static MonitoredNode createNode() throws Exception
 	{
-		try
-		{
-			if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true)) discoverDriver();
-			setSecurity();
-			Class clazz = getJPPFClassLoader().loadClass("org.jppf.server.node.JPPFNode");
-			MonitoredNode node = (MonitoredNode) clazz.newInstance();
-			node.setSocketWrapper(nodeSocket);
-			return node;
-		}
-		catch(Exception e)
-		{
-			throw e;
-		}
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true)) discoverDriver();
+		setSecurity();
+		Class clazz = getJPPFClassLoader().loadClass("org.jppf.server.node.JPPFNode");
+		MonitoredNode node = (MonitoredNode) clazz.newInstance();
+		if (debugEnabled) log.debug("Created new node instance: " + node);
+		node.setSocketWrapper(nodeSocket);
+		return node;
 	}
 
 	/**
@@ -179,6 +173,7 @@ public class NodeRunner
 			if (debugEnabled) log.debug("Could not auto-discover the driver connection information");
 			return;
 		}
+		if (debugEnabled) log.debug("Dicovered driver: " + info);
 		TypedProperties props = JPPFConfiguration.getProperties();
 		props.setProperty("jppf.server.host", info.host);
 		props.setProperty("class.server.port", StringUtils.buildString(info.classServerPorts));
@@ -198,6 +193,7 @@ public class NodeRunner
 			String s = props.getString("jppf.policy.file");
 			if (s != null)
 			{
+				if (debugEnabled) log.debug("setting security");
 				//java.rmi.server.hostname
 				String rmiHostName = props.getString("jppf.management.host", "localhost");
 				System.setProperty("java.rmi.server.hostname", rmiHostName);
@@ -215,6 +211,7 @@ public class NodeRunner
 	{
 		if (securityManagerSet)
 		{
+			if (debugEnabled) log.debug("un-setting security");
 			AccessController.doPrivileged(new PrivilegedAction<Object>()
 			{
 				public Object run()
