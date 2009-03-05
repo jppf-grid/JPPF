@@ -267,7 +267,8 @@ public class ReflectionUtils
 	public static boolean isJPPFAnnotated(AnnotatedElement annotatedElement)
 	{
 		if (annotatedElement == null) return false;
-		Annotation[] annotations = annotatedElement.getDeclaredAnnotations();
+		//Annotation[] annotations = annotatedElement.getDeclaredAnnotations();
+		Annotation[] annotations = annotatedElement.getAnnotations();
 		for (Annotation a: annotations)
 		{
 			if (JPPFRunnable.class.equals(a.annotationType())) return true;
