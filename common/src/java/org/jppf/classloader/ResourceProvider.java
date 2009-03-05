@@ -21,7 +21,7 @@ import java.io.*;
 import java.net.URL;
 
 import org.apache.commons.logging.*;
-import org.jppf.utils.*;
+import org.jppf.utils.FileUtils;
 
 /**
  * Instances of this class are dedicated to reading resource files form the JVM's classpath and converting them into
@@ -60,7 +60,10 @@ public class ResourceProvider
 	}
 
 	/**
-	 * Load a resource file (including class files) from the class path into an array of byte.
+	 * Load a resource file (including class files) from the class path or the file system into an array of byte.
+	 * The search order is defined as follows:<br>
+	 * - first the search is performed in the order specified by {@link java.lang.ClassLoader#getResourceAsStream(java.lang.String) ClassLoader.getResourceAsStream(String)}<br>
+	 * - if the resource is not found, it will be looked up in the file system <br>
 	 * @param resName the name of the resource to load.
 	 * @param cl the class loader to use to load the request resource.
 	 * @return an array of bytes, or nll if the resource could not be found.
