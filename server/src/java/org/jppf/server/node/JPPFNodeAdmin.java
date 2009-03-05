@@ -18,15 +18,15 @@
 
 package org.jppf.server.node;
 
-import static org.jppf.management.NodeParameter.COMMAND_PARAM;
-
 import java.io.Serializable;
+import java.util.Map;
 
 import org.apache.commons.logging.*;
+import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.management.*;
 import org.jppf.node.event.*;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.JPPFUuid;
+import org.jppf.utils.*;
 
 /**
  * Management bean for a JPPF node.
@@ -62,33 +62,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	public JPPFNodeAdmin (JPPFNode node)
 	{
 		this.node = node;
-	}
-
-	/**
-	 * Perform a node administration request specified by its parameters.
-	 * @param request an object specifying the request parameters.
-	 * @return a <code>JPPFManagementResponse</code> instance.
-	 * @see org.jppf.management.JPPFAdminMBean#performAdminRequest(org.jppf.management.JPPFManagementRequest)
-	 */
-	public JPPFManagementResponse performAdminRequest(JPPFManagementRequest<NodeParameter, Object> request)
-	{
-		if (debugEnabled) log.debug("received request: " + request);
-		JPPFManagementResponse response = null;
-		try
-		{
-			NodeParameter command = (NodeParameter) request.getParameter(COMMAND_PARAM);
-			switch(command)
-			{
-				case REFRESH_STATE:
-					response = new JPPFManagementResponse(state(), null);
-					break;
-			}
-		}
-		catch(Exception e)
-		{
-			response = new JPPFManagementResponse(e);
-		}
-		return response;
 	}
 
 	/**
@@ -265,5 +238,32 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	public void updateThreadsPriority(Integer newPriority)
 	{
 		node.getExecutionManager().updateThreadsPriority(newPriority);
+	}
+
+	/**
+	 * Update the configuration properties of the node. 
+	 * @param config the set of properties to update.
+	 * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, boolean)
+	 */
+	public void updateConfiguration(Map<String, String> config, Boolean reconnect)
+	{
+		if (config == null) return;
+		TypedProperties props = JPPFConfiguration.getProperties();
+		for (Map.Entry<String, String> entry: config.entrySet())
+		{
+			props.setProperty(entry.getKey(), entry.getValue());
+		}
+		if (reconnect)
+		{
+			node.setExitAction(new Runnable()
+			{
+				public void run()
+				{
+					throw new JPPFNodeReconnectionNotification("Reconnecting this node due to configuration changes");
+				}
+			});
+			node.setStopped(true);
+		}
 	}
 }

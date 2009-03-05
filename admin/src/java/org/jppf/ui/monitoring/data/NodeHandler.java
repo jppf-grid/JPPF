@@ -23,7 +23,7 @@ import java.util.*;
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.management.NodeManagementInfo;
+import org.jppf.management.*;
 import org.jppf.ui.monitoring.event.*;
 
 /**
@@ -133,7 +133,7 @@ public class NodeHandler implements ClientListener
 			try
 			{
 				JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection(name);
-				nodeList = c.getNodeManagementInfo();
+				nodeList = c.getJmxConnection().nodesInformation();
 				if (nodeList == null) continue;
 			}
 			catch(Exception e)

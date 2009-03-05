@@ -301,7 +301,7 @@ public class JPPFClient extends AbstractJPPFClient
 	public JPPFStats requestStatistics() throws Exception
 	{
 		JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) getClientConnection(true);
-		return (conn == null) ? null : conn.requestStatistics();
+		return (conn == null) ? null : conn.getJmxConnection().statistics();
 	}
 
 	/**

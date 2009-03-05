@@ -28,7 +28,6 @@ import javax.swing.*;
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.management.JMXConnectionWrapper;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.BundleParameter;
 import org.jppf.ui.monitoring.event.*;
@@ -151,16 +150,6 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	}
 
 	/**
-	 * Get the connection to the management server.
-	 * @param c the driver connection for which to get aJMX connection.
-	 * @return a <code>MBeanConnectionWrapper</code> instance.
-	 */
-	private JMXConnectionWrapper getMBeanConnection(JPPFClientConnectionImpl c)
-	{
-		return c.getJmxConnection();
-	}
-
-	/**
 	 * Request an update from the current server conenction.
 	 */
 	public void requestUpdate()
@@ -179,7 +168,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 		{
 			if ((c != null) && JPPFClientConnectionStatus.ACTIVE.equals(c.getStatus()))
 			{
-        update(c, c.requestStatistics());
+        update(c, c.getJmxConnection().statistics());
 			}
 		}
 		catch(Exception e)
@@ -203,7 +192,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 			params.put(COMMAND_PARAM, CHANGE_SETTINGS);
 			params.put(PASSWORD_PARAM, password);
 			if (debugEnabled) log.debug("command: CHANGE_SETTINGS, parameters: " + params);
-			msg = (String) ((JPPFClientConnectionImpl) getCurrentConnection()).processManagementRequest(params);
+			msg = (String) ((JPPFClientConnectionImpl) getCurrentConnection()).getJmxConnection().processManagementRequest(params);
 		}
 		catch(Exception e)
 		{
@@ -233,7 +222,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 			params.put(COMMAND_PARAM, command);
 			params.put(PASSWORD_PARAM, password);
 			if (debugEnabled) log.debug("command: " + command + ", parameters: " + params);
-			msg = (String) ((JPPFClientConnectionImpl) getCurrentConnection()).processManagementRequest(params);
+			msg = (String) ((JPPFClientConnectionImpl) getCurrentConnection()).getJmxConnection().processManagementRequest(params);
 		}
 		catch(Exception e)
 		{
@@ -261,7 +250,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 			params.put(PASSWORD_PARAM, password);
 			params.put(NEW_PASSWORD_PARAM, newPassword);
 			if (debugEnabled) log.debug("command: CHANGE_SETTINGS, parameters: " + params);
-			msg = (String) ((JPPFClientConnectionImpl) getCurrentConnection()).processManagementRequest(params);
+			msg = (String) ((JPPFClientConnectionImpl) getCurrentConnection()).getJmxConnection().processManagementRequest(params);
 		}
 		catch(Exception e)
 		{

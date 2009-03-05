@@ -19,13 +19,14 @@
 package org.jppf.management;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Node-specific connection wrapper, implementing a user-friendly interface for the monitoring
  * and management of the node.
  * @author Laurent Cohen
  */
-public class JMXNodeConnectionWrapper extends JMXConnectionWrapper
+public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JPPFNodeAdminMBean
 {
 	/**
 	 * Initialize the connection to the remote MBean server.
@@ -87,7 +88,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper
 	 * @param size the size as an int.
 	 * @throws Exception if an error occurs while invoking the Node MBean.
 	 */
-	public void updateThreadPoolSize(int size) throws Exception
+	public void updateThreadPoolSize(Integer size) throws Exception
 	{
 		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateThreadPoolSize",
 			new Object[] { size }, new String[] { "java.lang.Integer" }); 
@@ -138,9 +139,22 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper
 	 * @param newPriority the new priority to set.
 	 * @throws Exception if an error is raised when invoking the node mbean.
 	 */
-	public void updateThreadsPriority(int newPriority) throws Exception
+	public void updateThreadsPriority(Integer newPriority) throws Exception
 	{
 		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateThreadsPriority",
 			new Object[] { newPriority }, new String[] { "java.lang.Integer" }); 
+	}
+
+	/**
+	 * Update the configuration properties of the node. 
+	 * @param config the set of properties to update.
+	 * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
+	 * @throws Exception if an error is raised when invoking the node mbean.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, boolean)
+	 */
+	public void updateConfiguration(Map<String, String> config, Boolean reconnect) throws Exception
+	{
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateConfiguration",
+			new Object[] { config, reconnect }, new String[] { "java.util.Map", "java.lang.Boolean" }); 
 	}
 }

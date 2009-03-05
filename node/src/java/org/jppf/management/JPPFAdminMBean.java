@@ -44,10 +44,4 @@ public interface JPPFAdminMBean<T, U> extends Serializable
 	 * Name of the node's admin MBean.
 	 */
 	String DRIVER_MBEAN_NAME = "org.jppf:name=admin,type=driver";
-	/**
-	 * Perform an administration request specified by its parameters.
-	 * @param request an object specifying the request parameters.
-	 * @return a <code>JPPFManagementResponse</code> instance.
-	 */
-	JPPFManagementResponse performAdminRequest(JPPFManagementRequest<T, U> request);
 }

@@ -19,7 +19,7 @@
 package org.jppf.management;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
 
 import javax.management.*;
 import javax.management.remote.*;

@@ -32,11 +32,20 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean<BundleParameter, Ob
 	/**
 	 * Get the latest statistics snapshot from the JPPF driver.
 	 * @return a <code>JPPFStats</code> instance.
+	 * @throws Exception if any error occurs.
 	 */
-	JPPFStats statistics();
+	JPPFStats statistics() throws Exception;
 	/**
 	 * Request the JMX connection information for all the nodes attached to the server.
 	 * @return a collection of <code>NodeManagementInfo</code> instances.
+	 * @throws Exception if any error occurs.
 	 */
-	Collection<NodeManagementInfo> nodesInformation();
+	Collection<NodeManagementInfo> nodesInformation() throws Exception;
+	/**
+	 * Process a management or monitoring request.
+	 * @param parameters the parameters of the request to process
+	 * @return the result of the request.
+	 * @throws Exception if an error occurred while performing the request.
+	 */
+	Object processManagementRequest(Map<BundleParameter, Object> parameters) throws Exception;
 }

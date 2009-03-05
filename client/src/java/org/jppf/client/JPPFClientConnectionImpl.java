@@ -25,17 +25,13 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.crypto.SecretKey;
-
 import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
 import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
-import org.jppf.management.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.security.CryptoUtils;
-import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.TypedProperties;
@@ -59,10 +55,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Signature of the method invoked on the MBean.
-	 */
-	private static final String[] MBEAN_SIGNATURE = new String[] {JPPFManagementRequest.class.getName()};
-	/**
 	 * Used to synchronize request submissions performed by mutliple threads.
 	 */
 	private ReentrantLock lock = new ReentrantLock();
@@ -74,7 +66,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	/**
 	 * Provides access to the management functions of the driver.
 	 */
-	private JMXConnectionWrapper jmxConnection = null;
+	private JMXDriverConnectionWrapper jmxConnection = null;
 	/**
 	 * 
 	 */
@@ -179,7 +171,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 			mHost = host;
 			port = jmxPort;
 		}
-		jmxConnection = new JMXConnectionWrapper(mHost, port);
+		jmxConnection = new JMXDriverConnectionWrapper(mHost, port);
 		jmxConnection.connect();
 	}
 
@@ -204,18 +196,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	}
 
 	/**
-	 * Send a request to get the statistics collected by the JPPF server.
-	 * @return a <code>JPPFStats</code> instance.
-	 * @throws Exception if an error occurred while trying to get the server statistics.
-	 */
-	public JPPFStats requestStatistics() throws Exception
-	{
-		Map<BundleParameter, Object> params = new EnumMap<BundleParameter, Object>(BundleParameter.class);
-		params.put(COMMAND_PARAM, READ_STATISTICS);
-    return (JPPFStats) processManagementRequest(params);
-	}
-
-	/**
 	 * Submit an admin request with the specified command name and parameters.
 	 * @param password the current admin password.
 	 * @param newPassword the new password if the password is to be changed, can be null.
@@ -230,7 +210,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 			parameters.put(PASSWORD_PARAM, password);
 			parameters.put(NEW_PASSWORD_PARAM, newPassword);
 			parameters.put(COMMAND_PARAM, command);
-			return (String) processManagementRequest(parameters);
+			return (String) getJmxConnection().processManagementRequest(parameters);
 	}
 
 	/**
@@ -309,57 +289,9 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * Get the object that provides access to the management functions of the driver.
 	 * @return a <code>JMXConnectionWrapper</code> instance.
 	 */
-	public JMXConnectionWrapper getJmxConnection()
+	public JMXDriverConnectionWrapper getJmxConnection()
 	{
 		return jmxConnection;
-	}
-
-	/**
-	 * Process a management or monitoring request.
-	 * @param parameters the parameters of the request to process
-	 * @return the result of the request.
-	 * @throws Exception if an error occurred while performing the request.
-	 */
-	public Object processManagementRequest(Map<BundleParameter, Object> parameters) throws Exception
-	{
-		if (!READ_STATISTICS.equals(parameters.get(COMMAND_PARAM)) &&
-				!REFRESH_NODE_INFO.equals(parameters.get(COMMAND_PARAM)))
-		{
-			String password = (String) parameters.get(PASSWORD_PARAM);
-			SecretKey tmpKey = CryptoUtils.generateSecretKey();
-			parameters.put(KEY_PARAM, CryptoUtils.encrypt(tmpKey.getEncoded()));
-			parameters.put(PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, password.getBytes()));
-			String newPassword = (String) parameters.get(NEW_PASSWORD_PARAM);
-			if (newPassword != null)
-			{
-				parameters.put(NEW_PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, newPassword.getBytes()));
-			}
-		}
-		JPPFManagementRequest<BundleParameter, Object> request =
-			new JPPFManagementRequest<BundleParameter, Object>(parameters);
-		JMXConnectionWrapper wrapper = getJmxConnection();
-		if (wrapper == null) return null;
-		JPPFManagementResponse response = (JPPFManagementResponse) wrapper.invoke(
-			JPPFAdminMBean.DRIVER_MBEAN_NAME, "performAdminRequest", new Object[] {request}, MBEAN_SIGNATURE);
-		if (response == null) return null;
-		if (response.getException() == null) return response.getResult();
-		throw response.getException();
-	}
-
-	/**
-	 * Get the information to connect to the JMX servers of the nodes attached to a driver.
-	 * This method works by querying the driver for the information, through a JMX request. 
-	 * @return a coolection of <code>NodeManagementInfo</code>, which encapsulate the nodes JMX
-	 * server connection information.
-	 * @throws Exception if the connection ot the drivers JMX failed.
-	 */
-	public Collection<NodeManagementInfo> getNodeManagementInfo() throws Exception
-	{
-		Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
-		params.put(BundleParameter.COMMAND_PARAM, BundleParameter.REFRESH_NODE_INFO);
-		Collection<NodeManagementInfo> nodeList =
-			(Collection<NodeManagementInfo>) processManagementRequest(params);
-		return nodeList;
 	}
 
 	/**

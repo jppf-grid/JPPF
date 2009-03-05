@@ -57,15 +57,16 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * Perform an administration request specified by its parameters.
 	 * @param request an object specifying the request parameters.
 	 * @return a <code>JPPFManagementResponse</code> instance.
-	 * @see org.jppf.management.JPPFAdminMBean#performAdminRequest(org.jppf.management.JPPFManagementRequest)
+	 * @throws Exception if an error occurred while performing the request.
+	 * @see org.jppf.management.JPPFAdminMBean#processManagementRequest(org.jppf.management.JPPFManagementRequest)
 	 */
-	public JPPFManagementResponse performAdminRequest(JPPFManagementRequest<BundleParameter, Object> request)
+	public JPPFManagementResponse processManagementRequest(Map<BundleParameter, Object> request) throws Exception
 	{
 		if (debugEnabled) log.debug("received request: " + request);
 		JPPFManagementResponse response = null;
 		try
 		{
-			BundleParameter command = (BundleParameter) request.getParameter(COMMAND_PARAM);
+			BundleParameter command = (BundleParameter) request.get(COMMAND_PARAM);
 			switch(command)
 			{
 				case SHUTDOWN:
@@ -128,11 +129,11 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @return the statistics encapsulated in a <code>JPPFManagementResponse</code> instance.
 	 * @throws Exception if the statistics could not be obtained.
 	 */
-	private JPPFManagementResponse changePassword(JPPFManagementRequest<BundleParameter, Object> request) throws Exception
+	private JPPFManagementResponse changePassword(Map<BundleParameter, Object> request) throws Exception
 	{
 		checkPassword(request);
 		SecretKey tmpKey = getSecretKey(request);
-		byte[] b = (byte[]) request.getParameter(NEW_PASSWORD_PARAM);
+		byte[] b = (byte[]) request.get(NEW_PASSWORD_PARAM);
 		String newPwd = new String(CryptoUtils.decrypt(tmpKey, b));
 		PasswordManager pm = new PasswordManager();
 		pm.savePassword(CryptoUtils.encrypt(newPwd.getBytes()));
@@ -146,13 +147,13 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @throws Exception if an error occurred while updating the settings.
 	 */
 	private JPPFManagementResponse changeBundleSizeSettings(
-		JPPFManagementRequest<BundleParameter, Object> request) throws Exception
+		Map<BundleParameter, Object> request) throws Exception
 	{
 		checkPassword(request);
-		Bundler bundler = BundlerFactory.createBundler(request.getParametersMap(), false);
+		Bundler bundler = BundlerFactory.createBundler(request, false);
 		JPPFDriver.getInstance().getNodeNioServer().setBundler(bundler);
 		boolean manual =
-			"manual".equalsIgnoreCase((String) request.getParameter(BUNDLE_TUNING_TYPE_PARAM));
+			"manual".equalsIgnoreCase((String) request.get(BUNDLE_TUNING_TYPE_PARAM));
 		return new JPPFManagementResponse(localize((manual ? "manual" : "automatic") + ".settings.changed"), null);
 	}
 
@@ -163,13 +164,13 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @return the statistics encapsulated in a <code>JPPFManagementResponse</code> instance.
 	 * @throws Exception if an error occurred while updating the settings.
 	 */
-	private JPPFManagementResponse restartShutdown(
-		JPPFManagementRequest<BundleParameter, Object> request, BundleParameter command) throws Exception
+	public JPPFManagementResponse restartShutdown(
+		Map<BundleParameter, Object> request, BundleParameter command) throws Exception
 	{
 		checkPassword(request);
-		long shutdownDelay = (Long) request.getParameter(SHUTDOWN_DELAY_PARAM);
+		long shutdownDelay = (Long) request.get(SHUTDOWN_DELAY_PARAM);
 		boolean restart = !SHUTDOWN.equals(command);
-		long restartDelay = (Long) request.getParameter(RESTART_DELAY_PARAM);
+		long restartDelay = (Long) request.get(RESTART_DELAY_PARAM);
 		JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay, restart, restartDelay);
 		return new JPPFManagementResponse(localize("request.acknowledged"), null);
 	}
@@ -179,10 +180,10 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @param request the management request to check.
 	 * @throws Exception if the request does not have a valid password.
 	 */
-	private void checkPassword(JPPFManagementRequest<BundleParameter, Object> request) throws Exception
+	private void checkPassword(Map<BundleParameter, Object> request) throws Exception
 	{
 		SecretKey tmpKey = getSecretKey(request);
-		byte[] b = (byte[]) request.getParameter(PASSWORD_PARAM);
+		byte[] b = (byte[]) request.get(PASSWORD_PARAM);
 		String remotePwd = new String(CryptoUtils.decrypt(tmpKey, b));
 		PasswordManager pm = new PasswordManager();
 		b = pm.readPassword();
@@ -198,9 +199,9 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @return a <code>SecretKey</code> instance.
 	 * @throws Exception if the key could not be obtained.
 	 */
-	private SecretKey getSecretKey(JPPFManagementRequest<BundleParameter, Object> request) throws Exception
+	private SecretKey getSecretKey(Map<BundleParameter, Object> request) throws Exception
 	{
-		byte[] b = (byte[]) request.getParameter(KEY_PARAM);
+		byte[] b = (byte[]) request.get(KEY_PARAM);
 		b = CryptoUtils.decrypt(b);
 		return CryptoUtils.getSecretKeyFromEncoded(b);
 	}

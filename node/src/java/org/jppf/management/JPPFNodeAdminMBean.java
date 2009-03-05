@@ -19,6 +19,7 @@
 package org.jppf.management;
 
 import java.io.Serializable;
+import java.util.Map;
 
 
 /**
@@ -30,50 +31,61 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean<NodeParameter, Object
 	/**
 	 * Get the latest state information from the node.
 	 * @return a <code>JPPFNodeState</code> information.
+	 * @throws Exception if any error occurs.
 	 */
-	JPPFNodeState state();
+	JPPFNodeState state() throws Exception;
 	/**
 	 * Get the latest task notification from the node.
 	 * @return the notification as a <code>Serializable</code> object.
+	 * @throws Exception if any error occurs.
 	 */
-	Serializable notification();
+	Serializable notification() throws Exception;
 	/**
 	 * Cancel the execution of the tasks with the specified id.
 	 * @param id the id of the tasks to cancel.
+	 * @throws Exception if any error occurs.
 	 */
-	void cancelTask(String id);
+	void cancelTask(String id) throws Exception;
 	/**
 	 * Restart the execution of the tasks with the specified id.<br>
 	 * The task(s) will be restarted even if their execution has already completed.
 	 * @param id the id of the task or tasks to restart.
+	 * @throws Exception if any error occurs.
 	 */
-	void restartTask(String id);
+	void restartTask(String id) throws Exception;
 	/**
 	 * Set the size of the node's thread pool.
 	 * @param size the size as an int.
+	 * @throws Exception if any error occurs.
 	 */
-	void updateThreadPoolSize(Integer size);
+	void updateThreadPoolSize(Integer size) throws Exception;
 	/**
 	 * Get detailed information about the node's JVM properties, environment variables
 	 * and runtime information such as memory usage and available processors.
 	 * @return a <code>JPPFSystemInformation</code> instance.
+	 * @throws Exception if any error occurs.
 	 */
-	JPPFSystemInformation systemInformation();
+	JPPFSystemInformation systemInformation() throws Exception;
 	/**
 	 * Restart the node.
+	 * @throws Exception if any error occurs.
 	 */
-	void restart();
+	void restart() throws Exception;
 	/**
 	 * Shutdown the node.
+	 * @throws Exception if any error occurs.
 	 */
-	void shutdown();
+	void shutdown() throws Exception;
 	/**
 	 * Reset the node's executed tasks counter to zero. 
+	 * @throws Exception if any error occurs.
 	 */
-	void resetTaskCounter();
+	void resetTaskCounter() throws Exception;
 	/**
-	 * Update the priority of all execution threads.
-	 * @param newPriority the new priority to set.
+	 * Update the configuration properties of the node. 
+	 * @param config the set of properties to update.
+	 * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
+	 * @throws Exception if any error occurs.
 	 */
-	void updateThreadsPriority(Integer newPriority);
+	void updateConfiguration(Map<String, String> config, Boolean reconnect) throws Exception;
 }
