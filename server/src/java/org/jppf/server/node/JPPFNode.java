@@ -93,6 +93,10 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Determines whether JMX management and monitoring is enabled for this node.
 	 */
 	private boolean jmxEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true);
+	/**
+	 * Action executed when the node exits the main loop, in its {@link #run() run()} method.
+	 */
+	private Runnable exitAction = null;
 
 	/**
 	 * Main processing loop of this node.
@@ -142,6 +146,12 @@ public class JPPFNode extends AbstractMonitoredNode
 		}
 		if (debugEnabled) log.debug("End of node main loop");
 		if (notifying) fireNodeEvent(NodeEventType.DISCONNECTED);
+		if (exitAction != null)
+		{
+			Runnable r = exitAction;
+			setExitAction(null);
+			r.run();
+		}
 	}
 
 	/**
@@ -242,6 +252,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		String host = props.getString("jppf.server.host", "localhost");
 		int port = props.getInt("node.server.port", 11113);
 		socketClient = new SocketClient();
+		//socketClient = new SocketChannelClient(true);
 		socketClient.setHost(host);
 		socketClient.setPort(port);
 		socketClient.setSerializer(serializer);
@@ -533,10 +544,15 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	public void shutdown(boolean restart)
 	{
-		/*
-		stopNode(true);
-		System.exit(restart ? 2 : 0);
-		*/
 		NodeRunner.shutdown(this, restart);
+	}
+
+	/**
+	 * Set the action executed when the node exits the main loop.
+	 * @param exitAction the action to execute.
+	 */
+	public synchronized void setExitAction(Runnable exitAction)
+	{
+		this.exitAction = exitAction;
 	}
 }
