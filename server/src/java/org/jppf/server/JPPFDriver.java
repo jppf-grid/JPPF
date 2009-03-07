@@ -128,12 +128,24 @@ public class JPPFDriver
 		nodeNioServer.start();
 		printInitializedMessage(info.nodeServerPorts, "Tasks Server");
 
-		if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
+		try
 		{
-			jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX);
-			jmxServer.start();
-			jmxServer.registerMbean(JPPFAdminMBean.DRIVER_MBEAN_NAME, new JPPFDriverAdmin(), JPPFDriverAdminMBean.class);
-			System.out.println("JPPF Driver management initialized");
+			if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
+			{
+				jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX);
+				jmxServer.start();
+				jmxServer.registerMbean(JPPFAdminMBean.DRIVER_MBEAN_NAME, new JPPFDriverAdmin(), JPPFDriverAdminMBean.class);
+				System.out.println("JPPF Driver management initialized");
+			}
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+			JPPFConfiguration.getProperties().setProperty("jppf.management.enabled", "false");
+			String s = e.getMessage();
+			s = (s == null) ? "<none>" : s.replace("\t", "  ").replace("\n", " - ");
+			System.out.println("JPPF Driver management failed to initialize, with error message: '" + s + "'");
+			System.out.println("Management features are disabled. Please consult the driver's log file for more information");
 		}
 
 		if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true))
