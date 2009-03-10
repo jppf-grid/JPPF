@@ -65,7 +65,7 @@ public class ClientDataProvider extends MemoryMapDataProvider
 	 * @return the value as an <code>Object</code>.
 	 * @see org.jppf.task.storage.DataProvider#getValue(java.lang.Object)
 	 */
-	public <V> Object computeValue(String key, JPPFCallable<V> callable)
+	public <V> Object computeValue(Object key, JPPFCallable<V> callable)
 	{
 		if (key == null) throw new NullPointerException("key cannot be null");
 		Object result = null;
