@@ -75,10 +75,11 @@ public class ClientDataProvider extends MemoryMapDataProvider
 	}
 
 	/**
-	 * Lookup the value on the client-side.
+	 * Compute a value on the client-side, as the result of the execution of a {@link org.jppf.utils.JPPFCallable JPPFCallable}.
 	 * @param <V> - the type of results returned by the callable.
 	 * @param callable - the key from which to get the value.
 	 * @return the looked-up value, or null if the value could not be found.
+	 * @see org.jppf.utils.JPPFCallable
 	 */
 	private <V> Object getValueFromClient(JPPFCallable<V> callable)
 	{
