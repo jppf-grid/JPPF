@@ -124,7 +124,7 @@ public class TaskNotificationRunner
 		int count = 20;
 		while ((count-- > 0) && (nodeList == null))
 		{
-			nodeList = c.getNodeManagementInfo();
+			nodeList = c.getJmxConnection().nodesInformation();
 			if (nodeList == null) Thread.sleep(100L);
 		}
 		if (nodeList == null) return;
