@@ -42,7 +42,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 
 	/**
 	 * Initialize class server delegate with a spceified application uuid.
@@ -115,13 +115,17 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 					String name = resource.getName();
 					if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name);
 					byte[] b = null;
-					if (resource.isAsResource()) b = resourceProvider.getResource(name);
-					else b = resourceProvider.getResourceAsBytes(name);
+					byte[] callable = resource.getCallable();
+					if (callable != null) b = resourceProvider.computeCallable(callable);
+					else
+					{
+						if (resource.isAsResource()) b = resourceProvider.getResource(name);
+						else b = resourceProvider.getResourceAsBytes(name);
+					}
 					if (b == null) found = false;
 					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
 					//resource.setDefinition(b);
-					if (b != null) resource.setDefinition(CompressionUtils.zip(b, 0, b.length));
-					else resource.setDefinition(null);
+					resource.setDefinition(found ? CompressionUtils.zip(b, 0, b.length) : null);
 					socketClient.send(resource);
 					if  (debugEnabled)
 					{

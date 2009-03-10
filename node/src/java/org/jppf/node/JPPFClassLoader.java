@@ -341,6 +341,53 @@ public class JPPFClassLoader extends ClassLoader
 	}
 
 	/**
+	 * Request the remote computation of a <code>JPPFCallable</code> on the client.
+	 * @param callable - the serialized callable to execute remotely.
+	 * @return an array of bytes containing the result of the callable's execution.
+	 * @throws Exception if the connection was lost and could not be reestablished.
+	 */
+	public byte[] computeRemoteData(byte[] callable) throws Exception
+	{
+		byte[] b = null;
+		try
+		{
+			if (debugEnabled) log.debug("requesting remote computation of [" + callable + "], requestUuid = " + requestUuid);
+			lock.lock();
+			JPPFResourceWrapper resource = new JPPFResourceWrapper();
+			resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
+			resource.setDynamic(dynamic);
+			TraversalList<String> list = new TraversalList<String>(uuidPath);
+			resource.setUuidPath(list);
+			if (list.size() > 0) list.setPosition(uuidPath.size()-1);
+			resource.setCallable(callable);
+			resource.setAsResource(false);
+			resource.setRequestUuid(requestUuid);
+			
+			socketClient.send(resource);
+			resource = (JPPFResourceWrapper) socketClient.receive();
+			b = resource.getDefinition();
+			if (b != null)
+			{
+				try
+				{
+					b = CompressionUtils.unzip(b, 0, b.length);
+				}
+				catch(Exception e)
+				{
+					b = null;
+					log.error(e.getMessage(), e);
+				}
+			}
+			if (debugEnabled) log.debug("remote definition for resource [" + callable + "] "+ (b==null ? "not " : "") + "found");
+		}
+		finally
+		{
+			lock.unlock();
+		}
+		return b;
+	}
+
+	/**
 	 * Finds the resource with the specified name.
 	 * The resource lookup order is the same as the one specified by {@link #getResourceAsStream(String)} 
 	 * @param name the name of the resource to find.

@@ -92,7 +92,7 @@ public class WaitingProviderResponseState extends ClassServerState
 				", resource: " + context.getResource().getName());
 			JPPFResourceWrapper resource = context.deserializeResource();
 			// putting the definition in cache
-			if (resource.getDefinition() != null)
+			if ((resource.getDefinition() != null) && (resource.getCallable() == null))
 				server.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
 			// fowarding it to channel that requested
 			SelectionKey destinationKey = context.getCurrentRequest();

@@ -71,17 +71,15 @@ public class WaitingNodeRequestState extends ClassServerState
 			TraversalList<String> uuidPath = resource.getUuidPath();
 			boolean dynamic = resource.isDynamic();
 			String name = resource.getName();
+			byte[] callable = resource.getCallable();
 			String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null; 
 			byte[] b = null;
-			if ((uuid == null) || uuid.equals(JPPFDriver.getInstance().getUuid()))
+			if (((uuid == null) || uuid.equals(JPPFDriver.getInstance().getUuid())) && (callable == null))
 			{
 				if ((uuid == null) && !dynamic) uuid = JPPFDriver.getInstance().getUuid();
 				if (uuid != null) b = server.getCacheContent(uuid, name);
 				boolean alreadyInCache = (b != null);
-				if (debugEnabled)
-				{
-					log.debug("resource " + (alreadyInCache ? "" : "not ") + "found [" + name + "] in cache for node: " + getRemoteHost(channel));
-				}
+				if (debugEnabled) log.debug("resource " + (alreadyInCache ? "" : "not ") + "found [" + name + "] in cache for node: " + getRemoteHost(channel));
 				if (!alreadyInCache)
 				{
 					b = server.getResourceProvider().getResourceAsBytes(name);
@@ -89,10 +87,7 @@ public class WaitingNodeRequestState extends ClassServerState
 				}
 				if ((b != null) || !dynamic)
 				{
-					if (debugEnabled)
-					{
-						log.debug("resource " + (b == null ? "not " : "") + "found [" + name + "] in the driver's classpath for node: " + getRemoteHost(channel));
-					}
+					if (debugEnabled) log.debug("resource " + (b == null ? "not " : "") + "found [" + name + "] in the driver's classpath for node: " + getRemoteHost(channel));
 					if ((b != null) && !alreadyInCache) server.setCacheContent(JPPFDriver.getInstance().getUuid(), name, b);
 					resource.setDefinition(b);
 					context.serializeResource();
@@ -101,7 +96,7 @@ public class WaitingNodeRequestState extends ClassServerState
 			}
 			if ((b == null) && dynamic)
 			{
-				b = server.getCacheContent(uuidPath.getFirst(), name);
+				if (callable == null) b = server.getCacheContent(uuidPath.getFirst(), name);
 				if (b != null)
 				{
 					if (debugEnabled) log.debug("found cached resource [" + name + "] for node: " + getRemoteHost(channel));
@@ -116,15 +111,13 @@ public class WaitingNodeRequestState extends ClassServerState
 					SelectableChannel provider = findProviderConnection(uuid);
 					if (provider != null)
 					{
-						if (debugEnabled) log.debug("request resource [" + name + "] from client: " +
-							getRemoteHost(provider) + " for node: " + getRemoteHost(channel));
+						if (debugEnabled) log.debug("request resource [" + name + "] from client: " + getRemoteHost(provider) + " for node: " + getRemoteHost(channel));
 						SelectionKey providerKey = provider.keyFor(server.getSelector());
 						ClassContext providerContext = (ClassContext) providerKey.attachment();
 						providerContext.addRequest(key);
 						if (ClassState.IDLE_PROVIDER.equals(providerContext.getState()))
 						{
-							if (debugEnabled) log.debug("node " + getRemoteHost(channel) +
-								" changing key ops for provider " + getRemoteHost(provider));
+							if (debugEnabled) log.debug("node " + getRemoteHost(channel) + " changing key ops for provider " + getRemoteHost(provider));
 							providerContext.setState(ClassState.SENDING_PROVIDER_REQUEST);
 							server.getTransitionManager().setKeyOps(providerKey, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
 						}
