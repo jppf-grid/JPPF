@@ -133,10 +133,6 @@ public final class ProcessWrapper
 		 * The stream to get the output from.
 		 */
 		private InputStream is = null;
-		/**
-		 * This is where the output goes.
-		 */
-		private StringBuilder sb = null;
 
 		/**
 		 * Initialize this handler with the specified stream and buffer receiving its content.
@@ -147,7 +143,6 @@ public final class ProcessWrapper
 		public StreamHandler(InputStream is, StringBuilder sb, boolean output)
 		{
 			this.is = is;
-			this.sb = sb;
 			this.output = output;
 		}
 
@@ -164,11 +159,7 @@ public final class ProcessWrapper
 				while (s != null)
 				{
 					s = reader.readLine();
-					if (s != null)
-					{
-						if (sb != null) sb.append(s).append("\n");
-						fireStreamEvent(output, s);
-					}
+					if (s != null) fireStreamEvent(output, s);
 				}
 				Thread.sleep(10);
 			}
