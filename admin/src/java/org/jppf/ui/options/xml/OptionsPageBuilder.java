@@ -17,7 +17,6 @@
  */
 package org.jppf.ui.options.xml;
 
-import java.awt.Insets;
 import java.io.*;
 import java.net.*;
 
@@ -171,38 +170,11 @@ public class OptionsPageBuilder
 	{
 		elt.setName(desc.name);
 		elt.setLabel(LocalizationUtils.getLocalized(baseName, desc.name+".label", desc.getProperty("label")));
-		String s = desc.getProperty("orientation", "horizontal");
-		elt.setOrientation("horizontal".equalsIgnoreCase(s) ? OptionsPage.HORIZONTAL : OptionsPage.VERTICAL);
 		elt.setToolTipText(LocalizationUtils.getLocalized(baseName, desc.name+".tooltip", desc.getProperty("tooltip")));
 		elt.setScrollable(desc.getBoolean("scrollable", false));
 		elt.setBordered(desc.getBoolean("bordered", false));
-		elt.setWidth(desc.getInt("width", -1));
-		elt.setHeight(desc.getInt("height", -1));
-		s = desc.getProperty("insets");
-		int defMargin = 2;
-		if ((s == null) || ("".equals(s.trim())))
-			elt.setInsets(new Insets(defMargin, defMargin, defMargin, defMargin));
-		else
-		{
-			String[] sVals = s.split(",");
-			if (sVals.length != 4) elt.setInsets(new Insets(defMargin, defMargin, defMargin, defMargin));
-			else
-			{
-				int[] vals = new int[4];
-				for (int i=0; i<4; i++)
-				{
-					try
-					{
-						vals[i] = Integer.parseInt(sVals[i].trim());
-					}
-					catch(NumberFormatException e)
-					{
-						vals[i] = defMargin;
-					}
-				}
-				elt.setInsets(new Insets(vals[0], vals[1], vals[2], vals[3]));
-			}
-		}
+		elt.setLayoutConstraints(desc.getString("layoutConstraints", "fill, gapy 2!, insets 0 0 0 0"));
+		elt.setComponentConstraints(desc.getString("componentConstraints", "growx"));
 		for (ScriptDescriptor script: desc.scripts) elt.getScripts().add(script);
 		if (desc.initializer != null) elt.setInitializer(createListener(desc.initializer));
 	}

@@ -17,9 +17,10 @@
  */
 package org.jppf.ui.options;
 
-import java.awt.Dimension;
 import java.util.*;
+
 import javax.swing.JSplitPane;
+
 import org.apache.commons.logging.*;
 
 /**
@@ -32,6 +33,14 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(SplitPaneOption.class);
+	/**
+	 * Horizontal split.
+	 */
+	public static final int HORIZONTAL = 0;
+	/**
+	 * Vertical split.
+	 */
+	public static final int VERTICAL = 1;
 	/**
 	 * Used when nothing is set in the left (top) panel.
 	 */
@@ -52,6 +61,10 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * The split pane's divider width.
 	 */
 	protected int dividerWidth = 4;
+	/**
+	 * The orientation of the split, one of {@link #VERTICAL} or {@link #HORIZONTAL}.
+	 */
+	protected int orientation = 0;
 
 	/**
 	 * Initialize the split pane with 2 fillers as left (or top) and right (or bottom) components.
@@ -74,7 +87,6 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 		{
 			pane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		}
-		if ((width > 0) && (height > 0)) pane.setPreferredSize(new Dimension(width, height));
 		UIComponent = pane;
 		children.add(FILLER1);
 		children.add(FILLER2);
@@ -217,5 +229,23 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	public void setResizeWeight(double resizeWeight)
 	{
 		this.resizeWeight = resizeWeight;
+	}
+
+	/**
+	 * Get the orientation of the split.
+	 * @return one of {@link #VERTICAL} or {@link #HORIZONTAL}.
+	 */
+	public int getOrientation()
+	{
+		return orientation;
+	}
+
+	/**
+	 * Set the orientation of the split.
+	 * @param orientation - one of {@link #VERTICAL} or {@link #HORIZONTAL}.
+	 */
+	public void setOrientation(int orientation)
+	{
+		this.orientation = orientation;
 	}
 }

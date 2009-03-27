@@ -17,13 +17,12 @@
  */
 package org.jppf.ui.options;
 
-import static org.jppf.ui.utils.GuiUtils.addLayoutComp;
-import java.awt.*;
 import java.util.*;
-import java.util.List;
+
 import javax.swing.*;
 import javax.swing.border.*;
-import org.jppf.ui.utils.GuiUtils;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * Instances of this page represent dynamic UI components representing a page (or panel) container. 
@@ -39,26 +38,6 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 * The panel used to display this options page.
 	 */
 	protected JPanel panel = null;
-	/**
-	 * The layout for the panel.
-	 */
-	protected GridBagLayout g = null;
-	/**
-	 * Constraints used to layout the components in this page.
-	 */
-	protected GridBagConstraints c = null;
-	/**
-	 * Filler component used to handle horizontal and vertical extensions of this page.
-	 */
-	protected JComponent filler = null;
-	/**
-	 * 
-	 */
-	protected GridBagConstraints fillerConstraints = null;
-	/**
-	 * Determines whether this page is an outermost page.
-	 */
-	protected boolean mainPage = false;
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -73,19 +52,14 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 * @param name this component's name.
 	 * @param label the panel's title. 
 	 * @param scrollable determines whether this page should be enclosed within a scroll pane.
-	 * @param orientation one of {@link org.jppf.ui.options.OptionsPage#HORIZONTAL ORIENTATION_HORIZONTAL} or
-	 * {@link org.jppf.ui.options.OptionsPage#VERTICAL ORIENTATION_VERTICAL}.
 	 * @param bordered determines whether this page has a border around it.
-	 * @param mainPage determines whether this page is an outermost page.
 	 */
-	public OptionPanel(String name, String label, boolean scrollable, int orientation, boolean bordered, boolean mainPage)
+	public OptionPanel(String name, String label, boolean scrollable, boolean bordered)
 	{
 		this.name = name;
 		this.label = label;
 		this.scrollable = scrollable;
-		this.orientation = orientation;
 		this.bordered = bordered;
-		this.mainPage = mainPage;
 		createUI();
 	}
 
@@ -95,12 +69,10 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 * @param name this component's name.
 	 * @param label the panel's title. 
 	 * @param scrollable determines whether this page should be enclosed within a scroll pane.
-	 * @param orientation one of {@link org.jppf.ui.options.OptionsPage#HORIZONTAL ORIENTATION_HORIZONTAL} or
-	 * {@link org.jppf.ui.options.OptionsPage#VERTICAL ORIENTATION_VERTICAL}.
 	 */
-	public OptionPanel(String name, String label, boolean scrollable, int orientation)
+	public OptionPanel(String name, String label, boolean scrollable)
 	{
-		this(name, label, scrollable, orientation, false, true);
+		this(name, label, scrollable, false);
 	}
 
 	/**
@@ -117,24 +89,8 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 			panel.setBorder(border);
 		}
 		if (toolTipText != null) panel.setToolTipText(toolTipText);
-		g = new GridBagLayout();
-    c = new GridBagConstraints();
-		c.fill = GridBagConstraints.BOTH;
-		c.insets = insets;
-		c.anchor = GridBagConstraints.LINE_START;
-    if (orientation == HORIZONTAL)
-    {
-    	c.gridy = 0;
-    	if (mainPage) c.weighty = 1.0;
-    }
-    else
-    {
-    	c.gridx = 0;
-    	if (mainPage) c.weightx = 1.0;
-    }
-		panel.setLayout(g);
-		createFiller();
-		GuiUtils.addLayoutComp(panel, g, fillerConstraints, filler);
+		MigLayout mig = new MigLayout(layoutConstraints);
+		panel.setLayout(mig);
 		if (scrollable)
 		{
 			JScrollPane sp = new JScrollPane(panel);
@@ -142,52 +98,8 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 			UIComponent = sp;
 		}
 		else UIComponent = panel;
-		
-		if ((width > 0) && (height > 0))
-		{
-			Dimension d = new Dimension(width, height);
-			UIComponent.setPreferredSize(d);
-		}
 	}
 
-	/**
-	 * Create a filler component used to handle horizontal and vertical
-	 * extensions of the page.
-	 */
-	protected void createFiller()
-	{
-		filler = GuiUtils.createFiller(1, 1);
-		fillerConstraints = new GridBagConstraints();
- 		fillerConstraints.anchor = GridBagConstraints.SOUTHEAST;
-		fillerConstraints.fill = GridBagConstraints.BOTH;
-  	fillerConstraints.gridwidth = GridBagConstraints.REMAINDER;
-  	fillerConstraints.gridheight = GridBagConstraints.REMAINDER;
-  	if (mainPage)
-  	{
-	    if (orientation == HORIZONTAL)
-	    {
-	    	fillerConstraints.weightx = 1.0;
-	    }
-	    else
-	    {
-	    	fillerConstraints.weighty = 1.0;
-	    }
-  	}
-  	else
-  	{
-    	fillerConstraints.weightx = 1.0;
-    	fillerConstraints.weighty = 1.0;
-	    if (orientation == HORIZONTAL)
-	    {
-	    	fillerConstraints.gridy = 1;
-	    }
-	    else
-	    {
-	    	fillerConstraints.gridx = 1;
-	    }
-  	}
-	}
-	
 	/**
 	 * Get the options in this page.
 	 * @return a list of <code>Option</code> instances.
@@ -210,9 +122,7 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 		{
 			((AbstractOptionElement) element).setParent(this);
 		}
-		if (mainPage) panel.remove(filler);
-		addLayoutComp(panel, g, c, element.getUIComponent());
-		if (mainPage) GuiUtils.addLayoutComp(panel, g, fillerConstraints, filler);
+		panel.add(element.getUIComponent(), element.getComponentConstraints());
 	}
 
 	/**
@@ -230,25 +140,6 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 		panel.remove(element.getUIComponent());
 	}
 
-	/**
-	 * Determines whether this page is part of another.
-	 * @return true if this page is an outermost page, false if it is embedded within another page.
-	 * @see org.jppf.ui.options.OptionsPage#isMainPage()
-	 */
-	public boolean isMainPage()
-	{
-		return mainPage;
-	}
-
-	/**
-	 * Set whether this page is part of another.
-	 * @param mainPage true if this page is an outermost page, false if it is embedded within another page.
-	 */
-	public void setMainPage(boolean mainPage)
-	{
-		this.mainPage = mainPage;
-	}
-	
 	/**
 	 * Enable or disable this option.
 	 * @param enabled true to enable this option, false to disable it.

@@ -18,46 +18,40 @@
 -->
 
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="Admin" type="page">
-
 	<property name="label" value="Admin"/>
-	<property name="scrollable" value="false"/>
-	<property name="orientation" value="vertical"/>
-	<property name="bordered" value="false"/>
-	<property name="main" value="true"/>
+	<property name="scrollable" value="true"/>
+	<property name="layoutConstraints" value="fill, flowy"/>
+	<property name="componentConstraints" value="growx"/>
 	<property name="tooltip" value="Perform the remote administration of the server"/>
-	<script language="javascript">BASE = "org.jppf.ui.i18n.AdminPage";</script>
-	<script language="javascript" source="org/jppf/ui/options/xml/admin.js"/>
+	<script language="groovy">BASE = "org.jppf.ui.i18n.AdminPage";</script>
+	<script language="groovy" source="org/jppf/ui/options/xml/admin.groovy"/>
 
 	<!-- ===================================================================== -->
 	<!--                   Top Panels                                          -->
 	<!-- ===================================================================== -->
 	
 	<child name="AdminCommands" type="page">
-
 		<property name="label" value="Admin Commands"/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="horizontal"/>
-		<property name="bordered" value="false"/>
-		<property name="main" value="false"/>
+		<property name="layoutConstraints" value="fillx"/>
+		<property name="componentConstraints" value="growx, growy 0"/>
 
 		<!-- ===================================================================== -->
 		<!--                Server shutdown/restart area                           -->
 		<!-- ===================================================================== -->
 	
 		<child name="Server" type="page">
-	
 			<property name="label" value="Server Shutdown / Restart"/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="grow"/>
 			<property name="bordered" value="true"/>
-			<property name="main" value="false"/>
 			<property name="tooltip" value="Stop and restart the server using the specified delays"/>
 	
 			<child name="Perform_Now" type="Button">
 				<property name="label" value="Perform Now"/>
 				<property name="tooltip" value="Sends the shutdown and/or restart request to the server"/>
+				<property name="componentConstraints" value="growx 0, align left"/>
 				<listener type="script">
-					<script language="javascript">doPerform_Now();</script>
+					<script language="groovy">doPerform_Now()</script>
 				</listener>
 			</child>
 	
@@ -75,7 +69,7 @@
 				<property name="value" value="true"/>
 				<property name="persistent" value="true"/>
 				<listener type="script">
-					<script language="javascript">option.findElement("../Restart_delay").setEnabled(option.getValue().booleanValue());</script>
+					<script language="groovy">option.findElement("../Restart_delay").setEnabled(option.getValue().booleanValue())</script>
 				</listener>
 			</child>
 	
@@ -89,28 +83,22 @@
 	
 		</child>
 	
-		<child name="filler" type="Filler">
-			<property name="width" value="10"/>
-			<property name="height" value="10"/>
-		</child>
-
 		<!-- ===================================================================== -->
 		<!--          Administrator password configuration area                    -->
 		<!-- ===================================================================== -->
 	
 		<child name="Admin_password" type="page">
-	
 			<property name="label" value="Administrator password"/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="grow"/>
 			<property name="bordered" value="true"/>
-			<property name="main" value="false"/>
 	
 			<child name="Change_password" type="Button">
 				<property name="label" value="Change password"/>
 				<property name="tooltip" value="Tells the server to change the administrator password"/>
+				<property name="componentConstraints" value="growx 0, align left"/>
 				<listener type="script">
-					<script language="javascript">doChange_password();</script>
+					<script language="groovy">doChange_password()</script>
 				</listener>
 			</child>
 	
@@ -134,6 +122,10 @@
 	
 		</child>
 
+		<child name="filler" type="page">
+			<property name="componentConstraints" value="growx, pushx"/>
+		</child>
+
 	</child>
 
 	<!-- ===================================================================== -->
@@ -141,12 +133,10 @@
 	<!-- ===================================================================== -->
 	
 	<child name="AdminPreferences" type="page">
-
 		<property name="label" value="Monitor"/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="horizontal"/>
+		<property name="layoutConstraints" value="fillx"/>
+		<property name="componentConstraints" value="growx, growy 0"/>
 		<property name="bordered" value="true"/>
-		<property name="main" value="false"/>
 
 		<child name="Interval" type="FormattedNumber">
 			<property name="label" value="Refresh interval (ms)"/>
@@ -159,14 +149,14 @@
 		<child name="ApplyInterval" type="Button">
 			<property name="label" value="Apply"/>
 			<property name="tooltip" value="Apply the new interval value immediately"/>
+			<property name="componentConstraints" value="growx 0"/>
 			<listener type="script">
-				<script language="javascript">doApplyInterval();</script>
+				<script language="groovy">doApplyInterval()</script>
 			</listener>
 		</child>
 
-		<child name="filler" type="Filler">
-			<property name="width" value="1"/>
-			<property name="height" value="1"/>
+		<child name="filler" type="page">
+			<property name="componentConstraints" value="growx, pushx"/>
 		</child>
 
 	</child>
@@ -179,6 +169,7 @@
 		<property name="label" value="Server Messages"/>
 		<property name="tooltip" value="Feedback messages received from the server"/>
 		<property name="value" value=""/>
+		<property name="componentConstraints" value="grow, push"/>
 	</child>
 
 </opt:main>

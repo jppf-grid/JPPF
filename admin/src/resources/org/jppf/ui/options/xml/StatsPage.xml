@@ -21,10 +21,8 @@
 	<!-- test comment for save -->
 	<property name="label" value="Node Data"/>
 	<property name="scrollable" value="true"/>
-	<property name="orientation" value="vertical"/>
-	<property name="bordered" value="false"/>
-	<property name="main" value="true"/>
-	<property name="tooltip" value=""/>
+	<property name="layoutConstraints" value="flowy, fill, gap unrel rel"/>
+	<property name="componentConstraints" value="grow"/>
 
 	<!-- ===================================================================== -->
 	<!--                        Buttons area                                   -->
@@ -32,32 +30,13 @@
 
 	<child name="Actions" type="page">
 		<property name="label" value="Actions"/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="horizontal"/>
-		<property name="bordered" value="false"/>
-		<property name="main" value="false"/>
+		<property name="componentConstraints" value="growy 0"/>
 	
-		<child name="TableActions" type="page">
-			<property name="label" value="Table Actions"/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
-			<property name="bordered" value="false"/>
-			<property name="main" value="false"/>
-			<property name="insets" value="5,5,5,5"/>
-	
-			<child name="RefreshBtn" type="Button">
-				<property name="label" value=""/>
-				<property name="tooltip" value=""/>
-				<listener type="script">
-					<script language="javascript">StatsHandler.getInstance().requestUpdate();</script>
-				</listener>
-			</child>
-	
-			<child name="filler" type="Filler">
-				<property name="width" value="10"/>
-				<property name="height" value="10"/>
-			</child>
-
+		<child name="RefreshBtn" type="Button">
+			<property name="componentConstraints" value="growx 0"/>
+			<listener type="script">
+				<script language="groovy">StatsHandler.getInstance().requestUpdate()</script>
+			</listener>
 		</child>
 
 	</child>
@@ -66,25 +45,25 @@
 	<!--                      Tree table area                                  -->
 	<!-- ===================================================================== -->
 
-	<child name="TablesPanel" type="page">
-		<property name="label" value=""/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="horizontal"/>
-		<property name="bordered" value="false"/>
-		<property name="main" value="false"/>
-
-		<child name="filler" type="Filler">
-			<property name="width" value="0"/>
-			<property name="height" value="0"/>
-		</child>
+	<child name="TablesCOntainer" type="page">
+		<property name="label" value="Actions"/>
+		<property name="layoutConstraints" value="fill"/>
 
 		<child name="Tables" type="Java">
 			<property name="class" value="org.jppf.ui.monitoring.MonitoringPanel"/>
-			<property name="label" value=""/>
-			<property name="tooltip" value=""/>
+			<property name="layoutConstraints" value="gap unrel rel, fill, flowy"/>
+			<property name="componentConstraints" value="growx"/>
 			<property name="value" value=""/>
 		</child>
 
+		<child name="filler" type="Page">
+			<property name="componentConstraints" value="growx, span 2"/>
+		</child>
+
+	</child>
+
+	<child name="filler" type="Page">
+		<property name="componentConstraints" value="pushy"/>
 	</child>
 
 </opt:main>

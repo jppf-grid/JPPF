@@ -18,10 +18,14 @@
 package org.jppf.ui.options.event;
 
 import java.util.*;
+
 import javax.swing.tree.TreePath;
+
+import org.apache.commons.logging.*;
 import org.jppf.scripting.*;
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
+import org.jppf.utils.JPPFUuid;
 
 /**
  * Implementation of ValueChangeListener for script-based event listeners.
@@ -29,6 +33,14 @@ import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
  */
 public class ScriptedValueChangeListener implements ValueChangeListener
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(ScriptedValueChangeListener.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Name of the scripting language to use.
 	 */
@@ -41,6 +53,14 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 	 * A wrapper around the scripting engine.
 	 */
 	private ScriptRunner runner = null;
+	/**
+	 * The unique id of this scripted listener.
+	 */
+	private String uuid = new JPPFUuid().toString();
+	/**
+	 * Contains the text of the script, after its first execution. 
+	 */
+	private String scriptText = null;
 
 	/**
 	 * Initialize this listener with a specified scriot alnguage and script source.
@@ -64,28 +84,34 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 	public void valueChanged(ValueChangeEvent event)
 	{
 		OptionElement option = event.getOption();
-		TreePath path = option.getPath();
-		StringBuilder sb = new StringBuilder();
-		// add the scripts defined in the option and all its ancestors to the one in the listener.
-		// only scripts written in the same scripting language are added.
-		for (Object o: path.getPath())
+		if (scriptText == null)
 		{
-			OptionElement elt = (OptionElement) o;
-			for (ScriptDescriptor desc: elt.getScripts())
+			TreePath path = option.getPath();
+			StringBuilder sb = new StringBuilder();
+			// add the scripts defined in the option and all its ancestors to the one in the listener.
+			// only scripts written in the same scripting language are added.
+			for (Object o: path.getPath())
 			{
-				if (language.equals(desc.language))
+				OptionElement elt = (OptionElement) o;
+				for (ScriptDescriptor desc: elt.getScripts())
 				{
-					sb.append(desc.content).append("\n");
+					if (language.equals(desc.language)) sb.append(desc.content).append("\n");
 				}
 			}
+			sb.append(script);
+			scriptText = sb.toString();
 		}
-		sb.append(script);
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("root", option.getRoot());
 		variables.put("option", option);
 		try
 		{
-			runner.evaluate(sb.toString(), variables);
+			long start = System.currentTimeMillis();
+			runner.evaluate(uuid, scriptText, variables);
+			long elapsed = System.currentTimeMillis() - start;
+			StringBuilder sb = new StringBuilder("executed ").append(language).append(" script in ").append(elapsed).append(" ms for [").append(option).append("]");
+			if (debugEnabled) log.debug(sb.toString());
+			//System.out.println(sb.toString());
 		}
 		catch(JPPFScriptingException e)
 		{

@@ -66,6 +66,7 @@
 	<xs:complexType name="Import">
 		<xs:attribute name="source" type="opt:ImportSource"/>
 		<xs:attribute name="location"/>
+    <xs:attribute name="debug" use="optional" default="false">
 	</xs:complexType>
 
 	<xs:complexType name="Script">

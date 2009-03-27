@@ -17,10 +17,11 @@
  */
 package org.jppf.ui.options;
 
-import java.awt.Dimension;
 import java.util.*;
+
 import javax.swing.*;
 import javax.swing.event.*;
+
 import org.jppf.ui.utils.GuiUtils;
 
 /**
@@ -89,6 +90,7 @@ public class ListOption extends AbstractOption
 		{
 			public void valueChanged(ListSelectionEvent e)
 			{
+				if (e.getValueIsAdjusting()) return;
 				List<Object> sel = new ArrayList<Object>();
 				for (Object o: list.getSelectedValues()) sel.add(o);
 				value = sel;
@@ -125,11 +127,6 @@ public class ListOption extends AbstractOption
 		}
 		UIComponent = comp;
 		populateList();
-		if ((width > 0) && (height > 0))
-		{
-			Dimension d = new Dimension(width, height);
-			UIComponent.setPreferredSize(d);
-		}
 		setupValueChangeNotifications();
 	}
 

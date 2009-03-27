@@ -17,9 +17,11 @@
  */
 package org.jppf.ui.options;
 
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
 
-import javax.swing.JComponent;
+import javax.swing.*;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * An option that displays a UI component created through a Java class.
@@ -52,6 +54,7 @@ public class JavaOption extends AbstractOption
 		try
 		{
 			UIComponent = (JComponent) Class.forName(getClassName()).newInstance();
+			if (UIComponent instanceof JPanel) ((JPanel) UIComponent).setLayout(new MigLayout(layoutConstraints));
 			if (mouseListenerClassName != null)
 			{
 				JavaOptionMouseListener ml =

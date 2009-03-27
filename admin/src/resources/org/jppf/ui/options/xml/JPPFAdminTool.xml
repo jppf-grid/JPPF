@@ -18,29 +18,15 @@
 -->
 
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JPPFAdminTool" type="page">
-
 	<property name="label" value="JPPF Monitoring and Administration Tool"/>
-	<property name="scrollable" value="false"/>
-	<property name="orientation" value="vertical"/>
-	<property name="bordered" value="false"/>
-	<property name="main" value="true"/>
-	<script language="javascript" source="org/jppf/ui/options/xml/imports.js"/>
+	<property name="layoutConstraints" value="flowy, fill"/>
+	<script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
 	<initializer type="script">
-		<script language="javascript"><![CDATA[
-			var comp = option.findFirstWithName("/AdminPanels").getUIComponent();
-			var frame = new JFrame(option.getLabel());
-			wa = 
-			{
-				windowClosing: function(event)
-				{
-					var builder = OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("/ChartsBuilder").getUIComponent();
-					builder.getStorage().saveAll();
-					OptionsHandler.savePreferences();
-					System.exit(0);
-				}
-			};
-			frame.addWindowListener(new WindowAdapter(wa));
-			var statsHandler = StatsHandler.getInstance();
+		<script language="groovy"><![CDATA[
+			def comp = option.findFirstWithName("/AdminPanels").getUIComponent();
+			def frame = new JFrame(option.getLabel());
+			frame.addWindowListener(new WindowClosingListener());
+			def statsHandler = StatsHandler.getInstance();
 			comp.setSelectedIndex(0);
 			frame.getContentPane().add(option.getUIComponent());
 			frame.setSize(600, 730);
@@ -53,56 +39,36 @@
 	<!-- ===================================================================== -->
 	
 	<child name="Tabs" type="page">
-		<property name="label" value=""/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="horizontal"/>
-		<property name="bordered" value="false"/>
-		<property name="main" value="false"/>
 		<property name="tooltip" value="The list of drivers to connect to"/>
 
 		<child name="ServerChooser" type="ComboBox">
 			<property name="label" value="Server connection"/>
-			<property name="orientation" value="horizontal"/>
 			<property name="tooltip" value="The list of drivers to connect to"/>
 			<property name="value" value=""/>
 			<initializer type="script">
-				<script language="javascript"><![CDATA[
-					StatsHandler.getInstance().setServerListOption(option);
-					/*
-					var list = StatsHandler.getInstance().getJppfClient().getAllConnections();
-					option.setItems(list);
-					if (!list.isEmpty()) option.setValue(list.get(0));
-					*/
-				]]></script>
+				<script language="groovy">StatsHandler.getInstance().setServerListOption(option)</script>
 			</initializer>
 			<listener type="script">
-				<script language="javascript">StatsHandler.getInstance().setCurrentConnection(option.getValue());</script>
+				<script language="groovy">StatsHandler.getInstance().setCurrentConnection(option.getValue())</script>
 			</listener>
 		</child>
 	
-		<child name="filler" type="Filler">
-			<property name="width" value="1"/>
-			<property name="height" value="1"/>
+		<child name="filler" type="page">
+			<property name="componentConstraints" value="growx, pushx"/>
 		</child>
 
 	</child>
 
 	<child name="AdminPanels" type="TabbedPane">
-	
-		<property name="label" value=""/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="horizontal"/>
-		<property name="bordered" value="false"/>
-		<property name="main" value="false"/>
+		<property name="componentConstraints" value="grow"/>
+		<property name="layoutConstraints" value="fill"/>
 		<property name="tooltip" value="Perform the remote administration of the server"/>
-	
 		<import source="file" location="org/jppf/ui/options/xml/NodeDataPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/StatsPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/ServerChartsPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/ChartsConfigPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/AdminPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/BundleSizeTuningPage.xml"/>
-	
 	</child>
 
 </opt:main>

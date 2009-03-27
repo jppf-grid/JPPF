@@ -22,13 +22,13 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.table.*;
 
+import net.miginfocom.swing.MigLayout;
+
 import org.apache.commons.logging.*;
 import org.jppf.server.JPPFStats;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
-import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.LocalizationUtils;
-import org.jvnet.substance.SubstanceDefaultTableCellRenderer;
 
 /**
  * This class provides a graphical interface for monitoring the status and health 
@@ -62,6 +62,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	public MonitoringPanel()
 	{
 		this.statsHandler = StatsHandler.getInstance();
+		/*
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		add(Box.createVerticalStrut(5));
 		add(makeTablePanel(EXECUTION_PROPS, LocalizationUtils.getLocalized(BASE, "ExecutionTable.label")));
@@ -74,6 +75,13 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		add(Box.createVerticalStrut(5));
 		add(makeTablePanel(CONNECTION_PROPS, LocalizationUtils.getLocalized(BASE, "ConnectionsTable.label")));
 		add(Box.createVerticalGlue());
+		*/
+		setLayout(new MigLayout("fill, flowy"));
+		add(makeTablePanel(EXECUTION_PROPS, LocalizationUtils.getLocalized(BASE, "ExecutionTable.label")), "growx");
+		add(makeTablePanel(NODE_EXECUTION_PROPS, LocalizationUtils.getLocalized(BASE, "NodeExecutionTable.label")), "growx");
+		add(makeTablePanel(TRANSPORT_PROPS, LocalizationUtils.getLocalized(BASE, "NetworkOverheadTable.label")), "growx");
+		add(makeTablePanel(QUEUE_PROPS, LocalizationUtils.getLocalized(BASE, "QueueTable.label")), "growx");
+		add(makeTablePanel(CONNECTION_PROPS, LocalizationUtils.getLocalized(BASE, "ConnectionsTable.label")), "growx");
 		statsHandler.addStatsHandlerListener(this);
 	}
 	
@@ -103,7 +111,9 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	 */
 	private JComponent makeTablePanel(Fields[] props, String title)
 	{
-		JPanel panel = GuiUtils.createBoxPanel(BoxLayout.X_AXIS);
+		//JPanel panel = GuiUtils.createBoxPanel(BoxLayout.X_AXIS);
+		JPanel panel = new JPanel();
+		panel.setLayout(new MigLayout("fillx"));
 		panel.setBorder(BorderFactory.createTitledBorder(title));
 		JTable table = new JTable()
 		{
@@ -115,17 +125,17 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		MonitorTableModel model = new MonitorTableModel(props);
 		table.setModel(model);
 		table.setOpaque(true);
-		DefaultTableCellRenderer rend1 = new SubstanceDefaultTableCellRenderer();
+		DefaultTableCellRenderer rend1 = new DefaultTableCellRenderer();
 		rend1.setHorizontalAlignment(JLabel.RIGHT);
 		rend1.setOpaque(true);
 		table.getColumnModel().getColumn(1).setCellRenderer(rend1);
-		DefaultTableCellRenderer rend0 = new SubstanceDefaultTableCellRenderer();
+		DefaultTableCellRenderer rend0 = new DefaultTableCellRenderer();
 		rend0.setHorizontalAlignment(JLabel.LEFT);
 		rend0.setOpaque(true);
 		table.getColumnModel().getColumn(0).setCellRenderer(rend0);
 	  for (int i=0; i<model.getColumnCount(); i++) table.sizeColumnsToFit(i);
 		tableModels.add(model);
-		panel.add(table);
+		panel.add(table, "grow 100 0");
 		//panel.add(Box.createGlue());
 		table.setShowGrid(false);
 		return panel;

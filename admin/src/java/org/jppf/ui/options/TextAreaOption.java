@@ -17,8 +17,6 @@
  */
 package org.jppf.ui.options;
 
-import java.awt.Dimension;
-
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.Document;
@@ -35,6 +33,10 @@ public class TextAreaOption extends AbstractOption
 	 * The underlying UI component used to edit the value of this option.
 	 */
 	private JTextArea textArea = null;
+	/**
+	 * Determines whether the text area is editable.
+	 */
+	private boolean editable = false;
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -46,10 +48,10 @@ public class TextAreaOption extends AbstractOption
 
 	/**
 	 * Initialize this text area option with the specified parameters.
-	 * @param name this component's name.
-	 * @param label the label displayed with the text area. 
-	 * @param tooltip the tooltip associated with the text area.
-	 * @param value the initial value of this component.
+	 * @param name - this component's name.
+	 * @param label - the label displayed with the text area. 
+	 * @param tooltip - the tooltip associated with the text area.
+	 * @param value - the initial value of this component.
 	 */
 	public TextAreaOption(String name, String label, String tooltip, String value)
 	{
@@ -68,7 +70,7 @@ public class TextAreaOption extends AbstractOption
 		textArea = new JTextArea((String) value);
 		textArea.setBorder(BorderFactory.createEmptyBorder());
 		if (toolTipText != null) textArea.setToolTipText(toolTipText);
-		textArea.setEditable(false);
+		textArea.setEditable(editable);
 		//textArea.setOpaque(false);
 		if (scrollable)
 		{
@@ -82,13 +84,6 @@ public class TextAreaOption extends AbstractOption
 			mainPanel.setBorder(BorderFactory.createTitledBorder(label));
 			mainPanel.add(textArea);
 			UIComponent = mainPanel;
-		}
-		if ((width > 0) && (height > 0))
-		{
-			Dimension d = new Dimension(width, height);
-			textArea.setPreferredSize(d);
-			textArea.setMinimumSize(d);
-			textArea.setMaximumSize(d);
 		}
 		setupValueChangeNotifications();
 	}
@@ -169,7 +164,7 @@ public class TextAreaOption extends AbstractOption
 	 */
 	public boolean isEditable()
 	{
-		return textArea.isEditable();
+		return editable;
 	}
 
 	/**
@@ -178,7 +173,8 @@ public class TextAreaOption extends AbstractOption
 	 */
 	public void setEditable(boolean editable)
 	{
-		textArea.setEditable(editable);
+		this.editable = editable;
+		if (textArea != null) textArea.setEditable(editable);
 	}
 
 	/**

@@ -20,11 +20,7 @@
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeDataPage" type="page">
 	<!-- test comment for save -->
 	<property name="label" value="Node Data"/>
-	<property name="scrollable" value="false"/>
-	<property name="orientation" value="vertical"/>
-	<property name="bordered" value="false"/>
-	<property name="main" value="true"/>
-	<property name="tooltip" value=""/>
+	<property name="layoutConstraints" value="flowy, fill, gap rel"/>
 
 	<!-- ===================================================================== -->
 	<!--                        Buttons area                                   -->
@@ -32,18 +28,11 @@
 
 	<child name="Actions" type="page">
 		<property name="label" value="Actions"/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="horizontal"/>
-		<property name="bordered" value="false"/>
-		<property name="main" value="false"/>
+		<property name="componentConstraints" value="gap rel, cell 0 0"/>
 	
 		<child name="TreeStructureActions" type="page">
 			<property name="label" value="Tree Structure Actions"/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
-			<property name="bordered" value="false"/>
-			<property name="main" value="false"/>
-			<property name="insets" value="5,5,5,5"/>
+			<property name="layoutConstraints" value="flowy"/>
 	
 			<child name="Auto" type="Boolean">
 				<property name="label" value="Toggle automatic structure refresh"/>
@@ -51,9 +40,9 @@
 				<property name="value" value="true"/>
 				<property name="persistent" value="true"/>
 				<listener type="script">
-					<script language="javascript"><![CDATA[
-						b = option.getValue().booleanValue();
-						var handler = option.findFirstWithName("/Treetable").getHandler();
+					<script language="groovy"><![CDATA[
+						def b = option.getValue().booleanValue();
+						def handler = option.findFirstWithName("/Treetable").getHandler();
 						if (b) handler.startRefreshDriverTimer();
 						else handler.stopRefreshDriverTimer();
 					]]></script>
@@ -62,16 +51,10 @@
 	
 			<child name="RefreshButtonPanel" type="page">
 				<property name="label" value="RefreshButtonPanel"/>
-				<property name="scrollable" value="false"/>
-				<property name="orientation" value="horizontal"/>
-				<property name="bordered" value="false"/>
-				<property name="main" value="false"/>
 		
 				<child name="button.refresh" type="Button">
-					<property name="label" value=""/>
-					<property name="tooltip" value=""/>
 					<listener type="script">
-						<script language="javascript">option.findFirstWithName("/Treetable").getHandler().refresh(true);</script>
+						<script language="groovy">option.findFirstWithName("/Treetable").getHandler().refresh(true)</script>
 					</listener>
 				</child>
 		
@@ -86,33 +69,20 @@
 
 		<child name="TreeDisplayActions" type="page">
 			<property name="label" value="Tree Display Actions"/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
-			<property name="bordered" value="false"/>
-			<property name="main" value="false"/>
-			<property name="insets" value="5,5,5,5"/>
+			<property name="layoutConstraints" value="flowy"/>
 	
 			<child name="button.expand" type="Button">
-				<property name="label" value=""/>
-				<property name="tooltip" value=""/>
 				<listener type="script">
-					<script language="javascript">option.findFirstWithName("/Treetable").getTreeTable().expandAll();</script>
+					<script language="groovy">option.findFirstWithName("/Treetable").getTreeTable().expandAll()</script>
 				</listener>
 			</child>
 	
 			<child name="button.collapse" type="Button">
-				<property name="label" value=""/>
-				<property name="tooltip" value=""/>
 				<listener type="script">
-					<script language="javascript">option.findFirstWithName("/Treetable").getTreeTable().collapseAll();</script>
+					<script language="groovy">option.findFirstWithName("/Treetable").getTreeTable().collapseAll()</script>
 				</listener>
 			</child>
 
-			<child name="filler" type="Filler">
-				<property name="width" value="10"/>
-				<property name="height" value="10"/>
-			</child>
-	
 		</child>
 
 	</child>
@@ -121,10 +91,15 @@
 	<!--                      Tree table area                                  -->
 	<!-- ===================================================================== -->
 
-	<child name="Treetable" type="NodeDataPanel">
-		<property name="label" value=""/>
-		<property name="tooltip" value=""/>
-		<property name="value" value=""/>
+	<child name="treeTableContainer" type="page">
+		<property name="layoutConstraints" value="fill, nogrid"/>
+		<property name="componentConstraints" value="grow, span, push, cell 0 1, width 0"/>
+	
+		<child name="Treetable" type="NodeDataPanel">
+			<property name="componentConstraints" value="grow, width 0"/>
+			<property name="value" value=""/>
+		</child>
+
 	</child>
 	
 </opt:main>

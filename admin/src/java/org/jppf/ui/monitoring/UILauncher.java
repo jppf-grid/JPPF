@@ -54,6 +54,7 @@ public class UILauncher
 			if ((args  == null) || (args.length < 2))
 				throw new Exception("Usage: UILauncher page_location location_source");
 			String s = System.getProperty("swing.defaultlaf");
+			//System.out.println("system L&F: " + UIManager.getSystemLookAndFeelClassName());
 			if ((s == null) || SubstanceLookAndFeel.class.getName().equals(s))
 			{
 				UIManager.put(SubstanceLookAndFeel.ENABLE_INVERTED_THEMES, Boolean.TRUE);

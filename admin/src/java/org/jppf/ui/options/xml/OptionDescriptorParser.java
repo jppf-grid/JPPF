@@ -299,6 +299,8 @@ public class OptionDescriptorParser
 		desc.type = "import";
 		desc.setProperty("source", attrMap.getNamedItem("source").getNodeValue());
 		desc.setProperty("location", attrMap.getNamedItem("location").getNodeValue());
+		Node debugNode = attrMap.getNamedItem("debug");
+		if (debugNode != null) desc.setProperty("debug", debugNode.getNodeValue());
 		return desc;
 	}
 }

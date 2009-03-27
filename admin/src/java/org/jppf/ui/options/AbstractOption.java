@@ -17,12 +17,14 @@
  */
 package org.jppf.ui.options;
 
-import static org.jppf.ui.utils.GuiUtils.addLayoutComp;
-import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+
 import javax.swing.*;
+
+import net.miginfocom.swing.MigLayout;
+
+import org.apache.commons.logging.*;
 import org.jppf.ui.options.event.*;
-import org.jppf.ui.utils.GuiUtils;
 
 /**
  * Default abstract implementation of the <code>Option</code> interface.
@@ -30,6 +32,14 @@ import org.jppf.ui.utils.GuiUtils;
  */
 public abstract class AbstractOption extends AbstractOptionElement implements Option
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(AbstractOption.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The value of this option.
 	 */
@@ -94,6 +104,7 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	public void fireValueChanged()
 	{
 		if (!eventsEnabled) return;
+		if (debugEnabled) log.debug("firing event for " + this);
 		for (ValueChangeListener listener: listeners)
 		{
 			listener.valueChanged(new ValueChangeEvent(this));
@@ -107,74 +118,27 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	protected abstract void setupValueChangeNotifications();
 
 	/**
-	 * Layout 2 components according to this option's orientation.
-	 * This method adds a filler (invisible) component between the 2 components,
-	 * which will grow or decrease whenever the enclosing panel is resized.
+	 * Layout 2 components according to the specified layout constraints.
 	 * @param comp1 the first component to layout.
 	 * @param comp2 the second component to layout.
 	 * @return a <code>JPanel</code> instance, enclosing the 2 components plus the filler.
 	 */
 	protected JPanel layoutComponents(JComponent comp1, JComponent comp2)
 	{
-		return layoutComponents(comp1, comp2, this.orientation);
-	}
-
-	/**
-	 * Layout 2 components according to the specified orientation.
-	 * This method adds a filler (invisible) component between the 2 components,
-	 * which will grow or decrease whenever the enclosing panel is resized.
-	 * @param comp1 the first component to layout.
-	 * @param comp2 the second component to layout.
-	 * @param orientation the orientation to use to compute the layout.
-	 * @return a <code>JPanel</code> instance, enclosing the 2 components plus the filler.
-	 */
-	protected JPanel layoutComponents(JComponent comp1, JComponent comp2, int orientation)
-	{
 		JPanel panel = new JPanel();
+		String s = getLayoutConstraints().trim();
+		MigLayout mig = new MigLayout(s);
+		panel.setLayout(mig);
 		if ((comp1 == null) && (comp2 == null)) return panel;
 		if ((comp1 != null) && (comp2 != null))
 		{
-			GridBagLayout g = new GridBagLayout();
-			panel.setLayout(g);
-	    GridBagConstraints c = new GridBagConstraints();
-			c.insets = insets;
-			if (orientation == HORIZONTAL)
-			{
-				c.gridy = 0;
-				c.anchor = GridBagConstraints.LINE_START;
-			}
-			else
-			{
-				c.gridx  = 0;
-				c.anchor = GridBagConstraints.WEST;
-				//c.anchor = GridBagConstraints.NORTHWEST;
-			}
-			addLayoutComp(panel, g, c, comp1);
-			c.anchor = GridBagConstraints.CENTER;
-			if (orientation == HORIZONTAL) c.weightx = 1.0;
-			else c.weighty = 1.0;
-			JComponent filler = GuiUtils.createFiller(1, 1);
-			addLayoutComp(panel, g, c, filler);
-			if (orientation == HORIZONTAL)
-			{
-				c.anchor = GridBagConstraints.LINE_END;
-				c.weightx = 0.0;
-			}
-			else
-			{
-				c.anchor = GridBagConstraints.WEST;
-				//c.anchor = GridBagConstraints.SOUTHWEST;
-				c.weighty = 0.0;
-			}
-			addLayoutComp(panel, g, c, comp2);
+			panel.add(comp1, "align left, growx 0, pushx");
+			panel.add(comp2, "gap rel, grow");
 		}
 		else
 		{
-			int or = (orientation == HORIZONTAL) ? BoxLayout.X_AXIS : BoxLayout.Y_AXIS;
-			panel.setLayout(new BoxLayout(panel, or));
 			panel.add(comp1 != null ? comp1 : comp2);
 		}
-
 		return panel;
 	}
 

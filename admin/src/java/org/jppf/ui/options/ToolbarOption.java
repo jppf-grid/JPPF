@@ -17,8 +17,8 @@
  */
 package org.jppf.ui.options;
 
-import java.awt.Dimension;
 import java.util.*;
+
 import javax.swing.JToolBar;
 
 /**
@@ -46,7 +46,6 @@ public class ToolbarOption extends AbstractOptionElement implements OptionsPage
 	{
 		JToolBar toolbar = new JToolBar(JToolBar.HORIZONTAL);
 		toolbar.setFloatable(false);
-		if ((width > 0) && (height > 0)) toolbar.setPreferredSize(new Dimension(width, height));
 		UIComponent = toolbar;
 		toolbar.setOpaque(false);
 	}

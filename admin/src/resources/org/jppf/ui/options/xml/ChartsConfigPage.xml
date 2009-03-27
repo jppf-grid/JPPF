@@ -18,16 +18,13 @@
 -->
 
 <opt:main name="ChartsConfiguration" type="page" xmlns:opt="http://www.jppf.org/Options.xsd">
-
 	<property name="label" value="Charts Configuration"/>
 	<property name="scrollable" value="true"/>
-	<property name="orientation" value="vertical"/>
-	<property name="bordered" value="false"/>
-	<property name="main" value="true"/>
-	<script language="javascript" source="org/jppf/ui/options/xml/imports.js"/>
-	<script language="javascript" source="org/jppf/ui/options/xml/chartsConfig.js"/>
+	<property name="layoutConstraints" value="fill, flowy"/>
+	<script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
+	<script language="groovy" source="org/jppf/ui/options/xml/chartsConfig.groovy"/>
 	<initializer type="script">
-		<script language="javascript">initMain();</script>
+		<script language="groovy">initMain()</script>
 	</initializer>
 
 	<!-- ===================================================================== -->
@@ -36,23 +33,19 @@
 
 	<child name="Top" type="page">
 		<property name="label" value="Top"/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="horizontal"/>
-		<property name="bordered" value="false"/>
-		<property name="main" value="false"/>
+		<property name="layoutConstraints" value="fill"/>
+		<property name="componentConstraints" value="growx"/>
 
 		<child name="TabsBtnPanel" type="page">
 			<property name="label" value="Monitor"/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
-			<property name="bordered" value="false"/>
-			<property name="main" value="false"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="growx 0"/>
 
 			<child name="TabNew" type="Button">
 				<property name="label" value="New"/>
 				<property name="tooltip" value="Create a new tab"/>
 				<listener type="script">
-					<script language="javascript">doTabNew();</script>
+					<script language="groovy">doTabNew()</script>
 				</listener>
 			</child>
 
@@ -60,7 +53,7 @@
 				<property name="label" value="Remove"/>
 				<property name="tooltip" value="Remove the tab"/>
 				<listener type="script">
-					<script language="javascript">doTabRemove();</script>
+					<script language="groovy">doTabRemove()</script>
 				</listener>
 			</child>
 
@@ -68,7 +61,7 @@
 				<property name="label" value="Up"/>
 				<property name="tooltip" value="Move the tab one position up"/>
 				<listener type="script">
-					<script language="javascript">tabMoved();</script>
+					<script language="groovy">tabMoved()</script>
 				</listener>
 			</child>
 
@@ -76,49 +69,35 @@
 				<property name="label" value="Down"/>
 				<property name="tooltip" value="Move the tab one position down"/>
 				<listener type="script">
-					<script language="javascript">tabMoved();</script>
+					<script language="groovy">tabMoved()</script>
 				</listener>
-			</child>
-
-			<child name="filler" type="Filler">
-				<property name="width" value="1"/>
-				<property name="height" value="1"/>
 			</child>
 
 		</child>
 
 		<child name="TabsList" type="List">
 			<property name="label" value="Tabs"/>
-			<property name="orientation" value="horizontal"/>
 			<property name="tooltip" value="The list of active tabs"/>
 			<property name="scrollable" value="true"/>
 			<property name="bordered" value="true"/>
+			<property name="componentConstraints" value="growx, push"/>
 			<property name="value" value=""/>
 			<property name="selection" value="single"/>
-			<property name="width" value="140"/>
-			<property name="height" value="80"/>
 			<listener type="script">
-				<script language="javascript">doTabsList();</script>
+				<script language="groovy">doTabsList()</script>
 			</listener>
-		</child>
-
-		<child name="filler" type="Filler">
-			<property name="width" value="15"/>
-			<property name="height" value="1"/>
 		</child>
 
 		<child name="ChartsBtnPanel" type="page">
 			<property name="label" value="Monitor"/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
-			<property name="bordered" value="false"/>
-			<property name="main" value="false"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="growx 0"/>
 
 			<child name="ChartRemove" type="Button">
 				<property name="label" value="Remove"/>
 				<property name="tooltip" value="Remove the chart"/>
 				<listener type="script">
-					<script language="javascript">doChartRemove();</script>
+					<script language="groovy">doChartRemove()</script>
 				</listener>
 			</child>
 
@@ -126,7 +105,7 @@
 				<property name="label" value="Up"/>
 				<property name="tooltip" value="Move the chart one position up"/>
 				<listener type="script">
-					<script language="javascript">chartMoved();</script>
+					<script language="groovy">chartMoved()</script>
 				</listener>
 			</child>
 
@@ -134,13 +113,8 @@
 				<property name="label" value="Down"/>
 				<property name="tooltip" value="Move the chart one position down"/>
 				<listener type="script">
-					<script language="javascript">chartMoved();</script>
+					<script language="groovy">chartMoved()</script>
 				</listener>
-			</child>
-
-			<child name="filler" type="Filler">
-				<property name="width" value="1"/>
-				<property name="height" value="1"/>
 			</child>
 
 		</child>
@@ -152,17 +126,10 @@
 			<property name="selection" value="single"/>
 			<property name="scrollable" value="true"/>
 			<property name="bordered" value="true"/>
-			<property name="orientation" value="horizontal"/>
-			<property name="width" value="140"/>
-			<property name="height" value="80"/>
+			<property name="componentConstraints" value="growx, push"/>
 			<listener type="script">
-				<script language="javascript">doChartsList();</script>
+				<script language="groovy">doChartsList()</script>
 			</listener>
-		</child>
-
-		<child name="filler" type="Filler">
-			<property name="width" value="1"/>
-			<property name="height" value="1"/>
 		</child>
 
 	</child>
@@ -173,23 +140,19 @@
 
 	<child name="Bottom" type="page">
 		<property name="label" value="Bottom"/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="horizontal"/>
-		<property name="bordered" value="false"/>
-		<property name="main" value="false"/>
+		<property name="layoutConstraints" value="fill"/>
+		<property name="componentConstraints" value="growx"/>
 
 		<child name="ConfigFields" type="page">
 			<property name="label" value="Configuration"/>
 			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
 			<property name="bordered" value="true"/>
-			<property name="main" value="false"/>
 
 			<child name="TabName" type="ComboBox">
 				<property name="label" value="Tab name"/>
 				<property name="tooltip" value="Select the name of the tab this chart will be displayed in"/>
 				<property name="value" value="Some tab name"/>
-				<property name="orientation" value="horizontal"/>
 				<item name="Some tab name" selected="true"/>
 			</child>
 	
@@ -204,9 +167,8 @@
 				<property name="label" value="Chart type"/>
 				<property name="tooltip" value="Select the type of chart"/>
 				<property name="value" value="3D Bar Chart"/>
-				<property name="orientation" value="horizontal"/>
 				<listener type="script">
-					<script language="javascript">changePreview(getPopulatedConfiguration());</script>
+					<script language="groovy">changePreview(getPopulatedConfiguration())</script>
 				</listener>
 			</child>
 	
@@ -216,14 +178,12 @@
 				<property name="value" value="0"/>
 				<property name="minValue" value="0"/>
 				<property name="maxValue" value="5"/>
-				<property name="orientation" value="horizontal"/>
 			</child>
 
 			<child name="Unit" type="PlainText">
 				<property name="label" value="Unit"/>
 				<property name="tooltip" value="Unit used in the chart labels"/>
 				<property name="value" value=""/>
-				<property name="orientation" value="horizontal"/>
 			</child>
 	
 		</child>
@@ -235,26 +195,22 @@
 			<property name="selection" value="multiple"/>
 			<property name="scrollable" value="true"/>
 			<property name="bordered" value="true"/>
-			<property name="orientation" value="horizontal"/>
-			<property name="width" value="220"/>
-			<property name="height" value="200"/>
 			<listener type="script">
-				<script language="javascript">changePreview(getPopulatedConfiguration());</script>
+				<script language="groovy">changePreview(getPopulatedConfiguration())</script>
 			</listener>
 		</child>
 
 		<child name="ChartActionsPanel" type="page">
 			<property name="label" value="Actions"/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="growx 0"/>
 			<property name="bordered" value="true"/>
-			<property name="main" value="false"/>
 
 			<child name="SaveNewChart" type="Button">
 				<property name="label" value="Save as new"/>
 				<property name="tooltip" value="Save the chart configuration as a new chart"/>
 				<listener type="script">
-					<script language="javascript">doSaveNewChart();</script>
+					<script language="groovy">doSaveNewChart()</script>
 				</listener>
 			</child>
 
@@ -262,33 +218,19 @@
 				<property name="label" value="Update"/>
 				<property name="tooltip" value="Update the chart with the new configuration"/>
 				<listener type="script">
-					<script language="javascript">doUpdateChart();</script>
+					<script language="groovy">doUpdateChart()</script>
 				</listener>
 			</child>
 
-			<child name="filler" type="Filler">
-				<property name="width" value="1"/>
-				<property name="height" value="1"/>
-			</child>
-
-		</child>
-
-		<child name="filler" type="Filler">
-			<property name="width" value="1"/>
-			<property name="height" value="1"/>
 		</child>
 
 	</child>
 
 	<child name="ChartPreview" type="page">
 		<property name="label" value="Preview"/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="horizontal"/>
+		<property name="componentConstraints" value="grow, push"/>
 		<property name="bordered" value="true"/>
-		<property name="main" value="false"/>
 		<property name="tooltip" value="Display a preview of the chart with the current configuration parameters"/>
-		<property name="width" value="200"/>
-		<property name="height" value="150"/>
 	</child>
 
 </opt:main>

@@ -70,19 +70,6 @@ public final class GuiUtils
 	}
 
 	/**
-	 * Add a component to a panel with the specified constaints.
-	 * @param panel the panel to add the component to.
-	 * @param g the <code>GridBagLayout</code> set on the panel.
-	 * @param c the constraints to apply to the component.
-	 * @param comp the component to add.
-	 */
-	public static void addLayoutComp(JPanel panel, GridBagLayout g, GridBagConstraints c, Component comp)
-	{
-		g.setConstraints(comp, c);
-    panel.add(comp);
-	}
-
-	/**
 	 * Create a filler component with the specified fixed size. The resulting component can be used as a
 	 * separator for layout purposes.
 	 * @param width the component's width.

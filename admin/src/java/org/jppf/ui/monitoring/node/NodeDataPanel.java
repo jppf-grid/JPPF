@@ -21,6 +21,8 @@ package org.jppf.ui.monitoring.node;
 import java.util.Map;
 
 import javax.swing.JScrollPane;
+import javax.swing.table.TableColumn;
+import javax.swing.tree.TreePath;
 
 import org.apache.commons.logging.*;
 import org.jdesktop.swingx.JXTreeTable;
@@ -112,11 +114,22 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	  treeTable = new JXTreeTable(model);
 	  //setViewportView(treeTable);
 		treeTable.expandAll();
-	  //for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
-		treeTable.setHorizontalScrollEnabled(false);
+		//treeTable.setHorizontalScrollEnabled(false);
 		treeTable.setAutoResizeMode(JXTreeTable.AUTO_RESIZE_OFF);
-		setUIComponent(new JScrollPane(treeTable));
 		treeTable.addMouseListener(new TreeTableMouseListener());
+		JScrollPane sp = new JScrollPane(treeTable);
+		setUIComponent(sp);
+		int[] widths = { 200, 60, 60, 60, 60, 200 };
+		for (int i=0; i<widths.length; i++)
+		{
+			TableColumn c = treeTable.getColumn(i);
+			c.setMinWidth(widths[i]);
+			//c.setMaxWidth(widths[i]);
+			c.setPreferredWidth(widths[i]);
+		}
+	  for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
+		treeTable.setAutoResizeMode(JXTreeTable.AUTO_RESIZE_LAST_COLUMN);
+	  //for (int i=model.getColumnCount()-1; i<=0; i--) treeTable.sizeColumnsToFit(i);
 	}
 
 	/**
@@ -290,5 +303,45 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 		treeTable.expandAll();
 		treeTable.sizeColumnsToFit(0);
 	  //for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
+	}
+
+	/**
+	 * Determine whether only nodes are currently selected.
+	 * @return true if at least one node and no driver is selected, false otherwise. 
+	 */
+	public boolean areOnlyNodesSelected()
+	{
+		return areOnlyTypeSelected(true);
+	}
+
+	/**
+	 * Determine whether only drivers are currently selected.
+	 * @return true if at least one driver and no node is selected, false otherwise. 
+	 */
+	public boolean areOnlyDriversSelected()
+	{
+		return areOnlyTypeSelected(false);
+	}
+
+	/**
+	 * Determine whether only tree elements of the specified type are currently selected.
+	 * @param checkNodes true to check if nodes only are selected, false to check if drivers only are selected.
+	 * @return true if at least one element of the specified type and no element of another type is selected, false otherwise. 
+	 */
+	private boolean areOnlyTypeSelected(boolean checkNodes)
+	{
+		int[] rows = treeTable.getSelectedRows();
+		if ((rows == null) || (rows.length <= 0)) return false;
+		int nbNodes = 0;
+		int nbDrivers = 0;
+		for (int n: rows)
+		{
+			TreePath path = treeTable.getPathForRow(n);
+			DefaultMutableTreeTableNode treeNode = (DefaultMutableTreeTableNode) path.getLastPathComponent();
+			if (treeNode.getParent() == null) continue;
+			if (treeNode.getUserObject() instanceof NodeInfoHolder) nbNodes++;
+			else nbDrivers++;
+		}
+		return (checkNodes && (nbNodes > 0) && (nbDrivers == 0)) || (!checkNodes && (nbNodes == 0) && (nbDrivers > 0));
 	}
 }

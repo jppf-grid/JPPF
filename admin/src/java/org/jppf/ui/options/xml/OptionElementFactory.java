@@ -19,11 +19,12 @@ package org.jppf.ui.options.xml;
 
 import java.util.*;
 
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 
 import org.jppf.ui.monitoring.node.NodeDataPanel;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.xml.OptionDescriptor.ItemDescriptor;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * Factory class used to build UI eleemnts from XML descriptors.
@@ -56,7 +57,6 @@ public class OptionElementFactory
 		OptionPanel page = new OptionPanel();
 		page.setEventsEnabled(false);
 		builder.initCommonAttributes((OptionPanel) page, desc);
-		page.setMainPage(desc.getBoolean("main"));
 		page.createUI();
 		for (OptionDescriptor child: desc.children) page.add(builder.build(child));
 		page.setEventsEnabled(true);
@@ -110,8 +110,8 @@ public class OptionElementFactory
 		option.setEventsEnabled(false);
 		builder.initCommonOptionAttributes(option, desc);
 		//option.setBordered(desc.getBoolean("bordered", true));
-		option.createUI();
 		option.setEditable(desc.getBoolean("editable", false));
+		option.createUI();
 		option.setEventsEnabled(true);
 		return option;
 	}
@@ -307,6 +307,8 @@ public class OptionElementFactory
 		builder.initCommonAttributes(option, desc);
 		option.setDividerWidth(desc.getInt("dividerWidth", 4));
 		option.setResizeWeight(desc.getDouble("resizeWeight", 0.5d));
+		String s = desc.getString("orientation", "horizontal");
+		option.setOrientation("horizontal".equalsIgnoreCase(s) ? SplitPaneOption.HORIZONTAL : SplitPaneOption.VERTICAL);
 		option.createUI();
 		for (OptionDescriptor child: desc.children) option.add(builder.build(child));
 		return option;
@@ -373,11 +375,35 @@ public class OptionElementFactory
 	{
 		OptionsPageBuilder builder = new OptionsPageBuilder(true);
 		OptionElement elt = null;
-		if ("url".equalsIgnoreCase(desc.getProperty("source")))
-			elt = builder.buildPageFromURL(desc.getProperty("location"), builder.getBaseName());
-		else elt = builder.buildPage(desc.getProperty("location"), null);
-		//OptionsHandler.addPage(elt);
+		String source = desc.getProperty("source");
+		String location = desc.getProperty("location");
+		if ("url".equalsIgnoreCase(source)) elt = builder.buildPageFromURL(location, builder.getBaseName());
+		else elt = builder.buildPage(location, null);
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false)) addDebugComp(elt, source, location);
 		return elt;
+	}
+
+	/**
+	 * Add an invisible component from which to get a popup menu to reload the page.
+	 * @param elt - the option to debug.
+	 * @param source - determines whether the XML is loaded from a url or file location.
+	 * @param location - where to load the xml descriptor from.
+	 */
+	public void addDebugComp(OptionElement elt, String source, String location)
+	{
+		JLabel label = new JLabel("X")
+		{
+			public java.awt.Color getBackground()
+			{
+				return java.awt.Color.red;
+			}
+		};
+		label.setMinimumSize(new java.awt.Dimension(10, 10));
+		label.setBackground(java.awt.Color.red);
+		JComponent comp = elt.getUIComponent();
+		if (comp instanceof JScrollPane) comp = (JComponent) ((JScrollPane) comp).getViewport().getView();
+		comp.add(label, "w 10:10:10, h 10:10:10", 0);
+		label.addMouseListener(new DebugMouseListener(elt, source, location));
 	}
 
 	/**

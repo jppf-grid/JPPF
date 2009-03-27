@@ -15,29 +15,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.ui.options;
 
-import java.util.List;
+package org.jppf.ui.options.event;
+
+import java.awt.event.*;
+
+import org.jppf.ui.monitoring.charts.config.JPPFChartBuilder;
+import org.jppf.ui.options.factory.OptionsHandler;
 
 /**
- * Interface for dynamic UI components representing a page (or panel) container. 
+ * 
  * @author Laurent Cohen
  */
-public interface OptionsPage extends OptionElement
+public class WindowClosingListener extends WindowAdapter
 {
 	/**
-	 * Add an element to this options page.
-	 * @param element the element to add.
+	 * Process the closing of the main gframe.
+	 * @param e - the event we're interested in.
+	 * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
 	 */
-	void add(OptionElement element);
-	/**
-	 * Remove an element from this options page.
-	 * @param element the element to remove.
-	 */
-	void remove(OptionElement element);
-	/**
-	 * Get the options in this page.
-	 * @return a list of <code>Option</code> instances.
-	 */
-	List<OptionElement> getChildren();
+	public void windowClosing(WindowEvent e)
+	{
+		JPPFChartBuilder builder = (JPPFChartBuilder) OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("/ChartsBuilder").getUIComponent();
+		builder.getStorage().saveAll();
+		OptionsHandler.savePreferences();
+		System.exit(0);
+	}
 }

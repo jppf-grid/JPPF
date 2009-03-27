@@ -17,48 +17,45 @@
 	limitations under the License.
 -->
 
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeThreadPoolPanel" type="page">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="nodeConfigurationUpdatePanel" type="page">
 	<property name="label" value="Update number of threads and priority"/>
-	<property name="layoutConstraints" value="flowy"/>
+	<property name="layoutConstraints" value="flowy, fill"/>
 	<property name="componentConstraints" value=""/>
 
 	<!-- ===================================================================== -->
-	<!--                    Server Chooser Panel                               -->
+	<!--                          Text area                                    -->
 	<!-- ===================================================================== -->
-	
-	<child name="threadFields" type="page">
-		<property name="label" value=""/>
-		<property name="layoutConstraints" value="fill, flowy"/>
-		<property name="componentConstraints" value=""/>
-		<property name="tooltip" value="Settings of the node's execution thread pool"/>
 
-		<child name="nbThreads" type="SpinnerNumber">
-			<property name="label" value="Number of threads"/>
-			<property name="tooltip" value="Number of threads in the node's execution thread pool"/>
-			<property name="value" value="1"/>
-			<property name="minValue" value="1"/>
-			<property name="maxValue" value="10000"/>
+	<child name="mainArea" type="page">
+		<property name="layoutConstraints" value="fill, flowy"/>
+		<property name="componentConstraints" value="grow, push"/>
+		<property name="bordered" value="true"/>
+
+		<child name="forceReconnect" type="Boolean">
+			<property name="label" value="Force Reconnection"/>
+			<property name="tooltip" value="Determines whether the node should reconnect after its configuration is updated"/>
+			<property name="value" value="true"/>
 			<property name="persistent" value="true"/>
 		</child>
 
-		<child name="threadPriority" type="SpinnerNumber">
-			<property name="label" value="Threads priority (1 - 10)"/>
-			<property name="tooltip" value="Priority of the threads in the node's execution thread pool"/>
-			<property name="value" value="1"/>
-			<property name="minValue" value="1"/>
-			<property name="maxValue" value="10"/>
-			<property name="persistent" value="true"/>
+		<child name="configProperties" type="TextArea">
+			<property name="scrollable" value="true"/>
+			<property name="editable" value="true"/>
+			<property name="label" value="JPPF Configuration"/>
+			<property name="tooltip" value="Properties of the JPPF configuration"/>
+			<property name="value" value=""/>
+			<property name="componentConstraints" value="gaptop unrel, grow, push, w 400, h 300"/>
 		</child>
 
 	</child>
 
 	<child name="threadButtons" type="page">
 		<property name="layoutConstraints" value="fill"/>
-		<property name="componentConstraints" value=""/>
-		<property name="tooltip" value="Validate or cancel the update"/>
+		<property name="componentConstraints" value="growx 0"/>
+		<property name="tooltip" value="Validate or cancel the updates"/>
 
 		<child name="nodeThreadsOK" type="Button">
-			<property name="label" value="OK"/>
+			<property name="label" value="Update"/>
 			<property name="tooltip" value="Apply new settings by sending them to the node"/>
 		</child>
 

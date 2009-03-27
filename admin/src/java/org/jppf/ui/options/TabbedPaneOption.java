@@ -17,9 +17,10 @@
  */
 package org.jppf.ui.options;
 
-import java.awt.Dimension;
 import java.util.*;
+
 import javax.swing.*;
+
 import org.jppf.ui.utils.GuiUtils;
 
 /**
@@ -51,7 +52,6 @@ public class TabbedPaneOption extends AbstractOptionElement implements OptionsPa
 	{
 		JTabbedPane pane = new JTabbedPane();
 		pane.setDoubleBuffered(true);
-		if ((width > 0) && (height > 0)) pane.setPreferredSize(new Dimension(width, height));
 		UIComponent = pane;
 		pane.setOpaque(false);
 	}

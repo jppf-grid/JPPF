@@ -20,7 +20,6 @@ package org.jppf.ui.monitoring.charts.config;
 import static org.jppf.ui.monitoring.charts.ChartType.*;
 import static org.jppf.ui.monitoring.data.Fields.*;
 
-import java.awt.Color;
 import java.util.*;
 
 import javax.swing.*;
@@ -30,11 +29,6 @@ import org.jppf.ui.monitoring.charts.*;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.utils.GuiUtils;
-import org.jvnet.lafwidget.LafWidget;
-import org.jvnet.lafwidget.tabbed.*;
-import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.color.ColorScheme;
-import org.jvnet.substance.theme.*;
 
 /**
  * This class is used as a factory to create different charts, as well as for propagating the data updates
@@ -71,6 +65,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 	{
 		storage = new PreferencesStorage(this);
 		initHandlerMap();
+		/*
 		String s = System.getProperty("swing.defaultlaf");
 		if ((s == null) || SubstanceLookAndFeel.class.getName().equals(s))
 		{
@@ -105,6 +100,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 				}
 			});
 		}
+		*/
 		createInitialCharts();
 		StatsHandler.getInstance().addStatsHandlerListener(this);
 	}

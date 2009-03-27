@@ -20,18 +20,10 @@
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ChartsPage" type="page">
 	<!-- test comment for save -->
 	<property name="label" value="Charts"/>
-	<property name="scrollable" value="false"/>
-	<property name="orientation" value="vertical"/>
-	<property name="bordered" value="false"/>
-	<property name="main" value="true"/>
-	<property name="tooltip" value=""/>
-	<script language="javascript">BASE = "org.jppf.ui.i18n.ChartsPage";</script>
+	<script language="groovy">BASE = "org.jppf.ui.i18n.ChartsPage"</script>
 
 	<child name="ChartsBuilder" type="Java">
 		<property name="class" value="org.jppf.ui.monitoring.charts.config.JPPFChartBuilder"/>
-		<property name="label" value=""/>
-		<property name="tooltip" value=""/>
-		<property name="value" value=""/>
 	</child>
 
 </opt:main>
