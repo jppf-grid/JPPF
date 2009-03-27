@@ -16,82 +16,22 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
 -->
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="WebCrawler" type="page">
-
-	<property name="label" value="JPPF Web Crawler"/>
-	<property name="scrollable" value="true"/>
-	<property name="orientation" value="horizontal"/>
-	<property name="bordered" value="false"/>
-	<property name="main" value="true"/>
-	<property name="insets" value="0,0,0,0"/>
-	<script language="javascript"><![CDATA[
-		importPackage(Packages.java.lang);
-		importPackage(Packages.java.util);
-		importPackage(Packages.java.awt);
-		importPackage(Packages.java.awt.event);
-		importPackage(Packages.javax.swing);
-		importPackage(Packages.org.jppf.client);
-		importPackage(Packages.org.jppf.utils);
-		importPackage(Packages.org.jppf.ui.monitoring);
-		importPackage(Packages.org.jppf.ui.options);
-		importPackage(Packages.org.jppf.ui.options.event);
-		importPackage(Packages.org.jppf.ui.options.factory);
-		importPackage(Packages.org.jppf.ui.options.xml);
-		importPackage(Packages.org.jppf.samples.webcrawler);
-	]]></script>
-	<initializer type="script">
-		<script language="javascript"><![CDATA[
-			var comp = option.getUIComponent();
-			var frame = new JFrame(option.getLabel());
-			wa = 
-			{
-				windowClosing: function(event)
-				{
-					OptionsHandler.savePreferences();
-					System.exit(0);
-				}
-			};
-			frame.addWindowListener(new WindowAdapter(wa));
-			var BASE = "org.jppf.samples.i18n.WebCrawler";
-			frame.getContentPane().add(option.getUIComponent());
-			frame.setSize(705, 700);
-			frame.setVisible(true);
-		]]></script>
-	</initializer>
-
-	<child name="verticalWrapper" type="page">
-
-		<property name="label" value=""/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="vertical"/>
-		<property name="bordered" value="false"/>
-		<property name="main" value="true"/>
-		<property name="tooltip" value=""/>
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="verticalWrapper" type="page">
+	<property name="layoutConstraints" value="fill, flowy"/>
+	<property name="componentConstraints" value="grow"/>
 
 	<!-- ===================================================================== -->
 	<!--             web crawler configuration parameters                      -->
 	<!-- ===================================================================== -->
 
 	<child name="inputConfig" type="page">
-
-		<property name="label" value=""/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="horizontal"/>
-		<property name="bordered" value="false"/>
-		<property name="main" value="true"/>
-		<property name="tooltip" value=""/>
+		<property name="layoutConstraints" value="fill, insets 0 0 0 0"/>
 
 		<child name="ButtonPanel" type="page">
 			<property name="label" value="Actions"/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="growx 0, aligny top"/>
 			<property name="bordered" value="true"/>
-			<property name="main" value="true"/>
-
-			<child name="filler1" type="Filler">
-				<property name="width" value="1"/>
-				<property name="height" value="1"/>
-			</child>
 
 			<child name="compute" type="Button">
 				<property name="label" value="Compute"/>
@@ -106,11 +46,6 @@
 				</listener>
 			</child>
 
-			<child name="filler" type="Filler">
-				<property name="width" value="10"/>
-				<property name="height" value="10"/>
-			</child>
-
 			<child name="reset" type="Button">
 				<property name="label" value="Reset Defaults"/>
 				<property name="tooltip" value="Reset to the default values"/>
@@ -123,23 +58,18 @@
 				</listener>
 			</child>
 
-			<child name="filler3" type="Filler">
-				<property name="width" value="1"/>
-				<property name="height" value="1"/>
-			</child>
-
 		</child>
 
 		<child name="inputPanel" type="page">
 			<property name="label" value="Search parameters"/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
+			<property name="layoutConstraints" value="fill, flowy, gapy 5!"/>
+			<property name="componentConstraints" value="grow, push"/>
 			<property name="bordered" value="true"/>
-			<property name="main" value="true"/>
 
 			<child name="url" type="PlainText">
 				<property name="label" value="Start URL"/>
 				<property name="tooltip" value="The url from which to start the search"/>
+				<property name="layoutConstraints" value="nogrid, gapy 5!, insets 0 0 0 0"/>
 				<property name="value" value="http://www.jppf.org/index.php"/>
 				<property name="orientation" value="horizontal"/>
 				<property name="columns" value="60"/>
@@ -149,19 +79,17 @@
 			<child name="query" type="PlainText">
 				<property name="label" value="Search quey"/>
 				<property name="tooltip" value="The search quey, using the Lucene engine syntax"/>
+				<property name="layoutConstraints" value="nogrid, gapy 5!, insets 0 0 0 0"/>
 				<property name="value" value="JPPF"/>
 				<property name="orientation" value="horizontal"/>
 				<property name="columns" value="60"/>
 				<property name="persistent" value="true"/>
 			</child>
 
-			<child name="depthPanel" type="page">
-				<property name="label" value=""/>
-				<property name="scrollable" value="false"/>
-				<property name="orientation" value="horizontal"/>
-				<property name="bordered" value="false"/>
-				<property name="main" value="true"/>
-
+			<child name="wrapper" type="page">
+				<property name="layoutConstraints" value="fill, gapy 5!, insets 0 0 0 0"/>
+				<property name="componentConstraints" value="growx"/>
+	
 				<child name="depth" type="SpinnerNumber">
 					<property name="label" value="Search depth"/>
 					<property name="tooltip" value="Maximum depth (nested links) of the search"/>
@@ -170,6 +98,11 @@
 					<property name="maxValue" value="50"/>
 					<property name="persistent" value="true"/>
 				</child>
+	
+				<child name="wrfillerapper" type="page">
+					<property name="layoutConstraints" value="fill"/>
+					<property name="componentConstraints" value="growx, pushx"/>
+				</child>
 
 			</child>
 
@@ -177,29 +110,18 @@
 
 	</child>
 
-	<child name="filler" type="Filler">
-		<property name="width" value="1"/>
-		<property name="height" value="10"/>
-	</child>
-
 	<child name="resultPanel" type="page">
 		<property name="label" value="Search Results"/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="vertical"/>
+		<property name="layoutConstraints" value="fill, flowy"/>
+		<property name="componentConstraints" value="grow, push"/>
 		<property name="bordered" value="true"/>
-		<property name="main" value="true"/>
 
 		<child name="resultText" type="TextArea">
-			<property name="label" value=""/>
 			<property name="tooltip" value="Displays the links that match with the search query"/>
 			<property name="value" value=""/>
-			<property name="persistent" value="false"/>
-			<property name="editable" value="false"/>
 			<property name="scrollable" value="true"/>
-			<property name="bordered" value="false"/>
+			<property name="componentConstraints" value="grow, push"/>
 		</child>
-
-	</child>
 
 	</child>
 

@@ -17,13 +17,9 @@
 	limitations under the License.
 -->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="Sequence Alignment" type="page">
-
 	<property name="label" value="JPPF Sequence Alignment"/>
-	<property name="scrollable" value="false"/>
-	<property name="orientation" value="vertical"/>
-	<property name="bordered" value="false"/>
-	<property name="main" value="true"/>
-	<property name="insets" value="0,0,0,0"/>
+	<property name="layoutConstraints" value="fill, flowy"/>
+	<property name="componentConstraints" value="grow"/>
 	<script language="javascript"><![CDATA[
 		importPackage(Packages.java.lang);
 		importPackage(Packages.java.util);
@@ -38,11 +34,9 @@
 		importPackage(Packages.org.jppf.ui.options.factory);
 		importPackage(Packages.org.jppf.ui.options.xml);
 		importPackage(Packages.org.jppf.samples.jaligner);
-	]]></script>
-	<script language="javascript"><![CDATA[
+
 		function populateTargetSequence()
 		{
-			System.out.println("in populateTargetSequence()");
 			var file = option.findFirstWithName("/loadSequenceBtn").getValue();
 			if ((file != null) && !"".equals(file.trim()))
 			{
@@ -51,50 +45,20 @@
 			}
 		}
 	]]></script>
-	<initializer type="script">
-		<script language="javascript"><![CDATA[
-			var comp = option.getUIComponent();
-			var frame = new JFrame(option.getLabel());
-			wa = 
-			{
-				windowClosing: function(event)
-				{
-					OptionsHandler.savePreferences();
-					System.exit(0);
-				}
-			};
-			frame.addWindowListener(new WindowAdapter(wa));
-			var BASE = "org.jppf.samples.i18n.SequenceAlignment";
-			frame.getContentPane().add(option.getUIComponent());
-			frame.setSize(720, 700);
-			frame.setVisible(true);
-		]]></script>
-	</initializer>
 
 	<!-- ===================================================================== -->
 	<!--         Mandelbrot algorithm configuration parameters                 -->
 	<!-- ===================================================================== -->
 
 	<child name="inputConfig" type="page">
-
-		<property name="label" value=""/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="horizontal"/>
-		<property name="bordered" value="false"/>
-		<property name="main" value="false"/>
-		<property name="tooltip" value=""/>
+		<property name="layoutConstraints" value="fill, insets 0 0 0 0"/>
+		<property name="componentConstraints" value="growx"/>
 
 		<child name="ButtonPanel" type="page">
-			<property name="label" value="ButtonPanel"/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
-			<property name="bordered" value="false"/>
-			<property name="main" value="false"/>
-
-			<child name="filler1" type="Filler">
-				<property name="width" value="1"/>
-				<property name="height" value="1"/>
-			</child>
+			<property name="label" value="Actions"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="growx 0, aligny top"/>
+			<property name="bordered" value="true"/>
 
 			<child name="compute" type="Button">
 				<property name="label" value="Compute"/>
@@ -107,11 +71,6 @@
 						SequenceAlignmentRunner.perform(seq, matrix, db, option);
 					]]></script>
 				</listener>
-			</child>
-
-			<child name="filler2" type="Filler">
-				<property name="width" value="10"/>
-				<property name="height" value="10"/>
 			</child>
 
 			<child name="reset" type="Button">
@@ -129,26 +88,15 @@
 				</listener>
 			</child>
 
-			<child name="filler3" type="Filler">
-				<property name="width" value="1"/>
-				<property name="height" value="1"/>
-			</child>
-
 		</child>
 
 		<child name="inputPanel" type="page">
 			<property name="label" value="Target Sequence"/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="pushx, grow, gapright 0!"/>
 			<property name="bordered" value="true"/>
-			<property name="main" value="true"/>
 
 			<child name="matrixPanel" type="page">
-				<property name="label" value=""/>
-				<property name="scrollable" value="false"/>
-				<property name="orientation" value="horizontal"/>
-				<property name="bordered" value="false"/>
-				<property name="main" value="true"/>
 
 				<child name="matrix" type="ComboBox">
 					<property name="label" value="Substitution matrix"/>
@@ -229,12 +177,8 @@
 					<item name="PAM90" selected="false"/>
 				</child>
 	
-				<child name="filler" type="Filler">
-					<property name="width" value="20"/>
-					<property name="height" value="1"/>
-				</child>
-
 				<child name="loadDatabaseBtn" type="FileChooser">
+					<property name="componentConstraints" value="gapleft 20"/>
 					<property name="icon" value="/org/jppf/ui/resources/open.gif"/>
 					<property name="tooltip" value="Specify the database file"/>
 					<property name="value" value="data/ecoli.aa"/>
@@ -262,58 +206,41 @@
 					<property name="width" value="300"/>
 				</child>
 		
+				<child name="filler" type="page">
+					<property name="componentConstraints" value="growx, pushx 0"/>
+				</child>
+	
 			</child>
 
 			<child name="inputSequencePanel" type="page">
 				<property name="label" value="Target Sequence"/>
-				<property name="scrollable" value="false"/>
-				<property name="orientation" value="horizontal"/>
-				<property name="bordered" value="false"/>
-				<property name="main" value="false"/>
 
 				<child name="inputSequenceButtonPanel" type="page">
-					<property name="label" value=""/>
-					<property name="scrollable" value="false"/>
-					<property name="orientation" value="horizontal"/>
-					<property name="bordered" value="false"/>
-					<property name="main" value="false"/>
+					<property name="componentConstraints" value="growx 0, aligny top, gaptop 10"/>
 
 					<child name="loadSequenceBtn" type="FileChooser">
 						<property name="icon" value="/org/jppf/ui/resources/open.gif"/>
 						<property name="tooltip" value="Load the sequence from a file"/>
 						<property name="value" value="data/TargetSequence.txt"/>
 						<property name="extensions" value="*; All Files (*.*)"/>
-						<property name="orientation" value="vertical"/>
 						<property name="type" value="open"/>
 						<property name="persistent" value="true"/>
 						<listener type="script">
-							<script language="javascript"><![CDATA[
-								populateTargetSequence()
-							]]></script>
+							<script language="javascript"><![CDATA[populateTargetSequence()]]></script>
 						</listener>
-					</child>
-
-					<child name="filler" type="Filler">
-						<property name="width" value="1"/>
-						<property name="height" value="1"/>
 					</child>
 
 				</child>
 	
 				<child name="sequenceTextPanel" type="page">
-					<property name="label" value=""/>
-					<property name="scrollable" value="false"/>
-					<property name="orientation" value="vertical"/>
-					<property name="bordered" value="false"/>
-					<property name="main" value="true"/>
+					<property name="layoutConstraints" value="fill, flowy"/>
+					<property name="componentConstraints" value="grow, pushx"/>
 
 					<child name="sequenceText" type="TextArea">
-						<property name="label" value=""/>
 						<property name="tooltip" value="DNA or protein sequence to compare with those in the database"/>
-						<property name="scrollable" value="false"/>
 						<property name="persistent" value="true"/>
 						<property name="editable" value="true"/>
-						<property name="bordered" value="false"/>
+						<property name="scrollable" value="true"/>
 						<initializer type="script">
 							<script language="javascript"><![CDATA[
 								var value = option.getValue();
@@ -322,11 +249,6 @@
 						</initializer>
 					</child>
 
-					<child name="filler" type="Filler">
-						<property name="width" value="1"/>
-						<property name="height" value="1"/>
-					</child>
-
 				</child>
 
 			</child>
@@ -335,24 +257,14 @@
 
 	</child>
 
-	<child name="filler" type="Filler">
-		<property name="width" value="1"/>
-		<property name="height" value="10"/>
-	</child>
-
 	<child name="resultPanel" type="page">
 		<property name="label" value="Results"/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="vertical"/>
+		<property name="layoutConstraints" value="fill, flowy"/>
+		<property name="componentConstraints" value="push, grow"/>
 		<property name="bordered" value="true"/>
-		<property name="main" value="true"/>
 
 		<child name="scorePanel" type="page">
-			<property name="label" value=""/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="horizontal"/>
-			<property name="bordered" value="false"/>
-			<property name="main" value="false"/>
+			<property name="componentConstraints" value="growx 0"/>
 
 			<child name="score" type="FormattedNumber">
 				<property name="label" value="Score"/>
@@ -361,23 +273,17 @@
 				<property name="pattern" value="###,###,##0.###"/>
 				<property name="orientation" value="horizontal"/>
 				<property name="enabled" value="false"/>
-				<property name="persistent" value="false"/>
 			</child>
 	
-			<child name="filler" type="Filler">
-				<property name="width" value="1"/>
-				<property name="height" value="1"/>
-			</child>
-
 		</child>
 
 		<child name="resultSequenceText" type="TextArea">
+			<property name="componentConstraints" value="push, grow"/>
 			<property name="label" value=""/>
 			<property name="tooltip" value="DNA or protein sequence whose alignment with the target sequence resulted in the highest score"/>
 			<property name="value" value=""/>
-			<property name="persistent" value="false"/>
 			<property name="editable" value="true"/>
-			<property name="bordered" value="false"/>
+			<property name="scrollable" value="true"/>
 		</child>
 
 	</child>

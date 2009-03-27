@@ -18,14 +18,8 @@
 -->
 
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="MandelbrotSet" type="page">
-
-	<!-- test comment for save -->
 	<property name="label" value="Mandelbrot Set"/>
-	<property name="scrollable" value="false"/>
-	<property name="orientation" value="vertical"/>
-	<property name="bordered" value="false"/>
-	<property name="main" value="true"/>
-	<property name="tooltip" value=""/>
+	<property name="layoutConstraints" value="fill, flowy"/>
 	<script language="javascript"><![CDATA[
 		importPackage(java.lang);
 		importPackage(java.util);
@@ -58,24 +52,9 @@
 
 	<child name="MandelbrotConfig" type="page">
 
-		<property name="label" value=""/>
-		<property name="scrollable" value="false"/>
-		<property name="orientation" value="horizontal"/>
-		<property name="bordered" value="true"/>
-		<property name="main" value="false"/>
-		<property name="tooltip" value=""/>
-
 		<child name="ButtonPanel" type="page">
 			<property name="label" value="ButtonPanel"/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
-			<property name="bordered" value="false"/>
-			<property name="main" value="false"/>
-
-			<child name="filler1" type="Filler">
-				<property name="width" value="1"/>
-				<property name="height" value="1"/>
-			</child>
+			<property name="layoutConstraints" value="flowy, fill"/>
 
 			<child name="computeMandelbrot" type="Button">
 				<property name="label" value="Compute"/>
@@ -85,11 +64,6 @@
 					computeMandelbrot();
 					]]></script>
 				</listener>
-			</child>
-
-			<child name="filler2" type="Filler">
-				<property name="width" value="10"/>
-				<property name="height" value="10"/>
 			</child>
 
 			<child name="resetMandelbrot" type="Button">
@@ -105,19 +79,11 @@
 				</listener>
 			</child>
 
-			<child name="filler3" type="Filler">
-				<property name="width" value="1"/>
-				<property name="height" value="1"/>
-			</child>
-
 		</child>
 
 		<child name="centerXYPanel" type="page">
-			<property name="label" value=""/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
+			<property name="layoutConstraints" value="flowy, fill"/>
 			<property name="bordered" value="true"/>
-			<property name="main" value="false"/>
 
 			<child name="centerX" type="FormattedNumber">
 				<property name="label" value="center X"/>
@@ -140,11 +106,8 @@
 		</child>
 
 		<child name="otherPanel" type="page">
-			<property name="label" value=""/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
+			<property name="layoutConstraints" value="flowy, fill"/>
 			<property name="bordered" value="true"/>
-			<property name="main" value="false"/>
 
 			<child name="diameter" type="FormattedNumber">
 				<property name="label" value="diameter"/>
@@ -167,11 +130,8 @@
 		</child>
 
 		<child name="mandelbrotZoomPanel" type="page">
-			<property name="label" value=""/>
-			<property name="scrollable" value="false"/>
-			<property name="orientation" value="vertical"/>
+			<property name="layoutConstraints" value="flowy, fill"/>
 			<property name="bordered" value="true"/>
-			<property name="main" value="false"/>
 
 			<child name="mandelbrotZoomFactor" type="SpinnerNumber">
 				<property name="label" value="Zoom factor"/>
@@ -183,10 +143,6 @@
 			</child>
 
 			<child name="mandelbrotZoomButtons" type="page">
-				<property name="scrollable" value="false"/>
-				<property name="orientation" value="horizontal"/>
-				<property name="bordered" value="false"/>
-				<property name="main" value="false"/>
 	
 				<child name="mandelbrotZoomIn" type="Button">
 					<property name="icon" value="/icons/zoomIn.gif"/>
@@ -204,11 +160,6 @@
 					</listener>
 				</child>
 	
-				<child name="filler" type="Filler">
-					<property name="width" value="10"/>
-					<property name="height" value="1"/>
-				</child>
-
 				<child name="mandelbrotZoomOut" type="Button">
 					<property name="icon" value="/icons/zoomOut.gif"/>
 					<property name="tooltip" value="Zoom-out the image by the inverse of the current zoom factor"/>
@@ -225,18 +176,13 @@
 					</listener>
 				</child>
 
-				<child name="filler" type="Filler">
-					<property name="width" value="1"/>
-					<property name="height" value="1"/>
-				</child>
-
 			</child>
 
 		</child>
 
-		<child name="filler" type="Filler">
-			<property name="width" value="1"/>
-			<property name="height" value="1"/>
+		<child name="filler" type="page">
+			<property name="layoutConstraints" value="fill"/>
+			<property name="componentConstraints" value="growx, pushx"/>
 		</child>
 
 	</child>
@@ -248,6 +194,8 @@
 	<child name="mandelbrotImage" type="Java">
 		<property name="class" value="org.jppf.samples.fractals.ImagePanel"/>
 		<property name="mouseListenerClass" value="org.jppf.samples.fractals.MandelbrotMouseListener"/>
+		<property name="layoutConstraints" value="fill"/>
+		<property name="componentConstraints" value="grow, push"/>
 		<initializer type="script">
 			<script language="javascript"><![CDATA[
 				var comp = option.getUIComponent();
