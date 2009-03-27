@@ -107,7 +107,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		uuid = new JPPFUuid().toString();
 		buildNumber = VersionUtils.getBuildNumber();
 		setStopped(false);
-		int n = 0;
+		boolean initialized = false;
 		Throwable error = null;
 		if (debugEnabled) log.debug("Start of node main loop");
 		while (!isStopped())
@@ -115,10 +115,10 @@ public class JPPFNode extends AbstractMonitoredNode
 			try
 			{
 				init();
-				if (n == 0)
+				if (!initialized)
 				{
 					System.out.println("Node sucessfully initialized");
-					n++;
+					initialized = true;
 				}
 				perform();
 			}

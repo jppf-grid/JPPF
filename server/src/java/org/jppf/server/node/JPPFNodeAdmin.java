@@ -256,6 +256,16 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 		}
 		if (reconnect)
 		{
+			try
+			{
+				// we close the socket connection in case the node is waiting (in blocking mode)
+				// for data from the server.
+				node.getSocketWrapper().close();
+			}
+			catch(Exception e)
+			{
+				log.error(e.getMessage(), e);
+			}
 			node.setExitAction(new Runnable()
 			{
 				public void run()
