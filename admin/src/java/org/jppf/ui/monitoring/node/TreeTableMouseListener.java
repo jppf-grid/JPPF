@@ -114,6 +114,7 @@ public class TreeTableMouseListener extends MouseAdapter
 		menu.add(new JMenuItem(new NodeInformationAction(infoHolders)));
 		Component comp = event.getComponent();
 		Point p = comp.getLocationOnScreen();
+		menu.add(new JMenuItem(new NodeConfigurationAction(new Point(p.x + event.getX(), p.y + event.getY()), infoHolders)));
 		menu.add(new JMenuItem(new NodeThreadsAction(new Point(p.x + event.getX(), p.y + event.getY()), infoHolders)));
 		boolean singleSelection = infoHolders.length == 1;
 		JMenu cancel = new JMenu("Cancel task");
