@@ -21,14 +21,12 @@
 			<attribute name="javadoc_location" value="file:/C:/j2ee5/docs/api/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/JDesktop/swingx.jar" sourcepath="D:/ftp/dev/java/SwingX/swingx-2007_08_12-src/src">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/D:/ftp/dev/java/SwingX/swingx-2007_08_12-bin/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/Substance/substance-4.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/JFreeChart/jcommon-1.0.12.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/JFreeChart/jfreechart-1.0.9.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/Groovy/groovy-all-1.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/JDesktop/swingx-0.9.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/JDesktop/swingx-beaninfo-0.9.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/MigLayout/miglayout-3.7-swing.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/Groovy/groovy-all-1.6.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
