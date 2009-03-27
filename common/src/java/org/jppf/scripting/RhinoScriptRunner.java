@@ -32,6 +32,7 @@ public class RhinoScriptRunner implements ScriptRunner
 	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(RhinoScriptRunner.class);
+
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
@@ -48,6 +49,10 @@ public class RhinoScriptRunner implements ScriptRunner
 	 * USed to collect error messages.
 	 */
 	private ErrorHandler errorHandler = new ErrorHandler();
+	/**
+	 * Mapping of Rhino scripts to their uuid.
+	 */
+	private static Map<String, Script> scriptMap = new HashMap<String, Script>();
 
 	/**
 	 * Initialize the Rhino environment.
@@ -66,6 +71,22 @@ public class RhinoScriptRunner implements ScriptRunner
 	 */
 	public Object evaluate(String script, Map<String, Object> variables) throws JPPFScriptingException
 	{
+		return evaluate(null, script, variables);
+	}
+
+	/**
+	 * Evaluate the script specified as input and get the evaluation result.
+	 * @param scriptId - a unique identifer for the script, to be used if the engine generates compiled code
+	 * which can be later retrieved through this id.
+	 * @param script - a string containing the script to evaluate.
+	 * @param variables - a mapping of objects to variable names, added within the scope of the script.
+	 * @return the result of the evaluation as an object. The actual type of the result
+	 * depends on the scripting engine that is used.
+	 * @throws JPPFScriptingException if an error occurs while evaluating the script.
+	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.lang.String, java.util.Map)
+	 */
+	public Object evaluate(String scriptId, String script, Map<String, Object> variables) throws JPPFScriptingException
+	{
 		init();
 		errorHandler.errors.clear();
 		Object result = null;
@@ -74,9 +95,17 @@ public class RhinoScriptRunner implements ScriptRunner
 			Object wrapped = Context.javaToJS(entry.getValue(), scope);
 			ScriptableObject.putProperty(scope, entry.getKey(), wrapped);
 		}
+		Script rhinoScript = null;
+		if (scriptId != null) rhinoScript = scriptMap.get(scriptId);
+		if (rhinoScript == null)
+		{
+			rhinoScript = context.compileString(script, "script", 1, null);
+			if (scriptId != null) scriptMap.put(scriptId, rhinoScript);
+		}
 		try
 		{
-			result = context.evaluateString(scope, script, "script", 1, null);
+			//result = context.evaluateString(scope, script, "script", 1, null);
+			result = rhinoScript.exec(context, scope);
 		}
 		catch(EvaluatorException e)
 		{
@@ -84,8 +113,7 @@ public class RhinoScriptRunner implements ScriptRunner
 		}
 		finally
 		{
-			for (String name: variables.keySet())
-				ScriptableObject.deleteProperty(scope, name);
+			for (String name: variables.keySet()) ScriptableObject.deleteProperty(scope, name);
 			cleanup();
 		}
 		if (!errorHandler.errors.isEmpty())
@@ -108,7 +136,7 @@ public class RhinoScriptRunner implements ScriptRunner
 	 */
 	public void init()
 	{
-		context = Context.enter();
+		context = new ContextFactory().enterContext();
 		//scope = context.initStandardObjects(null);
 		scope = new ImporterTopLevel(context);
 		context.setErrorReporter(errorHandler);

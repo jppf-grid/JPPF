@@ -20,7 +20,7 @@ package org.jppf.scripting;
 
 import groovy.lang.*;
 
-import java.util.Map;
+import java.util.*;
 
 /**
  * Script runner wrapper around a Groovy script engine.
@@ -28,6 +28,11 @@ import java.util.Map;
  */
 public class GroovyScriptRunner implements ScriptRunner
 {
+	/**
+	 * Mapping of Groovy scripts to their uuid.
+	 */
+	private static Map<String, Script> scriptMap = new HashMap<String, Script>();
+
 	/**
 	 * Evaluate the script specified as input and get the evaluation result.
 	 * @param script a string containing the script to evaluate.
@@ -38,10 +43,34 @@ public class GroovyScriptRunner implements ScriptRunner
 	 */
 	public Object evaluate(String script, Map<String, Object> variables) throws JPPFScriptingException
 	{
+		return evaluate(null, script, variables);
+	}
+
+	/**
+	 * Evaluate the script specified as input and get the evaluation result.
+	 * @param scriptId - a unique identifer for the script, to be used if the engine generates compiled code
+	 * which can be later retrieved through this id.
+	 * @param script - a string containing the script to evaluate.
+	 * @param variables - a mapping of objects to variable names, added within the scope of the script.
+	 * @return the result of the evaluation as an object. The actual type of the result
+	 * depends on the scripting engine that is used.
+	 * @throws JPPFScriptingException if an error occurs while evaluating the script.
+	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.lang.String, java.util.Map)
+	 */
+	public Object evaluate(String scriptId, String script, Map<String, Object> variables) throws JPPFScriptingException
+	{
+		//GroovyShell shell = new GroovyShell(binding);
+		GroovyShell shell = new GroovyShell();
+		Script groovyScript = scriptMap.get(scriptId);
+		if (groovyScript == null)
+		{
+			groovyScript = shell.parse(script);
+			scriptMap.put(scriptId, groovyScript);
+		}
 		Binding binding = new Binding();
 		for (Map.Entry<String, Object> entry: variables.entrySet()) binding.setVariable(entry.getKey(), entry.getValue());
-		GroovyShell shell = new GroovyShell(binding);
-		return shell.evaluate(script);
+		groovyScript.setBinding(binding);
+		return groovyScript.run();
 	}
 
 	/**
