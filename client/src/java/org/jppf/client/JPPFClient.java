@@ -388,9 +388,9 @@ public class JPPFClient extends AbstractJPPFClient
 		 */
 		public void run()
 		{
+			JPPFMulticastReceiver receiver = new JPPFMulticastReceiver();
 			try
 			{
-				JPPFMulticastReceiver receiver = new JPPFMulticastReceiver();
 				while (!isStopped())
 				{
 					JPPFConnectionInformation info = receiver.receive();
@@ -402,11 +402,15 @@ public class JPPFClient extends AbstractJPPFClient
 						newConnection(c);
 					}
 				}
-				Thread.sleep(50L);
+				//Thread.sleep(50L);
 			}
 			catch(Exception e)
 			{
 				log.error(e.getMessage(), e);
+			}
+			finally
+			{
+				if (receiver != null) receiver.setStopped(true);
 			}
 		}
 	}
