@@ -306,4 +306,23 @@ public final class FileUtils
 		return b;
 		*/
 	}
+
+	/**
+	 * Copy the data read from the specified input stream to the specified output stream. 
+	 * @param is the input stream to read from.
+	 * @param os the output stream to write to.
+	 * @throws IOException if an I/O error occurs.
+	 */
+	public static void copyStream(InputStream is, OutputStream os) throws IOException
+	{
+		ByteBuffer tmp = BufferPool.pickBuffer();
+		byte[] bytes = tmp.array();
+		while(true)
+		{
+			int n = is.read(bytes);
+			if (n <= 0) break;
+			os.write(bytes, 0, n);
+		}
+		BufferPool.releaseBuffer(tmp);
+	}
 }
