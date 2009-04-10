@@ -358,16 +358,6 @@
 		</java>       
 	</target>
 
-	<target name="run.ui.builder">
-		<echo message="starting UI Builder Tool"/>
-		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="gui.classpath">
-			<arg value="org/jppf/ui/options/xml/JPPFGuiBuilder.xml"/>
-			<arg value="file"/>
-			<jvmarg value="-Djppf.config=jppf-gui.properties"/>
-			<jvmarg value="-Dlog4j.configuration=log4j-gui-builder.properties"/>
-		</java>       
-	</target>
-
 	<target name="run.crash">
 		<echo message="starting the second demo application"/>
 		<java fork="yes" classname="test.crash.StandaloneMatrixRunner" classpathref="client.classpath">
