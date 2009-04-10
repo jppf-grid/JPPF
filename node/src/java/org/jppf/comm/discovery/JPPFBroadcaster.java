@@ -98,8 +98,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 			buffer.putInt(infoBytes.length);
 			buffer.put(infoBytes);
 			DatagramPacket packet = new DatagramPacket(buffer.array(), 512, InetAddress.getByName(group), port);
-			//MulticastSocket socket = new MulticastSocket(new InetSocketAddress(addr, port));
-			MulticastSocket socket = new MulticastSocket(port);
+			MulticastSocket socket = new MulticastSocket(new InetSocketAddress(addr, port));
 			socket.setInterface(addr);
 			socketsInfo.add(new Pair<MulticastSocket, DatagramPacket>(socket, packet));
 		}

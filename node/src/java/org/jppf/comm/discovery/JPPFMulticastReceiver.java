@@ -183,8 +183,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 			try
 			{
 				int t = (int) 1000;
-				//socket = new MulticastSocket(new InetSocketAddress(addr, port));
-				socket = new MulticastSocket(port);
+				socket = new MulticastSocket(new InetSocketAddress(addr, port));
 				socket.setInterface(addr);
 				socket.joinGroup(groupInetAddress);
 				socket.setSoTimeout(timeout);
