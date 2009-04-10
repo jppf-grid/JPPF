@@ -20,6 +20,7 @@ package org.jppf.server.protocol;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.*;
 
 import org.jppf.utils.*;
 
@@ -34,6 +35,15 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * The path for this location.
 	 */
 	protected T path = null;
+	/**
+	 * The list of listeners to this location.
+	 */
+	protected List<LocationEventListener> listeners = new ArrayList<LocationEventListener>();
+	/**
+	 * Boolean flag that determines if at least one listener is registered.
+	 * Used to minimize the overhead of sending events if there is no listener.
+	 */
+	protected boolean eventsEnabled = false;
 
 	/**
 	 * Initialize this location with the specified type and path.
@@ -58,12 +68,13 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * Copy the content at this location to another location.
 	 * @param location the location to copy to.
 	 * @throws Exception if an I/O error occurs.
+	 * @see org.jppf.server.protocol.Location#copyTo(org.jppf.server.protocol.Location)
 	 */
 	public void copyTo(Location location) throws Exception
 	{
 		InputStream is = getInputStream();
 		OutputStream os = location.getOutputStream();
-		copy(is, os);
+		copyStream(is, os);
 		is.close();
 		os.flush();
 		os.close();
@@ -79,7 +90,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	{
 		InputStream is = getInputStream();
 		JPPFByteArrayOutputStream os = new JPPFByteArrayOutputStream();
-		copy(is, os);
+		copyStream(is, os);
 		is.close();
 		os.flush();
 		os.close();
@@ -87,18 +98,63 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	}
 
 	/**
+	 * Get a string representation of this location.
+	 * @return this location as a string.
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
+	{
+		return "" + getPath();
+	}
+
+	/**
+	 * Add a listener to the list of location event listeners for this location.
+	 * @param listener the listener to add to the list.
+	 * @throws NullPointerException if the listener object is null.
+	 */
+	public void addLocationEventListener(LocationEventListener listener)
+	{
+		if (listener == null) throw new NullPointerException("null listener not accepted");
+		listeners.add(listener);
+		if (!eventsEnabled) eventsEnabled = true;
+	}
+
+	/**
+	 * Remove a listener from the list of location event listeners for this location.
+	 * @param listener the listener to remove from the list.
+	 * @throws NullPointerException if the listener object is null.
+	 */
+	public void removeLocationEventListener(LocationEventListener listener)
+	{
+		if (listener == null) throw new NullPointerException("null listener not accepted");
+		listeners.remove(listener);
+		if (listeners.isEmpty()) eventsEnabled = false;
+	}
+
+	/**
+	 * Notify all listeners that a data transfer has occurred.
+	 * @param n - the size of the data that was transferred.
+	 */
+	protected void fireLocationEvent(int n)
+	{
+		LocationEvent event = new LocationEvent(this, n);
+		for (LocationEventListener l: listeners) l.dataTransferred(event);
+	}
+
+	/**
 	 * Copy the data read from the specified input stream to the specified output stream. 
 	 * @param is the input stream to read from.
 	 * @param os the output stream to write to.
-	 * @throws Exception if an I/O error occurs.
+	 * @throws IOException if an I/O error occurs.
 	 */
-	private void copy(InputStream is, OutputStream os) throws Exception
+	private void copyStream(InputStream is, OutputStream os) throws IOException
 	{
 		ByteBuffer tmp = BufferPool.pickBuffer();
 		byte[] bytes = tmp.array();
 		while(true)
 		{
 			int n = is.read(bytes);
+			if (eventsEnabled) fireLocationEvent(n);
 			if (n <= 0) break;
 			os.write(bytes, 0, n);
 		}

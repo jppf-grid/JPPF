@@ -21,7 +21,9 @@ package org.jppf.server.protocol;
 import java.io.*;
 
 /**
- * 
+ * Abstraction of a block of data no matter how its actual location is referred to.
+ * <p>The idea is to enable I/O operations with a very simple API between <code>Location</code> instances,
+ * for instance bettween a URL and File locations to download a file from the internet and save it locally.
  * @param <T> the type of this location.
  * @author Laurent Cohen
  */
