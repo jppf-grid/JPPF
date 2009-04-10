@@ -167,8 +167,8 @@ void doTabNew()
 {
 	pageRoot.setEventsEnabled(false);
 	def BASE_NAME = "org/jppf/ui/options/xml/ChartsConfigPage";
-	def s = JOptionPane.showInputDialog(option.getUIComponent(), StringUtils.getLocalized(BASE_NAME, "new.tab.name"),
-		StringUtils.getLocalized(BASE_NAME, "new.tab.title"), JOptionPane.PLAIN_MESSAGE, null, null, null);
+	def s = JOptionPane.showInputDialog(option.getUIComponent(), LocalizationUtils.getLocalized(BASE_NAME, "new.tab.name"),
+		LocalizationUtils.getLocalized(BASE_NAME, "new.tab.title"), JOptionPane.PLAIN_MESSAGE, null, null, null);
 	if ((s != null) && !"".equals(s.trim()))
 	{
 		def tab = new TabConfiguration(s, -1);
