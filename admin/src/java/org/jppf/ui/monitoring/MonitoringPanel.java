@@ -62,27 +62,23 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	public MonitoringPanel()
 	{
 		this.statsHandler = StatsHandler.getInstance();
-		/*
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(EXECUTION_PROPS, LocalizationUtils.getLocalized(BASE, "ExecutionTable.label")));
-		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(NODE_EXECUTION_PROPS, LocalizationUtils.getLocalized(BASE, "NodeExecutionTable.label")));
-		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(TRANSPORT_PROPS, LocalizationUtils.getLocalized(BASE, "NetworkOverheadTable.label")));
-		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(QUEUE_PROPS, LocalizationUtils.getLocalized(BASE, "QueueTable.label")));
-		add(Box.createVerticalStrut(5));
-		add(makeTablePanel(CONNECTION_PROPS, LocalizationUtils.getLocalized(BASE, "ConnectionsTable.label")));
-		add(Box.createVerticalGlue());
-		*/
 		setLayout(new MigLayout("fill, flowy"));
-		add(makeTablePanel(EXECUTION_PROPS, LocalizationUtils.getLocalized(BASE, "ExecutionTable.label")), "growx");
-		add(makeTablePanel(NODE_EXECUTION_PROPS, LocalizationUtils.getLocalized(BASE, "NodeExecutionTable.label")), "growx");
-		add(makeTablePanel(TRANSPORT_PROPS, LocalizationUtils.getLocalized(BASE, "NetworkOverheadTable.label")), "growx");
-		add(makeTablePanel(QUEUE_PROPS, LocalizationUtils.getLocalized(BASE, "QueueTable.label")), "growx");
-		add(makeTablePanel(CONNECTION_PROPS, LocalizationUtils.getLocalized(BASE, "ConnectionsTable.label")), "growx");
+		addTablePanel(EXECUTION_PROPS, "ExecutionTable.label");
+		addTablePanel(NODE_EXECUTION_PROPS, "NodeExecutionTable.label");
+		addTablePanel(TRANSPORT_PROPS, "NetworkOverheadTable.label");
+		addTablePanel(QUEUE_PROPS, "QueueTable.label");
+		addTablePanel(CONNECTION_PROPS, "ConnectionsTable.label");
 		statsHandler.addStatsHandlerListener(this);
+	}
+
+	/**
+	 * Add a table panel to this panel.
+	 * @param fields - the fields displayed in the table.
+	 * @param label - the reference to the localized title of the table.
+	 */
+	private void addTablePanel(Fields[] fields, String label)
+	{
+		add(makeTablePanel(fields, LocalizationUtils.getLocalized(BASE, label)), "grow");
 	}
 	
 	/**
@@ -111,9 +107,8 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	 */
 	private JComponent makeTablePanel(Fields[] props, String title)
 	{
-		//JPanel panel = GuiUtils.createBoxPanel(BoxLayout.X_AXIS);
 		JPanel panel = new JPanel();
-		panel.setLayout(new MigLayout("fillx"));
+		panel.setLayout(new MigLayout("fill"));
 		panel.setBorder(BorderFactory.createTitledBorder(title));
 		JTable table = new JTable()
 		{
@@ -135,8 +130,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		table.getColumnModel().getColumn(0).setCellRenderer(rend0);
 	  for (int i=0; i<model.getColumnCount(); i++) table.sizeColumnsToFit(i);
 		tableModels.add(model);
-		panel.add(table, "grow 100 0");
-		//panel.add(Box.createGlue());
+		panel.add(table, "growx, pushx");
 		table.setShowGrid(false);
 		return panel;
 	}

@@ -21,7 +21,7 @@
 	<!-- test comment for save -->
 	<property name="label" value="Node Data"/>
 	<property name="scrollable" value="true"/>
-	<property name="layoutConstraints" value="flowy, fill, gap unrel rel"/>
+	<property name="layoutConstraints" value="flowy, fill"/>
 	<property name="componentConstraints" value="grow"/>
 
 	<!-- ===================================================================== -->
@@ -45,14 +45,15 @@
 	<!--                      Tree table area                                  -->
 	<!-- ===================================================================== -->
 
-	<child name="TablesCOntainer" type="page">
+	<child name="TablesContainer" type="page">
 		<property name="label" value="Actions"/>
 		<property name="layoutConstraints" value="fill"/>
+		<property name="componentConstraints" value="grow"/>
 
 		<child name="Tables" type="Java">
 			<property name="class" value="org.jppf.ui.monitoring.MonitoringPanel"/>
-			<property name="layoutConstraints" value="gap unrel rel, fill, flowy"/>
-			<property name="componentConstraints" value="growx"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="grow"/>
 			<property name="value" value=""/>
 		</child>
 

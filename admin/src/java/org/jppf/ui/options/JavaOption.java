@@ -54,7 +54,11 @@ public class JavaOption extends AbstractOption
 		try
 		{
 			UIComponent = (JComponent) Class.forName(getClassName()).newInstance();
-			if (UIComponent instanceof JPanel) ((JPanel) UIComponent).setLayout(new MigLayout(layoutConstraints));
+			if (UIComponent instanceof JPanel)
+			{
+				JPanel panel = (JPanel) UIComponent;
+				if (!(panel.getLayout() instanceof MigLayout)) panel.setLayout(new MigLayout(layoutConstraints));
+			}
 			if (mouseListenerClassName != null)
 			{
 				JavaOptionMouseListener ml =
