@@ -267,6 +267,7 @@
 		<delete file="gigaspaces.file" quiet="true"/>
 		<zip destfile="${gigaspaces.file}">
 			<zipfileset dir="${gigaspaces}" prefix="JPPF-GigaSpaces">
+				<exclude name="**/CVS/**"/>
 				<exclude name="**/*.log"/>
 				<exclude name="**/*.classpath"/>
 				<exclude name="**/*.project"/>
@@ -686,6 +687,9 @@
 			<packageset dir="${admin}/src/java"/>
 			<packageset dir="${demo}/src/java"/>
 			<packageset dir="${jca-client}/src/java"/>
+			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Common/src"/>
+			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Client/src"/>
+			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/src"/>
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
 			<link href="http://java.sun.com/javaee/5/docs/api"/>
 			<link href="http://junit.sourceforge.net/javadoc"/>
@@ -706,7 +710,7 @@
 			</header>
 			<bottom>
 				<![CDATA[
-					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2008 JPPF Team.</i></font>
+					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2009 JPPF Team.</i></font>
 				]]>
 			</bottom>
 		</javadoc>
