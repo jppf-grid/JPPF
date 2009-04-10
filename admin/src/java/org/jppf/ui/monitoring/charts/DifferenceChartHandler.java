@@ -17,17 +17,20 @@
  */
 package org.jppf.ui.monitoring.charts;
 
-import java.awt.*;
+import static org.jppf.utils.ReflectionHelper.*;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Paint;
+import java.awt.Stroke;
+import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Map;
-import org.jfree.chart.*;
-import org.jfree.chart.labels.XYSeriesLabelGenerator;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.xy.XYDifferenceRenderer;
-import org.jfree.data.xy.*;
+
+import org.jppf.ui.monitoring.charts.PlotXYChartHandler.LegendLabelGeneratorInvocationHandler;
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
-import org.jppf.ui.monitoring.data.*;
-import org.jppf.utils.StringUtils;
+import org.jppf.ui.monitoring.data.Fields;
+import org.jppf.ui.monitoring.data.StatsHandler;
 
 /**
  * Instances of this class are used to create and update line charts with an horizontal orientation.
@@ -57,17 +60,27 @@ public class DifferenceChartHandler implements ChartHandler
 	 */
 	public ChartConfiguration createChart(ChartConfiguration config)
 	{
-		XYSeriesCollection ds = createDataset(config);
+		Object ds = createDataset(config);
 		String s = config.name;
 		if (config.unit != null) s += " ("+config.unit+")";
-		JFreeChart chart = ChartFactory.createXYLineChart(s, null, null, ds, PlotOrientation.VERTICAL, true, true, false);
-		XYPlot plot = chart.getXYPlot();
-		XYDifferenceRenderer rend = new XYDifferenceRenderer(Color.green, Color.red, false);
-		plot.setRenderer(rend);
-		//XYItemRenderer rend = plot.getRenderer();
-		rend.setBaseSeriesVisibleInLegend(true);
-		rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
-		rend.setBaseStroke(new BasicStroke(2f));
+		//JFreeChart chart = ChartFactory.createXYLineChart(s, null, null, ds, PlotOrientation.VERTICAL, true, true, false);
+		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createXYLineChart",
+			s, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "VERTICAL"), true, true, false);
+		//XYPlot plot = chart.getXYPlot();
+		Object plot = invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "getXYPlot");
+		//XYDifferenceRenderer rend = new XYDifferenceRenderer(Color.green, Color.red, false);
+		Object rend = invokeConstructor(getClass0("org.jfree.chart.renderer.xy.XYDifferenceRenderer"),
+			new Class[] {Paint.class, Paint.class, Boolean.TYPE}, Color.green, Color.red, false);
+		//plot.setRenderer(rend);
+		invokeMethod(plot.getClass(), plot, "setRenderer", new Class[] {getClass0("org.jfree.chart.renderer.xy.XYItemRenderer")}, rend);
+		//rend.setBaseSeriesVisibleInLegend(true);
+		invokeMethod(rend.getClass(), rend, "setBaseSeriesVisibleInLegend", new Class[] {Boolean.TYPE}, true);
+		//rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
+		Object labelGenerator = Proxy.newProxyInstance(
+			getClass().getClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
+		invokeMethod(rend.getClass(), rend, "setLegendItemLabelGenerator", labelGenerator);
+		//rend.setBaseStroke(new BasicStroke(2f));
+		invokeMethod(rend.getClass(), rend, "setBaseStroke", new Class[] {Stroke.class}, new BasicStroke(2f));
 		config.chart = chart;
 		return config;
 	}
@@ -77,17 +90,21 @@ public class DifferenceChartHandler implements ChartHandler
 	 * @param config the names of the fields whose values populate the dataset.
 	 * @return a <code>DefaultCategoryDataset</code> instance.
 	 */
-	private XYSeriesCollection createDataset(ChartConfiguration config)
+	private Object createDataset(ChartConfiguration config)
 	{
-		XYSeriesCollection ds = new XYSeriesCollection();
+		//XYSeriesCollection ds = new XYSeriesCollection();
+		Object ds = newInstance("org.jfree.data.xy.XYSeriesCollection");
 		if ((config.fields != null) && (config.fields.length >= 2))
 		{
 			for (int i=0; i<2; i++)
 			{
 				Fields key = config.fields[i];
-				XYSeries series = new XYSeries(key);
-				ds.addSeries(series);
-				series.setMaximumItemCount(statsHandler.getRolloverPosition());
+				//XYSeries series = new XYSeries(key);
+				Object series = invokeConstructor(getClass0("org.jfree.data.xy.XYSeries"), new Class[] {Comparable.class}, key);
+				//ds.addSeries(series);
+				invokeMethod(ds.getClass(), ds, "addSeries", series);
+				//series.setMaximumItemCount(statsHandler.getRolloverPosition());
+				invokeMethod(series.getClass(), series, "setMaximumItemCount", statsHandler.getRolloverPosition());
 			}
 		}
 		config.dataset = ds;
@@ -106,22 +123,25 @@ public class DifferenceChartHandler implements ChartHandler
 		if (config.fields == null) return config;
 		int len = config.fields.length;
 		if (len < 2) return config;
-		XYSeriesCollection dataset = (XYSeriesCollection) config.dataset;
-		List list = dataset.getSeries();
+		Object ds = config.dataset;
+		//List list = ds.getSeries();
+		List list = (List) invokeMethod(ds.getClass(), ds, "getSeries");
 		for (Object o: list)
 		{
-			XYSeries series = (XYSeries) o;
-			series.clear();
+			//((XYSeries) o).clear();
+			invokeMethod(o.getClass(), o, "clear");
 		}
 		for (int i=0; i<2; i++)
 		{
 			Fields key = config.fields[i];
-			XYSeries series = dataset.getSeries(i);
+			//XYSeries series = ds.getSeries(i);
+			Object series = invokeMethod(ds.getClass(), ds, "getSeries", new Class[] {Integer.TYPE}, i);
 			int start = Math.max(0, statsHandler.getTickCount() - statsHandler.getStatsCount());
 			for (int j=0; j<statsHandler.getStatsCount(); j++)
 			{
 				Map<Fields, Double> valueMap = statsHandler.getDoubleValues(j);
-				series.add(start + j, valueMap.get(key));
+				//series.add(start + j, valueMap.get(key));
+				invokeMethod(series.getClass(), series, "add", new Class[] { Double.TYPE, Number.class}, start + j, valueMap.get(key));
 			}
 		}
 		return config;
@@ -135,32 +155,21 @@ public class DifferenceChartHandler implements ChartHandler
 	 */
 	public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
-		XYSeriesCollection dataset = (XYSeriesCollection) config.dataset;
+		Object ds = config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
-		for (int i=0; i<dataset.getSeriesCount(); i++)
+		if (valueMap != null)
 		{
-			XYSeries series = dataset.getSeries(i);
-			Fields key = (Fields) series.getKey();
-			series.add(statsHandler.getTickCount(), valueMap.get(key));
+			//for (int i=0; i<ds.getSeriesCount(); i++)
+			for (int i=0; i<(Integer) invokeMethod(ds.getClass(), ds, "getSeriesCount"); i++)
+			{
+				//XYSeries series = ds.getSeries(i);
+				Object series = invokeMethod(ds.getClass(), ds, "getSeries", new Class[] {Integer.TYPE}, i);
+				//Fields key = (Fields) series.getKey();
+				Fields key = (Fields) invokeMethod(series.getClass(), series, "getKey");
+				//series.add(statsHandler.getTickCount(), valueMap.get(key));
+				invokeMethod(series.getClass(), series, "add", new Class[] { Double.TYPE, Number.class}, statsHandler.getTickCount(), valueMap.get(key));
+			}
 		}
 		return config;
-	}
-
-	/**
-	 * A label generator that builds value labels with a specified precision and unit. 
-	 */
-	public static class LegendLabelGenerator implements XYSeriesLabelGenerator
-	{
-		/**
-		 * Generate a label for a value of a specified dataset at the specified row and column.
-		 * @param dataset the dataset that contains the value to format.
-		 * @param seriesIndex the data series to create a label for.
-		 * @return a string containing the formatted value.
-		 */
-		public String generateLabel(XYDataset dataset, int seriesIndex)
-		{
-			Fields key = (Fields) dataset.getSeriesKey(seriesIndex);
-			return StringUtils.shortenLabel(key.toString());
-		}
 	}
 }

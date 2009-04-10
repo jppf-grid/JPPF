@@ -17,8 +17,10 @@
  */
 package org.jppf.ui.monitoring.charts;
 
-import org.jfree.chart.*;
-import org.jfree.data.general.PieDataset;
+import static org.jppf.utils.ReflectionHelper.*;
+
+import java.util.Locale;
+
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
 import org.jppf.ui.monitoring.data.StatsHandler;
 
@@ -45,8 +47,10 @@ public class RingChartHandler extends Pie3DChartHandler
 	 */
 	public ChartConfiguration createChart(ChartConfiguration config)
 	{
-		PieDataset ds = createDataset(config);
-		JFreeChart chart = ChartFactory.createRingChart(config.name, ds, false, true, false);
+		Object ds = createDataset(config);
+		//JFreeChart chart = ChartFactory.createRingChart(config.name, ds, false, true, Locale.getDefault());
+		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createRingChart",
+			(String) config.name, ds, false, true, Locale.getDefault());
 		config.chart = chart;
 		return config;
 	}

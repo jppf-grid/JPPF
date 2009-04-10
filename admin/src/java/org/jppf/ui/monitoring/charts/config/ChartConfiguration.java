@@ -17,8 +17,8 @@
  */
 package org.jppf.ui.monitoring.charts.config;
 
-import org.jfree.chart.*;
-import org.jfree.data.general.Dataset;
+import javax.swing.JPanel;
+
 import org.jppf.ui.monitoring.charts.ChartType;
 import org.jppf.ui.monitoring.data.Fields;
 
@@ -51,15 +51,18 @@ public class ChartConfiguration
 	/**
 	 * The dataset associated witht the chart.
 	 */
-	public Dataset dataset = null;
+	public Object dataset = null;
+	//public Dataset dataset = null;
 	/**
 	 * The JFreeChart object.
 	 */
-	public JFreeChart chart = null;
+	public Object chart = null;
+	//public JFreeChart chart = null;
 	/**
 	 * The chartPanel enclosing the chart.
 	 */
-	public ChartPanel chartPanel = null;
+	public JPanel chartPanel = null;
+	//public ChartPanel chartPanel = null;
 	/**
 	 * Position of the chart in its containing panel.
 	 */

@@ -19,12 +19,12 @@ package org.jppf.ui.monitoring.charts.config;
 
 import static org.jppf.ui.monitoring.charts.ChartType.*;
 import static org.jppf.ui.monitoring.data.Fields.*;
+import static org.jppf.utils.ReflectionHelper.*;
 
 import java.util.*;
 
 import javax.swing.*;
 
-import org.jfree.chart.ChartPanel;
 import org.jppf.ui.monitoring.charts.*;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
@@ -132,7 +132,8 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 		ChartHandler handler = handlerMap.get(cfg.type);
 		if (handler == null) return null;
 		handler.createChart(cfg);
-		cfg.chartPanel = new ChartPanel(cfg.chart);
+		//cfg.chartPanel = new ChartPanel(cfg.chart);
+		cfg.chartPanel = (JPanel) invokeConstructor(getClass0("org.jfree.chart.ChartPanel"), new Class[] {getClass0("org.jfree.chart.JFreeChart")}, cfg.chart);
 		return cfg;
 	}
 

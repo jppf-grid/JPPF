@@ -19,6 +19,8 @@ package org.jppf.ui.options.xml;
 
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.logging.*;
 import org.jppf.ui.options.*;
@@ -56,6 +58,11 @@ public class OptionsPageBuilder
 	 * Element factory used by this builder.
 	 */
 	private OptionElementFactory factory = null;
+	/**
+	 * Used to executed initial events in a separate thread,
+	 * with the goal to speed up the console's startup time.
+	 */
+	private ExecutorService eventExecutor = Executors.newFixedThreadPool(1);
 
 	/**
 	 * Default constructor.
@@ -144,12 +151,19 @@ public class OptionsPageBuilder
 	 * This ensures the consistence of the UI's initial state.
 	 * @param elt the root element of the options on which to trigger the events.
 	 */
-	public void triggerInitialEvents(OptionElement elt)
+	public void triggerInitialEvents(final OptionElement elt)
 	{
 		if (elt == null) return;
 		if (elt.getInitializer() != null)
 		{
-			elt.getInitializer().valueChanged(new ValueChangeEvent(elt));
+			Runnable r = new Runnable()
+			{
+				public void run()
+				{
+					elt.getInitializer().valueChanged(new ValueChangeEvent(elt));
+				}
+			};
+			eventExecutor.submit(r);
 		}
 		if (elt instanceof OptionsPage)
 		{
@@ -239,7 +253,6 @@ public class OptionsPageBuilder
 		else if ("ToolbarSeparator".equalsIgnoreCase(desc.type)) elt = f.buildToolbarSeparator(desc);
 		else if ("Button".equalsIgnoreCase(desc.type)) elt = f.buildButton(desc);
 		else if ("TextArea".equalsIgnoreCase(desc.type)) elt = f.buildTextArea(desc);
-		else if ("XMLEditor".equalsIgnoreCase(desc.type)) elt = f.buildXMLEditor(desc);
 		else if ("Password".equalsIgnoreCase(desc.type)) elt = f.buildPassword(desc);
 		else if ("PlainText".equalsIgnoreCase(desc.type)) elt = f.buildPlainText(desc);
 		else if ("FormattedNumber".equalsIgnoreCase(desc.type)) elt = f.buildFormattedNumber(desc);

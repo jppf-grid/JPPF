@@ -17,16 +17,18 @@
  */
 package org.jppf.ui.monitoring.charts;
 
-import java.awt.BasicStroke;
-import java.util.*;
+import static org.jppf.utils.ReflectionHelper.*;
 
-import org.jfree.chart.*;
-import org.jfree.chart.labels.XYSeriesLabelGenerator;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.xy.*;
+import java.awt.BasicStroke;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.List;
+import java.util.Map;
+
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
-import org.jppf.ui.monitoring.data.*;
+import org.jppf.ui.monitoring.data.Fields;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.utils.StringUtils;
 
 /**
@@ -57,15 +59,25 @@ public class PlotXYChartHandler implements ChartHandler
 	 */
 	public ChartConfiguration createChart(ChartConfiguration config)
 	{
-		XYSeriesCollection ds = createDataset(config);
+		Object ds = createDataset(config);
 		String s = config.name;
 		if (config.unit != null) s += " ("+config.unit+")";
-		JFreeChart chart = ChartFactory.createXYLineChart(s, null, null, ds, PlotOrientation.VERTICAL, true, true, false);
-		XYPlot plot = chart.getXYPlot();
-		XYItemRenderer rend = plot.getRenderer();
-		rend.setBaseSeriesVisibleInLegend(true);
-		rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
-		rend.setBaseStroke(new BasicStroke(2f));
+		//JFreeChart chart = ChartFactory.createXYLineChart(s, null, null, ds, PlotOrientation.VERTICAL, true, true, false);
+		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createXYLineChart",
+			s, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "VERTICAL"), true, true, false);
+		//XYPlot plot = chart.getXYPlot();
+		Object plot = invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "getXYPlot");
+		//XYItemRenderer rend = plot.getRenderer();
+		Object rend = invokeMethod(getClass0("org.jfree.chart.plot.XYPlot"), plot, "getRenderer");
+		Class rendClass = getClass0("org.jfree.chart.renderer.xy.XYItemRenderer");
+		//rend.setBaseSeriesVisibleInLegend(true);
+		invokeMethod(rendClass, rend, "setBaseSeriesVisibleInLegend", new Class[] {Boolean.TYPE}, true);
+		//rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
+		Object labelGenerator = Proxy.newProxyInstance(
+			getClass().getClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
+		invokeMethod(rendClass, rend, "setLegendItemLabelGenerator", labelGenerator);
+		//rend.setBaseStroke(new BasicStroke(2f));
+		invokeMethod(rendClass, rend, "setBaseStroke", new BasicStroke(2f));
 		config.chart = chart;
 		return config;
 	}
@@ -75,14 +87,18 @@ public class PlotXYChartHandler implements ChartHandler
 	 * @param config the names of the fields whose values populate the dataset.
 	 * @return a <code>DefaultCategoryDataset</code> instance.
 	 */
-	private XYSeriesCollection createDataset(ChartConfiguration config)
+	private Object createDataset(ChartConfiguration config)
 	{
-		XYSeriesCollection ds = new XYSeriesCollection();
+		//XYSeriesCollection ds = new XYSeriesCollection();
+		Object ds = newInstance("org.jfree.data.xy.XYSeriesCollection");
 		for (Fields key: config.fields)
 		{
-			XYSeries series = new XYSeries(key);
-			ds.addSeries(series);
-			series.setMaximumItemCount(statsHandler.getRolloverPosition());
+			//XYSeries series = new XYSeries(key);
+			Object series = invokeConstructor(getClass0("org.jfree.data.xy.XYSeries"), new Class[] {Comparable.class}, key);
+			//ds.addSeries(series);
+			invokeMethod(ds.getClass(), ds, "addSeries", series);
+			//series.setMaximumItemCount(statsHandler.getRolloverPosition());
+			invokeMethod(series.getClass(), series, "setMaximumItemCount", statsHandler.getRolloverPosition());
 		}
 		config.dataset = ds;
 		populateDataset(config);
@@ -97,22 +113,28 @@ public class PlotXYChartHandler implements ChartHandler
 	 */
 	public ChartConfiguration populateDataset(ChartConfiguration config)
 	{
-		XYSeriesCollection dataset = (XYSeriesCollection) config.dataset;
-		List list = dataset.getSeries();
+		//XYSeriesCollection ds= (XYSeriesCollection) config.dataset;
+		Object ds = config.dataset;
+		//List list = ds.getSeries();
+		List list = (List) invokeMethod(ds.getClass(), ds, "getSeries");
 		for (Object o: list)
 		{
-			XYSeries series = (XYSeries) o;
-			series.clear();
+			//((XYSeries) o).clear();
+			invokeMethod(o.getClass(), o, "clear");
 		}
-		for (int i=0; i<dataset.getSeriesCount(); i++)
+		//for (int i=0; i<ds.getSeriesCount(); i++)
+		for (int i=0; i<(Integer) invokeMethod(ds.getClass(), ds, "getSeriesCount"); i++)
 		{
-			Fields key = (Fields) dataset.getSeriesKey(i);
-			XYSeries series = dataset.getSeries(i);
+			//Fields key = (Fields) ds.getSeriesKey(i);
+			Fields key = (Fields) invokeMethod(ds.getClass(), ds, "getSeriesKey", i);
+			//XYSeries series = ds.getSeries(i);
+			Object series = invokeMethod(ds.getClass(), ds, "getSeries", new Class[] {Integer.TYPE}, i);
 			int start = Math.max(0, statsHandler.getTickCount() - statsHandler.getStatsCount());
 			for (int j=0; j<statsHandler.getStatsCount(); j++)
 			{
 				Map<Fields, Double> valueMap = statsHandler.getDoubleValues(j);
-				series.add(start + j, valueMap.get(key));
+				//series.add(start + j, valueMap.get(key));
+				invokeMethod(series.getClass(), series, "add", new Class[] { Double.TYPE, Number.class}, start + j, valueMap.get(key));
 			}
 		}
 		return config;
@@ -126,31 +148,39 @@ public class PlotXYChartHandler implements ChartHandler
 	 */
 	public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
-		XYSeriesCollection dataset = (XYSeriesCollection) config.dataset;
+		//XYSeriesCollection ds = (XYSeriesCollection) config.dataset;
+		Object ds = config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
-		for (int i=0; i<dataset.getSeriesCount(); i++)
+		//for (int i=0; i<ds.getSeriesCount(); i++)
+		for (int i=0; i<(Integer) invokeMethod(ds.getClass(), ds, "getSeriesCount"); i++)
 		{
-			XYSeries series = dataset.getSeries(i);
-			Fields key = (Fields) series.getKey();
-			series.add(statsHandler.getTickCount(), valueMap.get(key));
+			//XYSeries series = ds.getSeries(i);
+			Object series = invokeMethod(ds.getClass(), ds, "getSeries", new Class[] {Integer.TYPE}, i);
+			//Fields key = (Fields) series.getKey();
+			Fields key = (Fields) invokeMethod(series.getClass(), series, "getKey");
+			//series.add(statsHandler.getTickCount(), valueMap.get(key));
+			invokeMethod(series.getClass(), series, "add", new Class[] { Double.TYPE, Number.class}, statsHandler.getTickCount(), valueMap.get(key));
 		}
 		return config;
 	}
 
 	/**
-	 * A label generator that builds value labels with a specified precision and unit. 
+	 * Invocation handler for a dynamic proxy to a <code>org.jppf.ui.monitoring.charts.PlotXYChartHandler.LegendLabelGenerator</code> implementation.
 	 */
-	public static class LegendLabelGenerator implements XYSeriesLabelGenerator
+	public static class LegendLabelGeneratorInvocationHandler implements InvocationHandler
 	{
 		/**
-		 * Generate a label for a value of a specified dataset at the specified row and column.
-		 * @param dataset the dataset that contains the value to format.
-		 * @param seriesIndex the data series to create a label for.
-		 * @return a string containing the formatted value.
+		 * Invoke a specified method on the specified proxy.
+		 * @param proxy the dynamic proxy to invoke the method on.
+		 * @param method the method to invoke.
+		 * @param args the method parameters values.
+		 * @return the result of the method invocation.
+		 * @throws Throwable if any error occurs.
+		 * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 		 */
-		public String generateLabel(XYDataset dataset, int seriesIndex)
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
-			Fields key = (Fields) dataset.getSeriesKey(seriesIndex);
+			Fields key = (Fields) invokeMethod(args[0].getClass(), args[0], "getSeriesKey", args[1]);
 			return StringUtils.shortenLabel(key.toString());
 		}
 	}

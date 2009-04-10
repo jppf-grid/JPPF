@@ -17,11 +17,13 @@
  */
 package org.jppf.ui.monitoring.charts;
 
+import static org.jppf.utils.ReflectionHelper.*;
+
 import java.util.Map;
-import org.jfree.chart.*;
-import org.jfree.data.general.*;
+
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
-import org.jppf.ui.monitoring.data.*;
+import org.jppf.ui.monitoring.data.Fields;
+import org.jppf.ui.monitoring.data.StatsHandler;
 
 /**
  * Instances of this class are used to create and update 3D pie charts.
@@ -51,8 +53,10 @@ public class Pie3DChartHandler implements ChartHandler
 	 */
 	public ChartConfiguration createChart(ChartConfiguration config)
 	{
-		PieDataset ds = createDataset(config);
-		JFreeChart chart = ChartFactory.createPieChart3D(config.name, ds, false, true, false);
+		Object ds = createDataset(config);
+		//JFreeChart chart = ChartFactory.createPieChart3D(config.name, ds, false, true, false);
+		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createPieChart3D",
+			config.name, ds, false, true, false);
 		config.chart = chart;
 		return config;
 	}
@@ -62,9 +66,10 @@ public class Pie3DChartHandler implements ChartHandler
 	 * @param config the names of the fields whose values populate the dataset.
 	 * @return a <code>DefaultCategoryDataset</code> instance.
 	 */
-	protected PieDataset createDataset(ChartConfiguration config)
+	protected Object createDataset(ChartConfiguration config)
 	{
-		DefaultPieDataset ds = new DefaultPieDataset();
+		//PieDataset ds = new DefaultPieDataset();
+		Object ds = newInstance("org.jfree.data.general.DefaultPieDataset");
 		config.dataset = ds;
 		populateDataset(config);
 		return ds;
@@ -89,9 +94,16 @@ public class Pie3DChartHandler implements ChartHandler
 	 */
 	public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
-		DefaultPieDataset dataset = (DefaultPieDataset) config.dataset;
+		Object ds = config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
-		for (Fields key: config.fields) dataset.setValue(key, valueMap.get(key));
+		if (valueMap != null)
+		{
+			for (Fields key: config.fields)
+			{
+				//ds.setValue(key, valueMap.get(key));
+				invokeMethod(ds.getClass(), ds, "setValue", new Class[] {Comparable.class, Number.class}, key, valueMap.get(key));
+			}
+		}
 		return config;
 	}
 }

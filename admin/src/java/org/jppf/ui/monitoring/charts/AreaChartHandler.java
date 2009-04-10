@@ -17,16 +17,16 @@
  */
 package org.jppf.ui.monitoring.charts;
 
+import static org.jppf.utils.ReflectionHelper.*;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Map;
 
-import org.jfree.chart.*;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.labels.CategorySeriesLabelGenerator;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.category.AreaRenderer;
-import org.jfree.data.category.*;
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
-import org.jppf.ui.monitoring.data.*;
+import org.jppf.ui.monitoring.data.Fields;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.utils.StringUtils;
 
 /**
@@ -57,14 +57,24 @@ public class AreaChartHandler implements ChartHandler
 	 */
 	public ChartConfiguration createChart(ChartConfiguration config)
 	{
-		DefaultCategoryDataset ds = createDataset(config);
-		JFreeChart chart = ChartFactory.createAreaChart(null, null, config.name, ds, PlotOrientation.VERTICAL, true, true, false);
-		CategoryPlot plot = chart.getCategoryPlot();
-    plot.setForegroundAlpha(0.5f);
-		final CategoryAxis axis = plot.getDomainAxis();
-		axis.setTickLabelsVisible(false);
-		AreaRenderer rend = (AreaRenderer) plot.getRenderer();
-		rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
+		Object ds = createDataset(config);
+		//JFreeChart chart = ChartFactory.createAreaChart(null, null, config.name, ds, PlotOrientation.VERTICAL, true, true, false);
+		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createAreaChart",
+			(String) null, null, config.name, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "VERTICAL"), true, true, false);
+		//CategoryPlot plot = chart.getCategoryPlot();
+		Object plot = invokeMethod(chart.getClass(), chart, "getCategoryPlot");
+    //plot.setForegroundAlpha(0.5f);
+		invokeMethod(plot.getClass(), plot, "setForegroundAlpha", 0.5f);
+		//CategoryAxis axis = plot.getDomainAxis();
+		Object axis = invokeMethod(plot.getClass(), plot, "getDomainAxis");
+		//axis.setTickLabelsVisible(false);
+		invokeMethod(axis.getClass(), axis, "setTickLabelsVisible", false);
+		//AreaRenderer rend = (AreaRenderer) plot.getRenderer();
+		Object rend = invokeMethod(plot.getClass(), plot, "getRenderer");
+		//rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
+		Object labelGenerator = Proxy.newProxyInstance(
+			getClass().getClassLoader(), getClasses("org.jfree.chart.labels.CategorySeriesLabelGenerator"), new CategorySeriesLabelGeneratorInvocationHandler());
+		invokeMethod(rend.getClass(), rend, "setLegendItemLabelGenerator", labelGenerator);
 
 		config.chart = chart;
 		return config;
@@ -75,9 +85,10 @@ public class AreaChartHandler implements ChartHandler
 	 * @param config the names of the fields whose values populate the dataset.
 	 * @return a <code>DefaultCategoryDataset</code> instance.
 	 */
-	private DefaultCategoryDataset createDataset(ChartConfiguration config)
+	private Object createDataset(ChartConfiguration config)
 	{
-		DefaultCategoryDataset ds = new DefaultCategoryDataset();
+		//DefaultCategoryDataset ds = new DefaultCategoryDataset();
+		Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
 		config.dataset = ds;
 		populateDataset(config);
 		return ds;
@@ -91,15 +102,17 @@ public class AreaChartHandler implements ChartHandler
 	 */
 	public ChartConfiguration populateDataset(ChartConfiguration config)
 	{
-		DefaultCategoryDataset dataset = (DefaultCategoryDataset) config.dataset;
-		dataset.clear();
+		Object ds = config.dataset;
+		//ds.clear();
+		invokeMethod(ds.getClass(), ds, "clear");
 		int start = Math.max(0, statsHandler.getTickCount() - statsHandler.getStatsCount());
 		for (int j=0; j<statsHandler.getStatsCount(); j++)
 		{
 			Map<Fields, Double> valueMap = statsHandler.getDoubleValues(j);
 			for (Fields key: config.fields)
 			{
-				dataset.setValue(valueMap.get(key), key, Integer.valueOf(j + start));
+				//ds.setValue(valueMap.get(key), key, Integer.valueOf(j + start));
+				invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(j + start));
 			}
 		}
 		return config;
@@ -113,29 +126,43 @@ public class AreaChartHandler implements ChartHandler
 	 */
 	public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
-		DefaultCategoryDataset dataset = (DefaultCategoryDataset) config.dataset;
+		Object ds = config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
-		for (Fields key: config.fields)
-			dataset.setValue(valueMap.get(key), key, Integer.valueOf(statsHandler.getTickCount()));
-		if (dataset.getRowCount() > statsHandler.getRolloverPosition()) dataset.removeRow(0);
+		if (valueMap != null)
+		{
+			for (Fields key: config.fields)
+			{
+				//ds.setValue(valueMap.get(key), key, Integer.valueOf(statsHandler.getTickCount()));
+				invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(statsHandler.getTickCount()));
+			}
+		}
+		//if (ds.getRowCount() > statsHandler.getRolloverPosition())
+		if ((Integer) invokeMethod(ds.getClass(), ds, "getRowCount") > statsHandler.getRolloverPosition())
+		{
+			//ds.removeRow(0);
+			invokeMethod(ds.getClass(), ds, "removeRow", 0);
+		}
 		return config;
 	}
 
 	/**
-	 * A label generator that builds value labels with a specified precision and unit. 
+	 * Invocation handler for a dynamic proxy to a <code>org.jppf.ui.monitoring.charts.PlotXYChartHandler.LegendLabelGenerator</code> implementation.
 	 */
-	public static class LegendLabelGenerator implements CategorySeriesLabelGenerator
+	public static class CategorySeriesLabelGeneratorInvocationHandler implements InvocationHandler
 	{
 		/**
-		 * Generate a label for a value of a specified dataset at the specified row and column.
-		 * @param dataset the dataset that contains the value to format.
-		 * @param seriesIndex the data series to create a label for.
-		 * @return a string containing the formatted value.
+		 * Invoke a specified method on the specified proxy.
+		 * @param proxy the dynamic proxy to invoke the method on.
+		 * @param method the method to invoke.
+		 * @param args the method parameters values.
+		 * @return the result of the method invocation.
+		 * @throws Throwable if any error occurs.
+		 * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 		 */
-		public String generateLabel(CategoryDataset dataset, int seriesIndex)
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
-			String key = (String) dataset.getRowKey(seriesIndex);
-			return StringUtils.shortenLabel(key);
+			Fields key = (Fields) invokeMethod(args[0].getClass(), args[0], "getRowKey", args[1]);
+			return StringUtils.shortenLabel(key.toString());
 		}
 	}
 }

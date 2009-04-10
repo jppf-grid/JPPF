@@ -315,22 +315,6 @@ public class OptionElementFactory
 	}
 
 	/**
-	 * Build an XML editor option from the specified option descriptor.
-	 * @param desc the descriptor to get the page properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public Option buildXMLEditor(OptionDescriptor desc) throws Exception
-	{
-		XMLEditorOption option = new XMLEditorOption();
-		option.setEventsEnabled(false);
-		builder.initCommonOptionAttributes(option, desc);
-		option.createUI();
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
 	 * Build a toolbar option from the specified option descriptor.
 	 * @param desc the descriptor to get the properties from.
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
