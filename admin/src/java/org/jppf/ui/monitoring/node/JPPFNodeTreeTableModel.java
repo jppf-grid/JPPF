@@ -18,15 +18,17 @@
 
 package org.jppf.ui.monitoring.node;
 
-import org.jdesktop.swingx.treetable.*;
+import javax.swing.tree.*;
+
 import org.jppf.management.JPPFNodeState;
-import org.jppf.ui.monitoring.data.*;
+import org.jppf.ui.monitoring.data.NodeInfoHolder;
+import org.jppf.ui.treetable.*;
 import org.jppf.utils.LocalizationUtils;
 
 /**
  * Tree table model for the tree table.
  */
-public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
+public class JPPFNodeTreeTableModel extends AbstractTreeTableModel implements TreeTableModel
 {
 	/**
 	 * Base name for localization bundle lookups.
@@ -61,7 +63,7 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 	 * Initialize this model witht he specified tree.
 	 * @param node the root of the tree.
 	 */
-	public JPPFNodeTreeTableModel(TreeTableNode node)
+	public JPPFNodeTreeTableModel(TreeNode node)
 	{
 		super(node);
 	}
@@ -70,6 +72,7 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 	 * Get the number of columns in the table.
 	 * @return the number of columns as an int.
 	 * @see org.jdesktop.swingx.treetable.DefaultTreeTableModel#getColumnCount()
+	 * @see org.jppf.ui.treetable.TreeTableModel#getColumnCount()
 	 */
 	public int getColumnCount()
 	{
@@ -81,14 +84,14 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 	 * @param node the node for which to get a value.
 	 * @param column the column from which to set a value.
 	 * @return the value from the specified node and column.
-	 * @see org.jdesktop.swingx.treetable.DefaultTreeTableModel#getValueAt(java.lang.Object, int)
+	 * @see org.jppf.ui.treetable.TreeTableModel#getValueAt(java.lang.Object, int)
 	 */
 	public Object getValueAt(Object node, int column)
 	{
 		Object res = "";
-		if (node instanceof DefaultMutableTreeTableNode)
+		if (node instanceof DefaultMutableTreeNode)
 		{
-			DefaultMutableTreeTableNode defNode = (DefaultMutableTreeTableNode) node;
+			DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
 			if (defNode.getUserObject() instanceof NodeInfoHolder)
 			{
 				NodeInfoHolder info = (NodeInfoHolder) defNode.getUserObject();
@@ -102,16 +105,16 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 						res = "" + state.getThreadPoolSize() + " / " + state.getThreadPriority();
 						break;
 					case NODE_STATUS:
-						res = state.getConnectionStatus();
+						res = "" + state.getConnectionStatus();
 						break;
 					case EXECUTION_STATUS:
-						res = state.getExecutionStatus();
+						res = "" + state.getExecutionStatus();
 						break;
 					case NB_TASKS:
-						res = state.getNbTasksExecuted();
+						res = "" + state.getNbTasksExecuted();
 						break;
 					case TASK_EVENT:
-						res = state.getTaskNotification();
+						res = "" + state.getTaskNotification();
 						break;
 				}
 			}
@@ -127,7 +130,7 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 	 * What the TableHeader displays when the Table is in a JScrollPane.
 	 * @param column the index of the column for which to get a title.
 	 * @return the column title as a string.
-	 * @see org.jdesktop.swingx.treetable.DefaultTreeTableModel#getColumnName(int)
+	 * @see org.jppf.ui.treetable.TreeTableModel#getColumnName(int)
 	 */
 	public String getColumnName(int column)
 	{
@@ -161,11 +164,12 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 	 * @param node not used.
 	 * @param column not used.
 	 * @return true if the cell can be edited, false otherwise.
-	 * @see org.jdesktop.swingx.treetable.DefaultTreeTableModel#isCellEditable(java.lang.Object, int)
+	 * @see org.jppf.ui.treetable.AbstractTreeTableModel#isCellEditable(java.lang.Object, int)
 	 */
 	public boolean isCellEditable(Object node, int column)
 	{
-		return false;
+		//return false;
+		return super.isCellEditable(node, column);
 	}
 
 	/**
@@ -188,5 +192,63 @@ public class JPPFNodeTreeTableModel extends DefaultTreeTableModel
 	private String localize(String message)
 	{
 		return LocalizationUtils.getLocalized(BASE, message);
+	}
+
+	/**
+	 * Return the child at the spcified index from the specified parent node.
+	 * @param parent - the parent to get the child from.
+	 * @param index - the index at which to get the child
+	 * @return the child node, or null if the index is not valid.
+	 * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
+	 */
+	public Object getChild(Object parent, int index)
+	{
+		return ((TreeNode) parent).getChildAt(index);
+	}
+
+	/**
+	 * Get the number of children for the specified node.
+	 * @param parent the node for which to get the number of children. 
+	 * @return the number of children as an int.
+	 * @see javax.swing.tree.TreeModel#getChildCount(java.lang.Object)
+	 */
+	public int getChildCount(Object parent)
+	{
+		return ((TreeNode) parent).getChildCount();
+	}
+
+	/**
+	 * Insert the specified child into the specified parent's list of children at the specified position.
+	 * @param child - the node to insert into the parent.
+	 * @param parent - the node into which to insert the child.
+	 * @param pos - the position at which to insert the node.
+	 */
+	public void insertNodeInto(DefaultMutableTreeNode child, DefaultMutableTreeNode parent, int pos)
+	{
+		parent.insert(child, pos);
+		fireTreeNodesInserted(parent, parent.getPath(), new int[] { pos }, new Object[] { child } );
+	}
+
+	/**
+	 * Remove a node from the tree.
+	 * @param node - the node to remove from the parent.
+	 */
+	public void removeNodeFromParent(DefaultMutableTreeNode node)
+	{
+		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+		int pos = parent.getIndex(node);
+		parent.remove(node);
+		fireTreeNodesRemoved(parent, parent.getPath(), new int[] { pos }, new Object[] { node } );
+	}
+
+	/**
+	 * Determine the class of th specified column.
+	 * @param column - the column index.
+	 * @return a <code>Class</code> instance.
+	 * @see org.jppf.ui.treetable.AbstractTreeTableModel#getColumnClass(int)
+	 */
+	public Class getColumnClass(int column)
+	{
+		return (column == 0) ? TreeTableModel.class : String.class;
 	}
 }

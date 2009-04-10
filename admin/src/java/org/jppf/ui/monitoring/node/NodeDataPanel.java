@@ -20,17 +20,15 @@ package org.jppf.ui.monitoring.node;
 
 import java.util.Map;
 
-import javax.swing.JScrollPane;
-import javax.swing.table.TableColumn;
-import javax.swing.tree.TreePath;
+import javax.swing.*;
+import javax.swing.tree.*;
 
 import org.apache.commons.logging.*;
-import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jppf.management.NodeManagementInfo;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.options.AbstractOption;
+import org.jppf.ui.treetable.JTreeTable;
 import org.jppf.utils.LocalizationUtils;
 
 /**
@@ -54,7 +52,7 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	/**
 	 * A tree table component displaying the driver and nodes information. 
 	 */
-	private JXTreeTable treeTable = null;
+	private JPPFTreeTable treeTable = null;
 	/**
 	 * Contains all the data about the drivers and nodes.
 	 */
@@ -63,6 +61,10 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 * The tree table model associated witht he tree table.
 	 */
 	private transient JPPFNodeTreeTableModel model = null;
+	/**
+	 * The root of the tree model.
+	 */
+	private DefaultMutableTreeNode root = null;
 
 	/**
 	 * Initialize this panel with the specified information.
@@ -90,17 +92,24 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	private void createTreeTableModel()
 	{
-		DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode(localize("tree.root.name"));
+		root = new DefaultMutableTreeNode(localize("tree.root.name"));
 		model = new JPPFNodeTreeTableModel(root);
+	}
+
+	/**
+	 * Create and initialize the tree table model holding the drivers and nodes data.
+	 */
+	private void populateTreeTableModel()
+	{
 		Map<String, NodeInfoManager> nodeManagerMap = handler.getNodeManagerMap();
 		for (Map.Entry<String, NodeInfoManager> mgrEntry: nodeManagerMap.entrySet())
 		{
-			DefaultMutableTreeTableNode driverNode = new DefaultMutableTreeTableNode(mgrEntry.getKey());
+			DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(mgrEntry.getKey());
 			model.insertNodeInto(driverNode, root, root.getChildCount());
 			Map<NodeManagementInfo, NodeInfoHolder> driverNodeMap = mgrEntry.getValue().getNodeMap();
 			for (Map.Entry<NodeManagementInfo, NodeInfoHolder> infoEntry: driverNodeMap.entrySet())
 			{
-				DefaultMutableTreeTableNode nodeNode = new DefaultMutableTreeTableNode(infoEntry.getValue());
+				DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(infoEntry.getValue());
 				model.insertNodeInto(nodeNode, driverNode, driverNode.getChildCount());
 			}
 		}
@@ -111,25 +120,16 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	public void createUI()
 	{
-	  treeTable = new JXTreeTable(model);
-	  //setViewportView(treeTable);
+	  treeTable = new JPPFTreeTable(model);
+	  treeTable.getTree().setRootVisible(false);
+	  treeTable.getTree().setShowsRootHandles(true);
+	  populateTreeTableModel();
 		treeTable.expandAll();
-		//treeTable.setHorizontalScrollEnabled(false);
-		treeTable.setAutoResizeMode(JXTreeTable.AUTO_RESIZE_OFF);
 		treeTable.addMouseListener(new TreeTableMouseListener());
+	  for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
+		treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		JScrollPane sp = new JScrollPane(treeTable);
 		setUIComponent(sp);
-		int[] widths = { 200, 60, 60, 60, 60, 200 };
-		for (int i=0; i<widths.length; i++)
-		{
-			TableColumn c = treeTable.getColumn(i);
-			c.setMinWidth(widths[i]);
-			//c.setMaxWidth(widths[i]);
-			c.setPreferredWidth(widths[i]);
-		}
-	  for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
-		treeTable.setAutoResizeMode(JXTreeTable.AUTO_RESIZE_LAST_COLUMN);
-	  //for (int i=model.getColumnCount()-1; i<=0; i--) treeTable.sizeColumnsToFit(i);
 	}
 
 	/**
@@ -139,10 +139,10 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	public void nodeDataUpdated(NodeHandlerEvent event)
 	{
-		final DefaultMutableTreeTableNode root = (DefaultMutableTreeTableNode) model.getRoot();
-		final DefaultMutableTreeTableNode driverNode = findDriver(event.getDriverName());
+		final DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+		final DefaultMutableTreeNode driverNode = findDriver(event.getDriverName());
 		if (driverNode == null) return;
-		final DefaultMutableTreeTableNode node = findNode(driverNode, event.getInfoHolder());
+		final DefaultMutableTreeNode node = findNode(driverNode, event.getInfoHolder());
 		if (node == null) return;
 		treeTable.repaint();
 	}
@@ -154,8 +154,8 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	public void driverAdded(NodeHandlerEvent event)
 	{
-		final DefaultMutableTreeTableNode root = (DefaultMutableTreeTableNode) model.getRoot();
-		final DefaultMutableTreeTableNode driverNode = new DefaultMutableTreeTableNode(event.getDriverName());
+		final DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+		final DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(event.getDriverName());
 		if (debugEnabled) log.debug("adding driver: " + event.getDriverName());
 		model.insertNodeInto(driverNode, root, root.getChildCount());
 		if (root.getChildCount() == 1) expandAndResizeColumns();
@@ -168,7 +168,7 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	public void driverRemoved(NodeHandlerEvent event)
 	{
-		final DefaultMutableTreeTableNode driverNode = findDriver(event.getDriverName());
+		final DefaultMutableTreeNode driverNode = findDriver(event.getDriverName());
 		if (debugEnabled) log.debug("removing driver: " + event.getDriverName());
 		if (driverNode != null) model.removeNodeFromParent(driverNode);
 	}
@@ -180,12 +180,12 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	public void nodeAdded(NodeHandlerEvent event)
 	{
-		final DefaultMutableTreeTableNode driverNode = findDriver(event.getDriverName());
+		final DefaultMutableTreeNode driverNode = findDriver(event.getDriverName());
 		if (driverNode == null) return;
-		final DefaultMutableTreeTableNode node = new DefaultMutableTreeTableNode(event.getInfoHolder());
+		final DefaultMutableTreeNode node = new DefaultMutableTreeNode(event.getInfoHolder());
 		if (debugEnabled) log.debug("adding node: " + event.getInfoHolder());
 		model.insertNodeInto(node, driverNode, driverNode.getChildCount());
-		final DefaultMutableTreeTableNode root = (DefaultMutableTreeTableNode) model.getRoot();
+		final DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
 		if (root.getChildCount() == 1) expandAndResizeColumns();
 	}
 
@@ -196,9 +196,9 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	public void nodeRemoved(NodeHandlerEvent event)
 	{
-		DefaultMutableTreeTableNode driverNode = findDriver(event.getDriverName());
+		DefaultMutableTreeNode driverNode = findDriver(event.getDriverName());
 		if (driverNode == null) return;
-		final DefaultMutableTreeTableNode node = findNode(driverNode, event.getInfoHolder());
+		final DefaultMutableTreeNode node = findNode(driverNode, event.getInfoHolder());
 		if (node != null)
 		{
 			if (debugEnabled) log.debug("removing node: " + event.getInfoHolder());
@@ -209,14 +209,14 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	/**
 	 * Find the driver tree node with the specified driver name.
 	 * @param driverName name of the dirver to find.
-	 * @return a <code>DefaultMutableTreeTableNode</code> or null if the driver could not be found.
+	 * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
 	 */
-	private DefaultMutableTreeTableNode findDriver(String driverName)
+	private DefaultMutableTreeNode findDriver(String driverName)
 	{
-		DefaultMutableTreeTableNode root = (DefaultMutableTreeTableNode) model.getRoot();
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
 		for (int i=0; i<root.getChildCount(); i++)
 		{
-			DefaultMutableTreeTableNode driverNode = (DefaultMutableTreeTableNode) root.getChildAt(i);
+			DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) root.getChildAt(i);
 			String name = (String) driverNode.getUserObject();
 			if (name.equals(driverName)) return driverNode;
 		}
@@ -227,13 +227,13 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 * Find the node tree node with the specified driver name and node information.
 	 * @param driverNode name the parent of the node to find.
 	 * @param info the information on the node to find.
-	 * @return a <code>DefaultMutableTreeTableNode</code> or null if the driver could not be found.
+	 * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
 	 */
-	private DefaultMutableTreeTableNode findNode(DefaultMutableTreeTableNode driverNode, NodeInfoHolder info)
+	private DefaultMutableTreeNode findNode(DefaultMutableTreeNode driverNode, NodeInfoHolder info)
 	{
 		for (int i=0; i<driverNode.getChildCount(); i++)
 		{
-			DefaultMutableTreeTableNode node = (DefaultMutableTreeTableNode) driverNode.getChildAt(i);
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
 			NodeInfoHolder nodeInfoHolder = (NodeInfoHolder) node.getUserObject();
 			if (nodeInfoHolder.equals(info)) return node;
 		}
@@ -264,7 +264,7 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 * Get the tree table component displaying the driver and nodes information. 
 	 * @return a <code>JXTreeTable</code> instance.
 	 */
-	public synchronized JXTreeTable getTreeTable()
+	public synchronized JTreeTable getTreeTable()
 	{
 		return treeTable;
 	}
@@ -337,7 +337,7 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 		for (int n: rows)
 		{
 			TreePath path = treeTable.getPathForRow(n);
-			DefaultMutableTreeTableNode treeNode = (DefaultMutableTreeTableNode) path.getLastPathComponent();
+			DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) path.getLastPathComponent();
 			if (treeNode.getParent() == null) continue;
 			if (treeNode.getUserObject() instanceof NodeInfoHolder) nbNodes++;
 			else nbDrivers++;

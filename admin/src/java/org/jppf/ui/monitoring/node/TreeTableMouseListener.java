@@ -24,11 +24,9 @@ import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
-import javax.swing.tree.TreePath;
+import javax.swing.tree.*;
 
 import org.apache.commons.logging.*;
-import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jppf.management.JMXNodeConnectionWrapper;
 import org.jppf.ui.monitoring.data.NodeInfoHolder;
 import org.jppf.ui.monitoring.node.actions.*;
@@ -74,22 +72,24 @@ public class TreeTableMouseListener extends MouseAdapter
 	public void mousePressed(MouseEvent event)
 	{
 		Component comp = event.getComponent();
-		if (!(comp instanceof JXTreeTable)) return;
-		JXTreeTable treeTable = (JXTreeTable) comp;
+		if (!(comp instanceof JPPFTreeTable)) return;
+		JPPFTreeTable treeTable = (JPPFTreeTable) comp;
+		JTree tree = treeTable.getTree();
 		int x = event.getX();
 		int y = event.getY();
 		List<NodeInfoHolder> infoHolderList = new ArrayList<NodeInfoHolder>();
+		//int[] rows = tree.getSelectionRows();
 		int[] rows = treeTable.getSelectedRows();
 		if ((rows == null) || (rows.length == 0))
 		{
-			TreePath path = treeTable.getPathForLocation(x, y);
+			TreePath path = tree.getPathForLocation(x, y);
 			if (path == null) return;
-			rows = new int[] { treeTable.getRowForPath(path) };
+			rows = new int[] { tree.getRowForPath(path) };
 		}
 		for (int row: rows)
 		{
-			TreePath path = treeTable.getPathForRow(row);
-			DefaultMutableTreeTableNode node = (DefaultMutableTreeTableNode) path.getLastPathComponent();
+			TreePath path = tree.getPathForRow(row);
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
 			if (!(node.getUserObject() instanceof NodeInfoHolder)) continue;
 			infoHolderList.add((NodeInfoHolder) node.getUserObject());
 		}
