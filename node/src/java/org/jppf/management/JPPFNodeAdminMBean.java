@@ -60,6 +60,12 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean<NodeParameter, Object
 	 */
 	void updateThreadPoolSize(Integer size) throws Exception;
 	/**
+	 * Update the priority of all execution threads.
+	 * @param newPriority the new priority to set.
+	 * @throws Exception if an error is raised when invoking the node mbean.
+	 */
+	void updateThreadsPriority(Integer newPriority) throws Exception;
+	/**
 	 * Get detailed information about the node's JVM properties, environment variables
 	 * and runtime information such as memory usage and available processors.
 	 * @return a <code>JPPFSystemInformation</code> instance.
