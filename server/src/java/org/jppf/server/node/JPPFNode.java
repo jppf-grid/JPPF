@@ -19,7 +19,6 @@ package org.jppf.server.node;
 
 import static org.jppf.server.protocol.BundleParameter.*;
 
-import java.io.InvalidClassException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -80,6 +79,10 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * The task execution manager for this node.
 	 */
 	private NodeExecutionManager executionManager = null;
+	/**
+	 * The object responsible for this node's I/O.
+	 */
+	private NodeIO nodeIO = null;
 	/**
 	 * Holds the count of currently executing tasks.
 	 * Used to determine when this node is busy or idle.
@@ -159,12 +162,78 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * receives it, executes it and sends the results back.
 	 * @throws Exception if an error was raised from the underlying socket connection or the class loader.
 	 */
+	public void performAsync() throws Exception
+	{
+		if (debugEnabled) log.debug("Start of node secondary loop");
+		while (!isStopped())
+		{
+			JPPFTaskBundle bundle = nodeIO.readBundle();
+			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
+			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+			{
+				if (debugEnabled) log.debug("setting initial bundle uuid");
+				bundle.setBundleUuid(uuid);
+				Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
+				if (params != null) bundle.getParametersMap().putAll(params);
+				bundle.setParameter(NODE_UUID_PARAM, uuid);
+				if (isJmxEnabled())
+				{
+					TypedProperties props = JPPFConfiguration.getProperties();
+					bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
+					bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
+					bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeRunner.getJmxServer().getId());
+				}
+				JPPFSystemInformation info = new JPPFSystemInformation();
+				info.populate();
+				bundle.setParameter(NODE_SYSTEM_INFO_PARAM, info);
+			}
+			boolean notEmpty = bundle.getTaskCount() > 0;
+			if (debugEnabled) log.debug("received " + (notEmpty ? "a non-" : "an ") + "empty bundle");
+			List<JPPFTask> taskList =  new ArrayList<JPPFTask>();
+			if (notEmpty)
+			{
+				executionManager.setup(bundle);
+				DataProvider dataProvider = (DataProvider) nodeIO.nextObject();
+				for (int i=0; i<bundle.getTaskCount(); i++)
+				{
+					JPPFTask task = (JPPFTask) nodeIO.nextObject();
+					task.setDataProvider(dataProvider);
+					taskList.add(task);
+					executionManager.performTask(task);
+				}
+				executionManager.waitForResults();
+				executionManager.cleanup();
+			}
+			nodeIO.writeResults(bundle, taskList);
+			if (notEmpty)
+			{
+				if (isJmxEnabled()) getNodeAdmin().setTaskCounter(getTaskCount() + taskList.size());
+				else setTaskCount(getTaskCount() + taskList.size());
+				if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
+			}
+			int p = bundle.getBuildNumber();
+			if (buildNumber < p)
+			{
+				JPPFNodeReloadNotification notif = new JPPFNodeReloadNotification("detected new build number: " + p
+					+ "; previous build number: " + buildNumber);
+				VersionUtils.setBuildNumber(p);
+				throw notif;
+			}
+		}
+		if (debugEnabled) log.debug("End of node secondary loop");
+	}
+
+	/**
+	 * Perform the main execution loop for this node. At each iteration, this method listens for a task to execute,
+	 * receives it, executes it and sends the results back.
+	 * @throws Exception if an error was raised from the underlying socket connection or the class loader.
+	 */
 	public void perform() throws Exception
 	{
 		if (debugEnabled) log.debug("Start of node secondary loop");
 		while (!isStopped())
 		{
-			Pair<JPPFTaskBundle, List<JPPFTask>> pair = readTask();
+			Pair<JPPFTaskBundle, List<JPPFTask>> pair = nodeIO.readTask();
 			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
 			JPPFTaskBundle bundle = pair.first();
 			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
@@ -189,7 +258,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
 			if (debugEnabled) log.debug("received " + (notEmpty ? "a non-" : "an ") + "empty bundle");
 			if (notEmpty) executionManager.execute(bundle, taskList);
-			writeResults(bundle, taskList);
+			nodeIO.writeResults(bundle, taskList);
 			if (notEmpty)
 			{
 				if (isJmxEnabled()) getNodeAdmin().setTaskCounter(getTaskCount() + taskList.size());
@@ -238,6 +307,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		}
 		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
 		executionManager = new NodeExecutionManager(this);
+		nodeIO = new NodeIO(this);
 		if (debugEnabled) log.debug("end node initialization");
 	}
 
@@ -245,7 +315,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Initialize this node's resources.
 	 * @throws Exception if an error is raised during initialization.
 	 */
-	public void initSocketClient() throws Exception
+	private void initSocketClient() throws Exception
 	{
 		if (debugEnabled) log.debug("Initializing socket");
 		TypedProperties props = JPPFConfiguration.getProperties();
@@ -267,128 +337,6 @@ public class JPPFNode extends AbstractMonitoredNode
 	}
 	
 	/**
-	 * Read a task from the socket connection, along with its header information.
-	 * @return a pair of <code>JPPFTaskBundle</code> and a <code>List</code> of <code>JPPFTask</code> instances.
-	 * @throws Exception if an error is raised while reading the task data.
-	 */
-	private Pair<JPPFTaskBundle, List<JPPFTask>> readTask() throws Exception
-	{
-		Object[] result = readObjects();
-		JPPFTaskBundle bundle = (JPPFTaskBundle) result[0];
-		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()) &&
-			(bundle.getParameter(NODE_EXCEPTION_PARAM) == null))
-		{
-			DataProvider dataProvider = (DataProvider) result[1];
-			for (int i=0; i<bundle.getTaskCount(); i++)
-			{
-				JPPFTask task = (JPPFTask) result[2 + i];
-				task.setDataProvider(dataProvider);
-				taskList.add(task);
-			}
-		}
-		return new Pair<JPPFTaskBundle, List<JPPFTask>>(bundle, taskList);
-	}
-
-	/**
-	 * Deseralize the objects read from the socket, and reload the appropriate classes if any class change is detected.<br>
-	 * A class change is triggered when an <code>InvalidClassException</code> is caught. Upon catching this exception,
-	 * the class loader is reinitialized and the class are reloaded.
-	 * @return an array of objects deserialized from the socket stream.
-	 * @throws Exception if the classes could not be reloaded or an error occurred during deserialization.
-	 */
-	private Object[] readObjects() throws Exception
-	{
-		Object[] result = null;
-		boolean reload = false;
-		try
-		{
-			result = deserializeObjects();
-		}
-		catch(IncompatibleClassChangeError err)
-		{
-			reload = true;
-			if (debugEnabled) log.debug(err.getMessage() + "; reloading classes", err);
-		}
-		catch(InvalidClassException e)
-		{
-			reload = true;
-			if (debugEnabled) log.debug(e.getMessage() + "; reloading classes", e);
-		}
-		if (reload)
-		{
-			if (debugEnabled) log.debug("reloading classes");
-			classLoader = null;
-			initHelper();
-			socketClient.setSerializer(serializer);
-			result = deserializeObjects();
-		}
-		return result;
-	}
-
-	/**
-	 * Perform the deserialization of the objects received through the socket connection.
-	 * @return an array of objects deserialized from the socket stream.
-	 * @throws Exception if an error occurs while deserializing.
-	 */
-	private Object[] deserializeObjects() throws Exception
-	{
-		socketClient.skip(4);
-		List<Object> list = new ArrayList<Object>();
-		byte[] data = socketClient.receiveBytes(0).getBuffer();
-		JPPFTaskBundle bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
-		list.add(bundle);
-		try
-		{
-			bundle.setNodeExecutionTime(System.currentTimeMillis());
-			int count = bundle.getTaskCount();
-			if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
-			{
-				JPPFContainer cont = getContainer(bundle.getUuidPath().getList());
-				cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
-				cont.deserializeObject(socketClient, list, 1+count);
-			}
-			else
-			{
-				// skip null data provider
-				socketClient.receiveBytes(0);
-			}
-		}
-		catch(ClassNotFoundException e)
-		{
-			log.error("Exception occurred while deserializing the tasks", e);
-			bundle.setTaskCount(0);
-			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
-		}
-		catch(NoClassDefFoundError e)
-		{
-			log.error("Exception occurred while deserializing the tasks", e);
-			bundle.setTaskCount(0);
-			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
-		}
-		return list.toArray(new Object[0]);
-	}
-
-	/**
-	 * Write the execution results to the socket stream.
-	 * @param bundle the task wrapper to send along.
-	 * @param tasks the list of tasks with their result field updated.
-	 * @throws Exception if an error occurs while writtng to the socket stream.
-	 */
-	private void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
-	{
-		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
-		bundle.setNodeExecutionTime(elapsed);
-		List<JPPFBuffer> list = new ArrayList<JPPFBuffer>();
-		list.add(helper.toBytes(bundle, false));
-		for (JPPFTask task : tasks) list.add(helper.toBytes(task, false));
-		int size = 0;
-		for (JPPFBuffer buf: list) size += 4 + buf.getLength();
-		socketClient.writeInt(size);
-		for (JPPFBuffer buf: list) socketClient.sendBytes(buf);
-	}
-
-	/**
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @return a <code>ClassLoader</code> used for loading the classes of the framework.
 	 */
@@ -403,10 +351,19 @@ public class JPPFNode extends AbstractMonitoredNode
 	}
 
 	/**
+	 * Set the main classloader for the node.
+	 * @param cl - the class loader to set.
+	 */
+	void setClassLoader(JPPFClassLoader cl)
+	{
+		classLoader = cl;
+	}
+
+	/**
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @throws Exception if an error occcurs while instantiating the class loader.
 	 */
-	private void initHelper() throws Exception
+	void initHelper() throws Exception
 	{
 		if (debugEnabled) log.debug("Initializing serializer");
 		Class<?> c = getClassLoader().loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
@@ -423,7 +380,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * @return a <code>JPPFContainer</code> instance.
 	 * @throws Exception if an error occcurs while getting the container.
 	 */
-	public JPPFContainer getContainer(List<String> uuidPath) throws Exception
+	JPPFContainer getContainer(List<String> uuidPath) throws Exception
 	{
 		String uuid = uuidPath.get(0);
 		JPPFContainer container = containerMap.get(uuid);
@@ -506,7 +463,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Get the administration and monitoring MBean for this node.
 	 * @return a <code>JPPFNodeAdmin</code>m instance.
 	 */
-	public synchronized JPPFNodeAdmin getNodeAdmin()
+	synchronized JPPFNodeAdmin getNodeAdmin()
 	{
 		return nodeAdmin;
 	}
@@ -515,7 +472,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Set the administration and monitoring MBean for this node.
 	 * @param nodeAdmin a <code>JPPFNodeAdmin</code>m instance.
 	 */
-	public synchronized void setNodeAdmin(JPPFNodeAdmin nodeAdmin)
+	synchronized void setNodeAdmin(JPPFNodeAdmin nodeAdmin)
 	{
 		this.nodeAdmin = nodeAdmin;
 	}
@@ -524,7 +481,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Get the task execution manager for this node.
 	 * @return a <code>NodeExecutionManager</code> instance.
 	 */
-	public NodeExecutionManager getExecutionManager()
+	NodeExecutionManager getExecutionManager()
 	{
 		return executionManager;
 	}
@@ -533,7 +490,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Determines whether JMX management and monitoring is enabled for this node.
 	 * @return true if JMX is enabled, false otherwise. 
 	 */
-	public boolean isJmxEnabled()
+	boolean isJmxEnabled()
 	{
 		return jmxEnabled;
 	}
@@ -542,7 +499,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Shutdown and evenetually restart the node.
 	 * @param restart determines whether this node should be restarted by the node launcher.
 	 */
-	public void shutdown(boolean restart)
+	void shutdown(boolean restart)
 	{
 		NodeRunner.shutdown(this, restart);
 	}
@@ -551,7 +508,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Set the action executed when the node exits the main loop.
 	 * @param exitAction the action to execute.
 	 */
-	public synchronized void setExitAction(Runnable exitAction)
+	synchronized void setExitAction(Runnable exitAction)
 	{
 		this.exitAction = exitAction;
 	}
