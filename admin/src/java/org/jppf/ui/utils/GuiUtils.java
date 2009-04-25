@@ -60,12 +60,28 @@ public final class GuiUtils
 	 */
 	public static ImageIcon loadIcon(String path)
 	{
-		ImageIcon icon = iconMap.get(path);
-		if (icon != null) return icon;
+		return loadIcon(path, true);
+	}
+
+	/**
+	 * Load and cache an icon from the file system or classpath.
+	 * @param path - the path to the icon.
+	 * @param useCache - specifiies whether the icon should be retrieved from and/or put in the icon cache.
+	 * @return the loaded icon as an <code>ImageIcon</code> instance, or null if the icon
+	 * could not be loaded.
+	 */
+	public static ImageIcon loadIcon(String path, boolean useCache)
+	{
+		ImageIcon icon = null;
+		if (useCache)
+		{
+			icon = iconMap.get(path);
+			if (icon != null) return icon;
+		}
 		URL url = GuiUtils.class.getResource(path);
 		if (url == null) return null;
 		icon = new ImageIcon(url);
-		iconMap.put(path, icon);
+		if (useCache) iconMap.put(path, icon);
 		return icon;
 	}
 
