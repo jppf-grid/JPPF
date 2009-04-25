@@ -52,7 +52,9 @@ import javax.swing.tree.*;
  */
 public class JTreeTable extends JTable
 {
-	/** A subclass of JTree. */
+	/**
+	 * A subclass of JTree.
+	 */
 	protected TreeTableCellRenderer tree;
 
 	public JTreeTable(TreeTableModel treeTableModel)
@@ -68,7 +70,10 @@ public class JTreeTable extends JTable
 		// Force the JTable and JTree to share their row selection models.
 		ListToTreeSelectionModelWrapper selectionWrapper = new ListToTreeSelectionModelWrapper();
 		tree.setSelectionModel(selectionWrapper);
+		selectionWrapper.setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		setSelectionModel(selectionWrapper.getListSelectionModel());
+		selectionWrapper.getListSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
 		// Install the tree editor renderer and editor.
 		setDefaultRenderer(TreeTableModel.class, tree);
