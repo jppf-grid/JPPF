@@ -39,7 +39,7 @@ public class ClassNotFoundTestTask extends JPPFTestTask
 	 */
 	public void test()
 	{
-		new org.ujac.ui.editor.TextArea();
+		//new org.ujac.ui.editor.TextArea();
 		String s = "Please make sure the library 'ujac-ui.jar' is NOT present in the node, server or client classpath";
 		setResult(s);
 		System.out.println(s);
