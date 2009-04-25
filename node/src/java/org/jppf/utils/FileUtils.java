@@ -18,7 +18,7 @@
 package org.jppf.utils;
 
 import java.io.*;
-import java.net.URL;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -48,7 +48,7 @@ public final class FileUtils
 	 */
 	public static String readTextFile(Reader aReader) throws IOException
 	{
-		LineNumberReader reader = new LineNumberReader(aReader);
+		BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader);
 		StringBuilder sb = new StringBuilder();
 		String s = "";
 		while (s != null)
@@ -67,7 +67,16 @@ public final class FileUtils
 	 */
 	public static String readTextFile(String filename) throws IOException
 	{
-		return readTextFile(new BufferedReader(new FileReader(filename)));
+		Reader reader = null;
+		File f = new File(filename);
+		if (f.exists()) reader = new FileReader(filename);
+		else
+		{
+			InputStream is = FileUtils.class.getClassLoader().getResourceAsStream(filename);
+			if (is == null) return null;
+			reader = new InputStreamReader(is);
+		}
+		return readTextFile(reader);
 	}
 
 	/**
@@ -288,29 +297,12 @@ public final class FileUtils
 		{
 			BufferPool.releaseBuffer(tmp);
 		}
-		/*
-		byte[] buffer = new byte[BUFFER_SIZE];
-		byte[] b = null;
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		boolean end = false;
-		while (!end)
-		{
-			int n = is.read(buffer, 0, BUFFER_SIZE);
-			if (n < 0) end = true;
-			else baos.write(buffer, 0, n);
-		}
-		is.close();
-		baos.flush();
-		b = baos.toByteArray();
-		baos.close();
-		return b;
-		*/
 	}
 
 	/**
 	 * Copy the data read from the specified input stream to the specified output stream. 
-	 * @param is the input stream to read from.
-	 * @param os the output stream to write to.
+	 * @param is - the input stream to read from.
+	 * @param os - the output stream to write to.
 	 * @throws IOException if an I/O error occurs.
 	 */
 	public static void copyStream(InputStream is, OutputStream os) throws IOException
@@ -324,5 +316,40 @@ public final class FileUtils
 			os.write(bytes, 0, n);
 		}
 		BufferPool.releaseBuffer(tmp);
+	}
+
+	/**
+	 * Convert a set of file names into a set of <code>File</code> objects.
+	 * @param dir - the directory in which the files are located
+	 * @param names - the name part of each file (not the full path)
+	 * @return an array of <code>File</code> objects.
+	 */
+	public static File[] toFiles(File dir, String...names)
+	{
+		int len = names.length;
+		File[] files = new File[len];
+		for (int i=0; i<len; i++) files[i] = new File(dir.getPath() + System.getProperty("file.separator") + names[i]);
+		return files;
+	}
+
+	/**
+	 * Convert a set of file paths into a set of URLs.
+	 * @param files - the files whose path is to be converted to a URL.
+	 * @return an array of <code>URL</code> objects.
+	 */
+	public static URL[] toURLs(File...files)
+	{
+		URL[] urls = new URL[files.length];
+		for (int i=0; i<files.length; i++)
+		{
+			try
+			{
+				urls[i] = files[i].toURL();
+			}
+			catch(MalformedURLException ignored)
+			{
+			}
+		}
+		return urls;
 	}
 }
