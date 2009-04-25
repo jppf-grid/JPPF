@@ -16,4 +16,5 @@ import org.jppf.ui.monitoring.node.*
 import org.jppf.ui.options.*
 import org.jppf.ui.options.event.*
 import org.jppf.ui.options.factory.*
+import org.jppf.ui.utils.*
 import org.apache.commons.logging.*

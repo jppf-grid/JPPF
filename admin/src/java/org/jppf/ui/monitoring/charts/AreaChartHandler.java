@@ -73,7 +73,7 @@ public class AreaChartHandler implements ChartHandler
 		Object rend = invokeMethod(plot.getClass(), plot, "getRenderer");
 		//rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
 		Object labelGenerator = Proxy.newProxyInstance(
-			getClass().getClassLoader(), getClasses("org.jfree.chart.labels.CategorySeriesLabelGenerator"), new CategorySeriesLabelGeneratorInvocationHandler());
+			getCurrentClassLoader(), getClasses("org.jfree.chart.labels.CategorySeriesLabelGenerator"), new CategorySeriesLabelGeneratorInvocationHandler());
 		invokeMethod(rend.getClass(), rend, "setLegendItemLabelGenerator", labelGenerator);
 
 		config.chart = chart;

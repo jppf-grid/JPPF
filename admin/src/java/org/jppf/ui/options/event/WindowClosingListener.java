@@ -18,9 +18,11 @@
 
 package org.jppf.ui.options.event;
 
-import java.awt.event.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import org.jppf.ui.monitoring.charts.config.JPPFChartBuilder;
+import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.factory.OptionsHandler;
 
 /**
@@ -36,8 +38,12 @@ public class WindowClosingListener extends WindowAdapter
 	 */
 	public void windowClosing(WindowEvent e)
 	{
-		JPPFChartBuilder builder = (JPPFChartBuilder) OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("/ChartsBuilder").getUIComponent();
-		builder.getStorage().saveAll();
+		OptionElement elt = OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("/ChartsBuilder");
+		if (elt != null)
+		{
+			JPPFChartBuilder builder = (JPPFChartBuilder) elt.getUIComponent();
+			builder.getStorage().saveAll();
+		}
 		OptionsHandler.savePreferences();
 		System.exit(0);
 	}

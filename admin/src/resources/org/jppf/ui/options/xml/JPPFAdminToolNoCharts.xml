@@ -56,8 +56,6 @@
 		<property name="tooltip" value="Perform the remote administration of the server"/>
 		<import source="file" location="org/jppf/ui/options/xml/NodeDataPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/StatsPage.xml"/>
-		<import source="file" location="org/jppf/ui/options/xml/ServerChartsPage.xml"/>
-		<import source="file" location="org/jppf/ui/options/xml/ChartsConfigPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/AdminPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/BundleSizeTuningPage.xml"/>
 	</child>

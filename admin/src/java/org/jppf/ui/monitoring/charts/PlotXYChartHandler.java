@@ -74,7 +74,7 @@ public class PlotXYChartHandler implements ChartHandler
 		invokeMethod(rendClass, rend, "setBaseSeriesVisibleInLegend", new Class[] {Boolean.TYPE}, true);
 		//rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
 		Object labelGenerator = Proxy.newProxyInstance(
-			getClass().getClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
+			getCurrentClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
 		invokeMethod(rendClass, rend, "setLegendItemLabelGenerator", labelGenerator);
 		//rend.setBaseStroke(new BasicStroke(2f));
 		invokeMethod(rendClass, rend, "setBaseStroke", new BasicStroke(2f));

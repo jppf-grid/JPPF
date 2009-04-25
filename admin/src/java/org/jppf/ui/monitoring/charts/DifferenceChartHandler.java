@@ -77,7 +77,7 @@ public class DifferenceChartHandler implements ChartHandler
 		invokeMethod(rend.getClass(), rend, "setBaseSeriesVisibleInLegend", new Class[] {Boolean.TYPE}, true);
 		//rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
 		Object labelGenerator = Proxy.newProxyInstance(
-			getClass().getClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
+			getCurrentClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
 		invokeMethod(rend.getClass(), rend, "setLegendItemLabelGenerator", labelGenerator);
 		//rend.setBaseStroke(new BasicStroke(2f));
 		invokeMethod(rend.getClass(), rend, "setBaseStroke", new Class[] {Stroke.class}, new BasicStroke(2f));

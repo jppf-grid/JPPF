@@ -87,7 +87,7 @@ public class Bar3DChartHandler implements ChartHandler
 		invokeMethod(rend.getClass(), rend, "setSeriesPaint", new Class[] {Integer.TYPE, Paint.class}, 0, c1);
 		//rend.setBaseItemLabelGenerator(new LabelGenerator(config.unit, config.precision));
 		Object labelGenerator = Proxy.newProxyInstance(
-			getClass().getClassLoader(), getClasses("org.jfree.chart.labels.CategoryItemLabelGenerator"),
+			getCurrentClassLoader(), getClasses("org.jfree.chart.labels.CategoryItemLabelGenerator"),
 			new CategoryItemLabelGeneratorInvocationHandler(config.unit, config.precision));
 		invokeMethod(rend.getClass(), rend, "setBaseItemLabelGenerator", labelGenerator);
 
