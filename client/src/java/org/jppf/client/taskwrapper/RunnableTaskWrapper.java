@@ -19,10 +19,10 @@ package org.jppf.client.taskwrapper;
 
 
 /**
- * 
+ * Task wrapper for classes implementing {@link java.lang.Runnable Runnable}.
  * @author Laurent Cohen
  */
-public class RunnableTaskWrapper extends TaskObjectWrapper
+public class RunnableTaskWrapper extends AbstractTaskObjectWrapper
 {
 	/**
 	 * The object on which to execute a method, or the class of the object if the method is static.

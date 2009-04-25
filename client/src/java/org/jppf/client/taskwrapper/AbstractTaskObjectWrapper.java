@@ -18,49 +18,26 @@
 
 package org.jppf.client.taskwrapper;
 
-import java.io.Serializable;
+
 
 /**
- * Wrapper interface for tasks that are not sub-classes of {@link org.jppf.server.protocol.JPPFTask JPPFTask}.
+ * Common abstract superclass for non-JPPF taskss wrappers.
  * @author Laurent Cohen
  */
-public interface TaskObjectWrapper extends Serializable
+public abstract class AbstractTaskObjectWrapper implements TaskObjectWrapper
 {
 	/**
-	 * Type-safe enumeration for the type of method to execute.
+	 * The type of the method to execute on the object.
 	 */
-	public enum MethodType
-	{
-		/**
-		 * Instance method type.
-		 */
-		INSTANCE,
-		/**
-		 * Contructor type.
-		 */
-		CONSTRUCTOR,
-		/**
-		 * Static method type.
-		 */
-		STATIC
-	}
+	protected MethodType methodType = MethodType.INSTANCE;
 
 	/**
 	 * The type of the method to execute on the object.
 	 * @return a <code>MethodType</code> enum value.
+	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getMethodType()
 	 */
-	MethodType getMethodType();
-
-	/**
-	 * Execute the task depending on its type.
-	 * @return the result of the execution.
-	 * @throws Exception if an error occurs during the execution.
-	 */
-	Object execute() throws Exception;
-
-	/**
-	 * Return the object on which a method or constructor is called.
-	 * @return an object or null if the invoked method is static. 
-	 */
-	Object getTaskObject();
+	public MethodType getMethodType()
+	{
+		return null;
+	}
 }

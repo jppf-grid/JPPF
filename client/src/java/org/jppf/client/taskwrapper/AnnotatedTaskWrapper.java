@@ -30,7 +30,7 @@ import org.jppf.utils.ReflectionUtils;
  * 
  * @author Laurent Cohen
  */
-public class AnnotatedTaskWrapper extends TaskObjectWrapper
+public class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
 {
 	/**
 	 * The runnable object to execute.

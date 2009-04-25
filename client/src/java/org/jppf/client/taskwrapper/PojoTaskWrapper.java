@@ -26,10 +26,10 @@ import java.security.AccessController;
 import org.jppf.utils.ReflectionUtils;
 
 /**
- * 
+ * Task wrapper for POJO classes.
  * @author Laurent Cohen
  */
-public class PojoTaskWrapper extends TaskObjectWrapper
+public class PojoTaskWrapper extends AbstractTaskObjectWrapper
 {
 	/**
 	 * The runnable object to execute.

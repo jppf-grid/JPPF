@@ -21,10 +21,10 @@ package org.jppf.client.taskwrapper;
 import java.util.concurrent.Callable;
 
 /**
- * 
+ * Task wrapper for classes implementing {@link java.util.concurrent.Callable Callable}.
  * @author Laurent Cohen
  */
-public class CallableTaskWrapper extends TaskObjectWrapper
+public class CallableTaskWrapper extends AbstractTaskObjectWrapper
 {
 	/**
 	 * The callable object to execute.
