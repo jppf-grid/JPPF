@@ -61,13 +61,18 @@ public class MatrixRunner
 			int nbRows = props.getInt("task.nbRows", 1);
 			output("Running Matrix demo with matrix size = "+size+"*"+size+" for "+iterations+" iterations");
 			perform(size, iterations, nbRows);
-			System.exit(0);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 			output("before exit(1)");
-			System.exit(1);
+		}
+		finally
+		{
+			if (jppfClient != null)
+			{
+				jppfClient.close();
+			}
 		}
 	}
 	
