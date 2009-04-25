@@ -21,7 +21,7 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
-import org.jppf.client.JPPFClient;
+import org.jppf.client.*;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
@@ -57,12 +57,14 @@ public class LongTaskRunner
 			print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
 			perform(nbTask, length, iterations);
 			//performLong(size, iterations);
-			System.exit(0);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
-			System.exit(1);
+		}
+		finally
+		{
+			if (jppfClient != null) jppfClient.close();
 		}
 	}
 	
@@ -83,15 +85,15 @@ public class LongTaskRunner
 			{
 				long start = System.currentTimeMillis();
 				// create a task for each row in matrix a
-				List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+				JPPFJob job = new JPPFJob();
 				for (int i=0; i<nbTask; i++)
 				{
-					LongTask task = new LongTask(length);
+					LongTask task = new LongTask(length, false);
 					task.setId("" + (iter+1) + ":" + (i+1));
-					tasks.add(task);
+					job.addTask(task);
 				}
 				// submit the tasks for execution
-				List<JPPFTask> results = jppfClient.submit(tasks, null);
+				List<JPPFTask> results = jppfClient.submit(job);
 				for (JPPFTask task: results)
 				{
 					Exception e = task.getException();

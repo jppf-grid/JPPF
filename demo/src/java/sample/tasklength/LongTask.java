@@ -17,13 +17,13 @@
  */
 package sample.tasklength;
 
-import sample.BaseDemoTask;
+import org.jppf.server.protocol.JPPFTask;
 
 /**
  * Instances of this class are defined as tasks with a predefined execution length, specified at their creation. 
  * @author Laurent Cohen
  */
-public class LongTask extends BaseDemoTask
+public class LongTask extends JPPFTask
 {
 	/**
 	 * Determines how long this task will run.
@@ -33,6 +33,22 @@ public class LongTask extends BaseDemoTask
 	 * Timestamp marking the time when the task execution starts.
 	 */
 	private long taskStart = 0L;
+	/**
+	 * Determines this task's behavior: false if it should just sleep during its allocated time, or true if it should
+	 * do some make-do work that uses the cpu.   
+	 */
+	private boolean useCPU = false;
+
+	/**
+	 * Initialize this task with a predefined length of time, in milliseconds, during which it will run.
+	 * @param taskLength - determines how long this task will run.
+	 * @param useCPU - determines whether this task should just sleep during its allocated time or do some cpu-intensive work.
+	 */
+	public LongTask(long taskLength, boolean useCPU)
+	{
+		this.taskLength = taskLength;
+		this.useCPU = useCPU;
+	}
 
 	/**
 	 * Initialize this task with a predefined length of time, in milliseconds, during which it will run.
@@ -40,37 +56,37 @@ public class LongTask extends BaseDemoTask
 	 */
 	public LongTask(long taskLength)
 	{
-		this.taskLength = taskLength;
+		this(taskLength, false);
 	}
 
 	/**
 	 * Perform the excution of this task.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
-	public void doWork()
+	public void run()
 	{
-		/*
-		fireNotification("Starting task with duration = "+ taskLength + " ms");
 		taskStart = System.currentTimeMillis();
 		double elapsed = 0L;
-		while (elapsed < taskLength)
+		if (useCPU)
 		{
-			Random rand = new Random(System.currentTimeMillis());
-			String s = "";
-			for (int i=0; i<10; i++) s += "A"+rand.nextInt(10);
-			//s.replace("8", "$");
-			elapsed = System.currentTimeMillis() - taskStart;
+			for (; elapsed < taskLength; elapsed = System.currentTimeMillis() - taskStart)
+			{
+				String s = "";
+				for (int i=0; i<10; i++) s += "A"+"10";
+			}
 		}
-		fireNotification("Task execution ended after " + elapsed + " ms");
-		*/
-		try
+		else
 		{
-			Thread.sleep(taskLength);
-		}
-		catch(InterruptedException e)
-		{
-			setException(e);
-			setResult(e.getMessage());
+			try
+			{
+				Thread.sleep(taskLength);
+				elapsed = System.currentTimeMillis() - taskStart;
+			}
+			catch(InterruptedException e)
+			{
+				setException(e);
+				setResult(e.getMessage());
+			}
 		}
 		setResult("task has run for " + taskLength + " ms");
 	}
