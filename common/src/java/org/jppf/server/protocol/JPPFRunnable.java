@@ -21,7 +21,7 @@ package org.jppf.server.protocol;
 import java.lang.annotation.*;
 
 /**
- * 
+ * Annotation to determine which method in a class is the task's main method. 
  * @author Laurent Cohen
  */
 @Retention(RetentionPolicy.RUNTIME)
