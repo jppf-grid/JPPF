@@ -112,7 +112,7 @@ public final class ReflectionHelper
 	{
 		try
 		{
-			Class c = Class.forName(className);
+			Class c = getCurrentClassLoader().loadClass(className);
 			return c.newInstance();
 		}
 		catch(Exception e)
@@ -175,7 +175,9 @@ public final class ReflectionHelper
 		{
 			if ((classNames == null) || (classNames.length <= 0)) return new Class[0];
 			Class[] classes = new Class[classNames.length];
-			for (int i=0; i<classNames.length; i++) classes[i] = Class.forName(classNames[i]);
+			//for (int i=0; i<classNames.length; i++) classes[i] = Class.forName(classNames[i]);
+			ClassLoader cl = getCurrentClassLoader();
+			for (int i=0; i<classNames.length; i++) classes[i] = cl.loadClass(classNames[i]);
 			return classes;
 		}
 		catch(Exception e)
@@ -194,12 +196,23 @@ public final class ReflectionHelper
 	{
 		try
 		{
-			return Class.forName(className);
+			return getCurrentClassLoader().loadClass(className);
 		}
 		catch(Exception e)
 		{
 			log.error(e.getMessage(), e);
 			return null;
 		}
+	}
+
+	/**
+	 * Returns the current thread's context class loader, or this class's class loader if it is null. 
+	 * @return a <code>ClassLoader</code> instance.
+	 */
+	public static ClassLoader getCurrentClassLoader()
+	{
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if (cl == null) cl = ReflectionHelper.class.getClassLoader();
+		return cl;
 	}
 }
