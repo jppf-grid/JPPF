@@ -111,6 +111,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * Add a listener to the list of location event listeners for this location.
 	 * @param listener the listener to add to the list.
 	 * @throws NullPointerException if the listener object is null.
+	 * @see org.jppf.server.protocol.Location#addLocationEventListener(org.jppf.server.protocol.LocationEventListener)
 	 */
 	public void addLocationEventListener(LocationEventListener listener)
 	{
@@ -123,6 +124,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * Remove a listener from the list of location event listeners for this location.
 	 * @param listener the listener to remove from the list.
 	 * @throws NullPointerException if the listener object is null.
+	 * @see org.jppf.server.protocol.Location#removeLocationEventListener(org.jppf.server.protocol.LocationEventListener)
 	 */
 	public void removeLocationEventListener(LocationEventListener listener)
 	{

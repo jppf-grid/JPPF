@@ -63,4 +63,16 @@ public interface Location<T>
 	 * @throws Exception if an I/O error occurs.
 	 */
 	byte[] toByteArray() throws Exception;
+	/**
+	 * Add a listener to the list of location event listeners for this location.
+	 * @param listener the listener to add to the list.
+	 * @throws NullPointerException if the listener object is null.
+	 */
+	void addLocationEventListener(LocationEventListener listener);
+	/**
+	 * Remove a listener from the list of location event listeners for this location.
+	 * @param listener the listener to remove from the list.
+	 * @throws NullPointerException if the listener object is null.
+	 */
+	void removeLocationEventListener(LocationEventListener listener);
 }
