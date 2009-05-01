@@ -209,9 +209,12 @@ public class SequenceAlignmentRunner
 	{
 		if (window == null)
 		{
-			final Frame frame = Frame.getFrames()[0];
+			Frame frame = null;
+			for (Frame f: Frame.getFrames())
+			{
+				if (f.isVisible()) frame = f;
+			}
 			progressBar = new JProgressBar();
-			//progressBar.setIndeterminate(true);
 			Font font = progressBar.getFont();
 			Font f = new Font(font.getName(), Font.BOLD, 14);
 			progressBar.setFont(f);
@@ -220,15 +223,16 @@ public class SequenceAlignmentRunner
 			window = new JWindow(frame);
 			window.getContentPane().add(progressBar);
 			window.getContentPane().setBackground(Color.white);
-			Dimension d = frame.getSize();
-			int w = 300;
-			int h = 60;
-			window.setBounds((d.width-w)/2, (d.height-h)/2, w, h);
 		}
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
+				Dimension d = window.getOwner().getSize();
+				Point p = window.getOwner().getLocationOnScreen();
+				int w = 300;
+				int h = 60;
+				window.setBounds(p.x+(d.width-w)/2, p.y+(d.height-h)/2, w, h);
 				progressBar.setValue(0);
 				window.setVisible(true);
 			}

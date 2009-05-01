@@ -88,13 +88,13 @@
 	<!-- ========================================================================= -->
 
 	<target name="run">
-		<echo message="starting the JPPF Sequebce Alignment application"/>
+		<echo message="starting the JPPF Sequence Alignment application"/>
 		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="project.classpath">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx256m"/>
 			<jvmarg value="-Djppf.config=jppf-client.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
-			<arg value="org/jppf/samples/jaligner/xml/SequenceAlignment.xml"/>
+			<arg value="org/jppf/samples/jaligner/xml/JPPFSequenceAlignment.xml"/>
 			<arg value="file"/>
 		</java>       
 	</target>

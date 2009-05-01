@@ -26,6 +26,6 @@
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sample.tasklength.LongTaskRunner"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="demo"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djppf.config=jppf-client.properties -Dlog4j.configuration=log4j-client.properties -server -Xmx64m"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djppf.config=jppf-client.properties -Dlog4j.configuration=log4j-client.properties -server -Xmx256m"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:demo}"/>
 </launchConfiguration>

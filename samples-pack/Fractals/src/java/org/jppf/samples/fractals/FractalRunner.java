@@ -252,13 +252,7 @@ public class FractalRunner
 		}
 		else
 		{
-	    /*
-			rgb[0] = (255 * value) / max;
-	    rgb[1] = 0;
-	    rgb[2] = (255 * (max - value)) / max;
-	    */
 			long n = (16L * 16L * 16L * value) / max;
-			
 	    rgb[1] = 16 * (int) (n % 16);
 	    n /= 16;
 	    rgb[2] = 16 * (int) (n % 16);
@@ -287,9 +281,12 @@ public class FractalRunner
 	{
 		if (window == null)
 		{
-			final Frame frame = Frame.getFrames()[0];
-			JProgressBar progressBar = null;
-			progressBar = new JProgressBar();
+			Frame frame = null;
+			for (Frame f: Frame.getFrames())
+			{
+				if (f.isVisible()) frame = f;
+			}
+			JProgressBar progressBar = new JProgressBar();
 			progressBar.setIndeterminate(true);
 			Font font = progressBar.getFont();
 			Font f = new Font(font.getName(), Font.BOLD, 14);
@@ -299,15 +296,16 @@ public class FractalRunner
 			window = new JWindow(frame);
 			window.getContentPane().add(progressBar);
 			window.getContentPane().setBackground(Color.white);
-			Dimension d = frame.getSize();
-			int w = 300;
-			int h = 60;
-			window.setBounds((d.width-w)/2, (d.height-h)/2, w, h);
 		}
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
+				Dimension d = window.getOwner().getSize();
+				Point p = window.getOwner().getLocationOnScreen();
+				int w = 300;
+				int h = 60;
+				window.setBounds(p.x+(d.width-w)/2, p.y+(d.height-h)/2, w, h);
 				window.setVisible(true);
 			}
 		});

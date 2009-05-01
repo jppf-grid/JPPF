@@ -33,6 +33,7 @@
 	<property name="gigaspaces" value="${basedir}/../JPPF-GigaSpaces"/>
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
+  <property file="${gigaspaces}/build.properties"/>
   <property file="${build.properties.file}"/>
 	<property name="build.number.file" value="${basedir}/bin/build.number"/>
 	<property name="bin" value="${basedir}/bin"/>	
@@ -78,6 +79,11 @@
   <path id="javadoc.classpath">
 		<pathelement location="${bin}"/>
     <path refid="project.classpath"/>	
+		<pathelement location="${gs.home}/lib/jini/jsk-lib.jar"/>
+		<pathelement location="${gs.home}/lib/jini/jsk-platform.jar"/>
+		<pathelement location="${gs.home}/lib/openspaces/openspaces.jar"/>
+		<pathelement location="${gs.home}/lib/spring/spring.jar"/>
+		<pathelement location="${gs.home}/lib/JSpaces.jar"/>
   </path>
 
   <path id="run.classpath">
@@ -133,6 +139,8 @@
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
 		depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces"/>
+	<target name="deploy.nojavadoc"
+		depends="clean.deploy, rebuild, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces"/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
@@ -336,6 +344,7 @@
 			<zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
 		</zip>
 
+		<!--
 		<property name="lite.release.file"
 			value="${build}/${ant.project.name}-lite-src-${version.number}-${build.number}-${now}.zip"/>
 		<delete file="${lite.release.file}" quiet="true"/>
@@ -357,6 +366,7 @@
 			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="classes/**/*.*,*.log"/>
 			<zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client" excludes="classes/**/*.*,**/*.ear,**/**.rar,**/**.jar"/>
 		</zip>
+		-->
 	</target>
 
 	<!-- ========================================================================= -->
@@ -518,11 +528,12 @@
    	<unjar src="${build}/${ant.project.name}-admin.jar" dest="${build}/jar"/>
   	<unjar src="${lib}/log4j/log4j-1.2.9.jar" dest="${build}/jar"/>
   	<unjar src="${lib}/ApacheCommons/commons-logging-1.1.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/JDesktop/swingx.jar" dest="${build}/jar"/>
   	<unjar src="${lib}/JFreeChart/jcommon-1.0.12.jar" dest="${build}/jar"/>
   	<unjar src="${lib}/JFreeChart/jfreechart-1.0.9.jar" dest="${build}/jar"/>
    	<unjar src="${lib}/Rhino/js.jar" dest="${build}/jar"/>
   	<unjar src="${lib}/Substance/substance-4.3.jar" dest="${build}/jar"/>
+  	<unjar src="${lib}/Groovy/groovy-all-1.6.0.jar" dest="${build}/jar"/>
+  	<unjar src="${lib}/MigLayout/miglayout-3.7-swing.jar" dest="${build}/jar"/>
     <jar jarfile="${runtime.gui}/lib/jppf-gui.jar">
 			<fileset dir="${build}/jar"/>
 		</jar>
@@ -546,9 +557,6 @@
 			<fileset dir="${lib}/ApacheCommons">
 				<include name="commons-logging*.jar"/>
 			</fileset>
-			<fileset dir="${lib}/JDesktop">
-				<include name="*.jar"/>
-			</fileset>
 			<fileset dir="${lib}/JFreeChart">
 				<include name="*.jar"/>
 			</fileset>
@@ -556,6 +564,12 @@
 				<include name="*.jar"/>
 			</fileset>
 			<fileset dir="${lib}/Substance">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/Groovy">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/MigLayout">
 				<include name="*.jar"/>
 			</fileset>
 		</copy>
@@ -675,6 +689,7 @@
 	<!-- ========================================================================= -->
 
 	<target name="javadoc" description="Generate all java doc">
+		<echo message="gs.home = ${gs.home}"/>
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
 		<javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"

@@ -24,6 +24,6 @@
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.node.NodeLauncher"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="JPPF"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Djppf.config=node4.properties -Xmx512m -Dlog4j.configuration=log4j-node4.properties -Djava.util.logging.config.file=logging.properties"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Djppf.config=node4.properties -Xmx512m -Dlog4j.configuration=log4j-node4.properties -Djava.util.logging.config.file=logging-node4.properties"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:demo}"/>
 </launchConfiguration>

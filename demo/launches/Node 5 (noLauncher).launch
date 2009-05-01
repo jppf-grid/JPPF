@@ -23,6 +23,7 @@
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.node.NodeLauncher"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="noLauncher"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="JPPF"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djppf.config=node5.properties -server -Xmx512m -Dlog4j.configuration=log4j-node5.properties -Djava.util.logging.config.file=logging-node5.properties"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:demo}"/>

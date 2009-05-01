@@ -44,7 +44,7 @@
 		<echo message="starting the JPPF Administration and Monitoring Tool"/>
 		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="run.classpath">
 			<jvmarg value="-server"/>
-			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Xmx256m"/>
 			<jvmarg value="-Djppf.config=jppf-gui.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-gui.properties"/>
 			<arg value="org/jppf/ui/options/xml/JPPFAdminTool.xml"/>
