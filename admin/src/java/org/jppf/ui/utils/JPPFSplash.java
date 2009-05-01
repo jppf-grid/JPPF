@@ -31,6 +31,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
+import org.jppf.utils.JPPFConfiguration;
+
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -58,7 +60,7 @@ public class JPPFSplash extends Window
 	/**
 	 * Delay between images scrolling.
 	 */
-	private long delay = 1000;
+	private long delay = JPPFConfiguration.getProperties().getLong("jppf.ui.splash.delay", 500L);
 
 	/**
 	 * Initialize this window with the specified owner.
@@ -107,7 +109,7 @@ public class JPPFSplash extends Window
 		{
 			public void run()
 			{
-				try { Thread.sleep(2*delay); }
+				try { Thread.sleep(2000); }
 				catch(InterruptedException e) {}
 				setVisible(false);
 				task.cancel();
