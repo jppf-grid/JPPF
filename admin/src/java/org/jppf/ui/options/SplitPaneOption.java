@@ -176,16 +176,6 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	}
 
 	/**
-	 * Determines whether this page is part of another.
-	 * @return true if this page is an outermost page, false if it is embedded within another page.
-	 * @see org.jppf.ui.options.OptionsPage#isMainPage()
-	 */
-	public boolean isMainPage()
-	{
-		return false;
-	}
-
-	/**
 	 * Get the options in this page.
 	 * @return a list of <code>Option</code> instances.
 	 * @see org.jppf.ui.options.OptionsPage#getChildren()

@@ -342,7 +342,6 @@ public class OptionElementFactory
 		TabbedPaneOption option = new TabbedPaneOption();
 		option.setEventsEnabled(false);
 		builder.initCommonAttributes(option, desc);
-		option.setMainPage(desc.getBoolean("main"));
 		option.createUI();
 		for (OptionDescriptor child: desc.children) option.add(builder.build(child));
 		option.setEventsEnabled(true);

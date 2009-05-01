@@ -33,10 +33,6 @@ public class TabbedPaneOption extends AbstractOptionElement implements OptionsPa
 	 * The list of children of this options page.
 	 */
 	protected List<OptionElement> children = new ArrayList<OptionElement>();
-	/**
-	 * Determines whether this page is an outermost page.
-	 */
-	protected boolean mainPage = false;
 
 	/**
 	 * Initialize the split pane with 2 fillers as left (or top) and right (or bottom) components.
@@ -121,24 +117,5 @@ public class TabbedPaneOption extends AbstractOptionElement implements OptionsPa
 	public List<OptionElement> getChildren()
 	{
 		return Collections.unmodifiableList(children);
-	}
-
-	/**
-	 * Determines whether this page is part of another.
-	 * @return true if this page is an outermost page, false if it is embedded within another page.
-	 * @see org.jppf.ui.options.OptionsPage#isMainPage()
-	 */
-	public boolean isMainPage()
-	{
-		return mainPage;
-	}
-
-	/**
-	 * Set whether this page is part of another.
-	 * @param mainPage true if this page is an outermost page, false if it is embedded within another page.
-	 */
-	public void setMainPage(boolean mainPage)
-	{
-		this.mainPage = mainPage;
 	}
 }
