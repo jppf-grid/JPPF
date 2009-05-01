@@ -159,7 +159,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @param config the set of properties to update.
 	 * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
 	 * @throws Exception if an error is raised when invoking the node mbean.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, boolean)
+	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
 	 */
 	public void updateConfiguration(Map<String, String> config, Boolean reconnect) throws Exception
 	{

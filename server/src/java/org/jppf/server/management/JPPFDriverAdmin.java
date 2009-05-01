@@ -58,7 +58,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @param request an object specifying the request parameters.
 	 * @return a <code>JPPFManagementResponse</code> instance.
 	 * @throws Exception if an error occurred while performing the request.
-	 * @see org.jppf.management.JPPFAdminMBean#processManagementRequest(org.jppf.management.JPPFManagementRequest)
+	 * @see org.jppf.management.JPPFDriverAdminMBean#processManagementRequest(java.util.Map)
 	 */
 	public JPPFManagementResponse processManagementRequest(Map<BundleParameter, Object> request) throws Exception
 	{

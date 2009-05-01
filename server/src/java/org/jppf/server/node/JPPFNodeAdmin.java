@@ -233,7 +233,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	/**
 	 * Update the priority of all execution threads.
 	 * @param newPriority the new priority to set.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadsPriority(int)
+	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadsPriority(java.lang.Integer)
 	 */
 	public void updateThreadsPriority(Integer newPriority)
 	{
@@ -244,7 +244,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	 * Update the configuration properties of the node. 
 	 * @param config the set of properties to update.
 	 * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, boolean)
+	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
 	 */
 	public void updateConfiguration(Map<String, String> config, Boolean reconnect)
 	{
