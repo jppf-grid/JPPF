@@ -126,8 +126,9 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	  populateTreeTableModel();
 		treeTable.expandAll();
 		treeTable.addMouseListener(new TreeTableMouseListener());
-	  for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
-		treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		treeTable.getColumnModel().getColumn(0).setPreferredWidth(300);
+		treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+		treeTable.doLayout();
 		JScrollPane sp = new JScrollPane(treeTable);
 		setUIComponent(sp);
 	}

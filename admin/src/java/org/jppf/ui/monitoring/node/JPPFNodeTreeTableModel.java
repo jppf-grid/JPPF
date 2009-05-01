@@ -71,7 +71,6 @@ public class JPPFNodeTreeTableModel extends AbstractTreeTableModel implements Tr
 	/**
 	 * Get the number of columns in the table.
 	 * @return the number of columns as an int.
-	 * @see org.jdesktop.swingx.treetable.DefaultTreeTableModel#getColumnCount()
 	 * @see org.jppf.ui.treetable.TreeTableModel#getColumnCount()
 	 */
 	public int getColumnCount()
@@ -177,7 +176,7 @@ public class JPPFNodeTreeTableModel extends AbstractTreeTableModel implements Tr
 	 * @param value not used.
 	 * @param node not used.
 	 * @param column not used.
-	 * @see org.jdesktop.swingx.treetable.DefaultTreeTableModel#setValueAt(java.lang.Object, java.lang.Object, int)
+	 * @see org.jppf.ui.treetable.AbstractTreeTableModel#setValueAt(java.lang.Object, java.lang.Object, int)
 	 */
 	public void setValueAt(Object value, Object node, int column)
 	{
