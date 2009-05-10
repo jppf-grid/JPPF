@@ -105,7 +105,6 @@ public final class SerializationUtils
 	 * @param data the array of bytes into which to serialize the value.
 	 * @param offset the position in the array of byte at which the serializatrion should start.
 	 * @return the int value read from the array of bytes
-	 * @see org.jppf.utils.SerializationHelper#readInt(byte[], int)
 	 */
 	public static int readInt(byte[] data, int offset)
 	{

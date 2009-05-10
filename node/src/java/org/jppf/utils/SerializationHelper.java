@@ -17,7 +17,6 @@
  */
 package org.jppf.utils;
 
-import java.util.List;
 
 
 /**
@@ -32,56 +31,4 @@ public interface SerializationHelper
 	 * @throws Exception if the serializer could not be obtained.
 	 */
 	ObjectSerializer getSerializer() throws Exception;
-	/**
-	 * Serialize an object into an array of bytes.
-	 * @param o the object to serialize.
-	 * @param isCompressed determines whether the serialized representation object should be
-	 * compressed before serialization.
-	 * @return a <code>JPPFBuffer</code> instance encapsulating the resulting array of bytes. 
-	 * @throws Exception if an error occurs while writing to the stream, compressing or serializing.
-	 */
-	JPPFBuffer toBytes(Object o, boolean isCompressed) throws Exception;
-	/**
-	 * Serialize an int value into an array of bytes.
-	 * @param value the int value to serialize.
-	 * @param data the array of bytes into which to serialize the value.
-	 * @param offset the position in the array of byte at which the serializatrion should start.
-	 * @return the new offset after serialization.
-	 */
-	int writeInt(int value, byte[] data, int offset);
-	/**
-	 * Copy some byte data to a byte buffer.
-	 * @param source the source data.
-	 * @param dest the destination buffer
-	 * @param offset the position at which to start copying in the destination.
-	 * @param length the length of the data to copy.
-	 * @return the new postion in the destination buffer.
-	 */
-	int copyToBuffer(byte[] source, byte[] dest, int offset, int length);
-	/**
-	 * Deserialize an int value from an array of bytes.
-	 * @param data the array of bytes into which to serialize the value.
-	 * @param offset the position in the array of byte at which the serializatrion should start.
-	 * @return the int value read from the array of bytes
-	 */
-	int readInt(byte[] data, int offset);
-	/**
-	 * Copy some byte data from a byte buffer.
-	 * @param source the source data.
-	 * @param offset the position at which to start copying from the source.
-	 * @return the copied data as an array of bytes.
-	 */
-	byte[] copyFromBuffer(byte[] source, int offset);
-	/**
-	 * Deserialize a number of objects from an array of bytes.
-	 * @param <T> the type of the objects to deserialize.
-	 * @param source the array pf bytes from which to deserialize.
-	 * @param offset the position in the source data at whcih to start reading.
-	 * @param compressed determines whether the source data is comprssed or not.
-	 * @param result a list holding the resulting deserialized objects.
-	 * @param count the number of objects to deserialize.
-	 * @return the new position in the source data after deserialization.
-	 * @throws Exception if an error occurs while deserializing.
-	 */
-	<T> int fromBytes(byte[] source, int offset, boolean compressed, List<T> result, int count) throws Exception;
 }
