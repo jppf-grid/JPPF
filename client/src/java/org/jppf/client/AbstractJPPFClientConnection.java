@@ -64,11 +64,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	protected ClassServerDelegate delegate = null;
 	/**
-	 * Utility for deserialization and serialization.
-	 * @deprecated replaced with {@link #makeHelper() makeHelper()}
-	 */
-	private SerializationHelper helper = null;
-	/**
 	 * Unique identifier for this JPPF client.
 	 */
 	protected String appUuid = null;
@@ -252,7 +247,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	public void sendTasks(JPPFTaskBundle header, List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
 	{
-		SerializationHelper helper = makeHelper();
+		ObjectSerializer ser = makeHelper().getSerializer();
 		int count = taskList.size();
 		if (debugEnabled) log.debug("[client: "+name+"] sending "+count+" tasks");
 		TraversalList<String> uuidPath = new TraversalList<String>();
@@ -262,9 +257,9 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		header.setTaskCount(count);
 
 		List<JPPFBuffer> bufList = new ArrayList<JPPFBuffer>();
-		bufList.add(helper.toBytes(header, false));
-		bufList.add(helper.toBytes(dataProvider, false));
-		for (JPPFTask task : taskList) bufList.add(helper.toBytes(task, false));
+		bufList.add(ser.serialize(header));
+		bufList.add(ser.serialize(dataProvider));
+		for (JPPFTask task : taskList) bufList.add(ser.serialize(task));
 
 		SocketWrapper socketClient = taskServerConnection.getSocketClient();
 		int size = 0;
