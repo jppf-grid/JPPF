@@ -106,7 +106,7 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 		Object o = null;
 		try
 		{
-			if (timeout >= 0) socket.setSoTimeout(timeout);
+			if (timeout > 0) socket.setSoTimeout(timeout);
 			JPPFBuffer buf = receiveBytes(timeout);
 			ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
 			ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(bais);
@@ -116,7 +116,7 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 		finally
 		{
 			// disable the timeout on subsequent read operations.
-			socket.setSoTimeout(0);
+			if (timeout > 0) socket.setSoTimeout(0);
 		}
 		return o;
 	}
