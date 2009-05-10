@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.*;
 
 import org.jppf.process.ProcessWrapper;
+import org.jppf.process.event.*;
 import org.jppf.utils.CollectionUtils;
 
 /**
@@ -32,7 +33,7 @@ import org.jppf.utils.CollectionUtils;
  * external process.
  * @author Laurent Cohen
  */
-public abstract class CommandLineTask extends JPPFTask
+public abstract class CommandLineTask extends JPPFTask implements ProcessWrapperEventListener
 {
 	/**
 	 * The list of command-line arguments.
@@ -49,18 +50,18 @@ public abstract class CommandLineTask extends JPPFTask
 	/**
 	 * Content of the standard output for the process.
 	 */
-	private String standardOutput = null;
+	private StringBuilder standardOutput = new StringBuilder();
 	/**
 	 * Content of the error output for the process.
 	 */
-	private String errorOutput = null;
+	private StringBuilder errorOutput = new StringBuilder();
 	/**
 	 * Determines whether the process output should be captured.
 	 */
 	private boolean captureOutput = false;
 
 	/**
-	 * Derfault condtructor.
+	 * Default condtructor.
 	 */
 	public CommandLineTask()
 	{
@@ -105,16 +106,12 @@ public abstract class CommandLineTask extends JPPFTask
 			Map map = builder.environment();
 			for (Map.Entry e: env.entrySet()) map.put(e.getKey(), e.getValue());
 		}
+		ProcessWrapper wrapper = new ProcessWrapper();
+		if (captureOutput) wrapper.addProcessWrapperEventListener(this);
 		Process p = builder.start();
-		ProcessWrapper wrapper = new ProcessWrapper(p);
+		wrapper.setProcess(p);
 		p.waitFor();
-		if (captureOutput)
-		{
-			StringBuilder sb = wrapper.getStandardOutput();
-			if (sb != null) standardOutput = sb.toString();
-			sb = wrapper.getErrorOutput();
-			if (sb != null) errorOutput = sb.toString();
-		}
+		if (captureOutput) wrapper.removeProcessWrapperEventListener(this);
 	}
 
 	/**
@@ -128,7 +125,7 @@ public abstract class CommandLineTask extends JPPFTask
 
 	/**
 	 * Specifies whether the process output is captured.
-	 * @param captureOutput true if the output is cpatured, false otherwise.
+	 * @param captureOutput - true if the output is cpatured, false otherwise.
 	 */
 	public void setCaptureOutput(boolean captureOutput)
 	{
@@ -141,7 +138,7 @@ public abstract class CommandLineTask extends JPPFTask
 	 */
 	public String getStandardOutput()
 	{
-		return standardOutput;
+		return standardOutput.toString();
 	}
 
 	/**
@@ -150,7 +147,7 @@ public abstract class CommandLineTask extends JPPFTask
 	 */
 	public String getErrorOutput()
 	{
-		return errorOutput;
+		return errorOutput.toString();
 	}
 
 	/**
@@ -164,7 +161,7 @@ public abstract class CommandLineTask extends JPPFTask
 
 	/**
 	 * Set the list of command-line arguments.
-	 * @param commandList a list of arguments as strings.
+	 * @param commandList - a list of arguments as strings.
 	 */
 	public void setCommandList(List<String> commandList)
 	{
@@ -173,7 +170,7 @@ public abstract class CommandLineTask extends JPPFTask
 
 	/**
 	 * Set the list of command-line arguments.
-	 * @param commands a list of arguments as strings.
+	 * @param commands - a list of arguments as strings.
 	 */
 	public void setCommandList(String...commands)
 	{
@@ -191,7 +188,7 @@ public abstract class CommandLineTask extends JPPFTask
 
 	/**
 	 * Get the environment variables to set.
-	 * @param env a map of variable names to their corresponding values.
+	 * @param env - a map of variable names to their corresponding values.
 	 */
 	public void setEnv(Map<String, String> env)
 	{
@@ -209,10 +206,28 @@ public abstract class CommandLineTask extends JPPFTask
 
 	/**
 	 * Set the directory to start the command in.
-	 * @param startDir the start directory as a string.
+	 * @param startDir - the start directory as a string.
 	 */
 	public void setStartDir(String startDir)
 	{
 		this.startDir = startDir;
+	}
+
+	/**
+	 * Notification that the process has written to its output stream.
+	 * @param event - encapsulates the output stream's content.
+	 */
+	public void outputStreamAltered(ProcessWrapperEvent event)
+	{
+		standardOutput.append(event.getContent()).append("\n");
+	}
+
+	/**
+	 * Notification that the process has written to its error stream.
+	 * @param event - encapsulate the error stream's content.
+	 */
+	public void errorStreamAltered(ProcessWrapperEvent event)
+	{
+		errorOutput.append(event.getContent()).append("\n");
 	}
 }
