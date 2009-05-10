@@ -113,8 +113,8 @@ public class NodeContext extends NioContext<NodeState>
 	 */
 	public void handleException(SocketChannel channel)
 	{
-		getBundler().dispose();
-		NodeNioServer.closeNode(channel);
+		if (getBundler() != null) getBundler().dispose();
+		NodeNioServer.closeNode(channel, this);
 		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getBundle().getState()))
 		{
 			resubmitBundle(bundle);
@@ -128,7 +128,7 @@ public class NodeContext extends NioContext<NodeState>
 	public void serializeBundle() throws Exception
 	{
 		if (nodeMessage == null) nodeMessage = new NodeMessage();
-		JPPFBuffer buf = helper.toBytes(bundle.getBundle(), false);
+		JPPFBuffer buf = helper.getSerializer().serialize(bundle.getBundle());
 		nodeMessage.addLocation(new ByteBufferLocation(buf.getBuffer(), 0, buf.getLength()));
 		nodeMessage.addLocation(bundle.getDataProvider());
 		for (DataLocation dl: bundle.getTasks()) nodeMessage.addLocation(dl);
