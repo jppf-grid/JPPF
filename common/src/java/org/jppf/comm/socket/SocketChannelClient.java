@@ -168,7 +168,7 @@ public class SocketChannelClient implements SocketWrapper
 		Object o = null;
 		try
 		{
-			if (timeout >= 0) channel.socket().setSoTimeout(timeout);
+			if (timeout > 0) channel.socket().setSoTimeout(timeout);
 			JPPFBuffer buf = receiveBytes(timeout);
 			o = getSerializer().deserialize(buf);
 		}
@@ -183,7 +183,7 @@ public class SocketChannelClient implements SocketWrapper
 		finally
 		{
 			// disable the timeout on subsequent read operations.
-			channel.socket().setSoTimeout(0);
+			if (timeout > 0) channel.socket().setSoTimeout(0);
 		}
 		return o;
 	}

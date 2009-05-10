@@ -111,7 +111,7 @@ public class SocketClient extends AbstractSocketWrapper
 		Object o = null;
 		try
 		{
-	    if (timeout >= 0) socket.setSoTimeout(timeout);
+	    if (timeout > 0) socket.setSoTimeout(timeout);
 	    JPPFBuffer buf = receiveBytes(timeout);
 	    o = getSerializer().deserialize(buf);
 		}
@@ -126,7 +126,7 @@ public class SocketClient extends AbstractSocketWrapper
 		finally
 		{
 			// disable the timeout on subsequent read operations.
-			socket.setSoTimeout(0);
+			if (timeout > 0) socket.setSoTimeout(0);
 		}
 		return o;
 	}
