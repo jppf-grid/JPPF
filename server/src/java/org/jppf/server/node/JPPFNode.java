@@ -111,6 +111,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		buildNumber = VersionUtils.getBuildNumber();
 		setStopped(false);
 		boolean initialized = false;
+		boolean synchronous = JPPFConfiguration.getProperties().getBoolean("jppf.node.receive.synchronous", true);
 		Throwable error = null;
 		if (debugEnabled) log.debug("Start of node main loop");
 		while (!isStopped())
@@ -123,11 +124,11 @@ public class JPPFNode extends AbstractMonitoredNode
 					System.out.println("Node sucessfully initialized");
 					initialized = true;
 				}
-				perform();
+				if (synchronous) perform();
+				else performAsync();
 			}
 			catch(SecurityException e)
 			{
-				//log.error(e.getMessage(), e);
 				throw new JPPFError(e);
 			}
 			catch(Exception e)
@@ -169,24 +170,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		{
 			JPPFTaskBundle bundle = nodeIO.readBundle();
 			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
-			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
-			{
-				if (debugEnabled) log.debug("setting initial bundle uuid");
-				bundle.setBundleUuid(uuid);
-				Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
-				if (params != null) bundle.getParametersMap().putAll(params);
-				bundle.setParameter(NODE_UUID_PARAM, uuid);
-				if (isJmxEnabled())
-				{
-					TypedProperties props = JPPFConfiguration.getProperties();
-					bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
-					bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
-					bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeRunner.getJmxServer().getId());
-				}
-				JPPFSystemInformation info = new JPPFSystemInformation();
-				info.populate();
-				bundle.setParameter(NODE_SYSTEM_INFO_PARAM, info);
-			}
+			checkInitialBundle(bundle);
 			boolean notEmpty = bundle.getTaskCount() > 0;
 			if (debugEnabled) log.debug("received " + (notEmpty ? "a non-" : "an ") + "empty bundle");
 			List<JPPFTask> taskList =  new ArrayList<JPPFTask>();
@@ -204,21 +188,7 @@ public class JPPFNode extends AbstractMonitoredNode
 				executionManager.waitForResults();
 				executionManager.cleanup();
 			}
-			nodeIO.writeResults(bundle, taskList);
-			if (notEmpty)
-			{
-				if (isJmxEnabled()) getNodeAdmin().setTaskCounter(getTaskCount() + taskList.size());
-				else setTaskCount(getTaskCount() + taskList.size());
-				if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
-			}
-			int p = bundle.getBuildNumber();
-			if (buildNumber < p)
-			{
-				JPPFNodeReloadNotification notif = new JPPFNodeReloadNotification("detected new build number: " + p
-					+ "; previous build number: " + buildNumber);
-				VersionUtils.setBuildNumber(p);
-				throw notif;
-			}
+			processResults(bundle, taskList);
 		}
 		if (debugEnabled) log.debug("End of node secondary loop");
 	}
@@ -236,45 +206,66 @@ public class JPPFNode extends AbstractMonitoredNode
 			Pair<JPPFTaskBundle, List<JPPFTask>> pair = nodeIO.readTask();
 			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
 			JPPFTaskBundle bundle = pair.first();
-			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
-			{
-				if (debugEnabled) log.debug("setting initial bundle uuid");
-				bundle.setBundleUuid(uuid);
-				Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
-				if (params != null) bundle.getParametersMap().putAll(params);
-				bundle.setParameter(NODE_UUID_PARAM, uuid);
-				if (isJmxEnabled())
-				{
-					TypedProperties props = JPPFConfiguration.getProperties();
-					bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
-					bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
-					bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeRunner.getJmxServer().getId());
-				}
-				JPPFSystemInformation info = new JPPFSystemInformation();
-				info.populate();
-				bundle.setParameter(NODE_SYSTEM_INFO_PARAM, info);
-			}
+			checkInitialBundle(bundle);
 			List<JPPFTask> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
 			if (debugEnabled) log.debug("received " + (notEmpty ? "a non-" : "an ") + "empty bundle");
 			if (notEmpty) executionManager.execute(bundle, taskList);
-			nodeIO.writeResults(bundle, taskList);
-			if (notEmpty)
-			{
-				if (isJmxEnabled()) getNodeAdmin().setTaskCounter(getTaskCount() + taskList.size());
-				else setTaskCount(getTaskCount() + taskList.size());
-				if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
-			}
-			int p = bundle.getBuildNumber();
-			if (buildNumber < p)
-			{
-				JPPFNodeReloadNotification notif = new JPPFNodeReloadNotification("detected new build number: " + p
-					+ "; previous build number: " + buildNumber);
-				VersionUtils.setBuildNumber(p);
-				throw notif;
-			}
+			processResults(bundle, taskList);
 		}
 		if (debugEnabled) log.debug("End of node secondary loop");
+	}
+
+	/**
+	 * Checks whether the received bundle is the initial one sent by the driver,
+	 * and prepare a specific response if it is.
+	 * @param bundle - the bundle to check.
+	 */
+	private void checkInitialBundle(JPPFTaskBundle bundle)
+	{
+		if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+		{
+			if (debugEnabled) log.debug("setting initial bundle uuid");
+			bundle.setBundleUuid(uuid);
+			Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
+			if (params != null) bundle.getParametersMap().putAll(params);
+			bundle.setParameter(NODE_UUID_PARAM, uuid);
+			if (isJmxEnabled())
+			{
+				TypedProperties props = JPPFConfiguration.getProperties();
+				bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
+				bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
+				bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeRunner.getJmxServer().getId());
+			}
+			JPPFSystemInformation info = new JPPFSystemInformation();
+			info.populate();
+			bundle.setParameter(NODE_SYSTEM_INFO_PARAM, info);
+		}
+	}
+
+	/**
+	 * Send the results back to the server and perform final checks for the current execution. 
+	 * @param bundle - the bundle that contains the tasks and header information.
+	 * @param taskList - the tasks results.
+	 * @throws Exception if any error occurs.
+	 */
+	private void processResults(JPPFTaskBundle bundle, List<JPPFTask> taskList) throws Exception
+	{
+		nodeIO.writeResults(bundle, taskList);
+		if ((taskList != null) && (taskList.size() > 0))
+		{
+			if (isJmxEnabled()) getNodeAdmin().setTaskCounter(getTaskCount() + taskList.size());
+			else setTaskCount(getTaskCount() + taskList.size());
+			if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
+		}
+		int p = bundle.getBuildNumber();
+		if (buildNumber < p)
+		{
+			JPPFNodeReloadNotification notif = new JPPFNodeReloadNotification("detected new build number: " + p
+				+ "; previous build number: " + buildNumber);
+			VersionUtils.setBuildNumber(p);
+			throw notif;
+		}
 	}
 
 	/**
