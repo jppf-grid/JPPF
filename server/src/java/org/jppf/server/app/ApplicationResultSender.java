@@ -61,7 +61,7 @@ public class ApplicationResultSender extends AbstractResultSender
 	public void sendPartialResults(BundleWrapper bundle) throws Exception
 	{
 		if (debugEnabled) log.debug("Sending bundle with "+bundle.getBundle().getTaskCount()+" tasks");
-		JPPFBuffer bundleBuffer = helper.toBytes(bundle.getBundle(), false);
+		JPPFBuffer bundleBuffer = helper.getSerializer().serialize(bundle.getBundle());
 		int size = 4 + bundleBuffer.getLength();
 		for (DataLocation task : bundle.getTasks()) size += 4 + task.getSize();
 

@@ -19,6 +19,7 @@
 package org.jppf.server.nio.nodeserver;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -68,7 +69,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * Holds the currently idle channels.
 	 */
 	//private List<SocketChannel> idleChannels = new ArrayList<SocketChannel>();
+	//private Map<String, SelectableChannel> idleChannels = new Hashtable<String, SelectableChannel>();
 	private List<SelectableChannel> idleChannels = new ArrayList<SelectableChannel>();
+
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
@@ -148,7 +151,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 		catch (Exception e)
 		{
 			log.error(e.getMessage(), e);
-			closeNode(channel);
+			closeNode(channel, context);
 		}
 	}
 
@@ -314,9 +317,11 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 			{
 				JPPFSecurityContext cred = JPPFDriver.getInstance().getCredentials();
 				SerializationHelper helper = new SerializationHelperImpl();
-				JPPFBuffer buf = helper.toBytes(null, false);
-				byte[] dataProvider = new byte[4 + buf.getLength()];
-				helper.copyToBuffer(buf.getBuffer(), dataProvider, 0, buf.getLength());
+				// serializing a null data provider.
+				JPPFBuffer buf = helper.getSerializer().serialize(null);
+				ByteBuffer bb = ByteBuffer.wrap(new byte[4 + buf.getLength()]);
+				bb.putInt(buf.getLength());
+				bb.put(buf.getBuffer());
 				JPPFTaskBundle bundle = new JPPFTaskBundle();
 				bundle.setBundleUuid(INITIAL_BUNDLE_UUID);
 				bundle.setRequestUuid("0");
@@ -325,7 +330,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				bundle.setCredentials(cred);
 				bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
 				initialBundle = new BundleWrapper(bundle);
-				initialBundle.setDataProvider(new ByteBufferLocation(dataProvider, 0, dataProvider.length));
+				initialBundle.setDataProvider(new ByteBufferLocation(bb));
 			}
 			catch(Exception e)
 			{
@@ -337,16 +342,20 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 
 	/**
 	 * Close a connection to a node.
-	 * @param channel a <code>SocketChannel</code> that encapsulates the connection.
+	 * @param channel - a <code>SocketChannel</code> that encapsulates the connection.
+	 * @param context - the context data associated with the channel.
 	 */
-	public static void closeNode(SocketChannel channel)
+	public static void closeNode(SocketChannel channel, NodeContext context)
 	{
 		try
 		{
 			channel.close();
 			JPPFStatsUpdater.nodeConnectionClosed();
-			JPPFDriver.getInstance().removeNodeInformation(channel);
-			JPPFDriver.getInstance().getNodeNioServer().removeIdleChannel(channel);
+			if (context.getNodeUuid() != null)
+			{
+				JPPFDriver.getInstance().removeNodeInformation(channel);
+				JPPFDriver.getInstance().getNodeNioServer().removeIdleChannel(channel);
+			}
 		}
 		catch (IOException ignored)
 		{
