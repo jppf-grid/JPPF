@@ -19,7 +19,11 @@ package org.jppf.ui.options;
 
 import java.awt.Dimension;
 import java.text.DecimalFormat;
-import javax.swing.*;
+import java.text.NumberFormat;
+
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 /**
  * Option class for numbers formatted using a pattern, as defined in class
@@ -35,7 +39,7 @@ public class FormattedNumberOption extends AbstractOption
 	/**
 	 * Used to format the value according to the pattern specified in the constructor.
 	 */
-	private DecimalFormat format = null;
+	private NumberFormat format = null;
 	/**
 	 * Label associated with the formatted field.
 	 */
@@ -69,6 +73,7 @@ public class FormattedNumberOption extends AbstractOption
 		setToolTipText(tooltip);
 		this.value = value;
 		format = new DecimalFormat(pattern);
+		//format = NumberFormat.;
 		createUI();
 	}
 

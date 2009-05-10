@@ -210,15 +210,15 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	 * @param restartDelay the delay, starting after shutdown, before restarting.
 	 * @return the response message from the server.
 	 */
-	public String requestShutdownRestart(String password, BundleParameter command, long shutdownDelay, long restartDelay)
+	public String requestShutdownRestart(String password, BundleParameter command, Number shutdownDelay, Number restartDelay)
 	{
 		if (getCurrentConnection() == null) return "No active server connection";
 		String msg = null;
 		try
 		{
 			Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
-			params.put(SHUTDOWN_DELAY_PARAM, shutdownDelay);
-			params.put(RESTART_DELAY_PARAM, restartDelay);
+			params.put(SHUTDOWN_DELAY_PARAM, shutdownDelay.longValue());
+			params.put(RESTART_DELAY_PARAM, restartDelay.longValue());
 			params.put(COMMAND_PARAM, command);
 			params.put(PASSWORD_PARAM, password);
 			if (debugEnabled) log.debug("command: " + command + ", parameters: " + params);
