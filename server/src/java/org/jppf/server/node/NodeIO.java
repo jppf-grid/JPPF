@@ -22,7 +22,6 @@ import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 
 import java.io.InvalidClassException;
 import java.util.*;
-import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
@@ -60,10 +59,6 @@ public class NodeIO extends ThreadSynchronization
 	 * Synchronized list of tasks being read from the socket and at the same time consumed by the node for execution.
 	 */
 	private LinkedList<Object> readList = new LinkedList<Object>();
-	/**
-	 * Executes read operations in a separate thread.
-	 */
-	private ExecutorService executor = Executors.newSingleThreadExecutor();
 	/**
 	 * Used to serialize/deserialize tasks and data providers.
 	 */
@@ -122,7 +117,7 @@ public class NodeIO extends ThreadSynchronization
 					readObjectsAsync();
 				}
 			};
-			executor.submit(r);
+			new Thread(r).start();
 		}
 		else
 		{
@@ -222,8 +217,9 @@ public class NodeIO extends ThreadSynchronization
 		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		bundle.setNodeExecutionTime(elapsed);
 		List<JPPFBuffer> list = new ArrayList<JPPFBuffer>();
-		list.add(node.getHelper().toBytes(bundle, false));
-		for (JPPFTask task : tasks) list.add(node.getHelper().toBytes(task, false));
+		ObjectSerializer ser = node.getHelper().getSerializer();
+		list.add(ser.serialize(bundle));
+		for (JPPFTask task : tasks) list.add(ser.serialize(task));
 		int size = 0;
 		for (JPPFBuffer buf: list) size += 4 + buf.getLength();
 		socketWrapper.writeInt(size);
