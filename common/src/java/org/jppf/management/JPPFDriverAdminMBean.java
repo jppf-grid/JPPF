@@ -20,7 +20,7 @@ package org.jppf.management;
 
 import java.util.*;
 
-import org.jppf.server.*;
+import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.BundleParameter;
 
 /**

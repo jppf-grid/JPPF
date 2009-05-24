@@ -19,11 +19,12 @@ package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
+import java.util.List;
+
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.*;
 import org.jppf.node.JPPFResourceWrapper;
-import org.jppf.utils.CompressionUtils;
 
 /**
  * Wrapper around an incoming socket connection, whose role is to receive the names of classes
@@ -114,24 +115,31 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 					resource = (JPPFResourceWrapper) socketClient.receive();
 					String name = resource.getName();
 					if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name);
-					byte[] b = null;
-					byte[] callable = resource.getCallable();
-					if (callable != null) b = resourceProvider.computeCallable(callable);
+					if (resource.getData("multiple") == null)
+					{
+						byte[] b = null;
+						byte[] callable = resource.getCallable();
+						if (callable != null) b = resourceProvider.computeCallable(callable);
+						else
+						{
+							if (resource.isAsResource()) b = resourceProvider.getResource(name);
+							else b = resourceProvider.getResourceAsBytes(name);
+						}
+						if (b == null) found = false;
+						resource.setDefinition(b);
+						if  (debugEnabled)
+						{
+							if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
+							else log.debug("["+this.getName()+"] resource not found: " + name);
+						}
+					}
 					else
 					{
-						if (resource.isAsResource()) b = resourceProvider.getResource(name);
-						else b = resourceProvider.getResourceAsBytes(name);
+						List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, null);
+						if (list != null) resource.setData("resource_list", list);
 					}
-					if (b == null) found = false;
 					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
-					//resource.setDefinition(b);
-					resource.setDefinition(found ? CompressionUtils.zip(b, 0, b.length) : null);
 					socketClient.send(resource);
-					if  (debugEnabled)
-					{
-						if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
-						else log.debug("["+this.getName()+"] resource not found: " + name);
-					}
 				}
 				catch(Exception e)
 				{

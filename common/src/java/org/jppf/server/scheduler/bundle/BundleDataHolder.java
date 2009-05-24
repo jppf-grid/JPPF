@@ -141,4 +141,18 @@ public class BundleDataHolder
 	{
 		this.maLength = maLength;
 	}
+
+	/**
+	 * Get a string representation of this bundler data holder.
+	 * @return a string representing the state of this object.
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("mean = ").append(mean).append(", previousMean = ").append(previousMean);
+		sb.append(", totalTime = ").append(totalTime).append(", nbSamples = ").append(nbSamples);
+		sb.append(", maLength = ").append(maLength).append(", samples.size() = ").append(samples.size());
+		return sb.toString();
+	}
 }

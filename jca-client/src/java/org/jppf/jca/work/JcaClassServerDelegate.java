@@ -26,7 +26,6 @@ import org.jppf.JPPFException;
 import org.jppf.client.AbstractClassServerDelegate;
 import org.jppf.comm.socket.SocketInitializer;
 import org.jppf.node.JPPFResourceWrapper;
-import org.jppf.utils.CompressionUtils;
 
 /**
  * Wrapper around an incoming socket connection, whose role is to receive the names of classes
@@ -133,7 +132,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 						else b = resourceProvider.getResourceAsBytes(name, cl);
 						if (b == null) found = false;
 						resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
-						if (b != null) resource.setDefinition(CompressionUtils.zip(b, 0, b.length));
+						if (b != null) resource.setDefinition(b);
 						else resource.setDefinition(null);
 						socketClient.send(resource);
 						if  (debugEnabled)

@@ -21,6 +21,7 @@ package org.jppf.utils;
 import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.*;
 
@@ -34,10 +35,10 @@ import org.apache.commons.logging.*;
 public final class BufferPool
 {
 	/**
-	 * Maximum number of bytes that can be written or read in one shot.
+	 * Maximum number of bytes that can be written or read in one shot, in kilobytes.
 	 */
 	private static final int MAX_BUFFER_SIZE =
-		1024 * JPPFConfiguration.getProperties().getInt("io.buffer.size", 32);
+		1024 * JPPFConfiguration.getProperties().getInt("jppf.io.buffer.size", 32);
 	/**
 	 * Logger for this class.
 	 */
@@ -51,13 +52,9 @@ public final class BufferPool
 	 */
 	private static LinkedList<BufferReference> bufferPool = new LinkedList<BufferReference>();
 	/**
-	 * Total number of allocated buffers.
-	 */
-	private static int nbAllocatedBuffers = 0;
-	/**
 	 * Current number of buffers in the pool.
 	 */
-	private static int nbBuffersInPool = 0;
+	private static AtomicInteger nbBuffersInPool = new AtomicInteger(0);
 
 	/**
 	 * Instantiation of this class is not allowed.
@@ -73,25 +70,23 @@ public final class BufferPool
 	public static ByteBuffer pickBuffer()
 	{
 		ByteBuffer result = null;
-		synchronized(bufferPool)
+		while (result == null)
 		{
-			while (result == null)
+			if (bufferPool.isEmpty())
 			{
-				if (bufferPool.isEmpty())
+				result = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
+			}
+			else
+			{
+				BufferReference ref = null;
+				synchronized(bufferPool)
 				{
-					result = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
-					nbAllocatedBuffers++;
-					if (debugEnabled) log.debug("allocated buffers: " + nbAllocatedBuffers);
+					ref = bufferPool.remove();
+					nbBuffersInPool.decrementAndGet();
 				}
-				else
-				{
-					BufferReference ref = bufferPool.remove();
-					ref.setRemovedFromPool(true);
-					result = ref.get();
-					//ref.clear();
-					nbBuffersInPool--;
-					if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
-				}
+				ref.setRemovedFromPool(true);
+				result = ref.get();
+				if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
 			}
 		}
 		return result;
@@ -108,17 +103,9 @@ public final class BufferPool
 		synchronized(bufferPool)
 		{
 			bufferPool.add(new BufferReference(buffer));
-			nbBuffersInPool++;
-			if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
+			nbBuffersInPool.incrementAndGet();
 		}
-	}
-
-	/**
-	 * Log the buffer pool statistics. This method is intended for debugging purposes only.
-	 */
-	private static void logStats()
-	{
-		log.debug("allocated buffers: " + nbAllocatedBuffers + ", buffers in pool: " + nbBuffersInPool);
+		if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
 	}
 
 	/**
@@ -153,7 +140,7 @@ public final class BufferPool
 				synchronized(bufferPool)
 				{
 					bufferPool.remove(get());
-					nbBuffersInPool--;
+					nbBuffersInPool.decrementAndGet();
 					if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
 				}
 			}

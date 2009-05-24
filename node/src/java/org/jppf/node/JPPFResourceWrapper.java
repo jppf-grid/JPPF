@@ -18,8 +18,9 @@
 package org.jppf.node;
 
 import java.io.Serializable;
+import java.util.*;
 
-import org.jppf.utils.*;
+import org.jppf.utils.TraversalList;
 
 /**
  * Instances of this class encapsulate the necessary information used by the network classloader,
@@ -64,18 +65,6 @@ public class JPPFResourceWrapper implements Serializable
 	 */
 	private TraversalList<String> uuidPath = new TraversalList<String>();
 	/**
-	 * The name of the class whose definition is requested.
-	 */
-	private String name = null;
-	/**
-	 * A callback eventually provided to execute code on the client side.
-	 */
-	private byte[] callable = null;
-	/**
-	 * The actual definition of the requested class.
-	 */
-	private byte[] definition = null;
-	/**
 	 * Determines whether the class should be loaded through the network classloader.
 	 */
 	private boolean dynamic = false;
@@ -99,6 +88,10 @@ public class JPPFResourceWrapper implements Serializable
 	 * Uuid of the orignal task bundle that triggered this resource request. 
 	 */
 	private String requestUuid = null;
+	/**
+	 * Contains data about th kind of lookup that is to be done.
+	 */
+	private Map<String, Object> data = new HashMap<String, Object>();
 
 	/**
 	 * Add a uuid to the uuid path of this resource wrapper. 
@@ -115,7 +108,7 @@ public class JPPFResourceWrapper implements Serializable
 	 */
 	public String getName()
 	{
-		return name;
+		return (String) getData("name");
 	}
 
 	/**
@@ -124,7 +117,7 @@ public class JPPFResourceWrapper implements Serializable
 	 */
 	public void setName(String name)
 	{
-		this.name = name;
+		setData("name", name);
 	}
 
 	/**
@@ -133,7 +126,7 @@ public class JPPFResourceWrapper implements Serializable
 	 */
 	public byte[] getDefinition()
 	{
-		return definition;
+		return (byte[]) getData("definition");
 	}
 
 	/**
@@ -142,7 +135,7 @@ public class JPPFResourceWrapper implements Serializable
 	 */
 	public void setDefinition(byte[] definition)
 	{
-		this.definition = definition;
+		setData("definition", definition);
 	}
 
 	/**
@@ -279,7 +272,7 @@ public class JPPFResourceWrapper implements Serializable
 	 */
 	public byte[] getCallable()
 	{
-		return callable;
+		return (byte[]) getData("callable");
 	}
 
 	/**
@@ -288,6 +281,26 @@ public class JPPFResourceWrapper implements Serializable
 	 */
 	public void setCallable(byte[] callable)
 	{
-		this.callable = callable;
+		setData("callable", callable);
+	}
+
+	/**
+	 * Get the metadata corresponding to the specified key.
+	 * @param key - the string identifying the metadata.
+	 * @return an object value or null if the metadata could not be found.
+	 */
+	public Object getData(String key)
+	{
+		return data.get(key);
+	}
+
+	/**
+	 * Get the metadata corresponding to the specified key.
+	 * @param key - the string identifying the metadata.
+	 * @param value - the value of the metadata.
+	 */
+	public void setData(String key, Object value)
+	{
+		data.put(key, value);
 	}
 }

@@ -242,4 +242,22 @@ public class JPPFNodeState implements Serializable
 	{
 		this.threadPriority = threadPriority;
 	}
+
+	/**
+	 * Make a copy of this node state.
+	 * @return a <code>JPPFNodeState</code> instance.
+	 */
+	public JPPFNodeState copy()
+	{
+		JPPFNodeState s = new JPPFNodeState();
+		s.setNbTasksExecuted(getNbTasksExecuted());
+		s.setConnectionStatus(getConnectionStatus());
+		s.setExecutionStatus(getExecutionStatus());
+		s.setTaskEvent(getTaskNotification());
+		s.setTaskIdSet(getAllTaskIds());
+		s.setThreadPoolSize(getThreadPoolSize());
+		s.setThreadPriority(getThreadPriority());
+		s.setCpuTime(getCpuTime());
+		return s;
+	}
 }

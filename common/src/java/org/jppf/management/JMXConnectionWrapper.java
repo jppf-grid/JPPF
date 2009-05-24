@@ -76,8 +76,9 @@ public class JMXConnectionWrapper extends ThreadSynchronization
  
 	/**
 	 * Initialize the connection to the remote MBean server.
-	 * @param host the host the server is running on.
-	 * @param port the RMI port used by the server.
+	 * @param host - the host the server is running on.
+	 * @param port - the RMI port used by the server.
+	 * @deprecated use <code>JMXConnectionWrapper(String host, int port, String rmiSuffix)</code> instead
 	 */
 	public JMXConnectionWrapper(String host, int port)
 	{
@@ -86,9 +87,9 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 
 	/**
 	 * Initialize the connection to the remote MBean server.
-	 * @param host the host the server is running on.
-	 * @param port the RMI port used by the server.
-	 * @param rmiSuffix	RMI registry namespace suffix. 
+	 * @param host - the host the server is running on.
+	 * @param port - the RMI port used by the server.
+	 * @param rmiSuffix	- RMI registry namespace suffix. 
 	 */
 	public JMXConnectionWrapper(String host, int port, String rmiSuffix)
 	{
@@ -125,8 +126,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization
     {
     	connected = false;
       HashMap env = new HashMap(); 
-      //env.put("jmx.remote.credentials", credentials);
-      //System.setProperty("java.rmi.server.hostname", host);
       jmxc = JMXConnectorFactory.connect(url, env);
     	mbeanConnection = jmxc.getMBeanServerConnection();
     	connected = true;
@@ -146,10 +145,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 
 	/**
 	 * Invoke a method on the specified MBean.
-	 * @param name the name of the MBean.
-	 * @param methodName the name of the method to invoke.
-	 * @param params the method parameter values.
-	 * @param signature the types of the method parameters.
+	 * @param name - the name of the MBean.
+	 * @param methodName - the name of the method to invoke.
+	 * @param params - the method parameter values.
+	 * @param signature - the types of the method parameters.
 	 * @return an object or null.
 	 * @throws Exception if the invocation failed.
 	 */
@@ -161,16 +160,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		{
 	    ObjectName mbeanName = new ObjectName(name);
   		result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
-	    /*
-  		for (ObjectName objectName: allNames)
-	    {
-	    	if (mbeanName.apply(objectName))
-	    	{
-	    		result = getMbeanConnection().invoke(objectName, methodName, params, signature);
-	    		break;
-	    	}
-	    }
-	    */
 		}
 		catch(IOException e)
 		{

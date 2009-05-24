@@ -19,6 +19,7 @@ package org.jppf.classloader;
 
 import java.io.*;
 import java.net.URL;
+import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.utils.*;
@@ -209,5 +210,38 @@ public class ResourceProvider
 			}
 		}
 		return bytes;
+	}
+
+	/**
+	 * Get all resources asssociated with the specified resource name.
+	 * @param name the name of the resources to look for.
+	 * @param cl the class loader used to load the resources. 
+	 * @return the content of all found resources as a list of byte arrays.
+	 */
+	public List<byte[]> getMultipleResourcesAsBytes(String name, ClassLoader cl)
+	{
+		List<byte[]> result = null;
+		if (cl == null) cl = Thread.currentThread().getContextClassLoader();
+		if (cl == null) cl = this.getClass().getClassLoader();
+		try
+		{
+			Enumeration<URL> urlEnum = cl.getResources(name);
+			if (urlEnum.hasMoreElements())
+			{
+				result = new ArrayList<byte[]>();
+				while (urlEnum.hasMoreElements())
+				{
+					URL url = urlEnum.nextElement();
+					InputStream is = url.openStream();
+					byte[] b = FileUtils.getInputStreamAsByte(is);
+					result.add(b);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		return result;
 	}
 }

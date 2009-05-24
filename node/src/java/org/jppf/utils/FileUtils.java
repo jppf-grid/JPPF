@@ -252,7 +252,7 @@ public final class FileUtils
 	 */
 	public static byte[] getFileAsByte(String path) throws IOException
 	{
-		return getInputStreamAsByte(new BufferedInputStream(new FileInputStream(path)));
+		return getFileAsByte(new File(path));
 	}
 
 	/**
@@ -263,7 +263,10 @@ public final class FileUtils
 	 */
 	public static byte[] getFileAsByte(File file) throws IOException
 	{
-		return getInputStreamAsByte(new BufferedInputStream(new FileInputStream(file)));
+		InputStream is = new BufferedInputStream(new FileInputStream(file));
+		byte[] data = getInputStreamAsByte(is);
+		is.close();
+		return data;
 	}
 
 	/**
@@ -344,12 +347,52 @@ public final class FileUtils
 		{
 			try
 			{
-				urls[i] = files[i].toURL();
+				urls[i] = files[i].toURI().toURL();
 			}
 			catch(MalformedURLException ignored)
 			{
 			}
 		}
 		return urls;
+	}
+
+	/**
+	 * Write a byte array into an output stream.
+	 * @param data - the byte array to write.
+	 * @param os - the output stream to write to.
+	 * @throws IOException if an I/O error occurs.
+	 */
+	public static void writeBytesToStream(byte[] data, OutputStream os) throws IOException
+	{
+		ByteArrayInputStream bais = new ByteArrayInputStream(data);
+		copyStream(bais, os);
+		bais.close();
+	}
+
+	/**
+	 * Write a byte array into an file.
+	 * @param data - the byte array to write.
+	 * @param path - the path to the file to write to.
+	 * @throws IOException if an I/O error occurs.
+	 */
+	public static void writeBytesToFile(byte[] data, String path) throws IOException
+	{
+		writeBytesToFile(data, new File(path));
+	}
+
+	/**
+	 * Write a byte array into an file.
+	 * @param data - the byte array to write.
+	 * @param path - the path to the file to write to.
+	 * @throws IOException if an I/O error occurs.
+	 */
+	public static void writeBytesToFile(byte[] data, File path) throws IOException
+	{
+		ByteArrayInputStream bais = new ByteArrayInputStream(data);
+		OutputStream os = new BufferedOutputStream(new FileOutputStream(path));
+		copyStream(bais, os);
+		bais.close();
+		os.flush();
+		os.close();
 	}
 }

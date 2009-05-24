@@ -26,7 +26,6 @@ import org.apache.commons.logging.*;
 import org.jppf.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.management.*;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.utils.*;
 
@@ -63,10 +62,6 @@ public class NodeRunner
 	 */
 	private static Hashtable<Object, Object> persistentData = new Hashtable<Object, Object>();
 	/**
-	 * The jmx server that handles administration and monitoring functions for this node.
-	 */
-	private static JMXServerImpl jmxServer = null;
-	/**
 	 * Used to executed a JVM termination task;
 	 */
 	private static ExecutorService executor = Executors.newFixedThreadPool(1);
@@ -78,6 +73,10 @@ public class NodeRunner
 	 * Task used to restart the node.
 	 */
 	private static final ShutdownOrRestart RESTART_TASK = new ShutdownOrRestart(true); 
+	/**
+	 * The JPPF node.
+	 */
+	private static MonitoredNode node = null;
 
 	/**
 	 * Run a node as a standalone application.
@@ -85,7 +84,7 @@ public class NodeRunner
 	 */
 	public static void main(String...args)
 	{
-		MonitoredNode node = null;
+		node = null;
 		try
 		{
 			log.debug("launching the JPPF node");
@@ -276,24 +275,12 @@ public class NodeRunner
 	}
 
 	/**
-	 * Get the jmx server that handles administration and monitoring functions for this node.
-	 * @return a <code>JMXServerImpl</code> instance.
+	 * Get the JPPF node.
+	 * @return a <code>MonitoredNode</code> instance.
 	 */
-	public static JMXServerImpl getJmxServer()
+	public static MonitoredNode getNode()
 	{
-		if ((jmxServer == null) || jmxServer.isStopped())
-		{
-			try
-			{
-				jmxServer = new JMXServerImpl(JPPFAdminMBean.NODE_SUFFIX);
-				jmxServer.start();
-			}
-			catch(Exception e)
-			{
-				log.error("Error creating the JMX server", e);
-			}
-		}
-		return jmxServer;
+		return node;
 	}
 
 	/**

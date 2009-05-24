@@ -19,13 +19,14 @@ package org.jppf.node;
 
 import java.io.*;
 import java.net.URL;
-import java.security.*;
+import java.security.AccessController;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFNodeReconnectionNotification;
+import org.jppf.classloader.*;
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
 
@@ -34,7 +35,7 @@ import org.jppf.utils.*;
  * application classes, to avoid costly redeployment system-wide.
  * @author Laurent Cohen
  */
-public class JPPFClassLoader extends ClassLoader
+public class JPPFClassLoader extends ClassLoader implements JPPFClassLoaderMBean
 {
 	/**
 	 * Logger for this class.
@@ -72,13 +73,10 @@ public class JPPFClassLoader extends ClassLoader
 	 * Uuid of the orignal task bundle that triggered a resource loading request. 
 	 */
 	private String requestUuid = null;
-
 	/**
-	 * Default instanciation of this class is not permitted, a valid host name and port number MUST be provided.
+	 * The cache handling resources temporarily stored to file.
 	 */
-	private JPPFClassLoader()
-	{
-	}
+	private ResourceCache cache = new ResourceCache();
 
 	/**
 	 * Initialize this class loader with a parent class loader.
@@ -109,8 +107,42 @@ public class JPPFClassLoader extends ClassLoader
 	{
 		if (!isInitializing())
 		{
-			if (debugEnabled) log.debug("initializing connection");
-			setInitializing(true);
+			try
+			{
+				lock.lock();
+				if (debugEnabled) log.debug("initializing connection");
+				setInitializing(true);
+				System.out.println("JPPFClassLoader.init(): attempting connection to the class server");
+				if (socketClient == null) initSocketClient();
+				socketInitializer.initializeSocket(socketClient);
+				if (!socketInitializer.isSuccessfull())
+					throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
+
+				// we need to do this in order to dramatically simplify the state machine of ClassServer
+				try
+				{
+					if (debugEnabled) log.debug("sending node initiation message");
+					JPPFResourceWrapper resource = new JPPFResourceWrapper();
+					resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
+					socketClient.send(resource);
+					socketClient.receive();
+					if (debugEnabled) log.debug("received node initiation response");
+				}
+				catch (IOException e)
+				{
+					throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
+				}
+				catch (Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+				System.out.println("JPPFClassLoader.init(): Reconnected to the class server");
+			}
+			finally
+			{
+				lock.unlock();
+				setInitializing(false);
+			}
 		}
 		else
 		{
@@ -124,48 +156,6 @@ public class JPPFClassLoader extends ClassLoader
 			{
 				lock.unlock();
 			}
-			return;
-		}
-		try
-		{
-			lock.lock();
-			System.out.println("JPPFClassLoader.init(): attempting connection to the class server");
-			if (socketClient == null) initSocketClient();
-			socketInitializer.initializeSocket(socketClient);
-			if (!socketInitializer.isSuccessfull())
-				throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
-
-			// we need to do this in order to dramatically simplify the 
-			// state machine of ClassServer
-			try
-			{
-				if (debugEnabled) log.debug("sending node initiation message");
-				JPPFResourceWrapper resource = new JPPFResourceWrapper();
-				resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-				socketClient.send(resource);
-				socketClient.receive();
-				if (debugEnabled) log.debug("received node initiation response");
-			}
-			/*
-			catch(ClassNotFoundException e)
-			{
-				throw new RuntimeException(e);
-			}
-			*/
-			catch (IOException e)
-			{
-				throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
-			}
-			catch (Exception e)
-			{
-				throw new RuntimeException(e);
-			}
-			System.out.println("JPPFClassLoader.init(): Reconnected to the class server");
-		}
-		finally
-		{
-			lock.unlock();
-			setInitializing(false);
 		}
 	}
 	
@@ -184,16 +174,6 @@ public class JPPFClassLoader extends ClassLoader
 	}
 	
 	/**
-	 * Find a class already loaded by this class loader.
-	 * @param name the binary name of the class
-	 * @return the resulting <tt>Class</tt> object
-	 */
-	public synchronized Class<?> findAlreadyLoadedClass(String name)
-	{
-		return findLoadedClass(name);
-	}
-
-	/**
 	 * @param name the binary name of the class
 	 * @return the resulting <tt>Class</tt> object
 	 * @throws ClassNotFoundException if the class could not be found
@@ -205,10 +185,7 @@ public class JPPFClassLoader extends ClassLoader
 		if (c == null)
 		{
 			ClassLoader parent = getParent();
-			if (parent instanceof JPPFClassLoader)
-			{
-				c = ((JPPFClassLoader) parent).findAlreadyLoadedClass(name);
-			}
+			if (parent instanceof JPPFClassLoader) c = ((JPPFClassLoader) parent).findLoadedClass(name);
 		}
 		if (c == null)
 		{
@@ -230,10 +207,14 @@ public class JPPFClassLoader extends ClassLoader
 	{
 		try
 		{
+			lock.lock();
 			if (debugEnabled) log.debug("looking up definition for resource [" + name + "]");
 			byte[] b = null;
 			String resName = name.replace('.', '/') + ".class";
-			b = loadResourceData(resName, false);
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("name", resName);
+			JPPFResourceWrapper resource = loadResourceData(map, false);
+			b = resource.getDefinition();
 			if ((b == null) || (b.length == 0))
 			{
 				if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
@@ -242,26 +223,27 @@ public class JPPFClassLoader extends ClassLoader
 			if (debugEnabled) log.debug("found definition for resource [" + name + "]");
 			return defineClass(name, b, 0, b.length);
 		}
-		catch(Error e)
+		finally
 		{
-			throw e;
+			lock.unlock();
 		}
 	}
 
 	/**
 	 * Load the specified class from a socket conenction.
-	 * @param name the binary name of the class to load, such as specified in the JLS.
+	 * @param map - contains the necessary resource request data.
 	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
-	 * @return an array of bye containing the class' byte code.
+	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
 	 * @throws ClassNotFoundException if the class could not be loaded from the remote server.
 	 */
-	private byte[] loadResourceData(String name, boolean asResource) throws ClassNotFoundException
+	private JPPFResourceWrapper loadResourceData(Map<String, Object> map, boolean asResource) throws ClassNotFoundException
 	{
+		JPPFResourceWrapper resource = null;
 		byte[] b = null;
 		try
 		{
-			if (debugEnabled) log.debug("loading remote definition for resource [" + name + "]");
-			b = loadResourceData0(name, asResource);
+			if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + "]");
+			resource = loadResourceData0(map, asResource);
 		}
 		catch(IOException e)
 		{
@@ -269,10 +251,7 @@ public class JPPFClassLoader extends ClassLoader
 			init();
 			try
 			{
-				b = loadResourceData0(name, asResource);
-			}
-			catch(IOException ex)
-			{
+				resource = loadResourceData0(map, asResource);
 			}
 			catch(ClassNotFoundException ex)
 			{
@@ -289,55 +268,22 @@ public class JPPFClassLoader extends ClassLoader
 		catch(Exception e)
 		{
 		}
-		return b;
+		return resource;
 	}
 
 	/**
 	 * Load the specified class from a socket connection.
-	 * @param name the binary name of the class to load, such as specified in the JLS.
+	 * @param map - contains the necessary resource request data.
 	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
-	 * @return an array of bye containing the class' byte code.
+	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
 	 * @throws Exception if the connection was lost and could not be reestablished.
 	 */
-	private byte[] loadResourceData0(String name, boolean asResource) throws Exception
+	private JPPFResourceWrapper loadResourceData0(Map<String, Object> map, boolean asResource) throws Exception
 	{
-		byte[] b = null;
-		try
-		{
-			if (debugEnabled) log.debug("loading remote definition for resource [" + name + "], requestUuid = " + requestUuid);
-			lock.lock();
-			JPPFResourceWrapper resource = new JPPFResourceWrapper();
-			resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
-			resource.setDynamic(dynamic);
-			TraversalList<String> list = new TraversalList<String>(uuidPath);
-			resource.setUuidPath(list);
-			if (list.size() > 0) list.setPosition(uuidPath.size()-1);
-			resource.setName(name);
-			resource.setAsResource(asResource);
-			resource.setRequestUuid(requestUuid);
-			
-			socketClient.send(resource);
-			resource = (JPPFResourceWrapper) socketClient.receive();
-			b = resource.getDefinition();
-			if (b != null)
-			{
-				try
-				{
-					b = CompressionUtils.unzip(b, 0, b.length);
-				}
-				catch(Exception e)
-				{
-					b = null;
-					log.error(e.getMessage(), e);
-				}
-			}
-			if (debugEnabled) log.debug("remote definition for resource [" + name + "] "+ (b==null ? "not " : "") + "found");
-		}
-		finally
-		{
-			lock.unlock();
-		}
-		return b;
+		if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + "], requestUuid = " + requestUuid);
+		JPPFResourceWrapper resource = loadRemoteData(map, false);
+		if (debugEnabled) log.debug("remote definition for resource [" + map.get("name") + "] "+ (resource.getDefinition()==null ? "not " : "") + "found");
+		return resource;
 	}
 
 	/**
@@ -348,43 +294,43 @@ public class JPPFClassLoader extends ClassLoader
 	 */
 	public byte[] computeRemoteData(byte[] callable) throws Exception
 	{
-		byte[] b = null;
 		try
 		{
-			if (debugEnabled) log.debug("requesting remote computation of [" + callable + "], requestUuid = " + requestUuid);
 			lock.lock();
-			JPPFResourceWrapper resource = new JPPFResourceWrapper();
-			resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
-			resource.setDynamic(dynamic);
-			TraversalList<String> list = new TraversalList<String>(uuidPath);
-			resource.setUuidPath(list);
-			if (list.size() > 0) list.setPosition(uuidPath.size()-1);
-			resource.setCallable(callable);
-			resource.setAsResource(false);
-			resource.setRequestUuid(requestUuid);
-			
-			socketClient.send(resource);
-			resource = (JPPFResourceWrapper) socketClient.receive();
-			b = resource.getDefinition();
-			if (b != null)
-			{
-				try
-				{
-					b = CompressionUtils.unzip(b, 0, b.length);
-				}
-				catch(Exception e)
-				{
-					b = null;
-					log.error(e.getMessage(), e);
-				}
-			}
+			if (debugEnabled) log.debug("requesting remote computation of [" + callable + "], requestUuid = " + requestUuid);
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("callable", callable);
+			byte[] b = loadRemoteData(map, false).getCallable();
 			if (debugEnabled) log.debug("remote definition for resource [" + callable + "] "+ (b==null ? "not " : "") + "found");
+			return b;
 		}
 		finally
 		{
 			lock.unlock();
 		}
-		return b;
+	}
+
+	/**
+	 * Load the specified class from a socket connection.
+	 * @param map - contains the necessary resource request data.
+	 * @param asResource - true if the resource is loaded using getResource(), false otherwise. 
+	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
+	 * @throws Exception if the connection was lost and could not be reestablished.
+	 */
+	private JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception
+	{
+		JPPFResourceWrapper resource = new JPPFResourceWrapper();
+		resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
+		resource.setDynamic(dynamic);
+		TraversalList<String> list = new TraversalList<String>(uuidPath);
+		resource.setUuidPath(list);
+		if (list.size() > 0) list.setPosition(uuidPath.size()-1);
+		for (Map.Entry<String, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());
+		resource.setAsResource(asResource);
+		resource.setRequestUuid(requestUuid);
+		socketClient.send(resource);
+		resource = (JPPFResourceWrapper) socketClient.receive();
+		return resource;
 	}
 
 	/**
@@ -392,40 +338,24 @@ public class JPPFClassLoader extends ClassLoader
 	 * The resource lookup order is the same as the one specified by {@link #getResourceAsStream(String)} 
 	 * @param name the name of the resource to find.
 	 * @return the URL of the resource.
-	 * @see java.lang.ClassLoader#getResource(java.lang.String)
+	 * @see java.lang.ClassLoader#findResource(java.lang.String)
 	 */
-	public URL getResource(String name)
+	public URL findResource2(String name)
 	{
 		URL url = null;
 		if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
 		try
 		{
-			final byte[] b = loadResourceData(name, true);
+			lock.lock();
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("name", name);
+			JPPFResourceWrapper resource = loadResourceData(map, true);
+			byte[] b = resource.getDefinition();
 			boolean found = (b != null) && (b.length > 0);
 			if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
 			if (found)
 			{
-				File file = (File) AccessController.doPrivileged(new PrivilegedAction<Object>()
-				{
-					public Object run()
-					{
-						File tmp = null;
-						try
-						{
-							tmp = File.createTempFile("jppftemp_", "tmp");
-							tmp.deleteOnExit();
-							BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(tmp));
-							bos.write(b);
-							bos.flush();
-							bos.close();
-						}
-						catch(Exception e)
-						{
-							log.error(e.getMessage(), e);
-						}
-						return tmp;
-					}
-				});
+				File file = (File) AccessController.doPrivileged(new SaveFileAction(b));
 				if (file != null)
 				{
 					try
@@ -445,6 +375,37 @@ public class JPPFClassLoader extends ClassLoader
 		{
 			if (debugEnabled) log.debug("resource [" + name + "] not found remotely");
 		}
+		finally
+		{
+			lock.unlock();
+		}
+		return url;
+	}
+
+	/**
+	 * Finds the resource with the specified name.
+	 * The resource lookup order is the same as the one specified by {@link #getResourceAsStream(String)} 
+	 * @param name the name of the resource to find.
+	 * @return the URL of the resource.
+	 * @see java.lang.ClassLoader#findResource(java.lang.String)
+	 */
+	public URL findResource(String name)
+	{
+		URL url = null;
+		if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
+		try
+		{
+			Enumeration<URL> urlEnum = findResources(name);
+			if ((urlEnum != null) && urlEnum.hasMoreElements()) url = urlEnum.nextElement();
+		}
+		catch(IOException e)
+		{
+		}
+		finally
+		{
+			lock.unlock();
+		}
+		if (debugEnabled) log.debug("resource [" + name + "] " + (url == null ? "not " : "") + "found remotely");
 		return url;
 	}
 
@@ -454,12 +415,10 @@ public class JPPFClassLoader extends ClassLoader
 	 * <ul>
 	 * <li>locally, in the classpath for this class loader, such as specified by {@link java.lang.ClassLoader#getResourceAsStream(java.lang.String) ClassLoader.getResourceAsStream(String)}<br>
 	 * <li>if the parent of this class loader is NOT an instance of {@link JPPFClassLoader},
-	 * in the classpath of the <i>JPPF driver</i>, such as specified by
-	 * {@link org.jppf.classloader.ResourceProvider#getResourceAsBytes(java.lang.String, java.lang.ClassLoader) ResourceProvider.getResourceAsBytes(String, ClassLoader)}</li>
+	 * in the classpath of the <i>JPPF driver</i>, such as specified by {@link org.jppf.classloader.ResourceProvider#getResourceAsBytes(java.lang.String, java.lang.ClassLoader) ResourceProvider.getResourceAsBytes(String, ClassLoader)}</li>
 	 * (the search may eventually be sped up by looking up the driver's resource cache first)</li>
 	 * <li>if the parent of this class loader IS an instance of {@link JPPFClassLoader},
-	 * in the <i>classpath of the JPPF client</i>, such as specified by
-	 * {@link org.jppf.classloader.ResourceProvider#getResourceAsBytes(java.lang.String, java.lang.ClassLoader) ResourceProvider.getResourceAsBytes(String, ClassLoader)}
+	 * in the <i>classpath of the JPPF client</i>, such as specified by {@link org.jppf.classloader.ResourceProvider#getResourceAsBytes(java.lang.String, java.lang.ClassLoader) ResourceProvider.getResourceAsBytes(String, ClassLoader)}
 	 * (the search may eventually be sped up by looking up the driver's resource cache first)</li>
 	 * </ul>
 	 * @param name name of the resource to obtain a stream from. 
@@ -474,7 +433,11 @@ public class JPPFClassLoader extends ClassLoader
 			if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
 			try
 			{
-				byte[] b = loadResourceData(name, false);
+				lock.lock();
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("name", name);
+				JPPFResourceWrapper resource = loadResourceData(map, true);
+				byte[] b = resource.getDefinition();
 				boolean found = (b != null) && (b.length > 0);
 				if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
 				if (!found) return null;
@@ -484,6 +447,10 @@ public class JPPFClassLoader extends ClassLoader
 			{
 				if (debugEnabled) log.debug("resource [" + name + "] not found remotely");
 				return null;
+			}
+			finally
+			{
+				lock.unlock();
 			}
 		}
 		return is;
@@ -542,5 +509,61 @@ public class JPPFClassLoader extends ClassLoader
 			}
 			socketClient = null;
 		}
+	}
+
+	/**
+	 * Find all resources with the specified name.
+	 * @param name - name of the resources to find in the clas loader's classpath. 
+	 * @return An enumeration of URLs pointing to the resources found.
+	 * @throws IOException if an error occurs.
+	 * @see java.lang.ClassLoader#findResources(java.lang.String)
+	 */
+	protected Enumeration<URL> findResources(String name) throws IOException
+	{
+		List<URL> urlList = null;
+		if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
+		try
+		{
+			lock.lock();
+			List<String> locationsList = cache.getResourcesLocations(name);
+			if (locationsList == null)
+			{
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("name", name);
+				map.put("multiple", "true");
+				JPPFResourceWrapper resource = loadResourceData(map, true);
+				List<byte[]> dataList = (List<byte[]>) resource.getData("resource_list");
+				boolean found = (dataList != null) && !dataList.isEmpty();
+				if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
+				if (found)
+				{
+					cache.registerResources(name, dataList);
+					urlList = new ArrayList<URL>();
+					locationsList = cache.getResourcesLocations(name);
+				}
+			}
+			if (locationsList != null)
+			{
+				for (String path: locationsList)
+				{
+					File file = new File(path);
+					urlList.add(file.toURI().toURL());
+				}
+				if (debugEnabled) log.debug("found the following URLs for resource [" + name + "] : " + urlList);
+			}
+		}
+		catch(IOException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			if (debugEnabled) log.debug("resource [" + name + "] not found remotely");
+		}
+		finally
+		{
+			lock.unlock();
+		}
+		return urlList == null ? null : new IteratorEnumeration(urlList.iterator());
 	}
 }

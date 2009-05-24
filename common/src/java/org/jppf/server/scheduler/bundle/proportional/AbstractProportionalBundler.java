@@ -154,56 +154,122 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 */
 	private void computeBundleSizes()
 	{
-		double maxMean = Double.NEGATIVE_INFINITY;
-		double minMean = Double.POSITIVE_INFINITY;
-		AbstractProportionalBundler minBundler = null;
-		for (AbstractProportionalBundler b: bundlers)
+		synchronized(bundlers)
 		{
-			BundleDataHolder h = b.getDataHolder();
-			double m = h.getMean();
-			if (m > maxMean) maxMean = m;
-			if (m < minMean)
+			double maxMean = Double.NEGATIVE_INFINITY;
+			double minMean = Double.POSITIVE_INFINITY;
+			AbstractProportionalBundler minBundler = null;
+			for (AbstractProportionalBundler b: bundlers)
 			{
-				minMean = m;
-				minBundler = b;
+				BundleDataHolder h = b.getDataHolder();
+				double m = h.getMean();
+				if (m > maxMean) maxMean = m;
+				if (m < minMean)
+				{
+					minMean = m;
+					minBundler = b;
+				}
 			}
-		}
-		BundleDataHolder minHolder = minBundler.getDataHolder();
-		double diffSum = 0d;
-		for (AbstractProportionalBundler b: bundlers)
-		{
-			double diff = maxMean / b.getDataHolder().getMean();
-			diffSum += b.computeDiff(diff);
-		}
-		int max = maxSize();
-		int sum = 0;
-		for (AbstractProportionalBundler b: bundlers)
-		{
-			BundleDataHolder h = b.getDataHolder();
-			double diff = maxMean / h.getMean();
-			double d = b.computeDiff(diff) / diffSum;
-			int size = Math.max(1, (int) (max * d));
-			b.setBundleSize(size);
-			sum += size;
-		}
-		if (sum < max)
-		{
-			int size = minBundler.getBundleSize();
-			minBundler.setBundleSize(size + (max - sum));
-		}
-		if (debugEnabled)
-		{
-			StringBuilder sb = new StringBuilder();
-			sb.append("bundler info: [");
+			BundleDataHolder minHolder = minBundler.getDataHolder();
+			double diffSum = 0d;
+			double[] diffArray = new double[bundlers.size()];
 			int count = 0;
 			for (AbstractProportionalBundler b: bundlers)
 			{
-				if (count > 0) sb.append(", ");
-				count++;
-				sb.append("#").append(b.getBundlerNumber()).append(":").append(b.getBundleSize());
+				double diff = maxMean / b.getDataHolder().getMean();
+				double d = b.computeDiff(diff);
+				diffSum += d;
+				diffArray[count++] = d;
 			}
-			sb.append("]");
-			log.debug(sb.toString());
+			int max = maxSize();
+			int sum = 0;
+			count = 0;
+			for (AbstractProportionalBundler b: bundlers)
+			{
+				double d = diffArray[count++] / diffSum;
+				int size = Math.max(1, (int) (max * d));
+				//if (b == this) b.setBundleSize(size);
+				b.setBundleSize(size);
+				sum += size;
+			}
+			/*
+			if (sum < max)
+			{
+				int size = minBundler.getBundleSize();
+				minBundler.setBundleSize(size + (max - sum));
+			}
+			*/
+			if (debugEnabled)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("bundler info:\n");
+				sb.append("minMean = ").append(minMean).append(", maxMean = ").append(maxMean).append(", diffSum = ").append(diffSum).append(", maxSize = ").append(max).append("\n");
+				for (AbstractProportionalBundler b: bundlers)
+				{
+					sb.append("bundler #").append(b.getBundlerNumber()).append(" : ").append(b.getBundleSize()).append(":\n");
+					sb.append("  ").append(b.getDataHolder()).append("\n");
+				}
+				log.debug(sb.toString());
+			}
+		}
+	}
+
+	/**
+	 * Update the bundler sizes.
+	 */
+	private void computeBundleSizes2()
+	{
+		synchronized(bundlers)
+		{
+			double maxMean = Double.NEGATIVE_INFINITY;
+			double minMean = Double.POSITIVE_INFINITY;
+			AbstractProportionalBundler minBundler = null;
+			for (AbstractProportionalBundler b: bundlers)
+			{
+				BundleDataHolder h = b.getDataHolder();
+				double m = h.getMean();
+				if (m > maxMean) maxMean = m;
+				if (m < minMean)
+				{
+					minMean = m;
+					minBundler = b;
+				}
+			}
+			BundleDataHolder minHolder = minBundler.getDataHolder();
+			double diffSum = 0d;
+			for (AbstractProportionalBundler b: bundlers)
+			{
+				double diff = maxMean / b.getDataHolder().getMean();
+				diffSum += b.computeDiff(diff);
+			}
+			int max = maxSize();
+			int sum = 0;
+			for (AbstractProportionalBundler b: bundlers)
+			{
+				BundleDataHolder h = b.getDataHolder();
+				double diff = maxMean / h.getMean();
+				double d = b.computeDiff(diff) / diffSum;
+				int size = Math.max(1, (int) (max * d));
+				b.setBundleSize(size);
+				sum += size;
+			}
+			if (sum < max)
+			{
+				int size = minBundler.getBundleSize();
+				minBundler.setBundleSize(size + (max - sum));
+			}
+			if (debugEnabled)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("bundler info:\n");
+				sb.append("minMean = ").append(minMean).append(", maxMean = ").append(maxMean).append(", diffSum = ").append(diffSum).append(", maxSize = ").append(max).append("\n");
+				for (AbstractProportionalBundler b: bundlers)
+				{
+					sb.append("bundler #").append(b.getBundlerNumber()).append(" : ").append(b.getBundleSize()).append(":\n");
+					sb.append("  ").append(b.getDataHolder()).append("\n");
+				}
+				log.debug(sb.toString());
+			}
 		}
 	}
 

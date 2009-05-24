@@ -18,14 +18,16 @@
 
 package org.jppf.management;
 
-import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.rmi.registry.*;
+import java.util.*;
 
 import javax.management.*;
 import javax.management.remote.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.management.spi.JPPFMBeanProviderManager;
+import org.jppf.node.JPPFClassLoader;
 import org.jppf.utils.*;
 
 /**
@@ -67,6 +69,14 @@ public class JMXServerImpl
 	 * Used to distinguish between driver and node RMI registries.
 	 */
 	private String namespaceSuffix = null;
+	/**
+	 * Manager for the MBean defined through the service provider interface.
+	 */
+	private JPPFMBeanProviderManager providerManager = new JPPFMBeanProviderManager();
+	/**
+	 * Keeps a list of MBeans registered with the MBean server.
+	 */
+	private List<String> registeredMBeanNames = new Vector<String>();
 
 	/**
 	 * Initialize this JMX server with the specified namespace suffix.
@@ -79,24 +89,40 @@ public class JMXServerImpl
 
 	/**
 	 * Start the MBean server and associated resources.
+	 * @param cl - the default classloader to be used by the JMX remote connector.
 	 * @throws Exception if an error occurs when starting the server or one of its components. 
 	 */
-	public void start() throws Exception
+	public void start(ClassLoader cl) throws Exception
 	{
     if (debugEnabled) log.debug("starting remote connector server");
-		server = ManagementFactory.getPlatformMBeanServer();
-    locateOrCreateRegistry();
-		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = NetworkUtils.getManagementHost();
-		int port = props.getInt("jppf.management.port", 11198);
-		int rmiPort = props.getInt("jppf.management.rmi.port", 12198);
-    if (debugEnabled) log.debug("starting connector server with RMI registry port = " + port + " and RMI server port = " + rmiPort);
-		InetAddress addr = InetAddress.getByName(host);
-    JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://localhost:" + rmiPort + "/jndi/rmi://" + host + ":" + port + "/jppf" + namespaceSuffix);
-    connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, null, server);
-    connectorServer.start();
-    stopped = false;
-    if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);
+    ClassLoader tmp = Thread.currentThread().getContextClassLoader();
+    try
+    {
+	    Thread.currentThread().setContextClassLoader(cl);
+			//server = ManagementFactory.getPlatformMBeanServer();
+			server = MBeanServerFactory.newMBeanServer();
+			if (cl instanceof JPPFClassLoader) server.registerMBean(cl, new ObjectName("org.jppf:name=NodeClassLoader"));
+	    locateOrCreateRegistry();
+			TypedProperties props = JPPFConfiguration.getProperties();
+			String host = NetworkUtils.getManagementHost();
+			int port = props.getInt("jppf.management.port", 11198);
+			int rmiPort = props.getInt("jppf.management.rmi.port", 12198);
+	    if (debugEnabled) log.debug("starting connector server with RMI registry port = " + port + " and RMI server port = " + rmiPort);
+			InetAddress addr = InetAddress.getByName(host);
+	    JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://localhost:" + rmiPort + "/jndi/rmi://" + host + ":" + port + "/jppf" + namespaceSuffix);
+	    Map<String, Object> env = new HashMap<String, Object>();
+	    env.put("jmx.remote.default.class.loader", cl);
+	    env.put("jmx.remote.protocol.provider.class.loader", cl);
+	    connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
+	    //connectorServer.
+	    connectorServer.start();
+	    stopped = false;
+	    if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);
+    }
+    finally
+    {
+	    Thread.currentThread().setContextClassLoader(tmp);
+    }
 	}
 
 	/**
@@ -106,10 +132,11 @@ public class JMXServerImpl
 	 * @param mbeanInterface the exposed interface of the management bean.
 	 * @throws Exception if the registration failed.
 	 */
-	public void registerMbean(String name, Object mbean, Class mbeanInterface) throws Exception
+	public void registerMBean(String name, Object mbean, Class mbeanInterface) throws Exception
 	{
 		StandardMBean stdBean = new StandardMBean(mbean, mbeanInterface);
     server.registerMBean(stdBean, new ObjectName(name));
+    registeredMBeanNames.add(name);
 	}
 
 	/**
@@ -117,9 +144,10 @@ public class JMXServerImpl
 	 * @param name the name of the bean to register.
 	 * @throws Exception if the de-registration failed.
 	 */
-	public void unregisterMbean(String name) throws Exception
+	public void unregisterMBean(String name) throws Exception
 	{
     server.unregisterMBean(new ObjectName(name));
+    registeredMBeanNames.remove(name);
 	}
 
 	/**
@@ -130,6 +158,8 @@ public class JMXServerImpl
 	{
 		stopped = true;
     connectorServer.stop();
+    List<String> names = new ArrayList<String>(registeredMBeanNames);
+    for (String name: names) unregisterMBean(name);
 	}
 
 	/**
@@ -166,7 +196,7 @@ public class JMXServerImpl
 	}
 
 	/**
-	 * Get a unique identitier for this management server. This id must be unique accross JPPF nodes and servers,
+	 * Get a unique identifier for this management server. This id must be unique accross JPPF nodes and servers,
 	 * and is used to identify this server if multiple nodes or servers share the same RMI registry.
 	 * @return the id as a string.
 	 */

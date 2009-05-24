@@ -17,8 +17,6 @@
  */
 package org.jppf.utils;
 
-import java.io.*;
-
 import org.apache.commons.logging.*;
 
 /**
@@ -53,13 +51,12 @@ public final class CompressionUtils
 	 */
 	public static byte[] zip(byte[] bytes, int start, int length) throws Exception
 	{
+		/*
 		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		//GZIPOutputStream gzos = new GZIPOutputStream(baos);
 		DataOutputStream dos = null;
-		/*
-		DeflaterOutputStream gzos = new DeflaterOutputStream(baos);
-		dos = new DataOutputStream(gzos);
-		*/
+		//DeflaterOutputStream gzos = new DeflaterOutputStream(baos);
+		//dos = new DataOutputStream(gzos);
 		dos = new DataOutputStream(baos);
 		dos.writeInt(length);
 		dos.write(bytes, start, length);
@@ -67,6 +64,8 @@ public final class CompressionUtils
 		dos.close();
 		//if (debugEnabled) log.debug("compressed "+length+" bytes into "+baos.size());
 		return baos.toByteArray();
+		*/
+		return bytes;
 	}
 
 	/**
@@ -79,14 +78,13 @@ public final class CompressionUtils
 	 */
 	public static byte[] unzip(byte[] bytes, int start, int length) throws Exception
 	{
+		/*
 		int count = 0;
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes, start, length);
 		//GZIPInputStream gzis = new GZIPInputStream(bais);
 		DataInputStream dis = null;
-		/*
-		InflaterInputStream gzis = new InflaterInputStream(bais);
-		dis = new DataInputStream(gzis);
-		*/
+		//InflaterInputStream gzis = new InflaterInputStream(bais);
+		//dis = new DataInputStream(gzis);
 		dis = new DataInputStream(bais);
 		int len = dis.readInt();
 		byte[] result = new byte[len];
@@ -100,5 +98,7 @@ public final class CompressionUtils
 		dis.close();
 		//if (debugEnabled) log.debug("uncompressed " + length + " bytes into " + len);
 		return result;
+		*/
+		return bytes;
 	}
 }

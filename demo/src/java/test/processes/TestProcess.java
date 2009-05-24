@@ -159,8 +159,8 @@ public class TestProcess
 	public static void printProcessOutput(ProcessWrapper p, String processName) throws Exception
 	{
 		output("Output for process ["+processName+"] :");
-		output("\nstandard output:\n" + p.getStandardOutput().toString().trim());
-		output("\nerror output:\n" + p.getErrorOutput().toString().trim());
+		//output("\nstandard output:\n" + p.getStandardOutput().toString().trim());
+		//output("\nerror output:\n" + p.getErrorOutput().toString().trim());
 	}
 
 	/**

@@ -42,7 +42,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * Cancel the execution of the tasks with the specified id.
 	 * @param id the id of the tasks to cancel.
 	 * @throws Exception if an error occurs while invoking the Node MBean.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#cancelTask(java.lang.String)
+	 * @see org.jppf.server.node.node.JPPFNodeAdminMBean#cancelTask(java.lang.String)
 	 */
 	public void cancelTask(String id) throws Exception
 	{
@@ -55,7 +55,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * The task(s) will be restarted even if their execution has already completed.
 	 * @param id the id of the task or tasks to restart.
 	 * @throws Exception if an error occurs while invoking the Node MBean.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#restartTask(java.lang.String)
+	 * @see org.jppf.server.node.node.JPPFNodeAdminMBean#restartTask(java.lang.String)
 	 */
 	public void restartTask(String id) throws Exception
 	{
@@ -67,7 +67,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * Get the latest state information from the node.
 	 * @return a <code>JPPFNodeState</code> information.
 	 * @throws Exception if an error occurs while invoking the Node MBean.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#state()
+	 * @see org.jppf.server.node.node.JPPFNodeAdminMBean#state()
 	 */
 	public JPPFNodeState state() throws Exception
 	{
@@ -79,7 +79,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * Get the latest task notification from the node.
 	 * @return a the notification as a <code>Serializable</code> object.
 	 * @throws Exception if an error occurs while invoking the Node MBean.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#notification()
+	 * @see org.jppf.server.node.node.JPPFNodeAdminMBean#notification()
 	 */
 	public Serializable notification() throws Exception
 	{
@@ -91,7 +91,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * Set the size of the node's thread pool.
 	 * @param size the size as an int.
 	 * @throws Exception if an error occurs while invoking the Node MBean.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadPoolSize(java.lang.Integer)
+	 * @see org.jppf.server.node.node.JPPFNodeAdminMBean#updateThreadPoolSize(java.lang.Integer)
 	 */
 	public void updateThreadPoolSize(Integer size) throws Exception
 	{
@@ -104,7 +104,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * and runtime information such as memory usage and available processors.
 	 * @return a <code>JPPFSystemInformation</code> instance.
 	 * @throws Exception if an error occurs while invoking the Node MBean.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#systemInformation()
+	 * @see org.jppf.server.node.node.JPPFNodeAdminMBean#systemInformation()
 	 */
 	public JPPFSystemInformation systemInformation() throws Exception
 	{
@@ -115,7 +115,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	/**
 	 * Shutdown the node.
 	 * @throws Exception if an error is raised when invoking the node mbean.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#shutdown()
+	 * @see org.jppf.server.node.node.JPPFNodeAdminMBean#shutdown()
 	 */
 	public void shutdown() throws Exception
 	{
@@ -125,7 +125,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	/**
 	 * Restart the node.
 	 * @throws Exception if an error is raised when invoking the node mbean.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#restart()
+	 * @see org.jppf.server.node.node.JPPFNodeAdminMBean#restart()
 	 */
 	public void restart() throws Exception
 	{
@@ -135,7 +135,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	/**
 	 * Reset the node's executed tasks counter to zero. 
 	 * @throws Exception if an error is raised when invoking the node mbean.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#resetTaskCounter()
+	 * @see org.jppf.server.node.node.JPPFNodeAdminMBean#resetTaskCounter()
 	 */
 	public void resetTaskCounter() throws Exception
 	{
@@ -143,10 +143,21 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	}
 
 	/**
+	 * Set the node's executed tasks counter to the specified value.
+	 * @param n - the new value of the task counter.
+	 * @throws Exception if an error is raised when invoking the node mbean.
+	 * @see org.jppf.server.node.node.JPPFNodeAdminMBean#setTaskCounter(java.lang.Integer)
+	 */
+	public void setTaskCounter(Integer n) throws Exception
+	{
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "setTaskCounter", new Object[] { n }, new String[] { "java.lang.Integer" }); 
+	}
+
+	/**
 	 * Update the priority of all execution threads.
 	 * @param newPriority the new priority to set.
 	 * @throws Exception if an error is raised when invoking the node mbean.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadsPriority(java.lang.Integer)
+	 * @see org.jppf.server.node.node.JPPFNodeAdminMBean#updateThreadsPriority(java.lang.Integer)
 	 */
 	public void updateThreadsPriority(Integer newPriority) throws Exception
 	{
@@ -159,7 +170,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @param config the set of properties to update.
 	 * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
 	 * @throws Exception if an error is raised when invoking the node mbean.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
+	 * @see org.jppf.server.node.node.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
 	 */
 	public void updateConfiguration(Map<String, String> config, Boolean reconnect) throws Exception
 	{

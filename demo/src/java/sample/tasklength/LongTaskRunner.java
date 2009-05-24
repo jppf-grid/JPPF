@@ -17,7 +17,7 @@
  */
 package sample.tasklength;
 
-import java.util.*;
+import java.util.List;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
@@ -106,6 +106,7 @@ public class LongTaskRunner
 			print("Average iteration time: "+StringUtils.toStringDuration(totalTime/iterations));
 			JPPFStats stats = jppfClient.requestStatistics();
 			print("End statistics :\n"+stats.toString());
+	
 		}
 		catch(Exception e)
 		{

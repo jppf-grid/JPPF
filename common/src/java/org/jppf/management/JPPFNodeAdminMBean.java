@@ -83,10 +83,16 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean<NodeParameter, Object
 	 */
 	void shutdown() throws Exception;
 	/**
-	 * Reset the node's executed tasks counter to zero. 
+	 * Reset the node's executed tasks counter to zero.
 	 * @throws Exception if any error occurs.
 	 */
 	void resetTaskCounter() throws Exception;
+	/**
+	 * Reset the node's executed tasks counter to the specified value.
+	 * @param n - the number to set the task counter to.
+	 * @throws Exception if any error occurs.
+	 */
+	void setTaskCounter(Integer n) throws Exception;
 	/**
 	 * Update the configuration properties of the node. 
 	 * @param config the set of properties to update.

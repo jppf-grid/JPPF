@@ -59,16 +59,14 @@ permission java.io.FilePermission "${user.dir}/config/log4j-node.properties", "r
 permission java.io.FilePermission "${user.dir}/config/log4j-node1.properties", "read";
 permission java.io.FilePermission "${user.dir}/config/log4j-node2.properties", "read";
 permission java.io.FilePermission "C:/jdk1.5.0/jre/lib/xerces.properties", "read";
-permission java.io.FilePermission "${user.dir}/config/log4j-node2.properties", "read";
-permission java.io.FilePermission "jmxconfig/access.properties", "read";
-permission java.io.FilePermission "jmxconfig/password.properties", "read";
+//permission java.io.FilePermission "jmxconfig/access.properties", "read";
+//permission java.io.FilePermission "jmxconfig/password.properties", "read";
 
 //------------------------------------------------------------------------------//
 // Property permissions.                                                        //
 // Please do not change these permissions. JPPF may not work any more if you do //
 //------------------------------------------------------------------------------//
 
-permission java.util.PropertyPermission "*", "read";
 permission java.util.PropertyPermission "log4j.*", "read";
 permission java.util.PropertyPermission "org.apache.commons.logging.*", "read";
 permission java.util.PropertyPermission "java.*", "read";
@@ -134,3 +132,11 @@ permission java.net.SocketPermission "127.0.0.1:21", "accept,connect,listen,reso
 //permission java.util.PropertyPermission "client.logsRedirected", "read";
 //permission java.util.PropertyPermission "disableLogs", "read";
 permission java.util.PropertyPermission "db2.*", "read";
+
+//------------------------------------------------------------------------------//
+// permissions for Eclipse                                                      //
+//------------------------------------------------------------------------------//
+permission java.io.FilePermission "c:/Tools/eclipse", "read,write";
+permission java.io.FilePermission "c:/Tools/eclipse/configuration/config.ini", "read,write";
+permission java.io.FilePermission "c:/Tools/eclipse/-", "read,write";
+permission java.util.PropertyPermission "*", "read,write";
