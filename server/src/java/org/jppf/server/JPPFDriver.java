@@ -133,8 +133,8 @@ public class JPPFDriver
 			if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
 			{
 				jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX);
-				jmxServer.start();
-				jmxServer.registerMbean(JPPFAdminMBean.DRIVER_MBEAN_NAME, new JPPFDriverAdmin(), JPPFDriverAdminMBean.class);
+				jmxServer.start(getClass().getClassLoader());
+				jmxServer.registerMBean(JPPFAdminMBean.DRIVER_MBEAN_NAME, new JPPFDriverAdmin(), JPPFDriverAdminMBean.class);
 				System.out.println("JPPF Driver management initialized");
 			}
 		}

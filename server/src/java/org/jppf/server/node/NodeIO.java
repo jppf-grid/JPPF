@@ -30,7 +30,7 @@ import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 
 /**
- * 
+ * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
  * @author Laurent Cohen
  */
 public class NodeIO extends ThreadSynchronization

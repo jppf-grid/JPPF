@@ -72,58 +72,16 @@ public class WaitingNodeRequestState extends ClassServerState
 			boolean dynamic = resource.isDynamic();
 			String name = resource.getName();
 			byte[] callable = resource.getCallable();
-			String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null; 
 			byte[] b = null;
-			if (((uuid == null) || uuid.equals(JPPFDriver.getInstance().getUuid())) && (callable == null))
-			{
-				if ((uuid == null) && !dynamic) uuid = JPPFDriver.getInstance().getUuid();
-				if (uuid != null) b = server.getCacheContent(uuid, name);
-				boolean alreadyInCache = (b != null);
-				if (debugEnabled) log.debug("resource " + (alreadyInCache ? "" : "not ") + "found [" + name + "] in cache for node: " + getRemoteHost(channel));
-				if (!alreadyInCache)
-				{
-					b = server.getResourceProvider().getResourceAsBytes(name);
-					if (b != null) b = CompressionUtils.zip(b, 0, b.length);
-				}
-				if ((b != null) || !dynamic)
-				{
-					if (debugEnabled) log.debug("resource " + (b == null ? "not " : "") + "found [" + name + "] in the driver's classpath for node: " + getRemoteHost(channel));
-					if ((b != null) && !alreadyInCache) server.setCacheContent(JPPFDriver.getInstance().getUuid(), name, b);
-					resource.setDefinition(b);
-					context.serializeResource();
-					return TO_SENDING_NODE_RESPONSE;
-				}
-			}
+			String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null; 
+			ByteTransitionPair p = processNonDynamic(key, resource);
+			if (p.second() != null) return p.second();
+			b = p.first();
 			if ((b == null) && dynamic)
 			{
-				if (callable == null) b = server.getCacheContent(uuidPath.getFirst(), name);
-				if (b != null)
-				{
-					if (debugEnabled) log.debug("found cached resource [" + name + "] for node: " + getRemoteHost(channel));
-					resource.setDefinition(b);
-					context.serializeResource();
-					return TO_SENDING_NODE_RESPONSE;
-				}
-				else
-				{
-					uuidPath.decPosition();
-					uuid = uuidPath.getCurrentElement();
-					SelectableChannel provider = findProviderConnection(uuid);
-					if (provider != null)
-					{
-						if (debugEnabled) log.debug("request resource [" + name + "] from client: " + getRemoteHost(provider) + " for node: " + getRemoteHost(channel));
-						SelectionKey providerKey = provider.keyFor(server.getSelector());
-						ClassContext providerContext = (ClassContext) providerKey.attachment();
-						providerContext.addRequest(key);
-						if (ClassState.IDLE_PROVIDER.equals(providerContext.getState()))
-						{
-							if (debugEnabled) log.debug("node " + getRemoteHost(channel) + " changing key ops for provider " + getRemoteHost(provider));
-							providerContext.setState(ClassState.SENDING_PROVIDER_REQUEST);
-							server.getTransitionManager().setKeyOps(providerKey, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
-						}
-						return TO_IDLE_NODE;
-					}
-				}
+				p = processDynamic(key, resource);
+				if (p.second() != null) return p.second();
+				b = p.first();
 			}
 			if (debugEnabled) log.debug("resource [" + name + "] not found for node: " + getRemoteHost(channel));
 			resource.setDefinition(null);
@@ -156,6 +114,119 @@ public class WaitingNodeRequestState extends ClassServerState
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * Process a request to the driver's resource provider.
+	 * @param key - encapsulates the context and channel.
+	 * @param resource - the resource request description
+	 * @return a pair of an array of bytes and the resulting state transition.
+	 * @throws Exception if any error occurs.
+	 */
+	private ByteTransitionPair processNonDynamic(SelectionKey key, JPPFResourceWrapper resource) throws Exception
+	{
+		byte[] b = null;
+		ClassTransition t = null;
+		String name = resource.getName();
+		SelectableChannel channel = key.channel();
+		ClassContext context = (ClassContext) key.attachment();
+		TraversalList<String> uuidPath = resource.getUuidPath();
+
+		String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null; 
+		if (((uuid == null) || uuid.equals(JPPFDriver.getInstance().getUuid())) && (resource.getCallable() == null))
+		{
+			if (resource.getData("multiple") != null)
+			{
+				List<byte[]> list = server.getResourceProvider().getMultipleResourcesAsBytes(name, null);
+				if (list != null)
+				{
+					resource.setData("resource_list", list);
+					context.serializeResource();
+					t = TO_SENDING_NODE_RESPONSE;
+				}
+				if (debugEnabled) log.debug("multiple resources " + (list != null ? "" : "not ") + "found [" + name + "] in driver's classpath for node: " + getRemoteHost(channel));
+			}
+			else
+			{
+				if ((uuid == null) && !resource.isDynamic()) uuid = JPPFDriver.getInstance().getUuid();
+				if (uuid != null) b = server.getCacheContent(uuid, name);
+				boolean alreadyInCache = (b != null);
+				if (debugEnabled) log.debug("resource " + (alreadyInCache ? "" : "not ") + "found [" + name + "] in cache for node: " + getRemoteHost(channel));
+				if (!alreadyInCache) b = server.getResourceProvider().getResourceAsBytes(name);
+				if ((b != null) || !resource.isDynamic())
+				{
+					if (debugEnabled) log.debug("resource " + (b == null ? "not " : "") + "found [" + name + "] in the driver's classpath for node: " + getRemoteHost(channel));
+					if ((b != null) && !alreadyInCache) server.setCacheContent(JPPFDriver.getInstance().getUuid(), name, b);
+					resource.setDefinition(b);
+					context.serializeResource();
+					t = TO_SENDING_NODE_RESPONSE;
+				}
+			}
+		}
+		return new ByteTransitionPair(b, t);
+	}
+
+	/**
+	 * Process a request to the client's resource provider.
+	 * @param key - encapsulates the context and channel.
+	 * @param resource - the resource request description
+	 * @return a pair of an array of bytes and the resulting state transition.
+	 * @throws Exception if any error occurs.
+	 */
+	private ByteTransitionPair processDynamic(SelectionKey key, JPPFResourceWrapper resource) throws Exception
+	{
+		byte[] b = null;
+		ClassTransition t = null;
+		String name = resource.getName();
+		TraversalList<String> uuidPath = resource.getUuidPath();
+		ClassContext context = (ClassContext) key.attachment();
+		SelectableChannel channel = key.channel();
+
+		if (resource.getCallable() == null) b = server.getCacheContent(uuidPath.getFirst(), name);
+		if (b != null)
+		{
+			if (debugEnabled) log.debug("found cached resource [" + name + "] for node: " + getRemoteHost(channel));
+			resource.setDefinition(b);
+			context.serializeResource();
+			t = TO_SENDING_NODE_RESPONSE;
+		}
+		else
+		{
+			uuidPath.decPosition();
+			String uuid = uuidPath.getCurrentElement();
+			SelectableChannel provider = findProviderConnection(uuid);
+			if (provider != null)
+			{
+				if (debugEnabled) log.debug("request resource [" + name + "] from client: " + getRemoteHost(provider) + " for node: " + getRemoteHost(channel));
+				SelectionKey providerKey = provider.keyFor(server.getSelector());
+				ClassContext providerContext = (ClassContext) providerKey.attachment();
+				providerContext.addRequest(key);
+				if (ClassState.IDLE_PROVIDER.equals(providerContext.getState()))
+				{
+					if (debugEnabled) log.debug("node " + getRemoteHost(channel) + " changing key ops for provider " + getRemoteHost(provider));
+					providerContext.setState(ClassState.SENDING_PROVIDER_REQUEST);
+					server.getTransitionManager().setKeyOps(providerKey, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+				}
+				t = TO_IDLE_NODE;
+			}
+		}
+		return new ByteTransitionPair(b, t);
+	}
+
+	/**
+	 * A pair of array of bytes and class transition.
+	 */
+	private class ByteTransitionPair extends Pair<byte[], ClassTransition>
+	{
+		/**
+		 * Initialize this pair with the specified array of bytes and class transition.
+		 * @param first - an array of bytes.
+		 * @param second - a class transition.
+		 */
+		public ByteTransitionPair(byte[] first, ClassTransition second)
+		{
+			super(first, second);
+		}
 	}
 }
 

@@ -20,6 +20,7 @@ package org.jppf.server.node;
 import java.util.List;
 
 import org.jppf.JPPFException;
+import org.jppf.management.JPPFNodeAdmin;
 import org.jppf.server.protocol.JPPFTask;
 
 /**

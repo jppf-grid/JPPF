@@ -16,15 +16,15 @@
  * limitations under the License.
  */
 
-package org.jppf.server.node;
+package org.jppf.management;
 
 import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFNodeReconnectionNotification;
-import org.jppf.management.*;
 import org.jppf.node.event.*;
+import org.jppf.server.node.JPPFNode;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 
@@ -59,38 +59,177 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	 * Initialize this node management bean with the specified node.
 	 * @param node the node whose state is monitored.
 	 */
-	public JPPFNodeAdmin (JPPFNode node)
+	public JPPFNodeAdmin(JPPFNode node)
 	{
 		this.node = node;
+		node.setNodeAdmin(this);
+		node.addNodeListener(this);
+		nodeState.setThreadPriority(node.getExecutionManager().getThreadsPriority());
+		nodeState.setThreadPoolSize(node.getExecutionManager().getThreadPoolSize());
 	}
 
 	/**
 	 * Get the latest state information from the node.
 	 * @return a <code>JPPFNodeState</code> information.
+	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFNodeAdminMBean#state()
 	 */
-	public JPPFNodeState state()
+	public JPPFNodeState state() throws Exception
 	{
-		JPPFNodeState s = new JPPFNodeState();
-		s.setNbTasksExecuted(nodeState.getNbTasksExecuted());
-		s.setConnectionStatus(nodeState.getConnectionStatus());
-		s.setExecutionStatus(nodeState.getExecutionStatus());
-		s.setTaskEvent(nodeState.getTaskNotification());
-		s.setTaskIdSet(nodeState.getAllTaskIds());
-		s.setThreadPoolSize(node.getExecutionManager().getThreadPoolSize());
-		s.setThreadPriority(node.getExecutionManager().getThreadsPriority());
-		s.setCpuTime(node.getExecutionManager().getCpuTime());
-		return s;
+		return nodeState.copy();
 	}
 
 	/**
 	 * Get the latest state information from the node.
-	 * @return a <code>JPPFNodeState</code> information.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#state()
+	 * @return a serializable object.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#notification()
 	 */
-	public Serializable notification()
+	public Serializable notification() throws Exception
 	{
 		return nodeState.getTaskNotification();
+	}
+
+	/**
+	 * Cancel the execution of the tasks with the specified id.
+	 * @param id the id of the tasks to cancel.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#cancelTask(java.lang.String)
+	 */
+	public void cancelTask(String id) throws Exception
+	{
+		node.getExecutionManager().cancelTask(id);
+	}
+
+	/**
+	 * Restart the execution of the tasks with the specified id.<br>
+	 * The task(s) will be restarted even if their execution has already completed.
+	 * @param id the id of the task or tasks to restart.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#restartTask(java.lang.String)
+	 */
+	public void restartTask(String id) throws Exception
+	{
+		node.getExecutionManager().restartTask(id);
+	}
+
+	/**
+	 * Set the size of the node's thread pool.
+	 * @param size the size as an int.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadPoolSize(java.lang.Integer)
+	 */
+	public void updateThreadPoolSize(Integer size) throws Exception
+	{
+		node.getExecutionManager().setThreadPoolSize(size);
+		nodeState.setThreadPoolSize(size);
+	}
+
+	/**
+	 * Get detailed information about the node's JVM properties, environment variables
+	 * and runtime information such as memory usage and available processors.
+	 * @return a <code>JPPFSystemInformation</code> instance.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#systemInformation()
+	 */
+	public JPPFSystemInformation systemInformation() throws Exception
+	{
+		JPPFSystemInformation info = new JPPFSystemInformation();
+		info.populate();
+		info.getRuntime().setProperty("cpuTime", ""+node.getExecutionManager().getCpuTime());
+		return info;
+	}
+
+	/**
+	 * Restart the node.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#restart()
+	 */
+	public void restart() throws Exception
+	{
+		node.shutdown(true);
+	}
+
+	/**
+	 * Shutdown the node.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#shutdown()
+	 */
+	public void shutdown() throws Exception
+	{
+		node.shutdown(false);
+	}
+
+	/**
+	 * Reset the node's executed tasks counter to zero. 
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#resetTaskCounter()
+	 */
+	public void resetTaskCounter() throws Exception
+	{
+		setTaskCounter(0);
+	}
+
+	/**
+	 * Set the node's executed tasks counter to the specified value.
+	 * @param n - the new value of the task counter.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#setTaskCounter(java.lang.Integer)
+	 */
+	public void setTaskCounter(Integer n) throws Exception
+	{
+		node.setTaskCount(n);
+		nodeState.setNbTasksExecuted(n);
+	}
+
+	/**
+	 * Update the priority of all execution threads.
+	 * @param newPriority - the new priority to set.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadsPriority(java.lang.Integer)
+	 */
+	public void updateThreadsPriority(Integer newPriority) throws Exception
+	{
+		node.getExecutionManager().updateThreadsPriority(newPriority);
+		nodeState.setThreadPriority(newPriority);
+	}
+
+	/**
+	 * Update the configuration properties of the node. 
+	 * @param config - the set of properties to update.
+	 * @param reconnect - specifies whether the node should reconnect ot the driver after updating the properties.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
+	 */
+	public void updateConfiguration(Map<String, String> config, Boolean reconnect) throws Exception
+	{
+		if (config == null) return;
+		TypedProperties props = JPPFConfiguration.getProperties();
+		for (Map.Entry<String, String> entry: config.entrySet())
+		{
+			props.setProperty(entry.getKey(), entry.getValue());
+		}
+		if (reconnect)
+		{
+			try
+			{
+				// we close the socket connection in case the node is waiting (in blocking mode)
+				// for data from the server.
+				node.getSocketWrapper().close();
+			}
+			catch(Exception e)
+			{
+				log.error(e.getMessage(), e);
+			}
+			node.setExitAction(new Runnable()
+			{
+				public void run()
+				{
+					throw new JPPFNodeReconnectionNotification("Reconnecting this node due to configuration changes");
+				}
+			});
+			node.setStopped(true);
+		}
 	}
 
 	/**
@@ -129,27 +268,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	}
 
 	/**
-	 * Cancel the execution of the tasks with the specified id.
-	 * @param id the id of the tasks to cancel.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#cancelTask(java.lang.String)
-	 */
-	public void cancelTask(String id)
-	{
-		node.getExecutionManager().cancelTask(id);
-	}
-
-	/**
-	 * Restart the execution of the tasks with the specified id.<br>
-	 * The task(s) will be restarted even if their execution has already completed.
-	 * @param id the id of the task or tasks to restart.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#restartTask(java.lang.String)
-	 */
-	public void restartTask(String id)
-	{
-		node.getExecutionManager().restartTask(id);
-	}
-
-	/**
 	 * Notification that a task witht the specified id has started.
 	 * @param id the id of the task.
 	 */
@@ -167,113 +285,5 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	{
 		if (debugEnabled) log.debug("task id#" + id + " ended");
 		nodeState.taskEnded(id);
-	}
-
-	/**
-	 * Set the size of the node's thread pool.
-	 * @param size the size as an int.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadPoolSize(java.lang.Integer)
-	 */
-	public void updateThreadPoolSize(Integer size)
-	{
-		node.getExecutionManager().setThreadPoolSize(size);
-	}
-
-	/**
-	 * Get detailed information about the node's JVM properties, environment variables
-	 * and runtime information such as memory usage and available processors.
-	 * @return a <code>JPPFSystemInformation</code> instance.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#systemInformation()
-	 */
-	public JPPFSystemInformation systemInformation()
-	{
-		JPPFSystemInformation info = new JPPFSystemInformation();
-		info.populate();
-		info.getRuntime().setProperty("cpuTime", ""+node.getExecutionManager().getCpuTime());
-		return info;
-	}
-
-	/**
-	 * Restart the node.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#restart()
-	 */
-	public void restart()
-	{
-		node.shutdown(true);
-	}
-
-	/**
-	 * Shutdown the node.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#shutdown()
-	 */
-	public void shutdown()
-	{
-		node.shutdown(false);
-	}
-
-	/**
-	 * Reset the node's executed tasks counter to zero. 
-	 * @see org.jppf.management.JPPFNodeAdminMBean#resetTaskCounter()
-	 */
-	public void resetTaskCounter()
-	{
-		setTaskCounter(0);
-	}
-
-	/**
-	 * Set the node's executed tasks counter to the specified value.
-	 * @param n the new value of the task counter.
-	 */
-	public void setTaskCounter(int n)
-	{
-		node.setTaskCount(n);
-		nodeState.setNbTasksExecuted(n);
-	}
-
-	/**
-	 * Update the priority of all execution threads.
-	 * @param newPriority the new priority to set.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadsPriority(java.lang.Integer)
-	 */
-	public void updateThreadsPriority(Integer newPriority)
-	{
-		node.getExecutionManager().updateThreadsPriority(newPriority);
-	}
-
-	/**
-	 * Update the configuration properties of the node. 
-	 * @param config the set of properties to update.
-	 * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
-	 */
-	public void updateConfiguration(Map<String, String> config, Boolean reconnect)
-	{
-		if (config == null) return;
-		TypedProperties props = JPPFConfiguration.getProperties();
-		for (Map.Entry<String, String> entry: config.entrySet())
-		{
-			props.setProperty(entry.getKey(), entry.getValue());
-		}
-		if (reconnect)
-		{
-			try
-			{
-				// we close the socket connection in case the node is waiting (in blocking mode)
-				// for data from the server.
-				node.getSocketWrapper().close();
-			}
-			catch(Exception e)
-			{
-				log.error(e.getMessage(), e);
-			}
-			node.setExitAction(new Runnable()
-			{
-				public void run()
-				{
-					throw new JPPFNodeReconnectionNotification("Reconnecting this node due to configuration changes");
-				}
-			});
-			node.setStopped(true);
-		}
 	}
 }

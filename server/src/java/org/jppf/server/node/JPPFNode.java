@@ -22,10 +22,13 @@ import static org.jppf.server.protocol.BundleParameter.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.management.*;
+
 import org.apache.commons.logging.*;
 import org.jppf.*;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.management.*;
+import org.jppf.management.spi.*;
 import org.jppf.node.*;
 import org.jppf.node.event.NodeEventType;
 import org.jppf.server.protocol.*;
@@ -89,10 +92,6 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	private AtomicInteger executingCount = new AtomicInteger(0);
 	/**
-	 * The administration and monitoring MBean for this node.
-	 */
-	private JPPFNodeAdmin nodeAdmin = null;
-	/**
 	 * Determines whether JMX management and monitoring is enabled for this node.
 	 */
 	private boolean jmxEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true);
@@ -100,6 +99,22 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Action executed when the node exits the main loop, in its {@link #run() run()} method.
 	 */
 	private Runnable exitAction = null;
+	/**
+	 * The default node's management MBean.
+	 */
+	private JPPFNodeAdmin nodeAdmin = null;
+	/**
+	 * The jmx server that handles administration and monitoring functions for this node.
+	 */
+	private static JMXServerImpl jmxServer = null;
+
+	/**
+	 * Default constructor.
+	 */
+	public JPPFNode()
+	{
+		executionManager = new NodeExecutionManager(this);
+	}
 
 	/**
 	 * Main processing loop of this node.
@@ -235,7 +250,7 @@ public class JPPFNode extends AbstractMonitoredNode
 				TypedProperties props = JPPFConfiguration.getProperties();
 				bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
 				bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
-				bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeRunner.getJmxServer().getId());
+				bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, getJmxServer().getId());
 			}
 			JPPFSystemInformation info = new JPPFSystemInformation();
 			info.populate();
@@ -279,12 +294,9 @@ public class JPPFNode extends AbstractMonitoredNode
 		boolean mustInit = (socketClient == null);
 		if (mustInit)	initSocketClient();
 		initCredentials();
-		if ((nodeAdmin == null) && isJmxEnabled())
+		if (!getJmxServer().getServer().isRegistered(new ObjectName(JPPFAdminMBean.NODE_MBEAN_NAME)) && isJmxEnabled())
 		{
-			nodeAdmin = new JPPFNodeAdmin(JPPFNode.this);
-			String mbeanName = JPPFAdminMBean.NODE_MBEAN_NAME;
-			addNodeListener(nodeAdmin);
-			NodeRunner.getJmxServer().registerMbean(mbeanName, nodeAdmin, JPPFNodeAdminMBean.class);
+			registerProviderMBeans();
 		}
 		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
 		if (mustInit)
@@ -296,9 +308,8 @@ public class JPPFNode extends AbstractMonitoredNode
 			System.out.println("PeerNode.init(): Reconnected to the JPPF driver");
 			if (debugEnabled) log.debug("end socket initialization");
 		}
-		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
-		executionManager = new NodeExecutionManager(this);
 		nodeIO = new NodeIO(this);
+		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
 		if (debugEnabled) log.debug("end node initialization");
 	}
 
@@ -414,8 +425,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		}
 		try
 		{
-			String mbeanName = JPPFAdminMBean.NODE_MBEAN_NAME;
-			NodeRunner.getJmxServer().unregisterMbean(mbeanName);
+			getJmxServer().stop();
 		}
 		catch(Exception e)
 		{
@@ -454,7 +464,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Get the administration and monitoring MBean for this node.
 	 * @return a <code>JPPFNodeAdmin</code>m instance.
 	 */
-	synchronized JPPFNodeAdmin getNodeAdmin()
+	public synchronized JPPFNodeAdmin getNodeAdmin()
 	{
 		return nodeAdmin;
 	}
@@ -463,7 +473,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Set the administration and monitoring MBean for this node.
 	 * @param nodeAdmin a <code>JPPFNodeAdmin</code>m instance.
 	 */
-	synchronized void setNodeAdmin(JPPFNodeAdmin nodeAdmin)
+	public synchronized void setNodeAdmin(JPPFNodeAdmin nodeAdmin)
 	{
 		this.nodeAdmin = nodeAdmin;
 	}
@@ -472,7 +482,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Get the task execution manager for this node.
 	 * @return a <code>NodeExecutionManager</code> instance.
 	 */
-	NodeExecutionManager getExecutionManager()
+	public NodeExecutionManager getExecutionManager()
 	{
 		return executionManager;
 	}
@@ -490,7 +500,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Shutdown and evenetually restart the node.
 	 * @param restart determines whether this node should be restarted by the node launcher.
 	 */
-	void shutdown(boolean restart)
+	public void shutdown(boolean restart)
 	{
 		NodeRunner.shutdown(this, restart);
 	}
@@ -499,8 +509,65 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Set the action executed when the node exits the main loop.
 	 * @param exitAction the action to execute.
 	 */
-	synchronized void setExitAction(Runnable exitAction)
+	public synchronized void setExitAction(Runnable exitAction)
 	{
 		this.exitAction = exitAction;
+	}
+
+	/**
+	 * Register all MBeans defined through the service provider interface.
+	 * @throws Exception if the registration failed.
+	 */
+	private void registerProviderMBeans() throws Exception
+	{
+		JPPFClassLoader cl = (JPPFClassLoader) getClass().getClassLoader();
+    ClassLoader tmp = Thread.currentThread().getContextClassLoader();
+  	MBeanServer server = getJmxServer().getServer();
+    try
+    {
+	    Thread.currentThread().setContextClassLoader(cl);
+	    JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager();
+			List<JPPFNodeMBeanProvider> list = mgr.findAllProviders();
+			for (JPPFNodeMBeanProvider provider: list)
+			{
+				Object o = provider.createMBean(this);
+				Class inf = Class.forName(provider.getMBeanInterfaceName());
+				boolean b = mgr.registerProviderMBean(o, inf, provider.getMBeanName(), server);
+				if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + provider.getMBeanName() + "]");
+			}
+    }
+    finally
+    {
+	    Thread.currentThread().setContextClassLoader(tmp);
+    }
+    if (debugEnabled)
+    {
+    	ObjectName on = new ObjectName("org.jppf:name=SampleMBean");
+	    log.debug("classloader for SampleMBean: " + server.getClassLoaderFor(on));
+	    boolean b = server.isInstanceOf(on, "javax.management.NotificationBroadcaster");
+	    log.debug("Sample MBean instance of NotificationBroadcaster: " + b);
+    }
+	}
+
+	/**
+	 * Get the jmx server that handles administration and monitoring functions for this node.
+	 * @return a <code>JMXServerImpl</code> instance.
+	 */
+	public JMXServerImpl getJmxServer()
+	{
+		if ((jmxServer == null) || jmxServer.isStopped())
+		{
+			try
+			{
+				jmxServer = new JMXServerImpl(JPPFAdminMBean.NODE_SUFFIX);
+				jmxServer.start(getClass().getClassLoader());
+				registerProviderMBeans();
+			}
+			catch(Exception e)
+			{
+				log.error("Error creating the JMX server", e);
+			}
+		}
+		return jmxServer;
 	}
 }
