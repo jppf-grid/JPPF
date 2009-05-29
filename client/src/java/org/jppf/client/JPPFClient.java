@@ -328,6 +328,7 @@ public class JPPFClient extends AbstractJPPFClient
 		super.close();
 		if (receiverThread != null) receiverThread.setStopped(true);
 		if (executor != null) executor.shutdownNow();
+		if (loadBalancer != null) loadBalancer.stop();
 	}
 
 	/**

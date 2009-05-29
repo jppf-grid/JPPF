@@ -94,6 +94,14 @@ public class LoadBalancer
 	}
 
 	/**
+	 * Stop this load-balncer and cleanup any resource it uses.
+	 */
+	public void stop()
+	{
+		if (threadPool != null) threadPool.shutdownNow();
+	}
+
+	/**
 	 * Perform the execution.
 	 * @param execution the execution to perform.
 	 * @param connection the client connection for sending remote execution requests.

@@ -125,6 +125,7 @@ public class JPPFClassLoader extends ClassLoader implements JPPFClassLoaderMBean
 					JPPFResourceWrapper resource = new JPPFResourceWrapper();
 					resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
 					socketClient.send(resource);
+					socketClient.flush();
 					socketClient.receive();
 					if (debugEnabled) log.debug("received node initiation response");
 				}
@@ -329,6 +330,7 @@ public class JPPFClassLoader extends ClassLoader implements JPPFClassLoaderMBean
 		resource.setAsResource(asResource);
 		resource.setRequestUuid(requestUuid);
 		socketClient.send(resource);
+		socketClient.flush();
 		resource = (JPPFResourceWrapper) socketClient.receive();
 		return resource;
 	}

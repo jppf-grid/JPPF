@@ -21,7 +21,7 @@ package org.jppf.server.scheduler.bundle.rl;
 import java.util.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.*;
+import org.jppf.server.JPPFStatsUpdater;
 import org.jppf.server.scheduler.bundle.*;
 
 /**
@@ -41,20 +41,24 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	/**
 	 * The range of actions, expressed in terms of a percentage of increase/decrease of the bundle size.
 	 */
-	private static final int INCREASE_RANGE = 1;
+	private static final int INCREASE_RANGE = 20;
+	/**
+	 * The incrementation step of the action.
+	 */
+	private static final int STEP = 1;
 	/**
 	 * The number of possible actions.
 	 */
 	private static final int NB_ACTIONS = 2 * INCREASE_RANGE + 1;
 	/**
-	 * List of all currently active bundlers. Should always be used within a <code>synchronized(allBundlers)</code> statement.
+	 * List of all currently active bundlers. Should always be used within a <code>synchronized(bundlers)</code> statement.
 	 */
-	private static Set<AbstractRLBundler> allDataHolders = new HashSet<AbstractRLBundler>();
+	private static Set<AbstractRLBundler> bundlers = new HashSet<AbstractRLBundler>();
 	//private static Set<BundleDataHolder> allDataHolders = new HashSet<BundleDataHolder>();
 	/**
 	 * Action to take.
 	 */
-	protected int action = 0;
+	protected int action = INCREASE_RANGE;
 	/**
 	 * Index of the actrion taken.
 	 */
@@ -129,37 +133,36 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 */
 	public void feedback(int size, double totalTime)
 	{
-		double reward = 0d;
-		if (actionIndex >= 0)
-		{
-			reward = computeReward(size, totalTime);
-			utilities[actionIndex] = reward + profile.getDiscountFactor() * maxUtilities[actionIndex];
-			if (utilities[actionIndex] > maxUtilities[actionIndex]) maxUtilities[actionIndex] = utilities[actionIndex];
-		}
+		if (size <= 0) return;
+		BundlePerformanceSample sample = new BundlePerformanceSample((double) totalTime / (double) size, size);
+		dataHolder.addSample(sample);
 
-		if (rand.nextDouble() > 0.95d) actionIndex = rand.nextInt(NB_ACTIONS);
-		else
-		{
-			double maxUtility = Double.NEGATIVE_INFINITY;
-			for (int i=0; i<NB_ACTIONS; i++)
-			{
-				if ((utilities[i] >= maxUtility))
-				{
-					maxUtility = utilities[i];
-					actionIndex = i;
-				}
-			}
-		}
-
+		double d = dataHolder.getPreviousMean() - dataHolder.getMean();
+		int n = bundleSize - prevBundleSize;
 		prevBundleSize = bundleSize;
-		int n = actionIndex - INCREASE_RANGE;
-		int diff = (int) (n * bundleSize * profile.getIncreaseRate());
-		if ((diff == 0) && (n != 0)) diff = (n < 0) ? -1 : 1;
-		bundleSize += diff;
+		if (d < 0)
+		{
+			action += (n < 0) ? -STEP : STEP; 
+		}
+		else if (d > 0)
+		{
+			//action += (n < 0) ? 1 : -1;
+			action = (int) -Math.signum(action) * Math.max(STEP, Math.abs(action/2));
+		}
+		else action = 0;
+		if (action > INCREASE_RANGE) action = INCREASE_RANGE;
+		else if (action < -INCREASE_RANGE) action = -INCREASE_RANGE;
+		bundleSize += action;
+		int max = maxSize();
 		if (bundleSize <= 0) bundleSize = 1;
-
-		if (debugEnabled) log.debug("Bundler #" + bundlerNumber + " : " + "size=" + bundleSize + ", action=" + n +
-			", reward=" + reward + ", utilities=" + dumpArray(utilities) + ", maxUtilities=" + dumpArray(maxUtilities));
+		else if (bundleSize > max) bundleSize = max;
+		if (debugEnabled)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.append("bundler #").append(getBundlerNumber()).append(" : size=").append(getBundleSize());
+			sb.append(", ").append(getDataHolder());
+			log.debug(sb.toString());
+		}
 	}
 
 	/**
@@ -171,7 +174,7 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	private double computeReward(int size, double totalTime)
 	{
 		int n = maxSize();
-		synchronized(allDataHolders)
+		synchronized(bundlers)
 		{
 			getAllBundleStats(stats[0]);
 			dataHolder.addSample(new BundlePerformanceSample(totalTime, size));
@@ -225,10 +228,10 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 */
 	public void setup()
 	{
-		synchronized(allDataHolders)
+		synchronized(bundlers)
 		{
 			//allDataHolders.add(this.dataHolder);
-			allDataHolders.add(this);
+			bundlers.add(this);
 		}
 	}
 	
@@ -238,10 +241,10 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 */
 	public void dispose()
 	{
-		synchronized(allDataHolders)
+		synchronized(bundlers)
 		{
 			//allDataHolders.remove(this.dataHolder);
-			allDataHolders.remove(this);
+			bundlers.remove(this);
 		}
 		dataHolder = null;
 	}
@@ -297,7 +300,7 @@ public abstract class AbstractRLBundler extends AbstractBundler
 			stats.sum += holder.getMean();
 		}
 		*/
-		for (AbstractRLBundler bundler: allDataHolders)
+		for (AbstractRLBundler bundler: bundlers)
 		{
 			BundleDataHolder holder = bundler.getDataHolder();
 			stats.sum += holder.getMean();

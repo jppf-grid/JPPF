@@ -108,11 +108,20 @@ public class BundleDataHolder
 
 	/**
 	 * Get the computed mean execution time for the corresponding node.
-	 * @return  the mean value as a double.
+	 * @return the mean value as a double.
 	 */
 	public double getMean()
 	{
 		return mean;
+	}
+
+	/**
+	 * Get the computed mean execution time for the corresponding node.
+	 * @param mean - the mean value as a double.
+	 */
+	public void setMean(double mean)
+	{
+		this.mean = mean;
 	}
 
 	/**
@@ -154,5 +163,14 @@ public class BundleDataHolder
 		sb.append(", totalTime = ").append(totalTime).append(", nbSamples = ").append(nbSamples);
 		sb.append(", maLength = ").append(maLength).append(", samples.size() = ").append(samples.size());
 		return sb.toString();
+	}
+
+	/**
+	 * Get the current number of samples.
+	 * @return the number of samples as an int.
+	 */
+	public long getNbSamples()
+	{
+		return nbSamples;
 	}
 }

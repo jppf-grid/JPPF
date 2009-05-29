@@ -118,7 +118,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 		checkOpened();
 		dos.writeInt(buf.getLength());
 		dos.write(buf.getBuffer(), 0, buf.getLength());
-		dos.flush();
+		//dos.flush();
 	}
 
 	/**
@@ -133,7 +133,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	{
 		checkOpened();
 		dos.write(data, offset, len);
-		dos.flush();
+		//dos.flush();
 	}
 
 	/**
@@ -147,6 +147,16 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 		checkOpened();
 		byte[] bytes = SerializationUtils.writeInt(n);
 		for (byte b: bytes) dos.write(b);
+		//dos.flush();
+	}
+
+	/**
+	 * Flush the data currently in the send buffer.
+	 * @throws IOException if an I/O error occurs.
+	 * @see org.jppf.comm.socket.SocketWrapper#flush()
+	 */
+	public void flush() throws IOException
+	{
 		dos.flush();
 	}
 

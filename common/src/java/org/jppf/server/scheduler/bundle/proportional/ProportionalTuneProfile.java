@@ -20,6 +20,7 @@ package org.jppf.server.scheduler.bundle.proportional;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.logging.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.autotuned.AbstractAutoTuneProfile;
 import org.jppf.utils.*;
@@ -30,6 +31,14 @@ import org.jppf.utils.*;
  */
 public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(ProportionalTuneProfile.class);
+	/**
+	 * Determines whether debugging level is set for logging.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * A default profile with default parameter values.
 	 */
@@ -48,6 +57,7 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	 */
 	public ProportionalTuneProfile()
 	{
+		if (debugEnabled) log.debug("in default constructor");
 	}
 
 	/**
@@ -56,10 +66,11 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	 */
 	public ProportionalTuneProfile(String profileName)
 	{
+		if (debugEnabled) log.debug("in constructor with profile name");
 		String prefix = "strategy." + profileName + ".";
 		TypedProperties props = JPPFConfiguration.getProperties();
 		performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000);
-		proportionalityFactor = props.getInt(prefix + "propertionalityFactor", 2);
+		proportionalityFactor = props.getInt(prefix + "proportionalityFactor", 2);
 	}
 
 	/**
@@ -118,5 +129,15 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	public static ProportionalTuneProfile getDefaultProfile()
 	{
 		return defaultProfile.get();
+	}
+
+	/**
+	 * Return a string representation of this profile.
+	 * @return this profile represented as a string value.
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
+	{
+		return "performanceCacheSize="+performanceCacheSize+", proportionalityFactor="+proportionalityFactor;
 	}
 }

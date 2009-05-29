@@ -224,6 +224,7 @@ public class NodeIO extends ThreadSynchronization
 		for (JPPFBuffer buf: list) size += 4 + buf.getLength();
 		socketWrapper.writeInt(size);
 		for (JPPFBuffer buf: list) socketWrapper.sendBytes(buf);
+		socketWrapper.flush();
 	}
 
 	/**

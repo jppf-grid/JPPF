@@ -135,6 +135,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 						if (b != null) resource.setDefinition(b);
 						else resource.setDefinition(null);
 						socketClient.send(resource);
+						socketClient.flush();
 						if  (debugEnabled)
 						{
 							if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
@@ -177,6 +178,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 			resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
 			resource.addUuid(appUuid);
 			socketClient.send(resource);
+			socketClient.flush();
 			// receive the initial response from the server.
 			socketClient.receive();
 		}

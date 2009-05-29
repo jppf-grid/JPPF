@@ -105,6 +105,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
 			resource.addUuid(appUuid);
 			socketClient.send(resource);
+			socketClient.flush();
 			resource = (JPPFResourceWrapper) socketClient.receive();
 			((JPPFClientConnectionImpl) owner).initializeJmxConnection(resource.getManagementId());
 			while (!stop)
@@ -140,6 +141,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 					}
 					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
 					socketClient.send(resource);
+					socketClient.flush();
 				}
 				catch(Exception e)
 				{

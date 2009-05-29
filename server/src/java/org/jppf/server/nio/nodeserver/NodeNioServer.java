@@ -100,7 +100,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	public NodeNioServer(int[] ports, Bundler bundler) throws JPPFException
 	{
-		super(ports, "NodeServer Thread", false);
+		super(ports, "NodeServer Thread", true);
 		this.selectTimeout = 1L;
 		this.bundlerRef = new AtomicReference<Bundler>(bundler);
 		getQueue().addListener(new QueueListener()

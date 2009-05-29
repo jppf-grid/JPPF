@@ -69,6 +69,7 @@ public class PeerResourceProvider extends AbstractSocketChannelHandler
 			JPPFResourceWrapper resource = new JPPFResourceWrapper();
 			resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
 			socketClient.send(resource);
+			socketClient.flush();
 			if (debugEnabled) log.debug("sent node initiation");
 			// get a response containing the uuid of the contacted peer
 			resource = (JPPFResourceWrapper) socketClient.receive();

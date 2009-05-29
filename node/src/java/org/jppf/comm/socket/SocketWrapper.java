@@ -17,6 +17,7 @@
  */
 package org.jppf.comm.socket;
 
+import java.io.IOException;
 import java.net.Socket;
 
 import org.jppf.utils.*;
@@ -62,6 +63,11 @@ public interface SocketWrapper
 	 * @throws Exception if the underlying output stream throws an exception.
 	 */
 	void writeInt(int n) throws Exception;
+	/**
+	 * Flush the data currently in the send buffer.
+	 * @throws IOException if an I/O error occurs.
+	 */
+	void flush() throws IOException;
 
 	/**
 	 * Read an object from a TCP socket connection.

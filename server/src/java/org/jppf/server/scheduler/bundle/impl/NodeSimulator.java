@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.proportional.*;
 
 /**
  * Simulation of a node to test a bundler.
@@ -108,15 +109,18 @@ public class NodeSimulator
 		try
 		{
 			Random rand = new Random(System.currentTimeMillis());
-			Bundler initialBundler = BundlerFactory.createBundler();
+			ProportionalTuneProfile profile = new ProportionalTuneProfile();
+			profile.setPerformanceCacheSize(2000);
+			profile.setProportionalityFactor(2);
 
 			nbNodes = 2;
-			int maxTasks = 300;
-			double size = 1.5d;
-			double dataProviderSize = 0.75d;
-			long timePerTask = 10;
+			int maxTasks = 1000;
+			double size = 16d;
+			double dataProviderSize = 8d;
+			long timePerTask = 5;
 			int nbIter = 20;
 
+			Bundler initialBundler = new SimulatedProportionalBundler(profile, maxTasks);
 			System.out.println("Starting simulation with nbNodes="+nbNodes+", maxTasks="+maxTasks+", size="+size+", dataProviderSize="+dataProviderSize+
 				", timePerTask="+timePerTask+", nbIter="+nbIter);
 			threadPool = Executors.newFixedThreadPool(nbNodes);
@@ -125,19 +129,10 @@ public class NodeSimulator
 			for (int i=0; i<nbNodes; i++)
 			{
 				bundlers[i] = initialBundler.copy();
+				bundlers[i].setup();
 			}
-			/*
-			for (int i=0; i<nbNodes; i++)
-			{
-				double r = rand.nextDouble();
-				double l = 0.25 + 5 * r;
-				double o = 0.4 + r * 5;
-				double speed = 0.5 + rand.nextDouble() / 2;
-				nodes[i] = new NodeSimulator(l, o, speed);
-			}
-			*/
-			nodes[0] = new NodeSimulator(0.25, 0.5, 1);
-			nodes[1] = new NodeSimulator(2, 10, 0.5);
+			nodes[0] = new NodeSimulator(0.25, 0.5, 3);
+			nodes[1] = new NodeSimulator(2, 10, 1);
 			
 			for (int i=0; i<nbIter; i++)
 			{
@@ -225,6 +220,49 @@ public class NodeSimulator
 		public void run()
 		{
 			simulator.run(bundler, sizeMB, nbTasks, timePerTask);
+		}
+	}
+
+	/**
+	 * Used in simulations of proportianl bundlers.
+	 */
+	public static class SimulatedProportionalBundler extends AbstractProportionalBundler
+	{
+		/**
+		 * Maximum bundle size;
+		 */
+		private int maximumSize = 300;
+
+		/**
+		 * Creates a new instance with the initial size of bundle as the start size.
+		 * @param profile - the parameters of the auto-tuning algorithm.
+		 * @param maximumSize - the maximum bundle size.
+		 * grouped as a performance analysis profile.
+		 */
+		public SimulatedProportionalBundler(AutoTuneProfile profile, int maximumSize)
+		{
+			super(profile, false);
+			this.maximumSize = maximumSize;
+		}
+
+		/**
+		 * Get the max bundle size that can be used for this bundler.
+		 * @return the bundle size as an int.
+		 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
+		 */
+		protected int maxSize()
+		{
+			return maximumSize;
+		}
+
+		/**
+	 * Make a copy of this bundler
+	 * @return a <code>Bundler</code> instance.
+		 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
+		 */
+		public Bundler copy()
+		{
+			return new SimulatedProportionalBundler(profile, maximumSize);
 		}
 	}
 }

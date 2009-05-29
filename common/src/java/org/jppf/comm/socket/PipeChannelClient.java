@@ -105,10 +105,6 @@ public class PipeChannelClient implements SocketWrapper
 	{
 		ByteBuffer buffer = ByteBuffer.wrap(data, offset, len);
 		for (int count=0; count < len;) count += outPipe.sink().write(buffer);
-		/*
-		int count = 0;
-		while (count < len) count += channel.write(buffer);
-		*/
 	}
 
 	/**
@@ -121,10 +117,15 @@ public class PipeChannelClient implements SocketWrapper
 	{
 		ByteBuffer buffer = ByteBuffer.wrap(SerializationUtils.writeInt(n));
 		for (int count=0; count < 4;) count += outPipe.sink().write(buffer);
-		/*
-		int count = 0;
-		while (count < len) count += channel.write(buffer);
-		*/
+	}
+
+	/**
+	 * This method does nothing, there is no flush on socket channels.
+	 * @throws IOException if an I/O error occurs.
+	 * @see org.jppf.comm.socket.SocketWrapper#flush()
+	 */
+	public void flush() throws IOException
+	{
 	}
 
 	/**

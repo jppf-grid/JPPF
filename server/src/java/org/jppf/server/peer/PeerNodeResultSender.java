@@ -122,5 +122,6 @@ public class PeerNodeResultSender extends AbstractResultSender
 			destination.writeInt(task.getSize());
 			task.transferTo(destination, true);
 		}
+		socketClient.flush();
 	}
 }
