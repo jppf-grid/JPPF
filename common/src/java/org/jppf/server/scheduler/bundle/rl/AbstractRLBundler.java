@@ -142,14 +142,12 @@ public abstract class AbstractRLBundler extends AbstractBundler
 		prevBundleSize = bundleSize;
 		if (d < 0)
 		{
-			action += (n < 0) ? -STEP : STEP; 
+			action += Math.signum(action) * STEP;
 		}
 		else if (d > 0)
 		{
-			//action += (n < 0) ? 1 : -1;
 			action = (int) -Math.signum(action) * Math.max(STEP, Math.abs(action/2));
 		}
-		else action = 0;
 		if (action > INCREASE_RANGE) action = INCREASE_RANGE;
 		else if (action < -INCREASE_RANGE) action = -INCREASE_RANGE;
 		bundleSize += action;

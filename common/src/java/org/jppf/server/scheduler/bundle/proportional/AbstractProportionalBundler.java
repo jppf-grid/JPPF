@@ -176,8 +176,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 			for (AbstractProportionalBundler b: bundlers)
 			{
 				BundleDataHolder h = b.getDataHolder();
-				if (h.getMean() <= 0) continue;
-				//if (h.getMean() <= 0) h.setMean(maxMean);
+				//if (h.getMean() <= 0) continue;
 				meanSum += normalize(h.getMean());
 				//meanSum += m;
 			}
@@ -186,7 +185,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 			for (AbstractProportionalBundler b: bundlers)
 			{
 				BundleDataHolder h = b.getDataHolder();
-				if (h.getMean() <= 0) continue;
+				//if (h.getMean() <= 0) continue;
 				double p = normalize(h.getMean()) / meanSum;
 				int size = Math.max(1, (int) (p * max));
 				//size = Math.min((int) (0.9*max), size);
@@ -211,6 +210,22 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 				log.debug(sb.toString());
 			}
 		}
+	}
+
+	/**
+	 * 
+	 * @param x .
+	 * @return .
+	 */
+	public double normalize(double x)
+	{
+		return 1d / (1d + (x <= 0d ? 0d : Math.exp(1d + profile.getProportionalityFactor() * x)));
+		//return Math.exp(-profile.getProportionalityFactor() * x);
+		/*
+		double r = 1d;
+		for (int i=0; i<profile.getProportionalityFactor(); i++) r *= x;
+		return 1d/r;
+		*/
 	}
 
 	/**
@@ -249,14 +264,17 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 				double diff = maxMean / h.getMean();
 				double d = b.normalize(diff) / diffSum;
 				int size = Math.max(1, (int) (max * d));
+				if (size > (int) (0.9d * max)) size = (int) (0.9d * max);
 				b.setBundleSize(size);
 				sum += size;
 			}
+			/*
 			if (sum < max)
 			{
 				int size = minBundler.getBundleSize();
 				minBundler.setBundleSize(size + (max - sum));
 			}
+			*/
 			if (debugEnabled)
 			{
 				StringBuilder sb = new StringBuilder();
@@ -270,17 +288,5 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 				log.debug(sb.toString());
 			}
 		}
-	}
-
-	/**
-	 * 
-	 * @param x .
-	 * @return .
-	 */
-	public double normalize(double x)
-	{
-		double r = 1d;
-		for (int i=0; i<profile.getProportionalityFactor(); i++) r *= x;
-		return 1d/r;
 	}
 }

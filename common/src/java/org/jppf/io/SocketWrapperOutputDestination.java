@@ -56,7 +56,7 @@ public class SocketWrapperOutputDestination implements OutputDestination
 	public int write(byte[] data, int offset, int len) throws Exception
 	{
 		socketWrapper.write(data, offset, len);
-		socketWrapper.flush();
+		//socketWrapper.flush();
 		return len;
 	}
 
@@ -76,7 +76,7 @@ public class SocketWrapperOutputDestination implements OutputDestination
 			int size = Math.min(buf.length, data.remaining());
 			data.get(buf, 0, size);
 			socketWrapper.write(buf, 0, size);
-			socketWrapper.flush();
+			//socketWrapper.flush();
 			return size;
 		}
 		finally

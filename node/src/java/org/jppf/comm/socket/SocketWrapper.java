@@ -33,7 +33,7 @@ public interface SocketWrapper
 	/**
 	 * Size of receive buffer size for socket connections.
 	 */
-	int SOCKET_RECEIVE_BUFFER_SIZE = 64*1024;
+	int SOCKET_RECEIVE_BUFFER_SIZE = 256*1024;
 	/**
 	 * Send an object over a TCP socket connection.
 	 * @param o the object to send.

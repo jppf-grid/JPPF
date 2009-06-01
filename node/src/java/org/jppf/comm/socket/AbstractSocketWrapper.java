@@ -264,7 +264,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			socket = new Socket();
 			//socket.setReuseAddress(true);
 			InetSocketAddress addr = new InetSocketAddress(host, port);
-			int size = 32*1024;
+			int size = SOCKET_RECEIVE_BUFFER_SIZE;
 			socket.setReceiveBufferSize(size);
 			socket.connect(addr);
 			initStreams();
