@@ -147,7 +147,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 		checkOpened();
 		byte[] bytes = SerializationUtils.writeInt(n);
 		for (byte b: bytes) dos.write(b);
-		//dos.flush();
+		dos.flush();
 	}
 
 	/**
