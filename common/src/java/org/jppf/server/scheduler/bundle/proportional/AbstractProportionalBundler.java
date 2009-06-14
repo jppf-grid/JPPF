@@ -180,6 +180,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 				meanSum += normalize(h.getMean());
 				//meanSum += m;
 			}
+			//int max = Math.max(1, (int) (0.9d*maxSize()));
 			int max = maxSize();
 			int sum = 0;
 			for (AbstractProportionalBundler b: bundlers)
@@ -189,6 +190,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 				double p = normalize(h.getMean()) / meanSum;
 				int size = Math.max(1, (int) (p * max));
 				//size = Math.min((int) (0.9*max), size);
+				if (size >= max) size = max-1;
 				b.setBundleSize(size);
 				sum += size;
 			}
@@ -219,7 +221,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 */
 	public double normalize(double x)
 	{
-		return 1d / (1d + (x <= 0d ? 0d : Math.exp(1d + profile.getProportionalityFactor() * x)));
+		return 1d / (1d + (x <= 0d ? 0d : Math.log(1d + profile.getProportionalityFactor() * x)));
 		//return Math.exp(-profile.getProportionalityFactor() * x);
 		/*
 		double r = 1d;
@@ -264,7 +266,6 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 				double diff = maxMean / h.getMean();
 				double d = b.normalize(diff) / diffSum;
 				int size = Math.max(1, (int) (max * d));
-				if (size > (int) (0.9d * max)) size = (int) (0.9d * max);
 				b.setBundleSize(size);
 				sum += size;
 			}

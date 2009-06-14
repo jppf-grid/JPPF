@@ -81,6 +81,7 @@ public class LoadBalancer
 		{
 			int n = Runtime.getRuntime().availableProcessors();
 			int poolSize = JPPFConfiguration.getProperties().getInt("jppf.local.execution.threads", n);
+			log.info("local execution enabled with " + poolSize + " processing threads");
 			LinkedBlockingQueue queue = new LinkedBlockingQueue();
 			threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("client processing thread"));
 			ProportionalTuneProfile profile = new ProportionalTuneProfile();

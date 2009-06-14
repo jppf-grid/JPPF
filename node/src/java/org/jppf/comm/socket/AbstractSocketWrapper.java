@@ -118,7 +118,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 		checkOpened();
 		dos.writeInt(buf.getLength());
 		dos.write(buf.getBuffer(), 0, buf.getLength());
-		//dos.flush();
+		dos.flush();
 	}
 
 	/**
@@ -133,7 +133,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	{
 		checkOpened();
 		dos.write(data, offset, len);
-		//dos.flush();
+		dos.flush();
 	}
 
 	/**

@@ -108,6 +108,7 @@ public class JPPFThreadFactory implements ThreadFactory
 		Thread thread = new Thread(threadGroup, r, name + "-thread-" + incrementCount());
 		if (monitoringEnabled) threadIDs.add(thread.getId());
 		thread.setPriority(priority);
+		//thread.setDaemon(false);
 		return thread;
 	}
 

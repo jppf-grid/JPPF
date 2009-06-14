@@ -17,19 +17,18 @@
  */
 package sample.matrix;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.List;
 
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.node.policy.*;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.*;
+import org.jppf.task.storage.MemoryMapDataProvider;
 import org.jppf.utils.*;
 
 /**
- * Runner class for the matrix multiplication demo.
+ * Runner class for the square matrix multiplication demo.
  * @author Laurent Cohen
  */
 public class MatrixRunner
@@ -47,7 +46,7 @@ public class MatrixRunner
 	 * Entry point for this class, performs a matrix multiplication a number of times.,<br>
 	 * The number of times is specified as a configuration property named &quot;matrix.iterations&quot;.<br>
 	 * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
-	 * @param args not used.
+	 * @param args - not used.
 	 */
 	public static void main(String...args)
 	{
@@ -65,22 +64,18 @@ public class MatrixRunner
 		catch(Exception e)
 		{
 			e.printStackTrace();
-			output("before exit(1)");
 		}
 		finally
 		{
-			if (jppfClient != null)
-			{
-				jppfClient.close();
-			}
+			if (jppfClient != null) jppfClient.close();
 		}
 	}
 	
 	/**
 	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
-	 * @param size the size of the matrices.
-	 * @param iterations the number of times the multiplication will be performed.
-	 * @param nbRows number of rows of matrix a per task.
+	 * @param size - the size of the matrices.
+	 * @param iterations - the number of times the multiplication will be performed.
+	 * @param nbRows - number of rows of matrix a per task.
 	 * @throws Exception if an error is raised during the execution.
 	 */
 	private static void perform(int size, int iterations, int nbRows) throws Exception
@@ -92,13 +87,21 @@ public class MatrixRunner
 			a.assignRandomValues();
 			Matrix b = new Matrix(size);
 			b.assignRandomValues();
-			performSequentialMultiplication(a, b);
+			if (size <= 500) performSequentialMultiplication(a, b);
 			long totalIterationTime = 0L;
 	
+			// determine whether an execution policy should be used
+			ExecutionPolicy policy = null;
+			String s = JPPFConfiguration.getProperties().getString("jppf.execution.policy");
+			if (s != null)
+			{
+				PolicyParser.validatePolicy(s);
+				policy = PolicyParser.parsePolicy(s);
+			}
 			// perform "iteration" times
 			for (int iter=0; iter<iterations; iter++)
 			{
-				long elapsed = performParallelMultiplication(a, b, nbRows);
+				long elapsed = performParallelMultiplication(a, b, nbRows, policy);
 				totalIterationTime += elapsed;
 				output("Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
 			}
@@ -117,13 +120,14 @@ public class MatrixRunner
 
 	/**
 	 * Perform the sequential multiplication of 2 squares matrices of equal sizes.
-	 * @param a the left-hand matrix.
-	 * @param b the right-hand matrix.
-	 * @param nbRows number of rows of matrix a per task.
-	 * @return the elpased time for the computation.
+	 * @param a - the left-hand matrix.
+	 * @param b - the right-hand matrix.
+	 * @param nbRows - number of rows of matrix a per task.
+	 * @param policy - the execution policy to apply to the submitted job, may be null.
+	 * @return the elapsed time for the computation.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static long performParallelMultiplication(Matrix a, Matrix b, int nbRows) throws Exception
+	private static long performParallelMultiplication(Matrix a, Matrix b, int nbRows, ExecutionPolicy policy) throws Exception
 	{
 		long start = System.currentTimeMillis();
 		int size = a.getSize();
@@ -145,14 +149,7 @@ public class MatrixRunner
 		// create a data provider to share matrix b among all tasks
 		job.setDataProvider(new MemoryMapDataProvider());
 		job.getDataProvider().setValue(MatrixTask.DATA_KEY, b);
-		// determine if an optional execution policy is to be used.
-		ExecutionPolicy policy = null;
-		String s = JPPFConfiguration.getProperties().getString("jppf.execution.policy");
-		if (s != null)
-		{
-			PolicyParser.validatePolicy(s);
-			job.setExecutionPolicy(PolicyParser.parsePolicy(s));
-		}
+		job.setExecutionPolicy(policy);
 		// submit the tasks for execution
 		List<JPPFTask> results = jppfClient.submit(job);
 		// initialize the resulting matrix
@@ -161,7 +158,7 @@ public class MatrixRunner
 		int rowIdx = 0;
 		for (int i=0; i<results.size(); i++)
 		{
-			ExtMatrixTask matrixTask = (ExtMatrixTask) results.get(i);
+			JPPFTask matrixTask = results.get(i);
 			if (matrixTask.getException() != null) throw matrixTask.getException();
 			double[][] rows = (double[][]) matrixTask.getResult();
 			for (int j=0; j<rows.length; j++)
@@ -174,65 +171,21 @@ public class MatrixRunner
 	}
 
 	/**
-	 * The Thread Pool that really processes the tasks.
-	 */
-	private static ExecutorService threadPool = null;
-	
-	/**
-	 * Execute the tasks using a local thread pool.
-	 * @param tasks the tasks to execute.
-	 * @param dataProvider data shared by the tasks.
-	 * @return the execution result.
-	 * @throws Exception if an error is raised during the execution.
-	 */
-	private static List<JPPFTask> performLocalExecution(List<JPPFTask> tasks, DataProvider dataProvider) throws Exception
-	{
-		if (threadPool == null)
-		{
-			int poolSize = 4;
-			LinkedBlockingQueue queue = new LinkedBlockingQueue();
-			threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("client processing thread"));
-		}
-
-		List<Future<?>> futureList = new ArrayList<Future<?>>();
-		for (JPPFTask task: tasks)
-		{
-			if (dataProvider != null) task.setDataProvider(dataProvider);
-			futureList.add(threadPool.submit(task));
-		}
-		for (Future<?> f: futureList) f.get();
-
-		return tasks;
-	}
-
-	/**
 	 * Perform the sequential multiplication of 2 squares matrices of equal sizes.
-	 * @param a the left-hand matrix.
-	 * @param b the right-hand matrix.
+	 * @param a - the left-hand matrix.
+	 * @param b - the right-hand matrix.
 	 */
 	private static void performSequentialMultiplication(Matrix a, Matrix b)
 	{
 		long start = System.currentTimeMillis();
-		int size = a.getSize();
-		Matrix c = new Matrix(size);
-		// iterate over the rows of a
-		for (int i=0; i<size; i++)
-		{
-			// iterate over the columns of b
-			for (int j=0; j<size; j++)
-			{
-				double val = 0d;
-				for (int k=0; k<size; k++) val += a.getValueAt(i, k) * b.getValueAt(k, j); 
-				c.setValueAt(i, j, val);
-			}
-		}
+		Matrix c = a.multiply(b);
 		long elapsed = System.currentTimeMillis() - start;
 		output("Sequential computation performed in "+StringUtils.toStringDuration(elapsed));
 	}
 
 	/**
 	 * Print a message to the console and/or log file.
-	 * @param message the message to print.
+	 * @param message - the message to print.
 	 */
 	private static void output(String message)
 	{

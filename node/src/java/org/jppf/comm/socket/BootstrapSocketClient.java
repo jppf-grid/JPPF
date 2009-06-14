@@ -87,9 +87,7 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 		oos.flush();
 		oos.close();
 		// Remove references kept by the stream, otherwise leads to OutOfMemory.
-		JPPFBuffer buffer = new JPPFBuffer();
-		buffer.setBuffer(baos.toByteArray());
-		buffer.setLength(baos.size());
+		JPPFBuffer buffer = new JPPFBuffer(baos.toByteArray(), baos.size());
 		sendBytes(buffer);
 	}
 

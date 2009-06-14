@@ -126,13 +126,13 @@ public class JPPFNode extends AbstractMonitoredNode
 		buildNumber = VersionUtils.getBuildNumber();
 		setStopped(false);
 		boolean initialized = false;
-		boolean synchronous = JPPFConfiguration.getProperties().getBoolean("jppf.node.receive.synchronous", true);
 		Throwable error = null;
 		if (debugEnabled) log.debug("Start of node main loop");
 		while (!isStopped())
 		{
 			try
 			{
+				boolean synchronous = JPPFConfiguration.getProperties().getBoolean("jppf.node.receive.synchronous", true);
 				init();
 				if (!initialized)
 				{

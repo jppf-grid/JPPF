@@ -33,11 +33,11 @@ public class Matrix implements Serializable
 	/**
 	 * The size of this matrix. The matrix contains size*size values.
 	 */
-	private int size = 0;
+	private int size;
 	/**
 	 * The values in this matrix.
 	 */
-	private double[][] values = null;
+	public double[][] values;
 	
 	/**
 	 * Initialize this matrix with a specified size.
@@ -73,7 +73,7 @@ public class Matrix implements Serializable
 	}
 	
 	/**
-	 * Get the row a matrix values at the specified index. Provided as a convenience.
+	 * Get the row of matrix values at the specified index. Provided as a convenience.
 	 * @param row the row index.
 	 * @return the values in the row as an array of <code>double</code> values, or null if the row index is
 	 * greater than the matrix size.

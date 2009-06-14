@@ -20,8 +20,8 @@ package sample.matrix;
 import sample.BaseDemoTask;
 
 /**
- * This task performs the multiplication of one or more matrixs row by another matrix, as part of
- * the multiplication of 2 whole matrices.
+ * This task performs the multiplication of one or more matrixs rows by another matrix, as part of
+ * the multiplication of 2 whole square matrices.
  * @author Laurent Cohen
  */
 public class ExtMatrixTask extends BaseDemoTask
@@ -30,10 +30,6 @@ public class ExtMatrixTask extends BaseDemoTask
 	 * Data provider key mapping to the second matrix operand in the multiplication.
 	 */
 	public static final String DATA_KEY = "matrix";
-	/**
-	 * The result of this task's execution, ie a matrix row.
-	 */
-	private double[][] result = null;
 	/**
 	 * The row of values to multiply by a matrix.
 	 */
@@ -49,16 +45,6 @@ public class ExtMatrixTask extends BaseDemoTask
 	}
 	
 	/**
-	 * Get the result this task's execution, ie a matrix row.
-	 * @return a matrix column as an array of <code>double</code> values.
-	 * @see org.jppf.server.protocol.JPPFTask#getResult()
-	 */
-	public Object getResult()
-	{
-		return result;
-	}
-
-	/**
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
@@ -66,9 +52,9 @@ public class ExtMatrixTask extends BaseDemoTask
 	{
 		try
 		{
-			Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
-			int size = matrix.getSize();
-			result = new double[rowValues.length][size];
+			final Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
+			final int size = matrix.getSize();
+			final double[][] computeResult = new double[rowValues.length][size];
 	
 			// for each row of matrix a
 			for (int n=0; n<rowValues.length; n++)
@@ -80,10 +66,31 @@ public class ExtMatrixTask extends BaseDemoTask
 					for (int row=0; row<size; row++)
 					{
 						sum += matrix.getValueAt(row, col) * rowValues[n][row];
+						//matrix.valueAt(row, col);
 					}
-					result[n][col] = sum;
+					computeResult[n][col] = sum;
 				}
 			}
+			/*
+			for (int n=0; n<rowValues.length; n++)
+			{
+				double count = 0d;
+				for (int i=0; i<size; i++)
+				{
+					for (int j=0; j<size; j++)
+					{
+						count += 1d;
+					}
+					computeResult[n][i] = count;
+				}
+			}
+			*/
+			/*
+			long stop = System.currentTimeMillis() + 5L;
+			long count = 0L;
+			while (System.currentTimeMillis() < stop) count++;
+			*/
+			setResult(computeResult);
 		}
 		catch(Exception e)
 		{
