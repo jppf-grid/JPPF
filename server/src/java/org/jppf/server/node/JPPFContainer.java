@@ -39,6 +39,10 @@ public class JPPFContainer
 	 */
 	private static Log log = LogFactory.getLog(JPPFContainer.class);
 	/**
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * Utility for deserialization and serialization.
 	 */
 	private SerializationHelper helper = null;
@@ -85,12 +89,19 @@ public class JPPFContainer
 		try
 		{
 			Thread.currentThread().setContextClassLoader(classLoader);
+			long elapsed1 = 0L;
+			long elapsed2 = 0L;
 			for (int i=0; i<count; i++)
 			{
+				long start = System.currentTimeMillis();
 				JPPFBuffer buf = wrapper.receiveBytes(0);
+				elapsed1 += System.currentTimeMillis() - start;
 				byte[] data = buf.getBuffer();
+				start = System.currentTimeMillis();
 				list.add(helper.getSerializer().deserialize(data));
+				elapsed2 += System.currentTimeMillis() - start;
 			}
+			if (debugEnabled) log.debug("Avg read time: " + elapsed1 + " ms; avg deserialization time: " + elapsed2 + " ms");
 			return 0;
 		}
 		finally
