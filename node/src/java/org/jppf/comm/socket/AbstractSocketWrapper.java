@@ -264,8 +264,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			socket = new Socket();
 			//socket.setReuseAddress(true);
 			InetSocketAddress addr = new InetSocketAddress(host, port);
-			int size = SOCKET_RECEIVE_BUFFER_SIZE;
-			socket.setReceiveBufferSize(size);
+			//socket.setReceiveBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
 			socket.connect(addr);
 			initStreams();
 			opened = true;
@@ -282,7 +281,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	{
 		OutputStream os = socket.getOutputStream();
 		InputStream is = socket.getInputStream();
-		BufferedOutputStream bos = new BufferedOutputStream(os, SOCKET_RECEIVE_BUFFER_SIZE);
+		//BufferedOutputStream bos = new BufferedOutputStream(os, SOCKET_RECEIVE_BUFFER_SIZE);
+		BufferedOutputStream bos = new BufferedOutputStream(os);
 		dos = new DataOutputStream(bos);
 		dos.flush();
 		BufferedInputStream bis = new BufferedInputStream(is);

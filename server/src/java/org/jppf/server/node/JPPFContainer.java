@@ -95,13 +95,16 @@ public class JPPFContainer
 			{
 				long start = System.currentTimeMillis();
 				JPPFBuffer buf = wrapper.receiveBytes(0);
-				elapsed1 += System.currentTimeMillis() - start;
+				long time = System.currentTimeMillis() - start;
+				elapsed1 += time;
 				byte[] data = buf.getBuffer();
 				start = System.currentTimeMillis();
 				list.add(helper.getSerializer().deserialize(data));
-				elapsed2 += System.currentTimeMillis() - start;
+				long time2 = System.currentTimeMillis() - start;
+				elapsed2 += time2;
+				if (debugEnabled) log.debug("i = " + i + "; size = " + buf.getLength() + "; read time: " + time + " ms; deserialization: " + time2 + " ms");
 			}
-			if (debugEnabled) log.debug("Avg read time: " + elapsed1 + " ms; avg deserialization time: " + elapsed2 + " ms");
+			if (debugEnabled) log.debug("read time: " + elapsed1 + " ms; deserialization time: " + elapsed2 + " ms");
 			return 0;
 		}
 		finally

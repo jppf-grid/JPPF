@@ -248,7 +248,7 @@ public class SocketChannelClient implements SocketWrapper
 	public void open() throws ConnectException, IOException
 	{
 		channel = SocketChannel.open();
-		channel.socket().setReceiveBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
+		//channel.socket().setReceiveBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
 		channel.configureBlocking(blocking);
 		InetSocketAddress address = new InetSocketAddress(host, port);
 		channel.connect(address);

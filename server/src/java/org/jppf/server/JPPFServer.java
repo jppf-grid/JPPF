@@ -23,7 +23,6 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
-import org.jppf.comm.socket.SocketWrapper;
 
 /**
  * This class is a common abstract superclass for servers listening to incoming connections from
@@ -127,7 +126,7 @@ public abstract class JPPFServer extends Thread
 		{
 			server = new ServerSocket();
 			InetSocketAddress addr = new InetSocketAddress(port);
-			server.setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+			//server.setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 			server.bind(addr);
 		}
 		catch(IllegalArgumentException iae)
