@@ -100,7 +100,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	{
 		this.node = node;
 		TypedProperties props = JPPFConfiguration.getProperties();
-		int poolSize = props.getInt("processing.threads", 1);
+		int poolSize = props.getInt("processing.threads", Runtime.getRuntime().availableProcessors());
 		int priority = props.getInt("processing.threads.priority", Thread.NORM_PRIORITY);
 		log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
 		threadMXBean = ManagementFactory.getThreadMXBean();

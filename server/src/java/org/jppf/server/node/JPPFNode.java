@@ -294,7 +294,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		boolean mustInit = (socketClient == null);
 		if (mustInit)	initSocketClient();
 		initCredentials();
-		if (!getJmxServer().getServer().isRegistered(new ObjectName(JPPFAdminMBean.NODE_MBEAN_NAME)) && isJmxEnabled())
+		if (isJmxEnabled() && !getJmxServer().getServer().isRegistered(new ObjectName(JPPFAdminMBean.NODE_MBEAN_NAME)))
 		{
 			registerProviderMBeans();
 		}
@@ -520,7 +520,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	private void registerProviderMBeans() throws Exception
 	{
-		JPPFClassLoader cl = (JPPFClassLoader) getClass().getClassLoader();
+		ClassLoader cl = getClass().getClassLoader();
     ClassLoader tmp = Thread.currentThread().getContextClassLoader();
   	MBeanServer server = getJmxServer().getServer();
     try
