@@ -47,13 +47,25 @@ public class NodeMessage
 	 */
 	private int position = -1;
 	/**
-	 * The current number of bytes send or received for the location at the current position.
+	 * The current number of bytes sent or received for the location at the current position.
 	 */
 	private int locationCount = 0;
 	/**
 	 * The length of the location at the current position.
 	 */
 	private int locationLength = 0;
+	/**
+	 * Contains the int value of the length of the current location.
+	 */
+	private byte[] locationLengthBytes = new byte[4];
+	/**
+	 * Current position in {@link #locationLengthBytes locationLengthBytes}.
+	 */
+	private int locationLengthPos = 0;
+	/**
+	 * DataLocation wrapper for {@link #locationLengthBytes locationLengthBytes}.
+	 */
+	private DataLocation locationLengthLocation = null;
 	/**
 	 * An input source wrapping the channel from where data is read.
 	 */
@@ -134,12 +146,69 @@ public class NodeMessage
 		DataLocation location = locations.get(position);
 		if (locationCount == 0)
 		{
-			//od.writeInt(location.getSize());
+			if (locationLengthPos == 0)
+			{
+				SerializationUtils.writeInt(location.getSize(), locationLengthBytes, 0);
+				locationLengthLocation = new ByteBufferLocation(locationLengthBytes, 0, 4);
+			}
+			if (locationLengthPos < 4)
+			{
+				if (!writeLength(channel)) return false;
+			}
+			locationLength = location.getSize();
+			//SerializationUtils.writeInt(channel, location.getSize());
+			count += 4;
+		}
+
+		int n = location.transferTo(channel, false);
+		if (n > 0) locationCount += n;
+		if ((n == -1) || (locationCount >= locationLength))
+		{
+			count += locationLength;
+			locationCount = 0;
+			locationLength = 0;
+			locationLengthPos = 0;
+			position++;
+		}
+		return count >= length;
+	}
+
+	/**
+	 * Write an int value to the channel.
+	 * @param channel the channel to write to.
+	 * @return true if the value has been completely written to the channel, false otherwise.
+	 * @throws Exception if an IO error occurs.
+	 */
+	private boolean writeLength(WritableByteChannel channel) throws Exception
+	{
+		int n = locationLengthLocation.transferTo(channel, false);
+		locationLengthPos += n;
+		return locationLengthPos >= 4;
+	}
+
+	/**
+	 * Write a bundle to the channel.
+	 * @param channel the channel to write to.
+	 * @return true if the bundle has been completely written to the channel, false otherwise.
+	 * @throws Exception if an IO error occurs.
+	 */
+	public boolean write2(WritableByteChannel channel) throws Exception
+	{
+		if (!started)
+		{
+			started = true;
+			for (DataLocation dl: locations) length += 4 + dl.getSize();
+			SerializationUtils.writeInt(channel, length);
+			position = 0;
+		}
+		DataLocation location = locations.get(position);
+		if (locationCount == 0)
+		{
 			SerializationUtils.writeInt(channel, location.getSize());
 			locationLength = location.getSize();
 			count += 4;
 		}
-		//int n = location.transferTo(od, false);
+
 		int n = location.transferTo(channel, false);
 		if (n > 0) locationCount += n;
 		if ((n == -1) || (locationCount >= locationLength))

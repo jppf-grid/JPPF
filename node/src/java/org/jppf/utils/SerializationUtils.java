@@ -18,7 +18,7 @@
 
 package org.jppf.utils;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 
@@ -63,6 +63,20 @@ public final class SerializationUtils
 	}
 
 	/**
+	 * Serialize an int value to a stream.
+	 * @param value the int value to serialize.
+	 * @param os the stream to write to.
+	 * @throws IOException if an error occurs while writing the data.
+	 */
+	public static void writeInt(int value, OutputStream os) throws IOException
+	{
+    os.write((byte) ((value >>> 24) & 0xFF));
+    os.write((byte) ((value >>> 16) & 0xFF));
+    os.write((byte) ((value >>>  8) & 0xFF));
+    os.write((byte) ((value >>>  0) & 0xFF));
+	}
+
+	/**
 	 * Wrtie an integer value to a channel.
 	 * @param channel the channel to write to.
 	 * @param value the value to write.
@@ -76,8 +90,14 @@ public final class SerializationUtils
 		int count = 0;
 		while (count < 4)
 		{
+			int n = 0;
+			while (n == 0) n = channel.write(buf);
+			if (n < 0) throw new ClosedChannelException();
+			count += n;
+			/*
 			count += channel.write(buf);
 			if (count < 0) throw new ClosedChannelException();
+			*/
 		}
 	}
 
@@ -93,8 +113,14 @@ public final class SerializationUtils
 		int count = 0;
 		while (count < 4)
 		{
+			int n = 0;
+			while (n == 0) n = channel.read(buf);
+			if (n < 0) throw new ClosedChannelException();
+			count += n;
+			/*
 			count += channel.read(buf);
 			if (count < 0) throw new ClosedChannelException();
+			*/
 		}
 		buf.flip();
 		return buf.getInt();
@@ -113,6 +139,21 @@ public final class SerializationUtils
     result    += convertByte(data[pos++]) << 16;
     result    += convertByte(data[pos++]) <<  8;
     result    += convertByte(data[pos++]) <<  0;
+    return result;
+	}
+
+	/**
+	 * Deserialize an int value from a stream.
+	 * @param is the stream to read from.
+	 * @return the int value read from the stream.
+	 * @throws IOException if an error occurs while reading the data.
+	 */
+	public static int readInt(InputStream is) throws IOException
+	{
+    int result = convertByte(is.read()) << 24;
+    result    += convertByte(is.read()) << 16;
+    result    += convertByte(is.read()) <<  8;
+    result    += convertByte(is.read()) <<  0;
     return result;
 	}
 

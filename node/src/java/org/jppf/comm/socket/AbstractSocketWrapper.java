@@ -118,7 +118,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 		checkOpened();
 		dos.writeInt(buf.getLength());
 		dos.write(buf.getBuffer(), 0, buf.getLength());
-		//dos.flush();
+		dos.flush();
 	}
 
 	/**
@@ -145,8 +145,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	public void writeInt(int n) throws Exception
 	{
 		checkOpened();
-		byte[] bytes = SerializationUtils.writeInt(n);
-		for (byte b: bytes) dos.write(b);
+		dos.writeInt(n);
 		dos.flush();
 	}
 
@@ -242,9 +241,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 */
 	public int readInt() throws Exception
 	{
-		byte[] intBytes = new byte[4];
-		for (int i=0; i<4; i++) intBytes[i] = (byte) dis.read();
-    return SerializationUtils.readInt(intBytes, 0);
+    return dis.readInt();
 	}
 
 	/**
@@ -262,7 +259,6 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			else if (port <= 0)
 				throw new ConnectException("You must specify the port number");
 			socket = new Socket();
-			//socket.setReuseAddress(true);
 			InetSocketAddress addr = new InetSocketAddress(host, port);
 			//socket.setReceiveBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
 			socket.connect(addr);

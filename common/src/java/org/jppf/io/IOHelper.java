@@ -46,14 +46,8 @@ public final class IOHelper
 	 */
 	public static DataLocation createDataLocationMemorySensitive(int size) throws Exception
 	{
-		/*
-		return new ByteBufferLocation(size);
-		*/
 		long freeMem = SystemUtils.maxFreeHeap();
-		if ((long) (1.2d * size) < freeMem)
-		{
-			return new ByteBufferLocation(size);
-		}
+		if ((long) (1.2d * size) < freeMem) return new ByteBufferLocation(size);
 		File file = File.createTempFile("jppf", ".tmp");
 		file.deleteOnExit();
 		return new FileLocation(file, size);
