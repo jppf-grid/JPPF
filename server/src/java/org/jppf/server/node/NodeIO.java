@@ -170,11 +170,11 @@ public class NodeIO extends ThreadSynchronization
 	 */
 	private Object[] deserializeObjects() throws Exception
 	{
-		log.debug("waiting for next request");
+		if (debugEnabled) log.debug("waiting for next request");
 		socketWrapper.skip(4);
-		log.debug("skipped 4 bytes - start reading bundle data");
+		if (debugEnabled) log.debug("skipped 4 bytes - start reading bundle data");
 		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
-		log.debug("got bundle");
+		if (debugEnabled) log.debug("got bundle");
 		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
 		List<Object> list = new ArrayList<Object>();
 		list.add(bundle);
@@ -193,7 +193,7 @@ public class NodeIO extends ThreadSynchronization
 				// skip null data provider
 				socketWrapper.receiveBytes(0);
 			}
-			log.debug("got all data");
+			if (debugEnabled) log.debug("got all data");
 		}
 		catch(ClassNotFoundException e)
 		{

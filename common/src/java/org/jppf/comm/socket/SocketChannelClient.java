@@ -131,7 +131,10 @@ public class SocketChannelClient implements SocketWrapper
 	 */
 	public void writeInt(int n) throws Exception
 	{
-		ByteBuffer buffer = ByteBuffer.wrap(SerializationUtils.writeInt(n));
+		//ByteBuffer buffer = ByteBuffer.wrap(SerializationUtils.writeInt(n));
+		ByteBuffer buffer = ByteBuffer.allocateDirect(4);
+		buffer.putInt(n);
+		buffer.flip();
 		for (int count=0; count < 4;) count += channel.write(buffer);
 	}
 
