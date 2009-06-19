@@ -27,6 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.classloader.ResourceProvider;
+import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.utils.JPPFConfiguration;
 
 /**
@@ -159,7 +160,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 			{
 				ServerSocketChannel server = ServerSocketChannel.open();
 				//int size = 32*1024;
-				//server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+				server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 				server.socket().bind(new InetSocketAddress(port));
 				server.configureBlocking(false);
 				server.register(selector, SelectionKey.OP_ACCEPT);

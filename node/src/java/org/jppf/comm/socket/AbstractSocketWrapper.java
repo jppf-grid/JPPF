@@ -260,7 +260,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 				throw new ConnectException("You must specify the port number");
 			socket = new Socket();
 			InetSocketAddress addr = new InetSocketAddress(host, port);
-			//socket.setReceiveBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
+			socket.setReceiveBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
 			socket.connect(addr);
 			initStreams();
 			opened = true;

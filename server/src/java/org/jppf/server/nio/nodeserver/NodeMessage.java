@@ -57,15 +57,15 @@ public class NodeMessage
 	/**
 	 * Contains the int value of the length of the current location.
 	 */
-	private byte[] locationLengthBytes = new byte[4];
+	private byte[] lengthBytes = new byte[4];
 	/**
-	 * Current position in {@link #locationLengthBytes locationLengthBytes}.
+	 * Current position in {@link #lengthBytes locationLengthBytes}.
 	 */
-	private int locationLengthPos = 0;
+	private int lengthPos = 0;
 	/**
-	 * DataLocation wrapper for {@link #locationLengthBytes locationLengthBytes}.
+	 * DataLocation wrapper for {@link #lengthBytes lengthBytes}.
 	 */
-	private DataLocation locationLengthLocation = null;
+	private DataLocation lengthLocation = null;
 	/**
 	 * An input source wrapping the channel from where data is read.
 	 */
@@ -98,6 +98,70 @@ public class NodeMessage
 	{
 		if (!started)
 		{
+			if (lengthPos < 4)
+			{
+				if (!readLength(channel)) return false;
+			}
+			started = true;
+			lengthPos = 0;
+			length = SerializationUtils.readInt(lengthBytes, 0);
+		}
+		DataLocation location = null;
+		if (locationCount < locationLength)
+		{
+			location = locations.get(position);
+		}
+		else
+		{
+			if (lengthPos < 4)
+			{
+				if (!readLength(channel)) return false;
+			}
+			int n = SerializationUtils.readInt(lengthBytes, 0);
+			location = IOHelper.createDataLocationMemorySensitive(n);
+			locations.add(location);
+			locationLength = location.getSize();
+			position++;
+			count += 4;
+		}
+		int n = location.transferFrom(channel, false);
+		if (n > 0) locationCount += n;
+		if ((n == -1) || (locationCount >= locationLength))
+		{
+			count += locationLength;
+			locationCount = 0;
+			locationLength = 0;
+			lengthPos = 0;
+		}
+		return count >= length;
+	}
+
+	/**
+	 * Read an int value to the channel.
+	 * @param channel - the channel to read from.
+	 * @return true if the value has been completely read from the channel, false otherwise.
+	 * @throws Exception if an IO error occurs.
+	 */
+	private boolean readLength(ReadableByteChannel channel) throws Exception
+	{
+		if (lengthPos == 0)
+		{
+			lengthLocation = new ByteBufferLocation(lengthBytes, 0, 4);
+		}
+		lengthPos += lengthLocation.transferFrom(channel, false);
+		return lengthPos >= 4;
+	}
+
+	/**
+	 * Read a bundle from the channel.
+	 * @param channel the channel to read from.
+	 * @return true if the bundle has been completely read from the channel, false otherwise.
+	 * @throws Exception if an IO error occurs.
+	 */
+	public boolean read2(ReadableByteChannel channel) throws Exception
+	{
+		if (!started)
+		{
 			started = true;
 			length = SerializationUtils.readInt(channel);
 		}
@@ -108,7 +172,6 @@ public class NodeMessage
 		}
 		else
 		{
-			//int n = is.readInt();
 			int n = SerializationUtils.readInt(channel);
 			location = IOHelper.createDataLocationMemorySensitive(n);
 			locations.add(location);
@@ -116,7 +179,6 @@ public class NodeMessage
 			position++;
 			count += 4;
 		}
-		//int n = location.transferFrom(is, false);
 		int n = location.transferFrom(channel, false);
 		if (n > 0) locationCount += n;
 		if ((n == -1) || (locationCount >= locationLength))
@@ -130,7 +192,7 @@ public class NodeMessage
 
 	/**
 	 * Write a bundle to the channel.
-	 * @param channel the channel to write to.
+	 * @param channel - the channel to write to.
 	 * @return true if the bundle has been completely written to the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
@@ -138,25 +200,23 @@ public class NodeMessage
 	{
 		if (!started)
 		{
+			if (length <= 0) for (DataLocation dl: locations) length += 4 + dl.getSize();
+			if (lengthPos < 4)
+			{
+				if (!writeLength(channel, length)) return false;
+			}
 			started = true;
-			for (DataLocation dl: locations) length += 4 + dl.getSize();
-			SerializationUtils.writeInt(channel, length);
 			position = 0;
+			lengthPos = 0;
 		}
 		DataLocation location = locations.get(position);
 		if (locationCount == 0)
 		{
-			if (locationLengthPos == 0)
-			{
-				SerializationUtils.writeInt(location.getSize(), locationLengthBytes, 0);
-				locationLengthLocation = new ByteBufferLocation(locationLengthBytes, 0, 4);
-			}
-			if (locationLengthPos < 4)
-			{
-				if (!writeLength(channel)) return false;
-			}
 			locationLength = location.getSize();
-			//SerializationUtils.writeInt(channel, location.getSize());
+			if (lengthPos < 4)
+			{
+				if (!writeLength(channel, locationLength)) return false;
+			}
 			count += 4;
 		}
 
@@ -167,7 +227,7 @@ public class NodeMessage
 			count += locationLength;
 			locationCount = 0;
 			locationLength = 0;
-			locationLengthPos = 0;
+			lengthPos = 0;
 			position++;
 		}
 		return count >= length;
@@ -175,15 +235,20 @@ public class NodeMessage
 
 	/**
 	 * Write an int value to the channel.
-	 * @param channel the channel to write to.
+	 * @param channel - the channel to write to.
+	 * @param value - the value to write to the channel.
 	 * @return true if the value has been completely written to the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	private boolean writeLength(WritableByteChannel channel) throws Exception
+	private boolean writeLength(WritableByteChannel channel, int value) throws Exception
 	{
-		int n = locationLengthLocation.transferTo(channel, false);
-		locationLengthPos += n;
-		return locationLengthPos >= 4;
+		if (lengthPos == 0)
+		{
+			SerializationUtils.writeInt(value, lengthBytes, 0);
+			lengthLocation = new ByteBufferLocation(lengthBytes, 0, 4);
+		}
+		lengthPos += lengthLocation.transferTo(channel, false);
+		return lengthPos >= 4;
 	}
 
 	/**
