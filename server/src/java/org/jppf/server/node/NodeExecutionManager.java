@@ -353,7 +353,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	{
 		Future<?> future = futureMap.remove(number);
 		//if (debugEnabled) log.debug("removing task with number " + number + ", future = " + future);
-		TimerTask tt = timerTaskMap.remove(future);
+		TimerTask tt = future == null ? null : timerTaskMap.remove(future);
 		if (tt != null) tt.cancel();
 		wakeUp();
 	}

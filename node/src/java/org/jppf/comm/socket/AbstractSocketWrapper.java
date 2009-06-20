@@ -20,6 +20,7 @@ package org.jppf.comm.socket;
 import java.io.*;
 import java.net.*;
 
+import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.utils.*;
 
@@ -33,6 +34,10 @@ import org.jppf.utils.*;
  */
 public abstract class AbstractSocketWrapper implements SocketWrapper
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(AbstractSocketWrapper.class);
 	/**
 	 * The underlying socket wrapped by this SocketClient.
 	 */
@@ -264,6 +269,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			socket.connect(addr);
 			initStreams();
 			opened = true;
+			log.info("getReceiveBufferSize() = " + socket.getReceiveBufferSize());
 		}
 		//else throw new ConnectException("Client connection already opened");
 	}

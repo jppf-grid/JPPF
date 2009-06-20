@@ -269,6 +269,7 @@ public class SocketChannelClient implements SocketWrapper
 			}
 		}
 		opened = true;
+		log.info("getReceiveBufferSize() = " + channel.socket().getReceiveBufferSize());
 	}
 
 	/**
