@@ -171,7 +171,7 @@ public class NodeIO extends ThreadSynchronization
 	private Object[] deserializeObjects() throws Exception
 	{
 		if (debugEnabled) log.debug("waiting for next request");
-		socketWrapper.skip(4);
+		int size = socketWrapper.readInt();
 		if (debugEnabled) log.debug("skipped 4 bytes - start reading bundle data");
 		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
 		if (debugEnabled) log.debug("got bundle");

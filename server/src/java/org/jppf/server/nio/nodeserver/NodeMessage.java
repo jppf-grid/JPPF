@@ -209,26 +209,32 @@ public class NodeMessage
 			position = 0;
 			lengthPos = 0;
 		}
-		DataLocation location = locations.get(position);
-		if (locationCount == 0)
+		boolean end = false;
+		while (!end)
 		{
-			locationLength = location.getSize();
-			if (lengthPos < 4)
+			DataLocation location = locations.get(position);
+			if (locationCount == 0)
 			{
-				if (!writeLength(channel, locationLength)) return false;
+				locationLength = location.getSize();
+				if (lengthPos < 4)
+				{
+					if (!writeLength(channel, locationLength)) return false;
+				}
+				count += 4;
 			}
-			count += 4;
-		}
-
-		int n = location.transferTo(channel, false);
-		if (n > 0) locationCount += n;
-		if ((n == -1) || (locationCount >= locationLength))
-		{
-			count += locationLength;
-			locationCount = 0;
-			locationLength = 0;
-			lengthPos = 0;
-			position++;
+	
+			int n = location.transferTo(channel, false);
+			if (n == 0) return false;
+			if (n > 0) locationCount += n;
+			if ((n == -1) || (locationCount >= locationLength))
+			{
+				count += locationLength;
+				locationCount = 0;
+				locationLength = 0;
+				lengthPos = 0;
+				position++;
+				if (position >= locations.size()) end = true;
+			}
 		}
 		return count >= length;
 	}
