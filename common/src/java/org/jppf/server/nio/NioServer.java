@@ -291,6 +291,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 		if (channel == null) return;
 		try
 		{
+			channel.socket().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 			channel.configureBlocking(false);
 		}
 		catch (IOException e)

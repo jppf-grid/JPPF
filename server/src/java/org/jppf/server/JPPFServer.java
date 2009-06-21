@@ -96,10 +96,11 @@ public abstract class JPPFServer extends Thread
 	/**
 	 * Start serving a new incoming connection.
 	 * @param socket the socket connecting with this socket server.
-	 * @throws JPPFException if the new connection can't be initialized.
+	 * @throws Exception if the new connection can't be initialized.
 	 */
-	protected void serve(Socket socket) throws JPPFException
+	protected void serve(Socket socket) throws Exception
 	{
+		socket.setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 		JPPFConnection connection = createConnection(socket);
 		connections.add(connection);
 		connection.start();
