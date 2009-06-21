@@ -176,14 +176,6 @@ public class SocketChannelClient implements SocketWrapper
 			JPPFBuffer buf = receiveBytes(timeout);
 			o = getSerializer().deserialize(buf);
 		}
-		catch(ClassNotFoundException e)
-		{
-			throw e;
-		}
-		catch(IOException e)
-		{
-			throw e;
-		}
 		finally
 		{
 			// disable the timeout on subsequent read operations.

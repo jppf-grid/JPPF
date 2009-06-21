@@ -64,6 +64,7 @@ public interface SocketWrapper
 	 * @throws Exception if the underlying output stream throws an exception.
 	 */
 	void writeInt(int n) throws Exception;
+
 	/**
 	 * Flush the data currently in the send buffer.
 	 * @throws IOException if an I/O error occurs.

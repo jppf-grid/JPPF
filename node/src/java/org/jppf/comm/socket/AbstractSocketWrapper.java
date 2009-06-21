@@ -193,18 +193,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			if (timeout > 0) socket.setSoTimeout(timeout);
 			int len = dis.readInt();
 			byte[] buffer = new byte[len];
-			int count = 0;
-			while (count < len)
-			{
-				int n = dis.read(buffer, count, len - count);
-				if (n < 0) break;
-				else count += n;
-			}
+			int count = read(buffer, 0, len);
 			buf = new JPPFBuffer(buffer, len);
-		}
-		catch(IOException e)
-		{
-			throw e;
 		}
 		finally
 		{
@@ -222,17 +212,17 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @param offset the position where to start storing data read from the socket.
 	 * @param len the length of data to read.
 	 * @return the number of bytes actually read or -1 if the end of stream was reached.
-	 * @throws Exception if the underlying input stream throws an exception.
+	 * @throws IOException if the underlying input stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#read(byte[], int, int)
 	 */
-	public int read(byte[] data, int offset, int len) throws Exception
+	public int read(byte[] data, int offset, int len) throws IOException
 	{
 		checkOpened();
 		int count = 0;
 		while (count < len)
 		{
 			int n = dis.read(data, count + offset, len - count);
-			if (n < 0) return -1;
+			if (n < 0) break;
 			else count += n;
 		}
 		return count;
@@ -319,11 +309,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 */
 	protected void checkOpened() throws ConnectException
 	{
-		if (!opened)
-		{
-			ConnectException e = new ConnectException("Client connection not opened");
-			throw e;
-		}
+		if (!opened) throw new ConnectException("Client connection not opened");
 	}
 
 	/**
