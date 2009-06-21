@@ -57,8 +57,8 @@ public class SocketPerformance
 		{
 			JPPFConfiguration.getProperties();
 			if ((args == null) || (args.length < 1)) perform();
-			else if ("server".equalsIgnoreCase(args[0]));
-			else if ("client".equalsIgnoreCase(args[0]));
+			else if ("server".equalsIgnoreCase(args[0])) performServer();
+			else if ("client".equalsIgnoreCase(args[0])) performClient();
 		}
 		catch(Exception e)
 		{
@@ -85,9 +85,11 @@ public class SocketPerformance
 	 */
 	private static void performServer() throws Exception
 	{
+		System.out.println("starting server");
 		Server server = new Server();
 		server.start();
 		server.join();
+		System.out.println("server ended");
 	}
 
 	/**
@@ -96,9 +98,11 @@ public class SocketPerformance
 	 */
 	private static void performClient() throws Exception
 	{
+		System.out.println("starting client");
 		Client client = new Client();
 		client.start();
 		client.join();
+		System.out.println("client ended");
 	}
 
 	/**
