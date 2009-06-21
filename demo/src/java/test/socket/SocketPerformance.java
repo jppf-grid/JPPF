@@ -230,19 +230,19 @@ public class SocketPerformance
 				byte[] data = null;
 				while (true)
 				{
-					log.info("Client: reading next datasize");
+					//log.info("Client: reading next datasize");
 					int datasize = sc.readInt();
 					if (datasize == 0)
 					{
 						log.info("Client: terminating");
 						break;
 					}
-					log.info("Client: read datasize = " + datasize + ", reading next data");
+					//log.info("Client: read datasize = " + datasize + ", reading next data");
 					if ((data == null) || (data.length < datasize)) data = new byte[datasize];
 					long start = System.currentTimeMillis();
 					sc.read(data, 0, datasize);
 					long elapsed = System.currentTimeMillis() - start;
-					log.info("Client: data read in " + elapsed + " ms");
+					log.info("Client: read data size = " + datasize + " in " + elapsed + " ms");
 				}
 			}
 			catch(Exception e)
