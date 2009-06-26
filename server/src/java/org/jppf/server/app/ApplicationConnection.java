@@ -17,8 +17,6 @@
  */
 package org.jppf.server.app;
 
-import static org.jppf.server.JPPFStatsUpdater.*;
-
 import java.net.*;
 
 import org.apache.commons.logging.*;
@@ -89,7 +87,7 @@ public class ApplicationConnection extends JPPFConnection
 		resultSender = new ApplicationResultSender(socketClient);
 		InetAddress addr = socket.getInetAddress();
 		setName("appl [" + addr.getHostAddress() + ":" + socket.getPort() + "]");
-		if (isStatsEnabled()) newClientConnection();
+		if (JPPFDriver.getInstance().getStatsUpdater().isStatsEnabled()) JPPFDriver.getInstance().getStatsManager().newClientConnection();
 	}
 
 	/**
@@ -165,7 +163,7 @@ public class ApplicationConnection extends JPPFConnection
 	public void close()
 	{
 		super.close();
-		if (isStatsEnabled()) clientConnectionClosed();
+		JPPFDriver.getInstance().getStatsManager().clientConnectionClosed();
 	}
 
 	/**

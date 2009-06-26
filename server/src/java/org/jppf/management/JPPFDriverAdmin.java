@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.management;
+package org.jppf.management;
 
 import static org.jppf.server.protocol.BundleParameter.*;
 
@@ -26,7 +26,6 @@ import javax.crypto.SecretKey;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
-import org.jppf.management.*;
 import org.jppf.security.*;
 import org.jppf.server.*;
 import org.jppf.server.protocol.BundleParameter;
@@ -120,7 +119,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 */
 	public JPPFStats statistics()
 	{
-		return JPPFStatsUpdater.getStats();
+		return JPPFDriver.getInstance().getStatsUpdater().getStats();
 	}
 
 	/**

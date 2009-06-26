@@ -15,9 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.scheduler.bundle;
+package org.jppf.server.scheduler.bundle.impl;
 
-import org.jppf.server.JPPFStatsUpdater;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.scheduler.bundle.*;
+
 
 
 /**
@@ -59,7 +61,7 @@ public class FixedSizedBundler extends AbstractBundler
 	 */
 	public int getBundleSize() {
 		if (override) return overrideSize;
-		return JPPFStatsUpdater.getStaticBundleSize();
+		return JPPFDriver.getInstance().getStatsUpdater().getStaticBundleSize();
 	}
 
 	/**

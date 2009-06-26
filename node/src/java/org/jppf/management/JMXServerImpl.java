@@ -26,7 +26,6 @@ import javax.management.*;
 import javax.management.remote.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.management.spi.JPPFMBeanProviderManager;
 import org.jppf.node.JPPFClassLoader;
 import org.jppf.utils.*;
 
@@ -69,14 +68,6 @@ public class JMXServerImpl
 	 * Used to distinguish between driver and node RMI registries.
 	 */
 	private String namespaceSuffix = null;
-	/**
-	 * Manager for the MBean defined through the service provider interface.
-	 */
-	private JPPFMBeanProviderManager providerManager = new JPPFMBeanProviderManager();
-	/**
-	 * Keeps a list of MBeans registered with the MBean server.
-	 */
-	private List<String> registeredMBeanNames = new Vector<String>();
 
 	/**
 	 * Initialize this JMX server with the specified namespace suffix.
@@ -126,31 +117,6 @@ public class JMXServerImpl
 	}
 
 	/**
-	 * Register a management bean with the MBean server.
-	 * @param name the name of the bean to register.
-	 * @param mbean the management bean instance.
-	 * @param mbeanInterface the exposed interface of the management bean.
-	 * @throws Exception if the registration failed.
-	 */
-	public void registerMBean(String name, Object mbean, Class mbeanInterface) throws Exception
-	{
-		StandardMBean stdBean = new StandardMBean(mbean, mbeanInterface);
-    server.registerMBean(stdBean, new ObjectName(name));
-    registeredMBeanNames.add(name);
-	}
-
-	/**
-	 * Un register a management bean from the MBean server.
-	 * @param name the name of the bean to register.
-	 * @throws Exception if the de-registration failed.
-	 */
-	public void unregisterMBean(String name) throws Exception
-	{
-    server.unregisterMBean(new ObjectName(name));
-    registeredMBeanNames.remove(name);
-	}
-
-	/**
 	 * Stop the MBean server and associated resources.
 	 * @throws Exception if an error occurs when stopping the server or one of its components. 
 	 */
@@ -158,8 +124,6 @@ public class JMXServerImpl
 	{
 		stopped = true;
     connectorServer.stop();
-    List<String> names = new ArrayList<String>(registeredMBeanNames);
-    for (String name: names) unregisterMBean(name);
 	}
 
 	/**

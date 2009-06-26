@@ -19,7 +19,7 @@ package org.jppf.server;
 
 import java.io.Serializable;
 
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class hold server-wide statitics and settings.

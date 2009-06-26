@@ -18,13 +18,13 @@
 
 package org.jppf.server.queue;
 
-import static org.jppf.server.JPPFStatsUpdater.*;
 import static org.jppf.utils.CollectionUtils.*;
 
 import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**
@@ -69,7 +69,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		}
 		if (debugEnabled) log.debug("Maps size information:\n" + formatSizeMapInfo("priorityMap", priorityMap) + "\n" +
 			formatSizeMapInfo("sizeMap", sizeMap));
-		taskInQueue(bundle.getTaskCount());
+		JPPFDriver.getInstance().getStatsManager().taskInQueue(bundle.getTaskCount());
 		for (QueueListener listener : listeners) listener.newBundle(this);
 	}
 
@@ -95,6 +95,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 */
 	public BundleWrapper nextBundle(BundleWrapper bundleWrapper, int nbTasks)
 	{
+		if (nbTasks == 0)
+		{
+			int breakpoint = 0;
+		}
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		BundleWrapper result = null;
 		try
@@ -132,7 +136,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		}
 		if (debugEnabled) log.debug("Maps size information:\n" + formatSizeMapInfo("priorityMap", priorityMap) + "\n" +
 			formatSizeMapInfo("sizeMap", sizeMap));
-		taskOutOfQueue(result.getBundle().getTaskCount(), System.currentTimeMillis() - result.getBundle().getQueueEntryTime());
+		JPPFDriver.getInstance().getStatsManager().taskOutOfQueue(result.getBundle().getTaskCount(), System.currentTimeMillis() - result.getBundle().getQueueEntryTime());
 		return result;
 	}
 
@@ -161,8 +165,16 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 */
 	public int getMaxBundleSize()
 	{
-		latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
-		return latestMaxSize;
+		lock.lock();
+		try
+		{
+			latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
+			return latestMaxSize;
+		}
+		finally
+		{
+			lock.unlock();
+		}
 	}
 
 	/**

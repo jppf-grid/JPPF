@@ -18,7 +18,6 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import static org.jppf.server.JPPFStatsUpdater.*;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
@@ -26,6 +25,7 @@ import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 
 /**
@@ -83,13 +83,13 @@ public class WaitingResultsState extends NodeServerState
 				newBundle.setTaskCount(bundle.getTaskCount());
 			}
 			// updating stats
-			else if (isStatsEnabled())
+			else
 			{
 				if (newBundle.getNodeExecutionTime() > 1000000)
 				{
 					int breakpoint = 0;
 				}
-				taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getNodeMessage().getLength());
+				JPPFDriver.getInstance().getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getNodeMessage().getLength());
 				context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 			}
 			// notifing the client thread about the end of a bundle

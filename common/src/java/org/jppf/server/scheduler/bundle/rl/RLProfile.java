@@ -50,6 +50,10 @@ public class RLProfile extends AbstractAutoTuneProfile
 	 * The utility function's rate of change.
 	 */
 	private double rateOfChange = 0.9;
+	/**
+	 * Variation of the mean execution time that triggers a change in bundle size.
+	 */
+	private double performanceVariationThreshold = 0.05d;
 
 	/**
 	 * Initialize this profile with default parameters.
@@ -70,6 +74,7 @@ public class RLProfile extends AbstractAutoTuneProfile
 		increaseRate = props.getDouble(prefix + "increaseRate", 0.1);
 		discountFactor = props.getDouble(prefix + "discountFactor", 0.9);
 		rateOfChange = props.getDouble(prefix + "rateOfChange", 0.9);
+		performanceVariationThreshold = props.getDouble(prefix + "performanceVariationThreshold", 0.05);
 	}
 
 	/**
@@ -164,5 +169,14 @@ public class RLProfile extends AbstractAutoTuneProfile
 	public void setRateOfChange(double rateOfChange)
 	{
 		this.rateOfChange = rateOfChange;
+	}
+
+	/**
+	 * Get the variation of the mean execution time that triggers a change in bundle size.
+	 * @return the variation as a double value.
+	 */
+	public double getPerformanceVariationThreshold()
+	{
+		return performanceVariationThreshold;
 	}
 }

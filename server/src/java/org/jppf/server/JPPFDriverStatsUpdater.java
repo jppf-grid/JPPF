@@ -23,25 +23,25 @@ import java.util.concurrent.locks.ReentrantLock;
  * Instances of this class are used to collect statistics on the JPPF server.
  * @author Laurent Cohen
  */
-public final class JPPFStatsUpdater
+public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 {
 	/**
 	 * Used to synchronize access and updates to the stats from a large number of threads.
 	 */
-	private static ReentrantLock lock = new ReentrantLock();
+	private ReentrantLock lock = new ReentrantLock();
 	/**
 	 * The object that holds the stats.
 	 */
-	private static JPPFStats stats = new JPPFStats();
+	private JPPFStats stats = new JPPFStats();
 	/**
 	 * Flag to determine whether the statistics collection is enabled.
 	 */
-	private static boolean statsEnabled = true;
+	private boolean statsEnabled = true;
 	
 	/**
 	 * Called to notify that a new client is connected to he JPPF server.
 	 */
-	public static void newClientConnection()
+	public void newClientConnection()
 	{
 		lock.lock();
 		try
@@ -58,7 +58,7 @@ public final class JPPFStatsUpdater
 	/**
 	 * Called to notify that a new client has disconnected from he JPPF server.
 	 */
-	public static void clientConnectionClosed()
+	public void clientConnectionClosed()
 	{
 		lock.lock();
 		try
@@ -74,7 +74,7 @@ public final class JPPFStatsUpdater
 	/**
 	 * Called to notify that a new node is connected to he JPPF server.
 	 */
-	public static void newNodeConnection()
+	public void newNodeConnection()
 	{
 		lock.lock();
 		try
@@ -91,7 +91,7 @@ public final class JPPFStatsUpdater
 	/**
 	 * Called to notify that a new node is connected to he JPPF server.
 	 */
-	public static void nodeConnectionClosed()
+	public void nodeConnectionClosed()
 	{
 		lock.lock();
 		try
@@ -108,7 +108,7 @@ public final class JPPFStatsUpdater
 	 * Called to notify that a task was added to the queue.
 	 * @param count the number of tasks that have been added to the queue.
 	 */
-	public static void taskInQueue(int count)
+	public void taskInQueue(int count)
 	{
 		lock.lock();
 		try
@@ -127,7 +127,7 @@ public final class JPPFStatsUpdater
 	 * @param count the number of tasks that have been removed from the queue.
 	 * @param time the time the task remained in the queue.
 	 */
-	public static void taskOutOfQueue(int count, long time)
+	public void taskOutOfQueue(int count, long time)
 	{
 		lock.lock();
 		try
@@ -146,10 +146,10 @@ public final class JPPFStatsUpdater
 	 * Called when a task execution has completed.
 	 * @param count the number of tasks that have been executed.
 	 * @param time the time it took to execute the task, including transport to and from the node.
-	 * @param remoteTime the time it took to execute the in the node only.
+	 * @param remoteTime the time it took to execute the tasks in the node only.
 	 * @param size the size in bytes of the bundle that was sent to the node.
 	 */
-	public static void taskExecuted(int count, long time, long remoteTime, long size)
+	public void taskExecuted(int count, long time, long remoteTime, long size)
 	{
 		lock.lock();
 		try
@@ -170,7 +170,7 @@ public final class JPPFStatsUpdater
 	 * Get the stats maintained by this updater.
 	 * @return a <code>JPPFStats</code> instance.
 	 */
-	public static JPPFStats getStats()
+	public JPPFStats getStats()
 	{
 		return stats;
 	}
@@ -193,7 +193,7 @@ public final class JPPFStatsUpdater
 	 * Determine whether the statistics collection is enabled.
 	 * @return true if the statistics collection is enabled, false otherwise.
 	 */
-	public static boolean isStatsEnabled()
+	public boolean isStatsEnabled()
 	{
 		return statsEnabled;
 	}
@@ -202,7 +202,7 @@ public final class JPPFStatsUpdater
 	 * Get the current number of nodes connected to the server.
 	 * @return the numbe rof nodes as an int.
 	 */
-	public static int getNbNodes()
+	public int getNbNodes()
 	{
 		return stats.nbNodes;
 	}
@@ -211,7 +211,7 @@ public final class JPPFStatsUpdater
 	 * Get the maximum number of tasks in each task bundle.
 	 * @return the bundle size as an int.
 	 */
-	public static int getStaticBundleSize()
+	public int getStaticBundleSize()
 	{
 		lock.lock();
 		try
@@ -228,7 +228,7 @@ public final class JPPFStatsUpdater
 	 * Set the maximum number of tasks in each task bundle.
 	 * @param bundleSize the bundle size as an int.
 	 */
-	public static void setStaticBundleSize(int bundleSize)
+	public void setStaticBundleSize(int bundleSize)
 	{
 		lock.lock();
 		try

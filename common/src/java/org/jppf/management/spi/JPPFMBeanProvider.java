@@ -18,19 +18,23 @@
 
 package org.jppf.management.spi;
 
-import org.jppf.node.MonitoredNode;
 
 /**
- * Service provider interface for pluggable management beans for JPPF nodes.
+ * Service provider interface for pluggable management beans.
  * @author Laurent Cohen
  */
-public interface JPPFNodeMBeanProvider extends JPPFMBeanProvider
+public interface JPPFMBeanProvider
 {
 	/**
-	 * Return a concrete MBean.<br>
-	 * The class of this MBean must implement the interface defined by {@link JPPFMBeanProvider#getMBeanInterfaceName() getMBeanInterfaceName()}.
-	 * @param node - the JPPF node that is managed or monitored by the MBean.
-	 * @return an <code>Object</code> that is an implementation of the MBean interface.
+	 * Return the fully qualified name of the management interface defined by this provider.
+	 * @return the fully qualified interface name as a string.
 	 */
-	Object createMBean(MonitoredNode node);
+	String getMBeanInterfaceName();
+	/**
+	 * Return the name of the specified MBean.<br>
+	 * This is the name under which the MBean will be registered with the MBean server.
+	 * It must be a valid object name, as specified in the documentation for {@link javax.management.ObjectName ObjectName}.
+	 * @return the MBean name for this MBean provider.
+	 */
+	String getMBeanName();
 }

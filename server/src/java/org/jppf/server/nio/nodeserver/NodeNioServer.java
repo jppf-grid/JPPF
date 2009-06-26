@@ -30,7 +30,7 @@ import org.jppf.io.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.security.JPPFSecurityContext;
-import org.jppf.server.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.queue.*;
@@ -101,7 +101,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	public NodeNioServer(int[] ports, Bundler bundler) throws JPPFException
 	{
 		//super(ports, "NodeServer Thread", true);
-		super(ports, "NodeServer Thread", false);
+		super(ports, "NodeServer Thread", true);
 		this.selectTimeout = 1L;
 		this.bundlerRef = new AtomicReference<Bundler>(bundler);
 		getQueue().addListener(new QueueListener()
@@ -140,7 +140,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	public void postAccept(SelectionKey key)
 	{
-		JPPFStatsUpdater.newNodeConnection();
+		JPPFDriver.getInstance().getStatsManager().newNodeConnection();
 		SocketChannel channel = (SocketChannel) key.channel();
 		NodeContext context = (NodeContext) key.attachment();
 		try
@@ -351,7 +351,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 		try
 		{
 			channel.close();
-			JPPFStatsUpdater.nodeConnectionClosed();
+			JPPFDriver.getInstance().getStatsManager().nodeConnectionClosed();
 			if (context.getNodeUuid() != null)
 			{
 				JPPFDriver.getInstance().removeNodeInformation(channel);

@@ -21,7 +21,6 @@ package org.jppf.server.scheduler.bundle.proportional;
 import java.util.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.*;
 import org.jppf.server.scheduler.bundle.*;
 
 /**
@@ -73,7 +72,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	{
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		this.override = override;
-		int bundleSize = JPPFStatsUpdater.getStaticBundleSize();
+		int bundleSize = 1;
 		if (bundleSize < 1) bundleSize = 1;
 		this.profile = (ProportionalTuneProfile) profile;
 		log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize + ", profile: "+profile);
@@ -97,7 +96,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 */
 	public void setBundleSize(int size)
 	{
-		bundleSize = size;
+		bundleSize = (size <= 0) ? 1 : size;
 	}
 
 	/**

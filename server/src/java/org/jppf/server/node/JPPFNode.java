@@ -107,6 +107,10 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * The jmx server that handles administration and monitoring functions for this node.
 	 */
 	private static JMXServerImpl jmxServer = null;
+	/**
+	 * Manager for the MBean defined through the service provider interface.
+	 */
+	private JPPFMBeanProviderManager providerManager = null;
 
 	/**
 	 * Default constructor.
@@ -425,6 +429,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		}
 		try
 		{
+			providerManager.unregisterProviderMBeans();
 			getJmxServer().stop();
 		}
 		catch(Exception e)
@@ -523,16 +528,16 @@ public class JPPFNode extends AbstractMonitoredNode
 		ClassLoader cl = getClass().getClassLoader();
     ClassLoader tmp = Thread.currentThread().getContextClassLoader();
   	MBeanServer server = getJmxServer().getServer();
+  	if (providerManager == null) providerManager = new JPPFMBeanProviderManager(JPPFNodeMBeanProvider.class, server); 
     try
     {
 	    Thread.currentThread().setContextClassLoader(cl);
-	    JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager();
-			List<JPPFNodeMBeanProvider> list = mgr.findAllProviders();
+			List<JPPFNodeMBeanProvider> list = providerManager.getAllProviders();
 			for (JPPFNodeMBeanProvider provider: list)
 			{
 				Object o = provider.createMBean(this);
 				Class inf = Class.forName(provider.getMBeanInterfaceName());
-				boolean b = mgr.registerProviderMBean(o, inf, provider.getMBeanName(), server);
+				boolean b = providerManager.registerProviderMBean(o, inf, provider.getMBeanName());
 				if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + provider.getMBeanName() + "]");
 			}
     }
@@ -540,13 +545,14 @@ public class JPPFNode extends AbstractMonitoredNode
     {
 	    Thread.currentThread().setContextClassLoader(tmp);
     }
-    if (debugEnabled)
-    {
-    	ObjectName on = new ObjectName("org.jppf:name=SampleMBean");
-	    log.debug("classloader for SampleMBean: " + server.getClassLoaderFor(on));
-	    boolean b = server.isInstanceOf(on, "javax.management.NotificationBroadcaster");
-	    log.debug("Sample MBean instance of NotificationBroadcaster: " + b);
-    }
+	}
+
+	/**
+	 * Register all MBeans defined through the service provider interface.
+	 * @throws Exception if the registration failed.
+	 */
+	private void unregisterProviderMBeans() throws Exception
+	{
 	}
 
 	/**

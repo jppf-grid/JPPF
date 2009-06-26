@@ -85,29 +85,4 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	{
 		listeners.remove(listener);
 	}
-
-	/**
-	 * Get the next object in the queue.
-	 * This method only returns null and must be overriden by subclasses that want to use it.
-	 * @param nbTasks the maximum number of tasks to get out of the bundle.
-	 * @return the most recent object that was added to the queue.
-	 * @see org.jppf.server.queue.JPPFQueue#nextBundle(int)
-	 */
-	public BundleWrapper nextBundle(int nbTasks)
-	{
-		return null;
-	}
-
-	/**
-	 * Get the next object in the queue.
-	 * This method only returns null and must be overriden by subclasses that want to use it.
-	 * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
-	 * @param nbTasks the maximum number of tasks to get out of the bundle.
-	 * @return the most recent object that was added to the queue.
-	 * @see org.jppf.server.queue.JPPFQueue#nextBundle(int)
-	 */
-	public BundleWrapper nextBundle(BundleWrapper bundleWrapper, int nbTasks)
-	{
-		return null;
-	}
 }

@@ -21,13 +21,13 @@ package org.jppf.server.scheduler.bundle.impl;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.JPPFStatsUpdater;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.autotuned.AnnealingTuneProfile;
 
 /**
  * Instances of this bundler delegate their operations to a singleton instance of a
- * {@link org.jppf.server.scheduler.bundle.autotuned.AbstractAutoTunedBundler AutoTunedBundler}.
+ * {@link org.jppf.server.scheduler.bundle.impl.AbstractAutoTunedBundler AutoTunedBundler}.
  * @author Laurent Cohen
  */
 public class AutotunedDelegatingBundler extends AbstractBundler
@@ -63,7 +63,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	{
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		this.override = override;
-		int bundleSize = JPPFStatsUpdater.getStaticBundleSize();
+		int bundleSize = JPPFDriver.getInstance().getStatsUpdater().getStaticBundleSize();
 		if (bundleSize < 1)
 		{
 			bundleSize = 1;

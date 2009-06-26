@@ -21,18 +21,20 @@ import java.net.Socket;
 import java.nio.channels.*;
 import java.util.*;
 
+import javax.management.MBeanServer;
+
 import org.apache.commons.logging.*;
 import org.jppf.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.management.*;
+import org.jppf.management.spi.*;
 import org.jppf.security.*;
 import org.jppf.server.app.JPPFApplicationServer;
-import org.jppf.server.management.JPPFDriverAdmin;
 import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.peer.*;
 import org.jppf.server.queue.*;
-import org.jppf.server.scheduler.bundle.impl.*;
+import org.jppf.server.scheduler.bundle.impl.BundlerFactory;
 import org.jppf.utils.*;
 
 /**
@@ -47,7 +49,7 @@ public class JPPFDriver
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFDriver.class);
+	static Log log = LogFactory.getLog(JPPFDriver.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */
@@ -88,18 +90,26 @@ public class JPPFDriver
 	/**
 	 * A list of objects containing the information required to connect to the nodes JMX servers.
 	 */
-	private Map<SelectableChannel, NodeManagementInfo> nodeInfo =
-		new HashMap<SelectableChannel, NodeManagementInfo>();
+	private Map<SelectableChannel, NodeManagementInfo> nodeInfo = new HashMap<SelectableChannel, NodeManagementInfo>();
 	/**
 	 * The thread that performs the peer servers discovery.
 	 */
 	private PeerDiscoveryThread peerDiscoveryThread = null;
+	/**
+	 * This listener gathers the statistics published through the management interface.
+	 */
+	private JPPFDriverStatsUpdater statsUpdater = new JPPFDriverStatsUpdater();
+	/**
+	 * Generates the statistcs events of which all related listeners are notified.
+	 */
+	private JPPFDriverStatsManager statsManager = new JPPFDriverStatsManager();
 
 	/**
 	 * Initialize this JPPFDriver.
 	 */
 	protected JPPFDriver()
 	{
+		statsManager.addDriverStatsListener(statsUpdater);
 		initCredentials();
 	}
 
@@ -134,7 +144,8 @@ public class JPPFDriver
 			{
 				jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX);
 				jmxServer.start(getClass().getClassLoader());
-				jmxServer.registerMBean(JPPFAdminMBean.DRIVER_MBEAN_NAME, new JPPFDriverAdmin(), JPPFDriverAdminMBean.class);
+				//jmxServer.registerMBean(JPPFAdminMBean.DRIVER_MBEAN_NAME, new JPPFDriverAdmin(), JPPFDriverAdminMBean.class);
+				registerProviderMBeans();
 				System.out.println("JPPF Driver management initialized");
 			}
 		}
@@ -157,6 +168,25 @@ public class JPPFDriver
 		initPeers();
 		System.out.println("JPPF Driver initialization complete");
 	}
+
+	/**
+	 * Register all MBeans defined through the service provider interface.
+	 * @throws Exception if the registration failed.
+	 */
+	private void registerProviderMBeans() throws Exception
+	{
+  	MBeanServer server = getJmxServer().getServer();
+    JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager(JPPFDriverMBeanProvider.class, server);
+		List<JPPFDriverMBeanProvider> list = mgr.getAllProviders();
+		for (JPPFDriverMBeanProvider provider: list)
+		{
+			Object o = provider.createMBean();
+			Class inf = Class.forName(provider.getMBeanInterfaceName());
+			boolean b = mgr.registerProviderMBean(o, inf, provider.getMBeanName());
+			if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + provider.getMBeanName() + "]");
+		}
+	}
+
 
 	/**
 	 * Read configuration for the host name and ports used to conenct to this driver.
@@ -332,7 +362,7 @@ public class JPPFDriver
 	/**
 	 * Shutdown this server and all its components.
 	 */
-	private void shutdown()
+	public void shutdown()
 	{
 		classServer.end();
 		classServer = null;
@@ -411,6 +441,24 @@ public class JPPFDriver
 	}
 
 	/**
+	 * Get the listener that gathers the statistics published through the management interface.
+	 * @return a <code>JPPFStatsUpdater</code> instance.
+	 */
+	public JPPFDriverStatsUpdater getStatsUpdater()
+	{
+		return statsUpdater;
+	}
+
+	/**
+	 * Get a reference to the object that generates the statistcs events of which all related listeners are notified.
+	 * @return a <code>JPPFDriverStatsManager</code> instance.
+	 */
+	public JPPFDriverStatsManager getStatsManager()
+	{
+		return statsManager;
+	}
+
+	/**
 	 * Start the JPPF server.
 	 * @param args not used.
 	 */
@@ -436,79 +484,6 @@ public class JPPFDriver
 		{
 			log.fatal(e.getMessage(), e);
 			System.exit(1);
-		}
-	}
-	
-	/**
-	 * Task used by a timer to shutdown, and eventually restart, this server.<br>
-	 * Both shutdown and restart operations can be performed with a specified delay.
-	 */
-	private class ShutdownRestartTask extends TimerTask
-	{
-		/**
-		 * Determines whether the server should restart after shutdown is complete.
-		 */
-		private boolean restart = true;
-		/**
-		 * Delay, starting from shutdown completion, after which the server is restarted.
-		 */
-		private long restartDelay = 0L;
-		/**
-		 * The timer used to schedule this task, and eventually the restart operation.
-		 */
-		private Timer timer = null;
-
-		/**
-		 * Initialize this task with the specified parameters.<br>
-		 * The shutdown is initiated after the specified shutdown delay has expired.<br>
-		 * If the restart parameter is set to false then the JVM exits after the shutdown is complete.
-		 * @param timer the timer used to schedule this task, and eventually the restart operation.
-		 * @param restart determines whether the server should restart after shutdown is complete.
-		 * If set to false, then the JVM will exit.
-		 * @param restartDelay delay, starting from shutdown completion, after which the server is restarted.
-		 * A value of 0 or less means the server is restarted immediately after the shutdown is complete. 
-		 */
-		public ShutdownRestartTask(Timer timer, boolean restart, long restartDelay)
-		{
-			this.timer = timer;
-			this.restart = restart;
-			this.restartDelay = restartDelay;
-		}
-
-		/**
-		 * Perform the actual shutdown, and eventually restart, as specified in the constructor.
-		 * @see java.util.TimerTask#run()
-		 */
-		public void run()
-		{
-			log.info("Initiating shutdown");
-			shutdown();
-			if (!restart)
-			{
-				log.info("Performing requested exit");
-				System.exit(0);
-			}
-			else
-			{
-				TimerTask task = new TimerTask()
-				{
-					public void run()
-					{
-						try
-						{
-							log.info("Initiating restart");
-							System.exit(2);
-						}
-						catch(Exception e)
-						{
-							log.fatal(e.getMessage(), e);
-							throw new JPPFError("Could not restart the JPPFDriver");
-						}
-					}
-				};
-				cancel();
-				timer.schedule(task, restartDelay);
-			}
 		}
 	}
 }

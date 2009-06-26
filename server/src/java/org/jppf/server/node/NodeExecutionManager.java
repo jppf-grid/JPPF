@@ -143,7 +143,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 * @return a number identifying the task that was submitted.
 	 * @throws Exception if the execution failed.
 	 */
-	public long performTask(JPPFTask task) throws Exception
+	public synchronized long performTask(JPPFTask task) throws Exception
 	{
 		String id = task.getId();
 		long number = incTaskCount();

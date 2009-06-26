@@ -27,9 +27,10 @@ import org.apache.commons.logging.*;
 
 /**
  * Instances of this class manage all management plugins defined through the Service Provider Interface.
+ * @param <S> the SPI interface for the mbean provider.
  * @author Laurent Cohen
  */
-public class JPPFMBeanProviderManager
+public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
 {
 	/**
 	 * Logger for this class.
@@ -40,31 +41,46 @@ public class JPPFMBeanProviderManager
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The service registry for all mbean providers.
+	 * The class of the mbean provider interface.
 	 */
-	private ServiceRegistry registry = null;
+	private Class<S> providerClass = null;
+	/**
+	 * The list of providers found in the class path.
+	 */
+	private List<S> providerList = null;
+	/**
+	 * Keeps a list of MBeans registered with the MBean server.
+	 */
+	private List<String> registeredMBeanNames = new Vector<String>();
+	/**
+	 * The mbean server with which all mbeans are registered.
+	 */
+	private MBeanServer server = null;
 
 	/**
 	 * Initialize this mbean provider manager.
+	 * @param clazz the class object for the provider interface.
+	 * @param server - the MBean server on which to register.
 	 */
-	public JPPFMBeanProviderManager()
+	public JPPFMBeanProviderManager(Class<S> clazz, MBeanServer server)
 	{
-		List<Class<?>> categories = new ArrayList<Class<?>>();
-		categories.add(JPPFNodeMBeanProvider.class);
-		registry = new ServiceRegistry(categories.iterator());
+		this.providerClass = clazz;
+		this.server = server;
 	}
 
 	/**
-	 * Retrieve all defined MBean providers.
-	 * @return a list of <code>JPPFMBeanProvider</code> instances.
+	 * Retrieve all defined MBean providers for the specified provider interface.
+	 * @return a list of <code>S</code> instances.
 	 */
-	public List<JPPFNodeMBeanProvider> findAllProviders()
+	public List<S> getAllProviders()
 	{
-		List<JPPFNodeMBeanProvider> list = new ArrayList<JPPFNodeMBeanProvider>();
-		//Iterator<JPPFMBeanProvider> it = registry.getServiceProviders(JPPFMBeanProvider.class, false);
-		Iterator<JPPFNodeMBeanProvider> it = ServiceRegistry.lookupProviders(JPPFNodeMBeanProvider.class);
-		while (it.hasNext()) list.add(it.next());
-		return list;
+		if (providerList == null)
+		{
+			providerList = new ArrayList<S>();
+			Iterator<S> it = ServiceRegistry.lookupProviders(providerClass);
+			while (it.hasNext()) providerList.add(it.next());
+		}
+		return providerList;
 	}
 
 	/**
@@ -73,19 +89,15 @@ public class JPPFMBeanProviderManager
 	 * @param impl - the MBean implementation.
 	 * @param intf - the MBean exposed interface.
 	 * @param name - the MBean name.
-	 * @param server - the MBean server on which to register.
 	 * @return true if the registration succeeded, false otherwise.
 	 */
-	public <T> boolean registerProviderMBean(T impl, Class<T> intf, String name, MBeanServer server)
+	public <T> boolean registerProviderMBean(T impl, Class<T> intf, String name)
 	{
 		try
 		{
 			if (debugEnabled) log.debug("found MBean provider: [name="+name+", inf="+intf+", impl="+impl.getClass().getName()+"]");
 			server.registerMBean(impl, new ObjectName(name));
-			/*
-			StandardMBean std = new JPPFStandardMBean(impl, intf);
-			server.registerMBean(std, new ObjectName(name));
-			*/
+			registeredMBeanNames.add(name);
 			return true;
 		}
 		catch(Exception e)
@@ -96,45 +108,21 @@ public class JPPFMBeanProviderManager
 	}
 
 	/**
-	 * Custom Standard MBean implementation.
+	 * Un-register all registered mbeans.
 	 */
-	public static class JPPFStandardMBean extends StandardMBean
+	public void unregisterProviderMBeans()
 	{
-		/**
-		 * The class loader that loaded the implementation and interface.
-		 */
-		private ClassLoader cl = null;
-
-		/**
-		 * Initialize this standard MBean.
-		 * @param implementation - the MBean's implementation.
-		 * @param mbeanInterface - the MBean's interface.
-		 * @throws NotCompliantMBeanException if the MBean does not comply tot he JMX specifications for MBeans.
-		 */
-		public JPPFStandardMBean(Object implementation, Class mbeanInterface) throws NotCompliantMBeanException
+		while (!registeredMBeanNames.isEmpty())
 		{
-			super(implementation, mbeanInterface);
-			cl = mbeanInterface.getClassLoader();
-		}
-
-		/**
-		 * Overriden to prevent MBeanInfo caching.
-		 * @param info - the new MBeanInfo to cache.
-		 * @see javax.management.StandardMBean#cacheMBeanInfo(javax.management.MBeanInfo)
-		 */
-		protected synchronized void cacheMBeanInfo(MBeanInfo info)
-		{
-			super.cacheMBeanInfo(info);
-		}
-
-		/**
-		 * Overriden to prevent MBeanInfo caching.
-		 * @return null.
-		 * @see javax.management.StandardMBean#getCachedMBeanInfo()
-		 */
-		protected synchronized MBeanInfo getCachedMBeanInfo()
-		{
-			return super.getCachedMBeanInfo();
+			String s = registeredMBeanNames.remove(0);
+			try
+			{
+				server.unregisterMBean(new ObjectName(s));
+			}
+			catch(Exception e)
+			{
+				log.error(e.getMessage(), e);
+			}
 		}
 	}
 }

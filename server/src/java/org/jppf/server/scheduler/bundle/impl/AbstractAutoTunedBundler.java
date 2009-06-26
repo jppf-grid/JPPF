@@ -15,13 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.scheduler.bundle.autotuned;
+package org.jppf.server.scheduler.bundle.impl;
 
 import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.server.*;
 import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.autotuned.AnnealingTuneProfile;
 
 /**
  * This class implements a self tuned bundle size algorithm. It starts using the
@@ -82,7 +83,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	{
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		this.override = override;
-		currentSize = JPPFStatsUpdater.getStaticBundleSize();
+		currentSize = JPPFDriver.getInstance().getStatsUpdater().getStaticBundleSize();
 		if (currentSize < 1) currentSize = 1;
 		log.info("Bundler#" + bundlerNumber + ": The initial size is " + currentSize);
 		this.profile = profile;

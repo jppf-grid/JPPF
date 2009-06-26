@@ -21,12 +21,12 @@ import static org.jppf.server.protocol.BundleParameter.*;
 
 import java.util.Map;
 
-import org.jppf.server.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.BundleParameter;
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.server.scheduler.bundle.autotuned.*;
-import org.jppf.server.scheduler.bundle.proportional.*;
-import org.jppf.server.scheduler.bundle.rl.*;
+import org.jppf.server.scheduler.bundle.autotuned.AnnealingTuneProfile;
+import org.jppf.server.scheduler.bundle.proportional.ProportionalTuneProfile;
+import org.jppf.server.scheduler.bundle.rl.RLProfile;
 import org.jppf.utils.*;
 
 /**
@@ -126,7 +126,7 @@ public final class BundlerFactory
 		if (MANUAL_ALGORITHM.equalsIgnoreCase(algorithm))
 		{
 			Number n = (Number) map.get(BUNDLE_SIZE_PARAM);
-			if (n == null) n = JPPFStatsUpdater.getStaticBundleSize();
+			if (n == null) n = JPPFDriver.getInstance().getStatsUpdater().getStaticBundleSize();
 			bundler = createFixedSizeBundler(n.intValue());
 		}
 		else
