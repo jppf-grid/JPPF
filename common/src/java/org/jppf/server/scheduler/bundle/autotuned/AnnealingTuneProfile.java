@@ -20,7 +20,7 @@ package org.jppf.server.scheduler.bundle.autotuned;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.jppf.server.scheduler.bundle.AutoTuneProfile;
+import org.jppf.server.scheduler.bundle.LoadBalancingProfile;
 import org.jppf.utils.*;
 
 
@@ -102,6 +102,20 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 		maxGuessToStable = props.getInt(prefix + "maxGuessToStable", 10);
 		sizeRatioDeviation = props.getFloat(prefix + "sizeRatioDeviation", 1.5f);
 		decreaseRatio = props.getFloat(prefix + "decreaseRatio", 0.2f);
+	}
+
+	/**
+	 * Initialize this profile with values read from the configuration file.
+	 * @param config contains a mapping of the profile parameters to their value.
+	 */
+	public AnnealingTuneProfile(TypedProperties config)
+	{
+		minSamplesToAnalyse = config.getInt("minSamplesToAnalyse", 500);
+		minSamplesToCheckConvergence = config.getInt("minSamplesToCheckConvergence", 300);
+		maxDeviation = config.getDouble("maxDeviation", 0.2d);
+		maxGuessToStable = config.getInt("maxGuessToStable", 10);
+		sizeRatioDeviation = config.getFloat("sizeRatioDeviation", 1.5f);
+		decreaseRatio = config.getFloat("decreaseRatio", 0.2f);
 	}
 
 	/**
@@ -253,9 +267,9 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	/**
 	 * Make a copy of this profile.
 	 * @return a newly created <code>AutoTuneProfile</code> instance.
-	 * @see org.jppf.server.scheduler.bundle.AutoTuneProfile#copy()
+	 * @see org.jppf.server.scheduler.bundle.LoadBalancingProfile#copy()
 	 */
-	public AutoTuneProfile copy()
+	public LoadBalancingProfile copy()
 	{
 		AnnealingTuneProfile p = new AnnealingTuneProfile();
 		p.minSamplesToAnalyse = minSamplesToAnalyse;

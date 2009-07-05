@@ -46,7 +46,7 @@ public class ClientProportionalBundler extends AbstractProportionalBundler
 	 * @param profile the parameters of the auto-tuning algorithm,
 	 * grouped as a performance analysis profile.
 	 */
-	public ClientProportionalBundler(AutoTuneProfile profile)
+	public ClientProportionalBundler(LoadBalancingProfile profile)
 	{
 		super(profile, false);
 	}

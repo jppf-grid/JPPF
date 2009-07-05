@@ -18,42 +18,28 @@
 
 package org.jppf.server.scheduler.bundle.rl;
 
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.LoadBalancingProfile;
 import org.jppf.server.scheduler.bundle.autotuned.AbstractAutoTuneProfile;
 import org.jppf.utils.*;
 
 /**
- * Paremeters profile for a proportional bundler. 
+ * Parameters profile for a proportional bundler. 
  * @author Laurent Cohen
  */
 public class RLProfile extends AbstractAutoTuneProfile
 {
 	/**
-	 * A default profile with default parameter values.
-	 */
-	private static AtomicReference<RLProfile> defaultProfile = new AtomicReference<RLProfile>(new RLProfile());
-	/**
 	 * The maximum szie of the performance samples cache.
 	 */
 	private int performanceCacheSize = 2000;
 	/**
-	 * The bundle size increase rate.
-	 */
-	private double increaseRate = 0.1;
-	/**
-	 * The utility function's discount factor.
-	 */
-	private double discountFactor = 0.9;
-	/**
-	 * The utility function's rate of change.
-	 */
-	private double rateOfChange = 0.9;
-	/**
 	 * Variation of the mean execution time that triggers a change in bundle size.
 	 */
 	private double performanceVariationThreshold = 0.05d;
+	/**
+	 * The absolute value of the maximum increase of the the bundle size.
+	 */
+	private int maxActionRange = 50;
 
 	/**
 	 * Initialize this profile with default parameters.
@@ -71,22 +57,32 @@ public class RLProfile extends AbstractAutoTuneProfile
 		String prefix = "strategy." + profileName + ".";
 		TypedProperties props = JPPFConfiguration.getProperties();
 		performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000);
-		increaseRate = props.getDouble(prefix + "increaseRate", 0.1);
-		discountFactor = props.getDouble(prefix + "discountFactor", 0.9);
-		rateOfChange = props.getDouble(prefix + "rateOfChange", 0.9);
 		performanceVariationThreshold = props.getDouble(prefix + "performanceVariationThreshold", 0.05);
+		maxActionRange = props.getInt(prefix + "maxActionRange", 50);
+	}
+
+	/**
+	 * Initialize this profile with values read from the specified configuration.
+	 * @param config contains a mapping of the profile parameters to their value.
+	 */
+	public RLProfile(TypedProperties config)
+	{
+		performanceCacheSize = config.getInt("performanceCacheSize", 2000);
+		performanceVariationThreshold = config.getDouble("performanceVariationThreshold", 0.05);
+		maxActionRange = config.getInt("maxActionRange", 50);
 	}
 
 	/**
 	 * Make a copy of this profile.
 	 * @return a new <code>AutoTuneProfile</code> instance.
-	 * @see org.jppf.server.scheduler.bundle.AutoTuneProfile#copy()
+	 * @see org.jppf.server.scheduler.bundle.LoadBalancingProfile#copy()
 	 */
-	public AutoTuneProfile copy()
+	public LoadBalancingProfile copy()
 	{
 		RLProfile other = new RLProfile();
 		other.setPerformanceCacheSize(performanceCacheSize);
-		other.setIncreaseRate(increaseRate);
+		other.setPerformanceVariationThreshold(performanceVariationThreshold);
+		other.setMaxActionRange(maxActionRange);
 		return other;
 	}
 
@@ -101,74 +97,11 @@ public class RLProfile extends AbstractAutoTuneProfile
 
 	/**
 	 * Set the maximum size of the performance samples cache.
-	 * @param performanceCacheSize the cache size as an int.
+	 * @param performanceCacheSize - the cache size as an int.
 	 */
 	public void setPerformanceCacheSize(int performanceCacheSize)
 	{
 		this.performanceCacheSize = performanceCacheSize;
-	}
-
-	/**
-	 * Get the proportionality factor.
-	 * @return the factor as a double.
-	 */
-	public double getIncreaseRate()
-	{
-		return increaseRate;
-	}
-
-	/**
-	 * Set the increase rate.
-	 * @param increaseRate the factor as a double.
-	 */
-	public void setIncreaseRate(double increaseRate)
-	{
-		this.increaseRate = increaseRate;
-	}
-
-	/**
-	 * Get the default profile with default parameter values.
-	 * @return a <code>ProportionalTuneProfile</code> singleton instance.
-	 */
-	public static RLProfile getDefaultProfile()
-	{
-		return defaultProfile.get();
-	}
-
-	/**
-	 * Get the utility function's discount factor.
-	 * @return the discount factor as a double.
-	 */
-	public double getDiscountFactor()
-	{
-		return discountFactor;
-	}
-
-	/**
-	 * Set the utility function's discount factor.
-	 * @param discountFactor the discount factor as a double.
-	 */
-	public void setDiscountFactor(double discountFactor)
-	{
-		this.discountFactor = discountFactor;
-	}
-
-	/**
-	 * Get the utility function's rate of change.
-	 * @return the rate of change as a double.
-	 */
-	public double getRateOfChange()
-	{
-		return rateOfChange;
-	}
-
-	/**
-	 * Set the utility function's rate of change.
-	 * @param rateOfChange the rate of change as a double.
-	 */
-	public void setRateOfChange(double rateOfChange)
-	{
-		this.rateOfChange = rateOfChange;
 	}
 
 	/**
@@ -178,5 +111,32 @@ public class RLProfile extends AbstractAutoTuneProfile
 	public double getPerformanceVariationThreshold()
 	{
 		return performanceVariationThreshold;
+	}
+
+	/**
+	 * Get the variation of the mean execution time that triggers a change in bundle size.
+	 * @param performanceVariationThreshold - the variation as a double value.
+	 */
+	public void setPerformanceVariationThreshold(double performanceVariationThreshold)
+	{
+		this.performanceVariationThreshold = performanceVariationThreshold;
+	}
+
+	/**
+	 * Get the absolute value of the maximum increase of the the bundle size.
+	 * @return the value as an int.
+	 */
+	public int getMaxActionRange()
+	{
+		return maxActionRange;
+	}
+
+	/**
+	 * Get the absolute value of the maximum increase of the the bundle size.
+	 * @param maxActionRange - the value as an int.
+	 */
+	public void setMaxActionRange(int maxActionRange)
+	{
+		this.maxActionRange = maxActionRange;
 	}
 }

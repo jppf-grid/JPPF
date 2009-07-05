@@ -50,10 +50,6 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 */
 	private static Set<AbstractProportionalBundler> bundlers = new HashSet<AbstractProportionalBundler>();
 	/**
-	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
-	 */
-	protected ProportionalTuneProfile profile;
-	/**
 	 * Bounded memory of the past performance updates.
 	 */
 	protected BundleDataHolder dataHolder = null;
@@ -64,19 +60,17 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
-	 * @param profile the parameters of the auto-tuning algorithm,
-	 * @param override true if the settings were overriden by the node, false otherwise.
-	 * grouped as a performance analysis profile.
+	 * @param profile the parameters of the laod-balancing algorithm,
+	 * @param overriden true if the settings were overriden by the node, false otherwise.
 	 */
-	public AbstractProportionalBundler(AutoTuneProfile profile, boolean override)
+	public AbstractProportionalBundler(LoadBalancingProfile profile, boolean overriden)
 	{
+		super(profile, overriden);
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
-		this.override = override;
 		int bundleSize = 1;
 		if (bundleSize < 1) bundleSize = 1;
-		this.profile = (ProportionalTuneProfile) profile;
 		log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize + ", profile: "+profile);
-		dataHolder = new BundleDataHolder(this.profile.getPerformanceCacheSize());
+		dataHolder = new BundleDataHolder(((ProportionalTuneProfile) profile).getPerformanceCacheSize());
 	}
 
 	/**
@@ -220,73 +214,12 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 */
 	public double normalize(double x)
 	{
-		return 1d / (1d + (x <= 0d ? 0d : Math.log(1d + profile.getProportionalityFactor() * x)));
-		//return Math.exp(-profile.getProportionalityFactor() * x);
+		return 1d / (1d + (x <= 0d ? 0d : Math.log(1d + ((ProportionalTuneProfile) profile).getProportionalityFactor() * x)));
+		//return Math.exp(-((ProportionalTuneProfile) profile).getProportionalityFactor() * x);
 		/*
 		double r = 1d;
-		for (int i=0; i<profile.getProportionalityFactor(); i++) r *= x;
+		for (int i=0; i<((ProportionalTuneProfile) profile).getProportionalityFactor(); i++) r *= x;
 		return 1d/r;
 		*/
-	}
-
-	/**
-	 * Update the bundler sizes.
-	 */
-	private void computeBundleSizes2()
-	{
-		synchronized(bundlers)
-		{
-			double maxMean = Double.NEGATIVE_INFINITY;
-			double minMean = Double.POSITIVE_INFINITY;
-			AbstractProportionalBundler minBundler = null;
-			for (AbstractProportionalBundler b: bundlers)
-			{
-				BundleDataHolder h = b.getDataHolder();
-				double m = h.getMean();
-				if (m > maxMean) maxMean = m;
-				if (m < minMean)
-				{
-					minMean = m;
-					minBundler = b;
-				}
-			}
-			BundleDataHolder minHolder = minBundler.getDataHolder();
-			double diffSum = 0d;
-			for (AbstractProportionalBundler b: bundlers)
-			{
-				double diff = maxMean / b.getDataHolder().getMean();
-				diffSum += b.normalize(diff);
-			}
-			int max = maxSize();
-			int sum = 0;
-			for (AbstractProportionalBundler b: bundlers)
-			{
-				BundleDataHolder h = b.getDataHolder();
-				double diff = maxMean / h.getMean();
-				double d = b.normalize(diff) / diffSum;
-				int size = Math.max(1, (int) (max * d));
-				b.setBundleSize(size);
-				sum += size;
-			}
-			/*
-			if (sum < max)
-			{
-				int size = minBundler.getBundleSize();
-				minBundler.setBundleSize(size + (max - sum));
-			}
-			*/
-			if (debugEnabled)
-			{
-				StringBuilder sb = new StringBuilder();
-				sb.append("bundler info:\n");
-				sb.append("minMean = ").append(minMean).append(", maxMean = ").append(maxMean).append(", diffSum = ").append(diffSum).append(", maxSize = ").append(max).append("\n");
-				for (AbstractProportionalBundler b: bundlers)
-				{
-					sb.append("bundler #").append(b.getBundlerNumber()).append(" : ").append(b.getBundleSize()).append(":\n");
-					sb.append("  ").append(b.getDataHolder()).append("\n");
-				}
-				log.debug(sb.toString());
-			}
-		}
 	}
 }

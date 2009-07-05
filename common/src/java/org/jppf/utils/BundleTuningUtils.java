@@ -18,11 +18,7 @@
 
 package org.jppf.utils;
 
-import static org.jppf.server.protocol.BundleParameter.*;
-
-import java.util.*;
-
-import org.jppf.server.protocol.BundleParameter;
+import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 
 /**
  * This class provides a set of utility methods for accessing and operating on bundle tuning. 
@@ -41,26 +37,15 @@ public final class BundleTuningUtils
 	 * Get a configured bundle size tuning profile form the configuration file.
 	 * @return an <code>AnnealingTuneProfile</code> instance, or null if no profile was configured.
 	 */
-	public static Map<BundleParameter, Object> getBundleTunningParameters()
+	public static TypedProperties getBundleTunningParameters()
 	{
 		TypedProperties cfg = JPPFConfiguration.getProperties();
 		String s = cfg.getString("task.bundle.strategy");
 		if (s == null) return null;
 		
-		Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
-		params.put(BUNDLE_TUNING_TYPE_PARAM, s);
-		params.put(BUNDLE_SIZE_PARAM, cfg.getInt("task.bundle.size", 10));
-		if ("autotuned".equalsIgnoreCase(s))
-		{
-			String profile = cfg.getString("task.bundle.autotuned.strategy", "smooth");
-			String prefix = "strategy." + profile + ".";
-			params.put(MIN_SAMPLES_TO_ANALYSE, cfg.getInt(prefix + "minSamplesToAnalyse", 500));
-			params.put(MIN_SAMPLES_TO_CHECK_CONVERGENCE, cfg.getInt(prefix + "minSamplesToCheckConvergence", 300));
-			params.put(MAX_DEVIATION, cfg.getDouble(prefix + "maxDeviation", 0.2d));
-			params.put(MAX_GUESS_TO_STABLE, cfg.getInt(prefix + "maxGuessToStable", 10));
-			params.put(SIZE_RATIO_DEVIATION, cfg.getFloat(prefix + "sizeRatioDeviation", 1.5f));
-			params.put(DECREASE_RATIO, cfg.getFloat(prefix + "decreaseRatio", 0.2f));
-		}
+		String profile = cfg.getString("task.bundle.autotuned.strategy", "smooth");
+		TypedProperties params = new JPPFBundlerFactory().convertJPPFConfiguration(profile, cfg);
+		params.put("strategy", s);
 		return params;
 	}
 }

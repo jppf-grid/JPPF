@@ -74,11 +74,22 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	}
 
 	/**
+	 * Initialize this profile with values read from the configuration file.
+	 * @param config contains a mapping of the profile parameters to their value.
+	 */
+	public ProportionalTuneProfile(TypedProperties config)
+	{
+		if (debugEnabled) log.debug("in constructor with profile name");
+		performanceCacheSize = config.getInt("performanceCacheSize", 2000);
+		proportionalityFactor = config.getInt("proportionalityFactor", 2);
+	}
+
+	/**
 	 * Make a copy of this profile.
 	 * @return a new <code>AutoTuneProfile</code> instance.
-	 * @see org.jppf.server.scheduler.bundle.AutoTuneProfile#copy()
+	 * @see org.jppf.server.scheduler.bundle.LoadBalancingProfile#copy()
 	 */
-	public AutoTuneProfile copy()
+	public LoadBalancingProfile copy()
 	{
 		ProportionalTuneProfile other = new ProportionalTuneProfile();
 		other.setPerformanceCacheSize(performanceCacheSize);

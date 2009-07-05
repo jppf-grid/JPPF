@@ -18,8 +18,6 @@
 
 package org.jppf.server.scheduler.bundle.rl;
 
-import java.util.*;
-
 import org.apache.commons.logging.*;
 import org.jppf.server.scheduler.bundle.*;
 
@@ -38,34 +36,13 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The range of actions, expressed in terms of a percentage of increase/decrease of the bundle size.
-	 */
-	private static final int INCREASE_RANGE = 50;
-	/**
 	 * The incrementation step of the action.
 	 */
 	private static final int STEP = 1;
 	/**
-	 * The number of possible actions.
-	 */
-	private static final int NB_ACTIONS = 2 * INCREASE_RANGE + 1;
-	/**
-	 * List of all currently active bundlers. Should always be used within a <code>synchronized(bundlers)</code> statement.
-	 */
-	//private static Set<AbstractRLBundler> bundlers = new HashSet<AbstractRLBundler>();
-	//private static Set<BundleDataHolder> allDataHolders = new HashSet<BundleDataHolder>();
-	/**
 	 * Action to take.
 	 */
-	protected int action = INCREASE_RANGE;
-	/**
-	 * Index of the actrion taken.
-	 */
-	protected int actionIndex = -1;
-	/**
-	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
-	 */
-	protected RLProfile profile = null;
+	protected int action = STEP;
 	/**
 	 * Bounded memory of the past performance updates.
 	 */
@@ -78,25 +55,21 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 * The previous bundle size.
 	 */
 	protected int prevBundleSize = 1;
-	/**
-	 * Pseudo-random number generator.
-	 */
-	protected Random rand = new Random(System.currentTimeMillis());
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
 	 * @param profile the parameters of the auto-tuning algorithm,
-	 * @param override true if the settings were overriden by the node, false otherwise.
+	 * @param overriden true if the settings were overriden by the node, false otherwise.
 	 * grouped as a performance analysis profile.
 	 */
-	public AbstractRLBundler(AutoTuneProfile profile, boolean override)
+	public AbstractRLBundler(LoadBalancingProfile profile, boolean overriden)
 	{
+		super(profile, overriden);
 		log.info("Bundler#" + bundlerNumber + ": Using Reinforcement Learning bundle size");
-		this.override = override;
-		this.profile = (RLProfile) profile;
 		log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize +
-			", performanceVariationThreshold = " + this.profile.getPerformanceVariationThreshold());
-		this.dataHolder = new BundleDataHolder(this.profile.getPerformanceCacheSize());
+			", performanceVariationThreshold = " + ((RLProfile) profile).getPerformanceVariationThreshold());
+		this.dataHolder = new BundleDataHolder(((RLProfile) profile).getPerformanceCacheSize());
+		this.action = ((RLProfile) profile).getMaxActionRange();
 	}
 
 	/**
@@ -131,7 +104,7 @@ public abstract class AbstractRLBundler extends AbstractBundler
 		dataHolder.addSample(sample);
 
 		double d = dataHolder.getPreviousMean() - dataHolder.getMean();
-		double threshold = profile.getPerformanceVariationThreshold() * dataHolder.getPreviousMean();
+		double threshold = ((RLProfile) profile).getPerformanceVariationThreshold() * dataHolder.getPreviousMean();
 		int n = bundleSize - prevBundleSize;
 		prevBundleSize = bundleSize;
 		if (d < -threshold)
@@ -144,8 +117,9 @@ public abstract class AbstractRLBundler extends AbstractBundler
 		}
 		//else action = (int) -Math.signum(d) * (int) Math.signum(action) * STEP;
 		else action = 0;
-		if (action > INCREASE_RANGE) action = INCREASE_RANGE;
-		else if (action < -INCREASE_RANGE) action = -INCREASE_RANGE;
+		int maxActionRange = ((RLProfile) profile).getMaxActionRange();
+		if (action > maxActionRange) action = maxActionRange;
+		else if (action < -maxActionRange) action = -maxActionRange;
 		bundleSize += action;
 		//int max = Math.max(1, maxSize());
 		int max = maxSize();
@@ -175,24 +149,6 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	public void dispose()
 	{
 		dataHolder = null;
-	}
-
-	/**
-	 * Get a string representation of an array of double values.
-	 * @param array the array to convert top a string.
-	 * @return a string representation of the array.
-	 */
-	private String dumpArray(double[] array)
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("[");
-		for (int i=0; i<array.length; i++)
-		{
-			if (i> 0) sb.append(", ");
-			sb.append(array[i]);
-		}
-		sb.append("]");
-		return sb.toString();
 	}
 
 	/**

@@ -41,7 +41,29 @@ public abstract class AbstractBundler implements Bundler
 	/**
 	 * The override indicator.
 	 */
-	protected boolean override = false;
+	protected boolean overriden = false;
+	/**
+	 * Parameters of the algorithm, grouped as a performance analysis profile.
+	 */
+	protected LoadBalancingProfile profile;
+
+	/**
+	 * Default constructor.
+	 */
+	private AbstractBundler()
+	{
+	}
+
+	/**
+	 * Creates a new instance with the specified parameters profile and overriden flag.
+	 * @param profile the parameters of the load-balancing algorithm,
+	 * @param overriden true if the settings were overriden by the node, false otherwise.
+	 */
+	public AbstractBundler(LoadBalancingProfile profile, boolean overriden)
+	{
+		this.profile = profile;
+		this.overriden = overriden;
+	}
 
 	/**
 	 * Increment the bundlers count by one.
@@ -82,20 +104,20 @@ public abstract class AbstractBundler implements Bundler
 	/**
 	 * Get the  override indicator.
 	 * @return true if the settings were overriden by the node, false otherwise.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#isOverride()
+	 * @see org.jppf.server.scheduler.bundle.Bundler#isOverriden()
 	 */
-	public boolean isOverride()
+	public boolean isOverriden()
 	{
-		return override;
+		return overriden;
 	}
 
 	/**
 	 * Set the  override indicator.
 	 * @param override true if the settings were overriden by the node, false otherwise.
 	 */
-	public void setOverride(boolean override)
+	public void setOverriden(boolean override)
 	{
-		this.override = override;
+		this.overriden = override;
 	}
 
 	/**
@@ -121,5 +143,15 @@ public abstract class AbstractBundler implements Bundler
 	 */
 	public void dispose()
 	{
+	}
+
+	/**
+	 * Get the parameters of the algorithm, grouped as a performance analysis profile.
+	 * @return an instance of <code>LoadBalancingProfile</code>.
+	 * @see org.jppf.server.scheduler.bundle.Bundler#getProfile()
+	 */
+	public LoadBalancingProfile getProfile()
+	{
+		return profile;
 	}
 }

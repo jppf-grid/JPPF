@@ -17,7 +17,6 @@
  */
 package org.jppf.server.scheduler.bundle;
 
-import org.apache.commons.logging.*;
 
 /**
  * This is the interface of all strategies for defining bundle task size.
@@ -25,18 +24,10 @@ import org.apache.commons.logging.*;
  * can it be fixed or auto-tunned.
  * 
  * @author Domingos Creado
+ * @author Laurent COhen
  */
-public interface Bundler {
-	
-	/**
-	 * Logger for this class.
-	 */
-	Log LOG = LogFactory.getLog(Bundler.class);
-	/**
-	 * Determines whether debugging level is set for logging.
-	 */
-	boolean DEBUG_ENABLED = LOG.isDebugEnabled();
-
+public interface Bundler
+{
 	/**
 	 * Get the current size of bundle.
 	 * @return  the bundle size as an int value.
@@ -58,23 +49,32 @@ public interface Bundler {
 	 * @return a new <code>Bundler</code> instance.
 	 */
 	Bundler copy();
+
 	/**
 	 * Get the timestamp at which this bundler was created.
 	 * This is used to enable node channels to know when the bundler settings have changed.
 	 * @return the timestamp as a long value.
 	 */
 	long getTimestamp();
+
 	/**
 	 * Get the  override indicator.
 	 * @return true if the settings were overriden by the node, false otherwise.
 	 */
-	boolean isOverride();
+	boolean isOverriden();
+
 	/**
 	 * Release the resources used by this bundler.
 	 */
 	void dispose();
+
 	/**
 	 * Perform context-independant initializations.
 	 */
 	void setup();
+	/**
+	 * Get the parameters profile used by this load-balancer.
+	 * @return an instance of <code>LoadBalancingProfile</code>.
+	 */
+	LoadBalancingProfile getProfile();
 }

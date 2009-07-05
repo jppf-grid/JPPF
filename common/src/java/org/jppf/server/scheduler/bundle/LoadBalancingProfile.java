@@ -22,12 +22,13 @@ import java.io.Serializable;
 /**
  * This interface defines the set of parameters used by the auto-compute algorithm.
  * @author Domingos Creado
+ * @author Laurent Cohen
  */
-public interface AutoTuneProfile extends Serializable {
-
+public interface LoadBalancingProfile extends Serializable
+{
 	/**
 	 * Make a copy of this profile.
 	 * @return a newly created <code>AutoTuneProfile</code> instance.
 	 */
-	AutoTuneProfile copy();
+	LoadBalancingProfile copy();
 }

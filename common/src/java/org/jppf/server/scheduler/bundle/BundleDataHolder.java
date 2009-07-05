@@ -36,7 +36,7 @@ public class BundleDataHolder
 	 */
 	private double mean = 0d;
 	/**
-	 * Previous value of the moving average.
+	 * Previous value of the moving average, generally before a new sample was added.
 	 */
 	private double previousMean = 0d;
 	/**
@@ -50,28 +50,27 @@ public class BundleDataHolder
 	/**
 	 * Number of samples required to compute the moving average.
 	 */
-	private int maLength = 0;
+	private int performanceCacheSize = 0;
 
 	/**
-	 * Initialize this data holder with the specified number of samples required to compute the moving average.
-	 * @param maLength the number of samples as an int.
+	 * Initialize this data holder with the maximum number of samples in the performance cache.
+	 * @param performanceCacheSize - the number of samples as an int.
 	 */
-	public BundleDataHolder(int maLength)
+	public BundleDataHolder(int performanceCacheSize)
 	{
-		this.maLength = maLength;
+		this.performanceCacheSize = performanceCacheSize;
 	}
 
 	/**
-	 * Add the specified sample to the list of samples.
-	 * @param sample the sample to add.
-	 * @return true if the new performance sample triggers a new analysis, false otherwise.
+	 * Add the specified performance sample to the list of samples.
+	 * @param sample - the performance sample to add.
 	 */
-	public boolean addSample(BundlePerformanceSample sample)
+	public void addSample(BundlePerformanceSample sample)
 	{
-		boolean b = (sample.samples + nbSamples > maLength) || samples.isEmpty();
+		boolean b = (sample.samples + nbSamples > performanceCacheSize) || samples.isEmpty();
 		if (b)
 		{
-			while ((sample.samples + nbSamples > maLength) && !samples.isEmpty())
+			while ((sample.samples + nbSamples > performanceCacheSize) && !samples.isEmpty())
 			{
 				removeHeadSample();
 			}
@@ -81,7 +80,6 @@ public class BundleDataHolder
 		nbSamples += sample.samples;
 
 		computeMean();
-		return b;
 	}
 
 	/**
@@ -137,18 +135,18 @@ public class BundleDataHolder
 	 * Get the number of samples required to compute the moving average.
 	 * @return the number of samples as an int.
 	 */
-	public int getMaLength()
+	public int getPerformanceCacheSize()
 	{
-		return maLength;
+		return performanceCacheSize;
 	}
 
 	/**
 	 * Set the number of samples required to compute the moving average.
-	 * @param maLength the number of samples as an int.
+	 * @param performanceCacheSize - the number of samples as an int.
 	 */
-	public void setMaLength(int maLength)
+	public void setPerformanceCacheSize(int performanceCacheSize)
 	{
-		this.maLength = maLength;
+		this.performanceCacheSize = performanceCacheSize;
 	}
 
 	/**
@@ -161,7 +159,7 @@ public class BundleDataHolder
 		StringBuilder sb = new StringBuilder();
 		sb.append("mean = ").append(mean).append(", previousMean = ").append(previousMean);
 		sb.append(", totalTime = ").append(totalTime).append(", nbSamples = ").append(nbSamples);
-		sb.append(", maLength = ").append(maLength).append(", samples.size() = ").append(samples.size());
+		sb.append(", maLength = ").append(performanceCacheSize).append(", samples.size() = ").append(samples.size());
 		return sb.toString();
 	}
 

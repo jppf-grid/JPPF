@@ -47,7 +47,6 @@ public class BundlePerformanceSample
 	 */
 	public BundlePerformanceSample(double mean, long samples)
 	{
-		super();
 		this.mean = mean;
 		this.samples = samples;
 	}

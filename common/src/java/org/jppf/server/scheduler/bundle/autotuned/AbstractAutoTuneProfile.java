@@ -17,15 +17,15 @@
  */
 package org.jppf.server.scheduler.bundle.autotuned;
 
-import org.jppf.server.scheduler.bundle.AutoTuneProfile;
+import org.jppf.server.scheduler.bundle.LoadBalancingProfile;
 
 
 /**
- * Default abstract implementation of the {@link AutoTuneProfile} interface,
+ * Default abstract implementation of the {@link LoadBalancingProfile} interface,
  * providing an encapsulation of the parameters as Java properties.
  * @author Domingos Creado
  * @author Laurent Cohen
  */
-public abstract class AbstractAutoTuneProfile implements AutoTuneProfile
+public abstract class AbstractAutoTuneProfile implements LoadBalancingProfile
 {
 }
