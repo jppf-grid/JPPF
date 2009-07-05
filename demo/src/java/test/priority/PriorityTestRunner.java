@@ -42,8 +42,11 @@ public class PriorityTestRunner
 	{
 		try
 		{
+			System.out.println("Starting ...");
 			client = new JPPFClient();
-			performJobSubmissions();
+			//performJobSubmissions();
+			perform();
+			//perform2();
 		}
 		catch(Exception e)
 		{
@@ -53,6 +56,7 @@ public class PriorityTestRunner
 		{
 			if (client != null) client.close();
 		}
+		System.out.println("... done");
 	}
 
 	/**
@@ -62,18 +66,35 @@ public class PriorityTestRunner
 	public static void performJobSubmissions() throws Exception
 	{
 		int n = 10;
-		System.out.println("trace 1");
 		List<JPPFJob> jobList = new ArrayList<JPPFJob>();
-		System.out.println("trace 2");
 		jobList.add(createJob(new WaitTask(2000L), 0));
-		System.out.println("trace 3");
 		for (int i=1; i<=n; i++) jobList.add(createJob(new PrioritizedTask(i), i)); 
-		//for (int i=n; i>=1; i--) jobList.add(createJob(new PrioritizedTask(i))); 
-		System.out.println("trace 4");
 		for (JPPFJob job: jobList) client.submit(job);
-		System.out.println("trace 5");
 		for (JPPFJob job: jobList) ((JPPFResultCollector) job.getResultListener()).waitForResults();
-		System.out.println("trace 6");
+	}
+
+	/**
+	 * Submit non-blocking tasks.
+	 * @throws Exception if any error occurs.
+	 */
+	public static void perform() throws Exception
+	{
+		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+		tasks.add(new PrioritizedTask(0));
+		JPPFResultCollector collector = new JPPFResultCollector(1);
+		client.submitNonBlocking(tasks, null, collector);
+		List<JPPFTask> results = collector.waitForResults();
+	}
+
+	/**
+	 * Submit blocking tasks.
+	 * @throws Exception if any error occurs.
+	 */
+	public static void perform2() throws Exception
+	{
+		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+		tasks.add(new PrioritizedTask(0));
+		List<JPPFTask> results = client.submit(tasks, null);
 	}
 
 	/**

@@ -18,7 +18,7 @@
 
 package sample.allinone;
 
-import org.jppf.node.NodeLauncher;
+import org.jppf.node.NodeRunner;
 import org.jppf.server.JPPFDriver;
 
 /**
@@ -39,14 +39,14 @@ public class AllInOne
 			{
 				public void run()
 				{
-					JPPFDriver.main(new String[] { "noLauncher" });
+					JPPFDriver.main("noLauncher");
 				}
 			};
 			Thread nodeThread = new Thread()
 			{
 				public void run()
 				{
-					NodeLauncher.main(args);
+					NodeRunner.main("noLauncher");
 				}
 			};
 			driverThread.start();

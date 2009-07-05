@@ -18,7 +18,7 @@
 
 package sample.misc;
 
-import org.jppf.node.NodeLauncher;
+import org.jppf.node.NodeRunner;
 import org.jppf.server.JPPFDriver;
 
 /**
@@ -39,14 +39,14 @@ public class DriverAndNodeLauncher
 			{
 				public void run()
 				{
-					JPPFDriver.main(new String[] { "noLauncher" });
+					JPPFDriver.main("noLauncher");
 				}
 			};
 			Runnable node = new Runnable()
 			{
 				public void run()
 				{
-					NodeLauncher.main(args);
+					NodeRunner.main("noLauncher");
 				}
 			};
 			new Thread(driver).start();

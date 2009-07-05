@@ -32,14 +32,14 @@ public abstract class BaseDemoTask extends JPPFTask
 	 */
 	public void run()
 	{
-		fireNotification("start exec");
+		//fireNotification("start exec");
 		try
 		{
 			doWork();
 		}
 		finally
 		{
-			fireNotification("end exec");
+			//fireNotification("end exec");
 		}
 	}
 
