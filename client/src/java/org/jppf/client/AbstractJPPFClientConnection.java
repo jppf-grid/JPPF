@@ -321,16 +321,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	}
 
 	/**
-	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
-	 * @throws Exception if an error occcurs while instantiating the class loader.
-	 * @deprecated replaced with {@link #makeHelper() makeHelper()}
-	 */
-	protected void initHelper() throws Exception
-	{
-		//if (helper == null) helper = new SerializationHelperImpl();
-	}
-
-	/**
 	 * Instantiate a <code>SerializationHelper</code> using the current context class loader.
 	 * @return a <code>SerializationHelper</code> instance.
 	 * @throws Exception if the serialiozation helper could not be instantiated.
