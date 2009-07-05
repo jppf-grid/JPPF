@@ -24,7 +24,7 @@ import java.util.*;
 import org.apache.commons.logging.*;
 
 /**
- * 
+ * Utility class that provides method to discover the network configuration of the current machine.
  * @author Laurent Cohen
  */
 public final class NetworkUtils
@@ -80,11 +80,13 @@ public final class NetworkUtils
 			while (interfaces.hasMoreElements())
 			{
 				NetworkInterface ni = interfaces.nextElement();
+				if (debugEnabled) log.debug("interface " + ni.getName() + " : " + ni.getDisplayName());
 				Enumeration<InetAddress> addresses = ni.getInetAddresses();
 				while (addresses.hasMoreElements())
 				{
 					InetAddress addr = addresses.nextElement();
 					if (addr instanceof Inet4Address) list.add((Inet4Address) addr);
+					if (debugEnabled) log.debug("  " + addr.getHostName() + " : " + addr.getHostAddress()); 
 				}
 			}
 		}

@@ -28,7 +28,7 @@ import org.jppf.utils.StringUtils;
  * The information includes the host, class server, application and node server ports. 
  * @author Laurent Cohen
  */
-public class JPPFConnectionInformation implements Serializable
+public class JPPFConnectionInformation implements Serializable, Comparable<JPPFConnectionInformation>
 {
 	/**
 	 * The driver host name.
