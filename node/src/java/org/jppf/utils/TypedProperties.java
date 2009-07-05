@@ -18,7 +18,8 @@
 package org.jppf.utils;
 
 
-import java.util.Properties;
+import java.io.*;
+import java.util.*;
 
 /**
  * Extension of the <code>java.util.Properties</code> class to handle the conversion of
@@ -27,6 +28,33 @@ import java.util.Properties;
  */
 public class TypedProperties extends Properties
 {
+	/**
+	 * Default constructor.
+	 */
+	public TypedProperties()
+	{
+	}
+
+	/**
+	 * Initialize this object with a set of existing properties.
+	 * This will copy into the present object all map entries such that both key and value are strings.
+	 * @param map - the properties to be copied. No reference to this parameter is kept in this TypedProperties object.
+	 */
+	public TypedProperties(Map map)
+	{
+		if (map != null)
+		{
+			Set<Map.Entry<Object, Object>> entries = map.entrySet();
+			for (Map.Entry<Object, Object> entry: entries)
+			{
+				if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
+				{
+					setProperty((String) entry.getKey(), (String) entry.getValue());
+				}
+			}
+		}
+	}
+
 	/**
 	 * Get the string value of a property with a specified name.
 	 * @param key the name of the property to look for.
@@ -204,5 +232,36 @@ public class TypedProperties extends Properties
 	public boolean getBoolean(String key)
 	{
 		return getBoolean(key, false);
+	}
+
+	/**
+	 * Convert this set of properties into a string.
+	 * @return a representation of this object as a string.
+	 */
+	public String asString()
+	{
+		StringBuilder sb = new StringBuilder();
+		Set<Map.Entry<Object, Object>> entries = entrySet();
+		for (Map.Entry<Object, Object> entry: entries)
+		{
+			if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
+			{
+				sb.append(entry.getKey()).append(" = ").append(entry.getValue()).append("\n");
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * Load this set of properties from a string.
+	 * @param source the string to load from.
+	 * @throws IOException if any error occurs.
+	 */
+	public void loadString(String source) throws IOException
+	{
+		if (source == null) return;
+		ByteArrayInputStream bais = new ByteArrayInputStream(source.getBytes());
+		load(bais);
+		bais.close();
 	}
 }
