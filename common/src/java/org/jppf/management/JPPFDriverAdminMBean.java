@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.BundleParameter;
+import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 
 /**
  * MBean interface for the management of a JPPF driver.
@@ -42,10 +43,25 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean<BundleParameter, Ob
 	 */
 	Collection<NodeManagementInfo> nodesInformation() throws Exception;
 	/**
-	 * Process a management or monitoring request.
-	 * @param parameters the parameters of the request to process
-	 * @return the result of the request.
-	 * @throws Exception if an error occurred while performing the request.
+	 * Perform a shutdown or restart of the server.
+	 * @param shutdownDelay - the delay before shutting down the server, once the command is received. 
+	 * @param restartDelay - the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
+	 * @return an acknowledgement message.
+	 * @throws Exception if any error occurs.
 	 */
-	Object processManagementRequest(Map<BundleParameter, Object> parameters) throws Exception;
+	String restartShutdown(Long shutdownDelay, Long restartDelay) throws Exception;
+	/**
+	 * Change the bundle size tuning settings.
+	 * @param algorithm - the name opf the load-balancing algorithm to set.
+	 * @param parameters - the algorithm's parameters.
+	 * @return an acknowledgement or error message.
+	 * @throws Exception if an error occurred while updating the settings.
+	 */
+	String changeLoadBalancerSettings(String algorithm, Map parameters) throws Exception;
+	/**
+	 * Obtain the current load-balancing settings.
+	 * @return an instance of <code>LoadBalancingInformation</code>.
+	 * @throws Exception if an error occurred while fetching the settings.
+	 */
+	LoadBalancingInformation loadBalancerInformation() throws Exception;
 }

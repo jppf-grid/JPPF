@@ -18,15 +18,10 @@
 
 package org.jppf.management;
 
-import static org.jppf.server.protocol.BundleParameter.*;
-
 import java.util.*;
 
-import javax.crypto.SecretKey;
-
-import org.jppf.security.CryptoUtils;
 import org.jppf.server.JPPFStats;
-import org.jppf.server.protocol.BundleParameter;
+import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 
 /**
  * Node-specific connection wrapper, implementing a user-friendly interface for the monitoring
@@ -58,11 +53,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 */
 	public Collection<NodeManagementInfo> nodesInformation() throws Exception
 	{
-		Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
-		params.put(BundleParameter.COMMAND_PARAM, BundleParameter.REFRESH_NODE_INFO);
-		Collection<NodeManagementInfo> nodeList =
-			(Collection<NodeManagementInfo>) processManagementRequest(params);
-		return nodeList;
+		return (Collection<NodeManagementInfo>) invoke(DRIVER_MBEAN_NAME, "nodesInformation", (Object[]) null, (String[]) null);
 	}
 
 	/**
@@ -73,39 +64,45 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 */
 	public JPPFStats statistics() throws Exception
 	{
-		Map<BundleParameter, Object> params = new EnumMap<BundleParameter, Object>(BundleParameter.class);
-		params.put(COMMAND_PARAM, READ_STATISTICS);
-    return (JPPFStats) processManagementRequest(params);
+    return (JPPFStats) invoke(DRIVER_MBEAN_NAME, "statistics", (Object[]) null, (String[]) null);
 	}
 
 	/**
-	 * Process a management or monitoring request.
-	 * @param parameters the parameters of the request to process
-	 * @return the result of the request.
-	 * @throws Exception if an error occurred while performing the request.
+	 * Perform a shutdown or restart of the server.
+	 * @param shutdownDelay - the delay before shutting down the server, once the command is received. 
+	 * @param restartDelay - the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
+	 * @return an acknowledgement message.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFDriverAdminMBean#restartShutdown(java.lang.Long, java.lang.Long)
 	 */
-	public Object processManagementRequest(Map<BundleParameter, Object> parameters) throws Exception
+	public String restartShutdown(Long shutdownDelay, Long restartDelay) throws Exception
 	{
-		if (!READ_STATISTICS.equals(parameters.get(COMMAND_PARAM)) &&
-				!REFRESH_NODE_INFO.equals(parameters.get(COMMAND_PARAM)))
-		{
-			String password = (String) parameters.get(PASSWORD_PARAM);
-			SecretKey tmpKey = CryptoUtils.generateSecretKey();
-			parameters.put(KEY_PARAM, CryptoUtils.encrypt(tmpKey.getEncoded()));
-			parameters.put(PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, password.getBytes()));
-			String newPassword = (String) parameters.get(NEW_PASSWORD_PARAM);
-			if (newPassword != null)
-			{
-				parameters.put(NEW_PASSWORD_PARAM, CryptoUtils.encrypt(tmpKey, newPassword.getBytes()));
-			}
-		}
-		JPPFManagementRequest<BundleParameter, Object> request =
-			new JPPFManagementRequest<BundleParameter, Object>(parameters);
-		JPPFManagementResponse response = (JPPFManagementResponse)
-			invoke(JPPFAdminMBean.DRIVER_MBEAN_NAME, "processManagementRequest", new Object[] {parameters}, MBEAN_SIGNATURE);
-		if (response == null) return null;
-		if (response.getException() == null) return response.getResult();
-		throw response.getException();
+		return (String) invoke(DRIVER_MBEAN_NAME, "restartShutdown",
+			new Object[] {shutdownDelay, restartDelay}, new String[] {Long.class.getName(), Long.class.getName()});
 	}
 
+	/**
+	 * Change the bundle size tuning settings.
+	 * @param algorithm - the name opf the load-balancing algorithm to set.
+	 * @param parameters - the algorithm's parameters.
+	 * @return an acknowledgement or error message.
+	 * @throws Exception if an error occurred while updating the settings.
+	 * @see org.jppf.management.JPPFDriverAdminMBean#changeLoadBalancerSettings(java.lang.String, java.util.Map)
+	 */
+	public String changeLoadBalancerSettings(String algorithm, Map parameters) throws Exception
+	{
+		return (String) invoke(DRIVER_MBEAN_NAME, "changeLoadBalancerSettings",
+			new Object[] {algorithm, parameters}, new String[] {String.class.getName(), Map.class.getName()});
+	}
+
+	/**
+	 * Obtain the current load-balancing settings.
+	 * @return an instance of <code>LoadBalancingInformation</code>.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFDriverAdminMBean#loadBalancerInformation()
+	 */
+	public LoadBalancingInformation loadBalancerInformation() throws Exception
+	{
+		return (LoadBalancingInformation) invoke(DRIVER_MBEAN_NAME, "loadBalancerInformation", (Object[]) null, (String[]) null);
+	}
 }

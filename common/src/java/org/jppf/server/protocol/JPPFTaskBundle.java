@@ -112,7 +112,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	/**
 	 * Map holding the parameters of the request.
 	 */
-	private Map<BundleParameter, Object> parameters = new HashMap<BundleParameter, Object>();
+	private Map<Object, Object> parameters = new HashMap<Object, Object>();
 	/**
 	 * The execution policy for this bundle, which determines on which nodes the tasks can be run.
 	 */
@@ -429,7 +429,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * @param name the name of the parameter to set.
 	 * @param value the value of the parameter to set.
 	 */
-	public void setParameter(BundleParameter name, Object value)
+	public void setParameter(Object name, Object value)
 	{
 		parameters.put(name, value);
 	}
@@ -439,7 +439,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * @param name the name of the parameter to get.
 	 * @return the value of the parameter to set.
 	 */
-	public Object getParameter(BundleParameter name)
+	public Object getParameter(Object name)
 	{
 		return parameters.get(name);
 	}
@@ -448,7 +448,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * Get the map holding the parameters of the request.
 	 * @return a map of string keys to object values.
 	 */
-	public Map<BundleParameter, Object> getParametersMap()
+	public Map<Object, Object> getParametersMap()
 	{
 		return parameters;
 	}

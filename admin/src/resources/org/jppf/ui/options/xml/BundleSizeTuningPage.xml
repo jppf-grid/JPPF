@@ -24,7 +24,7 @@
 	<script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
 	<script language="groovy" source="org/jppf/ui/options/xml/bundleSize.groovy"/>
 	<initializer type="script">
-		<script language="groovy"><![CDATA[algorithmChanged()]]></script>
+		<script language="groovy">refresh()</script>
 	</initializer>
 
 	<child name="AlgorithmPanel" type="page">
@@ -32,15 +32,9 @@
 
 		<child name="Algorithm" type="ComboBox">
 			<property name="label" value="Algorithm"/>
-			<property name="tooltip" value="Bundle size computation algorithm"/>
+			<property name="tooltip" value="Choose the load-balancing algorithm"/>
 			<property name="value" value=""/>
 			<property name="persistent" value="true"/>
-			<item name="manual" selected="false"/>
-			<item name="autotuned" selected="false"/>
-			<item name="proportional" selected="true"/>
-			<listener type="script">
-				<script language="groovy"><![CDATA[algorithmChanged()]]></script>
-			</listener>
 		</child>
 
 		<child name="filler" type="page">
@@ -50,11 +44,23 @@
 	</child>
 
 	<!-- ===================================================================== -->
+	<!--                   Server messages area                                -->
+	<!-- ===================================================================== -->
+
+	<child name="LoadBalancingParameters" type="TextArea">
+		<property name="label" value="Parameters"/>
+		<property name="tooltip" value="Parameters of the load-balancing algorithm"/>
+		<property name="value" value=""/>
+		<property name="editable" value="true"/>
+		<property name="componentConstraints" value="grow, pushx, pushy 3"/>
+	</child>
+
+	<!-- ===================================================================== -->
 	<!--           Server bundle size manual configuration area                -->
 	<!-- ===================================================================== -->
 
-	<child name="ManualConfig" type="page">
-		<property name="label" value="Manual Configuration"/>
+	<child name="LoadBalancingActions" type="page">
+		<property name="label" value="Load-balancing actions"/>
 		<property name="layoutConstraints" value="fill, flowy"/>
 		<property name="componentConstraints" value="growx"/>
 		<property name="bordered" value="true"/>
@@ -64,19 +70,19 @@
 
 			<child name="Refresh" type="Button">
 				<property name="label" value="Refresh Settings"/>
-				<property name="tooltip" value="Refreshes the settings from the server values"/>
+				<property name="tooltip" value="Refreshes the settings from the values in the server"/>
 				<property name="componentConstraints" value="growx 0"/>
 				<listener type="script">
-					<script language="groovy"><![CDATA[refreshManual()]]></script>
+					<script language="groovy">refresh()</script>
 				</listener>
 			</child>
 
-			<child name="ApplyManual" type="Button">
-				<property name="label" value="Change Settings"/>
-				<property name="tooltip" value="Apply new settings by sending them to the server"/>
+			<child name="Apply" type="Button">
+				<property name="label" value="Apply Settings"/>
+				<property name="tooltip" value="Send the new settings to the server"/>
 				<property name="componentConstraints" value="growx 0"/>
 				<listener type="script">
-					<script language="groovy"><![CDATA[applyManual()]]></script>
+					<script language="groovy">apply()</script>
 				</listener>
 			</child>
 
@@ -84,165 +90,6 @@
 				<property name="componentConstraints" value="growx, pushx"/>
 			</child>
 
-		</child>
-
-		<child name="manualBundleSizePanel" type="page">
-			<property name="layoutConstraints" value="fill"/>
-			<property name="componentConstraints" value="growx"/>
-	
-			<child name="bundleSize" type="SpinnerNumber">
-				<property name="label" value="Task bundle size"/>
-				<property name="tooltip" value="Number of tasks sent at once to each node"/>
-				<property name="value" value="5"/>
-				<property name="minValue" value="1"/>
-				<property name="maxValue" value="10000"/>
-				<property name="persistent" value="true"/>
-			</child>
-
-			<child name="filler" type="page">
-				<property name="componentConstraints" value="growx, pushx"/>
-			</child>
-
-		</child>
-
-	</child>
-
-	<!-- ===================================================================== -->
-	<!--               Auto-tuning configuration area                          -->
-	<!-- ===================================================================== -->
-
-	<child name="AutoConfig" type="page">
-		<property name="label" value="Bundle size auto tuning profile"/>
-		<property name="layoutConstraints" value="fill"/>
-		<property name="componentConstraints" value="growx"/>
-		<property name="bordered" value="true"/>
-		<property name="tooltip" value="Configure a profile based on a simulated annealing strategy.\nThe possible move from the best known solution gets smaller each time it makes a move.\nThis strategy lets the algorithm explore the universe of bundle sizes with an almost known end"/>
-
-		<child name="autotunedLayout" type="page">
-			<property name="layoutConstraints" value="fill, flowy"/>
-			<property name="componentConstraints" value="growx 0"/>
-
-			<child name="ButtonPanel" type="page">
-				<property name="label" value="ButtonPanel"/>
-				<property name="componentConstraints" value="align left, growx 0"/>
-	
-				<child name="ApplyAuto" type="Button">
-					<property name="label" value="Apply"/>
-					<property name="tooltip" value="Apply the current settings to the server immediately"/>
-					<listener type="script">
-						<script language="groovy"><![CDATA[applyAutotuned()]]></script>
-					</listener>
-				</child>
-	
-			</child>
-	
-			<child name="MinSamplesToAnalyse" type="FormattedNumber">
-				<property name="label" value="Min number of samples to analyse"/>
-				<property name="tooltip" value="The minimum number of samples that must be collected\nbefore an analysis is triggered"/>
-				<property name="value" value="500"/>
-				<property name="pattern" value="###,###,##0"/>
-				<property name="persistent" value="true"/>
-			</child>
-	
-			<child name="MinSamplesToCheckConvergence" type="FormattedNumber">
-				<property name="label" value="Min number of samples to check convergence"/>
-				<property name="tooltip" value="The minimum number of samples to be collected\nbefore checking if the performance profile has changed"/>
-				<property name="value" value="300"/>
-				<property name="pattern" value="###,###,##0"/>
-				<property name="persistent" value="true"/>
-			</child>
-	
-			<child name="MaxDeviation" type="FormattedNumber">
-				<property name="label" value="Maximum deviation"/>
-				<property name="tooltip" value="The percentage of deviation of the current mean to the mean\nwhen the system was considered stable"/>
-				<property name="value" value="0.2"/>
-				<property name="pattern" value="###,##0.###"/>
-				<property name="persistent" value="true"/>
-			</child>
-	
-			<child name="MaxGuessToStable" type="FormattedNumber">
-				<property name="label" value="Max number of guesses to stable"/>
-				<property name="tooltip" value="The maximum number of guesses of number generated that were already tested\nfor the algorithm to consider the current best solution stable"/>
-				<property name="value" value="10"/>
-				<property name="pattern" value="###,###,##0"/>
-				<property name="persistent" value="true"/>
-			</child>
-	
-			<child name="SizeRatioDeviation" type="FormattedNumber">
-				<property name="label" value="Size deviation ratio"/>
-				<property name="tooltip" value="This parameter defines the multiplicity used to define the range available to\nthe random number generator, as the maximum"/>
-				<property name="value" value="1.5"/>
-				<property name="pattern" value="###,##0.###"/>
-				<property name="persistent" value="true"/>
-			</child>
-	
-			<child name="DecreaseRatio" type="FormattedNumber">
-				<property name="label" value="Size decrease ratio"/>
-				<property name="tooltip" value="This parameter defines how fast the tuning algorithm will stop generating random numbers.\nThis is essential to define what is the size of the universe that will be explored.\nGreater numbers make the algorithm stop sooner"/>
-				<property name="value" value="0.2"/>
-				<property name="pattern" value="###,###,##0"/>
-				<property name="persistent" value="true"/>
-			</child>
-
-		</child>
-
-		<child name="filler" type="page">
-			<property name="componentConstraints" value="growx, push"/>
-		</child>
-
-	</child>
-
-	<!-- ===================================================================== -->
-	<!--         Proportional auto-tuning configuration area                   -->
-	<!-- ===================================================================== -->
-
-	<child name="ProportionalConfig" type="page">
-		<property name="label" value="Bundle size proportional profile"/>
-		<property name="layoutConstraints" value="fill"/>
-		<property name="componentConstraints" value="growx"/>
-		<property name="bordered" value="true"/>
-		<property name="tooltip" value="Configure a profile based on a deterministic algortihm."/>
-
-		<child name="proportionalLayout" type="page">
-			<property name="layoutConstraints" value="fill, flowy"/>
-			<property name="componentConstraints" value="growx 0"/>
-	
-			<child name="ProportionalButtonPanel" type="page">
-				<property name="label" value="ButtonPanel"/>
-				<property name="componentConstraints" value="align left, growx 0"/>
-	
-				<child name="ApplyProportional" type="Button">
-					<property name="label" value="Apply"/>
-					<property name="tooltip" value="Apply the current settings to the server immediately"/>
-					<listener type="script">
-						<script language="groovy"><![CDATA[applyProportional()]]></script>
-					</listener>
-				</child>
-	
-			</child>
-	
-			<child name="PerformanceCacheSize" type="SpinnerNumber">
-				<property name="label" value="Task bundle size"/>
-				<property name="tooltip" value="Size of performance samples cache for each node"/>
-				<property name="value" value="2000"/>
-				<property name="minValue" value="1"/>
-				<property name="maxValue" value="99999"/>
-				<property name="persistent" value="true"/>
-			</child>
-	
-			<child name="ProportionalityFactor" type="SpinnerNumber">
-				<property name="label" value="Proportionality factor"/>
-				<property name="tooltip" value="Proportionality factor"/>
-				<property name="value" value="2"/>
-				<property name="minValue" value="1"/>
-				<property name="maxValue" value="99"/>
-				<property name="persistent" value="true"/>
-			</child>
-	
-		</child>
-	
-		<child name="filler" type="page">
-			<property name="componentConstraints" value="growx, push"/>
 		</child>
 
 	</child>
@@ -251,11 +98,11 @@
 	<!--                   Server messages area                                -->
 	<!-- ===================================================================== -->
 
-	<child name="TuningMessages" type="TextArea">
+	<child name="LoadBalancingMessages" type="TextArea">
 		<property name="label" value="Server Messages"/>
 		<property name="tooltip" value="Feedback messages received from the server"/>
 		<property name="value" value=""/>
-		<property name="componentConstraints" value="grow, push"/>
+		<property name="componentConstraints" value="grow, pushx, pushy 1"/>
 	</child>
 
 </opt:main>

@@ -17,22 +17,34 @@
  */
 package org.jppf.ui.monitoring.data;
 
-import static org.jppf.server.protocol.BundleParameter.*;
-
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.SwingUtilities;
 
-import org.apache.commons.logging.*;
-import org.jppf.client.*;
-import org.jppf.client.event.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFClientConnection;
+import org.jppf.client.JPPFClientConnectionImpl;
+import org.jppf.client.JPPFClientConnectionStatus;
+import org.jppf.client.event.ClientEvent;
+import org.jppf.client.event.ClientListener;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.JPPFStats;
-import org.jppf.server.protocol.BundleParameter;
-import org.jppf.ui.monitoring.event.*;
-import org.jppf.ui.options.*;
-import org.jppf.utils.*;
+import org.jppf.ui.monitoring.event.StatsHandlerEvent;
+import org.jppf.ui.monitoring.event.StatsHandlerListener;
+import org.jppf.ui.options.ComboBoxOption;
+import org.jppf.ui.options.OptionElement;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.ThreadSynchronization;
 
 /**
  * This class provides a convenient access to the statistics obtained from the JPPF server.
@@ -179,20 +191,18 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Request the server settings.
-	 * @param password the admin password to authenticate the command issuer.
-	 * @param params contains the names of the settings to change and their corresponding value.
+	 * @param algorithm - the name of the load-balancing algorithm to set on the server.
+	 * @param params - the algorithm's parameters.
 	 * @return the response message from the server.
 	 */
-	public String changeSettings(String password, Map<BundleParameter, Object> params)
+	public String changeSettings(String algorithm, Map params)
 	{
 		if (getCurrentConnection() == null) return "No active server connection";
 		String msg = null;
 		try
 		{
-			params.put(COMMAND_PARAM, CHANGE_SETTINGS);
-			params.put(PASSWORD_PARAM, password);
 			if (debugEnabled) log.debug("command: CHANGE_SETTINGS, parameters: " + params);
-			msg = (String) ((JPPFClientConnectionImpl) getCurrentConnection()).getJmxConnection().processManagementRequest(params);
+			msg = (String) currentJmxConnection().changeLoadBalancerSettings(algorithm, params);
 		}
 		catch(Exception e)
 		{
@@ -204,66 +214,29 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Shutdown, and eventually restart, the server.
-	 * @param password the admin password to authenticate the command issuer.
-	 * @param command the command to perform.
-	 * @param shutdownDelay the delay before shutting down.
-	 * @param restartDelay the delay, starting after shutdown, before restarting.
+	 * @param shutdownDelay - the delay before shutting down.
+	 * @param restartDelay - the delay, starting after shutdown, before restarting. If it is < 0, no restart occurs.
 	 * @return the response message from the server.
 	 */
-	public String requestShutdownRestart(String password, BundleParameter command, Number shutdownDelay, Number restartDelay)
+	public String requestShutdownRestart(Number shutdownDelay, Number restartDelay)
 	{
 		if (getCurrentConnection() == null) return "No active server connection";
 		String msg = null;
 		try
 		{
-			Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
-			params.put(SHUTDOWN_DELAY_PARAM, shutdownDelay.longValue());
-			params.put(RESTART_DELAY_PARAM, restartDelay.longValue());
-			params.put(COMMAND_PARAM, command);
-			params.put(PASSWORD_PARAM, password);
-			if (debugEnabled) log.debug("command: " + command + ", parameters: " + params);
-			msg = (String) ((JPPFClientConnectionImpl) getCurrentConnection()).getJmxConnection().processManagementRequest(params);
+			return (String) currentJmxConnection().restartShutdown(shutdownDelay.longValue(), restartDelay.longValue());
 		}
 		catch(Exception e)
 		{
 			log.error(e.getMessage(), e);
-			msg = "An exception occurred:\n"+e.getMessage();
+			return "An exception occurred:\n"+e.getMessage();
 		}
-		return msg;
-	}
-
-	/**
-	 * Send a request to change the admin password.
-	 * @param password the admin password to authenticate the command issuer.
-	 * @param newPassword the new password to replace the existing one.
-	 * @return the response message from the server.
-	 */
-	public String changeAdminPassword(String password, String newPassword)
-	{
-		String msg = null;
-		if (getJppfClient(null) == null) return "Not connected to the server";
-		if (getCurrentConnection() == null) return "No active server connection";
-		try
-		{
-			Map<BundleParameter, Object> params = new HashMap<BundleParameter, Object>();
-			params.put(COMMAND_PARAM, CHANGE_PASSWORD);
-			params.put(PASSWORD_PARAM, password);
-			params.put(NEW_PASSWORD_PARAM, newPassword);
-			if (debugEnabled) log.debug("command: CHANGE_SETTINGS, parameters: " + params);
-			msg = (String) ((JPPFClientConnectionImpl) getCurrentConnection()).getJmxConnection().processManagementRequest(params);
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-			msg = "An exception occurred:\n"+e.getMessage();
-		}
-		return msg;
 	}
 
 	/**
 	 * Update the current statistics with new values obtained from the server.
-	 * @param connection the client connection from which the data is obtained.
-	 * @param stats the object holding the new statistics values.
+	 * @param connection - the client connection from which the data is obtained.
+	 * @param stats - the object holding the new statistics values.
 	 */
 	public synchronized void update(JPPFClientConnection connection, JPPFStats stats)
 	{
@@ -297,7 +270,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Register a <code>StatsHandlerListener</code> with this stats formatter.
-	 * @param listener the listener to register.
+	 * @param listener - the listener to register.
 	 */
 	public void addStatsHandlerListener(StatsHandlerListener listener)
 	{
@@ -306,7 +279,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Unregister a <code>StatsHandlerListener</code> from this stats formatter.
-	 * @param listener the listener to register.
+	 * @param listener - the listener to unregister.
 	 */
 	public void removeStatsHandlerListener(StatsHandlerListener listener)
 	{
@@ -315,7 +288,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Notify all listeners of a change in this stats formatter.
-	 * @param type the type of event to fire.
+	 * @param type - the type of event to fire.
 	 */
 	public void fireStatsHandlerEvent(StatsHandlerEvent.Type type)
 	{
@@ -335,7 +308,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	/**
 	 * Set the number of data snapshots kept in memory. If the value if less than the former values, the corresponding,
 	 * older, data snapshots will be deleted. 
-	 * @param rolloverPosition the rollover position as an int value.
+	 * @param rolloverPosition - the rollover position as an int value.
 	 */
 	public synchronized void setRolloverPosition(int rolloverPosition)
 	{
@@ -364,7 +337,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Get the data snapshot at a specified position.
-	 * @param position the position to get the data at.
+	 * @param position - the position to get the data at.
 	 * @return a <code>JPPFStats</code> instance.
 	 */
 	public synchronized JPPFStats getStats(int position)
@@ -385,7 +358,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Get the mapping of a data snapshot's fields, at a specified position, to their corresponding string values.
-	 * @param position the position to get the data at.
+	 * @param position - the position to get the data at.
 	 * @return a map of field names to their values represented as strings.
 	 */
 	public synchronized Map<Fields, String> getStringValues(int position)
@@ -412,7 +385,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Get the mapping of a data snapshot's fields, at a specified position, to their corresponding double values.
-	 * @param position the position to get the data at.
+	 * @param position - the position to get the data at.
 	 * @return a map of field names to their values represented as double values.
 	 */
 	public synchronized Map<Fields, Double> getDoubleValues(int position)
@@ -457,7 +430,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Set the current client connection for which statistics and charts are displayed.
-	 * @param connection a <code>JPPFClientConnection</code> instance.
+	 * @param connection - a <code>JPPFClientConnection</code> instance.
 	 */
 	public synchronized void setCurrentConnection(final JPPFClientConnectionImpl connection)
 	{
@@ -479,7 +452,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * JPPF client used to submit data udpate and administration requests.
-	 * @param clientListener a listener to register with the JPPF client.
+	 * @param clientListener - a listener to register with the JPPF client.
 	 * @return a <code>JPPFClient</code> instance.
 	 */
 	public synchronized JPPFClient getJppfClient(ClientListener clientListener)
@@ -493,7 +466,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Notifiy this listener that a new driver connection was created.
-	 * @param event the event to notify this listener of.
+	 * @param event - the event to notify this listener of.
 	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
 	 */
 	public synchronized void newConnection(ClientEvent event)
@@ -512,12 +485,21 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Set the option containing the combobox with the list of driver connections. 
-	 * @param serverListOption an <code>OptionElement</code> instance.
+	 * @param serverListOption - an <code>OptionElement</code> instance.
 	 */
 	public synchronized void setServerListOption(OptionElement serverListOption)
 	{
 		this.serverListOption = serverListOption;
 		notifyAll();
+	}
+
+	/**
+	 * Get the JMX connection for the current driver connection.
+	 * @return a <code>JMXDriverConnectionWrapper</code> instance.
+	 */
+	public JMXDriverConnectionWrapper currentJmxConnection()
+	{
+		return ((JPPFClientConnectionImpl) getCurrentConnection()).getJmxConnection();
 	}
 
 	/**

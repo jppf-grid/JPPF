@@ -84,75 +84,32 @@
 		</child>
 	
 		<!-- ===================================================================== -->
-		<!--          Administrator password configuration area                    -->
+		<!--          Data Refresh interval configuration area                     -->
 		<!-- ===================================================================== -->
 	
-		<child name="Admin_password" type="page">
-			<property name="label" value="Administrator password"/>
+		<child name="AdminPreferences" type="page">
+			<property name="label" value="Monitor"/>
 			<property name="layoutConstraints" value="fill, flowy"/>
 			<property name="componentConstraints" value="grow"/>
 			<property name="bordered" value="true"/>
 	
-			<child name="Change_password" type="Button">
-				<property name="label" value="Change password"/>
-				<property name="tooltip" value="Tells the server to change the administrator password"/>
-				<property name="componentConstraints" value="growx 0, align left"/>
+			<child name="Interval" type="FormattedNumber">
+				<property name="label" value="Refresh interval (ms)"/>
+				<property name="tooltip" value="The time interval, in milliseconds, between servers requests to refresh the statistics"/>
+				<property name="value" value="1000"/>
+				<property name="pattern" value="###,###,##0"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+			<child name="ApplyInterval" type="Button">
+				<property name="label" value="Apply"/>
+				<property name="tooltip" value="Apply the new interval value immediately"/>
+				<property name="componentConstraints" value="growx 0"/>
 				<listener type="script">
-					<script language="groovy">doChange_password()</script>
+					<script language="groovy">doApplyInterval()</script>
 				</listener>
 			</child>
-	
-			<child name="actualPwd" type="Password">
-				<property name="label" value="Enter password"/>
-				<property name="tooltip" value="The current administrator password"/>
-				<property name="value" value=""/>
-			</child>
-	
-			<child name="newPwd" type="Password">
-				<property name="label" value="New password"/>
-				<property name="tooltip" value="Enter the new administrator password"/>
-				<property name="value" value=""/>
-			</child>
-	
-			<child name="confirmPwd" type="Password">
-				<property name="label" value="Confirm new password"/>
-				<property name="tooltip" value="Confirm the new administrator password"/>
-				<property name="value" value=""/>
-			</child>
-	
-		</child>
 
-		<child name="filler" type="page">
-			<property name="componentConstraints" value="growx, pushx"/>
-		</child>
-
-	</child>
-
-	<!-- ===================================================================== -->
-	<!--                    Bottom Panels                                      -->
-	<!-- ===================================================================== -->
-	
-	<child name="AdminPreferences" type="page">
-		<property name="label" value="Monitor"/>
-		<property name="layoutConstraints" value="fillx"/>
-		<property name="componentConstraints" value="growx, growy 0"/>
-		<property name="bordered" value="true"/>
-
-		<child name="Interval" type="FormattedNumber">
-			<property name="label" value="Refresh interval (ms)"/>
-			<property name="tooltip" value="The time interval, in milliseconds, between servers requests to refresh the statistics"/>
-			<property name="value" value="1000"/>
-			<property name="pattern" value="###,###,##0"/>
-			<property name="persistent" value="true"/>
-		</child>
-
-		<child name="ApplyInterval" type="Button">
-			<property name="label" value="Apply"/>
-			<property name="tooltip" value="Apply the new interval value immediately"/>
-			<property name="componentConstraints" value="growx 0"/>
-			<listener type="script">
-				<script language="groovy">doApplyInterval()</script>
-			</listener>
 		</child>
 
 		<child name="filler" type="page">

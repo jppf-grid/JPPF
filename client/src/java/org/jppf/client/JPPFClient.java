@@ -305,22 +305,6 @@ public class JPPFClient extends AbstractJPPFClient
 	}
 
 	/**
-	 * Submit an admin request with the specified command name and parameters.
-	 * @param password the current admin password.
-	 * @param newPassword the new password if the password is to be changed, can be null.
-	 * @param command the name of the command to submit.
-	 * @param parameters the parameters of the command to submit, may be null.
-	 * @return the reponse message from the server.
-	 * @throws Exception if an error occurred while trying to send or execute the command.
-	 */
-	public String submitAdminRequest(String password, String newPassword, BundleParameter command, Map<BundleParameter, Object> parameters)
-			throws Exception
-	{
-		JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) getClientConnection(); 
-		return conn.submitAdminRequest(password, newPassword, command, parameters);
-	}
-
-	/**
 	 * Close this client and release all the resources it is using.
 	 */
 	public void close()
@@ -379,7 +363,7 @@ public class JPPFClient extends AbstractJPPFClient
 		 */
 		private Set<JPPFConnectionInformation> infoSet = new HashSet<JPPFConnectionInformation>();
 		/**
-		 * Count of distinct retrieved connection informaiton objects.
+		 * Count of distinct retrieved connection information objects.
 		 */
 		private AtomicInteger count = new AtomicInteger(0);
 
@@ -399,8 +383,14 @@ public class JPPFClient extends AbstractJPPFClient
 					{
 						if (debugEnabled) log.debug("Found connection information: " + info);
 						infoSet.add(info);
-						JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, "driver-"+count.incrementAndGet(), info);
-						newConnection(c);
+						int n = JPPFConfiguration.getProperties().getInt("jppf.pool.size", 1);
+						if (n < 1) n = 1;
+						for (int i=1; i<=n; i++)
+						{
+							String name = "driver-" + count.incrementAndGet()  + (n == 1 ? "" : "-" + i);
+							JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, name, info);
+							newConnection(c);
+						}
 					}
 				}
 				//Thread.sleep(50L);

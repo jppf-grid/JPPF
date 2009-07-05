@@ -19,7 +19,6 @@
 package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
-import static org.jppf.server.protocol.BundleParameter.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -32,7 +31,7 @@ import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.TypedProperties;
 
@@ -193,24 +192,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(this, exec);
 		executor.submit(proc);
 		if (debugEnabled) log.debug("["+name+"] submitted " + taskList.size() + " tasks");
-	}
-
-	/**
-	 * Submit an admin request with the specified command name and parameters.
-	 * @param password the current admin password.
-	 * @param newPassword the new password if the password is to be changed, can be null.
-	 * @param command the name of the command to submit.
-	 * @param parameters the parameters of the command to submit, may be null.
-	 * @return the reponse message from the server.
-	 * @throws Exception if an error occurred while trying to send or execute the command.
-	 */
-	public String submitAdminRequest(String password, String newPassword, BundleParameter command, 
-		Map<BundleParameter, Object> parameters) throws Exception
-	{
-			parameters.put(PASSWORD_PARAM, password);
-			parameters.put(NEW_PASSWORD_PARAM, newPassword);
-			parameters.put(COMMAND_PARAM, command);
-			return (String) getJmxConnection().processManagementRequest(parameters);
 	}
 
 	/**
