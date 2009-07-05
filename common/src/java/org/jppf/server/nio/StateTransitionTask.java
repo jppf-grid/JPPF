@@ -76,7 +76,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 			this.ctx = (NioContext<S>) key.attachment();
 			if (debugEnabled)
 			{
-				synchronized(factory)
+				synchronized(log)
 				{
 					log.debug(getRemoteHost(key.channel()) + " transition from " + ctx.getState());
 				}
