@@ -24,7 +24,7 @@ import java.util.*;
 import javax.management.MBeanServer;
 
 import org.apache.commons.logging.*;
-import org.jppf.*;
+import org.jppf.JPPFException;
 import org.jppf.comm.discovery.*;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
@@ -34,7 +34,6 @@ import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.peer.*;
 import org.jppf.server.queue.*;
-import org.jppf.server.scheduler.bundle.impl.BundlerFactory;
 import org.jppf.utils.*;
 
 /**
@@ -134,7 +133,7 @@ public class JPPFDriver
 		}
 		printInitializedMessage(info.applicationServerPorts, "Client Server");
 
-		nodeNioServer = new NodeNioServer(info.nodeServerPorts, BundlerFactory.createBundler());
+		nodeNioServer = new NodeNioServer(info.nodeServerPorts);
 		nodeNioServer.start();
 		printInitializedMessage(info.nodeServerPorts, "Tasks Server");
 

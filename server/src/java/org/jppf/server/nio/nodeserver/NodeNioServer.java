@@ -25,7 +25,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.*;
-import org.jppf.JPPFException;
 import org.jppf.io.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
@@ -35,6 +34,7 @@ import org.jppf.server.nio.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.queue.*;
 import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.*;
 
 /**
@@ -55,7 +55,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * The algorithm that dynamically computes the task bundle size.
 	 */
 	private AtomicReference<Bundler> bundlerRef;
-
 	/**
 	 * The uuid for the task bundle sent to a newly connected node.
 	 */
@@ -64,14 +63,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * The the task bundle sent to a newly connected node.
 	 */
 	private BundleWrapper initialBundle = null;
-
 	/**
 	 * Holds the currently idle channels.
 	 */
-	//private List<SocketChannel> idleChannels = new ArrayList<SocketChannel>();
-	//private Map<String, SelectableChannel> idleChannels = new Hashtable<String, SelectableChannel>();
 	private List<SelectableChannel> idleChannels = new ArrayList<SelectableChannel>();
-
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
@@ -80,29 +75,31 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * Random number generator used to randomize the choice of idle channel.
 	 */
 	private Random random = new Random(System.currentTimeMillis());
+	/**
+	 * Used to create bundler instances.
+	 */
+	private JPPFBundlerFactory bundlerFactory = new JPPFBundlerFactory();
 
 	/**
-	 * Initialize this server with a specified port number and name.
+	 * Initialize this server with a specified port number.
 	 * @param port the port this socket server is listening to.
-	 * @param bundler the bundler used to compute the size of the bundles sent for execution..
-	 * @throws JPPFException if the underlying server socket can't be opened.
+	 * @throws Exception if the underlying server socket can't be opened.
 	 */
-	public NodeNioServer(int port, Bundler bundler) throws JPPFException
+	public NodeNioServer(int port) throws Exception
 	{
-		this(new int[] { port }, bundler);
+		this(new int[] { port });
 	}
 
 	/**
-	 * Initialize this server with the specified port numbers and name.
+	 * Initialize this server with the specified port numbers.
 	 * @param ports the ports this socket server is listening to.
-	 * @param bundler the bundler used to compute the size of the bundles sent for execution..
-	 * @throws JPPFException if the underlying server socket can't be opened.
+	 * @throws Exception if the underlying server socket can't be opened.
 	 */
-	public NodeNioServer(int[] ports, Bundler bundler) throws JPPFException
+	public NodeNioServer(int[] ports) throws Exception
 	{
-		//super(ports, "NodeServer Thread", true);
 		super(ports, "NodeServer Thread", true);
 		this.selectTimeout = 1L;
+		Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
 		this.bundlerRef = new AtomicReference<Bundler>(bundler);
 		getQueue().addListener(new QueueListener()
 		{
@@ -390,5 +387,14 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	{
 		if (queue == null) queue = JPPFDriver.getQueue();
 		return queue;
+	}
+
+	/**
+	 * Get the factory object used to create bundler instances.
+	 * @return an instance of <code>JPPFBundlerFactory</code>.
+	 */
+	public JPPFBundlerFactory getBundlerFactory()
+	{
+		return bundlerFactory;
 	}
 }

@@ -31,6 +31,7 @@ import org.jppf.server.scheduler.bundle.autotuned.*;
  * selected (like Monte Carlo algorithm).
  * 
  * @author Domingos Creado
+ * @author Laurent Cohen
  * 
  */
 public class AutoTunedBundler extends AbstractAutoTunedBundler
@@ -49,9 +50,9 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	 * @param profile the parameters of the auto-tuning algorithm,
 	 * grouped as a performance analysis profile.
 	 */
-	public AutoTunedBundler(AnnealingTuneProfile profile)
+	public AutoTunedBundler(LoadBalancingProfile profile)
 	{
-		this(profile, false);
+		this((AnnealingTuneProfile) profile, false);
 	}
 
 	/**
@@ -116,7 +117,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 			bundleSample.mean = (time + bundleSample.samples * bundleSample.mean) / samples;
 			bundleSample.samples = samples;
 		}
-		if (samples > profile.getMinSamplesToAnalyse())
+		if (samples > ((AnnealingTuneProfile) profile).getMinSamplesToAnalyse())
 		{
 			performAnalysis();
 			if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": bundle size = " + currentSize);
@@ -135,9 +136,9 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 			int max = maxSize();
 			if ((max > 0) && (bestSize > max)) bestSize = max;
 			int counter = 0;
-			while (counter < profile.getMaxGuessToStable())
+			while (counter < ((AnnealingTuneProfile) profile).getMaxGuessToStable())
 			{
-				int diff = profile.createDiff(bestSize, samplesMap.size(), rnd);
+				int diff = ((AnnealingTuneProfile) profile).createDiff(bestSize, samplesMap.size(), rnd);
 				if (diff < bestSize)
 				{
 					// the second part is there to ensure the size is > 0

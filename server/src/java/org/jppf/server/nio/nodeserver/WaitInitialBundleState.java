@@ -30,8 +30,7 @@ import org.jppf.management.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.Bundler;
-import org.jppf.server.scheduler.bundle.impl.*;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 
 /**
  * This class implements the state of receiving information from the node as a
@@ -79,7 +78,7 @@ public class WaitInitialBundleState extends NodeServerState
 			context.setUuid(bundle.getBundleUuid());
 			context.setNodeUuid((String) bundle.getParameter(NODE_UUID_PARAM));
 			boolean override = bundle.getParameter(BUNDLE_TUNING_TYPE_PARAM) != null;
-			Bundler bundler = override ? BundlerFactory.createBundler(bundle.getParametersMap(), true) : server.getBundler().copy();
+			Bundler bundler = createBundler(bundle);
 			bundler.setup();
 			context.setBundler(bundler);
 			Boolean b = (Boolean) bundle.getParameter(IS_PEER);
@@ -105,5 +104,23 @@ public class WaitInitialBundleState extends NodeServerState
 			return TO_IDLE;
 		}
 		return TO_WAIT_INITIAL;
+	}
+
+	/**
+	 * Crete a bundler based on the override parameters.
+	 * @param bundle the bundle from which to extract the parameters.
+	 * @return a <code>Bundler</code> instance.
+	 * @throws Exception if any error occurs.
+	 */
+	private Bundler createBundler(JPPFTaskBundle bundle) throws Exception
+	{
+		Bundler bundler = null;
+		TypedProperties props = (TypedProperties) bundle.getParametersMap().get("bundle.tuning.parameters");
+		if (props != null)
+		{
+			bundler = server.getBundlerFactory().createBundler(props.getString("strategy"), props);
+		}
+		else bundler = server.getBundler().copy();
+		return bundler;
 	}
 }

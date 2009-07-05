@@ -51,7 +51,7 @@ public class ProportionalBundler extends AbstractProportionalBundler
 	 * @param override true if the settings were overriden by the node, false otherwise.
 	 * grouped as a performance analysis profile.
 	 */
-	public ProportionalBundler(AutoTuneProfile profile, boolean override)
+	public ProportionalBundler(LoadBalancingProfile profile, boolean override)
 	{
 		super(profile, override);
 	}
@@ -63,7 +63,7 @@ public class ProportionalBundler extends AbstractProportionalBundler
 	 */
 	public Bundler copy()
 	{
-		return new ProportionalBundler((ProportionalTuneProfile) profile, override);
+		return new ProportionalBundler((ProportionalTuneProfile) profile, overriden);
 	}
 
 	/**

@@ -239,7 +239,7 @@ public class NodeSimulator
 		 * @param maximumSize - the maximum bundle size.
 		 * grouped as a performance analysis profile.
 		 */
-		public SimulatedProportionalBundler(AutoTuneProfile profile, int maximumSize)
+		public SimulatedProportionalBundler(LoadBalancingProfile profile, int maximumSize)
 		{
 			super(profile, false);
 			this.maximumSize = maximumSize;

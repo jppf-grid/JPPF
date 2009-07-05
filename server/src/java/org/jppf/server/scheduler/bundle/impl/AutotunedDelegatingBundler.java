@@ -56,26 +56,25 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
 	 * @param profile the parameters of the auto-tuning algorithm,
-	 * @param override true if the settings were overriden by the node, false otherwise.
+	 * @param overriden true if the settings were overriden by the node, false otherwise.
 	 * grouped as a performance analysis profile.
 	 */
-	public AutotunedDelegatingBundler(AnnealingTuneProfile profile, boolean override)
+	public AutotunedDelegatingBundler(AnnealingTuneProfile profile, boolean overriden)
 	{
+		super(profile, overriden);
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
-		this.override = override;
 		int bundleSize = JPPFDriver.getInstance().getStatsUpdater().getStaticBundleSize();
 		if (bundleSize < 1)
 		{
 			bundleSize = 1;
 		}
 		log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize);
-		this.profile = profile;
 		lock.lock();
 		try
 		{
 			if (simpleBundler == null)
 			{
-				simpleBundler = new AutoTunedBundler(profile, override);
+				simpleBundler = new AutoTunedBundler(profile, overriden);
 			}
 		}
 		finally
@@ -91,7 +90,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	 */
 	public Bundler copy()
 	{
-		return new AutotunedDelegatingBundler(profile, override);
+		return new AutotunedDelegatingBundler(profile, overriden);
 	}
 
 	/**

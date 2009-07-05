@@ -17,41 +17,35 @@
  */
 package org.jppf.server.scheduler.bundle.impl;
 
-import org.jppf.server.JPPFDriver;
+import org.apache.commons.logging.*;
 import org.jppf.server.scheduler.bundle.*;
-
+import org.jppf.server.scheduler.bundle.rl.AbstractRLBundler;
 
 
 /**
  * This class provide a used defined bundle size strategy.
- * It uses the size defined by admin in property file or the 
- * size defined by admin application.
- * 
+ * It uses the size defined by admin in property file or the size defined by admin application.
  * @author Domingos Creado
+ * @author Laurent Cohen
  */
-public class FixedSizedBundler extends AbstractBundler
+public class FixedSizeBundler extends AbstractBundler
 {
 	/**
-	 * The fixed bundle size such as specified by the node.
-	 * If the node doesn't specifiy a size, the size provided by the driver is used.
+	 * Logger for this class.
 	 */
-	private int overrideSize = -1;
+	private static Log log = LogFactory.getLog(AbstractRLBundler.class);
+	/**
+	 * Determines whether debugging level is set for logging.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 
 	/**
 	 * Initialize this bundler.
+	 * @param profile - contains the parameters for this bundler.
 	 */
-	public FixedSizedBundler(){
-		LOG.info("Using user-defined bundle size");
-	}
-
-	/**
-	 * Initialize this bundler.
-	 * @param overrideSize the node-defined (override) size.
-	 */
-	public FixedSizedBundler(int overrideSize){
-		this.overrideSize = overrideSize;
-		override = true;
-		LOG.info("Using node-overriden bundle size: " + overrideSize);
+	public FixedSizeBundler(LoadBalancingProfile profile)
+	{
+		super(profile, false);
 	}
 
 	/**
@@ -59,9 +53,9 @@ public class FixedSizedBundler extends AbstractBundler
 	 * @return the bundle size defined in the JPPF driver configuration.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
-	public int getBundleSize() {
-		if (override) return overrideSize;
-		return JPPFDriver.getInstance().getStatsUpdater().getStaticBundleSize();
+	public int getBundleSize()
+	{
+		return ((FixedSizeProfile) profile).getSize();
 	}
 
 	/**
@@ -71,7 +65,7 @@ public class FixedSizedBundler extends AbstractBundler
 	 */
 	public Bundler copy()
 	{
-		return this;
+		return new FixedSizeBundler(profile.copy());
 	}
 
 	/**

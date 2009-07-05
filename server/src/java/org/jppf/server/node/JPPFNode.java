@@ -51,10 +51,6 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Determines whether dumping byte arrays in the log is enabled.
-	 */
-	private boolean dumpEnabled = JPPFConfiguration.getProperties().getBoolean("byte.array.dump.enabled", false);
-	/**
 	 * Maximum number of containers kept by this node's cache.
 	 */
 	private static final int MAX_CONTAINERS = 1000;
@@ -246,8 +242,8 @@ public class JPPFNode extends AbstractMonitoredNode
 		{
 			if (debugEnabled) log.debug("setting initial bundle uuid");
 			bundle.setBundleUuid(uuid);
-			Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
-			if (params != null) bundle.getParametersMap().putAll(params);
+			TypedProperties params = BundleTuningUtils.getBundleTunningParameters();
+			if (params != null) bundle.getParametersMap().put("bundle.tuning.parameters", params);
 			bundle.setParameter(NODE_UUID_PARAM, uuid);
 			if (isJmxEnabled())
 			{
@@ -545,14 +541,6 @@ public class JPPFNode extends AbstractMonitoredNode
     {
 	    Thread.currentThread().setContextClassLoader(tmp);
     }
-	}
-
-	/**
-	 * Register all MBeans defined through the service provider interface.
-	 * @throws Exception if the registration failed.
-	 */
-	private void unregisterProviderMBeans() throws Exception
-	{
 	}
 
 	/**

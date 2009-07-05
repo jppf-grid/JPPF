@@ -20,7 +20,7 @@ package org.jppf.server.scheduler.bundle.impl;
 import java.util.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.autotuned.AnnealingTuneProfile;
 
@@ -58,10 +58,6 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	 * A map of performance samples, aorted by increasing bundle size.
 	 */
 	protected Map<Integer, BundlePerformanceSample> samplesMap = new HashMap<Integer, BundlePerformanceSample>();
-	/**
-	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
-	 */
-	protected AnnealingTuneProfile profile;
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
@@ -76,17 +72,16 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
 	 * @param profile the parameters of the auto-tuning algorithm,
-	 * @param override true if the settings were overriden by the node, false otherwise.
+	 * @param overriden true if the settings were overriden by the node, false otherwise.
 	 * grouped as a performance analysis profile.
 	 */
-	public AbstractAutoTunedBundler(AnnealingTuneProfile profile, boolean override)
+	public AbstractAutoTunedBundler(AnnealingTuneProfile profile, boolean overriden)
 	{
+		super(profile, overriden);
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
-		this.override = override;
 		currentSize = JPPFDriver.getInstance().getStatsUpdater().getStaticBundleSize();
 		if (currentSize < 1) currentSize = 1;
 		log.info("Bundler#" + bundlerNumber + ": The initial size is " + currentSize);
-		this.profile = profile;
 	}
 
 	/**
@@ -140,7 +135,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 			bundleSample.mean = (time + bundleSample.samples * bundleSample.mean) / samples;
 			bundleSample.samples = samples;
 		}
-		if (samples > profile.getMinSamplesToAnalyse())
+		if (samples > ((AnnealingTuneProfile) profile).getMinSamplesToAnalyse())
 		{
 			performAnalysis();
 			if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": bundle size = " + currentSize);
@@ -159,9 +154,9 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 			int max = maxSize();
 			if ((max > 0) && (bestSize > max)) bestSize = max;
 			int counter = 0;
-			while (counter < profile.getMaxGuessToStable())
+			while (counter < ((AnnealingTuneProfile) profile).getMaxGuessToStable())
 			{
-				int diff = profile.createDiff(bestSize, samplesMap.size(), rnd);
+				int diff = ((AnnealingTuneProfile) profile).createDiff(bestSize, samplesMap.size(), rnd);
 				if (diff < bestSize)
 				{
 					// the second part is there to ensure the size is > 0
