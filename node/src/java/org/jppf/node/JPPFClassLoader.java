@@ -18,15 +18,14 @@
 package org.jppf.node;
 
 import java.io.*;
-import java.net.URL;
-import java.security.AccessController;
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFNodeReconnectionNotification;
-import org.jppf.classloader.*;
+import org.jppf.classloader.ResourceCache;
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
 
@@ -35,7 +34,7 @@ import org.jppf.utils.*;
  * application classes, to avoid costly redeployment system-wide.
  * @author Laurent Cohen
  */
-public class JPPFClassLoader extends ClassLoader implements JPPFClassLoaderMBean
+public class JPPFClassLoader extends URLClassLoader implements JPPFClassLoaderMBean
 {
 	/**
 	 * Logger for this class.
@@ -84,7 +83,7 @@ public class JPPFClassLoader extends ClassLoader implements JPPFClassLoaderMBean
 	 */
 	public JPPFClassLoader(ClassLoader parent)
 	{
-		super(parent);
+		super(new URL[0], parent);
 		if (parent instanceof JPPFClassLoader) dynamic = true;
 		if (socketClient == null) init();
 	}
@@ -209,6 +208,16 @@ public class JPPFClassLoader extends ClassLoader implements JPPFClassLoaderMBean
 		try
 		{
 			lock.lock();
+			int i = name.lastIndexOf('.');
+			if (i >= 0)
+			{
+				String pkgName = name.substring(0, i);
+				Package pkg = getPackage(pkgName);
+				if (pkg == null)
+				{
+					definePackage(pkgName, null, null, null, null, null, null, null);
+				}
+			}
 			if (debugEnabled) log.debug("looking up definition for resource [" + name + "]");
 			byte[] b = null;
 			String resName = name.replace('.', '/') + ".class";
@@ -342,55 +351,6 @@ public class JPPFClassLoader extends ClassLoader implements JPPFClassLoaderMBean
 	 * @return the URL of the resource.
 	 * @see java.lang.ClassLoader#findResource(java.lang.String)
 	 */
-	public URL findResource2(String name)
-	{
-		URL url = null;
-		if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
-		try
-		{
-			lock.lock();
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("name", name);
-			JPPFResourceWrapper resource = loadResourceData(map, true);
-			byte[] b = resource.getDefinition();
-			boolean found = (b != null) && (b.length > 0);
-			if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
-			if (found)
-			{
-				File file = (File) AccessController.doPrivileged(new SaveFileAction(b));
-				if (file != null)
-				{
-					try
-					{
-						//url = file.toURL();
-						url = file.toURI().toURL();
-						if (debugEnabled) log.debug("resource [" + name + "] found with URL: "+url);
-					}
-					catch (Exception e)
-					{
-						log.error(e.getMessage(), e);
-					}
-				}
-			}
-		}
-		catch(ClassNotFoundException e)
-		{
-			if (debugEnabled) log.debug("resource [" + name + "] not found remotely");
-		}
-		finally
-		{
-			lock.unlock();
-		}
-		return url;
-	}
-
-	/**
-	 * Finds the resource with the specified name.
-	 * The resource lookup order is the same as the one specified by {@link #getResourceAsStream(String)} 
-	 * @param name the name of the resource to find.
-	 * @return the URL of the resource.
-	 * @see java.lang.ClassLoader#findResource(java.lang.String)
-	 */
 	public URL findResource(String name)
 	{
 		URL url = null;
@@ -405,7 +365,7 @@ public class JPPFClassLoader extends ClassLoader implements JPPFClassLoaderMBean
 		}
 		finally
 		{
-			lock.unlock();
+			//lock.unlock();
 		}
 		if (debugEnabled) log.debug("resource [" + name + "] " + (url == null ? "not " : "") + "found remotely");
 		return url;
@@ -520,7 +480,7 @@ public class JPPFClassLoader extends ClassLoader implements JPPFClassLoaderMBean
 	 * @throws IOException if an error occurs.
 	 * @see java.lang.ClassLoader#findResources(java.lang.String)
 	 */
-	protected Enumeration<URL> findResources(String name) throws IOException
+	public Enumeration<URL> findResources(String name) throws IOException
 	{
 		List<URL> urlList = null;
 		if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
