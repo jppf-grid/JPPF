@@ -43,17 +43,17 @@ public class AsynchronousResultProcessor implements Runnable
 	/**
 	 * The execution processed by this task.
 	 */
-	private ClientExecution execution = null;
+	private JPPFJob job = null;
 
 	/**
 	 * Initialize this result processor with a specified list of tasks, data provider and result listener.
 	 * @param connection the client connection owning this results processor.
-	 * @param execution the execution processed by this task.
+	 * @param job the JPPFJob processed by this task.
 	 */
-	public AsynchronousResultProcessor(JPPFClientConnectionImpl connection, ClientExecution execution)
+	public AsynchronousResultProcessor(JPPFClientConnectionImpl connection, JPPFJob job)
 	{
 		this.connection = connection;
-		this.execution = execution;
+		this.job = job;
 	}
 
 	/**
@@ -65,44 +65,28 @@ public class AsynchronousResultProcessor implements Runnable
 		boolean error = false;
 		try
 		{
-			if (!execution.isBlocking) connection.getLock().lock();
-			connection.currentExecution = execution;
+			if (!job.isBlocking()) connection.getLock().lock();
+			connection.job = job;
 			int count = 0;
-			for (JPPFTask task : execution.tasks) task.setPosition(count++);
+			for (JPPFTask task : job.getTasks()) task.setPosition(count++);
 			count = 0;
 			boolean completed = false;
-			//while (!completed)
+			try
 			{
-				try
-				{
-					/*
-					connection.sendTasks(execution.tasks, execution.dataProvider, execution.policy);
-					while (count < execution.tasks.size())
-					{
-						Pair<List<JPPFTask>, Integer> p = connection.receiveResults();
-						count += p.first().size();
-						if (execution.listener != null)
-						{
-							execution.listener.resultsReceived(new TaskResultEvent(p.first(), p.second()));
-						}
-					}
-					completed = true;
-					*/
-					JPPFClient.getLoadBalancer().execute(execution, connection);
-				}
-				catch(NotSerializableException e)
-				{
-					throw e;
-				}
-				catch(InterruptedException e)
-				{
-					throw e;
-				}
-				catch(Exception e)
-				{
-					log.error("["+connection.getName()+"] "+e.getMessage(), e);
-					connection.getTaskServerConnection().init();
-				}
+				JPPFClient.getLoadBalancer().execute(job, connection);
+			}
+			catch(NotSerializableException e)
+			{
+				throw e;
+			}
+			catch(InterruptedException e)
+			{
+				throw e;
+			}
+			catch(Exception e)
+			{
+				log.error("["+connection.getName()+"] "+e.getMessage(), e);
+				connection.getTaskServerConnection().init();
 			}
 		}
 		catch(Exception e)
@@ -112,17 +96,17 @@ public class AsynchronousResultProcessor implements Runnable
 		}
 		finally
 		{
-			if (!execution.isBlocking) connection.getLock().unlock();
-			if (!error) connection.currentExecution = null;
+			if (!job.isBlocking()) connection.getLock().unlock();
+			if (!error) connection.job = null;
 		}
 	}
 
 	/**
 	 * Get all the data pertaining to the execution for this task.
-	 * @return a <code>ClientExecution</code> instance.
+	 * @return a <code>JPPFJob</code> instance.
 	 */
-	public ClientExecution getExecution()
+	public JPPFJob getJob()
 	{
-		return execution;
+		return job;
 	}
 }

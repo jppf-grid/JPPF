@@ -43,10 +43,7 @@ public class NonBlockingPoolMatrixRunner
 	 * JPPF client used to submit execution requests.
 	 */
 	private static JPPFClient jppfClient = null;
-	/**
-	 * 
-	 */
-	private JPPFResultCollector[] collector = null; 
+
 	/**
 	 * Entry point for this class, performs a matrix multiplication a number of times.,<br>
 	 * The number of times is specified as a configuration property named &quot;matrix.iterations&quot;.<br>
@@ -91,33 +88,31 @@ public class NonBlockingPoolMatrixRunner
 			Matrix b = new Matrix(size);
 			b.assignRandomValues();
 	
-			collector = new JPPFResultCollector[nbSubmissions];
 			// perform "iteration" times
 			long totalTime = 0L;
 			for (int iter=0; iter<iterations; iter++)
 			{
 				long start = System.currentTimeMillis();
-				List<List<JPPFTask>> submissions = new ArrayList<List<JPPFTask>>();
-				for (int n=0; n<nbSubmissions; n++)
-				{
-					collector[n] = new JPPFResultCollector(size);
-					// create a task for each row in matrix a
-					List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-					for (int i=0; i<size; i++) tasks.add(new MatrixTask(a.getRow(i)));
-					submissions.add(tasks);
-				}
 				// create a data provider to share matrix b among all tasks
 				DataProvider dataProvider = new MemoryMapDataProvider();
 				dataProvider.setValue(MatrixTask.DATA_KEY, b);
-				// submit the tasks for execution
+				List<JPPFJob> submissions = new ArrayList<JPPFJob>();
 				for (int n=0; n<nbSubmissions; n++)
 				{
-					jppfClient.submitNonBlocking(submissions.get(n), dataProvider, collector[n]);
+					JPPFJob job = new JPPFJob(dataProvider);
+					for (int i=0; i<size; i++) job.addTask(new MatrixTask(a.getRow(i)));
+					job.setBlocking(false);
+					job.setResultListener(new JPPFResultCollector(size));
+					// create a task for each row in matrix a
+					submissions.add(job);
 				}
+				// submit the tasks for execution
+				for (JPPFJob job: submissions) jppfClient.submit(job);
 
-				for (int p=0; p<nbSubmissions; p++)
+				for (JPPFJob job: submissions)
 				{
-					List<JPPFTask> results = collector[p].waitForResults();
+					JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+					List<JPPFTask> results = collector.waitForResults();
 					// initialize the resulting matrix
 					Matrix c = new Matrix(size);
 					// Get the matrix values from the tasks results

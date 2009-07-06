@@ -20,7 +20,7 @@ package sample.test.tilmanb;
 
 import java.util.*;
 
-import org.jppf.client.JPPFClient;
+import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
 
@@ -52,15 +52,15 @@ public class MyLongTaskRunner implements TaskResultListener
 	{
 		MyLongTaskRunner resultListener = new MyLongTaskRunner();
 		JPPFClient client = new JPPFClient();
-
-		//
-		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-		taskList.add(new MyLongTask("listtask1", 2000));
-		taskList.add(new MyLongTask("listtask2", 2000));
-		taskList.add(new MyLongTask("listtask3", 2000));
-		taskList.add(new MyLongTask("listtask4", 2000));
-		taskList.add(new MyLongTask("listtask5", 2000));
-		client.submitNonBlocking(taskList, null, resultListener);
+		JPPFJob job = new JPPFJob();
+		job.addTask(new MyLongTask("listtask1", 2000));
+		job.addTask(new MyLongTask("listtask2", 2000));
+		job.addTask(new MyLongTask("listtask3", 2000));
+		job.addTask(new MyLongTask("listtask4", 2000));
+		job.addTask(new MyLongTask("listtask5", 2000));
+		job.setResultListener(resultListener);
+		job.setBlocking(false);
+		client.submit(job);
 
 		/*
 		client.submitNonBlocking(makeTask(new MyLongTask("short1", 2000)), null, resultListener);

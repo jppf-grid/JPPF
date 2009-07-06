@@ -59,7 +59,7 @@ public class JPPFJob implements Serializable
 	/**
 	 * The universal unique id for this job.
 	 */
-	private String uuid = null;
+	private String id = null;
 	/**
 	 * The list of tasks to execute.
 	 */
@@ -74,7 +74,7 @@ public class JPPFJob implements Serializable
 	 */
 	public JPPFJob()
 	{
-		uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
+		id = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class JPPFJob implements Serializable
 	 */
 	public JPPFJob(DataProvider dataProvider)
 	{
-		this(dataProvider, (ExecutionPolicy) null);
+		this(dataProvider, null, true, null, 0);
 	}
 
 	/**
@@ -93,8 +93,7 @@ public class JPPFJob implements Serializable
 	 */
 	public JPPFJob(DataProvider dataProvider, ExecutionPolicy executionPolicy)
 	{
-		this(dataProvider, executionPolicy, null);
-		blocking = true;
+		this(dataProvider, executionPolicy, true, null, 0);
 	}
 
 	/**
@@ -103,7 +102,7 @@ public class JPPFJob implements Serializable
 	 */
 	public JPPFJob(TaskResultListener resultsListener)
 	{
-		this(null, null, resultsListener);
+		this(null, null, false, resultsListener, 0);
 	}
 
 	/**
@@ -113,7 +112,7 @@ public class JPPFJob implements Serializable
 	 */
 	public JPPFJob(DataProvider dataProvider, TaskResultListener resultsListener)
 	{
-		this(dataProvider, null, resultsListener);
+		this(dataProvider, null, false, resultsListener, 0);
 	}
 
 	/**
@@ -124,29 +123,43 @@ public class JPPFJob implements Serializable
 	 */
 	public JPPFJob(DataProvider dataProvider, ExecutionPolicy executionPolicy, TaskResultListener resultsListener)
 	{
+		this(dataProvider, null, false, resultsListener, 0);
+	}
+
+	/**
+	 * Initialize a non-blocking job with the specified parameters.
+	 * @param dataProvider - the container for data shared between tasks.
+	 * @param executionPolicy - the tasks execution policy.
+	 * @param blocking - determines whetehr this job is blocking.
+	 * @param resultsListener - the listener that receives notifications of completed tasks.
+	 * @param priority - the priority of this job.
+	 */
+	public JPPFJob(DataProvider dataProvider, ExecutionPolicy executionPolicy, boolean blocking, TaskResultListener resultsListener, int priority)
+	{
 		this();
 		this.dataProvider = dataProvider;
 		this.executionPolicy = executionPolicy;
 		this.resultsListener = resultsListener;
-		blocking = false;
+		this.blocking = blocking;
+		this.priority = priority;
 	}
 
 	/**
 	 * Get the universal unique id for this job.
 	 * @return the uuid as a string. 
 	 */
-	public String getUuid()
+	public String getId()
 	{
-		return uuid;
+		return id;
 	}
 
 	/**
 	 * Set the universal unique id for this job.
-	 * @param uuid the uuid as a string. 
+	 * @param id the id as a string. 
 	 */
-	public void setUuid(String uuid)
+	public void setId(String id)
 	{
-		this.uuid = uuid;
+		this.id = id;
 	}
 
 	/**

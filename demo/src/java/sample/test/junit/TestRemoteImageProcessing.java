@@ -26,7 +26,7 @@ import javax.imageio.ImageIO;
 
 import junit.framework.TestCase;
 
-import org.jppf.client.JPPFClient;
+import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 
@@ -53,13 +53,13 @@ public class TestRemoteImageProcessing extends TestCase implements Serializable
 			int w = image.getWidth();
 			int h = image.getHeight();
 			int[] rgb = image.getRGB(0, 0, w, h, null, 0, w);
-			List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-			taskList.add(new ImageTask());
 			DataProvider dataProvider = new MemoryMapDataProvider();
 			dataProvider.setValue("image.rgb", rgb);
 			dataProvider.setValue("image.width", w);
 			dataProvider.setValue("image.height", h);
-			List<JPPFTask> results = client.submit(taskList, dataProvider);
+			JPPFJob job = new JPPFJob(dataProvider);
+			job.addTask(new ImageTask());
+			List<JPPFTask> results = client.submit(job);
 			assertNotNull(results);
 			assertFalse(results.isEmpty());
 			result = results.get(0);

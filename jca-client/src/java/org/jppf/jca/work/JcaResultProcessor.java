@@ -51,17 +51,17 @@ public class JcaResultProcessor implements Work
 	/**
 	 * The execution processed by this task.
 	 */
-	private ClientExecution execution = null;
+	private JPPFJob job = null;
 
 	/**
 	 * Initialize this result processor with a specified list of tasks, data provider and result listener.
 	 * @param connection the client connection owning this results processor.
-	 * @param execution the execution processed by this task.
+	 * @param job the execution processed by this task.
 	 */
-	public JcaResultProcessor(JPPFJcaClientConnection connection, ClientExecution execution)
+	public JcaResultProcessor(JPPFJcaClientConnection connection, JPPFJob job)
 	{
 		this.connection = connection;
-		this.execution = execution;
+		this.job = job;
 	}
 
 	/**
@@ -71,13 +71,13 @@ public class JcaResultProcessor implements Work
 	public void run()
 	{
 		boolean error = false;
-		JPPFSubmissionResult result = (JPPFSubmissionResult) execution.listener;
+		JPPFSubmissionResult result = (JPPFSubmissionResult) job.getResultListener();
 		result.setStatus(EXECUTING);
 		try
 		{
-			connection.setCurrentExecution(execution);
+			connection.setCurrentJob(job);
 			int count = 0;
-			for (JPPFTask task : execution.tasks) task.setPosition(count++);
+			for (JPPFTask task : job.getTasks()) task.setPosition(count++);
 			boolean completed = false;
 			while (!completed)
 			{
@@ -111,7 +111,7 @@ public class JcaResultProcessor implements Work
 		}
 		finally
 		{
-			if (!error) connection.setCurrentExecution(null);
+			if (!error) connection.setCurrentJob(null);
 			else result.setStatus(FAILED);
 		}
 	}
@@ -129,13 +129,13 @@ public class JcaResultProcessor implements Work
 		bundle.setRequestUuid(new JPPFUuid().toString());
 		JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
 		String requestUuid = bundle.getRequestUuid();
-		bundle.setExecutionPolicy(execution.policy);
-		bundle.setPriority(execution.priority);
+		bundle.setExecutionPolicy(job.getExecutionPolicy());
+		bundle.setPriority(job.getPriority());
 		ClassLoader cl = null;
 		ClassLoader oldCl = null;
-		if (!execution.tasks.isEmpty())
+		if (!job.getTasks().isEmpty())
 		{
-			JPPFTask task = execution.tasks.get(0);
+			JPPFTask task = job.getTasks().get(0);
 			cl = task.getClass().getClassLoader();
 			mgr.addRequestClassLoader(requestUuid, cl);
 		}
@@ -147,8 +147,8 @@ public class JcaResultProcessor implements Work
 				Thread.currentThread().setContextClassLoader(cl);
 			}
 			//log.debug("submitting with policy = " + execution.policy);
-			connection.sendTasks(cl, bundle, execution.tasks, execution.dataProvider);
-			while (count < execution.tasks.size())
+			connection.sendTasks(cl, bundle, job);
+			while (count < job.getTasks().size())
 			{
 				Pair<List<JPPFTask>, Integer> p = connection.receiveResults(cl);
 				count += p.first().size();
@@ -170,11 +170,11 @@ public class JcaResultProcessor implements Work
 
 	/**
 	 * Get all the data pertaining to the execution for this task.
-	 * @return a <code>ClientExecution</code> instance.
+	 * @return a <code>JPPFJob</code> instance.
 	 */
-	public ClientExecution getExecution()
+	public JPPFJob getJob()
 	{
-		return execution;
+		return job;
 	}
 
 	/**

@@ -206,6 +206,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * @param dataProvider the provider of the data shared among tasks, may be null.
 	 * @return the list of executed tasks with their results.
 	 * @throws Exception if an error occurs while sending the request.
+	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead.
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
 	{
@@ -219,6 +220,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
 	 * @return the list of executed tasks with their results.
 	 * @throws Exception if an error occurs while sending the request.
+	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead.
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy) throws Exception
 	{
@@ -233,25 +235,13 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
 	 * @return the list of executed tasks with their results.
 	 * @throws Exception if an error occurs while sending the request.
+	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead.
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy, int priority) throws Exception
 	{
-		JPPFResultCollector collector = new JPPFResultCollector(taskList.size());
-		List<JPPFTask> result = null;
-		while ((result == null) && !pools.isEmpty())
-		{
-			try
-			{
-				JPPFClientConnection c = getClientConnection();
-				c.submit(taskList, dataProvider, collector, policy, priority);
-				result = collector.waitForResults();
-			}
-			catch(Exception e)
-			{
-				if (pools.isEmpty()) throw e;
-			}
-		}
-		return result;
+		JPPFJob job = new JPPFJob(dataProvider, policy, true, null, priority);
+		for (JPPFTask task: taskList) job.addTask(task);
+		return submit(job);
 	}
 
 	/**
@@ -260,6 +250,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * @param dataProvider the provider of the data shared among tasks, may be null.
 	 * @param listener listener to notify whenever a set of results have been received.
 	 * @throws Exception if an error occurs while sending the request.
+	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead.
 	 */
 	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
 		throws Exception
@@ -274,6 +265,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * @param listener listener to notify whenever a set of results have been received.
 	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
 	 * @throws Exception if an error occurs while sending the request.
+	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead.
 	 */
 	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
 		throws Exception
@@ -289,11 +281,14 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
 	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
 	 * @throws Exception if an error occurs while sending the request.
+	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead.
 	 */
 	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
 		throws Exception
 	{
-		getClientConnection().submit(taskList, dataProvider, listener, policy, priority);
+		JPPFJob job = new JPPFJob(dataProvider, policy, false, listener, priority);
+		for (JPPFTask task: taskList) job.addTask(task);
+		submit(job);
 	}
 
 	/**
@@ -302,16 +297,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * @return the results of the tasks' execution, as a list of <code>JPPFTask</code> instances for a blocking job, or null if the job is non-blocking.
 	 * @throws Exception if an error occurs while sending the job for execution.
 	 */
-	public List<JPPFTask> submit(JPPFJob job) throws Exception
-	{
-		if (job.isBlocking())
-		{
-			List<JPPFTask> results = submit(job.getTasks(), job.getDataProvider(), job.getExecutionPolicy(), job.getPriority());
-			return results;
-		}
-		submitNonBlocking(job.getTasks(), job.getDataProvider(), job.getResultListener(), job.getExecutionPolicy(), job.getPriority());
-		return null;
-	}
+	public abstract List<JPPFTask> submit(JPPFJob job) throws Exception;
 
 	/**
 	 * Invoked when the status of a client connection has changed.
@@ -340,12 +326,12 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 			if (pool.clientList.isEmpty()) pools.remove(priority);
 			if (pools.isEmpty()) throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
 		}
-		List<ClientExecution> toResubmit = c.close();
+		List<JPPFJob> toResubmit = c.close();
 		int taskCount = 0;
 		int execCount = toResubmit.size();
-		for (ClientExecution exec: toResubmit)
+		for (JPPFJob exec: toResubmit)
 		{
-			if (exec.tasks != null) taskCount += exec.tasks.size();
+			if (exec.getTasks() != null) taskCount += exec.getTasks().size();
 		}
 		if (taskCount > 0)
 		{
@@ -355,11 +341,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		{
 			try
 			{
-				for (ClientExecution exec: toResubmit)
-				{
-					if (exec.isBlocking) submit(exec.tasks, exec.dataProvider);
-					else submitNonBlocking(exec.tasks, exec.dataProvider, exec.listener);
-				}
+				for (JPPFJob job: toResubmit) submit(job);
 			}
 			catch(Exception e)
 			{

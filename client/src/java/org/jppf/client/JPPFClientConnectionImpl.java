@@ -30,9 +30,6 @@ import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.TypedProperties;
 
 /**
@@ -176,30 +173,24 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 
 	/**
 	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param listener listener to notify whenever a set of results have been received.
-	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
-	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
+	 * @param job - the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener, org.jppf.node.policy.ExecutionPolicy, int)
 	 */
-	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
+	public void submit(JPPFJob job)
 			throws Exception
 	{
-		ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener, policy);
-		exec.priority = priority;
-		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(this, exec);
+		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(this, job);
 		executor.submit(proc);
-		if (debugEnabled) log.debug("["+name+"] submitted " + taskList.size() + " tasks");
+		if (debugEnabled) log.debug("["+name+"] submitted " + job.getTasks().size() + " tasks");
 	}
 
 	/**
 	 * Shutdown this client and retrieve all pending executions for resubmission.
-	 * @return a list of <code>ClientExecution</code> instances to resubmit.
+	 * @return a list of <code>JPPFJob</code> instances to resubmit.
 	 * @see org.jppf.client.JPPFClientConnection#close()
 	 */
-	public List<ClientExecution> close()
+	public List<JPPFJob> close()
 	{
 		if (!isShutdown)
 		{
@@ -215,12 +206,12 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 				log.error("[" + name + "] "+ e.getMessage(), e);
 			}
 			List<Runnable> pending = executor.shutdownNow();
-			List<ClientExecution> result = new ArrayList<ClientExecution>();
-			if (currentExecution != null) result.add(currentExecution);
+			List<JPPFJob> result = new ArrayList<JPPFJob>();
+			if (job != null) result.add(job);
 			while (!pending.isEmpty())
 			{
 				AsynchronousResultProcessor proc = (AsynchronousResultProcessor) pending.remove(0);
-				result.add(proc.getExecution());
+				result.add(proc.getJob());
 			}
 			return result;
 		}

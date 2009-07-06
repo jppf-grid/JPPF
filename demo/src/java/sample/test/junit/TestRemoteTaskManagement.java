@@ -19,7 +19,6 @@
 package sample.test.junit;
 
 import java.io.Serializable;
-import java.util.*;
 
 import junit.framework.TestCase;
 
@@ -89,10 +88,12 @@ public class TestRemoteTaskManagement extends TestCase implements Serializable
 	{
 		JPPFTask result = null;
 		client = new JPPFClient();
-		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-		taskList.add(task);
+		JPPFJob job = new JPPFJob();
+		job.addTask(task);
+		job.setBlocking(false);
 		JPPFResultCollector c = new JPPFResultCollector(1);
-		client.submitNonBlocking(taskList, null, c);
+		job.setResultListener(c);
+		client.submit(job);
 		Thread.sleep(1000L);
 		JMXNodeConnectionWrapper jmxClient = new JMXNodeConnectionWrapper("localhost", 12001);
 		jmxClient.connect();

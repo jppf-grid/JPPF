@@ -246,20 +246,50 @@ public class JPPFClient extends AbstractJPPFClient
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy, int priority) throws Exception
 	{
+		JPPFJob job = new JPPFJob(dataProvider, policy, true, null, priority);
+		for (JPPFTask task: taskList) job.addTask(task);
+		return submit(job);
+	}
+
+	/**
+	 * Submit the request to the server.
+	 * @param job - the job to execute remotely.
+	 * @return the list of executed tasks with their results.
+	 * @throws Exception if an error occurs while sending the request.
+	 * @see org.jppf.client.AbstractJPPFClient#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.node.policy.ExecutionPolicy)
+	 */
+	public List<JPPFTask> submit(JPPFJob job) throws Exception
+	{
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getClientConnection(true);
-		if (c != null)
+		if (job.isBlocking())
 		{
-			JPPFResultCollector collector = new JPPFResultCollector(taskList.size());
-			c.submit(taskList, dataProvider, collector, policy, priority);
-			return collector.waitForResults();
+			if (c != null)
+			{
+				JPPFResultCollector collector = new JPPFResultCollector(job.getTasks().size());
+				job.setResultListener(collector);
+				c.submit(job);
+				return collector.waitForResults();
+			}
+			if (LOCAL_EXEC_ENABLED)
+			{
+				JPPFResultCollector collector = new JPPFResultCollector(job.getTasks().size());
+				job.setResultListener(collector);
+				JPPFClient.getLoadBalancer().execute(job, c);
+				return collector.waitForResults();
+			}
 		}
-		if (LOCAL_EXEC_ENABLED)
+		else
 		{
-			JPPFResultCollector collector = new JPPFResultCollector(taskList.size());
-			ClientExecution exec = new ClientExecution(taskList, dataProvider, true, collector, policy);
-			exec.priority = priority;
-			JPPFClient.getLoadBalancer().execute(exec, c);
-			return collector.waitForResults();
+			if (c != null)
+			{
+				c.submit(job);
+				return null;
+			}
+			if (LOCAL_EXEC_ENABLED)
+			{
+				JPPFClient.getLoadBalancer().execute(job, c);
+				return null;
+			}
 		}
 		throw new JPPFException("Cannot execute: no driver connection available and local execution is disabled");
 	}
@@ -277,20 +307,9 @@ public class JPPFClient extends AbstractJPPFClient
 	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
 		throws Exception
 	{
-		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getClientConnection(true);
-		if (c != null)
-		{
-			c.submit(taskList, dataProvider, listener, policy, priority);
-			return;
-		}
-		if (LOCAL_EXEC_ENABLED)
-		{
-			ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener, policy);
-			exec.priority = priority;
-			JPPFClient.getLoadBalancer().execute(exec, c);
-			return;
-		}
-		throw new JPPFException("Cannot execute: no driver connection available and local execution is disabled");
+		JPPFJob job = new JPPFJob(dataProvider, policy, false, listener, priority);
+		for (JPPFTask task: taskList) job.addTask(task);
+		submit(job);
 	}
 
 	/**

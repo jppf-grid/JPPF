@@ -57,10 +57,9 @@ public class GenericRunner
 					super.resultsReceived(event);
 				}
 			};
-			//job.setBlocking(false);
-			//job.setResultListener(collector);
-			//client.submit(job);
-			client.submitNonBlocking(job.getTasks(), null, collector);
+			job.setBlocking(false);
+			job.setResultListener(collector);
+			client.submit(job);
 			results = collector.waitForResults();
 			for (JPPFTask task: results)
 			{

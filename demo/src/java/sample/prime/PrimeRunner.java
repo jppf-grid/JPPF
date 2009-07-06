@@ -21,7 +21,7 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
-import org.jppf.client.JPPFClient;
+import org.jppf.client.*;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
@@ -83,14 +83,14 @@ public class PrimeRunner
 			//count = 33222592; // about 10 million digits
 			while (pending > 0)
 			{
-				List<JPPFTask> list = new ArrayList<JPPFTask>();
+				JPPFJob job = new JPPFJob();
 				int nbTasks = (pending > batchSize) ? batchSize : pending;
 				for (int i=0; i<nbTasks; i++)
 				{
-					list.add(new PrimeTask(count++));
+					job.addTask(new PrimeTask(count++));
 				}
 				pending -= nbTasks;
-				List<JPPFTask> results = jppfClient.submit(list, null);
+				List<JPPFTask> results = jppfClient.submit(job);
 				for (JPPFTask t: results)
 				{
 					if (t.getResult() != null)

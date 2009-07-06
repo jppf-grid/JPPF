@@ -79,10 +79,12 @@ public class PriorityTestRunner
 	 */
 	public static void perform() throws Exception
 	{
-		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-		tasks.add(new PrioritizedTask(0));
+		JPPFJob job = new JPPFJob();
+		job.addTask(new PrioritizedTask(0));
 		JPPFResultCollector collector = new JPPFResultCollector(1);
-		client.submitNonBlocking(tasks, null, collector);
+		job.setResultListener(collector);
+		job.setBlocking(false);
+		client.submit(job);
 		List<JPPFTask> results = collector.waitForResults();
 	}
 
@@ -92,9 +94,9 @@ public class PriorityTestRunner
 	 */
 	public static void perform2() throws Exception
 	{
-		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-		tasks.add(new PrioritizedTask(0));
-		List<JPPFTask> results = client.submit(tasks, null);
+		JPPFJob job = new JPPFJob();
+		job.addTask(new PrioritizedTask(0));
+		List<JPPFTask> results = client.submit(job);
 	}
 
 	/**

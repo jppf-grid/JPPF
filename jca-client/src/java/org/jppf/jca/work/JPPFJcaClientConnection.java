@@ -23,13 +23,10 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 import java.util.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.*;
+import org.jppf.JPPFError;
 import org.jppf.client.*;
-import org.jppf.client.event.TaskResultListener;
 import org.jppf.comm.socket.SocketInitializer;
-import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.protocol.*;
-import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.Pair;
 
 /**
@@ -99,41 +96,19 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	}
 
 	/**
-	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param listener listener to notify whenever a set of results have been received.
-	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
-	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener)
-	 */
-	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
-			throws Exception
-	{
-		setStatus(EXECUTING);
-		ClientExecution exec = new ClientExecution(taskList, dataProvider, false, listener, policy);
-		exec.priority = priority;
-		JcaResultProcessor proc = new JcaResultProcessor(this, exec);
-		proc.run();
-		if (debugEnabled) log.debug("["+name+"] submitted " + taskList.size() + " tasks");
-	}
-
-	/**
 	 * Send tasks to the server for execution.
-	 * @param cl classloader used for serialization.
-	 * @param header the task bundle to send to the driver.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param cl - classloader used for serialization.
+	 * @param header - the task bundle to send to the driver.
+	 * @param job - the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
-	public void sendTasks(ClassLoader cl, JPPFTaskBundle header, List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
+	public void sendTasks(ClassLoader cl, JPPFTaskBundle header, JPPFJob job) throws Exception
 	{
 		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
 		try
 		{
 			if (cl != null) Thread.currentThread().setContextClassLoader(cl);
-			sendTasks(header, taskList, dataProvider);
+			sendTasks(header, job);
 		}
 		catch(Exception e)
 		{
@@ -149,6 +124,16 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 		{
 			if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
 		}
+	}
+
+	/**
+	 * Submit a JPPFJob for execution.
+	 * @param job the job to execute.
+	 * @throws Exception if an error occurs while sending the job for execution.
+	 * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
+	 */
+	public void submit(JPPFJob job) throws Exception
+	{
 	}
 
 	/**
@@ -187,10 +172,10 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 
 	/**
 	 * Shutdown this client and retrieve all pending executions for resubmission.
-	 * @return a list of <code>ClientExecution</code> instances to resubmit.
+	 * @return a list of <code>JPPFJob</code> instances to resubmit.
 	 * @see org.jppf.client.JPPFClientConnection#close()
 	 */
-	public List<ClientExecution> close()
+	public List<JPPFJob> close()
 	{
 		if (!isShutdown)
 		{
@@ -204,8 +189,8 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 			{
 				log.error("[" + name + "] "+ e.getMessage(), e);
 			}
-			List<ClientExecution> result = new ArrayList<ClientExecution>();
-			if (currentExecution != null) result.add(currentExecution);
+			List<JPPFJob> result = new ArrayList<JPPFJob>();
+			if (job != null) result.add(job);
 			return result;
 		}
 		return null;

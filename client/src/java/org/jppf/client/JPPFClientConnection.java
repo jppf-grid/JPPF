@@ -20,10 +20,7 @@ package org.jppf.client;
 
 import java.util.List;
 
-import org.jppf.client.event.*;
-import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.DataProvider;
+import org.jppf.client.event.ClientConnectionStatusHandler;
 
 /**
  * Interface for a client connection to a JPPF driver.
@@ -38,36 +35,10 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
 
 	/**
 	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param listener listener to notify whenever a set of results have been received.
+	 * @param job - the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
-	void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
-			throws Exception;
-
-	/**
-	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param listener listener to notify whenever a set of results have been received.
-	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
-	 * @throws Exception if an error occurs while sending the request.
-	 */
-	void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
-			throws Exception;
-
-	/**
-	 * Submit the request to the server with the specified priority.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param listener listener to notify whenever a set of results have been received.
-	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
-	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
-	 * @throws Exception if an error occurs while sending the request.
-	 */
-	void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
-			throws Exception;
+	void submit(JPPFJob job) throws Exception;
 
 	/**
 	 * Get the priority assigned to this connection.
@@ -77,9 +48,9 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
 
 	/**
 	 * Shutdown this client and retrieve all pending executions for resubmission.
-	 * @return a list of <code>ClientExecution</code> instances to resubmit.
+	 * @return a list of <code>JPPFJob</code> instances to resubmit.
 	 */
-	List<ClientExecution> close();
+	List<JPPFJob> close();
 
 	/**
 	 * Get the name assigned tothis client connection.

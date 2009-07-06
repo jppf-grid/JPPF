@@ -48,7 +48,8 @@ public class EclipseRunner
 		try
 		{
 			print("Running Eclipse Task");
-			JPPFTask t = new EclipseTask2();
+			//JPPFTask t = new EclipseTask2();
+			JPPFTask t = new JBossTask();
 			JPPFJob job = new JPPFJob();
 			job.addTask(t);
 			jppfClient = new JPPFClient();

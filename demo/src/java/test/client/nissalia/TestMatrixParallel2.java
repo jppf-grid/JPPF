@@ -58,17 +58,16 @@ public class TestMatrixParallel2
 	private static void perform() throws Exception
 	{
 		long time = -System.currentTimeMillis();
-		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
 		DataProvider dataProvider = new MemoryMapDataProvider();
+		JPPFJob job = new JPPFJob(dataProvider);
 
-		for (int i = 0; i < NB_REPETITIONS; i++)
-		{
-			tasks.add(new TestMatrixTask2(i));
-		}
+		for (int i=0; i<NB_REPETITIONS; i++) job.addTask(new TestMatrixTask2(i));
 
 // submit the tasks for execution
-		JPPFResultCollector collector = new JPPFResultCollector(tasks.size());
-		jppfClient.submitNonBlocking(tasks, dataProvider, collector);
+		JPPFResultCollector collector = new JPPFResultCollector(job.getTasks().size());
+		job.setResultListener(collector);
+		job.setBlocking(false);
+		jppfClient.submit(job);
 		List<JPPFTask> results = collector.waitForResults();
 
 // List<JPPFTask> results = jppfClient.submit(tasks, dataProvider);

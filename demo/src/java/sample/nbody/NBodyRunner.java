@@ -24,7 +24,7 @@ import java.util.*;
 import javax.swing.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.client.JPPFClient;
+import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
@@ -108,6 +108,11 @@ public class NBodyRunner
 			positions[i] = new Vector2d(rand.nextDouble()*r/2d+r/4d, rand.nextDouble()*r/2d+r/4d);
 		}
 		int count = 0;
+		DataProvider dp = new MemoryMapDataProvider();
+		dp.setValue("qp_qp", Double.valueOf(qp*qp));
+		dp.setValue("qp_b", Double.valueOf(qp*b));
+		dp.setValue("dt", Double.valueOf(dt));
+		JPPFJob job = new JPPFJob(dp);
 		for (int i=0; i<nbTasks; i++)
 		{
 			NBody[] bodies = new NBody[count + bodiesPerTask < nbBodies ? bodiesPerTask : nbBodies - count];
@@ -116,19 +121,15 @@ public class NBodyRunner
 				bodies[j] = new NBody(count, positions[count]);
 				count++;
 			}
-			tasks.add(new NBodyTask(bodies));
+			job.addTask(new NBodyTask(bodies));
 		}
-		DataProvider dp = new MemoryMapDataProvider();
-		dp.setValue("qp_qp", Double.valueOf(qp*qp));
-		dp.setValue("qp_b", Double.valueOf(qp*b));
-		dp.setValue("dt", Double.valueOf(dt));
 		for (int iter=0; iter<iterations; iter++)
 		{
 			panel.updatePositions(positions);
 			dp.setValue("positions", positions);
 			long start = System.currentTimeMillis();
 			// submit the tasks for execution
-			List<JPPFTask> results = jppfClient.submit(tasks, dp);
+			List<JPPFTask> results = jppfClient.submit(job);
 			for (JPPFTask task: results)
 			{
 				Exception e = task.getException();

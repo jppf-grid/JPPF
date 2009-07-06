@@ -18,7 +18,7 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.*;
+import static org.jppf.client.JPPFClientConnectionStatus.CONNECTING;
 
 import java.nio.channels.AsynchronousCloseException;
 import java.util.*;
@@ -27,10 +27,8 @@ import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
-import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.security.*;
 import org.jppf.server.protocol.*;
-import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 
 /**
@@ -109,7 +107,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	/**
 	 * Holds the tasks, data provider and submission mode for the current execution.
 	 */
-	protected ClientExecution currentExecution = null;
+	protected JPPFJob job = null;
 	/**
 	 * Determines whether this connection has been shut down;
 	 */
@@ -181,50 +179,18 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	}
 
 	/**
-	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param listener listener to notify whenever a set of results have been received.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener)
-	 */
-	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
-			throws Exception
-	{
-		submit(taskList, dataProvider, listener, null, 0);
-	}
-
-	/**
-	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param listener listener to notify whenever a set of results have been received.
-	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener, org.jppf.node.policy.ExecutionPolicy)
-	 */
-	public void submit(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
-			throws Exception
-	{
-		submit(taskList, dataProvider, listener, policy, 0);
-	}
-
-	/**
 	 * Send tasks to the server for execution.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param policy an execution policy that deternmines on which node(s) the tasks will be permitted to run.
-	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
+	 * @param job - the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
-	public void sendTasks(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy, int priority) throws Exception
+	public void sendTasks(JPPFJob job) throws Exception
 	{
 		try
 		{
 			JPPFTaskBundle bundle = new JPPFTaskBundle();
-			bundle.setExecutionPolicy(policy);
-			bundle.setPriority(priority);
-			sendTasks(bundle, taskList, dataProvider);
+			bundle.setExecutionPolicy(job.getExecutionPolicy());
+			bundle.setPriority(job.getPriority());
+			sendTasks(bundle, job);
 		}
 		catch(Exception e)
 		{
@@ -241,25 +207,25 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	/**
 	 * Send tasks to the server for execution.
 	 * @param header the task bundle to send to the driver.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
+	 * @param job - the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
-	public void sendTasks(JPPFTaskBundle header, List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
+	public void sendTasks(JPPFTaskBundle header, JPPFJob job) throws Exception
 	{
 		ObjectSerializer ser = makeHelper().getSerializer();
-		int count = taskList.size();
+		int count = job.getTasks().size();
 		if (debugEnabled) log.debug("[client: "+name+"] sending "+count+" tasks");
 		TraversalList<String> uuidPath = new TraversalList<String>();
 		uuidPath.add(appUuid);
 		header.setUuidPath(uuidPath);
 		header.setCredentials(credentials);
 		header.setTaskCount(count);
+		header.setParameter("jobId", job.getId());
 
 		List<JPPFBuffer> bufList = new ArrayList<JPPFBuffer>();
 		bufList.add(ser.serialize(header));
-		bufList.add(ser.serialize(dataProvider));
-		for (JPPFTask task : taskList) bufList.add(ser.serialize(task));
+		bufList.add(ser.serialize(job.getDataProvider()));
+		for (JPPFTask task : job.getTasks()) bufList.add(ser.serialize(task));
 
 		SocketWrapper socketClient = taskServerConnection.getSocketClient();
 		int size = 0;
@@ -424,10 +390,10 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 
 	/**
 	 * Shutdown this client and retrieve all pending executions for resubmission.
-	 * @return a list of <code>ClientExecution</code> instances to resubmit.
+	 * @return a list of <code>JPPFJob</code> instances to resubmit.
 	 * @see org.jppf.client.JPPFClientConnection#close()
 	 */
-	public abstract List<ClientExecution> close();
+	public abstract List<JPPFJob> close();
 
 	/**
 	 * Get the name assigned tothis client connection.
@@ -457,20 +423,20 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 
 	/**
 	 * Get the object that holds the tasks, data provider and submission mode for the current execution.
-	 * @return a <code>ClientExecution</code> instance.
+	 * @return a <code>JPPFJob</code> instance.
 	 */
-	public ClientExecution getCurrentExecution()
+	public JPPFJob getCurrentJob()
 	{
-		return currentExecution;
+		return job;
 	}
 
 	/**
 	 * Set the object that holds the tasks, data provider and submission mode for the current execution.
 	 * @param currentExecution a <code>ClientExecution</code> instance.
 	 */
-	public void setCurrentExecution(ClientExecution currentExecution)
+	public void setCurrentJob(JPPFJob currentExecution)
 	{
-		this.currentExecution = currentExecution;
+		this.job = currentExecution;
 	}
 
 	/**

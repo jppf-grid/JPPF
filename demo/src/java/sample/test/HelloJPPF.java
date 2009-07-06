@@ -18,10 +18,9 @@
 package sample.test;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import org.jppf.client.JPPFClient;
+import java.util.*;
+
+import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -65,25 +64,30 @@ public class HelloJPPF implements Serializable
 	 */
 	public static void main(String[] args)
 	{
+		try
+		{
 		HelloJPPF h = new HelloJPPF();
 		h.testInnerTask();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	/**
 	 * Test with a non-static inner class implementation of the class.
+	 * @throws Exception if any error occurs.
 	 */
-	void testInnerTask()
+	void testInnerTask() throws Exception
 	{
 		JPPFClient client = new JPPFClient();
-		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-		for (int i = 1; i < 4; i++)
-		{
-			tasks.add(new InnerTask(i));
-		}
+		JPPFJob job = new JPPFJob();
+		for (int i = 1; i < 4; i++) job.addTask(new InnerTask(i));
 		try
 		{
 			// execute tasks
-			List<JPPFTask> results = client.submit(tasks, null);
+			List<JPPFTask> results = client.submit(job);
 			// show results
 			System.out.println("Got " + results.size() + " results: ");
 			Iterator<JPPFTask> it = results.iterator();

@@ -45,7 +45,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	/**
 	 * The queue of submissions pending execution.
 	 */
-	private ConcurrentLinkedQueue<ClientExecution> execQueue = new ConcurrentLinkedQueue<ClientExecution>();
+	private ConcurrentLinkedQueue<JPPFJob> execQueue = new ConcurrentLinkedQueue<JPPFJob>();
 	/**
 	 * Mapping of submissions to their submission id.
 	 */
@@ -100,17 +100,17 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 				goToSleep();
 			}
 			if (isStopped()) break;
-			ClientExecution exec = execQueue.poll();
+			JPPFJob job = execQueue.poll();
 			JPPFJcaClientConnection c = null;
 			synchronized(client)
 			{
 				c = (JPPFJcaClientConnection) client.getClientConnection();
 				c.setStatus(JPPFClientConnectionStatus.EXECUTING);
 			}
-			JPPFSubmissionResult submission = (JPPFSubmissionResult) exec.listener;
+			JPPFSubmissionResult submission = (JPPFSubmissionResult) job.getResultListener();
 			try
 			{
-				workManager.scheduleWork(new JcaResultProcessor(c, exec));
+				workManager.scheduleWork(new JcaResultProcessor(c, job));
 			}
 			catch(WorkException e)
 			{
@@ -123,27 +123,27 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 
 	/**
 	 * Add a task submission to the execution queue.
-	 * @param exec encapsulation of the execution data.
+	 * @param job encapsulation of the execution data.
 	 * @return the unique id of the submission.
 	 */
-	public String addSubmission(ClientExecution exec)
+	public String addSubmission(JPPFJob job)
 	{
-		return addSubmission(exec, null);
+		return addSubmission(job, null);
 	}
 
 	/**
 	 * Add a task submission to the execution queue.
-	 * @param exec encapsulation of the execution data.
+	 * @param job encapsulation of the execution data.
 	 * @param listener an optional listener to receive submission status change notifications, may be null.
 	 * @return the unique id of the submission.
 	 */
-	public String addSubmission(ClientExecution exec, SubmissionStatusListener listener)
+	public String addSubmission(JPPFJob job, SubmissionStatusListener listener)
 	{
-		JPPFSubmissionResult submission = new JPPFSubmissionResult(exec.tasks.size());
+		JPPFSubmissionResult submission = new JPPFSubmissionResult(job.getTasks().size());
 		if (listener != null) submission.addSubmissionStatusListener(listener);
-		exec.listener = submission;
+		job.setResultListener(submission);
 		submission.setStatus(PENDING);
-		execQueue.add(exec);
+		execQueue.add(job);
 		submissionMap.put(submission.getId(), submission);
 		wakeUp();
 		return submission.getId();

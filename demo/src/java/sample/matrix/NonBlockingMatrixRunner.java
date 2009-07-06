@@ -162,13 +162,15 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 				nbTasks = size;
 				long start = System.currentTimeMillis();
 				// create a task for each row in matrix a
-				List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-				for (int i=0; i<size; i++) tasks.add(new MatrixTask(a.getRow(i)));
 				// create a data provider to share matrix b among all tasks
 				DataProvider dataProvider = new MemoryMapDataProvider();
 				dataProvider.setValue(MatrixTask.DATA_KEY, b);
+				JPPFJob job = new JPPFJob(dataProvider);
+				for (int i=0; i<size; i++) job.addTask(new MatrixTask(a.getRow(i)));
+				job.setBlocking(false);
+				job.setResultListener(this);
 				// submit the tasks for execution
-				jppfClient.submitNonBlocking(tasks, dataProvider, this);
+				jppfClient.submit(job);
 				waitForResults();
 				List<JPPFTask> results = new ArrayList<JPPFTask>();
 				for (Integer n: resultMap.keySet()) results.addAll(resultMap.get(n));

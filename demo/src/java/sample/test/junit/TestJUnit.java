@@ -19,11 +19,10 @@
 package sample.test.junit;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 import junit.framework.TestCase;
 
-import org.jppf.client.JPPFClient;
+import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -39,14 +38,16 @@ public class TestJUnit extends TestCase implements Serializable
 	public void test1() throws Exception
 	{
 		JPPFClient client = new JPPFClient();
-		client.submit(Arrays.<JPPFTask>asList(new JPPFTask()
+		JPPFJob job = new JPPFJob();
+		job.addTask(new JPPFTask()
 		{
       private static final long serialVersionUID = 1L;
       public void run()
       {
     		System.out.println("executing task");
       }
-		}), null);
+		});
+		client.submit(job);
 		System.out.println("before close");
 		client.close();
 		System.out.println("after close");

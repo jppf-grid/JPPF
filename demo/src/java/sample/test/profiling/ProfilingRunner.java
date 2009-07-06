@@ -20,7 +20,7 @@ package sample.test.profiling;
 import java.util.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.client.JPPFClient;
+import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 
@@ -80,10 +80,10 @@ public class ProfilingRunner
 		for (int iter=0; iter<iterations; iter++)
 		{
 			long start = System.currentTimeMillis();
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			for (int i=0; i<nbTask; i++) tasks.add(new EmptyTask(dataSize));
+			JPPFJob job = new JPPFJob();
+			for (int i=0; i<nbTask; i++) job.addTask(new EmptyTask(dataSize));
 			// submit the tasks for execution
-			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			List<JPPFTask> results = jppfClient.submit(job);
 			long elapsed = System.currentTimeMillis() - start;
 			System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
 		}

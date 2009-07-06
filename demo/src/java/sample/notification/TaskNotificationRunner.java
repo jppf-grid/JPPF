@@ -86,10 +86,10 @@ public class TaskNotificationRunner
 			{
 				long start = System.currentTimeMillis();
 				// create the tasks
-				List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-				for (int i=0; i<nbTasks; i++) tasks.add(new StagedTask(i, nbStages, duration));
+				JPPFJob job = new JPPFJob();
+				for (int i=0; i<nbTasks; i++) job.addTask(new StagedTask(i, nbStages, duration));
 				// submit the tasks for execution
-				List<JPPFTask> results = jppfClient.submit(tasks, null);
+				List<JPPFTask> results = jppfClient.submit(job);
 				for (JPPFTask task: results)
 				{
 					Exception e = task.getException();

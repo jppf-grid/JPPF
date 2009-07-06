@@ -95,7 +95,7 @@ public class LoadBalancer
 	}
 
 	/**
-	 * Stop this load-balncer and cleanup any resource it uses.
+	 * Stop this load-balancer and cleanup any resource it uses.
 	 */
 	public void stop()
 	{
@@ -104,14 +104,14 @@ public class LoadBalancer
 
 	/**
 	 * Perform the execution.
-	 * @param execution the execution to perform.
+	 * @param job the execution to perform.
 	 * @param connection the client connection for sending remote execution requests.
 	 * @throws Exception if an error is raised during execution.
 	 */
-	public void execute(ClientExecution execution, JPPFClientConnectionImpl connection) throws Exception
+	public void execute(JPPFJob job, JPPFClientConnectionImpl connection) throws Exception
 	{
 		int count = 0;
-		List<JPPFTask> tasks = execution.tasks;
+		List<JPPFTask> tasks = job.getTasks();
 		for (JPPFTask task : tasks) task.setPosition(count++);
 		if (localEnabled && locallyExecuting.compareAndSet(false, true))
 		{
@@ -144,9 +144,9 @@ public class LoadBalancer
 						list.add(CollectionUtils.getAllElements(tasks, idx, bundleSize[i]));
 						idx += bundleSize[i];
 					}
-					ExecutionThread[] threads = { new LocalExecutionThread(list.get(LOCAL), execution), new RemoteExecutionThread(list.get(REMOTE), execution, connection) };
+					ExecutionThread[] threads = { new LocalExecutionThread(list.get(LOCAL), job), new RemoteExecutionThread(list.get(REMOTE), job, connection) };
 					for (int i=LOCAL; i<=REMOTE; i++) threads[i].start();
-					if (execution.isBlocking)
+					if (job.isBlocking())
 					{
 						for (int i=LOCAL; i<=REMOTE; i++) threads[i].join();
 						for (int i=LOCAL; i<=REMOTE; i++) if (threads[i].getException() != null) throw threads[i].getException();
@@ -154,8 +154,8 @@ public class LoadBalancer
 				}
 				else
 				{
-					ExecutionThread localThread = new LocalExecutionThread(tasks, execution);
-					if (!execution.isBlocking) localThread.start();
+					ExecutionThread localThread = new LocalExecutionThread(tasks, job);
+					if (!job.isBlocking()) localThread.start();
 					else
 					{
 						localThread.run();
@@ -170,7 +170,7 @@ public class LoadBalancer
 		}
 		else if (connection != null)
 		{
-			ExecutionThread remoteThread = new RemoteExecutionThread(tasks, execution, connection);
+			ExecutionThread remoteThread = new RemoteExecutionThread(tasks, job, connection);
 			remoteThread.run();
 			if (remoteThread.getException() != null) throw remoteThread.getException();
 		}
@@ -205,17 +205,17 @@ public class LoadBalancer
 		/**
 		 * The execution to perform.
 		 */
-		protected ClientExecution execution = null;
+		protected JPPFJob job = null;
 
 		/**
 		 * Initialize this execution thread for remote excution.
 		 * @param tasks the tasks to execute.
-		 * @param execution the execution to perform.
+		 * @param job the execution to perform.
 		 */
-		public ExecutionThread(List<JPPFTask> tasks, ClientExecution execution)
+		public ExecutionThread(List<JPPFTask> tasks, JPPFJob job)
 		{
 			this.tasks = tasks;
-			this.execution = execution;
+			this.job = job;
 		}
 
 		/**
@@ -242,11 +242,11 @@ public class LoadBalancer
 		/**
 		 * Initialize this execution thread for local excution.
 		 * @param tasks the tasks to execute.
-		 * @param execution the execution to perform.
+		 * @param job the execution to perform.
 		 */
-		public LocalExecutionThread(List<JPPFTask> tasks, ClientExecution execution)
+		public LocalExecutionThread(List<JPPFTask> tasks, JPPFJob job)
 		{
-			super(tasks, execution);
+			super(tasks, job);
 		}
 
 		/**
@@ -261,15 +261,15 @@ public class LoadBalancer
 				List<Future<?>> futures = new ArrayList<Future<?>>();
 				for (JPPFTask task: tasks)
 				{
-					task.setDataProvider(execution.dataProvider);
+					task.setDataProvider(job.getDataProvider());
 					futures.add(threadPool.submit(new TaskWrapper(task)));
 				}
 				for (Future<?> f: futures) f.get();
-				if (execution.listener != null)
+				if (job.getResultListener() != null)
 				{
-					synchronized(execution.listener)
+					synchronized(job.getResultListener())
 					{
-						execution.listener.resultsReceived(new TaskResultEvent(tasks, tasks.get(0).getPosition()));
+						job.getResultListener().resultsReceived(new TaskResultEvent(tasks, tasks.get(0).getPosition()));
 					}
 				}
 				double elapsed = System.currentTimeMillis() - start;
@@ -296,12 +296,12 @@ public class LoadBalancer
 		/**
 		 * Initialize this execution thread for remote excution.
 		 * @param tasks the tasks to execute.
-		 * @param execution the execution to perform.
+		 * @param job the execution to perform.
 		 * @param connection the connection to the driver to use.
 		 */
-		public RemoteExecutionThread(List<JPPFTask> tasks, ClientExecution execution, JPPFClientConnectionImpl connection)
+		public RemoteExecutionThread(List<JPPFTask> tasks, JPPFJob job, JPPFClientConnectionImpl connection)
 		{
-			super(tasks, execution);
+			super(tasks, job);
 			this.connection = connection;
 		}
 
@@ -316,18 +316,20 @@ public class LoadBalancer
 				long start = System.currentTimeMillis();
 				int count = 0;
 				boolean completed = false;
+				JPPFJob newJob = new JPPFJob(job.getDataProvider(), job.getExecutionPolicy(), job.isBlocking(), job.getResultListener(), job.getPriority());
+				for (JPPFTask task: tasks) newJob.addTask(task);
 				while (!completed)
 				{
-					connection.sendTasks(tasks, execution.dataProvider, execution.policy, execution.priority);
+					connection.sendTasks(newJob);
 					while (count < tasks.size())
 					{
 						Pair<List<JPPFTask>, Integer> p = connection.receiveResults();
 						count += p.first().size();
-						if (execution.listener != null)
+						if (job.getResultListener() != null)
 						{
-							synchronized(execution.listener)
+							synchronized(newJob.getResultListener())
 							{
-								execution.listener.resultsReceived(new TaskResultEvent(p.first(), p.second()));
+								newJob.getResultListener().resultsReceived(new TaskResultEvent(p.first(), p.second()));
 							}
 						}
 					}

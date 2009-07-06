@@ -152,9 +152,14 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	 * @param dataProvider the provider of the data shared among tasks, may be null.
 	 * @return the list of executed tasks with their results.
 	 * @throws Exception if an error occurs while sending the request.
+	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead. 
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
 	{
+		JPPFJob job = new JPPFJob(dataProvider);
+		for (JPPFTask task: taskList) job.addTask(task);
+		return submit(job);
+		/*
 		JPPFSubmissionResult collector = new JPPFSubmissionResult(taskList.size());
 		List<JPPFTask> result = null;
 		while ((result == null) && !pools.isEmpty())
@@ -163,6 +168,19 @@ public class JPPFJcaClient extends AbstractJPPFClient
 			result = collector.getResults();
 		}
 		return result;
+		*/
+	}
+
+	/**
+	 * Submit a JPPFJob for execution.
+	 * @param job the job to execute.
+	 * @return the results of the tasks' execution, as a list of <code>JPPFTask</code> instances for a blocking job, or null if the job is non-blocking.
+	 * @throws Exception if an error occurs while sending the job for execution.
+	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
+	 */
+	public List<JPPFTask> submit(JPPFJob job) throws Exception
+	{
+		return null;
 	}
 
 	/**

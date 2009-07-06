@@ -20,7 +20,7 @@ package sample.test.tilmanb;
 
 import java.util.*;
 
-import org.jppf.client.JPPFClient;
+import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -53,14 +53,14 @@ public class ExitTest
 	{
 		JPPFClient client = new JPPFClient();
 
-		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-		taskList.add(new MyLongTask("task1", 100));
-		taskList.add(new MyLongTask("task2", 200));
-		taskList.add(new MyLongTask("task3", 200));
-		taskList.add(new MyLongTask("task4", 140));
+		JPPFJob job = new JPPFJob();
+		job.addTask(new MyLongTask("task1", 100));
+		job.addTask(new MyLongTask("task2", 200));
+		job.addTask(new MyLongTask("task3", 200));
+		job.addTask(new MyLongTask("task4", 140));
 
 		System.out.println("Submitting...");
-		List<JPPFTask> result = client.submit(taskList, null);
+		List<JPPFTask> result = client.submit(job);
 		System.out.println("processing results");
 		for (JPPFTask t : result)
 		{

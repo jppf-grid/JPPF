@@ -93,10 +93,9 @@ public class TestTaskRunner
 		System.out.println("Starting exception testing...");
 		try
 		{
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			JPPFTask task = new ExceptionTestTask();
-			tasks.add(task);
-			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			JPPFJob job = new JPPFJob();
+			job.addTask(new ExceptionTestTask());
+			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask resultTask = results.get(0);
 			if (resultTask.getException() != null)
 			{
@@ -123,10 +122,9 @@ public class TestTaskRunner
 		System.out.println("Starting URL testing...");
 		try
 		{
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			JPPFTask task = new FileDownloadTestTask("http://www.jppf.org/Options.xsd");
-			tasks.add(task);
-			List<JPPFTask> results = jppfClient.submit(tasks, new CompositeDataProvider());
+			JPPFJob job = new JPPFJob(new CompositeDataProvider());
+			job.addTask(new FileDownloadTestTask("http://www.jppf.org/Options.xsd"));
+			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask resultTask = results.get(0);
 			if (resultTask.getException() != null)
 			{
@@ -157,10 +155,9 @@ public class TestTaskRunner
 		System.out.println("Starting security testing...");
 		try
 		{
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			JPPFTask task = new SecurityTestTask();
-			tasks.add(task);
-			List<JPPFTask> results = jppfClient.submit(tasks, new CompositeDataProvider());
+			JPPFJob job = new JPPFJob(new CompositeDataProvider());
+			job.addTask(new SecurityTestTask());
+			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask resultTask = results.get(0);
 			System.out.println("Result is:\n"+resultTask);
 		}
@@ -184,8 +181,7 @@ public class TestTaskRunner
 		System.out.println("Starting empty tasks list testing...");
 		try
 		{
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			jppfClient.submit(tasks, null);
+			jppfClient.submit(new JPPFJob());
 		}
 		catch(Exception e)
 		{
@@ -208,9 +204,9 @@ public class TestTaskRunner
 		try
 		{
 			int n = 50;
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			for (int i=0; i<n; i++) tasks.add(new ConstantTask(i));
-			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			JPPFJob job = new JPPFJob();
+			for (int i=0; i<n; i++) job.addTask(new ConstantTask(i));
+			List<JPPFTask> results = jppfClient.submit(job);
 			for (int i=0; i<n; i++)
 			{
 				System.out.println("result for task #"+i+" is : "+results.get(i).getResult());
@@ -238,9 +234,9 @@ public class TestTaskRunner
 		System.out.println("classpath: "+cp);
 		try
 		{
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			tasks.add(new ClassNotFoundTestTask());
-			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			JPPFJob job = new JPPFJob();
+			job.addTask(new ClassNotFoundTestTask());
+			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask resultTask = results.get(0);
 			if (resultTask.getException() != null)
 			{
@@ -269,15 +265,12 @@ public class TestTaskRunner
 		System.out.println(banner);
 		System.out.println("Starting InnerTask task testing...");
 		HelloJPPF h = new HelloJPPF();
-		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-		for (int i=1; i<4;i++)
-		{
-			tasks.add(h.new InnerTask(i));
-		}
+		JPPFJob job = new JPPFJob();
 		try
 		{
+			for (int i=1; i<4;i++) job.addTask(h.new InnerTask(i));
 			// execute tasks
-			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			List<JPPFTask> results = jppfClient.submit(job);
 			// show results
 			System.out.println("Got "+results.size()+" results: ");
 			System.out.println("Result is:");
@@ -311,9 +304,9 @@ public class TestTaskRunner
 		try
 		{
 			int n = 1;
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			for (int i=0; i<n; i++) tasks.add(new DB2LoadingTask());
-			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			JPPFJob job = new JPPFJob();
+			for (int i=0; i<n; i++) job.addTask(new DB2LoadingTask());
+			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask resultTask = results.get(0);
 			if (resultTask.getException() != null)
 			{
@@ -345,9 +338,9 @@ public class TestTaskRunner
 		try
 		{
 			int n = 1;
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			for (int i=0; i<n; i++) tasks.add(new ParserTask("build.xml"));
-			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			JPPFJob job = new JPPFJob();
+			for (int i=0; i<n; i++) job.addTask(new ParserTask("build.xml"));
+			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask resultTask = results.get(0);
 			if (resultTask.getException() != null)
 			{
@@ -378,11 +371,11 @@ public class TestTaskRunner
 		System.out.println("Starting my task testing...");
 		try
 		{
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			tasks.add(new MyTask());
 			DataProvider dataProvider = new MemoryMapDataProvider();
 			dataProvider.setValue("DATA", new SimpleData("Data and more data"));			
-			List<JPPFTask> results = jppfClient.submit(tasks, dataProvider);
+			JPPFJob job = new JPPFJob(dataProvider);
+			job.addTask(new MyTask());
+			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask resultTask = results.get(0);
 			if (resultTask.getException() != null)
 			{
@@ -413,9 +406,9 @@ public class TestTaskRunner
 		System.out.println("Starting timeout testing...");
 		try
 		{
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			tasks.add(new TimeoutTask());
-			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			JPPFJob job = new JPPFJob();
+			job.addTask(new TimeoutTask());
+			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask resultTask = results.get(0);
 			if (resultTask.getException() != null)
 			{
@@ -468,9 +461,9 @@ public class TestTaskRunner
 		try
 		{
 			int n = 50;
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			tasks.add(new AnonymousInnerClassTask());
-			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			JPPFJob job = new JPPFJob();
+			job.addTask(new AnonymousInnerClassTask());
+			List<JPPFTask> results = jppfClient.submit(job);
 			System.out.println("result is : "+results.get(0).getResult());
 		}
 		catch(Exception e)
@@ -494,9 +487,9 @@ public class TestTaskRunner
 		try
 		{
 			int n = 50;
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			tasks.add(new OutOfMemoryTestTask());
-			List<JPPFTask> results = jppfClient.submit(tasks, null);
+			JPPFJob job = new JPPFJob();
+			job.addTask(new OutOfMemoryTestTask());
+			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask res = results.get(0);
 			if (res.getException() != null) throw res.getException();
 			System.out.println("result is : "+res.getResult());
@@ -522,12 +515,12 @@ public class TestTaskRunner
 		try
 		{
 			int n = 50;
-			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-			tasks.add(new ConstantTask(1));
 			DataProvider dp = new MemoryMapDataProvider();
 			byte[] data = new byte[128 * 1024 * 1204];
 			dp.setValue("test", data);
-			List<JPPFTask> results = jppfClient.submit(tasks, dp);
+			JPPFJob job = new JPPFJob(dp);
+			job.addTask(new ConstantTask(1));
+			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask res = results.get(0);
 			if (res.getException() != null) throw res.getException();
 			System.out.println("result is : " + res.getResult());
