@@ -20,7 +20,6 @@ package org.jppf.samples.fractals;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -28,7 +27,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.client.JPPFClient;
+import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.ui.options.Option;
@@ -104,11 +103,11 @@ public class FractalRunner
 		log.info("Executing " + nbTask + " tasks");
 		DataProvider dp = new MemoryMapDataProvider();
 		dp.setValue("config", config);
+		JPPFJob job = new JPPFJob(dp);
 		long start = System.currentTimeMillis();
-		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
-		for (int i=0; i<nbTask; i++) tasks.add(doMandelbrot ? new MandelbrotTask(i) : new LyapunovTask(i));
+		for (int i=0; i<nbTask; i++) job.addTask(doMandelbrot ? new MandelbrotTask(i) : new LyapunovTask(i));
 		// submit the tasks for execution
-		List<JPPFTask> results = jppfClient.submit(tasks, dp);
+		List<JPPFTask> results = jppfClient.submit(job);
 		long elapsed = System.currentTimeMillis() - start;
 		log.info("Computation performed in "+StringUtils.toStringDuration(elapsed));
 		//JPPFStats stats = jppfClient.requestStatistics();

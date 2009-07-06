@@ -26,7 +26,7 @@ import java.util.concurrent.*;
 import javax.swing.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.client.JPPFClient;
+import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.ui.options.*;
 import org.jppf.utils.*;
@@ -105,15 +105,16 @@ public class WebCrawlerRunner
 	public static List<JPPFTask> doPerform(Collection<String> urls, String query, boolean doSearch) throws Exception
 	{
 		int n = 0;
-		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
+		JPPFJob job = new JPPFJob();
 		for (String url: urls)
 		{
-			taskList.add(new CrawlerTask(url, query, ++n, doSearch));
+			job.addTask(new CrawlerTask(url, query, ++n, doSearch));
 		}
-		CrawlerResultCollector collector = new CrawlerResultCollector(taskList.size());
-		client.submitNonBlocking(taskList, null, collector);
-		taskList = collector.waitForResults();
-		return taskList;
+		CrawlerResultCollector collector = new CrawlerResultCollector(job.getTasks().size());
+		job.setResultListener(collector);
+		job.setBlocking(false);
+		client.submit(job);
+		return collector.waitForResults();
 	}
 
 	/**

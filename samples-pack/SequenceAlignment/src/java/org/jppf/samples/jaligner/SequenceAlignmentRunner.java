@@ -24,14 +24,13 @@ import jaligner.util.SequenceParser;
 
 import java.awt.*;
 import java.io.*;
-import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 
 import javax.swing.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.client.JPPFClient;
+import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.ui.options.*;
@@ -127,6 +126,7 @@ public class SequenceAlignmentRunner
 		DataProvider dp = new MemoryMapDataProvider();
 		dp.setValue(SequenceAlignmentTask.TARGET_SEQUENCE, target);
 		dp.setValue(SequenceAlignmentTask.SCORING_MATRIX, MatrixLoader.load(matrix));
+		JPPFJob job = new JPPFJob(dp);
 
 		System.out.println("Indexing sequence database...");
 		String idx = dbPath+".idx";
@@ -134,23 +134,24 @@ public class SequenceAlignmentRunner
 		System.out.println(""+nb+" sequences indexed");
 		int n = 0;
 		DatabaseHandler dh = new DatabaseHandler(dbPath, idx, null);
-		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
 		boolean end = false;
 		while (!end)
 		{
 			String s = dh.nextSequence();
 			if (s == null) end = true;
-			else taskList.add(new SequenceAlignmentTask(s, ++n));
+			else job.addTask(new SequenceAlignmentTask(s, ++n));
 		}
 		long start2 = System.currentTimeMillis();
 		//taskList = client.submit(taskList, dp);
-		AlignmentResultCollector collector = new AlignmentResultCollector(taskList.size());
-		client.submitNonBlocking(taskList, dp, collector);
-		taskList = collector.waitForResults();
+		AlignmentResultCollector collector = new AlignmentResultCollector(job.getTasks().size());
+		job.setBlocking(false);
+		job.setResultListener(collector);
+		client.submit(job);
+		List<JPPFTask> results = collector.waitForResults();
 		long elapsed2 = System.currentTimeMillis() - start2;
 		float maxScore = 0;
 		SequenceAlignmentTask maxTask = null;
-		for (JPPFTask t: taskList)
+		for (JPPFTask t: results)
 		{
 			SequenceAlignmentTask task = (SequenceAlignmentTask) t;
 			if (task.getException() != null)
