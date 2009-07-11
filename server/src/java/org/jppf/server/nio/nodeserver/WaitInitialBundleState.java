@@ -19,7 +19,6 @@
 package org.jppf.server.nio.nodeserver;
 
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
-import static org.jppf.server.protocol.BundleParameter.*;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.nio.channels.*;
@@ -28,7 +27,7 @@ import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
 import org.jppf.management.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;
 
@@ -76,23 +75,23 @@ public class WaitInitialBundleState extends NodeServerState
 			BundleWrapper bundleWrapper = context.deserializeBundle();
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			context.setUuid(bundle.getBundleUuid());
-			context.setNodeUuid((String) bundle.getParameter(NODE_UUID_PARAM));
-			boolean override = bundle.getParameter(BUNDLE_TUNING_TYPE_PARAM) != null;
+			context.setNodeUuid((String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM));
+			boolean override = bundle.getParameter(BundleParameter.BUNDLE_TUNING_TYPE_PARAM) != null;
 			Bundler bundler = createBundler(bundle);
 			bundler.setup();
 			context.setBundler(bundler);
-			Boolean b = (Boolean) bundle.getParameter(IS_PEER);
+			Boolean b = (Boolean) bundle.getParameter(BundleParameter.IS_PEER);
 			boolean isPeer = (b != null) && b;
 			context.setPeer(isPeer);
 			if (!isPeer && JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
 			{
-				String id = (String) bundle.getParameter(NODE_MANAGEMENT_ID_PARAM);
+				String id = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM);
 				if (id != null)
 				{
-					String host = (String) bundle.getParameter(NODE_MANAGEMENT_HOST_PARAM);
-					int port = (Integer) bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM);
+					String host = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM);
+					int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM);
 					NodeManagementInfo info = new NodeManagementInfo(host, port, id);
-					JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(NODE_SYSTEM_INFO_PARAM);
+					JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
 					if (systemInfo != null) info.setSystemInfo(systemInfo);
 					JPPFDriver.getInstance().addNodeInformation(channel, info);
 				}

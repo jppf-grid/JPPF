@@ -107,11 +107,11 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 			for (Map.Entry e: env.entrySet()) map.put(e.getKey(), e.getValue());
 		}
 		ProcessWrapper wrapper = new ProcessWrapper();
-		if (captureOutput) wrapper.addProcessWrapperEventListener(this);
+		if (captureOutput) wrapper.addListener(this);
 		Process p = builder.start();
 		wrapper.setProcess(p);
 		p.waitFor();
-		if (captureOutput) wrapper.removeProcessWrapperEventListener(this);
+		if (captureOutput) wrapper.removeListener(this);
 	}
 
 	/**

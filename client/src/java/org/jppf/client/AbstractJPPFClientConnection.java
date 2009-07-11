@@ -220,7 +220,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		header.setUuidPath(uuidPath);
 		header.setCredentials(credentials);
 		header.setTaskCount(count);
-		header.setParameter("jobId", job.getId());
+		header.setParameter(BundleParameter.JOB_ID, job.getId());
 
 		List<JPPFBuffer> bufList = new ArrayList<JPPFBuffer>();
 		bufList.add(ser.serialize(header));

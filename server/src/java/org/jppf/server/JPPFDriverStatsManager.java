@@ -17,7 +17,7 @@
  */
 package org.jppf.server;
 
-import java.util.*;
+import org.jppf.utils.EventEmitter;
 
 /**
  * This class is used to collect notifications from various components of the driver about jobs/tasks execution, queuing and performance.
@@ -25,51 +25,21 @@ import java.util.*;
  * @see org.jppf.server.JPPFDriver#getStatsManager()
  * @author Laurent Cohen
  */
-public final class JPPFDriverStatsManager
+public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListener>
 {
-	/**
-	 * The list of listeners to notify.
-	 */
-	private List<JPPFDriverListener> listeners = new ArrayList<JPPFDriverListener>();
 	/**
 	 * The object that holds the stats.
 	 */
 	private JPPFStats stats = new JPPFStats();
 	
 	/**
-	 * Add a listener to the list of listeners.
-	 * @param listener - the listener to add.
-	 */
-	public void addDriverStatsListener(JPPFDriverListener listener)
-	{
-		if (listener == null) return;
-		synchronized(listeners)
-		{
-			listeners.add(listener);
-		}
-	}
-
-	/**
-	 * Remove a listener from the list of listeners.
-	 * @param listener - the listener to remove.
-	 */
-	public void removeDriverStatsListener(JPPFDriverListener listener)
-	{
-		if (listener == null) return;
-		synchronized(listeners)
-		{
-			listeners.remove(listener);
-		}
-	}
-
-	/**
 	 * Called to notify that a new client is connected to he JPPF server.
 	 */
 	public void newClientConnection()
 	{
-		synchronized(listeners)
+		synchronized(eventListeners)
 		{
-			for (JPPFDriverListener listener: listeners) listener.newClientConnection();
+			for (JPPFDriverListener listener: eventListeners) listener.newClientConnection();
 		}
 	}
 
@@ -78,9 +48,9 @@ public final class JPPFDriverStatsManager
 	 */
 	public void clientConnectionClosed()
 	{
-		synchronized(listeners)
+		synchronized(eventListeners)
 		{
-			for (JPPFDriverListener listener: listeners) listener.clientConnectionClosed();
+			for (JPPFDriverListener listener: eventListeners) listener.clientConnectionClosed();
 		}
 	}
 
@@ -89,9 +59,9 @@ public final class JPPFDriverStatsManager
 	 */
 	public void newNodeConnection()
 	{
-		synchronized(listeners)
+		synchronized(eventListeners)
 		{
-			for (JPPFDriverListener listener: listeners) listener.newNodeConnection();
+			for (JPPFDriverListener listener: eventListeners) listener.newNodeConnection();
 		}
 	}
 
@@ -100,9 +70,9 @@ public final class JPPFDriverStatsManager
 	 */
 	public void nodeConnectionClosed()
 	{
-		synchronized(listeners)
+		synchronized(eventListeners)
 		{
-			for (JPPFDriverListener listener: listeners) listener.nodeConnectionClosed();
+			for (JPPFDriverListener listener: eventListeners) listener.nodeConnectionClosed();
 		}
 	}
 
@@ -112,9 +82,9 @@ public final class JPPFDriverStatsManager
 	 */
 	public void taskInQueue(int count)
 	{
-		synchronized(listeners)
+		synchronized(eventListeners)
 		{
-			for (JPPFDriverListener listener: listeners) listener.taskInQueue(count);
+			for (JPPFDriverListener listener: eventListeners) listener.taskInQueue(count);
 		}
 	}
 
@@ -125,9 +95,9 @@ public final class JPPFDriverStatsManager
 	 */
 	public void taskOutOfQueue(int count, long time)
 	{
-		synchronized(listeners)
+		synchronized(eventListeners)
 		{
-			for (JPPFDriverListener listener: listeners) listener.taskOutOfQueue(count, time);
+			for (JPPFDriverListener listener: eventListeners) listener.taskOutOfQueue(count, time);
 		}
 	}
 	
@@ -140,9 +110,9 @@ public final class JPPFDriverStatsManager
 	 */
 	public void taskExecuted(int count, long time, long remoteTime, long size)
 	{
-		synchronized(listeners)
+		synchronized(eventListeners)
 		{
-			for (JPPFDriverListener listener: listeners) listener.taskExecuted(count, time, remoteTime, size);
+			for (JPPFDriverListener listener: eventListeners) listener.taskExecuted(count, time, remoteTime, size);
 		}
 	}
 }

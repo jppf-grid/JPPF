@@ -26,7 +26,7 @@ import java.util.Map;
  * Exposed interface of the JPPF node management bean.
  * @author Laurent Cohen
  */
-public interface JPPFNodeAdminMBean extends JPPFAdminMBean<NodeParameter, Object>
+public interface JPPFNodeAdminMBean extends JPPFAdminMBean
 {
 	/**
 	 * Get the latest state information from the node.

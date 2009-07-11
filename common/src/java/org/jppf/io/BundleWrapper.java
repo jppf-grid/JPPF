@@ -114,7 +114,7 @@ public class BundleWrapper
 
 	/**
 	 * Make a copy of this bundle wrapper containing only the first nbTasks tasks it contains.
-	 * @param nbTasks the number of tasks to include in the copy.
+	 * @param nbTasks - the number of tasks to include in the copy.
 	 * @return a new <code>BundleWrapper</code> instance.
 	 */
 	public BundleWrapper copy(int nbTasks)
@@ -123,5 +123,24 @@ public class BundleWrapper
 		wrapper.setDataProvider(dataProvider);
 		for (int i=0; i<nbTasks; i++) wrapper.addTask(tasks.remove(0));
 		return wrapper;
+	}
+
+	/**
+	 * Merge this bundle wrapper with another.
+	 * @param other - the wrapper to merge with.
+	 * @param after - determines whether the tasks from other should be added first or last.
+	 */
+	public void merge(BundleWrapper other, boolean after)
+	{
+		int n = other.getBundle().getTaskCount();
+		bundle.setTaskCount(bundle.getTaskCount() + n);
+		if (after)
+		{
+			for (DataLocation task: other.getTasks()) tasks.add(task);
+		}
+		else
+		{
+			for (int i=n-1; i>=0; i--) tasks.add(0, other.getTasks().get(i));
+		}
 	}
 }

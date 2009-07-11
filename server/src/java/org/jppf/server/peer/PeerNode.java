@@ -17,8 +17,6 @@
  */
 package org.jppf.server.peer;
 
-import static org.jppf.server.protocol.BundleParameter.NODE_UUID_PARAM;
-
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.SocketClient;
@@ -146,7 +144,7 @@ public class PeerNode extends AbstractMonitoredNode
 				bundle.setBundleUuid(uuid);
 				boolean override = bundle.getParameter(BundleParameter.BUNDLE_TUNING_TYPE_PARAM) != null;
 				bundle.setParameter(BundleParameter.IS_PEER, true);
-				bundle.setParameter(NODE_UUID_PARAM, uuid);
+				bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
 			}
 			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
 			//boolean notEmpty = (bundle.getTasks() != null) && (bundle.getTaskCount() > 0);

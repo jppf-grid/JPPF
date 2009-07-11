@@ -30,8 +30,10 @@ import org.jppf.utils.JPPFUuid;
 
 /**
  * Instances of this class represent a JPPF submission and hold all the required elements:
- * tasks, execution policy, task listener, data provider.<br>
- * This class also provides the API for handling JPPF-annotated tasks and POJO tasks.
+ * tasks, execution policy, task listener, data provider, priority, blocking indicator.<br>
+ * <p>This class also provides the API for handling JPPF-annotated tasks and POJO tasks.
+ * <p>All jobs have an id. It can be specified by calling {@link #setId(java.lang.String) setId(String)}.
+ * If left unspecified, JPPF will automatically assign a uuid as its value.
  * @author Laurent Cohen
  */
 public class JPPFJob implements Serializable

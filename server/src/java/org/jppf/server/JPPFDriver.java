@@ -17,7 +17,6 @@
  */
 package org.jppf.server;
 
-import java.net.Socket;
 import java.nio.channels.*;
 import java.util.*;
 
@@ -28,8 +27,10 @@ import org.jppf.JPPFException;
 import org.jppf.comm.discovery.*;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
+import org.jppf.process.LauncherListener;
 import org.jppf.security.*;
 import org.jppf.server.app.JPPFApplicationServer;
+import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.peer.*;
@@ -102,13 +103,17 @@ public class JPPFDriver
 	 * Generates the statistcs events of which all related listeners are notified.
 	 */
 	private JPPFDriverStatsManager statsManager = new JPPFDriverStatsManager();
+	/**
+	 * Manages and monitors the jobs thoughout their processing within this driver.
+	 */
+	private JPPFJobManager jobManager = null;
 
 	/**
 	 * Initialize this JPPFDriver.
 	 */
 	protected JPPFDriver()
 	{
-		statsManager.addDriverStatsListener(statsUpdater);
+		statsManager.addListener(statsUpdater);
 		initCredentials();
 	}
 
@@ -118,8 +123,9 @@ public class JPPFDriver
 	 */
 	public void run() throws Exception
 	{
-		//taskQueue = new JPPFQueueImpl();
+		jobManager = new JPPFJobManager();
 		taskQueue = new JPPFPriorityQueue();
+		taskQueue.addQueueListener(jobManager);
 		JPPFConnectionInformation info = createConnectionInformation();
 		classServer = new ClassNioServer(info.classServerPorts);
 		classServer.start();
@@ -143,7 +149,6 @@ public class JPPFDriver
 			{
 				jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX);
 				jmxServer.start(getClass().getClassLoader());
-				//jmxServer.registerMBean(JPPFAdminMBean.DRIVER_MBEAN_NAME, new JPPFDriverAdmin(), JPPFDriverAdminMBean.class);
 				registerProviderMBeans();
 				System.out.println("JPPF Driver management initialized");
 			}
@@ -389,7 +394,7 @@ public class JPPFDriver
 	 * Remove a node information object from the map of node information.
 	 * @param channel a <code>SocketChannel</code> instance.
 	 */
-	public synchronized void removeNodeInformation(SocketChannel channel)
+	public synchronized void removeNodeInformation(SelectableChannel channel)
 	{
 		nodeInfo.remove(channel);
 	}
@@ -414,32 +419,6 @@ public class JPPFDriver
 	}
 
 	/**
-	 * Listen to a socket connection setup in the Driver Launcher, to handle the situation when the Launcher dies
-	 * unexpectedly.<br>
-	 * In that situation, the connection is broken and this driver knows that it must exit.
-	 * @param port the port to listen to.
-	 */
-	private static void runLauncherListener(final int port)
-	{
-		Runnable r = new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
-					Socket s = new Socket("localhost", port);
-					s.getInputStream().read();
-				}
-				catch(Throwable t)
-				{
-					System.exit(0);
-				}
-			}
-		};
-		new Thread(r).start();
-	}
-
-	/**
 	 * Get the listener that gathers the statistics published through the management interface.
 	 * @return a <code>JPPFStatsUpdater</code> instance.
 	 */
@@ -449,12 +428,21 @@ public class JPPFDriver
 	}
 
 	/**
-	 * Get a reference to the object that generates the statistcs events of which all related listeners are notified.
+	 * Get a reference to the object that generates the statistics events of which all related listeners are notified.
 	 * @return a <code>JPPFDriverStatsManager</code> instance.
 	 */
 	public JPPFDriverStatsManager getStatsManager()
 	{
 		return statsManager;
+	}
+
+	/**
+	 * Get the object that manages and monitors the jobs thoughout their processing within this driver.
+	 * @return an instance of <code>JPPFJobManager</code>.
+	 */
+	public JPPFJobManager getJobManager()
+	{
+		return jobManager;
 	}
 
 	/**
@@ -468,12 +456,12 @@ public class JPPFDriver
 			if (debugEnabled) log.debug("starting the JPPF driver");
 			if ((args == null) || (args.length <= 0))
 			{
-				throw new JPPFException("The driver should be run with an argument representing a valid TCP port");
+				throw new JPPFException("The driver should be run with an argument representing a valid TCP port or 'noLauncher'");
 			}
 			if (!"noLauncher".equals(args[0]))
 			{
 				int port = Integer.parseInt(args[0]);
-				runLauncherListener(port);
+				new LauncherListener(port).start();
 			}
 
 			JPPFDriver driver = getInstance();

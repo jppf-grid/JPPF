@@ -21,6 +21,7 @@ import java.io.*;
 import java.util.*;
 
 import org.jppf.process.event.*;
+import org.jppf.utils.EventEmitter;
 
 /**
  * Wrapper around an external process started with {@link java.lang.ProcessBuilder ProcessBuilder}.
@@ -28,16 +29,12 @@ import org.jppf.process.event.*;
  * a notification mechanism with separate events for the respective streams. 
  * @author Laurent Cohen
  */
-public final class ProcessWrapper
+public final class ProcessWrapper extends EventEmitter<ProcessWrapperEventListener>
 {
 	/**
 	 * The process to handle.
 	 */
 	private Process process = null;
-	/**
-	 * List of listeners to this wrapper's output and error stream events.
-	 */
-	private List<ProcessWrapperEventListener> listeners = new ArrayList<ProcessWrapperEventListener>();
 
 	/**
 	 * Initialize this process handler. 
@@ -80,24 +77,6 @@ public final class ProcessWrapper
 	}
 
 	/**
-	 * Add a listener to this process wrapper's listeners list.
-	 * @param listener the listener to add.
-	 */
-	public void addProcessWrapperEventListener(ProcessWrapperEventListener listener)
-	{
-		listeners.add(listener);
-	}
-
-	/**
-	 * Remove a listener from this process wrapper's listeners list.
-	 * @param listener the listener to remove.
-	 */
-	public void removeProcessWrapperEventListener(ProcessWrapperEventListener listener)
-	{
-		listeners.remove(listener);
-	}
-
-	/**
 	 * Notify all listeners that a stream event has occurred.
 	 * @param output true if the event is for the outpuit stream, false if it is for the error stream.   
 	 * @param content the text that written to the stream.
@@ -105,10 +84,14 @@ public final class ProcessWrapper
 	protected synchronized void fireStreamEvent(boolean output, String content)
 	{
 		ProcessWrapperEvent event = new ProcessWrapperEvent(content);
-		for (ProcessWrapperEventListener listener: listeners)
+		List<ProcessWrapperEventListener> listeners = getListeners();
+		synchronized (listeners)
 		{
-			if (output) listener.outputStreamAltered(event);
-			else listener.errorStreamAltered(event);
+			for (ProcessWrapperEventListener listener: listeners)
+			{
+				if (output) listener.outputStreamAltered(event);
+				else listener.errorStreamAltered(event);
+			}
 		}
 	}
 

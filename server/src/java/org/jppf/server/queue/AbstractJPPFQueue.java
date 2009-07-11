@@ -69,9 +69,9 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	/**
 	 * Add a listener to the current list of listeners to this queue.
 	 * @param listener the listener to add.
-	 * @see org.jppf.server.queue.JPPFQueue#addListener(org.jppf.server.queue.QueueListener)
+	 * @see org.jppf.server.queue.JPPFQueue#addQueueListener(org.jppf.server.queue.QueueListener)
 	 */
-	public void addListener(QueueListener listener)
+	public void addQueueListener(QueueListener listener)
 	{
 		listeners.add(listener);
 	}
@@ -79,10 +79,19 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	/**
 	 * Remove a listener from the current list of listeners to this queue.
 	 * @param listener the listener to remove.
-	 * @see org.jppf.server.queue.JPPFQueue#removeListener(org.jppf.server.queue.QueueListener)
+	 * @see org.jppf.server.queue.JPPFQueue#removeQueueListener(org.jppf.server.queue.QueueListener)
 	 */
-	public void removeListener(QueueListener listener)
+	public void removeQueueListener(QueueListener listener)
 	{
 		listeners.remove(listener);
+	}
+
+	/**
+	 * Notify all queue listeners of an event.
+	 * @param event - the event to notify of.
+	 */
+	protected void fireQueueEvent(QueueEvent event)
+	{
+		for (QueueListener listener : listeners) listener.newBundle(event);
 	}
 }

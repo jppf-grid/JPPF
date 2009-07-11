@@ -147,7 +147,7 @@ public class ProcessLauncher
 	public ProcessWrapper createProcessWrapper(Process p)
 	{
 		ProcessWrapper wrapper = new ProcessWrapper(process);
-		wrapper.addProcessWrapperEventListener(new ProcessWrapperEventListener()
+		wrapper.addListener(new ProcessWrapperEventListener()
 		{
 			public void errorStreamAltered(ProcessWrapperEvent event)
 			{

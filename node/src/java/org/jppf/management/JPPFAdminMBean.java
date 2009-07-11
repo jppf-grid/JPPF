@@ -22,11 +22,9 @@ import java.io.Serializable;
 
 /**
  * Management interface for the administration of a JPPF component, driver or node.
- * @param <T> the type of the parameters keys.
- * @param <U> the type of the parameters values.
  * @author Laurent Cohen
  */
-public interface JPPFAdminMBean<T, U> extends Serializable
+public interface JPPFAdminMBean extends Serializable
 {
 	/**
 	 * RMI registry namespace suffix for drivers. 

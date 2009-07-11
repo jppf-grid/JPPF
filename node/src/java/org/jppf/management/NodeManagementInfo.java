@@ -144,15 +144,6 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 	}
 
 	/**
-	 * Get the unique id for the node's mbean server. 
-	 * @return the id as a string.
-	 */
-	public synchronized String getId()
-	{
-		return id;
-	}
-
-	/**
 	 * Get the system information associated with the node at the time of the initial connection.
 	 * @return a <code>JPPFSystemInformation</code> instance.
 	 */

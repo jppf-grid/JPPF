@@ -15,20 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.client.event;
 
-import java.util.EventListener;
+package org.jppf.server.job;
 
 /**
- * Listener interface for receiving notifications of task results received from the server.
- * <p>To properly order the results, implementations of this interface should rely on {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()}.
+ * This enum describes the types of events emitted by a JPPFJobManager.
  * @author Laurent Cohen
  */
-public interface TaskResultListener extends EventListener
+public enum JobManagerEventType
 {
 	/**
-	 * Called to notify that that results of number of tasks have been received from the server.
-	 * @param event the event that encapsulates the tasks that were received and related information.
+	 * A new job was submmitted to the JPPF driver queue.
 	 */
-	void resultsReceived(TaskResultEvent event);
+	JOB_QUEUED,
+	/**
+	 * A job was completed and sent back to the client.
+	 */
+	JOB_ENDED,
+	/**
+	 * A part of all of a job was dispatched to a node.
+	 */
+	JOB_DISPATCHED,
+	/**
+	 * A new job was sent back to the client.
+	 */
+	JOB_RETURNED
 }

@@ -25,7 +25,7 @@ import java.util.*;
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.*;
 
 /**
  * A JPPF queue whose elements are ordered by decreasing priority.
@@ -45,6 +45,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * An of task bundles, ordered by descending priority.
 	 */
 	private TreeMap<JPPFPriority, List<BundleWrapper>> priorityMap = new TreeMap<JPPFPriority, List<BundleWrapper>>();
+	/**
+	 * Contains the ids of all queued jobs.
+	 */
+	private Map<String, BundleWrapper> jobMap = new HashMap<String, BundleWrapper>();
 
 	/**
 	 * Add an object to the queue, and notify all listeners about it.
@@ -54,14 +58,28 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	public void addBundle(BundleWrapper bundleWrapper)
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
-		bundle.setQueueEntryTime(System.currentTimeMillis());
 		try
 		{
 			lock.lock();
-			if (debugEnabled) log.debug("adding bundle with [priority=" + bundle.getPriority()+", initialTasksCount=" +
-				bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + "]");
-			putInListMap(new JPPFPriority(bundle.getPriority()), bundleWrapper, priorityMap);
-			putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
+			String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+			BundleWrapper other = jobMap.get(jobId);
+			if (other != null)
+			{
+				other.merge(bundleWrapper, false);
+				if (debugEnabled) log.debug("re-submitting bundle with [priority=" + bundle.getPriority()+", initialTasksCount=" +
+					bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + "]");
+				fireQueueEvent(new QueueEvent(this, bundleWrapper, true));
+			}
+			else
+			{
+				bundle.setQueueEntryTime(System.currentTimeMillis());
+				if (debugEnabled) log.debug("adding bundle with [priority=" + bundle.getPriority()+", initialTasksCount=" +
+					bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + "]");
+				putInListMap(new JPPFPriority(bundle.getPriority()), bundleWrapper, priorityMap);
+				putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
+				jobMap.put(jobId, bundleWrapper);
+				fireQueueEvent(new QueueEvent(this, bundleWrapper));
+			}
 		}
 		finally
 		{
@@ -70,7 +88,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		if (debugEnabled) log.debug("Maps size information:\n" + formatSizeMapInfo("priorityMap", priorityMap) + "\n" +
 			formatSizeMapInfo("sizeMap", sizeMap));
 		JPPFDriver.getInstance().getStatsManager().taskInQueue(bundle.getTaskCount());
-		for (QueueListener listener : listeners) listener.newBundle(this);
 	}
 
 	/**
@@ -82,8 +99,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	public BundleWrapper nextBundle(int nbTasks)
 	{
 		Iterator<BundleWrapper> it = iterator();
-		if (it.hasNext()) return nextBundle(it.next(),  nbTasks);
-		return null;
+		return it.hasNext() ? nextBundle(it.next(),  nbTasks) : null;
 	}
 
 	/**
@@ -95,10 +111,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 */
 	public BundleWrapper nextBundle(BundleWrapper bundleWrapper, int nbTasks)
 	{
-		if (nbTasks == 0)
-		{
-			int breakpoint = 0;
-		}
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		BundleWrapper result = null;
 		try
@@ -113,6 +125,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 				if (debugEnabled) log.debug("removing bundle from queue");
 				result = bundleWrapper;
 				removeFromListMap(new JPPFPriority(bundle.getPriority()), bundleWrapper, priorityMap);
+				jobMap.remove((String) bundle.getParameter(BundleParameter.JOB_ID));
 			}
 			else
 			{

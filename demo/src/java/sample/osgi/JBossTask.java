@@ -32,7 +32,6 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class JBossTask extends JPPFTask
 {
-
 	/**
 	 * Run the task.
 	 * @see java.lang.Runnable#run()
@@ -49,8 +48,7 @@ public class JBossTask extends JPPFTask
 			props.setProperty("jboss.server.name", "default");
 			props.setProperty("jboss.bind.address", "localhost");
 			System.setProperty("jboss.bind.address", "localhost");
-			//
-			//org.jboss.Main.main(new String[0]);
+
 			Server server = new ServerImpl();
 			server.init(props);
 			server.start();

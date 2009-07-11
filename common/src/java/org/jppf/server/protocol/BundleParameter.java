@@ -25,101 +25,9 @@ package org.jppf.server.protocol;
 public enum  BundleParameter
 {
 	/**
-	 * Admin command for scheduled shutdown of the server.
-	 */
-	SHUTDOWN,
-	/**
-	 * Admin command for scheduled shutdown and restart of the server.
-	 */
-	SHUTDOWN_RESTART,
-	/**
-	 * Admin command for scheduled shutdown and restart of the server.
-	 */
-	CHANGE_PASSWORD,
-	/**
-	 * Admin command for setting the size of the task bundles used by the server and nodes.
-	 */
-	CHANGE_SETTINGS,
-	/**
-	 * Admin command for getting the bundle size settings from the server.
-	 */
-	REFRESH_SETTINGS,
-	/**
-	 * Admin command for getting the latest statistics fropm the server.
-	 */
-	READ_STATISTICS,
-	/**
-	 * Admin command for getting the bundle size settings from the server.
-	 */
-	REFRESH_NODE_INFO,
-	/**
-	 * Parameter name for the administration command to perform.
-	 */
-	COMMAND_PARAM,
-	/**
-	 * Parameter name for the key, in encrypted format, used to decrypt the password.
-	 */
-	KEY_PARAM,
-	/**
-	 * Parameter name for the administration password in encrypted format.
-	 */
-	PASSWORD_PARAM,
-	/**
-	 * Parameter name for the new administration password in encrypted format, for password change.
-	 */
-	NEW_PASSWORD_PARAM,
-	/**
-	 * Parameter name for the delay before shutting down the server.
-	 */
-	SHUTDOWN_DELAY_PARAM,
-	/**
-	 * Parameter name for the delay before restarting the server.
-	 */
-	RESTART_DELAY_PARAM,
-	/**
-	 * Parameter name for the response message to this request.
-	 */
-	RESPONSE_PARAM,
-	/**
-	 * Parameter name for the size of the task bundles used by the server and nodes.
-	 */
-	BUNDLE_SIZE_PARAM,
-	/**
 	 * Parameter to determine whether the tasks bundle size is determined manually or automatically.
 	 */
 	BUNDLE_TUNING_TYPE_PARAM,
-	/**
-	 * Heuristic autotuning parameter: minimum number of samples to analyse
-	 */
-	MIN_SAMPLES_TO_ANALYSE,
-	/**
-	 * Heuristic autotuning parameter: minimum number of samples to check algorithm convergence
-	 */
-	MIN_SAMPLES_TO_CHECK_CONVERGENCE,
-	/**
-	 * Heuristic autotuning parameter: maximum allowed deviation.
-	 */
-	MAX_DEVIATION,
-	/**
-	 * Heuristic autotuning parameter: maximum number of guesses before best size is deemed stable.
-	 */
-	MAX_GUESS_TO_STABLE,
-	/**
-	 * Heuristic autotuning parameter: size ration deviation.
-	 */
-	SIZE_RATIO_DEVIATION,
-	/**
-	 * Heuristic autotuning parameter: decrease ratio.
-	 */
-	DECREASE_RATIO,
-	/**
-	 * Deterministic autotuning parameter: mazimum size of the performance samples cache for each node.
-	 */
-	PERFORMANCE_CACHE_SIZE,
-	/**
-	 * Deterministic autotuning parameter: proportionality factor.
-	 */
-	PROPORTIONALITY_FACTOR,
 	/**
 	 * To determine whether a node connection is for a peer driver or an actual execution node.
 	 */
@@ -147,5 +55,9 @@ public enum  BundleParameter
 	/**
 	 * Parameter for the node's uuid.
 	 */
-	NODE_UUID_PARAM
+	NODE_UUID_PARAM,
+	/**
+	 * The id of a job.
+	 */
+	JOB_ID
 }

@@ -354,6 +354,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 		for (int i=0; i<nbTasks; i++) list.add(tasks.remove(0));
 		*/
 		taskCount -= nbTasks;
+		bundle.getParametersMap().putAll(parameters);
 		bundle.setQueueEntryTime(queueEntryTime);
 		bundle.setCompletionListener(completionListener);
 		bundle.setCredentials(credentials);

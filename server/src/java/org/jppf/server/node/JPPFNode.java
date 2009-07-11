@@ -17,8 +17,6 @@
  */
 package org.jppf.server.node;
 
-import static org.jppf.server.protocol.BundleParameter.*;
-
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -244,17 +242,17 @@ public class JPPFNode extends AbstractMonitoredNode
 			bundle.setBundleUuid(uuid);
 			TypedProperties params = BundleTuningUtils.getBundleTunningParameters();
 			if (params != null) bundle.getParametersMap().put("bundle.tuning.parameters", params);
-			bundle.setParameter(NODE_UUID_PARAM, uuid);
+			bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
 			if (isJmxEnabled())
 			{
 				TypedProperties props = JPPFConfiguration.getProperties();
-				bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
-				bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
-				bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, getJmxServer().getId());
+				bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
+				bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
+				bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, getJmxServer().getId());
 			}
 			JPPFSystemInformation info = new JPPFSystemInformation();
 			info.populate();
-			bundle.setParameter(NODE_SYSTEM_INFO_PARAM, info);
+			bundle.setParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM, info);
 		}
 	}
 

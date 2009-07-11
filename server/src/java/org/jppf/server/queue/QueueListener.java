@@ -19,12 +19,14 @@ package org.jppf.server.queue;
 
 /**
  * Queue listener interface.
+ * @author Domingo Creados
+ * @author Laurent Cohen
  */
 public interface QueueListener
 {
 	/**
 	 * Notify a listener that a queue event occurred.
-	 * @param queue the queue from which the event originated.
+	 * @param event - a queue event.
 	 */
-	void newBundle(JPPFQueue queue);
+	void newBundle(QueueEvent event);
 }

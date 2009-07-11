@@ -21,14 +21,13 @@ package org.jppf.management;
 import java.util.*;
 
 import org.jppf.server.JPPFStats;
-import org.jppf.server.protocol.BundleParameter;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 
 /**
  * MBean interface for the management of a JPPF driver.
  * @author Laurent Cohen
  */
-public interface JPPFDriverAdminMBean extends JPPFAdminMBean<BundleParameter, Object>
+public interface JPPFDriverAdminMBean extends JPPFAdminMBean
 {
 	/**
 	 * Get the latest statistics snapshot from the JPPF driver.

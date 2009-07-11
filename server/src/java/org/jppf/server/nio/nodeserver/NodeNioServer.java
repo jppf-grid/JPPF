@@ -101,9 +101,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 		this.selectTimeout = 1L;
 		Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
 		this.bundlerRef = new AtomicReference<Bundler>(bundler);
-		getQueue().addListener(new QueueListener()
+		getQueue().addQueueListener(new QueueListener()
 		{
-			public void newBundle(JPPFQueue queue)
+			public void newBundle(QueueEvent event)
 			{
 				selector.wakeup();
 			}

@@ -17,7 +17,6 @@
  */
 package org.jppf.node;
 
-import java.net.Socket;
 import java.security.*;
 import java.util.Hashtable;
 import java.util.concurrent.*;
@@ -26,6 +25,7 @@ import org.apache.commons.logging.*;
 import org.jppf.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.utils.*;
 
@@ -93,7 +93,7 @@ public class NodeRunner
 			if (!"noLauncher".equals(args[0]))
 			{
 				int port = Integer.parseInt(args[0]);
-				runLauncherListener(port);
+				new LauncherListener(port).start();
 			}
 		}
 		catch(Exception e)
@@ -281,31 +281,6 @@ public class NodeRunner
 	public static MonitoredNode getNode()
 	{
 		return node;
-	}
-
-	/**
-	 * Listen to a socket connection setup in the Node Launcher, to handle the situation when the Launcher dies unexpectedly.<br>
-	 * In that situation, the connection is broken and this node knows that it must exit.
-	 * @param port the port to listen to.
-	 */
-	private static void runLauncherListener(final int port)
-	{
-		Runnable r = new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
-					Socket s = new Socket("localhost", port);
-					s.getInputStream().read();
-				}
-				catch(Throwable t)
-				{
-					System.exit(0);
-				}
-			}
-		};
-		new Thread(r).start();
 	}
 
 	/**
