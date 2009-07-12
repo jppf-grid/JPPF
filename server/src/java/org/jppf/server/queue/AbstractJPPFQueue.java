@@ -23,12 +23,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
+import org.jppf.utils.EventEmitter;
 
 /**
  * Abstract superclass for all JPPFQueue implementations.
  * @author Laurent Cohen
  */
-public abstract class AbstractJPPFQueue implements JPPFQueue
+public abstract class AbstractJPPFQueue extends EventEmitter<QueueListener> implements JPPFQueue
 {
 	/**
 	 * Logger for this class.
@@ -38,10 +39,6 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The current list of listeners to this queue.
-	 */
-	protected List<QueueListener> listeners = new LinkedList<QueueListener>();
 	/**
 	 * Used for synchronized access to the queue.
 	 */
@@ -67,31 +64,14 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	}
 
 	/**
-	 * Add a listener to the current list of listeners to this queue.
-	 * @param listener the listener to add.
-	 * @see org.jppf.server.queue.JPPFQueue#addQueueListener(org.jppf.server.queue.QueueListener)
-	 */
-	public void addQueueListener(QueueListener listener)
-	{
-		listeners.add(listener);
-	}
-
-	/**
-	 * Remove a listener from the current list of listeners to this queue.
-	 * @param listener the listener to remove.
-	 * @see org.jppf.server.queue.JPPFQueue#removeQueueListener(org.jppf.server.queue.QueueListener)
-	 */
-	public void removeQueueListener(QueueListener listener)
-	{
-		listeners.remove(listener);
-	}
-
-	/**
 	 * Notify all queue listeners of an event.
 	 * @param event - the event to notify of.
 	 */
 	protected void fireQueueEvent(QueueEvent event)
 	{
-		for (QueueListener listener : listeners) listener.newBundle(event);
+		synchronized(getListeners())
+		{
+			for (QueueListener listener : getListeners()) listener.newBundle(event);
+		}
 	}
 }

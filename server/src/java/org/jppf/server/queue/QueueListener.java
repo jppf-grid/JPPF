@@ -17,12 +17,14 @@
  */
 package org.jppf.server.queue;
 
+import java.util.EventListener;
+
 /**
  * Queue listener interface.
  * @author Domingo Creados
  * @author Laurent Cohen
  */
-public interface QueueListener
+public interface QueueListener extends EventListener
 {
 	/**
 	 * Notify a listener that a queue event occurred.

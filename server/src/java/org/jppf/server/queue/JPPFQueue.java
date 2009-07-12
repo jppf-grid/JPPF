@@ -48,18 +48,6 @@ public interface JPPFQueue extends Iterable<BundleWrapper>
 	BundleWrapper nextBundle(BundleWrapper bundleWrapper, int nbTasks);
 
 	/**
-	 * Add a listener to the current list of listeners to this queue.
-	 * @param listener the listener to add.
-	 */
-	void addQueueListener(QueueListener listener);
-
-	/**
-	 * Remove a listener from the current list of listeners to this queue.
-	 * @param listener the listener to remove.
-	 */
-	void removeQueueListener(QueueListener listener);
-
-	/**
 	 * Determine whether the queue is empty or not.
 	 * @return true if the queue is empty, false otherwise.
 	 */

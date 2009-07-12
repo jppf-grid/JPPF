@@ -125,7 +125,7 @@ public class JPPFDriver
 	{
 		jobManager = new JPPFJobManager();
 		taskQueue = new JPPFPriorityQueue();
-		taskQueue.addQueueListener(jobManager);
+		((JPPFPriorityQueue) taskQueue).addListener(jobManager);
 		JPPFConnectionInformation info = createConnectionInformation();
 		classServer = new ClassNioServer(info.classServerPorts);
 		classServer.start();
@@ -385,27 +385,36 @@ public class JPPFDriver
 	 * @param channel a <code>SocketChannel</code> instance.
 	 * @param info a <code>JPPFNodeManagementInformation</code> instance.
 	 */
-	public synchronized void addNodeInformation(SelectableChannel channel, NodeManagementInfo info)
+	public void addNodeInformation(SelectableChannel channel, NodeManagementInfo info)
 	{
-		nodeInfo.put(channel, info);
+		synchronized (nodeInfo)
+		{
+			nodeInfo.put(channel, info);
+		}
 	}
 
 	/**
 	 * Remove a node information object from the map of node information.
 	 * @param channel a <code>SocketChannel</code> instance.
 	 */
-	public synchronized void removeNodeInformation(SelectableChannel channel)
+	public void removeNodeInformation(SelectableChannel channel)
 	{
-		nodeInfo.remove(channel);
+		synchronized (nodeInfo)
+		{
+			nodeInfo.remove(channel);
+		}
 	}
 
 	/**
 	 * Remove a node information object from the map of node information.
 	 * @return channel a <code>SocketChannel</code> instance.
 	 */
-	public synchronized Map<SelectableChannel, NodeManagementInfo> getNodeInformationMap()
+	public Map<SelectableChannel, NodeManagementInfo> getNodeInformationMap()
 	{
-		return Collections.unmodifiableMap(nodeInfo);
+		synchronized (nodeInfo)
+		{
+			return Collections.unmodifiableMap(nodeInfo);
+		}
 	}
 
 	/**
@@ -413,9 +422,12 @@ public class JPPFDriver
 	 * @param channel the node for which ot get the information.
 	 * @return a <code>NodeManagementInfo</code> instance, or null if no informaiton is recorded for the node.
 	 */
-	public synchronized NodeManagementInfo getNodeInformation(SelectableChannel channel)
+	public NodeManagementInfo getNodeInformation(SelectableChannel channel)
 	{
-		return nodeInfo.get(channel);
+		synchronized (nodeInfo)
+		{
+			return nodeInfo.get(channel);
+		}
 	}
 
 	/**

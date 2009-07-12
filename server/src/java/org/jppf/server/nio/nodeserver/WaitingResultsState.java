@@ -94,6 +94,7 @@ public class WaitingResultsState extends NodeServerState
 			}
 			// notifing the client thread about the end of a bundle
 			if (listener != null) listener.taskCompleted(newBundleWrapper);
+			JPPFDriver.getInstance().getJobManager().jobReturned(bundleWrapper, channel);
 			// there is nothing to do, so this instance will wait for a task bundle
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setNodeMessage(null);

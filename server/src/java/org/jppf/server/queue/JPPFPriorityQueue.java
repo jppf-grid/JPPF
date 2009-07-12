@@ -79,6 +79,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 				putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
 				jobMap.put(jobId, bundleWrapper);
 				fireQueueEvent(new QueueEvent(this, bundleWrapper));
+				JPPFDriver.getInstance().getJobManager().jobQueued(bundleWrapper);
 			}
 		}
 		finally

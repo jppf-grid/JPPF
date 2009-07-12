@@ -153,6 +153,7 @@ public class ApplicationConnection extends JPPFConnection
 		}
 		if (count <= 0) resultSender.sendPartialResults(headerWrapper);
 		else resultSender.run(count);
+		JPPFDriver.getInstance().getJobManager().jobEnded(headerWrapper);
 		return;
 	}
 

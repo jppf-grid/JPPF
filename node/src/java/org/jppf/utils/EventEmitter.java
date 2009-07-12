@@ -57,8 +57,8 @@ public abstract class EventEmitter<S extends EventListener>
 	}
 
 	/**
-	 * return a list of all the registered listeners.
-	 * This list is not thread safe and must manually synchronized against concurrent modifications.
+	 * return a list of all the registered listee ners.
+	 * This list is not thread safe and must bmanually synchronized against concurrent modifications.
 	 * @return a list of listener instances.
 	 */
 	public List<S> getListeners()
