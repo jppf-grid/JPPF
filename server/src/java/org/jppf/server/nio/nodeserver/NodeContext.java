@@ -113,7 +113,7 @@ public class NodeContext extends NioContext<NodeState>
 	 */
 	public void handleException(SocketChannel channel)
 	{
-		getBundler().dispose();
+		if (getBundler() != null) getBundler().dispose();
 		NodeNioServer.closeNode(channel);
 		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getBundle().getState()))
 		{
