@@ -398,8 +398,14 @@ public class JPPFClient extends AbstractJPPFClient
 					{
 						if (debugEnabled) log.debug("Found connection information: " + info);
 						infoSet.add(info);
-						JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, "driver-"+count.incrementAndGet(), info);
-						newConnection(c);
+						int n = JPPFConfiguration.getProperties().getInt("jppf.pool.size", 1);
+						if (n < 1) n = 1;
+						for (int i=1; i<=n; i++)
+						{
+							String name = "driver-" + count.incrementAndGet()  + (n == 1 ? "" : "-" + i);
+							JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, name, info);
+							newConnection(c);
+						}
 					}
 				}
 				//Thread.sleep(50L);
