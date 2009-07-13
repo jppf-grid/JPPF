@@ -344,7 +344,7 @@ public final class FileUtils
 		{
 			try
 			{
-				urls[i] = files[i].toURL();
+				urls[i] = files[i].toURI().toURL();
 			}
 			catch(MalformedURLException ignored)
 			{

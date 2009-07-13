@@ -31,14 +31,6 @@ import org.jppf.process.event.*;
 public final class ProcessWrapper
 {
 	/**
-	 * Content of the standard output for the process.
-	 */
-	private StringBuilder standardOutput = null;
-	/**
-	 * Content of the error output for the process.
-	 */
-	private StringBuilder errorOutput = null;
-	/**
 	 * The process to handle.
 	 */
 	private Process process = null;
@@ -48,34 +40,19 @@ public final class ProcessWrapper
 	private List<ProcessWrapperEventListener> listeners = new ArrayList<ProcessWrapperEventListener>();
 
 	/**
+	 * Initialize this process handler. 
+	 */
+	public ProcessWrapper()
+	{
+	}
+
+	/**
 	 * Initialize this process handler with the specified process. 
 	 * @param process the process to handle.
 	 */
 	public ProcessWrapper(Process process)
 	{
-		this.process = process;
-		standardOutput = new StringBuilder();
-		errorOutput = new StringBuilder();
-		new StreamHandler(process.getInputStream(), standardOutput, true).start();
-		new StreamHandler(process.getErrorStream(), errorOutput, false).start();
-	}
-
-	/**
-	 * Get the content of the error output for the process.
-	 * @return the content as a <code>StringBuilder</code> instance.
-	 */
-	public StringBuilder getErrorOutput()
-	{
-		return errorOutput;
-	}
-
-	/**
-	 * Get the content of the standard output for the process.
-	 * @return the content as a <code>StringBuilder</code> instance.
-	 */
-	public StringBuilder getStandardOutput()
-	{
-		return standardOutput;
+		setProcess(process);
 	}
 
 	/**
@@ -85,6 +62,21 @@ public final class ProcessWrapper
 	public Process getProcess()
 	{
 		return process;
+	}
+
+	/**
+	 * Set the process to handle.
+	 * If the process has already been set through this setter or through the corresponding contructor, this method does nothing.
+	 * @param process - a <code>Process</code> instance.
+	 */
+	public void setProcess(Process process)
+	{
+		if (this.process == null)
+		{
+			this.process = process;
+			new StreamHandler(process.getInputStream(), true).start();
+			new StreamHandler(process.getErrorStream(), false).start();
+		}
 	}
 
 	/**
@@ -137,10 +129,9 @@ public final class ProcessWrapper
 		/**
 		 * Initialize this handler with the specified stream and buffer receiving its content.
 		 * @param is the stream where output is taken from.
-		 * @param sb the buffer where the output is written.
 		 * @param output true if this event is for an output stream, false for an error stream.
 		 */
-		public StreamHandler(InputStream is, StringBuilder sb, boolean output)
+		public StreamHandler(InputStream is, boolean output)
 		{
 			this.is = is;
 			this.output = output;

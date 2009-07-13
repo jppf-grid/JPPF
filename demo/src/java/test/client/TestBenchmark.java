@@ -163,7 +163,7 @@ public class TestBenchmark
 			process[n].getProcess().waitFor();
 			log(SEPARATOR);
 			log("" + nbNodes + " node(s) - " + threadsPerNode + " thread(s)\n");
-			log(process[n].getStandardOutput().toString());
+			//log(process[n].getStandardOutput().toString());
 			log("");
 		}
 		finally
