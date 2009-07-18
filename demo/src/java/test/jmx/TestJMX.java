@@ -73,14 +73,16 @@ public class TestJMX
 	  JMXDriverConnectionWrapper jmxConnection = new JMXDriverConnectionWrapper("localhost", 11198);
 	  // start the connection process and wait until the connection is established
 	  jmxConnection.connect();
-	  while (!jmxConnection.isConnected()) Thread.currentThread().sleep(100);
+	  while (!jmxConnection.isConnected()) Thread.currentThread().sleep(1);
 	  // request the statistics from the driver
 	  JPPFStats stats = jmxConnection.statistics();
-    while (stats == null)
+    /*
+	  while (stats == null)
     {
 	    Thread.currentThread().sleep(50);
     	stats = jmxConnection.statistics();
     }
+    */
 	  jmxConnection.close();
 	  // return the current number of nodes
 	  return stats.nbNodes;

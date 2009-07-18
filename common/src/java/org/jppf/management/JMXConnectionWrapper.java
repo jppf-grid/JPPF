@@ -113,23 +113,22 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	public void connect()
 	{
 		connectionThread = new JMXConnectionThread();
-		new Thread(connectionThread).start();
+		Thread t = new Thread(connectionThread, "JMX connection thread for [" + host + ":" + port + "]");
+		t.setDaemon(true);
+		t.start();
 	}
 
 	/**
 	 * Initialize the connection to the remote MBean server.
 	 * @throws Exception if the connection could not be established.
 	 */
-	private void performConnection() throws Exception
+	private synchronized void performConnection() throws Exception
 	{
-    synchronized(this)
-    {
-    	connected = false;
-      HashMap env = new HashMap(); 
-      jmxc = JMXConnectorFactory.connect(url, env);
-    	mbeanConnection = jmxc.getMBeanServerConnection();
-    	connected = true;
-    }
+  	connected = false;
+    HashMap env = new HashMap(); 
+    jmxc = JMXConnectorFactory.connect(url, env);
+  	mbeanConnection = jmxc.getMBeanServerConnection();
+  	connected = true;
 		log.info(getId() + "RMI connection successfully established");
 	}
 
@@ -152,7 +151,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 * @return an object or null.
 	 * @throws Exception if the invocation failed.
 	 */
-	public Object invoke(String name, String methodName, Object[] params, String[] signature) throws Exception
+	public synchronized Object invoke(String name, String methodName, Object[] params, String[] signature) throws Exception
 	{
 		if (connectionThread.isConnecting()) return null;
 		Object result = null;
@@ -165,7 +164,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		{
 			connectionThread.resume();
 			log.info(getId() + e.getMessage(), e);
-			//throw e;
 		}
 		return result;
 	}
@@ -206,8 +204,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 						if (debugEnabled) log.debug(getId() + "about to perform RMI connection attempts");
 						performConnection();
 						if (debugEnabled) log.debug(getId() + "about to suspend RMI connection attempts");
-						wakeUp();
 						suspend();
+						wakeUp();
 					}
 					catch(Exception ignored)
 					{
@@ -269,7 +267,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		 * Get the connecting state of this connection thread.
 		 * @param connecting true if the connection is established, false otherwise.
 		 */
-		public void setConnecting(boolean connecting)
+		public synchronized void setConnecting(boolean connecting)
 		{
 			this.connecting = connecting;
 		}
