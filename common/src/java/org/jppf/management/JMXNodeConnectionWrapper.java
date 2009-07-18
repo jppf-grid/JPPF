@@ -177,4 +177,15 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateConfiguration",
 			new Object[] { config, reconnect }, new String[] { "java.util.Map", "java.lang.Boolean" }); 
 	}
+
+	/**
+	 * Cancel the job with the specified id.
+	 * @param jobId - the id of the job to cancel.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#cancelJob(java.lang.String)
+	 */
+	public void cancelJob(String jobId) throws Exception
+	{
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelJob", new Object[] { jobId }, new String[] { "java.util.String" }); 
+	}
 }

@@ -42,27 +42,27 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
 	Serializable notification() throws Exception;
 	/**
 	 * Cancel the execution of the tasks with the specified id.
-	 * @param id the id of the tasks to cancel.
+	 * @param id - the id of the tasks to cancel.
 	 * @throws Exception if any error occurs.
 	 */
 	void cancelTask(String id) throws Exception;
 	/**
 	 * Restart the execution of the tasks with the specified id.<br>
 	 * The task(s) will be restarted even if their execution has already completed.
-	 * @param id the id of the task or tasks to restart.
+	 * @param id - the id of the task or tasks to restart.
 	 * @throws Exception if any error occurs.
 	 */
 	void restartTask(String id) throws Exception;
 	/**
 	 * Set the size of the node's thread pool.
-	 * @param size the size as an int.
+	 * @param size - the size as an int.
 	 * @throws Exception if any error occurs.
 	 */
 	void updateThreadPoolSize(Integer size) throws Exception;
 	/**
 	 * Update the priority of all execution threads.
-	 * @param newPriority the new priority to set.
-	 * @throws Exception if an error is raised when invoking the node mbean.
+	 * @param newPriority - the new priority to set.
+	 * @throws Exception - if an error is raised when invoking the node mbean.
 	 */
 	void updateThreadsPriority(Integer newPriority) throws Exception;
 	/**
@@ -95,9 +95,15 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
 	void setTaskCounter(Integer n) throws Exception;
 	/**
 	 * Update the configuration properties of the node. 
-	 * @param config the set of properties to update.
-	 * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
+	 * @param config - the set of properties to update.
+	 * @param reconnect - specifies whether the node should reconnect ot the driver after updating the properties.
 	 * @throws Exception if any error occurs.
 	 */
 	void updateConfiguration(Map<String, String> config, Boolean reconnect) throws Exception;
+	/**
+	 * Cancel the job with the specified id.
+	 * @param jobId - the id of the job to cancel.
+	 * @throws Exception if any error occurs.
+	 */
+	void cancelJob(String jobId) throws Exception;
 }

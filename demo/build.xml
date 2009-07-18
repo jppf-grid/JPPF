@@ -237,7 +237,7 @@
 
 	<target name="run.long.task">
 		<echo message="starting the 'Long task' demo application"/>
-		<java fork="yes" classname="sample.tasklength.LongTaskRunner" classpathref="client.classpath" taskname="client">
+		<java fork="yes" classname="sample.dist.tasklength.LongTaskRunner" classpathref="client.classpath" taskname="client">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx64m"/>
 			<jvmarg value="-Djppf.config=jppf-client.properties"/>
@@ -248,7 +248,7 @@
 
 	<target name="run.matrix">
 		<echo message="starting the 'Matrix Multiplication' demo application"/>
-		<java fork="yes" classname="sample.matrix.MatrixRunner" classpathref="client.classpath" taskname="client">
+		<java fork="yes" classname="sample.dist.matrix.MatrixRunner" classpathref="client.classpath" taskname="client">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx64m"/>
 			<jvmarg value="-Djppf.config=jppf-client.properties"/>
@@ -259,7 +259,7 @@
 
 	<target name="run.notification">
 		<echo message="starting the 'Matrix Multiplication' demo application"/>
-		<java fork="yes" classname="sample.notification.TaskNotificationRunner" classpathref="client.classpath" taskname="client">
+		<java fork="yes" classname="sample.dist.notification.TaskNotificationRunner" classpathref="client.classpath" taskname="client">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx64m"/>
 			<jvmarg value="-Djppf.config=jppf-client.properties"/>
@@ -270,7 +270,7 @@
 
 	<target name="run.matrix.async">
 		<echo message="starting the 'Matrix Multiplication With Non-Blocking Client' demo application"/>
-		<java fork="yes" classname="sample.matrix.NonBlockingMatrixRunner" classpathref="client.classpath" taskname="client">
+		<java fork="yes" classname="sample.dist.matrix.NonBlockingMatrixRunner" classpathref="client.classpath" taskname="client">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx64m"/>
 			<jvmarg value="-Djppf.config=jppf-client.properties"/>
@@ -281,7 +281,7 @@
 
 	<target name="run.matrix2">
 		<echo message="starting the second demo application"/>
-		<java fork="yes" classname="sample.matrix.MatrixRunner" classpathref="client.classpath" taskname="client">
+		<java fork="yes" classname="sample.dist.matrix.MatrixRunner" classpathref="client.classpath" taskname="client">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx64m"/>
 			<jvmarg value="-Djppf.config=jppf-client-2.properties"/>
@@ -292,7 +292,7 @@
 
 	<target name="run.client.pool">
 		<echo message="starting the 'Servrer Connection Pool' demo application"/>
-		<java fork="yes" classname="sample.matrix.clientpool.NonBlockingPoolMatrixRunner" classpathref="client.classpath" taskname="client">
+		<java fork="yes" classname="sample.dist.matrix.clientpool.NonBlockingPoolMatrixRunner" classpathref="client.classpath" taskname="client">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx64m"/>
 			<jvmarg value="-Djppf.config=jppf-client-pool.properties"/>
@@ -303,7 +303,7 @@
 
 	<target name="run.commandline">
 		<echo message="starting the 'Command Line' demo application"/>
-		<java fork="yes" classname="sample.commandline.CommandLineTaskRunner" classpathref="client.classpath" taskname="client">
+		<java fork="yes" classname="sample.dist.commandline.CommandLineTaskRunner" classpathref="client.classpath" taskname="client">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx64m"/>
 			<jvmarg value="-Djppf.config=jppf-client.properties"/>
@@ -314,7 +314,7 @@
 
 	<target name="run.taskcommunication">
 		<echo message="starting the 'Task Communication' demo application"/>
-		<java fork="yes" classname="sample.taskcommunication.MyTaskRunner" classpathref="client.classpath" taskname="client">
+		<java fork="yes" classname="sample.dist.taskcommunication.MyTaskRunner" classpathref="client.classpath" taskname="client">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx64m"/>
 			<jvmarg value="-Djppf.config=jppf-client.properties"/>

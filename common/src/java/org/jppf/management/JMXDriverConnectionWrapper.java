@@ -105,4 +105,15 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	{
 		return (LoadBalancingInformation) invoke(DRIVER_MBEAN_NAME, "loadBalancerInformation", (Object[]) null, (String[]) null);
 	}
+
+	/**
+	 * Cancel the job with the specified id.
+	 * @param jobId - the id of the job to cancel.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFDriverAdminMBean#cancelJob(java.lang.String)
+	 */
+	public void cancelJob(String jobId) throws Exception
+	{
+		invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "cancelJob", new Object[] { jobId }, new String[] { "java.lang.String" });
+	}
 }

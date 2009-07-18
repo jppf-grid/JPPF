@@ -55,7 +55,7 @@ public class DataProviderTestTask extends JPPFTask
 		{
 			String s = "this should be on the client side";
 			System.out.println(s);
-			return s;
+			return null;
 		}
 	}
 }
