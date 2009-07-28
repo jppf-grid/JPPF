@@ -25,7 +25,7 @@ import javax.management.*;
 import javax.management.remote.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.*;
 
 /**
  * Wrapper around a JMX connection, providing a thread-safe way of handling disconnections and recovery.
@@ -95,10 +95,12 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	{
 		this.host = host;
 		this.port = port;
-		
-		idString = "[" + (host == null ? "_" : host) + ":" + port + "] ";
+
 		try
 		{
+			String s = NetworkUtils.getHostAddress(host);
+			//idString = "[" + (host == null ? "_" : host) + ":" + port + "] ";
+			idString = (s == null ? "_" : s) + ":" + port;
 			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + "/jppf" + rmiSuffix);
 		}
 		catch(Exception e)
@@ -113,7 +115,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	public void connect()
 	{
 		connectionThread = new JMXConnectionThread();
-		Thread t = new Thread(connectionThread, "JMX connection thread for [" + host + ":" + port + "]");
+		Thread t = new Thread(connectionThread, "JMX connection thread for " + getId());
 		t.setDaemon(true);
 		t.start();
 	}
@@ -129,7 +131,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
     jmxc = JMXConnectorFactory.connect(url, env);
   	mbeanConnection = jmxc.getMBeanServerConnection();
   	connected = true;
-		log.info(getId() + "RMI connection successfully established");
+		log.info(getId() + " RMI connection successfully established");
 	}
 
 	/**
@@ -193,7 +195,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 			{
 				if (isSuspended())
 				{
-					if (debugEnabled) log.debug(getId() + "about to go to sleep");
+					if (debugEnabled) log.debug(getId() + " about to go to sleep");
 					goToSleep();
 					continue;
 				}
@@ -201,15 +203,15 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 				{
 					try
 					{
-						if (debugEnabled) log.debug(getId() + "about to perform RMI connection attempts");
+						if (debugEnabled) log.debug(getId() + " about to perform RMI connection attempts");
 						performConnection();
-						if (debugEnabled) log.debug(getId() + "about to suspend RMI connection attempts");
+						if (debugEnabled) log.debug(getId() + " about to suspend RMI connection attempts");
 						suspend();
 						wakeUp();
 					}
 					catch(Exception ignored)
 					{
-						if (debugEnabled) log.debug(getId()+ "JMX URL = "+url, ignored);
+						if (debugEnabled) log.debug(getId()+ " JMX URL = "+url, ignored);
 						try
 						{
 							Thread.sleep(100);
@@ -228,7 +230,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		 */
 		public synchronized void suspend()
 		{
-			if (debugEnabled) log.debug(getId() + "suspending RMI connection attempts");
+			if (debugEnabled) log.debug(getId() + " suspending RMI connection attempts");
 			setConnecting(false);
 			suspended = true;
 		}
@@ -238,7 +240,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		 */
 		public synchronized void resume()
 		{
-			if (debugEnabled) log.debug(getId() + "resuming RMI connection attempts");
+			if (debugEnabled) log.debug(getId() + " resuming RMI connection attempts");
 			setConnecting(true);
 			suspended = false;
 			wakeUp();

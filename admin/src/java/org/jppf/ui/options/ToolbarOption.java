@@ -22,7 +22,7 @@ import java.util.*;
 import javax.swing.JToolBar;
 
 /**
- * This option class encapsulates a split pane, as the one present in the Swing api.
+ * This option class encapsulates a JToolBar.
  * @author Laurent Cohen
  */
 public class ToolbarOption extends AbstractOptionElement implements OptionsPage

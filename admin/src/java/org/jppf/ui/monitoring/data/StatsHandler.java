@@ -250,8 +250,6 @@ public final class StatsHandler implements StatsConstants, ClientListener
 		ConnectionDataHolder dataHolder = dataHolderMap.get(connection.getName());
 		tickCount++;
 		if (dataHolder == null) return;
-		stats.avgTransportPerByte = (stats.footprint > 0)
-			? 1024d * 1024d * stats.transport.totalTime / stats.footprint : 0d;
 		dataHolder.getDataList().add(stats);
 		dataHolder.getStringValuesMaps().add(StatsFormatter.getStringValuesMap(stats));
 		dataHolder.getDoubleValuesMaps().add(StatsFormatter.getDoubleValuesMap(stats));

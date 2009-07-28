@@ -31,23 +31,23 @@ public class TimeSnapshot implements Serializable
 	/**
 	 * The total cumulated time.
 	 */
-	public long totalTime = 0L;
+	private long totalTime = 0L;
 	/**
 	 * The most recent time.
 	 */
-	public long latestTime = 0L;
+	private long latestTime = 0L;
 	/**
 	 * The minimum time.
 	 */
-	public long minTime = Long.MAX_VALUE;
+	private long minTime = Long.MAX_VALUE;
 	/**
 	 * The maximum task execution time.
 	 */
-	public long maxTime = 0L;
+	private long maxTime = 0L;
 	/**
-	 * Average time (computed elsewhere).
+	 * The average time.
 	 */
-	public double avgTime = 0d;
+	private double avgTime = 0d;
 	
 	/**
 	 * Initialize this time snapshot with a specified title.
@@ -105,5 +105,95 @@ public class TimeSnapshot implements Serializable
 		sb.append(title).append(" max time : ").append(maxTime).append("\n");
 		sb.append(title).append(" avg time : ").append(avgTime).append("\n");
 		return sb.toString();
+	}
+
+	/**
+	 * Set the total cumulated time.
+	 * @param totalTime - the total time as a long value.
+	 */
+	public void setTotalTime(long totalTime)
+	{
+		this.totalTime = totalTime;
+	}
+
+	/**
+	 * Get the total cumulated time.
+	 * @return the total time as a long value.
+	 */
+	public long getTotalTime()
+	{
+		return totalTime;
+	}
+
+	/**
+	 * Set the most recent time.
+	 * @param latestTime - the most recent time as a long value.
+	 */
+	public void setLatestTime(long latestTime)
+	{
+		this.latestTime = latestTime;
+	}
+
+	/**
+	 * Get the minimum time.
+	 * @return the minimum time as a long value.
+	 */
+	public long getLatestTime()
+	{
+		return latestTime;
+	}
+
+	/**
+	 * Set the most recent time.
+	 * @param minTime - the minimum time as a long value.
+	 */
+	public void setMinTime(long minTime)
+	{
+		this.minTime = minTime;
+	}
+
+	/**
+	 * Get the minimum time.
+	 * @return the minimum time as a long value.
+	 */
+	public long getMinTime()
+	{
+		return minTime;
+	}
+
+	/**
+	 * Set the maximum time.
+	 * @param maxTime - the maximum time as a long value.
+	 */
+	public void setMaxTime(long maxTime)
+	{
+		this.maxTime = maxTime;
+	}
+
+	/**
+	 * Get the maximum time.
+	 * @return the maximum time as a long value.
+	 */
+	public long getMaxTime()
+	{
+		return maxTime;
+	}
+
+	/**
+	 * Set the average time.
+	 * @param avgTime - the average time as a double value.
+	 */
+	public void setAvgTime(double avgTime)
+	{
+		this.avgTime = avgTime;
+	}
+
+	/**
+	 * Get the average time.
+	 * @return the average time as a double value.
+	 */
+	public double getAvgTime()
+	{
+		return avgTime;
 	}
 }

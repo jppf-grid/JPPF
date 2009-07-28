@@ -219,26 +219,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	}
 
 	/**
-	 * Get the name assigned tothis client connection.
-	 * @return the name as a string.
-	 * @see org.jppf.client.JPPFClientConnection#getName()
-	 */
-	public String getName()
-	{
-		return name;
-	}
-
-	/**
-	 * Get a string representation of this client connection.
-	 * @return a string representing this connection.
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString()
-	{
-		return name + " : " + status;
-	}
-
-	/**
 	 * Create a socket initializer.
 	 * @return an instance of <code>SocketInitializerImpl</code>.
 	 * @see org.jppf.client.AbstractJPPFClientConnection#createSocketInitializer()

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Java Parallel Processing Framework.
+	 Copyright (C) 2005-2009 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JobDataPage" type="page">
+	<!-- test comment for save -->
+	<property name="label" value="Job Data"/>
+	<property name="layoutConstraints" value="flowy, fill, gap rel"/>
+
+	<!-- ===================================================================== -->
+	<!--                        Buttons area                                   -->
+	<!-- ===================================================================== -->
+
+	<child name="Actions" type="page">
+		<property name="label" value="Actions"/>
+		<property name="componentConstraints" value="gap rel, cell 0 0"/>
+	
+		<child name="TreeStructureActions" type="page">
+			<property name="label" value="Tree Structure Actions"/>
+			<property name="layoutConstraints" value="flowy"/>
+	
+			<child name="RefreshButtonPanel" type="page">
+				<property name="label" value="RefreshButtonPanel"/>
+		
+				<child name="job.button.refresh" type="Button">
+					<listener type="script">
+						<script language="groovy">option.findFirstWithName("/JobTreetable").refresh()</script>
+					</listener>
+				</child>
+		
+				<child name="filler" type="Filler">
+					<property name="width" value="10"/>
+					<property name="height" value="10"/>
+				</child>
+
+			</child>
+
+		</child>
+
+		<child name="JobTreeDisplayActions" type="page">
+			<property name="label" value="Tree Display Actions"/>
+			<property name="layoutConstraints" value="flowy"/>
+	
+			<child name="job.button.expand" type="Button">
+				<listener type="script">
+					<script language="groovy">option.findFirstWithName("/JobTreetable").getTreeTable().expandAll()</script>
+				</listener>
+			</child>
+	
+			<child name="job.button.collapse" type="Button">
+				<listener type="script">
+					<script language="groovy">option.findFirstWithName("/JobTreetable").getTreeTable().collapseAll()</script>
+				</listener>
+			</child>
+
+		</child>
+
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--                      Tree table area                                  -->
+	<!-- ===================================================================== -->
+
+	<child name="jobTreeTableContainer" type="page">
+		<property name="layoutConstraints" value="fill, nogrid"/>
+		<property name="componentConstraints" value="grow, span, push, cell 0 1, width 0"/>
+	
+		<child name="JobTreetable" type="JobDataPanel">
+			<property name="componentConstraints" value="grow, width 0"/>
+			<property name="value" value=""/>
+		</child>
+
+	</child>
+	
+</opt:main>

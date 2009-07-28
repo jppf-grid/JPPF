@@ -13,6 +13,7 @@ import org.jppf.ui.monitoring.charts.*
 import org.jppf.ui.monitoring.charts.config.*
 import org.jppf.ui.monitoring.data.*
 import org.jppf.ui.monitoring.node.*
+import org.jppf.ui.monitoring.job.*
 import org.jppf.ui.options.*
 import org.jppf.ui.options.event.*
 import org.jppf.ui.options.factory.*

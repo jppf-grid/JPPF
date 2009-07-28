@@ -85,6 +85,6 @@ public class TestJMX
     */
 	  jmxConnection.close();
 	  // return the current number of nodes
-	  return stats.nbNodes;
+	  return stats.getNbNodes();
 	}
 }

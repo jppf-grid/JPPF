@@ -21,6 +21,7 @@ import java.util.*;
 
 import javax.swing.*;
 
+import org.jppf.ui.monitoring.job.JobDataPanel;
 import org.jppf.ui.monitoring.node.NodeDataPanel;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.xml.OptionDescriptor.ItemDescriptor;
@@ -414,6 +415,19 @@ public class OptionElementFactory
 	public Option buildNodeDataPanel(OptionDescriptor desc) throws Exception
 	{
 		NodeDataPanel option = new NodeDataPanel();
+		builder.initCommonOptionAttributes(option, desc);
+		return option;
+	}
+
+	/**
+	 * Build a JobDataPanel from the specified descriptor.
+	 * @param desc the descriptor to get the properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public Option buildJobDataPanel(OptionDescriptor desc) throws Exception
+	{
+		JobDataPanel option = new JobDataPanel();
 		builder.initCommonOptionAttributes(option, desc);
 		return option;
 	}

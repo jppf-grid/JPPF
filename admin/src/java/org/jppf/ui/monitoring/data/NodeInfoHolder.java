@@ -101,6 +101,7 @@ public class NodeInfoHolder
 	 */
 	public String toString()
 	{
-		return jmxClient.getHost() + ":" + jmxClient.getPort();
+		//return jmxClient.getHost() + ":" + jmxClient.getPort();
+		return jmxClient.getId();
 	}
 }

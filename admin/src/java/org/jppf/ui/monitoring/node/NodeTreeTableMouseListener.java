@@ -37,12 +37,12 @@ import org.jppf.ui.utils.GuiUtils;
  * Processes right-click events to display popup menus.
  * @author laurentcohen
  */
-public class TreeTableMouseListener extends MouseAdapter
+public class NodeTreeTableMouseListener extends MouseAdapter
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(TreeTableMouseListener.class);
+	private static Log log = LogFactory.getLog(NodeTreeTableMouseListener.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
@@ -72,8 +72,8 @@ public class TreeTableMouseListener extends MouseAdapter
 	public void mousePressed(MouseEvent event)
 	{
 		Component comp = event.getComponent();
-		if (!(comp instanceof JPPFTreeTable)) return;
-		JPPFTreeTable treeTable = (JPPFTreeTable) comp;
+		if (!(comp instanceof JPPFNodeTreeTable)) return;
+		JPPFNodeTreeTable treeTable = (JPPFNodeTreeTable) comp;
 		JTree tree = treeTable.getTree();
 		int x = event.getX();
 		int y = event.getY();

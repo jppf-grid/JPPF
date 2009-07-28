@@ -16,23 +16,26 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.node;
+package org.jppf.ui.monitoring.job;
 
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
-import org.jppf.ui.treetable.*;
+import org.jppf.ui.treetable.JTreeTable;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public class JPPFTreeTable extends JTreeTable
+public class JobTreeTable extends JTreeTable
 {
 	/**
 	 * Inityialize this tree table with the specified model.
 	 * @param treeTableModel - a tree table model.
 	 */
-	public JPPFTreeTable(JPPFNodeTreeTableModel treeTableModel)
+	public JobTreeTable(JobTreeTableModel treeTableModel)
 	{
 		super(treeTableModel);
 	}

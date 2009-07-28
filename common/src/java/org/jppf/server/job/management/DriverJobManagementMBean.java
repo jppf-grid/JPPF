@@ -20,6 +20,8 @@ package org.jppf.server.job.management;
 
 import javax.management.NotificationEmitter;
 
+import org.jppf.job.JobInformation;
+
 
 /**
  * A sample MBean interface.
@@ -33,4 +35,24 @@ public interface DriverJobManagementMBean extends NotificationEmitter
 	 * @throws Exception if any error occurs.
 	 */
 	void cancelJob(String jobId) throws Exception;
+	/**
+	 * Get the set of ids for all the jobs currently queued or executing.
+	 * @return an array of ids as strings.
+	 * @throws Exception if any error occurs.
+	 */
+	String[] getAllJobIds() throws Exception;
+	/**
+	 * Get an object describing the job with the specified id. 
+	 * @param jobId - the id of the job to get information about.
+	 * @return an instance of <code>JobInformation</code>.
+	 * @throws Exception if any error occurs.
+	 */
+	JobInformation getJobInformation(String jobId) throws Exception;
+	/**
+	 * Get a list of objects describing the nodes to which the whole or part of a job was dispatched.
+	 * @param jobId - the id of the job for which to find node information.
+	 * @return an array of <code>NodeManagementInfo</code>, <code>JobInformation</code> instances.
+	 * @throws Exception if any error occurs.
+	 */
+	NodeJobInformation[] getNodeInformation(String jobId) throws Exception;
 }

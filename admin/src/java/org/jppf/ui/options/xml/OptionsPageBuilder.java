@@ -266,6 +266,7 @@ public class OptionsPageBuilder
 		else if ("import".equalsIgnoreCase(desc.type)) elt = f.loadImport(desc);
 		else if ("Java".equalsIgnoreCase(desc.type)) elt = f.buildJavaOption(desc);
 		else if ("NodeDataPanel".equalsIgnoreCase(desc.type)) elt = f.buildNodeDataPanel(desc);
+		else if ("JobDataPanel".equalsIgnoreCase(desc.type)) elt = f.buildJobDataPanel(desc);
 		return elt;
 	}
 

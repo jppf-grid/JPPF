@@ -127,7 +127,8 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 							else b = resourceProvider.getResourceAsBytes(name);
 						}
 						if (b == null) found = false;
-						resource.setDefinition(b);
+						if (callable == null) resource.setDefinition(b);
+						else resource.setCallable(b);
 						if  (debugEnabled)
 						{
 							if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");

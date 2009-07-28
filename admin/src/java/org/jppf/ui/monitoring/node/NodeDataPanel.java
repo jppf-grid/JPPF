@@ -52,7 +52,7 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	/**
 	 * A tree table component displaying the driver and nodes information. 
 	 */
-	private JPPFTreeTable treeTable = null;
+	private JPPFNodeTreeTable treeTable = null;
 	/**
 	 * Contains all the data about the drivers and nodes.
 	 */
@@ -120,15 +120,16 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	public void createUI()
 	{
-	  treeTable = new JPPFTreeTable(model);
+	  treeTable = new JPPFNodeTreeTable(model);
 	  treeTable.getTree().setRootVisible(false);
 	  treeTable.getTree().setShowsRootHandles(true);
 	  populateTreeTableModel();
 		treeTable.expandAll();
-		treeTable.addMouseListener(new TreeTableMouseListener());
+		treeTable.addMouseListener(new NodeTreeTableMouseListener());
 		treeTable.getColumnModel().getColumn(0).setPreferredWidth(300);
 		treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 		treeTable.doLayout();
+		treeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		JScrollPane sp = new JScrollPane(treeTable);
 		setUIComponent(sp);
 	}

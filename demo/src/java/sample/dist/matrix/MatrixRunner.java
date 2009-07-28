@@ -41,6 +41,10 @@ public class MatrixRunner
 	 * JPPF client used to submit execution requests.
 	 */
 	private static JPPFClient jppfClient = null;
+	/**
+	 * Keeps track of the current iteration number.
+	 */
+	private static int iterationsCount = 0;
 
 	/**
 	 * Entry point for this class, performs a matrix multiplication a number of times.,<br>
@@ -133,7 +137,7 @@ public class MatrixRunner
 		int size = a.getSize();
 		// create a task for each row in matrix a
 		JPPFJob job = new JPPFJob();
-		job.setId("matrix sample");
+		job.setId("matrix sample " + (iterationsCount++));
 		int remaining = size;
 		for (int i=0; i<size; i+= nbRows)
 		{

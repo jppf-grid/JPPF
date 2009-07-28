@@ -32,14 +32,31 @@
  */
 package org.jppf.ui.treetable;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.tree.*;
+import javax.swing.JTable;
+import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
+import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeSelectionModel;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 /**
  * This example shows how to create a simple JTreeTable component, by using a JTree as a renderer (and editor) for the
@@ -138,6 +155,22 @@ public class JTreeTable extends JTable
 	public JTree getTree()
 	{
 		return tree;
+	}
+
+	/**
+	 * Set the selection mode of this tree table.
+	 * @param selectionMode - one of ListSelectionModel.SINGLE_SELECTION, ListSelectionModel.SINGLE_INTERVAL_SELECTION,
+	 * ListSelectionModel.MULTIPLE_INTERVAL_SELECTION.
+	 * @see javax.swing.JTable#setSelectionMode(int)
+   */
+	public void setSelectionMode(int selectionMode)
+	{
+		super.setSelectionMode(selectionMode);
+		int treeMode = 0;
+		if (selectionMode == ListSelectionModel.SINGLE_SELECTION) treeMode = TreeSelectionModel.SINGLE_TREE_SELECTION;
+		else if (selectionMode == ListSelectionModel.SINGLE_INTERVAL_SELECTION) treeMode = TreeSelectionModel.CONTIGUOUS_TREE_SELECTION;
+		else treeMode = TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION;
+		tree.getSelectionModel().setSelectionMode(treeMode);
 	}
 
 	/**
@@ -273,11 +306,13 @@ public class JTreeTable extends JTable
 	{
 		/** Set to true when we are updating the ListSelectionModel. */
 		protected boolean updatingListSelectionModel;
+		protected boolean updatingTreeSelectionModel;
 
 		public ListToTreeSelectionModelWrapper()
 		{
 			super();
 			getListSelectionModel().addListSelectionListener(createListSelectionListener());
+			getTree().getSelectionModel().addTreeSelectionListener(new TreeSelectionHandler());
 		}
 
 		/**
@@ -328,7 +363,7 @@ public class JTreeTable extends JTable
 		 */
 		protected void updateSelectedPathsFromSelectedRows()
 		{
-			if (!updatingListSelectionModel)
+			if (!updatingListSelectionModel && !updatingTreeSelectionModel)
 			{
 				updatingListSelectionModel = true;
 				try
@@ -363,6 +398,48 @@ public class JTreeTable extends JTable
 		}
 
 		/**
+		 * If <code>updatingListSelectionModel</code> is false, this will reset the selected paths from the selected rows in
+		 * the list selection model.
+		 */
+		protected void updateSelectedTableRows()
+		{
+			if (!updatingListSelectionModel && !updatingTreeSelectionModel)
+			{
+				System.out.println("in updateSelectedTableRows()");
+				updatingTreeSelectionModel = true;
+				try
+				{
+					TreeSelectionModel treeSelectionModel = getTree().getSelectionModel();
+					int[] rows = treeSelectionModel.getSelectionRows();
+					if ((rows == null) || (rows.length == 0))
+					{
+						listSelectionModel.clearSelection();
+					}
+					else
+					{
+						Set<Integer> selectionSet = new HashSet<Integer>();
+						for (int r: rows) selectionSet.add(r);
+						for (int i=0; i<JTreeTable.this.getRowCount(); i++)
+						{
+							if (selectionSet.contains(i))
+							{
+								if (!listSelectionModel.isSelectedIndex(i)) listSelectionModel.addSelectionInterval(i, i);
+							}
+							else
+							{
+								if (listSelectionModel.isSelectedIndex(i)) listSelectionModel.removeSelectionInterval(i, i);
+							}
+						}
+					}
+				}
+				finally
+				{
+					updatingTreeSelectionModel = false;
+				}
+			}
+		}
+
+		/**
 		 * Class responsible for calling updateSelectedPathsFromSelectedRows when the selection of the list changse.
 		 */
 		class ListSelectionHandler implements ListSelectionListener
@@ -370,6 +447,19 @@ public class JTreeTable extends JTable
 			public void valueChanged(ListSelectionEvent e)
 			{
 				updateSelectedPathsFromSelectedRows();
+			}
+		}
+
+		class TreeSelectionHandler implements TreeSelectionListener
+		{
+			/**
+			 * Invoked when the selection has changed in the tree.
+			 * @param e the tree selection event.
+			 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
+			 */
+			public void valueChanged(TreeSelectionEvent e)
+			{
+				updateSelectedTableRows();
 			}
 		}
 	}

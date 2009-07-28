@@ -17,27 +17,15 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.security.AllPermission;
-import java.security.CodeSource;
-import java.security.Permission;
-import java.security.PermissionCollection;
-import java.security.Permissions;
-import java.security.Policy;
-import java.security.ProtectionDomain;
+import java.security.*;
 
-import javax.swing.JFrame;
 import javax.swing.UIManager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.*;
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.JPPFSplash;
 import org.jppf.utils.JPPFConfiguration;
-import org.jvnet.lafwidget.LafWidget;
-import org.jvnet.lafwidget.tabbed.DefaultTabPreviewPainter;
-import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.watermark.SubstanceNoneWatermark;
 
 /**
  * This class provides a graphical interface for monitoring the status and health 
@@ -73,7 +61,9 @@ public class UILauncher
 			if ((args  == null) || (args.length < 2))
 				throw new Exception("Usage: UILauncher page_location location_source");
 			String s = System.getProperty("swing.defaultlaf");
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			//System.out.println("system L&F: " + UIManager.getSystemLookAndFeelClassName());
+			/*
 			if ((s == null) || SubstanceLookAndFeel.class.getName().equals(s))
 			{
 				UIManager.put(SubstanceLookAndFeel.ENABLE_INVERTED_THEMES, Boolean.TRUE);
@@ -85,6 +75,7 @@ public class UILauncher
 				//SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
 				SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNoneWatermark());
 			}
+			*/
 			boolean showSplash = JPPFConfiguration.getProperties().getBoolean("jppf.ui.splash", true);
 			if (showSplash)
 			{
