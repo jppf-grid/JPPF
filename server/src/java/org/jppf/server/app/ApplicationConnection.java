@@ -87,7 +87,7 @@ public class ApplicationConnection extends JPPFConnection
 		resultSender = new ApplicationResultSender(socketClient);
 		InetAddress addr = socket.getInetAddress();
 		setName("appl [" + addr.getHostAddress() + ":" + socket.getPort() + "]");
-		if (JPPFDriver.getInstance().getStatsUpdater().isStatsEnabled()) JPPFDriver.getInstance().getStatsManager().newClientConnection();
+		JPPFDriver.getInstance().getStatsManager().newClientConnection();
 	}
 
 	/**

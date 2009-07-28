@@ -69,6 +69,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 				if (debugEnabled) log.debug("re-submitting bundle with [priority=" + bundle.getPriority()+", initialTasksCount=" +
 					bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + "]");
 				fireQueueEvent(new QueueEvent(this, bundleWrapper, true));
+				bundle.setParameter("real.task.count", bundle.getTaskCount());
+				JPPFDriver.getInstance().getJobManager().jobUpdated(bundleWrapper);
 			}
 			else
 			{
@@ -79,7 +81,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 				putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
 				jobMap.put(jobId, bundleWrapper);
 				fireQueueEvent(new QueueEvent(this, bundleWrapper));
-				JPPFDriver.getInstance().getJobManager().jobQueued(bundleWrapper);
 			}
 		}
 		finally
@@ -127,6 +128,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 				result = bundleWrapper;
 				removeFromListMap(new JPPFPriority(bundle.getPriority()), bundleWrapper, priorityMap);
 				jobMap.remove((String) bundle.getParameter(BundleParameter.JOB_ID));
+				bundle.setParameter("real.task.count", 0);
 			}
 			else
 			{
@@ -141,7 +143,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 					sizeMap.put(size, list);
 				}
 				list.add(bundleWrapper);
+				bundle.setParameter("real.task.count", bundle.getTaskCount());
 			}
+			JPPFDriver.getInstance().getJobManager().jobUpdated(bundleWrapper);
 			result.getBundle().setExecutionStartTime(System.currentTimeMillis());
 		}
 		finally

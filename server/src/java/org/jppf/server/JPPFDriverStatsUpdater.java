@@ -17,7 +17,6 @@
  */
 package org.jppf.server;
 
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Instances of this class are used to collect statistics on the JPPF server.
@@ -26,100 +25,52 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 {
 	/**
-	 * Used to synchronize access and updates to the stats from a large number of threads.
-	 */
-	private ReentrantLock lock = new ReentrantLock();
-	/**
 	 * The object that holds the stats.
 	 */
 	private JPPFStats stats = new JPPFStats();
-	/**
-	 * Flag to determine whether the statistics collection is enabled.
-	 */
-	private boolean statsEnabled = true;
 	
 	/**
 	 * Called to notify that a new client is connected to he JPPF server.
 	 */
-	public void newClientConnection()
+	public synchronized void newClientConnection()
 	{
-		lock.lock();
-		try
-		{
-			stats.nbClients++;
-			if (stats.nbClients > stats.maxClients) stats.maxClients++;
-		}
-		finally
-		{
-			lock.unlock();
-		}
+		stats.setNbClients(stats.getNbClients() + 1);
+		if (stats.getNbClients() > stats.getMaxClients()) stats.setMaxClients(stats.getMaxClients() + 1);
 	}
 
 	/**
 	 * Called to notify that a new client has disconnected from he JPPF server.
 	 */
-	public void clientConnectionClosed()
+	public synchronized void clientConnectionClosed()
 	{
-		lock.lock();
-		try
-		{
-			stats.nbClients--;
-		}
-		finally
-		{
-			lock.unlock();
-		}
+		stats.setNbClients(stats.getNbClients() - 1);
 	}
 
 	/**
 	 * Called to notify that a new node is connected to he JPPF server.
 	 */
-	public void newNodeConnection()
+	public synchronized void newNodeConnection()
 	{
-		lock.lock();
-		try
-		{
-			stats.nbNodes++;
-			if (stats.nbNodes > stats.maxNodes) stats.maxNodes++;
-		}
-		finally
-		{
-			lock.unlock();
-		}
+		stats.setNbNodes(stats.getNbNodes() + 1);
+		if (stats.getNbNodes() > stats.getMaxNodes()) stats.setMaxNodes(stats.getMaxNodes() + 1);
 	}
 
 	/**
 	 * Called to notify that a new node is connected to he JPPF server.
 	 */
-	public void nodeConnectionClosed()
+	public synchronized void nodeConnectionClosed()
 	{
-		lock.lock();
-		try
-		{
-			stats.nbNodes--;
-		}
-		finally
-		{
-			lock.unlock();
-		}
+		stats.setNbNodes(stats.getNbNodes() - 1);
 	}
 
 	/**
 	 * Called to notify that a task was added to the queue.
 	 * @param count the number of tasks that have been added to the queue.
 	 */
-	public void taskInQueue(int count)
+	public synchronized void taskInQueue(int count)
 	{
-		lock.lock();
-		try
-		{
-			stats.queueSize += count;
-			if (stats.queueSize > stats.maxQueueSize) stats.maxQueueSize = stats.queueSize;
-		}
-		finally
-		{
-			lock.unlock();
-		}
+		stats.setQueueSize(stats.getQueueSize() + count);
+		if (stats.getQueueSize() > stats.getMaxQueueSize()) stats.setMaxQueueSize(stats.getQueueSize());
 	}
 
 	/**
@@ -127,19 +78,11 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 * @param count the number of tasks that have been removed from the queue.
 	 * @param time the time the task remained in the queue.
 	 */
-	public void taskOutOfQueue(int count, long time)
+	public synchronized void taskOutOfQueue(int count, long time)
 	{
-		lock.lock();
-		try
-		{
-			stats.queueSize -= count;
-			stats.totalQueued += count;
-			stats.queue.newTime(time, count, stats.totalQueued);
-		}
-		finally
-		{
-			lock.unlock();
-		}
+		stats.setQueueSize(stats.getQueueSize() - count);
+		stats.setTotalQueued(stats.getTotalQueued() + count);
+		stats.getQueue().newTime(time, count, stats.getTotalQueued());
 	}
 	
 	/**
@@ -149,95 +92,30 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 * @param remoteTime the time it took to execute the tasks in the node only.
 	 * @param size the size in bytes of the bundle that was sent to the node.
 	 */
-	public void taskExecuted(int count, long time, long remoteTime, long size)
+	public synchronized void taskExecuted(int count, long time, long remoteTime, long size)
 	{
-		lock.lock();
-		try
-		{
-			stats.totalTasksExecuted += count;
-			stats.execution.newTime(time, count, stats.totalTasksExecuted);
-			stats.nodeExecution.newTime(remoteTime, count, stats.totalTasksExecuted);
-			stats.transport.newTime(time - remoteTime, count, stats.totalTasksExecuted);
-			stats.footprint += size;
-		}
-		finally
-		{
-			lock.unlock();
-		}
+		stats.setTotalTasksExecuted(stats.getTotalTasksExecuted() + count);
+		stats.getExecution().newTime(time, count, stats.getTotalTasksExecuted());
+		stats.getNodeExecution().newTime(remoteTime, count, stats.getTotalTasksExecuted());
+		stats.getTransport().newTime(time - remoteTime, count, stats.getTotalTasksExecuted());
+		stats.setFootprint(stats.getFootprint() + size);
 	}
 
 	/**
 	 * Get the stats maintained by this updater.
 	 * @return a <code>JPPFStats</code> instance.
 	 */
-	public JPPFStats getStats()
+	public synchronized JPPFStats getStats()
 	{
-		return stats;
+		return stats.makeCopy();
 	}
-	/*
-	public static JPPFStats getStats()
-	{
-		lock.lock();
-		try
-		{
-			return stats.makeCopy();
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
-	*/
 
-	/**
-	 * Determine whether the statistics collection is enabled.
-	 * @return true if the statistics collection is enabled, false otherwise.
-	 */
-	public boolean isStatsEnabled()
-	{
-		return statsEnabled;
-	}
-	
 	/**
 	 * Get the current number of nodes connected to the server.
 	 * @return the numbe rof nodes as an int.
 	 */
 	public int getNbNodes()
 	{
-		return stats.nbNodes;
-	}
-
-	/**
-	 * Get the maximum number of tasks in each task bundle.
-	 * @return the bundle size as an int.
-	 */
-	public int getStaticBundleSize()
-	{
-		lock.lock();
-		try
-		{
-			return stats.bundleSize;
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
-
-	/**
-	 * Set the maximum number of tasks in each task bundle.
-	 * @param bundleSize the bundle size as an int.
-	 */
-	public void setStaticBundleSize(int bundleSize)
-	{
-		lock.lock();
-		try
-		{
-			stats.bundleSize = bundleSize;
-		}
-		finally
-		{
-			lock.unlock();
-		}
+		return stats.getNbNodes();
 	}
 }

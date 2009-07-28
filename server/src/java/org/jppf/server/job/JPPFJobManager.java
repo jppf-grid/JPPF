@@ -24,8 +24,7 @@ import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
-import org.jppf.management.NodeManagementInfo;
-import org.jppf.server.JPPFDriver;
+import org.jppf.job.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.*;
 import org.jppf.utils.*;
@@ -34,7 +33,7 @@ import org.jppf.utils.*;
  * Instances of this class manage and monitor the jobs thoughout their processing within the JPPF driver.
  * @author Laurent Cohen
  */
-public class JPPFJobManager extends EventEmitter<JobManagerListener> implements QueueListener
+public class JPPFJobManager extends EventEmitter<JobListener> implements QueueListener
 {
 	/**
 	 * Logger for this class.
@@ -47,11 +46,11 @@ public class JPPFJobManager extends EventEmitter<JobManagerListener> implements 
 	/**
 	 * Mapping of jobs to the nodes they are executing on.
 	 */
-	private Map<String, List<SelectableChannel>> jobMap = new HashMap<String, List<SelectableChannel>>();
+	private Map<String, List<ChannelBundlePair>> jobMap = new HashMap<String, List<ChannelBundlePair>>();
 	/**
 	 * Mapping of job ids to the corresponding <code>JPPFTaskBundle</code>.
 	 */
-	private Map<String, JPPFTaskBundle> bundleMap = new HashMap<String, JPPFTaskBundle>();
+	private Map<String, BundleWrapper> bundleMap = new HashMap<String, BundleWrapper>();
 	/**
 	 * Processes the event queue asynchronously.
 	 */
@@ -66,6 +65,35 @@ public class JPPFJobManager extends EventEmitter<JobManagerListener> implements 
 	}
 
 	/**
+	 * Get all the nodes to which a all or part of a job is dispatched.
+	 * @param jobId - the id of the job.
+	 * @return a list of <code>SelectableChannel</code> instances.
+	 */
+	public synchronized List<ChannelBundlePair> getNodesForJob(String jobId)
+	{
+		return Collections.unmodifiableList(jobMap.get(jobId));
+	}
+
+	/**
+	 * Get the set of ids for all the jobs currently queued or executing.
+	 * @return a set of ids as strings.
+	 */
+	public synchronized Set<String> getAllJobIds()
+	{
+		return Collections.unmodifiableSet(jobMap.keySet());
+	}
+
+	/**
+	 * Get the queueed bundle wrapper for the specified job.
+	 * @param jobId - the id of the job to look for.
+	 * @return a <code>BundleWrapper</code> instance, or null if the job is not queued anymore.
+	 */
+	public synchronized BundleWrapper getBundleForJob(String jobId)
+	{
+		return bundleMap.get(jobId);
+	}
+
+	/**
 	 * Called when all or part of a job is dispatched to a node.
 	 * @param bundleWrapper - the dispatched job.
 	 * @param channel - the node to which the job is dispatched.
@@ -74,15 +102,15 @@ public class JPPFJobManager extends EventEmitter<JobManagerListener> implements 
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
-		List<SelectableChannel> list = jobMap.get(jobId);
+		List<ChannelBundlePair> list = jobMap.get(jobId);
 		if (list == null)
 		{
-			list = new ArrayList<SelectableChannel>();
+			list = new ArrayList<ChannelBundlePair>();
 			jobMap.put(jobId, list);
 		}
-		list.add(channel);
+		list.add(new ChannelBundlePair(channel, bundleWrapper));
 		if (debugEnabled) log.debug("jobId '" + jobId + "' : added node " + channel);
-		submit(JobManagerEventType.JOB_DISPATCHED, bundle, channel);
+		submitEvent(JobEventType.JOB_DISPATCHED, bundle, channel);
 	}
 
 	/**
@@ -94,15 +122,15 @@ public class JPPFJobManager extends EventEmitter<JobManagerListener> implements 
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
-		List<SelectableChannel> list = jobMap.get(jobId);
+		List<ChannelBundlePair> list = jobMap.get(jobId);
 		if (list == null)
 		{
 			log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + jobId);
 			return;
 		}
-		list.remove(channel);
+		list.remove(new ChannelBundlePair(channel, bundleWrapper));
 		if (debugEnabled) log.debug("jobId '" + jobId + "' : removed node " + channel);
-		submit(JobManagerEventType.JOB_RETURNED, bundle, channel);
+		submitEvent(JobEventType.JOB_RETURNED, bundle, channel);
 	}
 
 	/**
@@ -113,10 +141,10 @@ public class JPPFJobManager extends EventEmitter<JobManagerListener> implements 
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
-		bundleMap.put(jobId, bundle);
-		jobMap.put(jobId, new ArrayList<SelectableChannel>());
+		bundleMap.put(jobId, bundleWrapper);
+		jobMap.put(jobId, new ArrayList<ChannelBundlePair>());
 		if (debugEnabled) log.debug("jobId '" + jobId + "' queued");
-		submit(JobManagerEventType.JOB_QUEUED, bundle, null);
+		submitEvent(JobEventType.JOB_QUEUED, bundle, null);
 	}
 
 	/**
@@ -130,7 +158,19 @@ public class JPPFJobManager extends EventEmitter<JobManagerListener> implements 
 		jobMap.remove(jobId);
 		bundleMap.remove(jobId);
 		if (debugEnabled) log.debug("jobId '" + jobId + "' ended");
-		submit(JobManagerEventType.JOB_ENDED, bundle, null);
+		submitEvent(JobEventType.JOB_ENDED, bundle, null);
+	}
+
+	/**
+	 * Called when a job is added to the server queue.
+	 * @param bundleWrapper - the queued job.
+	 */
+	public synchronized void jobUpdated(BundleWrapper bundleWrapper)
+	{
+		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+		if (debugEnabled) log.debug("jobId '" + jobId + "' updated");
+		submitEvent(JobEventType.JOB_UPDATED, bundle, null);
 	}
 
 	/**
@@ -149,82 +189,18 @@ public class JPPFJobManager extends EventEmitter<JobManagerListener> implements 
 	 * @param bundle - the job data.
 	 * @param channel - the id of the job source of the event.
 	 */
-	private void submit(JobManagerEventType eventType, JPPFTaskBundle bundle, SelectableChannel channel)
+	private void submitEvent(JobEventType eventType, JPPFTaskBundle bundle, SelectableChannel channel)
 	{
-		executor.submit(new JobManagerEventTask(eventType, bundle, channel));
+		executor.submit(new JobEventTask(this, eventType, bundle, channel));
 	}
 
 	/**
-	 * Instances of this class are submitted into an event queue and generate actual
-	 * job manager events that are then dispatched to registered listeners.
+	 * Close this job manager and release its resources.
 	 */
-	private class JobManagerEventTask implements Runnable
+	public synchronized void close()
 	{
-		/**
-		 * The type of event to generate.
-		 */
-		private JobManagerEventType eventType = null;
-		/**
-		 * The id of the job source of the event.
-		 */
-		private String jobId = null;
-		/**
-		 * The node, if any, for which the event happened.
-		 */
-		private SelectableChannel channel = null;
-		/**
-		 * The job data.
-		 */
-		private JPPFTaskBundle bundle = null;
-		/**
-		 * Creation timestamp for this task.
-		 */
-		private long timestamp = System.currentTimeMillis();
-
-		/**
-		 * .
-		 * @param eventType - the type of event to generate.
-		 * @param bundle - the job data.
-		 * @param channel - the id of the job source of the event.
-		 */
-		public JobManagerEventTask(JobManagerEventType eventType, JPPFTaskBundle bundle, SelectableChannel channel)
-		{
-			this.eventType = eventType;
-			this.channel = channel;
-			this.bundle = bundle;
-		}
-
-		/**
-		 * Execute this task.
-		 * @see java.lang.Runnable#run()
-		 */
-		public void run()
-		{
-			JobInformation jobInfo = new JobInformation((String) bundle.getParameter(BundleParameter.JOB_ID),
-				bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getPriority());
-			NodeManagementInfo nodeInfo = (channel == null) ? null : JPPFDriver.getInstance().getNodeInformation(channel);
-			JobManagerEvent event = new JobManagerEvent(jobInfo, nodeInfo);
-			synchronized(getListeners())
-			{
-				switch (eventType)
-				{
-					case JOB_QUEUED:
-						for (JobManagerListener listener: getListeners()) listener.jobQueued(event);
-						break;
-	
-					case JOB_ENDED:
-						for (JobManagerListener listener: getListeners()) listener.jobEnded(event);
-						break;
-	
-					case JOB_DISPATCHED:
-						for (JobManagerListener listener: getListeners()) listener.jobDispatched(event);
-						break;
-	
-					case JOB_RETURNED:
-						for (JobManagerListener listener: getListeners()) listener.jobReturned(event);
-						break;
-				}
-			}
-		}
+		executor.shutdownNow();
+		jobMap.clear();
+		bundleMap.clear();
 	}
 }

@@ -378,6 +378,7 @@ public class JPPFDriver
 			applicationServers[i] = null;
 		}
 		applicationServers = null;
+		jobManager.close();
 	}
 
 	/**

@@ -1,1 +1,2 @@
 org.jppf.server.spi.JPPFDefaultDriverMBeanProvider
+org.jppf.server.job.management.DriverJobManagementMBeanProvider

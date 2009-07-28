@@ -158,11 +158,24 @@ public final class NetworkUtils
 	}
 
 	/**
+	 * Attempt to resolve an IP address into a host name.
+	 * @param ip - the ip address to resolve.
+	 * @return the corresponding host name, orits IP if the name could not be resolved.
+	 */
+	public static String getHostAddress(String ip)
+	{
+		InetSocketAddress addr = new InetSocketAddress(ip, 0);
+		String s = addr.getHostName();
+		if (s == null) s = ip;
+		return s;
+	}
+
+	/**
 	 * Main entry point.
 	 * @param args not used.
 	 */
 	public static void main(String...args)
 	{
-		System.out.println("This host's ip address: " + getNonLocalHostAddress());
+		System.out.println("This host's ip addresses: " + getNonLocalHostAddress());
 	}
 }

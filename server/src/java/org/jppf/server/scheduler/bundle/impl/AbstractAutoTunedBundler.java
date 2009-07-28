@@ -20,7 +20,6 @@ package org.jppf.server.scheduler.bundle.impl;
 import java.util.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.autotuned.AnnealingTuneProfile;
 
@@ -48,7 +47,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	/**
 	 * The currrent bundle size.
 	 */
-	protected int currentSize;
+	protected int currentSize = 1;
 	/**
 	 * Used to compute a pseudo-random increment to the bundle size, as part of a Monte Carlo random walk
 	 * towards a good solution.
@@ -79,7 +78,6 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	{
 		super(profile, overriden);
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
-		currentSize = JPPFDriver.getInstance().getStatsUpdater().getStaticBundleSize();
 		if (currentSize < 1) currentSize = 1;
 		log.info("Bundler#" + bundlerNumber + ": The initial size is " + currentSize);
 	}

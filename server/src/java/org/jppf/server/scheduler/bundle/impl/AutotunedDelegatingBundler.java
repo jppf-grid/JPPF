@@ -21,7 +21,6 @@ package org.jppf.server.scheduler.bundle.impl;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.autotuned.AnnealingTuneProfile;
 
@@ -63,12 +62,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	{
 		super(profile, overriden);
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
-		int bundleSize = JPPFDriver.getInstance().getStatsUpdater().getStaticBundleSize();
-		if (bundleSize < 1)
-		{
-			bundleSize = 1;
-		}
-		log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize);
+		//log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize);
 		lock.lock();
 		try
 		{

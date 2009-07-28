@@ -290,7 +290,7 @@ public class NodeRunner
 	 */
 	public static void shutdown(MonitoredNode node, final boolean restart)
 	{
-		node.stopNode(true);
+		//node.stopNode(true);
 		executor.submit(restart ? RESTART_TASK : SHUTDOWN_TASK);
 	}
 

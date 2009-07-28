@@ -273,7 +273,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	 */
 	public void taskStarted(String id)
 	{
-		if (debugEnabled) log.debug("task id#" + id + " started");
+		//if (debugEnabled) log.debug("task id#" + id + " started");
 		nodeState.taskStarted(id);
 	}
 
@@ -283,7 +283,24 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	 */
 	public void taskEnded(String id)
 	{
-		if (debugEnabled) log.debug("task id#" + id + " ended");
+		//if (debugEnabled) log.debug("task id#" + id + " ended");
 		nodeState.taskEnded(id);
+	}
+
+	/**
+	 * Cancel the job with the specified id.
+	 * @param jobId - the id of the job to cancel.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFNodeAdminMBean#cancelJob(java.lang.String)
+	 */
+	public void cancelJob(String jobId) throws Exception
+	{
+		System.out.println("Request to cancel jobId = '" + jobId + "'");
+		if (debugEnabled) log.debug("Request to cancel jobId = '" + jobId + "'");
+		if (jobId == null) return;
+		if (jobId.equals(node.getExecutionManager().getCurrentJobId()))
+		{
+			node.getExecutionManager().cancelAllTasks(false);
+		}
 	}
 }

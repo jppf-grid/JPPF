@@ -63,9 +63,14 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 */
 	private Map<Future<?>, TimerTask> timerTaskMap = new Hashtable<Future<?>, TimerTask>();
 	/**
-	 * Mapping of tasks to their id.
+	 * Mapping of tasks numbers to their id.
 	 */
-	private Map<String, List<Pair<Long, JPPFTask>>> idMap = new Hashtable<String, List<Pair<Long, JPPFTask>>>();
+	//private Map<String, List<Pair<Long, JPPFTask>>> idMap = new Hashtable<String, List<Pair<Long, JPPFTask>>>();
+	private Map<String, List<Long>> idMap = new Hashtable<String, List<Long>>();
+	/**
+	 * Mapping of internal number to the coresponding tasks.
+	 */
+	private Map<Long, JPPFTask> taskMap = new Hashtable<Long, JPPFTask>();
 	/**
 	 * The bundle whose tasks are currently being executed.
 	 */
@@ -147,18 +152,19 @@ public class NodeExecutionManager extends ThreadSynchronization
 	{
 		String id = task.getId();
 		long number = incTaskCount();
+		taskMap.put(number, task);
 		//if (debugEnabled) log.debug("submitting task with number " + number);
 		Future<?> f = threadPool.submit(new NodeTaskWrapper(node, task, uuidList, number));
 		if (!f.isDone()) futureMap.put(number, f);
 		if (id != null)
 		{
-			List<Pair<Long, JPPFTask>> pairList = idMap.get(id);
+			List<Long> pairList = idMap.get(id);
 			if (pairList == null)
 			{
-				pairList = new ArrayList<Pair<Long, JPPFTask>>();
+				pairList = new ArrayList<Long>();
 				idMap.put(id, pairList);
 			}
-			pairList.add(new Pair<Long, JPPFTask>(number, task));
+			pairList.add(number);
 		}
 		if ((task.getTimeout() > 0L) || (task.getTimeoutDate() != null))
 		{
@@ -168,26 +174,43 @@ public class NodeExecutionManager extends ThreadSynchronization
 	}
 
 	/**
+	 * Cancel all executing or pending tasks.
+	 * @param callOnCancel - determines whether the onCancel() callback method of each task should be invoked.
+	 */
+	public synchronized void cancelAllTasks(boolean callOnCancel)
+	{
+		List<Long> list = new ArrayList<Long>(futureMap.keySet());
+		for (Long n: list) cancelTask(n, callOnCancel);
+	}
+
+	/**
 	 * Cancel the execution of the tasks with the specified id.
 	 * @param id the id of the tasks to cancel.
 	 */
 	public synchronized void cancelTask(String id)
 	{
 		if (debugEnabled) log.debug("cancelling tasks with id = " + id);
-		List<Pair<Long, JPPFTask>> pairList = idMap.get(id);
-		if (pairList == null) return;
-		idMap.remove(id);
-		if (debugEnabled) log.debug("number of tasks to cancel: " + pairList.size());
-		for (Pair<Long, JPPFTask> pair: pairList)
+		List<Long> numberList = idMap.remove(id);
+		if (numberList == null) return;
+		if (debugEnabled) log.debug("number of tasks to cancel: " + numberList.size());
+		for (Long number: numberList) cancelTask(number, true);
+	}
+
+	/**
+	 * Cancel the execution of the tasks with the specified id.
+	 * @param number - the index of the task to cancel.
+	 * @param callOnCancel - determines whether the onCancel() callback method of each task should be invoked.
+	 */
+	private synchronized void cancelTask(Long number, boolean callOnCancel)
+	{
+		if (debugEnabled) log.debug("cancelling task number = " + number);
+		Future<?> future = futureMap.get(number);
+		if (!future.isDone())
 		{
-			long number = pair.first();
-			Future<?> future = futureMap.get(number);
-			if (!future.isDone())
-			{
-				future.cancel(true);
-				pair.second().onCancel();
-				removeFuture(number);
-			}
+			future.cancel(true);
+			JPPFTask task = taskMap.remove(number);
+			if (task != null) task.onCancel();
+			removeFuture(number);
 		}
 	}
 
@@ -199,27 +222,29 @@ public class NodeExecutionManager extends ThreadSynchronization
 	public synchronized void restartTask(String id)
 	{
 		if (debugEnabled) log.debug("restarting tasks with id = " + id);
-		List<Pair<Long, JPPFTask>> pairList = idMap.get(id);
-		if (pairList == null) return;
-		idMap.remove(id);
-		if (debugEnabled) log.debug("number of tasks to restart: " + pairList.size());
-		for (Pair<Long, JPPFTask> pair: pairList)
+		List<Long> numberList = idMap.remove(id);
+		if (numberList == null) return;
+		if (debugEnabled) log.debug("number of tasks to restart: " + numberList.size());
+		for (Long number: numberList)
 		{
-			long number = pair.first();
 			Future<?> future = futureMap.get(number);
 			if (!future.isDone())
 			{
 				future.cancel(true);
-				pair.second().onRestart();
-				try
-				{
-					performTask(pair.second());
-				}
-				catch(Exception e)
-				{
-					log.error(e.getMessage(), e);
-				}
+				JPPFTask task = taskMap.remove(number);
 				removeFuture(number);
+				if (task != null)
+				{
+					task.onRestart();
+					try
+					{
+						performTask(task);
+					}
+					catch(Exception e)
+					{
+						log.error(e.getMessage(), e);
+					}
+				}
 			}
 		}
 	}
@@ -331,8 +356,10 @@ public class NodeExecutionManager extends ThreadSynchronization
 		this.bundle = null;
 		this.uuidList = null;
 		futureMap.clear();
+		taskMap.clear();
 		timerTaskMap.clear();
 		idMap.clear();
+		timeoutTimer.purge();
 	}
 
 	/**
@@ -421,5 +448,14 @@ public class NodeExecutionManager extends ThreadSynchronization
 	public void updateThreadsPriority(int newPriority)
 	{
 		threadFactory.updatePriority(newPriority);
+	}
+
+	/**
+	 * Get the id of the job currently being executed.
+	 * @return the job id as a string, or null if no job is being executed.
+	 */
+	public String getCurrentJobId()
+	{
+		return (bundle != null) ? (String) bundle.getParameter(BundleParameter.JOB_ID) : null;
 	}
 }

@@ -1,0 +1,214 @@
+/*
+ * Java Parallel Processing Framework.
+ *  Copyright (C) 2005-2009 JPPF Team. 
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jppf.server.job.management;
+
+import java.util.*;
+
+import javax.management.NotificationBroadcasterSupport;
+
+import org.apache.commons.logging.*;
+import org.jppf.io.BundleWrapper;
+import org.jppf.job.*;
+import org.jppf.management.NodeManagementInfo;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.job.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
+
+/**
+ * Implementation of the job management bean.
+ * @author Laurent Cohen
+ */
+public class DriverJobManagement extends NotificationBroadcasterSupport implements DriverJobManagementMBean
+{
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(DriverJobManagement.class);
+	/**
+	 * Determines whether debug-level logging is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Reference to the driver's job manager.
+	 */
+	private JPPFJobManager jobManager = null;
+	/**
+	 * Reference to the driver's job manager.
+	 */
+	private JPPFDriver driver = null;
+
+	/**
+	 * Initialize this MBean.
+	 */
+	public DriverJobManagement()
+	{
+		getJobManager().addListener(new JobEventNotifier());
+	}
+
+	/**
+	 * Cancel the job with the specified id.
+	 * @param jobId - the id of the job to cancel.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFDriverAdminMBean#cancelJob(java.lang.String)
+	 */
+	public void cancelJob(String jobId) throws Exception
+	{
+		if (debugEnabled) log.debug("Request to cancel jobId = '" + jobId + "'");
+		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobId);
+		if (bundleWrapper != null)
+		{
+			JPPFTaskBundle bundle = bundleWrapper.getBundle();
+			JPPFDriver.getQueue().nextBundle(bundleWrapper, bundle.getTaskCount());
+			if (bundle.getCompletionListener() != null) bundle.getCompletionListener().taskCompleted(bundleWrapper);
+		}
+		List<ChannelBundlePair> list = getJobManager().getNodesForJob(jobId);
+		if (list == null) return;
+		for (ChannelBundlePair pair: list)
+		{
+			CancelJobTask task = new CancelJobTask(jobId, pair.first());
+			new Thread(task).start();
+		}
+	}
+
+	/**
+	 * Get the set of ids for all the jobs currently queued or executing.
+	 * @return a set of ids as strings.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getAllJobIds()
+	 */
+	public String[] getAllJobIds() throws Exception
+	{
+		Set<String> set = getJobManager().getAllJobIds();
+		return set.toArray(new String[0]);
+	}
+
+	/**
+	 * Get an object describing the job with the specified id. 
+	 * @param jobId - the id of the job to get information about.
+	 * @return an instance of <code>JobInformation</code>.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getJobInformation(java.lang.String)
+	 */
+	public JobInformation getJobInformation(String jobId) throws Exception
+	{
+		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobId);
+		if (bundleWrapper == null) return null;
+		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JobInformation job = new JobInformation(jobId, bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getPriority());
+		return job;
+	}
+
+	/**
+	 * Get a list of objects describing the nodes to which the whole or part of a job was dispatched.
+	 * @param jobId - the id of the job for which to find node information.
+	 * @return a list of <code>NodeManagementInfo</code> instances.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getNodeInformation(java.lang.String)
+	 */
+	public NodeJobInformation[] getNodeInformation(String jobId) throws Exception
+	{
+		List<ChannelBundlePair> nodes = getJobManager().getNodesForJob(jobId);
+		if (nodes == null) return null;
+		NodeJobInformation[] result = new NodeJobInformation[nodes.size()];
+		for (int i=0; i<nodes.size(); i++)
+		{
+			NodeManagementInfo nodeInfo = getDriver().getNodeInformation(nodes.get(i).first());
+			JPPFTaskBundle bundle = nodes.get(i).second().getBundle();
+			JobInformation jobInfo = new JobInformation(jobId, bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getPriority());
+			result[i] = new NodeJobInformation(nodeInfo, jobInfo);
+		}
+		return result;
+	}
+
+	/**
+	 * Get a reference to the driver's job manager.
+	 * @return a <code>JPPFJobManager</code> instance.
+	 */
+	private JPPFJobManager getJobManager()
+	{
+		if (jobManager == null) jobManager = getDriver().getJobManager();
+		return jobManager;
+	}
+
+	/**
+	 * Get a reference to the driver.
+	 * @return a <code>JPPFDriver</code> instance.
+	 */
+	private JPPFDriver getDriver()
+	{
+		if (driver == null) driver = JPPFDriver.getInstance();
+		return driver;
+	}
+
+	/**
+	 * A job manager listeners that sends a notification through the mbean for each job manager event.
+	 */
+	private class JobEventNotifier implements JobListener
+	{
+		/**
+		 * Called when a new job is put in the job queue.
+		 * @param event - encapsulates the information about the event.
+		 * @see org.jppf.job.JobListener#jobQueued(org.jppf.job.JobNotification)
+		 */
+		public void jobQueued(JobNotification event)
+		{
+			sendNotification(event);
+		}
+
+		/**
+		 * Called when a job is complete and has been sent back to the client.
+		 * @param event - encapsulates the information about the event.
+		 * @see org.jppf.job.JobListener#jobEnded(org.jppf.job.JobNotification)
+		 */
+		public void jobEnded(JobNotification event)
+		{
+			sendNotification(event);
+		}
+
+		/**
+		 * Called when the current number of tasks in a job was updated.
+		 * @param event - encapsulates the information about the event.
+		 * @see org.jppf.job.JobListener#jobUpdated(org.jppf.job.JobNotification)
+		 */
+		public void jobUpdated(JobNotification event)
+		{
+			sendNotification(event);
+		}
+
+		/**
+		 * Called when all or part of a job is is sent to a node for execution.
+		 * @param event - encapsulates the information about the event.
+		 * @see org.jppf.job.JobListener#jobDispatched(org.jppf.job.JobNotification)
+		 */
+		public void jobDispatched(JobNotification event)
+		{
+			sendNotification(event);
+		}
+
+		/**
+		 * Called when all or part of a job has returned from irs execution on a node.
+		 * @param event - encapsulates the information about the event.
+		 * @see org.jppf.job.JobListener#jobReturned(org.jppf.job.JobNotification)
+		 */
+		public void jobReturned(JobNotification event)
+		{
+			sendNotification(event);
+		}
+	}
+}

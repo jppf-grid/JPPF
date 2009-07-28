@@ -28,64 +28,44 @@ import org.jppf.utils.EventEmitter;
 public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListener>
 {
 	/**
-	 * The object that holds the stats.
-	 */
-	private JPPFStats stats = new JPPFStats();
-	
-	/**
 	 * Called to notify that a new client is connected to he JPPF server.
 	 */
-	public void newClientConnection()
+	public synchronized void newClientConnection()
 	{
-		synchronized(eventListeners)
-		{
-			for (JPPFDriverListener listener: eventListeners) listener.newClientConnection();
-		}
+		for (JPPFDriverListener listener: eventListeners) listener.newClientConnection();
 	}
 
 	/**
 	 * Called to notify that a new client has disconnected from he JPPF server.
 	 */
-	public void clientConnectionClosed()
+	public synchronized void clientConnectionClosed()
 	{
-		synchronized(eventListeners)
-		{
-			for (JPPFDriverListener listener: eventListeners) listener.clientConnectionClosed();
-		}
+		for (JPPFDriverListener listener: eventListeners) listener.clientConnectionClosed();
 	}
 
 	/**
 	 * Called to notify that a new node is connected to he JPPF server.
 	 */
-	public void newNodeConnection()
+	public synchronized void newNodeConnection()
 	{
-		synchronized(eventListeners)
-		{
-			for (JPPFDriverListener listener: eventListeners) listener.newNodeConnection();
-		}
+		for (JPPFDriverListener listener: eventListeners) listener.newNodeConnection();
 	}
 
 	/**
 	 * Called to notify that a new node is connected to he JPPF server.
 	 */
-	public void nodeConnectionClosed()
+	public synchronized void nodeConnectionClosed()
 	{
-		synchronized(eventListeners)
-		{
-			for (JPPFDriverListener listener: eventListeners) listener.nodeConnectionClosed();
-		}
+		for (JPPFDriverListener listener: eventListeners) listener.nodeConnectionClosed();
 	}
 
 	/**
 	 * Called to notify that a task was added to the queue.
 	 * @param count - the number of tasks that have been added to the queue.
 	 */
-	public void taskInQueue(int count)
+	public synchronized void taskInQueue(int count)
 	{
-		synchronized(eventListeners)
-		{
-			for (JPPFDriverListener listener: eventListeners) listener.taskInQueue(count);
-		}
+		for (JPPFDriverListener listener: eventListeners) listener.taskInQueue(count);
 	}
 
 	/**
@@ -93,12 +73,9 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	 * @param count - the number of tasks that have been removed from the queue.
 	 * @param time - the time the task remained in the queue.
 	 */
-	public void taskOutOfQueue(int count, long time)
+	public synchronized void taskOutOfQueue(int count, long time)
 	{
-		synchronized(eventListeners)
-		{
-			for (JPPFDriverListener listener: eventListeners) listener.taskOutOfQueue(count, time);
-		}
+		for (JPPFDriverListener listener: eventListeners) listener.taskOutOfQueue(count, time);
 	}
 	
 	/**
@@ -108,11 +85,8 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	 * @param remoteTime - the time it took to execute the in the node only.
 	 * @param size - the size in bytes of the bundle that was sent to the node.
 	 */
-	public void taskExecuted(int count, long time, long remoteTime, long size)
+	public synchronized void taskExecuted(int count, long time, long remoteTime, long size)
 	{
-		synchronized(eventListeners)
-		{
-			for (JPPFDriverListener listener: eventListeners) listener.taskExecuted(count, time, remoteTime, size);
-		}
+		for (JPPFDriverListener listener: eventListeners) listener.taskExecuted(count, time, remoteTime, size);
 	}
 }
