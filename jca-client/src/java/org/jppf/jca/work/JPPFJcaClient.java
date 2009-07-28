@@ -227,6 +227,7 @@ public class JPPFJcaClient extends AbstractJPPFClient
 				availableConnections.remove(c);
 				break;
 		}
+		submissionManager.wakeUp();
 	}
 
 	/**
