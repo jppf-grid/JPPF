@@ -23,7 +23,7 @@ import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.server.*;
+import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 

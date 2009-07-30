@@ -18,9 +18,9 @@
 
 package sample.test;
 
-import java.io.*;
+import java.io.InputStream;
 
-import org.xml.sax.*;
+import org.xml.sax.InputSource;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**

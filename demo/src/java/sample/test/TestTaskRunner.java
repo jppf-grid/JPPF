@@ -23,7 +23,7 @@ import java.util.*;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.utils.StringUtils;
 
@@ -55,8 +55,8 @@ public class TestTaskRunner
 		try
 		{
 			jppfClient = new JPPFClient();
-			performSecurityTest();
 			/*
+			performSecurityTest();
 			performEmptyTaskListTest();
 			performExceptionTest();
 			performURLTest();
@@ -72,6 +72,7 @@ public class TestTaskRunner
 			performLargeDataTest();
 			performAnnotatedTaskTest();
 			*/
+			performClientDataProviderTest();
 		}
 		catch(Exception e)
 		{
@@ -98,10 +99,7 @@ public class TestTaskRunner
 			tasks.add(task);
 			List<JPPFTask> results = jppfClient.submit(tasks, null);
 			JPPFTask resultTask = results.get(0);
-			if (resultTask.getException() != null)
-			{
-				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
-			}
+			if (resultTask.getException() != null) System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
 		}
 		catch(Exception e)
 		{
@@ -128,14 +126,8 @@ public class TestTaskRunner
 			tasks.add(task);
 			List<JPPFTask> results = jppfClient.submit(tasks, new CompositeDataProvider());
 			JPPFTask resultTask = results.get(0);
-			if (resultTask.getException() != null)
-			{
-				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
-			}
-			else
-			{
-				System.out.println("Result is: "+resultTask.getResult());
-			}
+			if (resultTask.getException() != null) System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
+			else System.out.println("Result is: "+resultTask.getResult());
 		}
 		catch(Exception e)
 		{
@@ -211,10 +203,7 @@ public class TestTaskRunner
 			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
 			for (int i=0; i<n; i++) tasks.add(new ConstantTask(i));
 			List<JPPFTask> results = jppfClient.submit(tasks, null);
-			for (int i=0; i<n; i++)
-			{
-				System.out.println("result for task #"+i+" is : "+results.get(i).getResult());
-			}
+			for (int i=0; i<n; i++) System.out.println("result for task #"+i+" is : "+results.get(i).getResult());
 		}
 		catch(Exception e)
 		{
@@ -242,14 +231,8 @@ public class TestTaskRunner
 			tasks.add(new ClassNotFoundTestTask());
 			List<JPPFTask> results = jppfClient.submit(tasks, null);
 			JPPFTask resultTask = results.get(0);
-			if (resultTask.getException() != null)
-			{
-				System.out.println("Exception was caught: "+getStackTrace(resultTask.getException()));
-			}
-			else
-			{
-				System.out.println("Result is: "+resultTask.getResult());
-			}
+			if (resultTask.getException() != null) System.out.println("Exception was caught: "+getStackTrace(resultTask.getException()));
+			else System.out.println("Result is: "+resultTask.getResult());
 		}
 		catch(Exception e)
 		{
@@ -284,10 +267,7 @@ public class TestTaskRunner
 			for (JPPFTask t: results)
 			{
 				System.out.println(""+t.getResult());
-				if  (null != t.getException())
-				{
-					t.getException().printStackTrace();
-				}
+				if  (null != t.getException()) t.getException().printStackTrace();
 			}
 		}
 		catch (Exception e)
@@ -315,14 +295,8 @@ public class TestTaskRunner
 			for (int i=0; i<n; i++) tasks.add(new DB2LoadingTask());
 			List<JPPFTask> results = jppfClient.submit(tasks, null);
 			JPPFTask resultTask = results.get(0);
-			if (resultTask.getException() != null)
-			{
-				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
-			}
-			else
-			{
-				System.out.println("Result is: "+resultTask.getResult());
-			}
+			if (resultTask.getException() != null) System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
+			else System.out.println("Result is: "+resultTask.getResult());
 		}
 		catch(Exception e)
 		{
@@ -349,14 +323,8 @@ public class TestTaskRunner
 			for (int i=0; i<n; i++) tasks.add(new ParserTask("build.xml"));
 			List<JPPFTask> results = jppfClient.submit(tasks, null);
 			JPPFTask resultTask = results.get(0);
-			if (resultTask.getException() != null)
-			{
-				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
-			}
-			else
-			{
-				System.out.println("Result is: "+resultTask.getResult());
-			}
+			if (resultTask.getException() != null) System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
+			else System.out.println("Result is: "+resultTask.getResult());
 		}
 		catch(Exception e)
 		{
@@ -384,14 +352,8 @@ public class TestTaskRunner
 			dataProvider.setValue("DATA", new SimpleData("Data and more data"));			
 			List<JPPFTask> results = jppfClient.submit(tasks, dataProvider);
 			JPPFTask resultTask = results.get(0);
-			if (resultTask.getException() != null)
-			{
-				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
-			}
-			else
-			{
-				System.out.println("Result is: "+resultTask.getResult());
-			}
+			if (resultTask.getException() != null) System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
+			else System.out.println("Result is: "+resultTask.getResult());
 		}
 		catch(Exception e)
 		{
@@ -417,14 +379,8 @@ public class TestTaskRunner
 			tasks.add(new TimeoutTask());
 			List<JPPFTask> results = jppfClient.submit(tasks, null);
 			JPPFTask resultTask = results.get(0);
-			if (resultTask.getException() != null)
-			{
-				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
-			}
-			else
-			{
-				System.out.println("Result is: "+resultTask.getResult());
-			}
+			if (resultTask.getException() != null) System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
+			else System.out.println("Result is: "+resultTask.getResult());
 		}
 		catch(Exception e)
 		{
@@ -567,6 +523,33 @@ public class TestTaskRunner
 		finally
 		{
 			System.out.println("annotation testing complete.");
+		}
+	}
+
+	/**
+	 * Perform the test.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void performClientDataProviderTest() throws JPPFException
+	{
+		System.out.println(banner);
+		System.out.println("Starting client data provider testing...");
+		try
+		{
+			List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+			JPPFTask task = new TestJPPF();
+			tasks.add(task);
+			List<JPPFTask> results = jppfClient.submit(tasks, new ClientDataProvider());
+			JPPFTask resultTask = results.get(0);
+			if (resultTask.getException() != null) System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e);
+		}
+		finally
+		{
+			System.out.println("Exception testing complete.");
 		}
 	}
 }

@@ -19,6 +19,7 @@ package test.processes;
 
 import java.io.*;
 import java.util.Properties;
+
 import org.apache.commons.logging.*;
 import org.jppf.process.*;
 import org.jppf.utils.StringUtils;

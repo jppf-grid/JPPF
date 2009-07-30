@@ -21,7 +21,7 @@ import java.util.Properties;
 
 import org.apache.commons.logging.*;
 import org.jppf.process.*;
-import org.jppf.ui.options.*;
+import org.jppf.ui.options.TextAreaOption;
 import org.jppf.utils.StringUtils;
 
 /**

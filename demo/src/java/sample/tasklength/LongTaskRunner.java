@@ -17,7 +17,7 @@
  */
 package sample.tasklength;
 
-import java.util.*;
+import java.util.List;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
