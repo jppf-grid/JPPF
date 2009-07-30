@@ -82,6 +82,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 
 	/**
 	 * Initialize this client with a specified application UUID.
+	 * When two applications use the same client UUID, this causes the node to use the same class loader
+	 * to load the classes of both clients.
 	 * @param uuid the unique identifier for this local client.
 	 */
 	public AbstractJPPFClient(String uuid)
