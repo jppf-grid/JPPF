@@ -67,7 +67,8 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	/**
 	 * Keeps a list of the valid connections not currently executring tasks.
 	 */
-	private Vector<JPPFClientConnection> availableConnections = new Vector<JPPFClientConnection>();
+	//private Vector<JPPFClientConnection> availableConnections = new Vector<JPPFClientConnection>();
+	private Set<JPPFClientConnection> availableConnections = Collections.synchronizedSet(new HashSet<JPPFClientConnection>());
 	/**
 	 * Manages asynchronous work submission to the JPPF driver.
 	 */
@@ -206,9 +207,10 @@ public class JPPFJcaClient extends AbstractJPPFClient
 				availableConnections.add(c);
 				break;
 			default:
-				availableConnections.remove(c);
+				if (availableConnections.contains(c)) availableConnections.remove(c);
 				break;
 		}
+		submissionManager.wakeUp();
 	}
 
 	/**
