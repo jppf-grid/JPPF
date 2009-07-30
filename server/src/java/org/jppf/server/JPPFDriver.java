@@ -212,7 +212,7 @@ public class JPPFDriver
 	private void initPeers()
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
-		if (props.getBoolean("jppf.discovery.enabled", true))
+		if (props.getBoolean("jppf.peer.discovery.enabled", false))
 		{
 			peerDiscoveryThread = new PeerDiscoveryThread();
 			new Thread(peerDiscoveryThread).start();
