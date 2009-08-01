@@ -140,7 +140,7 @@
 	<target name="deploy"
 		depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces"/>
 	<target name="deploy.nojavadoc"
-		depends="clean.deploy, rebuild, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces"/>
+		depends="clean.deploy, rebuild, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces"/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
@@ -321,19 +321,17 @@
 	<!-- ========================================================================= -->
 
 	<target name="package" description="package the application into a release zip file" depends="rebuild">
-		<property name="zip.prefix" value="${ant.project.name}-${version.number}"/>
-		<property name="release.file"
-			value="${build}/${ant.project.name}-full-src-${version.number}-${build.number}-${now}.zip"/>
+		<property name="zip.prefix" value="${ant.project.name}-src-${version.number}"/>
+		<property name="release.file" value="${build}/${ant.project.name}-src-${version.number}-${build.number}-${now}.zip"/>
 		<delete file="${release.file}" quiet="true"/>
 		<zip destfile="${release.file}">
-			<zipfileset dir="${basedir}" prefix="${ant.project.name}-${version.number}/JPPF">
+			<zipfileset dir="${basedir}" prefix="${zip.prefix}/JPPF">
 				<include name="build/jppf*.jar"/>
 				<include name="bin/**/*.*"/>
 				<include name="config/**/*.*"/>
 				<!--<include name="docs/api/**/*.*"/>-->
 				<include name="lib/**/*.*"/>
 				<include name="${license.file}"/>
-				<include name="JPPF-3rd-party.html"/>
 			</zipfileset>
 			<zipfileset dir="${node}" prefix="${zip.prefix}/node"/>
 			<zipfileset dir="${common}" prefix="${zip.prefix}/common"/>
@@ -343,30 +341,6 @@
 			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
 			<zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
 		</zip>
-
-		<!--
-		<property name="lite.release.file"
-			value="${build}/${ant.project.name}-lite-src-${version.number}-${build.number}-${now}.zip"/>
-		<delete file="${lite.release.file}" quiet="true"/>
-		<zip destfile="${lite.release.file}">
-			<zipfileset dir="${basedir}" prefix="${ant.project.name}-${version.number}/JPPF">
-				<include name="bin/**/*.*"/>
-				<include name="config/**/*.*"/>
-				<include name="${license.file}"/>
-				<include name="JPPF-3rd-party.html"/>
-			</zipfileset>
-			<zipfileset dir="${basedir}/lib" prefix="${ant.project.name}-${version.number}/JPPF/lib">
-				<exclude name="**/*.jar"/>
-			</zipfileset>
-			<zipfileset dir="${node}" prefix="${zip.prefix}/node" excludes="classes/**/*.*"/>
-			<zipfileset dir="${common}" prefix="${zip.prefix}/common" excludes="classes/**/*.*"/>
-			<zipfileset dir="${client}" prefix="${zip.prefix}/client" excludes="classes/**/*.*"/>
-			<zipfileset dir="${server}" prefix="${zip.prefix}/server" excludes="classes/**/*.*"/>
-			<zipfileset dir="${admin}" prefix="${zip.prefix}/admin" excludes="classes/**/*.*"/>
-			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="classes/**/*.*,*.log"/>
-			<zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client" excludes="classes/**/*.*,**/*.ear,**/**.rar,**/**.jar"/>
-		</zip>
-		-->
 	</target>
 
 	<!-- ========================================================================= -->
@@ -388,9 +362,6 @@
 	<!-- ========================================================================= -->
 
 	<target name="runtime" description="" depends="rebuild">
-		<condition property="isSingleJar">
-			<equals arg1="${build.jars.type}" arg2="single"/>
-		</condition>
 		<antcall target="runtime.driver"/>
 		<antcall target="runtime.node"/>
 		<antcall target="runtime.gui"/>
@@ -400,25 +371,7 @@
 
 	<!-- =========== Driver packaging =========== -->
 
-	<target name="runtime.driver" depends="runtime.driver.single.jar,runtime.driver.multiple.jar"/>
-
-	<target name="runtime.driver.single.jar" if="isSingleJar">
-		<mkdir dir="${runtime.driver}/lib"/>
-		<mkdir dir="${build}/jar" />
-  	<unjar src="${build}/${ant.project.name}-common-node.jar" dest="${build}/jar"/>
-  	<unjar src="${build}/${ant.project.name}-common.jar" dest="${build}/jar"/>
-  	<unjar src="${build}/${ant.project.name}-server.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/log4j/log4j-1.2.9.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/ApacheCommons/commons-logging-1.1.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/ApacheCommons/commons-io-1.2.jar" dest="${build}/jar"/>
-    <jar jarfile="${runtime.driver}/lib/jppf-driver.jar">
-			<fileset dir="${build}/jar"/>
-		</jar>
-    <delete dir="${build}/jar" quiet="true"/>
-		<antcall target="runtime.driver.common"/>
-	</target>
-
-	<target name="runtime.driver.multiple.jar" unless="isSingleJar">
+	<target name="runtime.driver">
 		<mkdir dir="${runtime.driver}/lib"/>
 		<copy todir="${runtime.driver}/lib">
 			<fileset dir="${build}">
@@ -426,87 +379,35 @@
 				<include name="${ant.project.name}-common.jar"/>
 				<include name="${ant.project.name}-server.jar"/>
 			</fileset>
-			<fileset dir="${lib}/log4j">
-				<include name="*.*"/>
-			</fileset>
+			<fileset dir="${lib}/log4j" includes="*.jar"/>
 			<fileset dir="${lib}/ApacheCommons">
 				<include name="commons-io*.jar"/>
 				<include name="commons-logging*.jar"/>
 			</fileset>
 		</copy>
-		<antcall target="runtime.driver.common"/>
-	</target>
-
-	<target name="runtime.driver.common">
 		<copy tofile="${runtime.driver}/${license.file}" file="${basedir}/${license.file}"/>
-		<copy todir="${runtime.driver}/config">
-			<fileset dir="${config}/driver"/>
-			<fileset dir="${config}/node">
-				<include name="jppf.policy"/>
-			</fileset>
-		</copy>
-		<copy tofile="${runtime.driver}/build.xml" file="${bin}/ant-driver.xml"/>
-		<property name="runtime.driver.file"
-			value="${build}/${ant.project.name}-driver-bin-${version.number}-${build.number}-${now}.zip"/>
+		<copy todir="${runtime.driver}"><fileset dir="${config}/driver"/></copy>
+		<copy tofile="${runtime.driver}/config/jppf.policy" file="${config}/node/config/jppf.policy"/>
+		<property name="runtime.driver.file" value="${build}/${ant.project.name}-driver-bin-${version.number}-${build.number}-${now}.zip"/>
 		<delete file="${runtime.driver.file}" quiet="true"/>
 		<zip destfile="${runtime.driver.file}">
-			<zipfileset dir="${runtime.driver}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-driver"/>
+			<zipfileset dir="${runtime.driver}" prefix="${ant.project.name}-${version.number}-driver"/>
 		</zip>
     <delete dir="${runtime.driver}" quiet="true"/>
 	</target>
 
 	<!-- =========== Node packaging =========== -->
 
-	<target name="runtime.node" depends="runtime.node.single.jar,runtime.node.multiple.jar"/>
-
-	<target name="runtime.node.single.jar" if="isSingleJar">
-		<mkdir dir="${runtime.node}/lib"/>
-		<mkdir dir="${build}/jar" />
-  	<unjar src="${build}/${ant.project.name}-common-node.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/log4j/log4j-1.2.9.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/ApacheCommons/commons-logging-1.1.jar" dest="${build}/jar"/>
-    <jar jarfile="${runtime.node}/lib/jppf-node.jar">
-			<fileset dir="${build}/jar"/>
-		</jar>
-    <delete dir="${build}/jar" quiet="true"/>
-		<antcall target="runtime.node.common"/>
-	</target>
-
-	<target name="runtime.node.multiple.jar" unless="isSingleJar">
+	<target name="runtime.node">
 		<mkdir dir="${runtime.node}/lib"/>
 		<copy todir="${runtime.node}/lib">
-			<fileset dir="${build}">
-				<include name="${ant.project.name}-common-node.jar"/>
-			</fileset>
-			<fileset dir="${lib}/ApacheCommons">
-				<include name="commons-logging*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/log4j">
-				<include name="*.*"/>
-			</fileset>
+			<fileset dir="${build}" includes="${ant.project.name}-common-node.jar"/>
+			<fileset dir="${lib}/ApacheCommons" includes="commons-logging*.jar"/>
+			<fileset dir="${lib}/log4j" includes="*.jar"/>
 		</copy>
-		<antcall target="runtime.node.common"/>
-	</target>
-
-	<target name="runtime.node.common">
 		<copy tofile="${runtime.node}/${license.file}" file="${basedir}/${license.file}"/>
-		<copy todir="${runtime.node}/config">
-			<fileset dir="${config}/node">
-				<exclude name="*.bat"/>
-				<exclude name="JPPFNode"/>
-			</fileset>
-		</copy>
-		<copy todir="${runtime.node}">
-			<fileset dir="${config}/node">
-				<exclude name="*.properties"/>
-				<exclude name="*.policy"/>
-				<include name="*.bat"/>
-				<include name="JPPFNode"/>
-			</fileset>
-		</copy>
-		<copy tofile="${runtime.node}/build.xml" file="${bin}/ant-node.xml"/>
-		<property name="runtime.node.file"
-			value="${build}/${ant.project.name}-node-bin-${version.number}-${build.number}-${now}.zip"/>
+		<copy todir="${runtime.node}"><fileset dir="${config}/node"/></copy>
+		<property name="runtime.node.file" value="${build}/${ant.project.name}-node-bin-${version.number}-${build.number}-${now}.zip"/>
 		<delete file="${runtime.node.file}" quiet="true"/>
 		<zip destfile="${runtime.node.file}">
 			<zipfileset dir="${runtime.node}" prefix="${ant.project.name}-${version.number}-node"/>
@@ -516,32 +417,7 @@
 
 	<!-- =========== GUI packaging =========== -->
 
-	<target name="runtime.gui" depends="runtime.driver.single.jar,runtime.gui.multiple.jar"/>
-
-	<target name="runtime.gui.single.jar" if="isSingleJar">
-		<mkdir dir="${runtime.gui}/lib"/>
-		<mkdir dir="${build}/jar" />
-  	<unjar src="${build}/${ant.project.name}-common-node.jar" dest="${build}/jar"/>
-  	<unjar src="${build}/${ant.project.name}-common.jar" dest="${build}/jar"/>
-  	<unjar src="${build}/${ant.project.name}-server.jar" dest="${build}/jar"/>
-  	<unjar src="${build}/${ant.project.name}-client.jar" dest="${build}/jar"/>
-   	<unjar src="${build}/${ant.project.name}-admin.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/log4j/log4j-1.2.9.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/ApacheCommons/commons-logging-1.1.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/JFreeChart/jcommon-1.0.12.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/JFreeChart/jfreechart-1.0.9.jar" dest="${build}/jar"/>
-   	<unjar src="${lib}/Rhino/js.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/Substance/substance-4.3.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/Groovy/groovy-all-1.6.0.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/MigLayout/miglayout-3.7-swing.jar" dest="${build}/jar"/>
-    <jar jarfile="${runtime.gui}/lib/jppf-gui.jar">
-			<fileset dir="${build}/jar"/>
-		</jar>
-    <delete dir="${build}/jar" quiet="true"/>
-		<antcall target="runtime.gui.common"/>
-	</target>
-
-	<target name="runtime.gui.multiple.jar" unless="isSingleJar">
+	<target name="runtime.gui">
 		<mkdir dir="${runtime.gui}/lib"/>
 		<copy todir="${runtime.gui}/lib">
 			<fileset dir="${build}">
@@ -551,89 +427,39 @@
 				<include name="${ant.project.name}-client.jar"/>
 				<include name="${ant.project.name}-admin.jar"/>
 			</fileset>
-			<fileset dir="${lib}/log4j">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/ApacheCommons">
-				<include name="commons-logging*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/JFreeChart">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/Rhino">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/Substance">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/Groovy">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/MigLayout">
-				<include name="*.jar"/>
-			</fileset>
+			<fileset dir="${lib}/log4j" includes="*.jar"/>
+			<fileset dir="${lib}/ApacheCommons" includes="commons-logging*.jar"/>
+			<fileset dir="${lib}/JFreeChart" includes="*.jar"/>
+			<fileset dir="${lib}/Rhino" includes="*.jar"/>
+			<fileset dir="${lib}/Substance" includes="*.jar"/>
+			<fileset dir="${lib}/Groovy" includes="*.jar"/>
+			<fileset dir="${lib}/MigLayout" includes="*.jar"/>
 		</copy>
-		<antcall target="runtime.gui.common"/>
-	</target>
-
-	<target name="runtime.gui.common">
 		<copy tofile="${runtime.gui}/${license.file}" file="${basedir}/${license.file}"/>
-		<copy todir="${runtime.gui}/config">
-			<fileset dir="${config}/gui"/>
-		</copy>
-		<copy tofile="${runtime.gui}/build.xml" file="${bin}/ant-gui.xml"/>
-		<property name="runtime.gui.file"
-			value="${build}/${ant.project.name}-gui-bin-${version.number}-${build.number}-${now}.zip"/>
+		<copy todir="${runtime.gui}"><fileset dir="${config}/gui"/></copy>
+		<property name="runtime.gui.file" value="${build}/${ant.project.name}-gui-bin-${version.number}-${build.number}-${now}.zip"/>
 		<delete file="${runtime.gui.file}" quiet="true"/>
 		<zip destfile="${runtime.gui.file}">
-			<zipfileset dir="${runtime.gui}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-gui"/>
+			<zipfileset dir="${runtime.gui}" prefix="${ant.project.name}-${version.number}-gui"/>
 		</zip>
     <delete dir="${runtime.gui}" quiet="true"/>
 	</target>
 
 	<!-- =========== Multiplexer packaging =========== -->
 
-	<target name="runtime.multiplexer" depends="runtime.multiplexer.single.jar,runtime.multiplexer.multiple.jar"/>
-
-	<target name="runtime.multiplexer.single.jar" if="isSingleJar">
-		<mkdir dir="${runtime.driver}/lib"/>
-		<mkdir dir="${build}/jar" />
-  	<unjar src="${build}/${ant.project.name}-common-node.jar" dest="${build}/jar"/>
-  	<unjar src="${build}/${ant.project.name}-common.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/log4j/log4j-1.2.9.jar" dest="${build}/jar"/>
-  	<unjar src="${lib}/ApacheCommons/commons-logging-1.1.jar" dest="${build}/jar"/>
-    <jar jarfile="${runtime.multiplexer}/lib/jppf-multiplexer.jar">
-			<fileset dir="${build}/jar"/>
-		</jar>
-    <delete dir="${build}/jar" quiet="true"/>
-		<antcall target="runtime.multiplexer.common"/>
-	</target>
-
-	<target name="runtime.multiplexer.multiple.jar" unless="isSingleJar">
+	<target name="runtime.multiplexer">
 		<mkdir dir="${runtime.multiplexer}/lib"/>
 		<copy todir="${runtime.multiplexer}/lib">
 			<fileset dir="${build}">
 				<include name="${ant.project.name}-common-node.jar"/>
 				<include name="${ant.project.name}-common.jar"/>
 			</fileset>
-			<fileset dir="${lib}/log4j">
-				<include name="*.*"/>
-			</fileset>
-			<fileset dir="${lib}/ApacheCommons">
-				<include name="commons-logging*.jar"/>
-			</fileset>
+			<fileset dir="${lib}/log4j" includes="*.jar"/>
+			<fileset dir="${lib}/ApacheCommons" includes="commons-logging*.jar"/>
 		</copy>
-		<antcall target="runtime.multiplexer.common"/>
-	</target>
-
-	<target name="runtime.multiplexer.common">
 		<copy tofile="${runtime.multiplexer}/${license.file}" file="${basedir}/${license.file}"/>
-		<copy todir="${runtime.multiplexer}/config">
-			<fileset dir="${config}/multiplexer"/>
-		</copy>
-		<copy tofile="${runtime.multiplexer}/build.xml" file="${bin}/ant-multiplexer.xml"/>
-		<property name="runtime.multiplexer.file"
-			value="${build}/${ant.project.name}-multiplexer-bin-${version.number}.${build.number}-${now}.zip"/>
+		<copy todir="${runtime.multiplexer}"><fileset dir="${config}/multiplexer"/></copy>
+		<property name="runtime.multiplexer.file" value="${build}/${ant.project.name}-multiplexer-bin-${version.number}.${build.number}-${now}.zip"/>
 		<delete file="${runtime.multiplexer.file}" quiet="true"/>
 		<zip destfile="${runtime.multiplexer.file}">
 			<zipfileset dir="${runtime.multiplexer}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-multiplexer"/>
