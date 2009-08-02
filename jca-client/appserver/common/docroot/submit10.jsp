@@ -3,7 +3,7 @@
 <%@ include file="jndiName.jsp"%>
 <%@ include file="header.jsp"%>
 <%
-  int duration = 5;
+	int duration = 2;
   String perform = request.getParameter("perform");
   if (perform != null)
   {
@@ -16,24 +16,11 @@
 	  catch(NumberFormatException ignored)
 	  {
 	  }
-		String msg = new DemoTest(jndiName).testConnector(duration);
-		//SomeTestClass stc = new SomeTestClass();
-		//String msg = "something";
-		response.sendRedirect(request.getContextPath()+"/index.jsp?msg="+msg);
+		new DemoTest(jndiName).testConnector2();
+		response.sendRedirect(request.getContextPath()+"/submit10.jsp?msg=Submitted");
   }
 	else
 	{
-		String text = (String) session.getAttribute("duration");
-		if (text != null)
-		{
-		  try
-		  {
-		  	duration = Integer.parseInt(text);
-		  }
-		  catch(NumberFormatException ignored)
-		  {
-		  }
-		}
 %>
 <%
 		String title = "Submit a task";
@@ -47,9 +34,8 @@
 		</td></tr>
 
 		<tr><td align="center">
-			<form name="jppftest" action="<%=request.getContextPath()%>/index.jsp" method="post">
+			<form name="jppftest" action="<%=request.getContextPath()%>/submit10.jsp" method="post">
 				<input type="hidden" value="true" name="perform">
-				Duration in seconds: <input type="text" value="<%= duration %>" name="duration" maxLength="3">&nbsp;&nbsp;
 				<input type="submit" value="Submit">
 			</form>
 		</td></tr>

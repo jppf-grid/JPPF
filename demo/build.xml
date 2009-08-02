@@ -50,7 +50,7 @@
   <path id="node.classpath">
 		<pathelement location="${config.dir}"/>
 		<pathelement location="${basedir}/../node/classes"/>
-		<pathelement location="${jppf.lib}/log4j/log4j-1.2.9.jar"/>
+		<pathelement location="${jppf.lib}/log4j/log4j-1.2.15.jar"/>
 		<pathelement location="${jppf.lib}/ApacheCommons/commons-logging-1.1.jar"/>
   </path>
 
@@ -66,7 +66,7 @@
 		<pathelement location="${basedir}/../client/classes"/>
 		<pathelement location="${basedir}/../server/classes"/>
 		<pathelement location="${basedir}/../demo/classes"/>
-		<pathelement location="${jppf.lib}/log4j/log4j-1.2.9.jar"/>
+		<pathelement location="${jppf.lib}/log4j/log4j-1.2.15.jar"/>
 		<pathelement location="${jppf.lib}/ApacheCommons/commons-logging-1.1.jar"/>
 		<pathelement location="${jppf.lib}/Hazelcast/hazelcast.jar"/>
   </path>

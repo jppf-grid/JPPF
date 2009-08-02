@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="lib/log4j/log4j-1.2.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saverbeans-sdk/saverbeans-ant.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saverbeans-sdk/saverbeans-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/Rhino/js.jar" sourcepath="C:/Tools/rhino1_6R2/src">
@@ -23,5 +22,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/JFreeChart/jfreechart-1.0.12.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/Hazelcast/hazelcast.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/JUnit/junit-3.8.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/log4j/log4j-1.2.15.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

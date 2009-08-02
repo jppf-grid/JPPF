@@ -117,6 +117,32 @@ public class DemoTest implements Serializable
 	}
 
 	/**
+	 * Perform a simple call to the JPPF resource adapter.
+	 * @return a string reporting either the task execution result or an error message.
+	 * @throws Exception if the call to JPPF failed.
+	 */
+	public String testConnector2() throws Exception
+	{
+		JPPFConnection connection = null;
+		String id = null;
+		try
+		{
+			connection = getConnection();
+			for (int i=0; i<10; i++)
+			{
+				List list = new ArrayList();
+				list.add(new DurationTask(2));
+				id = connection.submitNonBlocking(list, null, null);
+			}
+		}
+		finally
+		{
+			if (connection != null) connection.close();
+		}
+		return id;
+	}
+
+	/**
 	 * Get the initial context.
 	 * @return an <code>InitialContext</code> instance.
 	 * @throws Exception if the context could not be obtained.

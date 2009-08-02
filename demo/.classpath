@@ -10,5 +10,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3.8.1"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/admin"/>
+	<classpathentry kind="lib" path="C:/ftp/dev/Apache/commons-dbcp-1.2.2/commons-dbcp-1.2.2.jar"/>
+	<classpathentry kind="lib" path="C:/ftp/dev/Apache/commons-pool-1.5.2/commons-pool-1.5.2.jar"/>
+	<classpathentry kind="lib" path="C:/Tools/MySQL/mysql-connector-java-5.1.6/mysql-connector-java-5.1.6-bin.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
