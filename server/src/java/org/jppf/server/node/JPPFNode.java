@@ -53,10 +53,6 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	private static final int MAX_CONTAINERS = 1000;
 	/**
-	 * Utility for deserialization and serialization.
-	 */
-	private ObjectSerializer serializer = null;
-	/**
 	 * Class loader used for dynamic loading and updating of client classes.
 	 */
 	private JPPFClassLoader classLoader = null;
@@ -427,6 +423,14 @@ public class JPPFNode extends AbstractMonitoredNode
 			getJmxServer().stop();
 		}
 		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		catch(JPPFNodeReconnectionNotification e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		catch(JPPFNodeReloadNotification e)
 		{
 			log.error(e.getMessage(), e);
 		}

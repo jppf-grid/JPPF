@@ -35,6 +35,10 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	 */
 	protected SerializationHelper helper = null;
 	/**
+	 * Utility for deserialization and serialization.
+	 */
+	protected ObjectSerializer serializer = null;
+	/**
 	 * Wrapper around the underlying server connection.
 	 */
 	protected SocketWrapper socketClient = null;
