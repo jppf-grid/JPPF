@@ -24,7 +24,7 @@ import org.jppf.io.BundleWrapper;
 import org.jppf.utils.Pair;
 
 /**
- * 
+ * Instances of this class associate a channel with a job that is being executed on the corresponding node.
  * @author Laurent Cohen
  */
 public class ChannelBundlePair extends Pair<SelectableChannel, BundleWrapper>

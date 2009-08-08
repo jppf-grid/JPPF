@@ -30,7 +30,7 @@ import org.jppf.server.queue.*;
 import org.jppf.utils.*;
 
 /**
- * Instances of this class manage and monitor the jobs thoughout their processing within the JPPF driver.
+ * Instances of this class manage and monitor the jobs throughout their processing within the JPPF driver.
  * @author Laurent Cohen
  */
 public class JPPFJobManager extends EventEmitter<JobListener> implements QueueListener
