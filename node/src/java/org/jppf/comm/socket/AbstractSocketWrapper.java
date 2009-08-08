@@ -260,7 +260,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			socket.connect(addr);
 			initStreams();
 			opened = true;
-			log.info("getReceiveBufferSize() = " + socket.getReceiveBufferSize());
+			if (log.isDebugEnabled()) log.debug("getReceiveBufferSize() = " + socket.getReceiveBufferSize());
 		}
 		//else throw new ConnectException("Client connection already opened");
 	}
