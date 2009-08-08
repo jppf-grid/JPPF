@@ -17,7 +17,7 @@
  */
 package org.jppf.server;
 
-import java.nio.channels.*;
+import java.nio.channels.SelectableChannel;
 import java.util.*;
 
 import javax.management.MBeanServer;
@@ -246,7 +246,7 @@ public class JPPFDriver
 	private void initPeers()
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
-		if (props.getBoolean("jppf.peer.discovery.enabled", true))
+		if (props.getBoolean("jppf.peer.discovery.enabled", false))
 		{
 			peerDiscoveryThread = new PeerDiscoveryThread();
 			new Thread(peerDiscoveryThread).start();
@@ -378,6 +378,14 @@ public class JPPFDriver
 			applicationServers[i] = null;
 		}
 		applicationServers = null;
+		try
+		{
+			if (getJmxServer() != null) getJmxServer().stop();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
 		jobManager.close();
 	}
 

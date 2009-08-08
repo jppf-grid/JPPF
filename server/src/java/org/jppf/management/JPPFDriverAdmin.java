@@ -138,7 +138,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	{
 		try
 		{
-			boolean restart = restartDelay < 0;
+			boolean restart = restartDelay >= 0;
 			JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay, restart, restartDelay);
 			return localize("request.acknowledged");
 		}

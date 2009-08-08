@@ -19,6 +19,7 @@ package org.jppf.server;
 
 import java.util.*;
 
+import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
 
 /**
@@ -27,6 +28,10 @@ import org.jppf.JPPFError;
  */
 public class ShutdownRestartTask extends TimerTask
 {
+	/**
+	 * Logger for this class.
+	 */
+	static Log log = LogFactory.getLog(ShutdownRestartTask.class);
 	/**
 	 * Determines whether the server should restart after shutdown is complete.
 	 */
@@ -63,11 +68,11 @@ public class ShutdownRestartTask extends TimerTask
 	 */
 	public void run()
 	{
-		JPPFDriver.log.info("Initiating shutdown");
+		log.info("Initiating shutdown");
 		JPPFDriver.getInstance().shutdown();
 		if (!restart)
 		{
-			JPPFDriver.log.info("Performing requested exit");
+			log.info("Performing requested exit");
 			System.exit(0);
 		}
 		else
@@ -78,12 +83,12 @@ public class ShutdownRestartTask extends TimerTask
 				{
 					try
 					{
-						JPPFDriver.log.info("Initiating restart");
+						log.info("Initiating restart");
 						System.exit(2);
 					}
 					catch(Exception e)
 					{
-						JPPFDriver.log.fatal(e.getMessage(), e);
+						log.fatal(e.getMessage(), e);
 						throw new JPPFError("Could not restart the JPPFDriver");
 					}
 				}
