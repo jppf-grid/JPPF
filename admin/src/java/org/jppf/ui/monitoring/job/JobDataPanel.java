@@ -168,6 +168,7 @@ public class JobDataPanel extends AbstractOption implements ClientListener
 		treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 		treeTable.doLayout();
 		treeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		treeTable.getTree().setCellRenderer(new JobNodeRenderer());
 		JScrollPane sp = new JScrollPane(treeTable);
 		setUIComponent(sp);
 	}
