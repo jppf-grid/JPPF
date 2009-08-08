@@ -165,7 +165,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		catch(IOException e)
 		{
 			connectionThread.resume();
-			log.info(getId() + e.getMessage(), e);
+			log.info(getId() + " : " + e.getMessage(), e);
 		}
 		return result;
 	}

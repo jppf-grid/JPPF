@@ -368,6 +368,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 		if (!isStopped()) return;
 		try
 		{
+			selector.close();
+			/*
 			for (SelectionKey connection: selector.keys())
 			{
 				try
@@ -379,6 +381,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 					log.error(e.getMessage(), e);
 				}
 			}
+			*/
 		}
 		catch (Exception e)
 		{

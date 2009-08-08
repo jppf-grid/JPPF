@@ -116,6 +116,49 @@ public abstract class AbstractRLBundler extends AbstractBundler
 			action = (int) -Math.signum(action) * Math.max(STEP, Math.abs(action/2));
 		}
 		//else action = (int) -Math.signum(d) * (int) Math.signum(action) * STEP;
+		else action = STEP;
+		int maxActionRange = ((RLProfile) profile).getMaxActionRange();
+		if (action > maxActionRange) action = maxActionRange;
+		else if (action < -maxActionRange) action = -maxActionRange;
+		bundleSize += action;
+		//int max = Math.max(1, maxSize());
+		int max = maxSize();
+		if (bundleSize > max) bundleSize = max;
+		if (bundleSize <= 0) bundleSize = 1;
+		if (debugEnabled)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.append("bundler #").append(getBundlerNumber()).append(" : size=").append(getBundleSize());
+			sb.append(", ").append(getDataHolder());
+			log.debug(sb.toString());
+		}
+	}
+
+	/**
+	 * This method computes the bundle size based on the new state of the server.
+	 * @param size the number of tasks executed.
+	 * @param totalTime the time in milliseconds it took to execute the tasks.
+	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
+	 */
+	public void feedback2(int size, double totalTime)
+	{
+		if (size <= 0) return;
+		BundlePerformanceSample sample = new BundlePerformanceSample((double) totalTime / (double) size, size);
+		dataHolder.addSample(sample);
+
+		double d = dataHolder.getPreviousMean() - dataHolder.getMean();
+		double threshold = ((RLProfile) profile).getPerformanceVariationThreshold() * dataHolder.getPreviousMean();
+		int n = bundleSize - prevBundleSize;
+		prevBundleSize = bundleSize;
+		if (d < -threshold)
+		{
+			action += (int) Math.signum(action) * STEP;
+		}
+		else if (d > threshold)
+		{
+			action = (int) -Math.signum(action) * Math.max(STEP, Math.abs(action/2));
+		}
+		//else action = (int) -Math.signum(d) * (int) Math.signum(action) * STEP;
 		else action = 0;
 		int maxActionRange = ((RLProfile) profile).getMaxActionRange();
 		if (action > maxActionRange) action = maxActionRange;

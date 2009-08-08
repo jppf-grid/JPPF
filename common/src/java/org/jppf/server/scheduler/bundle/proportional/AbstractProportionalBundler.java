@@ -214,12 +214,12 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 */
 	public double normalize(double x)
 	{
-		return 1d / (1d + (x <= 0d ? 0d : Math.log(1d + ((ProportionalTuneProfile) profile).getProportionalityFactor() * x)));
+		//return 1d / (1d + (x <= 0d ? 0d : Math.log(1d + ((ProportionalTuneProfile) profile).getProportionalityFactor() * x)));
 		//return Math.exp(-((ProportionalTuneProfile) profile).getProportionalityFactor() * x);
-		/*
 		double r = 1d;
 		for (int i=0; i<((ProportionalTuneProfile) profile).getProportionalityFactor(); i++) r *= x;
 		return 1d/r;
+		/*
 		*/
 	}
 }

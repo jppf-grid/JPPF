@@ -268,10 +268,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	public void setTaskCount(int taskCount)
 	{
 		this.taskCount = taskCount;
-		if (initialTaskCount <= 0)
-		{
-			initialTaskCount = taskCount;
-		}
+		if (initialTaskCount <= 0) initialTaskCount = taskCount;
 	}
 
 	/**
@@ -348,11 +345,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 		bundle.setRequestUuid(requestUuid);
 		bundle.setTaskCount(nbTasks);
 		bundle.setDataProvider(dataProvider);
-		/*
-		List<byte[]> list = new ArrayList<byte[]>();
-		bundle.setTasks(list);
-		for (int i=0; i<nbTasks; i++) list.add(tasks.remove(0));
-		*/
 		taskCount -= nbTasks;
 		bundle.getParametersMap().putAll(parameters);
 		bundle.setQueueEntryTime(queueEntryTime);
