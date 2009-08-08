@@ -133,6 +133,8 @@ public class NodeHandler implements ClientListener
 			try
 			{
 				JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection(name);
+				if (c == null) continue;
+				if (c.getJmxConnection() == null) continue;
 				nodeList = c.getJmxConnection().nodesInformation();
 				if (nodeList == null) continue;
 			}

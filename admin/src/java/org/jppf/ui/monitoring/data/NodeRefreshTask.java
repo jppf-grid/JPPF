@@ -90,7 +90,11 @@ public class NodeRefreshTask extends TimerTask
 			if (debugEnabled) log.debug(ignored.getMessage(), ignored);
 		}
 
-		if (state == null) return;
+		if (state == null)
+		{
+			handler.fireNodeHandlerEvent(driverName, infoHolder, NodeHandlerEvent.REMOVE_NODE);
+			return;
+		}
 		infoHolder.setState(state);
 		handler.fireNodeHandlerEvent(driverName, infoHolder, NodeHandlerEvent.UPDATE_NODE);
 	}

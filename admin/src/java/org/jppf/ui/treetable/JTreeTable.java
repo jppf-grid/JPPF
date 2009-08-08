@@ -236,7 +236,13 @@ public class JTreeTable extends JTable
 		public void paint(Graphics g)
 		{
 			g.translate(0, -visibleRow * getRowHeight());
-			super.paint(g);
+			try
+			{
+				super.paint(g);
+			}
+			catch(Exception ignore)
+			{
+			}
 		}
 
 		/**

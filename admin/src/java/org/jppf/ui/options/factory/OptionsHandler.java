@@ -78,7 +78,16 @@ public final class OptionsHandler
 	public static synchronized OptionElement addPage(OptionElement page)
 	{
 		pageList.add(page);
-		pageMap.put(page.getName(), page);
+		try
+		{
+			pageMap.put(page.getName(), page);
+		}
+		catch(RuntimeException e)
+		{
+			int breakpoint = 0;
+			log.info("Exception for page = \"" + page + "\" : " + e.getMessage());
+			throw e;
+		}
 		return page;
 	}
 
