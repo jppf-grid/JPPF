@@ -235,6 +235,41 @@ public class TypedProperties extends Properties
 	}
 
 	/**
+	 * Get the value of a property with the specified name as a set of a properties.
+	 * @param key - the name of the property to look for.
+	 * Its value is the path to another properties file. Relative paths are evaluated against the current application directory. 
+	 * @return the value of the property as another set of properties, or null if it is not found.
+	 */
+	public TypedProperties getProperties(String key)
+	{
+		return getProperties(key, null);
+	}
+
+	/**
+	 * Get the value of a property with the specified name as a set of a properties.
+	 * @param key - the name of the property to look for.
+	 * Its value is the path to another properties file. Relative paths are evaluated against the current application directory. 
+	 * @param def - a default value to return if the property is not found.
+	 * @return the value of the property as another set of properties, or the default value if it is not found.
+	 */
+	public TypedProperties getProperties(String key, TypedProperties def)
+	{
+		String path = getString(key);
+		File file = new File(path);
+		if (!file.exists()) return def;
+		TypedProperties res = new TypedProperties();
+		try
+		{
+			res.load(new BufferedInputStream(new FileInputStream(file)));
+		}
+		catch(IOException e)
+		{
+			return def;
+		}
+		return res;
+	}
+
+	/**
 	 * Convert this set of properties into a string.
 	 * @return a representation of this object as a string.
 	 */

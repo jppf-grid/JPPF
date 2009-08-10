@@ -284,7 +284,7 @@ public abstract class ExecutionPolicy implements Serializable
 		{
 			if ((rules == null) || (rules.length <= 0)) return true;
 			boolean b = rules[0].accepts(info);
-			if (rules.length >= 1) for (int i=1; i<rules.length; i++) b = (b == rules[i].accepts(info));
+			if (rules.length >= 1) for (int i=1; i<rules.length; i++) b = (b != rules[i].accepts(info));
 			return b;
 		}
 
