@@ -20,6 +20,7 @@ package org.jppf.server.node;
 
 import java.util.EventObject;
 
+import org.jppf.management.TaskInformation;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -29,12 +30,21 @@ import org.jppf.server.protocol.JPPFTask;
 public class TaskExecutionEvent extends EventObject
 {
 	/**
+	 * Object encapsulating information about the task.
+	 */
+	private TaskInformation taskInformation = null;
+
+	/**
 	 * Initialize this event object with the specified task.
 	 * @param task - the JPPF task from which the event originates.
+	 * @param cpuTime - the cpu time taken by the task.
+	 * @param elapsedTime - the wall clock time taken by the task.
+	 * @param error - determines whether the task had an exception.
 	 */
-	public TaskExecutionEvent(JPPFTask task)
+	public TaskExecutionEvent(JPPFTask task, long cpuTime, long elapsedTime, boolean error)
 	{
 		super(task);
+		this.taskInformation = new TaskInformation(task.getId(), cpuTime, elapsedTime, error);
 	}
 
 	/**
@@ -44,5 +54,14 @@ public class TaskExecutionEvent extends EventObject
 	public JPPFTask getTask()
 	{
 		return (JPPFTask) getSource();
+	}
+
+	/**
+	 * Get the object encapsulating information about the task.
+	 * @return a <code>TaskInformation</code> instance.
+	 */
+	public TaskInformation getTaskInformation()
+	{
+		return taskInformation;
 	}
 }

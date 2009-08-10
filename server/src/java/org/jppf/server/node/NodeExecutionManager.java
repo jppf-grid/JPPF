@@ -96,6 +96,10 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 * Determines wheather the thread cpu time measurement is supported and enabled.
 	 */
 	private boolean cpuTimeEnabled = false;
+	/**
+	 * List of listeners to task execution events.
+	 */
+	private List<TaskExecutionListener> taskExecutionListeners = new ArrayList<TaskExecutionListener>();
 
 	/**
 	 * Initialize this execution manager with the specified node.
@@ -397,10 +401,18 @@ public class NodeExecutionManager extends ThreadSynchronization
 	/**
 	 * Notifiaction sent by a node task wrapper when a task is complete.
 	 * @param taskNumber the number identifying the task.
+	 * @param cpuTime - the cpu time taken by the task.
+	 * @param elapsedTime - the wall clock time taken by the task
+	 * @param hasError - determines whether the task had an exception.
 	 */
-	public void taskEnded(long taskNumber)
+	public void taskEnded(long taskNumber, long cpuTime, long elapsedTime, boolean hasError)
 	{
+		TaskExecutionEvent event = new TaskExecutionEvent(taskMap.get(taskNumber), cpuTime, elapsedTime, hasError);
 		removeFuture(taskNumber);
+		synchronized(taskExecutionListeners)
+		{
+			for (TaskExecutionListener listener: taskExecutionListeners) listener.taskExecuted(event);
+		}
 	}
 
 	/**
@@ -433,6 +445,16 @@ public class NodeExecutionManager extends ThreadSynchronization
 	}
 
 	/**
+	 * Get the current cpu time for the thread identified by the specified id.
+	 * @param threadId - the id of the thread to the cpu time from.
+	 * @return the cpu time as a long value.
+	 */
+	public long getCpuTime(long threadId)
+	{
+		return threadMXBean.getThreadCpuTime(threadId);
+	}
+
+	/**
 	 * Get the priority assigned to the execution threads.
 	 * @return the priority as an int value.
 	 */
@@ -457,5 +479,29 @@ public class NodeExecutionManager extends ThreadSynchronization
 	public String getCurrentJobId()
 	{
 		return (bundle != null) ? (String) bundle.getParameter(BundleParameter.JOB_ID) : null;
+	}
+
+	/**
+	 * Add a task execution listener to the list of task execution listeners.
+	 * @param listener - the listener to add.
+	 */
+	public void addTaskExecutionListener(TaskExecutionListener listener)
+	{
+		synchronized(taskExecutionListeners)
+		{
+			taskExecutionListeners.add(listener);
+		}
+	}
+
+	/**
+	 * Remove a task execution listener from the list of task execution listeners.
+	 * @param listener - the listener to remove.
+	 */
+	public void removeTaskExecutionListener(TaskExecutionListener listener)
+	{
+		synchronized(taskExecutionListeners)
+		{
+			taskExecutionListeners.remove(listener);
+		}
 	}
 }

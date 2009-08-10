@@ -1,0 +1,91 @@
+/*
+ * Java Parallel Processing Framework.
+ *  Copyright (C) 2005-2009 JPPF Team. 
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jppf.management;
+
+import java.util.concurrent.atomic.*;
+
+import javax.management.*;
+
+import org.apache.commons.logging.*;
+import org.jppf.server.node.*;
+
+/**
+ * MBean implementation for task-level monitoring on each node.
+ * @author Laurent Cohen
+ */
+public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implements JPPFNodeTaskMonitorMBean, TaskExecutionListener
+{
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(JPPFNodeTaskMonitor.class);
+	/**
+	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * The mbrean object name sent with the notifications.
+	 */
+	private ObjectName OBJECT_NAME;
+	/**
+	 * The current count of tasks executed.
+	 */
+	private AtomicInteger taskCount = new AtomicInteger(0);
+	/**
+	 * The sequence number for notifications.
+	 */
+	private AtomicLong sequence = new AtomicLong(0L);
+
+	/**
+	 * Default constructor.
+	 * @param objectName - a string representing the MBean object name.
+	 */
+	public JPPFNodeTaskMonitor(String objectName)
+	{
+		try
+		{
+			OBJECT_NAME = new ObjectName(objectName);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Get the total number of tasks executed by the node.
+	 * @return the number of tasks as an integer value.
+	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getNbTasksExecuted()
+	 */
+	public Integer getNbTasksExecuted()
+	{
+		return taskCount.get();
+	}
+
+	/**
+	 * Called to notify a listener that a task was executed.
+	 * @param event - the event encapsulating the task-related data.
+	 * @see org.jppf.server.node.TaskExecutionListener#taskExecuted(org.jppf.server.node.TaskExecutionEvent)
+	 */
+	public void taskExecuted(TaskExecutionEvent event)
+	{
+		TaskExecutionNotification notif = new TaskExecutionNotification(OBJECT_NAME, sequence.getAndIncrement(), event.getTaskInformation());
+		sendNotification(notif);
+	}
+}

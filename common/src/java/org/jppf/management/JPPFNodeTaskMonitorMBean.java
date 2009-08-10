@@ -16,19 +16,24 @@
  * limitations under the License.
  */
 
-package org.jppf.server.node;
+package org.jppf.management;
 
-import java.util.EventListener;
+import javax.management.*;
+
 
 /**
- * Interface for all classes that wish to listen to events occurring during the life span of individual JPPF tasks.
+ * MBean interface for task-level monitoring on each node.
  * @author Laurent Cohen
  */
-public interface TaskExecutionListener extends EventListener
+public interface JPPFNodeTaskMonitorMBean extends NotificationEmitter
 {
 	/**
-	 * Called to notify a listener that a task was executed.
-	 * @param event - the event encapsulating the task-related data.
+	 * Name of the node's task monitor MBean.
 	 */
-	void taskExecuted(TaskExecutionEvent event);
+	String TASK_MONITOR_MBEAN_NAME = "org.jppf:name=task.monitor,type=node";
+	/**
+	 * Get the total number of tasks executed by the node.
+	 * @return the number of tasks as an integer value.
+	 */
+	Integer getNbTasksExecuted();
 }

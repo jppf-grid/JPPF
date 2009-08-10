@@ -21,13 +21,13 @@ package org.jppf.server.node.spi;
 import org.jppf.management.*;
 import org.jppf.management.spi.JPPFNodeMBeanProvider;
 import org.jppf.node.MonitoredNode;
-import org.jppf.server.node.*;
+import org.jppf.server.node.JPPFNode;
 
 /**
- * Provider for the default JPPF node management and monitoring features.
+ * SPI Provider implementation for task-level monitoring MBean.
  * @author Laurent Cohen
  */
-public class JPPFDefaultNodeMBeanProvider implements JPPFNodeMBeanProvider
+public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider
 {
 	/**
 	 * Return the fully qualified name of the management interface defined by this provider.
@@ -36,7 +36,7 @@ public class JPPFDefaultNodeMBeanProvider implements JPPFNodeMBeanProvider
 	 */
 	public String getMBeanInterfaceName()
 	{
-		return JPPFNodeTaskMonitorMBean.class.getName();
+		return JPPFNodeAdminMBean.class.getName();
 	}
 
 	/**
@@ -48,9 +48,7 @@ public class JPPFDefaultNodeMBeanProvider implements JPPFNodeMBeanProvider
 	 */
 	public Object createMBean(MonitoredNode node)
 	{
-		JPPFNodeTaskMonitor monitor = new JPPFNodeTaskMonitor(JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME);
-		((JPPFNode) node).getExecutionManager().addTaskExecutionListener(monitor);
-		return monitor;
+		return new JPPFNodeAdmin((JPPFNode) node);
 	}
 
 	/**
@@ -62,6 +60,6 @@ public class JPPFDefaultNodeMBeanProvider implements JPPFNodeMBeanProvider
 	 */
 	public String getMBeanName()
 	{
-		return JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME;
+		return JPPFAdminMBean.NODE_MBEAN_NAME;
 	}
 }
