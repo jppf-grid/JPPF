@@ -29,7 +29,7 @@ public class GSSerializationHelper extends SerializationHelperImpl
 	/**
 	 * Fully qualified name of the ObjectSerializer implementation class to use.
 	 */
-	private static String SERIALIZER_CLASS_NAME = "org.jppf.gigaspaces.serialization.GSSerializationHelper";
+	private static String SERIALIZER_CLASS_NAME = "org.jppf.gigaspaces.serialization.GSObjectSerializer";
 
 	/**
 	 * Default constructor.
