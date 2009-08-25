@@ -17,6 +17,8 @@
  */
 package org.jppf.utils;
 
+import java.io.*;
+
 
 /**
  * Instances of this class are used to serialize or deserialize objects to or from an array of bytes.<br>
@@ -33,6 +35,14 @@ public interface ObjectSerializer
 	 * @throws Exception if the object can't be serialized.
 	 */
 	JPPFBuffer serialize(Object o) throws Exception;
+
+	/**
+	 * Serialize an object into an output stream.
+	 * @param o - the object to Serialize.
+	 * @param os - the output stream to serialize to.
+	 * @throws Exception if the object can't be serialized.
+	 */
+	void serialize(Object o, OutputStream os) throws Exception;
 
 	/**
 	 * Read an object from an array of bytes.
@@ -59,4 +69,12 @@ public interface ObjectSerializer
 	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
 	 */
 	Object deserialize(byte[] bytes, int offset, int length) throws Exception;
+
+	/**
+	 * Read an object from an input stream.
+	 * @param is - the input stream to deserialize from.
+	 * @return the object that was deserialized from the array of bytes.
+	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
+	 */
+	Object deserialize(InputStream is) throws Exception;
 }
