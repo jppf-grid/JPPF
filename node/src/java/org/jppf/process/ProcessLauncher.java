@@ -36,7 +36,7 @@ import org.jppf.utils.*;
  * </ul>
  * @author Laurent Cohen
  */
-public class ProcessLauncher
+public class ProcessLauncher implements ProcessWrapperEventListener
 {
 	/**
 	 * Logger for this class.
@@ -139,6 +139,26 @@ public class ProcessLauncher
 	}
 
 	/**
+	 * Notification that the process has written to its error stream.
+	 * @param event encapsulate the error stream's content.
+	 * @see org.jppf.process.event.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
+	 */
+	public void errorStreamAltered(ProcessWrapperEvent event)
+	{
+		System.err.println(event.getContent());
+	}
+
+	/**
+	 * Notification that the process has written to its output stream.
+	 * @param event encapsulate the output stream's content.
+	 * @see org.jppf.process.event.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
+	 */
+	public void outputStreamAltered(ProcessWrapperEvent event)
+	{
+		System.out.println(event.getContent());
+	}
+
+	/**
 	 * Create a process wrapper around the specified process, to capture its console output
 	 * and prevent it from blocking.
 	 * @param p the process whose output is to be captured.
@@ -147,17 +167,7 @@ public class ProcessLauncher
 	public ProcessWrapper createProcessWrapper(Process p)
 	{
 		ProcessWrapper wrapper = new ProcessWrapper(process);
-		wrapper.addListener(new ProcessWrapperEventListener()
-		{
-			public void errorStreamAltered(ProcessWrapperEvent event)
-			{
-				System.err.println(event.getContent());
-			}
-			public void outputStreamAltered(ProcessWrapperEvent event)
-			{
-				System.out.println(event.getContent());
-			}
-		});
+		wrapper.addListener(this);
 		return wrapper;
 	}
 
