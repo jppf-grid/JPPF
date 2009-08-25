@@ -8,11 +8,9 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JPPF"/>
-	<classpathentry exported="true" kind="var" path="GS_HOME/lib/common/commons-logging.jar"/>
-	<classpathentry exported="true" kind="var" path="GS_HOME/lib/jini/jsk-lib.jar"/>
-	<classpathentry exported="true" kind="var" path="GS_HOME/lib/jini/jsk-platform.jar"/>
-	<classpathentry exported="true" kind="var" path="GS_HOME/lib/openspaces/openspaces.jar" sourcepath="/GS_HOME/lib/openspaces/openspaces-src.zip"/>
-	<classpathentry exported="true" kind="var" path="GS_HOME/lib/spring/spring.jar"/>
-	<classpathentry exported="true" kind="var" path="GS_HOME/lib/JSpaces.jar"/>
+	<classpathentry exported="true" kind="var" path="GS_HOME/lib/required/commons-logging.jar"/>
+	<classpathentry exported="true" kind="var" path="GS_HOME/lib/required/gs-openspaces.jar"/>
+	<classpathentry exported="true" kind="var" path="GS_HOME/lib/required/gs-runtime.jar"/>
+	<classpathentry exported="true" kind="var" path="GS_HOME/lib/required/spring.jar"/>
 	<classpathentry kind="output" path="JPPF-GigaSpaces-ProcessingUnit/classes"/>
 </classpath>

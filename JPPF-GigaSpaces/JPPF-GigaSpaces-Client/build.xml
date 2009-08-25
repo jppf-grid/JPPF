@@ -22,8 +22,7 @@
 	<!--                        Properties definitions                             -->
 	<!-- ========================================================================= -->
 
-	<property name="build.properties.file" value="${basedir}/../build.properties"/>
-  <property file="${build.properties.file}"/>
+  <property file="${basedir}/../build.properties"/>
 	<property name="common.dir"      value="${basedir}/../JPPF-GigaSpaces-common"/>	
 	<property name="classes.dir"     value="${basedir}/classes"/>	
 	<property name="src.dir"         value="${basedir}/src"/>
@@ -36,16 +35,9 @@
 
 	<path id="project.classpath">
 		<pathelement location="${classes.dir}"/>
-		<fileset dir="${common.dir}/lib">
-			<include name="*.jar"/>
-		</fileset>
 		<pathelement location="${common.dir}/build/common.jar"/>
-		<pathelement location="${gs.home}/lib/common/commons-logging.jar"/>
-		<pathelement location="${gs.home}/lib/jini/jsk-lib.jar"/>
-		<pathelement location="${gs.home}/lib/jini/jsk-platform.jar"/>
-		<pathelement location="${gs.home}/lib/openspaces/openspaces.jar"/>
-		<pathelement location="${gs.home}/lib/spring/spring.jar"/>
-		<pathelement location="${gs.home}/lib/JSpaces.jar"/>
+		<fileset dir="${common.dir}/lib" includes="*.jar"/>
+		<fileset dir="${gs.home}/lib/required" includes="*.jar"/>
 	</path>
 
 	<!-- ========================================================================= -->
@@ -98,6 +90,9 @@
     <war warfile="${build.dir}/jppftest.war" webxml="${docroot.dir}/WEB-INF/web.xml">
 			<classes dir="${classes.dir}"/>
 			<lib file="${common.dir}/build/common.jar"/>
+			<lib file="${common.dir}/lib/jppf-common-node.jar"/>
+			<lib file="${common.dir}/lib/jppf-common.jar"/>
+			<lib file="${common.dir}/lib/jppf-client.jar"/>
 			<zipfileset dir="${docroot.dir}/" includes="*.*"/>
 			<zipfileset dir="${docroot.dir}/images" prefix="images"/>
     </war>

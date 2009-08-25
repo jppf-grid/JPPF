@@ -22,6 +22,7 @@
 	<!--                          Property definitions                             -->
 	<!-- ========================================================================= -->
 
+  <property file="${basedir}/../build.properties"/>
 	<property name="common.dir"      value="${basedir}/../JPPF-GigaSpaces-common"/>	
 	<property name="classes.dir"     value="${basedir}/classes"/>	
 	<property name="src.dir"         value="${basedir}/src"/>
@@ -34,9 +35,8 @@
 	<path id="project.classpath">
 		<pathelement location="${classes.dir}"/>
 		<pathelement location="${common.dir}/classes"/>
-		<fileset dir="${common.dir}/lib">
-			<include name="*.jar"/>
-		</fileset>
+		<fileset dir="${common.dir}/lib" includes="*.jar"/>
+		<fileset dir="${gs.home}/lib/required" includes="*.jar"/>
 	</path>
 
 	<!-- ========================================================================= -->
@@ -86,10 +86,9 @@
     <jar jarfile="${build.dir}/${ant.project.name}.jar">
 			<fileset dir="${basedir}/config" includes="jppf.properties"/>
 			<fileset dir="${classes.dir}"/>
-			<zipfileset dir="${common.dir}/lib" prefix="shared-lib" includes="*.jar"/>
-			<zipfileset dir="${common.dir}/build" prefix="shared-lib" includes="common.jar"/>
+			<zipfileset dir="${common.dir}/lib" prefix="lib" includes="*.jar"/>
+			<zipfileset dir="${common.dir}/build" prefix="lib" includes="common.jar"/>
 		</jar>
 	</target>
 
 </project> 
-
