@@ -99,35 +99,6 @@ public class NodeIO extends ThreadSynchronization
 	}
 
 	/**
-	 * Read a task bundle from the socket connection.
-	 * @return a <code>JPPFTaskBundle</code> instance.
-	 * @throws Exception if an error is raised while reading the task data.
-	 */
-	public JPPFTaskBundle readBundle() throws Exception
-	{
-		socketWrapper.skip(4);
-		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
-		currentBundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
-		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(currentBundle.getState()))
-		{
-			Runnable r = new Runnable()
-			{
-				public void run()
-				{
-					readObjectsAsync();
-				}
-			};
-			new Thread(r).start();
-		}
-		else
-		{
-			// skip null data provider
-			socketWrapper.receiveBytes(0);
-		}
-		return currentBundle;
-	}
-
-	/**
 	 * Deserialize the objects read from the socket, and reload the appropriate classes if any class change is detected.<br>
 	 * A class change is triggered when an <code>InvalidClassException</code> is caught. Upon catching this exception,
 	 * the class loader is reinitialized and the class are reloaded.
@@ -176,6 +147,7 @@ public class NodeIO extends ThreadSynchronization
 		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
 		if (debugEnabled) log.debug("got bundle");
 		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
+		bundle.setParameter("initial.data.size", size);
 		List<Object> list = new ArrayList<Object>();
 		list.add(bundle);
 		try
@@ -186,7 +158,7 @@ public class NodeIO extends ThreadSynchronization
 			{
 				JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
 				cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
-				cont.deserializeObject(socketWrapper, list, 1+count);
+				cont.deserializeObject(socketWrapper, list, 1+count, size);
 			}
 			else
 			{
@@ -229,6 +201,35 @@ public class NodeIO extends ThreadSynchronization
 		socketWrapper.writeInt(size);
 		for (JPPFBuffer buf: list) socketWrapper.sendBytes(buf);
 		socketWrapper.flush();
+	}
+
+	/**
+	 * Read a task bundle from the socket connection.
+	 * @return a <code>JPPFTaskBundle</code> instance.
+	 * @throws Exception if an error is raised while reading the task data.
+	 */
+	public JPPFTaskBundle readBundle() throws Exception
+	{
+		socketWrapper.skip(4);
+		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
+		currentBundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
+		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(currentBundle.getState()))
+		{
+			Runnable r = new Runnable()
+			{
+				public void run()
+				{
+					readObjectsAsync();
+				}
+			};
+			new Thread(r).start();
+		}
+		else
+		{
+			// skip null data provider
+			socketWrapper.receiveBytes(0);
+		}
+		return currentBundle;
 	}
 
 	/**

@@ -18,11 +18,12 @@
 
 package org.jppf.server.nio.nodeserver;
 
+import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
 
 import org.jppf.io.*;
-import org.jppf.utils.SerializationUtils;
+import org.jppf.server.nio.NioObject;
 
 /**
  * 
@@ -39,45 +40,29 @@ public class NodeMessage
 	 */
 	private int length = 0;
 	/**
+	 * Object storing the length data.
+	 */
+	private NioObject lengthObject = null;
+	/**
 	 * The data location objects abstracting the data to send or receive.
 	 */
-	private List<DataLocation> locations = new ArrayList<DataLocation>();
+	private LinkedList<DataLocation> locations = new LinkedList<DataLocation>();
 	/**
 	 * The current position in the list of data locations.
 	 */
 	private int position = -1;
 	/**
-	 * The current number of bytes sent or received for the location at the current position.
-	 */
-	private int locationCount = 0;
-	/**
 	 * The length of the location at the current position.
 	 */
-	private int locationLength = 0;
+	private int currentLength = 0;
 	/**
-	 * Contains the int value of the length of the current location.
+	 * Object storing the length of the object currently being read or written.
 	 */
-	private byte[] lengthBytes = new byte[4];
+	private NioObject currentLengthObject = null;
 	/**
-	 * Current position in {@link #lengthBytes locationLengthBytes}.
+	 * Object storing the object currently being read or written.
 	 */
-	private int lengthPos = 0;
-	/**
-	 * DataLocation wrapper for {@link #lengthBytes lengthBytes}.
-	 */
-	private DataLocation lengthLocation = null;
-	/**
-	 * An input source wrapping the channel from where data is read.
-	 */
-	private InputSource is = null;
-	/**
-	 * An input source wrapping the channel from where data is read.
-	 */
-	private OutputDestination od = null;
-	/**
-	 * Determine whether writing to or reading from a channel has started for the next bundle. 
-	 */
-	private boolean started = false;
+	private NioObject currentObject = null;
 
 	/**
 	 * Add a location to the data locations of this message.
@@ -89,51 +74,49 @@ public class NodeMessage
 	}
 
 	/**
-	 * Read a bundle from the channel.
+	 * Read data from the channel.
 	 * @param channel the channel to read from.
-	 * @return true if the bundle has been completely read from the channel, false otherwise.
+	 * @return true if the data has been completely read from the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
 	public boolean read(ReadableByteChannel channel) throws Exception
 	{
-		if (!started)
+		if (!readLength(channel)) return false;
+		while (count < length)
 		{
-			if (lengthPos < 4)
-			{
-				if (!readLength(channel)) return false;
-			}
-			started = true;
-			lengthPos = 0;
-			length = SerializationUtils.readInt(lengthBytes, 0);
+			if (!readNextObject(channel)) return false;
 		}
-		DataLocation location = null;
-		if (locationCount < locationLength)
+		return true;
+	}
+
+	/**
+	 * Read the next serializable object from the specified channel.
+	 * @param channel - the channel to read from.
+	 * @return true if the object has been completely read from the channel, false otherwise.
+	 * @throws Exception if an IO error occurs.
+	 */
+	private boolean readNextObject(ReadableByteChannel channel) throws Exception
+	{
+		if (currentLengthObject == null) currentLengthObject = new NioObject(4, false);
+		InputSource is = new ChannelInputSource(channel);
+		if (!currentLengthObject.read(is)) return false;
+		if (currentLength <= 0)
 		{
-			location = locations.get(position);
-		}
-		else
-		{
-			if (lengthPos < 4)
-			{
-				if (!readLength(channel)) return false;
-			}
-			int n = SerializationUtils.readInt(lengthBytes, 0);
-			location = IOHelper.createDataLocationMemorySensitive(n);
-			locations.add(location);
-			locationLength = location.getSize();
-			position++;
+			currentLength = ((ByteBufferLocation) currentLengthObject.getData()).buffer().getInt();
 			count += 4;
 		}
-		int n = location.transferFrom(channel, false);
-		if (n > 0) locationCount += n;
-		if ((n == -1) || (locationCount >= locationLength))
+		if (currentObject == null)
 		{
-			count += locationLength;
-			locationCount = 0;
-			locationLength = 0;
-			lengthPos = 0;
+			DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
+			currentObject = new NioObject(location, false);
 		}
-		return count >= length;
+		if (!currentObject.read(is)) return false;
+		count += currentLength;
+		locations.add(currentObject.getData());
+		currentLengthObject = null;
+		currentObject = null;
+		currentLength = 0;
+		return true;
 	}
 
 	/**
@@ -144,152 +127,76 @@ public class NodeMessage
 	 */
 	private boolean readLength(ReadableByteChannel channel) throws Exception
 	{
-		if (lengthPos == 0)
-		{
-			lengthLocation = new ByteBufferLocation(lengthBytes, 0, 4);
-		}
-		lengthPos += lengthLocation.transferFrom(channel, false);
-		return lengthPos >= 4;
+		if (length > 0) return true;
+		if (lengthObject == null) lengthObject = new NioObject(new ByteBufferLocation(4), false);
+ 		if (!lengthObject.read(new ChannelInputSource(channel))) return false;
+		length = ((ByteBufferLocation) lengthObject.getData()).buffer().getInt();
+		lengthObject = null;
+		return true;
 	}
 
 	/**
-	 * Read a bundle from the channel.
-	 * @param channel the channel to read from.
-	 * @return true if the bundle has been completely read from the channel, false otherwise.
-	 * @throws Exception if an IO error occurs.
-	 */
-	public boolean read2(ReadableByteChannel channel) throws Exception
-	{
-		if (!started)
-		{
-			started = true;
-			length = SerializationUtils.readInt(channel);
-		}
-		DataLocation location = null;
-		if (locationCount < locationLength)
-		{
-			location = locations.get(position);
-		}
-		else
-		{
-			int n = SerializationUtils.readInt(channel);
-			location = IOHelper.createDataLocationMemorySensitive(n);
-			locations.add(location);
-			locationLength = location.getSize();
-			position++;
-			count += 4;
-		}
-		int n = location.transferFrom(channel, false);
-		if (n > 0) locationCount += n;
-		if ((n == -1) || (locationCount >= locationLength))
-		{
-			count += locationLength;
-			locationCount = 0;
-			locationLength = 0;
-		}
-		return count >= length;
-	}
-
-	/**
-	 * Write a bundle to the channel.
-	 * @param channel - the channel to write to.
-	 * @return true if the bundle has been completely written to the channel, false otherwise.
+	 * Read data from the channel.
+	 * @param channel the channel to write to.
+	 * @return true if the data has been completely written the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
 	public boolean write(WritableByteChannel channel) throws Exception
 	{
-		if (!started)
+		if (!writeLength(channel)) return false;
+		while (count < length)
 		{
-			if (length <= 0) for (DataLocation dl: locations) length += 4 + dl.getSize();
-			if (lengthPos < 4)
-			{
-				if (!writeLength(channel, length)) return false;
-			}
-			started = true;
-			position = 0;
-			lengthPos = 0;
+			if (!writeNextObject(channel)) return false;
 		}
-		boolean end = false;
-		while (!end)
+		return true;
+	}
+
+	/**
+	 * Write the next object to the specified channel.
+	 * @param channel - the channel to write to.
+	 * @return true if the object has been completely written the channel, false otherwise.
+	 * @throws Exception if an IO error occurs.
+	 */
+	private boolean writeNextObject(WritableByteChannel channel) throws Exception
+	{
+		if (currentLengthObject == null)
 		{
-			DataLocation location = locations.get(position);
-			if (locationCount == 0)
-			{
-				locationLength = location.getSize();
-				if (lengthPos < 4)
-				{
-					if (!writeLength(channel, locationLength)) return false;
-				}
-				count += 4;
-			}
-	
-			int n = location.transferTo(channel, false);
-			if (n == 0) return false;
-			if (n > 0) locationCount += n;
-			if ((n == -1) || (locationCount >= locationLength))
-			{
-				count += locationLength;
-				locationCount = 0;
-				locationLength = 0;
-				lengthPos = 0;
-				position++;
-				if (position >= locations.size()) end = true;
-			}
+			currentLengthObject = new NioObject(4, false);
+			ByteBuffer buffer = ((ByteBufferLocation) currentLengthObject.getData()).buffer();
+			buffer.putInt(locations.get(position).getSize());
+			buffer.flip();
 		}
-		return count >= length;
+		OutputDestination od = new ChannelOutputDestination(channel);
+		if (!currentLengthObject.write(od)) return false;
+		if (currentObject == null) currentObject = new NioObject(locations.get(position), false);
+		if (!currentObject.write(od)) return false;
+		count += 4 + locations.get(position).getSize();
+		position++;
+		currentLengthObject = null;
+		currentObject = null;
+		return true;
 	}
 
 	/**
 	 * Write an int value to the channel.
 	 * @param channel - the channel to write to.
-	 * @param value - the value to write to the channel.
 	 * @return true if the value has been completely written to the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	private boolean writeLength(WritableByteChannel channel, int value) throws Exception
+	private boolean writeLength(WritableByteChannel channel) throws Exception
 	{
-		if (lengthPos == 0)
+		if (lengthObject == null)
 		{
-			SerializationUtils.writeInt(value, lengthBytes, 0);
-			lengthLocation = new ByteBufferLocation(lengthBytes, 0, 4);
-		}
-		lengthPos += lengthLocation.transferTo(channel, false);
-		return lengthPos >= 4;
-	}
-
-	/**
-	 * Write a bundle to the channel.
-	 * @param channel the channel to write to.
-	 * @return true if the bundle has been completely written to the channel, false otherwise.
-	 * @throws Exception if an IO error occurs.
-	 */
-	public boolean write2(WritableByteChannel channel) throws Exception
-	{
-		if (!started)
-		{
-			started = true;
-			for (DataLocation dl: locations) length += 4 + dl.getSize();
-			SerializationUtils.writeInt(channel, length);
+			length = 0;
 			position = 0;
+			for (DataLocation dl: locations) length += 4 + dl.getSize();
+			lengthObject = new NioObject(new ByteBufferLocation(4), false);
+			ByteBuffer buffer = ((ByteBufferLocation) lengthObject.getData()).buffer();
+			buffer.putInt(length);
+			buffer.flip();
 		}
-		DataLocation location = locations.get(position);
-		if (locationCount == 0)
-		{
-			SerializationUtils.writeInt(channel, location.getSize());
-			locationLength = location.getSize();
-			count += 4;
-		}
-
-		int n = location.transferTo(channel, false);
-		if (n > 0) locationCount += n;
-		if ((n == -1) || (locationCount >= locationLength))
-		{
-			count += locationLength;
-			locationCount = 0;
-			locationLength = 0;
-			position++;
-		}
-		return count >= length;
+ 		if (!lengthObject.write(new ChannelOutputDestination(channel))) return false;
+		return true;
 	}
 
 	/**

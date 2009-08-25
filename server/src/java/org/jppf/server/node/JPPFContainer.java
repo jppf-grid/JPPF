@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.io.*;
 import org.jppf.node.*;
 import org.jppf.utils.*;
 
@@ -77,13 +78,42 @@ public class JPPFContainer
 	
 	/**
 	 * Deserialize a number of objects from a socket client.
+	 * @param wrapper - the socket client from which to read the objects to deserialize.
+	 * @param list - a list holding the resulting deserialized objects.
+	 * @param count - the number of objects to deserialize.
+	 * @param size - the total size of the data to read from the socket.
+	 * @return the new position in the source data after deserialization.
+	 * @throws Exception if an error occurs while deserializing.
+	 */
+	public int deserializeObject(SocketWrapper wrapper, List<Object> list, int count, int size) throws Exception
+	{
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		try
+		{
+			Thread.currentThread().setContextClassLoader(classLoader);
+			InputSource is = new SocketWrapperInputSource(wrapper);
+			for (int i=0; i<count; i++)
+			{
+				DataLocation dl = IOHelper.readData(is, size);
+				list.add(helper.getSerializer().deserialize(dl.getInputStream()));
+			}
+			return 0;
+		}
+		finally
+		{
+			Thread.currentThread().setContextClassLoader(cl);
+		}
+	}
+
+	/**
+	 * Deserialize a number of objects from a socket client.
 	 * @param wrapper the socket client from which to read the objects to deserialize.
 	 * @param list a list holding the resulting deserialized objects.
 	 * @param count the number of objects to deserialize.
 	 * @return the new position in the source data after deserialization.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	public int deserializeObject(SocketWrapper wrapper, List<Object> list, int count) throws Exception
+	public int deserializeObject2(SocketWrapper wrapper, List<Object> list, int count) throws Exception
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try
