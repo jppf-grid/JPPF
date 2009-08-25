@@ -19,7 +19,8 @@ package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.ActionEvent;
 
-import org.jppf.ui.monitoring.data.NodeInfoHolder;
+import org.jppf.management.JMXNodeConnectionWrapper;
+import org.jppf.ui.monitoring.node.TopologyData;
 
 /**
  * Attempts to cancel a task that is currently running on a node.
@@ -34,14 +35,14 @@ public class CancelTaskAction extends JPPFAbstractNodeAction
 	/**
 	 * Initialize this action.
 	 * @param taskId id of the task to cancel.
-	 * @param nodeInfoHolders the jmx client used to update the thread pool size.
+	 * @param dataArray - the information on the nodes this action applies to.
 	 */
-	public CancelTaskAction(String taskId, NodeInfoHolder...nodeInfoHolders)
+	public CancelTaskAction(String taskId, TopologyData...dataArray)
 	{
-		super(nodeInfoHolders);
+		super(dataArray);
 		setupIcon("/org/jppf/ui/resources/stop.gif");
 		putValue(NAME, "Task id " + taskId);
-		if (nodeInfoHolders.length > 1) setEnabled(false);
+		if (dataArray.length > 1) setEnabled(false);
 	}
 
 	/**
@@ -51,27 +52,20 @@ public class CancelTaskAction extends JPPFAbstractNodeAction
 	 */
 	public void actionPerformed(ActionEvent event)
 	{
-		try
+		Runnable r = new Runnable()
 		{
-			Runnable r = new Runnable()
+			public void run()
 			{
-				public void run()
+				try
 				{
-					try
-					{
-						nodeInfoHolders[0].getJmxClient().cancelTask(taskId);
-					}
-					catch(Exception e)
-					{
-						log.error(e.getMessage(), e);
-					}
+					((JMXNodeConnectionWrapper) dataArray[0].getJmxWrapper()).cancelTask(taskId);
 				}
-			};
-			new Thread(r).start();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
+				catch(Exception e)
+				{
+					log.error(e.getMessage(), e);
+				}
+			}
+		};
+		new Thread(r).start();
 	}
 }

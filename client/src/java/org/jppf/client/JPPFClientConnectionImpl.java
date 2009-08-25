@@ -86,6 +86,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 		configure(uuid, name, props.getString(prefix + "jppf.server.host", "localhost"),
 			props.getInt(prefix + "app.server.port", 11112), classServerPort,
 			props.getInt(prefix + "priority", 0));
+		initializeJmxConnection();
 	}
 
 	/**
@@ -99,6 +100,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 		classServerPort = info.classServerPorts[0];
 		jmxPort = info.managementPort;
 		configure(uuid, name + " (" + info.host + ":" + info.managementPort + ")", info.host, info.applicationServerPorts[0], classServerPort, 0);
+		initializeJmxConnection();
 	}
 
 	/**
@@ -149,9 +151,8 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 
 	/**
 	 * Initialize the jmx connection using the specifed jmx server id.
-	 * @param id the unique id of the jmx server to connect to.
 	 */
-	public void initializeJmxConnection(String id)
+	public void initializeJmxConnection()
 	{
 		String mHost = null;
 		int port = -1;

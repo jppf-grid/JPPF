@@ -107,7 +107,6 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			socketClient.send(resource);
 			socketClient.flush();
 			resource = (JPPFResourceWrapper) socketClient.receive();
-			((JPPFClientConnectionImpl) owner).initializeJmxConnection(resource.getManagementId());
 			while (!stop)
 			{
 				try

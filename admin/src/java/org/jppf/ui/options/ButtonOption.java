@@ -18,7 +18,10 @@
 package org.jppf.ui.options;
 
 import java.awt.event.*;
+
 import javax.swing.*;
+
+import org.apache.commons.logging.*;
 import org.jppf.ui.utils.GuiUtils;
 
 /**
@@ -27,6 +30,15 @@ import org.jppf.ui.utils.GuiUtils;
  */
 public class ButtonOption extends AbstractOption
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(ButtonOption.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
 	 * option elements through reflexion.
@@ -72,7 +84,8 @@ public class ButtonOption extends AbstractOption
 	 */
 	protected void setupValueChangeNotifications()
 	{
-		((JButton) UIComponent).addActionListener(new ActionListener()
+		JButton button = (JButton) UIComponent;
+		button.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{

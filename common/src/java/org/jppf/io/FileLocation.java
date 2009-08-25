@@ -198,63 +198,6 @@ public class FileLocation extends AbstractDataLocation
 	}
 
 	/**
-	 * Transfer the content of this data location from the specified channel.
-	 * @param source the channel to transfer to.
-	 * @param blocking if true, the method will block until the entire content has been transferred.
-	 * @return the number of bytes actually transferred. 
-	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.io.DataLocation#transferFrom(java.nio.channels.ReadableByteChannel, boolean)
-	 */
-	public int transferFrom(ReadableByteChannel source, boolean blocking) throws Exception
-	{
-		if (!transferring)
-		{
-			transferring = true;
-			fileChannel = new FileOutputStream(filePath).getChannel();
-			count = 0;
-		}
-		try
-		{
-			int res = 0;
-			if (!blocking)
-			{
-				res = (int) fileChannel.transferFrom(source, fileChannel.position(), size - count);
-				if (res > 0) count += res;
-				if ((res < 0) || (count >= size)) transferring = false;
-			}
-			else
-			{
-				while (count < size)
-				{
-					int n = (int) fileChannel.transferFrom(source, fileChannel.position(), size - count);
-					if (n < 0) break;
-					count += n;
-				}
-				transferring = false;
-				res = (count >= size) ? count : -1;
-			}
-			return res;
-		}
-		catch(Exception e)
-		{
-			transferring = false;
-			throw e;
-		}
-		finally
-		{
-			if (!transferring)
-			{
-				if (fileChannel != null)
-				{
-					fileChannel.force(false);
-					fileChannel.close();
-					fileChannel = null;
-				}
-			}
-		}
-	}
-
-	/**
 	 * Transfer the content of this data location to the specified output destination.
 	 * @param dest the output destination to transfer to.
 	 * @param blocking if true, the method will block until the entire content has been transferred. 
@@ -359,62 +302,6 @@ public class FileLocation extends AbstractDataLocation
 	}
 
 	/**
-	 * Transfer the content of this data location to the specified channel.
-	 * @param dest the channel to transfer to.
-	 * @param blocking if true, the method will block until the entire content has been transferred. 
-	 * @return the number of bytes actually transferred. 
-	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.io.DataLocation#transferTo(java.nio.channels.WritableByteChannel, boolean)
-	 */
-	public int transferTo(WritableByteChannel dest, boolean blocking) throws Exception
-	{
-		if (!transferring)
-		{
-			transferring = true;
-			fileChannel = new FileInputStream(filePath).getChannel();
-			count = 0;
-		}
-		try
-		{
-			int res = 0;
-			if (!blocking)
-			{
-				res = (int) fileChannel.transferTo(fileChannel.position(), size - count, dest);
-				if (res > 0) count += res;
-				if ((res < 0) || (count >= size)) transferring = false;
-			}
-			else
-			{
-				while (count < size)
-				{
-					int n = (int) fileChannel.transferTo(fileChannel.position(), size - count, dest);
-					if (n < 0) break;
-					count += n;
-				}
-				transferring = false;
-				res = (count >= size) ? count : -1;
-			}
-			return res;
-		}
-		catch(Exception e)
-		{
-			transferring = false;
-			throw e;
-		}
-		finally
-		{
-			if (!transferring)
-			{
-				if (fileChannel != null)
-				{
-					fileChannel.close();
-					fileChannel = null;
-				}
-			}
-		}
-	}
-
-	/**
 	 * This method deletes the underlying file.
 	 * @throws Throwable if an error occurs.
 	 * @see java.lang.Object#finalize()
@@ -423,5 +310,27 @@ public class FileLocation extends AbstractDataLocation
 	{
 		File file = new File(filePath);
 		if (file.exists()) file.delete();
+	}
+
+	/**
+	 * Get an input stream for this location.
+	 * @return an <code>InputStream</code> instance.
+	 * @throws Exception if an I/O error occurs.
+	 * @see org.jppf.io.DataLocation#getInputStream()
+	 */
+	public InputStream getInputStream() throws Exception
+	{
+		return new BufferedInputStream(new FileInputStream(filePath));
+	}
+
+	/**
+	 * Get an output stream for this location.
+	 * @return an <code>OutputStream</code> instance.
+	 * @throws Exception if an I/O error occurs.
+	 * @see org.jppf.io.DataLocation#getOutputStream()
+	 */
+	public OutputStream getOutputStream() throws Exception
+	{
+		return new BufferedOutputStream(new FileOutputStream(filePath));
 	}
 }

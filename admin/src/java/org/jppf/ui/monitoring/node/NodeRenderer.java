@@ -18,12 +18,12 @@
 
 package org.jppf.ui.monitoring.node;
 
-import java.awt.Component;
+import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.tree.*;
 
-import org.jppf.ui.monitoring.data.NodeInfoHolder;
+import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.ui.utils.GuiUtils;
 
 /**
@@ -33,13 +33,21 @@ import org.jppf.ui.utils.GuiUtils;
 public class NodeRenderer extends DefaultTreeCellRenderer
 {
 	/**
+	 * Path to the location of the icon files.
+	 */
+	private static final String RESOURCES = "/org/jppf/ui/resources/";
+	/**
 	 * Path to the icon used for a driver.
 	 */
-	private static final String DRIVER_ICON = "/org/jppf/ui/resources/mainframe_icon_32.gif";
+	private static final String DRIVER_ICON = RESOURCES + "mainframe.gif";
+	/**
+	 * Path to the icon used for an inactive driver connection.
+	 */
+	private static final String DRIVER_INACTIVE_ICON = RESOURCES + "mainframe_inactive.gif";
 	/**
 	 * Path to the icon used for a node.
 	 */
-	private static final String NODE_ICON = "/org/jppf/ui/resources/buggi_server_icon_32.gif";
+	private static final String NODE_ICON = RESOURCES + "buggi_server.gif";
 
 	/**
    * Configures the renderer based on the passed in components.
@@ -62,10 +70,30 @@ public class NodeRenderer extends DefaultTreeCellRenderer
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
 			if (!node.isRoot())
 			{
-				Object o = node.getUserObject();
-				String path = (o instanceof NodeInfoHolder) ? NODE_ICON : DRIVER_ICON;
+				TopologyData data = (TopologyData) node.getUserObject();
+				String path = null;
+				Color background = Color.WHITE;
+				switch(data.getType())
+				{
+					case DRIVER:
+						if (JPPFClientConnectionStatus.ACTIVE.equals(data.getClientConnection().getStatus()))
+						{
+							path = DRIVER_ICON;
+							background = Color.GREEN;
+						}
+						else
+						{
+							path = DRIVER_INACTIVE_ICON;
+							background = Color.RED;
+						}
+						break;
+					case NODE:
+						path = NODE_ICON;
+						break;
+				}
 				ImageIcon icon = GuiUtils.loadIcon(path);
 				renderer.setIcon(icon);
+				renderer.setBackgroundNonSelectionColor(background);
 			}
 		}
 		return renderer;

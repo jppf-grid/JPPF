@@ -19,7 +19,6 @@
 package org.jppf.server.nio;
 
 import java.nio.channels.*;
-import java.util.LinkedList;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 
@@ -27,9 +26,9 @@ import org.apache.commons.logging.*;
 import org.jppf.utils.*;
 
 /**
- * 
- * @param <S>
- * @param <T>
+ * Instances of this class manage the state transitions of channels opened via a <code>NioServer</code>.
+ * @param <S> type safe enum of the possible states for a channel.
+ * @param <T> type safe enum of the possible state transitions for a channel.
  * @author Laurent Cohen
  */
 public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
@@ -59,14 +58,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	private boolean sequential = false;
 	/**
-	 * The list of key ops to set. 
-	 */
-	private LinkedList<KeyOpsSetting> keyOpsList = new LinkedList<KeyOpsSetting>();
-	/**
-	 * The list of channel registrations to perform.
-	 */
-	private LinkedList<ChannelRegistration> registrationList = new LinkedList<ChannelRegistration>();
-	/**
 	 * A reentrant lock on the nio server.
 	 */
 	private Lock lock = null;
@@ -92,7 +83,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	protected void submitTransition(SelectionKey key)
 	{
 		setKeyOps(key, 0);
-		//key.interestOps(0);
 		StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, server.getFactory());
 		if (sequential) transition.run();
 		else executor.submit(transition);
@@ -116,12 +106,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		{
 			lock.unlock();
 		}
-		/*
-		synchronized(keyOpsList)
-		{
-			keyOpsList.add(new KeyOpsSetting(key, ops));
-		}
-		*/
 	}
 
 	/**
@@ -181,55 +165,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		{
 			log.error(e.getMessage(), e);
 		}
-		/*
-		synchronized(registrationList)
-		{
-			registrationList.add(new ChannelRegistration(channel, ops, context, action));
-		}
-		*/
-	}
-
-	/**
-	 * Perfom all the previously registered key ops setting actions.
-	 */
-	public void performKeyOpsSettings()
-	{
-		synchronized(keyOpsList)
-		{
-			while (keyOpsList.peek() != null)
-			{
-				KeyOpsSetting setting = keyOpsList.poll();
-				setting.key().interestOps(setting.ops());
-			}
-		}
-	}
-
-	/**
-	 * Perfom all the previously registered key ops setting actions.
-	 */
-	public void performChannelRegistrations()
-	{
-		synchronized(keyOpsList)
-		{
-			while (registrationList.peek() != null)
-			{
-				ChannelRegistration reg = registrationList.poll();
-				SelectionKey key = null;
-				try
-				{
-					key = reg.channel.register(server.getSelector(), reg.ops, reg.context);
-					if (reg.action != null)
-					{
-						reg.action.key = key;
-						reg.action.run();
-					}
-				}
-				catch (ClosedChannelException e)
-				{
-					log.error(e.getMessage(), e);
-				}
-			}
-		}
 	}
 
 	/**
@@ -249,78 +184,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	protected int threadPoolSize()
 	{
 		return THREAD_POOL_SIZE;
-	}
-
-	/**
-	 * Encapsulation of a (SelectionKey, interest ops) pair.
-	 */
-	private class KeyOpsSetting extends Pair<SelectionKey, Integer>
-	{
-		/**
-		 * Initialize this KeyOpsSetting.
-		 * @param key the selection key for which to set the interest ops.
-		 * @param ops the interest ops to set.
-		 */
-		public KeyOpsSetting(SelectionKey key, Integer ops)
-		{
-			super(key, ops);
-		}
-
-		/**
-		 * Get the selection key for which to set the interest ops.
-		 * @return a <code>SelectionKey</code> instance.
-		 */
-		public SelectionKey key()
-		{
-			return first();
-		}
-
-		/**
-		 * Get the interest ops to set.
-		 * @return the ops as an int value.
-		 */
-		public int ops()
-		{
-			return second();
-		}
-	}
-
-	/**
-	 * Encapsulation of the information required to regster a socket channel.
-	 */
-	private class ChannelRegistration
-	{
-		/**
-		 * The channel to register.
-		 */
-		public SocketChannel channel = null;
-		/**
-		 * The initial interest ops to set.
-		 */
-		public int ops = 0;
-		/**
-		 * The context associated with the channel, to set as attachment.
-		 */
-		public NioContext context = null;
-		/**
-		 * An action to perform upon registration of the channel.
-		 */
-		public ChannelRegistrationAction action = null;
-
-		/**
-		 * Initialise this channel registration witht he specified parameters.
-		 * @param channel the channel to register.
-		 * @param ops the initial interest ops to set.
-		 * @param context the context associated with the channel, to set as attachment.
-		 * @param action an action to perform upon registration of the channel.
-		 */
-		public ChannelRegistration(SocketChannel channel, int ops, NioContext context, ChannelRegistrationAction action)
-		{
-			this.channel =channel;
-			this.ops = ops;
-			this.context = context;
-			this.action = action;
-		}
 	}
 
 	/**

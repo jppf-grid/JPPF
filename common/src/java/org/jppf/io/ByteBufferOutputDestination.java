@@ -25,7 +25,7 @@ import java.nio.ByteBuffer;
  * Output destination backed by a {@link java.nio.ByteBuffer ByteBuffer}.
  * @author Laurent Cohen
  */
-public class ByteOutputDestination implements OutputDestination
+public class ByteBufferOutputDestination implements OutputDestination
 {
 	/**
 	 * The buffer that backs this output destination.
@@ -36,7 +36,7 @@ public class ByteOutputDestination implements OutputDestination
 	 * Initialize this input source with the specified data.
 	 * @param size trhe size of the data to write.
 	 */
-	public ByteOutputDestination(int size)
+	public ByteBufferOutputDestination(int size)
 	{
 		this(ByteBuffer.allocateDirect(size));
 	}
@@ -47,7 +47,7 @@ public class ByteOutputDestination implements OutputDestination
 	 * @param offset the start position in the buffer.
 	 * @param len the length of data to write to the buffer.
 	 */
-	public ByteOutputDestination(byte[] buffer, int offset, int len)
+	public ByteBufferOutputDestination(byte[] buffer, int offset, int len)
 	{
 		this(ByteBuffer.wrap(buffer, offset, len));
 	}
@@ -56,7 +56,7 @@ public class ByteOutputDestination implements OutputDestination
 	 * Initialize this output stream with the specified backing ByteBuffer.
 	 * @param buffer the backing byte buffer.
 	 */
-	public ByteOutputDestination(ByteBuffer buffer)
+	public ByteBufferOutputDestination(ByteBuffer buffer)
 	{
 		this.data = buffer;
 	}

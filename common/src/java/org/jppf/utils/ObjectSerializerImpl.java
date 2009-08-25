@@ -51,12 +51,24 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	public JPPFBuffer serialize(Object o) throws Exception
 	{
 		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(baos);
+		serialize(o, baos);
+		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
+		return buf;
+	}
+
+	/**
+	 * Serialize an object into an output stream.
+	 * @param o - the object to Serialize.
+	 * @param os - the output stream to serialize to.
+	 * @throws Exception if the object can't be serialized.
+	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object, java.io.OutputStream)
+	 */
+	public void serialize(Object o, OutputStream os) throws Exception
+	{
+		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(os);
 		oos.writeObject(o);
 		oos.flush();
 		oos.close();
-		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
-		return buf;
 	}
 
 	/**
@@ -68,7 +80,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 */
 	public Object deserialize(JPPFBuffer buf) throws Exception
 	{
-		return deserialize(buf.getBuffer(), 0, buf.getLength());
+		return deserialize(new ByteArrayInputStream(buf.getBuffer()));
 	}
 
 	/**
@@ -80,7 +92,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 */
 	public Object deserialize(byte[] bytes) throws Exception
 	{
-		return deserialize(bytes, 0, bytes.length);
+		return deserialize(new ByteArrayInputStream(bytes));
 	}
 
 	/**
@@ -94,9 +106,20 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 */
 	public Object deserialize(byte[] bytes, int offset, int length) throws Exception
 	{
+		return deserialize(new ByteArrayInputStream(bytes, offset, length));
+	}
+
+	/**
+	 * Read an object from an input stream.
+	 * @param is - the input stream to deserialize from.
+	 * @return the object that was deserialized from the array of bytes.
+	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
+	 * @see org.jppf.utils.ObjectSerializer#deserialize(java.io.InputStream)
+	 */
+	public Object deserialize(InputStream is) throws Exception
+	{
 		Object o = null;
-		ByteArrayInputStream bis = new ByteArrayInputStream(bytes, offset, length);
-		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(bis);
+		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
 		o = ois.readObject();
 		ois.close();
 		return o;

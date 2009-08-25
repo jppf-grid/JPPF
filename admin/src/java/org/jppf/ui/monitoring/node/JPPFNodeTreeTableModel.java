@@ -21,19 +21,13 @@ package org.jppf.ui.monitoring.node;
 import javax.swing.tree.*;
 
 import org.jppf.management.JPPFNodeState;
-import org.jppf.ui.monitoring.data.NodeInfoHolder;
-import org.jppf.ui.treetable.*;
-import org.jppf.utils.LocalizationUtils;
+import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
 
 /**
  * Tree table model for the tree table.
  */
-public class JPPFNodeTreeTableModel extends AbstractTreeTableModel implements TreeTableModel
+public class JPPFNodeTreeTableModel extends AbstractJPPFTreeTableModel
 {
-	/**
-	 * Base name for localization bundle lookups.
-	 */
-	private static final String BASE = "org.jppf.ui.i18n.NodeDataPage";
 	/**
 	 * Column number for the node's url.
 	 */
@@ -66,6 +60,7 @@ public class JPPFNodeTreeTableModel extends AbstractTreeTableModel implements Tr
 	public JPPFNodeTreeTableModel(TreeNode node)
 	{
 		super(node);
+		BASE = "org.jppf.ui.i18n.NodeDataPage";
 	}
 
 	/**
@@ -91,10 +86,11 @@ public class JPPFNodeTreeTableModel extends AbstractTreeTableModel implements Tr
 		if (node instanceof DefaultMutableTreeNode)
 		{
 			DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
-			if (defNode.getUserObject() instanceof NodeInfoHolder)
+			if (defNode.getUserObject() instanceof TopologyData)
 			{
-				NodeInfoHolder info = (NodeInfoHolder) defNode.getUserObject();
-				JPPFNodeState state = info.getState();
+				TopologyData info = (TopologyData) defNode.getUserObject();
+				JPPFNodeState state = info.getNodeState();
+				if (state == null) return res;
 				switch (column)
 				{
 					case NODE_URL:
@@ -156,98 +152,5 @@ public class JPPFNodeTreeTableModel extends AbstractTreeTableModel implements Tr
 				break;
 		}
 		return res;
-	}
-
-	/**
-	 * Tells if a cell can be edited.
-	 * @param node not used.
-	 * @param column not used.
-	 * @return true if the cell can be edited, false otherwise.
-	 * @see org.jppf.ui.treetable.AbstractTreeTableModel#isCellEditable(java.lang.Object, int)
-	 */
-	public boolean isCellEditable(Object node, int column)
-	{
-		//return false;
-		return super.isCellEditable(node, column);
-	}
-
-	/**
-	 * Called when done editing a cell. This method has an empty implementation and does nothing.
-	 * @param value not used.
-	 * @param node not used.
-	 * @param column not used.
-	 * @see org.jppf.ui.treetable.AbstractTreeTableModel#setValueAt(java.lang.Object, java.lang.Object, int)
-	 */
-	public void setValueAt(Object value, Object node, int column)
-	{
-	}
-
-	/**
-	 * Get a localized message given its unique name and the current locale.
-	 * @param message the unique name of the localized message.
-	 * @return a message in the current locale, or the default locale 
-	 * if the localization for the current locale is not found. 
-	 */
-	private String localize(String message)
-	{
-		return LocalizationUtils.getLocalized(BASE, message);
-	}
-
-	/**
-	 * Return the child at the spcified index from the specified parent node.
-	 * @param parent - the parent to get the child from.
-	 * @param index - the index at which to get the child
-	 * @return the child node, or null if the index is not valid.
-	 * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
-	 */
-	public Object getChild(Object parent, int index)
-	{
-		return ((TreeNode) parent).getChildAt(index);
-	}
-
-	/**
-	 * Get the number of children for the specified node.
-	 * @param parent the node for which to get the number of children. 
-	 * @return the number of children as an int.
-	 * @see javax.swing.tree.TreeModel#getChildCount(java.lang.Object)
-	 */
-	public int getChildCount(Object parent)
-	{
-		return ((TreeNode) parent).getChildCount();
-	}
-
-	/**
-	 * Insert the specified child into the specified parent's list of children at the specified position.
-	 * @param child - the node to insert into the parent.
-	 * @param parent - the node into which to insert the child.
-	 * @param pos - the position at which to insert the node.
-	 */
-	public void insertNodeInto(DefaultMutableTreeNode child, DefaultMutableTreeNode parent, int pos)
-	{
-		parent.insert(child, pos);
-		fireTreeNodesInserted(parent, parent.getPath(), new int[] { pos }, new Object[] { child } );
-	}
-
-	/**
-	 * Remove a node from the tree.
-	 * @param node - the node to remove from the parent.
-	 */
-	public void removeNodeFromParent(DefaultMutableTreeNode node)
-	{
-		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
-		int pos = parent.getIndex(node);
-		parent.remove(node);
-		fireTreeNodesRemoved(parent, parent.getPath(), new int[] { pos }, new Object[] { node } );
-	}
-
-	/**
-	 * Determine the class of th specified column.
-	 * @param column - the column index.
-	 * @return a <code>Class</code> instance.
-	 * @see org.jppf.ui.treetable.AbstractTreeTableModel#getColumnClass(int)
-	 */
-	public Class getColumnClass(int column)
-	{
-		return (column == 0) ? TreeTableModel.class : String.class;
 	}
 }

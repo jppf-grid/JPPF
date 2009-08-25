@@ -17,12 +17,14 @@
  */
 package org.jppf.ui.monitoring.node.actions;
 
-import java.awt.Point;
 import java.awt.event.*;
+import java.util.List;
 
 import javax.swing.*;
 
-import org.jppf.ui.monitoring.data.NodeInfoHolder;
+import org.apache.commons.logging.*;
+import org.jppf.management.JMXNodeConnectionWrapper;
+import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
@@ -31,8 +33,16 @@ import org.jppf.ui.utils.GuiUtils;
  * This action displays an input panel for the user to type a new
  * thread pool size for a node, and updates the node with it.
  */
-public class NodeThreadsAction extends JPPFAbstractNodeAction
+public class NodeThreadsAction extends AbstractTopologyAction
 {
+	/**
+	 * Logger for this class.
+	 */
+	protected static Log log = LogFactory.getLog(NodeThreadsAction.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	protected static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Determines whether the "OK" button was pressed.
 	 */
@@ -49,23 +59,25 @@ public class NodeThreadsAction extends JPPFAbstractNodeAction
 	 * Threads priority.
 	 */
 	private int priority = Thread.NORM_PRIORITY;
-	/**
-	 * Location at which to display the entry dialog. 
-	 */
-	private Point location = null;
 
 	/**
 	 * Initialize this action.
-	 * @param nodeInfoHolders the jmx client used to update the thread pool size.
-	 * @param location location at which to display the entry dialog.
 	 */
-	public NodeThreadsAction(Point location, NodeInfoHolder...nodeInfoHolders)
+	public NodeThreadsAction()
 	{
-		super(nodeInfoHolders);
-		this.location = location;
 		setupIcon("/org/jppf/ui/resources/threads.gif");
 		putValue(NAME, "Set thread pool size");
-		if (nodeInfoHolders.length < 1) setEnabled(false);
+	}
+
+	/**
+	 * Update this action's enabled state based on a list of selected elements.
+	 * @param selectedElements - a list of objects.
+	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+	 */
+	public void updateState(List<Object> selectedElements)
+	{
+		super.updateState(selectedElements);
+		setEnabled(nodeDataArray.length > 0);
 	}
 
 	/**
@@ -75,13 +87,16 @@ public class NodeThreadsAction extends JPPFAbstractNodeAction
 	 */
 	public void actionPerformed(ActionEvent event)
 	{
+		AbstractButton btn = (AbstractButton) event.getSource();
+		if (btn.isShowing()) location = btn.getLocationOnScreen();
+		if (selectedElements.isEmpty()) return;
 		try
 		{
 			panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/NodeThreadPoolPanel.xml");
-			if (nodeInfoHolders.length == 1)
+			if (nodeDataArray.length == 1)
 			{
-				nbThreads = nodeInfoHolders[0].getState().getThreadPoolSize();
-				priority = nodeInfoHolders[0].getState().getThreadPriority();
+				nbThreads = nodeDataArray[0].getNodeState().getThreadPoolSize();
+				priority = nodeDataArray[0].getNodeState().getThreadPriority();
 			}
 			((AbstractOption) panel.findFirstWithName("nbThreads")).setValue(nbThreads);
 			((AbstractOption) panel.findFirstWithName("threadPriority")).setValue(priority);
@@ -132,12 +147,13 @@ public class NodeThreadsAction extends JPPFAbstractNodeAction
 		{
 			public void run()
 			{
-				for (NodeInfoHolder connection: nodeInfoHolders)
+				for (TopologyData data: nodeDataArray)
 				{
 					try
 					{
-						connection.getJmxClient().updateThreadPoolSize(nbThreads);
-						connection.getJmxClient().updateThreadsPriority(priority);
+						JMXNodeConnectionWrapper jmx = (JMXNodeConnectionWrapper) data.getJmxWrapper();
+						jmx.updateThreadPoolSize(nbThreads);
+						jmx.updateThreadsPriority(priority);
 					}
 					catch(Exception e)
 					{

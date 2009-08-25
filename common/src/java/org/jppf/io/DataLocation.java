@@ -18,7 +18,8 @@
 
 package org.jppf.io;
 
-import java.nio.channels.*;
+import java.io.*;
+
 
 /**
  * This interface represents an abstraction of a block of data, regardless of where it is stored.
@@ -27,6 +28,10 @@ import java.nio.channels.*;
 public interface DataLocation
 {
 	/**
+	 * Constant for unkbown data location size.
+	 */
+	int UNKNOWN_SIZE = 1;
+	/**
 	 * Get the size of the data referenced by this data location.
 	 * @return the data size as an int.
 	 */
@@ -34,37 +39,31 @@ public interface DataLocation
 
 	/**
 	 * Transfer the content of this data location from the specified input source.
-	 * @param source the input source to transfer to.
-	 * @param blocking if true, the method will block until the entire content has been transferred.
+	 * @param source - the input source to transfer to.
+	 * @param blocking - if true, the method will block until the entire content has been transferred.
 	 * @return the number of bytes actually transferred. 
 	 * @throws Exception if an IO error occurs.
 	 */
 	int transferFrom(InputSource source, boolean blocking) throws Exception;
 
 	/**
-	 * Transfer the content of this data location from the specified channel.
-	 * @param source the channel to transfer to.
-	 * @param blocking if true, the method will block until the entire content has been transferred.
-	 * @return the number of bytes actually transferred. 
-	 * @throws Exception if an IO error occurs.
-	 */
-	int transferFrom(ReadableByteChannel source, boolean blocking) throws Exception;
-
-	/**
 	 * Transfer the content of this data location to the specified output destination.
-	 * @param dest the output destination to transfer to.
-	 * @param blocking if true, the method will block until the entire content has been transferred. 
+	 * @param dest - the output destination to transfer to.
+	 * @param blocking - if true, the method will block until the entire content has been transferred. 
 	 * @return the number of bytes actually transferred. 
 	 * @throws Exception if an IO error occurs.
 	 */
 	int transferTo(OutputDestination dest, boolean blocking) throws Exception;
-
 	/**
-	 * Transfer the content of this data location to the specified channel.
-	 * @param dest the channel to transfer to.
-	 * @param blocking if true, the method will block until the entire content has been transferred. 
-	 * @return the number of bytes actually transferred. 
-	 * @throws Exception if an IO error occurs.
+	 * Get an input stream for this location.
+	 * @return an <code>InputStream</code> instance.
+	 * @throws Exception if an I/O error occurs.
 	 */
-	int transferTo(WritableByteChannel dest, boolean blocking) throws Exception;
+	InputStream getInputStream() throws Exception;
+	/**
+	 * Get an output stream for this location.
+	 * @return an <code>OutputStream</code> instance.
+	 * @throws Exception if an I/O error occurs.
+	 */
+	OutputStream getOutputStream() throws Exception;
 }

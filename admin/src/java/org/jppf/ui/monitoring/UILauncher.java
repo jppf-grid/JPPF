@@ -31,7 +31,7 @@ import org.jppf.utils.JPPFConfiguration;
  * This class provides a graphical interface for monitoring the status and health 
  * of the JPPF server.<br>
  * It also provides a few customization options, such as setting the interval between 2 server refreshes,
- * and switching the color scheme (skin) fot the whole UI.
+ * and switching the color scheme (skin) for the whole UI.
  * @author Laurent Cohen
  */
 public class UILauncher
@@ -58,24 +58,21 @@ public class UILauncher
 		try
 		{
 			//configureSecurity();
-			if ((args  == null) || (args.length < 2))
-				throw new Exception("Usage: UILauncher page_location location_source");
+			if ((args  == null) || (args.length < 2)) throw new Exception("Usage: UILauncher page_location location_source");
 			String s = System.getProperty("swing.defaultlaf");
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			//System.out.println("system L&F: " + UIManager.getSystemLookAndFeelClassName());
-			/*
-			if ((s == null) || SubstanceLookAndFeel.class.getName().equals(s))
+			String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
+				"com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
+			int n = 2;
+			try
 			{
-				UIManager.put(SubstanceLookAndFeel.ENABLE_INVERTED_THEMES, Boolean.TRUE);
-				UIManager.put(LafWidget.TABBED_PANE_PREVIEW_PAINTER, new DefaultTabPreviewPainter());
-				JFrame.setDefaultLookAndFeelDecorated(true);
-				UIManager.setLookAndFeel(new SubstanceLookAndFeel());
-				SubstanceLookAndFeel.setCurrentTheme(new JPPFTheme());
-				//SubstanceLookAndFeel.setCurrentTheme(new SubstanceAquaTheme());
-				//SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNullWatermark());
-				SubstanceLookAndFeel.setCurrentWatermark(new SubstanceNoneWatermark());
+				UIManager.setLookAndFeel(laf[n]);
 			}
-			*/
+			catch(Throwable t)
+			{
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			}
 			boolean showSplash = JPPFConfiguration.getProperties().getBoolean("jppf.ui.splash", true);
 			if (showSplash)
 			{

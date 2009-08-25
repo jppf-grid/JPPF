@@ -18,24 +18,44 @@
 package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.List;
 
-import org.jppf.ui.monitoring.data.NodeInfoHolder;
+import org.apache.commons.logging.*;
+import org.jppf.management.JMXNodeConnectionWrapper;
+import org.jppf.ui.monitoring.node.TopologyData;
 
 /**
  * This action stops a node.
  */
-public class ShutdownNodeAction extends JPPFAbstractNodeAction
+public class ShutdownNodeAction extends AbstractTopologyAction
 {
 	/**
-	 * Initialize this action.
-	 * @param nodeInfoHolders the jmx client used to update the thread pool size.
+	 * Logger for this class.
 	 */
-	public ShutdownNodeAction(NodeInfoHolder...nodeInfoHolders)
+	protected static Log log = LogFactory.getLog(ShutdownNodeAction.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	protected static boolean debugEnabled = log.isDebugEnabled();
+
+	/**
+	 * Initialize this action.
+	 */
+	public ShutdownNodeAction()
 	{
-		super(nodeInfoHolders);
 		setupIcon("/org/jppf/ui/resources/traffic_light_red.gif");
 		putValue(NAME, "Node Shutdown");
-		if (nodeInfoHolders.length < 1) setEnabled(false);
+	}
+
+	/**
+	 * Update this action's enabled state based on a list of selected elements.
+	 * @param selectedElements - a list of objects.
+	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+	 */
+	public void updateState(List<Object> selectedElements)
+	{
+		super.updateState(selectedElements);
+		setEnabled(nodeDataArray.length > 0);
 	}
 
 	/**
@@ -45,39 +65,23 @@ public class ShutdownNodeAction extends JPPFAbstractNodeAction
 	 */
 	public void actionPerformed(ActionEvent event)
 	{
-		try
+		Runnable r = new Runnable()
 		{
-			for (NodeInfoHolder connection: nodeInfoHolders)
+			public void run()
 			{
-				try
+				for (TopologyData data: nodeDataArray)
 				{
-					Runnable r = new Runnable()
+					try
 					{
-						public void run()
-						{
-							for (NodeInfoHolder connection: nodeInfoHolders)
-							{
-								try
-								{
-									connection.getJmxClient().shutdown();
-								}
-								catch(Exception e)
-								{
-									log.error(e.getMessage(), e);
-								}
-							}
-						}
-					};
-					new Thread(r).start();
-				}
-				catch(Exception e)
-				{
-					log.error(e.getMessage(), e);
+						((JMXNodeConnectionWrapper) data.getJmxWrapper()).shutdown();
+					}
+					catch(Exception e)
+					{
+						log.error(e.getMessage(), e);
+					}
 				}
 			}
-		}
-		catch(NumberFormatException ignored)
-		{
-		}
+		};
+		new Thread(r).start();
 	}
 }

@@ -433,7 +433,7 @@
 			<fileset dir="${lib}/ApacheCommons" includes="commons-logging*.jar"/>
 			<fileset dir="${lib}/JFreeChart" includes="*.jar"/>
 			<fileset dir="${lib}/Rhino" includes="*.jar"/>
-			<fileset dir="${lib}/Substance" includes="*.jar"/>
+			<fileset dir="${lib}/JGoodies" includes="*.jar"/>
 			<fileset dir="${lib}/Groovy" includes="*.jar"/>
 			<fileset dir="${lib}/MigLayout" includes="*.jar"/>
 		</copy>

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.job;
+package org.jppf.ui.treetable;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
@@ -29,13 +29,13 @@ import org.jppf.ui.treetable.JTreeTable;
  * 
  * @author Laurent Cohen
  */
-public class JobTreeTable extends JTreeTable
+public class JPPFTreeTable extends JTreeTable
 {
 	/**
 	 * Inityialize this tree table with the specified model.
 	 * @param treeTableModel - a tree table model.
 	 */
-	public JobTreeTable(JobTreeTableModel treeTableModel)
+	public JPPFTreeTable(AbstractJPPFTreeTableModel treeTableModel)
 	{
 		super(treeTableModel);
 	}
@@ -77,7 +77,7 @@ public class JobTreeTable extends JTreeTable
 	 * Expands the leaves of the specified node. 
 	 * @param node - the node to expand.
 	 */
-	private void expand(DefaultMutableTreeNode node)
+	public void expand(DefaultMutableTreeNode node)
 	{
 		if (node.getChildCount() > 0)
 		{
@@ -87,7 +87,7 @@ public class JobTreeTable extends JTreeTable
 	}
 
 	/**
-	 * collapse all paths in the tree.
+	 * Collapse all paths in the tree.
 	 */
 	public void collapseAll()
 	{

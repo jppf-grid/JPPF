@@ -18,29 +18,37 @@
 package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.*;
+import java.util.List;
 
 import javax.swing.*;
 
 import org.jppf.management.*;
-import org.jppf.ui.monitoring.data.NodeInfoHolder;
 import org.jppf.ui.monitoring.node.*;
 import org.jppf.utils.StringUtils;
 
 /**
  * This action displays the node environment information in a spearate frame.
  */
-public class NodeInformationAction extends JPPFAbstractNodeAction
+public class NodeInformationAction extends AbstractTopologyAction
 {
 	/**
 	 * Initialize this action.
-	 * @param nodeInfoHolders the jmx client used to update the thread pool size.
 	 */
-	public NodeInformationAction(NodeInfoHolder...nodeInfoHolders)
+	public NodeInformationAction()
 	{
-		super(nodeInfoHolders);
 		setupIcon("/org/jppf/ui/resources/info.gif");
 		putValue(NAME, "Node System Information");
-		if (nodeInfoHolders.length != 1) setEnabled(false);
+	}
+
+	/**
+	 * Update this action's enabled state based on a list of selected elements.
+	 * @param selectedElements - a list of objects.
+	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+	 */
+	public void updateState(List<Object> selectedElements)
+	{
+		super.updateState(selectedElements);
+		setEnabled(nodeDataArray.length > 0);
 	}
 
 	/**
@@ -53,7 +61,7 @@ public class NodeInformationAction extends JPPFAbstractNodeAction
 		String s = null;
 		try
 		{
-			JMXNodeConnectionWrapper connection = nodeInfoHolders[0].getJmxClient();
+			JMXNodeConnectionWrapper connection = (JMXNodeConnectionWrapper) nodeDataArray[0].getJmxWrapper();
 			JPPFSystemInformation info = connection.systemInformation();
 			PropertiesTableFormat format = new HTMLPropertiesTableFormat("information for node " + connection.getId());
 			format.start();

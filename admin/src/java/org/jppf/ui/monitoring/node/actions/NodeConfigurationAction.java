@@ -24,7 +24,8 @@ import java.util.*;
 
 import javax.swing.*;
 
-import org.jppf.ui.monitoring.data.NodeInfoHolder;
+import org.apache.commons.logging.*;
+import org.jppf.management.JMXNodeConnectionWrapper;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
@@ -34,8 +35,16 @@ import org.jppf.utils.TypedProperties;
  * This action displays an input panel for the user to type a new
  * thread pool size for a node, and updates the node with it.
  */
-public class NodeConfigurationAction extends JPPFAbstractNodeAction
+public class NodeConfigurationAction extends AbstractTopologyAction
 {
+	/**
+	 * Logger for this class.
+	 */
+	protected static Log log = LogFactory.getLog(NodeConfigurationAction.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	protected static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Determines whether the "OK" button was pressed.
 	 */
@@ -51,16 +60,22 @@ public class NodeConfigurationAction extends JPPFAbstractNodeAction
 
 	/**
 	 * Initialize this action.
-	 * @param nodeInfoHolders - the jmx client used to update the thread pool size.
-	 * @param location - location at which to display the entry dialog.
 	 */
-	public NodeConfigurationAction(Point location, NodeInfoHolder...nodeInfoHolders)
+	public NodeConfigurationAction()
 	{
-		super(nodeInfoHolders);
-		this.location = location;
 		setupIcon("/org/jppf/ui/resources/update.gif");
 		putValue(NAME, "Update the configuration properties");
-		if (nodeInfoHolders.length != 1) setEnabled(false);
+	}
+
+	/**
+	 * Update this action's enabled state based on a list of selected elements.
+	 * @param selectedElements - a list of objects.
+	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+	 */
+	public void updateState(List<Object> selectedElements)
+	{
+		super.updateState(selectedElements);
+		setEnabled(nodeDataArray.length > 0);
 	}
 
 	/**
@@ -123,7 +138,7 @@ public class NodeConfigurationAction extends JPPFAbstractNodeAction
 			{
 				try
 				{
-					nodeInfoHolders[0].getJmxClient().updateConfiguration(map, b);
+					((JMXNodeConnectionWrapper) nodeDataArray[0].getJmxWrapper()).updateConfiguration(map, b);
 				}
 				catch(Exception e)
 				{
@@ -142,7 +157,7 @@ public class NodeConfigurationAction extends JPPFAbstractNodeAction
 	private String getPropertiesAsString() throws Exception
 	{
 		StringBuilder sb = new StringBuilder();
-		TypedProperties props = nodeInfoHolders[0].getJmxClient().systemInformation().getJppf();
+		TypedProperties props = ((JMXNodeConnectionWrapper) nodeDataArray[0].getJmxWrapper()).systemInformation().getJppf();
 		Set<String> keys = new TreeSet<String>();
 		for (Object o: props.keySet()) keys.add((String) o);
 		for (String s: keys) sb.append(s).append(" = ").append(props.get(s)).append("\n");

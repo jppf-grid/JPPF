@@ -18,24 +18,44 @@
 package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.List;
 
-import org.jppf.ui.monitoring.data.NodeInfoHolder;
+import org.apache.commons.logging.*;
+import org.jppf.management.JMXNodeConnectionWrapper;
+import org.jppf.ui.monitoring.node.TopologyData;
 
 /**
  * This action resets the task counter of a node to 0.
  */
-public class ResetTaskCounterAction extends JPPFAbstractNodeAction
+public class ResetTaskCounterAction extends AbstractTopologyAction
 {
 	/**
-	 * Initialize this action.
-	 * @param nodeInfoHolders the jmx client used to update the thread pool size.
+	 * Logger for this class.
 	 */
-	public ResetTaskCounterAction(NodeInfoHolder...nodeInfoHolders)
+	protected static Log log = LogFactory.getLog(ResetTaskCounterAction.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	protected static boolean debugEnabled = log.isDebugEnabled();
+
+	/**
+	 * Initialize this action.
+	 */
+	public ResetTaskCounterAction()
 	{
-		super(nodeInfoHolders);
 		setupIcon("/org/jppf/ui/resources/reset.gif");
 		putValue(NAME, "Reset task counter");
-		if (nodeInfoHolders.length < 1) setEnabled(false);
+	}
+
+	/**
+	 * Update this action's enabled state based on a list of selected elements.
+	 * @param selectedElements - a list of objects.
+	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+	 */
+	public void updateState(List<Object> selectedElements)
+	{
+		super.updateState(selectedElements);
+		setEnabled(nodeDataArray.length > 0);
 	}
 
 	/**
@@ -45,22 +65,17 @@ public class ResetTaskCounterAction extends JPPFAbstractNodeAction
 	 */
 	public void actionPerformed(ActionEvent event)
 	{
-		try
+		for (TopologyData data: nodeDataArray)
 		{
-			for (NodeInfoHolder connection: nodeInfoHolders)
+			try
 			{
-				try
-				{
-					connection.getJmxClient().resetTaskCounter();
-				}
-				catch(Exception e)
-				{
-					log.error(e.getMessage(), e);
-				}
+				JMXNodeConnectionWrapper jmx = (JMXNodeConnectionWrapper) data.getJmxWrapper();
+				jmx.resetTaskCounter();
 			}
-		}
-		catch(NumberFormatException ignored)
-		{
+			catch(Exception e)
+			{
+				log.error(e.getMessage(), e);
+			}
 		}
 	}
 }

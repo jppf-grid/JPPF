@@ -25,7 +25,7 @@ import java.nio.ByteBuffer;
  * Input source backed by an array of bytes.
  * @author Laurent Cohen
  */
-public class ByteInputSource implements InputSource
+public class ByteBufferInputSource implements InputSource
 {
 	/**
 	 * The buffer that backs this input source.
@@ -38,7 +38,7 @@ public class ByteInputSource implements InputSource
 	 * @param offset the start position in the buffer.
 	 * @param len the length of data to read from the buffer.
 	 */
-	public ByteInputSource(byte[] data, int offset, int len)
+	public ByteBufferInputSource(byte[] data, int offset, int len)
 	{
 		this(ByteBuffer.wrap(data, offset, len));
 	}
@@ -47,7 +47,7 @@ public class ByteInputSource implements InputSource
 	 * Initialize this input source with the specified byte buffer.
 	 * @param data the buffer from which to read.
 	 */
-	public ByteInputSource(ByteBuffer data)
+	public ByteBufferInputSource(ByteBuffer data)
 	{
 		this.data = data;
 	}

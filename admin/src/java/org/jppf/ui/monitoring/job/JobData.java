@@ -21,6 +21,7 @@ package org.jppf.ui.monitoring.job;
 import javax.management.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.client.*;
 import org.jppf.job.JobInformation;
 import org.jppf.management.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
@@ -44,6 +45,10 @@ public class JobData
 	 */
 	private JobDataType type = null;
 	/**
+	 * A driver connection.
+	 */
+	private JPPFClientConnection clientConnection = null;
+	/**
 	 * Wrapper holding the connection to the JMX server on a driver. 
 	 */
 	private JMXDriverConnectionWrapper jmxWrapper = null;
@@ -59,6 +64,10 @@ public class JobData
 	 * Proxy to the job management mbean.
 	 */
 	private DriverJobManagementMBean proxy = null;
+	/**
+	 * Receives notifications from the MBean.
+	 */
+	private NotificationListener notificationListener = null;
 
 	/**
 	 * Initialize this job data with the specified type.
@@ -71,12 +80,13 @@ public class JobData
 
 	/**
 	 * Initialize this job data as a driver related object.
-	 * @param jmxWrapper - a wrapper holding the connection to the JMX server on a driver.
+	 * @param clientConnection - a reference to the driver connection.
 	 */
-	public JobData(JMXDriverConnectionWrapper jmxWrapper)
+	public JobData(JPPFClientConnection clientConnection)
 	{
 		this(JobDataType.DRIVER);
-		this.jmxWrapper = jmxWrapper;
+		this.clientConnection = clientConnection;
+		this.jmxWrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
 	}
 
 	/**
@@ -181,5 +191,41 @@ public class JobData
 				break;
 		}
 		return s;
+	}
+
+	/**
+	 * Get the MBean notification listener.
+	 * @return a <code>NotificationListener</code> instance.
+	 */
+	public NotificationListener getNotificationListener()
+	{
+		return notificationListener;
+	}
+
+	/**
+	 * Set the MBean notification listener.
+	 * @param notificationListener - a <code>NotificationListener</code> instance.
+	 * @throws Exception - if any error occurs.
+	 */
+	public void changeNotificationListener(NotificationListener notificationListener) throws Exception
+	{
+		if (this.notificationListener != null)
+		{
+			if (proxy != null) proxy.removeNotificationListener(this.notificationListener);
+		}
+		this.notificationListener = notificationListener;
+		if (this.notificationListener != null)
+		{
+			if (proxy != null) proxy.addNotificationListener(this.notificationListener, null, null);
+		}
+	}
+
+	/**
+	 * Get a reference to the driver connection.
+	 * @return a <code>JPPFClientConnection</code> instance.
+	 */
+	public JPPFClientConnection getClientConnection()
+	{
+		return clientConnection;
 	}
 }

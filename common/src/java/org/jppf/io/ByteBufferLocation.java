@@ -18,8 +18,8 @@
 
 package org.jppf.io;
 
+import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.channels.*;
 
 /**
  * Data location backed by a byte buffer.
@@ -72,33 +72,6 @@ public class ByteBufferLocation extends AbstractDataLocation
 	 */
 	public int transferFrom(InputSource source, boolean blocking) throws Exception
 	{
-		return transferFrom_0(source, blocking, false);
-	}
-
-	/**
-	 * Transfer the content of this data location from the specified channel.
-	 * @param source the channel to transfer from.
-	 * @param blocking if true, the method will block until the entire content has been transferred.
-	 * @return the number of bytes actually transferred. 
-	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.io.DataLocation#transferFrom(java.nio.channels.ReadableByteChannel, boolean)
-	 */
-	public int transferFrom(ReadableByteChannel source, boolean blocking) throws Exception
-	{
-		return transferFrom_0(source, blocking, true);
-	}
-
-	/**
-	 * Transfer the content of this data location from the specified source.
-	 * @param source the source to transfer from.
-	 * @param blocking if true, the method will block until the entire content has been transferred.
-	 * @param isChannel if true, the source is a <code>ReadableByteChannel</code>, otherwise it is an <code>OutputDestination</code>. 
-	 * @return the number of bytes actually transferred. 
-	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.io.DataLocation#transferFrom(java.nio.channels.ReadableByteChannel, boolean)
-	 */
-	private int transferFrom_0(Object source, boolean blocking, boolean isChannel) throws Exception
-	{
 		if (!transferring)
 		{
 			transferring = true;
@@ -106,14 +79,14 @@ public class ByteBufferLocation extends AbstractDataLocation
 		}
 		if (!blocking)
 		{
-			int n = isChannel ? ((ReadableByteChannel) source).read(buffer) : ((InputSource) source).read(buffer);
+			int n = source.read(buffer);
 			if ((n < 0) || !buffer.hasRemaining()) transferring = false;
 			return n;
 		}
 		int count = 0;
 		while (count < size)
 		{
-			int n = isChannel ? ((ReadableByteChannel) source).read(buffer) : ((InputSource) source).read(buffer);
+			int n = source.read(buffer);
 			if (n < 0)
 			{
 				transferring = false;
@@ -135,33 +108,6 @@ public class ByteBufferLocation extends AbstractDataLocation
 	 */
 	public int transferTo(OutputDestination dest, boolean blocking) throws Exception
 	{
-		return transferTo_0(dest, blocking, false);
-	}
-
-	/**
-	 * Transfer the content of this data location to the specified channel.
-	 * @param dest the channel to transfer to.
-	 * @param blocking if true, the method will block until the entire content has been transferred. 
-	 * @return the number of bytes actually transferred. 
-	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.io.DataLocation#transferTo(java.nio.channels.WritableByteChannel, boolean)
-	 */
-	public int transferTo(WritableByteChannel dest, boolean blocking) throws Exception
-	{
-		return transferTo_0(dest, blocking, true);
-	}
-
-
-	/**
-	 * Transfer the content of this data location to the specified destination.
-	 * @param dest the channel to transfer to.
-	 * @param blocking if true, the method will block until the entire content has been transferred. 
-	 * @param isChannel if true, the destination is a <code>WritableByteChannel</code>, otherwise it is an <code>OutputDestination</code>. 
-	 * @return the number of bytes actually transferred. 
-	 * @throws Exception if an IO error occurs.
-	 */
-	private int transferTo_0(Object dest, boolean blocking, boolean isChannel) throws Exception
-	{
 		if (!transferring)
 		{
 			transferring = true;
@@ -169,14 +115,14 @@ public class ByteBufferLocation extends AbstractDataLocation
 		}
 		if (!blocking)
 		{
-			int n = isChannel ? ((WritableByteChannel) dest).write(buffer) : ((OutputDestination) dest).write(buffer);
+			int n = dest.write(buffer);
 			if ((n < 0) || !buffer.hasRemaining()) transferring = false;
 			return n;
 		}
 		int count = 0;
 		while (count < size)
 		{
-			int n = isChannel ? ((WritableByteChannel) dest).write(buffer) : ((OutputDestination) dest).write(buffer);
+			int n = dest.write(buffer);
 			if (n < 0)
 			{
 				transferring = false;
@@ -186,5 +132,36 @@ public class ByteBufferLocation extends AbstractDataLocation
 		}
 		transferring = false;
 		return count;
+	}
+
+	/**
+	 * Get the byte buffer that backs this location.
+	 * @return the backing byte buffer. 
+	 */
+	public ByteBuffer buffer()
+	{
+		return buffer;
+	}
+
+	/**
+	 * Get an input stream for this location.
+	 * @return an <code>InputStream</code> instance.
+	 * @throws Exception if an I/O error occurs.
+	 * @see org.jppf.io.DataLocation#getInputStream()
+	 */
+	public InputStream getInputStream() throws Exception
+	{
+		return new ByteBufferInputStream(buffer, true);
+	}
+
+	/**
+	 * Get an output stream for this location.
+	 * @return an <code>OutputStream</code> instance.
+	 * @throws Exception if an I/O error occurs.
+	 * @see org.jppf.io.DataLocation#getOutputStream()
+	 */
+	public OutputStream getOutputStream() throws Exception
+	{
+		return new ByteBufferOutputStream(buffer);
 	}
 }

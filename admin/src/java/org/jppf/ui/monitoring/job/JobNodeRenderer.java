@@ -18,12 +18,14 @@
 
 package org.jppf.ui.monitoring.job;
 
-import java.awt.Component;
+import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.tree.*;
 
+import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.ui.utils.GuiUtils;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * Renderer used to render the tree nodes in the job data panel.
@@ -32,17 +34,25 @@ import org.jppf.ui.utils.GuiUtils;
 public class JobNodeRenderer extends DefaultTreeCellRenderer
 {
 	/**
+	 * Path to the location of the icon files.
+	 */
+	private static final String RESOURCES = "/org/jppf/ui/resources/";
+	/**
 	 * Path to the icon used for a driver.
 	 */
-	private static final String DRIVER_ICON = "/org/jppf/ui/resources/mainframe_icon_32.gif";
+	private static final String DRIVER_ICON = RESOURCES + "mainframe.gif";
+	/**
+	 * Path to the icon used for an inactive driver connection.
+	 */
+	private static final String DRIVER_INACTIVE_ICON = RESOURCES + "mainframe_inactive.gif";
 	/**
 	 * Path to the icon used for a job.
 	 */
-	private static final String JOB_ICON = "/org/jppf/ui/resources/rack_icon_32.gif";
+	private static final String JOB_ICON = RESOURCES + "rack.gif";
 	/**
 	 * Path to the icon used for a node.
 	 */
-	private static final String NODE_ICON = "/org/jppf/ui/resources/buggi_server_icon_32.gif";
+	private static final String NODE_ICON = RESOURCES + "buggi_server.gif";
 
 	/**
    * Configures the renderer based on the passed in components.
@@ -67,10 +77,20 @@ public class JobNodeRenderer extends DefaultTreeCellRenderer
 			{
 				JobData data = (JobData) node.getUserObject();
 				String path = null;
+				Color background = Color.WHITE;
 				switch(data.getType())
 				{
 					case DRIVER:
-						path = DRIVER_ICON;
+						if (JPPFClientConnectionStatus.ACTIVE.equals(data.getClientConnection().getStatus()))
+						{
+							path = DRIVER_ICON;
+							background = Color.GREEN;
+						}
+						else
+						{
+							path = DRIVER_INACTIVE_ICON;
+							background = Color.RED;
+						}
 						break;
 					case JOB:
 						path = JOB_ICON;
@@ -81,6 +101,8 @@ public class JobNodeRenderer extends DefaultTreeCellRenderer
 				}
 				ImageIcon icon = GuiUtils.loadIcon(path);
 				renderer.setIcon(icon);
+				if (JPPFConfiguration.getProperties().getBoolean("jppf.state.highlighting.enabled", true))
+				renderer.setBackgroundNonSelectionColor(background);
 			}
 		}
 		return renderer;

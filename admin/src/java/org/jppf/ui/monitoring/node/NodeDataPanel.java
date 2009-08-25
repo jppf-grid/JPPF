@@ -18,24 +18,27 @@
 
 package org.jppf.ui.monitoring.node;
 
-import java.util.Map;
+import java.awt.Dimension;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.tree.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.management.NodeManagementInfo;
-import org.jppf.ui.monitoring.data.*;
-import org.jppf.ui.monitoring.event.*;
-import org.jppf.ui.options.AbstractOption;
-import org.jppf.ui.treetable.JTreeTable;
-import org.jppf.utils.LocalizationUtils;
+import org.jppf.client.*;
+import org.jppf.client.event.*;
+import org.jppf.management.*;
+import org.jppf.ui.actions.*;
+import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.node.actions.*;
+import org.jppf.ui.options.*;
+import org.jppf.ui.treetable.*;
 
 /**
  * Panel displaying the tree of all driver connections and attached nodes.
  * @author Laurent Cohen
  */
-public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
+public class NodeDataPanel extends AbstractTreeTableOption implements ClientListener
 {
 	/**
 	 * Logger for this class.
@@ -46,45 +49,26 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Base name for localization bundle lookups.
-	 */
-	private static final String BASE = "org.jppf.ui.i18n.NodeDataPage";
-	/**
-	 * A tree table component displaying the driver and nodes information. 
-	 */
-	private JPPFNodeTreeTable treeTable = null;
-	/**
 	 * Contains all the data about the drivers and nodes.
 	 */
-	private transient NodeHandler handler = null;
+	private transient RefreshHandler refreshHandler = null;
 	/**
-	 * The tree table model associated witht he tree table.
+	 * Mapping of connection names to status listener.
 	 */
-	private transient JPPFNodeTreeTableModel model = null;
-	/**
-	 * The root of the tree model.
-	 */
-	private DefaultMutableTreeNode root = null;
+	private Map<String, ConnectionStatusListener> listenerMap = new Hashtable<String, ConnectionStatusListener>();
 
 	/**
 	 * Initialize this panel with the specified information.
 	 */
 	public NodeDataPanel()
 	{
-		this(new NodeHandler());
-	}
-
-	/**
-	 * Initialize this panel with the specified information.
-	 * @param handler contains all the data about the drivers and nodes.
-	 */
-	public NodeDataPanel(NodeHandler handler)
-	{
+		BASE = "org.jppf.ui.i18n.NodeDataPage";
 		if (debugEnabled) log.debug("initializing NodeDataPanel");
-		this.handler = handler;
 		createTreeTableModel();
+		populateTreeTableModel();
+		refreshNodeStates();
 		createUI();
-	  handler.addNodeHandlerListener(this);
+		refreshHandler = new RefreshHandler(this);
 	}
 
 	/**
@@ -92,8 +76,8 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	private void createTreeTableModel()
 	{
-		root = new DefaultMutableTreeNode(localize("tree.root.name"));
-		model = new JPPFNodeTreeTableModel(root);
+		treeTableRoot = new DefaultMutableTreeNode(localize("tree.root.name"));
+		model = new JPPFNodeTreeTableModel(treeTableRoot);
 	}
 
 	/**
@@ -101,18 +85,9 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	private void populateTreeTableModel()
 	{
-		Map<String, NodeInfoManager> nodeManagerMap = handler.getNodeManagerMap();
-		for (Map.Entry<String, NodeInfoManager> mgrEntry: nodeManagerMap.entrySet())
-		{
-			DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(mgrEntry.getKey());
-			model.insertNodeInto(driverNode, root, root.getChildCount());
-			Map<NodeManagementInfo, NodeInfoHolder> driverNodeMap = mgrEntry.getValue().getNodeMap();
-			for (Map.Entry<NodeManagementInfo, NodeInfoHolder> infoEntry: driverNodeMap.entrySet())
-			{
-				DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(infoEntry.getValue());
-				model.insertNodeInto(nodeNode, driverNode, driverNode.getChildCount());
-			}
-		}
+		JPPFClient client = StatsHandler.getInstance().getJppfClient(null);
+		List<JPPFClientConnection> allConnections = client.getAllConnections();
+		for (JPPFClientConnection c: allConnections) driverAdded(c);
 	}
 
 	/**
@@ -120,12 +95,11 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 */
 	public void createUI()
 	{
-	  treeTable = new JPPFNodeTreeTable(model);
+	  treeTable = new JPPFTreeTable(model);
 	  treeTable.getTree().setRootVisible(false);
 	  treeTable.getTree().setShowsRootHandles(true);
 	  populateTreeTableModel();
 		treeTable.expandAll();
-		treeTable.addMouseListener(new NodeTreeTableMouseListener());
 		treeTable.getColumnModel().getColumn(0).setPreferredWidth(300);
 		treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 		treeTable.doLayout();
@@ -133,80 +107,106 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 		treeTable.getTree().setCellRenderer(new NodeRenderer());
 		JScrollPane sp = new JScrollPane(treeTable);
 		setUIComponent(sp);
+		setupActions();
 	}
 
 	/**
 	 * Called when the state information of a node has changed.
-	 * @param event the event that encapsulates the node information.
-	 * @see org.jppf.ui.monitoring.event.NodeHandlerListener#nodeDataUpdated(org.jppf.ui.monitoring.event.NodeHandlerEvent)
+	 * @param driverName - the name of the driver to which the node is attached.
+	 * @param nodeName - the name of the node to update.
 	 */
-	public void nodeDataUpdated(NodeHandlerEvent event)
+	public synchronized void nodeDataUpdated(String driverName, String nodeName)
 	{
-		final DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-		final DefaultMutableTreeNode driverNode = findDriver(event.getDriverName());
+		final DefaultMutableTreeNode driverNode = findDriver(driverName);
 		if (driverNode == null) return;
-		final DefaultMutableTreeNode node = findNode(driverNode, event.getInfoHolder());
-		if (node == null) return;
-		treeTable.repaint();
+		final DefaultMutableTreeNode node = findNode(driverNode, nodeName);
+		if (node != null) model.changeNode(node);
 	}
 
 	/**
 	 * Called to notify that a driver was added.
-	 * @param event the object that encapsulates the driver addition.
-	 * @see org.jppf.ui.monitoring.event.NodeHandlerListener#driverAdded(org.jppf.ui.monitoring.event.NodeHandlerEvent)
+	 * @param connection - a reference to the driver connection.
 	 */
-	public void driverAdded(NodeHandlerEvent event)
+	public synchronized void driverAdded(final JPPFClientConnection connection)
 	{
-		final DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-		final DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(event.getDriverName());
-		if (debugEnabled) log.debug("adding driver: " + event.getDriverName());
-		model.insertNodeInto(driverNode, root, root.getChildCount());
-		if (root.getChildCount() == 1) expandAndResizeColumns();
+		JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) connection).getJmxConnection();
+		String driverName = wrapper.getId();
+		if (findDriver(driverName) != null) return;
+		TopologyData driverData = new TopologyData(connection);
+		DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driverData);
+		model.insertNodeInto(driverNode, treeTableRoot, treeTableRoot.getChildCount());
+		if (listenerMap.get(wrapper.getId()) == null)
+		{
+			ConnectionStatusListener listener = new ConnectionStatusListener(wrapper.getId());
+			connection.addClientConnectionStatusListener(listener);
+			listenerMap.put(wrapper.getId(), listener);
+		}
+		Collection<NodeManagementInfo> nodes = null;
+		try
+		{
+			nodes = wrapper.nodesInformation();
+		}
+		catch(Exception e)
+		{
+			if (debugEnabled) log.debug(e.getMessage(), e);
+			return;
+		}
+		if (nodes != null) for (NodeManagementInfo nodeInfo: nodes) nodeAdded(driverNode, nodeInfo);
 	}
 
 	/**
 	 * Called to notify that a driver was removed.
-	 * @param event the object that encapsulates the driver removal.
+	 * @param driverName - the name of the driver to remove.
 	 * @see org.jppf.ui.monitoring.event.NodeHandlerListener#driverRemoved(org.jppf.ui.monitoring.event.NodeHandlerEvent)
 	 */
-	public void driverRemoved(NodeHandlerEvent event)
+	public synchronized void driverRemoved(String driverName)
 	{
-		final DefaultMutableTreeNode driverNode = findDriver(event.getDriverName());
-		if (debugEnabled) log.debug("removing driver: " + event.getDriverName());
+		final DefaultMutableTreeNode driverNode = findDriver(driverName);
+		if (debugEnabled) log.debug("removing driver: " + driverName);
 		if (driverNode != null) model.removeNodeFromParent(driverNode);
 	}
 
 	/**
 	 * Called to notify that a node was added to a driver.
-	 * @param event the object that encapsulates the node addition.
+	 * @param driverName - the name of the driver to which the node is added.
+	 * @param nodeInfo - the object that encapsulates the node addition.
 	 * @see org.jppf.ui.monitoring.event.NodeHandlerListener#nodeAdded(org.jppf.ui.monitoring.event.NodeHandlerEvent)
 	 */
-	public void nodeAdded(NodeHandlerEvent event)
+	public synchronized void nodeAdded(String driverName, NodeManagementInfo nodeInfo)
 	{
-		final DefaultMutableTreeNode driverNode = findDriver(event.getDriverName());
+		final DefaultMutableTreeNode driverNode = findDriver(driverName);
 		if (driverNode == null) return;
-		final DefaultMutableTreeNode node = new DefaultMutableTreeNode(event.getInfoHolder());
-		if (debugEnabled) log.debug("adding node: " + event.getInfoHolder());
-		model.insertNodeInto(node, driverNode, driverNode.getChildCount());
-		final DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-		if (root.getChildCount() == 1) expandAndResizeColumns();
+		nodeAdded(driverNode, nodeInfo);
+	}
+
+	/**
+	 * Called to notify that a node was added to a driver.
+	 * @param driverNode - the driver to which the node is added.
+	 * @param nodeInfo - the object that encapsulates the node addition.
+	 * @see org.jppf.ui.monitoring.event.NodeHandlerListener#nodeAdded(org.jppf.ui.monitoring.event.NodeHandlerEvent)
+	 */
+	public synchronized void nodeAdded(DefaultMutableTreeNode driverNode, NodeManagementInfo nodeInfo)
+	{
+		String nodeName = nodeInfo.getHost() + ":" + nodeInfo.getPort();
+		if (findNode(driverNode, nodeName) != null) return;
+		TopologyData nodeData = new TopologyData(nodeInfo);
+		DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(nodeData);
+		model.insertNodeInto(nodeNode, driverNode, driverNode.getChildCount());
 	}
 
 	/**
 	 * Called to notify that a node was removed from a driver.
-	 * @param event the object that encapsulates the node removal.
-	 * @see org.jppf.ui.monitoring.event.NodeHandlerListener#nodeRemoved(org.jppf.ui.monitoring.event.NodeHandlerEvent)
+	 * @param driverName - the name of the driver from which the node is removed.
+	 * @param nodeName - the name of the node to remove.
 	 */
-	public void nodeRemoved(NodeHandlerEvent event)
+	public synchronized void nodeRemoved(String driverName, String nodeName)
 	{
-		DefaultMutableTreeNode driverNode = findDriver(event.getDriverName());
+		DefaultMutableTreeNode driverNode = findDriver(driverName);
 		if (driverNode == null) return;
-		final DefaultMutableTreeNode node = findNode(driverNode, event.getInfoHolder());
-		if (node != null)
-		{
-			if (debugEnabled) log.debug("removing node: " + event.getInfoHolder());
-			model.removeNodeFromParent(node);
-		}
+		final DefaultMutableTreeNode node = findNode(driverNode, nodeName);
+		if (node == null) return;
+		if (debugEnabled) log.debug("removing node: " + nodeName);
+		model.removeNodeFromParent(node);
 	}
 
 	/**
@@ -214,13 +214,13 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 * @param driverName name of the dirver to find.
 	 * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
 	 */
-	private DefaultMutableTreeNode findDriver(String driverName)
+	public synchronized DefaultMutableTreeNode findDriver(String driverName)
 	{
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-		for (int i=0; i<root.getChildCount(); i++)
+		for (int i=0; i<treeTableRoot.getChildCount(); i++)
 		{
-			DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) root.getChildAt(i);
-			String name = (String) driverNode.getUserObject();
+			DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
+			TopologyData data = (TopologyData) driverNode.getUserObject();
+			String name = data.getJmxWrapper().getId();
 			if (name.equals(driverName)) return driverNode;
 		}
 		return null;
@@ -228,84 +228,19 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 
 	/**
 	 * Find the node tree node with the specified driver name and node information.
-	 * @param driverNode name the parent of the node to find.
-	 * @param info the information on the node to find.
+	 * @param driverNode - name the parent of the node to find.
+	 * @param nodeName - the name of the node to find.
 	 * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
 	 */
-	private DefaultMutableTreeNode findNode(DefaultMutableTreeNode driverNode, NodeInfoHolder info)
+	public synchronized DefaultMutableTreeNode findNode(DefaultMutableTreeNode driverNode, String nodeName)
 	{
 		for (int i=0; i<driverNode.getChildCount(); i++)
 		{
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
-			NodeInfoHolder nodeInfoHolder = (NodeInfoHolder) node.getUserObject();
-			if (nodeInfoHolder.equals(info)) return node;
+			TopologyData nodeData = (TopologyData) node.getUserObject();
+			if (nodeName.equals(nodeData.getJmxWrapper().getId())) return node;
 		}
 		return null;
-	}
-
-	/**
-	 * Get a localized message given its unique name and the current locale.
-	 * @param message the unique name of the localized message.
-	 * @return a message in the current locale, or the default locale 
-	 * if the localization for the current locale is not found. 
-	 */
-	private String localize(String message)
-	{
-		return LocalizationUtils.getLocalized(BASE, message);
-	}
-
-	/**
-	 * Get the container for all the data about the drivers and nodes.
-	 * @return a NodeHandler instance.
-	 */
-	public synchronized NodeHandler getHandler()
-	{
-		return handler;
-	}
-
-	/**
-	 * Get the tree table component displaying the driver and nodes information. 
-	 * @return a <code>JXTreeTable</code> instance.
-	 */
-	public synchronized JTreeTable getTreeTable()
-	{
-		return treeTable;
-	}
-
-	/**
-	 * Not implemented.
-	 * @param enabled not used.
-	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
-	 */
-	public void setEnabled(boolean enabled)
-	{
-	}
-
-	/**
-	 * Not implemented.
-	 * @param enabled not used.
-	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
-	 */
-	public void setEventsEnabled(boolean enabled)
-	{
-	}
-
-	/**
-	 * Not implemented.
-	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
-	 */
-	protected void setupValueChangeNotifications()
-	{
-	}
-
-	/**
-	 * Create, initialize and layout the GUI components displayed in this panel.
-	 */
-	private void expandAndResizeColumns()
-	{
-		treeTable.expandAll();
-		treeTable.sizeColumnsToFit(0);
-	  //for (int i=0; i<model.getColumnCount(); i++) treeTable.sizeColumnsToFit(i);
 	}
 
 	/**
@@ -331,7 +266,7 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 	 * @param checkNodes true to check if nodes only are selected, false to check if drivers only are selected.
 	 * @return true if at least one element of the specified type and no element of another type is selected, false otherwise. 
 	 */
-	private boolean areOnlyTypeSelected(boolean checkNodes)
+	private synchronized boolean areOnlyTypeSelected(boolean checkNodes)
 	{
 		int[] rows = treeTable.getSelectedRows();
 		if ((rows == null) || (rows.length <= 0)) return false;
@@ -342,9 +277,152 @@ public class NodeDataPanel extends AbstractOption implements NodeHandlerListener
 			TreePath path = treeTable.getPathForRow(n);
 			DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) path.getLastPathComponent();
 			if (treeNode.getParent() == null) continue;
-			if (treeNode.getUserObject() instanceof NodeInfoHolder) nbNodes++;
+			TopologyData data = (TopologyData) treeNode.getUserObject();
+			if (TopologyDataType.NODE.equals(data.getType())) nbNodes++;
 			else nbDrivers++;
 		}
 		return (checkNodes && (nbNodes > 0) && (nbDrivers == 0)) || (!checkNodes && (nbNodes == 0) && (nbDrivers > 0));
+	}
+
+	/**
+	 * Get a mapping of driver names to their corresponding connection.
+	 * @return a map of string to <code>JPPFClientConnection</code> instances.
+	 */
+	public synchronized Map<String, JPPFClientConnection> getAllDriverNames()
+	{
+		Map<String, JPPFClientConnection> map = new HashMap<String, JPPFClientConnection>();
+		for (int i=0; i<treeTableRoot.getChildCount(); i++)
+		{
+			DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
+			TopologyData data = (TopologyData) driverNode.getUserObject();
+			map.put(data.getJmxWrapper().getId(), data.getClientConnection());
+		}
+		return map;
+	}
+
+	/**
+	 * Refresh the states of all displayed nodes.
+	 */
+	public synchronized void refreshNodeStates()
+	{
+		for (int i=0; i<treeTableRoot.getChildCount(); i++)
+		{
+			DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
+			for (int j=0; j<driverNode.getChildCount(); j++)
+			{
+				DefaultMutableTreeNode nodeNode = (DefaultMutableTreeNode) driverNode.getChildAt(j);
+				TopologyData data = (TopologyData) nodeNode.getUserObject();
+				data.refreshNodeState();
+				//model.changeNode(nodeNode);
+			}
+		}
+	}
+
+	/**
+	 * Initialize all actions used in the panel.
+	 */
+	public void setupActions()
+	{
+		actionHandler = new JTreeTableActionHandler(treeTable);
+		actionHandler.putAction("update.configuration", new NodeConfigurationAction());
+		actionHandler.putAction("show.information", new NodeInformationAction());
+		actionHandler.putAction("update.threads", new NodeThreadsAction());
+		actionHandler.putAction("reset.counter", new ResetTaskCounterAction());
+		actionHandler.putAction("restart.node", new RestartNodeAction());
+		actionHandler.putAction("shutdown.node", new ShutdownNodeAction());
+		actionHandler.updateActions();
+		treeTable.addMouseListener(new NodeTreeTableMouseListener(actionHandler));
+		Runnable r = new ActionsInitializer();
+		new Thread(r).start();
+	}
+
+	/**
+	 * Notifiy this listener that a new driver connection was created.
+	 * @param event - the event to notify this listener of.
+	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
+	 */
+	public synchronized void newConnection(ClientEvent event)
+	{
+		driverAdded(event.getConnection());
+	}
+
+	/**
+	 * Task that sets the actions in the toolbar.
+	 */
+	public class ActionsInitializer implements Runnable
+	{
+		/**
+		 * Execute this task.
+		 * @see java.lang.Runnable#run()
+		 */
+		public void run()
+		{
+			OptionsPage page = null;
+			while (page == null)
+			{
+				OptionElement parent = getParent();
+				if (parent != null) page = (OptionsPage) NodeDataPanel.this.findFirstWithName("/topology.toolbar");
+				if (page == null)
+				{
+					try
+					{
+						Thread.sleep(100);
+					}
+					catch(InterruptedException e)
+					{
+					}
+				}
+				else
+				{
+					for (OptionElement elt: page.getChildren())
+					{
+						JButton button = (JButton) elt.getUIComponent();
+						UpdatableAction action = actionHandler.getAction(elt.getName());
+						button.setAction(action);
+						button.setText("");
+						button.setToolTipText((String) action.getValue(Action.NAME));
+						button.setPreferredSize(new Dimension(16,16));
+						//button.repaint();
+					}
+					page.getUIComponent().invalidate();
+					page.getUIComponent().repaint();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Listens to JPPF client connection status changes for rendering purposes.
+	 */
+	public class ConnectionStatusListener implements ClientConnectionStatusListener
+	{
+		/**
+		 * The name of the connection.
+		 */
+		String driverName = null;
+
+		/**
+		 * Initialize this listener with the specified connection name.
+		 * @param driverName - the name of the connection.
+		 */
+		public ConnectionStatusListener(String driverName)
+		{
+			this.driverName = driverName;
+		}
+
+		/**
+		 * Invoked when thew conneciton status has changed.
+		 * @param event - the connection status event.
+		 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+		 */
+		public void statusChanged(ClientConnectionStatusEvent event)
+		{
+			DefaultMutableTreeNode driverNode = findDriver(driverName);
+			if (driverNode != null)
+			{
+				//model.changeNode(driverNode);
+				if (!JPPFClientConnectionStatus.ACTIVE.equals(event.getClientConnectionStatusHandler().getStatus())) driverRemoved(driverName);
+			}
+		}
 	}
 }

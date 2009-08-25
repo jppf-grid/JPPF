@@ -21,7 +21,7 @@ package org.jppf.ui.monitoring.node.actions;
 import javax.swing.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.ui.monitoring.data.NodeInfoHolder;
+import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.ui.utils.GuiUtils;
 
 /**
@@ -41,15 +41,15 @@ public abstract class JPPFAbstractNodeAction extends AbstractAction
 	/**
 	 * JMX connections this action applies to.
 	 */
-	protected NodeInfoHolder[] nodeInfoHolders = null;
+	protected TopologyData[] dataArray = null;
 
 	/**
 	 * Initialize this action with the specified JMX connections.
-	 * @param nodeInfoHolders the JMX connections this action applies to.
+	 * @param dataArray - the information on the nodes this action applies to.
 	 */
-	protected JPPFAbstractNodeAction(NodeInfoHolder...nodeInfoHolders)
+	protected JPPFAbstractNodeAction(TopologyData...dataArray)
 	{
-		this.nodeInfoHolders = nodeInfoHolders;
+		this.dataArray = dataArray;
 	}
 
 	/**

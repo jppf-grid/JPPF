@@ -15,21 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.ui.monitoring;
 
-import org.jvnet.substance.theme.SubstanceTheme;
+package org.jppf.ui.monitoring.job;
+
+import org.jppf.ui.actions.JTreeTableActionHandler;
+import org.jppf.ui.treetable.JTreeTable;
 
 /**
- * JPPF Theme for Substance L&F.
+ * 
  * @author Laurent Cohen
  */
-public class JPPFTheme extends SubstanceTheme
+public class JobDataPanelActionManager extends JTreeTableActionHandler
 {
 	/**
-	 * Default initialization.
+	 * Initialize this action manager with the specified JTreeTable component.
+	 * @param treeTable - the JTreeTable whose actions are managed.
 	 */
-	public JPPFTheme()
+	public JobDataPanelActionManager(JTreeTable treeTable)
 	{
-		super(new JPPFColorScheme(), "JPPF", ThemeKind.COLD);
+		super(treeTable);
 	}
 }

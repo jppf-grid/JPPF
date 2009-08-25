@@ -28,8 +28,9 @@ import javax.swing.tree.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.management.JMXNodeConnectionWrapper;
-import org.jppf.ui.monitoring.data.NodeInfoHolder;
+import org.jppf.ui.actions.JTreeTableActionHandler;
 import org.jppf.ui.monitoring.node.actions.*;
+import org.jppf.ui.treetable.JPPFTreeTable;
 import org.jppf.ui.utils.GuiUtils;
 
 /**
@@ -56,13 +57,22 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 	 */
 	private static final String RESTART_ICON = "/org/jppf/ui/resources/restart.gif";
 	/**
-	 * List of current node info holders.
-	 */
-	private List<NodeInfoHolder> infoHolderList = null;
-	/**
 	 * Array of current corresponding jmx connections.
 	 */
-	private NodeInfoHolder[] infoHolders = null;
+	private TopologyData[] data = null;
+	/**
+	 * The object that handles tollbar and menu actions.
+	 */
+	private JTreeTableActionHandler actionHandler = null;
+
+	/**
+	 * Initialize this mouse listener.
+	 * @param actionHandler - the object that handles tollbar and menu actions.
+	 */
+	public NodeTreeTableMouseListener(JTreeTableActionHandler actionHandler)
+	{
+		this.actionHandler = actionHandler;
+	}
 
 	/**
 	 * Processes right-click events to display popup menus.
@@ -72,12 +82,12 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 	public void mousePressed(MouseEvent event)
 	{
 		Component comp = event.getComponent();
-		if (!(comp instanceof JPPFNodeTreeTable)) return;
-		JPPFNodeTreeTable treeTable = (JPPFNodeTreeTable) comp;
+		if (!(comp instanceof JPPFTreeTable)) return;
+		JPPFTreeTable treeTable = (JPPFTreeTable) comp;
 		JTree tree = treeTable.getTree();
 		int x = event.getX();
 		int y = event.getY();
-		List<NodeInfoHolder> infoHolderList = new ArrayList<NodeInfoHolder>();
+		List<TopologyData> dataList = new ArrayList<TopologyData>();
 		//int[] rows = tree.getSelectionRows();
 		int[] rows = treeTable.getSelectedRows();
 		if ((rows == null) || (rows.length == 0))
@@ -90,10 +100,11 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 		{
 			TreePath path = tree.getPathForRow(row);
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-			if (!(node.getUserObject() instanceof NodeInfoHolder)) continue;
-			infoHolderList.add((NodeInfoHolder) node.getUserObject());
+			if (!(node.getUserObject() instanceof TopologyData)) continue;
+			TopologyData td = (TopologyData) node.getUserObject();
+			if (TopologyDataType.NODE.equals(td.getType())) dataList.add((TopologyData) node.getUserObject());
 		}
-		infoHolders = infoHolderList.toArray(new NodeInfoHolder[0]);
+		data = dataList.toArray(new TopologyData[0]);
 		
 		int button = event.getButton();
 		if (button == MouseEvent.BUTTON3)
@@ -111,27 +122,28 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 	private JPopupMenu createPopupMenu(MouseEvent event)
 	{
 		JPopupMenu menu = new JPopupMenu();
-		menu.add(new JMenuItem(new NodeInformationAction(infoHolders)));
+		menu.add(new JMenuItem(actionHandler.getAction("show.information")));
 		Component comp = event.getComponent();
 		Point p = comp.getLocationOnScreen();
-		menu.add(new JMenuItem(new NodeConfigurationAction(new Point(p.x + event.getX(), p.y + event.getY()), infoHolders)));
-		menu.add(new JMenuItem(new NodeThreadsAction(new Point(p.x + event.getX(), p.y + event.getY()), infoHolders)));
-		boolean singleSelection = infoHolders.length == 1;
+		menu.add(new JMenuItem(actionHandler.getAction("update.configuration")));
+		menu.add(new JMenuItem(actionHandler.getAction("update.threads")));
+		boolean singleSelection = data.length == 1;
 		JMenu cancel = new JMenu("Cancel task");
 		cancel.setIcon(GuiUtils.loadIcon(CANCEL_ICON));
 		JMenu restart = new JMenu("Restart task");
 		restart.setIcon(GuiUtils.loadIcon(RESTART_ICON));
 		if (singleSelection)
 		{
-			JMXNodeConnectionWrapper connection = infoHolders[0].getJmxClient();
-			Set<String> idSet = infoHolders[0].getState().getAllTaskIds();
+			//if (TopologyDataType.
+			JMXNodeConnectionWrapper connection = (JMXNodeConnectionWrapper) data[0].getJmxWrapper();
+			Set<String> idSet = data[0].getNodeState().getAllTaskIds();
 			log.info("set of ids: " + idSet);
 			if (!idSet.isEmpty())
 			{
 				for (String id: idSet)
 				{
-					cancel.add(new JMenuItem(new CancelTaskAction(id, infoHolders[0])));
-					restart.add(new JMenuItem(new RestartTaskAction(id, infoHolders[0])));
+					cancel.add(new JMenuItem(new CancelTaskAction(id, data[0])));
+					restart.add(new JMenuItem(new RestartTaskAction(id, data[0])));
 				}
 			}
 		}
@@ -142,9 +154,9 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 		}
 		menu.add(cancel);
 		menu.add(restart);
-		menu.add(new JMenuItem(new RestartNodeAction(infoHolders)));
-		menu.add(new JMenuItem(new ShutdownNodeAction(infoHolders)));
-		menu.add(new JMenuItem(new ResetTaskCounterAction(infoHolders)));
+		menu.add(new JMenuItem(actionHandler.getAction("restart.node")));
+		menu.add(new JMenuItem(actionHandler.getAction("shutdown.node")));
+		menu.add(new JMenuItem(actionHandler.getAction("reset.counter")));
 		return menu;
 	}
 }

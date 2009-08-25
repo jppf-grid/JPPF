@@ -19,7 +19,8 @@ package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.ActionEvent;
 
-import org.jppf.ui.monitoring.data.NodeInfoHolder;
+import org.jppf.management.JMXNodeConnectionWrapper;
+import org.jppf.ui.monitoring.node.TopologyData;
 
 /**
  * Attempts to restart a task that is currently running on a node.
@@ -34,14 +35,14 @@ public class RestartTaskAction extends JPPFAbstractNodeAction
 	/**
 	 * Initialize this action.
 	 * @param taskId id of the task to cancel.
-	 * @param nodeInfoHolders the jmx client used to update the thread pool size.
+	 * @param dataArray - the information on the nodes this action applies to.
 	 */
-	public RestartTaskAction(String taskId, NodeInfoHolder...nodeInfoHolders)
+	public RestartTaskAction(String taskId, TopologyData...dataArray)
 	{
-		super(nodeInfoHolders);
+		super(dataArray);
 		setupIcon("/org/jppf/ui/resources/restart.gif");
 		putValue(NAME, "Task id " + taskId);
-		if (nodeInfoHolders.length > 1) setEnabled(false);
+		if (dataArray.length > 1) setEnabled(false);
 	}
 
 	/**
@@ -59,7 +60,7 @@ public class RestartTaskAction extends JPPFAbstractNodeAction
 				{
 					try
 					{
-						nodeInfoHolders[0].getJmxClient().restartTask(taskId);
+						((JMXNodeConnectionWrapper) dataArray[0].getJmxWrapper()).restartTask(taskId);
 					}
 					catch(Exception e)
 					{

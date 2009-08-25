@@ -18,7 +18,6 @@
 
 package org.jppf.io;
 
-import java.nio.channels.*;
 
 /**
  * Abstract implementation of the <code>DataLocation</code> interface.>br>
@@ -31,7 +30,8 @@ public abstract class AbstractDataLocation implements DataLocation
 	/**
 	 * The capacity of the underlying buffer.
 	 */
-	protected int size = 0;
+	protected int size = UNKNOWN_SIZE;
+
 	/**
 	 * Determines whether a transfer has been started.
 	 */
@@ -48,28 +48,11 @@ public abstract class AbstractDataLocation implements DataLocation
 	}
 
 	/**
-	 * Transfer the content of this data location from the specified channel.
-	 * @param source the channel to transfer to.
-	 * @param blocking if true, the method will block until the entire content has been transferred.
-	 * @return the number of bytes actually transferred. 
-	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.io.DataLocation#transferFrom(java.nio.channels.ReadableByteChannel, boolean)
+	 * Set the size of the data referenced by this data location.
+	 * @param size - the data size as an int.
 	 */
-	public int transferFrom(ReadableByteChannel source, boolean blocking) throws Exception
+	public void setSize(int size)
 	{
-		return transferFrom(new ChannelInputSource(source), blocking);
-	}
-
-	/**
-	 * Transfer the content of this data location to the specified channel.
-	 * @param dest the channel to transfer to.
-	 * @param blocking if true, the method will block until the entire content has been transferred. 
-	 * @return the number of bytes actually transferred. 
-	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.io.DataLocation#transferTo(java.nio.channels.WritableByteChannel, boolean)
-	 */
-	public int transferTo(WritableByteChannel dest, boolean blocking) throws Exception
-	{
-		return transferTo(new ChannelOutputDestination(dest), blocking);
+		this.size = size;
 	}
 }

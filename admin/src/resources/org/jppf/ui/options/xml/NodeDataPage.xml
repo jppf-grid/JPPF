@@ -26,9 +26,22 @@
 	<!--                        Buttons area                                   -->
 	<!-- ===================================================================== -->
 
+	<child name="topology.toolbar" type="Toolbar">
+		<property name="componentConstraints" value="gap rel"/>
+		<property name="layoutConstraints" value="insets 2"/>
+
+		<child name="update.configuration" type="Button"/>
+		<child name="show.information" type="Button"/>
+		<child name="update.threads" type="Button"/>
+		<child name="reset.counter" type="Button"/>
+		<child name="restart.node" type="Button"/>
+		<child name="shutdown.node" type="Button"/>
+
+	</child>
+	
 	<child name="Actions" type="page">
 		<property name="label" value="Actions"/>
-		<property name="componentConstraints" value="gap rel, cell 0 0"/>
+		<property name="componentConstraints" value="gap rel"/>
 	
 		<child name="TreeStructureActions" type="page">
 			<property name="label" value="Tree Structure Actions"/>
@@ -39,6 +52,7 @@
 				<property name="tooltip" value="Toggles between automatic and manual refresh of the tree structure"/>
 				<property name="value" value="true"/>
 				<property name="persistent" value="true"/>
+				<!--
 				<listener type="script">
 					<script language="groovy"><![CDATA[
 						def b = option.getValue().booleanValue();
@@ -47,15 +61,18 @@
 						else handler.stopRefreshDriverTimer();
 					]]></script>
 				</listener>
+				-->
 			</child>
 	
 			<child name="RefreshButtonPanel" type="page">
 				<property name="label" value="RefreshButtonPanel"/>
 		
 				<child name="button.refresh" type="Button">
+					<!--
 					<listener type="script">
 						<script language="groovy">option.findFirstWithName("/Treetable").getHandler().refresh(true)</script>
 					</listener>
+					-->
 				</child>
 		
 				<child name="filler" type="Filler">
@@ -93,7 +110,7 @@
 
 	<child name="treeTableContainer" type="page">
 		<property name="layoutConstraints" value="fill, nogrid"/>
-		<property name="componentConstraints" value="grow, span, push, cell 0 1, width 0"/>
+		<property name="componentConstraints" value="grow, span, push, width 0"/>
 	
 		<child name="Treetable" type="NodeDataPanel">
 			<property name="componentConstraints" value="grow, width 0"/>
