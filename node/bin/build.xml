@@ -131,7 +131,7 @@ USA
   <!-- Create screensaver distribution -->
   <target name="dist" depends="compile">
 		<mkdir dir="${build}/jar" />
-  	<unjar src="${JPPF.dir}/lib/log4j/log4j-1.2.9.jar" dest="${build}/share"/>
+  	<unjar src="${JPPF.dir}/lib/log4j/log4j-1.2.15.jar" dest="${build}/share"/>
   	<unjar src="${JPPF.dir}/lib/ApacheCommons/commons-logging-1.1.jar" dest="${build}/share"/>
 		<jar destfile="${build}/jar/${screensaver}.jar">
 			<fileset dir="${build}/share" />
