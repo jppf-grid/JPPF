@@ -72,21 +72,21 @@ public final class BufferPool
 		ByteBuffer result = null;
 		while (result == null)
 		{
-			if (bufferPool.isEmpty())
+			synchronized(bufferPool)
 			{
-				result = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
-			}
-			else
-			{
-				BufferReference ref = null;
-				synchronized(bufferPool)
+				if (bufferPool.isEmpty())
 				{
+					result = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
+				}
+				else
+				{
+					BufferReference ref = null;
 					ref = bufferPool.remove();
 					nbBuffersInPool.decrementAndGet();
+					ref.setRemovedFromPool(true);
+					result = ref.get();
+					if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
 				}
-				ref.setRemovedFromPool(true);
-				result = ref.get();
-				if (debugEnabled) log.debug("buffers in pool: " + nbBuffersInPool);
 			}
 		}
 		return result;
