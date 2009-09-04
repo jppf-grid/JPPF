@@ -84,6 +84,7 @@ public class ShutdownRestartTask extends TimerTask
 					try
 					{
 						log.info("Initiating restart");
+						cancel();
 						System.exit(2);
 					}
 					catch(Exception e)

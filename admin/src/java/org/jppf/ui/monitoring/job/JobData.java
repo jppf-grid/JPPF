@@ -130,6 +130,15 @@ public class JobData
 	}
 
 	/**
+	 * Set the wrapper holding the connection to the JMX server on a driver. 
+	 * @param jmxWrapper a <code>JMXDriverConnectionWrapper</code> instance.
+	 */
+	public void setJmxWrapper(JMXDriverConnectionWrapper jmxWrapper)
+	{
+		this.jmxWrapper = jmxWrapper;
+	}
+
+	/**
 	 * Get the information on the job or sub-job in a JPPF driver or node.
 	 * @return a <code>JobInformation</code> instance,
 	 */

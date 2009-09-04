@@ -112,10 +112,6 @@ public class PeerNodeResultSender extends AbstractResultSender
 		//bundle.setNodeExecutionTime(elapsed);
 
 		JPPFBuffer buf = helper.getSerializer().serialize(bundle);
-		int size = 4 + buf.getLength();
-		for (DataLocation task : bundleWrapper.getTasks()) size += 4 + task.getSize();
-
-		socketClient.writeInt(size);
 		socketClient.sendBytes(buf);
 		for (DataLocation task : bundleWrapper.getTasks())
 		{

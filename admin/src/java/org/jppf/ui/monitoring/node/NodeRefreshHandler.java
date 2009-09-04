@@ -33,12 +33,12 @@ import org.jppf.utils.NetworkUtils;
  * their attached nodes, for management and monitoring purposes. 
  * @author Laurent Cohen
  */
-public class RefreshHandler
+public class NodeRefreshHandler
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(RefreshHandler.class);
+	private static Log log = LogFactory.getLog(NodeRefreshHandler.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
@@ -64,25 +64,24 @@ public class RefreshHandler
 	 * Initialize this node handler.
 	 * @param nodeDataPanel - the panel to refresh.
 	 */
-	public RefreshHandler(NodeDataPanel nodeDataPanel)
+	public NodeRefreshHandler(NodeDataPanel nodeDataPanel)
 	{
 		this.nodeDataPanel = nodeDataPanel;
 		this.jppfClient = StatsHandler.getInstance().getJppfClient(null);
-		initialize(true);
+		initialize();
 	}
 
 	/**
-	 * Initialize the association of driver connections with the corresponding node managers.
-	 * @param triggerEvents specifies whether the listeners should be notified.
+	 * Initialize this node refresh handler.
 	 */
-	private void initialize(boolean triggerEvents)
+	private void initialize()
 	{
 		//refresh();
 		startRefreshTimer();
 	}
 
 	/**
-	 * Refresh the association of driver connections with the corresponding node managers.
+	 * Refresh the tree structure.
 	 */
 	public synchronized void refresh()
 	{
@@ -129,6 +128,7 @@ public class RefreshHandler
 		}
 		TopologyData data = (TopologyData) driverNode.getUserObject();
 		JMXDriverConnectionWrapper wrapper = (JMXDriverConnectionWrapper) data.getJmxWrapper();
+		if (!wrapper.isConnected()) return;
 		Collection<NodeManagementInfo> nodesInfo = null;
 		try
 		{
@@ -171,7 +171,7 @@ public class RefreshHandler
 	 */
 	private synchronized void removeDriver(String driverName)
 	{
-		nodeDataPanel.driverRemoved(driverName);
+		nodeDataPanel.driverRemoved(driverName, false);
 	}
 
 	/**
@@ -193,7 +193,7 @@ public class RefreshHandler
 	{
 		if (refreshTimer != null) return;
 		if (refreshInterval <= 0L) return;
-		refreshTimer = new Timer("JPPF Drivers Update Timer");
+		refreshTimer = new Timer("JPPF Topology Update Timer");
 		TimerTask task = new TimerTask()
 		{
 			public void run()

@@ -44,6 +44,14 @@ public class JobInformation implements Serializable
 	 * The priority of this task bundle.
 	 */
 	private int priority = 0;
+	/**
+	 * Determines whether the job is in suspended state.
+	 */
+	private boolean suspended = false; 
+	/**
+	 * The maximum number of nodes this job can run on.
+	 */
+	private int maxNodes = Integer.MAX_VALUE;
 
 	/**
 	 * Initialize this object.
@@ -58,13 +66,15 @@ public class JobInformation implements Serializable
 	 * @param taskCount - tne number of tasks in thsi job.
 	 * @param initialTaskCount - the initial number of tasks in the job submitted by the JPPF client.
 	 * @param priority - the priority of this job.
+	 * @param suspended - determines whether the job is in suspended state.
 	 */
-	public JobInformation(String jobId, int taskCount, int initialTaskCount, int priority)
+	public JobInformation(String jobId, int taskCount, int initialTaskCount, int priority, boolean suspended)
 	{
 		this.jobId = jobId;
 		this.taskCount = taskCount;
 		this.initialTaskCount = initialTaskCount;
 		this.priority = priority;
+		this.suspended = suspended;
 	}
 
 	/**
@@ -137,5 +147,41 @@ public class JobInformation implements Serializable
 	public void setInitialTaskCount(int initialTaskCount)
 	{
 		this.initialTaskCount = initialTaskCount;
+	}
+
+	/**
+	 * Determine whether the job is in suspended state.
+	 * @return true if the job is suspended, false otherwise.
+	 */
+	public boolean isSuspended()
+	{
+		return suspended;
+	}
+
+	/**
+	 * Specify whether the job is in suspended state.
+	 * @param suspended - true if the job is suspended, false otherwise.
+	 */
+	public void setSuspended(boolean suspended)
+	{
+		this.suspended = suspended;
+	}
+
+	/**
+	 * Get the maximum number of nodes this job can run on.
+	 * @return the number of nodes as an int value.
+	 */
+	public int getMaxNodes()
+	{
+		return maxNodes;
+	}
+
+	/**
+	 * Get the maximum number of nodes this job can run on.
+	 * @param maxNodes - the number of nodes as an int value.
+	 */
+	public void setMaxNodes(int maxNodes)
+	{
+		this.maxNodes = maxNodes;
 	}
 }

@@ -26,6 +26,7 @@ import javax.swing.*;
 
 import org.jppf.ui.options.event.ValueChangeEvent;
 import org.jppf.ui.utils.GuiUtils;
+import org.jppf.utils.LocalizationUtils;
 
 /**
  * Abstract superclass for actions used in toolbars or popup menus.
@@ -34,6 +35,10 @@ import org.jppf.ui.utils.GuiUtils;
 public abstract class AbstractUpdatableAction extends AbstractAction implements UpdatableAction
 {
 	/**
+	 * The base location for internationalized messages. 
+	 */
+	protected String BASE = null;
+	/**
 	 * The list of selected elements.
 	 */
 	protected List<Object> selectedElements = new ArrayList<Object>();
@@ -41,6 +46,24 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 	 * Location at which to display any window or dialog created by this action. 
 	 */
 	protected Point location = new Point(10, 10);
+
+	/**
+	 * Get the location at which to display any window or dialog created by this action. 
+	 * @return a <code>Point</code> instance.
+	 */
+	public Point getLocation()
+	{
+		return location;
+	}
+
+	/**
+	 * Set the location at which to display any window or dialog created by this action. 
+	 * @param location - a <code>Point</code> instance.
+	 */
+	public void setLocation(Point location)
+	{
+		this.location = location;
+	}
 
 	/**
 	 * Update this action's enabled state based on a list of selected elements.
@@ -69,5 +92,16 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 	protected void setupIcon(String name)
 	{
 		if (name != null) putValue(Action.SMALL_ICON, GuiUtils.loadIcon(name));
+	}
+
+	/**
+	 * Get a localized message given its unique name and the current locale.
+	 * @param message the unique name of the localized message.
+	 * @return a message in the current locale, or the default locale 
+	 * if the localization for the current locale is not found. 
+	 */
+	protected String localize(String message)
+	{
+		return LocalizationUtils.getLocalized(BASE, message);
 	}
 }

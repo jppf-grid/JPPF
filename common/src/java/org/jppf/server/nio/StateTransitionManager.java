@@ -73,7 +73,8 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		this.server = server;
 		this.sequential = sequential;
 		this.lock = server.getLock();
-		if (!sequential) executor = Executors.newFixedThreadPool(threadPoolSize(), new JPPFThreadFactory(server.getName()));
+		int n = sequential ? 1 : threadPoolSize();
+		executor = Executors.newFixedThreadPool(n, new JPPFThreadFactory(server.getName()));
 	}
 
 	/**
@@ -139,8 +140,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * @param context the context attached to the channel.
 	 * @param action an action to perform upon registration of the channel.
 	 */
-	public void registerChannel(SocketChannel channel, int ops, NioContext context,
-		ChannelRegistrationAction action)
+	public void registerChannel(SocketChannel channel, int ops, NioContext context,	ChannelRegistrationAction action)
 	{
 		SelectionKey key = null;
 		try

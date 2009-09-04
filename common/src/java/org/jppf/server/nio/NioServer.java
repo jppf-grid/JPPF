@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
@@ -65,7 +66,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	/**
 	 * Flag indicating that this socket server is closed.
 	 */
-	private boolean stopped = false;
+	private AtomicBoolean stopped = new AtomicBoolean(false);
 	/**
 	 * The ports this server is listening to.
 	 */
@@ -199,10 +200,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 				{
 					lock.unlock();
 				}
-				/*
-				transitionManager.performChannelRegistrations();
-				transitionManager.performKeyOpsSettings();
-				*/
 				int n = hasTimeout ? selector.select(selectTimeout) : selector.select();
 				if (n > 0) go(selector.selectedKeys());
 				postSelect();
@@ -369,19 +366,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 		try
 		{
 			selector.close();
-			/*
-			for (SelectionKey connection: selector.keys())
-			{
-				try
-				{
-					connection.channel().close();
-				}
-				catch (IOException e)
-				{
-					log.error(e.getMessage(), e);
-				}
-			}
-			*/
 		}
 		catch (Exception e)
 		{
@@ -421,18 +405,18 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * Set this server in the specified stopped state.
 	 * @param stopped true if this server is stopped, false otherwise.
 	 */
-	protected synchronized void setStopped(boolean stopped)
+	protected void setStopped(boolean stopped)
 	{
-		this.stopped = stopped;
+		this.stopped.set(stopped);
 	}
 
 	/**
 	 * Get the stopped state of this server.
 	 * @return  true if this server is stopped, false otherwise.
 	 */
-	protected synchronized boolean isStopped()
+	protected boolean isStopped()
 	{
-		return stopped;
+		return stopped.get();
 	}
 
 	/**

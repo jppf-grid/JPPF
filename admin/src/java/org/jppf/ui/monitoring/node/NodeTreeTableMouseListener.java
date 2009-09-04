@@ -28,7 +28,7 @@ import javax.swing.tree.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.management.JMXNodeConnectionWrapper;
-import org.jppf.ui.actions.JTreeTableActionHandler;
+import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.treetable.JPPFTreeTable;
 import org.jppf.ui.utils.GuiUtils;
@@ -121,12 +121,14 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 	 */
 	private JPopupMenu createPopupMenu(MouseEvent event)
 	{
-		JPopupMenu menu = new JPopupMenu();
-		menu.add(new JMenuItem(actionHandler.getAction("show.information")));
 		Component comp = event.getComponent();
 		Point p = comp.getLocationOnScreen();
-		menu.add(new JMenuItem(actionHandler.getAction("update.configuration")));
-		menu.add(new JMenuItem(actionHandler.getAction("update.threads")));
+		JPopupMenu menu = new JPopupMenu();
+		menu.add(createMenuItem(actionHandler.getAction("shutdown.restart.driver"), p));
+		menu.addSeparator();
+		menu.add(createMenuItem(actionHandler.getAction("show.information"), p));
+		menu.add(createMenuItem(actionHandler.getAction("update.configuration"), p));
+		menu.add(createMenuItem(actionHandler.getAction("update.threads"), p));
 		boolean singleSelection = data.length == 1;
 		JMenu cancel = new JMenu("Cancel task");
 		cancel.setIcon(GuiUtils.loadIcon(CANCEL_ICON));
@@ -154,9 +156,21 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 		}
 		menu.add(cancel);
 		menu.add(restart);
-		menu.add(new JMenuItem(actionHandler.getAction("restart.node")));
-		menu.add(new JMenuItem(actionHandler.getAction("shutdown.node")));
-		menu.add(new JMenuItem(actionHandler.getAction("reset.counter")));
+		menu.add(createMenuItem(actionHandler.getAction("restart.node"), p));
+		menu.add(createMenuItem(actionHandler.getAction("shutdown.node"), p));
+		menu.add(createMenuItem(actionHandler.getAction("reset.counter"), p));
 		return menu;
+	}
+
+	/**
+	 * Create a menu item.
+	 * @param action - the action associated with the neu item.
+	 * @param location - the location to use for any window create by the action.
+	 * @return a <code>JMenuItem</code> instance.
+	 */
+	private JMenuItem createMenuItem(Action action, Point location)
+	{
+		if (action instanceof AbstractUpdatableAction) ((AbstractUpdatableAction) action).setLocation(location);
+		return new JMenuItem(action);
 	}
 }

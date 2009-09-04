@@ -272,7 +272,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	}
 
 	/**
-	 * Handle a stayus change from either the class server delegate or the task server connection
+	 * Handle a status change from either the class server delegate or the task server connection
 	 * and determine whether it triggers a status change for the client connection.
 	 * @param delegateStatus status of the class server delegate conneciton.
 	 * @param taskConnectionStatus status of the task server connection.

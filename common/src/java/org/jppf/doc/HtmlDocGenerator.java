@@ -86,6 +86,7 @@ public class HtmlDocGenerator
 	 */
 	public void generatePage(String source, String target, String templateFolder) throws Exception
 	{
+		System.out.println("Processing source file " + source);
 		String s = FileUtils.readTextFile(source);
 		s = processTemplates(new HashMap<String, String>(), s, templateFolder);
 		FileUtils.writeTextFile(target, s);
@@ -138,8 +139,7 @@ public class HtmlDocGenerator
 	 * replaced with actual content.
 	 * @throws Exception if an error occurs while parsing the template.
 	 */
-	private String processTemplateCall(String templateCall, Map<String, String> callerMap, String templateFolder)
-		throws Exception
+	private String processTemplateCall(String templateCall, Map<String, String> callerMap, String templateFolder) throws Exception
 	{
 		int pos = TEMPLATE_START.length();
 		int index = pos;
@@ -183,6 +183,7 @@ public class HtmlDocGenerator
 		}
 		if (!templateFolder.endsWith("/")) templateFolder += "/";
 		String templateFile = templateFolder + parameterMap.get("name") + ".html";
+		if (!(new File(templateFile).exists())) throw new Exception("Could not find template file " + templateFile);
 		String content = FileUtils.readTextFile(templateFile);
 		content = processTemplates(parameterMap, content, templateFolder);
 		content = processParameters(parameterMap, content);

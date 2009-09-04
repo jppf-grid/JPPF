@@ -23,7 +23,7 @@
 	<property name="componentConstraints" value=""/>
 
 	<!-- ===================================================================== -->
-	<!--                    Server Chooser Panel                               -->
+	<!--              Threads number and priority panel                        -->
 	<!-- ===================================================================== -->
 	
 	<child name="threadFields" type="page">

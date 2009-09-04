@@ -46,8 +46,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 */
 	public void cancelTask(String id) throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelTask",
-			new Object[] { id }, new String[] { "java.lang.String" }); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelTask",	new Object[] { id }, new String[] { "java.lang.String" }); 
 	}
 
 	/**
@@ -59,8 +58,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 */
 	public void restartTask(String id) throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "restartTask",
-			new Object[] { id }, new String[] { "java.lang.String" }); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "restartTask", new Object[] { id }, new String[] { "java.lang.String" }); 
 	}
 
 	/**
@@ -71,8 +69,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 */
 	public JPPFNodeState state() throws Exception
 	{
-		return (JPPFNodeState) invoke(JPPFAdminMBean.NODE_MBEAN_NAME,
-			"state", (Object[]) null, (String[]) null); 
+		return (JPPFNodeState) invoke(JPPFAdminMBean.NODE_MBEAN_NAME,	"state", (Object[]) null, (String[]) null); 
 	}
 
 	/**
@@ -83,8 +80,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 */
 	public Serializable notification() throws Exception
 	{
-		return (Serializable) invoke(JPPFAdminMBean.NODE_MBEAN_NAME,
-			"notification", (Object[]) null, (String[]) null); 
+		return (Serializable) invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "notification", (Object[]) null, (String[]) null); 
 	}
 
 	/**
@@ -95,8 +91,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 */
 	public void updateThreadPoolSize(Integer size) throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateThreadPoolSize",
-			new Object[] { size }, new String[] { "java.lang.Integer" }); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateThreadPoolSize", new Object[] { size }, new String[] { "java.lang.Integer" }); 
 	}
 
 	/**
@@ -108,8 +103,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 */
 	public JPPFSystemInformation systemInformation() throws Exception
 	{
-		return (JPPFSystemInformation) invoke(JPPFAdminMBean.NODE_MBEAN_NAME,
-			"systemInformation", (Object[]) null, (String[]) null); 
+		return (JPPFSystemInformation) invoke(JPPFAdminMBean.NODE_MBEAN_NAME,	"systemInformation", (Object[]) null, (String[]) null); 
 	}
 
 	/**
@@ -161,8 +155,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 */
 	public void updateThreadsPriority(Integer newPriority) throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateThreadsPriority",
-			new Object[] { newPriority }, new String[] { "java.lang.Integer" }); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateThreadsPriority", new Object[] { newPriority }, new String[] { "java.lang.Integer" }); 
 	}
 
 	/**

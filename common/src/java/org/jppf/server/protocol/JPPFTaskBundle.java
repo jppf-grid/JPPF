@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.*;
 
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.security.JPPFSecurityContext;
 import org.jppf.utils.*;
 
 /**
@@ -101,10 +100,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 */
 	private int buildNumber = 0;
 	/**
-	 * Security credentials associated with the sender of this bundle.
-	 */
-	private JPPFSecurityContext credentials = null;
-	/**
 	 * The state of this bundle, to indicate whether it is used for handshake with
 	 * the server or for transporting tasks to execute.
 	 */
@@ -117,6 +112,10 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 * The execution policy for this bundle, which determines on which nodes the tasks can be run.
 	 */
 	private ExecutionPolicy executionPolicy = null;
+	/**
+	 * Determines whether the job is in suspended state.
+	 */
+	private boolean suspended = false; 
 
 	/**
 	 * Initialize this task bundle and set its build number.
@@ -349,27 +348,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 		bundle.getParametersMap().putAll(parameters);
 		bundle.setQueueEntryTime(queueEntryTime);
 		bundle.setCompletionListener(completionListener);
-		bundle.setCredentials(credentials);
 
 		return bundle;
-	}
-
-	/**
-	 * Get the security credentials associated with the sender of this bundle.
-	 * @return a <code>JPPFCredential</code> instance.
-	 */
-	public JPPFSecurityContext getCredentials()
-	{
-		return credentials;
-	}
-
-	/**
-	 * Set the security credentials associated with the sender of this bundle.
-	 * @param credentials a <code>JPPFCredential</code> instance.
-	 */
-	public void setCredentials(JPPFSecurityContext credentials)
-	{
-		this.credentials = credentials;
 	}
 
 	/**
@@ -462,5 +442,23 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	public synchronized void setExecutionPolicy(ExecutionPolicy executionPolicy)
 	{
 		this.executionPolicy = executionPolicy;
+	}
+
+	/**
+	 * Determine whether the job is in suspended state.
+	 * @return true if the job is suspended, false otherwise.
+	 */
+	public boolean isSuspended()
+	{
+		return suspended;
+	}
+
+	/**
+	 * Specify whether the job is in suspended state.
+	 * @param suspended - true if the job is suspended, false otherwise.
+	 */
+	public void setSuspended(boolean suspended)
+	{
+		this.suspended = suspended;
 	}
 }

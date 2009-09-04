@@ -108,12 +108,9 @@ public class ApplicationConnection extends JPPFConnection
 	public void perform() throws Exception
 	{
 		// Read the request header - with tasks count information
-		//int n = is.readInt();
-		int n = is.skip(4);
-		byte bytes[] = socketClient.receiveBytes(0).getBuffer();
-		JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(bytes);
-		if (debugEnabled) log.debug("received header from client, data length = " + bytes.length);
-		bytes = null;
+		DataLocation dl = IOHelper.readData(is);
+		JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(dl.getInputStream());
+		if (debugEnabled) log.debug("received header from client, data length = " + dl.getSize());
 		headerWrapper = new BundleWrapper(header);
 		executeTasks();
 	}

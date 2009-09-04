@@ -24,34 +24,28 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import org.jppf.client.JPPFClientConnectionStatus;
+import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.ui.utils.GuiUtils;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * Renderer used to render the tree nodes in the node data panel.
  * @author Laurent Cohen
  */
-public class NodeRenderer extends DefaultTreeCellRenderer
+public class NodeRenderer extends AbstractTreeCellRenderer
 {
 	/**
-	 * Path to the location of the icon files.
+	 * Default constructor.
 	 */
-	private static final String RESOURCES = "/org/jppf/ui/resources/";
-	/**
-	 * Path to the icon used for a driver.
-	 */
-	private static final String DRIVER_ICON = RESOURCES + "mainframe.gif";
-	/**
-	 * Path to the icon used for an inactive driver connection.
-	 */
-	private static final String DRIVER_INACTIVE_ICON = RESOURCES + "mainframe_inactive.gif";
-	/**
-	 * Path to the icon used for a node.
-	 */
-	private static final String NODE_ICON = RESOURCES + "buggi_server.gif";
+	public NodeRenderer()
+	{
+		defaultNonSelectionBackground = getBackgroundNonSelectionColor();
+		defaultSelectionBackground = getBackgroundSelectionColor();
+	}
 
 	/**
    * Configures the renderer based on the passed in components.
-	 * @param tree - the tree of which to apply this renderer.
+	 * @param tree - the tree on which to apply this renderer.
 	 * @param value - the node to render. 
 	 * @param sel - determines whether the node is selected.
 	 * @param expanded - determines whether the node is expanded.
@@ -61,8 +55,7 @@ public class NodeRenderer extends DefaultTreeCellRenderer
 	 * @return a component used to paint the node.
 	 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
 	 */
-	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
-			int row, boolean hasFocus)
+	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
 	{
 		DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 		if (value instanceof DefaultMutableTreeNode)
@@ -72,19 +65,21 @@ public class NodeRenderer extends DefaultTreeCellRenderer
 			{
 				TopologyData data = (TopologyData) node.getUserObject();
 				String path = null;
-				Color background = Color.WHITE;
+				Color background = defaultNonSelectionBackground;
+				Color backgroundSelected = defaultSelectionBackground;
 				switch(data.getType())
 				{
 					case DRIVER:
 						if (JPPFClientConnectionStatus.ACTIVE.equals(data.getClientConnection().getStatus()))
 						{
 							path = DRIVER_ICON;
-							background = Color.GREEN;
+							background = ACTIVE_COLOR;
 						}
 						else
 						{
 							path = DRIVER_INACTIVE_ICON;
-							background = Color.RED;
+							background = INACTIVE_COLOR;
+							backgroundSelected = INACTIVE_SELECTION_COLOR;
 						}
 						break;
 					case NODE:
@@ -93,7 +88,11 @@ public class NodeRenderer extends DefaultTreeCellRenderer
 				}
 				ImageIcon icon = GuiUtils.loadIcon(path);
 				renderer.setIcon(icon);
-				renderer.setBackgroundNonSelectionColor(background);
+				if (JPPFConfiguration.getProperties().getBoolean("jppf.state.highlighting.enabled", true))
+				{
+					renderer.setBackgroundNonSelectionColor(background);
+					renderer.setBackgroundSelectionColor(backgroundSelected);
+				}
 			}
 		}
 		return renderer;

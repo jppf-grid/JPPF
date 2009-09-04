@@ -38,7 +38,7 @@ public class NodeIO extends ThreadSynchronization
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFNode.class);
+	private static Log log = LogFactory.getLog(NodeIO.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
@@ -142,12 +142,9 @@ public class NodeIO extends ThreadSynchronization
 	private Object[] deserializeObjects() throws Exception
 	{
 		if (debugEnabled) log.debug("waiting for next request");
-		int size = socketWrapper.readInt();
-		if (debugEnabled) log.debug("skipped 4 bytes - start reading bundle data");
 		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
 		if (debugEnabled) log.debug("got bundle");
 		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
-		bundle.setParameter("initial.data.size", size);
 		List<Object> list = new ArrayList<Object>();
 		list.add(bundle);
 		try
@@ -158,7 +155,7 @@ public class NodeIO extends ThreadSynchronization
 			{
 				JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
 				cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
-				cont.deserializeObject(socketWrapper, list, 1+count, size);
+				cont.deserializeObject(socketWrapper, list, 1+count);
 			}
 			else
 			{
@@ -192,14 +189,9 @@ public class NodeIO extends ThreadSynchronization
 	{
 		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		bundle.setNodeExecutionTime(elapsed);
-		List<JPPFBuffer> list = new ArrayList<JPPFBuffer>();
 		ObjectSerializer ser = node.getHelper().getSerializer();
-		list.add(ser.serialize(bundle));
-		for (JPPFTask task : tasks) list.add(ser.serialize(task));
-		int size = 0;
-		for (JPPFBuffer buf: list) size += 4 + buf.getLength();
-		socketWrapper.writeInt(size);
-		for (JPPFBuffer buf: list) socketWrapper.sendBytes(buf);
+		socketWrapper.sendBytes(ser.serialize(bundle));
+		for (JPPFTask task : tasks) socketWrapper.sendBytes(ser.serialize(task));
 		socketWrapper.flush();
 	}
 
@@ -210,7 +202,7 @@ public class NodeIO extends ThreadSynchronization
 	 */
 	public JPPFTaskBundle readBundle() throws Exception
 	{
-		socketWrapper.skip(4);
+		//socketWrapper.skip(4);
 		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
 		currentBundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
 		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(currentBundle.getState()))

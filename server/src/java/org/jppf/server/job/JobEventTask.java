@@ -54,7 +54,7 @@ public class JobEventTask implements Runnable
 	/**
 	 * Creation timestamp for this task.
 	 */
-	private long timestamp = System.currentTimeMillis();
+	private final long timestamp = System.currentTimeMillis();
 
 	/**
 	 * Initialize this job manager event task with the specified parameters.
@@ -78,7 +78,9 @@ public class JobEventTask implements Runnable
 	public void run()
 	{
 		JobInformation jobInfo = new JobInformation((String) bundle.getParameter(BundleParameter.JOB_ID),
-			bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getPriority());
+			bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getPriority(), bundle.isSuspended());
+		Integer maxNodes = (Integer) bundle.getParameter(BundleParameter.MAX_JOB_NODES);
+		jobInfo.setMaxNodes(maxNodes == null ? Integer.MAX_VALUE : maxNodes);
 		NodeManagementInfo nodeInfo = (channel == null) ? null : JPPFDriver.getInstance().getNodeInformation(channel);
 		JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);
 		List<JobListener> listeners = jobManager.getListeners();

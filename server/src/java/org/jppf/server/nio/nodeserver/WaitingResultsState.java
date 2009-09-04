@@ -72,10 +72,8 @@ public class WaitingResultsState extends NodeServerState
 			if (debugEnabled) log.debug("read bundle from node " + getRemoteHost(channel) + " done");
 			BundleWrapper bundleWrapper = context.getBundle();
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
-			TaskCompletionListener listener = bundle.getCompletionListener();
 			BundleWrapper newBundleWrapper = context.deserializeBundle();
 			JPPFTaskBundle newBundle = newBundleWrapper.getBundle();
-			long elapsed = System.currentTimeMillis() - bundle.getExecutionStartTime();
 			// if an exception prevented the node from executing the tasks
 			if (newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM) != null)
 			{
@@ -85,17 +83,15 @@ public class WaitingResultsState extends NodeServerState
 			// updating stats
 			else
 			{
-				if (newBundle.getNodeExecutionTime() > 1000000)
-				{
-					int breakpoint = 0;
-				}
+				long elapsed = System.currentTimeMillis() - bundle.getExecutionStartTime();
 				JPPFDriver.getInstance().getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getNodeMessage().getLength());
 				context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 			}
 			// notifing the client thread about the end of a bundle
+			TaskCompletionListener listener = bundle.getCompletionListener();
 			if (listener != null) listener.taskCompleted(newBundleWrapper);
 			JPPFDriver.getInstance().getJobManager().jobReturned(bundleWrapper, channel);
-			// there is nothing to do, so this instance will wait for a task bundle
+			// there is nothing left to do, so this instance will wait for a task bundle
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setNodeMessage(null);
 			context.setBundle(null);

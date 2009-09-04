@@ -21,7 +21,6 @@ package org.jppf.server.nio;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.utils.StringUtils;
 
 /**
  * Instances of this class perform the transition of a channel from one state to another.
@@ -77,7 +76,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 			{
 				synchronized(log)
 				{
-					log.debug(StringUtils.getRemoteHost(key.channel()) + " transition from " + ctx.getState());
+					//log.debug(StringUtils.getRemoteHost(key.channel()) + " transition from " + ctx.getState());
 				}
 			}
 			NioState<T> state = factory.getState(ctx.getState());

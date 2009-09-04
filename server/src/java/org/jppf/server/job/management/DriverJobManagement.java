@@ -28,7 +28,7 @@ import org.jppf.job.*;
 import org.jppf.management.NodeManagementInfo;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.*;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.*;
 
 /**
  * Implementation of the job management bean.
@@ -87,6 +87,55 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	}
 
 	/**
+	 * Suspend the job with the specified id.
+	 * @param jobId - the id of the job to suspend.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#suspendJob(java.lang.String)
+	 */
+	public void suspendJob(String jobId) throws Exception
+	{
+		if (debugEnabled) log.debug("Request to suspend jobId = '" + jobId + "'");
+		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobId);
+		if (bundleWrapper == null) return;
+		if (bundleWrapper.getBundle().isSuspended()) return;
+		bundleWrapper.getBundle().setSuspended(true);
+		getJobManager().jobUpdated(bundleWrapper);
+	}
+
+	/**
+	 * Resume the job with the specified id.
+	 * @param jobId - the id of the job to resume.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#resumeJob(java.lang.String)
+	 */
+	public void resumeJob(String jobId) throws Exception
+	{
+		if (debugEnabled) log.debug("Request to resume jobId = '" + jobId + "'");
+		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobId);
+		if (bundleWrapper == null) return;
+		if (!bundleWrapper.getBundle().isSuspended()) return;
+		bundleWrapper.getBundle().setSuspended(false);
+		getJobManager().jobUpdated(bundleWrapper);
+	}
+
+	/**
+	 * Update the maximum number of nodes a node can run on.
+	 * @param jobId - the id of the job to update.
+	 * @param maxNodes - the new maximum number of nodes for the job.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#updateMaxNodes(java.lang.String, java.lang.Integer)
+	 */
+	public void updateMaxNodes(String jobId, Integer maxNodes) throws Exception
+	{
+		if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + jobId + "'");
+		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobId);
+		if (bundleWrapper == null) return;
+		if (maxNodes <= 0) return;
+		bundleWrapper.getBundle().setParameter(BundleParameter.MAX_JOB_NODES, maxNodes);
+		getJobManager().jobUpdated(bundleWrapper);
+	}
+
+	/**
 	 * Get the set of ids for all the jobs currently queued or executing.
 	 * @return a set of ids as strings.
 	 * @throws Exception if any error occurs.
@@ -110,7 +159,9 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobId);
 		if (bundleWrapper == null) return null;
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
-		JobInformation job = new JobInformation(jobId, bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getPriority());
+		JobInformation job = new JobInformation(jobId, bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getPriority(), bundle.isSuspended());
+		Integer maxNodes = (Integer) bundle.getParameter(BundleParameter.MAX_JOB_NODES);
+		job.setMaxNodes(maxNodes == null ? Integer.MAX_VALUE : maxNodes);
 		return job;
 	}
 
@@ -130,7 +181,9 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		{
 			NodeManagementInfo nodeInfo = getDriver().getNodeInformation(nodes.get(i).first());
 			JPPFTaskBundle bundle = nodes.get(i).second().getBundle();
-			JobInformation jobInfo = new JobInformation(jobId, bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getPriority());
+			JobInformation jobInfo = new JobInformation(jobId, bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getPriority(), bundle.isSuspended());
+			Integer maxNodes = (Integer) bundle.getParameter(BundleParameter.MAX_JOB_NODES);
+			jobInfo.setMaxNodes(maxNodes == null ? Integer.MAX_VALUE : maxNodes);
 			result[i] = new NodeJobInformation(nodeInfo, jobInfo);
 		}
 		return result;

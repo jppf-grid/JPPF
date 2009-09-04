@@ -161,6 +161,7 @@ public class TopologyData
 		if (!TopologyDataType.NODE.equals(type)) return;
 		try
 		{
+			if (!jmxWrapper.isConnected()) return;
 			nodeState = ((JMXNodeConnectionWrapper) jmxWrapper).state();
 		}
 		catch(Exception e)

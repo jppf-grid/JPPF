@@ -36,6 +36,25 @@ public interface DriverJobManagementMBean extends NotificationEmitter
 	 */
 	void cancelJob(String jobId) throws Exception;
 	/**
+	 * Suspend the job with the specified id.
+	 * @param jobId - the id of the job to suspend.
+	 * @throws Exception if any error occurs.
+	 */
+	void suspendJob(String jobId) throws Exception;
+	/**
+	 * Resume the job with the specified id.
+	 * @param jobId - the id of the job to resume.
+	 * @throws Exception if any error occurs.
+	 */
+	void resumeJob(String jobId) throws Exception;
+	/**
+	 * Update the maximum number of nodes a node can run on.
+	 * @param jobId - the id of the job to update.
+	 * @param maxNodes - the new maximum number of nodes for the job.
+	 * @throws Exception if any error occurs.
+	 */
+	void updateMaxNodes(String jobId, Integer maxNodes) throws Exception;
+	/**
 	 * Get the set of ids for all the jobs currently queued or executing.
 	 * @return an array of ids as strings.
 	 * @throws Exception if any error occurs.

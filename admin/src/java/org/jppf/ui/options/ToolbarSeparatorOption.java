@@ -45,7 +45,7 @@ public class ToolbarSeparatorOption extends AbstractOption
 	public ToolbarSeparatorOption(int width, int height)
 	{
 		//UIComponent = new JToolBar.Separator();
-		UIComponent = new JLabel("|");
+		UIComponent = new JLabel(" ");
 		((JLabel) UIComponent).setHorizontalAlignment(SwingConstants.CENTER);
 		((JLabel) UIComponent).setVerticalAlignment(SwingConstants.CENTER);
 		UIComponent.setForeground(UIComponent.getForeground().brighter());

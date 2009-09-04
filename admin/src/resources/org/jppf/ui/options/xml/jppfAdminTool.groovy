@@ -5,5 +5,5 @@ frame.addWindowListener(new WindowClosingListener());
 def statsHandler = StatsHandler.getInstance();
 comp.setSelectedIndex(0);
 frame.getContentPane().add(option.getUIComponent());
-frame.setSize(600, 730);
+frame.setSize(700, 768);
 frame.setVisible(true);

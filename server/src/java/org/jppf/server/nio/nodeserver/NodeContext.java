@@ -102,7 +102,7 @@ public class NodeContext extends NioContext<NodeState>
 	 */
 	public void resubmitBundle(BundleWrapper bundle)
 	{
-		bundle.getBundle().setPriority(10);
+		//bundle.getBundle().setPriority(10);
 		JPPFDriver.getQueue().addBundle(bundle);
 	}
 
@@ -117,6 +117,7 @@ public class NodeContext extends NioContext<NodeState>
 		NodeNioServer.closeNode(channel, this);
 		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getBundle().getState()))
 		{
+			JPPFDriver.getInstance().getJobManager().jobReturned(bundle, channel);
 			resubmitBundle(bundle);
 		}
 	}
@@ -127,11 +128,13 @@ public class NodeContext extends NioContext<NodeState>
 	 */
 	public void serializeBundle() throws Exception
 	{
-		if (nodeMessage == null) nodeMessage = new NodeMessage();
+		//if (nodeMessage == null)
+		nodeMessage = new NodeMessage();
 		JPPFBuffer buf = helper.getSerializer().serialize(bundle.getBundle());
 		nodeMessage.addLocation(new ByteBufferLocation(buf.getBuffer(), 0, buf.getLength()));
 		nodeMessage.addLocation(bundle.getDataProvider());
 		for (DataLocation dl: bundle.getTasks()) nodeMessage.addLocation(dl);
+		nodeMessage.setBundle(bundle.getBundle());
 	}
 
 	/**
@@ -142,15 +145,17 @@ public class NodeContext extends NioContext<NodeState>
 	public BundleWrapper deserializeBundle() throws Exception
 	{
 		List<DataLocation> locations = nodeMessage.getLocations();
+		/*
 		DataLocation location = locations.get(0);
 		byte[] data = new byte[location.getSize()];
 		OutputDestination dest = new ByteBufferOutputDestination(data, 0, data.length);
 		location.transferTo(dest, true);
 		JPPFTaskBundle bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
+		*/
+		JPPFTaskBundle bundle = nodeMessage.getBundle();
 		BundleWrapper wrapper = new BundleWrapper(bundle);
 		if (locations.size() > 1)
 		{
-			//wrapper.setDataProvider(locations.get(1));
 			for (int i=1; i<locations.size(); i++) wrapper.addTask(locations.get(i));
 		}
 		return wrapper;

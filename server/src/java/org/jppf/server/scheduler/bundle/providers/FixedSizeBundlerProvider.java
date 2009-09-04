@@ -19,7 +19,7 @@
 package org.jppf.server.scheduler.bundle.providers;
 
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.server.scheduler.bundle.impl.RLBundler;
+import org.jppf.server.scheduler.bundle.impl.FixedSizeBundler;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider;
 import org.jppf.utils.TypedProperties;
 
@@ -38,7 +38,7 @@ public class FixedSizeBundlerProvider implements JPPFBundlerProvider
 	 */
 	public Bundler createBundler(LoadBalancingProfile profile)
 	{
-		return new RLBundler(profile);
+		return new FixedSizeBundler(profile);
 	}
 
 	/**

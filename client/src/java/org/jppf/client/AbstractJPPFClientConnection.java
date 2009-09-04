@@ -218,20 +218,14 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		TraversalList<String> uuidPath = new TraversalList<String>();
 		uuidPath.add(appUuid);
 		header.setUuidPath(uuidPath);
-		header.setCredentials(credentials);
 		header.setTaskCount(count);
 		header.setParameter(BundleParameter.JOB_ID, job.getId());
-
-		List<JPPFBuffer> bufList = new ArrayList<JPPFBuffer>();
-		bufList.add(ser.serialize(header));
-		bufList.add(ser.serialize(job.getDataProvider()));
-		for (JPPFTask task : job.getTasks()) bufList.add(ser.serialize(task));
+		header.setParameter(BundleParameter.MAX_JOB_NODES, job.getMaxNodes());
 
 		SocketWrapper socketClient = taskServerConnection.getSocketClient();
-		int size = 0;
-		for (JPPFBuffer buf: bufList) size += 4 + buf.getLength();
-		socketClient.writeInt(size);
-		for (JPPFBuffer buf: bufList) socketClient.sendBytes(buf);
+		socketClient.sendBytes(ser.serialize(header));
+		socketClient.sendBytes(ser.serialize(job.getDataProvider()));
+		for (JPPFTask task : job.getTasks()) socketClient.sendBytes(ser.serialize(task));
 		socketClient.flush();
 	}
 
@@ -247,7 +241,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		{
 			SocketWrapper socketClient = taskServerConnection.getSocketClient();
 			SerializationHelper helper = makeHelper();
-			socketClient.skip(4);
 			byte[] data = socketClient.receiveBytes(0).getBuffer();
 			JPPFTaskBundle bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
 			int count = bundle.getTaskCount();

@@ -30,19 +30,27 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 	/**
 	 * Column number for the node's url.
 	 */
-	private static final int NODE_URL = 0;
+	static final int NODE_URL = 0;
 	/**
-	 * Column number for the node's thread pool size.
+	 * Column number for the job's execution state.
 	 */
-	private static final int INITIAL_TASK_COUNT = 1;
+	static final int JOB_STATE = 1;
 	/**
-	 * Column number for the node's last event.
+	 * Column number for the job's initial task count (at submission time).
 	 */
-	private static final int TASK_COUNT = 2;
+	static final int INITIAL_TASK_COUNT = 2;
 	/**
-	 * Column number for the node's last event.
+	 * Column number for the disptached job's task count.
 	 */
-	private static final int PRIORITY = 3;
+	static final int TASK_COUNT = 3;
+	/**
+	 * Column number for the job's priority.
+	 */
+	static final int PRIORITY = 4;
+	/**
+	 * Column number for the maximum number of nodes a job can run on.
+	 */
+	static final int MAX_NODES = 5;
 
 	/**
 	 * Initialize this model with the specified tree root.
@@ -61,7 +69,7 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 	 */
 	public int getColumnCount()
 	{
-		return 4;
+		return 6;
 	}
 
 	/**
@@ -83,7 +91,9 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 				switch (column)
 				{
 					case NODE_URL:
-						//res = info.toString();
+						break;
+					case JOB_STATE:
+						if (data.getType().equals(JobDataType.JOB)) res = localize("job.state." + (data.getJobInformation().isSuspended() ? "suspended" : "executing"));
 						break;
 					case TASK_COUNT:
 						if (data.getType().equals(JobDataType.SUB_JOB) || data.getType().equals(JobDataType.JOB)) res = "" + data.getJobInformation().getTaskCount();
@@ -93,6 +103,14 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 						break;
 					case PRIORITY:
 						if (data.getType().equals(JobDataType.JOB)) res = "" + data.getJobInformation().getPriority();
+						break;
+					case MAX_NODES:
+						if (data.getType().equals(JobDataType.JOB))
+						{
+							int n = data.getJobInformation().getMaxNodes();
+							if (n == Integer.MAX_VALUE) res = "\u221E";
+							else res = "" + n;
+						}
 						break;
 					default:
 						res = "";
@@ -118,13 +136,19 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 				res = "Driver / Job / Node";
 				break;
 			case TASK_COUNT:
-				res = "Current task count";
+				res = localize("job.current.task.count");
+				break;
+			case JOB_STATE:
+				res = localize("job.state");
 				break;
 			case INITIAL_TASK_COUNT:
-				res = "Initial task count";
+				res = localize("job.initial.task.count");
 				break;
 			case PRIORITY:
-				res = "Priority";
+				res = localize("job.priority");
+				break;
+			case MAX_NODES:
+				res = localize("job.max.nodes");
 				break;
 		}
 		return res;

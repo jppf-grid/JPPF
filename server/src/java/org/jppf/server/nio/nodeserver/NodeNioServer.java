@@ -26,10 +26,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.*;
 import org.jppf.io.*;
-import org.jppf.management.*;
-import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.queue.*;
@@ -72,13 +71,13 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	private JPPFQueue queue = null;
 	/**
-	 * Random number generator used to randomize the choice of idle channel.
-	 */
-	private Random random = new Random(System.currentTimeMillis());
-	/**
 	 * Used to create bundler instances.
 	 */
 	private JPPFBundlerFactory bundlerFactory = new JPPFBundlerFactory();
+	/**
+	 * .
+	 */
+	private final TaskQueueChecker taskQueueChecker;
 
 	/**
 	 * Initialize this server with a specified port number.
@@ -98,6 +97,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	public NodeNioServer(int[] ports) throws Exception
 	{
 		super(ports, "NodeServer Thread", true);
+		taskQueueChecker = new TaskQueueChecker(this);
 		this.selectTimeout = 1L;
 		Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
 		this.bundlerRef = new AtomicReference<Bundler>(bundler);
@@ -154,104 +154,12 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	}
 
 	/**
-	 * This class ensures that idle nodes get assigned pending tasks in the queue.
-	 */
-	private class TaskQueueChecker implements Runnable
-	{
-		/**
-		 * Perform the assignment of tasks.
-		 * @see java.lang.Runnable#run()
-		 */
-		public void run()
-		{
-			synchronized(idleChannels)
-			{
-				if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
-				if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
-				List<SelectableChannel> channelList = new ArrayList<SelectableChannel>();
-				channelList.addAll(idleChannels);
-				boolean found = false;
-				SelectableChannel channel = null;
-				BundleWrapper selectedBundle = null;
-				Iterator<BundleWrapper> it = getQueue().iterator();
-				while (!found && it.hasNext() && !idleChannels.isEmpty())
-				{
-					BundleWrapper bundleWrapper = it.next();
-					JPPFTaskBundle bundle = bundleWrapper.getBundle();
-					int n = findIdleChannelIndex(bundle);
-					if (n >= 0)
-					{
-						channel = idleChannels.remove(n);
-						selectedBundle = bundleWrapper;
-						found = true;
-					}
-				}
-				if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "found channel for bundle");
-				if (channel != null)
-				{
-					SelectionKey key = channel.keyFor(selector);
-					NodeContext context = (NodeContext) key.attachment();
-					BundleWrapper bundleWrapper = getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
-					context.setBundle(bundleWrapper);
-					transitionManager.transitionChannel(key, NodeTransition.TO_SENDING);
-				}
-			}
-		}
-
-		/**
-		 * Find a channel that can send the specified task bundle for execution.
-		 * @param bundle the bundle to execute.
-		 * @return the index of an available and acceptable channel, or -1 if no channel could be found.
-		 */
-		private int findIdleChannelIndex(JPPFTaskBundle bundle)
-		{
-			int n = -1;
-			ExecutionPolicy rule = bundle.getExecutionPolicy();
-			if (debugEnabled && (rule != null)) log.debug("Bundle has an execution policy:\n" + rule);
-			List<Integer> acceptableChannels = new ArrayList<Integer>();
-			List<Integer> channelsToRemove =  new ArrayList<Integer>();
-			List<String> uuidPath = bundle.getUuidPath().getList();
-			for (int i=0; i<idleChannels.size(); i++)
-			{
-				SelectableChannel ch = idleChannels.get(i);
-				if (!ch.isOpen())
-				{
-					channelsToRemove.add(i);
-					continue;
-				}
-				NodeContext context = (NodeContext) ch.keyFor(selector).attachment();
-				if (uuidPath.contains(context.getNodeUuid())) continue;
-				if (rule != null)
-				{
-					NodeManagementInfo mgtInfo = JPPFDriver.getInstance().getNodeInformation(ch);
-					JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
-					if (!rule.accepts(info)) continue;
-				}
-				acceptableChannels.add(i);
-			}
-			for (Integer i: channelsToRemove) idleChannels.remove(i);
-			if (debugEnabled) log.debug("found " + acceptableChannels.size() + " acceptable channels");
-			if (!acceptableChannels.isEmpty())
-			{
-				int rnd = random.nextInt(acceptableChannels.size());
-				n = acceptableChannels.remove(rnd);
-			}
-			return n;
-		}
-	}
-
-	/**
-	 * .
-	 */
-	private final Runnable r = new TaskQueueChecker();
-
-	/**
 	 * This method is invoked after all selected keys have been processed.
 	 */
 	protected void postSelect()
 	{
 		if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
-		transitionManager.submit(r);
+		/*if (!taskQueueChecker.isExecuting())*/ transitionManager.submit(taskQueueChecker);
 	}
 
 	/**
@@ -325,7 +233,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				bundle.setRequestUuid("0");
 				bundle.getUuidPath().add(JPPFDriver.getInstance().getUuid());
 				bundle.setTaskCount(0);
-				bundle.setCredentials(cred);
 				bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
 				initialBundle = new BundleWrapper(bundle);
 				initialBundle.setDataProvider(new ByteBufferLocation(bb));
@@ -390,11 +297,29 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	}
 
 	/**
+	 * Get a reference to the driver's job manager.
+	 * @return a <code>JPPFQueue</code> instance.
+	 */
+	protected JPPFJobManager getJobManager()
+	{
+		return JPPFDriver.getInstance().getJobManager();
+	}
+
+	/**
 	 * Get the factory object used to create bundler instances.
 	 * @return an instance of <code>JPPFBundlerFactory</code>.
 	 */
 	public JPPFBundlerFactory getBundlerFactory()
 	{
 		return bundlerFactory;
+	}
+
+	/**
+	 * Get the list of currently idle channels.
+	 * @return a list of <code>SelectableChannel</code> instances.
+	 */
+	public List<SelectableChannel> getIdleChannels()
+	{
+		return idleChannels;
 	}
 }

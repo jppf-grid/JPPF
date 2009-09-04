@@ -79,9 +79,9 @@ public class JPPFTreeTable extends JTreeTable
 	 */
 	public void expand(DefaultMutableTreeNode node)
 	{
+		getTree().expandPath(getPathForNode(node));
 		if (node.getChildCount() > 0)
 		{
-			getTree().expandPath(getPathForNode(node));
 			for (int i=0; i<node.getChildCount(); i++) expand((DefaultMutableTreeNode) node.getChildAt(i));
 		}
 	}

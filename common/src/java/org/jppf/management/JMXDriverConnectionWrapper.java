@@ -116,4 +116,38 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	{
 		invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "cancelJob", new Object[] { jobId }, new String[] { "java.lang.String" });
 	}
+
+	/**
+	 * Suspend the job with the specified id.
+	 * @param jobId - the id of the job to suspend.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFDriverAdminMBean#cancelJob(java.lang.String)
+	 */
+	public void suspendJob(String jobId) throws Exception
+	{
+		invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "suspendJob", new Object[] { jobId }, new String[] { "java.lang.String" });
+	}
+
+	/**
+	 * Resume the job with the specified id.
+	 * @param jobId - the id of the job to resume.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.management.JPPFDriverAdminMBean#cancelJob(java.lang.String)
+	 */
+	public void resumeJob(String jobId) throws Exception
+	{
+		invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "resumeJob", new Object[] { jobId }, new String[] { "java.lang.String" });
+	}
+
+	/**
+	 * Update the maximum number of nodes a node can run on.
+	 * @param jobId - the id of the job to update.
+	 * @param maxNodes - the new maximum number of nodes for the job.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#updateMaxNodes(java.lang.String, java.lang.Integer)
+	 */
+	public void updateMaxNodes(String jobId, Integer maxNodes) throws Exception
+	{
+		invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "updateMaxNodes", new Object[] { jobId, maxNodes }, new String[] { "java.lang.String", "java.lang.Integer" }); 
+	}
 }

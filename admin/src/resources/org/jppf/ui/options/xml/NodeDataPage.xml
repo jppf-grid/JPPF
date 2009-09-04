@@ -19,17 +19,20 @@
 
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeDataPage" type="page">
 	<!-- test comment for save -->
-	<property name="label" value="Node Data"/>
-	<property name="layoutConstraints" value="flowy, fill, gap rel"/>
+	<property name="label" value="Topology"/>
+	<property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
 
 	<!-- ===================================================================== -->
 	<!--                        Buttons area                                   -->
 	<!-- ===================================================================== -->
 
-	<child name="topology.toolbar" type="Toolbar">
+	<child name="topology.toolbar" type="page">
 		<property name="componentConstraints" value="gap rel"/>
-		<property name="layoutConstraints" value="insets 2"/>
+		<property name="layoutConstraints" value="insets 4 2 0 2"/>
 
+		<child name="shutdown.restart.driver" type="Button"/>
+
+		<child name="sep1" type="ToolbarSeparator"/>
 		<child name="update.configuration" type="Button"/>
 		<child name="show.information" type="Button"/>
 		<child name="update.threads" type="Button"/>
@@ -37,72 +40,46 @@
 		<child name="restart.node" type="Button"/>
 		<child name="shutdown.node" type="Button"/>
 
-	</child>
-	
-	<child name="Actions" type="page">
-		<property name="label" value="Actions"/>
-		<property name="componentConstraints" value="gap rel"/>
-	
-		<child name="TreeStructureActions" type="page">
-			<property name="label" value="Tree Structure Actions"/>
-			<property name="layoutConstraints" value="flowy"/>
-	
-			<child name="Auto" type="Boolean">
-				<property name="label" value="Toggle automatic structure refresh"/>
-				<property name="tooltip" value="Toggles between automatic and manual refresh of the tree structure"/>
-				<property name="value" value="true"/>
-				<property name="persistent" value="true"/>
-				<!--
-				<listener type="script">
-					<script language="groovy"><![CDATA[
-						def b = option.getValue().booleanValue();
-						def handler = option.findFirstWithName("/Treetable").getHandler();
-						if (b) handler.startRefreshDriverTimer();
-						else handler.stopRefreshDriverTimer();
-					]]></script>
-				</listener>
-				-->
-			</child>
-	
-			<child name="RefreshButtonPanel" type="page">
-				<property name="label" value="RefreshButtonPanel"/>
-		
-				<child name="button.refresh" type="Button">
-					<!--
-					<listener type="script">
-						<script language="groovy">option.findFirstWithName("/Treetable").getHandler().refresh(true)</script>
-					</listener>
-					-->
-				</child>
-		
-				<child name="filler" type="Filler">
-					<property name="width" value="10"/>
-					<property name="height" value="10"/>
-				</child>
-
-			</child>
-
+		<child name="sep2" type="ToolbarSeparator"/>
+		<child name="Auto" type="Boolean">
+			<property name="label" value="Auto refresh"/>
+			<property name="tooltip" value="Toggles between automatic and manual refresh of the tree structure"/>
+			<property name="value" value="true"/>
+			<property name="persistent" value="true"/>
+			<listener type="script">
+				<script language="groovy"><![CDATA[
+					def b = option.getValue().booleanValue();
+					def handler = option.findFirstWithName("/Treetable").getRefreshHandler();
+					if (b) handler.startRefreshTimer();
+					else handler.stopRefreshTimer();
+				]]></script>
+			</listener>
 		</child>
 
-		<child name="TreeDisplayActions" type="page">
-			<property name="label" value="Tree Display Actions"/>
-			<property name="layoutConstraints" value="flowy"/>
-	
-			<child name="button.expand" type="Button">
-				<listener type="script">
-					<script language="groovy">option.findFirstWithName("/Treetable").getTreeTable().expandAll()</script>
-				</listener>
-			</child>
-	
-			<child name="button.collapse" type="Button">
-				<listener type="script">
-					<script language="groovy">option.findFirstWithName("/Treetable").getTreeTable().collapseAll()</script>
-				</listener>
-			</child>
+		<child name="button.refresh" type="Button">
+			<property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
+			<listener type="script">
+				<script language="groovy">option.findFirstWithName("/Treetable").getRefreshHandler().refresh()</script>
+			</listener>
+		</child>
+		
+		<child name="sep3" type="ToolbarSeparator"/>
+		<child name="button.expand" type="Button">
+			<property name="icon" value="/org/jppf/ui/resources/expand.gif"/>
+			<listener type="script">
+				<script language="groovy">option.findFirstWithName("/Treetable").getTreeTable().expandAll()</script>
+			</listener>
+		</child>
 
+		<child name="button.collapse" type="Button">
+			<property name="icon" value="/org/jppf/ui/resources/collapse.gif"/>
+			<listener type="script">
+				<script language="groovy">option.findFirstWithName("/Treetable").getTreeTable().collapseAll()</script>
+			</listener>
 		</child>
 
 	</child>
+	
 
 	<!-- ===================================================================== -->
 	<!--                      Tree table area                                  -->

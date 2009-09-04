@@ -151,7 +151,8 @@ public class ByteBufferLocation extends AbstractDataLocation
 	 */
 	public InputStream getInputStream() throws Exception
 	{
-		return new ByteBufferInputStream(buffer, true);
+		buffer.rewind();
+		return new ByteBufferInputStream(buffer, false);
 	}
 
 	/**

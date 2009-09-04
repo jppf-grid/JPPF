@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
@@ -30,7 +30,9 @@ import org.jppf.client.event.*;
 import org.jppf.job.JobInformation;
 import org.jppf.management.*;
 import org.jppf.server.job.management.*;
-import org.jppf.ui.monitoring.data.*;
+import org.jppf.ui.actions.*;
+import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.job.actions.*;
 import org.jppf.ui.treetable.*;
 import org.jppf.utils.SynchronizedTask;
 
@@ -76,7 +78,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	 */
 	private void createTreeTableModel()
 	{
-		treeTableRoot = new DefaultMutableTreeNode(localize("tree.root.name"));
+		treeTableRoot = new DefaultMutableTreeNode(localize("job.tree.root.name"));
 		model = new JobTreeTableModel(treeTableRoot);
 	}
 
@@ -155,6 +157,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 				if (jobInfo != null)
 				{
 					JobData jobData = new JobData(jobInfo);
+					jobData.setJmxWrapper(data.getJmxWrapper());
 					DefaultMutableTreeNode jobNode = new DefaultMutableTreeNode(jobData);
 					model.insertNodeInto(jobNode, driverNode, driverNode.getChildCount());
 					NodeJobInformation[] subJobInfo = null;
@@ -194,14 +197,15 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	  treeTable = new JPPFTreeTable(model);
 	  treeTable.getTree().setRootVisible(false);
 	  treeTable.getTree().setShowsRootHandles(true);
-		//treeTable.addMouseListener(new NodeTreeTableMouseListener());
 		treeTable.getColumnModel().getColumn(0).setPreferredWidth(300);
 		treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 		treeTable.doLayout();
 		treeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		treeTable.getTree().setCellRenderer(new JobNodeRenderer());
+		treeTable.getTree().setCellRenderer(new JobRenderer());
+		treeTable.setDefaultRenderer(Object.class, new JobTableCellRenderer());
 		JScrollPane sp = new JScrollPane(treeTable);
 		setUIComponent(sp);
+		setupActions();
 	}
 
 	/**
@@ -277,10 +281,12 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 				DefaultMutableTreeNode driverNode = findDriver(driverName);
 				if (driverNode == null) return;
 				JobData data = new JobData(jobInfo);
+				JobData driverData = (JobData) driverNode.getUserObject();
+				data.setJmxWrapper(driverData.getJmxWrapper());
 				DefaultMutableTreeNode jobNode = new DefaultMutableTreeNode(data);
 				if (debugEnabled) log.debug("adding job: " + jobInfo.getJobId() + " to driver " + driverName);
 				model.insertNodeInto(jobNode, driverNode, driverNode.getChildCount());
-				treeTable.expand(jobNode);
+				treeTable.expand(driverNode);
 			}
 		};
 		executor.submit(r);
@@ -303,6 +309,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 				if (jobNode == null) return;
 				if (debugEnabled) log.debug("removing job: " + jobInfo.getJobId() + " from driver " + driverName);
 				model.removeNodeFromParent(jobNode);
+				treeTable.repaint();
 			}
 		};
 		executor.submit(r);
@@ -325,8 +332,11 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 				if (jobNode == null) return;
 				if (debugEnabled) log.debug("updating job: " + jobInfo.getJobId() + " from driver " + driverName);
 				JobData data = new JobData(jobInfo);
+				JobData driverData = (JobData) driverNode.getUserObject();
+				data.setJmxWrapper(driverData.getJmxWrapper());
 				jobNode.setUserObject(data);
 				model.changeNode(jobNode);
+				//treeTable.invalidate();
 			}
 		};
 		executor.submit(r);
@@ -352,7 +362,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 				DefaultMutableTreeNode subJobNode = new DefaultMutableTreeNode(data);
 				if (debugEnabled) log.debug("sub-job: " + jobInfo.getJobId() + " dispatched to node " + nodeInfo.getHost() + ":" + nodeInfo.getPort());
 				model.insertNodeInto(subJobNode, jobNode, jobNode.getChildCount());
-				treeTable.expand(subJobNode);
+				treeTable.expand(jobNode);
 			}
 		};
 		executor.submit(r);
@@ -378,6 +388,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 				if (subJobNode == null) return;
 				if (debugEnabled) log.debug("removing sub-job: " + jobInfo.getJobId() + " from node " + nodeInfo.getHost() + ":" + nodeInfo.getPort());
 				model.removeNodeFromParent(subJobNode);
+				treeTable.repaint();
 			}
 		};
 		executor.submit(r);
@@ -458,6 +469,22 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 				treeTable.updateUI();
 			}
 		});
+	}
+
+	/**
+	 * Initialize all actions used in the panel.
+	 */
+	public void setupActions()
+	{
+		actionHandler = new JTreeTableActionHandler(treeTable);
+		actionHandler.putAction("cancel.job", new CancelJobAction());
+		actionHandler.putAction("suspend.job", new SuspendJobAction());
+		actionHandler.putAction("resume.job", new ResumeJobAction());
+		actionHandler.putAction("max.nodes.job", new UpdateMaxNodesAction());
+		actionHandler.updateActions();
+		treeTable.addMouseListener(new JobTreeTableMouseListener(actionHandler));
+		Runnable r = new ActionsInitializer(this, "/job.toolbar");
+		new Thread(r).start();
 	}
 
 	/**

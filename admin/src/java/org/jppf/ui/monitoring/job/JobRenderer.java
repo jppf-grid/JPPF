@@ -24,6 +24,7 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import org.jppf.client.JPPFClientConnectionStatus;
+import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.JPPFConfiguration;
 
@@ -31,29 +32,8 @@ import org.jppf.utils.JPPFConfiguration;
  * Renderer used to render the tree nodes in the job data panel.
  * @author Laurent Cohen
  */
-public class JobNodeRenderer extends DefaultTreeCellRenderer
+public class JobRenderer extends AbstractTreeCellRenderer
 {
-	/**
-	 * Path to the location of the icon files.
-	 */
-	private static final String RESOURCES = "/org/jppf/ui/resources/";
-	/**
-	 * Path to the icon used for a driver.
-	 */
-	private static final String DRIVER_ICON = RESOURCES + "mainframe.gif";
-	/**
-	 * Path to the icon used for an inactive driver connection.
-	 */
-	private static final String DRIVER_INACTIVE_ICON = RESOURCES + "mainframe_inactive.gif";
-	/**
-	 * Path to the icon used for a job.
-	 */
-	private static final String JOB_ICON = RESOURCES + "rack.gif";
-	/**
-	 * Path to the icon used for a node.
-	 */
-	private static final String NODE_ICON = RESOURCES + "buggi_server.gif";
-
 	/**
    * Configures the renderer based on the passed in components.
 	 * @param tree - the tree of which to apply this renderer.
@@ -77,23 +57,30 @@ public class JobNodeRenderer extends DefaultTreeCellRenderer
 			{
 				JobData data = (JobData) node.getUserObject();
 				String path = null;
-				Color background = Color.WHITE;
+				Color background = defaultNonSelectionBackground;
+				Color backgroundSelected = defaultSelectionBackground;
 				switch(data.getType())
 				{
 					case DRIVER:
 						if (JPPFClientConnectionStatus.ACTIVE.equals(data.getClientConnection().getStatus()))
 						{
 							path = DRIVER_ICON;
-							background = Color.GREEN;
+							background = ACTIVE_COLOR;
 						}
 						else
 						{
 							path = DRIVER_INACTIVE_ICON;
-							background = Color.RED;
+							background = INACTIVE_COLOR;
+							backgroundSelected = INACTIVE_SELECTION_COLOR;
 						}
 						break;
 					case JOB:
 						path = JOB_ICON;
+						if (data.getJobInformation().isSuspended())
+						{
+							background = SUSPENDED_COLOR;
+							backgroundSelected = INACTIVE_SELECTION_COLOR;
+						}
 						break;
 					case SUB_JOB:
 						path = NODE_ICON;
@@ -102,7 +89,10 @@ public class JobNodeRenderer extends DefaultTreeCellRenderer
 				ImageIcon icon = GuiUtils.loadIcon(path);
 				renderer.setIcon(icon);
 				if (JPPFConfiguration.getProperties().getBoolean("jppf.state.highlighting.enabled", true))
-				renderer.setBackgroundNonSelectionColor(background);
+				{
+					renderer.setBackgroundNonSelectionColor(background);
+					renderer.setBackgroundSelectionColor(backgroundSelected);
+				}
 			}
 		}
 		return renderer;

@@ -26,7 +26,6 @@ import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.Bundler;
 
@@ -107,7 +106,7 @@ public class SendingBundleState extends NodeServerState
 		{
 			if (debugEnabled) log.debug("sent entire bundle to node " + getRemoteHost(channel));
 			context.setNodeMessage(null);
-			JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
+			//JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
 			return TO_WAITING;
 		}
 		if (debugEnabled) log.debug("part yet to send to node " + getRemoteHost(channel));

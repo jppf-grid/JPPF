@@ -88,6 +88,7 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 				: BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
 			panel.setBorder(border);
 		}
+		else panel.setBorder(BorderFactory.createEmptyBorder());
 		if (toolTipText != null) panel.setToolTipText(toolTipText);
 		MigLayout mig = new MigLayout(layoutConstraints);
 		panel.setLayout(mig);

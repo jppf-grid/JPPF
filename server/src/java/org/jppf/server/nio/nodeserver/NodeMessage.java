@@ -18,12 +18,15 @@
 
 package org.jppf.server.nio.nodeserver;
 
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
 
 import org.jppf.io.*;
 import org.jppf.server.nio.NioObject;
+import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.utils.*;
 
 /**
  * 
@@ -50,7 +53,11 @@ public class NodeMessage
 	/**
 	 * The current position in the list of data locations.
 	 */
-	private int position = -1;
+	private int position = 0;
+	/**
+	 * The number of objects toread or write.
+	 */
+	private int nbObjects = -1;
 	/**
 	 * The length of the location at the current position.
 	 */
@@ -63,6 +70,10 @@ public class NodeMessage
 	 * Object storing the object currently being read or written.
 	 */
 	private NioObject currentObject = null;
+	/**
+	 * The latest bundle that was sent or received.
+	 */
+	private JPPFTaskBundle bundle = null;
 
 	/**
 	 * Add a location to the data locations of this message.
@@ -81,8 +92,15 @@ public class NodeMessage
 	 */
 	public boolean read(ReadableByteChannel channel) throws Exception
 	{
-		if (!readLength(channel)) return false;
-		while (count < length)
+		if (nbObjects <= 0)
+		{
+			if (!readNextObject(channel)) return false;
+			InputStream is = locations.get(0).getInputStream();
+			SerializationHelper helper = new SerializationHelperImpl();
+			bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(is);
+			nbObjects = bundle.getTaskCount() + 1;
+		}
+		while (position < nbObjects)
 		{
 			if (!readNextObject(channel)) return false;
 		}
@@ -116,22 +134,7 @@ public class NodeMessage
 		currentLengthObject = null;
 		currentObject = null;
 		currentLength = 0;
-		return true;
-	}
-
-	/**
-	 * Read an int value to the channel.
-	 * @param channel - the channel to read from.
-	 * @return true if the value has been completely read from the channel, false otherwise.
-	 * @throws Exception if an IO error occurs.
-	 */
-	private boolean readLength(ReadableByteChannel channel) throws Exception
-	{
-		if (length > 0) return true;
-		if (lengthObject == null) lengthObject = new NioObject(new ByteBufferLocation(4), false);
- 		if (!lengthObject.read(new ChannelInputSource(channel))) return false;
-		length = ((ByteBufferLocation) lengthObject.getData()).buffer().getInt();
-		lengthObject = null;
+		position++;
 		return true;
 	}
 
@@ -143,8 +146,12 @@ public class NodeMessage
 	 */
 	public boolean write(WritableByteChannel channel) throws Exception
 	{
-		if (!writeLength(channel)) return false;
-		while (count < length)
+		if (nbObjects <= 0)
+		{
+			nbObjects = bundle.getTaskCount() + 2;
+		}
+		//if (!writeLength(channel)) return false;
+		while (position < nbObjects)
 		{
 			if (!writeNextObject(channel)) return false;
 		}
@@ -178,28 +185,6 @@ public class NodeMessage
 	}
 
 	/**
-	 * Write an int value to the channel.
-	 * @param channel - the channel to write to.
-	 * @return true if the value has been completely written to the channel, false otherwise.
-	 * @throws Exception if an IO error occurs.
-	 */
-	private boolean writeLength(WritableByteChannel channel) throws Exception
-	{
-		if (lengthObject == null)
-		{
-			length = 0;
-			position = 0;
-			for (DataLocation dl: locations) length += 4 + dl.getSize();
-			lengthObject = new NioObject(new ByteBufferLocation(4), false);
-			ByteBuffer buffer = ((ByteBufferLocation) lengthObject.getData()).buffer();
-			buffer.putInt(length);
-			buffer.flip();
-		}
- 		if (!lengthObject.write(new ChannelOutputDestination(channel))) return false;
-		return true;
-	}
-
-	/**
 	 * Get the data location objects abstracting the data to send or receive.
 	 * @return a list of <code>DataLocation</code> objects.
 	 */
@@ -215,5 +200,23 @@ public class NodeMessage
 	public int getLength()
 	{
 		return length;
+	}
+
+	/**
+	 * Get the latest bundle that was sent or received.
+	 * @return a <code>JPPFTaskBundle</code> instance.
+	 */
+	public JPPFTaskBundle getBundle()
+	{
+		return bundle;
+	}
+
+	/**
+	 * Set the latest bundle that was sent or received.
+	 * @param bundle - a <code>JPPFTaskBundle</code> instance.
+	 */
+	public void setBundle(JPPFTaskBundle bundle)
+	{
+		this.bundle = bundle;
 	}
 }

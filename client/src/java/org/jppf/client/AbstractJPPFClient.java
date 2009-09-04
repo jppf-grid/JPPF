@@ -101,7 +101,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public List<JPPFClientConnection> getAllConnections()
 	{
-		return Collections.unmodifiableList(allConnections);
+		return new ArrayList<JPPFClientConnection>(allConnections);
 	}
 
 	/**

@@ -62,10 +62,11 @@ public class ApplicationResultSender extends AbstractResultSender
 	{
 		if (debugEnabled) log.debug("Sending bundle with "+bundle.getBundle().getTaskCount()+" tasks");
 		JPPFBuffer bundleBuffer = helper.getSerializer().serialize(bundle.getBundle());
+		/*
 		int size = 4 + bundleBuffer.getLength();
 		for (DataLocation task : bundle.getTasks()) size += 4 + task.getSize();
-
 		socketClient.writeInt(size);
+		*/
 		socketClient.sendBytes(bundleBuffer);
 		for (DataLocation task : bundle.getTasks())
 		{

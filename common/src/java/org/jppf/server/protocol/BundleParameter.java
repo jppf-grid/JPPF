@@ -59,5 +59,9 @@ public enum  BundleParameter
 	/**
 	 * The id of a job.
 	 */
+	MAX_JOB_NODES,
+	/**
+	 * The id of a job.
+	 */
 	JOB_ID
 }

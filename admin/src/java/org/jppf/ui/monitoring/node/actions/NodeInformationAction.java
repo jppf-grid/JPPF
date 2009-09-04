@@ -88,9 +88,13 @@ public class NodeInformationAction extends AbstractTopologyAction
 			}
 		});
 		JEditorPane textArea = new JEditorPane("text/html", s);
+		AbstractButton btn = (AbstractButton) event.getSource();
+		if (btn.isShowing()) location = btn.getLocationOnScreen();
 		textArea.setEditable(false);
 		textArea.setOpaque(false);
 		frame.getContentPane().add(new JScrollPane(textArea));
+		frame.setLocationRelativeTo(null);
+		frame.setLocation(location);
 		frame.setSize(400, 400);
 		frame.setVisible(true);
 	}

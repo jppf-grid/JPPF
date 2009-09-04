@@ -37,7 +37,7 @@ public final class OptionsHandler
 	/**
 	 * The root of the preferences subtree in which the chart configurations are saved.
 	 */
-	private static Preferences PREFERENCES = Preferences.userRoot().node("jppf");
+	public static Preferences PREFERENCES = Preferences.userRoot().node("jppf");
 	/**
 	 * The list of option pages managed by this handler.
 	 */
@@ -245,7 +245,7 @@ public final class OptionsHandler
 	 * @param elt the root of the current subgraph.
 	 * @return an <code>OptionNode</code> instance.
 	 */
-	private static OptionNode buildPersistenceGraph(OptionElement elt)
+	public static OptionNode buildPersistenceGraph(OptionElement elt)
 	{
 		OptionNode node = null;
 		if (elt instanceof OptionsPage)
@@ -271,7 +271,7 @@ public final class OptionsHandler
 	/**
 	 * A graph of the persistent options. 
 	 */
-	private static class OptionNode
+	public static class OptionNode
 	{
 		/**
 		 * The correponding option element.

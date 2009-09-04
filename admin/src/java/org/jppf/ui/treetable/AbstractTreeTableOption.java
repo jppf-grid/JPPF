@@ -52,6 +52,15 @@ public abstract class AbstractTreeTableOption extends AbstractOption
 	protected JTreeTableActionHandler actionHandler = null;
 
 	/**
+	 * Get the object that handles all actions in toolbars or popup menus.
+	 * @return a <code>JTreeTableActionHandler</code> instance.
+	 */
+	public JTreeTableActionHandler getActionHandler()
+	{
+		return actionHandler;
+	}
+
+	/**
 	 * Get the tree table component displaying the driver and nodes information. 
 	 * @return a <code>JPPFTreeTable</code> instance.
 	 */

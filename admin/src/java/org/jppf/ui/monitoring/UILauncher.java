@@ -64,7 +64,7 @@ public class UILauncher
 			//System.out.println("system L&F: " + UIManager.getSystemLookAndFeelClassName());
 			String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
 				"com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
-			int n = 2;
+			int n = 3;
 			try
 			{
 				UIManager.setLookAndFeel(laf[n]);

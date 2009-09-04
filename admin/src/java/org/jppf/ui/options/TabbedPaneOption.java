@@ -48,6 +48,7 @@ public class TabbedPaneOption extends AbstractOptionElement implements OptionsPa
 	{
 		JTabbedPane pane = new JTabbedPane();
 		pane.setDoubleBuffered(true);
+		if (!bordered) pane.setBorder(BorderFactory.createEmptyBorder());
 		UIComponent = pane;
 		pane.setOpaque(false);
 	}

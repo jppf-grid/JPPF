@@ -26,48 +26,55 @@
 	<!--                        Buttons area                                   -->
 	<!-- ===================================================================== -->
 
-	<child name="Actions" type="page">
-		<property name="label" value="Actions"/>
-		<property name="componentConstraints" value="gap rel, cell 0 0"/>
+	<child name="job.toolbar" type="page">
+		<property name="componentConstraints" value="gap rel"/>
+		<property name="layoutConstraints" value="insets 4 2 0 2"/>
 	
-		<child name="TreeStructureActions" type="page">
-			<property name="label" value="Tree Structure Actions"/>
-			<property name="layoutConstraints" value="flowy"/>
-	
-			<child name="RefreshButtonPanel" type="page">
-				<property name="label" value="RefreshButtonPanel"/>
-		
-				<child name="job.button.refresh" type="Button">
-					<listener type="script">
-						<script language="groovy">option.findFirstWithName("/JobTreetable").refresh()</script>
-					</listener>
-				</child>
-		
-				<child name="filler" type="Filler">
-					<property name="width" value="10"/>
-					<property name="height" value="10"/>
-				</child>
+		<child name="cancel.job" type="Button"/>
+		<child name="suspend.job" type="Button"/>
+		<child name="resume.job" type="Button"/>
 
-			</child>
+		<child name="sep1" type="ToolbarSeparator"/>
+		<child name="max.nodes.job" type="Button"/>
 
+		<child name="sep2" type="ToolbarSeparator"/>
+		<child name="job.refresh.toggle" type="Boolean">
+			<property name="label" value="Auto refresh"/>
+			<property name="tooltip" value="Toggles between automatic and manual refresh of the tree structure"/>
+			<property name="value" value="true"/>
+			<property name="persistent" value="true"/>
+			<!--
+			<listener type="script">
+				<script language="groovy"><![CDATA[
+					def b = option.getValue().booleanValue();
+					def handler = option.findFirstWithName("/Treetable").getHandler();
+					if (b) handler.startRefreshDriverTimer();
+					else handler.stopRefreshDriverTimer();
+				]]></script>
+			</listener>
+			-->
 		</child>
 
-		<child name="JobTreeDisplayActions" type="page">
-			<property name="label" value="Tree Display Actions"/>
-			<property name="layoutConstraints" value="flowy"/>
-	
-			<child name="job.button.expand" type="Button">
-				<listener type="script">
-					<script language="groovy">option.findFirstWithName("/JobTreetable").getTreeTable().expandAll()</script>
-				</listener>
-			</child>
-	
-			<child name="job.button.collapse" type="Button">
-				<listener type="script">
-					<script language="groovy">option.findFirstWithName("/JobTreetable").getTreeTable().collapseAll()</script>
-				</listener>
-			</child>
+		<child name="job.button.refresh" type="Button">
+			<property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
+			<listener type="script">
+				<script language="groovy">option.findFirstWithName("/JobTreetable").refresh()</script>
+			</listener>
+		</child>
 
+		<child name="sep3" type="ToolbarSeparator"/>
+		<child name="job.button.expand" type="Button">
+			<property name="icon" value="/org/jppf/ui/resources/expand.gif"/>
+			<listener type="script">
+				<script language="groovy">option.findFirstWithName("/JobTreetable").getTreeTable().expandAll()</script>
+			</listener>
+		</child>
+
+		<child name="job.button.collapse" type="Button">
+			<property name="icon" value="/org/jppf/ui/resources/collapse.gif"/>
+			<listener type="script">
+				<script language="groovy">option.findFirstWithName("/JobTreetable").getTreeTable().collapseAll()</script>
+			</listener>
 		</child>
 
 	</child>

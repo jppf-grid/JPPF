@@ -18,7 +18,6 @@
 
 package org.jppf.ui.monitoring.node;
 
-import java.awt.Dimension;
 import java.util.*;
 
 import javax.swing.*;
@@ -31,7 +30,6 @@ import org.jppf.management.*;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
-import org.jppf.ui.options.*;
 import org.jppf.ui.treetable.*;
 
 /**
@@ -49,9 +47,9 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Contains all the data about the drivers and nodes.
+	 * Handles the automatic and manual refresh of the tree.
 	 */
-	private transient RefreshHandler refreshHandler = null;
+	private transient NodeRefreshHandler refreshHandler = null;
 	/**
 	 * Mapping of connection names to status listener.
 	 */
@@ -68,7 +66,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		populateTreeTableModel();
 		refreshNodeStates();
 		createUI();
-		refreshHandler = new RefreshHandler(this);
+		refreshHandler = new NodeRefreshHandler(this);
 	}
 
 	/**
@@ -157,13 +155,23 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	/**
 	 * Called to notify that a driver was removed.
 	 * @param driverName - the name of the driver to remove.
+	 * @param removeNodesOnly - true if only the nodes attached to the driver are to be removed.
 	 * @see org.jppf.ui.monitoring.event.NodeHandlerListener#driverRemoved(org.jppf.ui.monitoring.event.NodeHandlerEvent)
 	 */
-	public synchronized void driverRemoved(String driverName)
+	public synchronized void driverRemoved(String driverName, boolean removeNodesOnly)
 	{
 		final DefaultMutableTreeNode driverNode = findDriver(driverName);
 		if (debugEnabled) log.debug("removing driver: " + driverName);
-		if (driverNode != null) model.removeNodeFromParent(driverNode);
+		if (driverNode == null) return;
+		if (removeNodesOnly)
+		{
+			for (int i=driverNode.getChildCount()-1; i>=0; i--)
+			{
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode ) driverNode.getChildAt(i);
+				model.removeNodeFromParent(node);
+			}
+		}
+		else model.removeNodeFromParent(driverNode);
 	}
 
 	/**
@@ -244,6 +252,15 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	}
 
 	/**
+	 * Get the object that handles the automatic and manual refresh of the tree.
+	 * @return a <code>NodeRefreshHandler</code> instance.
+	 */
+	public NodeRefreshHandler getRefreshHandler()
+	{
+		return refreshHandler;
+	}
+
+	/**
 	 * Determine whether only nodes are currently selected.
 	 * @return true if at least one node and no driver is selected, false otherwise. 
 	 */
@@ -313,7 +330,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 				DefaultMutableTreeNode nodeNode = (DefaultMutableTreeNode) driverNode.getChildAt(j);
 				TopologyData data = (TopologyData) nodeNode.getUserObject();
 				data.refreshNodeState();
-				//model.changeNode(nodeNode);
 			}
 		}
 	}
@@ -324,6 +340,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	public void setupActions()
 	{
 		actionHandler = new JTreeTableActionHandler(treeTable);
+		actionHandler.putAction("shutdown.restart.driver", new ServerShutdownRestartAction());
 		actionHandler.putAction("update.configuration", new NodeConfigurationAction());
 		actionHandler.putAction("show.information", new NodeInformationAction());
 		actionHandler.putAction("update.threads", new NodeThreadsAction());
@@ -332,7 +349,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		actionHandler.putAction("shutdown.node", new ShutdownNodeAction());
 		actionHandler.updateActions();
 		treeTable.addMouseListener(new NodeTreeTableMouseListener(actionHandler));
-		Runnable r = new ActionsInitializer();
+		Runnable r = new ActionsInitializer(this, "/topology.toolbar");
 		new Thread(r).start();
 	}
 
@@ -344,51 +361,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	public synchronized void newConnection(ClientEvent event)
 	{
 		driverAdded(event.getConnection());
-	}
-
-	/**
-	 * Task that sets the actions in the toolbar.
-	 */
-	public class ActionsInitializer implements Runnable
-	{
-		/**
-		 * Execute this task.
-		 * @see java.lang.Runnable#run()
-		 */
-		public void run()
-		{
-			OptionsPage page = null;
-			while (page == null)
-			{
-				OptionElement parent = getParent();
-				if (parent != null) page = (OptionsPage) NodeDataPanel.this.findFirstWithName("/topology.toolbar");
-				if (page == null)
-				{
-					try
-					{
-						Thread.sleep(100);
-					}
-					catch(InterruptedException e)
-					{
-					}
-				}
-				else
-				{
-					for (OptionElement elt: page.getChildren())
-					{
-						JButton button = (JButton) elt.getUIComponent();
-						UpdatableAction action = actionHandler.getAction(elt.getName());
-						button.setAction(action);
-						button.setText("");
-						button.setToolTipText((String) action.getValue(Action.NAME));
-						button.setPreferredSize(new Dimension(16,16));
-						//button.repaint();
-					}
-					page.getUIComponent().invalidate();
-					page.getUIComponent().repaint();
-				}
-			}
-		}
 	}
 
 	/**
@@ -417,11 +389,20 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		 */
 		public void statusChanged(ClientConnectionStatusEvent event)
 		{
+			ClientConnectionStatusHandler ccsh =  event.getClientConnectionStatusHandler();
+			System.out.println("Received connection status changed event for " + ccsh + " : " + ccsh.getStatus());
 			DefaultMutableTreeNode driverNode = findDriver(driverName);
 			if (driverNode != null)
 			{
-				//model.changeNode(driverNode);
-				if (!JPPFClientConnectionStatus.ACTIVE.equals(event.getClientConnectionStatusHandler().getStatus())) driverRemoved(driverName);
+				/*
+				TreeNode[] tmp = driverNode.getPath();
+				if (tmp == null) return;
+				TreePath path = new TreePath(tmp);
+				Rectangle rect = treeTable.getTree().getPathBounds(path);
+				treeTable.getTree().repaint(rect);
+				*/
+				//treeTable.getTree().repaint();
+				driverRemoved(driverName, true);
 			}
 		}
 	}

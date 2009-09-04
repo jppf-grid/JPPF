@@ -19,7 +19,7 @@
 
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JPPFAdminTool" type="page">
 	<property name="label" value="JPPF Monitoring and Administration Tool"/>
-	<property name="layoutConstraints" value="flowy, fill"/>
+	<property name="layoutConstraints" value="flowy, fill, insets 0 0 0 0"/>
 	<script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
 	<initializer type="script">
 		<script language="groovy" source="org/jppf/ui/options/xml/jppfAdminTool.groovy"/>
@@ -61,6 +61,12 @@
 		<import source="file" location="org/jppf/ui/options/xml/ChartsConfigPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/AdminPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/BundleSizeTuningPage.xml"/>
+	</child>
+
+	<child name="StatusBar" type="page">
+		<property name="layoutConstraints" value="fillx, insets 0 0 0 0"/>
+		<property name="componentConstraints" value="growx, pushx, h 20!"/>
+		<property name="bordered" value="false"/>
 	</child>
 
 </opt:main>

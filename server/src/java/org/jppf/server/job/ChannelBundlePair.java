@@ -24,7 +24,7 @@ import org.jppf.io.BundleWrapper;
 import org.jppf.utils.Pair;
 
 /**
- * Instances of this class associate a channel with a job that is being executed on the corresponding node.
+ * Instances of this class associate a node channel with a job that is being executed on the corresponding node.
  * @author Laurent Cohen
  */
 public class ChannelBundlePair extends Pair<SelectableChannel, BundleWrapper>
@@ -50,7 +50,8 @@ public class ChannelBundlePair extends Pair<SelectableChannel, BundleWrapper>
 		if (obj == null) return false;
 		if (!obj.getClass().equals(this.getClass())) return false;
 		ChannelBundlePair pair = (ChannelBundlePair) obj;
-		if (first() == null) return pair.first() == null;
-		return first().equals(pair.first());
+		/*if (first() == null)*/
+		return pair.first() == first();
+		//return first().equals(pair.first());
 	}
 }
