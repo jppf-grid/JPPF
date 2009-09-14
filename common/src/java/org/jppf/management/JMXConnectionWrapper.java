@@ -140,8 +140,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 */
 	public void close() throws Exception
 	{
-		connectionThread.close();
-    jmxc.close();
+		if (connectionThread != null) connectionThread.close();
+    if (jmxc != null) jmxc.close();
 	}
 
 	/**
