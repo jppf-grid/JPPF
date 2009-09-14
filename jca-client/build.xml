@@ -16,7 +16,7 @@
 	limitations under the License.
 -->
 
-<project name="jca-client" default="build" basedir=".">
+<project name="J2EE Connector" default="build" basedir=".">
 
 	<!-- ========================================================================= -->
 	<!--                          Property definitions                             -->
@@ -331,11 +331,11 @@
 	<!--
 	-->
 	<target name="deploy.rar.jboss">
-		<copy todir="C:/Tools/jboss-4.0.5.GA/server/default/deploy" file="${build.dir}/jppf_ra_${jboss40}.rar"/>
+		<copy todir="C:/Tools/jboss-4.2.2.GA/server/jppf/deploy" file="${build.dir}/jppf_ra_${jboss40}.rar"/>
 	</target>
 
 	<target name="deploy.ear.jboss">
-		<copy todir="C:/Tools/jboss-4.0.5.GA/server/default/deploy" file="${build.dir}/${ear.prefix}_${jboss40}.ear"/>
+		<copy todir="C:/Tools/jboss-4.2.2.GA/server/jppf/deploy" file="${build.dir}/${ear.prefix}_${jboss40}.ear"/>
 	</target>
 
 	<target name="deploy.rar.weblogic">
