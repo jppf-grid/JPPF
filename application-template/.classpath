@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/jppf-client.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.jppf.org/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/jppf-common-node.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.jppf.org/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/jppf-common.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.jppf.org/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/commons-logging-1.1.jar"/>
+	<classpathentry kind="output" path="classes"/>
+</classpath>
