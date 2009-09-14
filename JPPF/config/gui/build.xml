@@ -16,7 +16,7 @@
 	limitations under the License.
 -->
 
-<project name="JPPF-Gui" default="run.gui" basedir=".">
+<project name="JPPF-GUI" default="run" basedir=".">
 
 	<!-- ========================================================================= -->
 	<!--                          Property definitions                             -->
@@ -31,19 +31,17 @@
 
   <path id="run.classpath">
 		<pathelement location="${config.dir}"/>
-		<fileset dir="${lib.dir}">
-			<include name="**/*.jar"/>
-		</fileset>
+		<fileset dir="${lib.dir}" includes="**/*.jar"/>
   </path>
 
 	<!-- ========================================================================= -->
 	<!--                     Run the framework processes                           -->
 	<!-- ========================================================================= -->
 
-	<target name="run.gui">
+	<target name="run">
 		<echo message="starting the JPPF Administration and Monitoring Tool"/>
 		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="run.classpath">
-			<jvmarg value="-server"/>
+			<!--<jvmarg value="-server"/>-->
 			<jvmarg value="-Xmx256m"/>
 			<jvmarg value="-Djppf.config=jppf-gui.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-gui.properties"/>
@@ -51,5 +49,8 @@
 			<arg value="file"/>
 		</java>       
 	</target>
+
+	<!-- for compatibility with previous versions -->
+	<target name="run.gui" depends="run"/>
 
 </project> 

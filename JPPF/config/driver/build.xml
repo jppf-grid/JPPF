@@ -16,7 +16,7 @@
 	limitations under the License.
 -->
 
-<project name='JPPF-Driver' default="run.driver" basedir=".">
+<project name='JPPF-Driver' default="run" basedir=".">
 
 	<!-- ========================================================================= -->
 	<!--                          Property definitions                             -->
@@ -31,23 +31,24 @@
 
   <path id="run.classpath">
 		<pathelement location="${config.dir}"/>
-		<fileset dir="${lib.dir}">
-			<include name="**/*.jar"/>
-		</fileset>
+		<fileset dir="${lib.dir}" includes="**/*.jar"/>
   </path>
 
 	<!-- ========================================================================= -->
-	<!--                     Run the framework processes                           -->
+	<!--                     Run the driver                                        -->
 	<!-- ========================================================================= -->
 
-	<target name="run.driver">
+	<target name="run">
 		<echo message="starting the JPPF driver"/>
 		<java fork="yes" classname="org.jppf.server.DriverLauncher" classpathref="run.classpath">
-			<jvmarg value="-server"/>
-			<jvmarg value="-Xmx64m"/>
+			<!--<jvmarg value="-server"/>-->
+			<jvmarg value="-Xmx32m"/>
 			<jvmarg value="-Djppf.config=jppf-driver.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-driver.properties"/>
 		</java>       
 	</target>
+
+	<!-- for compatibility with previous versions -->
+	<target name="run.driver" depends="run"/>
 
 </project> 

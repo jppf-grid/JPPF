@@ -16,7 +16,7 @@
 	limitations under the License.
 -->
 
-	<project name='JPPF-Node' default="run.node" basedir=".">
+	<project name='JPPF-Node' default="run" basedir=".">
 
 	<!-- ========================================================================= -->
 	<!--                          Property definitions                             -->
@@ -31,9 +31,7 @@
 
   <path id="run.classpath">
 		<pathelement location="${config.dir}"/>
-		<fileset dir="${lib.dir}">
-			<include name="**/*.jar"/>
-		</fileset>
+		<fileset dir="${lib.dir}" includes="**/*.jar"/>
   </path>
 
 	<!-- ========================================================================= -->
@@ -41,13 +39,16 @@
 	<!-- ========================================================================= -->
 
 	<!-- to run a single node -->
-	<target name="run.node">
+	<target name="run">
 		<java fork="yes" classname="org.jppf.node.NodeLauncher" classpathref="run.classpath">
-			<jvmarg value="-server" />
-			<jvmarg value="-Xmx16m" />
+			<!--<jvmarg value="-server"/>-->
+			<jvmarg value="-Xmx16m"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-node.properties" />
 			<jvmarg value="-Djppf.config=jppf-node.properties" />
 		</java>       
 	</target>
+
+	<!-- for compatibility with previous versions -->
+	<target name="run.node" depends="run"/>
 
 </project> 

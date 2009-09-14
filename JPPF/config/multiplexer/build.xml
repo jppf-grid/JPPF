@@ -16,7 +16,7 @@
 	limitations under the License.
 -->
 
-	<project name='JPPF-Multiplexer' default="run.multiplexer" basedir=".">
+	<project name='JPPF-Multiplexer' default="run" basedir=".">
 
 	<!-- ========================================================================= -->
 	<!--                          Property definitions                             -->
@@ -31,9 +31,7 @@
 
   <path id="run.classpath">
 		<pathelement location="${config.dir}"/>
-		<fileset dir="${lib.dir}">
-			<include name="**/*.jar"/>
-		</fileset>
+		<fileset dir="${lib.dir}" includes="**/*.jar"/>
   </path>
 
 	<!-- ========================================================================= -->
@@ -41,23 +39,29 @@
 	<!-- ========================================================================= -->
 
 	<!-- to run a multiplexer client -->
-	<target name="run.multiplexer">
+	<target name="run.client">
 		<java fork="yes" classname="org.jppf.server.nio.multiplexer.MultiplexerNioServer" classpathref="run.classpath">
-			<jvmarg value="-server" />
+			<!--<jvmarg value="-server"/>-->
 			<jvmarg value="-Xmx128m" />
 			<jvmarg value="-Dlog4j.configuration=log4j-multiplexer.properties" />
 			<jvmarg value="-Djppf.config=multiplexer.properties" />
 		</java>       
 	</target>
+	<!-- for consistency with the other modules -->
+	<target name="run" depends="run.client"/>
 
 	<!-- to run a multiplexer server -->
-	<target name="run.multiplexer.server">
+	<target name="run.server">
 		<java fork="yes" classname="org.jppf.server.nio.multiplexer.MultiplexerNioServer" classpathref="run.classpath">
-			<jvmarg value="-server" />
+			<!--<jvmarg value="-server"/>-->
 			<jvmarg value="-Xmx128m" />
 			<jvmarg value="-Dlog4j.configuration=log4j-multiplexer.properties" />
 			<jvmarg value="-Djppf.config=multiplexer-server.properties" />
 		</java>       
 	</target>
+
+	<!-- for compatibility with previous versions -->
+	<target name="run.multiplexer" depends="run.client"/>
+	<target name="run.multiplexer.server" depends="run.server"/>
 
 </project> 
