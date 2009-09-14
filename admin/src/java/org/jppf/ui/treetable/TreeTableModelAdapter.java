@@ -246,6 +246,7 @@ public class TreeTableModelAdapter extends AbstractTableModel
 	 */
 	protected void setSelectedPaths(TreePath[] paths)
 	{
+		if (paths == null) return;
 		List<TreePath> validPaths = new ArrayList<TreePath>();
 		for (TreePath path: paths)
 		{
