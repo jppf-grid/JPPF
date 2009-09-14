@@ -44,6 +44,7 @@ public class JPPFJob implements Serializable
 	private List<JPPFTask> tasks = null;
 	/**
 	 * The container for data shared between tasks.
+	 * The data provider should be considered read-only, i.e. no modification will be returned back to the client application.
 	 */
 	private DataProvider dataProvider = null;
 	/**
@@ -74,6 +75,11 @@ public class JPPFJob implements Serializable
 	 * The maximum number of nodes this job can run on.
 	 */
 	private int  maxNodes = Integer.MAX_VALUE;
+	/**
+	 * Determines whether this job is initially suspended.
+	 * If it is, it will have to be resumed, using either the amdin console or the JMX APIs.
+	 */
+	private boolean suspended = false;
 
 	/**
 	 * Default constructor.
@@ -85,7 +91,7 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Initialize a blocking job with the specified parameters.
-	 * @param dataProvider - the container for data shared between tasks.
+	 * @param dataProvider the container for data shared between tasks.
 	 */
 	public JPPFJob(DataProvider dataProvider)
 	{
@@ -94,8 +100,8 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Initialize a blocking job with the specified parameters.
-	 * @param dataProvider - the container for data shared between tasks.
-	 * @param executionPolicy - the tasks execution policy.
+	 * @param dataProvider the container for data shared between tasks.
+	 * @param executionPolicy the tasks execution policy.
 	 */
 	public JPPFJob(DataProvider dataProvider, ExecutionPolicy executionPolicy)
 	{
@@ -104,7 +110,7 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Initialize a non-blocking job with the specified parameters.
-	 * @param resultsListener - the listener that receives notifications of completed tasks.
+	 * @param resultsListener the listener that receives notifications of completed tasks.
 	 */
 	public JPPFJob(TaskResultListener resultsListener)
 	{
@@ -113,8 +119,8 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Initialize a non-blocking job with the specified parameters.
-	 * @param dataProvider - the container for data shared between tasks.
-	 * @param resultsListener - the listener that receives notifications of completed tasks.
+	 * @param dataProvider the container for data shared between tasks.
+	 * @param resultsListener the listener that receives notifications of completed tasks.
 	 */
 	public JPPFJob(DataProvider dataProvider, TaskResultListener resultsListener)
 	{
@@ -123,9 +129,9 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Initialize a non-blocking job with the specified parameters.
-	 * @param dataProvider - the container for data shared between tasks.
-	 * @param executionPolicy - the tasks execution policy.
-	 * @param resultsListener - the listener that receives notifications of completed tasks.
+	 * @param dataProvider the container for data shared between tasks.
+	 * @param executionPolicy the tasks execution policy.
+	 * @param resultsListener the listener that receives notifications of completed tasks.
 	 */
 	public JPPFJob(DataProvider dataProvider, ExecutionPolicy executionPolicy, TaskResultListener resultsListener)
 	{
@@ -134,11 +140,11 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Initialize a non-blocking job with the specified parameters.
-	 * @param dataProvider - the container for data shared between tasks.
-	 * @param executionPolicy - the tasks execution policy.
-	 * @param blocking - determines whetehr this job is blocking.
-	 * @param resultsListener - the listener that receives notifications of completed tasks.
-	 * @param priority - the priority of this job.
+	 * @param dataProvider the container for data shared between tasks.
+	 * @param executionPolicy the tasks execution policy.
+	 * @param blocking determines whether this job is blocking.
+	 * @param resultsListener the listener that receives notifications of completed tasks.
+	 * @param priority the priority of this job.
 	 */
 	public JPPFJob(DataProvider dataProvider, ExecutionPolicy executionPolicy, boolean blocking, TaskResultListener resultsListener, int priority)
 	{
@@ -161,7 +167,7 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Set the universal unique id for this job.
-	 * @param id - the id as a string. 
+	 * @param id the id as a string. 
 	 */
 	public void setId(String id)
 	{
@@ -178,9 +184,10 @@ public class JPPFJob implements Serializable
 	}
 
 	/**
-	 * Add a task to this job.
-	 * @param taskObject - the task to add to this job.
-	 * @param args - arguments to use with a JPPF-annotated class.
+	 * Add a task to this job. This method is for adding a task that is either an instance of {@link org.jppf.server.protocol.JPPFTask JPPFTask},
+	 * annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}, or an instance of {@link java.lang.Runnable Runnable} or {@link java.util.concurrent.Callable Callable}.
+	 * @param taskObject the task to add to this job.
+	 * @param args arguments to use with a JPPF-annotated class.
 	 * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
 	 */
 	public void addTask(Object taskObject, Object...args) throws JPPFException
@@ -194,7 +201,8 @@ public class JPPFJob implements Serializable
 	}
 
 	/**
-	 * Add a task to this job.
+	 * Add a POJO task to this job. The POJO task is identified as a method name associated with either an object for a non-static method,
+	 * or a class for a static method.
 	 * @param taskObject the task to add to this job.
 	 * @param method the name of the method to execute.
 	 * @param args arguments to use with a JPPF-annotated class.
@@ -218,7 +226,7 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Set the container for data shared between tasks.
-	 * @param dataProvider - a <code>DataProvider</code> instance.
+	 * @param dataProvider a <code>DataProvider</code> instance.
 	 */
 	public void setDataProvider(DataProvider dataProvider)
 	{
@@ -236,7 +244,7 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Set the tasks execution policy.
-	 * @param executionPolicy - an <code>ExecutionPolicy</code> instance.
+	 * @param executionPolicy an <code>ExecutionPolicy</code> instance.
 	 */
 	public void setExecutionPolicy(ExecutionPolicy executionPolicy)
 	{
@@ -254,7 +262,7 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Set the listener that receives notifications of completed tasks.
-	 * @param resultsListener - a <code>TaskCompletionListener</code> instance.
+	 * @param resultsListener a <code>TaskCompletionListener</code> instance.
 	 */
 	public void setResultListener(TaskResultListener resultsListener)
 	{
@@ -273,7 +281,7 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Specify whether the execution of this job is blocking on the client side.
-	 * @param blocking - true if the execution is blocking, false otherwise.
+	 * @param blocking true if the execution is blocking, false otherwise.
 	 */
 	public void setBlocking(boolean blocking)
 	{
@@ -309,10 +317,28 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Get the maximum number of nodes this job can run on.
-	 * @param maxNodes - the number of nodes as an int value.
+	 * @param maxNodes the number of nodes as an int value.
 	 */
 	public void setMaxNodes(int maxNodes)
 	{
 		this.maxNodes = maxNodes;
+	}
+
+	/**
+	 * Determine whether this job is initially suspended.
+	 * @return true if the job is suspended, false otherwise.
+	 */
+	public boolean isSuspended()
+	{
+		return suspended;
+	}
+
+	/**
+	 * Specify whether this job is initially suspended.
+	 * @param suspended true if the job is suspended, false otherwise.
+	 */
+	public void setSuspended(boolean suspended)
+	{
+		this.suspended = suspended;
 	}
 }

@@ -32,14 +32,15 @@ import org.jppf.server.protocol.JPPFTask;
 public class JPPFAnnotatedTask extends JPPFTask
 {
 	/**
-	 * 
+	 * Wrapper around a task that is not an instance of {@link org.jppf.server.protocol.JPPFTask JPPFTask}.
 	 */
 	protected TaskObjectWrapper taskObjectWrapper = null;
 
 	/**
-	 * Initialize this task with an object whose class is annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}.
-	 * @param taskObject a <code>JPPFRunnable</code>-annotated object.
-	 * @param args a <code>JPPFRunnable</code>-annotated object.
+	 * Initialize this task with an object whose class is either annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable},
+	 * an instance of {@link java.lang.Runnable Runnable} or  an instance of {@link java.util.concurrent.Callable Callable}. 
+	 * @param taskObject an object that encapsulates the task to execute.
+	 * @param args the optional arguments for a class that has one of its methods annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}.
 	 * @throws JPPFException if an error is raised while initializing this task.
 	 */
 	public JPPFAnnotatedTask(Object taskObject, Object...args) throws JPPFException
@@ -50,10 +51,10 @@ public class JPPFAnnotatedTask extends JPPFTask
 	}
 
 	/**
-	 * Initialize this task with an object whose class is annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}.
-	 * @param taskObject a <code>JPPFRunnable</code>-annotated object.
+	 * Initialize this task from a POJO, given a method and its arguments to execute it. 
+	 * @param taskObject either an instance of the POJO class if the method is non-static, or a class object if the method is static.
 	 * @param method the name of the method to execute.
-	 * @param args a <code>JPPFRunnable</code>-annotated object.
+	 * @param args the arguments for the method to execute.
 	 * @throws JPPFException if an error is raised while initializing this task.
 	 */
 	public JPPFAnnotatedTask(Object taskObject, String method, Object...args) throws JPPFException
