@@ -35,7 +35,7 @@ public class QueueEvent extends EventObject
 	/**
 	 * Determines if the event is a requeued bundle, following a node failure for instance.
 	 */
-	private boolean requeue = false;
+	private boolean requeued = false;
 
 	/**
 	 * Initialize this event with the specified queue and bundle.
@@ -57,7 +57,7 @@ public class QueueEvent extends EventObject
 	{
 		super(queue);
 		this.bundleWrapper = bundleWrapper;
-		this.requeue = requeue;
+		this.requeued = requeue;
 	}
 
 	/**
@@ -82,8 +82,8 @@ public class QueueEvent extends EventObject
 	 * Determine if this event is a requeued bundle, following a node failure for instance.
 	 * @return true if a bundle was requeued, false otherwise.
 	 */
-	public boolean isRequeue()
+	public boolean isRequeued()
 	{
-		return requeue;
+		return requeued;
 	}
 }

@@ -180,7 +180,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 	 */
 	public void newBundle(QueueEvent event)
 	{
-		if (!event.isRequeue()) jobQueued(event.getBundleWrapper());
+		if (!event.isRequeued()) jobQueued(event.getBundleWrapper());
 	}
 
 	/**
