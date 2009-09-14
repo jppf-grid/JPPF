@@ -16,7 +16,7 @@
 	limitations under the License.
 -->
 
-<project name="jppf" default="build" basedir="..">
+<project name="JPPF" default="build" basedir="..">
 
 	<!-- ========================================================================= -->
 	<!--                          Property definitions                             -->
@@ -31,6 +31,7 @@
 	<property name="jca-client" value="${basedir}/../jca-client"/>
 	<property name="jppfQuickStart" value="${basedir}/../JPPFQuickStart"/>
 	<property name="gigaspaces" value="${basedir}/../JPPF-GigaSpaces"/>
+	<property name="application.template" value="${basedir}/../application-template"/>
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${gigaspaces}/build.properties"/>
@@ -138,9 +139,9 @@
 	<target name="rebuild" depends="clean, init, compile, jar"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
-		depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces"/>
+		depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces, j2ee.connector"/>
 	<target name="deploy.nojavadoc"
-		depends="clean.deploy, rebuild, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces"/>
+		depends="clean.deploy, rebuild, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces, j2ee.connector, application.template"/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
@@ -157,6 +158,7 @@
 		<antcall target="compile.module"><param name="path" value="${admin}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${server}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${demo}"/></antcall>
+		
   </target>
 
 	<target name="compile.module">
@@ -196,7 +198,7 @@
 	<!--                         Generate the samples pack                         -->
 	<!-- ========================================================================= -->
 
-	<target name="samples.pack" description="Generate the screen saver packaging for the nodes"
+	<target name="samples.pack" description="Generate the packaging for the samples pack"
 		depends="init, build" if="samples.pack.present">
 		<copy todir="${basedir}/../samples-pack/shared/lib">
 			<fileset dir="${build}">
@@ -207,11 +209,12 @@
 		<ant antfile="${basedir}/../samples-pack/SequenceAlignment/build.xml" target="compile" inheritall="false"/>
 		<ant antfile="${basedir}/../samples-pack/WebSearchEngine/build.xml" target="compile" inheritall="false"/>
 		<ant antfile="${basedir}/../samples-pack/TomcatPort/build.xml" target="build" inheritall="false"/>
-		<property name="samples.pack.file"
-			value="${build}/${ant.project.name}-samples-pack-${version.number}.${build.number}-${now}.zip"/>
+		<!--<property name="samples.pack.file" value="${build}/${ant.project.name}-samples-pack-${version.number}.${build.number}-${now}.zip"/>-->
+		<property name="samples.pack.prefix" value="${ant.project.name}-${version.number}-samples-pack"/>
+		<property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>
 		<delete file="samples.pack.file" quiet="true"/>
 		<zip destfile="${samples.pack.file}">
-			<zipfileset dir="${basedir}/../samples-pack" prefix="samples-pack">
+			<zipfileset dir="${basedir}/../samples-pack" prefix="${samples.pack.prefix}">
 				<exclude name="**/*.log"/>
 				<exclude name="**/javadoc/**/*.*"/>
 			</zipfileset>
@@ -233,15 +236,16 @@
 		<ant antfile="${jppfQuickStart}/build.xml" target="compile" inheritall="false"/>
 		<echo message="quick start destination: ${jppfQuickStart}/docs"/>
 		<antcall target="doc.gen">
-			<param name="source" value="${jppfQuickStart}/docs/doc-source"/>
+			<param name="source" value="${home}/doc-source/quickstart/"/>
 			<param name="dest" value="${jppfQuickStart}/docs/"/>
-			<param name="templates" value="${jppfQuickStart}/docs/templates/"/>
+			<param name="templates" value="${home}/templates/quickstart/"/>
 		</antcall>
-		<property name="jppfQuickStart.file"
-			value="${build}/JPPFQuickStart-${version.number}.${build.number}-${now}.zip"/>
-		<delete file="jppfQuickStart.file" quiet="true"/>
-		<zip destfile="${jppfQuickStart.file}">
-			<zipfileset dir="${jppfQuickStart}" prefix="JPPFQuickStart">
+		<!--<property name="jppfQuickStart.file" value="${build}/JPPFQuickStart-${version.number}.${build.number}-${now}.zip"/>-->
+		<property name="QuickStart.prefix" value="${ant.project.name}-${version.number}-Quick-Start"/>
+		<property name="QuickStart.file" value="${build}/${QuickStart.prefix}.zip"/>
+		<delete file="QuickStart.file" quiet="true"/>
+		<zip destfile="${QuickStart.file}">
+			<zipfileset dir="${jppfQuickStart}" prefix="${QuickStart.prefix}">
 				<exclude name="**/*.log"/>
 				<exclude name="**/doc-source/**/*.*"/>
 				<exclude name="**/templates/**/*.*"/>
@@ -270,11 +274,11 @@
 			</fileset>
 		</copy>
 		<ant antfile="${gigaspaces}/build.xml" target="build" inheritall="false"/>
-		<property name="gigaspaces.file"
-			value="${build}/JPPF-GigaSpaces-${version.number}.${build.number}-${now}.zip"/>
+		<property name="gigaspaces.prefix" value="${ant.project.name}-${version.number}-GigaSpaces"/>
+		<property name="gigaspaces.file" value="${build}/${gigaspaces.prefix}.zip"/>
 		<delete file="gigaspaces.file" quiet="true"/>
 		<zip destfile="${gigaspaces.file}">
-			<zipfileset dir="${gigaspaces}" prefix="JPPF-GigaSpaces">
+			<zipfileset dir="${gigaspaces}" prefix="${gigaspaces.prefix}">
 				<exclude name="**/CVS/**"/>
 				<exclude name="**/*.log"/>
 				<exclude name="**/*.classpath"/>
@@ -321,12 +325,12 @@
 	<!-- ========================================================================= -->
 
 	<target name="package" description="package the application into a release zip file" depends="rebuild">
+		<!--<property name="release.file" value="${build}/${ant.project.name}-full-src-${version.number}-${build.number}-${now}.zip"/>-->
+		<property name="release.file" value="${build}/${ant.project.name}-${version.number}-full-src.zip"/>
 		<property name="zip.prefix" value="${ant.project.name}-${version.number}"/>
-		<property name="release.file"
-			value="${build}/${ant.project.name}-full-src-${version.number}-${build.number}-${now}.zip"/>
 		<delete file="${release.file}" quiet="true"/>
 		<zip destfile="${release.file}">
-			<zipfileset dir="${basedir}" prefix="${ant.project.name}-${version.number}/JPPF">
+			<zipfileset dir="${basedir}" prefix="${zip.prefix}/JPPF">
 				<include name="build/jppf*.jar"/>
 				<include name="bin/**/*.*"/>
 				<include name="config/**/*.*"/>
@@ -349,13 +353,44 @@
 	<!--             Package the j2ee connector for deployment                     -->
 	<!-- ========================================================================= -->
 
-	<target name="jppf.connector" description="" depends="rebuild">
-		<property name="zip.prefix" value="${ant.project.name}-${version.number}"/>
-		<property name="connector.release.file"
-			value="${build}/${ant.project.name}-j2ee-connector-${version.number}-${build.number}-${now}.zip"/>
+	<target name="j2ee.connector" description="" depends="rebuild">
+		<!--<property name="connector.release.file" value="${build}/${ant.project.name}-j2ee-connector-${version.number}-${build.number}-${now}.zip"/>-->
+		<property name="j2ee.prefix" value="${ant.project.name}-${version.number}-j2ee-connector"/>
+		<property name="connector.release.file" value="${build}/${j2ee.prefix}.zip"/>
 		<delete file="${connector.release.file}" quiet="true"/>
 		<zip destfile="${connector.release.file}">
-			<zipfileset dir="${jca-client}" prefix="${ant.project.name}-j2ee-connector-${version.number}"/>
+			<zipfileset dir="${jca-client}" prefix="${j2ee.prefix}" excludes=".*"/>
+		</zip>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--          Package the application template for deployment                  -->
+	<!-- ========================================================================= -->
+
+	<target name="application.template" description="" depends="init">
+		<delete>
+	    <fileset dir="." includes="jppf*.jar"/>
+	  </delete>
+		<copy todir="${application.template}/lib">
+			<fileset dir="${build}">
+				<include name="jppf-common-node.jar"/>
+				<include name="jppf-common.jar"/>
+				<include name="jppf-client.jar"/>
+			</fileset>
+		</copy>		
+    <delete dir="${application.template}/classes" quiet="true"/>
+ 		<mkdir dir="${application.template}/classes"/>
+		<javac srcdir="" destdir="${application.template}/classes"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+			<src path="${application.template}/src"/>
+		</javac>
+		<property name="template.prefix" value="${ant.project.name}-${version.number}-application-template"/>
+		<property name="template.release.file" value="${build}/${template.prefix}.zip"/>
+		<delete file="${template.release.file}" quiet="true"/>
+		<zip destfile="${template.release.file}">
+			<zipfileset dir="${application.template}" prefix="${template.prefix}" excludes=".*"/>
 		</zip>
 	</target>
 
@@ -377,9 +412,9 @@
 		<mkdir dir="${runtime.driver}/lib"/>
 		<copy todir="${runtime.driver}/lib">
 			<fileset dir="${build}">
-				<include name="${ant.project.name}-common-node.jar"/>
-				<include name="${ant.project.name}-common.jar"/>
-				<include name="${ant.project.name}-server.jar"/>
+				<include name="jppf-common-node.jar"/>
+				<include name="jppf-common.jar"/>
+				<include name="jppf-server.jar"/>
 			</fileset>
 			<fileset dir="${lib}/log4j" includes="*.jar"/>
 			<fileset dir="${lib}/ApacheCommons">
@@ -390,10 +425,11 @@
 		<copy tofile="${runtime.driver}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.driver}"><fileset dir="${config}/driver"/></copy>
 		<copy tofile="${runtime.driver}/config/jppf.policy" file="${config}/node/config/jppf.policy"/>
-		<property name="runtime.driver.file" value="${build}/${ant.project.name}-driver-bin-${version.number}-${build.number}-${now}.zip"/>
+		<property name="driver.prefix" value="${ant.project.name}-${version.number}-driver"/>
+		<property name="runtime.driver.file" value="${build}/${driver.prefix}.zip"/>
 		<delete file="${runtime.driver.file}" quiet="true"/>
 		<zip destfile="${runtime.driver.file}">
-			<zipfileset dir="${runtime.driver}" prefix="${ant.project.name}-${version.number}-driver"/>
+			<zipfileset dir="${runtime.driver}" prefix="${driver.prefix}"/>
 		</zip>
     <delete dir="${runtime.driver}" quiet="true"/>
 	</target>
@@ -403,16 +439,17 @@
 	<target name="runtime.node">
 		<mkdir dir="${runtime.node}/lib"/>
 		<copy todir="${runtime.node}/lib">
-			<fileset dir="${build}" includes="${ant.project.name}-common-node.jar"/>
+			<fileset dir="${build}" includes="jppf-common-node.jar"/>
 			<fileset dir="${lib}/ApacheCommons" includes="commons-logging*.jar"/>
 			<fileset dir="${lib}/log4j" includes="*.jar"/>
 		</copy>
 		<copy tofile="${runtime.node}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.node}"><fileset dir="${config}/node"/></copy>
-		<property name="runtime.node.file" value="${build}/${ant.project.name}-node-bin-${version.number}-${build.number}-${now}.zip"/>
+		<property name="node.prefix" value="${ant.project.name}-${version.number}-node"/>
+		<property name="runtime.node.file" value="${build}/${node.prefix}.zip"/>
 		<delete file="${runtime.node.file}" quiet="true"/>
 		<zip destfile="${runtime.node.file}">
-			<zipfileset dir="${runtime.node}" prefix="${ant.project.name}-${version.number}-node"/>
+			<zipfileset dir="${runtime.node}" prefix="${node.prefix}"/>
 		</zip>
     <delete dir="${runtime.node}" quiet="true"/>
 	</target>
@@ -423,11 +460,11 @@
 		<mkdir dir="${runtime.gui}/lib"/>
 		<copy todir="${runtime.gui}/lib">
 			<fileset dir="${build}">
-				<include name="${ant.project.name}-common-node.jar"/>
-				<include name="${ant.project.name}-common.jar"/>
-				<include name="${ant.project.name}-server.jar"/>
-				<include name="${ant.project.name}-client.jar"/>
-				<include name="${ant.project.name}-admin.jar"/>
+				<include name="jppf-common-node.jar"/>
+				<include name="jppf-common.jar"/>
+				<include name="jppf-server.jar"/>
+				<include name="jppf-client.jar"/>
+				<include name="jppf-admin.jar"/>
 			</fileset>
 			<fileset dir="${lib}/log4j" includes="*.jar"/>
 			<fileset dir="${lib}/ApacheCommons" includes="commons-logging*.jar"/>
@@ -439,10 +476,11 @@
 		</copy>
 		<copy tofile="${runtime.gui}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.gui}"><fileset dir="${config}/gui"/></copy>
-		<property name="runtime.gui.file" value="${build}/${ant.project.name}-gui-bin-${version.number}-${build.number}-${now}.zip"/>
+		<property name="gui.prefix" value="${ant.project.name}-${version.number}-admin-ui"/>
+		<property name="runtime.gui.file" value="${build}/${gui.prefix}.zip"/>
 		<delete file="${runtime.gui.file}" quiet="true"/>
 		<zip destfile="${runtime.gui.file}">
-			<zipfileset dir="${runtime.gui}" prefix="${ant.project.name}-${version.number}-gui"/>
+			<zipfileset dir="${runtime.gui}" prefix="${gui.prefix}"/>
 		</zip>
     <delete dir="${runtime.gui}" quiet="true"/>
 	</target>
@@ -453,18 +491,19 @@
 		<mkdir dir="${runtime.multiplexer}/lib"/>
 		<copy todir="${runtime.multiplexer}/lib">
 			<fileset dir="${build}">
-				<include name="${ant.project.name}-common-node.jar"/>
-				<include name="${ant.project.name}-common.jar"/>
+				<include name="jppf-common-node.jar"/>
+				<include name="jppf-common.jar"/>
 			</fileset>
 			<fileset dir="${lib}/log4j" includes="*.jar"/>
 			<fileset dir="${lib}/ApacheCommons" includes="commons-logging*.jar"/>
 		</copy>
 		<copy tofile="${runtime.multiplexer}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.multiplexer}"><fileset dir="${config}/multiplexer"/></copy>
-		<property name="runtime.multiplexer.file" value="${build}/${ant.project.name}-multiplexer-bin-${version.number}.${build.number}-${now}.zip"/>
+		<property name="multiplexer.prefix" value="${ant.project.name}-${version.number}-multiplexer"/>
+		<property name="runtime.multiplexer.file" value="${build}/${multiplexer.prefix}.zip"/>
 		<delete file="${runtime.multiplexer.file}" quiet="true"/>
 		<zip destfile="${runtime.multiplexer.file}">
-			<zipfileset dir="${runtime.multiplexer}" includes="**/*.*" prefix="${ant.project.name}-${version.number}-multiplexer"/>
+			<zipfileset dir="${runtime.multiplexer}" includes="**/*.*" prefix="${multiplexer.prefix}"/>
 		</zip>
     <delete dir="${runtime.multiplexer}" quiet="true"/>
 	</target>
@@ -473,7 +512,7 @@
 	<!--                     Build the web site content                            -->
 	<!-- ========================================================================= -->
 
-  <target name="doc" depends="doc.screenshots, doc.home">
+  <target name="doc" depends="doc.screenshots, doc.home, doc.home.1">
 	</target>
 
   <target name="doc.home" description="generates the project web site pages">
@@ -484,11 +523,19 @@
 		</antcall>
 	</target>
 
-	<target name="doc.overview" description="generates the project web site pages">
+  <target name="doc.home.1" description="generates the project web site pages">
 		<antcall target="doc.gen">
-			<param name="source" value="${home}/overview-source"/>
-			<param name="dest" value="${home}/"/>
-			<param name="templates" value="${home}/templates/"/>
+			<param name="source" value="docs/home/doc-source/v1"/>
+			<param name="dest" value="docs/home/"/>
+			<param name="templates" value="docs/home/templates/"/>
+		</antcall>
+	</target>
+
+  <target name="doc.home.2" description="generates the project web site pages">
+		<antcall target="doc.gen">
+			<param name="source" value="docs/home/doc-source/v2"/>
+			<param name="dest" value="docs/home/"/>
+			<param name="templates" value="docs/home/templates/"/>
 		</antcall>
 	</target>
 
@@ -544,7 +591,7 @@
 					<tr>
 						<td valign="center">
 							<a href="http://www.jppf.org" target="_top">
-								<img src="http://jppf-project.sourceforge.net/images/logo2.gif" border="0"/>
+								<img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/>
 							</a>
 						</td>
 					</tr>
