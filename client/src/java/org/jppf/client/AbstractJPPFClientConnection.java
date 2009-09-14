@@ -221,6 +221,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		header.setTaskCount(count);
 		header.setParameter(BundleParameter.JOB_ID, job.getId());
 		header.setParameter(BundleParameter.MAX_JOB_NODES, job.getMaxNodes());
+		header.setSuspended(job.isSuspended());
 
 		SocketWrapper socketClient = taskServerConnection.getSocketClient();
 		socketClient.sendBytes(ser.serialize(header));
@@ -296,6 +297,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			}
 			catch(ClassNotFoundException e)
 			{
+				log.error(e.getMessage(), e);
 			}
 		}
 		if (clazz == null)

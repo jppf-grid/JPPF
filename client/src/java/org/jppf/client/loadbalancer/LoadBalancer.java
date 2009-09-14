@@ -319,6 +319,7 @@ public class LoadBalancer
 				JPPFJob newJob = new JPPFJob(job.getDataProvider(), job.getExecutionPolicy(), job.isBlocking(), job.getResultListener(), job.getPriority());
 				newJob.setId(job.getId());
 				newJob.setMaxNodes(job.getMaxNodes());
+				newJob.setSuspended(job.isSuspended());
 				for (JPPFTask task: tasks) newJob.addTask(task);
 				while (!completed)
 				{
