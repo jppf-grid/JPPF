@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -77,10 +77,10 @@ public class JobEventTask implements Runnable
 	 */
 	public void run()
 	{
+		JPPFJobSLA sla = bundle.getJobSLA();
 		JobInformation jobInfo = new JobInformation((String) bundle.getParameter(BundleParameter.JOB_ID),
-			bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getPriority(), bundle.isSuspended());
-		Integer maxNodes = (Integer) bundle.getParameter(BundleParameter.MAX_JOB_NODES);
-		jobInfo.setMaxNodes(maxNodes == null ? Integer.MAX_VALUE : maxNodes);
+			bundle.getTaskCount(), bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended());
+		jobInfo.setMaxNodes(sla.getMaxNodes());
 		NodeManagementInfo nodeInfo = (channel == null) ? null : JPPFDriver.getInstance().getNodeInformation(channel);
 		JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);
 		List<JobListener> listeners = jobManager.getListeners();

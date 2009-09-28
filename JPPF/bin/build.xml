@@ -51,7 +51,7 @@
 	<property name="docs" value="${basedir}/docs"/>
 	<property name="home" value="${docs}/home"/>
 	<property name="examples" value="${basedir}/examples"/>
-	<property name="javadoc" value="${docs}/api"/>
+	<property name="javadoc" value="${home}/api"/>
 	<property name="app.jar.file" value="${ant.project.name}.jar"/>
 	<property name="license.file" value="LICENSE.txt"/>
 	<property name="runtime" value="${build}/runtime"/>
@@ -139,7 +139,7 @@
 	<target name="rebuild" depends="clean, init, compile, jar"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
-		depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces, j2ee.connector"/>
+		depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces, j2ee.connector, application.template"/>
 	<target name="deploy.nojavadoc"
 		depends="clean.deploy, rebuild, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces, j2ee.connector, application.template"/>
   <target name="deploy.splash">
@@ -555,7 +555,7 @@
 			<arg value="72"/>
 			<arg value="72"/>
 			<arg value="${home}/templates"/>
-			<arg value="10"/>
+			<arg value="9"/>
 		</java>       
 	</target>
 
@@ -604,7 +604,7 @@
 				]]>
 			</bottom>
 		</javadoc>
-		<copy todir="${docs}/api/resources" overwrite="true">
+		<copy todir="${javadoc}/resources" overwrite="true">
 			<fileset dir="${bin}">
 				<include name="*.gif"/>
 				<include name="*.jpg"/>
@@ -614,12 +614,7 @@
 
 	<target name="javadoc.package" description="Package the javadoc for deployment on the web site">
     <delete file="${docs}/api.tar.gz" quiet="true"/>
-		<tar destfile="${docs}/api.tar.gz" compression="gzip" basedir="${docs}" includes="api/**/*.*"/>
-    <delete dir="${home}/api" quiet="true"/>
-    <mkdir dir="${home}/api"/>
-		<copy todir="${home}/api">
-			<fileset dir="${javadoc}"/>
-		</copy>
+		<tar destfile="${docs}/api.tar.gz" compression="gzip" basedir="${home}" includes="api/**/*.*"/>
 	</target>
 
 	<!-- ========================================================================= -->

@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,7 +25,6 @@ import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 
 /**
@@ -42,6 +41,7 @@ public class WaitingResultsState extends NodeServerState
 	 * Determines whether DEBUG logging level is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+
 	/**
 	 * Initialize this state.
 	 * @param server the server that handles this state.
@@ -84,13 +84,23 @@ public class WaitingResultsState extends NodeServerState
 			else
 			{
 				long elapsed = System.currentTimeMillis() - bundle.getExecutionStartTime();
-				JPPFDriver.getInstance().getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getNodeMessage().getLength());
+				statsManager.taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getNodeMessage().getLength());
 				context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 			}
-			// notifing the client thread about the end of a bundle
-			TaskCompletionListener listener = bundle.getCompletionListener();
-			if (listener != null) listener.taskCompleted(newBundleWrapper);
-			JPPFDriver.getInstance().getJobManager().jobReturned(bundleWrapper, channel);
+			Boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.REQUEUE);
+			jobManager.jobReturned(bundleWrapper, channel);
+			if ((requeue != null) && requeue)
+			{
+				bundle.setParameter(BundleParameter.REQUEUE, true);
+				bundle.getJobSLA().setSuspended(true);
+				context.resubmitBundle(bundleWrapper);
+			}
+			else
+			{
+				// notifing the client thread about the end of a bundle
+				TaskCompletionListener listener = bundle.getCompletionListener();
+				if (listener != null) listener.taskCompleted(newBundleWrapper);
+			}
 			// there is nothing left to do, so this instance will wait for a task bundle
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setNodeMessage(null);

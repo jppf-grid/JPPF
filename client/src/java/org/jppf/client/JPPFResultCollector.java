@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,7 +26,7 @@ import org.jppf.server.protocol.*;
 
 /**
  * Implementation of the {@link org.jppf.client.event.TaskResultListener TaskResultListener} interface
- * that can be used &quot;as is&quot; to collect the results of an asynchronous tasks submission.
+ * that can be used &quot;as is&quot; to collect the results of an asynchronous job submission.
  * @see org.jppf.client.JPPFClient#submitNonBlocking(List, org.jppf.task.storage.DataProvider, TaskResultListener)
  * @author Laurent Cohen
  */
@@ -49,15 +49,10 @@ public class JPPFResultCollector implements TaskResultListener
 	 * submitted list of tasks.
 	 */
 	private Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
-	//private Map<Integer, List<JPPFTask>> resultMap = new TreeMap<Integer, List<JPPFTask>>();
 	/**
-	 * The list of final resulting taskss.
+	 * The list of final resulting tasks.
 	 */
 	private List<JPPFTask> results = null;
-	/**
-	 * The list of final result objects.
-	 */
-	private List<Object> resultObjects = null;
 
 	/**
 	 * Initialize this collector with a specified number of tasks. 
@@ -75,7 +70,6 @@ public class JPPFResultCollector implements TaskResultListener
 	 */
 	public synchronized void resultsReceived(TaskResultEvent event)
 	{
-		int idx = event.getStartIndex();
 		List<JPPFTask> tasks = event.getTaskList();
 		if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks");
 		for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
@@ -97,7 +91,7 @@ public class JPPFResultCollector implements TaskResultListener
 			}
 			catch(InterruptedException e)
 			{
-				e.printStackTrace();
+				log.error(e.getMessage(), e);
 			}
 		}
 		results = new ArrayList<JPPFTask>();
@@ -107,39 +101,11 @@ public class JPPFResultCollector implements TaskResultListener
 	}
 
 	/**
-	 * Wait until all result objects of a request have been collected.
-	 * @return the list of resulting objects, either tasks or JPPF-annotated objects.
-	 */
-	public synchronized List<Object> waitForResultObjects()
-	{
-		if (resultObjects == null)
-		{
-			waitForResults();
-			resultObjects = new ArrayList<Object>();
-			for (JPPFTask t: results)
-			{
-				resultObjects.add(
-					t instanceof JPPFAnnotatedTask ? ((JPPFAnnotatedTask) t).getResult() : t);
-			}
-		}
-		return resultObjects;
-	}
-
-	/**
 	 * Get the list of final results.
 	 * @return a list of results as tasks, or null if not all tasks have been executed.
 	 */
 	public List<JPPFTask> getResults()
 	{
 		return results;
-	}
-
-	/**
-	 * Get the list of final result objects.
-	 * @return a list of results as tasks, or null if not all tasks have been executed.
-	 */
-	public List<Object> getObjectResults()
-	{
-		return resultObjects;
 	}
 }

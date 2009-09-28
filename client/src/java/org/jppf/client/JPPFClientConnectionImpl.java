@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,7 +30,7 @@ import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 
 /**
  * This class provides an API to submit execution requests and administration
@@ -168,6 +168,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 			mHost = host;
 			port = jmxPort;
 		}
+		mHost = NetworkUtils.getHostName(mHost);
 		jmxConnection = new JMXDriverConnectionWrapper(mHost, port);
 		jmxConnection.connect();
 	}
@@ -176,7 +177,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * Submit the request to the server.
 	 * @param job - the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
-	 * @see org.jppf.client.JPPFClientConnection#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener, org.jppf.node.policy.ExecutionPolicy, int)
+	 * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
 	 */
 	public void submit(JPPFJob job)
 			throws Exception

@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,27 +42,27 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
 	Serializable notification() throws Exception;
 	/**
 	 * Cancel the execution of the tasks with the specified id.
-	 * @param id - the id of the tasks to cancel.
+	 * @param id the id of the tasks to cancel.
 	 * @throws Exception if any error occurs.
 	 */
 	void cancelTask(String id) throws Exception;
 	/**
 	 * Restart the execution of the tasks with the specified id.<br>
 	 * The task(s) will be restarted even if their execution has already completed.
-	 * @param id - the id of the task or tasks to restart.
+	 * @param id the id of the task or tasks to restart.
 	 * @throws Exception if any error occurs.
 	 */
 	void restartTask(String id) throws Exception;
 	/**
 	 * Set the size of the node's thread pool.
-	 * @param size - the size as an int.
+	 * @param size the size as an int.
 	 * @throws Exception if any error occurs.
 	 */
 	void updateThreadPoolSize(Integer size) throws Exception;
 	/**
 	 * Update the priority of all execution threads.
-	 * @param newPriority - the new priority to set.
-	 * @throws Exception - if an error is raised when invoking the node mbean.
+	 * @param newPriority the new priority to set.
+	 * @throws Exception if an error is raised when invoking the node mbean.
 	 */
 	void updateThreadsPriority(Integer newPriority) throws Exception;
 	/**
@@ -89,21 +89,22 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
 	void resetTaskCounter() throws Exception;
 	/**
 	 * Reset the node's executed tasks counter to the specified value.
-	 * @param n - the number to set the task counter to.
+	 * @param n the number to set the task counter to.
 	 * @throws Exception if any error occurs.
 	 */
 	void setTaskCounter(Integer n) throws Exception;
 	/**
 	 * Update the configuration properties of the node. 
-	 * @param config - the set of properties to update.
+	 * @param config the set of properties to update.
 	 * @param reconnect - specifies whether the node should reconnect ot the driver after updating the properties.
 	 * @throws Exception if any error occurs.
 	 */
 	void updateConfiguration(Map<String, String> config, Boolean reconnect) throws Exception;
 	/**
 	 * Cancel the job with the specified id.
-	 * @param jobId - the id of the job to cancel.
+	 * @param jobId the id of the job to cancel.
+	 * @param requeue true if the job should be requeued on the server side, false otherwise.
 	 * @throws Exception if any error occurs.
 	 */
-	void cancelJob(String jobId) throws Exception;
+	void cancelJob(String jobId, Boolean requeue) throws Exception;
 }

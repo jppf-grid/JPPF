@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,6 @@ package org.jppf.server.protocol;
 import java.io.Serializable;
 import java.util.*;
 
-import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.utils.*;
 
 /**
@@ -92,10 +91,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 */
 	private long executionStartTime = 0L;
 	/**
-	 * The priority of this task bundle.
-	 */
-	private int priority = 0;
-	/**
 	 * The build number of the current version of JPPF. 
 	 */
 	private int buildNumber = 0;
@@ -109,13 +104,9 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	 */
 	private Map<Object, Object> parameters = new HashMap<Object, Object>();
 	/**
-	 * The execution policy for this bundle, which determines on which nodes the tasks can be run.
+	 * The service level agreement between the job and the server.
 	 */
-	private ExecutionPolicy executionPolicy = null;
-	/**
-	 * Determines whether the job is in suspended state.
-	 */
-	private boolean suspended = false; 
+	private JPPFJobSLA jobSLA = new JPPFJobSLA();
 
 	/**
 	 * Initialize this task bundle and set its build number.
@@ -289,24 +280,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	}
 
 	/**
-	 * Get the priority of this task bundle.
-	 * @return the priority as an int.
-	 */
-	public int getPriority()
-	{
-		return priority;
-	}
-
-	/**
-	 * Set the priority of this task bundle.
-	 * @param priority the priority as an int. 
-	 */
-	public void setPriority(int priority)
-	{
-		this.priority = priority;
-	}
-
-	/**
 	 * Compare two task bundles, based on their respective priorities.<br>
 	 * <b>Note:</b> <i>this class has a natural ordering that is inconsistent with equals.</i>
 	 * @param bundle the bundle compare this one to.
@@ -317,8 +290,9 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	public int compareTo(JPPFTaskBundle bundle)
 	{
 		if (bundle == null) return 1;
-		if (priority < bundle.getPriority()) return -1;
-		if (priority > bundle.getPriority()) return 1;
+		int otherPriority = bundle.getJobSLA().getPriority();
+		if (jobSLA.getPriority() < otherPriority) return -1;
+		if (jobSLA.getPriority() > otherPriority) return 1;
 		return 0;
 	}
 
@@ -410,11 +384,21 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	/**
 	 * Get the value of a parameter of this request.
 	 * @param name the name of the parameter to get.
-	 * @return the value of the parameter to set.
+	 * @return the value of the parameter, or null if the parameter is not set.
 	 */
 	public Object getParameter(Object name)
 	{
 		return parameters.get(name);
+	}
+
+	/**
+	 * Remove a parameter from this request.
+	 * @param name the name of the parameter to remove.
+	 * @return the value of the parameter to remove, or null if the parameter is not set.
+	 */
+	public Object removeParameter(Object name)
+	{
+		return parameters.remove(name);
 	}
 
 	/**
@@ -427,38 +411,20 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	}
 
 	/**
-	 * Get the execution policy for this bundle.
-	 * @return an <code>ExecutionPolicy</code> instance.
+	 * Get the service level agreement between the job and the server.
+	 * @return an instance of <code>JPPFJobSLA</code>.
 	 */
-	public synchronized ExecutionPolicy getExecutionPolicy()
+	public JPPFJobSLA getJobSLA()
 	{
-		return executionPolicy;
+		return jobSLA;
 	}
 
 	/**
-	 * Set the execution policy for this bundle.
-	 * @param executionPolicy an <code>ExecutionPolicy</code> instance.
+	 * Get the service level agreement between the job and the server.
+	 * @param jobSLA an instance of <code>JPPFJobSLA</code>.
 	 */
-	public synchronized void setExecutionPolicy(ExecutionPolicy executionPolicy)
+	public void setJobSLA(JPPFJobSLA jobSLA)
 	{
-		this.executionPolicy = executionPolicy;
-	}
-
-	/**
-	 * Determine whether the job is in suspended state.
-	 * @return true if the job is suspended, false otherwise.
-	 */
-	public boolean isSuspended()
-	{
-		return suspended;
-	}
-
-	/**
-	 * Specify whether the job is in suspended state.
-	 * @param suspended - true if the job is suspended, false otherwise.
-	 */
-	public void setSuspended(boolean suspended)
-	{
-		this.suspended = suspended;
+		this.jobSLA = jobSLA;
 	}
 }

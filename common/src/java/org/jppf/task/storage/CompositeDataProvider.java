@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +25,8 @@ import java.net.URL;
  * data provider to use is performed based on the types of the arguments.
  * @see org.jppf.task.storage.DataProvider
  * @author Laurent Cohen
+ * @deprecated the semantics of this class is not clear, and its functionalities
+ * are made obsolete by the {@link org.jppf.server.protocol.Location location APIs}.
  */
 public class CompositeDataProvider implements DataProvider
 {
@@ -45,6 +47,7 @@ public class CompositeDataProvider implements DataProvider
 	 * @return the value as an <code>Object</code>.
 	 * @throws Exception if an error occured while retrieving the data.
 	 * @see org.jppf.task.storage.DataProvider#getValue(java.lang.Object)
+	 * @deprecated use the {@link org.jppf.server.protocol.Location location APIs} instead.
 	 */
 	public Object getValue(Object key) throws Exception
 	{
@@ -60,6 +63,7 @@ public class CompositeDataProvider implements DataProvider
 	 * @param value the value to store, associated with the key.
 	 * @throws Exception if an error occured setting the data.
 	 * @see org.jppf.task.storage.DataProvider#setValue(java.lang.Object, java.lang.Object)
+	 * @deprecated use the {@link org.jppf.server.protocol.Location location APIs} instead.
 	 */
 	public void setValue(Object key, Object value) throws Exception
 	{

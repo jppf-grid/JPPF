@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -53,7 +53,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 	/**
 	 * 
 	 */
-	private Map<Integer, List<JPPFTask>> resultMap = new TreeMap<Integer, List<JPPFTask>>();
+	private Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
 
 	/**
 	 * Entry point for this class, performs a matrix multiplication a number of times.,<br>
@@ -117,7 +117,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 				jppfClient.submit(job);
 				waitForResults();
 				List<JPPFTask> results = new ArrayList<JPPFTask>();
-				for (Integer n: resultMap.keySet()) results.addAll(resultMap.get(n));
+				for (Integer n: resultMap.keySet()) results.add(resultMap.get(n));
 				// initialize the resulting matrix
 				Matrix c = new Matrix(size);
 				// Get the matrix values from the tasks results
@@ -174,7 +174,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 				jppfClient.submit(job);
 				waitForResults();
 				List<JPPFTask> results = new ArrayList<JPPFTask>();
-				for (Integer n: resultMap.keySet()) results.addAll(resultMap.get(n));
+				for (Integer n: resultMap.keySet()) results.add(resultMap.get(n));
 				// initialize the resulting matrix
 				Matrix c = new Matrix(size);
 				// Get the matrix values from the tasks results
@@ -203,10 +203,9 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 	 */
 	public synchronized void resultsReceived(TaskResultEvent event)
 	{
-		int idx = event.getStartIndex();
 		List<JPPFTask> tasks = event.getTaskList();
-		System.out.println("Received results for tasks " + idx + " - " + (idx + tasks.size() - 1));
-		resultMap.put(idx, tasks);
+		System.out.println("Received results for " + tasks.size() + " tasks ");
+		for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
 		count += tasks.size();
 		notify();
 	}

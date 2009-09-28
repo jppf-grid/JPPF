@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -114,7 +114,7 @@ public class BundleWrapper
 
 	/**
 	 * Make a copy of this bundle wrapper containing only the first nbTasks tasks it contains.
-	 * @param nbTasks - the number of tasks to include in the copy.
+	 * @param nbTasks the number of tasks to include in the copy.
 	 * @return a new <code>BundleWrapper</code> instance.
 	 */
 	public BundleWrapper copy(int nbTasks)
@@ -127,13 +127,14 @@ public class BundleWrapper
 
 	/**
 	 * Merge this bundle wrapper with another.
-	 * @param other - the wrapper to merge with.
-	 * @param after - determines whether the tasks from other should be added first or last.
+	 * @param other the wrapper to merge with.
+	 * @param after determines whether the tasks from other should be added first or last.
 	 */
 	public void merge(BundleWrapper other, boolean after)
 	{
 		int n = other.getBundle().getTaskCount();
 		bundle.setTaskCount(bundle.getTaskCount() + n);
+		bundle.getJobSLA().setSuspended(other.getBundle().getJobSLA().isSuspended());
 		if (after)
 		{
 			for (DataLocation task: other.getTasks()) tasks.add(task);

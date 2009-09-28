@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,7 +43,8 @@ public class JPPFSubmissionResult implements TaskResultListener
 	 * A map containing the resulting tasks, ordered by ascending position in the
 	 * submitted list of tasks.
 	 */
-	private Map<Integer, List<JPPFTask>> resultMap = new TreeMap<Integer, List<JPPFTask>>();
+	//private Map<Integer, List<JPPFTask>> resultMap = new TreeMap<Integer, List<JPPFTask>>();
+	private Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
 	/**
 	 * The list of final results.
 	 */
@@ -81,11 +82,10 @@ public class JPPFSubmissionResult implements TaskResultListener
 	 */
 	public void resultsReceived(TaskResultEvent event)
 	{
-		int idx = event.getStartIndex();
 		List<JPPFTask> tasks = event.getTaskList();
 		pendingCount -= tasks.size();
-		if (debugEnabled) log.debug("Received results for tasks " + idx + " - " + (idx + tasks.size() - 1));
-		resultMap.put(idx, tasks);
+		if (debugEnabled) log.debug("Received results for" + tasks.size() + " tasks ");
+		for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
 	}
 
 	/**
@@ -98,10 +98,8 @@ public class JPPFSubmissionResult implements TaskResultListener
 		if (results == null)
 		{
 			results = new ArrayList<JPPFTask>();
-			for (Integer n: resultMap.keySet())
-			{
-				for (JPPFTask task: resultMap.get(n)) results.add(task);
-			}
+			//for (JPPFTask task: resultMap.values()) results.add(task);
+			for (Integer n: resultMap.keySet()) results.add(resultMap.get(n));
 			resultMap.clear();
 		}
 		return results;

@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -74,7 +74,7 @@ public class CascadingTestRunner
 	{
 		JPPFJob job = new JPPFJob();
 		job.addTask(new Task1());
-		job.setExecutionPolicy(new Equal("id", 1));
+		job.getJobSLA().setExecutionPolicy(new Equal("id", 1));
 		List<JPPFTask> results = jppfClient.submit(job);
 		for (JPPFTask task: results)
 		{

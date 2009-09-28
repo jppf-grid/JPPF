@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -69,8 +69,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 
 	/**
 	 * Perform a shutdown or restart of the server.
-	 * @param shutdownDelay - the delay before shutting down the server, once the command is received. 
-	 * @param restartDelay - the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
+	 * @param shutdownDelay the delay before shutting down the server, once the command is received. 
+	 * @param restartDelay the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
 	 * @return an acknowledgement message.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#restartShutdown(java.lang.Long, java.lang.Long)
@@ -83,8 +83,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 
 	/**
 	 * Change the bundle size tuning settings.
-	 * @param algorithm - the name opf the load-balancing algorithm to set.
-	 * @param parameters - the algorithm's parameters.
+	 * @param algorithm the name opf the load-balancing algorithm to set.
+	 * @param parameters the algorithm's parameters.
 	 * @return an acknowledgement or error message.
 	 * @throws Exception if an error occurred while updating the settings.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#changeLoadBalancerSettings(java.lang.String, java.util.Map)
@@ -108,9 +108,9 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 
 	/**
 	 * Cancel the job with the specified id.
-	 * @param jobId - the id of the job to cancel.
+	 * @param jobId the id of the job to cancel.
 	 * @throws Exception if any error occurs.
-	 * @see org.jppf.management.JPPFDriverAdminMBean#cancelJob(java.lang.String)
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
 	 */
 	public void cancelJob(String jobId) throws Exception
 	{
@@ -119,20 +119,22 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 
 	/**
 	 * Suspend the job with the specified id.
-	 * @param jobId - the id of the job to suspend.
+	 * @param jobId the id of the job to suspend.
+	 * @param requeue true if the sub-jobs running on each node should be canceled and requeued,
+	 * false if they should be left to execute until completion.
 	 * @throws Exception if any error occurs.
-	 * @see org.jppf.management.JPPFDriverAdminMBean#cancelJob(java.lang.String)
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#suspendJob(java.lang.String,java.lang.Boolean)
 	 */
-	public void suspendJob(String jobId) throws Exception
+	public void suspendJob(String jobId, Boolean requeue) throws Exception
 	{
-		invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "suspendJob", new Object[] { jobId }, new String[] { "java.lang.String" });
+		invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "suspendJob", new Object[] { jobId, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
 	}
 
 	/**
 	 * Resume the job with the specified id.
-	 * @param jobId - the id of the job to resume.
+	 * @param jobId the id of the job to resume.
 	 * @throws Exception if any error occurs.
-	 * @see org.jppf.management.JPPFDriverAdminMBean#cancelJob(java.lang.String)
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#resumeJob(java.lang.String)
 	 */
 	public void resumeJob(String jobId) throws Exception
 	{
@@ -141,8 +143,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 
 	/**
 	 * Update the maximum number of nodes a node can run on.
-	 * @param jobId - the id of the job to update.
-	 * @param maxNodes - the new maximum number of nodes for the job.
+	 * @param jobId the id of the job to update.
+	 * @param maxNodes the new maximum number of nodes for the job.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#updateMaxNodes(java.lang.String, java.lang.Integer)
 	 */

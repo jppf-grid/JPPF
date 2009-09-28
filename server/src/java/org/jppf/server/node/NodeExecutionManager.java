@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -179,10 +179,16 @@ public class NodeExecutionManager extends ThreadSynchronization
 
 	/**
 	 * Cancel all executing or pending tasks.
-	 * @param callOnCancel - determines whether the onCancel() callback method of each task should be invoked.
+	 * @param callOnCancel determines whether the onCancel() callback method of each task should be invoked.
+	 * @param requeue true if the job should be requeued on the server side, false otherwise.
 	 */
-	public synchronized void cancelAllTasks(boolean callOnCancel)
+	public synchronized void cancelAllTasks(boolean callOnCancel, boolean requeue)
 	{
+		if (requeue)
+		{
+			bundle.setParameter(BundleParameter.REQUEUE, true);
+			bundle.getJobSLA().setSuspended(true);
+		}
 		List<Long> list = new ArrayList<Long>(futureMap.keySet());
 		for (Long n: list) cancelTask(n, callOnCancel);
 	}

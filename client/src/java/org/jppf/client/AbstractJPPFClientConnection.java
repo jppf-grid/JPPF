@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -150,12 +150,12 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	protected void configure(String uuid, String name, String host, int driverPort, int classServerPort, int priority)
 	{
 		this.appUuid = uuid;
-		this.host = host;
+		this.host = NetworkUtils.getHostName(host);
 		this.port = driverPort;
 		this.priority = priority;
 		this.classServerPort = classServerPort;
 		this.name = name;
-		this.taskServerConnection = new TaskServerConnectionHandler(this, host, port);
+		this.taskServerConnection = new TaskServerConnectionHandler(this, this.host, this.port);
 	}
 
 	/**
@@ -188,8 +188,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		try
 		{
 			JPPFTaskBundle bundle = new JPPFTaskBundle();
-			bundle.setExecutionPolicy(job.getExecutionPolicy());
-			bundle.setPriority(job.getPriority());
 			sendTasks(bundle, job);
 		}
 		catch(Exception e)
@@ -220,8 +218,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		header.setUuidPath(uuidPath);
 		header.setTaskCount(count);
 		header.setParameter(BundleParameter.JOB_ID, job.getId());
-		header.setParameter(BundleParameter.MAX_JOB_NODES, job.getMaxNodes());
-		header.setSuspended(job.isSuspended());
+		header.setJobSLA(job.getJobSLA());
 
 		SocketWrapper socketClient = taskServerConnection.getSocketClient();
 		socketClient.sendBytes(ser.serialize(header));

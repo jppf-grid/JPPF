@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -129,8 +129,7 @@ public class JcaResultProcessor implements Work
 		bundle.setRequestUuid(new JPPFUuid().toString());
 		JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
 		String requestUuid = bundle.getRequestUuid();
-		bundle.setExecutionPolicy(job.getExecutionPolicy());
-		bundle.setPriority(job.getPriority());
+		bundle.setJobSLA(job.getJobSLA());
 		ClassLoader cl = null;
 		ClassLoader oldCl = null;
 		if (!job.getTasks().isEmpty())
@@ -154,7 +153,7 @@ public class JcaResultProcessor implements Work
 				count += p.first().size();
 				if (result != null)
 				{
-					result.resultsReceived(new TaskResultEvent(p.first(), p.second()));
+					result.resultsReceived(new TaskResultEvent(p.first()));
 				}
 			}
 			mgr.removeRequestClassLoader(requestUuid);

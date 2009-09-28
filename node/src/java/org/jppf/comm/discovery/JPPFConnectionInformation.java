@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,6 @@
 package org.jppf.comm.discovery;
 
 import java.io.*;
-import java.util.Arrays;
 
 import org.jppf.utils.StringUtils;
 
@@ -57,7 +56,14 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	/**
 	 * Identifier for this object.
 	 */
-	public transient long id = 0L;
+	public String uuid = null;
+
+	/**
+	 * Default constructor.
+	 */
+	public JPPFConnectionInformation()
+	{
+	}
 
 	/**
 	 * Compare this connection information with another.
@@ -67,11 +73,9 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 */
 	public int compareTo(JPPFConnectionInformation ci)
 	{
-		if ((ci == null) || (ci.host == null)) return -1;
-		int n = host.compareTo(ci.host);
-		if (n != 0) return n;
-		
-		return 0;
+		if ((ci == null) || (ci.uuid == null)) return 1;
+		if (uuid == null) return -1;
+		return uuid.compareTo(ci.uuid);
 	}
 
 	/**
@@ -81,13 +85,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 */
 	public int hashCode()
 	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + Arrays.hashCode(applicationServerPorts);
-		result = prime * result + Arrays.hashCode(classServerPorts);
-		result = prime * result + ((host == null) ? 0 : host.hashCode());
-		result = prime * result + Arrays.hashCode(nodeServerPorts);
-		return result;
+		return (uuid == null) ? 0 : uuid.hashCode();
 	}
 
 	/**
@@ -98,19 +96,12 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 */
 	public boolean equals(Object obj)
 	{
-		if (this == obj) return true;
 		if (obj == null) return false;
+		if (this == obj) return true;
 		if (getClass() != obj.getClass()) return false;
 		JPPFConnectionInformation other = (JPPFConnectionInformation) obj;
-		if (host == null)
-		{
-			if (other.host != null) return false;
-		}
-		else if (!host.equals(other.host)) return false;
-		if (!Arrays.equals(applicationServerPorts, other.applicationServerPorts)) return false;
-		if (!Arrays.equals(classServerPorts, other.classServerPorts)) return false;
-		if (!Arrays.equals(nodeServerPorts, other.nodeServerPorts)) return false;
-		return true;
+		if (uuid == null) return other.uuid == null;
+		return uuid.equals(other.uuid);
 	}
 
 	/**
@@ -120,11 +111,14 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 */
 	public String toString()
 	{
-		return "host = " + host +
-			", class server = " + StringUtils.buildString(classServerPorts) +
-			", node server = " + StringUtils.buildString(nodeServerPorts) +
-			", app server = " + StringUtils.buildString(applicationServerPorts) +
-			", management = " + managementPort;
+		StringBuilder sb = new StringBuilder();
+		sb.append("host = ").append(host);
+		sb.append(", class server = ").append(StringUtils.buildString(classServerPorts));
+		sb.append(", node server = ").append(StringUtils.buildString(nodeServerPorts));
+		sb.append(", app server = ").append(StringUtils.buildString(applicationServerPorts));
+		sb.append(", management = ").append(managementPort);
+		sb.append(", uuid = ").append(uuid);
+		return sb.toString();
 	}
 
 	/**

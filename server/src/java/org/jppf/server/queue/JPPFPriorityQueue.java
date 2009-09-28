@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,8 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
-import org.jppf.server.JPPFDriver;
+import org.jppf.server.*;
+import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.protocol.*;
 
 /**
@@ -49,6 +50,23 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * Contains the ids of all queued jobs.
 	 */
 	private Map<String, BundleWrapper> jobMap = new HashMap<String, BundleWrapper>();
+	/**
+	 * The driver stats manager.
+	 */
+	protected JPPFDriverStatsManager statsManager = null;
+	/**
+	 * The job manager.
+	 */
+	protected JPPFJobManager jobManager = null;
+
+	/**
+	 * Initialize this queue.
+	 */
+	public JPPFPriorityQueue()
+	{
+		statsManager = JPPFDriver.getInstance().getStatsManager();
+		jobManager = JPPFDriver.getInstance().getJobManager();
+	}
 
 	/**
 	 * Add an object to the queue, and notify all listeners about it.
@@ -58,6 +76,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	public void addBundle(BundleWrapper bundleWrapper)
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFJobSLA sla = bundle.getJobSLA();
 		try
 		{
 			lock.lock();
@@ -66,21 +85,22 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			if (other != null)
 			{
 				other.merge(bundleWrapper, false);
-				if (debugEnabled) log.debug("re-submitting bundle with [priority=" + bundle.getPriority()+", initialTasksCount=" +
+				if (debugEnabled) log.debug("re-submitting bundle with [priority=" + sla.getPriority()+", initialTasksCount=" +
 					bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + "]");
-				fireQueueEvent(new QueueEvent(this, bundleWrapper, true));
 				bundle.setParameter("real.task.count", bundle.getTaskCount());
-				JPPFDriver.getInstance().getJobManager().jobUpdated(bundleWrapper);
+				fireQueueEvent(new QueueEvent(this, other, true));
 			}
 			else
 			{
 				bundle.setQueueEntryTime(System.currentTimeMillis());
-				if (debugEnabled) log.debug("adding bundle with [priority=" + bundle.getPriority()+", initialTasksCount=" +
+				if (debugEnabled) log.debug("adding bundle with [priority=" + sla.getPriority()+", initialTasksCount=" +
 					bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + "]");
-				putInListMap(new JPPFPriority(bundle.getPriority()), bundleWrapper, priorityMap);
+				putInListMap(new JPPFPriority(sla.getPriority()), bundleWrapper, priorityMap);
 				putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
 				jobMap.put(jobId, bundleWrapper);
-				fireQueueEvent(new QueueEvent(this, bundleWrapper));
+				Boolean requeued = (Boolean) bundle.removeParameter(BundleParameter.REQUEUE);
+				if (requeued == null) requeued = false;
+				fireQueueEvent(new QueueEvent(this, bundleWrapper, requeued));
 			}
 		}
 		finally
@@ -89,7 +109,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		}
 		if (debugEnabled) log.debug("Maps size information:\n" + formatSizeMapInfo("priorityMap", priorityMap) + "\n" +
 			formatSizeMapInfo("sizeMap", sizeMap));
-		JPPFDriver.getInstance().getStatsManager().taskInQueue(bundle.getTaskCount());
+		statsManager.taskInQueue(bundle.getTaskCount());
 	}
 
 	/**
@@ -126,7 +146,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			{
 				if (debugEnabled) log.debug("removing bundle from queue");
 				result = bundleWrapper;
-				removeFromListMap(new JPPFPriority(bundle.getPriority()), bundleWrapper, priorityMap);
+				removeFromListMap(new JPPFPriority(bundle.getJobSLA().getPriority()), bundleWrapper, priorityMap);
 				jobMap.remove((String) bundle.getParameter(BundleParameter.JOB_ID));
 				bundle.setParameter("real.task.count", 0);
 			}
@@ -145,7 +165,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 				list.add(bundleWrapper);
 				bundle.setParameter("real.task.count", bundle.getTaskCount());
 			}
-			JPPFDriver.getInstance().getJobManager().jobUpdated(bundleWrapper);
+			jobManager.jobUpdated(bundleWrapper);
 			result.getBundle().setExecutionStartTime(System.currentTimeMillis());
 		}
 		finally
@@ -154,7 +174,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		}
 		if (debugEnabled) log.debug("Maps size information:\n" + formatSizeMapInfo("priorityMap", priorityMap) + "\n" +
 			formatSizeMapInfo("sizeMap", sizeMap));
-		JPPFDriver.getInstance().getStatsManager().taskOutOfQueue(result.getBundle().getTaskCount(), System.currentTimeMillis() - result.getBundle().getQueueEntryTime());
+		statsManager.taskOutOfQueue(result.getBundle().getTaskCount(), System.currentTimeMillis() - result.getBundle().getQueueEntryTime());
 		return result;
 	}
 

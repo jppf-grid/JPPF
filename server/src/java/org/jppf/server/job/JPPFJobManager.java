@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -66,7 +66,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 
 	/**
 	 * Get all the nodes to which a all or part of a job is dispatched.
-	 * @param jobId - the id of the job.
+	 * @param jobId the id of the job.
 	 * @return a list of <code>SelectableChannel</code> instances.
 	 */
 	public synchronized List<ChannelBundlePair> getNodesForJob(String jobId)
@@ -85,7 +85,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 
 	/**
 	 * Get the queueed bundle wrapper for the specified job.
-	 * @param jobId - the id of the job to look for.
+	 * @param jobId the id of the job to look for.
 	 * @return a <code>BundleWrapper</code> instance, or null if the job is not queued anymore.
 	 */
 	public synchronized BundleWrapper getBundleForJob(String jobId)
@@ -95,8 +95,8 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 
 	/**
 	 * Called when all or part of a job is dispatched to a node.
-	 * @param bundleWrapper - the dispatched job.
-	 * @param channel - the node to which the job is dispatched.
+	 * @param bundleWrapper the dispatched job.
+	 * @param channel the node to which the job is dispatched.
 	 */
 	public synchronized void jobDispatched(BundleWrapper bundleWrapper, SelectableChannel channel)
 	{
@@ -115,8 +115,8 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 
 	/**
 	 * Called when all or part of a job has returned from a node.
-	 * @param bundleWrapper - the returned job.
-	 * @param channel - the node to which the job is dispatched.
+	 * @param bundleWrapper the returned job.
+	 * @param channel the node to which the job is dispatched.
 	 */
 	public synchronized void jobReturned(BundleWrapper bundleWrapper, SelectableChannel channel)
 	{
@@ -135,7 +135,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 
 	/**
 	 * Called when a job is added to the server queue.
-	 * @param bundleWrapper - the queued job.
+	 * @param bundleWrapper the queued job.
 	 */
 	public synchronized void jobQueued(BundleWrapper bundleWrapper)
 	{
@@ -149,7 +149,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 
 	/**
 	 * Called when a job is complete and returned to the client.
-	 * @param bundleWrapper - the completed job.
+	 * @param bundleWrapper the completed job.
 	 */
 	public synchronized void jobEnded(BundleWrapper bundleWrapper)
 	{
@@ -163,7 +163,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 
 	/**
 	 * Called when a job is added to the server queue.
-	 * @param bundleWrapper - the queued job.
+	 * @param bundleWrapper the queued job.
 	 */
 	public synchronized void jobUpdated(BundleWrapper bundleWrapper)
 	{
@@ -174,20 +174,21 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 	}
 
 	/**
-	 * Called when a queue event occurred.
-	 * @param event - a queue event.
+	 * Called when a queue event occurrs.
+	 * @param event a queue event.
 	 * @see org.jppf.server.queue.QueueListener#newBundle(org.jppf.server.queue.QueueEvent)
 	 */
 	public void newBundle(QueueEvent event)
 	{
 		if (!event.isRequeued()) jobQueued(event.getBundleWrapper());
+		else jobUpdated(event.getBundleWrapper());
 	}
 
 	/**
 	 * Submit an event to the event queue.
-	 * @param eventType - the type of event to generate.
-	 * @param bundle - the job data.
-	 * @param channel - the id of the job source of the event.
+	 * @param eventType the type of event to generate.
+	 * @param bundle the job data.
+	 * @param channel the id of the job source of the event.
 	 */
 	private void submitEvent(JobEventType eventType, JPPFTaskBundle bundle, SelectableChannel channel)
 	{

@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,8 @@
 package org.jppf.management;
 
 import java.io.Serializable;
+
+import org.jppf.utils.NetworkUtils;
 
 
 /**
@@ -53,7 +55,7 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 	 */
 	public NodeManagementInfo(String host, int port, String id)
 	{
-		this.host = host;
+		this.host = NetworkUtils.getHostName(host);
 		this.port = port;
 		this.id = id;
 	}
@@ -83,12 +85,7 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 	 */
 	public int hashCode()
 	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((host == null) ? 0 : host.hashCode());
-		result = prime * result + port;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
+		return (id == null) ? 0 : id.hashCode();
 	}
 
 	/**
@@ -103,18 +100,8 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
 		final NodeManagementInfo other = (NodeManagementInfo) obj;
-		if (host == null)
-		{
-			if (other.host != null) return false;
-		}
-		else if (!host.equals(other.host)) return false;
-		if (id == null)
-		{
-			if (other.id != null) return false;
-		}
-		else if (!id.equals(other.id)) return false;
-		if (port != other.port) return false;
-		return true;
+		if (other.id == null) return id == null;
+		return (id == null) ? false : id.equals(other.id);
 	}
 
 	/**
@@ -159,5 +146,14 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 	public synchronized void setSystemInfo(JPPFSystemInformation systemInfo)
 	{
 		this.systemInfo = systemInfo;
+	}
+
+	/**
+	 * Get the unique id for the node's mbean server. 
+	 * @return the id as a string.
+	 */
+	public String getId()
+	{
+		return id;
 	}
 }

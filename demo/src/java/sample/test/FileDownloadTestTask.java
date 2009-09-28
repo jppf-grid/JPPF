@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,9 +17,7 @@
  */
 package sample.test;
 
-import java.io.*;
-import java.net.URL;
-import org.jppf.utils.FileUtils;
+import org.jppf.server.protocol.*;
 
 /**
  * This task downloads a file from a web site, then uploads it to an ftp server.
@@ -49,11 +47,6 @@ public class FileDownloadTestTask extends JPPFTestTask
 	 */
 	public void testDownloadUpload() throws Exception
 	{
-		URL url = new URL(location);
-		InputStream is = (InputStream) getDataProvider().getValue(url);
-		String s = FileUtils.readTextFile(new BufferedReader(new InputStreamReader(is)));
-		setResult(s);
-		url = new URL("ftp://localhost/Options.xsd");
-		getDataProvider().setValue(url, new ByteArrayInputStream(s.getBytes()));
+		new URLLocation(location).copyTo(new URLLocation("ftp://localhost/Options.xsd"));
 	}
 }

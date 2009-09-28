@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,16 +45,22 @@ public class CancelJobTask implements Runnable
 	 * The node on which to perform this task.
 	 */
 	private SelectableChannel channel = null;
+	/**
+	 * True if the job should be requeued on the server side, false otherwise.
+	 */
+	private boolean requeue = true;
 
 	/**
 	 * Initialize this task.
-	 * @param jobId - the id of the job to manage.
-	 * @param channel - the node on which to perform this task.
+	 * @param jobId the id of the job to manage.
+	 * @param channel the node on which to perform this task.
+	 * @param requeue true if the job should be requeued on the server side, false otherwise.
 	 */
-	public CancelJobTask(String jobId, SelectableChannel channel)
+	public CancelJobTask(String jobId, SelectableChannel channel, boolean requeue)
 	{
 		this.jobId = jobId;
 		this.channel = channel;
+		this.requeue = requeue;
 	}
 
 	/**
@@ -65,13 +71,13 @@ public class CancelJobTask implements Runnable
 	{
 		try
 		{
-			if (debugEnabled) log.debug("Request to cancel jobId = '" + jobId + "' on node " + channel);
+			if (debugEnabled) log.debug("Request to cancel jobId = '" + jobId + "' on node " + channel + ", requeue = " + requeue);
 			NodeManagementInfo nodeInfo = JPPFDriver.getInstance().getNodeInformation(channel);
 			if (nodeInfo == null) return;
 			JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(nodeInfo.getHost(), nodeInfo.getPort());
 			node.connect();
 			while (!node.isConnected()) Thread.sleep(10);
-			node.invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelJob", new Object[] { jobId }, new String[] { "java.lang.String" });
+			node.invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelJob", new Object[] { jobId, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
 			node.close();
 		}
 		catch(Exception e)

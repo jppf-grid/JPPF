@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -107,6 +107,10 @@ public class JPPFDriver
 	 * Manages and monitors the jobs thoughout their processing within this driver.
 	 */
 	private JPPFJobManager jobManager = null;
+	/**
+	 * Uuid for this driver.
+	 */
+	private String uuid = new JPPFUuid().toString();
 
 	/**
 	 * Initialize this JPPFDriver.
@@ -200,6 +204,7 @@ public class JPPFDriver
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
 		JPPFConnectionInformation info = new JPPFConnectionInformation();
+		info.uuid = uuid;
 		String s = props.getString("class.server.port", "11111");
 		info.classServerPorts = StringUtils.parseIntValues(s);
 		s = props.getString("app.server.port", "11112");
@@ -230,7 +235,6 @@ public class JPPFDriver
 	 */
 	private void initCredentials()
 	{
-		String uuid = new JPPFUuid().toString();
 		StringBuilder sb = new StringBuilder("Driver:");
 		sb.append(VersionUtils.getLocalIpAddress()).append(":");
 		TypedProperties props = JPPFConfiguration.getProperties();
@@ -339,7 +343,7 @@ public class JPPFDriver
 	 */
 	public String getUuid()
 	{
-		return credentials.getUuid();
+		return uuid;
 	}
 
 	/**

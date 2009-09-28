@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,8 @@
 
 package org.jppf.server.nio.nodeserver;
 
+import org.jppf.server.*;
+import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.NioState;
 
 /**
@@ -30,6 +32,14 @@ public abstract class NodeServerState extends NioState<NodeTransition>
 	 * The server that handles this state.
 	 */
 	protected NodeNioServer server = null;
+	/**
+	 * The driver stats manager.
+	 */
+	protected JPPFDriverStatsManager statsManager = null;
+	/**
+	 * The job manager.
+	 */
+	protected JPPFJobManager jobManager = null;
 
 	/**
 	 * Initialize this state.
@@ -38,5 +48,7 @@ public abstract class NodeServerState extends NioState<NodeTransition>
 	public NodeServerState(NodeNioServer server)
 	{
 		this.server = server;
+		statsManager = JPPFDriver.getInstance().getStatsManager();
+		jobManager = JPPFDriver.getInstance().getJobManager();
 	}
 }

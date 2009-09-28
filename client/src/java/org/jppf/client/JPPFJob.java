@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,7 @@ import java.util.*;
 import org.jppf.JPPFException;
 import org.jppf.client.event.TaskResultListener;
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.JPPFUuid;
 
@@ -48,10 +48,6 @@ public class JPPFJob implements Serializable
 	 */
 	private DataProvider dataProvider = null;
 	/**
-	 * The tasks execution policy.
-	 */
-	private ExecutionPolicy executionPolicy = null;
-	/**
 	 * The listener that receives notifications of completed tasks.
 	 */
 	private transient TaskResultListener resultsListener = null;
@@ -68,21 +64,13 @@ public class JPPFJob implements Serializable
 	 */
 	private List<JPPFTask> results = null;
 	/**
-	 * The priority of this job, used by the server to prioritize queued jobs.
+	 * The service level agreement between the job and the server.
 	 */
-	private int priority = 0;
-	/**
-	 * The maximum number of nodes this job can run on.
-	 */
-	private int  maxNodes = Integer.MAX_VALUE;
-	/**
-	 * Determines whether this job is initially suspended.
-	 * If it is, it will have to be resumed, using either the amdin console or the JMX APIs.
-	 */
-	private boolean suspended = false;
+	private JPPFJobSLA jobSLA = new JPPFJobSLA();
 
 	/**
-	 * Default constructor.
+	 * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
+	 * This constructor generates a pseudo-random id as a string of 32 hexadecimal characters.
 	 */
 	public JPPFJob()
 	{
@@ -95,17 +83,17 @@ public class JPPFJob implements Serializable
 	 */
 	public JPPFJob(DataProvider dataProvider)
 	{
-		this(dataProvider, null, true, null, 0);
+		this(dataProvider, null, true, null);
 	}
 
 	/**
 	 * Initialize a blocking job with the specified parameters.
 	 * @param dataProvider the container for data shared between tasks.
-	 * @param executionPolicy the tasks execution policy.
+	 * @param jobSLA sevice level agreement between job and server.
 	 */
-	public JPPFJob(DataProvider dataProvider, ExecutionPolicy executionPolicy)
+	public JPPFJob(DataProvider dataProvider, JPPFJobSLA jobSLA)
 	{
-		this(dataProvider, executionPolicy, true, null, 0);
+		this(dataProvider, jobSLA, true, null);
 	}
 
 	/**
@@ -114,7 +102,7 @@ public class JPPFJob implements Serializable
 	 */
 	public JPPFJob(TaskResultListener resultsListener)
 	{
-		this(null, null, false, resultsListener, 0);
+		this(null, null, false, resultsListener);
 	}
 
 	/**
@@ -124,36 +112,34 @@ public class JPPFJob implements Serializable
 	 */
 	public JPPFJob(DataProvider dataProvider, TaskResultListener resultsListener)
 	{
-		this(dataProvider, null, false, resultsListener, 0);
+		this(dataProvider, null, false, resultsListener);
 	}
 
 	/**
 	 * Initialize a non-blocking job with the specified parameters.
 	 * @param dataProvider the container for data shared between tasks.
-	 * @param executionPolicy the tasks execution policy.
+	 * @param jobSLA sevice level agreement between job and server.
 	 * @param resultsListener the listener that receives notifications of completed tasks.
 	 */
-	public JPPFJob(DataProvider dataProvider, ExecutionPolicy executionPolicy, TaskResultListener resultsListener)
+	public JPPFJob(DataProvider dataProvider, JPPFJobSLA jobSLA, TaskResultListener resultsListener)
 	{
-		this(dataProvider, null, false, resultsListener, 0);
+		this(dataProvider, jobSLA, false, resultsListener);
 	}
 
 	/**
-	 * Initialize a non-blocking job with the specified parameters.
+	 * Initialize a job with the specified parameters.
 	 * @param dataProvider the container for data shared between tasks.
-	 * @param executionPolicy the tasks execution policy.
+	 * @param jobSLA sevice level agreement between job and server.
 	 * @param blocking determines whether this job is blocking.
 	 * @param resultsListener the listener that receives notifications of completed tasks.
-	 * @param priority the priority of this job.
 	 */
-	public JPPFJob(DataProvider dataProvider, ExecutionPolicy executionPolicy, boolean blocking, TaskResultListener resultsListener, int priority)
+	public JPPFJob(DataProvider dataProvider, JPPFJobSLA jobSLA, boolean blocking, TaskResultListener resultsListener)
 	{
 		this();
 		this.dataProvider = dataProvider;
-		this.executionPolicy = executionPolicy;
+		if (jobSLA != null) this.jobSLA = jobSLA;
 		this.resultsListener = resultsListener;
 		this.blocking = blocking;
-		this.priority = priority;
 	}
 
 	/**
@@ -188,9 +174,11 @@ public class JPPFJob implements Serializable
 	 * annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}, or an instance of {@link java.lang.Runnable Runnable} or {@link java.util.concurrent.Callable Callable}.
 	 * @param taskObject the task to add to this job.
 	 * @param args arguments to use with a JPPF-annotated class.
+	 * @return an instance of <code>JPPFTask</code> that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
+	 * or a wrapper around the input object in the other cases.
 	 * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
 	 */
-	public void addTask(Object taskObject, Object...args) throws JPPFException
+	public JPPFTask addTask(Object taskObject, Object...args) throws JPPFException
 	{
 		JPPFTask tmp = null;
 		if (taskObject == null) throw new JPPFException("null tasks are not accepted");
@@ -198,21 +186,25 @@ public class JPPFJob implements Serializable
 		else tmp = new JPPFAnnotatedTask(taskObject, args);
 		if (tasks == null) tasks = new ArrayList<JPPFTask>();
 		tasks.add(tmp);
+		return tmp;
 	}
 
 	/**
 	 * Add a POJO task to this job. The POJO task is identified as a method name associated with either an object for a non-static method,
-	 * or a class for a static method.
+	 * or a class for a static method or for a constructor.
 	 * @param taskObject the task to add to this job.
 	 * @param method the name of the method to execute.
 	 * @param args arguments to use with a JPPF-annotated class.
+	 * @return an instance of <code>JPPFTask</code> that is a wrapper around the input task object.
 	 * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
 	 */
-	public void addTask(String method, Object taskObject, Object...args) throws JPPFException
+	public JPPFTask addTask(String method, Object taskObject, Object...args) throws JPPFException
 	{
 		if (taskObject == null) throw new JPPFException("null tasks are not accepted");
 		if (tasks == null) tasks = new ArrayList<JPPFTask>();
-		tasks.add(new JPPFAnnotatedTask(taskObject, method, args));
+		JPPFTask jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
+		tasks.add(jppfTask);
+		return jppfTask;
 	}
 
 	/**
@@ -231,24 +223,6 @@ public class JPPFJob implements Serializable
 	public void setDataProvider(DataProvider dataProvider)
 	{
 		this.dataProvider = dataProvider;
-	}
-
-	/**
-	 * Get the tasks execution policy.
-	 * @return an <code>ExecutionPolicy</code> instance.
-	 */
-	public ExecutionPolicy getExecutionPolicy()
-	{
-		return executionPolicy;
-	}
-
-	/**
-	 * Set the tasks execution policy.
-	 * @param executionPolicy an <code>ExecutionPolicy</code> instance.
-	 */
-	public void setExecutionPolicy(ExecutionPolicy executionPolicy)
-	{
-		this.executionPolicy = executionPolicy;
 	}
 
 	/**
@@ -289,56 +263,60 @@ public class JPPFJob implements Serializable
 	}
 
 	/**
+	 * Get the tasks execution policy.
+	 * @return an <code>ExecutionPolicy</code> instance.
+	 * @deprecated use {@link org.jppf.server.protocol.JPPFJobSLA#getExecutionPolicy() JPPFJobSLA.getExecutionPolicy()} instead.
+	 */
+	public ExecutionPolicy getExecutionPolicy()
+	{
+		return jobSLA.getExecutionPolicy();
+	}
+
+	/**
+	 * Set the tasks execution policy.
+	 * @param executionPolicy an <code>ExecutionPolicy</code> instance.
+	 * @deprecated use {@link org.jppf.server.protocol.JPPFJobSLA#setExecutionPolicy(org.jppf.node.policy.ExecutionPolicy) JPPFJobSLA.setExecutionPolicy(ExecutionPolicy)} instead.
+	 */
+	public void setExecutionPolicy(ExecutionPolicy executionPolicy)
+	{
+		jobSLA.setExecutionPolicy(executionPolicy);
+	}
+
+	/**
 	 * Get the priority of this job.
 	 * @return the priority as an int.
+	 * @deprecated use {@link org.jppf.server.protocol.JPPFJobSLA#getPriority() JPPFJobSLA.getPriority()} instead.
 	 */
 	public int getPriority()
 	{
-		return priority;
+		return jobSLA.getPriority();
 	}
 
 	/**
 	 * Set the priority of this job.
 	 * @param priority the priority as an int.
+	 * @deprecated use {@link org.jppf.server.protocol.JPPFJobSLA#setPriority(int) JPPFJobSLA.setPriority(int)} instead.
 	 */
 	public void setPriority(int priority)
 	{
-		this.priority = priority;
+		jobSLA.setPriority(priority);
 	}
 
 	/**
-	 * Get the maximum number of nodes this job can run on.
-	 * @return the number of nodes as an int value.
+	 * Get the service level agreement between the job and the server.
+	 * @return an instance of <code>JPPFJobSLA</code>.
 	 */
-	public int getMaxNodes()
+	public JPPFJobSLA getJobSLA()
 	{
-		return maxNodes;
+		return jobSLA;
 	}
 
 	/**
-	 * Get the maximum number of nodes this job can run on.
-	 * @param maxNodes the number of nodes as an int value.
+	 * Get the service level agreement between the job and the server.
+	 * @param jobSLA an instance of <code>JPPFJobSLA</code>.
 	 */
-	public void setMaxNodes(int maxNodes)
+	public void setJobSLA(JPPFJobSLA jobSLA)
 	{
-		this.maxNodes = maxNodes;
-	}
-
-	/**
-	 * Determine whether this job is initially suspended.
-	 * @return true if the job is suspended, false otherwise.
-	 */
-	public boolean isSuspended()
-	{
-		return suspended;
-	}
-
-	/**
-	 * Specify whether this job is initially suspended.
-	 * @param suspended true if the job is suspended, false otherwise.
-	 */
-	public void setSuspended(boolean suspended)
-	{
-		this.suspended = suspended;
+		this.jobSLA = jobSLA;
 	}
 }

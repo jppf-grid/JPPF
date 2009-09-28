@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -124,7 +124,7 @@ public class TaskQueueChecker implements Runnable
 	{
 		List<SelectableChannel> idleChannels = server.getIdleChannels();
 		int n = -1;
-		ExecutionPolicy rule = bundle.getExecutionPolicy();
+		ExecutionPolicy rule = bundle.getJobSLA().getExecutionPolicy();
 		if (debugEnabled && (rule != null)) log.debug("Bundle has an execution policy:\n" + rule);
 		List<Integer> acceptableChannels = new ArrayList<Integer>();
 		List<Integer> channelsToRemove =  new ArrayList<Integer>();
@@ -166,10 +166,10 @@ public class TaskQueueChecker implements Runnable
 	 */
 	private boolean checkJobState(JPPFTaskBundle bundle)
 	{
-		if (bundle.isSuspended()) return false;
+		JPPFJobSLA sla = bundle.getJobSLA();
+		if (sla.isSuspended()) return false;
 		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
-		Integer maxNodes = (Integer) bundle.getParameter(BundleParameter.MAX_JOB_NODES);
-		if (maxNodes == null) maxNodes = Integer.MAX_VALUE;
+		int maxNodes = sla.getMaxNodes();
 		List<ChannelBundlePair> list = server.getJobManager().getNodesForJob(jobId);
 		int n = (list == null) ? 0 : list.size();
 		if (debugEnabled) log.debug("current nodes = " + n + ", maxNodes = " + maxNodes);

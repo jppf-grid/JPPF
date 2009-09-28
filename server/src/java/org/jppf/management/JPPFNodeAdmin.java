@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -172,7 +172,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 
 	/**
 	 * Set the node's executed tasks counter to the specified value.
-	 * @param n - the new value of the task counter.
+	 * @param n the new value of the task counter.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFNodeAdminMBean#setTaskCounter(java.lang.Integer)
 	 */
@@ -184,7 +184,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 
 	/**
 	 * Update the priority of all execution threads.
-	 * @param newPriority - the new priority to set.
+	 * @param newPriority the new priority to set.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadsPriority(java.lang.Integer)
 	 */
@@ -196,8 +196,8 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 
 	/**
 	 * Update the configuration properties of the node. 
-	 * @param config - the set of properties to update.
-	 * @param reconnect - specifies whether the node should reconnect ot the driver after updating the properties.
+	 * @param config the set of properties to update.
+	 * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
 	 */
@@ -289,18 +289,18 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 
 	/**
 	 * Cancel the job with the specified id.
-	 * @param jobId - the id of the job to cancel.
+	 * @param jobId the id of the job to cancel.
+	 * @param requeue true if the job should be requeued on the server side, false otherwise.
 	 * @throws Exception if any error occurs.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#cancelJob(java.lang.String)
+	 * @see org.jppf.management.JPPFNodeAdminMBean#cancelJob(java.lang.String,java.lang.Boolean)
 	 */
-	public void cancelJob(String jobId) throws Exception
+	public void cancelJob(String jobId, Boolean requeue) throws Exception
 	{
-		System.out.println("Request to cancel jobId = '" + jobId + "'");
-		if (debugEnabled) log.debug("Request to cancel jobId = '" + jobId + "'");
+		if (debugEnabled) log.debug("Request to cancel jobId = '" + jobId + "', requeue = " + requeue);
 		if (jobId == null) return;
 		if (jobId.equals(node.getExecutionManager().getCurrentJobId()))
 		{
-			node.getExecutionManager().cancelAllTasks(false);
+			node.getExecutionManager().cancelAllTasks(false, requeue);
 		}
 	}
 }

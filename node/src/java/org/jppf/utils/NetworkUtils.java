@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -159,10 +159,10 @@ public final class NetworkUtils
 
 	/**
 	 * Attempt to resolve an IP address into a host name.
-	 * @param ip - the ip address to resolve.
-	 * @return the corresponding host name, orits IP if the name could not be resolved.
+	 * @param ip the ip address to resolve.
+	 * @return the corresponding host name, or its IP if the name could not be resolved.
 	 */
-	public static String getHostAddress(String ip)
+	public static String getHostName(String ip)
 	{
 		InetSocketAddress addr = new InetSocketAddress(ip, 0);
 		String s = addr.getHostName();

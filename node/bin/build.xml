@@ -160,7 +160,7 @@ USA
 			</fileset>
 		</copy>
   	<antcall target="installer"/>
-		<zip destfile="${JPPF.build.dir}/${screensaver}-${version.number}-screensaver-win32.zip"
+		<zip destfile="${JPPF.build.dir}/JPPF-${version.number}-screensaver-win32.zip"
 			basedir="${JPPF.build.dir}" includes="JPPF@Home_Setup.exe"/>
 
 		<!-- Create distribution for Unix: -->

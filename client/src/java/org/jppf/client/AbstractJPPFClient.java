@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -239,7 +239,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy, int priority) throws Exception
 	{
-		JPPFJob job = new JPPFJob(dataProvider, policy, true, null, priority);
+		JPPFJobSLA sla = new JPPFJobSLA(policy, priority);
+		JPPFJob job = new JPPFJob(dataProvider, sla, true, null);
 		for (JPPFTask task: taskList) job.addTask(task);
 		return submit(job);
 	}
@@ -286,7 +287,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
 		throws Exception
 	{
-		JPPFJob job = new JPPFJob(dataProvider, policy, false, listener, priority);
+		JPPFJobSLA sla = new JPPFJobSLA(policy, priority);
+		JPPFJob job = new JPPFJob(dataProvider, sla, false, listener);
 		for (JPPFTask task: taskList) job.addTask(task);
 		submit(job);
 	}
