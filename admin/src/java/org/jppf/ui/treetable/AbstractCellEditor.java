@@ -35,17 +35,35 @@ import java.util.EventObject;
 import javax.swing.CellEditor;
 import javax.swing.event.*;
 
-public class AbstractCellEditor implements CellEditor
+/**
+ * Abstract cell editor for the tree table.
+ * @author Philip Milne
+ * @author Scott Violet
+ */
+public abstract class AbstractCellEditor implements CellEditor
 {
-
+	/**
+	 * The list of listners for this cell editor.
+	 */
 	protected EventListenerList listenerList = new EventListenerList();
 
+	/**
+   * Returns the value contained in the editor. This method always returns null.
+   * @return <code>null</code>.
+	 * @see javax.swing.CellEditor#getCellEditorValue()
+	 */
 	public Object getCellEditorValue()
 	{
 		return null;
 	}
 
-	public boolean isCellEditable(EventObject e)
+	/**
+   * Asks the editor if it can start editing using <code>anEvent</code>. This method always returns true.
+   * @param	event	the event the editor should use to consider whether to begin editing or not.
+   * @return <code>true</code>.
+	 * @see javax.swing.CellEditor#isCellEditable(java.util.EventObject)
+	 */
+	public boolean isCellEditable(EventObject event)
 	{
 		return true;
 	}
@@ -74,9 +92,8 @@ public class AbstractCellEditor implements CellEditor
 		listenerList.remove(CellEditorListener.class, l);
 	}
 
-	/*
+	/**
 	 * Notify all listeners that have registered interest for notification on this event type.
-	 * 
 	 * @see EventListenerList
 	 */
 	protected void fireEditingStopped()
@@ -94,9 +111,8 @@ public class AbstractCellEditor implements CellEditor
 		}
 	}
 
-	/*
+	/**
 	 * Notify all listeners that have registered interest for notification on this event type.
-	 * 
 	 * @see EventListenerList
 	 */
 	protected void fireEditingCanceled()

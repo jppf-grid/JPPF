@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -210,7 +210,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 
 	/**
 	 * Called to notify that a driver was added.
-	 * @param clientConnection - a reference to the driver connection.
+	 * @param clientConnection a reference to the driver connection.
 	 */
 	public void driverAdded(final JPPFClientConnection clientConnection)
 	{
@@ -240,8 +240,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 
 	/**
 	 * Called to notify that a driver was removed.
-	 * @param driverName - the name of the driver to remove.
-	 * @see org.jppf.ui.monitoring.event.NodeHandlerListener#driverRemoved(org.jppf.ui.monitoring.event.NodeHandlerEvent)
+	 * @param driverName the name of the driver to remove.
 	 */
 	public void driverRemoved(final String driverName)
 	{
@@ -269,8 +268,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 
 	/**
 	 * Called to notify that a job was submitted to a driver.
-	 * @param driverName - the name of the driver the job was submitted to.
-	 * @param jobInfo - information about the submitted job.
+	 * @param driverName the name of the driver the job was submitted to.
+	 * @param jobInfo information about the submitted job.
 	 */
 	public void jobAdded(final String driverName, final JobInformation jobInfo)
 	{
@@ -294,8 +293,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 
 	/**
 	 * Called to notify that a job was removed from a driver.
-	 * @param driverName - the name of the driver the job was submitted to.
-	 * @param jobInfo - information about the job.
+	 * @param driverName the name of the driver the job was submitted to.
+	 * @param jobInfo information about the job.
 	 */
 	public void jobRemoved(final String driverName, final JobInformation jobInfo)
 	{
@@ -317,8 +316,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 
 	/**
 	 * Called to notify that a job was removed from a driver.
-	 * @param driverName - the name of the driver the job was submitted to.
-	 * @param jobInfo - information about the job.
+	 * @param driverName the name of the driver the job was submitted to.
+	 * @param jobInfo information about the job.
 	 */
 	public void jobUpdated(final String driverName, final JobInformation jobInfo)
 	{
@@ -344,9 +343,9 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 
 	/**
 	 * Called to notify that a sub-job was dispatched to a node.
-	 * @param driverName - the name of the driver the job was submitted to.
-	 * @param jobInfo - information about the sub-job.
-	 * @param nodeInfo - information about the node where the sub-job was dispatched.
+	 * @param driverName the name of the driver the job was submitted to.
+	 * @param jobInfo information about the sub-job.
+	 * @param nodeInfo information about the node where the sub-job was dispatched.
 	 */
 	public void subJobAdded(final String driverName, final JobInformation jobInfo, final NodeManagementInfo nodeInfo)
 	{
@@ -370,9 +369,9 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 
 	/**
 	 * Called to notify that a sub-job was removed from a node.
-	 * @param driverName - the name of the driver the job was submitted to.
-	 * @param jobInfo - information about the job.
-	 * @param nodeInfo - information about the node where the sub-job was dispatched.
+	 * @param driverName the name of the driver the job was submitted to.
+	 * @param jobInfo information about the job.
+	 * @param nodeInfo information about the node where the sub-job was dispatched.
 	 */
 	public void subJobRemoved(final String driverName, final JobInformation jobInfo, final NodeManagementInfo nodeInfo)
 	{
@@ -413,8 +412,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 
 	/**
 	 * Find the job with the specified id that was submitted to the specified driver.
-	 * @param driverNode - the driver where the job was submitted.
-	 * @param jobInfo - information about the job to find.
+	 * @param driverNode the driver where the job was submitted.
+	 * @param jobInfo information about the job to find.
 	 * @return a <code>DefaultMutableTreeNode</code> or null if the job could not be found.
 	 */
 	private DefaultMutableTreeNode findJob(DefaultMutableTreeNode driverNode, JobInformation jobInfo)
@@ -430,24 +429,26 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 
 	/**
 	 * Find the sub-job with the specified id that was dispatched to the specified JPPF node.
-	 * @param jobNode - the job whose sub-job we are looking for.
-	 * @param nodeInfo - holds information on the node to which the sub-job was dispatched.
+	 * @param jobNode the job whose sub-job we are looking for.
+	 * @param nodeInfo holds information on the node to which the sub-job was dispatched.
 	 * @return a <code>DefaultMutableTreeNode</code> or null if the sub-job could not be found.
 	 */
 	private DefaultMutableTreeNode findSubJob(DefaultMutableTreeNode jobNode, NodeManagementInfo nodeInfo)
 	{
+		if (nodeInfo == null) return null;
 		for (int i=0; i<jobNode.getChildCount(); i++)
 		{
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) jobNode.getChildAt(i);
 			JobData data = (JobData) node.getUserObject();
-			if (data.getNodeInformation().toString().equals(nodeInfo.toString())) return node;
+			if ((data == null) || (data.getNodeInformation() == null)) return null;
+			if (data.getNodeInformation().getId().equals(nodeInfo.getId())) return node;
 		}
 		return null;
 	}
 
 	/**
 	 * Notifiy this listener that a new driver connection was created.
-	 * @param event - the event to notify this listener of.
+	 * @param event the event to notify this listener of.
 	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
 	 */
 	public synchronized void newConnection(ClientEvent event)
@@ -479,6 +480,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		actionHandler = new JTreeTableActionHandler(treeTable);
 		actionHandler.putAction("cancel.job", new CancelJobAction());
 		actionHandler.putAction("suspend.job", new SuspendJobAction());
+		actionHandler.putAction("suspend_requeue.job", new SuspendRequeueJobAction());
 		actionHandler.putAction("resume.job", new ResumeJobAction());
 		actionHandler.putAction("max.nodes.job", new UpdateMaxNodesAction());
 		actionHandler.updateActions();
@@ -499,7 +501,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 
 		/**
 		 * Initialize this listener with the specified connection name.
-		 * @param driverName - the name of the connection.
+		 * @param driverName the name of the connection.
 		 */
 		public ConnectionStatusListener(String driverName)
 		{
@@ -508,7 +510,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 
 		/**
 		 * Invoked when thew conneciton status has changed.
-		 * @param event - the connection status event.
+		 * @param event the connection status event.
 		 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 		 */
 		public void statusChanged(ClientConnectionStatusEvent event)

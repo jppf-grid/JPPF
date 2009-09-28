@@ -32,6 +32,7 @@
 	
 		<child name="cancel.job" type="Button"/>
 		<child name="suspend.job" type="Button"/>
+		<child name="suspend_requeue.job" type="Button"/>
 		<child name="resume.job" type="Button"/>
 
 		<child name="sep1" type="ToolbarSeparator"/>

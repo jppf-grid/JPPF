@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -54,8 +54,8 @@ public class Pie3DChartHandler implements ChartHandler
 	public ChartConfiguration createChart(ChartConfiguration config)
 	{
 		Object ds = createDataset(config);
-		//JFreeChart chart = ChartFactory.createPieChart3D(config.name, ds, false, true, false);
-		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createPieChart3D",
+		Class[] paramTypes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE };
+		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createPieChart3D", paramTypes,
 			config.name, ds, false, true, false);
 		config.chart = chart;
 		return config;

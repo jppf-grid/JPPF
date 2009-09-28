@@ -20,14 +20,14 @@ package org.jppf.ui.monitoring.job.actions;
 import org.apache.commons.logging.*;
 
 /**
- * This action suspends a job and causes all sub-jobs currently executing to lwft executing until completion.
+ * This action suspends a job and causes all sub-jobs currently executing to be canceled and requeued on the server.
  */
-public class SuspendJobAction extends AbstractSuspendJobAction
+public class SuspendRequeueJobAction extends AbstractSuspendJobAction
 {
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(SuspendJobAction.class);
+	protected static Log log = LogFactory.getLog(SuspendRequeueJobAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
@@ -36,10 +36,10 @@ public class SuspendJobAction extends AbstractSuspendJobAction
 	/**
 	 * Initialize this action.
 	 */
-	public SuspendJobAction()
+	public SuspendRequeueJobAction()
 	{
-		setupIcon("/org/jppf/ui/resources/suspend.gif");
-		putValue(NAME, localize("job.suspend.label"));
-		requeue = false;
+		setupIcon("/org/jppf/ui/resources/suspend_requeue.gif");
+		putValue(NAME, localize("job.suspend_requeue.label"));
+		requeue = true;
 	}
 }

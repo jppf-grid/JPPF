@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -106,6 +106,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		JScrollPane sp = new JScrollPane(treeTable);
 		setUIComponent(sp);
 		setupActions();
+		treeTable.expandAll();
 	}
 
 	/**
@@ -156,7 +157,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * Called to notify that a driver was removed.
 	 * @param driverName - the name of the driver to remove.
 	 * @param removeNodesOnly - true if only the nodes attached to the driver are to be removed.
-	 * @see org.jppf.ui.monitoring.event.NodeHandlerListener#driverRemoved(org.jppf.ui.monitoring.event.NodeHandlerEvent)
 	 */
 	public synchronized void driverRemoved(String driverName, boolean removeNodesOnly)
 	{
@@ -178,7 +178,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * Called to notify that a node was added to a driver.
 	 * @param driverName - the name of the driver to which the node is added.
 	 * @param nodeInfo - the object that encapsulates the node addition.
-	 * @see org.jppf.ui.monitoring.event.NodeHandlerListener#nodeAdded(org.jppf.ui.monitoring.event.NodeHandlerEvent)
 	 */
 	public synchronized void nodeAdded(String driverName, NodeManagementInfo nodeInfo)
 	{
@@ -191,7 +190,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * Called to notify that a node was added to a driver.
 	 * @param driverNode - the driver to which the node is added.
 	 * @param nodeInfo - the object that encapsulates the node addition.
-	 * @see org.jppf.ui.monitoring.event.NodeHandlerListener#nodeAdded(org.jppf.ui.monitoring.event.NodeHandlerEvent)
 	 */
 	public synchronized void nodeAdded(DefaultMutableTreeNode driverNode, NodeManagementInfo nodeInfo)
 	{

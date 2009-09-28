@@ -1,6 +1,7 @@
 import java.lang.*
 import java.lang.reflect.*
 import java.util.*
+import java.util.prefs.*
 import java.awt.*
 import java.awt.event.*
 import javax.swing.*

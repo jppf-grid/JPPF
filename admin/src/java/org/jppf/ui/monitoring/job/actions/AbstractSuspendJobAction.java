@@ -15,36 +15,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.ui.monitoring.node.actions;
+package org.jppf.ui.monitoring.job.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
 
 import org.apache.commons.logging.*;
-import org.jppf.management.JMXNodeConnectionWrapper;
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.ui.monitoring.job.JobData;
 
 /**
- * This action restarts a node.
+ * This action suspends a job.
  */
-public class RestartNodeAction extends AbstractTopologyAction
+public abstract class AbstractSuspendJobAction extends AbstractJobAction
 {
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(RestartNodeAction.class);
+	protected static Log log = LogFactory.getLog(AbstractSuspendJobAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
 	protected static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Determines if the suspended sub-job should be requeued on the driver side.
+	 */
+	protected boolean requeue = true;
 
 	/**
 	 * Initialize this action.
 	 */
-	public RestartNodeAction()
+	public AbstractSuspendJobAction()
 	{
-		setupIcon("/org/jppf/ui/resources/traffic_light_red_green.gif");
-		putValue(NAME, "Node Restart");
 	}
 
 	/**
@@ -55,7 +57,18 @@ public class RestartNodeAction extends AbstractTopologyAction
 	public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
-		setEnabled(nodeDataArray.length > 0);
+		if (jobDataArray.length > 0)
+		{
+			for (JobData data: jobDataArray)
+			{
+				if (!data.getJobInformation().isSuspended())
+				{
+					setEnabled(true);
+					return;
+				}
+			}
+		}
+		setEnabled(false);
 	}
 
 	/**
@@ -69,11 +82,11 @@ public class RestartNodeAction extends AbstractTopologyAction
 		{
 			public void run()
 			{
-				for (TopologyData data: nodeDataArray)
+				for (JobData data: jobDataArray)
 				{
 					try
 					{
-						((JMXNodeConnectionWrapper) data.getJmxWrapper()).restart();
+						((JMXDriverConnectionWrapper) data.getJmxWrapper()).suspendJob(data.getJobInformation().getJobId(), requeue);
 					}
 					catch(Exception e)
 					{

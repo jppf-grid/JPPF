@@ -39,6 +39,8 @@ import javax.swing.event.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.*;
 
+import org.apache.commons.logging.*;
+
 /**
  * This is a wrapper class takes a TreeTableModel and implements the table model interface. The implementation is
  * trivial, with all of the event dispatching support provided by the superclass: the AbstractTableModel.
@@ -50,6 +52,14 @@ import javax.swing.tree.*;
  */
 public class TreeTableModelAdapter extends AbstractTableModel
 {
+	/**
+	 * Logger for this class.
+	 */
+	static Log log = LogFactory.getLog(TreeTableModelAdapter.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The underlying JTree.
 	 */
@@ -79,11 +89,11 @@ public class TreeTableModelAdapter extends AbstractTableModel
 
 		tree.addTreeExpansionListener(new TreeExpansionListener()
 		{
-			// Don't use fireTableRowsInserted() here; the selection model
-			// would get updated twice.
+			// Don't use fireTableRowsInserted() here; the selection model would get updated twice.
 			public void treeExpanded(TreeExpansionEvent event)
 			{
 				TreePath[] paths = getSelectedPaths();
+				if (debugEnabled) log.debug("selected paths = " + paths);
 				fireTableDataChanged();
 				setSelectedPaths(paths);
 			}
@@ -91,15 +101,14 @@ public class TreeTableModelAdapter extends AbstractTableModel
 			public void treeCollapsed(TreeExpansionEvent event)
 			{
 				TreePath[] paths = getSelectedPaths();
+				if (debugEnabled) log.debug("selected paths = " + paths);
 				fireTableDataChanged();
 				setSelectedPaths(paths);
 			}
 		});
 
-		// Install a TreeModelListener that can update the table when
-		// tree changes. We use delayedFireTableDataChanged as we can
-		// not be guaranteed the tree will have finished processing
-		// the event before us.
+		// Install a TreeModelListener that can update the table when tree changes. We use delayedFireTableDataChanged
+		// as we can not be guaranteed the tree will have finished processing the event before us.
 		treeTableModel.addTreeModelListener(new TreeModelListener()
 		{
 			public void treeNodesChanged(TreeModelEvent e)
@@ -138,7 +147,7 @@ public class TreeTableModelAdapter extends AbstractTableModel
 
 	/**
 	 * Get the name of the column at the specified index.
-	 * @param column - the index of the column.
+	 * @param column the index of the column.
 	 * @return the default name of the column as a string.
 	 * @see javax.swing.table.AbstractTableModel#getColumnName(int)
 	 */
@@ -147,6 +156,12 @@ public class TreeTableModelAdapter extends AbstractTableModel
 		return treeTableModel.getColumnName(column);
 	}
 
+	/**
+   * Returns <code>Object.class</code> regardless of <code>columnIndex</code>.
+   * @param column the column being queried.
+   * @return the <code>Object.class</code> object.
+	 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
+	 */
 	public Class getColumnClass(int column)
 	{
 		return treeTableModel.getColumnClass(column);
@@ -176,8 +191,8 @@ public class TreeTableModelAdapter extends AbstractTableModel
 
 	/**
 	 * Get the value of the cell at the specified coordinates.
-	 * @param row - the row coordinate.
-	 * @param column - the column coordinate.
+	 * @param row the row coordinate.
+	 * @param column the column coordinate.
 	 * @return the value of the specified cell.
 	 * @see javax.swing.table.TableModel#getValueAt(int, int)
 	 */
@@ -190,8 +205,8 @@ public class TreeTableModelAdapter extends AbstractTableModel
 
 	/**
 	 * Determine whether the cell at the specified coordinates is editable.
-	 * @param row - the row coordinate.
-	 * @param column - the column coordinate.
+	 * @param row the row coordinate.
+	 * @param column the column coordinate.
 	 * @return true if the cell is editable, false otherwise.
 	 * @see javax.swing.table.AbstractTableModel#isCellEditable(int, int)
 	 */
@@ -202,10 +217,9 @@ public class TreeTableModelAdapter extends AbstractTableModel
 
 	/**
 	 * Set the value of the cell at the specified coordinates.
-	 * @return the value of the specified cell.
-	 * @param value - the value to set on the specified cell.
-	 * @param row - the row coordinate.
-	 * @param column - the column coordinate.
+	 * @param value the value to set on the specified cell.
+	 * @param row the row coordinate.
+	 * @param column the column coordinate.
 	 * @see javax.swing.table.AbstractTableModel#setValueAt(java.lang.Object, int, int)
 	 */
 	public void setValueAt(Object value, int row, int column)

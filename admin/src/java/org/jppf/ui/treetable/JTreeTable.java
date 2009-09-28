@@ -32,31 +32,16 @@
  */
 package org.jppf.ui.treetable;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.util.EventObject;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-import javax.swing.JTable;
-import javax.swing.JTree;
-import javax.swing.ListSelectionModel;
-import javax.swing.LookAndFeel;
-import javax.swing.UIManager;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeSelectionModel;
-import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.table.*;
+import javax.swing.tree.*;
+
+import org.apache.commons.logging.*;
 
 /**
  * This example shows how to create a simple JTreeTable component, by using a JTree as a renderer (and editor) for the
@@ -69,6 +54,14 @@ import javax.swing.tree.TreeSelectionModel;
  */
 public class JTreeTable extends JTable
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(JTreeTable.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * A subclass of JTree.
 	 */
@@ -199,8 +192,7 @@ public class JTreeTable extends JTable
 			{
 				DefaultTreeCellRenderer dtcr = ((DefaultTreeCellRenderer) tcr);
 				// For 1.1 uncomment this, 1.2 has a bug that will cause an
-				// exception to be thrown if the border selection color is
-				// null.
+				// exception to be thrown if the border selection color is null.
 				// dtcr.setBorderSelectionColor(null);
 				dtcr.setTextSelectionColor(UIManager.getColor("Table.selectionForeground"));
 				dtcr.setBackgroundSelectionColor(UIManager.getColor("Table.selectionBackground"));
@@ -292,8 +284,21 @@ public class JTreeTable extends JTable
 					if (getColumnClass(counter) == TreeTableModel.class)
 					{
 						MouseEvent me = (MouseEvent) e;
-						MouseEvent newME = new MouseEvent(tree, me.getID(), me.getWhen(), me.getModifiersEx(), me.getX()
-								- getCellRect(0, counter, true).x, me.getY(), me.getClickCount(), me.isPopupTrigger());
+						int x = me.getX() - getCellRect(0, counter, true).x;
+						//MouseEvent newME = new MouseEvent(tree, me.getID(), me.getWhen(), me.getModifiersEx(), x, me.getY(), me.getClickCount(), me.isPopupTrigger());
+						//int modifiers =  ((me.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) > 0) ? me.getModifiersEx() : me.getModifiers();
+						int modifiers =  me.getModifiersEx();
+						if (debugEnabled)
+						{
+							int b = me.getButton();
+							String s = null;
+							if (b == MouseEvent.NOBUTTON) s = "NOBUTTON";
+							if (b == MouseEvent.BUTTON1) s = "BUTTON1";
+							else if (b == MouseEvent.BUTTON2) s = "BUTTON2";
+							else if (b == MouseEvent.BUTTON3) s = "BUTTON3";
+							if (s != null) log.debug("button pressed: " + s);
+						}
+						MouseEvent newME = new MouseEvent(tree, me.getID(), me.getWhen(), modifiers, x, me.getY(), me.getClickCount(), me.isPopupTrigger(), me.getButton());
 						tree.dispatchEvent(newME);
 						break;
 					}
@@ -387,11 +392,7 @@ public class JTreeTable extends JTable
 							if (listSelectionModel.isSelectedIndex(counter))
 							{
 								TreePath selPath = tree.getPathForRow(counter);
-
-								if (selPath != null)
-								{
-									addSelectionPath(selPath);
-								}
+								if (selPath != null) addSelectionPath(selPath);
 							}
 						}
 					}
@@ -417,23 +418,21 @@ public class JTreeTable extends JTable
 				{
 					TreeSelectionModel treeSelectionModel = getTree().getSelectionModel();
 					int[] rows = treeSelectionModel.getSelectionRows();
-					if ((rows == null) || (rows.length == 0))
-					{
-						listSelectionModel.clearSelection();
-					}
+					if ((rows == null) || (rows.length == 0)) listSelectionModel.clearSelection();
 					else
 					{
 						Set<Integer> selectionSet = new HashSet<Integer>();
 						for (int r: rows) selectionSet.add(r);
 						for (int i=0; i<JTreeTable.this.getRowCount(); i++)
 						{
+							boolean sel = listSelectionModel.isSelectedIndex(i);
 							if (selectionSet.contains(i))
 							{
-								if (!listSelectionModel.isSelectedIndex(i)) listSelectionModel.addSelectionInterval(i, i);
+								if (!sel) listSelectionModel.addSelectionInterval(i, i);
 							}
 							else
 							{
-								if (listSelectionModel.isSelectedIndex(i)) listSelectionModel.removeSelectionInterval(i, i);
+								if (sel) listSelectionModel.removeSelectionInterval(i, i);
 							}
 						}
 					}

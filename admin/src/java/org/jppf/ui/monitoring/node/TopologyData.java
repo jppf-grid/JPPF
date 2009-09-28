@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ package org.jppf.ui.monitoring.node;
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
+import org.jppf.utils.NetworkUtils;
 
 /**
  * Instances of this class represent the state of a node in the Yopology panel tree.
@@ -85,7 +86,8 @@ public class TopologyData
 	{
 		this(TopologyDataType.NODE);
 		this.nodeInformation = nodeInformation;
-		jmxWrapper = new JMXNodeConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort());
+		String host = NetworkUtils.getHostName(nodeInformation.getHost());
+		jmxWrapper = new JMXNodeConnectionWrapper(host, nodeInformation.getPort());
 		jmxWrapper.connect();
 	}
 

@@ -1,13 +1,13 @@
 /*
  * Java Parallel Processing Framework.
- *  Copyright (C) 2005-2009 JPPF Team. 
+ * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -74,45 +74,14 @@ public class ConsoleLoader
 
 	/**
 	 * Start the console UI, optionally with the charting components.
-	 * This method checks whether the JFreeChart libraries are present in the classpath.
-	 * If not, we propose the user to either download and install the jars automatically, or use the console without charts. 
 	 * @param args not used.
 	 */
 	public static void main(String...args)
 	{
 		try
 		{
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			ClassLoader cl = ConsoleLoader.class.getClassLoader();
-			String[] names = new String[] { "jcommon-1.0.15.jar", "jfreechart-1.0.12.jar" };
-			File folder = new File("lib");
-			File[] files = FileUtils.toFiles(folder, names);
-			Downloader downloader = new Downloader();
-			boolean present = downloader.checkFilesPresent(folder, names);
-			if (!present)
-			{
-				frame = new JFrame(TITLE);
-				frame.setUndecorated(true);
-				frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/jppf-icon.gif").getImage());
-				if (showDownloadDialog())
-				{
-					downloader.setListener(new DownloadListener());
-					downloader.extractFiles("http://downloads.sourceforge.net/jfreechart/jfreechart-1.0.12.zip", "lib", names);
-					present = downloader.checkFilesPresent(folder, names);
-				}
-				frame.setVisible(false);
-				frame.dispose();
-			}
-			String xmlPath = "org/jppf/ui/options/xml/JPPFAdminTool" + (present ? "" : "NoCharts") + ".xml";
-			if (present)
-			{
-				URL[] urls = FileUtils.toURLs(files);
-				//URLClassLoader consoleClassLoader = new URLClassLoader(urls, cl);
-				ConsoleClassLoader consoleClassLoader = new ConsoleClassLoader(null, cl);
-				for (URL url: urls) consoleClassLoader.addURL(url);
-				Thread.currentThread().setContextClassLoader(consoleClassLoader);
-			}
-			UILauncher.main(xmlPath, "file");
+			startWithCheckNoDownload();
+			//startWithCheckAndDownload();
 		}
 		catch(Exception e)
 		{
@@ -120,6 +89,69 @@ public class ConsoleLoader
 			log.error(e.getMessage(), e);
 			System.exit(1);
 		}
+	}
+
+	/**
+	 * Start the console UI, optionally with the charting components.
+	 * This method checks whether the JFreeChart libraries are present in the classpath.
+	 * If not, the charting functionalities are discarded from the application.
+	 * @throws Exception if any error occurs.
+	 */
+	private static void startWithCheckNoDownload() throws Exception
+	{
+		boolean present = false;
+		try
+		{
+			Class clazz = Class.forName("org.jfree.chart.ChartFactory");
+			present = true;
+		}
+		catch(ClassNotFoundException e)
+		{
+			present = false;
+		}
+		String xmlPath = "org/jppf/ui/options/xml/JPPFAdminTool" + (present ? "" : "NoCharts") + ".xml";
+		UILauncher.main(xmlPath, "file");
+	}
+
+	/**
+	 * Start the console UI, optionally with the charting components.
+	 * This method checks whether the JFreeChart libraries are present in the classpath.
+	 * If not, we propose the user to either download and install the jars automatically, or use the console without charts.
+	 * @throws Exception if any error occurs.
+	 */
+	private static void startWithCheckAndDownload() throws Exception
+	{
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		ClassLoader cl = ConsoleLoader.class.getClassLoader();
+		String[] names = new String[] { "jcommon-1.0.15.jar", "jfreechart-1.0.12.jar" };
+		File folder = new File("lib");
+		File[] files = FileUtils.toFiles(folder, names);
+		Downloader downloader = new Downloader();
+		boolean present = downloader.checkFilesPresent(folder, names);
+		if (!present)
+		{
+			frame = new JFrame(TITLE);
+			frame.setUndecorated(true);
+			frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/jppf-icon.gif").getImage());
+			if (showDownloadDialog())
+			{
+				downloader.setListener(new DownloadListener());
+				downloader.extractFiles("http://downloads.sourceforge.net/jfreechart/jfreechart-1.0.12.zip", "lib", names);
+				present = downloader.checkFilesPresent(folder, names);
+			}
+			frame.setVisible(false);
+			frame.dispose();
+		}
+		String xmlPath = "org/jppf/ui/options/xml/JPPFAdminTool" + (present ? "" : "NoCharts") + ".xml";
+		if (present)
+		{
+			URL[] urls = FileUtils.toURLs(files);
+			//URLClassLoader consoleClassLoader = new URLClassLoader(urls, cl);
+			ConsoleClassLoader consoleClassLoader = new ConsoleClassLoader(null, cl);
+			for (URL url: urls) consoleClassLoader.addURL(url);
+			Thread.currentThread().setContextClassLoader(consoleClassLoader);
+		}
+		UILauncher.main(xmlPath, "file");
 	}
 
 	/**
