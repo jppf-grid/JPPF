@@ -82,7 +82,7 @@ public class JPPFClient extends AbstractJPPFClient
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
-	 * @param listeners listenrs to add to this JPPF client.
+	 * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
 	 */
 	public JPPFClient(ClientListener...listeners)
 	{
@@ -102,10 +102,22 @@ public class JPPFClient extends AbstractJPPFClient
 	}
 
 	/**
+	 * Initialize this client with the specified application UUID and new connection listeners.
+	 * @param uuid the unique identifier for this local client.
+	 * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
+	 */
+	public JPPFClient(String uuid, ClientListener...listeners)
+	{
+		super(uuid);
+		for (ClientListener listener: listeners) addClientListener(listener);
+		initPools();
+	}
+
+	/**
 	 * Read all client connection information from the configuration and initialize
 	 * the connection pools accordingly.
 	 */
-	public void initPools()
+	protected void initPools()
 	{
 		if (config.getBoolean("jppf.discovery.enabled", true)) initPoolsFromAutoDiscovery();
 		else initPoolsFromConfig();
@@ -115,7 +127,7 @@ public class JPPFClient extends AbstractJPPFClient
 	 * Read all client connection information from the configuration and initialize
 	 * the connection pools accordingly.
 	 */
-	public void initPoolsFromConfig()
+	private void initPoolsFromConfig()
 	{
 		try
 		{
@@ -158,7 +170,7 @@ public class JPPFClient extends AbstractJPPFClient
 	 * Read connection information from the information and broadcasted 
 	 * by the server and initialize the connection pools accordingly.
 	 */
-	public void initPoolsFromAutoDiscovery()
+	private void initPoolsFromAutoDiscovery()
 	{
 		try
 		{
@@ -240,7 +252,7 @@ public class JPPFClient extends AbstractJPPFClient
 	 * @return the list of executed tasks with their results.
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.AbstractJPPFClient#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.node.policy.ExecutionPolicy)
-	 * @deprecated {@link #submit(org.jppf.client.JPPFJob) submit(JPPFJob)} shouyld be used instead.
+	 * @deprecated {@link #submit(org.jppf.client.JPPFJob) submit(JPPFJob)} should be used instead.
 	 */
 	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy, int priority) throws Exception
 	{
@@ -302,6 +314,7 @@ public class JPPFClient extends AbstractJPPFClient
 	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.AbstractJPPFClient#submitNonBlocking(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener, org.jppf.node.policy.ExecutionPolicy)
+	 * @deprecated {@link #submit(org.jppf.client.JPPFJob) submit(JPPFJob)} should be used instead.
 	 */
 	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
 		throws Exception
@@ -373,7 +386,8 @@ public class JPPFClient extends AbstractJPPFClient
 	}
 
 	/**
-	 * 
+	 * This class listens to information broadcast by JPPF servers on the network and uses it
+	 * to establish a connection with one or more servers. 
 	 */
 	private class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runnable
 	{
