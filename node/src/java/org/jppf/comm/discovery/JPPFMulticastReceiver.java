@@ -48,15 +48,15 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 	/**
 	 * Multicast group to join.
 	 */
-	private	static String group = props.getString("jppf.discovery.group", "230.0.0.1");
+	private	String group = "230.0.0.1";
 	/**
 	 * Multicast port to listen to.
 	 */
-	private	static int port = props.getInt("jppf.discovery.port", 11111);
+	private	int port = 11111;
 	/**
 	 * Timeout for UDP socket read operations.
 	 */
-	private	static int timeout = props.getInt("jppf.discovery.timeout", 5000);
+	private	int timeout = 5000;
 	/**
 	 * Multicast group to join.
 	 */
@@ -69,6 +69,29 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 	 * Count of connection information objects used for ordering.
 	 */
 	private AtomicLong count = new AtomicLong(0L);
+
+	/**
+	 * Default constructor.
+	 */
+	public JPPFMulticastReceiver()
+	{
+		group = props.getString("jppf.discovery.group", "230.0.0.1");
+		port = props.getInt("jppf.discovery.port", 11111);
+		timeout = props.getInt("jppf.discovery.timeout", 5000);
+	}
+
+	/**
+	 * Initialize this discovery thread with the specified UDP group, UDP port and timeout.
+	 * @param group the multicast group to join.
+	 * @param port the multicast port to listen to.
+	 * @param timeout the timeout for UDP socket read operations.
+	 */
+	public JPPFMulticastReceiver(String group, int port, int timeout)
+	{
+		this.group = group;
+		this.port = port;
+		this.timeout = timeout;
+	}
 
 	/**
 	 * Retrieve the driver connection information broadcast by the driver.
