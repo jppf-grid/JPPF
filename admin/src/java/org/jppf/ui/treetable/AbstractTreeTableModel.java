@@ -62,7 +62,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	}
 
 	//
-	// Default implmentations for methods in the TreeModel interface.
+	// Default implementations for methods in the TreeModel interface.
 	//
 
 	public Object getRoot()
@@ -102,7 +102,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 		listenerList.remove(TreeModelListener.class, l);
 	}
 
-	/*
+	/**
 	 * Notify all listeners that have registered interest for notification on this event type. The event instance is
 	 * lazily created using the parameters passed into the fire method.
 	 * 
@@ -126,7 +126,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 		}
 	}
 
-	/*
+	/**
 	 * Notify all listeners that have registered interest for notification on this event type. The event instance is
 	 * lazily created using the parameters passed into the fire method.
 	 * 
@@ -150,7 +150,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 		}
 	}
 
-	/*
+	/**
 	 * Notify all listeners that have registered interest for notification on this event type. The event instance is
 	 * lazily created using the parameters passed into the fire method.
 	 * @see EventListenerList
@@ -173,7 +173,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 		}
 	}
 
-	/*
+	/**
 	 * Notify all listeners that have registered interest for notification on this event type. The event instance is
 	 * lazily created using the parameters passed into the fire method.
 	 * @see EventListenerList

@@ -35,7 +35,7 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
 
 	/**
 	 * Submit the request to the server.
-	 * @param job - the job to execute remotely.
+	 * @param job the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
 	void submit(JPPFJob job) throws Exception;
