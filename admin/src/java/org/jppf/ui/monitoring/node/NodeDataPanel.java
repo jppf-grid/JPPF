@@ -151,6 +151,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 			return;
 		}
 		if (nodes != null) for (NodeManagementInfo nodeInfo: nodes) nodeAdded(driverNode, nodeInfo);
+		if (treeTable != null) treeTable.expand(driverNode);
 	}
 
 	/**
