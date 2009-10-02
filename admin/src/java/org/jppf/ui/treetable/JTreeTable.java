@@ -284,21 +284,11 @@ public class JTreeTable extends JTable
 					if (getColumnClass(counter) == TreeTableModel.class)
 					{
 						MouseEvent me = (MouseEvent) e;
+						if (me.isControlDown()) return false;
 						int x = me.getX() - getCellRect(0, counter, true).x;
-						//MouseEvent newME = new MouseEvent(tree, me.getID(), me.getWhen(), me.getModifiersEx(), x, me.getY(), me.getClickCount(), me.isPopupTrigger());
-						//int modifiers =  ((me.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) > 0) ? me.getModifiersEx() : me.getModifiers();
-						int modifiers =  me.getModifiersEx();
-						if (debugEnabled)
-						{
-							int b = me.getButton();
-							String s = null;
-							if (b == MouseEvent.NOBUTTON) s = "NOBUTTON";
-							if (b == MouseEvent.BUTTON1) s = "BUTTON1";
-							else if (b == MouseEvent.BUTTON2) s = "BUTTON2";
-							else if (b == MouseEvent.BUTTON3) s = "BUTTON3";
-							if (s != null) log.debug("button pressed: " + s);
-						}
-						MouseEvent newME = new MouseEvent(tree, me.getID(), me.getWhen(), modifiers, x, me.getY(), me.getClickCount(), me.isPopupTrigger(), me.getButton());
+						int row = JTreeTable.this.rowAtPoint(me.getPoint());
+						int y = me.getY() - (row * JTreeTable.this.getIntercellSpacing().height);
+						MouseEvent newME = new MouseEvent(tree, me.getID(), me.getWhen(), me.getModifiers(), x, y, me.getClickCount(), me.isPopupTrigger());
 						tree.dispatchEvent(newME);
 						break;
 					}
