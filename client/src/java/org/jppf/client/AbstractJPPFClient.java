@@ -93,7 +93,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * Read all client connection information from the configuration and initialize
 	 * the connection pools accordingly.
 	 */
-	public abstract void initPools();
+	protected abstract void initPools();
 
 	/**
 	 * Get all the client connections handled by this JPPFClient. 
