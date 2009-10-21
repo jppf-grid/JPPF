@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -123,7 +123,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 					if (getStatus().equals(ACTIVE))
 					{
 						boolean found = true;
-						JPPFResourceWrapper resource = (JPPFResourceWrapper) socketClient.receive();
+						JPPFResourceWrapper resource = readResource();
 						String name = resource.getName();
 						ClassLoader cl = getClassLoader(resource.getRequestUuid());
 						if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name);
@@ -134,8 +134,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 						resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
 						if (b != null) resource.setDefinition(b);
 						else resource.setDefinition(null);
-						socketClient.send(resource);
-						socketClient.flush();
+						writeResource(resource);
 						if  (debugEnabled)
 						{
 							if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
@@ -177,10 +176,9 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 			JPPFResourceWrapper resource = new JPPFResourceWrapper();
 			resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
 			resource.addUuid(appUuid);
-			socketClient.send(resource);
-			socketClient.flush();
+			writeResource(resource);
 			// receive the initial response from the server.
-			socketClient.receive();
+			readResource();
 		}
 		finally
 		{

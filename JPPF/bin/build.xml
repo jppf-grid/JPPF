@@ -1,6 +1,6 @@
 <!--
-	Java Parallel Processing Framework.
-	 Copyright (C) 2005-2009 JPPF Team. 
+	JPPF
+  Copyright (C) 2005-2009 JPPF Team. 
 	http://www.jppf.org
 
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -522,6 +522,7 @@
 			<param name="templates" value="docs/home/templates/"/>
 		</antcall>
 	</target>
+	<copy toDir="docs/home/wiki/includes" file="docs/home/jppf_header.php"/>
 
   <target name="doc.home.1" description="generates the project web site pages">
 		<antcall target="doc.gen">
@@ -584,7 +585,7 @@
 			<link href="http://java.sun.com/javaee/5/docs/api"/>
 			<link href="http://junit.sourceforge.net/javadoc"/>
 			<link href="http://xstream.codehaus.org/javadoc"/>
-			<doctitle><![CDATA[Java Parallel Processing Framework v${version.number}]]></doctitle>
+			<doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
 			<header>
 				<![CDATA[
 					<table>
