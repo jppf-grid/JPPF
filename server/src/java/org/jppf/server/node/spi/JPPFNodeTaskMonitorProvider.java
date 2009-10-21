@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -36,7 +36,7 @@ public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider
 	 */
 	public String getMBeanInterfaceName()
 	{
-		return JPPFNodeAdminMBean.class.getName();
+		return JPPFNodeTaskMonitorMBean.class.getName();
 	}
 
 	/**
@@ -48,7 +48,9 @@ public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider
 	 */
 	public Object createMBean(MonitoredNode node)
 	{
-		return new JPPFNodeAdmin((JPPFNode) node);
+		JPPFNodeTaskMonitor monitor = new JPPFNodeTaskMonitor(JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME);
+		((JPPFNode) node).getExecutionManager().addTaskExecutionListener(monitor);
+		return monitor;
 	}
 
 	/**
@@ -60,6 +62,6 @@ public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider
 	 */
 	public String getMBeanName()
 	{
-		return JPPFAdminMBean.NODE_MBEAN_NAME;
+		return JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME;
 	}
 }

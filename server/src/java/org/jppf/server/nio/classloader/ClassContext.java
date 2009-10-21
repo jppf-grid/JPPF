@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -18,16 +18,15 @@
 
 package org.jppf.server.nio.classloader;
 
-import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.List;
 
+import org.jppf.data.transform.*;
 import org.jppf.io.ByteBufferInputStream;
 import org.jppf.node.JPPFResourceWrapper;
-import org.jppf.serialization.JPPFObjectStreamFactory;
 import org.jppf.server.nio.*;
-import org.jppf.utils.JPPFByteArrayOutputStream;
+import org.jppf.utils.*;
 
 /**
  * Context obect associated with a socket channel used by the class server of the JPPF driver. 
@@ -56,9 +55,11 @@ public class ClassContext extends NioContext<ClassState>
 	public JPPFResourceWrapper deserializeResource() throws Exception
 	{
 		ByteBufferInputStream bbis = new ByteBufferInputStream(message.buffer, true);
-		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(bbis);
-		resource = (JPPFResourceWrapper) ois.readObject();
-		ois.close();
+		byte[] data = FileUtils.getInputStreamAsByte(bbis);
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		if (transform != null) data = transform.unwrap(data);
+		ObjectSerializer serializer = new ObjectSerializerImpl();
+		resource = (JPPFResourceWrapper) serializer.deserialize(data);
 		return resource;
 	}
 
@@ -68,19 +69,10 @@ public class ClassContext extends NioContext<ClassState>
 	 */
 	public void serializeResource() throws Exception
 	{
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(baos);
-		try
-		{
-			oos.writeObject(resource);
-		}
-		catch (Exception e)
-		{
-			if (e instanceof IOException) throw (IOException) e;
-			else throw new IOException(e.getMessage());
-		}
-		oos.close();
-		byte[] data = baos.toByteArray();
+		ObjectSerializer serializer = new ObjectSerializerImpl();
+		byte[] data = serializer.serialize(resource).getBuffer();
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		if (transform != null) data = transform.wrap(data);
 		if (message == null) message = new NioMessage();
 		message.length = data.length;
 		message.buffer = ByteBuffer.wrap(data);

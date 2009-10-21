@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -156,7 +156,9 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobId);
 		if (bundleWrapper == null) return null;
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
-		JobInformation job = new JobInformation(jobId, bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getJobSLA().getPriority(), bundle.getJobSLA().isSuspended());
+		Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
+		JobInformation job = new JobInformation(jobId, bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getJobSLA().getPriority(),
+			bundle.getJobSLA().isSuspended(), (pending != null) && pending);
 		job.setMaxNodes(bundle.getJobSLA().getMaxNodes());
 		return job;
 	}
@@ -177,7 +179,9 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		{
 			NodeManagementInfo nodeInfo = getDriver().getNodeInformation(nodes.get(i).first());
 			JPPFTaskBundle bundle = nodes.get(i).second().getBundle();
-			JobInformation jobInfo = new JobInformation(jobId, bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getJobSLA().getPriority(), bundle.getJobSLA().isSuspended());
+			Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
+			JobInformation jobInfo = new JobInformation(jobId, bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getJobSLA().getPriority(),
+				bundle.getJobSLA().isSuspended(), (pending != null) && pending);
 			jobInfo.setMaxNodes(bundle.getJobSLA().getMaxNodes());
 			result[i] = new NodeJobInformation(nodeInfo, jobInfo);
 		}

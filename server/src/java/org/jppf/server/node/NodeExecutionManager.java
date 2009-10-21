@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -19,12 +19,12 @@
 package org.jppf.server.node;
 
 import java.lang.management.*;
-import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.logging.*;
+import org.jppf.scheduling.JPPFScheduleHandler;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 
@@ -57,15 +57,10 @@ public class NodeExecutionManager extends ThreadSynchronization
 	/**
 	 * Timer managing the tasks timeout.
 	 */
-	private Timer timeoutTimer = null;
-	/**
-	 * Map of futures to corresponding timeout timer tasks.
-	 */
-	private Map<Future<?>, TimerTask> timerTaskMap = new Hashtable<Future<?>, TimerTask>();
+	private JPPFScheduleHandler timeoutHandler = new JPPFScheduleHandler("Node Task Timeout Timer");
 	/**
 	 * Mapping of tasks numbers to their id.
 	 */
-	//private Map<String, List<Pair<Long, JPPFTask>>> idMap = new Hashtable<String, List<Pair<Long, JPPFTask>>>();
 	private Map<String, List<Long>> idMap = new Hashtable<String, List<Long>>();
 	/**
 	 * Mapping of internal number to the coresponding tasks.
@@ -117,7 +112,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 		threadFactory = new JPPFThreadFactory("node processing thread", cpuTimeEnabled);
 		LinkedBlockingQueue queue = new LinkedBlockingQueue();
 		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory);
-		timeoutTimer = new Timer("Node Task Timeout Timer");
+		//timeoutTimer = new Timer("Node Task Timeout Timer");
 		if (debugEnabled) log.debug("thread cpu time supported = " + cpuTimeEnabled);
 		if (cpuTimeEnabled) threadMXBean.setThreadCpuTimeEnabled(true);
 	}
@@ -186,7 +181,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	{
 		if (requeue)
 		{
-			bundle.setParameter(BundleParameter.REQUEUE, true);
+			bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
 			bundle.getJobSLA().setSuspended(true);
 		}
 		List<Long> list = new ArrayList<Long>(futureMap.keySet());
@@ -263,29 +258,14 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 * Notify the timer that a task must be aborted if its timeout period expired.
 	 * @param task the JPPF task for which to set the timeout.
 	 * @param number a number identifying the task submitted to the thread pool.
+	 * @throws Exception if any error occurs.
 	 */
-	private void processTaskTimeout(JPPFTask task, long number)
+	private void processTaskTimeout(JPPFTask task, long number) throws Exception
 	{
-		long time = 0L;
-		if (task.getTimeout() > 0) time = task.getTimeout();
-		else
+		if (task.getTimeoutSchedule() != null)
 		{
-			String date = task.getTimeoutDate();
-			SimpleDateFormat sdf = task.getTimeoutDateFormat();
-			try
-			{
-				time = sdf.parse(date).getTime() - System.currentTimeMillis();
-			}
-			catch(ParseException e)
-			{
-				log.error("Unparseable timeout date: " + date + ", format = " + sdf.toPattern(), e);
-			}
-		}
-		if (time > 0L)
-		{
-			TimerTask tt = new TimeoutTimerTask(this, number, task);
-			timerTaskMap.put(getFutureFromNumber(number), tt);
-			timeoutTimer.schedule(tt, time);
+			TimeoutTimerTask tt = new TimeoutTimerTask(this, number, task);
+			timeoutHandler.scheduleAction(getFutureFromNumber(number), task.getTimeoutSchedule(), tt);
 		}
 	}
 
@@ -295,8 +275,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	public void shutdown()
 	{
 		threadPool.shutdownNow();
-		if (timeoutTimer != null) timeoutTimer.cancel();
-		timerTaskMap.clear();
+		timeoutHandler.clear();
 	}
 
 	/**
@@ -367,9 +346,8 @@ public class NodeExecutionManager extends ThreadSynchronization
 		this.uuidList = null;
 		futureMap.clear();
 		taskMap.clear();
-		timerTaskMap.clear();
+		timeoutHandler.clear();
 		idMap.clear();
-		timeoutTimer.purge();
 	}
 
 	/**
@@ -390,8 +368,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	{
 		Future<?> future = futureMap.remove(number);
 		//if (debugEnabled) log.debug("removing task with number " + number + ", future = " + future);
-		TimerTask tt = future == null ? null : timerTaskMap.remove(future);
-		if (tt != null) tt.cancel();
+		if (future != null) timeoutHandler.cancelAction(future);
 		wakeUp();
 	}
 
@@ -413,7 +390,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 */
 	public void taskEnded(long taskNumber, long cpuTime, long elapsedTime, boolean hasError)
 	{
-		TaskExecutionEvent event = new TaskExecutionEvent(taskMap.get(taskNumber), cpuTime, elapsedTime, hasError);
+		TaskExecutionEvent event = new TaskExecutionEvent(taskMap.get(taskNumber), getCurrentJobId(), cpuTime, elapsedTime, hasError);
 		removeFuture(taskNumber);
 		synchronized(taskExecutionListeners)
 		{
@@ -509,5 +486,14 @@ public class NodeExecutionManager extends ThreadSynchronization
 		{
 			taskExecutionListeners.remove(listener);
 		}
+	}
+
+	/**
+	 * Get the executor used by this execution manager.
+	 * @return an <code>ExecutorService</code> instance.
+	 */
+	ExecutorService getExecutor()
+	{
+		return threadPool;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -22,9 +22,11 @@ import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 
 import java.io.InvalidClassException;
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.data.transform.*;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
@@ -63,6 +65,10 @@ public class NodeIO extends ThreadSynchronization
 	 * Used to serialize/deserialize tasks and data providers.
 	 */
 	ObjectSerializer serializer = null;
+	/**
+	 * .
+	 */
+	private ExecutorService executor = Executors.newSingleThreadExecutor();
 
 	/**
 	 * Initialize this TaskIO with the specified node. 
@@ -144,6 +150,8 @@ public class NodeIO extends ThreadSynchronization
 		if (debugEnabled) log.debug("waiting for next request");
 		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
 		if (debugEnabled) log.debug("got bundle");
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		if (transform != null) data = transform.unwrap(data);
 		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
 		List<Object> list = new ArrayList<Object>();
 		list.add(bundle);
@@ -155,7 +163,8 @@ public class NodeIO extends ThreadSynchronization
 			{
 				JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
 				cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
-				cont.deserializeObject(socketWrapper, list, 1+count);
+				//cont.deserializeObjects(socketWrapper, list, 1+count);
+				cont.deserializeObjects(socketWrapper, list, 1+count, node.getExecutionManager().getExecutor());
 			}
 			else
 			{
@@ -187,11 +196,22 @@ public class NodeIO extends ThreadSynchronization
 	 */
 	public void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
 	{
+		ExecutorService executor = node.getExecutionManager().getExecutor();
 		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		bundle.setNodeExecutionTime(elapsed);
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
 		ObjectSerializer ser = node.getHelper().getSerializer();
-		socketWrapper.sendBytes(ser.serialize(bundle));
-		for (JPPFTask task : tasks) socketWrapper.sendBytes(ser.serialize(task));
+		byte[] data = ser.serialize(bundle).getBuffer();
+		if (transform != null) data = transform.wrap(data);
+		socketWrapper.sendBytes(new JPPFBuffer(data, data.length));
+		int taskCount = 0;
+		List<Future<byte[]>> futureList = new ArrayList<Future<byte[]>>();
+		for (JPPFTask task : tasks) futureList.add(executor.submit(new ObjectWriteTask(task)));
+		for (Future<byte[]> f: futureList)
+		{
+			data = f.get();
+			socketWrapper.sendBytes(new JPPFBuffer(data, data.length));
+		}
 		socketWrapper.flush();
 	}
 
@@ -281,5 +301,46 @@ public class NodeIO extends ThreadSynchronization
 	{
 		if (readList.isEmpty()) goToSleep();
 		return readList.removeFirst();
+	}
+
+	/**
+	 * .
+	 */
+	public class ObjectWriteTask implements Callable<byte[]>
+	{
+		/**
+		 * The data to send over the network connection.
+		 */
+		private Object object = null;
+
+		/**
+		 * Initialize this task with the psecicfied data buffer.
+		 * @param object the object to serialize.
+		 */
+		public ObjectWriteTask(Object object)
+		{
+			this.object = object;
+		}
+
+		/**
+		 * Execute this task.
+		 * @return the serialized object.
+		 * @see java.util.concurrent.Callable#call()
+		 */
+		public byte[] call()
+		{
+			byte[] data = null;
+			try
+			{
+				JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+				data = node.getHelper().getSerializer().serialize(object).getBuffer();
+				if (transform != null) data = transform.wrap(data);
+			}
+			catch(Exception e)
+			{
+				log.error(e.getMessage(), e);
+			}
+			return data;
+		}
 	}
 }

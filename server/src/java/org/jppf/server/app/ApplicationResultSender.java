@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -19,6 +19,7 @@ package org.jppf.server.app;
 
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.data.transform.*;
 import org.jppf.io.*;
 import org.jppf.server.AbstractResultSender;
 import org.jppf.utils.JPPFBuffer;
@@ -61,13 +62,10 @@ public class ApplicationResultSender extends AbstractResultSender
 	public void sendPartialResults(BundleWrapper bundle) throws Exception
 	{
 		if (debugEnabled) log.debug("Sending bundle with "+bundle.getBundle().getTaskCount()+" tasks");
-		JPPFBuffer bundleBuffer = helper.getSerializer().serialize(bundle.getBundle());
-		/*
-		int size = 4 + bundleBuffer.getLength();
-		for (DataLocation task : bundle.getTasks()) size += 4 + task.getSize();
-		socketClient.writeInt(size);
-		*/
-		socketClient.sendBytes(bundleBuffer);
+		byte[] data = helper.getSerializer().serialize(bundle.getBundle()).getBuffer();
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		if (transform != null) data = transform.wrap(data);
+		socketClient.sendBytes(new JPPFBuffer(data, data.length));
 		for (DataLocation task : bundle.getTasks())
 		{
 			destination.writeInt(task.getSize());

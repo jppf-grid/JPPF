@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -21,6 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import java.nio.channels.SocketChannel;
 import java.util.List;
 
+import org.jppf.data.transform.*;
 import org.jppf.io.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.NioContext;
@@ -130,8 +131,10 @@ public class NodeContext extends NioContext<NodeState>
 	{
 		//if (nodeMessage == null)
 		nodeMessage = new NodeMessage();
-		JPPFBuffer buf = helper.getSerializer().serialize(bundle.getBundle());
-		nodeMessage.addLocation(new ByteBufferLocation(buf.getBuffer(), 0, buf.getLength()));
+		byte[] data = helper.getSerializer().serialize(bundle.getBundle()).getBuffer();
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		if (transform != null) data = transform.wrap(data);
+		nodeMessage.addLocation(new ByteBufferLocation(data, 0, data.length));
 		nodeMessage.addLocation(bundle.getDataProvider());
 		for (DataLocation dl: bundle.getTasks()) nodeMessage.addLocation(dl);
 		nodeMessage.setBundle(bundle.getBundle());

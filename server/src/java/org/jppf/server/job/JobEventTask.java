@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -78,8 +78,9 @@ public class JobEventTask implements Runnable
 	public void run()
 	{
 		JPPFJobSLA sla = bundle.getJobSLA();
-		JobInformation jobInfo = new JobInformation((String) bundle.getParameter(BundleParameter.JOB_ID),
-			bundle.getTaskCount(), bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended());
+		Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
+		JobInformation jobInfo = new JobInformation((String) bundle.getParameter(BundleParameter.JOB_ID), bundle.getTaskCount(),
+			bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
 		jobInfo.setMaxNodes(sla.getMaxNodes());
 		NodeManagementInfo nodeInfo = (channel == null) ? null : JPPFDriver.getInstance().getNodeInformation(channel);
 		JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);

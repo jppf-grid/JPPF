@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -117,7 +117,7 @@ public class WaitInitialBundleState extends NodeServerState
 		TypedProperties props = (TypedProperties) bundle.getParametersMap().get("bundle.tuning.parameters");
 		if (props != null)
 		{
-			bundler = server.getBundlerFactory().createBundler(props.getString("strategy"), props);
+			bundler = server.getBundlerFactory().createBundler(props.getString("algorithm"), props);
 		}
 		else bundler = server.getBundler().copy();
 		return bundler;

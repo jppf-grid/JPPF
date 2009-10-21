@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
 
+import org.jppf.data.transform.*;
 import org.jppf.io.*;
 import org.jppf.server.nio.NioObject;
 import org.jppf.server.protocol.JPPFTaskBundle;
@@ -96,8 +97,11 @@ public class NodeMessage
 		{
 			if (!readNextObject(channel)) return false;
 			InputStream is = locations.get(0).getInputStream();
+			byte[] data = FileUtils.getInputStreamAsByte(is);
+			JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+			if (transform != null) data = transform.unwrap(data);
 			SerializationHelper helper = new SerializationHelperImpl();
-			bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(is);
+			bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
 			nbObjects = bundle.getTaskCount() + 1;
 		}
 		while (position < nbObjects)

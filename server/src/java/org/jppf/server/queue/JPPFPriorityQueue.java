@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -20,10 +20,12 @@ package org.jppf.server.queue;
 
 import static org.jppf.utils.CollectionUtils.*;
 
+import java.text.ParseException;
 import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
+import org.jppf.scheduling.*;
 import org.jppf.server.*;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.protocol.*;
@@ -58,6 +60,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * The job manager.
 	 */
 	protected JPPFJobManager jobManager = null;
+	/**
+	 * Handles the schedule of each job that has one.
+	 */
+	private JPPFScheduleHandler jobScheduleHandler = new JPPFScheduleHandler("Job Schedule Handler");
 
 	/**
 	 * Initialize this queue.
@@ -97,9 +103,28 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 					bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + "]");
 				putInListMap(new JPPFPriority(sla.getPriority()), bundleWrapper, priorityMap);
 				putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
-				jobMap.put(jobId, bundleWrapper);
-				Boolean requeued = (Boolean) bundle.removeParameter(BundleParameter.REQUEUE);
+				Boolean requeued = (Boolean) bundle.removeParameter(BundleParameter.JOB_REQUEUE);
 				if (requeued == null) requeued = false;
+				if (!requeued)
+				{
+					JPPFSchedule schedule = sla.getJobSchedule();
+					boolean pending = (schedule == null) ? false : true;
+					bundle.setParameter(BundleParameter.JOB_PENDING, pending);
+					if (pending)
+					{
+						try
+						{
+							jobScheduleHandler.scheduleAction(jobId, sla.getJobSchedule(), new JobScheduleAction(bundleWrapper));
+						}
+						catch(ParseException e)
+						{
+							bundle.setParameter(BundleParameter.JOB_PENDING, false);
+							log.error("Unparseable date for job id " + jobId + " : date = " + schedule.getDate() +
+								", date format = " + (schedule.getDateFormat() == null ? "null" : schedule.getDateFormat().toLocalizedPattern()), e);
+						}
+					}
+				}
+				jobMap.put(jobId, bundleWrapper);
 				fireQueueEvent(new QueueEvent(this, bundleWrapper, requeued));
 			}
 		}
@@ -166,7 +191,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 				bundle.setParameter("real.task.count", bundle.getTaskCount());
 			}
 			jobManager.jobUpdated(bundleWrapper);
-			result.getBundle().setExecutionStartTime(System.currentTimeMillis());
+			//result.getBundle().setExecutionStartTime(System.currentTimeMillis());
 		}
 		finally
 		{
@@ -286,6 +311,39 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		public void remove() throws UnsupportedOperationException
 		{
 			throw new UnsupportedOperationException("remove() is not supported on a BundleIterator");
+		}
+	}
+
+	/**
+	 * Action triggered when a job reaches its scheduled execution date.
+	 */
+	public class JobScheduleAction implements Runnable
+	{
+		/**
+		 * The bundle wrapper encapsulating the job.
+		 */
+		private BundleWrapper bundleWrapper = null;
+
+		/**
+		 * Initialize this action witht he specified bundle wrapper.
+		 * @param bundleWrapper the bundle wrapper encapsulating the job.
+		 */
+		public JobScheduleAction(BundleWrapper bundleWrapper)
+		{
+			this.bundleWrapper = bundleWrapper;
+		}
+
+		/**
+		 * Execute this action.
+		 * @see java.lang.Runnable#run()
+		 */
+		public void run()
+		{
+			synchronized(bundleWrapper)
+			{
+				bundleWrapper.getBundle().setParameter(BundleParameter.JOB_PENDING, false);
+				jobManager.jobUpdated(bundleWrapper);
+			}
 		}
 	}
 }

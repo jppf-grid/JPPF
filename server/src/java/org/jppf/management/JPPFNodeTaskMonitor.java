@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -48,13 +48,29 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	 */
 	private AtomicInteger taskCount = new AtomicInteger(0);
 	/**
+	 * The current count of tasks executed.
+	 */
+	private AtomicInteger taskInErrorCount = new AtomicInteger(0);
+	/**
+	 * The current count of tasks executed.
+	 */
+	private AtomicInteger taskSucessfullCount = new AtomicInteger(0);
+	/**
+	 * The current count of tasks executed.
+	 */
+	private AtomicLong totalCpuTime = new AtomicLong(0L);
+	/**
+	 * The current count of tasks executed.
+	 */
+	private AtomicLong totalElapsedTime = new AtomicLong(0L);
+	/**
 	 * The sequence number for notifications.
 	 */
 	private AtomicLong sequence = new AtomicLong(0L);
 
 	/**
 	 * Default constructor.
-	 * @param objectName - a string representing the MBean object name.
+	 * @param objectName a string representing the MBean object name.
 	 */
 	public JPPFNodeTaskMonitor(String objectName)
 	{
@@ -69,24 +85,68 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	}
 
 	/**
+	 * Called to notify a listener that a task was executed.
+	 * @param event the event encapsulating the task-related data.
+	 * @see org.jppf.server.node.TaskExecutionListener#taskExecuted(org.jppf.server.node.TaskExecutionEvent)
+	 */
+	public void taskExecuted(TaskExecutionEvent event)
+	{
+		TaskInformation info = event.getTaskInformation();
+		taskCount.incrementAndGet();
+		if (info.hasError()) taskInErrorCount.incrementAndGet();
+		else taskSucessfullCount.incrementAndGet();
+		totalCpuTime.addAndGet(info.getCpuTime());
+		totalElapsedTime.addAndGet(info.getElapsedTime());
+		sendNotification(new TaskExecutionNotification(OBJECT_NAME, sequence.getAndIncrement(), info));
+	}
+
+	/**
 	 * Get the total number of tasks executed by the node.
 	 * @return the number of tasks as an integer value.
-	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getNbTasksExecuted()
+	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTasksExecuted()
 	 */
-	public Integer getNbTasksExecuted()
+	public Integer getTotalTasksExecuted()
 	{
 		return taskCount.get();
 	}
 
 	/**
-	 * Called to notify a listener that a task was executed.
-	 * @param event - the event encapsulating the task-related data.
-	 * @see org.jppf.server.node.TaskExecutionListener#taskExecuted(org.jppf.server.node.TaskExecutionEvent)
+	 * The total cpu time used by the tasks in milliseconds.
+	 * @return the cpu time as long value.
+	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTaskCpuTime()
 	 */
-	public void taskExecuted(TaskExecutionEvent event)
+	public Long getTotalTaskCpuTime()
 	{
-		taskCount.incrementAndGet();
-		TaskExecutionNotification notif = new TaskExecutionNotification(OBJECT_NAME, sequence.getAndIncrement(), event.getTaskInformation());
-		sendNotification(notif);
+		return totalCpuTime.get();
+	}
+
+	/**
+	 * The total elapsed time used by the tasks in milliseconds.
+	 * @return the elapsed time as long value.
+	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTaskElpasedTime()
+	 */
+	public Long getTotalTaskElapsedTime()
+	{
+		return totalElapsedTime.get();
+	}
+
+	/**
+	 * The total number of tasks that ended in error.
+	 * @return the number as an integer value.
+	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTasksInError()
+	 */
+	public Integer getTotalTasksInError()
+	{
+		return taskInErrorCount.get();
+	}
+
+	/**
+	 * The total number of tasks that executed sucessfully.
+	 * @return the number as an integer value.
+	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTasksSucessfull()
+	 */
+	public Integer getTotalTasksSucessfull()
+	{
+		return taskSucessfullCount.get();
 	}
 }

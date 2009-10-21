@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -101,8 +101,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 			NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
 			if (!server.getBundlerFactory().getBundlerProviderNames().contains(algorithm)) return "Error: unknown algorithm '" + algorithm + "'";
 			TypedProperties config = JPPFConfiguration.getProperties();
-			config.setProperty("task.bundle.strategy", algorithm);
-			config.setProperty("task.bundle.autotuned.strategy", "jppf");
+			config.setProperty("jppf.load.balancing.algorithm", algorithm);
+			config.setProperty("jppf.load.balancing.strategy", "jppf");
 			String prefix = "strategy.jppf.";
 			for (Object key: parameters.keySet())
 			{
@@ -158,8 +158,12 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	public LoadBalancingInformation loadBalancerInformation() throws Exception
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
-		String algorithm = props.getString("task.bundle.strategy", "manual");
-		String profileName = props.getString("task.bundle.autotuned.strategy", "jppf");
+		String algorithm = props.getString("jppf.load.balancing.algorithm", null);
+		// for compatibility with v1.x configuration files
+		if (algorithm == null) algorithm = props.getString("task.bundle.strategy", "manual");
+		String profileName = props.getString("jppf.load.balancing.strategy", null);
+		// for compatibility with v1.x configuration files
+		if (profileName == null) profileName = props.getString("task.bundle.autotuned.strategy", "jppf");
 		JPPFBundlerFactory factory = JPPFDriver.getInstance().getNodeNioServer().getBundlerFactory();
 		TypedProperties params = factory.convertJPPFConfiguration(profileName, props);
 		return new LoadBalancingInformation(algorithm, params, factory.getBundlerProviderNames());

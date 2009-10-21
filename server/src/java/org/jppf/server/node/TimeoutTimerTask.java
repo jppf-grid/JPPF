@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -17,7 +17,6 @@
  */
 package org.jppf.server.node;
 
-import java.util.TimerTask;
 import java.util.concurrent.Future;
 
 import org.jppf.server.protocol.JPPFTask;
@@ -27,7 +26,7 @@ import org.jppf.server.protocol.JPPFTask;
  * whether the corresponding JPPF task timeout has been reached, and abort the
  * task if necessary.
  */
-public class TimeoutTimerTask extends TimerTask
+public class TimeoutTimerTask implements Runnable
 {
 	/**
 	 * The number identifying the task.

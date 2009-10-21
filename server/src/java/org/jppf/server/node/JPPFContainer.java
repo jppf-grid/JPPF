@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -19,10 +19,11 @@ package org.jppf.server.node;
 
 import java.security.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.io.*;
+import org.jppf.data.transform.*;
 import org.jppf.node.*;
 import org.jppf.utils.*;
 
@@ -78,23 +79,24 @@ public class JPPFContainer
 	
 	/**
 	 * Deserialize a number of objects from a socket client.
-	 * @param wrapper - the socket client from which to read the objects to deserialize.
-	 * @param list - a list holding the resulting deserialized objects.
-	 * @param count - the number of objects to deserialize.
+	 * @param wrapper the socket client from which to read the objects to deserialize.
+	 * @param list a list holding the resulting deserialized objects.
+	 * @param count the number of objects to deserialize.
 	 * @return the new position in the source data after deserialization.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	public int deserializeObject(SocketWrapper wrapper, List<Object> list, int count) throws Exception
+	public int deserializeObjects(SocketWrapper wrapper, List<Object> list, int count) throws Exception
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try
 		{
 			Thread.currentThread().setContextClassLoader(classLoader);
-			InputSource is = new SocketWrapperInputSource(wrapper);
+			JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
 			for (int i=0; i<count; i++)
 			{
-				DataLocation dl = IOHelper.readData(is);
-				list.add(helper.getSerializer().deserialize(dl.getInputStream()));
+				JPPFBuffer buf = wrapper.receiveBytes(0);
+				byte[] data = (transform == null) ? buf.getBuffer() : transform.unwrap(buf.getBuffer());
+				list.add(helper.getSerializer().deserialize(data));
 			}
 			return 0;
 		}
@@ -109,31 +111,23 @@ public class JPPFContainer
 	 * @param wrapper the socket client from which to read the objects to deserialize.
 	 * @param list a list holding the resulting deserialized objects.
 	 * @param count the number of objects to deserialize.
+	 * @param executor the number of objects to deserialize.
 	 * @return the new position in the source data after deserialization.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	public int deserializeObject2(SocketWrapper wrapper, List<Object> list, int count) throws Exception
+	public int deserializeObjects(SocketWrapper wrapper, List<Object> list, int count, ExecutorService executor) throws Exception
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try
 		{
 			Thread.currentThread().setContextClassLoader(classLoader);
-			long elapsed1 = 0L;
-			long elapsed2 = 0L;
+			List<Future<Object>> futureList = new ArrayList<Future<Object>>();
 			for (int i=0; i<count; i++)
 			{
-				long start = System.currentTimeMillis();
 				JPPFBuffer buf = wrapper.receiveBytes(0);
-				long time = System.currentTimeMillis() - start;
-				elapsed1 += time;
-				byte[] data = buf.getBuffer();
-				start = System.currentTimeMillis();
-				list.add(helper.getSerializer().deserialize(data));
-				long time2 = System.currentTimeMillis() - start;
-				elapsed2 += time2;
-				if (debugEnabled) log.debug("i = " + i + "; size = " + buf.getLength() + "; read time: " + time + " ms; deserialization: " + time2 + " ms");
+				futureList.add(executor.submit(new ObjectReadTask(buf.getBuffer())));
 			}
-			if (debugEnabled) log.debug("read time: " + elapsed1 + " ms; deserialization time: " + elapsed2 + " ms");
+			for (Future<Object> f: futureList) list.add(f.get());
 			return 0;
 		}
 		finally
@@ -221,5 +215,45 @@ public class JPPFContainer
 	public void setUuidPath(List<String> uuidPath)
 	{
 		this.uuidPath = uuidPath;
+	}
+
+	/**
+	 * .
+	 */
+	public class ObjectReadTask implements Callable<Object>
+	{
+		/**
+		 * The data to send over the network connection.
+		 */
+		private byte[] buffer = null;
+
+		/**
+		 * Initialize this task with the specicfied data buffer.
+		 * @param buffer the data read from the network connection.
+		 */
+		public ObjectReadTask(byte[] buffer)
+		{
+			this.buffer = buffer;
+		}
+
+		/**
+		 * Execute this task.
+		 * @return a deserialized object.
+		 * @see java.util.concurrent.Callable#call()
+		 */
+		public Object call()
+		{
+			try
+			{
+				JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+				byte[] data = (transform == null) ? buffer : transform.unwrap(buffer);
+				return helper.getSerializer().deserialize(data);
+			}
+			catch(Exception e)
+			{
+				log.error(e.getMessage(), e);
+			}
+			return null;
+		}
 	}
 }

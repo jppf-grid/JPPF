@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -87,11 +87,11 @@ public class WaitingResultsState extends NodeServerState
 				statsManager.taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getNodeMessage().getLength());
 				context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 			}
-			Boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.REQUEUE);
+			Boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE);
 			jobManager.jobReturned(bundleWrapper, channel);
 			if ((requeue != null) && requeue)
 			{
-				bundle.setParameter(BundleParameter.REQUEUE, true);
+				bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
 				bundle.getJobSLA().setSuspended(true);
 				context.resubmitBundle(bundleWrapper);
 			}

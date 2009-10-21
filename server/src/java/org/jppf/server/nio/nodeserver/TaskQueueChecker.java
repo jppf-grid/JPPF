@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -168,6 +168,8 @@ public class TaskQueueChecker implements Runnable
 	{
 		JPPFJobSLA sla = bundle.getJobSLA();
 		if (sla.isSuspended()) return false;
+		Boolean b = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
+		if ((b != null) && b) return false;
 		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
 		int maxNodes = sla.getMaxNodes();
 		List<ChannelBundlePair> list = server.getJobManager().getNodesForJob(jobId);

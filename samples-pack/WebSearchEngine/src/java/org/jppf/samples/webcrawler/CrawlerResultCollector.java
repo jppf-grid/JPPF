@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -48,7 +48,7 @@ public class CrawlerResultCollector implements TaskResultListener
 	 * A map containing the resulting tasks, ordered by ascending position in the
 	 * submitted list of tasks.
 	 */
-	private Map<Integer, List<JPPFTask>> resultMap = new TreeMap<Integer, List<JPPFTask>>();
+	private Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
 	/**
 	 * The list of final results.
 	 */
@@ -70,10 +70,9 @@ public class CrawlerResultCollector implements TaskResultListener
 	 */
 	public synchronized void resultsReceived(TaskResultEvent event)
 	{
-		int idx = event.getStartIndex();
 		List<JPPFTask> tasks = event.getTaskList();
-		if (debugEnabled) log.debug("Received results for tasks " + idx + " - " + (idx + tasks.size() - 1));
-		resultMap.put(idx, tasks);
+		if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks");
+		for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
 		pendingCount -= tasks.size();
 		notify();
 		int sum = 0;
@@ -109,10 +108,7 @@ public class CrawlerResultCollector implements TaskResultListener
 			}
 		}
 		results = new ArrayList<JPPFTask>();
-		for (Integer n: resultMap.keySet())
-		{
-			for (JPPFTask task: resultMap.get(n)) results.add(task);
-		}
+		for (Integer n: resultMap.keySet()) results.add(resultMap.get(n));
 		resultMap.clear();
 		return results;
 	}

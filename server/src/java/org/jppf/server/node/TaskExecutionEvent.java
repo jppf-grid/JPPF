@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -36,15 +36,16 @@ public class TaskExecutionEvent extends EventObject
 
 	/**
 	 * Initialize this event object with the specified task.
-	 * @param task - the JPPF task from which the event originates.
-	 * @param cpuTime - the cpu time taken by the task.
-	 * @param elapsedTime - the wall clock time taken by the task.
-	 * @param error - determines whether the task had an exception.
+	 * @param task the JPPF task from which the event originates.
+	 * @param jobId the id of the job this task belongs to.
+	 * @param cpuTime the cpu time taken by the task.
+	 * @param elapsedTime the wall clock time taken by the task.
+	 * @param error determines whether the task had an exception.
 	 */
-	public TaskExecutionEvent(JPPFTask task, long cpuTime, long elapsedTime, boolean error)
+	public TaskExecutionEvent(JPPFTask task, String jobId, long cpuTime, long elapsedTime, boolean error)
 	{
 		super(task);
-		this.taskInformation = new TaskInformation(task.getId(), cpuTime, elapsedTime, error);
+		this.taskInformation = new TaskInformation(task.getId(), jobId, cpuTime, elapsedTime, error);
 	}
 
 	/**

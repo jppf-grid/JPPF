@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -21,6 +21,7 @@ import java.net.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
+import org.jppf.data.transform.*;
 import org.jppf.io.*;
 import org.jppf.server.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
@@ -79,8 +80,7 @@ public class ApplicationConnection extends JPPFConnection
 	 * which responses are sent.
 	 * @throws JPPFException if this socket handler can't be initialized.
 	 */
-	public ApplicationConnection(JPPFServer server, Socket socket)
-			throws JPPFException
+	public ApplicationConnection(JPPFServer server, Socket socket) throws JPPFException
 	{
 		super(server, socket);
 		is = new SocketWrapperInputSource(socketClient);
@@ -109,8 +109,11 @@ public class ApplicationConnection extends JPPFConnection
 	{
 		// Read the request header - with tasks count information
 		DataLocation dl = IOHelper.readData(is);
-		JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(dl.getInputStream());
-		if (debugEnabled) log.debug("received header from client, data length = " + dl.getSize());
+		byte[] data = FileUtils.getInputStreamAsByte(dl.getInputStream());
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		if (transform != null) data = transform.unwrap(data);
+		JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
+		if (debugEnabled) log.debug("received header from client, data length = " + data.length);
 		headerWrapper = new BundleWrapper(header);
 		executeTasks();
 	}
