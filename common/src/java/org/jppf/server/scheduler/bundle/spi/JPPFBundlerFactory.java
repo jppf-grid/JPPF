@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -70,10 +70,14 @@ public class JPPFBundlerFactory
 	public Bundler createBundlerFromJPPFConfiguration() throws Exception
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
-		String name = props.getString("task.bundle.strategy", "manual");
-		String profileName = props.getString("task.bundle.autotuned.strategy", "jppf");
+		String algorithm = props.getString("jppf.load.balancing.algorithm", null);
+		// for compatibility with v1.x configuration files
+		if (algorithm == null) algorithm = props.getString("task.bundle.strategy", "manual");
+		String profileName = props.getString("jppf.load.balancing.strategy", null);
+		// for compatibility with v1.x configuration files
+		if (profileName == null) profileName = props.getString("task.bundle.autotuned.strategy", "jppf");
 		TypedProperties configuration = convertJPPFConfiguration(profileName, props);
-		return createBundler(name, configuration);
+		return createBundler(algorithm, configuration);
 	}
 
 	/**

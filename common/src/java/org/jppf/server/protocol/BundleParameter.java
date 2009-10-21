@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -67,5 +67,9 @@ public enum  BundleParameter
 	/**
 	 * Job requeue indicator.
 	 */
-	REQUEUE
+	JOB_REQUEUE,
+	/**
+	 * Job pending indicator, detrmines whether the job is waiting for its scheduled time to start.
+	 */
+	JOB_PENDING
 }

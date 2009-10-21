@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -20,6 +20,7 @@ package org.jppf.ui.monitoring.job;
 
 import javax.swing.tree.*;
 
+import org.jppf.job.JobInformation;
 import org.jppf.ui.treetable.*;
 
 /**
@@ -88,26 +89,34 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 			if (defNode.getUserObject() instanceof JobData)
 			{
 				JobData data = (JobData) defNode.getUserObject();
+				JobInformation jobInfo = data.getJobInformation();
 				switch (column)
 				{
 					case NODE_URL:
 						break;
 					case JOB_STATE:
-						if (data.getType().equals(JobDataType.JOB)) res = localize("job.state." + (data.getJobInformation().isSuspended() ? "suspended" : "executing"));
+						if (data.getType().equals(JobDataType.JOB))
+						{
+							String s = null;
+							if (jobInfo.isPending()) s = "pending";
+							else s = jobInfo.isSuspended() ? "suspended" : "executing";
+							res = localize("job.state." + s);
+						}
 						break;
 					case TASK_COUNT:
-						if (data.getType().equals(JobDataType.SUB_JOB) || data.getType().equals(JobDataType.JOB)) res = "" + data.getJobInformation().getTaskCount();
+						if (data.getType().equals(JobDataType.SUB_JOB) || data.getType().equals(JobDataType.JOB)) res = "" + jobInfo.getTaskCount();
 						break;
 					case INITIAL_TASK_COUNT:
-						if (data.getType().equals(JobDataType.JOB)) res = "" + data.getJobInformation().getInitialTaskCount();
+						if (data.getType().equals(JobDataType.JOB)) res = "" + jobInfo.getInitialTaskCount();
 						break;
 					case PRIORITY:
-						if (data.getType().equals(JobDataType.JOB)) res = "" + data.getJobInformation().getPriority();
+						if (data.getType().equals(JobDataType.JOB)) res = "" + jobInfo.getPriority();
 						break;
 					case MAX_NODES:
 						if (data.getType().equals(JobDataType.JOB))
 						{
-							int n = data.getJobInformation().getMaxNodes();
+							int n = jobInfo.getMaxNodes();
+							// \u221E = infinity symbol
 							if (n == Integer.MAX_VALUE) res = "\u221E";
 							else res = "" + n;
 						}

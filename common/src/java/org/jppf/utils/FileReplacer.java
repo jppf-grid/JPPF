@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -59,7 +59,7 @@ public class FileReplacer
 	/**
 	 * The filter to use when looking for files to process.
 	 */
-	private ReplacerFiler filter = null;
+	private ReplacerFilter filter = null;
 	/**
 	 * Number of replacements actually performed.
 	 */
@@ -89,7 +89,7 @@ public class FileReplacer
 		}
 		this.searchOnly = searchOnly;
 		pattern = Pattern.compile(src, Pattern.LITERAL);
-		filter = new ReplacerFiler(ext);
+		filter = new ReplacerFilter(ext);
 		File f = new File(rootDir);
 		nbFilesChanged = 0;
 		nbReplacements = 0;
@@ -179,7 +179,7 @@ public class FileReplacer
 	/**
 	 * File filter based on a set of extensions.
 	 */
-	public static class ReplacerFiler implements FileFilter
+	public static class ReplacerFilter implements FileFilter
 	{
 		/**
 		 * The list of file extensions to process.
@@ -190,7 +190,7 @@ public class FileReplacer
 		 * Initializer this filter with the specified set of file extensions.
 		 * @param ext a comma-separated list of file extensions to process.
 		 */
-		public ReplacerFiler(String ext)
+		public ReplacerFilter(String ext)
 		{
 			if (ext == null) ext = "";
 			extensions = ext.split(",");

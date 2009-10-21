@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -27,6 +27,7 @@ import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
+import org.jppf.data.transform.*;
 import org.jppf.security.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
@@ -221,10 +222,31 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		header.setJobSLA(job.getJobSLA());
 
 		SocketWrapper socketClient = taskServerConnection.getSocketClient();
+		socketClient.sendBytes(wrappedData(header, ser));
+		socketClient.sendBytes(wrappedData(job.getDataProvider(), ser));
+		for (JPPFTask task : job.getTasks()) socketClient.sendBytes(wrappedData(task, ser));
+		/*
 		socketClient.sendBytes(ser.serialize(header));
 		socketClient.sendBytes(ser.serialize(job.getDataProvider()));
 		for (JPPFTask task : job.getTasks()) socketClient.sendBytes(ser.serialize(task));
+		*/
 		socketClient.flush();
+	}
+
+	/**
+	 * Transform an object into a an array of bytes to send trough the network connection.
+	 * @param o the object to transform.
+	 * @param ser the object serializer to use.
+	 * @return the transformed result as an array of bytes.
+	 * @throws Exception if an error occurs while preparing the data.
+	 */
+	private JPPFBuffer wrappedData(Object o, ObjectSerializer ser) throws Exception
+	{
+		JPPFBuffer serialized = ser.serialize(o);
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		if (transform == null) return serialized;
+		byte[] data = transform.wrap(serialized.getBuffer());
+		return new JPPFBuffer(data, data.length);
 	}
 
 	/**
@@ -238,15 +260,21 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		try
 		{
 			SocketWrapper socketClient = taskServerConnection.getSocketClient();
-			SerializationHelper helper = makeHelper();
+			ObjectSerializer ser = makeHelper().getSerializer();
+			/*
 			byte[] data = socketClient.receiveBytes(0).getBuffer();
 			JPPFTaskBundle bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
+			*/
+			JPPFTaskBundle bundle = (JPPFTaskBundle) unwrappedData(socketClient.receiveBytes(0), ser);
 			int count = bundle.getTaskCount();
 			List<JPPFTask> taskList = new ArrayList<JPPFTask>();
 			for (int i=0; i<count; i++)
 			{
+				/*
 				data = socketClient.receiveBytes(0).getBuffer();
 				taskList.add((JPPFTask) helper.getSerializer().deserialize(data));
+				*/
+				taskList.add((JPPFTask) unwrappedData(socketClient.receiveBytes(0), ser));
 			}
 	
 			int startIndex = (taskList.isEmpty()) ? -1 : taskList.get(0).getPosition();
@@ -275,6 +303,21 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			log.error(e.getMessage(), e);
 			throw e;
 		}
+	}
+
+	/**
+	 * Transform an array of bytes received from the network into an object.
+	 * @param buffer the data to unwrap.
+	 * @param ser the object serializer to use.
+	 * @return the transformed result as an object.
+	 * @throws Exception if an error occurs while preparing the data.
+	 */
+	private Object unwrappedData(JPPFBuffer buffer, ObjectSerializer ser) throws Exception
+	{
+		byte[] data = buffer.getBuffer();
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		if (transform != null) data = transform.unwrap(data);
+		return ser.deserialize(data);
 	}
 
 	/**

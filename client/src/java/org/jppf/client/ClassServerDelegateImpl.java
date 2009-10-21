@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -104,15 +104,14 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			JPPFResourceWrapper resource = new JPPFResourceWrapper();
 			resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
 			resource.addUuid(appUuid);
-			socketClient.send(resource);
-			socketClient.flush();
-			resource = (JPPFResourceWrapper) socketClient.receive();
+			writeResource(resource);
+			resource = readResource();
 			while (!stop)
 			{
 				try
 				{
 					boolean found = true;
-					resource = (JPPFResourceWrapper) socketClient.receive();
+					resource = readResource();
 					String name = resource.getName();
 					if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name);
 					if (resource.getData("multiple") == null)
@@ -140,8 +139,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 						if (list != null) resource.setData("resource_list", list);
 					}
 					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
-					socketClient.send(resource);
-					socketClient.flush();
+					writeResource(resource);
 				}
 				catch(Exception e)
 				{

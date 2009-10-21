@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -26,7 +26,6 @@ import org.jppf.utils.*;
 
 /**
  * This class provides a simple API to transfer objects over a TCP socket connection.
- * 
  * @author Laurent Cohen
  */
 public class SocketClient extends AbstractSocketWrapper

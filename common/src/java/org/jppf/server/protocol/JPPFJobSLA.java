@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -21,6 +21,7 @@ package org.jppf.server.protocol;
 import java.io.Serializable;
 
 import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.scheduling.JPPFSchedule;
 
 /**
  * This class represents the Service Level Agreement Between a JPPF job and a server.
@@ -46,6 +47,10 @@ public class JPPFJobSLA implements Serializable
 	 * If it is, it will have to be resumed, using either the admin console or the JMX APIs.
 	 */
 	private boolean suspended = false;
+	/**
+	 * Rhe job schedule configuration.
+	 */
+	private JPPFSchedule jobSchedule = null;
 
 	/**
 	 * Default constructor.
@@ -158,5 +163,23 @@ public class JPPFJobSLA implements Serializable
 	public void setSuspended(boolean suspended)
 	{
 		this.suspended = suspended;
+	}
+
+	/**
+	 * Get the job schedule.
+	 * @return a <code>JPPFSchedule</code> instance.
+	 */
+	public JPPFSchedule getJobSchedule()
+	{
+		return jobSchedule;
+	}
+
+	/**
+	 * Set the job schedule.
+	 * @param jobSchedule a <code>JPPFSchedule</code> instance. 
+	 */
+	public void setJobSchedule(JPPFSchedule jobSchedule)
+	{
+		this.jobSchedule = jobSchedule;
 	}
 }

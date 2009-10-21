@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -18,10 +18,13 @@
 
 package org.jppf.ui.treetable;
 
+import java.util.prefs.Preferences;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.ui.actions.JTreeTableActionHandler;
 import org.jppf.ui.options.AbstractOption;
+import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.utils.LocalizationUtils;
 
 /**
@@ -104,5 +107,45 @@ public abstract class AbstractTreeTableOption extends AbstractOption
 	protected String localize(String message)
 	{
 		return LocalizationUtils.getLocalized(BASE, message);
+	}
+
+	/**
+	 * Set the columns width based on values stored as preferences.
+	 */
+	public void setupTableColumns()
+	{
+		Preferences pref = OptionsHandler.PREFERENCES.node("JPPFAdminTool");
+		String s = pref.get(getName() + "_column_widths", null);
+		if (s == null) return;
+		String[] wStr = s.split("\\s");
+		for (int i=0; i<Math.min(treeTable.getColumnCount(), wStr.length); i++)
+		{
+			int width = 60;
+			try
+			{
+				width = Integer.valueOf(wStr[i]);
+			}
+			catch(NumberFormatException e)
+			{
+			}
+			treeTable.getColumnModel().getColumn(i).setPreferredWidth(width);
+		}
+	}
+
+	/**
+	 * Set the columns width based on values stored as preferences.
+	 */
+	public void saveTableColumnsWidth()
+	{
+		Preferences pref = OptionsHandler.PREFERENCES.node("JPPFAdminTool");
+		String key = getName() + "_column_widths";
+		StringBuilder sb = new StringBuilder();
+		for (int i=0; i<treeTable.getColumnCount(); i++)
+		{
+			int width = treeTable.getColumnModel().getColumn(i).getPreferredWidth();
+			if (i > 0) sb.append(" ");
+			sb.append(width);
+		}
+		pref.put(key, sb.toString());
 	}
 }

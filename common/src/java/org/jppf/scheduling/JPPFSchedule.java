@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -16,77 +16,80 @@
  * limitations under the License.
  */
 
-package org.jppf.timeout;
+package org.jppf.scheduling;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
 /**
- * Instances of this class contain data used to setup a timeout.
+ * Instances of this class contain data used to setup a schedule.
  * This includes duration, date, date format.
  * @author Laurent Cohen
  */
-public class JPPFTimeoutConfiguration implements Serializable
+public class JPPFSchedule implements Serializable
 {
 	/**
 	 * Time in milliseconds, after which this task will be aborted.<br>
 	 * A value of 0 or less indicates this task never times out.
 	 */
-	private long timeout = 0L;
+	private long duration = 0L;
 	/**
-	 * Timeout date as a string.
+	 * Schedule date as a string.
 	 */
 	private String date = null;
 	/**
-	 * Format describing the timeout date.
+	 * Format describing the schedule date.
 	 */
 	private SimpleDateFormat dateFormat = null;
 
 	/**
-	 * Initialize this timeout configuration with the specified duration.
+	 * Initialize this schedule configuration with the specified duration.
 	 * @param duration the duration in milliseconds.
 	 */
-	public JPPFTimeoutConfiguration(long duration)
+	public JPPFSchedule(long duration)
 	{
-		this.timeout = duration;
+		this.duration = duration;
 	}
 
 	/**
-	 * Initialize this timeout configuration with the specified duration.
-	 * @param date the tiemout date provided as a string.
+	 * Initialize this schedule configuration with the specified duration.
+	 * @param date the schedule date provided as a string.
 	 * @param dateFormat the format in which the date is expressed (including locale and time zone information).
 	 */
-	public JPPFTimeoutConfiguration(String date, SimpleDateFormat dateFormat)
+	public JPPFSchedule(String date, SimpleDateFormat dateFormat)
 	{
 		this.date = date;
 		this.dateFormat = dateFormat;
 	}
 
 	/**
-	 * Get the timeout for this task.
+	 * Get the duration for this configuration.
+	 * The time at which the duration starts dependends on who is using it.
+	 * For instance, for scheduling a job, it starts when the job is inserted into the job queue by the server. 
 	 * @return the timeout in milliseconds.
 	 */
-	public long getTimeout()
+	public long getDuration()
 	{
-		return timeout;
+		return duration;
 	}
 
 	/**
-	 * Set the timeout for this task.
-	 * @param timeout the timeout in milliseconds.
+	 * Set the duration for this configuration.
+	 * Calling this setter will reset the date and date format values, as duration and date are mutually exclusive.
+	 * @param duration the timeout in milliseconds.
 	 */
-	public void setTimeout(long timeout)
+	public void setDuration(long duration)
 	{
-		this.timeout = timeout;
+		this.duration = duration;
 		this.date = null;
 		this.dateFormat = null;
 	}
 
 	/**
-	 * Get the timeout date for this task.
+	 * Get the scheduled date for this configuration.
 	 * @return the date in string format.
 	 */
-	public String getTimeoutDate()
+	public String getDate()
 	{
 		return date;
 	}
@@ -101,16 +104,15 @@ public class JPPFTimeoutConfiguration implements Serializable
 	}
 
 	/**
-	 * Set the timeout date for this task.<br>
-	 * Calling this method will reset the timeout value, as both timeout duration and timeout date
-	 * are mutually exclusive.
+	 * Set the date and date format for this configuration.<br>
+	 * Calling this method will reset the duration, as duration and date are mutually exclusive.
 	 * @param date the date to set in string representation.
 	 * @param dateFormat the format of of the date to set.
 	 * @see java.text.SimpleDateFormat
 	 */
 	public void setDate(String date, SimpleDateFormat dateFormat)
 	{
-		this.timeout = 0L;
+		this.duration = 0L;
 		this.date = date;
 		this.dateFormat = dateFormat;
 	}

@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -34,18 +34,22 @@ public final class BundleTuningUtils
 	}
 
 	/**
-	 * Get a configured bundle size tuning profile form the configuration file.
+	 * Get a configured bundle size tuning profile from the configuration file.
 	 * @return an <code>AnnealingTuneProfile</code> instance, or null if no profile was configured.
 	 */
 	public static TypedProperties getBundleTunningParameters()
 	{
 		TypedProperties cfg = JPPFConfiguration.getProperties();
-		String s = cfg.getString("task.bundle.strategy");
-		if (s == null) return null;
+		String algorithm = cfg.getString("jppf.load.balancing.algorithm", null);
+		// for compatibility with v1.x configuration files
+		if (algorithm == null) algorithm = cfg.getString("task.bundle.strategy");
+		if (algorithm == null) return null;
 		
-		String profile = cfg.getString("task.bundle.autotuned.strategy", "smooth");
+		String profile = cfg.getString("jppf.load.balancing.strategy", null);
+		// for compatibility with v1.x configuration files
+		if (profile == null) profile = cfg.getString("task.bundle.autotuned.strategy", "jppf");
 		TypedProperties params = new JPPFBundlerFactory().convertJPPFConfiguration(profile, cfg);
-		params.put("strategy", s);
+		params.put("algorithm", algorithm);
 		return params;
 	}
 }

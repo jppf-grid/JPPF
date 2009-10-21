@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -20,6 +20,9 @@ package org.jppf.client;
 
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.comm.socket.SocketClient;
+import org.jppf.data.transform.*;
+import org.jppf.node.JPPFResourceWrapper;
+import org.jppf.utils.JPPFBuffer;
 
 /**
  * 
@@ -93,5 +96,32 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 		socketClient = new SocketClient();
 		socketClient.setHost(host);
 		socketClient.setPort(port);
+	}
+
+	/**
+	 * Read a resource wrapper object from the socket connection.
+	 * @return a <code>JPPFResourceWrapper</code> instance.
+	 * @throws Exception if any error is raised.
+	 */
+	protected JPPFResourceWrapper readResource() throws Exception
+	{
+		JPPFBuffer buffer = socketClient.receiveBytes(0);
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		byte[] data = (transform == null) ? buffer.getBuffer() : transform.unwrap(buffer.getBuffer());
+		return (JPPFResourceWrapper) socketClient.getSerializer().deserialize(data);
+	}
+
+	/**
+	 * Write a resource wrapper object to the socket connection.
+	 * @param resource a <code>JPPFResourceWrapper</code> instance.
+	 * @throws Exception if any error is raised.
+	 */
+	protected void writeResource(JPPFResourceWrapper resource) throws Exception
+	{
+		JPPFBuffer buffer = socketClient.getSerializer().serialize(resource);
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		byte[] data = (transform == null) ? buffer.getBuffer() : transform.wrap(buffer.getBuffer());
+		socketClient.sendBytes(new JPPFBuffer(data, data.length));
+		socketClient.flush();
 	}
 }

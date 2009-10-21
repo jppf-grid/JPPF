@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.text.*;
 import java.util.*;
 
+import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.task.storage.DataProvider;
 
 /**
@@ -63,18 +64,9 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 */
 	protected transient List<JPPFTaskListener> listeners = null;
 	/**
-	 * Time in milliseconds, after which this task will be aborted.<br>
-	 * A value of 0 or less indicates this task never times out.
+	 * The task timeout schedule configuration.
 	 */
-	private long timeout = 0L;
-	/**
-	 * Timeout date as a string.
-	 */
-	private String timeoutDate = null;
-	/**
-	 * Format describing the timeout date.
-	 */
-	private SimpleDateFormat timeoutDateFormat = null;
+	private JPPFSchedule timeoutSchedule = null;
 
 	/**
 	 * Default constructor.
@@ -208,7 +200,8 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 */
 	public long getTimeout()
 	{
-		return timeout;
+		if (timeoutSchedule == null) return 0L;
+		return timeoutSchedule.getDuration();
 	}
 
 	/**
@@ -217,9 +210,7 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 */
 	public void setTimeout(long timeout)
 	{
-		this.timeout = timeout;
-		this.timeoutDate = null;
-		this.timeoutDateFormat = null;
+		timeoutSchedule = new JPPFSchedule(timeout);
 	}
 
 	/**
@@ -228,7 +219,8 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 */
 	public String getTimeoutDate()
 	{
-		return timeoutDate;
+		if (timeoutSchedule == null) return null;
+		return timeoutSchedule.getDate();
 	}
 
 	/**
@@ -237,7 +229,8 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 */
 	public SimpleDateFormat getTimeoutDateFormat()
 	{
-		return timeoutDateFormat;
+		if (timeoutSchedule == null) return null;
+		return timeoutSchedule.getDateFormat();
 	}
 
 	/**
@@ -250,9 +243,7 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 */
 	public void setTimeoutDate(String timeoutDate, SimpleDateFormat timeoutDateFormat)
 	{
-		this.timeout = 0L;
-		this.timeoutDate = timeoutDate;
-		this.timeoutDateFormat = timeoutDateFormat;
+		timeoutSchedule = new JPPFSchedule(timeoutDate, timeoutDateFormat);
 	}
 
 	/**
@@ -308,5 +299,23 @@ public abstract class JPPFTask implements Runnable, Serializable
 	public Object getTaskObject()
 	{
 		return null;
+	}
+
+	/**
+	 * Get the task timeout schedule configuration.
+	 * @return a <code>JPPFScheduleConfiguration</code> instance.
+	 */
+	public JPPFSchedule getTimeoutSchedule()
+	{
+		return timeoutSchedule;
+	}
+
+	/**
+	 * Get the task timeout schedule configuration.
+	 * @param timeoutSchedule a <code>JPPFScheduleConfiguration</code> instance. 
+	 */
+	public void setTimeoutSchedule(JPPFSchedule timeoutSchedule)
+	{
+		this.timeoutSchedule = timeoutSchedule;
 	}
 }

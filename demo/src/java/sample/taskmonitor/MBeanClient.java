@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -59,7 +59,7 @@ public class MBeanClient extends JMXConnectionWrapper implements NotificationLis
 			while (!client.isConnected()) Thread.sleep(100);
 			MBeanServerConnection mbsc = client.getMbeanConnection();
 			JPPFNodeTaskMonitorMBean proxy = (JPPFNodeTaskMonitorMBean) MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, JPPFNodeTaskMonitorMBean.class, true);
-			proxy.getNbTasksExecuted();
+			proxy.getTotalTasksExecuted();
 			//client.invoke(mbeanName, "test", (Object[]) null, (String[]) null);
 			Set set = mbsc.queryNames(null, null);
 			System.out.println("all mbeans: " + set);

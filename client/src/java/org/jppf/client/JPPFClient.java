@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -119,6 +119,8 @@ public class JPPFClient extends AbstractJPPFClient
 	 */
 	protected void initPools()
 	{
+		LinkedBlockingQueue queue = new LinkedBlockingQueue();
+		executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("JPPF Client"));
 		if (config.getBoolean("jppf.discovery.enabled", true)) initPoolsFromAutoDiscovery();
 		else initPoolsFromConfig();
 	}
@@ -131,30 +133,17 @@ public class JPPFClient extends AbstractJPPFClient
 	{
 		try
 		{
-			LinkedBlockingQueue queue = new LinkedBlockingQueue();
-			executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("JPPF Client"));
-			String driverNames = config.getString("jppf.drivers");
+			String driverNames = config.getString("jppf.drivers", "default-driver");
+			if ((driverNames == null) || "".equals(driverNames.trim())) driverNames = "default-driver";
 			if (debugEnabled) log.debug("list of drivers: " + driverNames);
-			String[] names = null;
-			// if config file is still used as with single client version
-			if ((driverNames == null) || "".equals(driverNames.trim()))
+			String[] names = driverNames.split("\\s");
+			for (String name: names)
 			{
-				//names = new String[] { "" };
-				return;
-			}
-			else
-			{
-				names = driverNames.split("\\s");
-			}
-			for (String s: names)
-			{
-				String name = "".equals(s) ? "default" : s;
 				int n = config.getInt(name + ".jppf.pool.size", 1);
 				if (n <= 0) n = 1;
 				for (int i=1; i<=n; i++)
 				{
-					JPPFClientConnection c =
-						new JPPFClientConnectionImpl(uuid, (n > 1) ? name + "-" + i : name, config);
+					JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, (n > 1) ? name + "-" + i : name, config);
 					newConnection(c);
 				}
 			}
@@ -174,8 +163,6 @@ public class JPPFClient extends AbstractJPPFClient
 	{
 		try
 		{
-			LinkedBlockingQueue queue = new LinkedBlockingQueue();
-			executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("JPPF Client"));
 			receiverThread = new JPPFMulticastReceiverThread();
 			new Thread(receiverThread).start();
 			waitForPools(false);

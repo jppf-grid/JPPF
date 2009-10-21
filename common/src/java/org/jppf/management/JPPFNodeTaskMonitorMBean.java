@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -35,5 +35,25 @@ public interface JPPFNodeTaskMonitorMBean extends NotificationEmitter
 	 * Get the total number of tasks executed by the node.
 	 * @return the number of tasks as an integer value.
 	 */
-	Integer getNbTasksExecuted();
+	Integer getTotalTasksExecuted();
+	/**
+	 * The total number of tasks that ended in error.
+	 * @return the number as an integer value.
+	 */
+	Integer getTotalTasksInError();
+	/**
+	 * The total number of tasks that executed sucessfully.
+	 * @return the number as an integer value.
+	 */
+	Integer getTotalTasksSucessfull();
+	/**
+	 * The total cpu time used by the tasks in milliseconds.
+	 * @return the cpu time as long value.
+	 */
+	Long getTotalTaskCpuTime();
+	/**
+	 * The total elapsed time used by the tasks in milliseconds.
+	 * @return the elapsed time as long value.
+	 */
+	Long getTotalTaskElapsedTime();
 }

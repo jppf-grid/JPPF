@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -21,7 +21,7 @@ package org.jppf.management;
 import java.io.Serializable;
 
 /**
- * Instances of this class encapsulate information on tasks executed by a node.
+ * Instances of this class encapsulate runtime information on tasks executed by a node.
  * @author Laurent Cohen
  */
 public class TaskInformation implements Serializable
@@ -30,6 +30,10 @@ public class TaskInformation implements Serializable
 	 * The task id.
 	 */
 	private String id = null;
+	/**
+	 * The id of the job this task belongs to.
+	 */
+	private String jobId = null;
 	/**
 	 * The cpu time taken by the task.
 	 */
@@ -49,12 +53,13 @@ public class TaskInformation implements Serializable
 
 	/**
 	 * Initialize this event object with the specified task.
-	 * @param id - the task id.
-	 * @param cpuTime - the cpu time taken by the task.
-	 * @param elapsedTime - the wall clock time taken by the task.
-	 * @param error - determines whether the task had an exception.
+	 * @param id the task id.
+	 * @param jobId the id of the job this task belongs to.
+	 * @param cpuTime the cpu time taken by the task.
+	 * @param elapsedTime the wall clock time taken by the task.
+	 * @param error determines whether the task had an exception.
 	 */
-	public TaskInformation(String id, long cpuTime, long elapsedTime, boolean error)
+	public TaskInformation(String id, String jobId, long cpuTime, long elapsedTime, boolean error)
 	{
 		this.id = id;
 		this.cpuTime = cpuTime;
@@ -69,6 +74,15 @@ public class TaskInformation implements Serializable
 	public String getId()
 	{
 		return id;
+	}
+
+	/**
+	 * Get the id of the job this task belongs to.
+	 * @return the job id as a string.
+	 */
+	public String getJobId()
+	{
+		return jobId;
 	}
 
 	/**

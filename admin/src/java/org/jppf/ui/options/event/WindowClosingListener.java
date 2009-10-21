@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 import org.jppf.ui.monitoring.charts.config.JPPFChartBuilder;
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.factory.OptionsHandler;
+import org.jppf.ui.treetable.AbstractTreeTableOption;
 
 /**
  * 
@@ -63,6 +64,11 @@ public class WindowClosingListener extends WindowAdapter
 		pref.putInt("width", d.width);
 		pref.putInt("height", d.height);
 		pref.putBoolean("maximized", maximized);
+
+		AbstractTreeTableOption opt = (AbstractTreeTableOption) OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("/NodeTreeTable");
+		opt.saveTableColumnsWidth();
+		opt = (AbstractTreeTableOption) OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("/JobTreetable");
+		opt.saveTableColumnsWidth();
 		try
 		{
 			pref.flush();

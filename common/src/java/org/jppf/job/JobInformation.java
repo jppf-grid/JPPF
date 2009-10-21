@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -49,6 +49,10 @@ public class JobInformation implements Serializable
 	 */
 	private boolean suspended = false; 
 	/**
+	 * Determines whether the job is waiting to reach its scheduled execution date.
+	 */
+	private boolean pending = false; 
+	/**
 	 * The maximum number of nodes this job can run on.
 	 */
 	private int maxNodes = Integer.MAX_VALUE;
@@ -67,14 +71,16 @@ public class JobInformation implements Serializable
 	 * @param initialTaskCount - the initial number of tasks in the job submitted by the JPPF client.
 	 * @param priority - the priority of this job.
 	 * @param suspended - determines whether the job is in suspended state.
+	 * @param pending - determines whether the job is waiting to reach its scheduled execution date.
 	 */
-	public JobInformation(String jobId, int taskCount, int initialTaskCount, int priority, boolean suspended)
+	public JobInformation(String jobId, int taskCount, int initialTaskCount, int priority, boolean suspended, boolean pending)
 	{
 		this.jobId = jobId;
 		this.taskCount = taskCount;
 		this.initialTaskCount = initialTaskCount;
 		this.priority = priority;
 		this.suspended = suspended;
+		this.pending = pending;
 	}
 
 	/**
@@ -183,5 +189,23 @@ public class JobInformation implements Serializable
 	public void setMaxNodes(int maxNodes)
 	{
 		this.maxNodes = maxNodes;
+	}
+
+	/**
+	 * Get the pending state of the job.
+	 * @return determines whether the job is waiting to reach its scheduled execution date.
+	 */
+	public boolean isPending()
+	{
+		return pending;
+	}
+
+	/**
+	 * Set the pending state of the job.
+	 * @param pending specifies whether the job is waiting to reach its scheduled execution date.
+	 */
+	public void setPending(boolean pending)
+	{
+		this.pending = pending;
 	}
 }

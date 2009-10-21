@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	Java Parallel Processing Framework.
+	JPPF.
 	 Copyright (C) 2005-2009 JPPF Team. 
 	http://www.jppf.org
 
@@ -49,7 +49,7 @@
 			<listener type="script">
 				<script language="groovy"><![CDATA[
 					def b = option.getValue().booleanValue();
-					def handler = option.findFirstWithName("/Treetable").getRefreshHandler();
+					def handler = option.findFirstWithName("/NodeTreeTable").getRefreshHandler();
 					if (b) handler.startRefreshTimer();
 					else handler.stopRefreshTimer();
 				]]></script>
@@ -59,7 +59,7 @@
 		<child name="button.refresh" type="Button">
 			<property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
 			<listener type="script">
-				<script language="groovy">option.findFirstWithName("/Treetable").getRefreshHandler().refresh()</script>
+				<script language="groovy">option.findFirstWithName("/NodeTreeTable").getRefreshHandler().refresh()</script>
 			</listener>
 		</child>
 		
@@ -67,14 +67,14 @@
 		<child name="button.expand" type="Button">
 			<property name="icon" value="/org/jppf/ui/resources/expand.gif"/>
 			<listener type="script">
-				<script language="groovy">option.findFirstWithName("/Treetable").getTreeTable().expandAll()</script>
+				<script language="groovy">option.findFirstWithName("/NodeTreeTable").getTreeTable().expandAll()</script>
 			</listener>
 		</child>
 
 		<child name="button.collapse" type="Button">
 			<property name="icon" value="/org/jppf/ui/resources/collapse.gif"/>
 			<listener type="script">
-				<script language="groovy">option.findFirstWithName("/Treetable").getTreeTable().collapseAll()</script>
+				<script language="groovy">option.findFirstWithName("/NodeTreeTable").getTreeTable().collapseAll()</script>
 			</listener>
 		</child>
 
@@ -89,7 +89,7 @@
 		<property name="layoutConstraints" value="fill, nogrid"/>
 		<property name="componentConstraints" value="grow, span, push, width 0"/>
 	
-		<child name="Treetable" type="NodeDataPanel">
+		<child name="NodeTreeTable" type="NodeDataPanel">
 			<property name="componentConstraints" value="grow, width 0"/>
 			<property name="value" value=""/>
 		</child>
