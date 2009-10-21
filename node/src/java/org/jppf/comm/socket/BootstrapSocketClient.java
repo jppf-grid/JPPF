@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -17,12 +17,11 @@
  */
 package org.jppf.comm.socket;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.*;
 
 import org.jppf.JPPFException;
-import org.jppf.serialization.JPPFObjectStreamFactory;
-import org.jppf.utils.JPPFBuffer;
+import org.jppf.utils.*;
 
 /**
  * This class provides a simple API to transfer objects over a TCP socket connection.
@@ -30,11 +29,6 @@ import org.jppf.utils.JPPFBuffer;
  */
 public class BootstrapSocketClient extends AbstractSocketWrapper
 {
-	/**
-	 * Buffer used to receive data from the socket connection.
-	 */
-	protected JPPFBuffer jppfBuffer = new JPPFBuffer();
-
 	/**
 	 * Default constructor is invisible to other classes.
 	 * See {@link org.jppf.comm.socket.BootstrapSocketClient#BootstrapSocketClient(java.lang.String, int) BootstrapSocketClient(String, int)} and
@@ -75,19 +69,8 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 	 */
 	public void send(Object o) throws Exception
 	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream()
-		{
-			public synchronized byte[] toByteArray()
-			{
-				return buf;
-			}
-		};
-		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(baos);
-		oos.writeObject(o);
-		oos.flush();
-		oos.close();
 		// Remove references kept by the stream, otherwise leads to OutOfMemory.
-		JPPFBuffer buffer = new JPPFBuffer(baos.toByteArray(), baos.size());
+		JPPFBuffer buffer = getSerializer().serialize(o);
 		sendBytes(buffer);
 	}
 
@@ -106,10 +89,7 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 		{
 			if (timeout > 0) socket.setSoTimeout(timeout);
 			JPPFBuffer buf = receiveBytes(timeout);
-			ByteArrayInputStream bais = new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength());
-			ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(bais);
-			o = ois.readObject();
-			ois.close();
+			o = getSerializer().deserialize(buf);
 		}
 		finally
 		{
@@ -117,5 +97,16 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 			if (timeout > 0) socket.setSoTimeout(0);
 		}
 		return o;
+	}
+
+	/**
+	 * Get the object serializer for this socket connection.
+	 * @return  an instance of <code>ObjectSerializer</code>.
+	 * @see org.jppf.comm.socket.AbstractSocketWrapper#getSerializer()
+	 */
+	public ObjectSerializer getSerializer()
+	{
+		if (serializer == null) serializer = new BootstrapObjectSerializer();
+		return serializer;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -21,7 +21,7 @@ package org.jppf.process.event;
 import java.util.EventObject;
 
 /**
- * Instances of this class encapsulate an event occurring when a process wrties to
+ * Instances of this class encapsulate an event occurring when a process writes to
  * its output or error stream. 
  * @author Laurent Cohen
  */
@@ -38,7 +38,7 @@ public class ProcessWrapperEvent extends EventObject
 
 	/**
 	 * Get the content of this event.
-	 * @return the content encapsualted in a <code>StringBuilder</code> instance.
+	 * @return the content as a string.
 	 */
 	public String getContent()
 	{

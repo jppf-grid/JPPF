@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -106,6 +106,7 @@ public class ProcessLauncher implements ProcessWrapperEventListener
 	 */
 	public Process buildProcess() throws Exception
 	{
+		TypedProperties config = JPPFConfiguration.getProperties();
 		List<String> command = new ArrayList<String>();
 		command.add(System.getProperty("java.home")+"/bin/java");
 		command.add("-cp");
@@ -113,23 +114,26 @@ public class ProcessLauncher implements ProcessWrapperEventListener
 		command.add("-D"+JPPFConfiguration.CONFIG_PROPERTY+"="+System.getProperty(JPPFConfiguration.CONFIG_PROPERTY));
 		command.add("-Dlog4j.configuration="+System.getProperty("log4j.configuration"));
 		//command.add("-server");
-		int n = JPPFConfiguration.getProperties().getInt("max.memory.option", 128);
-		command.add("-Xmx" + n + "m");
-		String s = JPPFConfiguration.getProperties().getString("other.jvm.options");
+		//int n = JPPFConfiguration.getProperties().getInt("max.memory.option", 128);
+		//command.add("-Xmx" + n + "m");
+		String s = config.getString("jppf.jvm.options");
+		// for backward compatibility with 1.x versions
+		if (s == null) s = config.getString("other.jvm.options");
 		if (s != null)
 		{
 			String[] options = s.split("\\s");
 			for (String opt: options) command.add(opt);
 		}
 
-		TypedProperties props = JPPFConfiguration.getProperties();
-		if (props.getBoolean("remote.debug.enabled", false))
+		/*
+		if (config.getBoolean("remote.debug.enabled", false))
 		{
-			int debugPort = props.getInt("remote.debug.port", 8000);
-			boolean b = props.getBoolean("remote.debug.suspend", false);
+			int debugPort = config.getInt("remote.debug.port", 8000);
+			boolean b = config.getBoolean("remote.debug.suspend", false);
 			command.add("-Xdebug");
 			command.add("-Xrunjdwp:transport=dt_socket,address=localhost:"+debugPort+",server=y,suspend="+(b?"y":"n"));
 		}
+		*/
 
 		command.add(mainClass);
 		command.add("" + processPort);

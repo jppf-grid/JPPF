@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -27,6 +27,7 @@ import org.apache.commons.logging.*;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.ResourceCache;
 import org.jppf.comm.socket.*;
+import org.jppf.data.transform.*;
 import org.jppf.utils.*;
 
 /**
@@ -68,6 +69,10 @@ public class JPPFClassLoader extends URLClassLoader implements JPPFClassLoaderMB
 	 * Determines whether this class loader should handle dynamic class updating.
 	 */
 	private static AtomicBoolean initializing = new AtomicBoolean(false);
+	/**
+	 * Determines whether this class loader is currently loading resources from the network.
+	 */
+	private static AtomicBoolean loading = new AtomicBoolean(false);
 	/**
 	 * Uuid of the orignal task bundle that triggered a resource loading request. 
 	 */
@@ -123,9 +128,15 @@ public class JPPFClassLoader extends URLClassLoader implements JPPFClassLoaderMB
 					if (debugEnabled) log.debug("sending node initiation message");
 					JPPFResourceWrapper resource = new JPPFResourceWrapper();
 					resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-					socketClient.send(resource);
+					
+					JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+					ObjectSerializer serializer = socketClient.getSerializer();
+					JPPFBuffer buf = serializer.serialize(resource);
+					byte[] data = buf.getBuffer();
+					if (transform != null) data = transform.wrap(data);
+					socketClient.sendBytes(new JPPFBuffer(data, data.length));
 					socketClient.flush();
-					socketClient.receive();
+					socketClient.receiveBytes(0);
 					if (debugEnabled) log.debug("received node initiation response");
 				}
 				catch (IOException e)
@@ -329,19 +340,35 @@ public class JPPFClassLoader extends URLClassLoader implements JPPFClassLoaderMB
 	 */
 	private JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception
 	{
-		JPPFResourceWrapper resource = new JPPFResourceWrapper();
-		resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
-		resource.setDynamic(dynamic);
-		TraversalList<String> list = new TraversalList<String>(uuidPath);
-		resource.setUuidPath(list);
-		if (list.size() > 0) list.setPosition(uuidPath.size()-1);
-		for (Map.Entry<String, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());
-		resource.setAsResource(asResource);
-		resource.setRequestUuid(requestUuid);
-		socketClient.send(resource);
-		socketClient.flush();
-		resource = (JPPFResourceWrapper) socketClient.receive();
-		return resource;
+		try
+		{
+			loading.set(true);
+			JPPFResourceWrapper resource = new JPPFResourceWrapper();
+			resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
+			resource.setDynamic(dynamic);
+			TraversalList<String> list = new TraversalList<String>(uuidPath);
+			resource.setUuidPath(list);
+			if (list.size() > 0) list.setPosition(uuidPath.size()-1);
+			for (Map.Entry<String, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());
+			resource.setAsResource(asResource);
+			resource.setRequestUuid(requestUuid);
+	
+			JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+			ObjectSerializer serializer = socketClient.getSerializer();
+			JPPFBuffer buf = serializer.serialize(resource);
+			byte[] data = buf.getBuffer();
+			if (transform != null) data = transform.wrap(data);
+			socketClient.sendBytes(new JPPFBuffer(data, data.length));
+			socketClient.flush();
+			buf = socketClient.receiveBytes(0);
+			data = (transform == null) ? buf.getBuffer() : transform.unwrap(buf.getBuffer());
+			resource = (JPPFResourceWrapper) serializer.deserialize(data);
+			return resource;
+		}
+		finally
+		{
+			loading.set(false);
+		}
 	}
 
 	/**
@@ -390,6 +417,7 @@ public class JPPFClassLoader extends URLClassLoader implements JPPFClassLoaderMB
 	public InputStream getResourceAsStream(String name)
 	{
 		InputStream is = getClass().getClassLoader().getResourceAsStream(name);
+		//if ((is == null) && !loading.get())
 		if (is == null)
 		{
 			if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
@@ -483,6 +511,7 @@ public class JPPFClassLoader extends URLClassLoader implements JPPFClassLoaderMB
 	public Enumeration<URL> findResources(String name) throws IOException
 	{
 		List<URL> urlList = null;
+		//if (loading.get()) return null;
 		if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
 		try
 		{

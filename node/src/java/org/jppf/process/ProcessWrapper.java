@@ -1,5 +1,5 @@
 /*
- * Java Parallel Processing Framework.
+ * JPPF.
  * Copyright (C) 2005-2009 JPPF Team.
  * http://www.jppf.org
  *
@@ -63,7 +63,7 @@ public final class ProcessWrapper extends EventEmitter<ProcessWrapperEventListen
 
 	/**
 	 * Set the process to handle.
-	 * If the process has already been set through this setter or through the corresponding contructor, this method does nothing.
+	 * If the process has already been set through this setter or the corresponding contructor, this method does nothing.
 	 * @param process - a <code>Process</code> instance.
 	 */
 	public void setProcess(Process process)
