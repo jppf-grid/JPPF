@@ -172,7 +172,7 @@ public class NodeRunner
 			if (debugEnabled) log.debug("Could not auto-discover the driver connection information");
 			return;
 		}
-		if (debugEnabled) log.debug("Dicovered driver: " + info);
+		if (debugEnabled) log.debug("Discovered driver: " + info);
 		TypedProperties props = JPPFConfiguration.getProperties();
 		props.setProperty("jppf.server.host", info.host);
 		props.setProperty("class.server.port", StringUtils.buildString(info.classServerPorts));
@@ -284,7 +284,7 @@ public class NodeRunner
 	}
 
 	/**
-	 * Shutdown and evenetually restart the node.
+	 * Shutdown and eventually restart the node.
 	 * @param node the node to shutdown or restart.
 	 * @param restart determines whether this node should be restarted by the node launcher.
 	 */
