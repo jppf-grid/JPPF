@@ -18,6 +18,8 @@
 
 package org.jppf.utils;
 
+import java.io.File;
+import java.lang.reflect.Method;
 import java.net.*;
 import java.security.*;
 import java.util.*;
@@ -26,7 +28,7 @@ import org.apache.commons.logging.*;
 
 /**
  * Collection of utility methods used as a convenience for retrieving
- * JVM-level or SYstem-level information. 
+ * JVM-level or System-level information. 
  * @author Laurent Cohen
  */
 public final class SystemUtils
@@ -188,6 +190,61 @@ public final class SystemUtils
 		}
 		props.setProperty("maxMemory", s);
 
+		return props;
+	}
+
+	/**
+	 * Get storage information about each file system root available on the current host.
+	 * This method first checks that the Java version is 1.6 or later, then populates
+	 * a <code>TypedProperties</code> object with root name, free space, total space and usable space
+	 * information for each root.
+	 * <p>If the Java version is before 1.6, only the root name is retrieved.
+	 * An example root name would be &quot;C:\&quot; for a Windows system and &quot;/&quot; for a Unix system.
+	 * @return TypedProperties object with storage information.
+	 */
+	public static synchronized TypedProperties getStorageInformation()
+	{
+		TypedProperties props = new TypedProperties();
+		File[] roots = File.listRoots();
+		if ((roots == null) || (roots.length <= 0)) return props;
+		boolean atLeastJdk16 = true;
+		Method usableSpaceMethod = null;
+		Method freeSpaceMethod = null;
+		Method totalSpaceMethod = null;
+		try
+		{
+			usableSpaceMethod = File.class.getMethod("getUsableSpace");
+			freeSpaceMethod = File.class.getMethod("getFreeSpace");
+			totalSpaceMethod = File.class.getMethod("getTotalSpace");
+		}
+		catch (Exception e)
+		{
+			atLeastJdk16 = false;
+		}
+		props.setProperty("host.roots.number", "" + roots.length);
+		StringBuilder sb = new StringBuilder();
+		for (int i=0; i<roots.length; i++)
+		{
+			try
+			{
+				if (i > 0) sb.append(" ");
+				String s = roots[i].getCanonicalPath();
+				sb.append(s);
+				String prefix = "root." + i;
+				props.setProperty(prefix + ".name", s);
+				if (!atLeastJdk16) continue;
+				long space = (Long) totalSpaceMethod.invoke(roots[i]);
+				props.setProperty(prefix + ".space.total", "" + space);
+				space = (Long) freeSpaceMethod.invoke(roots[i]);
+				props.setProperty(prefix + ".space.free", "" + space);
+				space = (Long) usableSpaceMethod.invoke(roots[i]);
+				props.setProperty(prefix + ".space.usable", "" + space);
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		props.setProperty("host.roots.names", sb.toString());		
 		return props;
 	}
 
