@@ -70,6 +70,7 @@ public class NodeInformationAction extends AbstractTopologyAction
 			format.formatTable(info.getRuntime(), "Runtime Information");
 			format.formatTable(info.getJppf(), "JPPF configuration");
 			format.formatTable(info.getNetwork(), "Network configuration");
+			format.formatTable(info.getStorage(), "Storage Information");
 			format.end();
 			s = format.getText();
 		}
