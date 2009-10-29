@@ -30,7 +30,7 @@ import org.jppf.management.spi.*;
 import org.jppf.node.*;
 import org.jppf.node.event.NodeEventType;
 import org.jppf.server.protocol.*;
-import org.jppf.task.storage.DataProvider;
+import org.jppf.startup.*;
 import org.jppf.utils.*;
 
 /**
@@ -133,8 +133,7 @@ public class JPPFNode extends AbstractMonitoredNode
 					System.out.println("Node sucessfully initialized");
 					initialized = true;
 				}
-				if (synchronous) perform();
-				else performAsync();
+				perform();
 			}
 			catch(SecurityException e)
 			{
@@ -165,41 +164,6 @@ public class JPPFNode extends AbstractMonitoredNode
 			setExitAction(null);
 			r.run();
 		}
-	}
-
-	/**
-	 * Perform the main execution loop for this node. At each iteration, this method listens for a task to execute,
-	 * receives it, executes it and sends the results back.
-	 * @throws Exception if an error was raised from the underlying socket connection or the class loader.
-	 */
-	public void performAsync() throws Exception
-	{
-		if (debugEnabled) log.debug("Start of node secondary loop");
-		while (!isStopped())
-		{
-			JPPFTaskBundle bundle = nodeIO.readBundle();
-			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
-			checkInitialBundle(bundle);
-			boolean notEmpty = bundle.getTaskCount() > 0;
-			if (debugEnabled) log.debug("received " + (notEmpty ? "a non-" : "an ") + "empty bundle");
-			List<JPPFTask> taskList =  new ArrayList<JPPFTask>();
-			if (notEmpty)
-			{
-				executionManager.setup(bundle);
-				DataProvider dataProvider = (DataProvider) nodeIO.nextObject();
-				for (int i=0; i<bundle.getTaskCount(); i++)
-				{
-					JPPFTask task = (JPPFTask) nodeIO.nextObject();
-					task.setDataProvider(dataProvider);
-					taskList.add(task);
-					executionManager.performTask(task);
-				}
-				executionManager.waitForResults();
-				executionManager.cleanup();
-			}
-			processResults(bundle, taskList);
-		}
-		if (debugEnabled) log.debug("End of node secondary loop");
 	}
 
 	/**
@@ -270,10 +234,8 @@ public class JPPFNode extends AbstractMonitoredNode
 		int p = bundle.getBuildNumber();
 		if (buildNumber < p)
 		{
-			JPPFNodeReloadNotification notif = new JPPFNodeReloadNotification("detected new build number: " + p
-				+ "; previous build number: " + buildNumber);
 			VersionUtils.setBuildNumber(p);
-			throw notif;
+			throw new JPPFNodeReloadNotification("detected new build number: " + p + "; previous build number: " + buildNumber);
 		}
 	}
 
@@ -281,25 +243,25 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Initialize this node's resources.
 	 * @throws Exception if an error is raised during initialization.
 	 */
-	public synchronized void init() throws Exception
+	private synchronized void init() throws Exception
 	{
 		if (debugEnabled) log.debug("start node initialization");
 		initHelper();
 		boolean mustInit = (socketClient == null);
 		if (mustInit)	initSocketClient();
-		initCredentials();
 		if (isJmxEnabled() && !getJmxServer().getServer().isRegistered(new ObjectName(JPPFAdminMBean.NODE_MBEAN_NAME)))
 		{
 			registerProviderMBeans();
 		}
+		new JPPFStartupLoader().load(JPPFNodeStartupSPI.class);
 		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
 		if (mustInit)
 		{
 			if (debugEnabled) log.debug("start socket initialization");
-			System.out.println("PeerNode.init(): Attempting connection to the JPPF driver");
+			System.out.println("Attempting connection to the node server");
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isSuccessfull()) throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
-			System.out.println("PeerNode.init(): Reconnected to the JPPF driver");
+			System.out.println("Reconnected to the node server");
 			if (debugEnabled) log.debug("end socket initialization");
 		}
 		nodeIO = new NodeIO(this);
@@ -325,13 +287,6 @@ public class JPPFNode extends AbstractMonitoredNode
 		if (debugEnabled) log.debug("end socket client initialization");
 	}
 
-	/**
-	 * Initialize the security credentials associated with this JPPF node.
-	 */
-	private void initCredentials()
-	{
-	}
-	
 	/**
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @return a <code>ClassLoader</code> used for loading the classes of the framework.
@@ -426,14 +381,6 @@ public class JPPFNode extends AbstractMonitoredNode
 		{
 			log.error(e.getMessage(), e);
 		}
-		catch(JPPFNodeReconnectionNotification e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		catch(JPPFNodeReloadNotification e)
-		{
-			log.error(e.getMessage(), e);
-		}
 		setNodeAdmin(null);
 		classLoader = null;
 	}
@@ -444,10 +391,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	void decrementExecutingCount()
 	{
-		if (executingCount.decrementAndGet() == 0)
-		{
-			fireNodeEvent(NodeEventType.END_EXEC);
-		}
+		if (executingCount.decrementAndGet() == 0) fireNodeEvent(NodeEventType.END_EXEC);
 		fireNodeEvent(NodeEventType.TASK_EXECUTED);
 	}
 	
@@ -457,10 +401,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	void incrementExecutingCount()
 	{
-		if (executingCount.incrementAndGet() == 1)
-		{
-			fireNodeEvent(NodeEventType.START_EXEC);
-		}
+		if (executingCount.incrementAndGet() == 1) fireNodeEvent(NodeEventType.START_EXEC);
 	}
 
 	/**

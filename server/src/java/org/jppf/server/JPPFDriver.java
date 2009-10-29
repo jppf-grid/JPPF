@@ -35,6 +35,7 @@ import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.peer.*;
 import org.jppf.server.queue.*;
+import org.jppf.startup.*;
 import org.jppf.utils.*;
 
 /**
@@ -166,6 +167,7 @@ public class JPPFDriver
 			System.out.println("JPPF Driver management failed to initialize, with error message: '" + s + "'");
 			System.out.println("Management features are disabled. Please consult the driver's log file for more information");
 		}
+		new JPPFStartupLoader().load(JPPFDriverStartupSPI.class);
 
 		if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true))
 		{
