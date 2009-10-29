@@ -29,6 +29,14 @@ import java.util.Map;
 public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JPPFNodeAdminMBean
 {
 	/**
+	 * Initialize a local connection to the MBean server.
+	 */
+	public JMXNodeConnectionWrapper()
+	{
+		local = true;
+	}
+
+	/**
 	 * Initialize the connection to the remote MBean server.
 	 * @param host the host the server is running on.
 	 * @param port the RMI port used by the server.
@@ -36,6 +44,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	public JMXNodeConnectionWrapper(String host, int port)
 	{
 		super(host, port, JPPFAdminMBean.NODE_SUFFIX);
+		local = false;
 	}
 
 	/**

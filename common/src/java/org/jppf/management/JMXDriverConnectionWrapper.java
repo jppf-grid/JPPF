@@ -36,6 +36,14 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	public static final String[] MBEAN_SIGNATURE = new String[] {Map.class.getName()};
 
 	/**
+	 * Initialize a local connection to the MBean server.
+	 */
+	public JMXDriverConnectionWrapper()
+	{
+		local = true;
+	}
+
+	/**
 	 * Initialize the connection to the remote MBean server.
 	 * @param host the host the server is running on.
 	 * @param port the RMI port used by the server.
@@ -43,6 +51,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	public JMXDriverConnectionWrapper(String host, int port)
 	{
 		super(host, port, JPPFAdminMBean.DRIVER_SUFFIX);
+		local = false;
 	}
 
 	/**

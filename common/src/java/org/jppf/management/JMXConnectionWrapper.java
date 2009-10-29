@@ -19,6 +19,7 @@
 package org.jppf.management;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 
 import javax.management.*;
@@ -73,16 +74,17 @@ public class JMXConnectionWrapper extends ThreadSynchronization
    * Determines whether the connection to the JMX server has been established.
    */
   private boolean connected = false;
- 
+  /**
+   * Determines whether the connection to the JMX server has been established.
+   */
+  protected boolean local = false;
+
 	/**
-	 * Initialize the connection to the remote MBean server.
-	 * @param host - the host the server is running on.
-	 * @param port - the RMI port used by the server.
-	 * @deprecated use <code>JMXConnectionWrapper(String host, int port, String rmiSuffix)</code> instead
+	 * Initialize a local connection (same JVM) to the MBean server.
 	 */
-	public JMXConnectionWrapper(String host, int port)
+	public JMXConnectionWrapper()
 	{
-		this(host, port, JPPFAdminMBean.DRIVER_SUFFIX);
+		local = true;
 	}
 
 	/**
@@ -107,6 +109,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		{
 			log.error(e.getMessage(), e);
 		}
+		local = false;
 	}
 
 	/**
@@ -114,10 +117,18 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 */
 	public void connect()
 	{
-		connectionThread = new JMXConnectionThread();
-		Thread t = new Thread(connectionThread, "JMX connection thread for " + getId());
-		t.setDaemon(true);
-		t.start();
+		if (local)
+		{
+			mbeanConnection = ManagementFactory.getPlatformMBeanServer();
+	  	connected = true;
+		}
+		else
+		{
+			connectionThread = new JMXConnectionThread();
+			Thread t = new Thread(connectionThread, "JMX connection thread for " + getId());
+			t.setDaemon(true);
+			t.start();
+		}
 	}
 
 	/**
@@ -168,6 +179,51 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 			log.info(getId() + " : " + e.getMessage(), e);
 		}
 		return result;
+	}
+
+	/**
+	 * Get the host the server is running on.
+	 * @return the host as a string.
+	 */
+	public String getHost()
+	{
+		return host;
+	}
+
+	/**
+	 * Get the RMI port used by the server.
+	 * @return the port as an int.
+	 */
+	public int getPort()
+	{
+		return port;
+	}
+
+	/**
+	 * Get a string describing this connection.
+	 * @return a string in the format host:port.
+	 */
+	public String getId()
+	{
+		return idString;
+	}
+
+	/**
+	 * Get the connection to the MBean server.
+	 * @return a <code>MBeanServerConnection</code> instance.
+	 */
+	public synchronized MBeanServerConnection getMbeanConnection()
+	{
+		return mbeanConnection;
+	}
+
+	/**
+   * Determines whether the connection to the JMX server has been established.
+	 * @return true if the connection is established, false otherwise.
+	 */
+	public synchronized boolean isConnected()
+	{
+		return connected;
 	}
 
 	/**
@@ -282,50 +338,5 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		{
 			return suspended;
 		}
-	}
-
-	/**
-	 * Get the host the server is running on.
-	 * @return the host as a string.
-	 */
-	public String getHost()
-	{
-		return host;
-	}
-
-	/**
-	 * Get the RMI port used by the server.
-	 * @return the port as an int.
-	 */
-	public int getPort()
-	{
-		return port;
-	}
-
-	/**
-	 * Get a string describing this connection.
-	 * @return a string in the format host:port.
-	 */
-	public String getId()
-	{
-		return idString;
-	}
-
-	/**
-	 * Get the connection to the MBean server.
-	 * @return a <code>MBeanServerConnection</code> instance.
-	 */
-	public synchronized MBeanServerConnection getMbeanConnection()
-	{
-		return mbeanConnection;
-	}
-
-	/**
-   * Determines whether the connection to the JMX server has been established.
-	 * @return true if the connection is established, false otherwise.
-	 */
-	public synchronized boolean isConnected()
-	{
-		return connected;
 	}
 }
