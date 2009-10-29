@@ -187,10 +187,10 @@ public class PeerNode extends AbstractMonitoredNode
 		if (mustInit)
 		{
 			if (debugEnabled) log.debug(getName() + "initializing socket");
-			System.out.println(getName() + "PeerNode.init(): Attempting connection to the JPPF driver");
+			System.out.println(getName() + "Attempting connection to the peer node server");
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isSuccessfull()) throw new JPPFException(getName() + " : Unable to reconnect to peer server");
-			System.out.println(getName() + "PeerNode.init(): Reconnected to the JPPF driver");
+			System.out.println(getName() + "Reconnected to the peer node server");
 			is = new SocketWrapperInputSource(socketClient);
 		}
 		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
