@@ -18,6 +18,7 @@
 
 package org.jppf.management;
 
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.rmi.registry.*;
 import java.util.*;
@@ -90,8 +91,8 @@ public class JMXServerImpl
     try
     {
 	    Thread.currentThread().setContextClassLoader(cl);
-			//server = ManagementFactory.getPlatformMBeanServer();
-			server = MBeanServerFactory.newMBeanServer();
+			server = ManagementFactory.getPlatformMBeanServer();
+			//server = MBeanServerFactory.newMBeanServer();
 			if (cl instanceof JPPFClassLoader) server.registerMBean(cl, new ObjectName("org.jppf:name=NodeClassLoader"));
 	    locateOrCreateRegistry();
 			TypedProperties props = JPPFConfiguration.getProperties();
