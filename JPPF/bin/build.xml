@@ -22,43 +22,46 @@
 	<!--                          Property definitions                             -->
 	<!-- ========================================================================= -->
 
-	<property name="common" value="${basedir}/../common"/>
-	<property name="admin" value="${basedir}/../admin"/>
-	<property name="client" value="${basedir}/../client"/>
-	<property name="node" value="${basedir}/../node"/>
-	<property name="server" value="${basedir}/../server"/>
-	<property name="demo" value="${basedir}/../demo"/>
-	<property name="jca-client" value="${basedir}/../jca-client"/>
-	<property name="jppfQuickStart" value="${basedir}/../JPPFQuickStart"/>
-	<property name="gigaspaces" value="${basedir}/../JPPF-GigaSpaces"/>
-	<property name="application.template" value="${basedir}/../application-template"/>
+	<property name="common"                value="${basedir}/../common"/>
+	<property name="admin"                 value="${basedir}/../admin"/>
+	<property name="client"                value="${basedir}/../client"/>
+	<property name="node"                  value="${basedir}/../node"/>
+	<property name="server"                value="${basedir}/../server"/>
+	<property name="demo"                  value="${basedir}/../demo"/>
+	<property name="jca-client"            value="${basedir}/../jca-client"/>
+	<property name="jppfQuickStart"        value="${basedir}/../JPPFQuickStart"/>
+	<property name="gigaspaces"            value="${basedir}/../JPPF-GigaSpaces"/>
+	<property name="application.template"  value="${basedir}/../application-template"/>
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${gigaspaces}/build.properties"/>
   <property file="${build.properties.file}"/>
-	<property name="build.number.file" value="${basedir}/bin/build.number"/>
-	<property name="bin" value="${basedir}/bin"/>	
-	<property name="data" value="${basedir}/data"/>	
-	<property name="config" value="${basedir}/config"/>	
-	<property name="build" value="${basedir}/build"/>	
-	<property name="deploy" value="${build}/deploy"/>	
-	<property name="deploy.lib" value="${deploy}/lib"/>
-	<property name="deploy.build" value="${deploy}/build"/>
-	<property name="deploy.config" value="${deploy}/config"/>	
-	<property name="classes" value="${build}/classes"/>
-	<property name="src" value="${basedir}/src"/>
-	<property name="lib" value="${basedir}/lib"/>
-	<property name="docs" value="${basedir}/docs"/>
-	<property name="home" value="${docs}/home"/>
-	<property name="examples" value="${basedir}/examples"/>
-	<property name="javadoc" value="${home}/api"/>
-	<property name="app.jar.file" value="${ant.project.name}.jar"/>
-	<property name="license.file" value="LICENSE.txt"/>
-	<property name="runtime" value="${build}/runtime"/>
-	<property name="runtime.driver" value="${build}/runtime/driver"/>
-	<property name="runtime.multiplexer" value="${build}/runtime/multiplexer"/>
-	<property name="runtime.node" value="${build}/runtime/node"/>
-	<property name="runtime.gui" value="${build}/runtime/gui"/>
+	<property name="build.number.file"     value="${basedir}/bin/build.number"/>
+	<property name="bin"                   value="${basedir}/bin"/>	
+	<property name="installer"             value="${bin}/installer"/>
+	<property name="data"                  value="${basedir}/data"/>	
+	<property name="config"                value="${basedir}/config"/>	
+	<property name="build"                 value="${basedir}/build"/>	
+	<property name="deploy"                value="${build}/deploy"/>	
+	<property name="deploy.lib"            value="${deploy}/lib"/>
+	<property name="deploy.build"          value="${deploy}/build"/>
+	<property name="deploy.config"         value="${deploy}/config"/>	
+	<property name="classes"               value="${build}/classes"/>
+	<property name="src"                   value="${basedir}/src"/>
+	<property name="lib"                   value="${basedir}/lib"/>
+	<property name="docs"                  value="${basedir}/docs"/>
+	<property name="home"                  value="${docs}/home"/>
+	<property name="examples"              value="${basedir}/examples"/>
+	<!--<property name="javadoc"               value="${home}/api"/>-->
+	<property name="javadoc"               value="${home}/api-2.0"/>
+	<property name="app.jar.file"          value="${ant.project.name}.jar"/>
+	<property name="license.file"          value="LICENSE.txt"/>
+	<property name="runtime"               value="${build}/runtime"/>
+	<property name="runtime.driver"        value="${build}/runtime/driver"/>
+	<property name="runtime.multiplexer"   value="${build}/runtime/multiplexer"/>
+	<property name="runtime.node"          value="${build}/runtime/node"/>
+	<property name="runtime.gui"           value="${build}/runtime/gui"/>
+	<property name="app.ver"               value="${ant.project.name}-${version.number}"/>
 
 	<!-- ========================================================================= -->
 	<!--                           Classpath definitions                           -->
@@ -158,7 +161,6 @@
 		<antcall target="compile.module"><param name="path" value="${admin}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${server}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${demo}"/></antcall>
-		
   </target>
 
 	<target name="compile.module">
@@ -210,7 +212,7 @@
 		<ant antfile="${basedir}/../samples-pack/WebSearchEngine/build.xml" target="compile" inheritall="false"/>
 		<ant antfile="${basedir}/../samples-pack/TomcatPort/build.xml" target="build" inheritall="false"/>
 		<!--<property name="samples.pack.file" value="${build}/${ant.project.name}-samples-pack-${version.number}.${build.number}-${now}.zip"/>-->
-		<property name="samples.pack.prefix" value="${ant.project.name}-${version.number}-samples-pack"/>
+		<property name="samples.pack.prefix" value="${app.ver}-samples-pack"/>
 		<property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>
 		<delete file="samples.pack.file" quiet="true"/>
 		<zip destfile="${samples.pack.file}">
@@ -241,7 +243,7 @@
 			<param name="templates" value="${home}/templates/quickstart/"/>
 		</antcall>
 		<!--<property name="jppfQuickStart.file" value="${build}/JPPFQuickStart-${version.number}.${build.number}-${now}.zip"/>-->
-		<property name="QuickStart.prefix" value="${ant.project.name}-${version.number}-Quick-Start"/>
+		<property name="QuickStart.prefix" value="${app.ver}-Quick-Start"/>
 		<property name="QuickStart.file" value="${build}/${QuickStart.prefix}.zip"/>
 		<delete file="QuickStart.file" quiet="true"/>
 		<zip destfile="${QuickStart.file}">
@@ -260,6 +262,8 @@
 				<exclude name="**/templates/**/*.*"/>
 			</fileset>
 		</copy>
+		<copy toDir="${home}/JPPFQuickStart/docs" file="${home}/jppf_header.php"/>
+		<copy toDir="${home}/JPPFQuickStart/docs" file="${home}/jppf.css"/>
   </target>
 
 	<!-- ========================================================================= -->
@@ -274,7 +278,7 @@
 			</fileset>
 		</copy>
 		<ant antfile="${gigaspaces}/build.xml" target="build" inheritall="false"/>
-		<property name="gigaspaces.prefix" value="${ant.project.name}-${version.number}-GigaSpaces"/>
+		<property name="gigaspaces.prefix" value="${app.ver}-GigaSpaces"/>
 		<property name="gigaspaces.file" value="${build}/${gigaspaces.prefix}.zip"/>
 		<delete file="gigaspaces.file" quiet="true"/>
 		<zip destfile="${gigaspaces.file}">
@@ -326,8 +330,8 @@
 
 	<target name="package" description="package the application into a release zip file" depends="rebuild">
 		<!--<property name="release.file" value="${build}/${ant.project.name}-full-src-${version.number}-${build.number}-${now}.zip"/>-->
-		<property name="release.file" value="${build}/${ant.project.name}-${version.number}-full-src.zip"/>
-		<property name="zip.prefix" value="${ant.project.name}-${version.number}"/>
+		<property name="zip.prefix" value="${app.ver}-full-src"/>
+		<property name="release.file" value="${build}/${zip.prefix}.zip"/>
 		<delete file="${release.file}" quiet="true"/>
 		<zip destfile="${release.file}">
 			<zipfileset dir="${basedir}" prefix="${zip.prefix}/JPPF">
@@ -355,7 +359,7 @@
 
 	<target name="j2ee.connector" description="" depends="rebuild">
 		<!--<property name="connector.release.file" value="${build}/${ant.project.name}-j2ee-connector-${version.number}-${build.number}-${now}.zip"/>-->
-		<property name="j2ee.prefix" value="${ant.project.name}-${version.number}-j2ee-connector"/>
+		<property name="j2ee.prefix" value="${app.ver}-j2ee-connector"/>
 		<property name="connector.release.file" value="${build}/${j2ee.prefix}.zip"/>
 		<delete file="${connector.release.file}" quiet="true"/>
 		<zip destfile="${connector.release.file}">
@@ -386,7 +390,7 @@
 	    <compilerarg line="-Xlint:unchecked"/>
 			<src path="${application.template}/src"/>
 		</javac>
-		<property name="template.prefix" value="${ant.project.name}-${version.number}-application-template"/>
+		<property name="template.prefix" value="${app.ver}-application-template"/>
 		<property name="template.release.file" value="${build}/${template.prefix}.zip"/>
 		<delete file="${template.release.file}" quiet="true"/>
 		<zip destfile="${template.release.file}">
@@ -425,7 +429,7 @@
 		<copy tofile="${runtime.driver}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.driver}"><fileset dir="${config}/driver"/></copy>
 		<copy tofile="${runtime.driver}/config/jppf.policy" file="${config}/node/config/jppf.policy"/>
-		<property name="driver.prefix" value="${ant.project.name}-${version.number}-driver"/>
+		<property name="driver.prefix" value="${app.ver}-driver"/>
 		<property name="runtime.driver.file" value="${build}/${driver.prefix}.zip"/>
 		<delete file="${runtime.driver.file}" quiet="true"/>
 		<zip destfile="${runtime.driver.file}">
@@ -445,7 +449,7 @@
 		</copy>
 		<copy tofile="${runtime.node}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.node}"><fileset dir="${config}/node"/></copy>
-		<property name="node.prefix" value="${ant.project.name}-${version.number}-node"/>
+		<property name="node.prefix" value="${app.ver}-node"/>
 		<property name="runtime.node.file" value="${build}/${node.prefix}.zip"/>
 		<delete file="${runtime.node.file}" quiet="true"/>
 		<zip destfile="${runtime.node.file}">
@@ -476,7 +480,7 @@
 		</copy>
 		<copy tofile="${runtime.gui}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.gui}"><fileset dir="${config}/gui"/></copy>
-		<property name="gui.prefix" value="${ant.project.name}-${version.number}-admin-ui"/>
+		<property name="gui.prefix" value="${app.ver}-admin-ui"/>
 		<property name="runtime.gui.file" value="${build}/${gui.prefix}.zip"/>
 		<delete file="${runtime.gui.file}" quiet="true"/>
 		<zip destfile="${runtime.gui.file}">
@@ -499,13 +503,70 @@
 		</copy>
 		<copy tofile="${runtime.multiplexer}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.multiplexer}"><fileset dir="${config}/multiplexer"/></copy>
-		<property name="multiplexer.prefix" value="${ant.project.name}-${version.number}-multiplexer"/>
+		<property name="multiplexer.prefix" value="${app.ver}-multiplexer"/>
 		<property name="runtime.multiplexer.file" value="${build}/${multiplexer.prefix}.zip"/>
 		<delete file="${runtime.multiplexer.file}" quiet="true"/>
 		<zip destfile="${runtime.multiplexer.file}">
 			<zipfileset dir="${runtime.multiplexer}" includes="**/*.*" prefix="${multiplexer.prefix}"/>
 		</zip>
     <delete dir="${runtime.multiplexer}" quiet="true"/>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                    Generate the IzPack installer jar                      -->
+	<!-- ========================================================================= -->
+	<!-- This requires the property  ${izpack.home} defined in build.preoperties   -->
+	<!-- It must point to the root installation directory of IzPack                -->
+	<!-- ========================================================================= -->
+
+	<taskdef onerror="report" name="izpack" classpath="${izpack.home}/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask"/>
+
+	<target name="installer">
+		<available file="${izpack.home}/lib/standalone-compiler.jar" property="izpack.present"/>
+		<antcall target="installer.package"/>
+	</target>
+
+	<target name="installer.package" description="package the jar installer" if="izpack.present">
+		<property name="install.prefix" value="${build}/${app.ver}"/>
+		<property name="install.file" value="${install.prefix}-Installer"/>
+		<delete file="${install.file}.jar" quiet="true"/>
+		<mkdir dir="${install.prefix}"/>
+		<unzip src="${install.prefix}-full-src.zip" dest="${install.prefix}"/>
+		<unzip src="${install.prefix}-driver.zip" dest="${install.prefix}"/>
+		<unzip src="${install.prefix}-node.zip" dest="${install.prefix}"/>
+		<unzip src="${install.prefix}-admin-ui.zip" dest="${install.prefix}"/>
+		<unzip src="${install.prefix}-application-template.zip" dest="${install.prefix}"/>
+		<unzip src="${install.prefix}-api.zip" dest="${install.prefix}"/>
+		<unzip src="${install.prefix}-samples-pack.zip" dest="${install.prefix}"/>
+		<unzip src="${install.prefix}-screensaver-win32.zip" dest="${install.prefix}/${app.ver}-screensaver-win32"/>
+		<unzip src="${install.prefix}-j2ee-connector.zip" dest="${install.prefix}"/>
+		<unzip src="${install.prefix}-GigaSpaces.zip" dest="${install.prefix}"/>
+		<unzip src="${install.prefix}-multiplexer.zip" dest="${install.prefix}"/>
+		<!--
+    -->
+		<!-- Generate offline installer -->
+		<izpack input="${installer}/install.xml" output="${install.file}.jar" installerType="standard" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
+
+		<!-- Generate web installer -->
+		<property name="web.installer.dir" value="${home}/download/${version.number}"/>
+		<delete dir="${web.installer.dir}" quiet="true"/>
+		<mkdir dir="${web.installer.dir}"/>
+		<property name="web.installer.file" value="${web.installer.dir}/${app.ver}-Web-Installer.jar"/>
+		<izpack input="${installer}/install.xml" output="${web.installer.file}" installerType="web" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
+
+		<!-- Sign the web installer jar -->
+		<exec executable="c:/jdk1.5.0/bin/jarsigner.exe">
+			<arg value="-keystore"/>
+			<arg value="C:\Workspaces\SourceForge\JPPF\bin\security\jppf.keystore"/>
+			<arg value="-storepass"/>
+			<arg value="Faz600er"/>
+			<arg value="-keypass"/>
+			<arg value="Faz600er"/>
+			<arg value="${web.installer.file}"/>
+			<arg value="jppf"/>
+		</exec>
+
+		<delete dir="${install.prefix}" quiet="true"/>
 	</target>
 
 	<!-- ========================================================================= -->
@@ -517,26 +578,27 @@
 
   <target name="doc.home" description="generates the project web site pages">
 		<antcall target="doc.gen">
-			<param name="source" value="docs/home/doc-source"/>
-			<param name="dest" value="docs/home/"/>
-			<param name="templates" value="docs/home/templates/"/>
+			<param name="source" value="${home}/doc-source"/>
+			<param name="dest" value="${home}/"/>
+			<param name="templates" value="${home}/templates/"/>
 		</antcall>
 	</target>
-	<copy toDir="docs/home/wiki/includes" file="docs/home/jppf_header.php"/>
+	<copy toDir="${home}/wiki/includes" file="${home}/jppf_header.php"/>
+	<copy toDir="${home}/forums" file="${home}/jppf_header.php"/>
 
   <target name="doc.home.1" description="generates the project web site pages">
 		<antcall target="doc.gen">
-			<param name="source" value="docs/home/doc-source/v1"/>
-			<param name="dest" value="docs/home/"/>
-			<param name="templates" value="docs/home/templates/"/>
+			<param name="source" value="${home}/doc-source/v1"/>
+			<param name="dest" value="${home}/"/>
+			<param name="templates" value="${home}/templates/"/>
 		</antcall>
 	</target>
 
   <target name="doc.home.2" description="generates the project web site pages">
 		<antcall target="doc.gen">
-			<param name="source" value="docs/home/doc-source/v2"/>
-			<param name="dest" value="docs/home/"/>
-			<param name="templates" value="docs/home/templates/"/>
+			<param name="source" value="${home}/doc-source/v2"/>
+			<param name="dest" value="${home}/"/>
+			<param name="templates" value="${home}/templates/"/>
 		</antcall>
 	</target>
 
@@ -611,11 +673,16 @@
 				<include name="*.jpg"/>
 			</fileset>
 		</copy>
+		<property name="javadoc.file" value="${build}/${app.ver}-api.zip"/>
+		<delete file="${javadoc.file}" quiet="true"/>
+		<zip destfile="${javadoc.file}">
+			<zipfileset dir="${javadoc}" includes="**/*.*" prefix="${app.ver}-api"/>
+		</zip>
 	</target>
 
 	<target name="javadoc.package" description="Package the javadoc for deployment on the web site">
     <delete file="${docs}/api.tar.gz" quiet="true"/>
-		<tar destfile="${docs}/api.tar.gz" compression="gzip" basedir="${home}" includes="api/**/*.*"/>
+		<tar destfile="${docs}/api.tar.gz" compression="gzip" basedir="${home}" includes="api-2.0/**/*.*"/>
 	</target>
 
 	<!-- ========================================================================= -->
