@@ -39,15 +39,11 @@ public interface JPPFAdminMBean extends Serializable
 	 */
 	String NODE_MBEAN_NAME = "org.jppf:name=admin,type=node";
 	/**
-	 * Name of the node's admin MBean.
+	 * Name of the driver's admin MBean.
 	 */
 	String DRIVER_MBEAN_NAME = "org.jppf:name=admin,type=driver";
 	/**
 	 * Node of the MBEAN that performs job manageemnt and monitoring on the driver.
 	 */
 	String DRIVER_JOB_MANAGEMENT_MBEAN_NAME = "org.jppf:name=jobManagement,type=driver";
-	/**
-	 * Node of the MBEAN that performs job manageemnt an dmonitoring on the node.
-	 */
-	String NODE_JOB_MANAGEMENT_MBEAN_NAME = "org.jppf:name=jobManagement,type=node";
 }
