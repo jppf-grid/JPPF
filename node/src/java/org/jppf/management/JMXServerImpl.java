@@ -23,11 +23,10 @@ import java.net.InetAddress;
 import java.rmi.registry.*;
 import java.util.*;
 
-import javax.management.*;
+import javax.management.MBeanServer;
 import javax.management.remote.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.node.JPPFClassLoader;
 import org.jppf.utils.*;
 
 /**
@@ -93,7 +92,7 @@ public class JMXServerImpl
 	    Thread.currentThread().setContextClassLoader(cl);
 			server = ManagementFactory.getPlatformMBeanServer();
 			//server = MBeanServerFactory.newMBeanServer();
-			if (cl instanceof JPPFClassLoader) server.registerMBean(cl, new ObjectName("org.jppf:name=NodeClassLoader"));
+			//if (cl instanceof JPPFClassLoader) server.registerMBean(cl, new ObjectName("org.jppf:name=NodeClassLoader"));
 	    locateOrCreateRegistry();
 			TypedProperties props = JPPFConfiguration.getProperties();
 			String host = NetworkUtils.getManagementHost();
