@@ -33,9 +33,9 @@ public class TaskExecutionNotification extends Notification
 
 	/**
 	 * Initialize this notification with the specified parameters.
-	 * @param source - the emitter MBean's object name.
-	 * @param sequenceNumber - the notification sequence number.
-	 * @param taskInformation - information about the task that triggered this notification.
+	 * @param source the emitter MBean's object name.
+	 * @param sequenceNumber the notification sequence number.
+	 * @param taskInformation information about the task that triggered this notification.
 	 */
 	public TaskExecutionNotification(ObjectName source, long sequenceNumber, TaskInformation taskInformation)
 	{
