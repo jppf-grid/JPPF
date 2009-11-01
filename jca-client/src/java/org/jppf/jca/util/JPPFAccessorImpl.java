@@ -25,23 +25,44 @@ import javax.resource.ResourceException;
 import org.jppf.jca.work.JPPFJcaClient;
 
 /**
- * 
+ * Utility class used to provide access to JPPF components.
  * @author Laurent Cohen
  */
-public interface JPPFAccessor
+public abstract class JPPFAccessorImpl implements JPPFAccessor
 {
+  /**
+   * The JPPF client used to submit tasks.
+   */
+  protected transient JPPFJcaClient jppfClient = null;
+  /**
+   * The log writer for this object.
+   */
+  protected PrintWriter logWriter = null;
 
+  /**
+   * Default constructor.
+   */
+  protected JPPFAccessorImpl()
+  {
+  }
+ 
 	/**
-	 * Get the JPPF client used to submit tasks.
+   * Get the JPPF client used to submit tasks.
 	 * @return a <code>JPPFJcaClient</code> instance.
 	 */
-	JPPFJcaClient getJppfClient();
+	public JPPFJcaClient getJppfClient()
+	{
+		return jppfClient;
+	}
 
 	/**
-	 * Set the JPPF client used to submit tasks.
+   * Set the JPPF client used to submit tasks.
 	 * @param jppfClient a <code>JPPFJcaClient</code> instance.
 	 */
-	void setJppfClient(JPPFJcaClient jppfClient);
+	public void setJppfClient(JPPFJcaClient jppfClient)
+	{
+		this.jppfClient = jppfClient;
+	}
 
 	/**
 	 * Get the log writer for this object.
@@ -49,7 +70,10 @@ public interface JPPFAccessor
 	 * @throws ResourceException if the log writer could not be obtained.
 	 * @see javax.resource.spi.ManagedConnectionFactory#getLogWriter()
 	 */
-	PrintWriter getLogWriter() throws ResourceException;
+	public PrintWriter getLogWriter() throws ResourceException
+	{
+		return logWriter;
+	}
 
 	/**
 	 * Set the log writer for this object.
@@ -57,6 +81,8 @@ public interface JPPFAccessor
 	 * @throws ResourceException if the log writer could not be set.
 	 * @see javax.resource.spi.ManagedConnectionFactory#setLogWriter(java.io.PrintWriter)
 	 */
-	void setLogWriter(PrintWriter writer) throws ResourceException;
-
+	public void setLogWriter(PrintWriter writer) throws ResourceException
+	{
+		this.logWriter = writer;
+	}
 }

@@ -25,20 +25,20 @@ import javax.resource.spi.*;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
 
-import org.jppf.jca.cci.JPPFConnection;
-import org.jppf.jca.util.JPPFAccessor;
+import org.jppf.jca.cci.*;
+import org.jppf.jca.util.JPPFAccessorImpl;
 
 
 /**
  * Implementation of the ManagedConnection interface.
  * @author Laurent Cohen
  */
-public class JPPFManagedConnection extends JPPFAccessor implements ManagedConnection
+public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedConnection
 {
 	/**
 	 * This managed connection's associated connection handle.
 	 */
-	private JPPFConnection connection = null;
+	private JPPFConnectionImpl connection = null;
 	/**
 	 * List of connection event listeners for this managed connection.
 	 */
@@ -112,7 +112,7 @@ public class JPPFManagedConnection extends JPPFAccessor implements ManagedConnec
 	 */
 	public void associateConnection(Object conn) throws ResourceException
 	{
-		connection = (JPPFConnection) conn;
+		connection = (JPPFConnectionImpl) conn;
 		connection.setConn(this);
 	}
 
@@ -146,7 +146,7 @@ public class JPPFManagedConnection extends JPPFAccessor implements ManagedConnec
 	{
 		if (connection == null)
 		{
-			connection = new JPPFConnection(this);
+			connection = new JPPFConnectionImpl(this);
 			if (connection.getJppfClient() == null) connection.setJppfClient(getJppfClient());
 		}
 		if (connection.isClosed()) connection.setAvailable();

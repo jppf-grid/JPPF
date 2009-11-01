@@ -27,7 +27,7 @@ import javax.resource.spi.work.*;
 import javax.transaction.xa.XAResource;
 
 import org.apache.commons.logging.*;
-import org.jppf.jca.util.JPPFAccessor;
+import org.jppf.jca.util.JPPFAccessorImpl;
 import org.jppf.jca.work.*;
 import org.jppf.jca.work.submission.JPPFSubmissionManager;
 import org.jppf.utils.JPPFUuid;
@@ -37,7 +37,7 @@ import org.jppf.utils.JPPFUuid;
  * This class initiates a JPPF client with a pool of driver connections.
  * @author Laurent Cohen
  */
-public class JPPFResourceAdapter extends JPPFAccessor implements ResourceAdapter, Serializable
+public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAdapter, Serializable
 {
 	/**
 	 * Logger for this class.

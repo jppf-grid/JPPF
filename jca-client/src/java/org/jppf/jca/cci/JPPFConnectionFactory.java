@@ -24,14 +24,14 @@ import javax.resource.cci.*;
 import javax.resource.spi.ConnectionManager;
 
 import org.jppf.jca.spi.*;
-import org.jppf.jca.util.JPPFAccessor;
+import org.jppf.jca.util.JPPFAccessorImpl;
 
 /**
  * Implementation of the {@link javax.resource.cci.ConnectionFactory ConnectionFactory} interface for
  * the JPPF resource adapter.
  * @author Laurent Cohen
  */
-public class JPPFConnectionFactory extends JPPFAccessor implements ConnectionFactory
+public class JPPFConnectionFactory extends JPPFAccessorImpl implements ConnectionFactory
 {
   /**
    * The default managed factory.

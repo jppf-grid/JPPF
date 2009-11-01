@@ -25,14 +25,14 @@ import javax.resource.spi.*;
 import javax.security.auth.Subject;
 
 import org.jppf.jca.cci.*;
-import org.jppf.jca.util.JPPFAccessor;
+import org.jppf.jca.util.JPPFAccessorImpl;
 
 
 /**
  * Implementation of the ManagedConnectionFactory interface.
  * @author Laurent Cohen
  */
-public class JPPFManagedConnectionFactory extends JPPFAccessor implements ManagedConnectionFactory, ResourceAdapterAssociation
+public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements ManagedConnectionFactory, ResourceAdapterAssociation
 {
 	/**
 	 * Handle to the resource adapter.

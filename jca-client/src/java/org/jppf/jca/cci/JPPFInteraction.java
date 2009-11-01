@@ -30,13 +30,13 @@ public class JPPFInteraction implements Interaction
 	/**
 	 * The connection associated with this interaction
 	 */
-	private JPPFConnection conn;
+	private JPPFConnectionImpl conn;
 
 	/**
 	 * Intialize this interaction with a specified connection.
 	 * @param conn a <code>Connection</code> instance.
 	 */
-	public JPPFInteraction(JPPFConnection conn)
+	public JPPFInteraction(JPPFConnectionImpl conn)
 	{
 		this.conn = conn;
 	}
