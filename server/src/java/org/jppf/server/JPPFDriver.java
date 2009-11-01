@@ -112,6 +112,10 @@ public class JPPFDriver
 	 * Uuid for this driver.
 	 */
 	private String uuid = new JPPFUuid().toString();
+	/**
+	 * The thread that broadcasts the server connection information using UDP multicast.
+	 */
+	private JPPFBroadcaster broadcaster = null;
 
 	/**
 	 * Initialize this JPPFDriver.
@@ -171,10 +175,9 @@ public class JPPFDriver
 
 		if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true))
 		{
-			JPPFBroadcaster broadcaster = new JPPFBroadcaster(info);
+			broadcaster = new JPPFBroadcaster(info);
 			new Thread(broadcaster, "JPPF Broadcaster").start();
 		}
-
 		initPeers();
 		System.out.println("JPPF Driver initialization complete");
 	}
@@ -374,6 +377,17 @@ public class JPPFDriver
 	 */
 	public void shutdown()
 	{
+		log.info("Shutting down");
+		if (broadcaster != null)
+		{
+			broadcaster.setStopped(true);
+			broadcaster = null;
+		}
+		if (peerDiscoveryThread != null)
+		{
+			peerDiscoveryThread.setStopped(true);
+			peerDiscoveryThread = null;
+		}
 		classServer.end();
 		classServer = null;
 		nodeNioServer.end();
