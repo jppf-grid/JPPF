@@ -348,7 +348,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	/**
 	 * Close the underlying server socket and stop this socket server.
 	 */
-	public synchronized void end()
+	public void end()
 	{
 		if (!isStopped())
 		{
@@ -360,11 +360,18 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	/**
 	 * Close and remove all connections accepted by this server.
 	 */
-	public synchronized void removeAllConnections()
+	public void removeAllConnections()
 	{
 		if (!isStopped()) return;
 		try
 		{
+			selector.wakeup();
+			Set<SelectionKey> keySet = selector.keys();
+			for (SelectionKey key: keySet)
+			{
+				key.channel().close();
+				key.cancel();
+			}
 			selector.close();
 		}
 		catch (Exception e)
