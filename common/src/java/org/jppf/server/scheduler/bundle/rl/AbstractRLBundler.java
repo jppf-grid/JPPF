@@ -113,7 +113,8 @@ public abstract class AbstractRLBundler extends AbstractBundler
 		}
 		else if (d > threshold)
 		{
-			action = (int) -Math.signum(action) * Math.max(STEP, Math.abs(action/2));
+			//action = (int) -Math.signum(action) * Math.max(STEP, Math.abs(action/2));
+			action = (int) -Math.signum(action) * STEP;
 		}
 		//else action = (int) -Math.signum(d) * (int) Math.signum(action) * STEP;
 		else action = STEP;
