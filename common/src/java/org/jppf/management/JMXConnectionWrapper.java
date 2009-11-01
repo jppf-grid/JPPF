@@ -132,6 +132,18 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	}
 
 	/**
+	 * Initiate the connection and wait until the connection is established or the timeout has expired, whichever comes first.
+	 * @param timeout the maximum time to wait for, a value of zero means no timeout and
+	 * this method just waits until the connection is established.
+	 */
+	public void connectAndWait(long timeout)
+	{
+		connect();
+		if (connected) return;
+		goToSleep(timeout);
+	}
+
+	/**
 	 * Initialize the connection to the remote MBean server.
 	 * @throws Exception if the connection could not be established.
 	 */
@@ -264,6 +276,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 						if (debugEnabled) log.debug(getId() + " about to suspend RMI connection attempts");
 						suspend();
 						wakeUp();
+						JMXConnectionWrapper.this.wakeUp();
 					}
 					catch(Exception ignored)
 					{
