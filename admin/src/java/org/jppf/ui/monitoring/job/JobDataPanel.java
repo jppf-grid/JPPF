@@ -205,7 +205,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		treeTable.setDefaultRenderer(Object.class, new JobTableCellRenderer());
 		JScrollPane sp = new JScrollPane(treeTable);
 		setUIComponent(sp);
-		setupActions();
+		//setupActions();
 	}
 
 	/**

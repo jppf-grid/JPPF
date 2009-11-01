@@ -91,6 +91,9 @@
 		<child name="JobTreetable" type="JobDataPanel">
 			<property name="componentConstraints" value="grow, width 0"/>
 			<property name="value" value=""/>
+			<initializer type="script">
+				<script language="groovy">option.setupActions();</script>
+			</initializer>
 		</child>
 
 	</child>

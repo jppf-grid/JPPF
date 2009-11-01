@@ -58,17 +58,14 @@ public class ActionsInitializer implements Runnable
 		{
 			OptionElement parent = mainPanel.getParent();
 			if (parent != null) page = (OptionsPage) mainPanel.findFirstWithName(btnContainerName);
-			if (page == null)
+			try
 			{
-				try
-				{
-					Thread.sleep(100);
-				}
-				catch(InterruptedException e)
-				{
-				}
+				Thread.sleep(100);
 			}
-			else
+			catch(InterruptedException e)
+			{
+			}
+			if (page != null)
 			{
 				for (OptionElement elt: page.getChildren())
 				{

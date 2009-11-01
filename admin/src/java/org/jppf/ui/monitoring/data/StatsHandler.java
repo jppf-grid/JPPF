@@ -114,7 +114,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	 * Get the singleton instance of this class.
 	 * @return a <code>StatsHandler</code> instance.
 	 */
-	public static StatsHandler getInstance()
+	public synchronized static StatsHandler getInstance()
 	{
 		if (instance.get() == null) instance.set(new StatsHandler());
 		return instance.get();
@@ -126,8 +126,9 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	private StatsHandler()
 	{
 		if (debugEnabled) log.debug("initializing StatsHandler");
-		refreshInterval = JPPFConfiguration.getProperties().getLong("default.refresh.interval", 2000L);
+		refreshInterval = JPPFConfiguration.getProperties().getLong("default.refresh.interval", 1000L);
 		if (refreshInterval > 0L) timer = new java.util.Timer("JPPF Driver Statistics Update Timer");
+		getJppfClient(null);
 		update(null, stats);
 	}
 
@@ -180,7 +181,8 @@ public final class StatsHandler implements StatsConstants, ClientListener
 		{
 			if ((c != null) && JPPFClientConnectionStatus.ACTIVE.equals(c.getStatus()))
 			{
-        update(c, c.getJmxConnection().statistics());
+				JPPFStats stats = c.getJmxConnection().statistics();
+        if (stats != null) update(c, stats);
 			}
 		}
 		catch(Exception e)

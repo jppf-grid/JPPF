@@ -65,8 +65,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		createTreeTableModel();
 		populateTreeTableModel();
 		refreshNodeStates();
-		createUI();
 		refreshHandler = new NodeRefreshHandler(this);
+		createUI();
 	}
 
 	/**
@@ -96,7 +96,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	  treeTable = new JPPFTreeTable(model);
 	  treeTable.getTree().setRootVisible(false);
 	  treeTable.getTree().setShowsRootHandles(true);
-	  populateTreeTableModel();
 		treeTable.expandAll();
 		treeTable.getColumnModel().getColumn(0).setPreferredWidth(300);
 		treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
@@ -105,7 +104,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		treeTable.getTree().setCellRenderer(new NodeRenderer());
 		JScrollPane sp = new JScrollPane(treeTable);
 		setUIComponent(sp);
-		setupActions();
+		//setupActions();
 		treeTable.expandAll();
 	}
 
@@ -391,18 +390,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 			ClientConnectionStatusHandler ccsh =  event.getClientConnectionStatusHandler();
 			System.out.println("Received connection status changed event for " + ccsh + " : " + ccsh.getStatus());
 			DefaultMutableTreeNode driverNode = findDriver(driverName);
-			if (driverNode != null)
-			{
-				/*
-				TreeNode[] tmp = driverNode.getPath();
-				if (tmp == null) return;
-				TreePath path = new TreePath(tmp);
-				Rectangle rect = treeTable.getTree().getPathBounds(path);
-				treeTable.getTree().repaint(rect);
-				*/
-				//treeTable.getTree().repaint();
-				driverRemoved(driverName, true);
-			}
+			if (driverNode != null) model.changeNode(driverNode);
 		}
 	}
 }
