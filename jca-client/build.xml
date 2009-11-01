@@ -47,6 +47,7 @@
 	<property name="oracle10"        value="Oracle-10"/>
 	<property name="sunas90"         value="SunAS-9.0"/>
 	<property name="weblogic92"      value="Weblogic-9.2"/>
+	<property name="geronimo"        value="Geronimo"/>
 
 	<!-- ========================================================================= -->
 	<!--                           Classpath definitions                           -->
@@ -196,6 +197,10 @@
 			<param name="appserver" value="${weblogic92}"/>
 			<param name="include.client.classes" value="false"/>
 		</antcall>
+		<antcall target="ear">
+			<param name="appserver" value="${geronimo}"/>
+			<param name="include.client.classes" value="false"/>
+		</antcall>
   	<!-- ***** add EAR generation for other application servers here ***** -->
   	<!-- ***** end of add other                                      ***** -->
 		<echo message="EAR files created"/>
@@ -282,6 +287,7 @@
 		<antcall target="rar"><param name="appserver" value="${was61}"/></antcall>
 		<antcall target="rar"><param name="appserver" value="${weblogic92}"/></antcall>
 		<antcall target="rar"><param name="appserver" value="${oracle10}"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${geronimo}"/></antcall>
   	<!-- ***** add RAR generation for other application servers here ***** -->
   	<!-- ***** end of add other                                      ***** -->
 		<echo message="RAR files created"/>
