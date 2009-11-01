@@ -123,7 +123,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	/**
 	 * The total elapsed time used by the tasks in milliseconds.
 	 * @return the elapsed time as long value.
-	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTaskElpasedTime()
+	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTaskElapsedTime()
 	 */
 	public Long getTotalTaskElapsedTime()
 	{
