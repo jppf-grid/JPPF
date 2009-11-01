@@ -62,6 +62,7 @@ public class TaskInformation implements Serializable
 	public TaskInformation(String id, String jobId, long cpuTime, long elapsedTime, boolean error)
 	{
 		this.id = id;
+		this.jobId = jobId;
 		this.cpuTime = cpuTime;
 		this.elapsedTime = elapsedTime;
 		this.error = error;
