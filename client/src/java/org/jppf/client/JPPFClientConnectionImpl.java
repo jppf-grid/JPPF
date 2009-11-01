@@ -287,9 +287,13 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 		}
 		else
 		{
-			int n = delegateStatus.compareTo(taskConnectionStatus);
-			if ((n < 0) && !delegateStatus.equals(this.getStatus())) setStatus(delegateStatus);
-			else if (!taskConnectionStatus.equals(this.getStatus())) setStatus(taskConnectionStatus);
+			if (ACTIVE.equals(taskConnectionStatus)) setStatus(delegateStatus);
+			else
+			{
+				int n = delegateStatus.compareTo(taskConnectionStatus);
+				if ((n < 0) && !delegateStatus.equals(this.getStatus())) setStatus(delegateStatus);
+				else if (!taskConnectionStatus.equals(this.getStatus())) setStatus(taskConnectionStatus);
+			}
 		}
 	}
 }
