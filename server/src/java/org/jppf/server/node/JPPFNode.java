@@ -24,7 +24,7 @@ import javax.management.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.*;
-import org.jppf.comm.socket.SocketChannelClient;
+import org.jppf.comm.socket.SocketClient;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.node.*;
@@ -279,8 +279,8 @@ public class JPPFNode extends AbstractMonitoredNode
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String host = props.getString("jppf.server.host", "localhost");
 		int port = props.getInt("node.server.port", 11113);
-		//socketClient = new SocketClient();
-		socketClient = new SocketChannelClient(true);
+		socketClient = new SocketClient();
+		//socketClient = new SocketChannelClient(true);
 		socketClient.setHost(host);
 		socketClient.setPort(port);
 		socketClient.setSerializer(serializer);
@@ -375,7 +375,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		try
 		{
 			providerManager.unregisterProviderMBeans();
-			getJmxServer().stop();
+			if (jmxServer != null) jmxServer.stop();
 		}
 		catch(Exception e)
 		{
@@ -492,7 +492,17 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	public JMXServerImpl getJmxServer()
 	{
-		if ((jmxServer == null) || jmxServer.isStopped())
+		return getJmxServer(true);
+	}
+
+	/**
+	 * Get the jmx server that handles administration and monitoring functions for this node.
+	 * @param attemptRestart if true then attemp to restart the jmx server if it was stopped.
+	 * @return a <code>JMXServerImpl</code> instance.
+	 */
+	public JMXServerImpl getJmxServer(boolean attemptRestart)
+	{
+		if (((jmxServer == null) || jmxServer.isStopped()) && attemptRestart)
 		{
 			try
 			{
