@@ -20,7 +20,7 @@ package org.jppf.server.scheduler.bundle;
 import java.io.Serializable;
 
 /**
- * This interface defines the set of parameters used by the auto-compute algorithm.
+ * This interface defines the set of parameters used by a load-balancing algorithm.
  * @author Domingos Creado
  * @author Laurent Cohen
  */
@@ -28,7 +28,7 @@ public interface LoadBalancingProfile extends Serializable
 {
 	/**
 	 * Make a copy of this profile.
-	 * @return a newly created <code>AutoTuneProfile</code> instance.
+	 * @return a newly created <code>LoadBalancingProfile</code> instance.
 	 */
 	LoadBalancingProfile copy();
 }

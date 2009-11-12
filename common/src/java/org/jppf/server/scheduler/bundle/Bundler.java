@@ -20,11 +20,9 @@ package org.jppf.server.scheduler.bundle;
 
 /**
  * This is the interface of all strategies for defining bundle task size.
- * A Bundler define the current bundle size using different ways, 
- * can it be fixed or auto-tunned.
- * 
+ * A Bundler defines the current bundle size using different algorithms, depending on the implementation.
  * @author Domingos Creado
- * @author Laurent COhen
+ * @author Laurent Cohen
  */
 public interface Bundler
 {
@@ -35,13 +33,13 @@ public interface Bundler
 	int getBundleSize();
 	
 	/**
-	 * feedback the bundler with the result of using the bundle
-	 * with the specified size.
-	 * 
-	 * @param bundleSize the bundle size used
-	 * @param totalTime the total time considering the transmission and execution.
+	 * Feedback the bundler with the result of using the bundle with the specified size.
+	 * The feedback data consists in providing a number of tasks that were executed, and their total execution time in milliseconds.
+	 * The execution time includes the network round trip between node and server.
+	 * @param nbTasks number of tasks that were executed.
+	 * @param totalTime the total execution and transport time.
 	 */
-	void feedback(int bundleSize, double totalTime) ;
+	void feedback(int nbTasks, double totalTime);
 
 	/**
 	 * Make a copy of this bundler.
@@ -58,12 +56,6 @@ public interface Bundler
 	long getTimestamp();
 
 	/**
-	 * Get the  override indicator.
-	 * @return true if the settings were overriden by the node, false otherwise.
-	 */
-	boolean isOverriden();
-
-	/**
 	 * Release the resources used by this bundler.
 	 */
 	void dispose();
@@ -72,6 +64,7 @@ public interface Bundler
 	 * Perform context-independant initializations.
 	 */
 	void setup();
+
 	/**
 	 * Get the parameters profile used by this load-balancer.
 	 * @return an instance of <code>LoadBalancingProfile</code>.

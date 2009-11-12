@@ -60,12 +60,11 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
-	 * @param profile the parameters of the laod-balancing algorithm,
-	 * @param overriden true if the settings were overriden by the node, false otherwise.
+	 * @param profile the parameters of the load-balancing algorithm,
 	 */
-	public AbstractProportionalBundler(LoadBalancingProfile profile, boolean overriden)
+	public AbstractProportionalBundler(LoadBalancingProfile profile)
 	{
-		super(profile, overriden);
+		super(profile);
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		int bundleSize = 1;
 		if (bundleSize < 1) bundleSize = 1;

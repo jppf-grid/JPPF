@@ -57,14 +57,12 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	protected int prevBundleSize = 1;
 
 	/**
-	 * Creates a new instance with the initial size of bundle as the start size.
-	 * @param profile the parameters of the auto-tuning algorithm,
-	 * @param overriden true if the settings were overriden by the node, false otherwise.
-	 * grouped as a performance analysis profile.
+	 * Creates a new instance with the specified parameters profile.
+	 * @param profile the parameters of the algorithm grouped as a performance analysis profile.
 	 */
-	public AbstractRLBundler(LoadBalancingProfile profile, boolean overriden)
+	public AbstractRLBundler(LoadBalancingProfile profile)
 	{
-		super(profile, overriden);
+		super(profile);
 		log.info("Bundler#" + bundlerNumber + ": Using Reinforcement Learning bundle size");
 		log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize +
 			", performanceVariationThreshold = " + ((RLProfile) profile).getPerformanceVariationThreshold());

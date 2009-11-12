@@ -39,10 +39,6 @@ public abstract class AbstractBundler implements Bundler
 	 */
 	protected long timestamp = System.currentTimeMillis();
 	/**
-	 * The override indicator.
-	 */
-	protected boolean overriden = false;
-	/**
 	 * Parameters of the algorithm, grouped as a performance analysis profile.
 	 */
 	protected LoadBalancingProfile profile;
@@ -55,14 +51,12 @@ public abstract class AbstractBundler implements Bundler
 	}
 
 	/**
-	 * Creates a new instance with the specified parameters profile and overriden flag.
+	 * Creates a new instance with the specified parameters profile.
 	 * @param profile the parameters of the load-balancing algorithm,
-	 * @param overriden true if the settings were overriden by the node, false otherwise.
 	 */
-	public AbstractBundler(LoadBalancingProfile profile, boolean overriden)
+	public AbstractBundler(LoadBalancingProfile profile)
 	{
 		this.profile = profile;
-		this.overriden = overriden;
 	}
 
 	/**
@@ -99,25 +93,6 @@ public abstract class AbstractBundler implements Bundler
 	public long getTimestamp()
 	{
 		return timestamp;
-	}
-
-	/**
-	 * Get the  override indicator.
-	 * @return true if the settings were overriden by the node, false otherwise.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#isOverriden()
-	 */
-	public boolean isOverriden()
-	{
-		return overriden;
-	}
-
-	/**
-	 * Set the  override indicator.
-	 * @param override true if the settings were overriden by the node, false otherwise.
-	 */
-	public void setOverriden(boolean override)
-	{
-		this.overriden = override;
 	}
 
 	/**
