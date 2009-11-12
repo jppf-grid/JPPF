@@ -73,11 +73,10 @@
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 	    <classpath refid="project.classpath"/>
 	    <compilerarg line="-Xlint:unchecked"/>
-			<src path="${src.dir}/java"/>
-	    <src path="${src.dir}/resources"/>
+			<src path="${src.dir}"/>
 		</javac>
 		<copy todir="${classes.dir}">
-			<fileset dir="${src.dir}/resources">
+			<fileset dir="${src.dir}">
 				<exclude name="**/package.html"/>
 			</fileset>
 		</copy>
@@ -112,14 +111,14 @@
 			<packageset dir="${src.dir}/java"/>
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
 			<link href="http://www.jppf.org/api"/>
-			<doctitle><![CDATA[JPPF - Fractals Generation Sample]]></doctitle>
+			<doctitle><![CDATA[JPPF - DNA/Protein Sequence Alignment Sample]]></doctitle>
 			<header>
 				<![CDATA[
 					<table>
 					<tr>
 						<td valign="center">
 							<a href="http://www.jppf.org" target="_top">
-								<img src="http://jppf-project.sourceforge.net/images/logo2.gif" border="0"/>
+								<img src="http://www.jppf.org/images/logo2.gif" border="0"/>
 							</a>
 						</td>
 					</tr>
@@ -128,7 +127,7 @@
 			</header>
 			<bottom>
 				<![CDATA[
-					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2008 JPPF Team.</i></font>
+					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2009 JPPF Team.</i></font>
 				]]>
 			</bottom>
 		</javadoc>
