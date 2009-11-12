@@ -42,12 +42,12 @@
 	<!-- definition of application server-specific properties                      -->
 	<!-- the value is used to generate the names of the corresponding EAR and RAR  -->
 	<!-- ========================================================================= -->
-	<property name="was61"           value="WAS-6.1"/>
-	<property name="jboss40"         value="JBoss-4.0"/>
-	<property name="oracle10"        value="Oracle-10"/>
-	<property name="sunas90"         value="SunAS-9.0"/>
-	<property name="weblogic92"      value="Weblogic-9.2"/>
-	<property name="geronimo"        value="Geronimo"/>
+	<property name="was"           value="Websphere"/>
+	<property name="jboss"         value="JBoss"/>
+	<property name="oracle"        value="Oracle"/>
+	<property name="sunas"         value="Glassfish"/>
+	<property name="weblogic"      value="Weblogic"/>
+	<property name="geronimo"      value="Geronimo"/>
 
 	<!-- ========================================================================= -->
 	<!--                           Classpath definitions                           -->
@@ -178,23 +178,23 @@
 	<target name="ear.all" depends="compile,build.util.jar" description="generate the ear files">
 		<echo message="creating the EAR files..."/>
 		<antcall target="ear">
-			<param name="appserver" value="${jboss40}"/>
+			<param name="appserver" value="${jboss}"/>
 			<param name="include.client.classes" value="false"/>
 		</antcall>
 		<antcall target="ear">
-			<param name="appserver" value="${oracle10}"/>
+			<param name="appserver" value="${oracle}"/>
 			<param name="include.client.classes" value="false"/>
 		</antcall>
 		<antcall target="ear">
-			<param name="appserver" value="${sunas90}"/>
+			<param name="appserver" value="${sunas}"/>
 			<param name="include.client.classes" value="false"/>
 		</antcall>
 		<antcall target="ear">
-			<param name="appserver" value="${was61}"/>
+			<param name="appserver" value="${was}"/>
 			<param name="include.client.classes" value="false"/>
 		</antcall>
 		<antcall target="ear">
-			<param name="appserver" value="${weblogic92}"/>
+			<param name="appserver" value="${weblogic}"/>
 			<param name="include.client.classes" value="false"/>
 		</antcall>
 		<antcall target="ear">
@@ -282,11 +282,11 @@
 
 	<target name="rar.all" depends="compile" description="generate the ear files">
 		<echo message="creating the RAR files..."/>
-		<antcall target="rar"><param name="appserver" value="${jboss40}"/></antcall>
-		<antcall target="rar"><param name="appserver" value="${sunas90}"/></antcall>
-		<antcall target="rar"><param name="appserver" value="${was61}"/></antcall>
-		<antcall target="rar"><param name="appserver" value="${weblogic92}"/></antcall>
-		<antcall target="rar"><param name="appserver" value="${oracle10}"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${jboss}"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${sunas}"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${was}"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${weblogic}"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${oracle}"/></antcall>
 		<antcall target="rar"><param name="appserver" value="${geronimo}"/></antcall>
   	<!-- ***** add RAR generation for other application servers here ***** -->
   	<!-- ***** end of add other                                      ***** -->
@@ -337,27 +337,27 @@
 	<!--
 	-->
 	<target name="deploy.rar.jboss">
-		<copy todir="C:/Tools/jboss-4.2.2.GA/server/jppf/deploy" file="${build.dir}/jppf_ra_${jboss40}.rar"/>
+		<copy todir="C:/Tools/jboss-4.2.2.GA/server/jppf/deploy" file="${build.dir}/jppf_ra_${jboss}.rar"/>
 	</target>
 
 	<target name="deploy.ear.jboss">
-		<copy todir="C:/Tools/jboss-4.2.2.GA/server/jppf/deploy" file="${build.dir}/${ear.prefix}_${jboss40}.ear"/>
+		<copy todir="C:/Tools/jboss-4.2.2.GA/server/jppf/deploy" file="${build.dir}/${ear.prefix}_${jboss}.ear"/>
 	</target>
 
 	<target name="deploy.rar.weblogic">
-		<copy todir="C:/bea/user_projects/domains/jppf_domain/autodeploy" file="${build.dir}/jppf_ra_${weblogic92}.rar"/>
+		<copy todir="C:/bea/user_projects/domains/jppf_domain/autodeploy" file="${build.dir}/jppf_ra_${weblogic}.rar"/>
 	</target>
 
 	<target name="deploy.ear.weblogic">
-		<copy todir="C:/bea/user_projects/domains/jppf_domain/autodeploy" file="${build.dir}/${ear.prefix}_${weblogic92}.ear"/>
+		<copy todir="C:/bea/user_projects/domains/jppf_domain/autodeploy" file="${build.dir}/${ear.prefix}_${weblogic}.ear"/>
 	</target>
 
 	<target name="deploy.rar.sunas">
-		<copy todir="C:/Tools/Sun/AppServer/domains/domain1/autodeploy" file="${build.dir}/jppf_ra_${sunas90}.rar"/>
+		<copy todir="C:/Tools/Sun/AppServer/domains/domain1/autodeploy" file="${build.dir}/jppf_ra_${sunas}.rar"/>
 	</target>
 
 	<target name="deploy.ear.sunsas">
-		<copy todir="C:/Tools/Sun/AppServer/domains/domain1/autodeploy" file="${build.dir}/${ear.prefix}_${sunas90}.ear"/>
+		<copy todir="C:/Tools/Sun/AppServer/domains/domain1/autodeploy" file="${build.dir}/${ear.prefix}_${sunas}.ear"/>
 	</target>
 
 </project> 
