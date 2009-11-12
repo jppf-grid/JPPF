@@ -37,19 +37,16 @@ public class GSObjectSerializer extends ObjectSerializerImpl
 	}
 
 	/**
-	 * Read an object from an array of bytes.
-	 * @param bytes buffer holding the array of bytes to deserialize from.
-	 * @param offset position at which to start reading the bytes from.
-	 * @param length the number of bytes to read.
+	 * Read an object from an input stream.
+	 * @param is - the input stream to deserialize from.
 	 * @return the object that was deserialized from the array of bytes.
 	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
-	 * @see org.jppf.utils.ObjectSerializerImpl#deserialize(byte[], int, int)
+	 * @see org.jppf.utils.ObjectSerializer#deserialize(java.io.InputStream)
 	 */
-	public Object deserialize(byte[] bytes, int offset, int length) throws Exception
+	public Object deserialize(InputStream is) throws Exception
 	{
 		Object o = null;
-		ByteArrayInputStream bis = new ByteArrayInputStream(bytes, offset, length);
-		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(bis);
+		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
 		o = ois.readObject();
 		ois.close();
 		return o;
