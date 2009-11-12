@@ -28,8 +28,16 @@ import org.jppf.utils.NetworkUtils;
  * the JMX server of a node.
  * @author Laurent Cohen
  */
-public class NodeManagementInfo implements Serializable, Comparable<NodeManagementInfo>
+public class JPPFManagementInfo implements Serializable, Comparable<JPPFManagementInfo>
 {
+	/**
+	 * DRIVER information type.
+	 */
+	public static final int DRIVER = 0;
+	/**
+	 * Node information type. 
+	 */
+	public static final int NODE = 1;
 	/**
 	 * The host on which the node is running.
 	 */
@@ -43,21 +51,38 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 	 */
 	private String id = null;
 	/**
+	 * The type of component this info is for, must be one of {@link #NODE NODE} or {@link #DRIVER DRIVER}.
+	 */
+	private int type = NODE;
+	/**
 	 * The system information associated with the node at the time of the initial connection.
 	 */
 	private transient JPPFSystemInformation systemInfo = null;
 
 	/**
-	 * Initialize this information with the specified parameters.
+	 * Initialize this information with the specified parameters, using {@link #NODE NODE} as type.
 	 * @param host the host on which the node is running.
-	 * @param port he port on which the node's JMX server is listening.
+	 * @param port the port on which the node's JMX server is listening.
 	 * @param id unique id for the node's mbean server.
 	 */
-	public NodeManagementInfo(String host, int port, String id)
+	public JPPFManagementInfo(String host, int port, String id)
+	{
+		this(host, port, id, NODE);
+	}
+
+	/**
+	 * Initialize this information with the specified parameters.
+	 * @param host the host on which the node is running.
+	 * @param port the port on which the node's JMX server is listening.
+	 * @param id unique id for the node's mbean server.
+	 * @param type the type of component this info is for, must be one of {@link #NODE NODE} or {@link #DRIVER DRIVER}.
+	 */
+	public JPPFManagementInfo(String host, int port, String id, int type)
 	{
 		this.host = NetworkUtils.getHostName(host);
 		this.port = port;
 		this.id = id;
+		this.type = type;
 	}
 
 	/**
@@ -99,7 +124,7 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 		if (this == obj) return true;
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
-		final NodeManagementInfo other = (NodeManagementInfo) obj;
+		final JPPFManagementInfo other = (JPPFManagementInfo) obj;
 		if (other.id == null) return id == null;
 		return (id == null) ? false : id.equals(other.id);
 	}
@@ -110,7 +135,7 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 	 * @return a negative number if this object is less than the other, 0 if they are equal, a positive number otherwise.
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(NodeManagementInfo o)
+	public int compareTo(JPPFManagementInfo o)
 	{
 		if (o == null) return 1;
 		if (this.equals(o)) return 0;
@@ -155,5 +180,14 @@ public class NodeManagementInfo implements Serializable, Comparable<NodeManageme
 	public String getId()
 	{
 		return id;
+	}
+
+	/**
+	 * Get the type of component this info is for.
+	 * @return one of {@link #NODE NODE} or {@link #DRIVER DRIVER}.
+	 */
+	public int getType()
+	{
+		return type;
 	}
 }
