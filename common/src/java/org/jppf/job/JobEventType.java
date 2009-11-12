@@ -33,11 +33,11 @@ public enum JobEventType
 	 */
 	JOB_ENDED,
 	/**
-	 * A part of all of a job was dispatched to a node.
+	 * A sub-job was dispatched to a node.
 	 */
 	JOB_DISPATCHED,
 	/**
-	 * A new job was sent back to the client.
+	 * A sub-job returned from a node.
 	 */
 	JOB_RETURNED,
 	/**

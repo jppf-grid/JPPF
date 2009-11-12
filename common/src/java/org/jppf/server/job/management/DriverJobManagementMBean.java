@@ -24,7 +24,7 @@ import org.jppf.job.JobInformation;
 
 
 /**
- * A sample MBean interface.
+ * This is the job management MBean interface.
  * @author Laurent Cohen
  */
 public interface DriverJobManagementMBean extends NotificationEmitter
@@ -50,7 +50,7 @@ public interface DriverJobManagementMBean extends NotificationEmitter
 	 */
 	void resumeJob(String jobId) throws Exception;
 	/**
-	 * Update the maximum number of nodes a node can run on.
+	 * Update the maximum number of nodes a job can run on.
 	 * @param jobId the id of the job to update.
 	 * @param maxNodes the new maximum number of nodes for the job.
 	 * @throws Exception if any error occurs.

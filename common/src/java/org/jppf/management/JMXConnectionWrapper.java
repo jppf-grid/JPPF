@@ -89,9 +89,9 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 
 	/**
 	 * Initialize the connection to the remote MBean server.
-	 * @param host - the host the server is running on.
-	 * @param port - the RMI port used by the server.
-	 * @param rmiSuffix	- RMI registry namespace suffix. 
+	 * @param host the host the server is running on.
+	 * @param port the RMI port used by the server.
+	 * @param rmiSuffix	RMI registry namespace suffix. 
 	 */
 	public JMXConnectionWrapper(String host, int port, String rmiSuffix)
 	{
@@ -169,10 +169,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 
 	/**
 	 * Invoke a method on the specified MBean.
-	 * @param name - the name of the MBean.
-	 * @param methodName - the name of the method to invoke.
-	 * @param params - the method parameter values.
-	 * @param signature - the types of the method parameters.
+	 * @param name the name of the MBean.
+	 * @param methodName the name of the method to invoke.
+	 * @param params the method parameter values.
+	 * @param signature the types of the method parameters.
 	 * @return an object or null.
 	 * @throws Exception if the invocation failed.
 	 */

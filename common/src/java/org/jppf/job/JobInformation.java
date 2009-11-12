@@ -29,19 +29,19 @@ import java.io.Serializable;
 public class JobInformation implements Serializable
 {
 	/**
-	 * The unique identifier for this task bundle.
+	 * The unique identifier for the job.
 	 */
 	private String jobId = null;
 	/**
-	 * The number of tasks in this bundle.
+	 * The current number of tasks in the job.
 	 */
 	private int taskCount = 0;
 	/**
-	 * The initial number of tasks in this job.
+	 * The initial number of tasks in the job.
 	 */
 	private int initialTaskCount = 0;
 	/**
-	 * The priority of this task bundle.
+	 * The priority of this job.
 	 */
 	private int priority = 0;
 	/**
@@ -84,7 +84,7 @@ public class JobInformation implements Serializable
 	}
 
 	/**
-	 * Get the unique identifier for this task bundle.
+	 * Get the unique identifier for the job.
 	 * @return the uuid as a string.
 	 */
 	public String getJobId()
@@ -93,7 +93,7 @@ public class JobInformation implements Serializable
 	}
 
 	/**
-	 * Set the unique identifier for this task bundle.
+	 * Set the unique identifier for the job.
 	 * @param uuid the uuid as a string.
 	 */
 	public void setJobId(String uuid)
@@ -102,7 +102,7 @@ public class JobInformation implements Serializable
 	}
 
 	/**
-	 * Get the current number of tasks in this bundle.
+	 * Get the current number of tasks in the job.
 	 * @return the number of tasks as an int.
 	 */
 	public int getTaskCount()
@@ -111,7 +111,7 @@ public class JobInformation implements Serializable
 	}
 
 	/**
-	 * Set the number of tasks in this bundle.
+	 * Set the current number of tasks in the job.
 	 * @param taskCount the number of tasks as an int.
 	 */
 	public void setTaskCount(int taskCount)
@@ -120,7 +120,7 @@ public class JobInformation implements Serializable
 	}
 
 	/**
-	 * Get the priority of this task bundle.
+	 * Get the priority of the job.
 	 * @return the priority as an int.
 	 */
 	public int getPriority()
@@ -129,7 +129,7 @@ public class JobInformation implements Serializable
 	}
 
 	/**
-	 * Set the priority of this task bundle.
+	 * Set the priority of the job.
 	 * @param priority the priority as an int. 
 	 */
 	public void setPriority(int priority)
@@ -147,8 +147,8 @@ public class JobInformation implements Serializable
 	}
 
 	/**
-	 * Set the initial task count of this bundle.
-	 * @param initialTaskCount - the task count as an int.
+	 * Set the initial task count of the job.
+	 * @param initialTaskCount the task count as an int.
 	 */
 	public void setInitialTaskCount(int initialTaskCount)
 	{
@@ -166,7 +166,7 @@ public class JobInformation implements Serializable
 
 	/**
 	 * Specify whether the job is in suspended state.
-	 * @param suspended - true if the job is suspended, false otherwise.
+	 * @param suspended true if the job is suspended, false otherwise.
 	 */
 	public void setSuspended(boolean suspended)
 	{
@@ -184,7 +184,7 @@ public class JobInformation implements Serializable
 
 	/**
 	 * Get the maximum number of nodes this job can run on.
-	 * @param maxNodes - the number of nodes as an int value.
+	 * @param maxNodes the number of nodes as an int value.
 	 */
 	public void setMaxNodes(int maxNodes)
 	{
@@ -193,6 +193,7 @@ public class JobInformation implements Serializable
 
 	/**
 	 * Get the pending state of the job.
+	 * A job is pending if its scheduled execution date/time has not yet been reached.
 	 * @return determines whether the job is waiting to reach its scheduled execution date.
 	 */
 	public boolean isPending()

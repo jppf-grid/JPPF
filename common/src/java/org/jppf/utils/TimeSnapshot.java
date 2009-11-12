@@ -126,7 +126,7 @@ public class TimeSnapshot implements Serializable
 	}
 
 	/**
-	 * Set the most recent time.
+	 * Set the most recent time observed.
 	 * @param latestTime - the most recent time as a long value.
 	 */
 	public void setLatestTime(long latestTime)
@@ -135,7 +135,7 @@ public class TimeSnapshot implements Serializable
 	}
 
 	/**
-	 * Get the minimum time.
+	 * Get the minimum time observed.
 	 * @return the minimum time as a long value.
 	 */
 	public long getLatestTime()
@@ -144,7 +144,7 @@ public class TimeSnapshot implements Serializable
 	}
 
 	/**
-	 * Set the most recent time.
+	 * Set the smallest time observed.
 	 * @param minTime - the minimum time as a long value.
 	 */
 	public void setMinTime(long minTime)
@@ -153,7 +153,7 @@ public class TimeSnapshot implements Serializable
 	}
 
 	/**
-	 * Get the minimum time.
+	 * Get the smallest time observed.
 	 * @return the minimum time as a long value.
 	 */
 	public long getMinTime()
@@ -162,7 +162,7 @@ public class TimeSnapshot implements Serializable
 	}
 
 	/**
-	 * Set the maximum time.
+	 * Set the peak time.
 	 * @param maxTime - the maximum time as a long value.
 	 */
 	public void setMaxTime(long maxTime)
@@ -171,7 +171,7 @@ public class TimeSnapshot implements Serializable
 	}
 
 	/**
-	 * Get the maximum time.
+	 * Get the peak time.
 	 * @return the maximum time as a long value.
 	 */
 	public long getMaxTime()
