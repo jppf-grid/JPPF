@@ -59,7 +59,7 @@ public class JobData
 	/**
 	 * Information on the JPPF node in which part of a job is executing.
 	 */
-	private NodeManagementInfo nodeInformation = null;
+	private JPPFManagementInfo nodeInformation = null;
 	/**
 	 * Proxy to the job management mbean.
 	 */
@@ -104,7 +104,7 @@ public class JobData
 	 * @param jobInformation - information on the job in a JPPF driver.
 	 * @param nodeInformation - information on the JPPF node in which part of a job is executing.
 	 */
-	public JobData(JobInformation jobInformation, NodeManagementInfo nodeInformation)
+	public JobData(JobInformation jobInformation, JPPFManagementInfo nodeInformation)
 	{
 		this(JobDataType.SUB_JOB);
 		this.jobInformation = jobInformation;
@@ -151,7 +151,7 @@ public class JobData
 	 * Get the information on the JPPF node in which part of a job is executing.
 	 * @return a <code>NodeManagementInfo</code> instance.
 	 */
-	public NodeManagementInfo getNodeInformation()
+	public JPPFManagementInfo getNodeInformation()
 	{
 		return nodeInformation;
 	}

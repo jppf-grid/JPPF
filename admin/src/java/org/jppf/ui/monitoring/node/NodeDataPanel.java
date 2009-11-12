@@ -139,7 +139,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 			connection.addClientConnectionStatusListener(listener);
 			listenerMap.put(wrapper.getId(), listener);
 		}
-		Collection<NodeManagementInfo> nodes = null;
+		Collection<JPPFManagementInfo> nodes = null;
 		try
 		{
 			nodes = wrapper.nodesInformation();
@@ -149,7 +149,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 			if (debugEnabled) log.debug(e.getMessage(), e);
 			return;
 		}
-		if (nodes != null) for (NodeManagementInfo nodeInfo: nodes) nodeAdded(driverNode, nodeInfo);
+		if (nodes != null) for (JPPFManagementInfo nodeInfo: nodes) nodeAdded(driverNode, nodeInfo);
 		if (treeTable != null) treeTable.expand(driverNode);
 	}
 
@@ -179,7 +179,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * @param driverName - the name of the driver to which the node is added.
 	 * @param nodeInfo - the object that encapsulates the node addition.
 	 */
-	public synchronized void nodeAdded(String driverName, NodeManagementInfo nodeInfo)
+	public synchronized void nodeAdded(String driverName, JPPFManagementInfo nodeInfo)
 	{
 		final DefaultMutableTreeNode driverNode = findDriver(driverName);
 		if (driverNode == null) return;
@@ -191,7 +191,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * @param driverNode - the driver to which the node is added.
 	 * @param nodeInfo - the object that encapsulates the node addition.
 	 */
-	public synchronized void nodeAdded(DefaultMutableTreeNode driverNode, NodeManagementInfo nodeInfo)
+	public synchronized void nodeAdded(DefaultMutableTreeNode driverNode, JPPFManagementInfo nodeInfo)
 	{
 		String nodeName = nodeInfo.getHost() + ":" + nodeInfo.getPort();
 		if (findNode(driverNode, nodeName) != null) return;

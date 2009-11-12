@@ -21,7 +21,7 @@ package org.jppf.server.job.management;
 import java.io.Serializable;
 
 import org.jppf.job.JobInformation;
-import org.jppf.management.NodeManagementInfo;
+import org.jppf.management.JPPFManagementInfo;
 
 /**
  * Instances of this cass hold temporary information about a sub-job and the node it was dispatched to
@@ -32,7 +32,7 @@ public class NodeJobInformation implements Serializable
 	/**
 	 * The information about the node.
 	 */
-	public final NodeManagementInfo nodeInfo;
+	public final JPPFManagementInfo nodeInfo;
 	/**
 	 * The information about the sub-job.
 	 */
@@ -43,7 +43,7 @@ public class NodeJobInformation implements Serializable
 	 * @param nodeInfo - the information about the node.
 	 * @param jobInfo - the information about the sub-job.
 	 */
-	public NodeJobInformation(NodeManagementInfo nodeInfo, JobInformation jobInfo)
+	public NodeJobInformation(JPPFManagementInfo nodeInfo, JobInformation jobInfo)
 	{
 		this.nodeInfo = nodeInfo;
 		this.jobInfo = jobInfo;

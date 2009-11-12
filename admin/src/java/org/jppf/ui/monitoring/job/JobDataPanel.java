@@ -347,7 +347,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	 * @param jobInfo information about the sub-job.
 	 * @param nodeInfo information about the node where the sub-job was dispatched.
 	 */
-	public void subJobAdded(final String driverName, final JobInformation jobInfo, final NodeManagementInfo nodeInfo)
+	public void subJobAdded(final String driverName, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo)
 	{
 		Runnable r = new SynchronizedTask(this)
 		{
@@ -373,7 +373,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	 * @param jobInfo information about the job.
 	 * @param nodeInfo information about the node where the sub-job was dispatched.
 	 */
-	public void subJobRemoved(final String driverName, final JobInformation jobInfo, final NodeManagementInfo nodeInfo)
+	public void subJobRemoved(final String driverName, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo)
 	{
 		Runnable r = new SynchronizedTask(this)
 		{
@@ -433,7 +433,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	 * @param nodeInfo holds information on the node to which the sub-job was dispatched.
 	 * @return a <code>DefaultMutableTreeNode</code> or null if the sub-job could not be found.
 	 */
-	private DefaultMutableTreeNode findSubJob(DefaultMutableTreeNode jobNode, NodeManagementInfo nodeInfo)
+	private DefaultMutableTreeNode findSubJob(DefaultMutableTreeNode jobNode, JPPFManagementInfo nodeInfo)
 	{
 		if (nodeInfo == null) return null;
 		for (int i=0; i<jobNode.getChildCount(); i++)

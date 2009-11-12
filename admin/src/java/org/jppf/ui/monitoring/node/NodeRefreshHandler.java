@@ -129,7 +129,7 @@ public class NodeRefreshHandler
 		TopologyData data = (TopologyData) driverNode.getUserObject();
 		JMXDriverConnectionWrapper wrapper = (JMXDriverConnectionWrapper) data.getJmxWrapper();
 		if (!wrapper.isConnected()) return;
-		Collection<NodeManagementInfo> nodesInfo = null;
+		Collection<JPPFManagementInfo> nodesInfo = null;
 		try
 		{
 			nodesInfo = wrapper.nodesInformation();
@@ -140,8 +140,8 @@ public class NodeRefreshHandler
 			return;
 		}
 		if (nodesInfo == null) return;
-		Map<String, NodeManagementInfo> actualMap = new HashMap<String, NodeManagementInfo>();
-		for (NodeManagementInfo info: nodesInfo) actualMap.put(NetworkUtils.getHostName(info.getHost()) + ":" + info.getPort(), info);
+		Map<String, JPPFManagementInfo> actualMap = new HashMap<String, JPPFManagementInfo>();
+		for (JPPFManagementInfo info: nodesInfo) actualMap.put(NetworkUtils.getHostName(info.getHost()) + ":" + info.getPort(), info);
 		List<String> nodesToProcess = new ArrayList<String>();
 		for (String name: panelNames)
 		{

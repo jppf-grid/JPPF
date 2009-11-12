@@ -52,7 +52,7 @@ public class TopologyData
 	/**
 	 * Information on the JPPF node .
 	 */
-	private NodeManagementInfo nodeInformation = null;
+	private JPPFManagementInfo nodeInformation = null;
 	/**
 	 * Object describing the current state of a node.
 	 */
@@ -82,7 +82,7 @@ public class TopologyData
 	 * Initialize this topology data as holding information about a node.
 	 * @param nodeInformation - information on the JPPF node.
 	 */
-	public TopologyData(NodeManagementInfo nodeInformation)
+	public TopologyData(JPPFManagementInfo nodeInformation)
 	{
 		this(TopologyDataType.NODE);
 		this.nodeInformation = nodeInformation;
@@ -113,7 +113,7 @@ public class TopologyData
 	 * Get the information on a JPPF node.
 	 * @return a <code>NodeManagementInfo</code> instance.
 	 */
-	public NodeManagementInfo getNodeInformation()
+	public JPPFManagementInfo getNodeInformation()
 	{
 		return nodeInformation;
 	}

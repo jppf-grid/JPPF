@@ -20,7 +20,7 @@ package org.jppf.job;
 
 import javax.management.Notification;
 
-import org.jppf.management.NodeManagementInfo;
+import org.jppf.management.JPPFManagementInfo;
 
 /**
  * Instances of this class represent events emitted by a JPPFJobManager.
@@ -31,7 +31,7 @@ public class JobNotification extends Notification
 	/**
 	 * Information about a node.
 	 */
-	private NodeManagementInfo nodeInfo = null;
+	private JPPFManagementInfo nodeInfo = null;
 	/**
 	 * Creation timestamp for this event.
 	 */
@@ -48,7 +48,7 @@ public class JobNotification extends Notification
 	 * @param nodeInfo - information about the node.
 	 * @param timestamp - the creation timestamp for this event.
 	 */
-	public JobNotification(JobEventType eventType, JobInformation jobInfo, NodeManagementInfo nodeInfo, long timestamp)
+	public JobNotification(JobEventType eventType, JobInformation jobInfo, JPPFManagementInfo nodeInfo, long timestamp)
 	{
 		super("jobEvent", jobInfo, timestamp);
 		this.eventType = eventType;
@@ -69,7 +69,7 @@ public class JobNotification extends Notification
 	 * Get the information about the node.
 	 * @return a <code>NodeManagementInfo</code> instance.
 	 */
-	public NodeManagementInfo getNodeInfo()
+	public JPPFManagementInfo getNodeInfo()
 	{
 		return nodeInfo;
 	}

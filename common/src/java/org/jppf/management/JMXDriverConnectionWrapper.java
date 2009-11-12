@@ -20,12 +20,15 @@ package org.jppf.management;
 
 import java.util.*;
 
+import org.jppf.job.JobInformation;
 import org.jppf.server.JPPFStats;
+import org.jppf.server.job.management.NodeJobInformation;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 
 /**
  * Node-specific connection wrapper, implementing a user-friendly interface for the monitoring
- * and management of the node.
+ * and management of the node. Note that this class implements all the methods in the interface
+ * {@link org.jppf.server.job.management.DriverJobManagementMBean DriverJobManagementMBean}, without implementing the interface itself.
  * @author Laurent Cohen
  */
 public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements JPPFDriverAdminMBean
@@ -60,9 +63,9 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#nodesInformation()
 	 */
-	public Collection<NodeManagementInfo> nodesInformation() throws Exception
+	public Collection<JPPFManagementInfo> nodesInformation() throws Exception
 	{
-		return (Collection<NodeManagementInfo>) invoke(DRIVER_MBEAN_NAME, "nodesInformation", (Object[]) null, (String[]) null);
+		return (Collection<JPPFManagementInfo>) invoke(DRIVER_MBEAN_NAME, "nodesInformation", (Object[]) null, (String[]) null);
 	}
 
 	/**
@@ -160,5 +163,40 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	public void updateMaxNodes(String jobId, Integer maxNodes) throws Exception
 	{
 		invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "updateMaxNodes", new Object[] { jobId, maxNodes }, new String[] { "java.lang.String", "java.lang.Integer" }); 
+	}
+
+	/**
+	 * Get the set of ids for all the jobs currently queued or executing.
+	 * @return an array of ids as strings.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getAllJobIds()
+	 */
+	public String[] getAllJobIds() throws Exception
+	{
+		return (String[]) invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "getAllJobIds", (Object[]) null, (String[]) null);
+	}
+
+	/**
+	 * Get an object describing the job with the specified id. 
+	 * @param jobId the id of the job to get information about.
+	 * @return an instance of <code>JobInformation</code>.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getJobInformation(java.lang.String)
+	 */
+	public JobInformation getJobInformation(String jobId) throws Exception
+	{
+		return (JobInformation) invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "getJobInformation", new Object[] { jobId }, new String[] { "java.lang.String" });
+	}
+
+	/**
+	 * Get a list of objects describing the nodes to which the whole or part of a job was dispatched.
+	 * @param jobId the id of the job for which to find node information.
+	 * @return an array of <code>NodeManagementInfo</code>, <code>JobInformation</code> instances.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getNodeInformation(java.lang.String)
+	 */
+	public NodeJobInformation[] getNodeInformation(String jobId) throws Exception
+	{
+		return (NodeJobInformation[]) invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "getNodeInformation", new Object[] { jobId }, new String[] { "java.lang.String" });
 	}
 }

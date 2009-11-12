@@ -40,7 +40,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
 	 * @return a collection of <code>NodeManagementInfo</code> instances.
 	 * @throws Exception if any error occurs.
 	 */
-	Collection<NodeManagementInfo> nodesInformation() throws Exception;
+	Collection<JPPFManagementInfo> nodesInformation() throws Exception;
 	/**
 	 * Perform a shutdown or restart of the server.
 	 * @param shutdownDelay - the delay before shutting down the server, once the command is received. 
