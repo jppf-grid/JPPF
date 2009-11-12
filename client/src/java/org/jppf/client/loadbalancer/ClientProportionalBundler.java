@@ -48,7 +48,7 @@ public class ClientProportionalBundler extends AbstractProportionalBundler
 	 */
 	public ClientProportionalBundler(LoadBalancingProfile profile)
 	{
-		super(profile, false);
+		super(profile);
 	}
 
 	/**
