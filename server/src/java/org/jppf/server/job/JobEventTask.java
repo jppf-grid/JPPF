@@ -21,7 +21,7 @@ import java.nio.channels.SelectableChannel;
 import java.util.List;
 
 import org.jppf.job.*;
-import org.jppf.management.NodeManagementInfo;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 
@@ -82,7 +82,7 @@ public class JobEventTask implements Runnable
 		JobInformation jobInfo = new JobInformation((String) bundle.getParameter(BundleParameter.JOB_ID), bundle.getTaskCount(),
 			bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
 		jobInfo.setMaxNodes(sla.getMaxNodes());
-		NodeManagementInfo nodeInfo = (channel == null) ? null : JPPFDriver.getInstance().getNodeInformation(channel);
+		JPPFManagementInfo nodeInfo = (channel == null) ? null : JPPFDriver.getInstance().getNodeInformation(channel);
 		JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);
 		List<JobListener> listeners = jobManager.getListeners();
 		synchronized(listeners)

@@ -91,7 +91,7 @@ public class JPPFDriver
 	/**
 	 * A list of objects containing the information required to connect to the nodes JMX servers.
 	 */
-	private Map<SelectableChannel, NodeManagementInfo> nodeInfo = new HashMap<SelectableChannel, NodeManagementInfo>();
+	private Map<SelectableChannel, JPPFManagementInfo> nodeInfo = new HashMap<SelectableChannel, JPPFManagementInfo>();
 	/**
 	 * The thread that performs the peer servers discovery.
 	 */
@@ -414,7 +414,7 @@ public class JPPFDriver
 	 * @param channel a <code>SocketChannel</code> instance.
 	 * @param info a <code>JPPFNodeManagementInformation</code> instance.
 	 */
-	public void addNodeInformation(SelectableChannel channel, NodeManagementInfo info)
+	public void addNodeInformation(SelectableChannel channel, JPPFManagementInfo info)
 	{
 		synchronized (nodeInfo)
 		{
@@ -438,7 +438,7 @@ public class JPPFDriver
 	 * Remove a node information object from the map of node information.
 	 * @return channel a <code>SocketChannel</code> instance.
 	 */
-	public Map<SelectableChannel, NodeManagementInfo> getNodeInformationMap()
+	public Map<SelectableChannel, JPPFManagementInfo> getNodeInformationMap()
 	{
 		synchronized (nodeInfo)
 		{
@@ -451,7 +451,7 @@ public class JPPFDriver
 	 * @param channel the node for which ot get the information.
 	 * @return a <code>NodeManagementInfo</code> instance, or null if no informaiton is recorded for the node.
 	 */
-	public NodeManagementInfo getNodeInformation(SelectableChannel channel)
+	public JPPFManagementInfo getNodeInformation(SelectableChannel channel)
 	{
 		synchronized (nodeInfo)
 		{

@@ -141,7 +141,7 @@ public class TaskQueueChecker implements Runnable
 			if (uuidPath.contains(context.getNodeUuid())) continue;
 			if (rule != null)
 			{
-				NodeManagementInfo mgtInfo = JPPFDriver.getInstance().getNodeInformation(ch);
+				JPPFManagementInfo mgtInfo = JPPFDriver.getInstance().getNodeInformation(ch);
 				JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
 				if (!rule.accepts(info)) continue;
 			}

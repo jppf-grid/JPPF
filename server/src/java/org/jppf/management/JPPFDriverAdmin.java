@@ -51,11 +51,11 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @return a collection of <code>NodeManagementInfo</code> instances.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#nodesInformation()
 	 */
-	public Collection<NodeManagementInfo> nodesInformation()
+	public Collection<JPPFManagementInfo> nodesInformation()
 	{
 		try
 		{
-			List<NodeManagementInfo> list = new ArrayList<NodeManagementInfo>();
+			List<JPPFManagementInfo> list = new ArrayList<JPPFManagementInfo>();
 			list.addAll(JPPFDriver.getInstance().getNodeInformationMap().values());
 			return list;
 		}

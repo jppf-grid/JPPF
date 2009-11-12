@@ -76,8 +76,7 @@ public class WaitInitialBundleState extends NodeServerState
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			context.setUuid(bundle.getBundleUuid());
 			context.setNodeUuid((String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM));
-			boolean override = bundle.getParameter(BundleParameter.BUNDLE_TUNING_TYPE_PARAM) != null;
-			Bundler bundler = createBundler(bundle);
+			Bundler bundler = server.getBundler().copy();
 			bundler.setup();
 			context.setBundler(bundler);
 			Boolean b = (Boolean) bundle.getParameter(BundleParameter.IS_PEER);
@@ -90,7 +89,7 @@ public class WaitInitialBundleState extends NodeServerState
 				{
 					String host = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM);
 					int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM);
-					NodeManagementInfo info = new NodeManagementInfo(host, port, id);
+					JPPFManagementInfo info = new JPPFManagementInfo(host, port, id);
 					JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
 					if (systemInfo != null) info.setSystemInfo(systemInfo);
 					JPPFDriver.getInstance().addNodeInformation(channel, info);
@@ -103,23 +102,5 @@ public class WaitInitialBundleState extends NodeServerState
 			return TO_IDLE;
 		}
 		return TO_WAIT_INITIAL;
-	}
-
-	/**
-	 * Crete a bundler based on the override parameters.
-	 * @param bundle the bundle from which to extract the parameters.
-	 * @return a <code>Bundler</code> instance.
-	 * @throws Exception if any error occurs.
-	 */
-	private Bundler createBundler(JPPFTaskBundle bundle) throws Exception
-	{
-		Bundler bundler = null;
-		TypedProperties props = (TypedProperties) bundle.getParametersMap().get("bundle.tuning.parameters");
-		if (props != null)
-		{
-			bundler = server.getBundlerFactory().createBundler(props.getString("algorithm"), props);
-		}
-		else bundler = server.getBundler().copy();
-		return bundler;
 	}
 }

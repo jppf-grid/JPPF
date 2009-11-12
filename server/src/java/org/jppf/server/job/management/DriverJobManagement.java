@@ -25,7 +25,7 @@ import javax.management.NotificationBroadcasterSupport;
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
 import org.jppf.job.*;
-import org.jppf.management.NodeManagementInfo;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.*;
 import org.jppf.server.protocol.*;
@@ -177,7 +177,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		NodeJobInformation[] result = new NodeJobInformation[nodes.size()];
 		for (int i=0; i<nodes.size(); i++)
 		{
-			NodeManagementInfo nodeInfo = getDriver().getNodeInformation(nodes.get(i).first());
+			JPPFManagementInfo nodeInfo = getDriver().getNodeInformation(nodes.get(i).first());
 			JPPFTaskBundle bundle = nodes.get(i).second().getBundle();
 			Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
 			JobInformation jobInfo = new JobInformation(jobId, bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getJobSLA().getPriority(),
