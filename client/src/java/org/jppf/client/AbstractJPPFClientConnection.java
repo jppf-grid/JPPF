@@ -225,11 +225,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		socketClient.sendBytes(wrappedData(header, ser));
 		socketClient.sendBytes(wrappedData(job.getDataProvider(), ser));
 		for (JPPFTask task : job.getTasks()) socketClient.sendBytes(wrappedData(task, ser));
-		/*
-		socketClient.sendBytes(ser.serialize(header));
-		socketClient.sendBytes(ser.serialize(job.getDataProvider()));
-		for (JPPFTask task : job.getTasks()) socketClient.sendBytes(ser.serialize(task));
-		*/
 		socketClient.flush();
 	}
 
@@ -261,19 +256,12 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		{
 			SocketWrapper socketClient = taskServerConnection.getSocketClient();
 			ObjectSerializer ser = makeHelper().getSerializer();
-			/*
-			byte[] data = socketClient.receiveBytes(0).getBuffer();
-			JPPFTaskBundle bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
-			*/
+			System.out.println("AbstractJPPFClientConnection.receiveResults() : ser = " + ser);
 			JPPFTaskBundle bundle = (JPPFTaskBundle) unwrappedData(socketClient.receiveBytes(0), ser);
 			int count = bundle.getTaskCount();
 			List<JPPFTask> taskList = new ArrayList<JPPFTask>();
 			for (int i=0; i<count; i++)
 			{
-				/*
-				data = socketClient.receiveBytes(0).getBuffer();
-				taskList.add((JPPFTask) helper.getSerializer().deserialize(data));
-				*/
 				taskList.add((JPPFTask) unwrappedData(socketClient.receiveBytes(0), ser));
 			}
 	
@@ -327,13 +315,25 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	protected SerializationHelper makeHelper() throws Exception
 	{
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		return makeHelper(null);
+	}
+
+	/**
+	 * Instantiate a <code>SerializationHelper</code> using the current context class loader.
+	 * @param cl the class loader to usew to load the seriaization helper class.
+	 * @return a <code>SerializationHelper</code> instance.
+	 * @throws Exception if the serialiozation helper could not be instantiated.
+	 */
+	protected SerializationHelper makeHelper(ClassLoader cl) throws Exception
+	{
+		if (cl == null) cl = Thread.currentThread().getContextClassLoader();
+		String helperClassName = getSerializationHelperClassName();
 		Class clazz = null;
 		if (cl != null)
 		{
 			try
 			{
-				clazz = cl.loadClass(getSerializationHelperClassName());
+				clazz = cl.loadClass(helperClassName);
 			}
 			catch(ClassNotFoundException e)
 			{
@@ -343,9 +343,10 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		if (clazz == null)
 		{
 			cl = this.getClass().getClassLoader();
-			clazz = cl.loadClass(getSerializationHelperClassName());
+			clazz = cl.loadClass(helperClassName);
 		}
 		SerializationHelper helper = (SerializationHelper) clazz.newInstance();
+		
 		return helper;
 	}
 
