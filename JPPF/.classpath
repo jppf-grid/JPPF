@@ -15,7 +15,6 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/ApacheCommons/commons-logging-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/MigLayout/miglayout-3.7-swing.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/Groovy/groovy-all-1.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/J2EE/geronimo-j2ee-connector_1.5_spec-2.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/JFreeChart/jcommon-1.0.15.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/JFreeChart/jfreechart-1.0.12.jar"/>
@@ -23,5 +22,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/JUnit/junit-3.8.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j/log4j-1.2.15.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/JGoodies/looks-2.2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/Groovy/groovy-all-1.6.5.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
