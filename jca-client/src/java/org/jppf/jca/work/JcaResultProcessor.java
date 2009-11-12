@@ -145,7 +145,6 @@ public class JcaResultProcessor implements Work
 				oldCl = Thread.currentThread().getContextClassLoader();
 				Thread.currentThread().setContextClassLoader(cl);
 			}
-			//log.debug("submitting with policy = " + execution.policy);
 			connection.sendTasks(cl, bundle, job);
 			while (count < job.getTasks().size())
 			{
