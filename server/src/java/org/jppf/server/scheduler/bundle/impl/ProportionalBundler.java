@@ -45,15 +45,14 @@ public class ProportionalBundler extends AbstractProportionalBundler
 	 * Determines whether debugging level is set for logging.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
-	 * @param profile the parameters of the auto-tuning algorithm,
-	 * @param override true if the settings were overriden by the node, false otherwise.
-	 * grouped as a performance analysis profile.
+	 * @param profile the parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
 	 */
-	public ProportionalBundler(LoadBalancingProfile profile, boolean override)
+	public ProportionalBundler(LoadBalancingProfile profile)
 	{
-		super(profile, override);
+		super(profile);
 	}
 
 	/**
@@ -63,7 +62,7 @@ public class ProportionalBundler extends AbstractProportionalBundler
 	 */
 	public Bundler copy()
 	{
-		return new ProportionalBundler((ProportionalTuneProfile) profile, overriden);
+		return new ProportionalBundler((ProportionalTuneProfile) profile);
 	}
 
 	/**

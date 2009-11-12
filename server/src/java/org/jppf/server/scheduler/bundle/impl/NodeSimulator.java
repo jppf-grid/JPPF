@@ -235,13 +235,13 @@ public class NodeSimulator
 
 		/**
 		 * Creates a new instance with the initial size of bundle as the start size.
-		 * @param profile - the parameters of the auto-tuning algorithm.
-		 * @param maximumSize - the maximum bundle size.
+		 * @param profile the parameters of the auto-tuning algorithm.
+		 * @param maximumSize the maximum bundle size.
 		 * grouped as a performance analysis profile.
 		 */
 		public SimulatedProportionalBundler(LoadBalancingProfile profile, int maximumSize)
 		{
-			super(profile, false);
+			super(profile);
 			this.maximumSize = maximumSize;
 		}
 

@@ -39,7 +39,7 @@ public class ProportionalBundlerProvider implements JPPFBundlerProvider
 	 */
 	public Bundler createBundler(LoadBalancingProfile profile)
 	{
-		return new ProportionalBundler(profile, false);
+		return new ProportionalBundler(profile);
 	}
 
 	/**

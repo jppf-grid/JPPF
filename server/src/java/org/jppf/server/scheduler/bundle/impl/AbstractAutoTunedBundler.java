@@ -65,18 +65,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	 */
 	public AbstractAutoTunedBundler(AnnealingTuneProfile profile)
 	{
-		this(profile, false);
-	}
-
-	/**
-	 * Creates a new instance with the initial size of bundle as the start size.
-	 * @param profile the parameters of the auto-tuning algorithm,
-	 * @param overriden true if the settings were overriden by the node, false otherwise.
-	 * grouped as a performance analysis profile.
-	 */
-	public AbstractAutoTunedBundler(AnnealingTuneProfile profile, boolean overriden)
-	{
-		super(profile, overriden);
+		super(profile);
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		if (currentSize < 1) currentSize = 1;
 		log.info("Bundler#" + bundlerNumber + ": The initial size is " + currentSize);

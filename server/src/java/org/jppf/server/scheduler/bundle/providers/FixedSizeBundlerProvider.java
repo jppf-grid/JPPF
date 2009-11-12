@@ -19,7 +19,7 @@
 package org.jppf.server.scheduler.bundle.providers;
 
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.server.scheduler.bundle.impl.FixedSizeBundler;
+import org.jppf.server.scheduler.bundle.fixedsize.*;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider;
 import org.jppf.utils.TypedProperties;
 
@@ -29,7 +29,6 @@ import org.jppf.utils.TypedProperties;
  */
 public class FixedSizeBundlerProvider implements JPPFBundlerProvider
 {
-
 	/**
 	 * Create a bundler instance using the specified parameters profile.
 	 * @param profile - an <code>FixedSizeProfile</code> instance.
@@ -44,7 +43,7 @@ public class FixedSizeBundlerProvider implements JPPFBundlerProvider
 	/**
 	 * Create a bundler profile containing the parameters of the algorithm.
 	 * @param configuration - a set of properties defining the algorithm's parameters.
-	 * @return an {@link org.jppf.server.scheduler.bundle.FixedSizeProfile FixedSizeProfile} instance.
+	 * @return an {@link org.jppf.server.scheduler.bundle.fixedsize.FixedSizeProfile FixedSizeProfile} instance.
 	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
 	 */
 	public LoadBalancingProfile createProfile(TypedProperties configuration)

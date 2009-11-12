@@ -47,23 +47,12 @@ public class RLBundler extends AbstractRLBundler
 	private static final int NB_ACTIONS = 2 * INCREASE_RANGE + 1;
 
 	/**
-	 * Creates a new instance with the initial size of bundle as the start size.
-	 * @param profile the parameters of the auto-tuning algorithm,
+	 * Creates a new instance with the specified parameters.
+	 * @param profile the parameters of the algorithm, grouped as a performance analysis profile.
 	 */
 	public RLBundler(LoadBalancingProfile profile)
 	{
-		super(profile, false);
-	}
-
-	/**
-	 * Creates a new instance with the initial size of bundle as the start size.
-	 * @param profile the parameters of the auto-tuning algorithm,
-	 * @param override true if the settings were overriden by the node, false otherwise.
-	 * grouped as a performance analysis profile.
-	 */
-	public RLBundler(LoadBalancingProfile profile, boolean override)
-	{
-		super(profile, override);
+		super(profile);
 	}
 
 	/**
@@ -73,7 +62,7 @@ public class RLBundler extends AbstractRLBundler
 	 */
 	public Bundler copy()
 	{
-		return new RLBundler(profile, overriden);
+		return new RLBundler(profile);
 	}
 
 	/**

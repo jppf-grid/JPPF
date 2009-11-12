@@ -72,8 +72,7 @@ public class SendingBundleState extends NodeServerState
 		if (context.getNodeMessage() == null)
 		{
 			// check whether the bundler settings have changed.
-			if (!context.getBundler().isOverriden() &&
-					(context.getBundler().getTimestamp() < server.getBundler().getTimestamp()))
+			if (context.getBundler().getTimestamp() < server.getBundler().getTimestamp())
 			{
 				context.getBundler().dispose();
 				Bundler bundler = server.getBundler().copy();

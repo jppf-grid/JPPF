@@ -52,18 +52,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	 */
 	public AutoTunedBundler(LoadBalancingProfile profile)
 	{
-		this((AnnealingTuneProfile) profile, false);
-	}
-
-	/**
-	 * Creates a new instance with the initial size of bundle as the start size.
-	 * @param profile the parameters of the auto-tuning algorithm,
-	 * @param override true if the settings were overriden by the node, false otherwise.
-	 * grouped as a performance analysis profile.
-	 */
-	public AutoTunedBundler(AnnealingTuneProfile profile, boolean override)
-	{
-		super(profile, override);
+		super((AnnealingTuneProfile) profile);
 	}
 
 	/**

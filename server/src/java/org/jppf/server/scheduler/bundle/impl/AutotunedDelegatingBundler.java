@@ -54,13 +54,11 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
-	 * @param profile the parameters of the auto-tuning algorithm,
-	 * @param overriden true if the settings were overriden by the node, false otherwise.
-	 * grouped as a performance analysis profile.
+	 * @param profile the parameters of the auto-tuning algorithm grouped as a performance analysis profile.
 	 */
-	public AutotunedDelegatingBundler(AnnealingTuneProfile profile, boolean overriden)
+	public AutotunedDelegatingBundler(AnnealingTuneProfile profile)
 	{
-		super(profile, overriden);
+		super(profile);
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
 		//log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize);
 		lock.lock();
@@ -68,7 +66,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 		{
 			if (simpleBundler == null)
 			{
-				simpleBundler = new AutoTunedBundler(profile, overriden);
+				simpleBundler = new AutoTunedBundler(profile);
 			}
 		}
 		finally
@@ -84,7 +82,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	 */
 	public Bundler copy()
 	{
-		return new AutotunedDelegatingBundler(profile, overriden);
+		return new AutotunedDelegatingBundler(profile);
 	}
 
 	/**
