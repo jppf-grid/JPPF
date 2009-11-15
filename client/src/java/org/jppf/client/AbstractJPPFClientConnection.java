@@ -256,7 +256,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		{
 			SocketWrapper socketClient = taskServerConnection.getSocketClient();
 			ObjectSerializer ser = makeHelper().getSerializer();
-			System.out.println("AbstractJPPFClientConnection.receiveResults() : ser = " + ser);
 			JPPFTaskBundle bundle = (JPPFTaskBundle) unwrappedData(socketClient.receiveBytes(0), ser);
 			int count = bundle.getTaskCount();
 			List<JPPFTask> taskList = new ArrayList<JPPFTask>();
