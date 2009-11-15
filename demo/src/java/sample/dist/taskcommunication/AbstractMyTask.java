@@ -18,7 +18,7 @@
 
 package sample.dist.taskcommunication;
 
-import java.util.Map;
+import java.util.*;
 
 import org.jppf.node.NodeRunner;
 import org.jppf.server.protocol.JPPFTask;
@@ -70,5 +70,22 @@ public abstract class AbstractMyTask extends JPPFTask
 			NodeRunner.setPersistentData(key, map);
 		}
 		return map;
+	}
+
+	/**
+	 * Check that the distributed queue is empty.
+	 * This method lazily initializes the queue if required.
+	 * @return true if the distributed queue is empty, false otherwise.
+	 */
+	public boolean checkQueue()
+	{
+		String key = "MyDistyributedQueue";
+		Queue<Object> queue = (Queue<Object>) NodeRunner.getPersistentData(key);
+		if (queue == null)
+		{
+			queue = Hazelcast.getQueue(key);
+			NodeRunner.setPersistentData(key, queue);
+		}
+		return queue.isEmpty();
 	}
 }

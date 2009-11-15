@@ -72,8 +72,7 @@ public class TestJMX
 	  // replace "your_host_address" and "your_port" with the appropriate values for your configuration
 	  JMXDriverConnectionWrapper jmxConnection = new JMXDriverConnectionWrapper("localhost", 11198);
 	  // start the connection process and wait until the connection is established
-	  jmxConnection.connect();
-	  while (!jmxConnection.isConnected()) Thread.currentThread().sleep(1);
+	  jmxConnection.connectAndWait(1000);
 	  // request the statistics from the driver
 	  JPPFStats stats = jmxConnection.statistics();
     /*
