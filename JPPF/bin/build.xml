@@ -142,9 +142,9 @@
 	<target name="rebuild" depends="clean, init, compile, jar"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
-		depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces, j2ee.connector, application.template, installer"/>
+		depends="clean.deploy, rebuild, javadoc, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer"/>
 	<target name="deploy.nojavadoc"
-		depends="clean.deploy, rebuild, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces, j2ee.connector, application.template, installer"/>
+		depends="clean.deploy, rebuild, doc, init.deploy, jca, package, runtime, screensaver, samples.pack, jppf.quick.start, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer"/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
@@ -536,16 +536,18 @@
 		<unzip src="${install.prefix}-node.zip" dest="${install.prefix}"/>
 		<unzip src="${install.prefix}-admin-ui.zip" dest="${install.prefix}"/>
 		<unzip src="${install.prefix}-application-template.zip" dest="${install.prefix}"/>
+		<unzip src="${install.prefix}-User-Guide.zip" dest="${install.prefix}"/>
 		<unzip src="${install.prefix}-api.zip" dest="${install.prefix}"/>
 		<unzip src="${install.prefix}-samples-pack.zip" dest="${install.prefix}"/>
 		<unzip src="${install.prefix}-screensaver-win32.zip" dest="${install.prefix}/${app.ver}-screensaver-win32"/>
 		<unzip src="${install.prefix}-j2ee-connector.zip" dest="${install.prefix}"/>
 		<unzip src="${install.prefix}-GigaSpaces.zip" dest="${install.prefix}"/>
 		<unzip src="${install.prefix}-multiplexer.zip" dest="${install.prefix}"/>
-		<!--
-    -->
+
 		<!-- Generate offline installer -->
+		<!--
 		<izpack input="${installer}/install.xml" output="${install.file}.jar" installerType="standard" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
+    -->
 
 		<!-- Generate web installer -->
 		<property name="web.installer.dir" value="${home}/download/${version.number}"/>
@@ -573,7 +575,7 @@
 	<!--                     Build the web site content                            -->
 	<!-- ========================================================================= -->
 
-  <target name="doc" depends="doc.screenshots, doc.home, doc.home.1">
+  <target name="doc" depends="doc.screenshots, doc.home, doc.home.2">
 	</target>
 
   <target name="doc.home" description="generates the project web site pages">
@@ -620,6 +622,18 @@
 			<arg value="${home}/templates"/>
 			<arg value="9"/>
 		</java>       
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                 Generate the User Guide redistributable                   -->
+	<!-- ========================================================================= -->
+
+	<target name="user.guide" description="Generate the user guide zip file">
+		<property name="user.guide.file" value="${build}/${app.ver}-User-Guide.zip"/>
+		<delete file="${user.guide.file}" quiet="true"/>
+		<zip destfile="${user.guide.file}">
+			<zipfileset dir="${docs}" includes="JPPF-*.pdf" prefix="${app.ver}-User-Guide"/>
+		</zip>
 	</target>
 
 	<!-- ========================================================================= -->
