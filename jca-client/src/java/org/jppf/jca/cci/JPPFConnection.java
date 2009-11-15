@@ -31,12 +31,11 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 
 /**
- * 
+ * Interface for JPPF JCA connections. This interface provides an API to send jobs to a JPPF driver.
  * @author Laurent Cohen
  */
 public interface JPPFConnection extends Connection, JPPFAccessor
 {
-
 	/**
 	 * Submit an asynchronous execution request to the JPPF client.<br>
 	 * This method exits immediately after adding the request to the requests queue.<br>

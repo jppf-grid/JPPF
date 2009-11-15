@@ -77,7 +77,7 @@ public class DemoTest implements Serializable
 			*/
 
 			/*
-			id = connection.submitNonBlocking(list, null, new SubmissionStatusListener()
+			id = connection.submitNonBlocking(job, new SubmissionStatusListener()
 			{
 				public void submissionStatusChanged(SubmissionStatusEvent event)
 				{
