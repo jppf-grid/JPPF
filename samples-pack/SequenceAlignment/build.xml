@@ -102,43 +102,33 @@
 	<!--                        Generate the Javadoc                               -->
 	<!-- ========================================================================= -->
 
-	<target name="javadoc" description="Generate all java doc">
+	<target name="javadoc" description="Generate all javadoc">
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
 		<javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"
 			packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true"
 			stylesheetfile="${shared.img}/javadoc.css" additionalparam="-quiet">
-			<packageset dir="${src.dir}/java"/>
+			<packageset dir="${src.dir}"/>
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
-			<link href="http://www.jppf.org/api"/>
+			<link href="http://www.jppf.org/api-2.0"/>
 			<doctitle><![CDATA[JPPF - DNA/Protein Sequence Alignment Sample]]></doctitle>
 			<header>
 				<![CDATA[
-					<table>
-					<tr>
-						<td valign="center">
-							<a href="http://www.jppf.org" target="_top">
-								<img src="http://www.jppf.org/images/logo2.gif" border="0"/>
-							</a>
-						</td>
-					</tr>
-					</table>
+					<table><tr><td valign="center">
+						<a href="http://www.jppf.org" target="_top">
+							<img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/>
+						</a>
+					</td></tr></table>
 				]]>
 			</header>
 			<bottom>
 				<![CDATA[
-					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2009 JPPF Team.</i></font>
+					<font face="Arial" size=2 color="#6D78B6"><i>Copyright &copy; 2005-2009 JPPF Team.</i></font>
 				]]>
 			</bottom>
 		</javadoc>
 		<copy todir="${javadoc}/resources" overwrite="true">
-			<fileset dir="${shared.img}">
-				<include name="*.gif"/>
-				<size value="10" units="Ki" when="less"/>
-			</fileset>
-			<fileset dir="${shared.img}">
-				<include name="bkg_new2.jpg"/>
-			</fileset>
+			<fileset dir="${shared.img}" includes="inherit.gif"/>
 		</copy>
 	</target>
 
