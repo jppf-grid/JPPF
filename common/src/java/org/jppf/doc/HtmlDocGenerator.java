@@ -242,20 +242,8 @@ public class HtmlDocGenerator
 			if (!templateDir.exists() || !templateDir.isDirectory())
 				showUsageAndExit("Templates location must be an existing folder");
 
-			FileFilter filter = new FileFilter()
-			{
-				public boolean accept(File pathname)
-				{
-					if (pathname.isDirectory()) return false;
-					String s = pathname.getPath();
-					int idx = s.lastIndexOf(".");
-					if (idx < 0) return false;
-					s = s.substring(idx).toLowerCase();
-					return ".html".equals(s) || ".htm".equals(s) || ".php".equals(s);
-				}
-			};
 			HtmlDocGenerator docGen = new HtmlDocGenerator();
-			for (File file: sourceDir.listFiles(filter))
+			for (File file: sourceDir.listFiles(new JPPFFileFilter()))
 			{
 				String target = targetDir.getPath();
 				if (!target.endsWith("/") && !target.endsWith("\\")) target += "/";
@@ -268,6 +256,29 @@ public class HtmlDocGenerator
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * Filter that only accepts html and php files.
+	 */
+	public static class JPPFFileFilter implements FileFilter
+	{
+		/**
+		 * Determine if a file is accepted.
+		 * @param pathname the file path to check.
+		 * @return true if the file is accepted, false otherwise.
+		 * @see java.io.FileFilter#accept(java.io.File)
+		 */
+		public boolean accept(File pathname)
+		{
+			if (pathname.isDirectory()) return false;
+			String s = pathname.getPath();
+			int idx = s.lastIndexOf(".");
+			if (idx < 0) return false;
+			s = s.substring(idx).toLowerCase();
+			return ".html".equals(s) || ".htm".equals(s) || ".php".equals(s);
+		}
+	};
+	
 
 	/**
 	 * Give a brief explanation of the comand-line parameters.
