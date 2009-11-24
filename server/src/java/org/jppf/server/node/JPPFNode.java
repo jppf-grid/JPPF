@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,7 +29,6 @@ import org.jppf.management.*;
 import org.jppf.node.*;
 import org.jppf.node.event.NodeEventType;
 import org.jppf.server.protocol.*;
-import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 
 /**
@@ -162,72 +161,6 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * receives it, executes it and sends the results back.
 	 * @throws Exception if an error was raised from the underlying socket connection or the class loader.
 	 */
-	public void performAsync() throws Exception
-	{
-		if (debugEnabled) log.debug("Start of node secondary loop");
-		while (!isStopped())
-		{
-			JPPFTaskBundle bundle = nodeIO.readBundle();
-			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
-			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
-			{
-				if (debugEnabled) log.debug("setting initial bundle uuid");
-				bundle.setBundleUuid(uuid);
-				Map<BundleParameter, Object> params = BundleTuningUtils.getBundleTunningParameters();
-				if (params != null) bundle.getParametersMap().putAll(params);
-				bundle.setParameter(NODE_UUID_PARAM, uuid);
-				if (isJmxEnabled())
-				{
-					TypedProperties props = JPPFConfiguration.getProperties();
-					bundle.setParameter(NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
-					bundle.setParameter(NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
-					bundle.setParameter(NODE_MANAGEMENT_ID_PARAM, NodeRunner.getJmxServer().getId());
-				}
-				JPPFSystemInformation info = new JPPFSystemInformation();
-				info.populate();
-				bundle.setParameter(NODE_SYSTEM_INFO_PARAM, info);
-			}
-			boolean notEmpty = bundle.getTaskCount() > 0;
-			if (debugEnabled) log.debug("received " + (notEmpty ? "a non-" : "an ") + "empty bundle");
-			List<JPPFTask> taskList =  new ArrayList<JPPFTask>();
-			if (notEmpty)
-			{
-				executionManager.setup(bundle);
-				DataProvider dataProvider = (DataProvider) nodeIO.nextObject();
-				for (int i=0; i<bundle.getTaskCount(); i++)
-				{
-					JPPFTask task = (JPPFTask) nodeIO.nextObject();
-					task.setDataProvider(dataProvider);
-					taskList.add(task);
-					executionManager.performTask(task);
-				}
-				executionManager.waitForResults();
-				executionManager.cleanup();
-			}
-			nodeIO.writeResults(bundle, taskList);
-			if (notEmpty)
-			{
-				if (isJmxEnabled()) getNodeAdmin().setTaskCounter(getTaskCount() + taskList.size());
-				else setTaskCount(getTaskCount() + taskList.size());
-				if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
-			}
-			int p = bundle.getBuildNumber();
-			if (buildNumber < p)
-			{
-				JPPFNodeReloadNotification notif = new JPPFNodeReloadNotification("detected new build number: " + p
-					+ "; previous build number: " + buildNumber);
-				VersionUtils.setBuildNumber(p);
-				throw notif;
-			}
-		}
-		if (debugEnabled) log.debug("End of node secondary loop");
-	}
-
-	/**
-	 * Perform the main execution loop for this node. At each iteration, this method listens for a task to execute,
-	 * receives it, executes it and sends the results back.
-	 * @throws Exception if an error was raised from the underlying socket connection or the class loader.
-	 */
 	public void perform() throws Exception
 	{
 		if (debugEnabled) log.debug("Start of node secondary loop");
@@ -265,13 +198,16 @@ public class JPPFNode extends AbstractMonitoredNode
 				else setTaskCount(getTaskCount() + taskList.size());
 				if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
 			}
-			int p = bundle.getBuildNumber();
-			if (buildNumber < p)
+			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 			{
-				JPPFNodeReloadNotification notif = new JPPFNodeReloadNotification("detected new build number: " + p
-					+ "; previous build number: " + buildNumber);
-				VersionUtils.setBuildNumber(p);
-				throw notif;
+				int p = bundle.getBuildNumber();
+				if (buildNumber < p)
+				{
+					JPPFNodeReloadNotification notif = new JPPFNodeReloadNotification("detected new build number: " + p
+						+ "; previous build number: " + buildNumber);
+					VersionUtils.setBuildNumber(p);
+					throw notif;
+				}
 			}
 		}
 		if (debugEnabled) log.debug("End of node secondary loop");
