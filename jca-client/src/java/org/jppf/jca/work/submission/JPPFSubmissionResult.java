@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -57,6 +57,10 @@ public class JPPFSubmissionResult implements TaskResultListener
 	 */
 	private int pendingCount = -1;
 	/**
+	 * Total number of tasks to execute.
+	 */
+	private int taskCount = -1;
+	/**
 	 * The unique id of this submission.
 	 */
 	private String id = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
@@ -71,6 +75,7 @@ public class JPPFSubmissionResult implements TaskResultListener
 	 */
 	public JPPFSubmissionResult(int taskCount)
 	{
+		this.taskCount = taskCount;
 		this.pendingCount = taskCount;
 	}
 
@@ -143,7 +148,10 @@ public class JPPFSubmissionResult implements TaskResultListener
 	public void addSubmissionStatusListener(SubmissionStatusListener listener)
 	{
 		if (debugEnabled) log.debug("submission [" + id + "] adding status listener " + listener);
-		if (listener != null) listeners.add(listener);
+		synchronized(listeners)
+		{
+			if (listener != null) listeners.add(listener);
+		}
 	}
 
 	/**
@@ -153,7 +161,10 @@ public class JPPFSubmissionResult implements TaskResultListener
 	public void removeSubmissionStatusListener(SubmissionStatusListener listener)
 	{
 		if (debugEnabled) log.debug("submission [" + id + "] removing status listener " + listener);
-		if (listener != null) listeners.remove(listener);
+		synchronized(listeners)
+		{
+			if (listener != null) listeners.remove(listener);
+		}
 	}
 
 	/**
@@ -161,12 +172,25 @@ public class JPPFSubmissionResult implements TaskResultListener
 	 */
 	protected void fireStatusChangeEvent()
 	{
-		if (listeners.isEmpty()) return;
-		if (debugEnabled) log.debug("submission [" + id + "] firng status changed event for '" + status + "'");
-		SubmissionStatusEvent event = new SubmissionStatusEvent(id, status);
-		for (SubmissionStatusListener listener: listeners)
+		synchronized(listeners)
 		{
-			listener.submissionStatusChanged(event);
+			if (listeners.isEmpty()) return;
+			if (debugEnabled) log.debug("submission [" + id + "] firing status changed event for '" + status + "'");
+			SubmissionStatusEvent event = new SubmissionStatusEvent(id, status);
+			for (SubmissionStatusListener listener: listeners)
+			{
+				listener.submissionStatusChanged(event);
+			}
 		}
+	}
+
+	/**
+	 * Reset this submission result for new submission of the same tasks. 
+	 */
+	void reset()
+	{
+		resultMap.clear();
+		results = null;
+		pendingCount = taskCount;
 	}
 }

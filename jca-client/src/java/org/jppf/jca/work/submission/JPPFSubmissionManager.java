@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -100,13 +100,14 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 				goToSleep();
 			}
 			if (isStopped()) break;
-			ClientExecution exec = execQueue.poll();
 			JPPFJcaClientConnection c = null;
 			synchronized(client)
 			{
 				c = (JPPFJcaClientConnection) client.getClientConnection();
+				if (!JPPFClientConnectionStatus.ACTIVE.equals(c.getStatus())) continue;
 				c.setStatus(JPPFClientConnectionStatus.EXECUTING);
 			}
+			ClientExecution exec = execQueue.poll();
 			JPPFSubmissionResult submission = (JPPFSubmissionResult) exec.listener;
 			try
 			{
@@ -150,9 +151,25 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	}
 
 	/**
-	 * Get a submission given its id, without removing it from this submissison manager.
+	 * Add an existing submission back into the execution queue.
+	 * @param exec encapsulation of the execution data.
+	 * @return the unique id of the submission.
+	 */
+	public String addExistingSubmission(ClientExecution exec)
+	{
+		JPPFSubmissionResult submission = (JPPFSubmissionResult) exec.listener;
+		submission.reset();
+		submission.setStatus(PENDING);
+		execQueue.add(exec);
+		submissionMap.put(submission.getId(), submission);
+		wakeUp();
+		return submission.getId();
+	}
+
+	/**
+	 * Get a submission given its id, without removing it from this submission manager.
 	 * @param id the id of the submission to find.
-	 * @return the submisison corresponding to the id, or null if the submission could not be found.
+	 * @return the submission corresponding to the id, or null if the submission could not be found.
 	 */
 	public JPPFSubmissionResult peekSubmission(String id)
 	{
@@ -160,7 +177,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	}
 
 	/**
-	 * Get a submission given its id, and remove it from this submissison manager.
+	 * Get a submission given its id, and remove it from this submission manager.
 	 * @param id the id of the submission to find.
 	 * @return the submisison corresponding to the id, or null if the submission could not be found.
 	 */
