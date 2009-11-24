@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -110,7 +110,7 @@ public class NodeIO extends ThreadSynchronization
 	 */
 	public JPPFTaskBundle readBundle() throws Exception
 	{
-		socketWrapper.skip(4);
+		int n = socketWrapper.readInt();
 		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
 		currentBundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
 		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(currentBundle.getState()))
@@ -175,7 +175,7 @@ public class NodeIO extends ThreadSynchronization
 	 */
 	private Object[] deserializeObjects() throws Exception
 	{
-		socketWrapper.skip(4);
+		int n = socketWrapper.readInt();
 		List<Object> list = new ArrayList<Object>();
 		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
 		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);

@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -398,6 +398,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 */
 	public int skip(int n) throws Exception
 	{
+		return (int) dis.skip(n);
+		/*
 		if (n < 0) throw new IllegalArgumentException("number of bytes to skip must be >= 0");
 		else if (n == 0) return 0;
 		int count = 0;
@@ -405,9 +407,10 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 		{
 			long p = dis.skip(n-count);
 			//if (p < 0) break;
-			if (p <= 0) break;
+			if (p < 0) break;
 			else count += p;
 		}
 		return count;
+		*/
 	}
 }

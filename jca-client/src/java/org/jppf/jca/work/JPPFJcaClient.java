@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -204,10 +204,16 @@ public class JPPFJcaClient extends AbstractJPPFClient
 		switch(c.getStatus())
 		{
 			case ACTIVE:
-				availableConnections.add(c);
+				synchronized(availableConnections)
+				{
+					if (!availableConnections.contains(c)) availableConnections.add(c);
+				}
 				break;
 			default:
-				if (availableConnections.contains(c)) availableConnections.remove(c);
+				synchronized(availableConnections)
+				{
+					if (availableConnections.contains(c)) availableConnections.remove(c);
+				}
 				break;
 		}
 		submissionManager.wakeUp();
@@ -215,11 +221,16 @@ public class JPPFJcaClient extends AbstractJPPFClient
 
 	/**
 	 * Determine whether there is a client connection available for execution.
-	 * @return true if at least one ocnnection is available, false otherwise.
+	 * @return true if at least one connection is available, false otherwise.
 	 */
 	public boolean hasAvailableConnection()
 	{
-		return !availableConnections.isEmpty();
+		boolean b = false;
+		synchronized(availableConnections)
+		{
+			b = availableConnections.isEmpty();
+		}
+		return !b;
 	}
 
 	/**

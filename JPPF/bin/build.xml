@@ -535,14 +535,20 @@
 			<link href="http://java.sun.com/javaee/5/docs/api"/>
 			<link href="http://junit.sourceforge.net/javadoc"/>
 			<link href="http://xstream.codehaus.org/javadoc"/>
-			<doctitle><![CDATA[Java Parallel Processing Framework v${version.number}]]></doctitle>
+			<doctitle><![CDATA[
+				<a href="http://www.jppf.org" target="_top">
+					<img src="http://www.jppf.org/images/logo1.gif" border="0"/>
+				</a><br>
+				Java Parallel Processing Framework<br>v${version.number}
+				]]>
+			</doctitle>
 			<header>
 				<![CDATA[
 					<table>
 					<tr>
 						<td valign="center">
 							<a href="http://www.jppf.org" target="_top">
-								<img src="http://jppf-project.sourceforge.net/images/logo2.gif" border="0"/>
+								<img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/>
 							</a>
 						</td>
 					</tr>
@@ -561,6 +567,11 @@
 				<include name="*.jpg"/>
 			</fileset>
 		</copy>
+		<property name="javadoc.file" value="${build}/${ant.project.name}-api-${version.number}-${build.number}-${now}.zip"/>
+		<delete file="${javadoc.file}" quiet="true"/>
+		<zip destfile="${javadoc.file}">
+			<zipfileset dir="${docs}/api" includes="**/*.*" prefix="${ant.project.name}-${version.number}-api"/>
+		</zip>
 	</target>
 
 	<target name="javadoc.package" description="Package the javadoc for deployment on the web site">

@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +25,10 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class LongTask extends JPPFTask
 {
+	/**
+	 * A line of text to print on the screen.
+	 */
+	private static final String BANNER = "********************************************************************************";
 	/**
 	 * Determines how long this task will run.
 	 */
@@ -81,6 +85,7 @@ public class LongTask extends JPPFTask
 			{
 				Thread.sleep(taskLength);
 				elapsed = System.currentTimeMillis() - taskStart;
+				//for (int i=0; i<10; i++) System.out.println(BANNER);
 			}
 			catch(InterruptedException e)
 			{
