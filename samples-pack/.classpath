@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="CustomMBeans/classes" path="CustomMBeans/src"/>
+	<classpathentry kind="src" output="MatrixMultiplication/classes" path="MatrixMultiplication/src"/>
 	<classpathentry kind="src" output="WebSearchEngine/classes" path="WebSearchEngine/src"/>
 	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src"/>
 	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src"/>

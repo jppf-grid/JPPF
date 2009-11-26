@@ -1,5 +1,5 @@
 <%@ page language="java" %>
-<%@ page import="sample.tasklength.*" %>
+<%@ page import="sample.dist.tasklength.*" %>
 <%@ page import="org.jppf.client.*" %>
 <%@ page import="org.jppf.server.protocol.*" %>
 <%@ page import="org.jppf.utils.*" %>
@@ -47,11 +47,8 @@
 			}
 %>
 <br>
-<%
-			String title = "Submit a task";
-%>
-<%@ include file="block_header.jsp"%>
-			<table align="center" cellspacing="0" cellpadding="5">
+			<h1 align="center">Submit a task</h1>
+			<table align="center" cellspacing="0" cellpadding="0">
 				<tr><td height="5"></td></tr>
 				<tr><td width="50%" align="center">
 					<h3>Click on the button to submit a task to JPPF</h3>
@@ -78,5 +75,4 @@
 			}
 %>
 			</table>
-<%@ include file="block_footer.jsp"%>
 <%@ include file="footer.jsp"%>

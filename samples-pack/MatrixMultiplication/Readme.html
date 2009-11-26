@@ -19,42 +19,53 @@
 					<tr style="height: 80px">
 						<td width="20"></td>
 						<td width="400" align="left" valign="center"><img src="../shared/images/logo2.gif" border="0" alt="JPPF"/></td>
-						<td valign="center"><h1>Tomcat Port of the JPPF Client</h1></td>
+						<td valign="center"><h1>Dense Matrix Multiplication sample</h1></td>
 						<td width="20"></td>
 					</tr>
 				</table>
 				<!-- end header -->
 
 				<!-- start content -->
-				<table width="100%" class="sideborders" cellspacing="0" cellpadding="10">
+				<table class="sideborders" cellspacing="0" cellpadding="10" width="100%">
 					<tr><td align="left" valign="center">
 						<h3>What does the sample do?</h3>
-						This sample is a simple demonstration of a JPPF client embedded in a web application and running within a Tomcat container.<br>
-						It has been tested with <a href="http://tomcat.apache.org">Apache Tomcat</a> versions 5.5 and 6.0.
+						This sample performs the multplication of 2 square dense matrices by dividing the operation into as many JPPF tasks as there are rows in each matrix. Each task multiplies a row of the first matrix by the second matrix.
 					</td></tr>
 					<tr><td align="left" valign="center">
 						<h3>How do I run it?</h3>
 						Before running this sample application, you must have a JPPF server and at least one node running.<br>
 						For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki">JPPF documentation</a>.<br>
-						Once you have a server and node, from a command prompt, perform the following steps:
-						<ul>
-							<li>configure the application settings, by editing the configuration files (JPPF and logging) in the <b>TomcatPort/src/java</b> folder</li>
-							<li>from a shell or command prompt, type: <b>&quot;ant build&quot;</b>. This will build a WAR file that embeds a JPPF client, in the <b>TomcatPort/build</b> folder.</li>
-							<li>deploy the WAR file to Tomcat (usually by copying it to TOMCAT_HOME/webapps)</li>
-							<li>start Tomcat</li>
-						</ul>
+						Once you have a server and node, from a command prompt, type: <b>&quot;ant run&quot;</b>
 					</td></tr>
 					<tr><td align="left" valign="center">
 						<h3>How do I use it?</h3>
-						To use this sample, open a browser at this URL: http://<i>tomcat_host</i>:<i>tomcat_port</i>/jppf-tomcat
+						<p>This sample doesn't have a graphical user interface, however you can modify some of the parameters in the JPPF configuration file:
+						<ol>
+							<li>open the file "<b>config/jppf-client.properties</b>" in a text editor</li>
+							<li>at the end of the file, you will see the following properties:<br><br>
+								<div style="background: #C0C0C0"><tt>
+									<font color="green"># the size of the matrices to multiply</font><br>
+									matrix.size = 300<br>
+									<br>
+									<font color="green"># number of times the matrix multiplication is performed</font><br>
+									matrix.iterations = 100
+								</tt></div><br>
+							</li>
+							<li>"<b>matrix.size</b>" allows you to experiment with different sizes of the matrices</li>
+							<li>"<b>matrix.iterations</b>" is the number of times the matrix multiplication will be performed.
+							As the sample simply prints the time per iteration, this will allow you to have a feel as to how the load-balancing algortihm converges toward a near-optimal performance</li>
+						</ol>
+						<p>It is interesting to experiment with a different number of nodes and load-balancing algorithm, and test their efficiency in your environment.
 					</td></tr>
 					<tr><td align="left" valign="center">
-						<h3>What integration features of JPPF are demonstrated?</h3>
-						Integration with the Tomcat Servlets/JSP container.
+						<h3>How can I build the sample?</h3>
+						To compile the source code, from a command prompt, type: <b>&quot;ant compile&quot;</b><br>
+						To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;</b>
 					</td></tr>
 					<tr><td align="left" valign="center">
 						<h3>I have additional questions and comments, where can I go?</h3>
-						<p>If you need more insight into the code of this demo, you can consult the JSP source files located in the <b>TomcatPort/src/resources</b> folder.
+						<p>If you need more insight into the code of this demo, you can consult the source, or have a look at the
+						<a href="javadoc/index.html">API documentation</a>.
 						<p>In addition, There are 2 privileged places you can go to:
 						<ul>
 							<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>

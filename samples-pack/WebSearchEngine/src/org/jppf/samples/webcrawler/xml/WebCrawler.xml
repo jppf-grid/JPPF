@@ -77,7 +77,7 @@
 			</child>
 	
 			<child name="query" type="PlainText">
-				<property name="label" value="Search quey"/>
+				<property name="label" value="Search query"/>
 				<property name="tooltip" value="The search quey, using the Lucene engine syntax"/>
 				<property name="layoutConstraints" value="nogrid, gapy 5!, insets 0 0 0 0"/>
 				<property name="value" value="JPPF"/>

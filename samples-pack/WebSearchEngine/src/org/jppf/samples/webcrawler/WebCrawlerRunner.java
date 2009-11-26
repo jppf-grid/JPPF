@@ -110,6 +110,7 @@ public class WebCrawlerRunner
 		{
 			job.addTask(new CrawlerTask(url, query, ++n, doSearch));
 		}
+		if (job.getTasks() == null) return new ArrayList<JPPFTask>();
 		CrawlerResultCollector collector = new CrawlerResultCollector(job.getTasks().size());
 		job.setResultListener(collector);
 		job.setBlocking(false);

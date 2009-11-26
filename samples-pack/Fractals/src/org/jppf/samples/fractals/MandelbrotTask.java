@@ -86,4 +86,26 @@ public class MandelbrotTask extends JPPFTask
 			setException(e);
 		}
 	}
+
+	/*
+	private static synchronized void redefineOutput()
+	{
+		try
+		{
+			// check if output has already been redefined
+			Boolean redefined = (Boolean) NodeRunner.getPersistentData("output.redefined");
+			if (redefined == null)
+			{
+				System.setOut(new PrintStream("myapp.out"));
+				System.setErr(new PrintStream("myapp.err"));
+				// to ensure other tasks won't redefine it again
+				NodeRunner.setPersistentData("output.redefined", true);
+			}
+		}
+		catch(Exception e)
+		{
+			// ...
+		}
+	}
+	*/
 }

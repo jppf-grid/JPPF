@@ -252,16 +252,25 @@ public class FractalRunner
 		}
 		else
 		{
+			/*
 			long n = (16L * 16L * 16L * value) / max;
 	    rgb[1] = 16 * (int) (n % 16);
 	    n /= 16;
 	    rgb[2] = 16 * (int) (n % 16);
 	    n /= 16;
 	    rgb[0] = 16 * (int) (n % 16);
+	    */
+			double d = (double) value / max;
+			int n = (int) (256*256*256*d);
+	    rgb[2] = (int) n / (256*256);
+	    n = n - (rgb[2] * 256 * 256);
+	    rgb[1] = (int) (n / 256);
+	    n = n - (rgb[1] * 256);
+	    rgb[0] = n;
 		}
 		int n = rgb[0];
 		n = 256 * n + rgb[1];
-		n = 256 * n +rgb[2];
+		n = 256 * n + rgb[2];
     return n;
 	}
 
