@@ -3,10 +3,8 @@
 <%@ page import="org.jppf.jca.demo.*" %>
 <%@ include file="jndiName.jsp"%>
 <%@ include file="header.jsp"%>
-<%
-			String title = "Results";
-%>
-<%@ include file="block_header.jsp"%>
+		<div align="center">
+		<h1>Results</h1>
 		<table width="500" cellspacing="0" cellpadding="5">
 			<tr><td height="5"></td></tr>
 			<tr><td align="center">
@@ -15,7 +13,6 @@
 			</td></tr>
 		</table>
 
-		<div align="center">
 		<table cellspacing="0" cellpadding="5" border="1">
 			<tr>
 				<th colspan="2">Submissions Queue</th>
@@ -66,5 +63,4 @@
 %>
 		</table>
 		</div>
-<%@ include file="block_footer.jsp"%>
 <%@ include file="footer.jsp"%>

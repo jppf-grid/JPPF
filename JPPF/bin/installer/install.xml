@@ -103,12 +103,6 @@
       	<include name="**/*.*"/>
       </fileset>
     </pack>
-    <pack name="Screensaver_Node" required="no" preselected="yes">
-      <description>A JPPF node that runs as a Windows screensaver</description>
-      <fileset dir="./build/@{app.ver}/@{app.ver}-screensaver-win32" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-screensaver-win32">
-      	<include name="**/*.*"/>
-      </fileset>
-    </pack>
     <pack name="J2EE_Connector" required="no" preselected="yes">
       <description>A JCA resource adapter that allows J2EE applications to use a JPPF grid</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-j2ee-connector" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-j2ee-connector">

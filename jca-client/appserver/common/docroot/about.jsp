@@ -3,10 +3,7 @@
 <%@ include file="jndiName.jsp"%>
 <%@ include file="header.jsp"%>
 
-<%
-	String title = "About JPPF";
-%>
-<%@ include file="block_header.jsp"%>
+	<h1>About JPPF</h1>
 	<br>
 	<table width="600" align="center" cellspacing="0" cellpadding="5">
 		<tr><td height="5"></td></tr>
@@ -35,5 +32,4 @@
 		</td></tr>
 	</table>
 
-<%@ include file="block_footer.jsp"%>
 <%@ include file="footer.jsp"%>

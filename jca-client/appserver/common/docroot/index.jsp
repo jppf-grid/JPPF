@@ -35,11 +35,9 @@
 			  }
 			}
 %>
-<%
-			String title = "Submit a task";
-%>
-<%@ include file="block_header.jsp"%>
-		<table width="600" align="center" cellspacing="0" cellpadding="5">
+		<div align="center">
+		<h1>Submit a task</h1>
+		<table width="600" cellspacing="0" cellpadding="5">
 			<tr><td height="5"></td></tr>
 			<tr><td align="center">
 				<h3>Click on the button to submit a task to JPPF</h3>
@@ -66,5 +64,5 @@
 		}
 %>
 		</table>
-<%@ include file="block_footer.jsp"%>
+		</div>
 <%@ include file="footer.jsp"%>
