@@ -25,7 +25,7 @@ import java.util.*;
 import javax.swing.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.management.JMXNodeConnectionWrapper;
+import org.jppf.management.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
@@ -87,6 +87,8 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	{
 		try
 		{
+			AbstractButton btn = (AbstractButton) event.getSource();
+			if (btn.isShowing()) location = btn.getLocationOnScreen();
 			panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JPPFConfigurationPanel.xml");
 			TextAreaOption textArea = (TextAreaOption) panel.findFirstWithName("configProperties");
 			textArea.setValue(getPropertiesAsString());
@@ -115,12 +117,12 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 			frame.getContentPane().add(panel.getUIComponent());
 			frame.pack();
 			frame.setLocationRelativeTo(null);
-			frame.setLocation(location);
+			if (location != null) frame.setLocation(location);
 			frame.setVisible(true);
 		}
 		catch(Exception e)
 		{
-			if (debugEnabled) log.debug(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -157,7 +159,9 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	private String getPropertiesAsString() throws Exception
 	{
 		StringBuilder sb = new StringBuilder();
-		TypedProperties props = ((JMXNodeConnectionWrapper) nodeDataArray[0].getJmxWrapper()).systemInformation().getJppf();
+		JMXNodeConnectionWrapper wrapper = ((JMXNodeConnectionWrapper) nodeDataArray[0].getJmxWrapper());
+		JPPFSystemInformation info = wrapper.systemInformation();
+		TypedProperties props = info.getJppf();
 		Set<String> keys = new TreeSet<String>();
 		for (Object o: props.keySet()) keys.add((String) o);
 		for (String s: keys) sb.append(s).append(" = ").append(props.get(s)).append("\n");
