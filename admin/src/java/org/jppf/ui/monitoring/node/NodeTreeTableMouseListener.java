@@ -136,16 +136,18 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 		restart.setIcon(GuiUtils.loadIcon(RESTART_ICON));
 		if (singleSelection)
 		{
-			//if (TopologyDataType.
 			JMXNodeConnectionWrapper connection = (JMXNodeConnectionWrapper) data[0].getJmxWrapper();
-			Set<String> idSet = data[0].getNodeState().getAllTaskIds();
-			log.info("set of ids: " + idSet);
-			if (!idSet.isEmpty())
+			if (data[0].getNodeState() != null)
 			{
-				for (String id: idSet)
+				Set<String> idSet = data[0].getNodeState().getAllTaskIds();
+				if (debugEnabled) log.debug("set of ids: " + idSet);
+				if (!idSet.isEmpty())
 				{
-					cancel.add(new JMenuItem(new CancelTaskAction(id, data[0])));
-					restart.add(new JMenuItem(new RestartTaskAction(id, data[0])));
+					for (String id: idSet)
+					{
+						cancel.add(new JMenuItem(new CancelTaskAction(id, data[0])));
+						restart.add(new JMenuItem(new RestartTaskAction(id, data[0])));
+					}
 				}
 			}
 		}
