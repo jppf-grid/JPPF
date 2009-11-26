@@ -198,6 +198,14 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		TopologyData nodeData = new TopologyData(nodeInfo);
 		DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(nodeData);
 		model.insertNodeInto(nodeNode, driverNode, driverNode.getChildCount());
+
+		for (int i=0; i<treeTableRoot.getChildCount(); i++)
+		{
+			DefaultMutableTreeNode driverNode2 = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
+			if (driverNode2 == driverNode) continue;
+			DefaultMutableTreeNode nodeNode2 = findNode(driverNode2, nodeName);
+			if (nodeNode2 != null) model.removeNodeFromParent(nodeNode2);
+		}
 	}
 
 	/**
