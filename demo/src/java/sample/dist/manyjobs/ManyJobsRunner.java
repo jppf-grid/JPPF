@@ -51,6 +51,7 @@ public class ManyJobsRunner
 		try
 		{
 			jppfClient = new JPPFClient();
+			Thread.sleep(5000);
 			TypedProperties props = JPPFConfiguration.getProperties();
 			int length = 1000;
 			int nbTask = 100;
