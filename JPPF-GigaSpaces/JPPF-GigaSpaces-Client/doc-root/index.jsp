@@ -10,17 +10,16 @@
 	  }
 		else
 		{
-			String title = "Submit a job";
 %>
-<%@ include file="block_header.jsp"%>
-		<table width="600" align="center" cellspacing="0" cellpadding="5">
+		<h1>Submit a job</h1>
+		<table width="600" cellspacing="0" cellpadding="5">
 			<tr><td height="5"></td></tr>
-			<tr><td align="center">
+			<tr><td>
 				<h3>Click on the button to submit a job to JPPF</h3>
 				<h4>This will submit a job to the JPPF processing unit</h4>
 			</td></tr>
 	
-			<tr><td align="center">
+			<tr><td>
 				<form name="jppftest" action="<%=request.getContextPath()%>/index.jsp" method="post">
 					<input type="hidden" value="true" name="perform">
 					<input type="submit" value="Submit">
@@ -31,7 +30,7 @@
 			if (msg != null)
 			{
 %>
-			<tr><td align="center">
+			<tr><td>
 		    <h3>Result : <%= msg %></h3>
 			</td></tr>
 <%
@@ -39,5 +38,4 @@
 		}
 %>
 		</table>
-<%@ include file="block_footer.jsp"%>
 <%@ include file="footer.jsp"%>
