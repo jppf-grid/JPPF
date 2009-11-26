@@ -150,6 +150,22 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	}
 
 	/**
+	 * Add an existing submission back into the execution queue.
+	 * @param job encapsulation of the execution data.
+	 * @return the unique id of the submission.
+	 */
+	public String addExistingSubmission(JPPFJob job)
+	{
+		JPPFSubmissionResult submission = (JPPFSubmissionResult) job.getResultListener();
+		submission.reset();
+		submission.setStatus(PENDING);
+		execQueue.add(job);
+		submissionMap.put(submission.getId(), submission);
+		wakeUp();
+		return submission.getId();
+	}
+
+	/**
 	 * Get a submission given its id, without removing it from this submissison manager.
 	 * @param id the id of the submission to find.
 	 * @return the submisison corresponding to the id, or null if the submission could not be found.

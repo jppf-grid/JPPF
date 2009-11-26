@@ -101,6 +101,9 @@ public class JcaResultProcessor implements Work
 				{
 					if (debugEnabled) log.debug("["+connection.getName()+"] "+e.getMessage(), e);
 					connection.setStatus(JPPFClientConnectionStatus.DISCONNECTED);
+					JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
+					mgr.addExistingSubmission(job);
+					break;
 				}
 			}
 		}

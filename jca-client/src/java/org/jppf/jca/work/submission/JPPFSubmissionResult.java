@@ -58,6 +58,10 @@ public class JPPFSubmissionResult implements TaskResultListener
 	 */
 	private int pendingCount = -1;
 	/**
+	 * Total number of tasks to execute.
+	 */
+	private int taskCount = -1;
+	/**
 	 * The unique id of this submission.
 	 */
 	private String id = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
@@ -72,6 +76,7 @@ public class JPPFSubmissionResult implements TaskResultListener
 	 */
 	public JPPFSubmissionResult(int taskCount)
 	{
+		this.taskCount = taskCount;
 		this.pendingCount = taskCount;
 	}
 
@@ -166,5 +171,15 @@ public class JPPFSubmissionResult implements TaskResultListener
 		{
 			listener.submissionStatusChanged(event);
 		}
+	}
+
+	/**
+	 * Reset this submission result for new submission of the same tasks. 
+	 */
+	void reset()
+	{
+		resultMap.clear();
+		results = null;
+		pendingCount = taskCount;
 	}
 }
