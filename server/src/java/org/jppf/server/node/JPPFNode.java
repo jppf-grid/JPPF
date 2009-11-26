@@ -229,11 +229,14 @@ public class JPPFNode extends AbstractMonitoredNode
 			else setTaskCount(getTaskCount() + taskList.size());
 			if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
 		}
-		int p = bundle.getBuildNumber();
-		if (buildNumber < p)
+		if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 		{
-			VersionUtils.setBuildNumber(p);
-			throw new JPPFNodeReloadNotification("detected new build number: " + p + "; previous build number: " + buildNumber);
+			int p = bundle.getBuildNumber();
+			if (buildNumber < p)
+			{
+				VersionUtils.setBuildNumber(p);
+				throw new JPPFNodeReloadNotification("detected new build number: " + p + "; previous build number: " + buildNumber);
+			}
 		}
 	}
 
