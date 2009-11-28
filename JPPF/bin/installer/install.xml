@@ -55,7 +55,7 @@
   </panels>
 
   <packs>
-    <pack name="Full_sources" required="no" preselected="yes">
+    <pack name="Full_sources" required="no" preselected="no">
       <description>All JPPF modules with their source code</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-full-src" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-full-src">
       	<include name="**/*.*"/>
@@ -91,31 +91,31 @@
       	<include name="**/*.*"/>
       </fileset>
     </pack>
-    <pack name="JPPF_API" required="no" preselected="yes">
+    <pack name="JPPF_API" required="no" preselected="no">
       <description>Full Javadoc (source code documentation) in HTML format</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-api" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-api">
       	<include name="**/*.*"/>
       </fileset>
     </pack>
-    <pack name="Samples_Pack" required="no" preselected="yes">
+    <pack name="Samples_Pack" required="no" preselected="no">
       <description>A set of full-fledged applications using JPPF</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-samples-pack" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack">
       	<include name="**/*.*"/>
       </fileset>
     </pack>
-    <pack name="J2EE_Connector" required="no" preselected="yes">
+    <pack name="J2EE_Connector" required="no" preselected="no">
       <description>A JCA resource adapter that allows J2EE applications to use a JPPF grid</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-j2ee-connector" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-j2ee-connector">
       	<include name="**/*.*"/>
       </fileset>
     </pack>
-    <pack name="GigaSpaces_Connector" required="no" preselected="yes">
+    <pack name="GigaSpaces_Connector" required="no" preselected="no">
       <description></description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-GigaSpaces" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-GigaSpaces">
       	<include name="**/*.*"/>
       </fileset>
     </pack>
-    <pack name="TCP_Multiplexer" required="no" preselected="yes">
+    <pack name="TCP_Multiplexer" required="no" preselected="no">
       <description>A tool that routes all JPPF traffic through a single TCP port to work in firewalled environments</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-multiplexer" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-multiplexer">
       	<include name="**/*.*"/>

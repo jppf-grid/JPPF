@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="1.5+" codebase="http://localhost:8880/" href="download/jppf_ws.jnlp">
+<jnlp spec="1.5+" codebase="http://www.jppf.org/" href="download/jppf_ws.jnlp">
   <information>
     <title>JPPF</title>
     <vendor>JPPF.org</vendor>
@@ -15,4 +15,4 @@
     <jar href="download/2.0/JPPF-2.0-Web-Installer.jar"/>
   </resources>
   <application-desc main-class="com.izforge.izpack.installer.Installer"/>
-</jnlp> 
+</jnlp>
