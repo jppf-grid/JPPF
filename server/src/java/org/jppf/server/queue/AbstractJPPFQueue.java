@@ -110,4 +110,13 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	{
 		return null;
 	}
+
+	/**
+	 * Get the lock used for synchronized access to the queue.
+	 * @return a <code>ReentrantLock</code> instance.
+	 */
+	public ReentrantLock getLock()
+	{
+		return lock;
+	}
 }

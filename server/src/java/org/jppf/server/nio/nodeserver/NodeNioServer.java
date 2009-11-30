@@ -172,19 +172,29 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				boolean found = false;
 				SelectableChannel channel = null;
 				BundleWrapper selectedBundle = null;
-				Iterator<BundleWrapper> it = getQueue().iterator();
-				while (!found && it.hasNext() && !idleChannels.isEmpty())
+				AbstractJPPFQueue queue = (AbstractJPPFQueue) getQueue();
+				queue.getLock().lock();
+				Iterator<BundleWrapper> it = queue.iterator();
+				try
 				{
-					BundleWrapper bundleWrapper = it.next();
-					JPPFTaskBundle bundle = bundleWrapper.getBundle();
-					int n = findIdleChannelIndex(bundle);
-					if (n >= 0)
+					while (!found && it.hasNext() && !idleChannels.isEmpty())
 					{
-						channel = idleChannels.remove(n);
-						selectedBundle = bundleWrapper;
-						found = true;
+						BundleWrapper bundleWrapper = it.next();
+						JPPFTaskBundle bundle = bundleWrapper.getBundle();
+						int n = findIdleChannelIndex(bundle);
+						if (n >= 0)
+						{
+							channel = idleChannels.remove(n);
+							selectedBundle = bundleWrapper;
+							found = true;
+						}
 					}
 				}
+				finally
+				{
+					queue.getLock().unlock();
+				}
+				
 				if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "found channel for bundle");
 				if (channel != null)
 				{
