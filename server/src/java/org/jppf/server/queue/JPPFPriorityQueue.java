@@ -270,8 +270,16 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		 */
 		public BundleIterator()
 		{
-			entryIterator = priorityMap.entrySet().iterator();
-			if (entryIterator.hasNext()) listIterator = entryIterator.next().getValue().iterator();
+			lock.lock();
+			try
+			{
+				entryIterator = priorityMap.entrySet().iterator();
+				if (entryIterator.hasNext()) listIterator = entryIterator.next().getValue().iterator();
+			}
+			finally
+			{
+				lock.unlock();
+			}
 		}
 
 		/**
@@ -281,7 +289,15 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		 */
 		public boolean hasNext()
 		{
-			return entryIterator.hasNext() || ((listIterator != null) && listIterator.hasNext());
+			lock.lock();
+			try
+			{
+				return entryIterator.hasNext() || ((listIterator != null) && listIterator.hasNext());
+			}
+			finally
+			{
+				lock.unlock();
+			}
 		}
 
 		/**
@@ -291,16 +307,24 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		 */
 		public BundleWrapper next()
 		{
-			if (listIterator != null)
+			lock.lock();
+			try
 			{
-				 if (listIterator.hasNext()) return listIterator.next();
-				 if (entryIterator.hasNext())
-				 {
-					 listIterator = entryIterator.next().getValue().iterator();
-					 if (listIterator.hasNext()) return listIterator.next();
-				 }
+				if (listIterator != null)
+				{
+					if (listIterator.hasNext()) return listIterator.next();
+					if (entryIterator.hasNext())
+					{
+						listIterator = entryIterator.next().getValue().iterator();
+						if (listIterator.hasNext()) return listIterator.next();
+					}
+				}
+				throw new NoSuchElementException("no more element in this BundleIterator");
 			}
-			throw new NoSuchElementException("no more element in this BundleIterator");
+			finally
+			{
+				lock.unlock();
+			}
 		}
 
 		/**

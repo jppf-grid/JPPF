@@ -74,4 +74,13 @@ public abstract class AbstractJPPFQueue extends EventEmitter<QueueListener> impl
 			for (QueueListener listener : getListeners()) listener.newBundle(event);
 		}
 	}
+
+	/**
+	 * Get the lock used for synchronized access to the queue.
+	 * @return a <code>ReentrantLock</code> instance.
+	 */
+	public ReentrantLock getLock()
+	{
+		return lock;
+	}
 }

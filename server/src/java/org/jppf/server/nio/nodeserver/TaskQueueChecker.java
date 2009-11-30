@@ -28,6 +28,7 @@ import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.ChannelBundlePair;
 import org.jppf.server.protocol.*;
+import org.jppf.server.queue.AbstractJPPFQueue;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
@@ -83,19 +84,28 @@ public class TaskQueueChecker implements Runnable
 				boolean found = false;
 				SelectableChannel channel = null;
 				BundleWrapper selectedBundle = null;
-				Iterator<BundleWrapper> it = server.getQueue().iterator();
-				while (!found && it.hasNext() && !idleChannels.isEmpty())
+				AbstractJPPFQueue queue = (AbstractJPPFQueue) server.getQueue();
+				queue.getLock().lock();
+				try
 				{
-					BundleWrapper bundleWrapper = it.next();
-					JPPFTaskBundle bundle = bundleWrapper.getBundle();
-					if (!checkJobState(bundle)) continue;
-					int n = findIdleChannelIndex(bundle);
-					if (n >= 0)
+					Iterator<BundleWrapper> it = queue.iterator();
+					while (!found && it.hasNext() && !idleChannels.isEmpty())
 					{
-						channel = idleChannels.remove(n);
-						selectedBundle = bundleWrapper;
-						found = true;
+						BundleWrapper bundleWrapper = it.next();
+						JPPFTaskBundle bundle = bundleWrapper.getBundle();
+						if (!checkJobState(bundle)) continue;
+						int n = findIdleChannelIndex(bundle);
+						if (n >= 0)
+						{
+							channel = idleChannels.remove(n);
+							selectedBundle = bundleWrapper;
+							found = true;
+						}
 					}
+				}
+				finally
+				{
+					queue.getLock().unlock();
 				}
 				if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "found channel for bundle");
 				if (channel != null)
