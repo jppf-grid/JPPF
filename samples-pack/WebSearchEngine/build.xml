@@ -1,5 +1,5 @@
 <!--
-	Java Parallel Processing Framework.
+	JPPF.
 	 Copyright (C) 2005-2009 JPPF Team. 
 	http://www.jppf.org
 
@@ -112,7 +112,7 @@
 			<packageset dir="${src.dir}/java"/>
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
 			<link href="http://www.jppf.org/api"/>
-			<doctitle><![CDATA[Java Parallel Processing Framework - Fractals Generation Sample]]></doctitle>
+			<doctitle><![CDATA[JPPF - Fractals Generation Sample]]></doctitle>
 			<header>
 				<![CDATA[
 					<table>
@@ -122,7 +122,7 @@
 								<img src="http://jppf-project.sourceforge.net/images/logo2.gif" border="0"/>
 							</a>
 						</td>
-						<td valign="center"><font face="Arial" color="#000000">&nbsp;&nbsp;Java Parallel Processing Framework</font></td>
+						<td valign="center"><font face="Arial" color="#000000">&nbsp;&nbsp;JPPF</font></td>
 					</tr>
 					</table>
 				]]>

@@ -1,7 +1,7 @@
 <%@ page language="java" %>
 <html>
 	<head>
-		<title>Java Parallel Processing Framework J2EE Demo</title>
+		<title>JPPF GigaSpaces Integration Demo</title>
 		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
 		<meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
 		<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
@@ -16,10 +16,10 @@
 				<table width="100%" cellspacing="0" cellpadding="5">
 					<tr>
 						<td width="70%" align="right" valign="center">
-							<h1>Java Parallel Processing<br>Framework</h1>
+							<h1>JPPF</h1>
 						</td>
 						<td width="30%" align="center">
-							<img src="images/logo1.gif" border="0" alt="Java Parallel Processing Framework"/>
+							<img src="images/logo1.gif" border="0" alt="JPPF"/>
 						</td>
 					</tr>
 				</table>

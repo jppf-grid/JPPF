@@ -1,5 +1,5 @@
 @echo off
-rem Java Parallel Processing Framework.
+rem JPPF.
 rem Copyright (C) 2005-2009 JPPF Team.
 rem http://www.jppf.org
 rem 
