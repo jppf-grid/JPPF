@@ -125,10 +125,11 @@ public class ProcessLauncher
 		TypedProperties props = JPPFConfiguration.getProperties();
 		if (props.getBoolean("remote.debug.enabled", false))
 		{
+			String debugHost = props.getString("remote.debug.host", "locahost");
 			int debugPort = props.getInt("remote.debug.port", 8000);
 			boolean b = props.getBoolean("remote.debug.suspend", false);
 			command.add("-Xdebug");
-			command.add("-Xrunjdwp:transport=dt_socket,address=localhost:"+debugPort+",server=y,suspend="+(b?"y":"n"));
+			command.add("-Xrunjdwp:transport=dt_socket,address="+debugHost+":"+debugPort+",server=y,suspend="+(b?"y":"n"));
 		}
 
 		command.add(mainClass);
