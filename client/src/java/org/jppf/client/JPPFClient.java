@@ -405,9 +405,10 @@ public class JPPFClient extends AbstractJPPFClient
 						infoSet.add(info);
 						int n = JPPFConfiguration.getProperties().getInt("jppf.pool.size", 1);
 						if (n < 1) n = 1;
+						int currentCount = count.incrementAndGet();
 						for (int i=1; i<=n; i++)
 						{
-							String name = "driver-" + count.incrementAndGet()  + (n == 1 ? "" : "-" + i);
+							String name = "driver-" + currentCount  + (n == 1 ? "" : "-" + i);
 							JPPFClientConnection c = new JPPFClientConnectionImpl(uuid, name, info);
 							newConnection(c);
 						}
