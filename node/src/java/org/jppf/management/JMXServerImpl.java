@@ -19,7 +19,7 @@
 package org.jppf.management;
 
 import java.lang.management.ManagementFactory;
-import java.net.InetAddress;
+import java.net.*;
 import java.rmi.registry.*;
 import java.util.*;
 
@@ -91,22 +91,35 @@ public class JMXServerImpl
     {
 	    Thread.currentThread().setContextClassLoader(cl);
 			server = ManagementFactory.getPlatformMBeanServer();
-			//server = MBeanServerFactory.newMBeanServer();
-			//if (cl instanceof JPPFClassLoader) server.registerMBean(cl, new ObjectName("org.jppf:name=NodeClassLoader"));
-	    locateOrCreateRegistry();
+	    //locateOrCreateRegistry();
 			TypedProperties props = JPPFConfiguration.getProperties();
 			String host = NetworkUtils.getManagementHost();
-			int port = props.getInt("jppf.management.port", 11198);
+			int port = locateOrCreateRegistry2();
 			int rmiPort = props.getInt("jppf.management.rmi.port", 12198);
+			boolean found = false;
+			JMXServiceURL url = null;
+			while (!found)
+			{
+				try
+				{
+					InetAddress addr = InetAddress.getByName(host);
+			    url = new JMXServiceURL("service:jmx:rmi://localhost:" + rmiPort + "/jndi/rmi://" + host + ":" + port + "/jppf" + namespaceSuffix);
+			    Map<String, Object> env = new HashMap<String, Object>();
+			    env.put("jmx.remote.default.class.loader", cl);
+			    env.put("jmx.remote.protocol.provider.class.loader", cl);
+			    connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
+			    connectorServer.start();
+			    found = true;
+				}
+				catch(Exception e)
+				{
+					Throwable cause = e.getCause();
+					if (cause instanceof BindException) rmiPort++;
+					else throw e;
+				}
+			}
+			props.setProperty("jppf.management.rmi.port", "" + rmiPort);
 	    if (debugEnabled) log.debug("starting connector server with RMI registry port = " + port + " and RMI server port = " + rmiPort);
-			InetAddress addr = InetAddress.getByName(host);
-	    JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://localhost:" + rmiPort + "/jndi/rmi://" + host + ":" + port + "/jppf" + namespaceSuffix);
-	    Map<String, Object> env = new HashMap<String, Object>();
-	    env.put("jmx.remote.default.class.loader", cl);
-	    env.put("jmx.remote.protocol.provider.class.loader", cl);
-	    connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
-	    //connectorServer.
-	    connectorServer.start();
 	    stopped = false;
 	    if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);
     }
@@ -157,6 +170,37 @@ public class JMXServerImpl
 		int port = props.getInt("jppf.management.port", 11198);
     if (debugEnabled) log.debug("starting RMI registry on port " + port);
 		registry = LocateRegistry.createRegistry(port);
+	}
+
+	/**
+	 * Locate an RMI registry specified by the configuration properties,
+	 * or create an embedded one if it cannot be found.
+	 * @return the port number to which the registry is bound.
+	 * @throws Exception if the registry could be neither located nor created. 
+	 */
+	private static synchronized int locateOrCreateRegistry2() throws Exception
+	{
+		TypedProperties props = JPPFConfiguration.getProperties();
+		int port = props.getInt("jppf.management.port", 11198);
+		if (registry != null) return port;
+    if (debugEnabled) log.debug("starting RMI registry on port " + port);
+    boolean found = false;
+    while (!found)
+    {
+    	try
+    	{
+    		registry = LocateRegistry.createRegistry(port);
+    		found = true;
+    	}
+    	catch(Exception e)
+    	{
+    		Throwable cause = e.getCause();
+    		if (cause instanceof BindException) port++;
+    		else throw e;
+    	}
+    }
+    props.setProperty("jppf.management.port", "" + port);
+		return port;
 	}
 
 	/**
