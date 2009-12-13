@@ -197,39 +197,40 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	/**
 	 * Update the configuration properties of the node. 
 	 * @param config the set of properties to update.
-	 * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
+	 * @param reconnect - specifies whether the node should reconnect ot the driver after updating the properties.
 	 * @throws Exception if any error occurs.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
+	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(org.jppf.utils.TypedProperties, java.lang.Boolean)
 	 */
-	public void updateConfiguration(Map<String, String> config, Boolean reconnect) throws Exception
+	public void updateConfiguration(Map config, Boolean reconnect) throws Exception
 	{
 		if (config == null) return;
-		TypedProperties props = JPPFConfiguration.getProperties();
-		for (Map.Entry<String, String> entry: config.entrySet())
+		JPPFConfiguration.getProperties().putAll(config);
+		if (reconnect) triggerReconnect();
+	}
+
+	/**
+	 * Trigger a deconnection/reconnection of this node.
+	 * @throws Exception if any error occurs.
+	 */
+	private void triggerReconnect() throws Exception
+	{
+		try
 		{
-			props.setProperty(entry.getKey(), entry.getValue());
+			// we close the socket connection in case the node is waiting for data from the server.
+			node.getSocketWrapper().close();
 		}
-		if (reconnect)
+		catch(Exception e)
 		{
-			try
-			{
-				// we close the socket connection in case the node is waiting (in blocking mode)
-				// for data from the server.
-				node.getSocketWrapper().close();
-			}
-			catch(Exception e)
-			{
-				log.error(e.getMessage(), e);
-			}
-			node.setExitAction(new Runnable()
-			{
-				public void run()
-				{
-					throw new JPPFNodeReconnectionNotification("Reconnecting this node due to configuration changes");
-				}
-			});
-			node.setStopped(true);
+			log.error(e.getMessage(), e);
 		}
+		node.setExitAction(new Runnable()
+		{
+			public void run()
+			{
+				throw new JPPFNodeReconnectionNotification("Reconnecting this node due to configuration changes");
+			}
+		});
+		node.setStopped(true);
 	}
 
 	/**
