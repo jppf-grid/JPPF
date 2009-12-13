@@ -20,6 +20,7 @@ package org.jppf.example.datadependency.simulation;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.*;
 import org.jppf.example.datadependency.model.MarketData;
@@ -39,10 +40,6 @@ public class Ticker extends ThreadSynchronization implements Runnable
 	 * Debug enabled flag.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Random number generator.
-	 */
-	private Random random = new Random(System.currentTimeMillis());
 	/**
 	 * Market data to use.
 	 */
@@ -67,6 +64,14 @@ public class Ticker extends ThreadSynchronization implements Runnable
 	 * Executes the event notifications.
 	 */
 	private ExecutorService notificationExecutor = Executors.newFixedThreadPool(1);
+	/**
+	 * The count of generated events.
+	 */
+	private AtomicInteger eventCount = new AtomicInteger(0);
+	/**
+	 * Source of randomly generated data.
+	 */
+	private DataFactory dataFactory = null;
 
 	/**
 	 * Initialize this Ticker with the specified parameters.
@@ -74,13 +79,15 @@ public class Ticker extends ThreadSynchronization implements Runnable
 	 * @param minInterval the minimum tick interval in milliseconds.
 	 * @param maxInterval the maximum tick interval in milliseconds.
 	 * @param maxEvents the maximum number of events to generate.
+	 * @param dataFactory the random number generator used by this ticker.
 	 */
-	public Ticker(List<MarketData> marketData, int minInterval, int maxInterval, int maxEvents)
+	public Ticker(List<MarketData> marketData, int minInterval, int maxInterval, int maxEvents, DataFactory dataFactory)
 	{
 		this.marketData = marketData;
 		this.minInterval = minInterval;
 		this.maxInterval = maxInterval;
 		this.maxEvents = maxEvents;
+		this.dataFactory = dataFactory;
 	}
 
 	/**
@@ -91,18 +98,20 @@ public class Ticker extends ThreadSynchronization implements Runnable
 	{
 		if (debugEnabled) log.debug("starting ticker");
 		int size = marketData.size();
-		int eventCount = 0;
+		eventCount.set(0);
 		while (!isStopped())
 		{
 			try
 			{
-				int n = minInterval + random.nextInt(maxInterval - minInterval + 1);
+				// compute a random interval int the [min, max] range
+				//int n = minInterval + random.nextInt(maxInterval - minInterval + 1);
+				int n = dataFactory.getRandomInt(minInterval, maxInterval);
 				Thread.sleep(n);
 				// choose some market data randomly and emit a ticker event for it
-				n = random.nextInt(size);
+				n = dataFactory.getRandomInt(size);
 				fireTickerEvent(marketData.get(n));
-				eventCount++;
-				if ((maxEvents > 0) && (eventCount >= maxEvents)) setStopped(true);
+				eventCount.incrementAndGet();
+				if ((maxEvents > 0) && (eventCount.get() >= maxEvents)) setStopped(true);
 			}
 			catch(Exception e)
 			{
@@ -139,6 +148,15 @@ public class Ticker extends ThreadSynchronization implements Runnable
 	private void fireTickerEvent(MarketData marketData)
 	{
 		notificationExecutor.submit(new NotificationTask(marketData));
+	}
+
+	/**
+	 * Get the count of generated events.
+	 * @return the event count as an int.
+	 */
+	public int getEventCount()
+	{
+		return eventCount.get();
 	}
 
 	/**

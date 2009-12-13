@@ -104,6 +104,15 @@ public class StatsCollector
 	}
 
 	/**
+	 * Set the total processing time.
+	 * @param time the total time as a long value.
+	 */
+	public void setTotalTime(long time)
+	{
+		totalTime.set(time);
+	}
+
+	/**
 	 * Dump the statistics to a string.
 	 * @return a string.
 	 * @see java.lang.Object#toString()

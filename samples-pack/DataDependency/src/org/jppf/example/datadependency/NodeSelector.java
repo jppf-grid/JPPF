@@ -31,15 +31,21 @@ public class NodeSelector
 	/**
 	 * Distribution of trade sets among the nodes.
 	 */
-	private List<Set<String>> tradeSets = new ArrayList<Set<String>>(); 
+	private List<Set<String>> tradeSets = new ArrayList<Set<String>>();
+	/**
+	 * The list of node ids.
+	 */
+	private List<Integer> idList = null;
 
 	/**
 	 * Initialize this node selector.
 	 * @param trades the list of trades to distribute among the nodes.
-	 * @param nbNodes the number of nodes.
+	 * @param idList the list of node ids.
 	 */
-	public NodeSelector(List<Trade> trades, int nbNodes)
+	public NodeSelector(List<Trade> trades, List<Integer> idList)
 	{
+		this.idList = idList;
+		int nbNodes = idList.size();
 		for (int i=0; i<nbNodes; i++) tradeSets.add(new HashSet<String>());
 		for (int i=0; i<trades.size(); i++)
 		{
@@ -67,7 +73,7 @@ public class NodeSelector
 	{
 		for (int i=0; i<tradeSets.size(); i++)
 		{
-			if (tradeSets.get(i).contains(tradeId)) return (i + 1);
+			if (tradeSets.get(i).contains(tradeId)) return idList.get(i);
 		}
 		return -1;
 	}

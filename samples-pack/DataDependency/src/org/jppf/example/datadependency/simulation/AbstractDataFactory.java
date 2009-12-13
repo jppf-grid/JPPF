@@ -18,40 +18,49 @@
 
 package org.jppf.example.datadependency.simulation;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.example.datadependency.model.*;
 
 /**
- * Interface for all classes used to generate random data for the simulation.
- * The random number generator uses a gaussian distribution.
+ * 
  * @author Laurent Cohen
  */
-public interface DataFactory
+public abstract class AbstractDataFactory implements DataFactory
 {
 	/**
-	 * Generate a random number in the range [0, value[.
-	 * @param value the maximum random value (exclusive).
-	 * @return a pseudo-random number in the specified range.
+	 * Random number generator.
 	 */
-	int getRandomInt(int value);
+	protected Random random = new Random(System.currentTimeMillis());
 
 	/**
 	 * Generate a random number in the specified range.
 	 * @param min the minimum random value.
 	 * @param max the maximum random value.
 	 * @return a pseudo-random number in the specified range.
+	 * @see org.jppf.example.datadependency.simulation.DataFactory#getRandomInt(int, int)
 	 */
-	int getRandomInt(int min, int max);
+	public int getRandomInt(int min, int max)
+	{
+		if (max < min) max = min;
+		if (max == min) return min;
+		return min + getRandomInt(max - min + 1);
+	}
 
 	/**
 	 * Generate the specified number of data market objects.
 	 * Each generated object has an id in the format &quot;Dn&quot; where <i>n</i> is a sequence number.
 	 * @param n the number of objects to generate.
 	 * @return a list of <code>MarketData</code> instances.
+	 * @see org.jppf.example.datadependency.simulation.DataFactory#generateDataMarketObjects(int)
 	 */
-	List<MarketData> generateDataMarketObjects(int n);
-
+	public List<MarketData> generateDataMarketObjects(int n)
+	{
+		List<MarketData> result = new ArrayList<MarketData>();
+		for (int i=1; i<=n; i++) result.add(new MarketData("D" + i));
+		return result;
+	}
+	
 	/**
 	 * Generate a list of trade objects with their dependencies.
 	 * Each generated object has an id in the format &quot;Tn&quot; where <i>n</i> is a sequence number.
@@ -62,7 +71,25 @@ public interface DataFactory
 	 * @param minData the minimum number of dependencies per trade (inclusive).
 	 * @param maxData the maximum number of dependencies per trade (inclusive).
 	 * @return a list of <code>Trade</code> instances.
+	 * @see org.jppf.example.datadependency.simulation.DataFactory#generateTradeObjects(int, java.util.List, int, int)
 	 */
-	List<Trade> generateTradeObjects(int nbTrades, List<MarketData> dataList, int minData, int maxData);
-
+	public List<Trade> generateTradeObjects(int nbTrades, List<MarketData> dataList, int minData, int maxData)
+	{
+		List<Trade> result = new ArrayList<Trade>();
+		for (int i=1; i<nbTrades; i++)
+		{
+			Trade trade = new Trade("T" + i);
+			int n = getRandomInt(minData, maxData);
+			SortedSet<String> dependencies = trade.getDataDependencies();
+			List<Integer> indices = new LinkedList<Integer>();
+			for (int k=0; k<dataList.size(); k++) indices.add(k);
+			for (int j=0; j<n; j++)
+			{
+				int p = indices.remove(getRandomInt(indices.size()));
+				dependencies.add(dataList.get(p).getId());
+			}
+			result.add(trade);
+		}
+		return result;
+	}
 }

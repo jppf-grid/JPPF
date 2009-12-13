@@ -27,7 +27,6 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class TradeUpdateTask extends JPPFTask
 {
-	
 	/**
 	 * The trade to recompute
 	 */
@@ -39,7 +38,7 @@ public class TradeUpdateTask extends JPPFTask
 	/**
 	 * Simulated duration of this task.
 	 */
-	private long taskLength = 1L;
+	private long taskDuration = 1000L;
 
 	/**
 	 * Initialize this task with the specified trade and ids of updated market data. 
@@ -60,7 +59,7 @@ public class TradeUpdateTask extends JPPFTask
 	{
 		long taskStart = System.currentTimeMillis();
 		// perform some dummy cpu-consuming computation
-		for (long elapsed = 0L; elapsed < taskLength; elapsed = System.currentTimeMillis() - taskStart)
+		for (long elapsed = 0L; elapsed < taskDuration; elapsed = System.currentTimeMillis() - taskStart)
 		{
 			String s = "";
 			for (int i=0; i<10; i++) s += "A"+"10";
@@ -74,5 +73,23 @@ public class TradeUpdateTask extends JPPFTask
 	public Trade getTrade()
 	{
 		return trade;
+	}
+
+	/**
+	 * Get the simulated duration of this task.
+	 * @return the duration in milliseconds.
+	 */
+	public long getTaskDuration()
+	{
+		return taskDuration;
+	}
+
+	/**
+	 * Set the simulated duration of this task.
+	 * @param taskDuration the duration in milliseconds.
+	 */
+	public void setTaskDuration(long taskDuration)
+	{
+		this.taskDuration = taskDuration;
 	}
 }
