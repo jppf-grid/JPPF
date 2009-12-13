@@ -113,9 +113,6 @@ public class ProcessLauncher implements ProcessWrapperEventListener
 		command.add(System.getProperty("java.class.path"));
 		command.add("-D"+JPPFConfiguration.CONFIG_PROPERTY+"="+System.getProperty(JPPFConfiguration.CONFIG_PROPERTY));
 		command.add("-Dlog4j.configuration="+System.getProperty("log4j.configuration"));
-		//command.add("-server");
-		//int n = JPPFConfiguration.getProperties().getInt("max.memory.option", 128);
-		//command.add("-Xmx" + n + "m");
 		String s = config.getString("jppf.jvm.options");
 		// for backward compatibility with 1.x versions
 		if (s == null) s = config.getString("other.jvm.options");
@@ -124,16 +121,6 @@ public class ProcessLauncher implements ProcessWrapperEventListener
 			String[] options = s.split("\\s");
 			for (String opt: options) command.add(opt);
 		}
-
-		/*
-		if (config.getBoolean("remote.debug.enabled", false))
-		{
-			int debugPort = config.getInt("remote.debug.port", 8000);
-			boolean b = config.getBoolean("remote.debug.suspend", false);
-			command.add("-Xdebug");
-			command.add("-Xrunjdwp:transport=dt_socket,address=localhost:"+debugPort+",server=y,suspend="+(b?"y":"n"));
-		}
-		*/
 
 		command.add(mainClass);
 		command.add("" + processPort);
