@@ -185,16 +185,12 @@ public class FractalRunner
 		{
 			MandelbrotTask task = (MandelbrotTask) taskList.get(j);
 			int[] values = (int[]) task.getResult();
-			for (int i=0; i<config.asize; i++)
-			{
-				int rgb = computeMandelbrotRGB(values[i], max);
-				image.setRGB(i, config.bsize - j - 1, rgb);
-			}
+			int[] colors = task.getColors();
+			for (int i=0; i<config.asize; i++) image.setRGB(i, config.bsize - j - 1, colors[i]);
 		}
 		try
 		{
 			ImageIO.write(image, "jpeg", new File("data/mandelbrot.jpg"));
-			//writeImage(image, "data/mandelbrot.jpg");
 		}
 		catch(Exception e)
 		{
@@ -233,45 +229,6 @@ public class FractalRunner
 			result = 256 * result + n;
 		}
     return result;
-	}
-
-	/**
-	 * Compute the color as an RGB integer value.
-	 * @param value the number of escape iterations to convert into a color rgb value.
-	 * @param max the maximum lambda value found.
-	 * @return an RGB value represented as an int.
-	 */
-	private static int computeMandelbrotRGB(int value, int max)
-	{
-		int[] rgb = new int[3];
-		if (value >= max)
-		{
-	    rgb[0] = 0;
-	    rgb[1] = 0;
-	    rgb[2] = 0;
-		}
-		else
-		{
-			/*
-			long n = (16L * 16L * 16L * value) / max;
-	    rgb[1] = 16 * (int) (n % 16);
-	    n /= 16;
-	    rgb[2] = 16 * (int) (n % 16);
-	    n /= 16;
-	    rgb[0] = 16 * (int) (n % 16);
-	    */
-			double d = (double) value / max;
-			int n = (int) (256*256*256*d);
-	    rgb[2] = (int) n / (256*256);
-	    n = n - (rgb[2] * 256 * 256);
-	    rgb[1] = (int) (n / 256);
-	    n = n - (rgb[1] * 256);
-	    rgb[0] = n;
-		}
-		int n = rgb[0];
-		n = 256 * n + rgb[1];
-		n = 256 * n + rgb[2];
-    return n;
 	}
 
 	/**

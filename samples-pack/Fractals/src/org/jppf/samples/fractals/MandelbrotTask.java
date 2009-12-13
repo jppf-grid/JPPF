@@ -31,6 +31,10 @@ public class MandelbrotTask extends JPPFTask
 	 * The line number, for which to compute the escape value for each point in the line. 
 	 */
 	private int b = -1;
+	/**
+	 * The computed colors for each computed point.
+	 */
+	private int[] colors = null;
 
 	/**
 	 * Initialize this task with the specified line number.
@@ -55,6 +59,7 @@ public class MandelbrotTask extends JPPFTask
 			FractalConfiguration config =
 				(FractalConfiguration) getDataProvider().getValue("config");
 			int[] iter = new int[config.asize];
+			colors = new int[config.asize];
 			double bval = config.bmin +
 				(double) b * (config.bmax - config.bmin) / (double) config.bsize; 
 			double astep = (config.amax - config.amin) / (double) config.asize;
@@ -74,6 +79,7 @@ public class MandelbrotTask extends JPPFTask
 					iteration++;
 				}
 				iter[i] = iteration;
+				colors[i] = computeRGB(iteration, config.nmax);
 				aval += astep;
 			}
 			// set the results
@@ -85,6 +91,45 @@ public class MandelbrotTask extends JPPFTask
 		{
 			setException(e);
 		}
+	}
+
+	/**
+	 * Compute a RGB value for a specific poitn. 
+	 * @param value the escape time value for the point.
+	 * @param max the max escapte time value.
+	 * @return an int value representing the rgb components for the point.
+	 */
+	private int computeRGB(int value, int max)
+	{
+		if (value >= max) return 0;
+		double x, y, z, t;
+		t = 2 * Math.PI * (double) value / max;
+		x = 2 * t * (Math.cos(value) + 1);
+		y = 2 * t * (Math.sin(t) + 1);
+		z = t;
+		int rgb[] = new int[3];
+		rgb[0] = (int) (230 * x);
+		rgb[1] = (int) (230 * y);
+		rgb[2] = (int) (230 * z);
+		for (int i=0; i<3; i++)
+		{
+			if (rgb[i] > 460) rgb[i] = rgb[i] % 460;
+			if (rgb[i] > 230) rgb[i] = 460 - rgb[i];
+			rgb[i] += 25;
+		}
+		int n = rgb[2];
+		n = 256 * n + rgb[1];
+		n = 256 * n + rgb[0];
+		return n;
+	}
+
+	/**
+	 * Get the computed colors for each computed point.
+	 * @return an array of int values.
+	 */
+	public int[] getColors()
+	{
+		return colors;
 	}
 
 	/*
