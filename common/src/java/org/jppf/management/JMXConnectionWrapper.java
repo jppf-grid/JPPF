@@ -178,7 +178,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 */
 	public synchronized Object invoke(String name, String methodName, Object[] params, String[] signature) throws Exception
 	{
-		if (connectionThread.isConnecting()) return null;
+		if ((connectionThread != null) && connectionThread.isConnecting()) return null;
 		Object result = null;
 		try
 		{
