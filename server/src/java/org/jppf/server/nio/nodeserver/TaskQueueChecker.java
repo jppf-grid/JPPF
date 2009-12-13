@@ -135,7 +135,7 @@ public class TaskQueueChecker implements Runnable
 		List<SelectableChannel> idleChannels = server.getIdleChannels();
 		int n = -1;
 		ExecutionPolicy rule = bundle.getJobSLA().getExecutionPolicy();
-		if (debugEnabled && (rule != null)) log.debug("Bundle has an execution policy:\n" + rule);
+		//if (debugEnabled && (rule != null)) log.debug("Bundle has an execution policy:\n" + rule);
 		List<Integer> acceptableChannels = new ArrayList<Integer>();
 		List<Integer> channelsToRemove =  new ArrayList<Integer>();
 		List<String> uuidPath = bundle.getUuidPath().getList();
