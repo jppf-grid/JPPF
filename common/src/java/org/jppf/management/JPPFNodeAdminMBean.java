@@ -99,7 +99,7 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
 	 * @param reconnect - specifies whether the node should reconnect ot the driver after updating the properties.
 	 * @throws Exception if any error occurs.
 	 */
-	void updateConfiguration(Map<String, String> config, Boolean reconnect) throws Exception;
+	void updateConfiguration(Map config, Boolean reconnect) throws Exception;
 	/**
 	 * Cancel the job with the specified id.
 	 * @param jobId the id of the job to cancel.

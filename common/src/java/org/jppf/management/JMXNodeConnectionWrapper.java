@@ -174,7 +174,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @throws Exception if an error is raised when invoking the node mbean.
 	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
 	 */
-	public void updateConfiguration(Map<String, String> config, Boolean reconnect) throws Exception
+	public void updateConfiguration(Map config, Boolean reconnect) throws Exception
 	{
 		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateConfiguration",
 			new Object[] { config, reconnect }, new String[] { "java.util.Map", "java.lang.Boolean" }); 
