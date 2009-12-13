@@ -22,7 +22,7 @@ import javax.management.*;
 import org.jppf.job.JobNotification;
 
 /**
- * Implementation of a notifiaction listeners for processing of job events.
+ * Implementation of a notification listener for processing of job events.
  */
 public class JobNotificationListener implements NotificationListener
 {
