@@ -203,10 +203,17 @@ public class JPPFNode extends AbstractMonitoredNode
 			bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
 			if (isJmxEnabled())
 			{
-				TypedProperties props = JPPFConfiguration.getProperties();
-				bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
-				bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
-				bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, getJmxServer().getId());
+				try
+				{
+					TypedProperties props = JPPFConfiguration.getProperties();
+					bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
+					bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
+					bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, getJmxServer().getId());
+				}
+				catch(Exception e)
+				{
+					log.error(e.getMessage(), e);
+				}
 			}
 			JPPFSystemInformation info = new JPPFSystemInformation();
 			info.populate();
@@ -250,9 +257,27 @@ public class JPPFNode extends AbstractMonitoredNode
 		initHelper();
 		boolean mustInit = (socketClient == null);
 		if (mustInit)	initSocketClient();
-		if (isJmxEnabled() && !getJmxServer().getServer().isRegistered(new ObjectName(JPPFAdminMBean.NODE_MBEAN_NAME)))
+		if (isJmxEnabled())
 		{
-			registerProviderMBeans();
+			JMXServerImpl jmxServer = null;
+			try
+			{
+				jmxServer = getJmxServer();
+				if (!jmxServer.getServer().isRegistered(new ObjectName(JPPFAdminMBean.NODE_MBEAN_NAME))) registerProviderMBeans();
+			}
+			catch(Exception e)
+			{
+				jmxEnabled = false;
+				System.out.println("JMX initalization failure - management is disabled for this node");
+				System.out.println("see the log file for details");
+				try
+				{
+					if (jmxServer != null) jmxServer.stop();
+				}
+				catch(Exception ignore) { }
+				jmxServer = null;
+				log.error("Error creating the JMX server", e);
+			}
 		}
 		new JPPFStartupLoader().load(JPPFNodeStartupSPI.class);
 		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
@@ -281,7 +306,6 @@ public class JPPFNode extends AbstractMonitoredNode
 		String host = props.getString("jppf.server.host", "localhost");
 		int port = props.getInt("node.server.port", 11113);
 		socketClient = new SocketClient();
-		//socketClient = new SocketChannelClient(true);
 		socketClient.setHost(host);
 		socketClient.setPort(port);
 		socketClient.setSerializer(serializer);
@@ -490,31 +514,15 @@ public class JPPFNode extends AbstractMonitoredNode
 	/**
 	 * Get the jmx server that handles administration and monitoring functions for this node.
 	 * @return a <code>JMXServerImpl</code> instance.
+	 * @throws Exception if any error occurs.
 	 */
-	public JMXServerImpl getJmxServer()
+	public JMXServerImpl getJmxServer() throws Exception
 	{
-		return getJmxServer(true);
-	}
-
-	/**
-	 * Get the jmx server that handles administration and monitoring functions for this node.
-	 * @param attemptRestart if true then attemp to restart the jmx server if it was stopped.
-	 * @return a <code>JMXServerImpl</code> instance.
-	 */
-	public JMXServerImpl getJmxServer(boolean attemptRestart)
-	{
-		if (((jmxServer == null) || jmxServer.isStopped()) && attemptRestart)
+		if ((jmxServer == null) || jmxServer.isStopped())
 		{
-			try
-			{
-				jmxServer = new JMXServerImpl(JPPFAdminMBean.NODE_SUFFIX);
-				jmxServer.start(getClass().getClassLoader());
-				registerProviderMBeans();
-			}
-			catch(Exception e)
-			{
-				log.error("Error creating the JMX server", e);
-			}
+			jmxServer = new JMXServerImpl(JPPFAdminMBean.NODE_SUFFIX);
+			jmxServer.start(getClass().getClassLoader());
+			registerProviderMBeans();
 		}
 		return jmxServer;
 	}

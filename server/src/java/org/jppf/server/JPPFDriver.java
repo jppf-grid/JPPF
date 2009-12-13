@@ -158,6 +158,7 @@ public class JPPFDriver
 			{
 				jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX);
 				jmxServer.start(getClass().getClassLoader());
+				info.managementPort = JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198);
 				registerProviderMBeans();
 				System.out.println("JPPF Driver management initialized");
 			}
@@ -257,6 +258,7 @@ public class JPPFDriver
 		TypedProperties props = JPPFConfiguration.getProperties();
 		if (props.getBoolean("jppf.peer.discovery.enabled", false))
 		{
+			if (debugEnabled) log.debug("starting peers discovery");
 			peerDiscoveryThread = new PeerDiscoveryThread();
 			new Thread(peerDiscoveryThread).start();
 		}
@@ -264,6 +266,7 @@ public class JPPFDriver
 		{
 			String peerNames = props.getString("jppf.peers");
 			if ((peerNames == null) || "".equals(peerNames.trim())) return;
+			if (debugEnabled) log.debug("found peers in the configuration");
 			String[] names = peerNames.split("\\s");
 			for (String peerName: names) new JPPFPeerInitializer(peerName).start();
 		}

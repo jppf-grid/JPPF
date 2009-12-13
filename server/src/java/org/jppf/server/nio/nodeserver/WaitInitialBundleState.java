@@ -82,14 +82,14 @@ public class WaitInitialBundleState extends NodeServerState
 			Boolean b = (Boolean) bundle.getParameter(BundleParameter.IS_PEER);
 			boolean isPeer = (b != null) && b;
 			context.setPeer(isPeer);
-			if (!isPeer && JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
+			if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
 			{
 				String id = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM);
 				if (id != null)
 				{
 					String host = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM);
 					int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM);
-					JPPFManagementInfo info = new JPPFManagementInfo(host, port, id);
+					JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE);
 					JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
 					if (systemInfo != null) info.setSystemInfo(systemInfo);
 					JPPFDriver.getInstance().addNodeInformation(channel, info);

@@ -21,6 +21,7 @@ import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.io.*;
+import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.AbstractMonitoredNode;
 import org.jppf.node.event.NodeEventType;
 import org.jppf.server.*;
@@ -141,10 +142,27 @@ public class PeerNode extends AbstractMonitoredNode
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 			{
+				if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
+				{
+					try
+					{
+						TypedProperties props = JPPFConfiguration.getProperties();
+						bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
+						bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
+						bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, driver.getJmxServer().getId());
+					}
+					catch(Exception e)
+					{
+						log.error(e.getMessage(), e);
+					}
+				}
+
 				bundle.setBundleUuid(uuid);
-				boolean override = bundle.getParameter(BundleParameter.BUNDLE_TUNING_TYPE_PARAM) != null;
 				bundle.setParameter(BundleParameter.IS_PEER, true);
 				bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
+				JPPFSystemInformation sysInfo = new JPPFSystemInformation();
+				sysInfo.populate();
+				bundle.setParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM, sysInfo);
 			}
 			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
 			//boolean notEmpty = (bundle.getTasks() != null) && (bundle.getTaskCount() > 0);
@@ -164,6 +182,7 @@ public class PeerNode extends AbstractMonitoredNode
 			{
 				resultSender.sendPartialResults(bundleWrapper);
 			}
+			JPPFDriver.getInstance().getJobManager().jobEnded(bundleWrapper);
 			if (notifying) fireNodeEvent(NodeEventType.END_EXEC);
 		}
 		if (debugEnabled) log.debug(getName() + " End of peer node secondary loop");
