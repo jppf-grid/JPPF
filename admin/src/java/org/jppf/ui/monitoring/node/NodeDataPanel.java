@@ -132,6 +132,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		if (findDriver(driverName) != null) return;
 		TopologyData driverData = new TopologyData(connection);
 		DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driverData);
+		if (debugEnabled) log.debug("adding driver: " + driverName);
 		model.insertNodeInto(driverNode, treeTableRoot, treeTableRoot.getChildCount());
 		if (listenerMap.get(wrapper.getId()) == null)
 		{
@@ -195,6 +196,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	{
 		String nodeName = nodeInfo.getHost() + ":" + nodeInfo.getPort();
 		if (findNode(driverNode, nodeName) != null) return;
+		if (debugEnabled) log.debug("adding node: " + nodeName);
 		TopologyData nodeData = new TopologyData(nodeInfo);
 		DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(nodeData);
 		model.insertNodeInto(nodeNode, driverNode, driverNode.getChildCount());

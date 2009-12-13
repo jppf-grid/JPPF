@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.node;
 
 import javax.swing.tree.*;
 
-import org.jppf.management.JPPFNodeState;
+import org.jppf.management.*;
 import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
 
 /**
@@ -89,28 +89,30 @@ public class JPPFNodeTreeTableModel extends AbstractJPPFTreeTableModel
 			if (defNode.getUserObject() instanceof TopologyData)
 			{
 				TopologyData info = (TopologyData) defNode.getUserObject();
+				JPPFManagementInfo mgtInfo = info.getNodeInformation();
+				boolean isNode = ((mgtInfo != null) && (mgtInfo.getType() == JPPFManagementInfo.NODE));
 				if (TopologyDataType.DRIVER.equals(info.getType()) && (column > 0)) return res;
 				JPPFNodeState state = info.getNodeState();
 				if (state == null) return res;
 				switch (column)
 				{
 					case NODE_URL:
-						res = info.toString();
+						res = info.toString() + (isNode ? "" : "(peer driver)");
 						break;
 					case NODE_THREADS:
-						res = "" + state.getThreadPoolSize() + " / " + state.getThreadPriority();
+						if (isNode) res = "" + state.getThreadPoolSize() + " / " + state.getThreadPriority();
 						break;
 					case NODE_STATUS:
-						res = "" + state.getConnectionStatus();
+						if (isNode) res = "" + state.getConnectionStatus();
 						break;
 					case EXECUTION_STATUS:
-						res = "" + state.getExecutionStatus();
+						if (isNode) res = "" + state.getExecutionStatus();
 						break;
 					case NB_TASKS:
-						res = "" + state.getNbTasksExecuted();
+						if (isNode) res = "" + state.getNbTasksExecuted();
 						break;
 					case TASK_EVENT:
-						res = "" + state.getTaskNotification();
+						if (isNode) res = "" + state.getTaskNotification();
 						break;
 				}
 			}
