@@ -207,7 +207,8 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 			{
 				log.error("[" + name + "] "+ e.getMessage(), e);
 			}
-			List<Runnable> pending = executor.shutdownNow();
+			List<Runnable> pending = new ArrayList<Runnable>();
+			pending.addAll(executor.shutdownNow());
 			List<JPPFJob> result = new ArrayList<JPPFJob>();
 			if (job != null) result.add(job);
 			while (!pending.isEmpty())
