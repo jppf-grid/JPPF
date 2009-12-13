@@ -423,7 +423,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 			}
 			catch(Exception e)
 			{
-				log.error(e);
+				log.error(e.getMessage(), e);
 			}
 		}
 	}
