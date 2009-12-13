@@ -16,7 +16,7 @@
 	limitations under the License.
 -->
 
-<project name='DataDependency' basedir="." default="run">
+<project name='Data Dependency' basedir="." default="run">
 
 	<!-- ========================================================================= -->
 	<!--                          Property definitions                             -->
@@ -102,7 +102,7 @@
 
 	<target name="run">
 		<echo message="Running the Data Dependency application"/>
-		<java fork="yes" classname="org.jppf.example.datadependency.TradeUpdater" classpathref="project.classpath">
+		<java fork="yes" classname="org.jppf.example.datadependency.DataDependency" classpathref="project.classpath">
 			<jvmarg value="-server"/>
 			<jvmarg value="-Xmx512m"/>
 			<jvmarg value="-Djppf.config=jppf.properties"/>
@@ -123,7 +123,7 @@
 			<packageset dir="${src.dir}"/>
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
 			<link href="http://www.jppf.org/api-2.0"/>
-			<doctitle><![CDATA[JPPF - Custom MBeans Sample]]></doctitle>
+			<doctitle><![CDATA[JPPF - Data Dependency Sample]]></doctitle>
 			<header>
 				<![CDATA[
 					<table><tr><td valign="center">

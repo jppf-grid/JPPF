@@ -19,7 +19,7 @@
 					<tr style="height: 80px">
 						<td width="20"></td>
 						<td width="400" align="left" valign="center"><img src="../shared/images/logo2.gif" border="0" alt="JPPF"/></td>
-						<td valign="center"><h1>Custom MBeans sample</h1></td>
+						<td valign="center"><h1>Data Dependency sample</h1></td>
 						<td width="20"></td>
 					</tr>
 				</table>
@@ -27,41 +27,122 @@
 
 				<!-- start content -->
 				<table width="100%" class="sideborders" cellspacing="0" cellpadding="10">
-					<tr><td align="left" valign="center">
+					<tr><td align="left">
 						<h3>What does the sample do?</h3>
-						This samples illustrates the implementation of custom MBeans for a JPPF server and node.
-						Each MBean simply retrieves the number of processors available to the JVM it is running in.
+						<p>This sample simulates near real-time updates of a portfolio, based on simulated "live" events from financial markets.
 					</td></tr>
-					<tr><td align="left" valign="center">
-						<h3>How do I run it?</h3>
+					<tr><td align="left">
+						<h3 style="margin-top: 0px">Description of the problem to solve</h3>
+						We have:
+						<ul>
+							<li>a portfolio, made of a number of trades T<sub>1</sub>, ..., T<sub>n</sub></li>
+							<li>a number of pieces of market data such as stocks or index tickers D<sub>1</sub>, ..., D<sub>p</sub></li>
+							<li>each trade depends on one or several pieces of market data, for instance:<br>
+								- T1 depends on D1 and D3<br>
+								- T2 depends on D2, D3, D4<br>
+								- T3 depends on D1, D5<br>
+								- etc...
+							</li>
+						</ul>
+						The market emits frequent data update events. When market data D<sub>i</sub> is updated, each trade that depends on it must be recomputed.
+						The number of trades is large enough, and their computation time long enough, that their computation must be distributed over a number of nodes, in order to keep up with the pace of market events.
+					</td></tr>
+					<tr><td align="left">
+						<h3 style="margin-top: 0px">Description of the solution</h3>
+						The overall architecture of the solution is as follows:
+						<p><img src="../shared/images/DataDependencyArchitecture.gif" border="0"/>
+						<p>The ticker component simulates market events by picking up, at chosen intervals, a random piece of market data, and notifying the application (JPPF client) as well as the nodes.
+						<p>To optimize the load on the nodes, the trades are partitioned into multiple groups, each group being associated with a single node. This implies that any trade T<sub>i</sub> will always be computed on the same node.
+						<p>The application generates and keeps a mapping of the trades to the market data they depend on.
+						<p>The application generates and keeps a mapping of the nodes on which each trade is computed.
+						<p>When a market event occurs, the following happens:
+						<ol>
+							<li>the nodes and the application are notified</li>
+							<li>the application determines which trades are impacted by the data update</li>
+							<li>the application determines on which nodes these trades will be updated and asynchronously submits a JPPF job for each node</li>
+						</ol>
+						The application can function in 2 distinct modes:
+						<ul style="margin-bottom: 0px">
+							<li>event-based mode: trade update jobs are submitted as each event occurs, simulating a "real-time" flow of trade updates.
+									In this mode, one should be careful that updates are performed fast enough, otherwise the jobs queue will keep growing until all resources are consumed.</li>
+							<li>snapshot-based mode: the application simply aggregates the update events and, at regular intervals, submits trade update jobs to the JPPF grid.
+									This mode provides the best overall throughput, but does not allow real-time updates. This is a tradeoff to consider when the market pace is too fast to work in event-based mode.</li>
+						</ul>
+						<p>To make it easy to simulate various scenarios, the application provides a configuration property for most of the the parameters it uses:
+						number of market data pieces, number of trades, number of market data dependencies per trade, interval between ticker events, event vs. snapshot run mode, duration of each trade computation, etc...
+						<p>As all events and resulting job submissions are fully asynchronous, the application relies on a pool of connections to the JPPF driver, rather than on a single connection.
+						See <a href="http://www.jppf.org/wiki/index.php?title=Configuration_guide#Server_discovery_3">server discovery</a> and 
+						<a href="http://www.jppf.org/wiki/index.php?title=Configuration_guide#Manual_network_configuration_2">manual configuration</a> in the JPPF documentation for details on how to do this.
+					</td></tr>
+					<tr><td align="left">
+						<h3 style="margin-top: 0px">How do I run it?</h3>
 						Before running this sample application, you need to install a JPPF server and at least one node.<br>
 						For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki/index.php?title=Introduction">JPPF documentation</a>.<br>
-						Once you have installed a server and node, perform the following steps:
+						Once you have installed a server and one or multiple nodes, perform the following steps:
 						<ol>
-							<li>open a command prompt in JPPF-2.0-samples-pack/CustomMBeans</li>
-							<li>build the sample: type "<b>ant jar</b>"; this will create a file named <b>CustomMBeans.jar</b></li>
-							<li>copy CustomMBeans.jar in the "lib" folder of the JPPF driver installation, to add it to the driver's classpath. This is enough, as the node will download the custom MBean code from the server.</li>
+							<li>for each node, go to the "<b>config</b>" folder and edit the node's configuration file. Add this line: <tt>id = &lt;x&gt;</tt>, where <i>x</i> is any positive number, distinct for each node.</li>
+							<li>build the custom pluggable MBean that will handle the ticker events notifications to the nodes: type "<b>ant jar</b>"; this will create a file named <b>DataDependency.jar</b></li>
+							<li>copy DataDependency.jar in the "<b>lib</b>" folder of the JPPF driver installation, to add it to the driver's classpath. This is enough, as the node will download the custom MBean code from the server.</li>
 							<li>open a command prompt in the driver's install folder and start the driver by typing "<b>ant run</b>"</li>
-							<li>open a command prompt in the node's install folder and start the node by typing "<b>ant run</b>"</li>
-							<li>in the sample's command prompt, type "<b>ant run</b>" to run the sample</li>
-							<li>you should see the following display:
-<pre style="background: #C0C0C0">  [echo] Testing the custom server MBean
-  [java] The server has 8 available processors
-  [echo] Testing the custom node MBean
-  [java] The node has 8 available processors</pre>
+							<li>open a command prompt in each node's install folder and start the node by typing "<b>ant run</b>"</li>
+							<li>from the sample's "config" folder, open the client configuration file "<b>jppf.properties</b>" in a text editor</li>
+							<li>find the line containing "<b>jppf.pool.size = value</b>" and update the value as you see fit (server connection pool size)</li>
+							<li>At the end of the file, you will find the configuration of the simulation parameters, for instance:
+<pre style="background: #D8D8D8"><font color="green">#------------------------------------------------------------------------------#
+#         Parameters specific to the data dependency application               #
+#------------------------------------------------------------------------------#</font>
+
+<font color="green"># data factory implementation, either UniformDataFactory or GaussianDataFactory.
+# This determines the distribution of randomly generated data</font>
+dataFactoryImpl = org.jppf.example.datadependency.simulation.GaussianDataFactory
+
+<font color="green"># run mode, either snapshot-based or event-based. Possible values: event | snapshot</font>
+runMode = snapshot
+
+<font color="green"># number of market data objects to use</font>
+nbMarketData = 2000
+
+<font color="green"># number of trade objects</font>
+nbTrades = 10000
+
+<font color="green"># min and max number of market data object a trade depends on (randomly chosen)</font>
+minDataPerTrade = 1
+maxDataPerTrade = 6
+
+<font color="green"># min and max intervals in milliseconds between ticker events
+# (computed randomly in the specified range)</font>
+minTickerInterval = 20
+maxTickerInterval = 100
+
+<font color="green"># number of ticker events during the simulation; value <= 0 means no limit</font>
+nbTickerEvents = 0
+
+<font color="green"># duration of the simulation in milliseconds (after that the ticker stops emitting events)</font>
+simulationDuration = 10000
+
+<font color="green"># min and max simulated task duration in milliseconds
+# (task duration is computed randomly in the specified range)</font>
+minTaskDuration = 1000
+maxTaskDuration = 1000
+
+<font color="green"># interval between 2 snapshots when running in snapshot-based mode</font>
+snapshotInterval = 10000</pre>
               </li>
+							<li>once you have configured your scenario, in the sample's command prompt, type "<b>ant run</b>" to run the simulation</li>
 						</ol>
 					</td></tr>
 					<tr><td align="left" valign="center">
-						<h3>What features of JPPF are demonstrated?</h3>
-						Pluggable management beans for JPPF nodes and servers.<br>
-						Dynamic code deployment from the server to a node.
+						<h3 style="margin-top: 0px">What features of JPPF are demonstrated?</h3>
+						Pluggable management beans for JPPF nodes<br>
+						Execution policy (to specify on which nodes the trades are computed).<br>
+						Asynchronous job submissions.<br>
+						Extension of the JPPF configuration to application-specific parameters.<br>
 						For a detailed explanation, please refer to the related documentation in the
 						<a href="http://www.jppf.org/wiki/index.php?title=Extending_and_Customizing_JPPF#Pluggable_MBeans">Extending and Customizing JPPF &gt; Pluggable MBeans</a> section.
 					</td></tr>
 					<tr><td align="left" valign="center">
-						<h3>I have additional questions and comments, where can I go?</h3>
-						<p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>CustomMBeans/src</b> folder.
+						<h3 style="margin-top: 0px">I have additional questions and comments, where can I go?</h3>
+						<p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>DataDependency/src</b> folder.
 						<p>In addition, There are 2 privileged places you can go to:
 						<ul>
 							<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
