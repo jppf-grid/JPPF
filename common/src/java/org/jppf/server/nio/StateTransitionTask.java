@@ -69,26 +69,25 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 	 */
 	public void run()
 	{
+		StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
 		try
 		{
 			this.ctx = (NioContext<S>) key.attachment();
-			if (debugEnabled)
-			{
-				synchronized(log)
-				{
-					//log.debug(StringUtils.getRemoteHost(key.channel()) + " transition from " + ctx.getState());
-				}
-			}
+			//if (debugEnabled) log.debug(StringUtils.getRemoteHost(key.channel()) + " transition from " + ctx.getState());
 			NioState<T> state = factory.getState(ctx.getState());
 			NioTransition<S> transition = factory.getTransition(state.performTransition(key));
 			ctx.setState(transition.getState());
-			factory.getServer().getTransitionManager().setKeyOps(key, transition.getInterestOps());
+			transitionManager.setKeyOps(key, transition.getInterestOps());
 		}
 		catch(Exception e)
 		{
 			if (debugEnabled) log.debug(e.getMessage(), e);
 			else log.warn(e);
 			ctx.handleException((SocketChannel) key.channel());
+		}
+		finally
+		{
+			if (!transitionManager.isSequential()) transitionManager.releaseKey(key);
 		}
 	}
 }

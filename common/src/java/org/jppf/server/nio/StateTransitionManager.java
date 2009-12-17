@@ -19,8 +19,9 @@
 package org.jppf.server.nio;
 
 import java.nio.channels.*;
+import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.utils.*;
@@ -45,6 +46,14 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	private static Log log = LogFactory.getLog(NioServer.class);
 	/**
+	 * Determines whether DEBUG logging level is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * A dummy object to use as map value.
+	 */
+	private static Object DUMMY_OBJECT = "dummy object";
+	/**
 	 * The pool of threads used for submitting channel state transitions.
 	 */
 	protected ExecutorService executor = null;
@@ -60,7 +69,11 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	/**
 	 * A reentrant lock on the nio server.
 	 */
-	private Lock lock = null;
+	private Lock lock = new ReentrantLock();
+	/**
+	 * The set of keys currently being processed.
+	 */
+	private Set<SelectionKey> processingKeys = new HashSet<SelectionKey>();
 
 	/**
 	 * Initialize this transition manager with the specified server and sequential flag.
@@ -72,9 +85,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	{
 		this.server = server;
 		this.sequential = sequential;
-		this.lock = server.getLock();
-		int n = sequential ? 1 : threadPoolSize();
-		executor = Executors.newFixedThreadPool(n, new JPPFThreadFactory(server.getName()));
+		if (!sequential) executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE, new JPPFThreadFactory(server.getName()));
 	}
 
 	/**
@@ -83,10 +94,60 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	protected void submitTransition(SelectionKey key)
 	{
+		if (!sequential)
+		{
+			lock.lock();
+			try
+			{
+				if (debugEnabled) log.debug("processed keys: " + processingKeys + ", before adding " + key);
+				if (processingKeys.contains(key)) return;
+				processingKeys.add(key);
+			}
+			finally
+			{
+				lock.unlock();
+			}
+		}
 		setKeyOps(key, 0);
 		StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, server.getFactory());
 		if (sequential) transition.run();
 		else executor.submit(transition);
+	}
+
+	/**
+	 * Remove the specified key from the set of currently processed keys.
+	 * @param key the key to release.
+	 */
+	void releaseKey(SelectionKey key)
+	{
+		lock.lock();
+		try
+		{
+			if (debugEnabled) log.debug("processed keys: " + processingKeys + ", before removing " + key);
+			processingKeys.remove(key);
+		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
+
+	/**
+	 * Determine whether the specified key is currently being processed.
+	 * @param key the key to check.
+	 * @return true if the key is being processed, false otherwise.
+	 */
+	public boolean isProcessingKey(SelectionKey key)
+	{
+		lock.lock();
+		try
+		{
+			return processingKeys.contains(key);
+		}
+		finally
+		{
+			lock.unlock();
+		}
 	}
 
 	/**
@@ -97,7 +158,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	public void setKeyOps(SelectionKey key, int ops)
 	{
-		lock.lock();
+		server.getLock().lock();
 		try
 		{
 			server.getSelector().wakeup();
@@ -105,7 +166,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		}
 		finally
 		{
-			lock.unlock();
+			server.getLock().unlock();
 		}
 	}
 
@@ -173,17 +234,11 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	public void submit(Runnable r)
 	{
+		/*
 		if (sequential) r.run();
 		else executor.submit(r);
-	}
-
-	/**
-	 * Get the size of the state transition's thread pool.
-	 * @return the value of the constant {@link #THREAD_POOL_SIZE THREAD_POOL_SIZE}.
-	 */
-	protected int threadPoolSize()
-	{
-		return THREAD_POOL_SIZE;
+		*/
+		r.run();
 	}
 
 	/**
@@ -195,5 +250,14 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		 * The key resulting form the channel registration.
 		 */
 		public SelectionKey key = null;
+	}
+
+	/**
+	 * Determine whether the submission of state transitions should be performed sequentially.
+	 * @return true if state transitions are sequential or false if they are in parallel.
+	 */
+	public boolean isSequential()
+	{
+		return sequential;
 	}
 }
