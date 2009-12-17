@@ -138,7 +138,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	public void postAccept(SelectionKey key)
 	{
 		JPPFDriver.getInstance().getStatsManager().newNodeConnection();
-		SocketChannel channel = (SocketChannel) key.channel();
 		NodeContext context = (NodeContext) key.attachment();
 		try
 		{
@@ -149,7 +148,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 		catch (Exception e)
 		{
 			log.error(e.getMessage(), e);
-			closeNode(channel, context);
+			closeNode((SocketChannel) key.channel(), context);
 		}
 	}
 

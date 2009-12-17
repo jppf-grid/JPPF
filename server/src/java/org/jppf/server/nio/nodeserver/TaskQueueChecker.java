@@ -147,7 +147,9 @@ public class TaskQueueChecker implements Runnable
 				channelsToRemove.add(i);
 				continue;
 			}
-			NodeContext context = (NodeContext) ch.keyFor(server.getSelector()).attachment();
+			SelectionKey key = ch.keyFor(server.getSelector());
+			if (!server.getTransitionManager().isSequential() && server.getTransitionManager().isProcessingKey(key)) continue;
+			NodeContext context = (NodeContext) key.attachment();
 			if (uuidPath.contains(context.getNodeUuid())) continue;
 			if (rule != null)
 			{
@@ -171,7 +173,7 @@ public class TaskQueueChecker implements Runnable
 	 * Check if the job state allows it to be dispatched on another node.
 	 * There are two cases when this method will return false: when the job is suspended and
 	 * when the job is already executing on its maximum allowed number of nodes.
-	 * @param bundle - the bundle from which to get the job information.
+	 * @param bundle the bundle from which to get the job information.
 	 * @return true if the job can be dispatched to at least one more node, false otherwise.
 	 */
 	private boolean checkJobState(JPPFTaskBundle bundle)
@@ -199,7 +201,7 @@ public class TaskQueueChecker implements Runnable
 
 	/**
 	 * Specify whether this task is currently executing.
-	 * @param executing - true if this task is currently executing, false otherwise.
+	 * @param executing true if this task is currently executing, false otherwise.
 	 */
 	public void setExecuting(boolean executing)
 	{
