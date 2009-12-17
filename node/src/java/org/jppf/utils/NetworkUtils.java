@@ -37,6 +37,11 @@ public final class NetworkUtils
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Contains a set of all possible loopback addresses.
+	 * These are all the IPs in the 127.0.0.0/8 range.
+	 */
+	private static final Set<String> LOOPBACK_ADDRESSES = createLoopbackAddresses();
 
 	/**
 	 * Instantiation opf this class is not permitted.
@@ -51,20 +56,8 @@ public final class NetworkUtils
 	 */
 	public static String getNonLocalHostAddress()
 	{
-		try
-		{
-			List<Inet4Address> allAddresses = getIPV4Addresses();
-			for (Inet4Address addr: allAddresses)
-			{
-				String host = addr.getHostAddress();
-				if (!"127.0.0.1".equals(host)) return host;
-			}
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		return null;
+		List<Inet4Address> allAddresses = getNonLocalIPV4Addresses();
+		return allAddresses.isEmpty() ? null : allAddresses.get(0).getHostAddress();
 	}
 
 	/**
@@ -109,8 +102,21 @@ public final class NetworkUtils
 		{
 			Inet4Address ad = it.next();
 			String host = ad.getHostAddress();
-			if ("127.0.0.1".equals(host) || "localhost".equals(host)) it.remove();
+			if (LOOPBACK_ADDRESSES.contains(host) || "localhost".equals(host)) it.remove();
 		}
+		return addresses;
+	}
+
+	/**
+	 * Create a set of IPV4 addresses that map to the loopback address.
+	 * These are all the IPs in the 127.0.0.0/8 range.
+	 * @return a set of IP addresses as strings.
+	 */
+	private static Set<String> createLoopbackAddresses()
+	{
+		Set<String> addresses = new HashSet<String>();
+		String s = "127.0.0.";
+		for (int i=0; i<=8; i++) addresses.add(s + i);
 		return addresses;
 	}
 
