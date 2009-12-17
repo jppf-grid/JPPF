@@ -144,6 +144,7 @@ public class JPPFNode extends AbstractMonitoredNode
 				log.error(e.getMessage(), e);
 				try
 				{
+					if (notifying) fireNodeEvent(NodeEventType.DISCONNECTED);
 					synchronized(this)
 					{
 						if (socketClient != null) socketClient.close();
@@ -157,7 +158,6 @@ public class JPPFNode extends AbstractMonitoredNode
 			}
 		}
 		if (debugEnabled) log.debug("End of node main loop");
-		if (notifying) fireNodeEvent(NodeEventType.DISCONNECTED);
 		if (exitAction != null)
 		{
 			Runnable r = exitAction;
