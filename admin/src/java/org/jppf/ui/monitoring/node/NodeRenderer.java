@@ -24,6 +24,7 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import org.jppf.client.JPPFClientConnectionStatus;
+import org.jppf.management.*;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.JPPFConfiguration;
@@ -83,7 +84,9 @@ public class NodeRenderer extends AbstractTreeCellRenderer
 						}
 						break;
 					case NODE:
-						path = NODE_ICON;
+						JPPFManagementInfo info = data.getNodeInformation();
+						if ((info != null) && (JPPFManagementInfo.DRIVER == info.getType())) path = DRIVER_ICON;
+						else path = NODE_ICON;
 						break;
 				}
 				ImageIcon icon = GuiUtils.loadIcon(path);
