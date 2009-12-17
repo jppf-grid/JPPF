@@ -25,7 +25,7 @@ import org.jppf.node.policy.Equal;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
- * Task1.
+ * This task submits a JPPF job.
  * @author Laurent Cohen
  */
 public class Task1 extends JPPFTask
