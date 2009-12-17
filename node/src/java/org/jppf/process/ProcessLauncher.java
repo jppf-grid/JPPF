@@ -107,21 +107,39 @@ public class ProcessLauncher implements ProcessWrapperEventListener
 	public Process buildProcess() throws Exception
 	{
 		TypedProperties config = JPPFConfiguration.getProperties();
-		List<String> command = new ArrayList<String>();
-		command.add(System.getProperty("java.home")+"/bin/java");
-		command.add("-cp");
-		command.add(System.getProperty("java.class.path"));
-		command.add("-D"+JPPFConfiguration.CONFIG_PROPERTY+"="+System.getProperty(JPPFConfiguration.CONFIG_PROPERTY));
-		command.add("-Dlog4j.configuration="+System.getProperty("log4j.configuration"));
+		List<String> jvmOptions = new ArrayList<String>();
+		List<String> cpElements = new ArrayList<String>();
+		cpElements.add(System.getProperty("java.class.path"));
 		String s = config.getString("jppf.jvm.options");
 		// for backward compatibility with 1.x versions
 		if (s == null) s = config.getString("other.jvm.options");
 		if (s != null)
 		{
 			String[] options = s.split("\\s");
-			for (String opt: options) command.add(opt);
+			//for (String opt: options) command.add(opt);
+			int count = 0;
+			while (count < options.length)
+			{
+				String option = options[count++];
+				if ("-cp".equalsIgnoreCase(option) || "-classpath".equalsIgnoreCase(option)) cpElements.add(options[count++]);
+				else jvmOptions.add(option);
+			}
 		}
-
+		List<String> command = new ArrayList<String>();
+		command.add(System.getProperty("java.home")+"/bin/java");
+		command.add("-cp");
+		StringBuilder sb = new StringBuilder();
+		String sep = System.getProperty("path.separator");
+		for (int i=0; i<cpElements.size(); i++)
+		{
+			if (i > 0) sb.append(sep);
+			sb.append(cpElements.get(i));
+		}
+		command.add(sb.toString());
+		//command.add(System.getProperty("java.class.path"));
+		command.add("-D" + JPPFConfiguration.CONFIG_PROPERTY + "=" + System.getProperty(JPPFConfiguration.CONFIG_PROPERTY));
+		command.add("-Dlog4j.configuration=" + System.getProperty("log4j.configuration"));
+		for (String opt: jvmOptions) command.add(opt);
 		command.add(mainClass);
 		command.add("" + processPort);
 		if (debugEnabled) log.debug("process command:\n" + command);
