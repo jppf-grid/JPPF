@@ -55,8 +55,9 @@ public class TestTaskRunner
 		try
 		{
 			jppfClient = new JPPFClient();
-			performSecurityTest();
+			performBasicTest();
 			/*
+			performSecurityTest();
 			performEmptyTaskListTest();
 			performExceptionTest();
 			performURLTest();
@@ -548,6 +549,33 @@ public class TestTaskRunner
 			JPPFJob job = new JPPFJob();
 			job.addTask(new TestAnnotatedTask(), 11, "test string");
 			job.addTask(TestAnnotatedStaticTask.class, 22, "test string (static method)");
+			List<JPPFTask> results = jppfClient.submit(job);
+			JPPFTask res = results.get(0);
+			if (res.getException() != null) throw res.getException();
+			System.out.println("result is : " + res.getResult());
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e);
+		}
+		finally
+		{
+			System.out.println("annotation testing complete.");
+		}
+	}
+
+	/**
+	 * Test an annotated task.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void performBasicTest() throws JPPFException
+	{
+		System.out.println(banner);
+		System.out.println("Starting basic testing...");
+		try
+		{
+			JPPFJob job = new JPPFJob();
+			for (int i=0; i<100; i++) job.addTask(new TemplateJPPFTask(i));
 			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask res = results.get(0);
 			if (res.getException() != null) throw res.getException();
