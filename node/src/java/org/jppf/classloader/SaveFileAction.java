@@ -51,9 +51,23 @@ public class SaveFileAction implements PrivilegedAction<File>
 	public File run()
 	{
 		File tmp = null;
+		File tmpDir = null;
 		try
 		{
-			tmp = File.createTempFile("jppftemp_", "tmp");
+			/*
+			System.out.println("tmpDir: " + System.getProperty("java.io.tmpdir") + ", user.name: " + System.getProperty("user.name") +
+				", user.home: " + System.getProperty("user.home") + ", user.dir: " + System.getProperty("user.dir"));
+			*/
+			try
+			{
+				tmp = File.createTempFile("jppftemp_", ".tmp");
+			}
+			catch(IOException e)
+			{
+				tmpDir = new File(System.getProperty("user.dir") + File.separator + "Temp" + File.separator);
+				if (!tmpDir.exists() || !tmpDir.isDirectory()) tmpDir.mkdirs();
+				tmp = File.createTempFile("jppftemp_", ".tmp", tmpDir);
+			}
 			tmp.deleteOnExit();
 			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(tmp));
 			bos.write(definition);
