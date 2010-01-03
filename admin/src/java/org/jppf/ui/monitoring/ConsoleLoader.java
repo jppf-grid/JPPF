@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.text.NumberFormat;
 
 import javax.swing.JButton;
@@ -80,6 +81,7 @@ public class ConsoleLoader
 	{
 		try
 		{
+			System.out.println("Default charset: " + Charset.defaultCharset());
 			startWithCheckNoDownload();
 			//startWithCheckAndDownload();
 		}
