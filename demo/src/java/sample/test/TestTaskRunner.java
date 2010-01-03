@@ -575,7 +575,7 @@ public class TestTaskRunner
 		try
 		{
 			JPPFJob job = new JPPFJob();
-			for (int i=0; i<100; i++) job.addTask(new TemplateJPPFTask(i));
+			for (int i=0; i<1; i++) job.addTask(new TemplateJPPFTask(i));
 			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask res = results.get(0);
 			if (res.getException() != null) throw res.getException();

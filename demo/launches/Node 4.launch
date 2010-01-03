@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/JPPF"/>
@@ -24,6 +24,6 @@
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.node.NodeLauncher"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="JPPF"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Djppf.config=node4.properties -Xmx512m -Dlog4j.configuration=log4j-node4.properties -Djava.util.logging.config.file=logging-node4.properties"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Djppf.config=node4.properties -Dlog4j.configuration=log4j-node4.properties"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:demo}"/>
 </launchConfiguration>

@@ -19,7 +19,6 @@ package org.jppf.server.nio.nodeserver;
 
 import java.nio.channels.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
@@ -27,6 +26,7 @@ import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.ChannelBundlePair;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.AbstractJPPFQueue;
 
@@ -51,10 +51,6 @@ public class TaskQueueChecker implements Runnable
 	 * The owner of this queue checker.
 	 */
 	private NodeNioServer server = null;
-	/**
-	 * Determines whether this task is currently executing.
-	 */
-	private AtomicBoolean executing = new AtomicBoolean(false);
 	
 	/**
 	 * Initialize this task queue checker with the specified node server. 
@@ -71,41 +67,33 @@ public class TaskQueueChecker implements Runnable
 	 */
 	public void run()
 	{
-		try
+		List<SelectableChannel> idleChannels = server.getIdleChannels();
+		synchronized(idleChannels)
 		{
-			setExecuting(true);
-			List<SelectableChannel> idleChannels = server.getIdleChannels();
-			synchronized(idleChannels)
+			if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return;
+			if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
+			List<SelectableChannel> channelList = new ArrayList<SelectableChannel>();
+			channelList.addAll(idleChannels);
+			boolean found = false;
+			SelectableChannel channel = null;
+			BundleWrapper selectedBundle = null;
+			AbstractJPPFQueue queue = (AbstractJPPFQueue) server.getQueue();
+			queue.getLock().lock();
+			try
 			{
-				if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return;
-				if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
-				List<SelectableChannel> channelList = new ArrayList<SelectableChannel>();
-				channelList.addAll(idleChannels);
-				boolean found = false;
-				SelectableChannel channel = null;
-				BundleWrapper selectedBundle = null;
-				AbstractJPPFQueue queue = (AbstractJPPFQueue) server.getQueue();
-				queue.getLock().lock();
-				try
+				Iterator<BundleWrapper> it = queue.iterator();
+				while (!found && it.hasNext() && !idleChannels.isEmpty())
 				{
-					Iterator<BundleWrapper> it = queue.iterator();
-					while (!found && it.hasNext() && !idleChannels.isEmpty())
+					BundleWrapper bundleWrapper = it.next();
+					JPPFTaskBundle bundle = bundleWrapper.getBundle();
+					if (!checkJobState(bundle)) continue;
+					int n = findIdleChannelIndex(bundle);
+					if (n >= 0)
 					{
-						BundleWrapper bundleWrapper = it.next();
-						JPPFTaskBundle bundle = bundleWrapper.getBundle();
-						if (!checkJobState(bundle)) continue;
-						int n = findIdleChannelIndex(bundle);
-						if (n >= 0)
-						{
-							channel = idleChannels.remove(n);
-							selectedBundle = bundleWrapper;
-							found = true;
-						}
+						channel = idleChannels.remove(n);
+						selectedBundle = bundleWrapper;
+						found = true;
 					}
-				}
-				finally
-				{
-					queue.getLock().unlock();
 				}
 				if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "found channel for bundle");
 				if (channel != null)
@@ -115,13 +103,13 @@ public class TaskQueueChecker implements Runnable
 					BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
 					context.setBundle(bundleWrapper);
 					server.getTransitionManager().transitionChannel(key, NodeTransition.TO_SENDING);
-					JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
+					JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), new ChannelWrapper<SelectableChannel>(channel));
 				}
 			}
-		}
-		finally
-		{
-			setExecuting(false);
+			finally
+			{
+				queue.getLock().unlock();
+			}
 		}
 	}
 
@@ -153,7 +141,7 @@ public class TaskQueueChecker implements Runnable
 			if (uuidPath.contains(context.getNodeUuid())) continue;
 			if (rule != null)
 			{
-				JPPFManagementInfo mgtInfo = JPPFDriver.getInstance().getNodeInformation(ch);
+				JPPFManagementInfo mgtInfo = JPPFDriver.getInstance().getNodeInformation(new ChannelWrapper<SelectableChannel>(ch));
 				JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
 				if (!rule.accepts(info)) continue;
 			}
@@ -188,23 +176,5 @@ public class TaskQueueChecker implements Runnable
 		int n = (list == null) ? 0 : list.size();
 		if (debugEnabled) log.debug("current nodes = " + n + ", maxNodes = " + maxNodes);
 		return n < maxNodes;
-	}
-
-	/**
-	 * Determine whether this task is currently executing.
-	 * @return true if this task is currently executing, false otherwise.
-	 */
-	public boolean isExecuting()
-	{
-		return executing.get();
-	}
-
-	/**
-	 * Specify whether this task is currently executing.
-	 * @param executing true if this task is currently executing, false otherwise.
-	 */
-	public void setExecuting(boolean executing)
-	{
-		this.executing.set(executing);
 	}
 }

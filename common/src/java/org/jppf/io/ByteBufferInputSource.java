@@ -78,7 +78,14 @@ public class ByteBufferInputSource implements InputSource
 	public int read(ByteBuffer buffer) throws Exception
 	{
 		int pos = buffer.position();
-		buffer.put(data);
+		if (data.remaining() > buffer.remaining())
+		{
+			int limit = data.limit();
+			data.limit(data.position() + buffer.remaining());
+			buffer.put(data);
+			data.limit(limit);
+		}
+		else buffer.put(data);
 		return buffer.position() - pos;
 	}
 

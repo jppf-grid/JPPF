@@ -124,4 +124,13 @@ public class NioObject
 	{
 		return data;
 	}
+
+	/**
+	 * Number of bytes read from or written to the message.
+	 * @return  the numbe rof bytes as an int.
+	 */
+	public int getCount()
+	{
+		return count;
+	}
 }

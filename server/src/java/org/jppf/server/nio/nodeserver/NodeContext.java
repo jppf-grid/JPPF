@@ -24,7 +24,7 @@ import java.util.List;
 import org.jppf.data.transform.*;
 import org.jppf.io.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.NioContext;
+import org.jppf.server.nio.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;
@@ -118,7 +118,7 @@ public class NodeContext extends NioContext<NodeState>
 		NodeNioServer.closeNode(channel, this);
 		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getBundle().getState()))
 		{
-			JPPFDriver.getInstance().getJobManager().jobReturned(bundle, channel);
+			JPPFDriver.getInstance().getJobManager().jobReturned(bundle, new ChannelWrapper<SocketChannel>(channel));
 			resubmitBundle(bundle);
 		}
 	}

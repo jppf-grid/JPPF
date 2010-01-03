@@ -125,7 +125,7 @@ public class JPPFContainer
 			for (int i=0; i<count; i++)
 			{
 				JPPFBuffer buf = wrapper.receiveBytes(0);
-				futureList.add(executor.submit(new ObjectReadTask(buf.getBuffer())));
+				futureList.add(executor.submit(new ObjectReadTask(buf.getBuffer(), i)));
 			}
 			for (Future<Object> f: futureList) list.add(f.get());
 			return 0;
@@ -218,7 +218,8 @@ public class JPPFContainer
 	}
 
 	/**
-	 * .
+	 * Instances of this class are used to deserialize objects from an
+	 * incoming message in parallel.
 	 */
 	public class ObjectReadTask implements Callable<Object>
 	{
@@ -226,14 +227,20 @@ public class JPPFContainer
 		 * The data to send over the network connection.
 		 */
 		private byte[] buffer = null;
+		/**
+		 * Index of the object to deserialize in the incoming IO message; used for debugging purposes.
+		 */
+		private int index = 0;
 
 		/**
 		 * Initialize this task with the specicfied data buffer.
 		 * @param buffer the data read from the network connection.
+		 * @param index index of the object to deserialize in the incoming IO message; used for debugging purposes.
 		 */
-		public ObjectReadTask(byte[] buffer)
+		public ObjectReadTask(byte[] buffer, int index)
 		{
 			this.buffer = buffer;
+			this.index = index;
 		}
 
 		/**
@@ -251,7 +258,7 @@ public class JPPFContainer
 			}
 			catch(Exception e)
 			{
-				log.error(e.getMessage(), e);
+				log.error(e.getMessage() + " [object index: " + index + "]", e);
 			}
 			return null;
 		}

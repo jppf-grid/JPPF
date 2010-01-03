@@ -18,7 +18,7 @@
 package org.jppf.utils;
 
 import java.io.*;
-import java.net.Socket;
+import java.net.*;
 import java.nio.channels.*;
 import java.util.*;
 
@@ -193,23 +193,40 @@ public final class StringUtils
 	public static String getRemoteHost(Channel channel)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("[");
 		if (channel instanceof SocketChannel)
 		{
 			if (channel.isOpen())
 			{
 				Socket s = ((SocketChannel)channel).socket();
-				sb.append(s.getInetAddress().getHostAddress()).append(":").append(s.getPort());
+				sb.append(getRemoteHost((InetSocketAddress) s.getRemoteSocketAddress()));
 			}
 			else
 			{
-				sb.append("channel closed");
+				sb.append("[channel closed]");
 			}
 		}
 		else
 		{
-			sb.append("JVM-local");
+			sb.append("[JVM-local]");
 		}
+		return sb.toString();
+	}
+
+	/**
+	 * Returns the IP address of the remote host for a socket channel.
+	 * @param address the address to get the host from.
+	 * @return an IP address as a string.
+	 */
+	public static String getRemoteHost(SocketAddress address)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		if (address instanceof InetSocketAddress)
+		{
+			InetSocketAddress add = (InetSocketAddress) address;
+			sb.append(add.getHostName()).append(":").append(add.getPort());
+		}
+		else sb.append("socket address type not handled: " + address); 
 		sb.append("]");
 		return sb.toString();
 	}

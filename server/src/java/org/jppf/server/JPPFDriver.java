@@ -17,7 +17,6 @@
  */
 package org.jppf.server;
 
-import java.nio.channels.SelectableChannel;
 import java.util.*;
 
 import javax.management.MBeanServer;
@@ -31,6 +30,8 @@ import org.jppf.process.LauncherListener;
 import org.jppf.security.*;
 import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.job.JPPFJobManager;
+import org.jppf.server.mina.nodeserver.MinaNodeServer;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.peer.*;
@@ -73,6 +74,10 @@ public class JPPFDriver
 	 */
 	private NodeNioServer nodeNioServer = null;
 	/**
+	 * Node server based on Mina framework.
+	 */
+	private MinaNodeServer minaNodeServer = null;
+	/**
 	 * Serves class loading requests from the JPPF nodes.
 	 */
 	private ClassNioServer classServer = null;
@@ -91,7 +96,7 @@ public class JPPFDriver
 	/**
 	 * A list of objects containing the information required to connect to the nodes JMX servers.
 	 */
-	private Map<SelectableChannel, JPPFManagementInfo> nodeInfo = new HashMap<SelectableChannel, JPPFManagementInfo>();
+	private Map<ChannelWrapper, JPPFManagementInfo> nodeInfo = new HashMap<ChannelWrapper, JPPFManagementInfo>();
 	/**
 	 * The thread that performs the peer servers discovery.
 	 */
@@ -148,8 +153,12 @@ public class JPPFDriver
 		}
 		printInitializedMessage(info.applicationServerPorts, "Client Server");
 
+		/*
 		nodeNioServer = new NodeNioServer(info.nodeServerPorts);
 		nodeNioServer.start();
+		*/
+		minaNodeServer = new MinaNodeServer(info.nodeServerPorts);
+		minaNodeServer.start();
 		printInitializedMessage(info.nodeServerPorts, "Tasks Server");
 
 		try
@@ -310,6 +319,15 @@ public class JPPFDriver
 	}
 
 	/**
+	 * Get the node server based on Mina framework.
+	 * @return a <code>MinaNodeServer</code> instance.
+	 */
+	public MinaNodeServer getMinaNodeServer()
+	{
+		return minaNodeServer;
+	}
+
+	/**
 	 * Get the jmx server used to manage and monitor this driver.
 	 * @return a <code>JMXServerImpl</code> instance.
 	 */
@@ -417,7 +435,7 @@ public class JPPFDriver
 	 * @param channel a <code>SocketChannel</code> instance.
 	 * @param info a <code>JPPFNodeManagementInformation</code> instance.
 	 */
-	public void addNodeInformation(SelectableChannel channel, JPPFManagementInfo info)
+	public void addNodeInformation(ChannelWrapper channel, JPPFManagementInfo info)
 	{
 		synchronized (nodeInfo)
 		{
@@ -429,7 +447,7 @@ public class JPPFDriver
 	 * Remove a node information object from the map of node information.
 	 * @param channel a <code>SocketChannel</code> instance.
 	 */
-	public void removeNodeInformation(SelectableChannel channel)
+	public void removeNodeInformation(ChannelWrapper channel)
 	{
 		synchronized (nodeInfo)
 		{
@@ -441,7 +459,7 @@ public class JPPFDriver
 	 * Remove a node information object from the map of node information.
 	 * @return channel a <code>SocketChannel</code> instance.
 	 */
-	public Map<SelectableChannel, JPPFManagementInfo> getNodeInformationMap()
+	public Map<ChannelWrapper, JPPFManagementInfo> getNodeInformationMap()
 	{
 		synchronized (nodeInfo)
 		{
@@ -454,7 +472,7 @@ public class JPPFDriver
 	 * @param channel the node for which ot get the information.
 	 * @return a <code>NodeManagementInfo</code> instance, or null if no informaiton is recorded for the node.
 	 */
-	public JPPFManagementInfo getNodeInformation(SelectableChannel channel)
+	public JPPFManagementInfo getNodeInformation(ChannelWrapper channel)
 	{
 		synchronized (nodeInfo)
 		{

@@ -25,6 +25,7 @@ import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 
 /**
@@ -88,7 +89,7 @@ public class WaitingResultsState extends NodeServerState
 				context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 			}
 			Boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE);
-			jobManager.jobReturned(bundleWrapper, channel);
+			jobManager.jobReturned(bundleWrapper, new ChannelWrapper<SelectableChannel>(channel));
 			if ((requeue != null) && requeue)
 			{
 				bundle.setParameter(BundleParameter.JOB_REQUEUE, true);

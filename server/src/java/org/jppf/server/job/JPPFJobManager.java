@@ -18,13 +18,13 @@
 
 package org.jppf.server.job;
 
-import java.nio.channels.SelectableChannel;
 import java.util.*;
 import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
 import org.jppf.job.*;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.*;
 import org.jppf.utils.*;
@@ -98,7 +98,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 	 * @param bundleWrapper the dispatched job.
 	 * @param channel the node to which the job is dispatched.
 	 */
-	public synchronized void jobDispatched(BundleWrapper bundleWrapper, SelectableChannel channel)
+	public synchronized void jobDispatched(BundleWrapper bundleWrapper, ChannelWrapper channel)
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
@@ -118,7 +118,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 	 * @param bundleWrapper the returned job.
 	 * @param channel the node to which the job is dispatched.
 	 */
-	public synchronized void jobReturned(BundleWrapper bundleWrapper, SelectableChannel channel)
+	public synchronized void jobReturned(BundleWrapper bundleWrapper, ChannelWrapper channel)
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
@@ -190,7 +190,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 	 * @param bundle the job data.
 	 * @param channel the id of the job source of the event.
 	 */
-	private void submitEvent(JobEventType eventType, JPPFTaskBundle bundle, SelectableChannel channel)
+	private void submitEvent(JobEventType eventType, JPPFTaskBundle bundle, ChannelWrapper channel)
 	{
 		executor.submit(new JobEventTask(this, eventType, bundle, channel));
 	}

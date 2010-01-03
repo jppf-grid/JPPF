@@ -17,11 +17,10 @@
  */
 package org.jppf.server.job.management;
 
-import java.nio.channels.SelectableChannel;
-
 import org.apache.commons.logging.*;
 import org.jppf.management.*;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.ChannelWrapper;
 
 /**
  * Instances of this class are intented to perform job management functions for a specxific node. 
@@ -44,7 +43,7 @@ public class CancelJobTask implements Runnable
 	/**
 	 * The node on which to perform this task.
 	 */
-	private SelectableChannel channel = null;
+	private ChannelWrapper channel = null;
 	/**
 	 * True if the job should be requeued on the server side, false otherwise.
 	 */
@@ -56,7 +55,7 @@ public class CancelJobTask implements Runnable
 	 * @param channel the node on which to perform this task.
 	 * @param requeue true if the job should be requeued on the server side, false otherwise.
 	 */
-	public CancelJobTask(String jobId, SelectableChannel channel, boolean requeue)
+	public CancelJobTask(String jobId, ChannelWrapper channel, boolean requeue)
 	{
 		this.jobId = jobId;
 		this.channel = channel;

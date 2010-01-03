@@ -27,6 +27,7 @@ import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
 import org.jppf.management.*;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;
@@ -92,7 +93,7 @@ public class WaitInitialBundleState extends NodeServerState
 					JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE);
 					JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
 					if (systemInfo != null) info.setSystemInfo(systemInfo);
-					JPPFDriver.getInstance().addNodeInformation(channel, info);
+					JPPFDriver.getInstance().addNodeInformation(new ChannelWrapper<SelectableChannel>(channel), info);
 				}
 			}
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.

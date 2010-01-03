@@ -158,7 +158,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	protected void postSelect()
 	{
 		if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
-		/*if (!taskQueueChecker.isExecuting())*/ transitionManager.submit(taskQueueChecker);
+		transitionManager.submit(taskQueueChecker);
 	}
 
 	/**
@@ -257,7 +257,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 			JPPFDriver.getInstance().getStatsManager().nodeConnectionClosed();
 			if (context.getNodeUuid() != null)
 			{
-				JPPFDriver.getInstance().removeNodeInformation(channel);
+				JPPFDriver.getInstance().removeNodeInformation(new ChannelWrapper<SocketChannel>(channel));
 				JPPFDriver.getInstance().getNodeNioServer().removeIdleChannel(channel);
 			}
 		}

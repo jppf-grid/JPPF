@@ -18,23 +18,22 @@
 
 package org.jppf.server.job;
 
-import java.nio.channels.SelectableChannel;
-
 import org.jppf.io.BundleWrapper;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.utils.Pair;
 
 /**
  * Instances of this class associate a node channel with a job that is being executed on the corresponding node.
  * @author Laurent Cohen
  */
-public class ChannelBundlePair extends Pair<SelectableChannel, BundleWrapper>
+public class ChannelBundlePair extends Pair<ChannelWrapper, BundleWrapper>
 {
 	/**
 	 * Initialize this object with the specified parameters.
 	 * @param first - the first object of this pair.
 	 * @param second - the second object of this pair.
 	 */
-	public ChannelBundlePair(SelectableChannel first, BundleWrapper second)
+	public ChannelBundlePair(ChannelWrapper first, BundleWrapper second)
 	{
 		super(first, second);
 	}
@@ -50,8 +49,8 @@ public class ChannelBundlePair extends Pair<SelectableChannel, BundleWrapper>
 		if (obj == null) return false;
 		if (!obj.getClass().equals(this.getClass())) return false;
 		ChannelBundlePair pair = (ChannelBundlePair) obj;
-		/*if (first() == null)*/
-		return pair.first() == first();
-		//return first().equals(pair.first());
+		if (first() == null) return pair.first() == null;
+		if (pair.first() == first()) return true;
+		return first().equals(pair.first());
 	}
 }

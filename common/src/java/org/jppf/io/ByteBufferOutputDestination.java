@@ -87,7 +87,15 @@ public class ByteBufferOutputDestination implements OutputDestination
 	public int write(ByteBuffer buffer) throws Exception
 	{
 		int pos = data.position();
-		data.put(buffer);
+
+		if (buffer.remaining() > data.remaining())
+		{
+			int limit = buffer.limit();
+			buffer.limit(buffer.position() + data.remaining());
+			data.put(buffer);
+			buffer.limit(limit);
+		}
+		else data.put(buffer);
 		return data.position() - pos;
 	}
 

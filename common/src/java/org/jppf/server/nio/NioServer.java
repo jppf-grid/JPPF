@@ -121,7 +121,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 */
 	public NioServer(int port, String name) throws JPPFException
 	{
-		this(new int[] { port }, name, false);
+		this(new int[] { port }, name, true);
 	}
 
 	/**

@@ -17,12 +17,12 @@
  */
 package org.jppf.server.job;
 
-import java.nio.channels.SelectableChannel;
 import java.util.List;
 
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 
 /**
@@ -46,7 +46,7 @@ public class JobEventTask implements Runnable
 	/**
 	 * The node, if any, for which the event happened.
 	 */
-	private SelectableChannel channel = null;
+	private ChannelWrapper channel = null;
 	/**
 	 * The job data.
 	 */
@@ -63,7 +63,7 @@ public class JobEventTask implements Runnable
 	 * @param bundle - the job data.
 	 * @param channel - the id of the job source of the event.
 	 */
-	public JobEventTask(JPPFJobManager jobManager, JobEventType eventType, JPPFTaskBundle bundle, SelectableChannel channel)
+	public JobEventTask(JPPFJobManager jobManager, JobEventType eventType, JPPFTaskBundle bundle, ChannelWrapper channel)
 	{
 		this.jobManager = jobManager;
 		this.eventType = eventType;

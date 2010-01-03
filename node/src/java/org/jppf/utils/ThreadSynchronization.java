@@ -60,6 +60,22 @@ public abstract class ThreadSynchronization
 	}
 
 	/**
+	 * Cause the current thread to wait until notified or the specified time has passed, whichever comes first.
+	 * @param millis the maximum time to wait in milliseconds.
+	 * @param nanos the additional time to wait in nanoseconds.
+	 */
+	public synchronized void goToSleep(long millis, int nanos)
+	{
+		try
+		{
+			wait(millis, nanos);
+		}
+		catch(InterruptedException ignored)
+		{
+		}
+	}
+
+	/**
 	 * Notify the threads currently waiting on this object that they can resume.
 	 */
 	public synchronized void wakeUp()

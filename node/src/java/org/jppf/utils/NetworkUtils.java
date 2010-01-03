@@ -172,8 +172,7 @@ public final class NetworkUtils
 	{
 		InetSocketAddress addr = new InetSocketAddress(ip, 0);
 		String s = addr.getHostName();
-		if (s == null) s = ip;
-		return s;
+		return s == null ? ip : s;
 	}
 
 	/**

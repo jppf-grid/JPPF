@@ -65,12 +65,22 @@ public class TemplateJPPFTask extends JPPFTask
 	 */
 	public void run()
 	{
-		// write your task code here.
-		System.out.println("Hello, this is the node executing a template JPPF task " + taskId);
+		try
+		{
+			// write your task code here.
+      System.out.println("Hello, this is the node executing a template JPPF task");
 
-		// ...
-
-		// eventually set the execution results
-		setResult("the execution was performed successfully");
+      for (int i = 0; i < 10; i++)
+      {
+				System.out.println(i);
+				try {Thread.sleep(1000);} catch (Exception e) {System.out.println(e);}
+      }
+      // eventually set the execution results
+      setResult("the execution was performed successfully");
+    }
+		catch(Exception e)
+		{
+			setException(e);
+		}
 	}
 }
