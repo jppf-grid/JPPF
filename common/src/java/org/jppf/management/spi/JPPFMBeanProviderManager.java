@@ -60,7 +60,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
 	/**
 	 * Initialize this mbean provider manager.
 	 * @param clazz the class object for the provider interface.
-	 * @param server - the MBean server on which to register.
+	 * @param server the MBean server on which to register.
 	 */
 	public JPPFMBeanProviderManager(Class<S> clazz, MBeanServer server)
 	{
@@ -85,10 +85,10 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
 
 	/**
 	 * Register the specified MBean.
-	 * @param <T> - the type of the MBean interface. 
-	 * @param impl - the MBean implementation.
-	 * @param intf - the MBean exposed interface.
-	 * @param name - the MBean name.
+	 * @param <T> the type of the MBean interface. 
+	 * @param impl the MBean implementation.
+	 * @param intf the MBean exposed interface.
+	 * @param name the MBean name.
 	 * @return true if the registration succeeded, false otherwise.
 	 */
 	public <T> boolean registerProviderMBean(T impl, Class<T> intf, String name)
