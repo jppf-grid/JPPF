@@ -10,7 +10,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3.8.1"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/admin"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JBossServer"/>
-	<classpathentry kind="lib" path="C:/Tools/eclipse/plugins/org.eclipse.equinox.launcher_1.0.201.R35x_v20090715.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
