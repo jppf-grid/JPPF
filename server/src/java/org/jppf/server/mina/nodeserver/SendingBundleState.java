@@ -100,8 +100,8 @@ public class SendingBundleState extends NodeServerState
 			}
 			else
 			{
-				server.addIdleChannel(session);
 				server.transitionSession(session, TO_IDLE);
+				server.addIdleChannel(session);
 				return false;
 			}
 		}
@@ -119,14 +119,6 @@ public class SendingBundleState extends NodeServerState
 	public void endTransition(IoSession session) throws Exception
 	{
 		if (debugEnabled) log.debug("session " + uuid(session) + " : sent entire bundle to node " + getRemoteHost(session.getRemoteAddress()));
-		/*
-		WriteRequest request = session.getCurrentWriteRequest();
-		if (request != null)
-		{
-			WriteFuture wf = request.getFuture();
-			wf.await();
-		}
-		*/
 		NodeContext context = getContext(session);
 		context.setNodeMessage(null);
 		//JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);

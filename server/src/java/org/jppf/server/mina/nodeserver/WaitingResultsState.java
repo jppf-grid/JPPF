@@ -60,6 +60,8 @@ public class WaitingResultsState extends NodeServerState
 	public boolean startTransition(IoSession session) throws Exception
 	{
 		session.setAttribute("transitionStarted", true);
+		NodeContext context = getContext(session);
+		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
 		return true;
 	}
 
@@ -91,8 +93,8 @@ public class WaitingResultsState extends NodeServerState
 			statsManager.taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getNodeMessage().getLength());
 			context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 		}
-		Boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE);
 		jobManager.jobReturned(bundleWrapper, new IoSessionWrapper(session));
+		Boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE);
 		if ((requeue != null) && requeue)
 		{
 			bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
@@ -101,7 +103,7 @@ public class WaitingResultsState extends NodeServerState
 		}
 		else
 		{
-			// notifing the client thread about the end of a bundle
+			// notify the client thread about the end of a bundle
 			TaskCompletionListener listener = bundle.getCompletionListener();
 			if (listener != null) listener.taskCompleted(newBundleWrapper);
 		}

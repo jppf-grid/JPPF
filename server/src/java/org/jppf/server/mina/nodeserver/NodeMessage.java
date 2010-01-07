@@ -120,7 +120,7 @@ public class NodeMessage
 	private boolean readNextObject(IoBuffer channel) throws Exception
 	{
 		if (currentLengthObject == null) currentLengthObject = new NioObject(4, false);
-		InputSource is = new ByteBufferInputSource(channel.buf());
+		InputSource is = new IoBufferInputSource(channel);
 		if (!currentLengthObject.read(is)) return false;
 		if (currentLength <= 0)
 		{
@@ -170,6 +170,10 @@ public class NodeMessage
 	 */
 	private boolean writeNextObject(IoBuffer channel) throws Exception
 	{
+		if (position == 1)
+		{
+			int breakpoint = 0;
+		}
 		if (currentLengthObject == null)
 		{
 			currentLengthObject = new NioObject(4, false);
@@ -177,9 +181,57 @@ public class NodeMessage
 			buffer.putInt(locations.get(position).getSize());
 			buffer.flip();
 		}
-		OutputDestination od = new ByteBufferOutputDestination(channel.buf());
+		OutputDestination od = new IoBufferOutputDestination(channel);
 		if (!currentLengthObject.write(od)) return false;
 		if (currentObject == null) currentObject = new NioObject(locations.get(position), false);
+		if (!currentObject.write(od)) return false;
+		count += 4 + locations.get(position).getSize();
+		position++;
+		currentLengthObject = null;
+		currentObject = null;
+		return true;
+	}
+
+	/**
+	 * Read data from the channel.
+	 * @param channel the channel to write to.
+	 * @param sessionId the id of the session we write to.
+	 * @return true if the data has been completely written the channel, false otherwise.
+	 * @throws Exception if an IO error occurs.
+	 */
+	public boolean write(ByteBuffer channel, long sessionId) throws Exception
+	{
+		if (nbObjects <= 0)
+		{
+			nbObjects = bundle.getTaskCount() + 2;
+		}
+		//if (!writeLength(channel)) return false;
+		while (position < nbObjects)
+		{
+			if (!writeNextObject(channel, sessionId)) return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Write the next object to the specified channel.
+	 * @param channel - the channel to write to.
+	 * @param sessionId the id of the session we write to.
+	 * @return true if the object has been completely written the channel, false otherwise.
+	 * @throws Exception if an IO error occurs.
+	 */
+	private boolean writeNextObject(ByteBuffer channel, long sessionId) throws Exception
+	{
+		if (currentLengthObject == null)
+		{
+			currentLengthObject = new NioObject(4, false, sessionId);
+			ByteBuffer buffer = ((ByteBufferLocation) currentLengthObject.getData()).buffer();
+			buffer.putInt(locations.get(position).getSize());
+			buffer.flip();
+		}
+		OutputDestination od = new ByteBufferOutputDestination(channel);
+		if (!currentLengthObject.write(od)) return false;
+		if (currentObject == null) currentObject = new NioObject(locations.get(position), false, sessionId);
 		if (!currentObject.write(od)) return false;
 		count += 4 + locations.get(position).getSize();
 		position++;

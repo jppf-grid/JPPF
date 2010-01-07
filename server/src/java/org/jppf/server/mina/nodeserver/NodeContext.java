@@ -149,6 +149,7 @@ public class NodeContext extends MinaContext<NodeState>
 	 */
 	public BundleWrapper deserializeBundle() throws Exception
 	{
+		//if (nodeMessage == null) nodeMessage = new NodeMessage();
 		List<DataLocation> locations = nodeMessage.getLocations();
 		JPPFTaskBundle bundle = nodeMessage.getBundle();
 		BundleWrapper wrapper = new BundleWrapper(bundle);
