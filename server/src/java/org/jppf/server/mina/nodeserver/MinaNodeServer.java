@@ -127,6 +127,11 @@ public class MinaNodeServer
 		acceptor.getSessionConfig().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 		acceptor.getSessionConfig().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 		acceptor.getFilterChain().addLast("nodeMessageFilter", new NodeIoFilter());
+		/*
+		LoggingFilter loggingFilter = new LoggingFilter();
+		loggingFilter.setMessageSentLogLevel(LogLevel.TRACE);
+		acceptor.getFilterChain().addLast("logging", loggingFilter);
+		*/
 		//acceptor.getFilterChain().addLast("executor", new ExecutorFilter(new OrderedThreadPoolExecutor()));
 		acceptor.setHandler(new NodeIoHandler(this));
 		new Thread(queueChecker, "Node Queue Checker").start();
@@ -297,7 +302,8 @@ public class MinaNodeServer
 				SerializationHelper helper = new SerializationHelperImpl();
 				// serializing a null data provider.
 				JPPFBuffer buf = helper.getSerializer().serialize(null);
-				ByteBuffer bb = ByteBuffer.wrap(new byte[4 + buf.getLength()]);
+				byte[] dataProviderBytes = new byte[4 + buf.getLength()];
+				ByteBuffer bb = ByteBuffer.wrap(dataProviderBytes);
 				bb.putInt(buf.getLength());
 				bb.put(buf.getBuffer());
 				JPPFTaskBundle bundle = new JPPFTaskBundle();
@@ -307,7 +313,7 @@ public class MinaNodeServer
 				bundle.setTaskCount(0);
 				bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
 				initialBundle = new BundleWrapper(bundle);
-				initialBundle.setDataProvider(new ByteBufferLocation(bb));
+				initialBundle.setDataProvider(new ByteBufferLocation(dataProviderBytes, 0, dataProviderBytes.length));
 			}
 			catch(Exception e)
 			{

@@ -18,8 +18,6 @@
 
 package org.jppf.server.mina.nodeserver;
 
-import java.nio.ByteBuffer;
-
 import org.apache.commons.logging.*;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
@@ -76,7 +74,9 @@ public class NodeIoFilter extends IoFilterAdapter
 		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
 		boolean complete = false;
 		//if (debugEnabled) log.debug("session: " + session);
-		ByteBuffer buffer = ByteBuffer.allocate(32768);
+		IoBuffer buffer = IoBuffer.allocate(32768);
+		//IoBuffer buffer = IoBuffer.allocate(800000);
+		buffer.setAutoExpand(false);
 		//IoBuffer buffer = IoBuffer.allocate(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 		complete = context.getNodeMessage().write(buffer, session.getId());
 		if (debugEnabled) log.debug("session " + uuid(session) + " : written " + context.getNodeMessage().count + " bytes to buffer, write complete: " + complete); 
@@ -84,7 +84,7 @@ public class NodeIoFilter extends IoFilterAdapter
 		//if (buffer.position() > 0)
 		{
 			buffer.flip();
-			nextFilter.filterWrite(session, new DefaultWriteRequest(IoBuffer.wrap(buffer)));
+			nextFilter.filterWrite(session, new DefaultWriteRequest(buffer));
 		}
 	}
 

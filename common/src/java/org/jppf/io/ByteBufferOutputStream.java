@@ -38,7 +38,7 @@ public class ByteBufferOutputStream extends OutputStream
 	 */
 	public ByteBufferOutputStream(int capacity)
 	{
-		buffer = ByteBuffer.allocateDirect(capacity);
+		buffer = ByteBuffer.allocate(capacity);
 	}
 
 	/**

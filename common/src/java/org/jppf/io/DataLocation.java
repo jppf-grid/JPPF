@@ -66,4 +66,10 @@ public interface DataLocation
 	 * @throws Exception if an I/O error occurs.
 	 */
 	OutputStream getOutputStream() throws Exception;
+	/**
+	 * Make a shallow copy of this data location.
+	 * The data it points to is not copied.
+	 * @return a new DataLocation instance pointing to the same data.
+	 */
+	DataLocation copy();
 }

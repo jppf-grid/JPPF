@@ -19,14 +19,13 @@
 package org.jppf.server.mina.nodeserver;
 
 import org.apache.mina.core.session.IoSession;
-import org.jppf.server.mina.MinaContext;
 import org.jppf.server.nio.ChannelWrapper;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public class IoSessionWrapper extends ChannelWrapper<String>
+public class IoSessionWrapper extends ChannelWrapper<Long>
 {
 	/**
 	 * Initialize this wrapper with the specified io session.
@@ -34,6 +33,6 @@ public class IoSessionWrapper extends ChannelWrapper<String>
 	 */
 	public IoSessionWrapper(IoSession session)
 	{
-		super((String) session.getAttribute(MinaContext.SESSION_UUID_KEY));
+		super(session.getId());
 	}
 }

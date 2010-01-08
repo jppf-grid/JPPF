@@ -24,7 +24,6 @@ import static org.jppf.utils.StringUtils.getRemoteHost;
 import org.apache.commons.logging.*;
 import org.apache.mina.core.session.IoSession;
 import org.jppf.io.BundleWrapper;
-import org.jppf.server.mina.MinaContext;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.Bundler;
 
@@ -107,6 +106,8 @@ public class SendingBundleState extends NodeServerState
 		}
 		session.setAttribute("transitionStarted", true);
 		session.write(context.getBundle());
+		//WriteRequestQueue queue = session.getWriteRequestQueue();
+		//queue.offer(session, new DefaultWriteRequest(context.getBundle()));
 		return true;
 	}
 
@@ -118,20 +119,10 @@ public class SendingBundleState extends NodeServerState
 	 */
 	public void endTransition(IoSession session) throws Exception
 	{
-		if (debugEnabled) log.debug("session " + uuid(session) + " : sent entire bundle to node " + getRemoteHost(session.getRemoteAddress()));
+		if (debugEnabled) log.debug("session " + session.getId() + " : sent entire bundle to node " + getRemoteHost(session.getRemoteAddress()));
 		NodeContext context = getContext(session);
 		context.setNodeMessage(null);
 		//JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
 		server.transitionSession(session, TO_WAITING);
-	}
-
-	/**
-	 * Get the uuid of the specified session.
-	 * @param session the session to look up. 
-	 * @return the uuid as a string.
-	 */
-	private String uuid(IoSession session)
-	{
-		return (String) session.getAttribute(MinaContext.SESSION_UUID_KEY);
 	}
 }

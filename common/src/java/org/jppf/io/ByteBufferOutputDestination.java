@@ -38,7 +38,7 @@ public class ByteBufferOutputDestination implements OutputDestination
 	 */
 	public ByteBufferOutputDestination(int size)
 	{
-		this(ByteBuffer.allocateDirect(size));
+		this(ByteBuffer.allocate(size));
 	}
 
 	/**

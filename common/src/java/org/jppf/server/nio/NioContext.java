@@ -91,7 +91,7 @@ public abstract class NioContext<S extends Enum>
 		if (message.length <= 0)
 		{
 			message.length = SerializationUtils.readInt(channel);
-			message.buffer = ByteBuffer.allocateDirect(message.length);
+			message.buffer = ByteBuffer.allocate(message.length);
 			readByteCount = 0;
 		}
 		readByteCount += channel.read(message.buffer);

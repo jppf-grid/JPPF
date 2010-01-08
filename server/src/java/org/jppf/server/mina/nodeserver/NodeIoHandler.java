@@ -103,8 +103,6 @@ public class NodeIoHandler extends IoHandlerAdapter
 		if (debugEnabled) log.debug("session: " + session); 
 		NodeContext context = new NodeContext();
 		session.setAttribute(MinaContext.SESSION_CONTEXT_KEY, context);
-		//session.setAttribute(MinaContext.SESSION_UUID_KEY, StringUtils.getRemoteHost(session.getRemoteAddress())+ " : " + sessionCount.incrementAndGet());
-		session.setAttribute(MinaContext.SESSION_UUID_KEY, "" + sessionCount.incrementAndGet());
 		context.setBundle(server.getInitialBundle());
 		server.transitionSession(session, NodeTransition.TO_SEND_INITIAL);
 		NodeServerState state = server.factory.getState(context.getState());
@@ -112,7 +110,7 @@ public class NodeIoHandler extends IoHandlerAdapter
 	}
 
 	/**
-	 * Pefrom the final step of a state transition.
+	 * Perform the final step of a state transition.
 	 * @param session the session representing the connection to the node.
 	 * @throws Exception if any error occurs.
 	 */
@@ -135,16 +133,6 @@ public class NodeIoHandler extends IoHandlerAdapter
 	{
 		NodeContext context = (NodeContext) session.getAttribute(MinaContext.SESSION_CONTEXT_KEY);
 		context.handleException(session);
-		log.error("session " + uuid(session) + " : " + cause.getMessage(), new Exception(cause));
-	}
-
-	/**
-	 * Get the uuid of the specified session.
-	 * @param session the session to look up. 
-	 * @return the uuid as a string.
-	 */
-	private String uuid(IoSession session)
-	{
-		return (String) session.getAttribute(MinaContext.SESSION_UUID_KEY);
+		log.error("session " + session.getId() + " : " + cause.getMessage(), new Exception(cause));
 	}
 }

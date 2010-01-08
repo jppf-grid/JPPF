@@ -132,7 +132,7 @@ public class SocketChannelClient implements SocketWrapper
 	public void writeInt(int n) throws Exception
 	{
 		//ByteBuffer buffer = ByteBuffer.wrap(SerializationUtils.writeInt(n));
-		ByteBuffer buffer = ByteBuffer.allocateDirect(4);
+		ByteBuffer buffer = ByteBuffer.allocate(4);
 		buffer.putInt(n);
 		buffer.flip();
 		for (int count=0; count < 4;) count += channel.write(buffer);
@@ -227,7 +227,7 @@ public class SocketChannelClient implements SocketWrapper
 	 */
 	public int readInt() throws Exception
 	{
-		ByteBuffer buf = ByteBuffer.allocateDirect(4);
+		ByteBuffer buf = ByteBuffer.allocate(4);
 		int count = 0;
 		while (count < 4) count += channel.read(buf);
 		buf.flip();
@@ -419,7 +419,7 @@ public class SocketChannelClient implements SocketWrapper
 	{
 		if (n < 0) throw new IllegalArgumentException("number of bytes to skip must be >= 0");
 		else if (n == 0) return 0;
-		ByteBuffer buf = ByteBuffer.allocateDirect(n);
+		ByteBuffer buf = ByteBuffer.allocate(n);
 		while (buf.hasRemaining())
 		{
 			int r = channel.read(buf);

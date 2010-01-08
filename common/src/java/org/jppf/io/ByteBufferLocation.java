@@ -38,7 +38,7 @@ public class ByteBufferLocation extends AbstractDataLocation
 	 */
 	public ByteBufferLocation(int capacity)
 	{
-		this(ByteBuffer.allocateDirect(capacity));
+		this(new byte[capacity], 0, capacity);
 	}
 
 	/**
@@ -56,7 +56,7 @@ public class ByteBufferLocation extends AbstractDataLocation
 	 * Initialize this location with the specified buffer.
 	 * @param buffer the data abstracted by this memory location.
 	 */
-	public ByteBufferLocation(ByteBuffer buffer)
+	private ByteBufferLocation(ByteBuffer buffer)
 	{
 		this.buffer = buffer;
 		size = buffer.limit();
@@ -164,5 +164,17 @@ public class ByteBufferLocation extends AbstractDataLocation
 	public OutputStream getOutputStream() throws Exception
 	{
 		return new ByteBufferOutputStream(buffer);
+	}
+
+	/**
+	 * Make a shallow copy of this data location.
+	 * The data it points to is not copied.
+	 * @return a new DataLocation instance pointing to the same data.
+	 * @see org.jppf.io.DataLocation#copy()
+	 */
+	public DataLocation copy()
+	{
+		byte[] array = buffer.array();
+		return new ByteBufferLocation(array, 0, array.length);
 	}
 }

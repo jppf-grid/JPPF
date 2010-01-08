@@ -91,7 +91,7 @@ public class ChannelInputSource implements InputSource
 	 */
 	public int skip(int n) throws Exception
 	{
-		ByteBuffer buf = ByteBuffer.allocateDirect(n);
+		ByteBuffer buf = ByteBuffer.allocate(n);
 		channel.read(buf);
 		return buf.position();
 	}

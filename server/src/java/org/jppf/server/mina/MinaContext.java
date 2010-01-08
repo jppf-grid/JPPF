@@ -41,10 +41,6 @@ public abstract class MinaContext<S extends Enum>
 	 */
 	public static final String SESSION_CONTEXT_KEY = "sessionContext";
 	/**
-	 * Key for the session uuid.
-	 */
-	public static final String SESSION_UUID_KEY = "uuid";
-	/**
 	 * The current state of the channel this context is associated with.
 	 */
 	protected S state = null;

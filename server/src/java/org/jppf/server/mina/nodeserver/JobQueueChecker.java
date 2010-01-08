@@ -18,6 +18,7 @@
 package org.jppf.server.mina.nodeserver;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.*;
@@ -58,6 +59,11 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 	 * Determines whether this task is currently executing.
 	 */
 	private AtomicBoolean executing = new AtomicBoolean(false);
+	/**
+	 * 
+	 */
+	private ExecutorService executor = Executors.newSingleThreadExecutor();
+	
 	
 	/**
 	 * Initialize this task queue checker with the specified node server. 
@@ -119,7 +125,8 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 							server.transitionSession(channel, NodeTransition.TO_SENDING);
 							JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), new IoSessionWrapper(channel));
 							NodeServerState state = server.factory.getState(context.getState());
-							channel.setAttribute("transitionStarted", state.startTransition(channel));
+							//channel.setAttribute("transitionStarted", state.startTransition(channel));
+							executor.submit(new ChannelTransitionTask(channel, state));
 						}
 					}
 					catch(Exception e)
@@ -207,5 +214,47 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 	private String getJobId(JPPFTaskBundle bundle)
 	{
 		return (String) bundle.getParameter(BundleParameter.JOB_ID);
+	}
+
+	/**
+	 * 
+	 */
+	private class ChannelTransitionTask implements Runnable
+	{
+		/**
+		 * The state to transition to.
+		 */
+		private NodeServerState state = null;
+		/**
+		 * The session that is transitionned.
+		 */
+		private IoSession session = null;
+	
+		/**
+		 * Initialize this task.
+		 * @param session the state to transition to.
+		 * @param state the session that is transitionned.
+		 */
+		public ChannelTransitionTask(IoSession session, NodeServerState state)
+		{
+			this.session = session;
+			this.state = state;
+		}
+
+		/**
+		 * Perform the transition
+		 * @see java.lang.Runnable#run()
+		 */
+		public void run()
+		{
+			try
+			{
+				session.setAttribute("transitionStarted", state.startTransition(session));
+			}
+			catch(Exception e)
+			{
+				log.error(e.getMessage(), e);
+			}
+		}
 	}
 }

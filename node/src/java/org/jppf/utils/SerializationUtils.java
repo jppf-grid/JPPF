@@ -84,7 +84,7 @@ public final class SerializationUtils
 	 */
 	public static void writeInt(WritableByteChannel channel, int value) throws IOException
 	{
-		ByteBuffer buf = ByteBuffer.allocateDirect(4);
+		ByteBuffer buf = ByteBuffer.allocate(4);
 		buf.putInt(value);
 		buf.flip();
 		int count = 0;
@@ -109,7 +109,7 @@ public final class SerializationUtils
 	 */
 	public static int readInt(ReadableByteChannel channel) throws IOException
 	{
-		ByteBuffer buf = ByteBuffer.allocateDirect(4);
+		ByteBuffer buf = ByteBuffer.allocate(4);
 		int count = 0;
 		while (count < 4)
 		{

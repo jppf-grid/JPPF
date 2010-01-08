@@ -224,7 +224,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				SerializationHelper helper = new SerializationHelperImpl();
 				// serializing a null data provider.
 				JPPFBuffer buf = helper.getSerializer().serialize(null);
-				ByteBuffer bb = ByteBuffer.wrap(new byte[4 + buf.getLength()]);
+				byte[] dataProviderBytes = new byte[4 + buf.getLength()];
+				ByteBuffer bb = ByteBuffer.wrap(dataProviderBytes);
 				bb.putInt(buf.getLength());
 				bb.put(buf.getBuffer());
 				JPPFTaskBundle bundle = new JPPFTaskBundle();
@@ -234,7 +235,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				bundle.setTaskCount(0);
 				bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
 				initialBundle = new BundleWrapper(bundle);
-				initialBundle.setDataProvider(new ByteBufferLocation(bb));
+				initialBundle.setDataProvider(new ByteBufferLocation(dataProviderBytes, 0, dataProviderBytes.length));
 			}
 			catch(Exception e)
 			{

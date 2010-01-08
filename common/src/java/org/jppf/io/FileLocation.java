@@ -333,4 +333,15 @@ public class FileLocation extends AbstractDataLocation
 	{
 		return new BufferedOutputStream(new FileOutputStream(filePath));
 	}
+
+	/**
+	 * Make a shallow copy of this data location.
+	 * The data it points to is not copied.
+	 * @return a new DataLocation instance pointing to the same data.
+	 * @see org.jppf.io.DataLocation#copy()
+	 */
+	public DataLocation copy()
+	{
+		return new FileLocation(filePath, size);
+	}
 }
