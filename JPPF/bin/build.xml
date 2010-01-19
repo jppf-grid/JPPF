@@ -581,9 +581,9 @@
 			<param name="dest" value="${home}/"/>
 			<param name="templates" value="${home}/templates/"/>
 		</antcall>
+  	<copy toDir="${home}/wiki/includes" file="${home}/jppf_header.php"/>
+  	<!--<copy toDir="${home}/forums" file="${home}/jppf_header.php"/>-->
 	</target>
-	<copy toDir="${home}/wiki/includes" file="${home}/jppf_header.php"/>
-	<!--<copy toDir="${home}/forums" file="${home}/jppf_header.php"/>-->
 
   <target name="doc.home.1" description="generates the project web site pages">
 		<antcall target="doc.gen">
