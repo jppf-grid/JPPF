@@ -22,17 +22,29 @@
 	<!--                          Property definitions                             -->
 	<!-- ========================================================================= -->
 
+  <property file="${basedir}/build.properties"/>
+
 	<!-- ========================================================================= -->
 	<!--                         Build everything                                  -->
 	<!-- ========================================================================= -->
 
 	<target name="build">
+		<available file="${gs.home}/lib/required" property="gs.present"/>
+		<antcall target="build.gs.present"/>
+		<antcall target="build.gs.not.present"/>
+	</target>
+	
+	<target name="build.gs.present" if="gs.present">
 		<echo message="***** Building common components"/>
 		<ant antfile="${basedir}/JPPF-GigaSpaces-Common/build.xml" target="build" inheritall="false"/>
 		<echo message="***** Building the JPPF processing Unit"/>
 		<ant antfile="${basedir}/JPPF-GigaSpaces-ProcessingUnit/build.xml" target="build" inheritall="false"/>
 		<echo message="***** Building the GigaSpacaes client and demo web application"/>
 		<ant antfile="${basedir}/JPPF-GigaSpaces-Client/build.xml" target="build" inheritall="false"/>
+	</target>
+
+	<target name="build.gs.not.present" unless="gs.present">
+		<echo message="GigaSpaces installation not found - skipping this build step"/>
 	</target>
 
 </project> 
