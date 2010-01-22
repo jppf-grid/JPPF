@@ -17,7 +17,7 @@
 	limitations under the License.
 -->
 
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ChartsPage" type="page">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ServerChartsPage" type="page">
 	<!-- test comment for save -->
 	<property name="label" value="Charts"/>
 	<script language="groovy">BASE = "org.jppf.ui.i18n.ChartsPage"</script>
