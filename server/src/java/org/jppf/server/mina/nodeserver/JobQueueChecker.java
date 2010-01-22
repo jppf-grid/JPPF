@@ -19,7 +19,7 @@ package org.jppf.server.mina.nodeserver;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
 
 import org.apache.commons.logging.*;
 import org.apache.mina.core.session.IoSession;
@@ -35,7 +35,7 @@ import org.jppf.server.queue.AbstractJPPFQueue;
 import org.jppf.utils.ThreadSynchronization;
 
 /**
- * This class ensures that idle nodes get assigned pending tasks in the queue.
+ * This class ensures that idle nodes get assigned pending jobs in the queue.
  */
 public class JobQueueChecker extends ThreadSynchronization implements Runnable
 {
@@ -63,8 +63,11 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 	 * 
 	 */
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
-	
-	
+	/**
+	 * COunts the number of loops performed.
+	 */
+	private AtomicLong loopCount = new AtomicLong(0L);
+
 	/**
 	 * Initialize this task queue checker with the specified node server. 
 	 * @param server the owner of this queue checker.
@@ -81,10 +84,11 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 	public void run()
 	{
 		List<IoSession> idleChannels = server.getIdleChannels();
-		long sleepMillis = 0L;
-		int sleepNanos = 100000;
+		long sleepMillis = 1L;
+		int sleepNanos = 0;
 		while (!isStopped())
 		{
+			loopCount.incrementAndGet();
 			while (idleChannels.isEmpty() || server.getQueue().isEmpty()) goToSleep(sleepMillis, sleepNanos);
 			synchronized(idleChannels)
 			{
@@ -108,7 +112,6 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 						int n = findIdleChannelIndex(bundle);
 						if (n >= 0)
 						{
-							//channel = idleChannels.remove(n);
 							channel = server.removeIdleChannel(n);
 							selectedBundle = bundleWrapper;
 							found = true;
@@ -119,7 +122,7 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 						if (debugEnabled) log.debug((channel == null ? "no channel found for bundle" : "found channel for bundle") + " id=" + getJobId(selectedBundle.getBundle()));
 						if (channel != null)
 						{
-							NodeContext context = (NodeContext) channel.getAttribute(MinaContext.SESSION_CONTEXT_KEY);
+							NodeContext context = (NodeContext) channel.getAttribute(MinaContext.CONTEXT);
 							BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
 							context.setBundle(bundleWrapper);
 							server.transitionSession(channel, NodeTransition.TO_SENDING);
@@ -138,7 +141,7 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 				{
 					queue.getLock().unlock();
 				}
-				if (channel == null) goToSleep(sleepMillis);
+				if (channel == null) goToSleep(sleepMillis, sleepNanos);
 			}
 		}
 	}
@@ -165,7 +168,7 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 				channelsToRemove.add(i);
 				continue;
 			}
-			NodeContext context = (NodeContext) ch.getAttribute(MinaContext.SESSION_CONTEXT_KEY);
+			NodeContext context = (NodeContext) ch.getAttribute(MinaContext.CONTEXT);
 			if (uuidPath.contains(context.getNodeUuid())) continue;
 			if (rule != null)
 			{

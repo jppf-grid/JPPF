@@ -61,6 +61,7 @@ public class WaitingResultsState extends NodeServerState
 	{
 		session.setAttribute("transitionStarted", true);
 		NodeContext context = getContext(session);
+		if (debugEnabled) log.debug("session " + session.getId() + " starting " + context.getState());
 		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
 		return true;
 	}
@@ -74,8 +75,8 @@ public class WaitingResultsState extends NodeServerState
 	 */
 	public void endTransition(IoSession session) throws Exception
 	{
-		if (debugEnabled) log.debug("read bundle from node " + getRemoteHost(session.getRemoteAddress()) + " done");
 		NodeContext context = getContext(session);
+		if (debugEnabled) log.debug("session " + session.getId() + " : ending " + context.getState() + ", read bundle from node " + getRemoteHost(session.getRemoteAddress()) + " done");
 		BundleWrapper bundleWrapper = context.getBundle();
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		BundleWrapper newBundleWrapper = context.deserializeBundle();

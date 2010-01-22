@@ -18,11 +18,10 @@
 
 package org.jppf.server.mina.nodeserver;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.commons.logging.*;
 import org.apache.mina.core.service.IoHandlerAdapter;
-import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.session.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.mina.MinaContext;
 import org.jppf.server.nio.nodeserver.*;
 
@@ -44,10 +43,6 @@ public class NodeIoHandler extends IoHandlerAdapter
 	 * The node server.
 	 */
 	private MinaNodeServer server = null;
-	/**
-	 * Count of sessions created.
-	 */
-	private static AtomicInteger sessionCount = new AtomicInteger(0);
 
 	/**
 	 * Initialize this io handler with the specified node server.
@@ -67,10 +62,10 @@ public class NodeIoHandler extends IoHandlerAdapter
 	 */
 	public void messageReceived(IoSession session, Object message) throws Exception
 	{
-		if (debugEnabled) log.debug("session: " + session); 
-		Boolean b = (Boolean) session.getAttribute("readComplete", Boolean.TRUE);
-		Boolean transitionStarted = (Boolean) session.getAttribute("transitionStarted", Boolean.TRUE);
-		if (b && transitionStarted) endTransition(session);
+		Boolean readComplete = (Boolean) session.getAttribute(MinaContext.READ_COMPLETE, Boolean.TRUE);
+		Boolean transitionStarted = (Boolean) session.getAttribute(MinaContext.TRANSITION_STARTED, Boolean.TRUE);
+		if (debugEnabled) log.debug("session " + session.getId() + " : transitionStarted = " + transitionStarted + ", readComplete = " + readComplete);
+		if (readComplete && transitionStarted) endTransition(session);
 	}
 
 	/**
@@ -82,13 +77,19 @@ public class NodeIoHandler extends IoHandlerAdapter
 	 */
 	public void messageSent(IoSession session, Object message) throws Exception
 	{
-		if (debugEnabled) log.debug("session: " + session);
-		Boolean transitionStarted = (Boolean) session.getAttribute("transitionStarted", Boolean.TRUE);
+		Boolean transitionStarted = (Boolean) session.getAttribute(MinaContext.TRANSITION_STARTED, Boolean.TRUE);
+		Boolean writeComplete = (Boolean) session.getAttribute(MinaContext.WRITE_COMPLETE, Boolean.TRUE);
+		if (debugEnabled) log.debug("session " + session.getId() + " : transitionStarted = " + transitionStarted + ", writeComplete = " + writeComplete);
 		if (transitionStarted)
 		{
-			Boolean b = (Boolean) session.getAttribute("writeComplete", Boolean.TRUE);
-			if (!b) session.write(message);
-			else endTransition(session);
+			if (!writeComplete) session.write(message); // write next message chunk
+			else
+			{
+				endTransition(session);
+				NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
+				NodeServerState state = server.factory.getState(context.getState());
+				session.setAttribute(MinaContext.TRANSITION_STARTED, state.startTransition(session));
+			}
 		}
 	}
 
@@ -102,11 +103,11 @@ public class NodeIoHandler extends IoHandlerAdapter
 	{
 		if (debugEnabled) log.debug("session: " + session); 
 		NodeContext context = new NodeContext();
-		session.setAttribute(MinaContext.SESSION_CONTEXT_KEY, context);
+		session.setAttribute(MinaContext.CONTEXT, context);
 		context.setBundle(server.getInitialBundle());
 		server.transitionSession(session, NodeTransition.TO_SEND_INITIAL);
 		NodeServerState state = server.factory.getState(context.getState());
-		session.setAttribute("transitionStarted", state.startTransition(session));
+		session.setAttribute(MinaContext.TRANSITION_STARTED, state.startTransition(session));
 	}
 
 	/**
@@ -116,7 +117,7 @@ public class NodeIoHandler extends IoHandlerAdapter
 	 */
 	private void endTransition(IoSession session) throws Exception
 	{
-		NodeContext context = (NodeContext) session.getAttribute(MinaContext.SESSION_CONTEXT_KEY);
+		NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
 		NodeState s = context.getState();
 		NodeServerState state = server.factory.getState(s);
 		state.endTransition(session);
@@ -131,8 +132,43 @@ public class NodeIoHandler extends IoHandlerAdapter
 	 */
 	public void exceptionCaught(IoSession session, Throwable cause) throws Exception
 	{
-		NodeContext context = (NodeContext) session.getAttribute(MinaContext.SESSION_CONTEXT_KEY);
+		NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
 		context.handleException(session);
-		log.error("session " + session.getId() + " : " + cause.getMessage(), new Exception(cause));
+		log.error("session " + session.getId() + " : " + cause.getMessage(), cause);
+	}
+
+	/**
+	 * Called when a session is closed.
+	 * @param session the session that was closed.
+	 * @throws Exception if any error occurs.
+	 * @see org.apache.mina.core.service.IoHandlerAdapter#sessionClosed(org.apache.mina.core.session.IoSession)
+	 */
+	public void sessionClosed(IoSession session) throws Exception
+	{
+		if (debugEnabled) log.debug("session " + session.getId() + " closed");
+	}
+
+	/**
+	 * Called when a session is created.
+	 * @param session the session that was created.
+	 * @throws Exception if any error occurs.
+	 * @see org.apache.mina.core.service.IoHandlerAdapter#sessionCreated(org.apache.mina.core.session.IoSession)
+	 */
+	public void sessionCreated(IoSession session) throws Exception
+	{
+		if (debugEnabled) log.debug("session " + session.getId() + " created");
+		JPPFDriver.getInstance().getStatsManager().newNodeConnection();
+	}
+
+	/**
+	 * Called when a session becomes idle.
+	 * @param session the session that is idle.
+	 * @param status the session's idle status.
+	 * @throws Exception if any error occurs.
+	 * @see org.apache.mina.core.service.IoHandlerAdapter#sessionIdle(org.apache.mina.core.session.IoSession, org.apache.mina.core.session.IdleStatus)
+	 */
+	public void sessionIdle(IoSession session, IdleStatus status) throws Exception
+	{
+		if (debugEnabled) log.debug("session " + session.getId() + " idle, status = " + status);
 	}
 }

@@ -66,6 +66,7 @@ public class SendingBundleState extends NodeServerState
 		}
 		*/
 		NodeContext context = getContext(session);
+		if (debugEnabled) log.debug("session " + session.getId() + " starting " + context.getState());
 		if (context.getNodeMessage() == null)
 		{
 			// check whether the bundler settings have changed.
@@ -119,8 +120,8 @@ public class SendingBundleState extends NodeServerState
 	 */
 	public void endTransition(IoSession session) throws Exception
 	{
-		if (debugEnabled) log.debug("session " + session.getId() + " : sent entire bundle to node " + getRemoteHost(session.getRemoteAddress()));
 		NodeContext context = getContext(session);
+		if (debugEnabled) log.debug("session " + session.getId() + ": ending " + context.getState() + ", sent entire bundle to node " + getRemoteHost(session.getRemoteAddress()));
 		context.setNodeMessage(null);
 		//JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
 		server.transitionSession(session, TO_WAITING);

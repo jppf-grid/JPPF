@@ -75,6 +75,6 @@ public abstract class NodeServerState
 	 */
 	public NodeContext getContext(IoSession session)
 	{
-		return (NodeContext) session.getAttribute(MinaContext.SESSION_CONTEXT_KEY);
+		return (NodeContext) session.getAttribute(MinaContext.CONTEXT);
 	}
 }

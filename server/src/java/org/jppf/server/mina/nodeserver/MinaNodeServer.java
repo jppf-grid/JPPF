@@ -24,7 +24,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.*;
-import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.session.*;
+import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
@@ -91,7 +92,8 @@ public class MinaNodeServer
 	 */
 	private JPPFBundlerFactory bundlerFactory = new JPPFBundlerFactory();
 	/**
-	 * 
+	 * A separate thread that runs continuously and checks for jobs that can
+	 * be sent to available nodes.
 	 */
 	private JobQueueChecker queueChecker = new JobQueueChecker(this);
 
@@ -128,11 +130,10 @@ public class MinaNodeServer
 		acceptor.getSessionConfig().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 		acceptor.getFilterChain().addLast("nodeMessageFilter", new NodeIoFilter());
 		/*
-		LoggingFilter loggingFilter = new LoggingFilter();
-		loggingFilter.setMessageSentLogLevel(LogLevel.TRACE);
-		acceptor.getFilterChain().addLast("logging", loggingFilter);
-		*/
-		//acceptor.getFilterChain().addLast("executor", new ExecutorFilter(new OrderedThreadPoolExecutor()));
+		OrderedThreadPoolExecutor x = new OrderedThreadPoolExecutor(16, 16, 1L, TimeUnit.HOURS, new JPPFThreadFactory("NodeIoProcessor"));
+		ExecutorFilter ef = new ExecutorFilter(x);
+		acceptor.getFilterChain().addLast("executor", ef);
+    */
 		acceptor.setHandler(new NodeIoHandler(this));
 		new Thread(queueChecker, "Node Queue Checker").start();
 		getQueue().addListener(new QueueListener()
@@ -166,6 +167,7 @@ public class MinaNodeServer
 		synchronized(idleChannels)
 		{
 			idleChannels.add(channel);
+			if (debugEnabled) log.debug("" + idleChannels.size() + " channels idle");
 		}
 		queueChecker.wakeUp();
 	}
@@ -261,17 +263,20 @@ public class MinaNodeServer
 	 */
 	public void transitionSession(IoSession session, NodeTransition transition)
 	{
+		if (!session.isConnected()) return;
 		NioTransition<NodeState> tr = factory.getTransition(transition);
 		NodeState s = tr.getState();
-		NodeContext context = (NodeContext) session.getAttribute(MinaContext.SESSION_CONTEXT_KEY);
+		NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
 		context.setState(s);
 		switch(tr.getInterestOps())
 		{
 			case NodeServerFactory.NONE:
+				//suspendWrite(session);
 				if (!session.isWriteSuspended()) session.suspendWrite();
 				if (!session.isReadSuspended()) session.suspendRead();
 				return;
 			case NodeServerFactory.R:
+				//suspendWrite(session);
 				if (!session.isWriteSuspended()) session.suspendWrite();
 				if (session.isReadSuspended()) session.resumeRead();
 				break;
@@ -284,6 +289,24 @@ public class MinaNodeServer
 				if (session.isWriteSuspended()) session.resumeWrite();
 				break;
 		}
+	}
+
+	/**
+	 * Suspend writes on the specified session. This method first ensures that any
+	 * remaining data in the write request queue is flushed.
+	 * @param session th session for which to suspend writes.
+	 */
+	private void suspendWrite(IoSession session)
+	{
+		if (session.isWriteSuspended()) return;
+		WriteRequestQueue queue = session.getWriteRequestQueue();
+		if (!queue.isEmpty(session))
+		{
+			if (debugEnabled) log.debug("flushing session " + session);
+			AbstractIoSession s = (AbstractIoSession) session;
+			s.getProcessor().flush(session);
+		}
+		session.suspendWrite();
 	}
 
 	/**
@@ -325,25 +348,25 @@ public class MinaNodeServer
 
 	/**
 	 * Close a connection to a node.
-	 * @param channel - a <code>SocketChannel</code> that encapsulates the connection.
-	 * @param context - the context data associated with the channel.
+	 * @param session a <code>IoSession</code> that encapsulates the connection.
+	 * @param context the context data associated with the channel.
 	 */
-	public void closeNode(IoSession channel, NodeContext context)
+	public void closeNode(IoSession session, NodeContext context)
 	{
 		try
 		{
-			channel.close(true);
+			session.close(true);
 			JPPFDriver.getInstance().getStatsManager().nodeConnectionClosed();
 			if (context.getNodeUuid() != null)
 			{
-				ChannelWrapper cw = new IoSessionWrapper(channel);
+				ChannelWrapper cw = new IoSessionWrapper(session);
 				JPPFDriver.getInstance().removeNodeInformation(cw);
-				removeIdleChannel(channel);
+				removeIdleChannel(session);
 			}
 		}
-		catch (Exception ignored)
+		catch (Exception e)
 		{
-			log.error(ignored.getMessage(), ignored);
+			log.error(e.getMessage(), e);
 		}
 	}
 }

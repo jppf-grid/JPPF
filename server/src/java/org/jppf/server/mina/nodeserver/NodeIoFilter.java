@@ -18,12 +18,16 @@
 
 package org.jppf.server.mina.nodeserver;
 
+import java.net.ConnectException;
+
 import org.apache.commons.logging.*;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
-import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.session.*;
 import org.apache.mina.core.write.*;
 import org.jppf.server.mina.MinaContext;
+import org.jppf.server.nio.nodeserver.NodeState;
+import org.jppf.utils.StringUtils;
 
 /**
  * Tranforms IO messages and into <code>BundleWrapper</code> instances and vice-versa.
@@ -50,13 +54,17 @@ public class NodeIoFilter extends IoFilterAdapter
 	 */
 	public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception
 	{
-		//if (debugEnabled) log.debug("session: " + session); 
-		NodeContext context = (NodeContext) session.getAttribute(MinaContext.SESSION_CONTEXT_KEY);
+		NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
+		NodeState state = context.getState();
+		if (NodeState.SEND_INITIAL_BUNDLE.equals(state) || NodeState.SENDING_BUNDLE.equals(state))
+		{
+			throw new ConnectException("Node " + StringUtils.getRemoteHost(session.getRemoteAddress()) + " has been disconnected");
+		}
 		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
 		IoBuffer buffer = (IoBuffer) message;
-		boolean b = context.getNodeMessage().read(buffer);
-		if (debugEnabled) log.debug("session " + uuid(session) + " : read " + context.getNodeMessage().count + " bytes from buffer, read complete: " + b); 
-		session.setAttribute("readComplete", b);
+		boolean complete = context.getNodeMessage().read(buffer);
+		if (debugEnabled) log.debug("session " + session.getId() + " : read " + context.getNodeMessage().count + " bytes from buffer, read complete: " + complete); 
+		session.setAttribute(MinaContext.READ_COMPLETE, complete);
 		nextFilter.messageReceived(session, context.getBundle());
 	}
 
@@ -70,22 +78,15 @@ public class NodeIoFilter extends IoFilterAdapter
 	 */
 	public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest request) throws Exception
 	{
-		NodeContext context = (NodeContext) session.getAttribute(MinaContext.SESSION_CONTEXT_KEY);
+		NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
 		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
-		boolean complete = false;
-		//if (debugEnabled) log.debug("session: " + session);
-		IoBuffer buffer = IoBuffer.allocate(32768);
-		//IoBuffer buffer = IoBuffer.allocate(800000);
-		buffer.setAutoExpand(false);
-		//IoBuffer buffer = IoBuffer.allocate(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-		complete = context.getNodeMessage().write(buffer, session.getId());
-		if (debugEnabled) log.debug("session " + uuid(session) + " : written " + context.getNodeMessage().count + " bytes to buffer, write complete: " + complete); 
-		session.setAttribute("writeComplete", complete);
-		//if (buffer.position() > 0)
-		{
-			buffer.flip();
-			nextFilter.filterWrite(session, new DefaultWriteRequest(buffer));
-		}
+		IoBuffer buffer = IoBuffer.wrap(new byte[32768]);
+		boolean complete = context.getNodeMessage().write(buffer, session.getId());
+		session.setAttribute(MinaContext.WRITE_COMPLETE, complete);
+		buffer.flip();
+		if (debugEnabled) log.debug("session " + session.getId() + " : write count = " + context.getNodeMessage().count + ", write complete: " + complete + ", written " + buffer.limit() + " bytes"); 
+		nextFilter.filterWrite(session, new DefaultWriteRequest(buffer));
+		//if (debugEnabled) log.debug("session " + session.getId() + " : after nextFilter.write()");
 	}
 
 	/**
@@ -98,25 +99,8 @@ public class NodeIoFilter extends IoFilterAdapter
 	 */
 	public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest request) throws Exception
 	{
-		if (debugEnabled) log.debug("session: " + session);
-		NodeContext context = (NodeContext) session.getAttribute(MinaContext.SESSION_CONTEXT_KEY);
+		if (debugEnabled) log.debug("session: " + session + ", message = " + request.getMessage());
+		NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
 		nextFilter.messageSent(session, new DefaultWriteRequest(context.getBundle()));
-		/*
-		Boolean b = (Boolean) session.getAttribute("writeComplete", Boolean.TRUE);
-		if (b)
-		{
-		}
-		*/
-	}
-
-	/**
-	 * Get the uuid of the specified session.
-	 * @param session the session to look up. 
-	 * @return the uuid as a string.
-	 */
-	private String uuid(IoSession session)
-	{
-		//return (String) session.getAttribute(MinaContext.SESSION_UUID_KEY);
-		return "" + (int) session.getId();
 	}
 }
