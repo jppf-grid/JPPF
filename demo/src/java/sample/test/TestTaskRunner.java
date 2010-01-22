@@ -18,12 +18,12 @@
 package sample.test;
 
 import java.io.*;
-import java.util.*;
+import java.util.List;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.utils.StringUtils;
 
@@ -55,8 +55,9 @@ public class TestTaskRunner
 		try
 		{
 			jppfClient = new JPPFClient();
-			performBasicTest();
+			performNonSerializableAttributeTest();
 			/*
+			performBasicTest();
 			performSecurityTest();
 			performEmptyTaskListTest();
 			performExceptionTest();
@@ -300,32 +301,10 @@ public class TestTaskRunner
 	 */
 	static void performDB2LoadingTaskTest() throws JPPFException
 	{
-		System.out.println(banner);
-		System.out.println("Starting DB2 Loading task testing...");
-		try
-		{
-			int n = 1;
-			JPPFJob job = new JPPFJob();
-			for (int i=0; i<n; i++) job.addTask(new DB2LoadingTask());
-			List<JPPFTask> results = jppfClient.submit(job);
-			JPPFTask resultTask = results.get(0);
-			if (resultTask.getException() != null)
-			{
-				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
-			}
-			else
-			{
-				System.out.println("Result is: "+resultTask.getResult());
-			}
-		}
-		catch(Exception e)
-		{
-			throw new JPPFException(e);
-		}
-		finally
-		{
-			System.out.println("DB2 Loading tasks testing complete.");
-		}
+		int n = 1;
+		Object[] tasks = new Object[n];
+		for (int i=0; i<n; i++) tasks[i] = new DB2LoadingTask();
+		singleTest("DB2 Loading task", null, tasks);
 	}
 	
 	/**
@@ -334,67 +313,22 @@ public class TestTaskRunner
 	 */
 	static void performXMLParsingTaskTest() throws JPPFException
 	{
-		System.out.println(banner);
-		System.out.println("Starting XML parsing task testing...");
-		try
-		{
-			int n = 1;
-			JPPFJob job = new JPPFJob();
-			for (int i=0; i<n; i++) job.addTask(new ParserTask("build.xml"));
-			List<JPPFTask> results = jppfClient.submit(job);
-			JPPFTask resultTask = results.get(0);
-			if (resultTask.getException() != null)
-			{
-				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
-			}
-			else
-			{
-				System.out.println("Result is: "+resultTask.getResult());
-			}
-		}
-		catch(Exception e)
-		{
-			throw new JPPFException(e);
-		}
-		finally
-		{
-			System.out.println("XML parsing task testing complete.");
-		}
+		int n = 1;
+		Object[] tasks = new Object[n];
+		for (int i=0; i<n; i++) tasks[i] = new ParserTask("build.xml");
+		singleTest("XML parsing task", null, tasks);
 	}
 	
 	/**
 	 * Check that correct results are returned by the framework.
-	 * @throws JPPFException if an error is raised during the execution.
+	 * @throws Exception if an error is raised during the execution.
 	 */
-	static void performMyTaskTest() throws JPPFException
+	static void performMyTaskTest() throws Exception
 	{
-		System.out.println(banner);
-		System.out.println("Starting my task testing...");
-		try
-		{
-			DataProvider dataProvider = new MemoryMapDataProvider();
-			dataProvider.setValue("DATA", new SimpleData("Data and more data"));			
-			JPPFJob job = new JPPFJob(dataProvider);
-			job.addTask(new MyTask());
-			List<JPPFTask> results = jppfClient.submit(job);
-			JPPFTask resultTask = results.get(0);
-			if (resultTask.getException() != null)
-			{
-				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
-			}
-			else
-			{
-				System.out.println("Result is: "+resultTask.getResult());
-			}
-		}
-		catch(Exception e)
-		{
-			throw new JPPFException(e);
-		}
-		finally
-		{
-			System.out.println("My task testing complete.");
-		}
+		DataProvider dataProvider = new MemoryMapDataProvider();
+		dataProvider.setValue("DATA", new SimpleData("Data and more data"));			
+		JPPFJob job = new JPPFJob(dataProvider);
+		singleTest("my task", dataProvider, new MyTask());
 	}
 	
 	/**
@@ -403,31 +337,7 @@ public class TestTaskRunner
 	 */
 	static void performTimeoutTaskTest() throws JPPFException
 	{
-		System.out.println(banner);
-		System.out.println("Starting timeout testing...");
-		try
-		{
-			JPPFJob job = new JPPFJob();
-			job.addTask(new TimeoutTask());
-			List<JPPFTask> results = jppfClient.submit(job);
-			JPPFTask resultTask = results.get(0);
-			if (resultTask.getException() != null)
-			{
-				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
-			}
-			else
-			{
-				System.out.println("Result is: "+resultTask.getResult());
-			}
-		}
-		catch(Exception e)
-		{
-			throw new JPPFException(e);
-		}
-		finally
-		{
-			System.out.println("Timeout testing complete.");
-		}
+		singleTest("timeout", null, new TimeoutTask());
 	}
 	
 	/**
@@ -457,24 +367,7 @@ public class TestTaskRunner
 	 */
 	static void performAnonymousInnerClassTaskTest() throws JPPFException
 	{
-		System.out.println(banner);
-		System.out.println("Starting anonymous inner class task testing...");
-		try
-		{
-			int n = 50;
-			JPPFJob job = new JPPFJob();
-			job.addTask(new AnonymousInnerClassTask());
-			List<JPPFTask> results = jppfClient.submit(job);
-			System.out.println("result is : "+results.get(0).getResult());
-		}
-		catch(Exception e)
-		{
-			throw new JPPFException(e);
-		}
-		finally
-		{
-			System.out.println("Anonymous inner class task testing complete.");
-		}
+		singleTest("anonymous inner class task", null, new AnonymousInnerClassTask());
 	}
 
 	/**
@@ -483,57 +376,19 @@ public class TestTaskRunner
 	 */
 	static void performOutOfMemoryTest() throws JPPFException
 	{
-		System.out.println(banner);
-		System.out.println("Starting OOM testing...");
-		try
-		{
-			int n = 50;
-			JPPFJob job = new JPPFJob();
-			job.addTask(new OutOfMemoryTestTask());
-			List<JPPFTask> results = jppfClient.submit(job);
-			JPPFTask res = results.get(0);
-			if (res.getException() != null) throw res.getException();
-			System.out.println("result is : "+res.getResult());
-		}
-		catch(Exception e)
-		{
-			throw new JPPFException(e);
-		}
-		finally
-		{
-			System.out.println("OOM testing complete.");
-		}
+		singleTest("OOM", null, new OutOfMemoryTestTask());
 	}
 
 	/**
 	 * Check that an anonymous inner class fails with a NotSerializableException on the client side.
-	 * @throws JPPFException if an error is raised during the execution.
+	 * @throws Exception if an error is raised during the execution.
 	 */
-	static void performLargeDataTest() throws JPPFException
+	static void performLargeDataTest() throws Exception
 	{
-		System.out.println(banner);
-		System.out.println("Starting OOM testing...");
-		try
-		{
-			int n = 50;
-			DataProvider dp = new MemoryMapDataProvider();
-			byte[] data = new byte[128 * 1024 * 1204];
-			dp.setValue("test", data);
-			JPPFJob job = new JPPFJob(dp);
-			job.addTask(new ConstantTask(1));
-			List<JPPFTask> results = jppfClient.submit(job);
-			JPPFTask res = results.get(0);
-			if (res.getException() != null) throw res.getException();
-			System.out.println("result is : " + res.getResult());
-		}
-		catch(Exception e)
-		{
-			throw new JPPFException(e);
-		}
-		finally
-		{
-			System.out.println("OOM testing complete.");
-		}
+		DataProvider dp = new MemoryMapDataProvider();
+		byte[] data = new byte[128 * 1024 * 1204];
+		dp.setValue("test", data);
+		singleTest("Large Data", dp, new ConstantTask(1));
 	}
 
 	/**
@@ -566,16 +421,40 @@ public class TestTaskRunner
 
 	/**
 	 * Test an annotated task.
+	 * @throws Exception if an error is raised during the execution.
+	 */
+	static void performBasicTest() throws Exception
+	{
+		JPPFTask[] tasks = new JPPFTask[1];
+		for (int i=0; i<1; i++) tasks[i] = new TemplateJPPFTask(i);
+		singleTest("basic", null, (Object[]) tasks);
+	}
+
+	/**
+	 * Test with a non-serializable attribute initially null n the task.
+	 * This test should fail on the node side when sending results back to the server.
 	 * @throws JPPFException if an error is raised during the execution.
 	 */
-	static void performBasicTest() throws JPPFException
+	static void performNonSerializableAttributeTest() throws JPPFException
+	{
+		singleTest("non-serializable attribute", null, new NonSerializableAttributeTask());
+	}
+
+	/**
+	 * Perform a test with a single JPPF task and a data provider.
+	 * @param title the title given to the test.
+	 * @param dp the data provider.
+	 * @param tasks the task to execute.
+	 * @throws JPPFException if an error is raised during the execution.
+	 */
+	static void singleTest(String title, DataProvider dp, Object...tasks) throws JPPFException
 	{
 		System.out.println(banner);
-		System.out.println("Starting basic testing...");
+		System.out.println("Starting " + title + " test ...");
 		try
 		{
-			JPPFJob job = new JPPFJob();
-			for (int i=0; i<1; i++) job.addTask(new TemplateJPPFTask(i));
+			JPPFJob job = new JPPFJob(dp);
+			for (Object task: tasks) job.addTask(task);
 			List<JPPFTask> results = jppfClient.submit(job);
 			JPPFTask res = results.get(0);
 			if (res.getException() != null) throw res.getException();
@@ -587,7 +466,7 @@ public class TestTaskRunner
 		}
 		finally
 		{
-			System.out.println("annotation testing complete.");
+			System.out.println(title + " test complete.");
 		}
 	}
 }
