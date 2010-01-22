@@ -39,7 +39,19 @@ public abstract class MinaContext<S extends Enum>
 	/**
 	 * Key for the node context as a session attribute.
 	 */
-	public static final String SESSION_CONTEXT_KEY = "sessionContext";
+	public static final String CONTEXT = "sessionContext";
+	/**
+	 * Key for the message read complete flag.
+	 */
+	public static final String READ_COMPLETE = "readComplete";
+	/**
+	 * Key for the message write complete flag.
+	 */
+	public static final String WRITE_COMPLETE = "writeComplete";
+	/**
+	 * Key for the trnasitiion started flag.
+	 */
+	public static final String TRANSITION_STARTED = "transitionStarted";
 	/**
 	 * The current state of the channel this context is associated with.
 	 */
