@@ -216,7 +216,8 @@ public class NodeIO extends ThreadSynchronization
 	}
 
 	/**
-	 * .
+	 * The goal of this class is to serialize an object before sending it back to the server,
+	 * and catch an eventual exception.
 	 */
 	public class ObjectWriteTask implements Callable<byte[]>
 	{
@@ -224,6 +225,10 @@ public class NodeIO extends ThreadSynchronization
 		 * The data to send over the network connection.
 		 */
 		private Object object = null;
+		/**
+		 * An exception that may occur during serialization will be captured in this attribute.
+		 */
+		private Exception exception = null;
 
 		/**
 		 * Initialize this task with the psecicfied data buffer.
@@ -244,15 +249,48 @@ public class NodeIO extends ThreadSynchronization
 			byte[] data = null;
 			try
 			{
-				JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-				data = node.getHelper().getSerializer().serialize(object).getBuffer();
-				if (transform != null) data = transform.wrap(data);
+				data = serialize(object);
 			}
 			catch(Exception e)
 			{
+				exception = e;
 				log.error(e.getMessage(), e);
+				try
+				{
+					JPPFExceptionResult result = new JPPFExceptionResult(e, object);
+					if (object instanceof JPPFTask) result.setPosition(((JPPFTask) object).getPosition());
+					data = serialize(result);
+				}
+				catch(Exception e2)
+				{
+					log.error(e2.getMessage(), e2);
+				}
 			}
 			return data;
+		}
+
+		/**
+		 * Serialize the specified object
+		 * @param o the object to serialize.
+		 * @return the serialized object as an array of bytes.
+		 * @throws Exception if any error occurs.
+		 */
+		private byte[] serialize(Object o) throws Exception
+		{
+			byte[] data = null;
+			JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+			data = node.getHelper().getSerializer().serialize(o).getBuffer();
+			if (transform != null) data = transform.wrap(data);
+			return data;
+		}
+
+		/**
+		 * Get an exception that may have occurred during serialization.
+		 * @return an <code>Exception</code> instance.
+		 */
+		public Exception getException()
+		{
+			return exception;
 		}
 	}
 }
