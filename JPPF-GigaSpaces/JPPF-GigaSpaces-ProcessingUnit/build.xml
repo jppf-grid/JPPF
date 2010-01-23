@@ -36,7 +36,7 @@
 		<pathelement location="${classes.dir}"/>
 		<pathelement location="${common.dir}/classes"/>
 		<fileset dir="${common.dir}/lib" includes="*.jar"/>
-		<fileset dir="${gs.home}/lib/required" includes="*.jar"/>
+		<!--<fileset dir="${gs.home}/lib/required" includes="*.jar"/>-->
 	</path>
 
 	<!-- ========================================================================= -->
