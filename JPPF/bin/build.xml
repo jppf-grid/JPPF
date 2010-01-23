@@ -517,7 +517,7 @@
 	<!-- It must point to the root installation directory of IzPack                -->
 	<!-- ========================================================================= -->
 
-	<taskdef onerror="report" name="izpack" classpath="${izpack.home}/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask"/>
+	<taskdef onerror="ignore" name="izpack" classpath="${izpack.home}/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask"/>
 
 	<target name="installer">
 		<available file="${izpack.home}/lib/standalone-compiler.jar" property="izpack.present"/>
