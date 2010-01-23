@@ -22,7 +22,7 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.Timer;
 import javax.swing.*;
-import org.jdesktop.jdic.screensaver.*;
+//import org.jdesktop.jdic.screensaver.*;
 import org.jppf.utils.*;
 
 /**
@@ -30,7 +30,7 @@ import org.jppf.utils.*;
  * @author Laurent Cohen
  * @author nissalia
  */
-public class JPPFScreenSaver extends SimpleScreensaver
+public class JPPFScreenSaver //extends SimpleScreensaver
 {
 	/**
 	 * The node UI used in the screen saver.
@@ -123,12 +123,12 @@ public class JPPFScreenSaver extends SimpleScreensaver
 		initializeSettings();
 		data = new ImageData[nbLogos];
 		for (int i=0; i<nbLogos; i++) data[i] = new ImageData();
-		parent = (Container) getContext().getComponent();
+		//parent = (Container) getContext().getComponent();
 		parent.setBackground(Color.BLACK);
     Dimension fullSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-		//boolean activate = getContext().isFullScreen() || ((Frame.getFrames()[0].getExtendedState() & Frame.MAXIMIZED_BOTH) > 0);
-		boolean activate = getContext().isFullScreen();
+		//boolean activate = getContext().isFullScreen();
+    boolean activate = true;
 		if (node == null) node = new NodePanel(activate);
 		node.setDoubleBuffered(true);
 		parent.add(node);
@@ -174,17 +174,19 @@ public class JPPFScreenSaver extends SimpleScreensaver
 	 */
 	private void initializeSettings()
 	{
-		ScreensaverSettings settings = getContext().getSettings();
+		//ScreensaverSettings settings = getContext().getSettings();
 		System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, "jppf-node.properties");
 
 		TypedProperties props = JPPFConfiguration.getProperties();
+		/*
 		props.setProperty("jppf.server.host", settings.getProperty("host"));
 		props.setProperty("class.server.port", settings.getProperty("classServerPort"));
 		props.setProperty("node.server.port", settings.getProperty("nodeServerPort"));
 		props.setProperty("processing.threads", settings.getProperty("nbThreads"));
+		*/
 		props.setProperty("jppf.management.port", "12010");
 
-		collisions = settings.getProperty("collisions") != null;
+		//collisions = settings.getProperty("collisions") != null;
 		nbLogos = getIntSetting("nbLogos", 5);
 		speed = getIntSetting("speed", 5);
 	}
@@ -226,9 +228,11 @@ public class JPPFScreenSaver extends SimpleScreensaver
 		int result = defValue;
 		try
 		{
+			/*
 			ScreensaverSettings settings = getContext().getSettings();
 			String s = settings.getProperty(name);
 			result = Integer.parseInt(s);
+			*/
 		}
 		catch(NumberFormatException e)
 		{
