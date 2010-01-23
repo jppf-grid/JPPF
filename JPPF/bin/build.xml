@@ -153,7 +153,7 @@
 	<!--                         Compile the application                           -->
 	<!-- ========================================================================= -->
 
-	<target name="compile" description="Compile" depends="init">
+	<target name="compile" description="Compile" depends="init, i18n">
 		<antcall target="compile.module"><param name="path" value="${node}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${common}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${client}"/></antcall>
@@ -179,12 +179,12 @@
   </target>
 
 	<!-- ========================================================================= -->
-	<!--                         Generate the screensaver                          -->
+	<!--              Convert native translations to ascii                         -->
 	<!-- ========================================================================= -->
 
-	<target name="screensaver" description="Generate the screen saver packaging for the nodes"
-		depends="init" if="NSIS.present">
-		<ant antfile="${basedir}/../node/bin/build.xml" inheritall="false"/>
+	<target name="i18n" description="Convert native translations to ascii" depends="init">
+		<property name="i18n.dir" value="${admin}/src/resources/org/jppf/ui/i18n"/> 
+		<native2ascii encoding="windows-1251" src="${i18n.dir}/native/ru" dest="${i18n.dir}" includes="**/*.properties"/>
   </target>
 
 	<!-- ========================================================================= -->
