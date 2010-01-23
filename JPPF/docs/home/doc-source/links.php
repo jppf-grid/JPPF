@@ -1,12 +1,7 @@
-<html>
-	$template{name="head-section" title="Links Page"}$
+<?php $currentPage="Links" ?>
+$template{name="about-page-header" title="Links"}$
 
-	<body>
-		<div align="center">
-		$template{name="jppf-header"}$
-		<h1 align="center" style="color: blue">Related Links</h1>
-		<table cellspacing="0" cellpadding="0" width="80%">
-
+		<h1 align="center">Related Links</h1>
 <?php
 		$link = mysql_connect('localhost', 'pervasiv_jppfadm', 'tri75den')
 			 or die('Could not connect: ' . mysql_error());
@@ -27,9 +22,7 @@
 		foreach ($groups as $key => $value)
 		{
 ?>
-			<tr><td colspan="*">
-			<br>$template{name="highlight-header" span="1" title="<?php printf('%s', $value); ?>"}$
-			<br>
+			<h2><?php printf('%s', $value); ?></h2>
 <?php
 			$query = "SELECT * FROM links WHERE group_id = '$key' ORDER BY link_id ASC";
 			$result = mysql_query($query) or die('Query failed: ' . mysql_error());
@@ -39,21 +32,15 @@
 				<ul>
 <?php
 				$ref = $key . "." . $line["q_id"];
-				printf("<li><span class=\"linksub\"><a href=\"%s\">%s</a>:</span> %s</li>", $line["url"], $line["title"], $line["desc"]);
+				printf("<li><div align='justify'><span class='linksub'><a href='%s'>%s</a>:</span> %s</div></li>", $line["url"], $line["title"], $line["desc"]);
 ?>
 				</ul>
 <?php
 			}
 ?>
-			$template{name="highlight-bottom" span="1" color="yellow"}$
-			</td></tr>
 <?php
 		}
 		// Closing connection
 		mysql_close($link);
 ?>
-		</table>
-	</div>
-	$template{name="jppf-footer"}$
-	</body>
-</html>
+$template{name="about-page-footer"}$

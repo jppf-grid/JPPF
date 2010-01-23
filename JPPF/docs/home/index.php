@@ -1,6 +1,8 @@
+<?php $currentPage="Home" ?>
 <html>
 		<head>
-		<title>Java Parallel Processing Framework Home Page</title>
+		<title>JPPF Home
+</title>
 		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
 		<meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
 		<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
@@ -8,244 +10,318 @@
 		<link rel="stylesheet" type="text/css" href="./jppf.css" title="Style">
 	</head>
 	<body>
-		<script type="text/javascript">
-			function setImage(id, image)
-			{
-				document.getElementById(id).src=image;
-			}
-		</script>
 		<div align="center">
-				<table align="center" width="70%" cellspacing="0" cellpadding="5"
-			class="table_" style="background: url('images/grid.gif'); background-repeat: repeat; background-attachment: fixed">
-			<tr><td height="5"></td></tr>
+		<div class="gwrapper" align="center">
+					<?php
+		if (!isset($currentPage))
+		{
+			$currentPage = $_REQUEST["page"];
+			if (($currentPage == NULL) || ($currentPage == ""))
+			{
+				$currentPage = "Home";
+			}
+		}
+		if ($currentPage != "Forums")
+		{
+		?>
+		<div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="/images/frame_top.gif"/></div>
+		<?php
+		}
+		?>
+		<!--<div class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">-->
+			<table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">
+				<tr style="height: 80px">
+					<td width="20"></td>
+					<td width="400" align="left" valign="center"><img src="/images/logo2.gif" border="0" alt="JPPF"/></td>
+					<td align="right">
+						<table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color:transparent;">
+							<tr>
+								<td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Home") echo "btn_start.gif"; else echo "btn_active_start.gif"; ?>') repeat-x scroll left bottom; width: 9px"></td>
+								<td style="width: 1px"></td>
+											<?php
+			$itemClass = "";
+			if ($currentPage == Home)
+			{
+			?>
+			<td class="headerMenuItem2" style="background: transparent url('/images/buttons/btn_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/index.php" class="headerMenuItem2">Home</a>&nbsp;</td>
+			<?php
+			}
+			else
+			{
+			?>
+			<td class="headerMenuItem" style="background: transparent url('/images/buttons/tab_active_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/index.php" class="headerMenuItem">Home</a>&nbsp;</td>
+			<?php
+			}
+			?>
+			<td style="width: 1px"></td>
+											<?php
+			$itemClass = "";
+			if ($currentPage == About)
+			{
+			?>
+			<td class="headerMenuItem2" style="background: transparent url('/images/buttons/btn_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/about.php" class="headerMenuItem2">About</a>&nbsp;</td>
+			<?php
+			}
+			else
+			{
+			?>
+			<td class="headerMenuItem" style="background: transparent url('/images/buttons/tab_active_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/about.php" class="headerMenuItem">About</a>&nbsp;</td>
+			<?php
+			}
+			?>
+			<td style="width: 1px"></td>
+											<?php
+			$itemClass = "";
+			if ($currentPage == Download)
+			{
+			?>
+			<td class="headerMenuItem2" style="background: transparent url('/images/buttons/btn_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/downloads.php" class="headerMenuItem2">Download</a>&nbsp;</td>
+			<?php
+			}
+			else
+			{
+			?>
+			<td class="headerMenuItem" style="background: transparent url('/images/buttons/tab_active_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/downloads.php" class="headerMenuItem">Download</a>&nbsp;</td>
+			<?php
+			}
+			?>
+			<td style="width: 1px"></td>
+											<?php
+			$itemClass = "";
+			if ($currentPage == Documentation)
+			{
+			?>
+			<td class="headerMenuItem2" style="background: transparent url('/images/buttons/btn_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/wiki" class="headerMenuItem2">Documentation</a>&nbsp;</td>
+			<?php
+			}
+			else
+			{
+			?>
+			<td class="headerMenuItem" style="background: transparent url('/images/buttons/tab_active_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/wiki" class="headerMenuItem">Documentation</a>&nbsp;</td>
+			<?php
+			}
+			?>
+			<td style="width: 1px"></td>
+											<?php
+			$itemClass = "";
+			if ($currentPage == Forums)
+			{
+			?>
+			<td class="headerMenuItem2" style="background: transparent url('/images/buttons/btn_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/forums" class="headerMenuItem2">Forums</a>&nbsp;</td>
+			<?php
+			}
+			else
+			{
+			?>
+			<td class="headerMenuItem" style="background: transparent url('/images/buttons/tab_active_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/forums" class="headerMenuItem">Forums</a>&nbsp;</td>
+			<?php
+			}
+			?>
+			<td style="width: 1px"></td>
+								<td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Forums") echo "btn_end.gif"; else echo "btn_active_end.gif"; ?>') repeat-x scroll right bottom; width: 9px"></td>
+							</tr>
+						</table>
+					</td>
+					<td width="20"></td>
+				</tr>
+			</table>
+		<!--</div>-->
+			<!--
+			<table width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: white"><tr><td valign="middle" align="center" style="height: 30px; border: 1px solid #6D78B6; border-bottom: none">
+				<h4 style="color: #6D78B6; margin-top: 0px; margin-bottom: 0px">The Extensible Grid Computing Platform</h4>
+			</td></tr></table>
+			-->
+					<table border="0" cellspacing="0" cellpadding="5" width="100%px" style="border: 1px solid #6D78B6; border-top: 8px solid #6D78B6;">
 			<tr>
-				<td width="30%" align="left" valign="center">
-					<h3>Java Parallel Processing Framework</h3>
-				</td>
-				<td width="40%" align="center">
-					<img src="images/logo.gif" border="0" alt="Java Parallel Processing Framework"/>
-				</td>
-				<td width="30%" align="right">
-					<a href="http://sourceforge.net" target="_top">
-						<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&amp;type=1"
-							width="88" height="31" border="0" alt="SourceForge.net Logo" />
+				<td style="background-color: #FFFFFF">
+				<div class="sidebar">
+									<br>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Home") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/" class="<?php echo $itemClass; ?>">&raquo; Home</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "About") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="about.php" class="<?php echo $itemClass; ?>">&raquo; About</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="release_notes.php?version=2.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Features") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="features.php" class="<?php echo $itemClass; ?>">&raquo; Features</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Press") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Download") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="downloads.php" class="<?php echo $itemClass; ?>">&raquo; Download</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Documentation") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/wiki" class="<?php echo $itemClass; ?>">&raquo; Documentation</a><br>
+											</div>
+															<a href="/api-2.0" class="<?php if ($currentPage == Javadoc) echo 'aboutMenuItem'; else echo 'aboutMenuItem2'; ?>">&raquo; Javadoc</a><br>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "License") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="screenshots.php" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "News") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br>
+											</div>
+				</div>
+				<div class="content">
+	<table border="0" cellpadding="0" cellspacing="0" style="vertical-align: middle; height: 250px; width: 750px; background-image: url('/images/test1.gif'); background-repeat: no-repeat; background-attachment: scroll">
+	<tr><td align="center" valign="center"><img src="/images/Animation1.gif" border="0" alt="JPPF" style="background: transparent"/></td></tr>
+	</table>
+	<div style="margin: 15px; ">
+	<p style="text-align: justify; font-size: 12pt">JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.
+	This is done by splitting an application into smaller parts that can be executed simultaneously on different machines.
+	<p style="text-align: justify; font-size: 12pt">Start easily with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">JPPF Tutorial</a>.
+	</div>
+	<div class="column1">
+		<?php
+			$link = mysql_connect('localhost', 'pervasiv_jppfadm', 'tri75den')
+				 or die('Could not connect: ' . mysql_error());
+			mysql_select_db('pervasiv_jppfweb') or die('Could not select database');
+			$query = 'SELECT * FROM news ORDER BY date DESC';
+			$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+		?>
+		<h3>Latest Releases</h3>
+		<?php
+			for ($i=1; $i<=3; $i++)
+			{
+				$line = mysql_fetch_array($result, MYSQL_ASSOC);
+				printf("<a href='news.php#news%d' style='font-size: 10pt'><span style='white-space: nowrap'>%s %s</span></a><br>", $i, date("n/j/Y", strtotime($line["date"])), $line["title"]);
+			}
+			mysql_free_result($result);
+			mysql_close($link);
+		?>
+		<div align="left">
+			<br><b>Feeds: </b>
+			<a href="http://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1"><img src="images/feed-16x16.gif" border="0"/></a>
+			<a href="http://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1">News</a>
+			&nbsp;<a href="http://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1"><img src="images/feed-16x16.gif" border="0"/></a>
+			<a href="http://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1">Releases</a>
+			&nbsp;&nbsp;<a href="/news.php"><b style="color: #6D78B6">All News</b></a>
+		</div>
+		<br>
+		<h3>Our users say</h3>
+		<a href="quotes.php" style="text-decoration: none">... we have found the framework to be extremely powerful and easy to work with...</a>
+		<p><a href="quotes.php" style="text-decoration: none">... The ability to adapt our existing technology without having to redesign or rethink entire processes is fantastic ...</a>
+		<br>
+		<!--
+		<h3>Licensing & Status</h3>
+		JPPF is licensed under the <a href="/license.php"><b>Apache License, Version 2.0</b></a>
+		<br>Latest stable version: Version 1.9.1
+		-->
+	</div>
+	<div class="column2">
+		<h3>Easy and powerful</h3>
+		&bull;&nbsp;a JPPF grid can be up and running in minutes<br>
+		&bull;&nbsp;dynamically scalable on-demand<br>
+		&bull;&nbsp;connectors with leading J2EE application servers<br>
+		&bull;&nbsp;connector with GigaSpaces eXtreme Application Platform<br>
+		&bull;&nbsp;easy programming model<br>
+		&bull;&nbsp;fine-grained monitoring and administration<br>
+		&bull;&nbsp;fault-tolerance and self-repair capabilities<br>
+		&bull;&nbsp;exceptional level of service and reliability<br>
+		&bull;&nbsp;fully documented samples, using JPPF on real-life problems<br>
+		&bull;&nbsp;flexible open-source licensing with Apache 2.0
+		<h3>Contribute</h3>
+		<b>Browse our <a href="./wiki" target=_top>documentation</a></b><br>
+		<b>Find support, share your ideas, in our <a href="./forums" target=_top>discussion forums</a></b><br>
+		<b>Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>bugs database</a></b><br>
+		<b>Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>feature requests database</a></b>
+	</div>
+				</div>
+									</td>
+				</tr>
+			</table>
+				<!--<div align="center" style="width: 100%; border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">-->
+		<table border="0" cellspacing="0" cellpadding="0" width="100%" class="jppffooter">
+			<tr><td colspan="*" style="height: 10px"></td></tr>
+			</tr>
+			<tr>
+				<td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2009 JPPF.org</td>
+				<td align="right">
+					<a href="http://www.parallel-matters.com"><img src="/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
+					<a href="http://sourceforge.net/projects/jppf-project">
+						<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
+							alt="Get JPPF at SourceForge.net. Fast, secure and Free Open Source software downloads"/>
 					</a>
 				</td>
+				<td style="width: 10px"></td>
 			</tr>
-			<tr><td height="5"></td></tr>
+			<tr><td colspan="*" style="height: 10px"></td></tr>
 		</table>
-		<!--<table border="0" style="background-color: #8080FF" cellspacing="0" cellpadding="0" width="80%">-->
-		<table style="background: url('images/bkg-menu.gif'); background-repeat: repeat; background-attachment: fixed"
-			cellspacing="0" cellpadding="0" width="70%">
-			<tr>
-				<td>
-					<table border="0" cellspacing="0" cellpadding="5">
-						<tr>
-							<td class="menu_first"><a href="index.php">Home</a></td>
-							<td class="menu"><a href="presentation.php?current=0">Overview</a></td>
-							<td class="menu"><a href="http://sourceforge.net/project/showfiles.php?group_id=135654">Download</a></td>
-							<td class="menu"><a href="./wiki">Documentation</a></td>
-							<td class="menu"><a href="./forums">Forums</a></td>
-							<td class="menu"><a href="screenshots.html">Screenshots</a></td >
-							<!--
-							<td class="menu"><a href="api/index.html">API Doc</a></td >
-							<td class="menu"><a href="faq.php">Faqs</a></td>
-							-->
-							<td class="menu"><a href="news.php">News</a></td>
-							<td class="menu"><a href="http://sourceforge.net/projects/jppf-project">Project</a></td>
-							<td class="menu"><a href="links.php">Links</a></td>
-							<td class="menu"></td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
-		<table border="0" cellspacing="0" cellpadding="0" width="70%">
-						<tr>
-				<td width="12" height="12" class="bleft"/>
-				<td colspan="3" bgcolor="white"/>
-				<td width="12" height="12" class="bright"/>
-			</tr>
-   		<tr>
-				<td width="12" class="bleft"/>
-				<td valign="top" bgcolor="white" width="50%" style="max-width: 50%">
-					<table class="noborder_" cellspacing="0" cellpadding="5" width="100%">
-						<tr><td class="noborder_">
-									<table border="0" cellspacing="0" cellpadding="0">
-			<tr>
-				<td width="12" height="12" style="background-image: url(images/pblueNW.gif); background-repeat: no-repeat; background-position: 1000% 1000%"/>
-				<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
-				<td width="12" height="12" style="background-image: url(images/pblueNE.gif); background-repeat: no-repeat; background-position: 0% 100%"/>
-			</tr>
-			<tr>
-				<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
-				<td style="background-image: url(images/pblueFiller.gif); background-repeat: repeat; background-position: 0% 0%">
-							<h3>About JPPF</h3>
-							<div style="text-align: justify">JPPF is a grid toolkit for Java that makes it easy to run your applications in parallel, and speed up their execution by orders of magnitude.
-							Write once, deploy once, execute everywhere!</div>
-												</td>
-					<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
-				</tr>
-				<tr>
-					<td width="12" height="12" style="background-image: url(images/pblueSW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
-					<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
-					<td width="12" height="12" style="background-image: url(images/pblueSE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
-				</tr>
-			</table>
-						</td></tr>
-						<tr><td class="noborder_">
-							<h4>Features</h4>
-							<ul type="square">
-								<li>a JPPF grid can be up and running in minutes</li>
-								<li>full platform independance
-								<li>highly scalable, distributed framework for the execution of Java tasks</li>
-								<li>leverages JCA 1.5 to integrate with leading J2EE application servers</li>
-								<li>easy programming model that abstracts the complexity of distributed and parallel processing</li>
-								<li>graphical and programmatic tools for fine-grained monitoring and administration</li>
-								<li>reliability through redundancy, recovery and failover capabilities</li>
-								<li>a set of fully documented sample applications, applying JPPF to real-life problems</li>
-								<li>a JPPF screensaver node enables the automatic use of idle computers</li>
-								<li>very flexible and non-constraining open-source licensing</li>
-							</ul>
-						</td></tr>
-						<tr><td align="center" class="noborder_">
-							<a href="http://sourceforge.net/project/showfiles.php?group_id=135654"
-								onmouseover="setImage('dl_jppf', 'images/downloadJPPF2.jpg')"
-								onmouseout="setImage('dl_jppf', 'images/downloadJPPF.jpg')">
-								<img id="dl_jppf" src="images/downloadJPPF.jpg" border="0" alt="Download JPPF Now"/></a><br>&nbsp;
-						</td></tr>
-						<tr><td class="noborder_">
-							<h4>Current&nbsp;status: <span style="color: black; font-weight: normal; font-size: 10pt">Version 1.0 release candidate 1</span></h4>
-						</td></tr>
-						<tr><td class="noborder_">
-									<table border="0" cellspacing="0" cellpadding="0">
-			<tr>
-				<td width="12" height="12" style="background-image: url(images/pblueNW.gif); background-repeat: no-repeat; background-position: 1000% 1000%"/>
-				<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
-				<td width="12" height="12" style="background-image: url(images/pblueNE.gif); background-repeat: no-repeat; background-position: 0% 100%"/>
-			</tr>
-			<tr>
-				<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
-				<td style="background-image: url(images/pblueFiller.gif); background-repeat: repeat; background-position: 0% 0%">
-								<h3>Participate and stay informed:</h3>
-								<strong style="color: #8080FF">Browse our <a href="./wiki" target=_top>documentation</a></strong><br>
-								<strong style="color: #8080FF">Give your comments and advice, find support, on our <a href="./forums" target=_top>discussion forums</a></strong><br>
-								<strong style="color: #8080FF">Browse and update our <a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>bugs database</a></strong><br>
-								<strong style="color: #8080FF">Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>feature requests database</a></strong>
-												</td>
-					<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
-				</tr>
-				<tr>
-					<td width="12" height="12" style="background-image: url(images/pblueSW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
-					<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
-					<td width="12" height="12" style="background-image: url(images/pblueSE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
-				</tr>
-			</table>
-						</td></tr>
-					</table>
-				</td>
-				<td width="10" bgcolor="white">
-				<td valign="top" bgcolor="white">
-					<table class="noborder_" cellspacing="0" cellpadding="5" width="100%">
-						<tr><td class="noborder_">
-						<?php
-							$link = mysql_connect('mysql4-j', 'j135654admin', 'Faz600er')
-								 or die('Could not connect: ' . mysql_error());
-							mysql_select_db('j135654_web') or die('Could not select database');
-							$query = 'SELECT * FROM news ORDER BY date DESC';
-							$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-							$line = mysql_fetch_array($result, MYSQL_ASSOC);
-						?>
-								<table border="0" cellspacing="0" cellpadding="0">
-			<tr>
-				<td width="12" height="12" style="background-image: url(images/pblueNW.gif); background-repeat: no-repeat; background-position: 1000% 1000%"/>
-				<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
-				<td width="12" height="12" style="background-image: url(images/pblueNE.gif); background-repeat: no-repeat; background-position: 0% 100%"/>
-			</tr>
-			<tr>
-				<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
-				<td style="background-image: url(images/pblueFiller.gif); background-repeat: repeat; background-position: 0% 0%">
-						<?php
-							printf("<span class='newsTitle'>Latest news: <span style='color: black'>%s %s</span></span><br>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
-							//printf("<h3>Latest news: <span style='color: black'>%s %s</span></h3>", date("n/j/Y", strtotime($line["date"])), $line["title"]);
-						?>
-											</td>
-					<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
-				</tr>
-				<tr>
-					<td width="12" height="12" style="background-image: url(images/pblueSW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
-					<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
-					<td width="12" height="12" style="background-image: url(images/pblueSE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
-				</tr>
-			</table>
-						<?php
-							printf("<br>%s", $line["desc"]);
-						?>
-						<p><u style="color: #8080FF"><strong style="color: #8080FF">Summary of changes:</strong></u>
-						<?php
-							printf("%s", $line["content"]);
-							mysql_free_result($result);
-							mysql_close($link);
-						?>
-						</td></tr>
-						<tr><td class="noborder_">
-									<table border="0" cellspacing="0" cellpadding="0">
-			<tr>
-				<td width="12" height="12" style="background-image: url(images/pblueNW.gif); background-repeat: no-repeat; background-position: 1000% 1000%"/>
-				<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
-				<td width="12" height="12" style="background-image: url(images/pblueNE.gif); background-repeat: no-repeat; background-position: 0% 100%"/>
-			</tr>
-			<tr>
-				<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
-				<td style="background-image: url(images/pblueFiller.gif); background-repeat: repeat; background-position: 0% 0%">
-							<table border="0" cellspacing="0" cellpadding="5">
-								<tr>
-									<td align="center" valign="center">
-										<strong style="color: #8080FF">JPPF feeds:</strong>
-									</td>
-									<td align="center" valign="center">
-										<a href="http://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1">
-											<img src="images/feed-16x16.gif" border="0"/>News</a>
-									</td>
-									<td align="center" valign="center">
-										<a href="http://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1">
-											<img src="images/feed-16x16.gif" border="0"/>Releases</a>
-									</td>
-								</tr>
-							</table>
-												</td>
-					<td width="12" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-y; background-position: 0% 0%"/>
-				</tr>
-				<tr>
-					<td width="12" height="12" style="background-image: url(images/pblueSW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
-					<td width="12" height="12" colspan="1" style="background-image: url(images/pblueFiller.gif); background-repeat: repeat-x; background-position: 0% 0%"/>
-					<td width="12" height="12" style="background-image: url(images/pblueSE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
-				</tr>
-			</table>
-						</td></tr>
-						<tr><td class="noborder_">
-							<h4>Licensing: <span style="color: black; font-weight: normal; font-size: 10pt">This project is licensed under the Apache License, Version 2.0.<br>
-							A copy of the licensing terms can be obtained <a href="http://www.apache.org/licenses/LICENSE-2.0"><b>at this location</b></a>.</span></h4>
-						</td></tr>
-						<tr><td class="noborder_">
-							<h3>JPPF on the web:</h3>
-							<strong style="color: #8080FF"><a href="http://www.jroller.com/jppf/" target=_top>JPPF Blog</a></strong><br>
-							<strong style="color: #8080FF"><a href="http://www.jroller.com/gkorland/entry/jppf" target=_top>Guy Korland's Blog</a></strong><br>
-							<strong style="color: #8080FF"><a href="http://www.infoq.com/news/Grid-Computing-JPPF" target=_top>JPPF on InfoQ</a></strong><br>
-							<strong style="color: #8080FF"><a href="http://weblogs.java.net/blog/fabriziogiudici/archive/2006/11/parallel_comput_1.html" target=_top>Fabrizio Giudici's Blog</a></strong><br>
-							<strong style="color: #8080FF"><a href="http://wiki.cs.rit.edu/bin/view/Main/KarolPietrzakComputerGraphicsJPPF" target=_top> Karl Pietrzak's Parallelization of Ray Tracing</a></strong><br>
-							<strong style="color: #8080FF"><a href="http://www.oitos.it/opencms/opencms/oitos/modules/products/product_0033.html" target=_top>JPPF evaluation on OITOS</a> (in Italian)</strong><br>
-						</td></tr>
-					</table>
-				</td>
-				<td width="12" class="bright"/>
-			</tr>
-						<tr>
-				<td width="12" height="12" style="background-image: url(images/roundCorner_SW.gif); background-repeat: no-repeat; background-position: 0% 0%"/>
-				<td width="12" height="12" colspan="3" class="bbottom"/>
-				<td width="12" height="12" style="background-image: url(images/roundCorner_SE.gif); background-repeat: no-repeat; background-position: 100% 0%"/>
-			</tr>
-		</table>
+	<!--</div>-->
+	<div style="background-color: #E2E4F0; width: 100%;"><img src="/images/frame_bottom.gif" border="0"/></div>
+		</div>
 		</div>
 	</body>
 </html>

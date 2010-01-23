@@ -1,0 +1,39 @@
+		<div class="jppfheader">
+			<table width="100%" cellspacing="0" cellpadding="0">
+				<tr style="height: 130px">
+					<td width="100" align="right" valign="center"/>
+					<td align="left" valign="center">
+						<h1 class="header">Java Parallel Processing<br>Framework</h1>
+					</td>
+					<td width="100" align="right" valign="center"><div style="margin-right: 15px"><a href="/"><img src="/images/logo1.gif" border="0" alt="Java Parallel Processing Framework"/></a></div></td>
+				</tr>
+			</table>
+
+			<?php
+			if (!isset($currentPage))
+			{
+				$currentPage = $_REQUEST["page"];
+				if (($currentPage == NULL) || ($currentPage == ""))
+				{
+					$currentPage = "Home";
+				}
+			}
+			?>
+			<div>
+			<table border="0" cellspacing="0" cellpadding="0" style="background-color: white; width: 100%; border: 1px solid #6D78B6; border-bottom: none;" align="left">
+				<tr>
+					<td align="center">
+						<table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color: white">
+							<tr>
+								$template{name="menu-item" class="noborder_" url="/index.php" label="Home"}$
+								$template{name="menu-item" class="left_" url="/about.php" label="About"}$
+								$template{name="menu-item" class="left_" url="/downloads.php" label="Download"}$
+								$template{name="menu-item" class="left_" url="/wiki" label="Documentation"}$
+								$template{name="menu-item" class="left_" url="/forums" label="Forums"}$
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table><div style="height: 31px"></div>
+			</div>
+		</div>

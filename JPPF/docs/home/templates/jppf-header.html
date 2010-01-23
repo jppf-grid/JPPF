@@ -1,32 +1,40 @@
-		<table width="80%" cellspacing="0" cellpadding="0"
-			style="background: url('images/header_new.jpg'); background-repeat: no-repeat; background-attachment: scroll; background-position: left top; min-width: 1024px;
-				width:expression(document.body.clientWidth < 1024 ? '1024px': (document.body.clientWidth > 1536 ? 1536 : '100%'))">
-			<tr><td>
-				<table width="100%" cellspacing="0" cellpadding="5">
-					<tr>
-						<td width="70%" align="right" valign="center">
-							<h1 style="font-size: 24pt">Java Parallel Processing<br>Framework</h1>
-						</td>
-						<td width="30%" align="center">
-							<img src="images/logo1.gif" border="0" alt="Java Parallel Processing Framework"/>
-						</td>
-					</tr>
-				</table>
-			</td></tr>
+		<?php
+		if (!isset($currentPage))
+		{
+			$currentPage = $_REQUEST["page"];
+			if (($currentPage == NULL) || ($currentPage == ""))
+			{
+				$currentPage = "Home";
+			}
+		}
+		if ($currentPage != "Forums")
+		{
+		?>
+		<div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="/images/frame_top.gif"/></div>
+		<?php
+		}
+		?>
+		<!--<div class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">-->
+			<table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">
+				<tr style="height: 80px">
+					<td width="20"></td>
+					<td width="400" align="left" valign="center"><img src="/images/logo2.gif" border="0" alt="JPPF"/></td>
+					<td align="right">
+						<table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color:transparent;">
+							<tr>
+								<td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Home") echo "btn_start.gif"; else echo "btn_active_start.gif"; ?>') repeat-x scroll left bottom; width: 9px"></td>
+								<td style="width: 1px"></td>
+								$template{name="menu-item" class="noborder_" url="/index.php" label="Home"}$
+								$template{name="menu-item" class="left_" url="/about.php" label="About"}$
+								$template{name="menu-item" class="left_" url="/downloads.php" label="Download"}$
+								$template{name="menu-item" class="left_" url="/wiki" label="Documentation"}$
+								$template{name="menu-item" class="left_" url="/forums" label="Forums"}$
+								<td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Forums") echo "btn_end.gif"; else echo "btn_active_end.gif"; ?>') repeat-x scroll right bottom; width: 9px"></td>
+							</tr>
+						</table>
+					</td>
+					<td width="20"></td>
+				</tr>
+			</table>
+		<!--</div>-->
 
-			<tr><td>
-				<table border="0" cellspacing="5" cellpadding="0" style="position: relative; top: 20px">
-					<tr>
-						$template{name="menu-item" class="noborder_" url="index.php" label="Home"}$
-						$template{name="menu-item" class="left_" url="testimonials.php" label="Testimonials"}$
-						$template{name="menu-item" class="left_" url="http://sourceforge.net/project/showfiles.php?group_id=135654" label="Download"}$
-						$template{name="menu-item" class="left_" url="./wiki" label="Doc"}$
-						$template{name="menu-item" class="left_" url="./forums" label="Forums"}$
-						$template{name="menu-item" class="left_" url="screenshots.php" label="Screenshots"}$
-						$template{name="menu-item" class="left_" url="http://sourceforge.net/projects/jppf-project" label="Project"}$
-						$template{name="menu-item" class="left_" url="credits.php" label="Credits"}$
-						$template{name="menu-item" class="left_" url="links.php" label="Links"}$
-					</tr>
-				</table>
-			</td></tr>
-		</table><br>
