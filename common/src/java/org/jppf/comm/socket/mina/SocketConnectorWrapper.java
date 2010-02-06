@@ -1,0 +1,400 @@
+/*
+ * JPPF.
+ * Copyright (C) 2005-2009 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jppf.comm.socket.mina;
+
+import java.io.IOException;
+import java.net.*;
+import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.concurrent.Executors;
+
+import org.apache.commons.logging.*;
+import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.service.IoConnector;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.transport.socket.SocketSessionConfig;
+import org.apache.mina.transport.socket.nio.*;
+import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.utils.*;
+
+/**
+ * Implementation of the <code>SocketWrapper</code> interface around a Mina connector.
+ * @author Laurent Cohen
+ */
+public class SocketConnectorWrapper implements SocketWrapper
+{
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(SocketConnectorWrapper.class);
+	/**
+	 * The remote host this socket wrapper connects to.
+	 */
+	protected String host = null;
+	/**
+	 * The remote port this socket wrapper connects to.
+	 */
+	protected int port = -1;
+	/**
+	 * Flag indicating the opened state of the underlying socket.
+	 */
+	protected boolean opened = false;
+	/**
+	 * The IO connector that handles the communication with the server.
+	 */
+	protected IoConnector connector = null;
+	/**
+	 * The connector's <code>IoHandler</code>.
+	 */
+	protected SocketConnectorIoHandler handler = new SocketConnectorIoHandler();
+	/**
+	 * Used to serialize or deserialize an object into or from an array of bytes.
+	 */
+	protected ObjectSerializer serializer = null;
+
+	/**
+	 * Default constructor.
+	 */
+	public SocketConnectorWrapper()
+	{
+	}
+
+	/**
+	 * Initialize this socket wrapper with the specified remote host and port.
+	 * @param host the remote host this socket wrapper connects to.
+	 * @param port the remote port this socket wrapper connects to.
+	 * @throws Exception if any error occurs
+	 */
+	public SocketConnectorWrapper(String host, int port) throws Exception
+	{
+		this.host = host;
+		this.port = port;
+		open();
+	}
+
+	/**
+	 * Get the remote host the underlying socket connects to.
+	 * @return the host name or ip address as a string.
+	 * @see org.jppf.comm.socket.SocketWrapper#getHost()
+	 */
+	public String getHost()
+	{
+		return host;
+	}
+
+	/**
+	 * Set the remote host the underlying socket connects to.
+	 * @param host the host name or ip address as a string.
+	 * @see org.jppf.comm.socket.SocketWrapper#setHost(java.lang.String)
+	 */
+	public void setHost(String host)
+	{
+		this.host = host;
+	}
+
+	/**
+	 * Get the remote port the underlying socket connects to.
+	 * @return the port number on the remote host.
+	 * @see org.jppf.comm.socket.SocketWrapper#getPort()
+	 */
+	public int getPort()
+	{
+		return port;
+	}
+
+	/**
+	 * Get the remote port the underlying socket connects to.
+	 * @param port the port number on the remote host.
+	 * @see org.jppf.comm.socket.SocketWrapper#setPort(int)
+	 */
+	public void setPort(int port)
+	{
+		this.port = port;
+	}
+
+	/**
+	 * Determine whether this socket client is opened or not.
+	 * @return true if this client is opened, false otherwise.
+	 * @see org.jppf.comm.socket.SocketWrapper#isOpened()
+	 */
+	public boolean isOpened()
+	{
+		return opened;
+	}
+
+	/**
+	 * Open the underlying socket connection.
+	 * @throws Exception if the underlying input and output streams raise an error.
+	 * @see org.jppf.comm.socket.SocketWrapper#open()
+	 */
+	public void open() throws Exception
+	{
+		connector = new NioSocketConnector(new NioProcessor(Executors.newSingleThreadExecutor()));
+		connector.getFilterChain().addLast("filter", new SocketConnectorIoFilter());
+		connector.setHandler(handler);
+		//connector.getSessionConfig().setMinReadBufferSize(32768);
+		((SocketSessionConfig) connector.getSessionConfig()).setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+		((SocketSessionConfig) connector.getSessionConfig()).setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+		ConnectFuture cf = connector.connect(new InetSocketAddress(host, port));
+		cf.await();
+		handler.setSession(cf.getSession());
+	}
+
+	/**
+	 * Close the underlying socket connection.
+	 * @throws Exception if the underlying input and output streams raise an error.
+	 * @see org.jppf.comm.socket.SocketWrapper#close()
+	 */
+	public void close() throws Exception
+	{
+		if (connector != null)
+		{
+			Map<Long, IoSession> sessions = connector.getManagedSessions();
+			for (Map.Entry<Long, IoSession> entry: sessions.entrySet()) entry.getValue().close(true);
+			connector.dispose();
+		}
+	}
+
+	/**
+	 * Flush the data currently in the send buffer.
+	 * @throws IOException if an I/O error occurs.
+	 * @see org.jppf.comm.socket.SocketWrapper#flush()
+	 */
+	public void flush() throws IOException
+	{
+	}
+
+	/**
+	 * Read <code>len</code> bytes from a TCP connection into a byte array, starting
+	 * at position <code>offset</code> in that array.
+	 * This method blocks until at least one byte of data is received.
+	 * @param data an array of bytes into which the data is stored.
+	 * @param offset the position where to start storing data read from the socket.
+	 * @param len the length of data to read.
+	 * @return the number of bytes actually read or -1 if the end of stream was reached.
+	 * @throws Exception if the underlying input stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#read(byte[], int, int)
+	 */
+	public int read(byte[] data, int offset, int len) throws Exception
+	{
+		handler.readMessage(data, offset, len);
+		/*
+		if (message.exception != null)
+		{
+			if (message.exception instanceof Exception) throw (Exception) message.exception;
+			else throw new JPPFException(message.exception);
+		}
+		*/
+		return len;
+	}
+
+	/**
+	 * Read an int value from a socket connection.
+	 * @return n the value to read from the socket, or -1 if end of stream was reached.
+	 * @throws Exception if the underlying input stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#readInt()
+	 */
+	public int readInt() throws Exception
+	{
+		byte[] data = new byte[4];
+		handler.readMessage(data, 0, 4);
+		ByteBuffer buffer = ByteBuffer.wrap(data);
+		return buffer.getInt();
+	}
+
+	/**
+	 * Read an object from a TCP socket connection.
+	 * This method blocks until an object is received.
+	 * @return the object that was read from the underlying input stream.
+	 * @throws Exception if the underlying input stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#receive()
+	 */
+	public Object receive() throws Exception
+	{
+		return receive(0);
+	}
+
+	/**
+	 * Read an object from a TCP socket connection.
+	 * This method blocks until an object is received or the specified timeout has expired, whichever happens first.
+	 * @param timeout timeout after which the operation is aborted. A timeout of zero is interpreted as an infinite timeout.
+	 * @return the object that was read from the underlying input stream or null if the operation timed out.
+	 * @throws Exception if the underlying input stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#receive(int)
+	 */
+	public Object receive(int timeout) throws Exception
+	{
+		Object o = null;
+		try
+		{
+	    //if (timeout > 0) connector.getSessionConfig().setSoTimeout(timeout);
+	    JPPFBuffer buf = receiveBytes(timeout);
+	    o = getSerializer().deserialize(buf);
+		}
+		finally
+		{
+			// disable the timeout on subsequent read operations.
+			//if (timeout > 0) socket.setSoTimeout(0);
+		}
+		return o;
+	}
+
+	/**
+	 * Read an array of bytes from a TCP socket connection.
+	 * The data read is prefixed by an int header whose value is the actual length of data to read.
+	 * This method blocks until data is received or the specified timeout has expired, whichever happens first.
+	 * @param timeout timeout after which the operation is aborted. A timeout of zero is interpreted as an infinite timeout.
+	 * @return a buffer holding the length of data and the data itself.
+	 * @throws Exception if the underlying input stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#receiveBytes(int)
+	 */
+	public JPPFBuffer receiveBytes(int timeout) throws Exception
+	{
+		int n = readInt();
+		byte[] data = new byte[n];
+		handler.readMessage(data, 0, n);
+		return new JPPFBuffer(data, n);
+	}
+
+	/**
+	 * Send an object over a TCP socket connection.
+	 * @param o the object to send.
+	 * @throws Exception if the underlying output stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#send(java.lang.Object)
+	 */
+	public void send(Object o) throws Exception
+	{
+	  JPPFBuffer buf = getSerializer().serialize(o);
+	  sendBytes(buf);
+	}
+
+	/**
+	 * Send an array of bytes over a TCP socket connection.
+	 * @param buf the buffer container for the data to send.
+	 * @throws Exception if the underlying output stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#sendBytes(org.jppf.utils.JPPFBuffer)
+	 */
+	public void sendBytes(JPPFBuffer buf) throws Exception
+	{
+		writeInt(buf.getLength());
+		write(buf.getBuffer(), 0, buf.getLength());
+	}
+
+	/**
+	 * Send an array of bytes over a TCP socket connection.
+	 * @param data the data to send.
+	 * @param offset the position where to start reading data from the input array.
+	 * @param len the length of data to write.
+	 * @throws Exception if the underlying output stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#write(byte[], int, int)
+	 */
+	public void write(byte[] data, int offset, int len) throws Exception
+	{
+		handler.writeMessage(data, offset, len);
+	}
+
+	/**
+	 * Write an int value over a socket connection.
+	 * @param n the value to write.
+	 * @throws Exception if the underlying output stream throws an exception.
+	 * @see org.jppf.comm.socket.SocketWrapper#writeInt(int)
+	 */
+	public void writeInt(int n) throws Exception
+	{
+		byte[] data = new byte[4];
+		ByteBuffer buffer = ByteBuffer.wrap(data);
+		buffer.putInt(n);
+		handler.writeMessage(data, 0, 4);
+	}
+
+	/**
+	 * Skip <code>n</code> bytes of data from the socket or channel input stream.
+	 * @param n the number of bytes to skip.
+	 * @return the actual number of bytes skipped.
+	 * @throws Exception if an IO error occurs.
+	 * @see org.jppf.comm.socket.SocketWrapper#skip(int)
+	 */
+	public int skip(int n) throws Exception
+	{
+		byte[] data = new byte[n];
+		handler.readMessage(data, 0, n);
+		return n;
+	}
+
+	/**
+	 * Get an object serializer / deserializer to convert an object to or from an array of bytes.
+	 * @return an <code>ObjectSerializer</code> instance.
+	 * @see org.jppf.comm.socket.SocketWrapper#getSerializer()
+	 */
+	public ObjectSerializer getSerializer()
+	{
+		if (serializer == null)
+		{
+			// serializer = new ObjectSerializerImpl();
+			String name = "org.jppf.utils.ObjectSerializerImpl";
+			try
+			{
+				serializer = (ObjectSerializer) Class.forName(name).newInstance();
+			}
+			catch (InstantiationException e)
+			{
+				log.fatal(e.getMessage(), e);
+			}
+			catch (IllegalAccessException e)
+			{
+				log.fatal(e.getMessage(), e);
+			}
+			catch (ClassNotFoundException e)
+			{
+				log.fatal(e.getMessage(), e);
+			}
+		}
+		return serializer;
+	}
+
+	/**
+	 * Set the object serializer / deserializer to convert an object to or from an array of bytes.
+	 * @param serializer an <code>ObjectSerializer</code> instance.
+	 * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.utils.ObjectSerializer)
+	 */
+	public void setSerializer(ObjectSerializer serializer)
+	{
+		this.serializer = serializer;
+	}
+
+	/**
+	 * Get the underlying socket used by this socket wrapper.
+	 * @return a Socket instance.
+	 * @see org.jppf.comm.socket.SocketWrapper#getSocket()
+	 */
+	public Socket getSocket()
+	{
+		return null;
+	}
+
+	/**
+	 * Set the underlying socket to be used by this socket wrapper.
+	 * @param socket a Socket instance.
+	 * @see org.jppf.comm.socket.SocketWrapper#setSocket(java.net.Socket)
+	 */
+	public void setSocket(Socket socket)
+	{
+	}
+
+}
