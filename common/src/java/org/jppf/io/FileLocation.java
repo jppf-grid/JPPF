@@ -20,9 +20,7 @@ package org.jppf.io;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.channels.*;
-
-import org.jppf.utils.BufferPool;
+import java.nio.channels.FileChannel;
 
 /**
  * Data location backed by a file.
@@ -91,7 +89,7 @@ public class FileLocation extends AbstractDataLocation
 		{
 			transferring = true;
 			fileChannel = new FileOutputStream(filePath).getChannel();
-			buffer = BufferPool.pickBuffer();
+			buffer = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
 			if (size < buffer.limit()) buffer.limit(size);
 			count = 0;
 		}
@@ -110,11 +108,7 @@ public class FileLocation extends AbstractDataLocation
 		{
 			if (transferring == false)
 			{
-				if (buffer != null)
-				{
-					BufferPool.releaseBuffer(buffer);
-					buffer = null;
-				}
+				buffer = null;
 				if (fileChannel != null)
 				{
 					fileChannel.force(false);
@@ -211,7 +205,7 @@ public class FileLocation extends AbstractDataLocation
 		{
 			transferring = true;
 			fileChannel = new FileInputStream(filePath).getChannel();
-			buffer = BufferPool.pickBuffer();
+			buffer = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
 			count = 0;
 		}
 		try
@@ -227,11 +221,7 @@ public class FileLocation extends AbstractDataLocation
 		{
 			if (!transferring)
 			{
-				if (buffer != null)
-				{
-					BufferPool.releaseBuffer(buffer);
-					buffer = null;
-				}
+				buffer = null;
 				if (fileChannel != null)
 				{
 					fileChannel.close();
@@ -250,26 +240,26 @@ public class FileLocation extends AbstractDataLocation
 	 */
 	private int nonBlockingTransferTo(OutputDestination dest) throws Exception
 	{
-			if (blockSize == 0)
-			{
-				blockSize = fileChannel.read(buffer);
-				buffer.flip();
-			}
-			int n = dest.write(buffer);
-			if (n < 0)
-			{
-				transferring = false;
-				return -1;
-			}
-			else blockCount += n; 
-			if (!buffer.hasRemaining())
-			{
-				count += blockSize;
-				blockSize = 0;
-				buffer.clear();
-				if (count >= size) transferring = false;
-			}
-			return n;
+		if (blockSize == 0)
+		{
+			blockSize = fileChannel.read(buffer);
+			buffer.flip();
+		}
+		int n = dest.write(buffer);
+		if (n < 0)
+		{
+			transferring = false;
+			return -1;
+		}
+		else blockCount += n; 
+		if (!buffer.hasRemaining())
+		{
+			count += blockSize;
+			blockSize = 0;
+			buffer.clear();
+			if (count >= size) transferring = false;
+		}
+		return n;
 	}
 
 	/**

@@ -68,7 +68,7 @@ public class StreamInputSource implements InputSource
 	public int read(ByteBuffer buffer) throws Exception
 	{
 		int pos = buffer.position();
-		ByteBuffer tmp = BufferPool.pickBuffer();
+		ByteBuffer tmp = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
 		byte[] bytes = tmp.array();
 		while (buffer.remaining() > 0)
 		{
@@ -76,7 +76,6 @@ public class StreamInputSource implements InputSource
 			if (n <= 0) break;
 			buffer.put(bytes, 0, n);
 		}
-		BufferPool.releaseBuffer(tmp);
 		return buffer.position() - pos;
 	}
 

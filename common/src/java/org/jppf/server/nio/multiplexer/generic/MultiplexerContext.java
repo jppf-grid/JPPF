@@ -24,8 +24,9 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.logging.*;
+import org.jppf.io.IOHelper;
 import org.jppf.server.nio.NioContext;
-import org.jppf.utils.*;
+import org.jppf.utils.StringUtils;
 
 /**
  * Context obect associated with a socket channel used by the multiplexer. 
@@ -192,35 +193,26 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public ByteBuffer readMultiplexerMessage(ReadableByteChannel channel) throws Exception
 	{
-		ByteBuffer msg = BufferPool.pickBuffer();
-		try
+		ByteBuffer msg = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
+		int count = 0;
+		int n = 0;
+		do
 		{
-			int count = 0;
-			int n = 0;
-			do
-			{
-				count = channel.read(msg);
-				n += count;
-			}
-			while ((count > 0) && msg.hasRemaining());
-			if (debugEnabled)
-			{
-				log.debug("[" + getShortClassName() + "] " + "read " + n + " bytes from " +
-					StringUtils.getRemoteHost((SocketChannel) channel));
-			}
-			if (count < 0) setEof(true);
-			if (msg.position() > 0)
-			{
-				msg.flip();
-				return msg;
-			}
+			count = channel.read(msg);
+			n += count;
 		}
-		catch(Exception e)
+		while ((count > 0) && msg.hasRemaining());
+		if (debugEnabled)
 		{
-			BufferPool.releaseBuffer(msg);
-			throw e;
+			log.debug("[" + getShortClassName() + "] " + "read " + n + " bytes from " +
+				StringUtils.getRemoteHost((SocketChannel) channel));
 		}
-		BufferPool.releaseBuffer(msg);
+		if (count < 0) setEof(true);
+		if (msg.position() > 0)
+		{
+			msg.flip();
+			return msg;
+		}
 		return null;
 	}
 
@@ -233,26 +225,18 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	public boolean writeMultiplexerMessage(WritableByteChannel channel) throws Exception
 	{
 		ByteBuffer msg = getCurrentMessage();
-		try
+		int count = 0;
+		do
 		{
-			int count = 0;
-			do
-			{
-				count = channel.write(msg);
-			}
-			while ((count > 0) && msg.hasRemaining());
-			if (debugEnabled)
-			{
-				log.debug("[" + getShortClassName() + "] " + "written " + count + " bytes to " +
-					StringUtils.getRemoteHost((SocketChannel) channel));
-			}
-			return !msg.hasRemaining();
+			count = channel.write(msg);
 		}
-		catch(Exception e)
+		while ((count > 0) && msg.hasRemaining());
+		if (debugEnabled)
 		{
-			BufferPool.releaseBuffer(msg);
-			throw e;
+			log.debug("[" + getShortClassName() + "] " + "written " + count + " bytes to " +
+				StringUtils.getRemoteHost((SocketChannel) channel));
 		}
+		return !msg.hasRemaining();
 	}
 
 	/**
@@ -297,7 +281,6 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 */
 	public synchronized void setCurrentMessage(ByteBuffer message)
 	{
-		if ((message == null) && (currentMessage != null)) BufferPool.releaseBuffer(currentMessage);
 		currentMessage = message;
 	}
 

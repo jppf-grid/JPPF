@@ -68,7 +68,7 @@ public class StreamOutputDestination implements OutputDestination
 	public int write(ByteBuffer buffer) throws Exception
 	{
 		int pos = buffer.position();
-		ByteBuffer tmp = BufferPool.pickBuffer();
+		ByteBuffer tmp = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
 		byte[] bytes = tmp.array();
 		while (buffer.remaining() > 0)
 		{
@@ -78,7 +78,6 @@ public class StreamOutputDestination implements OutputDestination
 			if (n <= 0) break;
 			os.write(bytes, 0, n);
 		}
-		BufferPool.releaseBuffer(tmp);
 		return buffer.position() - pos;
 	}
 

@@ -22,6 +22,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.*;
 
+import org.jppf.io.IOHelper;
 import org.jppf.utils.*;
 
 /**
@@ -151,7 +152,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 */
 	private void copyStream(InputStream is, OutputStream os) throws IOException
 	{
-		ByteBuffer tmp = BufferPool.pickBuffer();
+		ByteBuffer tmp = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
 		byte[] bytes = tmp.array();
 		while(true)
 		{
@@ -160,6 +161,5 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 			if (n <= 0) break;
 			os.write(bytes, 0, n);
 		}
-		BufferPool.releaseBuffer(tmp);
 	}
 }

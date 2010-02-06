@@ -30,6 +30,11 @@ import org.jppf.utils.SystemUtils;
 public final class IOHelper
 {
 	/**
+	 * Suze of temporary buffers used in I/O transfers.
+	 */
+	public static final int TEMP_BUFFER_SIZE = 32768;
+
+	/**
 	 * Instantiation of this class is not permitted.
 	 */
 	private IOHelper()
