@@ -40,5 +40,9 @@ public enum NodeState
 	/**
 	 * State of waiting for the execution result of a task bundle.
 	 */
-	WAITING_RESULTS;
+	WAITING_RESULTS,
+	/**
+	 * Idle state for a node channel.
+	 */
+	IDLE;
 }
