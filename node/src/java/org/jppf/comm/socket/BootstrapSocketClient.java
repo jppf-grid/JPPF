@@ -18,9 +18,8 @@
 package org.jppf.comm.socket;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.ConnectException;
 
-import org.jppf.JPPFException;
 import org.jppf.utils.*;
 
 /**
@@ -31,9 +30,7 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 {
 	/**
 	 * Default constructor is invisible to other classes.
-	 * See {@link org.jppf.comm.socket.BootstrapSocketClient#BootstrapSocketClient(java.lang.String, int) BootstrapSocketClient(String, int)} and
-	 * {@link org.jppf.comm.socket.BootstrapSocketClient#BootstrapSocketClient(java.net.Socket) BootstrapSocketClient(Socket)} for ways to
-	 * instanciate a SocketClient.
+	 * See {@link org.jppf.comm.socket.BootstrapSocketClient#BootstrapSocketClient(java.lang.String, int) BootstrapSocketClient(String, int)}
 	 */
 	public BootstrapSocketClient()
 	{
@@ -50,16 +47,6 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 	public BootstrapSocketClient(String host, int port) throws ConnectException, IOException
 	{
 		super(host, port, null);
-	}
-
-	/**
-	 * Initialize this socket client with an already opened and connected socket.
-	 * @param socket the underlying socket this socket client wraps around.
-	 * @throws JPPFException if the socket connection fails.
-	 */
-	public BootstrapSocketClient(Socket socket) throws JPPFException
-	{
-		super(socket);
 	}
 
 	/**

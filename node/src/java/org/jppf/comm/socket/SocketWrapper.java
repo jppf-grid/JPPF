@@ -118,7 +118,7 @@ public interface SocketWrapper
 	JPPFBuffer receiveBytes(int timeout) throws Exception;
 
 	/**
-	 * Skip <code>n</code> bytes of data from the sokcet of channel input stream.
+	 * Skip <code>n</code> bytes of data from the socket or channel input stream.
 	 * @param n the number of bytes to skip.
 	 * @return the actual number of bytes skipped.
 	 * @throws Exception if an IO error occurs.
