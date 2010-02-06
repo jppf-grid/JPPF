@@ -30,6 +30,7 @@ import org.apache.commons.logging.*;
  * All buffers created by this pool are backed by an array of bytes.<br>
  * The pool is implemented as a soft cache, meaning that all buffers in it are softly-referenced
  * and are guaranteed to be reclaimed by the garbage collector before an OutOfMemoryError is thrown.
+ * @deprecated this class was not fulfilling its promise to keep mempry usage low and provide better performance.
  * @author Laurent Cohen
  */
 public final class BufferPool
@@ -37,7 +38,7 @@ public final class BufferPool
 	/**
 	 * Maximum number of bytes that can be written or read in one shot, in kilobytes.
 	 */
-	private static final int MAX_BUFFER_SIZE =
+	public static final int TEMP_BUFFER_SIZE =
 		1024 * JPPFConfiguration.getProperties().getInt("jppf.io.buffer.size", 32);
 	/**
 	 * Logger for this class.
@@ -76,7 +77,7 @@ public final class BufferPool
 			{
 				if (bufferPool.isEmpty())
 				{
-					result = ByteBuffer.wrap(new byte[MAX_BUFFER_SIZE]);
+					result = ByteBuffer.wrap(new byte[TEMP_BUFFER_SIZE]);
 				}
 				else
 				{

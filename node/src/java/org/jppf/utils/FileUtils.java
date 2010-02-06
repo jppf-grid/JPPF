@@ -31,7 +31,7 @@ public final class FileUtils
 	/**
 	 * Maximum buffer size for reading class files.
 	 */
-	private static final int BUFFER_SIZE = 32*1024;
+	private static final int TEMP_BUFFER_SIZE = 32*1024;
 
 	/**
 	 * Instantiation of this class is not permitted.
@@ -277,29 +277,22 @@ public final class FileUtils
 	 */
 	public static byte[] getInputStreamAsByte(InputStream is) throws IOException
 	{
-		ByteBuffer tmp = BufferPool.pickBuffer();
-		try
+		ByteBuffer tmp = ByteBuffer.wrap(new byte[TEMP_BUFFER_SIZE]);
+		byte[] buffer = tmp.array();
+		byte[] b = null;
+		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
+		boolean end = false;
+		while (!end)
 		{
-			byte[] buffer = tmp.array();
-			byte[] b = null;
-			ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-			boolean end = false;
-			while (!end)
-			{
-				int n = is.read(buffer, 0, buffer.length);
-				if (n < 0) end = true;
-				else baos.write(buffer, 0, n);
-			}
-			is.close();
-			baos.flush();
-			b = baos.toByteArray();
-			baos.close();
-			return b;
+			int n = is.read(buffer, 0, buffer.length);
+			if (n < 0) end = true;
+			else baos.write(buffer, 0, n);
 		}
-		finally
-		{
-			BufferPool.releaseBuffer(tmp);
-		}
+		is.close();
+		baos.flush();
+		b = baos.toByteArray();
+		baos.close();
+		return b;
 	}
 
 	/**
@@ -310,7 +303,7 @@ public final class FileUtils
 	 */
 	public static void copyStream(InputStream is, OutputStream os) throws IOException
 	{
-		ByteBuffer tmp = BufferPool.pickBuffer();
+		ByteBuffer tmp = ByteBuffer.wrap(new byte[TEMP_BUFFER_SIZE]);
 		byte[] bytes = tmp.array();
 		while(true)
 		{
@@ -318,7 +311,6 @@ public final class FileUtils
 			if (n <= 0) break;
 			os.write(bytes, 0, n);
 		}
-		BufferPool.releaseBuffer(tmp);
 	}
 
 	/**
