@@ -36,6 +36,8 @@ import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.peer.*;
 import org.jppf.server.queue.*;
+import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.startup.*;
 import org.jppf.utils.*;
 
@@ -153,12 +155,16 @@ public class JPPFDriver
 		}
 		printInitializedMessage(info.applicationServerPorts, "Client Server");
 
-		/*
-		nodeNioServer = new NodeNioServer(info.nodeServerPorts);
-		nodeNioServer.start();
-		*/
-		minaNodeServer = new MinaNodeServer(info.nodeServerPorts);
-		minaNodeServer.start();
+		if (JPPFConfiguration.getProperties().getBoolean("communications.use.mina", false))
+		{
+			minaNodeServer = new MinaNodeServer(info.nodeServerPorts);
+			minaNodeServer.start();
+		}
+		else
+		{
+			nodeNioServer = new NodeNioServer(info.nodeServerPorts);
+			nodeNioServer.start();
+		}
 		printInitializedMessage(info.nodeServerPorts, "Tasks Server");
 
 		try
@@ -411,8 +417,16 @@ public class JPPFDriver
 		}
 		classServer.end();
 		classServer = null;
-		nodeNioServer.end();
-		nodeNioServer = null;
+		if (nodeNioServer != null)
+		{
+			nodeNioServer.end();
+			nodeNioServer = null;
+		}
+		if (minaNodeServer != null)
+		{
+			minaNodeServer.close();
+			minaNodeServer = null;
+		}
 		for (int i=0; i<applicationServers.length; i++)
 		{
 			applicationServers[i].end();
@@ -505,6 +519,26 @@ public class JPPFDriver
 	public JPPFJobManager getJobManager()
 	{
 		return jobManager;
+	}
+
+	/**
+	 * Get the bundle factory used by the node server.
+	 * @return a <code>JPPFBundlerFactory</code> instance.
+	 */
+	public JPPFBundlerFactory getBundlerFactory()
+	{
+		if (nodeNioServer != null) return nodeNioServer.getBundlerFactory();
+		return minaNodeServer.getBundlerFactory();
+	}
+
+	/**
+	 * Set the bundler used by the node server.
+	 * @param bundler a <code>Bundler</code> instance.
+	 */
+	public void setBundler(Bundler bundler)
+	{
+		if (nodeNioServer != null) nodeNioServer.setBundler(bundler);
+		else minaNodeServer.setBundler(bundler);
 	}
 
 	/**
