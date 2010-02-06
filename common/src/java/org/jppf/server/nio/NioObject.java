@@ -57,7 +57,7 @@ public class NioObject
 	private long sessionId = 0L;
 
 	/**
-	 * Initialize this IOObject with the specified size.
+	 * Initialize this NioObject with the specified size.
 	 * @param size the size of the internal buffer.
 	 * @param blocking specfifes whether the I/O performed by this object are blocking.
 	 */
@@ -67,7 +67,7 @@ public class NioObject
 	}
 
 	/**
-	 * Initialize this IOObject with the specified size.
+	 * Initialize this NioObject with the specified size.
 	 * @param size the size of the internal buffer.
 	 * @param blocking specfifes whether the I/O performed by this object are blocking.
 	 * @param sessionId the id of the session we write to.
@@ -78,7 +78,7 @@ public class NioObject
 	}
 
 	/**
-	 * Initialize this location with the specified buffer.
+	 * Initialize this NioObject with the specified buffer.
 	 * @param data the buffer containing the data.
 	 * @param offset the start position in the buffer.
 	 * @param len the size in bytes of the data to write.
@@ -90,7 +90,7 @@ public class NioObject
 	}
 
 	/**
-	 * Initialize this IOObject with the specified size.
+	 * Initialize this NioObject with the specified size.
 	 * @param data the location of the data to read from or write to.
 	 * @param blocking specfifes whether the I/O performed by this object are blocking.
 	 */
@@ -102,7 +102,7 @@ public class NioObject
 	}
 
 	/**
-	 * Initialize this IOObject with the specified size.
+	 * Initialize this NioObject with the specified size.
 	 * @param data the location of the data to read from or write to.
 	 * @param blocking specfifes whether the I/O performed by this object are blocking.
 	 * @param sessionId the id of the session we write to.
@@ -167,7 +167,7 @@ public class NioObject
 
 	/**
 	 * Number of bytes read from or written to the message.
-	 * @return  the numbe rof bytes as an int.
+	 * @return  the number of bytes as an int.
 	 */
 	public int getCount()
 	{
