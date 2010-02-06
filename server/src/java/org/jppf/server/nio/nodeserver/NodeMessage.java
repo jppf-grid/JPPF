@@ -179,7 +179,11 @@ public class NodeMessage
 		}
 		OutputDestination od = new ChannelOutputDestination(channel);
 		if (!currentLengthObject.write(od)) return false;
-		if (currentObject == null) currentObject = new NioObject(locations.get(position), false);
+		if (currentObject == null)
+		{
+			DataLocation loc = locations.get(position);
+			currentObject = new NioObject(loc.copy(), false);
+		}
 		if (!currentObject.write(od)) return false;
 		count += 4 + locations.get(position).getSize();
 		position++;
