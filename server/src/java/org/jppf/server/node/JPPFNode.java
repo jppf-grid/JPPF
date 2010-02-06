@@ -306,6 +306,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		String host = props.getString("jppf.server.host", "localhost");
 		int port = props.getInt("node.server.port", 11113);
 		socketClient = new SocketClient();
+		//socketClient = new SocketConnectorWrapper();
 		socketClient.setHost(host);
 		socketClient.setPort(port);
 		socketClient.setSerializer(serializer);
