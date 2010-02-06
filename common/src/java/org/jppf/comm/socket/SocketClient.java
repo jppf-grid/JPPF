@@ -17,8 +17,7 @@
  */
 package org.jppf.comm.socket;
 
-import java.io.*;
-import java.net.*;
+import java.net.Socket;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
@@ -85,15 +84,8 @@ public class SocketClient extends AbstractSocketWrapper
 	 */
 	public void send(Object o) throws Exception
 	{
-		try
-		{
-		  JPPFBuffer buf = getSerializer().serialize(o);
-		  sendBytes(buf);
-		}
-		catch (IOException e)
-		{
-		  throw e;
-		}
+	  JPPFBuffer buf = getSerializer().serialize(o);
+	  sendBytes(buf);
 	}
 	
 	/**
@@ -113,14 +105,6 @@ public class SocketClient extends AbstractSocketWrapper
 	    if (timeout > 0) socket.setSoTimeout(timeout);
 	    JPPFBuffer buf = receiveBytes(timeout);
 	    o = getSerializer().deserialize(buf);
-		}
-		catch (ClassNotFoundException e)
-		{
-			throw e;
-		}
-		catch (IOException e)
-		{
-			throw e;
 		}
 		finally
 		{
