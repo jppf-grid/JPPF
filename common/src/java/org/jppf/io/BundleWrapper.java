@@ -119,9 +119,13 @@ public class BundleWrapper
 	 */
 	public BundleWrapper copy(int nbTasks)
 	{
-		BundleWrapper wrapper = new BundleWrapper(bundle.copy(nbTasks));
-		wrapper.setDataProvider(dataProvider);
-		for (int i=0; i<nbTasks; i++) wrapper.addTask(tasks.remove(0));
+		BundleWrapper wrapper = null;
+		synchronized(this)
+		{
+			wrapper = new BundleWrapper(bundle.copy(nbTasks));
+			for (int i=0; i<nbTasks; i++) wrapper.addTask(tasks.remove(0).copy());
+		}
+		wrapper.setDataProvider(dataProvider.copy());
 		return wrapper;
 	}
 
