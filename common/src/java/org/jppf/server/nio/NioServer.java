@@ -393,9 +393,12 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * Get the factory for this server.
 	 * @return an <code>NioServerFactory</code> instance.
 	 */
-	public synchronized NioServerFactory getFactory()
+	public NioServerFactory getFactory()
 	{
-		if (factory == null) factory = createFactory();
+		synchronized(this)
+		{
+			if (factory == null) factory = createFactory();
+		}
 		return factory;
 	}
 
@@ -430,7 +433,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * Get the manager that performs all operations that relate to channel states.
 	 * @return a <code>StateTransitionManager</code> instance.
 	 */
-	public synchronized StateTransitionManager<S, T> getTransitionManager()
+	public StateTransitionManager<S, T> getTransitionManager()
 	{
 		return transitionManager;
 	}
@@ -439,7 +442,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * Get the ports this server is listening to.
 	 * @return an array of int values.
 	 */
-	public synchronized int[] getPorts()
+	public int[] getPorts()
 	{
 		return ports;
 	}
