@@ -114,7 +114,7 @@ public class IoBufferInputSource implements InputSource
 	{
 		if (!data.hasRemaining()) return -1;
 		int count = Math.min(n, data.remaining());
-		data.position(count);
+		data.skip(count);
 		return count;
 	}
 

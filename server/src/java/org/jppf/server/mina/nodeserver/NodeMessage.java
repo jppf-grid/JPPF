@@ -75,6 +75,10 @@ public class NodeMessage
 	 * The latest bundle that was sent or received.
 	 */
 	private JPPFTaskBundle bundle = null;
+	/**
+	 * Count of bytes written for this message.
+	 */
+	public int writeCount = 0;
 
 	/**
 	 * Add a location to the data locations of this message.
@@ -145,72 +149,28 @@ public class NodeMessage
 	/**
 	 * Read data from the channel.
 	 * @param channel the channel to write to.
-	 * @return true if the data has been completely written the channel, false otherwise.
-	 * @throws Exception if an IO error occurs.
-	 */
-	public boolean write(IoBuffer channel) throws Exception
-	{
-		if (nbObjects <= 0)
-		{
-			nbObjects = bundle.getTaskCount() + 2;
-		}
-		//if (!writeLength(channel)) return false;
-		while (position < nbObjects)
-		{
-			if (!writeNextObject(channel)) return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Write the next object to the specified channel.
-	 * @param channel - the channel to write to.
-	 * @return true if the object has been completely written the channel, false otherwise.
-	 * @throws Exception if an IO error occurs.
-	 */
-	private boolean writeNextObject(IoBuffer channel) throws Exception
-	{
-		if (position == 1)
-		{
-			int breakpoint = 0;
-		}
-		if (currentLengthObject == null)
-		{
-			currentLengthObject = new NioObject(4, false);
-			ByteBuffer buffer = ((ByteBufferLocation) currentLengthObject.getData()).buffer();
-			buffer.putInt(locations.get(position).getSize());
-			buffer.flip();
-		}
-		OutputDestination od = new IoBufferOutputDestination(channel);
-		if (!currentLengthObject.write(od)) return false;
-		if (currentObject == null) currentObject = new NioObject(locations.get(position), false);
-		if (!currentObject.write(od)) return false;
-		count += 4 + locations.get(position).getSize();
-		position++;
-		currentLengthObject = null;
-		currentObject = null;
-		return true;
-	}
-
-	/**
-	 * Read data from the channel.
-	 * @param channel the channel to write to.
 	 * @param sessionId the id of the session we write to.
 	 * @return true if the data has been completely written the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
 	public boolean write(IoBuffer channel, long sessionId) throws Exception
 	{
+		boolean complete = true;
+		int pos = channel.position();
 		if (nbObjects <= 0)
 		{
 			nbObjects = bundle.getTaskCount() + 2;
+			writeCount = 0;
 		}
-		//if (!writeLength(channel)) return false;
-		while (position < nbObjects)
+		//while (position < nbObjects)
+		while ((position < nbObjects) && complete)
 		{
-			if (!writeNextObject(channel, sessionId)) return false;
+			//if (!writeNextObject(channel), sessionId) return false;
+			if (!writeNextObject(channel, sessionId)) complete = false;
 		}
-		return true;
+		//return true;
+		writeCount += channel.position() - pos;
+		return complete;
 	}
 
 	/**
@@ -234,7 +194,8 @@ public class NodeMessage
 		if (currentObject == null)
 		{
 			DataLocation loc = locations.get(position);
-			currentObject = new NioObject(loc.copy(), false, sessionId);
+			//currentObject = new NioObject(loc.copy(), false, sessionId);
+			currentObject = new NioObject(loc, false, sessionId);
 		}
 		if (!currentObject.write(od)) return false;
 		count += 4 + locations.get(position).getSize();

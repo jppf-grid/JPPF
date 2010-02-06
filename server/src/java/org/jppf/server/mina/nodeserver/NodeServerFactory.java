@@ -85,6 +85,7 @@ public final class NodeServerFactory
 		map.put(WAIT_INITIAL_BUNDLE, new WaitInitialBundleState(server));
 		map.put(SENDING_BUNDLE, new SendingBundleState(server));
 		map.put(WAITING_RESULTS, new WaitingResultsState(server));
+		map.put(IDLE, new IdleState(server));
 		return map;
 	}
 
@@ -97,13 +98,12 @@ public final class NodeServerFactory
 	{
 		Map<NodeTransition, NioTransition<NodeState>> map =
 			new EnumMap<NodeTransition, NioTransition<NodeState>>(NodeTransition.class);
-		map.put(TO_SENDING, transition(SENDING_BUNDLE, RW));
-		//map.put(TO_SENDING, transition(SENDING_BUNDLE, W));
+		map.put(TO_SENDING, transition(SENDING_BUNDLE, W));
 		map.put(TO_WAITING, transition(WAITING_RESULTS, R));
-		map.put(TO_SEND_INITIAL, transition(SEND_INITIAL_BUNDLE, RW));
-		//map.put(TO_SEND_INITIAL, transition(SEND_INITIAL_BUNDLE, W));
+		map.put(TO_SEND_INITIAL, transition(SEND_INITIAL_BUNDLE, W));
 		map.put(TO_WAIT_INITIAL, transition(WAIT_INITIAL_BUNDLE, R));
-		map.put(TO_IDLE, transition(SENDING_BUNDLE, R));
+		map.put(TO_IDLE, transition(SENDING_BUNDLE, NONE));
+		//map.put(TO_IDLE, transition(IDLE, NONE));
 		return map;
 	}
 

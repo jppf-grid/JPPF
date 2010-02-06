@@ -19,18 +19,19 @@
 package org.jppf.server.mina.nodeserver;
 
 import java.net.ConnectException;
+import java.nio.ByteBuffer;
 
 import org.apache.commons.logging.*;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
-import org.apache.mina.core.session.*;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.*;
 import org.jppf.server.mina.MinaContext;
 import org.jppf.server.nio.nodeserver.NodeState;
 import org.jppf.utils.StringUtils;
 
 /**
- * Tranforms IO messages and into <code>BundleWrapper</code> instances and vice-versa.
+ * Tranforms IO messages into <code>BundleWrapper</code> instances and vice-versa.
  * @author Laurent Cohen
  */
 public class NodeIoFilter extends IoFilterAdapter
@@ -63,7 +64,8 @@ public class NodeIoFilter extends IoFilterAdapter
 		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
 		IoBuffer buffer = (IoBuffer) message;
 		boolean complete = context.getNodeMessage().read(buffer);
-		if (debugEnabled) log.debug("session " + session.getId() + " : read " + context.getNodeMessage().count + " bytes from buffer, read complete: " + complete); 
+		if (debugEnabled) log.debug(" session " + session.getId() + " : read " + context.getNodeMessage().count + " bytes from buffer, read complete: " + complete +
+			", message = " + buffer.flip());
 		session.setAttribute(MinaContext.READ_COMPLETE, complete);
 		nextFilter.messageReceived(session, context.getBundle());
 	}
@@ -80,13 +82,16 @@ public class NodeIoFilter extends IoFilterAdapter
 	{
 		NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
 		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
-		IoBuffer buffer = IoBuffer.wrap(new byte[32768]);
+		int size = 64 * 1024;
+		ByteBuffer toWrap = ByteBuffer.allocate(size);
+		IoBuffer buffer = IoBuffer.wrap(toWrap);
 		boolean complete = context.getNodeMessage().write(buffer, session.getId());
 		session.setAttribute(MinaContext.WRITE_COMPLETE, complete);
 		buffer.flip();
-		if (debugEnabled) log.debug("session " + session.getId() + " : write count = " + context.getNodeMessage().count + ", write complete: " + complete + ", written " + buffer.limit() + " bytes"); 
-		nextFilter.filterWrite(session, new DefaultWriteRequest(buffer));
-		//if (debugEnabled) log.debug("session " + session.getId() + " : after nextFilter.write()");
+		if (debugEnabled) log.debug("     session " + session.getId() + " : write complete: " + complete + ", written " + buffer.limit() +
+			" bytes, message = " + request.getMessage() + ", writeCount = " + context.getNodeMessage().writeCount + ", buffer = " + buffer); 
+		nextFilter.filterWrite(session, new DefaultWriteRequest(buffer, request.getFuture(), request.getDestination()));
+		if (debugEnabled) log.debug("session " + session.getId() + " : after nextFilter.write()");
 	}
 
 	/**
@@ -99,8 +104,8 @@ public class NodeIoFilter extends IoFilterAdapter
 	 */
 	public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest request) throws Exception
 	{
-		if (debugEnabled) log.debug("session: " + session + ", message = " + request.getMessage());
+		if (debugEnabled) log.debug("    session " + session.getId() + " : message = " + request.getMessage());
 		NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
-		nextFilter.messageSent(session, new DefaultWriteRequest(context.getBundle()));
+		nextFilter.messageSent(session, new DefaultWriteRequest(context.getBundle(), request.getFuture(), request.getDestination()));
 	}
 }

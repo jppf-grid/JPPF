@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.logging.*;
 import org.apache.mina.core.session.*;
 import org.apache.mina.core.write.WriteRequestQueue;
-import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.apache.mina.transport.socket.nio.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.security.JPPFSecurityContext;
@@ -125,9 +125,12 @@ public class MinaNodeServer
 		this.bundlerRef = new AtomicReference<Bundler>(bundler);
 		List<InetSocketAddress> addresses = new ArrayList<InetSocketAddress>();
 		for (int port: ports) addresses.add(new InetSocketAddress(port));
+		//acceptor = new NioSocketAcceptor(new NioProcessor(Executors.newFixedThreadPool(1)));
 		acceptor = new NioSocketAcceptor();
 		acceptor.getSessionConfig().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 		acceptor.getSessionConfig().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+		acceptor.getSessionConfig().setReuseAddress(false);
+		//acceptor.getSessionConfig().setMinReadBufferSize(32768);
 		acceptor.getFilterChain().addLast("nodeMessageFilter", new NodeIoFilter());
 		/*
 		OrderedThreadPoolExecutor x = new OrderedThreadPoolExecutor(16, 16, 1L, TimeUnit.HOURS, new JPPFThreadFactory("NodeIoProcessor"));
@@ -147,7 +150,7 @@ public class MinaNodeServer
 	}
 
 	/**
-	 * CLose this node server.
+	 * Close this node server.
 	 */
 	public void close()
 	{

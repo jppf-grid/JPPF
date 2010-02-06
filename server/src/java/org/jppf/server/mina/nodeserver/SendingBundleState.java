@@ -24,6 +24,7 @@ import static org.jppf.utils.StringUtils.getRemoteHost;
 import org.apache.commons.logging.*;
 import org.apache.mina.core.session.IoSession;
 import org.jppf.io.BundleWrapper;
+import org.jppf.server.nio.nodeserver.NodeState;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.Bundler;
 
@@ -67,6 +68,10 @@ public class SendingBundleState extends NodeServerState
 		*/
 		NodeContext context = getContext(session);
 		if (debugEnabled) log.debug("session " + session.getId() + " starting " + context.getState());
+		if (NodeState.IDLE.equals(context.getState()))
+		{
+			int breakpoint = 0;
+		}
 		if (context.getNodeMessage() == null)
 		{
 			// check whether the bundler settings have changed.

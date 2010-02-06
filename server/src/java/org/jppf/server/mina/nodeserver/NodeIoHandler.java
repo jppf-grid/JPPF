@@ -18,12 +18,15 @@
 
 package org.jppf.server.mina.nodeserver;
 
+import java.util.concurrent.*;
+
 import org.apache.commons.logging.*;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.mina.MinaContext;
 import org.jppf.server.nio.nodeserver.*;
+import org.jppf.utils.JPPFThreadFactory;
 
 /**
  * 
@@ -43,6 +46,12 @@ public class NodeIoHandler extends IoHandlerAdapter
 	 * The node server.
 	 */
 	private MinaNodeServer server = null;
+	/**
+	 * A single thread used for asynchronous submission of the write operations.
+	 * This is used to avoid doing write operaations in the same thread as the
+	 * Mina events emitter.
+	 */
+	private ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("Node writes executor"));
 
 	/**
 	 * Initialize this io handler with the specified node server.
@@ -79,10 +88,15 @@ public class NodeIoHandler extends IoHandlerAdapter
 	{
 		Boolean transitionStarted = (Boolean) session.getAttribute(MinaContext.TRANSITION_STARTED, Boolean.TRUE);
 		Boolean writeComplete = (Boolean) session.getAttribute(MinaContext.WRITE_COMPLETE, Boolean.TRUE);
-		if (debugEnabled) log.debug("session " + session.getId() + " : transitionStarted = " + transitionStarted + ", writeComplete = " + writeComplete);
+		if (debugEnabled) log.debug("    session " + session.getId() + " : transitionStarted = " + transitionStarted + ", writeComplete = " + writeComplete);
 		if (transitionStarted)
 		{
-			if (!writeComplete) session.write(message); // write next message chunk
+			if (!writeComplete)
+			{
+				// write next message chunk
+				//session.write(message);
+				executor.submit(new WriteMessageTask(session, message));
+			}
 			else
 			{
 				endTransition(session);
@@ -170,5 +184,40 @@ public class NodeIoHandler extends IoHandlerAdapter
 	public void sessionIdle(IoSession session, IdleStatus status) throws Exception
 	{
 		if (debugEnabled) log.debug("session " + session.getId() + " idle, status = " + status);
+	}
+
+	/**
+	 * Tasks submitted to an executor for asynchronous I/O writes.
+	 */
+	public class WriteMessageTask implements Runnable
+	{
+		/**
+		 * The session that performs the write operation.
+		 */
+		private IoSession session = null;
+		/**
+		 * The message to write.
+		 */
+		private Object message = null;
+
+		/**
+		 * Initialize this task with the specified parameters.
+		 * @param session the session that performs the write operation.
+		 * @param message the message to write.
+		 */
+		public WriteMessageTask(IoSession session, Object message)
+		{
+			this.session = session;
+			this.message = message;
+		}
+
+		/**
+		 * Execute this task.
+		 * @see java.lang.Runnable#run()
+		 */
+		public void run()
+		{
+			session.write(message);
+		}
 	}
 }
