@@ -22,7 +22,6 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.server.*;
-import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.*;
@@ -98,8 +97,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		try
 		{
 			if (algorithm == null) return "Error: no algorithm specified (null value)";
-			NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
-			if (!server.getBundlerFactory().getBundlerProviderNames().contains(algorithm)) return "Error: unknown algorithm '" + algorithm + "'";
+			JPPFBundlerFactory factory = JPPFDriver.getInstance().getBundlerFactory();
+			if (!factory.getBundlerProviderNames().contains(algorithm)) return "Error: unknown algorithm '" + algorithm + "'";
 			TypedProperties config = JPPFConfiguration.getProperties();
 			config.setProperty("jppf.load.balancing.algorithm", algorithm);
 			config.setProperty("jppf.load.balancing.strategy", "jppf");
@@ -114,8 +113,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 				}
 			}
 			TypedProperties props = new TypedProperties(parameters);
-			Bundler bundler = server.getBundlerFactory().createBundler(algorithm, props);
-			server.setBundler(bundler);
+			Bundler bundler = factory.createBundler(algorithm, props);
+			JPPFDriver.getInstance().setBundler(bundler);
 			//return new JPPFManagementResponse(localize((manual ? "manual" : "automatic") + ".settings.changed"), null);
 			return "Load-balancing settings updated";
 		}
@@ -164,7 +163,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		String profileName = props.getString("jppf.load.balancing.strategy", null);
 		// for compatibility with v1.x configuration files
 		if (profileName == null) profileName = props.getString("task.bundle.autotuned.strategy", "jppf");
-		JPPFBundlerFactory factory = JPPFDriver.getInstance().getNodeNioServer().getBundlerFactory();
+		JPPFBundlerFactory factory = JPPFDriver.getInstance().getBundlerFactory();
 		TypedProperties params = factory.convertJPPFConfiguration(profileName, props);
 		return new LoadBalancingInformation(algorithm, params, factory.getBundlerProviderNames());
 	}
