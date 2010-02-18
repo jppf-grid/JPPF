@@ -275,7 +275,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	public void shutdown()
 	{
 		threadPool.shutdownNow();
-		timeoutHandler.clear();
+		timeoutHandler.clear(true);
 	}
 
 	/**

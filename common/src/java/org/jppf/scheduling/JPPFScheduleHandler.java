@@ -40,13 +40,17 @@ public class JPPFScheduleHandler
 	 * Mapping of timer tasks to a key.
 	 */
 	private Map<Object, TimerTask> timerTaskMap = new Hashtable<Object, TimerTask>();
+	/**
+	 * The name given to this schedule handler's internal timer.
+	 */
+	private String name = null;
 
 	/**
 	 * Initialize this schedule handler with a default name.
 	 */
 	public JPPFScheduleHandler()
 	{
-		timer = new Timer("JPPFScheduleHandler timer - " + instanceCount.incrementAndGet());
+		this("JPPFScheduleHandler timer - " + instanceCount.incrementAndGet());
 	}
 
 	/**
@@ -55,6 +59,7 @@ public class JPPFScheduleHandler
 	 */
 	public JPPFScheduleHandler(String name)
 	{
+		this.name = name;
 		timer = new Timer(name);
 	}
 
@@ -130,12 +135,22 @@ public class JPPFScheduleHandler
 	}
 
 	/**
-	 * Shutdown this schedule handler.
+	 * Cleanup this schedule handler.
 	 */
 	public void clear()
+	{
+		clear(false);
+	}
+
+	/**
+	 * Shutdown this schedule handler.
+	 * @param shutdown flag indicating whether this scehdule handler should be shutdown.
+	 */
+	public void clear(boolean shutdown)
 	{
 		timer.cancel();
 		timer.purge();
 		timerTaskMap.clear();
+		if (!shutdown) timer = new Timer(name);
 	}
 }
