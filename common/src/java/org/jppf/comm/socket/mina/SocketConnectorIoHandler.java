@@ -136,6 +136,7 @@ public class SocketConnectorIoHandler extends IoHandlerAdapter
 			if (!writeComplete.get()) writeLock.wait();
 		}
 		if (debugEnabled) log.debug("len = " + len + ", count = " + buffer.position() + ", buffer = " + buffer);
+		if (exception.get() != null) throw exception.get();
 		//session.suspendWrite();
 	}
 

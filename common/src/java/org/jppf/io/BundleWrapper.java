@@ -123,7 +123,7 @@ public class BundleWrapper
 		synchronized(this)
 		{
 			wrapper = new BundleWrapper(bundle.copy(nbTasks));
-			for (int i=0; i<nbTasks; i++) wrapper.addTask(tasks.remove(0).copy());
+			for (int i=0; i<nbTasks; i++) wrapper.addTask(tasks.remove(0));
 		}
 		wrapper.setDataProvider(dataProvider.copy());
 		return wrapper;

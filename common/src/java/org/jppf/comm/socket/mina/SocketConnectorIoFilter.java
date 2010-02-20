@@ -64,7 +64,7 @@ public class SocketConnectorIoFilter extends IoFilterAdapter
 	public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest request) throws Exception
 	{
 		if (debugEnabled) log.debug("session " + session.getId() + ", message = " + request.getMessage()); 
-		nextFilter.filterWrite(session, new DefaultWriteRequest(request.getMessage()));
+		nextFilter.filterWrite(session, new DefaultWriteRequest(request.getMessage(), request.getFuture(), request.getDestination()));
 	}
 
 	/**
@@ -77,9 +77,12 @@ public class SocketConnectorIoFilter extends IoFilterAdapter
 	 */
 	public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest request) throws Exception
 	{
-		IoBuffer message = (IoBuffer) request.getMessage();
-		if (debugEnabled) log.debug("session " + session.getId() + ", message = " + message);
+		if (debugEnabled)
+		{
+			IoBuffer message = (IoBuffer) request.getMessage();
+			log.debug("session " + session.getId() + ", message = " + message);
+		}
 		//if (!message.hasRemaining())
-		nextFilter.messageSent(session, new DefaultWriteRequest(message));
+		nextFilter.messageSent(session, new DefaultWriteRequest(request.getMessage(), request.getFuture(), request.getDestination()));
 	}
 }
