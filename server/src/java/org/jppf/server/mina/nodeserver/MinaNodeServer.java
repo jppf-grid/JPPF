@@ -24,8 +24,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.*;
-import org.apache.mina.core.session.*;
-import org.apache.mina.core.write.WriteRequestQueue;
+import org.apache.mina.core.service.SimpleIoProcessorPool;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.nio.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
@@ -71,6 +71,10 @@ public class MinaNodeServer
 	 * Acceptor for this server.
 	 */
 	private NioSocketAcceptor acceptor = null;
+	/**
+	 * The IoProcessor for the acceptor.
+	 */
+	private SimpleIoProcessorPool processor = null;
 	/**
 	 * The algorithm that dynamically computes the task bundle size.
 	 */
@@ -126,10 +130,12 @@ public class MinaNodeServer
 		List<InetSocketAddress> addresses = new ArrayList<InetSocketAddress>();
 		for (int port: ports) addresses.add(new InetSocketAddress(port));
 		//acceptor = new NioSocketAcceptor(new NioProcessor(Executors.newFixedThreadPool(1)));
-		acceptor = new NioSocketAcceptor();
+		processor = new SimpleIoProcessorPool(NioProcessor.class);
+		acceptor = new NioSocketAcceptor(processor);
 		acceptor.getSessionConfig().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 		acceptor.getSessionConfig().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 		acceptor.getSessionConfig().setReuseAddress(false);
+		acceptor.getSessionConfig().setKeepAlive(false);
 		//acceptor.getSessionConfig().setMinReadBufferSize(32768);
 		acceptor.getFilterChain().addLast("nodeMessageFilter", new NodeIoFilter());
 		/*
@@ -274,42 +280,22 @@ public class MinaNodeServer
 		switch(tr.getInterestOps())
 		{
 			case NodeServerFactory.NONE:
-				//suspendWrite(session);
-				if (!session.isWriteSuspended()) session.suspendWrite();
-				if (!session.isReadSuspended()) session.suspendRead();
+				session.suspendRead();
+				session.suspendWrite();
 				return;
 			case NodeServerFactory.R:
-				//suspendWrite(session);
-				if (!session.isWriteSuspended()) session.suspendWrite();
-				if (session.isReadSuspended()) session.resumeRead();
+				session.resumeRead();
+				session.suspendWrite();
 				break;
 			case NodeServerFactory.W:
-				if (!session.isReadSuspended()) session.suspendRead();
-				if (session.isWriteSuspended()) session.resumeWrite();
+				session.suspendRead();
+				session.resumeWrite();
 				break;
 			case NodeServerFactory.RW:
-				if (session.isReadSuspended()) session.resumeRead();
-				if (session.isWriteSuspended()) session.resumeWrite();
+				session.resumeRead();
+				session.resumeWrite();
 				break;
 		}
-	}
-
-	/**
-	 * Suspend writes on the specified session. This method first ensures that any
-	 * remaining data in the write request queue is flushed.
-	 * @param session th session for which to suspend writes.
-	 */
-	private void suspendWrite(IoSession session)
-	{
-		if (session.isWriteSuspended()) return;
-		WriteRequestQueue queue = session.getWriteRequestQueue();
-		if (!queue.isEmpty(session))
-		{
-			if (debugEnabled) log.debug("flushing session " + session);
-			AbstractIoSession s = (AbstractIoSession) session;
-			s.getProcessor().flush(session);
-		}
-		session.suspendWrite();
 	}
 
 	/**
@@ -371,5 +357,14 @@ public class MinaNodeServer
 		{
 			log.error(e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * Get the IoProcessor for the acceptor.
+	 * @return a <code>SimpleIoProcessorPool</code> instance.
+	 */
+	public SimpleIoProcessorPool getProcessor()
+	{
+		return processor;
 	}
 }

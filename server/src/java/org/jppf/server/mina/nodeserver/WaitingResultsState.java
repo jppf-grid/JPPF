@@ -112,7 +112,7 @@ public class WaitingResultsState extends NodeServerState
 		// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 		context.setNodeMessage(null);
 		context.setBundle(null);
-		server.addIdleChannel(session);
 		server.transitionSession(session, TO_IDLE);
+		server.addIdleChannel(session);
 	}
 }

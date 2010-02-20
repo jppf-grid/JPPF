@@ -18,15 +18,12 @@
 
 package org.jppf.server.mina.nodeserver;
 
-import java.util.concurrent.*;
-
 import org.apache.commons.logging.*;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.mina.MinaContext;
 import org.jppf.server.nio.nodeserver.*;
-import org.jppf.utils.JPPFThreadFactory;
 
 /**
  * 
@@ -51,7 +48,7 @@ public class NodeIoHandler extends IoHandlerAdapter
 	 * This is used to avoid doing write operaations in the same thread as the
 	 * Mina events emitter.
 	 */
-	private ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("Node writes executor"));
+	//private ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("Node writes executor"));
 
 	/**
 	 * Initialize this io handler with the specified node server.
@@ -86,25 +83,11 @@ public class NodeIoHandler extends IoHandlerAdapter
 	 */
 	public void messageSent(IoSession session, Object message) throws Exception
 	{
-		Boolean transitionStarted = (Boolean) session.getAttribute(MinaContext.TRANSITION_STARTED, Boolean.TRUE);
-		Boolean writeComplete = (Boolean) session.getAttribute(MinaContext.WRITE_COMPLETE, Boolean.TRUE);
-		if (debugEnabled) log.debug("    session " + session.getId() + " : transitionStarted = " + transitionStarted + ", writeComplete = " + writeComplete);
-		if (transitionStarted)
-		{
-			if (!writeComplete)
-			{
-				// write next message chunk
-				//session.write(message);
-				executor.submit(new WriteMessageTask(session, message));
-			}
-			else
-			{
-				endTransition(session);
-				NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
-				NodeServerState state = server.factory.getState(context.getState());
-				session.setAttribute(MinaContext.TRANSITION_STARTED, state.startTransition(session));
-			}
-		}
+		if (debugEnabled) log.debug("    session " + session.getId());
+		endTransition(session);
+		NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
+		NodeServerState state = server.factory.getState(context.getState());
+		session.setAttribute(MinaContext.TRANSITION_STARTED, state.startTransition(session));
 	}
 
 	/**

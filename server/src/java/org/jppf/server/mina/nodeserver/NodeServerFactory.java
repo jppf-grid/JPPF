@@ -102,8 +102,8 @@ public final class NodeServerFactory
 		map.put(TO_WAITING, transition(WAITING_RESULTS, R));
 		map.put(TO_SEND_INITIAL, transition(SEND_INITIAL_BUNDLE, W));
 		map.put(TO_WAIT_INITIAL, transition(WAIT_INITIAL_BUNDLE, R));
-		map.put(TO_IDLE, transition(SENDING_BUNDLE, NONE));
-		//map.put(TO_IDLE, transition(IDLE, NONE));
+		//map.put(TO_IDLE, transition(SENDING_BUNDLE, NONE));
+		map.put(TO_IDLE, transition(IDLE, NONE));
 		return map;
 	}
 

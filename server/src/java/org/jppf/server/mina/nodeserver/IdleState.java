@@ -18,8 +18,6 @@
 
 package org.jppf.server.mina.nodeserver;
 
-import static org.jppf.utils.StringUtils.getRemoteHost;
-
 import org.apache.commons.logging.*;
 import org.apache.mina.core.session.IoSession;
 
@@ -55,7 +53,12 @@ public class IdleState extends NodeServerState
 	 */
 	public boolean startTransition(IoSession session) throws Exception
 	{
-		if (debugEnabled) log.debug("session idle for " + getRemoteHost(session.getRemoteAddress()));
+		if (debugEnabled)
+		{
+			NodeContext context = getContext(session);
+			log.debug("session " + session.getId() + " starting " + context.getState());
+		}
+		//if (debugEnabled) log.debug("session idle for " + getRemoteHost(session.getRemoteAddress()));
 		return true;
 	}
 
@@ -68,6 +71,10 @@ public class IdleState extends NodeServerState
 	 */
 	public void endTransition(IoSession session) throws Exception
 	{
-		if (debugEnabled) log.debug("end transition of session idle for " + getRemoteHost(session.getRemoteAddress()));
+		if (debugEnabled)
+		{
+			NodeContext context = getContext(session);
+			log.debug("session " + session.getId() + " ending " + context.getState());
+		}
 	}
 }

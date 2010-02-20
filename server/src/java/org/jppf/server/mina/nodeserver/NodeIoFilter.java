@@ -82,15 +82,16 @@ public class NodeIoFilter extends IoFilterAdapter
 	{
 		NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
 		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
-		int size = 64 * 1024;
+		int size = 32 * 1024;
 		ByteBuffer toWrap = ByteBuffer.allocate(size);
 		IoBuffer buffer = IoBuffer.wrap(toWrap);
 		boolean complete = context.getNodeMessage().write(buffer, session.getId());
 		session.setAttribute(MinaContext.WRITE_COMPLETE, complete);
 		buffer.flip();
 		if (debugEnabled) log.debug("     session " + session.getId() + " : write complete: " + complete + ", written " + buffer.limit() +
-			" bytes, message = " + request.getMessage() + ", writeCount = " + context.getNodeMessage().writeCount + ", buffer = " + buffer); 
-		nextFilter.filterWrite(session, new DefaultWriteRequest(buffer, request.getFuture(), request.getDestination()));
+			" bytes, message = " + request.getMessage() + ", writeCount = " + context.getNodeMessage().writeCount + ", buffer = " + buffer + ", writeSuspended = " + session.isWriteSuspended());
+		DefaultWriteRequest newRequest = new DefaultWriteRequest(buffer, request.getFuture(), request.getDestination());
+		nextFilter.filterWrite(session, newRequest);
 		if (debugEnabled) log.debug("session " + session.getId() + " : after nextFilter.write()");
 	}
 
@@ -106,6 +107,21 @@ public class NodeIoFilter extends IoFilterAdapter
 	{
 		if (debugEnabled) log.debug("    session " + session.getId() + " : message = " + request.getMessage());
 		NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
-		nextFilter.messageSent(session, new DefaultWriteRequest(context.getBundle(), request.getFuture(), request.getDestination()));
+		DefaultWriteRequest req = (DefaultWriteRequest) request;
+
+		Boolean transitionStarted = (Boolean) session.getAttribute(MinaContext.TRANSITION_STARTED, Boolean.TRUE);
+		Boolean writeComplete = (Boolean) session.getAttribute(MinaContext.WRITE_COMPLETE, Boolean.TRUE);
+		if (transitionStarted)
+		{
+			if (!writeComplete)
+			{
+				// write next message chunk
+				session.write(context.getBundle());
+			}
+			else
+			{
+				nextFilter.messageSent(session, new DefaultWriteRequest(context.getBundle(), request.getFuture(), request.getDestination()));
+			}
+		}
 	}
 }
