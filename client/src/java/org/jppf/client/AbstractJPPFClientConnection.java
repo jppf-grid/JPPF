@@ -369,6 +369,15 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	}
 
 	/**
+	 * Set the priority assigned to this connection.
+	 * @param priority a priority as an int value.
+	 */
+	public void setPriority(int priority)
+	{
+		this.priority = priority;
+	}
+
+	/**
 	 * Get the status of this connection.
 	 * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
 	 * @see org.jppf.client.JPPFClientConnection#getStatus()
