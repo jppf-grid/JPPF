@@ -125,6 +125,7 @@ public class JPPFContainer
 			for (int i=0; i<count; i++)
 			{
 				JPPFBuffer buf = wrapper.receiveBytes(0);
+				if (debugEnabled) log.debug("i = " + i + ", read buffer size = " + buf.getLength());
 				futureList.add(executor.submit(new ObjectReadTask(buf.getBuffer(), i)));
 			}
 			for (Future<Object> f: futureList) list.add(f.get());
@@ -252,9 +253,12 @@ public class JPPFContainer
 		{
 			try
 			{
+				if (debugEnabled) log.debug("deserializing object index = " + index);
 				JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
 				byte[] data = (transform == null) ? buffer : transform.unwrap(buffer);
-				return helper.getSerializer().deserialize(data);
+				Object o = helper.getSerializer().deserialize(data);
+				if (debugEnabled) log.debug("deserialized object index = " + index);
+				return o;
 			}
 			catch(Exception e)
 			{

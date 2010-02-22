@@ -159,6 +159,7 @@ public class NodeIO extends ThreadSynchronization
 		{
 			bundle.setNodeExecutionTime(System.currentTimeMillis());
 			int count = bundle.getTaskCount();
+			if (debugEnabled) log.debug("bundle task count = " + count + ", state = " + bundle.getState());
 			if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 			{
 				JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());

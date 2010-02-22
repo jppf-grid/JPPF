@@ -113,6 +113,7 @@ public class SocketConnectorIoHandler extends IoHandlerAdapter
 			if ((remainder != null) && !remainder.hasRemaining()) remainder = null;
 			if (debugEnabled) log.debug("message buffer = " + message.buffer);
 		}
+		if (debugEnabled) log.debug("message buffer = " + message.buffer);
 		if (exception.get() != null) throw exception.get();
 		//session.suspendRead();
 	}
