@@ -151,6 +151,7 @@ public class SocketConnectorWrapper implements SocketWrapper
 		//connector.getSessionConfig().setMinReadBufferSize(32768);
 		((SocketSessionConfig) connector.getSessionConfig()).setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 		((SocketSessionConfig) connector.getSessionConfig()).setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+		((SocketSessionConfig) connector.getSessionConfig()).setReuseAddress(false);
 		ConnectFuture cf = connector.connect(new InetSocketAddress(host, port));
 		cf.await();
 		handler.setSession(cf.getSession());
