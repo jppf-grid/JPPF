@@ -29,7 +29,7 @@ import org.jppf.management.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
-import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
 
 /**
@@ -78,6 +78,8 @@ public class WaitInitialBundleState extends NodeServerState
 			context.setUuid(bundle.getBundleUuid());
 			context.setNodeUuid((String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM));
 			Bundler bundler = server.getBundler().copy();
+			JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
+			if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
 			bundler.setup();
 			context.setBundler(bundler);
 			Boolean b = (Boolean) bundle.getParameter(BundleParameter.IS_PEER);
@@ -91,7 +93,6 @@ public class WaitInitialBundleState extends NodeServerState
 					String host = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM);
 					int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM);
 					JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE);
-					JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
 					if (systemInfo != null) info.setSystemInfo(systemInfo);
 					JPPFDriver.getInstance().addNodeInformation(new ChannelWrapper<SelectableChannel>(channel), info);
 				}
