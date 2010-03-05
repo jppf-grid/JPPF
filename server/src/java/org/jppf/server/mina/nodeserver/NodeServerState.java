@@ -21,18 +21,14 @@ package org.jppf.server.mina.nodeserver;
 import org.apache.mina.core.session.IoSession;
 import org.jppf.server.*;
 import org.jppf.server.job.JPPFJobManager;
-import org.jppf.server.mina.MinaContext;
+import org.jppf.server.mina.*;
 
 /**
  * Common abstract superclass for all states of a node that executes tasks. 
  * @author Laurent Cohen
  */
-public abstract class NodeServerState
+public abstract class NodeServerState extends MinaState
 {
-	/**
-	 * The server that handles this state.
-	 */
-	protected MinaNodeServer server = null;
 	/**
 	 * The driver stats manager.
 	 */
@@ -46,34 +42,19 @@ public abstract class NodeServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public NodeServerState(MinaNodeServer server)
+	protected NodeServerState(MinaNodeServer server)
 	{
-		this.server = server;
+		super(server);
 		statsManager = JPPFDriver.getInstance().getStatsManager();
 		jobManager = JPPFDriver.getInstance().getJobManager();
 	}
-
-	/**
-	 * Execute the action associated with this channel state.
-	 * @param session the current session to which the state applies.
-	 * @return true if the transition could be applied, false otherwise. If true, then <code>endTransition()</code> will be called.
-	 * @throws Exception if an error occurs while transitioning to another state.
-	 */
-	public abstract boolean startTransition(IoSession session) throws Exception;
-
-	/**
-	 * End the transition associated with this channel state.
-	 * @param session the current session to which the state applies.
-	 * @throws Exception if an error occurs while transitioning to another state.
-	 */
-	public abstract void endTransition(IoSession session) throws Exception;
 
 	/**
 	 * Get the node context attahced tot he specified session.
 	 * @param session the IO session to get the context from.
 	 * @return a <code>NodeContext</code> instance.
 	 */
-	public NodeContext getContext(IoSession session)
+	protected NodeContext getContext(IoSession session)
 	{
 		return (NodeContext) session.getAttribute(MinaContext.CONTEXT);
 	}

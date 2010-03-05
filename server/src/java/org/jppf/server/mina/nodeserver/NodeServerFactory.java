@@ -23,64 +23,36 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
 import java.util.*;
 
-import org.jppf.server.nio.*;
-import org.jppf.server.nio.nodeserver.*;
+import org.jppf.server.mina.*;
+import org.jppf.server.nio.NioTransition;
+import org.jppf.server.nio.nodeserver.NodeState;
+import org.jppf.server.nio.nodeserver.NodeTransition;
 
 /**
  * Utility class used to specify the possible states of a node server connection, as well as the possible
  * transitions between those states.
  * @author Laurent Cohen
  */
-public final class NodeServerFactory
+public final class NodeServerFactory extends MinaServerFactory<NodeState, NodeTransition>
 {
-	/**
-	 * A short name for no channel operations.
-	 */
-	public static final int NONE = 0;
-	/**
-	 * A short name for read channel operations.
-	 */
-	public static final int R = 1;
-	/**
-	 * A short name for wirte channel operations.
-	 */
-	public static final int W = 2;
-	/**
-	 * A short name for read and write channel operations.
-	 */
-	public static final int RW = 3;
-	/**
-	 * Map of all states for a class server.
-	 */
-	protected Map<NodeState, NodeServerState> stateMap = null;
-	/**
-	 * Map of all states for a class server.
-	 */
-	protected Map<NodeTransition, NioTransition<NodeState>> transitionMap = null;
-	/**
-	 * The node server.
-	 */
-	private MinaNodeServer server = null;
-
 	/**
 	 * Initialize this factory with the specified server.
 	 * @param server the server for which to initialize.
 	 */
 	public NodeServerFactory(MinaNodeServer server)
 	{
-		this.server = server;
-		stateMap = createStateMap();
-		transitionMap = createTransitionMap();
+		super(server);
 	}
 
 	/**
 	 * Create the map of all possible states.
 	 * @return a mapping of the states enumeration to the corresponding NioState instances.
-	 * @see org.jppf.server.nio.NioServerFactory#createStateMap()
+	 * @see org.jppf.server.mina.MinaServerFactory#createStateMap()
 	 */
-	public Map<NodeState, NodeServerState> createStateMap()
+	public Map<NodeState, MinaState> createStateMap()
 	{
-		Map<NodeState, NodeServerState> map = new EnumMap<NodeState, NodeServerState>(NodeState.class);
+		MinaNodeServer server = (MinaNodeServer) this.server;
+		Map<NodeState, MinaState> map = new EnumMap<NodeState, MinaState>(NodeState.class);
 		map.put(SEND_INITIAL_BUNDLE, new SendInitialBundleState(server));
 		map.put(WAIT_INITIAL_BUNDLE, new WaitInitialBundleState(server));
 		map.put(SENDING_BUNDLE, new SendingBundleState(server));
@@ -105,37 +77,5 @@ public final class NodeServerFactory
 		//map.put(TO_IDLE, transition(SENDING_BUNDLE, NONE));
 		map.put(TO_IDLE, transition(IDLE, NONE));
 		return map;
-	}
-
-
-	/**
-	 * Create a transition to the specified state for the specified IO operations.
-	 * @param state resulting state of the transition.
-	 * @param ops the operations allowed.
-	 * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
-	 */
-	private NioTransition<NodeState> transition(NodeState state, int ops)
-	{
-		return new NioTransition<NodeState>(state, ops);
-	}
-
-	/**
-	 * Get a state given its name.
-	 * @param name the name of the state to lookup.
-	 * @return an <code>NioState</code> instance.
-	 */
-	public NodeServerState getState(NodeState name)
-	{
-		return stateMap.get(name);
-	}
-
-	/**
-	 * Get a transition given its name.
-	 * @param name the name of the transition to lookup.
-	 * @return an <code>NioTransition</code> instance.
-	 */
-	public NioTransition<NodeState> getTransition(NodeTransition name)
-	{
-		return transitionMap.get(name);
 	}
 }

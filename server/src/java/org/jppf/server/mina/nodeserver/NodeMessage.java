@@ -25,6 +25,7 @@ import java.util.*;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.jppf.data.transform.*;
 import org.jppf.io.*;
+import org.jppf.server.mina.*;
 import org.jppf.server.nio.NioObject;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.*;

@@ -26,6 +26,7 @@ import org.apache.mina.core.session.IoSession;
 import org.jppf.io.BundleWrapper;
 import org.jppf.management.*;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.mina.IoSessionWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.JPPFConfiguration;
@@ -81,7 +82,7 @@ public class WaitInitialBundleState extends NodeServerState
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		context.setUuid(bundle.getBundleUuid());
 		context.setNodeUuid((String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM));
-		Bundler bundler = server.getBundler().copy();
+		Bundler bundler = ((MinaNodeServer) server).getBundler().copy();
 		JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
 		if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
 		bundler.setup();
@@ -104,7 +105,7 @@ public class WaitInitialBundleState extends NodeServerState
 		// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 		context.setNodeMessage(null);
 		context.setBundle(null);
-		server.addIdleChannel(session);
+		((MinaNodeServer) server).addIdleChannel(session);
 		server.transitionSession(session, TO_IDLE);
 	}
 }

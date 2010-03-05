@@ -24,16 +24,16 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.*;
-import org.apache.mina.core.service.SimpleIoProcessorPool;
-import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.session.*;
+import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.transport.socket.nio.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
-import org.jppf.server.mina.MinaContext;
-import org.jppf.server.nio.*;
+import org.jppf.server.mina.*;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.queue.*;
@@ -45,7 +45,7 @@ import org.jppf.utils.*;
  * 
  * @author Laurent Cohen
  */
-public class MinaNodeServer
+public class MinaNodeServer extends MinaServer<NodeState, NodeTransition>
 {
 	/**
 	 * Logger for this class.
@@ -64,18 +64,6 @@ public class MinaNodeServer
 	 */
 	private BundleWrapper initialBundle = null;
 	/**
-	 * The ports to listen to.
-	 */
-	private int[] ports = null;
-	/**
-	 * Acceptor for this server.
-	 */
-	private NioSocketAcceptor acceptor = null;
-	/**
-	 * The IoProcessor for the acceptor.
-	 */
-	private SimpleIoProcessorPool processor = null;
-	/**
 	 * The algorithm that dynamically computes the task bundle size.
 	 */
 	private AtomicReference<Bundler> bundlerRef;
@@ -83,10 +71,6 @@ public class MinaNodeServer
 	 * Holds the currently idle channels.
 	 */
 	private List<IoSession> idleChannels = new ArrayList<IoSession>();
-	/**
-	 * The factory for this server.
-	 */
-	protected NodeServerFactory factory = new NodeServerFactory(this);
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
@@ -116,7 +100,7 @@ public class MinaNodeServer
 	 */
 	public MinaNodeServer(int[] ports)
 	{
-		this.ports = ports;
+		super(ports);
 	}
 
 	/**
@@ -129,14 +113,15 @@ public class MinaNodeServer
 		this.bundlerRef = new AtomicReference<Bundler>(bundler);
 		List<InetSocketAddress> addresses = new ArrayList<InetSocketAddress>();
 		for (int port: ports) addresses.add(new InetSocketAddress(port));
-		//acceptor = new NioSocketAcceptor(new NioProcessor(Executors.newFixedThreadPool(1)));
-		processor = new SimpleIoProcessorPool(NioProcessor.class);
-		acceptor = new NioSocketAcceptor(processor);
-		acceptor.getSessionConfig().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-		acceptor.getSessionConfig().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-		acceptor.getSessionConfig().setReuseAddress(false);
-		acceptor.getSessionConfig().setKeepAlive(false);
-		//acceptor.getSessionConfig().setMinReadBufferSize(32768);
+		int size = Runtime.getRuntime().availableProcessors() + 1;
+		processor = new NioProcessor(createExecutor("Node Server Processor", size));
+		acceptor = new NioSocketAcceptor(createExecutor("Node Server Acceptor", 1), processor);
+		SocketSessionConfig cfg = acceptor.getSessionConfig();
+		cfg.setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+		cfg.setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+		cfg.setReuseAddress(false);
+		cfg.setKeepAlive(false);
+		cfg.setIdleTime(IdleStatus.BOTH_IDLE, 0);
 		acceptor.getFilterChain().addLast("nodeMessageFilter", new NodeIoFilter());
 		/*
 		OrderedThreadPoolExecutor x = new OrderedThreadPoolExecutor(16, 16, 1L, TimeUnit.HOURS, new JPPFThreadFactory("NodeIoProcessor"));
@@ -266,39 +251,6 @@ public class MinaNodeServer
 	}
 
 	/**
-	 * Transition the specified session to the specified transition.
-	 * @param session the session to transition.
-	 * @param transition contains the new state and interest ops.
-	 */
-	public void transitionSession(IoSession session, NodeTransition transition)
-	{
-		if (!session.isConnected()) return;
-		NioTransition<NodeState> tr = factory.getTransition(transition);
-		NodeState s = tr.getState();
-		NodeContext context = (NodeContext) session.getAttribute(MinaContext.CONTEXT);
-		context.setState(s);
-		switch(tr.getInterestOps())
-		{
-			case NodeServerFactory.NONE:
-				session.suspendRead();
-				session.suspendWrite();
-				return;
-			case NodeServerFactory.R:
-				session.resumeRead();
-				session.suspendWrite();
-				break;
-			case NodeServerFactory.W:
-				session.suspendRead();
-				session.resumeWrite();
-				break;
-			case NodeServerFactory.RW:
-				session.resumeRead();
-				session.resumeWrite();
-				break;
-		}
-	}
-
-	/**
 	 * Get the task bundle sent to a newly connected node,
 	 * so that it can check whether it is up to date, without having
 	 * to wait for an actual request to be sent.
@@ -360,11 +312,11 @@ public class MinaNodeServer
 	}
 
 	/**
-	 * Get the IoProcessor for the acceptor.
-	 * @return a <code>SimpleIoProcessorPool</code> instance.
+	 * Create the factory holding all the states and transition mappings.
+	 * @return an <code>MinaServerFactory</code> instance.
 	 */
-	public SimpleIoProcessorPool getProcessor()
+	protected MinaServerFactory<NodeState, NodeTransition> createFactory()
 	{
-		return processor;
+		return new NodeServerFactory(this);
 	}
 }
