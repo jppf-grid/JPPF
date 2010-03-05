@@ -6,11 +6,6 @@
 			<attribute name="javadoc_location" value="file:/C:/Tools/rhino1_6R2/docs/apidocs/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/ApacheCommons/commons-io-1.2.jar" sourcepath="C:/Tools/Apache/commons-io-1.2/src/java">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/C:/Tools/Apache/commons-io-1.2/docs/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/MigLayout/miglayout-3.7-swing.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/J2EE/geronimo-j2ee-connector_1.5_spec-2.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/JFreeChart/jcommon-1.0.15.jar"/>
@@ -25,9 +20,8 @@
 			<attribute name="javadoc_location" value="file:/C:/ftp/dev/Apache/mina-2.0.0-RC1/docs/apidocs/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/ApacheMina/slf4j-api-1.5.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ApacheMina/slf4j-log4j12-1.5.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ApacheMina/jcl-over-slf4j-1.5.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ApacheCommons/commons-logging-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j/jcl-over-slf4j-1.5.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j/slf4j-api-1.5.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j/slf4j-log4j12-1.5.2.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
