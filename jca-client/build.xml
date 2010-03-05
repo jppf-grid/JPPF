@@ -261,8 +261,8 @@
 				<include name="jppf-common.jar"/>
 				<include name="jppf-client.jar"/>
 			</zipfileset>
-			<zipfileset dir="${jppf.lib.dir}/ApacheCommons" prefix="lib">
-				<include name="commons-logging-1.1.jar"/>
+			<zipfileset dir="${jppf.lib.dir}/slf4j">
+				<include name="*.jar"/>
 			</zipfileset>
 		</ear>
 	</target>
@@ -327,8 +327,8 @@
 				<include name="jppf-common.jar"/>
 				<include name="jppf-client.jar"/>
 			</zipfileset>
-			<zipfileset dir="${jppf.lib.dir}/ApacheCommons">
-				<include name="commons-logging-1.1.jar"/>
+			<zipfileset dir="${jppf.lib.dir}/slf4j">
+				<include name="*.jar"/>
 			</zipfileset>
 		</jar>
     <delete dir="${build.dir}/${appserver}" quiet="true"/>
