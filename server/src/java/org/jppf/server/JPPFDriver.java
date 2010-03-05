@@ -30,6 +30,7 @@ import org.jppf.process.LauncherListener;
 import org.jppf.security.*;
 import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.job.JPPFJobManager;
+import org.jppf.server.mina.classloader.MinaClassServer;
 import org.jppf.server.mina.nodeserver.MinaNodeServer;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.ClassNioServer;
@@ -83,6 +84,10 @@ public class JPPFDriver
 	 * Serves class loading requests from the JPPF nodes.
 	 */
 	private ClassNioServer classServer = null;
+	/**
+	 * Serves class loading requests from the JPPF nodes.
+	 */
+	private MinaClassServer minaClassServer = null;
 	/**
 	 * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
 	 */
@@ -143,8 +148,21 @@ public class JPPFDriver
 		taskQueue = new JPPFPriorityQueue();
 		((JPPFPriorityQueue) taskQueue).addListener(jobManager);
 		JPPFConnectionInformation info = createConnectionInformation();
-		classServer = new ClassNioServer(info.classServerPorts);
-		classServer.start();
+		boolean useMina = JPPFConfiguration.getProperties().getBoolean("communications.use.mina", false);
+		if (useMina) System.out.println("Using Mina framework");
+
+		/*
+		*/
+		if (useMina)
+		{
+			minaClassServer = new MinaClassServer(info.classServerPorts);
+			minaClassServer.start();
+		}
+		else
+		{
+			classServer = new ClassNioServer(info.classServerPorts);
+			classServer.start();
+		}
 		printInitializedMessage(info.classServerPorts, "Class Server");
 
 		applicationServers = new JPPFApplicationServer[info.applicationServerPorts.length];
@@ -155,7 +173,7 @@ public class JPPFDriver
 		}
 		printInitializedMessage(info.applicationServerPorts, "Client Server");
 
-		if (JPPFConfiguration.getProperties().getBoolean("communications.use.mina", false))
+		if (useMina)
 		{
 			minaNodeServer = new MinaNodeServer(info.nodeServerPorts);
 			minaNodeServer.start();
