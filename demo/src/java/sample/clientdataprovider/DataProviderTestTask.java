@@ -29,33 +29,54 @@ import org.jppf.utils.JPPFCallable;
 public class DataProviderTestTask extends JPPFTask
 {
 	/**
+	 * Used as job identifier.
+	 */
+	public int i = 0;
+	/**
+	 * Used as task identifier within a job.
+	 */
+	public int j = 0;
+
+	/**
+	 * Initialize this task with the specified parameters
+	 * @param i used as job identifier.
+	 * @param j used as task identifier within a job.
+	 */
+	public DataProviderTestTask(int i, int j)
+	{
+		this.i = i;
+		this.j = j;
+	}
+
+	/**
 	 * Execute the task.
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run()
 	{
-		System.out.println("this should be on the node side");
+		//System.out.println("this should be on the node side");
 		ClientDataProvider dp = (ClientDataProvider) getDataProvider();
 		Object o = dp.computeValue("result", new MyCallable());
-		System.out.println("Result of client-side execution:\n" + o);
+		byte[] bytes = (byte[]) o;
+		System.out.println("Result of client-side execution is a byte[" + bytes.length + "]");
 		setResult(o);
 	}
 
 	/**
 	 * A callable that simply prints a message on the client side.
 	 */
-	public static class MyCallable implements JPPFCallable<String>
+	public static class MyCallable implements JPPFCallable<byte[]>
 	{
 		/**
 		 * Execute this callable.
 		 * @return a string message.
 		 * @see java.util.concurrent.Callable#call()
 		 */
-		public String call()
+		public byte[] call()
 		{
-			String s = "this should be on the client side";
-			System.out.println(s);
-			return null;
+			//String s = "this should be on the client side";
+			//System.out.println(s);
+			return new byte[10*1024*1024];
 		}
 	}
 }

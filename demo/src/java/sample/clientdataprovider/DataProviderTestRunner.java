@@ -19,11 +19,9 @@ package sample.clientdataprovider;
 
 import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.ClientDataProvider;
-import org.jppf.utils.StringUtils;
 
 /**
  * Runner class used for testing the framework.
@@ -32,28 +30,27 @@ import org.jppf.utils.StringUtils;
 public class DataProviderTestRunner
 {
 	/**
-	 * Logger for this class.
-	 */
-	static Log log = LogFactory.getLog(DataProviderTestRunner.class);
-	/**
-	 * JPPF client used to submit execution requests.
-	 */
-	private static JPPFClient jppfClient = null;
-	/**
-	 * Separator for each test.
-	 */
-	private static String banner = "\n"+StringUtils.padLeft("", '-', 80)+"\n";
-
-	/**
 	 * Entry point for this class, performs a matrix multiplication a number of times.
 	 * @param args not used.
 	 */
 	public static void main(String...args)
 	{
+		JPPFClient jppfClient = new JPPFClient();
 		try
 		{
-			jppfClient = new JPPFClient();
-			performCommand();
+			for (int i=1; i<=100; i++)
+			{
+				JPPFJob job = new JPPFJob();
+				for (int j=1; j<=2; j++) job.addTask(new DataProviderTestTask(i, j));
+				job.setDataProvider(new ClientDataProvider());
+				List<JPPFTask> results = jppfClient.submit(job);
+				for (JPPFTask task: results)
+				{
+					DataProviderTestTask t = (DataProviderTestTask) task;
+					if (t.getException() != null) throw t.getException();
+					else System.out.println("iteration #" + t.i +" task #" + t.j + " : result: " + t.getResult());
+				}
+			}
 		}
 		catch(Exception e)
 		{
@@ -64,22 +61,5 @@ public class DataProviderTestRunner
 			jppfClient.close();
 		}
 		System.exit(0);
-	}
-
-	/**
-	 * .
-	 * @throws Exception .
-	 */
-	private static void performCommand() throws Exception
-	{
-		JPPFJob job = new JPPFJob();
-		job.addTask(new DataProviderTestTask());
-		job.setDataProvider(new ClientDataProvider());
-		List<JPPFTask> results = jppfClient.submit(job);
-		for (JPPFTask task: results)
-		{
-			if (task.getException() != null) task.getException().printStackTrace();
-			else System.out.println("result: " + task.getResult());
-		}
 	}
 }
