@@ -56,7 +56,7 @@ public class ByteBufferLocation extends AbstractDataLocation
 	 * Initialize this location with the specified buffer.
 	 * @param buffer the data abstracted by this memory location.
 	 */
-	private ByteBufferLocation(ByteBuffer buffer)
+	public ByteBufferLocation(ByteBuffer buffer)
 	{
 		this.buffer = buffer;
 		size = buffer.limit();
