@@ -126,6 +126,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 
 	/**
 	 * Close and remove all connections accepted by this server.
+	 * @see org.jppf.server.nio.NioServer#removeAllConnections()
 	 */
 	public synchronized void removeAllConnections()
 	{
