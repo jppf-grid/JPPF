@@ -19,11 +19,10 @@
 package org.jppf.server.protocol;
 
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.util.*;
 
 import org.jppf.io.IOHelper;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFByteArrayOutputStream;
 
 /**
  * Instances of this class represent the location of an artifact, generally a file or the data found at a url.
@@ -140,6 +139,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 */
 	protected void fireLocationEvent(int n)
 	{
+		if (listeners.isEmpty()) return;
 		LocationEvent event = new LocationEvent(this, n);
 		for (LocationEventListener l: listeners) l.dataTransferred(event);
 	}
@@ -152,13 +152,12 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 */
 	private void copyStream(InputStream is, OutputStream os) throws IOException
 	{
-		ByteBuffer tmp = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
-		byte[] bytes = tmp.array();
+		byte[] bytes = new byte[IOHelper.TEMP_BUFFER_SIZE];
 		while(true)
 		{
 			int n = is.read(bytes);
-			if (eventsEnabled) fireLocationEvent(n);
 			if (n <= 0) break;
+			if (eventsEnabled) fireLocationEvent(n);
 			os.write(bytes, 0, n);
 		}
 	}
