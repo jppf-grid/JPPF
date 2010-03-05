@@ -95,4 +95,19 @@ public class ByteMessage
 		}
 		else dest.put(src);
 	}
+
+	/**
+	 * Reset this message using the specified data.
+	 * @param data an array of bytes into which the data is stored.
+	 * @param offset the position where to start storing data read from the socket.
+	 * @param len the length of data to read.
+	 */
+	public void reset(byte[] data, int offset, int len)
+	{
+		buffer = ByteBuffer.wrap(data, offset, len);
+		length = len;
+		complete = false;
+		exception = null;
+		count = 0;
+	}
 }

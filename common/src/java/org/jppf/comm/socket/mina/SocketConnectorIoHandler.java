@@ -18,7 +18,6 @@
 
 package org.jppf.comm.socket.mina;
 
-import java.nio.ByteBuffer;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.*;
@@ -72,6 +71,10 @@ public class SocketConnectorIoHandler extends IoHandlerAdapter
 	 * 
 	 */
 	private AtomicBoolean writeComplete = new AtomicBoolean(false);
+	/**
+	 * Cached read message, used for performance improvements.
+	 */
+	private ByteMessage readMessage = new ByteMessage();
 
 	/**
 	 * Initialize this io handler.
@@ -91,10 +94,13 @@ public class SocketConnectorIoHandler extends IoHandlerAdapter
 	{
 		if (debugEnabled) log.debug("len = " + len);
 		//if (session.isReadSuspended()) session.resumeRead();
-		ByteMessage message = new ByteMessage();
-		message.buffer = ByteBuffer.wrap(data, offset, len);
-		message.length = len;
-		while (!message.complete && (exception.get() == null))
+		/*
+		ByteMessage readMessage = new ByteMessage();
+		readMessage.buffer = ByteBuffer.wrap(data, offset, len);
+		readMessage.length = len;
+		*/
+		readMessage.reset(data, offset, len);
+		while (!readMessage.complete && (exception.get() == null))
 		{
 			IoBuffer buffer = null;
 			synchronized(readLock)
@@ -106,14 +112,14 @@ public class SocketConnectorIoHandler extends IoHandlerAdapter
 					continue;
 				}
 			}
-			if (message.read(buffer))
+			if (readMessage.read(buffer))
 			{
 				remainder = buffer.hasRemaining() ? buffer : null;
 			}
 			if ((remainder != null) && !remainder.hasRemaining()) remainder = null;
-			if (debugEnabled) log.debug("message buffer = " + message.buffer);
+			if (debugEnabled) log.debug("message buffer = " + readMessage.buffer);
 		}
-		if (debugEnabled) log.debug("message buffer = " + message.buffer);
+		if (debugEnabled) log.debug("message buffer = " + readMessage.buffer);
 		if (exception.get() != null) throw exception.get();
 		//session.suspendRead();
 	}
