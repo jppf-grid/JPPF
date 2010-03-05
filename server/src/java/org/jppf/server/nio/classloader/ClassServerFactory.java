@@ -53,7 +53,7 @@ public final class ClassServerFactory
 			new EnumMap<ClassState, NioState<ClassTransition>>(ClassState.class);
 		map.put(DEFINING_TYPE, new DefiningChannelTypeState((ClassNioServer) server));
 		map.put(SENDING_INITIAL_PROVIDER_RESPONSE, new SendingProviderInitialResponseState((ClassNioServer) server));
-		map.put(SENDING_INITIAL_RESPONSE, new SendingInitialResponseState((ClassNioServer) server));
+		map.put(SENDING_INITIAL_NODE_RESPONSE, new SendingNodeInitialResponseState((ClassNioServer) server));
 		map.put(SENDING_NODE_RESPONSE, new SendingNodeResponseState((ClassNioServer) server));
 		map.put(SENDING_PROVIDER_REQUEST, new SendingProviderRequestState((ClassNioServer) server));
 		map.put(WAITING_NODE_REQUEST, new WaitingNodeRequestState((ClassNioServer) server));
@@ -73,7 +73,7 @@ public final class ClassServerFactory
 			new EnumMap<ClassTransition, NioTransition<ClassState>>(ClassTransition.class);
 		map.put(TO_DEFINING_TYPE, transition(DEFINING_TYPE, R));
 		map.put(TO_SENDING_INITIAL_PROVIDER_RESPONSE, transition(SENDING_INITIAL_PROVIDER_RESPONSE, RW));
-		map.put(TO_SENDING_INITIAL_RESPONSE, transition(SENDING_INITIAL_RESPONSE, RW));
+		map.put(TO_SENDING_INITIAL_NODE_RESPONSE, transition(SENDING_INITIAL_NODE_RESPONSE, RW));
 		map.put(TO_WAITING_NODE_REQUEST, transition(WAITING_NODE_REQUEST, R));
 		map.put(TO_SENDING_NODE_RESPONSE, transition(SENDING_NODE_RESPONSE, RW));
 		map.put(TO_SENDING_PROVIDER_REQUEST, transition(SENDING_PROVIDER_REQUEST, RW));

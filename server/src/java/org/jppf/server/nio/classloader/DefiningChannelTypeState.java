@@ -98,7 +98,7 @@ public class DefiningChannelTypeState extends ClassServerState
 				resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
 				resource.setProviderUuid(JPPFDriver.getInstance().getUuid());
 				context.serializeResource();
-				return TO_SENDING_INITIAL_RESPONSE;
+				return TO_SENDING_INITIAL_NODE_RESPONSE;
 			}
 		}
 		return TO_DEFINING_TYPE;

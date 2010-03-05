@@ -30,12 +30,12 @@ import org.apache.commons.logging.*;
  * State of sending the initial response to a newly created node channel.
  * @author Laurent Cohen
  */
-public class SendingInitialResponseState extends ClassServerState
+public class SendingNodeInitialResponseState extends ClassServerState
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SendingInitialResponseState.class);
+	private static Log log = LogFactory.getLog(SendingNodeInitialResponseState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
@@ -45,7 +45,7 @@ public class SendingInitialResponseState extends ClassServerState
 	 * Initialize this state with a specified NioServer.
 	 * @param server the NioServer this state relates to.
 	 */
-	public SendingInitialResponseState(ClassNioServer server)
+	public SendingNodeInitialResponseState(ClassNioServer server)
 	{
 		super(server);
 	}
@@ -71,6 +71,6 @@ public class SendingInitialResponseState extends ClassServerState
 			context.setMessage(null);
 			return TO_WAITING_NODE_REQUEST;
 		}
-		return TO_SENDING_INITIAL_RESPONSE;
+		return TO_SENDING_INITIAL_NODE_RESPONSE;
 	}
 }

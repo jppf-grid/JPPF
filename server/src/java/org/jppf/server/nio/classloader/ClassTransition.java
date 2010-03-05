@@ -34,7 +34,7 @@ public enum ClassTransition
 	/**
 	 * Transition to the SENDING_INITIAL_RESPONSE state.
 	 */
-	TO_SENDING_INITIAL_RESPONSE,
+	TO_SENDING_INITIAL_NODE_RESPONSE,
 	/**
 	 * Transition to the WAITING_NODE_REQUEST state.
 	 */
