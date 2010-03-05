@@ -27,7 +27,6 @@ import java.nio.channels.*;
 import org.apache.commons.logging.*;
 import org.jppf.io.BundleWrapper;
 import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.server.scheduler.bundle.Bundler;
 
 /**
  * This class represents the state of waiting for some action.
@@ -71,14 +70,6 @@ public class SendingBundleState extends NodeServerState
 		NodeContext context = (NodeContext) key.attachment();
 		if (context.getNodeMessage() == null)
 		{
-			// check whether the bundler settings have changed.
-			if (context.getBundler().getTimestamp() < server.getBundler().getTimestamp())
-			{
-				context.getBundler().dispose();
-				Bundler bundler = server.getBundler().copy();
-				bundler.setup();
-				context.setBundler(bundler);
-			}
 			BundleWrapper bundleWrapper = context.getBundle();
 			JPPFTaskBundle bundle = (bundleWrapper == null) ? null : bundleWrapper.getBundle();
 			if (bundle != null)

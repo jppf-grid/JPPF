@@ -24,7 +24,7 @@ import org.apache.mina.core.session.IoSession;
 import org.jppf.data.transform.*;
 import org.jppf.io.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.mina.MinaContext;
+import org.jppf.server.mina.*;
 import org.jppf.server.nio.nodeserver.NodeState;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.Bundler;
@@ -81,7 +81,7 @@ public class NodeContext extends MinaContext<NodeState>
 
 	/**
 	 * Get the bundler used to schedule tasks for the corresponding node.
-	 * @return a <code>Bundler</code> instance.
+	 * @return a {@link Bundler} instance.
 	 */
 	public Bundler getBundler()
 	{
@@ -90,11 +90,31 @@ public class NodeContext extends MinaContext<NodeState>
 
 	/**
 	 * Set the bundler used to schedule tasks for the corresponding node.
-	 * @param bundler a <code>Bundler</code> instance.
+	 * @param bundler a {@link Bundler} instance.
 	 */
 	public void setBundler(Bundler bundler)
 	{
 		this.bundler = bundler;
+	}
+
+	/**
+	 * Check whether the bundler held by this context is up to date by comparison
+	 * with the specified bundler.<br>
+	 * If it is not, then it is replaced with a copy of the specified bundler, with a
+	 * timestamp taken at creation time.
+	 * @param serverBundler the bundler to compare with.
+	 * @return true if the bundler is up to date, false if it wasn't and has been updated.
+	 */
+	public boolean checkBundler(Bundler serverBundler)
+	{
+		if (this.bundler.getTimestamp() < serverBundler.getTimestamp())
+		{
+			this.bundler.dispose();
+			this.bundler = serverBundler.copy();
+			this.bundler.setup();
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -144,7 +164,7 @@ public class NodeContext extends MinaContext<NodeState>
 
 	/**
 	 * Deserialize a task bundle from the message read into this buffer.
-	 * @return a <code>BundleWrapper</code> instance.
+	 * @return a {@link NodeContext} instance.
 	 * @throws Exception if an error occurs during the deserialization.
 	 */
 	public BundleWrapper deserializeBundle() throws Exception
@@ -162,7 +182,7 @@ public class NodeContext extends MinaContext<NodeState>
 
 	/**
 	 * Get the message wrapping the data sent or received over the socket channel.
-	 * @return a <code>NodeMessage</code> instance.
+	 * @return a {@link NodeContext} instance.
 	 */
 	public NodeMessage getNodeMessage()
 	{
@@ -171,7 +191,7 @@ public class NodeContext extends MinaContext<NodeState>
 
 	/**
 	 * Set the message wrapping the data sent or received over the socket channel.
-	 * @param nodeMessage a <code>NodeMessage</code> instance.
+	 * @param nodeMessage a {@link NodeContext} instance.
 	 */
 	public void setNodeMessage(NodeMessage nodeMessage)
 	{

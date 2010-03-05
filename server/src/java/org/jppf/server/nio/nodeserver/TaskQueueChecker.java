@@ -100,6 +100,7 @@ public class TaskQueueChecker implements Runnable
 				{
 					SelectionKey key = channel.keyFor(server.getSelector());
 					NodeContext context = (NodeContext) key.attachment();
+					context.checkBundler(server.getBundler());
 					BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
 					context.setBundle(bundleWrapper);
 					server.getTransitionManager().transitionChannel(key, NodeTransition.TO_SENDING);

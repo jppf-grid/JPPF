@@ -28,7 +28,7 @@ import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.ChannelBundlePair;
-import org.jppf.server.mina.MinaContext;
+import org.jppf.server.mina.*;
 import org.jppf.server.nio.nodeserver.NodeTransition;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.AbstractJPPFQueue;
@@ -60,13 +60,9 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 	 */
 	private AtomicBoolean executing = new AtomicBoolean(false);
 	/**
-	 * 
+	 * Used for asynchronous channel state transitions.
 	 */
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
-	/**
-	 * COunts the number of loops performed.
-	 */
-	private AtomicLong loopCount = new AtomicLong(0L);
 
 	/**
 	 * Initialize this task queue checker with the specified node server. 
@@ -85,11 +81,9 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 	{
 		List<IoSession> idleChannels = server.getIdleChannels();
 		long sleepMillis = 1L;
-		int sleepNanos = 0;
 		while (!isStopped())
 		{
-			loopCount.incrementAndGet();
-			while (idleChannels.isEmpty() || server.getQueue().isEmpty()) goToSleep(sleepMillis, sleepNanos);
+			while (idleChannels.isEmpty() || server.getQueue().isEmpty()) goToSleep(sleepMillis);
 			synchronized(idleChannels)
 			{
 				if (idleChannels.isEmpty() || server.getQueue().isEmpty()) continue;
@@ -117,31 +111,29 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 							found = true;
 						}
 					}
-					try
+					if (debugEnabled) log.debug((channel == null ? "no channel found for bundle" : "found channel for bundle") + " id=" + getJobId(selectedBundle.getBundle()));
+					if (channel != null)
 					{
-						if (debugEnabled) log.debug((channel == null ? "no channel found for bundle" : "found channel for bundle") + " id=" + getJobId(selectedBundle.getBundle()));
-						if (channel != null)
-						{
-							NodeContext context = (NodeContext) channel.getAttribute(MinaContext.CONTEXT);
-							BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
-							context.setBundle(bundleWrapper);
-							server.transitionSession(channel, NodeTransition.TO_SENDING);
-							JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), new IoSessionWrapper(channel));
-							NodeServerState state = server.factory.getState(context.getState());
-							//channel.setAttribute("transitionStarted", state.startTransition(channel));
-							executor.submit(new ChannelTransitionTask(channel, state));
-						}
+						NodeContext context = (NodeContext) channel.getAttribute(MinaContext.CONTEXT);
+						context.checkBundler(server.getBundler());
+						BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
+						context.setBundle(bundleWrapper);
+						server.transitionSession(channel, NodeTransition.TO_SENDING);
+						JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), new IoSessionWrapper(channel));
+						NodeServerState state = (NodeServerState) server.getFactory().getState(context.getState());
+						//channel.setAttribute("transitionStarted", state.startTransition(channel));
+						executor.submit(new ChannelTransitionTask(channel, state));
 					}
-					catch(Exception e)
-					{
-						log.error(e.getMessage(), e);
-					}
+				}
+				catch(Exception e)
+				{
+					log.error(e.getMessage(), e);
 				}
 				finally
 				{
 					queue.getLock().unlock();
 				}
-				if (channel == null) goToSleep(sleepMillis, sleepNanos);
+				if (channel == null) goToSleep(sleepMillis);
 			}
 		}
 	}
@@ -220,7 +212,7 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 	}
 
 	/**
-	 * 
+	 * Transition a session to a new state asynchronously, to avoid overloading of the JobQueueChecker.
 	 */
 	private class ChannelTransitionTask implements Runnable
 	{

@@ -26,7 +26,6 @@ import org.apache.mina.core.session.IoSession;
 import org.jppf.io.BundleWrapper;
 import org.jppf.server.nio.nodeserver.NodeState;
 import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.server.scheduler.bundle.Bundler;
 
 /**
  * This class represents the state of waiting for some action.
@@ -67,6 +66,7 @@ public class SendingBundleState extends NodeServerState
 		}
 		*/
 		NodeContext context = getContext(session);
+		MinaNodeServer srv = (MinaNodeServer) server;
 		if (debugEnabled) log.debug("session " + session.getId() + " starting " + context.getState());
 		if (NodeState.IDLE.equals(context.getState()))
 		{
@@ -74,14 +74,6 @@ public class SendingBundleState extends NodeServerState
 		}
 		if (context.getNodeMessage() == null)
 		{
-			// check whether the bundler settings have changed.
-			if (context.getBundler().getTimestamp() < server.getBundler().getTimestamp())
-			{
-				context.getBundler().dispose();
-				Bundler bundler = server.getBundler().copy();
-				bundler.setup();
-				context.setBundler(bundler);
-			}
 			BundleWrapper bundleWrapper = context.getBundle();
 			JPPFTaskBundle bundle = (bundleWrapper == null) ? null : bundleWrapper.getBundle();
 			if (bundle != null)
@@ -93,7 +85,7 @@ public class SendingBundleState extends NodeServerState
 					if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: " + bundle.getUuidPath().getList());
 					context.resubmitBundle(bundleWrapper);
 					context.setBundle(null);
-					server.addIdleChannel(session);
+					srv.addIdleChannel(session);
 					server.transitionSession(session, TO_IDLE);
 					return false;
 				}
@@ -106,7 +98,7 @@ public class SendingBundleState extends NodeServerState
 			else
 			{
 				server.transitionSession(session, TO_IDLE);
-				server.addIdleChannel(session);
+				srv.addIdleChannel(session);
 				return false;
 			}
 		}
