@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 
-package org.jppf.client;
+package org.jppf.client.taskwrapper;
 
 import java.util.concurrent.Callable;
 
 import org.jppf.JPPFException;
-import org.jppf.client.taskwrapper.*;
 import org.jppf.server.protocol.JPPFTask;
 
 

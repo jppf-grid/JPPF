@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.event.TaskResultListener;
+import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
