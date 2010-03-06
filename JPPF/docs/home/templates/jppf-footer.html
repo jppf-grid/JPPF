@@ -3,7 +3,7 @@
 			<tr><td colspan="*" style="height: 10px"></td></tr>
 			</tr>
 			<tr>
-				<td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2009 JPPF.org</td>
+				<td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2010 JPPF.org</td>
 				<td align="right">
 					<a href="http://www.parallel-matters.com"><img src="/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
 					<a href="http://sourceforge.net/projects/jppf-project">

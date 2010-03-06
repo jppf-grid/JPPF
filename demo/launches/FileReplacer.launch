@@ -14,7 +14,7 @@
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.utils.FileReplacer"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="C:/Workspaces/SourceForge C:/temp/_find.txt C:/temp/_replace.txt java,properties,groovy,xml false"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="C:/Workspaces/SourceForge C:/temp/find.txt C:/temp/replace.txt java,properties,groovy,xml,css,html,xsd,jsp,conf false"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="demo"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configuration=log4j-FileReplacer.properties -server -Xmx256m"/>
 </launchConfiguration>
