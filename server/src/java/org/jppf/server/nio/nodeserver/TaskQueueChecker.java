@@ -29,6 +29,7 @@ import org.jppf.server.job.ChannelBundlePair;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.AbstractJPPFQueue;
+import org.jppf.server.scheduler.bundle.*;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
@@ -100,7 +101,7 @@ public class TaskQueueChecker implements Runnable
 				{
 					SelectionKey key = channel.keyFor(server.getSelector());
 					NodeContext context = (NodeContext) key.attachment();
-					context.checkBundler(server.getBundler());
+					updateBundler(server.getBundler(), selectedBundle.getBundle(), context);
 					BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
 					context.setBundle(bundleWrapper);
 					server.getTransitionManager().transitionChannel(key, NodeTransition.TO_SENDING);
@@ -177,5 +178,21 @@ public class TaskQueueChecker implements Runnable
 		int n = (list == null) ? 0 : list.size();
 		if (debugEnabled) log.debug("current nodes = " + n + ", maxNodes = " + maxNodes);
 		return n < maxNodes;
+	}
+
+	/**
+	 * Perform the checks on the bundler before submitting a job.
+	 * @param bundler the bundler to check and update.
+	 * @param taskBundle the job.
+	 * @param context the current node context.
+	 */
+	private void updateBundler(Bundler bundler, JPPFTaskBundle taskBundle, NodeContext context)
+	{
+		context.checkBundler(server.getBundler());
+		if (bundler instanceof JobAwareness)
+		{
+			JPPFJobMetadata metadata = (JPPFJobMetadata) taskBundle.getParameter(BundleParameter.JOB_METADATA);
+			((JobAwareness) bundler).setJobMetadata(metadata);
+		}
 	}
 }
