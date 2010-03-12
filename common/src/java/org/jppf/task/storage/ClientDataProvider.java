@@ -91,7 +91,7 @@ public class ClientDataProvider extends MemoryMapDataProvider
 			Class clazz = loader.loadClass("org.jppf.utils.ObjectSerializerImpl");
 			ObjectSerializer ser = (ObjectSerializer) clazz.newInstance();
 			byte[] bytes = ser.serialize(callable).getBuffer();
-			bytes = ((JPPFClassLoader) cl).computeRemoteData(bytes);
+			bytes = loader.computeRemoteData(bytes);
 			if (bytes == null) return null;
 			return ser.deserialize(bytes);
 		}

@@ -337,11 +337,11 @@
 	<!--
 	-->
 	<target name="deploy.rar.jboss">
-		<copy todir="C:/Tools/jboss-4.2.2.GA/server/jppf/deploy" file="${build.dir}/jppf_ra_${jboss}.rar"/>
+		<copy todir="C:/Tools/jboss-4.2.2.GA/server/default/deploy" file="${build.dir}/jppf_ra_${jboss}.rar"/>
 	</target>
 
 	<target name="deploy.ear.jboss">
-		<copy todir="C:/Tools/jboss-4.2.2.GA/server/jppf/deploy" file="${build.dir}/${ear.prefix}_${jboss}.ear"/>
+		<copy todir="C:/Tools/jboss-4.2.2.GA/server/default/deploy" file="${build.dir}/${ear.prefix}_${jboss}.ear"/>
 	</target>
 
 	<target name="deploy.rar.weblogic">
