@@ -40,7 +40,7 @@
 								<td style="width: 1px"></td>
 											<?php
 			$itemClass = "";
-			if ($currentPage == Home)
+			if ($currentPage == "Home")
 			{
 			?>
 			<td class="headerMenuItem2" style="background: transparent url('/images/buttons/btn_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/index.php" class="headerMenuItem2">Home</a>&nbsp;</td>
@@ -56,7 +56,7 @@
 			<td style="width: 1px"></td>
 											<?php
 			$itemClass = "";
-			if ($currentPage == About)
+			if ($currentPage == "About")
 			{
 			?>
 			<td class="headerMenuItem2" style="background: transparent url('/images/buttons/btn_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/about.php" class="headerMenuItem2">About</a>&nbsp;</td>
@@ -72,7 +72,7 @@
 			<td style="width: 1px"></td>
 											<?php
 			$itemClass = "";
-			if ($currentPage == Download)
+			if ($currentPage == "Download")
 			{
 			?>
 			<td class="headerMenuItem2" style="background: transparent url('/images/buttons/btn_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/downloads.php" class="headerMenuItem2">Download</a>&nbsp;</td>
@@ -88,7 +88,7 @@
 			<td style="width: 1px"></td>
 											<?php
 			$itemClass = "";
-			if ($currentPage == Documentation)
+			if ($currentPage == "Documentation")
 			{
 			?>
 			<td class="headerMenuItem2" style="background: transparent url('/images/buttons/btn_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/wiki" class="headerMenuItem2">Documentation</a>&nbsp;</td>
@@ -104,7 +104,7 @@
 			<td style="width: 1px"></td>
 											<?php
 			$itemClass = "";
-			if ($currentPage == Forums)
+			if ($currentPage == "Forums")
 			{
 			?>
 			<td class="headerMenuItem2" style="background: transparent url('/images/buttons/btn_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="/forums" class="headerMenuItem2">Forums</a>&nbsp;</td>
@@ -291,7 +291,7 @@
 			<tr><td colspan="*" style="height: 10px"></td></tr>
 			</tr>
 			<tr>
-				<td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2009 JPPF.org</td>
+				<td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2010 JPPF.org</td>
 				<td align="right">
 					<a href="http://www.parallel-matters.com"><img src="/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
 					<a href="http://sourceforge.net/projects/jppf-project">
