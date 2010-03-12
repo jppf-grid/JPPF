@@ -46,7 +46,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	private static boolean debugEnabled = log.isDebugEnabled();
 
 	/**
-	 * Initialize class server delegate with a spceified application uuid.
+	 * Initialize class server delegate with a specified application uuid.
 	 * @param owner the client connection which owns this delegate.
 	 * @param uuid the unique identifier for the local JPPF client.
 	 * @param host the name or IP address of the host the class server is running on.

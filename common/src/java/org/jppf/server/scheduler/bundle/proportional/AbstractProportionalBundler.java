@@ -65,16 +65,13 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	public AbstractProportionalBundler(LoadBalancingProfile profile)
 	{
 		super(profile);
-		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
-		int bundleSize = 1;
-		if (bundleSize < 1) bundleSize = 1;
-		log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize + ", profile: "+profile);
+		if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size - the initial size is " + bundleSize + ", profile: " + profile);
 		dataHolder = new BundleDataHolder(((ProportionalTuneProfile) profile).getPerformanceCacheSize());
 	}
 
 	/**
 	 * Get the current size of bundle.
-	 * @return  the bundle size as an int value.
+	 * @return the bundle size as an int value.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
 	public int getBundleSize()
@@ -84,7 +81,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 
 	/**
 	 * Set the current size of bundle.
-	 * @param size - the bundle size as an int value.
+	 * @param size the bundle size as an int value.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
 	public void setBundleSize(int size)
@@ -94,8 +91,8 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 
 	/**
 	 * This method delegates the bundle size calculation to the singleton instance of <code>SimpleBundler</code>.
-	 * @param size - the number of tasks executed.
-	 * @param time - the time in milliseconds it took to execute the tasks.
+	 * @param size the number of tasks executed.
+	 * @param time the time in milliseconds it took to execute the tasks.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
 	 */
 	public void feedback(int size, double time)
@@ -164,24 +161,18 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 					minBundler = b;
 				}
 			}
-			//if (maxMean <= 0) maxMean = 1d;
 			for (AbstractProportionalBundler b: bundlers)
 			{
 				BundleDataHolder h = b.getDataHolder();
-				//if (h.getMean() <= 0) continue;
 				meanSum += normalize(h.getMean());
-				//meanSum += m;
 			}
-			//int max = Math.max(1, (int) (0.9d*maxSize()));
 			int max = maxSize();
 			int sum = 0;
 			for (AbstractProportionalBundler b: bundlers)
 			{
 				BundleDataHolder h = b.getDataHolder();
-				//if (h.getMean() <= 0) continue;
 				double p = normalize(h.getMean()) / meanSum;
 				int size = Math.max(1, (int) (p * max));
-				//size = Math.min((int) (0.9*max), size);
 				if (size >= max) size = max-1;
 				b.setBundleSize(size);
 				sum += size;
