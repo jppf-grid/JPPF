@@ -71,5 +71,9 @@ public enum  BundleParameter
 	/**
 	 * Job pending indicator, detrmines whether the job is waiting for its scheduled time to start.
 	 */
-	JOB_PENDING
+	JOB_PENDING,
+	/**
+	 * Key for the job metadata Map in the JPPFTaskBundle.
+	 */
+	JOB_METADATA
 }

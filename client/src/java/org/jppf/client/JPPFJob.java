@@ -68,6 +68,10 @@ public class JPPFJob implements Serializable
 	 * The service level agreement between the job and the server.
 	 */
 	private JPPFJobSLA jobSLA = new JPPFJobSLA();
+	/**
+	 * The user-defined metadata asoociated with this job.
+	 */
+	private JPPFJobMetadata jobMetadata = new JPPFJobMetadata();
 
 	/**
 	 * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -136,9 +140,23 @@ public class JPPFJob implements Serializable
 	 */
 	public JPPFJob(DataProvider dataProvider, JPPFJobSLA jobSLA, boolean blocking, TaskResultListener resultsListener)
 	{
+		this(dataProvider, jobSLA, null, blocking, resultsListener);
+	}
+
+	/**
+	 * Initialize a job with the specified parameters.
+	 * @param dataProvider the container for data shared between tasks.
+	 * @param jobSLA sevice level agreement between job and server.
+	 * @param jobMetadata the user-defined job metadata.
+	 * @param blocking determines whether this job is blocking.
+	 * @param resultsListener the listener that receives notifications of completed tasks.
+	 */
+	public JPPFJob(DataProvider dataProvider, JPPFJobSLA jobSLA, JPPFJobMetadata jobMetadata, boolean blocking, TaskResultListener resultsListener)
+	{
 		this();
 		this.dataProvider = dataProvider;
 		if (jobSLA != null) this.jobSLA = jobSLA;
+		if (jobMetadata != null) this.jobMetadata = jobMetadata;
 		this.resultsListener = resultsListener;
 		this.blocking = blocking;
 	}
@@ -319,5 +337,14 @@ public class JPPFJob implements Serializable
 	public void setJobSLA(JPPFJobSLA jobSLA)
 	{
 		this.jobSLA = jobSLA;
+	}
+
+	/**
+	 * Get the user-defined metadata asoociated with this job.
+	 * @return a {@link JPPFJobMetadata} instance.
+	 */
+	public JPPFJobMetadata getJobMetadata()
+	{
+		return jobMetadata;
 	}
 }

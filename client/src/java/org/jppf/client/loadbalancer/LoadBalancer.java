@@ -316,7 +316,7 @@ public class LoadBalancer
 				long start = System.currentTimeMillis();
 				int count = 0;
 				boolean completed = false;
-				JPPFJob newJob = new JPPFJob(job.getDataProvider(), job.getJobSLA(), job.isBlocking(), job.getResultListener());
+				JPPFJob newJob = new JPPFJob(job.getDataProvider(), job.getJobSLA(), job.getJobMetadata(), job.isBlocking(), job.getResultListener());
 				newJob.setId(job.getId());
 				for (JPPFTask task: tasks) newJob.addTask(task);
 				while (!completed)

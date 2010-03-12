@@ -133,6 +133,7 @@ public class JcaResultProcessor implements Work
 		JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
 		String requestUuid = bundle.getRequestUuid();
 		bundle.setJobSLA(job.getJobSLA());
+		bundle.setParameter(BundleParameter.JOB_METADATA, job.getJobMetadata());
 		ClassLoader cl = null;
 		ClassLoader oldCl = null;
 		if (!job.getTasks().isEmpty())

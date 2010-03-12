@@ -18,22 +18,22 @@
 
 package org.jppf.server.scheduler.bundle;
 
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.server.protocol.JPPFJobMetadata;
 
 /**
- * Bundler implementations should impelement this interface if they wish to have access to a node's configuration.
+ * Bundler implementations should impelement this interface if they wish to have access to a job's metadata.
  * @author Laurent Cohen
  */
-public interface NodeAwareness
+public interface JobAwareness
 {
 	/**
-	 * Get the corresponding node's system information.
-	 * @return a {@link JPPFSystemInformation} instance.
+	 * Get the current job's metadata.
+	 * @return a {@link JPPFJobMetadata} instance.
 	 */
-	JPPFSystemInformation getNodeConfiguration();
+	JPPFJobMetadata getJobMetadata();
 	/**
-	 * Set the corresponding node's system information.
-	 * @param nodeConfiguration a {@link JPPFSystemInformation} instance.
+	 * Set the current job's metadata.
+	 * @param metadata a {@link JPPFJobMetadata} instance.
 	 */
-	void setNodeConfiguration(JPPFSystemInformation nodeConfiguration);
+	void setJobMetadata(JPPFJobMetadata metadata);
 }

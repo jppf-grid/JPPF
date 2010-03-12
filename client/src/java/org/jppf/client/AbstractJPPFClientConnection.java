@@ -220,6 +220,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		header.setTaskCount(count);
 		header.setParameter(BundleParameter.JOB_ID, job.getId());
 		header.setJobSLA(job.getJobSLA());
+		header.setParameter(BundleParameter.JOB_METADATA, job.getJobMetadata());
 
 		SocketWrapper socketClient = taskServerConnection.getSocketClient();
 		socketClient.sendBytes(wrappedData(header, ser));
