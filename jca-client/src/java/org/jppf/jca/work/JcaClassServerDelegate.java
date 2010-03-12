@@ -19,6 +19,8 @@ package org.jppf.jca.work;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
+import java.util.List;
+
 import javax.resource.spi.work.Work;
 
 import org.apache.commons.logging.*;
@@ -125,21 +127,40 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 						boolean found = true;
 						JPPFResourceWrapper resource = readResource();
 						String name = resource.getName();
-						ClassLoader cl = getClassLoader(resource.getRequestUuid());
 						if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name);
-						byte[] b = null;
-						if (resource.isAsResource()) b = resourceProvider.getResource(name, cl);
-						else b = resourceProvider.getResourceAsBytes(name, cl);
-						if (b == null) found = false;
-						resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
-						if (b != null) resource.setDefinition(b);
-						else resource.setDefinition(null);
-						writeResource(resource);
-						if  (debugEnabled)
+
+						ClassLoader cl = getClassLoader(resource.getRequestUuid());
+						if (resource.getData("multiple") == null)
 						{
-							if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
-							else log.debug("["+this.getName()+"] resource not found: " + name);
+							byte[] b = null;
+							byte[] callable = resource.getCallable();
+							if (callable != null) b = resourceProvider.computeCallable(callable);
+							else
+							{
+								if (resource.isAsResource()) b = resourceProvider.getResource(name, cl);
+								else b = resourceProvider.getResourceAsBytes(name);
+							}
+							if (b == null) found = false;
+							if (callable == null) resource.setDefinition(b);
+							else resource.setCallable(b);
+							if  (debugEnabled)
+							{
+								if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
+								else log.debug("["+this.getName()+"] resource not found: " + name);
+							}
+							if  (debugEnabled)
+							{
+								if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
+								else log.debug("["+this.getName()+"] resource not found: " + name);
+							}
 						}
+						else
+						{
+							List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
+							if (list != null) resource.setData("resource_list", list);
+						}
+						resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
+						writeResource(resource);
 					}
 					else
 					{
