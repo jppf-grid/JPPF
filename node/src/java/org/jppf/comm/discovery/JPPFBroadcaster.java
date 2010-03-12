@@ -87,22 +87,29 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 		}
 		for (Inet4Address addr: addresses)
 		{
-			JPPFConnectionInformation ci = new JPPFConnectionInformation();
-			ci.host = addr.getHostAddress();
-			ci.uuid = info.uuid;
-			ci.classServerPorts = info.classServerPorts;
-			ci.applicationServerPorts = info.applicationServerPorts;
-			ci.nodeServerPorts = info.nodeServerPorts;
-			ci.managementPort = info.managementPort;
-			byte[] infoBytes = JPPFConnectionInformation.toBytes(ci);
-			ByteBuffer buffer = ByteBuffer.wrap(new byte[512]);
-			buffer.putInt(infoBytes.length);
-			buffer.put(infoBytes);
-			DatagramPacket packet = new DatagramPacket(buffer.array(), 512, InetAddress.getByName(group), port);
-			//MulticastSocket socket = new MulticastSocket(new InetSocketAddress(addr, port));
-			MulticastSocket socket = new MulticastSocket(port);
-			socket.setInterface(addr);
-			socketsInfo.add(new Pair<MulticastSocket, DatagramPacket>(socket, packet));
+			try
+			{
+				JPPFConnectionInformation ci = new JPPFConnectionInformation();
+				ci.host = addr.getHostAddress();
+				ci.uuid = info.uuid;
+				ci.classServerPorts = info.classServerPorts;
+				ci.applicationServerPorts = info.applicationServerPorts;
+				ci.nodeServerPorts = info.nodeServerPorts;
+				ci.managementPort = info.managementPort;
+				byte[] infoBytes = JPPFConnectionInformation.toBytes(ci);
+				ByteBuffer buffer = ByteBuffer.wrap(new byte[512]);
+				buffer.putInt(infoBytes.length);
+				buffer.put(infoBytes);
+				DatagramPacket packet = new DatagramPacket(buffer.array(), 512, InetAddress.getByName(group), port);
+				//MulticastSocket socket = new MulticastSocket(new InetSocketAddress(addr, port));
+				MulticastSocket socket = new MulticastSocket(port);
+				socket.setInterface(addr);
+				socketsInfo.add(new Pair<MulticastSocket, DatagramPacket>(socket, packet));
+			}
+			catch(Exception e)
+			{
+				log.error("Unable to bind to interface " + addr.getHostAddress() + " on port " + port, e);
+			}
 		}
 	}
 
