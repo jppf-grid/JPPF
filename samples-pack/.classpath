@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" output="CustomLoadBalancer/classes" path="CustomLoadBalancer/src"/>
 	<classpathentry kind="src" output="CustomMBeans/classes" path="CustomMBeans/src"/>
 	<classpathentry kind="src" output="DataDependency/classes" path="DataDependency/src"/>
-	<classpathentry kind="src" output="MatrixMultiplication/classes" path="MatrixMultiplication/src"/>
-	<classpathentry kind="src" output="WebSearchEngine/classes" path="WebSearchEngine/src"/>
-	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src"/>
-	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src"/>
 	<classpathentry kind="src" output="DataEncryption/classes" path="DataEncryption/src"/>
+	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src"/>
+	<classpathentry kind="src" output="MatrixMultiplication/classes" path="MatrixMultiplication/src"/>
+	<classpathentry kind="src" output="NodeTray/classes" path="NodeTray/src"/>
+	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src"/>
 	<classpathentry kind="src" output="StartupClasses/classes" path="StartupClasses/src"/>
 	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/java"/>
 	<classpathentry kind="src" path="TomcatPort/src/resources"/>
+	<classpathentry kind="src" output="WebSearchEngine/classes" path="WebSearchEngine/src"/>
 	<classpathentry kind="lib" path="shared/lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jaligner.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-admin.jar" sourcepath="/admin/src/java"/>
