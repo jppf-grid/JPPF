@@ -23,7 +23,7 @@
 	<!-- ========================================================================= -->
 
   <property file="${basedir}/../build.properties"/>
-	<property name="common.dir"      value="${basedir}/../JPPF-GigaSpaces-common"/>	
+	<property name="common.dir"      value="${basedir}/../JPPF-GigaSpaces-Common"/>	
 	<property name="classes.dir"     value="${basedir}/classes"/>	
 	<property name="src.dir"         value="${basedir}/src"/>
 	<property name="build.dir"       value="${basedir}/build"/>
