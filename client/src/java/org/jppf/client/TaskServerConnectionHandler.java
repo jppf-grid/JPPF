@@ -99,7 +99,9 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
 	 */
 	public void initSocketClient() throws Exception
 	{
-		socketClient = new SocketChannelClient(host, port, true);
+		socketClient = new SocketClient();
+		socketClient.setHost(host);
+		socketClient.setPort(port);
 	}
 
 	/**
