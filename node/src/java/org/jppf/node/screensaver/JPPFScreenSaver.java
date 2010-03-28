@@ -94,7 +94,6 @@ public class JPPFScreenSaver //extends SimpleScreensaver
 	
 	/**
 	 * Initialize the UI components.
-	 * @see org.jdesktop.jdic.screensaver.ScreensaverBase#init()
 	 */
 	public void init()
 	{
@@ -243,7 +242,6 @@ public class JPPFScreenSaver //extends SimpleScreensaver
 	/**
 	 * Called at regular intervals to render the next frame in the screen saver. 
 	 * @param g the graphics on which to paint the frame.
-	 * @see org.jdesktop.jdic.screensaver.SimpleScreensaver#paint(java.awt.Graphics)
 	 */
 	public void paint(Graphics g)
 	{
@@ -251,7 +249,6 @@ public class JPPFScreenSaver //extends SimpleScreensaver
 
 	/**
 	 * Invoked whne the screen saver terminates, to free the resources used by the node.
-	 * @see org.jdesktop.jdic.screensaver.ScreensaverBase#destroy()
 	 */
 	protected void destroy()
 	{
