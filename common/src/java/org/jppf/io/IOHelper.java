@@ -32,7 +32,7 @@ public final class IOHelper
 	/**
 	 * Suze of temporary buffers used in I/O transfers.
 	 */
-	public static final int TEMP_BUFFER_SIZE = 32768;
+	public static final int TEMP_BUFFER_SIZE = 32 * 1024;
 
 	/**
 	 * Instantiation of this class is not permitted.

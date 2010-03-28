@@ -20,6 +20,8 @@ package org.jppf.server.protocol;
 
 import java.io.*;
 
+import org.jppf.JPPFException;
+
 /**
  * Instances of this class are used to signal that a task could not be sent back by the node to the server.
  * <p>This generally happens when a task cannot be serialized after its execution, or if a data transformation is
@@ -47,7 +49,7 @@ public final class JPPFExceptionResult extends JPPFTask
 	public JPPFExceptionResult(Throwable throwable, Object object)
 	{
 		if (throwable instanceof Exception) setException((Exception) throwable);
-		else setException(new Exception(throwable));
+		else setException(new JPPFException(throwable));
 		objectDescriptor = "" + object;
 		if (object != null) className = object.getClass().getName();
 	}
@@ -57,6 +59,16 @@ public final class JPPFExceptionResult extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run()
+	{
+		System.out.println(toString());
+	}
+
+	/**
+	 * Construct a string representation of this object.
+	 * @return a string representing this JPPFExceptionResult.
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("Error occurred on object [").append(objectDescriptor).append("], class=").append(className);
@@ -68,6 +80,6 @@ public final class JPPFExceptionResult extends JPPFTask
 			getException().printStackTrace(writer);
 			sb.append(sw.toString());
 		}
-		System.out.println(sb.toString());
+		return sb.toString();
 	}
 }

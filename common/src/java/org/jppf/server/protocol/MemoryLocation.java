@@ -44,8 +44,7 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	 */
 	public MemoryLocation(int size)
 	{
-		super(new byte[size]);
-		len = size;
+		this(new byte[size], 0, size);
 	}
 
 	/**
@@ -54,8 +53,7 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	 */
 	public MemoryLocation(byte[] buffer)
 	{
-		super(buffer);
-		len = buffer.length;
+		this(buffer, 0, buffer.length);
 	}
 
 	/**

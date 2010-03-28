@@ -35,13 +35,6 @@ import org.jppf.utils.*;
 public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 {
 	/**
-	 * Size of the pool of threads for the state transition executor.
-	 * It is defined as the value of the configuration property 
-	 * &quot;transition.thread.pool.size&quot;, with a default value of 1.
-	 */
-	private static final int THREAD_POOL_SIZE =
-		JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", 1);
-	/**
 	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(NioServer.class);
@@ -85,7 +78,9 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	{
 		this.server = server;
 		this.sequential = sequential;
-		if (!sequential) executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE, new JPPFThreadFactory(server.getName()));
+		int size = JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", -1);
+		if (size <= 0) size = Runtime.getRuntime().availableProcessors();
+		if (!sequential) executor = Executors.newFixedThreadPool(size, new JPPFThreadFactory(server.getName()));
 	}
 
 	/**

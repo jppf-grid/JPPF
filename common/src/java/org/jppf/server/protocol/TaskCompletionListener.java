@@ -17,7 +17,6 @@
  */
 package org.jppf.server.protocol;
 
-import org.jppf.io.BundleWrapper;
 
 
 /**
