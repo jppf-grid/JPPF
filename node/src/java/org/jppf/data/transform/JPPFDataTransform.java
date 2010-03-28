@@ -18,6 +18,8 @@
 
 package org.jppf.data.transform;
 
+import java.io.*;
+
 /**
  * This is the interface for arbitrary transformation and reverse-transformation of blocks of data that transit through the network.
  * <p>Among others, this permits encryption of the data, allowing a measure of security on the grid.
@@ -30,18 +32,20 @@ public interface JPPFDataTransform
 {
 	/**
 	 * Transform a block of data into another, transformed one.
-	 * This operation must be such that the result of <code>this.unwrap(this.wrap(data))</code> is equal to <code>data</code>.
-	 * @param data the data to transform.
-	 * @return the transformed data as an array of bytes.
+	 * This operation must be such that the result of unwrapping the data of the destination must be the same as the source data.
+	 * @param source the input stream of data to transform.
+	 * @param destination the stream into which the transformed data is written.
+	 * @throws Exception if any error occurs while transforming the data.
 	 */
-	byte[] wrap(byte[] data);
+	void wrap(InputStream source, OutputStream destination) throws Exception;
 
 	/**
-	 * Transform a block of data into another, reversed-transformed one.
-	 * This method is the reverse operation with regards to {@link #wrap(byte[])}.
+	 * Transform a block of data into another, reverse-transformed one.
+	 * This method is the reverse operation with regards to {@link #wrap(java.io.InputStream, java.io.OutputStream)}.
 	 * This operation must be such that the result of <code>this.unwrap(this.wrap(data))</code> is equal to <code>data</code>.
-	 * @param data the data to transform.
-	 * @return the transformed data as an array of bytes.
+	 * @param source the input stream of data to reverse-transform.
+	 * @param destination the stream into which the reverse-transformed data is written.
+	 * @throws Exception if any error occurs while transforming the data.
 	 */
-	byte[] unwrap(byte[] data);
+	void unwrap(InputStream source, OutputStream destination) throws Exception;
 }

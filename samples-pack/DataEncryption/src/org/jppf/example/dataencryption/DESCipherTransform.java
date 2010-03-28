@@ -18,7 +18,7 @@
 
 package org.jppf.example.dataencryption;
 
-import java.io.InputStream;
+import java.io.*;
 import java.security.spec.KeySpec;
 
 import javax.crypto.*;
@@ -39,45 +39,49 @@ public class DESCipherTransform implements JPPFDataTransform
 	private static SecretKey secretKey = getSecretKey();
 
 	/**
-	 * Encrypt the data.
-	 * @param data the data to transform.
-	 * @return the transformed data as an array of bytes.
+	 * Encrypt the data using streams.
+	 * @param source the input stream of data to encrypt.
+	 * @param destination the stream into which the encrypted data is written.
+	 * @throws Exception if any error occurs while encrypting the data.
 	 * @see org.jppf.data.transform.JPPFDataTransform#wrap(byte[])
 	 */
-	public byte[] wrap(byte[] data)
+	public void wrap(InputStream source, OutputStream destination) throws Exception
 	{
-		try
-		{
-			Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
-			cipher.init(Cipher.ENCRYPT_MODE, getSecretKey());
-			return cipher.doFinal(data);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		return null;
+		transform(Cipher.ENCRYPT_MODE, source, destination);
 	}
 
 	/**
 	 * Decrypt the data.
-	 * @param data the data to transform.
-	 * @return the transformed data as an array of bytes.
+	 * @param source the input stream of data to decrypt.
+	 * @param destination the stream into which the decrypted data is written.
+	 * @throws Exception if any error occurs while decrypting the data.
 	 * @see org.jppf.data.transform.JPPFDataTransform#unwrap(byte[])
 	 */
-	public byte[] unwrap(byte[] data)
+	public void unwrap(InputStream source, OutputStream destination) throws Exception
 	{
-		try
+		transform(Cipher.DECRYPT_MODE, source, destination);
+	}
+
+	/**
+	 * Transform the specified input source and write it into the specified destination.<br>
+	 * The transformation is either encrytion or decryption, depeding on how the cipher was initilized.
+	 * @param mode the cipher mode to use for encryption/decryption.
+	 * @param source the input stream of data to encrypt/decrypt.
+	 * @param destination the stream into which the encrypted/decrypted data is written.
+	 * @throws Exception if any error occurs while encrypting or decrypting the data.
+	 */
+	private void transform(int mode, InputStream source, OutputStream destination) throws Exception
+	{
+		Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+		cipher.init(mode, getSecretKey());
+		CipherOutputStream cos = new CipherOutputStream(destination, cipher);
+		byte[] buffer = new byte[8192];
+		while (true)
 		{
-			Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
-			cipher.init(Cipher.DECRYPT_MODE, getSecretKey());
-			return cipher.doFinal(data);
+			int n = source.read(buffer);
+			if (n <= 0) break;
+			destination.write(buffer, 0, n);
 		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	/**
@@ -97,8 +101,7 @@ public class DESCipherTransform implements JPPFDataTransform
 				InputStream is = cl.getResourceAsStream("org/jppf/example/dataencryption/sk.bin");
 				byte[] encoded = FileUtils.getInputStreamAsByte(is);
 				KeySpec spec = new DESKeySpec(encoded);
-				SecretKeyFactory skf = SecretKeyFactory.getInstance("DES");
-				return skf.generateSecret(spec);
+				secretKey = SecretKeyFactory.getInstance("DES").generateSecret(spec);
 			}
 			catch(Exception e)
 			{

@@ -18,8 +18,10 @@
 
 package org.jppf.data.transform;
 
+import java.io.*;
+
 import org.apache.commons.logging.*;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 
 /**
  * Factory class for data transform.
@@ -69,5 +71,65 @@ public class JPPFDataTransformFactory
 	public static JPPFDataTransform getInstance()
 	{
 		return createInstance();
+	}
+
+	/**
+	 * Transform the specified data using the specified data transformation. 
+	 * @param transform the data transformation to use.
+	 * @param normal true to wrap the data, false to unwrap it.
+	 * @param data the data to transform.
+	 * @param offset the position to start a in the data.
+	 * @param len the number of bytes to process, starting at the offset, in the data.
+	 * @return the result of the transformation as an array of bytes.
+	 * @throws Exception if any error occurs while tranforming the data.
+	 */
+	public static byte[] transform(JPPFDataTransform transform, boolean normal, byte[] data, int offset, int len) throws Exception
+	{
+		InputStream is = new ByteArrayInputStream(data, offset, len);
+		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
+		if (normal) transform.wrap(is, mbos);
+		else transform.unwrap(is, mbos);
+		return mbos.toByteArray();
+	}
+
+	/**
+	 * Transform the specified data using the specified data transformation. 
+	 * @param transform the data transformation to use.
+	 * @param normal true to wrap the data, false to unwrap it.
+	 * @param data the data to transform.
+	 * @return the result of the transformation as an array of bytes.
+	 * @throws Exception if any error occurs while tranforming the data.
+	 */
+	public static byte[] transform(JPPFDataTransform transform, boolean normal, byte[] data) throws Exception
+	{
+		return transform(transform, normal, data, 0, data.length);
+	}
+
+	/**
+	 * Transform the specified data using a new data transformation instance.
+	 * @param normal true to wrap the data, false to unwrap it.
+	 * @param data the data to transform.
+	 * @param offset the position to start a in the data.
+	 * @param len the number of bytes to process, starting at the offset, in the data.
+	 * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
+	 * @throws Exception if any error occurs while tranforming the data.
+	 */
+	public static byte[] transform(boolean normal, byte[] data, int offset, int len) throws Exception
+	{
+		JPPFDataTransform dataTransform = createInstance();
+		return dataTransform == null ? data : transform(dataTransform, normal, data, offset, len);
+	}
+
+	/**
+	 * Transform the specified data using a new data transformation instance.
+	 * @param normal true to wrap the data, false to unwrap it.
+	 * @param data the data to transform.
+	 * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
+	 * @throws Exception if any error occurs while tranforming the data.
+	 */
+	public static byte[] transform(boolean normal, byte[] data) throws Exception
+	{
+		JPPFDataTransform dataTransform = createInstance();
+		return dataTransform == null ? data : transform(dataTransform, normal, data, 0, data.length);
 	}
 }

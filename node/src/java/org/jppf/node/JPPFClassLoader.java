@@ -128,12 +128,10 @@ public class JPPFClassLoader extends URLClassLoader implements JPPFClassLoaderMB
 					if (debugEnabled) log.debug("sending node initiation message");
 					JPPFResourceWrapper resource = new JPPFResourceWrapper();
 					resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-					
-					JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
 					ObjectSerializer serializer = socketClient.getSerializer();
 					JPPFBuffer buf = serializer.serialize(resource);
 					byte[] data = buf.getBuffer();
-					if (transform != null) data = transform.wrap(data);
+					data = JPPFDataTransformFactory.transform(true, data);
 					socketClient.sendBytes(new JPPFBuffer(data, data.length));
 					socketClient.flush();
 					socketClient.receiveBytes(0);
@@ -357,11 +355,12 @@ public class JPPFClassLoader extends URLClassLoader implements JPPFClassLoaderMB
 			ObjectSerializer serializer = socketClient.getSerializer();
 			JPPFBuffer buf = serializer.serialize(resource);
 			byte[] data = buf.getBuffer();
-			if (transform != null) data = transform.wrap(data);
+			if (transform != null) data = JPPFDataTransformFactory.transform(transform, true, data);
 			socketClient.sendBytes(new JPPFBuffer(data, data.length));
 			socketClient.flush();
 			buf = socketClient.receiveBytes(0);
-			data = (transform == null) ? buf.getBuffer() : transform.unwrap(buf.getBuffer());
+			data = buf.getBuffer();
+			if (transform != null) data = JPPFDataTransformFactory.transform(transform, false, data);
 			resource = (JPPFResourceWrapper) serializer.deserialize(data);
 			return resource;
 		}
