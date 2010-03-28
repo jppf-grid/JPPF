@@ -45,9 +45,23 @@ public class BootstrapObjectSerializer implements ObjectSerializer
 	 */
 	public JPPFBuffer serialize(Object o) throws Exception
 	{
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
+		return serialize(o, false);
+	}
+
+	/**
+	 * Serialize an object into an array of bytes.
+	 * @param o the object to Serialize.
+	 * @param noCopy avoid copying intermediate buffers.
+	 * @return a <code>JPPFBuffer</code> instance holding the serialized object.
+	 * @throws Exception if the object can't be serialized.
+	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object)
+	 */
+	public JPPFBuffer serialize(Object o, boolean noCopy) throws Exception
+	{
+		JPPFByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		serialize(o, baos);
-		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
+		byte[] data = noCopy ? baos.getBuf() : baos.toByteArray();
+		JPPFBuffer buf = new JPPFBuffer(data, baos.size());
 		return buf;
 	}
 

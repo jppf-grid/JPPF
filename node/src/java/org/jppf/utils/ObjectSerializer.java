@@ -31,15 +31,24 @@ public interface ObjectSerializer
 	/**
 	 * Serialize an object into an array of bytes.
 	 * @param o the object to Serialize.
-	 * @return a <code>JPPFBuffer</code> instance holding the serialized object.
+	 * @return a {@link JPPFBuffer} instance holding the serialized object.
 	 * @throws Exception if the object can't be serialized.
 	 */
 	JPPFBuffer serialize(Object o) throws Exception;
 
 	/**
+	 * Serialize an object into an array of bytes.
+	 * @param o the object to Serialize.
+	 * @param noCopy avoid copying intermediate buffers.
+	 * @return a {@link JPPFBuffer} instance holding the serialized object.
+	 * @throws Exception if the object can't be serialized.
+	 */
+	JPPFBuffer serialize(Object o, boolean noCopy) throws Exception;
+
+	/**
 	 * Serialize an object into an output stream.
-	 * @param o - the object to Serialize.
-	 * @param os - the output stream to serialize to.
+	 * @param o the object to Serialize.
+	 * @param os the output stream to serialize to.
 	 * @throws Exception if the object can't be serialized.
 	 */
 	void serialize(Object o, OutputStream os) throws Exception;

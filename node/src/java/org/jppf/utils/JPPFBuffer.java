@@ -25,13 +25,17 @@ package org.jppf.utils;
 public class JPPFBuffer
 {
 	/**
-	 * The actual buffer, intended to contain a serialize object graph.
+	 * The actual buffer, intended to contain a serialized object graph.
 	 */
-	private byte[] buffer = new byte[0];
+	public byte[] buffer = new byte[0];
 	/**
 	 * The length of the buffer.
 	 */
-	private int length = 0;
+	public int length = 0;
+	/**
+	 * Current position in this buffer.
+	 */
+	int pos = 0;
 
 	/**
 	 * Initialize this buffer.
@@ -96,5 +100,23 @@ public class JPPFBuffer
 	public int getLength()
 	{
 		return length;
+	}
+
+	/**
+	 * Return the number of bytes available for writing in this buffer.
+	 * @return the available bytes as an int value.
+	 */
+	int remaining()
+	{
+		return buffer.length - length;
+	}
+
+	/**
+	 * Return the number of bytes available for reading in this buffer.
+	 * @return the available bytes as an int value.
+	 */
+	int remainingFromPos()
+	{
+		return length - pos;
 	}
 }

@@ -53,4 +53,13 @@ public class JPPFByteArrayOutputStream extends ByteArrayOutputStream
 	{
 		return buf.length == count ? buf : super.toByteArray();
 	}
+
+	/**
+	 * Provide access to the internal buffer.
+	 * @return an array of bytes.
+	 */
+	public byte[] getBuf()
+	{
+		return buf;
+	}
 }
