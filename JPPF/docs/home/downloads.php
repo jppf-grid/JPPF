@@ -203,6 +203,14 @@
 															<a href="/api-2.0" class="<?php if ($currentPage == Javadoc) echo 'aboutMenuItem'; else echo 'aboutMenuItem2'; ?>">&raquo; Javadoc</a><br>
 															<?php
 											$itemClass = "";
+											if ($currentPage == "Samples") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="../samples-pack/index.html" class="<?php echo $itemClass; ?>">&raquo; Samples</a><br>
+											</div>
+															<?php
+											$itemClass = "";
 											if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem';
 											else $itemClass = 'aboutMenuItem2'; 
 											?>

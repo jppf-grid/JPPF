@@ -32,6 +32,7 @@
 	<property name="jppfQuickStart"        value="${basedir}/../JPPFQuickStart"/>
 	<property name="gigaspaces"            value="${basedir}/../JPPF-GigaSpaces"/>
 	<property name="application.template"  value="${basedir}/../application-template"/>
+	<property name="samples-pack"          value="${basedir}/../samples-pack"/>
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${gigaspaces}/build.properties"/>
@@ -199,18 +200,24 @@
 	<!--                         Generate the samples pack                         -->
 	<!-- ========================================================================= -->
 
+	<taskdef name="java2html" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${lib}/java2html_50/java2html.jar"/>
+
 	<target name="samples.pack" description="Generate the packaging for the samples pack"
 		depends="init, build" if="samples.pack.present">
-		<copy todir="${basedir}/../samples-pack/shared/lib">
+		<copy todir="${samples-pack}/shared/lib">
 			<fileset dir="${build}">
 				<include name="jppf*.jar"/>
 			</fileset>
 		</copy>
-		<ant antfile="${basedir}/../samples-pack/Fractals/build.xml" target="compile" inheritall="false"/>
-		<ant antfile="${basedir}/../samples-pack/SequenceAlignment/build.xml" target="compile" inheritall="false"/>
-		<ant antfile="${basedir}/../samples-pack/WebSearchEngine/build.xml" target="compile" inheritall="false"/>
-		<ant antfile="${basedir}/../samples-pack/TomcatPort/build.xml" target="build" inheritall="false"/>
-		<!--<property name="samples.pack.file" value="${build}/${ant.project.name}-samples-pack-${version.number}.${build.number}-${now}.zip"/>-->
+		<!--
+		<ant antfile="${samples-pack}/Fractals/build.xml" target="compile" inheritall="false"/>
+		<ant antfile="${samples-pack}/SequenceAlignment/build.xml" target="compile" inheritall="false"/>
+		<ant antfile="${samples-pack}/WebSearchEngine/build.xml" target="compile" inheritall="false"/>
+		<ant antfile="${samples-pack}/TomcatPort/build.xml" target="build" inheritall="false"/>
+		<property name="samples.pack.file" value="${build}/${ant.project.name}-samples-pack-${version.number}.${build.number}-${now}.zip"/>
+		-->
+		<java2html srcdir="${samples-pack}/CustomLoadBalancer" destdir="${samples-pack}/CustomLoadBalancer" includes="**/*.java"
+			style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false"/>
 		<property name="samples.pack.prefix" value="${app.ver}-samples-pack"/>
 		<property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>
 		<delete file="samples.pack.file" quiet="true"/>
@@ -220,6 +227,19 @@
 				<exclude name="**/javadoc/**/*.*"/>
 			</zipfileset>
 		</zip>
+    <delete dir="${home}/samples-pack" quiet="true"/>
+ 		<mkdir dir="${home}/samples-pack"/>
+		<copy todir="${home}/samples-pack">
+			<fileset dir="${samples-pack}">
+				<include name="**/*.java"/>
+				<include name="CustomLoadBalancer/**/*.properties"/>
+				<include name="**/*.html"/>
+				<include name="shared/images/*.*"/>
+				<include name="NodeTray/images/*.*"/>
+			</fileset>
+		</copy>
+		<move file="${home}/samples-pack/samples-pack-Readme.html" tofile="${home}/samples-pack/index.html"/>
+		<delete><fileset dir="${samples-pack}/CustomLoadBalancer" includes="**/*.java.html"/></delete>
   </target>
 
 	<!-- ========================================================================= -->
