@@ -110,8 +110,9 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 	 */
 	protected void initializeData() throws Exception
 	{
-		String s = config.getString("dataFactoryImpl", "org.jppf.example.datadependency.simulation.UniformDataFactory");
-		dataFactory = (DataFactory) Class.forName(s).newInstance();
+		String s = config.getString("dataFactoryImpl", "uniform");
+		if (s.equalsIgnoreCase("gaussian")) dataFactory = new GaussianDataFactory();
+		else dataFactory = new UniformDataFactory();
 		// generate random market data
 		marketDataList = dataFactory.generateDataMarketObjects(config.getInt("nbMarketData", 10));
 		// generate random trades
