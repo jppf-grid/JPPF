@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package org.jppf.io;
+package org.jppf.server.protocol;
 
 import java.util.*;
 
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.io.DataLocation;
 
 /**
  * This class wraps a task bundle to express it in terms of {@link org.jppf.io.DataLocation DataLocation}.
