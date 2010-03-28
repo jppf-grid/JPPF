@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
-import org.jppf.io.BundleWrapper;
+import org.jppf.server.protocol.BundleWrapper;
 import org.jppf.utils.EventEmitter;
 
 /**

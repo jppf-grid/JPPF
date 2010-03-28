@@ -22,7 +22,6 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.io.BundleWrapper;
 import org.jppf.job.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;

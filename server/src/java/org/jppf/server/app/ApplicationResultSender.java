@@ -22,6 +22,7 @@ import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.data.transform.*;
 import org.jppf.io.*;
 import org.jppf.server.AbstractResultSender;
+import org.jppf.server.protocol.BundleWrapper;
 import org.jppf.utils.JPPFBuffer;
 
 /**
@@ -63,8 +64,7 @@ public class ApplicationResultSender extends AbstractResultSender
 	{
 		if (debugEnabled) log.debug("Sending bundle with "+bundle.getBundle().getTaskCount()+" tasks");
 		byte[] data = helper.getSerializer().serialize(bundle.getBundle()).getBuffer();
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		if (transform != null) data = transform.wrap(data);
+		data = JPPFDataTransformFactory.transform(true, data);
 		socketClient.sendBytes(new JPPFBuffer(data, data.length));
 		for (DataLocation task : bundle.getTasks())
 		{

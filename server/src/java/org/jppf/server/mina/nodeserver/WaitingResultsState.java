@@ -23,7 +23,6 @@ import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import org.apache.commons.logging.*;
 import org.apache.mina.core.session.IoSession;
-import org.jppf.io.BundleWrapper;
 import org.jppf.server.mina.IoSessionWrapper;
 import org.jppf.server.protocol.*;
 

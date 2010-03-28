@@ -35,7 +35,7 @@ import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.mina.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.nodeserver.*;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.*;
 import org.jppf.server.queue.*;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;

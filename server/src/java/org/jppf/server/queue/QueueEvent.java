@@ -20,7 +20,7 @@ package org.jppf.server.queue;
 
 import java.util.EventObject;
 
-import org.jppf.io.BundleWrapper;
+import org.jppf.server.protocol.BundleWrapper;
 
 /**
  * Instances of this class represent <code>JPPFQueue</code> events.

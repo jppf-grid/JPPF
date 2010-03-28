@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.*;
 
 import org.apache.commons.logging.*;
 import org.apache.mina.core.session.IoSession;
-import org.jppf.io.BundleWrapper;
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFDriver;

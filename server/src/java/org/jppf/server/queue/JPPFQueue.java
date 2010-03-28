@@ -18,7 +18,7 @@
 
 package org.jppf.server.queue;
 
-import org.jppf.io.BundleWrapper;
+import org.jppf.server.protocol.BundleWrapper;
 
 /**
  * Implementation of a generic non-blocking queue, to allow asynchronous access from a large number of threads.

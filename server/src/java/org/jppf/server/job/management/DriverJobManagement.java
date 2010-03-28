@@ -23,7 +23,6 @@ import java.util.*;
 import javax.management.NotificationBroadcasterSupport;
 
 import org.apache.commons.logging.*;
-import org.jppf.io.BundleWrapper;
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.JPPFDriver;

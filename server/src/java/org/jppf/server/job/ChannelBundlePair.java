@@ -18,8 +18,8 @@
 
 package org.jppf.server.job;
 
-import org.jppf.io.BundleWrapper;
 import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.protocol.BundleWrapper;
 import org.jppf.utils.Pair;
 
 /**

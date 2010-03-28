@@ -24,7 +24,6 @@ import java.text.ParseException;
 import java.util.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.io.BundleWrapper;
 import org.jppf.scheduling.*;
 import org.jppf.server.*;
 import org.jppf.server.job.JPPFJobManager;
@@ -77,7 +76,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	/**
 	 * Add an object to the queue, and notify all listeners about it.
 	 * @param bundleWrapper the object to add to the queue.
-	 * @see org.jppf.server.queue.JPPFQueue#addBundle(org.jppf.io.BundleWrapper)
+	 * @see org.jppf.server.queue.JPPFQueue#addBundle(org.jppf.server.protocol.BundleWrapper)
 	 */
 	public void addBundle(BundleWrapper bundleWrapper)
 	{
@@ -154,7 +153,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
 	 * @param nbTasks the maximum number of tasks to get out of the bundle.
 	 * @return the most recent object that was added to the queue.
-	 * @see org.jppf.server.queue.AbstractJPPFQueue#nextBundle(org.jppf.io.BundleWrapper, int)
+	 * @see org.jppf.server.queue.AbstractJPPFQueue#nextBundle(org.jppf.server.protocol.BundleWrapper, int)
 	 */
 	public BundleWrapper nextBundle(BundleWrapper bundleWrapper, int nbTasks)
 	{
