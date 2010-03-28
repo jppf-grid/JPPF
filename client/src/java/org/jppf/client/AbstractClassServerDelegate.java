@@ -107,7 +107,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	{
 		JPPFBuffer buffer = socketClient.receiveBytes(0);
 		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		byte[] data = (transform == null) ? buffer.getBuffer() : transform.unwrap(buffer.getBuffer());
+		byte[] data = (transform == null) ? buffer.getBuffer() : JPPFDataTransformFactory.transform(transform, false, buffer.buffer, 0, buffer.length);
 		return (JPPFResourceWrapper) socketClient.getSerializer().deserialize(data);
 	}
 
@@ -120,7 +120,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	{
 		JPPFBuffer buffer = socketClient.getSerializer().serialize(resource);
 		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		byte[] data = (transform == null) ? buffer.getBuffer() : transform.wrap(buffer.getBuffer());
+		byte[] data = (transform == null) ? buffer.getBuffer() : JPPFDataTransformFactory.transform(transform, true, buffer.buffer, 0, buffer.length);
 		socketClient.sendBytes(new JPPFBuffer(data, data.length));
 		socketClient.flush();
 	}

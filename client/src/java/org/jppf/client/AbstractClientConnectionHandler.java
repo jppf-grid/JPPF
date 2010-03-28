@@ -26,7 +26,7 @@ import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
 
 /**
- * 
+ * Common abstract superclass for client connections to a server.
  * @author Laurent Cohen
  */
 public abstract class AbstractClientConnectionHandler implements ClientConnectionHandler

@@ -223,26 +223,37 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		header.setParameter(BundleParameter.JOB_METADATA, job.getJobMetadata());
 
 		SocketWrapper socketClient = taskServerConnection.getSocketClient();
-		socketClient.sendBytes(wrappedData(header, ser));
-		socketClient.sendBytes(wrappedData(job.getDataProvider(), ser));
-		for (JPPFTask task : job.getTasks()) socketClient.sendBytes(wrappedData(task, ser));
+		sendData(socketClient, header, ser);
+		sendData(socketClient, job.getDataProvider(), ser);
+		for (JPPFTask task : job.getTasks()) sendData(socketClient, task, ser);
 		socketClient.flush();
 	}
 
 	/**
-	 * Transform an object into a an array of bytes to send trough the network connection.
-	 * @param o the object to transform.
-	 * @param ser the object serializer to use.
-	 * @return the transformed result as an array of bytes.
-	 * @throws Exception if an error occurs while preparing the data.
+	 * Serialize an object and send it to the server.
+	 * @param socketWrapper the socket client used to send data to the server.
+	 * @param o the object to serialize.
+	 * @param ser the object serializer.
+	 * @throws Exception if any error occurs.
 	 */
-	private JPPFBuffer wrappedData(Object o, ObjectSerializer ser) throws Exception
+	private void sendData(SocketWrapper socketWrapper, Object o, ObjectSerializer ser) throws Exception
 	{
-		JPPFBuffer serialized = ser.serialize(o);
+		List<JPPFBuffer> list = null;
 		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		if (transform == null) return serialized;
-		byte[] data = transform.wrap(serialized.getBuffer());
-		return new JPPFBuffer(data, data.length);
+		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
+		ser.serialize(o, mbos);
+		int size = mbos.size();
+		if (transform != null)
+		{
+			MultipleBuffersInputStream mbis = new MultipleBuffersInputStream(mbos.toBufferList());
+			mbos = new MultipleBuffersOutputStream();
+			transform.wrap(mbis, mbos);
+			list = mbos.toBufferList();
+			size = mbos.size();
+		}
+		else list = mbos.toBufferList();
+		socketWrapper.writeInt(size);
+		for (JPPFBuffer buf: list) socketWrapper.write(buf.buffer, 0, buf.length);
 	}
 
 	/**
@@ -304,7 +315,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	{
 		byte[] data = buffer.getBuffer();
 		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		if (transform != null) data = transform.unwrap(data);
+		if (transform != null) data = JPPFDataTransformFactory.transform(transform, false, data);
 		return ser.deserialize(data);
 	}
 
