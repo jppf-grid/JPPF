@@ -19,6 +19,7 @@ package org.jppf.utils;
 
 import java.io.*;
 
+import org.jppf.io.DataLocation;
 import org.jppf.serialization.JPPFObjectStreamFactory;
 
 /**
@@ -29,11 +30,6 @@ import org.jppf.serialization.JPPFObjectStreamFactory;
  */
 public class ObjectSerializerImpl implements ObjectSerializer
 {
-	/**
-	 * Logger for this class.
-	 */
-	//private static Log log = LogFactory.getLog(ObjectSerializerImpl.class);
-
 	/**
 	 * The default constructor must be public to allow for instantiation through Java reflection.
 	 */
@@ -50,22 +46,51 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 */
 	public JPPFBuffer serialize(Object o) throws Exception
 	{
-		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
+		return serialize(o, false);
+	}
+
+	/**
+	 * Serialize an object into an array of bytes.
+	 * @param o the object to Serialize.
+	 * @param noCopy avoid copying intermediate buffers.
+	 * @return a <code>JPPFBuffer</code> instance holding the serialized object.
+	 * @throws Exception if the object can't be serialized.
+	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object)
+	 */
+	public JPPFBuffer serialize(Object o, boolean noCopy) throws Exception
+	{
+		JPPFByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		serialize(o, baos);
-		JPPFBuffer buf = new JPPFBuffer(baos.toByteArray(), baos.size());
+		byte[] data = noCopy ? baos.getBuf() : baos.toByteArray();
+		JPPFBuffer buf = new JPPFBuffer(data, baos.size());
 		return buf;
 	}
 
 	/**
 	 * Serialize an object into an output stream.
-	 * @param o - the object to Serialize.
-	 * @param os - the output stream to serialize to.
+	 * @param o the object to Serialize.
+	 * @param os the output stream to serialize to.
 	 * @throws Exception if the object can't be serialized.
 	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object, java.io.OutputStream)
 	 */
 	public void serialize(Object o, OutputStream os) throws Exception
 	{
 		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(os);
+		oos.writeObject(o);
+		oos.flush();
+		oos.close();
+	}
+
+	/**
+	 * Serialize an object into an output stream.
+	 * @param o the object to Serialize.
+	 * @param location the location to serialize to.
+	 * @throws Exception if the object can't be serialized.
+	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object, java.io.OutputStream)
+	 */
+	public void serialize(Object o, DataLocation location) throws Exception
+	{
+		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(location.getOutputStream());
 		oos.writeObject(o);
 		oos.flush();
 		oos.close();
@@ -80,7 +105,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 */
 	public Object deserialize(JPPFBuffer buf) throws Exception
 	{
-		return deserialize(new ByteArrayInputStream(buf.getBuffer()));
+		return deserialize(new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength()));
 	}
 
 	/**
