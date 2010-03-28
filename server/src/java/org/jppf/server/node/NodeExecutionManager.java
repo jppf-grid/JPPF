@@ -21,7 +21,7 @@ package org.jppf.server.node;
 import java.lang.management.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.scheduling.JPPFScheduleHandler;
@@ -95,6 +95,10 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 * List of listeners to task execution events.
 	 */
 	private List<TaskExecutionListener> taskExecutionListeners = new ArrayList<TaskExecutionListener>();
+	/**
+	 * Determines whether the number of threads or their priority has changed.
+	 */
+	private AtomicBoolean configChanged = new AtomicBoolean(true);
 
 	/**
 	 * Initialize this execution manager with the specified node.
@@ -104,7 +108,12 @@ public class NodeExecutionManager extends ThreadSynchronization
 	{
 		this.node = node;
 		TypedProperties props = JPPFConfiguration.getProperties();
-		int poolSize = props.getInt("processing.threads", Runtime.getRuntime().availableProcessors());
+		int poolSize = props.getInt("processing.threads", -1);
+		if (poolSize < 0)
+		{
+			poolSize = Runtime.getRuntime().availableProcessors();
+			props.setProperty("processing.threads", "" + poolSize);
+		}
 		int priority = props.getInt("processing.threads.priority", Thread.NORM_PRIORITY);
 		log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
 		threadMXBean = ManagementFactory.getThreadMXBean();
@@ -495,5 +504,14 @@ public class NodeExecutionManager extends ThreadSynchronization
 	ExecutorService getExecutor()
 	{
 		return threadPool;
+	}
+
+	/**
+	 * Determines whether the configuration has changed and resets the flag if it has. 
+	 * @return true if the config was changed, false otherwise.
+	 */
+	public boolean checkConfigChanged()
+	{
+		return configChanged.compareAndSet(true, false);
 	}
 }

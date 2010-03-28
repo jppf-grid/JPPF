@@ -150,8 +150,7 @@ public class NodeIO extends ThreadSynchronization
 		if (debugEnabled) log.debug("waiting for next request");
 		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
 		if (debugEnabled) log.debug("got bundle");
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		if (transform != null) data = transform.unwrap(data);
+		data = JPPFDataTransformFactory.transform(false, data);
 		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
 		List<Object> list = new ArrayList<Object>();
 		list.add(bundle);
@@ -200,18 +199,14 @@ public class NodeIO extends ThreadSynchronization
 		ExecutorService executor = node.getExecutionManager().getExecutor();
 		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		bundle.setNodeExecutionTime(elapsed);
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		ObjectSerializer ser = node.getHelper().getSerializer();
-		byte[] data = ser.serialize(bundle).getBuffer();
-		if (transform != null) data = transform.wrap(data);
-		socketWrapper.sendBytes(new JPPFBuffer(data, data.length));
-		int taskCount = 0;
-		List<Future<byte[]>> futureList = new ArrayList<Future<byte[]>>();
+		List<Future<BufferList>> futureList = new ArrayList<Future<BufferList>>();
+		futureList.add(executor.submit(new ObjectWriteTask(bundle)));
 		for (JPPFTask task : tasks) futureList.add(executor.submit(new ObjectWriteTask(task)));
-		for (Future<byte[]> f: futureList)
+		for (Future<BufferList> f: futureList)
 		{
-			data = f.get();
-			socketWrapper.sendBytes(new JPPFBuffer(data, data.length));
+			BufferList list = f.get();
+			socketWrapper.writeInt(list.second());
+			for (JPPFBuffer buf: list.first()) socketWrapper.write(buf.buffer, 0, buf.length);
 		}
 		socketWrapper.flush();
 	}
@@ -220,16 +215,12 @@ public class NodeIO extends ThreadSynchronization
 	 * The goal of this class is to serialize an object before sending it back to the server,
 	 * and catch an eventual exception.
 	 */
-	public class ObjectWriteTask implements Callable<byte[]>
+	public class ObjectWriteTask implements Callable<BufferList>
 	{
 		/**
 		 * The data to send over the network connection.
 		 */
 		private Object object = null;
-		/**
-		 * An exception that may occur during serialization will be captured in this attribute.
-		 */
-		private Exception exception = null;
 
 		/**
 		 * Initialize this task with the psecicfied data buffer.
@@ -245,21 +236,25 @@ public class NodeIO extends ThreadSynchronization
 		 * @return the serialized object.
 		 * @see java.util.concurrent.Callable#call()
 		 */
-		public byte[] call()
+		public BufferList call()
 		{
-			byte[] data = null;
+			BufferList data = null;
+			int p = (object instanceof JPPFTask) ? ((JPPFTask) object).getPosition() : -1;
 			try
 			{
+				if (debugEnabled) log.debug("before serialization of object at position " + p);
 				data = serialize(object);
+				if (debugEnabled) log.debug("serialized object at position " + p);
 			}
-			catch(Exception e)
+			catch(Throwable t)
 			{
-				exception = e;
-				log.error(e.getMessage(), e);
+				data = null;
+				log.error(t.getMessage(), t);
 				try
 				{
-					JPPFExceptionResult result = new JPPFExceptionResult(e, object);
-					if (object instanceof JPPFTask) result.setPosition(((JPPFTask) object).getPosition());
+					JPPFExceptionResult result = new JPPFExceptionResult(t, object);
+					object = null;
+					result.setPosition(p);
 					data = serialize(result);
 				}
 				catch(Exception e2)
@@ -267,6 +262,7 @@ public class NodeIO extends ThreadSynchronization
 					log.error(e2.getMessage(), e2);
 				}
 			}
+			object = null;
 			return data;
 		}
 
@@ -276,22 +272,38 @@ public class NodeIO extends ThreadSynchronization
 		 * @return the serialized object as an array of bytes.
 		 * @throws Exception if any error occurs.
 		 */
-		private byte[] serialize(Object o) throws Exception
+		private BufferList serialize(Object o) throws Exception
 		{
-			byte[] data = null;
+			MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
+			node.getHelper().getSerializer().serialize(o, mbos);
+			List<JPPFBuffer> data = mbos.toBufferList();
+			int length = mbos.size();
 			JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-			data = node.getHelper().getSerializer().serialize(o).getBuffer();
-			if (transform != null) data = transform.wrap(data);
-			return data;
+			if (transform != null)
+			{
+				MultipleBuffersInputStream mbis = new MultipleBuffersInputStream(mbos.toBufferList());
+				mbos = new MultipleBuffersOutputStream();
+				transform.wrap(mbis, mbos);
+				data = mbos.toBufferList();
+				length = mbos.size();
+			}
+			return new BufferList(data, length);
 		}
+	}
 
+	/**
+	 * A pairing of a list of buffers and the total length of their usable data.
+	 */
+	private static class BufferList extends Pair<List<JPPFBuffer>, Integer>
+	{
 		/**
-		 * Get an exception that may have occurred during serialization.
-		 * @return an <code>Exception</code> instance.
+		 * Iitialize this pairing with the specified list of buffers and length.
+		 * @param first the list of buffers.
+		 * @param second the total data length.
 		 */
-		public Exception getException()
+		public BufferList(List<JPPFBuffer> first, Integer second)
 		{
-			return exception;
+			super(first, second);
 		}
 	}
 }

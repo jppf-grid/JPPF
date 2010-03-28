@@ -21,7 +21,7 @@ import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.server.AbstractResultSender;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.JPPFBuffer;
 
 /**

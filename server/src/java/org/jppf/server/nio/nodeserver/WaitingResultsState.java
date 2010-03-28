@@ -24,9 +24,10 @@ import static org.jppf.utils.StringUtils.getRemoteHost;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.io.BundleWrapper;
+import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
+import org.jppf.server.scheduler.bundle.*;
 
 /**
  * This class performs performs the work of reading a task bundle execution response from a node. 
@@ -102,6 +103,9 @@ public class WaitingResultsState extends NodeServerState
 				TaskCompletionListener listener = bundle.getCompletionListener();
 				if (listener != null) listener.taskCompleted(newBundleWrapper);
 			}
+			Bundler bundler = context.getBundler();
+			JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
+			if ((systemInfo != null) && (bundler instanceof NodeAwareness)) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
 			// there is nothing left to do, so this instance will wait for a task bundle
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setNodeMessage(null);

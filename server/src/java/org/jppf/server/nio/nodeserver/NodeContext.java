@@ -25,7 +25,7 @@ import org.jppf.data.transform.*;
 import org.jppf.io.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;
 
@@ -152,8 +152,7 @@ public class NodeContext extends NioContext<NodeState>
 		//if (nodeMessage == null)
 		nodeMessage = new NodeMessage();
 		byte[] data = helper.getSerializer().serialize(bundle.getBundle()).getBuffer();
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		if (transform != null) data = transform.wrap(data);
+		data = JPPFDataTransformFactory.transform(true, data, 0, data.length);
 		nodeMessage.addLocation(new ByteBufferLocation(data, 0, data.length));
 		nodeMessage.addLocation(bundle.getDataProvider());
 		for (DataLocation dl: bundle.getTasks()) nodeMessage.addLocation(dl);

@@ -77,8 +77,7 @@ public class ClassContext extends MinaContext<ClassState>
 		InputStream is = message.message.getData().getInputStream();
 		//InputStream is = message.getData().getInputStream();
 		byte[] data = FileUtils.getInputStreamAsByte(is);
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		if (transform != null) data = transform.unwrap(data);
+		data = JPPFDataTransformFactory.transform(false, data);
 		ObjectSerializer serializer = new ObjectSerializerImpl();
 		resource = (JPPFResourceWrapper) serializer.deserialize(data);
 		return resource;
@@ -92,8 +91,7 @@ public class ClassContext extends MinaContext<ClassState>
 	{
 		ObjectSerializer serializer = new ObjectSerializerImpl();
 		byte[] data = serializer.serialize(resource).getBuffer();
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		if (transform != null) data = transform.wrap(data);
+		data = JPPFDataTransformFactory.transform(true, data);
 		//if (message == null)
 		currentLength = 0;
 		message = new ClassServerMessage();

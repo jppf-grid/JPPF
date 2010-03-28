@@ -25,8 +25,7 @@ import java.net.ConnectException;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.io.BundleWrapper;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.*;
 
 /**
  * This class represents the state of waiting for some action.

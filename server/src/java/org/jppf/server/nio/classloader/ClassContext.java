@@ -56,8 +56,7 @@ public class ClassContext extends NioContext<ClassState>
 	{
 		ByteBufferInputStream bbis = new ByteBufferInputStream(message.buffer, true);
 		byte[] data = FileUtils.getInputStreamAsByte(bbis);
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		if (transform != null) data = transform.unwrap(data);
+		data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
 		ObjectSerializer serializer = new ObjectSerializerImpl();
 		resource = (JPPFResourceWrapper) serializer.deserialize(data);
 		return resource;
@@ -71,8 +70,7 @@ public class ClassContext extends NioContext<ClassState>
 	{
 		ObjectSerializer serializer = new ObjectSerializerImpl();
 		byte[] data = serializer.serialize(resource).getBuffer();
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		if (transform != null) data = transform.wrap(data);
+		data = JPPFDataTransformFactory.transform(true, data, 0, data.length);
 		if (message == null) message = new NioMessage();
 		message.length = data.length;
 		message.buffer = ByteBuffer.wrap(data);

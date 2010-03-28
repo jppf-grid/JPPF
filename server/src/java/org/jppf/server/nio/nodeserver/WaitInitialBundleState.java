@@ -24,7 +24,6 @@ import static org.jppf.utils.StringUtils.getRemoteHost;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.io.BundleWrapper;
 import org.jppf.management.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
@@ -80,6 +79,7 @@ public class WaitInitialBundleState extends NodeServerState
 			Bundler bundler = server.getBundler().copy();
 			JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
 			if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
+			if (debugEnabled) log.debug("processing threads for node " + getRemoteHost(channel) + " = " + systemInfo.getJppf().getInt("processing.threads", -1));
 			bundler.setup();
 			context.setBundler(bundler);
 			Boolean b = (Boolean) bundle.getParameter(BundleParameter.IS_PEER);

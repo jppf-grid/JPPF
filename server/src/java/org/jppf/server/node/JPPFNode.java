@@ -215,9 +215,6 @@ public class JPPFNode extends AbstractMonitoredNode
 					log.error(e.getMessage(), e);
 				}
 			}
-			JPPFSystemInformation info = new JPPFSystemInformation();
-			info.populate();
-			bundle.setParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM, info);
 		}
 	}
 
@@ -229,6 +226,12 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	private void processResults(JPPFTaskBundle bundle, List<JPPFTask> taskList) throws Exception
 	{
+		if (executionManager.checkConfigChanged())
+		{
+			JPPFSystemInformation info = new JPPFSystemInformation();
+			info.populate();
+			bundle.setParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM, info);
+		}
 		nodeIO.writeResults(bundle, taskList);
 		if ((taskList != null) && (taskList.size() > 0))
 		{

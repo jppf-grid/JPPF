@@ -24,7 +24,7 @@ import org.jppf.JPPFException;
 import org.jppf.data.transform.*;
 import org.jppf.io.*;
 import org.jppf.server.*;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 
 /**
@@ -48,10 +48,6 @@ public class ApplicationConnection extends JPPFConnection
 	 * Determines whether debug log statements are enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Determines whether dumping byte arrays in the log is enabled.
-	 */
-	private boolean dumpEnabled = JPPFConfiguration.getProperties().getBoolean("byte.array.dump.enabled", false);
 	/**
 	 * IO wrapper for the header.
 	 */
@@ -107,11 +103,11 @@ public class ApplicationConnection extends JPPFConnection
 	 */
 	public void perform() throws Exception
 	{
+		if (debugEnabled) log.debug("before reading header");
 		// Read the request header - with tasks count information
 		DataLocation dl = IOHelper.readData(is);
 		byte[] data = FileUtils.getInputStreamAsByte(dl.getInputStream());
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		if (transform != null) data = transform.unwrap(data);
+		data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
 		JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
 		if (debugEnabled) log.debug("received header from client, data length = " + data.length);
 		headerWrapper = new BundleWrapper(header);
@@ -134,12 +130,12 @@ public class ApplicationConnection extends JPPFConnection
 			if (i == 0)
 			{
 				headerWrapper.setDataProvider(dl);
-				if (debugEnabled) log.debug("received data provider from client, data length = " + dl.getSize());
+				if (log.isTraceEnabled()) log.trace("received data provider from client, data length = " + dl.getSize());
 			}
 			else
 			{
 				headerWrapper.addTask(dl);
-				if (debugEnabled) log.debug("received task #"+ i + " from client, data length = " + dl.getSize());
+				if (log.isTraceEnabled()) log.trace("received task #"+ i + " from client, data length = " + dl.getSize());
 			}
 		}
 

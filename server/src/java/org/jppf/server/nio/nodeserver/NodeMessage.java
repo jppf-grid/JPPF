@@ -98,8 +98,7 @@ public class NodeMessage
 			if (!readNextObject(channel)) return false;
 			InputStream is = locations.get(0).getInputStream();
 			byte[] data = FileUtils.getInputStreamAsByte(is);
-			JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-			if (transform != null) data = transform.unwrap(data);
+			data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
 			SerializationHelper helper = new SerializationHelperImpl();
 			bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
 			nbObjects = bundle.getTaskCount() + 1;

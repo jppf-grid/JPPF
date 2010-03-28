@@ -21,7 +21,6 @@ import java.nio.channels.*;
 import java.util.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.io.BundleWrapper;
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFDriver;
@@ -189,10 +188,10 @@ public class TaskQueueChecker implements Runnable
 	private void updateBundler(Bundler bundler, JPPFTaskBundle taskBundle, NodeContext context)
 	{
 		context.checkBundler(server.getBundler());
-		if (bundler instanceof JobAwareness)
+		if (context.getBundler() instanceof JobAwareness)
 		{
 			JPPFJobMetadata metadata = (JPPFJobMetadata) taskBundle.getParameter(BundleParameter.JOB_METADATA);
-			((JobAwareness) bundler).setJobMetadata(metadata);
+			((JobAwareness) context.getBundler()).setJobMetadata(metadata);
 		}
 	}
 }

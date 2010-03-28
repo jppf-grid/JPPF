@@ -95,7 +95,7 @@ public class JPPFContainer
 			for (int i=0; i<count; i++)
 			{
 				JPPFBuffer buf = wrapper.receiveBytes(0);
-				byte[] data = (transform == null) ? buf.getBuffer() : transform.unwrap(buf.getBuffer());
+				byte[] data = (transform == null) ? buf.getBuffer() : JPPFDataTransformFactory.transform(transform, false, buf.getBuffer(), 0, buf.getLength());
 				list.add(helper.getSerializer().deserialize(data));
 			}
 			return 0;
@@ -254,15 +254,19 @@ public class JPPFContainer
 			try
 			{
 				if (debugEnabled) log.debug("deserializing object index = " + index);
-				JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-				byte[] data = (transform == null) ? buffer : transform.unwrap(buffer);
-				Object o = helper.getSerializer().deserialize(data);
+				buffer = JPPFDataTransformFactory.transform(false, buffer);
+				Object o = helper.getSerializer().deserialize(buffer);
+				buffer = null;
 				if (debugEnabled) log.debug("deserialized object index = " + index);
 				return o;
 			}
 			catch(Exception e)
 			{
 				log.error(e.getMessage() + " [object index: " + index + "]", e);
+			}
+			finally
+			{
+				buffer = null;
 			}
 			return null;
 		}
