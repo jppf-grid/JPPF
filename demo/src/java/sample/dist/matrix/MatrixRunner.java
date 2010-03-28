@@ -56,9 +56,9 @@ public class MatrixRunner
 	{
 		try
 		{
+			TypedProperties props = JPPFConfiguration.getProperties();
 			if ((args != null) && (args.length > 0)) jppfClient = new JPPFClient(args[0]);
 			else jppfClient = new JPPFClient();
-			TypedProperties props = JPPFConfiguration.getProperties();
 			int size = props.getInt("matrix.size", 300);
 			int iterations = props.getInt("matrix.iterations", 10);
 			int nbRows = props.getInt("task.nbRows", 1);
