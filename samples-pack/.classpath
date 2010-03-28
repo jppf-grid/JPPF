@@ -10,7 +10,7 @@
 	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src"/>
 	<classpathentry kind="src" output="StartupClasses/classes" path="StartupClasses/src"/>
 	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/java"/>
-	<classpathentry kind="src" path="TomcatPort/src/resources"/>
+	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/resources"/>
 	<classpathentry kind="src" output="WebSearchEngine/classes" path="WebSearchEngine/src"/>
 	<classpathentry kind="lib" path="shared/lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jaligner.jar"/>
