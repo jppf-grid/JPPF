@@ -199,7 +199,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	 * @param config the set of properties to update.
 	 * @param reconnect - specifies whether the node should reconnect ot the driver after updating the properties.
 	 * @throws Exception if any error occurs.
-	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(org.jppf.utils.TypedProperties, java.lang.Boolean)
+	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
 	 */
 	public void updateConfiguration(Map config, Boolean reconnect) throws Exception
 	{
