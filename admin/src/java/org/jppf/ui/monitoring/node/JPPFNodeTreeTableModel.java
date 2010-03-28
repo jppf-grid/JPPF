@@ -100,7 +100,12 @@ public class JPPFNodeTreeTableModel extends AbstractJPPFTreeTableModel
 						res = info.toString() + (isNode ? "" : "(peer driver)");
 						break;
 					case NODE_THREADS:
-						if (isNode) res = "" + state.getThreadPoolSize() + " / " + state.getThreadPriority();
+						if (isNode)
+						{
+							int n = state.getThreadPoolSize();
+							int p = state.getThreadPriority();
+							res = "" + (n <= 0 ? "?" : n) + " / " + (p <= 0 ? "?" : p);
+						}
 						break;
 					case NODE_STATUS:
 						if (isNode) res = "" + state.getConnectionStatus();
