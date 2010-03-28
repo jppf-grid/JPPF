@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.example.loadbalancer.client;
+package org.jppf.example.loadbalancer.server;
 
+import org.apache.commons.logging.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.JPPFJobMetadata;
@@ -25,11 +26,24 @@ import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.TypedProperties;
 
 /**
- * 
+ * This implementation of a load-balancing algorithm illustrates the use of
+ * the {@link NodeAwareness} and {@link JobAwereness} APIs, allowing the algorithm to work
+ * based on known information about the nodes and the jobs.
+ * <p>In this implementation, we assume each job provides the following metadata:
+ * <ul>
+ * <li>"task.memory": the maximum memory footprint of each task in bytes</li> 
+ * <li>"task.time": the maximum duration of a task in milliseconds</li> 
+ * <li>"allowed.time": the maximum allowed time for execution of a single set of tasks on a node, in milliseconds</li>
+ * <li>"id": the id of the current job being executed, used for debugging and logging</li>
+ * </ul>
  * @author Laurent Cohen
  */
 public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness, JobAwareness
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(CustomLoadBalancer.class);
 	/**
 	 * Holds information about the node's environment and configuration.
 	 */
@@ -50,6 +64,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	public CustomLoadBalancer(LoadBalancingProfile profile)
 	{
 		super(profile);
+		if (log.isDebugEnabled()) log.debug("creating CustomLoadBalancer #" + this.bundlerNumber);
 	}
 
 	/**
@@ -91,6 +106,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	public void setNodeConfiguration(JPPFSystemInformation nodeConfiguration)
 	{
 		this.nodeConfiguration = nodeConfiguration;
+		if (log.isDebugEnabled()) log.debug("setting node configuration on bundler #" + bundlerNumber + ": " + nodeConfiguration);
 	}
 
 	/**
@@ -122,33 +138,39 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	{
 		this.jobMetadata = metadata;
 		// compute the number of tasks to send to the node,
-		// based on the new job mmetadata
+		// based on the new job metadata
 		computeBundleSize();
 	}
 
 	/**
-	 * Compute the number of tasks to send to the job.
+	 * Compute the number of tasks to send to the job. This is the actual algorithm implementation.
 	 */
 	private void computeBundleSize()
 	{
+		if (log.isDebugEnabled()) log.debug("computing bundle size for bundler #" + this.bundlerNumber);
 		// Get the job metadata in an easy to use format
 		TypedProperties props = new TypedProperties(getJobMetadata().getAll());
 		// the maximum memory footprint of each task in bytes
-		long taskMemory = props.getLong("task.memory", 10000);
+		long taskMemory = props.getLong("task.memory", 10*1024);
 		// fetch the length of a task in milliseconds
 		long taskTime = props.getLong("task.time", 10);
 		// fetch the maximum allowed time for execution of a single set of tasks on a node
-		long allowedTime = props.getLong("allowed.time", 10);
+		long allowedTime = props.getLong("allowed.time", -1);
+		// if allowed time is not defined we assume no time limit
+		if (allowedTime <= 0) allowedTime = Long.MAX_VALUE;
 		// get the number of processing threads in the node 
 		int nbThreads = getNodeConfiguration().getJppf().getInt("processing.threads", -1);
 		// if number of threads is not defined, we assume it is the number of available processors
 		if (nbThreads <= 0) nbThreads = getNodeConfiguration().getRuntime().getInt("availableProcessors");
 		// max node heap size of the node in bytes
 		long nodeMemory = getNodeConfiguration().getRuntime().getLong("maxMemory");
-		// we assume 20 MB of the node's memory is taken by JPPF code
+		// we assume 20 MB of the node's memory is taken by JPPF code and add-ons
 		nodeMemory -= 20 * 1024 * 1024;
+		if (nodeMemory < 0) nodeMemory = 0;
 		// max number of tasks that can fit in the node's heap
-		int maxTasks = (int) (nodeMemory / taskMemory);
+		// we count 2*taskMemory because it will take approximately twice the memory footprint
+		// when each task is serialized or deserialized in the node (serialized data + the object itself)
+		int maxTasks = (int) (nodeMemory / (2 * taskMemory));
 		// the maximum time needed to execute maxTasks tasks on nbThreads parallel threads
 		long maxTime = taskTime * maxTasks / nbThreads;
 		// if maxTime is not a multiple of nbThreads, make the adjustement
@@ -158,8 +180,12 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 		{
 			maxTasks = (int) ((maxTasks * allowedTime) / maxTime); 
 		}
-		// finally, store the computation result
-		bundleSize = maxTasks;
+		// finally, store the computation result, ensuring that 1 <= size <= maxSize
+		bundleSize = Math.max(1, Math.min(maxTasks, maxSize()));
+		// for debugging and logging purposes
+		String id = props.getString("id", "unknown id");
+		// log the new bundle size
+		if (log.isDebugEnabled()) log.debug("bundler #" + this.bundlerNumber + " computed new bundle size = " + bundleSize + " for job id = " + id);
 	}
 
 	/**
@@ -168,6 +194,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	 */
 	public void dispose()
 	{
+		if (log.isDebugEnabled()) log.debug("disposing bundler #" + this.bundlerNumber);
 		this.jobMetadata = null;
 		this.nodeConfiguration = null;
 	}

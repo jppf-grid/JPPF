@@ -98,6 +98,20 @@
   </target>
 
 	<!-- ========================================================================= -->
+	<!--                     Run the sample application                            -->
+	<!-- ========================================================================= -->
+
+	<target name="run">
+		<echo message="Testing the Custom Load Balancer"/>
+		<java fork="yes" classname="org.jppf.example.loadbalancer.client.CustomLoadBalancerRunner" classpathref="project.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx256m"/>
+			<jvmarg value="-Djppf.config=jppf-client.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+		</java>       
+	</target>
+
+	<!-- ========================================================================= -->
 	<!--                        Generate the Javadoc                               -->
 	<!-- ========================================================================= -->
 
