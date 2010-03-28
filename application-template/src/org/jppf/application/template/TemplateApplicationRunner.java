@@ -24,7 +24,7 @@ import org.jppf.server.protocol.JPPFTask;
 
 /**
  * This is a template JPPF application runner.
- * It is fully commented and is designed to be used as a staring point
+ * It is fully commented and is designed to be used as a starting point
  * to write an application using JPPF.
  * @author Laurent Cohen
  */

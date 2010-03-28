@@ -22,7 +22,7 @@ import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketWrapper;
 
 /**
- * 
+ * Interface for wrappers around a socket connection to the server on the client side.
  * @author Laurent Cohen
  */
 public interface ClientConnectionHandler extends ClientConnectionStatusHandler
