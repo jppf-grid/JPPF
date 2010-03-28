@@ -28,15 +28,14 @@ import java.io.*;
 public interface DataLocation
 {
 	/**
-	 * Constant for unkbown data location size.
+	 * Constant for unknown data location size.
 	 */
-	int UNKNOWN_SIZE = 1;
+	int UNKNOWN_SIZE = -1;
 	/**
 	 * Get the size of the data referenced by this data location.
 	 * @return the data size as an int.
 	 */
 	int getSize();
-
 	/**
 	 * Transfer the content of this data location from the specified input source.
 	 * @param source - the input source to transfer to.
@@ -45,7 +44,6 @@ public interface DataLocation
 	 * @throws Exception if an IO error occurs.
 	 */
 	int transferFrom(InputSource source, boolean blocking) throws Exception;
-
 	/**
 	 * Transfer the content of this data location to the specified output destination.
 	 * @param dest - the output destination to transfer to.

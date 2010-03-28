@@ -22,9 +22,9 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Instances of this class hold metadata about a job, that can be used from a load-balancer
+ * Instances of this class hold metadata about a job, that can be used from a load-balancer,
  * to adapt the load balancing to the computational weight of the job and/or the contained tasks.
- * It may be used in othe places in future versions.
+ * It may be used in other places in future versions.
  * @see org.jppf.server.scheduler.bundle.JobAwareness
  * @author Laurent Cohen
  */
@@ -79,7 +79,7 @@ public class JPPFJobMetadata implements Serializable
 	}
 
 	/**
-	 * Get a copy of the metedata map.
+	 * Get a copy of the metadata map.
 	 * @return a map of the metadata contained in this object.
 	 */
 	public Map<Object, Object> getAll()

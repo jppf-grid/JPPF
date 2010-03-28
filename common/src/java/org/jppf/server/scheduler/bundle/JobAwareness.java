@@ -21,7 +21,7 @@ package org.jppf.server.scheduler.bundle;
 import org.jppf.server.protocol.JPPFJobMetadata;
 
 /**
- * Bundler implementations should impelement this interface if they wish to have access to a job's metadata.
+ * Bundler implementations should implement this interface if they wish to have access to a job's metadata.
  * @author Laurent Cohen
  */
 public interface JobAwareness

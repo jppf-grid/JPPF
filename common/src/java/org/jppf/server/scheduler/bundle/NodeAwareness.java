@@ -21,7 +21,7 @@ package org.jppf.server.scheduler.bundle;
 import org.jppf.management.JPPFSystemInformation;
 
 /**
- * Bundler implementations should impelement this interface if they wish to have access to a node's configuration.
+ * Bundler implementations should implement this interface if they wish to have access to a node's configuration.
  * @author Laurent Cohen
  */
 public interface NodeAwareness
