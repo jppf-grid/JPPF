@@ -37,6 +37,10 @@ public abstract class JPPFServer extends Thread
 	 */
 	private static Log log = LogFactory.getLog(JPPFServer.class);
 	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * Server socket listening for requests on the configured port.
 	 */
 	protected ServerSocket server = null;
@@ -100,7 +104,8 @@ public abstract class JPPFServer extends Thread
 	 */
 	protected void serve(Socket socket) throws Exception
 	{
-		socket.setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+		//socket.setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+		if (debugEnabled) log.debug("Server " + server + " serving new socket: " + socket);
 		JPPFConnection connection = createConnection(socket);
 		connections.add(connection);
 		connection.start();
