@@ -61,11 +61,12 @@ public class JPPFNodeState implements Serializable
 	/**
 	 * Size of the node's thread pool.
 	 */
-	private int threadPoolSize = 1;
+	private int threadPoolSize = -1;
 	/**
 	 * Priority of the threads in the pool.
 	 */
-	private int threadPriority = Thread.NORM_PRIORITY;
+	private int threadPriority = -1;
+	//private int threadPriority = Thread.NORM_PRIORITY;
 
 	/**
 	 * Get the latest event received from a task.
