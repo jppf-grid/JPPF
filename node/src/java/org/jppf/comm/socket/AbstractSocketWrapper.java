@@ -193,7 +193,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			if (timeout > 0) socket.setSoTimeout(timeout);
 			int len = dis.readInt();
 			byte[] buffer = new byte[len];
-			int count = read(buffer, 0, len);
+			read(buffer, 0, len);
 			buf = new JPPFBuffer(buffer, len);
 		}
 		finally

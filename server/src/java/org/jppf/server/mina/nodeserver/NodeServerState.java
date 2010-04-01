@@ -37,6 +37,10 @@ public abstract class NodeServerState extends MinaState
 	 * The job manager.
 	 */
 	protected JPPFJobManager jobManager = null;
+	/**
+	 * Reference to the driver.
+	 */
+	protected JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
 	 * Initialize this state.
@@ -45,8 +49,8 @@ public abstract class NodeServerState extends MinaState
 	protected NodeServerState(MinaNodeServer server)
 	{
 		super(server);
-		statsManager = JPPFDriver.getInstance().getStatsManager();
-		jobManager = JPPFDriver.getInstance().getJobManager();
+		statsManager = driver.getStatsManager();
+		jobManager = driver.getJobManager();
 	}
 
 	/**

@@ -51,7 +51,11 @@ public class TaskQueueChecker implements Runnable
 	 * The owner of this queue checker.
 	 */
 	private NodeNioServer server = null;
-	
+	/**
+	 * Reference to the driver.
+	 */
+	private JPPFDriver driver = JPPFDriver.getInstance();
+
 	/**
 	 * Initialize this task queue checker with the specified node server. 
 	 * @param server - the owner of this queue checker.
@@ -104,7 +108,7 @@ public class TaskQueueChecker implements Runnable
 					BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
 					context.setBundle(bundleWrapper);
 					server.getTransitionManager().transitionChannel(key, NodeTransition.TO_SENDING);
-					JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), new ChannelWrapper<SelectableChannel>(channel));
+					driver.getJobManager().jobDispatched(context.getBundle(), new ChannelWrapper<SelectableChannel>(channel));
 				}
 			}
 			finally
@@ -142,7 +146,7 @@ public class TaskQueueChecker implements Runnable
 			if (uuidPath.contains(context.getNodeUuid())) continue;
 			if (rule != null)
 			{
-				JPPFManagementInfo mgtInfo = JPPFDriver.getInstance().getNodeInformation(new ChannelWrapper<SelectableChannel>(ch));
+				JPPFManagementInfo mgtInfo = driver.getNodeInformation(new ChannelWrapper<SelectableChannel>(ch));
 				JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
 				if (!rule.accepts(info)) continue;
 			}

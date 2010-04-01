@@ -108,7 +108,6 @@ public class NodeSimulator
 	{
 		try
 		{
-			Random rand = new Random(System.currentTimeMillis());
 			ProportionalTuneProfile profile = new ProportionalTuneProfile();
 			profile.setPerformanceCacheSize(2000);
 			profile.setProportionalityFactor(2);

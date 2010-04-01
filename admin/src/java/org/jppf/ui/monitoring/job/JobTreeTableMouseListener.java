@@ -66,7 +66,6 @@ public class JobTreeTableMouseListener extends MouseAdapter
 		Component comp = event.getComponent();
 		if (!(comp instanceof JPPFTreeTable)) return;
 		JPPFTreeTable treeTable = (JPPFTreeTable) comp;
-		JTree tree = treeTable.getTree();
 		int x = event.getX();
 		int y = event.getY();
 		int button = event.getButton();

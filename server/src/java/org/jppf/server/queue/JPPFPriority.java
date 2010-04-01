@@ -30,7 +30,7 @@ public class JPPFPriority implements Comparable<JPPFPriority>, Serializable
 	/**
 	 * The actual value of the priority.
 	 */
-	private Integer value = Integer.valueOf(0);
+	private int value = 0;
 
 	/**
 	 * Initialize this priority witht he specified object.
@@ -60,6 +60,28 @@ public class JPPFPriority implements Comparable<JPPFPriority>, Serializable
 	 * @return the priority as an integer value.
 	 */
 	public int getValue()
+	{
+		return value;
+	}
+
+	/**
+	 * Indcates whether some object is "equal" to this one.
+	 * @param obj the object ot compare with.
+	 * @return true if the 2 objects are equal, false otherwise.
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof JPPFPriority)) return false; 
+		return value == ((JPPFPriority) obj).getValue();
+	}
+
+	/**
+	 * Return a hashcode value for this object. 
+	 * @return the priority value.
+	 * @see java.lang.Object#hashCode()
+	 */
+	public int hashCode()
 	{
 		return value;
 	}

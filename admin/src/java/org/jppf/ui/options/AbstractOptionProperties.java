@@ -43,10 +43,6 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 */
 	protected String toolTipText = null;
 	/**
-	 * The root of the option tree this option belongs to.
-	 */
-	protected OptionElement root = null;
-	/**
 	 * Get the UI component for this option element.
 	 */
 	protected JComponent UIComponent = null;

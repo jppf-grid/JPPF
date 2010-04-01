@@ -339,16 +339,13 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		{
 			log.info("Connection [" + c.getName() + "] : resubmitting " + taskCount + "tasks for " + execCount + " executions");
 		}
-		if (c != null)
+		try
 		{
-			try
-			{
-				for (JPPFJob job: toResubmit) submit(job);
-			}
-			catch(Exception e)
-			{
-				log.error(e);
-			}
+			for (JPPFJob job: toResubmit) submit(job);
+		}
+		catch(Exception e)
+		{
+			log.error(e);
 		}
 	}
 

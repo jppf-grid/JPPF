@@ -104,7 +104,6 @@ public class ClassIoFilter extends IoFilterAdapter
 	{
 		if (debugEnabled) log.debug("    session " + session.getId() + " : message = " + request.getMessage());
 		ClassContext context = (ClassContext) session.getAttribute(MinaContext.CONTEXT);
-		DefaultWriteRequest req = (DefaultWriteRequest) request;
 
 		Boolean transitionStarted = (Boolean) session.getAttribute(MinaContext.TRANSITION_STARTED, Boolean.TRUE);
 		Boolean writeComplete = (Boolean) session.getAttribute(MinaContext.WRITE_COMPLETE, Boolean.TRUE);

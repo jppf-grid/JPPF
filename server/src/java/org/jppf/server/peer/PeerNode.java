@@ -59,6 +59,10 @@ public class PeerNode extends AbstractMonitoredNode
 	 * Security credentials associated with this JPPF node.
 	 */
 	//private JPPFSecurityContext credentials = null;
+	/**
+	 * Reference to the driver.
+	 */
+	private JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
 	 * Initialize this peer node with the specified configuration name.
@@ -68,7 +72,7 @@ public class PeerNode extends AbstractMonitoredNode
 	{
 		this.peerName = peerName;
 		//this.uuid = new JPPFUuid().toString();
-		this.uuid = JPPFDriver.getInstance().getUuid();
+		this.uuid = driver.getUuid();
 		this.helper = new SerializationHelperImpl();
 	}
 
@@ -92,7 +96,7 @@ public class PeerNode extends AbstractMonitoredNode
 				if (socketInitializer != null) socketInitializer.close();
 				TypedProperties props = JPPFConfiguration.getProperties();
 				if (props.getBoolean("jppf.discovery.enabled", true) && props.getBoolean("jppf.peer.discovery.enabled", true))
-					JPPFDriver.getInstance().getPeerDiscoveryThread().removePeer(peerName);
+					driver.getPeerDiscoveryThread().removePeer(peerName);
 				if (debugEnabled) log.debug(getName() + " : " + e.getMessage(), e);
 			}
 			if (!stopped)
@@ -134,7 +138,6 @@ public class PeerNode extends AbstractMonitoredNode
 	 */
 	public void perform() throws Exception
 	{
-		JPPFDriver driver = JPPFDriver.getInstance();
 		if (debugEnabled) log.debug(getName() + "Start of peer node secondary loop");
 		while (!stopped)
 		{
@@ -182,7 +185,7 @@ public class PeerNode extends AbstractMonitoredNode
 			{
 				resultSender.sendPartialResults(bundleWrapper);
 			}
-			JPPFDriver.getInstance().getJobManager().jobEnded(bundleWrapper);
+			driver.getJobManager().jobEnded(bundleWrapper);
 			if (notifying) fireNodeEvent(NodeEventType.END_EXEC);
 		}
 		if (debugEnabled) log.debug(getName() + " End of peer node secondary loop");

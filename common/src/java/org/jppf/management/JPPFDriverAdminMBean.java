@@ -56,7 +56,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
 	 * @return an acknowledgement or error message.
 	 * @throws Exception if an error occurred while updating the settings.
 	 */
-	String changeLoadBalancerSettings(String algorithm, Map parameters) throws Exception;
+	String changeLoadBalancerSettings(String algorithm, Map<Object, Object> parameters) throws Exception;
 	/**
 	 * Obtain the current load-balancing settings.
 	 * @return an instance of <code>LoadBalancingInformation</code>.

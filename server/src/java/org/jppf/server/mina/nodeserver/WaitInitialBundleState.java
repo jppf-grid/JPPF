@@ -24,7 +24,6 @@ import static org.jppf.utils.StringUtils.getRemoteHost;
 import org.apache.commons.logging.*;
 import org.apache.mina.core.session.IoSession;
 import org.jppf.management.*;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.mina.IoSessionWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
@@ -98,7 +97,7 @@ public class WaitInitialBundleState extends NodeServerState
 				int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM);
 				JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE);
 				if (systemInfo != null) info.setSystemInfo(systemInfo);
-				JPPFDriver.getInstance().addNodeInformation(new IoSessionWrapper(session), info);
+				driver.addNodeInformation(new IoSessionWrapper(session), info);
 			}
 		}
 		// make sure the context is reset so as not to resubmit the last bundle executed by the node.

@@ -533,7 +533,7 @@
 	<!-- ========================================================================= -->
 	<!--                    Generate the IzPack installer jar                      -->
 	<!-- ========================================================================= -->
-	<!-- This requires the property  ${izpack.home} defined in build.preoperties   -->
+	<!-- This requires the property  ${izpack.home} defined in build.properties    -->
 	<!-- It must point to the root installation directory of IzPack                -->
 	<!-- ========================================================================= -->
 
@@ -586,6 +586,89 @@
 		</exec>
 
 		<delete dir="${install.prefix}" quiet="true"/>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                    Generate the findbugs reports                          -->
+	<!-- ========================================================================= -->
+	<!-- This requires the property ${findbugs.home} defined in build.properties   -->
+	<!-- It must point to the root installation directory of findbugs              -->
+	<!-- ========================================================================= -->
+
+	<taskdef onerror="ignore" name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
+		<classpath>
+			<fileset dir="${findbugs.home}/lib" includes="*.jar"/>
+		</classpath>
+	</taskdef>
+
+	<target name="findbugs">
+		<available file="${findbugs.home}/lib/findbugs-ant.jar" property="findbugs.present"/>
+		<antcall target="findbugs.package"/>
+	</target>
+
+	<target name="findbugs.package" description="run findbugs on all modules" if="findbugs.present">
+		<property name="output.type" value="xml"/>
+		<delete dir="${build}/findbugs" quiet="true"/>
+		<mkdir dir="${build}/findbugs"/>
+		<antcall target="findbugs.module"><param name="path" value="node"/></antcall>
+		<antcall target="findbugs.module"><param name="path" value="common"/></antcall>
+		<antcall target="findbugs.module"><param name="path" value="client"/></antcall>
+		<antcall target="findbugs.module"><param name="path" value="admin"/></antcall>
+		<antcall target="findbugs.module"><param name="path" value="server"/></antcall>
+		<antcall target="findbugs.module"><param name="path" value="demo"/></antcall>
+
+		<antcall target="findbugs.generic">
+			<param name="foutput" value="application-template"/>
+			<param name="fsrc" value="${application.template}/src"/>
+			<param name="fclass" value="${application.template}/classes"/>
+		</antcall>
+		<antcall target="findbugs.generic">
+			<param name="foutput" value="jca-client-jca"/>
+			<param name="fsrc" value="${jca-client}/src/java"/>
+			<param name="fclass" value="${jca-client}/classes/jca"/>
+		</antcall>
+		<antcall target="findbugs.generic">
+			<param name="foutput" value="jca-client-j2eeclient"/>
+			<param name="fsrc" value="${jca-client}/src/j2eeclient"/>
+			<param name="fclass" value="${jca-client}/classes/j2eeclient"/>
+		</antcall>
+		<antcall target="findbugs.generic">
+			<param name="foutput" value="gigaspaces-common"/>
+			<param name="fsrc" value="${gigaspaces}/JPPF-GigaSpaces-Common/src"/>
+			<param name="fclass" value="${gigaspaces}/JPPF-GigaSpaces-Common/classes"/>
+		</antcall>
+		<antcall target="findbugs.generic">
+			<param name="foutput" value="gigaspaces-client"/>
+			<param name="fsrc" value="${gigaspaces}/JPPF-GigaSpaces-Client/src"/>
+			<param name="fclass" value="${gigaspaces}/JPPF-GigaSpaces-Client/classes"/>
+		</antcall>
+		<antcall target="findbugs.generic">
+			<param name="foutput" value="gigaspaces-pu"/>
+			<param name="fsrc" value="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/src"/>
+			<param name="fclass" value="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/classes"/>
+		</antcall>
+	</target>
+
+	<target name="findbugs.module">
+    <findbugs home="${findbugs.home}" output="${output.type}" outputFile="${build}/findbugs/${path}-findbugs.${output.type}" jvmargs="-server -Xmx512m -Duser.language=en -Duser.country=US">
+      <auxClasspath>
+      	<fileset dir="${lib}" includes="**/*.jar"/>
+      	<fileset dir="${build}" includes="**/jppf*.jar"/>
+      </auxClasspath>
+      <sourcePath path="${basedir}/../${path}/src/java"/>
+      <class location="${basedir}/../${path}/classes"/>
+    </findbugs>
+	</target>
+
+	<target name="findbugs.generic">
+    <findbugs home="${findbugs.home}" output="${output.type}" outputFile="${build}/findbugs/${foutput}-findbugs.${output.type}" jvmargs="-server -Xmx512m -Duser.language=en -Duser.country=US">
+      <auxClasspath>
+      	<fileset dir="${lib}" includes="**/*.jar"/>
+      	<fileset dir="${build}" includes="**/jppf*.jar"/>
+      </auxClasspath>
+      <sourcePath path="${fsrc}"/>
+      <class location="${fclass}"/>
+    </findbugs>
 	</target>
 
 	<!-- ========================================================================= -->
@@ -646,10 +729,10 @@
 	<!-- ========================================================================= -->
 
 	<target name="user.guide" description="Generate the user guide zip file">
-		<property name="user.guide.file" value="${build}/${app.ver}-User-Guide.zip"/>
+		<property name="user.guide.file" value="${build}/JPPF-User-Guide.zip"/>
 		<delete file="${user.guide.file}" quiet="true"/>
 		<zip destfile="${user.guide.file}">
-			<zipfileset dir="${docs}" includes="JPPF-*.pdf" prefix="${app.ver}-User-Guide"/>
+			<zipfileset dir="${docs}" includes="JPPF-*.pdf" prefix="JPPF-User-Guide"/>
 		</zip>
 	</target>
 

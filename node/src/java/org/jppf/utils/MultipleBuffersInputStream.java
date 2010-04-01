@@ -28,10 +28,6 @@ import java.util.*;
 public class MultipleBuffersInputStream extends InputStream
 {
 	/**
-	 * Default length of each new buffer.
-	 */
-	private int defaultLength = 32768;
-	/**
 	 * Contains the data written to this ouptput stream, as a sequence of {@link JPPFBuffer} instances.
 	 */
 	private List<JPPFBuffer> list = new ArrayList<JPPFBuffer>();
@@ -58,7 +54,11 @@ public class MultipleBuffersInputStream extends InputStream
 	 */
 	public MultipleBuffersInputStream(JPPFBuffer...buffers)
 	{
-		for (JPPFBuffer b: buffers) list.add(b);
+		for (JPPFBuffer b: buffers)
+		{
+			list.add(b);
+			totalSize += b.length;
+		}
 	}
 
 	/**

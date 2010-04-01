@@ -68,6 +68,10 @@ public class ApplicationConnection extends JPPFConnection
 	 * Used to send the task results back to the requester.
 	 */
 	private ApplicationResultSender resultSender = null;
+	/**
+	 * Reference to the driver.
+	 */
+	private JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
 	 * Initialize this connection with an open socket connection to a remote client.
@@ -83,7 +87,7 @@ public class ApplicationConnection extends JPPFConnection
 		resultSender = new ApplicationResultSender(socketClient);
 		InetAddress addr = socket.getInetAddress();
 		setName("appl [" + addr.getHostAddress() + ":" + socket.getPort() + "]");
-		JPPFDriver.getInstance().getStatsManager().newClientConnection();
+		driver.getStatsManager().newClientConnection();
 	}
 
 	/**
@@ -139,7 +143,7 @@ public class ApplicationConnection extends JPPFConnection
 			}
 		}
 
-		header.getUuidPath().add(JPPFDriver.getInstance().getUuid());
+		header.getUuidPath().add(driver.getUuid());
 		header.setCompletionListener(resultSender);
 		JPPFDriver.getQueue().addBundle(headerWrapper);
 		if (count > 0)
@@ -149,7 +153,7 @@ public class ApplicationConnection extends JPPFConnection
 		}
 		if (count <= 0) resultSender.sendPartialResults(headerWrapper);
 		else resultSender.run(count);
-		JPPFDriver.getInstance().getJobManager().jobEnded(headerWrapper);
+		driver.getJobManager().jobEnded(headerWrapper);
 		return;
 	}
 
@@ -160,7 +164,7 @@ public class ApplicationConnection extends JPPFConnection
 	public void close()
 	{
 		super.close();
-		JPPFDriver.getInstance().getStatsManager().clientConnectionClosed();
+		driver.getStatsManager().clientConnectionClosed();
 	}
 
 	/**

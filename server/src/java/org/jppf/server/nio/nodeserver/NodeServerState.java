@@ -40,6 +40,10 @@ public abstract class NodeServerState extends NioState<NodeTransition>
 	 * The job manager.
 	 */
 	protected JPPFJobManager jobManager = null;
+	/**
+	 * Reference to the driver.
+	 */
+	protected JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
 	 * Initialize this state.
@@ -48,7 +52,7 @@ public abstract class NodeServerState extends NioState<NodeTransition>
 	public NodeServerState(NodeNioServer server)
 	{
 		this.server = server;
-		statsManager = JPPFDriver.getInstance().getStatsManager();
-		jobManager = JPPFDriver.getInstance().getJobManager();
+		statsManager = driver.getStatsManager();
+		jobManager = driver.getJobManager();
 	}
 }

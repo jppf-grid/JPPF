@@ -84,6 +84,10 @@ public class MinaNodeServer extends MinaServer<NodeState, NodeTransition>
 	 * be sent to available nodes.
 	 */
 	private JobQueueChecker queueChecker = new JobQueueChecker(this);
+	/**
+	 * Reference to the driver.
+	 */
+	private JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
 	 * Initialiaze this server with the specified port number.
@@ -229,7 +233,7 @@ public class MinaNodeServer extends MinaServer<NodeState, NodeTransition>
 	 */
 	protected JPPFJobManager getJobManager()
 	{
-		return JPPFDriver.getInstance().getJobManager();
+		return driver.getJobManager();
 	}
 
 	/**
@@ -262,7 +266,7 @@ public class MinaNodeServer extends MinaServer<NodeState, NodeTransition>
 		{
 			try
 			{
-				JPPFSecurityContext cred = JPPFDriver.getInstance().getCredentials();
+				JPPFSecurityContext cred = driver.getCredentials();
 				SerializationHelper helper = new SerializationHelperImpl();
 				// serializing a null data provider.
 				JPPFBuffer buf = helper.getSerializer().serialize(null);
@@ -273,7 +277,7 @@ public class MinaNodeServer extends MinaServer<NodeState, NodeTransition>
 				JPPFTaskBundle bundle = new JPPFTaskBundle();
 				bundle.setBundleUuid(INITIAL_BUNDLE_UUID);
 				bundle.setRequestUuid("0");
-				bundle.getUuidPath().add(JPPFDriver.getInstance().getUuid());
+				bundle.getUuidPath().add(driver.getUuid());
 				bundle.setTaskCount(0);
 				bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
 				initialBundle = new BundleWrapper(bundle);
@@ -297,11 +301,11 @@ public class MinaNodeServer extends MinaServer<NodeState, NodeTransition>
 		try
 		{
 			session.close(true);
-			JPPFDriver.getInstance().getStatsManager().nodeConnectionClosed();
+			driver.getStatsManager().nodeConnectionClosed();
 			if (context.getNodeUuid() != null)
 			{
 				ChannelWrapper cw = new IoSessionWrapper(session);
-				JPPFDriver.getInstance().removeNodeInformation(cw);
+				driver.removeNodeInformation(cw);
 				removeIdleChannel(session);
 			}
 		}

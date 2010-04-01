@@ -264,7 +264,7 @@ public class JPPFScreenSaver //extends SimpleScreensaver
 	/**
 	 * Data structure holding the position and direction of a flying logo.
 	 */
-	private static class ImageData implements Cloneable
+	private static class ImageData
 	{
 		/**
 		 * The previous position on the x axis.

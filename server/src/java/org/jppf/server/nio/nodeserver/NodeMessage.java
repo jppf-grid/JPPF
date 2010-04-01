@@ -44,10 +44,6 @@ public class NodeMessage
 	 */
 	private int length = 0;
 	/**
-	 * Object storing the length data.
-	 */
-	private NioObject lengthObject = null;
-	/**
 	 * The data location objects abstracting the data to send or receive.
 	 */
 	private LinkedList<DataLocation> locations = new LinkedList<DataLocation>();

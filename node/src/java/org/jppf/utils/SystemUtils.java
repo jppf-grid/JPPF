@@ -242,6 +242,8 @@ public final class SystemUtils
 			}
 			catch(Exception e)
 			{
+				if (debugEnabled) log.debug(e.getMessage(), e);
+				else log.info(e);
 			}
 		}
 		props.setProperty("host.roots.names", sb.toString());		

@@ -93,7 +93,7 @@ public class TreeTableModelAdapter extends AbstractTableModel
 			public void treeExpanded(TreeExpansionEvent event)
 			{
 				TreePath[] paths = getSelectedPaths();
-				if (debugEnabled) log.debug("selected paths = " + paths);
+				if (debugEnabled) log.debug("selected paths = " + dumpTreePaths(paths));
 				fireTableDataChanged();
 				setSelectedPaths(paths);
 			}
@@ -101,7 +101,7 @@ public class TreeTableModelAdapter extends AbstractTableModel
 			public void treeCollapsed(TreeExpansionEvent event)
 			{
 				TreePath[] paths = getSelectedPaths();
-				if (debugEnabled) log.debug("selected paths = " + paths);
+				if (debugEnabled) log.debug("selected paths = " + dumpTreePaths(paths));
 				fireTableDataChanged();
 				setSelectedPaths(paths);
 			}
@@ -276,5 +276,22 @@ public class TreeTableModelAdapter extends AbstractTableModel
 			if ((node != null) && (node.getParent() != null)) validPaths.add(path);
 		}
 		tree.setSelectionPaths(validPaths.toArray(ZERO_PATH));
+	}
+
+	/**
+	 * Dump the specified tree paths to a string.
+	 * @param paths the paths to dump.
+	 * @return a string representation of the array of <code>TreePath</code> objects.
+	 */
+	protected String dumpTreePaths(TreePath[] paths)
+	{
+		StringBuilder sb = new StringBuilder("selected paths = [");
+		for (int i=0; i<paths.length; i++)
+		{
+			if (i > 0) sb.append(", ");
+			sb.append(paths[i]);
+		}
+		sb.append("]");
+		return sb.toString();
 	}
 }

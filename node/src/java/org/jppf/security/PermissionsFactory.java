@@ -149,7 +149,7 @@ public final class PermissionsFactory
 			port = props.getInt("node.server.port", 11113);
 			addPermission(new SocketPermission(host + ":" + port, "connect,listen"), "dynamic");
 			host = props.getString("jppf.discovery.group", "230.0.0.1");
-			port = props.getInt("jppf.discovery.port", 11111);
+			//port = props.getInt("jppf.discovery.port", 11111);
 			addPermission(new SocketPermission(host + ":0-", "accept,connect,listen,resolve"), "dynamic");
 		}
 		catch(Exception e)
@@ -166,7 +166,7 @@ public final class PermissionsFactory
 		try
 		{
 			TypedProperties props = JPPFConfiguration.getProperties();
-			String host = props.getString("jppf.management.host", "localhost");
+			//String host = props.getString("jppf.management.host", "localhost");
 			int port = props.getInt("jppf.management.port", 11198);
 			int rmiPort = props.getInt("jppf.management.rmi.port", 12198);
 			// TODO: find a way to be more restrictive on RMI permissions

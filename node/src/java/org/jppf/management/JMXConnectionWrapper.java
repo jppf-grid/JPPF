@@ -21,6 +21,7 @@ package org.jppf.management;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
+import java.util.concurrent.atomic.*;
 
 import javax.management.*;
 import javax.management.remote.*;
@@ -53,7 +54,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	/**
 	 * A connection to the MBean server.
 	 */
-	private MBeanServerConnection mbeanConnection = null;
+	private AtomicReference<MBeanServerConnection> mbeanConnection = new AtomicReference<MBeanServerConnection>(null);
 	/**
 	 * The host the server is running on.
 	 */
@@ -65,7 +66,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	/**
 	 * The connection thread that performs the connection to the management server.
 	 */
-	private JMXConnectionThread connectionThread = null;
+	private AtomicReference<JMXConnectionThread> connectionThread = new AtomicReference<JMXConnectionThread>(null);
 	/**
 	 * A string representing this connection, used for logging purposes.
 	 */
@@ -73,7 +74,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
   /**
    * Determines whether the connection to the JMX server has been established.
    */
-  private boolean connected = false;
+  private AtomicBoolean connected = new AtomicBoolean(false);
   /**
    * Determines whether the connection to the JMX server has been established.
    */
@@ -119,13 +120,13 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	{
 		if (local)
 		{
-			mbeanConnection = ManagementFactory.getPlatformMBeanServer();
-	  	connected = true;
+			mbeanConnection.set(ManagementFactory.getPlatformMBeanServer());
+			connected.set(true);
 		}
 		else
 		{
-			connectionThread = new JMXConnectionThread();
-			Thread t = new Thread(connectionThread, "JMX connection thread for " + getId());
+			connectionThread.set(new JMXConnectionThread());
+			Thread t = new Thread(connectionThread.get(), "JMX connection thread for " + getId());
 			t.setDaemon(true);
 			t.start();
 		}
@@ -139,7 +140,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	public void connectAndWait(long timeout)
 	{
 		connect();
-		if (connected) return;
+		if (connected.get()) return;
 		goToSleep(timeout);
 	}
 
@@ -149,11 +150,11 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 */
 	private synchronized void performConnection() throws Exception
 	{
-  	connected = false;
+  	connected.set(false);
     HashMap env = new HashMap(); 
     jmxc = JMXConnectorFactory.connect(url, env);
-  	mbeanConnection = jmxc.getMBeanServerConnection();
-  	connected = true;
+  	mbeanConnection.set(jmxc.getMBeanServerConnection());
+  	connected.set(true);
 		log.info(getId() + " RMI connection successfully established");
 	}
 
@@ -163,7 +164,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 */
 	public void close() throws Exception
 	{
-		if (connectionThread != null) connectionThread.close();
+		if (connectionThread.get() != null) connectionThread.get().close();
     if (jmxc != null) jmxc.close();
 	}
 
@@ -178,7 +179,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 */
 	public synchronized Object invoke(String name, String methodName, Object[] params, String[] signature) throws Exception
 	{
-		if ((connectionThread != null) && connectionThread.isConnecting()) return null;
+		if ((connectionThread.get() != null) && connectionThread.get().isConnecting()) return null;
 		Object result = null;
 		try
 		{
@@ -187,7 +188,16 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		}
 		catch(IOException e)
 		{
-			if (!connectionThread.isConnecting()) connectionThread.resume();
+			connected.set(false);
+			try
+			{
+		    if (jmxc != null) jmxc.close();
+			}
+			catch(Exception e2)
+			{
+				if (debugEnabled) log.debug(e2.getMessage(), e2);
+			}
+			if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
 			log.info(getId() + " : " + e.getMessage(), e);
 		}
 		return result;
@@ -224,18 +234,18 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 * Get the connection to the MBean server.
 	 * @return a <code>MBeanServerConnection</code> instance.
 	 */
-	public synchronized MBeanServerConnection getMbeanConnection()
+	public MBeanServerConnection getMbeanConnection()
 	{
-		return mbeanConnection;
+		return mbeanConnection.get();
 	}
 
 	/**
    * Determines whether the connection to the JMX server has been established.
 	 * @return true if the connection is established, false otherwise.
 	 */
-	public synchronized boolean isConnected()
+	public boolean isConnected()
 	{
-		return connected;
+		return connected.get();
 	}
 
 	/**
@@ -301,7 +311,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		{
 			if (debugEnabled) log.debug(getId() + " suspending RMI connection attempts");
 			setConnecting(false);
-			suspended = true;
+			setSuspended(true);
 		}
 
 		/**
@@ -311,7 +321,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		{
 			if (debugEnabled) log.debug(getId() + " resuming RMI connection attempts");
 			setConnecting(true);
-			suspended = false;
+			setSuspended(false);
 			wakeUp();
 		}
 
@@ -350,6 +360,15 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		public synchronized boolean isSuspended()
 		{
 			return suspended;
+		}
+
+		/**
+		 * Set the suspended state of this connection thread.
+		 * @param suspended true if the connection is suspended, false otherwise.
+		 */
+		public synchronized void setSuspended(boolean suspended)
+		{
+			this.suspended = suspended;
 		}
 	}
 }

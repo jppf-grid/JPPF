@@ -62,6 +62,10 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 	 * Used for asynchronous channel state transitions.
 	 */
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
+	/**
+	 * Reference to the driver.
+	 */
+	private JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
 	 * Initialize this task queue checker with the specified node server. 
@@ -118,7 +122,7 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 						BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
 						context.setBundle(bundleWrapper);
 						server.transitionSession(channel, NodeTransition.TO_SENDING);
-						JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), new IoSessionWrapper(channel));
+						driver.getJobManager().jobDispatched(context.getBundle(), new IoSessionWrapper(channel));
 						NodeServerState state = (NodeServerState) server.getFactory().getState(context.getState());
 						//channel.setAttribute("transitionStarted", state.startTransition(channel));
 						executor.submit(new ChannelTransitionTask(channel, state));
@@ -163,7 +167,7 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 			if (uuidPath.contains(context.getNodeUuid())) continue;
 			if (rule != null)
 			{
-				JPPFManagementInfo mgtInfo = JPPFDriver.getInstance().getNodeInformation(new IoSessionWrapper(ch));
+				JPPFManagementInfo mgtInfo = driver.getNodeInformation(new IoSessionWrapper(ch));
 				JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
 				if (!rule.accepts(info)) continue;
 			}
@@ -213,7 +217,7 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 	/**
 	 * Transition a session to a new state asynchronously, to avoid overloading of the JobQueueChecker.
 	 */
-	private class ChannelTransitionTask implements Runnable
+	private static class ChannelTransitionTask implements Runnable
 	{
 		/**
 		 * The state to transition to.

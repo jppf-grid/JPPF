@@ -78,6 +78,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * .
 	 */
 	private final TaskQueueChecker taskQueueChecker;
+	/**
+	 * Reference to the driver.
+	 */
+	private static JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
 	 * Initialize this server with a specified port number.
@@ -127,7 +131,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	protected boolean externalStopCondition()
 	{
-		return JPPFDriver.getInstance().isShuttingDown();
+		return driver.isShuttingDown();
 	}
 
 	/**
@@ -137,7 +141,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	public void postAccept(SelectionKey key)
 	{
-		JPPFDriver.getInstance().getStatsManager().newNodeConnection();
+		driver.getStatsManager().newNodeConnection();
 		NodeContext context = (NodeContext) key.attachment();
 		try
 		{
@@ -220,7 +224,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 		{
 			try
 			{
-				JPPFSecurityContext cred = JPPFDriver.getInstance().getCredentials();
+				JPPFSecurityContext cred = driver.getCredentials();
 				SerializationHelper helper = new SerializationHelperImpl();
 				// serializing a null data provider.
 				JPPFBuffer buf = helper.getSerializer().serialize(null);
@@ -231,7 +235,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				JPPFTaskBundle bundle = new JPPFTaskBundle();
 				bundle.setBundleUuid(INITIAL_BUNDLE_UUID);
 				bundle.setRequestUuid("0");
-				bundle.getUuidPath().add(JPPFDriver.getInstance().getUuid());
+				bundle.getUuidPath().add(driver.getUuid());
 				bundle.setTaskCount(0);
 				bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
 				initialBundle = new BundleWrapper(bundle);
@@ -255,11 +259,11 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 		try
 		{
 			channel.close();
-			JPPFDriver.getInstance().getStatsManager().nodeConnectionClosed();
+			driver.getStatsManager().nodeConnectionClosed();
 			if (context.getNodeUuid() != null)
 			{
-				JPPFDriver.getInstance().removeNodeInformation(new ChannelWrapper<SocketChannel>(channel));
-				JPPFDriver.getInstance().getNodeNioServer().removeIdleChannel(channel);
+				driver.removeNodeInformation(new ChannelWrapper<SocketChannel>(channel));
+				driver.getNodeNioServer().removeIdleChannel(channel);
 			}
 		}
 		catch (IOException ignored)
@@ -302,7 +306,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	protected JPPFJobManager getJobManager()
 	{
-		return JPPFDriver.getInstance().getJobManager();
+		return driver.getJobManager();
 	}
 
 	/**

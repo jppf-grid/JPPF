@@ -27,7 +27,6 @@ import java.util.Vector;
 
 import org.apache.commons.logging.*;
 import org.jppf.node.JPPFResourceWrapper;
-import org.jppf.server.JPPFDriver;
 import org.jppf.utils.JPPFConfiguration;
 
 /**
@@ -86,7 +85,7 @@ public class DefiningChannelTypeState extends ClassServerState
 				context.setMessage(null);
 				if (managementEnabled)
 				{
-					resource.setManagementId(JPPFDriver.getInstance().getJmxServer().getId());
+					resource.setManagementId(driver.getJmxServer().getId());
 				}
 				context.serializeResource();
 				return TO_SENDING_INITIAL_PROVIDER_RESPONSE;
@@ -96,7 +95,7 @@ public class DefiningChannelTypeState extends ClassServerState
 				if (debugEnabled) log.debug("initiating node: " + getRemoteHost(channel));
 				// send the uuid of this driver to the node or node peer.
 				resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
-				resource.setProviderUuid(JPPFDriver.getInstance().getUuid());
+				resource.setProviderUuid(driver.getUuid());
 				context.serializeResource();
 				return TO_SENDING_INITIAL_NODE_RESPONSE;
 			}

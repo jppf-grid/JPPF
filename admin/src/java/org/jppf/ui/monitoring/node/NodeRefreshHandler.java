@@ -92,8 +92,9 @@ public class NodeRefreshHandler
 
 		// handle drivers that were removed
 		List<String> driversToProcess = new ArrayList<String>();
-		for (String name: connectionMap.keySet())
+		for (Map.Entry<String, JPPFClientConnection> entry: connectionMap.entrySet())
 		{
+			String name = entry.getKey();
 			if (!map.containsKey(name)) driversToProcess.add(name);
 			else refreshNodes(name);
 		}
@@ -101,8 +102,9 @@ public class NodeRefreshHandler
 
 		// handle drivers that were added
 		driversToProcess = new ArrayList<String>();
-		for (String name: map.keySet())
+		for (Map.Entry<String, JPPFClientConnection> entry: map.entrySet())
 		{
+			String name = entry.getKey();
 			if (!connectionMap.containsKey(name)) driversToProcess.add(name);
 		}
 		for (String name: driversToProcess) addDriver(map.get(name));

@@ -31,7 +31,7 @@ public class QueueEvent extends EventObject
 	/**
 	 * Represents part or the totality of a job that was submitted.
 	 */
-	private BundleWrapper bundleWrapper = null;
+	private transient BundleWrapper bundleWrapper = null;
 	/**
 	 * Determines if the event is a requeued bundle, following a node failure for instance.
 	 */

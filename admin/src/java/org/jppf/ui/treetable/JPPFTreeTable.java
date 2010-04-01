@@ -48,7 +48,6 @@ public class JPPFTreeTable extends JTreeTable
 	public TreePath getPathForRow(int n)
 	{
 		//JPPFNodeTreeTableModel model = (JPPFNodeTreeTableModel) getModel();
-		Object o = getModel();
 		TreeModel model = (TreeModel) getTree().getModel();
 	  TreeNode[] path = ((DefaultMutableTreeNode) model.getRoot()).getPath();
 		return new TreePath(path);

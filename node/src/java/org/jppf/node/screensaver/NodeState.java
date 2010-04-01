@@ -152,7 +152,6 @@ public class NodeState implements NodeListener
 	 */
 	public void eventOccurred(NodeEvent event)
 	{
-		NodeEventType type = event.getType();
 		switch (event.getType())
 		{
 			case START_CONNECT:

@@ -53,6 +53,7 @@ public class TimeoutTimerTask implements Runnable
 	 */
 	public TimeoutTimerTask(NodeExecutionManager executionManager, long number, JPPFTask task)
 	{
+		this.executionManager = executionManager;
 		this.number = number;
 		this.future = executionManager.getFutureFromNumber(number);
 		this.task = task;

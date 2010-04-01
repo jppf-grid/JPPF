@@ -40,10 +40,6 @@ public class JobEventTask implements Runnable
 	 */
 	private JobEventType eventType = null;
 	/**
-	 * The id of the job source of the event.
-	 */
-	private String jobId = null;
-	/**
 	 * The node, if any, for which the event happened.
 	 */
 	private ChannelWrapper channel = null;

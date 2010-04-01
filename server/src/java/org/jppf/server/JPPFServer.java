@@ -56,6 +56,10 @@ public abstract class JPPFServer extends Thread
 	 * The list of connections accepted by this server.
 	 */
 	protected List<JPPFConnection> connections = new ArrayList<JPPFConnection>();
+	/**
+	 * Reference to the driver.
+	 */
+	private JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
 	 * Initialize this socket server with a specified execution service and port number.
@@ -78,10 +82,10 @@ public abstract class JPPFServer extends Thread
 	{
 		try
 		{
-			while (!isStopped() && !JPPFDriver.getInstance().isShuttingDown())
+			while (!isStopped() && !driver.isShuttingDown())
 			{
 				Socket socket = server.accept();
-				if (JPPFDriver.getInstance().isShuttingDown())
+				if (driver.isShuttingDown())
 				{
 					socket.close();
 					break;

@@ -68,7 +68,7 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	/**
 	 * The the returned file length for directories.
 	 */
-	public static final Integer ZERO = new Integer(0);
+	public static final Integer ZERO = Integer.valueOf(0);
 
 	/**
 	 * Default constructor.
@@ -154,7 +154,7 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 				case 0:
 					return file.getName();
 				case 1:
-					return file.isFile() ? new Integer((int) file.length()) : ZERO;
+					return file.isFile() ? Integer.valueOf((int) file.length()) : ZERO;
 				case 2:
 					return file.isFile() ? "File" : "Directory";
 				case 3:

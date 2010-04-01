@@ -309,7 +309,7 @@ public class JPPFDriver
 	 * Get the singleton instance of the JPPFDriver.
 	 * @return a <code>JPPFDriver</code> instance.
 	 */
-	public static JPPFDriver getInstance()
+	public synchronized static JPPFDriver getInstance()
 	{
 		if (instance == null) instance = new JPPFDriver();
 		return instance;

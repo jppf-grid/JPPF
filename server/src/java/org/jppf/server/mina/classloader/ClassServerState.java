@@ -20,6 +20,7 @@ package org.jppf.server.mina.classloader;
 
 import org.apache.commons.logging.*;
 import org.apache.mina.core.session.IoSession;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.mina.*;
 import org.jppf.server.nio.classloader.ClassTransition;
 
@@ -37,6 +38,10 @@ public abstract class ClassServerState extends MinaState
 	 * Determines whether DEBUG logging level is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Reference to the driver.
+	 */
+	protected JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
 	 * Initialize this state.

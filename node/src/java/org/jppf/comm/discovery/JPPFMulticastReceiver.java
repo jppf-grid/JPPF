@@ -123,7 +123,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 				for (Receiver r: receivers) r.start();
 			}
 			if (!hasConnectionInfo()) wait(timeout);
-			else Thread.sleep(50);
+			else wait(50);
 			info = getMostRecent();
 		}
 		catch(Exception e)

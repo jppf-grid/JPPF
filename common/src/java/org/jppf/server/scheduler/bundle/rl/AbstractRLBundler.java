@@ -103,7 +103,6 @@ public abstract class AbstractRLBundler extends AbstractBundler
 
 		double d = dataHolder.getPreviousMean() - dataHolder.getMean();
 		double threshold = ((RLProfile) profile).getPerformanceVariationThreshold() * dataHolder.getPreviousMean();
-		int n = bundleSize - prevBundleSize;
 		prevBundleSize = bundleSize;
 		if (d < -threshold)
 		{
@@ -147,7 +146,6 @@ public abstract class AbstractRLBundler extends AbstractBundler
 
 		double d = dataHolder.getPreviousMean() - dataHolder.getMean();
 		double threshold = ((RLProfile) profile).getPerformanceVariationThreshold() * dataHolder.getPreviousMean();
-		int n = bundleSize - prevBundleSize;
 		prevBundleSize = bundleSize;
 		if (d < -threshold)
 		{

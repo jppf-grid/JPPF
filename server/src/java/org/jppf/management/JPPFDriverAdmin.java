@@ -44,6 +44,10 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * Base name used for localization lookups";
 	 */
 	private static final String I18N_BASE = "org.jppf.server.i18n.messages";
+	/**
+	 * Reference to the driver.
+	 */
+	private transient JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
 	 * Request the JMX connection information for all the nodes attached to the server.
@@ -55,7 +59,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		try
 		{
 			List<JPPFManagementInfo> list = new ArrayList<JPPFManagementInfo>();
-			list.addAll(JPPFDriver.getInstance().getNodeInformationMap().values());
+			list.addAll(driver.getNodeInformationMap().values());
 			return list;
 		}
 		catch(Exception e)
@@ -75,7 +79,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	{
 		try
 		{
-			return JPPFDriver.getInstance().getStatsUpdater().getStats();
+			return driver.getStatsUpdater().getStats();
 		}
 		catch(Exception e)
 		{
@@ -92,29 +96,16 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @throws Exception if an error occurred while updating the settings.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#changeLoadBalancerSettings(java.lang.String, java.util.Map)
 	 */
-	public String changeLoadBalancerSettings(String algorithm, Map parameters) throws Exception
+	public String changeLoadBalancerSettings(String algorithm, Map<Object, Object> parameters) throws Exception
 	{
 		try
 		{
 			if (algorithm == null) return "Error: no algorithm specified (null value)";
-			JPPFBundlerFactory factory = JPPFDriver.getInstance().getBundlerFactory();
+			JPPFBundlerFactory factory = driver.getBundlerFactory();
 			if (!factory.getBundlerProviderNames().contains(algorithm)) return "Error: unknown algorithm '" + algorithm + "'";
-			TypedProperties config = JPPFConfiguration.getProperties();
-			config.setProperty("jppf.load.balancing.algorithm", algorithm);
-			config.setProperty("jppf.load.balancing.strategy", "jppf");
-			String prefix = "strategy.jppf.";
-			for (Object key: parameters.keySet())
-			{
-				if (key instanceof String)
-				{
-					String name = (String) key;
-					String value = (String) parameters.get(key);
-					config.setProperty(prefix + name, value);
-				}
-			}
 			TypedProperties props = new TypedProperties(parameters);
 			Bundler bundler = factory.createBundler(algorithm, props);
-			JPPFDriver.getInstance().setBundler(bundler);
+			driver.setBundler(bundler);
 			//return new JPPFManagementResponse(localize((manual ? "manual" : "automatic") + ".settings.changed"), null);
 			return "Load-balancing settings updated";
 		}
@@ -138,7 +129,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		try
 		{
 			boolean restart = restartDelay >= 0;
-			JPPFDriver.getInstance().initiateShutdownRestart(shutdownDelay, restart, restartDelay);
+			driver.initiateShutdownRestart(shutdownDelay, restart, restartDelay);
 			return localize("request.acknowledged");
 		}
 		catch(Exception e)
@@ -163,7 +154,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		String profileName = props.getString("jppf.load.balancing.strategy", null);
 		// for compatibility with v1.x configuration files
 		if (profileName == null) profileName = props.getString("task.bundle.autotuned.strategy", "jppf");
-		JPPFBundlerFactory factory = JPPFDriver.getInstance().getBundlerFactory();
+		JPPFBundlerFactory factory = driver.getBundlerFactory();
 		TypedProperties params = factory.convertJPPFConfiguration(profileName, props);
 		return new LoadBalancingInformation(algorithm, params, factory.getBundlerProviderNames());
 	}

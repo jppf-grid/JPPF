@@ -25,7 +25,6 @@ import java.util.List;
 import org.apache.commons.logging.*;
 import org.apache.mina.core.session.IoSession;
 import org.jppf.node.JPPFResourceWrapper;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.mina.MinaContext;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
@@ -68,7 +67,6 @@ public class WaitingNodeRequestState extends ClassServerState
 		TraversalList<String> uuidPath = resource.getUuidPath();
 		boolean dynamic = resource.isDynamic();
 		String name = resource.getName();
-		byte[] callable = resource.getCallable();
 		byte[] b = null;
 		String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null; 
 		ByteTransitionPair p = processNonDynamic(session, resource);
@@ -88,7 +86,7 @@ public class WaitingNodeRequestState extends ClassServerState
 				if (p.second() != TO_IDLE_NODE) session.write(context.getMessage());
 				return;
 			}
-			b = p.first();
+			//b = p.first();
 		}
 		if (debugEnabled) log.debug("resource [" + name + "] not found for node: session " + session.getId());
 		resource.setDefinition(null);
@@ -138,7 +136,7 @@ public class WaitingNodeRequestState extends ClassServerState
 		TraversalList<String> uuidPath = resource.getUuidPath();
 
 		String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null; 
-		if (((uuid == null) || uuid.equals(JPPFDriver.getInstance().getUuid())) && (resource.getCallable() == null))
+		if (((uuid == null) || uuid.equals(driver.getUuid())) && (resource.getCallable() == null))
 		{
 			if (resource.getData("multiple") != null)
 			{
@@ -153,7 +151,7 @@ public class WaitingNodeRequestState extends ClassServerState
 			}
 			else
 			{
-				if ((uuid == null) && !resource.isDynamic()) uuid = JPPFDriver.getInstance().getUuid();
+				if ((uuid == null) && !resource.isDynamic()) uuid = driver.getUuid();
 				if (uuid != null) b = server.getCacheContent(uuid, name);
 				boolean alreadyInCache = (b != null);
 				if (debugEnabled) log.debug("resource " + (alreadyInCache ? "" : "not ") + "found [" + name + "] in cache for node: session" + session.getId());
@@ -161,7 +159,7 @@ public class WaitingNodeRequestState extends ClassServerState
 				if ((b != null) || !resource.isDynamic())
 				{
 					if (debugEnabled) log.debug("resource " + (b == null ? "not " : "") + "found [" + name + "] in the driver's classpath for node: session " + session.getId());
-					if ((b != null) && !alreadyInCache) server.setCacheContent(JPPFDriver.getInstance().getUuid(), name, b);
+					if ((b != null) && !alreadyInCache) server.setCacheContent(driver.getUuid(), name, b);
 					resource.setDefinition(b);
 					context.serializeResource();
 					t = TO_SENDING_NODE_RESPONSE;
@@ -222,7 +220,7 @@ public class WaitingNodeRequestState extends ClassServerState
 	/**
 	 * A pair of array of bytes and class transition.
 	 */
-	private class ByteTransitionPair extends Pair<byte[], ClassTransition>
+	private static class ByteTransitionPair extends Pair<byte[], ClassTransition>
 	{
 		/**
 		 * Initialize this pair with the specified array of bytes and class transition.

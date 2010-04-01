@@ -300,7 +300,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	 * Get the number of data snapshots kept in memory.
 	 * @return the rollover position as an int value.
 	 */
-	public int getRolloverPosition()
+	public synchronized int getRolloverPosition()
 	{
 		return rolloverPosition;
 	}
@@ -556,7 +556,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 			if (currentConnection == null)
 			{
 				currentConnection = (JPPFClientConnectionImpl) c;
-				if (box != null) box.setSelectedItem(c);
+				box.setSelectedItem(c);
 			}
 		}
 	}

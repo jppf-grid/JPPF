@@ -27,7 +27,6 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.management.JMXNodeConnectionWrapper;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.treetable.JPPFTreeTable;
@@ -136,7 +135,6 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 		restart.setIcon(GuiUtils.loadIcon(RESTART_ICON));
 		if (singleSelection)
 		{
-			JMXNodeConnectionWrapper connection = (JMXNodeConnectionWrapper) data[0].getJmxWrapper();
 			if (data[0].getNodeState() != null)
 			{
 				Set<String> idSet = data[0].getNodeState().getAllTaskIds();

@@ -24,6 +24,7 @@ import static org.jppf.utils.StringUtils.getRemoteHost;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 
 /**
@@ -44,6 +45,10 @@ public abstract class ClassServerState extends NioState<ClassTransition>
 	 * The server that handles this state.
 	 */
 	protected ClassNioServer server = null;
+	/**
+	 * Reference to the driver.
+	 */
+	protected JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
 	 * Initialize this state.

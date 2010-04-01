@@ -48,9 +48,9 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 */
 	private JPPFJobManager jobManager = null;
 	/**
-	 * Reference to the driver's job manager.
+	 * Reference to the driver.
 	 */
-	private JPPFDriver driver = null;
+	private JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
 	 * Initialize this MBean.
@@ -176,7 +176,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		NodeJobInformation[] result = new NodeJobInformation[nodes.size()];
 		for (int i=0; i<nodes.size(); i++)
 		{
-			JPPFManagementInfo nodeInfo = getDriver().getNodeInformation(nodes.get(i).first());
+			JPPFManagementInfo nodeInfo = driver.getNodeInformation(nodes.get(i).first());
 			JPPFTaskBundle bundle = nodes.get(i).second().getBundle();
 			Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
 			JobInformation jobInfo = new JobInformation(jobId, bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getJobSLA().getPriority(),
@@ -210,18 +210,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 */
 	private JPPFJobManager getJobManager()
 	{
-		if (jobManager == null) jobManager = getDriver().getJobManager();
+		if (jobManager == null) jobManager = driver.getJobManager();
 		return jobManager;
-	}
-
-	/**
-	 * Get a reference to the driver.
-	 * @return a <code>JPPFDriver</code> instance.
-	 */
-	private JPPFDriver getDriver()
-	{
-		if (driver == null) driver = JPPFDriver.getInstance();
-		return driver;
 	}
 
 	/**

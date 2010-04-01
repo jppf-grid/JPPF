@@ -258,7 +258,6 @@ public class JPPFClassLoader extends URLClassLoader implements JPPFClassLoaderMB
 	private JPPFResourceWrapper loadResourceData(Map<String, Object> map, boolean asResource) throws ClassNotFoundException
 	{
 		JPPFResourceWrapper resource = null;
-		byte[] b = null;
 		try
 		{
 			if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + "]");
@@ -316,11 +315,11 @@ public class JPPFClassLoader extends URLClassLoader implements JPPFClassLoaderMB
 		try
 		{
 			lock.lock();
-			if (debugEnabled) log.debug("requesting remote computation of [" + callable + "], requestUuid = " + requestUuid);
+			if (debugEnabled) log.debug("requesting remote computation, requestUuid = " + requestUuid);
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("callable", callable);
 			byte[] b = loadRemoteData(map, false).getCallable();
-			if (debugEnabled) log.debug("remote definition for resource [" + callable + "] "+ (b==null ? "not " : "") + "found");
+			if (debugEnabled) log.debug("remote definition for collable resource "+ (b==null ? "not " : "") + "found");
 			return b;
 		}
 		finally
@@ -486,17 +485,26 @@ public class JPPFClassLoader extends URLClassLoader implements JPPFClassLoaderMB
 	 */
 	public void close()
 	{
-		if (socketInitializer != null) socketInitializer.close();
-		if (socketClient != null)
+		lock.lock();
+		try
 		{
-			try
+			if (socketInitializer != null) socketInitializer.close();
+			if (socketClient != null)
 			{
-				socketClient.close();
+				try
+				{
+					socketClient.close();
+				}
+				catch(Exception e)
+				{
+					if (debugEnabled) log.debug(e.getMessage(), e);
+				}
+				socketClient = null;
 			}
-			catch(Exception ignore)
-			{
-			}
-			socketClient = null;
+		}
+		finally
+		{
+			lock.unlock();
 		}
 	}
 

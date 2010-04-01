@@ -25,11 +25,10 @@ import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.management.*;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * This class implements the state of receiving information from the node as a
@@ -94,7 +93,7 @@ public class WaitInitialBundleState extends NodeServerState
 					int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM);
 					JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE);
 					if (systemInfo != null) info.setSystemInfo(systemInfo);
-					JPPFDriver.getInstance().addNodeInformation(new ChannelWrapper<SelectableChannel>(channel), info);
+					driver.addNodeInformation(new ChannelWrapper<SelectableChannel>(channel), info);
 				}
 			}
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.

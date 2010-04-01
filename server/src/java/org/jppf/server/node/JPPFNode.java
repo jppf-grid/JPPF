@@ -277,7 +277,10 @@ public class JPPFNode extends AbstractMonitoredNode
 				{
 					if (jmxServer != null) jmxServer.stop();
 				}
-				catch(Exception ignore) { }
+				catch(Exception e2)
+				{
+					log.error("Error stopping the JMX server", e2);
+				}
 				jmxServer = null;
 				log.error("Error creating the JMX server", e);
 			}
@@ -522,11 +525,14 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	public JMXServerImpl getJmxServer() throws Exception
 	{
-		if ((jmxServer == null) || jmxServer.isStopped())
+		synchronized(this)
 		{
-			jmxServer = new JMXServerImpl(JPPFAdminMBean.NODE_SUFFIX);
-			jmxServer.start(getClass().getClassLoader());
-			registerProviderMBeans();
+			if ((jmxServer == null) || jmxServer.isStopped())
+			{
+				jmxServer = new JMXServerImpl(JPPFAdminMBean.NODE_SUFFIX);
+				jmxServer.start(getClass().getClassLoader());
+				registerProviderMBeans();
+			}
 		}
 		return jmxServer;
 	}

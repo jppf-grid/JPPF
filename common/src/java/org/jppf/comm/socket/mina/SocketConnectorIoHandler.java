@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.*;
 
 import org.apache.commons.logging.*;
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.*;
 import org.jppf.JPPFException;
@@ -139,7 +138,7 @@ public class SocketConnectorIoHandler extends IoHandlerAdapter
 		if (debugEnabled) log.debug("about to write buffer: " + buffer);
 		synchronized(writeLock)
 		{
-			WriteFuture future = session.write(buffer);
+			session.write(buffer);
 			if (!writeComplete.get()) writeLock.wait();
 		}
 		if (debugEnabled) log.debug("len = " + len + ", count = " + buffer.position() + ", buffer = " + buffer);
