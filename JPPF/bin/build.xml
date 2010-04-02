@@ -595,21 +595,21 @@
 	<!-- It must point to the root installation directory of findbugs              -->
 	<!-- ========================================================================= -->
 
-	<taskdef onerror="ignore" name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
-		<classpath>
-			<fileset dir="${findbugs.home}/lib" includes="*.jar"/>
-		</classpath>
-	</taskdef>
-
 	<target name="findbugs">
 		<available file="${findbugs.home}/lib/findbugs-ant.jar" property="findbugs.present"/>
 		<antcall target="findbugs.package"/>
 	</target>
 
 	<target name="findbugs.package" description="run findbugs on all modules" if="findbugs.present">
+		<path id="findbugs.classpath">
+			<fileset dir="${findbugs.home}/lib" includes="*.jar"/>
+		</path>
+		<taskdef onerror="ignore" name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="findbugs.classpath"/>
+
 		<property name="output.type" value="xml"/>
 		<delete dir="${build}/findbugs" quiet="true"/>
 		<mkdir dir="${build}/findbugs"/>
+
 		<antcall target="findbugs.module"><param name="path" value="node"/></antcall>
 		<antcall target="findbugs.module"><param name="path" value="common"/></antcall>
 		<antcall target="findbugs.module"><param name="path" value="client"/></antcall>
