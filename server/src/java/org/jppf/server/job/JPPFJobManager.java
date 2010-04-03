@@ -70,7 +70,9 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 	 */
 	public synchronized List<ChannelBundlePair> getNodesForJob(String jobId)
 	{
-		return Collections.unmodifiableList(jobMap.get(jobId));
+		if (jobId == null) return null;
+		List<ChannelBundlePair> list = jobMap.get(jobId);
+		return list == null ? null : Collections.unmodifiableList(list);
 	}
 
 	/**

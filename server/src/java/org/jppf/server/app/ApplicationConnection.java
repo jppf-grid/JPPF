@@ -72,6 +72,10 @@ public class ApplicationConnection extends JPPFConnection
 	 * Reference to the driver.
 	 */
 	private JPPFDriver driver = JPPFDriver.getInstance();
+	/**
+	 * The id of the last job submitted via this connection.
+	 */
+	private String currentJobId = null;
 
 	/**
 	 * Initialize this connection with an open socket connection to a remote client.
@@ -145,6 +149,7 @@ public class ApplicationConnection extends JPPFConnection
 
 		header.getUuidPath().add(driver.getUuid());
 		header.setCompletionListener(resultSender);
+		currentJobId = (String) header.getParameter(BundleParameter.JOB_ID);
 		JPPFDriver.getQueue().addBundle(headerWrapper);
 		if (count > 0)
 		{
@@ -163,6 +168,10 @@ public class ApplicationConnection extends JPPFConnection
 	 */
 	public void close()
 	{
+		if (currentJobId != null)
+		{
+			JPPFDriver.getInstance().getJobManager().jobEnded(headerWrapper);
+		}
 		super.close();
 		driver.getStatsManager().clientConnectionClosed();
 	}
