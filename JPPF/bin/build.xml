@@ -701,7 +701,7 @@
 		<property name="user.guide.file" value="${build}/JPPF-${version.number}-User-Guide.zip"/>
 		<delete file="${user.guide.file}" quiet="true"/>
 		<zip destfile="${user.guide.file}">
-			<zipfileset dir="${docs}" includes="JPPF-*.pdf" prefix="JPPF-${version.number}-User-Guide"/>
+			<zipfileset dir="${home}/documents" includes="JPPF-*.pdf" prefix="JPPF-${version.number}-User-Guide"/>
 		</zip>
 	</target>
 
