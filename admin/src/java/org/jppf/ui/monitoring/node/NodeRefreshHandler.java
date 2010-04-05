@@ -98,7 +98,11 @@ public class NodeRefreshHandler
 			if (!map.containsKey(name)) driversToProcess.add(name);
 			else refreshNodes(name);
 		}
-		for (String name: driversToProcess) removeDriver(name);
+		for (String name: driversToProcess)
+		{
+			if (debugEnabled) log.debug("removing driver " + name); 
+			removeDriver(name);
+		}
 
 		// handle drivers that were added
 		driversToProcess = new ArrayList<String>();
@@ -107,7 +111,11 @@ public class NodeRefreshHandler
 			String name = entry.getKey();
 			if (!connectionMap.containsKey(name)) driversToProcess.add(name);
 		}
-		for (String name: driversToProcess) addDriver(map.get(name));
+		for (String name: driversToProcess)
+		{
+			if (debugEnabled) log.debug("adding driver " + name); 
+			addDriver(map.get(name));
+		}
 		nodeDataPanel.refreshNodeStates();
 		nodeDataPanel.getTreeTable().invalidate();
 		nodeDataPanel.getTreeTable().repaint();
@@ -149,13 +157,21 @@ public class NodeRefreshHandler
 		{
 			if (!actualMap.containsKey(name)) nodesToProcess.add(name);
 		}
-		for (String name: nodesToProcess) nodeDataPanel.nodeRemoved(driverName, name);
+		for (String name: nodesToProcess)
+		{
+			if (debugEnabled) log.debug("removing node " + name); 
+			nodeDataPanel.nodeRemoved(driverName, name);
+		}
 		nodesToProcess = new ArrayList<String>();
 		for (String name: actualMap.keySet())
 		{
 			if (!panelNames.contains(name)) nodesToProcess.add(name);
 		}
-		for (String name: nodesToProcess) nodeDataPanel.nodeAdded(driverName, actualMap.get(name));
+		for (String name: nodesToProcess)
+		{
+			if (debugEnabled) log.debug("adding node " + name); 
+			nodeDataPanel.nodeAdded(driverName, actualMap.get(name));
+		}
 	}
 
 	/**

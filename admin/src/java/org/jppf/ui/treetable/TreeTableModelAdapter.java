@@ -285,13 +285,18 @@ public class TreeTableModelAdapter extends AbstractTableModel
 	 */
 	protected String dumpTreePaths(TreePath[] paths)
 	{
-		StringBuilder sb = new StringBuilder("selected paths = [");
-		for (int i=0; i<paths.length; i++)
+		StringBuilder sb = new StringBuilder();
+		if (paths == null) sb.append("null");
+		else
 		{
-			if (i > 0) sb.append(", ");
-			sb.append(paths[i]);
+			sb.append("[");
+			for (int i=0; i<paths.length; i++)
+			{
+				if (i > 0) sb.append(", ");
+				sb.append(paths[i]);
+			}
+			sb.append("]");
 		}
-		sb.append("]");
 		return sb.toString();
 	}
 }
