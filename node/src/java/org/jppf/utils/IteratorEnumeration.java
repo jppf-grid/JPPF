@@ -32,7 +32,7 @@ public class IteratorEnumeration<T> implements Enumeration<T>
 
 	/**
 	 * Initialize this enumeration with the specified iterator.
-	 * @param iterator - the iterator to wrap as an enumeration.
+	 * @param iterator the iterator to wrap as an enumeration.
 	 */
 	public IteratorEnumeration(Iterator<T> iterator)
 	{
@@ -41,7 +41,7 @@ public class IteratorEnumeration<T> implements Enumeration<T>
 
 	/**
    * Tests if this enumeration contains more elements.
-   * @return  true if and only if this enumeration object contains at least one more element to provide, false otherwise.
+   * @return true if and only if this enumeration object contains at least one more element to provide, false otherwise.
 	 * @see java.util.Enumeration#hasMoreElements()
 	 */
 	public boolean hasMoreElements()
@@ -52,7 +52,7 @@ public class IteratorEnumeration<T> implements Enumeration<T>
 	/**
    * Returns the next element of this enumeration if this enumeration object has at least one more element to provide.
    * @return the next element of this enumeration.
-   * @exception  NoSuchElementException if no more elements exist.
+   * @exception NoSuchElementException if no more elements exist.
 	 * @see java.util.Enumeration#nextElement()
 	 */
 	public T nextElement()

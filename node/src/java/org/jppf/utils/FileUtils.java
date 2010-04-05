@@ -197,7 +197,7 @@ public final class FileUtils
 	/**
 	 * Split a file into multiple files whose size is as close as possible to the specified split size.
 	 * @param file the etxt file to split.
-	 * @param splitSize the maximum file of each split file.
+	 * @param splitSize the maximum number of lines of each resulting file.
 	 * @throws IOException if an IO error occurs.
 	 */
 	public static void splitTextFile(String file, int splitSize) throws IOException
@@ -277,9 +277,8 @@ public final class FileUtils
 	 */
 	public static byte[] getInputStreamAsByte(InputStream is) throws IOException
 	{
-		ByteBuffer tmp = ByteBuffer.wrap(new byte[TEMP_BUFFER_SIZE]);
-		byte[] buffer = tmp.array();
-		byte[] b = null;
+		byte[] buffer = new byte[TEMP_BUFFER_SIZE];
+		byte[] result = null;
 		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		boolean end = false;
 		while (!end)
@@ -290,9 +289,9 @@ public final class FileUtils
 		}
 		is.close();
 		baos.flush();
-		b = baos.toByteArray();
+		result = baos.toByteArray();
 		baos.close();
-		return b;
+		return result;
 	}
 
 	/**

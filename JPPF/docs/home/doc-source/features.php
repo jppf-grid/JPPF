@@ -1,7 +1,7 @@
 <?php $currentPage="Features" ?>
 $template{name="about-page-header" title="Features"}$
 
-<h1>JPPF 2.0 features</h1>
+<h1>JPPF 2.1 features</h1>
 
 <h3>Ease of use</h3>
 <ul>
@@ -100,13 +100,17 @@ $template{name="about-page-header" title="Features"}$
 
 <h3>Full fledged samples</h3>
 <ul>
-	<li>Mandelbrot / Julia set fractals generation</li>
-	<li>Protein and DNA sequence alignment</li>
-	<li>Distributed web crawler and search engine</li>
-	<li>Pluggable MBeans sample</li>
-	<li>Network data encryption sample</li>
-	<li>Customized server and node initialization sample</li>
-	<li>Basic dense matrix multiplication parallelization sample</li>
+	<li><a href="samples-pack/Fractals/Readme.html">Mandelbrot / Julia set fractals generation</a></li>
+	<li><a href="samples-pack/SequenceAlignment/Readme.html">Protein and DNA sequence alignment</a></li>
+	<li><a href="samples-pack/WebSearchEngine/Readme.html">Distributed web crawler and search engine</a></li>
+	<li><a href="samples-pack/TomcatPort/Readme.html">Tomcat 5.5/6.0 port</a></li>
+	<li><a href="samples-pack/CustomMBeans/Readme.html">Pluggable management beans sample</a></li>
+	<li><a href="samples-pack/DataEncryption/Readme.html">Network data encryption sample</a></li>
+	<li><a href="samples-pack/StartupClasses/Readme.html">Customized server and node initialization sample</a></li>
+	<li><a href="samples-pack/MatrixMultiplication/Readme.html">Basic dense matrix multiplication parallelization sample</a></li>
+	<li><a href="samples-pack/DataDependency/Readme.html">Simulation of large portfolio updates</a></li>
+	<li><a href="samples-pack/NodeTray/Readme.html">JPPF node health monitor in the system tray</a></li>
+	<li><a href="samples-pack/CustomLoadBalancer/Readme.html">An example of a sophisticated load-balancer implementation</a></li>
 </ul>
 
 $template{name="about-page-footer"}$

@@ -158,7 +158,7 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="release_notes.php?version=2.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
+											<a href="release_notes.php?version=2.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -376,6 +376,9 @@
 			<tr><td colspan="*" style="height: 10px"></td></tr>
 			</tr>
 			<tr>
+				<td align="center" style="font-size: 9pt; color: #6D78B6">
+					<a href="http://sourceforge.net/donate/index.php?group_id=135654"><img src="http://images.sourceforge.net/images/project-support.jpg" width="88" height="32" border="0" alt="Support This Project" /></a>
+				</td>
 				<td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2010 JPPF.org</td>
 				<td align="right">
 					<a href="http://www.parallel-matters.com"><img src="/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;

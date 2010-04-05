@@ -81,7 +81,7 @@ public class JPPFDataTransformFactory
 	 * @param offset the position to start a in the data.
 	 * @param len the number of bytes to process, starting at the offset, in the data.
 	 * @return the result of the transformation as an array of bytes.
-	 * @throws Exception if any error occurs while tranforming the data.
+	 * @throws Exception if any error occurs while transforming the data.
 	 */
 	public static byte[] transform(JPPFDataTransform transform, boolean normal, byte[] data, int offset, int len) throws Exception
 	{
@@ -98,7 +98,7 @@ public class JPPFDataTransformFactory
 	 * @param normal true to wrap the data, false to unwrap it.
 	 * @param data the data to transform.
 	 * @return the result of the transformation as an array of bytes.
-	 * @throws Exception if any error occurs while tranforming the data.
+	 * @throws Exception if any error occurs while transforming the data.
 	 */
 	public static byte[] transform(JPPFDataTransform transform, boolean normal, byte[] data) throws Exception
 	{
@@ -112,6 +112,7 @@ public class JPPFDataTransformFactory
 	 * @param offset the position to start a in the data.
 	 * @param len the number of bytes to process, starting at the offset, in the data.
 	 * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
+	 * @throws Exception if any error occurs while transforming the data.
 	 * @throws Exception if any error occurs while tranforming the data.
 	 */
 	public static byte[] transform(boolean normal, byte[] data, int offset, int len) throws Exception
@@ -125,7 +126,7 @@ public class JPPFDataTransformFactory
 	 * @param normal true to wrap the data, false to unwrap it.
 	 * @param data the data to transform.
 	 * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
-	 * @throws Exception if any error occurs while tranforming the data.
+	 * @throws Exception if any error occurs while transforming the data.
 	 */
 	public static byte[] transform(boolean normal, byte[] data) throws Exception
 	{

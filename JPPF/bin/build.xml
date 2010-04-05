@@ -142,9 +142,9 @@
 	<target name="rebuild" depends="clean, init, compile, jar"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
-		depends="clean.deploy, rebuild, javadoc, init.deploy, jca, package, runtime, samples.pack, jppf.quick.start, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer"/>
+		depends="clean.deploy, rebuild, javadoc, init.deploy, jca, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer"/>
 	<target name="deploy.nojavadoc"
-		depends="clean.deploy, rebuild,          init.deploy, jca, package, runtime, samples.pack, jppf.quick.start, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer"/>
+		depends="clean.deploy, rebuild,          init.deploy, jca, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer"/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
@@ -235,53 +235,12 @@
 				<include name="CustomLoadBalancer/**/*.properties"/>
 				<include name="**/*.html"/>
 				<include name="shared/images/*.*"/>
-				<include name="NodeTray/images/*.*"/>
+				<include name="DataDependency/images/*.gif"/>
+				<include name="NodeTray/images/*.gif"/>
 			</fileset>
 		</copy>
 		<move file="${home}/samples-pack/samples-pack-Readme.html" tofile="${home}/samples-pack/index.html"/>
 		<delete><fileset dir="${samples-pack}/CustomLoadBalancer" includes="**/*.java.html"/></delete>
-  </target>
-
-	<!-- ========================================================================= -->
-	<!--                      Generate the Quick Start Guide                       -->
-	<!-- ========================================================================= -->
-
-	<target name="jppf.quick.start" description="Generate the JPPF Quick Start Guide"
-		depends="init, build" if="jppfQuickStart.present">
-		<copy todir="${jppfQuickStart}/lib">
-			<fileset dir="${build}">
-				<include name="jppf-client.jar"/>
-				<include name="jppf-common*.jar"/>
-			</fileset>
-		</copy>
-		<ant antfile="${jppfQuickStart}/build.xml" target="compile" inheritall="false"/>
-		<echo message="quick start destination: ${jppfQuickStart}/docs"/>
-		<antcall target="doc.gen">
-			<param name="source" value="${home}/doc-source/quickstart/"/>
-			<param name="dest" value="${jppfQuickStart}/docs/"/>
-			<param name="templates" value="${home}/templates/quickstart/"/>
-		</antcall>
-		<property name="QuickStart.prefix" value="${app.ver}-Quick-Start"/>
-		<property name="QuickStart.file" value="${build}/${QuickStart.prefix}.zip"/>
-		<delete file="QuickStart.file" quiet="true"/>
-		<zip destfile="${QuickStart.file}">
-			<zipfileset dir="${jppfQuickStart}" prefix="${QuickStart.prefix}">
-				<exclude name="**/*.log"/>
-				<exclude name="**/doc-source/**/*.*"/>
-				<exclude name="**/templates/**/*.*"/>
-			</zipfileset>
-		</zip>
-	  <delete dir="${home}/JPPFQuickStart" quiet="true"/>
- 		<mkdir dir="${home}/JPPFQuickStart"/>
-		<copy todir="${home}/JPPFQuickStart">
-			<fileset dir="${jppfQuickStart}">
-				<exclude name="**/*.log"/>
-				<exclude name="**/doc-source/**/*.*"/>
-				<exclude name="**/templates/**/*.*"/>
-			</fileset>
-		</copy>
-		<copy toDir="${home}/JPPFQuickStart/docs" file="${home}/jppf_header.php"/>
-		<copy toDir="${home}/JPPFQuickStart/docs" file="${home}/jppf.css"/>
   </target>
 
 	<!-- ========================================================================= -->
@@ -537,14 +496,13 @@
 	<!-- It must point to the root installation directory of IzPack                -->
 	<!-- ========================================================================= -->
 
-	<taskdef onerror="ignore" name="izpack" classpath="${izpack.home}/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask"/>
-
 	<target name="installer">
 		<available file="${izpack.home}/lib/standalone-compiler.jar" property="izpack.present"/>
 		<antcall target="installer.package"/>
 	</target>
 
 	<target name="installer.package" description="package the jar installer" if="izpack.present">
+		<taskdef onerror="ignore" name="izpack" classpath="${izpack.home}/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask"/>
 		<property name="install.prefix" value="${build}/${app.ver}"/>
 		<property name="install.file" value="${install.prefix}-Installer"/>
 		<delete file="${install.file}.jar" quiet="true"/>
@@ -570,6 +528,8 @@
 		<property name="web.installer.dir" value="${home}/download/${version.number}"/>
 		<delete dir="${web.installer.dir}" quiet="true"/>
 		<mkdir dir="${web.installer.dir}"/>
+		<copy file="${installer}/jppf_ws.jnlp" todir="${home}/download"/>
+		<replace file="${home}/download/jppf_ws.jnlp" token="@version@" value="${version.number}"/>
 		<property name="web.installer.file" value="${web.installer.dir}/${app.ver}-Web-Installer.jar"/>
 		<izpack input="${installer}/install.xml" output="${web.installer.file}" installerType="web" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
 
@@ -617,6 +577,7 @@
 		<antcall target="findbugs.module"><param name="path" value="server"/></antcall>
 		<antcall target="findbugs.module"><param name="path" value="demo"/></antcall>
 
+		<property name="findbug.jvm.flags" value="-server -Xmx512m -Duser.language=en -Duser.country=US"/>
 		<antcall target="findbugs.generic">
 			<param name="foutput" value="application-template"/>
 			<param name="fsrc" value="${application.template}/src"/>
@@ -650,22 +611,30 @@
 	</target>
 
 	<target name="findbugs.module">
-    <findbugs home="${findbugs.home}" output="${output.type}" outputFile="${build}/findbugs/${path}-findbugs.${output.type}" jvmargs="-server -Xmx512m -Duser.language=en -Duser.country=US">
+    <findbugs home="${findbugs.home}" output="${output.type}" outputFile="${build}/findbugs/${path}-findbugs.${output.type}" jvmargs="${findbug.jvm.flags}">
       <auxClasspath>
       	<fileset dir="${lib}" includes="**/*.jar"/>
-      	<fileset dir="${build}" includes="**/jppf*.jar"/>
+      	<fileset dir="${build}" includes="*.jar"/>
       </auxClasspath>
       <sourcePath path="${basedir}/../${path}/src/java"/>
       <class location="${basedir}/../${path}/classes"/>
     </findbugs>
 	</target>
 
+  <path id="findbugs.generic.classpath">
+		<pathelement location="${jca-client}/classes/j2eeclient"/>
+		<pathelement location="${jca-client}/classes/jca"/>
+		<pathelement location="${gigaspaces}/JPPF-GigaSpaces-Common/classes"/>
+		<pathelement location="${gigaspaces}/JPPF-GigaSpaces-Common/lib/spring.jar"/>
+		<pathelement location="${gigaspaces}/JPPF-GigaSpaces-Client/classes"/>
+		<pathelement location="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/classes"/>
+  	<fileset dir="${lib}" includes="**/*.jar"/>
+  	<fileset dir="${build}" includes="*.jar"/>
+  </path>
+
 	<target name="findbugs.generic">
-    <findbugs home="${findbugs.home}" output="${output.type}" outputFile="${build}/findbugs/${foutput}-findbugs.${output.type}" jvmargs="-server -Xmx512m -Duser.language=en -Duser.country=US">
-      <auxClasspath>
-      	<fileset dir="${lib}" includes="**/*.jar"/>
-      	<fileset dir="${build}" includes="**/jppf*.jar"/>
-      </auxClasspath>
+    <findbugs home="${findbugs.home}" output="${output.type}" outputFile="${build}/findbugs/${foutput}-findbugs.${output.type}" jvmargs="${findbug.jvm.flags}">
+    	<auxClasspath refid="findbugs.generic.classpath"/>
       <sourcePath path="${fsrc}"/>
       <class location="${fclass}"/>
     </findbugs>
@@ -729,10 +698,10 @@
 	<!-- ========================================================================= -->
 
 	<target name="user.guide" description="Generate the user guide zip file">
-		<property name="user.guide.file" value="${build}/JPPF-User-Guide.zip"/>
+		<property name="user.guide.file" value="${build}/JPPF-${version.number}-User-Guide.zip"/>
 		<delete file="${user.guide.file}" quiet="true"/>
 		<zip destfile="${user.guide.file}">
-			<zipfileset dir="${docs}" includes="JPPF-*.pdf" prefix="JPPF-User-Guide"/>
+			<zipfileset dir="${docs}" includes="JPPF-*.pdf" prefix="JPPF-${version.number}-User-Guide"/>
 		</zip>
 	</target>
 
@@ -811,7 +780,6 @@
 				<exclude name="**/JPPF/docs/home/**/*.*"/>
 				<exclude name="**/.history/"/>
 				<exclude name="**/JPPF/build/"/>
-				<exclude name="**/.metadata/.plugins/net.sf.eclipsensis/help/**/*.*"/>
 				<exclude name="**/*.history"/>
 				<exclude name="**/*.index"/>
 				<exclude name="**/*.ear"/>

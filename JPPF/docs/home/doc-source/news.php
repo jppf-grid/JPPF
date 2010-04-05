@@ -25,7 +25,7 @@ $template{name="about-page-header" title="News"}$
 		$title = date("n/j/Y", strtotime($line["date"])) . " " . $line["title"];
 		?>
 		<br><a name="news<?php echo $i ?>"></a>
-		<h2><?php echo $title ?></h2>
+		<h1><?php echo $title ?></h1>
 		<br><?php echo $line["desc"] ?>
 		<?php echo $line["content"]	?>
 		<br>

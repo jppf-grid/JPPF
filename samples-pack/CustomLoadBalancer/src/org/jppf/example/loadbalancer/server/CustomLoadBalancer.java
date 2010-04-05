@@ -59,7 +59,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 
 	/**
 	 * Creates a new instance with the specified parameters profile.
-	 * @param profile the parameters of the load-balancing algorithm,
+	 * @param profile the parameters of the load-balancing algorithm.
 	 */
 	public CustomLoadBalancer(LoadBalancingProfile profile)
 	{
@@ -143,7 +143,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	}
 
 	/**
-	 * Compute the number of tasks to send to the job. This is the actual algorithm implementation.
+	 * Compute the number of tasks to send to the node. This is the actual algorithm implementation.
 	 */
 	private void computeBundleSize()
 	{
