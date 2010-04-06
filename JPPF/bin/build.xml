@@ -560,6 +560,8 @@
 		<antcall target="findbugs.package"/>
 	</target>
 
+	<property name="findbug.jvm.flags" value="-server -Xmx512m -Duser.language=en -Duser.country=US"/>
+
 	<target name="findbugs.package" description="run findbugs on all modules" if="findbugs.present">
 		<path id="findbugs.classpath">
 			<fileset dir="${findbugs.home}/lib" includes="*.jar"/>
@@ -577,7 +579,6 @@
 		<antcall target="findbugs.module"><param name="path" value="server"/></antcall>
 		<antcall target="findbugs.module"><param name="path" value="demo"/></antcall>
 
-		<property name="findbug.jvm.flags" value="-server -Xmx512m -Duser.language=en -Duser.country=US"/>
 		<antcall target="findbugs.generic">
 			<param name="foutput" value="application-template"/>
 			<param name="fsrc" value="${application.template}/src"/>
