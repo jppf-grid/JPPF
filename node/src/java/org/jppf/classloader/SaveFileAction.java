@@ -20,6 +20,8 @@ package org.jppf.classloader;
 import java.io.*;
 import java.security.PrivilegedAction;
 
+import org.jppf.JPPFException;
+
 /**
  * Privileged action wrapper for saving a resource definition to a temporary file.
  */
@@ -28,7 +30,7 @@ public class SaveFileAction implements PrivilegedAction<File>
 	/**
 	 * The resource definition to save.
 	 */
-	private byte[] definition = null;
+	private final byte[] definition;
 	/**
 	 * An eventually resulting exception.
 	 */
@@ -36,9 +38,9 @@ public class SaveFileAction implements PrivilegedAction<File>
 
 	/**
 	 * Initialize this action with the specified resource definition.
-	 * @param definition - the resource definition to save.
+	 * @param definition the resource definition to save.
 	 */
-	public SaveFileAction(byte[] definition)
+	public SaveFileAction(final byte[] definition)
 	{
 		this.definition = definition;
 	}
@@ -51,7 +53,6 @@ public class SaveFileAction implements PrivilegedAction<File>
 	public File run()
 	{
 		File tmp = null;
-		File tmpDir = null;
 		try
 		{
 			/*
@@ -64,9 +65,11 @@ public class SaveFileAction implements PrivilegedAction<File>
 			}
 			catch(IOException e)
 			{
-				tmpDir = new File(System.getProperty("user.dir") + File.separator + "Temp" + File.separator);
-				if (!tmpDir.exists() || !tmpDir.isDirectory()) tmpDir.mkdirs();
-				tmp = File.createTempFile("jppftemp_", ".tmp", tmpDir);
+				File tmpDir = new File(System.getProperty("user.dir") + File.separator + "temp" + File.separator);
+				boolean created = true;
+				if (!tmpDir.exists() || !tmpDir.isDirectory()) created = tmpDir.mkdirs();
+				if (created) tmp = File.createTempFile("jppftemp_", ".tmp", tmpDir);
+				else throw new JPPFException("Could not create temp dir " + tmpDir.getCanonicalPath());
 			}
 			tmp.deleteOnExit();
 			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(tmp));

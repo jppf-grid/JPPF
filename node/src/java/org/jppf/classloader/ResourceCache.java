@@ -45,7 +45,7 @@ public class ResourceCache
 
 	/**
 	 * Get the list of locations for the resource with the specified name.
-	 * @param name - the name of the resource to lookup.
+	 * @param name the name of the resource to lookup.
 	 * @return a list of file paths, or null if the resource is not found in the cache.
 	 */
 	public List<String> getResourcesLocations(String name)
@@ -55,7 +55,7 @@ public class ResourceCache
 
 	/**
 	 * Get a location for the resource with the specified name.
-	 * @param name - the name of the resource to lookup.
+	 * @param name the name of the resource to lookup.
 	 * @return a file path, or null if the resource is not found in the cache.
 	 */
 	public String getResourceLocation(String name)
@@ -67,8 +67,8 @@ public class ResourceCache
 
 	/**
 	 * Set the list of locations for the resource with the specified name.
-	 * @param name - the name of the resource to lookup.
-	 * @param locations - a list of file paths.
+	 * @param name the name of the resource to lookup.
+	 * @param locations a list of file paths.
 	 */
 	public void setResourcesLocations(String name, List<String> locations)
 	{
@@ -77,8 +77,8 @@ public class ResourceCache
 
 	/**
 	 * Set the location for the resource with the specified name.
-	 * @param name - the name of the resource to lookup.
-	 * @param location - a file path.
+	 * @param name the name of the resource to lookup.
+	 * @param location a file path.
 	 */
 	public void setResourceLocation(String name, String location)
 	{
@@ -89,8 +89,8 @@ public class ResourceCache
 
 	/**
 	 * Save the definitions for a resource to temporary files, and register their location with this cache.
-	 * @param name - the name of the resource to register.
-	 * @param definitions - a list of byte array definitions.
+	 * @param name the name of the resource to register.
+	 * @param definitions a list of byte array definitions.
 	 * @throws Exception if any I/O error occurs.
 	 */
 	public void registerResources(String name, List<byte[]> definitions) throws Exception
@@ -101,19 +101,8 @@ public class ResourceCache
 	}
 
 	/**
-	 * Get the content of all resources with the specified name as arrays of bytes. 
-	 * @param name - the name of the resources to lookup.
-	 * @return a list of byte arrays, or null if no resource with the specified name could be found.
-	 * @throws Exception if any I/O error occurs.
-	 */
-	public List<byte[]> getResourcesAsBytes(String name) throws Exception
-	{
-		return null;
-	}
-
-	/**
 	 * Save the specified reosurce definition to a temporary file.
-	 * @param definition - the definition to save, specified as a byte array.
+	 * @param definition the definition to save, specified as a byte array.
 	 * @return the path to the created file.
 	 * @throws Exception if any I/O error occurs.
 	 */
