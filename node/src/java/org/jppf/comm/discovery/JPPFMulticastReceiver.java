@@ -218,18 +218,9 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 					long start = System.currentTimeMillis();
 					while (System.currentTimeMillis() - start < t)
 					{
-						boolean hasTimedOut = false;
 						try
 						{
 							socket.receive(packet);
-						}
-						catch(SocketTimeoutException e)
-						{
-							hasTimedOut = true;
-							if (debugEnabled) log.debug(e.getMessage(), e);
-						}
-						if (!hasTimedOut)
-						{
 							ByteBuffer buffer = ByteBuffer.wrap(buf);
 							int len = buffer.getInt();
 							byte[] bytes = new byte[len];
@@ -239,6 +230,10 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 							if (host == null) host = addr.getHostAddress();
 							info.managementHost = host;
 							addConnectionInfo(info);
+						}
+						catch(SocketTimeoutException e)
+						{
+							if (debugEnabled) log.debug(e.getMessage(), e);
 						}
 						if (System.currentTimeMillis() - start < t) Thread.sleep(50L);
 					}
