@@ -40,6 +40,10 @@ import org.jppf.utils.JPPFUuid;
 public class JPPFJob implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The list of tasks to execute.
 	 */
 	private List<JPPFTask> tasks = null;
