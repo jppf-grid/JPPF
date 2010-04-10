@@ -173,7 +173,7 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 			}
 			acceptableChannels.add(i);
 		}
-		for (Integer i: channelsToRemove) idleChannels.remove(i);
+		for (Integer i: channelsToRemove) idleChannels.remove(i.intValue());
 		if (debugEnabled) log.debug("found " + acceptableChannels.size() + " acceptable channels");
 		if (!acceptableChannels.isEmpty())
 		{
