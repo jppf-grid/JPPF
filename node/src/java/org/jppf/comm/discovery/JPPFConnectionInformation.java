@@ -30,6 +30,10 @@ import org.jppf.utils.StringUtils;
 public class JPPFConnectionInformation implements Serializable, Comparable<JPPFConnectionInformation>
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The driver host name.
 	 */
 	public String host = null;
