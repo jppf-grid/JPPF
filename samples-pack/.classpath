@@ -11,6 +11,7 @@
 	<classpathentry kind="src" output="StartupClasses/classes" path="StartupClasses/src"/>
 	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/java"/>
 	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/resources"/>
+	<classpathentry kind="src" output="TransactionalDatabase/classes" path="TransactionalDatabase/src"/>
 	<classpathentry kind="src" output="WebSearchEngine/classes" path="WebSearchEngine/src"/>
 	<classpathentry kind="lib" path="shared/lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jaligner.jar"/>
@@ -31,5 +32,6 @@
 	<classpathentry kind="lib" path="shared/lib/miglayout-3.7-swing.jar"/>
 	<classpathentry kind="lib" path="shared/lib/groovy-all-1.6.5.jar"/>
 	<classpathentry kind="lib" path="shared/lib/looks-2.2.2.jar"/>
+	<classpathentry kind="lib" path="shared/lib/commons-dbcp-1.4.jar"/>
 	<classpathentry kind="output" path="shared/classes"/>
 </classpath>
