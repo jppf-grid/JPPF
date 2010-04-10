@@ -469,7 +469,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 */
 	public String getCurrentJobId()
 	{
-		return (bundle != null) ? (String) bundle.getParameter(BundleParameter.JOB_ID) : null;
+		return (bundle != null) ? (String) bundle.getParameter(BundleParameter.JOB_UUID) : null;
 	}
 
 	/**

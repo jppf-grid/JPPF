@@ -61,9 +61,13 @@ public class JPPFJob implements Serializable
 	 */
 	private boolean blocking = true;
 	/**
-	 * The universal unique id for this job.
+	 * The user-defined display name for this job.
 	 */
 	private String id = null;
+	/**
+	 * The universal unique id for this job.
+	 */
+	private String uuid = null;
 	/**
 	 * The list of tasks to execute.
 	 */
@@ -83,7 +87,8 @@ public class JPPFJob implements Serializable
 	 */
 	public JPPFJob()
 	{
-		id = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
+		uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
+		id = uuid;
 	}
 
 	/**
@@ -167,7 +172,16 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Get the universal unique id for this job.
-	 * @return the uuid as a string. 
+	 * @return the uuid as a string.
+	 */
+	public String getUuid()
+	{
+		return uuid;
+	}
+
+	/**
+	 * Get the user-defined display name for this job. This is th name displayed in the administration console.
+	 * @return the id as a string. 
 	 */
 	public String getId()
 	{
@@ -175,8 +189,8 @@ public class JPPFJob implements Serializable
 	}
 
 	/**
-	 * Set the universal unique id for this job.
-	 * @param id the id as a string. 
+	 * Set the user-defined display name for this job.
+	 * @param id the display name as a string. 
 	 */
 	public void setId(String id)
 	{
@@ -350,5 +364,37 @@ public class JPPFJob implements Serializable
 	public JPPFJobMetadata getJobMetadata()
 	{
 		return jobMetadata;
+	}
+
+	/**
+	 * COmpute the hascode of this job.
+	 * @return th hascode as an int.
+	 * @see java.lang.Object#hashCode()
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+		return result;
+	}
+
+	/**
+	 * Determine whether this object is equal to another.
+	 * @param obj the object to compare with.
+	 * @return true if the two objects are equal, false otherwise.
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (!(obj instanceof JPPFJob)) return false;
+		JPPFJob other = (JPPFJob) obj;
+		if (uuid == null)
+		{
+			if (other.uuid != null) return false;
+		}
+		return uuid.equals(other.uuid);
 	}
 }

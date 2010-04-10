@@ -147,7 +147,7 @@ public class UpdateMaxNodesAction extends AbstractJobAction
 					try
 					{
 						JMXDriverConnectionWrapper jmx = (JMXDriverConnectionWrapper) data.getJmxWrapper();
-						jmx.updateMaxNodes(data.getJobInformation().getJobId(), maxNodes);
+						jmx.updateMaxNodes(data.getJobInformation().getJobUuid(), maxNodes);
 					}
 					catch(Exception e)
 					{

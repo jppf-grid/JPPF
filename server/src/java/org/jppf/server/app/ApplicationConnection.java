@@ -149,7 +149,7 @@ public class ApplicationConnection extends JPPFConnection
 
 		header.getUuidPath().add(driver.getUuid());
 		header.setCompletionListener(resultSender);
-		currentJobId = (String) header.getParameter(BundleParameter.JOB_ID);
+		currentJobId = (String) header.getParameter(BundleParameter.JOB_UUID);
 		JPPFDriver.getQueue().addBundle(headerWrapper);
 		if (count > 0)
 		{

@@ -61,9 +61,13 @@ public enum  BundleParameter
 	 */
 	JOB_SLA,
 	/**
-	 * The id of a job.
+	 * The user-defined id of a job.
 	 */
 	JOB_ID,
+	/**
+	 * The unique universal id of a job.
+	 */
+	JOB_UUID,
 	/**
 	 * Job requeue indicator.
 	 */

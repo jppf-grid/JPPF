@@ -73,7 +73,7 @@ public class CancelJobAction extends AbstractJobAction
 				{
 					try
 					{
-						((JMXDriverConnectionWrapper) data.getJmxWrapper()).cancelJob(data.getJobInformation().getJobId());
+						((JMXDriverConnectionWrapper) data.getJmxWrapper()).cancelJob(data.getJobInformation().getJobUuid());
 					}
 					catch(Exception e)
 					{

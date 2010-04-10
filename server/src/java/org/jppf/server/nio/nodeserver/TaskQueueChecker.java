@@ -175,7 +175,7 @@ public class TaskQueueChecker implements Runnable
 		if (sla.isSuspended()) return false;
 		Boolean b = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
 		if ((b != null) && b) return false;
-		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+		String jobId = (String) bundle.getParameter(BundleParameter.JOB_UUID);
 		int maxNodes = sla.getMaxNodes();
 		List<ChannelBundlePair> list = server.getJobManager().getNodesForJob(jobId);
 		int n = (list == null) ? 0 : list.size();

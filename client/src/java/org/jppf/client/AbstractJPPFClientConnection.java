@@ -219,6 +219,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		header.setUuidPath(uuidPath);
 		header.setTaskCount(count);
 		header.setParameter(BundleParameter.JOB_ID, job.getId());
+		header.setParameter(BundleParameter.JOB_UUID, job.getUuid());
 		header.setJobSLA(job.getJobSLA());
 		header.setParameter(BundleParameter.JOB_METADATA, job.getJobMetadata());
 

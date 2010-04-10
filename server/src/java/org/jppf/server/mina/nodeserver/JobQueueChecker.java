@@ -211,7 +211,7 @@ public class JobQueueChecker extends ThreadSynchronization implements Runnable
 	 */
 	private String getJobId(JPPFTaskBundle bundle)
 	{
-		return (String) bundle.getParameter(BundleParameter.JOB_ID);
+		return (String) bundle.getParameter(BundleParameter.JOB_UUID);
 	}
 
 	/**
