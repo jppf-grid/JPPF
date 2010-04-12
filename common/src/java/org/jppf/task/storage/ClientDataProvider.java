@@ -19,7 +19,7 @@
 package org.jppf.task.storage;
 
 import org.apache.commons.logging.*;
-import org.jppf.node.JPPFClassLoader;
+import org.jppf.classloader.JPPFClassLoader;
 import org.jppf.utils.*;
 
 /**

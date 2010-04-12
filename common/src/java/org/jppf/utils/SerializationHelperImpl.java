@@ -18,7 +18,7 @@
 package org.jppf.utils;
 
 import org.apache.commons.logging.*;
-import org.jppf.node.JPPFClassLoader;
+import org.jppf.classloader.JPPFClassLoader;
 
 /**
  * Collection of utility methods for serializing and deserializing to and from bytes buffers.

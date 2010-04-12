@@ -20,7 +20,7 @@ package org.jppf.security;
 import java.security.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.node.JPPFClassLoader;
+import org.jppf.classloader.JPPFClassLoader;
 
 /**
  * Security policy for JPPF Nodes.

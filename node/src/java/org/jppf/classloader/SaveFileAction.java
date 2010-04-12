@@ -25,7 +25,7 @@ import org.jppf.JPPFException;
 /**
  * Privileged action wrapper for saving a resource definition to a temporary file.
  */
-public class SaveFileAction implements PrivilegedAction<File>
+class SaveFileAction implements PrivilegedAction<File>
 {
 	/**
 	 * The resource definition to save.

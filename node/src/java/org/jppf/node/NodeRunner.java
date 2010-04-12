@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.*;
+import org.jppf.classloader.JPPFClassLoader;
 import org.jppf.comm.discovery.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.process.LauncherListener;

@@ -24,7 +24,7 @@ import org.jppf.utils.JPPFUuid;
  * <p>This interface encapsulates the required information and behaviour to manage
  * how a component (driver, node or client) interacts with the others, in terms
  * of authorizations and clearance.
- * <p>Organizations  - or users or entities - willing to participate in a JPPF grid network
+ * <p>Organizations - or users or entities - willing to participate in a JPPF grid network
  * must have an implementation of this interface provided with every component they send
  * onto the network. If it is not present, any component of this organization should be denied access.
  * @author Laurent Cohen

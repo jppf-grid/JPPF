@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.node;
+package org.jppf.classloader;
 
 import java.io.*;
 import java.net.*;
@@ -25,7 +25,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFNodeReconnectionNotification;
-import org.jppf.classloader.ResourceCache;
 import org.jppf.comm.socket.*;
 import org.jppf.data.transform.*;
 import org.jppf.utils.*;
@@ -35,7 +34,7 @@ import org.jppf.utils.*;
  * application classes, to avoid costly redeployment system-wide.
  * @author Laurent Cohen
  */
-public class JPPFClassLoader extends URLClassLoader implements JPPFClassLoaderMBean
+public class JPPFClassLoader extends URLClassLoader
 {
 	/**
 	 * Logger for this class.
