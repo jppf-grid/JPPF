@@ -60,13 +60,13 @@ public class LongTask extends JPPFTask
 	}
 
 	/**
-	 * Perform the excution of this task.
+	 * Perform the execution of this task.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
 	public void run()
 	{
 		taskStart = System.currentTimeMillis();
-		double elapsed = 0L;
+		long elapsed = 0L;
 		if (useCPU)
 		{
 			for (; elapsed < taskLength; elapsed = System.currentTimeMillis() - taskStart)
@@ -80,15 +80,15 @@ public class LongTask extends JPPFTask
 			try
 			{
 				Thread.sleep(taskLength);
-				elapsed = System.currentTimeMillis() - taskStart;
 			}
 			catch(InterruptedException e)
 			{
 				//setException(e);
 				setResult(e.getMessage());
 			}
+			elapsed = System.currentTimeMillis() - taskStart;
 		}
-		setResult("task has run for " + taskLength + " ms");
+		setResult("task has run for " + elapsed + " ms");
 	}
 
 	/**
