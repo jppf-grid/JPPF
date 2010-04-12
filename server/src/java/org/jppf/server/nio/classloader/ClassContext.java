@@ -22,9 +22,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.List;
 
+import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.data.transform.*;
 import org.jppf.io.ByteBufferInputStream;
-import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.server.nio.*;
 import org.jppf.utils.*;
 

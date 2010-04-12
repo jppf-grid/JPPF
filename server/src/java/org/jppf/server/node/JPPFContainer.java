@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.classloader.JPPFClassLoader;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.data.transform.*;
 import org.jppf.node.*;
@@ -34,7 +35,7 @@ import org.jppf.utils.*;
  * a client application, a provides the methods to enable the transport, serialization and deserialization of these classes.
  * @author Laurent Cohen
  */
-public class JPPFContainer
+class JPPFContainer
 {
 	/**
 	 * Logger for this class.

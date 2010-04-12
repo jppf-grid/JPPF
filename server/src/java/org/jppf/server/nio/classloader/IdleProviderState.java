@@ -30,7 +30,7 @@ import org.apache.commons.logging.*;
  * This class represents the state of waiting for the next request for a provider.
  * @author Laurent Cohen
  */
-public class IdleProviderState extends ClassServerState
+class IdleProviderState extends ClassServerState
 {
 	/**
 	 * Logger for this class.

@@ -33,7 +33,7 @@ import org.jppf.utils.*;
  * 
  * @author Laurent Cohen
  */
-public class NodeMessage
+class NodeMessage
 {
 	/**
 	 * The current count of bytes sent or received.

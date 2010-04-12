@@ -29,7 +29,7 @@ import org.jppf.utils.*;
  * This class enables launching a JPPF node as an applet, from a web browser.
  * @author Laurent Cohen
  */
-public class NodePanel extends JPanel
+class NodePanel extends JPanel
 {
 	/**
 	 * Path to the images to display in the UI.

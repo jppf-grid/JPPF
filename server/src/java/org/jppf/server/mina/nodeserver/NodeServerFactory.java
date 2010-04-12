@@ -33,7 +33,7 @@ import org.jppf.server.nio.nodeserver.NodeTransition;
  * transitions between those states.
  * @author Laurent Cohen
  */
-public final class NodeServerFactory extends MinaServerFactory<NodeState, NodeTransition>
+final class NodeServerFactory extends MinaServerFactory<NodeState, NodeTransition>
 {
 	/**
 	 * Initialize this factory with the specified server.

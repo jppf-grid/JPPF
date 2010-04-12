@@ -25,13 +25,13 @@ import java.io.IOException;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.node.JPPFResourceWrapper;
+import org.jppf.classloader.JPPFResourceWrapper;
 
 /**
  * This class represents the state of waiting for the response from a provider.
  * @author Laurent Cohen
  */
-public class WaitingProviderResponseState extends ClassServerState
+class WaitingProviderResponseState extends ClassServerState
 {
 	/**
 	 * Logger for this class.

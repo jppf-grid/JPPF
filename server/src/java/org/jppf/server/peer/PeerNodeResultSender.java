@@ -30,7 +30,7 @@ import org.jppf.utils.JPPFBuffer;
  * and send the results back to this driver.
  * @author Laurent Cohen
  */
-public class PeerNodeResultSender extends AbstractResultSender
+class PeerNodeResultSender extends AbstractResultSender
 {
 	/**
 	 * Logger for this class.

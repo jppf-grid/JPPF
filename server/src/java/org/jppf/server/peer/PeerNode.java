@@ -33,7 +33,7 @@ import org.jppf.utils.*;
  * @author Laurent Cohen
  * @author Domingos Creado
  */
-public class PeerNode extends AbstractMonitoredNode
+class PeerNode extends AbstractMonitoredNode
 {
 	/**
 	 * Logger for this class.

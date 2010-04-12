@@ -28,7 +28,7 @@ import org.jppf.server.nio.classloader.ClassTransition;
  * Common abstract superclass for all states of a node that executes tasks. 
  * @author Laurent Cohen
  */
-public abstract class ClassServerState extends MinaState
+abstract class ClassServerState extends MinaState
 {
 	/**
 	 * Logger for this class.

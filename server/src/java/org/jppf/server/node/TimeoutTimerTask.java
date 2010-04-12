@@ -26,7 +26,7 @@ import org.jppf.server.protocol.JPPFTask;
  * whether the corresponding JPPF task timeout has been reached, and abort the
  * task if necessary.
  */
-public class TimeoutTimerTask implements Runnable
+class TimeoutTimerTask implements Runnable
 {
 	/**
 	 * The number identifying the task.

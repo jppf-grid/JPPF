@@ -22,8 +22,8 @@ import java.nio.channels.*;
 import java.util.Vector;
 
 import org.apache.commons.logging.*;
+import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.comm.socket.*;
-import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
@@ -32,7 +32,7 @@ import org.jppf.utils.*;
  * This class represents a connection to the class server of a remote JPPF driver (peer driver).
  * @author Laurent Cohen
  */
-public class PeerResourceProvider extends AbstractSocketChannelHandler
+class PeerResourceProvider extends AbstractSocketChannelHandler
 {
 	/**
 	 * Logger for this class.

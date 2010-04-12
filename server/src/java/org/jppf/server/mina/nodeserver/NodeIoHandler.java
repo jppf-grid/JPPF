@@ -28,7 +28,7 @@ import org.jppf.server.nio.nodeserver.*;
  * 
  * @author Laurent Cohen
  */
-public class NodeIoHandler extends MinaIoHandler
+class NodeIoHandler extends MinaIoHandler
 {
 	/**
 	 * Logger for this class.

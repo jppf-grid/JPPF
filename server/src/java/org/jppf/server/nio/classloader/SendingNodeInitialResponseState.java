@@ -30,7 +30,7 @@ import org.apache.commons.logging.*;
  * State of sending the initial response to a newly created node channel.
  * @author Laurent Cohen
  */
-public class SendingNodeInitialResponseState extends ClassServerState
+class SendingNodeInitialResponseState extends ClassServerState
 {
 	/**
 	 * Logger for this class.

@@ -25,7 +25,7 @@ import org.apache.mina.core.session.IoSession;
  * This class represents the state of sending the initial hand-shaking data to a newly connected node.
  * @author Laurent Cohen
  */
-public class IdleState extends NodeServerState
+class IdleState extends NodeServerState
 {
 	/**
 	 * Logger for this class.

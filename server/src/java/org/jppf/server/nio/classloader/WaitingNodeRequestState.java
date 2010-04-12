@@ -25,14 +25,14 @@ import java.nio.channels.*;
 import java.util.List;
 
 import org.apache.commons.logging.*;
-import org.jppf.node.JPPFResourceWrapper;
+import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.utils.*;
 
 /**
  * This class represents the state of waiting for a request from a node.
  * @author Laurent Cohen
  */
-public class WaitingNodeRequestState extends ClassServerState
+class WaitingNodeRequestState extends ClassServerState
 {
 	/**
 	 * Logger for this class.

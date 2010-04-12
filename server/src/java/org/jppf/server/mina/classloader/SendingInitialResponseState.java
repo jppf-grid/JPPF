@@ -26,7 +26,7 @@ import org.jppf.server.nio.classloader.ClassTransition;
  * State of sending the initial response to a newly created node channel.
  * @author Laurent Cohen
  */
-public class SendingInitialResponseState extends ClassServerState
+class SendingInitialResponseState extends ClassServerState
 {
 	/**
 	 * Logger for this class.

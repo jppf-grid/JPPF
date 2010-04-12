@@ -26,7 +26,7 @@ import org.jppf.server.nio.classloader.ClassTransition;
  * This class represents the state of sending a response to a node.
  * @author Laurent Cohen
  */
-public class SendingNodeResponseState extends ClassServerState
+class SendingNodeResponseState extends ClassServerState
 {
 	/**
 	 * Logger for this class.

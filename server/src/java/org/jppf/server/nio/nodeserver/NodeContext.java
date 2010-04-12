@@ -33,7 +33,7 @@ import org.jppf.utils.*;
  * Context associated with a channel serving tasks to a node.
  * @author Laurent Cohen
  */
-public class NodeContext extends NioContext<NodeState>
+class NodeContext extends NioContext<NodeState>
 {
 	/**
 	 * The message wrapping the data sent or received over the socket channel.

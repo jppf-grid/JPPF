@@ -32,7 +32,7 @@ import org.jppf.server.nio.classloader.*;
  * transitions between those states.
  * @author Laurent Cohen
  */
-public final class ClassServerFactory	extends MinaServerFactory<ClassState, ClassTransition>
+final class ClassServerFactory	extends MinaServerFactory<ClassState, ClassTransition>
 {
 	/**
 	 * Initialize this factory with the specified server.

@@ -25,7 +25,7 @@ import org.jppf.node.event.NodeListener;
  * Instances of this class encapsulate separate threads in which nodes are launched.
  * @author Laurent Cohen
  */
-public class NodeThread extends Thread
+class NodeThread extends Thread
 {
 	/**
 	 * Reference to the underlying JPPF node.

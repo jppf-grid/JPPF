@@ -26,7 +26,7 @@ import org.jppf.server.nio.NioState;
  * Common abstract superclass for all states of a node that executes tasks. 
  * @author Laurent Cohen
  */
-public abstract class NodeServerState extends NioState<NodeTransition>
+abstract class NodeServerState extends NioState<NodeTransition>
 {
 	/**
 	 * The server that handles this state.

@@ -28,7 +28,7 @@ import org.jppf.node.event.*;
 /**
  * Instances of this class represent information about a node.
  */
-public class NodeState implements NodeListener
+class NodeState implements NodeListener
 {
 	/**
 	 * Contains the threads in which the nodes run.

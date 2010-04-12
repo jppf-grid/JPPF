@@ -30,7 +30,7 @@ import org.jppf.server.protocol.*;
  * This class performs performs the work of reading a task bundle execution response from a node. 
  * @author Laurent Cohen
  */
-public class WaitingResultsState extends NodeServerState
+class WaitingResultsState extends NodeServerState
 {
 	/**
 	 * Logger for this class.

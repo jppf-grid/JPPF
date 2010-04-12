@@ -24,6 +24,7 @@ import javax.management.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.*;
+import org.jppf.classloader.JPPFClassLoader;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;

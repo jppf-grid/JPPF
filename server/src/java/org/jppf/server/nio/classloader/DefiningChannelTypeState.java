@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio.classloader;
 
-import static org.jppf.node.JPPFResourceWrapper.State.*;
+import static org.jppf.classloader.JPPFResourceWrapper.State.*;
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
@@ -26,14 +26,14 @@ import java.nio.channels.*;
 import java.util.Vector;
 
 import org.apache.commons.logging.*;
-import org.jppf.node.JPPFResourceWrapper;
+import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.utils.JPPFConfiguration;
 
 /**
  * This class represents the state of a new class server connection, whose type is yet undetermined.
  * @author Laurent Cohen
  */
-public class DefiningChannelTypeState extends ClassServerState
+class DefiningChannelTypeState extends ClassServerState
 {
 	/**
 	 * Logger for this class.

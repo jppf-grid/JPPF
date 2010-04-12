@@ -24,7 +24,7 @@ import org.apache.mina.core.session.IoSession;
  * This class represents the state of waiting for the next request for a provider.
  * @author Laurent Cohen
  */
-public class IdleProviderState extends ClassServerState
+class IdleProviderState extends ClassServerState
 {
 	/**
 	 * Initialize this state with a specified NioServer.

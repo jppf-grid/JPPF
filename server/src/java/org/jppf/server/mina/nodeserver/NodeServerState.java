@@ -27,7 +27,7 @@ import org.jppf.server.mina.*;
  * Common abstract superclass for all states of a node that executes tasks. 
  * @author Laurent Cohen
  */
-public abstract class NodeServerState extends MinaState
+abstract class NodeServerState extends MinaState
 {
 	/**
 	 * The driver stats manager.

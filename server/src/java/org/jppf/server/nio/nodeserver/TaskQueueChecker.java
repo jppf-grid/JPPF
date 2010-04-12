@@ -33,7 +33,7 @@ import org.jppf.server.scheduler.bundle.*;
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
  */
-public class TaskQueueChecker implements Runnable
+class TaskQueueChecker implements Runnable
 {
 	/**
 	 * Logger for this class.

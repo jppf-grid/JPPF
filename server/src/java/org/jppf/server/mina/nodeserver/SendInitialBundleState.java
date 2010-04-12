@@ -28,7 +28,7 @@ import org.jppf.server.nio.nodeserver.NodeTransition;
  * This class represents the state of sending the initial hand-shaking data to a newly connected node.
  * @author Laurent Cohen
  */
-public class SendInitialBundleState extends NodeServerState
+class SendInitialBundleState extends NodeServerState
 {
 	/**
 	 * Logger for this class.

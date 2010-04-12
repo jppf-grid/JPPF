@@ -30,7 +30,7 @@ import org.jppf.server.protocol.*;
  * This class represents the state of waiting for some action.
  * @author Laurent Cohen
  */
-public class SendingBundleState extends NodeServerState
+class SendingBundleState extends NodeServerState
 {
 	/**
 	 * Logger for this class.

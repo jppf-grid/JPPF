@@ -30,7 +30,7 @@ import org.jppf.utils.*;
  * @author Laurent Cohen
  * @author nissalia
  */
-public class JPPFScreenSaver //extends SimpleScreensaver
+class JPPFScreenSaver //extends SimpleScreensaver
 {
 	/**
 	 * The node UI used in the screen saver.

@@ -27,7 +27,7 @@ import org.jppf.server.nio.classloader.*;
  * 
  * @author Laurent Cohen
  */
-public class ClassIoHandler extends MinaIoHandler<ClassState, ClassTransition>
+class ClassIoHandler extends MinaIoHandler<ClassState, ClassTransition>
 {
 	/**
 	 * Logger for this class.

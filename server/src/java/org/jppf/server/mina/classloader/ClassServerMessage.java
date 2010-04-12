@@ -24,7 +24,7 @@ import org.jppf.server.nio.NioObject;
  * Message handled by the class server.
  * @author Laurent Cohen
  */
-public class ClassServerMessage
+class ClassServerMessage
 {
 	/**
 	 * Contains the length of the actual message.

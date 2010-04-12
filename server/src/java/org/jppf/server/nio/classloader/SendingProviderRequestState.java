@@ -31,7 +31,7 @@ import org.jppf.server.nio.NioMessage;
  * This class represents the state of sending a request to a provider.
  * @author Laurent Cohen
  */
-public class SendingProviderRequestState extends ClassServerState
+class SendingProviderRequestState extends ClassServerState
 {
 	/**
 	 * Logger for this class.

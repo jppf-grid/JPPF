@@ -31,7 +31,7 @@ import org.jppf.server.mina.MinaContext;
  * Tranforms IO messages into <code>BundleWrapper</code> instances and vice-versa.
  * @author Laurent Cohen
  */
-public class ClassIoFilter extends IoFilterAdapter
+class ClassIoFilter extends IoFilterAdapter
 {
 	/**
 	 * Logger for this class.

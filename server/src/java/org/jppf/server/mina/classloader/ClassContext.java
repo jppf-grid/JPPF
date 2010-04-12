@@ -24,9 +24,9 @@ import java.util.List;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
+import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.data.transform.*;
 import org.jppf.io.*;
-import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.server.mina.*;
 import org.jppf.server.nio.NioObject;
 import org.jppf.server.nio.classloader.ClassState;
@@ -36,7 +36,7 @@ import org.jppf.utils.*;
  * Context obect associated with a socket channel used by the class server of the JPPF driver. 
  * @author Laurent Cohen
  */
-public class ClassContext extends MinaContext<ClassState>
+class ClassContext extends MinaContext<ClassState>
 {
 	/**
 	 * The resource read from or written to the associated channel.

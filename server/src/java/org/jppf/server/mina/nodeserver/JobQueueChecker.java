@@ -36,7 +36,7 @@ import org.jppf.utils.ThreadSynchronization;
 /**
  * This class ensures that idle nodes get assigned pending jobs in the queue.
  */
-public class JobQueueChecker extends ThreadSynchronization implements Runnable
+class JobQueueChecker extends ThreadSynchronization implements Runnable
 {
 	/**
 	 * Logger for this class.

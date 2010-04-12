@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.commons.logging.*;
 import org.apache.mina.core.session.IoSession;
-import org.jppf.node.JPPFResourceWrapper;
+import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.mina.MinaContext;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
@@ -33,7 +33,7 @@ import org.jppf.utils.*;
  * This class represents the state of waiting for a request from a node.
  * @author Laurent Cohen
  */
-public class WaitingNodeRequestState extends ClassServerState
+class WaitingNodeRequestState extends ClassServerState
 {
 	/**
 	 * Logger for this class.

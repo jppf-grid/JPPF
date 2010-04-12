@@ -23,7 +23,7 @@ package org.jppf.server.mina.classloader;
  * This class represents the state of waiting for the next request for a provider.
  * @author Laurent Cohen
  */
-public class IdleNodeState extends ClassServerState
+class IdleNodeState extends ClassServerState
 {
 	/**
 	 * Initialize this state with a specified NioServer.

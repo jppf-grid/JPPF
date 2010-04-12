@@ -34,7 +34,7 @@ import org.jppf.utils.StringUtils;
  * Tranforms IO messages into <code>BundleWrapper</code> instances and vice-versa.
  * @author Laurent Cohen
  */
-public class NodeIoFilter extends IoFilterAdapter
+class NodeIoFilter extends IoFilterAdapter
 {
 	/**
 	 * Logger for this class.

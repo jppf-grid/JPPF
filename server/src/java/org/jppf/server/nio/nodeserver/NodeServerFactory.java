@@ -30,7 +30,7 @@ import org.jppf.server.nio.*;
  * transitions between those states.
  * @author Laurent Cohen
  */
-public final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition>
+final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition>
 {
 	/**
 	 * Initialize this factory with the specified server.

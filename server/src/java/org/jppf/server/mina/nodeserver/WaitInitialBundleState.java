@@ -34,7 +34,7 @@ import org.jppf.utils.JPPFConfiguration;
  * response to sending the initial bundle.
  * @author Laurent Cohen
  */
-public class WaitInitialBundleState extends NodeServerState
+class WaitInitialBundleState extends NodeServerState
 {
 	/**
 	 * Logger for this class.

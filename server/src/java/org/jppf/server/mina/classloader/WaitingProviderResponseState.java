@@ -21,14 +21,14 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import org.apache.commons.logging.*;
 import org.apache.mina.core.session.IoSession;
-import org.jppf.node.JPPFResourceWrapper;
+import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.mina.MinaContext;
 
 /**
  * This class represents the state of waiting for the response from a provider.
  * @author Laurent Cohen
  */
-public class WaitingProviderResponseState extends ClassServerState
+class WaitingProviderResponseState extends ClassServerState
 {
 	/**
 	 * Logger for this class.

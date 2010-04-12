@@ -29,7 +29,7 @@ import org.apache.mina.core.session.IoSession;
  * State of sending the initial response to a newly created provider channel.
  * @author Laurent Cohen
  */
-public class SendingProviderInitialResponseState extends ClassServerState
+class SendingProviderInitialResponseState extends ClassServerState
 {
 	/**
 	 * Logger for this class.
