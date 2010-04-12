@@ -112,7 +112,7 @@ public class LoadBalancer
 	{
 		int count = 0;
 		List<JPPFTask> tasks = job.getTasks();
-		for (JPPFTask task : tasks) task.setPosition(count++);
+		//for (JPPFTask task : tasks) task.setPosition(count++);
 		if (localEnabled && locallyExecuting.compareAndSet(false, true))
 		{
 			try

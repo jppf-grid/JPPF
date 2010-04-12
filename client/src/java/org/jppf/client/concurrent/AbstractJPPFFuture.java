@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @param <V> the type of result returned by this future.
  * @author Laurent Cohen
  */
-public abstract class AbstractJPPFFuture<V> implements Future<V>
+abstract class AbstractJPPFFuture<V> implements Future<V>
 {
 	/**
 	 * The completion status of the task represented by this future.

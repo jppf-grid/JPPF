@@ -18,6 +18,7 @@
 
 package org.jppf.client.concurrent;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -58,6 +59,15 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * Determines whether this executor has been terminated.
 	 */
 	private AtomicBoolean terminated = new AtomicBoolean(false);
+
+	/**
+	 * Initialize this executor service with the specified JPPF client.
+	 * @param client the {@link JPPFClient} to use for job submission.
+	 */
+	public JPPFExecutorService(JPPFClient client)
+	{
+		this.client = client;
+	}
 
 	/**
 	 * Executes the given tasks, returning a list of Futures holding their status and results when all complete.
@@ -101,11 +111,12 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 		List<Future<T>> futureList = new ArrayList<Future<T>>(tasks.size());
 		try
 		{
+			int position = 0;
 			for (Callable<T> task: tasks)
 			{
 				if (task == null) throw new NullPointerException("a task cannot be null");
 				JPPFTask jppfTask = addToJob(job, task);
-				futureList.add(new JPPFTaskFuture<T>(collector, jppfTask.getPosition()));
+				futureList.add(new JPPFTaskFuture<T>(collector, position++));
 			}
 			collector.setTaskCount(job.getTasks().size());
 			submitJob(job);
@@ -115,15 +126,24 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 				if (millis == 0) collector.waitForResults(0);
 				else collector.waitForResults(millis - elapsed);
 			}
-			for (Future<T> f: futureList) ((JPPFTaskFuture<T>) f).setDone();
+			elapsed = System.currentTimeMillis() - start;
+			for (Future<T> f: futureList)
+			{
+				if (!f.isDone())
+				{
+					JPPFTaskFuture<T> future = (JPPFTaskFuture<T>) f;
+					future.setDone();
+					future.setCancelled();
+				}
+			}
 		}
 		catch(InterruptedException e)
 		{
 			for (Future<T> f: futureList)
 			{
-				JPPFTaskFuture<T> future = (JPPFTaskFuture<T>) f;
-				if (!future.isDone())
+				if (!f.isDone())
 				{
+					JPPFTaskFuture<T> future = (JPPFTaskFuture<T>) f;
 					future.setDone();
 					future.setCancelled();
 				}
@@ -256,13 +276,15 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * or the current thread is interrupted, whichever happens first.
 	 * @param timeout the maximum time to wait.
 	 * @param unit the time unit of the timeout argument.
-	 * @return true if this executor terminated and false  if the timeout elapsed before termination.
+	 * @return true if this executor terminated and false if the timeout elapsed before termination.
 	 * @throws InterruptedException if interrupted while waiting.
 	 * @see java.util.concurrent.ExecutorService#awaitTermination(long, java.util.concurrent.TimeUnit)
 	 */
 	public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException
 	{
-		return false;
+		long millis = DateTimeUtils.toMillis(timeout, unit);
+		waitForTerminated(millis);
+		return terminated.get();
 	}
 
 	/**
@@ -287,28 +309,39 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	}
 
 	/**
+	 * Set the terminated status for this executor.
+	 * @see java.util.concurrent.ExecutorService#isTerminated()
+	 */
+	private void setTerminated()
+	{
+		terminated.set(true);
+		synchronized(this)
+		{
+			notifyAll();
+		}
+	}
+
+	/**
 	 * Initiates an orderly shutdown in which previously submitted tasks are executed, but no new tasks will be accepted.
 	 * @see java.util.concurrent.ExecutorService#shutdown()
 	 */
 	public void shutdown()
 	{
 		shuttingDown.set(true);
+		terminated.compareAndSet(false, jobMap.isEmpty());
 	}
 
 	/**
 	 * Attempts to stop all actively executing tasks, halts the processing of waiting tasks,
-	 * and returns a list of the tasks that were awaiting execution. 
+	 * and returns a list of the tasks that were awaiting execution.<br>
+	 * This implementation simply waits for all submitted tasks to terminate, due to the complexity of stopping remote tasks.
 	 * @return a list of tasks that never commenced execution. 
 	 * @see java.util.concurrent.ExecutorService#shutdownNow()
 	 */
 	public List<Runnable> shutdownNow()
 	{
 		shuttingDown.set(true);
-		for (Map.Entry<String, JPPFJob> entry: jobMap.entrySet())
-		{
-			FutureResultCollector collector = (FutureResultCollector) entry.getValue().getResultListener();
-			collector.waitForResults();
-		}
+		waitForTerminated(0L);
 		return null;
 	}
 
@@ -319,8 +352,10 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	private JPPFJob createJob()
 	{
 		JPPFJob job = new JPPFJob();
-		job.setResultListener(new FutureResultCollector(0, job.getUuid()));
+		FutureResultCollector collector = new FutureResultCollector(0, job.getUuid());
+		job.setResultListener(collector);
 		job.setBlocking(false);
+		collector.addListener(this);
 		return job;
 	}
 
@@ -348,10 +383,35 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	}
 
 	/**
+	 * Wait until this executor has terminated, or the specified timeout has expired, whichever happens first.
+	 * @param timeout the maximum time to wait, zero means indefinite time.
+	 */
+	private void waitForTerminated(long timeout)
+	{
+		long elapsed = 0L;
+		long start = System.currentTimeMillis();
+		while (!terminated.get() && ((timeout == 0L) || (elapsed < timeout)))
+		{
+			synchronized (this)
+			{
+				try
+				{
+					wait(timeout == 0L ? 0L : timeout - elapsed);
+				}
+				catch(InterruptedException e)
+				{
+					log.error(e.getMessage(), e);
+				}
+				elapsed = System.currentTimeMillis() - start;
+			}
+		}
+	}
+
+	/**
 	 * Callable wrapper around a Runnable.
 	 * @param <V> the type of result.
 	 */
-	private static class RunnableWrapper<V> implements Callable<V>
+	private static class RunnableWrapper<V> implements Callable<V>, Serializable
 	{
 		/**
 		 * The runnable to execute.
@@ -394,6 +454,6 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	{
 		String jobUuid = event.getCollector().getJobUuid();
 		jobMap.remove(jobUuid);
-		if (shuttingDown.get()) terminated.compareAndSet(false, jobMap.size() == 0);
+		if (shuttingDown.get() && jobMap.isEmpty()) setTerminated();
 	}
 }

@@ -80,6 +80,10 @@ public class JPPFJob implements Serializable
 	 * The user-defined metadata asoociated with this job.
 	 */
 	private JPPFJobMetadata jobMetadata = new JPPFJobMetadata();
+	/**
+	 * The number of tasks in this job.
+	 */
+	private int taskCount = 0;
 
 	/**
 	 * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -223,6 +227,7 @@ public class JPPFJob implements Serializable
 		else tmp = new JPPFAnnotatedTask(taskObject, args);
 		if (tasks == null) tasks = new ArrayList<JPPFTask>();
 		tasks.add(tmp);
+		tmp.setPosition(taskCount++);
 		return tmp;
 	}
 
@@ -241,6 +246,7 @@ public class JPPFJob implements Serializable
 		if (tasks == null) tasks = new ArrayList<JPPFTask>();
 		JPPFTask jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
 		tasks.add(jppfTask);
+		jppfTask.setPosition(taskCount++);
 		return jppfTask;
 	}
 

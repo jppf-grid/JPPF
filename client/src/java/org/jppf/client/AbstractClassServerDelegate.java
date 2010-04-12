@@ -18,10 +18,9 @@
 
 package org.jppf.client;
 
-import org.jppf.classloader.ResourceProvider;
+import org.jppf.classloader.*;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.data.transform.*;
-import org.jppf.node.JPPFResourceWrapper;
 import org.jppf.utils.JPPFBuffer;
 
 /**

@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
+import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.comm.socket.*;
-import org.jppf.node.JPPFResourceWrapper;
 
 /**
  * Wrapper around an incoming socket connection, whose role is to receive the names of classes

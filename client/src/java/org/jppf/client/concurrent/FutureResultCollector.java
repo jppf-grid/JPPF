@@ -29,7 +29,7 @@ import org.jppf.server.protocol.JPPFTask;
  * 
  * @author Laurent Cohen
  */
-public class FutureResultCollector extends JPPFResultCollector
+class FutureResultCollector extends JPPFResultCollector
 {
 	/**
 	 * Logger for this class.
@@ -56,6 +56,7 @@ public class FutureResultCollector extends JPPFResultCollector
 	FutureResultCollector(int count, String jobUuid)
 	{
 		super(count);
+		this.jobUuid = jobUuid;
 	}
 
 	/**
@@ -65,6 +66,16 @@ public class FutureResultCollector extends JPPFResultCollector
 	void setTaskCount(int count)
 	{
 		pendingCount = count;
+	}
+
+	/**
+	 * Get the task at the specified position.
+	 * @param position the position of the task in the job it is a part of.
+	 * @return the task whose results were received, or null if the results were not received.
+	 */
+	synchronized JPPFTask getTask(int position)
+	{
+		return resultMap.get(position);
 	}
 
 	/**

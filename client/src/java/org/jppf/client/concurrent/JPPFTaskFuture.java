@@ -21,6 +21,7 @@ package org.jppf.client.concurrent;
 import java.util.concurrent.*;
 
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.DateTimeUtils;
 
 /**
@@ -28,7 +29,7 @@ import org.jppf.utils.DateTimeUtils;
  * @param <V> the type of the result for the future.
  * @author Laurent Cohen
  */
-public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
+class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 {
 	/**
 	 * The collector that receives the results from the server.
@@ -80,7 +81,8 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 */
 	public boolean isDone()
 	{
-		return done.compareAndSet(false, collector.isTaskReceived(position));
+		done.compareAndSet(false, collector.isTaskReceived(position));
+		return done.get();
 	}
 
 	/**
@@ -92,6 +94,11 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 */
 	public V get() throws InterruptedException, ExecutionException
 	{
+		if (isDone())
+		{
+			JPPFTask task = collector.getTask(position);
+			return task == null ? null : (V) task.getResult();
+		}
 		return (V) collector.waitForTask(position).getResult();
 	}
 
@@ -108,6 +115,11 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 */
 	public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
 	{
+		if (isDone())
+		{
+			JPPFTask task = collector.getTask(position);
+			return task == null ? null : (V) task.getResult();
+		}
 		long millis = DateTimeUtils.toMillis(timeout, unit);
 		return (V) collector.waitForTask(position, millis).getResult();
 	}
