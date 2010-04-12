@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server;
+package org.jppf.server.app;
 
 import java.io.IOException;
 import java.net.*;
@@ -24,13 +24,14 @@ import java.util.*;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.server.JPPFDriver;
 
 /**
  * This class is a common abstract superclass for servers listening to incoming connections from
  * execution nodes or client connections, and whose role is to handle execution requests.
  * @author Laurent Cohen
  */
-public abstract class JPPFServer extends Thread
+abstract class JPPFServer extends Thread
 {
 	/**
 	 * Logger for this class.

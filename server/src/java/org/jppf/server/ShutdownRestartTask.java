@@ -26,7 +26,7 @@ import org.jppf.JPPFError;
  * Task used by a timer to shutdown, and eventually restart, this server.<br>
  * Both shutdown and restart operations can be performed with a specified delay.
  */
-public class ShutdownRestartTask extends TimerTask
+class ShutdownRestartTask extends TimerTask
 {
 	/**
 	 * Logger for this class.
