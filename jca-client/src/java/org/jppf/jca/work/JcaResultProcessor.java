@@ -77,7 +77,7 @@ public class JcaResultProcessor implements Work
 		{
 			connection.setCurrentJob(job);
 			int count = 0;
-			for (JPPFTask task : job.getTasks()) task.setPosition(count++);
+			//for (JPPFTask task : job.getTasks()) task.setPosition(count++);
 			boolean completed = false;
 			while (!completed)
 			{
