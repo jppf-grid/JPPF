@@ -45,7 +45,7 @@
 
   <target name="clean">
     <delete dir="${classes.dir}" quiet="true"/>
-    <delete dir="${build.dir}" quiet="true"/>
+    <delete dir="${build.dir}" quiet="true" excludes=".cvsignore"/>
   </target>               
 
 	<!-- ========================================================================= -->
