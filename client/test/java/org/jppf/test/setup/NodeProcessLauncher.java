@@ -22,7 +22,7 @@ package org.jppf.test.setup;
  * Used to launch a single node.
  * @author Laurent Cohen
  */
-public class NodeProcessLauncher extends TestProcessLauncher
+public class NodeProcessLauncher extends GenericProcessLauncher
 {
 	/**
 	 * Initialize the node launcher with the specified node id.

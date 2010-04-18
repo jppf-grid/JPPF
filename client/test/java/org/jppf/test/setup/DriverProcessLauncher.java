@@ -22,7 +22,7 @@ package org.jppf.test.setup;
  * Used to launch a driver.
  * @author Laurent Cohen
  */
-public class DriverProcessLauncher extends TestProcessLauncher
+public class DriverProcessLauncher extends GenericProcessLauncher
 {
 	/**
 	 * Initialize the driver launcher.

@@ -27,7 +27,7 @@ import org.jppf.process.ProcessWrapper;
  * Super class for launching a JPPF driver or node.
  * @author Laurent Cohen
  */
-public class TestProcessLauncher
+public class GenericProcessLauncher
 {
 	/**
 	 * System path separator.
@@ -81,7 +81,7 @@ public class TestProcessLauncher
 	/**
 	 * Default constructor.
 	 */
-	public TestProcessLauncher()
+	public GenericProcessLauncher()
 	{
 		addClasspathElement("../node/classes");
 		String libDir = "../JPPF/lib/";
