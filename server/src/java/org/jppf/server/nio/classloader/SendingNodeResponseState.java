@@ -19,12 +19,11 @@
 package org.jppf.server.nio.classloader;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
-import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.net.ConnectException;
-import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.server.nio.ChannelWrapper;
 
 /**
  * This class represents the state of sending a response to a node.
@@ -52,23 +51,21 @@ class SendingNodeResponseState extends ClassServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ClassTransition performTransition(SelectionKey key) throws Exception
+	public ClassTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		SelectableChannel channel = key.channel();
-		if (key.isReadable())
+		if (wrapper.isReadable())
 		{
-			throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");
+			throw new ConnectException("node " + wrapper + " has been disconnected");
 		}
-		ClassContext context = (ClassContext) key.attachment();
-		if (context.writeMessage((WritableByteChannel) channel))
+		ClassContext context = (ClassContext) wrapper.getContext();
+		if (context.writeMessage(wrapper))
 		{
-			if (debugEnabled) log.debug("node: " + getRemoteHost(channel) + ", response [" +
-				context.getResource().getName() + "] sent to the node");
+			if (debugEnabled) log.debug("node: " + wrapper + ", response [" + context.getResource().getName() + "] sent to the node");
 			context.setMessage(null);
 			return TO_WAITING_NODE_REQUEST;
 		}

@@ -19,13 +19,11 @@
 package org.jppf.server.nio.classloader;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
-import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.net.ConnectException;
-import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.nio.NioMessage;
+import org.jppf.server.nio.*;
 
 /**
  * This class represents the state of sending a request to a provider.
@@ -53,59 +51,54 @@ class SendingProviderRequestState extends ClassServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ClassTransition performTransition(SelectionKey key) throws Exception
+	public ClassTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		SelectableChannel channel = key.channel();
-		ClassContext context = (ClassContext) key.attachment();
-		if (key.isReadable())
+		ClassContext context = (ClassContext) wrapper.getContext();
+		if (wrapper.isReadable())
 		{
-			server.removeProviderConnection(context.getUuid(), channel);
-			SelectionKey currentRequest = context.getCurrentRequest();
-			if (debugEnabled) log.debug("provider: " + getRemoteHost(channel) + " sending null response for disconnected provider");
+			server.removeProviderConnection(context.getUuid(), wrapper);
+			ChannelWrapper currentRequest = context.getCurrentRequest();
+			if (debugEnabled) log.debug("provider: " + wrapper + " sending null response for disconnected provider");
 			if ((currentRequest != null) || !context.getPendingRequests().isEmpty())
 			{
 				if (currentRequest != null)
 				{
-					if (debugEnabled) log.debug("provider: " + getRemoteHost(channel) +
-						" disconnected while serving request [" + context.getResource().getName() +
-						"] for node " + getRemoteHost((SocketChannel) context.getCurrentRequest().channel()));
+					if (debugEnabled) log.debug("provider: " + wrapper + " disconnected while serving request [" + context.getResource().getName() + "] for node " + context.getCurrentRequest());
 					context.setCurrentRequest(null);
 					sendNullResponse(currentRequest);
 				}
 				for (int i=0; i<context.getPendingRequests().size(); i++)
 					sendNullResponse(context.getPendingRequests().remove(0));
 			}
-			throw new ConnectException("provider " + getRemoteHost(channel) + " has been disconnected");
+			throw new ConnectException("provider " + wrapper + " has been disconnected");
 		}
 		if ((context.getCurrentRequest() == null) && !context.getPendingRequests().isEmpty())
 		{
-			SelectionKey request = context.getPendingRequests().remove(0);
-			ClassContext requestContext = (ClassContext) request.attachment();
+			SelectionKeyWrapper request = (SelectionKeyWrapper) context.getPendingRequests().remove(0);
+			ClassContext requestContext = (ClassContext) request.getChannel().attachment();
 			context.setMessage(null);
 			context.setResource(requestContext.getResource());
 			if (debugEnabled)
 			{
-				log.debug("provider " + getRemoteHost(channel) + " serving new resource request [" +
-					context.getResource().getName() + "] from node: " + getRemoteHost((SocketChannel) request.channel()));
+				log.debug("provider " + wrapper + " serving new resource request [" + context.getResource().getName() + "] from node: " + request);
 			}
 			context.serializeResource();
 			context.setCurrentRequest(request);
 		}
 		if (context.getCurrentRequest() == null)
 		{
-			if (debugEnabled) log.debug("provider: " + getRemoteHost(channel) + " has no request to process, returning to idle mode");
+			if (debugEnabled) log.debug("provider: " + wrapper + " has no request to process, returning to idle mode");
 			context.setMessage(null);
 			return TO_IDLE_PROVIDER;
 		}
-		if (context.writeMessage((WritableByteChannel) channel))
+		if (context.writeMessage(wrapper))
 		{
-			if (debugEnabled) log.debug("request sent to the provider " + getRemoteHost(channel) + " from node " + 
-				getRemoteHost((SocketChannel) context.getCurrentRequest().channel()) + 
+			if (debugEnabled) log.debug("request sent to the provider " + wrapper + " from node " + context.getCurrentRequest() + 
 				", resource: " + context.getResource().getName() + ", requestUuid = " + context.getResource().getRequestUuid());
 			context.setMessage(new NioMessage());
 			return TO_WAITING_PROVIDER_RESPONSE;

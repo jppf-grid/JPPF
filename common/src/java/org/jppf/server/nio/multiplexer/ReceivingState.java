@@ -19,12 +19,9 @@
 package org.jppf.server.nio.multiplexer;
 
 import static org.jppf.server.nio.multiplexer.MultiplexerTransition.*;
-import static org.jppf.utils.StringUtils.getRemoteHost;
-
-import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.nio.NioMessage;
+import org.jppf.server.nio.*;
 
 /**
  * State of receiving data on a channel.
@@ -54,24 +51,23 @@ public class ReceivingState extends MultiplexerServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public MultiplexerTransition performTransition(SelectionKey key) throws Exception
+	public MultiplexerTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		SelectableChannel channel = key.channel();
-		MultiplexerContext context = (MultiplexerContext) key.attachment();
-		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
-		if (context.readMessage((ReadableByteChannel) channel))
+		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
+		if (debugEnabled) log.debug("exec() for " + wrapper);
+		if (context.readMessage(wrapper))
 		{
-			if (debugEnabled) log.debug("read message for " + getRemoteHost(channel) + " done");
-			SelectionKey linkedKey = context.getLinkedKey();
+			if (debugEnabled) log.debug("read message for " + wrapper + " done");
+			ChannelWrapper linkedKey = context.getLinkedKey();
 			NioMessage msg = context.getMessage();
 			msg.buffer.flip();
 			context.setMessage(null);
-			MultiplexerContext linkedContext = (MultiplexerContext) linkedKey.attachment();
+			MultiplexerContext linkedContext = (MultiplexerContext) linkedKey.getContext();
 			linkedContext.setMessage(msg);
 			server.getTransitionManager().transitionChannel(linkedKey, MultiplexerTransition.TO_SENDING);
 			return TO_SENDING_OR_RECEIVING;

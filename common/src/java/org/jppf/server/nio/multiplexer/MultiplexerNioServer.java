@@ -162,41 +162,42 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 
 	/**
 	 * Process a channel that was accepted by the server socket channel.
-	 * @param key the selection key for the socket channel to process.
+	 * @param channel the selection key for the socket channel to process.
 	 * @param serverChannel the ServerSocketChannel that accepted the channel.
 	 * @see org.jppf.server.nio.NioServer#postAccept(java.nio.channels.SelectionKey, java.nio.channels.ServerSocketChannel)
 	 */
-	public void postAccept(SelectionKey key, ServerSocketChannel serverChannel)
+	public void postAccept(ChannelWrapper channel, ServerSocketChannel serverChannel)
 	{
 		int port = serverChannel.socket().getLocalPort();
 		if (debugEnabled) log.debug("accepting on port " + port);
-		MultiplexerContext context = (MultiplexerContext) key.attachment();
+		MultiplexerContext context = (MultiplexerContext) channel.getContext();
 		if (multiplexerPorts.contains(port)) context.setMultiplexerPort(port);
 		else if (boundPorts.contains(port)) context.setBoundPort(port);
-		postAccept(key);
+		postAccept(channel);
 	}
 
 	/**
 	 * Process a channel that was accepted by the server socket channel.
-	 * @param key the selection key for the socket channel to process.
+	 * @param channel the selection key for the socket channel to process.
 	 * @see org.jppf.server.nio.NioServer#postAccept(java.nio.channels.SelectionKey)
 	 */
-	public void postAccept(SelectionKey key)
+	public void postAccept(ChannelWrapper channel)
 	{
-		MultiplexerContext context = (MultiplexerContext) key.attachment();
+		
+		MultiplexerContext context = (MultiplexerContext) channel.getContext();
 		if (context.isApplicationPort())
 		{
 			if (debugEnabled) log.debug("initializing outbound port " + context.getBoundPort());
-			transitionManager.transitionChannel(key, MultiplexerTransition.TO_IDLE);
+			transitionManager.transitionChannel(channel, MultiplexerTransition.TO_IDLE);
 			HostPort mult = getHostPortForBoundPort(context.getBoundPort());
-			MultiplexerChannelHandler handler = new MultiplexerChannelHandler(this, mult.host(), mult.port(), key);
+			MultiplexerChannelHandler handler = new MultiplexerChannelHandler(this, mult.host(), mult.port(), channel);
 			MultiplexerChannelInitializer init = new MultiplexerChannelInitializer(handler);
 			new Thread(init).start();
 		}
 		else if (context.isMultiplexerPort())
 		{
 			if (debugEnabled) log.debug("initializing multiplexing port " + context.getMultiplexerPort());
-			transitionManager.transitionChannel(key, MultiplexerTransition.TO_IDENTIFYING_INBOUND_CHANNEL);
+			transitionManager.transitionChannel(channel, MultiplexerTransition.TO_IDENTIFYING_INBOUND_CHANNEL);
 		}
 	}
 

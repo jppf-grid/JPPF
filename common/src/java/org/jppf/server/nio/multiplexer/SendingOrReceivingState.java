@@ -19,11 +19,9 @@
 package org.jppf.server.nio.multiplexer;
 
 import static org.jppf.server.nio.multiplexer.MultiplexerTransition.*;
-import static org.jppf.utils.StringUtils.getRemoteHost;
-
-import java.nio.channels.SelectionKey;
 
 import org.apache.commons.logging.*;
+import org.jppf.server.nio.ChannelWrapper;
 
 /**
  * This state is for determining whether a channel should be sending data,
@@ -52,26 +50,26 @@ public class SendingOrReceivingState extends MultiplexerServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public MultiplexerTransition performTransition(SelectionKey key) throws Exception
+	public MultiplexerTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
 		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(key.channel()));
-		MultiplexerContext context = (MultiplexerContext) key.attachment();
+		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
 		if (context.getMessage() != null)
 		{
-			if (debugEnabled) log.debug("returning TO_SENDING for " + getRemoteHost(key.channel()));
+			if (debugEnabled) log.debug("returning TO_SENDING for " + wrapper);
 			return TO_SENDING;
 		}
-		else if (key.isReadable())
+		else if (wrapper.isReadable())
 		{
-			if (debugEnabled) log.debug("returning TO_RECEIVING for " + getRemoteHost(key.channel()));
+			if (debugEnabled) log.debug("returning TO_RECEIVING for " + wrapper);
 			return TO_RECEIVING;
 		}
-		if (debugEnabled) log.debug("returning TO_SENDING_OR_RECEIVING for " + getRemoteHost(key.channel()));
+		if (debugEnabled) log.debug("returning TO_SENDING_OR_RECEIVING for " + wrapper);
 		return TO_SENDING_OR_RECEIVING;
 	}
 }

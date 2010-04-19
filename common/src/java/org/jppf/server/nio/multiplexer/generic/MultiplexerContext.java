@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.logging.*;
 import org.jppf.io.IOHelper;
-import org.jppf.server.nio.NioContext;
+import org.jppf.server.nio.*;
 import org.jppf.utils.StringUtils;
 
 /**
@@ -45,7 +45,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	/**
 	 * The request currently processed.
 	 */
-	private SelectionKey linkedKey = null;
+	private ChannelWrapper linkedKey = null;
 	/**
 	 * The application port to which the channel may be bound.
 	 */
@@ -76,17 +76,17 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * @param channel the channel that threw the exception.
 	 * @see org.jppf.server.nio.NioContext#handleException(java.nio.channels.SocketChannel)
 	 */
-	public void handleException(SocketChannel channel)
+	public void handleException(ChannelWrapper channel)
 	{
 		try
 		{
 			if (linkedKey != null)
 			{
-				if (linkedKey.channel() != null)
+				if (linkedKey != null)
 				{
 					try
 					{
-						linkedKey.channel().close();
+						linkedKey.close();
 					}
 					catch(Exception e)
 					{
@@ -104,18 +104,18 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 
 	/**
 	 * Get the request currently processed.
-	 * @return a <code>SelectionKey</code> instance.
+	 * @return a <code>ChannelWrapper</code> instance.
 	 */
-	public synchronized SelectionKey getLinkedKey()
+	public synchronized ChannelWrapper getLinkedKey()
 	{
 		return linkedKey;
 	}
 
 	/**
 	 * Set the request currently processed.
-	 * @param key a <code>SelectionKey</code> instance. 
+	 * @param key a <code>ChannelWrapper</code> instance. 
 	 */
-	public synchronized void setLinkedKey(SelectionKey key)
+	public synchronized void setLinkedKey(ChannelWrapper key)
 	{
 		this.linkedKey = key;
 	}
@@ -187,15 +187,16 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 
 	/**
 	 * Read data from a channel.
-	 * @param channel the channel to read the data from.
+	 * @param wrapper the channel to read the data from.
 	 * @return a ByteBuffer containing the data read from the channel, or null if no data was read.
 	 * @throws Exception if an error occurs while reading the data.
 	 */
-	public ByteBuffer readMultiplexerMessage(ReadableByteChannel channel) throws Exception
+	public ByteBuffer readMultiplexerMessage(ChannelWrapper wrapper) throws Exception
 	{
 		ByteBuffer msg = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
 		int count = 0;
 		int n = 0;
+		ReadableByteChannel channel = (ReadableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel();
 		do
 		{
 			count = channel.read(msg);
@@ -218,14 +219,15 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 
 	/**
 	 * Write the current message to a channel.
-	 * @param channel the channel to write the data to.
+	 * @param wrapper the channel to write the data to.
 	 * @return true if the current message was completely written, false otherwise.
 	 * @throws Exception if an error occurs while reading the data.
 	 */
-	public boolean writeMultiplexerMessage(WritableByteChannel channel) throws Exception
+	public boolean writeMultiplexerMessage(ChannelWrapper wrapper) throws Exception
 	{
 		ByteBuffer msg = getCurrentMessage();
 		int count = 0;
+		WritableByteChannel channel = (WritableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel();
 		do
 		{
 			count = channel.write(msg);

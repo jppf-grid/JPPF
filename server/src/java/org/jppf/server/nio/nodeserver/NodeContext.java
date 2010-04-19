@@ -18,10 +18,9 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import java.nio.channels.SocketChannel;
 import java.util.List;
 
-import org.jppf.data.transform.*;
+import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
@@ -132,13 +131,13 @@ class NodeContext extends NioContext<NodeState>
 	 * @param channel the channel that threw the exception.
 	 * @see org.jppf.server.nio.NioContext#handleException(java.nio.channels.SocketChannel)
 	 */
-	public void handleException(SocketChannel channel)
+	public void handleException(ChannelWrapper channel)
 	{
 		if (getBundler() != null) getBundler().dispose();
 		NodeNioServer.closeNode(channel, this);
 		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getBundle().getState()))
 		{
-			JPPFDriver.getInstance().getJobManager().jobReturned(bundle, new ChannelWrapper<SocketChannel>(channel));
+			JPPFDriver.getInstance().getJobManager().jobReturned(bundle, channel);
 			resubmitBundle(bundle);
 		}
 	}
@@ -228,5 +227,29 @@ class NodeContext extends NioContext<NodeState>
 	public void setNodeUuid(String nodeUuid)
 	{
 		this.nodeUuid = nodeUuid;
+	}
+
+	/**
+	 * Read data from a channel.
+	 * @param channel the channel to read the data from.
+	 * @return true if all the data has been read, false otherwise.
+	 * @throws Exception if an error occurs while reading the data.
+	 * @see org.jppf.server.nio.NioContext#readMessage(java.nio.channels.ReadableByteChannel)
+	 */
+	public boolean readMessage(ChannelWrapper<?> channel) throws Exception
+	{
+		return getNodeMessage().read(channel);
+	}
+
+	/**
+	 * Write data to a channel.
+	 * @param channel the channel to write the data to.
+	 * @return true if all the data has been written, false otherwise.
+	 * @throws Exception if an error occurs while writing the data.
+	 * @see org.jppf.server.nio.NioContext#writeMessage(java.nio.channels.WritableByteChannel)
+	 */
+	public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
+	{
+		return getNodeMessage().write(channel);
 	}
 }

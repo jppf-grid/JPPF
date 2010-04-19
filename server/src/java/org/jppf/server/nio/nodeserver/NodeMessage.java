@@ -23,9 +23,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
 
-import org.jppf.data.transform.*;
+import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
-import org.jppf.server.nio.NioObject;
+import org.jppf.server.nio.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.*;
 
@@ -83,12 +83,13 @@ class NodeMessage
 
 	/**
 	 * Read data from the channel.
-	 * @param channel the channel to read from.
+	 * @param wrapper the channel to read from.
 	 * @return true if the data has been completely read from the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	public boolean read(ReadableByteChannel channel) throws Exception
+	public boolean read(ChannelWrapper<?> wrapper) throws Exception
 	{
+		SocketChannel channel = (SocketChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
 		if (nbObjects <= 0)
 		{
 			if (!readNextObject(channel)) return false;
@@ -139,12 +140,13 @@ class NodeMessage
 
 	/**
 	 * Read data from the channel.
-	 * @param channel the channel to write to.
+	 * @param wrapper the channel to write to.
 	 * @return true if the data has been completely written the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	public boolean write(WritableByteChannel channel) throws Exception
+	public boolean write(ChannelWrapper<?> wrapper) throws Exception
 	{
+		SocketChannel channel = (SocketChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
 		if (nbObjects <= 0)
 		{
 			nbObjects = bundle.getTaskCount() + 2;

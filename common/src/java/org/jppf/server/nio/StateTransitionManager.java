@@ -66,7 +66,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	/**
 	 * The set of keys currently being processed.
 	 */
-	private Set<SelectionKey> processingKeys = new HashSet<SelectionKey>();
+	private Set<ChannelWrapper> processingKeys = new HashSet<ChannelWrapper>();
 
 	/**
 	 * Initialize this transition manager with the specified server and sequential flag.
@@ -87,7 +87,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * Submit the next state transition for a specified channel.
 	 * @param key the selection key that references the channel.
 	 */
-	protected void submitTransition(SelectionKey key)
+	protected void submitTransition(ChannelWrapper key)
 	{
 		if (!sequential)
 		{
@@ -111,15 +111,15 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 
 	/**
 	 * Remove the specified key from the set of currently processed keys.
-	 * @param key the key to release.
+	 * @param channel the key to release.
 	 */
-	void releaseKey(SelectionKey key)
+	void releaseKey(ChannelWrapper channel)
 	{
 		lock.lock();
 		try
 		{
-			if (debugEnabled) log.debug("processed keys: " + processingKeys + ", before removing " + key);
-			processingKeys.remove(key);
+			if (debugEnabled) log.debug("processed keys: " + processingKeys + ", before removing " + channel);
+			processingKeys.remove(channel);
 		}
 		finally
 		{
@@ -129,15 +129,15 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 
 	/**
 	 * Determine whether the specified key is currently being processed.
-	 * @param key the key to check.
+	 * @param channel the key to check.
 	 * @return true if the key is being processed, false otherwise.
 	 */
-	public boolean isProcessingKey(SelectionKey key)
+	public boolean isProcessingKey(ChannelWrapper channel)
 	{
 		lock.lock();
 		try
 		{
-			return processingKeys.contains(key);
+			return processingKeys.contains(channel);
 		}
 		finally
 		{
@@ -151,14 +151,14 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * @param key the key on which to set the interest operations.
 	 * @param ops the operations to set on the key.
 	 */
-	public void setKeyOps(SelectionKey key, int ops)
+	public void setKeyOps(ChannelWrapper key, int ops)
 	{
 		Lock lock = server.getLock();
 		lock.lock();
 		try
 		{
 			server.getSelector().wakeup();
-			key.interestOps(ops);
+			key.setKeyOps(ops);
 		}
 		finally
 		{
@@ -171,9 +171,9 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * @param key the key holding the channel and associated context. 
 	 * @param transition holds the new state of the channel and associated key ops.
 	 */
-	public void transitionChannel(SelectionKey key, T transition)
+	public void transitionChannel(ChannelWrapper key, T transition)
 	{
-		NioContext<S> context = (NioContext<S>) key.attachment();
+		NioContext<S> context = (NioContext<S>) key.getContext();
 		NioTransition<S> t = server.getFactory().getTransition(transition);
 		context.setState(t.getState());
 		setKeyOps(key, t.getInterestOps());
@@ -184,21 +184,12 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * @param channel the channel to register.
 	 * @param ops the operations the channel is initially interested in.
 	 * @param context the context attached to the channel.
-	 */
-	public void registerChannel(SocketChannel channel, int ops, NioContext context)
-	{
-		registerChannel(channel, ops, context, null);
-	}
-
-	/**
-	 * Register a channel not opened through this server.
-	 * @param channel the channel to register.
-	 * @param ops the operations the channel is initially interested in.
-	 * @param context the context attached to the channel.
 	 * @param action an action to perform upon registration of the channel.
+	 * @return a {@link ChannelWrapper} instance.
 	 */
-	public void registerChannel(SocketChannel channel, int ops, NioContext context,	ChannelRegistrationAction action)
+	public ChannelWrapper registerChannel(SocketChannel channel, int ops, NioContext context,	ChannelRegistrationAction action)
 	{
+		ChannelWrapper wrapper = null;
 		SelectionKey key = null;
 		try
 		{
@@ -207,9 +198,10 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 			{
 				server.getSelector().wakeup();
 				key = channel.register(server.getSelector(), ops, context);
+				wrapper = new SelectionKeyWrapper(key);
 				if (action != null)
 				{
-					action.key = key;
+					action.key = wrapper;
 					action.run();
 				}
 			}
@@ -222,6 +214,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		{
 			log.error(e.getMessage(), e);
 		}
+		return wrapper;
 	}
 
 	/**
@@ -245,7 +238,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		/**
 		 * The key resulting form the channel registration.
 		 */
-		public SelectionKey key = null;
+		public ChannelWrapper key = null;
 	}
 
 	/**

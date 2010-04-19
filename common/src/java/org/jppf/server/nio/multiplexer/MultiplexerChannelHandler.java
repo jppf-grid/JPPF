@@ -43,7 +43,7 @@ public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
 	/**
 	 * The key associated with the initial connection.
 	 */
-	private SelectionKey initialKey = null;
+	private ChannelWrapper initialKey = null;
 
 	/**
 	 * Initialize the channel with the specified host and port.
@@ -52,8 +52,7 @@ public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
 	 * @param port the port to connect to on the remote host.
 	 * @param initialKey the key associated with the initial connection.
 	 */
-	public MultiplexerChannelHandler(NioServer server, String host, int port,
-		SelectionKey initialKey)
+	public MultiplexerChannelHandler(NioServer server, String host, int port, ChannelWrapper initialKey)
 	{
 		super(server, host, port);
 		this.initialKey = initialKey;
@@ -87,7 +86,7 @@ public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
 			{
 				public void run()
 				{
-					MultiplexerContext initialContext = (MultiplexerContext ) initialKey.attachment();
+					MultiplexerContext initialContext = (MultiplexerContext ) initialKey.getContext();
 					initialContext.setLinkedKey(key);
 					server.getTransitionManager().transitionChannel(initialKey, MultiplexerTransition.TO_SENDING_OR_RECEIVING);
 				}

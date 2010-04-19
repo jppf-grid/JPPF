@@ -19,11 +19,9 @@
 package org.jppf.server.nio.multiplexer;
 
 import static org.jppf.server.nio.multiplexer.MultiplexerTransition.TO_IDLE;
-import static org.jppf.utils.StringUtils.getRemoteHost;
-
-import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.server.nio.ChannelWrapper;
 
 /**
  * State of doing nothing.
@@ -51,17 +49,16 @@ public class IdleState extends MultiplexerServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public MultiplexerTransition performTransition(SelectionKey key) throws Exception
+	public MultiplexerTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
 		if (debugEnabled)
 		{
-			SelectableChannel channel = key.channel();
-			log.debug("channel " + getRemoteHost(channel) + " in idle mode");
+			log.debug("channel " + wrapper + " in idle mode");
 		}
 		return TO_IDLE;
 	}

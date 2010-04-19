@@ -166,11 +166,11 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 * @param serverChannel the ServerSocketChannel that accepted the channel.
 	 * @see org.jppf.server.nio.NioServer#postAccept(java.nio.channels.SelectionKey, java.nio.channels.ServerSocketChannel)
 	 */
-	public void postAccept(SelectionKey key, ServerSocketChannel serverChannel)
+	public void postAccept(ChannelWrapper key, ServerSocketChannel serverChannel)
 	{
 		int port = serverChannel.socket().getLocalPort();
 		if (debugEnabled) log.debug("accepting on port " + port);
-		MultiplexerContext context = (MultiplexerContext) key.attachment();
+		MultiplexerContext context = (MultiplexerContext) key.getContext();
 		if (multiplexerPorts.contains(port)) context.setMultiplexerPort(port);
 		else if (boundPorts.contains(port)) context.setBoundPort(port);
 		postAccept(key);
@@ -181,9 +181,9 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 * @param key the selection key for the socket channel to process.
 	 * @see org.jppf.server.nio.NioServer#postAccept(java.nio.channels.SelectionKey)
 	 */
-	public void postAccept(SelectionKey key)
+	public void postAccept(ChannelWrapper key)
 	{
-		MultiplexerContext context = (MultiplexerContext) key.attachment();
+		MultiplexerContext context = (MultiplexerContext) key.getContext();
 		if (context.isApplicationPort())
 		{
 			if (debugEnabled) log.debug("initializing outbound port " + context.getBoundPort());

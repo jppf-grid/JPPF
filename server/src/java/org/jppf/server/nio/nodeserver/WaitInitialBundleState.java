@@ -19,9 +19,6 @@
 package org.jppf.server.nio.nodeserver;
 
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
-import static org.jppf.utils.StringUtils.getRemoteHost;
-
-import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.management.*;
@@ -57,20 +54,19 @@ class WaitInitialBundleState extends NodeServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public NodeTransition performTransition(SelectionKey key) throws Exception
+	public NodeTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		SelectableChannel channel = key.channel();
-		NodeContext context = (NodeContext) key.attachment();
-		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
+		NodeContext context = (NodeContext) wrapper.getContext();
+		if (debugEnabled) log.debug("exec() for " + wrapper);
 		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
-		if (context.getNodeMessage().read((ReadableByteChannel) channel))
+		if (context.readMessage(wrapper))
 		{
-			if (debugEnabled) log.debug("read bundle for " + getRemoteHost(channel) + " done");
+			if (debugEnabled) log.debug("read bundle for " + wrapper + " done");
 			BundleWrapper bundleWrapper = context.deserializeBundle();
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			context.setUuid(bundle.getBundleUuid());
@@ -78,7 +74,7 @@ class WaitInitialBundleState extends NodeServerState
 			Bundler bundler = server.getBundler().copy();
 			JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
 			if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
-			if (debugEnabled) log.debug("processing threads for node " + getRemoteHost(channel) + " = " + systemInfo.getJppf().getInt("processing.threads", -1));
+			if (debugEnabled) log.debug("processing threads for node " + wrapper + " = " + systemInfo.getJppf().getInt("processing.threads", -1));
 			bundler.setup();
 			context.setBundler(bundler);
 			Boolean b = (Boolean) bundle.getParameter(BundleParameter.IS_PEER);
@@ -93,13 +89,13 @@ class WaitInitialBundleState extends NodeServerState
 					int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM);
 					JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE);
 					if (systemInfo != null) info.setSystemInfo(systemInfo);
-					driver.addNodeInformation(new ChannelWrapper<SelectableChannel>(channel), info);
+					driver.addNodeInformation(wrapper, info);
 				}
 			}
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setNodeMessage(null);
 			context.setBundle(null);
-			server.addIdleChannel(channel);
+			server.addIdleChannel(wrapper);
 			return TO_IDLE;
 		}
 		return TO_WAIT_INITIAL;

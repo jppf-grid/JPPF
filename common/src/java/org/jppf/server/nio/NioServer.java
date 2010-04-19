@@ -160,7 +160,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 			for (int port: ports)
 			{
 				ServerSocketChannel server = ServerSocketChannel.open();
-				//int size = 32*1024;
 				server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 				server.socket().bind(new InetSocketAddress(port));
 				server.configureBlocking(false);
@@ -239,7 +238,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 			try
 			{
 				if (key.isAcceptable()) doAccept(key);
-				else transitionManager.submitTransition(key);
+				else transitionManager.submitTransition(new SelectionKeyWrapper(key));
 			}
 			catch (Exception e)
 			{
@@ -308,7 +307,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 		try
 		{
 			SelectionKey selKey = channel.register(selector,	getInitialInterest(), context);
-			postAccept(selKey, serverSocketChannel);
+			postAccept(new SelectionKeyWrapper(selKey), serverSocketChannel);
 		}
 		catch (ClosedChannelException e)
 		{
@@ -321,7 +320,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * @param key the selection key for the socket channel to process.
 	 * @param serverChannel the ServerSocketChannel that accepted the channel.
 	 */
-	public void postAccept(SelectionKey key, ServerSocketChannel serverChannel)
+	public void postAccept(ChannelWrapper key, ServerSocketChannel serverChannel)
 	{
 		postAccept(key);
 	}
@@ -330,7 +329,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * Process a channel that was accepted by the server socket channel.
 	 * @param key the selection key for the socket channel to process.
 	 */
-	public abstract void postAccept(SelectionKey key);
+	public abstract void postAccept(ChannelWrapper key);
 
 	/**
 	 * Define a context for a newly created channel.

@@ -18,13 +18,12 @@
 
 package org.jppf.server.nio.multiplexer;
 
-import static org.jppf.utils.StringUtils.getRemoteHost;
 import static org.jppf.server.nio.multiplexer.MultiplexerTransition.*;
 
 import java.io.IOException;
-import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.server.nio.ChannelWrapper;
 
 /**
  * In this state, the channel is waiting for the port number to which data should be forwarded locally.
@@ -52,28 +51,27 @@ public class IdentifyingInboundChannelState extends MultiplexerServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public MultiplexerTransition performTransition(SelectionKey key) throws Exception
+	public MultiplexerTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		SelectableChannel channel = key.channel();
-		MultiplexerContext context = (MultiplexerContext) key.attachment();
-		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
-		if (context.readMessage((ReadableByteChannel) channel))
+		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
+		if (debugEnabled) log.debug("exec() for " + wrapper);
+		if (context.readMessage(wrapper))
 		{
 			int port = context.readOutBoundPort();
-			if (debugEnabled) log.debug("read port number for " + getRemoteHost(channel) + ": " + port);
+			if (debugEnabled) log.debug("read port number for " + wrapper + ": " + port);
 			if (port <= 0)
 			{
 				throw new IOException("outbound port could not be read from this channel");
 			}
-			OutboundChannelHandler handler = new OutboundChannelHandler(server, "localhost", port, key);
+			OutboundChannelHandler handler = new OutboundChannelHandler(server, "localhost", port, wrapper);
 			MultiplexerChannelInitializer init = new MultiplexerChannelInitializer(handler);
 			context.setMessage(null);
-			server.getTransitionManager().transitionChannel(key, TO_IDLE);
+			server.getTransitionManager().transitionChannel(wrapper, TO_IDLE);
 			new Thread(init).start();
 			return TO_IDLE;
 		}

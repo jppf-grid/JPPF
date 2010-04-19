@@ -18,9 +18,7 @@
 
 package org.jppf.server.nio.multiplexer;
 
-import java.nio.channels.*;
-
-import org.jppf.server.nio.NioContext;
+import org.jppf.server.nio.*;
 
 /**
  * Context obect associated with a socket channel used by the multiplexer. 
@@ -31,7 +29,7 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	/**
 	 * The request currently processed.
 	 */
-	private SelectionKey linkedKey = null;
+	private ChannelWrapper linkedKey = null;
 	/**
 	 * The application port to which the channel may be bound.
 	 */
@@ -46,17 +44,17 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 	 * @param channel the channel that threw the exception.
 	 * @see org.jppf.server.nio.NioContext#handleException(java.nio.channels.SocketChannel)
 	 */
-	public void handleException(SocketChannel channel)
+	public void handleException(ChannelWrapper channel)
 	{
 		try
 		{
 			if (linkedKey != null)
 			{
-				if (linkedKey.channel() != null)
+				if (linkedKey != null)
 				{
 					try
 					{
-						linkedKey.channel().close();
+						linkedKey.close();
 					}
 					catch(Exception e)
 					{
@@ -74,18 +72,18 @@ public class MultiplexerContext extends NioContext<MultiplexerState>
 
 	/**
 	 * Get the request currently processed.
-	 * @return a <code>SelectionKey</code> instance.
+	 * @return a <code>ChannelWrapper</code> instance.
 	 */
-	public synchronized SelectionKey getLinkedKey()
+	public synchronized ChannelWrapper getLinkedKey()
 	{
 		return linkedKey;
 	}
 
 	/**
 	 * Set the request currently processed.
-	 * @param key a <code>SelectionKey</code> instance. 
+	 * @param key a <code>ChannelWrapper</code> instance. 
 	 */
-	public synchronized void setLinkedKey(SelectionKey key)
+	public synchronized void setLinkedKey(ChannelWrapper key)
 	{
 		this.linkedKey = key;
 	}

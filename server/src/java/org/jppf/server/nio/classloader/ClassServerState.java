@@ -65,11 +65,11 @@ abstract class ClassServerState extends NioState<ClassTransition>
 	 * @param request the selection key wrapping the requesting channel.
 	 * @throws Exception if an error occurs while setting the new requester's state.
 	 */
-	protected void sendNullResponse(SelectionKey request) throws Exception
+	protected void sendNullResponse(ChannelWrapper request) throws Exception
 	{
 		if (debugEnabled) log.debug("disconnected provider: sending null response to node " +
-			getRemoteHost((SocketChannel) request.channel()));
-		ClassContext requestContext = (ClassContext) request.attachment();
+			getRemoteHost((SocketChannel) ((SelectionKeyWrapper) request).getChannel().channel()));
+		ClassContext requestContext = (ClassContext) request.getContext();
 		requestContext.getResource().setDefinition(null);
 		requestContext.serializeResource();
 		requestContext.setState(SENDING_NODE_RESPONSE);

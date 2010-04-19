@@ -19,11 +19,9 @@
 package org.jppf.server.nio.multiplexer.generic;
 
 import static org.jppf.server.nio.multiplexer.generic.MultiplexerTransition.*;
-import static org.jppf.utils.StringUtils.getRemoteHost;
-
-import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.server.nio.ChannelWrapper;
 
 /**
  * State of sending data on a channel.
@@ -51,26 +49,25 @@ public class SendingState extends MultiplexerServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public MultiplexerTransition performTransition(SelectionKey key) throws Exception
+	public MultiplexerTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		SelectableChannel channel = key.channel();
-		MultiplexerContext context = (MultiplexerContext) key.attachment();
+		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
 		if (context.hasPendingMessage() && (context.getCurrentMessage() == null))
 		{
 			ByteBufferWrapper message = context.nextPendingMessage();
 			context.setCurrentMessage(message.buffer);
-			if (debugEnabled) log.debug(getRemoteHost(channel) + " about to send message #" + message.order +
+			if (debugEnabled) log.debug(wrapper.toString() + " about to send message #" + message.order +
 				": " + (message.buffer.limit()+1) + " bytes");
 		}
 		if (context.getCurrentMessage() == null) return TO_SENDING_OR_RECEIVING;
-		if (context.writeMultiplexerMessage((WritableByteChannel) channel))
+		if (context.writeMultiplexerMessage(wrapper))
 		{
-			if (debugEnabled) log.debug(getRemoteHost(channel) + " message sent");
+			if (debugEnabled) log.debug(wrapper.toString() + " message sent");
 			context.setCurrentMessage(null);
 			return context.hasPendingMessage() ? TO_SENDING : TO_SENDING_OR_RECEIVING;
 		}

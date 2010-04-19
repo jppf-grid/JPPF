@@ -19,12 +19,11 @@
 package org.jppf.server.nio.classloader;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
-import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.net.ConnectException;
-import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.server.nio.ChannelWrapper;
 
 /**
  * State of sending the initial response to a newly created provider channel.
@@ -52,22 +51,21 @@ class SendingProviderInitialResponseState extends ClassServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ClassTransition performTransition(SelectionKey key) throws Exception
+	public ClassTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		SelectableChannel channel = (SocketChannel) key.channel();
-		ClassContext context = (ClassContext) key.attachment();
-		if (key.isReadable())
+		ClassContext context = (ClassContext) wrapper.getContext();
+		if (wrapper.isReadable())
 		{
-			throw new ConnectException("provider " + getRemoteHost(channel) + " has been disconnected");
+			throw new ConnectException("provider " + wrapper + " has been disconnected");
 		}
-		if (context.writeMessage((WritableByteChannel) channel))
+		if (context.writeMessage(wrapper))
 		{
-			if (debugEnabled) log.debug("sent management to provider: " + getRemoteHost(channel));
+			if (debugEnabled) log.debug("sent management to provider: " + wrapper);
 			context.setMessage(null);
 			return TO_IDLE_PROVIDER;
 		}

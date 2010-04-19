@@ -18,17 +18,19 @@
 
 package org.jppf.server.nio;
 
+import java.nio.channels.SelectionKey;
+
 /**
  * Wraps a communication channel, no matter what the channel is.
  * @param <S> the type of wrapped channel.
  * @author Laurent Cohen
  */
-public class ChannelWrapper<S>
+public abstract class ChannelWrapper<S>
 {
 	/**
 	 * The channel to wrap.
 	 */
-	private final S channel;
+	protected S channel;
 	
 	/**
 	 * Initialize this channel wrapper with the specified channel.
@@ -46,6 +48,29 @@ public class ChannelWrapper<S>
 	public S getChannel()
 	{
 		return channel;
+	}
+
+	/**
+	 * Close the channel.
+	 * @throws Exception if any error occurs while closing the channel.
+	 */
+	public void close() throws Exception
+	{
+	}
+
+	/**
+	 * Get the {@link NioContext} attached to the channel.
+	 * @return a {@link NioContext} instance.
+	 */
+	public abstract NioContext getContext();
+
+	/**
+	 * Determine whether the channel is opened.
+	 * @return true if the channel is opened, false otherwise.
+	 */
+	public boolean isOpen()
+	{
+		return true;
 	}
 
 	/**
@@ -82,5 +107,67 @@ public class ChannelWrapper<S>
 	public String toString()
 	{
 		return "" + channel;
+	}
+
+	/**
+	 * Get the operations enabled for this channel.
+	 * @return the operations as an int value.
+	 */
+	public int getKeyOps()
+	{
+		return 0;
+	}
+
+	/**
+	 * Get the operations enabled for this channel.
+	 * @param keyOps the operations as an int value.
+	 */
+	public void setKeyOps(int keyOps)
+	{
+	}
+
+	/**
+	 * Get the operations available for this channel.
+	 * @return the operations as an int value.
+	 */
+	protected int readyOps()
+	{
+		return 0;
+	}
+
+	/**
+	 * Determine whether the channel can be read from.
+	 * @return true if the channel can be read, false otherwise.
+	 */
+	public boolean isReadable()
+	{
+		return (readyOps() & SelectionKey.OP_READ) > 0;
+	}
+
+	/**
+	 * Determine whether the channel can be written to.
+	 * @return true if the channel can be written to, false otherwise.
+	 */
+	public boolean isWritable()
+	{
+		return (readyOps() & SelectionKey.OP_WRITE) > 0;
+	}
+
+	/**
+	 * Determine whether the channel can accept connections.
+	 * @return true if the channel can accept connections, false otherwise.
+	 */
+	public boolean isAcceptable()
+	{
+		return (readyOps() & SelectionKey.OP_ACCEPT) > 0;
+	}
+
+	/**
+	 * Determine whether the channel can be connected.
+	 * @return true if the channel can be connected, false otherwise.
+	 */
+	public boolean isConnectable()
+	{
+		return (readyOps() & SelectionKey.OP_CONNECT) > 0;
 	}
 }

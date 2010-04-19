@@ -71,15 +71,15 @@ class TaskQueueChecker implements Runnable
 	 */
 	public void run()
 	{
-		List<SelectableChannel> idleChannels = server.getIdleChannels();
+		List<ChannelWrapper> idleChannels = server.getIdleChannels();
 		synchronized(idleChannels)
 		{
 			if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return;
 			if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
-			List<SelectableChannel> channelList = new ArrayList<SelectableChannel>();
+			List<ChannelWrapper> channelList = new ArrayList<ChannelWrapper>();
 			channelList.addAll(idleChannels);
 			boolean found = false;
-			SelectableChannel channel = null;
+			ChannelWrapper channel = null;
 			BundleWrapper selectedBundle = null;
 			AbstractJPPFQueue queue = (AbstractJPPFQueue) server.getQueue();
 			queue.getLock().lock();
@@ -102,13 +102,13 @@ class TaskQueueChecker implements Runnable
 				if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "found channel for bundle");
 				if (channel != null)
 				{
-					SelectionKey key = channel.keyFor(server.getSelector());
+					SelectionKey key = (SelectionKey) channel.getChannel(); //channel.keyFor(server.getSelector());
 					NodeContext context = (NodeContext) key.attachment();
 					updateBundler(server.getBundler(), selectedBundle.getBundle(), context);
 					BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
 					context.setBundle(bundleWrapper);
-					server.getTransitionManager().transitionChannel(key, NodeTransition.TO_SENDING);
-					driver.getJobManager().jobDispatched(context.getBundle(), new ChannelWrapper<SelectableChannel>(channel));
+					server.getTransitionManager().transitionChannel(channel, NodeTransition.TO_SENDING);
+					driver.getJobManager().jobDispatched(context.getBundle(), channel);
 				}
 			}
 			finally
@@ -125,7 +125,7 @@ class TaskQueueChecker implements Runnable
 	 */
 	private int findIdleChannelIndex(JPPFTaskBundle bundle)
 	{
-		List<SelectableChannel> idleChannels = server.getIdleChannels();
+		List<ChannelWrapper> idleChannels = server.getIdleChannels();
 		int n = -1;
 		ExecutionPolicy rule = bundle.getJobSLA().getExecutionPolicy();
 		//if (debugEnabled && (rule != null)) log.debug("Bundle has an execution policy:\n" + rule);
@@ -134,19 +134,19 @@ class TaskQueueChecker implements Runnable
 		List<String> uuidPath = bundle.getUuidPath().getList();
 		for (int i=0; i<idleChannels.size(); i++)
 		{
-			SelectableChannel ch = idleChannels.get(i);
+			ChannelWrapper ch = idleChannels.get(i);
 			if (!ch.isOpen())
 			{
 				channelsToRemove.add(i);
 				continue;
 			}
-			SelectionKey key = ch.keyFor(server.getSelector());
-			if (!server.getTransitionManager().isSequential() && server.getTransitionManager().isProcessingKey(key)) continue;
+			SelectionKey key = (SelectionKey) ch.getChannel();
+			if (!server.getTransitionManager().isSequential() && server.getTransitionManager().isProcessingKey(ch)) continue;
 			NodeContext context = (NodeContext) key.attachment();
 			if (uuidPath.contains(context.getNodeUuid())) continue;
 			if (rule != null)
 			{
-				JPPFManagementInfo mgtInfo = driver.getNodeInformation(new ChannelWrapper<SelectableChannel>(ch));
+				JPPFManagementInfo mgtInfo = driver.getNodeInformation(ch);
 				JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
 				if (!rule.accepts(info)) continue;
 			}

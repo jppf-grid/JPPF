@@ -19,9 +19,6 @@
 package org.jppf.server.nio.nodeserver;
 
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
-import static org.jppf.utils.StringUtils.getRemoteHost;
-
-import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.management.JPPFSystemInformation;
@@ -55,23 +52,22 @@ class WaitingResultsState extends NodeServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public NodeTransition performTransition(SelectionKey key) throws Exception
+	public NodeTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		SelectableChannel channel = key.channel();
-		NodeContext context = (NodeContext) key.attachment();
+		NodeContext context = (NodeContext) wrapper.getContext();
 		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 
 		// Wait the full byte[] of the bundle come to start processing.
 		// This makes the integration of non-blocking with ObjectInputStream easier.
 		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
-		if (context.getNodeMessage().read((ReadableByteChannel) channel))
+		if (context.readMessage(wrapper))
 		{
-			if (debugEnabled) log.debug("read bundle from node " + getRemoteHost(channel) + " done");
+			if (debugEnabled) log.debug("read bundle from node " + wrapper + " done");
 			BundleWrapper bundleWrapper = context.getBundle();
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			BundleWrapper newBundleWrapper = context.deserializeBundle();
@@ -90,7 +86,7 @@ class WaitingResultsState extends NodeServerState
 				context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 			}
 			Boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE);
-			jobManager.jobReturned(bundleWrapper, new ChannelWrapper<SelectableChannel>(channel));
+			jobManager.jobReturned(bundleWrapper, wrapper);
 			if ((requeue != null) && requeue)
 			{
 				bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
@@ -110,7 +106,7 @@ class WaitingResultsState extends NodeServerState
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setNodeMessage(null);
 			context.setBundle(null);
-			server.addIdleChannel(channel);
+			server.addIdleChannel(wrapper);
 			return TO_IDLE;
 		}
 		return TO_WAITING;

@@ -80,10 +80,10 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
 			ClassContext context = (ClassContext) server.createNioContext();
 			//context.setState(ClassState.SENDING_PROVIDER_REQUEST);
 			context.setState(ClassState.IDLE_PROVIDER);
-			context.setPendingRequests(new Vector<SelectionKey>());
+			context.setPendingRequests(new Vector<ChannelWrapper>());
 			context.setUuid(resource.getProviderUuid());
-			server.getTransitionManager().registerChannel(channel, 0, context);
-			((ClassNioServer) server).addProviderConnection(resource.getProviderUuid(), channel);
+			ChannelWrapper wrapper = server.getTransitionManager().registerChannel(channel, 0, context, null);
+			((ClassNioServer) server).addProviderConnection(resource.getProviderUuid(), wrapper);
 			if (debugEnabled) log.debug("registered class server channel");
 		}
 		catch (IOException e)

@@ -18,8 +18,6 @@
 
 package org.jppf.server.nio;
 
-import java.nio.channels.*;
-
 import org.apache.commons.logging.*;
 
 /**
@@ -42,7 +40,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 	/**
 	 * The selection key corresponding to the channel whose state is changing.
 	 */
-	private SelectionKey key = null;
+	private ChannelWrapper channel = null;
 	/**
 	 * The context attached to the key.
 	 */
@@ -54,12 +52,12 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 
 	/**
 	 * Initialize this task with the specified key and factory.
-	 * @param key the selection key corresponding to the channel whose state is changing.
+	 * @param channel the selection key corresponding to the channel whose state is changing.
 	 * @param factory the factory for the server that runs this task.
 	 */
-	public StateTransitionTask(SelectionKey key, NioServerFactory<S, T> factory)
+	public StateTransitionTask(ChannelWrapper channel, NioServerFactory<S, T> factory)
 	{
-		this.key = key;
+		this.channel = channel;
 		this.factory = factory;
 	}
 
@@ -72,22 +70,22 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 		StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
 		try
 		{
-			this.ctx = (NioContext<S>) key.attachment();
+			this.ctx = (NioContext<S>) channel.getContext();
 			//if (debugEnabled) log.debug(StringUtils.getRemoteHost(key.channel()) + " transition from " + ctx.getState());
 			NioState<T> state = factory.getState(ctx.getState());
-			NioTransition<S> transition = factory.getTransition(state.performTransition(key));
+			NioTransition<S> transition = factory.getTransition(state.performTransition(channel));
 			ctx.setState(transition.getState());
-			transitionManager.setKeyOps(key, transition.getInterestOps());
+			transitionManager.setKeyOps(channel, transition.getInterestOps());
 		}
 		catch(Exception e)
 		{
 			if (debugEnabled) log.debug(e.getMessage(), e);
 			else log.warn(e);
-			ctx.handleException((SocketChannel) key.channel());
+			ctx.handleException(channel);
 		}
 		finally
 		{
-			if (!transitionManager.isSequential()) transitionManager.releaseKey(key);
+			if (!transitionManager.isSequential()) transitionManager.releaseKey(channel);
 		}
 	}
 }

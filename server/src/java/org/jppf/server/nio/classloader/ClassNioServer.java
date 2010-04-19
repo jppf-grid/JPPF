@@ -44,8 +44,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 	 * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine in
 	 * which application classpath to look for the requested resources.
 	 */
-	//protected Map<String, SocketChannel> providerConnections = new Hashtable<String, SocketChannel>();
-	protected Map<String, List<SelectableChannel>> providerConnections = new Hashtable<String, List<SelectableChannel>>();
+	protected Map<String, List<ChannelWrapper>> providerConnections = new Hashtable<String, List<ChannelWrapper>>();
 	/**
 	 * The cache of class definition, this is done to not flood the provider when it dispatch many tasks. it use
 	 * WeakHashMap to minimize the OutOfMemory.
@@ -116,12 +115,12 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 
 	/**
 	 * Process a channel that was accepted by the server socket channel.
-	 * @param key the selection key for the socket channel to process.
+	 * @param wrapper the selection key for the socket channel to process.
 	 * @see org.jppf.server.nio.NioServer#postAccept(java.nio.channels.SelectionKey)
 	 */
-	public void postAccept(SelectionKey key)
+	public void postAccept(ChannelWrapper wrapper)
 	{
-		((ClassContext) key.attachment()).setState(DEFINING_TYPE);
+		((ClassContext) wrapper.getContext()).setState(DEFINING_TYPE);
 	}
 
 	/**
@@ -149,12 +148,12 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 	 * @param uuid the provider uuid as a string.
 	 * @param channel the provider's communication channel.
 	 */
-	public void addProviderConnection(String uuid, SelectableChannel channel)
+	public void addProviderConnection(String uuid, ChannelWrapper channel)
 	{
-		List<SelectableChannel> list = providerConnections.get(uuid);
+		List<ChannelWrapper> list = providerConnections.get(uuid);
 		if (list == null)
 		{
-			list = new ArrayList<SelectableChannel>();
+			list = new ArrayList<ChannelWrapper>();
 			providerConnections.put(uuid, list);
 		}
 		list.add(channel);
@@ -165,9 +164,9 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 	 * @param uuid the provider uuid as a string.
 	 * @param channel the provider's communication channel.
 	 */
-	public void removeProviderConnection(String uuid, SelectableChannel channel)
+	public void removeProviderConnection(String uuid, ChannelWrapper channel)
 	{
-		List<SelectableChannel> list = providerConnections.get(uuid);
+		List<ChannelWrapper> list = providerConnections.get(uuid);
 		if (list == null) return;
 		list.remove(channel);
 	}

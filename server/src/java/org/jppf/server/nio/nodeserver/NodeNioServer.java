@@ -18,14 +18,13 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.*;
+import java.nio.channels.SelectionKey;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.*;
-import org.jppf.io.*;
+import org.jppf.io.ByteBufferLocation;
 import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
@@ -65,7 +64,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	/**
 	 * Holds the currently idle channels.
 	 */
-	private List<SelectableChannel> idleChannels = new ArrayList<SelectableChannel>();
+	private List<ChannelWrapper> idleChannels = new ArrayList<ChannelWrapper>();
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
@@ -136,23 +135,22 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 
 	/**
 	 * Process a channel that was accepted by the server socket channel.
-	 * @param key the selection key for the socket channel to process.
+	 * @param channel the selection key for the socket channel to process.
 	 * @see org.jppf.server.nio.NioServer#postAccept(java.nio.channels.SelectionKey)
 	 */
-	public void postAccept(SelectionKey key)
+	public void postAccept(ChannelWrapper channel)
 	{
 		driver.getStatsManager().newNodeConnection();
-		NodeContext context = (NodeContext) key.attachment();
+		NodeContext context = (NodeContext) channel.getContext();
 		try
 		{
 			context.setBundle(getInitialBundle());
-			//context.setBundler(bundler.copy());
-			transitionManager.transitionChannel(key, NodeTransition.TO_SEND_INITIAL);
+			transitionManager.transitionChannel(channel, NodeTransition.TO_SEND_INITIAL);
 		}
 		catch (Exception e)
 		{
 			log.error(e.getMessage(), e);
-			closeNode((SocketChannel) key.channel(), context);
+			closeNode(channel, context);
 		}
 	}
 
@@ -169,7 +167,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * Add a channel to the list of idle channels.
 	 * @param channel the channel to add to the list.
 	 */
-	public void addIdleChannel(SelectableChannel channel)
+	public void addIdleChannel(ChannelWrapper channel)
 	{
 		if (debugEnabled) log.debug("Adding idle chanel " + channel);
 		synchronized(idleChannels)
@@ -182,7 +180,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * Remove a channel from the list of idle channels.
 	 * @param channel the channel to remove from the list.
 	 */
-	public void removeIdleChannel(SelectableChannel channel)
+	public void removeIdleChannel(ChannelWrapper channel)
 	{
 		if (debugEnabled) log.debug("Removing idle chanel " + channel);
 		synchronized(idleChannels)
@@ -254,7 +252,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * @param channel - a <code>SocketChannel</code> that encapsulates the connection.
 	 * @param context - the context data associated with the channel.
 	 */
-	public static void closeNode(SocketChannel channel, NodeContext context)
+	public static void closeNode(ChannelWrapper channel, NodeContext context)
 	{
 		try
 		{
@@ -262,11 +260,11 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 			driver.getStatsManager().nodeConnectionClosed();
 			if (context.getNodeUuid() != null)
 			{
-				driver.removeNodeInformation(new ChannelWrapper<SocketChannel>(channel));
+				driver.removeNodeInformation(channel);
 				driver.getNodeNioServer().removeIdleChannel(channel);
 			}
 		}
-		catch (IOException ignored)
+		catch (Exception ignored)
 		{
 			log.error(ignored.getMessage(), ignored);
 		}
@@ -322,7 +320,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * Get the list of currently idle channels.
 	 * @return a list of <code>SelectableChannel</code> instances.
 	 */
-	public List<SelectableChannel> getIdleChannels()
+	public List<ChannelWrapper> getIdleChannels()
 	{
 		return idleChannels;
 	}

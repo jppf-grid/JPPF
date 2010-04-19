@@ -19,13 +19,13 @@ package org.jppf.server.nio.classloader;
 
 import static org.jppf.server.nio.classloader.ClassState.SENDING_NODE_RESPONSE;
 import static org.jppf.server.nio.classloader.ClassTransition.*;
-import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.io.IOException;
-import java.nio.channels.*;
+import java.nio.channels.SelectionKey;
 
 import org.apache.commons.logging.*;
 import org.jppf.classloader.JPPFResourceWrapper;
+import org.jppf.server.nio.ChannelWrapper;
 
 /**
  * This class represents the state of waiting for the response from a provider.
@@ -53,28 +53,27 @@ class WaitingProviderResponseState extends ClassServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ClassTransition performTransition(SelectionKey key) throws Exception
+	public ClassTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		SelectableChannel channel = key.channel();
-		ClassContext context = (ClassContext) key.attachment();
+		ClassContext context = (ClassContext) wrapper.getContext();
 		boolean messageRead = false;
 		try
 		{
-			messageRead = context.readMessage((ReadableByteChannel) channel);
+			messageRead = context.readMessage(wrapper);
 		}
 		catch(IOException e)
 		{
-			if (debugEnabled) log.debug("an exception occurred while reading response from provider: " + getRemoteHost(channel));
-			server.removeProviderConnection(context.getUuid(), channel);
-			SelectionKey currentRequest = context.getCurrentRequest();
+			if (debugEnabled) log.debug("an exception occurred while reading response from provider: " + wrapper);
+			server.removeProviderConnection(context.getUuid(), wrapper);
+			ChannelWrapper currentRequest = context.getCurrentRequest();
 			if ((currentRequest != null) || !context.getPendingRequests().isEmpty())
 			{
-				if (debugEnabled) log.debug("provider: " + getRemoteHost(channel) + " sending null response for disconnected provider");
+				if (debugEnabled) log.debug("provider: " + wrapper + " sending null response for disconnected provider");
 				if (currentRequest != null)
 				{
 					context.setCurrentRequest(null);
@@ -87,16 +86,15 @@ class WaitingProviderResponseState extends ClassServerState
 		}
 		if (messageRead)
 		{
-			if (debugEnabled) log.debug("read response from provider: " + getRemoteHost(channel) +
-				" complete, sending to node " + getRemoteHost((SocketChannel) context.getCurrentRequest().channel()) + 
+			if (debugEnabled) log.debug("read response from provider: " + wrapper + " complete, sending to node " + context.getCurrentRequest() + 
 				", resource: " + context.getResource().getName());
 			JPPFResourceWrapper resource = context.deserializeResource();
 			// putting the definition in cache
 			if ((resource.getDefinition() != null) && (resource.getCallable() == null))
 				server.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
 			// fowarding it to channel that requested
-			SelectionKey destinationKey = context.getCurrentRequest();
-			ClassContext destinationContext = (ClassContext) destinationKey.attachment();
+			ChannelWrapper destinationKey = context.getCurrentRequest();
+			ClassContext destinationContext = (ClassContext) destinationKey.getContext();
 			resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
 			destinationContext.setMessage(null);
 			destinationContext.setResource(resource);

@@ -19,12 +19,11 @@
 package org.jppf.server.nio.multiplexer;
 
 import static org.jppf.server.nio.multiplexer.MultiplexerTransition.*;
-import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.net.ConnectException;
-import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.server.nio.ChannelWrapper;
 
 /**
  * State of sending data on a channel.
@@ -52,22 +51,21 @@ public class SendingState extends MultiplexerServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public MultiplexerTransition performTransition(SelectionKey key) throws Exception
+	public MultiplexerTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		SelectableChannel channel = key.channel();
-		if (key.isReadable())
+		if (wrapper.isReadable())
 		{
-			throw new ConnectException("multiplexer " + getRemoteHost(channel) + " has been disconnected");
+			throw new ConnectException("multiplexer " + wrapper + " has been disconnected");
 		}
-		MultiplexerContext context = (MultiplexerContext) key.attachment();
-		if (context.writeMessage((WritableByteChannel) channel))
+		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
+		if (context.writeMessage(wrapper))
 		{
-			if (debugEnabled) log.debug(getRemoteHost(channel) + " message sent");
+			if (debugEnabled) log.debug(wrapper.toString() + " message sent");
 			context.setMessage(null);
 			return TO_SENDING_OR_RECEIVING;
 		}

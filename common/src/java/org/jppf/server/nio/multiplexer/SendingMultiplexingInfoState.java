@@ -19,14 +19,12 @@
 package org.jppf.server.nio.multiplexer;
 
 import static org.jppf.server.nio.multiplexer.MultiplexerTransition.*;
-import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.net.ConnectException;
 import java.nio.ByteBuffer;
-import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.nio.NioMessage;
+import org.jppf.server.nio.*;
 
 /**
  * This state is for sending a port number to a remote multiplexer, which will then establish
@@ -55,23 +53,22 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public MultiplexerTransition performTransition(SelectionKey key) throws Exception
+	public MultiplexerTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		SelectableChannel channel = key.channel();
-		if (key.isReadable())
+		if (wrapper.isReadable())
 		{
-			throw new ConnectException("multiplexer channel " + getRemoteHost(channel) + " has been disconnected");
+			throw new ConnectException("multiplexer channel " + wrapper + " has been disconnected");
 		}
-		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
-		MultiplexerContext context = (MultiplexerContext) key.attachment();
+		if (debugEnabled) log.debug("exec() for " + wrapper);
+		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
 		if (context.getMessage() == null)
 		{
-			MultiplexerContext linkedContext = (MultiplexerContext) context.getLinkedKey().attachment();
+			MultiplexerContext linkedContext = (MultiplexerContext) context.getLinkedKey().getContext();
 			NioMessage msg = new NioMessage();
 			msg.length = 4;
 			msg.buffer = ByteBuffer.wrap(new byte[4]);
@@ -79,9 +76,9 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 			msg.buffer.flip();
 			context.setMessage(msg);
 		}
-		if (context.writeMessage((WritableByteChannel) channel))
+		if (context.writeMessage(wrapper))
 		{
-			if (debugEnabled) log.debug("message sent to remote multiplexer " + getRemoteHost(channel));
+			if (debugEnabled) log.debug("message sent to remote multiplexer " + wrapper);
 			context.setMessage(null);
 			return TO_SENDING_OR_RECEIVING;
 		}

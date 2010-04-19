@@ -18,7 +18,6 @@
 
 package org.jppf.server.nio;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 
@@ -81,12 +80,13 @@ public abstract class NioContext<S extends Enum>
 
 	/**
 	 * Read data from a channel.
-	 * @param channel the channel to read the data from.
+	 * @param wrapper the channel to read the data from.
 	 * @return true if all the data has been read, false otherwise.
-	 * @throws IOException if an error occurs while reading the data.
+	 * @throws Exception if an error occurs while reading the data.
 	 */
-	public boolean readMessage(ReadableByteChannel channel) throws IOException
+	public boolean readMessage(ChannelWrapper<?> wrapper) throws Exception
 	{
+		ReadableByteChannel channel = (ReadableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
 		if (message == null) message = new NioMessage();
 		if (message.length <= 0)
 		{
@@ -105,12 +105,13 @@ public abstract class NioContext<S extends Enum>
 
 	/**
 	 * Write data to a channel.
-	 * @param channel the channel to write the data to.
+	 * @param wrapper the channel to write the data to.
 	 * @return true if all the data has been written, false otherwise.
-	 * @throws IOException if an error occurs while writing the data.
+	 * @throws Exception if an error occurs while writing the data.
 	 */
-	public boolean writeMessage(WritableByteChannel channel) throws IOException
+	public boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception
 	{
+		WritableByteChannel channel = (WritableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
 		if (!message.lengthWritten)
 		{
 			SerializationUtils.writeInt(channel, message.length);
@@ -177,5 +178,5 @@ public abstract class NioContext<S extends Enum>
 	 * Handle the cleanup when an exception occurs on the channel.
 	 * @param channel the channel that threw the exception.
 	 */
-	public abstract void handleException(SocketChannel channel);
+	public abstract void handleException(ChannelWrapper channel);
 }

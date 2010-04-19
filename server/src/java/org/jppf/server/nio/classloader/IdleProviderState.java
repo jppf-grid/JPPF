@@ -19,12 +19,11 @@
 package org.jppf.server.nio.classloader;
 
 import static org.jppf.server.nio.classloader.ClassTransition.TO_IDLE_PROVIDER;
-import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.net.ConnectException;
-import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.server.nio.ChannelWrapper;
 
 /**
  * This class represents the state of waiting for the next request for a provider.
@@ -52,19 +51,18 @@ class IdleProviderState extends ClassServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param key the selection key corresponding to the channel and selector for this state.
+	 * @param wrapper the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ClassTransition performTransition(SelectionKey key) throws Exception
+	public ClassTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		if (key.isReadable())
+		if (wrapper.isReadable())
 		{
-			SelectableChannel channel = key.channel();
-			ClassContext context = (ClassContext) key.attachment();
-			server.removeProviderConnection(context.getUuid(), channel);
-			throw new ConnectException("provider " + getRemoteHost(channel) + " has been disconnected");
+			ClassContext context = (ClassContext) wrapper.getContext();
+			server.removeProviderConnection(context.getUuid(), wrapper);
+			throw new ConnectException("provider " + wrapper + " has been disconnected");
 		}
 		return TO_IDLE_PROVIDER;
 	}
