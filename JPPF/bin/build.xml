@@ -399,7 +399,6 @@
 			</fileset>
 			<fileset dir="${lib}/log4j" includes="*.jar"/>
 			<fileset dir="${lib}/slf4j" includes="*.jar"/>
-			<fileset dir="${lib}/ApacheMina" includes="*.jar"/>
 		</copy>
 		<copy tofile="${runtime.driver}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.driver}"><fileset dir="${config}/driver"/></copy>
@@ -421,7 +420,6 @@
 			<fileset dir="${build}" includes="jppf-common-node.jar"/>
 			<fileset dir="${lib}/log4j" includes="*.jar"/>
 			<fileset dir="${lib}/slf4j" includes="*.jar"/>
-			<fileset dir="${lib}/ApacheMina" includes="*.jar"/>
 		</copy>
 		<copy tofile="${runtime.node}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.node}"><fileset dir="${config}/node"/></copy>
