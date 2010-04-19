@@ -474,7 +474,6 @@
 			</fileset>
 			<fileset dir="${lib}/log4j" includes="*.jar"/>
 			<fileset dir="${lib}/slf4j" includes="*.jar"/>
-			<fileset dir="${lib}/ApacheMina" includes="*.jar"/>
 		</copy>
 		<copy tofile="${runtime.multiplexer}/${license.file}" file="${basedir}/${license.file}"/>
 		<copy todir="${runtime.multiplexer}"><fileset dir="${config}/multiplexer"/></copy>
