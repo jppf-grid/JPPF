@@ -148,7 +148,8 @@ abstract class JPPFConnection extends Thread
 		}
 		catch (Exception e)
 		{
-			log.error(e.getMessage(), e);
+			if (debugEnabled) log.error(e.getMessage(), e);
+			else log.warn(e.getMessage());
 		}
 		closed = true;
 	}
