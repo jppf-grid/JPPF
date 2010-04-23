@@ -291,7 +291,12 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	public void close() throws ConnectException, IOException
 	{
 		opened = false;
-		if (socket != null) socket.close();
+		if (socket != null)
+		{
+			socket.shutdownInput();
+			socket.shutdownOutput();
+			socket.close();
+		}
 	}
 
 	/**

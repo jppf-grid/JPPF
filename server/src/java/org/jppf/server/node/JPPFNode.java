@@ -101,6 +101,10 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Manager for the MBean defined through the service provider interface.
 	 */
 	private JPPFMBeanProviderManager providerManager = null;
+	/**
+	 * The shutdown hook for this node.
+	 */
+	private NodeShutdownHook shutdownHook = null;
 
 	/**
 	 * Default constructor.
@@ -108,6 +112,8 @@ public class JPPFNode extends AbstractMonitoredNode
 	public JPPFNode()
 	{
 		executionManager = new NodeExecutionManager(this);
+		shutdownHook = new NodeShutdownHook(this);
+		Runtime.getRuntime().addShutdownHook(shutdownHook);
 	}
 
 	/**
@@ -416,6 +422,7 @@ public class JPPFNode extends AbstractMonitoredNode
 		}
 		setNodeAdmin(null);
 		classLoader = null;
+		Runtime.getRuntime().removeShutdownHook(shutdownHook);
 	}
 
 	/**
@@ -479,6 +486,14 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	public void shutdown(boolean restart)
 	{
+		try
+		{
+			if ((socketClient != null) && !socketClient.isOpened()) socketClient.close();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
 		NodeRunner.shutdown(this, restart);
 	}
 
