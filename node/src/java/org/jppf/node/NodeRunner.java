@@ -323,7 +323,9 @@ public class NodeRunner
 			{
 				public Object run()
 				{
-					System.exit(restart ? 2 : 0);
+					int exitCode = restart ? 2 : 0;
+					if (debugEnabled) log.debug("About to " + (restart ? "restart": "shutdown") + ", before System.exit(" + exitCode + ")");
+					System.exit(exitCode);
 					return null;
 				}
 			});

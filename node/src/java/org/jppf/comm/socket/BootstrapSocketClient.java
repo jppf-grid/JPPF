@@ -30,7 +30,6 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 {
 	/**
 	 * Default constructor is invisible to other classes.
-	 * See {@link org.jppf.comm.socket.BootstrapSocketClient#BootstrapSocketClient(java.lang.String, int) BootstrapSocketClient(String, int)}
 	 */
 	public BootstrapSocketClient()
 	{

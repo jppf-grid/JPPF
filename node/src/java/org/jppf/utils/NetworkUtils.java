@@ -19,6 +19,7 @@
 package org.jppf.utils;
 
 import java.net.*;
+import java.nio.channels.*;
 import java.util.*;
 
 import org.apache.commons.logging.*;
@@ -173,6 +174,27 @@ public final class NetworkUtils
 		InetSocketAddress addr = new InetSocketAddress(ip, 0);
 		String s = addr.getHostName();
 		return s == null ? ip : s;
+	}
+
+	/**
+	 * Check whether the specified key is valid.
+	 * @param key the key to check.
+	 * @return true if the key is valid, false otherwise.
+	 */
+	public static boolean isKeyValid(SelectionKey key)
+	{
+		if ((key == null) || !key.isValid()) return false;
+		SelectableChannel channel = key.channel();
+		if (!channel.isOpen() || !channel.isRegistered()) return false;
+		//if ((channel instanceof SocketChannel) && !((SocketChannel) channel).isConnected()) return false;
+		if (channel instanceof SocketChannel)
+		{
+			SocketChannel sc = (SocketChannel) channel;
+			if (!sc.isConnected()) return false;
+			Socket s = sc.socket();
+			if (s.isClosed() || !s.isConnected() || s.isInputShutdown() || s.isOutputShutdown()) return false;
+		}
+		return true;
 	}
 
 	/**

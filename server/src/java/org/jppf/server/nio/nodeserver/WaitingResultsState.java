@@ -21,6 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
+import java.net.ConnectException;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
@@ -28,6 +29,7 @@ import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
+import org.jppf.utils.NetworkUtils;
 
 /**
  * This class performs performs the work of reading a task bundle execution response from a node. 
@@ -62,7 +64,9 @@ public class WaitingResultsState extends NodeServerState
 	 */
 	public NodeTransition performTransition(SelectionKey key) throws Exception
 	{
-		SelectableChannel channel = key.channel();
+		//SelectableChannel channel = key.channel();
+		SocketChannel channel = (SocketChannel) key.channel();
+		if (!NetworkUtils.isKeyValid(key)) throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");
 		NodeContext context = (NodeContext) key.attachment();
 		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 

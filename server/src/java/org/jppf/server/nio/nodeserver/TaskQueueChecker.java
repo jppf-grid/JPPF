@@ -29,6 +29,7 @@ import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.AbstractJPPFQueue;
 import org.jppf.server.scheduler.bundle.*;
+import org.jppf.utils.*;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
@@ -55,6 +56,10 @@ public class TaskQueueChecker implements Runnable
 	 * Reference to the driver.
 	 */
 	private JPPFDriver driver = JPPFDriver.getInstance();
+	/**
+	 * The selector owned by the server.
+	 */
+	private Selector selector = null;
 
 	/**
 	 * Initialize this task queue checker with the specified node server. 
@@ -63,6 +68,7 @@ public class TaskQueueChecker implements Runnable
 	public TaskQueueChecker(NodeNioServer server)
 	{
 		this.server = server;
+		this.selector = server.getSelector();
 	}
 
 	/**
@@ -71,14 +77,12 @@ public class TaskQueueChecker implements Runnable
 	 */
 	public void run()
 	{
-		List<SelectableChannel> idleChannels = server.getIdleChannels();
-		synchronized(idleChannels)
+		synchronized(server.getIdleChannels())
 		{
+			List<SelectableChannel> idleChannels = server.getIdleChannels();
 			if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return;
-			if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
-			List<SelectableChannel> channelList = new ArrayList<SelectableChannel>();
-			channelList.addAll(idleChannels);
-			boolean found = false;
+			if (debugEnabled) log.debug("" + idleChannels.size() + " channels idle");
+			boolean channelFound = false;
 			SelectableChannel channel = null;
 			BundleWrapper selectedBundle = null;
 			AbstractJPPFQueue queue = (AbstractJPPFQueue) server.getQueue();
@@ -86,7 +90,7 @@ public class TaskQueueChecker implements Runnable
 			try
 			{
 				Iterator<BundleWrapper> it = queue.iterator();
-				while (!found && it.hasNext() && !idleChannels.isEmpty())
+				while (!channelFound && it.hasNext() && !idleChannels.isEmpty())
 				{
 					BundleWrapper bundleWrapper = it.next();
 					JPPFTaskBundle bundle = bundleWrapper.getBundle();
@@ -96,13 +100,13 @@ public class TaskQueueChecker implements Runnable
 					{
 						channel = idleChannels.remove(n);
 						selectedBundle = bundleWrapper;
-						found = true;
+						channelFound = true;
 					}
 				}
-				if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "found channel for bundle");
-				if (channel != null)
+				if (debugEnabled) log.debug((channelFound ? "" : "no ") + "channel found for bundle");
+				if (channelFound)
 				{
-					SelectionKey key = channel.keyFor(server.getSelector());
+					SelectionKey key = channel.keyFor(selector);
 					NodeContext context = (NodeContext) key.attachment();
 					updateBundler(server.getBundler(), selectedBundle.getBundle(), context);
 					BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
@@ -135,13 +139,14 @@ public class TaskQueueChecker implements Runnable
 		for (int i=0; i<idleChannels.size(); i++)
 		{
 			SelectableChannel ch = idleChannels.get(i);
-			if (!ch.isOpen())
+			//if (!ch.isOpen() || !NetworkUtils.isKeyValid(ch.keyFor(selector)))
+			SelectionKey key = ch.keyFor(selector);
+			if (!NetworkUtils.isKeyValid(key))
 			{
 				channelsToRemove.add(i);
 				continue;
 			}
-			SelectionKey key = ch.keyFor(server.getSelector());
-			if (!server.getTransitionManager().isSequential() && server.getTransitionManager().isProcessingKey(key)) continue;
+			//if (!server.getTransitionManager().isSequential() && server.getTransitionManager().isProcessingKey(key)) continue;
 			NodeContext context = (NodeContext) key.attachment();
 			if (uuidPath.contains(context.getNodeUuid())) continue;
 			if (rule != null)
@@ -152,7 +157,21 @@ public class TaskQueueChecker implements Runnable
 			}
 			acceptableChannels.add(i);
 		}
-		for (Integer i: channelsToRemove) idleChannels.remove(i);
+		for (int i: channelsToRemove)
+		{
+			SocketChannel ch = (SocketChannel) idleChannels.remove(i);
+			SelectionKey key = ch.keyFor(selector);
+			if (key != null)
+			{
+				NodeContext context = (NodeContext) key.attachment();
+				context.handleException(ch);
+			}
+			
+			else
+			{
+				NodeNioServer.closeNode(ch, null);
+			}
+		}
 		if (debugEnabled) log.debug("found " + acceptableChannels.size() + " acceptable channels");
 		if (!acceptableChannels.isEmpty())
 		{

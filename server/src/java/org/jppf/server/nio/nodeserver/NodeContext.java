@@ -21,7 +21,8 @@ package org.jppf.server.nio.nodeserver;
 import java.nio.channels.SocketChannel;
 import java.util.List;
 
-import org.jppf.data.transform.*;
+import org.apache.commons.logging.*;
+import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
@@ -35,6 +36,14 @@ import org.jppf.utils.*;
  */
 public class NodeContext extends NioContext<NodeState>
 {
+	/**
+	 * Logger for this class.
+	 */
+	protected static Log log = LogFactory.getLog(NodeContext.class);
+	/**
+	 * Determines whther DEBUG logging level is enabled.
+	 */
+	protected static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The message wrapping the data sent or received over the socket channel.
 	 */
@@ -59,6 +68,10 @@ public class NodeContext extends NioContext<NodeState>
 	 * The uuid of the corresponding node.
 	 */
 	private String nodeUuid = null;
+	/**
+	 * Determines whether the corresponding channel was closed.
+	 */
+	private boolean closed = false;
 
 	/**
 	 * Get the task bundle to send or receive.
@@ -123,6 +136,13 @@ public class NodeContext extends NioContext<NodeState>
 	 */
 	public void resubmitBundle(BundleWrapper bundle)
 	{
+		if (debugEnabled)
+		{
+			JPPFTaskBundle bnd = bundle.getBundle();
+			int n = bnd.getTaskCount();
+			String jobId = (String) bnd.getParameter(BundleParameter.JOB_ID);
+			log.debug("resubmitting "  + n + " tasks for job id = " + jobId);
+		}
 		//bundle.getBundle().setPriority(10);
 		JPPFDriver.getQueue().addBundle(bundle);
 	}
@@ -134,6 +154,8 @@ public class NodeContext extends NioContext<NodeState>
 	 */
 	public void handleException(SocketChannel channel)
 	{
+		close();
+		if (debugEnabled) log.debug("handling exception for " + channel);
 		if (getBundler() != null) getBundler().dispose();
 		NodeNioServer.closeNode(channel, this);
 		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getBundle().getState()))
@@ -228,5 +250,22 @@ public class NodeContext extends NioContext<NodeState>
 	public void setNodeUuid(String nodeUuid)
 	{
 		this.nodeUuid = nodeUuid;
+	}
+
+	/**
+	 * Determine whether the corresponding channel was closed.
+	 * @return true if the channel was closed.
+	 */
+	public synchronized boolean isClosed()
+	{
+		return closed;
+	}
+
+	/**
+	 * Close this context.
+	 */
+	public synchronized void close()
+	{
+		closed = true;
 	}
 }

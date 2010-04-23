@@ -21,6 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
+import java.net.ConnectException;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
@@ -28,7 +29,7 @@ import org.jppf.management.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 
 /**
  * This class implements the state of receiving information from the node as a
@@ -65,6 +66,10 @@ public class WaitInitialBundleState extends NodeServerState
 	public NodeTransition performTransition(SelectionKey key) throws Exception
 	{
 		SelectableChannel channel = key.channel();
+		if (!NetworkUtils.isKeyValid(key))
+		{
+			throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");
+		}
 		NodeContext context = (NodeContext) key.attachment();
 		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
@@ -78,7 +83,11 @@ public class WaitInitialBundleState extends NodeServerState
 			Bundler bundler = server.getBundler().copy();
 			JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
 			if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
-			if (debugEnabled) log.debug("processing threads for node " + getRemoteHost(channel) + " = " + systemInfo.getJppf().getInt("processing.threads", -1));
+			if (debugEnabled)
+			{
+				if (systemInfo == null) log.debug("system info is null for node " + getRemoteHost(channel));
+				else log.debug("processing threads for node " + getRemoteHost(channel) + " = " + systemInfo.getJppf().getInt("processing.threads", -1));
+			}
 			bundler.setup();
 			context.setBundler(bundler);
 			Boolean b = (Boolean) bundle.getParameter(BundleParameter.IS_PEER);

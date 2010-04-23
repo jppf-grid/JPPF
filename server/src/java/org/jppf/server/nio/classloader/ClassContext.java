@@ -87,9 +87,9 @@ public class ClassContext extends NioContext<ClassState>
 		{
 			channel.close();
 		}
-		catch(Exception ignored)
+		catch(Exception e)
 		{
-			log.error(ignored.getMessage(), ignored);
+			log.error(e.getMessage(), e);
 		}
 	}
 

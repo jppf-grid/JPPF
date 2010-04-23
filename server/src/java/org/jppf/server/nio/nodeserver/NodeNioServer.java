@@ -82,6 +82,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * Reference to the driver.
 	 */
 	private static JPPFDriver driver = JPPFDriver.getInstance();
+	/**
+	 * The connection reaper timer.
+	 */
+	private Timer reaperTimer = new Timer("Reaper Timer");
 
 	/**
 	 * Initialize this server with a specified port number.
@@ -112,6 +116,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				selector.wakeup();
 			}
 		});
+		reaperTimer.schedule(new Reaper(getSelector()), 100L, 1000L);
 	}
 
 	/**
@@ -251,24 +256,38 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 
 	/**
 	 * Close a connection to a node.
-	 * @param channel - a <code>SocketChannel</code> that encapsulates the connection.
-	 * @param context - the context data associated with the channel.
+	 * @param channel a <code>SocketChannel</code> that encapsulates the connection.
+	 * @param context the context data associated with the channel.
 	 */
 	public static void closeNode(SocketChannel channel, NodeContext context)
 	{
+		if (context != null)
+		{
+			if (context.isClosed()) return;
+			context.close();
+		}
 		try
 		{
 			channel.close();
+		}
+		catch (IOException e)
+		{
+			if (debugEnabled) log.debug(e.getMessage(), e);
+			else log.error(e);
+		}
+		try
+		{
 			driver.getStatsManager().nodeConnectionClosed();
-			if (context.getNodeUuid() != null)
+			//if ((context != null) && (context.getNodeUuid() != null))
 			{
 				driver.removeNodeInformation(new ChannelWrapper<SocketChannel>(channel));
 				driver.getNodeNioServer().removeIdleChannel(channel);
 			}
 		}
-		catch (IOException ignored)
+		catch (Exception e)
 		{
-			log.error(ignored.getMessage(), ignored);
+			if (debugEnabled) log.debug(e.getMessage(), e);
+			else log.error(e);
 		}
 	}
 

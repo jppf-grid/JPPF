@@ -245,7 +245,8 @@ public class JPPFNode extends AbstractMonitoredNode
 			if (buildNumber < p)
 			{
 				VersionUtils.setBuildNumber(p);
-				throw new JPPFNodeReloadNotification("detected new build number: " + p + "; previous build number: " + buildNumber);
+				log.info("detected new build number: " + p + "; previous build number: " + buildNumber);
+				//throw new JPPFNodeReloadNotification("detected new build number: " + p + "; previous build number: " + buildNumber);
 			}
 		}
 	}

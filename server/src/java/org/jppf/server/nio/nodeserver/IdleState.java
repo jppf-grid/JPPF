@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import static org.jppf.server.nio.nodeserver.NodeTransition.*;
+import static org.jppf.server.nio.nodeserver.NodeTransition.TO_IDLE;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.net.ConnectException;
@@ -28,24 +28,25 @@ import org.apache.commons.logging.*;
 import org.jppf.utils.NetworkUtils;
 
 /**
- * This class represents the state of sending the initial hand-shaking data to a newly connected node.
+ * This class represents the state of waiting for some action.
  * @author Laurent Cohen
  */
-public class SendInitialBundleState extends NodeServerState
+public class IdleState extends NodeServerState
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SendInitialBundleState.class);
+	private static Log log = LogFactory.getLog(IdleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+
 	/**
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public SendInitialBundleState(NodeNioServer server)
+	public IdleState(NodeNioServer server)
 	{
 		super(server);
 	}
@@ -60,26 +61,11 @@ public class SendInitialBundleState extends NodeServerState
 	public NodeTransition performTransition(SelectionKey key) throws Exception
 	{
 		SelectableChannel channel = key.channel();
-		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
+		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		if (key.isReadable() || !NetworkUtils.isKeyValid(key))
 		{
 			throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");
 		}
-
-		NodeContext context = (NodeContext) key.attachment();
-		if (context.getNodeMessage() == null)
-		{
-			if (debugEnabled) log.debug("serializing initial bundle for " + getRemoteHost(channel));
-			context.serializeBundle();
-		}
-		if (context.getNodeMessage().write((WritableByteChannel) channel))
-		{
-			if (debugEnabled) log.debug("sent entire initial bundle for " + getRemoteHost(channel));
-			context.setNodeMessage(null);
-			context.setBundle(null);
-			return TO_WAIT_INITIAL;
-		}
-		if (debugEnabled) log.debug("part yet to send for " + getRemoteHost(channel));
-		return TO_SEND_INITIAL;
+		return TO_IDLE;
 	}
 }

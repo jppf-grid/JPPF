@@ -37,7 +37,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NioServer.class);
+	private static Log log = LogFactory.getLog(StateTransitionManager.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
@@ -89,12 +89,13 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	protected void submitTransition(SelectionKey key)
 	{
+		/*
 		if (!sequential)
 		{
 			lock.lock();
 			try
 			{
-				if (debugEnabled) log.debug("processed keys: " + processingKeys + ", before adding " + key);
+				//if (debugEnabled) log.debug("processed keys: " + processingKeys + ", before adding " + key);
 				if (processingKeys.contains(key)) return;
 				processingKeys.add(key);
 			}
@@ -103,6 +104,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 				lock.unlock();
 			}
 		}
+		*/
 		setKeyOps(key, 0);
 		StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, server.getFactory());
 		if (sequential) transition.run();
@@ -118,7 +120,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		lock.lock();
 		try
 		{
-			if (debugEnabled) log.debug("processed keys: " + processingKeys + ", before removing " + key);
+			//if (debugEnabled) log.debug("processed keys: " + processingKeys + ", before removing " + key);
 			processingKeys.remove(key);
 		}
 		finally
@@ -173,9 +175,13 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	public void transitionChannel(SelectionKey key, T transition)
 	{
+		setKeyOps(key, 0);
 		NioContext<S> context = (NioContext<S>) key.attachment();
+		S s1 = context.getState();
 		NioTransition<S> t = server.getFactory().getTransition(transition);
-		context.setState(t.getState());
+		S s2 = t.getState();
+		if (debugEnabled && !s2.equals(s1)) log.debug(StringUtils.getRemoteHost(key.channel()) + " transition from " + (s1 == null ? "NULL" : s1) + " to " + s2);
+		context.setState(s2);
 		setKeyOps(key, t.getInterestOps());
 	}
 
