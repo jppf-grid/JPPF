@@ -500,7 +500,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 * Get the executor used by this execution manager.
 	 * @return an <code>ExecutorService</code> instance.
 	 */
-	ExecutorService getExecutor()
+	public ExecutorService getExecutor()
 	{
 		return threadPool;
 	}

@@ -279,9 +279,9 @@ public class JPPFDriver
 	 * Get the singleton instance of the JPPFDriver.
 	 * @return a <code>JPPFDriver</code> instance.
 	 */
-	public synchronized static JPPFDriver getInstance()
+	public static JPPFDriver getInstance()
 	{
-		if (instance == null) instance = new JPPFDriver();
+		//if (instance == null) instance = new JPPFDriver();
 		return instance;
 	}
 
@@ -532,8 +532,10 @@ public class JPPFDriver
 				new LauncherListener(port).start();
 			}
 
-			JPPFDriver driver = getInstance();
-			driver.run();
+			instance = new JPPFDriver();
+			instance.run();
+			//JPPFDriver driver = getInstance();
+			//driver.run();
 		}
 		catch(Exception e)
 		{

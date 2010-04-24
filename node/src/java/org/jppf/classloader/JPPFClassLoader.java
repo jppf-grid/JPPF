@@ -49,6 +49,10 @@ public class JPPFClassLoader extends URLClassLoader
 	 */
 	private static SocketWrapper socketClient = null;
 	/**
+	 * The I/O handler to which read/write operations are delegated.
+	 */
+	private static IOHandler ioHandler = null;
+	/**
 	 * Determines whether this class loader should handle dynamic class updating.
 	 */
 	private boolean dynamic = false;
@@ -80,6 +84,10 @@ public class JPPFClassLoader extends URLClassLoader
 	 * The cache handling resources temporarily stored to file.
 	 */
 	private ResourceCache cache = new ResourceCache();
+	/**
+	 * The object used to serialize and deserialize resources.
+	 */
+	private ObjectSerializer serializer = null;
 
 	/**
 	 * Initialize this class loader with a parent class loader.
@@ -89,7 +97,7 @@ public class JPPFClassLoader extends URLClassLoader
 	{
 		super(new URL[0], parent);
 		if (parent instanceof JPPFClassLoader) dynamic = true;
-		if (socketClient == null) init();
+		if (ioHandler == null) init();
 	}
 
 	/**
@@ -120,6 +128,7 @@ public class JPPFClassLoader extends URLClassLoader
 				socketInitializer.initializeSocket(socketClient);
 				if (!socketInitializer.isSuccessfull())
 					throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
+				ioHandler = new BootstrapSocketIOHandler(socketClient);
 
 				// we need to do this in order to dramatically simplify the state machine of ClassServer
 				try
@@ -127,13 +136,14 @@ public class JPPFClassLoader extends URLClassLoader
 					if (debugEnabled) log.debug("sending node initiation message");
 					JPPFResourceWrapper resource = new JPPFResourceWrapper();
 					resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-					ObjectSerializer serializer = socketClient.getSerializer();
+					ObjectSerializer serializer = new BootstrapObjectSerializer();
 					JPPFBuffer buf = serializer.serialize(resource);
 					byte[] data = buf.getBuffer();
 					data = JPPFDataTransformFactory.transform(true, data);
-					socketClient.sendBytes(new JPPFBuffer(data, data.length));
-					socketClient.flush();
-					socketClient.receiveBytes(0);
+					ioHandler.writeInt(data.length);
+					ioHandler.write(data, 0, data.length);
+					ioHandler.flush();
+					ioHandler.read();
 					if (debugEnabled) log.debug("received node initiation response");
 				}
 				catch (IOException e)
@@ -350,13 +360,14 @@ public class JPPFClassLoader extends URLClassLoader
 			resource.setRequestUuid(requestUuid);
 	
 			JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-			ObjectSerializer serializer = socketClient.getSerializer();
+			ObjectSerializer serializer = getSerializer();
 			JPPFBuffer buf = serializer.serialize(resource);
 			byte[] data = buf.getBuffer();
 			if (transform != null) data = JPPFDataTransformFactory.transform(transform, true, data);
-			socketClient.sendBytes(new JPPFBuffer(data, data.length));
-			socketClient.flush();
-			buf = socketClient.receiveBytes(0);
+			ioHandler.writeInt(data.length);
+			ioHandler.write(data, 0, data.length);
+			ioHandler.flush();
+			buf = ioHandler.read();
 			data = buf.getBuffer();
 			if (transform != null) data = JPPFDataTransformFactory.transform(transform, false, data);
 			resource = (JPPFResourceWrapper) serializer.deserialize(data);
@@ -562,5 +573,16 @@ public class JPPFClassLoader extends URLClassLoader
 			lock.unlock();
 		}
 		return urlList == null ? null : new IteratorEnumeration(urlList.iterator());
+	}
+
+	/**
+	 * Get the object used to serialize and deserialize resources.
+	 * @return an {@link ObjectSerializer} instance.
+	 * @throws Exception if any error occurs.
+	 */
+	private ObjectSerializer getSerializer() throws Exception
+	{
+		if (serializer == null) serializer = (ObjectSerializer) getParent().loadClass("org.jppf.comm.socket.BootstrapObjectSerializer").newInstance();
+		return serializer;
 	}
 }

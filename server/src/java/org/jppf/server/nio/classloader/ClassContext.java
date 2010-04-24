@@ -29,10 +29,10 @@ import org.jppf.server.nio.*;
 import org.jppf.utils.*;
 
 /**
- * Context obect associated with a socket channel used by the class server of the JPPF driver. 
+ * Context object associated with a socket channel used by the class server of the JPPF driver. 
  * @author Laurent Cohen
  */
-public class ClassContext extends NioContext<ClassState>
+public class ClassContext extends SimpleNioContext<ClassState>
 {
 	/**
 	 * Logger for this class.

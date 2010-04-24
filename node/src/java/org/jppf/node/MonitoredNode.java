@@ -58,7 +58,7 @@ public interface MonitoredNode extends Runnable
 	void fireNodeEvent(int nbTasks);
 	/**
 	 * Stop this node and release the resources it is using.
-	 * @param closeSocket determines whether the underlying socket should be closed.
+	 * @param closeDataChannel determines whether the underlying data channel should be closed.
 	 */
-	void stopNode(boolean closeSocket);
+	void stopNode(boolean closeDataChannel);
 }

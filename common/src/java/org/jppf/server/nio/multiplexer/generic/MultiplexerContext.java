@@ -32,7 +32,7 @@ import org.jppf.utils.StringUtils;
  * Context obect associated with a socket channel used by the multiplexer. 
  * @author Laurent Cohen
  */
-public class MultiplexerContext extends NioContext<MultiplexerState>
+public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 {
 	/**
 	 * Logger for this class.

@@ -18,11 +18,7 @@
 
 package org.jppf.server.nio;
 
-import java.nio.ByteBuffer;
-import java.nio.channels.*;
-
 import org.apache.commons.logging.*;
-import org.jppf.utils.*;
 
 /**
  * Context associated with an open socket channel.
@@ -43,18 +39,6 @@ public abstract class NioContext<S extends Enum>
 	 * The current state of the channel this context is associated with.
 	 */
 	protected S state = null;
-	/**
-	 * Container for the current message data.
-	 */
-	protected NioMessage message = null;
-	/**
-	 * Count of bytes read.
-	 */
-	protected int readByteCount = 0;
-	/**
-	 * Count of bytes written.
-	 */
-	protected int writeByteCount = 0;
 	/**
 	 * Uuid for this node context.
 	 */
@@ -84,24 +68,7 @@ public abstract class NioContext<S extends Enum>
 	 * @return true if all the data has been read, false otherwise.
 	 * @throws Exception if an error occurs while reading the data.
 	 */
-	public boolean readMessage(ChannelWrapper<?> wrapper) throws Exception
-	{
-		ReadableByteChannel channel = (ReadableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
-		if (message == null) message = new NioMessage();
-		if (message.length <= 0)
-		{
-			message.length = SerializationUtils.readInt(channel);
-			message.buffer = ByteBuffer.allocate(message.length);
-			readByteCount = 0;
-		}
-		readByteCount += channel.read(message.buffer);
-		if (debugEnabled)
-		{
-			log.debug("[" + getShortClassName() + "] " + "read " + readByteCount + " bytes out of " +
-				message.length + " for " + StringUtils.getRemoteHost((SocketChannel) channel));
-		}
-		return readByteCount >= message.length;
-	}
+	public abstract boolean readMessage(ChannelWrapper<?> wrapper) throws Exception;
 
 	/**
 	 * Write data to a channel.
@@ -109,41 +76,7 @@ public abstract class NioContext<S extends Enum>
 	 * @return true if all the data has been written, false otherwise.
 	 * @throws Exception if an error occurs while writing the data.
 	 */
-	public boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception
-	{
-		WritableByteChannel channel = (WritableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
-		if (!message.lengthWritten)
-		{
-			SerializationUtils.writeInt(channel, message.length);
-			message.lengthWritten = true;
-			writeByteCount = 0;
-		}
-		writeByteCount += channel.write(message.buffer);
-		if (debugEnabled)
-		{
-			log.debug("[" + getShortClassName() + "] " + "written " + writeByteCount + " bytes out of " +
-				message.length + " for " + StringUtils.getRemoteHost((SelectableChannel) channel));
-		}
-		return writeByteCount >= message.length;
-	}
-
-	/**
-	 * Get the container for the current message data.
-	 * @return an <code>NioMessage</code> instance.
-	 */
-	public NioMessage getMessage()
-	{
-		return message;
-	}
-
-	/**
-	 * Set the container for the current message data.
-	 * @param message an <code>NioMessage</code> instance.
-	 */
-	public void setMessage(NioMessage message)
-	{
-		this.message = message;
-	}
+	public abstract boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception;
 
 	/**
 	 * Get the uuid for this node context.

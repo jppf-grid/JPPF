@@ -17,7 +17,9 @@
  */
 package org.jppf.server.node;
 
+import java.security.*;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.*;
@@ -25,7 +27,6 @@ import javax.management.*;
 import org.apache.commons.logging.*;
 import org.jppf.*;
 import org.jppf.classloader.JPPFClassLoader;
-import org.jppf.comm.socket.SocketClient;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.node.*;
@@ -39,7 +40,7 @@ import org.jppf.utils.*;
  * @author Laurent Cohen
  * @author Domingos Creado
  */
-public class JPPFNode extends AbstractMonitoredNode
+public abstract class JPPFNode extends AbstractMonitoredNode
 {
 	/**
 	 * Logger for this class.
@@ -76,7 +77,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	/**
 	 * The object responsible for this node's I/O.
 	 */
-	private NodeIO nodeIO = null;
+	protected NodeIO nodeIO = null;
 	/**
 	 * Holds the count of currently executing tasks.
 	 * Used to determine when this node is busy or idle.
@@ -102,6 +103,10 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Manager for the MBean defined through the service provider interface.
 	 */
 	private JPPFMBeanProviderManager providerManager = null;
+	/**
+	 * The callback used to create the class loader in each {@link JPPFContainer}.
+	 */
+	private Callable<JPPFClassLoader> classLoaderCreator = null;
 
 	/**
 	 * Default constructor.
@@ -121,13 +126,11 @@ public class JPPFNode extends AbstractMonitoredNode
 		buildNumber = VersionUtils.getBuildNumber();
 		setStopped(false);
 		boolean initialized = false;
-		Throwable error = null;
 		if (debugEnabled) log.debug("Start of node main loop");
 		while (!isStopped())
 		{
 			try
 			{
-				boolean synchronous = JPPFConfiguration.getProperties().getBoolean("jppf.node.receive.synchronous", true);
 				init();
 				if (!initialized)
 				{
@@ -259,8 +262,6 @@ public class JPPFNode extends AbstractMonitoredNode
 	{
 		if (debugEnabled) log.debug("start node initialization");
 		initHelper();
-		boolean mustInit = (socketClient == null);
-		if (mustInit)	initSocketClient();
 		if (isJmxEnabled())
 		{
 			JMXServerImpl jmxServer = null;
@@ -288,57 +289,44 @@ public class JPPFNode extends AbstractMonitoredNode
 		}
 		new JPPFStartupLoader().load(JPPFNodeStartupSPI.class);
 		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
-		if (mustInit)
-		{
-			if (debugEnabled) log.debug("start socket initialization");
-			System.out.println("Attempting connection to the node server");
-			socketInitializer.initializeSocket(socketClient);
-			if (!socketInitializer.isSuccessfull()) throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
-			System.out.println("Reconnected to the node server");
-			if (debugEnabled) log.debug("end socket initialization");
-		}
-		nodeIO = new NodeIO(this);
+		initDataChannel();
 		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
 		if (debugEnabled) log.debug("end node initialization");
 	}
 
 	/**
-	 * Initialize this node's resources.
+	 * Initialize this node's data channel.
 	 * @throws Exception if an error is raised during initialization.
 	 */
-	private void initSocketClient() throws Exception
-	{
-		if (debugEnabled) log.debug("Initializing socket");
-		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = props.getString("jppf.server.host", "localhost");
-		int port = props.getInt("node.server.port", 11113);
-		socketClient = new SocketClient();
-		//socketClient = new SocketConnectorWrapper();
-		socketClient.setHost(host);
-		socketClient.setPort(port);
-		socketClient.setSerializer(serializer);
-		if (debugEnabled) log.debug("end socket client initialization");
-	}
+	protected abstract void initDataChannel() throws Exception;
+
+	/**
+	 * Initialize this node's data channel.
+	 * @throws Exception if an error is raised during initialization.
+	 */
+	protected abstract void closeDataChannel() throws Exception;
 
 	/**
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @return a <code>ClassLoader</code> used for loading the classes of the framework.
 	 */
-	private JPPFClassLoader getClassLoader()
+	public JPPFClassLoader getClassLoader()
 	{
-		if (classLoader == null)
-		{
-			if (debugEnabled) log.debug("Initializing classloader");
-			classLoader = new JPPFClassLoader(NodeRunner.getJPPFClassLoader());
-		}
+		if (classLoader == null) classLoader = createClassLoader();
 		return classLoader;
 	}
+
+	/**
+	 * Create the class loader for this node.
+	 * @return a {@link JPPFClassLoader} instance.
+	 */
+	protected abstract JPPFClassLoader createClassLoader();
 
 	/**
 	 * Set the main classloader for the node.
 	 * @param cl - the class loader to set.
 	 */
-	void setClassLoader(JPPFClassLoader cl)
+	public void setClassLoader(JPPFClassLoader cl)
 	{
 		classLoader = cl;
 	}
@@ -347,7 +335,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @throws Exception if an error occcurs while instantiating the class loader.
 	 */
-	void initHelper() throws Exception
+	public void initHelper() throws Exception
 	{
 		if (debugEnabled) log.debug("Initializing serializer");
 		Class<?> c = getClassLoader().loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
@@ -364,14 +352,29 @@ public class JPPFNode extends AbstractMonitoredNode
 	 * @return a <code>JPPFContainer</code> instance.
 	 * @throws Exception if an error occcurs while getting the container.
 	 */
-	JPPFContainer getContainer(List<String> uuidPath) throws Exception
+	public JPPFContainer getContainer(final List<String> uuidPath) throws Exception
 	{
 		String uuid = uuidPath.get(0);
 		JPPFContainer container = containerMap.get(uuid);
 		if (container == null)
 		{
 			if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
-			container = new JPPFContainer(uuidPath);
+			JPPFClassLoader cl = AccessController.doPrivileged(new PrivilegedAction<JPPFClassLoader>()
+			{
+				public JPPFClassLoader run()
+				{
+					try
+					{
+						return newClassLoaderCreator(uuidPath).call();
+					}
+					catch(Exception e)
+					{
+						log.error(e.getMessage(), e);
+					}
+					return null;
+				}
+			});
+			container = new JPPFContainer(uuidPath, cl);
 			if (containerList.size() >= MAX_CONTAINERS)
 			{
 				JPPFContainer toRemove = containerList.removeFirst();
@@ -384,39 +387,11 @@ public class JPPFNode extends AbstractMonitoredNode
 	}
 
 	/**
-	 * Stop this node and release the resources it is using.
-	 * @param closeSocket determines whether the underlying socket should be closed.
-	 * @see org.jppf.node.MonitoredNode#stopNode(boolean)
+	 * Instatiate the callback used to create the class loader in each {@link JPPFContainer}.
+	 * @param uuidPath the uuid path containing the key to the container.
+	 * @return a {@link Callable} instance.
 	 */
-	public synchronized void stopNode(boolean closeSocket)
-	{
-		if (debugEnabled) log.debug("stopping node");
-		setStopped(true);
-		executionManager.shutdown();
-		if (closeSocket && (socketClient != null))
-		{
-			try
-			{
-				socketClient.close();
-			}
-			catch(Exception ex)
-			{
-				log.error(ex.getMessage(), ex);
-			}
-			socketClient = null;
-		}
-		try
-		{
-			providerManager.unregisterProviderMBeans();
-			if (jmxServer != null) jmxServer.stop();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		setNodeAdmin(null);
-		classLoader = null;
-	}
+	protected abstract Callable<JPPFClassLoader> newClassLoaderCreator(List<String> uuidPath);
 
 	/**
 	 * Decrement the count of currently executing tasks and determine whether
@@ -471,6 +446,41 @@ public class JPPFNode extends AbstractMonitoredNode
 	boolean isJmxEnabled()
 	{
 		return jmxEnabled;
+	}
+
+	/**
+	 * Stop this node and release the resources it is using.
+	 * @param closeSocket determines whether the underlying socket should be closed.
+	 * @see org.jppf.node.MonitoredNode#stopNode(boolean)
+	 */
+	public synchronized void stopNode(boolean closeSocket)
+	{
+		if (debugEnabled) log.debug("stopping node");
+		setStopped(true);
+		executionManager.shutdown();
+		if (closeSocket)
+		{
+			try
+			{
+				closeDataChannel();
+			}
+			catch(Exception ex)
+			{
+				log.error(ex.getMessage(), ex);
+			}
+		}
+		socketClient = null;
+		try
+		{
+			providerManager.unregisterProviderMBeans();
+			if (jmxServer != null) jmxServer.stop();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		setNodeAdmin(null);
+		classLoader = null;
 	}
 
 	/**

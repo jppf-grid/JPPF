@@ -17,15 +17,13 @@
  */
 package org.jppf.server.node;
 
-import java.security.*;
 import java.util.*;
 import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.classloader.JPPFClassLoader;
-import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.comm.socket.*;
 import org.jppf.data.transform.*;
-import org.jppf.node.*;
 import org.jppf.utils.*;
 
 /**
@@ -35,7 +33,7 @@ import org.jppf.utils.*;
  * a client application, a provides the methods to enable the transport, serialization and deserialization of these classes.
  * @author Laurent Cohen
  */
-class JPPFContainer
+public class JPPFContainer
 {
 	/**
 	 * Logger for this class.
@@ -61,11 +59,13 @@ class JPPFContainer
 	/**
 	 * Initialize this container with a specified application uuid.
 	 * @param uuidPath the unique identifier of a submitting application.
+	 * @param classLoader the class loader for this container.
 	 * @throws Exception if an error occurs while initializing.
 	 */
-	public JPPFContainer(List<String> uuidPath) throws Exception
+	public JPPFContainer(List<String> uuidPath, JPPFClassLoader classLoader) throws Exception
 	{
 		this.uuidPath = uuidPath;
+		this.classLoader = classLoader;
 		init();
 	}
 
@@ -109,14 +109,14 @@ class JPPFContainer
 
 	/**
 	 * Deserialize a number of objects from a socket client.
-	 * @param wrapper the socket client from which to read the objects to deserialize.
+	 * @param ioHandler the IOHandler from which to read the objects to deserialize.
 	 * @param list a list holding the resulting deserialized objects.
 	 * @param count the number of objects to deserialize.
 	 * @param executor the number of objects to deserialize.
 	 * @return the new position in the source data after deserialization.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	public int deserializeObjects(SocketWrapper wrapper, List<Object> list, int count, ExecutorService executor) throws Exception
+	public int deserializeObjects(IOHandler ioHandler, List<Object> list, int count, ExecutorService executor) throws Exception
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try
@@ -125,9 +125,9 @@ class JPPFContainer
 			List<Future<Object>> futureList = new ArrayList<Future<Object>>();
 			for (int i=0; i<count; i++)
 			{
-				JPPFBuffer buf = wrapper.receiveBytes(0);
+				JPPFBuffer buf = ioHandler.read();
 				if (debugEnabled) log.debug("i = " + i + ", read buffer size = " + buf.getLength());
-				futureList.add(executor.submit(new ObjectReadTask(buf.getBuffer(), i)));
+				futureList.add(executor.submit(new ObjectDeserializationTask(buf.getBuffer(), i)));
 			}
 			for (Future<Object> f: futureList) list.add(f.get());
 			return 0;
@@ -140,13 +140,13 @@ class JPPFContainer
 
 	/**
 	 * Deserialize an object from a socket client.
-	 * @param wrapper the socket client from which to read the objects to deserialize.
+	 * @param ioHandler the IOHandler from which to read the objects to deserialize.
 	 * @return the new position in the source data after deserialization.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	public Object deserializeObject(SocketWrapper wrapper) throws Exception
+	public Object deserializeObject(IOHandler ioHandler) throws Exception
 	{
-		return deserializeObject(wrapper.receiveBytes(0).getBuffer());
+		return deserializeObject(ioHandler.read().getBuffer());
 	}
 
 	/**
@@ -170,23 +170,11 @@ class JPPFContainer
 	}
 
 	/**
-	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
+	 * Get the main class loader for this container.
 	 * @return a <code>ClassLoader</code> used for loading the classes of the framework.
 	 */
 	public JPPFClassLoader getClassLoader()
 	{
-		if (classLoader == null)
-		{
-			log.debug("Creating new class loader with uuidPath="+uuidPath);
-			AccessController.doPrivileged(new PrivilegedAction<Object>()
-			{
-				public Object run()
-				{
-					classLoader = new JPPFClassLoader(NodeRunner.getJPPFClassLoader(), uuidPath);
-					return null;
-				}
-			});
-		}
 		return classLoader;
 	}
 	
@@ -194,7 +182,7 @@ class JPPFContainer
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @throws Exception if an error occcurs while instantiating the class loader.
 	 */
-	private void initHelper() throws Exception
+	protected void initHelper() throws Exception
 	{
 		Class c = getClassLoader().loadJPPFClass("org.jppf.utils.SerializationHelperImpl");
 		Object o = c.newInstance();
@@ -223,7 +211,7 @@ class JPPFContainer
 	 * Instances of this class are used to deserialize objects from an
 	 * incoming message in parallel.
 	 */
-	public class ObjectReadTask implements Callable<Object>
+	protected class ObjectDeserializationTask implements Callable<Object>
 	{
 		/**
 		 * The data to send over the network connection.
@@ -239,7 +227,7 @@ class JPPFContainer
 		 * @param buffer the data read from the network connection.
 		 * @param index index of the object to deserialize in the incoming IO message; used for debugging purposes.
 		 */
-		public ObjectReadTask(byte[] buffer, int index)
+		public ObjectDeserializationTask(byte[] buffer, int index)
 		{
 			this.buffer = buffer;
 			this.index = index;
