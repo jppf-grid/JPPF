@@ -48,7 +48,7 @@ $title = "JPPF " . $version . " Release Notes";
 			<table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">
 				<tr style="height: 80px">
 					<td width="20"></td>
-					<td width="400" align="left" valign="center"><img src="/images/logo2.gif" border="0" alt="JPPF"/></td>
+					<td width="400" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF"/></a></td>
 					<td align="right">
 						<table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color:transparent;">
 							<tr>

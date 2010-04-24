@@ -32,7 +32,7 @@
 			<table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">
 				<tr style="height: 80px">
 					<td width="20"></td>
-					<td width="400" align="left" valign="center"><img src="/images/logo2.gif" border="0" alt="JPPF"/></td>
+					<td width="400" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF"/></a></td>
 					<td align="right">
 						<table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color:transparent;">
 							<tr>
@@ -243,27 +243,27 @@
 											</div>
 				</div>
 				<div class="content">
-	<?php $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%202.1/"; ?>
+	<?php $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%202.1.1/"; ?>
 	<a name="2.0"></a>
-	<h1>JPPF 2.1 Downloads</h1>
+	<h1>JPPF 2.1.1 Downloads</h1>
 	<h3>Installer</h3>
 	<a href="/download/jppf_ws.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
 	<h3>Deployable module binaries</h3>
-	<a href="<?php echo $base . 'JPPF-2.1-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>
-	<a href="<?php echo $base . 'JPPF-2.1-node.zip/download'; ?>">JPPF node distribution</a><br>
-	<a href="<?php echo $base . 'JPPF-2.1-admin-ui.zip/download'; ?>">JPPF administration and monitoring console</a><br>
-	<a href="<?php echo $base . 'JPPF-2.1-application-template.zip/download'; ?>">JPPF application template</a> (fully working, fully commented, to use as a starting point).<p>
+	<a href="<?php echo $base . 'JPPF-2.1.1-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>
+	<a href="<?php echo $base . 'JPPF-2.1.1-node.zip/download'; ?>">JPPF node distribution</a><br>
+	<a href="<?php echo $base . 'JPPF-2.1.1-admin-ui.zip/download'; ?>">JPPF administration and monitoring console</a><br>
+	<a href="<?php echo $base . 'JPPF-2.1.1-application-template.zip/download'; ?>">JPPF application template</a> (fully working, fully commented, to use as a starting point).<p>
 	<h3>Source code and documentation</h3>
-	<a href="<?php echo $base . 'JPPF-2.1-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a><br>
-	User Guide: <a href="/wiki">view online</a> or <a href="<?php echo $base . 'JPPF-2.1-User-Guide.zip/download'; ?>">download the PDF</a><br>
-	API documentation: <a href="/api-2.0">browse online</a> or <a href="<?php echo $base . 'JPPF-2.1-api.zip/download'; ?>">download</a><p>
+	<a href="<?php echo $base . 'JPPF-2.1.1-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a><br>
+	User Guide: <a href="/wiki">view online</a> or <a href="<?php echo $base . 'JPPF-2.1.1-User-Guide.zip/download'; ?>">download the PDF</a><br>
+	API documentation: <a href="/api-2.0">browse online</a> or <a href="<?php echo $base . 'JPPF-2.1.1-api.zip/download'; ?>">download</a><p>
 	<h3>Connectors and add-ons</h3>
-	<a href="<?php echo $base . 'JPPF-2.1-GigaSpaces.zip/download'; ?>">GigaSpaces XAP connector</a><br>
-	<a href="<?php echo $base . 'JPPF-2.1-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>
-	<a href="<?php echo $base . 'JPPF-2.1-multiplexer.zip/download'; ?>">JPPF TCP multiplexer</a><p>
+	<a href="<?php echo $base . 'JPPF-2.1.1-GigaSpaces.zip/download'; ?>">GigaSpaces XAP connector</a><br>
+	<a href="<?php echo $base . 'JPPF-2.1.1-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>
+	<a href="<?php echo $base . 'JPPF-2.1.1-multiplexer.zip/download'; ?>">JPPF TCP multiplexer</a><p>
 	<h3>Samples and tutorials</h3>
-	<a href="<?php echo $base . 'JPPF-2.1-samples-pack.zip/download'; ?>">JPPF samples pack</a><br>
-	<a href="<?php echo $base . 'JPPF-2.1-Quick-Start.zip/download'; ?>">JPPF quick start guide</a><br>&nbsp;
+	<a href="<?php echo $base . 'JPPF-2.1.1-samples-pack.zip/download'; ?>">JPPF samples pack</a><br>
+	Make sure to get started with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">online tutorial</a>
 	<hr>
 	<?php $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%201.9.2/"; ?>
 	<a name="1.9.2"></a>
