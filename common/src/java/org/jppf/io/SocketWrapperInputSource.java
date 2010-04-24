@@ -18,7 +18,7 @@
 
 package org.jppf.io;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
 
 import org.jppf.comm.socket.SocketWrapper;
@@ -54,7 +54,9 @@ public class SocketWrapperInputSource implements InputSource
 	 */
 	public int read(byte[] data, int offset, int len) throws Exception
 	{
-		return socketWrapper.read(data, offset, len);
+		int n = socketWrapper.read(data, offset, len);
+		if (n < 0) throw new EOFException();
+		return n;
 	}
 
 	/**
@@ -69,7 +71,7 @@ public class SocketWrapperInputSource implements InputSource
 		ByteBuffer tmp = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
 		byte[] buf = tmp.array();
 		int size = Math.min(buf.length, data.remaining());
-		int n = socketWrapper.read(buf, 0, size);
+		int n = read(buf, 0, size);
 		if (n > 0) data.put(buf, 0, n);
 		return n;
 	}

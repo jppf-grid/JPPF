@@ -55,7 +55,9 @@ public class StreamInputSource implements InputSource
 	 */
 	public int read(byte[] data, int offset, int len) throws Exception
 	{
-		return is.read(data, offset, len);
+		int n = is.read(data, offset, len);
+		if (n < 0) throw new EOFException();
+		return n;
 	}
 
 	/**
@@ -72,7 +74,7 @@ public class StreamInputSource implements InputSource
 		byte[] bytes = tmp.array();
 		while (buffer.remaining() > 0)
 		{
-			int n = is.read(bytes, 0, Math.min(buffer.remaining(), bytes.length));
+			int n = read(bytes, 0, Math.min(buffer.remaining(), bytes.length));
 			if (n <= 0) break;
 			buffer.put(bytes, 0, n);
 		}
@@ -88,7 +90,7 @@ public class StreamInputSource implements InputSource
 	public int readInt() throws Exception
 	{
 		byte[] value = new byte[4];
-		is.read(value);
+		read(value, 0, 4);
 		return SerializationUtils.readInt(value, 0);
 	}
 

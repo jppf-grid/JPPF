@@ -53,7 +53,7 @@ public class ByteBufferInputSource implements InputSource
 	}
 
 	/**
-	 * Read data from this input source and wrtite it into an array of bytes.
+	 * Read data from this input source and write it into an array of bytes.
 	 * @param buffer the buffer into which to write.
 	 * @param offset the position in the buffer where to start storing the data.
 	 * @param len the size in bvytes of the data to read. 
