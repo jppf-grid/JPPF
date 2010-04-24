@@ -26,7 +26,6 @@ import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.NetworkUtils;
 
 /**
  * This class represents the state of waiting for some action.
@@ -62,7 +61,7 @@ public class SendingBundleState extends NodeServerState
 	{
 		SelectableChannel channel = key.channel();
 		//if (debugEnabled) log.debug("exec() for " + getRemostHost(channel));
-		if (key.isReadable() || !NetworkUtils.isKeyValid(key))
+		if (key.isReadable())
 		{
 			throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");
 		}

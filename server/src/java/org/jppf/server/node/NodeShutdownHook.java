@@ -22,7 +22,9 @@ import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
 
 /**
- * 
+ * This thread is run when the node process is killed brutally, either through System.exit()
+ * or via a Ctrl-C or a kill process command.
+ * Its goal is to properly shutdown the connection to the server before exiting. 
  * @author Laurent Cohen
  */
 public class NodeShutdownHook extends Thread
@@ -62,8 +64,16 @@ public class NodeShutdownHook extends Thread
 			SocketWrapper wrapper = node.getSocketWrapper();
 			if ((wrapper != null) && wrapper.isOpened())
 			{
+				try
+				{
+					wrapper.write(new byte[] { (byte) 0xFF }, 0, 1);
+					wrapper.flush();
+				}
+				catch(Exception e)
+				{
+					if (debugEnabled) log.debug(e.getMessage(), e);
+				}
 				wrapper.close();
-				//Socket s = wrapper.getSocket();
 			}
 		}
 		catch(Exception e)

@@ -222,7 +222,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 		while (count < len)
 		{
 			int n = dis.read(data, count + offset, len - count);
-			if (n < 0) break;
+			if (n < 0) throw new EOFException();
 			else count += n;
 		}
 		return count;

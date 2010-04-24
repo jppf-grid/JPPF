@@ -82,10 +82,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * Reference to the driver.
 	 */
 	private static JPPFDriver driver = JPPFDriver.getInstance();
-	/**
-	 * The connection reaper timer.
-	 */
-	private Timer reaperTimer = new Timer("Reaper Timer");
 
 	/**
 	 * Initialize this server with a specified port number.
@@ -116,7 +112,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				selector.wakeup();
 			}
 		});
-		reaperTimer.schedule(new Reaper(getSelector()), 100L, 1000L);
 	}
 
 	/**

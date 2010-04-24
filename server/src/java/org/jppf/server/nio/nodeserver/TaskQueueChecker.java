@@ -29,7 +29,6 @@ import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.AbstractJPPFQueue;
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.utils.*;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
@@ -139,14 +138,12 @@ public class TaskQueueChecker implements Runnable
 		for (int i=0; i<idleChannels.size(); i++)
 		{
 			SelectableChannel ch = idleChannels.get(i);
-			//if (!ch.isOpen() || !NetworkUtils.isKeyValid(ch.keyFor(selector)))
-			SelectionKey key = ch.keyFor(selector);
-			if (!NetworkUtils.isKeyValid(key))
+			if (!ch.isOpen())
 			{
 				channelsToRemove.add(i);
 				continue;
 			}
-			//if (!server.getTransitionManager().isSequential() && server.getTransitionManager().isProcessingKey(key)) continue;
+			SelectionKey key = ch.keyFor(selector);
 			NodeContext context = (NodeContext) key.attachment();
 			if (uuidPath.contains(context.getNodeUuid())) continue;
 			if (rule != null)
@@ -166,11 +163,7 @@ public class TaskQueueChecker implements Runnable
 				NodeContext context = (NodeContext) key.attachment();
 				context.handleException(ch);
 			}
-			
-			else
-			{
-				NodeNioServer.closeNode(ch, null);
-			}
+			else NodeNioServer.closeNode(ch, null);
 		}
 		if (debugEnabled) log.debug("found " + acceptableChannels.size() + " acceptable channels");
 		if (!acceptableChannels.isEmpty())

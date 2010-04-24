@@ -21,7 +21,6 @@ package org.jppf.server.nio.nodeserver;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
-import java.net.ConnectException;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
@@ -29,7 +28,7 @@ import org.jppf.management.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * This class implements the state of receiving information from the node as a
@@ -66,10 +65,6 @@ public class WaitInitialBundleState extends NodeServerState
 	public NodeTransition performTransition(SelectionKey key) throws Exception
 	{
 		SelectableChannel channel = key.channel();
-		if (!NetworkUtils.isKeyValid(key))
-		{
-			throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");
-		}
 		NodeContext context = (NodeContext) key.attachment();
 		if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());

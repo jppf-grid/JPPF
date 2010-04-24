@@ -153,7 +153,7 @@ public class JPPFNode extends AbstractMonitoredNode
 					if (notifying) fireNodeEvent(NodeEventType.DISCONNECTED);
 					synchronized(this)
 					{
-						if (socketClient != null) socketClient.close();
+						if ((socketClient != null) && socketClient.isOpened()) socketClient.close();
 						socketClient = null;
 					}
 				}

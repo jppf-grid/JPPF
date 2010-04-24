@@ -18,7 +18,7 @@
 
 package org.jppf.io;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 
@@ -56,7 +56,7 @@ public class ChannelInputSource implements InputSource
 	public int read(byte[] data, int offset, int len) throws Exception
 	{
 		ByteBuffer buffer = ByteBuffer.wrap(data, offset, len);
-		return channel.read(buffer);
+		return read(buffer);
 	}
 
 	/**
@@ -68,7 +68,9 @@ public class ChannelInputSource implements InputSource
 	 */
 	public int read(ByteBuffer data) throws Exception
 	{
-		return channel.read(data);
+		int n = channel.read(data);
+		if (n < 0) throw new EOFException();
+		return n;
 	}
 
 	/**
@@ -92,7 +94,7 @@ public class ChannelInputSource implements InputSource
 	public int skip(int n) throws Exception
 	{
 		ByteBuffer buf = ByteBuffer.allocate(n);
-		channel.read(buf);
+		read(buf);
 		return buf.position();
 	}
 
