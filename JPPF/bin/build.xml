@@ -528,8 +528,8 @@
 		<property name="web.installer.dir" value="${home}/download/${version.number}"/>
 		<delete dir="${web.installer.dir}" quiet="true"/>
 		<mkdir dir="${web.installer.dir}"/>
-		<copy file="${installer}/jppf_ws.jnlp" todir="${home}/download"/>
-		<replace file="${home}/download/jppf_ws.jnlp" token="@version@" value="${version.number}"/>
+		<copy file="${installer}/jppf_ws.jnlp" todir="${home}/download" overwrite="true"/>
+		<replace file="${home}/download/jppf_ws.jnlp" token="@version@" value="${version.number}" />
 		<property name="web.installer.file" value="${web.installer.dir}/${app.ver}-Web-Installer.jar"/>
 		<izpack input="${installer}/install.xml" output="${web.installer.file}" installerType="web" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
 
