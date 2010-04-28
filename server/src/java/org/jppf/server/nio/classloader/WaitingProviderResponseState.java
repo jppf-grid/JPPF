@@ -17,11 +17,9 @@
  */
 package org.jppf.server.nio.classloader;
 
-import static org.jppf.server.nio.classloader.ClassState.SENDING_NODE_RESPONSE;
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.io.IOException;
-import java.nio.channels.SelectionKey;
 
 import org.apache.commons.logging.*;
 import org.jppf.classloader.JPPFResourceWrapper;
@@ -99,8 +97,7 @@ class WaitingProviderResponseState extends ClassServerState
 			destinationContext.setMessage(null);
 			destinationContext.setResource(resource);
 			destinationContext.serializeResource();
-			destinationContext.setState(SENDING_NODE_RESPONSE);
-			server.getTransitionManager().setKeyOps(destinationKey, SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+			server.getTransitionManager().transitionChannel(destinationKey, TO_SENDING_NODE_RESPONSE);
 			context.setMessage(null);
 			context.setCurrentRequest(null);
 			return TO_SENDING_PROVIDER_REQUEST;

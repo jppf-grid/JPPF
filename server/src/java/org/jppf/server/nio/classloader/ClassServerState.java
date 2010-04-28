@@ -18,10 +18,9 @@
 
 package org.jppf.server.nio.classloader;
 
-import static org.jppf.server.nio.classloader.ClassState.SENDING_NODE_RESPONSE;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
-import java.nio.channels.*;
+import java.nio.channels.SocketChannel;
 
 import org.apache.commons.logging.*;
 import org.jppf.server.JPPFDriver;
@@ -72,7 +71,6 @@ abstract class ClassServerState extends NioState<ClassTransition>
 		ClassContext requestContext = (ClassContext) request.getContext();
 		requestContext.getResource().setDefinition(null);
 		requestContext.serializeResource();
-		requestContext.setState(SENDING_NODE_RESPONSE);
-		server.getTransitionManager().setKeyOps(request, SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+		server.getTransitionManager().transitionChannel(request, ClassTransition.TO_SENDING_NODE_RESPONSE);
 	}
 }

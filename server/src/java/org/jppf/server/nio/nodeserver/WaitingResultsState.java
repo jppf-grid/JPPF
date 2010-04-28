@@ -59,12 +59,12 @@ class WaitingResultsState extends NodeServerState
 	 */
 	public NodeTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		NodeContext context = (NodeContext) wrapper.getContext();
+		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
 		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 
 		// Wait the full byte[] of the bundle come to start processing.
 		// This makes the integration of non-blocking with ObjectInputStream easier.
-		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
+		if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage());
 		if (context.readMessage(wrapper))
 		{
 			if (debugEnabled) log.debug("read bundle from node " + wrapper + " done");

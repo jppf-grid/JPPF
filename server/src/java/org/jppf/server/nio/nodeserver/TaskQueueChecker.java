@@ -17,7 +17,6 @@
  */
 package org.jppf.server.nio.nodeserver;
 
-import java.nio.channels.*;
 import java.util.*;
 
 import org.apache.commons.logging.*;
@@ -76,9 +75,6 @@ class TaskQueueChecker implements Runnable
 		{
 			if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return;
 			if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
-			List<ChannelWrapper> channelList = new ArrayList<ChannelWrapper>();
-			channelList.addAll(idleChannels);
-			boolean found = false;
 			ChannelWrapper channel = null;
 			BundleWrapper selectedBundle = null;
 			AbstractJPPFQueue queue = (AbstractJPPFQueue) server.getQueue();
@@ -86,7 +82,7 @@ class TaskQueueChecker implements Runnable
 			try
 			{
 				Iterator<BundleWrapper> it = queue.iterator();
-				while (!found && it.hasNext() && !idleChannels.isEmpty())
+				while ((channel == null) && it.hasNext() && !idleChannels.isEmpty())
 				{
 					BundleWrapper bundleWrapper = it.next();
 					JPPFTaskBundle bundle = bundleWrapper.getBundle();
@@ -96,14 +92,12 @@ class TaskQueueChecker implements Runnable
 					{
 						channel = idleChannels.remove(n);
 						selectedBundle = bundleWrapper;
-						found = true;
 					}
 				}
-				if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "found channel for bundle");
+				if (debugEnabled) log.debug((channel == null ? "no " : "") + "channel found for bundle");
 				if (channel != null)
 				{
-					SelectionKey key = (SelectionKey) channel.getChannel(); //channel.keyFor(server.getSelector());
-					NodeContext context = (NodeContext) key.attachment();
+					AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
 					updateBundler(server.getBundler(), selectedBundle.getBundle(), context);
 					BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
 					context.setBundle(bundleWrapper);
@@ -140,9 +134,7 @@ class TaskQueueChecker implements Runnable
 				channelsToRemove.add(i);
 				continue;
 			}
-			SelectionKey key = (SelectionKey) ch.getChannel();
-			if (!server.getTransitionManager().isSequential() && server.getTransitionManager().isProcessingKey(ch)) continue;
-			NodeContext context = (NodeContext) key.attachment();
+			AbstractNodeContext context = (AbstractNodeContext) ch.getContext();
 			if (uuidPath.contains(context.getNodeUuid())) continue;
 			if (rule != null)
 			{
@@ -189,7 +181,7 @@ class TaskQueueChecker implements Runnable
 	 * @param taskBundle the job.
 	 * @param context the current node context.
 	 */
-	private void updateBundler(Bundler bundler, JPPFTaskBundle taskBundle, NodeContext context)
+	private void updateBundler(Bundler bundler, JPPFTaskBundle taskBundle, AbstractNodeContext context)
 	{
 		context.checkBundler(server.getBundler());
 		if (context.getBundler() instanceof JobAwareness)

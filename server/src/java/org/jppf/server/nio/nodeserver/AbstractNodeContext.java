@@ -32,24 +32,24 @@ import org.jppf.utils.*;
  * Context associated with a channel serving tasks to a node.
  * @author Laurent Cohen
  */
-class NodeContext extends NioContext<NodeState>
+public abstract class AbstractNodeContext extends NioContext<NodeState>
 {
 	/**
 	 * The message wrapping the data sent or received over the socket channel.
 	 */
-	private NodeMessage nodeMessage = null;
+	protected AbstractNodeMessage nodeMessage = null;
 	/**
 	 * The task bundle to send or receive.
 	 */
-	private BundleWrapper bundle = null;
+	protected BundleWrapper bundle = null;
 	/**
 	 * Bundler used to schedule tasks for the corresponding node.
 	 */
-	private Bundler bundler = null;
+	protected Bundler bundler = null;
 	/**
 	 * Helper used to serialize the bundle objects.
 	 */
-	private SerializationHelper helper = new SerializationHelperImpl();
+	protected SerializationHelper helper = new SerializationHelperImpl();
 	/**
 	 * Determines whether this context is attached to a peer node.
 	 */
@@ -57,7 +57,7 @@ class NodeContext extends NioContext<NodeState>
 	/**
 	 * The uuid of the corresponding node.
 	 */
-	private String nodeUuid = null;
+	protected String nodeUuid = null;
 
 	/**
 	 * Get the task bundle to send or receive.
@@ -149,7 +149,7 @@ class NodeContext extends NioContext<NodeState>
 	public void serializeBundle() throws Exception
 	{
 		//if (nodeMessage == null)
-		nodeMessage = new NodeMessage();
+		nodeMessage = newMessage();
 		byte[] data = helper.getSerializer().serialize(bundle.getBundle()).getBuffer();
 		data = JPPFDataTransformFactory.transform(true, data, 0, data.length);
 		nodeMessage.addLocation(new ByteBufferLocation(data, 0, data.length));
@@ -160,7 +160,7 @@ class NodeContext extends NioContext<NodeState>
 
 	/**
 	 * Deserialize a task bundle from the message read into this buffer.
-	 * @return a {@link NodeContext} instance.
+	 * @return a {@link AbstractNodeContext} instance.
 	 * @throws Exception if an error occurs during the deserialization.
 	 */
 	public BundleWrapper deserializeBundle() throws Exception
@@ -176,19 +176,25 @@ class NodeContext extends NioContext<NodeState>
 	}
 
 	/**
-	 * Get the message wrapping the data sent or received over the socket channel.
-	 * @return a {@link NodeMessage NodeMessage} instance.
+	 * Create a new message.
+	 * @return an {@link AbstractNodeMessage} instance.
 	 */
-	public NodeMessage getNodeMessage()
+	public abstract AbstractNodeMessage newMessage();
+
+	/**
+	 * Get the message wrapping the data sent or received over the socket channel.
+	 * @return a {@link RemoteNodeMessage NodeMessage} instance.
+	 */
+	public AbstractNodeMessage getNodeMessage()
 	{
 		return nodeMessage;
 	}
 
 	/**
 	 * Set the message wrapping the data sent or received over the socket channel.
-	 * @param nodeMessage a {@link NodeMessage NodeMessage} instance.
+	 * @param nodeMessage a {@link RemoteNodeMessage NodeMessage} instance.
 	 */
-	public void setNodeMessage(NodeMessage nodeMessage)
+	public void setNodeMessage(AbstractNodeMessage nodeMessage)
 	{
 		this.nodeMessage = nodeMessage;
 	}
@@ -238,6 +244,7 @@ class NodeContext extends NioContext<NodeState>
 	 */
 	public boolean readMessage(ChannelWrapper<?> channel) throws Exception
 	{
+		if (nodeMessage == null) nodeMessage = newMessage();
 		return getNodeMessage().read(channel);
 	}
 

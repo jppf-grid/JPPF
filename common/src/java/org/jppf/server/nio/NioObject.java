@@ -51,10 +51,6 @@ public class NioObject
 	 * Determines whether the I/O performed by this object are blocking.
 	 */
 	private boolean blocking = false;
-	/**
-	 * 
-	 */
-	private long sessionId = 0L;
 
 	/**
 	 * Initialize this NioObject with the specified size.
@@ -64,17 +60,6 @@ public class NioObject
 	public NioObject(int size, boolean blocking)
 	{
 		this(new ByteBufferLocation(size), blocking);
-	}
-
-	/**
-	 * Initialize this NioObject with the specified size.
-	 * @param size the size of the internal buffer.
-	 * @param blocking specfifes whether the I/O performed by this object are blocking.
-	 * @param sessionId the id of the session we write to.
-	 */
-	public NioObject(int size, boolean blocking, long sessionId)
-	{
-		this(new ByteBufferLocation(size), blocking, sessionId);
 	}
 
 	/**
@@ -102,20 +87,6 @@ public class NioObject
 	}
 
 	/**
-	 * Initialize this NioObject with the specified size.
-	 * @param data the location of the data to read from or write to.
-	 * @param blocking specfifes whether the I/O performed by this object are blocking.
-	 * @param sessionId the id of the session we write to.
-	 */
-	public NioObject(DataLocation data, boolean blocking, long sessionId)
-	{
-		this.size = data.getSize();
-		this.data = data;
-		this.sessionId = sessionId;
-		if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().rewind();
-	}
-
-	/**
 	 * Read the current frame.
 	 * @param source the source to read from.
 	 * @return true if the frame has been read fully, false otherwise.
@@ -126,8 +97,10 @@ public class NioObject
 		if (count >= size) return true;
 		int n = data.transferFrom(source, blocking);
 		if (n > 0) count += n;
+		if (debugEnabled) log.debug("read " + n + " bytes from input source, count = " + count);
 		if (count >= size)
 		{
+			if (debugEnabled) log.debug("count = " + count + ", size = " + size);
 			if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().flip();
 			return true;
 		}
@@ -145,10 +118,10 @@ public class NioObject
 		if (count >= size) return true;
 		int n = data.transferTo(dest, blocking);
 		if (n > 0) count += n;
-		if (debugEnabled) log.debug("sessionId = " + sessionId + " : wrote " + n + " bytes to output destination, count = " + count);
+		if (debugEnabled) log.debug("wrote " + n + " bytes to output destination, count = " + count);
 		if (count >= size)
 		{
-			if (debugEnabled) log.debug("sessionId = " + sessionId + " : count = " + count + ", size = " + size);
+			if (debugEnabled) log.debug("count = " + count + ", size = " + size);
 			if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().flip();
 			//if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().rewind();
 			return true;

@@ -99,9 +99,9 @@ public class SelectionKeyWrapper extends ChannelWrapper<SelectionKey>
 	/**
 	 * Get the operations available for this channel.
 	 * @return the operations as an int value.
-	 * @see org.jppf.server.nio.ChannelWrapper#readyOps()
+	 * @see org.jppf.server.nio.ChannelWrapper#getReadyOps()
 	 */
-	protected int readyOps()
+	protected int getReadyOps()
 	{
 		return getChannel().readyOps();
 	}

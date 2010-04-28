@@ -38,7 +38,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The selection key corresponding to the channel whose state is changing.
+	 * The channel whose state is changing.
 	 */
 	private ChannelWrapper channel = null;
 	/**
@@ -52,7 +52,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 
 	/**
 	 * Initialize this task with the specified key and factory.
-	 * @param channel the selection key corresponding to the channel whose state is changing.
+	 * @param channel the channel whose state is changing.
 	 * @param factory the factory for the server that runs this task.
 	 */
 	public StateTransitionTask(ChannelWrapper channel, NioServerFactory<S, T> factory)
@@ -71,21 +71,15 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 		try
 		{
 			this.ctx = (NioContext<S>) channel.getContext();
-			//if (debugEnabled) log.debug(StringUtils.getRemoteHost(key.channel()) + " transition from " + ctx.getState());
 			NioState<T> state = factory.getState(ctx.getState());
-			NioTransition<S> transition = factory.getTransition(state.performTransition(channel));
-			ctx.setState(transition.getState());
-			transitionManager.setKeyOps(channel, transition.getInterestOps());
+			T t = state.performTransition(channel);
+			transitionManager.transitionChannel(channel, t);
 		}
 		catch(Exception e)
 		{
 			if (debugEnabled) log.debug(e.getMessage(), e);
 			else log.warn(e);
 			ctx.handleException(channel);
-		}
-		finally
-		{
-			if (!transitionManager.isSequential()) transitionManager.releaseKey(channel);
 		}
 	}
 }

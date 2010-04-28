@@ -205,7 +205,7 @@ public abstract class AbstractNodeIO implements NodeIO
 			ioHandler.writeInt(list.second());
 			for (JPPFBuffer buf: list.first()) ioHandler.write(buf.buffer, 0, buf.length);
 		}
-		ioHandler.flush();
+		//ioHandler.flush();
 	}
 
 	/**

@@ -63,7 +63,7 @@ class SendInitialBundleState extends NodeServerState
 			throw new ConnectException("node " + wrapper + " has been disconnected");
 		}
 
-		NodeContext context = (NodeContext) wrapper.getContext();
+		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
 		if (context.getNodeMessage() == null)
 		{
 			if (debugEnabled) log.debug("serializing initial bundle for " + wrapper);

@@ -19,12 +19,10 @@
 package org.jppf.server.nio.nodeserver;
 
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.*;
 import java.util.*;
 
 import org.jppf.data.transform.JPPFDataTransformFactory;
-import org.jppf.io.*;
+import org.jppf.io.DataLocation;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.*;
@@ -33,44 +31,32 @@ import org.jppf.utils.*;
  * 
  * @author Laurent Cohen
  */
-class NodeMessage
+public abstract class AbstractNodeMessage
 {
 	/**
 	 * The current count of bytes sent or received.
 	 */
-	private int count = 0;
+	protected int count = 0;
 	/**
 	 * The total length of data to send or receive.
 	 */
-	private int length = 0;
+	protected int length = 0;
 	/**
 	 * The data location objects abstracting the data to send or receive.
 	 */
-	private LinkedList<DataLocation> locations = new LinkedList<DataLocation>();
+	protected LinkedList<DataLocation> locations = new LinkedList<DataLocation>();
 	/**
 	 * The current position in the list of data locations.
 	 */
-	private int position = 0;
+	protected int position = 0;
 	/**
 	 * The number of objects toread or write.
 	 */
-	private int nbObjects = -1;
-	/**
-	 * The length of the location at the current position.
-	 */
-	private int currentLength = 0;
-	/**
-	 * Object storing the length of the object currently being read or written.
-	 */
-	private NioObject currentLengthObject = null;
-	/**
-	 * Object storing the object currently being read or written.
-	 */
-	private NioObject currentObject = null;
+	protected int nbObjects = -1;
 	/**
 	 * The latest bundle that was sent or received.
 	 */
-	private JPPFTaskBundle bundle = null;
+	protected JPPFTaskBundle bundle = null;
 
 	/**
 	 * Add a location to the data locations of this message.
@@ -89,10 +75,9 @@ class NodeMessage
 	 */
 	public boolean read(ChannelWrapper<?> wrapper) throws Exception
 	{
-		SocketChannel channel = (SocketChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
 		if (nbObjects <= 0)
 		{
-			if (!readNextObject(channel)) return false;
+			if (!readNextObject(wrapper)) return false;
 			InputStream is = locations.get(0).getInputStream();
 			byte[] data = FileUtils.getInputStreamAsByte(is);
 			data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
@@ -102,41 +87,18 @@ class NodeMessage
 		}
 		while (position < nbObjects)
 		{
-			if (!readNextObject(channel)) return false;
+			if (!readNextObject(wrapper)) return false;
 		}
 		return true;
 	}
 
 	/**
 	 * Read the next serializable object from the specified channel.
-	 * @param channel - the channel to read from.
+	 * @param wrapper the channel to read from.
 	 * @return true if the object has been completely read from the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	private boolean readNextObject(ReadableByteChannel channel) throws Exception
-	{
-		if (currentLengthObject == null) currentLengthObject = new NioObject(4, false);
-		InputSource is = new ChannelInputSource(channel);
-		if (!currentLengthObject.read(is)) return false;
-		if (currentLength <= 0)
-		{
-			currentLength = ((ByteBufferLocation) currentLengthObject.getData()).buffer().getInt();
-			count += 4;
-		}
-		if (currentObject == null)
-		{
-			DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
-			currentObject = new NioObject(location, false);
-		}
-		if (!currentObject.read(is)) return false;
-		count += currentLength;
-		locations.add(currentObject.getData());
-		currentLengthObject = null;
-		currentObject = null;
-		currentLength = 0;
-		position++;
-		return true;
-	}
+	protected abstract boolean readNextObject(ChannelWrapper<?> wrapper) throws Exception;
 
 	/**
 	 * Read data from the channel.
@@ -146,7 +108,6 @@ class NodeMessage
 	 */
 	public boolean write(ChannelWrapper<?> wrapper) throws Exception
 	{
-		SocketChannel channel = (SocketChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
 		if (nbObjects <= 0)
 		{
 			nbObjects = bundle.getTaskCount() + 2;
@@ -154,40 +115,18 @@ class NodeMessage
 		//if (!writeLength(channel)) return false;
 		while (position < nbObjects)
 		{
-			if (!writeNextObject(channel)) return false;
+			if (!writeNextObject(wrapper)) return false;
 		}
 		return true;
 	}
 
 	/**
 	 * Write the next object to the specified channel.
-	 * @param channel - the channel to write to.
+	 * @param wrapper the channel to write to.
 	 * @return true if the object has been completely written the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	private boolean writeNextObject(WritableByteChannel channel) throws Exception
-	{
-		if (currentLengthObject == null)
-		{
-			currentLengthObject = new NioObject(4, false);
-			ByteBuffer buffer = ((ByteBufferLocation) currentLengthObject.getData()).buffer();
-			buffer.putInt(locations.get(position).getSize());
-			buffer.flip();
-		}
-		OutputDestination od = new ChannelOutputDestination(channel);
-		if (!currentLengthObject.write(od)) return false;
-		if (currentObject == null)
-		{
-			DataLocation loc = locations.get(position);
-			currentObject = new NioObject(loc.copy(), false);
-		}
-		if (!currentObject.write(od)) return false;
-		count += 4 + locations.get(position).getSize();
-		position++;
-		currentLengthObject = null;
-		currentObject = null;
-		return true;
-	}
+	protected abstract boolean writeNextObject(ChannelWrapper<?> wrapper) throws Exception;
 
 	/**
 	 * Get the data location objects abstracting the data to send or receive.

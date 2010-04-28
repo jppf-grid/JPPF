@@ -141,7 +141,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	public void postAccept(ChannelWrapper channel)
 	{
 		driver.getStatsManager().newNodeConnection();
-		NodeContext context = (NodeContext) channel.getContext();
+		RemoteNodeContext context = (RemoteNodeContext) channel.getContext();
 		try
 		{
 			context.setBundle(getInitialBundle());
@@ -156,6 +156,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 
 	/**
 	 * This method is invoked after all selected keys have been processed.
+	 * @see org.jppf.server.nio.NioServer#postSelect()
 	 */
 	protected void postSelect()
 	{
@@ -169,7 +170,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	public void addIdleChannel(ChannelWrapper channel)
 	{
-		if (debugEnabled) log.debug("Adding idle chanel " + channel);
+		if (debugEnabled) log.debug("Adding idle channel " + channel);
 		synchronized(idleChannels)
 		{
 			idleChannels.add(channel);
@@ -196,7 +197,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	public NioContext createNioContext()
 	{
-		return new NodeContext();
+		return new RemoteNodeContext();
 	}
 
 	/**
@@ -249,14 +250,22 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 
 	/**
 	 * Close a connection to a node.
-	 * @param channel - a <code>SocketChannel</code> that encapsulates the connection.
-	 * @param context - the context data associated with the channel.
+	 * @param channel a <code>SocketChannel</code> that encapsulates the connection.
+	 * @param context the context data associated with the channel.
 	 */
-	public static void closeNode(ChannelWrapper channel, NodeContext context)
+	public static void closeNode(ChannelWrapper channel, AbstractNodeContext context)
 	{
+		// bug [993389 - Nodes are not removed from the console upon dying]
 		try
 		{
 			channel.close();
+		}
+		catch (Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		try
+		{
 			driver.getStatsManager().nodeConnectionClosed();
 			if (context.getNodeUuid() != null)
 			{
@@ -264,9 +273,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				driver.getNodeNioServer().removeIdleChannel(channel);
 			}
 		}
-		catch (Exception ignored)
+		catch (Exception e)
 		{
-			log.error(ignored.getMessage(), ignored);
+			log.error(e.getMessage(), e);
 		}
 	}
 

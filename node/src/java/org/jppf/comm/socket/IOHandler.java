@@ -32,7 +32,19 @@ public interface IOHandler
 	 * @throws Exception if any error occurs.
 	 */
 	JPPFBuffer read() throws Exception;
-	/** 
+	/**
+	 * Write multiple blocks of data to the channel.
+	 * @param len the total length of the data to write.
+	 * @param data the data to write as an array of byte arrays.
+	 * @throws Exception if any error occurs.
+	 */
+	void write(int len, byte[]...data) throws Exception;
+	/**
+	 * Flush this handler.
+	 * @throws Exception if any error occurs.
+	 */
+	void flush() throws Exception;
+	/**
 	 * Write an int value to the channel.
 	 * @param value the value to write.
 	 * @throws Exception if any error occurs.
@@ -40,15 +52,10 @@ public interface IOHandler
 	void writeInt(int value) throws Exception;
 	/**
 	 * Write a block of data to the channel.
-	 * @param data the data to write.
-	 * @param offset the start position in the data.
-	 * @param len th elength of data to read starting from <code>offset</code>.
+	 * @param data the data to write as an array of bytes.
+	 * @param offset the poistion a which to start in the data.
+	 * @param len the number of bytes to write.
 	 * @throws Exception if any error occurs.
 	 */
 	void write(byte[] data, int offset, int len) throws Exception;
-	/**
-	 * Flush this handler.
-	 * @throws Exception if any error occurs.
-	 */
-	void flush() throws Exception;
 }

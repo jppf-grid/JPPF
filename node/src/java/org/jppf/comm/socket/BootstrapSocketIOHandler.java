@@ -21,7 +21,7 @@ package org.jppf.comm.socket;
 import org.jppf.utils.JPPFBuffer;
 
 /**
- * An IOHandler implementation that delegates I/O to a {@link SocketWrapper}.
+ * An {@link IOHandler} implementation that delegates I/O to a {@link SocketWrapper}.
  * @author Laurent Cohen
  */
 public class BootstrapSocketIOHandler implements IOHandler
@@ -29,7 +29,7 @@ public class BootstrapSocketIOHandler implements IOHandler
 	/**
 	 * The socket wrapper that handles the I/O.
 	 */
-	private SocketWrapper socketWrapper = null;
+	protected SocketWrapper socketWrapper = null;
 
 	/**
 	 * Initialize this handler with the specified socket wrapper.
@@ -52,27 +52,28 @@ public class BootstrapSocketIOHandler implements IOHandler
 	}
 
 	/**
-	 * Write a block of data to the channel.
-	 * @param data the data to write.
-	 * @param offset the start position in the data.
-	 * @param len th elength of data to read starting from <code>offset</code>.
-	 * @throws Exception if any error occurs.
-	 * @see org.jppf.server.node.IOHandler#write(byte[], int, int)
+	 * {@inheritDoc}
 	 */
-	public void write(byte[] data, int offset, int len) throws Exception
+	public void write(int len, byte[]...data) throws Exception
 	{
-		socketWrapper.write(data, offset, len);
+		socketWrapper.writeInt(len);
+		for (byte[] b: data) socketWrapper.write(b, 0, b.length);
 	}
 
 	/**
-	 * Write an int value to the channel.
-	 * @param value the value to write.
-	 * @throws Exception if any error occurs.
-	 * @see org.jppf.server.node.IOHandler#writeInt(int)
+	 * {@inheritDoc}
 	 */
 	public void writeInt(int value) throws Exception
 	{
 		socketWrapper.writeInt(value);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void write(byte[] data, int offset, int len) throws Exception
+	{
+		socketWrapper.write(data, offset, len);
 	}
 
 	/**

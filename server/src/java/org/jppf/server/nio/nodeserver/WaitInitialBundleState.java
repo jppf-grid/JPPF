@@ -61,9 +61,9 @@ class WaitInitialBundleState extends NodeServerState
 	 */
 	public NodeTransition performTransition(ChannelWrapper wrapper) throws Exception
 	{
-		NodeContext context = (NodeContext) wrapper.getContext();
+		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
 		if (debugEnabled) log.debug("exec() for " + wrapper);
-		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
+		if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage());
 		if (context.readMessage(wrapper))
 		{
 			if (debugEnabled) log.debug("read bundle for " + wrapper + " done");
@@ -74,7 +74,7 @@ class WaitInitialBundleState extends NodeServerState
 			Bundler bundler = server.getBundler().copy();
 			JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
 			if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
-			if (debugEnabled) log.debug("processing threads for node " + wrapper + " = " + systemInfo.getJppf().getInt("processing.threads", -1));
+			if (debugEnabled) log.debug("processing threads for node " + wrapper + " = " + (systemInfo == null ? "?" : systemInfo.getJppf().getInt("processing.threads", -1)));
 			bundler.setup();
 			context.setBundler(bundler);
 			Boolean b = (Boolean) bundle.getParameter(BundleParameter.IS_PEER);

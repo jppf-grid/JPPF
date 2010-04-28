@@ -53,6 +53,7 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
 		map.put(WAIT_INITIAL_BUNDLE, new WaitInitialBundleState((NodeNioServer) server));
 		map.put(SENDING_BUNDLE, new SendingBundleState((NodeNioServer) server));
 		map.put(WAITING_RESULTS, new WaitingResultsState((NodeNioServer) server));
+		map.put(IDLE, new IdleState((NodeNioServer) server));
 		return map;
 	}
 
@@ -69,7 +70,7 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
 		map.put(TO_WAITING, transition(WAITING_RESULTS, R));
 		map.put(TO_SEND_INITIAL, transition(SEND_INITIAL_BUNDLE, RW));
 		map.put(TO_WAIT_INITIAL, transition(WAIT_INITIAL_BUNDLE, R));
-		map.put(TO_IDLE, transition(SENDING_BUNDLE, R));
+		map.put(TO_IDLE, transition(IDLE, R));
 		return map;
 	}
 

@@ -19,9 +19,8 @@
 package org.jppf.server.nio;
 
 import java.nio.channels.*;
-import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.*;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.commons.logging.*;
 import org.jppf.utils.*;
@@ -37,15 +36,11 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NioServer.class);
+	private static Log log = LogFactory.getLog(StateTransitionManager.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * A dummy object to use as map value.
-	 */
-	private static Object DUMMY_OBJECT = "dummy object";
 	/**
 	 * The pool of threads used for submitting channel state transitions.
 	 */
@@ -59,14 +54,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * performed sequentially or through the executor thread pool.
 	 */
 	private boolean sequential = false;
-	/**
-	 * A reentrant lock on the nio server.
-	 */
-	private Lock lock = new ReentrantLock();
-	/**
-	 * The set of keys currently being processed.
-	 */
-	private Set<ChannelWrapper> processingKeys = new HashSet<ChannelWrapper>();
 
 	/**
 	 * Initialize this transition manager with the specified server and sequential flag.
@@ -89,60 +76,10 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	protected void submitTransition(ChannelWrapper key)
 	{
-		if (!sequential)
-		{
-			lock.lock();
-			try
-			{
-				if (debugEnabled) log.debug("processed keys: " + processingKeys + ", before adding " + key);
-				if (processingKeys.contains(key)) return;
-				processingKeys.add(key);
-			}
-			finally
-			{
-				lock.unlock();
-			}
-		}
 		setKeyOps(key, 0);
 		StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, server.getFactory());
 		if (sequential) transition.run();
 		else executor.submit(transition);
-	}
-
-	/**
-	 * Remove the specified key from the set of currently processed keys.
-	 * @param channel the key to release.
-	 */
-	void releaseKey(ChannelWrapper channel)
-	{
-		lock.lock();
-		try
-		{
-			if (debugEnabled) log.debug("processed keys: " + processingKeys + ", before removing " + channel);
-			processingKeys.remove(channel);
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
-
-	/**
-	 * Determine whether the specified key is currently being processed.
-	 * @param channel the key to check.
-	 * @return true if the key is being processed, false otherwise.
-	 */
-	public boolean isProcessingKey(ChannelWrapper channel)
-	{
-		lock.lock();
-		try
-		{
-			return processingKeys.contains(channel);
-		}
-		finally
-		{
-			lock.unlock();
-		}
 	}
 
 	/**
@@ -151,7 +88,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * @param key the key on which to set the interest operations.
 	 * @param ops the operations to set on the key.
 	 */
-	public void setKeyOps(ChannelWrapper key, int ops)
+	private void setKeyOps(ChannelWrapper key, int ops)
 	{
 		Lock lock = server.getLock();
 		lock.lock();
@@ -173,10 +110,23 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	public void transitionChannel(ChannelWrapper key, T transition)
 	{
-		NioContext<S> context = (NioContext<S>) key.getContext();
-		NioTransition<S> t = server.getFactory().getTransition(transition);
-		context.setState(t.getState());
-		setKeyOps(key, t.getInterestOps());
+		Lock lock = server.getLock();
+		lock.lock();
+		try
+		{
+			server.getSelector().wakeup();
+			NioContext<S> context = (NioContext<S>) key.getContext();
+			S s1 = context.getState();
+			NioTransition<S> t = server.getFactory().getTransition(transition);
+			S s2 = t.getState();
+			context.setState(s2);
+			key.setKeyOps(t.getInterestOps());
+			if (debugEnabled) log.debug("transitionned " + key + " from " + s1 + " to " + s2);
+		}
+		finally
+		{
+			lock.unlock();
+		}
 	}
 
 	/**

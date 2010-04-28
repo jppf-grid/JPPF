@@ -130,10 +130,7 @@ public abstract class ChannelWrapper<S>
 	 * Get the operations available for this channel.
 	 * @return the operations as an int value.
 	 */
-	protected int readyOps()
-	{
-		return 0;
-	}
+	protected abstract int getReadyOps();
 
 	/**
 	 * Determine whether the channel can be read from.
@@ -141,7 +138,7 @@ public abstract class ChannelWrapper<S>
 	 */
 	public boolean isReadable()
 	{
-		return (readyOps() & SelectionKey.OP_READ) > 0;
+		return (getReadyOps() & SelectionKey.OP_READ) != 0;
 	}
 
 	/**
@@ -150,7 +147,7 @@ public abstract class ChannelWrapper<S>
 	 */
 	public boolean isWritable()
 	{
-		return (readyOps() & SelectionKey.OP_WRITE) > 0;
+		return (getReadyOps() & SelectionKey.OP_WRITE) != 0;
 	}
 
 	/**
@@ -159,7 +156,7 @@ public abstract class ChannelWrapper<S>
 	 */
 	public boolean isAcceptable()
 	{
-		return (readyOps() & SelectionKey.OP_ACCEPT) > 0;
+		return (getReadyOps() & SelectionKey.OP_ACCEPT) != 0;
 	}
 
 	/**
@@ -168,6 +165,6 @@ public abstract class ChannelWrapper<S>
 	 */
 	public boolean isConnectable()
 	{
-		return (readyOps() & SelectionKey.OP_CONNECT) > 0;
+		return (getReadyOps() & SelectionKey.OP_CONNECT) != 0;
 	}
 }
