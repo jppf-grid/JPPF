@@ -256,11 +256,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	public static void closeNode(SocketChannel channel, NodeContext context)
 	{
-		if (context != null)
-		{
-			if (context.isClosed()) return;
-			context.close();
-		}
+		if (context != null) context.close();
 		try
 		{
 			channel.close();
