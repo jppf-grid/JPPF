@@ -358,6 +358,8 @@
 				<include name="jppf-common.jar"/>
 				<include name="jppf-client.jar"/>
 			</fileset>
+			<fileset dir="${lib}/log4j" includes="*.jar"/>
+			<fileset dir="${lib}/slf4j" includes="*.jar"/>
 		</copy>		
     <delete dir="${application.template}/classes" quiet="true"/>
  		<mkdir dir="${application.template}/classes"/>
