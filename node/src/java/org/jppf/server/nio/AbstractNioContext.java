@@ -21,16 +21,16 @@ package org.jppf.server.nio;
 import org.apache.commons.logging.*;
 
 /**
- * Context associated with an open socket channel.
+ * Context associated with an open communication channel.
  * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
-public abstract class NioContext<S extends Enum>
+public abstract class AbstractNioContext<S extends Enum> implements NioContext<S>
 {
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(NioContext.class);
+	protected static Log log = LogFactory.getLog(AbstractNioContext.class);
 	/**
 	 * Determines whther DEBUG logging level is enabled.
 	 */
@@ -43,10 +43,21 @@ public abstract class NioContext<S extends Enum>
 	 * Uuid for this node context.
 	 */
 	protected String uuid = null;
+	/**
+	 * Container for the current message data.
+	 */
+	protected NioMessage message = null;
+	/**
+	 * Count of bytes read.
+	 */
+	public int readByteCount = 0;
+	/**
+	 * Count of bytes written.
+	 */
+	public int writeByteCount = 0;
 
 	/**
-	 * Get the current state of the channel this context is associated with.
-	 * @return a state enum value.
+	 * {@inheritDoc}
 	 */
 	public S getState()
 	{
@@ -54,8 +65,7 @@ public abstract class NioContext<S extends Enum>
 	}
 
 	/**
-	 * Set the current state of the channel this context is associated with.
-	 * @param state a state enum value.
+	 * {@inheritDoc}
 	 */
 	public void setState(S state)
 	{
@@ -63,24 +73,7 @@ public abstract class NioContext<S extends Enum>
 	}
 
 	/**
-	 * Read data from a channel.
-	 * @param wrapper the channel to read the data from.
-	 * @return true if all the data has been read, false otherwise.
-	 * @throws Exception if an error occurs while reading the data.
-	 */
-	public abstract boolean readMessage(ChannelWrapper<?> wrapper) throws Exception;
-
-	/**
-	 * Write data to a channel.
-	 * @param wrapper the channel to write the data to.
-	 * @return true if all the data has been written, false otherwise.
-	 * @throws Exception if an error occurs while writing the data.
-	 */
-	public abstract boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception;
-
-	/**
-	 * Get the uuid for this node context.
-	 * @return the uuid as a string.
+	 * {@inheritDoc}
 	 */
 	public String getUuid()
 	{
@@ -88,8 +81,7 @@ public abstract class NioContext<S extends Enum>
 	}
 
 	/**
-	 * Set the uuid for this node context.
-	 * @param uuid the uuid as a string.
+	 * {@inheritDoc}
 	 */
 	public void setUuid(String uuid)
 	{
@@ -108,8 +100,20 @@ public abstract class NioContext<S extends Enum>
 	}
 
 	/**
-	 * Handle the cleanup when an exception occurs on the channel.
-	 * @param channel the channel that threw the exception.
+	 * Get the container for the current message data.
+	 * @return an <code>NioMessage</code> instance.
 	 */
-	public abstract void handleException(ChannelWrapper channel);
+	public NioMessage getMessage()
+	{
+		return message;
+	}
+
+	/**
+	 * Set the container for the current message data.
+	 * @param message an <code>NioMessage</code> instance.
+	 */
+	public void setMessage(NioMessage message)
+	{
+		this.message = message;
+	}
 }

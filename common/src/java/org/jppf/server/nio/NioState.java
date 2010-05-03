@@ -32,5 +32,5 @@ public abstract class NioState<T extends Enum<T>>
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 */
-	public abstract T performTransition(ChannelWrapper channel) throws Exception;
+	public abstract T performTransition(ChannelWrapper<?> channel) throws Exception;
 }

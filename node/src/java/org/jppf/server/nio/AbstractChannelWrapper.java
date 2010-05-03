@@ -18,32 +18,45 @@
 
 package org.jppf.server.nio;
 
-import java.nio.channels.SelectionKey;
+import static java.nio.channels.SelectionKey.*;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Wraps a communication channel, no matter what the channel is.
  * @param <S> the type of wrapped channel.
  * @author Laurent Cohen
  */
-public abstract class ChannelWrapper<S>
+public abstract class AbstractChannelWrapper<S> implements ChannelWrapper<S>
 {
+	/**
+	 * Count of instances of this class.
+	 */
+	private static AtomicInteger instanceCount = new AtomicInteger(0);
+	/**
+	 * Id of this instance.
+	 */
+	protected final int id = instanceCount.incrementAndGet();
 	/**
 	 * The channel to wrap.
 	 */
 	protected S channel;
+	/**
+	 * The selctor for this channel.
+	 */
+	protected ChannelSelector selector = null;
 	
 	/**
 	 * Initialize this channel wrapper with the specified channel.
 	 * @param channel the channel to wrap.
 	 */
-	public ChannelWrapper(S channel)
+	public AbstractChannelWrapper(S channel)
 	{
 		this.channel = channel;
 	}
 
 	/**
-	 * Get the channel to wrap.
-	 * @return the wrapped channel.
+	 * {@inheritDoc}
 	 */
 	public S getChannel()
 	{
@@ -51,22 +64,20 @@ public abstract class ChannelWrapper<S>
 	}
 
 	/**
-	 * Close the channel.
-	 * @throws Exception if any error occurs while closing the channel.
+	 * {@inheritDoc}
+	 * @see org.jppf.server.nio.ChannelWrapper#close()
 	 */
 	public void close() throws Exception
 	{
 	}
 
 	/**
-	 * Get the {@link NioContext} attached to the channel.
-	 * @return a {@link NioContext} instance.
+	 * {@inheritDoc}
 	 */
 	public abstract NioContext getContext();
 
 	/**
-	 * Determine whether the channel is opened.
-	 * @return true if the channel is opened, false otherwise.
+	 * {@inheritDoc}
 	 */
 	public boolean isOpen()
 	{
@@ -74,9 +85,7 @@ public abstract class ChannelWrapper<S>
 	}
 
 	/**
-	 * Get the hashcode for this object.
-	 * @return the hashcode of the wrapped channel.
-	 * @see java.lang.Object#hashCode()
+	 * {@inheritDoc}
 	 */
 	public int hashCode()
 	{
@@ -94,7 +103,7 @@ public abstract class ChannelWrapper<S>
 		if (this == obj) return true;
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
-		ChannelWrapper other = (ChannelWrapper) obj;
+		AbstractChannelWrapper other = (AbstractChannelWrapper) obj;
 		if (channel == null) return (other.channel == null);
 		return channel.equals(other.channel);
 	}
@@ -110,8 +119,8 @@ public abstract class ChannelWrapper<S>
 	}
 
 	/**
-	 * Get the operations enabled for this channel.
-	 * @return the operations as an int value.
+	 * {@inheritDoc}
+	 * @see org.jppf.server.nio.ChannelWrapper#getKeyOps()
 	 */
 	public int getKeyOps()
 	{
@@ -119,8 +128,8 @@ public abstract class ChannelWrapper<S>
 	}
 
 	/**
-	 * Get the operations enabled for this channel.
-	 * @param keyOps the operations as an int value.
+	 * {@inheritDoc}
+	 * @see org.jppf.server.nio.ChannelWrapper#setKeyOps(int)
 	 */
 	public void setKeyOps(int keyOps)
 	{
@@ -130,41 +139,84 @@ public abstract class ChannelWrapper<S>
 	 * Get the operations available for this channel.
 	 * @return the operations as an int value.
 	 */
-	protected abstract int getReadyOps();
+	public abstract int getReadyOps();
 
 	/**
-	 * Determine whether the channel can be read from.
-	 * @return true if the channel can be read, false otherwise.
+	 * {@inheritDoc}
+	 * @see org.jppf.server.nio.ChannelWrapper#isReadable()
 	 */
 	public boolean isReadable()
 	{
-		return (getReadyOps() & SelectionKey.OP_READ) != 0;
+		return (getReadyOps() & OP_READ) != 0;
 	}
 
 	/**
-	 * Determine whether the channel can be written to.
-	 * @return true if the channel can be written to, false otherwise.
+	 * {@inheritDoc}
+	 * @see org.jppf.server.nio.ChannelWrapper#isWritable()
 	 */
 	public boolean isWritable()
 	{
-		return (getReadyOps() & SelectionKey.OP_WRITE) != 0;
+		return (getReadyOps() & OP_WRITE) != 0;
 	}
 
 	/**
-	 * Determine whether the channel can accept connections.
-	 * @return true if the channel can accept connections, false otherwise.
+	 * {@inheritDoc}
+	 * @see org.jppf.server.nio.ChannelWrapper#isAcceptable()
 	 */
 	public boolean isAcceptable()
 	{
-		return (getReadyOps() & SelectionKey.OP_ACCEPT) != 0;
+		return (getReadyOps() & OP_ACCEPT) != 0;
 	}
 
 	/**
-	 * Determine whether the channel can be connected.
-	 * @return true if the channel can be connected, false otherwise.
+	 * {@inheritDoc}
+	 * @see org.jppf.server.nio.ChannelWrapper#isConnectable()
 	 */
 	public boolean isConnectable()
 	{
-		return (getReadyOps() & SelectionKey.OP_CONNECT) != 0;
+		return (getReadyOps() & OP_CONNECT) != 0;
+	}
+
+	/**
+	 * Cause the current thread to wait until notified.
+	 */
+	public synchronized void goToSleep()
+	{
+		try
+		{
+			wait();
+		}
+		catch(InterruptedException ignored)
+		{
+		}
+	}
+
+	/**
+	 * Notify the threads currently waiting on this object that they can resume.
+	 */
+	public synchronized void wakeUp()
+	{
+		notifyAll();
+	}
+
+	/**
+	 * Default implementation of this method returns null.
+	 * @return by default this method returns null.
+	 * @see org.jppf.server.nio.ChannelWrapper#getSelector()
+	 */
+	public ChannelSelector getSelector()
+	{
+		return selector;
+	}
+
+	/**
+	 * By default, this method does nothing.
+	 * Subclasses should override it ot implement their own selection mechanism.
+	 * @param selector the selector associated with this mechanism.
+	 * @see org.jppf.server.nio.ChannelWrapper#setSelector(org.jppf.server.nio.ChannelSelector)
+	 */
+	public void setSelector(ChannelSelector selector)
+	{
+		this.selector = selector;
 	}
 }

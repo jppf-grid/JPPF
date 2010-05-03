@@ -28,7 +28,7 @@ import org.jppf.utils.*;
  * Abstract implementation of the <code>MonitoredNode</code> interface.
  * @author Laurent Cohen
  */
-public abstract class AbstractMonitoredNode extends ThreadSynchronization implements MonitoredNode
+public abstract class AbstractMonitoredNode extends ThreadSynchronization implements MonitoredNode, Runnable
 {
 	/**
 	 * Utility for deserialization and serialization.

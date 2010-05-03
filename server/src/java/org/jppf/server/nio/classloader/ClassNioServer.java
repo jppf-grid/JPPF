@@ -20,7 +20,7 @@ package org.jppf.server.nio.classloader;
 
 import static org.jppf.server.nio.classloader.ClassState.DEFINING_TYPE;
 
-import java.nio.channels.*;
+import java.nio.channels.SelectionKey;
 import java.util.*;
 
 import org.apache.commons.logging.*;
@@ -28,6 +28,7 @@ import org.jppf.JPPFException;
 import org.jppf.classloader.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * Instances of this class serve class loading requests from the JPPF nodes.
@@ -44,12 +45,20 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 	 * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine in
 	 * which application classpath to look for the requested resources.
 	 */
-	protected Map<String, List<ChannelWrapper>> providerConnections = new Hashtable<String, List<ChannelWrapper>>();
+	protected Map<String, List<ChannelWrapper<?>>> providerConnections = new Hashtable<String, List<ChannelWrapper<?>>>();
 	/**
 	 * The cache of class definition, this is done to not flood the provider when it dispatch many tasks. it use
 	 * WeakHashMap to minimize the OutOfMemory.
 	 */
 	Map<CacheClassKey, CacheClassContent> classCache = new WeakHashMap<CacheClassKey, CacheClassContent>();
+	/**
+	 * The thread polling the local channel.
+	 */
+	private ChannelSelectorThread selectorThread = null;
+	/**
+	 * The local channel, if any.
+	 */
+	private ChannelWrapper<?> localChannel = null;
 
 	/**
 	 * Initialize this class server with the port it will listen to.
@@ -72,6 +81,24 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 		//selectTimeout = 1L;
 	}
 
+	/**
+	 * Initialize the local channel connection.
+	 * @param localChannel the local channel to use.
+	 */
+	public void initLocalChannel(ChannelWrapper<?> localChannel)
+	{
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.local.node.enabled", false))
+		{
+			this.localChannel = localChannel;
+			ChannelSelector channelSelector = new LocalChannelSelector(localChannel, this);
+			localChannel.setSelector(channelSelector);
+			selectorThread = new ChannelSelectorThread(channelSelector, this);
+			localChannel.setKeyOps(getInitialInterest());
+			new Thread(selectorThread, "Class server local node").start();
+			postAccept(localChannel);
+		}
+	}
+	
 	/**
 	 * Create the factory holding all the states and transition mappings.
 	 * @return an <code>NioServerFactory</code> instance.
@@ -148,12 +175,12 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 	 * @param uuid the provider uuid as a string.
 	 * @param channel the provider's communication channel.
 	 */
-	public void addProviderConnection(String uuid, ChannelWrapper channel)
+	public void addProviderConnection(String uuid, ChannelWrapper<?> channel)
 	{
-		List<ChannelWrapper> list = providerConnections.get(uuid);
+		List<ChannelWrapper<?>> list = providerConnections.get(uuid);
 		if (list == null)
 		{
-			list = new ArrayList<ChannelWrapper>();
+			list = new ArrayList<ChannelWrapper<?>>();
 			providerConnections.put(uuid, list);
 		}
 		list.add(channel);
@@ -166,7 +193,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 	 */
 	public void removeProviderConnection(String uuid, ChannelWrapper channel)
 	{
-		List<ChannelWrapper> list = providerConnections.get(uuid);
+		List<ChannelWrapper<?>> list = providerConnections.get(uuid);
 		if (list == null) return;
 		list.remove(channel);
 	}

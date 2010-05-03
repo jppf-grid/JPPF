@@ -16,33 +16,31 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.nodeserver;
+package org.jppf.classloader;
 
 import static java.nio.channels.SelectionKey.*;
 
-import java.io.InputStream;
-import java.util.concurrent.atomic.*;
+import java.nio.ByteBuffer;
 
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.IOHandler;
-import org.jppf.io.*;
 import org.jppf.server.nio.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
 
 /**
- * Wrapper implementation for a local node's communication channel.
+ * Channel wrapper and I/O implementation for the class loader of an in-VM node.
  * @author Laurent Cohen
  */
-public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeContext> implements IOHandler
+public class LocalClassLoaderWrapperHandler extends AbstractChannelWrapper<AbstractNioContext> implements IOHandler
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(LocalNodeWrapperHandler.class);
+	static Log log = LogFactory.getLog(LocalClassLoaderWrapperHandler.class);
 	/**
-	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+	 * Determines whether debug-level logging is enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * This channel's key ops.
 	 */
@@ -51,32 +49,12 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	 * This channel's ready ops.
 	 */
 	private int readyOps = 0;
-	/**
-	 * Determines whether this handler has data to read.
-	 */
-	private AtomicBoolean readable = new AtomicBoolean(false);
-	/**
-	 * Position of the next block of data to be read by the node.
-	 */
-	private int readPosition = 0;
-	/**
-	 * Position of the next block of data to be written by the node.
-	 */
-	private int writePosition = 0;
-	/**
-	 * The current object being read or written.
-	 */
-	private DataLocation currentLocation = null;
-	/**
-	 * Count of bytes read or written in the current data location.
-	 */
-	private int currentCount = 0;
 
 	/**
-	 * Initialize this channel wrapper with the specified node context.
-	 * @param context the node context used as channel.
+	 * Initialize this I/O handler with the specified context.
+	 * @param context the context used as communication channel.
 	 */
-	public LocalNodeWrapperHandler(LocalNodeContext context)
+	public LocalClassLoaderWrapperHandler(AbstractNioContext context)
 	{
 		super(context);
 	}
@@ -86,7 +64,7 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	 */
 	public NioContext getContext()
 	{
-		return channel;
+		return getChannel();
 	}
 
 	/**
@@ -103,8 +81,10 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	public synchronized void setKeyOps(int keyOps)
 	{
 		// to avoid exception when testing isReadable() when channel is write-ready.
-		if ((keyOps & OP_WRITE) != 0) readyOps = keyOps & ~OP_READ;
+		//if ((keyOps & OP_WRITE) != 0) readyOps = keyOps & ~OP_READ;
+		if ((keyOps & OP_WRITE) != 0) readyOps &= ~OP_READ;
 		this.keyOps = keyOps;
+		if (debugEnabled) log.debug("readyOps = " + readyOps + ", keyOps = " + keyOps);
 		if (getSelector() != null) getSelector().wakeup();
 	}
 
@@ -123,6 +103,7 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	protected synchronized void setReadyOps(int readyOps)
 	{
 		this.readyOps = readyOps;
+		if (debugEnabled) log.debug("readyOps = " + readyOps + ", keyOps = " + keyOps);
 		if (getSelector() != null) getSelector().wakeup();
 	}
 
@@ -138,13 +119,14 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	 */
 	public JPPFBuffer read() throws Exception
 	{
-		//while (!readable.get()) goToSleep();
 		setReadyOps(OP_WRITE);
-		while (readPosition >= channel.getNodeMessage().getLocations().size()) goToSleep();
-		readPosition++;
-		DataLocation dl = getChannel().getNodeMessage().getLocations().get(readPosition);
-		InputStream is = dl.getInputStream();
-		return new JPPFBuffer(FileUtils.getInputStreamAsByte(is), dl.getSize());
+		AbstractNioContext context = getChannel();
+		while ((context.getMessage() == null) || !context.getMessage().lengthWritten ||
+			(context.writeByteCount < context.getMessage().length)) goToSleep();
+		//while (readPosition >= channel.getNodeMessage().getLocations().size()) goToSleep();
+		NioMessage message = context.getMessage();
+		setReadyOps(0);
+		return new JPPFBuffer(message.buffer.array(), message.length);
 	}
 
 	/**
@@ -152,11 +134,13 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	 */
 	public void write(byte[] data, int offset, int len) throws Exception
 	{
-		InputSource is = new ByteBufferInputSource(data, offset, len);
-		currentLocation = IOHelper.createDataLocationMemorySensitive(len);
-		int n = currentLocation.transferFrom(is, true);
-		getChannel().getNodeMessage().addLocation(currentLocation);
-		((LocalNodeMessage) getChannel().getNodeMessage()).wakeUp();
+		AbstractNioContext context = getChannel();
+		if (context.getMessage() == null) context.setMessage(new NioMessage());
+		NioMessage message = context.getMessage();
+		message.length = len;
+		message.lengthWritten = true;
+		message.buffer = ByteBuffer.wrap(data, offset, len);
+		context.readByteCount = len;
 		setReadyOps(OP_READ);
 	}
 
@@ -165,7 +149,6 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	 */
 	public void writeInt(int value) throws Exception
 	{
-		currentCount = 0;
 	}
 
 	/**
@@ -190,11 +173,12 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 		notifyAll();
 	}
 
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public String toString()
 	{
-		return this.getClass().getSimpleName() + ":" + id;
+		return LocalClassLoaderWrapperHandler.class.getSimpleName() + ":" + id;
 	}
 }

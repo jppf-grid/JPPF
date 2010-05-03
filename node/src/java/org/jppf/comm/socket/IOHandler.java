@@ -33,13 +33,6 @@ public interface IOHandler
 	 */
 	JPPFBuffer read() throws Exception;
 	/**
-	 * Write multiple blocks of data to the channel.
-	 * @param len the total length of the data to write.
-	 * @param data the data to write as an array of byte arrays.
-	 * @throws Exception if any error occurs.
-	 */
-	void write(int len, byte[]...data) throws Exception;
-	/**
 	 * Flush this handler.
 	 * @throws Exception if any error occurs.
 	 */

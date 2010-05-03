@@ -89,7 +89,20 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	{
 		super(new URL[0], parent);
 		if (parent instanceof AbstractJPPFClassLoader) dynamic = true;
-		if (ioHandler == null) init();
+		init(null);
+	}
+
+	/**
+	 * Initialize this class loader with a parent class loader.
+	 * @param tmpHandler wraps the communication channel with the driver.
+	 * @param parent a ClassLoader instance.
+	 */
+	public AbstractJPPFClassLoader(IOHandler tmpHandler, ClassLoader parent)
+	{
+		super(new URL[0], parent);
+		if (parent instanceof AbstractJPPFClassLoader) dynamic = true;
+		if (ioHandler == null) init(tmpHandler);
+		//else AbstractJPPFClassLoader.ioHandler = ioHandler;
 	}
 
 	/**
@@ -105,8 +118,9 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 
 	/**
 	 * Initialize the underlying socket connection.
+	 * @param tmpHandler thez io handler to use.
 	 */
-	private void init()
+	protected void init(IOHandler tmpHandler)
 	{
 		lock.lock();
 		try
@@ -114,7 +128,9 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 			if (ioHandler != null) return;
 			if (!isInitializing())
 			{
-				initIoHandler();
+				setInitializing(true);
+				if (tmpHandler == null) ioHandler = initIoHandler();
+				else ioHandler = tmpHandler;
 				// we need to do this in order to dramatically simplify the state machine of ClassServer
 				try
 				{
@@ -125,7 +141,8 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 					JPPFBuffer buf = serializer.serialize(resource);
 					byte[] data = buf.getBuffer();
 					data = JPPFDataTransformFactory.transform(true, data);
-					ioHandler.write(data.length, data);
+					ioHandler.writeInt(data.length);
+					ioHandler.write(data, 0, data.length);
 					ioHandler.flush();
 					ioHandler.read();
 					if (debugEnabled) log.debug("received node initiation response");
@@ -150,8 +167,9 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 
 	/**
 	 * Initialize the connection with the class server.
+	 * @return the IOHandler created.
 	 */
-	protected abstract void initIoHandler();
+	protected abstract IOHandler initIoHandler();
 
 	/**
 	 * @param name the binary name of the class
@@ -238,7 +256,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		{
 			if (debugEnabled) log.debug("connection with class server ended, re-initializing");
 			ioHandler = null;
-			init();
+			init(null);
 			try
 			{
 				resource = loadResourceData0(map, asResource);
@@ -329,7 +347,8 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 			JPPFBuffer buf = serializer.serialize(resource);
 			byte[] data = buf.getBuffer();
 			if (transform != null) data = JPPFDataTransformFactory.transform(transform, true, data);
-			ioHandler.write(data.length, data);
+			ioHandler.writeInt(data.length);
+			ioHandler.write(data, 0, data.length);
 			ioHandler.flush();
 			buf = ioHandler.read();
 			data = buf.getBuffer();
@@ -452,7 +471,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 
 	/**
 	 * Find all resources with the specified name.
-	 * @param name - name of the resources to find in the clas loader's classpath. 
+	 * @param name name of the resources to find in the clas loader's classpath. 
 	 * @return An enumeration of URLs pointing to the resources found.
 	 * @throws IOException if an error occurs.
 	 * @see java.lang.ClassLoader#findResources(java.lang.String)

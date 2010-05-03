@@ -74,7 +74,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * Submit the next state transition for a specified channel.
 	 * @param key the selection key that references the channel.
 	 */
-	protected void submitTransition(ChannelWrapper key)
+	protected void submitTransition(ChannelWrapper<?> key)
 	{
 		setKeyOps(key, 0);
 		StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, server.getFactory());
@@ -88,7 +88,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * @param key the key on which to set the interest operations.
 	 * @param ops the operations to set on the key.
 	 */
-	private void setKeyOps(ChannelWrapper key, int ops)
+	private void setKeyOps(ChannelWrapper<?> key, int ops)
 	{
 		Lock lock = server.getLock();
 		lock.lock();
@@ -108,7 +108,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * @param key the key holding the channel and associated context. 
 	 * @param transition holds the new state of the channel and associated key ops.
 	 */
-	public void transitionChannel(ChannelWrapper key, T transition)
+	public void transitionChannel(ChannelWrapper<?> key, T transition)
 	{
 		Lock lock = server.getLock();
 		lock.lock();
@@ -121,7 +121,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 			S s2 = t.getState();
 			context.setState(s2);
 			key.setKeyOps(t.getInterestOps());
-			if (debugEnabled) log.debug("transitionned " + key + " from " + s1 + " to " + s2);
+			if (debugEnabled && (s1 != s2)) log.debug("transitionned " + key + " from " + s1 + " to " + s2);
 		}
 		finally
 		{
@@ -137,9 +137,9 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * @param action an action to perform upon registration of the channel.
 	 * @return a {@link ChannelWrapper} instance.
 	 */
-	public ChannelWrapper registerChannel(SocketChannel channel, int ops, NioContext context,	ChannelRegistrationAction action)
+	public ChannelWrapper<?> registerChannel(SocketChannel channel, int ops, NioContext context,	ChannelRegistrationAction action)
 	{
-		ChannelWrapper wrapper = null;
+		ChannelWrapper<?> wrapper = null;
 		SelectionKey key = null;
 		try
 		{
@@ -188,7 +188,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		/**
 		 * The key resulting form the channel registration.
 		 */
-		public ChannelWrapper key = null;
+		public ChannelWrapper<?> key = null;
 	}
 
 	/**

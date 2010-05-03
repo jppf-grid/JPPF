@@ -32,7 +32,7 @@ import org.jppf.utils.*;
  * Context associated with a channel serving tasks to a node.
  * @author Laurent Cohen
  */
-public abstract class AbstractNodeContext extends NioContext<NodeState>
+public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 {
 	/**
 	 * The message wrapping the data sent or received over the socket channel.
@@ -129,7 +129,7 @@ public abstract class AbstractNodeContext extends NioContext<NodeState>
 	/**
 	 * Handle the cleanup when an exception occurs on the channel.
 	 * @param channel the channel that threw the exception.
-	 * @see org.jppf.server.nio.NioContext#handleException(java.nio.channels.SocketChannel)
+	 * @see org.jppf.server.nio.AbstractNioContext#handleException(java.nio.channels.SocketChannel)
 	 */
 	public void handleException(ChannelWrapper channel)
 	{
@@ -144,9 +144,10 @@ public abstract class AbstractNodeContext extends NioContext<NodeState>
 
 	/**
 	 * Serialize this context's bundle into a byte buffer.
+	 * @param wrapper channel wrapper for this context.
 	 * @throws Exception if any error occurs.
 	 */
-	public void serializeBundle() throws Exception
+	public void serializeBundle(ChannelWrapper<?> wrapper) throws Exception
 	{
 		//if (nodeMessage == null)
 		nodeMessage = newMessage();
@@ -240,7 +241,7 @@ public abstract class AbstractNodeContext extends NioContext<NodeState>
 	 * @param channel the channel to read the data from.
 	 * @return true if all the data has been read, false otherwise.
 	 * @throws Exception if an error occurs while reading the data.
-	 * @see org.jppf.server.nio.NioContext#readMessage(java.nio.channels.ReadableByteChannel)
+	 * @see org.jppf.server.nio.AbstractNioContext#readMessage(java.nio.channels.ReadableByteChannel)
 	 */
 	public boolean readMessage(ChannelWrapper<?> channel) throws Exception
 	{
@@ -253,7 +254,7 @@ public abstract class AbstractNodeContext extends NioContext<NodeState>
 	 * @param channel the channel to write the data to.
 	 * @return true if all the data has been written, false otherwise.
 	 * @throws Exception if an error occurs while writing the data.
-	 * @see org.jppf.server.nio.NioContext#writeMessage(java.nio.channels.WritableByteChannel)
+	 * @see org.jppf.server.nio.AbstractNioContext#writeMessage(java.nio.channels.WritableByteChannel)
 	 */
 	public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
 	{

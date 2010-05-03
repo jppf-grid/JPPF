@@ -20,7 +20,7 @@ package org.jppf.server.nio.classloader;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
-import java.nio.channels.*;
+import java.nio.channels.Selector;
 import java.util.List;
 
 import org.apache.commons.logging.*;
@@ -59,7 +59,7 @@ class WaitingNodeRequestState extends ClassServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ClassTransition performTransition(ChannelWrapper wrapper) throws Exception
+	public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		ClassContext context = (ClassContext) wrapper.getContext();
 		if (context.readMessage(wrapper))
@@ -97,7 +97,7 @@ class WaitingNodeRequestState extends ClassServerState
 	private ChannelWrapper findProviderConnection(String uuid) throws Exception
 	{
 		ChannelWrapper result = null;
-		List<ChannelWrapper> connections = server.providerConnections.get(uuid);
+		List<ChannelWrapper<?>> connections = server.providerConnections.get(uuid);
 		int minRequests = Integer.MAX_VALUE;
 		Selector selector = server.getSelector();
 		for (ChannelWrapper channel: connections)
@@ -120,7 +120,7 @@ class WaitingNodeRequestState extends ClassServerState
 	 * @return a pair of an array of bytes and the resulting state transition.
 	 * @throws Exception if any error occurs.
 	 */
-	private ByteTransitionPair processNonDynamic(ChannelWrapper wrapper, JPPFResourceWrapper resource) throws Exception
+	private ByteTransitionPair processNonDynamic(ChannelWrapper<?> wrapper, JPPFResourceWrapper resource) throws Exception
 	{
 		byte[] b = null;
 		ClassTransition t = null;
@@ -169,7 +169,7 @@ class WaitingNodeRequestState extends ClassServerState
 	 * @return a pair of an array of bytes and the resulting state transition.
 	 * @throws Exception if any error occurs.
 	 */
-	private ByteTransitionPair processDynamic(ChannelWrapper wrapper, JPPFResourceWrapper resource) throws Exception
+	private ByteTransitionPair processDynamic(ChannelWrapper<?> wrapper, JPPFResourceWrapper resource) throws Exception
 	{
 		byte[] b = null;
 		ClassTransition t = null;

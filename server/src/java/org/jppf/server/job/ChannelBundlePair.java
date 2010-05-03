@@ -18,7 +18,7 @@
 
 package org.jppf.server.job;
 
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.*;
 import org.jppf.server.protocol.BundleWrapper;
 import org.jppf.utils.Pair;
 
@@ -26,14 +26,14 @@ import org.jppf.utils.Pair;
  * Instances of this class associate a node channel with a job that is being executed on the corresponding node.
  * @author Laurent Cohen
  */
-public class ChannelBundlePair extends Pair<ChannelWrapper, BundleWrapper>
+public class ChannelBundlePair extends Pair<ChannelWrapper<?>, BundleWrapper>
 {
 	/**
 	 * Initialize this object with the specified parameters.
 	 * @param first - the first object of this pair.
 	 * @param second - the second object of this pair.
 	 */
-	public ChannelBundlePair(ChannelWrapper first, BundleWrapper second)
+	public ChannelBundlePair(ChannelWrapper<?> first, BundleWrapper second)
 	{
 		super(first, second);
 	}

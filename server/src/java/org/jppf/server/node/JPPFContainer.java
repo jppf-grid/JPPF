@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.classloader.JPPFClassLoader;
+import org.jppf.classloader.*;
 import org.jppf.comm.socket.*;
 import org.jppf.data.transform.*;
 import org.jppf.utils.*;
@@ -50,7 +50,7 @@ public class JPPFContainer
 	/**
 	 * Class loader used for dynamic loading and updating of client classes.
 	 */
-	private JPPFClassLoader classLoader = null;
+	private AbstractJPPFClassLoader classLoader = null;
 	/**
 	 * The unique identifier for the submitting application.
 	 */
@@ -62,7 +62,7 @@ public class JPPFContainer
 	 * @param classLoader the class loader for this container.
 	 * @throws Exception if an error occurs while initializing.
 	 */
-	public JPPFContainer(List<String> uuidPath, JPPFClassLoader classLoader) throws Exception
+	public JPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader classLoader) throws Exception
 	{
 		this.uuidPath = uuidPath;
 		this.classLoader = classLoader;
@@ -173,7 +173,7 @@ public class JPPFContainer
 	 * Get the main class loader for this container.
 	 * @return a <code>ClassLoader</code> used for loading the classes of the framework.
 	 */
-	public JPPFClassLoader getClassLoader()
+	public AbstractJPPFClassLoader getClassLoader()
 	{
 		return classLoader;
 	}

@@ -26,7 +26,7 @@ import org.jppf.utils.StringUtils;
  * Channel wrapper implementation for a {@link SelectionKey}.
  * @author Laurent Cohen
  */
-public class SelectionKeyWrapper extends ChannelWrapper<SelectionKey>
+public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
 {
 	/**
 	 * Initialize this channel wrapper with the specified channel.
@@ -38,9 +38,9 @@ public class SelectionKeyWrapper extends ChannelWrapper<SelectionKey>
 	}
 
 	/**
-	 * Get the {@link NioContext} attached to the channel.
-	 * @return a {@link NioContext} instance.
-	 * @see org.jppf.server.nio.ChannelWrapper#getContext()
+	 * Get the {@link AbstractNioContext} attached to the channel.
+	 * @return a {@link AbstractNioContext} instance.
+	 * @see org.jppf.server.nio.AbstractChannelWrapper#getContext()
 	 */
 	public NioContext getContext()
 	{
@@ -79,7 +79,7 @@ public class SelectionKeyWrapper extends ChannelWrapper<SelectionKey>
 	/**
 	 * Get the operations enabled for this channel.
 	 * @return the operations as an int value.
-	 * @see org.jppf.server.nio.ChannelWrapper#getKeyOps()
+	 * @see org.jppf.server.nio.AbstractChannelWrapper#getKeyOps()
 	 */
 	public int getKeyOps()
 	{
@@ -89,7 +89,7 @@ public class SelectionKeyWrapper extends ChannelWrapper<SelectionKey>
 	/**
 	 * Get the operations enabled for this channel.
 	 * @param keyOps the operations as an int value.
-	 * @see org.jppf.server.nio.ChannelWrapper#setKeyOps(int)
+	 * @see org.jppf.server.nio.AbstractChannelWrapper#setKeyOps(int)
 	 */
 	public void setKeyOps(int keyOps)
 	{
@@ -99,9 +99,9 @@ public class SelectionKeyWrapper extends ChannelWrapper<SelectionKey>
 	/**
 	 * Get the operations available for this channel.
 	 * @return the operations as an int value.
-	 * @see org.jppf.server.nio.ChannelWrapper#getReadyOps()
+	 * @see org.jppf.server.nio.AbstractChannelWrapper#getReadyOps()
 	 */
-	protected int getReadyOps()
+	public int getReadyOps()
 	{
 		return getChannel().readyOps();
 	}

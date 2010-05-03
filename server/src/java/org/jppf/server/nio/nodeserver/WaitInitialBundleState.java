@@ -59,7 +59,7 @@ class WaitInitialBundleState extends NodeServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public NodeTransition performTransition(ChannelWrapper wrapper) throws Exception
+	public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
 		if (debugEnabled) log.debug("exec() for " + wrapper);

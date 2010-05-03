@@ -22,7 +22,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFNodeReconnectionNotification;
-import org.jppf.classloader.JPPFClassLoader;
+import org.jppf.classloader.*;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.node.NodeRunner;
 import org.jppf.server.node.*;
@@ -105,11 +105,11 @@ public class JPPFRemoteNode extends JPPFNode
 	 * Instatiate the callback used to create the class loader in each {@link JPPFContainer}.
 	 * @return a {@link Callable} instance.
 	 */
-	protected Callable<JPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
+	protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
 	{
-		return new Callable<JPPFClassLoader>()
+		return new Callable<AbstractJPPFClassLoader>()
 		{
-			public JPPFClassLoader call()
+			public AbstractJPPFClassLoader call()
 			{
 				return new JPPFClassLoader(getClass().getClassLoader(), uuidPath);
 			}

@@ -23,6 +23,7 @@ import javax.management.MBeanServer;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
+import org.jppf.classloader.LocalClassLoaderWrapperHandler;
 import org.jppf.comm.discovery.*;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
@@ -31,8 +32,9 @@ import org.jppf.security.*;
 import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.ChannelWrapper;
-import org.jppf.server.nio.classloader.ClassNioServer;
-import org.jppf.server.nio.nodeserver.NodeNioServer;
+import org.jppf.server.nio.classloader.*;
+import org.jppf.server.nio.nodeserver.*;
+import org.jppf.server.node.local.JPPFLocalNode;
 import org.jppf.server.peer.*;
 import org.jppf.server.queue.*;
 import org.jppf.server.scheduler.bundle.Bundler;
@@ -93,7 +95,7 @@ public class JPPFDriver
 	/**
 	 * A list of objects containing the information required to connect to the nodes JMX servers.
 	 */
-	private Map<ChannelWrapper, JPPFManagementInfo> nodeInfo = new HashMap<ChannelWrapper, JPPFManagementInfo>();
+	private Map<ChannelWrapper<?>, JPPFManagementInfo> nodeInfo = new HashMap<ChannelWrapper<?>, JPPFManagementInfo>();
 	/**
 	 * The thread that performs the peer servers discovery.
 	 */
@@ -155,6 +157,16 @@ public class JPPFDriver
 		nodeNioServer.start();
 		printInitializedMessage(info.nodeServerPorts, "Tasks Server");
 
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.local.node.enabled", false))
+		{
+			LocalClassLoaderWrapperHandler localClassChannel = new LocalClassLoaderWrapperHandler(new LocalClassContext());
+			LocalNodeWrapperHandler localNodeChannel = new LocalNodeWrapperHandler(new LocalNodeContext());
+			JPPFLocalNode node = new JPPFLocalNode(localNodeChannel, localClassChannel);
+			classServer.initLocalChannel(localClassChannel);
+			nodeNioServer.initLocalChannel(localNodeChannel);
+			new Thread(node, "Local node").start();
+		}
+		
 		try
 		{
 			if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
@@ -423,7 +435,7 @@ public class JPPFDriver
 	 * @param channel a <code>SocketChannel</code> instance.
 	 * @param info a <code>JPPFNodeManagementInformation</code> instance.
 	 */
-	public void addNodeInformation(ChannelWrapper channel, JPPFManagementInfo info)
+	public void addNodeInformation(ChannelWrapper<?> channel, JPPFManagementInfo info)
 	{
 		synchronized (nodeInfo)
 		{
@@ -447,7 +459,7 @@ public class JPPFDriver
 	 * Remove a node information object from the map of node information.
 	 * @return channel a <code>SocketChannel</code> instance.
 	 */
-	public Map<ChannelWrapper, JPPFManagementInfo> getNodeInformationMap()
+	public Map<ChannelWrapper<?>, JPPFManagementInfo> getNodeInformationMap()
 	{
 		synchronized (nodeInfo)
 		{
@@ -539,6 +551,7 @@ public class JPPFDriver
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			log.fatal(e.getMessage(), e);
 			System.exit(1);
 		}

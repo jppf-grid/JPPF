@@ -55,7 +55,7 @@ class SendInitialBundleState extends NodeServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public NodeTransition performTransition(ChannelWrapper wrapper) throws Exception
+	public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		if (wrapper.isReadable())
@@ -67,7 +67,7 @@ class SendInitialBundleState extends NodeServerState
 		if (context.getNodeMessage() == null)
 		{
 			if (debugEnabled) log.debug("serializing initial bundle for " + wrapper);
-			context.serializeBundle();
+			context.serializeBundle(wrapper);
 		}
 		if (context.writeMessage(wrapper))
 		{

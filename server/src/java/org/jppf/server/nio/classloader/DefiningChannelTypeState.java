@@ -25,7 +25,7 @@ import java.util.Vector;
 
 import org.apache.commons.logging.*;
 import org.jppf.classloader.JPPFResourceWrapper;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.*;
 import org.jppf.utils.JPPFConfiguration;
 
 /**
@@ -64,7 +64,7 @@ class DefiningChannelTypeState extends ClassServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ClassTransition performTransition(ChannelWrapper wrapper) throws Exception
+	public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		// we don't know yet which whom we are talking, is it a node or a provider?
 		ClassContext context = (ClassContext) wrapper.getContext();
@@ -79,7 +79,7 @@ class DefiningChannelTypeState extends ClassServerState
 				// it is a provider
 				server.addProviderConnection(uuid, wrapper);
 				context.setUuid(uuid);
-				context.setPendingRequests(new Vector<ChannelWrapper>());
+				context.setPendingRequests(new Vector<ChannelWrapper<?>>());
 				context.setMessage(null);
 				if (managementEnabled)
 				{

@@ -37,7 +37,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(NioContext.class);
+	protected static Log log = LogFactory.getLog(ClassContext.class);
 	/**
 	 * Determines whther DEBUG logging level is enabled.
 	 */
@@ -45,15 +45,15 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	/**
 	 * The resource read from or written to the associated channel.
 	 */
-	private JPPFResourceWrapper resource = null;
+	protected JPPFResourceWrapper resource = null;
 	/**
 	 * The list of pending resource requests for a resource provider.
 	 */
-	private List<ChannelWrapper> pendingRequests = null;
+	protected List<ChannelWrapper<?>> pendingRequests = null;
 	/**
 	 * The request currently processed.
 	 */
-	private ChannelWrapper currentRequest = null;
+	protected ChannelWrapper<?> currentRequest = null;
 
 	/**
 	 * Deserialize a resource wrapper from an array of bytes.
@@ -87,7 +87,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	/**
 	 * Handle the cleanup when an exception occurs on the channel.
 	 * @param channel the channel that threw the exception.
-	 * @see org.jppf.server.nio.NioContext#handleException(java.nio.channels.SocketChannel)
+	 * @see org.jppf.server.nio.AbstractNioContext#handleException(java.nio.channels.SocketChannel)
 	 */
 	public void handleException(ChannelWrapper channel)
 	{
@@ -124,7 +124,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * Add a new pending request to this resource provider.
 	 * @param request the request as a <code>SelectionKey</code> instance. 
 	 */
-	public synchronized void addRequest(ChannelWrapper request)
+	public synchronized void addRequest(ChannelWrapper<?> request)
 	{
 		pendingRequests.add(request);
 	}
@@ -133,7 +133,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * Get the request currently processed.
 	 * @return a <code>SelectionKey</code> instance.
 	 */
-	public synchronized ChannelWrapper getCurrentRequest()
+	public synchronized ChannelWrapper<?> getCurrentRequest()
 	{
 		return currentRequest;
 	}
@@ -142,7 +142,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * Set the request currently processed.
 	 * @param currentRequest a <code>SelectionKey</code> instance. 
 	 */
-	public synchronized void setCurrentRequest(ChannelWrapper currentRequest)
+	public synchronized void setCurrentRequest(ChannelWrapper<?> currentRequest)
 	{
 		this.currentRequest = currentRequest;
 	}
@@ -153,7 +153,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 */
 	public synchronized int getNbPendingRequests()
 	{
-		List<ChannelWrapper> reqs = getPendingRequests();
+		List<ChannelWrapper<?>> reqs = getPendingRequests();
 		return (reqs == null ? 0 : reqs.size()) + (getCurrentRequest() == null ? 0 : 1);
 	}
 
@@ -161,7 +161,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * Get the list of pending resource requests for a resource provider.
 	 * @return a <code>List</code> of <code>SelectionKey</code> instances. 
 	 */
-	public List<ChannelWrapper> getPendingRequests()
+	public List<ChannelWrapper<?>> getPendingRequests()
 	{
 		return pendingRequests;
 	}
@@ -170,7 +170,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * Set the list of pending resource requests for a resource provider.
 	 * @param pendingRequests a <code>List</code> of <code>SelectionKey</code> instances. 
 	 */
-	public void setPendingRequests(List<ChannelWrapper> pendingRequests)
+	public void setPendingRequests(List<ChannelWrapper<?>> pendingRequests)
 	{
 		this.pendingRequests = pendingRequests;
 	}

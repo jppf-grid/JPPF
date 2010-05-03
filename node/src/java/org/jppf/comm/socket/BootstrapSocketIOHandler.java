@@ -54,15 +54,6 @@ public class BootstrapSocketIOHandler implements IOHandler
 	/**
 	 * {@inheritDoc}
 	 */
-	public void write(int len, byte[]...data) throws Exception
-	{
-		socketWrapper.writeInt(len);
-		for (byte[] b: data) socketWrapper.write(b, 0, b.length);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public void writeInt(int value) throws Exception
 	{
 		socketWrapper.writeInt(value);

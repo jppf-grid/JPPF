@@ -23,7 +23,7 @@ import static org.jppf.server.nio.multiplexer.generic.MultiplexerTransition.*;
 import java.nio.ByteBuffer;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.*;
 
 /**
  * State of receiving data on a channel.
@@ -58,7 +58,7 @@ public class ReceivingState extends MultiplexerServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public MultiplexerTransition performTransition(ChannelWrapper wrapper) throws Exception
+	public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
 		if (debugEnabled) log.debug("exec() for " + wrapper);

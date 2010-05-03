@@ -21,7 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import org.jppf.server.nio.ChannelWrapper;
 
 /**
- * 
+ * Node message implementation for an in-VM node.
  * @author Laurent Cohen
  */
 public class LocalNodeMessage extends AbstractNodeMessage
@@ -34,7 +34,7 @@ public class LocalNodeMessage extends AbstractNodeMessage
 	 */
 	protected synchronized boolean readNextObject(ChannelWrapper<?> wrapper) throws Exception
 	{
-		if (locations.size() <= position) goToSleep();
+		while (locations.size() <= position) goToSleep();
 		position++;
 		return true;
 	}
@@ -47,6 +47,8 @@ public class LocalNodeMessage extends AbstractNodeMessage
 	 */
 	protected boolean writeNextObject(ChannelWrapper<?> wrapper) throws Exception
 	{
+		LocalNodeWrapperHandler wrapperHandler = (LocalNodeWrapperHandler) wrapper;
+		wrapperHandler.wakeUp();
 		return true;
 	}
 

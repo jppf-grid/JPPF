@@ -29,7 +29,7 @@ import org.jppf.utils.*;
  * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
-public abstract class SimpleNioContext<S extends Enum> extends NioContext<S>
+public abstract class SimpleNioContext<S extends Enum> extends AbstractNioContext<S>
 {
 	/**
 	 * Logger for this class.
@@ -39,18 +39,6 @@ public abstract class SimpleNioContext<S extends Enum> extends NioContext<S>
 	 * Determines whther DEBUG logging level is enabled.
 	 */
 	protected static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Container for the current message data.
-	 */
-	protected NioMessage message = null;
-	/**
-	 * Count of bytes read.
-	 */
-	protected int readByteCount = 0;
-	/**
-	 * Count of bytes written.
-	 */
-	protected int writeByteCount = 0;
 
 	/**
 	 * Read data from a channel.
@@ -99,23 +87,5 @@ public abstract class SimpleNioContext<S extends Enum> extends NioContext<S>
 				message.length + " for " + StringUtils.getRemoteHost((SelectableChannel) channel));
 		}
 		return writeByteCount >= message.length;
-	}
-
-	/**
-	 * Get the container for the current message data.
-	 * @return an <code>NioMessage</code> instance.
-	 */
-	public NioMessage getMessage()
-	{
-		return message;
-	}
-
-	/**
-	 * Set the container for the current message data.
-	 * @param message an <code>NioMessage</code> instance.
-	 */
-	public void setMessage(NioMessage message)
-	{
-		this.message = message;
 	}
 }

@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.classloader.ResourceProvider;
-import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.comm.socket.*;
 import org.jppf.utils.JPPFConfiguration;
 
 /**
@@ -262,7 +262,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * This method is invoked after all selected keys have been processed.
 	 * This implementation does nothing. Subclasses should override this method as needed.
 	 */
-	protected void postSelect()
+	public void postSelect()
 	{
 	}
 

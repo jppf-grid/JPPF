@@ -56,7 +56,7 @@ class SendingBundleState extends NodeServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public NodeTransition performTransition(ChannelWrapper wrapper) throws Exception
+	public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		//if (debugEnabled) log.debug("exec() for " + getRemostHost(channel));
 		if (wrapper.isReadable())
@@ -82,7 +82,7 @@ class SendingBundleState extends NodeServerState
 					return TO_IDLE;
 				}
 				bundle.setExecutionStartTime(System.currentTimeMillis());
-				context.serializeBundle();
+				context.serializeBundle(wrapper);
 			}
 			else
 			{

@@ -42,7 +42,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	/**
 	 * Handle the cleanup when an exception occurs on the channel.
 	 * @param channel the channel that threw the exception.
-	 * @see org.jppf.server.nio.NioContext#handleException(java.nio.channels.SocketChannel)
+	 * @see org.jppf.server.nio.AbstractNioContext#handleException(java.nio.channels.SocketChannel)
 	 */
 	public void handleException(ChannelWrapper channel)
 	{

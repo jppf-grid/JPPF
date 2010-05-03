@@ -26,7 +26,7 @@ import javax.management.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.*;
-import org.jppf.classloader.JPPFClassLoader;
+import org.jppf.classloader.*;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.node.*;
@@ -57,7 +57,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	/**
 	 * Class loader used for dynamic loading and updating of client classes.
 	 */
-	private JPPFClassLoader classLoader = null;
+	protected AbstractJPPFClassLoader classLoader = null;
 	/**
 	 * Mapping of containers to their corresponding application uuid.
 	 */
@@ -310,7 +310,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @return a <code>ClassLoader</code> used for loading the classes of the framework.
 	 */
-	public JPPFClassLoader getClassLoader()
+	public AbstractJPPFClassLoader getClassLoader()
 	{
 		if (classLoader == null) classLoader = createClassLoader();
 		return classLoader;
@@ -320,7 +320,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 * Create the class loader for this node.
 	 * @return a {@link JPPFClassLoader} instance.
 	 */
-	protected abstract JPPFClassLoader createClassLoader();
+	protected abstract AbstractJPPFClassLoader createClassLoader();
 
 	/**
 	 * Set the main classloader for the node.
@@ -359,9 +359,9 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 		if (container == null)
 		{
 			if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
-			JPPFClassLoader cl = AccessController.doPrivileged(new PrivilegedAction<JPPFClassLoader>()
+			AbstractJPPFClassLoader cl = AccessController.doPrivileged(new PrivilegedAction<AbstractJPPFClassLoader>()
 			{
-				public JPPFClassLoader run()
+				public AbstractJPPFClassLoader run()
 				{
 					try
 					{
@@ -391,7 +391,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 * @param uuidPath the uuid path containing the key to the container.
 	 * @return a {@link Callable} instance.
 	 */
-	protected abstract Callable<JPPFClassLoader> newClassLoaderCreator(List<String> uuidPath);
+	protected abstract Callable<AbstractJPPFClassLoader> newClassLoaderCreator(List<String> uuidPath);
 
 	/**
 	 * Decrement the count of currently executing tasks and determine whether

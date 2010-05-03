@@ -24,7 +24,7 @@ import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.ChannelBundlePair;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.AbstractJPPFQueue;
 import org.jppf.server.scheduler.bundle.*;
@@ -70,7 +70,7 @@ class TaskQueueChecker implements Runnable
 	 */
 	public void run()
 	{
-		List<ChannelWrapper> idleChannels = server.getIdleChannels();
+		List<ChannelWrapper<?>> idleChannels = server.getIdleChannels();
 		synchronized(idleChannels)
 		{
 			if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return;
@@ -119,7 +119,7 @@ class TaskQueueChecker implements Runnable
 	 */
 	private int findIdleChannelIndex(JPPFTaskBundle bundle)
 	{
-		List<ChannelWrapper> idleChannels = server.getIdleChannels();
+		List<ChannelWrapper<?>> idleChannels = server.getIdleChannels();
 		int n = -1;
 		ExecutionPolicy rule = bundle.getJobSLA().getExecutionPolicy();
 		//if (debugEnabled && (rule != null)) log.debug("Bundle has an execution policy:\n" + rule);

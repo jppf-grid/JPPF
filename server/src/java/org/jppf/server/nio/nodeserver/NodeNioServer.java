@@ -64,7 +64,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	/**
 	 * Holds the currently idle channels.
 	 */
-	private List<ChannelWrapper> idleChannels = new ArrayList<ChannelWrapper>();
+	private List<ChannelWrapper<?>> idleChannels = new ArrayList<ChannelWrapper<?>>();
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
@@ -74,13 +74,21 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	private JPPFBundlerFactory bundlerFactory = new JPPFBundlerFactory();
 	/**
-	 * .
+	 * Task that dispatches queued jobs to available nodes.
 	 */
 	private final TaskQueueChecker taskQueueChecker;
 	/**
 	 * Reference to the driver.
 	 */
 	private static JPPFDriver driver = JPPFDriver.getInstance();
+	/**
+	 * The thread polling the local channel.
+	 */
+	private ChannelSelectorThread selectorThread = null;
+	/**
+	 * The local channel, if any.
+	 */
+	private ChannelWrapper<?> localChannel = null;
 
 	/**
 	 * Initialize this server with a specified port number.
@@ -114,6 +122,24 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	}
 
 	/**
+	 * Initialize the local channel connection.
+	 * @param localChannel the local channel to use.
+	 */
+	public void initLocalChannel(ChannelWrapper<?> localChannel)
+	{
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.local.node.enabled", false))
+		{
+			this.localChannel = localChannel;
+			ChannelSelector channelSelector = new LocalChannelSelector(localChannel, this);
+			localChannel.setSelector(channelSelector);
+			selectorThread = new ChannelSelectorThread(channelSelector, this);
+			localChannel.setKeyOps(getInitialInterest());
+			new Thread(selectorThread, "Node server local node").start();
+			postAccept(localChannel);
+		}
+	}
+	
+	/**
 	 * Create the factory holding all the states and transition mappings.
 	 * @return an <code>NioServerFactory</code> instance.
 	 * @see org.jppf.server.nio.NioServer#createFactory()
@@ -141,7 +167,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	public void postAccept(ChannelWrapper channel)
 	{
 		driver.getStatsManager().newNodeConnection();
-		RemoteNodeContext context = (RemoteNodeContext) channel.getContext();
+		AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
 		try
 		{
 			context.setBundle(getInitialBundle());
@@ -158,7 +184,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * This method is invoked after all selected keys have been processed.
 	 * @see org.jppf.server.nio.NioServer#postSelect()
 	 */
-	protected void postSelect()
+	public void postSelect()
 	{
 		if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
 		transitionManager.submit(taskQueueChecker);
@@ -168,7 +194,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * Add a channel to the list of idle channels.
 	 * @param channel the channel to add to the list.
 	 */
-	public void addIdleChannel(ChannelWrapper channel)
+	public void addIdleChannel(ChannelWrapper<?> channel)
 	{
 		if (debugEnabled) log.debug("Adding idle channel " + channel);
 		synchronized(idleChannels)
@@ -329,7 +355,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * Get the list of currently idle channels.
 	 * @return a list of <code>SelectableChannel</code> instances.
 	 */
-	public List<ChannelWrapper> getIdleChannels()
+	public List<ChannelWrapper<?>> getIdleChannels()
 	{
 		return idleChannels;
 	}
