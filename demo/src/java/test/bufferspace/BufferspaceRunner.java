@@ -107,8 +107,8 @@ public class BufferspaceRunner
 		job.setBlocking(false);
 		job.setResultListener(collector);
 		jppfClient.submit(job);
-		Thread.sleep(100L);
-		resetNodeJmx();
+		//Thread.sleep(100L);
+		//resetNodeJmx();
 		List<JPPFTask> results = collector.waitForResults();
 		for (JPPFTask t: results)
 		{
