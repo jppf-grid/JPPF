@@ -19,17 +19,17 @@
 package org.jppf.server.nio;
 
 /**
- * @param <C>
+ * @param <S>
  * @author Laurent Cohen
  */
-public interface ChannelWrapper<C>
+public interface ChannelWrapper<S>
 {
 
 	/**
 	 * Get the channel to wrap.
 	 * @return the wrapped channel.
 	 */
-	C getChannel();
+	S getChannel();
 
 	/**
 	 * Close the channel.
