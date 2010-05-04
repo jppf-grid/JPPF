@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 /**
  * Class used to invoke a method through reflection when a security manager is present. 
  */
-class PrivilegedMethodAction extends AbstractPrivilegedAction
+class PrivilegedMethodAction extends AbstractPrivilegedAction<Object>
 {
 	/**
 	 * The method to invoke.

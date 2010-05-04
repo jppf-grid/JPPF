@@ -151,7 +151,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	private synchronized void performConnection() throws Exception
 	{
   	connected.set(false);
-    HashMap env = new HashMap(); 
+    HashMap<String, ?> env = new HashMap<String, Object>(); 
     jmxc = JMXConnectorFactory.connect(url, env);
   	mbeanConnection.set(jmxc.getMBeanServerConnection());
   	connected.set(true);

@@ -98,9 +98,9 @@ public class XstreamObjectStreamBuilder implements JPPFObjectStreamBuilder
 				{
 					if (xstream == null)
 					{
-						Class xstreamClass = Class.forName("com.thoughtworks.xstream.XStream");
-						Class hierarchicalStreamDriverClass = Class.forName("com.thoughtworks.xstream.io.HierarchicalStreamDriver");
-						Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.XppDriver"); // the fastest so far
+						Class<?> xstreamClass = Class.forName("com.thoughtworks.xstream.XStream");
+						Class<?> hierarchicalStreamDriverClass = Class.forName("com.thoughtworks.xstream.io.HierarchicalStreamDriver");
+						Class<?> driverClass = Class.forName("com.thoughtworks.xstream.io.xml.XppDriver"); // the fastest so far
 						//Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.Dom4JDriver"); // causes org.dom4j.DocumentException: Error on line 1 of document  : Premature end of file
 						//Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.JDomDriver"); // causes StackOverflowError
 						//Class driverClass = Class.forName("com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver"); // causes com.thoughtworks.xstream.mapper.CannotResolveClassException: loadFactor : loadFactor
@@ -108,7 +108,7 @@ public class XstreamObjectStreamBuilder implements JPPFObjectStreamBuilder
 						//Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.XomDriver"); // causes org.xml.sax.SAXException: FWK005 parse may not be called while parsing
 						//Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.StaxDriver"); // causes a stack overflow at not initialization
 						//Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.DomDriver"); // very very slow
-						Constructor c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
+						Constructor<?> c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
 						Object o = c.newInstance(driverClass.newInstance());
 						createOisMethod = xstreamClass.getMethod("createObjectInputStream", new Class[] {InputStream.class});
 						createOosMethod = xstreamClass.getMethod("createObjectOutputStream", new Class[] {OutputStream.class});

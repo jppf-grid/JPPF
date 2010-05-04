@@ -32,19 +32,19 @@ public class JPPFConfigurationObjectStreamBuilder implements JPPFObjectStreamBui
 	/**
 	 * The class of input object streams.
 	 */
-	private Class oisClass = null;
+	private Class<?> oisClass = null;
 	/**
 	 * The class of output object streams.
 	 */
-	private Class oosClass = null;
+	private Class<?> oosClass = null;
 	/**
 	 * Object input stream constructor.
 	 */
-	private Constructor oisConstructor = null;
+	private Constructor<?> oisConstructor = null;
 	/**
 	 * Object output stream constructor.
 	 */
-	private Constructor oosConstructor = null;
+	private Constructor<?> oosConstructor = null;
 
 	/**
 	 * Initialize this builder with the default <code>ObjectInputStream</code> and <code>ObjectOutputStream</code> classes of the JDK. 
@@ -63,7 +63,7 @@ public class JPPFConfigurationObjectStreamBuilder implements JPPFObjectStreamBui
 	 * @param oosClass the object output stream class to use.
 	 * @throws Exception if an error is raised while initializing.
 	 */
-	public JPPFConfigurationObjectStreamBuilder(Class oisClass, Class oosClass) throws Exception
+	public JPPFConfigurationObjectStreamBuilder(Class<?> oisClass, Class<?> oosClass) throws Exception
 	{
 		this.oisClass = oisClass;
 		this.oosClass = oosClass;

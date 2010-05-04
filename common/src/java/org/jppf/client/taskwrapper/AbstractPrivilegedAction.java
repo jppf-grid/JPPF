@@ -21,8 +21,10 @@ import java.security.PrivilegedAction;
 
 /**
  * Abstract superclass for priviledged actions  used to invoke a method or constructor through reflection when a security manager is present. 
+ * @param <T> the type of value returned y the action.
+ * @author Laurent Cohen
  */
-public abstract class AbstractPrivilegedAction implements PrivilegedAction
+public abstract class AbstractPrivilegedAction<T> implements PrivilegedAction<T>
 {
 	/**
 	 * Used to capture an exception resulting from the method or constructore invocation.

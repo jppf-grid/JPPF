@@ -83,7 +83,7 @@ public class PojoTaskWrapper extends AbstractTaskObjectWrapper
 	{
 		Class clazz = INSTANCE.equals(methodType) ? taskObject.getClass() : Class.forName(className);
 		Object result = null;
-		AbstractPrivilegedAction action = null; 
+		AbstractPrivilegedAction<Object> action = null; 
 		switch(methodType)
 		{
 			case INSTANCE:

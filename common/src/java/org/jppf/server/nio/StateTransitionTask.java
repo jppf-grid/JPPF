@@ -72,8 +72,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 		{
 			this.ctx = (NioContext<S>) channel.getContext();
 			NioState<T> state = factory.getState(ctx.getState());
-			T t = state.performTransition(channel);
-			transitionManager.transitionChannel(channel, t);
+			transitionManager.transitionChannel(channel, state.performTransition(channel));
 		}
 		catch(Exception e)
 		{

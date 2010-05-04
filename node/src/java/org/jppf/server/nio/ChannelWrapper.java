@@ -19,17 +19,17 @@
 package org.jppf.server.nio;
 
 /**
- * @param <S>
+ * @param <C>
  * @author Laurent Cohen
  */
-public interface ChannelWrapper<S>
+public interface ChannelWrapper<C>
 {
 
 	/**
 	 * Get the channel to wrap.
 	 * @return the wrapped channel.
 	 */
-	S getChannel();
+	C getChannel();
 
 	/**
 	 * Close the channel.
@@ -41,7 +41,7 @@ public interface ChannelWrapper<S>
 	 * Get the {@link AbstractNioContext} attached to the channel.
 	 * @return a {@link AbstractNioContext} instance.
 	 */
-	NioContext getContext();
+	NioContext<?> getContext();
 
 	/**
 	 * Determine whether the channel is opened.

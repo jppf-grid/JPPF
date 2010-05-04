@@ -88,7 +88,7 @@ public class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
 	{
 		Class clazz = INSTANCE.equals(methodType) ? taskObject.getClass() : Class.forName(className);
 		Object result = null;
-		AbstractPrivilegedAction action = null; 
+		AbstractPrivilegedAction<?> action = null; 
 		switch(methodType)
 		{
 			case INSTANCE:

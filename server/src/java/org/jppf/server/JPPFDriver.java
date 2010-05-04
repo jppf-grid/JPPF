@@ -187,7 +187,7 @@ public class JPPFDriver
 			System.out.println("JPPF Driver management failed to initialize, with error message: '" + s + "'");
 			System.out.println("Management features are disabled. Please consult the driver's log file for more information");
 		}
-		new JPPFStartupLoader().load(JPPFDriverStartupSPI.class);
+		new JPPFStartupLoader<JPPFDriverStartupSPI>().load(JPPFDriverStartupSPI.class);
 
 		if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true))
 		{
@@ -205,12 +205,12 @@ public class JPPFDriver
 	private void registerProviderMBeans() throws Exception
 	{
   	MBeanServer server = getJmxServer().getServer();
-    JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager(JPPFDriverMBeanProvider.class, server);
+    JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager<JPPFDriverMBeanProvider>(JPPFDriverMBeanProvider.class, server);
 		List<JPPFDriverMBeanProvider> list = mgr.getAllProviders();
 		for (JPPFDriverMBeanProvider provider: list)
 		{
 			Object o = provider.createMBean();
-			Class inf = Class.forName(provider.getMBeanInterfaceName());
+			Class<?> inf = Class.forName(provider.getMBeanInterfaceName());
 			boolean b = mgr.registerProviderMBean(o, inf, provider.getMBeanName());
 			if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + provider.getMBeanName() + "]");
 		}

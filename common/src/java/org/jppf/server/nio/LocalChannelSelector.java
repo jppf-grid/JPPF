@@ -31,14 +31,14 @@ public class LocalChannelSelector implements ChannelSelector
 	/**
 	 * The server that handles the channel.
 	 */
-	private NioServer server = null;
+	private NioServer<?, ?> server = null;
 
 	/**
 	 * Initialize this selector with the specified channel.
 	 * @param channel the channel polled by this selector.
 	 * @param server the server that handles the channel.
 	 */
-	public LocalChannelSelector(ChannelWrapper<?> channel, NioServer server)
+	public LocalChannelSelector(ChannelWrapper<?> channel, NioServer<?, ?> server)
 	{
 		this.channel = channel;
 		this.server = server;

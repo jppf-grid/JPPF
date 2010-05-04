@@ -110,7 +110,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	{
 		super(name);
 		factory = createFactory();
-		transitionManager = new StateTransitionManager(this, sequential);
+		transitionManager = new StateTransitionManager<S, T>(this, sequential);
 	}
 
 	/**
@@ -392,7 +392,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * Get the factory for this server.
 	 * @return an <code>NioServerFactory</code> instance.
 	 */
-	public NioServerFactory getFactory()
+	public NioServerFactory<S, T> getFactory()
 	{
 		synchronized(this)
 		{

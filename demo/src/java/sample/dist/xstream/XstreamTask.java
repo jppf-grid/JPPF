@@ -85,10 +85,10 @@ public class XstreamTask extends JPPFTask
 	 */
 	private Object instantiateXStream() throws Exception
 	{
-		Class xstreamClass = Class.forName("com.thoughtworks.xstream.XStream");
-		Class hierarchicalStreamDriverClass = Class.forName("com.thoughtworks.xstream.io.HierarchicalStreamDriver");
-		Constructor c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
-		Class domDriverClass = Class.forName("com.thoughtworks.xstream.io.xml.DomDriver");
+		Class<?> xstreamClass = Class.forName("com.thoughtworks.xstream.XStream");
+		Class<?> hierarchicalStreamDriverClass = Class.forName("com.thoughtworks.xstream.io.HierarchicalStreamDriver");
+		Constructor<?> c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
+		Class<?> domDriverClass = Class.forName("com.thoughtworks.xstream.io.xml.DomDriver");
 		Object driver = domDriverClass.newInstance();
 		return c.newInstance(driver);
 	}

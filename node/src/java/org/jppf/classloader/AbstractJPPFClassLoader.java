@@ -523,7 +523,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		{
 			lock.unlock();
 		}
-		return urlList == null ? null : new IteratorEnumeration(urlList.iterator());
+		return urlList == null ? null : new IteratorEnumeration<URL>(urlList.iterator());
 	}
 
 	/**

@@ -80,7 +80,7 @@ public abstract class AbstractMyTask extends JPPFTask
 	public boolean checkQueue()
 	{
 		String key = "MyDistyributedQueue";
-		Queue<Object> queue = (Queue<Object>) NodeRunner.getPersistentData(key);
+		Queue<?> queue = (Queue<?>) NodeRunner.getPersistentData(key);
 		if (queue == null)
 		{
 			queue = Hazelcast.getQueue(key);

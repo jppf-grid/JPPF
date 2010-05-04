@@ -201,7 +201,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
 	 */
-	public void updateConfiguration(Map config, Boolean reconnect) throws Exception
+	public void updateConfiguration(Map<Object, Object> config, Boolean reconnect) throws Exception
 	{
 		if (config == null) return;
 		JPPFConfiguration.getProperties().putAll(config);

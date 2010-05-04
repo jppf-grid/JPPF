@@ -103,8 +103,8 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 		if (startDir != null) builder.directory(new File(startDir));
 		if (env != null)
 		{
-			Map map = builder.environment();
-			for (Map.Entry e: env.entrySet()) map.put(e.getKey(), e.getValue());
+			Map<String, String> map = builder.environment();
+			for (Map.Entry<String, String> e: env.entrySet()) map.put(e.getKey(), e.getValue());
 		}
 		ProcessWrapper wrapper = new ProcessWrapper();
 		if (captureOutput) wrapper.addListener(this);

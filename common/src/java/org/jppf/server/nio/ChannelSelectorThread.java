@@ -33,14 +33,14 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
 	/**
 	 * The nio server that own this thread.
 	 */
-	private NioServer server = null;
+	private NioServer<?, ?> server = null;
 
 	/**
 	 * Initialize this threadwith the specified name, selector and NIO server.
 	 * @param selector the channel selector associated with this thread.
 	 * @param server the nio server that own this thread.
 	 */
-	public ChannelSelectorThread(ChannelSelector selector, NioServer server)
+	public ChannelSelectorThread(ChannelSelector selector, NioServer<?, ?> server)
 	{
 		this.selector = selector;
 		this.server = server;

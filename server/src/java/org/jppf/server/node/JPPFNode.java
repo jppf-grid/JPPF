@@ -287,7 +287,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 				log.error("Error creating the JMX server", e);
 			}
 		}
-		new JPPFStartupLoader().load(JPPFNodeStartupSPI.class);
+		new JPPFStartupLoader<JPPFNodeStartupSPI>().load(JPPFNodeStartupSPI.class);
 		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
 		initDataChannel();
 		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
@@ -510,7 +510,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 		ClassLoader cl = getClass().getClassLoader();
     ClassLoader tmp = Thread.currentThread().getContextClassLoader();
   	MBeanServer server = getJmxServer().getServer();
-  	if (providerManager == null) providerManager = new JPPFMBeanProviderManager(JPPFNodeMBeanProvider.class, server); 
+  	if (providerManager == null) providerManager = new JPPFMBeanProviderManager<JPPFNodeMBeanProvider>(JPPFNodeMBeanProvider.class, server); 
     try
     {
 	    Thread.currentThread().setContextClassLoader(cl);

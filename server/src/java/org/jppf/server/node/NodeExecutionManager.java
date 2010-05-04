@@ -118,7 +118,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 		threadMXBean = ManagementFactory.getThreadMXBean();
 		cpuTimeEnabled = threadMXBean.isThreadCpuTimeSupported();
 		threadFactory = new JPPFThreadFactory("node processing thread", cpuTimeEnabled);
-		LinkedBlockingQueue queue = new LinkedBlockingQueue();
+		LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
 		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory);
 		//timeoutTimer = new Timer("Node Task Timeout Timer");
 		if (debugEnabled) log.debug("thread cpu time supported = " + cpuTimeEnabled);

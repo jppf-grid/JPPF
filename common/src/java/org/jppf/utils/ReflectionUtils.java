@@ -320,14 +320,14 @@ public class ReflectionUtils
 	 * @param types the set of types to match. 
 	 * @return true if the methods match, false otherwise.
 	 */
-	public static boolean matchingTypes(Class[] argTypes, Class[] types)
+	public static boolean matchingTypes(Class<?>[] argTypes, Class<?>[] types)
 	{
 		if (argTypes.length != types.length) return false;
 		for (int i=0; i<types.length; i++)
 		{
 			if (argTypes[i] != null)
 			{
-				Class c = types[i].isPrimitive() ? mapPrimitveType(types[i]) :  types[i];
+				Class<?> c = types[i].isPrimitive() ? mapPrimitveType(types[i]) :  types[i];
 				if (!c.isAssignableFrom(argTypes[i])) return false;
 			}
 		}
