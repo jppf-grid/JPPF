@@ -99,7 +99,8 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	{
 		classServerPort = info.classServerPorts[0];
 		jmxPort = info.managementPort;
-		configure(uuid, name + " (" + info.host + ":" + info.managementPort + ")", info.host, info.applicationServerPorts[0], classServerPort, 0);
+		//configure(uuid, name + " (" + info.host + ":" + info.managementPort + ")", info.host, info.applicationServerPorts[0], classServerPort, 0);
+		configure(uuid, name, info.host, info.applicationServerPorts[0], classServerPort, 0);
 		initializeJmxConnection();
 	}
 
