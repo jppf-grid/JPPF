@@ -137,6 +137,7 @@ public class ManyNodes
 		File file = new File("config/manynodes/node" + n + ".properties");
 		if (file.exists()) return;
 		StringBuilder sb = new StringBuilder();
+		sb.append("jppf.server.host = 192.168.1.11\n");
 		sb.append("jppf.jvm.options = -server -Xmx32m\n");
 		sb.append("processing.threads = 1\n");
 		sb.append("reconnect.max.time = 5\n");
