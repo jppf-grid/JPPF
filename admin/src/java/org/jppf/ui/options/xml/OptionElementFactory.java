@@ -167,6 +167,7 @@ public class OptionElementFactory
 		option.setPattern(desc.getProperty("pattern"));
 		option.createUI();
 		option.setEventsEnabled(true);
+		option.setEditable(desc.getBoolean("editable", true));
 		return option;
 	}
 

@@ -46,13 +46,13 @@ public class NodeRenderer extends AbstractTreeCellRenderer
 
 	/**
    * Configures the renderer based on the passed in components.
-	 * @param tree - the tree on which to apply this renderer.
-	 * @param value - the node to render. 
-	 * @param sel - determines whether the node is selected.
-	 * @param expanded - determines whether the node is expanded.
-	 * @param leaf - determines whether the node is a leaf.
-	 * @param row - the node's row number. 
-	 * @param hasFocus - determines whether the node has the focus. 
+	 * @param tree the tree on which to apply this renderer.
+	 * @param value the node to render. 
+	 * @param sel determines whether the node is selected.
+	 * @param expanded determines whether the node is expanded.
+	 * @param leaf determines whether the node is a leaf.
+	 * @param row the node's row number. 
+	 * @param hasFocus determines whether the node has the focus. 
 	 * @return a component used to paint the node.
 	 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
 	 */
@@ -87,6 +87,11 @@ public class NodeRenderer extends AbstractTreeCellRenderer
 						JPPFManagementInfo info = data.getNodeInformation();
 						if ((info != null) && (JPPFManagementInfo.DRIVER == info.getType())) path = DRIVER_ICON;
 						else path = NODE_ICON;
+						if (!TopologyDataStatus.UP.equals(data.getStatus()))
+						{
+							background = INACTIVE_COLOR;
+							backgroundSelected = INACTIVE_SELECTION_COLOR;
+						}
 						break;
 				}
 				ImageIcon icon = GuiUtils.loadIcon(path);

@@ -16,6 +16,7 @@ def maximized = pref.getBoolean("maximized", false);
 if (maximized) frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 def opt = option.findFirstWithName("/NodeTreeTable");
 opt.setupTableColumns();
+opt.refreshStatusBar();
 opt = option.findFirstWithName("/JobTreetable");
 opt.setupTableColumns();
 frame.setVisible(true);

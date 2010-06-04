@@ -71,12 +71,9 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 */
 	public OptionElement getRoot()
 	{
-		if (root == null)
-		{
-			OptionElement elt = this;
-			while (elt.getParent() != null) elt = elt.getParent();
-			root = elt;
-		}
+		OptionElement elt = this;
+		while (elt.getParent() != null) elt = elt.getParent();
+		root = elt;
 		return root;
 	}
 
