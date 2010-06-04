@@ -316,4 +316,11 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	{
 		this.componentConstraints = componentConstraints;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setEditable(boolean editable)
+	{
+	}
 }

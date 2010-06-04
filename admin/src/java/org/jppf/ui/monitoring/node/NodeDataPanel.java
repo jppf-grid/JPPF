@@ -19,6 +19,7 @@
 package org.jppf.ui.monitoring.node;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -30,6 +31,7 @@ import org.jppf.management.*;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
+import org.jppf.ui.options.FormattedNumberOption;
 import org.jppf.ui.treetable.*;
 
 /**
@@ -54,6 +56,14 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * Mapping of connection names to status listener.
 	 */
 	private Map<String, ConnectionStatusListener> listenerMap = new Hashtable<String, ConnectionStatusListener>();
+	/**
+	 * Number of active servers.
+	 */
+	private AtomicInteger nbServers = new AtomicInteger(0);
+	/**
+	 * Number of active nodes.
+	 */
+	private AtomicInteger nbNodes = new AtomicInteger(0);
 
 	/**
 	 * Initialize this panel with the specified information.
@@ -152,6 +162,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		}
 		if (nodes != null) for (JPPFManagementInfo nodeInfo: nodes) nodeAdded(driverNode, nodeInfo);
 		if (treeTable != null) treeTable.expand(driverNode);
+		updateStatusBar("/StatusNbServers", 1);
 	}
 
 	/**
@@ -172,7 +183,11 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 				model.removeNodeFromParent(node);
 			}
 		}
-		else model.removeNodeFromParent(driverNode);
+		else
+		{
+			model.removeNodeFromParent(driverNode);
+			updateStatusBar("/StatusNbServers", -1);
+		}
 	}
 
 	/**
@@ -200,6 +215,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		TopologyData nodeData = new TopologyData(nodeInfo);
 		DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(nodeData);
 		model.insertNodeInto(nodeNode, driverNode, driverNode.getChildCount());
+		updateStatusBar("/StatusNbNodes", 1);
 
 		for (int i=0; i<treeTableRoot.getChildCount(); i++)
 		{
@@ -223,6 +239,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		if (node == null) return;
 		if (debugEnabled) log.debug("removing node: " + nodeName);
 		model.removeNodeFromParent(node);
+		updateStatusBar("/StatusNbNodes", -1);
 	}
 
 	/**
@@ -363,12 +380,44 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 
 	/**
 	 * Notifiy this listener that a new driver connection was created.
-	 * @param event - the event to notify this listener of.
+	 * @param event the event to notify this listener of.
 	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
 	 */
 	public synchronized void newConnection(ClientEvent event)
 	{
 		driverAdded(event.getConnection());
+	}
+
+	/**
+	 * Update the number of active servers or nodes in the status bar.
+	 * @param name the name of the field to update.
+	 * @param n the number of servers to add or subtract.
+	 */
+	private void updateStatusBar(String name, int n)
+	{
+		try
+		{
+			AtomicInteger nb = "/StatusNbServers".equals(name) ? nbServers : nbNodes;
+			int newNb = nb.addAndGet(n);
+			if (debugEnabled) log.debug("updating '" + name + "' with value = " + n + ", result = " + newNb);
+			FormattedNumberOption option = (FormattedNumberOption) findFirstWithName(name);
+			if (option != null) option.setValue(Double.valueOf(newNb));
+		}
+		catch(Throwable t)
+		{
+			log.error(t.getMessage(), t);
+		}
+	}
+
+	/**
+	 * Refresh the number of active servers and nodes in the status bar.
+	 */
+	public void refreshStatusBar()
+	{
+		FormattedNumberOption option = (FormattedNumberOption) findFirstWithName("/StatusNbServers");
+		if (option != null) option.setValue(Double.valueOf(nbServers.get()));
+		option = (FormattedNumberOption) findFirstWithName("/StatusNbNodes");
+		if (option != null) option.setValue(Double.valueOf(nbNodes.get()));
 	}
 
 	/**
@@ -383,7 +432,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 
 		/**
 		 * Initialize this listener with the specified connection name.
-		 * @param driverName - the name of the connection.
+		 * @param driverName the name of the connection.
 		 */
 		public ConnectionStatusListener(String driverName)
 		{
@@ -392,13 +441,13 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 
 		/**
 		 * Invoked when thew conneciton status has changed.
-		 * @param event - the connection status event.
+		 * @param event the connection status event.
 		 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 		 */
 		public void statusChanged(ClientConnectionStatusEvent event)
 		{
 			ClientConnectionStatusHandler ccsh =  event.getClientConnectionStatusHandler();
-			System.out.println("Received connection status changed event for " + ccsh + " : " + ccsh.getStatus());
+			if (debugEnabled) log.debug("Received connection status changed event for " + ccsh + " : " + ccsh.getStatus());
 			DefaultMutableTreeNode driverNode = findDriver(driverName);
 			if (driverNode != null) model.changeNode(driverNode);
 		}

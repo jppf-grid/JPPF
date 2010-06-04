@@ -63,10 +63,6 @@
 		<import source="file" location="org/jppf/ui/options/xml/BundleSizeTuningPage.xml"/>
 	</child>
 
-	<child name="StatusBar" type="page">
-		<property name="layoutConstraints" value="fillx, insets 0 0 0 0"/>
-		<property name="componentConstraints" value="growx, pushx, h 20!"/>
-		<property name="bordered" value="false"/>
-	</child>
+	<import source="file" location="org/jppf/ui/options/xml/StatusBarPage.xml"/>
 
 </opt:main>

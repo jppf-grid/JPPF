@@ -42,6 +42,10 @@ public class TopologyData
 	 */
 	private TopologyDataType type = null;
 	/**
+	 * The status of the node.
+	 */
+	private TopologyDataStatus status = TopologyDataStatus.UP;
+	/**
 	 * A driver connection.
 	 */
 	private JPPFClientConnection clientConnection = null;
@@ -165,10 +169,30 @@ public class TopologyData
 		{
 			if (!jmxWrapper.isConnected()) return;
 			nodeState = ((JMXNodeConnectionWrapper) jmxWrapper).state();
+			if (nodeState == null) setStatus(TopologyDataStatus.DOWN);
 		}
 		catch(Exception e)
 		{
+			setStatus(TopologyDataStatus.DOWN);
 			if (debugEnabled) log.debug(e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * Get the status of the node.
+	 * @return the node status.
+	 */
+	public TopologyDataStatus getStatus()
+	{
+		return status;
+	}
+
+	/**
+	 * Set the status of the node.
+	 * @param status the node status.
+	 */
+	public void setStatus(TopologyDataStatus status)
+	{
+		this.status = status;
 	}
 }

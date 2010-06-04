@@ -60,4 +60,6 @@
 		<import source="file" location="org/jppf/ui/options/xml/BundleSizeTuningPage.xml"/>
 	</child>
 
+	<import source="file" location="org/jppf/ui/options/xml/StatusBarPage.xml"/>
+
 </opt:main>

@@ -72,6 +72,7 @@ public class FormattedNumberOption extends AbstractOption
 		this.label = label;
 		setToolTipText(tooltip);
 		this.value = value;
+		this.pattern = pattern;
 		format = new DecimalFormat(pattern);
 		//format = NumberFormat.;
 		createUI();
@@ -176,5 +177,14 @@ public class FormattedNumberOption extends AbstractOption
 	public void setPattern(String pattern)
 	{
 		this.pattern = pattern;
+		format = new DecimalFormat(pattern);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setEditable(boolean editable)
+	{
+		if (field != null) field.setEditable(editable);
 	}
 }

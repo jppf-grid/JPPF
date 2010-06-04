@@ -19,6 +19,7 @@
 package org.jppf.ui.monitoring.node;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -59,6 +60,14 @@ public class NodeRefreshHandler
 	 * The panel to refresh.
 	 */
 	private NodeDataPanel nodeDataPanel = null;
+	/**
+	 * Count of refresh invocations.
+	 */
+	private AtomicLong refreshCount = new AtomicLong(0L);
+	/**
+	 * Determines whether we are currently refreshing.
+	 */
+	private AtomicBoolean refreshing = new AtomicBoolean(false);
 
 	/**
 	 * Initialize this node handler.
@@ -81,44 +90,68 @@ public class NodeRefreshHandler
 	}
 
 	/**
-	 * Refresh the tree structure.
+	 * Refresh the tree structure asynchonously (not in the AWT event thread).
 	 */
 	public synchronized void refresh()
 	{
-		Collection<JPPFClientConnection> connectionList = jppfClient.getAllConnections();
-		Map<String, JPPFClientConnection> map = new HashMap<String, JPPFClientConnection>();
-		for (JPPFClientConnection c: connectionList) map.put(((JPPFClientConnectionImpl) c).getJmxConnection().getId(), c);
-		Map<String, JPPFClientConnection> connectionMap = nodeDataPanel.getAllDriverNames();
+		if (refreshing.get()) return;
+		refreshing.set(true);
+		Runnable r = new Runnable()
+		{
+			public void run()
+			{
+				refresh0();
+			}
+		};
+		new Thread(r, "node panel refresh " + refreshCount.incrementAndGet()).start();
+	}
 
-		// handle drivers that were removed
-		List<String> driversToProcess = new ArrayList<String>();
-		for (Map.Entry<String, JPPFClientConnection> entry: connectionMap.entrySet())
+	/**
+	 * Refresh the tree structure.
+	 */
+	public synchronized void refresh0()
+	{
+		try
 		{
-			String name = entry.getKey();
-			if (!map.containsKey(name)) driversToProcess.add(name);
-			else refreshNodes(name);
+			Collection<JPPFClientConnection> connectionList = jppfClient.getAllConnections();
+			Map<String, JPPFClientConnection> map = new HashMap<String, JPPFClientConnection>();
+			for (JPPFClientConnection c: connectionList) map.put(((JPPFClientConnectionImpl) c).getJmxConnection().getId(), c);
+			Map<String, JPPFClientConnection> connectionMap = nodeDataPanel.getAllDriverNames();
+	
+			// handle drivers that were removed
+			List<String> driversToProcess = new ArrayList<String>();
+			for (Map.Entry<String, JPPFClientConnection> entry: connectionMap.entrySet())
+			{
+				String name = entry.getKey();
+				if (!map.containsKey(name)) driversToProcess.add(name);
+				else refreshNodes(name);
+			}
+			for (String name: driversToProcess)
+			{
+				if (debugEnabled) log.debug("removing driver " + name); 
+				removeDriver(name);
+			}
+	
+			// handle drivers that were added
+			driversToProcess = new ArrayList<String>();
+			for (Map.Entry<String, JPPFClientConnection> entry: map.entrySet())
+			{
+				String name = entry.getKey();
+				if (!connectionMap.containsKey(name)) driversToProcess.add(name);
+			}
+			for (String name: driversToProcess)
+			{
+				if (debugEnabled) log.debug("adding driver " + name); 
+				addDriver(map.get(name));
+			}
+			nodeDataPanel.refreshNodeStates();
+			nodeDataPanel.getTreeTable().invalidate();
+			nodeDataPanel.getTreeTable().repaint();
 		}
-		for (String name: driversToProcess)
+		finally
 		{
-			if (debugEnabled) log.debug("removing driver " + name); 
-			removeDriver(name);
+			refreshing.set(false);
 		}
-
-		// handle drivers that were added
-		driversToProcess = new ArrayList<String>();
-		for (Map.Entry<String, JPPFClientConnection> entry: map.entrySet())
-		{
-			String name = entry.getKey();
-			if (!connectionMap.containsKey(name)) driversToProcess.add(name);
-		}
-		for (String name: driversToProcess)
-		{
-			if (debugEnabled) log.debug("adding driver " + name); 
-			addDriver(map.get(name));
-		}
-		nodeDataPanel.refreshNodeStates();
-		nodeDataPanel.getTreeTable().invalidate();
-		nodeDataPanel.getTreeTable().repaint();
 	}
 
 	/**

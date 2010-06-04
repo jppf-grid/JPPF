@@ -59,6 +59,11 @@ public interface OptionProperties extends Serializable
 	 */
 	void setEnabled(boolean enabled);
 	/**
+	 * Enable or disable this option.
+	 * @param editable true to make this option editable, false otherwise.
+	 */
+	void setEditable(boolean editable);
+	/**
 	 * Determine whether the events firing in this option and/or its children are enabled.
 	 * @return enabled true if the events are enabled, false otherwise.
 	 */

@@ -202,6 +202,7 @@ public class OptionsPageBuilder
 	public void initCommonOptionAttributes(AbstractOption option, OptionDescriptor desc) throws Exception
 	{
 		initCommonAttributes(option, desc);
+		//option.setEditable(desc.getBoolean("editable", false));
 		option.setPersistent(desc.getBoolean("persistent", false));
 		for (ListenerDescriptor listenerDesc: desc.listeners)
 		{
