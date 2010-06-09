@@ -72,16 +72,8 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
 		while (((timeout == 0L) || (elapsed < timeout)) && !selected)
 		{
 			goToSleep(timeout == 0L ? 0 : timeout - elapsed);
-			lock.lock();
-			try
-			{
-				elapsed = System.currentTimeMillis() - start;
-				selected = (channel.getKeyOps() & channel.getReadyOps()) != 0;
-			}
-			finally
-			{
-				lock.unlock();
-			}
+			elapsed = System.currentTimeMillis() - start;
+			selected = (channel.getKeyOps() & channel.getReadyOps()) != 0;
 		}
 		return selected;
 	}
@@ -100,21 +92,5 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
 	public ChannelWrapper<?> getChannel()
 	{
 		return channel;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public synchronized void wakeUp()
-	{
-		lock.lock();
-		try
-		{
-			super.wakeUp();
-		}
-		finally
-		{
-			lock.unlock();
-		}
 	}
 }
