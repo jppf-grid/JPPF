@@ -17,8 +17,11 @@
  */
 package org.jppf.doc;
 
+import static org.jppf.doc.ParameterNames.*;
+
 import java.io.*;
 import java.util.*;
+
 import org.jppf.utils.FileUtils;
 
 /**
@@ -56,7 +59,7 @@ public class HtmlDocGenerator
 	 */
 	public static final String CONTENT_END = "]CONTENT$";
 	/**
-	 * Separator for parameter nane/value pair.
+	 * Separator for parameter name/value pair.
 	 */
 	public static final String EQUALS = "=";
 	/**
@@ -224,61 +227,90 @@ public class HtmlDocGenerator
 
 	/**
 	 * Test this class.
-	 * @param args not used.
+	 * @param args the options to use.
 	 */
 	public static void main(String...args)
 	{
 		try
 		{
-			if (args.length < 3) showUsageAndExit("Missing parameter(s).\n");
-			if (args.length > 3) showUsageAndExit("Too many parameter(s).\n");
-			File sourceDir = new File(args[0]);
-			if (!sourceDir.exists() || !sourceDir.isDirectory())
-				showUsageAndExit("Source location must be an existing folder");
-			File targetDir = new File(args[1]);
-			if (!targetDir.exists() || !targetDir.isDirectory())
-				showUsageAndExit("Target location must be an existing folder");
-			File templateDir = new File(args[2]);
-			if (!templateDir.exists() || !templateDir.isDirectory())
-				showUsageAndExit("Templates location must be an existing folder");
+			Map<ParameterNames, Object> parameters = new ParametersHandler().parseArguments(args);
+			File sourceDir = new File((String) parameters.get(SOURCE_DIR));
+			if (!sourceDir.exists() || !sourceDir.isDirectory()) showUsageAndExit("Source location must be an existing folder");
+			File destDir = new File((String) parameters.get(DEST_DIR));
+			if (!destDir.exists() || !destDir.isDirectory()) showUsageAndExit("Target location must be an existing folder");
+			File templateDir = new File((String) parameters.get(TEMPLATES_DIR));
+			if (!templateDir.exists() || !templateDir.isDirectory()) showUsageAndExit("Templates location must be an existing folder");
 
-			HtmlDocGenerator docGen = new HtmlDocGenerator();
-			for (File file: sourceDir.listFiles(new JPPFFileFilter()))
-			{
-				String target = targetDir.getPath();
-				if (!target.endsWith("/") && !target.endsWith("\\")) target += "/";
-				target += file.getName();
-				docGen.generatePage(file.getPath(), target, templateDir.getPath());
-			}
+			boolean recursive = (Boolean) parameters.get(RECURSIVE);
+			if (recursive) generateDocRecursive(sourceDir, destDir, templateDir, parameters);
+			else generateDoc(sourceDir, destDir, templateDir, parameters);
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
+			showUsageAndExit(e.getMessage());
 		}
 	}
 
 	/**
-	 * Filter that only accepts html and php files.
+	 * Generate the documentation recursively.
+	 * @param sourceDir source folder.
+	 * @param destDir target folder.
+	 * @param templateDir templates folder.
+	 * @param parameters the options to use.
+	 * @throws Exception if any error occurs.
 	 */
-	public static class JPPFFileFilter implements FileFilter
+	private static void generateDocRecursive(File sourceDir, File destDir, File templateDir, Map<ParameterNames, Object> parameters) throws Exception
 	{
-		/**
-		 * Determine if a file is accepted.
-		 * @param pathname the file path to check.
-		 * @return true if the file is accepted, false otherwise.
-		 * @see java.io.FileFilter#accept(java.io.File)
-		 */
-		public boolean accept(File pathname)
+		generateDoc(sourceDir, destDir, templateDir, parameters);
+		List<File> allSourceDirs = new ArrayList<File>();
+		allDirsRecursive(sourceDir, allSourceDirs, parameters);
+		String rootSourceName = sourceDir.getCanonicalPath();
+		String rootTargetName = destDir.getCanonicalPath();
+		for (File source: allSourceDirs)
 		{
-			if (pathname.isDirectory()) return false;
-			String s = pathname.getPath();
-			int idx = s.lastIndexOf(".");
-			if (idx < 0) return false;
-			s = s.substring(idx).toLowerCase();
-			return ".html".equals(s) || ".htm".equals(s) || ".php".equals(s);
+			String s = source.getCanonicalPath().substring(rootSourceName.length());
+			File target = new File(rootTargetName + s);
+			generateDoc(source, target, templateDir, parameters);
 		}
-	};
-	
+	}
+
+	/**
+	 * Generate the documentation recursively.
+	 * @param sourceDir source folder.
+	 * @param destDir target folder.
+	 * @param templateDir templates folder.
+	 * @param parameters the options to use.
+	 * @throws Exception if any error occurs.
+	 */
+	private static void generateDoc(File sourceDir, File destDir, File templateDir, Map<ParameterNames, Object> parameters) throws Exception
+	{
+		HtmlDocGenerator docGen = new HtmlDocGenerator();
+		for (File file: sourceDir.listFiles(new JPPFFileFilter((String[]) parameters.get(FILE_INCLUDES), (String[]) parameters.get(FILE_EXCLUDES))))
+		{
+			if (!destDir.exists()) destDir.mkdirs();
+			String target = destDir.getPath();
+			if (!target.endsWith("/") && !target.endsWith("\\")) target += "/";
+			target += file.getName();
+			docGen.generatePage(file.getPath(), target, templateDir.getPath());
+		}
+	}
+
+	/**
+	 * Get recursively all directories under the specified root, and add them to the specified list.
+	 * @param root the root directory to search from.
+	 * @param list the list to add directories to.
+	 * @param parameters the options to use.
+	 * @throws Exception if any error occurs.
+	 */
+	private static void allDirsRecursive(File root, List<File> list, Map<ParameterNames, Object> parameters) throws Exception
+	{
+		for (File file: root.listFiles(new JPPFDirFilter((String[]) parameters.get(DIR_INCLUDES), (String[]) parameters.get(DIR_EXCLUDES))))
+		{
+			list.add(file);
+			allDirsRecursive(file, list, parameters);
+		}
+	}
 
 	/**
 	 * Give a brief explanation of the comand-line parameters.
@@ -287,15 +319,22 @@ public class HtmlDocGenerator
 	private static void showUsageAndExit(String msg)
 	{
 		System.err.println(msg);
-		System.err.println("HtmlDocGenerator usage: java "+HtmlDocGenerator.class.getName()+" sourceDir"+" targetDir"+" templatesDir");
+		System.err.println("HtmlDocGenerator usage: java " + HtmlDocGenerator.class.getName() + " -s sourceDir -d destDir -t templatesDir");
+		System.err.println("  [[-r] [-fi includedFiles] [-fe excludedFiles] [-di includedDirs] [-de excludedDirs]]");
+		System.err.println("where:");
+		System.err.println("-s  sourceDir is the location of the root folder with the documents sources");
+		System.err.println("-d  destDir is the root folder where the converted documents are created");
+		System.err.println("-t  templatesDir is the location of the root folder where the templates are");
+		System.err.println("-r  specifies whether the source directory should be processed recursively");
+		System.err.println("-fi specifies extensions of the files to include");
+		System.err.println("    if left unspecified, default 'html, htm, php' are included");
+		System.err.println("-fe specifies extensions of the files to exclude");
+		System.err.println("    if left unspecified none are excluded");
+		System.err.println("-di specifies the names of the directories to include");
+		System.err.println("    if left unspecified all are included");
+		System.err.println("-de specifies names of the directories to exclude");
+		System.err.println("    if left unspecified, default 'CVS, .svn' are excluded");
 		System.err.println();
-		System.err.println("Where:");
-		System.err.println("- sourceDir is the location of the folder with the documents sources (those that use templates)");
-		System.err.println("- targetDir is the location of the folder where the actual HTML documents are created");
-		System.err.println("- templatesDir is the location of the root folder where the templates are");
-		System.err.println();
-		System.err.println("This tool only handles html documents, thus any other file has to be already in the right location,");
-		System.err.println("including stylesheets, image files and others.");
-		System.exit(0);
+		System.exit(1);
 	}
 }

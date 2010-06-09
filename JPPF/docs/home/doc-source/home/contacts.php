@@ -1,6 +1,6 @@
 <?php $currentPage="Contacts" ?>
 $template{name="about-page-header" title="Contacts"}$
-	<table border="0" cellpadding="0" cellspacing="20">
+	<table border="0" cellpadding="0" cellspacing="10">
 		<tr>
 			<td width="200"><b>Contact</b></td>
 			<td width="100"><b>Country</b></td>
@@ -11,9 +11,9 @@ $template{name="about-page-header" title="Contacts"}$
 			<td>
 				Laurent Cohen<br>
 				<a href="mailto:laurent.cohen@jppf.org">laurent.cohen@jppf.org</a><br>
-				+33 1 41 20 82 66<br>
+				+33 2 32 35 13 12<br>
 				Skype: <a href="callto://lolocohen">lolocohen</a><br>
-				Nanterre, France<br>
+				Evreux, France<br>
 			</td>
 			<td valign="top">France</td>
 			<td valign="top">English, French</td>
@@ -23,9 +23,9 @@ $template{name="about-page-header" title="Contacts"}$
 			<td>
 				Laurent Cohen<br>
 				<a href="mailto:laurent.cohen@jppf.org">laurent.cohen@jppf.org</a><br>
-				+33 1 41 20 82 66<br>
+				+33 2 32 35 13 12<br>
 				Skype: <a href="callto://lolocohen">lolocohen</a><br>
-				Nanterre, France<br>
+				Evreux, France<br>
 			</td>
 			<td valign="top">France</td>
 			<td valign="top">English, French</td>
@@ -35,16 +35,16 @@ $template{name="about-page-header" title="Contacts"}$
 			<td>
 				Laurent Cohen<br>
 				<a href="mailto:laurent.cohen@jppf.org">laurent.cohen@jppf.org</a><br>
-				+33 1 41 20 82 66<br>
+				+33 2 32 35 13 12<br>
 				Skype: <a href="callto://lolocohen">lolocohen</a><br>
-				Nanterre, France<br>
+				Evreux, France<br>
 			</td>
 			<td valign="top">France</td>
 			<td valign="top">English, French</td>
 		</tr>
 	</table>
 	<br>
-	<h3>Notice:<h3> the people in this list have volunteered their precious time for specific inquiries in a limited number of areas.
+	<h3>Notice:</h3> the people in this list have volunteered their precious time for specific inquiries in a limited number of areas.
 	Please do not abuse this time. The contact informations provided in this list are not to be used for technical support purposes. For technical support, please use our <a href="/forums">user forums</a>
 	<br>
 $template{name="about-page-footer"}$

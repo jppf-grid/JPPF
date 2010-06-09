@@ -4,10 +4,10 @@
 		<title>JPPF Contacts
 </title>
 		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
-		<meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
+		<meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, gloud, open source">
 		<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
-		<link rel="stylesheet" type="text/css" href="./jppf.css" title="Style">
+		<link rel="stylesheet" type="text/css" href="/jppf.css" title="Style">
 	</head>
 	<body>
 		<div align="center">
@@ -126,16 +126,11 @@
 				</tr>
 			</table>
 		<!--</div>-->
-			<!--
-			<table width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: white"><tr><td valign="middle" align="center" style="height: 30px; border: 1px solid #6D78B6; border-bottom: none">
-				<h4 style="color: #6D78B6; margin-top: 0px; margin-bottom: 0px">The Extensible Grid Computing Platform</h4>
-			</td></tr></table>
-			-->
 					<table border="0" cellspacing="0" cellpadding="5" width="100%px" style="border: 1px solid #6D78B6; border-top: 8px solid #6D78B6;">
 			<tr>
 				<td style="background-color: #FFFFFF">
 				<div class="sidebar">
-									<br>
+									<br/>
 															<?php
 											$itemClass = "";
 											if ($currentPage == "Home") $itemClass = 'aboutMenuItem';
@@ -150,39 +145,7 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="about.php" class="<?php echo $itemClass; ?>">&raquo; About</a><br>
-											</div>
-															<?php
-											$itemClass = "";
-											if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="release_notes.php?version=2.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
-											</div>
-															<?php
-											$itemClass = "";
-											if ($currentPage == "Features") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="features.php" class="<?php echo $itemClass; ?>">&raquo; Features</a><br>
-											</div>
-															<?php
-											$itemClass = "";
-											if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br>
-											</div>
-															<?php
-											$itemClass = "";
-											if ($currentPage == "Press") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br>
+											<a href="/about.php" class="<?php echo $itemClass; ?>">&raquo; About</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -190,7 +153,15 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="downloads.php" class="<?php echo $itemClass; ?>">&raquo; Download</a><br>
+											<a href="/downloads.php" class="<?php echo $itemClass; ?>">&raquo; Download</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Features") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/features.php" class="<?php echo $itemClass; ?>">&raquo; Features</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -207,15 +178,7 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="../samples-pack/index.html" class="<?php echo $itemClass; ?>">&raquo; Samples</a><br>
-											</div>
-															<?php
-											$itemClass = "";
-											if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br>
+											<a href="/samples-pack/index.php" class="<?php echo $itemClass; ?>">&raquo; Samples</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -223,7 +186,32 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br>
+											<a href="/license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br>
+											</div>
+				<hr/>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Press") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/release_notes.php?version=2.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -231,7 +219,7 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="screenshots.php" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br>
+											<a href="/screenshots.php" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -239,11 +227,29 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br>
+											<a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br>
 											</div>
+				<hr/>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Services") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/services.php" class="<?php echo $itemClass; ?>">&raquo; Services</a><br>
+											</div>
+				<br/>
 				</div>
 				<div class="content">
-	<table border="0" cellpadding="0" cellspacing="20">
+	<table border="0" cellpadding="0" cellspacing="10">
 		<tr>
 			<td width="200"><b>Contact</b></td>
 			<td width="100"><b>Country</b></td>
@@ -254,9 +260,9 @@
 			<td>
 				Laurent Cohen<br>
 				<a href="mailto:laurent.cohen@jppf.org">laurent.cohen@jppf.org</a><br>
-				+33 1 41 20 82 66<br>
+				+33 2 32 35 13 12<br>
 				Skype: <a href="callto://lolocohen">lolocohen</a><br>
-				Nanterre, France<br>
+				Evreux, France<br>
 			</td>
 			<td valign="top">France</td>
 			<td valign="top">English, French</td>
@@ -266,9 +272,9 @@
 			<td>
 				Laurent Cohen<br>
 				<a href="mailto:laurent.cohen@jppf.org">laurent.cohen@jppf.org</a><br>
-				+33 1 41 20 82 66<br>
+				+33 2 32 35 13 12<br>
 				Skype: <a href="callto://lolocohen">lolocohen</a><br>
-				Nanterre, France<br>
+				Evreux, France<br>
 			</td>
 			<td valign="top">France</td>
 			<td valign="top">English, French</td>
@@ -278,16 +284,16 @@
 			<td>
 				Laurent Cohen<br>
 				<a href="mailto:laurent.cohen@jppf.org">laurent.cohen@jppf.org</a><br>
-				+33 1 41 20 82 66<br>
+				+33 2 32 35 13 12<br>
 				Skype: <a href="callto://lolocohen">lolocohen</a><br>
-				Nanterre, France<br>
+				Evreux, France<br>
 			</td>
 			<td valign="top">France</td>
 			<td valign="top">English, French</td>
 		</tr>
 	</table>
 	<br>
-	<h3>Notice:<h3> the people in this list have volunteered their precious time for specific inquiries in a limited number of areas.
+	<h3>Notice:</h3> the people in this list have volunteered their precious time for specific inquiries in a limited number of areas.
 	Please do not abuse this time. The contact informations provided in this list are not to be used for technical support purposes. For technical support, please use our <a href="/forums">user forums</a>
 	<br>
 				</div>

@@ -1,7 +1,7 @@
-<?php $currentPage="Credits" ?>
+<?php $currentPage="Services" ?>
 <html>
 		<head>
-		<title>JPPF Credits
+		<title>JPPF Services
 </title>
 		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
 		<meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, gloud, open source">
@@ -249,12 +249,26 @@
 				<br/>
 				</div>
 				<div class="content">
-	<h2><a href="http://www.yourkit.com">YourKit</a></h2>
-	YourKit is kindly supporting open source projects with its full-featured Java Profiler.<br>
-	YourKit, LLC is the creator of innovative and intelligent tools for profiling Java and .NET applications.<br>
-	Take a look at YourKit's leading software products:
-	<a href="http://www.yourkit.com/java/profiler/index.jsp">YourKit Java Profiler</a> and
-	<a href="http://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profiler</a>.
+	<div align="justify">
+		<h3>Community Support</h3>
+		<p>Looking for support from the users community and JPPF contributors? The best place to start is in our <a href="/forums">community forums</a>.
+		<p>You may also directly:
+		<ul>
+			<li>Report issues and bugs you have found via our <a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse">bugs tracker</a> (SourceForge.net login required)</li>
+			<li>Request new features and enhancements via our <a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse">feature requests tracker</a> (SourceForge.net login required)</li>
+		</ul>
+		If you do so, we may need to contact you via the SourceForge.net mail system for additional information, so please make sure the email address in your profile is up to date.
+		<p>If you would like to contribute to the project in a significant way, please contact us via our <a href="/forums">forums</a> or one of the mmeans indicated in our <a href="contacts.php">contacts</a> page.
+		<br/><hr/>
+		<h3>Commercial Services</h3>
+		<table border="0" cellspacing="10" cellpadding="0">
+		<tr>
+		<td valign="center"><a href="http://www.parallel-matters.com"><img src="/images/pm_logo_tiny.jpg" border="0" alt="Parallel Matters"></a></td>
+		<td valign="center"><a href="http://www.parallel-matters.com"><b>Parallel Matters</b></a>: company founded by the creator of JPPF, offers support plans, consulting services and enterprise-class extensions to JPPF applications.</td>
+		</tr>
+		</table>
+		<p><i>If you or your company would like to be referenced in this section, please get in touch with us via our </i><a href="contacts.php">contacts</a><i> page</i>.
+	</div>
 				</div>
 									</td>
 				</tr>

@@ -100,17 +100,17 @@ $template{name="about-page-header" title="Features"}$
 
 <h3>Full fledged samples</h3>
 <ul>
-	<li><a href="samples-pack/Fractals/Readme.html">Mandelbrot / Julia set fractals generation</a></li>
-	<li><a href="samples-pack/SequenceAlignment/Readme.html">Protein and DNA sequence alignment</a></li>
-	<li><a href="samples-pack/WebSearchEngine/Readme.html">Distributed web crawler and search engine</a></li>
-	<li><a href="samples-pack/TomcatPort/Readme.html">Tomcat 5.5/6.0 port</a></li>
-	<li><a href="samples-pack/CustomMBeans/Readme.html">Pluggable management beans sample</a></li>
-	<li><a href="samples-pack/DataEncryption/Readme.html">Network data encryption sample</a></li>
-	<li><a href="samples-pack/StartupClasses/Readme.html">Customized server and node initialization sample</a></li>
-	<li><a href="samples-pack/MatrixMultiplication/Readme.html">Basic dense matrix multiplication parallelization sample</a></li>
-	<li><a href="samples-pack/DataDependency/Readme.html">Simulation of large portfolio updates</a></li>
-	<li><a href="samples-pack/NodeTray/Readme.html">JPPF node health monitor in the system tray</a></li>
-	<li><a href="samples-pack/CustomLoadBalancer/Readme.html">An example of a sophisticated load-balancer implementation</a></li>
+	<li><a href="samples-pack/Fractals/Readme.php">Mandelbrot / Julia set fractals generation</a></li>
+	<li><a href="samples-pack/SequenceAlignment/Readme.php">Protein and DNA sequence alignment</a></li>
+	<li><a href="samples-pack/WebSearchEngine/Readme.php">Distributed web crawler and search engine</a></li>
+	<li><a href="samples-pack/TomcatPort/Readme.php">Tomcat 5.5/6.0 port</a></li>
+	<li><a href="samples-pack/CustomMBeans/Readme.php">Pluggable management beans sample</a></li>
+	<li><a href="samples-pack/DataEncryption/Readme.php">Network data encryption sample</a></li>
+	<li><a href="samples-pack/StartupClasses/Readme.php">Customized server and node initialization sample</a></li>
+	<li><a href="samples-pack/MatrixMultiplication/Readme.php">Basic dense matrix multiplication parallelization sample</a></li>
+	<li><a href="samples-pack/DataDependency/Readme.php">Simulation of large portfolio updates</a></li>
+	<li><a href="samples-pack/NodeTray/Readme.php">JPPF node health monitor in the system tray</a></li>
+	<li><a href="samples-pack/CustomLoadBalancer/Readme.php">An example of a sophisticated load-balancer implementation</a></li>
 </ul>
 
 $template{name="about-page-footer"}$

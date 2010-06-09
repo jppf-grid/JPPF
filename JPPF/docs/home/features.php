@@ -4,10 +4,10 @@
 		<title>JPPF Features
 </title>
 		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
-		<meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
+		<meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, gloud, open source">
 		<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
-		<link rel="stylesheet" type="text/css" href="./jppf.css" title="Style">
+		<link rel="stylesheet" type="text/css" href="/jppf.css" title="Style">
 	</head>
 	<body>
 		<div align="center">
@@ -126,16 +126,11 @@
 				</tr>
 			</table>
 		<!--</div>-->
-			<!--
-			<table width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: white"><tr><td valign="middle" align="center" style="height: 30px; border: 1px solid #6D78B6; border-bottom: none">
-				<h4 style="color: #6D78B6; margin-top: 0px; margin-bottom: 0px">The Extensible Grid Computing Platform</h4>
-			</td></tr></table>
-			-->
 					<table border="0" cellspacing="0" cellpadding="5" width="100%px" style="border: 1px solid #6D78B6; border-top: 8px solid #6D78B6;">
 			<tr>
 				<td style="background-color: #FFFFFF">
 				<div class="sidebar">
-									<br>
+									<br/>
 															<?php
 											$itemClass = "";
 											if ($currentPage == "Home") $itemClass = 'aboutMenuItem';
@@ -150,39 +145,7 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="about.php" class="<?php echo $itemClass; ?>">&raquo; About</a><br>
-											</div>
-															<?php
-											$itemClass = "";
-											if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="release_notes.php?version=2.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
-											</div>
-															<?php
-											$itemClass = "";
-											if ($currentPage == "Features") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="features.php" class="<?php echo $itemClass; ?>">&raquo; Features</a><br>
-											</div>
-															<?php
-											$itemClass = "";
-											if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br>
-											</div>
-															<?php
-											$itemClass = "";
-											if ($currentPage == "Press") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br>
+											<a href="/about.php" class="<?php echo $itemClass; ?>">&raquo; About</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -190,7 +153,15 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="downloads.php" class="<?php echo $itemClass; ?>">&raquo; Download</a><br>
+											<a href="/downloads.php" class="<?php echo $itemClass; ?>">&raquo; Download</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Features") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/features.php" class="<?php echo $itemClass; ?>">&raquo; Features</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -207,15 +178,7 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="../samples-pack/index.html" class="<?php echo $itemClass; ?>">&raquo; Samples</a><br>
-											</div>
-															<?php
-											$itemClass = "";
-											if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br>
+											<a href="/samples-pack/index.php" class="<?php echo $itemClass; ?>">&raquo; Samples</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -223,7 +186,32 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br>
+											<a href="/license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br>
+											</div>
+				<hr/>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Press") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/release_notes.php?version=2.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -231,7 +219,7 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="screenshots.php" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br>
+											<a href="/screenshots.php" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -239,8 +227,26 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br>
+											<a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br>
 											</div>
+				<hr/>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Services") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/services.php" class="<?php echo $itemClass; ?>">&raquo; Services</a><br>
+											</div>
+				<br/>
 				</div>
 				<div class="content">
 <h1>JPPF 2.1 features</h1>
@@ -326,17 +332,17 @@
 </ul>
 <h3>Full fledged samples</h3>
 <ul>
-	<li><a href="samples-pack/Fractals/Readme.html">Mandelbrot / Julia set fractals generation</a></li>
-	<li><a href="samples-pack/SequenceAlignment/Readme.html">Protein and DNA sequence alignment</a></li>
-	<li><a href="samples-pack/WebSearchEngine/Readme.html">Distributed web crawler and search engine</a></li>
-	<li><a href="samples-pack/TomcatPort/Readme.html">Tomcat 5.5/6.0 port</a></li>
-	<li><a href="samples-pack/CustomMBeans/Readme.html">Pluggable management beans sample</a></li>
-	<li><a href="samples-pack/DataEncryption/Readme.html">Network data encryption sample</a></li>
-	<li><a href="samples-pack/StartupClasses/Readme.html">Customized server and node initialization sample</a></li>
-	<li><a href="samples-pack/MatrixMultiplication/Readme.html">Basic dense matrix multiplication parallelization sample</a></li>
-	<li><a href="samples-pack/DataDependency/Readme.html">Simulation of large portfolio updates</a></li>
-	<li><a href="samples-pack/NodeTray/Readme.html">JPPF node health monitor in the system tray</a></li>
-	<li><a href="samples-pack/CustomLoadBalancer/Readme.html">An example of a sophisticated load-balancer implementation</a></li>
+	<li><a href="samples-pack/Fractals/Readme.php">Mandelbrot / Julia set fractals generation</a></li>
+	<li><a href="samples-pack/SequenceAlignment/Readme.php">Protein and DNA sequence alignment</a></li>
+	<li><a href="samples-pack/WebSearchEngine/Readme.php">Distributed web crawler and search engine</a></li>
+	<li><a href="samples-pack/TomcatPort/Readme.php">Tomcat 5.5/6.0 port</a></li>
+	<li><a href="samples-pack/CustomMBeans/Readme.php">Pluggable management beans sample</a></li>
+	<li><a href="samples-pack/DataEncryption/Readme.php">Network data encryption sample</a></li>
+	<li><a href="samples-pack/StartupClasses/Readme.php">Customized server and node initialization sample</a></li>
+	<li><a href="samples-pack/MatrixMultiplication/Readme.php">Basic dense matrix multiplication parallelization sample</a></li>
+	<li><a href="samples-pack/DataDependency/Readme.php">Simulation of large portfolio updates</a></li>
+	<li><a href="samples-pack/NodeTray/Readme.php">JPPF node health monitor in the system tray</a></li>
+	<li><a href="samples-pack/CustomLoadBalancer/Readme.php">An example of a sophisticated load-balancer implementation</a></li>
 </ul>
 				</div>
 									</td>

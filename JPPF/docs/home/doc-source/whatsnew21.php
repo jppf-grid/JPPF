@@ -15,7 +15,7 @@ $template{name="about-page-header" title="What's new"}$
 		<h3>Load balancing</h3>
 		Custom load-balancers can now use information about the nodes' environment and configuration, along with metadata about the jobs.<br/>
 		This allows for sophisticated load-balancing implementations that can adapt to the capabilities of each node and the computational characteristics of each job.<br/>
-		A sophisticated and fully documented <a href="samples-pack/CustomLoadBalancer/Readme.html"><b>sample</b></a> illustrates these new capabilities and will get you started in no time.
+		A sophisticated and fully documented <a href="samples-pack/CustomLoadBalancer/Readme.php"><b>sample</b></a> illustrates these new capabilities and will get you started in no time.
 
 		<h3>Configuration</h3>
 		The managment port auto-incrementation enables servers and nodes to automatically find port available numbers, making JPPF configuration even easier and removing one the  main configuration hurdles.<br/>
@@ -24,9 +24,9 @@ $template{name="about-page-header" title="What's new"}$
 		<h3>New Samples</h3>
 		Three new samples complement our offering in the JPPF samples pack:
 		<ul>
-			<li><a href="samples-pack/DataDependency/Readme.html">Simulation of large portfolio updates</a></li>
-			<li><a href="samples-pack/NodeTray/Readme.html">JPPF node health monitor in the system tray</a></li>
-			<li><a href="samples-pack/CustomLoadBalancer/Readme.html">An example of a sophisticated load-balancer implementation</a></li>
+			<li><a href="samples-pack/DataDependency/Readme.php">Simulation of large portfolio updates</a></li>
+			<li><a href="samples-pack/NodeTray/Readme.php">JPPF node health monitor in the system tray</a></li>
+			<li><a href="samples-pack/CustomLoadBalancer/Readme.php">An example of a sophisticated load-balancer implementation</a></li>
 		</ul>
 
 		<h3>New Feature Requests</h3>
@@ -50,10 +50,6 @@ $template{name="about-page-header" title="What's new"}$
 			<li>2907258 - JMX initialization failure causes node to stop working</li>
 			<li>2907246 - Remote debugging is only possible on localhost</li>
 		</ul>
-
-		<h3></h3>
-
-		<h3></h3>
 
 	</div>
 	<br>

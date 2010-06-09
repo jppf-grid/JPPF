@@ -4,7 +4,7 @@
 		<title>JPPF What's new
 </title>
 		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
-		<meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
+		<meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, gloud, open source">
 		<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
 		<link rel="stylesheet" type="text/css" href="./jppf.css" title="Style">
@@ -135,7 +135,7 @@
 			<tr>
 				<td style="background-color: #FFFFFF">
 				<div class="sidebar">
-									<br>
+									<br/>
 															<?php
 											$itemClass = "";
 											if ($currentPage == "Home") $itemClass = 'aboutMenuItem';
@@ -154,11 +154,11 @@
 											</div>
 															<?php
 											$itemClass = "";
-											if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem';
+											if ($currentPage == "Download") $itemClass = 'aboutMenuItem';
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="release_notes.php?version=2.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
+											<a href="downloads.php" class="<?php echo $itemClass; ?>">&raquo; Download</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -167,30 +167,6 @@
 											?>
 											<div class="<?php echo $itemClass; ?>">
 											<a href="features.php" class="<?php echo $itemClass; ?>">&raquo; Features</a><br>
-											</div>
-															<?php
-											$itemClass = "";
-											if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br>
-											</div>
-															<?php
-											$itemClass = "";
-											if ($currentPage == "Press") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br>
-											</div>
-															<?php
-											$itemClass = "";
-											if ($currentPage == "Download") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="downloads.php" class="<?php echo $itemClass; ?>">&raquo; Download</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -211,19 +187,36 @@
 											</div>
 															<?php
 											$itemClass = "";
-											if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br>
-											</div>
-															<?php
-											$itemClass = "";
 											if ($currentPage == "License") $itemClass = 'aboutMenuItem';
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
 											<a href="license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br>
+											</div>
+				<hr/>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Press") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="release_notes.php?version=2.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -241,6 +234,24 @@
 											<div class="<?php echo $itemClass; ?>">
 											<a href="news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br>
 											</div>
+				<hr/>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br>
+											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Services") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="services.php" class="<?php echo $itemClass; ?>">&raquo; Services</a><br>
+											</div>
+				<br/>
 				</div>
 				<div class="content">
 	<div align="justify">

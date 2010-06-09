@@ -103,6 +103,16 @@
     <delete dir="${build}" quiet="true"/>
   </target>               
 
+  <target name="clean.all" depends="clean.deploy" description="">
+    <delete dir="${node}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${common}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${server}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${cient}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${admin}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${demo}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${jca-client}/classes" quiet="true" includes="**/*.*"/>
+  </target>               
+
   <target name="clean.deploy" description="clean the deploy folder">
     <delete dir="${deploy}" quiet="true"/>
 	  <delete dir="${runtime}" quiet="true"/>
@@ -139,12 +149,12 @@
 	<!-- ========================================================================= -->
 
   <target name="build" depends="init, compile, jar"/>
-	<target name="rebuild" depends="clean, init, compile, jar"/>
+	<target name="rebuild" depends="clean.all, init, compile, jar"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
-		depends="clean.deploy, rebuild, javadoc, init.deploy, jca, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer"/>
+		depends="clean.all, rebuild, javadoc, init.deploy, jca, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer"/>
 	<target name="deploy.nojavadoc"
-		depends="clean.deploy, rebuild,          init.deploy, jca, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer"/>
+		depends="clean.all, rebuild,          init.deploy, jca, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer"/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
@@ -360,7 +370,7 @@
 			</fileset>
 			<fileset dir="${lib}/log4j" includes="*.jar"/>
 			<fileset dir="${lib}/slf4j" includes="*.jar"/>
-		</copy>		
+		</copy>
     <delete dir="${application.template}/classes" quiet="true"/>
  		<mkdir dir="${application.template}/classes"/>
 		<javac srcdir="" destdir="${application.template}/classes"
@@ -644,12 +654,12 @@
 	<!--                     Build the web site content                            -->
 	<!-- ========================================================================= -->
 
-  <target name="doc" depends="doc.screenshots, doc.home, doc.home.2">
+  <target name="doc" depends="doc.screenshots, doc.home">
 	</target>
 
   <target name="doc.home" description="generates the project web site pages">
 		<antcall target="doc.gen">
-			<param name="source" value="${home}/doc-source"/>
+			<param name="source" value="${home}/doc-source/home"/>
 			<param name="dest" value="${home}/"/>
 			<param name="templates" value="${home}/templates/"/>
 		</antcall>
@@ -657,28 +667,16 @@
   	<!--<copy toDir="${home}/forums" file="${home}/jppf_header.php"/>-->
 	</target>
 
-  <target name="doc.home.1" description="generates the project web site pages">
-		<antcall target="doc.gen">
-			<param name="source" value="${home}/doc-source/v1"/>
-			<param name="dest" value="${home}/"/>
-			<param name="templates" value="${home}/templates/"/>
-		</antcall>
-	</target>
-
-  <target name="doc.home.2" description="generates the project web site pages">
-		<antcall target="doc.gen">
-			<param name="source" value="${home}/doc-source/v2"/>
-			<param name="dest" value="${home}/"/>
-			<param name="templates" value="${home}/templates/"/>
-		</antcall>
-	</target>
-
 	<target name="doc.gen" description="generates the project web site pages">
 		<java fork="yes" classname="org.jppf.doc.HtmlDocGenerator" classpathref="run.classpath">
 			<jvmarg value="-Xmx128m" />
+			<arg value="-s"/>
 			<arg value="${source}"/>
+			<arg value="-d"/>
 			<arg value="${dest}"/>
+			<arg value="-t"/>
 			<arg value="${templates}"/>
+			<arg value="-r"/>
 		</java>       
 	</target>
 
