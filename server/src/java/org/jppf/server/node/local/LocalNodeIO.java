@@ -18,9 +18,20 @@
 
 package org.jppf.server.node.local;
 
+import static java.nio.channels.SelectionKey.*;
+
+import java.io.InputStream;
+import java.util.*;
+import java.util.concurrent.*;
+
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.data.transform.JPPFDataTransformFactory;
+import org.jppf.io.*;
+import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.*;
+import org.jppf.server.protocol.*;
+import org.jppf.utils.MultipleBuffersInputStream;
 
 /**
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
@@ -62,5 +73,115 @@ public class LocalNodeIO extends AbstractNodeIO
 		node.setClassLoader(null);
 		node.initHelper();
 		socketWrapper.setSerializer(node.getHelper().getSerializer());
+	}
+
+	/**
+	 * {@inheritDoc}.
+	 */
+	protected Object[] deserializeObjects() throws Exception
+	{
+		if (debugEnabled) log.debug("waiting for next request");
+		LocalNodeWrapperHandler wrapper = (LocalNodeWrapperHandler) ioHandler;
+		wrapper.setReadyOps(OP_WRITE);
+		while (wrapper.getMessage() == null) wrapper.goToSleep();
+		LocalNodeMessage message = wrapper.getMessage();
+		DataLocation location = message.getLocations().get(0);
+		if (debugEnabled) log.debug("got bundle");
+		byte[] data = JPPFDataTransformFactory.transform(false, location.getInputStream());
+		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
+		return deserializeObjects(bundle);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
+	{
+		LocalNodeWrapperHandler wrapper = (LocalNodeWrapperHandler) ioHandler;
+		wrapper.setMessage(null);
+		ExecutorService executor = node.getExecutionManager().getExecutor();
+		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
+		bundle.setNodeExecutionTime(elapsed);
+		List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>();
+		futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
+		for (JPPFTask task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
+		LocalNodeContext ctx = wrapper.getChannel();
+		if (ctx.getNodeMessage() == null) ctx.setNodeMessage(ctx.newMessage(), wrapper);
+		for (Future<DataLocation> f: futureList)
+		{
+			DataLocation location = f.get();
+			ctx.getNodeMessage().addLocation(location);
+		}
+		wrapper.setReadyOps(OP_READ);
+		while (ctx.getNodeMessage() != null) wrapper.goToSleep();
+		//ioHandler.flush();
+	}
+
+	/**
+	 * The goal of this class is to serialize an object before sending it back to the server,
+	 * and catch an eventual exception.
+	 */
+	protected class ObjectSerializationTask implements Callable<DataLocation>
+	{
+		/**
+		 * The data to send over the network connection.
+		 */
+		private Object object = null;
+
+		/**
+		 * Initialize this task with the psecicfied data buffer.
+		 * @param object the object to serialize.
+		 */
+		public ObjectSerializationTask(Object object)
+		{
+			this.object = object;
+		}
+
+		/**
+		 * Execute this task.
+		 * @return the serialized object.
+		 */
+		public DataLocation call()
+		{
+			BufferList data = null;
+			int p = (object instanceof JPPFTask) ? ((JPPFTask) object).getPosition() : -1;
+			try
+			{
+				if (debugEnabled) log.debug("before serialization of object at position " + p);
+				data = serialize(object);
+				if (debugEnabled) log.debug("serialized object at position " + p);
+			}
+			catch(Throwable t)
+			{
+				data = null;
+				log.error(t.getMessage(), t);
+				try
+				{
+					JPPFExceptionResult result = new JPPFExceptionResult(t, object);
+					object = null;
+					result.setPosition(p);
+					data = serialize(result);
+				}
+				catch(Exception e2)
+				{
+					log.error(e2.getMessage(), e2);
+				}
+			}
+			object = null;
+			DataLocation location = null;
+			try
+			{
+				location = IOHelper.createDataLocationMemorySensitive(data.second());
+				InputStream is = new MultipleBuffersInputStream(data.first());
+				InputSource source = new StreamInputSource(is);
+				location.transferFrom(source, true);
+				int i=0;
+			}
+			catch(Throwable t)
+			{
+				log.error(t.getMessage(), t);
+			}
+			return location;
+		}
 	}
 }

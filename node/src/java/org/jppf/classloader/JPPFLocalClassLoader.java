@@ -17,10 +17,12 @@
  */
 package org.jppf.classloader;
 
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.IOHandler;
+import org.jppf.utils.FileUtils;
 
 /**
  * This class is a custom class loader serving the purpose of dynamically loading the JPPF classes and the client
@@ -90,5 +92,63 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	 */
 	public void close()
 	{
+	}
+
+	/**
+	 * Load a JPPF class from the server.
+	 * @param name the binary name of the class
+	 * @return the resulting <tt>Class</tt> object
+	 * @throws ClassNotFoundException if the class could not be found
+	 */
+	public synchronized Class<?> loadJPPFClass(String name) throws ClassNotFoundException
+	{
+		if (debugEnabled) log.debug("looking up resource [" + name + "]");
+		Class<?> c = findLoadedClass(name);
+		/*
+		if (c == null)
+		{
+			ClassLoader parent = getParent();
+			if (parent instanceof AbstractJPPFClassLoader) c = ((AbstractJPPFClassLoader) parent).findLoadedClass(name);
+		}
+		*/
+		if (c == null)
+		{
+			if (debugEnabled) log.debug("resource [" + name + "] not already loaded");
+			ClassLoader cl = this;
+			while (cl instanceof AbstractJPPFClassLoader) cl = cl.getParent();
+			if (cl != null)
+			{
+				int i = name.lastIndexOf('.');
+				if (i >= 0)
+				{
+					String pkgName = name.substring(0, i);
+					Package pkg = getPackage(pkgName);
+					if (pkg == null)
+					{
+						definePackage(pkgName, null, null, null, null, null, null, null);
+					}
+				}
+				String resName = name.replace(".", "/") + ".class";
+				InputStream is = cl.getResourceAsStream(resName);
+				try
+				{
+					byte[] definition = FileUtils.getInputStreamAsByte(is);
+					c = defineClass(name, definition, 0, definition.length);
+				}
+				catch(Exception e)
+				{
+					log.warn(e.getMessage(), e);
+				}
+			}
+		}
+		if (c == null)
+		{
+			c = findClass(name);
+		}
+		if (debugEnabled) log.debug("definition for resource [" + name + "] : " + c);
+		return c;
+		/*
+		return loadClass(name);
+		*/
 	}
 }

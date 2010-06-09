@@ -18,7 +18,7 @@
 package org.jppf.utils;
 
 import org.apache.commons.logging.*;
-import org.jppf.classloader.JPPFClassLoader;
+import org.jppf.classloader.*;
 
 /**
  * Collection of utility methods for serializing and deserializing to and from bytes buffers.
@@ -62,10 +62,10 @@ public class SerializationHelperImpl implements SerializationHelper
 		if (serializer == null)
 		{
 			ClassLoader cl = getClass().getClassLoader();
-			if (cl instanceof JPPFClassLoader)
+			if (cl instanceof AbstractJPPFClassLoader)
 			{
 				serializer = (ObjectSerializer)
-					((JPPFClassLoader) cl).loadJPPFClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
+					((AbstractJPPFClassLoader) cl).loadJPPFClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
 			}
 			else
 			{

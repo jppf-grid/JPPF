@@ -18,6 +18,7 @@
 
 package org.jppf.server.nio;
 
+
 /**
  * 
  * @author Laurent Cohen
@@ -43,7 +44,7 @@ public interface ChannelSelector
 	/**
 	 * Wake up this selector. If the selector was not engaged in a blocking operation, this method has no effect.
 	 */
-	void wakeup(); 
+	void wakeUp(); 
 	/**
 	 * Get the channel this selector is polling.
 	 * @return a {@link ChannelWrapper} instance.

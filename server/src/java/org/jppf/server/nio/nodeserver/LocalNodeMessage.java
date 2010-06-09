@@ -18,7 +18,12 @@
 
 package org.jppf.server.nio.nodeserver;
 
+import java.io.InputStream;
+
+import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.utils.*;
 
 /**
  * Node message implementation for an in-VM node.
@@ -27,50 +32,40 @@ import org.jppf.server.nio.ChannelWrapper;
 public class LocalNodeMessage extends AbstractNodeMessage
 {
 	/**
-	 * Read the next serializable object from the specified channel.
-	 * @param wrapper the channel to read from.
-	 * @return true if the object has been completely read from the channel, false otherwise.
-	 * @throws Exception if an IO error occurs.
+	 * {@inheritDoc}
+	 */
+	public boolean read(ChannelWrapper<?> wrapper) throws Exception
+	{
+		InputStream is = locations.get(0).getInputStream();
+		byte[] data = FileUtils.getInputStreamAsByte(is);
+		data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
+		SerializationHelper helper = new SerializationHelperImpl();
+		bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
 	 */
 	protected synchronized boolean readNextObject(ChannelWrapper<?> wrapper) throws Exception
 	{
-		while (locations.size() <= position) goToSleep();
-		position++;
 		return true;
 	}
 
 	/**
-	 * Write the next object to the specified channel.
-	 * @param wrapper the channel to write to.
-	 * @return true if the object has been completely written the channel, false otherwise.
-	 * @throws Exception if an IO error occurs.
+	 * {@inheritDoc}
+	 */
+	public boolean write(ChannelWrapper<?> wrapper) throws Exception
+	{
+		((LocalNodeWrapperHandler) wrapper).wakeUp();
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
 	 */
 	protected boolean writeNextObject(ChannelWrapper<?> wrapper) throws Exception
 	{
-		LocalNodeWrapperHandler wrapperHandler = (LocalNodeWrapperHandler) wrapper;
-		wrapperHandler.wakeUp();
 		return true;
-	}
-
-	/**
-	 * Cause the current thread to wait until notified.
-	 */
-	public synchronized void goToSleep()
-	{
-		try
-		{
-			wait();
-		}
-		catch(InterruptedException ignored)
-		{
-		}
-	}
-
-	/**
-	 * Notify the threads currently waiting on this object that they can resume.
-	 */
-	public synchronized void wakeUp()
-	{
-		notifyAll();
 	}
 }

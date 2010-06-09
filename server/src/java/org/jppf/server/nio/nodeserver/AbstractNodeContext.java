@@ -194,8 +194,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	/**
 	 * Set the message wrapping the data sent or received over the socket channel.
 	 * @param nodeMessage a {@link RemoteNodeMessage NodeMessage} instance.
+	 * @param channel reference to the channel.
 	 */
-	public void setNodeMessage(AbstractNodeMessage nodeMessage)
+	public void setNodeMessage(AbstractNodeMessage nodeMessage, ChannelWrapper<?> channel)
 	{
 		this.nodeMessage = nodeMessage;
 	}

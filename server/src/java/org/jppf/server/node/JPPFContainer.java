@@ -46,15 +46,15 @@ public class JPPFContainer
 	/**
 	 * Utility for deserialization and serialization.
 	 */
-	private SerializationHelper helper = null;
+	protected SerializationHelper helper = null;
 	/**
 	 * Class loader used for dynamic loading and updating of client classes.
 	 */
-	private AbstractJPPFClassLoader classLoader = null;
+	protected AbstractJPPFClassLoader classLoader = null;
 	/**
 	 * The unique identifier for the submitting application.
 	 */
-	private List<String> uuidPath = new ArrayList<String>();
+	protected List<String> uuidPath = new ArrayList<String>();
 
 	/**
 	 * Initialize this container with a specified application uuid.
@@ -240,8 +240,10 @@ public class JPPFContainer
 		 */
 		public Object call()
 		{
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
 			try
 			{
+				Thread.currentThread().setContextClassLoader(getClassLoader());
 				if (debugEnabled) log.debug("deserializing object index = " + index);
 				buffer = JPPFDataTransformFactory.transform(false, buffer);
 				Object o = helper.getSerializer().deserialize(buffer);
@@ -256,6 +258,7 @@ public class JPPFContainer
 			finally
 			{
 				buffer = null;
+				Thread.currentThread().setContextClassLoader(cl);
 			}
 			return null;
 		}

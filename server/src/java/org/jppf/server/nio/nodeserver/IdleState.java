@@ -23,7 +23,7 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.TO_IDLE;
 import java.net.ConnectException;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.*;
 
 /**
  * This class represents the state of waiting for some action.
@@ -70,7 +70,7 @@ class IdleState extends NodeServerState
 				log.debug("readable channel: read " + n + " bytes");
 			}
 			*/
-			throw new ConnectException("node " + wrapper + " has been disconnected");
+			if (!(wrapper instanceof LocalNodeWrapperHandler)) throw new ConnectException("node " + wrapper + " has been disconnected");
 		}
 		return TO_IDLE;
 	}

@@ -133,4 +133,21 @@ public class JPPFDataTransformFactory
 		JPPFDataTransform dataTransform = createInstance();
 		return dataTransform == null ? data : transform(dataTransform, normal, data, 0, data.length);
 	}
+
+	/**
+	 * Transform the specified data using a new data transformation instance.
+	 * @param normal true to wrap the data, false to unwrap it.
+	 * @param is the data to transform.
+	 * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
+	 * @throws Exception if any error occurs while transforming the data.
+	 */
+	public static byte[] transform(boolean normal, InputStream is) throws Exception
+	{
+		JPPFDataTransform dataTransform = createInstance();
+		if (dataTransform == null) return FileUtils.getInputStreamAsByte(is);
+		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
+		if (normal) dataTransform.wrap(is, mbos);
+		else dataTransform.unwrap(is, mbos);
+		return mbos.toByteArray();
+	}
 }

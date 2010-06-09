@@ -18,6 +18,8 @@
 
 package org.jppf.server.nio.nodeserver;
 
+import org.apache.commons.logging.*;
+import org.jppf.server.nio.ChannelWrapper;
 
 
 /**
@@ -27,10 +29,50 @@ package org.jppf.server.nio.nodeserver;
 public class LocalNodeContext extends AbstractNodeContext
 {
 	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(LocalNodeContext.class);
+	/**
+	 * Determines whether DEBUG logging level is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+
+	/**
 	 * {@inheritDoc}.
 	 */
 	public AbstractNodeMessage newMessage()
 	{
 		return new LocalNodeMessage();
+	}
+
+	/**
+	 * Serialize this context's bundle into a byte buffer.
+	 * @param channel channel wrapper for this context.
+	 * @throws Exception if any error occurs.
+	 */
+	public void serializeBundle(ChannelWrapper<?> channel) throws Exception
+	{
+		//if (nodeMessage == null)
+		super.serializeBundle(channel);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
+	{
+		boolean b = super.writeMessage(channel);
+		if (debugEnabled) log.debug("wrote " + nodeMessage + " to " + channel);
+		((LocalNodeWrapperHandler) channel).setMessage((LocalNodeMessage) nodeMessage);
+		return b;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setNodeMessage(AbstractNodeMessage nodeMessage, ChannelWrapper<?> channel)
+	{
+		super.setNodeMessage(nodeMessage, channel);
+		((LocalNodeWrapperHandler) channel).wakeUp();
 	}
 }

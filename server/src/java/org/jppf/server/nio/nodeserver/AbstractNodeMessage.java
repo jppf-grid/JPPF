@@ -77,6 +77,7 @@ public abstract class AbstractNodeMessage
 	{
 		if (nbObjects <= 0)
 		{
+			if (position != 0) position = 0;
 			if (!readNextObject(wrapper)) return false;
 			InputStream is = locations.get(0).getInputStream();
 			byte[] data = FileUtils.getInputStreamAsByte(is);
@@ -111,6 +112,7 @@ public abstract class AbstractNodeMessage
 		if (nbObjects <= 0)
 		{
 			nbObjects = bundle.getTaskCount() + 2;
+			position = 0;
 		}
 		//if (!writeLength(channel)) return false;
 		while (position < nbObjects)
@@ -162,5 +164,20 @@ public abstract class AbstractNodeMessage
 	public void setBundle(JPPFTaskBundle bundle)
 	{
 		this.bundle = bundle;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("[");
+		sb.append("nb locations=").append(locations == null ? -1 : locations.size());
+		sb.append(", position=").append(position);
+		sb.append(", nbObjects=").append(nbObjects);
+		sb.append(", length=").append(length);
+		sb.append(", count=").append(count);
+		sb.append("]");
+		return sb.toString();
 	}
 }

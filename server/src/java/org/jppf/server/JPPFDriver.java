@@ -157,7 +157,8 @@ public class JPPFDriver
 		nodeNioServer.start();
 		printInitializedMessage(info.nodeServerPorts, "Tasks Server");
 
-		if (JPPFConfiguration.getProperties().getBoolean("jppf.local.node.enabled", false))
+		TypedProperties config = JPPFConfiguration.getProperties();
+		if (config.getBoolean("jppf.local.node.enabled", false))
 		{
 			LocalClassLoaderWrapperHandler localClassChannel = new LocalClassLoaderWrapperHandler(new LocalClassContext());
 			LocalNodeWrapperHandler localNodeChannel = new LocalNodeWrapperHandler(new LocalNodeContext());
@@ -169,7 +170,7 @@ public class JPPFDriver
 		
 		try
 		{
-			if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
+			if (config.getBoolean("jppf.management.enabled", true))
 			{
 				jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX);
 				jmxServer.start(getClass().getClassLoader());
@@ -181,7 +182,7 @@ public class JPPFDriver
 		catch(Exception e)
 		{
 			log.error(e.getMessage(), e);
-			JPPFConfiguration.getProperties().setProperty("jppf.management.enabled", "false");
+			config.setProperty("jppf.management.enabled", "false");
 			String s = e.getMessage();
 			s = (s == null) ? "<none>" : s.replace("\t", "  ").replace("\n", " - ");
 			System.out.println("JPPF Driver management failed to initialize, with error message: '" + s + "'");
@@ -189,7 +190,7 @@ public class JPPFDriver
 		}
 		new JPPFStartupLoader<JPPFDriverStartupSPI>().load(JPPFDriverStartupSPI.class);
 
-		if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true))
+		if (config.getBoolean("jppf.discovery.enabled", true))
 		{
 			broadcaster = new JPPFBroadcaster(info);
 			new Thread(broadcaster, "JPPF Broadcaster").start();

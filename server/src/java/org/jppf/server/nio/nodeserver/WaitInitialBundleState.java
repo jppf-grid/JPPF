@@ -63,7 +63,7 @@ class WaitInitialBundleState extends NodeServerState
 	{
 		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
 		if (debugEnabled) log.debug("exec() for " + wrapper);
-		if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage());
+		if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage(), wrapper);
 		if (context.readMessage(wrapper))
 		{
 			if (debugEnabled) log.debug("read bundle for " + wrapper + " done");
@@ -93,7 +93,7 @@ class WaitInitialBundleState extends NodeServerState
 				}
 			}
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
-			context.setNodeMessage(null);
+			context.setNodeMessage(null, wrapper);
 			context.setBundle(null);
 			server.addIdleChannel(wrapper);
 			return TO_IDLE;

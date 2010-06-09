@@ -36,9 +36,9 @@ public abstract class SimpleNioContext<S extends Enum> extends AbstractNioContex
 	 */
 	protected static Log log = LogFactory.getLog(SimpleNioContext.class);
 	/**
-	 * Determines whther DEBUG logging level is enabled.
+	 * Determines whther TRACE logging level is enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	protected static boolean traceEnabled = log.isTraceEnabled();
 
 	/**
 	 * Read data from a channel.
@@ -57,9 +57,9 @@ public abstract class SimpleNioContext<S extends Enum> extends AbstractNioContex
 			readByteCount = 0;
 		}
 		readByteCount += channel.read(message.buffer);
-		if (debugEnabled)
+		if (traceEnabled)
 		{
-			log.debug("[" + getShortClassName() + "] " + "read " + readByteCount + " bytes out of " +
+			log.trace("[" + getShortClassName() + "] " + "read " + readByteCount + " bytes out of " +
 				message.length + " for " + StringUtils.getRemoteHost((SocketChannel) channel));
 		}
 		return readByteCount >= message.length;
@@ -81,9 +81,9 @@ public abstract class SimpleNioContext<S extends Enum> extends AbstractNioContex
 			writeByteCount = 0;
 		}
 		writeByteCount += channel.write(message.buffer);
-		if (debugEnabled)
+		if (traceEnabled)
 		{
-			log.debug("[" + getShortClassName() + "] " + "written " + writeByteCount + " bytes out of " +
+			log.trace("[" + getShortClassName() + "] " + "written " + writeByteCount + " bytes out of " +
 				message.length + " for " + StringUtils.getRemoteHost((SelectableChannel) channel));
 		}
 		return writeByteCount >= message.length;

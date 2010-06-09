@@ -21,11 +21,12 @@ package org.jppf.classloader;
 import static java.nio.channels.SelectionKey.*;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.IOHandler;
 import org.jppf.server.nio.*;
-import org.jppf.utils.JPPFBuffer;
+import org.jppf.utils.*;
 
 /**
  * Channel wrapper and I/O implementation for the class loader of an in-VM node.
@@ -38,17 +39,21 @@ public class LocalClassLoaderWrapperHandler extends AbstractChannelWrapper<Abstr
 	 */
 	static Log log = LogFactory.getLog(LocalClassLoaderWrapperHandler.class);
 	/**
-	 * Determines whether debug-level logging is enabled.
+	 * Determines whether trace-level logging is enabled.
 	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
 	 * This channel's key ops.
 	 */
-	private int keyOps = 0;
+	private AtomicInteger keyOps = new AtomicInteger(0);
 	/**
 	 * This channel's ready ops.
 	 */
-	private int readyOps = 0;
+	private AtomicInteger readyOps = new AtomicInteger(0);
+	/**
+	 * The mesage currently being read.
+	 */
+	private NioMessage message = null;
 
 	/**
 	 * Initialize this I/O handler with the specified context.
@@ -57,6 +62,7 @@ public class LocalClassLoaderWrapperHandler extends AbstractChannelWrapper<Abstr
 	public LocalClassLoaderWrapperHandler(AbstractNioContext context)
 	{
 		super(context);
+		if (traceEnabled) log.trace("created " + this); 
 	}
 
 	/**
@@ -70,41 +76,38 @@ public class LocalClassLoaderWrapperHandler extends AbstractChannelWrapper<Abstr
 	/**
 	 * {@inheritDoc}
 	 */
-	public synchronized int getKeyOps()
+	public int getKeyOps()
 	{
-		return keyOps;
+		return keyOps.get();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public synchronized void setKeyOps(int keyOps)
+	public void setKeyOps(int keyOps)
 	{
-		// to avoid exception when testing isReadable() when channel is write-ready.
-		//if ((keyOps & OP_WRITE) != 0) readyOps = keyOps & ~OP_READ;
-		if ((keyOps & OP_WRITE) != 0) readyOps &= ~OP_READ;
-		this.keyOps = keyOps;
-		if (debugEnabled) log.debug("readyOps = " + readyOps + ", keyOps = " + keyOps);
-		if (getSelector() != null) getSelector().wakeup();
+		this.keyOps.set(keyOps);
+		if (traceEnabled) log.trace("readyOps = " + readyOps + ", keyOps = " + keyOps);
+		if (getSelector() != null) getSelector().wakeUp();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public synchronized int getReadyOps()
+	public int getReadyOps()
 	{
-		return this.readyOps;
+		return readyOps.get();
 	}
 
 	/**
 	 * Set the operations for which this channel is ready.
 	 * @param readyOps the bitwise operations as an int value.
 	 */
-	protected synchronized void setReadyOps(int readyOps)
+	protected void setReadyOps(int readyOps)
 	{
-		this.readyOps = readyOps;
-		if (debugEnabled) log.debug("readyOps = " + readyOps + ", keyOps = " + keyOps);
-		if (getSelector() != null) getSelector().wakeup();
+		this.readyOps.set(readyOps);
+		if (traceEnabled) log.debug("readyOps = " + readyOps + ", keyOps = " + keyOps);
+		if (selector != null) selector.wakeUp();
 	}
 
 	/**
@@ -121,11 +124,13 @@ public class LocalClassLoaderWrapperHandler extends AbstractChannelWrapper<Abstr
 	{
 		setReadyOps(OP_WRITE);
 		AbstractNioContext context = getChannel();
-		while ((context.getMessage() == null) || !context.getMessage().lengthWritten ||
-			(context.writeByteCount < context.getMessage().length)) goToSleep();
-		//while (readPosition >= channel.getNodeMessage().getLocations().size()) goToSleep();
-		NioMessage message = context.getMessage();
-		setReadyOps(0);
+		//NioMessage message = context.getMessage();
+		while ((message == null) || !message.lengthWritten || (context.writeByteCount < message.length))
+		{
+			goToSleep();
+			//message = context.getMessage();
+		}
+		if (traceEnabled) log.trace("read " + message);
 		return new JPPFBuffer(message.buffer.array(), message.length);
 	}
 
@@ -134,14 +139,21 @@ public class LocalClassLoaderWrapperHandler extends AbstractChannelWrapper<Abstr
 	 */
 	public void write(byte[] data, int offset, int len) throws Exception
 	{
+		if (traceEnabled) log.trace("" + this + " writing data length = " + len + " offset = " + offset);
+		this.message = null;
 		AbstractNioContext context = getChannel();
 		if (context.getMessage() == null) context.setMessage(new NioMessage());
 		NioMessage message = context.getMessage();
 		message.length = len;
-		message.lengthWritten = true;
 		message.buffer = ByteBuffer.wrap(data, offset, len);
+		message.buffer.position(len);
 		context.readByteCount = len;
+		if (traceEnabled) log.trace("" + this + " written " + message);
 		setReadyOps(OP_READ);
+		wakeUp();
+		goToSleep();
+		//Thread.sleep(100);
+		//wakeUp();
 	}
 
 	/**
@@ -152,33 +164,20 @@ public class LocalClassLoaderWrapperHandler extends AbstractChannelWrapper<Abstr
 	}
 
 	/**
-	 * Cause the current thread to wait until notified.
+	 * Get the message currently being read.
+	 * @return a {@link NioMessage} instance.
 	 */
-	public synchronized void goToSleep()
+	public NioMessage getMessage()
 	{
-		try
-		{
-			wait();
-		}
-		catch(InterruptedException ignored)
-		{
-		}
+		return message;
 	}
 
 	/**
-	 * Notify the threads currently waiting on this object that they can resume.
+	 * Set the message currently being read.
+	 * @param message a {@link NioMessage} instance.
 	 */
-	public synchronized void wakeUp()
+	public void setMessage(NioMessage message)
 	{
-		notifyAll();
-	}
-
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String toString()
-	{
-		return LocalClassLoaderWrapperHandler.class.getSimpleName() + ":" + id;
+		this.message = message;
 	}
 }

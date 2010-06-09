@@ -61,7 +61,7 @@ class SendingBundleState extends NodeServerState
 		//if (debugEnabled) log.debug("exec() for " + getRemostHost(channel));
 		if (wrapper.isReadable())
 		{
-			throw new ConnectException("node " + wrapper + " has been disconnected");
+			if (!(wrapper instanceof LocalNodeWrapperHandler)) throw new ConnectException("node " + wrapper + " has been disconnected");
 		}
 
 		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
@@ -93,7 +93,7 @@ class SendingBundleState extends NodeServerState
 		if (context.writeMessage(wrapper))
 		{
 			if (debugEnabled) log.debug("sent entire bundle to node " + wrapper);
-			context.setNodeMessage(null);
+			context.setNodeMessage(null, wrapper);
 			//JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
 			return TO_WAITING;
 		}

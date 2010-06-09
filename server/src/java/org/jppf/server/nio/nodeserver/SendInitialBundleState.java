@@ -60,7 +60,7 @@ class SendInitialBundleState extends NodeServerState
 		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		if (wrapper.isReadable())
 		{
-			throw new ConnectException("node " + wrapper + " has been disconnected");
+			if (!(wrapper instanceof LocalNodeWrapperHandler)) throw new ConnectException("node " + wrapper + " has been disconnected");
 		}
 
 		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
@@ -72,7 +72,7 @@ class SendInitialBundleState extends NodeServerState
 		if (context.writeMessage(wrapper))
 		{
 			if (debugEnabled) log.debug("sent entire initial bundle for " + wrapper);
-			context.setNodeMessage(null);
+			context.setNodeMessage(null, wrapper);
 			context.setBundle(null);
 			return TO_WAIT_INITIAL;
 		}

@@ -22,12 +22,14 @@ import static java.nio.channels.SelectionKey.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jppf.utils.ThreadSynchronization;
+
 /**
  * Wraps a communication channel, no matter what the channel is.
  * @param <S> the type of wrapped channel.
  * @author Laurent Cohen
  */
-public abstract class AbstractChannelWrapper<S> implements ChannelWrapper<S>
+public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization implements ChannelWrapper<S>
 {
 	/**
 	 * Count of instances of this class.
@@ -109,13 +111,11 @@ public abstract class AbstractChannelWrapper<S> implements ChannelWrapper<S>
 	}
 
 	/**
-	 * Generate a string that represents this channel wrapper.
-	 * @return a string that represents this channel wrapper.
-	 * @see java.lang.Object#toString()
+	 * {@inheritDoc}
 	 */
 	public String toString()
 	{
-		return "" + channel;
+		return getClass().getSimpleName() + "[id=" + id + ", readyOps=" + getReadyOps() + ", keyOps=" + getKeyOps() + "]";
 	}
 
 	/**

@@ -141,13 +141,16 @@ public abstract class AbstractNodeIO implements NodeIO
 	 * @return an array of objects deserialized from the socket stream.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	protected Object[] deserializeObjects() throws Exception
+	protected abstract Object[] deserializeObjects() throws Exception;
+
+	/**
+	 * Perform the deserialization of the objects received through the socket connection.
+	 * @param bundle the message header that contains information about the tasks and data provider.
+	 * @return an array of objects deserialized from the socket stream.
+	 * @throws Exception if an error occurs while deserializing.
+	 */
+	protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
 	{
-		if (debugEnabled) log.debug("waiting for next request");
-		byte[] data = ioHandler.read().getBuffer();
-		if (debugEnabled) log.debug("got bundle");
-		data = JPPFDataTransformFactory.transform(false, data);
-		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
 		List<Object> list = new ArrayList<Object>();
 		list.add(bundle);
 		try
@@ -262,30 +265,30 @@ public abstract class AbstractNodeIO implements NodeIO
 			object = null;
 			return data;
 		}
+	}
 
-		/**
-		 * Serialize the specified object
-		 * @param o the object to serialize.
-		 * @return the serialized object as an array of bytes.
-		 * @throws Exception if any error occurs.
-		 */
-		private BufferList serialize(Object o) throws Exception
+	/**
+	 * Serialize the specified object
+	 * @param o the object to serialize.
+	 * @return the serialized object as an array of bytes.
+	 * @throws Exception if any error occurs.
+	 */
+	protected BufferList serialize(Object o) throws Exception
+	{
+		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
+		node.getHelper().getSerializer().serialize(o, mbos);
+		List<JPPFBuffer> data = mbos.toBufferList();
+		int length = mbos.size();
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		if (transform != null)
 		{
-			MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
-			node.getHelper().getSerializer().serialize(o, mbos);
-			List<JPPFBuffer> data = mbos.toBufferList();
-			int length = mbos.size();
-			JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-			if (transform != null)
-			{
-				MultipleBuffersInputStream mbis = new MultipleBuffersInputStream(mbos.toBufferList());
-				mbos = new MultipleBuffersOutputStream();
-				transform.wrap(mbis, mbos);
-				data = mbos.toBufferList();
-				length = mbos.size();
-			}
-			return new BufferList(data, length);
+			MultipleBuffersInputStream mbis = new MultipleBuffersInputStream(mbos.toBufferList());
+			mbos = new MultipleBuffersOutputStream();
+			transform.wrap(mbis, mbos);
+			data = mbos.toBufferList();
+			length = mbos.size();
 		}
+		return new BufferList(data, length);
 	}
 
 	/**

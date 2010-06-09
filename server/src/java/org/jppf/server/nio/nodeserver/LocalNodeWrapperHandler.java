@@ -18,16 +18,12 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import static java.nio.channels.SelectionKey.*;
-
-import java.io.InputStream;
-import java.util.concurrent.atomic.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.IOHandler;
-import org.jppf.io.*;
 import org.jppf.server.nio.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
 
 /**
  * Wrapper implementation for a local node's communication channel.
@@ -40,21 +36,17 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	 */
 	private static Log log = LogFactory.getLog(LocalNodeWrapperHandler.class);
 	/**
-	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+	 * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	protected static boolean traceEnabled = log.isTraceEnabled();
 	/**
 	 * This channel's key ops.
 	 */
-	private int keyOps = 0;
+	private AtomicInteger keyOps = new AtomicInteger(0);
 	/**
 	 * This channel's ready ops.
 	 */
-	private int readyOps = 0;
-	/**
-	 * Determines whether this handler has data to read.
-	 */
-	private AtomicBoolean readable = new AtomicBoolean(false);
+	private AtomicInteger readyOps = new AtomicInteger(0);
 	/**
 	 * Position of the next block of data to be read by the node.
 	 */
@@ -64,13 +56,9 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	 */
 	private int writePosition = 0;
 	/**
-	 * The current object being read or written.
+	 * The message currently being read.
 	 */
-	private DataLocation currentLocation = null;
-	/**
-	 * Count of bytes read or written in the current data location.
-	 */
-	private int currentCount = 0;
+	private LocalNodeMessage message = null;
 
 	/**
 	 * Initialize this channel wrapper with the specified node context.
@@ -79,6 +67,7 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	public LocalNodeWrapperHandler(LocalNodeContext context)
 	{
 		super(context);
+		if (traceEnabled) log.trace("created " + this); 
 	}
 
 	/**
@@ -92,20 +81,19 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	/**
 	 * {@inheritDoc}
 	 */
-	public synchronized int getKeyOps()
+	public int getKeyOps()
 	{
-		return keyOps;
+		return keyOps.get();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public synchronized void setKeyOps(int keyOps)
+	public void setKeyOps(int keyOps)
 	{
-		// to avoid exception when testing isReadable() when channel is write-ready.
-		if ((keyOps & OP_WRITE) != 0) readyOps = keyOps & ~OP_READ;
-		this.keyOps = keyOps;
-		if (getSelector() != null) getSelector().wakeup();
+		this.keyOps.set(keyOps);
+		if (traceEnabled) log.trace("readyOps = " + readyOps + ", keyOps = " + keyOps);
+		if (getSelector() != null) getSelector().wakeUp();
 	}
 
 	/**
@@ -113,17 +101,18 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	 */
 	public synchronized int getReadyOps()
 	{
-		return this.readyOps;
+		return readyOps.get();
 	}
 
 	/**
 	 * Set the operations for which this channel is ready.
 	 * @param readyOps the bitwise operations as an int value.
 	 */
-	protected synchronized void setReadyOps(int readyOps)
+	public synchronized void setReadyOps(int readyOps)
 	{
-		this.readyOps = readyOps;
-		if (getSelector() != null) getSelector().wakeup();
+		this.readyOps.set(readyOps);
+		if (traceEnabled) log.trace("readyOps = " + readyOps + ", keyOps = " + keyOps);
+		if (getSelector() != null) getSelector().wakeUp();
 	}
 
 	/**
@@ -138,13 +127,17 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	 */
 	public JPPFBuffer read() throws Exception
 	{
-		//while (!readable.get()) goToSleep();
+		/*
+		writePosition = 0;
 		setReadyOps(OP_WRITE);
-		while (readPosition >= channel.getNodeMessage().getLocations().size()) goToSleep();
-		readPosition++;
-		DataLocation dl = getChannel().getNodeMessage().getLocations().get(readPosition);
+		if (traceEnabled) log.trace("" + this + " reading data, message = " + message);
+		while ((message == null) || message.isReading() || (readPosition >= message.getLocations().size())) goToSleep();
+		DataLocation dl = message.getLocations().get(readPosition++);
+		if (traceEnabled) log.trace("" + this + " data received, size = " + dl.getSize() + ", message = " + message);
 		InputStream is = dl.getInputStream();
 		return new JPPFBuffer(FileUtils.getInputStreamAsByte(is), dl.getSize());
+		*/
+		return null;
 	}
 
 	/**
@@ -152,12 +145,21 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	 */
 	public void write(byte[] data, int offset, int len) throws Exception
 	{
+		/*
+		readPosition = 0;
+		message = null;
+		if (channel.getNodeMessage() == null) channel.setNodeMessage(new LocalNodeMessage());
+		LocalNodeMessage message = (LocalNodeMessage) channel.getNodeMessage();
+		if (writePosition <= 0) message.getLocations().clear();
+		if (traceEnabled) log.trace("" + this + " writing data length = " + len + " offset = " + offset);
 		InputSource is = new ByteBufferInputSource(data, offset, len);
-		currentLocation = IOHelper.createDataLocationMemorySensitive(len);
-		int n = currentLocation.transferFrom(is, true);
-		getChannel().getNodeMessage().addLocation(currentLocation);
-		((LocalNodeMessage) getChannel().getNodeMessage()).wakeUp();
+		DataLocation location = IOHelper.createDataLocationMemorySensitive(len);
+		int n = location.transferFrom(is, true);
+		message.addLocation(location);
+		writePosition++;
 		setReadyOps(OP_READ);
+		wakeUp();
+		*/
 	}
 
 	/**
@@ -165,36 +167,32 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	 */
 	public void writeInt(int value) throws Exception
 	{
-		currentCount = 0;
 	}
 
 	/**
-	 * Cause the current thread to wait until notified.
+	 * Get the message currently being read.
+	 * @return an {@link AbstractNodeMessage} instance.
 	 */
-	public synchronized void goToSleep()
+	public synchronized LocalNodeMessage getMessage()
 	{
-		try
+		return message;
+	}
+
+	/**
+	 * Set the message currently being read.
+	 * @param message an {@link AbstractNodeMessage} instance.
+	 */
+	public synchronized void setMessage(LocalNodeMessage message)
+	{
+		log.trace("setting message " + message);
+		/*
+		if (message == null)
 		{
-			wait();
+			Exception e = new Exception("debug stack");
+			log.trace(e.getMessage(), e);
 		}
-		catch(InterruptedException ignored)
-		{
-		}
-	}
-
-	/**
-	 * Notify the threads currently waiting on this object that they can resume.
-	 */
-	public synchronized void wakeUp()
-	{
-		notifyAll();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String toString()
-	{
-		return this.getClass().getSimpleName() + ":" + id;
+		*/
+		this.message = message;
+		wakeUp();
 	}
 }

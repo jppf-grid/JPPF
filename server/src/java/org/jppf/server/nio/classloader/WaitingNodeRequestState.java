@@ -82,7 +82,7 @@ class WaitingNodeRequestState extends ClassServerState
 			}
 			if (debugEnabled) log.debug("resource [" + name + "] not found for node: " + wrapper);
 			resource.setDefinition(null);
-			context.serializeResource();
+			context.serializeResource(wrapper);
 			return TO_SENDING_NODE_RESPONSE;
 		}
 		return TO_WAITING_NODE_REQUEST;
@@ -137,7 +137,7 @@ class WaitingNodeRequestState extends ClassServerState
 				if (list != null)
 				{
 					resource.setData("resource_list", list);
-					context.serializeResource();
+					context.serializeResource(wrapper);
 					t = TO_SENDING_NODE_RESPONSE;
 				}
 				if (debugEnabled) log.debug("multiple resources " + (list != null ? "" : "not ") + "found [" + name + "] in driver's classpath for node: " + wrapper);
@@ -154,7 +154,7 @@ class WaitingNodeRequestState extends ClassServerState
 					if (debugEnabled) log.debug("resource " + (b == null ? "not " : "") + "found [" + name + "] in the driver's classpath for node: " + wrapper);
 					if ((b != null) && !alreadyInCache) server.setCacheContent(driver.getUuid(), name, b);
 					resource.setDefinition(b);
-					context.serializeResource();
+					context.serializeResource(wrapper);
 					t = TO_SENDING_NODE_RESPONSE;
 				}
 			}
@@ -182,7 +182,7 @@ class WaitingNodeRequestState extends ClassServerState
 		{
 			if (debugEnabled) log.debug("found cached resource [" + name + "] for node: " + wrapper);
 			resource.setDefinition(b);
-			context.serializeResource();
+			context.serializeResource(wrapper);
 			t = TO_SENDING_NODE_RESPONSE;
 		}
 		else

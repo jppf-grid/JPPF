@@ -78,7 +78,7 @@ public class JPPFLocalNode extends JPPFNode
 
 	/**
 	 * @param uuidPath the uuid path containing the key to the container.
-	 * Instatiate the callback used to create the class loader in each {@link JPPFContainer}.
+	 * Instatiate the callback used to create the class loader in each {@link JPPFLocalContainer}.
 	 * @return a {@link Callable} instance.
 	 */
 	protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
@@ -87,7 +87,7 @@ public class JPPFLocalNode extends JPPFNode
 		{
 			public AbstractJPPFClassLoader call()
 			{
-				return new JPPFLocalClassLoader(getClass().getClassLoader(), uuidPath);
+				return new JPPFLocalClassLoader(getClassLoader(), uuidPath);
 			}
 		};
 	}
@@ -99,5 +99,13 @@ public class JPPFLocalNode extends JPPFNode
 	public LocalNodeWrapperHandler getHandler()
 	{
 		return handler;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception
+	{
+		return new JPPFLocalContainer(uuidPath, cl);
 	}
 }

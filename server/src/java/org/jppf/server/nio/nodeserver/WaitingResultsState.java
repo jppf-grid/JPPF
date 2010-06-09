@@ -64,7 +64,7 @@ class WaitingResultsState extends NodeServerState
 
 		// Wait the full byte[] of the bundle come to start processing.
 		// This makes the integration of non-blocking with ObjectInputStream easier.
-		if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage());
+		if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage(), wrapper);
 		if (context.readMessage(wrapper))
 		{
 			if (debugEnabled) log.debug("read bundle from node " + wrapper + " done");
@@ -104,7 +104,7 @@ class WaitingResultsState extends NodeServerState
 			if ((systemInfo != null) && (bundler instanceof NodeAwareness)) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
 			// there is nothing left to do, so this instance will wait for a task bundle
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
-			context.setNodeMessage(null);
+			context.setNodeMessage(null, wrapper);
 			context.setBundle(null);
 			server.addIdleChannel(wrapper);
 			return TO_IDLE;

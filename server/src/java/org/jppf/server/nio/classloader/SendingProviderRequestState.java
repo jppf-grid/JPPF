@@ -23,6 +23,7 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 import java.net.ConnectException;
 
 import org.apache.commons.logging.*;
+import org.jppf.classloader.LocalClassLoaderWrapperHandler;
 import org.jppf.server.nio.*;
 
 /**
@@ -59,7 +60,7 @@ class SendingProviderRequestState extends ClassServerState
 	public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		ClassContext context = (ClassContext) wrapper.getContext();
-		if (wrapper.isReadable())
+		if (wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderWrapperHandler))
 		{
 			server.removeProviderConnection(context.getUuid(), wrapper);
 			ChannelWrapper currentRequest = context.getCurrentRequest();
@@ -79,15 +80,15 @@ class SendingProviderRequestState extends ClassServerState
 		}
 		if ((context.getCurrentRequest() == null) && !context.getPendingRequests().isEmpty())
 		{
-			SelectionKeyWrapper request = (SelectionKeyWrapper) context.getPendingRequests().remove(0);
-			ClassContext requestContext = (ClassContext) request.getChannel().attachment();
+			ChannelWrapper<?> request = (ChannelWrapper<?>) context.getPendingRequests().remove(0);
+			ClassContext requestContext = (ClassContext) request.getContext();
 			context.setMessage(null);
 			context.setResource(requestContext.getResource());
 			if (debugEnabled)
 			{
 				log.debug("provider " + wrapper + " serving new resource request [" + context.getResource().getName() + "] from node: " + request);
 			}
-			context.serializeResource();
+			context.serializeResource(wrapper);
 			context.setCurrentRequest(request);
 		}
 		if (context.getCurrentRequest() == null)

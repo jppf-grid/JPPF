@@ -23,6 +23,7 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 import java.net.ConnectException;
 
 import org.apache.commons.logging.*;
+import org.jppf.classloader.LocalClassLoaderWrapperHandler;
 import org.jppf.server.nio.ChannelWrapper;
 
 /**
@@ -58,7 +59,7 @@ class SendingNodeInitialResponseState extends ClassServerState
 	 */
 	public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
-		if (wrapper.isReadable())
+		if (wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderWrapperHandler))
 		{
 			throw new ConnectException("node " + wrapper + " has been disconnected");
 		}

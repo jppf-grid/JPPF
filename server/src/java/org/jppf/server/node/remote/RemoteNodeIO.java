@@ -20,7 +20,9 @@ package org.jppf.server.node.remote;
 
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.server.node.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
@@ -50,6 +52,19 @@ public class RemoteNodeIO extends AbstractNodeIO
 		super(node);
 		this.socketWrapper = node.getSocketWrapper();
 		this.ioHandler = new RemoteIOHandler(socketWrapper);
+	}
+
+	/**
+	 * {@inheritDoc}.
+	 */
+	protected Object[] deserializeObjects() throws Exception
+	{
+		if (debugEnabled) log.debug("waiting for next request");
+		byte[] data = ioHandler.read().getBuffer();
+		if (debugEnabled) log.debug("got bundle");
+		data = JPPFDataTransformFactory.transform(false, data);
+		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
+		return deserializeObjects(bundle);
 	}
 
 	/**

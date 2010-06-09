@@ -17,7 +17,6 @@
  */
 package sample.test;
 
-import java.io.*;
 import java.util.List;
 
 import org.apache.commons.logging.*;
@@ -101,7 +100,7 @@ public class TestTaskRunner
 			JPPFTask resultTask = results.get(0);
 			if (resultTask.getException() != null)
 			{
-				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
+				System.out.println("Exception was caught:" + StringUtils.getStackTrace(resultTask.getException()));
 			}
 		}
 		catch(Exception e)
@@ -130,7 +129,7 @@ public class TestTaskRunner
 			JPPFTask resultTask = results.get(0);
 			if (resultTask.getException() != null)
 			{
-				System.out.println("Exception was caught:"+getStackTrace(resultTask.getException()));
+				System.out.println("Exception was caught:" + StringUtils.getStackTrace(resultTask.getException()));
 			}
 			else
 			{
@@ -242,7 +241,7 @@ public class TestTaskRunner
 			JPPFTask resultTask = results.get(0);
 			if (resultTask.getException() != null)
 			{
-				System.out.println("Exception was caught: "+getStackTrace(resultTask.getException()));
+				System.out.println("Exception was caught: "+StringUtils.getStackTrace(resultTask.getException()));
 			}
 			else
 			{
@@ -338,27 +337,6 @@ public class TestTaskRunner
 	static void performTimeoutTaskTest() throws JPPFException
 	{
 		singleTest("timeout", null, new TimeoutTask());
-	}
-	
-	/**
-	 * Return an exception stack trace as a string.
-	 * @param t the throwable to get the stack trace from.
-	 * @return a string.
-	 */
-	static String getStackTrace(Throwable t)
-	{
-		try
-		{
-			StringWriter sw = new StringWriter();
-			PrintWriter writer = new PrintWriter(sw);
-			t.printStackTrace(writer);
-			return sw.toString();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		return "";
 	}
 
 	/**

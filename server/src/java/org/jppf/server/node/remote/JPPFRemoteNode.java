@@ -115,4 +115,12 @@ public class JPPFRemoteNode extends JPPFNode
 			}
 		};
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception
+	{
+		return new JPPFContainer(uuidPath, cl);
+	}
 }

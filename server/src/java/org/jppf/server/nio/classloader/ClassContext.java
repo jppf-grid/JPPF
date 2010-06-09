@@ -54,6 +54,10 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * The request currently processed.
 	 */
 	protected ChannelWrapper<?> currentRequest = null;
+	/**
+	 * Determines whether the message should be reset.
+	 */
+	protected boolean resetMessage = false;
 
 	/**
 	 * Deserialize a resource wrapper from an array of bytes.
@@ -72,9 +76,10 @@ public class ClassContext extends SimpleNioContext<ClassState>
 
 	/**
 	 * Serialize a resource wrapper to an array of bytes.
+	 * @param wrapper the channel through which the resource is sent.
 	 * @throws Exception if an error occurs while serializing.
 	 */
-	public void serializeResource() throws Exception
+	public void serializeResource(ChannelWrapper<?> wrapper) throws Exception
 	{
 		ObjectSerializer serializer = new ObjectSerializerImpl();
 		byte[] data = serializer.serialize(resource).getBuffer();
@@ -82,6 +87,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 		if (message == null) message = new NioMessage();
 		message.length = data.length;
 		message.buffer = ByteBuffer.wrap(data);
+		message.lengthWritten = false;
 	}
 
 	/**

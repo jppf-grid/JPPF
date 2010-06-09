@@ -339,11 +339,14 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	{
 		if (debugEnabled) log.debug("Initializing serializer");
 		Class<?> c = getClassLoader().loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
+		if (debugEnabled) log.debug("Loaded serializer class " + c);
 		Object o = c.newInstance();
 		serializer = (ObjectSerializer) o;
 		c = getClassLoader().loadJPPFClass("org.jppf.utils.SerializationHelperImpl");
+		if (debugEnabled) log.debug("Loaded helper class " + c);
 		o = c.newInstance();
 		helper = (SerializationHelper) o;
+		if (debugEnabled) log.debug("Serializer initialized");
 	}
 
 	/**
@@ -374,7 +377,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 					return null;
 				}
 			});
-			container = new JPPFContainer(uuidPath, cl);
+			container = newJPPFContainer(uuidPath, cl);
 			if (containerList.size() >= MAX_CONTAINERS)
 			{
 				JPPFContainer toRemove = containerList.removeFirst();
@@ -387,7 +390,16 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	}
 
 	/**
-	 * Instatiate the callback used to create the class loader in each {@link JPPFContainer}.
+	 * Create a new container based on the uuid path and class loader.
+	 * @param uuidPath uuid path for the corresponding client.
+	 * @param cl the class loader to use.
+	 * @return a {@link JPPFContainer} instance.
+	 * @throws Exception if any error occurs
+	 */
+	protected abstract JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception;
+
+	/**
+	 * Instantiate the callback used to create the class loader in each {@link JPPFContainer}.
 	 * @param uuidPath the uuid path containing the key to the container.
 	 * @return a {@link Callable} instance.
 	 */

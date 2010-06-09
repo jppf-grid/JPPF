@@ -50,11 +50,11 @@ public abstract class AbstractNioContext<S extends Enum> implements NioContext<S
 	/**
 	 * Count of bytes read.
 	 */
-	public int readByteCount = 0;
+	public int readByteCount = -1;
 	/**
 	 * Count of bytes written.
 	 */
-	public int writeByteCount = 0;
+	public int writeByteCount = -1;
 
 	/**
 	 * {@inheritDoc}

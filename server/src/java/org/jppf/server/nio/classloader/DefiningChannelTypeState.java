@@ -85,7 +85,7 @@ class DefiningChannelTypeState extends ClassServerState
 				{
 					resource.setManagementId(driver.getJmxServer().getId());
 				}
-				context.serializeResource();
+				context.serializeResource(wrapper);
 				return TO_SENDING_INITIAL_PROVIDER_RESPONSE;
 			}
 			else if (NODE_INITIATION.equals(resource.getState()))
@@ -94,7 +94,7 @@ class DefiningChannelTypeState extends ClassServerState
 				// send the uuid of this driver to the node or node peer.
 				resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
 				resource.setProviderUuid(driver.getUuid());
-				context.serializeResource();
+				context.serializeResource(wrapper);
 				return TO_SENDING_INITIAL_NODE_RESPONSE;
 			}
 		}

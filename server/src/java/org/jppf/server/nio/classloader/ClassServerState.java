@@ -70,7 +70,7 @@ abstract class ClassServerState extends NioState<ClassTransition>
 			getRemoteHost((SocketChannel) ((SelectionKeyWrapper) request).getChannel().channel()));
 		ClassContext requestContext = (ClassContext) request.getContext();
 		requestContext.getResource().setDefinition(null);
-		requestContext.serializeResource();
+		requestContext.serializeResource(request);
 		server.getTransitionManager().transitionChannel(request, ClassTransition.TO_SENDING_NODE_RESPONSE);
 	}
 }

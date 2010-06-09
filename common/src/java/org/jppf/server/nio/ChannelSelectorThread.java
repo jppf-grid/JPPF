@@ -18,14 +18,23 @@
 
 package org.jppf.server.nio;
 
+import org.apache.commons.logging.*;
 import org.jppf.utils.ThreadSynchronization;
 
 /**
- * 
+ * Instances of this class perform the selection loop for a local (in-VM) channel.
  * @author Laurent Cohen
  */
 public class ChannelSelectorThread extends ThreadSynchronization implements Runnable
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(ChannelSelectorThread.class);
+	/**
+	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+	 */
+	protected static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The channel selector associated with this thread.
 	 */
@@ -47,14 +56,29 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
 	}
 
 	/**
-	 * 
+	 * Perform the selection loop.
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run()
 	{
 		while (!isStopped())
 		{
-			if (selector.select(10)) server.getTransitionManager().submitTransition(selector.getChannel());
+			if (selector.select())
+			{
+				ChannelWrapper<?> channel = selector.getChannel();
+				if (debugEnabled) log.debug("selected channel " + channel);
+				server.getTransitionManager().submitTransition(channel);
+				server.postSelect();
+			}
 		}
+	}
+
+	/**
+	 * Closes this channel selector. If <code>close()</code> was already called, then this method has no effect.
+	 */
+	public void close()
+	{
+		setStopped(true);
+		selector.wakeUp();
 	}
 }

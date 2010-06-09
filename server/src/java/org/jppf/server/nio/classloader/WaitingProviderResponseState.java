@@ -94,11 +94,11 @@ class WaitingProviderResponseState extends ClassServerState
 			ChannelWrapper destinationKey = context.getCurrentRequest();
 			ClassContext destinationContext = (ClassContext) destinationKey.getContext();
 			resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
-			destinationContext.setMessage(null);
+			//destinationContext.setMessage(null);
 			destinationContext.setResource(resource);
-			destinationContext.serializeResource();
+			destinationContext.serializeResource(destinationKey);
 			server.getTransitionManager().transitionChannel(destinationKey, TO_SENDING_NODE_RESPONSE);
-			context.setMessage(null);
+			//context.setMessage(null);
 			context.setCurrentRequest(null);
 			return TO_SENDING_PROVIDER_REQUEST;
 		}

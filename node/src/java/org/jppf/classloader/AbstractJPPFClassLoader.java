@@ -144,6 +144,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 					ioHandler.writeInt(data.length);
 					ioHandler.write(data, 0, data.length);
 					ioHandler.flush();
+					if (debugEnabled) log.debug("node initiation message sent");
 					ioHandler.read();
 					if (debugEnabled) log.debug("received node initiation response");
 				}
@@ -172,6 +173,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	protected abstract IOHandler initIoHandler();
 
 	/**
+	 * Load a JPPF class from the server.
 	 * @param name the binary name of the class
 	 * @return the resulting <tt>Class</tt> object
 	 * @throws ClassNotFoundException if the class could not be found
@@ -238,7 +240,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	}
 
 	/**
-	 * Load the specified class from a socket conenction.
+	 * Load the specified class from a socket connection.
 	 * @param map - contains the necessary resource request data.
 	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
 	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.

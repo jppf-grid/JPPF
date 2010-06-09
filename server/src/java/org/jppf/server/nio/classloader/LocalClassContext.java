@@ -31,11 +31,20 @@ public class LocalClassContext extends ClassContext
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(LocalClassContext.class);
+	private static Log log = LogFactory.getLog(LocalClassContext.class);
 	/**
 	 * Determines whther DEBUG logging level is enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	protected static boolean traceEnabled = log.isTraceEnabled();
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void serializeResource(ChannelWrapper<?> wrapper) throws Exception
+	{
+		super.serializeResource(wrapper);
+		((LocalClassLoaderWrapperHandler) wrapper).setMessage(message);
+	}
 
 	/**
 	 * Read data from a channel.
@@ -45,6 +54,11 @@ public class LocalClassContext extends ClassContext
 	 */
 	public boolean readMessage(ChannelWrapper<?> wrapper) throws Exception
 	{
+		if (traceEnabled) log.trace("reading message for " + wrapper + ", message = " + message);
+		LocalClassLoaderWrapperHandler channel = (LocalClassLoaderWrapperHandler) wrapper;
+		while ((message == null) || (message.buffer == null) || (message.length <= 0) || (readByteCount < message.length)) channel.goToSleep();
+		if (traceEnabled) log.trace("message read for " + wrapper + ", message = " + message);
+		channel.wakeUp();
 		return true;
 	}
 
@@ -56,6 +70,7 @@ public class LocalClassContext extends ClassContext
 	 */
 	public boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception
 	{
+		if (traceEnabled) log.trace("writing message for " + wrapper);
 		message.lengthWritten = true;
 		writeByteCount = message.length;
 		((LocalClassLoaderWrapperHandler) wrapper).wakeUp();

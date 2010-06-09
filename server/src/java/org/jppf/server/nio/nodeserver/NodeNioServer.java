@@ -134,7 +134,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 			localChannel.setSelector(channelSelector);
 			selectorThread = new ChannelSelectorThread(channelSelector, this);
 			localChannel.setKeyOps(getInitialInterest());
-			new Thread(selectorThread, "Node server local node").start();
+			new Thread(selectorThread, "Node server channel selector").start();
 			postAccept(localChannel);
 		}
 	}

@@ -18,11 +18,15 @@
 
 package org.jppf.server.nio;
 
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.jppf.utils.ThreadSynchronization;
+
 /**
  * 
  * @author Laurent Cohen
  */
-public class LocalChannelSelector implements ChannelSelector
+public class LocalChannelSelector extends ThreadSynchronization implements ChannelSelector
 {
 	/**
 	 * The channel polled by this selector.
@@ -32,6 +36,10 @@ public class LocalChannelSelector implements ChannelSelector
 	 * The server that handles the channel.
 	 */
 	private NioServer<?, ?> server = null;
+	/**
+	 * 
+	 */
+	private ReentrantLock lock = new ReentrantLock(); 
 
 	/**
 	 * Initialize this selector with the specified channel.
@@ -60,29 +68,22 @@ public class LocalChannelSelector implements ChannelSelector
 		if (timeout < 0L) throw new IllegalArgumentException("timeout must be >= 0");
 		long start = System.currentTimeMillis();
 		long elapsed = 0;
-		while (((timeout == 0L) || (elapsed < timeout)) && ((channel.getKeyOps() & channel.getReadyOps()) == 0))
+		boolean selected = (channel.getKeyOps() & channel.getReadyOps()) != 0;
+		while (((timeout == 0L) || (elapsed < timeout)) && !selected)
 		{
-			synchronized(this)
+			goToSleep(timeout == 0L ? 0 : timeout - elapsed);
+			lock.lock();
+			try
 			{
-				try
-				{
-					if (timeout == 0) wait();
-					else wait(timeout - elapsed);
-				}
-				catch(InterruptedException e)
-				{
-					e.printStackTrace();
-				}
+				elapsed = System.currentTimeMillis() - start;
+				selected = (channel.getKeyOps() & channel.getReadyOps()) != 0;
 			}
-			elapsed = System.currentTimeMillis() - start;
+			finally
+			{
+				lock.unlock();
+			}
 		}
-		boolean b = (channel.getKeyOps() & channel.getReadyOps()) != 0;
-		if (b)
-		{
-			server.getTransitionManager().submitTransition(channel);
-			server.postSelect();
-		}
-		return b;
+		return selected;
 	}
 
 	/**
@@ -96,16 +97,24 @@ public class LocalChannelSelector implements ChannelSelector
 	/**
 	 * {@inheritDoc}
 	 */
-	public synchronized void wakeup()
+	public ChannelWrapper<?> getChannel()
 	{
-		notifyAll();
+		return channel;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public ChannelWrapper<?> getChannel()
+	public synchronized void wakeUp()
 	{
-		return channel;
+		lock.lock();
+		try
+		{
+			super.wakeUp();
+		}
+		finally
+		{
+			lock.unlock();
+		}
 	}
 }

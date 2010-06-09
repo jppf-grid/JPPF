@@ -23,6 +23,7 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 import java.net.ConnectException;
 
 import org.apache.commons.logging.*;
+import org.jppf.classloader.LocalClassLoaderWrapperHandler;
 import org.jppf.server.nio.ChannelWrapper;
 
 /**
@@ -59,14 +60,14 @@ class SendingProviderInitialResponseState extends ClassServerState
 	public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		ClassContext context = (ClassContext) wrapper.getContext();
-		if (wrapper.isReadable())
+		if (wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderWrapperHandler))
 		{
 			throw new ConnectException("provider " + wrapper + " has been disconnected");
 		}
 		if (context.writeMessage(wrapper))
 		{
 			if (debugEnabled) log.debug("sent management to provider: " + wrapper);
-			context.setMessage(null);
+			//context.setMessage(null);
 			return TO_IDLE_PROVIDER;
 		}
 		return TO_SENDING_INITIAL_PROVIDER_RESPONSE;
