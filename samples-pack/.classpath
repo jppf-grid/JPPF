@@ -9,6 +9,7 @@
 	<classpathentry kind="src" output="NodeTray/classes" path="NodeTray/src"/>
 	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src"/>
 	<classpathentry kind="src" output="StartupClasses/classes" path="StartupClasses/src"/>
+	<classpathentry kind="src" output="TaskNotifications/classes" path="TaskNotifications/src"/>
 	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/java"/>
 	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/resources"/>
 	<classpathentry kind="src" output="WebSearchEngine/classes" path="WebSearchEngine/src"/>
