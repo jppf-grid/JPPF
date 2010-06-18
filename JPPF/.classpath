@@ -19,11 +19,6 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/JGoodies/looks-2.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/Groovy/groovy-all-1.6.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ApacheMina/mina-core-2.0.0-RC1.jar" sourcepath="C:/Workspaces/Mina/core/src/main/java">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/C:/ftp/dev/Apache/mina-2.0.0-RC1/docs/apidocs/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/slf4j/jcl-over-slf4j-1.5.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/slf4j/slf4j-api-1.5.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/slf4j/slf4j-log4j12-1.5.2.jar"/>

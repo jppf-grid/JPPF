@@ -30,8 +30,6 @@ import org.jppf.process.LauncherListener;
 import org.jppf.security.*;
 import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.job.JPPFJobManager;
-import org.jppf.server.mina.classloader.MinaClassServer;
-import org.jppf.server.mina.nodeserver.MinaNodeServer;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
@@ -77,17 +75,9 @@ public class JPPFDriver
 	 */
 	private NodeNioServer nodeNioServer = null;
 	/**
-	 * Node server based on Mina framework.
-	 */
-	private MinaNodeServer minaNodeServer = null;
-	/**
 	 * Serves class loading requests from the JPPF nodes.
 	 */
 	private ClassNioServer classServer = null;
-	/**
-	 * Serves class loading requests from the JPPF nodes.
-	 */
-	private MinaClassServer minaClassServer = null;
 	/**
 	 * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
 	 */
@@ -151,18 +141,8 @@ public class JPPFDriver
 		boolean useMina = JPPFConfiguration.getProperties().getBoolean("communications.use.mina", false);
 		if (useMina) System.out.println("Using Mina framework");
 
-		/*
-		*/
-		if (useMina)
-		{
-			minaClassServer = new MinaClassServer(info.classServerPorts);
-			minaClassServer.start();
-		}
-		else
-		{
-			classServer = new ClassNioServer(info.classServerPorts);
-			classServer.start();
-		}
+		classServer = new ClassNioServer(info.classServerPorts);
+		classServer.start();
 		printInitializedMessage(info.classServerPorts, "Class Server");
 
 		applicationServers = new JPPFApplicationServer[info.applicationServerPorts.length];
@@ -173,16 +153,8 @@ public class JPPFDriver
 		}
 		printInitializedMessage(info.applicationServerPorts, "Client Server");
 
-		if (useMina)
-		{
-			minaNodeServer = new MinaNodeServer(info.nodeServerPorts);
-			minaNodeServer.start();
-		}
-		else
-		{
-			nodeNioServer = new NodeNioServer(info.nodeServerPorts);
-			nodeNioServer.start();
-		}
+		nodeNioServer = new NodeNioServer(info.nodeServerPorts);
+		nodeNioServer.start();
 		printInitializedMessage(info.nodeServerPorts, "Tasks Server");
 
 		try
@@ -343,15 +315,6 @@ public class JPPFDriver
 	}
 
 	/**
-	 * Get the node server based on Mina framework.
-	 * @return a <code>MinaNodeServer</code> instance.
-	 */
-	public MinaNodeServer getMinaNodeServer()
-	{
-		return minaNodeServer;
-	}
-
-	/**
 	 * Get the jmx server used to manage and monitor this driver.
 	 * @return a <code>JMXServerImpl</code> instance.
 	 */
@@ -439,11 +402,6 @@ public class JPPFDriver
 		{
 			nodeNioServer.end();
 			nodeNioServer = null;
-		}
-		if (minaNodeServer != null)
-		{
-			minaNodeServer.close();
-			minaNodeServer = null;
 		}
 		for (int i=0; i<applicationServers.length; i++)
 		{
@@ -545,8 +503,7 @@ public class JPPFDriver
 	 */
 	public JPPFBundlerFactory getBundlerFactory()
 	{
-		if (nodeNioServer != null) return nodeNioServer.getBundlerFactory();
-		return minaNodeServer.getBundlerFactory();
+		return nodeNioServer.getBundlerFactory();
 	}
 
 	/**
@@ -555,8 +512,7 @@ public class JPPFDriver
 	 */
 	public void setBundler(Bundler bundler)
 	{
-		if (nodeNioServer != null) nodeNioServer.setBundler(bundler);
-		else minaNodeServer.setBundler(bundler);
+		nodeNioServer.setBundler(bundler);
 	}
 
 	/**
