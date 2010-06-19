@@ -85,8 +85,7 @@ public class WaitInitialBundleState extends NodeServerState
 			}
 			bundler.setup();
 			context.setBundler(bundler);
-			Boolean b = (Boolean) bundle.getParameter(BundleParameter.IS_PEER);
-			boolean isPeer = (b != null) && b;
+			boolean isPeer = (Boolean) bundle.getParameter(BundleParameter.IS_PEER, Boolean.FALSE);
 			context.setPeer(isPeer);
 			if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
 			{
