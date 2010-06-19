@@ -80,8 +80,8 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
 		{
 			try
 			{
-				if (debugEnabled) log.debug(name + "about to close socket wrapper");
-				/*if(socketWrapper.isOpened())*/ socketWrapper.close();
+				if (debugEnabled) log.debug(name + "about to close socket wrapper [" + socketWrapper.getHost() + ", " + socketWrapper.getPort() + "]");
+				if(socketWrapper.isOpened()) socketWrapper.close();
 			}
 			catch(Exception e)
 			{

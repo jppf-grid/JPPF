@@ -198,7 +198,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 				if (debugEnabled) log.debug(e2.getMessage(), e2);
 			}
 			if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
-			log.info(getId() + " : " + e.getMessage(), e);
+			if (debugEnabled) log.error(getId() + " : " + e.getMessage(), e);
+			else log.error(getId() + " : " + e.getMessage());
 		}
 		return result;
 	}

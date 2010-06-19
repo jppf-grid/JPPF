@@ -40,7 +40,7 @@ public class TypedProperties extends Properties
 	 * This will copy into the present object all map entries such that both key and value are strings.
 	 * @param map - the properties to be copied. No reference to this parameter is kept in this TypedProperties object.
 	 */
-	public TypedProperties(Map map)
+	public TypedProperties(Map<Object, Object> map)
 	{
 		if (map != null)
 		{

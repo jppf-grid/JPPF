@@ -106,7 +106,7 @@ public class MultipleBuffersInputStream extends InputStream
 			if ((currentBuffer == null) || (currentBuffer.remainingFromPos() <= 0)) nextBuffer();
 			if (eofReached) break;
 			int n = Math.min(currentBuffer.remainingFromPos(), len - count);
-			System.arraycopy(currentBuffer.buffer, currentBuffer.length, b, off + count, n);
+			System.arraycopy(currentBuffer.buffer, currentBuffer.pos, b, off + count, n);
 			count += n;
 			currentBuffer.pos += n;
 		}

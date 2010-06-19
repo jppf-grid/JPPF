@@ -69,7 +69,9 @@ public final class NetworkUtils
 		List<Inet4Address> list = new ArrayList<Inet4Address>();
 		try
 		{
+			if (debugEnabled) log.debug("Getting all network interfaces"); 
 			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+			if (debugEnabled) log.debug("got all network interfaces"); 
 			while (interfaces.hasMoreElements())
 			{
 				NetworkInterface ni = interfaces.nextElement();
