@@ -206,7 +206,8 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 			}
 			catch(Exception e)
 			{
-				log.error("[" + name + "] "+ e.getMessage(), e);
+				if (debugEnabled) log.debug("[" + name + "] "+ e.getMessage(), e);
+				else log.error("[" + name + "] "+ e.getMessage());
 			}
 			List<Runnable> pending = new ArrayList<Runnable>();
 			pending.addAll(executor.shutdownNow());

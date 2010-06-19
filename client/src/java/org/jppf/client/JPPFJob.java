@@ -40,6 +40,10 @@ import org.jppf.utils.JPPFUuid;
 public class JPPFJob implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The list of tasks to execute.
 	 */
 	private List<JPPFTask> tasks = null;
@@ -57,9 +61,13 @@ public class JPPFJob implements Serializable
 	 */
 	private boolean blocking = true;
 	/**
-	 * The universal unique id for this job.
+	 * The user-defined display name for this job.
 	 */
 	private String id = null;
+	/**
+	 * The universal unique id for this job.
+	 */
+	private String uuid = null;
 	/**
 	 * The list of tasks to execute.
 	 */
@@ -72,6 +80,10 @@ public class JPPFJob implements Serializable
 	 * The user-defined metadata asoociated with this job.
 	 */
 	private JPPFJobMetadata jobMetadata = new JPPFJobMetadata();
+	/**
+	 * The number of tasks in this job.
+	 */
+	private int taskCount = 0;
 
 	/**
 	 * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -79,7 +91,8 @@ public class JPPFJob implements Serializable
 	 */
 	public JPPFJob()
 	{
-		id = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
+		uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
+		id = uuid;
 	}
 
 	/**
@@ -163,7 +176,16 @@ public class JPPFJob implements Serializable
 
 	/**
 	 * Get the universal unique id for this job.
-	 * @return the uuid as a string. 
+	 * @return the uuid as a string.
+	 */
+	public String getUuid()
+	{
+		return uuid;
+	}
+
+	/**
+	 * Get the user-defined display name for this job. This is th name displayed in the administration console.
+	 * @return the id as a string. 
 	 */
 	public String getId()
 	{
@@ -171,8 +193,8 @@ public class JPPFJob implements Serializable
 	}
 
 	/**
-	 * Set the universal unique id for this job.
-	 * @param id the id as a string. 
+	 * Set the user-defined display name for this job.
+	 * @param id the display name as a string. 
 	 */
 	public void setId(String id)
 	{
@@ -205,6 +227,7 @@ public class JPPFJob implements Serializable
 		else tmp = new JPPFAnnotatedTask(taskObject, args);
 		if (tasks == null) tasks = new ArrayList<JPPFTask>();
 		tasks.add(tmp);
+		tmp.setPosition(taskCount++);
 		return tmp;
 	}
 
@@ -223,6 +246,7 @@ public class JPPFJob implements Serializable
 		if (tasks == null) tasks = new ArrayList<JPPFTask>();
 		JPPFTask jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
 		tasks.add(jppfTask);
+		jppfTask.setPosition(taskCount++);
 		return jppfTask;
 	}
 
@@ -346,5 +370,37 @@ public class JPPFJob implements Serializable
 	public JPPFJobMetadata getJobMetadata()
 	{
 		return jobMetadata;
+	}
+
+	/**
+	 * COmpute the hascode of this job.
+	 * @return th hascode as an int.
+	 * @see java.lang.Object#hashCode()
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+		return result;
+	}
+
+	/**
+	 * Determine whether this object is equal to another.
+	 * @param obj the object to compare with.
+	 * @return true if the two objects are equal, false otherwise.
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (!(obj instanceof JPPFJob)) return false;
+		JPPFJob other = (JPPFJob) obj;
+		if (uuid == null)
+		{
+			if (other.uuid != null) return false;
+		}
+		return uuid.equals(other.uuid);
 	}
 }

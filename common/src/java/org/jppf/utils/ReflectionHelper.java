@@ -48,7 +48,7 @@ public final class ReflectionHelper
 	 * @return the result of the method's invocation, or null if the method's return type is void,
 	 * or a <code>JPPFException</code> if the invocation failed.
 	 */
-	public static Object invokeMethod(Class clazz, Object instance, String methodName, Class[] paramTypes, Object...values)
+	public static Object invokeMethod(Class<?> clazz, Object instance, String methodName, Class<?>[] paramTypes, Object...values)
 	{
 		try
 		{
@@ -129,11 +129,11 @@ public final class ReflectionHelper
 	 * @param values - the values of the constructor's parameters, may be null if no parameters.
 	 * @return the result of the constructor's invocation, or a <code>JPPFException</code> if the invocation failed.
 	 */
-	public static Object invokeConstructor(Class clazz, Class[] paramTypes, Object...values)
+	public static Object invokeConstructor(Class<?> clazz, Class<?>[] paramTypes, Object...values)
 	{
 		try
 		{
-			Constructor c = clazz.getConstructor(paramTypes);
+			Constructor<?> c = clazz.getConstructor(paramTypes);
 			return c.newInstance(values);
 		}
 		catch(Exception e)

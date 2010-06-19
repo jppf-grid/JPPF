@@ -48,9 +48,13 @@ public class JPPFJobSLA implements Serializable
 	 */
 	private boolean suspended = false;
 	/**
-	 * Rhe job schedule configuration.
+	 * The job start schedule configuration.
 	 */
 	private JPPFSchedule jobSchedule = null;
+	/**
+	 * The job expiration schedule configuration.
+	 */
+	private JPPFSchedule jobExpirationSchedule = null;
 
 	/**
 	 * Default constructor.
@@ -181,5 +185,23 @@ public class JPPFJobSLA implements Serializable
 	public void setJobSchedule(JPPFSchedule jobSchedule)
 	{
 		this.jobSchedule = jobSchedule;
+	}
+
+	/**
+	 * Get the job expiration schedule configuration.
+	 * @return a {@link JPPFSchedule} instance.
+	 */
+	public JPPFSchedule getJobExpirationSchedule()
+	{
+		return jobExpirationSchedule;
+	}
+
+	/**
+	 * Set the job expiration schedule configuration.
+	 * @param jobExpirationSchedule a {@link JPPFSchedule} instance.
+	 */
+	public void setJobExpirationSchedule(JPPFSchedule jobExpirationSchedule)
+	{
+		this.jobExpirationSchedule = jobExpirationSchedule;
 	}
 }

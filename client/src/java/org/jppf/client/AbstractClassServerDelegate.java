@@ -18,6 +18,7 @@
 
 package org.jppf.client;
 
+import org.apache.commons.logging.*;
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.data.transform.*;
@@ -30,6 +31,14 @@ import org.jppf.utils.JPPFBuffer;
  */
 public abstract class AbstractClassServerDelegate extends AbstractClientConnectionHandler implements ClassServerDelegate
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(AbstractClassServerDelegate.class);
+	/**
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Indicates whether this socket handler should be terminated and stop processing.
 	 */
@@ -121,6 +130,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 		JPPFBuffer buffer = socketClient.getSerializer().serialize(resource);
 		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
 		byte[] data = (transform == null) ? buffer.getBuffer() : JPPFDataTransformFactory.transform(transform, true, buffer.buffer, 0, buffer.length);
+		if (debugEnabled) log.debug("sending " + data.length + " bytes to the server");
 		socketClient.sendBytes(new JPPFBuffer(data, data.length));
 		socketClient.flush();
 	}

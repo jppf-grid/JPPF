@@ -394,9 +394,9 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	protected static class DescendingIntegerComparator implements Comparator<Integer>, Serializable
 	{
 		/**
-		 * Compare two integers.
+		 * Compare two integers. This comparator defines a descending order for integers.
 		 * @param o1 first integer to compare.
-		 * @param o2 second integrto compare.
+		 * @param o2 second integer to compare.
 		 * @return -1 if o1 > o2, 0 if o1 == o2, 1 if o1 < o2
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */

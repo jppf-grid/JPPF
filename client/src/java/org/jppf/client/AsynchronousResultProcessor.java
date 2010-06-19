@@ -20,7 +20,6 @@ package org.jppf.client;
 import java.io.NotSerializableException;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.protocol.JPPFTask;
 
 /**
  * This class encapsulates a pool of threads that submit the tasks to a driver
@@ -68,7 +67,7 @@ public class AsynchronousResultProcessor implements Runnable
 			if (!job.isBlocking()) connection.getLock().lock();
 			connection.job = job;
 			int count = 0;
-			for (JPPFTask task : job.getTasks()) task.setPosition(count++);
+			//for (JPPFTask task : job.getTasks()) task.setPosition(count++);
 			count = 0;
 			boolean completed = false;
 			try

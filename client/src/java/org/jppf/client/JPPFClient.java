@@ -279,7 +279,7 @@ public class JPPFClient extends AbstractJPPFClient
 			{
 				JPPFResultCollector collector = new JPPFResultCollector(job.getTasks().size());
 				job.setResultListener(collector);
-				JPPFClient.getLoadBalancer().execute(job, c);
+				JPPFClient.getLoadBalancer().execute(job, null);
 				return collector.waitForResults();
 			}
 		}
@@ -292,7 +292,7 @@ public class JPPFClient extends AbstractJPPFClient
 			}
 			if (LOCAL_EXEC_ENABLED)
 			{
-				JPPFClient.getLoadBalancer().execute(job, c);
+				JPPFClient.getLoadBalancer().execute(job, null);
 				return null;
 			}
 		}

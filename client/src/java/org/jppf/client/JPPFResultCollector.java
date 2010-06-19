@@ -43,16 +43,16 @@ public class JPPFResultCollector implements TaskResultListener
 	/**
 	 * Count of results notr yet received.
 	 */
-	private int pendingCount = 0;
+	protected int pendingCount = 0;
 	/**
 	 * A map containing the resulting tasks, ordered by ascending position in the
 	 * submitted list of tasks.
 	 */
-	private Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
+	protected Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
 	/**
 	 * The list of final resulting tasks.
 	 */
-	private List<JPPFTask> results = null;
+	protected List<JPPFTask> results = null;
 
 	/**
 	 * Initialize this collector with a specified number of tasks. 
@@ -83,20 +83,41 @@ public class JPPFResultCollector implements TaskResultListener
 	 */
 	public synchronized List<JPPFTask> waitForResults()
 	{
-		while (pendingCount > 0)
+		return waitForResults(0);
+	}
+
+	/**
+	 * Wait until all results of a request have been collected, or the timeout has expired,
+	 * whichever happens first.
+	 * @param millis the maximum time to wait, zero meaning an indefinite wait. 
+	 * @return the list of resulting tasks.
+	 */
+	public synchronized List<JPPFTask> waitForResults(long millis)
+	{
+		if (millis < 0) throw new IllegalArgumentException("wait time cannot be negative");
+		if (debugEnabled) log.debug("timeout = " + millis);
+		long start = System.currentTimeMillis();
+		long elapsed = 0;
+		while (((millis == 0) || (elapsed < millis)) && (pendingCount > 0))
 		{
 			try
 			{
-				wait();
+				wait(millis == 0 ? 0 : millis - elapsed);
+				if ((millis > 0) && (elapsed >= millis)) return null;
 			}
 			catch(InterruptedException e)
 			{
 				log.error(e.getMessage(), e);
 			}
+			elapsed = System.currentTimeMillis() - start;
 		}
-		results = new ArrayList<JPPFTask>();
-		for (Integer n: resultMap.keySet()) results.add(resultMap.get(n));
-		resultMap.clear();
+		if (pendingCount <= 0)
+		{
+			results = new ArrayList<JPPFTask>();
+			for (Map.Entry<Integer, JPPFTask> entry: resultMap.entrySet()) results.add(entry.getValue());
+			//resultMap.clear();
+		}
+		if (debugEnabled) log.debug("elapsed = " + elapsed);
 		return results;
 	}
 
