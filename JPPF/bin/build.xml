@@ -709,7 +709,7 @@
 		<echo message="gs.home = ${gs.home}"/>
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
-		<javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"
+		<javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF"
 			packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true"
 			stylesheetfile="${bin}/javadoc.css" additionalparam="-quiet">
 			<packageset dir="${node}/src/java"/>
