@@ -84,7 +84,7 @@ public class ResumeJobAction extends AbstractJobAction
 				{
 					try
 					{
-						((JMXDriverConnectionWrapper) data.getJmxWrapper()).resumeJob(data.getJobInformation().getJobId());
+						((JMXDriverConnectionWrapper) data.getJmxWrapper()).resumeJob(data.getJobInformation().getJobUuid());
 					}
 					catch(Exception e)
 					{

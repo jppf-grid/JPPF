@@ -31,6 +31,10 @@ public class JobInformation implements Serializable
 	/**
 	 * The unique identifier for the job.
 	 */
+	private String jobUuid = null;
+	/**
+	 * The user-defined identifier for the job.
+	 */
 	private String jobId = null;
 	/**
 	 * The current number of tasks in the job.
@@ -66,15 +70,17 @@ public class JobInformation implements Serializable
 
 	/**
 	 * Initialize this object with the specified parameters.
-	 * @param jobId - the id of this job.
-	 * @param taskCount - tne number of tasks in thsi job.
-	 * @param initialTaskCount - the initial number of tasks in the job submitted by the JPPF client.
-	 * @param priority - the priority of this job.
-	 * @param suspended - determines whether the job is in suspended state.
-	 * @param pending - determines whether the job is waiting to reach its scheduled execution date.
+	 * @param jobUuid the universal unique id of this job.
+	 * @param jobId the user-defined id of this job.
+	 * @param taskCount tne number of tasks in thsi job.
+	 * @param initialTaskCount the initial number of tasks in the job submitted by the JPPF client.
+	 * @param priority the priority of this job.
+	 * @param suspended determines whether the job is in suspended state.
+	 * @param pending determines whether the job is waiting to reach its scheduled execution date.
 	 */
-	public JobInformation(String jobId, int taskCount, int initialTaskCount, int priority, boolean suspended, boolean pending)
+	public JobInformation(String jobUuid, String jobId, int taskCount, int initialTaskCount, int priority, boolean suspended, boolean pending)
 	{
+		this.jobUuid = jobUuid;
 		this.jobId = jobId;
 		this.taskCount = taskCount;
 		this.initialTaskCount = initialTaskCount;
@@ -84,8 +90,8 @@ public class JobInformation implements Serializable
 	}
 
 	/**
-	 * Get the unique identifier for the job.
-	 * @return the uuid as a string.
+	 * Get the user-defined identifier for the job.
+	 * @return the id as a string.
 	 */
 	public String getJobId()
 	{
@@ -93,12 +99,12 @@ public class JobInformation implements Serializable
 	}
 
 	/**
-	 * Set the unique identifier for the job.
-	 * @param uuid the uuid as a string.
+	 * Set the user-defined identifier for the job.
+	 * @param id the id as a string.
 	 */
-	public void setJobId(String uuid)
+	public void setJobId(String id)
 	{
-		this.jobId = uuid;
+		this.jobId = id;
 	}
 
 	/**
@@ -208,5 +214,23 @@ public class JobInformation implements Serializable
 	public void setPending(boolean pending)
 	{
 		this.pending = pending;
+	}
+
+	/**
+	 * Get the unique identifier for the job.
+	 * @return the uuid as a string.
+	 */
+	public String getJobUuid()
+	{
+		return jobUuid;
+	}
+
+	/**
+	 * Set the unique identifier for the job.
+	 * @param jobUuid the uuid as a string.
+	 */
+	public void setJobUuid(String jobUuid)
+	{
+		this.jobUuid = jobUuid;
 	}
 }

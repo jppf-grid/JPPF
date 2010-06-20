@@ -86,7 +86,7 @@ public abstract class AbstractSuspendJobAction extends AbstractJobAction
 				{
 					try
 					{
-						((JMXDriverConnectionWrapper) data.getJmxWrapper()).suspendJob(data.getJobInformation().getJobId(), requeue);
+						((JMXDriverConnectionWrapper) data.getJmxWrapper()).suspendJob(data.getJobInformation().getJobUuid(), requeue);
 					}
 					catch(Exception e)
 					{

@@ -102,7 +102,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 	public synchronized void jobDispatched(BundleWrapper bundleWrapper, ChannelWrapper channel)
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
-		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+		String jobId = (String) bundle.getParameter(BundleParameter.JOB_UUID);
 		List<ChannelBundlePair> list = jobMap.get(jobId);
 		if (list == null)
 		{
@@ -122,7 +122,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 	public synchronized void jobReturned(BundleWrapper bundleWrapper, ChannelWrapper channel)
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
-		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+		String jobId = (String) bundle.getParameter(BundleParameter.JOB_UUID);
 		List<ChannelBundlePair> list = jobMap.get(jobId);
 		if (list == null)
 		{
@@ -141,7 +141,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 	public synchronized void jobQueued(BundleWrapper bundleWrapper)
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
-		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+		String jobId = (String) bundle.getParameter(BundleParameter.JOB_UUID);
 		bundleMap.put(jobId, bundleWrapper);
 		jobMap.put(jobId, new ArrayList<ChannelBundlePair>());
 		if (debugEnabled) log.debug("jobId '" + jobId + "' queued");
@@ -155,7 +155,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 	public synchronized void jobEnded(BundleWrapper bundleWrapper)
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
-		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+		String jobId = (String) bundle.getParameter(BundleParameter.JOB_UUID);
 		jobMap.remove(jobId);
 		bundleMap.remove(jobId);
 		if (debugEnabled) log.debug("jobId '" + jobId + "' ended");
@@ -169,7 +169,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 	public synchronized void jobUpdated(BundleWrapper bundleWrapper)
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
-		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+		String jobId = (String) bundle.getParameter(BundleParameter.JOB_UUID);
 		if (debugEnabled) log.debug("jobId '" + jobId + "' updated");
 		submitEvent(JobEventType.JOB_UPDATED, bundle, null);
 	}

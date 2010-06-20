@@ -26,7 +26,7 @@ import org.jppf.server.nio.ChannelWrapper;
  * Instances of this class are intented to perform job management functions for a specxific node. 
  * @author Laurent Cohen
  */
-public class CancelJobTask implements Runnable
+class CancelJobTask implements Runnable
 {
 	/**
 	 * Logger for this class.
