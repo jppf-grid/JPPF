@@ -85,7 +85,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		try
 		{
 			lock.lock();
-			String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+			String jobId = (String) bundle.getParameter(BundleParameter.JOB_UUID);
 			BundleWrapper other = jobMap.get(jobId);
 			if (other != null)
 			{
@@ -171,7 +171,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 				if (debugEnabled) log.debug("removing bundle from queue");
 				result = bundleWrapper;
 				removeFromListMap(new JPPFPriority(bundle.getJobSLA().getPriority()), bundleWrapper, priorityMap);
-				jobMap.remove((String) bundle.getParameter(BundleParameter.JOB_ID));
+				jobMap.remove((String) bundle.getParameter(BundleParameter.JOB_UUID));
 				bundle.setParameter("real.task.count", 0);
 			}
 			else

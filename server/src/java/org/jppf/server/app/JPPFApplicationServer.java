@@ -18,8 +18,8 @@
 package org.jppf.server.app;
 
 import java.net.Socket;
+
 import org.jppf.JPPFException;
-import org.jppf.server.*;
 
 /**
  * Instances of this class listens for incoming connections from client applications.<br>

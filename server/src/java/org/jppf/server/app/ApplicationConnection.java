@@ -34,7 +34,7 @@ import org.jppf.utils.*;
  * notified, through an asynchronous event mechanism.
  * @author Laurent Cohen
  */
-public class ApplicationConnection extends JPPFConnection
+class ApplicationConnection extends JPPFConnection
 {
 	/**
 	 * Logger for this class.
@@ -107,7 +107,7 @@ public class ApplicationConnection extends JPPFConnection
 	 * </ul>
 	 * 
 	 * @throws Exception if an error is raised while processing an execution request.
-	 * @see org.jppf.server.JPPFConnection#perform()
+	 * @see org.jppf.server.app.JPPFConnection#perform()
 	 */
 	public void perform() throws Exception
 	{
@@ -149,7 +149,7 @@ public class ApplicationConnection extends JPPFConnection
 
 		header.getUuidPath().add(driver.getUuid());
 		header.setCompletionListener(resultSender);
-		currentJobId = (String) header.getParameter(BundleParameter.JOB_ID);
+		currentJobId = (String) header.getParameter(BundleParameter.JOB_UUID);
 		JPPFDriver.getQueue().addBundle(headerWrapper);
 		if (count > 0)
 		{
@@ -164,7 +164,7 @@ public class ApplicationConnection extends JPPFConnection
 
 	/**
 	 * Close this application connection.
-	 * @see org.jppf.server.JPPFConnection#close()
+	 * @see org.jppf.server.app.JPPFConnection#close()
 	 */
 	public void close()
 	{
@@ -179,7 +179,7 @@ public class ApplicationConnection extends JPPFConnection
 	/**
 	 * Get a string representation of this connection.
 	 * @return a string representation of this connection.
-	 * @see org.jppf.server.JPPFConnection#toString()
+	 * @see org.jppf.server.app.JPPFConnection#toString()
 	 */
 	public String toString()
 	{

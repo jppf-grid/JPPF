@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server;
+package org.jppf.server.app;
 
 import java.net.Socket;
 import org.apache.commons.logging.*;
@@ -30,7 +30,7 @@ import org.jppf.comm.socket.*;
  * to dynamically load classes from the JVM that runs the class server.
  * @author Laurent Cohen
  */
-public abstract class JPPFConnection extends Thread
+abstract class JPPFConnection extends Thread
 {
 	/**
 	 * Logger for this class.
@@ -148,7 +148,8 @@ public abstract class JPPFConnection extends Thread
 		}
 		catch (Exception e)
 		{
-			log.error(e.getMessage(), e);
+			if (debugEnabled) log.error(e.getMessage(), e);
+			else log.warn(e.getMessage());
 		}
 		closed = true;
 	}
