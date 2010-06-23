@@ -81,7 +81,7 @@ public class JobEventTask implements Runnable
 		jobInfo.setMaxNodes(sla.getMaxNodes());
 		JPPFManagementInfo nodeInfo = (channel == null) ? null : JPPFDriver.getInstance().getNodeInformation(channel);
 		JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);
-		List<JobListener> listeners = jobManager.getListeners();
+		List<JobListener> listeners = jobManager.getJobListeners();
 		synchronized(listeners)
 		{
 			switch (eventType)

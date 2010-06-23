@@ -77,6 +77,7 @@ public class WaitingResultsState extends NodeServerState
 			BundleWrapper newBundleWrapper = context.deserializeBundle();
 			JPPFTaskBundle newBundle = newBundleWrapper.getBundle();
 			// if an exception prevented the node from executing the tasks
+			jobManager.jobReturned(bundleWrapper, new ChannelWrapper<SelectableChannel>(channel));
 			if (newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM) != null)
 			{
 				newBundle.setTasks(bundle.getTasks());
@@ -89,9 +90,8 @@ public class WaitingResultsState extends NodeServerState
 				statsManager.taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getNodeMessage().getLength());
 				context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 			}
-			Boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE);
-			jobManager.jobReturned(bundleWrapper, new ChannelWrapper<SelectableChannel>(channel));
-			if ((requeue != null) && requeue)
+			boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE, Boolean.FALSE);
+			if (requeue)
 			{
 				bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
 				bundle.getJobSLA().setSuspended(true);

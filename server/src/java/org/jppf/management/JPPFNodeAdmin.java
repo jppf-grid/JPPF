@@ -301,6 +301,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 		if (jobId == null) return;
 		if (jobId.equals(node.getExecutionManager().getCurrentJobId()))
 		{
+			if (debugEnabled) log.debug("Cancelling all tasks for jobId = '" + jobId + "'");
 			node.getExecutionManager().cancelAllTasks(false, requeue);
 		}
 	}

@@ -19,7 +19,8 @@
 package org.jppf.scheduling;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
+import java.text.*;
+import java.util.Date;
 
 /**
  * Instances of this class contain data used to setup a schedule.
@@ -74,18 +75,6 @@ public class JPPFSchedule implements Serializable
 	}
 
 	/**
-	 * Set the duration for this configuration.
-	 * Calling this setter will reset the date and date format values, as duration and date are mutually exclusive.
-	 * @param duration the timeout in milliseconds.
-	 */
-	public void setDuration(long duration)
-	{
-		this.duration = duration;
-		this.date = null;
-		this.dateFormat = null;
-	}
-
-	/**
 	 * Get the scheduled date for this configuration.
 	 * @return the date in string format.
 	 */
@@ -104,16 +93,55 @@ public class JPPFSchedule implements Serializable
 	}
 
 	/**
-	 * Set the date and date format for this configuration.<br>
-	 * Calling this method will reset the duration, as duration and date are mutually exclusive.
-	 * @param date the date to set in string representation.
-	 * @param dateFormat the format of of the date to set.
-	 * @see java.text.SimpleDateFormat
+	 * Convert this schedule to a {@link Date} object.
+	 * @param startDate the starting date to use if the schedule is expressed as a duration.
+	 * @return this schedule expressed as a {@link Date}.
+	 * @throws ParseException if parsing using the simple date format fails.
 	 */
-	public void setDate(String date, SimpleDateFormat dateFormat)
+	public Date toDate(long startDate) throws ParseException
 	{
-		this.duration = 0L;
-		this.date = date;
-		this.dateFormat = dateFormat;
+		Date dt = null;
+		if ((date == null) || (dateFormat == null))
+		{
+			dt = new Date(startDate + duration);
+		}
+		else
+		{
+			dt = dateFormat.parse(date);
+		}
+		return dt;
+	}
+
+	/**
+	 * Convert this schedule to a long value.
+	 * @param startDate the starting date to use if the schedule is expressed as a duration.
+	 * @return this schedule expressed as a long.
+	 * @throws ParseException if parsing using the simple date format fails.
+	 */
+	public long toLong(long startDate) throws ParseException
+	{
+		long result = 0L;
+		if ((date == null) || (dateFormat == null))
+		{
+			result = startDate + duration;
+		}
+		else
+		{
+			Date dt = dateFormat.parse(date);
+			result = dt.getTime();
+		}
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder("schedule[");
+		if (date != null) sb.append("date=").append(date).append(", format=").append(dateFormat == null ? "null" : dateFormat.toPattern());
+		else sb.append("delay=").append(duration);
+		sb.append("]");
+		return sb.toString();
 	}
 }

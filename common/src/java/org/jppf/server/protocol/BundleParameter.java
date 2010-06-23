@@ -73,11 +73,19 @@ public enum  BundleParameter
 	 */
 	JOB_REQUEUE,
 	/**
-	 * Job pending indicator, detrmines whether the job is waiting for its scheduled time to start.
+	 * Job pending indicator, determines whether the job is waiting for its scheduled time to start.
 	 */
 	JOB_PENDING,
 	/**
+	 * Job expired indicator, determines whether the job is should be cancelled.
+	 */
+	JOB_EXPIRED,
+	/**
 	 * Key for the job metadata Map in the JPPFTaskBundle.
 	 */
-	JOB_METADATA
+	JOB_METADATA,
+	/**
+	 * Time at which the job is received on the server side.
+	 */
+	JOB_RECEIVED_TIME_MILLIS
 }

@@ -118,6 +118,8 @@ class ApplicationConnection extends JPPFConnection
 		data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
 		JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
 		if (debugEnabled) log.debug("received header from client, data length = " + data.length);
+		if (header.getParameter(BundleParameter.JOB_RECEIVED_TIME_MILLIS) == null)
+			header.setParameter(BundleParameter.JOB_RECEIVED_TIME_MILLIS, System.currentTimeMillis());
 		headerWrapper = new BundleWrapper(header);
 		executeTasks();
 	}
@@ -155,9 +157,9 @@ class ApplicationConnection extends JPPFConnection
 		{
 			totalTaskCount += count;
 			if (debugEnabled) log.debug("Queued " + totalTaskCount + " tasks");
+			resultSender.run(count);
 		}
-		if (count <= 0) resultSender.sendPartialResults(headerWrapper);
-		else resultSender.run(count);
+		else resultSender.sendPartialResults(headerWrapper);
 		driver.getJobManager().jobEnded(headerWrapper);
 		return;
 	}
@@ -168,6 +170,7 @@ class ApplicationConnection extends JPPFConnection
 	 */
 	public void close()
 	{
+		if (debugEnabled) log.debug("closing " + this);
 		if (currentJobId != null)
 		{
 			JPPFDriver.getInstance().getJobManager().jobEnded(headerWrapper);
@@ -183,6 +186,6 @@ class ApplicationConnection extends JPPFConnection
 	 */
 	public String toString()
 	{
-		return "Application connection : " + super.toString();
+		return "application connection : " + super.toString();
 	}
 }

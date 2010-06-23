@@ -23,10 +23,14 @@ import static org.jppf.utils.CollectionUtils.*;
 import java.text.ParseException;
 import java.util.*;
 
+import javax.management.*;
+
 import org.apache.commons.logging.*;
+import org.jppf.management.*;
 import org.jppf.scheduling.*;
 import org.jppf.server.*;
 import org.jppf.server.job.JPPFJobManager;
+import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.*;
 
 /**
@@ -63,6 +67,14 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * Handles the schedule of each job that has one.
 	 */
 	private JPPFScheduleHandler jobScheduleHandler = new JPPFScheduleHandler("Job Schedule Handler");
+	/**
+	 * Handles the expiration schedule of each job that has one.
+	 */
+	private JPPFScheduleHandler jobExpirationHandler = new JPPFScheduleHandler("Job Expiration Handler");
+	/**
+	 * Proxy to the job management MBean.
+	 */
+	private DriverJobManagementMBean jobManagamentMBean = null;
 
 	/**
 	 * Initialize this queue.
@@ -71,6 +83,18 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	{
 		statsManager = JPPFDriver.getInstance().getStatsManager();
 		jobManager = JPPFDriver.getInstance().getJobManager();
+		try
+		{
+			JMXDriverConnectionWrapper jmxWrapper = new JMXDriverConnectionWrapper();
+			jmxWrapper.connect();
+			MBeanServerConnection mbsc = jmxWrapper.getMbeanConnection();
+			ObjectName objectName = new ObjectName(JPPFAdminMBean.DRIVER_JOB_MANAGEMENT_MBEAN_NAME);
+			jobManagamentMBean = (DriverJobManagementMBean) MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, DriverJobManagementMBean.class, true);
+		}
+		catch(Exception e)
+		{
+			log.error("Could not initialize a proxy to the job management MBean", e);
+		}
 	}
 
 	/**
@@ -85,12 +109,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		try
 		{
 			lock.lock();
-			String jobId = (String) bundle.getParameter(BundleParameter.JOB_UUID);
-			BundleWrapper other = jobMap.get(jobId);
+			String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+			String jobUuid = (String) bundle.getParameter(BundleParameter.JOB_UUID);
+			BundleWrapper other = jobMap.get(jobUuid);
 			if (other != null)
 			{
 				other.merge(bundleWrapper, false);
-				if (debugEnabled) log.debug("re-submitting bundle with [priority=" + sla.getPriority()+", initialTasksCount=" +
+				if (debugEnabled) log.debug("re-submitting bundle with [jobId=" + jobId + ", priority=" + sla.getPriority()+", initialTasksCount=" +
 					bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + "]");
 				bundle.setParameter("real.task.count", bundle.getTaskCount());
 				fireQueueEvent(new QueueEvent(this, other, true));
@@ -98,7 +123,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			else
 			{
 				bundle.setQueueEntryTime(System.currentTimeMillis());
-				if (debugEnabled) log.debug("adding bundle with [priority=" + sla.getPriority()+", initialTasksCount=" +
+				if (debugEnabled) log.debug("adding bundle with [jobId=" + jobId + ", priority=" + sla.getPriority()+", initialTasksCount=" +
 					bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + "]");
 				putInListMap(new JPPFPriority(sla.getPriority()), bundleWrapper, priorityMap);
 				putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
@@ -106,24 +131,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 				if (requeued == null) requeued = false;
 				if (!requeued)
 				{
-					JPPFSchedule schedule = sla.getJobSchedule();
-					boolean pending = (schedule == null) ? false : true;
-					bundle.setParameter(BundleParameter.JOB_PENDING, pending);
-					if (pending)
-					{
-						try
-						{
-							jobScheduleHandler.scheduleAction(jobId, sla.getJobSchedule(), new JobScheduleAction(bundleWrapper));
-						}
-						catch(ParseException e)
-						{
-							bundle.setParameter(BundleParameter.JOB_PENDING, false);
-							log.error("Unparseable date for job id " + jobId + " : date = " + schedule.getDate() +
-								", date format = " + (schedule.getDateFormat() == null ? "null" : schedule.getDateFormat().toLocalizedPattern()), e);
-						}
-					}
+					handleStartJobSchedule(bundleWrapper);
+					handleExpirationJobSchedule(bundleWrapper);
 				}
-				jobMap.put(jobId, bundleWrapper);
+				jobMap.put(jobUuid, bundleWrapper);
 				fireQueueEvent(new QueueEvent(this, bundleWrapper, requeued));
 			}
 		}
@@ -131,8 +142,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		{
 			lock.unlock();
 		}
-		if (debugEnabled) log.debug("Maps size information:\n" + formatSizeMapInfo("priorityMap", priorityMap) + "\n" +
-			formatSizeMapInfo("sizeMap", sizeMap));
+		if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
 		statsManager.taskInQueue(bundle.getTaskCount());
 	}
 
@@ -162,16 +172,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		try
 		{
 			lock.lock();
-			if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks");
-			if (debugEnabled) log.debug("next bundle has " + bundle.getTaskCount() + " tasks");
+			if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + bundle.getTaskCount() + " tasks");
 			int size = getSize(bundleWrapper);
 			removeFromListMap(size, bundleWrapper, sizeMap);
 			if (nbTasks >= bundle.getTaskCount())
 			{
-				if (debugEnabled) log.debug("removing bundle from queue");
 				result = bundleWrapper;
-				removeFromListMap(new JPPFPriority(bundle.getJobSLA().getPriority()), bundleWrapper, priorityMap);
-				jobMap.remove((String) bundle.getParameter(BundleParameter.JOB_UUID));
+				removeBundle(bundleWrapper);
 				bundle.setParameter("real.task.count", 0);
 			}
 			else
@@ -196,7 +203,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		{
 			lock.unlock();
 		}
-		if (debugEnabled) log.debug("Maps size information:\n" + formatSizeMapInfo("priorityMap", priorityMap) + "\n" +
+		if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " +
 			formatSizeMapInfo("sizeMap", sizeMap));
 		statsManager.taskOutOfQueue(result.getBundle().getTaskCount(), System.currentTimeMillis() - result.getBundle().getQueueEntryTime());
 		return result;
@@ -240,6 +247,25 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public void removeBundle(BundleWrapper bundleWrapper)
+	{
+		lock.lock();
+		try
+		{
+			JPPFTaskBundle bundle = bundleWrapper.getBundle();
+			if (debugEnabled) log.debug("removing bundle from queue, jobId=" + bundle.getParameter(BundleParameter.JOB_ID));
+			removeFromListMap(new JPPFPriority(bundle.getJobSLA().getPriority()), bundleWrapper, priorityMap);
+			jobMap.remove((String) bundle.getParameter(BundleParameter.JOB_UUID));
+		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
+
+	/**
 	 * Get an iterator on the task bundles in this queue.
 	 * @return an iterator.
 	 * @see java.lang.Iterable#iterator()
@@ -247,6 +273,75 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	public Iterator<BundleWrapper> iterator()
 	{
 		return new BundleIterator();
+	}
+
+	/**
+	 * Process the start schedule specified in the job SLA.
+	 * @param bundleWrapper the job to process.
+	 */
+	private void handleStartJobSchedule(BundleWrapper bundleWrapper)
+	{
+		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFJobSLA sla = bundle.getJobSLA();
+		JPPFSchedule schedule = sla.getJobSchedule();
+		if (schedule != null)
+		{
+			String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+			Object uuid = bundle.getParameter(BundleParameter.JOB_UUID);
+			if (debugEnabled) log.debug("found start " + schedule + " for jobId = " + jobId);
+			try
+			{
+				long dt = (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME_MILLIS);
+				jobScheduleHandler.scheduleAction(uuid, schedule, new JobScheduleAction(bundleWrapper), dt);
+			}
+			catch(ParseException e)
+			{
+				bundle.setParameter(BundleParameter.JOB_PENDING, false);
+				log.error("Unparseable start date for job id " + jobId + " : date = " + schedule.getDate() +
+					", date format = " + (schedule.getDateFormat() == null ? "null" : schedule.getDateFormat().toLocalizedPattern()), e);
+			}
+		}
+		else bundle.setParameter(BundleParameter.JOB_PENDING, false);
+	}
+
+	/**
+	 * Process the expiration schedule specified in the job SLA.
+	 * @param bundleWrapper the job to process.
+	 */
+	private void handleExpirationJobSchedule(BundleWrapper bundleWrapper)
+	{
+		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		bundle.setParameter(BundleParameter.JOB_EXPIRED, false);
+		JPPFJobSLA sla = bundle.getJobSLA();
+		JPPFSchedule schedule = sla.getJobExpirationSchedule();
+		if (schedule != null)
+		{
+			String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+			Object uuid = bundle.getParameter(BundleParameter.JOB_UUID);
+			if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + jobId);
+			long dt = (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME_MILLIS);
+			try
+			{
+				jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(bundleWrapper), dt);
+			}
+			catch(ParseException e)
+			{
+				bundle.setParameter(BundleParameter.JOB_EXPIRED, false);
+				log.error("Unparseable expiration date for job id " + jobId + " : date = " + schedule.getDate() +
+					", date format = " + (schedule.getDateFormat() == null ? "null" : schedule.getDateFormat().toLocalizedPattern()), e);
+			}
+		}
+	}
+
+	/**
+	 * Clear all the scheduled actions associated with a job.
+	 * This method should normally only be called when a job has completed.
+	 * @param jobUuid the job uuid.
+	 */
+	public void clearSchedules(String jobUuid)
+	{
+		jobScheduleHandler.cancelAction(jobUuid);
+		jobExpirationHandler.cancelAction(jobUuid);
 	}
 
 	/**
@@ -340,7 +435,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	/**
 	 * Action triggered when a job reaches its scheduled execution date.
 	 */
-	public class JobScheduleAction implements Runnable
+	private class JobScheduleAction implements Runnable
 	{
 		/**
 		 * The bundle wrapper encapsulating the job.
@@ -364,8 +459,57 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		{
 			synchronized(bundleWrapper)
 			{
+				if (debugEnabled)
+				{
+					String jobId = (String) bundleWrapper.getBundle().getParameter(BundleParameter.JOB_ID);
+					log.debug("job '" + jobId + "' is resuming");
+				}
 				bundleWrapper.getBundle().setParameter(BundleParameter.JOB_PENDING, false);
 				jobManager.jobUpdated(bundleWrapper);
+			}
+		}
+	}
+
+	/**
+	 * Action triggered when a job reaches its scheduled execution date.
+	 */
+	private class JobExpirationAction implements Runnable
+	{
+		/**
+		 * The bundle wrapper encapsulating the job.
+		 */
+		private BundleWrapper bundleWrapper = null;
+
+		/**
+		 * Initialize this action witht he specified bundle wrapper.
+		 * @param bundleWrapper the bundle wrapper encapsulating the job.
+		 */
+		public JobExpirationAction(BundleWrapper bundleWrapper)
+		{
+			this.bundleWrapper = bundleWrapper;
+		}
+
+		/**
+		 * Execute this action.
+		 * @see java.lang.Runnable#run()
+		 */
+		public void run()
+		{
+			synchronized(bundleWrapper)
+			{
+				String jobId = (String) bundleWrapper.getBundle().getParameter(BundleParameter.JOB_ID);
+				try
+				{
+					if (debugEnabled) log.debug("job '" + jobId + "' is expiring");
+					removeBundle(bundleWrapper);
+					bundleWrapper.getBundle().setParameter(BundleParameter.JOB_EXPIRED, true);
+					String jobUuid = (String) bundleWrapper.getBundle().getParameter(BundleParameter.JOB_UUID);
+					jobManagamentMBean.cancelJob(jobUuid);
+				}
+				catch (Exception e)
+				{
+					log.error("Error while cancelling job id = " + jobId, e);
+				}
 			}
 		}
 	}

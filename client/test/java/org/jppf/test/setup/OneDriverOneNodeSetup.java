@@ -1,0 +1,93 @@
+/*
+ * JPPF.
+ * Copyright (C) 2005-2010 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jppf.test.setup;
+
+import java.io.IOException;
+
+import org.jppf.client.JPPFClient;
+import org.junit.*;
+
+/**
+ * Unit tests for {@link JPPFExecutorService}.
+ * @author Laurent Cohen
+ */
+public class OneDriverOneNodeSetup
+{
+	/**
+	 * Message used for successful task execution.
+	 */
+	public static final String EXECUTION_SUCCESSFUL_MESSAGE = "execution successful";
+	/**
+	 * The node to lunch for the test.
+	 */
+	protected static NodeProcessLauncher node = null;
+	/**
+	 * The node to lunch for the test.
+	 */
+	protected static DriverProcessLauncher driver = null;
+	/**
+	 * The jppf client to use.
+	 */
+	protected static JPPFClient client = null;
+	/**
+	 * Shutdown hook used to destroy the driver and node processes, in case the JVM terminates abnormally.
+	 */
+	protected static Thread shutdownHook = null;
+	/**
+	 * Default duration for tasks that use a duration. Adjust the value for slow hardware.
+	 */
+	protected static final long TASK_DURATION = 100L;
+
+	/**
+	 * Launches a driver and node and start the client.
+	 * @throws IOException if a process could not be started.
+	 */
+	@BeforeClass
+	public static void setup() throws IOException
+	{
+		shutdownHook = new Thread()
+		{
+			public void run()
+			{
+				node.stopProcess();
+				driver.stopProcess();
+			}
+		};
+		Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+		driver = new DriverProcessLauncher();
+		driver.startProcess();
+		node = new NodeProcessLauncher(1);
+		node.startProcess();
+		client = new JPPFClient();
+	}
+
+	/**
+	 * Stops the driver and node and close the client.
+	 * @throws IOException if a process could not be stopped.
+	 */
+	@AfterClass
+	public static void cleanup() throws IOException
+	{
+		client.close();
+		node.stopProcess();
+		driver.stopProcess();
+		Runtime.getRuntime().removeShutdownHook(shutdownHook);
+	}
+}

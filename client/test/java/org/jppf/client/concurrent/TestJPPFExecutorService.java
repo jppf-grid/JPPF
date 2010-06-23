@@ -20,82 +20,18 @@ package org.jppf.client.concurrent;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.client.JPPFClient;
 import org.jppf.test.setup.*;
-import org.junit.*;
+import org.junit.Test;
 
 /**
  * Unit tests for {@link JPPFExecutorService}.
  * @author Laurent Cohen
  */
-public class TestJPPFExecutorService
+public class TestJPPFExecutorService extends OneDriverOneNodeSetup
 {
-	/**
-	 * Message used for successful task execution.
-	 */
-	public static final String EXECUTION_SUCCESSFUL_MESSAGE = "execution successful";
-	/**
-	 * The node to lunch for the test.
-	 */
-	private static NodeProcessLauncher node = null;
-	/**
-	 * The node to lunch for the test.
-	 */
-	private static DriverProcessLauncher driver = null;
-	/**
-	 * The jppf client to use.
-	 */
-	private static JPPFClient client = null;
-	/**
-	 * Shutdown hook used to destroy the driver and node processes, in case the JVM terminates abnormally.
-	 */
-	private static Thread shutdownHook = null;
-	/**
-	 * Default duration for tasks that use a duration. Adjust the value for slow hardware.
-	 */
-	private static final long TASK_DURATION = 100L;
-
-	/**
-	 * Launches a driver and node and start the client.
-	 * @throws IOException if a process could not be started.
-	 */
-	@BeforeClass
-	public static void setup() throws IOException
-	{
-		shutdownHook = new Thread()
-		{
-			public void run()
-			{
-				node.stopProcess();
-				driver.stopProcess();
-			}
-		};
-		Runtime.getRuntime().addShutdownHook(shutdownHook);
-
-		driver = new DriverProcessLauncher();
-		driver.startProcess();
-		node = new NodeProcessLauncher(1);
-		node.startProcess();
-		client = new JPPFClient();
-	}
-
-	/**
-	 * Stops the driver and node and close the client.
-	 * @throws IOException if a process could not be stopped.
-	 */
-	@AfterClass
-	public static void cleanup() throws IOException
-	{
-		node.stopProcess();
-		driver.stopProcess();
-		Runtime.getRuntime().removeShutdownHook(shutdownHook);
-		client.close();
-	}
-
 	/**
 	 * Invocation of <code>JPPFExecutorService.submit(Runnable)</code>.
 	 * @throws Exception if any error occurs

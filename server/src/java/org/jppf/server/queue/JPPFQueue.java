@@ -58,4 +58,10 @@ public interface JPPFQueue extends Iterable<BundleWrapper>
 	 * @return the bundle size as an int.
 	 */
 	int getMaxBundleSize();
+
+	/**
+	 * Remove the specified bundle from the queue.
+	 * @param bundleWrapper the bundle to remove.
+	 */
+	void removeBundle(BundleWrapper bundleWrapper);
 }

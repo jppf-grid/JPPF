@@ -18,9 +18,11 @@
 
 package org.jppf.scheduling;
 
-import java.text.ParseException;
+import java.text.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.commons.logging.*;
 
 /**
  * This class handles a timer.
@@ -28,6 +30,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class JPPFScheduleHandler
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(JPPFScheduleHandler.class);
+	/**
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Timer that will trigger an action when a schedule date is reached.
 	 */
@@ -44,6 +54,10 @@ public class JPPFScheduleHandler
 	 * The name given to this schedule handler's internal timer.
 	 */
 	private String name = null;
+	/**
+	 * Used to debug date information.
+	 */
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
 	/**
 	 * Initialize this schedule handler with a default name.
@@ -66,25 +80,51 @@ public class JPPFScheduleHandler
 	/**
 	 * Schedule an action.
 	 * @param key key used to retrieve or cancel the action at a later time.
-	 * @param config the schedule at which the action is triggered.
+	 * @param schedule the schedule at which the action is triggered.
 	 * @param action the action to perform when the schedule date is reached.
 	 * @throws ParseException if the schedule date could not be parsed
 	 */
-	public void scheduleAction(Object key, JPPFSchedule config, Runnable action) throws ParseException
+	public void scheduleAction(Object key, JPPFSchedule schedule, Runnable action) throws ParseException
 	{
-		long date = -1L;
-		if (config.getDuration() > 0)
+		scheduleAction(key, schedule, action, System.currentTimeMillis());
+	}
+
+	/**
+	 * Schedule an action.
+	 * @param key key used to retrieve or cancel the action at a later time.
+	 * @param schedule the schedule at which the action is triggered.
+	 * @param action the action to perform when the schedule date is reached.
+	 * @param start the start time to use if the schedule is expressed as a durartion.
+	 * @throws ParseException if the schedule date could not be parsed
+	 */
+	public void scheduleAction(Object key, JPPFSchedule schedule, Runnable action, long start) throws ParseException
+	{
+		if (debugEnabled)
 		{
-			date = System.currentTimeMillis() + config.getDuration();
+			synchronized(sdf)
+			{
+				log.debug(name + " : scheduling action[key=" + key + ", " + schedule + ", action=" + action + ", start=" + sdf.format(new Date(start)));
+			}
+		}
+		Date date = null;
+		if (schedule.getDuration() > 0L)
+		{
+			date = new Date(start + schedule.getDuration());
 		}
 		else
 		{
-			Date d = config.getDateFormat().parse(config.getDate());
-			date = d.getTime();
+			date = schedule.getDateFormat().parse(schedule.getDate());
 		}
 		ScheduleHandlerTask task = new ScheduleHandlerTask(key, action);
 		timerTaskMap.put(key, task);
-		timer.schedule(task, new Date(date));
+		if (debugEnabled)
+		{
+			synchronized(sdf)
+			{
+				log.debug(name + " : date=" + sdf.format(date) + ", key=" + key + ", timerTaskMap=" + timerTaskMap);
+			}
+		}
+		timer.schedule(task, date);
 	}
 
 	/**
@@ -95,6 +135,7 @@ public class JPPFScheduleHandler
 	{
 		TimerTask task = null;
 		task = timerTaskMap.remove(key);
+		if (debugEnabled) log.debug(name + " : cancelling action for key=" + key + ", task=" + task);
 		if (task != null) task.cancel();
 	}
 

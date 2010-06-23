@@ -133,7 +133,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 */
 	public void execute(JPPFTaskBundle bundle, List<JPPFTask> taskList) throws Exception
 	{
-		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
+		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks for job '" + bundle.getParameter(BundleParameter.JOB_ID) + "'");
 		NodeExecutionInfo info = null;
 		if (cpuTimeEnabled) info = computeExecutionInfo();
 		setup(bundle);
@@ -340,6 +340,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 */
 	public void setup(JPPFTaskBundle bundle)
 	{
+		if (debugEnabled) log.debug("setup before job execution");
 		this.bundle = bundle;
 		this.uuidList = bundle.getUuidPath().getList();
 		taskCount = new AtomicLong(0L);
@@ -350,6 +351,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 */
 	public void cleanup()
 	{
+		if (debugEnabled) log.debug("cleaning up after job execution");
 		this.bundle = null;
 		this.uuidList = null;
 		futureMap.clear();
@@ -469,7 +471,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 */
 	public String getCurrentJobId()
 	{
-		return (bundle != null) ? (String) bundle.getParameter(BundleParameter.JOB_ID) : null;
+		return (bundle != null) ? (String) bundle.getParameter(BundleParameter.JOB_UUID) : null;
 	}
 
 	/**

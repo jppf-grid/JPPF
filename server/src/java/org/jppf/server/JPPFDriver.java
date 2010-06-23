@@ -136,7 +136,7 @@ public class JPPFDriver
 	{
 		jobManager = new JPPFJobManager();
 		taskQueue = new JPPFPriorityQueue();
-		((JPPFPriorityQueue) taskQueue).addListener(jobManager);
+		((JPPFPriorityQueue) taskQueue).addQueueListener(jobManager);
 		JPPFConnectionInformation info = createConnectionInformation();
 		boolean useMina = JPPFConfiguration.getProperties().getBoolean("communications.use.mina", false);
 		if (useMina) System.out.println("Using Mina framework");
