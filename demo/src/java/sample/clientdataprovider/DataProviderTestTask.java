@@ -56,7 +56,7 @@ public class DataProviderTestTask extends JPPFTask
 	{
 		//System.out.println("this should be on the node side");
 		ClientDataProvider dp = (ClientDataProvider) getDataProvider();
-		Object o = dp.computeValue("result", new MyCallable());
+		Object o = dp.computeValue("result", new MyCallable("" + i + ":" + j));
 		byte[] bytes = (byte[]) o;
 		System.out.println("Result of client-side execution is a byte[" + bytes.length + "]");
 		setResult(o);
@@ -68,6 +68,20 @@ public class DataProviderTestTask extends JPPFTask
 	public static class MyCallable implements JPPFCallable<byte[]>
 	{
 		/**
+		 * The id for this callable.
+		 */
+		private String id = null;
+
+		/**
+		 * Initialize this callable wth the specified id.
+		 * @param id the id for this callable.
+		 */
+		public MyCallable(String id)
+		{
+			this.id = id;
+		}
+
+		/**
 		 * Execute this callable.
 		 * @return a string message.
 		 * @see java.util.concurrent.Callable#call()
@@ -76,7 +90,17 @@ public class DataProviderTestTask extends JPPFTask
 		{
 			//String s = "this should be on the client side";
 			//System.out.println(s);
-			return new byte[10*1024*1024];
+			Thread thread = Thread.currentThread();
+			System.out.println("computeValue() for callable id '" + id + "' is running in thread '" + thread.getName() + "'");
+			try
+			{
+				Thread.sleep(1000L);
+				return new byte[10];
+			}
+			catch(Exception e)
+			{
+				return null;
+			}
 		}
 	}
 }
