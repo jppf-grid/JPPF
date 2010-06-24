@@ -23,13 +23,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
 import org.jppf.server.protocol.BundleWrapper;
-import org.jppf.utils.EventEmitter;
 
 /**
  * Abstract superclass for all JPPFQueue implementations.
  * @author Laurent Cohen
  */
-public abstract class AbstractJPPFQueue extends EventEmitter<QueueListener> implements JPPFQueue
+public abstract class AbstractJPPFQueue implements JPPFQueue
 {
 	/**
 	 * Logger for this class.
@@ -51,6 +50,44 @@ public abstract class AbstractJPPFQueue extends EventEmitter<QueueListener> impl
 	 * 
 	 */
 	protected int latestMaxSize = 0;
+	/**
+	 * The list of registered listeners.
+	 */
+	protected List<QueueListener> queueListeners = new ArrayList<QueueListener>();
+
+	/**
+	 * Add a listener to the list of listeners.
+	 * @param listener the listener to add to the list.
+	 */
+	public void addQueueListener(QueueListener listener)
+	{
+		synchronized(queueListeners)
+		{
+			queueListeners.add(listener);
+		}
+	}
+
+	/**
+	 * Remove a listener from the list of listeners.
+	 * @param listener the listener to rmeove from the list.
+	 */
+	public void removeQueueListener(QueueListener listener)
+	{
+		synchronized(queueListeners)
+		{
+			queueListeners.remove(listener);
+		}
+	}
+
+	/**
+	 * return a list of all the registered listee ners.
+	 * This list is not thread safe and must bmanually synchronized against concurrent modifications.
+	 * @return a list of listener instances.
+	 */
+	public List<QueueListener> getQueueListeners()
+	{
+		return queueListeners;
+	}
 
 	/**
 	 * Get the bundle size to use for bundle size tuning.
@@ -69,9 +106,9 @@ public abstract class AbstractJPPFQueue extends EventEmitter<QueueListener> impl
 	 */
 	protected void fireQueueEvent(QueueEvent event)
 	{
-		synchronized(getListeners())
+		synchronized(getQueueListeners())
 		{
-			for (QueueListener listener : getListeners()) listener.newBundle(event);
+			for (QueueListener listener : getQueueListeners()) listener.newBundle(event);
 		}
 	}
 

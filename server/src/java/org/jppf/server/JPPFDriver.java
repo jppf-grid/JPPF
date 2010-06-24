@@ -138,7 +138,7 @@ public class JPPFDriver
 	{
 		jobManager = new JPPFJobManager();
 		taskQueue = new JPPFPriorityQueue();
-		((JPPFPriorityQueue) taskQueue).addListener(jobManager);
+		((JPPFPriorityQueue) taskQueue).addQueueListener(jobManager);
 		JPPFConnectionInformation info = createConnectionInformation();
 
 		classServer = new ClassNioServer(info.classServerPorts);

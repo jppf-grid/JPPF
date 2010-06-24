@@ -139,8 +139,8 @@ public final class CollectionUtils
 	public static <T, U> String formatSizeMapInfo(String name, Map<T, List<U>> map)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(name).append(": shallow size = ").append(map.size());
-		sb.append(", total elements = ").append(sizeOfListMap(map));
+		sb.append(name).append("[shallow size=").append(map.size());
+		sb.append(", total elements=").append(sizeOfListMap(map)).append("]");
 		return sb.toString();
 	}
 

@@ -33,7 +33,8 @@ public class NodeProcessLauncher extends GenericProcessLauncher
 		super();
 		setMainClass("org.jppf.node.NodeRunner");
 		addArgument("noLauncher");
-		setJppfConfig("config/node" + n + ".properties");
-		setLog4j("config/log4j-node" + n + ".properties");
+		setJppfConfig("node" + n + ".properties");
+		setLog4j("log4j-node" + n + ".properties");
+		addClasspathElement("test/classes/config");
 	}
 }

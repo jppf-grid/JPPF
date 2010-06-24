@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.job.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.*;
@@ -32,7 +33,7 @@ import org.jppf.utils.*;
  * Instances of this class manage and monitor the jobs throughout their processing within the JPPF driver.
  * @author Laurent Cohen
  */
-public class JPPFJobManager extends EventEmitter<JobListener> implements QueueListener
+public class JPPFJobManager implements QueueListener
 {
 	/**
 	 * Logger for this class.
@@ -54,6 +55,10 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 	 * Processes the event queue asynchronously.
 	 */
 	private ExecutorService executor = null;
+	/**
+	 * The list of registered listeners.
+	 */
+	protected List<JobListener> eventListeners = new ArrayList<JobListener>();
 
 	/**
 	 * Default constructor.
@@ -158,6 +163,7 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 		String jobId = (String) bundle.getParameter(BundleParameter.JOB_UUID);
 		jobMap.remove(jobId);
 		bundleMap.remove(jobId);
+		((JPPFPriorityQueue) JPPFDriver.getInstance().getQueue()).clearSchedules(jobId);
 		if (debugEnabled) log.debug("jobId '" + jobId + "' ended");
 		submitEvent(JobEventType.JOB_ENDED, bundle, null);
 	}
@@ -204,5 +210,39 @@ public class JPPFJobManager extends EventEmitter<JobListener> implements QueueLi
 		executor.shutdownNow();
 		jobMap.clear();
 		bundleMap.clear();
+	}
+
+	/**
+	 * Add a listener to the list of listeners.
+	 * @param listener the listener to add to the list.
+	 */
+	public void addJobListener(JobListener listener)
+	{
+		synchronized(eventListeners)
+		{
+			eventListeners.add(listener);
+		}
+	}
+
+	/**
+	 * Remove a listener from the list of listeners.
+	 * @param listener the listener to rmeove from the list.
+	 */
+	public void removeJobListener(JobListener listener)
+	{
+		synchronized(eventListeners)
+		{
+			eventListeners.remove(listener);
+		}
+	}
+
+	/**
+	 * return a list of all the registered listee ners.
+	 * This list is not thread safe and must bmanually synchronized against concurrent modifications.
+	 * @return a list of listener instances.
+	 */
+	public List<JobListener> getJobListeners()
+	{
+		return eventListeners;
 	}
 }
