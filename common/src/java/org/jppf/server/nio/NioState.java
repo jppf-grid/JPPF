@@ -33,4 +33,14 @@ public abstract class NioState<T extends Enum<T>>
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 */
 	public abstract T performTransition(ChannelWrapper<?> channel) throws Exception;
+
+	/**
+	 * Determine whether the interest ops for the channel should be changed
+	 * whenever the channel is transitionned to the same state. 
+	 * @return true if the interest ops should be changed, false otherwise.
+	 */
+	public boolean autoChangeInterestOps()
+	{
+		return true;
+	}
 }

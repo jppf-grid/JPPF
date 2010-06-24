@@ -46,17 +46,6 @@ public class LocalNodeContext extends AbstractNodeContext
 	}
 
 	/**
-	 * Serialize this context's bundle into a byte buffer.
-	 * @param channel channel wrapper for this context.
-	 * @throws Exception if any error occurs.
-	 */
-	public void serializeBundle(ChannelWrapper<?> channel) throws Exception
-	{
-		//if (nodeMessage == null)
-		super.serializeBundle(channel);
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
@@ -74,5 +63,18 @@ public class LocalNodeContext extends AbstractNodeContext
 	{
 		super.setNodeMessage(nodeMessage, channel);
 		((LocalNodeWrapperHandler) channel).wakeUp();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setState(NodeState state)
+	{
+		if (NodeState.SENDING_BUNDLE.equals(this.state) && NodeState.IDLE.equals(state))
+		{
+			log.debug("debug stack", new Exception());
+			int breakpoint = 0;
+		}
+		super.setState(state);
 	}
 }

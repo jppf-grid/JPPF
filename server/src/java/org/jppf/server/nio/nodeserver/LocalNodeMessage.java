@@ -36,6 +36,7 @@ public class LocalNodeMessage extends AbstractNodeMessage
 	 */
 	public boolean read(ChannelWrapper<?> wrapper) throws Exception
 	{
+		//while (locations.isEmpty()) ((LocalNodeWrapperHandler) wrapper).goToSleep();
 		InputStream is = locations.get(0).getInputStream();
 		byte[] data = FileUtils.getInputStreamAsByte(is);
 		data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
@@ -57,7 +58,7 @@ public class LocalNodeMessage extends AbstractNodeMessage
 	 */
 	public boolean write(ChannelWrapper<?> wrapper) throws Exception
 	{
-		((LocalNodeWrapperHandler) wrapper).wakeUp();
+		//((LocalNodeWrapperHandler) wrapper).wakeUp();
 		return true;
 	}
 

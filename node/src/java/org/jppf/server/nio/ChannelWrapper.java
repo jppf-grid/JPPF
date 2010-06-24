@@ -24,7 +24,6 @@ package org.jppf.server.nio;
  */
 public interface ChannelWrapper<S>
 {
-
 	/**
 	 * Get the channel to wrap.
 	 * @return the wrapped channel.
@@ -102,4 +101,12 @@ public interface ChannelWrapper<S>
 	 * @param selector a {@link LocalChannelSelector} instance.
 	 */
 	void setSelector(ChannelSelector selector);
+	/**
+	 * Take a lock on this channel.
+	 */
+	void lock();
+	/**
+	 * Release a lock on this channel.
+	 */
+	void unlock();
 }

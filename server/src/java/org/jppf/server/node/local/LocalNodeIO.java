@@ -82,14 +82,27 @@ public class LocalNodeIO extends AbstractNodeIO
 	{
 		if (debugEnabled) log.debug("waiting for next request");
 		LocalNodeWrapperHandler wrapper = (LocalNodeWrapperHandler) ioHandler;
+		while (wrapper.getMessage() != null) wrapper.goToSleep();
 		wrapper.setReadyOps(OP_WRITE);
 		while (wrapper.getMessage() == null) wrapper.goToSleep();
-		LocalNodeMessage message = wrapper.getMessage();
-		DataLocation location = message.getLocations().get(0);
-		if (debugEnabled) log.debug("got bundle");
-		byte[] data = JPPFDataTransformFactory.transform(false, location.getInputStream());
-		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
-		return deserializeObjects(bundle);
+		wrapper.lock();
+		try
+		{
+			wrapper.setReadyOps(0);
+			LocalNodeMessage message = wrapper.getMessage();
+			DataLocation location = message.getLocations().get(0);
+			if (debugEnabled) log.debug("got bundle");
+			byte[] data = JPPFDataTransformFactory.transform(false, location.getInputStream());
+			JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
+			Object[] result = deserializeObjects(bundle);
+			if (debugEnabled) log.debug("got all data");
+			wrapper.setMessage(null);
+			return result;
+		}
+		finally
+		{
+			wrapper.unlock();
+		}
 	}
 
 	/**
@@ -97,23 +110,34 @@ public class LocalNodeIO extends AbstractNodeIO
 	 */
 	public void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
 	{
+		if (debugEnabled) log.debug("writing results");
 		LocalNodeWrapperHandler wrapper = (LocalNodeWrapperHandler) ioHandler;
-		wrapper.setMessage(null);
-		ExecutorService executor = node.getExecutionManager().getExecutor();
-		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
-		bundle.setNodeExecutionTime(elapsed);
-		List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>();
-		futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
-		for (JPPFTask task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
-		LocalNodeContext ctx = wrapper.getChannel();
-		if (ctx.getNodeMessage() == null) ctx.setNodeMessage(ctx.newMessage(), wrapper);
-		for (Future<DataLocation> f: futureList)
+		wrapper.lock();
+		try
 		{
-			DataLocation location = f.get();
-			ctx.getNodeMessage().addLocation(location);
+			ExecutorService executor = node.getExecutionManager().getExecutor();
+			long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
+			bundle.setNodeExecutionTime(elapsed);
+			List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>();
+			futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
+			for (JPPFTask task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
+			LocalNodeContext ctx = wrapper.getChannel();
+			if (ctx.getNodeMessage() == null) ctx.setNodeMessage(ctx.newMessage(), wrapper);
+			for (Future<DataLocation> f: futureList)
+			{
+				DataLocation location = f.get();
+				ctx.getNodeMessage().addLocation(location);
+			}
+			if (debugEnabled) log.debug("wrote full results");
+			wrapper.setReadyOps(OP_READ);
 		}
-		wrapper.setReadyOps(OP_READ);
-		while (ctx.getNodeMessage() != null) wrapper.goToSleep();
+		finally
+		{
+			wrapper.unlock();
+		}
+		wrapper.goToSleep();
+		//while (ctx.getNodeMessage() != null) wrapper.goToSleep();
+		//if (debugEnabled) log.debug("results have been read by the server");
 		//ioHandler.flush();
 	}
 
@@ -147,9 +171,9 @@ public class LocalNodeIO extends AbstractNodeIO
 			int p = (object instanceof JPPFTask) ? ((JPPFTask) object).getPosition() : -1;
 			try
 			{
-				if (debugEnabled) log.debug("before serialization of object at position " + p);
+				if (log.isTraceEnabled()) log.trace("before serialization of object at position " + p);
 				data = serialize(object);
-				if (debugEnabled) log.debug("serialized object at position " + p);
+				if (log.isTraceEnabled()) log.trace("serialized object at position " + p);
 			}
 			catch(Throwable t)
 			{

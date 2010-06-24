@@ -76,6 +76,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	protected void submitTransition(ChannelWrapper<?> key)
 	{
+		if (debugEnabled) log.debug("submitting transition for " + key);
 		setKeyOps(key, 0);
 		StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, server.getFactory());
 		if (sequential) transition.run();
@@ -105,27 +106,40 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 
 	/**
 	 * Transition the specified channel to the specified state.
-	 * @param key the key holding the channel and associated context. 
+	 * @param channel the key holding the channel and associated context. 
 	 * @param transition holds the new state of the channel and associated key ops.
 	 */
-	public void transitionChannel(ChannelWrapper<?> key, T transition)
+	public void transitionChannel(ChannelWrapper<?> channel, T transition)
 	{
-		Lock lock = server.getLock();
-		lock.lock();
+		channel.lock();
 		try
 		{
-			server.getSelector().wakeup();
-			NioContext<S> context = (NioContext<S>) key.getContext();
-			S s1 = context.getState();
-			NioTransition<S> t = server.getFactory().getTransition(transition);
-			S s2 = t.getState();
-			context.setState(s2);
-			key.setKeyOps(t.getInterestOps());
-			if (debugEnabled && (s1 != s2)) log.debug("transitionned " + key + " from " + s1 + " to " + s2);
+			server.getLock().lock();
+			try
+			{
+				server.getSelector().wakeup();
+				NioContext<S> context = (NioContext<S>) channel.getContext();
+				S s1 = context.getState();
+				NioTransition<S> t = server.getFactory().getTransition(transition);
+				S s2 = t.getState();
+				context.setState(s2);
+				boolean b = true;
+				if ((s1 == s2) && (s2 != null))
+				{
+					NioState<T> state = server.getFactory().getState(s2);
+					b = state.autoChangeInterestOps();
+				}
+				if (b) channel.setKeyOps(t.getInterestOps());
+				if (debugEnabled && (s1 != s2)) log.debug("transitionned " + channel + " from " + s1 + " to " + s2);
+			}
+			finally
+			{
+				server.getLock().unlock();
+			}
 		}
 		finally
 		{
-			lock.unlock();
+			channel.unlock();
 		}
 	}
 

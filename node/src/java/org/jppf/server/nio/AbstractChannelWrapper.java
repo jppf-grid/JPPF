@@ -21,6 +21,7 @@ package org.jppf.server.nio;
 import static java.nio.channels.SelectionKey.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.utils.ThreadSynchronization;
 
@@ -47,6 +48,10 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * The selctor for this channel.
 	 */
 	protected ChannelSelector selector = null;
+	/**
+	 * Used to take exclusive access to this channel.
+	 */
+	private ReentrantLock lock = new ReentrantLock();
 	
 	/**
 	 * Initialize this channel wrapper with the specified channel.
@@ -218,5 +223,21 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	public void setSelector(ChannelSelector selector)
 	{
 		this.selector = selector;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void lock()
+	{
+		lock.lock();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void unlock()
+	{
+		lock.unlock();
 	}
 }

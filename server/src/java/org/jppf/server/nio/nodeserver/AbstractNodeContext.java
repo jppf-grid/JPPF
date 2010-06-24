@@ -150,13 +150,15 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	public void serializeBundle(ChannelWrapper<?> wrapper) throws Exception
 	{
 		//if (nodeMessage == null)
-		nodeMessage = newMessage();
+		
+		AbstractNodeMessage message = newMessage();
 		byte[] data = helper.getSerializer().serialize(bundle.getBundle()).getBuffer();
 		data = JPPFDataTransformFactory.transform(true, data, 0, data.length);
-		nodeMessage.addLocation(new ByteBufferLocation(data, 0, data.length));
-		nodeMessage.addLocation(bundle.getDataProvider());
-		for (DataLocation dl: bundle.getTasks()) nodeMessage.addLocation(dl);
-		nodeMessage.setBundle(bundle.getBundle());
+		message.addLocation(new ByteBufferLocation(data, 0, data.length));
+		message.addLocation(bundle.getDataProvider());
+		for (DataLocation dl: bundle.getTasks()) message.addLocation(dl);
+		message.setBundle(bundle.getBundle());
+		setNodeMessage(message, wrapper);
 	}
 
 	/**

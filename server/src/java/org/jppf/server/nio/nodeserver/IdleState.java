@@ -74,4 +74,12 @@ class IdleState extends NodeServerState
 		}
 		return TO_IDLE;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean autoChangeInterestOps()
+	{
+		return false;
+	}
 }

@@ -18,11 +18,15 @@
 
 package org.jppf.server.node.remote;
 
+import java.util.*;
+import java.util.concurrent.*;
+
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.data.transform.JPPFDataTransformFactory;
+import org.jppf.data.transform.*;
 import org.jppf.server.node.*;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.*;
+import org.jppf.utils.*;
 
 /**
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
@@ -77,5 +81,85 @@ public class RemoteNodeIO extends AbstractNodeIO
 		node.setClassLoader(null);
 		node.initHelper();
 		socketWrapper.setSerializer(node.getHelper().getSerializer());
+	}
+
+	/**
+	 * Write the execution results to the socket stream.
+	 * @param bundle the task wrapper to send along.
+	 * @param tasks the list of tasks with their result field updated.
+	 * @throws Exception if an error occurs while writtng to the socket stream.
+	 * @see org.jppf.server.node.NodeIO#writeResults(org.jppf.server.protocol.JPPFTaskBundle, java.util.List)
+	 */
+	public void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
+	{
+		ExecutorService executor = node.getExecutionManager().getExecutor();
+		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
+		bundle.setNodeExecutionTime(elapsed);
+		List<Future<BufferList>> futureList = new ArrayList<Future<BufferList>>();
+		futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
+		for (JPPFTask task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
+		for (Future<BufferList> f: futureList)
+		{
+			BufferList list = f.get();
+			ioHandler.writeInt(list.second());
+			for (JPPFBuffer buf: list.first()) ioHandler.write(buf.buffer, 0, buf.length);
+		}
+		//ioHandler.flush();
+	}
+
+	/**
+	 * The goal of this class is to serialize an object before sending it back to the server,
+	 * and catch an eventual exception.
+	 */
+	protected class ObjectSerializationTask implements Callable<BufferList>
+	{
+		/**
+		 * The data to send over the network connection.
+		 */
+		private Object object = null;
+
+		/**
+		 * Initialize this task with the psecicfied data buffer.
+		 * @param object the object to serialize.
+		 */
+		public ObjectSerializationTask(Object object)
+		{
+			this.object = object;
+		}
+
+		/**
+		 * Execute this task.
+		 * @return the serialized object.
+		 * @see java.util.concurrent.Callable#call()
+		 */
+		public BufferList call()
+		{
+			BufferList data = null;
+			int p = (object instanceof JPPFTask) ? ((JPPFTask) object).getPosition() : -1;
+			try
+			{
+				if (debugEnabled) log.debug("before serialization of object at position " + p);
+				data = serialize(object);
+				if (debugEnabled) log.debug("serialized object at position " + p);
+			}
+			catch(Throwable t)
+			{
+				data = null;
+				log.error(t.getMessage(), t);
+				try
+				{
+					JPPFExceptionResult result = new JPPFExceptionResult(t, object);
+					object = null;
+					result.setPosition(p);
+					data = serialize(result);
+				}
+				catch(Exception e2)
+				{
+					log.error(e2.getMessage(), e2);
+				}
+			}
+			object = null;
+			return data;
+		}
 	}
 }

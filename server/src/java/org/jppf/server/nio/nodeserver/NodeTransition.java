@@ -42,7 +42,7 @@ public enum NodeTransition
 	 */
 	TO_WAIT_INITIAL,
 	/**
-	 * Transition from a state to SENDING_BUNDLE in idle mode.
+	 * Transition from a state to IDLE.
 	 */
 	TO_IDLE;
 }

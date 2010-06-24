@@ -54,6 +54,10 @@ class TaskQueueChecker implements Runnable
 	 * Reference to the driver.
 	 */
 	private JPPFDriver driver = JPPFDriver.getInstance();
+	/**
+	 * Determines whether this instance is already running its run() method.
+	 */
+	private boolean running = false;
 
 	/**
 	 * Initialize this task queue checker with the specified node server. 
@@ -70,45 +74,65 @@ class TaskQueueChecker implements Runnable
 	 */
 	public void run()
 	{
-		List<ChannelWrapper<?>> idleChannels = server.getIdleChannels();
-		synchronized(idleChannels)
+		setRunning(true);
+		try
 		{
-			if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return;
-			if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
-			ChannelWrapper channel = null;
-			BundleWrapper selectedBundle = null;
-			AbstractJPPFQueue queue = (AbstractJPPFQueue) server.getQueue();
-			queue.getLock().lock();
-			try
+			List<ChannelWrapper<?>> idleChannels = server.getIdleChannels();
+			synchronized(idleChannels)
 			{
-				Iterator<BundleWrapper> it = queue.iterator();
-				while ((channel == null) && it.hasNext() && !idleChannels.isEmpty())
+				if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return;
+				if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
+				ChannelWrapper channel = null;
+				BundleWrapper selectedBundle = null;
+				AbstractJPPFQueue queue = (AbstractJPPFQueue) server.getQueue();
+				queue.getLock().lock();
+				try
 				{
-					BundleWrapper bundleWrapper = it.next();
-					JPPFTaskBundle bundle = bundleWrapper.getBundle();
-					if (!checkJobState(bundle)) continue;
-					int n = findIdleChannelIndex(bundle);
-					if (n >= 0)
+					Iterator<BundleWrapper> it = queue.iterator();
+					while ((channel == null) && it.hasNext() && !idleChannels.isEmpty())
 					{
-						channel = idleChannels.remove(n);
-						selectedBundle = bundleWrapper;
+						BundleWrapper bundleWrapper = it.next();
+						JPPFTaskBundle bundle = bundleWrapper.getBundle();
+						if (!checkJobState(bundle)) continue;
+						int n = findIdleChannelIndex(bundle);
+						if (n >= 0)
+						{
+							channel = idleChannels.remove(n);
+							selectedBundle = bundleWrapper;
+						}
+					}
+					if (debugEnabled)
+					{
+						if (channel == null) log.debug("no channel found for bundle");
+						else log.debug("channel found for bundle: " + channel);
+					}
+					if (channel != null)
+					{
+						channel.lock();
+						try
+						{
+							AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
+							updateBundler(server.getBundler(), selectedBundle.getBundle(), context);
+							BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
+							context.setBundle(bundleWrapper);
+							server.getTransitionManager().transitionChannel(channel, NodeTransition.TO_SENDING);
+							driver.getJobManager().jobDispatched(context.getBundle(), channel);
+						}
+						finally
+						{
+							channel.unlock();
+						}
 					}
 				}
-				if (debugEnabled) log.debug((channel == null ? "no " : "") + "channel found for bundle");
-				if (channel != null)
+				finally
 				{
-					AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
-					updateBundler(server.getBundler(), selectedBundle.getBundle(), context);
-					BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
-					context.setBundle(bundleWrapper);
-					server.getTransitionManager().transitionChannel(channel, NodeTransition.TO_SENDING);
-					driver.getJobManager().jobDispatched(context.getBundle(), channel);
+					queue.getLock().unlock();
 				}
 			}
-			finally
-			{
-				queue.getLock().unlock();
-			}
+		}
+		finally
+		{
+			setRunning(false);
 		}
 	}
 
@@ -165,8 +189,10 @@ class TaskQueueChecker implements Runnable
 	{
 		JPPFJobSLA sla = bundle.getJobSLA();
 		if (sla.isSuspended()) return false;
-		Boolean b = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
-		if ((b != null) && b) return false;
+		boolean b = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING, Boolean.FALSE);
+		if (b) return false;
+		b = (Boolean) bundle.getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE);
+		if (b) return false;
 		String jobId = (String) bundle.getParameter(BundleParameter.JOB_UUID);
 		int maxNodes = sla.getMaxNodes();
 		List<ChannelBundlePair> list = server.getJobManager().getNodesForJob(jobId);
@@ -189,5 +215,23 @@ class TaskQueueChecker implements Runnable
 			JPPFJobMetadata metadata = (JPPFJobMetadata) taskBundle.getParameter(BundleParameter.JOB_METADATA);
 			((JobAwareness) context.getBundler()).setJobMetadata(metadata);
 		}
+	}
+
+	/**
+	 * Determine whether this instance is already running its run() method.
+	 * @return true if this instance is running, false otherwise.
+	 */
+	public synchronized boolean isRunning()
+	{
+		return running;
+	}
+
+	/**
+	 * Specifiy whether this instance is already running its run() method.
+	 * @param running true if this instance is running, false otherwise.
+	 */
+	public synchronized void setRunning(boolean running)
+	{
+		this.running = running;
 	}
 }

@@ -21,6 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.*;
@@ -89,6 +90,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * The local channel, if any.
 	 */
 	private ChannelWrapper<?> localChannel = null;
+	/**
+	 * 
+	 */
+	private ExecutorService checkerExecutor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("JobChecker"));
 
 	/**
 	 * Initialize this server with a specified port number.
@@ -107,12 +112,12 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	public NodeNioServer(int[] ports) throws Exception
 	{
-		super(ports, "NodeServer Thread", false);
+		super(ports, "NodeServer", false);
 		taskQueueChecker = new TaskQueueChecker(this);
 		this.selectTimeout = 1L;
 		Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
 		this.bundlerRef = new AtomicReference<Bundler>(bundler);
-		((JPPFPriorityQueue) getQueue()).addListener(new QueueListener()
+		((JPPFPriorityQueue) getQueue()).addQueueListener(new QueueListener()
 		{
 			public void newBundle(QueueEvent event)
 			{
@@ -134,7 +139,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 			localChannel.setSelector(channelSelector);
 			selectorThread = new ChannelSelectorThread(channelSelector, this);
 			localChannel.setKeyOps(getInitialInterest());
-			new Thread(selectorThread, "Node server channel selector").start();
+			new Thread(selectorThread, "NodeChannelSelector").start();
 			postAccept(localChannel);
 		}
 	}
@@ -187,7 +192,12 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	public void postSelect()
 	{
 		if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
-		transitionManager.submit(taskQueueChecker);
+		if (!taskQueueChecker.isRunning())
+		{
+			taskQueueChecker.setRunning(true);
+			checkerExecutor.submit(taskQueueChecker);
+			//transitionManager.submit(taskQueueChecker);
+		}
 	}
 
 	/**

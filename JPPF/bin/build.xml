@@ -219,14 +219,9 @@
 				<include name="jppf*.jar"/>
 			</fileset>
 		</copy>
-		<!--
-		<ant antfile="${samples-pack}/Fractals/build.xml" target="compile" inheritall="false"/>
-		<ant antfile="${samples-pack}/SequenceAlignment/build.xml" target="compile" inheritall="false"/>
-		<ant antfile="${samples-pack}/WebSearchEngine/build.xml" target="compile" inheritall="false"/>
-		<ant antfile="${samples-pack}/TomcatPort/build.xml" target="build" inheritall="false"/>
-		<property name="samples.pack.file" value="${build}/${ant.project.name}-samples-pack-${version.number}.${build.number}-${now}.zip"/>
-		-->
 		<java2html srcdir="${samples-pack}/CustomLoadBalancer" destdir="${samples-pack}/CustomLoadBalancer" includes="**/*.java"
+			style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false"/>
+		<java2html srcdir="${samples-pack}/TaskNotifications" destdir="${samples-pack}/TaskNotifications" includes="**/*.java, **/services/*.*"
 			style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false"/>
 		<property name="samples.pack.prefix" value="${app.ver}-samples-pack"/>
 		<property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>
@@ -251,6 +246,7 @@
 		</copy>
 		<move file="${home}/samples-pack/samples-pack-Readme.html" tofile="${home}/samples-pack/index.html"/>
 		<delete><fileset dir="${samples-pack}/CustomLoadBalancer" includes="**/*.java.html"/></delete>
+		<delete><fileset dir="${samples-pack}/TaskNotifications" includes="**/*.java.html, **/services/*.html"/></delete>
   </target>
 
 	<!-- ========================================================================= -->

@@ -20,7 +20,7 @@ package org.jppf.server.nio.nodeserver;
 
 import org.jppf.server.*;
 import org.jppf.server.job.JPPFJobManager;
-import org.jppf.server.nio.NioState;
+import org.jppf.server.nio.*;
 
 /**
  * Common abstract superclass for all states of a node that executes tasks. 

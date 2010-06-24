@@ -19,6 +19,7 @@
 package org.jppf.server.nio.nodeserver;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.comm.socket.IOHandler;
@@ -59,6 +60,10 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	 * The message currently being read.
 	 */
 	private LocalNodeMessage message = null;
+	/**
+	 * 
+	 */
+	private Lock lock = new ReentrantLock();
 
 	/**
 	 * Initialize this channel wrapper with the specified node context.
@@ -81,7 +86,7 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	/**
 	 * {@inheritDoc}
 	 */
-	public int getKeyOps()
+	public synchronized int getKeyOps()
 	{
 		return keyOps.get();
 	}
@@ -89,7 +94,7 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setKeyOps(int keyOps)
+	public synchronized void setKeyOps(int keyOps)
 	{
 		this.keyOps.set(keyOps);
 		if (traceEnabled) log.trace("readyOps = " + readyOps + ", keyOps = " + keyOps);
@@ -194,5 +199,14 @@ public class LocalNodeWrapperHandler extends AbstractChannelWrapper<LocalNodeCon
 		*/
 		this.message = message;
 		wakeUp();
+	}
+
+	/**
+	 * Get the lock for this channel.
+	 * @return  a lock instance.
+	 */
+	public Lock getLock()
+	{
+		return lock;
 	}
 }

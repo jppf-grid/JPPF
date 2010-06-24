@@ -66,9 +66,18 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
 			if (selector.select())
 			{
 				ChannelWrapper<?> channel = selector.getChannel();
-				if (debugEnabled) log.debug("selected channel " + channel);
-				server.getTransitionManager().submitTransition(channel);
-				server.postSelect();
+				channel.lock();
+				try
+				{
+					//if (channel instanceof AbstractChannelWrapper) ((AbstractChannelWrapper) channel).wakeUp();
+					if (debugEnabled) log.debug("selected channel " + channel);
+					server.getTransitionManager().submitTransition(channel);
+					server.postSelect();
+				}
+				finally
+				{
+					channel.unlock();
+				}
 			}
 		}
 	}

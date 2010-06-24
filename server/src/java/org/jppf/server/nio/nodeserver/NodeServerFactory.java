@@ -71,6 +71,7 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
 		map.put(TO_SEND_INITIAL, transition(SEND_INITIAL_BUNDLE, RW));
 		map.put(TO_WAIT_INITIAL, transition(WAIT_INITIAL_BUNDLE, R));
 		map.put(TO_IDLE, transition(IDLE, R));
+		//map.put(TO_IDLE, transition(SENDING_BUNDLE, R));
 		return map;
 	}
 

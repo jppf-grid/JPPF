@@ -86,6 +86,7 @@ class SendingBundleState extends NodeServerState
 			}
 			else
 			{
+				if (debugEnabled) log.debug("null bundle for node " + wrapper);
 				server.addIdleChannel(wrapper);
 				return TO_IDLE;
 			}

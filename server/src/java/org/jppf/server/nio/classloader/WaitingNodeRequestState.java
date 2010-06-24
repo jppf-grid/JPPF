@@ -20,7 +20,6 @@ package org.jppf.server.nio.classloader;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
-import java.nio.channels.Selector;
 import java.util.List;
 
 import org.apache.commons.logging.*;
@@ -99,11 +98,11 @@ class WaitingNodeRequestState extends ClassServerState
 		ChannelWrapper result = null;
 		List<ChannelWrapper<?>> connections = server.providerConnections.get(uuid);
 		int minRequests = Integer.MAX_VALUE;
-		Selector selector = server.getSelector();
 		for (ChannelWrapper channel: connections)
 		{
 			ClassContext ctx = (ClassContext) channel.getContext();
 			int size = ctx.getNbPendingRequests();
+			//size += ctx.getCurrentRequest() == null ? 0 : 1;
 			if (size < minRequests)
 			{
 				minRequests = size;
