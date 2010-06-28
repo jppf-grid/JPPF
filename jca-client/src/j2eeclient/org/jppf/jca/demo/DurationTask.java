@@ -18,6 +18,8 @@
 
 package org.jppf.jca.demo;
 
+import java.text.*;
+
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -37,13 +39,13 @@ public class DurationTask extends JPPFTask
 	/**
 	 * Duration of this task in seconds.
 	 */
-	private int duration = 1;
+	private long duration = 1;
 
 	/**
 	 * Initialize this task withe specified duration.
-	 * @param duration duration of this task in seconds.
+	 * @param duration duration of this task in milliseconds.
 	 */
-	public DurationTask(int duration)
+	public DurationTask(long duration)
 	{
 		incrementCount();
 		counter = count;
@@ -56,17 +58,19 @@ public class DurationTask extends JPPFTask
 	 */
 	public void run()
 	{
+		DecimalFormat nf = new DecimalFormat("0.###");
+		String res = nf.format(duration/1000f);
 		try
 		{
-			Thread.sleep((long) (duration * 1000));
-			String s = "***** Hello JPPF !!! [" + counter + "] *****";
+			Thread.sleep(duration);
+			String s = "JPPF task [" + getId() + "] successfully completed after " + res + " seconds";
 			System.out.println(s);
 			setResult(s);
 		}
 		catch (InterruptedException e)
 		{
 			setException(e);
-			setResult("Exception for task #"+counter+" with specified duration of "+duration+" seconds: "+e.getMessage());
+			setResult("Exception for task [" + getId() + "] with specified duration of " + res + " seconds: " + e.getMessage());
 		}
 	}
 

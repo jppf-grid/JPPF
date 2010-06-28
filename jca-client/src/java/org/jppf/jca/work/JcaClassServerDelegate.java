@@ -130,6 +130,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 						if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name);
 
 						ClassLoader cl = getClassLoader(resource.getRequestUuid());
+						if (debugEnabled) log.debug("attempting resource lookup using classloader=" + cl);
 						if (resource.getData("multiple") == null)
 						{
 							byte[] b = null;
@@ -138,17 +139,12 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 							else
 							{
 								if (resource.isAsResource()) b = resourceProvider.getResource(name, cl);
-								else b = resourceProvider.getResourceAsBytes(name);
+								else b = resourceProvider.getResourceAsBytes(name, cl);
 							}
 							if (b == null) found = false;
 							if (callable == null) resource.setDefinition(b);
 							else resource.setCallable(b);
-							if  (debugEnabled)
-							{
-								if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
-								else log.debug("["+this.getName()+"] resource not found: " + name);
-							}
-							if  (debugEnabled)
+							if (debugEnabled)
 							{
 								if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
 								else log.debug("["+this.getName()+"] resource not found: " + name);

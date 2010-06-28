@@ -76,23 +76,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * Initialize this client with a specified application UUID.
 	 * @param uuid the unique identifier for this local client.
 	 * @param name configuration name for this local client.
-	 * @param props the configuration properties for this connection.
-	 */
-	public JPPFClientConnectionImpl(String uuid, String name, TypedProperties props)
-	{
-		this.props = props;
-		String prefix = name + ".";
-		classServerPort = props.getInt(prefix + "class.server.port", 11111);
-		configure(uuid, name, props.getString(prefix + "jppf.server.host", "localhost"),
-			props.getInt(prefix + "app.server.port", 11112), classServerPort,
-			props.getInt(prefix + "priority", 0));
-		initializeJmxConnection();
-	}
-
-	/**
-	 * Initialize this client with a specified application UUID.
-	 * @param uuid the unique identifier for this local client.
-	 * @param name configuration name for this local client.
 	 * @param info the connection properties for this connection.
 	 */
 	public JPPFClientConnectionImpl(String uuid, String name, JPPFConnectionInformation info)
@@ -249,54 +232,5 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	public JMXDriverConnectionWrapper getJmxConnection()
 	{
 		return jmxConnection;
-	}
-
-	/**
-	 * Invoked to notify of a status change event on a client connection.
-	 * @param event the event to notify of.
-	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
-	 */
-	public void delegateStatusChanged(ClientConnectionStatusEvent event)
-	{
-		JPPFClientConnectionStatus s1 = event.getClientConnectionStatusHandler().getStatus();
-		JPPFClientConnectionStatus s2 = taskServerConnection.getStatus();
-		processStatusChanged(s1, s2);
-	}
-
-	/**
-	 * Invoked to notify of a status change event on a client connection.
-	 * @param event the event to notify of.
-	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
-	 */
-	public void taskServerConnectionStatusChanged(ClientConnectionStatusEvent event)
-	{
-		JPPFClientConnectionStatus s1 = event.getClientConnectionStatusHandler().getStatus();
-		JPPFClientConnectionStatus s2 = delegate.getStatus();
-		processStatusChanged(s2, s1);
-	}
-
-	/**
-	 * Handle a status change from either the class server delegate or the task server connection
-	 * and determine whether it triggers a status change for the client connection.
-	 * @param delegateStatus status of the class server delegate conneciton.
-	 * @param taskConnectionStatus status of the task server connection.
-	 */
-	protected void processStatusChanged(JPPFClientConnectionStatus delegateStatus, JPPFClientConnectionStatus taskConnectionStatus)
-	{
-		if (FAILED.equals(delegateStatus)) setStatus(FAILED);
-		else if (ACTIVE.equals(delegateStatus))
-		{
-			if (ACTIVE.equals(taskConnectionStatus) && !ACTIVE.equals(this.getStatus())) setStatus(ACTIVE);
-		}
-		else
-		{
-			if (ACTIVE.equals(taskConnectionStatus)) setStatus(delegateStatus);
-			else
-			{
-				int n = delegateStatus.compareTo(taskConnectionStatus);
-				if ((n < 0) && !delegateStatus.equals(this.getStatus())) setStatus(delegateStatus);
-				else if (!taskConnectionStatus.equals(this.getStatus())) setStatus(taskConnectionStatus);
-			}
-		}
 	}
 }

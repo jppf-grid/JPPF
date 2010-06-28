@@ -116,6 +116,38 @@ public class DemoTest implements Serializable
 	}
 
 	/**
+	 * Perform a simple call to the JPPF resource adapter.
+	 * @param jobId the name given to the job.
+	 * @param duration the duration of the task to submit.
+	 * @param nbTasks the number of tasks to submit.
+	 * @return a string reporting either the task execution result or an error message.
+	 * @throws Exception if the call to JPPF failed.
+	 */
+	public String testConnector(String jobId, long duration, int nbTasks) throws Exception
+	{
+		JPPFConnection connection = null;
+		String id = null;
+		try
+		{
+			connection = getConnection();
+			JPPFJob job = new JPPFJob();
+			job.setId(jobId);
+			for (int i=0; i<nbTasks; i++)
+			{
+				DurationTask task = new DurationTask(duration);
+				task.setId(jobId + " task #" + (i+1));
+				job.addTask(task);
+			}
+			id = connection.submitNonBlocking(job);
+		}
+		finally
+		{
+			if (connection != null) connection.close();
+		}
+		return id;
+	}
+
+	/**
 	 * Get the initial context.
 	 * @return an <code>InitialContext</code> instance.
 	 * @throws Exception if the context could not be obtained.
@@ -167,7 +199,18 @@ public class DemoTest implements Serializable
 		{
 			connection = getConnection();
 			List<JPPFTask> results = connection.getSubmissionResults(id);
-			msg = (results == null) ? "submission is not in queue anymore" : (String) results.get(0).getResult();
+			if (results == null) msg = "submission is not in queue anymore";
+			else
+			{
+				StringBuffer sb = new StringBuffer();
+				for (JPPFTask task: results)
+				{
+					if (task.getException() == null) sb.append(task.getResult());
+					else sb.append("task [" + task.getId() + "] ended in error: " + task.getException().getMessage());
+					sb.append("<br/>");
+				}
+				msg = sb.toString();
+			}
 		}
 		finally
 		{

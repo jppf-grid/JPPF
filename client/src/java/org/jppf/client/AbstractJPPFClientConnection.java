@@ -18,7 +18,7 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.CONNECTING;
+import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.nio.channels.AsynchronousCloseException;
 import java.util.*;
@@ -512,5 +512,56 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	public TaskServerConnectionHandler getTaskServerConnection()
 	{
 		return taskServerConnection;
+	}
+
+
+	/**
+	 * Invoked to notify of a status change event on a client connection.
+	 * @param event the event to notify of.
+	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+	 */
+	public void delegateStatusChanged(ClientConnectionStatusEvent event)
+	{
+		JPPFClientConnectionStatus s1 = event.getClientConnectionStatusHandler().getStatus();
+		JPPFClientConnectionStatus s2 = taskServerConnection.getStatus();
+		processStatusChanged(s1, s2);
+	}
+
+	/**
+	 * Invoked to notify of a status change event on a client connection.
+	 * @param event the event to notify of.
+	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+	 */
+	public void taskServerConnectionStatusChanged(ClientConnectionStatusEvent event)
+	{
+		JPPFClientConnectionStatus s1 = event.getClientConnectionStatusHandler().getStatus();
+		JPPFClientConnectionStatus s2 = delegate.getStatus();
+		processStatusChanged(s2, s1);
+	}
+
+	/**
+	 * Handle a status change from either the class server delegate or the task server connection
+	 * and determine whether it triggers a status change for the client connection.
+	 * @param delegateStatus status of the class server delegate conneciton.
+	 * @param taskConnectionStatus status of the task server connection.
+	 */
+	protected void processStatusChanged(JPPFClientConnectionStatus delegateStatus, JPPFClientConnectionStatus taskConnectionStatus)
+	{
+		if (FAILED.equals(delegateStatus)) setStatus(FAILED);
+		else if (ACTIVE.equals(delegateStatus))
+		{
+			if (ACTIVE.equals(taskConnectionStatus) && !ACTIVE.equals(this.getStatus())) setStatus(ACTIVE);
+			else if (!taskConnectionStatus.equals(this.getStatus())) setStatus(taskConnectionStatus);
+		}
+		else
+		{
+			if (ACTIVE.equals(taskConnectionStatus)) setStatus(delegateStatus);
+			else
+			{
+				int n = delegateStatus.compareTo(taskConnectionStatus);
+				if ((n < 0) && !delegateStatus.equals(this.getStatus())) setStatus(delegateStatus);
+				else if (!taskConnectionStatus.equals(this.getStatus())) setStatus(taskConnectionStatus);
+			}
+		}
 	}
 }

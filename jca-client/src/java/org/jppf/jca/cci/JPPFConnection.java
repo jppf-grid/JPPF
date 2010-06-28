@@ -168,12 +168,12 @@ public interface JPPFConnection extends Connection, JPPFAccessor
 	 * Get the associated managed connection.
 	 * @return a <code>JPPFManagedConnection</code> instance.
 	 */
-	JPPFManagedConnection getConn();
+	JPPFManagedConnection getManagedConnection();
 
 	/**
 	 * Set the associated managed connection.
 	 * @param conn a <code>JPPFManagedConnection</code> instance.
 	 */
-	void setConn(JPPFManagedConnection conn);
+	void setManagedConnection(JPPFManagedConnection conn);
 
 }

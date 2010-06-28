@@ -45,7 +45,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	/**
 	 * The associated managed connection.
 	 */
-	private JPPFManagedConnection conn;
+	private JPPFManagedConnection managedConnection;
 
 	/**
 	 * Initialize this connection from a managed connection.
@@ -53,7 +53,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 */
 	public JPPFConnectionImpl(JPPFManagedConnection conn)
 	{
-		this.conn = conn;
+		this.managedConnection = conn;
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	public void close()
 	{
 		closed = true;
-		if (conn != null) conn.fireConnectionEvent(this, ConnectionEvent.CONNECTION_CLOSED, null);
+		if (managedConnection != null) managedConnection.fireConnectionEvent(this, ConnectionEvent.CONNECTION_CLOSED, null);
 	}
 
 	/**
@@ -302,17 +302,17 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * Get the associated managed connection.
 	 * @return a <code>JPPFManagedConnection</code> instance.
 	 */
-	public JPPFManagedConnection getConn()
+	public JPPFManagedConnection getManagedConnection()
 	{
-		return conn;
+		return managedConnection;
 	}
 
 	/**
 	 * Set the associated managed connection.
 	 * @param conn a <code>JPPFManagedConnection</code> instance.
 	 */
-	public void setConn(JPPFManagedConnection conn)
+	public void setManagedConnection(JPPFManagedConnection conn)
 	{
-		this.conn = conn;
+		this.managedConnection = conn;
 	}
 }

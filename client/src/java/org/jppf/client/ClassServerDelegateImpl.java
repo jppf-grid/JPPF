@@ -51,7 +51,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 * @param uuid the unique identifier for the local JPPF client.
 	 * @param host the name or IP address of the host the class server is running on.
 	 * @param port the TCP port the class server is listening to.
-	 * @throws Exception if the connection could not be opended.
+	 * @throws Exception if the connection could not be opened.
 	 */
 	public ClassServerDelegateImpl(JPPFClientConnection owner, String uuid, String host, int port) throws Exception
 	{

@@ -60,13 +60,13 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 */
 	private int connectionPoolSize = 5;
 	/**
+	 * A string holding the client configuration, specified as a property in the ra.xml descriptor.
+	 */
+	private String clientConfiguration = "";
+	/**
 	 * Bootstrap context provided by the application server.
 	 */
 	private transient BootstrapContext ctx = null;
-	/**
-	 * Manages asynchronous work submission to the JPPF driver.
-	 */
-	//private JPPFSubmissionManager submissionManager = null;
 
 	/**
 	 * Start this resource adapater with the specified bootstrap context.
@@ -80,27 +80,10 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 		this.ctx = ctx;
 		log.info("Starting JPPF resource adapter");
 		WorkManager workManager = ctx.getWorkManager();
-		jppfClient =
-			new JPPFJcaClient(new JPPFUuid().toString(), connectionPoolSize, serverHost, classServerPort, appServerPort);
+		jppfClient = new JPPFJcaClient(new JPPFUuid().toString(), getClientConfiguration());
 		log.info("Starting JPPF resource adapter: jppf client="+jppfClient);
 		JPPFSubmissionManager submissionManager = new JPPFSubmissionManager(jppfClient, workManager);
 		jppfClient.setSubmissionManager(submissionManager);
-		try
-		{
-			workManager.scheduleWork((JcaClassServerDelegate) jppfClient.getDelegate());
-		}
-		catch(WorkException e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		try
-		{
-			workManager.scheduleWork(new JPPFJcaJob(jppfClient.getInitialWorkList(), 1000));
-		}
-		catch(WorkException e)
-		{
-			log.error(e.getMessage(), e);
-		}
 		try
 		{
 			workManager.scheduleWork(submissionManager);
@@ -225,5 +208,23 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	public void setConnectionPoolSize(Integer connectionPoolSize)
 	{
 		this.connectionPoolSize = connectionPoolSize;
+	}
+
+	/**
+	 * Get the string holding the client configuration.
+	 * @return the configuration as a stirng.
+	 */
+	public String getClientConfiguration()
+	{
+		return clientConfiguration;
+	}
+
+	/**
+	 * Set the string holding the client configuration.
+	 * @param clientConfiguration the configuration as a stirng.
+	 */
+	public void setClientConfiguration(String clientConfiguration)
+	{
+		this.clientConfiguration = clientConfiguration;
 	}
 }

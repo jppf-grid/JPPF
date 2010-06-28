@@ -113,7 +113,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	public void associateConnection(Object conn) throws ResourceException
 	{
 		connection = (JPPFConnectionImpl) conn;
-		connection.setConn(this);
+		connection.setManagedConnection(this);
 	}
 
 	/**

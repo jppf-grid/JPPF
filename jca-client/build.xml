@@ -101,6 +101,7 @@
 	<!-- ========================================================================= -->
 
 	<target name="build" depends="ear.all,rar.all"/>
+	<target name="build.deploy.jboss" depends="build, deploy.1.rar.jboss, deploy.1.ear.jboss"/>
 
 	<!-- ========================================================================= -->
 	<!--                         Compile the application                           -->
@@ -137,7 +138,7 @@
  		<mkdir dir="${build.dir}/lib"/>
 	  <property file="${build.number.file}"/>
 		<tstamp>
-			<format property="readable.now" pattern="d-MMMM-yyyy hh:mm"/>
+			<format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
 		</tstamp>
     <jar jarfile="${build.dir}/lib/jppf-jca.jar" basedir="${classes.dir}/jca">
       <manifest>
@@ -230,13 +231,24 @@
 
 	<!-- Build the WAR and EAR, wihtout any client classes in the application -->
 	<target name="ear.noclient.classes" if="noclient.classes">
-    <war warfile="${build.dir}/${appserver}/jppftest.war" webxml="${meta.inf.dir}/${appserver}/WEB-INF/web.xml" manifest="${basedir}/docroot/META-INF/manifest1.mf">
+    <war warfile="${build.dir}/${appserver}/jppftest.war" webxml="${meta.inf.dir}/${appserver}/WEB-INF/web.xml">
+	    <manifest>
+	      <attribute name="Class-Path" value="lib/jppf-j2ee-client.jar"/>
+	      <attribute name="JPPF-Version" value="${version.number}"/>
+	      <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+	    </manifest>
 			<zipfileset dir="${meta.inf.dir}/${appserver}/WEB-INF" excludes="web.xml" prefix="WEB-INF"/>
 			<zipfileset dir="${meta.inf.dir}/${appserver}/docroot" includes="**/*.*"/>
 			<zipfileset dir="${meta.inf.dir}/common/docroot" includes="**/*.*"/>
     </war>
 
 		<ear destfile="${build.dir}/${ear.prefix}_${appserver}.ear" appxml="${meta.inf.dir}/application.xml">
+	    <manifest>
+	      <attribute name="JPPF-Version" value="${version.number}"/>
+	      <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+	    </manifest>
 			<zipfileset dir="${meta.inf.dir}/${appserver}/application" prefix="META-INF"/>
 			<fileset dir="${build.dir}/${appserver}" includes="jppftest.war"/>
 			<zipfileset dir="${build.dir}/lib" prefix="lib" includes="jppf-j2ee-client.jar"/>
@@ -245,23 +257,32 @@
 
 	<!-- Build the WAR and EAR, including the client classes in the application -->
 	<target name="ear.client.classes" unless="noclient.classes">
-    <war warfile="${build.dir}/${appserver}/jppftest.war" webxml="${meta.inf.dir}/${appserver}/WEB-INF/web.xml"
-    	manifest="${basedir}/docroot/META-INF/manifest2.mf">
+    <war warfile="${build.dir}/${appserver}/jppftest.war" webxml="${meta.inf.dir}/${appserver}/WEB-INF/web.xml">
+	    <manifest>
+	      <attribute name="Class-Path" value="lib/jppf-j2ee-client.jar lib/jppf-client.jar lib/jppf-common.jar lib/jppf-common-node.jar lib/jppf-jca.jar lib/commons-logging-1.1.jar"/>
+	      <attribute name="JPPF-Version" value="${version.number}"/>
+	      <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+	    </manifest>
 			<zipfileset dir="${meta.inf.dir}/${appserver}/WEB-INF" excludes="web.xml" prefix="WEB-INF"/>
 			<zipfileset dir="${meta.inf.dir}/${appserver}/docroot" includes="*.*"/>
 			<zipfileset dir="${meta.inf.dir}/common/docroot" includes="**/*.*"/>
     </war>
 
 		<ear destfile="${build.dir}/${ear.prefix}_${appserver}.ear" appxml="${build.dir}/${appserver}/application.xml">
+	    <manifest>
+	      <attribute name="JPPF-Version" value="${version.number}"/>
+	      <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+	    </manifest>
 			<fileset dir="${build.dir}/${appserver}" includes="jppftest.war"/>
-			<!--<zipfileset dir="${meta.inf.dir}/${appserver}/application" prefix="META-INF"/>-->
 			<zipfileset dir="${build.dir}/lib" prefix="lib"/>
 			<zipfileset dir="${jppf.build.dir}" prefix="lib">
 				<include name="jppf-common-node.jar"/>
 				<include name="jppf-common.jar"/>
 				<include name="jppf-client.jar"/>
 			</zipfileset>
-			<zipfileset dir="${jppf.lib.dir}/slf4j">
+			<zipfileset dir="${basedir}/lib">
 				<include name="*.jar"/>
 			</zipfileset>
 		</ear>
@@ -312,6 +333,11 @@
 		</copy>
 
 		<jar destfile="${build.dir}/jppf_ra_${appserver}.rar" index="true">
+	    <manifest>
+	      <attribute name="JPPF-Version" value="${version.number}"/>
+	      <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+	    </manifest>
 			<zipfileset dir="${build.dir}/${appserver}">
 				<include name="*.*"/>
 				<exclude name="ra.xml"/>
@@ -327,7 +353,7 @@
 				<include name="jppf-common.jar"/>
 				<include name="jppf-client.jar"/>
 			</zipfileset>
-			<zipfileset dir="${jppf.lib.dir}/slf4j">
+			<zipfileset dir="${basedir}/lib">
 				<include name="*.jar"/>
 			</zipfileset>
 		</jar>
@@ -336,27 +362,27 @@
 	
 	<!--
 	-->
-	<target name="deploy.rar.jboss">
-		<copy todir="C:/Tools/jboss-4.2.2.GA/server/default/deploy" file="${build.dir}/jppf_ra_${jboss}.rar"/>
+	<target name="deploy.1.rar.jboss">
+		<copy todir="C:/Tools/jboss-5.1.0.GA/server/default/deploy" file="${build.dir}/jppf_ra_${jboss}.rar"/>
 	</target>
 
-	<target name="deploy.ear.jboss">
-		<copy todir="C:/Tools/jboss-4.2.2.GA/server/default/deploy" file="${build.dir}/${ear.prefix}_${jboss}.ear"/>
+	<target name="deploy.1.ear.jboss">
+		<copy todir="C:/Tools/jboss-5.1.0.GA/server/default/deploy" file="${build.dir}/${ear.prefix}_${jboss}.ear"/>
 	</target>
 
-	<target name="deploy.rar.weblogic">
+	<target name="deploy.2.rar.weblogic">
 		<copy todir="C:/bea/user_projects/domains/jppf_domain/autodeploy" file="${build.dir}/jppf_ra_${weblogic}.rar"/>
 	</target>
 
-	<target name="deploy.ear.weblogic">
+	<target name="deploy.2.ear.weblogic">
 		<copy todir="C:/bea/user_projects/domains/jppf_domain/autodeploy" file="${build.dir}/${ear.prefix}_${weblogic}.ear"/>
 	</target>
 
-	<target name="deploy.rar.sunas">
+	<target name="deploy.3.rar.sunas">
 		<copy todir="C:/Tools/Sun/AppServer/domains/domain1/autodeploy" file="${build.dir}/jppf_ra_${sunas}.rar"/>
 	</target>
 
-	<target name="deploy.ear.sunsas">
+	<target name="deploy.3.ear.sunsas">
 		<copy todir="C:/Tools/Sun/AppServer/domains/domain1/autodeploy" file="${build.dir}/${ear.prefix}_${sunas}.ear"/>
 	</target>
 
