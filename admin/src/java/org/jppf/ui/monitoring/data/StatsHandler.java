@@ -490,6 +490,9 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	public synchronized void setServerListOption(OptionElement serverListOption)
 	{
 		this.serverListOption = serverListOption;
+		if (debugEnabled) log.debug("setting serverList option=" + serverListOption);
+		List<JPPFClientConnection> list = getJppfClient(null).getAllConnections();
+		for (JPPFClientConnection c: list)executor.submit(new NewConnectionTask(c));
 		notifyAll();
 	}
 
@@ -538,25 +541,43 @@ public final class StatsHandler implements StatsConstants, ClientListener
 			}
 			JComboBox box = null;
 			while (getServerListOption() == null) goToSleep(50L);
-			box = ((ComboBoxOption) getServerListOption()).getComboBox();
-			box.addItem(c);
-			int maxLen = 0;
-			Object proto = null;
-			for (int i=0; i<box.getItemCount(); i++)
+			synchronized(StatsHandler.this)
 			{
-				Object o = box.getItemAt(i);
-				int n = o.toString().length();
-				if (n > maxLen)
+				if (debugEnabled) log.debug("adding client connection " + c.getName());
+				box = ((ComboBoxOption) getServerListOption()).getComboBox();
+				int count = box.getItemCount();
+				boolean found = false;
+				for (int i=0; i<count; i++)
 				{
-					maxLen = n;
-					proto = o;
+					Object o = box.getItemAt(i);
+					if (c.equals(o))
+					{
+						found = true;
+						break;
+					}
 				}
-			}
-			if (proto != null) box.setPrototypeDisplayValue(proto);
-			if (currentConnection == null)
-			{
-				currentConnection = (JPPFClientConnectionImpl) c;
-				box.setSelectedItem(c);
+				if (!found)
+				{
+					box.addItem(c);
+					int maxLen = 0;
+					Object proto = null;
+					for (int i=0; i<box.getItemCount(); i++)
+					{
+						Object o = box.getItemAt(i);
+						int n = o.toString().length();
+						if (n > maxLen)
+						{
+							maxLen = n;
+							proto = o;
+						}
+					}
+					if (proto != null) box.setPrototypeDisplayValue(proto);
+				}
+				if (currentConnection == null)
+				{
+					currentConnection = (JPPFClientConnectionImpl) c;
+					box.setSelectedItem(c);
+				}
 			}
 		}
 	}
