@@ -13,7 +13,7 @@
 	<table align="center" cellspacing="0" cellpadding="5">
 		<tr><td height="5"></td></tr>
 		<tr><td width="50%" align="center">
-			<h3><%= msg %></h3>
+			<%= msg %>
 		</td></tr>
 	</table>
 <%@ include file="footer.jsp"%>

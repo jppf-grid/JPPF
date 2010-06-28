@@ -15,6 +15,45 @@
 	<resourceadapter>
 		<resourceadapter-class>org.jppf.jca.spi.JPPFResourceAdapter</resourceadapter-class>
 
+		<!-- JPPF Client Configuration -->
+		<config-property>
+			<config-property-name>ClientConfiguration</config-property-name>
+			<config-property-type>java.lang.String</config-property-type>
+			<config-property-value>
+				jppf.drivers = driver1 driver2
+
+				driver1.jppf.server.host = localhost
+				driver1.class.server.port = 11111
+				driver1.app.server.port = 11112
+				driver1.priority = 10
+				driver1.jppf.pool.size = 5
+
+				driver2.jppf.server.host = localhost
+				driver2.class.server.port = 11121
+				driver2.app.server.port = 11122
+				driver2.priority = 10
+				driver2.jppf.pool.size = 5
+
+				#jppf.management.port = 11098
+				#jppf.management.enabled = false
+				#jppf.client.max.init.time = 1000
+				#reconnect.initial.delay = 1
+				reconnect.max.time = 10
+				#reconnect.interval = 1
+
+				#jppf.local.execution.enabled = true
+				#jppf.local.execution.threads = 4
+
+				#jppf.discovery.enabled = false
+				#jppf.discovery.group = 230.0.0.1
+				#jppf.discovery.port = 11111
+				jppf.pool.size = 2
+
+				#jppf.data.transform.class = org.jppf.data.transform.DESCipherTransform
+				#jppf.object.stream.builder = org.jppf.serialization.XstreamObjectStreamBuilder
+			</config-property-value>
+		</config-property>
+
 		<!-- Host name or IP address of the JPPF driver -->
 		<config-property>
 			<config-property-name>ServerHost</config-property-name>

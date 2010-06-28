@@ -103,6 +103,7 @@ public class JcaResultProcessor implements Work
 					connection.setStatus(JPPFClientConnectionStatus.DISCONNECTED);
 					JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
 					mgr.addExistingSubmission(job);
+					connection.getTaskServerConnection().init();
 					break;
 				}
 			}
@@ -129,9 +130,9 @@ public class JcaResultProcessor implements Work
 	{
 		int count = 0;
 		JPPFTaskBundle bundle = new JPPFTaskBundle();
-		bundle.setRequestUuid(new JPPFUuid().toString());
+		String requestUuid = new JPPFUuid().toString();
+		bundle.setRequestUuid(requestUuid);
 		JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
-		String requestUuid = bundle.getRequestUuid();
 		bundle.setJobSLA(job.getJobSLA());
 		bundle.setParameter(BundleParameter.JOB_METADATA, job.getJobMetadata());
 		ClassLoader cl = null;
@@ -141,6 +142,7 @@ public class JcaResultProcessor implements Work
 			JPPFTask task = job.getTasks().get(0);
 			cl = task.getClass().getClassLoader();
 			mgr.addRequestClassLoader(requestUuid, cl);
+			if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
 		}
 		try
 		{

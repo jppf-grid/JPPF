@@ -25,6 +25,8 @@ import java.util.*;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
 import org.jppf.client.*;
+import org.jppf.client.event.*;
+import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.SocketInitializer;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.Pair;
@@ -71,6 +73,21 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	}
 
 	/**
+	 * Initialize this client with a specified application UUID.
+	 * @param uuid the unique identifier for this local client.
+	 * @param name configuration name for this local client.
+	 * @param info the connection properties for this connection.
+	 * @param client the JPPF client that owns this connection.
+	 */
+	public JPPFJcaClientConnection(String uuid, String name, JPPFConnectionInformation info, JPPFJcaClient client)
+	{
+		super(uuid, name, info.host, info.applicationServerPorts[0], info.classServerPorts[0], 0);
+		status = DISCONNECTED;
+		classServerPort = info.classServerPorts[0];
+		this.client = client;
+	}
+
+	/**
 	 * 
 	 * @see org.jppf.client.JPPFClientConnection#init()
 	 */
@@ -78,28 +95,52 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	{
 		try
 		{
-			setStatus(CONNECTING);
+			delegate = new JcaClassServerDelegate(name, appUuid, host, classServerPort, client);
+			//setStatus(CONNECTING);
 			initCredentials();
-			taskServerConnection.init();
-			setStatus(ACTIVE);
+			//taskServerConnection.init();
+			delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
+			{
+				public void statusChanged(ClientConnectionStatusEvent event)
+				{
+					delegateStatusChanged(event);
+				}
+			});
+			taskServerConnection.addClientConnectionStatusListener(new ClientConnectionStatusListener()
+			{
+				public void statusChanged(ClientConnectionStatusEvent event)
+				{
+					taskServerConnectionStatusChanged(event);
+				}
+			});
+			//delegate.init();
+			((JcaClassServerDelegate) delegate).performConnection();
+			if (!delegate.isClosed())
+			{
+				Thread t = new Thread(delegate);
+				t.setName("[" + delegate.getName() + " : class delegate]");
+				t.start();
+				taskServerConnection.init();
+			}
+			//setStatus(ACTIVE);
 		}
 		catch(Exception e)
 		{
 			log.debug(e);
-			setStatus(DISCONNECTED);
+			//setStatus(DISCONNECTED);
 		}
 		catch(JPPFError e)
 		{
-			setStatus(FAILED);
+			//setStatus(FAILED);
 			throw e;
 		}
 	}
 
 	/**
 	 * Send tasks to the server for execution.
-	 * @param cl - classloader used for serialization.
-	 * @param header - the task bundle to send to the driver.
-	 * @param job - the job to execute remotely.
+	 * @param cl classloader used for serialization.
+	 * @param header the task bundle to send to the driver.
+	 * @param job the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
 	public void sendTasks(ClassLoader cl, JPPFTaskBundle header, JPPFJob job) throws Exception

@@ -17,14 +17,17 @@
  */
 package org.jppf.jca.work;
 
+import java.io.ByteArrayInputStream;
 import java.util.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.client.event.ClientConnectionStatusEvent;
-import org.jppf.jca.work.submission.*;
+import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.jca.work.submission.JPPFSubmissionManager;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
+import org.jppf.utils.TypedProperties;
 
 /**
  * This class provides an API to submit execution requests and administration commands,
@@ -34,116 +37,29 @@ import org.jppf.task.storage.DataProvider;
  * the uuid has changed or not.
  * @author Laurent Cohen
  */
-public class JPPFJcaClient extends AbstractJPPFClient
+public class JPPFJcaClient extends AbstractGenericClient
 {
 	/**
 	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(JPPFJcaClient.class);
 	/**
-	 * The number of connections in the pool.
-	 */
-	private int poolSize = 1;
-	/**
-	 * The host hostname of the JPPF driver.
-	 */
-	private String host = "localhost";
-	/**
-	 * The clasPort port used by the JPPF class loader.
-	 */
-	private int classPort = 11111;
-	/**
-	 * The poolSize port on which tasks are sent.
-	 */
-	private int appPort = 11112;
-	/**
-	 * Initial list of connections to initialize.
-	 */
-	private List<Runnable> initialWorkList = new ArrayList<Runnable>();
-	/**
-	 * The unique class server delegate for all connections.
-	 */
-	private ClassServerDelegate delegate = null;
-	/**
 	 * Keeps a list of the valid connections not currently executring tasks.
 	 */
-	private Vector<JPPFClientConnection> availableConnections = new Vector<JPPFClientConnection>();
+	private Vector<JPPFClientConnection> availableConnections;
 	/**
 	 * Manages asynchronous work submission to the JPPF driver.
 	 */
 	private JPPFSubmissionManager submissionManager = null;
 
 	/**
-	 * Initialize this client with an automatically generated application UUID.
-	 */
-	public JPPFJcaClient()
-	{
-		super();
-		initPools();
-	}
-
-	/**
 	 * Initialize this client with a specified application UUID.
 	 * @param uuid the unique identifier for this local client.
-	 * @param poolSize number of connections in the pool.
-	 * @param host hostname of the JPPF driver.
-	 * @param classPort port used by the JPPF class loader.
-	 * @param appPort port on which tasks are sent.
+	 * @param configuration the object holding the JPPF configuration.
 	 */
-	public JPPFJcaClient(String uuid, int poolSize, String host, int classPort, int appPort)
+	public JPPFJcaClient(String uuid, String configuration)
 	{
-		super(uuid);
-		this.poolSize = poolSize;
-		this.host = host;
-		this.appPort = appPort;
-		initPools();
-	}
-
-	/**
-	 * Read all client connection information from the configuration and initialize
-	 * the connection pools accordingly.
-	 */
-	public void initPools()
-	{
-		try
-		{
-			delegate = new JcaClassServerDelegate("ra_driver", uuid, host, classPort, this);
-			if (poolSize <= 0) poolSize = 1;
-			String[] names = new String[poolSize];
-			for (int i=0; i<poolSize; i++) names[i] = "driver_" + (i + 1);
-			// if config file is still used as with single client version
-			for (String name: names)
-			{
-				int priority = 0;
-				JPPFClientConnection c = new JPPFJcaClientConnection(uuid, name, host, appPort, classPort, priority, this);
-				c.addClientConnectionStatusListener(this);
-				ClientPool pool = pools.get(priority);
-				if (pool == null)
-				{
-					pool = new ClientPool();
-					pool.priority = priority;
-					pools.put(priority, pool);
-				}
-				pool.clientList.add(c);
-			}
-			for (int priority: pools.keySet())
-			{
-				ClientPool pool = pools.get(priority);
-				for (JPPFClientConnection c: pool.clientList) allConnections.add(c);
-			}
-			for (Integer priority: pools.keySet())
-			{
-				ClientPool pool = pools.get(priority);
-				for (JPPFClientConnection c: pool.clientList)
-				{
-					initialWorkList.add(new ConnectionInitializerTask(c));
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
+		super(uuid, configuration);
 	}
 
 	/**
@@ -192,24 +108,6 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	}
 
 	/**
-	 * Get the initial list of connections to initialize.
-	 * @return a list of <code>Work</code> instances.
-	 */
-	public List<Runnable> getInitialWorkList()
-	{
-		return initialWorkList;
-	}
-
-	/**
-	 * Return the class server delegate aoosicated with this JPPF client.
-	 * @return a <code>ClassServerDelegate</code> instance. 
-	 */
-	public ClassServerDelegate getDelegate()
-	{
-		return delegate;
-	}
-
-	/**
 	 * Invoked when the status of a client connection has changed.
 	 * @param event the event to notify of.
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
@@ -218,16 +116,17 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	{
 		super.statusChanged(event);
 		JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
+		if (log.isDebugEnabled()) log.debug("connection=" + c + ", availableConnections=" + availableConnections);
 		switch(c.getStatus())
 		{
 			case ACTIVE:
-				availableConnections.add(c);
+				getAvailableConnections().add(c);
 				break;
 			default:
-				availableConnections.remove(c);
+				getAvailableConnections().remove(c);
 				break;
 		}
-		submissionManager.wakeUp();
+		if (submissionManager != null) submissionManager.wakeUp();
 	}
 
 	/**
@@ -236,7 +135,7 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	 */
 	public boolean hasAvailableConnection()
 	{
-		return !availableConnections.isEmpty();
+		return !getAvailableConnections().isEmpty();
 	}
 
 	/**
@@ -255,5 +154,44 @@ public class JPPFJcaClient extends AbstractJPPFClient
 	public void setSubmissionManager(JPPFSubmissionManager submissionManager)
 	{
 		this.submissionManager = submissionManager;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
+	{
+		return new JPPFJcaClientConnection(uuid, name, info, this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected void initConfig(Object configuration)
+	{
+		if (log.isDebugEnabled()) log.debug("initializing configuration:\n" + configuration);
+		try
+		{
+			TypedProperties props = new TypedProperties();
+			ByteArrayInputStream bais = new ByteArrayInputStream(((String) configuration).getBytes());
+			props.load(bais);
+			bais.close();
+			config = props;
+		}
+		catch(Exception e)
+		{
+			log.error("Error while initializing the JPPF client configuration", e);
+		}
+		if (log.isDebugEnabled()) log.debug("config properties: " + config);
+	}
+
+	/**
+	 * Get the list of available connections.
+	 * @return a vector of connections instances.
+	 */
+	private Vector<JPPFClientConnection> getAvailableConnections()
+	{
+		if (availableConnections == null) availableConnections = new Vector<JPPFClientConnection>();
+		return availableConnections;
 	}
 }
