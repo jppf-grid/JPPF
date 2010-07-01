@@ -198,7 +198,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	/**
 	 * Checks whether the received bundle is the initial one sent by the driver,
 	 * and prepare a specific response if it is.
-	 * @param bundle - the bundle to check.
+	 * @param bundle the bundle to check.
 	 */
 	private void checkInitialBundle(JPPFTaskBundle bundle)
 	{

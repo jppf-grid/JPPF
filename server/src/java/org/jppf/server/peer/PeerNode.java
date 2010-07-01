@@ -185,7 +185,8 @@ public class PeerNode extends AbstractMonitoredNode
 			{
 				resultSender.sendPartialResults(bundleWrapper);
 			}
-			driver.getJobManager().jobEnded(bundleWrapper);
+			if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+				driver.getJobManager().jobEnded(bundleWrapper);
 			if (notifying) fireNodeEvent(NodeEventType.END_EXEC);
 		}
 		if (debugEnabled) log.debug(getName() + " End of peer node secondary loop");

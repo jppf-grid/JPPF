@@ -133,6 +133,7 @@ public class JPPFScheduleHandler
 	 */
 	public void cancelAction(Object key)
 	{
+		if (key == null) return;
 		TimerTask task = null;
 		task = timerTaskMap.remove(key);
 		if (debugEnabled) log.debug(name + " : cancelling action for key=" + key + ", task=" + task);
