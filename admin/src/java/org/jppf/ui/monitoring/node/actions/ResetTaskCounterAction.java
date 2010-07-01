@@ -44,7 +44,7 @@ public class ResetTaskCounterAction extends AbstractTopologyAction
 	public ResetTaskCounterAction()
 	{
 		setupIcon("/org/jppf/ui/resources/reset.gif");
-		putValue(NAME, "Reset task counter");
+		setupNameAndTooltip("reset.counter");
 	}
 
 	/**

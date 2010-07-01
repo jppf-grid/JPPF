@@ -78,6 +78,9 @@
 			</listener>
 		</child>
 
+		<child name="sep4" type="ToolbarSeparator"/>
+		<child name="select.drivers" type="Button"/>
+		<child name="select.nodes" type="Button"/>
 	</child>
 	
 

@@ -79,8 +79,8 @@ public class TreeTableModelAdapter extends AbstractTableModel
 
 	/**
 	 * Initialize this model adapter with the specified tree table model and JTree.
-	 * @param treeTableModel - the tree table model.
-	 * @param tree - the underlying JTree.
+	 * @param treeTableModel the tree table model.
+	 * @param tree the underlying JTree.
 	 */
 	public TreeTableModelAdapter(TreeTableModel treeTableModel, final JTree tree)
 	{
@@ -89,7 +89,10 @@ public class TreeTableModelAdapter extends AbstractTableModel
 
 		tree.addTreeExpansionListener(new TreeExpansionListener()
 		{
-			// Don't use fireTableRowsInserted() here; the selection model would get updated twice.
+			/**
+			 * Don't use fireTableRowsInserted() here; the selection model would get updated twice.
+			 * {@inheritDoc}
+			 */
 			public void treeExpanded(TreeExpansionEvent event)
 			{
 				TreePath[] paths = getSelectedPaths();
@@ -98,6 +101,9 @@ public class TreeTableModelAdapter extends AbstractTableModel
 				setSelectedPaths(paths);
 			}
 
+			/**
+			 * {@inheritDoc}
+			 */
 			public void treeCollapsed(TreeExpansionEvent event)
 			{
 				TreePath[] paths = getSelectedPaths();
@@ -111,21 +117,33 @@ public class TreeTableModelAdapter extends AbstractTableModel
 		// as we can not be guaranteed the tree will have finished processing the event before us.
 		treeTableModel.addTreeModelListener(new TreeModelListener()
 		{
+			/**
+			 * {@inheritDoc}
+			 */
 			public void treeNodesChanged(TreeModelEvent e)
 			{
 				delayedFireTableDataChanged();
 			}
 
+			/**
+			 * {@inheritDoc}
+			 */
 			public void treeNodesInserted(TreeModelEvent e)
 			{
 				delayedFireTableDataChanged();
 			}
 
+			/**
+			 * {@inheritDoc}
+			 */
 			public void treeNodesRemoved(TreeModelEvent e)
 			{
 				delayedFireTableDataChanged();
 			}
 
+			/**
+			 * {@inheritDoc}
+			 */
 			public void treeStructureChanged(TreeModelEvent e)
 			{
 				delayedFireTableDataChanged();
@@ -179,7 +197,7 @@ public class TreeTableModelAdapter extends AbstractTableModel
 
 	/**
 	 * Get the node for the specified row.
-	 * @param row - the row index.
+	 * @param row the row index.
 	 * @return the corresponding node object, or null if this row doesn't exist in the tree.
 	 */
 	protected Object nodeForRow(int row)
@@ -257,16 +275,16 @@ public class TreeTableModelAdapter extends AbstractTableModel
 	 * Get the currently selected paths in the tree.
 	 * @return an array of <code>TreePath</code> objects.
 	 */
-	protected TreePath[] getSelectedPaths()
+	public TreePath[] getSelectedPaths()
 	{
 		return tree.getSelectionPaths();
 	}
 
 	/**
 	 * Set the currently selected paths in the tree.
-	 * @param paths - an array of <code>TreePath</code> objects.
+	 * @param paths an array of <code>TreePath</code> objects.
 	 */
-	protected void setSelectedPaths(TreePath[] paths)
+	public void setSelectedPaths(TreePath[] paths)
 	{
 		if (paths == null) return;
 		List<TreePath> validPaths = new ArrayList<TreePath>();
@@ -283,7 +301,7 @@ public class TreeTableModelAdapter extends AbstractTableModel
 	 * @param paths the paths to dump.
 	 * @return a string representation of the array of <code>TreePath</code> objects.
 	 */
-	protected String dumpTreePaths(TreePath[] paths)
+	public String dumpTreePaths(TreePath[] paths)
 	{
 		StringBuilder sb = new StringBuilder();
 		if (paths == null) sb.append("null");
@@ -298,5 +316,14 @@ public class TreeTableModelAdapter extends AbstractTableModel
 			sb.append("]");
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Get the tree table model wrapped by this class.
+	 * @return a {@link TreeTableModel} instance.
+	 */
+	public TreeTableModel getTreeTableModel()
+	{
+		return treeTableModel;
 	}
 }

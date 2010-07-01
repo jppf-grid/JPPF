@@ -228,7 +228,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 					listenerMap.put(wrapper.getId(), listener);
 				}
 				DriverJobManagementMBean proxy = data.getProxy();
-				proxy.addNotificationListener(new JobNotificationListener(JobDataPanel.this, wrapper.getId()), null, null);
+				if (proxy != null) proxy.addNotificationListener(new JobNotificationListener(JobDataPanel.this, wrapper.getId()), null, null);
 				DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(data);
 				if (debugEnabled) log.debug("adding driver: " + wrapper.getId());
 				model.insertNodeInto(driverNode, treeTableRoot, treeTableRoot.getChildCount());

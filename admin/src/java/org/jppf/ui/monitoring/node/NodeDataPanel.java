@@ -212,10 +212,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		String nodeName = nodeInfo.getHost() + ":" + nodeInfo.getPort();
 		if (findNode(driverNode, nodeName) != null) return;
 		if (debugEnabled) log.debug("adding node: " + nodeName);
-		TopologyData nodeData = new TopologyData(nodeInfo);
-		DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(nodeData);
+		TopologyData data = new TopologyData(nodeInfo);
+		DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(data);
 		model.insertNodeInto(nodeNode, driverNode, driverNode.getChildCount());
-		updateStatusBar("/StatusNbNodes", 1);
+		if (nodeInfo.getType() == JPPFManagementInfo.NODE) updateStatusBar("/StatusNbNodes", 1);
 
 		for (int i=0; i<treeTableRoot.getChildCount(); i++)
 		{
@@ -239,7 +239,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		if (node == null) return;
 		if (debugEnabled) log.debug("removing node: " + nodeName);
 		model.removeNodeFromParent(node);
-		updateStatusBar("/StatusNbNodes", -1);
+		TopologyData data = (TopologyData) node.getUserObject();
+		if ((data != null) && (data.getNodeInformation().getType() == JPPFManagementInfo.NODE)) updateStatusBar("/StatusNbNodes", -1);
 	}
 
 	/**
@@ -372,6 +373,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		actionHandler.putAction("reset.counter", new ResetTaskCounterAction());
 		actionHandler.putAction("restart.node", new RestartNodeAction());
 		actionHandler.putAction("shutdown.node", new ShutdownNodeAction());
+		actionHandler.putAction("select.drivers", new SelectDriversAction(this));
+		actionHandler.putAction("select.nodes", new SelectNodesAction(this));
 		actionHandler.updateActions();
 		treeTable.addMouseListener(new NodeTreeTableMouseListener(actionHandler));
 		Runnable r = new ActionsInitializer(this, "/topology.toolbar");
