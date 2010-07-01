@@ -18,7 +18,7 @@
 
 package org.jppf.ui.treetable;
 
-import java.awt.Color;
+import java.awt.*;
 
 import javax.swing.tree.DefaultTreeCellRenderer;
 
@@ -65,13 +65,37 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
 	 */
 	protected static final Color SUSPENDED_COLOR = new Color(255, 216, 0);
 	/**
-	 * Default non-selection backgroung.
+	 * Default foreground color.
+	 */
+	protected static final Color DEFAULT_FOREGROUND = Color.BLACK;
+	/**
+	 * Default foreground color.
+	 */
+	protected static final Color DIMMED_FOREGROUND = Color.GRAY;
+	/**
+	 * Default non-selection background.
 	 */
 	protected Color defaultNonSelectionBackground = null;
 	/**
-	 * Default non-selection backgroung.
+	 * Default non-selection background.
 	 */
 	protected Color defaultSelectionBackground = null;
+	/**
+	 * The default plain font.
+	 */
+	protected Font plainFont = null;
+	/**
+	 * The default italic font.
+	 */
+	protected Font italicFont = null;
+	/**
+	 * The default bold font.
+	 */
+	protected Font boldFont = null;
+	/**
+	 * The default bold and italic font.
+	 */
+	protected Font boldItalicFont = null;
 
 	/**
 	 * Default constructor.
@@ -80,5 +104,63 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
 	{
 		defaultNonSelectionBackground = getBackgroundNonSelectionColor();
 		defaultSelectionBackground = getBackgroundSelectionColor();
+		//plainFont = new Font(Font.SANS_SERIF, 12, Font.PLAIN);
+		//italicFont = new Font(Font.SANS_SERIF, 12, Font.ITALIC);
+	}
+
+	/**
+	 * Get the default plain font.
+	 * @param font the font to base the result on.
+	 * @return a {@link Font} instance.
+	 */
+	public Font getPlainFont(Font font)
+	{
+		if (plainFont == null)
+		{
+			plainFont = new Font(font.getName(), Font.PLAIN, font.getSize());
+		}
+		return plainFont;
+	}
+
+	/**
+	 * Get the default italic font.
+	 * @param font the font to base the result on.
+	 * @return a {@link Font} instance.
+	 */
+	public Font getItalicFont(Font font)
+	{
+		if (italicFont == null)
+		{
+			italicFont = new Font(font.getName(), Font.ITALIC, font.getSize());
+		}
+		return italicFont;
+	}
+
+	/**
+	 * Get the default bold font.
+	 * @param font the font to base the result on.
+	 * @return a {@link Font} instance.
+	 */
+	public Font getBoldFont(Font font)
+	{
+		if (boldFont == null)
+		{
+			boldFont = new Font(font.getName(), Font.BOLD, font.getSize());
+		}
+		return boldFont;
+	}
+
+	/**
+	 * Get the default bold and italic font.
+	 * @param font the font to base the result on.
+	 * @return a {@link Font} instance.
+	 */
+	public Font getBoldItalicFont(Font font)
+	{
+		if (boldItalicFont == null)
+		{
+			boldItalicFont = new Font(font.getName(), Font.BOLD|Font.ITALIC, font.getSize());
+		}
+		return boldItalicFont;
 	}
 }

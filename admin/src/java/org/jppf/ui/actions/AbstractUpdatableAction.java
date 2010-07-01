@@ -95,6 +95,16 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 	}
 
 	/**
+	 * Set the action name and tooltip text.
+	 * @param name the key to find the name and tooltip in the localized resource bundles.
+	 */
+	protected void setupNameAndTooltip(String name)
+	{
+		putValue(NAME, localize(name + ".label"));
+		putValue(SHORT_DESCRIPTION, localize(name + ".tooltip"));
+	}
+
+	/**
 	 * Get a localized message given its unique name and the current locale.
 	 * @param message the unique name of the localized message.
 	 * @return a message in the current locale, or the default locale 

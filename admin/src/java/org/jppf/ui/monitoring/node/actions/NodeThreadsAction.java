@@ -66,7 +66,7 @@ public class NodeThreadsAction extends AbstractTopologyAction
 	public NodeThreadsAction()
 	{
 		setupIcon("/org/jppf/ui/resources/threads.gif");
-		putValue(NAME, "Set thread pool size");
+		setupNameAndTooltip("update.threads");
 	}
 
 	/**

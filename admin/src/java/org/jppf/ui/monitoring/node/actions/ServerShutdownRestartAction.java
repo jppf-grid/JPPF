@@ -65,13 +65,13 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 	public ServerShutdownRestartAction()
 	{
 		setupIcon("/org/jppf/ui/resources/server_restart.gif");
-		putValue(NAME, "Server Shutdown or Restart");
+		setupNameAndTooltip("shutdown.restart.driver");
 	}
 
 	/**
 	 * Update this action's enabled state based on a list of selected elements.
 	 * This method sets the enabled state to true if at list one driver is selected in the tree.
-	 * @param selectedElements - a list of objects.
+	 * @param selectedElements a list of objects.
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
 	public void updateState(List<Object> selectedElements)
@@ -92,7 +92,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 
 	/**
 	 * Perform the action.
-	 * @param event - encapsulates the source of the event and additional information.
+	 * @param event encapsulates the source of the event and additional information.
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent event)

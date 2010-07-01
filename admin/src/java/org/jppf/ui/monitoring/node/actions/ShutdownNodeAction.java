@@ -44,7 +44,7 @@ public class ShutdownNodeAction extends AbstractTopologyAction
 	public ShutdownNodeAction()
 	{
 		setupIcon("/org/jppf/ui/resources/traffic_light_red.gif");
-		putValue(NAME, "Node Shutdown");
+		setupNameAndTooltip("shutdown.node");
 	}
 
 	/**

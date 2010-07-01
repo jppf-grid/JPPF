@@ -64,7 +64,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	public NodeConfigurationAction()
 	{
 		setupIcon("/org/jppf/ui/resources/update.gif");
-		putValue(NAME, "Update the configuration properties");
+		setupNameAndTooltip("update.configuration");
 	}
 
 	/**

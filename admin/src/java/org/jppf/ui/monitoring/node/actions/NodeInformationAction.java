@@ -37,7 +37,7 @@ public class NodeInformationAction extends AbstractTopologyAction
 	public NodeInformationAction()
 	{
 		setupIcon("/org/jppf/ui/resources/info.gif");
-		putValue(NAME, "Node System Information");
+		setupNameAndTooltip("show.information");
 	}
 
 	/**

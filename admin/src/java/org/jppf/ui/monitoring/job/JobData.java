@@ -174,6 +174,7 @@ public class JobData
 			catch(Exception e)
 			{
 				if (debugEnabled) log.debug(e.getMessage(), e);
+				else log.warn(e);
 			}
 		}
 		return proxy;

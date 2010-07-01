@@ -44,7 +44,7 @@ public class RestartNodeAction extends AbstractTopologyAction
 	public RestartNodeAction()
 	{
 		setupIcon("/org/jppf/ui/resources/traffic_light_red_green.gif");
-		putValue(NAME, "Node Restart");
+		setupNameAndTooltip("restart.node");
 	}
 
 	/**

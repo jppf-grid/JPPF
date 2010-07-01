@@ -22,6 +22,10 @@
 	<property name="componentConstraints" value="growx, pushx, h 22!"/>
 	<property name="bordered" value="false"/>
 
+	<child name="filler" type="page">
+		<property name="componentConstraints" value="w 10!"/>
+	</child>
+
 	<child name="StatusNbServers" type="FormattedNumber">
 		<property name="label" value="Active servers"/>
 		<property name="tooltip" value="Current number of active JPPF servers"/>
@@ -30,6 +34,10 @@
 		<property name="orientation" value="horizontal"/>
 		<property name="enabled" value="false"/>
 		<property name="editable" value="false"/>
+	</child>
+
+	<child name="filler" type="page">
+		<property name="componentConstraints" value="w 20!"/>
 	</child>
 
 	<child name="StatusNbNodes" type="FormattedNumber">

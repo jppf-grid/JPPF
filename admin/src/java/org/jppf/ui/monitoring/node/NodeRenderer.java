@@ -68,6 +68,9 @@ public class NodeRenderer extends AbstractTreeCellRenderer
 				String path = null;
 				Color background = defaultNonSelectionBackground;
 				Color backgroundSelected = defaultSelectionBackground;
+				Color foreground = DEFAULT_FOREGROUND;
+				Font f = renderer.getFont();
+				Font font = getPlainFont(f);
 				switch(data.getType())
 				{
 					case DRIVER:
@@ -75,31 +78,41 @@ public class NodeRenderer extends AbstractTreeCellRenderer
 						{
 							path = DRIVER_ICON;
 							background = ACTIVE_COLOR;
+							font = getBoldFont(f);
 						}
 						else
 						{
 							path = DRIVER_INACTIVE_ICON;
 							background = INACTIVE_COLOR;
 							backgroundSelected = INACTIVE_SELECTION_COLOR;
+							font = getBoldItalicFont(f);
 						}
 						break;
 					case NODE:
 						JPPFManagementInfo info = data.getNodeInformation();
-						if ((info != null) && (JPPFManagementInfo.DRIVER == info.getType())) path = DRIVER_ICON;
+						if ((info != null) && (JPPFManagementInfo.DRIVER == info.getType()))
+						{
+							path = DRIVER_ICON;
+							font = getBoldItalicFont(f);
+							foreground = DIMMED_FOREGROUND;
+						}
 						else path = NODE_ICON;
 						if (!TopologyDataStatus.UP.equals(data.getStatus()))
 						{
 							background = INACTIVE_COLOR;
 							backgroundSelected = INACTIVE_SELECTION_COLOR;
+							font = getItalicFont(f);
 						}
 						break;
 				}
+				if (font != null) setFont(font);
 				ImageIcon icon = GuiUtils.loadIcon(path);
 				renderer.setIcon(icon);
 				if (JPPFConfiguration.getProperties().getBoolean("jppf.state.highlighting.enabled", true))
 				{
 					renderer.setBackgroundNonSelectionColor(background);
 					renderer.setBackgroundSelectionColor(backgroundSelected);
+					renderer.setForeground(foreground);
 				}
 			}
 		}

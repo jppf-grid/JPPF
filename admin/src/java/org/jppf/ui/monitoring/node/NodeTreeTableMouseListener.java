@@ -164,8 +164,8 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 
 	/**
 	 * Create a menu item.
-	 * @param action - the action associated with the neu item.
-	 * @param location - the location to use for any window create by the action.
+	 * @param action the action associated with the neu item.
+	 * @param location the location to use for any window create by the action.
 	 * @return a <code>JMenuItem</code> instance.
 	 */
 	private JMenuItem createMenuItem(Action action, Point location)

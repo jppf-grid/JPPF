@@ -20,6 +20,7 @@ package org.jppf.ui.monitoring.node.actions;
 
 import java.util.*;
 
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.actions.AbstractUpdatableAction;
 import org.jppf.ui.monitoring.node.*;
 
@@ -30,9 +31,17 @@ import org.jppf.ui.monitoring.node.*;
 public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 {
 	/**
-	 * The object rpresenting the JPPF nodes in the tree table.
+	 * The object representing the JPPF nodes in the tree table.
 	 */
 	protected TopologyData[] nodeDataArray = new TopologyData[0];
+
+	/**
+	 * Iniitialize this action.
+	 */
+	protected AbstractTopologyAction()
+	{
+		BASE = "org.jppf.ui.i18n.NodeDataPage";
+	}
 
 	/**
 	 * Update this action's enabled state based on a list of selected elements.
@@ -45,8 +54,17 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 		List<TopologyData> list = new ArrayList<TopologyData>();
 		for (Object o: selectedElements)
 		{
+			/*
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) o;
+			if (!(node.getUserObject() instanceof TopologyData)) continue;
+			TopologyData data = (TopologyData) node.getUserObject();
+			*/
 			TopologyData data = (TopologyData) o;
-			if (TopologyDataType.NODE.equals(data.getType())) list.add(data);
+			if (TopologyDataType.NODE.equals(data.getType()))
+			{
+				JPPFManagementInfo info = data.getNodeInformation();
+				if ((info != null) && (JPPFManagementInfo.NODE == info.getType())) list.add(data);
+			}
 		}
 		nodeDataArray = list.toArray(new TopologyData[0]);
 	}
