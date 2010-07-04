@@ -39,9 +39,13 @@ public class JPPFSchedule implements Serializable
 	 */
 	private String date = null;
 	/**
+	 * Schedule date format as a string.
+	 */
+	private String format = null;
+	/**
 	 * Format describing the schedule date.
 	 */
-	private SimpleDateFormat dateFormat = null;
+	private transient SimpleDateFormat dateFormat = null;
 
 	/**
 	 * Initialize this schedule configuration with the specified duration.
@@ -55,12 +59,26 @@ public class JPPFSchedule implements Serializable
 	/**
 	 * Initialize this schedule configuration with the specified duration.
 	 * @param date the schedule date provided as a string.
+	 * @param format the format in which the date is expressed (including locale and time zone information),
+	 * as specified in the description of {@link SimpleDateFormat}.
+	 */
+	public JPPFSchedule(String date, String format)
+	{
+		this.date = date;
+		this.format = format;
+	}
+
+	/**
+	 * Initialize this schedule configuration with the specified duration.
+	 * @param date the schedule date provided as a string.
 	 * @param dateFormat the format in which the date is expressed (including locale and time zone information).
+	 * @deprecated use {@link #JPPFSchedule(java.lang.String, java.lang.String) JPPFSchedule(String, String)} instead.
 	 */
 	public JPPFSchedule(String date, SimpleDateFormat dateFormat)
 	{
 		this.date = date;
-		this.dateFormat = dateFormat;
+		//this.dateFormat = dateFormat;
+		this.format = dateFormat.toPattern();
 	}
 
 	/**
@@ -86,10 +104,20 @@ public class JPPFSchedule implements Serializable
 	/**
 	 * Get the format of timeout date for this task.
 	 * @return a <code>SimpleDateFormat</code> instance.
+	 * @deprecated use {@link #getFormat() getFormat()} instead.
 	 */
 	public SimpleDateFormat getDateFormat()
 	{
 		return dateFormat;
+	}
+
+	/**
+	 * Get the format of timeout date for this task.
+	 * @return the date format as a string pattern.
+	 */
+	public String getFormat()
+	{
+		return format;
 	}
 
 	/**
@@ -101,12 +129,13 @@ public class JPPFSchedule implements Serializable
 	public Date toDate(long startDate) throws ParseException
 	{
 		Date dt = null;
-		if ((date == null) || (dateFormat == null))
+		if ((date == null) || (format == null))
 		{
 			dt = new Date(startDate + duration);
 		}
 		else
 		{
+			if (dateFormat == null) dateFormat = new SimpleDateFormat(format);
 			dt = dateFormat.parse(date);
 		}
 		return dt;
@@ -121,12 +150,13 @@ public class JPPFSchedule implements Serializable
 	public long toLong(long startDate) throws ParseException
 	{
 		long result = 0L;
-		if ((date == null) || (dateFormat == null))
+		if ((date == null) || (format == null))
 		{
 			result = startDate + duration;
 		}
 		else
 		{
+			if (dateFormat == null) dateFormat = new SimpleDateFormat(format);
 			Date dt = dateFormat.parse(date);
 			result = dt.getTime();
 		}
@@ -139,6 +169,7 @@ public class JPPFSchedule implements Serializable
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder("schedule[");
+		if ((dateFormat == null) && (format != null)) dateFormat = new SimpleDateFormat(format);
 		if (date != null) sb.append("date=").append(date).append(", format=").append(dateFormat == null ? "null" : dateFormat.toPattern());
 		else sb.append("delay=").append(duration);
 		sb.append("]");
