@@ -106,15 +106,7 @@ public class JPPFScheduleHandler
 				log.debug(name + " : scheduling action[key=" + key + ", " + schedule + ", action=" + action + ", start=" + sdf.format(new Date(start)));
 			}
 		}
-		Date date = null;
-		if (schedule.getDuration() > 0L)
-		{
-			date = new Date(start + schedule.getDuration());
-		}
-		else
-		{
-			date = schedule.getDateFormat().parse(schedule.getDate());
-		}
+		Date date = schedule.toDate(start);
 		ScheduleHandlerTask task = new ScheduleHandlerTask(key, action);
 		timerTaskMap.put(key, task);
 		if (debugEnabled)

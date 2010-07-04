@@ -74,8 +74,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		if (bundleWrapper != null)
 		{
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
-			JPPFDriver.getQueue().nextBundle(bundleWrapper, bundle.getTaskCount());
-			//if (bundle.getCompletionListener() != null) bundle.getCompletionListener().taskCompleted(bundleWrapper);
+			BundleWrapper queuedWrapper = JPPFDriver.getQueue().nextBundle(bundleWrapper, bundle.getTaskCount());
+			//if ((queuedWrapper != null) && (bundle.getCompletionListener() != null)) bundle.getCompletionListener().taskCompleted(bundleWrapper);
 		}
 		cancelJobInNodes(jobId, false);
 	}

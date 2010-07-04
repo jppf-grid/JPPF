@@ -226,11 +226,22 @@ public abstract class JPPFTask implements Runnable, Serializable
 	/**
 	 * Get the format of timeout date for this task.
 	 * @return a <code>SimpleDateFormat</code> instance.
+	 * @deprecated use {@link #getTimeoutFormat() getTimeoutFormat()} instead.
 	 */
 	public SimpleDateFormat getTimeoutDateFormat()
 	{
 		if (timeoutSchedule == null) return null;
-		return timeoutSchedule.getDateFormat();
+		return new SimpleDateFormat(timeoutSchedule.getFormat());
+	}
+
+	/**
+	 * Get the format of timeout date for this task.
+	 * @return the timeout date format as a string pattern, as decribed in the specification for {@link SimpleDateFormat}.
+	 */
+	public String getTimeoutFormat()
+	{
+		if (timeoutSchedule == null) return null;
+		return timeoutSchedule.getFormat();
 	}
 
 	/**
@@ -239,11 +250,23 @@ public abstract class JPPFTask implements Runnable, Serializable
 	 * are mutually exclusive.
 	 * @param timeoutDate the date to set in string representation.
 	 * @param timeoutDateFormat the format of of the date to set.
-	 * @see java.text.SimpleDateFormat
+	 * @deprecated use {@link #setTimeoutDate(java.lang.String, java.lang.String) getTimeoutFormat(String, String)} instead.
 	 */
 	public void setTimeoutDate(String timeoutDate, SimpleDateFormat timeoutDateFormat)
 	{
-		timeoutSchedule = new JPPFSchedule(timeoutDate, timeoutDateFormat);
+		timeoutSchedule = new JPPFSchedule(timeoutDate, timeoutDateFormat.toPattern());
+	}
+
+	/**
+	 * Set the timeout date for this task.<br>
+	 * Calling this method will reset the timeout value, as both timeout duration and timeout date are mutually exclusive.
+	 * @param timeoutDate the date to set in string representation.
+	 * @param format the format of of the date to set, as described in the specfication for {@link SimpleDateFormat}.
+	 * @see java.text.SimpleDateFormat
+	 */
+	public void setTimeoutDate(String timeoutDate, String format)
+	{
+		timeoutSchedule = new JPPFSchedule(timeoutDate, format);
 	}
 
 	/**

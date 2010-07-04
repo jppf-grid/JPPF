@@ -54,6 +54,10 @@ public class TestJPPFJobSLA extends OneDriverOneNodeSetup
 	 * A "rest" duration for this test.
 	 */
 	private static final long TIME_REST = 1L;
+	/**
+	 * A the date format used in the tests.
+	 */
+	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
 	/**
 	 * Simply test that a job does expires at a specified date.
@@ -83,9 +87,9 @@ public class TestJPPFJobSLA extends OneDriverOneNodeSetup
 	public void testJobExpirationAtDate() throws Exception
 	{
 		JPPFJob job = createJob("testJobExpirationAtDate", 1, TIME_LONG);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 		Date date = new Date(System.currentTimeMillis() + TIME_SHORT);
-		job.getJobSLA().setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), sdf));
+		job.getJobSLA().setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), DATE_FORMAT));
 		List<JPPFTask> results = client.submit(job);
 		assertNotNull(results);
 		assertEquals(results.size(), 1);
@@ -101,9 +105,9 @@ public class TestJPPFJobSLA extends OneDriverOneNodeSetup
 	public void testJobExpirationAtDateTooLate() throws Exception
 	{
 		JPPFJob job = createJob("testJobExpirationAtDateTooLate", 1, TIME_SHORT);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 		Date date = new Date(System.currentTimeMillis() + TIME_LONG);
-		job.getJobSLA().setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), sdf));
+		job.getJobSLA().setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), DATE_FORMAT));
 		List<JPPFTask> results = client.submit(job);
 		assertNotNull(results);
 		assertEquals(results.size(), 1);
@@ -143,6 +147,23 @@ public class TestJPPFJobSLA extends OneDriverOneNodeSetup
 		JPPFTask task = results.get(0);
 		assertNotNull(task.getResult());
 		assertEquals(OneDriverOneNodeSetup.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+	}
+
+	/**
+	 * Simply test that a job does expires after a specified delay.
+	 * @throws Exception if any error occurs.
+	 */
+	@Test(timeout=5000)
+	public void testSuspendedJobExpiration() throws Exception
+	{
+		JPPFJob job = createJob("testJobExpirationAfterDelay", 1, TIME_LONG);
+		job.getJobSLA().setSuspended(true);
+		job.getJobSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
+		List<JPPFTask> results = client.submit(job);
+		assertNotNull(results);
+		assertEquals(results.size(), 1);
+		JPPFTask task = results.get(0);
+		assertNull(task.getResult());
 	}
 
 	/**

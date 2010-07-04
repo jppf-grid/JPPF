@@ -85,6 +85,13 @@ public class OneDriverOneNodeSetup
 	@AfterClass
 	public static void cleanup() throws IOException
 	{
+		try
+		{
+			Thread.sleep(1000L);
+		}
+		catch(Exception e)
+		{
+		}
 		client.close();
 		node.stopProcess();
 		driver.stopProcess();

@@ -123,12 +123,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			else
 			{
 				bundle.setQueueEntryTime(System.currentTimeMillis());
-				if (debugEnabled) log.debug("adding bundle with [jobId=" + jobId + ", priority=" + sla.getPriority()+", initialTasksCount=" +
-					bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + "]");
 				putInListMap(new JPPFPriority(sla.getPriority()), bundleWrapper, priorityMap);
 				putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
 				Boolean requeued = (Boolean) bundle.removeParameter(BundleParameter.JOB_REQUEUE);
 				if (requeued == null) requeued = false;
+				if (debugEnabled) log.debug("adding bundle with [jobId=" + jobId + ", priority=" + sla.getPriority()+", initialTasksCount=" +
+					bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + ", requeue=" + requeued + "]");
 				if (!requeued)
 				{
 					handleStartJobSchedule(bundleWrapper);
@@ -249,7 +249,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeBundle(BundleWrapper bundleWrapper)
+	public BundleWrapper removeBundle(BundleWrapper bundleWrapper)
 	{
 		lock.lock();
 		try
@@ -257,7 +257,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			if (debugEnabled) log.debug("removing bundle from queue, jobId=" + bundle.getParameter(BundleParameter.JOB_ID));
 			removeFromListMap(new JPPFPriority(bundle.getJobSLA().getPriority()), bundleWrapper, priorityMap);
-			jobMap.remove((String) bundle.getParameter(BundleParameter.JOB_UUID));
+			return jobMap.remove((String) bundle.getParameter(BundleParameter.JOB_UUID));
 		}
 		finally
 		{
@@ -286,6 +286,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		JPPFSchedule schedule = sla.getJobSchedule();
 		if (schedule != null)
 		{
+			bundle.setParameter(BundleParameter.JOB_PENDING, true);
 			String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
 			Object uuid = bundle.getParameter(BundleParameter.JOB_UUID);
 			if (debugEnabled) log.debug("found start " + schedule + " for jobId = " + jobId);
@@ -298,7 +299,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			{
 				bundle.setParameter(BundleParameter.JOB_PENDING, false);
 				log.error("Unparseable start date for job id " + jobId + " : date = " + schedule.getDate() +
-					", date format = " + (schedule.getDateFormat() == null ? "null" : schedule.getDateFormat().toLocalizedPattern()), e);
+					", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
 			}
 		}
 		else bundle.setParameter(BundleParameter.JOB_PENDING, false);
@@ -328,7 +329,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			{
 				bundle.setParameter(BundleParameter.JOB_EXPIRED, false);
 				log.error("Unparseable expiration date for job id " + jobId + " : date = " + schedule.getDate() +
-					", date format = " + (schedule.getDateFormat() == null ? "null" : schedule.getDateFormat().toLocalizedPattern()), e);
+					", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
 			}
 		}
 	}
@@ -501,8 +502,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 				try
 				{
 					if (debugEnabled) log.debug("job '" + jobId + "' is expiring");
-					removeBundle(bundleWrapper);
+					//removeBundle(bundleWrapper);
 					bundleWrapper.getBundle().setParameter(BundleParameter.JOB_EXPIRED, true);
+					JPPFTaskBundle bundle = bundleWrapper.getBundle();
+					if (bundle.getTaskCount() > 0)
+					{
+						if (bundle.getCompletionListener() != null) bundle.getCompletionListener().taskCompleted(bundleWrapper);
+					}
 					String jobUuid = (String) bundleWrapper.getBundle().getParameter(BundleParameter.JOB_UUID);
 					jobManagamentMBean.cancelJob(jobUuid);
 				}

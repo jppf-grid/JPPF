@@ -62,6 +62,7 @@ public interface JPPFQueue extends Iterable<BundleWrapper>
 	/**
 	 * Remove the specified bundle from the queue.
 	 * @param bundleWrapper the bundle to remove.
+	 * @return the bundle that was removed.
 	 */
-	void removeBundle(BundleWrapper bundleWrapper);
+	BundleWrapper removeBundle(BundleWrapper bundleWrapper);
 }
