@@ -49,7 +49,7 @@ public class TestJPPFJobSLA extends OneDriverOneNodeSetup
 	/**
 	 * A "long" duration for this test.
 	 */
-	private static final long TIME_LONG = 2500L;
+	private static final long TIME_LONG = 3000L;
 	/**
 	 * A "rest" duration for this test.
 	 */
