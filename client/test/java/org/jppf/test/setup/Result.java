@@ -21,7 +21,7 @@ package org.jppf.test.setup;
 import java.io.Serializable;
 
 /**
- * A simple runnable task implementation.
+ * Instances of this class represent the result of a task execution.
  */
 public class Result implements Serializable
 {

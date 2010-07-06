@@ -21,7 +21,7 @@ package org.jppf.client.concurrent;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
@@ -59,6 +59,10 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * Determines whether this executor has been terminated.
 	 */
 	private AtomicBoolean terminated = new AtomicBoolean(false);
+	/**
+	 * Count of jobs created by this executor service.
+	 */
+	private static AtomicLong jobCount = new AtomicLong(0);
 
 	/**
 	 * Initialize this executor service with the specified JPPF client.
@@ -104,8 +108,9 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	{
 		if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
 		if (timeout < 0) throw new IllegalArgumentException("timeout cannot be negative");
-		long millis = DateTimeUtils.toMillis(timeout, unit);
 		long start = System.currentTimeMillis();
+		long millis = DateTimeUtils.toMillis(timeout, unit);
+		if (debugEnabled) log.debug("timeout in millis: " + millis);
 		JPPFJob job = createJob();
 		FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
 		List<Future<T>> futureList = new ArrayList<Future<T>>(tasks.size());
@@ -121,33 +126,14 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 			collector.setTaskCount(job.getTasks().size());
 			submitJob(job);
 			long elapsed = System.currentTimeMillis() - start;
-			if ((millis == 0) || (elapsed < millis))
-			{
-				if (millis == 0) collector.waitForResults(0);
-				else collector.waitForResults(millis - elapsed);
-			}
+			if ((millis == 0) || (elapsed < millis)) collector.waitForResults(millis == 0 ? 0 : millis - elapsed);
 			elapsed = System.currentTimeMillis() - start;
-			for (Future<T> f: futureList)
-			{
-				if (!f.isDone())
-				{
-					JPPFTaskFuture<T> future = (JPPFTaskFuture<T>) f;
-					future.setDone();
-					future.setCancelled();
-				}
-			}
+			if (debugEnabled) log.debug("elapsed=" + elapsed);
+			handleFutureList(futureList);
 		}
 		catch(InterruptedException e)
 		{
-			for (Future<T> f: futureList)
-			{
-				if (!f.isDone())
-				{
-					JPPFTaskFuture<T> future = (JPPFTaskFuture<T>) f;
-					future.setDone();
-					future.setCancelled();
-				}
-			}
+			handleFutureList(futureList);
 			throw e;
 		}
 		catch(Exception e)
@@ -155,6 +141,24 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 			throw new RejectedExecutionException(e);
 		}
 		return futureList;
+	}
+
+	/**
+	 * Ensure that all futures in the specified list that have not completed are marked as cancelled.
+	 * @param <T> the type of results held by each future.
+	 * @param futureList the list of futures to handle.
+	 */
+	private <T> void handleFutureList(List<Future<T>> futureList)
+	{
+		for (Future<T> f: futureList)
+		{
+			if (!f.isDone())
+			{
+				JPPFTaskFuture<T> future = (JPPFTaskFuture<T>) f;
+				future.setDone();
+				future.setCancelled();
+			}
+		}
 	}
 
 	/**
@@ -341,6 +345,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	public List<Runnable> shutdownNow()
 	{
 		shuttingDown.set(true);
+		terminated.compareAndSet(false, jobMap.isEmpty());
 		waitForTerminated(0L);
 		return null;
 	}
@@ -352,6 +357,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	private JPPFJob createJob()
 	{
 		JPPFJob job = new JPPFJob();
+		job.setId(getClass().getSimpleName() + " job " + jobCount.incrementAndGet());
 		FutureResultCollector collector = new FutureResultCollector(0, job.getUuid());
 		job.setResultListener(collector);
 		job.setBlocking(false);
