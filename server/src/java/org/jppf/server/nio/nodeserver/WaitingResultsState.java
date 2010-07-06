@@ -60,18 +60,18 @@ class WaitingResultsState extends NodeServerState
 	public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
-		if (debugEnabled) log.debug("exec() for " + wrapper);
+		//if (debugEnabled) log.debug("exec() for " + wrapper);
 
 		// Wait the full byte[] of the bundle come to start processing.
 		// This makes the integration of non-blocking with ObjectInputStream easier.
 		if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage(), wrapper);
 		if (context.readMessage(wrapper))
 		{
-			if (debugEnabled) log.debug("read bundle from node " + wrapper + " done");
 			BundleWrapper bundleWrapper = context.getBundle();
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			BundleWrapper newBundleWrapper = context.deserializeBundle();
 			JPPFTaskBundle newBundle = newBundleWrapper.getBundle();
+			if (debugEnabled) log.debug("read bundle" + newBundle + "from node " + wrapper + " done");
 			// if an exception prevented the node from executing the tasks
 			if (newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM) != null)
 			{

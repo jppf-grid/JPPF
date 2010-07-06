@@ -505,6 +505,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 					//removeBundle(bundleWrapper);
 					bundleWrapper.getBundle().setParameter(BundleParameter.JOB_EXPIRED, true);
 					JPPFTaskBundle bundle = bundleWrapper.getBundle();
+					/*
+					*/
 					if (bundle.getTaskCount() > 0)
 					{
 						if (bundle.getCompletionListener() != null) bundle.getCompletionListener().taskCompleted(bundleWrapper);
