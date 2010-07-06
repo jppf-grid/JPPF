@@ -49,10 +49,6 @@ public class OneDriverOneNodeSetup
 	 * Shutdown hook used to destroy the driver and node processes, in case the JVM terminates abnormally.
 	 */
 	protected static Thread shutdownHook = null;
-	/**
-	 * Default duration for tasks that use a duration. Adjust the value for slow hardware.
-	 */
-	protected static final long TASK_DURATION = 100L;
 
 	/**
 	 * Launches a driver and node and start the client.
@@ -61,6 +57,7 @@ public class OneDriverOneNodeSetup
 	@BeforeClass
 	public static void setup() throws IOException
 	{
+		System.out.println("performing setup");
 		shutdownHook = new Thread()
 		{
 			public void run()
@@ -76,6 +73,14 @@ public class OneDriverOneNodeSetup
 		node = new NodeProcessLauncher(1);
 		node.startProcess();
 		client = new JPPFClient();
+		// give some time for everyone to initialize
+		try
+		{
+			Thread.sleep(1000L);
+		}
+		catch(Exception e)
+		{
+		}
 	}
 
 	/**
@@ -85,6 +90,7 @@ public class OneDriverOneNodeSetup
 	@AfterClass
 	public static void cleanup() throws IOException
 	{
+		System.out.println("performing cleanup");
 		try
 		{
 			Thread.sleep(1000L);
