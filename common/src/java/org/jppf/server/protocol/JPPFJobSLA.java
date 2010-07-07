@@ -31,6 +31,10 @@ import org.jppf.scheduling.JPPFSchedule;
 public class JPPFJobSLA implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The tasks execution policy.
 	 */
 	private ExecutionPolicy executionPolicy = null;

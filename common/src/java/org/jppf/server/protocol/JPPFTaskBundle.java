@@ -32,6 +32,11 @@ import org.jppf.utils.*;
 public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Type safe enumeration for the values of the bundle state.
 	 */
 	public enum State

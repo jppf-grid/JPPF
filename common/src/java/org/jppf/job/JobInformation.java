@@ -29,6 +29,10 @@ import java.io.Serializable;
 public class JobInformation implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The unique identifier for the job.
 	 */
 	private String jobUuid = null;

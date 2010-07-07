@@ -25,6 +25,10 @@ package org.jppf.client.taskwrapper;
 public class RunnableTaskWrapper extends AbstractTaskObjectWrapper
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The object on which to execute a method, or the class of the object if the method is static.
 	 */
 	private Runnable runnable = null;
