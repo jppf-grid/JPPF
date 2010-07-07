@@ -23,18 +23,31 @@
 	<!-- ========================================================================= -->
 
   <property file="${basedir}/build.properties"/>
+	<property name="deployable"  value="${basedir}/deployable"/>
+
+	<!-- ========================================================================= -->
+	<!--                                    Clean                                  -->
+	<!-- ========================================================================= -->
+
+  <target name="clean" description="">
+    <delete quiet="true">
+    	<fileset dir="${deployable}" includes="*.war, *.jar"/>
+  	</delete>
+  </target>               
 
 	<!-- ========================================================================= -->
 	<!--                         Build everything                                  -->
 	<!-- ========================================================================= -->
 
-	<target name="build">
+	<target name="build" depends="clean">
 		<echo message="***** Building common components"/>
 		<ant antfile="${basedir}/JPPF-GigaSpaces-Common/build.xml" target="build" inheritall="false"/>
 		<echo message="***** Building the JPPF processing Unit"/>
 		<ant antfile="${basedir}/JPPF-GigaSpaces-ProcessingUnit/build.xml" target="build" inheritall="false"/>
 		<echo message="***** Building the GigaSpacaes client and demo web application"/>
 		<ant antfile="${basedir}/JPPF-GigaSpaces-Client/build.xml" target="build" inheritall="false"/>
+		<copy todir="${deployable}" file="${basedir}/JPPF-GigaSpaces-ProcessingUnit/pu/JPPF-GigaSpaces-ProcessingUnit.jar"/>
+		<copy todir="${deployable}" file="${basedir}/JPPF-GigaSpaces-Client/build/jppftest.war"/>
 	</target>
 	
 </project> 
