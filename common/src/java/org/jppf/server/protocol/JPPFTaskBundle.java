@@ -29,7 +29,7 @@ import org.jppf.utils.*;
  * The bundle size is computed dynamically, depending on the number of nodes connected to the server, and other factors.
  * @author Laurent Cohen
  */
-public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
+public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>, JPPFDistributedJob
 {
 	/**
 	 * Explicit serialVersionUID.
@@ -428,8 +428,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 	}
 
 	/**
-	 * Get the service level agreement between the job and the server.
-	 * @return an instance of <code>JPPFJobSLA</code>.
+	 * {@inheritDoc}
 	 */
 	public JPPFJobSLA getJobSLA()
 	{
@@ -457,5 +456,29 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>
 		sb.append(", taskCount=").append(taskCount);
 		sb.append("]");
 		return sb.toString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getId()
+	{
+		return (String) getParameter(BundleParameter.JOB_ID);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public JPPFJobMetadata getJobMetadata()
+	{
+		return (JPPFJobMetadata) getParameter(BundleParameter.JOB_METADATA);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getJobUuid()
+	{
+		return (String) getParameter(BundleParameter.JOB_UUID);
 	}
 }
