@@ -219,7 +219,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		header.setUuidPath(uuidPath);
 		header.setTaskCount(count);
 		header.setParameter(BundleParameter.JOB_ID, job.getId());
-		header.setParameter(BundleParameter.JOB_UUID, job.getUuid());
+		header.setParameter(BundleParameter.JOB_UUID, job.getJobUuid());
 		header.setJobSLA(job.getJobSLA());
 		header.setParameter(BundleParameter.JOB_METADATA, job.getJobMetadata());
 
@@ -482,7 +482,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * Get the object that holds the tasks, data provider and submission mode for the current execution.
 	 * @return a <code>JPPFJob</code> instance.
 	 */
-	public JPPFJob getCurrentJob()
+	public JPPFDistributedJob getCurrentJob()
 	{
 		return job;
 	}
