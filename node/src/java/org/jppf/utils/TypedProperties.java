@@ -29,6 +29,11 @@ import java.util.*;
 public class TypedProperties extends Properties
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Default constructor.
 	 */
 	public TypedProperties()
@@ -236,7 +241,13 @@ public class TypedProperties extends Properties
 
 	/**
 	 * Get the value of a property with the specified name as a set of a properties.
-	 * @param key - the name of the property to look for.
+	 * <p>The lookup for the corresponding properties file is performed in this order:
+	 * <ol>
+	 * <li>in the file system</li>
+	 * <li>in the class path, using <code>Thread.currentThread().getContextClassLoader()</code></li>
+	 * <li>in the class path, using <code>this.getClass().getClassLoader()</code></li>
+	 * </ol>
+	 * @param key the name of the property to look for.
 	 * Its value is the path to another properties file. Relative paths are evaluated against the current application directory. 
 	 * @return the value of the property as another set of properties, or null if it is not found.
 	 */
@@ -247,20 +258,40 @@ public class TypedProperties extends Properties
 
 	/**
 	 * Get the value of a property with the specified name as a set of a properties.
-	 * @param key - the name of the property to look for.
+	 * <p>The lookup for the corresponding properties file is performed in this order:
+	 * <ol>
+	 * <li>in the file system</li>
+	 * <li>in the class path, using <code>Thread.currentThread().getContextClassLoader()</code></li>
+	 * <li>in the class path, using <code>this.getClass().getClassLoader()</code></li>
+	 * </ol>
+	 * @param key the name of the property to look for.
 	 * Its value is the path to another properties file. Relative paths are evaluated against the current application directory. 
-	 * @param def - a default value to return if the property is not found.
+	 * @param def a default value to return if the property is not found.
 	 * @return the value of the property as another set of properties, or the default value if it is not found.
 	 */
 	public TypedProperties getProperties(String key, TypedProperties def)
 	{
 		String path = getString(key);
-		File file = new File(path);
-		if (!file.exists()) return def;
-		TypedProperties res = new TypedProperties();
+		if (path == null) return def;
+		TypedProperties res = null;
 		try
 		{
-			res.load(new BufferedInputStream(new FileInputStream(file)));
+			InputStream is = null;
+			File file = new File(path);
+			if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
+			if (is == null)
+			{
+				ClassLoader cl = Thread.currentThread().getContextClassLoader();
+				if (cl != null) is = cl.getResourceAsStream(path);
+				if (is == null)
+				{
+					cl = this.getClass().getClassLoader();
+					if (cl != null) is = cl.getResourceAsStream(path);
+					if (is == null) return def;
+				}
+			}
+			res = new TypedProperties();
+			res.load(is);
 		}
 		catch(IOException e)
 		{
@@ -270,7 +301,8 @@ public class TypedProperties extends Properties
 	}
 
 	/**
-	 * Convert this set of properties into a string.
+	 * Convert this set of properties into a string.<br>
+	 * This method filters out entries whose key or value is not a string.
 	 * @return a representation of this object as a string.
 	 */
 	public String asString()
