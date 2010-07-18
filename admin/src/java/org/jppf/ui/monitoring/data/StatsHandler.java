@@ -430,7 +430,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Set the current client connection for which statistics and charts are displayed.
-	 * @param connection - a <code>JPPFClientConnection</code> instance.
+	 * @param connection a <code>JPPFClientConnection</code> instance.
 	 */
 	public synchronized void setCurrentConnection(final JPPFClientConnectionImpl connection)
 	{
@@ -452,7 +452,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * JPPF client used to submit data udpate and administration requests.
-	 * @param clientListener - a listener to register with the JPPF client.
+	 * @param clientListener a listener to register with the JPPF client.
 	 * @return a <code>JPPFClient</code> instance.
 	 */
 	public synchronized JPPFClient getJppfClient(ClientListener clientListener)
@@ -466,7 +466,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Notifiy this listener that a new driver connection was created.
-	 * @param event - the event to notify this listener of.
+	 * @param event the event to notify this listener of.
 	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
 	 */
 	public synchronized void newConnection(ClientEvent event)
@@ -485,7 +485,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Set the option containing the combobox with the list of driver connections. 
-	 * @param serverListOption - an <code>OptionElement</code> instance.
+	 * @param serverListOption an <code>OptionElement</code> instance.
 	 */
 	public synchronized void setServerListOption(OptionElement serverListOption)
 	{
