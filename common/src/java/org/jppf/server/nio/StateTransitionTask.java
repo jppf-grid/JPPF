@@ -21,7 +21,6 @@ package org.jppf.server.nio;
 import java.nio.channels.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.utils.StringUtils;
 
 /**
  * Instances of this class perform the transition of a channel from one state to another.
@@ -70,30 +69,27 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 	 */
 	public void run()
 	{
-		StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
-		try
+		synchronized(key)
 		{
-			this.ctx = (NioContext<S>) key.attachment();
-			S s1 = ctx.getState();
-			NioState<T> state = factory.getState(s1);
-			NioTransition<S> transition = factory.getTransition(state.performTransition(key));
-			S s2 = transition.getState();
-			ctx.setState(s2);
-			if (debugEnabled && !s1.equals(s2)) log.debug(StringUtils.getRemoteHost(key.channel()) + " transition from " + s1 + " to " + s2);
-			transitionManager.setKeyOps(key, transition.getInterestOps());
+			StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
+			try
+			{
+				this.ctx = (NioContext<S>) key.attachment();
+				S s = ctx.getState();
+				NioState<T> state = factory.getState(ctx.getState());
+				T transition = state.performTransition(key);
+				transitionManager.transitionChannel(key, transition);
+			}
+			catch(Exception e)
+			{
+				ctx.handleException((SocketChannel) key.channel());
+				if (debugEnabled) log.debug(e.getMessage(), e);
+				else log.warn(e);
+			}
+			finally
+			{
+				//transitionManager.releaseKey(key);
+			}
 		}
-		catch(Exception e)
-		{
-			ctx.handleException((SocketChannel) key.channel());
-			//key.cancel();
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.warn(e);
-		}
-		/*
-		finally
-		{
-			if (!transitionManager.isSequential()) transitionManager.releaseKey(key);
-		}
-		*/
 	}
 }

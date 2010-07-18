@@ -89,26 +89,27 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	protected void submitTransition(SelectionKey key)
 	{
-		/*
-		if (!sequential)
-		{
-			lock.lock();
-			try
-			{
-				//if (debugEnabled) log.debug("processed keys: " + processingKeys + ", before adding " + key);
-				if (processingKeys.contains(key)) return;
-				processingKeys.add(key);
-			}
-			finally
-			{
-				lock.unlock();
-			}
-		}
-		*/
 		setKeyOps(key, 0);
 		StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, server.getFactory());
 		if (sequential) transition.run();
 		else executor.submit(transition);
+	}
+
+	/**
+	 * Mark a key as being processed.
+	 * @param key the key to add.
+	 */
+	void addKey(SelectionKey key)
+	{
+		lock.lock();
+		try
+		{
+			if (!processingKeys.contains(key)) processingKeys.add(key);
+		}
+		finally
+		{
+			lock.unlock();
+		}
 	}
 
 	/**
@@ -148,6 +149,23 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	}
 
 	/**
+	 * Get all keys being processed.
+	 * @return a set of {@link SelectionKey} instances.
+	 */
+	public Set<SelectionKey> getProcessingKeys()
+	{
+		lock.lock();
+		try
+		{
+			return Collections.unmodifiableSet(processingKeys);
+		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
+
+	/**
 	 * Set the interest ops of a specified selection key, ensuring no blocking occurs while doing so.
 	 * This method is proposed as a convenience, to encapsulate the inner locking mechanism. 
 	 * @param key the key on which to set the interest operations.
@@ -155,8 +173,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	public void setKeyOps(SelectionKey key, int ops)
 	{
-		Lock lock = server.getLock();
-		lock.lock();
+		server.getLock().lock();
 		try
 		{
 			server.getSelector().wakeup();
@@ -164,7 +181,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		}
 		finally
 		{
-			lock.unlock();
+			server.getLock().unlock();
 		}
 	}
 
@@ -175,14 +192,22 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	public void transitionChannel(SelectionKey key, T transition)
 	{
-		setKeyOps(key, 0);
-		NioContext<S> context = (NioContext<S>) key.attachment();
-		S s1 = context.getState();
-		NioTransition<S> t = server.getFactory().getTransition(transition);
-		S s2 = t.getState();
-		if (debugEnabled && !s2.equals(s1)) log.debug(StringUtils.getRemoteHost(key.channel()) + " transition from " + (s1 == null ? "NULL" : s1) + " to " + s2);
-		context.setState(s2);
-		setKeyOps(key, t.getInterestOps());
+		server.getLock().lock();
+		try
+		{
+			setKeyOps(key, 0);
+			NioContext<S> context = (NioContext<S>) key.attachment();
+			S s1 = context.getState();
+			NioTransition<S> t = server.getFactory().getTransition(transition);
+			S s2 = t.getState();
+			if (debugEnabled && !s2.equals(s1)) log.debug(StringUtils.getRemoteHost(key.channel()) + " transition from " + (s1 == null ? "NULL" : s1) + " to " + s2);
+			context.setState(s2);
+			setKeyOps(key, t.getInterestOps());
+		}
+		finally
+		{
+			server.getLock().unlock();
+		}
 	}
 
 	/**
