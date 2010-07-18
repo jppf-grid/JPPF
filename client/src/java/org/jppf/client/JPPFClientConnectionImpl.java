@@ -233,4 +233,14 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	{
 		return jmxConnection;
 	}
+
+	/**
+	 * Get a string representation of this client connection.
+	 * @return a string representing this connection.
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
+	{
+		return name + "( " + host + ":" + jmxPort + ") : " + status;
+	}
 }
