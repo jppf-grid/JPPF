@@ -31,6 +31,10 @@ import org.jppf.utils.NetworkUtils;
 public class JPPFManagementInfo implements Serializable, Comparable<JPPFManagementInfo>
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * DRIVER information type.
 	 */
 	public static final int DRIVER = 0;
@@ -146,16 +150,6 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	}
 
 	/**
-	 * Get a string representation of this node information.
-	 * @return a string with the host:port format.
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString()
-	{
-		return host + ":" + port;
-	}
-
-	/**
 	 * Get the system information associated with the node at the time of the initial connection.
 	 * @return a <code>JPPFSystemInformation</code> instance.
 	 */
@@ -189,5 +183,19 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	public int getType()
 	{
 		return type;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder("[");
+		sb.append("host=").append(host);
+		sb.append(", port=").append(port);
+		sb.append(", type=").append(type);
+		sb.append(", id=").append(id);
+		sb.append("]");
+		return sb.toString();
 	}
 }

@@ -30,6 +30,10 @@ import org.jppf.utils.TypedProperties;
 public abstract class ExecutionPolicy implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Level of indentation used in the toString() method.
 	 */
 	protected static int toStringIndent = 0;
