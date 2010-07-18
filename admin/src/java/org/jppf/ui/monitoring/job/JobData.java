@@ -214,19 +214,19 @@ public class JobData
 
 	/**
 	 * Set the MBean notification listener.
-	 * @param notificationListener - a <code>NotificationListener</code> instance.
-	 * @throws Exception - if any error occurs.
+	 * @param listener a <code>NotificationListener</code> instance.
+	 * @throws Exception if any error occurs.
 	 */
-	public void changeNotificationListener(NotificationListener notificationListener) throws Exception
+	public void changeNotificationListener(NotificationListener listener) throws Exception
 	{
-		if (this.notificationListener != null)
+		if (notificationListener != null)
 		{
-			if (proxy != null) proxy.removeNotificationListener(this.notificationListener);
+			if (proxy != null) proxy.removeNotificationListener(notificationListener);
 		}
-		this.notificationListener = notificationListener;
-		if (this.notificationListener != null)
+		notificationListener = listener;
+		if (notificationListener != null)
 		{
-			if (proxy != null) proxy.addNotificationListener(this.notificationListener, null, null);
+			if (proxy != null) proxy.addNotificationListener(notificationListener, null, null);
 		}
 	}
 
