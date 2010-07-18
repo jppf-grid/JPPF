@@ -133,7 +133,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 */
 	public void execute(JPPFTaskBundle bundle, List<JPPFTask> taskList) throws Exception
 	{
-		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks for job '" + bundle.getParameter(BundleParameter.JOB_ID) + "'");
+		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks for job '" + bundle.getId() + "'");
 		NodeExecutionInfo info = null;
 		if (cpuTimeEnabled) info = computeExecutionInfo();
 		setup(bundle);

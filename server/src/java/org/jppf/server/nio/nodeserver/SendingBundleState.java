@@ -60,41 +60,48 @@ public class SendingBundleState extends NodeServerState
 	public NodeTransition performTransition(SelectionKey key) throws Exception
 	{
 		SelectableChannel channel = key.channel();
-		//if (debugEnabled) log.debug("exec() for " + getRemostHost(channel));
 		if (key.isReadable())
 		{
 			throw new ConnectException("node " + getRemoteHost(channel) + " has been disconnected");
 		}
 
 		NodeContext context = (NodeContext) key.attachment();
+		if (debugEnabled) log.debug("jobId='" + context.getBundle().getBundle().getId() + "' being sent by " + channel);
 		if (context.getNodeMessage() == null)
 		{
 			BundleWrapper bundleWrapper = context.getBundle();
 			JPPFTaskBundle bundle = (bundleWrapper == null) ? null : bundleWrapper.getBundle();
 			if (bundle != null)
 			{
-				if (debugEnabled) log.debug("got bundle from the queue for " + getRemoteHost(channel));
+				if (debugEnabled) log.debug("got bundle from the queue for " + getRemoteHost(channel) + ", jobId = '" + bundle.getId() + "'");
 				// to avoid cycles in peer-to-peer routing of jobs.
 				if (bundle.getUuidPath().contains(context.getUuid()))
 				{
 					if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: " + bundle.getUuidPath().getList());
 					context.resubmitBundle(bundleWrapper);
 					context.setBundle(null);
-					server.addIdleChannel(channel);
-					return TO_IDLE;
+					synchronized(server.getIdleChannels())
+					{
+						server.addIdleChannel(channel);
+						return TO_IDLE;
+					}
 				}
 				bundle.setExecutionStartTime(System.currentTimeMillis());
 				context.serializeBundle();
 			}
 			else
 			{
-				server.addIdleChannel(channel);
-				return TO_IDLE;
+				if (debugEnabled) log.debug("not bundle found for " + getRemoteHost(channel));
+				synchronized(server.getIdleChannels())
+				{
+					server.addIdleChannel(channel);
+					return TO_IDLE;
+				}
 			}
 		}
 		if (context.getNodeMessage().write((WritableByteChannel) channel))
 		{
-			if (debugEnabled) log.debug("sent entire bundle to node " + getRemoteHost(channel));
+			if (debugEnabled) log.debug("sent entire bundle to node " + getRemoteHost(channel) + ", jobId = '" + context.getBundle().getBundle().getId() + "'");
 			context.setNodeMessage(null);
 			//JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
 			return TO_WAITING;

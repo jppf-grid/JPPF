@@ -71,9 +71,9 @@ public class WaitingResultsState extends NodeServerState
 		if (context.getNodeMessage() == null) context.setNodeMessage(new NodeMessage());
 		if (context.getNodeMessage().read((ReadableByteChannel) channel))
 		{
-			if (debugEnabled) log.debug("read bundle from node " + getRemoteHost(channel) + " done");
 			BundleWrapper bundleWrapper = context.getBundle();
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
+			if (debugEnabled) log.debug("read bundle from node " + getRemoteHost(channel) + " done, job id = '" + bundle.getId() + "'");
 			BundleWrapper newBundleWrapper = context.deserializeBundle();
 			JPPFTaskBundle newBundle = newBundleWrapper.getBundle();
 			// if an exception prevented the node from executing the tasks
@@ -110,8 +110,11 @@ public class WaitingResultsState extends NodeServerState
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setNodeMessage(null);
 			context.setBundle(null);
-			server.addIdleChannel(channel);
-			return TO_IDLE;
+			synchronized(server.getIdleChannels())
+			{
+				server.addIdleChannel(channel);
+				return TO_IDLE;
+			}
 		}
 		return TO_WAITING;
 	}

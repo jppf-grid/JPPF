@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import static org.jppf.server.nio.nodeserver.NodeTransition.TO_IDLE;
+import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.net.ConnectException;

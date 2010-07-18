@@ -109,8 +109,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		try
 		{
 			lock.lock();
-			String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
-			String jobUuid = (String) bundle.getParameter(BundleParameter.JOB_UUID);
+			String jobId = bundle.getId();
+			String jobUuid = bundle.getJobUuid();
 			BundleWrapper other = jobMap.get(jobUuid);
 			if (other != null)
 			{
@@ -255,9 +255,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		try
 		{
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
-			if (debugEnabled) log.debug("removing bundle from queue, jobId=" + bundle.getParameter(BundleParameter.JOB_ID));
+			if (debugEnabled) log.debug("removing bundle from queue, jobId=" + bundle.getId());
 			removeFromListMap(new JPPFPriority(bundle.getJobSLA().getPriority()), bundleWrapper, priorityMap);
-			return jobMap.remove((String) bundle.getParameter(BundleParameter.JOB_UUID));
+			return jobMap.remove(bundle.getJobUuid());
 		}
 		finally
 		{
@@ -287,8 +287,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		if (schedule != null)
 		{
 			bundle.setParameter(BundleParameter.JOB_PENDING, true);
-			String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
-			Object uuid = bundle.getParameter(BundleParameter.JOB_UUID);
+			String jobId = bundle.getId();
+			String uuid = bundle.getJobUuid();
 			if (debugEnabled) log.debug("found start " + schedule + " for jobId = " + jobId);
 			try
 			{
@@ -317,8 +317,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		JPPFSchedule schedule = sla.getJobExpirationSchedule();
 		if (schedule != null)
 		{
-			String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
-			Object uuid = bundle.getParameter(BundleParameter.JOB_UUID);
+			String jobId = bundle.getId();
+			String uuid = bundle.getJobUuid();
 			if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + jobId);
 			long dt = (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME_MILLIS);
 			try
@@ -462,7 +462,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			{
 				if (debugEnabled)
 				{
-					String jobId = (String) bundleWrapper.getBundle().getParameter(BundleParameter.JOB_ID);
+					String jobId = bundleWrapper.getBundle().getId();
 					log.debug("job '" + jobId + "' is resuming");
 				}
 				bundleWrapper.getBundle().setParameter(BundleParameter.JOB_PENDING, false);
@@ -498,7 +498,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		{
 			synchronized(bundleWrapper)
 			{
-				String jobId = (String) bundleWrapper.getBundle().getParameter(BundleParameter.JOB_ID);
+				String jobId = bundleWrapper.getBundle().getId();
 				try
 				{
 					if (debugEnabled) log.debug("job '" + jobId + "' is expiring");
@@ -511,7 +511,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 					{
 						if (bundle.getCompletionListener() != null) bundle.getCompletionListener().taskCompleted(bundleWrapper);
 					}
-					String jobUuid = (String) bundleWrapper.getBundle().getParameter(BundleParameter.JOB_UUID);
+					String jobUuid = bundleWrapper.getBundle().getJobUuid();
 					jobManagamentMBean.cancelJob(jobUuid);
 				}
 				catch (Exception e)

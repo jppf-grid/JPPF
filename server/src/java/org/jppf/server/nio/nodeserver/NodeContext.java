@@ -140,8 +140,7 @@ public class NodeContext extends NioContext<NodeState>
 		{
 			JPPFTaskBundle bnd = bundle.getBundle();
 			int n = bnd.getTaskCount();
-			String jobId = (String) bnd.getParameter(BundleParameter.JOB_ID);
-			log.debug("resubmitting "  + n + " tasks for job id = " + jobId);
+			log.debug("resubmitting "  + n + " tasks for job id = " + bnd.getId());
 		}
 		//bundle.getBundle().setPriority(10);
 		JPPFDriver.getQueue().addBundle(bundle);
@@ -157,12 +156,12 @@ public class NodeContext extends NioContext<NodeState>
 		close();
 		if (debugEnabled) log.debug("handling exception for " + channel);
 		if (getBundler() != null) getBundler().dispose();
-		NodeNioServer.closeNode(channel, this);
 		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getBundle().getState()))
 		{
 			JPPFDriver.getInstance().getJobManager().jobReturned(bundle, new ChannelWrapper<SocketChannel>(channel));
 			resubmitBundle(bundle);
 		}
+		NodeNioServer.closeNode(channel, this);
 	}
 
 	/**

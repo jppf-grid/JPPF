@@ -171,9 +171,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	public void addIdleChannel(SelectableChannel channel)
 	{
-		if (debugEnabled) log.debug("Adding idle chanel " + channel);
 		synchronized(idleChannels)
 		{
+			if (debugEnabled) log.debug("Adding idle chanel " + channel);
 			idleChannels.add(channel);
 		}
 	}
@@ -184,9 +184,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 */
 	public void removeIdleChannel(SelectableChannel channel)
 	{
-		if (debugEnabled) log.debug("Removing idle chanel " + channel);
 		synchronized(idleChannels)
 		{
+			if (debugEnabled) log.debug("Removing idle chanel " + channel);
 			idleChannels.remove(channel);
 		}
 	}

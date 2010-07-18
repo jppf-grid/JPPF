@@ -146,18 +146,18 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
 	/**
 	 * Get an object describing the job with the specified id. 
-	 * @param jobId the id of the job to get information about.
+	 * @param jobUuid the id of the job to get information about.
 	 * @return an instance of <code>JobInformation</code>.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getJobInformation(java.lang.String)
 	 */
-	public JobInformation getJobInformation(String jobId) throws Exception
+	public JobInformation getJobInformation(String jobUuid) throws Exception
 	{
-		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobId);
+		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null) return null;
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
-		JobInformation job = new JobInformation(jobId, (String) bundle.getParameter(BundleParameter.JOB_UUID),
+		JobInformation job = new JobInformation(jobUuid, bundle.getId(),
 			bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getJobSLA().getPriority(),
 			bundle.getJobSLA().isSuspended(), (pending != null) && pending);
 		job.setMaxNodes(bundle.getJobSLA().getMaxNodes());
@@ -166,14 +166,14 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
 	/**
 	 * Get a list of objects describing the nodes to which the whole or part of a job was dispatched.
-	 * @param jobId the id of the job for which to find node information.
+	 * @param jobUuid the id of the job for which to find node information.
 	 * @return a list of <code>NodeManagementInfo</code> instances.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getNodeInformation(java.lang.String)
 	 */
-	public NodeJobInformation[] getNodeInformation(String jobId) throws Exception
+	public NodeJobInformation[] getNodeInformation(String jobUuid) throws Exception
 	{
-		List<ChannelBundlePair> nodes = getJobManager().getNodesForJob(jobId);
+		List<ChannelBundlePair> nodes = getJobManager().getNodesForJob(jobUuid);
 		if (nodes == null) return null;
 		NodeJobInformation[] result = new NodeJobInformation[nodes.size()];
 		for (int i=0; i<nodes.size(); i++)
@@ -181,7 +181,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 			JPPFManagementInfo nodeInfo = driver.getNodeInformation(nodes.get(i).first());
 			JPPFTaskBundle bundle = nodes.get(i).second().getBundle();
 			Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
-			JobInformation jobInfo = new JobInformation(jobId, (String) bundle.getParameter(BundleParameter.JOB_UUID),
+			JobInformation jobInfo = new JobInformation(jobUuid, bundle.getId(),
 				bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getJobSLA().getPriority(),
 				bundle.getJobSLA().isSuspended(), (pending != null) && pending);
 			jobInfo.setMaxNodes(bundle.getJobSLA().getMaxNodes());

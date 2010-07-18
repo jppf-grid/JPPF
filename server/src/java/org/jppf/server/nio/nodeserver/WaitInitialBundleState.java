@@ -102,8 +102,11 @@ public class WaitInitialBundleState extends NodeServerState
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
 			context.setNodeMessage(null);
 			context.setBundle(null);
-			server.addIdleChannel(channel);
-			return TO_IDLE;
+			synchronized(server.getIdleChannels())
+			{
+				server.addIdleChannel(channel);
+				return TO_IDLE;
+			}
 		}
 		return TO_WAIT_INITIAL;
 	}

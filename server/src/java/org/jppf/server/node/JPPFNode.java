@@ -132,7 +132,6 @@ public class JPPFNode extends AbstractMonitoredNode
 		{
 			try
 			{
-				boolean synchronous = JPPFConfiguration.getProperties().getBoolean("jppf.node.receive.synchronous", true);
 				init();
 				if (!initialized)
 				{
@@ -188,7 +187,7 @@ public class JPPFNode extends AbstractMonitoredNode
 			checkInitialBundle(bundle);
 			List<JPPFTask> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
-			if (debugEnabled) log.debug("received " + (notEmpty ? "a non-" : "an ") + "empty bundle");
+			if (debugEnabled) log.debug("received " + (notEmpty ? "a non-" : "an ") + "empty bundle, job id = '" + bundle.getId() + "'");
 			if (notEmpty) executionManager.execute(bundle, taskList);
 			processResults(bundle, taskList);
 		}
@@ -232,6 +231,7 @@ public class JPPFNode extends AbstractMonitoredNode
 	 */
 	private void processResults(JPPFTaskBundle bundle, List<JPPFTask> taskList) throws Exception
 	{
+		if (debugEnabled) log.debug("processing results for job id = '" + bundle.getId() + "'");
 		if (executionManager.checkConfigChanged())
 		{
 			JPPFSystemInformation info = new JPPFSystemInformation();

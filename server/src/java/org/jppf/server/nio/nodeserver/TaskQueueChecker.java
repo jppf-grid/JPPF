@@ -76,48 +76,59 @@ public class TaskQueueChecker implements Runnable
 	 */
 	public void run()
 	{
-		synchronized(server.getIdleChannels())
+		try
 		{
-			List<SelectableChannel> idleChannels = server.getIdleChannels();
-			if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return;
-			if (debugEnabled) log.debug("" + idleChannels.size() + " channels idle");
-			boolean channelFound = false;
-			SelectableChannel channel = null;
-			BundleWrapper selectedBundle = null;
-			AbstractJPPFQueue queue = (AbstractJPPFQueue) server.getQueue();
-			queue.getLock().lock();
-			try
+			synchronized(server.getIdleChannels())
 			{
-				Iterator<BundleWrapper> it = queue.iterator();
-				while (!channelFound && it.hasNext() && !idleChannels.isEmpty())
+				List<SelectableChannel> idleChannels = server.getIdleChannels();
+				if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return;
+				if (debugEnabled) log.debug("" + idleChannels.size() + " channels idle");
+				boolean channelFound = false;
+				SelectableChannel channel = null;
+				BundleWrapper selectedBundle = null;
+				AbstractJPPFQueue queue = (AbstractJPPFQueue) server.getQueue();
+				queue.getLock().lock();
+				try
 				{
-					BundleWrapper bundleWrapper = it.next();
-					JPPFTaskBundle bundle = bundleWrapper.getBundle();
-					if (!checkJobState(bundle)) continue;
-					int n = findIdleChannelIndex(bundle);
-					if (n >= 0)
+					Iterator<BundleWrapper> it = queue.iterator();
+					while (!channelFound && it.hasNext() && !idleChannels.isEmpty())
 					{
-						channel = idleChannels.remove(n);
-						selectedBundle = bundleWrapper;
-						channelFound = true;
+						BundleWrapper bundleWrapper = it.next();
+						JPPFTaskBundle bundle = bundleWrapper.getBundle();
+						if (!checkJobState(bundle)) continue;
+						int n = findIdleChannelIndex(bundle);
+						if (n >= 0)
+						{
+							channel = idleChannels.remove(n);
+							selectedBundle = bundleWrapper;
+							channelFound = true;
+						}
+					}
+					if (debugEnabled) log.debug((channelFound ? "" : "no ") + "channel found for bundle");
+					if (channelFound)
+					{
+						log.info("selected channel " + channel + " for jobId = '" + selectedBundle.getBundle().getId() + "'");
+						SelectionKey key = channel.keyFor(selector);
+						NodeContext context = (NodeContext) key.attachment();
+						updateBundler(server.getBundler(), selectedBundle.getBundle(), context);
+						BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
+						context.setBundle(bundleWrapper);
+						synchronized(key)
+						{
+							server.getTransitionManager().transitionChannel(key, NodeTransition.TO_SENDING);
+						}
+						driver.getJobManager().jobDispatched(context.getBundle(), new ChannelWrapper<SelectableChannel>(channel));
 					}
 				}
-				if (debugEnabled) log.debug((channelFound ? "" : "no ") + "channel found for bundle");
-				if (channelFound)
+				finally
 				{
-					SelectionKey key = channel.keyFor(selector);
-					NodeContext context = (NodeContext) key.attachment();
-					updateBundler(server.getBundler(), selectedBundle.getBundle(), context);
-					BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
-					context.setBundle(bundleWrapper);
-					server.getTransitionManager().transitionChannel(key, NodeTransition.TO_SENDING);
-					driver.getJobManager().jobDispatched(context.getBundle(), new ChannelWrapper<SelectableChannel>(channel));
+					queue.getLock().unlock();
 				}
 			}
-			finally
-			{
-				queue.getLock().unlock();
-			}
+		}
+		catch(Throwable t)
+		{
+			log.error(t.getMessage(), t);
 		}
 	}
 
@@ -189,9 +200,9 @@ public class TaskQueueChecker implements Runnable
 		if (b) return false;
 		b = (Boolean) bundle.getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE);
 		if (b) return false;
-		String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+		String jobUuid = bundle.getJobUuid();
 		int maxNodes = sla.getMaxNodes();
-		List<ChannelBundlePair> list = server.getJobManager().getNodesForJob(jobId);
+		List<ChannelBundlePair> list = server.getJobManager().getNodesForJob(jobUuid);
 		int n = (list == null) ? 0 : list.size();
 		if (debugEnabled) log.debug("current nodes = " + n + ", maxNodes = " + maxNodes);
 		return n < maxNodes;
@@ -208,8 +219,7 @@ public class TaskQueueChecker implements Runnable
 		context.checkBundler(server.getBundler());
 		if (context.getBundler() instanceof JobAwareness)
 		{
-			JPPFJobMetadata metadata = (JPPFJobMetadata) taskBundle.getParameter(BundleParameter.JOB_METADATA);
-			((JobAwareness) context.getBundler()).setJobMetadata(metadata);
+			((JobAwareness) context.getBundler()).setJobMetadata(taskBundle.getJobMetadata());
 		}
 	}
 }
