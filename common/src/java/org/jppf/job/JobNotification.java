@@ -29,6 +29,10 @@ import org.jppf.management.JPPFManagementInfo;
 public class JobNotification extends Notification
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Information about a node.
 	 */
 	private JPPFManagementInfo nodeInfo = null;
@@ -90,5 +94,19 @@ public class JobNotification extends Notification
 	public JobEventType getEventType()
 	{
 		return eventType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder("[");
+		sb.append("eventType=" + eventType);
+		sb.append(", jobInfo=" + getJobInformation());
+		sb.append(", nodeInfo=" + nodeInfo);
+		sb.append(", timestamp=" + timestamp);
+		sb.append("]");
+		return sb.toString();
 	}
 }

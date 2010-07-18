@@ -237,4 +237,22 @@ public class JobInformation implements Serializable
 	{
 		this.jobUuid = jobUuid;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder("[");
+		//jobUuid, jobId, taskCount, initialTaskCount, priority, suspended, pending
+		sb.append("jobId=").append(jobId);
+		sb.append(", jobUuid=").append(jobUuid);
+		sb.append(", taskCount=").append(taskCount);
+		sb.append(", initialTaskCount=").append(initialTaskCount);
+		sb.append(", priority=").append(priority);
+		sb.append(", suspended=").append(suspended);
+		sb.append(", pending=").append(pending);
+		sb.append("]");
+		return sb.toString();
+	}
 }
