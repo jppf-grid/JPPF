@@ -30,6 +30,9 @@
 	<property name="src.dir"     value="${basedir}/src"/>
 	<property name="javadoc"     value="${basedir}/javadoc"/>
 
+	<!-- the keystore password in clear, will be encoded in Base64 and stored in a password file -->
+	<property name="password"    value="myPassword"/>
+
 	<!-- ========================================================================= -->
 	<!--                           Classpath definitions                           -->
 	<!-- ========================================================================= -->
@@ -87,13 +90,26 @@
 	<!--                                  Jar                                      -->
 	<!-- ========================================================================= -->
 
-	<target name="jar" depends="compile">
+	<target name="jar" depends="compile, create.keystore">
 	  <jar jarfile="DataEncryption.jar" index="true">
 			<fileset dir="${classes.dir}"/>
+	  	<zipfileset dir="${basedir}" prefix="org/jppf/example/dataencryption/helper" includes="keystore.ks, password.pwd"/>
 	  </jar>
 		<echo/>
+    <delete file="${basedir}/keystore.ks" quiet="true"/>
+    <delete file="${basedir}/password.pwd" quiet="true"/>
 		<echo message="*** The file DataEncryption.jar is now ready to be deployed ***"/>
 		<echo/>
+  </target>
+	
+	<!-- ========================================================================= -->
+	<!--                                  Jar                                      -->
+	<!-- ========================================================================= -->
+
+	<target name="create.keystore">
+		<java fork="yes" classname="org.jppf.example.dataencryption.helper.Helper" classpathref="project.classpath">
+			<arg value="${password}"/>
+		</java>
   </target>
 	
 	<!-- ========================================================================= -->
