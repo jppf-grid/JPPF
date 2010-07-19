@@ -219,10 +219,9 @@
 				<include name="jppf*.jar"/>
 			</fileset>
 		</copy>
-		<java2html srcdir="${samples-pack}/CustomLoadBalancer" destdir="${samples-pack}/CustomLoadBalancer" includes="**/*.java"
-			style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false"/>
-		<java2html srcdir="${samples-pack}/TaskNotifications" destdir="${samples-pack}/TaskNotifications" includes="**/*.java, **/services/*.*"
-			style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false"/>
+		<antcall target="include.code"><param name="sample" value="CustomLoadBalancer"/></antcall>
+		<antcall target="include.code"><param name="sample" value="DataEncryption"/></antcall>
+		<antcall target="include.code"><param name="sample" value="TaskNotifications"/></antcall>
 		<property name="samples.pack.prefix" value="${app.ver}-samples-pack"/>
 		<property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>
 		<delete file="samples.pack.file" quiet="true"/>
@@ -246,7 +245,13 @@
 		</copy>
 		<move file="${home}/samples-pack/samples-pack-Readme.html" tofile="${home}/samples-pack/index.html"/>
 		<delete><fileset dir="${samples-pack}/CustomLoadBalancer" includes="**/*.java.html"/></delete>
+		<delete><fileset dir="${samples-pack}/DataEncryption" includes="**/*.java.html, **/services/*.html"/></delete>
 		<delete><fileset dir="${samples-pack}/TaskNotifications" includes="**/*.java.html, **/services/*.html"/></delete>
+  </target>
+
+	<target name="include.code">
+		<java2html srcdir="${samples-pack}/${sample}" destdir="${samples-pack}/${sample}" includes="**/*.java"
+			style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false"/>
   </target>
 
 	<!-- ========================================================================= -->
@@ -294,7 +299,7 @@
 			</not>
 		</condition>
 		<tstamp>
-			<format property="readable.now" pattern="d-MMMM-yyyy hh:mm"/>
+			<format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
 		</tstamp>
     <jar jarfile="${build}/jppf-${jar}.jar" index="true">
 			<fileset dir="${basedir}/../${module}/classes"/>

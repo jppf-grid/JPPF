@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.example.dataencryption;
+package org.jppf.example.dataencryption.old;
 
 import java.io.*;
 import java.security.spec.KeySpec;

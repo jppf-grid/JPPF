@@ -10,4 +10,7 @@
   <filter name="FileTypesFilter" enabled="true">
     <filter-data value="java"/>
   </filter>
+  <filter name="FilesFromPackage" enabled="true">
+    <filter-data value="DataEncryption/src/org/jppf/example/dataencryption/helper"/>
+  </filter>
 </fileset-config>
