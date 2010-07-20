@@ -20,7 +20,7 @@ The obfuscated password is then stored in a file, which is also included in the 
 <h3>Related source files</h3>
 <ul>
 	<li><a href="src/org/jppf/example/dataencryption/SecureKeyCipherTransform.java.html">SecureKeyCipherTransform.java</a> : the data transformer that performs the encryption and decryption</li>
-	<li><a href="src/org/jppf/example/dataencryption/helper/Helper.java.html">Helper.java</a> : a set of utility methods to retrieve generate and retrieve passwords and secret keys, create and manipulate a keystore, and provide the encryption parameters</li>
+	<li><a href="src/org/jppf/example/dataencryption/helper/Helper.java.html">Helper.java</a> : a set of utility methods to generate and retrieve passwords and secret keys, create and manipulate a keystore, and provide the encryption parameters</li>
 	<li><a href="src/org/jppf/example/dataencryption/helper/Base64.java.html">Base64.java</a> : this is the API for Base64 encoding and decoding</li>
 </ul>
 
