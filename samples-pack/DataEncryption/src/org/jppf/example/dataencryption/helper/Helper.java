@@ -34,12 +34,10 @@ public final class Helper
 {
   /**
    * The keystore password.
-   * Note that we provide the password characcters directly. For additional security,
-   * it would be better to use a reversible scrambling / unscrambling algorothm and only store
-   * the scrambled version here. For example, Base64 encoding provides a pretty good password obfuscation.
+   * This variable will be assigned the password value in clear,
+   * after it has been read from a file and decoded from Base64 encoding.
    */
   private static char[] some_chars = null; 
-  //private static char[] some_chars = { 78, 108, 123, 69, 57, 47, 97, 103 }; 
 
 	/**
 	 * Instanciation of this class is not permitted.
@@ -125,7 +123,7 @@ public final class Helper
 	}
 
 	/**
-	 * Get password file name.
+	 * Get the password file name.
 	 * @return the password file name.
 	 */
 	public static String getPasswordFilename()
@@ -134,8 +132,8 @@ public final class Helper
 	}
 
 	/**
-	 * Get the cryptographic provider.
-	 * @return the provider name.
+	 * Get the keystore file name.
+	 * @return the keystore file name.
 	 */
 	public static String getKeystoreFilename()
 	{
@@ -152,8 +150,8 @@ public final class Helper
 	}
 
 	/**
-	 * Get the cryptographic provider.
-	 * @return the provider name.
+	 * Get the key alias.
+	 * @return the key alias.
 	 */
 	public static String getKeyAlias()
 	{
