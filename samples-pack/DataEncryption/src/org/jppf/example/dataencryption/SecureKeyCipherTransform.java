@@ -75,13 +75,13 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
 	{
 		// start by reading the secret key to use to decrypt the data
 		DataInputStream dis = new DataInputStream(source);
-		int keyLength = dis.readInt();
 		// read the length of the key
-		byte[] keyBytes = new byte[keyLength];
+		int keyLength = dis.readInt();
 		// read the encrypted key
+		byte[] keyBytes = new byte[keyLength];
 		dis.read(keyBytes);
-		Cipher cipher = Cipher.getInstance(Helper.getTransformation());
 		// decrypt the key using the initial key stored in the keystore
+		Cipher cipher = Cipher.getInstance(Helper.getTransformation());
 		cipher.init(Cipher.UNWRAP_MODE, getSecretKey());
 		SecretKey key = (SecretKey) cipher.unwrap(keyBytes, Helper.getAlgorithm(), Cipher.SECRET_KEY);
 		// finally, decrypt the data using the new key
@@ -95,14 +95,13 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
 	 */
 	private SecretKey generateKey() throws Exception
 	{
-		String strKey = null;
 		KeyGenerator gen = KeyGenerator.getInstance(Helper.getAlgorithm());
 		return gen.generateKey();
 	}
 
 	/**
 	 * Transform the specified input source and write it into the specified destination.<br>
-	 * The transformation is either encrytion or decryption, depeding on how the cipher was initilized.
+	 * The transformation is either encrytion or decryption, depending on how the cipher was initialized.
 	 * @param mode the cipher mode to use for encryption/decryption.
 	 * @param source the input stream of data to encrypt/decrypt.
 	 * @param destination the stream into which the encrypted/decrypted data is written.
@@ -142,7 +141,7 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
 				// get the keystore password
 				char[] password = Helper.getPassword();
 				ClassLoader cl = SecureKeyCipherTransform.class.getClassLoader();
-				InputStream is = cl.getResourceAsStream("org/jppf/example/dataencryption/helper/" + Helper.getKeystoreFilename());
+				InputStream is = cl.getResourceAsStream(Helper.getKeystoreFolder() + Helper.getKeystoreFilename());
 				KeyStore ks = KeyStore.getInstance(Helper.getProvider());
 				// load the keystore
 				ks.load(is, password);

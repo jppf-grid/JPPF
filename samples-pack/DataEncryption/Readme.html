@@ -42,6 +42,13 @@
 					There remains, however, one vulnerability: we still need the keystore password to be stored somewhere, so that we can use the keystore.
 					To avoid storing this password in clear, we obfuscate it by using a Base64 encoding, thanks to the excellent <a href="http://iharder.sourceforge.net/current/java/base64/">iHarder.net public domain Base64 library</a>.
 					The obfuscated password is then stored in a file, which is also included in the jar file to deploy.
+					
+					<h3>Related source files</h3>
+					<ul>
+						<li><a href="src/org/jppf/example/dataencryption/SecureKeyCipherTransform.java.html">SecureKeyCipherTransform.java</a> : the data transformer that performs the encryption and decryption</li>
+						<li><a href="src/org/jppf/example/dataencryption/helper/Helper.java.html">Helper.java</a> : a set of utility methods to retrieve generate and retrieve passwords and secret keys, create and manipulate a keystore, and provide the encryption parameters</li>
+						<li><a href="src/org/jppf/example/dataencryption/helper/Base64.java.html">Base64.java</a> : this is the API for Base64 encoding and decoding</li>
+					</ul>
 
 					<h3>How do I use it?</h3>
 					First you need to build the sample jar file. To do this, perform the following steps:
