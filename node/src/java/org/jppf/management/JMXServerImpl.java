@@ -91,10 +91,9 @@ public class JMXServerImpl
     {
 	    Thread.currentThread().setContextClassLoader(cl);
 			server = ManagementFactory.getPlatformMBeanServer();
-	    //locateOrCreateRegistry();
 			TypedProperties props = JPPFConfiguration.getProperties();
 			String host = NetworkUtils.getManagementHost();
-			int port = locateOrCreateRegistry2();
+			int port = locateOrCreateRegistry();
 			int rmiPort = props.getInt("jppf.management.rmi.port", 12198);
 			boolean found = false;
 			JMXServiceURL url = null;
@@ -103,7 +102,7 @@ public class JMXServerImpl
 				try
 				{
 					InetAddress addr = InetAddress.getByName(host);
-			    url = new JMXServiceURL("service:jmx:rmi://localhost:" + rmiPort + "/jndi/rmi://" + host + ":" + port + "/jppf" + namespaceSuffix);
+			    url = new JMXServiceURL("service:jmx:rmi://" + host + ":" + rmiPort + "/jndi/rmi://localhost:" + port + "/jppf" + namespaceSuffix);
 			    Map<String, Object> env = new HashMap<String, Object>();
 			    env.put("jmx.remote.default.class.loader", cl);
 			    env.put("jmx.remote.protocol.provider.class.loader", cl);
@@ -160,25 +159,10 @@ public class JMXServerImpl
 	/**
 	 * Locate an RMI registry specified by the configuration properties,
 	 * or create an embedded one if it cannot be found.
-	 * @throws Exception if the registry could be neither located nor created. 
-	 */
-	private static synchronized void locateOrCreateRegistry() throws Exception
-	{
-		if (registry != null) return;
-    if (debugEnabled) log.debug("starting RMI registry ");
-		TypedProperties props = JPPFConfiguration.getProperties();
-		int port = props.getInt("jppf.management.port", 11198);
-    if (debugEnabled) log.debug("starting RMI registry on port " + port);
-		registry = LocateRegistry.createRegistry(port);
-	}
-
-	/**
-	 * Locate an RMI registry specified by the configuration properties,
-	 * or create an embedded one if it cannot be found.
 	 * @return the port number to which the registry is bound.
 	 * @throws Exception if the registry could be neither located nor created. 
 	 */
-	private static synchronized int locateOrCreateRegistry2() throws Exception
+	private static synchronized int locateOrCreateRegistry() throws Exception
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
 		int port = props.getInt("jppf.management.port", 11198);
