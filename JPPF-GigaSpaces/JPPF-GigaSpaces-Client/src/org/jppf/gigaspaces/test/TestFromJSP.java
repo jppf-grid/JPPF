@@ -29,13 +29,33 @@ import org.jppf.server.protocol.JPPFTask;
 public class TestFromJSP
 {
 	/**
-	 * Execute a job and return the result as string.
+	 * Execute a job and return the result as a string.
+	 * @param jobName the name given to the JPPF job.
+	 * @param nbTasks the number of tasks in the job.
+	 * @param taskDuration the duration in milliseconds of each task in the job.
 	 * @return the job result as a string message.
 	 */
-	public static String testGS()
+	public static String testGS(String jobName, int nbTasks, long taskDuration)
 	{
-		JPPFJob job = GSClient.execute();
-		JPPFTask task = job.getTasks().get(0);
-		return (String) task.getResult();
+		JPPFJob job = null;
+		StringBuilder sb = new StringBuilder();
+		sb.append("<h2>Results for job ").append(jobName).append("</h2>");
+		try
+		{
+			job = GSClient.execute(jobName, nbTasks, taskDuration);
+			for (JPPFTask task: job.getTasks())
+			{
+				sb.append("Task ").append(task.getId()).append(" : ").append(task.getResult()).append("<br/>");
+			}
+		}
+		catch(Exception e)
+		{
+			sb.append(e.getClass().getName()).append(" : ").append(e.getMessage()).append("<br/>");
+			for (StackTraceElement elt: e.getStackTrace())
+			{
+				sb.append(elt).append("<br/>");
+			}
+		}
+		return sb.toString();
 	}
 }

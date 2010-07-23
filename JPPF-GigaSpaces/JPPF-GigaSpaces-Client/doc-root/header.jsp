@@ -17,15 +17,16 @@
 				<!-- start header -->
 				<div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="images/frame_top.gif"/></div>
 				<table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6;  border-bottom: 9px solid #6D78B6;">
-					<tr style="height: 80px">
+					<tr style="height: 90px">
 						<td width="20"></td>
-						<td width="400" align="left" valign="center"><img src="images/logo2.gif" border="0" alt="JPPF"/></td>
-						<td>
+						<td align="left" valign="center"><a href="http://www.jppf.org"><img src="images/logo2.gif" border="0" alt="JPPF"/></a></td>
+						<td align="center" valign="center"><h1>JPPF - Gigaspaces XAP<br/>Integration</h1></td>
+						<td align="right">
 							<table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color:transparent;">
 								<tr>
 									<td style="background: transparent url('images/buttons/btn_active_start.gif') repeat-x scroll left bottom; width: 9px"></td>
 									<td style="width: 1px"></td>
-									<td class="headerMenuItem" style="background: transparent url('images/buttons/tab_active_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="index.jsp" class="headerMenuItem">Submit</a>&nbsp;</td>
+									<td class="headerMenuItem" style="background: transparent url('images/buttons/tab_active_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="index.jsp" class="headerMenuItem">Demo</a>&nbsp;</td>
 									<td style="width: 1px"></td>
 									<td class="headerMenuItem" style="background: transparent url('images/buttons/tab_active_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="about.jsp" class="headerMenuItem">About</a>&nbsp;</td>
 									<td style="width: 1px"></td>

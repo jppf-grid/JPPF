@@ -33,31 +33,22 @@ public class GSClient implements InitializingBean
 	 * Reference to the JPPF service.
 	 */
 	private JPPFService jppfService = null;
-	/**
-	 * The job that was recently sent.
-	 */
-	private JPPFJob job = null;
-
-	/**
-	 * Entry point for execution of this client as a standalone application.
-	 * @param args not used.
-	 */
-	public static void main(String[] args)
-	{
-		execute();
-	}
 
 	/**
 	 * Initialize the Spring context, invoke the appropriate bean method,
-	 * and store the results of the JPPF execution.
+	 * and return the results of the JPPF execution.
+	 * @param jobName the name given to the JPPF job.
+	 * @param nbTasks the number of tasks in the job.
+	 * @param taskDuration the duration in milliseconds of each task in the job.
 	 * @return the results as a <code>JPPFJob</code> instance.
+	 * @throws Exception if any error occurs.
 	 */
-	public static JPPFJob execute()
+	public static JPPFJob execute(String jobName, int nbTasks, long taskDuration) throws Exception
 	{
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:client.xml");
 		context.start();
 		GSClient gsc = (GSClient) context.getBean("gsclient");
-		return gsc.getJob();
+		return gsc.runJob(jobName, nbTasks, taskDuration);
 	}
 
 	/**
@@ -68,15 +59,33 @@ public class GSClient implements InitializingBean
 	}
 
 	/**
-	 * Called after the Spring bean initialization and submits a JPPF job to the JPPF space.
+	 * Called after the Spring bean initialization.
 	 * @throws Exception if any error occurs.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception
 	{
-		JPPFJob newJob = new JPPFJob();
-		newJob.addTask(new HelloTask());
-		this.job = jppfService.submitJob(newJob);
+	}
+
+	/**
+	 * Execute a job with the specified parameters, submitting it to the JPPF space. 
+	 * @param jobName the name given to the JPPF job.
+	 * @param nbTasks the number of tasks in the job.
+	 * @param taskDuration the duration in milliseconds of each task in the job.
+	 * @return the results as a <code>JPPFJob</code> instance.
+	 * @throws Exception if any error occurs.
+	 */
+	public JPPFJob runJob(String jobName, int nbTasks, long taskDuration) throws Exception
+	{
+		JPPFJob job = new JPPFJob();
+		job.setId(jobName);
+		for (int i=1; i<= nbTasks; i++)
+		{
+			HelloTask task = new HelloTask(taskDuration);
+			task.setId("" + i);
+			job.addTask(task);
+		}
+		return jppfService.submitJob(job);
 	}
 
 	/**
@@ -95,14 +104,5 @@ public class GSClient implements InitializingBean
 	public void setJppfService(JPPFService service)
 	{
 		this.jppfService = service;
-	}
-
-	/**
-	 * Get the resulting JPPF job instance.
-	 * @return a <code>JPPFJob</code> instance
-	 */
-	public JPPFJob getJob()
-	{
-		return job;
 	}
 }
