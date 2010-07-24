@@ -1,36 +1,33 @@
 <%@ page language="java" %>
-<%@ page import="sample.dist.tasklength.*" %>
-<%@ page import="org.jppf.client.*" %>
-<%@ page import="org.jppf.server.protocol.*" %>
-<%@ page import="org.jppf.utils.*" %>
-<%@ page import="java.util.*" %>
+<%@ page import="org.jppf.example.tomcat.*" %>
 <%@ include file="header.jsp"%>
 <%
-	  int duration = 5;
+	  long duration = 500L;
+	  int nbTasks = 10;
+	  String jobId = "Demo job";
 	  String perform = request.getParameter("perform");
 	  if (perform != null)
 	  {
 		  String text = request.getParameter("duration");
 		  try
 		  {
-		  	duration = Integer.parseInt(text);
+		  	duration = (long) (1000L * Float.parseFloat(text));
 		  	session.setAttribute("duration", text);
-		  	
 		  }
-		  catch(NumberFormatException ignored)
+		  catch(NumberFormatException ignored) {}
+		  text = request.getParameter("nbTasks");
+		  try
 		  {
+		  	nbTasks = Integer.parseInt(text);
+		  	session.setAttribute("nbTasks", text);
 		  }
-		  List list = new ArrayList();
-		  list.add(new LongTask(1000*duration));
-		  JPPFClient jppfClient = (JPPFClient) session.getAttribute("jppfClient");
-		  if (jppfClient == null)
-		  {
-		  	jppfClient = new JPPFClient();
-		  	session.setAttribute("jppfClient", jppfClient);
-		  }
-		  List results = jppfClient.submit(list, null);
-		  String msg = (String) ((JPPFTask) results.get(0)).getResult();
-			response.sendRedirect(request.getContextPath()+"/results.jsp?msg="+msg);
+		  catch(NumberFormatException ignored) {}
+		  text = request.getParameter("jobId");
+		  if ((text != null) && !"".equals(text.trim())) jobId = text;
+		  session.setAttribute("jobId", text);
+			String msg = new Demo().submitJob(jobId, nbTasks, duration);
+	  	session.setAttribute("result", msg);
+			response.sendRedirect(request.getContextPath()+"/results.jsp");
 	  }
 		else
 		{
@@ -39,40 +36,45 @@
 			{
 			  try
 			  {
-			  	duration = Integer.parseInt(text);
+			  	duration = (long) (1000L * Float.parseFloat(text));
 			  }
-			  catch(NumberFormatException ignored)
+			  catch(NumberFormatException ignored) {}
+			}
+			text = (String) session.getAttribute("nbTasks");
+			if (text != null)
+			{
+			  try
 			  {
+		  		nbTasks = Integer.parseInt(text);
 			  }
+			  catch(NumberFormatException ignored) {}
 			}
+			text = (String) session.getAttribute("jobId");
+			if (text != null) jobId = text;
 %>
-<br>
-			<h1 align="center">Submit a task</h1>
-			<table align="center" cellspacing="0" cellpadding="0">
-				<tr><td height="5"></td></tr>
-				<tr><td width="50%" align="center">
-					<h3>Click on the button to submit a task to JPPF</h3>
-					<h4>This will submit a task that will be executed for the specified duration</h4>
-				</td></tr>
-
-				<tr><td width="50%" align="center">
-					<form name="jppftest" action="<%=request.getContextPath()%>/index.jsp" method="post">
-						<input type="hidden" value="true" name="perform">
-						Duration in seconds: <input type="text" value="<%= duration %>" name="duration" maxLength="3">&nbsp;&nbsp;
-						<input type="submit" value="Submit">
-					</form>
-				</td></tr>
+			<div align="center">
+			<h1>Submit a job</h1>
+			<br/>
+			<h4>Submit a job with the specified number of tasks and duration for each task</h4>
+			<form name="jppftest" action="<%=request.getContextPath()%>/index.jsp" method="post">
+				<table width="450" cellspacing="0" cellpadding="5">
+					<tr>
+						<td>Job name:</td>
+						<td><input type="text" value="<%= jobId %>" name="jobId" maxLength="30"></td>
+					</tr>
+					<tr>
+						<td>Number of tasks in the job:</td>
+						<td><input type="text" value="<%= nbTasks %>" name="nbTasks" maxLength="5"></td>
+					</tr>
+					<tr>
+						<td>Duration of each task in seconds:</td>
+						<td><input type="text" value="<%= (float) duration / 1000f %>" name="duration" maxLength="10"></td>
+					</tr>
+					<tr><td align="center" colspan="*"><input type="hidden" value="true" name="perform"><input type="submit" value="Submit"></td></tr>
+				</table>
+			</form>
+			</div>
 <%
-				String msg = request.getParameter("msg");
-				if (msg != null)
-				{
+		}
 %>
-				<tr><td width="50%" align="center">
-					<h3>Result : <%= msg %></h3>
-				</td></tr>
-<%
-				}
-			}
-%>
-			</table>
 <%@ include file="footer.jsp"%>

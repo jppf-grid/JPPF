@@ -28,8 +28,9 @@
 	<property name="build.dir"       value="${basedir}/build"/>
 	<property name="docroot.dir"     value="${basedir}/src/resources"/>
 	<property name="web.inf.dir"     value="${docroot.dir}/WEB-INF"/>
-	<property name="war.file"        value="jppftest-tomcat.war"/>
-	<property name="tomcat.home"     value="C:/Tools/apache/apache-tomcat-6.0.16"/>
+	<property name="war.prefix"      value="jppftest"/>
+	<property name="war.file"        value="${war.prefix}.war"/>
+	<property name="tomcat.home"     value="C:/Tools/apache/apache-tomcat-7.0.0"/>
 
 	<!-- ========================================================================= -->
 	<!--                           Classpath definitions                           -->
@@ -41,7 +42,6 @@
 			<include name="jppf-common-node.jar"/>
 			<include name="jppf-common.jar"/>
 			<include name="jppf-client.jar"/>
-			<include name="jppf-demo.jar"/>
 			<include name="commons-logging-1.1.jar"/>
 			<include name="log4j-1.2.9.jar"/>
 		</fileset>
@@ -107,7 +107,6 @@
 				<include name="jppf-common-node.jar"/>
 				<include name="jppf-common.jar"/>
 				<include name="jppf-client.jar"/>
-				<include name="jppf-demo.jar"/>
 				<include name="commons-logging-1.1.jar"/>
 				<include name="log4j-1.2.9.jar"/>
 			</lib>
@@ -118,6 +117,7 @@
 	<!--
 	-->
 	<target name="deploy.war.tomcat">
+    <delete dir="${tomcat.home}/webapps/${war.prefix}" quiet="true"/>
 		<copy todir="${tomcat.home}/webapps" file="${build.dir}/${war.file}"/>
 	</target>
 </project> 
