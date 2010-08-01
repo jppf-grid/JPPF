@@ -68,13 +68,11 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
 		if (timeout < 0L) throw new IllegalArgumentException("timeout must be >= 0");
 		long start = System.currentTimeMillis();
 		long elapsed = 0;
-		//boolean selected = (channel.getKeyOps() & channel.getReadyOps()) != 0;
 		boolean selected = channelSelected();
 		while (((timeout == 0L) || (elapsed < timeout)) && !selected)
 		{
 			goToSleep(timeout == 0L ? 0 : timeout - elapsed);
 			elapsed = System.currentTimeMillis() - start;
-			//selected = (channel.getKeyOps() & channel.getReadyOps()) != 0;
 			selected = channelSelected();
 		}
 		return selected;
@@ -102,14 +100,9 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
 	 */
 	private boolean channelSelected()
 	{
-		channel.lock();
-		try
+		synchronized(channel)
 		{
 			return (channel.getKeyOps() & channel.getReadyOps()) != 0;
-		}
-		finally
-		{
-			channel.unlock();
 		}
 	}
 }

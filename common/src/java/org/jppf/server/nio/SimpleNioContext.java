@@ -29,7 +29,7 @@ import org.jppf.utils.*;
  * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
-public abstract class SimpleNioContext<S extends Enum> extends AbstractNioContext<S>
+public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioContext<S>
 {
 	/**
 	 * Logger for this class.

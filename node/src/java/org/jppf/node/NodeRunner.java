@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.*;
-import org.jppf.classloader.JPPFClassLoader;
+import org.jppf.classloader.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.process.LauncherListener;
@@ -47,7 +47,7 @@ public class NodeRunner
 	/**
 	 * The ClassLoader used for loading the classes of the framework.
 	 */
-	private static JPPFClassLoader classLoader = null;
+	private static AbstractJPPFClassLoader classLoader = null;
 	/**
 	 * Determine whether a security manager has already been set.
 	 */
@@ -232,9 +232,9 @@ public class NodeRunner
 
 	/**
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
-	 * @return a <code>ClassLoader</code> used for loading the classes of the framework.
+	 * @return a <code>AbstractJPPFClassLoader</code> used for loading the classes of the framework.
 	 */
-	public static JPPFClassLoader getJPPFClassLoader()
+	public static AbstractJPPFClassLoader getJPPFClassLoader()
 	{
 		if (classLoader == null)
 		{

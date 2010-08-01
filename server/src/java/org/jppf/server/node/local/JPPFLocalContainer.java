@@ -23,7 +23,6 @@ import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
-import org.jppf.comm.socket.IOHandler;
 import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.DataLocation;
 import org.jppf.server.nio.nodeserver.*;
@@ -45,36 +44,40 @@ public class JPPFLocalContainer extends JPPFContainer
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
+	 * The I/O handler for this node.
+	 */
+	private LocalNodeChannel channel = null;
 
 	/**
 	 * Initialize this container with a specified application uuid.
+	 * @param channel the I/O channelof the node.
 	 * @param uuidPath the unique identifier of a submitting application.
 	 * @param classLoader the class loader for this container.
 	 * @throws Exception if an error occurs while initializing.
 	 */
-	public JPPFLocalContainer(List<String> uuidPath, AbstractJPPFClassLoader classLoader) throws Exception
+	public JPPFLocalContainer(LocalNodeChannel channel, List<String> uuidPath, AbstractJPPFClassLoader classLoader) throws Exception
 	{
 		super(uuidPath, classLoader);
+		this.channel = channel;
 	}
 
 	/**
 	 * Deserialize a number of objects from a socket client.
-	 * @param ioHandler the IOHandler from which to read the objects to deserialize.
 	 * @param list a list holding the resulting deserialized objects.
 	 * @param count the number of objects to deserialize.
 	 * @param executor the number of objects to deserialize.
 	 * @return the new position in the source data after deserialization.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	public int deserializeObjects(IOHandler ioHandler, List<Object> list, int count, ExecutorService executor) throws Exception
+	public int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Exception
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try
 		{
 			Thread.currentThread().setContextClassLoader(classLoader);
-			LocalNodeWrapperHandler wrapper = (LocalNodeWrapperHandler) ioHandler;
-			LocalNodeMessage message = wrapper.getMessage();
+			LocalNodeMessage message = channel.getNodeResource();
 			List<DataLocation> locations = message.getLocations();
 			List<Future<Object>> futureList = new ArrayList<Future<Object>>();
 			for (int i=0; i<count; i++)
@@ -128,10 +131,10 @@ public class JPPFLocalContainer extends JPPFContainer
 			{
 				Thread.currentThread().setContextClassLoader(getClassLoader());
 				InputStream is = location.getInputStream();
-				if (debugEnabled) log.debug("deserializing object index = " + index);
+				if (traceEnabled) log.debug("deserializing object index = " + index);
 				byte[] buffer = JPPFDataTransformFactory.transform(false, is);
 				Object o = helper.getSerializer().deserialize(buffer);
-				if (debugEnabled) log.debug("deserialized object index = " + index);
+				if (traceEnabled) log.debug("deserialized object index = " + index);
 				return o;
 			}
 			catch(Exception e)

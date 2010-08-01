@@ -23,7 +23,7 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 import java.net.ConnectException;
 
 import org.apache.commons.logging.*;
-import org.jppf.classloader.LocalClassLoaderWrapperHandler;
+import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.*;
 
 /**
@@ -60,7 +60,7 @@ class SendingProviderRequestState extends ClassServerState
 	public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		ClassContext context = (ClassContext) wrapper.getContext();
-		if (wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderWrapperHandler))
+		if (wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
 		{
 			server.removeProviderConnection(context.getUuid(), wrapper);
 			ChannelWrapper currentRequest = context.getCurrentRequest();

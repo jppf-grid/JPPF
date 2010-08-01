@@ -25,7 +25,7 @@ import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.*;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.node.NodeRunner;
-import org.jppf.server.node.*;
+import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
 
 /**
@@ -94,15 +94,16 @@ public class JPPFRemoteNode extends JPPFNode
 	 * Create the class loader for this node.
 	 * @return a {@link JPPFClassLoader} instance.
 	 */
-	protected JPPFClassLoader createClassLoader()
+	protected AbstractJPPFClassLoader createClassLoader()
 	{
 		if (debugEnabled) log.debug("Initializing classloader");
-		return new JPPFClassLoader(NodeRunner.getJPPFClassLoader());
+		if (classLoader == null) classLoader = NodeRunner.getJPPFClassLoader();
+		return classLoader;
 	}
 
 	/**
 	 * @param uuidPath the uuid path containing the key to the container.
-	 * Instatiate the callback used to create the class loader in each {@link JPPFContainer}.
+	 * Instatiate the callback used to create the class loader in each {@link JPPFRemoteContainer}.
 	 * @return a {@link Callable} instance.
 	 */
 	protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
@@ -111,7 +112,7 @@ public class JPPFRemoteNode extends JPPFNode
 		{
 			public AbstractJPPFClassLoader call()
 			{
-				return new JPPFClassLoader(getClass().getClassLoader(), uuidPath);
+				return new JPPFClassLoader(getClassLoader(), uuidPath);
 			}
 		};
 	}
@@ -119,8 +120,8 @@ public class JPPFRemoteNode extends JPPFNode
 	/**
 	 * {@inheritDoc}
 	 */
-	protected JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception
+	protected JPPFRemoteContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception
 	{
-		return new JPPFContainer(uuidPath, cl);
+		return new JPPFRemoteContainer(socketClient, uuidPath, cl);
 	}
 }

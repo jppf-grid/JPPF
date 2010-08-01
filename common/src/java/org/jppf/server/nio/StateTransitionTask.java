@@ -67,26 +67,22 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 	 */
 	public void run()
 	{
-		StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
-		try
+		synchronized(channel)
 		{
+			StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
+			this.ctx = (NioContext<S>) channel.getContext();
+			if (debugEnabled) log.debug("performing transition to state " + ctx.getState() + " for " + channel);
 			try
 			{
-				channel.lock();
-				this.ctx = (NioContext<S>) channel.getContext();
 				NioState<T> state = factory.getState(ctx.getState());
 				transitionManager.transitionChannel(channel, state.performTransition(channel));
 			}
-			finally
+			catch(Exception e)
 			{
-				channel.unlock();
+				if (debugEnabled) log.debug(e.getMessage(), e);
+				else log.warn(e);
+				ctx.handleException(channel);
 			}
-		}
-		catch(Exception e)
-		{
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.warn(e);
-			ctx.handleException(channel);
 		}
 	}
 }

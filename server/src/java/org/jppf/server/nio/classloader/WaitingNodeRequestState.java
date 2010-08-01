@@ -196,8 +196,8 @@ class WaitingNodeRequestState extends ClassServerState
 				providerContext.addRequest(wrapper);
 				if (ClassState.IDLE_PROVIDER.equals(providerContext.getState()))
 				{
-					if (debugEnabled) log.debug("node " + wrapper + " changing key ops for provider " + provider);
 					server.getTransitionManager().transitionChannel(provider, TO_SENDING_PROVIDER_REQUEST);
+					if (debugEnabled) log.debug("node " + wrapper + " transitioned provider " + provider);
 				}
 				t = TO_IDLE_NODE;
 			}

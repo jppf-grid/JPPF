@@ -20,8 +20,7 @@ package org.jppf.server.nio;
 
 import static java.nio.channels.SelectionKey.*;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.utils.ThreadSynchronization;
 
@@ -35,11 +34,11 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	/**
 	 * Count of instances of this class.
 	 */
-	private static AtomicInteger instanceCount = new AtomicInteger(0);
+	private static AtomicLong instanceCount = new AtomicLong(0);
 	/**
 	 * Id of this instance.
 	 */
-	protected final int id = instanceCount.incrementAndGet();
+	protected final long id = instanceCount.incrementAndGet();
 	/**
 	 * The channel to wrap.
 	 */
@@ -48,10 +47,6 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * The selctor for this channel.
 	 */
 	protected ChannelSelector selector = null;
-	/**
-	 * Used to take exclusive access to this channel.
-	 */
-	private ReentrantLock lock = new ReentrantLock();
 	
 	/**
 	 * Initialize this channel wrapper with the specified channel.
@@ -120,7 +115,16 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 */
 	public String toString()
 	{
-		return getClass().getSimpleName() + "[id=" + id + ", readyOps=" + getReadyOps() + ", keyOps=" + getKeyOps() + "]";
+		//return getClass().getSimpleName() + "[id=" + getId() + ", readyOps=" + getReadyOps() + ", keyOps=" + getKeyOps() + "]";
+		StringBuilder sb = new StringBuilder();
+		sb.append(getClass().getSimpleName());
+		sb.append("[");
+		sb.append(getId());
+		sb.append(",").append(" readyOps=").append(getReadyOps());
+		sb.append(",").append(" keyOps=").append(getKeyOps());
+		//sb.append(",").append(" state=").append(getContext().getState());
+		sb.append("]");
+		return sb.toString();
 	}
 
 	/**
@@ -183,28 +187,6 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	}
 
 	/**
-	 * Cause the current thread to wait until notified.
-	 */
-	public synchronized void goToSleep()
-	{
-		try
-		{
-			wait();
-		}
-		catch(InterruptedException ignored)
-		{
-		}
-	}
-
-	/**
-	 * Notify the threads currently waiting on this object that they can resume.
-	 */
-	public synchronized void wakeUp()
-	{
-		notifyAll();
-	}
-
-	/**
 	 * Default implementation of this method returns null.
 	 * @return by default this method returns null.
 	 * @see org.jppf.server.nio.ChannelWrapper#getSelector()
@@ -226,18 +208,11 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Get a string uniquely identifying this channel.
+	 * @return a unique id as a string.
 	 */
-	public void lock()
+	public String getId()
 	{
-		lock.lock();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void unlock()
-	{
-		lock.unlock();
+		return "id=" + id;
 	}
 }

@@ -25,7 +25,7 @@ import org.apache.commons.logging.*;
  * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
-public abstract class AbstractNioContext<S extends Enum> implements NioContext<S>
+public abstract class AbstractNioContext<S extends Enum<S>> implements NioContext<S>
 {
 	/**
 	 * Logger for this class.

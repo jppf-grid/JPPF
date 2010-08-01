@@ -18,11 +18,11 @@
 package org.jppf.classloader;
 
 import java.io.InputStream;
-import java.util.List;
+import java.nio.channels.SelectionKey;
+import java.util.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.comm.socket.IOHandler;
-import org.jppf.utils.FileUtils;
+import org.jppf.utils.*;
 
 /**
  * This class is a custom class loader serving the purpose of dynamically loading the JPPF classes and the client
@@ -42,17 +42,18 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	/**
 	 * temporary IO handler.
 	 */
-	private static IOHandler tmpHandler = null;
+	private static LocalClassLoaderChannel channel = null;
 
 	/**
 	 * Initialize this class loader with a parent class loader.
 	 * @param ioHandler wraps the communication channel with the driver.
 	 * @param parent a ClassLoader instance.
 	 */
-	public JPPFLocalClassLoader(IOHandler ioHandler, ClassLoader parent)
+	public JPPFLocalClassLoader(LocalClassLoaderChannel ioHandler, ClassLoader parent)
 	{
-		super(ioHandler, parent);
-		tmpHandler = ioHandler;
+		super(parent);
+		channel = ioHandler;
+		init();
 	}
 
 	/**
@@ -66,26 +67,53 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	}
 
 	/**
-	 * Initialize the connection with the class server.
-	 * @return the IOHandler created.
-	 * @see org.jppf.classloader.AbstractJPPFClassLoader#initIoHandler()
-	 */
-	protected IOHandler initIoHandler()
-	{
-		setInitializing(true);
-		if (debugEnabled) log.debug("initializing connection");
-		System.out.println("JPPFClassLoader.init(): attempting connection to the class server");
-		return tmpHandler;
-	}
-
-	/**
 	 * Initialize the underlying socket connection.
 	 */
-	private void initSocketClient()
+	protected void init()
 	{
-		if (debugEnabled) log.debug("initializing socket connection");
+		lock.lock();
+		try
+		{
+			//if (channel != null) return;
+			if (!isInitializing())
+			{
+				setInitializing(true);
+				// we need to do this in order to dramatically simplify the state machine of ClassServer
+				try
+				{
+					if (debugEnabled) log.debug("sending node initiation message");
+					JPPFResourceWrapper resource = new JPPFResourceWrapper();
+					resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
+					synchronized(channel)
+					{
+						channel.setServerResource(resource);
+						channel.setReadyOps(SelectionKey.OP_READ);
+					}
+					while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
+					if (debugEnabled) log.debug("node initiation message sent");
+					synchronized(channel)
+					{
+						channel.setNodeResource(null);
+						channel.setReadyOps(SelectionKey.OP_WRITE);
+					}
+					while (channel.getNodeResource() == null) channel.getNodeLock().goToSleep();
+					channel.setNodeResource(null);
+					if (debugEnabled) log.debug("received node initiation response");
+				}
+				catch (Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+				System.out.println(getClass().getSimpleName() + ".init(): Reconnected to the class server");
+			}
+		}
+		finally
+		{
+			lock.unlock();
+			setInitializing(false);
+		}
 	}
-	
+
 	/**
 	 * Terminate this classloader and clean the resources it uses.
 	 * @see org.jppf.classloader.AbstractJPPFClassLoader#close()
@@ -150,5 +178,38 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 		/*
 		return loadClass(name);
 		*/
+	}
+
+	/**
+	 * Load the specified class from a socket connection.
+	 * @param map contains the necessary resource request data.
+	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
+	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
+	 * @throws Exception if the connection was lost and could not be reestablished.
+	 */
+	protected JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception
+	{
+		JPPFResourceWrapper resource = new JPPFResourceWrapper();
+		resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
+		resource.setDynamic(dynamic);
+		TraversalList<String> list = new TraversalList<String>(uuidPath);
+		resource.setUuidPath(list);
+		if (list.size() > 0) list.setPosition(uuidPath.size()-1);
+		for (Map.Entry<String, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());
+		resource.setAsResource(asResource);
+		resource.setRequestUuid(requestUuid);
+
+		synchronized(channel)
+		{
+			channel.setServerResource(resource);
+			channel.setReadyOps(SelectionKey.OP_READ);
+		}
+		while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
+		
+		channel.setReadyOps(SelectionKey.OP_WRITE);
+		while (channel.getNodeResource() == null) channel.getNodeLock().goToSleep();
+		resource = channel.getNodeResource();
+		channel.setNodeResource(null);
+		return resource;
 	}
 }

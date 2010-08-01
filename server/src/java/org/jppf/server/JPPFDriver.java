@@ -23,7 +23,7 @@ import javax.management.MBeanServer;
 
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
-import org.jppf.classloader.LocalClassLoaderWrapperHandler;
+import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.comm.discovery.*;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
@@ -160,8 +160,8 @@ public class JPPFDriver
 		TypedProperties config = JPPFConfiguration.getProperties();
 		if (config.getBoolean("jppf.local.node.enabled", false))
 		{
-			LocalClassLoaderWrapperHandler localClassChannel = new LocalClassLoaderWrapperHandler(new LocalClassContext());
-			LocalNodeWrapperHandler localNodeChannel = new LocalNodeWrapperHandler(new LocalNodeContext());
+			LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
+			LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext());
 			JPPFLocalNode node = new JPPFLocalNode(localNodeChannel, localClassChannel);
 			classServer.initLocalChannel(localClassChannel);
 			nodeNioServer.initLocalChannel(localNodeChannel);

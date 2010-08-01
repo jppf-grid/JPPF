@@ -19,7 +19,7 @@
 package org.jppf.server.nio.classloader;
 
 import org.apache.commons.logging.*;
-import org.jppf.classloader.LocalClassLoaderWrapperHandler;
+import org.jppf.classloader.*;
 import org.jppf.server.nio.ChannelWrapper;
 
 /**
@@ -42,8 +42,14 @@ public class LocalClassContext extends ClassContext
 	 */
 	public void serializeResource(ChannelWrapper<?> wrapper) throws Exception
 	{
-		super.serializeResource(wrapper);
-		((LocalClassLoaderWrapperHandler) wrapper).setMessage(message);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public JPPFResourceWrapper deserializeResource() throws Exception
+	{
+		return resource;
 	}
 
 	/**
@@ -54,11 +60,12 @@ public class LocalClassContext extends ClassContext
 	 */
 	public boolean readMessage(ChannelWrapper<?> wrapper) throws Exception
 	{
+		LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
 		if (traceEnabled) log.trace("reading message for " + wrapper + ", message = " + message);
-		LocalClassLoaderWrapperHandler channel = (LocalClassLoaderWrapperHandler) wrapper;
-		while ((message == null) || (message.buffer == null) || (message.length <= 0) || (readByteCount < message.length)) channel.goToSleep();
-		if (traceEnabled) log.trace("message read for " + wrapper + ", message = " + message);
-		channel.wakeUp();
+		while (channel.getServerResource() == null) channel.goToSleep();
+		resource = channel.getServerResource();
+		channel.setServerResource(null);
+		if (traceEnabled) log.trace("message read for " + wrapper);
 		return true;
 	}
 
@@ -70,10 +77,9 @@ public class LocalClassContext extends ClassContext
 	 */
 	public boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception
 	{
-		if (traceEnabled) log.trace("writing message for " + wrapper);
-		message.lengthWritten = true;
-		writeByteCount = message.length;
-		((LocalClassLoaderWrapperHandler) wrapper).wakeUp();
+		if (traceEnabled) log.trace("writing message for " + wrapper + ", resource=" + resource);
+		LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
+		channel.setNodeResource(resource);
 		return true;
 	}
 }

@@ -16,21 +16,22 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio;
+package org.jppf.classloader;
 
+import org.jppf.server.nio.*;
 
 /**
- * State associated with a socket channel.
- * @param <T> the type of transitions for this state.
+ * Channel wrapper and I/O implementation for the class loader of an in-VM node.
  * @author Laurent Cohen
  */
-public abstract class NioState<T extends Enum<T>>
+public class LocalClassLoaderChannel extends AbstractLocalChannelWrapper<JPPFResourceWrapper, AbstractNioContext>
 {
 	/**
-	 * Execute the action associated with this channel state.
-	 * @param channel the selection key corresponding to the channel and selector for this state.
-	 * @return a state transition as an <code>NioTransition</code> instance.
-	 * @throws Exception if an error occurs while transitioning to another state.
+	 * Initialize this I/O handler with the specified context.
+	 * @param context the context used as communication channel.
 	 */
-	public abstract T performTransition(ChannelWrapper<?> channel) throws Exception;
+	public LocalClassLoaderChannel(AbstractNioContext context)
+	{
+		super(context);
+	}
 }

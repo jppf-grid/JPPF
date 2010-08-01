@@ -16,22 +16,22 @@
  * limitations under the License.
  */
 
-package org.jppf.server.node.remote;
+package org.jppf.server.nio.nodeserver;
 
-import org.jppf.comm.socket.*;
+import org.jppf.server.nio.AbstractLocalChannelWrapper;
 
 /**
- * An IOHandler implementation that delegates I/O to a {@link SocketWrapper}.
+ * Wrapper implementation for a local node's communication channel.
  * @author Laurent Cohen
  */
-public class RemoteIOHandler extends BootstrapSocketIOHandler
+public class LocalNodeChannel extends AbstractLocalChannelWrapper<LocalNodeMessage, LocalNodeContext>
 {
 	/**
-	 * Initialize this handler with the specified socket wrapper.
-	 * @param socketWrapper the socket wrapper that handles the I/O.
+	 * Initialize this channel wrapper with the specified node context.
+	 * @param context the node context used as channel.
 	 */
-	public RemoteIOHandler(SocketWrapper socketWrapper)
+	public LocalNodeChannel(LocalNodeContext context)
 	{
-		super(socketWrapper);
+		super(context);
 	}
 }

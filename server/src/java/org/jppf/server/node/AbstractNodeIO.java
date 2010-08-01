@@ -24,7 +24,6 @@ import java.io.InvalidClassException;
 import java.util.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.comm.socket.IOHandler;
 import org.jppf.data.transform.*;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
@@ -56,10 +55,6 @@ public abstract class AbstractNodeIO implements NodeIO
 	 * Used to serialize/deserialize tasks and data providers.
 	 */
 	protected ObjectSerializer serializer = null;
-	/**
-	 * The I/O handler to which read/write operations are delegated.
-	 */
-	protected IOHandler ioHandler = null;
 
 	/**
 	 * Initialize this TaskIO with the specified node. 
@@ -148,43 +143,7 @@ public abstract class AbstractNodeIO implements NodeIO
 	 * @return an array of objects deserialized from the socket stream.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
-	{
-		List<Object> list = new ArrayList<Object>();
-		list.add(bundle);
-		try
-		{
-			bundle.setNodeExecutionTime(System.currentTimeMillis());
-			int count = bundle.getTaskCount();
-			if (debugEnabled) log.debug("bundle task count = " + count + ", state = " + bundle.getState());
-			if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
-			{
-				JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
-				cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
-				//cont.deserializeObjects(socketWrapper, list, 1+count);
-				cont.deserializeObjects(ioHandler, list, 1+count, node.getExecutionManager().getExecutor());
-			}
-			else
-			{
-				// skip null data provider
-				ioHandler.read();
-			}
-			if (debugEnabled) log.debug("got all data");
-		}
-		catch(ClassNotFoundException e)
-		{
-			log.error("Exception occurred while deserializing the tasks", e);
-			bundle.setTaskCount(0);
-			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
-		}
-		catch(NoClassDefFoundError e)
-		{
-			log.error("Exception occurred while deserializing the tasks", e);
-			bundle.setTaskCount(0);
-			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
-		}
-		return list.toArray(new Object[0]);
-	}
+	protected abstract Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception;
 
 	/**
 	 * Write the execution results to the socket stream.

@@ -48,11 +48,25 @@ public class LocalNodeContext extends AbstractNodeContext
 	/**
 	 * {@inheritDoc}
 	 */
+	public boolean readMessage(ChannelWrapper<?> channel) throws Exception
+	{
+		if (debugEnabled) log.debug("reading message from " + channel);
+		LocalNodeChannel handler = (LocalNodeChannel) channel;
+		while (handler.getServerResource() == null) handler.getServerLock().goToSleep();
+		setNodeMessage(handler.getServerResource(), channel); 
+		handler.setServerResource(null);
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
 	{
+		LocalNodeChannel handler = (LocalNodeChannel) channel;
 		boolean b = super.writeMessage(channel);
 		if (debugEnabled) log.debug("wrote " + nodeMessage + " to " + channel);
-		((LocalNodeWrapperHandler) channel).setMessage((LocalNodeMessage) nodeMessage);
+		handler.setNodeResource((LocalNodeMessage) nodeMessage);
 		return b;
 	}
 
@@ -62,7 +76,7 @@ public class LocalNodeContext extends AbstractNodeContext
 	public void setNodeMessage(AbstractNodeMessage nodeMessage, ChannelWrapper<?> channel)
 	{
 		super.setNodeMessage(nodeMessage, channel);
-		((LocalNodeWrapperHandler) channel).wakeUp();
+		((LocalNodeChannel) channel).wakeUp();
 	}
 
 	/**

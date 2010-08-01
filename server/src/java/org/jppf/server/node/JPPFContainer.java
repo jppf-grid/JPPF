@@ -33,7 +33,7 @@ import org.jppf.utils.*;
  * a client application, a provides the methods to enable the transport, serialization and deserialization of these classes.
  * @author Laurent Cohen
  */
-public class JPPFContainer
+public abstract class JPPFContainer
 {
 	/**
 	 * Logger for this class.
@@ -108,46 +108,14 @@ public class JPPFContainer
 	}
 
 	/**
-	 * Deserialize a number of objects from a socket client.
-	 * @param ioHandler the IOHandler from which to read the objects to deserialize.
+	 * Deserialize a number of objects from the I/O channel.
 	 * @param list a list holding the resulting deserialized objects.
 	 * @param count the number of objects to deserialize.
 	 * @param executor the number of objects to deserialize.
 	 * @return the new position in the source data after deserialization.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	public int deserializeObjects(IOHandler ioHandler, List<Object> list, int count, ExecutorService executor) throws Exception
-	{
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		try
-		{
-			Thread.currentThread().setContextClassLoader(classLoader);
-			List<Future<Object>> futureList = new ArrayList<Future<Object>>();
-			for (int i=0; i<count; i++)
-			{
-				JPPFBuffer buf = ioHandler.read();
-				if (debugEnabled) log.debug("i = " + i + ", read buffer size = " + buf.getLength());
-				futureList.add(executor.submit(new ObjectDeserializationTask(buf.getBuffer(), i)));
-			}
-			for (Future<Object> f: futureList) list.add(f.get());
-			return 0;
-		}
-		finally
-		{
-			Thread.currentThread().setContextClassLoader(cl);
-		}
-	}
-
-	/**
-	 * Deserialize an object from a socket client.
-	 * @param ioHandler the IOHandler from which to read the objects to deserialize.
-	 * @return the new position in the source data after deserialization.
-	 * @throws Exception if an error occurs while deserializing.
-	 */
-	public Object deserializeObject(IOHandler ioHandler) throws Exception
-	{
-		return deserializeObject(ioHandler.read().getBuffer());
-	}
+	public abstract int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Exception;
 
 	/**
 	 * Deserialize an object from a socket client.

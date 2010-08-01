@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.jppf.classloader.*;
-import org.jppf.comm.socket.IOHandler;
-import org.jppf.server.nio.nodeserver.LocalNodeWrapperHandler;
+import org.jppf.server.nio.nodeserver.LocalNodeChannel;
 import org.jppf.server.node.*;
 
 /**
@@ -35,20 +34,20 @@ public class JPPFLocalNode extends JPPFNode
 	/**
 	 * The I/O handler for this node.
 	 */
-	private LocalNodeWrapperHandler handler = null;
+	private LocalNodeChannel channel = null;
 	/**
 	 * The I/O handler for the class loader.
 	 */
-	private IOHandler classLoaderHandler = null;
+	private LocalClassLoaderChannel classLoaderHandler = null;
 
 	/**
 	 * Initialize this local node with the specfied I/O handler.
 	 * @param handler the I/O handler for this node.
 	 * @param classLoaderHandler the I/O handler for the class loader.
 	 */
-	public JPPFLocalNode(LocalNodeWrapperHandler handler, IOHandler classLoaderHandler)
+	public JPPFLocalNode(LocalNodeChannel handler, LocalClassLoaderChannel classLoaderHandler)
 	{
-		this.handler = handler;
+		this.channel = handler;
 		this.classLoaderHandler = classLoaderHandler;
 	}
 
@@ -94,11 +93,11 @@ public class JPPFLocalNode extends JPPFNode
 
 	/**
 	 * Get the I/O handler for this node.
-	 * @return a {@link LocalNodeWrapperHandler} instance.
+	 * @return a {@link LocalNodeChannel} instance.
 	 */
-	public LocalNodeWrapperHandler getHandler()
+	public LocalNodeChannel getChannel()
 	{
-		return handler;
+		return channel;
 	}
 
 	/**
@@ -106,6 +105,6 @@ public class JPPFLocalNode extends JPPFNode
 	 */
 	protected JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception
 	{
-		return new JPPFLocalContainer(uuidPath, cl);
+		return new JPPFLocalContainer(channel, uuidPath, cl);
 	}
 }

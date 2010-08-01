@@ -70,7 +70,7 @@ class IdleState extends NodeServerState
 				log.debug("readable channel: read " + n + " bytes");
 			}
 			*/
-			if (!(wrapper instanceof LocalNodeWrapperHandler)) throw new ConnectException("node " + wrapper + " has been disconnected");
+			if (!(wrapper instanceof LocalNodeChannel)) throw new ConnectException("node " + wrapper + " has been disconnected");
 		}
 		return TO_IDLE;
 	}

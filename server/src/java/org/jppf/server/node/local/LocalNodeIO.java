@@ -19,13 +19,13 @@
 package org.jppf.server.node.local;
 
 import static java.nio.channels.SelectionKey.*;
+import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
-import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
 import org.jppf.server.nio.nodeserver.*;
@@ -48,9 +48,9 @@ public class LocalNodeIO extends AbstractNodeIO
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The underlying socket wrapper.
+	 * The I/O channel for this node.
 	 */
-	private SocketWrapper socketWrapper = null;
+	private LocalNodeChannel channel = null;
 
 	/**
 	 * Initialize this TaskIO with the specified node. 
@@ -59,8 +59,7 @@ public class LocalNodeIO extends AbstractNodeIO
 	public LocalNodeIO(JPPFNode node)
 	{
 		super(node);
-		this.socketWrapper = node.getSocketWrapper();
-		this.ioHandler = ((JPPFLocalNode) node).getHandler();
+		this.channel = ((JPPFLocalNode) node).getChannel();
 	}
 
 	/**
@@ -72,7 +71,6 @@ public class LocalNodeIO extends AbstractNodeIO
 	{
 		node.setClassLoader(null);
 		node.initHelper();
-		socketWrapper.setSerializer(node.getHelper().getSerializer());
 	}
 
 	/**
@@ -80,29 +78,62 @@ public class LocalNodeIO extends AbstractNodeIO
 	 */
 	protected Object[] deserializeObjects() throws Exception
 	{
+		channel.setReadyOps(OP_WRITE);
 		if (debugEnabled) log.debug("waiting for next request");
-		LocalNodeWrapperHandler wrapper = (LocalNodeWrapperHandler) ioHandler;
-		while (wrapper.getMessage() != null) wrapper.goToSleep();
-		wrapper.setReadyOps(OP_WRITE);
-		while (wrapper.getMessage() == null) wrapper.goToSleep();
-		wrapper.lock();
+		// wait until a message has been sent by the server
+		while (channel.getNodeResource() == null) channel.getNodeLock().goToSleep();
+		if (debugEnabled) log.debug("got request");
+		LocalNodeMessage message = null;
+		channel.setReadyOps(0);
+		message = channel.getNodeResource();
+		DataLocation location = message.getLocations().get(0);
+		if (debugEnabled) log.debug("got bundle");
+		byte[] data = JPPFDataTransformFactory.transform(false, location.getInputStream());
+		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
+		Object[] result = deserializeObjects(bundle);
+		channel.setNodeResource(null);
+		if (debugEnabled) log.debug("got all data");
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
+	{
+		List<Object> list = new ArrayList<Object>();
+		list.add(bundle);
 		try
 		{
-			wrapper.setReadyOps(0);
-			LocalNodeMessage message = wrapper.getMessage();
-			DataLocation location = message.getLocations().get(0);
-			if (debugEnabled) log.debug("got bundle");
-			byte[] data = JPPFDataTransformFactory.transform(false, location.getInputStream());
-			JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
-			Object[] result = deserializeObjects(bundle);
+			bundle.setNodeExecutionTime(System.currentTimeMillis());
+			int count = bundle.getTaskCount();
+			if (debugEnabled) log.debug("bundle task count = " + count + ", state = " + bundle.getState());
+			if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+			{
+				JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
+				cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
+				cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());
+			}
+			else
+			{
+				// skip null data provider
+				//ioHandler.read();
+			}
 			if (debugEnabled) log.debug("got all data");
-			wrapper.setMessage(null);
-			return result;
 		}
-		finally
+		catch(ClassNotFoundException e)
 		{
-			wrapper.unlock();
+			log.error("Exception occurred while deserializing the tasks", e);
+			bundle.setTaskCount(0);
+			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
 		}
+		catch(NoClassDefFoundError e)
+		{
+			log.error("Exception occurred while deserializing the tasks", e);
+			bundle.setTaskCount(0);
+			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
+		}
+		return list.toArray(new Object[0]);
 	}
 
 	/**
@@ -111,34 +142,26 @@ public class LocalNodeIO extends AbstractNodeIO
 	public void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
 	{
 		if (debugEnabled) log.debug("writing results");
-		LocalNodeWrapperHandler wrapper = (LocalNodeWrapperHandler) ioHandler;
-		wrapper.lock();
-		try
+		ExecutorService executor = node.getExecutionManager().getExecutor();
+		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
+		bundle.setNodeExecutionTime(elapsed);
+		List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>();
+		futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
+		for (JPPFTask task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
+		LocalNodeContext ctx = channel.getChannel();
+		LocalNodeMessage message = (LocalNodeMessage) ctx.newMessage();
+		for (Future<DataLocation> f: futureList)
 		{
-			ExecutorService executor = node.getExecutionManager().getExecutor();
-			long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
-			bundle.setNodeExecutionTime(elapsed);
-			List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>();
-			futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
-			for (JPPFTask task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
-			LocalNodeContext ctx = wrapper.getChannel();
-			if (ctx.getNodeMessage() == null) ctx.setNodeMessage(ctx.newMessage(), wrapper);
-			for (Future<DataLocation> f: futureList)
-			{
-				DataLocation location = f.get();
-				ctx.getNodeMessage().addLocation(location);
-			}
-			if (debugEnabled) log.debug("wrote full results");
-			wrapper.setReadyOps(OP_READ);
+			DataLocation location = f.get();
+			message.addLocation(location);
 		}
-		finally
-		{
-			wrapper.unlock();
-		}
-		wrapper.goToSleep();
-		//while (ctx.getNodeMessage() != null) wrapper.goToSleep();
-		//if (debugEnabled) log.debug("results have been read by the server");
-		//ioHandler.flush();
+		message.setBundle(bundle);
+		channel.setServerResource(message);
+		channel.setReadyOps(OP_READ);
+		if (debugEnabled) log.debug("wrote full results");
+		// wait until the message has been read by the server
+		while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
+		channel.setReadyOps(0);
 	}
 
 	/**

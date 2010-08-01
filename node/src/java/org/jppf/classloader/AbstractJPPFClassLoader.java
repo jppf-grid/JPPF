@@ -24,9 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.*;
-import org.jppf.JPPFNodeReconnectionNotification;
-import org.jppf.comm.socket.*;
-import org.jppf.data.transform.*;
 import org.jppf.utils.*;
 
 /**
@@ -44,10 +41,6 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The I/O handler to which read/write operations are delegated.
-	 */
-	protected static IOHandler ioHandler = null;
 	/**
 	 * Used to synchronize access to the underlying socket from multiple threads.
 	 */
@@ -89,20 +82,6 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	{
 		super(new URL[0], parent);
 		if (parent instanceof AbstractJPPFClassLoader) dynamic = true;
-		init(null);
-	}
-
-	/**
-	 * Initialize this class loader with a parent class loader.
-	 * @param tmpHandler wraps the communication channel with the driver.
-	 * @param parent a ClassLoader instance.
-	 */
-	public AbstractJPPFClassLoader(IOHandler tmpHandler, ClassLoader parent)
-	{
-		super(new URL[0], parent);
-		if (parent instanceof AbstractJPPFClassLoader) dynamic = true;
-		if (ioHandler == null) init(tmpHandler);
-		//else AbstractJPPFClassLoader.ioHandler = ioHandler;
 	}
 
 	/**
@@ -118,59 +97,8 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 
 	/**
 	 * Initialize the underlying socket connection.
-	 * @param tmpHandler thez io handler to use.
 	 */
-	protected void init(IOHandler tmpHandler)
-	{
-		lock.lock();
-		try
-		{
-			if (ioHandler != null) return;
-			if (!isInitializing())
-			{
-				setInitializing(true);
-				if (tmpHandler == null) ioHandler = initIoHandler();
-				else ioHandler = tmpHandler;
-				// we need to do this in order to dramatically simplify the state machine of ClassServer
-				try
-				{
-					if (debugEnabled) log.debug("sending node initiation message");
-					JPPFResourceWrapper resource = new JPPFResourceWrapper();
-					resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-					ObjectSerializer serializer = new BootstrapObjectSerializer();
-					JPPFBuffer buf = serializer.serialize(resource);
-					byte[] data = buf.getBuffer();
-					data = JPPFDataTransformFactory.transform(true, data);
-					ioHandler.writeInt(data.length);
-					ioHandler.write(data, 0, data.length);
-					ioHandler.flush();
-					if (debugEnabled) log.debug("node initiation message sent");
-					ioHandler.read();
-					if (debugEnabled) log.debug("received node initiation response");
-				}
-				catch (IOException e)
-				{
-					throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
-				}
-				catch (Exception e)
-				{
-					throw new RuntimeException(e);
-				}
-				System.out.println("JPPFClassLoader.init(): Reconnected to the class server");
-			}
-		}
-		finally
-		{
-			lock.unlock();
-			setInitializing(false);
-		}
-	}
-
-	/**
-	 * Initialize the connection with the class server.
-	 * @return the IOHandler created.
-	 */
-	protected abstract IOHandler initIoHandler();
+	protected abstract void init();
 
 	/**
 	 * Load a JPPF class from the server.
@@ -182,11 +110,13 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	{
 		if (debugEnabled) log.debug("looking up resource [" + name + "]");
 		Class<?> c = findLoadedClass(name);
+		/*
 		if (c == null)
 		{
 			ClassLoader parent = getParent();
 			if (parent instanceof AbstractJPPFClassLoader) c = ((AbstractJPPFClassLoader) parent).findLoadedClass(name);
 		}
+		*/
 		if (c == null)
 		{
 			if (debugEnabled) log.debug("resource [" + name + "] not already loaded");
@@ -258,8 +188,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		catch(IOException e)
 		{
 			if (debugEnabled) log.debug("connection with class server ended, re-initializing");
-			ioHandler = null;
-			init(null);
+			init();
 			try
 			{
 				resource = loadResourceData0(map, asResource);
@@ -325,45 +254,12 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 
 	/**
 	 * Load the specified class from a socket connection.
-	 * @param map - contains the necessary resource request data.
-	 * @param asResource - true if the resource is loaded using getResource(), false otherwise. 
+	 * @param map contains the necessary resource request data.
+	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
 	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
 	 * @throws Exception if the connection was lost and could not be reestablished.
 	 */
-	private JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception
-	{
-		try
-		{
-			loading.set(true);
-			JPPFResourceWrapper resource = new JPPFResourceWrapper();
-			resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
-			resource.setDynamic(dynamic);
-			TraversalList<String> list = new TraversalList<String>(uuidPath);
-			resource.setUuidPath(list);
-			if (list.size() > 0) list.setPosition(uuidPath.size()-1);
-			for (Map.Entry<String, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());
-			resource.setAsResource(asResource);
-			resource.setRequestUuid(requestUuid);
-	
-			JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-			ObjectSerializer serializer = getSerializer();
-			JPPFBuffer buf = serializer.serialize(resource);
-			byte[] data = buf.getBuffer();
-			if (transform != null) data = JPPFDataTransformFactory.transform(transform, true, data);
-			ioHandler.writeInt(data.length);
-			ioHandler.write(data, 0, data.length);
-			ioHandler.flush();
-			buf = ioHandler.read();
-			data = buf.getBuffer();
-			if (transform != null) data = JPPFDataTransformFactory.transform(transform, false, data);
-			resource = (JPPFResourceWrapper) serializer.deserialize(data);
-			return resource;
-		}
-		finally
-		{
-			loading.set(false);
-		}
-	}
+	protected abstract JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception;
 
 	/**
 	 * Finds the resource with the specified name.

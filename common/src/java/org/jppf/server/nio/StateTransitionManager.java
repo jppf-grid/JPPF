@@ -111,35 +111,21 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	public void transitionChannel(ChannelWrapper<?> channel, T transition)
 	{
-		channel.lock();
+		server.getLock().lock();
 		try
 		{
-			server.getLock().lock();
-			try
-			{
-				server.getSelector().wakeup();
-				NioContext<S> context = (NioContext<S>) channel.getContext();
-				S s1 = context.getState();
-				NioTransition<S> t = server.getFactory().getTransition(transition);
-				S s2 = t.getState();
-				context.setState(s2);
-				boolean b = true;
-				if ((s1 == s2) && (s2 != null))
-				{
-					NioState<T> state = server.getFactory().getState(s2);
-					b = state.autoChangeInterestOps();
-				}
-				if (b) channel.setKeyOps(t.getInterestOps());
-				if (debugEnabled && (s1 != s2)) log.debug("transitionned " + channel + " from " + s1 + " to " + s2);
-			}
-			finally
-			{
-				server.getLock().unlock();
-			}
+			NioContext<S> context = (NioContext<S>) channel.getContext();
+			S s1 = context.getState();
+			NioTransition<S> t = server.getFactory().getTransition(transition);
+			S s2 = t.getState();
+			context.setState(s2);
+			channel.setKeyOps(t.getInterestOps());
+			//setKeyOps(channel, t.getInterestOps());
+			if (debugEnabled && (s1 != s2)) log.debug("transitionned " + channel + " from " + s1 + " to " + s2);
 		}
 		finally
 		{
-			channel.unlock();
+			server.getLock().unlock();
 		}
 	}
 

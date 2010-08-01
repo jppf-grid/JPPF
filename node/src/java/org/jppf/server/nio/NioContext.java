@@ -23,7 +23,7 @@ package org.jppf.server.nio;
  * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
-public interface NioContext<S extends Enum>
+public interface NioContext<S extends Enum<S>>
 {
 
 	/**

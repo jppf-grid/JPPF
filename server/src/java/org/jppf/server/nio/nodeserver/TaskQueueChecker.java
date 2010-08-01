@@ -108,8 +108,7 @@ class TaskQueueChecker implements Runnable
 					}
 					if (channel != null)
 					{
-						channel.lock();
-						try
+						synchronized(channel)
 						{
 							AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
 							updateBundler(server.getBundler(), selectedBundle.getBundle(), context);
@@ -117,10 +116,6 @@ class TaskQueueChecker implements Runnable
 							context.setBundle(bundleWrapper);
 							server.getTransitionManager().transitionChannel(channel, NodeTransition.TO_SENDING);
 							driver.getJobManager().jobDispatched(context.getBundle(), channel);
-						}
-						finally
-						{
-							channel.unlock();
 						}
 					}
 				}
@@ -193,7 +188,7 @@ class TaskQueueChecker implements Runnable
 		if (b) return false;
 		b = (Boolean) bundle.getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE);
 		if (b) return false;
-		String jobId = (String) bundle.getParameter(BundleParameter.JOB_UUID);
+		String jobId = bundle.getJobUuid();
 		int maxNodes = sla.getMaxNodes();
 		List<ChannelBundlePair> list = server.getJobManager().getNodesForJob(jobId);
 		int n = (list == null) ? 0 : list.size();
@@ -212,7 +207,7 @@ class TaskQueueChecker implements Runnable
 		context.checkBundler(server.getBundler());
 		if (context.getBundler() instanceof JobAwareness)
 		{
-			JPPFJobMetadata metadata = (JPPFJobMetadata) taskBundle.getParameter(BundleParameter.JOB_METADATA);
+			JPPFJobMetadata metadata = taskBundle.getJobMetadata();
 			((JobAwareness) context.getBundler()).setJobMetadata(metadata);
 		}
 	}

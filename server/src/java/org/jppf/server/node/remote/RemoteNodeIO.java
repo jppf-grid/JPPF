@@ -18,6 +18,8 @@
 
 package org.jppf.server.node.remote;
 
+import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
+
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -55,7 +57,6 @@ public class RemoteNodeIO extends AbstractNodeIO
 	{
 		super(node);
 		this.socketWrapper = node.getSocketWrapper();
-		this.ioHandler = new RemoteIOHandler(socketWrapper);
 	}
 
 	/**
@@ -64,11 +65,52 @@ public class RemoteNodeIO extends AbstractNodeIO
 	protected Object[] deserializeObjects() throws Exception
 	{
 		if (debugEnabled) log.debug("waiting for next request");
-		byte[] data = ioHandler.read().getBuffer();
+		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
 		if (debugEnabled) log.debug("got bundle");
 		data = JPPFDataTransformFactory.transform(false, data);
 		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
 		return deserializeObjects(bundle);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
+	{
+		List<Object> list = new ArrayList<Object>();
+		list.add(bundle);
+		try
+		{
+			bundle.setNodeExecutionTime(System.currentTimeMillis());
+			int count = bundle.getTaskCount();
+			if (debugEnabled) log.debug("bundle task count = " + count + ", state = " + bundle.getState());
+			if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+			{
+				JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
+				cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
+				//cont.deserializeObjects(socketWrapper, list, 1+count);
+				cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());
+			}
+			else
+			{
+				// skip null data provider
+				socketWrapper.receiveBytes(0);
+			}
+			if (debugEnabled) log.debug("got all data");
+		}
+		catch(ClassNotFoundException e)
+		{
+			log.error("Exception occurred while deserializing the tasks", e);
+			bundle.setTaskCount(0);
+			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
+		}
+		catch(NoClassDefFoundError e)
+		{
+			log.error("Exception occurred while deserializing the tasks", e);
+			bundle.setTaskCount(0);
+			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
+		}
+		return list.toArray(new Object[0]);
 	}
 
 	/**
@@ -101,8 +143,8 @@ public class RemoteNodeIO extends AbstractNodeIO
 		for (Future<BufferList> f: futureList)
 		{
 			BufferList list = f.get();
-			ioHandler.writeInt(list.second());
-			for (JPPFBuffer buf: list.first()) ioHandler.write(buf.buffer, 0, buf.length);
+			socketWrapper.writeInt(list.second());
+			for (JPPFBuffer buf: list.first()) socketWrapper.write(buf.buffer, 0, buf.length);
 		}
 		//ioHandler.flush();
 	}

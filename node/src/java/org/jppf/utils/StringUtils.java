@@ -220,14 +220,14 @@ public final class StringUtils
 	public static String getRemoteHost(SocketAddress address)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("[");
+		//sb.append("[");
 		if (address instanceof InetSocketAddress)
 		{
 			InetSocketAddress add = (InetSocketAddress) address;
 			sb.append(add.getHostName()).append(":").append(add.getPort());
 		}
 		else sb.append("socket address type not handled: " + address); 
-		sb.append("]");
+		//sb.append("]");
 		return sb.toString();
 	}
 
@@ -246,7 +246,7 @@ public final class StringUtils
   		sb.append("[");
   		for (int i=0; i<array.length; i++)
   		{
-  			if (i > 0) sb.append(";");
+  			if (i > 0) sb.append(",");
   			sb.append(array[i]);
   		}
   		sb.append("]");

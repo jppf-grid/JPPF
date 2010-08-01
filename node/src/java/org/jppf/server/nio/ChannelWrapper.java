@@ -101,12 +101,4 @@ public interface ChannelWrapper<S>
 	 * @param selector a {@link LocalChannelSelector} instance.
 	 */
 	void setSelector(ChannelSelector selector);
-	/**
-	 * Take a lock on this channel.
-	 */
-	void lock();
-	/**
-	 * Release a lock on this channel.
-	 */
-	void unlock();
 }

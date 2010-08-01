@@ -117,7 +117,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 		log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
 		threadMXBean = ManagementFactory.getThreadMXBean();
 		cpuTimeEnabled = threadMXBean.isThreadCpuTimeSupported();
-		threadFactory = new JPPFThreadFactory("node processing thread", cpuTimeEnabled);
+		threadFactory = new JPPFThreadFactory("node processing", cpuTimeEnabled);
 		LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
 		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory);
 		//timeoutTimer = new Timer("Node Task Timeout Timer");
@@ -469,7 +469,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 */
 	public String getCurrentJobId()
 	{
-		return (bundle != null) ? (String) bundle.getParameter(BundleParameter.JOB_UUID) : null;
+		return (bundle != null) ? bundle.getJobUuid() : null;
 	}
 
 	/**
