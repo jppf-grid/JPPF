@@ -144,31 +144,6 @@ public class ResourceProvider
 			log.error(e.getMessage(), e);
 		}
 
-		/*
-		try
-		{
-			URL url = cl.getResource(resName);
-			if (url != null)
-			{
-				if (debugEnabled) log.debug("resource [" + resName + "] found, url = " + url);
-				return FileUtils.getInputStreamAsByte(url.openStream());
-			}
-			else
-			{
-				File file = new File(resName);
-				if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
-				if (is != null)
-				{
-					if (debugEnabled) log.debug("resource [" + resName + "] found");
-					return FileUtils.getInputStreamAsByte(is);
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		*/
 		if (debugEnabled) log.debug("resource [" + resName + "] not found");
 		return null;
 	}
