@@ -31,6 +31,10 @@ import java.util.*;
 public class JPPFJobMetadata implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The metadata map.
 	 */
 	private Map<Object, Object> metadata = new HashMap<Object, Object>();

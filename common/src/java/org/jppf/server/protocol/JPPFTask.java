@@ -44,6 +44,10 @@ import org.jppf.task.storage.DataProvider;
 public abstract class JPPFTask implements Runnable, Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The position of this task at the submission time.
 	 */
 	private int position;

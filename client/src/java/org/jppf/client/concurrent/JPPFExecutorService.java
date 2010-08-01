@@ -358,7 +358,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	{
 		JPPFJob job = new JPPFJob();
 		job.setId(getClass().getSimpleName() + " job " + jobCount.incrementAndGet());
-		FutureResultCollector collector = new FutureResultCollector(0, job.getUuid());
+		FutureResultCollector collector = new FutureResultCollector(0, job.getJobUuid());
 		job.setResultListener(collector);
 		job.setBlocking(false);
 		collector.addListener(this);
@@ -385,7 +385,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	private void submitJob(JPPFJob job) throws Exception
 	{
 		client.submit(job);
-		jobMap.put(job.getUuid(), job);
+		jobMap.put(job.getJobUuid(), job);
 	}
 
 	/**

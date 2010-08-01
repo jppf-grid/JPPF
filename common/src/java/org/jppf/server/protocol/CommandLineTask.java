@@ -36,6 +36,10 @@ import org.jppf.utils.CollectionUtils;
 public abstract class CommandLineTask extends JPPFTask implements ProcessWrapperEventListener
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The list of command-line arguments.
 	 */
 	private List<String> commandList = new ArrayList<String>();

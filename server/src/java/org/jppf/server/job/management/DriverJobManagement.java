@@ -62,14 +62,14 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
 	/**
 	 * Cancel the job with the specified id.
-	 * @param jobId the id of the job to cancel.
+	 * @param jobUuid the id of the job to cancel.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
 	 */
-	public void cancelJob(String jobId) throws Exception
+	public void cancelJob(String jobUuid) throws Exception
 	{
-		if (debugEnabled) log.debug("Request to cancel jobId = '" + jobId + "'");
-		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobId);
+		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+		if (debugEnabled) log.debug("Request to cancel jobId = '" + bundleWrapper.getBundle().getId() + "'");
 		if (debugEnabled) log.debug("bundleWrapper=" + bundleWrapper);
 		if (bundleWrapper != null)
 		{
@@ -77,38 +77,38 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 			BundleWrapper queuedWrapper = JPPFDriver.getQueue().nextBundle(bundleWrapper, bundle.getTaskCount());
 			//if ((queuedWrapper != null) && (bundle.getCompletionListener() != null)) bundle.getCompletionListener().taskCompleted(bundleWrapper);
 		}
-		cancelJobInNodes(jobId, false);
+		cancelJobInNodes(jobUuid, false);
 	}
 
 	/**
 	 * Suspend the job with the specified id.
-	 * @param jobId the id of the job to suspend.
+	 * @param jobUuid the id of the job to suspend.
 	 * @param requeue true if the sub-jobs running on each node should be canceled and requeued,
 	 * false if they should be left to execute until completion.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#suspendJob(java.lang.String,java.lang.Boolean)
 	 */
-	public void suspendJob(String jobId, Boolean requeue) throws Exception
+	public void suspendJob(String jobUuid, Boolean requeue) throws Exception
 	{
-		if (debugEnabled) log.debug("Request to suspend jobId = '" + jobId + "'");
-		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobId);
+		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+		if (debugEnabled) log.debug("Request to suspend jobId = '" + bundleWrapper.getBundle().getId() + "'");
 		if (bundleWrapper == null) return;
 		if (bundleWrapper.getBundle().getJobSLA().isSuspended()) return;
 		bundleWrapper.getBundle().getJobSLA().setSuspended(true);
 		getJobManager().jobUpdated(bundleWrapper);
-		if (requeue) cancelJobInNodes(jobId, true);
+		if (requeue) cancelJobInNodes(jobUuid, true);
 	}
 
 	/**
 	 * Resume the job with the specified id.
-	 * @param jobId the id of the job to resume.
+	 * @param jobUuid the id of the job to resume.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#resumeJob(java.lang.String)
 	 */
-	public void resumeJob(String jobId) throws Exception
+	public void resumeJob(String jobUuid) throws Exception
 	{
-		if (debugEnabled) log.debug("Request to resume jobId = '" + jobId + "'");
-		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobId);
+		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+		if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getBundle().getId() + "'");
 		if (bundleWrapper == null) return;
 		if (!bundleWrapper.getBundle().getJobSLA().isSuspended()) return;
 		bundleWrapper.getBundle().getJobSLA().setSuspended(false);
@@ -117,15 +117,15 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
 	/**
 	 * Update the maximum number of nodes a node can run on.
-	 * @param jobId the id of the job to update.
+	 * @param jobUuid the id of the job to update.
 	 * @param maxNodes the new maximum number of nodes for the job.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#updateMaxNodes(java.lang.String, java.lang.Integer)
 	 */
-	public void updateMaxNodes(String jobId, Integer maxNodes) throws Exception
+	public void updateMaxNodes(String jobUuid, Integer maxNodes) throws Exception
 	{
-		if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + jobId + "'");
-		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobId);
+		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+		if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + bundleWrapper.getBundle().getId() + "'");
 		if (bundleWrapper == null) return;
 		if (maxNodes <= 0) return;
 		bundleWrapper.getBundle().getJobSLA().setMaxNodes(maxNodes);
@@ -146,18 +146,18 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
 	/**
 	 * Get an object describing the job with the specified id. 
-	 * @param jobId the id of the job to get information about.
+	 * @param jobUuid the id of the job to get information about.
 	 * @return an instance of <code>JobInformation</code>.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getJobInformation(java.lang.String)
 	 */
-	public JobInformation getJobInformation(String jobId) throws Exception
+	public JobInformation getJobInformation(String jobUuid) throws Exception
 	{
-		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobId);
+		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null) return null;
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
-		JobInformation job = new JobInformation(jobId, (String) bundle.getParameter(BundleParameter.JOB_UUID),
+		JobInformation job = new JobInformation(jobUuid, bundle.getId(),
 			bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getJobSLA().getPriority(),
 			bundle.getJobSLA().isSuspended(), (pending != null) && pending);
 		job.setMaxNodes(bundle.getJobSLA().getMaxNodes());
@@ -166,14 +166,14 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
 	/**
 	 * Get a list of objects describing the nodes to which the whole or part of a job was dispatched.
-	 * @param jobId the id of the job for which to find node information.
+	 * @param jobUuid the id of the job for which to find node information.
 	 * @return a list of <code>NodeManagementInfo</code> instances.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getNodeInformation(java.lang.String)
 	 */
-	public NodeJobInformation[] getNodeInformation(String jobId) throws Exception
+	public NodeJobInformation[] getNodeInformation(String jobUuid) throws Exception
 	{
-		List<ChannelBundlePair> nodes = getJobManager().getNodesForJob(jobId);
+		List<ChannelBundlePair> nodes = getJobManager().getNodesForJob(jobUuid);
 		if (nodes == null) return null;
 		NodeJobInformation[] result = new NodeJobInformation[nodes.size()];
 		for (int i=0; i<nodes.size(); i++)
@@ -181,7 +181,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 			JPPFManagementInfo nodeInfo = driver.getNodeInformation(nodes.get(i).first());
 			JPPFTaskBundle bundle = nodes.get(i).second().getBundle();
 			Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
-			JobInformation jobInfo = new JobInformation(jobId, (String) bundle.getParameter(BundleParameter.JOB_UUID),
+			JobInformation jobInfo = new JobInformation(jobUuid, bundle.getId(),
 				bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getJobSLA().getPriority(),
 				bundle.getJobSLA().isSuspended(), (pending != null) && pending);
 			jobInfo.setMaxNodes(bundle.getJobSLA().getMaxNodes());
@@ -193,17 +193,17 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	/**
 	 * Cancel all sub-jobs of the job with the specified id, by issuing a cancel command
 	 * to each corresponding node. 
-	 * @param jobId the id of the job to cancel.
+	 * @param jobUuid the id of the job to cancel.
 	 * @param requeue specifies whether the sub-jobs should be requeued.
 	 */
-	private void cancelJobInNodes(String jobId, boolean requeue)
+	private void cancelJobInNodes(String jobUuid, boolean requeue)
 	{
-		List<ChannelBundlePair> list = getJobManager().getNodesForJob(jobId);
-		if (debugEnabled) log.debug("Cancelling jobId = '" + jobId + "' in nodes: " + list);
+		List<ChannelBundlePair> list = getJobManager().getNodesForJob(jobUuid);
+		if (debugEnabled) log.debug("Cancelling jobId = '" + jobUuid + "' in nodes: " + list);
 		if (list == null) return;
 		for (ChannelBundlePair pair: list)
 		{
-			CancelJobTask task = new CancelJobTask(jobId, pair.first(), requeue);
+			CancelJobTask task = new CancelJobTask(jobUuid, pair.first(), requeue);
 			new Thread(task).start();
 		}
 	}

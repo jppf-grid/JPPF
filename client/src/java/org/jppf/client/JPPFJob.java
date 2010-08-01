@@ -37,7 +37,7 @@ import org.jppf.utils.JPPFUuid;
  * If left unspecified, JPPF will automatically assign a uuid as its value.
  * @author Laurent Cohen
  */
-public class JPPFJob implements Serializable
+public class JPPFJob implements Serializable, JPPFDistributedJob
 {
 	/**
 	 * Explicit serialVersionUID.
@@ -67,7 +67,7 @@ public class JPPFJob implements Serializable
 	/**
 	 * The universal unique id for this job.
 	 */
-	private String uuid = null;
+	private String jobUuid = null;
 	/**
 	 * The list of tasks to execute.
 	 */
@@ -91,8 +91,8 @@ public class JPPFJob implements Serializable
 	 */
 	public JPPFJob()
 	{
-		uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
-		id = uuid;
+		jobUuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
+		id = jobUuid;
 	}
 
 	/**
@@ -175,17 +175,15 @@ public class JPPFJob implements Serializable
 	}
 
 	/**
-	 * Get the universal unique id for this job.
-	 * @return the uuid as a string.
+	 * {@inheritDoc}
 	 */
-	public String getUuid()
+	public String getJobUuid()
 	{
-		return uuid;
+		return jobUuid;
 	}
 
 	/**
-	 * Get the user-defined display name for this job. This is th name displayed in the administration console.
-	 * @return the id as a string. 
+	 * {@inheritDoc}
 	 */
 	public String getId()
 	{
@@ -346,8 +344,7 @@ public class JPPFJob implements Serializable
 	}
 
 	/**
-	 * Get the service level agreement between the job and the server.
-	 * @return an instance of <code>JPPFJobSLA</code>.
+	 * {@inheritDoc}
 	 */
 	public JPPFJobSLA getJobSLA()
 	{
@@ -364,8 +361,7 @@ public class JPPFJob implements Serializable
 	}
 
 	/**
-	 * Get the user-defined metadata asoociated with this job.
-	 * @return a {@link JPPFJobMetadata} instance.
+	 * {@inheritDoc}
 	 */
 	public JPPFJobMetadata getJobMetadata()
 	{
@@ -381,7 +377,7 @@ public class JPPFJob implements Serializable
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+		result = prime * result + ((jobUuid == null) ? 0 : jobUuid.hashCode());
 		return result;
 	}
 
@@ -397,10 +393,10 @@ public class JPPFJob implements Serializable
 		if (obj == null) return false;
 		if (!(obj instanceof JPPFJob)) return false;
 		JPPFJob other = (JPPFJob) obj;
-		if (uuid == null)
+		if (jobUuid == null)
 		{
-			if (other.uuid != null) return false;
+			if (other.jobUuid != null) return false;
 		}
-		return uuid.equals(other.uuid);
+		return jobUuid.equals(other.jobUuid);
 	}
 }
