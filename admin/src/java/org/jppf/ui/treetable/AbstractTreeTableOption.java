@@ -148,4 +148,22 @@ public abstract class AbstractTreeTableOption extends AbstractOption
 		}
 		pref.put(key, sb.toString());
 	}
+
+	/**
+	 * Get the root of the tree model.
+	 * @return a {@link DefaultMutableTreeNode} instance.
+	 */
+	public DefaultMutableTreeNode getTreeTableRoot()
+	{
+		return treeTableRoot;
+	}
+
+	/**
+	 * get the tree table model associated with the tree table.
+	 * @return an {@link AbstractJPPFTreeTableModel} instance.
+	 */
+	public AbstractJPPFTreeTableModel getModel()
+	{
+		return model;
+	}
 }

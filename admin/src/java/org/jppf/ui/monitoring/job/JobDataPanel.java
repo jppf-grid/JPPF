@@ -55,9 +55,9 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	 */
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
 	/**
-	 * Mapping of connection names to status listener.
+	 * The object that manages updates to and navigation within the tree table.
 	 */
-	private Map<String, ConnectionStatusListener> listenerMap = new Hashtable<String, ConnectionStatusListener>();
+	private JobDataPanelManager panelManager = null;
 
 	/**
 	 * Initialize this panel with the specified information.
@@ -68,6 +68,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		BASE = "org.jppf.ui.i18n.JobDataPage";
 		createTreeTableModel();
 		createUI();
+		panelManager = new JobDataPanelManager(this);
 	  populateTreeTableModel();
 	  StatsHandler.getInstance().getJppfClient(null).addClientListener(this);
 		treeTable.expandAll();
@@ -88,26 +89,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	 */
 	public synchronized void refresh()
 	{
-		Runnable r = new SynchronizedTask(this)
-		{
-			public void perform()
-			{
-				int n = treeTableRoot.getChildCount();
-				for (int i=n-1; i>=0; i--)
-				{
-					DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
-					try
-					{
-						((JobData) driverNode.getUserObject()).changeNotificationListener(null);
-					}
-					catch(Exception e) { if (debugEnabled) log.debug("while refreshing: " + e.getMessage(), e); }
-					model.removeNodeFromParent(driverNode);
-				}
-				populateTreeTableModel();
-				refreshUI();
-			}
-		};
-		executor.submit(r);
+		executor.submit(new RefreshTask());
 	}
 
 	/**
@@ -118,19 +100,15 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		List<JPPFClientConnection> list = StatsHandler.getInstance().getJppfClient(null).getAllConnections();
 		for (JPPFClientConnection c: list)
 		{
+			panelManager.driverAdded(c);
 			JPPFClientConnectionImpl connection = (JPPFClientConnectionImpl) c;
-			JobData data = new JobData(connection);
-			DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(data);
-			model.insertNodeInto(driverNode, treeTableRoot, treeTableRoot.getChildCount());
 			JMXDriverConnectionWrapper wrapper = connection.getJmxConnection();
 			if (wrapper == null) continue;
-			if (listenerMap.get(wrapper.getId()) == null)
-			{
-				ConnectionStatusListener listener = new ConnectionStatusListener(wrapper.getId());
-				connection.addClientConnectionStatusListener(listener);
-				listenerMap.put(wrapper.getId(), listener);
-			}
-			DriverJobManagementMBean proxy = data.getProxy();
+			String driverName = wrapper.getId();
+			DefaultMutableTreeNode driverNode = panelManager.findDriver(driverName);
+			if (driverNode == null) continue;
+			JobData driverData = (JobData) driverNode.getUserObject();
+			DriverJobManagementMBean proxy = driverData.getProxy();
 			if (proxy == null) continue;
 			String[] jobIds = null;
 			try
@@ -152,39 +130,21 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 				catch(Exception e)
 				{
 					if (debugEnabled) log.debug("populating model: " + e.getMessage(), e);
+				}
+				if (jobInfo == null) continue;
+				panelManager.jobAdded(driverName, jobInfo);
+				DefaultMutableTreeNode jobNode = panelManager.findJob(driverNode, jobInfo);
+				NodeJobInformation[] subJobInfo = null;
+				try
+				{
+					subJobInfo = proxy.getNodeInformation(id);
+				}
+				catch(Exception e)
+				{
+					if (debugEnabled) log.debug("populating model: " + e.getMessage(), e);
 					continue;
 				}
-				if (jobInfo != null)
-				{
-					JobData jobData = new JobData(jobInfo);
-					jobData.setJmxWrapper(data.getJmxWrapper());
-					DefaultMutableTreeNode jobNode = new DefaultMutableTreeNode(jobData);
-					model.insertNodeInto(jobNode, driverNode, driverNode.getChildCount());
-					NodeJobInformation[] subJobInfo = null;
-					try
-					{
-						subJobInfo = proxy.getNodeInformation(id);
-					}
-					catch(Exception e)
-					{
-						if (debugEnabled) log.debug("populating model: " + e.getMessage(), e);
-						continue;
-					}
-					for (NodeJobInformation nji: subJobInfo)
-					{
-						JobData subJobData = new JobData(nji.jobInfo, nji.nodeInfo);
-						DefaultMutableTreeNode subJobNode = new DefaultMutableTreeNode(subJobData);
-						model.insertNodeInto(subJobNode, jobNode, jobNode.getChildCount());
-					}
-				}
-			}
-			try
-			{
-				data.changeNotificationListener(new JobNotificationListener(this, wrapper.getId()));
-			}
-			catch(Exception e)
-			{
-				if (debugEnabled) log.debug("populating model: " + e.getMessage(), e);
+				for (NodeJobInformation nji: subJobInfo) panelManager.subJobAdded(driverName, nji.jobInfo, nji.nodeInfo);
 			}
 		}
 	}
@@ -218,21 +178,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		{
 			public void perform()
 			{
-				JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
-				if (findDriver(wrapper.getId()) != null) return;
-				JobData data = new JobData(clientConnection);
-				if (listenerMap.get(wrapper.getId()) == null)
-				{
-					ConnectionStatusListener listener = new ConnectionStatusListener(wrapper.getId());
-					clientConnection.addClientConnectionStatusListener(listener);
-					listenerMap.put(wrapper.getId(), listener);
-				}
-				DriverJobManagementMBean proxy = data.getProxy();
-				if (proxy != null) proxy.addNotificationListener(new JobNotificationListener(JobDataPanel.this, wrapper.getId()), null, null);
-				DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(data);
-				if (debugEnabled) log.debug("adding driver: " + wrapper.getId());
-				model.insertNodeInto(driverNode, treeTableRoot, treeTableRoot.getChildCount());
-				treeTable.expand(driverNode);
+				panelManager.driverAdded(clientConnection);
 			}
 		};
 		executor.submit(r);
@@ -248,19 +194,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		{
 			public void perform()
 			{
-				DefaultMutableTreeNode driverNode = findDriver(driverName);
-				if (debugEnabled) log.debug("removing driver: " + driverName);
-				if (driverNode == null) return;
-				try
-				{
-					JobData data = (JobData) driverNode.getUserObject();
-					data.changeNotificationListener(null);
-				}
-				catch(Exception e)
-				{
-					log.error(e.getMessage(), e);
-				}
-				model.removeNodeFromParent(driverNode);
+				panelManager.driverRemoved(driverName);
 			}
 		};
 		executor.submit(r);
@@ -277,15 +211,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		{
 			public void perform()
 			{
-				DefaultMutableTreeNode driverNode = findDriver(driverName);
-				if (driverNode == null) return;
-				JobData data = new JobData(jobInfo);
-				JobData driverData = (JobData) driverNode.getUserObject();
-				data.setJmxWrapper(driverData.getJmxWrapper());
-				DefaultMutableTreeNode jobNode = new DefaultMutableTreeNode(data);
-				if (debugEnabled) log.debug("adding job: " + jobInfo.getJobId() + " to driver " + driverName);
-				model.insertNodeInto(jobNode, driverNode, driverNode.getChildCount());
-				treeTable.expand(driverNode);
+				panelManager.jobAdded(driverName, jobInfo);
 			}
 		};
 		executor.submit(r);
@@ -302,13 +228,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		{
 			public void perform()
 			{
-				DefaultMutableTreeNode driverNode = findDriver(driverName);
-				if (driverNode == null) return;
-				DefaultMutableTreeNode jobNode = findJob(driverNode, jobInfo);
-				if (jobNode == null) return;
-				if (debugEnabled) log.debug("removing job: " + jobInfo.getJobId() + " from driver " + driverName);
-				model.removeNodeFromParent(jobNode);
-				treeTable.repaint();
+				panelManager.jobRemoved(driverName, jobInfo);
 			}
 		};
 		executor.submit(r);
@@ -325,17 +245,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		{
 			public void perform()
 			{
-				DefaultMutableTreeNode driverNode = findDriver(driverName);
-				if (driverNode == null) return;
-				DefaultMutableTreeNode jobNode = findJob(driverNode, jobInfo);
-				if (jobNode == null) return;
-				if (debugEnabled) log.debug("updating job: " + jobInfo.getJobId() + " from driver " + driverName);
-				JobData data = new JobData(jobInfo);
-				JobData driverData = (JobData) driverNode.getUserObject();
-				data.setJmxWrapper(driverData.getJmxWrapper());
-				jobNode.setUserObject(data);
-				model.changeNode(jobNode);
-				//treeTable.invalidate();
+				panelManager.jobUpdated(driverName, jobInfo);
 			}
 		};
 		executor.submit(r);
@@ -353,15 +263,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		{
 			public void perform()
 			{
-				DefaultMutableTreeNode driverNode = findDriver(driverName);
-				if (driverNode == null) return;
-				DefaultMutableTreeNode jobNode = findJob(driverNode, jobInfo);
-				if (jobNode == null) return;
-				JobData data = new JobData(jobInfo, nodeInfo);
-				DefaultMutableTreeNode subJobNode = new DefaultMutableTreeNode(data);
-				if (debugEnabled) log.debug("sub-job: " + jobInfo.getJobId() + " dispatched to node " + nodeInfo.getHost() + ":" + nodeInfo.getPort());
-				model.insertNodeInto(subJobNode, jobNode, jobNode.getChildCount());
-				treeTable.expand(jobNode);
+				panelManager.subJobAdded(driverName, jobInfo, nodeInfo);
 			}
 		};
 		executor.submit(r);
@@ -379,71 +281,10 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		{
 			public void perform()
 			{
-				DefaultMutableTreeNode driverNode = findDriver(driverName);
-				if (driverNode == null) return;
-				DefaultMutableTreeNode jobNode = findJob(driverNode, jobInfo);
-				if (jobNode == null) return;
-				DefaultMutableTreeNode subJobNode = findSubJob(jobNode, nodeInfo);
-				if (subJobNode == null) return;
-				if (debugEnabled) log.debug("removing sub-job: " + jobInfo.getJobId() + " from node " + nodeInfo.getHost() + ":" + nodeInfo.getPort());
-				model.removeNodeFromParent(subJobNode);
-				treeTable.repaint();
+				panelManager.subJobRemoved(driverName, jobInfo, nodeInfo);
 			}
 		};
 		executor.submit(r);
-	}
-
-	/**
-	 * Find the driver tree node with the specified driver name.
-	 * @param driverName name of the dirver to find.
-	 * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
-	 */
-	private DefaultMutableTreeNode findDriver(String driverName)
-	{
-		for (int i=0; i<treeTableRoot.getChildCount(); i++)
-		{
-			DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
-			JobData data = (JobData) driverNode.getUserObject();
-			JMXDriverConnectionWrapper wrapper = data.getJmxWrapper();
-			if (wrapper.getId().equals(driverName)) return driverNode;
-		}
-		return null;
-	}
-
-	/**
-	 * Find the job with the specified id that was submitted to the specified driver.
-	 * @param driverNode the driver where the job was submitted.
-	 * @param jobInfo information about the job to find.
-	 * @return a <code>DefaultMutableTreeNode</code> or null if the job could not be found.
-	 */
-	private DefaultMutableTreeNode findJob(DefaultMutableTreeNode driverNode, JobInformation jobInfo)
-	{
-		for (int i=0; i<driverNode.getChildCount(); i++)
-		{
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
-			JobData data = (JobData) node.getUserObject();
-			if (data.getJobInformation().getJobId().equals(jobInfo.getJobId())) return node;
-		}
-		return null;
-	}
-
-	/**
-	 * Find the sub-job with the specified id that was dispatched to the specified JPPF node.
-	 * @param jobNode the job whose sub-job we are looking for.
-	 * @param nodeInfo holds information on the node to which the sub-job was dispatched.
-	 * @return a <code>DefaultMutableTreeNode</code> or null if the sub-job could not be found.
-	 */
-	private DefaultMutableTreeNode findSubJob(DefaultMutableTreeNode jobNode, JPPFManagementInfo nodeInfo)
-	{
-		if (nodeInfo == null) return null;
-		for (int i=0; i<jobNode.getChildCount(); i++)
-		{
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) jobNode.getChildAt(i);
-			JobData data = (JobData) node.getUserObject();
-			if ((data == null) || (data.getNodeInformation() == null)) return null;
-			if (data.getNodeInformation().getId().equals(nodeInfo.getId())) return node;
-		}
-		return null;
 	}
 
 	/**
@@ -490,33 +331,39 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	}
 
 	/**
-	 * Listens to JPPF client connection status changes for rendering purposes.
+	 * This task refreshes the entire job data panel.
 	 */
-	public class ConnectionStatusListener implements ClientConnectionStatusListener
+	public class RefreshTask extends SynchronizedTask
 	{
 		/**
-		 * The name of the connection.
+		 * Initialize this task.
 		 */
-		String driverName = null;
-
-		/**
-		 * Initialize this listener with the specified connection name.
-		 * @param driverName the name of the connection.
-		 */
-		public ConnectionStatusListener(String driverName)
+		public RefreshTask()
 		{
-			this.driverName = driverName;
+			super(JobDataPanel.this);
 		}
 
 		/**
-		 * Invoked when thew conneciton status has changed.
-		 * @param event the connection status event.
-		 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+		 * Perform the refresh.
 		 */
-		public void statusChanged(ClientConnectionStatusEvent event)
+		public void perform()
 		{
-			DefaultMutableTreeNode driverNode = findDriver(driverName);
-			if (driverNode != null) model.changeNode(driverNode);
+			int n = treeTableRoot.getChildCount();
+			for (int i=n-1; i>=0; i--)
+			{
+				DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
+				try
+				{
+					((JobData) driverNode.getUserObject()).changeNotificationListener(null);
+				}
+				catch(Exception e)
+				{
+					if (debugEnabled) log.debug("while refreshing: " + e.getMessage(), e);
+				}
+				model.removeNodeFromParent(driverNode);
+			}
+			populateTreeTableModel();
+			refreshUI();
 		}
 	}
 }

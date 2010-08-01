@@ -19,6 +19,7 @@ package org.jppf.ui.monitoring.job;
 
 import javax.management.*;
 
+import org.apache.commons.logging.*;
 import org.jppf.job.JobNotification;
 
 /**
@@ -26,6 +27,14 @@ import org.jppf.job.JobNotification;
  */
 public class JobNotificationListener implements NotificationListener
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(JobNotificationListener.class);
+	/**
+	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
 	 * String identifying the driver that sends the notifications.
 	 */
@@ -56,6 +65,7 @@ public class JobNotificationListener implements NotificationListener
 	{
 		if (!(notification instanceof JobNotification)) return;
 		JobNotification notif = (JobNotification) notification;
+		if (traceEnabled) log.trace("received notIfication: " + notif);
 		switch(notif.getEventType())
 		{
 			case JOB_QUEUED:
