@@ -23,7 +23,7 @@ import java.util.List;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.task.storage.*;
 import org.jppf.utils.StringUtils;
 
@@ -327,7 +327,7 @@ public class TestTaskRunner
 	{
 		DataProvider dataProvider = new MemoryMapDataProvider();
 		dataProvider.setValue("DATA", new SimpleData("Data and more data"));			
-		JPPFJob job = new JPPFJob(dataProvider);
+		JPPFDistributedJob job = new JPPFJob(dataProvider);
 		singleTest("my task", dataProvider, new MyTask());
 	}
 	

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package test.manynodes;
+package sample.dist.manyjobs;
 
 import java.io.File;
 
@@ -87,13 +87,11 @@ public class ManyNodes
 			}
 		};
 		Runtime.getRuntime().addShutdownHook(shutdownHook);
-		int nbNodes = 250;
+		int nbNodes = 8;
 		nodes = new NodeProcessLauncher[nbNodes];
 
-		/*
 		driver = new DriverProcessLauncher();
 		driver.startProcess();
-		*/
 		for (int i=0; i<nbNodes; i++)
 		{
 			createNodeConfigFile(i+1);
@@ -101,7 +99,6 @@ public class ManyNodes
 			nodes[i] = new NodeProcessLauncher(i+1);
 		}
 		for (int i=0; i<nbNodes; i++) nodes[i].startProcess();
-		//client = new JPPFClient();
 	}
 
 	/**
@@ -112,7 +109,6 @@ public class ManyNodes
 	{
 		stopProcesses();
 		Runtime.getRuntime().removeShutdownHook(shutdownHook);
-		if (client != null) client.close();
 	}
 
 	/**
@@ -136,7 +132,7 @@ public class ManyNodes
 		if (file.exists()) return;
 		StringBuilder sb = new StringBuilder();
 		sb.append("jppf.server.host = 192.168.1.11\n");
-		sb.append("jppf.jvm.options = -server -Xmx32m\n");
+		sb.append("jppf.jvm.options = -server -Xmx512m\n");
 		sb.append("processing.threads = 1\n");
 		sb.append("reconnect.max.time = 5\n");
 		sb.append("id = ").append(n).append("\n");

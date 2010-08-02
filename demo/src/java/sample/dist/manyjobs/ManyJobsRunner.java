@@ -23,7 +23,6 @@ import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.*;
 
 import sample.dist.tasklength.LongTask;
 
@@ -50,15 +49,14 @@ public class ManyJobsRunner
 	{
 		try
 		{
+			//ManyNodes.setup();
 			jppfClient = new JPPFClient();
-			Thread.sleep(5000);
-			TypedProperties props = JPPFConfiguration.getProperties();
-			int length = 1000;
-			int nbTask = 100;
-			int nbJobs = 15;
-			print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+nbJobs+" iterations");
+			Thread.sleep(1000);
+			int length = 1;
+			int nbTask = 1;
+			int nbJobs = 2000;
+			print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+nbJobs+" jobs");
 			perform(nbTask, length, nbJobs);
-			//performLong(size, iterations);
 		}
 		catch(Exception e)
 		{
@@ -66,6 +64,14 @@ public class ManyJobsRunner
 		}
 		finally
 		{
+			try
+			{
+				//ManyNodes.cleanup();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 			if (jppfClient != null) jppfClient.close();
 		}
 	}
@@ -89,18 +95,12 @@ public class ManyJobsRunner
 				jobs[n] = new JPPFJob();
 				jobs[n].setId("JPPF Job " + (n+1));
 				jobs[n].setBlocking(false);
-				//job.getJobSLA().setMaxNodes(1);
 				for (int i=0; i<nbTask; i++)
 				{
 					LongTask task = new LongTask(length, false);
 					task.setId("" + (n+1) + ":" + (i+1));
 					jobs[n].addTask(task);
 				}
-				/*
-				JPPFSchedule schedule = new JPPFSchedule(5000L);
-				job.getJobSLA().setJobSchedule(schedule);
-				job.getJobSLA().setSuspended(true);
-				*/
 				// submit the tasks for execution
 				JPPFResultCollector collector = new JPPFResultCollector(nbTask);
 				jobs[n].setResultListener(collector);

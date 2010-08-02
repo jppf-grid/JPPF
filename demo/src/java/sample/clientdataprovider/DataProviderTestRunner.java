@@ -38,19 +38,36 @@ public class DataProviderTestRunner
 		JPPFClient jppfClient = new JPPFClient();
 		try
 		{
-			for (int i=1; i<=100; i++)
+			Thread.sleep(5000L);
+			int nbJobs = 10;
+			int nbTasks = 1;
+			JPPFJob[] jobs = new JPPFJob[nbJobs];
+			for (int i=0; i<nbJobs; i++)
 			{
-				JPPFJob job = new JPPFJob();
-				for (int j=1; j<=2; j++) job.addTask(new DataProviderTestTask(i, j));
-				job.setDataProvider(new ClientDataProvider());
-				List<JPPFTask> results = jppfClient.submit(job);
+				jobs[i] = new JPPFJob();
+				for (int j=1; j<=nbTasks; j++) jobs[i].addTask(new DataProviderTestTask(i+1, j));
+				jobs[i].setDataProvider(new ClientDataProvider());
+				jobs[i].setId("job " + (i+1));
+				jobs[i].setBlocking(false);
+				jobs[i].setResultListener(new JPPFResultCollector(nbTasks));
+				//jobs[i].getJobSLA().setMaxNodes(1);
+			}
+			for (int i=0; i<nbJobs; i++)
+			{
+				jppfClient.submit(jobs[i]);
+			}
+			for (int i=0; i<nbJobs; i++)
+			{
+				JPPFResultCollector collector = (JPPFResultCollector) jobs[i].getResultListener();
+				List<JPPFTask> results = collector.waitForResults();
 				for (JPPFTask task: results)
 				{
 					DataProviderTestTask t = (DataProviderTestTask) task;
 					if (t.getException() != null) throw t.getException();
-					else System.out.println("iteration #" + t.i +" task #" + t.j + " : result: " + t.getResult());
+					else System.out.println("job #" + t.i +" task #" + t.j + " : result: " + t.getResult());
 				}
 			}
+			Thread.sleep(10000L);
 		}
 		catch(Exception e)
 		{
