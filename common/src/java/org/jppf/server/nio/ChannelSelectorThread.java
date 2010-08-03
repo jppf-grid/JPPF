@@ -34,7 +34,7 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The channel selector associated with this thread.
 	 */

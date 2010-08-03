@@ -37,11 +37,11 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(ServerShutdownRestartAction.class);
+	private static Log log = LogFactory.getLog(ServerShutdownRestartAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Determines whether the "OK" button was pressed.
 	 */
@@ -112,7 +112,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 		{
 			panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/DriverShutdownRestartPanel.xml");
 			OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(panel);
-			OptionsHandler.loadPreferences(optionNode, OptionsHandler.PREFERENCES);
+			OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
 			JButton okBtn = (JButton) panel.findFirstWithName("driverShutdownRestartOK").getUIComponent();
 			JButton cancelBtn = (JButton) panel.findFirstWithName("serverShutdownRestartCancel").getUIComponent();
 			final JFrame frame = new JFrame("Enter the number of threads and their priority");
@@ -178,7 +178,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 					}
 				}
 				OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(panel);
-				OptionsHandler.savePreferences(optionNode, OptionsHandler.PREFERENCES);
+				OptionsHandler.savePreferences(optionNode, OptionsHandler.getPreferences());
 			}
 		};
 		new Thread(r).start();

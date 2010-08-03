@@ -40,7 +40,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(NodeConfigurationAction.class);
+	private static Log log = LogFactory.getLog(NodeConfigurationAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

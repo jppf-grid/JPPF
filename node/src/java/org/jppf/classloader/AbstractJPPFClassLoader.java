@@ -44,15 +44,11 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	/**
 	 * Used to synchronize access to the underlying socket from multiple threads.
 	 */
-	protected static ReentrantLock lock = new ReentrantLock();
+	protected static final ReentrantLock LOCK = new ReentrantLock();
 	/**
 	 * Determines whether this class loader should handle dynamic class updating.
 	 */
-	protected static AtomicBoolean initializing = new AtomicBoolean(false);
-	/**
-	 * Determines whether this class loader is currently loading resources from the network.
-	 */
-	protected static AtomicBoolean loading = new AtomicBoolean(false);
+	protected static final AtomicBoolean INITIALIZING = new AtomicBoolean(false);
 	/**
 	 * Determines whether this class loader should handle dynamic class updating.
 	 */
@@ -137,7 +133,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	{
 		try
 		{
-			lock.lock();
+			LOCK.lock();
 			int i = name.lastIndexOf('.');
 			if (i >= 0)
 			{
@@ -166,7 +162,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		}
 		finally
 		{
-			lock.unlock();
+			LOCK.unlock();
 		}
 	}
 
@@ -238,7 +234,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	{
 		try
 		{
-			lock.lock();
+			LOCK.lock();
 			if (debugEnabled) log.debug("requesting remote computation, requestUuid = " + requestUuid);
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("callable", callable);
@@ -248,7 +244,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		}
 		finally
 		{
-			lock.unlock();
+			LOCK.unlock();
 		}
 	}
 
@@ -313,7 +309,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 			if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
 			try
 			{
-				lock.lock();
+				LOCK.lock();
 				Map<String, Object> map = new HashMap<String, Object>();
 				map.put("name", name);
 				JPPFResourceWrapper resource = loadResourceData(map, true);
@@ -330,7 +326,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 			}
 			finally
 			{
-				lock.unlock();
+				LOCK.unlock();
 			}
 		}
 		return is;
@@ -342,7 +338,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	 */
 	static boolean isInitializing()
 	{
-		return initializing.get();
+		return INITIALIZING.get();
 	}
 
 	/**
@@ -351,7 +347,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	 */
 	static void setInitializing(boolean initFlag)
 	{
-		initializing.set(initFlag);
+		INITIALIZING.set(initFlag);
 	}
 
 	/**
@@ -382,7 +378,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
 		try
 		{
-			lock.lock();
+			LOCK.lock();
 			List<String> locationsList = cache.getResourcesLocations(name);
 			if (locationsList == null)
 			{
@@ -420,7 +416,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		}
 		finally
 		{
-			lock.unlock();
+			LOCK.unlock();
 		}
 		return urlList == null ? null : new IteratorEnumeration<URL>(urlList.iterator());
 	}

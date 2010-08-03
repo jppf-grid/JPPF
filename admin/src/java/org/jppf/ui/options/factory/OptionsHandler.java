@@ -37,7 +37,7 @@ public final class OptionsHandler
 	/**
 	 * The root of the preferences subtree in which the chart configurations are saved.
 	 */
-	public static Preferences PREFERENCES = Preferences.userRoot().node("jppf");
+	private static final Preferences PREFERENCES = Preferences.userRoot().node("jppf");
 	/**
 	 * The list of option pages managed by this handler.
 	 */
@@ -169,9 +169,9 @@ public final class OptionsHandler
 			for (OptionElement elt: pageList)
 			{
 				OptionNode node = buildPersistenceGraph(elt);
-				savePreferences(node, PREFERENCES);
+				savePreferences(node, getPreferences());
 			}
-			PREFERENCES.flush();
+			getPreferences().flush();
 		}
 		catch(Exception e)
 		{
@@ -206,7 +206,7 @@ public final class OptionsHandler
 		for (OptionElement elt: pageList)
 		{
 			OptionNode node = buildPersistenceGraph(elt);
-			loadPreferences(node, PREFERENCES);
+			loadPreferences(node, getPreferences());
 		}
 	}
 
@@ -266,6 +266,15 @@ public final class OptionsHandler
 			if (((AbstractOption) elt).isPersistent()) node = new OptionNode(elt);
 		}
 		return node;
+	}
+
+	/**
+	 * Get the root of the preferences subtree in which the chart configurations are saved.
+	 * @return a {@link Preferences} instance.
+	 */
+	public static Preferences getPreferences()
+	{
+		return PREFERENCES;
 	}
 
 	/**

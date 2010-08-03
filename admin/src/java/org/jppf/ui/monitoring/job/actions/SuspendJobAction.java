@@ -27,11 +27,11 @@ public class SuspendJobAction extends AbstractSuspendJobAction
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(SuspendJobAction.class);
+	private static Log log = LogFactory.getLog(SuspendJobAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 
 	/**
 	 * Initialize this action.

@@ -93,7 +93,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		{
 			try
 			{
-				lock.lock();
+				LOCK.lock();
 				if (debugEnabled) log.debug("initializing connection");
 				setInitializing(true);
 				System.out.println("JPPFClassLoader.init(): attempting connection to the class server");
@@ -130,7 +130,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 			}
 			finally
 			{
-				lock.unlock();
+				LOCK.unlock();
 				setInitializing(false);
 			}
 		}
@@ -140,11 +140,11 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 			// wait until initialization is over.
 			try
 			{
-				lock.lock();
+				LOCK.lock();
 			}
 			finally
 			{
-				lock.unlock();
+				LOCK.unlock();
 			}
 		}
 	}
@@ -155,7 +155,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	 */
 	public void close()
 	{
-		lock.lock();
+		LOCK.lock();
 		try
 		{
 			if (socketInitializer != null) socketInitializer.close();
@@ -174,7 +174,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		}
 		finally
 		{
-			lock.unlock();
+			LOCK.unlock();
 		}
 	}
 
@@ -187,36 +187,28 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	 */
 	protected JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception
 	{
-		try
-		{
-			loading.set(true);
-			JPPFResourceWrapper resource = new JPPFResourceWrapper();
-			resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
-			resource.setDynamic(dynamic);
-			TraversalList<String> list = new TraversalList<String>(uuidPath);
-			resource.setUuidPath(list);
-			if (list.size() > 0) list.setPosition(uuidPath.size()-1);
-			for (Map.Entry<String, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());
-			resource.setAsResource(asResource);
-			resource.setRequestUuid(requestUuid);
-	
-			JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-			ObjectSerializer serializer = getSerializer();
-			JPPFBuffer buf = serializer.serialize(resource);
-			byte[] data = buf.getBuffer();
-			if (transform != null) data = JPPFDataTransformFactory.transform(transform, true, data);
-			socketClient.writeInt(data.length);
-			socketClient.write(data, 0, data.length);
-			socketClient.flush();
-			buf = socketClient.receiveBytes(0);
-			data = buf.getBuffer();
-			if (transform != null) data = JPPFDataTransformFactory.transform(transform, false, data);
-			resource = (JPPFResourceWrapper) serializer.deserialize(data);
-			return resource;
-		}
-		finally
-		{
-			loading.set(false);
-		}
+		JPPFResourceWrapper resource = new JPPFResourceWrapper();
+		resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
+		resource.setDynamic(dynamic);
+		TraversalList<String> list = new TraversalList<String>(uuidPath);
+		resource.setUuidPath(list);
+		if (list.size() > 0) list.setPosition(uuidPath.size()-1);
+		for (Map.Entry<String, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());
+		resource.setAsResource(asResource);
+		resource.setRequestUuid(requestUuid);
+
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		ObjectSerializer serializer = getSerializer();
+		JPPFBuffer buf = serializer.serialize(resource);
+		byte[] data = buf.getBuffer();
+		if (transform != null) data = JPPFDataTransformFactory.transform(transform, true, data);
+		socketClient.writeInt(data.length);
+		socketClient.write(data, 0, data.length);
+		socketClient.flush();
+		buf = socketClient.receiveBytes(0);
+		data = buf.getBuffer();
+		if (transform != null) data = JPPFDataTransformFactory.transform(transform, false, data);
+		resource = (JPPFResourceWrapper) serializer.deserialize(data);
+		return resource;
 	}
 }

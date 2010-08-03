@@ -36,11 +36,11 @@ public class UpdateMaxNodesAction extends AbstractJobAction
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(UpdateMaxNodesAction.class);
+	private static Log log = LogFactory.getLog(UpdateMaxNodesAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Determines whether the "OK" button was pressed.
 	 */

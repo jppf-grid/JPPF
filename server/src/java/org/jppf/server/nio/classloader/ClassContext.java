@@ -37,11 +37,11 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(ClassContext.class);
+	private static Log log = LogFactory.getLog(ClassContext.class);
 	/**
 	 * Determines whther DEBUG logging level is enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The resource read from or written to the associated channel.
 	 */

@@ -35,7 +35,7 @@ public class LocalClassContext extends ClassContext
 	/**
 	 * Determines whther DEBUG logging level is enabled.
 	 */
-	protected static boolean traceEnabled = log.isTraceEnabled();
+	private static boolean traceEnabled = log.isTraceEnabled();
 
 	/**
 	 * {@inheritDoc}

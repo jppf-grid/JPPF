@@ -38,11 +38,11 @@ public class NodeThreadsAction extends AbstractTopologyAction
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(NodeThreadsAction.class);
+	private static Log log = LogFactory.getLog(NodeThreadsAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Determines whether the "OK" button was pressed.
 	 */

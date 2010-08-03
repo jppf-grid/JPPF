@@ -34,11 +34,11 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(SimpleNioContext.class);
+	private static Log log = LogFactory.getLog(SimpleNioContext.class);
 	/**
 	 * Determines whther TRACE logging level is enabled.
 	 */
-	protected static boolean traceEnabled = log.isTraceEnabled();
+	private static boolean traceEnabled = log.isTraceEnabled();
 
 	/**
 	 * Read data from a channel.

@@ -33,11 +33,11 @@ public abstract class JPPFAbstractNodeAction extends AbstractAction
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(JPPFAbstractNodeAction.class);
+	private static Log log = LogFactory.getLog(JPPFAbstractNodeAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * JMX connections this action applies to.
 	 */

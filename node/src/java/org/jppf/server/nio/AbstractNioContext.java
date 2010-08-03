@@ -30,11 +30,11 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(AbstractNioContext.class);
+	private static Log log = LogFactory.getLog(AbstractNioContext.class);
 	/**
 	 * Determines whther DEBUG logging level is enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The current state of the channel this context is associated with.
 	 */

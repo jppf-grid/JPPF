@@ -18,6 +18,7 @@
 
 package org.jppf.server.nio.multiplexer;
 
+import org.apache.commons.logging.*;
 import org.jppf.server.nio.*;
 
 /**
@@ -26,6 +27,10 @@ import org.jppf.server.nio.*;
  */
 public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(MultiplexerContext.class);
 	/**
 	 * The request currently processed.
 	 */

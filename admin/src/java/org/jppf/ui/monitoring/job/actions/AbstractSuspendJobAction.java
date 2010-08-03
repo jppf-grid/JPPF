@@ -32,11 +32,11 @@ public abstract class AbstractSuspendJobAction extends AbstractJobAction
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(AbstractSuspendJobAction.class);
+	private static Log log = LogFactory.getLog(AbstractSuspendJobAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Determines if the suspended sub-job should be requeued on the driver side.
 	 */

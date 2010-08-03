@@ -32,11 +32,11 @@ public class RestartNodeAction extends AbstractTopologyAction
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(RestartNodeAction.class);
+	private static Log log = LogFactory.getLog(RestartNodeAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 
 	/**
 	 * Initialize this action.

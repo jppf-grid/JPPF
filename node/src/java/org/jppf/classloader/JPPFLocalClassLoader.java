@@ -71,7 +71,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	 */
 	protected void init()
 	{
-		lock.lock();
+		LOCK.lock();
 		try
 		{
 			//if (channel != null) return;
@@ -109,7 +109,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 		}
 		finally
 		{
-			lock.unlock();
+			LOCK.unlock();
 			setInitializing(false);
 		}
 	}

@@ -56,7 +56,7 @@ public class WindowClosingListener extends WindowAdapter
 		{
 			frame.setExtendedState(Frame.NORMAL);
 		}
-		Preferences pref = OptionsHandler.PREFERENCES.node("JPPFAdminTool");
+		Preferences pref = OptionsHandler.getPreferences().node("JPPFAdminTool");
 		Point p = frame.getLocation();
 		pref.putInt("locationx", p.x);
 		pref.putInt("locationy", p.y);
