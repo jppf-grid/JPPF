@@ -55,16 +55,13 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 		{
 			if (linkedKey != null)
 			{
-				if (linkedKey != null)
+				try
 				{
-					try
-					{
-						linkedKey.close();
-					}
-					catch(Exception e)
-					{
-						log.error(e.getMessage(), e);
-					}
+					linkedKey.close();
+				}
+				catch(Exception e)
+				{
+					log.error(e.getMessage(), e);
 				}
 			}
 			channel.close();
