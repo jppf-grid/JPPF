@@ -28,6 +28,10 @@ import java.util.*;
 public class TraversalList<E> implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The actual list that backs this traversal list.
 	 */
 	private List<E> list = new ArrayList<E>();

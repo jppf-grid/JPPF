@@ -28,6 +28,11 @@ import java.util.concurrent.Callable;
 public class CallableTask implements Callable<String>, Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Default constructor.
 	 */
 	public CallableTask()

@@ -28,6 +28,10 @@ import java.util.Arrays;
 public class LargeInt implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * 2's complement representation of zero.
 	 */
 	public static final byte[] ZERO = { 0 };

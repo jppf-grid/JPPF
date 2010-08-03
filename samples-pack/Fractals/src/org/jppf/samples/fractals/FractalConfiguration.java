@@ -31,6 +31,10 @@ import java.io.Serializable;
 public class FractalConfiguration implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Lyapunov: lower bound for &quot;a&quot;.<br>
 	 * Mandelbrot: lower bound for real part of &quot;c&quot;.
 	 */

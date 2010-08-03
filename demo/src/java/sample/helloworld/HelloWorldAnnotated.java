@@ -28,6 +28,10 @@ import org.jppf.server.protocol.JPPFRunnable;
 public class HelloWorldAnnotated implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Execute the task.
 	 * @param message a message to print.
 	 * @param number an example primitive argument.

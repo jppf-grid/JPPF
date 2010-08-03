@@ -45,7 +45,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	/**
 	 * Get the UI component for this option element.
 	 */
-	protected JComponent UIComponent = null;
+	protected transient JComponent UIComponent = null;
 	/**
 	 * Path to an eventual icon displayed in the button.
 	 */

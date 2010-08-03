@@ -30,6 +30,10 @@ import java.util.Date;
 public class JPPFSchedule implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Time in milliseconds, after which this task will be aborted.<br>
 	 * A value of 0 or less indicates this task never times out.
 	 */

@@ -40,6 +40,10 @@ import org.jppf.utils.JPPFUuid;
 public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAdapter, Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Logger for this class.
 	 */
 	private static Log log = LogFactory.getLog(JPPFJcaClient.class);

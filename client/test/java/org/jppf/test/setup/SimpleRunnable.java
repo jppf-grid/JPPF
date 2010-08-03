@@ -28,6 +28,10 @@ import org.jppf.client.concurrent.TestJPPFExecutorService;
 public class SimpleRunnable implements Runnable, Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The result of executing this task.
 	 */
 	private Result executionResult = null;

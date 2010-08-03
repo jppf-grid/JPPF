@@ -26,6 +26,10 @@ import java.io.Serializable;
 public class HelloWorldRunnable implements Runnable, Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The string resulting from the task execution.
 	 */
 	private String hello = null;

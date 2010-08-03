@@ -28,6 +28,10 @@ import java.io.Serializable;
 public class Pair<U, V> implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The first object of this pair.
 	 */
 	private U first = null;

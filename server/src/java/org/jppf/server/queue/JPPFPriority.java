@@ -28,6 +28,10 @@ import java.io.Serializable;
 public class JPPFPriority implements Comparable<JPPFPriority>, Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The actual value of the priority.
 	 */
 	private int value = 0;

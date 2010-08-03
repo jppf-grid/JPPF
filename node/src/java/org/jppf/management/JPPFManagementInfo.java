@@ -31,6 +31,10 @@ import org.jppf.utils.NetworkUtils;
 public class JPPFManagementInfo implements Serializable, Comparable<JPPFManagementInfo>
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * DRIVER information type.
 	 */
 	public static final int DRIVER = 0;

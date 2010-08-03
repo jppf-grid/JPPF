@@ -26,6 +26,10 @@ import java.io.Serializable;
 public class Result implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The result of executing this task.
 	 */
 	public String message = null;

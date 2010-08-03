@@ -30,6 +30,10 @@ import org.jppf.management.JPPFManagementInfo;
 public class NodeJobInformation implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The information about the node.
 	 */
 	public final JPPFManagementInfo nodeInfo;

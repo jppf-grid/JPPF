@@ -25,6 +25,10 @@ import java.io.Serializable;
 public class LinkMatch implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The url of the link matching the query.
 	 */
 	public String url = null;

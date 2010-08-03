@@ -27,6 +27,10 @@ import java.io.Serializable;
 public class TaskInformation implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The task id.
 	 */
 	private String id = null;

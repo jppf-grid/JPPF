@@ -27,9 +27,9 @@ import java.io.Serializable;
 public class SimpleData implements Serializable
 {
 	/**
-	 * serialVersionUID.
+	 * Explicit serialVersionUID.
 	 */
-	//private static final long serialVersionUID = 8745530253562020399L;
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Test field.

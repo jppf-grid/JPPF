@@ -34,6 +34,10 @@ import java.util.Random;
 public class JPPFUuid implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Set of characters used to compose a uuid, including more than alphanumeric characters.
 	 */
 	public static final String[] ALPHABET_SUPERSET =

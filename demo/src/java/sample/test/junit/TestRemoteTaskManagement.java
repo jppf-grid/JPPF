@@ -36,6 +36,10 @@ import org.jppf.server.protocol.JPPFTask;
 public class TestRemoteTaskManagement extends TestCase implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Cancel task command.
 	 */
 	private static final int CANCEL = 1;

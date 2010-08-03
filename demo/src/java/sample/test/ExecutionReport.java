@@ -25,6 +25,10 @@ import java.io.Serializable;
 public class ExecutionReport implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Name of the method executed.
 	 */
 	public String methodName = "";

@@ -40,6 +40,11 @@ import org.jppf.task.storage.*;
 public class TestRemoteImageProcessing extends TestCase implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Execute a single JPPF task and return the results.
 	 * @throws Exception if the execution failed.
 	 */

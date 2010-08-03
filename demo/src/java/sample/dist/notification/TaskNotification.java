@@ -28,6 +28,10 @@ import java.io.Serializable;
 public class TaskNotification implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The id of the task sending this notification.
 	 */
 	private int taskId = 0;

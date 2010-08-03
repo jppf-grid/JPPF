@@ -28,6 +28,10 @@ import org.jppf.utils.*;
 public class JPPFStats implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The total number of tasks executed.
 	 */
 	private int totalTasksExecuted = 0;

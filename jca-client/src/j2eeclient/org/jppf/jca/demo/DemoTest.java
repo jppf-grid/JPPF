@@ -18,7 +18,6 @@
 
 package org.jppf.jca.demo;
 
-import java.io.Serializable;
 import java.util.*;
 
 import javax.naming.InitialContext;
@@ -33,7 +32,7 @@ import org.jppf.server.protocol.JPPFTask;
  * Instances of this class encapsulate a simple call to the JPPF resource adapter.
  * @author Laurent Cohen
  */
-public class DemoTest implements Serializable
+public class DemoTest
 {
 	/**
 	 * JNDI name of the JPPFConnectionFactory.

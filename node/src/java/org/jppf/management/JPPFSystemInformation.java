@@ -38,6 +38,10 @@ import org.jppf.utils.*;
 public class JPPFSystemInformation implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Map holding the system properties.
 	 */
 	private TypedProperties system = null;

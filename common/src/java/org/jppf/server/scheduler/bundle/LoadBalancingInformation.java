@@ -30,6 +30,10 @@ import org.jppf.utils.TypedProperties;
 public class LoadBalancingInformation implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The name of the algorithm.
 	 */
 	public String algorithm = null;

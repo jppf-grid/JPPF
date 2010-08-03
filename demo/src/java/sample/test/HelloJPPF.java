@@ -32,6 +32,11 @@ import org.jppf.server.protocol.JPPFTask;
 public class HelloJPPF implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * JPPF Task used in the HelloJPPF code sample.
 	 */
 	public class InnerTask extends JPPFTestTask

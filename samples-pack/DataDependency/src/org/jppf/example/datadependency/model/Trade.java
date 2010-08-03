@@ -28,6 +28,10 @@ import java.util.*;
 public class Trade implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Trade identifier.
 	 */
 	private String id = "";

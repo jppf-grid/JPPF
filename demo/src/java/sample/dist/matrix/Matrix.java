@@ -27,6 +27,10 @@ import java.util.Random;
 public class Matrix implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The range of values for random values.
 	 */
 	private static final double RANDOM_RANGE = 1e6d;

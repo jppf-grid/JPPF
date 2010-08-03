@@ -420,6 +420,10 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	private static class RunnableWrapper<V> implements Callable<V>, Serializable
 	{
 		/**
+		 * Explicit serialVersionUID.
+		 */
+		private static final long serialVersionUID = 1L;
+		/**
 		 * The runnable to execute.
 		 */
 		private Runnable runnable = null;

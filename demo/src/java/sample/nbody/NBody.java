@@ -27,6 +27,10 @@ import java.io.Serializable;
 public class NBody implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The total acceleration the body is subjected to.
 	 */
 	public Vector2d acceleration = new Vector2d();

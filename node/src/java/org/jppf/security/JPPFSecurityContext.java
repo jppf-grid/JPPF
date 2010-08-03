@@ -32,6 +32,10 @@ import org.jppf.utils.JPPFUuid;
 public final class JPPFSecurityContext implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Uuid for the owner of these credentials.
 	 */
 	private String uuid = new JPPFUuid().toString();

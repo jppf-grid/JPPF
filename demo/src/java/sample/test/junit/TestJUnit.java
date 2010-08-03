@@ -32,6 +32,11 @@ import org.jppf.server.protocol.JPPFTask;
 public class TestJUnit extends TestCase implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * First test.
 	 * @throws Exception if the test fails.
 	 */

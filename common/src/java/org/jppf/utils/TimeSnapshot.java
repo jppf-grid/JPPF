@@ -25,6 +25,10 @@ import java.io.Serializable;
 public class TimeSnapshot implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Title for this snapshot, used in the {@link #toString()} method.
 	 */
 	public String title = "";

@@ -27,6 +27,10 @@ import java.io.Serializable;
 public class MarketData implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Market data identifier.
 	 */
 	private String id = "";

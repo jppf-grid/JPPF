@@ -29,6 +29,11 @@ import org.jppf.server.protocol.JPPFRunnable;
 public final class TestAnnotatedStaticTask implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Instantiation not permitted.
 	 */
 	private TestAnnotatedStaticTask()

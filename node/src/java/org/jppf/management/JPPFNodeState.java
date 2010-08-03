@@ -31,6 +31,10 @@ import org.jppf.node.event.NodeEventType;
 public class JPPFNodeState implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The latest event received from a task.
 	 */
 	private Serializable taskEvent = "";

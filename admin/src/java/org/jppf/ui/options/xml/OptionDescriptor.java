@@ -28,6 +28,10 @@ import org.jppf.utils.TypedProperties;
 public class OptionDescriptor extends TypedProperties
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Type of option component.
 	 * The possible values are:
 	 * <ul>
@@ -75,6 +79,10 @@ public class OptionDescriptor extends TypedProperties
 	public static class ListenerDescriptor implements Serializable
 	{
 		/**
+		 * Explicit serialVersionUID.
+		 */
+		private static final long serialVersionUID = 1L;
+		/**
 		 * Type of listener.
 		 * The possible values are:
 		 * <ul>
@@ -100,6 +108,10 @@ public class OptionDescriptor extends TypedProperties
 	public static class ScriptDescriptor implements Serializable
 	{
 		/**
+		 * Explicit serialVersionUID.
+		 */
+		private static final long serialVersionUID = 1L;
+		/**
 		 * The content of the script to execute if this listener is script-based.
 		 */
 		public String content = null;
@@ -118,6 +130,10 @@ public class OptionDescriptor extends TypedProperties
 	 */
 	public static class ItemDescriptor implements Serializable
 	{
+		/**
+		 * Explicit serialVersionUID.
+		 */
+		private static final long serialVersionUID = 1L;
 		/**
 		 * The name of this item.
 		 */

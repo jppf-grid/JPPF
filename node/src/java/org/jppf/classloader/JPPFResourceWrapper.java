@@ -30,6 +30,11 @@ import org.jppf.utils.TraversalList;
 public class JPPFResourceWrapper implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Enumeration of the possible states for this resource wrapper.
 	 */
 	public enum State

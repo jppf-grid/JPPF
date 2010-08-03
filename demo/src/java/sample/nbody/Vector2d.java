@@ -27,6 +27,10 @@ import java.io.Serializable;
 public class Vector2d implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * X coordinate.
 	 */
 	public double x = 0d;

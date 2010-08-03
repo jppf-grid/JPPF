@@ -29,6 +29,11 @@ import org.jppf.server.protocol.JPPFRunnable;
 public class TestAnnotatedTask implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The method to run.
 	 * @param intArg an int argument.
 	 * @param stringArg a string argument.

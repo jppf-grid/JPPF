@@ -29,6 +29,10 @@ import org.jppf.client.concurrent.TestJPPFExecutorService;
 public class SimpleCallable implements Callable<Result>, Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The position of this task.
 	 */
 	private int position = 0;

@@ -26,6 +26,10 @@ import java.io.Serializable;
 public class HelloWorldPojoStatic implements Serializable
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Execute the task.
 	 * @param message a message to print.
 	 * @param number an example primitive argument.
