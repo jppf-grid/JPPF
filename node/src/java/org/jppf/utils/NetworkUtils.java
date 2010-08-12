@@ -151,7 +151,35 @@ public final class NetworkUtils
 	}
 
 	/**
-	 * Get the management host specifieed in the configuration file.
+	 * Get a list of all known non-local IP v4 addresses for the current host.
+	 * @return a List of <code>Inet6Address</code> instances, may be empty but never null.
+	 */
+	public static List<Inet6Address> getNonLocalIPV6Addresses()
+	{
+		List<Inet6Address> addresses = getIPV6Addresses();
+		Iterator<Inet6Address> it = addresses.iterator();
+		while (it.hasNext())
+		{
+			Inet6Address ad = it.next();
+			if (ad.isLoopbackAddress() || "localhost".equals(ad.getHostName())) it.remove();
+		}
+		return addresses;
+	}
+
+	/**
+	 * Get a list of all known non-local IP v4  and v6 addresses for the current host.
+	 * @return a List of <code>InetAddress</code> instances, may be empty but never null.
+	 */
+	public static List<InetAddress> getNonLocalIPAddresses()
+	{
+		List<InetAddress> addresses = new ArrayList<InetAddress>();
+		addresses.addAll(getIPV4Addresses());
+		addresses.addAll(getIPV6Addresses());
+		return addresses;
+	}
+
+	/**
+	 * Get the management host specified in the configuration file.
 	 * @return the host as a string.
 	 */
 	public static String getManagementHost()
