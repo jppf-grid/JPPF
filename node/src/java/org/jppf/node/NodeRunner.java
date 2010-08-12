@@ -82,6 +82,10 @@ public class NodeRunner
 	 * Determines whether the node is local to a driver's JVM or remote.
 	 */
 	private static boolean localNode = false;
+	/**
+	 * Used to synchronize start and stop methods when the node is run as a service.
+	 */
+	private static SimpleObjectLock serviceLock = new SimpleObjectLock();
 
 	/**
 	 * Run a node as a standalone application.
@@ -145,8 +149,29 @@ public class NodeRunner
 			e.printStackTrace();
 		}
 	}
+
 	
 	/**
+	 * Run a node as a standalone application.
+	 * @param args not used.
+	 */
+	public static void start(String...args)
+	{
+		main(args);
+		serviceLock.goToSleep();
+	}
+
+	/**
+	 * Run a node as a standalone application.
+	 * @param args not used.
+	 */
+	public static void stop(String...args)
+	{
+		serviceLock.wakeUp();
+		System.exit(0);
+	}
+
+		/**
 	 * Start the node.
 	 * @return the node that was started, as a <code>MonitoredNode</code> instance.
 	 * @throws Exception if the node failed to run or couldn't connect to the server.
