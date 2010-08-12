@@ -152,9 +152,9 @@
 	<target name="rebuild" depends="clean.all, init, compile, jar"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
-		depends="clean.all, rebuild, javadoc, init.deploy, jca, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer"/>
+		depends="clean.all, rebuild, javadoc, init.deploy, jca, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer, doc"/>
 	<target name="deploy.nojavadoc"
-		depends="clean.all, rebuild,          init.deploy, jca, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer"/>
+		depends="clean.all, rebuild,          init.deploy, jca, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer, doc"/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
@@ -235,9 +235,11 @@
  		<mkdir dir="${home}/samples-pack"/>
 		<copy todir="${home}/samples-pack">
 			<fileset dir="${samples-pack}">
-				<include name="**/*.java"/>
-				<include name="CustomLoadBalancer/**/*.properties"/>
 				<include name="**/*.html"/>
+				<exclude name="**/package.html"/>
+				<exclude name="**/Readme.html"/>
+				<include name="CustomLoadBalancer/**/*.properties"/>
+				<exclude name="**/classes/**/*.*"/>
 				<include name="shared/images/*.*"/>
 				<include name="DataDependency/images/*.gif"/>
 				<include name="NodeTray/images/*.gif"/>
@@ -725,7 +727,8 @@
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Common/src"/>
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Client/src"/>
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/src"/>
-			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
+			<!--<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>-->
+			<link href="http://download.oracle.com/javase/6/docs/api/"/>
 			<link href="http://java.sun.com/javaee/5/docs/api"/>
 			<link href="http://junit.sourceforge.net/javadoc"/>
 			<link href="http://xstream.codehaus.org/javadoc"/>
