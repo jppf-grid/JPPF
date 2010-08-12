@@ -29,11 +29,11 @@ public interface JPPFAdminMBean extends Serializable
 	/**
 	 * RMI registry namespace suffix for drivers. 
 	 */
-	String DRIVER_SUFFIX = "/driver";
+	String DRIVER_SUFFIX = "/jppf/driver";
 	/**
 	 * RMI registry namespace suffix for nodes. 
 	 */
-	String NODE_SUFFIX = "/node";
+	String NODE_SUFFIX = "/jppf/node";
 	/**
 	 * Name of the node's admin MBean.
 	 */

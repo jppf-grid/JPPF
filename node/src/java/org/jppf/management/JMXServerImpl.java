@@ -102,7 +102,7 @@ public class JMXServerImpl
 				try
 				{
 					InetAddress addr = InetAddress.getByName(host);
-			    url = new JMXServiceURL("service:jmx:rmi://" + host + ":" + rmiPort + "/jndi/rmi://localhost:" + port + "/jppf" + namespaceSuffix);
+			    url = new JMXServiceURL("service:jmx:rmi://" + host + ":" + rmiPort + "/jndi/rmi://localhost:" + port + namespaceSuffix);
 			    Map<String, Object> env = new HashMap<String, Object>();
 			    env.put("jmx.remote.default.class.loader", cl);
 			    env.put("jmx.remote.protocol.provider.class.loader", cl);
@@ -113,7 +113,11 @@ public class JMXServerImpl
 				catch(Exception e)
 				{
 					Throwable cause = e.getCause();
-					if (cause instanceof BindException) rmiPort++;
+					if (cause instanceof BindException)
+					{
+						if (rmiPort >= 65530) rmiPort = 1024;
+						rmiPort++;
+					}
 					else throw e;
 				}
 			}
@@ -179,7 +183,11 @@ public class JMXServerImpl
     	catch(Exception e)
     	{
     		Throwable cause = e.getCause();
-    		if (cause instanceof BindException) port++;
+				if (cause instanceof BindException)
+				{
+					if (port >= 65530) port = 1024;
+					port++;
+				}
     		else throw e;
     	}
     }

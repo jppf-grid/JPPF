@@ -104,7 +104,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 			String s = NetworkUtils.getHostName(host);
 			//idString = "[" + (host == null ? "_" : host) + ":" + port + "] ";
 			idString = (s == null ? "_" : s) + ":" + port;
-			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + "/jppf" + rmiSuffix);
+			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + rmiSuffix);
 		}
 		catch(Exception e)
 		{
