@@ -255,7 +255,7 @@
 		This is done by splitting an application into smaller parts that can be executed simultaneously on different machines.
 		<h3>How it works</h3>
 		<p>There are 2 aspects to this:
-		<p><i>Dividing an application into smaller parts that can be executed independantly and in parallel.</i>
+		<p><i>Dividing an application into smaller parts that can be executed independently and in parallel.</i>
 		<br>JPPF provides facilities that make this effort a lot easier, faster and much less painful than without them.
 		The result is a JPPF object called a "job", itself made of smaller independant parts called "tasks".
 		<p><i>Executing the application on the JPPF Grid.</i>
