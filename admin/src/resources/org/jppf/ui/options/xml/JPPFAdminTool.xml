@@ -43,7 +43,7 @@
 				<script language="groovy">StatsHandler.getInstance().setCurrentConnection(option.getValue())</script>
 			</listener>
 		</child>
-	
+
 		<child name="filler" type="page">
 			<property name="componentConstraints" value="growx, pushx"/>
 		</child>

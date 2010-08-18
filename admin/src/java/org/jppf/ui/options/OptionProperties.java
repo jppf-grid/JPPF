@@ -111,7 +111,7 @@ public interface OptionProperties extends Serializable
 	String getLayoutConstraints();
 	/**
 	 * Set the Mig layout constraints for the entire layout.
-	 * @param layoutConstraints - the constraints as a string.
+	 * @param layoutConstraints the constraints as a string.
 	 */
 	void setLayoutConstraints(String layoutConstraints);
 	/**
@@ -121,7 +121,7 @@ public interface OptionProperties extends Serializable
 	String getComponentConstraints();
 	/**
 	 * Set the Mig layout constraints for a component.
-	 * @param componentConstraints - the constraints as a string.
+	 * @param componentConstraints the constraints as a string.
 	 */
 	void setComponentConstraints(String componentConstraints);
 }
