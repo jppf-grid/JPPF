@@ -18,11 +18,10 @@
 
 package org.jppf.startup;
 
-import java.util.*;
-
-import javax.imageio.spi.ServiceRegistry;
+import java.util.Iterator;
 
 import org.apache.commons.logging.*;
+import org.jppf.utils.ServiceFinder;
 
 /**
  * Loader for the JPPF startup SPI implementations.
@@ -46,7 +45,7 @@ public class JPPFStartupLoader<S extends JPPFStartup>
 	 */
 	public void load(Class<S> clazz)
 	{
-		Iterator<S> it = ServiceRegistry.lookupProviders(clazz);
+		Iterator<S> it = ServiceFinder.lookupProviders(clazz);
 		while (it.hasNext())
 		{
 			try

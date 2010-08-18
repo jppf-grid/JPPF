@@ -60,6 +60,25 @@ public final class FileUtils
 	}
 
 	/**
+	 * Read the content of a specified reader into a string.
+	 * @param aReader the reader to read the vcontent from.
+	 * @return the content of the file as a string.
+	 * @throws IOException if the file can't be found or read.
+	 */
+	public static List<String> textFileAsLines(Reader aReader) throws IOException
+	{
+		List<String> lines = new ArrayList<String>();
+		BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader);
+		String s = "";
+		while (s != null)
+		{
+			s = reader.readLine();
+			if (s != null) lines.add(s);
+		}
+		return lines;
+	}
+
+	/**
 	 * Read the content of a specified file into a string.
 	 * @param filename the location of the file to read.
 	 * @return the content of the file as a string.
@@ -314,8 +333,8 @@ public final class FileUtils
 
 	/**
 	 * Convert a set of file names into a set of <code>File</code> objects.
-	 * @param dir - the directory in which the files are located
-	 * @param names - the name part of each file (not the full path)
+	 * @param dir the directory in which the files are located
+	 * @param names the name part of each file (not the full path)
 	 * @return an array of <code>File</code> objects.
 	 */
 	public static File[] toFiles(File dir, String...names)
@@ -328,7 +347,7 @@ public final class FileUtils
 
 	/**
 	 * Convert a set of file paths into a set of URLs.
-	 * @param files - the files whose path is to be converted to a URL.
+	 * @param files the files whose path is to be converted to a URL.
 	 * @return an array of <code>URL</code> objects.
 	 */
 	public static URL[] toURLs(File...files)
@@ -349,8 +368,8 @@ public final class FileUtils
 
 	/**
 	 * Write a byte array into an output stream.
-	 * @param data - the byte array to write.
-	 * @param os - the output stream to write to.
+	 * @param data the byte array to write.
+	 * @param os the output stream to write to.
 	 * @throws IOException if an I/O error occurs.
 	 */
 	public static void writeBytesToStream(byte[] data, OutputStream os) throws IOException
@@ -362,8 +381,8 @@ public final class FileUtils
 
 	/**
 	 * Write a byte array into an file.
-	 * @param data - the byte array to write.
-	 * @param path - the path to the file to write to.
+	 * @param data the byte array to write.
+	 * @param path the path to the file to write to.
 	 * @throws IOException if an I/O error occurs.
 	 */
 	public static void writeBytesToFile(byte[] data, String path) throws IOException
@@ -373,8 +392,8 @@ public final class FileUtils
 
 	/**
 	 * Write a byte array into an file.
-	 * @param data - the byte array to write.
-	 * @param path - the path to the file to write to.
+	 * @param data the byte array to write.
+	 * @param path the path to the file to write to.
 	 * @throws IOException if an I/O error occurs.
 	 */
 	public static void writeBytesToFile(byte[] data, File path) throws IOException
