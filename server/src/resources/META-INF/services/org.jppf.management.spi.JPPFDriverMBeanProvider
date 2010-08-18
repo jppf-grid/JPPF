@@ -1,2 +1,2 @@
-org.jppf.server.spi.JPPFDefaultDriverMBeanProvider
-org.jppf.server.job.management.DriverJobManagementMBeanProvider
+org.jppf.server.spi.JPPFDefaultDriverMBeanProvider               # Driver-level management
+org.jppf.server.job.management.DriverJobManagementMBeanProvider  # Job-level management
