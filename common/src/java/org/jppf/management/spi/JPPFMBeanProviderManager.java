@@ -20,10 +20,10 @@ package org.jppf.management.spi;
 
 import java.util.*;
 
-import javax.imageio.spi.ServiceRegistry;
 import javax.management.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.utils.ServiceFinder;
 
 /**
  * Instances of this class manage all management plugins defined through the Service Provider Interface.
@@ -77,7 +77,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
 		if (providerList == null)
 		{
 			providerList = new ArrayList<S>();
-			Iterator<S> it = ServiceRegistry.lookupProviders(providerClass);
+			Iterator<S> it = ServiceFinder.lookupProviders(providerClass);
 			while (it.hasNext()) providerList.add(it.next());
 		}
 		return providerList;

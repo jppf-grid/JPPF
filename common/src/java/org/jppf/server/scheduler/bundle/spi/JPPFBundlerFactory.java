@@ -20,8 +20,6 @@ package org.jppf.server.scheduler.bundle.spi;
 
 import java.util.*;
 
-import javax.imageio.spi.ServiceRegistry;
-
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.server.scheduler.bundle.*;
@@ -112,7 +110,7 @@ public class JPPFBundlerFactory
 	private void loadProviders() throws Exception
 	{
 		Map<String, JPPFBundlerProvider> map = new Hashtable<String, JPPFBundlerProvider>();
-		Iterator<JPPFBundlerProvider> it = ServiceRegistry.lookupProviders(JPPFBundlerProvider.class);
+		Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class);
 		while (it.hasNext())
 		{
 			JPPFBundlerProvider provider = it.next();
