@@ -555,6 +555,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 				jmxServer = new JMXServerImpl(JPPFAdminMBean.NODE_SUFFIX);
 				jmxServer.start(getClass().getClassLoader());
 				registerProviderMBeans();
+				System.out.println("JPPF Node management initialized");
 			}
 		}
 		return jmxServer;
