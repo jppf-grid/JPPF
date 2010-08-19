@@ -53,46 +53,19 @@ public class ServiceFinder
 		if (cl == null) throw new NullPointerException("The specified class loader cannot be null");
 		List<T> list = new ArrayList<T>();
 		String name = providerClass.getName();
-		try
+		List<String> lines = findServiceDefinitions("META-INF/services/" + name, cl);
+		for (String s: lines)
 		{
-			List<URL> urls = resourcesList("META-INF/services/" + name, cl);
-			List<String> lines = new ArrayList<String>();
-			for (URL url: urls)
+			try
 			{
-				InputStream is = url.openStream();
-				BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-				try
-				{
-					lines.addAll(FileUtils.textFileAsLines(reader));
-				}
-				finally
-				{
-					reader.close();
-				}
+				Class<?> clazz = cl.loadClass(s);
+				T t = (T) clazz.newInstance();
+				list.add(t);
 			}
-			for (String s: lines)
+			catch(Exception e)
 			{
-				int idx = s.indexOf('#');
-				if (idx > 0) s = s.substring(0, idx);
-				s = s.trim();
-				if (s.startsWith("#")) continue;
-				try
-				{
-					//Class<?> clazz = Class.forName(s);
-					Class<?> clazz = cl.loadClass(s);
-					T t = (T) clazz.newInstance();
-					list.add(t);
-				}
-				catch(Exception e)
-				{
-					if (debugEnabled) log.debug(e.getMessage(), e);
-				}
+				if (debugEnabled) log.debug(e.getMessage(), e);
 			}
-		}
-		catch(IOException e)
-		{
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.warn(e);
 		}
 		return list;
 	}
@@ -128,6 +101,47 @@ public class ServiceFinder
 			else log.warn(e);
 		}
 		return urls;
+	}
+
+	/**
+	 * Find all service definitions in the classpath, that match the specified path.
+	 * @param path the path to the definition files to find.
+	 * @param cl the class loader to use for classpath lookup. 
+	 * @return the defintions found as a list of strings.
+	 */
+	public List<String> findServiceDefinitions(String path, ClassLoader cl)
+	{
+		List<String> lines = new ArrayList<String>();
+		try
+		{
+			List<URL> urls = resourcesList(path, cl);
+			for (URL url: urls)
+			{
+				InputStream is = url.openStream();
+				BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+				try
+				{
+					List<String> fileLines = FileUtils.textFileAsLines(reader);
+					for (String s: fileLines)
+					{
+						int idx = s.indexOf('#');
+						if (idx > 0) s = s.substring(0, idx);
+						s = s.trim();
+						if (!s.startsWith("#")) lines.add(s);
+					}
+				}
+				finally
+				{
+					reader.close();
+				}
+			}
+		}
+		catch(IOException e)
+		{
+			if (debugEnabled) log.debug(e.getMessage(), e);
+			else log.warn(e);
+		}
+		return lines;
 	}
 
 	/**
