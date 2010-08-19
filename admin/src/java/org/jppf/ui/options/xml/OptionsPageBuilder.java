@@ -19,13 +19,14 @@ package org.jppf.ui.options.xml;
 
 import java.io.*;
 import java.net.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.*;
+import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.event.*;
-import org.jppf.ui.options.xml.OptionDescriptor.*;
+import org.jppf.ui.options.xml.OptionDescriptor.ListenerDescriptor;
+import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
 import org.jppf.utils.*;
 
 /**
@@ -93,7 +94,7 @@ public class OptionsPageBuilder
 		this.baseName = baseName;
 		OptionDescriptor desc = new OptionDescriptorParser().parse(new StringReader(content));
 		if (desc == null) return null;
-		OptionElement page = build(desc);
+		OptionElement page = build(desc).get(0);
 		if (eventEnabled) triggerInitialEvents(page);
 		return page;
 	}
@@ -141,7 +142,8 @@ public class OptionsPageBuilder
 		else this.baseName = baseName;
 		OptionDescriptor desc = new OptionDescriptorParser().parse(xmlPath);
 		if (desc == null) return null;
-		OptionElement page = build(desc);
+		OptionElement page = build(desc).get(0);
+		
 		//if (eventEnabled) triggerInitialEvents(page);
 		return page;
 	}
@@ -242,6 +244,35 @@ public class OptionsPageBuilder
 	 * @return an OptionElement instance.
 	 * @throws Exception if an error was raised while building the page.
 	 */
+	public List<OptionElement> build(OptionDescriptor desc) throws Exception
+	{
+		OptionElementFactory f = getFactory();
+		List<OptionElement> list = new ArrayList<OptionElement>();
+		String type = desc.type;
+		if ("page".equalsIgnoreCase(type)) list.add(f.buildPage(desc));
+		else if ("SplitPane".equalsIgnoreCase(desc.type)) list.add(f.buildSplitPane(desc));
+		else if ("TabbedPane".equalsIgnoreCase(desc.type)) list.add(f.buildTabbedPane(desc));
+		else if ("Toolbar".equalsIgnoreCase(desc.type)) list.add(f.buildToolbar(desc));
+		else if ("ToolbarSeparator".equalsIgnoreCase(desc.type)) list.add(f.buildToolbarSeparator(desc));
+		else if ("Button".equalsIgnoreCase(desc.type)) list.add(f.buildButton(desc));
+		else if ("TextArea".equalsIgnoreCase(desc.type)) list.add(f.buildTextArea(desc));
+		else if ("Password".equalsIgnoreCase(desc.type)) list.add(f.buildPassword(desc));
+		else if ("PlainText".equalsIgnoreCase(desc.type)) list.add(f.buildPlainText(desc));
+		else if ("FormattedNumber".equalsIgnoreCase(desc.type)) list.add(f.buildFormattedNumber(desc));
+		else if ("SpinnerNumber".equalsIgnoreCase(desc.type)) list.add(f.buildSpinnerNumber(desc));
+		else if ("Boolean".equalsIgnoreCase(desc.type)) list.add(f.buildBoolean(desc));
+		else if ("ComboBox".equalsIgnoreCase(desc.type)) list.add(f.buildComboBox(desc));
+		else if ("Filler".equalsIgnoreCase(desc.type)) list.add(f.buildFiller(desc));
+		else if ("List".equalsIgnoreCase(desc.type)) list.add(f.buildList(desc));
+		else if ("FileChooser".equalsIgnoreCase(desc.type)) list.add(f.buildFileChooser(desc));
+		else if ("Label".equalsIgnoreCase(desc.type)) list.add(f.buildLabel(desc));
+		else if ("import".equalsIgnoreCase(desc.type)) list.addAll(f.loadImport(desc));
+		else if ("Java".equalsIgnoreCase(desc.type)) list.add(f.buildJavaOption(desc));
+		else if ("NodeDataPanel".equalsIgnoreCase(desc.type)) list.add(f.buildNodeDataPanel(desc));
+		else if ("JobDataPanel".equalsIgnoreCase(desc.type)) list.add(f.buildJobDataPanel(desc));
+		return list;
+	}
+	/*
 	public OptionElement build(OptionDescriptor desc) throws Exception
 	{
 		OptionElementFactory f = getFactory();
@@ -270,6 +301,7 @@ public class OptionsPageBuilder
 		else if ("JobDataPanel".equalsIgnoreCase(desc.type)) elt = f.buildJobDataPanel(desc);
 		return elt;
 	}
+	*/
 
 	/**
 	 * Get the element factory used by this builder.

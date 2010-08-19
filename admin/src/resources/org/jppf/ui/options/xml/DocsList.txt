@@ -1,6 +1,13 @@
 org/jppf/ui/options/xml/JPPFAdminTool.xml
-org/jppf/ui/options/xml/AdminPage.xml
+org/jppf/ui/options/xml/JPPFAdminToolNoCharts.xml
+org/jppf/ui/options/xml/NodeDataPage.xml
+org/jppf/ui/options/xml/JobDataPage.xml
 org/jppf/ui/options/xml/BundleSizeTuningPage.xml
+org/jppf/ui/options/xml/ChartsCheckPanel.xml
 org/jppf/ui/options/xml/ChartsConfigPage.xml
-org/jppf/ui/options/xml/JPPFGuiBuilder.xml
-org/jppf/ui/options/xml/JPPFGuiBuilderPreferences.xml
+org/jppf/ui/options/xml/DriverShutdownRestartPanel.xml
+org/jppf/ui/options/xml/JobMaxNodesPanel.xml
+org/jppf/ui/options/xml/JPPFConfigurationPanel.xml
+org/jppf/ui/options/xml/NodeThreadPoolPanel.xml
+org/jppf/ui/options/xml/StatsPage.xml
+org/jppf/ui/options/xml/StatusBarPage.xml

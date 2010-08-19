@@ -25,7 +25,7 @@ import org.jppf.ui.monitoring.job.JobDataPanel;
 import org.jppf.ui.monitoring.node.NodeDataPanel;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.xml.OptionDescriptor.ItemDescriptor;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 
 /**
  * Factory class used to build UI eleemnts from XML descriptors.
@@ -59,7 +59,10 @@ public class OptionElementFactory
 		page.setEventsEnabled(false);
 		builder.initCommonAttributes((OptionPanel) page, desc);
 		page.createUI();
-		for (OptionDescriptor child: desc.children) page.add(builder.build(child));
+		for (OptionDescriptor child: desc.children)
+		{
+			for (OptionElement elt: builder.build(child)) page.add(elt);
+		}
 		page.setEventsEnabled(true);
 		return page;
 	}
@@ -312,7 +315,10 @@ public class OptionElementFactory
 		String s = desc.getString("orientation", "horizontal");
 		option.setOrientation("horizontal".equalsIgnoreCase(s) ? SplitPaneOption.HORIZONTAL : SplitPaneOption.VERTICAL);
 		option.createUI();
-		for (OptionDescriptor child: desc.children) option.add(builder.build(child));
+		for (OptionDescriptor child: desc.children)
+		{
+			for (OptionElement elt: builder.build(child)) option.add(elt);
+		}
 		return option;
 	}
 
@@ -328,7 +334,10 @@ public class OptionElementFactory
 		option.setEventsEnabled(false);
 		builder.initCommonAttributes(option, desc);
 		option.createUI();
-		for (OptionDescriptor child: desc.children) option.add(builder.build(child));
+		for (OptionDescriptor child: desc.children)
+		{
+			for (OptionElement elt: builder.build(child)) option.add(elt);
+		}
 		option.setEventsEnabled(true);
 		return option;
 	}
@@ -345,7 +354,10 @@ public class OptionElementFactory
 		option.setEventsEnabled(false);
 		builder.initCommonAttributes(option, desc);
 		option.createUI();
-		for (OptionDescriptor child: desc.children) option.add(builder.build(child));
+		for (OptionDescriptor child: desc.children)
+		{
+			for (OptionElement elt: builder.build(child)) option.add(elt);
+		}
 		option.setEventsEnabled(true);
 		return option;
 	}
@@ -356,16 +368,24 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public OptionElement loadImport(OptionDescriptor desc) throws Exception
+	public List<OptionElement> loadImport(OptionDescriptor desc) throws Exception
 	{
 		OptionsPageBuilder builder = new OptionsPageBuilder(true);
-		OptionElement elt = null;
+		List<OptionElement> list = new ArrayList<OptionElement>();
 		String source = desc.getProperty("source");
 		String location = desc.getProperty("location");
-		if ("url".equalsIgnoreCase(source)) elt = builder.buildPageFromURL(location, builder.getBaseName());
-		else elt = builder.buildPage(location, null);
-		if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false)) addDebugComp(elt, source, location);
-		return elt;
+		if ("url".equalsIgnoreCase(source)) list.add(builder.buildPageFromURL(location, builder.getBaseName()));
+		else if ("file".equalsIgnoreCase(source)) list.add(builder.buildPage(location, null));
+		else if ("plugin".equalsIgnoreCase(source))
+		{
+			List<String> pathList = new ServiceFinder().findServiceDefinitions(location, getClass().getClassLoader());
+			for (String def: pathList) list.add(builder.buildPage(def, null));
+		}
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false))
+		{
+			for (OptionElement elt: list) addDebugComp(elt, source, location);
+		}
+		return list;
 	}
 
 	/**

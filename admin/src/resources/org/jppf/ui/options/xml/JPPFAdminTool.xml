@@ -54,13 +54,15 @@
 		<property name="componentConstraints" value="grow"/>
 		<property name="layoutConstraints" value="fill"/>
 		<property name="tooltip" value="Perform the remote administration of the server"/>
+		<import source="plugin" location="jppf-plugins/jppf-ui-plugin"/>
+		<!--
 		<import source="file" location="org/jppf/ui/options/xml/NodeDataPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/JobDataPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/StatsPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/ServerChartsPage.xml"/>
 		<import source="file" location="org/jppf/ui/options/xml/ChartsConfigPage.xml"/>
-		<!--<import source="file" location="org/jppf/ui/options/xml/AdminPage.xml"/>-->
 		<import source="file" location="org/jppf/ui/options/xml/BundleSizeTuningPage.xml"/>
+		-->
 	</child>
 
 	<import source="file" location="org/jppf/ui/options/xml/StatusBarPage.xml"/>

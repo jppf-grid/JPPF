@@ -29,17 +29,15 @@
 	<xs:element name="main" type="opt:OptionElement"/>
 
 	<xs:complexType name="OptionElement">
-		<xs:choice>
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element name="property" type="opt:Property" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="script" type="opt:Script" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="initializer" type="opt:Listener" minOccurs="0"/>
+			<xs:element name="listener" type="opt:Listener" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="item" type="opt:Item" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="import" type="opt:Import" minOccurs="0" maxOccurs="unbounded"/>
-			<xs:sequence>
-				<xs:element name="property" type="opt:Property" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element name="script" type="opt:Script" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element name="initializer" type="opt:Listener" minOccurs="0"/>
-				<xs:element name="listener" type="opt:Listener" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element name="item" type="opt:Item" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element name="child" type="opt:OptionElement" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:choice>
+			<xs:element name="child" type="opt:OptionElement" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
 		<xs:attribute name="name"/>
 		<xs:attribute name="type"/>
 	</xs:complexType>
@@ -66,7 +64,7 @@
 	<xs:complexType name="Import">
 		<xs:attribute name="source" type="opt:ImportSource"/>
 		<xs:attribute name="location"/>
-    <xs:attribute name="debug" use="optional" default="false">
+    <xs:attribute name="debug" use="optional" default="false"/>
 	</xs:complexType>
 
 	<xs:complexType name="Script">
@@ -82,6 +80,7 @@
 	  <xs:restriction base="xs:string">
 	    <xs:enumeration value="file"/>
 	    <xs:enumeration value="url"/>
+	    <xs:enumeration value="plugin"/>
 	  </xs:restriction>
 	</xs:simpleType>
 
