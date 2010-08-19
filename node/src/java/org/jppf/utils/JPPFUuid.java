@@ -86,7 +86,6 @@ public class JPPFUuid implements Serializable
 	 * Number of codes to use to build the uuid.
 	 */
 	private int length = 16;
-	
 
 	/**
 	 * Instanciate this JPPFUuid with a generated unique identifier.
@@ -121,7 +120,7 @@ public class JPPFUuid implements Serializable
 	}
 	
 	/**
-	 * Get a string representaiton of the generated unique identifier.
+	 * Get a string representation of the generated unique identifier.
 	 * @return a string containing the uuid.
 	 * @see java.lang.Object#toString()
 	 */
