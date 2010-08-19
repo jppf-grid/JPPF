@@ -47,7 +47,7 @@ public class JavaOption extends AbstractOption
 	}
 
 	/**
-	 * Create the UI components for this option.
+	 * {@inheritDoc}
 	 */
 	public void createUI()
 	{
@@ -74,7 +74,7 @@ public class JavaOption extends AbstractOption
 	}
 
 	/**
-	 * Propagate the state changes of the underlying checkbox to the listeners to this option.
+	 * Propagate the state changes of the underlying component to the listeners to this component.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	protected void setupValueChangeNotifications()
