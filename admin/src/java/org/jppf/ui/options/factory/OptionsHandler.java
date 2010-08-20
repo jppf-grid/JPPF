@@ -156,7 +156,7 @@ public final class OptionsHandler
 	 */
 	public static synchronized OptionElement addPageFromURL(String xmlPath, String baseName)
 	{
-			return addPage(loadPageFromURL(xmlPath, baseName));
+		return addPage(loadPageFromURL(xmlPath, baseName));
 	}
 
 	/**
