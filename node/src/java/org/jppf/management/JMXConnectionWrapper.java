@@ -102,7 +102,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		try
 		{
 			String s = NetworkUtils.getHostName(host);
-			//idString = "[" + (host == null ? "_" : host) + ":" + port + "] ";
 			idString = (s == null ? "_" : s) + ":" + port;
 			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + rmiSuffix);
 		}
@@ -121,7 +120,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		if (local)
 		{
 			mbeanConnection.set(ManagementFactory.getPlatformMBeanServer());
-			connected.set(true);
+			setConnectedStatus(true);
 		}
 		else
 		{
@@ -140,7 +139,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	public void connectAndWait(long timeout)
 	{
 		connect();
-		if (connected.get()) return;
+		if (isConnected()) return;
 		goToSleep(timeout);
 	}
 
@@ -154,8 +153,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization
     HashMap<String, ?> env = new HashMap<String, Object>(); 
     jmxc = JMXConnectorFactory.connect(url, env);
   	mbeanConnection.set(jmxc.getMBeanServerConnection());
-  	connected.set(true);
-		log.info(getId() + " RMI connection successfully established");
+  	setConnectedStatus(true);
+		log.info(getId() + " JMX connection successfully established");
 	}
 
 	/**
@@ -188,7 +187,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		}
 		catch(IOException e)
 		{
-			connected.set(false);
+			setConnectedStatus(false);
 			try
 			{
 		    if (jmxc != null) jmxc.close();
@@ -198,7 +197,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 				if (debugEnabled) log.debug(e2.getMessage(), e2);
 			}
 			if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
-			log.info(getId() + " : " + e.getMessage(), e);
+			log.info(getId() + " : error while invoking the JLX connection", e);
 		}
 		return result;
 	}
@@ -237,6 +236,15 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	public MBeanServerConnection getMbeanConnection()
 	{
 		return mbeanConnection.get();
+	}
+
+	/**
+	 * Set the connected state of this conenction wrapper.
+	 * @param status true if the jmx connection is established, false otherwise.
+	 */
+	protected void setConnectedStatus(boolean status)
+	{
+  	connected.set(status);
 	}
 
 	/**
