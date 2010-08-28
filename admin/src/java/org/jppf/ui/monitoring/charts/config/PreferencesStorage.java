@@ -23,6 +23,7 @@ import java.util.prefs.*;
 import org.apache.commons.logging.*;
 import org.jppf.ui.monitoring.charts.ChartType;
 import org.jppf.ui.monitoring.data.Fields;
+import org.jppf.ui.options.factory.OptionsHandler;
 
 /**
  * This class provides an API to store and retrieve the chart configuration
@@ -38,7 +39,7 @@ public class PreferencesStorage
 	/**
 	 * The root of the preferences subtree in which the chart configurations are saved.
 	 */
-	private static Preferences CHART_CONFIG_PREFERENCES = Preferences.userRoot().node("jppf/TabConfigurations");
+	private static Preferences CHART_CONFIG_PREFERENCES = OptionsHandler.getPreferences().node("TabConfigurations");
 	/**
 	 * 
 	 */

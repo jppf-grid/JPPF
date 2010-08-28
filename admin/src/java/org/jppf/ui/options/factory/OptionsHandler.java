@@ -18,7 +18,9 @@
 package org.jppf.ui.options.factory;
 
 import java.util.*;
-import java.util.prefs.Preferences;
+import java.util.prefs.*;
+
+import javax.swing.JFrame;
 
 import org.apache.commons.logging.*;
 import org.jppf.ui.options.*;
@@ -37,7 +39,11 @@ public final class OptionsHandler
 	/**
 	 * The root of the preferences subtree in which the chart configurations are saved.
 	 */
-	private static final Preferences PREFERENCES = Preferences.userRoot().node("jppf");
+	private static final Preferences JPPF_PREFERENCES = Preferences.userRoot().node("jppf");
+	/**
+	 * The root of the preferences subtree in which the chart configurations are saved.
+	 */
+	private static Preferences preferences = JPPF_PREFERENCES;
 	/**
 	 * The list of option pages managed by this handler.
 	 */
@@ -217,12 +223,13 @@ public final class OptionsHandler
 	 */
 	public static void loadPreferences(OptionNode node, Preferences prefs)
 	{
+		//if (node == null) return;
 		if (!node.children.isEmpty())
 		{
 			Preferences p = prefs.node(node.elt.getName());
 			for (OptionNode child: node.children) loadPreferences(child, p);
 		}
-		else
+		else if (node.elt instanceof AbstractOption)
 		{
 			AbstractOption option = (AbstractOption) node.elt;
 			Object def = option.getValue();
@@ -250,6 +257,7 @@ public final class OptionsHandler
 		OptionNode node = null;
 		if (elt instanceof OptionsPage)
 		{
+			node = new OptionNode(elt);
 			OptionsPage page = (OptionsPage) elt;
 			for (OptionElement child: page.getChildren())
 			{
@@ -272,9 +280,62 @@ public final class OptionsHandler
 	 * Get the root of the preferences subtree in which the chart configurations are saved.
 	 * @return a {@link Preferences} instance.
 	 */
-	public static Preferences getPreferences()
+	public static synchronized Preferences getPreferences()
 	{
-		return PREFERENCES;
+		return preferences;
+	}
+
+	/**
+	 * Set the root of the preferences subtree in which the chart configurations are saved.
+	 * @param preferences a {@link Preferences} instance.
+	 */
+	public static synchronized void setPreferences(Preferences preferences)
+	{
+		OptionsHandler.preferences = preferences;
+	}
+
+	/**
+	 * Save the application window state to the preferences store.
+	 * @param frame the frame representing the main application window.
+	 * @param pref the preferences node where the attributes are saved.
+	 */
+	public static void saveMainWindowAttributes(JFrame frame, Preferences pref)
+	{
+		int state = frame.getExtendedState();
+		boolean maximized = (state & java.awt.Frame.MAXIMIZED_BOTH) > 0;
+		if (maximized) frame.setExtendedState(java.awt.Frame.NORMAL);
+		java.awt.Point p = frame.getLocation();
+		pref.putInt("locationx", p.x);
+		pref.putInt("locationy", p.y);
+		java.awt.Dimension d = frame.getSize();
+		pref.putInt("width", d.width);
+		pref.putInt("height", d.height);
+		pref.putBoolean("maximized", maximized);
+
+		try
+		{
+			pref.flush();
+		}
+		catch(BackingStoreException e)
+		{
+		}
+	}
+
+	/**
+	 * Load the application window state from the preferences store.
+	 * @param frame the frame representing the main application window.
+	 * @param pref the preferences node from where the attributes are loaded.
+	 */
+	public static void loadMainWindowAttributes(JFrame frame, Preferences pref)
+	{
+		int x = pref.getInt("locationx", 0);
+		int y = pref.getInt("locationy", 0);
+		int width = pref.getInt("width", 600);
+		int height = pref.getInt("height", 768);
+		frame.setSize(width, height);
+		frame.setLocation(x, y);
+		boolean maximized = pref.getBoolean("maximized", false);
+		if (maximized) frame.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
 	}
 
 	/**

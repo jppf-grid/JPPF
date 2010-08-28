@@ -183,11 +183,12 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		 */
 		public Object getValueAt(int row, int column)
 		{
+			Fields name = fields[row];
+			if (column == 0) return name;
 			Map<Fields, String> valuesMap = null;
 			if (statsHandler.getStatsCount() > 0) valuesMap = statsHandler.getLatestStringValues();
 			else valuesMap = StatsFormatter.getStringValuesMap(new JPPFStats());
-			Fields name = fields[row];
-			return column == 0 ? name : valuesMap.get(name);
+			return valuesMap.get(name);
 		}
 	}
 }

@@ -18,7 +18,6 @@
 
 package org.jppf.ui.options.event;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.util.prefs.*;
 
@@ -50,20 +49,8 @@ public class WindowClosingListener extends WindowAdapter
 			JPPFChartBuilder builder = (JPPFChartBuilder) elt.getUIComponent();
 			builder.getStorage().saveAll();
 		}
-		int state = frame.getExtendedState();
-		boolean maximized = (state & Frame.MAXIMIZED_BOTH) > 0;
-		if (maximized)
-		{
-			frame.setExtendedState(Frame.NORMAL);
-		}
 		Preferences pref = OptionsHandler.getPreferences().node("JPPFAdminTool");
-		Point p = frame.getLocation();
-		pref.putInt("locationx", p.x);
-		pref.putInt("locationy", p.y);
-		Dimension d = frame.getSize();
-		pref.putInt("width", d.width);
-		pref.putInt("height", d.height);
-		pref.putBoolean("maximized", maximized);
+		OptionsHandler.saveMainWindowAttributes(frame, pref);
 
 		AbstractTreeTableOption opt = (AbstractTreeTableOption) OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("/NodeTreeTable");
 		opt.saveTableColumnsWidth();

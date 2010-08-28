@@ -114,7 +114,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption
 	 */
 	public void setupTableColumns()
 	{
-		Preferences pref = OptionsHandler.getPreferences().node("JPPFAdminTool");
+		Preferences pref = OptionsHandler.getPreferences();
 		String s = pref.get(getName() + "_column_widths", null);
 		if (s == null) return;
 		String[] wStr = s.split("\\s");
@@ -137,7 +137,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption
 	 */
 	public void saveTableColumnsWidth()
 	{
-		Preferences pref = OptionsHandler.getPreferences().node("JPPFAdminTool");
+		Preferences pref = OptionsHandler.getPreferences();
 		String key = getName() + "_column_widths";
 		StringBuilder sb = new StringBuilder();
 		for (int i=0; i<treeTable.getColumnCount(); i++)
