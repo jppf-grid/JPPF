@@ -98,7 +98,7 @@ public final class LocalizationUtils
 		{
 			File file = new File(filename);
 			result = file.getName();
-			int idx = result.lastIndexOf(".xml");
+			int idx = result.lastIndexOf(".");
 			if (idx >= 0) result = result.substring(0, idx);
 			result = base + "/" + result;
 		}
