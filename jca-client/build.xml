@@ -81,8 +81,9 @@
 	<!-- ========================================================================= -->
 
   <target name="clean">
-    <delete dir="${classes.dir}" quiet="true"/>
-    <delete dir="${build.dir}" quiet="true"/>
+		<delete><fileset dir="${classes.dir}/j2eeclient" includes="**/*.*"/></delete>
+		<delete><fileset dir="${classes.dir}/jca" includes="**/*.*"/></delete>
+		<delete><fileset dir="${build.dir}" includes="**/*.*"/></delete>
   </target>               
 
 	<!-- ========================================================================= -->
@@ -90,10 +91,12 @@
 	<!-- ========================================================================= -->
 
 	<target name="init" depends="clean" description="Initialize ressources">
- 		<mkdir dir="${classes.dir}"/>
+ 		<!--
+		<mkdir dir="${classes.dir}"/>
  		<mkdir dir="${classes.dir}/jca"/>
  		<mkdir dir="${classes.dir}/j2eeclient"/>
  		<mkdir dir="${build.dir}"/>
+ 		-->
 	</target>
 
 	<!-- ========================================================================= -->
