@@ -100,8 +100,8 @@
 	<!-- ========================================================================= -->
 
   <target name="clean" description="">
-    <delete dir="${build}" quiet="true"/>
-  </target>               
+		<delete><fileset dir="${build}" includes="**/*.*"/></delete>
+  </target>
 
   <target name="clean.all" depends="clean.deploy" description="">
     <delete dir="${node}/classes" quiet="true" includes="**/*.*"/>
@@ -148,7 +148,7 @@
 	<!--                           Build the application                           -->
 	<!-- ========================================================================= -->
 
-  <target name="build" depends="init, compile, jar"/>
+  <target name="build" depends="init, compile, jar, jar.src"/>
 	<target name="rebuild" depends="clean.all, init, compile, jar"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
@@ -282,7 +282,7 @@
   </target>
 
 	<!-- ========================================================================= -->
-	<!--                     Build the application jar files                       -->
+	<!--                     Build the jar files                                   -->
 	<!-- ========================================================================= -->
 
 	<target name="jar" description="generates the application jar" depends="compile">
@@ -305,6 +305,40 @@
 		</tstamp>
     <jar jarfile="${build}/jppf-${jar}.jar" index="true">
 			<fileset dir="${basedir}/../${module}/classes"/>
+			<fileset file="${bin}/build.number"/>
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+      </manifest>
+    </jar>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--                     Build the source jar files                            -->
+	<!-- ========================================================================= -->
+
+	<target name="jar.src" description="generates the application jar" depends="compile">
+		<antcall target="jar.src.module"><param name="module" value="common"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="node"/><param name="jar" value="common-node"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="admin"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="client"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="server"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="demo"/></antcall>
+	</target>
+
+	<target name="jar.src.module">
+		<condition property="jar" value="${module}">
+			<not>
+				<isset property="jar"/>
+			</not>
+		</condition>
+		<tstamp>
+			<format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
+		</tstamp>
+    <jar jarfile="${build}/jppf-${jar}-src.jar" index="true">
+			<fileset dir="${basedir}/../${module}/src/java"/>
+			<fileset dir="${basedir}/../${module}/src/resources"/>
 			<fileset file="${bin}/build.number"/>
       <manifest>
         <attribute name="JPPF-Version" value="${version.number}"/>
