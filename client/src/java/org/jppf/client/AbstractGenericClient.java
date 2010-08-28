@@ -298,7 +298,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 						}
 					}
 				}
-				//Thread.sleep(50L);
 			}
 			catch(Exception e)
 			{
