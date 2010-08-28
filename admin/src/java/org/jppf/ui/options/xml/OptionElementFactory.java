@@ -21,8 +21,6 @@ import java.util.*;
 
 import javax.swing.*;
 
-import org.jppf.ui.monitoring.job.JobDataPanel;
-import org.jppf.ui.monitoring.node.NodeDataPanel;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.xml.OptionDescriptor.ItemDescriptor;
 import org.jppf.utils.*;
@@ -48,6 +46,19 @@ public class OptionElementFactory
 	}
 
 	/**
+	 * Get a page builder using the specified path for localized resource bundles.
+	 * @param i18n the path for localized resource bundles.
+	 * @return an {@link OptionsPageBuilder} instance.
+	 */
+	private OptionsPageBuilder getOrCreateBuilder(String i18n)
+	{
+		if ((i18n == null) || "".equals(i18n.trim()) || i18n.equals(builder.getBaseName())) return this.builder;
+		OptionsPageBuilder newBuilder = new OptionsPageBuilder(builder.isEventEnabled());
+		newBuilder.setBaseName(i18n);
+		return newBuilder;
+	}
+
+	/**
 	 * Build an option page from the specified option descriptor.
 	 * @param desc the descriptor to get the page properties from.
 	 * @return an <code>OptionsPage</code> instance, or null if the page could not be build.
@@ -55,16 +66,82 @@ public class OptionElementFactory
 	 */
 	public OptionElement buildPage(OptionDescriptor desc) throws Exception
 	{
+		OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
 		OptionPanel page = new OptionPanel();
 		page.setEventsEnabled(false);
-		builder.initCommonAttributes((OptionPanel) page, desc);
+		tmpBuilder.initCommonAttributes(page, desc);
 		page.createUI();
 		for (OptionDescriptor child: desc.children)
 		{
-			for (OptionElement elt: builder.build(child)) page.add(elt);
+			for (OptionElement elt: tmpBuilder.build(child)) page.add(elt);
 		}
 		page.setEventsEnabled(true);
 		return page;
+	}
+
+	/**
+	 * Build a split pane option from the specified option descriptor.
+	 * @param desc the descriptor to get the properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public OptionElement buildSplitPane(OptionDescriptor desc) throws Exception
+	{
+		OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
+		SplitPaneOption option = new SplitPaneOption();
+		tmpBuilder.initCommonAttributes(option, desc);
+		option.setDividerWidth(desc.getInt("dividerWidth", 4));
+		option.setResizeWeight(desc.getDouble("resizeWeight", 0.5d));
+		String s = desc.getString("orientation", "horizontal");
+		option.setOrientation("horizontal".equalsIgnoreCase(s) ? SplitPaneOption.HORIZONTAL : SplitPaneOption.VERTICAL);
+		option.createUI();
+		for (OptionDescriptor child: desc.children)
+		{
+			for (OptionElement elt: tmpBuilder.build(child)) option.add(elt);
+		}
+		return option;
+	}
+
+	/**
+	 * Build a toolbar option from the specified option descriptor.
+	 * @param desc the descriptor to get the properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public OptionElement buildToolbar(OptionDescriptor desc) throws Exception
+	{
+		OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
+		ToolbarOption option = new ToolbarOption();
+		option.setEventsEnabled(false);
+		tmpBuilder.initCommonAttributes(option, desc);
+		option.createUI();
+		for (OptionDescriptor child: desc.children)
+		{
+			for (OptionElement elt: tmpBuilder.build(child)) option.add(elt);
+		}
+		option.setEventsEnabled(true);
+		return option;
+	}
+
+	/**
+	 * Build a toolbar option from the specified option descriptor.
+	 * @param desc the descriptor to get the properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public OptionElement buildTabbedPane(OptionDescriptor desc) throws Exception
+	{
+		OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
+		TabbedPaneOption option = new TabbedPaneOption();
+		option.setEventsEnabled(false);
+		tmpBuilder.initCommonAttributes(option, desc);
+		option.createUI();
+		for (OptionDescriptor child: desc.children)
+		{
+			for (OptionElement elt: tmpBuilder.build(child)) option.add(elt);
+		}
+		option.setEventsEnabled(true);
+		return option;
 	}
 
 	/**
@@ -301,68 +378,6 @@ public class OptionElementFactory
 	}
 
 	/**
-	 * Build a split pane option from the specified option descriptor.
-	 * @param desc the descriptor to get the properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public OptionElement buildSplitPane(OptionDescriptor desc) throws Exception
-	{
-		SplitPaneOption option = new SplitPaneOption();
-		builder.initCommonAttributes(option, desc);
-		option.setDividerWidth(desc.getInt("dividerWidth", 4));
-		option.setResizeWeight(desc.getDouble("resizeWeight", 0.5d));
-		String s = desc.getString("orientation", "horizontal");
-		option.setOrientation("horizontal".equalsIgnoreCase(s) ? SplitPaneOption.HORIZONTAL : SplitPaneOption.VERTICAL);
-		option.createUI();
-		for (OptionDescriptor child: desc.children)
-		{
-			for (OptionElement elt: builder.build(child)) option.add(elt);
-		}
-		return option;
-	}
-
-	/**
-	 * Build a toolbar option from the specified option descriptor.
-	 * @param desc the descriptor to get the properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public OptionElement buildToolbar(OptionDescriptor desc) throws Exception
-	{
-		ToolbarOption option = new ToolbarOption();
-		option.setEventsEnabled(false);
-		builder.initCommonAttributes(option, desc);
-		option.createUI();
-		for (OptionDescriptor child: desc.children)
-		{
-			for (OptionElement elt: builder.build(child)) option.add(elt);
-		}
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
-	 * Build a toolbar option from the specified option descriptor.
-	 * @param desc the descriptor to get the properties from.
-	 * @return an <code>Option</code> instance, or null if the option could not be build.
-	 * @throws Exception if an error was raised while building the option.
-	 */
-	public OptionElement buildTabbedPane(OptionDescriptor desc) throws Exception
-	{
-		TabbedPaneOption option = new TabbedPaneOption();
-		option.setEventsEnabled(false);
-		builder.initCommonAttributes(option, desc);
-		option.createUI();
-		for (OptionDescriptor child: desc.children)
-		{
-			for (OptionElement elt: builder.build(child)) option.add(elt);
-		}
-		option.setEventsEnabled(true);
-		return option;
-	}
-
-	/**
 	 * Build a toolbar option from the specified option descriptor.
 	 * @param desc the descriptor to get the properties from.
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
@@ -435,7 +450,9 @@ public class OptionElementFactory
 	 */
 	public Option buildNodeDataPanel(OptionDescriptor desc) throws Exception
 	{
-		NodeDataPanel option = new NodeDataPanel();
+		//NodeDataPanel option = new NodeDataPanel();
+		Class clazz = Class.forName("org.jppf.ui.monitoring.node.NodeDataPanel");
+		AbstractOption option = (AbstractOption) clazz.newInstance();
 		builder.initCommonOptionAttributes(option, desc);
 		return option;
 	}
@@ -448,7 +465,9 @@ public class OptionElementFactory
 	 */
 	public Option buildJobDataPanel(OptionDescriptor desc) throws Exception
 	{
-		JobDataPanel option = new JobDataPanel();
+		//JobDataPanel option = new JobDataPanel();
+		Class clazz = Class.forName("org.jppf.ui.monitoring.job.JobDataPanel");
+		AbstractOption option = (AbstractOption) clazz.newInstance();
 		builder.initCommonOptionAttributes(option, desc);
 		return option;
 	}

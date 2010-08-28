@@ -116,6 +116,8 @@ public class OptionDescriptorParser
 		NamedNodeMap attrMap = node.getAttributes();
 		desc.type = attrMap.getNamedItem("type").getNodeValue();
 		desc.name = attrMap.getNamedItem("name").getNodeValue();
+		Node i18nNode = attrMap.getNamedItem("i18n");
+		if (i18nNode != null) desc.i18n = i18nNode.getNodeValue();
 		NodeList list = node.getChildNodes();
 		for (int i=0; i<list.getLength(); i++)
 		{

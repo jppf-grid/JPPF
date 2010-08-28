@@ -52,6 +52,10 @@ public class OptionDescriptor extends TypedProperties
 	 */
 	public String name = null;
 	/**
+	 * Path to the folder containing the localized resource bundles for a page (doesn't apply to non-page elements).
+	 */
+	public String i18n = null;
+	/**
 	 * Children of this option element.
 	 */
 	public List<OptionDescriptor> children = new ArrayList<OptionDescriptor>();

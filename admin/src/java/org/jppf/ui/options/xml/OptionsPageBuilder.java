@@ -52,7 +52,7 @@ public class OptionsPageBuilder
 	 */
 	private String baseName = null;
 	/**
-	 * Base name used to localize labels and tooltips.
+	 * Determines whether events should be triggered after the component is built.
 	 */
 	private boolean eventEnabled = true;
 	/**
@@ -134,9 +134,10 @@ public class OptionsPageBuilder
 	{
 		if (baseName == null)
 		{
-			int idx = xmlPath.lastIndexOf("/");
-			this.baseName = BASE_NAME + ((idx < 0) ? xmlPath : xmlPath.substring(idx + 1));
-			idx = this.baseName.lastIndexOf(".xml");
+			String path = xmlPath.replace("\\", "/");
+			int idx = path.lastIndexOf("/");
+			this.baseName = BASE_NAME + ((idx < 0) ? path : path.substring(idx + 1));
+			idx = this.baseName.lastIndexOf(".");
 			if (idx >= 0) this.baseName = this.baseName.substring(0, idx);
 		}
 		else this.baseName = baseName;
@@ -272,36 +273,6 @@ public class OptionsPageBuilder
 		else if ("JobDataPanel".equalsIgnoreCase(desc.type)) list.add(f.buildJobDataPanel(desc));
 		return list;
 	}
-	/*
-	public OptionElement build(OptionDescriptor desc) throws Exception
-	{
-		OptionElementFactory f = getFactory();
-		OptionElement elt = null; 
-		String type = desc.type;
-		if ("page".equalsIgnoreCase(type)) elt = f.buildPage(desc);
-		else if ("SplitPane".equalsIgnoreCase(desc.type)) elt = f.buildSplitPane(desc);
-		else if ("TabbedPane".equalsIgnoreCase(desc.type)) elt = f.buildTabbedPane(desc);
-		else if ("Toolbar".equalsIgnoreCase(desc.type)) elt = f.buildToolbar(desc);
-		else if ("ToolbarSeparator".equalsIgnoreCase(desc.type)) elt = f.buildToolbarSeparator(desc);
-		else if ("Button".equalsIgnoreCase(desc.type)) elt = f.buildButton(desc);
-		else if ("TextArea".equalsIgnoreCase(desc.type)) elt = f.buildTextArea(desc);
-		else if ("Password".equalsIgnoreCase(desc.type)) elt = f.buildPassword(desc);
-		else if ("PlainText".equalsIgnoreCase(desc.type)) elt = f.buildPlainText(desc);
-		else if ("FormattedNumber".equalsIgnoreCase(desc.type)) elt = f.buildFormattedNumber(desc);
-		else if ("SpinnerNumber".equalsIgnoreCase(desc.type)) elt = f.buildSpinnerNumber(desc);
-		else if ("Boolean".equalsIgnoreCase(desc.type)) elt = f.buildBoolean(desc);
-		else if ("ComboBox".equalsIgnoreCase(desc.type)) elt = f.buildComboBox(desc);
-		else if ("Filler".equalsIgnoreCase(desc.type)) elt = f.buildFiller(desc);
-		else if ("List".equalsIgnoreCase(desc.type)) elt = f.buildList(desc);
-		else if ("FileChooser".equalsIgnoreCase(desc.type)) elt = f.buildFileChooser(desc);
-		else if ("Label".equalsIgnoreCase(desc.type)) elt = f.buildLabel(desc);
-		else if ("import".equalsIgnoreCase(desc.type)) elt = f.loadImport(desc);
-		else if ("Java".equalsIgnoreCase(desc.type)) elt = f.buildJavaOption(desc);
-		else if ("NodeDataPanel".equalsIgnoreCase(desc.type)) elt = f.buildNodeDataPanel(desc);
-		else if ("JobDataPanel".equalsIgnoreCase(desc.type)) elt = f.buildJobDataPanel(desc);
-		return elt;
-	}
-	*/
 
 	/**
 	 * Get the element factory used by this builder.
@@ -320,5 +291,23 @@ public class OptionsPageBuilder
 	public String getBaseName()
 	{
 		return baseName;
+	}
+
+	/**
+	 * Set the base name used to localize labels and tooltips.
+	 * @param baseName the base name as a string value.
+	 */
+	public void setBaseName(String baseName)
+	{
+		this.baseName = baseName;
+	}
+
+	/**
+	 * Determine whether events should be triggered after the component is built.
+	 * @return true if events should be triggered, false otherwise.
+	 */
+	public boolean isEventEnabled()
+	{
+		return eventEnabled;
 	}
 }
