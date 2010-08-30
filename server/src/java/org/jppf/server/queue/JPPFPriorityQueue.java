@@ -195,6 +195,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 				}
 				list.add(bundleWrapper);
 				bundle.setParameter("real.task.count", bundle.getTaskCount());
+				List<BundleWrapper> bundleList = priorityMap.get(new JPPFPriority(bundle.getJobSLA().getPriority()));
+				bundleList.remove(bundleWrapper);
+				bundleList.add(bundleWrapper);
 			}
 			jobManager.jobUpdated(bundleWrapper);
 			//result.getBundle().setExecutionStartTime(System.currentTimeMillis());
