@@ -154,6 +154,5 @@ public class JavaOption extends AbstractOption
 	public void setMouseListenerClassName(String mouseListenerClassName)
 	{
 		this.mouseListenerClassName = mouseListenerClassName;
-		
 	}
 }

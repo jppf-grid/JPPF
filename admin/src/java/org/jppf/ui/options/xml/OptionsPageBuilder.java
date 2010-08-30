@@ -271,6 +271,7 @@ public class OptionsPageBuilder
 		else if ("Java".equalsIgnoreCase(desc.type)) list.add(f.buildJavaOption(desc));
 		else if ("NodeDataPanel".equalsIgnoreCase(desc.type)) list.add(f.buildNodeDataPanel(desc));
 		else if ("JobDataPanel".equalsIgnoreCase(desc.type)) list.add(f.buildJobDataPanel(desc));
+		else if ("Custom".equalsIgnoreCase(desc.type)) list.add(f.buildCustomOption(desc));
 		return list;
 	}
 

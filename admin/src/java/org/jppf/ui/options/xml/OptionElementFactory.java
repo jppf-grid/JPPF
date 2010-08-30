@@ -471,4 +471,20 @@ public class OptionElementFactory
 		builder.initCommonOptionAttributes(option, desc);
 		return option;
 	}
+
+	/**
+	 * Build a custom option implemented as a Java class.
+	 * @param desc the descriptor to get the properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public Option buildCustomOption(OptionDescriptor desc) throws Exception
+	{
+		String className = desc.getString("impl.class");
+		Class clazz = Class.forName(className);
+		AbstractOption option = (AbstractOption) clazz.newInstance();
+		builder.initCommonOptionAttributes(option, desc);
+		option.createUI();
+		return option;
+	}
 }
