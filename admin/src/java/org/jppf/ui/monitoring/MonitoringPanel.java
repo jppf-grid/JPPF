@@ -25,7 +25,6 @@ import javax.swing.table.*;
 import net.miginfocom.swing.MigLayout;
 
 import org.apache.commons.logging.*;
-import org.jppf.server.JPPFStats;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.utils.LocalizationUtils;
@@ -73,8 +72,8 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 
 	/**
 	 * Add a table panel to this panel.
-	 * @param fields - the fields displayed in the table.
-	 * @param label - the reference to the localized title of the table.
+	 * @param fields the fields displayed in the table.
+	 * @param label the reference to the localized title of the table.
 	 */
 	private void addTablePanel(Fields[] fields, String label)
 	{
@@ -133,62 +132,5 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		panel.add(table, "growx, pushx");
 		table.setShowGrid(false);
 		return panel;
-	}
-
-	/**
-	 * Data model for the tables displaying the values.
-	 */
-	private class MonitorTableModel extends AbstractTableModel
-	{
-		/**
-		 * The list of fields whose values are displayed in the table.
-		 */
-		private Fields[] fields = null;
-
-		/**
-		 * Initialize this table model witht he specified list of fields.
-		 * @param fields the list of fields whose values are displayed in the table.
-		 */
-		MonitorTableModel(Fields[] fields)
-		{
-			this.fields = fields;
-		}
-
-		/**
-		 * Get the number of columns in the table.
-		 * @return 2.
-		 * @see javax.swing.table.TableModel#getColumnCount()
-		 */
-		public int getColumnCount()
-		{
-			return 2;
-		}
-
-		/**
-		 * Get the number of rows in the table.
-		 * @return the number of fields displayed in the table.
-		 * @see javax.swing.table.TableModel#getRowCount()
-		 */
-		public int getRowCount()
-		{
-			return fields.length;
-		}
-
-		/**
-		 * Get a value at specified coordinates in the table.
-		 * @param row the row coordinate.
-		 * @param column the column coordinate.
-		 * @return the value as an object.
-		 * @see javax.swing.table.TableModel#getValueAt(int, int)
-		 */
-		public Object getValueAt(int row, int column)
-		{
-			Fields name = fields[row];
-			if (column == 0) return name;
-			Map<Fields, String> valuesMap = null;
-			if (statsHandler.getStatsCount() > 0) valuesMap = statsHandler.getLatestStringValues();
-			else valuesMap = StatsFormatter.getStringValuesMap(new JPPFStats());
-			return valuesMap.get(name);
-		}
 	}
 }
