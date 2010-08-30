@@ -177,7 +177,9 @@ class JobDataPanelManager
 		DefaultMutableTreeNode jobNode = findJob(driverNode, jobInfo);
 		if (jobNode == null) return;
 		JobData data = new JobData(jobInfo, nodeInfo);
-		DefaultMutableTreeNode subJobNode = new DefaultMutableTreeNode(data);
+		DefaultMutableTreeNode subJobNode = findSubJob(jobNode, nodeInfo);
+		if (subJobNode != null) return;
+		subJobNode = new DefaultMutableTreeNode(data);
 		if (debugEnabled) log.debug("sub-job: " + jobInfo.getJobId() + " dispatched to node " + nodeInfo.getHost() + ":" + nodeInfo.getPort());
 		jobPanel.getModel().insertNodeInto(subJobNode, jobNode, jobNode.getChildCount());
 		jobPanel.getTreeTable().expand(jobNode);
