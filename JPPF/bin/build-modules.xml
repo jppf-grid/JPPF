@@ -1,0 +1,185 @@
+<!--
+	JPPF
+  Copyright (C) 2005-2010 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name="JPPF-modules" basedir="..">
+
+	<!-- ========================================================================= -->
+	<!--                 Package the runtime components for deployment             -->
+	<!-- ========================================================================= -->
+
+	<target name="runtime" description="" depends="rebuild">
+		<antcall target="runtime.driver"/>
+		<antcall target="runtime.node"/>
+		<antcall target="runtime.gui"/>
+		<antcall target="application.template"/>
+		<antcall target="runtime.multiplexer"/>
+    <delete dir="${runtime}" quiet="true"/>
+	</target>
+
+	<!-- =========== Driver packaging =========== -->
+
+	<target name="runtime.driver">
+		<property name="driver.prefix" value="${app.ver}-driver"/>
+		<property name="runtime.driver.file" value="${build}/${driver.prefix}.zip"/>
+		<delete file="${runtime.driver.file}" quiet="true"/>
+		<zip destfile="${runtime.driver.file}">
+			<zipfileset dir="${basedir}" prefix="${driver.prefix}">
+				<include name="${license.file}"/>
+			</zipfileset>
+			<zipfileset dir="${config}/driver" prefix="${driver.prefix}"/>
+			<zipfileset dir="${config}/node/config" prefix="${driver.prefix}/config" includes="jppf.policy"/>
+			<zipfileset dir="${build}" prefix="${driver.prefix}/lib">
+				<include name="jppf-common-node.jar"/>
+				<include name="jppf-common.jar"/>
+				<include name="jppf-server.jar"/>
+			</zipfileset>
+			<zipfileset dir="${lib}" prefix="${driver.prefix}/lib">
+				<include name="log4j/*.jar"/>
+				<include name="slf4j/*.jar"/>
+			</zipfileset>
+			<zipfileset dir="${build}" prefix="${driver.prefix}/lib-src">
+				<include name="jppf-common-node-src.jar"/>
+				<include name="jppf-common-src.jar"/>
+				<include name="jppf-server-src.jar"/>
+			</zipfileset>
+		</zip>
+    <delete dir="${runtime.driver}" quiet="true"/>
+	</target>
+
+	<!-- =========== Node packaging =========== -->
+
+	<target name="runtime.node">
+		<property name="node.prefix" value="${app.ver}-node"/>
+		<property name="runtime.node.file" value="${build}/${node.prefix}.zip"/>
+		<delete file="${runtime.node.file}" quiet="true"/>
+		<zip destfile="${runtime.node.file}">
+			<zipfileset dir="${basedir}" prefix="${node.prefix}">
+				<include name="${license.file}"/>
+			</zipfileset>
+			<zipfileset dir="${config}/node" prefix="${node.prefix}"/>
+			<zipfileset dir="${build}" prefix="${node.prefix}/lib">
+				<include name="jppf-common-node.jar"/>
+			</zipfileset>
+			<zipfileset dir="${lib}" prefix="${node.prefix}/lib">
+				<include name="log4j/*.jar"/>
+				<include name="slf4j/*.jar"/>
+			</zipfileset>
+			<zipfileset dir="${build}" prefix="${node.prefix}/lib-src">
+				<include name="jppf-common-node-src.jar"/>
+			</zipfileset>
+		</zip>
+    <delete dir="${runtime.node}" quiet="true"/>
+	</target>
+
+	<!-- =========== GUI packaging =========== -->
+
+	<target name="runtime.gui">
+		<property name="gui.prefix" value="${app.ver}-admin-ui"/>
+		<property name="runtime.gui.file" value="${build}/${gui.prefix}.zip"/>
+		<delete file="${runtime.gui.file}" quiet="true"/>
+		<zip destfile="${runtime.gui.file}">
+			<zipfileset dir="${basedir}" prefix="${gui.prefix}">
+				<include name="${license.file}"/>
+			</zipfileset>
+			<zipfileset dir="${config}/gui" prefix="${gui.prefix}"/>
+			<zipfileset dir="${build}" prefix="${gui.prefix}/lib">
+				<include name="jppf-common-node.jar"/>
+				<include name="jppf-common.jar"/>
+				<include name="jppf-client.jar"/>
+				<include name="jppf-admin.jar"/>
+			</zipfileset>
+			<zipfileset dir="${lib}" prefix="${gui.prefix}/lib">
+				<include name="log4j/*.jar"/>
+				<include name="slf4j/*.jar"/>
+				<include name="JFreeChart/*.jar"/>
+				<include name="Rhino/*.jar"/>
+				<include name="JGoodies/*.jar"/>
+				<include name="Groovy/*.jar"/>
+				<include name="MigLayout/*.jar"/>
+			</zipfileset>
+			<zipfileset dir="${build}" prefix="${gui.prefix}/lib-src">
+				<include name="jppf-common-node-src.jar"/>
+				<include name="jppf-common-src.jar"/>
+				<include name="jppf-client-src.jar"/>
+				<include name="jppf-admin-src.jar"/>
+			</zipfileset>
+		</zip>
+    <delete dir="${runtime.gui}" quiet="true"/>
+	</target>
+
+	<!-- =========== Multiplexer packaging =========== -->
+
+	<target name="runtime.multiplexer">
+		<property name="multiplexer.prefix" value="${app.ver}-multiplexer"/>
+		<property name="runtime.multiplexer.file" value="${build}/${multiplexer.prefix}.zip"/>
+		<delete file="${runtime.multiplexer.file}" quiet="true"/>
+		<zip destfile="${runtime.multiplexer.file}">
+			<zipfileset dir="${basedir}" prefix="${multiplexer.prefix}">
+				<include name="${license.file}"/>
+			</zipfileset>
+			<zipfileset dir="${config}/multiplexer" prefix="${multiplexer.prefix}"/>
+			<zipfileset dir="${build}" prefix="${multiplexer.prefix}/lib">
+				<include name="jppf-common-node.jar"/>
+				<include name="jppf-common.jar"/>
+			</zipfileset>
+			<zipfileset dir="${lib}" prefix="${multiplexer.prefix}/lib">
+				<include name="log4j/*.jar"/>
+				<include name="slf4j/*.jar"/>
+			</zipfileset>
+			<zipfileset dir="${build}" prefix="${multiplexer.prefix}/lib-src">
+				<include name="jppf-common-node-src.jar"/>
+				<include name="jppf-common-src.jar"/>
+			</zipfileset>
+		</zip>
+    <delete dir="${runtime.multiplexer}" quiet="true"/>
+	</target>
+
+	<!-- =========== Application template packaging =========== -->
+
+	<target name="application.template" description="" depends="init">
+		<delete><fileset dir="${application.template}/classes" includes="**/*.*"/></delete>
+		<javac srcdir="" destdir="${application.template}/classes"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+			<src path="${application.template}/src"/>
+		</javac>
+		<property name="template.prefix" value="${app.ver}-application-template"/>
+		<property name="template.release.file" value="${build}/${template.prefix}.zip"/>
+		<delete file="${template.release.file}" quiet="true"/>
+		<zip destfile="${template.release.file}">
+			<zipfileset dir="${application.template}" prefix="${template.prefix}" excludes=".*"/>
+			<zipfileset dir="${build}" prefix="${template.prefix}/lib">
+				<include name="jppf-common-node.jar"/>
+				<include name="jppf-common.jar"/>
+				<include name="jppf-client.jar"/>
+			</zipfileset>
+			<zipfileset dir="${lib}" prefix="${template.prefix}/lib">
+				<include name="log4j/*.jar"/>
+				<include name="slf4j/*.jar"/>
+			</zipfileset>
+			<zipfileset dir="${build}" prefix="${template.prefix}/lib-src">
+				<include name="jppf-common-node-src.jar"/>
+				<include name="jppf-common-src.jar"/>
+				<include name="jppf-client-src.jar"/>
+			</zipfileset>
+		</zip>
+    <delete dir="${application.template}/lib-src" quiet="true"/>
+	</target>
+
+</project> 

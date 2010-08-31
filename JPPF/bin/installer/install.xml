@@ -8,9 +8,10 @@
 		<authors>
 			<author name="The JPPF Team" email=""/>
 		</authors>
-		<url>http://www.jppf.org</url>
+		<!--<url>http://www.jppf.org</url>-->
+		<url>@{installer.url}</url>
 		<javaversion>1.5</javaversion>
-		<webdir>@{web.installer.base}</webdir>
+		<webdir>@{installer.url}download/${version.number}</webdir>
   </info>
 
 	<guiprefs width="600" height="400" resizable="yes">

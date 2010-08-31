@@ -1,0 +1,138 @@
+<!--
+	JPPF
+  Copyright (C) 2005-2010 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name="JPPF-docs" basedir="..">
+
+	<!-- ========================================================================= -->
+	<!--                     Build the web site content                            -->
+	<!-- ========================================================================= -->
+
+  <target name="doc" depends="doc.screenshots, doc.home">
+	</target>
+
+  <target name="doc.home" description="generates the project web site pages">
+		<antcall target="doc.gen">
+			<param name="source" value="${home}/doc-source/home"/>
+			<param name="dest" value="${home}/"/>
+			<param name="templates" value="${home}/templates/"/>
+		</antcall>
+  	<copy toDir="${home}/wiki/includes" file="${home}/jppf_header.php"/>
+  	<!--<copy toDir="${home}/forums" file="${home}/jppf_header.php"/>-->
+	</target>
+
+	<target name="doc.gen" description="generates the project web site pages">
+		<java fork="yes" classname="org.jppf.doc.HtmlDocGenerator" classpathref="run.classpath">
+			<jvmarg value="-Xmx128m" />
+			<arg value="-s"/>
+			<arg value="${source}"/>
+			<arg value="-d"/>
+			<arg value="${dest}"/>
+			<arg value="-t"/>
+			<arg value="${templates}"/>
+			<arg value="-r"/>
+		</java>       
+	</target>
+
+	<target name="doc.screenshots" description="generates the project web site pages">
+		<java fork="yes" classname="org.jppf.utils.ThumbnailGenerator" classpathref="run.classpath">
+			<jvmarg value="-Xmx128m" />
+			<arg value="${home}/screenshots"/>
+			<arg value="72"/>
+			<arg value="72"/>
+			<arg value="${home}/templates"/>
+			<arg value="9"/>
+		</java>       
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                 Generate the User Guide redistributable                   -->
+	<!-- ========================================================================= -->
+
+	<target name="user.guide" description="Generate the user guide zip file">
+		<property name="user.guide.file" value="${build}/JPPF-${version.number}-User-Guide.zip"/>
+		<delete file="${user.guide.file}" quiet="true"/>
+		<zip destfile="${user.guide.file}">
+			<zipfileset dir="${home}/documents" includes="JPPF-*.pdf" prefix="JPPF-${version.number}-User-Guide"/>
+		</zip>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                        Generate the Javadoc                               -->
+	<!-- ========================================================================= -->
+
+	<target name="javadoc" description="Generate all java doc">
+		<echo message="gs.home = ${gs.home}"/>
+    <delete dir="${javadoc}" quiet="true"/>
+    <mkdir dir="${javadoc}"/>
+		<javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF"
+			packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true"
+			stylesheetfile="${bin}/javadoc.css" additionalparam="-quiet">
+			<packageset dir="${node}/src/java"/>
+			<packageset dir="${common}/src/java"/>
+			<packageset dir="${client}/src/java"/>
+			<packageset dir="${server}/src/java"/>
+			<packageset dir="${admin}/src/java"/>
+			<packageset dir="${demo}/src/java"/>
+			<packageset dir="${jca-client}/src/java"/>
+			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Common/src"/>
+			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Client/src"/>
+			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/src"/>
+			<!--<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>-->
+			<link href="http://download.oracle.com/javase/6/docs/api/"/>
+			<link href="http://java.sun.com/javaee/5/docs/api"/>
+			<link href="http://junit.sourceforge.net/javadoc"/>
+			<link href="http://xstream.codehaus.org/javadoc"/>
+			<doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
+			<header>
+				<![CDATA[
+					<table>
+					<tr>
+						<td valign="center">
+							<a href="http://www.jppf.org" target="_top">
+								<img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/>
+							</a>
+						</td>
+					</tr>
+					</table>
+				]]>
+			</header>
+			<bottom>
+				<![CDATA[
+					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2010 JPPF Team.</i></font>
+				]]>
+			</bottom>
+		</javadoc>
+		<copy todir="${javadoc}/resources" overwrite="true">
+			<fileset dir="${bin}">
+				<include name="*.gif"/>
+				<include name="*.jpg"/>
+			</fileset>
+		</copy>
+		<property name="javadoc.file" value="${build}/${app.ver}-api.zip"/>
+		<delete file="${javadoc.file}" quiet="true"/>
+		<zip destfile="${javadoc.file}">
+			<zipfileset dir="${javadoc}" includes="**/*.*" prefix="${app.ver}-api"/>
+		</zip>
+	</target>
+
+	<target name="javadoc.package" description="Package the javadoc for deployment on the web site">
+    <delete file="${docs}/api.tar.gz" quiet="true"/>
+		<tar destfile="${docs}/api.tar.gz" compression="gzip" basedir="${home}" includes="api-2.0/**/*.*"/>
+	</target>
+
+</project> 

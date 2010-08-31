@@ -1,0 +1,82 @@
+<!--
+	JPPF
+  Copyright (C) 2005-2010 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name="JPPF-samples" basedir="..">
+
+	<!-- ========================================================================= -->
+	<!--                         Generate the samples pack                         -->
+	<!-- ========================================================================= -->
+
+	<taskdef name="java2html" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${lib}/java2html_50/java2html.jar"/>
+
+	<target name="samples.pack" description="Generate the packaging for the samples pack"
+		depends="init, build" if="samples.pack.present">
+		<copy todir="${samples-pack}/shared/lib">
+			<fileset dir="${build}">
+				<include name="jppf-common-node.jar"/>
+				<include name="jppf-common.jar"/>
+				<include name="jppf-client.jar"/>
+				<include name="jppf-admin.jar"/>
+				<include name="jppf-server.jar"/>
+			</fileset>
+		</copy>
+		<antcall target="include.code"><param name="sample" value="CustomLoadBalancer"/></antcall>
+		<antcall target="include.code"><param name="sample" value="DataEncryption"/></antcall>
+		<antcall target="include.code"><param name="sample" value="TaskNotifications"/></antcall>
+		<property name="samples.pack.prefix" value="${app.ver}-samples-pack"/>
+		<property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>
+		<delete file="samples.pack.file" quiet="true"/>
+		<zip destfile="${samples.pack.file}">
+			<zipfileset dir="${basedir}/../samples-pack" prefix="${samples.pack.prefix}">
+				<exclude name="**/*.log"/>
+				<exclude name="**/javadoc/**/*.*"/>
+			</zipfileset>
+			<zipfileset dir="${build}/" prefix="${samples.pack.prefix}/shared/lib-src">
+				<include name="jppf-common-node-src.jar"/>
+				<include name="jppf-common-src.jar"/>
+				<include name="jppf-client-src.jar"/>
+				<include name="jppf-admin-src.jar"/>
+				<include name="jppf-server-src.jar"/>
+			</zipfileset>
+		</zip>
+    <delete dir="${home}/samples-pack" quiet="true"/>
+ 		<mkdir dir="${home}/samples-pack"/>
+		<copy todir="${home}/samples-pack">
+			<fileset dir="${samples-pack}">
+				<include name="**/*.html"/>
+				<exclude name="**/package.html"/>
+				<exclude name="**/Readme.html"/>
+				<include name="CustomLoadBalancer/**/*.properties"/>
+				<exclude name="**/classes/**/*.*"/>
+				<include name="shared/images/*.*"/>
+				<include name="DataDependency/images/*.gif"/>
+				<include name="NodeTray/images/*.gif"/>
+			</fileset>
+		</copy>
+		<move file="${home}/samples-pack/samples-pack-Readme.html" tofile="${home}/samples-pack/index.html"/>
+		<delete><fileset dir="${samples-pack}/CustomLoadBalancer" includes="**/*.java.html"/></delete>
+		<delete><fileset dir="${samples-pack}/DataEncryption" includes="**/*.java.html, **/services/*.html"/></delete>
+		<delete><fileset dir="${samples-pack}/TaskNotifications" includes="**/*.java.html, **/services/*.html"/></delete>
+  </target>
+
+	<target name="include.code">
+		<java2html srcdir="${samples-pack}/${sample}" destdir="${samples-pack}/${sample}" includes="**/*.java"
+			style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false"/>
+  </target>
+
+</project> 
