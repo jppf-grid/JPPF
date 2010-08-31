@@ -20,7 +20,6 @@
 	<classpathentry kind="lib" path="shared/lib/jppf-client.jar" sourcepath="/client/src/java"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-common-node.jar" sourcepath="/node/src/java"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-common.jar" sourcepath="/common/src/java"/>
-	<classpathentry kind="lib" path="shared/lib/jppf-server.jar" sourcepath="/server/src/java"/>
 	<classpathentry kind="lib" path="shared/lib/log4j-1.2.9.jar"/>
 	<classpathentry kind="lib" path="shared/lib/js.jar"/>
 	<classpathentry kind="lib" path="shared/lib/crawler-1.0.0.jar"/>
@@ -34,5 +33,6 @@
 	<classpathentry kind="lib" path="shared/lib/groovy-all-1.6.5.jar"/>
 	<classpathentry kind="lib" path="shared/lib/looks-2.2.2.jar"/>
 	<classpathentry kind="lib" path="shared/lib/commons-dbcp-1.4.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-server.jar"/>
 	<classpathentry kind="output" path="shared/classes"/>
 </classpath>
