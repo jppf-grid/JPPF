@@ -53,7 +53,7 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
 	List<JPPFJob> close();
 
 	/**
-	 * Get the name assigned tothis client connection.
+	 * Get the name assigned to this client connection.
 	 * @return the name as a string.
 	 */
 	String getName();
