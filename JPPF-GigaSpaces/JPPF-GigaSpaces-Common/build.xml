@@ -40,8 +40,8 @@
 	<!-- ========================================================================= -->
 
   <target name="clean">
-    <delete dir="${classes.dir}" quiet="true"/>
-    <delete dir="${build.dir}" quiet="true" excludes=".cvsignore"/>
+		<delete><fileset dir="${classes.dir}" includes="**/*.*"/></delete>
+    <delete dir="${build.dir}" quiet="true" excludes=".svnignore"/>
   </target>               
 
 	<!-- ========================================================================= -->
