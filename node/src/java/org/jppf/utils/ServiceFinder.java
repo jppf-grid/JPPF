@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.*;
 
 import org.apache.commons.logging.*;
+import org.jppf.classloader.AbstractJPPFClassLoader;
 
 /**
  * Instances of this class look for and find services implemented via the Service Provider Interface (SPI).
@@ -58,7 +59,18 @@ public class ServiceFinder
 		{
 			try
 			{
-				Class<?> clazz = cl.loadClass(s);
+				Class<?> clazz = null;
+				if (cl instanceof AbstractJPPFClassLoader)
+				{
+					try
+					{
+						clazz = ((AbstractJPPFClassLoader) cl).loadJPPFClass(s);
+					}
+					catch(Exception e)
+					{
+					}
+				}
+				if (clazz == null) clazz = cl.loadClass(s);
 				T t = (T) clazz.newInstance();
 				list.add(t);
 			}
