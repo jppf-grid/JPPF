@@ -22,8 +22,8 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.TO_IDLE;
 
 import java.net.ConnectException;
 
-import org.apache.commons.logging.*;
-import org.jppf.server.nio.*;
+import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  * This class represents the state of waiting for some action.
@@ -34,7 +34,7 @@ class IdleState extends NodeServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(IdleState.class);
+	private static Logger log = LoggerFactory.getLogger(IdleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

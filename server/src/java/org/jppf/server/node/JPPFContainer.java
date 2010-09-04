@@ -20,10 +20,10 @@ package org.jppf.server.node;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.utils.SerializationHelper;
+import org.slf4j.*;
 
 /**
  * Instances of this class represent dynamic class loading, and serialization/deserialization, capabilities, associated
@@ -37,7 +37,7 @@ public abstract class JPPFContainer
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFContainer.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFContainer.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

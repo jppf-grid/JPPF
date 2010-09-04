@@ -19,13 +19,13 @@ package org.jppf.server.app;
 
 import java.net.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
-import org.jppf.data.transform.*;
+import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
-import org.jppf.server.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class listen to incoming client application requests, so as
@@ -39,7 +39,7 @@ class ApplicationConnection extends JPPFConnection
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ApplicationConnection.class);
+	private static Logger log = LoggerFactory.getLogger(ApplicationConnection.class);
 	/**
 	 * Base name used for localization lookups";
 	 */

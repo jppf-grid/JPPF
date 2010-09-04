@@ -21,12 +21,12 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.DataLocation;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.JPPFContainer;
+import org.slf4j.*;
 
 /**
  * Instances of this class represent dynamic class loading, and serialization/deserialization, capabilities, associated
@@ -40,7 +40,7 @@ public class JPPFLocalContainer extends JPPFContainer
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFLocalContainer.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFLocalContainer.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

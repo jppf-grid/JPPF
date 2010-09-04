@@ -17,13 +17,13 @@
  */
 package org.jppf.server.app;
 
-import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.data.transform.*;
+import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
 import org.jppf.server.AbstractResultSender;
 import org.jppf.server.protocol.BundleWrapper;
 import org.jppf.utils.JPPFBuffer;
+import org.slf4j.*;
 
 /**
  * Instances of this class are used to send task bundle execution results back to a JPPF client.
@@ -34,7 +34,7 @@ class ApplicationResultSender extends AbstractResultSender
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ApplicationResultSender.class);
+	private static Logger log = LoggerFactory.getLogger(ApplicationResultSender.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

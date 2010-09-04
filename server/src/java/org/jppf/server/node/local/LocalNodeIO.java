@@ -25,13 +25,13 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.MultipleBuffersInputStream;
+import org.slf4j.*;
 
 /**
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
@@ -42,7 +42,7 @@ public class LocalNodeIO extends AbstractNodeIO
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(LocalNodeIO.class);
+	private static Logger log = LoggerFactory.getLogger(LocalNodeIO.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

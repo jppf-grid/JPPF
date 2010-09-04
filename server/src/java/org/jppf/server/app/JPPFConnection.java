@@ -18,10 +18,11 @@
 package org.jppf.server.app;
 
 import java.net.Socket;
-import org.apache.commons.logging.*;
+
 import org.jppf.JPPFException;
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.comm.socket.*;
+import org.slf4j.*;
 
 /**
  * Wrapper around an incoming socket connection, whose role is to receive the names of classes
@@ -35,7 +36,7 @@ abstract class JPPFConnection extends Thread
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFConnection.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFConnection.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
@@ -97,7 +98,7 @@ abstract class JPPFConnection extends Thread
 		catch (Exception e)
 		{
 			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.warn(e);
+			else log.warn(e.getMessage());
 			setClosed();
 			server.removeConnection(this);
 		}

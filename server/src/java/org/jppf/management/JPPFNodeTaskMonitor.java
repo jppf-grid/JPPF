@@ -22,8 +22,8 @@ import java.util.concurrent.atomic.*;
 
 import javax.management.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.node.*;
+import org.slf4j.*;
 
 /**
  * MBean implementation for task-level monitoring on each node.
@@ -34,7 +34,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFNodeTaskMonitor.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFNodeTaskMonitor.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

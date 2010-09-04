@@ -23,12 +23,12 @@ import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.data.transform.*;
+import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
+import org.slf4j.*;
 
 /**
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
@@ -39,7 +39,7 @@ public class RemoteNodeIO extends AbstractNodeIO
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(RemoteNodeIO.class);
+	private static Logger log = LoggerFactory.getLogger(RemoteNodeIO.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

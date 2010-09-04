@@ -18,9 +18,9 @@
 
 package org.jppf.server.nio.classloader;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.*;
 import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  * Context object associated with a socket channel used by the class server of the JPPF driver. 
@@ -31,7 +31,7 @@ public class LocalClassContext extends ClassContext
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(LocalClassContext.class);
+	private static Logger log = LoggerFactory.getLogger(LocalClassContext.class);
 	/**
 	 * Determines whther DEBUG logging level is enabled.
 	 */

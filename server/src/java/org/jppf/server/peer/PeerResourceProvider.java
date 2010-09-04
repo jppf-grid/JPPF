@@ -18,15 +18,15 @@
 package org.jppf.server.peer;
 
 import java.io.IOException;
-import java.nio.channels.*;
+import java.nio.channels.SocketChannel;
 import java.util.Vector;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.JPPFResourceWrapper;
-import org.jppf.comm.socket.*;
+import org.jppf.comm.socket.SocketChannelClient;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class represents a connection to the class server of a remote JPPF driver (peer driver).
@@ -37,7 +37,7 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(PeerResourceProvider.class);
+	private static Logger log = LoggerFactory.getLogger(PeerResourceProvider.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
@@ -88,7 +88,7 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
 		}
 		catch (IOException e)
 		{
-			log.error(e);
+			log.error(e.getMessage());
 			throw new RuntimeException(e);
 		}
 	}

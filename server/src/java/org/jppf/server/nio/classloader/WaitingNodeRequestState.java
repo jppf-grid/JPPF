@@ -22,10 +22,10 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class represents the state of waiting for a request from a node.
@@ -36,7 +36,7 @@ class WaitingNodeRequestState extends ClassServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(WaitingNodeRequestState.class);
+	private static Logger log = LoggerFactory.getLogger(WaitingNodeRequestState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

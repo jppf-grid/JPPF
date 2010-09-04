@@ -20,11 +20,11 @@ package org.jppf.server.nio.nodeserver;
 
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
+import org.slf4j.*;
 
 /**
  * This class performs performs the work of reading a task bundle execution response from a node. 
@@ -35,7 +35,7 @@ class WaitingResultsState extends NodeServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(WaitingResultsState.class);
+	private static Logger log = LoggerFactory.getLogger(WaitingResultsState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

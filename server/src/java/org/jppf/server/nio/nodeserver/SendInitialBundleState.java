@@ -22,8 +22,8 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
 import java.net.ConnectException;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  * This class represents the state of sending the initial hand-shaking data to a newly connected node.
@@ -34,7 +34,7 @@ class SendInitialBundleState extends NodeServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SendInitialBundleState.class);
+	private static Logger log = LoggerFactory.getLogger(SendInitialBundleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

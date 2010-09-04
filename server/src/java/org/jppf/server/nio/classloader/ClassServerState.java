@@ -22,9 +22,9 @@ import static org.jppf.utils.StringUtils.getRemoteHost;
 
 import java.nio.channels.SocketChannel;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
+import org.slf4j.*;
 
 /**
  * ABstract superclass for all possible states of a class server connection.
@@ -35,7 +35,7 @@ abstract class ClassServerState extends NioState<ClassTransition>
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ClassServerState.class);
+	private static Logger log = LoggerFactory.getLogger(ClassServerState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

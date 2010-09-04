@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.*;
 import org.jppf.classloader.*;
 import org.jppf.management.*;
@@ -34,6 +33,7 @@ import org.jppf.node.event.NodeEventType;
 import org.jppf.server.protocol.*;
 import org.jppf.startup.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class encapsulate execution nodes.
@@ -45,7 +45,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFNode.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFNode.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

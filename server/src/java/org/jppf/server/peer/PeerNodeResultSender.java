@@ -17,12 +17,12 @@
  */
 package org.jppf.server.peer;
 
-import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.server.AbstractResultSender;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.JPPFBuffer;
+import org.slf4j.*;
 
 /**
  * Result sender for a peer driver.<br>
@@ -35,7 +35,7 @@ class PeerNodeResultSender extends AbstractResultSender
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(PeerNodeResultSender.class);
+	private static Logger log = LoggerFactory.getLogger(PeerNodeResultSender.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

@@ -25,13 +25,13 @@ import java.util.*;
 
 import javax.management.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.*;
 import org.jppf.scheduling.*;
 import org.jppf.server.*;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.*;
+import org.slf4j.*;
 
 /**
  * A JPPF queue whose elements are ordered by decreasing priority.
@@ -42,7 +42,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFPriorityQueue.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFPriorityQueue.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

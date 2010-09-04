@@ -23,11 +23,11 @@ import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 import java.io.InvalidClassException;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.data.transform.*;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
@@ -38,7 +38,7 @@ public abstract class AbstractNodeIO implements NodeIO
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AbstractNodeIO.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractNodeIO.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

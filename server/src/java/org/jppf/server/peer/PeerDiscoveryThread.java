@@ -22,10 +22,10 @@ import java.net.Inet4Address;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.logging.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * 
@@ -36,7 +36,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(PeerNode.class);
+	private static Logger log = LoggerFactory.getLogger(PeerNode.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

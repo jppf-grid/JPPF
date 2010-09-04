@@ -18,10 +18,10 @@
 
 package org.jppf.server.scheduler.bundle.impl;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.proportional.*;
+import org.slf4j.*;
 
 /**
  * This bundler implementation computes bundle sizes propertional to the mean execution
@@ -40,7 +40,7 @@ public class ProportionalBundler extends AbstractProportionalBundler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ProportionalBundler.class);
+	private static Logger log = LoggerFactory.getLogger(ProportionalBundler.class);
 	/**
 	 * Determines whether debugging level is set for logging.
 	 */

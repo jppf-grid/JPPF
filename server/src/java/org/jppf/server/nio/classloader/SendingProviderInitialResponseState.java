@@ -22,9 +22,9 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.net.ConnectException;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  * State of sending the initial response to a newly created provider channel.
@@ -35,7 +35,7 @@ class SendingProviderInitialResponseState extends ClassServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SendingProviderInitialResponseState.class);
+	private static Logger log = LoggerFactory.getLogger(SendingProviderInitialResponseState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

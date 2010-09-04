@@ -22,9 +22,9 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
 import java.net.ConnectException;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
+import org.slf4j.*;
 
 /**
  * This class represents the state of waiting for some action.
@@ -35,7 +35,7 @@ class SendingBundleState extends NodeServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SendingBundleState.class);
+	private static Logger log = LoggerFactory.getLogger(SendingBundleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

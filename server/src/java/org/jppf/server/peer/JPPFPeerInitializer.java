@@ -17,8 +17,8 @@
  */
 package org.jppf.server.peer;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.JPPFDriver;
+import org.slf4j.*;
 
 
 /**
@@ -31,7 +31,7 @@ public class JPPFPeerInitializer extends Thread
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFPeerInitializer.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFPeerInitializer.class);
 	/**
 	 * Name of the peer in the configuration file.
 	 */

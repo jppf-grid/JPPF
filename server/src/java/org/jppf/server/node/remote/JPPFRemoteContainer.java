@@ -20,11 +20,11 @@ package org.jppf.server.node.remote;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.server.node.JPPFContainer;
 import org.jppf.utils.JPPFBuffer;
+import org.slf4j.*;
 
 /**
  * Instances of this class represent dynamic class loading, and serialization/deserialization, capabilities, associated
@@ -38,7 +38,7 @@ public class JPPFRemoteContainer extends JPPFContainer
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFRemoteContainer.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFRemoteContainer.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

@@ -17,7 +17,6 @@
  */
 package org.jppf.server.peer;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.io.*;
@@ -27,6 +26,7 @@ import org.jppf.node.event.NodeEventType;
 import org.jppf.server.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class encapsulate execution nodes.
@@ -38,7 +38,7 @@ class PeerNode extends AbstractMonitoredNode
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(PeerNode.class);
+	private static Logger log = LoggerFactory.getLogger(PeerNode.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

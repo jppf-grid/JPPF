@@ -23,12 +23,12 @@ import static org.jppf.server.nio.classloader.ClassState.DEFINING_TYPE;
 import java.nio.channels.SelectionKey;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
-import org.jppf.classloader.*;
+import org.jppf.classloader.ResourceProvider;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.utils.JPPFConfiguration;
+import org.slf4j.*;
 
 /**
  * Instances of this class serve class loading requests from the JPPF nodes.
@@ -39,7 +39,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ClassNioServer.class);
+	private static Logger log = LoggerFactory.getLogger(ClassNioServer.class);
 	/**
 	 * A mapping of the remote resource provider connections handled by this socket server, to their unique uuid.<br>
 	 * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine in

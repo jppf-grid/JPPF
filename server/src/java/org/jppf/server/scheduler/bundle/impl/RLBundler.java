@@ -18,10 +18,10 @@
 
 package org.jppf.server.scheduler.bundle.impl;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.rl.AbstractRLBundler;
+import org.slf4j.*;
 
 /**
  * Bundler based on a reinforcement learning algorithm.
@@ -32,7 +32,7 @@ public class RLBundler extends AbstractRLBundler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(RLBundler.class);
+	private static Logger log = LoggerFactory.getLogger(RLBundler.class);
 	/**
 	 * Determines whether debugging level is set for logging.
 	 */

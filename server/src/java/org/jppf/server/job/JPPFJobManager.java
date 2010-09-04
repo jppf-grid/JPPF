@@ -21,13 +21,13 @@ package org.jppf.server.job;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.job.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFThreadFactory;
+import org.slf4j.*;
 
 /**
  * Instances of this class manage and monitor the jobs throughout their processing within the JPPF driver.
@@ -38,7 +38,7 @@ public class JPPFJobManager implements QueueListener
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFJobManager.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFJobManager.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

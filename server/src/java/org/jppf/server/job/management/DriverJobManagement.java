@@ -22,12 +22,12 @@ import java.util.*;
 
 import javax.management.NotificationBroadcasterSupport;
 
-import org.apache.commons.logging.*;
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.*;
 import org.jppf.server.protocol.*;
+import org.slf4j.*;
 
 /**
  * Implementation of the job management bean.
@@ -38,7 +38,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(DriverJobManagement.class);
+	private static Logger log = LoggerFactory.getLogger(DriverJobManagement.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

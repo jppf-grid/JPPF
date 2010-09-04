@@ -20,13 +20,13 @@ package org.jppf.server.node.remote;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.*;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.node.NodeRunner;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class encapsulate execution nodes.
@@ -37,7 +37,7 @@ public class JPPFRemoteNode extends JPPFNode
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFRemoteNode.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFRemoteNode.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

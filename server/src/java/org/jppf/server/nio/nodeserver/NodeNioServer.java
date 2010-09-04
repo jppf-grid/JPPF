@@ -24,7 +24,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.commons.logging.*;
 import org.jppf.io.ByteBufferLocation;
 import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.JPPFDriver;
@@ -35,6 +34,7 @@ import org.jppf.server.queue.*;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class serve task execution requests to the JPPF nodes.
@@ -45,7 +45,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NodeNioServer.class);
+	private static Logger log = LoggerFactory.getLogger(NodeNioServer.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

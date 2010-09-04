@@ -21,12 +21,12 @@ package org.jppf.management;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.node.event.*;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Management bean for a JPPF node.
@@ -37,7 +37,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFNodeAdmin.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFNodeAdmin.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

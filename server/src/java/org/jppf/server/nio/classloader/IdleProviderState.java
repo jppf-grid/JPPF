@@ -22,9 +22,9 @@ import static org.jppf.server.nio.classloader.ClassTransition.TO_IDLE_PROVIDER;
 
 import java.net.ConnectException;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  * This class represents the state of waiting for the next request for a provider.
@@ -35,7 +35,7 @@ class IdleProviderState extends ClassServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(IdleProviderState.class);
+	private static Logger log = LoggerFactory.getLogger(IdleProviderState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

@@ -20,11 +20,11 @@ package org.jppf.management;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class encapsulate the administration functionalities for a JPPF driver.
@@ -35,7 +35,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFDriverAdmin.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFDriverAdmin.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

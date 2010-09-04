@@ -18,8 +18,8 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 
 /**
@@ -31,7 +31,7 @@ public class LocalNodeContext extends AbstractNodeContext
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(LocalNodeContext.class);
+	private static Logger log = LoggerFactory.getLogger(LocalNodeContext.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

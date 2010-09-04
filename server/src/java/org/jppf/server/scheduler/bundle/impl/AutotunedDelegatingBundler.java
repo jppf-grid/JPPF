@@ -20,9 +20,9 @@ package org.jppf.server.scheduler.bundle.impl;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.autotuned.AnnealingTuneProfile;
+import org.slf4j.*;
 
 /**
  * Instances of this bundler delegate their operations to a singleton instance of a
@@ -34,7 +34,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AutotunedDelegatingBundler.class);
+	private static Logger log = LoggerFactory.getLogger(AutotunedDelegatingBundler.class);
 	/**
 	 * Determines whether debugging level is set for logging.
 	 */

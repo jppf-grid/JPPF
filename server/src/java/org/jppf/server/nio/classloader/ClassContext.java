@@ -21,12 +21,12 @@ package org.jppf.server.nio.classloader;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.ByteBufferInputStream;
 import org.jppf.server.nio.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Context object associated with a socket channel used by the class server of the JPPF driver. 
@@ -37,7 +37,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ClassContext.class);
+	private static Logger log = LoggerFactory.getLogger(ClassContext.class);
 	/**
 	 * Determines whther DEBUG logging level is enabled.
 	 */
@@ -104,7 +104,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 		catch(Exception e)
 		{
 			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.warn(e);
+			else log.warn(e.getMessage());
 		}
 	}
 

@@ -17,10 +17,10 @@
  */
 package org.jppf.server.scheduler.bundle.impl;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.server.scheduler.bundle.autotuned.*;
+import org.jppf.server.scheduler.bundle.autotuned.AnnealingTuneProfile;
+import org.slf4j.*;
 
 /**
  * This class implements a self tuned bundle size algorithm. It starts using the
@@ -39,7 +39,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AutoTunedBundler.class);
+	private static Logger log = LoggerFactory.getLogger(AutoTunedBundler.class);
 	/**
 	 * Determines whether debugging level is set for logging.
 	 */

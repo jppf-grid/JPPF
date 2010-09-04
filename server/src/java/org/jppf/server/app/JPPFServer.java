@@ -21,10 +21,10 @@ import java.io.IOException;
 import java.net.*;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.server.JPPFDriver;
+import org.slf4j.*;
 
 /**
  * This class is a common abstract superclass for servers listening to incoming connections from
@@ -36,7 +36,7 @@ abstract class JPPFServer extends Thread
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFServer.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFServer.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

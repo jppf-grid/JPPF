@@ -23,10 +23,10 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.scheduling.JPPFScheduleHandler;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class manage the execution of JPPF tasks by a node.
@@ -37,7 +37,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NodeExecutionManager.class);
+	private static Logger log = LoggerFactory.getLogger(NodeExecutionManager.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

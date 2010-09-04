@@ -21,8 +21,8 @@ package org.jppf.server.queue;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.protocol.BundleWrapper;
+import org.slf4j.*;
 
 /**
  * Abstract superclass for all JPPFQueue implementations.
@@ -33,7 +33,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AbstractJPPFQueue.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractJPPFQueue.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

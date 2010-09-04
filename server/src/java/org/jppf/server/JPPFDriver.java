@@ -21,10 +21,10 @@ import java.util.*;
 
 import javax.management.MBeanServer;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.comm.discovery.*;
+import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.process.LauncherListener;
@@ -41,6 +41,7 @@ import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.startup.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class serves as an initializer for the entire JPPF server. It follows the singleton pattern and provides access,
@@ -54,7 +55,7 @@ public class JPPFDriver
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(JPPFDriver.class);
+	static Logger log = LoggerFactory.getLogger(JPPFDriver.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */
@@ -126,6 +127,8 @@ public class JPPFDriver
 	 */
 	protected JPPFDriver()
 	{
+		// initialize the jmx logger
+		new JmxMessageNotifier();
 		statsManager.addListener(statsUpdater);
 		initCredentials();
 	}
@@ -553,7 +556,7 @@ public class JPPFDriver
 		catch(Exception e)
 		{
 			e.printStackTrace();
-			log.fatal(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			System.exit(1);
 		}
 	}

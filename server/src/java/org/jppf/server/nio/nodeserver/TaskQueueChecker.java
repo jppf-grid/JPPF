@@ -19,15 +19,15 @@ package org.jppf.server.nio.nodeserver;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.ChannelBundlePair;
-import org.jppf.server.nio.*;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.AbstractJPPFQueue;
 import org.jppf.server.scheduler.bundle.*;
+import org.slf4j.*;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
@@ -37,7 +37,7 @@ class TaskQueueChecker implements Runnable
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(TaskQueueChecker.class);
+	private static Logger log = LoggerFactory.getLogger(TaskQueueChecker.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

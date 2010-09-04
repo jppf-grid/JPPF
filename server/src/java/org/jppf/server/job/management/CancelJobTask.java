@@ -17,10 +17,10 @@
  */
 package org.jppf.server.job.management;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  * Instances of this class are intented to perform job management functions for a specxific node. 
@@ -31,7 +31,7 @@ class CancelJobTask implements Runnable
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(CancelJobTask.class);
+	private static Logger log = LoggerFactory.getLogger(CancelJobTask.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

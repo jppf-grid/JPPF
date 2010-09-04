@@ -22,9 +22,9 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.net.ConnectException;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  * This class represents the state of sending a response to a node.
@@ -35,7 +35,7 @@ class SendingNodeResponseState extends ClassServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SendingNodeResponseState.class);
+	private static Logger log = LoggerFactory.getLogger(SendingNodeResponseState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

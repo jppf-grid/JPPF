@@ -21,9 +21,9 @@ package org.jppf.server.scheduler.bundle.impl;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.proportional.*;
+import org.slf4j.*;
 
 /**
  * Simulation of a node to test a bundler.
@@ -34,7 +34,7 @@ public class NodeSimulator
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NodeSimulator.class);
+	private static Logger log = LoggerFactory.getLogger(NodeSimulator.class);
 	/**
 	 * Determines whether debugging level is set for logging.
 	 */

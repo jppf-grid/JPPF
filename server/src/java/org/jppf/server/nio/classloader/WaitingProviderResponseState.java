@@ -21,9 +21,9 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  * This class represents the state of waiting for the response from a provider.
@@ -34,7 +34,7 @@ class WaitingProviderResponseState extends ClassServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(WaitingProviderResponseState.class);
+	private static Logger log = LoggerFactory.getLogger(WaitingProviderResponseState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

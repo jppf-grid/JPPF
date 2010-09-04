@@ -19,8 +19,8 @@ package org.jppf.server;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
+import org.slf4j.*;
 
 /**
  * Task used by a timer to shutdown, and eventually restart, this server.<br>
@@ -31,7 +31,7 @@ class ShutdownRestartTask extends TimerTask
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(ShutdownRestartTask.class);
+	static Logger log = LoggerFactory.getLogger(ShutdownRestartTask.class);
 	/**
 	 * Determines whether the server should restart after shutdown is complete.
 	 */
@@ -89,7 +89,7 @@ class ShutdownRestartTask extends TimerTask
 					}
 					catch(Exception e)
 					{
-						log.fatal(e.getMessage(), e);
+						log.error(e.getMessage(), e);
 						throw new JPPFError("Could not restart the JPPFDriver");
 					}
 				}

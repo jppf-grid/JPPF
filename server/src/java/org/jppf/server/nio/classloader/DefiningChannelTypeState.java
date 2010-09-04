@@ -23,10 +23,10 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.util.Vector;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.JPPFResourceWrapper;
-import org.jppf.server.nio.*;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.utils.JPPFConfiguration;
+import org.slf4j.*;
 
 /**
  * This class represents the state of a new class server connection, whose type is yet undetermined.
@@ -37,7 +37,7 @@ class DefiningChannelTypeState extends ClassServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(DefiningChannelTypeState.class);
+	private static Logger log = LoggerFactory.getLogger(DefiningChannelTypeState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

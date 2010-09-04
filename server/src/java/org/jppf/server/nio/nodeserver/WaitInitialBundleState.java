@@ -20,12 +20,12 @@ package org.jppf.server.nio.nodeserver;
 
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.JPPFConfiguration;
+import org.slf4j.*;
 
 /**
  * This class implements the state of receiving information from the node as a
@@ -37,7 +37,7 @@ class WaitInitialBundleState extends NodeServerState
 	/**
 	 * Logger for this class.
 	 */
-	protected static Log log = LogFactory.getLog(WaitInitialBundleState.class);
+	protected static Logger log = LoggerFactory.getLogger(WaitInitialBundleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
