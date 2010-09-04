@@ -16,11 +16,13 @@
  * limitations under the License.
  */
 
-package org.jppf.utils;
+package org.jppf.logging.jdk;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.*;
+
+import org.jppf.utils.StringUtils;
 
 /**
  * Formats log records in format [yyyy/MM/dd hh:mm:ss.SSS][LEVEL][package.ClassName.method()]: message.
