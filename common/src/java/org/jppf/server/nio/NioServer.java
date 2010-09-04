@@ -25,11 +25,11 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.classloader.ResourceProvider;
-import org.jppf.comm.socket.*;
+import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.utils.JPPFConfiguration;
+import org.slf4j.*;
 
 /**
  * Generic server for non-blocking asynchronous socket channel based communications.<br>
@@ -47,7 +47,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NioServer.class);
+	private static Logger log = LoggerFactory.getLogger(NioServer.class);
 	/**
 	 * Size of the pool of threads for the state transition executor.
 	 * It is defined as the value of the configuration property 

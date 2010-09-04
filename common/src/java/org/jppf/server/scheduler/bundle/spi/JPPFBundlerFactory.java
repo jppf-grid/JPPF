@@ -20,10 +20,10 @@ package org.jppf.server.scheduler.bundle.spi;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Factory class for JPPF load-balancing algorithms defined through the {@link org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider JPPFBundlerProvider}
@@ -35,7 +35,7 @@ public class JPPFBundlerFactory
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFBundlerFactory.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFBundlerFactory.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class perform the transition of a channel from one state to another.
@@ -32,7 +32,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(StateTransitionTask.class);
+	private static Logger log = LoggerFactory.getLogger(StateTransitionTask.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
@@ -80,7 +80,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 			catch(Exception e)
 			{
 				if (debugEnabled) log.debug(e.getMessage(), e);
-				else log.warn(e);
+				else log.warn(e.getMessage());
 				ctx.handleException(channel);
 			}
 		}

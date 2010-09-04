@@ -17,7 +17,7 @@
  */
 package org.jppf.utils;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * Task that is submitted for each received notification.
@@ -27,7 +27,7 @@ public abstract class SynchronizedTask implements Runnable
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SynchronizedTask.class);
+	private static Logger log = LoggerFactory.getLogger(SynchronizedTask.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

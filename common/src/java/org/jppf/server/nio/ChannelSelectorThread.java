@@ -18,8 +18,8 @@
 
 package org.jppf.server.nio;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.ThreadSynchronization;
+import org.slf4j.*;
 
 /**
  * Instances of this class perform the selection loop for a local (in-VM) channel.
@@ -30,7 +30,7 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ChannelSelectorThread.class);
+	private static Logger log = LoggerFactory.getLogger(ChannelSelectorThread.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

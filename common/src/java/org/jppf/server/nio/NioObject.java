@@ -18,8 +18,8 @@
 
 package org.jppf.server.nio;
 
-import org.apache.commons.logging.*;
 import org.jppf.io.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class represent a data frame read asynchronously from an input source.
@@ -30,7 +30,7 @@ public class NioObject
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NioObject.class);
+	private static Logger log = LoggerFactory.getLogger(NioObject.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

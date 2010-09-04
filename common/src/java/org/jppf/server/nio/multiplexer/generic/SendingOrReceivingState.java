@@ -20,8 +20,8 @@ package org.jppf.server.nio.multiplexer.generic;
 
 import static org.jppf.server.nio.multiplexer.generic.MultiplexerTransition.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  * This state is for determining whether a channel should be sending data,
@@ -33,7 +33,7 @@ public class SendingOrReceivingState extends MultiplexerServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SendingOrReceivingState.class);
+	private static Logger log = LoggerFactory.getLogger(SendingOrReceivingState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

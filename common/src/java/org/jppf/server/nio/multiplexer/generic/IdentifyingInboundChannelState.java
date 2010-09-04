@@ -22,8 +22,8 @@ import static org.jppf.server.nio.multiplexer.generic.MultiplexerTransition.*;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  * In this state, the channel is waiting for the port number to which data should be forwarded locally.
@@ -34,7 +34,7 @@ public class IdentifyingInboundChannelState extends MultiplexerServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(IdentifyingInboundChannelState.class);
+	private static Logger log = LoggerFactory.getLogger(IdentifyingInboundChannelState.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

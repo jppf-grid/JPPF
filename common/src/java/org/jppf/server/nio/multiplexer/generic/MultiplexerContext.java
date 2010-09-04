@@ -23,10 +23,10 @@ import java.nio.channels.*;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.commons.logging.*;
 import org.jppf.io.IOHelper;
 import org.jppf.server.nio.*;
 import org.jppf.utils.StringUtils;
+import org.slf4j.*;
 
 /**
  * Context obect associated with a socket channel used by the multiplexer. 
@@ -37,7 +37,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ReceivingState.class);
+	private static Logger log = LoggerFactory.getLogger(ReceivingState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

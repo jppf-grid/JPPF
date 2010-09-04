@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * Utility to replace multiline content in text files.
@@ -34,7 +34,7 @@ public class FileReplacer
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(FileReplacer.class);
+	private static Logger log = LoggerFactory.getLogger(FileReplacer.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

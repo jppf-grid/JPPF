@@ -21,7 +21,7 @@ package org.jppf.utils;
 import java.io.File;
 import java.util.ResourceBundle;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * Utility methods to localize messages in the JPPF components. 
@@ -32,7 +32,7 @@ public final class LocalizationUtils
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(LocalizationUtils.class);
+	private static Logger log = LoggerFactory.getLogger(LocalizationUtils.class);
 
 	/**
 	 * Get a localized property value.

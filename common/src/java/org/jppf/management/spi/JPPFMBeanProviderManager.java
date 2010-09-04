@@ -22,8 +22,8 @@ import java.util.*;
 
 import javax.management.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.ServiceFinder;
+import org.slf4j.*;
 
 /**
  * Instances of this class manage all management plugins defined through the Service Provider Interface.
@@ -35,7 +35,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFMBeanProviderManager.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFMBeanProviderManager.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

@@ -18,8 +18,8 @@
 
 package org.jppf.server.nio.multiplexer;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.nio.AbstractSocketChannelHandler;
+import org.slf4j.*;
 
 /**
  * Instances of this class act as a separate thread wrapper around a channel handler.
@@ -30,7 +30,7 @@ public class MultiplexerChannelInitializer implements Runnable
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(MultiplexerChannelInitializer.class);
+	private static Logger log = LoggerFactory.getLogger(MultiplexerChannelInitializer.class);
 	/**
 	 * Wrapper for the new connection to establish.
 	 */

@@ -19,9 +19,9 @@ package org.jppf.comm.socket;
 
 import java.net.Socket;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class provides a simple API to transfer objects over a TCP socket connection.
@@ -32,7 +32,7 @@ public class SocketClient extends AbstractSocketWrapper
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SocketClient.class);
+	private static Logger log = LoggerFactory.getLogger(SocketClient.class);
 	
 	/**
 	 * Default constructor is invisible to other classes.
@@ -131,15 +131,15 @@ public class SocketClient extends AbstractSocketWrapper
 			}
 			catch (InstantiationException e)
 			{
-				log.fatal(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 			catch (IllegalAccessException e)
 			{
-				log.fatal(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 			catch (ClassNotFoundException e)
 			{
-				log.fatal(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 		return serializer;

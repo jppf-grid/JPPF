@@ -21,8 +21,9 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import org.apache.commons.logging.*;
+
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This SocketWrapper implementation relies on an underlying SocketChannel, in order to allow
@@ -34,7 +35,7 @@ public class SocketChannelClient implements SocketWrapper
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SocketChannelClient.class);
+	private static Logger log = LoggerFactory.getLogger(SocketChannelClient.class);
 	/**
 	 * The channel associated with the underlying socket connection.
 	 */
@@ -307,15 +308,15 @@ public class SocketChannelClient implements SocketWrapper
 			}
 			catch(InstantiationException e)
 			{
-				log.fatal(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 			catch(IllegalAccessException e)
 			{
-				log.fatal(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 			catch(ClassNotFoundException e)
 			{
-				log.fatal(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 		return serializer;

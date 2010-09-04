@@ -17,8 +17,8 @@
  */
 package org.jppf.server.nio;
 
-import org.apache.commons.logging.*;
 import org.jppf.comm.socket.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class act as wrapper for a connection to a JPPF component.<br>
@@ -30,7 +30,7 @@ public abstract class AbstractSocketChannelHandler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AbstractSocketChannelHandler.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractSocketChannelHandler.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

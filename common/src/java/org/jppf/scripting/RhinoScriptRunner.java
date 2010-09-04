@@ -19,8 +19,8 @@ package org.jppf.scripting;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.mozilla.javascript.*;
+import org.slf4j.*;
 
 /**
  * Script runner wrapper around a Rhino script engine.
@@ -31,7 +31,7 @@ public class RhinoScriptRunner implements ScriptRunner
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(RhinoScriptRunner.class);
+	private static Logger log = LoggerFactory.getLogger(RhinoScriptRunner.class);
 
 	/**
 	 * Determines whether debug log statements are enabled.

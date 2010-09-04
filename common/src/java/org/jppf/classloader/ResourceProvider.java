@@ -21,8 +21,8 @@ import java.io.*;
 import java.net.URL;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class are dedicated to reading resource files form the JVM's classpath and converting them into
@@ -35,7 +35,7 @@ public class ResourceProvider
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ResourceProvider.class);
+	private static Logger log = LoggerFactory.getLogger(ResourceProvider.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

@@ -20,8 +20,8 @@ package org.jppf.server.scheduler.bundle.proportional;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.scheduler.bundle.*;
+import org.slf4j.*;
 
 /**
  * This bundler implementation computes bundle sizes propertional to the mean execution
@@ -40,7 +40,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AbstractProportionalBundler.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractProportionalBundler.class);
 	/**
 	 * Determines whether debugging level is set for logging.
 	 */

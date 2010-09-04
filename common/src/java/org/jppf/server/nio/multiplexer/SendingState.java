@@ -22,8 +22,8 @@ import static org.jppf.server.nio.multiplexer.MultiplexerTransition.*;
 
 import java.net.ConnectException;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  * State of sending data on a channel.
@@ -34,7 +34,7 @@ public class SendingState extends MultiplexerServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SendingState.class);
+	private static Logger log = LoggerFactory.getLogger(SendingState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

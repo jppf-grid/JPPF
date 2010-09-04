@@ -18,8 +18,8 @@
 
 package org.jppf.server.nio.multiplexer;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.nio.*;
+import org.slf4j.*;
 
 /**
  * Context obect associated with a socket channel used by the multiplexer. 
@@ -30,7 +30,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(MultiplexerContext.class);
+	private static Logger log = LoggerFactory.getLogger(MultiplexerContext.class);
 	/**
 	 * The request currently processed.
 	 */

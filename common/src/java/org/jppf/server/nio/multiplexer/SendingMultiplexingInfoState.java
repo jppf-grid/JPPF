@@ -23,8 +23,8 @@ import static org.jppf.server.nio.multiplexer.MultiplexerTransition.*;
 import java.net.ConnectException;
 import java.nio.ByteBuffer;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.nio.*;
+import org.slf4j.*;
 
 /**
  * This state is for sending a port number to a remote multiplexer, which will then establish
@@ -36,7 +36,7 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SendingMultiplexingInfoState.class);
+	private static Logger log = LoggerFactory.getLogger(SendingMultiplexingInfoState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

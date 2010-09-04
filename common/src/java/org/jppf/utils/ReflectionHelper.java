@@ -20,8 +20,8 @@ package org.jppf.utils;
 
 import java.lang.reflect.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
+import org.slf4j.*;
 
 /**
  * 
@@ -32,7 +32,7 @@ public final class ReflectionHelper
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ReflectionHelper.class);
+	private static Logger log = LoggerFactory.getLogger(ReflectionHelper.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

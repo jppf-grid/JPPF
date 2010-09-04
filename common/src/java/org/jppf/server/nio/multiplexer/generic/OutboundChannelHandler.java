@@ -20,10 +20,10 @@ package org.jppf.server.nio.multiplexer.generic;
 
 import java.nio.channels.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketChannelClient;
 import org.jppf.server.nio.*;
 import org.jppf.utils.StringUtils;
+import org.slf4j.*;
 
 /**
  * They handle (re)connection services when needed.
@@ -35,7 +35,7 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(OutboundChannelHandler.class);
+	private static Logger log = LoggerFactory.getLogger(OutboundChannelHandler.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

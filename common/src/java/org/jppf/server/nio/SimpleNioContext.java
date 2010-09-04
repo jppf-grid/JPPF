@@ -21,8 +21,8 @@ package org.jppf.server.nio;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Context associated with an open socket channel.
@@ -34,7 +34,7 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SimpleNioContext.class);
+	private static Logger log = LoggerFactory.getLogger(SimpleNioContext.class);
 	/**
 	 * Determines whther TRACE logging level is enabled.
 	 */

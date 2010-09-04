@@ -20,10 +20,10 @@ package org.jppf.server.scheduler.bundle.proportional;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.commons.logging.*;
-import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.LoadBalancingProfile;
 import org.jppf.server.scheduler.bundle.autotuned.AbstractAutoTuneProfile;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Paremeters profile for a proportional bundler. 
@@ -34,7 +34,7 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ProportionalTuneProfile.class);
+	private static Logger log = LoggerFactory.getLogger(ProportionalTuneProfile.class);
 	/**
 	 * Determines whether debugging level is set for logging.
 	 */

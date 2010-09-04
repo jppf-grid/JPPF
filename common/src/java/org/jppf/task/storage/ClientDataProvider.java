@@ -18,9 +18,9 @@
 
 package org.jppf.task.storage;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.JPPFClassLoader;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This data provider is an extension of <code>MemoryMapDataProvider</code> that enables executing a callback method on the client side.
@@ -31,7 +31,7 @@ public class ClientDataProvider extends MemoryMapDataProvider
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ClientDataProvider.class);
+	private static Logger log = LoggerFactory.getLogger(ClientDataProvider.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

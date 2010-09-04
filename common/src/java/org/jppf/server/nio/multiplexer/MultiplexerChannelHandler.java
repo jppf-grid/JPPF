@@ -20,9 +20,9 @@ package org.jppf.server.nio.multiplexer;
 
 import java.nio.channels.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.comm.socket.SocketChannelClient;
 import org.jppf.server.nio.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class are used when a client or node is connecting to the multiplexer.
@@ -35,7 +35,7 @@ public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(MultiplexerChannelHandler.class);
+	private static Logger log = LoggerFactory.getLogger(MultiplexerChannelHandler.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

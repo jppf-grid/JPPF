@@ -22,7 +22,7 @@ import java.text.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * This class handles a timer.
@@ -33,7 +33,7 @@ public class JPPFScheduleHandler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFScheduleHandler.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFScheduleHandler.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

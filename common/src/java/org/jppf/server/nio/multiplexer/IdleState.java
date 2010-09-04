@@ -20,8 +20,8 @@ package org.jppf.server.nio.multiplexer;
 
 import static org.jppf.server.nio.multiplexer.MultiplexerTransition.TO_IDLE;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  * State of doing nothing.
@@ -32,7 +32,7 @@ public class IdleState extends MultiplexerServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(IdleState.class);
+	private static Logger log = LoggerFactory.getLogger(IdleState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

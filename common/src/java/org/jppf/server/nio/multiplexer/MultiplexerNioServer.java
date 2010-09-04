@@ -21,10 +21,10 @@ package org.jppf.server.nio.multiplexer;
 import java.nio.channels.*;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.server.nio.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Nio server managing connections to and from the multiplexer.
@@ -39,7 +39,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(MultiplexerNioServer.class);
+	private static Logger log = LoggerFactory.getLogger(MultiplexerNioServer.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

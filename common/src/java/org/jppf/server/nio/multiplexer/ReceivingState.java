@@ -20,8 +20,8 @@ package org.jppf.server.nio.multiplexer;
 
 import static org.jppf.server.nio.multiplexer.MultiplexerTransition.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.nio.*;
+import org.slf4j.*;
 
 /**
  * State of receiving data on a channel.
@@ -34,7 +34,7 @@ public class ReceivingState extends MultiplexerServerState
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ReceivingState.class);
+	private static Logger log = LoggerFactory.getLogger(ReceivingState.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

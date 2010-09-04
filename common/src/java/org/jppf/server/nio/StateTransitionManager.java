@@ -22,8 +22,8 @@ import java.nio.channels.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class manage the state transitions of channels opened via a <code>NioServer</code>.
@@ -36,7 +36,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(StateTransitionManager.class);
+	private static Logger log = LoggerFactory.getLogger(StateTransitionManager.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */
