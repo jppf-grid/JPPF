@@ -104,22 +104,38 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	 */
 	public synchronized Class<?> loadJPPFClass(String name) throws ClassNotFoundException
 	{
-		if (debugEnabled) log.debug("looking up resource [" + name + "]");
-		Class<?> c = findLoadedClass(name);
-		/*
-		if (c == null)
+		try
 		{
-			ClassLoader parent = getParent();
-			if (parent instanceof AbstractJPPFClassLoader) c = ((AbstractJPPFClassLoader) parent).findLoadedClass(name);
+			if (name.indexOf("JPPFMBeanProvider") >= 0)
+			{
+				int breakpoint = 0;
+			}
+			if (debugEnabled) log.debug("looking up resource [" + name + "]");
+			Class<?> c = findLoadedClass(name);
+			if (c != null)
+			{
+				ClassLoader cl = c.getClassLoader();
+				if (debugEnabled) log.debug("classloader = " + cl);
+			}
+			/*
+			if (c == null)
+			{
+				ClassLoader parent = getParent();
+				if (parent instanceof AbstractJPPFClassLoader) c = ((AbstractJPPFClassLoader) parent).findLoadedClass(name);
+			}
+			*/
+			if (c == null)
+			{
+				if (debugEnabled) log.debug("resource [" + name + "] not already loaded");
+				c = findClass(name);
+			}
+			if (debugEnabled) log.debug("definition for resource [" + name + "] : " + c);
+			return c;
 		}
-		*/
-		if (c == null)
+		catch(NoClassDefFoundError e)
 		{
-			if (debugEnabled) log.debug("resource [" + name + "] not already loaded");
-			c = findClass(name);
+			throw e;
 		}
-		if (debugEnabled) log.debug("definition for resource [" + name + "] : " + c);
-		return c;
 	}
 
 	/**
@@ -157,7 +173,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 				if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
 				throw new ClassNotFoundException("Could not load class '" + name + "'");
 			}
-			if (debugEnabled) log.debug("found definition for resource [" + name + "]");
+			if (debugEnabled) log.debug("found definition for resource [" + name + ", definitionLength=" + b.length + "]");
 			return defineClass(name, b, 0, b.length);
 		}
 		finally
