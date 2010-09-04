@@ -79,10 +79,6 @@ public class NodeRunner
 	 */
 	private static MonitoredNode node = null;
 	/**
-	 * Determines whether the node is local to a driver's JVM or remote.
-	 */
-	private static boolean localNode = false;
-	/**
 	 * Used to synchronize start and stop methods when the node is run as a service.
 	 */
 	private static SimpleObjectLock serviceLock = new SimpleObjectLock();
@@ -99,8 +95,7 @@ public class NodeRunner
 			if (debugEnabled) log.debug("launching the JPPF node");
 			if ((args == null) || (args.length <= 0))
 				throw new JPPFException("The node should be run with an argument representing a valid TCP port, 'noLauncher' or 'local'");
-			localNode = "local".equals(args[0]);
-			if (!"noLauncher".equals(args[0]) && !localNode)
+			if (!"noLauncher".equals(args[0]))
 			{
 				int port = Integer.parseInt(args[0]);
 				new LauncherListener(port).start();
@@ -109,7 +104,7 @@ public class NodeRunner
 		catch(Exception e)
 		{
 			log.fatal(e.getMessage(), e);
-			if (!localNode) System.exit(1);
+			System.exit(1);
 		}
 		try
 		{
@@ -132,7 +127,7 @@ public class NodeRunner
 					classLoader.close();
 					classLoader = null;
 					node.stopNode(false);
-					if (!localNode) unsetSecurity();
+					unsetSecurity();
 				}
 				catch(JPPFNodeReconnectionNotification e)
 				{
@@ -140,7 +135,7 @@ public class NodeRunner
 					if (classLoader != null) classLoader.close();
 					classLoader = null;
 					if (node != null) node.stopNode(true);
-					if (!localNode) unsetSecurity();
+					unsetSecurity();
 				}
 			}
 		}
@@ -178,13 +173,13 @@ public class NodeRunner
 	 */
 	public static MonitoredNode createNode() throws Exception
 	{
-		if (!localNode && JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true)) discoverDriver();
-		if (!localNode) setSecurity();
-		String className = localNode ? "org.jppf.server.node.local.JPPFLocalNode" : "org.jppf.server.node.remote.JPPFRemoteNode";
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true)) discoverDriver();
+		setSecurity();
+		String className = "org.jppf.server.node.remote.JPPFRemoteNode";
 		Class clazz = getJPPFClassLoader().loadClass(className);
 		MonitoredNode node = (MonitoredNode) clazz.newInstance();
 		if (debugEnabled) log.debug("Created new node instance: " + node);
-		if (!localNode) node.setSocketWrapper(nodeSocket);
+		node.setSocketWrapper(nodeSocket);
 		return node;
 	}
 
