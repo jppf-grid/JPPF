@@ -152,6 +152,7 @@
 	<!-- =========== Application template packaging =========== -->
 
 	<target name="application.template" description="" depends="init">
+		<mkdir dir="${application.template}/classes"/>
 		<delete><fileset dir="${application.template}/classes" includes="**/*.*"/></delete>
 		<javac srcdir="" destdir="${application.template}/classes"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
