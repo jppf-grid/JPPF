@@ -74,10 +74,20 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
 	 */
 	public List<S> getAllProviders()
 	{
+		return getAllProviders(getClass().getClassLoader());
+	}
+
+	/**
+	 * Retrieve all defined MBean providers for the specified provider interface.
+	 * @param cl the class loader to use for class lookup.
+	 * @return a list of <code>S</code> instances.
+	 */
+	public List<S> getAllProviders(ClassLoader cl)
+	{
 		if (providerList == null)
 		{
 			providerList = new ArrayList<S>();
-			Iterator<S> it = ServiceFinder.lookupProviders(providerClass);
+			Iterator<S> it = ServiceFinder.lookupProviders(providerClass, cl);
 			while (it.hasNext()) providerList.add(it.next());
 		}
 		return providerList;
@@ -85,7 +95,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
 
 	/**
 	 * Register the specified MBean.
-	 * @param <T> the type of the MBean interface. 
+	 * @param <T> the type of the MBean interface.
 	 * @param impl the MBean implementation.
 	 * @param intf the MBean exposed interface.
 	 * @param name the MBean name.
@@ -96,9 +106,14 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
 		try
 		{
 			if (debugEnabled) log.debug("found MBean provider: [name="+name+", inf="+intf+", impl="+impl.getClass().getName()+"]");
-			server.registerMBean(impl, new ObjectName(name));
-			registeredMBeanNames.add(name);
-			return true;
+			ObjectName objectName = new ObjectName(name);
+			if (!server.isRegistered(objectName))
+			{
+				server.registerMBean(impl, objectName);
+				registeredMBeanNames.add(name);
+				return true;
+			}
+			else log.warn("an instance of MBean [" + name + "] already exists, registration was skipped");
 		}
 		catch(Exception e)
 		{
