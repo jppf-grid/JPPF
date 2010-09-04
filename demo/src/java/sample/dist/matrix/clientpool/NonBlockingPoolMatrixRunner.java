@@ -19,13 +19,13 @@ package sample.dist.matrix.clientpool;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 import sample.dist.matrix.*;
 
@@ -38,7 +38,7 @@ public class NonBlockingPoolMatrixRunner
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(NonBlockingPoolMatrixRunner.class);
+	static Logger log = LoggerFactory.getLogger(NonBlockingPoolMatrixRunner.class);
 	/**
 	 * JPPF client used to submit execution requests.
 	 */

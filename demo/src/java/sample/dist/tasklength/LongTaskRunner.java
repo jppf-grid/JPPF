@@ -19,13 +19,13 @@ package sample.dist.tasklength;
 
 import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Runner class for the &quot;Long Task&quot; demo.
@@ -36,7 +36,7 @@ public class LongTaskRunner
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(LongTaskRunner.class);
+	static Logger log = LoggerFactory.getLogger(LongTaskRunner.class);
 	/**
 	 * JPPF client used to submit execution requests.
 	 */

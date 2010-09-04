@@ -19,10 +19,10 @@ package sample.dist.commandline;
 
 import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.StringUtils;
+import org.slf4j.*;
 
 /**
  * Runner class used for testing the framework.
@@ -33,7 +33,7 @@ public class CommandLineTaskRunner
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(CommandLineTaskRunner.class);
+	static Logger log = LoggerFactory.getLogger(CommandLineTaskRunner.class);
 	/**
 	 * JPPF client used to submit execution requests.
 	 */

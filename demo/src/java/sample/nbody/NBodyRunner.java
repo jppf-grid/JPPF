@@ -23,11 +23,11 @@ import java.util.*;
 
 import javax.swing.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Runner class for the &quot;N-Body demo&quot; demo.
@@ -38,7 +38,7 @@ public class NBodyRunner
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(NBodyRunner.class);
+	static Logger log = LoggerFactory.getLogger(NBodyRunner.class);
 	/**
 	 * JPPF client used to submit execution requests.
 	 */

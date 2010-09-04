@@ -20,9 +20,9 @@ package test.socket;
 
 import java.net.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * 
@@ -33,7 +33,7 @@ public class SocketPerformance
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SocketPerformance.class);
+	private static Logger log = LoggerFactory.getLogger(SocketPerformance.class);
 	/**
 	 * One kilobyte.
 	 */

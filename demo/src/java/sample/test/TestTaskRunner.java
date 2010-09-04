@@ -19,12 +19,12 @@ package sample.test;
 
 import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.utils.StringUtils;
+import org.slf4j.*;
 
 /**
  * Runner class used for testing the framework.
@@ -35,7 +35,7 @@ public class TestTaskRunner
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(TestTaskRunner.class);
+	static Logger log = LoggerFactory.getLogger(TestTaskRunner.class);
 	/**
 	 * JPPF client used to submit execution requests.
 	 */

@@ -19,11 +19,11 @@ package sample.cascading;
 
 import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
-import org.jppf.node.policy.*;
+import org.jppf.node.policy.Equal;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.StringUtils;
+import org.slf4j.*;
 
 /**
  * Runner class used for testing the framework.
@@ -34,7 +34,7 @@ public class CascadingTestRunner
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(CascadingTestRunner.class);
+	static Logger log = LoggerFactory.getLogger(CascadingTestRunner.class);
 	/**
 	 * JPPF client used to submit execution requests.
 	 */

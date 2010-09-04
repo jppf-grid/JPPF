@@ -17,13 +17,13 @@
  */
 package sample.datasize;
 
-import java.util.*;
+import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Runner class for the matrix multiplication demo.
@@ -34,7 +34,7 @@ public class DataSizeRunner
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(DataSizeRunner.class);
+	static Logger log = LoggerFactory.getLogger(DataSizeRunner.class);
 	/**
 	 * JPPF client used to submit execution requests.
 	 */

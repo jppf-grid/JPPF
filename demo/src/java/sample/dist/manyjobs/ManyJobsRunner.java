@@ -19,11 +19,11 @@ package sample.dist.manyjobs;
 
 import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 import sample.dist.tasklength.LongTask;
 
@@ -36,7 +36,7 @@ public class ManyJobsRunner
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(ManyJobsRunner.class);
+	static Logger log = LoggerFactory.getLogger(ManyJobsRunner.class);
 	/**
 	 * JPPF client used to submit execution requests.
 	 */

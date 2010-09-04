@@ -19,10 +19,10 @@ package sample.test.profiling;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Runner class for the &quot;Long Task&quot; demo.
@@ -33,7 +33,7 @@ public class ProfilingRunner
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(ProfilingRunner.class);
+	static Logger log = LoggerFactory.getLogger(ProfilingRunner.class);
 	/**
 	 * JPPF client used to submit execution requests.
 	 */

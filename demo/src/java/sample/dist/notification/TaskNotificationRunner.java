@@ -19,13 +19,13 @@ package sample.dist.notification;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.server.*;
+import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Runner class for the &quot;Task Notification&quot; demo.
@@ -36,7 +36,7 @@ public class TaskNotificationRunner
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(TaskNotificationRunner.class);
+	static Logger log = LoggerFactory.getLogger(TaskNotificationRunner.class);
 	/**
 	 * JPPF client used to submit execution requests.
 	 */

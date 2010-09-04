@@ -21,8 +21,8 @@ package test.ipprobe;
 import java.net.Socket;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * 
@@ -32,7 +32,7 @@ public class Probe
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(Probe.class);
+	private static Logger log = LoggerFactory.getLogger(Probe.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */
@@ -102,7 +102,7 @@ public class Probe
 				catch(Exception e)
 				{
 					if (debugEnabled) log.debug(e.getMessage(), e);
-					else log.error(e);
+					else log.error(e.getMessage());
 				}
 			}
 		}
