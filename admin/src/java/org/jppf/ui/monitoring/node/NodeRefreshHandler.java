@@ -23,11 +23,11 @@ import java.util.concurrent.atomic.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.utils.NetworkUtils;
+import org.slf4j.*;
 
 /**
  * Instances of this class hold information about the associations between JPPF drivers and
@@ -39,7 +39,7 @@ public class NodeRefreshHandler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NodeRefreshHandler.class);
+	private static Logger log = LoggerFactory.getLogger(NodeRefreshHandler.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

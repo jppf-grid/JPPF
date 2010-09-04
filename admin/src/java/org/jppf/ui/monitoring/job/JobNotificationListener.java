@@ -19,8 +19,8 @@ package org.jppf.ui.monitoring.job;
 
 import javax.management.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.job.JobNotification;
+import org.slf4j.*;
 
 /**
  * Implementation of a notification listener for processing of job events.
@@ -30,7 +30,7 @@ public class JobNotificationListener implements NotificationListener
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JobNotificationListener.class);
+	private static Logger log = LoggerFactory.getLogger(JobNotificationListener.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

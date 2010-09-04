@@ -20,9 +20,9 @@ package org.jppf.ui.monitoring.node.actions;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.JMXNodeConnectionWrapper;
 import org.jppf.ui.monitoring.node.TopologyData;
+import org.slf4j.*;
 
 /**
  * This action stops a node.
@@ -32,7 +32,7 @@ public class ShutdownNodeAction extends AbstractTopologyAction
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ShutdownNodeAction.class);
+	private static Logger log = LoggerFactory.getLogger(ShutdownNodeAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

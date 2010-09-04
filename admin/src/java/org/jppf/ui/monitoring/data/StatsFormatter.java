@@ -18,11 +18,13 @@
 package org.jppf.ui.monitoring.data;
 
 import static org.jppf.ui.monitoring.data.Fields.*;
+
 import java.text.NumberFormat;
 import java.util.*;
-import org.apache.commons.logging.*;
+
 import org.jppf.server.JPPFStats;
 import org.jppf.utils.StringUtils;
+import org.slf4j.*;
 
 /**
  * This class provides a set of methods to format the statistics data received from the server.
@@ -33,7 +35,7 @@ public final class StatsFormatter implements StatsConstants
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(StatsFormatter.class);
+	static Logger log = LoggerFactory.getLogger(StatsFormatter.class);
 	/**
 	 * Formatter for integer values.
 	 */

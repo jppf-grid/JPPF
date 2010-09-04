@@ -18,13 +18,12 @@
 
 package org.jppf.ui.monitoring.job;
 
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.*;
 
 import javax.swing.*;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.job.JobInformation;
@@ -35,6 +34,7 @@ import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.job.actions.*;
 import org.jppf.ui.treetable.*;
 import org.jppf.utils.SynchronizedTask;
+import org.slf4j.*;
 
 /**
  * Panel displaying the tree of all driver connections and attached nodes.
@@ -45,7 +45,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(JobDataPanel.class);
+	static Logger log = LoggerFactory.getLogger(JobDataPanel.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

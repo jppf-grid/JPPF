@@ -18,10 +18,10 @@
 
 package org.jppf.ui.monitoring.node;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.utils.NetworkUtils;
+import org.slf4j.*;
 
 /**
  * Instances of this class represent the state of a node in the Yopology panel tree.
@@ -32,7 +32,7 @@ public class TopologyData
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(TopologyData.class);
+	private static Logger log = LoggerFactory.getLogger(TopologyData.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

@@ -21,8 +21,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.ui.utils.GuiUtils;
+import org.slf4j.*;
 
 /**
  * Option implementation with a JButton as the underlying component.
@@ -33,7 +33,7 @@ public class ButtonOption extends AbstractOption
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ButtonOption.class);
+	private static Logger log = LoggerFactory.getLogger(ButtonOption.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

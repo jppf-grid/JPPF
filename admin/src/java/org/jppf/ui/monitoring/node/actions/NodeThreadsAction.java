@@ -22,12 +22,12 @@ import java.util.List;
 
 import javax.swing.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.JMXNodeConnectionWrapper;
 import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
+import org.slf4j.*;
 
 /**
  * This action displays an input panel for the user to type a new
@@ -38,7 +38,7 @@ public class NodeThreadsAction extends AbstractTopologyAction
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NodeThreadsAction.class);
+	private static Logger log = LoggerFactory.getLogger(NodeThreadsAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

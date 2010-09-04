@@ -23,9 +23,9 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.treetable.JPPFTreeTable;
+import org.slf4j.*;
 
 /**
  * Mouse listener for the node data panel.
@@ -37,7 +37,7 @@ public class JobTreeTableMouseListener extends MouseAdapter
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JobTreeTableMouseListener.class);
+	private static Logger log = LoggerFactory.getLogger(JobTreeTableMouseListener.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

@@ -20,9 +20,9 @@ package org.jppf.ui.monitoring.node.actions;
 
 import javax.swing.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.ui.utils.GuiUtils;
+import org.slf4j.*;
 
 /**
  * Abstract superclass for popup menu actions used in the ui.  
@@ -33,7 +33,7 @@ public abstract class JPPFAbstractNodeAction extends AbstractAction
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFAbstractNodeAction.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFAbstractNodeAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

@@ -20,14 +20,14 @@ package org.jppf.ui.monitoring;
 import java.util.*;
 
 import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import net.miginfocom.swing.MigLayout;
 
-import org.apache.commons.logging.*;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.utils.LocalizationUtils;
+import org.slf4j.*;
 
 /**
  * This class provides a graphical interface for monitoring the status and health 
@@ -41,7 +41,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(MonitoringPanel.class);
+	static Logger log = LoggerFactory.getLogger(MonitoringPanel.class);
 	/**
 	 * Base name for localization bundle lookups.
 	 */

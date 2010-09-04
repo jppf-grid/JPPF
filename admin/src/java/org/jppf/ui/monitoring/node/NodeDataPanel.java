@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.*;
 import javax.swing.tree.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.management.*;
@@ -33,6 +32,7 @@ import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.FormattedNumberOption;
 import org.jppf.ui.treetable.*;
+import org.slf4j.*;
 
 /**
  * Panel displaying the tree of all driver connections and attached nodes.
@@ -43,7 +43,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NodeDataPanel.class);
+	private static Logger log = LoggerFactory.getLogger(NodeDataPanel.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

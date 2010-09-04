@@ -22,9 +22,9 @@ import java.util.prefs.*;
 
 import javax.swing.JFrame;
 
-import org.apache.commons.logging.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
+import org.slf4j.*;
 
 /**
  * This class handles the persistence of the dynamic UI com
@@ -35,7 +35,7 @@ public final class OptionsHandler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(OptionsHandler.class);
+	private static Logger log = LoggerFactory.getLogger(OptionsHandler.class);
 	/**
 	 * The root of the preferences subtree in which the chart configurations are saved.
 	 */

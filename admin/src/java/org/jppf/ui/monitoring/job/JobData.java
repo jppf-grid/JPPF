@@ -20,11 +20,11 @@ package org.jppf.ui.monitoring.job;
 
 import javax.management.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.job.JobInformation;
 import org.jppf.management.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.slf4j.*;
 
 /**
  * Instances of this class hold the information related to each node in the job data tree table.
@@ -35,7 +35,7 @@ public class JobData
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JobData.class);
+	private static Logger log = LoggerFactory.getLogger(JobData.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
@@ -174,7 +174,7 @@ public class JobData
 			catch(Exception e)
 			{
 				if (debugEnabled) log.debug(e.getMessage(), e);
-				else log.warn(e);
+				else log.warn(e.getMessage());
 			}
 		}
 		return proxy;

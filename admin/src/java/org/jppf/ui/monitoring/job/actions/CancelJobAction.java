@@ -20,9 +20,9 @@ package org.jppf.ui.monitoring.job.actions;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.monitoring.job.JobData;
+import org.slf4j.*;
 
 /**
  * This action stops a job.
@@ -32,7 +32,7 @@ public class CancelJobAction extends AbstractJobAction
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(CancelJobAction.class);
+	private static Logger log = LoggerFactory.getLogger(CancelJobAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

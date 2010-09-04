@@ -19,9 +19,9 @@ package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.ActionEvent;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.JMXNodeConnectionWrapper;
 import org.jppf.ui.monitoring.node.TopologyData;
+import org.slf4j.*;
 
 /**
  * Attempts to cancel a task that is currently running on a node.
@@ -31,7 +31,7 @@ public class CancelTaskAction extends JPPFAbstractNodeAction
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(CancelTaskAction.class);
+	private static Logger log = LoggerFactory.getLogger(CancelTaskAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

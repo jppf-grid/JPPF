@@ -24,12 +24,12 @@ import java.util.*;
 
 import javax.swing.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.TypedProperties;
+import org.slf4j.*;
 
 /**
  * This action displays an input panel for the user to type a new
@@ -40,7 +40,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NodeConfigurationAction.class);
+	private static Logger log = LoggerFactory.getLogger(NodeConfigurationAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

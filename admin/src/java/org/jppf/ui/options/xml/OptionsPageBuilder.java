@@ -22,12 +22,12 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.event.*;
 import org.jppf.ui.options.xml.OptionDescriptor.ListenerDescriptor;
 import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class build options pages from XML descriptors.
@@ -38,7 +38,7 @@ public class OptionsPageBuilder
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(OptionsPageBuilder.class);
+	private static Logger log = LoggerFactory.getLogger(OptionsPageBuilder.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

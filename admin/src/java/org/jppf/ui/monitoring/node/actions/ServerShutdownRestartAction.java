@@ -22,12 +22,12 @@ import java.util.*;
 
 import javax.swing.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.monitoring.node.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
+import org.slf4j.*;
 
 /**
  * This action stops a node.
@@ -37,7 +37,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ServerShutdownRestartAction.class);
+	private static Logger log = LoggerFactory.getLogger(ServerShutdownRestartAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

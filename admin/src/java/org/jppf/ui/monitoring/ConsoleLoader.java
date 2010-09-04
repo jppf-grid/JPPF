@@ -17,37 +17,24 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.net.*;
 import java.nio.charset.Charset;
 import java.text.NumberFormat;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 
 import net.miginfocom.swing.MigLayout;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jppf.libmanagement.Downloader;
-import org.jppf.server.protocol.LocationEvent;
-import org.jppf.server.protocol.LocationEventListener;
-import org.jppf.ui.options.OptionElement;
-import org.jppf.ui.options.TextAreaOption;
+import org.jppf.server.protocol.*;
+import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.FileUtils;
+import org.slf4j.*;
 
 /**
  * This class provides a graphical interface for monitoring the status and health of the JPPF servers and nodes.<br>
@@ -59,7 +46,7 @@ public class ConsoleLoader
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(ConsoleLoader.class);
+	static Logger log = LoggerFactory.getLogger(ConsoleLoader.class);
 	/**
 	 * Determines whether to proceed with the download or not.
 	 */

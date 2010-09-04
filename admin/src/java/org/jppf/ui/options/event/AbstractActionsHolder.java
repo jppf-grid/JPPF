@@ -20,9 +20,9 @@ package org.jppf.ui.options.event;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
+import org.slf4j.*;
 
 /**
  * 
@@ -33,7 +33,7 @@ public abstract class AbstractActionsHolder  implements ValueChangeListener
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(OptionsHandler.class);
+	private static Logger log = LoggerFactory.getLogger(OptionsHandler.class);
 	/**
 	 * The option that triggered the action
 	 */

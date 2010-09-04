@@ -39,7 +39,7 @@ import javax.swing.event.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.*;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * This is a wrapper class takes a TreeTableModel and implements the table model interface. The implementation is
@@ -55,7 +55,7 @@ public class TreeTableModelAdapter extends AbstractTableModel
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(TreeTableModelAdapter.class);
+	static Logger log = LoggerFactory.getLogger(TreeTableModelAdapter.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

@@ -18,12 +18,14 @@
 package org.jppf.ui.monitoring.charts.config;
 
 import static org.jppf.ui.monitoring.charts.ChartType.CHART_PLOTXY;
+
 import java.util.*;
 import java.util.prefs.*;
-import org.apache.commons.logging.*;
+
 import org.jppf.ui.monitoring.charts.ChartType;
 import org.jppf.ui.monitoring.data.Fields;
 import org.jppf.ui.options.factory.OptionsHandler;
+import org.slf4j.*;
 
 /**
  * This class provides an API to store and retrieve the chart configuration
@@ -35,7 +37,7 @@ public class PreferencesStorage
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(PreferencesStorage.class);
+	private static Logger log = LoggerFactory.getLogger(PreferencesStorage.class);
 	/**
 	 * The root of the preferences subtree in which the chart configurations are saved.
 	 */

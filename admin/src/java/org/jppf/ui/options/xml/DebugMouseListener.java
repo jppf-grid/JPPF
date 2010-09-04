@@ -23,8 +23,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.ui.options.*;
+import org.slf4j.*;
 
 /**
  * Mouse listener for debug use. Shows a popup menu on the top container of options loaded through an "import" tag in the XML descriptor.
@@ -36,7 +36,7 @@ public class DebugMouseListener extends MouseAdapter
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(DebugMouseListener.class);
+	private static Logger log = LoggerFactory.getLogger(DebugMouseListener.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

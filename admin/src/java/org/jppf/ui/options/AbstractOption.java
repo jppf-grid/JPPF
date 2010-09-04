@@ -23,8 +23,8 @@ import javax.swing.*;
 
 import net.miginfocom.swing.MigLayout;
 
-import org.apache.commons.logging.*;
 import org.jppf.ui.options.event.*;
+import org.slf4j.*;
 
 /**
  * Default abstract implementation of the <code>Option</code> interface.
@@ -35,7 +35,7 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AbstractOption.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractOption.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

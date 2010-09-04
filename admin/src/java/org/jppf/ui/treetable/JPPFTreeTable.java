@@ -18,12 +18,7 @@
 
 package org.jppf.ui.treetable;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-
-import org.jppf.ui.treetable.JTreeTable;
+import javax.swing.tree.*;
 
 /**
  * 

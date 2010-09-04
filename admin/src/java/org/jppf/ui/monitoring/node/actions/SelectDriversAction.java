@@ -23,7 +23,7 @@ import java.util.*;
 
 import javax.swing.tree.*;
 
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.monitoring.node.NodeDataPanel;
 import org.jppf.ui.treetable.*;
 
 /**

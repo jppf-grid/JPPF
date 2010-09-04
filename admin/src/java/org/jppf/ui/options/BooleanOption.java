@@ -18,6 +18,7 @@
 package org.jppf.ui.options;
 
 import java.awt.event.*;
+
 import javax.swing.JCheckBox;
 
 /**

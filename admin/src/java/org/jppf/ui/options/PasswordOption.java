@@ -18,6 +18,7 @@
 package org.jppf.ui.options;
 
 import java.awt.Dimension;
+
 import javax.swing.*;
 
 /**

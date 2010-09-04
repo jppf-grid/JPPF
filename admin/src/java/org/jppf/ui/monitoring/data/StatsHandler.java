@@ -17,34 +17,20 @@
  */
 package org.jppf.ui.monitoring.data;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.swing.JComboBox;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.jppf.client.JPPFClient;
-import org.jppf.client.JPPFClientConnection;
-import org.jppf.client.JPPFClientConnectionImpl;
-import org.jppf.client.JPPFClientConnectionStatus;
-import org.jppf.client.event.ClientEvent;
-import org.jppf.client.event.ClientListener;
+import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.JPPFStats;
-import org.jppf.ui.monitoring.event.StatsHandlerEvent;
-import org.jppf.ui.monitoring.event.StatsHandlerListener;
-import org.jppf.ui.options.ComboBoxOption;
-import org.jppf.ui.options.OptionElement;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.ui.monitoring.event.*;
+import org.jppf.ui.options.*;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class provides a convenient access to the statistics obtained from the JPPF server.
@@ -55,7 +41,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(StatsHandler.class);
+	private static Logger log = LoggerFactory.getLogger(StatsHandler.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

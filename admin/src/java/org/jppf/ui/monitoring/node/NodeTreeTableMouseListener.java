@@ -26,11 +26,11 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.tree.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.treetable.JPPFTreeTable;
 import org.jppf.ui.utils.GuiUtils;
+import org.slf4j.*;
 
 /**
  * Mouse listener for the node data panel.
@@ -42,7 +42,7 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NodeTreeTableMouseListener.class);
+	private static Logger log = LoggerFactory.getLogger(NodeTreeTableMouseListener.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

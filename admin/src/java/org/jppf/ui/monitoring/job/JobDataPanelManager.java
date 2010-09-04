@@ -22,12 +22,12 @@ import java.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.job.JobInformation;
 import org.jppf.management.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.slf4j.*;
 
 /**
  * This class manages updates to, and navigation within, the tree table
@@ -39,7 +39,7 @@ class JobDataPanelManager
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(JobDataPanelManager.class);
+	static Logger log = LoggerFactory.getLogger(JobDataPanelManager.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

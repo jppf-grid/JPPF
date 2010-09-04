@@ -22,11 +22,11 @@ import java.util.List;
 
 import javax.swing.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.monitoring.job.JobData;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
+import org.slf4j.*;
 
 /**
  * This action updates the maximum number of nodes a job can run on.
@@ -36,7 +36,7 @@ public class UpdateMaxNodesAction extends AbstractJobAction
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(UpdateMaxNodesAction.class);
+	private static Logger log = LoggerFactory.getLogger(UpdateMaxNodesAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

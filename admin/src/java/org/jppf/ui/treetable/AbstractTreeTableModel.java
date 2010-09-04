@@ -42,7 +42,7 @@ package org.jppf.ui.treetable;
 import javax.swing.event.*;
 import javax.swing.tree.TreePath;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * An abstract implementation of the TreeTableModel interface, handling the list of listeners.
@@ -57,7 +57,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AbstractTreeTableModel.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractTreeTableModel.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

@@ -21,11 +21,11 @@ import java.util.*;
 
 import javax.swing.tree.TreePath;
 
-import org.apache.commons.logging.*;
 import org.jppf.scripting.*;
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
 import org.jppf.utils.JPPFUuid;
+import org.slf4j.*;
 
 /**
  * Implementation of ValueChangeListener for script-based event listeners.
@@ -36,7 +36,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ScriptedValueChangeListener.class);
+	private static Logger log = LoggerFactory.getLogger(ScriptedValueChangeListener.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

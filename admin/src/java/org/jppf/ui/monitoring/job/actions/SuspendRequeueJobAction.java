@@ -17,7 +17,8 @@
  */
 package org.jppf.ui.monitoring.job.actions;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
+
 
 /**
  * This action suspends a job and causes all sub-jobs currently executing to be canceled and requeued on the server.
@@ -27,7 +28,7 @@ public class SuspendRequeueJobAction extends AbstractSuspendJobAction
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SuspendRequeueJobAction.class);
+	private static Logger log = LoggerFactory.getLogger(SuspendRequeueJobAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

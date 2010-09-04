@@ -21,11 +21,11 @@ import java.security.*;
 
 import javax.swing.UIManager;
 
-import org.apache.commons.logging.*;
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.JPPFSplash;
 import org.jppf.utils.JPPFConfiguration;
+import org.slf4j.*;
 
 /**
  * This class provides a graphical interface for monitoring the status and health 
@@ -39,7 +39,7 @@ public class UILauncher
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(UILauncher.class);
+	static Logger log = LoggerFactory.getLogger(UILauncher.class);
 	/**
 	 * The permissions for the UI.
 	 */

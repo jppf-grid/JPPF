@@ -18,7 +18,8 @@
 package org.jppf.ui.options.event;
 
 import java.util.EventObject;
-import org.jppf.ui.options.*;
+
+import org.jppf.ui.options.OptionElement;
 
 /**
  * Event generated when the value of an option has changed.

@@ -20,9 +20,9 @@ package org.jppf.ui.monitoring.node.actions;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.JMXNodeConnectionWrapper;
 import org.jppf.ui.monitoring.node.TopologyData;
+import org.slf4j.*;
 
 /**
  * This action resets the task counter of a node to 0.
@@ -32,7 +32,7 @@ public class ResetTaskCounterAction extends AbstractTopologyAction
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ResetTaskCounterAction.class);
+	private static Logger log = LoggerFactory.getLogger(ResetTaskCounterAction.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

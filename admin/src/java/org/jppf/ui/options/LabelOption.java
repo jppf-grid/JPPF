@@ -18,6 +18,7 @@
 package org.jppf.ui.options;
 
 import javax.swing.*;
+
 import org.jppf.ui.utils.GuiUtils;
 
 /**

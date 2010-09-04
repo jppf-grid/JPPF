@@ -18,6 +18,7 @@
 package org.jppf.ui.monitoring.data;
 
 import static org.jppf.ui.monitoring.data.Fields.*;
+
 import org.jppf.utils.CollectionUtils;
 
 /**

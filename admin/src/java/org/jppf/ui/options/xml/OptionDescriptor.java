@@ -19,6 +19,7 @@ package org.jppf.ui.options.xml;
 
 import java.io.Serializable;
 import java.util.*;
+
 import org.jppf.utils.TypedProperties;
 
 /**

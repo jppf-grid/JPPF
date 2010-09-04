@@ -18,12 +18,9 @@
 package org.jppf.ui.options;
 
 import java.awt.Dimension;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import java.text.*;
 
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 /**
  * Option class for numbers formatted using a pattern, as defined in class

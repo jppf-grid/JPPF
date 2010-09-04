@@ -18,6 +18,7 @@
 package org.jppf.ui.monitoring.charts.config;
 
 import java.util.*;
+
 import javax.swing.JPanel;
 
 /**

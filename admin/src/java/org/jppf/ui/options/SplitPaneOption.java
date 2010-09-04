@@ -21,7 +21,7 @@ import java.util.*;
 
 import javax.swing.JSplitPane;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * This option class encapsulates a split pane, as the one present in the Swing api.
@@ -32,7 +32,7 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SplitPaneOption.class);
+	private static Logger log = LoggerFactory.getLogger(SplitPaneOption.class);
 	/**
 	 * Horizontal split.
 	 */

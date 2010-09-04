@@ -22,9 +22,11 @@ import java.net.URL;
 
 import javax.xml.parsers.*;
 
-import org.apache.commons.logging.*;
-import org.jppf.ui.options.xml.OptionDescriptor.*;
+import org.jppf.ui.options.xml.OptionDescriptor.ItemDescriptor;
+import org.jppf.ui.options.xml.OptionDescriptor.ListenerDescriptor;
+import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
 import org.jppf.utils.FileUtils;
+import org.slf4j.*;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
@@ -38,7 +40,7 @@ public class OptionDescriptorParser
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(OptionDescriptorParser.class);
+	private static Logger log = LoggerFactory.getLogger(OptionDescriptorParser.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
@@ -253,7 +255,7 @@ public class OptionDescriptorParser
 				}
 				catch(Exception e)
 				{
-					if (debugEnabled) log.debug(e);
+					if (debugEnabled) log.debug(e.getMessage());
 				}
 				try
 				{

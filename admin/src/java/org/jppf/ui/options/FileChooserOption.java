@@ -20,8 +20,10 @@ package org.jppf.ui.options;
 import java.awt.event.*;
 import java.io.File;
 import java.util.*;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+
 import org.jppf.ui.utils.GuiUtils;
 
 /**

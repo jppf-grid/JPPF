@@ -41,7 +41,7 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.tree.*;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * This example shows how to create a simple JTreeTable component, by using a JTree as a renderer (and editor) for the
@@ -57,7 +57,7 @@ public class JTreeTable extends JTable
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JTreeTable.class);
+	private static Logger log = LoggerFactory.getLogger(JTreeTable.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
