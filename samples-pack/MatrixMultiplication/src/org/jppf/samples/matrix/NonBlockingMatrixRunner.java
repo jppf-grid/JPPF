@@ -19,7 +19,6 @@ package org.jppf.samples.matrix;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
@@ -27,6 +26,7 @@ import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Runner class for the matrix multiplication demo.
@@ -37,7 +37,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(NonBlockingMatrixRunner.class);
+	static Logger log = LoggerFactory.getLogger(NonBlockingMatrixRunner.class);
 	/**
 	 * JPPF client used to submit execution requests.
 	 */

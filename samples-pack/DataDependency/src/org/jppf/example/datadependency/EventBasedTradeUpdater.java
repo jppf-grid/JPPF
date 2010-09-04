@@ -18,8 +18,8 @@
 
 package org.jppf.example.datadependency;
 
-import org.apache.commons.logging.*;
 import org.jppf.example.datadependency.simulation.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class start a simulated ticker and process
@@ -31,7 +31,7 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(EventBasedTradeUpdater.class);
+	private static Logger log = LoggerFactory.getLogger(EventBasedTradeUpdater.class);
 	/**
 	 * Debug enabled flag.
 	 */

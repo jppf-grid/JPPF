@@ -22,9 +22,9 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.logging.*;
 import org.jppf.example.datadependency.model.MarketData;
 import org.jppf.utils.ThreadSynchronization;
+import org.slf4j.*;
 
 /**
  * This class simulates a market ticker by generating random updates at random intervals.
@@ -35,7 +35,7 @@ public class Ticker extends ThreadSynchronization implements Runnable
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(Ticker.class);
+	private static Logger log = LoggerFactory.getLogger(Ticker.class);
 	/**
 	 * Debug enabled flag.
 	 */

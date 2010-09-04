@@ -21,9 +21,9 @@ package org.jppf.example.datadependency;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.logging.*;
 import org.jppf.example.datadependency.model.MarketData;
 import org.jppf.example.datadependency.simulation.*;
+import org.slf4j.*;
 
 /**
  * 
@@ -34,7 +34,7 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SnapshotBasedTradeUpdater.class);
+	private static Logger log = LoggerFactory.getLogger(SnapshotBasedTradeUpdater.class);
 	/**
 	 * Debug enabled flag.
 	 */

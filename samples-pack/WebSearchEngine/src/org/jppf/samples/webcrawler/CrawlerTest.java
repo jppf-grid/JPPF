@@ -21,11 +21,11 @@ package org.jppf.samples.webcrawler;
 import java.util.*;
 
 import org.apache.commons.httpclient.params.DefaultHttpParams;
-import org.apache.commons.logging.*;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.*;
+import org.slf4j.*;
 
 import com.torunski.crawler.Crawler;
 import com.torunski.crawler.events.*;
@@ -42,7 +42,7 @@ public class CrawlerTest
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(CrawlerTest.class);
+	private static Logger log = LoggerFactory.getLogger(CrawlerTest.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

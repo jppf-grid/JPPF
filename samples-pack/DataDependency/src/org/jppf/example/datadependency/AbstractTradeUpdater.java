@@ -22,13 +22,13 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.example.datadependency.model.*;
 import org.jppf.example.datadependency.simulation.*;
 import org.jppf.node.policy.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * 
@@ -39,7 +39,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AbstractTradeUpdater.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractTradeUpdater.class);
 	/**
 	 * Debug enabled flag.
 	 */

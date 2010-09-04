@@ -25,11 +25,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.management.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.*;
 import org.jppf.node.*;
 import org.jppf.node.event.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Adds a system tray icon for node monitoring.
@@ -42,7 +42,7 @@ public class NodeSystemTray
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NodeSystemTray.class);
+	private static Logger log = LoggerFactory.getLogger(NodeSystemTray.class);
 	/**
 	 * The icon displayed in the system tray.
 	 */

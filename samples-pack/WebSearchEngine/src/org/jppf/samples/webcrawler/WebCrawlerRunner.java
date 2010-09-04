@@ -25,11 +25,11 @@ import java.util.concurrent.*;
 
 import javax.swing.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.ui.options.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 
 /**
@@ -42,7 +42,7 @@ public class WebCrawlerRunner
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(WebCrawlerRunner.class);
+	private static Logger log = LoggerFactory.getLogger(WebCrawlerRunner.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

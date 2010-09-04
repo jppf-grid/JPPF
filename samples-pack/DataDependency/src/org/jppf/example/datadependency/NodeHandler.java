@@ -21,11 +21,11 @@ package org.jppf.example.datadependency;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.example.datadependency.model.MarketData;
 import org.jppf.example.datadependency.simulation.*;
 import org.jppf.management.*;
 import org.jppf.utils.TypedProperties;
+import org.slf4j.*;
 
 /**
  * 
@@ -44,7 +44,7 @@ public class NodeHandler implements TickerListener
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NodeHandler.class);
+	private static Logger log = LoggerFactory.getLogger(NodeHandler.class);
 	/**
 	 * Debug enabled flag.
 	 */

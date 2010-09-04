@@ -14,7 +14,6 @@
 	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/resources"/>
 	<classpathentry kind="src" output="TransactionalDatabase/classes" path="TransactionalDatabase/src"/>
 	<classpathentry kind="src" output="WebSearchEngine/classes" path="WebSearchEngine/src"/>
-	<classpathentry kind="lib" path="shared/lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jaligner.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-admin.jar" sourcepath="/admin/src/java"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-client.jar" sourcepath="/client/src/java"/>
@@ -34,5 +33,8 @@
 	<classpathentry kind="lib" path="shared/lib/looks-2.2.2.jar"/>
 	<classpathentry kind="lib" path="shared/lib/commons-dbcp-1.4.jar"/>
 	<classpathentry kind="lib" path="shared/lib/jppf-server.jar"/>
+	<classpathentry kind="lib" path="shared/lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="shared/lib/slf4j-jdk14-1.6.1.jar"/>
+	<classpathentry kind="lib" path="shared/lib/slf4j-log4j12-1.6.1.jar"/>
 	<classpathentry kind="output" path="shared/classes"/>
 </classpath>

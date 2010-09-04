@@ -29,12 +29,12 @@ import java.util.concurrent.*;
 
 import javax.swing.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.ui.options.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 
 /**
@@ -47,7 +47,7 @@ public class SequenceAlignmentRunner
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SequenceAlignmentRunner.class);
+	private static Logger log = LoggerFactory.getLogger(SequenceAlignmentRunner.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

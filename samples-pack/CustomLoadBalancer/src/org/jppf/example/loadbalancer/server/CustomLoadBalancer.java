@@ -18,12 +18,12 @@
 
 package org.jppf.example.loadbalancer.server;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.JPPFJobMetadata;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.TypedProperties;
+import org.slf4j.*;
 
 /**
  * This implementation of a load-balancing algorithm illustrates the use of
@@ -43,7 +43,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(CustomLoadBalancer.class);
+	private static Logger log = LoggerFactory.getLogger(CustomLoadBalancer.class);
 	/**
 	 * Holds information about the node's environment and configuration.
 	 */

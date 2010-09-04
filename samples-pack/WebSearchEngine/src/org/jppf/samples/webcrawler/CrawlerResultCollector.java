@@ -22,10 +22,10 @@ import java.util.*;
 
 import javax.swing.SwingUtilities;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.JPPFResultCollector;
 import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
+import org.slf4j.*;
 
 /**
  * Result collector that updates the progess bar's value during the computation.
@@ -35,7 +35,7 @@ public class CrawlerResultCollector implements TaskResultListener
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFResultCollector.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFResultCollector.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

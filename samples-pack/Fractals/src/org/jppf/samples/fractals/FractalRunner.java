@@ -26,12 +26,12 @@ import java.util.concurrent.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.ui.options.Option;
 import org.jppf.utils.StringUtils;
+import org.slf4j.*;
 
 /**
  * Runner class for the Lyapunov and Mandelbrot fractals sample application.
@@ -42,7 +42,7 @@ public class FractalRunner
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(FractalRunner.class);
+	static Logger log = LoggerFactory.getLogger(FractalRunner.class);
 	/**
 	 * JPPF client used to submit execution requests.
 	 */
