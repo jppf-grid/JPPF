@@ -21,7 +21,7 @@ package org.jppf.security;
 import java.security.*;
 import java.util.*;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * 
@@ -32,7 +32,7 @@ public class JPPFPermissions extends PermissionCollection
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFPolicy.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFPolicy.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

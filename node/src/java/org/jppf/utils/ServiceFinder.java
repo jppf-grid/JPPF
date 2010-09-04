@@ -22,8 +22,8 @@ import java.io.*;
 import java.net.URL;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
+import org.slf4j.*;
 
 /**
  * Instances of this class look for and find services implemented via the Service Provider Interface (SPI).
@@ -35,7 +35,7 @@ public class ServiceFinder
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ServiceFinder.class);
+	private static Logger log = LoggerFactory.getLogger(ServiceFinder.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
@@ -110,7 +110,7 @@ public class ServiceFinder
 		catch(IOException e)
 		{
 			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.warn(e);
+			else log.warn(e.getMessage());
 		}
 		return urls;
 	}
@@ -151,7 +151,7 @@ public class ServiceFinder
 		catch(IOException e)
 		{
 			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.warn(e);
+			else log.warn(e.getMessage());
 		}
 		return lines;
 	}

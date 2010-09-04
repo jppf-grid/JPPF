@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * Context associated with an open communication channel.
@@ -30,7 +30,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AbstractNioContext.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractNioContext.class);
 	/**
 	 * Determines whther DEBUG logging level is enabled.
 	 */

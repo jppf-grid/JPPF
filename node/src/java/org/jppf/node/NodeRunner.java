@@ -21,14 +21,15 @@ import java.security.*;
 import java.util.Hashtable;
 import java.util.concurrent.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.*;
 import org.jppf.classloader.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Bootstrap class for lauching a JPPF node. The node class is dynamically loaded from a remote server.
@@ -39,7 +40,7 @@ public class NodeRunner
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NodeRunner.class);
+	private static Logger log = LoggerFactory.getLogger(NodeRunner.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */
@@ -92,6 +93,8 @@ public class NodeRunner
 		node = null;
 		try
 		{
+			// initialize the jmx logger
+			new JmxMessageNotifier();
 			if (debugEnabled) log.debug("launching the JPPF node");
 			if ((args == null) || (args.length <= 0))
 				throw new JPPFException("The node should be run with an argument representing a valid TCP port, 'noLauncher' or 'local'");
@@ -103,7 +106,7 @@ public class NodeRunner
 		}
 		catch(Exception e)
 		{
-			log.fatal(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			System.exit(1);
 		}
 		try

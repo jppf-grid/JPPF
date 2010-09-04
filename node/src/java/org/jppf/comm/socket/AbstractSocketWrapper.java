@@ -20,9 +20,9 @@ package org.jppf.comm.socket;
 import java.io.*;
 import java.net.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 
 /**
@@ -37,7 +37,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AbstractSocketWrapper.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractSocketWrapper.class);
 	/**
 	 * The underlying socket wrapped by this SocketClient.
 	 */

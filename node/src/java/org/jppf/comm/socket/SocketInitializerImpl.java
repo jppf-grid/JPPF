@@ -20,9 +20,9 @@ package org.jppf.comm.socket;
 import java.util.*;
 import java.util.concurrent.locks.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class attempt to connect a {@link org.jppf.comm.socket.SocketWrapper SocketWrapper} to a remote server.
@@ -35,7 +35,7 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(SocketInitializerImpl.class);
+	private static Logger log = LoggerFactory.getLogger(SocketInitializerImpl.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

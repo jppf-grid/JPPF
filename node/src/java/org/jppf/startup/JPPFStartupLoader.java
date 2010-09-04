@@ -20,8 +20,8 @@ package org.jppf.startup;
 
 import java.util.Iterator;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.ServiceFinder;
+import org.slf4j.*;
 
 /**
  * Loader for the JPPF startup SPI implementations.
@@ -33,7 +33,7 @@ public class JPPFStartupLoader<S extends JPPFStartup>
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFStartupLoader.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFStartupLoader.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

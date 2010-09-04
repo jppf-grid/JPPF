@@ -21,8 +21,8 @@ import java.io.InputStream;
 import java.nio.channels.SelectionKey;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class is a custom class loader serving the purpose of dynamically loading the JPPF classes and the client
@@ -34,7 +34,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFLocalClassLoader.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFLocalClassLoader.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

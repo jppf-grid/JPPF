@@ -21,7 +21,7 @@ package org.jppf.utils;
 import java.net.*;
 import java.util.*;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * Utility class that provides method to discover the network configuration of the current machine.
@@ -32,7 +32,7 @@ public final class NetworkUtils
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NetworkUtils.class);
+	private static Logger log = LoggerFactory.getLogger(NetworkUtils.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

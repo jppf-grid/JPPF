@@ -20,11 +20,11 @@ package org.jppf.classloader;
 import java.io.IOException;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.*;
 import org.jppf.data.transform.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class is a custom class loader serving the purpose of dynamically loading the JPPF classes and the client
@@ -36,7 +36,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFClassLoader.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFClassLoader.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

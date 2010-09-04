@@ -51,6 +51,10 @@ public class JmxMessageNotifier
 	 * The MBean server with which the MBean is registered.
 	 */
 	private static MBeanServer server = null;
+	/**
+	 * 
+	 */
+	private static boolean initializing = false;
 
 	/**
 	 * Initialize this notifier with the default MBean name.
@@ -66,7 +70,8 @@ public class JmxMessageNotifier
 	 */
 	public JmxMessageNotifier(String name)
 	{
-		initializeJmx(name == null ? JmxLogger.DEFAULT_MBEAN_NAME : name);
+		//initializeJmx(name == null ? JmxLogger.DEFAULT_MBEAN_NAME : name);
+		initializeJmx(JmxLogger.DEFAULT_MBEAN_NAME);
 	}
 
 	/**
@@ -109,7 +114,7 @@ public class JmxMessageNotifier
 	{
 		try
 		{
-			objectName = new ObjectName(name);
+			if (objectName == null) objectName = new ObjectName(name);
 		}
 		catch (Exception e)
 		{
@@ -133,7 +138,7 @@ public class JmxMessageNotifier
 	{
 		try
 		{
-			jmxLogger = (JmxLogger) MBeanServerInvocationHandler.newProxyInstance(server, objectName, JmxLogger.class, true);
+			if (jmxLogger == null) jmxLogger = (JmxLogger) MBeanServerInvocationHandler.newProxyInstance(server, objectName, JmxLogger.class, true);
 		}
 		catch (Exception e)
 		{
@@ -149,6 +154,8 @@ public class JmxMessageNotifier
 		LOCK.lock();
 		try
 		{
+			if (initializing) return;
+			initializing = true;
 			if (server != null) return;
 			server = obtainMBeanServer();
 			if (server == null) return;
@@ -167,6 +174,7 @@ public class JmxMessageNotifier
 		}
 		finally
 		{
+			initializing = false;
 			LOCK.unlock();
 		}
 	}

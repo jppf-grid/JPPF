@@ -21,9 +21,9 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.process.event.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * <p>This class is intended as a controller for a subprocess, to enable stopping and restarting it when requested.
@@ -41,7 +41,7 @@ public class ProcessLauncher implements ProcessWrapperEventListener
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ProcessLauncher.class);
+	private static Logger log = LoggerFactory.getLogger(ProcessLauncher.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

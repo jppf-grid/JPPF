@@ -22,8 +22,8 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class broadcast JPPF driver information at regular intervals,
@@ -36,7 +36,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFBroadcaster.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFBroadcaster.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

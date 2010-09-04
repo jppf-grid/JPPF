@@ -23,8 +23,8 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * An instance of this class listens to messages broadcast by the driver
@@ -36,7 +36,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFMulticastReceiver.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFMulticastReceiver.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

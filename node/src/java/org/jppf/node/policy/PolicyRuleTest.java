@@ -18,8 +18,8 @@
 
 package org.jppf.node.policy;
 
-import org.apache.commons.logging.*;
 import org.jppf.management.JPPFSystemInformation;
+import org.slf4j.*;
 
 /**
  * Simple test of an execution policy.
@@ -30,7 +30,7 @@ public class PolicyRuleTest extends ExecutionPolicy
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(PolicyRuleTest.class);
+	private static Logger log = LoggerFactory.getLogger(PolicyRuleTest.class);
 	/**
 	 * Determines whether DEBUG logging level is enabled.
 	 */

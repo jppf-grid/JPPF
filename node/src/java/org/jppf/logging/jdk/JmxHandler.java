@@ -56,6 +56,7 @@ public class JmxHandler extends Handler
 		Formatter f = getFormatter();
 		if (f == null) f = new JPPFLogFormatter();
 		String s = f.format(record);
+		notifier.sendMessage(s);
 	}
 
 	/**

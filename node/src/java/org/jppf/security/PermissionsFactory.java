@@ -25,8 +25,8 @@ import java.util.*;
 
 import javax.management.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class is used to generate and obtain the permissions that constitute the security policy for a JPPF node.
@@ -37,7 +37,7 @@ public final class PermissionsFactory
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(PermissionsFactory.class);
+	private static Logger log = LoggerFactory.getLogger(PermissionsFactory.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

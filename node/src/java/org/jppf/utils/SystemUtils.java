@@ -20,11 +20,11 @@ package org.jppf.utils;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.net.*;
+import java.net.InetAddress;
 import java.security.*;
 import java.util.*;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * Collection of utility methods used as a convenience for retrieving
@@ -36,7 +36,7 @@ public final class SystemUtils
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(NetworkUtils.class);
+	private static Logger log = LoggerFactory.getLogger(NetworkUtils.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
@@ -105,14 +105,14 @@ public final class SystemUtils
 				catch(SecurityException e)
 				{
 					if (debugEnabled) log.debug(e.getMessage(), e);
-					else log.info(e);
+					else log.info(e.getMessage());
 				}
 			}
 		}
 		catch(SecurityException e)
 		{
 			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.info(e);
+			else log.info(e.getMessage());
 		}
 	}
 
@@ -132,7 +132,7 @@ public final class SystemUtils
 		{
 			s = e.getMessage();
 			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.info(e);
+			else log.info(e.getMessage());
 		}
 		if (s != null) props.setProperty(name, s);
 	}
@@ -153,7 +153,7 @@ public final class SystemUtils
 		{
 			s = e.getMessage();
 			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.info(e);
+			else log.info(e.getMessage());
 		}
 		props.setProperty("availableProcessors", s);
 		try
@@ -164,7 +164,7 @@ public final class SystemUtils
 		{
 			s = e.getMessage();
 			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.info(e);
+			else log.info(e.getMessage());
 		}
 		props.setProperty("freeMemory", s);
 		try
@@ -175,7 +175,7 @@ public final class SystemUtils
 		{
 			s = e.getMessage();
 			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.info(e);
+			else log.info(e.getMessage());
 		}
 		props.setProperty("totalMemory", s);
 		try
@@ -186,7 +186,7 @@ public final class SystemUtils
 		{
 			s = e.getMessage();
 			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.info(e);
+			else log.info(e.getMessage());
 		}
 		props.setProperty("maxMemory", s);
 
@@ -243,7 +243,7 @@ public final class SystemUtils
 			catch(Exception e)
 			{
 				if (debugEnabled) log.debug(e.getMessage(), e);
-				else log.info(e);
+				else log.info(e.getMessage());
 			}
 		}
 		props.setProperty("host.roots.names", sb.toString());		
@@ -270,7 +270,7 @@ public final class SystemUtils
 			catch(SecurityException e)
 			{
 				if (debugEnabled) log.debug(e.getMessage(), e);
-				else log.info(e);
+				else log.info(e.getMessage());
 			}
 		}
 		return env;
@@ -293,7 +293,7 @@ public final class SystemUtils
 			catch(SecurityException e)
 			{
 				if (debugEnabled) log.debug(e.getMessage(), e);
-				else log.info(e);
+				else log.info(e.getMessage());
 			}
 		}
 		return network;

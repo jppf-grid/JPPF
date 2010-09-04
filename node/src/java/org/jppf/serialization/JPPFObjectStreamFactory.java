@@ -20,9 +20,9 @@ package org.jppf.serialization;
 
 import java.io.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class builds object streams based on JPPF configuration properties.
@@ -45,7 +45,7 @@ public class JPPFObjectStreamFactory
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFObjectStreamFactory.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFObjectStreamFactory.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
@@ -83,7 +83,7 @@ public class JPPFObjectStreamFactory
 				StringBuilder sb = new StringBuilder();
 				sb.append("Could not instantiate object stream builder for [").append(OIS_CLASS).append(" = ").append(oisName);
 				sb.append(", ").append(OOS_CLASS).append(" = ").append(oosName).append("]\nTerminating this application\n");
-				log.fatal(sb.toString() + e.getMessage(), e);
+				log.error(sb.toString() + e.getMessage(), e);
 				throw new JPPFError(sb.toString() + e.getMessage(), e);
 			}
 		}
@@ -99,7 +99,7 @@ public class JPPFObjectStreamFactory
 				StringBuilder sb = new StringBuilder();
 				sb.append("Could not instantiate object stream builder for [").append(BUILDER_CLASS).append(" = ");
 				sb.append(builderName).append("]\nTerminating this application\n");
-				log.fatal(sb.toString() + e.getMessage(), e);
+				log.error(sb.toString() + e.getMessage(), e);
 				throw new JPPFError(sb.toString() + e.getMessage(), e);
 			}
 		}

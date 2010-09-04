@@ -22,7 +22,7 @@ import java.net.*;
 import java.nio.channels.*;
 import java.util.*;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 
 /**
@@ -34,7 +34,7 @@ public final class StringUtils
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(StringUtils.class);
+	private static Logger log = LoggerFactory.getLogger(StringUtils.class);
 	/**
 	 * Keywords to look for and replace in the legend items of the charts.
 	 */

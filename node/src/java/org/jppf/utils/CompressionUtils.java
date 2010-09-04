@@ -17,7 +17,7 @@
  */
 package org.jppf.utils;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * Collection of utility methods for compressing and uncompressing data.
@@ -28,7 +28,7 @@ public final class CompressionUtils
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(CompressionUtils.class);
+	private static Logger log = LoggerFactory.getLogger(CompressionUtils.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

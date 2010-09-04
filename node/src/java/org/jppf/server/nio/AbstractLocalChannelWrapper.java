@@ -20,8 +20,8 @@ package org.jppf.server.nio;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.SimpleObjectLock;
+import org.slf4j.*;
 
 /**
  * Channel wrapper and I/O implementation for the class loader of an in-VM node.
@@ -34,7 +34,7 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
 	/**
 	 * Logger for this class.
 	 */
-	static Log log = LogFactory.getLog(AbstractLocalChannelWrapper.class);
+	static Logger log = LoggerFactory.getLogger(AbstractLocalChannelWrapper.class);
 	/**
 	 * Determines whether trace-level logging is enabled.
 	 */

@@ -22,22 +22,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.*;
 
-import org.apache.commons.logging.*;
-
 /**
  * Implementation of a  simple logger that sends logged messages as JMX notifications.
  * @author Laurent Cohen
  */
 public class JmxLoggerImpl extends NotificationBroadcasterSupport implements JmxLogger
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Log log = LogFactory.getLog(JmxLoggerImpl.class);
-	/**
-	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The mbrean object name sent with the notifications.
 	 */
@@ -77,7 +67,7 @@ public class JmxLoggerImpl extends NotificationBroadcasterSupport implements Jmx
 		}
 		catch(Exception e)
 		{
-			log.error("failed to send JMX log notification", e);
+			System.out.println("Error: failed to send JMX log notification (" + e.getMessage() + ")");
 		}
 		return null;
 	}

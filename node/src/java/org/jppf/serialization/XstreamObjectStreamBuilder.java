@@ -22,8 +22,8 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
+import org.slf4j.*;
 
 /**
  * Object stream factory that creates streams from the XStream framework.
@@ -37,7 +37,7 @@ public class XstreamObjectStreamBuilder implements JPPFObjectStreamBuilder
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(XstreamObjectStreamBuilder.class);
+	private static Logger log = LoggerFactory.getLogger(XstreamObjectStreamBuilder.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
@@ -123,7 +123,7 @@ public class XstreamObjectStreamBuilder implements JPPFObjectStreamBuilder
 		}
 		catch(Exception e)
 		{
-			log.fatal(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw new JPPFError("A fatal error occurred: " + e.getMessage(), e);
 		}
 		return xstream;

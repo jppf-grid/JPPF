@@ -26,8 +26,8 @@ import java.util.concurrent.atomic.*;
 import javax.management.*;
 import javax.management.remote.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Wrapper around a JMX connection, providing a thread-safe way of handling disconnections and recovery.
@@ -38,7 +38,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JMXConnectionWrapper.class);
+	private static Logger log = LoggerFactory.getLogger(JMXConnectionWrapper.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

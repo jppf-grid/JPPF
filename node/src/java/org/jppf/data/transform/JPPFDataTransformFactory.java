@@ -20,8 +20,8 @@ package org.jppf.data.transform;
 
 import java.io.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Factory class for data transform.
@@ -35,7 +35,7 @@ public class JPPFDataTransformFactory
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFDataTransformFactory.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFDataTransformFactory.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

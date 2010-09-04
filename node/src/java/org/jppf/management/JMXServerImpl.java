@@ -26,8 +26,8 @@ import java.util.*;
 import javax.management.MBeanServer;
 import javax.management.remote.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class is a wrapper around a JMX management server.
@@ -39,7 +39,7 @@ public class JMXServerImpl
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JMXServerImpl.class);
+	private static Logger log = LoggerFactory.getLogger(JMXServerImpl.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */

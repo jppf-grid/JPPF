@@ -18,11 +18,11 @@
 
 package org.jppf.classloader;
 
-import java.io.*;
-import java.security.*;
+import java.io.File;
+import java.security.AccessController;
 import java.util.*;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class are used as cache for resources downloaded from a driver or client, using the JPPF class loader APIs.
@@ -33,7 +33,7 @@ class ResourceCache
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ResourceCache.class);
+	private static Logger log = LoggerFactory.getLogger(ResourceCache.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
