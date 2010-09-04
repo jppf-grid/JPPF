@@ -20,10 +20,10 @@ package org.jppf.client.concurrent;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.JPPFResultCollector;
 import org.jppf.client.event.TaskResultEvent;
 import org.jppf.server.protocol.JPPFTask;
+import org.slf4j.*;
 
 /**
  * 
@@ -34,7 +34,7 @@ class FutureResultCollector extends JPPFResultCollector
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(FutureResultCollector.class);
+	private static Logger log = LoggerFactory.getLogger(FutureResultCollector.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

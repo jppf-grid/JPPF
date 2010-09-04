@@ -19,7 +19,7 @@ package org.jppf.client;
 
 import java.io.NotSerializableException;
 
-import org.apache.commons.logging.*;
+import org.slf4j.*;
 
 /**
  * This class encapsulates a pool of threads that submit the tasks to a driver
@@ -30,7 +30,7 @@ public class AsynchronousResultProcessor implements Runnable
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AsynchronousResultProcessor.class);
+	private static Logger log = LoggerFactory.getLogger(AsynchronousResultProcessor.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

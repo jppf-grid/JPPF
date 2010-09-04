@@ -19,7 +19,6 @@ package org.jppf.client;
 
 import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
 import org.jppf.client.loadbalancer.LoadBalancer;
@@ -29,6 +28,7 @@ import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class provides an API to submit execution requests and administration commands,
@@ -43,7 +43,7 @@ public class JPPFClient extends AbstractGenericClient
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFClient.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFClient.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

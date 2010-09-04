@@ -18,11 +18,11 @@
 
 package org.jppf.client;
 
-import org.apache.commons.logging.*;
 import org.jppf.classloader.*;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.data.transform.*;
 import org.jppf.utils.JPPFBuffer;
+import org.slf4j.*;
 
 /**
  * 
@@ -33,7 +33,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AbstractClassServerDelegate.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractClassServerDelegate.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

@@ -22,7 +22,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
@@ -30,6 +29,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.proportional.ProportionalTuneProfile;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class is used to balance the number of tasks in an execution between local and remote execution.
@@ -42,7 +42,7 @@ public class LoadBalancer
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(LoadBalancer.class);
+	private static Logger log = LoggerFactory.getLogger(LoadBalancer.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

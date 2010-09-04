@@ -23,11 +23,11 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.DateTimeUtils;
+import org.slf4j.*;
 
 /**
  * Implementatation of an {@link ExecutorService} wrapper around a {@link JPPFClient}.
@@ -38,7 +38,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFExecutorService.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFExecutorService.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

@@ -21,9 +21,9 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.logging.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class provides an API to submit execution requests and administration commands,
@@ -38,7 +38,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AbstractGenericClient.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractGenericClient.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

@@ -21,10 +21,10 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.util.List;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.comm.socket.*;
+import org.slf4j.*;
 
 /**
  * Wrapper around an incoming socket connection, whose role is to receive the names of classes
@@ -39,7 +39,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ClassServerDelegateImpl.class);
+	private static Logger log = LoggerFactory.getLogger(ClassServerDelegateImpl.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

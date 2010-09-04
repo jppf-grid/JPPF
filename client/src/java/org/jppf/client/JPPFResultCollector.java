@@ -20,9 +20,9 @@ package org.jppf.client;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.event.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
+import org.slf4j.*;
 
 /**
  * Implementation of the {@link org.jppf.client.event.TaskResultListener TaskResultListener} interface
@@ -35,7 +35,7 @@ public class JPPFResultCollector implements TaskResultListener
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFResultCollector.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFResultCollector.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

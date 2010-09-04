@@ -20,9 +20,9 @@ package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.*;
+import org.slf4j.*;
 
 /**
  * 
@@ -33,7 +33,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(TaskServerConnectionHandler.class);
+	private static Logger log = LoggerFactory.getLogger(TaskServerConnectionHandler.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

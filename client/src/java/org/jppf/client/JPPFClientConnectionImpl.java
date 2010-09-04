@@ -18,19 +18,19 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.*;
+import static org.jppf.client.JPPFClientConnectionStatus.FAILED;
 
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
 import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class provides an API to submit execution requests and administration
@@ -45,7 +45,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFClientConnectionImpl.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFClientConnectionImpl.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */

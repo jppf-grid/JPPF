@@ -20,7 +20,6 @@ package org.jppf.client;
 import java.io.Serializable;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
 import org.jppf.client.event.*;
 import org.jppf.node.policy.ExecutionPolicy;
@@ -28,6 +27,7 @@ import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.JPPFUuid;
+import org.slf4j.*;
 
 /**
  * This class provides an API to submit execution requests and administration commands,
@@ -42,7 +42,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AbstractJPPFClient.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractJPPFClient.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
@@ -345,7 +345,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		}
 		catch(Exception e)
 		{
-			log.error(e);
+			log.error(e.getMessage());
 		}
 	}
 

@@ -18,9 +18,9 @@
 
 package org.jppf.client.loadbalancer;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.proportional.*;
+import org.slf4j.*;
 
 /**
  * 
@@ -31,7 +31,7 @@ public class ClientProportionalBundler extends AbstractProportionalBundler
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ClientProportionalBundler.class);
+	private static Logger log = LoggerFactory.getLogger(ClientProportionalBundler.class);
 	/**
 	 * Determines whether debugging level is set for logging.
 	 */

@@ -23,7 +23,6 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 import java.nio.channels.AsynchronousCloseException;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
@@ -31,6 +30,7 @@ import org.jppf.data.transform.*;
 import org.jppf.security.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class provides an API to submit execution requests and administration
@@ -45,7 +45,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(AbstractJPPFClientConnection.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractJPPFClientConnection.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

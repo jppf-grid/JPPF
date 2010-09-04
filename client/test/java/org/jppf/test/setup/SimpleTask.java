@@ -29,7 +29,7 @@ public class SimpleTask extends JPPFTask
 	/**
 	 * Logger for this class.
 	 */
-	//private static Log log = LogFactory.getLog(SimpleTask.class);
+	//private static Logger log = LoggerFactory.getLogger(SimpleTask.class);
 	/**
 	 * The duration of this task;
 	 */
