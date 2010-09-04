@@ -526,7 +526,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
     try
     {
 	    Thread.currentThread().setContextClassLoader(cl);
-			List<JPPFNodeMBeanProvider> list = providerManager.getAllProviders();
+			List<JPPFNodeMBeanProvider> list = providerManager.getAllProviders(cl);
 			for (JPPFNodeMBeanProvider provider: list)
 			{
 				Object o = provider.createMBean(this);
