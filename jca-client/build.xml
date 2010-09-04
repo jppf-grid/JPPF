@@ -91,12 +91,10 @@
 	<!-- ========================================================================= -->
 
 	<target name="init" depends="clean" description="Initialize ressources">
- 		<!--
 		<mkdir dir="${classes.dir}"/>
  		<mkdir dir="${classes.dir}/jca"/>
  		<mkdir dir="${classes.dir}/j2eeclient"/>
  		<mkdir dir="${build.dir}"/>
- 		-->
 	</target>
 
 	<!-- ========================================================================= -->
