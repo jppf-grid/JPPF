@@ -138,6 +138,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 */
 	public void connectAndWait(long timeout)
 	{
+		if (isConnected()) return;
 		connect();
 		if (isConnected()) return;
 		goToSleep(timeout);
@@ -256,6 +257,37 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		return connected.get();
 	}
 
+	/**
+	 * Obtain a proxy to the soecified remote MBean.
+	 * @param <T> the type of the MBean (must be an interface).
+	 * @param name the name of the mbean to retrieve.
+	 * @param inf the class of the MBean interface.
+	 * @return an instance of the specified proxy interface.
+	 * @throws Exception if any error occurs.
+	 */
+	public <T> T getProxy(String name, Class<T> inf) throws Exception
+	{
+	  return getProxy(new ObjectName(name), inf);
+	}
+	
+	/**
+	 * Obtain a proxy to the soecified remote MBean.
+	 * @param <T> the type of the MBean (must be an interface).
+	 * @param objectName the name of the mbean to retrieve.
+	 * @param inf the class of the MBean interface.
+	 * @return an instance of the specified proxy interface.
+	 * @throws Exception if any error occurs.
+	 */
+	public <T> T getProxy(ObjectName objectName, Class<T> inf) throws Exception
+	{
+		// if the connection is not yet established, then connect
+		if (!isConnected()) connectAndWait(5000L);
+		// obtain a connection to the remote MBean server
+	  MBeanServerConnection mbsc = getMbeanConnection();
+	  // finally obtain and return a proxy to the specified remote MBean
+	  return (T) MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, inf, true);
+	}
+	
 	/**
 	 * This class is intended to be used as a thread that attempts to (re-)connect to
 	 * the management server.
