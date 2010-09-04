@@ -26,11 +26,11 @@ import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.resource.spi.work.*;
 import javax.transaction.xa.XAResource;
 
-import org.apache.commons.logging.*;
 import org.jppf.jca.util.JPPFAccessorImpl;
-import org.jppf.jca.work.*;
+import org.jppf.jca.work.JPPFJcaClient;
 import org.jppf.jca.work.submission.JPPFSubmissionManager;
 import org.jppf.utils.JPPFUuid;
+import org.slf4j.*;
 
 /**
  * Implementation of the JPPF Resource Adapter for J2EE.
@@ -46,7 +46,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFJcaClient.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFJcaClient.class);
 	/**
 	 * Host name or IP address for the JPPF driver.
 	 */

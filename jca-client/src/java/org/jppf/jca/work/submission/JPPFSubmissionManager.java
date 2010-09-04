@@ -25,10 +25,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.resource.spi.work.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.jca.work.*;
 import org.jppf.utils.ThreadSynchronization;
+import org.slf4j.*;
 
 /**
  * This task provides asynchronous management of tasks submitted through the resource adapter.
@@ -41,7 +41,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFSubmissionManager.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFSubmissionManager.class);
 	/**
 	 * The queue of submissions pending execution.
 	 */

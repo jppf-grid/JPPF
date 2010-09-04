@@ -20,10 +20,10 @@ package org.jppf.jca.work.submission;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.JPPFUuid;
+import org.slf4j.*;
 
 /**
  * This class encapsulates the results of an asynchronous tasks submission.
@@ -34,7 +34,7 @@ public class JPPFSubmissionResult implements TaskResultListener
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFSubmissionResult.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFSubmissionResult.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */

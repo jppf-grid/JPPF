@@ -19,8 +19,8 @@ package org.jppf.jca.work;
 
 import static org.jppf.client.JPPFClientConnectionStatus.DISCONNECTED;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.JPPFClientConnection;
+import org.slf4j.*;
 
 /**
  * Wrapper class for the initialization of a client connection.
@@ -30,7 +30,7 @@ public class ConnectionInitializerTask implements Runnable
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(ConnectionInitializerTask.class);
+	private static Logger log = LoggerFactory.getLogger(ConnectionInitializerTask.class);
 	/**
 	 * The client connection to initialize.
 	 */

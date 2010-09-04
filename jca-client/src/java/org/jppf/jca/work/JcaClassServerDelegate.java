@@ -23,11 +23,11 @@ import java.util.List;
 
 import javax.resource.spi.work.Work;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.client.AbstractClassServerDelegate;
 import org.jppf.comm.socket.SocketInitializer;
+import org.slf4j.*;
 
 /**
  * Wrapper around an incoming socket connection, whose role is to receive the names of classes
@@ -41,7 +41,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JcaClassServerDelegate.class);
+	private static Logger log = LoggerFactory.getLogger(JcaClassServerDelegate.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

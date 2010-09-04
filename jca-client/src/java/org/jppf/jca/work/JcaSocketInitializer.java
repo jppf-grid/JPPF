@@ -18,8 +18,8 @@
 
 package org.jppf.jca.work;
 
-import org.apache.commons.logging.*;
 import org.jppf.comm.socket.*;
+import org.slf4j.*;
 
 /**
  * Socket intializer for the JPPF resource adapter.
@@ -31,7 +31,7 @@ public class JcaSocketInitializer extends AbstractSocketInitializer
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JcaSocketInitializer.class);
+	private static Logger log = LoggerFactory.getLogger(JcaSocketInitializer.class);
 	/**
 	 * Maximum number of connection attempts.
 	 */
@@ -82,7 +82,7 @@ public class JcaSocketInitializer extends AbstractSocketInitializer
 					catch(InterruptedException e2)
 					{
 						close();
-						log.error(e);
+						log.error(e.getMessage());
 						break;
 					}
 				}

@@ -20,9 +20,9 @@ package org.jppf.jca.work;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
+import org.slf4j.*;
 
 /**
  * Implementation of the {@link org.jppf.client.event.TaskResultListener TaskResultListener} interface
@@ -35,7 +35,7 @@ public class JPPFJcaResultCollector implements TaskResultListener
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JcaResultProcessor.class);
+	private static Logger log = LoggerFactory.getLogger(JcaResultProcessor.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

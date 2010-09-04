@@ -24,12 +24,12 @@ import java.util.List;
 
 import javax.resource.spi.work.Work;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
 import org.jppf.jca.work.submission.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class send tasks to a JPPF driver and collect the results.
@@ -39,7 +39,7 @@ public class JcaResultProcessor implements Work
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JcaResultProcessor.class);
+	private static Logger log = LoggerFactory.getLogger(JcaResultProcessor.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */

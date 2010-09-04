@@ -18,11 +18,10 @@
 
 package org.jppf.jca.work;
 
-import static org.jppf.client.JPPFClientConnectionStatus.*;
+import static org.jppf.client.JPPFClientConnectionStatus.DISCONNECTED;
 
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.JPPFError;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
@@ -30,6 +29,7 @@ import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.SocketInitializer;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.Pair;
+import org.slf4j.*;
 
 /**
  * This class provides an API to submit execution requests and administration
@@ -44,7 +44,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFJcaClientConnection.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFJcaClientConnection.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
@@ -126,7 +126,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 		}
 		catch(Exception e)
 		{
-			log.debug(e);
+			log.debug(e.getMessage());
 			//setStatus(DISCONNECTED);
 		}
 		catch(JPPFError e)

@@ -20,7 +20,6 @@ package org.jppf.jca.work;
 import java.io.ByteArrayInputStream;
 import java.util.*;
 
-import org.apache.commons.logging.*;
 import org.jppf.client.*;
 import org.jppf.client.event.ClientConnectionStatusEvent;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
@@ -28,6 +27,7 @@ import org.jppf.jca.work.submission.JPPFSubmissionManager;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.TypedProperties;
+import org.slf4j.*;
 
 /**
  * This class provides an API to submit execution requests and administration commands,
@@ -42,7 +42,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	/**
 	 * Logger for this class.
 	 */
-	private static Log log = LogFactory.getLog(JPPFJcaClient.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFJcaClient.class);
 	/**
 	 * Keeps a list of the valid connections not currently executring tasks.
 	 */
