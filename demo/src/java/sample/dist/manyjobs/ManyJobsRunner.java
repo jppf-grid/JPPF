@@ -51,11 +51,11 @@ public class ManyJobsRunner
 		try
 		{
 			jppfClient = new JPPFClient();
-			Thread.sleep(5000);
+			Thread.sleep(1000);
 			TypedProperties props = JPPFConfiguration.getProperties();
 			int length = 1000;
-			int nbTask = 100;
-			int nbJobs = 15;
+			int nbTask = 35;
+			int nbJobs = 3;
 			print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+nbJobs+" iterations");
 			perform(nbTask, length, nbJobs);
 			//performLong(size, iterations);

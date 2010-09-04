@@ -20,6 +20,6 @@
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.ui.monitoring.ConsoleLoader"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="admin"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Djppf.config=jppf-gui.properties -Dlog4j.configuration=log4j-gui.properties -Xmx512m -Djava.util.logging.config.file=config/logging.properties -Duser.language=en"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Djppf.config=jppf-gui.properties -Dlog4j.configuration=log4j-gui.properties -Xmx512m -Djava.util.logging.config.file=config/logging.properties -Duser.language=fr"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:demo}"/>
 </launchConfiguration>
