@@ -60,6 +60,7 @@ public abstract class AbstractMyTask extends JPPFTask
 	 * Get the distributed map, and lazily initialize it if required.
 	 * @return an <code>IMap</code> instance.
 	 */
+	@SuppressWarnings("unchecked")
 	protected Map<String, String> getMap()
 	{
 		String key = "taskMap";

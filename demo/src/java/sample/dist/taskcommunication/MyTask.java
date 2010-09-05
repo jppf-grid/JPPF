@@ -40,6 +40,7 @@ public class MyTask extends JPPFTask implements ItemListener
 	 * Execute this task.
 	 * @see java.lang.Runnable#run()
 	 */
+	@SuppressWarnings("unchecked")
 	public void run()
 	{
 		try
@@ -72,6 +73,7 @@ public class MyTask extends JPPFTask implements ItemListener
 	 * This method lazily initializes the queue if required.
 	 * @return an IQueue instance (Hazel distributed queue).
 	 */
+	@SuppressWarnings("unchecked")
 	public IQueue getQueue()
 	{
 		String key = "MyDistyributedQueue";
