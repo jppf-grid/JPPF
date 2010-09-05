@@ -81,9 +81,9 @@
 	<!-- ========================================================================= -->
 
   <target name="clean">
-		<delete><fileset dir="${classes.dir}/j2eeclient" includes="**/*.*"/></delete>
-		<delete><fileset dir="${classes.dir}/jca" includes="**/*.*"/></delete>
-		<delete><fileset dir="${build.dir}" includes="**/*.*"/></delete>
+		<delete quiet="true"><fileset dir="${classes.dir}/j2eeclient" includes="**/*.*"/></delete>
+		<delete quiet="true"><fileset dir="${classes.dir}/jca" includes="**/*.*"/></delete>
+		<delete quiet="true"><fileset dir="${build.dir}" includes="**/*.*"/></delete>
   </target>               
 
 	<!-- ========================================================================= -->
