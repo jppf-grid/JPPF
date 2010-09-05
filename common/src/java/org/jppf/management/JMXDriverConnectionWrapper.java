@@ -63,6 +63,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#nodesInformation()
 	 */
+	@SuppressWarnings("unchecked")
 	public Collection<JPPFManagementInfo> nodesInformation() throws Exception
 	{
 		return (Collection<JPPFManagementInfo>) invoke(DRIVER_MBEAN_NAME, "nodesInformation", (Object[]) null, (String[]) null);

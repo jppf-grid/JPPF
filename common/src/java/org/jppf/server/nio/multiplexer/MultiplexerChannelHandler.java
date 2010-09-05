@@ -74,6 +74,7 @@ public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
 	 * @throws Exception if an error is raised while performing the initialization.
 	 * @see org.jppf.server.nio.AbstractSocketChannelHandler#postInit()
 	 */
+	@SuppressWarnings("unchecked")
 	protected void postInit() throws Exception
 	{
 		SocketChannel channel = socketClient.getChannel();

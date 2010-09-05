@@ -65,6 +65,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 	 * Perform the state transition.
 	 * @see java.lang.Runnable#run()
 	 */
+	@SuppressWarnings("unchecked")
 	public void run()
 	{
 		synchronized(channel)

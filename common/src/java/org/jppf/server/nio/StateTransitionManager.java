@@ -109,6 +109,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * @param channel the key holding the channel and associated context. 
 	 * @param transition holds the new state of the channel and associated key ops.
 	 */
+	@SuppressWarnings("unchecked")
 	public void transitionChannel(ChannelWrapper<?> channel, T transition)
 	{
 		server.getLock().lock();
