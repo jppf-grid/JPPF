@@ -44,7 +44,7 @@
 	<!-- ========================================================================= -->
 
   <target name="clean">
-		<delete><fileset dir="${classes.dir}" includes="**/*.*"/></delete>
+		<delete quiet="true"><fileset dir="${classes.dir}" includes="**/*.*"/></delete>
     <delete dir="${build.dir}" quiet="true" excludes=".svnignore"/>
   </target>               
 
