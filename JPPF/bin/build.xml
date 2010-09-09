@@ -139,11 +139,6 @@
 		</tstamp>
 	</target>
 
-	<target name="init.deploy" description="Initialize ressources">
- 		<mkdir dir="${runtime.driver}"/>
- 		<mkdir dir="${runtime.node}"/>
-	</target>
-
 	<!-- ========================================================================= -->
 	<!--                           Build the application                           -->
 	<!-- ========================================================================= -->
@@ -152,9 +147,9 @@
 	<target name="rebuild" depends="clean.all, init, compile, jar"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
-		depends="clean.all, rebuild, javadoc, init.deploy, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide, installer, doc"/>
+		depends="clean.all, rebuild, javadoc, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide, installer, doc"/>
 	<target name="deploy.nojavadoc"
-		depends="clean.all, rebuild,          init.deploy, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide, installer, doc"/>
+		depends="clean.all, rebuild,          package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide, installer, doc"/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>

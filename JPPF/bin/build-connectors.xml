@@ -25,9 +25,9 @@
 	<target name="jppf.gigaspaces" description="Generate the JPPF-GigaSpaces integration package" depends="init, build">
 		<copy todir="${gigaspaces}/JPPF-GigaSpaces-Common/lib">
 			<fileset dir="${build}">
-				<include name="jppf-client.jar"/>
-				<include name="jppf-common.jar"/>
-				<include name="jppf-common-node.jar"/>
+				<include name="jppf-client*.jar"/>
+				<include name="jppf-common*.jar"/>
+				<include name="jppf-common-node*.jar"/>
 			</fileset>
 		</copy>
 		<ant antfile="${gigaspaces}/build.xml" target="build" inheritall="false"/>
@@ -40,11 +40,6 @@
 				<exclude name="**/*.log"/>
 				<exclude name="**/*.classpath"/>
 				<exclude name="**/*.project"/>
-			</zipfileset>
-			<zipfileset dir="${build}" prefix="${gigaspaces.prefix}/JPPF-GigaSpaces-Common/lib-src">
-				<include name="jppf-client-src.jar"/>
-				<include name="jppf-common-src.jar"/>
-				<include name="jppf-common-node-src.jar"/>
 			</zipfileset>
 		</zip>
   </target>
