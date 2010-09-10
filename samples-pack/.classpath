@@ -5,6 +5,7 @@
 	<classpathentry kind="src" output="DataDependency/classes" path="DataDependency/src"/>
 	<classpathentry kind="src" output="DataEncryption/classes" path="DataEncryption/src"/>
 	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src"/>
+	<classpathentry kind="src" output="IdleSystem/classes" path="IdleSystem/src"/>
 	<classpathentry kind="src" output="MatrixMultiplication/classes" path="MatrixMultiplication/src"/>
 	<classpathentry kind="src" output="NodeTray/classes" path="NodeTray/src"/>
 	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src"/>
@@ -36,5 +37,7 @@
 	<classpathentry kind="lib" path="shared/lib/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="shared/lib/slf4j-jdk14-1.6.1.jar"/>
 	<classpathentry kind="lib" path="shared/lib/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry kind="lib" path="IdleSystem/lib/jna.jar"/>
+	<classpathentry kind="lib" path="IdleSystem/lib/platform.jar"/>
 	<classpathentry kind="output" path="shared/classes"/>
 </classpath>
