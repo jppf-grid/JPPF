@@ -60,7 +60,7 @@ public class TopologyData
 	/**
 	 * Object describing the current state of a node.
 	 */
-	private JPPFNodeState nodeState = new JPPFNodeState();
+	private JPPFNodeState nodeState = null;
 
 	/**
 	 * Initialize topology job data with the specified type.
@@ -90,6 +90,7 @@ public class TopologyData
 	{
 		this(TopologyDataType.NODE);
 		this.nodeInformation = nodeInformation;
+		this.nodeState = new JPPFNodeState();
 		String host = NetworkUtils.getHostName(nodeInformation.getHost());
 		jmxWrapper = new JMXNodeConnectionWrapper(host, nodeInformation.getPort());
 		jmxWrapper.connect();
