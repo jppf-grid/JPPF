@@ -18,7 +18,7 @@
 
 package org.jppf.example.driver.test;
 
-import org.jppf.management.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 
 /**
  * Simple class to test a custom node MBean
