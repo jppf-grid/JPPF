@@ -48,6 +48,7 @@ public class ServiceFinder
 	 * @param cl the class loader to user for the lookup.
 	 * @return a list of concrete providers of the specified type.
 	 */
+	@SuppressWarnings("unchecked")
 	public <T> List<T> findProviders(Class<T> providerClass, ClassLoader cl)
 	{
 		if (providerClass == null) throw new IllegalArgumentException("Provider class cannot be null");
