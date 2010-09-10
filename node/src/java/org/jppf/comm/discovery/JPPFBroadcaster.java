@@ -158,5 +158,6 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 			}
 		}
 		for (Pair<MulticastSocket, DatagramPacket> socketInfo: socketsInfo) socketInfo.first().close();
+		socketsInfo.clear();
 	}
 }
