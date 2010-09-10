@@ -343,4 +343,24 @@ public final class StringUtils
 		for (Object o: args) sb.append(o);
 		return sb.toString();
 	}
+
+	/**
+	 * Determine whether the specified source string starts with one of the specified values.
+	 * @param source the string to match with the values.
+	 * @param ignoreCase specifies whether case should be ignore in the string matching.
+	 * @param values the values to match the source with.
+	 * @return true if the source matches one of the values, false otherwise.
+	 */
+	public static boolean startsWithOneOf(String source, boolean ignoreCase, String...values)
+	{
+		if ((source == null) || (values == null)) return false;
+		String s = ignoreCase ? source.toLowerCase(): source;
+		for (String val: values)
+		{
+			if (val == null) continue;
+			String s2 = ignoreCase ? val.toLowerCase() : val;
+			if (s.startsWith(s2)) return true;
+		}
+		return false;
+	}
 }
