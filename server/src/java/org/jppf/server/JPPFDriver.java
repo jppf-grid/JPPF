@@ -206,6 +206,7 @@ public class JPPFDriver
 	 * Register all MBeans defined through the service provider interface.
 	 * @throws Exception if the registration failed.
 	 */
+	@SuppressWarnings("unchecked")
 	private void registerProviderMBeans() throws Exception
 	{
   	MBeanServer server = getJmxServer().getServer();
