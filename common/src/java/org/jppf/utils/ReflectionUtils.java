@@ -100,12 +100,10 @@ public class ReflectionUtils
 	{
 		Class type = meth.getReturnType();
 		if (Void.TYPE.equals(type)) return false;
-		if (!meth.getName().startsWith("get") && !meth.getName().startsWith("is"))
-			return false;
+		if (!StringUtils.startsWithOneOf(meth.getName(), false, "get", "is")) return false;
 		if (meth.getName().startsWith("is"))
 		{
-			if (!Boolean.class.equals(type) && !Boolean.TYPE.equals(type))
-				return false;
+			if (!Boolean.class.equals(type) && !Boolean.TYPE.equals(type)) return false;
 		}
 		Class[] paramTypes = meth.getParameterTypes();
 		if ((paramTypes != null) && (paramTypes.length > 0)) return false;
