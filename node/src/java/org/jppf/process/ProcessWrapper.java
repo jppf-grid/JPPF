@@ -137,6 +137,9 @@ public final class ProcessWrapper extends EventEmitter<ProcessWrapperEventListen
 				}
 				Thread.sleep(10);
 			}
+			catch(IOException ignore)
+			{
+			}
 			catch(Throwable t)
 			{
 				t.printStackTrace();

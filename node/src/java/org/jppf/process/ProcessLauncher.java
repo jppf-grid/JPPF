@@ -20,7 +20,9 @@ package org.jppf.process;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.jppf.node.idle.*;
 import org.jppf.process.event.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -36,7 +38,7 @@ import org.slf4j.*;
  * </ul>
  * @author Laurent Cohen
  */
-public class ProcessLauncher implements ProcessWrapperEventListener
+public class ProcessLauncher extends ThreadSynchronization implements Runnable, ProcessWrapperEventListener, IdleStateListener
 {
 	/**
 	 * Logger for this class.
@@ -55,13 +57,29 @@ public class ProcessLauncher implements ProcessWrapperEventListener
 	 */
 	private ServerSocket processServer = null;
 	/**
-	 * The prot number the erver socket listens to.
+	 * The port number the erver socket listens to.
 	 */ 
 	private int processPort = 0;
 	/**
 	 * The fully qualified name of the main class of the subprocess to launch.
 	 */
 	private String mainClass = null;
+	/**
+	 * Determines whether the process was stopped because the system went into "busy state".
+	 */
+	private AtomicBoolean stoppedOnBusyState = new AtomicBoolean(false);
+	/**
+	 * Determines whether the system is in "idle state".
+	 */
+	private AtomicBoolean idle = new AtomicBoolean(false);
+	/**
+	 * Specifies whether the subprocess is launched only when the system is idle.
+	 */
+	private boolean idleMode = false;
+	/**
+	 * Detects system idle state changes.
+	 */
+	private IdleDetector idleDetector = null;
 
 	/**
 	 * Initialize this process launcher.
@@ -75,21 +93,26 @@ public class ProcessLauncher implements ProcessWrapperEventListener
 	/**
 	 * Start the socket listener and the subprocess.
 	 */
-	public void start()
+	public void run()
 	{
+		idleMode = JPPFConfiguration.getProperties().getBoolean("jppf.idle.mode.enabled", false);
 		boolean end = false;
 		try
 		{
 			createShutdownHook();
 			startDriverSocket();
+			if (idleMode)
+			{
+				idleDetector = new IdleDetector(this);
+				idleDetector.run();
+			}
 			while (!end)
 			{
-				process = buildProcess();
-				ProcessWrapper wrapper = createProcessWrapper(process);
-				if (debugEnabled) log.debug("started driver process [" + process + "]");
+				if (idleMode) while (!idle.get()) goToSleep();
+				startProcess();
 				int n = process.waitFor();
 				end = onProcessExit(n);
-				process.destroy();
+				if (process != null) process.destroy();
 			}
 		}
 		catch (Exception e)
@@ -97,6 +120,18 @@ public class ProcessLauncher implements ProcessWrapperEventListener
 			e.printStackTrace();
 		}
 		System.exit(0);
+	}
+
+	/**
+	 * Start the sub-process.
+	 * @throws Exception if any error occurs.
+	 */
+	public void startProcess() throws Exception
+	{
+		stoppedOnBusyState.set(false);
+		process = buildProcess();
+		ProcessWrapper wrapper = createProcessWrapper(process);
+		if (debugEnabled) log.debug("started driver process [" + process + "]");
 	}
 
 	/**
@@ -148,32 +183,12 @@ public class ProcessLauncher implements ProcessWrapperEventListener
 	}
 
 	/**
-	 * Notification that the process has written to its error stream.
-	 * @param event encapsulate the error stream's content.
-	 * @see org.jppf.process.event.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
-	 */
-	public void errorStreamAltered(ProcessWrapperEvent event)
-	{
-		System.err.println(event.getContent());
-	}
-
-	/**
-	 * Notification that the process has written to its output stream.
-	 * @param event encapsulate the output stream's content.
-	 * @see org.jppf.process.event.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
-	 */
-	public void outputStreamAltered(ProcessWrapperEvent event)
-	{
-		System.out.println(event.getContent());
-	}
-
-	/**
 	 * Create a process wrapper around the specified process, to capture its console output
 	 * and prevent it from blocking.
 	 * @param p the process whose output is to be captured.
 	 * @return a <code>ProcessWrapper</code> instance.
 	 */
-	public ProcessWrapper createProcessWrapper(Process p)
+	private ProcessWrapper createProcessWrapper(Process p)
 	{
 		ProcessWrapper wrapper = new ProcessWrapper(process);
 		wrapper.addListener(this);
@@ -187,7 +202,7 @@ public class ProcessLauncher implements ProcessWrapperEventListener
 	 * @param n the exit value of the subprocess.
 	 * @return true if this launcher is to be terminated, false if it should re-launch the subprocess.
 	 */
-	public boolean onProcessExit(int n)
+	private boolean onProcessExit(int n)
 	{
 		String s = getOutput(process, "std").trim();
 		if (s.length() > 0)
@@ -201,7 +216,7 @@ public class ProcessLauncher implements ProcessWrapperEventListener
 			System.out.println("\nerror output:\n" + s);
 			log.info("error output:\n" + s);
 		}
-		return n != 2;
+		return (n != 2) && !stoppedOnBusyState.get();
 	}
 
 	/**
@@ -304,5 +319,47 @@ public class ProcessLauncher implements ProcessWrapperEventListener
 			log.error(e.getMessage(), e);
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Notification that the process has written to its error stream.
+	 * @param event encapsulate the error stream's content.
+	 * @see org.jppf.process.event.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
+	 */
+	public void errorStreamAltered(ProcessWrapperEvent event)
+	{
+		System.err.println(event.getContent());
+	}
+
+	/**
+	 * Notification that the process has written to its output stream.
+	 * @param event encapsulate the output stream's content.
+	 * @see org.jppf.process.event.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
+	 */
+	public void outputStreamAltered(ProcessWrapperEvent event)
+	{
+		System.out.println(event.getContent());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void idleStateChanged(IdleStateEvent event)
+	{
+		IdleState state = event.getState();
+		if (IdleState.BUSY.equals(state))
+		{
+			if (idleMode && (process != null))
+			{
+				idle.set(false);
+				stoppedOnBusyState.set(true);
+				process.destroy();
+			}
+		}
+		else
+		{
+			idle.set(true);
+			wakeUp();
+		}
 	}
 }
