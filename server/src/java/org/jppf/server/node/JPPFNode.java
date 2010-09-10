@@ -517,6 +517,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 * Register all MBeans defined through the service provider interface.
 	 * @throws Exception if the registration failed.
 	 */
+	@SuppressWarnings("unchecked")
 	private void registerProviderMBeans() throws Exception
 	{
 		ClassLoader cl = getClass().getClassLoader();
