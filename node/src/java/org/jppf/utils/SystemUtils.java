@@ -53,6 +53,26 @@ public final class SystemUtils
 	 * A map of the network configuration.
 	 */
 	private static TypedProperties network = null;
+	/**
+	 * Windows OS.
+	 */
+	private static final int WINDOWS_OS = 1;
+	/**
+	 * X11 based OS.
+	 */
+	private static final int X11_OS = 2;
+	/**
+	 * The MAC based OS.
+	 */
+	private static final int MAC_OS = 3;
+	/**
+	 * Unknown or unsupported OS.
+	 */
+	private static final int UNKNOWN_OS = -1;
+	/**
+	 * The type of this host's OS.
+	 */
+	private static final int OS_TYPE = determineOSType();
 
 	/**
 	 * Instantiation of this class is not permitted.
@@ -117,27 +137,6 @@ public final class SystemUtils
 	}
 
 	/**
-	 * Add a system property to a set of properties.
-	 * @param name name of the system property to add.
-	 * @param props properties set to add to.
-	 */
-	private static void addSystemProperty(String name, TypedProperties props)
-	{
-		String s = null;
-		try
-		{
-			s = System.getProperty(name);
-		}
-		catch(SecurityException e)
-		{
-			s = e.getMessage();
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.info(e.getMessage());
-		}
-		if (s != null) props.setProperty(name, s);
-	}
-
-	/**
 	 * Get information about the number of processors available to the JVM and the JVM memory usage.
 	 * @return a <code>TypedProperties</code> instance holding the requested information.
 	 */
@@ -148,47 +147,19 @@ public final class SystemUtils
 		try
 		{
 			s = "" + Runtime.getRuntime().availableProcessors();
-		}
-		catch(SecurityException e)
-		{
-			s = e.getMessage();
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.info(e.getMessage());
-		}
-		props.setProperty("availableProcessors", s);
-		try
-		{
+			props.setProperty("availableProcessors", s);
 			s = "" + Runtime.getRuntime().freeMemory();
-		}
-		catch(SecurityException e)
-		{
-			s = e.getMessage();
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.info(e.getMessage());
-		}
-		props.setProperty("freeMemory", s);
-		try
-		{
+			props.setProperty("freeMemory", s);
 			s = "" + Runtime.getRuntime().totalMemory();
-		}
-		catch(SecurityException e)
-		{
-			s = e.getMessage();
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.info(e.getMessage());
-		}
-		props.setProperty("totalMemory", s);
-		try
-		{
+			props.setProperty("totalMemory", s);
 			s = "" + Runtime.getRuntime().maxMemory();
+			props.setProperty("maxMemory", s);
 		}
 		catch(SecurityException e)
 		{
-			s = e.getMessage();
 			if (debugEnabled) log.debug(e.getMessage(), e);
 			else log.info(e.getMessage());
 		}
-		props.setProperty("maxMemory", s);
 
 		return props;
 	}
@@ -325,5 +296,46 @@ public final class SystemUtils
 	{
 		Runtime rt = Runtime.getRuntime();
 		return rt.maxMemory() - (rt.totalMemory() - rt.freeMemory());
+	}
+
+	/**
+	 * Determine the type of this host's operating system, based on the value
+	 * of the system property &quot;os.name&quot;.
+	 * @return an int value indentifying the type of OS.
+	 */
+	private static int determineOSType()
+  {
+    String name = System.getProperty("os.name");
+    if (StringUtils.startsWithOneOf(name, true, "Linux", "SunOS", "Solaris", "FreeBSD", "OpenBSD")) return X11_OS; 
+    else if (StringUtils.startsWithOneOf(name, true, "Mac", "Darwin")) return MAC_OS;
+    else if (name.startsWith("Windows") && !name.startsWith("Windows CE")) return WINDOWS_OS;
+    return UNKNOWN_OS;
+  }
+
+	/**
+	 * Determine whether the current OS is Windows.
+	 * @return true if the system is Windows, false otherwise.
+	 */
+	public static boolean isWindows()
+	{
+		return OS_TYPE == WINDOWS_OS;
+	}
+
+	/**
+	 * Determine whether the current OS is X11-based.
+	 * @return true if the system is X11, false otherwise.
+	 */
+	public static boolean isX11()
+	{
+		return OS_TYPE == X11_OS;
+	}
+
+	/**
+	 * Determine whether the current OS is Mac-based.
+	 * @return true if the system is Mac-based, false otherwise.
+	 */
+	public static boolean isMac()
+	{
+		return OS_TYPE == MAC_OS;
 	}
 }
