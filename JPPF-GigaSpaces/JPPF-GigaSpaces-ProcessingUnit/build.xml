@@ -86,7 +86,7 @@
     <jar jarfile="${build.dir}/${ant.project.name}.jar">
 			<fileset dir="${basedir}/config" includes="jppf.properties"/>
 			<fileset dir="${classes.dir}"/>
-			<zipfileset dir="${common.dir}/lib" prefix="lib" includes="*.jar"/>
+			<zipfileset dir="${common.dir}/lib" prefix="lib" includes="*.jar" excludes="*-src.jar"/>
 			<zipfileset dir="${common.dir}/build" prefix="lib" includes="common.jar"/>
 		</jar>
 	</target>
