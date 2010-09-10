@@ -52,7 +52,9 @@ public class JmxMessageNotifier
 	 */
 	private static MBeanServer server = null;
 	/**
-	 * 
+	 * Flag used to avoid stack overflow error when using JDK logging.
+	 * The error is caused by the fact that {@link ManagementFactory#getPlatformMBeanServer()}
+	 * is performing some logging of its own, so we need to prevent the recursion the first time this notifier is used.
 	 */
 	private static boolean initializing = false;
 
