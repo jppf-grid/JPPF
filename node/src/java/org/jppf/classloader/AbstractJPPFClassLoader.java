@@ -387,6 +387,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	 * @throws IOException if an error occurs.
 	 * @see java.lang.ClassLoader#findResources(java.lang.String)
 	 */
+	@SuppressWarnings("unchecked")
 	public Enumeration<URL> findResources(String name) throws IOException
 	{
 		List<URL> urlList = null;
@@ -402,7 +403,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 				map.put("name", name);
 				map.put("multiple", "true");
 				JPPFResourceWrapper resource = loadResourceData(map, true);
-				List<byte[]> dataList = (List<byte[]>) resource.getData("resource_list");
+				List<byte[]> dataList = (List<byte[]>)resource.getData("resource_list");
 				boolean found = (dataList != null) && !dataList.isEmpty();
 				if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
 				if (found)
