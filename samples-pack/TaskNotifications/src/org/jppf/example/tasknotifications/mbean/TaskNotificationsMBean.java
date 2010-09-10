@@ -18,7 +18,7 @@
 
 package org.jppf.example.tasknotifications.mbean;
 
-import javax.management.*;
+import javax.management.NotificationEmitter;
 
 /**
  * Interface for an MBean that sends notifications fron the tasks.
