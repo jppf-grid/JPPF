@@ -57,7 +57,7 @@ public class MacIdleTimeDetector implements IdleTimeDetector
 		/**
 		 * Returns the elapsed time since the last event for a Quartz event source.
 		 * @param sourceStateId the source state to access.
-		 * @param eventType the event type to access. To get the elapsed time since the previous input event—keyboard, mouse, or tablet, specify KCG_ANY_INPUT_EVENT_TYPE.
+		 * @param eventType the event type to access. To get the elapsed time since the previous input event: keyboard, mouse, or tablet, specify KCG_ANY_INPUT_EVENT_TYPE.
 		 * @return the elapsed seconds since the last input event.
 		 * @see http://developer.apple.com/mac/library/documentation/Carbon/Reference/QuartzEventServicesRef/Reference/reference.html#//apple_ref/c/func/CGEventSourceSecondsSinceLastEventType
 		 */
