@@ -21,10 +21,8 @@ package org.jppf.example.idlesystem;
 import org.jppf.node.idle.IdleTimeDetector;
 
 import com.sun.jna.*;
-import com.sun.jna.platform.unix.*;
-import com.sun.jna.platform.unix.X11.Display;
-import com.sun.jna.platform.unix.X11.Drawable;
-import com.sun.jna.platform.unix.X11.Window;
+import com.sun.jna.platform.unix.X11;
+import com.sun.jna.platform.unix.X11.*;
 
 /**
  * Instances of this class provide the computer idle time on a Linux system with X11.
@@ -97,24 +95,23 @@ public class X11IdleTimeDetector implements IdleTimeDetector
 		X11.Window window = null;
 		XScreenSaverInfo info = null;
 		Display display = null;
-		final X11 x11 = X11.INSTANCE;
-		final Xss xss = Xss.INSTANCE;
 
 		long idleMillis = 0L;
 		try
 		{
-			display = x11.XOpenDisplay(null);
-			window = x11.XDefaultRootWindow(display);
-			info = xss.XScreenSaverAllocInfo();
-			xss.XScreenSaverQueryInfo(display, window, info);
+			display = X11.INSTANCE.XOpenDisplay(null);
+			window = X11.INSTANCE.XDefaultRootWindow(display);
+			//info = Xss.INSTANCE.XScreenSaverAllocInfo();
+			info = new XScreenSaverInfo();
+			Xss.INSTANCE.XScreenSaverQueryInfo(display, window, info);
 			idleMillis = info.idle.longValue();
 		}
 		finally
 		{
-			if (info != null) x11.XFree(info.getPointer());
+			if (info != null) X11.INSTANCE.XFree(info.getPointer());
 			info = null;
 
-			if (display != null) x11.XCloseDisplay(display);
+			if (display != null) X11.INSTANCE.XCloseDisplay(display);
 			display = null;
 		}
 		return idleMillis;
