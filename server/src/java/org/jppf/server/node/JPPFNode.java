@@ -122,7 +122,6 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 */
 	public void run()
 	{
-		uuid = new JPPFUuid().toString();
 		buildNumber = VersionUtils.getBuildNumber();
 		setStopped(false);
 		boolean initialized = false;
@@ -243,6 +242,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 			else setTaskCount(getTaskCount() + taskList.size());
 			if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
 		}
+		/*
 		if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 		{
 			int p = bundle.getBuildNumber();
@@ -252,6 +252,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 				throw new JPPFNodeReloadNotification("detected new build number: " + p + "; previous build number: " + buildNumber);
 			}
 		}
+		*/
 	}
 
 	/**

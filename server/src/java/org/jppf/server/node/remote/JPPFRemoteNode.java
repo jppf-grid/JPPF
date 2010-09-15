@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.*;
+import org.jppf.comm.recovery.ClientConnection;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.node.NodeRunner;
 import org.jppf.server.node.JPPFNode;
@@ -42,6 +43,10 @@ public class JPPFRemoteNode extends JPPFNode
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Connection to the revoery server.
+	 */
+	private ClientConnection clientConnection = null;
 
 	/**
 	 * Default constructor.
@@ -78,6 +83,8 @@ public class JPPFRemoteNode extends JPPFNode
 			if (debugEnabled) log.debug("end socket initializer");
 		}
 		nodeIO = new RemoteNodeIO(this);
+		clientConnection = new ClientConnection(uuid);
+		new Thread(clientConnection, "reaper client connection").start();
 	}
 
 	/**
@@ -102,8 +109,8 @@ public class JPPFRemoteNode extends JPPFNode
 	}
 
 	/**
+	 * Instantiate the callback used to create the class loader in each {@link JPPFRemoteContainer}.
 	 * @param uuidPath the uuid path containing the key to the container.
-	 * Instatiate the callback used to create the class loader in each {@link JPPFRemoteContainer}.
 	 * @return a {@link Callable} instance.
 	 */
 	protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)

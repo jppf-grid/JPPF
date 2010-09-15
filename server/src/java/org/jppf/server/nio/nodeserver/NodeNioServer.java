@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.jppf.comm.recovery.*;
 import org.jppf.io.ByteBufferLocation;
 import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.JPPFDriver;
@@ -40,7 +41,7 @@ import org.slf4j.*;
  * Instances of this class serve task execution requests to the JPPF nodes.
  * @author Laurent Cohen
  */
-public class NodeNioServer extends NioServer<NodeState, NodeTransition>
+public class NodeNioServer extends NioServer<NodeState, NodeTransition> implements ReaperListener
 {
 	/**
 	 * Logger for this class.
@@ -94,6 +95,14 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * 
 	 */
 	private ExecutorService checkerExecutor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("JobChecker"));
+	/**
+	 * Mapping of channels to their uuid.
+	 */
+	private Map<String, ChannelWrapper<?>> uuidMap = new HashMap<String, ChannelWrapper<?>>();
+	/**
+	 * The server used to detect that individual connections are broken due to hardware failures.
+	 */
+	private RecoveryServer recoveryServer = null;
 
 	/**
 	 * Initialize this server with a specified port number.
@@ -124,6 +133,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 				selector.wakeup();
 			}
 		});
+		recoveryServer = new RecoveryServer();
+		recoveryServer.getReaper().addReaperListener(this);
+		new Thread(recoveryServer, "RecoveryServer thread").start();
 	}
 
 	/**
@@ -289,7 +301,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	 * @param channel a <code>SocketChannel</code> that encapsulates the connection.
 	 * @param context the context data associated with the channel.
 	 */
-	public static void closeNode(ChannelWrapper channel, AbstractNodeContext context)
+	public static void closeNode(ChannelWrapper<?> channel, AbstractNodeContext context)
 	{
 		// bug [993389 - Nodes are not removed from the console upon dying]
 		try
@@ -303,10 +315,13 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 		try
 		{
 			driver.getStatsManager().nodeConnectionClosed();
-			if (context.getNodeUuid() != null)
+			String uuid = context.getNodeUuid();
+			if (uuid != null)
 			{
+				NodeNioServer server = driver.getNodeNioServer();
 				driver.removeNodeInformation(channel);
-				driver.getNodeNioServer().removeIdleChannel(channel);
+				server.removeIdleChannel(channel);
+				server.removeUuid(uuid);
 			}
 		}
 		catch (Exception e)
@@ -368,5 +383,62 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition>
 	public List<ChannelWrapper<?>> getIdleChannels()
 	{
 		return idleChannels;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void connectionFailed(ReaperEvent event)
+	{
+		ServerConnection c = event.getConnection();
+		/*if (c.isOk() && !c.isInitialized())
+		{
+			String uuid = c.getUuid();
+		}
+		else */if (!c.isOk())
+		{
+			String uuid = c.getUuid();
+			ChannelWrapper<?> channel = removeUuid(uuid);
+			closeNode(channel, (AbstractNodeContext) channel.getContext());
+		}
+	}
+
+	/**
+	 * Get a channel from its uuid.
+	 * @param uuid the uuid key to look up in the the map.
+	 * @return channel the corresponding channel.
+	 */
+	ChannelWrapper<?> getChannelFromUuid(String uuid)
+	{
+		synchronized(uuidMap)
+		{
+			return uuidMap.get(uuid);
+		}
+	}
+
+	/**
+	 * Put the specified uuid / channel pair into the uuid map.
+	 * @param uuid the uuid key to add to the map.
+	 * @param channel the corresponding channel.
+	 */
+	void putUuid(String uuid, ChannelWrapper<?> channel)
+	{
+		synchronized(uuidMap)
+		{
+			uuidMap.put(uuid, channel);
+		}
+	}
+
+	/**
+	 * Remove the specified uuid entry from the uuid map.
+	 * @param uuid the uuid key to remove from the map.
+	 * @return channel the corresponding channel.
+	 */
+	ChannelWrapper<?> removeUuid(String uuid)
+	{
+		synchronized(uuidMap)
+		{
+			return uuidMap.remove(uuid);
+		}
 	}
 }

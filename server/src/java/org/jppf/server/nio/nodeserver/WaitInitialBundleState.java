@@ -70,15 +70,16 @@ class WaitInitialBundleState extends NodeServerState
 			BundleWrapper bundleWrapper = context.deserializeBundle();
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			context.setUuid(bundle.getBundleUuid());
-			context.setNodeUuid((String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM));
+			String uuid = (String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM);
+			context.setNodeUuid(uuid);
+			server.putUuid(uuid, wrapper);
 			Bundler bundler = server.getBundler().copy();
 			JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
 			if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
 			if (debugEnabled) log.debug("processing threads for node " + wrapper + " = " + (systemInfo == null ? "?" : systemInfo.getJppf().getInt("processing.threads", -1)));
 			bundler.setup();
 			context.setBundler(bundler);
-			Boolean b = (Boolean) bundle.getParameter(BundleParameter.IS_PEER);
-			boolean isPeer = (b != null) && b;
+			boolean isPeer = (Boolean) bundle.getParameter(BundleParameter.IS_PEER, Boolean.FALSE);
 			context.setPeer(isPeer);
 			if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
 			{
