@@ -197,7 +197,7 @@ public final class OptionsHandler
 			Preferences p = prefs.node(node.elt.getName());
 			for (OptionNode child: node.children) savePreferences(child, p);
 		}
-		else
+		else if (node.elt instanceof Option)
 		{
 			Option option = (Option) node.elt;
 			if (option.isPersistent()) prefs.put(option.getName(), ""+option.getValue());
