@@ -45,12 +45,12 @@ public class JPPFBuffer
 	}
 
 	/**
-	 * Initialize this buffer with the following String.
+	 * Initialize this buffer with the specified String, using UTF-8 encoding.
 	 * @param str the string whose contents will be put into this buffer. 
 	 */
 	public JPPFBuffer(String str)
 	{
-		this.buffer = str.getBytes();
+		this.buffer = str.getBytes(StringUtils.UTF_8);
 		this.length = buffer.length;
 	}
 
@@ -118,5 +118,14 @@ public class JPPFBuffer
 	int remainingFromPos()
 	{
 		return length - pos;
+	}
+
+	/**
+	 * Transform this buffer into a string using UTF-8 encoding.
+	 * @return the content of this buffer as a string.
+	 */
+	public String asString()
+	{
+		return new String(buffer, pos, length, StringUtils.UTF_8);
 	}
 }

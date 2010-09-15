@@ -20,6 +20,7 @@ package org.jppf.utils;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.*;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import org.slf4j.*;
@@ -43,6 +44,10 @@ public final class StringUtils
 	 * The the replacements words for the keywords in the legend items. Used to shorten the legend labels.
 	 */
 	private static final String[] REPLACEMENTS = new String[] { "Exec", "Max", "Min", "Avg", "Cumul" };
+	/**
+	 * Charset instance for UTF-8 encoding.
+	 */
+	public static final Charset UTF_8 = makeUTF8();
 
 	/**
 	 * Instantiation of this class is not permitted.
@@ -362,5 +367,23 @@ public final class StringUtils
 			if (s.startsWith(s2)) return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Create an instance of the UTF-8 charset.
+	 * @return a {@link Charset} instance for UTF-8, or null if the charset could not be instantiated. 
+	 */
+	private static Charset makeUTF8()
+	{
+		Charset utf8 = null;
+		try
+		{
+			utf8 = Charset.forName("UTF-8");
+		}
+		catch(Exception e)
+		{
+			log.error("Charset UTF-8 could not be instantiated", e);
+		}
+		return utf8;
 	}
 }
