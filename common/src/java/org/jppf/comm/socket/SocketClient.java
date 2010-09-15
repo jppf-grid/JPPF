@@ -75,7 +75,7 @@ public class SocketClient extends AbstractSocketWrapper
 	{
 		super(socket);
 	}
-	
+
 	/**
 	 * Send an object over a TCP socket connection.
 	 * @param o the object to send.
@@ -162,6 +162,6 @@ public class SocketClient extends AbstractSocketWrapper
 	 */
 	public String toString()
 	{
-		return "SocketClient (" + this.host + ":" + this.port + ") open:" + this.opened;
+		return "SocketClient[" + this.host + ":" + this.port + ", open=" + this.opened + "]";
 	}
 }
