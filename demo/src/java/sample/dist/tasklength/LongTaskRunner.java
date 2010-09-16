@@ -22,7 +22,6 @@ import java.util.List;
 import org.apache.commons.logging.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
@@ -95,9 +94,9 @@ public class LongTaskRunner
 					task.setId("" + (iter+1) + ":" + (i+1));
 					job.addTask(task);
 				}
-				JPPFSchedule schedule = new JPPFSchedule(5000L);
-				job.getJobSLA().setJobSchedule(schedule);
-				job.getJobSLA().setSuspended(true);
+				//JPPFSchedule schedule = new JPPFSchedule(5000L);
+				//job.getJobSLA().setJobSchedule(schedule);
+				//job.getJobSLA().setSuspended(true);
 				// submit the tasks for execution
 				List<JPPFTask> results = jppfClient.submit(job);
 				for (JPPFTask task: results)

@@ -17,6 +17,7 @@
  */
 package sample.dist.tasklength;
 
+import org.apache.commons.logging.*;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -25,6 +26,10 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class LongTask extends JPPFTask
 {
+	/**
+	 * Logger for this class.
+	 */
+	Log log = null;
 	/**
 	 * Determines how long this task will run.
 	 */
@@ -65,6 +70,8 @@ public class LongTask extends JPPFTask
 	 */
 	public void run()
 	{
+		log = LogFactory.getLog(LongTask.class);
+		log.info("running the tak");
 		taskStart = System.currentTimeMillis();
 		double elapsed = 0L;
 		if (useCPU)
