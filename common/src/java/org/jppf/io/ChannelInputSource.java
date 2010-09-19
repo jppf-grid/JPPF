@@ -22,6 +22,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 
+import org.apache.commons.logging.*;
 import org.jppf.utils.SerializationUtils;
 
 /**
@@ -31,9 +32,17 @@ import org.jppf.utils.SerializationUtils;
 public class ChannelInputSource implements InputSource
 {
 	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(ChannelInputSource.class);
+	/**
 	 * The backing <code>ReadableByteChannel</code>.
 	 */
 	protected ReadableByteChannel channel = null;
+	/**
+	 * 
+	 */
+	protected ByteBuffer tmpDirectBuffer = null;
 
 	/**
 	 * Initialize this input source with the specified <code>SocketWrapper</code>.
@@ -61,6 +70,13 @@ public class ChannelInputSource implements InputSource
 
 	/**
 	 * Read data from this input source into a byte buffer.
+	 * <p><b>Implementation details</b>:<br/>
+	 * We read the data by small chunks of max 32768 bytes wrapped in a direct ByteBuffer,
+	 * to work around the fact that Sun NIO implementation of SocketChannelImpl.read()
+	 * attempts to allocate a direct buffer of the requested data size (i.e. <code>data</code>.remaining() in our case),
+	 * <i>if the destination ByteBuffer is not direct</i>.<br/>
+	 * This implementation can result in a &quot;OutOfMemoryError: Direct buffer space&quot; when the size of the data to read is too large.<br/>
+	 * See <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4879883">Sun Bug ID: 4879883</a> for details.
 	 * @param data the buffer into which to write.
 	 * @return the number of bytes actually read, or -1 if end of stream was reached.
 	 * @throws Exception if an IO error occurs.
@@ -68,9 +84,25 @@ public class ChannelInputSource implements InputSource
 	 */
 	public int read(ByteBuffer data) throws Exception
 	{
-		int n = channel.read(data);
-		if (n < 0) throw new EOFException();
-		return n;
+		if (tmpDirectBuffer == null) tmpDirectBuffer = ByteBuffer.allocateDirect(IOHelper.TEMP_BUFFER_SIZE);
+		else tmpDirectBuffer.clear();
+		int remaining = data.remaining();
+		int count = 0;
+		while (count < remaining)
+		{
+			if (data.remaining() < tmpDirectBuffer.remaining()) tmpDirectBuffer.limit(data.remaining());
+			int n = channel.read(tmpDirectBuffer);
+			if (n < 0) throw new EOFException();
+			else if (n == 0) break;
+			else
+			{
+				count += n;
+				tmpDirectBuffer.flip();
+				data.put(tmpDirectBuffer);
+				tmpDirectBuffer.clear();
+			}
+		}
+		return count;
 	}
 
 	/**

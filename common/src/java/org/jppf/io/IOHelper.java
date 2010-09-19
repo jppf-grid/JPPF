@@ -20,7 +20,8 @@ package org.jppf.io;
 
 import java.io.File;
 
-import org.jppf.utils.SystemUtils;
+import org.apache.commons.logging.*;
+import org.jppf.utils.*;
 
 
 /**
@@ -30,9 +31,21 @@ import org.jppf.utils.SystemUtils;
 public final class IOHelper
 {
 	/**
-	 * Suze of temporary buffers used in I/O transfers.
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(IOHelper.class);
+	/**
+	 * Determines whether debug-level logging is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Size of temporary buffers used in I/O transfers.
 	 */
 	public static final int TEMP_BUFFER_SIZE = 32 * 1024;
+	/**
+	 * Free memory / requested allocation size ration threshold that triggers disk overflow.
+	 */
+	private static final double FREE_MEM_TO_SIZE_RATIO = JPPFConfiguration.getProperties().getDouble("jppf.disk.overflow.threshold", 2.0d);
 
 	/**
 	 * Instantiation of this class is not permitted.
@@ -44,7 +57,7 @@ public final class IOHelper
 	/**
 	 * Create a data location object based on a comparison of the available heap memory
 	 * and the data location object size.
-	 * @param size - the requested size of the data location to create.
+	 * @param size the requested size of the data location to create.
 	 * @return a <code>DataLocation</code> object whose content may be stored in memory
 	 * or on another medium, depending on the available memory.
 	 * @throws Exception if an IO error occurs.
@@ -57,8 +70,8 @@ public final class IOHelper
 	/**
 	 * Create a data location object based on a comparison of the available heap memory
 	 * and the data location object size.
-	 * @param size - the requested size of the data location to create.
-	 * @param memorySize - the size to consider when calculating the available memory.
+	 * @param size the requested size of the data location to create.
+	 * @param memorySize the size to consider when calculating the available memory.
 	 * @return a <code>DataLocation</code> object whose content may be stored in memory
 	 * or on another medium, depending on the available memory.
 	 * @throws Exception if an IO error occurs.
@@ -66,8 +79,21 @@ public final class IOHelper
 	public static DataLocation createDataLocationMemorySensitive(int size, int memorySize) throws Exception
 	{
 		long freeMem = SystemUtils.maxFreeHeap();
-		if ((long) (1.2d * memorySize) < freeMem) return new ByteBufferLocation(size);
+		if (debugEnabled) log.debug("free mem / requested size : " + freeMem + "/" + size);
+		if ((long) (FREE_MEM_TO_SIZE_RATIO * memorySize) < freeMem)
+		{
+			try
+			{
+				byte[] bytes = new byte[size];
+				return new ByteBufferLocation(bytes, 0, size);
+			}
+			catch (OutOfMemoryError oome)
+			{
+				if (debugEnabled) log.debug("OOM when allocating in-memory data location", oome);
+			}
+		}
 		File file = File.createTempFile("jppf", ".tmp");
+		if (debugEnabled) log.debug("disk overflow: creating temp file '" + file.getCanonicalPath() + "' with size=" + size);
 		file.deleteOnExit();
 		return new FileLocation(file, size);
 	}
@@ -75,7 +101,7 @@ public final class IOHelper
 	/**
 	 * Read a provider or task data from an input source.
 	 * The data may be stored in memory or on another medium depending on its size and the available memory.
-	 * @param source - the input source from which to read the data.
+	 * @param source the input source from which to read the data.
 	 * @return A data location containing the data provider or task data.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
@@ -90,8 +116,8 @@ public final class IOHelper
 	/**
 	 * Read a provider or task data from an input source.
 	 * The data may be stored in memory or on another medium depending on its size and the available memory.
-	 * @param source - the input source from which to read the data.
-	 * @param memorySize - the size to consider when calculating the available memory.
+	 * @param source the input source from which to read the data.
+	 * @param memorySize the size to consider when calculating the available memory.
 	 * @return A data location containing the data provider or task data.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
