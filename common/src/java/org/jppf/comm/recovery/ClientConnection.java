@@ -65,23 +65,23 @@ public class ClientConnection extends ThreadSynchronization implements Runnable
 	{
 		try
 		{
-			TypedProperties config = JPPFConfiguration.getProperties();
-			String host = config.getString("jppf.server.host", "localhost");
-			int port = config.getInt("jppf.recovery.server.port", 22222);
-			//socketWrapper = new SocketClient(host, port);
-			socketWrapper = new SocketClient();
-			socketWrapper.setHost(host);
-			socketWrapper.setPort(port);
-			if (debugEnabled) log.debug("initializing " + socketWrapper);
-			socketInitializer.initializeSocket(socketWrapper);
-			if (!socketInitializer.isSuccessfull())
-			{
-				log.error("Could not initialize reaper connection " + socketWrapper);
-				socketInitializer.close();
-				return;
-			}
 			while (!isStopped())
 			{
+				TypedProperties config = JPPFConfiguration.getProperties();
+				String host = config.getString("jppf.server.host", "localhost");
+				int port = config.getInt("jppf.recovery.server.port", 22222);
+				//socketWrapper = new SocketClient(host, port);
+				socketWrapper = new SocketClient();
+				socketWrapper.setHost(host);
+				socketWrapper.setPort(port);
+				if (debugEnabled) log.debug("initializing " + socketWrapper);
+				socketInitializer.initializeSocket(socketWrapper);
+				if (!socketInitializer.isSuccessfull())
+				{
+					log.error("Could not initialize reaper connection " + socketWrapper);
+					socketInitializer.close();
+					return;
+				}
 				JPPFBuffer buffer = socketWrapper.receiveBytes(0);
 				String message = new String(buffer.buffer);
 				if (debugEnabled) log.debug("received '" + message + "'");
@@ -94,6 +94,14 @@ public class ClientConnection extends ThreadSynchronization implements Runnable
 		catch (Exception e)
 		{
 			log.error(e.getMessage(), e);
+			try
+			{
+				if (socketWrapper != null) socketWrapper.close();
+			}
+			catch(Exception e2)
+			{
+				log.error("Exception closing the reaper connection", e2);
+			}
 		}
 	}
 

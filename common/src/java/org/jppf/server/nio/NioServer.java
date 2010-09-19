@@ -237,6 +237,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 			it.remove();
 			try
 			{
+				if (!key.isValid()) continue;
 				if (key.isAcceptable()) doAccept(key);
 				else transitionManager.submitTransition(new SelectionKeyWrapper(key));
 			}
