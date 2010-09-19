@@ -22,12 +22,22 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+import org.slf4j.*;
+
 /**
  * Data location backed by a file.
  * @author Laurent Cohen
  */
 public class FileLocation extends AbstractDataLocation
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(FileLocation.class);
+	/**
+	 * Determines whether debug-level logging is enabled.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
 	 * The current count of bytes read from/written to the underlying file.
 	 */
@@ -127,11 +137,15 @@ public class FileLocation extends AbstractDataLocation
 	 */
 	private int nonBlockingTransferFrom(InputSource source) throws Exception
 	{
+		int remaining = size - count;
+		if (remaining < buffer.remaining())
+		{
+			buffer.limit(buffer.position() + remaining);
+		}
 		int n = source.read(buffer);
 		if (n > 0)
 		{
-			int remaining = size - count;
-			if ((remaining < buffer.limit()) && (remaining > 0))  buffer.limit(remaining);
+			//if ((remaining < buffer.limit()) && (remaining > 0))  buffer.limit(remaining);
 			count += n;
 			buffer.flip();
 			int tempCount = 0;
@@ -144,6 +158,7 @@ public class FileLocation extends AbstractDataLocation
 					return -1;
 				}
 				tempCount += tmp;
+				if (traceEnabled) log.trace("written " + tmp + " bytes (total: " + tempCount + "/" + n + ")");
 			}
 			buffer.clear();
 		}
