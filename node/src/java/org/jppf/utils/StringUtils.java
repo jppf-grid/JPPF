@@ -330,4 +330,17 @@ public final class StringUtils
 		pw.close();
 		return sw.toString();
 	}
+
+	/**
+	 * Build a string made of the specified tokens. 
+	 * @param args the tokens composing the string.
+	 * @return the concatenation of the string values of the tokens.
+	 */
+	public static String buildString(Object...args)
+	{
+		if (args == null) return null;
+		StringBuilder sb = new StringBuilder();
+		for (Object o: args) sb.append(o);
+		return sb.toString();
+	}
 }

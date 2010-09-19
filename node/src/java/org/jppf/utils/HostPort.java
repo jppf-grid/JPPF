@@ -59,6 +59,6 @@ public class HostPort extends Pair<String, Integer>
 	 */
 	public String toString()
 	{
-		return "" + host() + ":" + port();
+		return new StringBuilder(host()).append(":").append(port()).toString();
 	}
 }
