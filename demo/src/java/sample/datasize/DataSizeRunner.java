@@ -77,21 +77,23 @@ public class DataSizeRunner
 	 */
 	private static void perform() throws Exception
 	{
-		TypedProperties props = JPPFConfiguration.getProperties();
-		int datasize = props.getInt("datasize.size", 1);
-		int nbTasks = props.getInt("datasize.nbTasks", 10);
-		String unit = props.getString("datasize.unit", "b").toLowerCase();
+		TypedProperties config = JPPFConfiguration.getProperties();
+		boolean inNodeOnly = config.getBoolean("datasize.inNodeOnly", false);
+		int datasize = config.getInt("datasize.size", 1);
+		int nbTasks = config.getInt("datasize.nbTasks", 10);
+		String unit = config.getString("datasize.unit", "b").toLowerCase();
 		if ("k".equals(unit)) datasize *= KILO;
 		else if ("m".equals(unit)) datasize *= MEGA;
 		
 		output("Running datasize demo with data size = " + datasize + " with " + nbTasks + " tasks");
 		long totalTime = System.currentTimeMillis();
 		JPPFJob job = new JPPFJob();
-		for (int i=0; i<nbTasks; i++) job.addTask(new DataTask(datasize));
+		for (int i=0; i<nbTasks; i++) job.addTask(new DataTask(datasize, inNodeOnly));
 		List<JPPFTask> results = jppfClient.submit(job);
 		for (JPPFTask t: results)
 		{
-			if (t.getException() != null) throw t.getException();
+			if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
+			else System.out.println("task result: " + t.getResult());
 		}
 		totalTime = System.currentTimeMillis() - totalTime;
 		output("Computation time: " + StringUtils.toStringDuration(totalTime));
