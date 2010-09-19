@@ -46,6 +46,10 @@ public class NodeIO extends ThreadSynchronization
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * The node who owns this TaskIO.
 	 */
 	private JPPFNode node = null;
@@ -199,14 +203,23 @@ public class NodeIO extends ThreadSynchronization
 		ExecutorService executor = node.getExecutionManager().getExecutor();
 		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		bundle.setNodeExecutionTime(elapsed);
+		if (debugEnabled) log.debug("serializing " + tasks.size() + " tasks");
 		List<Future<BufferList>> futureList = new ArrayList<Future<BufferList>>();
 		futureList.add(executor.submit(new ObjectWriteTask(bundle)));
 		for (JPPFTask task : tasks) futureList.add(executor.submit(new ObjectWriteTask(task)));
+		if (debugEnabled) log.debug("sending " + tasks.size() + " tasks to the server");
 		for (Future<BufferList> f: futureList)
 		{
 			BufferList list = f.get();
+			if (traceEnabled) log.trace("task has " + list.first().size() + " buffers, total data size = " + list.second());
 			socketWrapper.writeInt(list.second());
-			for (JPPFBuffer buf: list.first()) socketWrapper.write(buf.buffer, 0, buf.length);
+			//for (JPPFBuffer buf: list.first())
+			for (int j=0; j<list.first().size(); j++)
+			{
+				JPPFBuffer buf = list.first().get(j);
+				if (traceEnabled) log.trace("sending buffer[" + j + "] of size " + buf.length);
+				socketWrapper.write(buf.buffer, 0, buf.length);
+			}
 		}
 		socketWrapper.flush();
 	}
@@ -242,9 +255,9 @@ public class NodeIO extends ThreadSynchronization
 			int p = (object instanceof JPPFTask) ? ((JPPFTask) object).getPosition() : -1;
 			try
 			{
-				if (debugEnabled) log.debug("before serialization of object at position " + p);
+				if (traceEnabled) log.trace("before serialization of object at position " + p);
 				data = serialize(object);
-				if (debugEnabled) log.debug("serialized object at position " + p);
+				if (traceEnabled) log.trace("serialized object at position " + p);
 			}
 			catch(Throwable t)
 			{

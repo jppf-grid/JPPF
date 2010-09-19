@@ -23,7 +23,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
 
-import org.jppf.data.transform.*;
+import org.apache.commons.logging.*;
+import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
 import org.jppf.server.nio.NioObject;
 import org.jppf.server.protocol.JPPFTaskBundle;
@@ -35,6 +36,18 @@ import org.jppf.utils.*;
  */
 public class NodeMessage
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Log log = LogFactory.getLog(NodeMessage.class);
+	/**
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
 	 * The current count of bytes sent or received.
 	 */
@@ -89,6 +102,8 @@ public class NodeMessage
 	 */
 	public boolean read(ReadableByteChannel channel) throws Exception
 	{
+		try
+		{
 		if (nbObjects <= 0)
 		{
 			if (!readNextObject(channel)) return false;
@@ -104,11 +119,17 @@ public class NodeMessage
 			if (!readNextObject(channel)) return false;
 		}
 		return true;
+		}
+		catch(Error e)
+		{
+			log.error(e.getMessage(), e);
+			throw e;
+		}
 	}
 
 	/**
 	 * Read the next serializable object from the specified channel.
-	 * @param channel - the channel to read from.
+	 * @param channel the channel to read from.
 	 * @return true if the object has been completely read from the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
@@ -121,6 +142,7 @@ public class NodeMessage
 		{
 			currentLength = ((ByteBufferLocation) currentLengthObject.getData()).buffer().getInt();
 			count += 4;
+			if (traceEnabled) log.trace(StringUtils.getRemoteHost(channel) + " : position=" + position + ", count = " + count + ", object size=" + currentLength);
 		}
 		if (currentObject == null)
 		{
@@ -130,6 +152,7 @@ public class NodeMessage
 		if (!currentObject.read(is)) return false;
 		count += currentLength;
 		locations.add(currentObject.getData());
+		if (traceEnabled) log.trace(StringUtils.getRemoteHost(channel) + " : position=" + position + ", count = " + count + ", object size=" + currentLength + ", read complete");
 		currentLengthObject = null;
 		currentObject = null;
 		currentLength = 0;
