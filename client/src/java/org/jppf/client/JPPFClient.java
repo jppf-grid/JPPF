@@ -81,7 +81,7 @@ public class JPPFClient extends AbstractGenericClient
 	 */
 	public JPPFClient(String uuid)
 	{
-		super(uuid);
+		super(uuid, JPPFConfiguration.getProperties());
 	}
 
 	/**
