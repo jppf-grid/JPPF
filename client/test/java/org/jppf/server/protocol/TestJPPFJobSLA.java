@@ -36,7 +36,7 @@ import org.junit.Test;
  * as specified in the job SLA. 
  * @author Laurent Cohen
  */
-public class TestJPPFJobSLA extends OneDriverOneNodeSetup
+public class TestJPPFJobSLA extends Setup1D1N1C
 {
 	/**
 	 * Count of the number of jobs created.
@@ -113,7 +113,7 @@ public class TestJPPFJobSLA extends OneDriverOneNodeSetup
 		assertEquals(results.size(), 1);
 		JPPFTask task = results.get(0);
 		assertNotNull(task.getResult());
-		assertEquals(OneDriverOneNodeSetup.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+		assertEquals(Setup1D1N1C.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class TestJPPFJobSLA extends OneDriverOneNodeSetup
 		assertEquals(results.size(), 1);
 		JPPFTask task = results.get(0);
 		assertNotNull(task.getResult());
-		assertEquals(OneDriverOneNodeSetup.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+		assertEquals(Setup1D1N1C.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
 	}
 
 	/**

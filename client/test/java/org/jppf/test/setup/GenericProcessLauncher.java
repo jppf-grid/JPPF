@@ -85,9 +85,9 @@ public class GenericProcessLauncher
 	{
 		addClasspathElement("../node/classes");
 		String libDir = "../JPPF/lib/";
-		addClasspathElement(libDir + "slf4j/jcl-over-slf4j-1.5.2.jar");
-		addClasspathElement(libDir + "slf4j/slf4j-api-1.5.2.jar");
-		addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.5.2.jar");
+		//addClasspathElement(libDir + "slf4j/jcl-over-slf4j-1.6.1.jar");
+		addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
+		addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
 		addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
 	}
 
