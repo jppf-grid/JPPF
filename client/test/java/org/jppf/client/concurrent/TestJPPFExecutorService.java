@@ -31,7 +31,7 @@ import org.junit.*;
  * Unit tests for {@link JPPFExecutorService}.
  * @author Laurent Cohen
  */
-public class TestJPPFExecutorService extends OneDriverOneNodeSetup
+public class TestJPPFExecutorService extends Setup1D1N1C
 {
 	/**
 	 * Default duration for tasks that use a duration. Adjust the value for slow hardware.

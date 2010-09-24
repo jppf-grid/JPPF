@@ -59,7 +59,7 @@ public class SimpleTask extends JPPFTask
 		try
 		{
 			if (duration > 0) Thread.sleep(duration);
-			setResult(OneDriverOneNodeSetup.EXECUTION_SUCCESSFUL_MESSAGE);
+			setResult(Setup1D1N1C.EXECUTION_SUCCESSFUL_MESSAGE);
 			//log.info("task id =" + getId() + ", duration=" + duration + ", result=" + OneDriverOneNodeSetup.EXECUTION_SUCCESSFUL_MESSAGE);
 		}
 		catch(Exception e)

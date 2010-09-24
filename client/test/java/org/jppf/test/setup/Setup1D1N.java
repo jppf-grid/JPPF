@@ -20,14 +20,15 @@ package org.jppf.test.setup;
 
 import java.io.IOException;
 
-import org.jppf.client.JPPFClient;
 import org.junit.*;
 
 /**
  * Unit tests for {@link JPPFExecutorService}.
+ * This class starts and stops a driver and a node before and after
+ * running the tests in a unit test class.
  * @author Laurent Cohen
  */
-public class OneDriverOneNodeSetup
+public class Setup1D1N
 {
 	/**
 	 * Message used for successful task execution.
@@ -41,10 +42,6 @@ public class OneDriverOneNodeSetup
 	 * The node to lunch for the test.
 	 */
 	protected static DriverProcessLauncher driver = null;
-	/**
-	 * The jppf client to use.
-	 */
-	protected static JPPFClient client = null;
 	/**
 	 * Shutdown hook used to destroy the driver and node processes, in case the JVM terminates abnormally.
 	 */
@@ -71,7 +68,6 @@ public class OneDriverOneNodeSetup
 		driver.startProcess();
 		node = new NodeProcessLauncher(1);
 		node.startProcess();
-		client = new JPPFClient();
 		// give some time for everyone to initialize
 		try
 		{
@@ -96,7 +92,6 @@ public class OneDriverOneNodeSetup
 		catch(Exception e)
 		{
 		}
-		client.close();
 		node.stopProcess();
 		driver.stopProcess();
 		Runtime.getRuntime().removeShutdownHook(shutdownHook);
