@@ -171,6 +171,7 @@ public class TopologyData
 			if (!jmxWrapper.isConnected()) return;
 			nodeState = ((JMXNodeConnectionWrapper) jmxWrapper).state();
 			if (nodeState == null) setStatus(TopologyDataStatus.DOWN);
+			else setStatus(TopologyDataStatus.UP);
 		}
 		catch(Exception e)
 		{
