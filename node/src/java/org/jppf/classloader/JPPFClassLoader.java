@@ -23,6 +23,7 @@ import java.util.*;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.*;
 import org.jppf.data.transform.*;
+import org.jppf.node.NodeRunner;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -108,6 +109,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 					if (debugEnabled) log.debug("sending node initiation message");
 					JPPFResourceWrapper resource = new JPPFResourceWrapper();
 					resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
+					resource.setData("node.uuid", NodeRunner.getUuid());
 					ObjectSerializer serializer = socketClient.getSerializer();
 					JPPFBuffer buf = serializer.serialize(resource);
 					byte[] data = buf.getBuffer();
@@ -146,6 +148,23 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 			{
 				LOCK.unlock();
 			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void reset()
+	{
+		LOCK.lock();
+		try
+		{
+			socketClient = null;
+			init();
+		}
+		finally
+		{
+			LOCK.unlock();
 		}
 	}
 

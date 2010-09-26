@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.nio.channels.SelectionKey;
 import java.util.*;
 
+import org.jppf.node.NodeRunner;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -84,6 +85,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 					if (debugEnabled) log.debug("sending node initiation message");
 					JPPFResourceWrapper resource = new JPPFResourceWrapper();
 					resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
+					resource.setData("node.uuid", NodeRunner.getUuid());
 					synchronized(channel)
 					{
 						channel.setServerResource(resource);
@@ -112,6 +114,14 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 			LOCK.unlock();
 			setInitializing(false);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void reset()
+	{
+		init();
 	}
 
 	/**

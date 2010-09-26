@@ -83,6 +83,10 @@ public class NodeRunner
 	 * Used to synchronize start and stop methods when the node is run as a service.
 	 */
 	private static SimpleObjectLock serviceLock = new SimpleObjectLock();
+	/**
+	 * This node's universal identifier.
+	 */
+	private static String uuid = new JPPFUuid().toString();
 
 	/**
 	 * Run a node as a standalone application.
@@ -358,5 +362,14 @@ public class NodeRunner
 				}
 			});
 		}
+	}
+
+	/**
+	 * This node's universal identifier.
+	 * @return a uuid as a string.
+	 */
+	public static String getUuid()
+	{
+		return uuid;
 	}
 }

@@ -61,7 +61,7 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	/**
 	 * This node's universal identifier.
 	 */
-	protected String uuid = new JPPFUuid().toString();
+	protected String uuid = null;
 
 	/**
 	 * Add a listener to the list of listener for this node.

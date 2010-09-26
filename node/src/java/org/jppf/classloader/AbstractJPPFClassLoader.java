@@ -95,6 +95,10 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	 * Initialize the underlying socket connection.
 	 */
 	protected abstract void init();
+	/**
+	 * Reset and reinitialize the connection ot the server. 
+	 */
+	public abstract void reset();
 
 	/**
 	 * Load a JPPF class from the server.
@@ -106,10 +110,6 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	{
 		try
 		{
-			if (name.indexOf("JPPFMBeanProvider") >= 0)
-			{
-				int breakpoint = 0;
-			}
 			if (debugEnabled) log.debug("looking up resource [" + name + "]");
 			Class<?> c = findLoadedClass(name);
 			if (c != null)
