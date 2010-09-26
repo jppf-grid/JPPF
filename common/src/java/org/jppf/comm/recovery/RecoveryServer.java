@@ -38,7 +38,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Indicates the remote peer is a driver.
 	 */
@@ -99,16 +99,12 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
 	{
 		try
 		{
-			serverSocket = new ServerSocket(22222);
+			serverSocket = new ServerSocket(recoveryPort);
 			while (!isStopped())
 			{
 				Socket socket = serverSocket.accept();
 				ServerConnection connection = new ServerConnection(socket, maxRetries, socketReadTimeout);
-				synchronized(connections)
-				{
-					connections.add(connection);
-				}
-				//new Thread(connection, "server connection " + connectionCount.incrementAndGet()).start();
+				reaper.newConnection(connection);
 			}
 		}
 		catch (Exception e)
@@ -158,11 +154,35 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
 	 * The resulting array is independant from the original collection: changes to one has no effect on the other.
 	 * @return an array of {@link ServerConnection} instances.
 	 */
-	public ServerConnection[] connections()
+	ServerConnection[] connections()
 	{
 		synchronized(connections)
 		{
 			return connections.toArray(EMPTY_CONNECTION_ARRAY);
+		}
+	}
+
+	/**
+	 * Add the specified connection to the list of connections handled by this server.
+	 * @param connection the connection to add.
+	 */
+	void addConnection(ServerConnection connection)
+	{
+		synchronized(connections)
+		{
+			connections.add(connection);
+		}
+	}
+
+	/**
+	 * Remove the specified connection from the list of connections handled by this server.
+	 * @param connection the connection to remove.
+	 */
+	void removeConnection(ServerConnection connection)
+	{
+		synchronized(connections)
+		{
+			connections.remove(connection);
 		}
 	}
 

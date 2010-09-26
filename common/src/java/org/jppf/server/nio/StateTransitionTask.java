@@ -38,6 +38,10 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether TRACE logging level is enabled.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * The channel whose state is changing.
 	 */
 	private ChannelWrapper<?> channel = null;
@@ -72,7 +76,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 		{
 			StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
 			this.ctx = (NioContext<S>) channel.getContext();
-			if (debugEnabled) log.debug("performing transition to state " + ctx.getState() + " for " + channel);
+			if (traceEnabled) log.trace("performing transition to state " + ctx.getState() + " for " + channel);
 			try
 			{
 				NioState<T> state = factory.getState(ctx.getState());

@@ -70,20 +70,12 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
 	 * @return a string that represents this channel wrapper.
 	 * @see java.lang.Object#toString()
 	 */
-	/*
 	public String toString()
 	{
 		SelectableChannel ch = ((SelectionKey) getChannel()).channel();
-		StringBuilder sb = new StringBuilder();
-		sb.append("[");
-		sb.append(StringUtils.getRemoteHost(ch));
-		sb.append(",").append(" readyOps=").append(getReadyOps());
-		sb.append(",").append(" keyOps=").append(getKeyOps());
-		sb.append(",").append(" state=").append(getContext().getState());
-		sb.append("]");
-		return sb.toString();
+		if (channel.isValid()) return super.toString();
+		return "[invalid channel]";
 	}
-	*/
 
 	/**
 	 * {@inheritDoc}

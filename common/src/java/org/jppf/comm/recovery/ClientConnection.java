@@ -26,7 +26,7 @@ import org.slf4j.*;
  * 
  * @author Laurent Cohen
  */
-public class ClientConnection extends ThreadSynchronization implements Runnable
+public class ClientConnection extends AbstractRecoveryConnection
 {
 	/**
 	 * Logger for this class.
@@ -35,19 +35,11 @@ public class ClientConnection extends ThreadSynchronization implements Runnable
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Connection to a client.
-	 */
-	private SocketWrapper socketWrapper = null;
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Used to synchronize access to the underlying socket from multiple threads.
 	 */
-	private SocketInitializer socketInitializer = new SocketInitializerImpl();
-	/**
-	 * The JPPF node or client uuid.
-	 */
-	private String uuid = null;
+	private SocketInitializer socketInitializer;
 
 	/**
 	 * Initialize this cliet connection with the specified uuid.
@@ -65,28 +57,21 @@ public class ClientConnection extends ThreadSynchronization implements Runnable
 	{
 		try
 		{
+			configure();
+			if (debugEnabled) log.debug("initializing recovery client connection " + socketWrapper);
+			socketInitializer = new SocketInitializerImpl();
+			socketInitializer.initializeSocket(socketWrapper);
+			if (!socketInitializer.isSuccessfull())
+			{
+				log.error("Could not initialize recovery client connection " + socketWrapper);
+				close();
+				return;
+			}
 			while (!isStopped())
 			{
-				TypedProperties config = JPPFConfiguration.getProperties();
-				String host = config.getString("jppf.server.host", "localhost");
-				int port = config.getInt("jppf.recovery.server.port", 22222);
-				//socketWrapper = new SocketClient(host, port);
-				socketWrapper = new SocketClient();
-				socketWrapper.setHost(host);
-				socketWrapper.setPort(port);
-				if (debugEnabled) log.debug("initializing " + socketWrapper);
-				socketInitializer.initializeSocket(socketWrapper);
-				if (!socketInitializer.isSuccessfull())
-				{
-					log.error("Could not initialize reaper connection " + socketWrapper);
-					socketInitializer.close();
-					return;
-				}
-				JPPFBuffer buffer = socketWrapper.receiveBytes(0);
-				String message = new String(buffer.buffer);
-				if (debugEnabled) log.debug("received '" + message + "'");
+				String message = receiveMessage();
 				String response = "checked;" + uuid;
-				buffer = new JPPFBuffer(response);
+				JPPFBuffer buffer = new JPPFBuffer(response);
 				socketWrapper.sendBytes(buffer);
 				if (debugEnabled) log.debug("sent '" + response + "'");
 			}
@@ -94,15 +79,27 @@ public class ClientConnection extends ThreadSynchronization implements Runnable
 		catch (Exception e)
 		{
 			log.error(e.getMessage(), e);
-			try
-			{
-				if (socketWrapper != null) socketWrapper.close();
-			}
-			catch(Exception e2)
-			{
-				log.error("Exception closing the reaper connection", e2);
-			}
+			close();
 		}
+		if (debugEnabled) log.debug(Thread.currentThread().getName() + " stopping");
+	}
+
+	/**
+	 * Configure this client connection from the JPPF properties.
+	 */
+	private void configure()
+	{
+		if (debugEnabled) log.debug("configuring connection");
+		TypedProperties config = JPPFConfiguration.getProperties();
+		String host = config.getString("jppf.server.host", "localhost");
+		int port = config.getInt("jppf.recovery.server.port", 22222);
+		//maxRetries = config.getInt("jppf.recovery.max.retries", 3);
+		//socketReadTimeout = config.getInt("jppf.recovery.read.timeout", 6000);
+		maxRetries = 1;
+		socketReadTimeout = 0;
+		socketWrapper = new SocketClient();
+		socketWrapper.setHost(host);
+		socketWrapper.setPort(port);
 	}
 
 	/**
@@ -110,30 +107,19 @@ public class ClientConnection extends ThreadSynchronization implements Runnable
 	 */
 	public void close()
 	{
+		setStopped(true);
 		try
 		{
-			setStopped(true);
-			socketWrapper.close();
+			if (debugEnabled) log.debug("closing connection");
+			SocketWrapper tmp = socketWrapper;
+			socketWrapper = null;
+			if (tmp != null) tmp.close();
+			if (socketInitializer != null) socketInitializer.close();
+			socketInitializer = null;
 		}
 		catch (Exception e)
 		{
 			log.error(e.getMessage(), e);
-		}
-	}
-
-	/**
-	 * Main entry point.
-	 * @param args not used.
-	 */
-	public static void main(String[] args)
-	{
-		try
-		{
-			new ClientConnection("jppf").run();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
 		}
 	}
 }

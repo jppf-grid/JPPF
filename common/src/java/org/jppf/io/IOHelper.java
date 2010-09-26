@@ -39,6 +39,10 @@ public final class IOHelper
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether trace-level logging is enabled.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * Size of temporary buffers used in I/O transfers.
 	 */
 	public static final int TEMP_BUFFER_SIZE = 32 * 1024;
@@ -65,7 +69,7 @@ public final class IOHelper
 	public static DataLocation createDataLocationMemorySensitive(int size) throws Exception
 	{
 		long freeMem = SystemUtils.maxFreeHeap();
-		if (debugEnabled) log.debug("free mem / requested size : " + freeMem + "/" + size);
+		if (traceEnabled) log.trace("free mem / requested size : " + freeMem + "/" + size);
 		if ((long) (FREE_MEM_TO_SIZE_RATIO * size) < freeMem)
 		{
 			try

@@ -38,7 +38,7 @@ public class Reaper
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Size of the reaper thread pool.
 	 */
@@ -62,7 +62,7 @@ public class Reaper
 	/**
 	 * The list of listeners to this object's events.
 	 */
-	private List<Pair<ReaperListener, ReaperEventFilter>> listeners = new ArrayList<Pair<ReaperListener, ReaperEventFilter>>();
+	private List<ReaperListener> listeners = new ArrayList<ReaperListener>();
 
 	/**
 	 * Initialize this reaper with the specified recovery server.
@@ -76,8 +76,26 @@ public class Reaper
 		this.poolSize = poolSize;
 		this.runInterval = runInterval;
 		threadPool = Executors.newFixedThreadPool(poolSize, new JPPFThreadFactory("Reaper"));
-		timer = new Timer();
+		timer = new Timer("Reaper timer");
 		timer.schedule(new ReaperTask(), 0L, runInterval);
+	}
+
+	/**
+	 * Submit a new connection for immediate check and get the corresponding node or client uuid.
+	 * @param connection the conenction to check.
+	 */
+	void newConnection(final ServerConnection connection)
+	{
+		Runnable r = new Runnable()
+		{
+			public void run()
+			{
+				connection.run();
+				checkConnection(connection);
+				if (connection.isOk()) server.addConnection(connection);
+			}
+		};
+		new Thread(r).start();
 	}
 
 	/**
@@ -86,20 +104,10 @@ public class Reaper
 	 */
 	public void addReaperListener(ReaperListener listener)
 	{
-		addReaperListener(listener, null);
-	}
-
-	/**
-	 * Add a listener / filter pair to the list of listeners.
-	 * @param listener the listener to add.
-	 * @param filter the filter to apply to the listener.
-	 */
-	public void addReaperListener(ReaperListener listener, ReaperEventFilter filter)
-	{
 		if (listener == null) return;
 		synchronized (listeners)
 		{
-			listeners.add(new Pair<ReaperListener, ReaperEventFilter>(listener, filter));
+			listeners.add(listener);
 		}
 	}
 
@@ -117,20 +125,6 @@ public class Reaper
 	}
 
 	/**
-	 * Remove a listener / filter pair from the list of listeners.
-	 * @param listener the listener to remove.
-	 * @param filter the filter applied to the listener.
-	 */
-	public void removeReaperListener(ReaperListener listener, ReaperEventFilter filter)
-	{
-		if (listener == null) return;
-		synchronized (listeners)
-		{
-			listeners.remove(new Pair<ReaperListener, ReaperEventFilter>(listener, filter));
-		}
-	}
-
-	/**
 	 * Notify all listeners that a connection has failed.
 	 * @param connection the server-side connection that failed.
 	 */
@@ -139,11 +133,25 @@ public class Reaper
 		ReaperEvent event = new ReaperEvent(connection);
 		synchronized (listeners)
 		{
-			for (Pair<ReaperListener, ReaperEventFilter> pair: listeners)
-			{
-				ReaperEventFilter filter = pair.second();
-				if ((filter == null) || filter.isEventEnabled(event)) pair.first().connectionFailed(event);
-			}
+			for (ReaperListener listener: listeners) listener.connectionFailed(event);
+		}
+	}
+
+	/**
+	 * Check a connection after an attempt to reach the remote peer.
+	 * @param connection the conenction to check.
+	 */
+	private void checkConnection(ServerConnection connection)
+	{
+		if (!connection.isOk())
+		{
+			server.removeConnection(connection);
+			fireReaperEvent(connection);
+		}
+		else if (!connection.isInitialized())
+		{
+			fireReaperEvent(connection);
+			connection.setInitialized(true);
 		}
 	}
 
@@ -158,7 +166,7 @@ public class Reaper
 		public void run()
 		{
 			ServerConnection[] connections = server.connections();
-			List<Future<?>> futures = new ArrayList<Future<?>>();
+			List<Future<?>> futures = new ArrayList<Future<?>>(connections.length);
 			for (ServerConnection c: connections) futures.add(threadPool.submit(c));
 			for (Future<?> f: futures)
 			{
@@ -171,18 +179,7 @@ public class Reaper
 					if (debugEnabled) log.debug(e.getMessage(), e);
 				}
 			}
-			for (ServerConnection c: connections) 
-			{
-				if (!c.isOk())
-				{
-					fireReaperEvent(c);
-				}
-				else if (!c.isInitialized())
-				{
-					fireReaperEvent(c);
-					c.setInitialized(true);
-				}
-			}
+			for (ServerConnection c: connections) checkConnection(c);
 		}
 	}
 }

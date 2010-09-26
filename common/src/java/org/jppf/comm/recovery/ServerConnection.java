@@ -30,10 +30,10 @@ import org.slf4j.*;
  * if the expected response is received. If the response is incorrect or not received at all,
  * then the connection is considered broken and closed on the server side.
  * <p>The main goal is to detect network connections broken due to hardware failures on
- * tthe remote peer side, which cannot be detected otherwise.
+ * the remote peer side, which cannot be detected otherwise.
  * @author Laurent Cohen
  */
-public class ServerConnection implements Runnable
+public class ServerConnection extends AbstractRecoveryConnection
 {
 	/**
 	 * Logger for this class.
@@ -42,34 +42,15 @@ public class ServerConnection implements Runnable
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Connection to a client.
-	 */
-	private SocketWrapper socketWrapper = null;
-	/**
-	 * Maximum number of failed write/read attempts on a connection before the remote peer is considered dead.
-	 */
-	private int maxRetries = 3;
-	/**
-	 * Maximum wait time on a response from the remote peer.
-	 */
-	private int socketReadTimeout = 6000;
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Determines whether this connection is ok after is has been checked.
 	 */
-	private boolean ok = true;
+	private boolean ok;
 	/**
 	 * Determines whether the initial handshake has been performed.
 	 */
-	private boolean initialized = false;
-	/**
-	 * The uuid for the remote peer, sent by the peer during handshake.
-	 * It is used to correlate this server connection with a corresponding channel
-	 * handled by the {@link org.jppf.server.nio.nodeserver.NodeNioServer}, so the node connection can be closed when this
-	 * connection is considered broken.
-	 */
-	private String uuid = null;
+	private boolean initialized;
 
 	/**
 	 * Initialize this connection with the specified socket.
@@ -80,6 +61,8 @@ public class ServerConnection implements Runnable
 	 */
 	public ServerConnection(Socket socket, int maxRetries, int socketReadTimeout) throws Exception
 	{
+		this.ok = true;
+		this.initialized = false;
 		this.maxRetries = maxRetries;
 		this.socketReadTimeout = socketReadTimeout;
 		socketWrapper = new SocketClient(socket);
@@ -88,8 +71,9 @@ public class ServerConnection implements Runnable
 	/**
 	 * {@inheritDoc}
 	 */
-	public void run()
+	public synchronized void run()
 	{
+		if (!isOk()) return;
 		if (!initialized) performHandshake();
 		else performCheck();
 	}
@@ -121,9 +105,6 @@ public class ServerConnection implements Runnable
 	/**
 	 * Send a string to the remote peer and receive a string back.
 	 * If any exception occurs while sending or receiving, the connection is considered broken.
-	 * While receiving the response, this method also waits for {@link #socketReadTimeout} specified
-	 * in the constructor. If the timeout expires {@link #maxRetries} times in a row, the connection
-	 * is also considered broken.
 	 * @param message the string message to send to the remote peer.
 	 * @return the response as a string.
 	 */
@@ -132,32 +113,16 @@ public class ServerConnection implements Runnable
 		String response = null;
 		try
 		{
+			if (socketWrapper == null) return null;
 			JPPFBuffer buffer = new JPPFBuffer(message);
 			socketWrapper.sendBytes(buffer);
-			if (debugEnabled) log.debug("sent '" + message + "'");
-			int retries = 0;
-			boolean success = false;
-			while ((retries < maxRetries) && !success)
-			{
-				try
-				{
-					buffer = socketWrapper.receiveBytes(socketReadTimeout);
-					success = true;
-					response = buffer.asString();
-					if (debugEnabled) log.debug("received '" + response + "'");
-				}
-				catch (SocketTimeoutException e)
-				{
-					retries++;
-					if (debugEnabled) log.debug("retry #" + retries + " failed! (" + this + ")");
-				}
-			}
-			if (!success) setOk(false);
+			if (debugEnabled) log.debug(this + " sent '" + message + "'");
+			response = receiveMessage();
 		}
 		catch (Exception e)
 		{
-			setOk(false);
-			if (debugEnabled) log.debug("error closing the recovery server socket", e);
+			close();
+			if (debugEnabled) log.debug("error checking " + this, e);
 		}
 		return response;
 	}
@@ -165,15 +130,21 @@ public class ServerConnection implements Runnable
 	/**
 	 * Close this server connection and release the resources it is using.
 	 */
-	public void close()
+	public synchronized void close()
 	{
 		try
 		{
-			socketWrapper.close();
+			if (socketWrapper != null)
+			{
+				SocketWrapper tmp = socketWrapper;
+				socketWrapper = null;
+				setOk(false);
+				tmp.close();
+			}
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			if (debugEnabled) log.debug("error closing " + this, e);
 		}
 	}
 
@@ -211,15 +182,6 @@ public class ServerConnection implements Runnable
 	public synchronized void setInitialized(boolean initialized)
 	{
 		this.initialized = initialized;
-	}
-
-	/**
-	 * Get the uuid of the remote peer.
-	 * @return the uuid as a string.
-	 */
-	public String getUuid()
-	{
-		return uuid;
 	}
 
 	/**
