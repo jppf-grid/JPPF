@@ -108,7 +108,7 @@ public class X11IdleTimeDetector implements IdleTimeDetector
 		}
 		finally
 		{
-			if (info != null) X11.INSTANCE.XFree(info.getPointer());
+			//if (info != null) X11.INSTANCE.XFree(info.getPointer());
 			info = null;
 
 			if (display != null) X11.INSTANCE.XCloseDisplay(display);
