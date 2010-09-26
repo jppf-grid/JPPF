@@ -43,6 +43,10 @@ public abstract class JPPFContainer
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * Utility for deserialization and serialization.
 	 */
 	protected SerializationHelper helper = null;
@@ -182,11 +186,11 @@ public abstract class JPPFContainer
 			try
 			{
 				Thread.currentThread().setContextClassLoader(getClassLoader());
-				if (debugEnabled) log.debug("deserializing object index = " + index);
+				if (traceEnabled) log.debug("deserializing object index = " + index);
 				buffer = JPPFDataTransformFactory.transform(false, buffer);
 				Object o = helper.getSerializer().deserialize(buffer);
 				buffer = null;
-				if (debugEnabled) log.debug("deserialized object index = " + index);
+				if (traceEnabled) log.debug("deserialized object index = " + index);
 				return o;
 			}
 			catch(Exception e)

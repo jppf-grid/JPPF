@@ -52,6 +52,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether TRACE logging level is enabled.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * The algorithm that dynamically computes the task bundle size.
 	 */
 	private AtomicReference<Bundler> bundlerRef;
@@ -99,10 +103,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * Mapping of channels to their uuid.
 	 */
 	private Map<String, ChannelWrapper<?>> uuidMap = new HashMap<String, ChannelWrapper<?>>();
-	/**
-	 * The server used to detect that individual connections are broken due to hardware failures.
-	 */
-	private RecoveryServer recoveryServer = null;
 
 	/**
 	 * Initialize this server with a specified port number.
@@ -133,9 +133,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 				selector.wakeup();
 			}
 		});
-		recoveryServer = new RecoveryServer();
-		recoveryServer.getReaper().addReaperListener(this);
-		new Thread(recoveryServer, "RecoveryServer thread").start();
+		RecoveryServer recoveryServer = JPPFDriver.getInstance().getRecoveryServer();
+		if (recoveryServer != null) recoveryServer.getReaper().addReaperListener(this);
 	}
 
 	/**
@@ -218,7 +217,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 */
 	public void addIdleChannel(ChannelWrapper<?> channel)
 	{
-		if (debugEnabled) log.debug("Adding idle channel " + channel);
+		if (traceEnabled) log.trace("Adding idle channel " + channel);
 		synchronized(idleChannels)
 		{
 			idleChannels.add(channel);
@@ -228,14 +227,40 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	/**
 	 * Remove a channel from the list of idle channels.
 	 * @param channel the channel to remove from the list.
+	 * @return a reference to the removed channel.
 	 */
-	public void removeIdleChannel(ChannelWrapper channel)
+	public ChannelWrapper<?> removeIdleChannel(ChannelWrapper<?> channel)
 	{
-		if (debugEnabled) log.debug("Removing idle chanel " + channel);
+		if (traceEnabled) log.trace("Removing idle chanel " + channel);
 		synchronized(idleChannels)
 		{
 			idleChannels.remove(channel);
 		}
+		return channel;
+	}
+
+	/**
+	 * Remove the channel at the specified index from the list of idle channels.
+	 * @param index the index of the channel to remove from the list.
+	 * @return a reference to the removed channel.
+	 */
+	public ChannelWrapper<?>  removeIdleChannel(int index)
+	{
+		ChannelWrapper<?> channel = null;
+		synchronized(idleChannels)
+		{
+			try
+			{
+				channel = idleChannels.remove(index);
+				if (traceEnabled) log.trace("Removed idle chanel " + channel + " at index " + index);
+			}
+			catch(Exception e)
+			{
+				if (debugEnabled) log.debug("error removing channel at index " + index, e);
+				else log.warn("error removing channel at index " + index + " : " + e.getMessage());
+			}
+		}
+		return channel;
 	}
 
 	/**
@@ -315,13 +340,16 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 		try
 		{
 			driver.getStatsManager().nodeConnectionClosed();
-			String uuid = context.getNodeUuid();
-			if (uuid != null)
+			NodeNioServer server = driver.getNodeNioServer();
+			driver.removeNodeInformation(channel);
+			server.removeIdleChannel(channel);
+			if (context != null)
 			{
-				NodeNioServer server = driver.getNodeNioServer();
-				driver.removeNodeInformation(channel);
-				server.removeIdleChannel(channel);
-				server.removeUuid(uuid);
+				String uuid = context.getNodeUuid();
+				if (uuid != null)
+				{
+					server.removeUuid(uuid);
+				}
 			}
 		}
 		catch (Exception e)
@@ -391,15 +419,21 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	public void connectionFailed(ReaperEvent event)
 	{
 		ServerConnection c = event.getConnection();
-		/*if (c.isOk() && !c.isInitialized())
+		if (!c.isOk())
 		{
 			String uuid = c.getUuid();
-		}
-		else */if (!c.isOk())
-		{
-			String uuid = c.getUuid();
-			ChannelWrapper<?> channel = removeUuid(uuid);
-			closeNode(channel, (AbstractNodeContext) channel.getContext());
+			ChannelWrapper<?> channel = (uuid != null) ? removeUuid(uuid) : null;
+			if (channel != null)
+			{
+				if (debugEnabled) log.debug("about to close channel = " + (channel.isOpen() ? channel : channel.getClass().getSimpleName()) + " with uuid = " + uuid);
+				AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
+				if (context != null) context.handleException(channel);
+				else
+				{
+					log.warn("found null context - a job may be stuck!");
+					closeNode(channel, null);
+				}
+			}
 		}
 	}
 

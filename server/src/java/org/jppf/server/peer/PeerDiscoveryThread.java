@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.comm.discovery.*;
-import org.jppf.server.JPPFDriver;
+import org.jppf.server.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -63,7 +63,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 	 */
 	public PeerDiscoveryThread()
 	{
-		localInfo = JPPFDriver.getInstance().createConnectionInformation();
+		localInfo = new DriverInitializer(JPPFDriver.getInstance()).createConnectionInformation();
 	}
 
 	/**

@@ -25,6 +25,7 @@ import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.classloader.ResourceProvider;
+import org.jppf.comm.recovery.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.utils.JPPFConfiguration;
@@ -34,12 +35,16 @@ import org.slf4j.*;
  * Instances of this class serve class loading requests from the JPPF nodes.
  * @author Laurent Cohen
  */
-public class ClassNioServer extends NioServer<ClassState, ClassTransition>
+public class ClassNioServer extends NioServer<ClassState, ClassTransition> implements ReaperListener
 {
 	/**
 	 * Logger for this class.
 	 */
 	private static Logger log = LoggerFactory.getLogger(ClassNioServer.class);
+	/**
+	 * Determines whether DEBUG logging level is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * A mapping of the remote resource provider connections handled by this socket server, to their unique uuid.<br>
 	 * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine in
@@ -59,6 +64,10 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 	 * The local channel, if any.
 	 */
 	private ChannelWrapper<?> localChannel = null;
+	/**
+	 * Mapping of channels to their uuid.
+	 */
+	private Map<String, ChannelWrapper<?>> nodeConnections = new HashMap<String, ChannelWrapper<?>>();
 
 	/**
 	 * Initialize this class server with the port it will listen to.
@@ -78,6 +87,8 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 	public ClassNioServer(final int[] ports) throws JPPFException
 	{
 		super(ports, "ClassServer", false);
+		RecoveryServer recoveryServer = JPPFDriver.getInstance().getRecoveryServer();
+		if (recoveryServer != null) recoveryServer.getReaper().addReaperListener(this);
 		//selectTimeout = 1L;
 	}
 
@@ -221,5 +232,85 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition>
 	{
 		CacheClassContent content = classCache.get(new CacheClassKey(uuid, name));
 		return content != null ? content.getContent() : null;
+	}
+
+	/**
+	 * Get a channel from its uuid.
+	 * @param uuid the uuid key to look up in the the map.
+	 * @return channel the corresponding channel.
+	 */
+	ChannelWrapper<?> getNodeConnection(String uuid)
+	{
+		synchronized(nodeConnections)
+		{
+			return nodeConnections.get(uuid);
+		}
+	}
+
+	/**
+	 * Put the specified uuid / channel pair into the uuid map.
+	 * @param uuid the uuid key to add to the map.
+	 * @param channel the corresponding channel.
+	 */
+	void addNodeConnection(String uuid, ChannelWrapper<?> channel)
+	{
+		synchronized(nodeConnections)
+		{
+			nodeConnections.put(uuid, channel);
+		}
+	}
+
+	/**
+	 * Remove the specified uuid entry from the uuid map.
+	 * @param uuid the uuid key to remove from the map.
+	 * @return channel the corresponding channel.
+	 */
+	ChannelWrapper<?> removeNodeConnection(String uuid)
+	{
+		synchronized(nodeConnections)
+		{
+			return nodeConnections.remove(uuid);
+		}
+	}
+
+	/**
+	 * Close the specified connection.
+	 * @param channel the channel representing the connection.
+	 */
+	static void closeConnection(ChannelWrapper<?> channel)
+	{
+		if (channel == null)
+		{
+			log.warn("attempt to close null channel - skipping this step");
+			return;
+		}
+		ClassNioServer server = JPPFDriver.getInstance().getClassServer();
+		ClassContext context = (ClassContext) channel.getContext();
+		String uuid = context.getUuid();
+		if (uuid != null) server.removeNodeConnection(uuid);
+		try
+		{
+			channel.close();
+		}
+		catch(Exception e)
+		{
+			if (debugEnabled) log.debug(e.getMessage(), e);
+			else log.warn(e.getMessage());
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void connectionFailed(ReaperEvent event)
+	{
+		ServerConnection c = event.getConnection();
+		if (!c.isOk())
+		{
+			String uuid = c.getUuid();
+			ChannelWrapper<?> channel = getNodeConnection(uuid);
+			if (debugEnabled) log.debug("about to close channel = " + channel + " with uuid = " + uuid);
+			closeConnection(channel);
+		}
 	}
 }

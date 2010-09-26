@@ -113,6 +113,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 */
 	public JPPFNode()
 	{
+		uuid = NodeRunner.getUuid();
 		executionManager = new NodeExecutionManager(this);
 	}
 
@@ -145,13 +146,19 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 			catch(Exception e)
 			{
 				log.error(e.getMessage(), e);
+				if (classLoader != null)
+				{
+					classLoader.reset();
+					setClassLoader(null);
+				}
 				try
 				{
 					if (notifying) fireNodeEvent(NodeEventType.DISCONNECTED);
 					synchronized(this)
 					{
-						if (socketClient != null) socketClient.close();
-						socketClient = null;
+						closeDataChannel();
+						containerMap.clear();
+						containerList.clear();
 					}
 				}
 				catch(Exception ex)
@@ -185,7 +192,11 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 			checkInitialBundle(bundle);
 			List<JPPFTask> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
-			if (debugEnabled) log.debug("received " + (notEmpty ? "a non-" : "an ") + "empty bundle");
+			if (debugEnabled)
+			{
+				if (notEmpty) log.debug("received a bundle with " + taskList.size()  + " tasks");
+				else log.debug("received an empty bundle");
+			}
 			if (notEmpty) executionManager.execute(bundle, taskList);
 			processResults(bundle, taskList);
 		}
@@ -229,6 +240,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 */
 	private void processResults(JPPFTaskBundle bundle, List<JPPFTask> taskList) throws Exception
 	{
+		if (debugEnabled) log.debug("processing results for job '" + bundle.getId() + "'");
 		if (executionManager.checkConfigChanged())
 		{
 			JPPFSystemInformation info = new JPPFSystemInformation();
@@ -240,19 +252,8 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 		{
 			if (isJmxEnabled()) getNodeAdmin().setTaskCounter(getTaskCount() + taskList.size());
 			else setTaskCount(getTaskCount() + taskList.size());
-			if (debugEnabled) log.debug("tasks executed: "+getTaskCount());
+			if (debugEnabled) log.debug("tasks executed: " + getTaskCount());
 		}
-		/*
-		if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
-		{
-			int p = bundle.getBuildNumber();
-			if (buildNumber < p)
-			{
-				VersionUtils.setBuildNumber(p);
-				throw new JPPFNodeReloadNotification("detected new build number: " + p + "; previous build number: " + buildNumber);
-			}
-		}
-		*/
 	}
 
 	/**
@@ -359,33 +360,37 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	public JPPFContainer getContainer(final List<String> uuidPath) throws Exception
 	{
 		String uuid = uuidPath.get(0);
-		JPPFContainer container = containerMap.get(uuid);
-		if (container == null)
+		JPPFContainer container = null;
+		synchronized(this)
 		{
-			if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
-			AbstractJPPFClassLoader cl = AccessController.doPrivileged(new PrivilegedAction<AbstractJPPFClassLoader>()
+			container = containerMap.get(uuid);
+			if (container == null)
 			{
-				public AbstractJPPFClassLoader run()
+				if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
+				AbstractJPPFClassLoader cl = AccessController.doPrivileged(new PrivilegedAction<AbstractJPPFClassLoader>()
 				{
-					try
+					public AbstractJPPFClassLoader run()
 					{
-						return newClassLoaderCreator(uuidPath).call();
+						try
+						{
+							return newClassLoaderCreator(uuidPath).call();
+						}
+						catch(Exception e)
+						{
+							log.error(e.getMessage(), e);
+						}
+						return null;
 					}
-					catch(Exception e)
-					{
-						log.error(e.getMessage(), e);
-					}
-					return null;
+				});
+				container = newJPPFContainer(uuidPath, cl);
+				if (containerList.size() >= MAX_CONTAINERS)
+				{
+					JPPFContainer toRemove = containerList.removeFirst();
+					containerMap.remove(toRemove.getAppUuid());
 				}
-			});
-			container = newJPPFContainer(uuidPath, cl);
-			if (containerList.size() >= MAX_CONTAINERS)
-			{
-				JPPFContainer toRemove = containerList.removeFirst();
-				containerMap.remove(toRemove.getAppUuid());
+				containerList.add(container);
+				containerMap.put(uuid, container);
 			}
-			containerList.add(container);
-			containerMap.put(uuid, container);
 		}
 		return container;
 	}
@@ -482,7 +487,6 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 				log.error(ex.getMessage(), ex);
 			}
 		}
-		socketClient = null;
 		try
 		{
 			providerManager.unregisterProviderMBeans();

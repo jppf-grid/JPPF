@@ -91,10 +91,17 @@ class DefiningChannelTypeState extends ClassServerState
 			else if (NODE_INITIATION.equals(resource.getState()))
 			{
 				if (debugEnabled) log.debug("initiating node: " + wrapper);
+				String uuid = (String) resource.getData("node.uuid");
+				if (uuid != null)
+				{
+					context.setUuid(uuid);
+					server.addNodeConnection(uuid, wrapper);
+				}
 				// send the uuid of this driver to the node or node peer.
 				resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
 				resource.setProviderUuid(driver.getUuid());
 				context.serializeResource(wrapper);
+				
 				return TO_SENDING_INITIAL_NODE_RESPONSE;
 			}
 		}

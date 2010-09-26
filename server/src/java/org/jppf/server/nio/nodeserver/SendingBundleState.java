@@ -41,6 +41,10 @@ class SendingBundleState extends NodeServerState
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether TRACE logging level is enabled.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
@@ -76,8 +80,8 @@ class SendingBundleState extends NodeServerState
 				if (bundle.getUuidPath().contains(context.getUuid()))
 				{
 					if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: " + bundle.getUuidPath().getList());
-					context.resubmitBundle(bundleWrapper);
 					context.setBundle(null);
+					context.resubmitBundle(bundleWrapper);
 					server.addIdleChannel(wrapper);
 					return TO_IDLE;
 				}
@@ -98,7 +102,7 @@ class SendingBundleState extends NodeServerState
 			//JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
 			return TO_WAITING;
 		}
-		if (debugEnabled) log.debug("part yet to send to node " + wrapper);
+		if (traceEnabled) log.trace("part yet to send to node " + wrapper);
 		return TO_SENDING;
 	}
 }

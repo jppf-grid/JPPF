@@ -131,14 +131,16 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * @param channel the channel that threw the exception.
 	 * @see org.jppf.server.nio.AbstractNioContext#handleException(java.nio.channels.SocketChannel)
 	 */
-	public void handleException(ChannelWrapper channel)
+	public void handleException(ChannelWrapper<?> channel)
 	{
 		if (getBundler() != null) getBundler().dispose();
 		NodeNioServer.closeNode(channel, this);
 		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getBundle().getState()))
 		{
 			JPPFDriver.getInstance().getJobManager().jobReturned(bundle, channel);
-			resubmitBundle(bundle);
+			BundleWrapper tmp = bundle;
+			bundle = null;
+			resubmitBundle(tmp);
 		}
 	}
 

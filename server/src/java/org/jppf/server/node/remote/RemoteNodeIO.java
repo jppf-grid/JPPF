@@ -45,6 +45,10 @@ public class RemoteNodeIO extends AbstractNodeIO
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * The underlying socket wrapper.
 	 */
 	private SocketWrapper socketWrapper = null;
@@ -180,9 +184,9 @@ public class RemoteNodeIO extends AbstractNodeIO
 			int p = (object instanceof JPPFTask) ? ((JPPFTask) object).getPosition() : -1;
 			try
 			{
-				if (debugEnabled) log.debug("before serialization of object at position " + p);
+				if (traceEnabled) log.trace("before serialization of object at position " + p);
 				data = serialize(object);
-				if (debugEnabled) log.debug("serialized object at position " + p);
+				if (traceEnabled) log.trace("serialized object at position " + p);
 			}
 			catch(Throwable t)
 			{

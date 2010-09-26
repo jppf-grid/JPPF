@@ -19,16 +19,14 @@ package org.jppf.server;
 
 import java.util.*;
 
-import javax.management.MBeanServer;
-
 import org.jppf.JPPFException;
 import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.comm.discovery.*;
+import org.jppf.comm.recovery.RecoveryServer;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.*;
-import org.jppf.management.spi.*;
 import org.jppf.process.LauncherListener;
-import org.jppf.security.*;
+import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.ChannelWrapper;
@@ -121,6 +119,10 @@ public class JPPFDriver
 	 * The thread that broadcasts the server connection information using UDP multicast.
 	 */
 	private JPPFBroadcaster broadcaster = null;
+	/**
+	 * The server used to detect that individual connections are broken due to hardware failures.
+	 */
+	private RecoveryServer recoveryServer = null;
 
 	/**
 	 * Initialize this JPPFDriver.
@@ -130,7 +132,7 @@ public class JPPFDriver
 		// initialize the jmx logger
 		new JmxMessageNotifier();
 		statsManager.addListener(statsUpdater);
-		initCredentials();
+		credentials = new DriverInitializer(this).initCredentials();
 	}
 
 	/**
@@ -139,14 +141,22 @@ public class JPPFDriver
 	 */
 	public void run() throws Exception
 	{
+		DriverInitializer init = new DriverInitializer(this);
 		jobManager = new JPPFJobManager();
 		taskQueue = new JPPFPriorityQueue();
 		((JPPFPriorityQueue) taskQueue).addQueueListener(jobManager);
-		JPPFConnectionInformation info = createConnectionInformation();
+		JPPFConnectionInformation info = init.createConnectionInformation();
+		TypedProperties config = JPPFConfiguration.getProperties();
+
+		if (config.getBoolean("jppf.recovery.enabled", true))
+		{
+			recoveryServer = new RecoveryServer();
+			new Thread(recoveryServer, "RecoveryServer thread").start();
+		}
 
 		classServer = new ClassNioServer(info.classServerPorts);
 		classServer.start();
-		printInitializedMessage(info.classServerPorts, "Class Server");
+		init.printInitializedMessage(info.classServerPorts, "Class Server");
 
 		applicationServers = new JPPFApplicationServer[info.applicationServerPorts.length];
 		for (int i=0; i<info.applicationServerPorts.length; i++)
@@ -154,13 +164,12 @@ public class JPPFDriver
 			applicationServers[i] = new JPPFApplicationServer(info.applicationServerPorts[i]);
 			applicationServers[i].start();
 		}
-		printInitializedMessage(info.applicationServerPorts, "Client Server");
+		init.printInitializedMessage(info.applicationServerPorts, "Client Server");
 
 		nodeNioServer = new NodeNioServer(info.nodeServerPorts);
 		nodeNioServer.start();
-		printInitializedMessage(info.nodeServerPorts, "Tasks Server");
+		init.printInitializedMessage(info.nodeServerPorts, "Tasks Server");
 
-		TypedProperties config = JPPFConfiguration.getProperties();
 		if (config.getBoolean("jppf.local.node.enabled", false))
 		{
 			LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
@@ -178,7 +187,7 @@ public class JPPFDriver
 				jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX);
 				jmxServer.start(getClass().getClassLoader());
 				info.managementPort = JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198);
-				registerProviderMBeans();
+				init.registerProviderMBeans();
 				System.out.println("JPPF Driver management initialized");
 			}
 		}
@@ -200,74 +209,6 @@ public class JPPFDriver
 		}
 		initPeers();
 		System.out.println("JPPF Driver initialization complete");
-	}
-
-	/**
-	 * Register all MBeans defined through the service provider interface.
-	 * @throws Exception if the registration failed.
-	 */
-	@SuppressWarnings("unchecked")
-	private void registerProviderMBeans() throws Exception
-	{
-  	MBeanServer server = getJmxServer().getServer();
-    JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager<JPPFDriverMBeanProvider>(JPPFDriverMBeanProvider.class, server);
-		List<JPPFDriverMBeanProvider> list = mgr.getAllProviders();
-		for (JPPFDriverMBeanProvider provider: list)
-		{
-			Object o = provider.createMBean();
-			Class<?> inf = Class.forName(provider.getMBeanInterfaceName());
-			boolean b = mgr.registerProviderMBean(o, inf, provider.getMBeanName());
-			if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + provider.getMBeanName() + "]");
-		}
-	}
-
-
-	/**
-	 * Read configuration for the host name and ports used to conenct to this driver.
-	 * @return a <code>DriverConnectionInformation</code> instance.
-	 */
-	public JPPFConnectionInformation createConnectionInformation()
-	{
-		TypedProperties props = JPPFConfiguration.getProperties();
-		JPPFConnectionInformation info = new JPPFConnectionInformation();
-		info.uuid = uuid;
-		String s = props.getString("class.server.port", "11111");
-		info.classServerPorts = StringUtils.parseIntValues(s);
-		s = props.getString("app.server.port", "11112");
-		info.applicationServerPorts = StringUtils.parseIntValues(s);
-		s = props.getString("node.server.port", "11113");
-		info.nodeServerPorts = StringUtils.parseIntValues(s);
-		info.host = NetworkUtils.getManagementHost();
-		if (props.getBoolean("jppf.management.enabled", true)) info.managementPort = props.getInt("jppf.management.port", 11198);
-		return info;
-	}
-
-	/**
-	 * Print a message to the console to signify that the initialization of a server was succesfull.
-	 * @param ports the ports on which the server is listening.
-	 * @param name the name to use for the server.
-	 */
-	protected void printInitializedMessage(int[] ports, String name)
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append(name).append(" initialized - listening on port");
-		if (ports.length > 1) sb.append("s");
-		for (int n: ports) sb.append(" ").append(n);
-		System.out.println(sb.toString());
-	}
-
-	/**
-	 * Initialize the security credentials associated with this JPPF driver.
-	 */
-	private void initCredentials()
-	{
-		StringBuilder sb = new StringBuilder("Driver:");
-		sb.append(VersionUtils.getLocalIpAddress()).append(":");
-		TypedProperties props = JPPFConfiguration.getProperties();
-		sb.append(props.getInt("class.server.port", 11111)).append(":");
-		sb.append(props.getInt("app.server.port", 11112)).append(":");
-		sb.append(props.getInt("node.server.port", 11113));
-		credentials = new JPPFSecurityContext(uuid, sb.toString(), new JPPFCredentials());
 	}
 
 	/**
@@ -560,5 +501,14 @@ public class JPPFDriver
 			log.error(e.getMessage(), e);
 			System.exit(1);
 		}
+	}
+
+	/**
+	 * The server used to detect that individual connections are broken due to hardware failures.
+	 * @return a {@link RecoveryServer} instance.
+	 */
+	public RecoveryServer getRecoveryServer()
+	{
+		return recoveryServer;
 	}
 }

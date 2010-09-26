@@ -97,7 +97,7 @@ class TaskQueueChecker implements Runnable
 						int n = findIdleChannelIndex(bundle);
 						if (n >= 0)
 						{
-							channel = idleChannels.remove(n);
+							channel = server.removeIdleChannel(n);
 							selectedBundle = bundleWrapper;
 						}
 					}
@@ -163,7 +163,7 @@ class TaskQueueChecker implements Runnable
 			}
 			acceptableChannels.add(i);
 		}
-		for (Integer i: channelsToRemove) idleChannels.remove(i.intValue());
+		for (Integer i: channelsToRemove) server.removeIdleChannel(i);
 		if (debugEnabled) log.debug("found " + acceptableChannels.size() + " acceptable channels");
 		if (!acceptableChannels.isEmpty())
 		{

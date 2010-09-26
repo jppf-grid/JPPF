@@ -44,6 +44,10 @@ public class JPPFRemoteContainer extends JPPFContainer
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * The socket connection wrapper.
 	 */
 	private SocketWrapper socketClient = null;
@@ -80,7 +84,7 @@ public class JPPFRemoteContainer extends JPPFContainer
 			for (int i=0; i<count; i++)
 			{
 				JPPFBuffer buf = socketClient.receiveBytes(0);
-				if (debugEnabled) log.debug("i = " + i + ", read buffer size = " + buf.getLength());
+				if (traceEnabled) log.trace("i = " + i + ", read buffer size = " + buf.getLength());
 				futureList.add(executor.submit(new ObjectDeserializationTask(buf.getBuffer(), i)));
 			}
 			for (Future<Object> f: futureList) list.add(f.get());

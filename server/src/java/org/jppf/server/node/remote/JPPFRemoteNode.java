@@ -22,8 +22,8 @@ import java.util.concurrent.Callable;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.*;
-import org.jppf.comm.recovery.ClientConnection;
-import org.jppf.comm.socket.SocketClient;
+import org.jppf.comm.recovery.*;
+import org.jppf.comm.socket.*;
 import org.jppf.node.NodeRunner;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
@@ -78,13 +78,24 @@ public class JPPFRemoteNode extends JPPFNode
 			if (debugEnabled) log.debug("start socket initializer");
 			System.out.println("Attempting connection to the node server");
 			socketInitializer.initializeSocket(socketClient);
-			if (!socketInitializer.isSuccessfull()) throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
+			if (!socketInitializer.isSuccessfull())
+			{
+				if (debugEnabled) log.debug("socket initializer failed");
+				throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
+			}
 			System.out.println("Reconnected to the node server");
 			if (debugEnabled) log.debug("end socket initializer");
 		}
 		nodeIO = new RemoteNodeIO(this);
-		clientConnection = new ClientConnection(uuid);
-		new Thread(clientConnection, "reaper client connection").start();
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.recovery.enabled", true))
+		{
+			if (clientConnection == null)
+			{
+				if (debugEnabled) log.debug("Initializing recovery");
+				clientConnection = new ClientConnection(uuid);
+				new Thread(clientConnection, "reaper client connection").start();
+			}
+		}
 	}
 
 	/**
@@ -94,7 +105,19 @@ public class JPPFRemoteNode extends JPPFNode
 	 */
 	protected void closeDataChannel() throws Exception
 	{
-		if (socketClient != null) socketClient.close();
+		if (debugEnabled) log.debug("closing data channel: socketClient=" + socketClient + ", clientConnection=" + clientConnection);
+		if (socketClient != null)
+		{
+			SocketWrapper tmp = socketClient;
+			socketClient = null;
+			tmp.close();
+		}
+		if (clientConnection != null)
+		{
+			ClientConnection tmp = clientConnection;
+			clientConnection = null;
+			tmp.close();
+		}
 	}
 
 	/**
