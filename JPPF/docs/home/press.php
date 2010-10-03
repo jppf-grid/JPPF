@@ -262,24 +262,27 @@
 	</div>
 	<br>
 	<a name="original_release"></a>
-	<h3>Latest press release: JPPF 2.1</h3>
+	<h3>Latest press release: JPPF 2.2</h3>
 	<p>In this version, many improvements and fixes increase the reliability, scalability and ease of use of JPPF.
-	For the full list and details of the new features in JPPF 2.1, do not hesitate to read the <a href="release_notes.php?version=2.1">JPPF 2.1 release notes</a>.
-	<p><b>Performance</b>: special emphasis on both memory usage and performance improvements. The JPPF server now executes multithreaded network I/O and reaches new levels of scalability.
-	JPPF applications can now enjoy faster execution of larger jobs.
-	<p><b>Localization</b>: Russian localization is now available for the graphical administration console.
-	<p><b>Load balancing</b>: Custom load-balancers can now use information about the nodes' environment and configuration, along with metadata about the jobs.
-	This allows for sophisticated load-balancing implementations that can adapt to the capabilities of each node and the computational characteristics of each job.
-	<p><b>Configuration</b>: the managment port auto-incrementation enables servers and nodes to automatically find port available numbers, making JPPF configuration even easier and removing one the main configuration hurdles.
-	It is now possible to specify the number of concurrent threads performing I/O in the server.
-	<p><b>New Samples</b>: three new samples complement our offering in the JPPF samples pack:<br/>
-	- Simulation of large portfolio updates<br/>
-	- JPPF node health monitor in the system tray<br/>
-	- An example of a sophisticated load-balancer implementation<br/>
+	For the full list and details of the new features in JPPF 2.2, do not hesitate to read the <a href="release_notes.php?version=2.2">JPPF 2.2 release notes</a>.
+	<p><b>JVM Support</b>: as of version 2.2, JPPF is dropping support for the JDK 1.5. Only JDK 1.6 and later are supported.
+	<p><b>JPPF Executor Service</b>: this new API provides an executor service facade for the JPPF client.<br/>
+	It implements all the functionality specified in <a href="http://java.sun.com/javase/6/docs/api/index.html?java/util/concurrent/ExecutorService.html" target="_blank">java.util.concurrent.ExecutorService</a>
+	<p><b>Administration console</b>:<br/>
+	- A new status bar indicates the number of currently connected servers and nodes<br>
+	- The topology view includes two new buttons in the toolbar to select all servers or all nodes at once<br/>
+	- Multiple bugs have been fixed, making the console mmore robust and reliable than ever<br>
+	<p><b>Connectors</b>:<br/>
+	- The J2EE connector now has the ability to connect to multiple servers and automatically discover servers on the network<br/>
+	- The Gigaspace connector was upgraded to support Gigaspaces XAP 7.1<br/>
+	- The Tomcat connector was upgraded to support Tomcat 7.0.0 beta<br/>
+	- All three connectors have seen their demo web application revamped for a more enjoyable experience<br/>
+	<p><b>Job SLA</b>: JPPF jobs can now be set to expire at a specified date or after a specified amount of time<br/>
+	<p><b>Samples</b>: the network data encryption sample was upgraded to offer a much more secure solution.
 	<a name="features"></a>
 	<h3>Features</h3>
 	<div class="u_link" style="margin-left: 10px">
-		<a href="release_notes.php?version=2.1">Release notes</a>: see what's new in JPPF 2.1<br>
+		<a href="release_notes.php?version=2.2">Release notes</a>: see what's new in JPPF 2.2<br>
 		<a href="features.php">Full features list</a><br>
 	</div>
 	<a name="downloads"></a>

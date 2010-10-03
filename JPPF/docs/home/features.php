@@ -249,7 +249,7 @@
 				<br/>
 				</div>
 				<div class="content">
-<h1>JPPF 2.1 features</h1>
+<h1>JPPF 2.3 features</h1>
 <h3>Ease of use</h3>
 <ul>
 	<li>simple APIs requiring small or no learning curve</li>
@@ -258,19 +258,22 @@
 	<li>"happy path" with no additional configuration</li>
 	<li>automatic server discovery</li>
 	<li>convenient reusable application template to quickly and easily start developing JPPF applications</li>
+	<li>straightforward Executor Service interface to the JPPF grid</li>
 </ul>
 <h3>Self-repair and recovery</h3>
 <ul>
 	<li>automated node reconnection with failover strategy</li>
 	<li>automated client reconnection with failover strategy</li>
 	<li>fault tolerance with job requeuing</li>
+	<li>detection, recovery from hard-disconnects of remote nodes</li>
 </ul>
 <h3>Job-level SLA</h3>
 <ul>
-	<li>execution policies enable rule-based node filtering</li>
-	<li>maximum number of nodes a job can run on</li>
+	<li>job execution policies enable rule-based node filtering</li>
+	<li>maximum number of nodes a job can run on (grid partitioning)</li>
 	<li>job prioritization</li>
 	<li>job scheduled start date</li>
+	<li>job scheduled expiration date</li>
 </ul>
 <h3>Management and monitoring</h3>
 <ul>
@@ -284,6 +287,7 @@
 	<li>cpu utilization monitoring</li>
 	<li>management of load-balancing</li>
 	<li>management and monitoring available via APIs and graphical user interface (administration console)</li>
+	<li>access to remote sevrers and nodes logs via the JMX-based logger (integrates with Log4j and JDK logging)</li>
 </ul>
 <h3>Platform extensibility</h3>
 <ul>
@@ -297,7 +301,7 @@
 <ul>
 	<li>multiple configurable load-balancing algorithms</li>
 	<li>adaptive load-balancing adjusts in real-time to workload changes</li>
-	<li>memory-aware servers and nodes (toggle automatically from memory to file storage when memory becomes sparse)</li>
+	<li>memory-aware servers and nodes with disk overflow</li>
 	<li>client-side server connection pools</li>
 </ul>
 <h3>Dynamic topology scaling</h3>
@@ -305,6 +309,7 @@
 	<li>nodes can be added and removed dynamically from the grid</li>
 	<li>servers can be added and removed dynamically from the grid</li>
 	<li>servers can work alone or linked in P2P topology with other servers</li>
+	<li>ability to run a node in the same JVM as the server</li>
 </ul>
 <h3>Third-party connectors</h3>
 <ul>
@@ -321,7 +326,8 @@
 	<li>all components deployable as standalone Java applications</li>
 	<li>servers and nodes deployable as Linux/Unix daemons</li>
 	<li>servers and nodes deployable as Windows services</li>
-	<li>application client deployment as a web, J2EE or GigaSpaces XAP application
+	<li>application client deployment as a Web, J2EE or GigaSpaces XAP application
+	<li>nodes can run in idle system mode (idle system scavenging)</li>
 </ul>
 <h3>Execution modes</h3>
 <ul>
@@ -343,6 +349,8 @@
 	<li><a href="samples-pack/DataDependency/Readme.php">Simulation of large portfolio updates</a></li>
 	<li><a href="samples-pack/NodeTray/Readme.php">JPPF node health monitor in the system tray</a></li>
 	<li><a href="samples-pack/CustomLoadBalancer/Readme.php">An example of a sophisticated load-balancer implementation</a></li>
+	<li><a href="samples-pack/TaskNotifications/Readme.php">A customization that allows tasks to send notifications while executing</a></li>
+	<li><a href="samples-pack/IdleSystem/Readme.php">An extension that enables nodes to run only when the machine is idle</a></li>
 </ul>
 				</div>
 									</td>
