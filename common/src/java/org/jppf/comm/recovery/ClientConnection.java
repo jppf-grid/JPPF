@@ -23,7 +23,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Client-side connection for the recovery mechanism.
  * @author Laurent Cohen
  */
 public class ClientConnection extends AbstractRecoveryConnection

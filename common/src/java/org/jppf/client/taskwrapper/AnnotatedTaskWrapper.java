@@ -27,10 +27,10 @@ import org.jppf.JPPFException;
 import org.jppf.utils.ReflectionUtils;
 
 /**
- * 
+ * Wrapper class for a task not extending {@link org.jppf.server.protocol.JPPFTask JPPFTask}.
  * @author Laurent Cohen
  */
-public class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
+class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
 {
 	/**
 	 * The runnable object to execute.

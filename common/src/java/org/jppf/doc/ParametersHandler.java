@@ -22,7 +22,7 @@ import static org.jppf.doc.ParameterNames.*;
 import java.util.*;
 
 /**
- * 
+ * Instances of this class handle the command-line options used by the template-based doc generator.
  * @author Laurent Cohen
  */
 public class ParametersHandler

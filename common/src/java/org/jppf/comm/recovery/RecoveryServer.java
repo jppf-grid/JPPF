@@ -26,7 +26,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * This class handles the server-side management of recovery connections to remote peers.
  * @author Laurent Cohen
  */
 public class RecoveryServer extends ThreadSynchronization implements Runnable

@@ -45,11 +45,9 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	private int multiplexerPort = -1;
 
 	/**
-	 * Handle the cleanup when an exception occurs on the channel.
-	 * @param channel the channel that threw the exception.
-	 * @see org.jppf.server.nio.AbstractNioContext#handleException(java.nio.channels.SocketChannel)
+	 * {@inheritDoc}
 	 */
-	public void handleException(ChannelWrapper channel)
+	public void handleException(ChannelWrapper<?> channel)
 	{
 		try
 		{
@@ -76,7 +74,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * Get the request currently processed.
 	 * @return a <code>ChannelWrapper</code> instance.
 	 */
-	public synchronized ChannelWrapper getLinkedKey()
+	public synchronized ChannelWrapper<?> getLinkedKey()
 	{
 		return linkedKey;
 	}
@@ -85,7 +83,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * Set the request currently processed.
 	 * @param key a <code>ChannelWrapper</code> instance. 
 	 */
-	public synchronized void setLinkedKey(ChannelWrapper key)
+	public synchronized void setLinkedKey(ChannelWrapper<?> key)
 	{
 		this.linkedKey = key;
 	}

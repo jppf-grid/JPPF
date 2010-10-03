@@ -28,8 +28,8 @@ public final class DateTimeUtils
 {
 	/**
 	 * Convert the specified duration expressed in the specfied time unit into milliseconds.
-	 * If the unit is smaller than a millisecond (either {@link TimeUnit.NANOSECONDS} or {@link TimeUnit.MICROSECONDS}),
-	 * the result will be rounded to the closest millisecond.
+	 * If the unit is smaller than a millisecond (either {@link java.util.concurrent.TimeUnit#NANOSECONDS TimeUnit.NANOSECONDS} or 
+	 * {@link java.util.concurrent.TimeUnit#MICROSECONDS TimeUnit.MICROSECONDS}), the result will be rounded to the closest millisecond.
 	 * @param time the duration to convert.
 	 * @param unit the unit in which the duration is expressed.
 	 * @return the duration coverted to milliseconds.

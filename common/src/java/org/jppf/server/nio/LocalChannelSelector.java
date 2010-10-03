@@ -23,7 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.jppf.utils.ThreadSynchronization;
 
 /**
- * 
+ * Instances of this class act as a NIO selector for local (in-VM) channels.
  * @author Laurent Cohen
  */
 public class LocalChannelSelector extends ThreadSynchronization implements ChannelSelector

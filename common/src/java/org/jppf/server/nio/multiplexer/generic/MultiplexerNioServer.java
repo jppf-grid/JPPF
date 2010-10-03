@@ -140,9 +140,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	}
 
 	/**
-	 * Define a context for a newly created channel.
-	 * @return an <code>NioContext</code> instance.
-	 * @see org.jppf.server.nio.NioServer#createNioContext()
+	 * {@inheritDoc}
 	 */
 	public NioContext createNioContext()
 	{
@@ -150,10 +148,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	}
 
 	/**
-	 * Get the IO operations a connection is initially interested in.
-	 * @return a bit-wise combination of the interests, taken from
-	 * {@link java.nio.channels.SelectionKey SelectionKey} constants definitions.
-	 * @see org.jppf.server.nio.NioServer#getInitialInterest()
+	 * {@inheritDoc}
 	 */
 	public int getInitialInterest()
 	{
@@ -161,10 +156,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	}
 
 	/**
-	 * Process a channel that was accepted by the server socket channel.
-	 * @param key the selection key for the socket channel to process.
-	 * @param serverChannel the ServerSocketChannel that accepted the channel.
-	 * @see org.jppf.server.nio.NioServer#postAccept(java.nio.channels.SelectionKey, java.nio.channels.ServerSocketChannel)
+	 * {@inheritDoc}
 	 */
 	public void postAccept(ChannelWrapper key, ServerSocketChannel serverChannel)
 	{
@@ -177,9 +169,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	}
 
 	/**
-	 * Process a channel that was accepted by the server socket channel.
-	 * @param key the selection key for the socket channel to process.
-	 * @see org.jppf.server.nio.NioServer#postAccept(java.nio.channels.SelectionKey)
+	 * {@inheritDoc}
 	 */
 	public void postAccept(ChannelWrapper key)
 	{

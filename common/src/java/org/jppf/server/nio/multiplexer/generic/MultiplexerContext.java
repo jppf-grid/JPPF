@@ -72,9 +72,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	private int readMessageCount = 0; 
 
 	/**
-	 * Handle the cleanup when an exception occurs on the channel.
-	 * @param channel the channel that threw the exception.
-	 * @see org.jppf.server.nio.AbstractNioContext#handleException(java.nio.channels.SocketChannel)
+	 * {@inheritDoc}
 	 */
 	public void handleException(ChannelWrapper channel)
 	{
@@ -188,7 +186,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * @return a ByteBuffer containing the data read from the channel, or null if no data was read.
 	 * @throws Exception if an error occurs while reading the data.
 	 */
-	public ByteBuffer readMultiplexerMessage(ChannelWrapper wrapper) throws Exception
+	public ByteBuffer readMultiplexerMessage(ChannelWrapper<?> wrapper) throws Exception
 	{
 		ByteBuffer msg = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
 		int count = 0;
@@ -220,7 +218,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * @return true if the current message was completely written, false otherwise.
 	 * @throws Exception if an error occurs while reading the data.
 	 */
-	public boolean writeMultiplexerMessage(ChannelWrapper wrapper) throws Exception
+	public boolean writeMultiplexerMessage(ChannelWrapper<?> wrapper) throws Exception
 	{
 		ByteBuffer msg = getCurrentMessage();
 		int count = 0;

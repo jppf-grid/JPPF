@@ -21,7 +21,7 @@ package org.jppf.server.nio.multiplexer.generic;
 import java.nio.ByteBuffer;
 
 /**
- * 
+ * Wrapper around a <code>ByteBuffer</code> that retains the order in which it was received.
  * @author Laurent Cohen
  */
 public class ByteBufferWrapper

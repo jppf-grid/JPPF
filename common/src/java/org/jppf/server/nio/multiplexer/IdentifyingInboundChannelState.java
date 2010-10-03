@@ -50,11 +50,7 @@ public class IdentifyingInboundChannelState extends MultiplexerServerState
 	}
 
 	/**
-	 * Execute the action associated with this channel state.
-	 * @param wrapper the selection key corresponding to the channel and selector for this state.
-	 * @return a state transition as an <code>NioTransition</code> instance.
-	 * @throws Exception if an error occurs while transitioning to another state.
-	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
+	 * {@inheritDoc}
 	 */
 	public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{

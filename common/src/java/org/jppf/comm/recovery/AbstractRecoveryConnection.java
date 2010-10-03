@@ -26,7 +26,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Common abstract super class for a connection dedicated to receovery from hardware fialure of a remote peer.  
  * @author Laurent Cohen
  */
 public abstract class AbstractRecoveryConnection extends ThreadSynchronization implements Runnable

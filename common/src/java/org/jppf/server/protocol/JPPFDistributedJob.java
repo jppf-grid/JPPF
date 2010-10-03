@@ -20,7 +20,8 @@ package org.jppf.server.protocol;
 
 
 /**
- * 
+ * Common interface for client-side jobs (see {@link org.jppf.client.JPPFJob JPPFJob} and server-side jobs
+ * (see {@link org.jppf.server.protocol.JPPFTaskBundle JPPFTaskBundle}).
  * @author Laurent Cohen
  */
 public interface JPPFDistributedJob

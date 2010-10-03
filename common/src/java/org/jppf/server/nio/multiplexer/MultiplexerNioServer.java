@@ -78,9 +78,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	}
 
 	/**
-	 * Create the factory holding all the states and transition mappings.
-	 * @return an <code>NioServerFactory</code> instance.
-	 * @see org.jppf.server.nio.NioServer#createFactory()
+	 * {@inheritDoc}
 	 */
 	protected NioServerFactory<MultiplexerState, MultiplexerTransition> createFactory()
 	{
@@ -140,9 +138,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	}
 
 	/**
-	 * Define a context for a newly created channel.
-	 * @return an <code>NioContext</code> instance.
-	 * @see org.jppf.server.nio.NioServer#createNioContext()
+	 * {@inheritDoc}
 	 */
 	public NioContext createNioContext()
 	{
@@ -161,10 +157,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	}
 
 	/**
-	 * Process a channel that was accepted by the server socket channel.
-	 * @param channel the selection key for the socket channel to process.
-	 * @param serverChannel the ServerSocketChannel that accepted the channel.
-	 * @see org.jppf.server.nio.NioServer#postAccept(java.nio.channels.SelectionKey, java.nio.channels.ServerSocketChannel)
+	 * {@inheritDoc}
 	 */
 	public void postAccept(ChannelWrapper channel, ServerSocketChannel serverChannel)
 	{
@@ -177,9 +170,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	}
 
 	/**
-	 * Process a channel that was accepted by the server socket channel.
-	 * @param channel the selection key for the socket channel to process.
-	 * @see org.jppf.server.nio.NioServer#postAccept(java.nio.channels.SelectionKey)
+	 * {@inheritDoc}
 	 */
 	public void postAccept(ChannelWrapper channel)
 	{
