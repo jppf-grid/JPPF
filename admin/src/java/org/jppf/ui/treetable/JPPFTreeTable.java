@@ -21,7 +21,7 @@ package org.jppf.ui.treetable;
 import javax.swing.tree.*;
 
 /**
- * 
+ * Common super class for all tree tables in the admin console.
  * @author Laurent Cohen
  */
 public class JPPFTreeTable extends JTreeTable

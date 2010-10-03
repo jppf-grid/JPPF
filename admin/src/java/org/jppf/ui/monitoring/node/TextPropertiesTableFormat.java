@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.node;
 
 
 /**
- * 
+ * Formatter that print the contents of a {@link java.util.Properties Properties} object as a plain-text string.
  * @author Laurent Cohen
  */
 public class TextPropertiesTableFormat extends PropertiesTableFormat

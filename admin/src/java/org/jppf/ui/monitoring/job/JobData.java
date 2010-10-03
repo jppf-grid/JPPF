@@ -197,7 +197,8 @@ public class JobData
 				s = jobInformation.getJobId();
 				break;
 			case SUB_JOB:
-				s = nodeInformation.getHost() + ":" + nodeInformation.getPort();
+				if (nodeInformation == null) s = "no information";
+				else s = nodeInformation.getHost() + ":" + nodeInformation.getPort();
 				break;
 		}
 		return s;

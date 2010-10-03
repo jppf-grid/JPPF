@@ -24,7 +24,7 @@ import org.jppf.ui.actions.AbstractUpdatableAction;
 import org.jppf.ui.monitoring.job.*;
 
 /**
- * 
+ * Common super class for job actions.
  * @author Laurent Cohen
  */
 public abstract class AbstractJobAction extends AbstractUpdatableAction

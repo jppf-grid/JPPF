@@ -25,7 +25,7 @@ import org.jppf.ui.actions.AbstractUpdatableAction;
 import org.jppf.ui.monitoring.node.*;
 
 /**
- * 
+ * Abstract superclass for all actions in the topology panel.
  * @author Laurent Cohen
  */
 public abstract class AbstractTopologyAction extends AbstractUpdatableAction

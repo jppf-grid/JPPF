@@ -22,7 +22,7 @@ import org.jppf.ui.actions.JTreeTableActionHandler;
 import org.jppf.ui.treetable.JTreeTable;
 
 /**
- * 
+ * Action handler for the JOb Data Panel.
  * @author Laurent Cohen
  */
 public class JobDataPanelActionManager extends JTreeTableActionHandler
