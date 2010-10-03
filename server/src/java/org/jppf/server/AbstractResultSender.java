@@ -26,7 +26,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Abstract super class for objects that sends results back to a remote peer acting as a JPPF client.
  * @author Laurent Cohen
  */
 public abstract class AbstractResultSender implements TaskCompletionListener

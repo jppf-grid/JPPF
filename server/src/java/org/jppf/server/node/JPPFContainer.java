@@ -87,9 +87,9 @@ public abstract class JPPFContainer
 	 * @param count the number of objects to deserialize.
 	 * @param executor the number of objects to deserialize.
 	 * @return the new position in the source data after deserialization.
-	 * @throws Exception if an error occurs while deserializing.
+	 * @throws Throwable if an error occurs while deserializing.
 	 */
-	public abstract int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Exception;
+	public abstract int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Throwable;
 
 	/**
 	 * Deserialize an object from a socket client.
@@ -193,20 +193,16 @@ public abstract class JPPFContainer
 				if (traceEnabled) log.debug("deserialized object index = " + index);
 				return o;
 			}
-			catch(Exception e)
+			catch(Throwable t)
 			{
-				log.error(e.getMessage() + " [object index: " + index + "]", e);
-			}
-			catch(Error e)
-			{
-				log.error(e.getMessage() + " [object index: " + index + "]", e);
+				log.error(t.getMessage() + " [object index: " + index + "]", t);
+				return t;
 			}
 			finally
 			{
 				buffer = null;
 				Thread.currentThread().setContextClassLoader(cl);
 			}
-			return null;
 		}
 	}
 }

@@ -121,17 +121,11 @@ public class LocalNodeIO extends AbstractNodeIO
 			}
 			if (debugEnabled) log.debug("got all data");
 		}
-		catch(ClassNotFoundException e)
+		catch(Throwable t)
 		{
-			log.error("Exception occurred while deserializing the tasks", e);
+			log.error("Exception occurred while deserializing the tasks", t);
 			bundle.setTaskCount(0);
-			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
-		}
-		catch(NoClassDefFoundError e)
-		{
-			log.error("Exception occurred while deserializing the tasks", e);
-			bundle.setTaskCount(0);
-			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
+			bundle.setParameter(NODE_EXCEPTION_PARAM, t);
 		}
 		return list.toArray(new Object[0]);
 	}

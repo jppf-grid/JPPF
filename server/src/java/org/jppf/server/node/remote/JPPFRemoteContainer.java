@@ -72,9 +72,9 @@ public class JPPFRemoteContainer extends JPPFContainer
 	 * @param count the number of objects to deserialize.
 	 * @param executor the number of objects to deserialize.
 	 * @return the new position in the source data after deserialization.
-	 * @throws Exception if an error occurs while deserializing.
+	 * @throws Throwable if an error occurs while deserializing.
 	 */
-	public int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Exception
+	public int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Throwable
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try
@@ -87,7 +87,12 @@ public class JPPFRemoteContainer extends JPPFContainer
 				if (traceEnabled) log.trace("i = " + i + ", read buffer size = " + buf.getLength());
 				futureList.add(executor.submit(new ObjectDeserializationTask(buf.getBuffer(), i)));
 			}
-			for (Future<Object> f: futureList) list.add(f.get());
+			for (Future<Object> f: futureList)
+			{
+				Object o = f.get();
+				if (o instanceof Throwable) throw (Throwable) o;
+				list.add(o);
+			}
 			return 0;
 		}
 		finally

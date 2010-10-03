@@ -102,13 +102,7 @@ public class RemoteNodeIO extends AbstractNodeIO
 			}
 			if (debugEnabled) log.debug("got all data");
 		}
-		catch(ClassNotFoundException e)
-		{
-			log.error("Exception occurred while deserializing the tasks", e);
-			bundle.setTaskCount(0);
-			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
-		}
-		catch(NoClassDefFoundError e)
+		catch(Throwable e)
 		{
 			log.error("Exception occurred while deserializing the tasks", e);
 			bundle.setTaskCount(0);

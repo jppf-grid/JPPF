@@ -137,15 +137,15 @@ public class JPPFLocalContainer extends JPPFContainer
 				if (traceEnabled) log.debug("deserialized object index = " + index);
 				return o;
 			}
-			catch(Exception e)
+			catch(Throwable t)
 			{
-				log.error(e.getMessage() + " [object index: " + index + "]", e);
+				log.error(t.getMessage() + " [object index: " + index + "]", t);
+				return t;
 			}
 			finally
 			{
 				Thread.currentThread().setContextClassLoader(cl);
 			}
-			return null;
 		}
 	}
 }

@@ -95,9 +95,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	}
 
 	/**
-	 * Handle the cleanup when an exception occurs on the channel.
-	 * @param channel the channel that threw the exception.
-	 * @see org.jppf.server.nio.AbstractNioContext#handleException(java.nio.channels.SocketChannel)
+	 * {@inheritDoc}
 	 */
 	public void handleException(ChannelWrapper<?> channel)
 	{

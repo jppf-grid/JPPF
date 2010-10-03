@@ -111,9 +111,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	}
 	
 	/**
-	 * Create the factory holding all the states and transition mappings.
-	 * @return an <code>NioServerFactory</code> instance.
-	 * @see org.jppf.server.nio.NioServer#createFactory()
+	 * {@inheritDoc}
 	 */
 	protected NioServerFactory<ClassState, ClassTransition> createFactory()
 	{
@@ -131,9 +129,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	}
 
 	/**
-	 * Define a context for a newly created channel.
-	 * @return an <code>NioContext</code> instance.
-	 * @see org.jppf.server.nio.NioServer#createNioContext()
+	 * {@inheritDoc}
 	 */
 	public NioContext createNioContext()
 	{
@@ -141,10 +137,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	}
 
 	/**
-	 * Get the IO operations a connection is initially interested in.
-	 * @return a bit-wise combination of the interests, taken from {@link java.nio.channels.SelectionKey SelectionKey}
-	 * constants definitions.
-	 * @see org.jppf.server.nio.NioServer#getInitialInterest()
+	 * {@inheritDoc}
 	 */
 	public int getInitialInterest()
 	{
@@ -152,9 +145,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	}
 
 	/**
-	 * Process a channel that was accepted by the server socket channel.
-	 * @param wrapper the selection key for the socket channel to process.
-	 * @see org.jppf.server.nio.NioServer#postAccept(java.nio.channels.SelectionKey)
+	 * {@inheritDoc}
 	 */
 	public void postAccept(ChannelWrapper wrapper)
 	{

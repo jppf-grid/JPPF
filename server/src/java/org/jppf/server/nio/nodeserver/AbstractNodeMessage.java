@@ -28,7 +28,8 @@ import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.*;
 
 /**
- * 
+ * Common abstract superclass representing a message sent or received by a node.
+ * A message is the transformation of a job into an more easily transportable format.
  * @author Laurent Cohen
  */
 public abstract class AbstractNodeMessage

@@ -170,7 +170,7 @@ public class NodeSimulator
 	}
 
 	/**
-	 * .
+	 * Instances of this class enable testing a load-balancing alogrithm on a simulated node.
 	 */
 	public static class SimulatorTask implements Runnable
 	{

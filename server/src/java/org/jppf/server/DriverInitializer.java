@@ -29,7 +29,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Handles various initializations for the driver.
  * @author Laurent Cohen
  */
 public class DriverInitializer

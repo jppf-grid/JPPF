@@ -25,7 +25,7 @@ import org.jppf.io.*;
 import org.jppf.server.nio.*;
 
 /**
- * 
+ * Representation of a message sent or received by a remote node.
  * @author Laurent Cohen
  */
 public class RemoteNodeMessage extends AbstractNodeMessage

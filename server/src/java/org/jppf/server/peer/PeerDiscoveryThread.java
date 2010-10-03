@@ -28,7 +28,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Instances of this class discover peer drivers over the network.
  * @author Laurent Cohen
  */
 public class PeerDiscoveryThread extends ThreadSynchronization implements Runnable

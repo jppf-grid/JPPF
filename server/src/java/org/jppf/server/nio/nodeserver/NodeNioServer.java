@@ -156,9 +156,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	}
 	
 	/**
-	 * Create the factory holding all the states and transition mappings.
-	 * @return an <code>NioServerFactory</code> instance.
-	 * @see org.jppf.server.nio.NioServer#createFactory()
+	 * {@inheritDoc}
 	 */
 	protected NioServerFactory<NodeState, NodeTransition> createFactory()
 	{
@@ -166,9 +164,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	}
 
 	/**
-	 * Determine whether a stop condition external to this server has been reached.
-	 * @return true if the driver is shutting down, false otherwise.
-	 * @see org.jppf.server.nio.NioServer#externalStopCondition()
+	 * {@inheritDoc}
 	 */
 	protected boolean externalStopCondition()
 	{
@@ -176,9 +172,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	}
 
 	/**
-	 * Process a channel that was accepted by the server socket channel.
-	 * @param channel the selection key for the socket channel to process.
-	 * @see org.jppf.server.nio.NioServer#postAccept(java.nio.channels.SelectionKey)
+	 * {@inheritDoc}
 	 */
 	public void postAccept(ChannelWrapper channel)
 	{
@@ -197,8 +191,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	}
 
 	/**
-	 * This method is invoked after all selected keys have been processed.
-	 * @see org.jppf.server.nio.NioServer#postSelect()
+	 * {@inheritDoc}
 	 */
 	public void postSelect()
 	{
@@ -231,7 +224,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 */
 	public ChannelWrapper<?> removeIdleChannel(ChannelWrapper<?> channel)
 	{
-		if (traceEnabled) log.trace("Removing idle chanel " + channel);
+		if (traceEnabled) log.trace("Removing idle channel " + channel);
 		synchronized(idleChannels)
 		{
 			idleChannels.remove(channel);
