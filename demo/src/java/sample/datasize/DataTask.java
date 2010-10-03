@@ -30,14 +30,38 @@ public class DataTask extends JPPFTask
 	 * The data this task owns.
 	 */
 	private byte[] data = null;
+	/**
+	 * If true, the array is created at execution time, otherwise at construction time.
+	 */
+	private boolean inNodeOnly = false;
+	/**
+	 * The size in byte of the byte array this task owns.
+	 */
+	private int datasize = 0;
 
 	/**
-	 * Initialize this task with a specified row of values to multiply.
-	 * @param datasize - the size in byte of the byte array this task owns.
+	 * Initialize this task with a byte array of the psecified size.
+	 * The array is created at construction time and passed on to the node.
+	 * @param datasize the size in byte of the byte array this task owns.
 	 */
 	public DataTask(int datasize)
 	{
+		this.datasize = datasize;
 		data = new byte[datasize];
+	}
+	
+	/**
+	 * Initialize this task with a byte array of the psecified size.
+	 * The array is created at construction time and passed on to the node, or task execution time and passed back to the client,
+	 * depending on the inNodeOnly flag.
+	 * @param datasize the size in byte of the byte array this task owns.
+	 * @param inNodeOnly if true, the array is created at execution time, otherwise at construction time.
+	 */
+	public DataTask(int datasize, boolean inNodeOnly)
+	{
+		this.datasize = datasize;
+		this.inNodeOnly = inNodeOnly;
+		if (!inNodeOnly) data = new byte[datasize];
 	}
 	
 	/**
@@ -48,6 +72,8 @@ public class DataTask extends JPPFTask
 	{
 		try
 		{
+			if (inNodeOnly) data = new byte[datasize];
+			setResult("execution successful");
 		}
 		catch(Exception e)
 		{

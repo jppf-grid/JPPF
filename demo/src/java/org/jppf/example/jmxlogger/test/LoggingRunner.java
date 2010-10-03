@@ -17,6 +17,7 @@
  */
 package org.jppf.example.jmxlogger.test;
 
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -26,6 +27,7 @@ import org.jppf.client.*;
 import org.jppf.logging.jmx.JmxLogger;
 import org.jppf.management.*;
 import org.jppf.server.protocol.JPPFTask;
+import org.slf4j.*;
 
 /**
  * This is a template JPPF application runner.
@@ -35,6 +37,10 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class LoggingRunner implements NotificationListener
 {
+	/**
+	 * Logger for this class.
+	 */
+	static Logger log = LoggerFactory.getLogger(LoggingRunner.class);
 	/**
 	 * The JPPF client, handles all communications with the server.
 	 * It is recommended to only use one JPPF client per JVM, so it
@@ -49,6 +55,10 @@ public class LoggingRunner implements NotificationListener
 	 * Used to sequentialize the processing of notifications from multiple nodes.
 	 */
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
+	/**
+	 * Used to print remote JMX log messages to a file.
+	 */
+	private PrintWriter jmxPrinter = null;
 
 	/**
 	 * The entry point for this application runner to be run from a Java command line.
@@ -69,12 +79,9 @@ public class LoggingRunner implements NotificationListener
 			{
 				// subscribe to the notifications from all nodes
 				runner.registerToMBeans();
-	
-				// Create a job
-				JPPFJob job = runner.createJob();
-	
-				// execute a blocking job
-				runner.executeBlockingJob(job);
+				Thread.sleep(300000L);
+				//JPPFJob job = runner.createJob();
+				//runner.executeBlockingJob(job);
 			}
 			finally
 			{
@@ -153,6 +160,7 @@ public class LoggingRunner implements NotificationListener
 	 */
 	public void registerToMBeans() throws Exception
 	{
+		jmxPrinter = new PrintWriter("remote-jmx.log");
 		//String name = "com.parallel.matters:name=jmxlogger,type=log4j";
 		//String name = "com.parallel.matters:name=jmxlogger,type=jdk";
 		String name = JmxLogger.DEFAULT_MBEAN_NAME;
@@ -166,19 +174,28 @@ public class LoggingRunner implements NotificationListener
 	  String source = "driver " + jmxDriver.getHost() + ":" + jmxDriver.getPort();
 	  // subbscribe to all notifications from the MBean
 	  driverProxy.addNotificationListener(this, null, source);
+	  /*
+	  */
 	  // collect the information to connect to the nodes' mbean servers 
 	  Collection<JPPFManagementInfo> nodes = jmxDriver.nodesInformation();
 	  for (JPPFManagementInfo node: nodes)
 	  {
-			// get a jmx connection to the node MBean server
-	  	JMXNodeConnectionWrapper jmxNode = new JMXNodeConnectionWrapper(node.getHost(), node.getPort());
-		  JmxLogger nodeProxy = jmxNode.getProxy(name, JmxLogger.class);
-		 
-		  // used as handback object so we know where the log messages comes from.
-		  source = "node   " + jmxNode.getHost() + ":" + jmxNode.getPort();
-		  // subbscribe to all notifications from the MBean
-		  nodeProxy.addNotificationListener(this, null, source);
-		  jmxConnections.add(jmxNode);
+	  	try
+	  	{
+				// get a jmx connection to the node MBean server
+		  	JMXNodeConnectionWrapper jmxNode = new JMXNodeConnectionWrapper(node.getHost(), node.getPort());
+			  JmxLogger nodeProxy = jmxNode.getProxy(name, JmxLogger.class);
+			 
+			  // used as handback object so we know where the log messages comes from.
+			  source = "node   " + jmxNode.getHost() + ":" + jmxNode.getPort();
+			  // subbscribe to all notifications from the MBean
+			  nodeProxy.addNotificationListener(this, null, source);
+			  jmxConnections.add(jmxNode);
+	  	}
+	  	catch(Exception e)
+	  	{
+	  		log.error(e.getMessage());
+	  	}
 	  }
 	}
 	
@@ -194,8 +211,11 @@ public class LoggingRunner implements NotificationListener
 		{
 			public void run()
 			{
+				String s = handback.toString() + ": " + message;
 				// process the notification; here we simply display the message
-				System.out.print(handback.toString() + ": " + message);
+				System.out.print(s);
+				jmxPrinter.print(s);
+				jmxPrinter.flush();
 			}
 		};
 		executor.submit(r);
@@ -218,5 +238,6 @@ public class LoggingRunner implements NotificationListener
 			}
 		}
 		if (executor != null) executor.shutdown();
+		jmxPrinter.close();
 	}
 }
