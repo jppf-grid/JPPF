@@ -25,7 +25,7 @@ import javax.resource.ResourceException;
 import org.jppf.jca.work.JPPFJcaClient;
 
 /**
- * 
+ * Utility interface used for accessing common attributes of the j2ee connector objects.
  * @author Laurent Cohen
  */
 public interface JPPFAccessor
