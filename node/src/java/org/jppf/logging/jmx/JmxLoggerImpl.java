@@ -47,7 +47,6 @@ public class JmxLoggerImpl extends NotificationBroadcasterSupport implements Jmx
 	/**
 	 * Log the specified message as a JMX notification.
 	 * @param message the message to log.
-	 * @see org.jppf.logging.jmx.JmxLogger#log(java.lang.Integer, java.lang.String, java.lang.Throwable)
 	 */
 	public void log(String message)
 	{

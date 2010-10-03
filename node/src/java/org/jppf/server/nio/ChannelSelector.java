@@ -20,7 +20,7 @@ package org.jppf.server.nio;
 
 
 /**
- * 
+ * Interface for objects that act as an NIO selector for local (in-VM) channels.
  * @author Laurent Cohen
  */
 public interface ChannelSelector

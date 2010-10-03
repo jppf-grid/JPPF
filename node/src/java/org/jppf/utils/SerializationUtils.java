@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 
 /**
- * 
+ * Utility methods for serializing and deserializing data
  * @author Laurent Cohen
  */
 public final class SerializationUtils

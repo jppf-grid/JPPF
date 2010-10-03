@@ -19,6 +19,7 @@
 package org.jppf.server.nio;
 
 /**
+ * Interface for a set of abstractions wrapping different communication channels into a common semantic.
  * @param <S>
  * @author Laurent Cohen
  */

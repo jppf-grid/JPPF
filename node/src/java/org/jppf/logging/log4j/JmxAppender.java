@@ -33,6 +33,10 @@ public class JmxAppender extends AppenderSkeleton
 	 */
 	private static Layout DEFAULT_LAYOUT = new SimpleLayout();
 	/**
+	 * Platform-defined line separator.
+	 */
+	private static String LINE_SEP = System.getProperty("line.separator");
+	/**
 	 * The notifier that sends formatted log messages as JMX notifications.
 	 */
 	private JmxMessageNotifier notifier = null;
@@ -57,7 +61,7 @@ public class JmxAppender extends AppenderSkeleton
 	}
 
 	/**
-	 * Append the specified event to the {@link JmxLoggerImpl}.
+	 * Append the specified event to the logger.
 	 * @param event the event to log.
 	 * @see org.apache.log4j.AppenderSkeleton#append(org.apache.log4j.spi.LoggingEvent)
 	 */
@@ -66,8 +70,13 @@ public class JmxAppender extends AppenderSkeleton
 		if (notifier == null) init();
 		Layout layout = getLayout();
 		if (layout == null) layout = DEFAULT_LAYOUT;
-		String s = (layout != null) ? layout.format(event) : event.getRenderedMessage();
-		notifier.sendMessage(s);
+		StringBuilder sb = new StringBuilder(layout.format(event));
+		if (layout.ignoresThrowable())
+		{
+			String[] strs = event.getThrowableStrRep();
+			if (strs != null) for (String s: strs) sb.append(s).append(LINE_SEP);
+		}
+		notifier.sendMessage(sb.toString());
 	}
 
 	/**

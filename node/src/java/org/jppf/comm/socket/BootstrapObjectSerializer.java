@@ -24,7 +24,7 @@ import org.jppf.serialization.JPPFObjectStreamFactory;
 import org.jppf.utils.*;
 
 /**
- * 
+ * This serializer is used solely by the nodes to enable their bootstrapping.
  * @author Laurent Cohen
  */
 public class BootstrapObjectSerializer implements ObjectSerializer

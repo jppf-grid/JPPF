@@ -22,7 +22,7 @@ import javax.management.*;
 
 
 /**
- * MBean interface for task-level monitoring on each node.
+ * MBean interface for sending log and trace messages as JMX notifications.
  * @author Laurent Cohen
  */
 public interface JmxLogger extends NotificationEmitter

@@ -17,7 +17,6 @@
  */
 package org.jppf.node;
 
-import org.jppf.node.idle.*;
 import org.jppf.process.ProcessLauncher;
 
 /**
@@ -42,20 +41,5 @@ public class NodeLauncher
 			e.printStackTrace();
 		}
 		System.exit(0);
-	}
-
-	/**
-	 * 
-	 */
-	public static class IdleListener implements IdleStateListener
-	{
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public void idleStateChanged(IdleStateEvent event)
-		{
-		}
-		
 	}
 }

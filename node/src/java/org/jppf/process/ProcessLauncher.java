@@ -104,6 +104,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 			if (idleMode)
 			{
 				idleDetector = new IdleDetector(this);
+				System.out.println("Node running in \"Idle Host\" mode");
 				idleDetector.run();
 			}
 			while (!end)
@@ -136,7 +137,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 
 	/**
 	 * Start the JPPF driver subprocess.
-	 * @return A reference to the Process object representing the JPPF driver suprocess.
+	 * @return A reference to the {@link Process} object representing the JPPF driver suprocess.
 	 * @throws Exception if the process failed to start.
 	 */
 	public Process buildProcess() throws Exception
@@ -299,7 +300,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 		try
 		{
 			InputStream is = "std".equals(streamType) ? process.getInputStream() : process.getErrorStream();
-			LineNumberReader reader = new LineNumberReader(new InputStreamReader(is));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 			try
 			{
 				String s = "";

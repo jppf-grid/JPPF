@@ -24,7 +24,7 @@ import java.util.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Implementation of node-specific permissions collection. 
  * @author Laurent Cohen
  */
 public class JPPFPermissions extends PermissionCollection
