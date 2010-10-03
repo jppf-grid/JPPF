@@ -23,7 +23,8 @@ import java.util.EventObject;
 import org.jppf.client.JPPFClientConnection;
 
 /**
- * 
+ * Instances of this class are events sent to notify interested listeners
+ * that a new connection to a JPPF driver was created.
  * @author Laurent Cohen
  */
 public class ClientEvent extends EventObject

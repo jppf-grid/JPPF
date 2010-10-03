@@ -23,7 +23,8 @@ import org.jppf.server.scheduler.bundle.proportional.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Implementation of the &quot;proportional&quot; load-balancing algortihm, dedicated to
+ * balancing the load between local and remote execution, when local execution is enabled in the client.
  * @author Laurent Cohen
  */
 public class ClientProportionalBundler extends AbstractProportionalBundler

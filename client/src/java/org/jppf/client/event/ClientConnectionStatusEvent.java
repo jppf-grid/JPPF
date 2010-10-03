@@ -21,7 +21,7 @@ package org.jppf.client.event;
 import java.util.EventObject;
 
 /**
- * Event sent to notify of a status chnage for a client connection.
+ * Event sent to notify of a status change for a client connection.
  * @author Laurent Cohen
  */
 public class ClientConnectionStatusEvent extends EventObject

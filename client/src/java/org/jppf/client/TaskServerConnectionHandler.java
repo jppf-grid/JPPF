@@ -25,7 +25,7 @@ import org.jppf.comm.socket.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Instances of this class handle the sending and receiving of jobs to and from a JPPF driver.
  * @author Laurent Cohen
  */
 public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
