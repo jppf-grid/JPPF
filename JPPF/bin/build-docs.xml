@@ -87,12 +87,11 @@
 			<packageset dir="${client}/src/java"/>
 			<packageset dir="${server}/src/java"/>
 			<packageset dir="${admin}/src/java"/>
-			<packageset dir="${demo}/src/java"/>
+			<!--<packageset dir="${demo}/src/java"/>-->
 			<packageset dir="${jca-client}/src/java"/>
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Common/src"/>
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Client/src"/>
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/src"/>
-			<!--<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>-->
 			<link href="http://download.oracle.com/javase/6/docs/api/"/>
 			<link href="http://java.sun.com/javaee/5/docs/api"/>
 			<link href="http://junit.sourceforge.net/javadoc"/>
