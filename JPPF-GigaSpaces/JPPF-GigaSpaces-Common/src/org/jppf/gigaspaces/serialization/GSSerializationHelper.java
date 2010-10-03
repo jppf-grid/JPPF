@@ -21,7 +21,7 @@ package org.jppf.gigaspaces.serialization;
 import org.jppf.utils.*;
 
 /**
- * 
+ * Serialization helper used for GS client bootstrapping.
  * @author Laurent Cohen
  */
 public class GSSerializationHelper extends SerializationHelperImpl

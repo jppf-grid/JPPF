@@ -24,7 +24,7 @@ import org.jppf.serialization.JPPFObjectStreamFactory;
 import org.jppf.utils.ObjectSerializerImpl;
 
 /**
- * 
+ * Object serializer used for GS client bootstrapping.
  * @author Laurent Cohen
  */
 public class GSObjectSerializer extends ObjectSerializerImpl
@@ -38,7 +38,7 @@ public class GSObjectSerializer extends ObjectSerializerImpl
 
 	/**
 	 * Read an object from an input stream.
-	 * @param is - the input stream to deserialize from.
+	 * @param is the input stream to deserialize from.
 	 * @return the object that was deserialized from the array of bytes.
 	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(java.io.InputStream)
