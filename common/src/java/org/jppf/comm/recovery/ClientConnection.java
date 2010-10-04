@@ -69,11 +69,10 @@ public class ClientConnection extends AbstractRecoveryConnection
 			}
 			while (!isStopped())
 			{
-				String message = receiveMessage();
+				String message = receiveMessage(1, 0);
 				String response = "checked;" + uuid;
-				JPPFBuffer buffer = new JPPFBuffer(response);
-				socketWrapper.sendBytes(buffer);
-				if (debugEnabled) log.debug("sent '" + response + "'");
+				sendMessage(response);
+				//message = receiveMessage();
 			}
 		}
 		catch (Exception e)
@@ -93,10 +92,8 @@ public class ClientConnection extends AbstractRecoveryConnection
 		TypedProperties config = JPPFConfiguration.getProperties();
 		String host = config.getString("jppf.server.host", "localhost");
 		int port = config.getInt("jppf.recovery.server.port", 22222);
-		//maxRetries = config.getInt("jppf.recovery.max.retries", 3);
-		//socketReadTimeout = config.getInt("jppf.recovery.read.timeout", 6000);
-		maxRetries = 1;
-		socketReadTimeout = 0;
+		maxRetries = config.getInt("jppf.recovery.max.retries", 3);
+		socketReadTimeout = config.getInt("jppf.recovery.read.timeout", 6000);
 		socketWrapper = new SocketClient();
 		socketWrapper.setHost(host);
 		socketWrapper.setPort(port);

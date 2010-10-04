@@ -44,10 +44,6 @@ public class ServerConnection extends AbstractRecoveryConnection
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Determines whether this connection is ok after is has been checked.
-	 */
-	private boolean ok;
-	/**
 	 * Determines whether the initial handshake has been performed.
 	 */
 	private boolean initialized;
@@ -114,10 +110,9 @@ public class ServerConnection extends AbstractRecoveryConnection
 		try
 		{
 			if (socketWrapper == null) return null;
-			JPPFBuffer buffer = new JPPFBuffer(message);
-			socketWrapper.sendBytes(buffer);
-			if (debugEnabled) log.debug(this + " sent '" + message + "'");
+			sendMessage(message);
 			response = receiveMessage();
+			//sendMessage("final");
 		}
 		catch (Exception e)
 		{
@@ -146,24 +141,6 @@ public class ServerConnection extends AbstractRecoveryConnection
 		{
 			if (debugEnabled) log.debug("error closing " + this, e);
 		}
-	}
-
-	/**
-	 * Determine whether this connection is ok after is has been checked.
-	 * @return true if the connection is ok, false otherwise.
-	 */
-	public synchronized boolean isOk()
-	{
-		return ok;
-	}
-
-	/**
-	 * Specifiy whether this connection is ok after is has been checked.
-	 * @param ok true if the connection is ok, false otherwise.
-	 */
-	public synchronized void setOk(boolean ok)
-	{
-		this.ok = ok;
 	}
 
 	/**

@@ -55,6 +55,10 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	 * The JPPF node or client uuid.
 	 */
 	protected String uuid = null;
+	/**
+	 * Determines whether this connection is ok after is has been checked.
+	 */
+	protected boolean ok;
 
 	/**
 	 * Read a message form the remote peer.
@@ -65,6 +69,21 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	 * @throws Exception if any error occurs.
 	 */
 	protected String receiveMessage() throws Exception
+	{
+		return receiveMessage(this.maxRetries, this.socketReadTimeout);
+	}
+
+	/**
+	 * Read a message form the remote peer.
+	 * While receiving the message, this method also waits for {@link #socketReadTimeout} specified
+	 * in the configuration. If the timeout expires {@link #maxRetries} times in a row, the connection
+	 * is also considered broken.
+	 * @param maxRetries maximum number of attempts to read a response form the rmeote peer.
+	 * @param socketReadTimeout timeout for each attempt.
+	 * @return the message that was received.
+	 * @throws Exception if any error occurs.
+	 */
+	protected String receiveMessage(int maxRetries, int socketReadTimeout) throws Exception
 	{
 		String message = null;
 		JPPFBuffer buffer = null;
@@ -90,6 +109,18 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	}
 
 	/**
+	 * Send a message to the remote peer.
+	 * @param message the message to send.
+	 * @throws Exception if any error occurs while sending the message.
+	 */
+	public void sendMessage(String message) throws Exception
+	{
+		JPPFBuffer buffer = new JPPFBuffer(message);
+		socketWrapper.sendBytes(buffer);
+		if (debugEnabled) log.debug(this + " sent '" + message + "'");
+	}
+
+	/**
 	 * Close this client and release any resources it is using.
 	 */
 	public abstract void close();
@@ -101,5 +132,23 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	public String getUuid()
 	{
 		return uuid;
+	}
+
+	/**
+	 * Determine whether this connection is ok after is has been checked.
+	 * @return true if the connection is ok, false otherwise.
+	 */
+	public synchronized boolean isOk()
+	{
+		return ok;
+	}
+
+	/**
+	 * Specifiy whether this connection is ok after is has been checked.
+	 * @param ok true if the connection is ok, false otherwise.
+	 */
+	public synchronized void setOk(boolean ok)
+	{
+		this.ok = ok;
 	}
 }
