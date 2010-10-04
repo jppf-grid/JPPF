@@ -74,7 +74,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			socketInitializer.setName("[" + getName() + " - delegate] ");
 			setStatus(CONNECTING);
 			if (socketClient == null) initSocketClient();
-			System.out.println("[client: "+getName()+"] ClassServerDelegate.init(): Attempting connection to the class server");
+			System.out.println("[client: " + getName() + "] Attempting connection to the class server at " + host + ":" + port);
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isSuccessfull() && !socketInitializer.isClosed())
 			{
@@ -82,7 +82,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			}
 			if (!socketInitializer.isClosed())
 			{
-				System.out.println("[client: "+getName()+"] ClassServerDelegate.init(): Reconnected to the class server");
+				System.out.println("[client: "+getName()+"] Reconnected to the class server");
 				setStatus(ACTIVE);
 			}
 		}
