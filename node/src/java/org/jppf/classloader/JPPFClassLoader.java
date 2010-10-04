@@ -97,11 +97,11 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 				LOCK.lock();
 				if (debugEnabled) log.debug("initializing connection");
 				setInitializing(true);
-				System.out.println("JPPFClassLoader.init(): attempting connection to the class server");
 				if (socketClient == null) initSocketClient();
+				System.out.println("attempting connection to the class server at " + socketClient.getHost() + ":" + socketClient.getPort());
 				socketInitializer.initializeSocket(socketClient);
 				if (!socketInitializer.isSuccessfull())
-					throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
+					throw new JPPFNodeReconnectionNotification("Could not reconnect to the server");
 
 				// we need to do this in order to dramatically simplify the state machine of ClassServer
 				try
@@ -128,7 +128,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 				{
 					throw new RuntimeException(e);
 				}
-				System.out.println("JPPFClassLoader.init(): Reconnected to the class server");
+				System.out.println("Reconnected to the class server");
 			}
 			finally
 			{
