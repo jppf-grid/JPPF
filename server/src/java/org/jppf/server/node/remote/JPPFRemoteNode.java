@@ -76,7 +76,7 @@ public class JPPFRemoteNode extends JPPFNode
 			socketClient.setSerializer(serializer);
 			if (debugEnabled) log.debug("end socket client initialization");
 			if (debugEnabled) log.debug("start socket initializer");
-			System.out.println("Attempting connection to the node server");
+			System.out.println("Attempting connection to the node server at " + host + ":" + port);
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isSuccessfull())
 			{
