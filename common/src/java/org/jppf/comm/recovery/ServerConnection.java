@@ -43,10 +43,6 @@ public class ServerConnection extends AbstractRecoveryConnection
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Determines whether the initial handshake has been performed.
-	 */
-	private boolean initialized;
 
 	/**
 	 * Initialize this connection with the specified socket.
@@ -79,7 +75,7 @@ public class ServerConnection extends AbstractRecoveryConnection
 	 */
 	private void performHandshake()
 	{
-		String response = doRequestResponse("handshake");
+		String response = doSendReceive("handshake");
 		if (!isOk()) return;
 		int idx = response.indexOf(';');
 		if (idx < 0)
@@ -95,7 +91,7 @@ public class ServerConnection extends AbstractRecoveryConnection
 	 */
 	private void performCheck()
 	{
-		String response = doRequestResponse("check");
+		String response = doSendReceive("check");
 	}
 
 	/**
@@ -104,7 +100,7 @@ public class ServerConnection extends AbstractRecoveryConnection
 	 * @param message the string message to send to the remote peer.
 	 * @return the response as a string.
 	 */
-	private String doRequestResponse(String message)
+	private String doSendReceive(String message)
 	{
 		String response = null;
 		try
@@ -141,24 +137,6 @@ public class ServerConnection extends AbstractRecoveryConnection
 		{
 			if (debugEnabled) log.debug("error closing " + this, e);
 		}
-	}
-
-	/**
-	 * Determine whether the initial handshake has been performed.
-	 * @return <code>true</code> if the initial handshake was done, <code>false</code> otherwise.
-	 */
-	public synchronized boolean isInitialized()
-	{
-		return initialized;
-	}
-
-	/**
-	 * Specify whether the initial handshake has been performed.
-	 * @param initialized <code>true</code> if the initial handshake was done, <code>false</code> otherwise.
-	 */
-	public synchronized void setInitialized(boolean initialized)
-	{
-		this.initialized = initialized;
 	}
 
 	/**

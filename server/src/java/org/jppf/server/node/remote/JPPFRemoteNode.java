@@ -33,7 +33,7 @@ import org.slf4j.*;
  * Instances of this class encapsulate execution nodes.
  * @author Laurent Cohen
  */
-public class JPPFRemoteNode extends JPPFNode
+public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 {
 	/**
 	 * Logger for this class.
@@ -153,5 +153,21 @@ public class JPPFRemoteNode extends JPPFNode
 	protected JPPFRemoteContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception
 	{
 		return new JPPFRemoteContainer(socketClient, uuidPath, cl);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void clientConnectionFailed(ClientConnectionEvent event)
+	{
+		try
+		{
+			if (debugEnabled) log.debug("recovery connection failed, attempting to reconnect this node");
+			closeDataChannel();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
 	}
 }

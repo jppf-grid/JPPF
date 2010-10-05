@@ -18,6 +18,8 @@
 
 package org.jppf.comm.recovery;
 
+import java.util.*;
+
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -40,6 +42,10 @@ public class ClientConnection extends AbstractRecoveryConnection
 	 * Used to synchronize access to the underlying socket from multiple threads.
 	 */
 	private SocketInitializer socketInitializer;
+	/**
+	 * The list of listeners to this object's events.
+	 */
+	private List<ClientConnectionListener> listeners = new ArrayList<ClientConnectionListener>();
 
 	/**
 	 * Initialize this cliet connection with the specified uuid.
@@ -57,6 +63,8 @@ public class ClientConnection extends AbstractRecoveryConnection
 	{
 		try
 		{
+			// hack to force loading of the ClientConnectionEvent class
+			ClientConnectionEvent event = null;
 			configure();
 			if (debugEnabled) log.debug("initializing recovery client connection " + socketWrapper);
 			socketInitializer = new SocketInitializerImpl();
@@ -69,16 +77,17 @@ public class ClientConnection extends AbstractRecoveryConnection
 			}
 			while (!isStopped())
 			{
-				String message = receiveMessage(1, 0);
+				String message = receiveMessage(1, 20000);
+				if ((message != null) && message.startsWith("handshake")) setInitialized(true);
 				String response = "checked;" + uuid;
 				sendMessage(response);
-				//message = receiveMessage();
 			}
 		}
 		catch (Exception e)
 		{
 			log.error(e.getMessage(), e);
 			close();
+			fireClientConnectionEvent();
 		}
 		if (debugEnabled) log.debug(Thread.currentThread().getName() + " stopping");
 	}
@@ -92,7 +101,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 		TypedProperties config = JPPFConfiguration.getProperties();
 		String host = config.getString("jppf.server.host", "localhost");
 		int port = config.getInt("jppf.recovery.server.port", 22222);
-		maxRetries = config.getInt("jppf.recovery.max.retries", 3);
+		maxRetries = config.getInt("jppf.recovery.max.retries", 2);
 		socketReadTimeout = config.getInt("jppf.recovery.read.timeout", 6000);
 		socketWrapper = new SocketClient();
 		socketWrapper.setHost(host);
@@ -117,6 +126,44 @@ public class ClientConnection extends AbstractRecoveryConnection
 		catch (Exception e)
 		{
 			log.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Add a listener to the list of listeners.
+	 * @param listener the listener to add.
+	 */
+	public void addClientConnectionListener(ClientConnectionListener listener)
+	{
+		if (listener == null) return;
+		synchronized (listeners)
+		{
+			listeners.add(listener);
+		}
+	}
+
+	/**
+	 * Remove a listener from the list of listeners.
+	 * @param listener the listener to remove.
+	 */
+	public void removeClientConnectionListener(ClientConnectionListener listener)
+	{
+		if (listener == null) return;
+		synchronized (listeners)
+		{
+			listeners.remove(listener);
+		}
+	}
+
+	/**
+	 * Notify all listeners that an event has occurred.
+	 */
+	private void fireClientConnectionEvent()
+	{
+		ClientConnectionEvent event = new ClientConnectionEvent(this);
+		synchronized (listeners)
+		{
+			for (ClientConnectionListener listener : listeners) listener.clientConnectionFailed(event);
 		}
 	}
 }

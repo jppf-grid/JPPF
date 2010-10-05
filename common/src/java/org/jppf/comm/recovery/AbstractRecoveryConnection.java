@@ -40,6 +40,10 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * Connection to a client.
 	 */
 	protected SocketWrapper socketWrapper = null;
@@ -59,6 +63,10 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	 * Determines whether this connection is ok after is has been checked.
 	 */
 	protected boolean ok;
+	/**
+	 * Determines whether the initial handshake has been performed.
+	 */
+	protected boolean initialized;
 
 	/**
 	 * Read a message form the remote peer.
@@ -74,7 +82,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	}
 
 	/**
-	 * Read a message form the remote peer.
+	 * Read a message from the remote peer.
 	 * While receiving the message, this method also waits for {@link #socketReadTimeout} specified
 	 * in the configuration. If the timeout expires {@link #maxRetries} times in a row, the connection
 	 * is also considered broken.
@@ -96,7 +104,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 				buffer = socketWrapper.receiveBytes(socketReadTimeout);
 				success = true;
 				message = buffer.asString();
-				if (debugEnabled) log.debug(this + " received '" + message + "'");
+				if (traceEnabled) log.trace(this + " received '" + message + "'");
 			}
 			catch (SocketTimeoutException e)
 			{
@@ -117,7 +125,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	{
 		JPPFBuffer buffer = new JPPFBuffer(message);
 		socketWrapper.sendBytes(buffer);
-		if (debugEnabled) log.debug(this + " sent '" + message + "'");
+		if (traceEnabled) log.trace(this + " sent '" + message + "'");
 	}
 
 	/**
@@ -150,5 +158,23 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	public synchronized void setOk(boolean ok)
 	{
 		this.ok = ok;
+	}
+
+	/**
+	 * Determine whether the initial handshake has been performed.
+	 * @return <code>true</code> if the initial handshake was done, <code>false</code> otherwise.
+	 */
+	public synchronized boolean isInitialized()
+	{
+		return initialized;
+	}
+
+	/**
+	 * Specify whether the initial handshake has been performed.
+	 * @param initialized <code>true</code> if the initial handshake was done, <code>false</code> otherwise.
+	 */
+	public synchronized void setInitialized(boolean initialized)
+	{
+		this.initialized = initialized;
 	}
 }
