@@ -49,7 +49,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 	/**
 	 * Single event sent to the listeners.
 	 */
-	private final ClientConnectionEvent event = new ClientConnectionEvent(this);
+	private final ClientConnectionEvent event;
 
 	/**
 	 * Initialize this cliet connection with the specified uuid.
@@ -58,6 +58,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 	public ClientConnection(String uuid)
 	{
 		this.uuid = uuid;
+		event = new ClientConnectionEvent(this);
 	}
 
 	/**
@@ -163,7 +164,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 	 */
 	private void fireClientConnectionEvent()
 	{
-		ClientConnectionEvent event = new ClientConnectionEvent(this);
+		//ClientConnectionEvent event = new ClientConnectionEvent(this);
 		synchronized (listeners)
 		{
 			for (ClientConnectionListener listener : listeners) listener.clientConnectionFailed(event);
