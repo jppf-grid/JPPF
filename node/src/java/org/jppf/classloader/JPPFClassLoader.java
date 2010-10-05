@@ -101,7 +101,10 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 				System.out.println("Attempting connection to the class server at " + socketClient.getHost() + ":" + socketClient.getPort());
 				socketInitializer.initializeSocket(socketClient);
 				if (!socketInitializer.isSuccessfull())
+				{
+					socketClient = null;
 					throw new JPPFNodeReconnectionNotification("Could not reconnect to the server");
+				}
 
 				// we need to do this in order to dramatically simplify the state machine of ClassServer
 				try

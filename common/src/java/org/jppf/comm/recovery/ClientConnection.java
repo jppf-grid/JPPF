@@ -46,6 +46,10 @@ public class ClientConnection extends AbstractRecoveryConnection
 	 * The list of listeners to this object's events.
 	 */
 	private List<ClientConnectionListener> listeners = new ArrayList<ClientConnectionListener>();
+	/**
+	 * Single event sent to the listeners.
+	 */
+	private final ClientConnectionEvent event = new ClientConnectionEvent(this);
 
 	/**
 	 * Initialize this cliet connection with the specified uuid.
@@ -64,7 +68,6 @@ public class ClientConnection extends AbstractRecoveryConnection
 		try
 		{
 			// hack to force loading of the ClientConnectionEvent class
-			ClientConnectionEvent event = null;
 			configure();
 			if (debugEnabled) log.debug("initializing recovery client connection " + socketWrapper);
 			socketInitializer = new SocketInitializerImpl();
