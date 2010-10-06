@@ -32,6 +32,7 @@
 			<param name="templates" value="${home}/templates/"/>
 		</antcall>
   	<copy toDir="${home}/wiki/includes" file="${home}/jppf_header.php"/>
+  	<copy toDir="${home}/wiki/includes" file="${home}/jppf_menu.php"/>
   	<!--<copy toDir="${home}/forums" file="${home}/jppf_header.php"/>-->
 	</target>
 
