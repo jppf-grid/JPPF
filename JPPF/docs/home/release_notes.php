@@ -146,8 +146,7 @@ $title = "JPPF " . $version . " Release Notes";
 			<tr>
 				<td style="background-color: #FFFFFF">
 				<div class="sidebar">
-									<br/>
-															<?php
+																				<?php
 											$itemClass = "";
 											if ($currentPage == "Home") $itemClass = 'aboutMenuItem';
 											else $itemClass = 'aboutMenuItem2'; 
@@ -204,7 +203,7 @@ $title = "JPPF " . $version . " Release Notes";
 											<div class="<?php echo $itemClass; ?>">
 											<a href="/license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br>
 											</div>
-				<hr/>
+				<hr style="background-color: #6D78B6"/>
 															<?php
 											$itemClass = "";
 											if ($currentPage == "Press") $itemClass = 'aboutMenuItem';
@@ -245,7 +244,7 @@ $title = "JPPF " . $version . " Release Notes";
 											<div class="<?php echo $itemClass; ?>">
 											<a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br>
 											</div>
-				<hr/>
+				<hr style="background-color: #6D78B6"/>
 															<?php
 											$itemClass = "";
 											if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem';
