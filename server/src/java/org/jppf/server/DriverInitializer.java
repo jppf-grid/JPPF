@@ -81,17 +81,19 @@ public class DriverInitializer
 	 */
 	public JPPFConnectionInformation createConnectionInformation()
 	{
-		TypedProperties props = JPPFConfiguration.getProperties();
+		TypedProperties config = JPPFConfiguration.getProperties();
 		JPPFConnectionInformation info = new JPPFConnectionInformation();
 		info.uuid = driver.getUuid();
-		String s = props.getString("class.server.port", "11111");
+		String s = config.getString("class.server.port", "11111");
 		info.classServerPorts = StringUtils.parseIntValues(s);
-		s = props.getString("app.server.port", "11112");
+		s = config.getString("app.server.port", "11112");
 		info.applicationServerPorts = StringUtils.parseIntValues(s);
-		s = props.getString("node.server.port", "11113");
+		s = config.getString("node.server.port", "11113");
 		info.nodeServerPorts = StringUtils.parseIntValues(s);
 		info.host = NetworkUtils.getManagementHost();
-		if (props.getBoolean("jppf.management.enabled", true)) info.managementPort = props.getInt("jppf.management.port", 11198);
+		if (config.getBoolean("jppf.management.enabled", true)) info.managementPort = config.getInt("jppf.management.port", 11198);
+		boolean recoveryEnabled = config.getBoolean("jppf.recovery.enabled", true);
+		if (recoveryEnabled) info.recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
 		return info;
 	}
 

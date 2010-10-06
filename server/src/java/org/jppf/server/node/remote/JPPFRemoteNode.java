@@ -115,7 +115,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 		}
 		if (clientConnection != null)
 		{
-			clientConnection.removeClientConnectionListener(this);
+			//clientConnection.removeClientConnectionListener(this);
 			ClientConnection tmp = clientConnection;
 			clientConnection = null;
 			tmp.close();
