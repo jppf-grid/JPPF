@@ -207,11 +207,17 @@ public class NodeRunner
 			return;
 		}
 		if (debugEnabled) log.debug("Discovered driver: " + info);
-		TypedProperties props = JPPFConfiguration.getProperties();
-		props.setProperty("jppf.server.host", info.host);
-		props.setProperty("class.server.port", StringUtils.buildString(info.classServerPorts));
-		props.setProperty("node.server.port", StringUtils.buildString(info.nodeServerPorts));
-		if (info.managementHost != null) props.setProperty("jppf.management.host", info.managementHost);
+		TypedProperties config = JPPFConfiguration.getProperties();
+		config.setProperty("jppf.server.host", info.host);
+		config.setProperty("class.server.port", StringUtils.buildString(info.classServerPorts));
+		config.setProperty("node.server.port", StringUtils.buildString(info.nodeServerPorts));
+		if (info.managementHost != null) config.setProperty("jppf.management.host", info.managementHost);
+		if (info.recoveryPort >= 0)
+		{
+			config.setProperty("jppf.recovery.server.port", "" + info.recoveryPort);
+			config.setProperty("jppf.recovery.enabled", "true");
+		}
+		else config.setProperty("jppf.recovery.enabled", "false");
 	}
 
 	/**

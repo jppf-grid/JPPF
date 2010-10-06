@@ -89,19 +89,13 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 		{
 			try
 			{
-				JPPFConnectionInformation ci = new JPPFConnectionInformation();
+				JPPFConnectionInformation ci = (JPPFConnectionInformation) info.clone();
 				ci.host = addr.getHostAddress();
-				ci.uuid = info.uuid;
-				ci.classServerPorts = info.classServerPorts;
-				ci.applicationServerPorts = info.applicationServerPorts;
-				ci.nodeServerPorts = info.nodeServerPorts;
-				ci.managementPort = info.managementPort;
 				byte[] infoBytes = JPPFConnectionInformation.toBytes(ci);
 				ByteBuffer buffer = ByteBuffer.wrap(new byte[512]);
 				buffer.putInt(infoBytes.length);
 				buffer.put(infoBytes);
 				DatagramPacket packet = new DatagramPacket(buffer.array(), 512, InetAddress.getByName(group), port);
-				//MulticastSocket socket = new MulticastSocket(new InetSocketAddress(addr, port));
 				MulticastSocket socket = new MulticastSocket(port);
 				socket.setInterface(addr);
 				socketsInfo.add(new Pair<MulticastSocket, DatagramPacket>(socket, packet));

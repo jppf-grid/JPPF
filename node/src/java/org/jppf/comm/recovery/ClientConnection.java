@@ -46,10 +46,6 @@ public class ClientConnection extends AbstractRecoveryConnection
 	 * The list of listeners to this object's events.
 	 */
 	private List<ClientConnectionListener> listeners = new ArrayList<ClientConnectionListener>();
-	/**
-	 * Single event sent to the listeners.
-	 */
-	private final ClientConnectionEvent event;
 
 	/**
 	 * Initialize this cliet connection with the specified uuid.
@@ -58,7 +54,6 @@ public class ClientConnection extends AbstractRecoveryConnection
 	public ClientConnection(String uuid)
 	{
 		this.uuid = uuid;
-		event = new ClientConnectionEvent(this);
 	}
 
 	/**
@@ -68,7 +63,6 @@ public class ClientConnection extends AbstractRecoveryConnection
 	{
 		try
 		{
-			// hack to force loading of the ClientConnectionEvent class
 			configure();
 			if (debugEnabled) log.debug("initializing recovery client connection " + socketWrapper);
 			socketInitializer = new SocketInitializerImpl();
@@ -81,7 +75,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 			}
 			while (!isStopped())
 			{
-				String message = receiveMessage(1, 20000);
+				String message = receiveMessage(maxRetries, socketReadTimeout);
 				if ((message != null) && message.startsWith("handshake")) setInitialized(true);
 				String response = "checked;" + uuid;
 				sendMessage(response);
@@ -90,8 +84,8 @@ public class ClientConnection extends AbstractRecoveryConnection
 		catch (Exception e)
 		{
 			log.error(e.getMessage(), e);
-			close();
 			fireClientConnectionEvent();
+			close();
 		}
 		if (debugEnabled) log.debug(Thread.currentThread().getName() + " stopping");
 	}
@@ -126,7 +120,10 @@ public class ClientConnection extends AbstractRecoveryConnection
 			if (tmp != null) tmp.close();
 			if (socketInitializer != null) socketInitializer.close();
 			socketInitializer = null;
-			listeners.clear();
+			synchronized(listeners)
+			{
+				listeners.clear();
+			}
 		}
 		catch (Exception e)
 		{
@@ -165,10 +162,12 @@ public class ClientConnection extends AbstractRecoveryConnection
 	 */
 	private void fireClientConnectionEvent()
 	{
-		//ClientConnectionEvent event = new ClientConnectionEvent(this);
+		ClientConnectionEvent event = new ClientConnectionEvent(this);
+		ClientConnectionListener[] tmp = null;
 		synchronized (listeners)
 		{
-			for (ClientConnectionListener listener : listeners) listener.clientConnectionFailed(event);
+			tmp = listeners.toArray(new ClientConnectionListener[0]);
 		}
+		for (ClientConnectionListener listener : tmp) listener.clientConnectionFailed(event);
 	}
 }

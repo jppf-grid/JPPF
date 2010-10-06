@@ -27,7 +27,7 @@ import org.jppf.utils.StringUtils;
  * The information includes the host, class server, application and node server ports. 
  * @author Laurent Cohen
  */
-public class JPPFConnectionInformation implements Serializable, Comparable<JPPFConnectionInformation>
+public class JPPFConnectionInformation implements Serializable, Comparable<JPPFConnectionInformation>, Cloneable
 {
 	/**
 	 * Explicit serialVersionUID.
@@ -41,6 +41,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * The ports on which the class server is listening. 
 	 */
 	public int[] classServerPorts = null;
+
 	/**
 	 * The ports on which the node server is listening. 
 	 */
@@ -53,6 +54,10 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * Port number used for JMX management and monitoring.
 	 */
 	public int managementPort = -1;
+	/**
+	 * Port number for recovery from hardware failures.
+	 */
+	public int recoveryPort = -1;
 	/**
 	 * Host address used for JMX management and monitoring.
 	 */
@@ -112,6 +117,14 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public Object clone() throws CloneNotSupportedException
+	{
+		return super.clone();
+	}
+
+	/**
 	 * Get a string representation of this connection information object.
 	 * @return a string describing this object.
 	 * @see java.lang.Object#toString()
@@ -119,12 +132,15 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("host = ").append(host);
-		sb.append(", class server = ").append(StringUtils.buildString(classServerPorts));
-		sb.append(", node server = ").append(StringUtils.buildString(nodeServerPorts));
-		sb.append(", app server = ").append(StringUtils.buildString(applicationServerPorts));
-		sb.append(", management = ").append(managementPort);
-		sb.append(", uuid = ").append(uuid);
+		sb.append(getClass().getSimpleName()).append("[");
+		sb.append("uuid=").append(uuid);
+		sb.append(", host=").append(host);
+		sb.append(", class server=").append(StringUtils.buildString(classServerPorts));
+		sb.append(", node server=").append(StringUtils.buildString(nodeServerPorts));
+		sb.append(", app server=").append(StringUtils.buildString(applicationServerPorts));
+		sb.append(", management=").append(managementPort);
+		sb.append(", recoveryPort=").append(recoveryPort);
+		sb.append("]");
 		return sb.toString();
 	}
 
