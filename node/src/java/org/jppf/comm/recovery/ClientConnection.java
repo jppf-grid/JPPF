@@ -126,6 +126,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 			if (tmp != null) tmp.close();
 			if (socketInitializer != null) socketInitializer.close();
 			socketInitializer = null;
+			listeners.clear();
 		}
 		catch (Exception e)
 		{

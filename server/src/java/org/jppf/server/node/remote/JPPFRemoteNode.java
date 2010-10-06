@@ -93,6 +93,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 			{
 				if (debugEnabled) log.debug("Initializing recovery");
 				clientConnection = new ClientConnection(uuid);
+				clientConnection.addClientConnectionListener(this);
 				new Thread(clientConnection, "reaper client connection").start();
 			}
 		}
@@ -114,6 +115,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 		}
 		if (clientConnection != null)
 		{
+			clientConnection.removeClientConnectionListener(this);
 			ClientConnection tmp = clientConnection;
 			clientConnection = null;
 			tmp.close();
