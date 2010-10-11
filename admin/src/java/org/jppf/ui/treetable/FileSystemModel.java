@@ -1,4 +1,21 @@
 /*
+ * JPPF.
+ * Copyright (C) 2005-2010 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/*
  * %W% %E%
  *
  * Copyright 1997, 1998 Sun Microsystems, Inc. All Rights Reserved.
@@ -52,7 +69,6 @@ import java.util.*;
  * @author Philip Milne
  * @author Scott Violet
  */
-
 public class FileSystemModel extends AbstractTreeTableModel implements TreeTableModel
 {
 	/**
@@ -80,9 +96,7 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 
 	/**
 	 * Get the file a node points to.
-	 * 
-	 * @param node
-	 *          - the node to get the file from.
+	 * @param node the node to get the file from.
 	 * @return a <code>File</code> instance.
 	 */
 	protected File getFile(Object node)
@@ -93,9 +107,7 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 
 	/**
 	 * Get the children of the specified node.
-	 * 
-	 * @param node
-	 *          - the node to get the children of.
+	 * @param node the node to get the children of.
 	 * @return the children as an array of objects
 	 */
 	protected Object[] getChildren(Object node)
@@ -108,20 +120,29 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	// The TreeModel interface
 	//
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public int getChildCount(Object node)
 	{
 		Object[] children = getChildren(node);
 		return (children == null) ? 0 : children.length;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Object getChild(Object node, int i)
 	{
 		return getChildren(node)[i];
 	}
 
-	// The superclass's implementation would work, but this is more efficient.
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean isLeaf(Object node)
 	{
+		// The superclass's implementation would work, but this is more efficient.
 		return getFile(node).isFile();
 	}
 
@@ -129,21 +150,33 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	// The TreeTableNode interface.
 	//
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public int getColumnCount()
 	{
 		return cNames.length;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getColumnName(int column)
 	{
 		return cNames[column];
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Class getColumnClass(int column)
 	{
 		return cTypes[column];
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Object getValueAt(Object node, int column)
 	{
 		File file = getFile(node);
@@ -169,30 +202,43 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	}
 }
 
-/*
+/**
  * A FileNode is a derivative of the File class - though we delegate to the File object rather than subclassing it. It
  * is used to maintain a cache of a directory's children and therefore avoid repeated access to the underlying file
  * system during rendering.
  */
 class FileNode
 {
+	/**
+	 * The referenced file.
+	 */
 	File file;
-
+	/**
+	 * This node's children.
+	 */
 	Object[] children;
 
+	/**
+	 * Initialize this node with thespecified file.
+	 * @param file the referenced file.
+	 */
 	public FileNode(File file)
 	{
 		this.file = file;
 	}
 
 	/**
-	 * Returns the the string to be used to display this leaf in the JTree.
+	 * {@inheritDoc}
 	 */
 	public String toString()
 	{
 		return file.getName();
 	}
 
+	/**
+	 * Get the referenced file.
+	 * @return a {@link File} instance.
+	 */
 	public File getFile()
 	{
 		return file;
@@ -200,6 +246,7 @@ class FileNode
 
 	/**
 	 * Loads the children, caching the results in the children ivar.
+	 * @return the children as an array.
 	 */
 	protected Object[] getChildren()
 	{

@@ -1,4 +1,21 @@
 /*
+ * JPPF.
+ * Copyright (C) 2005-2010 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/*
  * @(#)TreeTableModelAdapter.java       1.2 98/10/27
  *
  * Copyright 1997, 1998 Sun Microsystems, Inc.  All Rights Reserved.
@@ -91,7 +108,6 @@ public class TreeTableModelAdapter extends AbstractTableModel
 		{
 			/**
 			 * Don't use fireTableRowsInserted() here; the selection model would get updated twice.
-			 * {@inheritDoc}
 			 */
 			public void treeExpanded(TreeExpansionEvent event)
 			{
@@ -101,9 +117,6 @@ public class TreeTableModelAdapter extends AbstractTableModel
 				setSelectedPaths(paths);
 			}
 
-			/**
-			 * {@inheritDoc}
-			 */
 			public void treeCollapsed(TreeExpansionEvent event)
 			{
 				TreePath[] paths = getSelectedPaths();
@@ -113,37 +126,22 @@ public class TreeTableModelAdapter extends AbstractTableModel
 			}
 		});
 
-		// Install a TreeModelListener that can update the table when tree changes. We use delayedFireTableDataChanged
-		// as we can not be guaranteed the tree will have finished processing the event before us.
+		 //Install a TreeModelListener that can update the table when tree changes. We use delayedFireTableDataChanged
+		 // as we can not be guaranteed the tree will have finished processing the event before us.
 		treeTableModel.addTreeModelListener(new TreeModelListener()
 		{
-			/**
-			 * {@inheritDoc}
-			 */
 			public void treeNodesChanged(TreeModelEvent e)
 			{
 				delayedFireTableDataChanged();
 			}
-
-			/**
-			 * {@inheritDoc}
-			 */
 			public void treeNodesInserted(TreeModelEvent e)
 			{
 				delayedFireTableDataChanged();
 			}
-
-			/**
-			 * {@inheritDoc}
-			 */
 			public void treeNodesRemoved(TreeModelEvent e)
 			{
 				delayedFireTableDataChanged();
 			}
-
-			/**
-			 * {@inheritDoc}
-			 */
 			public void treeStructureChanged(TreeModelEvent e)
 			{
 				delayedFireTableDataChanged();

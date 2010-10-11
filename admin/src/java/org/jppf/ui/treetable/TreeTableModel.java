@@ -1,4 +1,21 @@
 /*
+ * JPPF.
+ * Copyright (C) 2005-2010 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/*
  * TreeTableModel.java
  * 
  * Copyright 1998 Sun Microsystems, Inc.  All Rights Reserved.
@@ -46,32 +63,46 @@ import javax.swing.tree.TreeModel;
 public interface TreeTableModel extends TreeModel
 {
 	/**
-	 * Returns the number ofs availible column.
+	 * Returns the number ofs available columns.
+	 * @return the number of columns.
 	 */
-	public int getColumnCount();
+	int getColumnCount();
 
 	/**
 	 * Returns the name for column number <code>column</code>.
+	 * @param column the column number.
+	 * @return the name of the column as a string.
 	 */
-	public String getColumnName(int column);
+	String getColumnName(int column);
 
 	/**
 	 * Returns the type for column number <code>column</code>.
+	 * @param column the column number.
+	 * @return the type of the column.
 	 */
-	public Class getColumnClass(int column);
+	Class getColumnClass(int column);
 
 	/**
 	 * Returns the value to be displayed for node <code>node</code>, at column number <code>column</code>.
+	 * @param node the nodefor which to get the value.
+	 * @param column the comumn whzere the value is.
+	 * @return the value for the specified node and column.
 	 */
-	public Object getValueAt(Object node, int column);
+	Object getValueAt(Object node, int column);
 
 	/**
 	 * Indicates whether the the value for node <code>node</code>, at column number <code>column</code> is editable.
+	 * @param node the node to check.
+	 * @param column the column where the value is.
+	 * @return true if the cell is editable, false otherwise.
 	 */
-	public boolean isCellEditable(Object node, int column);
+	boolean isCellEditable(Object node, int column);
 
 	/**
 	 * Sets the value for node <code>node</code>, at column number <code>column</code>.
+	 * @param aValue the value to set.
+	 * @param node the node for which to set the value.
+	 * @param column the column where the value is to be set.
 	 */
-	public void setValueAt(Object aValue, Object node, int column);
+	void setValueAt(Object aValue, Object node, int column);
 }

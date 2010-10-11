@@ -1,4 +1,21 @@
 /*
+ * JPPF.
+ * Copyright (C) 2005-2010 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/*
  * %W% %E%
  *
  * Copyright 1997, 1998 Sun Microsystems, Inc. All Rights Reserved.
@@ -143,10 +160,10 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	/**
 	 * Notify all listeners that have registered interest for notification on this event type. The event instance is
 	 * lazily created using the parameters passed into the fire method.
-	 * @param source
-	 * @param path
-	 * @param childIndices
-	 * @param children
+	 * @param source the source of the event.
+	 * @param path the path of the parent node whose children have changed.
+	 * @param childIndices the indices of the children that changed.
+	 * @param children an array of the children that changed.
 	 * @see EventListenerList
 	 */
 	protected void fireTreeNodesChanged(Object source, Object[] path, int[] childIndices, Object[] children)
@@ -170,10 +187,10 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	/**
 	 * Notify all listeners that have registered interest for notification on this event type. The event instance is
 	 * lazily created using the parameters passed into the fire method.
-	 * @param source
-	 * @param path
-	 * @param childIndices
-	 * @param children
+	 * @param source the source of the event.
+	 * @param path the path of the parent node whose children have changed.
+	 * @param childIndices the indices of the children that were inserted.
+	 * @param children an array of the children that were inserted.
 	 * @see EventListenerList
 	 */
 	protected void fireTreeNodesInserted(Object source, Object[] path, int[] childIndices, Object[] children)
@@ -197,10 +214,10 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	/**
 	 * Notify all listeners that have registered interest for notification on this event type. The event instance is
 	 * lazily created using the parameters passed into the fire method.
-	 * @param source
-	 * @param path
-	 * @param childIndices
-	 * @param children
+	 * @param source the source of the event.
+	 * @param path the path of the parent node whose children have changed.
+	 * @param childIndices the indices of the children that were removed.
+	 * @param children an array of the children that were removed.
 	 * @see EventListenerList
 	 */
 	protected void fireTreeNodesRemoved(Object source, Object[] path, int[] childIndices, Object[] children)
@@ -231,10 +248,10 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	/**
 	 * Notify all listeners that have registered interest for notification on this event type. The event instance is
 	 * lazily created using the parameters passed into the fire method.
-	 * @param source
-	 * @param path
-	 * @param childIndices
-	 * @param children
+	 * @param source the source of the event.
+	 * @param path the path of the parent node whose children have changed.
+	 * @param childIndices the indices of the children that have changed.
+	 * @param children an array of the children that chnaged.
 	 * @see EventListenerList
 	 */
 	protected void fireTreeStructureChanged(Object source, Object[] path, int[] childIndices, Object[] children)
@@ -270,7 +287,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	/**
 	 * By default, make the column with the Tree in it the only editable one. Making this column editable causes the
 	 * JTable to forward mouse and keyboard events in the Tree column to the underlying JTree.
-	 * {inheritDoc}
+	 * {@inheritDoc}
 	 */
 	public boolean isCellEditable(Object node, int column)
 	{

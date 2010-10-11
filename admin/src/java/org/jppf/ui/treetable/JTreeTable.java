@@ -1,4 +1,21 @@
 /*
+ * JPPF.
+ * Copyright (C) 2005-2010 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/*
  * @(#)JTreeTable.java  1.2 98/10/27
  *
  * Copyright 1997, 1998 Sun Microsystems, Inc.  All Rights Reserved.
@@ -67,6 +84,10 @@ public class JTreeTable extends JTable
 	 */
 	protected TreeTableCellRenderer tree;
 
+	/**
+	 * Initialize this tree table with the specified model.
+	 * @param treeTableModel this tree table's model.
+	 */
 	public JTreeTable(TreeTableModel treeTableModel)
 	{
 		super();
@@ -120,10 +141,11 @@ public class JTreeTable extends JTable
 		LookAndFeel.installColorsAndFont(this, "Tree.background", "Tree.foreground", "Tree.font");
 	}
 
-	/*
+	/**
 	 * Workaround for BasicTableUI anomaly. Make sure the UI never tries to paint the editor. The UI currently uses
 	 * different techniques to paint the renderers and editors and overriding setBounds() below is not the right thing to
 	 * do for an editor. Returning -1 for the editing row in this case, ensures the editor is never painted.
+	 * {@inheritDoc}
 	 */
 	public int getEditingRow()
 	{
@@ -132,6 +154,7 @@ public class JTreeTable extends JTable
 
 	/**
 	 * Overridden to pass the new rowHeight to the tree.
+	 * {@inheritDoc}
 	 */
 	public void setRowHeight(int rowHeight)
 	{
@@ -144,6 +167,7 @@ public class JTreeTable extends JTable
 
 	/**
 	 * Returns the tree that is being shared between the model.
+	 * @return a {@link JTree} instance.
 	 */
 	public JTree getTree()
 	{
@@ -171,9 +195,15 @@ public class JTreeTable extends JTable
 	 */
 	public class TreeTableCellRenderer extends JTree implements TableCellRenderer
 	{
-		/** Last table/tree row asked to renderer. */
+		/**
+		 * Last table/tree row asked to renderer.
+		 */
 		protected int visibleRow;
 
+		/**
+		 * Initialize this renderer with the specified tree model.
+		 * @param model a {@link TreeModel} instance.
+		 */
 		public TreeTableCellRenderer(TreeModel model)
 		{
 			super(model);
@@ -201,6 +231,7 @@ public class JTreeTable extends JTable
 
 		/**
 		 * Sets the row height of the tree, and forwards the row height to the table.
+		 * {@inheritDoc}
 		 */
 		public void setRowHeight(int rowHeight)
 		{
@@ -216,6 +247,7 @@ public class JTreeTable extends JTable
 
 		/**
 		 * This is overridden to set the height to match that of the JTable.
+		 * {@inheritDoc}
 		 */
 		public void setBounds(int x, int y, int w, int h)
 		{
@@ -224,6 +256,7 @@ public class JTreeTable extends JTable
 
 		/**
 		 * Sublcassed to translate the graphics such that the last visible row will be drawn at 0,0.
+		 * {@inheritDoc}
 		 */
 		public void paint(Graphics g)
 		{
@@ -239,6 +272,7 @@ public class JTreeTable extends JTable
 
 		/**
 		 * TreeCellRenderer method. Overridden to update the visible row.
+		 * {@inheritDoc}
 		 */
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column)
@@ -256,6 +290,9 @@ public class JTreeTable extends JTable
 	 */
 	public class TreeTableCellEditor extends AbstractCellEditor implements TableCellEditor
 	{
+		/**
+		 * {@inheritDoc}
+		 */
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int r, int c)
 		{
 			return tree;
@@ -274,6 +311,7 @@ public class JTreeTable extends JTable
 		 * <p>
 		 * By returning false we are also enforcing the policy that the tree will never be editable (at least by a key
 		 * sequence).
+		 * {@inheritDoc}
 		 */
 		public boolean isCellEditable(EventObject e)
 		{
@@ -305,10 +343,18 @@ public class JTreeTable extends JTable
 	 */
 	class ListToTreeSelectionModelWrapper extends DefaultTreeSelectionModel
 	{
-		/** Set to true when we are updating the ListSelectionModel. */
+		/**
+		 * Set to true when we are updating the ListSelectionModel.
+		 */
 		protected boolean updatingListSelectionModel;
+		/**
+		 * 
+		 */
 		protected boolean updatingTreeSelectionModel;
 
+		/**
+		 * Initialize this selction model.
+		 */
 		public ListToTreeSelectionModelWrapper()
 		{
 			super();
@@ -319,6 +365,7 @@ public class JTreeTable extends JTable
 		/**
 		 * Returns the list selection model. ListToTreeSelectionModelWrapper listens for changes to this model and updates
 		 * the selected paths accordingly.
+		 * @return a {@link ListSelectionModel} instance.
 		 */
 		ListSelectionModel getListSelectionModel()
 		{
@@ -352,6 +399,7 @@ public class JTreeTable extends JTable
 
 		/**
 		 * Creates and returns an instance of ListSelectionHandler.
+		 * @return a {@link ListSelectionListener} instance.
 		 */
 		protected ListSelectionListener createListSelectionListener()
 		{
@@ -439,12 +487,18 @@ public class JTreeTable extends JTable
 		 */
 		class ListSelectionHandler implements ListSelectionListener
 		{
+			/**
+			 * {@inheritDoc}
+			 */
 			public void valueChanged(ListSelectionEvent e)
 			{
 				updateSelectedPathsFromSelectedRows();
 			}
 		}
 
+		/**
+		 * 
+		 */
 		class TreeSelectionHandler implements TreeSelectionListener
 		{
 			/**
