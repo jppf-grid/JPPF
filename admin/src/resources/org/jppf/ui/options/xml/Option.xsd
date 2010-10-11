@@ -33,6 +33,7 @@
 			<xs:element name="property" type="opt:Property" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="script" type="opt:Script" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="initializer" type="opt:Listener" minOccurs="0"/>
+			<xs:element name="finalizer" type="opt:Listener" minOccurs="0"/>
 			<xs:element name="listener" type="opt:Listener" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="item" type="opt:Item" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="import" type="opt:Import" minOccurs="0" maxOccurs="unbounded"/>

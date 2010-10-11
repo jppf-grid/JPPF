@@ -92,8 +92,14 @@
 			<property name="componentConstraints" value="grow, width 0"/>
 			<property name="value" value=""/>
 			<initializer type="script">
-				<script language="groovy">option.setupActions();</script>
+				<script language="groovy">
+					option.setupActions();
+					option.setupTableColumns();
+				</script>
 			</initializer>
+			<finalizer type="script">
+				<script language="groovy">option.saveTableColumnsWidth();</script>
+			</finalizer>
 		</child>
 
 	</child>

@@ -37,8 +37,8 @@ public abstract class AbstractActionHandler implements ActionHandler
 
 	/**
 	 * Add an action with the specified name to this action manager.
-	 * @param name - the name of the action to add.
-	 * @param action - the action to add.
+	 * @param name the name of the action to add.
+	 * @param action the action to add.
 	 * @see org.jppf.ui.actions.ActionHandler#putAction(java.lang.String, org.jppf.ui.actions.UpdatableAction)
 	 */
 	public void putAction(String name, UpdatableAction action)
@@ -48,7 +48,7 @@ public abstract class AbstractActionHandler implements ActionHandler
 
 	/**
 	 * Get the action with the specified name.
-	 * @param name - the name of the action to find.
+	 * @param name the name of the action to find.
 	 * @return an <code>Action</code> or null if the specified name could not be found.
 	 * @see org.jppf.ui.actions.ActionHandler#getAction(java.lang.String)
 	 */

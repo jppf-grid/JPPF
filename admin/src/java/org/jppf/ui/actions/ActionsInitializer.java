@@ -20,7 +20,6 @@ package org.jppf.ui.actions;
 import javax.swing.*;
 
 import org.jppf.ui.options.*;
-import org.jppf.ui.treetable.AbstractTreeTableOption;
 
 /**
  * Task that sets the actions in the toolbar.
@@ -30,7 +29,11 @@ public class ActionsInitializer implements Runnable
 	/**
 	 * The panel to which the actions apply.
 	 */
-	private AbstractTreeTableOption mainPanel = null;
+	private OptionElement mainPanel = null;
+	/**
+	 * The panel to which the actions apply.
+	 */
+	private ActionHolder actionHolder = null;
 	/**
 	 * The container for the buttons associated with the actions (toolbar).
 	 */
@@ -38,12 +41,24 @@ public class ActionsInitializer implements Runnable
 
 	/**
 	 * Initialize this actions initializer.
-	 * @param mainPanel - the panel to which the actions apply.
-	 * @param btnContainerName - the container for the buttons associated with the actions (toolbar).
+	 * @param mainPanel the panel to which the actions apply.
+	 * @param btnContainerName the container for the buttons associated with the actions (toolbar).
 	 */
-	public ActionsInitializer(AbstractTreeTableOption mainPanel, String btnContainerName)
+	public ActionsInitializer(OptionElement mainPanel, String btnContainerName)
+	{
+		this(mainPanel, (ActionHolder) mainPanel, btnContainerName);
+	}
+
+	/**
+	 * Initialize this actions initializer.
+	 * @param mainPanel the panel to which the actions apply.
+	 * @param actionHolder the panel to which the actions apply.
+	 * @param btnContainerName the container for the buttons associated with the actions (toolbar).
+	 */
+	public ActionsInitializer(OptionElement mainPanel, ActionHolder actionHolder, String btnContainerName)
 	{
 		this.mainPanel = mainPanel;
+		this.actionHolder = actionHolder;
 		this.btnContainerName = btnContainerName;
 	}
 
@@ -71,7 +86,7 @@ public class ActionsInitializer implements Runnable
 				{
 					if (!(elt.getUIComponent() instanceof JButton)) continue;
 					JButton button = (JButton) elt.getUIComponent();
-					UpdatableAction action = mainPanel.getActionHandler().getAction(elt.getName());
+					UpdatableAction action = actionHolder.getActionHandler().getAction(elt.getName());
 					if (action == null) continue;
 					button.setAction(action);
 					button.setText("");

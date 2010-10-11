@@ -100,6 +100,11 @@ public interface OptionProperties extends Serializable
 	 */
 	ValueChangeListener getInitializer();
 	/**
+	 * Get the action to fire immediately when the page is disposed.
+	 * @return a ValueChangeListener instance.
+	 */
+	ValueChangeListener getFinalizer();
+	/**
 	 * Get the path to an eventual icon displayed in the button.
 	 * @return the path as a string.
 	 */

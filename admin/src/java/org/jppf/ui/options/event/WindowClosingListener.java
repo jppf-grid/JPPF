@@ -19,14 +19,12 @@
 package org.jppf.ui.options.event;
 
 import java.awt.event.*;
+import java.util.List;
 import java.util.prefs.*;
 
-import javax.swing.JFrame;
-
-import org.jppf.ui.monitoring.charts.config.JPPFChartBuilder;
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.factory.OptionsHandler;
-import org.jppf.ui.treetable.AbstractTreeTableOption;
+import org.jppf.ui.options.xml.OptionsPageBuilder;
 
 /**
  * This class performs cleanup and preferences stroign actions when the admin console is closed.
@@ -36,26 +34,20 @@ public class WindowClosingListener extends WindowAdapter
 {
 	/**
 	 * Process the closing of the main gframe.
-	 * @param event - the event we're interested in.
+	 * @param event the event we're interested in.
 	 * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
 	 */
 	public void windowClosing(WindowEvent event)
 	{
-		JFrame frame = (JFrame) event.getWindow();
-		//frame.setVisible(false);
-		OptionElement elt = OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("/ChartsBuilder");
-		if (elt != null)
+		Preferences pref = OptionsHandler.getPreferences();
+		List<OptionElement> list = OptionsHandler.getPageList();
+		if (list.size() > 0)
 		{
-			JPPFChartBuilder builder = (JPPFChartBuilder) elt.getUIComponent();
-			builder.getStorage().saveAll();
+			OptionElement elt = list.get(0);
+			OptionsPageBuilder builder = new OptionsPageBuilder();
+			builder.triggerFinalEvents(elt);
 		}
-		Preferences pref = OptionsHandler.getPreferences().node("JPPFAdminTool");
-		OptionsHandler.saveMainWindowAttributes(frame, pref);
 
-		AbstractTreeTableOption opt = (AbstractTreeTableOption) OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("/NodeTreeTable");
-		opt.saveTableColumnsWidth();
-		opt = (AbstractTreeTableOption) OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("/JobTreetable");
-		opt.saveTableColumnsWidth();
 		try
 		{
 			pref.flush();

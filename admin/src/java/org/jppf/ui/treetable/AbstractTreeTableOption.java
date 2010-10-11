@@ -115,7 +115,8 @@ public abstract class AbstractTreeTableOption extends AbstractOption
 	public void setupTableColumns()
 	{
 		Preferences pref = OptionsHandler.getPreferences();
-		String s = pref.get(getName() + "_column_widths", null);
+		String key = getName() + "_column_widths";
+		String s = pref.get(key, null);
 		if (s == null) return;
 		String[] wStr = s.split("\\s");
 		for (int i=0; i<Math.min(treeTable.getColumnCount(), wStr.length); i++)

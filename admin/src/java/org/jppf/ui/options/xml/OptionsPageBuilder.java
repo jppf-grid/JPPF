@@ -63,7 +63,7 @@ public class OptionsPageBuilder
 	 * Used to executed initial events in a separate thread,
 	 * with the goal to speed up the console's startup time.
 	 */
-	private ExecutorService eventExecutor = Executors.newFixedThreadPool(1);
+	private static ExecutorService eventExecutor = Executors.newFixedThreadPool(1);
 
 	/**
 	 * Default constructor.
@@ -150,20 +150,42 @@ public class OptionsPageBuilder
 	}
 
 	/**
-	 * Trigger all events listeners for all options, immeidately after the page has been built.
+	 * Trigger all initializers for all options, immediately after the page has been built.
 	 * This ensures the consistence of the UI's initial state.
 	 * @param elt the root element of the options on which to trigger the events.
 	 */
 	public void triggerInitialEvents(final OptionElement elt)
 	{
+		triggerLifeCycleEvents(elt, true);
+	}
+
+	/**
+	 * Trigger all finalizers for all options, before they are disposed.
+	 * This enables saving some state that can be reloaded upon the next startup.
+	 * @param elt the root element of the options on which to trigger the events.
+	 */
+	public void triggerFinalEvents(final OptionElement elt)
+	{
+		triggerLifeCycleEvents(elt, false);
+	}
+
+	/**
+	 * Trigger all events listeners for all options, immeidately after the page has been built.
+	 * This ensures the consistence of the UI's initial state.
+	 * @param elt the root element of the options on which to trigger the events.
+	 * @param initial true to trigger the initializers, false to trigger the finalizers.
+	 */
+	private void triggerLifeCycleEvents(final OptionElement elt, boolean initial)
+	{
 		if (elt == null) return;
-		if (elt.getInitializer() != null)
+		final ValueChangeListener listener = initial ? elt.getInitializer() : elt.getFinalizer();
+		if (listener != null)
 		{
 			Runnable r = new Runnable()
 			{
 				public void run()
 				{
-					elt.getInitializer().valueChanged(new ValueChangeEvent(elt));
+					listener.valueChanged(new ValueChangeEvent(elt));
 				}
 			};
 			eventExecutor.submit(r);
@@ -172,7 +194,7 @@ public class OptionsPageBuilder
 		{
 			for (OptionElement child: ((OptionsPage) elt).getChildren())
 			{
-				triggerInitialEvents(child);
+				triggerLifeCycleEvents(child, initial);
 			}
 		}
 	}
@@ -194,6 +216,7 @@ public class OptionsPageBuilder
 		elt.setComponentConstraints(desc.getString("componentConstraints", "growx"));
 		for (ScriptDescriptor script: desc.scripts) elt.getScripts().add(script);
 		if (desc.initializer != null) elt.setInitializer(createListener(desc.initializer));
+		if (desc.finalizer != null) elt.setFinalizer(createListener(desc.finalizer));
 	}
 
 	/**

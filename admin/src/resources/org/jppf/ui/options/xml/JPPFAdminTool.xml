@@ -24,6 +24,13 @@
 	<initializer type="script">
 		<script language="groovy" source="org/jppf/ui/options/xml/jppfAdminTool.groovy"/>
 	</initializer>
+	<finalizer type="script">
+		<script language="groovy">
+			def frame = event.getWindow();
+			def pref = OptionsHandler.getPreferences().node("JPPFAdminTool");
+			OptionsHandler.saveMainWindowAttributes(frame, pref);
+		</script>
+	</finalizer>
 
 	<!-- ===================================================================== -->
 	<!--                    Server Chooser Panel                               -->
@@ -31,6 +38,8 @@
 	
 	<child name="Tabs" type="page">
 		<property name="tooltip" value="The list of drivers to connect to"/>
+		<property name="layoutConstraints" value="flowy, fill, insets 2 2 2 2"/>
+		<property name="componentConstraints" value="pushy 0, pushx, h 22!"/>
 
 		<child name="ServerChooser" type="ComboBox">
 			<property name="label" value="Server connection"/>
@@ -44,14 +53,16 @@
 			</listener>
 		</child>
 
+		<!--
 		<child name="filler" type="page">
 			<property name="componentConstraints" value="growx, pushx"/>
 		</child>
+		-->
 
 	</child>
 
 	<child name="AdminPanels" type="TabbedPane">
-		<property name="componentConstraints" value="grow"/>
+		<property name="componentConstraints" value="push, grow"/>
 		<property name="layoutConstraints" value="fill"/>
 		<property name="tooltip" value="Perform the remote administration of the server"/>
 		<import source="plugin" location="jppf-plugins/jppf-ui-plugin"/>

@@ -72,11 +72,14 @@ public class OptionDescriptor extends TypedProperties
 	 * Items used in list boxes or combo boxes.
 	 */
 	public List<ScriptDescriptor> scripts = new ArrayList<ScriptDescriptor>();
-
 	/**
-	 * Items used in list boxes or combo boxes.
+	 * Initializer.
 	 */
 	public ListenerDescriptor initializer = null;
+	/**
+	 * Finalizer.
+	 */
+	public ListenerDescriptor finalizer = null;
 
 	/**
 	 * Descriptor for listeners set on option elements.

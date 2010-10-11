@@ -10,7 +10,5 @@
   <filter name="FileTypesFilter" enabled="true">
     <filter-data value="java"/>
   </filter>
-  <filter name="FilesFromPackage" enabled="true">
-    <filter-data value="src/java/org/jppf/ui/treetable"/>
-  </filter>
+  <filter name="FilesFromPackage" enabled="true"/>
 </fileset-config>

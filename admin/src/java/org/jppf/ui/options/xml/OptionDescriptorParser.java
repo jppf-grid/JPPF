@@ -133,6 +133,8 @@ public class OptionDescriptorParser
 					desc.scripts.add(createScriptDescriptor(childNode));
 				else if ("initializer".equals(name))
 					desc.initializer = createListenerDescriptor(childNode);
+				else if ("finalizer".equals(name))
+					desc.finalizer = createListenerDescriptor(childNode);
 				else if ("property".equals(name))
 					addProperty(desc, childNode);
 				else if ("item".equals(name))

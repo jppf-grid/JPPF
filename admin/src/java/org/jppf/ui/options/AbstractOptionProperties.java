@@ -68,6 +68,10 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 */
 	protected ValueChangeListener initializer = null;
 	/**
+	 * The action to fire immediately when the page is disposed.
+	 */
+	protected ValueChangeListener finalizer = null;
+	/**
 	 * Determines whether firing events is enabled or not.
 	 */
 	protected boolean eventsEnabled = true;
@@ -237,6 +241,25 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	public void setInitializer(ValueChangeListener initializer)
 	{
 		this.initializer = initializer;
+	}
+
+	/**
+	 * Get the finalizer for this option.
+	 * @return a <code>ValueChangeListener</code> instance. 
+	 * @see org.jppf.ui.options.OptionElement#getFinalizer()
+	 */
+	public ValueChangeListener getFinalizer()
+	{
+		return finalizer;
+	}
+
+	/**
+	 * Set the finalizer for this option.
+	 * @param finalizer a <code>ValueChangeListener</code> instance.
+	 */
+	public void setFinalizer(ValueChangeListener finalizer)
+	{
+		this.finalizer = finalizer;
 	}
 
 	/**

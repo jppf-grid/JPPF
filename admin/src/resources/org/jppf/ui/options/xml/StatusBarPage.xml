@@ -18,8 +18,8 @@
 -->
 
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd"  name="StatusBar" type="page">
-	<property name="layoutConstraints" value="fillx, insets 0 0 0 0"/>
-	<property name="componentConstraints" value="growx, pushx, h 22!"/>
+	<property name="layoutConstraints" value="fillx, insets 2 2 2 2"/>
+	<property name="componentConstraints" value="pushy 0, growx, pushx, h 26!"/>
 	<property name="bordered" value="false"/>
 
 	<child name="filler" type="page">
