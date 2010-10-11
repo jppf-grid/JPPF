@@ -188,7 +188,15 @@ public class OptionsPageBuilder
 					listener.valueChanged(new ValueChangeEvent(elt));
 				}
 			};
-			eventExecutor.submit(r);
+			//eventExecutor.submit(r);
+			Future<?> future = eventExecutor.submit(r);
+			try
+			{
+				future.get();
+			}
+			catch (Exception e)
+			{
+			}
 		}
 		if (elt instanceof OptionsPage)
 		{

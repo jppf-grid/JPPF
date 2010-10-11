@@ -56,6 +56,10 @@ public final class OptionsHandler
 	 * The page builder used to instantiate pages from XML descriptors.
 	 */
 	private static OptionsPageBuilder builder = new OptionsPageBuilder();
+	/**
+	 * The main window of the application.
+	 */
+	private static JFrame mainWindow = null;
 
 	/**
 	 * Get the list of option pages managed by this handler.
@@ -295,19 +299,18 @@ public final class OptionsHandler
 	}
 
 	/**
-	 * Save the application window state to the preferences store.
-	 * @param frame the frame representing the main application window.
+	 * Save the application's main window state to the preferences store.
 	 * @param pref the preferences node where the attributes are saved.
 	 */
-	public static void saveMainWindowAttributes(JFrame frame, Preferences pref)
+	public static void saveMainWindowAttributes(Preferences pref)
 	{
-		int state = frame.getExtendedState();
+		int state = mainWindow.getExtendedState();
 		boolean maximized = (state & java.awt.Frame.MAXIMIZED_BOTH) > 0;
-		if (maximized) frame.setExtendedState(java.awt.Frame.NORMAL);
-		java.awt.Point p = frame.getLocation();
+		if (maximized) mainWindow.setExtendedState(java.awt.Frame.NORMAL);
+		java.awt.Point p = mainWindow.getLocation();
 		pref.putInt("locationx", p.x);
 		pref.putInt("locationy", p.y);
-		java.awt.Dimension d = frame.getSize();
+		java.awt.Dimension d = mainWindow.getSize();
 		pref.putInt("width", d.width);
 		pref.putInt("height", d.height);
 		pref.putBoolean("maximized", maximized);
@@ -322,20 +325,19 @@ public final class OptionsHandler
 	}
 
 	/**
-	 * Load the application window state from the preferences store.
-	 * @param frame the frame representing the main application window.
+	 * Load the application's main window state from the preferences store.
 	 * @param pref the preferences node from where the attributes are loaded.
 	 */
-	public static void loadMainWindowAttributes(JFrame frame, Preferences pref)
+	public static void loadMainWindowAttributes(Preferences pref)
 	{
 		int x = pref.getInt("locationx", 0);
 		int y = pref.getInt("locationy", 0);
 		int width = pref.getInt("width", 600);
 		int height = pref.getInt("height", 768);
-		frame.setSize(width, height);
-		frame.setLocation(x, y);
+		mainWindow.setSize(width, height);
+		mainWindow.setLocation(x, y);
 		boolean maximized = pref.getBoolean("maximized", false);
-		if (maximized) frame.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
+		if (maximized) mainWindow.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
 	}
 
 	/**
@@ -344,7 +346,7 @@ public final class OptionsHandler
 	public static class OptionNode
 	{
 		/**
-		 * The correponding option element.
+		 * The corresponding option element.
 		 */
 		public OptionElement elt = null;
 		/**
@@ -360,5 +362,23 @@ public final class OptionsHandler
 		{
 			this.elt = elt;
 		}
+	}
+
+	/**
+	 * Get the main window of the application.
+	 * @return a {@link JFrame} instance.
+	 */
+	public static JFrame getMainWindow()
+	{
+		return mainWindow;
+	}
+
+	/**
+	 * Set the main window of the application.
+	 * @param mainWindow a {@link JFrame} instance.
+	 */
+	public static void setMainWindow(JFrame mainWindow)
+	{
+		OptionsHandler.mainWindow = mainWindow;
 	}
 }

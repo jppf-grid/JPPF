@@ -33,7 +33,7 @@ import org.jppf.ui.options.xml.OptionsPageBuilder;
 public class WindowClosingListener extends WindowAdapter
 {
 	/**
-	 * Process the closing of the main gframe.
+	 * Process the closing of the main frame.
 	 * @param event the event we're interested in.
 	 * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
 	 */

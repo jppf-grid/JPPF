@@ -25,11 +25,7 @@
 		<script language="groovy" source="org/jppf/ui/options/xml/jppfAdminTool.groovy"/>
 	</initializer>
 	<finalizer type="script">
-		<script language="groovy">
-			def frame = event.getWindow();
-			def pref = OptionsHandler.getPreferences().node("JPPFAdminTool");
-			OptionsHandler.saveMainWindowAttributes(frame, pref);
-		</script>
+		<script language="groovy">OptionsHandler.saveMainWindowAttributes(OptionsHandler.getPreferences().node("JPPFAdminTool"));</script>
 	</finalizer>
 
 	<!-- ===================================================================== -->
@@ -52,12 +48,6 @@
 				<script language="groovy">StatsHandler.getInstance().setCurrentConnection(option.getValue())</script>
 			</listener>
 		</child>
-
-		<!--
-		<child name="filler" type="page">
-			<property name="componentConstraints" value="growx, pushx"/>
-		</child>
-		-->
 
 	</child>
 
