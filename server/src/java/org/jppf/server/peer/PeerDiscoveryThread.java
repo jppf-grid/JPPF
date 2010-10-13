@@ -18,7 +18,7 @@
 
 package org.jppf.server.peer;
 
-import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -127,8 +127,8 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 	 */
 	private boolean isSelf(JPPFConnectionInformation info)
 	{
-		List<Inet4Address> ipv4Addresses = NetworkUtils.getIPV4Addresses();
-		for (Inet4Address addr: ipv4Addresses)
+		List<InetAddress> ipv4Addresses = NetworkUtils.getIPV4Addresses();
+		for (InetAddress addr: ipv4Addresses)
 		{
 			String ip = addr.getHostAddress();
 			if (info.host.equals(ip) && Arrays.equals(info.classServerPorts, localInfo.classServerPorts))

@@ -106,7 +106,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 			if (groupInetAddress == null)
 			{
 				groupInetAddress = InetAddress.getByName(group);
-				List<Inet4Address> addresses = NetworkUtils.getNonLocalIPV4Addresses();
+				List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
 				if (addresses.isEmpty()) addresses.add((Inet4Address) InetAddress.getByName("127.0.0.1"));
 				int len = addresses.size();
 				if (debugEnabled)
@@ -115,7 +115,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 					sb.append("Found ").append(len).append(" address");
 					if (len > 1) sb.append("es");
 					sb.append(":");
-					for (Inet4Address addr: addresses) sb.append(" ").append(addr.getHostAddress());
+					for (InetAddress addr: addresses) sb.append(" ").append(addr.getHostAddress());
 					log.debug(sb.toString());
 				}
 				Receiver[] receivers = new Receiver[len];

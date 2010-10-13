@@ -56,32 +56,90 @@ public final class NetworkUtils
 	 */
 	public static String getNonLocalHostAddress()
 	{
-		List<Inet4Address> allAddresses = getNonLocalIPV4Addresses();
+		List<InetAddress> allAddresses = getNonLocalIPV4Addresses();
 		return allAddresses.isEmpty() ? null : allAddresses.get(0).getHostAddress();
 	}
 
 	/**
 	 * Get a list of all known IP v4 addresses for the current host.
-	 * @return a List of <code>Inet4Address</code> instances, may be empty but never null.
+	 * @return a List of <code>InetAddress</code> instances, may be empty but never null.
 	 */
-	public static List<Inet4Address> getIPV4Addresses()
+	public static List<InetAddress> getIPV4Addresses()
 	{
-		List<Inet4Address> list = new ArrayList<Inet4Address>();
+		return getIPAddresses(new InetAddressFilter()
+		{
+			public boolean accepts(InetAddress addr)
+			{
+				return addr instanceof Inet4Address;
+			}
+		});
+	}
+
+	/**
+	 * Get a list of all known non-local IP v4 addresses for the current host.
+	 * @return a List of <code>InetAddress</code> instances, may be empty but never null.
+	 */
+	public static List<InetAddress> getNonLocalIPV4Addresses()
+	{
+		return getIPAddresses(new InetAddressFilter()
+		{
+			public boolean accepts(InetAddress addr)
+			{
+				return (addr instanceof Inet4Address)
+					&& !(LOOPBACK_ADDRESSES.contains(addr.getHostAddress()) || "localhost".equals(addr.getHostName()));
+			}
+		});
+	}
+
+	/**
+	 * Get a list of all known IP v6 addresses for the current host.
+	 * @return a List of <code>Inet6Address</code> instances, may be empty but never null.
+	 */
+	public static List<InetAddress> getIPV6Addresses()
+	{
+		return getIPAddresses(new InetAddressFilter()
+		{
+			public boolean accepts(InetAddress addr)
+			{
+				return addr instanceof Inet6Address;
+			}
+		});
+	}
+
+	/**
+	 * Get a list of all known non-local IP v4 addresses for the current host.
+	 * @return a List of <code>InetAddress</code> instances, may be empty but never null.
+	 */
+	public static List<InetAddress> getNonLocalIPV6Addresses()
+	{
+		return getIPAddresses(new InetAddressFilter()
+		{
+			public boolean accepts(InetAddress addr)
+			{
+				return (addr instanceof Inet6Address) && !(addr.isLoopbackAddress() || "localhost".equals(addr.getHostName()));
+			}
+		});
+	}
+
+	/**
+	 * Get a list of all known IP addresses for the current host, according to the specified filter.
+	 * @param filter filters out unwanted addresses.
+	 * @return a List of <code>InetAddress</code> instances, may be empty but never null.
+	 */
+	private static List<InetAddress> getIPAddresses(InetAddressFilter filter)
+	{
+		List<InetAddress> list = new ArrayList<InetAddress>();
 		try
 		{
-			if (debugEnabled) log.debug("Getting all network interfaces"); 
 			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-			if (debugEnabled) log.debug("got all network interfaces"); 
 			while (interfaces.hasMoreElements())
 			{
 				NetworkInterface ni = interfaces.nextElement();
-				if (debugEnabled) log.debug("interface " + ni.getName() + " : " + ni.getDisplayName());
 				Enumeration<InetAddress> addresses = ni.getInetAddresses();
 				while (addresses.hasMoreElements())
 				{
 					InetAddress addr = addresses.nextElement();
-					if (addr instanceof Inet4Address) list.add((Inet4Address) addr);
-					if (debugEnabled) log.debug("  " + addr.getHostName() + " : " + addr.getHostAddress()); 
+					if ((filter == null) || filter.accepts(addr)) list.add(addr);
 				}
 			}
 		}
@@ -93,19 +151,14 @@ public final class NetworkUtils
 	}
 
 	/**
-	 * Get a list of all known non-local IP v4 addresses for the current host.
-	 * @return a List of <code>Inet4Address</code> instances, may be empty but never null.
+	 * Get a list of all known non-local IP v4  and v6 addresses for the current host.
+	 * @return a List of <code>InetAddress</code> instances, may be empty but never null.
 	 */
-	public static List<Inet4Address> getNonLocalIPV4Addresses()
+	public static List<InetAddress> getNonLocalIPAddresses()
 	{
-		List<Inet4Address> addresses = getIPV4Addresses();
-		Iterator<Inet4Address> it = addresses.iterator();
-		while (it.hasNext())
-		{
-			Inet4Address ad = it.next();
-			String host = ad.getHostAddress();
-			if (LOOPBACK_ADDRESSES.contains(host) || "localhost".equals(host)) it.remove();
-		}
+		List<InetAddress> addresses = new ArrayList<InetAddress>();
+		addresses.addAll(getNonLocalIPV4Addresses());
+		addresses.addAll(getNonLocalIPV6Addresses());
 		return addresses;
 	}
 
@@ -119,62 +172,6 @@ public final class NetworkUtils
 		Set<String> addresses = new HashSet<String>();
 		String s = "127.0.0.";
 		for (int i=0; i<=8; i++) addresses.add(s + i);
-		return addresses;
-	}
-
-	/**
-	 * Get a list of all known IP v6 addresses for the current host.
-	 * @return a List of <code>Inet6Address</code> instances, may be empty but never null.
-	 */
-	public static List<Inet6Address> getIPV6Addresses()
-	{
-		List<Inet6Address> list = new ArrayList<Inet6Address>();
-		try
-		{
-			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-			while (interfaces.hasMoreElements())
-			{
-				NetworkInterface ni = interfaces.nextElement();
-				Enumeration<InetAddress> addresses = ni.getInetAddresses();
-				while (addresses.hasMoreElements())
-				{
-					InetAddress addr = addresses.nextElement();
-					if (addr instanceof Inet6Address) list.add((Inet6Address) addr);
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		return list;
-	}
-
-	/**
-	 * Get a list of all known non-local IP v4 addresses for the current host.
-	 * @return a List of <code>Inet6Address</code> instances, may be empty but never null.
-	 */
-	public static List<Inet6Address> getNonLocalIPV6Addresses()
-	{
-		List<Inet6Address> addresses = getIPV6Addresses();
-		Iterator<Inet6Address> it = addresses.iterator();
-		while (it.hasNext())
-		{
-			Inet6Address ad = it.next();
-			if (ad.isLoopbackAddress() || "localhost".equals(ad.getHostName())) it.remove();
-		}
-		return addresses;
-	}
-
-	/**
-	 * Get a list of all known non-local IP v4  and v6 addresses for the current host.
-	 * @return a List of <code>InetAddress</code> instances, may be empty but never null.
-	 */
-	public static List<InetAddress> getNonLocalIPAddresses()
-	{
-		List<InetAddress> addresses = new ArrayList<InetAddress>();
-		addresses.addAll(getIPV4Addresses());
-		addresses.addAll(getIPV6Addresses());
 		return addresses;
 	}
 
@@ -203,6 +200,19 @@ public final class NetworkUtils
 		InetSocketAddress addr = new InetSocketAddress(ip, 0);
 		String s = addr.getHostName();
 		return s == null ? ip : s;
+	}
+
+	/**
+	 * Filter interface for the methods discovering available IP addresses. 
+	 */
+	private interface InetAddressFilter
+	{
+		/**
+		 * Determine whether the specified address is accepted.
+		 * @param addr the address to check.
+		 * @return true if the address is accepted, false otherwise.
+		 */
+		boolean accepts(InetAddress addr);
 	}
 
 	/**
