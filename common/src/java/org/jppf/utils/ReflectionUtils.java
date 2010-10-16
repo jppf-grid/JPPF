@@ -333,14 +333,14 @@ public class ReflectionUtils
 	}
 
 	/**
-	 * Map a primitive type to itsa corresponding wrapper type.
+	 * Map a primitive type to its corresponding wrapper type.
 	 * @param type a primtive type.
 	 * @return a <code>Class</code> instance.
 	 */
 	public static Class mapPrimitveType(Class type)
 	{
 		if (Boolean.TYPE.equals(type)) return Boolean.class;
-		else if (Byte.TYPE.equals(type)) return Byte.class;
+		else if (Character.TYPE.equals(type)) return Character.class;
 		else if (Byte.TYPE.equals(type)) return Byte.class;
 		else if (Short.TYPE.equals(type)) return Short.class;
 		else if (Integer.TYPE.equals(type)) return Integer.class;
@@ -352,7 +352,7 @@ public class ReflectionUtils
 
 	/**
 	 * Generate an array of the types of the specified arguments.
-	 * If they array of arguments is null this method will return an empty array.
+	 * If the array of arguments is null this method will return an empty array.
 	 * @param args the arguments to get the types from.
 	 * @return an array of <code>Class</code> instances.
 	 */
