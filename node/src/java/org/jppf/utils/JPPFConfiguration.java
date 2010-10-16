@@ -19,19 +19,36 @@ package org.jppf.utils;
 
 import java.io.*;
 
+import org.slf4j.*;
+
 /**
  * Utility class for loading and accessing the JPPF configuration properties.
  * <p>The configuration file path is set through the system property {@link org.jppf.utils#CONFIG_PROPERTY CONFIG_PROPERTY},
  * whose value is &quot;jppf.config&quot;.<br>
  * As an example, it can be configured by adding the JVM argument &quot;<i>-Djppf.config=jppf-config.properties</i>&quot;.
  * @author Laurent Cohen
+ * @author Jonathan Newbrough
+ * <br>Modified to allow users to get configuration properties from an alternate source. Any user-provided class that
+ * implements {@link ConfigurationSource} and returns a stream with the same configuration values provided in the properties file.
  */
 public class JPPFConfiguration
 {
 	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(JPPFConfiguration.class);
+	/**
+	 * Determines whether debug log statements are enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * Name of the system property holding the location of the JPPF configuration file.
 	 */
 	public static final String CONFIG_PROPERTY = "jppf.config";
+	/**
+	 * The name of the system property used to specified an alternate JPPF configuration source.
+	 */
+	public static final String CONFIG_PLUGIN_PROPERTY = "jppf.config.plugin";
 	/**
 	 * Default location of the JPPF configuration file.
 	 */
@@ -60,19 +77,55 @@ public class JPPFConfiguration
 		props = new TypedProperties();
 		try
 		{
+			InputStream is = getStream();
+			if (is != null) props.load(is);
+		}
+		catch(Exception e)
+		{
+			log.error("error reading the configuration", e);
+		}
+	}
+
+	/**
+	 * Get an input stream from which to read the configuration properties.
+	 * @return an {@link InputStream} instance.
+	 * @throws Exception if any error occurs while trying to obtain the stream.
+	 */
+	private static InputStream getStream() throws Exception
+  {
+		String altSource = System.getProperty(CONFIG_PLUGIN_PROPERTY);
+		if (altSource == null)
+		{
+			String filename = System.getProperty(CONFIG_PROPERTY, DEFAULT_FILE);
+			if (log.isDebugEnabled()) log.debug("reading JPPF configuration file: " + filename);
 			InputStream is = null;
 			File file = new File(filename);
 			if (file.exists()) is = new BufferedInputStream(new FileInputStream(filename));
 			if (is == null) is = JPPFConfiguration.class.getClassLoader().getResourceAsStream(filename);
-			if (is != null) props.load(is);
+			return is;
 		}
-		catch(FileNotFoundException e)
+		else
 		{
-			e.printStackTrace();
+			if (log.isDebugEnabled()) log.debug("reading JPPF configuration from alternate source: " + altSource);
+			ConfigurationSource source = (ConfigurationSource) Class.forName(altSource).newInstance();
+			return source.getPropertyStream();
 		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}
-	}
+  }
+
+	/**
+	 * Implement this interface to provide an alternate configuration source.
+	 * <p>WARNING: not shown in the interface but also required:
+   * implementations must have a public no-arg constructor.
+   */
+  public static interface ConfigurationSource
+  {
+    /**
+     * Obtain the JPPF configuration properties from an input stream.
+     * The returned stream content must conform to the properties file's specifications
+     * (i.e. it must be usable as the argument to <code>Properties.load(InputStream)</code>).
+     * @return an {@link InputStream} instance.
+     * @throws IOException if the stream cannot be created.
+     */
+    InputStream getPropertyStream() throws IOException;
+  }
 }
