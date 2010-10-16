@@ -92,7 +92,7 @@ public class JPPFConfiguration
 	 * @throws Exception if any error occurs while trying to obtain the stream.
 	 */
 	private static InputStream getStream() throws Exception
-  {
+	{
 		String altSource = System.getProperty(CONFIG_PLUGIN_PROPERTY);
 		if (altSource == null)
 		{
@@ -110,22 +110,22 @@ public class JPPFConfiguration
 			ConfigurationSource source = (ConfigurationSource) Class.forName(altSource).newInstance();
 			return source.getPropertyStream();
 		}
-  }
+	}
 
 	/**
 	 * Implement this interface to provide an alternate configuration source.
 	 * <p>WARNING: not shown in the interface but also required:
-   * implementations must have a public no-arg constructor.
-   */
-  public static interface ConfigurationSource
-  {
-    /**
-     * Obtain the JPPF configuration properties from an input stream.
-     * The returned stream content must conform to the properties file's specifications
-     * (i.e. it must be usable as the argument to <code>Properties.load(InputStream)</code>).
-     * @return an {@link InputStream} instance.
-     * @throws IOException if the stream cannot be created.
-     */
-    InputStream getPropertyStream() throws IOException;
-  }
+	 * implementations must have a public no-arg constructor.
+	 */
+	public static interface ConfigurationSource
+	{
+		/**
+		 * Obtain the JPPF configuration properties from an input stream.
+		 * The returned stream content must conform to the properties file's specifications
+		 * (i.e. it must be usable as the argument to <code>Properties.load(InputStream)</code>).
+		 * @return an {@link InputStream} instance.
+		 * @throws IOException if the stream cannot be created.
+		 */
+		InputStream getPropertyStream() throws IOException;
+	}
 }
