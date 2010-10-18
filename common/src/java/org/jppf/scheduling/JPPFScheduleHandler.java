@@ -163,6 +163,7 @@ public class JPPFScheduleHandler
 		 */
 		public void run()
 		{
+			if (debugEnabled) log.debug("triggering scheduled action: key=" + key + ", action=" + action);
 			timerTaskMap.remove(key);
 			action.run();
 		}
