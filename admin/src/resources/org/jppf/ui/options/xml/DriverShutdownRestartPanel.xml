@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2010 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="DriverShutdownRestartPanel" type="page">
+	<property name="label" value="Shutdown or restart one or more drivers"/>
+	<property name="layoutConstraints" value="flowy"/>
+	<property name="componentConstraints" value=""/>
+
+	<!-- ===================================================================== -->
+	<!--              Server Shutdwon and Restart Panel                        -->
+	<!-- ===================================================================== -->
+	
+	<child name="threadFields" type="page">
+		<property name="label" value=""/>
+		<property name="layoutConstraints" value="fill, flowy"/>
+		<property name="componentConstraints" value=""/>
+		<property name="tooltip" value="Settings of the node's execution thread pool"/>
+
+		<child name="Shutdown_delay" type="FormattedNumber">
+			<property name="label" value="Shutdown delay"/>
+			<property name="tooltip" value="delay, in milliseconds, before the server starts shutting down"/>
+			<property name="value" value="1000"/>
+			<property name="pattern" value="###,###,##0"/>
+			<property name="persistent" value="true"/>
+		</child>
+
+		<child name="Restart" type="Boolean">
+			<property name="label" value="Restart"/>
+			<property name="tooltip" value="Determines whether the server should be restarted"/>
+			<property name="value" value="false"/>
+			<property name="persistent" value="true"/>
+			<listener type="script">
+				<script language="groovy">option.findElement("../Restart_delay").setEnabled(option.getValue().booleanValue())</script>
+			</listener>
+		</child>
+
+		<child name="Restart_delay" type="FormattedNumber">
+			<property name="label" value="Restart delay"/>
+			<property name="tooltip" value="delay, in milliseconds, before the server is restarted"/>
+			<property name="value" value="5000"/>
+			<property name="pattern" value="###,###,##0"/>
+			<property name="persistent" value="true"/>
+		</child>
+
+	</child>
+
+	<child name="threadButtons" type="page">
+		<property name="layoutConstraints" value="fill"/>
+		<property name="componentConstraints" value=""/>
+		<property name="tooltip" value="Validate or cancel the update"/>
+
+		<child name="driverShutdownRestartOK" type="Button">
+			<property name="label" value="OK"/>
+			<property name="tooltip" value="Apply new settings by sending them to the node"/>
+		</child>
+
+		<child name="serverShutdownRestartCancel" type="Button">
+			<property name="label" value="Cancel"/>
+			<property name="tooltip" value="Close this dialog without applying any settings"/>
+			<property name="componentConstraints" value="gap unrel"/>
+		</child>
+
+	</child>
+
+</opt:main>

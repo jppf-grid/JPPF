@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="CustomLoadBalancer/classes" path="CustomLoadBalancer/src"/>
+	<classpathentry kind="src" output="CustomMBeans/classes" path="CustomMBeans/src"/>
+	<classpathentry kind="src" output="DataDependency/classes" path="DataDependency/src"/>
+	<classpathentry kind="src" output="DataEncryption/classes" path="DataEncryption/src"/>
+	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src"/>
+	<classpathentry kind="src" output="IdleSystem/classes" path="IdleSystem/src"/>
+	<classpathentry kind="src" output="MatrixMultiplication/classes" path="MatrixMultiplication/src"/>
+	<classpathentry kind="src" output="NodeTray/classes" path="NodeTray/src"/>
+	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src"/>
+	<classpathentry kind="src" output="StartupClasses/classes" path="StartupClasses/src"/>
+	<classpathentry kind="src" output="TaskNotifications/classes" path="TaskNotifications/src"/>
+	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/java"/>
+	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/resources"/>
+	<classpathentry kind="src" output="TransactionalDatabase/classes" path="TransactionalDatabase/src"/>
+	<classpathentry kind="src" output="WebSearchEngine/classes" path="WebSearchEngine/src"/>
+	<classpathentry kind="lib" path="shared/lib/jaligner.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-admin.jar" sourcepath="/admin/src/java"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-client.jar" sourcepath="/client/src/java"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-common-node.jar" sourcepath="/node/src/java"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-common.jar" sourcepath="/common/src/java"/>
+	<classpathentry kind="lib" path="shared/lib/js.jar"/>
+	<classpathentry kind="lib" path="shared/lib/crawler-1.0.0.jar"/>
+	<classpathentry kind="lib" path="shared/lib/commons-codec-1.3.jar"/>
+	<classpathentry kind="lib" path="shared/lib/commons-httpclient-3.0.1.jar"/>
+	<classpathentry kind="lib" path="shared/lib/lucene-core-2.2.0.jar"/>
+	<classpathentry kind="lib" path="shared/lib/lucene-demos-2.2.0.jar"/>
+	<classpathentry kind="lib" path="shared/lib/lucene-memory-2.2.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="shared/lib/miglayout-3.7-swing.jar"/>
+	<classpathentry kind="lib" path="shared/lib/groovy-all-1.6.5.jar"/>
+	<classpathentry kind="lib" path="shared/lib/looks-2.2.2.jar"/>
+	<classpathentry kind="lib" path="shared/lib/commons-dbcp-1.4.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-server.jar"/>
+	<classpathentry kind="lib" path="shared/lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="shared/lib/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry kind="lib" path="IdleSystem/lib/jna.jar"/>
+	<classpathentry kind="lib" path="IdleSystem/lib/platform.jar"/>
+	<classpathentry kind="lib" path="shared/lib/log4j-1.2.15.jar"/>
+	<classpathentry kind="output" path="shared/classes"/>
+</classpath>

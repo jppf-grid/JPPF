@@ -1,0 +1,216 @@
+<!--
+	JPPF
+  Copyright (C) 2005-2010 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name="JPPF" default="build" basedir="..">
+
+	<!-- ========================================================================= -->
+	<!--                          Property definitions                             -->
+	<!-- ========================================================================= -->
+
+	<property name="common"                value="${basedir}/../common"/>
+	<property name="admin"                 value="${basedir}/../admin"/>
+	<property name="client"                value="${basedir}/../client"/>
+	<property name="node"                  value="${basedir}/../node"/>
+	<property name="server"                value="${basedir}/../server"/>
+	<property name="demo"                  value="${basedir}/../demo"/>
+	<property name="jca-client"            value="${basedir}/../jca-client"/>
+	<property name="jppfQuickStart"        value="${basedir}/../JPPFQuickStart"/>
+	<property name="gigaspaces"            value="${basedir}/../JPPF-GigaSpaces"/>
+	<property name="application.template"  value="${basedir}/../application-template"/>
+	<property name="samples-pack"          value="${basedir}/../samples-pack"/>
+
+	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
+  <property file="${gigaspaces}/build.properties"/>
+  <property file="${build.properties.file}"/>
+	<property name="build.number.file"     value="${basedir}/bin/build.number"/>
+	<property name="bin"                   value="${basedir}/bin"/>	
+	<property name="installer"             value="${bin}/installer"/>
+	<property name="data"                  value="${basedir}/data"/>	
+	<property name="config"                value="${basedir}/config"/>	
+	<property name="build"                 value="${basedir}/build"/>	
+	<property name="deploy"                value="${build}/deploy"/>	
+	<property name="deploy.lib"            value="${deploy}/lib"/>
+	<property name="deploy.build"          value="${deploy}/build"/>
+	<property name="deploy.config"         value="${deploy}/config"/>	
+	<property name="classes"               value="${build}/classes"/>
+	<property name="src"                   value="${basedir}/src"/>
+	<property name="lib"                   value="${basedir}/lib"/>
+	<property name="docs"                  value="${basedir}/docs"/>
+	<property name="home"                  value="${docs}/home"/>
+	<property name="examples"              value="${basedir}/examples"/>
+	<property name="javadoc"               value="${home}/api-2.0"/>
+	<property name="app.jar.file"          value="${ant.project.name}.jar"/>
+	<property name="license.file"          value="LICENSE.txt"/>
+	<property name="runtime"               value="${build}/runtime"/>
+	<property name="runtime.driver"        value="${build}/runtime/driver"/>
+	<property name="runtime.multiplexer"   value="${build}/runtime/multiplexer"/>
+	<property name="runtime.node"          value="${build}/runtime/node"/>
+	<property name="runtime.gui"           value="${build}/runtime/gui"/>
+	<property name="app.ver"               value="${ant.project.name}-${version.number}"/>
+
+	<!-- ========================================================================= -->
+	<!--                           Classpath definitions                           -->
+	<!-- ========================================================================= -->
+
+	<path id="project.classpath">
+		<pathelement location="${common}/classes"/>
+		<pathelement location="${node}/classes"/>
+		<pathelement location="${admin}/classes"/>
+		<pathelement location="${client}/classes"/>
+		<pathelement location="${server}/classes"/>
+		<pathelement location="${demo}/classes"/>
+		<pathelement location="${jca-client}/classes"/>
+		<fileset dir="${lib}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+  <path id="javadoc.classpath">
+		<pathelement location="${bin}"/>
+    <path refid="project.classpath"/>	
+		<pathelement location="${gs.home}/lib/jini/jsk-lib.jar"/>
+		<pathelement location="${gs.home}/lib/jini/jsk-platform.jar"/>
+		<pathelement location="${gs.home}/lib/openspaces/openspaces.jar"/>
+		<pathelement location="${gs.home}/lib/spring/spring.jar"/>
+		<pathelement location="${gs.home}/lib/JSpaces.jar"/>
+  </path>
+
+  <path id="run.classpath">
+		<pathelement location="${config}"/>
+    <path refid="project.classpath"/>	
+  </path>
+
+	<!-- ========================================================================= -->
+	<!--                                    Clean                                  -->
+	<!-- ========================================================================= -->
+
+  <target name="clean" description="">
+		<delete><fileset dir="${build}" includes="**/*.*"/></delete>
+  </target>
+
+  <target name="clean.all" depends="clean.deploy" description="">
+    <delete dir="${node}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${common}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${server}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${cient}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${admin}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${demo}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${jca-client}/classes" quiet="true" includes="**/*.*"/>
+  </target>               
+
+  <target name="clean.deploy" description="clean the deploy folder">
+    <delete dir="${deploy}" quiet="true"/>
+	  <delete dir="${runtime}" quiet="true"/>
+  </target>               
+
+	<!-- ========================================================================= -->
+	<!--                                    Init                                   -->
+	<!-- ========================================================================= -->
+
+	<target name="init" description="Initialize ressources">
+ 		<mkdir dir="${build}"/>
+		<available file="${NSIS.home}/makensis.exe" property="NSIS.present"/>
+		<available type="dir" file="${basedir}/../samples-pack" property="samples.pack.present"/>
+		<available type="dir" file="${basedir}/../JPPFQuickStart" property="jppfQuickStart.present"/>
+		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
+		<!-- The build number is also incremented by 1                                      -->
+		<propertyfile file="${build.number.file}">
+			<entry key="build.number" type="int" default="0000" operation="+" pattern="0000" />
+		</propertyfile>
+		<!-- Read the build number -->
+	  <property file="${build.number.file}"/>
+		<tstamp>
+			<format property="now" pattern="yyyyMMdd"/>
+		</tstamp>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                           Build the application                           -->
+	<!-- ========================================================================= -->
+
+  <target name="build" depends="init, compile, jar, jar.src"/>
+	<target name="rebuild" depends="clean.all, init, compile, jar"/>
+	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
+	<target name="deploy"
+		depends="clean.all, rebuild, javadoc, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide, installer, doc"/>
+	<target name="deploy.nojavadoc"
+		depends="clean.all, rebuild,          package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide, installer, doc"/>
+  <target name="deploy.splash">
+  	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
+  	<antcall target="deploy"/>
+  </target>
+
+	<import file="build-compile-jar.xml"/>
+	<import file="build-modules.xml"/>
+	<import file="build-samples.xml"/>
+	<import file="build-connectors.xml"/>
+	<import file="build-installer.xml"/>
+	<import file="build-findbugs.xml"/>
+	<import file="build-docs.xml"/>
+	
+	<!-- ========================================================================= -->
+	<!--                 Package the application for deployment                    -->
+	<!-- ========================================================================= -->
+
+	<target name="package" description="package the application into a release zip file" depends="rebuild">
+		<!--<property name="release.file" value="${build}/${ant.project.name}-full-src-${version.number}-${build.number}-${now}.zip"/>-->
+		<property name="zip.prefix" value="${app.ver}-full-src"/>
+		<property name="release.file" value="${build}/${zip.prefix}.zip"/>
+		<delete file="${release.file}" quiet="true"/>
+		<zip destfile="${release.file}">
+			<zipfileset dir="${basedir}" prefix="${zip.prefix}/JPPF">
+				<include name="build/jppf*.jar"/>
+				<include name="bin/**/*.*"/>
+				<include name="config/**/*.*"/>
+				<!--<include name="docs/api/**/*.*"/>-->
+				<include name="lib/**/*.*"/>
+				<include name="${license.file}"/>
+				<include name="JPPF-3rd-party.html"/>
+			</zipfileset>
+			<zipfileset dir="${node}" prefix="${zip.prefix}/node"/>
+			<zipfileset dir="${common}" prefix="${zip.prefix}/common"/>
+			<zipfileset dir="${client}" prefix="${zip.prefix}/client"/>
+			<zipfileset dir="${server}" prefix="${zip.prefix}/server"/>
+			<zipfileset dir="${admin}" prefix="${zip.prefix}/admin"/>
+			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
+			<zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
+		</zip>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                        Zip the whole workspace                            -->
+	<!-- ========================================================================= -->
+
+	<target name="zip.workspace" description="Zip the whole workspace">
+    <delete file="${basedir}/../../JPPF.zip" quiet="true"/>
+		<zip destfile="${basedir}/../../JPPF.zip">
+			<zipfileset dir="${basedir}/.." prefix="JPPF">
+				<exclude name="**/*.lock"/>
+				<exclude name="**/JPPF/docs/home/**/*.*"/>
+				<exclude name="**/.history/"/>
+				<exclude name="**/JPPF/build/"/>
+				<exclude name="**/*.history"/>
+				<exclude name="**/*.index"/>
+				<exclude name="**/*.ear"/>
+				<exclude name="**/*.rar"/>
+				<exclude name="**/*.war"/>
+			</zipfileset>
+		</zip>
+	</target>
+
+</project> 
