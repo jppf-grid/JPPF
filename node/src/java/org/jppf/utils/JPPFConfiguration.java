@@ -69,11 +69,20 @@ public class JPPFConfiguration
 	}
 
 	/**
+	 * Reset and reload the JPPF configuration.
+	 * This allows reloading the configuration from a different source or file
+	 * (after changing the values of the related system properties for instance). 
+	 */
+	public static void reset()
+	{
+		loadProperties();
+	}
+
+	/**
 	 * Load the JPPF configuration properties from a file.
 	 */
 	private static void loadProperties()
 	{
-		String filename = System.getProperty(CONFIG_PROPERTY, DEFAULT_FILE);
 		props = new TypedProperties();
 		try
 		{

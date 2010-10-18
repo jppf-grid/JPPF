@@ -182,7 +182,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 
 	/**
 	 * Cancel the job with the specified id.
-	 * @param jobId - the id of the job to cancel.
+	 * @param jobId the id of the job to cancel.
 	 * @param requeue true if the job should be requeued on the server side, false otherwise.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFNodeAdminMBean#cancelJob(java.lang.String,java.lang.Boolean)

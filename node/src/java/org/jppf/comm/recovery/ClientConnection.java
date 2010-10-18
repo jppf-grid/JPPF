@@ -100,7 +100,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 		String host = config.getString("jppf.server.host", "localhost");
 		int port = config.getInt("jppf.recovery.server.port", 22222);
 		maxRetries = config.getInt("jppf.recovery.max.retries", 2);
-		socketReadTimeout = config.getInt("jppf.recovery.read.timeout", 6000);
+		socketReadTimeout = config.getInt("jppf.recovery.read.timeout", 60000);
 		socketWrapper = new BootstrapSocketClient();
 		socketWrapper.setHost(host);
 		socketWrapper.setPort(port);
