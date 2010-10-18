@@ -49,7 +49,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
 	/**
 	 * A "long" duration for this test.
 	 */
-	private static final long TIME_LONG = 3000L;
+	private static final long TIME_LONG = 6000L;
 	/**
 	 * A "rest" duration for this test.
 	 */

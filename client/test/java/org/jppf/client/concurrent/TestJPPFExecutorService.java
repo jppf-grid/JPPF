@@ -139,36 +139,11 @@ public class TestJPPFExecutorService extends Setup1D1N1C
 
 	/**
 	 * Test invocation of <code>JPPFExecutorService.invokeAll(List&lt;Callable&gt;, long, TimeUnit)</code>.
-	 * In this test, we submit 3 tasks, and we know for sure the 3rd doesn't have time to execute.
-	 * @throws Exception if any error occurs
-	 */
-	@Test
-	public void testInvokeAllWithTimeout() throws Exception
-	{
-		int n = 3;
-		long timeout = (3L * TASK_DURATION) / 2L;
-		List<SimpleCallable> tasks = new ArrayList<SimpleCallable>();
-		for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i, TASK_DURATION));
-		List<Future<Result>> futures = executor.invokeAll(tasks, timeout, TimeUnit.MILLISECONDS);
-		assertNotNull(futures);
-		assertEquals(n, futures.size());
-
-		Future<Result> future = futures.get(2);
-		assertNotNull(future);
-		Result result = future.get();
-		assertNull(result);
-		assertTrue(future.isDone());
-		assertTrue(future.isCancelled());
-		Thread.sleep(100L + (n * TASK_DURATION) - timeout);
-	}
-
-	/**
-	 * Test invocation of <code>JPPFExecutorService.invokeAll(List&lt;Callable&gt;, long, TimeUnit)</code>.
 	 * In this test, no task has enough time to execute.
 	 * @throws Exception if any error occurs
 	 */
 	@Test
-	public void testInvokeAllWithTimeout2() throws Exception
+	public void testInvokeAllWithTimeout() throws Exception
 	{
 		int n = 3;
 		long timeout = TASK_DURATION / 2L;
@@ -204,32 +179,11 @@ public class TestJPPFExecutorService extends Setup1D1N1C
 
 	/**
 	 * Test invocation of <code>JPPFExecutorService.invokeAny(List&lt;Callable&gt;, long, TimeUnit)</code>.
-	 * In this test, at least one task has enough time to execute.
-	 * @throws Exception if any error occurs
-	 */
-	@Test
-	public void testInvokeAnyWithTimeout() throws Exception
-	{
-		int n = 3;
-		long timeout = (3L * TASK_DURATION) / 2L;
-		List<SimpleCallable> tasks = new ArrayList<SimpleCallable>();
-		for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i, TASK_DURATION));
-		/*
-		// we can't guarantee that any task will complete before the timeout expires
-		Result result = executor.invokeAny(tasks, timeout, TimeUnit.MILLISECONDS);
-		assertNotNull(result);
-		assertTrue(result.position >= 0);
-		*/
-		Thread.sleep(100L + (n * TASK_DURATION) - timeout);
-	}
-
-	/**
-	 * Test invocation of <code>JPPFExecutorService.invokeAny(List&lt;Callable&gt;, long, TimeUnit)</code>.
 	 * In this test, no task has enough time to complete its execution.
 	 * @throws Exception if any error occurs
 	 */
 	@Test
-	public void testInvokeAnyWithTimeout2() throws Exception
+	public void testInvokeAnyWithTimeout() throws Exception
 	{
 		int n = 3;
 		long timeout = TASK_DURATION / 2L;

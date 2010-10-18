@@ -54,6 +54,7 @@ public class Setup1D1N
 	@BeforeClass
 	public static void setup() throws IOException
 	{
+		/*
 		shutdownHook = new Thread()
 		{
 			public void run()
@@ -76,6 +77,7 @@ public class Setup1D1N
 		catch(Exception e)
 		{
 		}
+		*/
 	}
 
 	/**
@@ -85,6 +87,7 @@ public class Setup1D1N
 	@AfterClass
 	public static void cleanup() throws IOException
 	{
+		/*
 		try
 		{
 			Thread.sleep(1000L);
@@ -95,5 +98,6 @@ public class Setup1D1N
 		node.stopProcess();
 		driver.stopProcess();
 		Runtime.getRuntime().removeShutdownHook(shutdownHook);
+		*/
 	}
 }

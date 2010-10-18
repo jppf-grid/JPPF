@@ -18,8 +18,6 @@
 
 package org.jppf.test.setup;
 
-import java.io.IOException;
-
 import org.jppf.client.JPPFClient;
 import org.junit.*;
 
@@ -52,12 +50,13 @@ public class Setup1D1N1C
 
 	/**
 	 * Launches a driver and node and start the client.
-	 * @throws IOException if a process could not be started.
+	 * @throws Exception if a process could not be started.
 	 */
 	@BeforeClass
-	public static void setup() throws IOException
+	public static void setup() throws Exception
 	{
 		System.out.println("performing setup");
+		/*
 		shutdownHook = new Thread()
 		{
 			public void run()
@@ -72,6 +71,7 @@ public class Setup1D1N1C
 		driver.startProcess();
 		node = new NodeProcessLauncher(1);
 		node.startProcess();
+		*/
 		client = new JPPFClient();
 		// give some time for everyone to initialize
 		try
@@ -85,10 +85,10 @@ public class Setup1D1N1C
 
 	/**
 	 * Stops the driver and node and close the client.
-	 * @throws IOException if a process could not be stopped.
+	 * @throws Exception if a process could not be stopped.
 	 */
 	@AfterClass
-	public static void cleanup() throws IOException
+	public static void cleanup() throws Exception
 	{
 		System.out.println("performing cleanup");
 		try
@@ -99,8 +99,10 @@ public class Setup1D1N1C
 		{
 		}
 		client.close();
+		/*
 		node.stopProcess();
 		driver.stopProcess();
 		Runtime.getRuntime().removeShutdownHook(shutdownHook);
+		*/
 	}
 }
