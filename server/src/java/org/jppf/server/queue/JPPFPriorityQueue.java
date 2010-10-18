@@ -106,11 +106,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		JPPFJobSLA sla = bundle.getJobSLA();
+		String jobId = bundle.getId();
+		String jobUuid = bundle.getJobUuid();
 		try
 		{
 			lock.lock();
-			String jobId = bundle.getId();
-			String jobUuid = bundle.getJobUuid();
 			BundleWrapper other = jobMap.get(jobUuid);
 			if (other != null)
 			{
@@ -285,8 +285,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	private void handleStartJobSchedule(BundleWrapper bundleWrapper)
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
-		JPPFJobSLA sla = bundle.getJobSLA();
-		JPPFSchedule schedule = sla.getJobSchedule();
+		JPPFSchedule schedule = bundle.getJobSLA().getJobSchedule();
 		if (schedule != null)
 		{
 			bundle.setParameter(BundleParameter.JOB_PENDING, true);
@@ -316,8 +315,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		bundle.setParameter(BundleParameter.JOB_EXPIRED, false);
-		JPPFJobSLA sla = bundle.getJobSLA();
-		JPPFSchedule schedule = sla.getJobExpirationSchedule();
+		JPPFSchedule schedule = bundle.getJobSLA().getJobExpirationSchedule();
 		if (schedule != null)
 		{
 			String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);

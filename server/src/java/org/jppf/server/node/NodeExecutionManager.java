@@ -187,6 +187,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 */
 	public synchronized void cancelAllTasks(boolean callOnCancel, boolean requeue)
 	{
+		if (debugEnabled) log.debug("cancelling all tasks with: callOnCancel=" + callOnCancel + ", requeue=" + requeue);
 		if (requeue)
 		{
 			bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
@@ -392,9 +393,9 @@ public class NodeExecutionManager extends ThreadSynchronization
 	/**
 	 * Notifiaction sent by a node task wrapper when a task is complete.
 	 * @param taskNumber the number identifying the task.
-	 * @param cpuTime - the cpu time taken by the task.
-	 * @param elapsedTime - the wall clock time taken by the task
-	 * @param hasError - determines whether the task had an exception.
+	 * @param cpuTime the cpu time taken by the task.
+	 * @param elapsedTime the wall clock time taken by the task
+	 * @param hasError determines whether the task had an exception.
 	 */
 	public void taskEnded(long taskNumber, long cpuTime, long elapsedTime, boolean hasError)
 	{
@@ -437,7 +438,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 
 	/**
 	 * Get the current cpu time for the thread identified by the specified id.
-	 * @param threadId - the id of the thread to the cpu time from.
+	 * @param threadId the id of the thread to the cpu time from.
 	 * @return the cpu time as a long value.
 	 */
 	public long getCpuTime(long threadId)
@@ -474,7 +475,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 
 	/**
 	 * Add a task execution listener to the list of task execution listeners.
-	 * @param listener - the listener to add.
+	 * @param listener the listener to add.
 	 */
 	public void addTaskExecutionListener(TaskExecutionListener listener)
 	{
@@ -486,7 +487,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 
 	/**
 	 * Remove a task execution listener from the list of task execution listeners.
-	 * @param listener - the listener to remove.
+	 * @param listener the listener to remove.
 	 */
 	public void removeTaskExecutionListener(TaskExecutionListener listener)
 	{
