@@ -202,7 +202,7 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="/release_notes.php?version=2.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
+											<a href="/release_notes.php?version=2.3" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -282,16 +282,11 @@
 			<a href="http://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1">Releases</a>
 			&nbsp;&nbsp;<a href="/news.php"><b style="color: #6D78B6">All News</b></a>
 		</div>
-		<br>
+		<p><b>Follow us on <a href="http://www.twitter.com/jppfgrid"><img src="http://twitter-badges.s3.amazonaws.com/twitter-c.png" alt="Follow JPPF on Twitter" border="0"/></a></b>
 		<h3>Our users say</h3>
 		<a href="quotes.php" style="text-decoration: none">... we have found the framework to be extremely powerful and easy to work with...</a>
 		<p><a href="quotes.php" style="text-decoration: none">... The ability to adapt our existing technology without having to redesign or rethink entire processes is fantastic ...</a>
 		<br>
-		<!--
-		<h3>Licensing & Status</h3>
-		JPPF is licensed under the <a href="/license.php"><b>Apache License, Version 2.0</b></a>
-		<br>Latest stable version: Version 1.9.1
-		-->
 	</div>
 	<div class="column2">
 		<h3>Easy and powerful</h3>
@@ -304,7 +299,7 @@
 		&bull;&nbsp;fault-tolerance and self-repair capabilities<br>
 		&bull;&nbsp;exceptional level of service and reliability<br>
 		&bull;&nbsp;fully documented samples, using JPPF on real-life problems<br>
-		&bull;&nbsp;flexible open-source licensing with Apache 2.0
+		&bull;&nbsp;flexible open-source licensing with <a href="/license.php"><b>Apache License v2.0</b></a>
 		<h3>Contribute</h3>
 		<b>Browse our <a href="./wiki" target=_top>documentation</a></b><br>
 		<b>Find support, share your ideas, in our <a href="./forums" target=_top>discussion forums</a></b><br>

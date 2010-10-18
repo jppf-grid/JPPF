@@ -70,7 +70,7 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="/release_notes.php?version=2.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
+											<a href="/release_notes.php?version=2.3" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
 											</div>
 															<?php
 											$itemClass = "";

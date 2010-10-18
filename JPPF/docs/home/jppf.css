@@ -25,7 +25,7 @@ a { text-decoration: none; font-weight: normal }
 a:hover { text-decoration: underline; color: red; font-weight: normal }
 
 .gwrapper { width: 900px; max-width: 900px; background: white; }
-.sidebar   { width:  90px; float: left; padding-left: 5px; background-color: white; }
+.sidebar   { width:  90px; float: left; padding-left: 0px; background-color: white; }
 .content   { width: 766px; float: right; padding-left: 15px; padding-right: 5px; margin-bottom: 5px; background-color: white; }
 /*
 .column1   { width: 250px; float: left; }
@@ -79,8 +79,8 @@ table  {font-size: 10pt; font-family: Arial, Verdana, sans-serif; margin: 0px }
 /*.download:hover { color: red }*/
 
 .aboutMenuItem, .aboutMenuItem2 { text-decoration: none; white-space: nowrap }
-.aboutMenuItem { color: #6D78B6; background-image: url('images/menu_bkg1.jpg'); background-repeat: repeat; }
-.aboutMenuItem2 { color: #6D78B6; }
+.aboutMenuItem { color: #6D78B6; background-image: url('images/menu_bkg1.jpg'); background-repeat: repeat; font-size: 9pt; overflow: visible; }
+.aboutMenuItem2 { color: #6D78B6; font-size: 9pt; overflow: visible; }
 div.aboutMenuItem { background-color: #6D78B6;}
 
 .codeBlock { font-family: Courrier New, Courrier, Console; border: 1px dashed blue }
