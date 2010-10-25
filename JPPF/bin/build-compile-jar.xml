@@ -123,4 +123,27 @@
     </jar>
   </target>
 
+	<!-- ========================================================================= -->
+	<!--               Build the logging formatter jar                             -->
+	<!-- ========================================================================= -->
+
+	<target name="jar.logging" description="generates the jar with the JPPF logging formatter" depends="compile">
+		<tstamp>
+			<format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
+		</tstamp>
+    <jar jarfile="${build}/jppf-logging-formatter.jar" index="true">
+			<fileset dir="${basedir}/../node/classes">
+				<include name="**/JPPFFileHandler.class"/>
+				<include name="**/JPPFLogFormatter.class"/>
+				<include name="**/StringUtils.class"/>
+			</fileset>
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+      </manifest>
+    </jar>
+	</target>
+
+
 </project> 
