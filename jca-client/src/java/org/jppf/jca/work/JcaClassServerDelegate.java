@@ -129,8 +129,9 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 						String name = resource.getName();
 						if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name);
 
-						ClassLoader cl = getClassLoader(resource.getRequestUuid());
-						if (debugEnabled) log.debug("attempting resource lookup using classloader=" + cl);
+						String requestUuid = resource.getRequestUuid();
+						ClassLoader cl = getClassLoader(requestUuid);
+						if (debugEnabled) log.debug("attempting resource lookup using classloader=" + cl + " for request uuid = " + requestUuid);
 						if (resource.getData("multiple") == null)
 						{
 							byte[] b = null;

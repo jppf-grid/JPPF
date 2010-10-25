@@ -129,6 +129,46 @@ public class JcaResultProcessor implements Work
 	private boolean performSubmission(JPPFSubmissionResult result) throws Exception
 	{
 		int count = 0;
+		String requestUuid = job.getJobUuid();
+		JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
+		ClassLoader cl = null;
+		ClassLoader oldCl = null;
+		if (!job.getTasks().isEmpty())
+		{
+			JPPFTask task = job.getTasks().get(0);
+			cl = task.getClass().getClassLoader();
+			mgr.addRequestClassLoader(requestUuid, cl);
+			if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
+		}
+		try
+		{
+			if (cl != null)
+			{
+				oldCl = Thread.currentThread().getContextClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+			}
+			connection.getClient().getLoadBalancer().execute(job, connection);
+			result.waitForResults(0);
+			mgr.removeRequestClassLoader(requestUuid);
+			result.setStatus(COMPLETE);
+			connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
+		}
+		finally
+		{
+			if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
+		}
+		return true;
+	}
+
+	/**
+	 * Perform the actual tasks submission.
+	 * @param result the submission result.
+	 * @return true if the submission is successfull.
+	 * @throws Exception if an error is raised while submitting the tasks or receiving the results.
+	 */
+	private boolean performSubmission2(JPPFSubmissionResult result) throws Exception
+	{
+		int count = 0;
 		JPPFTaskBundle bundle = new JPPFTaskBundle();
 		String requestUuid = new JPPFUuid().toString();
 		bundle.setRequestUuid(requestUuid);

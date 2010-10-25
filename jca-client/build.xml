@@ -304,14 +304,19 @@
 
 	<target name="rar.all" depends="compile" description="generate the ear files">
 		<echo message="creating the RAR files..."/>
-		<antcall target="rar"><param name="appserver" value="${jboss}"/></antcall>
-		<antcall target="rar"><param name="appserver" value="${sunas}"/></antcall>
-		<antcall target="rar"><param name="appserver" value="${was}"/></antcall>
-		<antcall target="rar"><param name="appserver" value="${weblogic}"/></antcall>
-		<antcall target="rar"><param name="appserver" value="${oracle}"/></antcall>
-		<antcall target="rar"><param name="appserver" value="${geronimo}"/></antcall>
-  	<!-- ***** add RAR generation for other application servers here ***** -->
-  	<!-- ***** end of add other                                      ***** -->
+		<!--
+		Parameters:
+		  appserver = application server name property
+		  logging = type of slf4j binding, either "log4j12" or "jdk14"
+		-->
+		<antcall target="rar"><param name="appserver" value="${jboss}"/><param name="logging" value="log4j12"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${sunas}"/><param name="logging" value="jdk14"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${was}"/><param name="logging" value="jdk14"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${weblogic}"/><param name="logging" value="jdk14"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${oracle}"/><param name="logging" value="jdk14"/></antcall>
+		<antcall target="rar"><param name="appserver" value="${geronimo}"/><param name="logging" value="log4j12"/></antcall>
+  	<!-- *****                      add RAR generation for other application servers here                     ***** -->
+  	<!-- *****                      end of add other                                                          ***** -->
 		<echo message="RAR files created"/>
 	</target>
 
@@ -342,6 +347,7 @@
 			<zipfileset dir="${build.dir}/${appserver}">
 				<include name="*.*"/>
 				<exclude name="ra.xml"/>
+				<exclude name="commons-logging.properties"/>
 			</zipfileset>
 			<zipfileset dir="${build.dir}/${appserver}/ra" prefix="META-INF">
 				<include name="*.*"/>
@@ -354,8 +360,9 @@
 				<include name="jppf-common.jar"/>
 				<include name="jppf-client.jar"/>
 			</zipfileset>
-			<zipfileset dir="${basedir}/lib">
-				<include name="*.jar"/>
+			<zipfileset dir="${jppf.lib.dir}/slf4j">
+				<include name="slf4j-api-1.6.1.jar"/>
+				<include name="slf4j-${logging}-1.6.1.jar"/>
 			</zipfileset>
 		</jar>
     <delete dir="${build.dir}/${appserver}" quiet="true"/>

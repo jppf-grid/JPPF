@@ -43,6 +43,10 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 */
 	private static Logger log = LoggerFactory.getLogger(JPPFSubmissionManager.class);
 	/**
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * The queue of submissions pending execution.
 	 */
 	private ConcurrentLinkedQueue<JPPFJob> execQueue = new ConcurrentLinkedQueue<JPPFJob>();
@@ -95,7 +99,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	{
 		while (!isStopped())
 		{
-			while ((execQueue.peek() == null) || !client.hasAvailableConnection())
+			while (((execQueue.peek() == null) || !client.hasAvailableConnection()) && !isStopped())
 			{
 				goToSleep();
 			}
@@ -105,14 +109,20 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 			synchronized(client)
 			{
 				c = (JPPFJcaClientConnection) client.getClientConnection();
-				c.setStatus(JPPFClientConnectionStatus.EXECUTING);
+				if (c != null) c.setStatus(JPPFClientConnectionStatus.EXECUTING);
 			}
 			JPPFSubmissionResult submission = (JPPFSubmissionResult) job.getResultListener();
 			try
 			{
-				workManager.scheduleWork(new JcaResultProcessor(c, job));
+				if (c != null) c.submit(job);
+				else if (client.getLoadBalancer().isLocalEnabled())
+				{
+					submission.setStatus(EXECUTING);
+					client.getLoadBalancer().execute(job, null);
+					submission.setStatus(COMPLETE);
+				}
 			}
-			catch(WorkException e)
+			catch(Exception e)
 			{
 				submission.setStatus(FAILED);
 				c.setStatus(JPPFClientConnectionStatus.ACTIVE);
@@ -139,7 +149,9 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 */
 	public String addSubmission(JPPFJob job, SubmissionStatusListener listener)
 	{
-		JPPFSubmissionResult submission = new JPPFSubmissionResult(job.getTasks().size());
+		int count = job.getTasks().size();
+		JPPFSubmissionResult submission = new JPPFSubmissionResult(count, job.getJobUuid());
+		if (debugEnabled) log.debug("adding new submission: jobId=" + job.getId() + ", nbTasks=" + count + ", submission id=" + submission.getId());
 		if (listener != null) submission.addSubmissionStatusListener(listener);
 		job.setResultListener(submission);
 		submission.setStatus(PENDING);

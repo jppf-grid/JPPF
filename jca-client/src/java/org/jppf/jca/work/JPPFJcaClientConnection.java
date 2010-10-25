@@ -26,9 +26,9 @@ import org.jppf.JPPFError;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.comm.socket.SocketInitializer;
+import org.jppf.comm.socket.*;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.Pair;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -58,30 +58,12 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * Initialize this client with a specified application UUID.
 	 * @param uuid the unique identifier for this local client.
 	 * @param name configuration name for this local client.
-	 * @param host the name or IP address of the host the JPPF driver is running on.
-	 * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
-	 * @param classServerPort the TCP port the class server is listening to.
-	 * @param priority the assigned to this client connection.
-	 * @param client the JPPF client that owns this connection.
-	 */
-	public JPPFJcaClientConnection(String uuid, String name, String host, int driverPort,
-		int classServerPort, int priority, JPPFJcaClient client)
-	{
-		super(uuid, name, host, driverPort, classServerPort, priority);
-		status = DISCONNECTED;
-		this.client = client;
-	}
-
-	/**
-	 * Initialize this client with a specified application UUID.
-	 * @param uuid the unique identifier for this local client.
-	 * @param name configuration name for this local client.
 	 * @param info the connection properties for this connection.
 	 * @param client the JPPF client that owns this connection.
 	 */
 	public JPPFJcaClientConnection(String uuid, String name, JPPFConnectionInformation info, JPPFJcaClient client)
 	{
-		super(uuid, name, info.host, info.applicationServerPorts[0], info.classServerPorts[0], 0);
+		configure(uuid, name, info.host, info.applicationServerPorts[0], info.classServerPorts[0], 0);
 		status = DISCONNECTED;
 		classServerPort = info.classServerPorts[0];
 		this.client = client;
@@ -168,6 +150,36 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public void sendTasks(JPPFTaskBundle header, JPPFJob job) throws Exception
+	{
+		header.setRequestUuid(job.getJobUuid());
+		if (debugEnabled) log.debug("sending tasks bundle with requestUuid=" + header.getRequestUuid());
+		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+		ClassLoader cl = (job.getTasks().size() > 0) ? job.getTasks().get(0).getClass().getClassLoader() : null;
+		try
+		{
+			if (cl != null) Thread.currentThread().setContextClassLoader(cl);
+			super.sendTasks(header, job);
+		}
+		catch(Exception e)
+		{
+			if (debugEnabled) log.debug(e.getMessage(), e);
+			throw e;
+		}
+		catch(Error e)
+		{
+			if (debugEnabled) log.debug(e.getMessage(), e);
+			throw e;
+		}
+		finally
+		{
+			if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
+		}
+	}
+
+	/**
 	 * Submit a JPPFJob for execution.
 	 * @param job the job to execute.
 	 * @throws Exception if an error occurs while sending the job for execution.
@@ -175,6 +187,9 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 */
 	public void submit(JPPFJob job) throws Exception
 	{
+		JcaResultProcessor proc = new JcaResultProcessor(this, job);
+		executor.submit(proc);
+		if (debugEnabled) log.debug("["+name+"] submitted " + job.getTasks().size() + " tasks");
 	}
 
 	/**

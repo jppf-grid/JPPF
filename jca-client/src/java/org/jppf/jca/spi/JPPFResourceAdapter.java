@@ -144,7 +144,8 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 
 	/**
 	 * Get the host name or IP address for the JPPF driver.
-	 * @return the host as a string. 
+	 * @return the host as a string.
+	 * @deprecated use {@link #getClientConfiguration() getClientConfiguration()} instead.
 	 */
 	public String getServerHost()
 	{
@@ -154,6 +155,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	/**
 	 * Set the host name or IP address for the JPPF driver.
 	 * @param serverHost the host as a string. 
+	 * @deprecated use {@link #setClientConfiguration(java.lang.String) setClientConfiguration(String)} instead.
 	 */
 	public void setServerHost(String serverHost)
 	{
@@ -163,6 +165,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	/**
 	 * Get the port for the class server in the driver.
 	 * @return the port number as an int. 
+	 * @deprecated use {@link #getClientConfiguration() getClientConfiguration()} instead.
 	 */
 	public Integer getClassServerPort()
 	{
@@ -172,6 +175,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	/**
 	 * Set the port for the class server in the driver.
 	 * @param classServerPort the port number as an int. 
+	 * @deprecated use {@link #setClientConfiguration(java.lang.String) setClientConfiguration(String)} instead.
 	 */
 	public void setClassServerPort(Integer classServerPort)
 	{
@@ -181,6 +185,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	/**
 	 * Get the port for the client application server in the driver.
 	 * @return the port number as an int. 
+	 * @deprecated use {@link #getClientConfiguration() getClientConfiguration()} instead.
 	 */
 	public Integer getAppServerPort()
 	{
@@ -190,6 +195,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	/**
 	 * Get the port for the client application server in the driver.
 	 * @param appServerPort the port number as an int.
+	 * @deprecated use {@link #setClientConfiguration(java.lang.String) setClientConfiguration(String)} instead.
 	 */
 	public void setAppServerPort(Integer appServerPort)
 	{
@@ -199,6 +205,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	/**
 	 * Get the number of JPPF driver connections.
 	 * @return the number of connections as an int.
+	 * @deprecated use {@link #getClientConfiguration() getClientConfiguration()} instead.
 	 */
 	public Integer getConnectionPoolSize()
 	{
@@ -208,6 +215,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	/**
 	 * Set the number of JPPF driver connections.
 	 * @param connectionPoolSize the number of connections as an int.
+	 * @deprecated use {@link #setClientConfiguration(java.lang.String) setClientConfiguration(String)} instead.
 	 */
 	public void setConnectionPoolSize(Integer connectionPoolSize)
 	{

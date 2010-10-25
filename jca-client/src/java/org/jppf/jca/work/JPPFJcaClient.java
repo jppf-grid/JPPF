@@ -26,7 +26,7 @@ import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.jca.work.submission.JPPFSubmissionManager;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -43,6 +43,10 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * Logger for this class.
 	 */
 	private static Logger log = LoggerFactory.getLogger(JPPFJcaClient.class);
+	/**
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Keeps a list of the valid connections not currently executring tasks.
 	 */
@@ -116,7 +120,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	{
 		super.statusChanged(event);
 		JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
-		if (log.isDebugEnabled()) log.debug("connection=" + c + ", availableConnections=" + availableConnections);
+		if (debugEnabled) log.debug("connection=" + c + ", availableConnections=" + availableConnections);
 		switch(c.getStatus())
 		{
 			case ACTIVE:
@@ -135,7 +139,15 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 */
 	public boolean hasAvailableConnection()
 	{
-		return !getAvailableConnections().isEmpty();
+		if (debugEnabled)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.append("available connections: ").append(getAvailableConnections().size()).append(", ");
+			sb.append("local execution enabled: ").append(loadBalancer.isLocalEnabled()).append(", ");
+			sb.append("localy executing: ").append(loadBalancer.isLocallyExecuting());
+			log.debug(sb.toString());
+		}
+		return (!getAvailableConnections().isEmpty() || (loadBalancer.isLocalEnabled() && !loadBalancer.isLocallyExecuting()));
 	}
 
 	/**
@@ -172,7 +184,8 @@ public class JPPFJcaClient extends AbstractGenericClient
 		if (log.isDebugEnabled()) log.debug("initializing configuration:\n" + configuration);
 		try
 		{
-			TypedProperties props = new TypedProperties();
+			//TypedProperties props = new TypedProperties();
+			TypedProperties props = JPPFConfiguration.getProperties();
 			ByteArrayInputStream bais = new ByteArrayInputStream(((String) configuration).getBytes());
 			props.load(bais);
 			bais.close();

@@ -205,7 +205,7 @@ public class DemoTest
 				for (JPPFTask task: results)
 				{
 					if (task.getException() == null) sb.append(task.getResult());
-					else sb.append("task [" + task.getId() + "] ended in error: " + task.getException().getMessage());
+					else sb.append("task [").append(task.getId()).append("] ended in error: ").append(task.getException().getMessage());
 					sb.append("<br/>");
 				}
 				msg = sb.toString();

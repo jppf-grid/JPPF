@@ -205,6 +205,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 */
 	public String submitNonBlocking(JPPFJob job, SubmissionStatusListener listener) throws Exception
 	{
+		job.setBlocking(false);
 		return getJppfClient().getSubmissionManager().addSubmission(job, listener);
 	}
 
