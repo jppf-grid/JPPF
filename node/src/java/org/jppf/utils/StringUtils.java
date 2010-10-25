@@ -23,8 +23,6 @@ import java.nio.channels.*;
 import java.nio.charset.Charset;
 import java.util.*;
 
-import org.slf4j.*;
-
 
 /**
  * This class provides a set of utility methods for manipulating strings. 
@@ -35,7 +33,7 @@ public final class StringUtils
 	/**
 	 * Logger for this class.
 	 */
-	private static Logger log = LoggerFactory.getLogger(StringUtils.class);
+	//private static Logger log = LoggerFactory.getLogger(StringUtils.class);
 	/**
 	 * Keywords to look for and replace in the legend items of the charts.
 	 */
@@ -277,7 +275,8 @@ public final class StringUtils
 			}
 			catch(NumberFormatException e)
 			{
-				log.error("invalid port number format: " + sp);
+				//log.error("invalid port number format: " + sp);
+				return null;
 			}
 		}
 		int[] ports = new int[portList.size()];
@@ -317,7 +316,8 @@ public final class StringUtils
 		}
 		catch(NumberFormatException e)
 		{
-			log.error("invalid port number format: " + comps[1]);
+			//log.error("invalid port number format: " + comps[1]);
+			return null;
 		}
 		return new HostPort(comps[0], port);
 	}
@@ -382,7 +382,8 @@ public final class StringUtils
 		}
 		catch(Exception e)
 		{
-			log.error("Charset UTF-8 could not be instantiated", e);
+			//log.error("Charset UTF-8 could not be instantiated", e);
+			return null;
 		}
 		return utf8;
 	}
