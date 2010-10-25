@@ -41,6 +41,7 @@
 				reconnect.max.time = 10
 				#reconnect.interval = 1
 
+				jppf.remote.execution.enabled = true
 				#jppf.local.execution.enabled = true
 				#jppf.local.execution.threads = 4
 

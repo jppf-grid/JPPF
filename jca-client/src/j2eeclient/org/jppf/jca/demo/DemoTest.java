@@ -147,6 +147,41 @@ public class DemoTest
 	}
 
 	/**
+	 * Perform a simple call to the JPPF resource adapter.
+	 * This method blocks until all job results have been received.
+	 * @param jobId the name given to the job.
+	 * @param duration the duration of the task to submit.
+	 * @param nbTasks the number of tasks to submit.
+	 * @return a string reporting either the task execution result or an error message.
+	 * @throws Exception if the call to JPPF failed.
+	 */
+	public String testConnectorBlocking(String jobId, long duration, int nbTasks) throws Exception
+	{
+		JPPFConnection connection = null;
+		String id = null;
+		try
+		{
+			connection = getConnection();
+			JPPFJob job = new JPPFJob();
+			job.setId(jobId);
+			for (int i=0; i<nbTasks; i++)
+			{
+				DurationTask task = new DurationTask(duration);
+				task.setId(jobId + " task #" + (i+1));
+				job.addTask(task);
+			}
+			id = connection.submitNonBlocking(job);
+			List<JPPFTask> results = connection.waitForResults(id);
+			System.out.println("received " + results.size() + " results for job '" + job.getId() + "'");
+		}
+		finally
+		{
+			if (connection != null) connection.close();
+		}
+		return id;
+	}
+
+	/**
 	 * Get the initial context.
 	 * @return an <code>InitialContext</code> instance.
 	 * @throws Exception if the context could not be obtained.

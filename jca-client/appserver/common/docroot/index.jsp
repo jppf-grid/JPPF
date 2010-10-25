@@ -26,9 +26,11 @@
 		  text = request.getParameter("jobId");
 		  if ((text != null) && !"".equals(text.trim())) jobId = text;
 		  session.setAttribute("jobId", text);
-			String msg = new DemoTest(jndiName).testConnector(jobId, duration, nbTasks);
-			//SomeTestClass stc = new SomeTestClass();
-			//String msg = "something";
+		  boolean blocking = request.getParameter("blocking") != null;
+		  DemoTest test = new DemoTest(jndiName);
+		  String msg = null;
+			if (!blocking) msg = test.testConnector(jobId, duration, nbTasks);
+			else msg = test.testConnectorBlocking(jobId, duration, nbTasks);
 			response.sendRedirect(request.getContextPath()+"/index.jsp?msg="+msg);
 	  }
 		else
@@ -57,7 +59,8 @@
 		<div align="center">
 		<h1>Submit a job</h1>
 		<br/>
-		<h4>Submit a job with the specified number of tasks and duration for each task</h4>
+		<h4>Submit a job with the specified number of tasks and duration for each task<br/>
+		A blocking job will wait until the job has finished executing, whereas a non-blocking job will return immediately with a job submission id</h4>
 		<form name="jppftest" action="<%=request.getContextPath()%>/index.jsp" method="post">
 			<table width="450" cellspacing="0" cellpadding="5">
 				<tr>
@@ -72,7 +75,10 @@
 					<td>Duration of each task in seconds:</td>
 					<td><input type="text" value="<%= (float) duration / 1000f %>" name="duration" maxLength="10"></td>
 				</tr>
-				<tr><td align="center" colspan="*"><input type="hidden" value="true" name="perform"><input type="submit" value="Submit"></td></tr>
+				<tr>
+					<td colspan="2"><input type="checkbox" checked="true" name="blocking">Blocking job?</td>
+				</tr>
+				<tr><td align="center" colspan="2">&nbsp;<br/><input type="hidden" value="true" name="perform"><input type="submit" value="Submit"></td></tr>
 			</table>
 		</form>
 <%

@@ -316,4 +316,15 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	{
 		this.managedConnection = conn;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<JPPFTask> waitForResults(String submissionId) throws Exception
+	{
+		JPPFSubmissionResult result = getSubmissionResult(submissionId);
+		if (result == null) return null;
+		result.waitForResults(0L);
+		return result.getResults();
+	}
 }
