@@ -127,14 +127,18 @@ public class JPPFClient extends AbstractGenericClient
 	}
 
 	/**
-	 * Submit the request to the server.
-	 * @param job the job to execute remotely.
+	 * Submit a job execution request.
+	 * @param job the job to execute.
 	 * @return the list of executed tasks with their results.
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
 	 */
 	public List<JPPFTask> submit(JPPFJob job) throws Exception
 	{
+		if (!job.isBlocking() && (job.getResultListener() == null))
+		{
+			job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
+		}
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getClientConnection(true);
 		if (job.isBlocking())
 		{
