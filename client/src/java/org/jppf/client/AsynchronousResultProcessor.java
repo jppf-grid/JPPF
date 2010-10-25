@@ -72,7 +72,7 @@ public class AsynchronousResultProcessor implements Runnable
 			boolean completed = false;
 			try
 			{
-				JPPFClient.getLoadBalancer().execute(job, connection);
+				connection.getLoadBalancer().execute(job, connection);
 			}
 			catch(NotSerializableException e)
 			{

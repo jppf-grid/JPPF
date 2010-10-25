@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
-import org.jppf.client.loadbalancer.LoadBalancer;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFStats;
@@ -48,14 +47,6 @@ public class JPPFClient extends AbstractGenericClient
 	 * Determines whether debug-level logging is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The load balancer for local versus remote execution.
-	 */
-	private static LoadBalancer loadBalancer = new LoadBalancer();
-	/**
-	 * Determines whether local execution is enabled.
-	 */
-	public static final boolean LOCAL_EXEC_ENABLED = JPPFConfiguration.getProperties().getBoolean("jppf.local.execution.enabled", true);
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -113,7 +104,7 @@ public class JPPFClient extends AbstractGenericClient
 	 */
 	protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
 	{
-		return new JPPFClientConnectionImpl(uuid, name, info);
+		return new JPPFClientConnectionImpl(uuid, name, info, getLoadBalancer());
 	}
 
 	/**
@@ -137,7 +128,7 @@ public class JPPFClient extends AbstractGenericClient
 
 	/**
 	 * Submit the request to the server.
-	 * @param job - the job to execute remotely.
+	 * @param job the job to execute remotely.
 	 * @return the list of executed tasks with their results.
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
@@ -154,11 +145,11 @@ public class JPPFClient extends AbstractGenericClient
 				c.submit(job);
 				return collector.waitForResults();
 			}
-			if (LOCAL_EXEC_ENABLED)
+			if (loadBalancer.isLocalEnabled())
 			{
 				JPPFResultCollector collector = new JPPFResultCollector(job.getTasks().size());
 				job.setResultListener(collector);
-				JPPFClient.getLoadBalancer().execute(job, null);
+				loadBalancer.execute(job, null);
 				return collector.waitForResults();
 			}
 		}
@@ -169,9 +160,9 @@ public class JPPFClient extends AbstractGenericClient
 				c.submit(job);
 				return null;
 			}
-			if (LOCAL_EXEC_ENABLED)
+			if (loadBalancer.isLocalEnabled())
 			{
-				JPPFClient.getLoadBalancer().execute(job, null);
+				loadBalancer.execute(job, null);
 				return null;
 			}
 		}
@@ -216,14 +207,5 @@ public class JPPFClient extends AbstractGenericClient
 	{
 		super.close();
 		if (loadBalancer != null) loadBalancer.stop();
-	}
-
-	/**
-	 * Get the load balancer for local versus remote execution.
-	 * @return a <code>LoadBalancer</code> instance.
-	 */
-	public static LoadBalancer getLoadBalancer()
-	{
-		return loadBalancer;
 	}
 }

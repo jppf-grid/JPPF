@@ -66,7 +66,7 @@ public class LoadBalancer
 	/**
 	 * The bundlers used to split the tasks between local and remote execution.
 	 */
-	private ClientProportionalBundler[] bundlers = null;
+	private Bundler[] bundlers = null;
 	/**
 	 * Determines whether this load balancer is currently executing tasks locally.
 	 */
@@ -108,7 +108,7 @@ public class LoadBalancer
 	 * @param connection the client connection for sending remote execution requests.
 	 * @throws Exception if an error is raised during execution.
 	 */
-	public void execute(JPPFJob job, JPPFClientConnectionImpl connection) throws Exception
+	public void execute(JPPFJob job, AbstractJPPFClientConnection connection) throws Exception
 	{
 		int count = 0;
 		List<JPPFTask> tasks = job.getTasks();
@@ -124,7 +124,7 @@ public class LoadBalancer
 					{
 						for (int i=LOCAL; i<=REMOTE; i++)
 						{
-							bundlers[i].setMaxSize(tasks.size());
+							((ClientProportionalBundler) bundlers[i]).setMaxSize(tasks.size());
 							bundleSize[i] = bundlers[i].getBundleSize();
 						}
 					}
@@ -145,6 +145,7 @@ public class LoadBalancer
 						idx += bundleSize[i];
 					}
 					ExecutionThread[] threads = { new LocalExecutionThread(list.get(LOCAL), job), new RemoteExecutionThread(list.get(REMOTE), job, connection) };
+					for (int i=LOCAL; i<=REMOTE; i++) threads[i].setContextClassLoader(Thread.currentThread().getContextClassLoader());
 					for (int i=LOCAL; i<=REMOTE; i++) threads[i].start();
 					if (job.isBlocking())
 					{
@@ -155,7 +156,11 @@ public class LoadBalancer
 				else
 				{
 					ExecutionThread localThread = new LocalExecutionThread(tasks, job);
-					if (!job.isBlocking()) localThread.start();
+					if (!job.isBlocking())
+					{
+						localThread.setContextClassLoader(Thread.currentThread().getContextClassLoader());
+						localThread.start();
+					}
 					else
 					{
 						localThread.run();
@@ -265,6 +270,8 @@ public class LoadBalancer
 					futures.add(threadPool.submit(new TaskWrapper(task)));
 				}
 				for (Future<?> f: futures) f.get();
+				int n = futures.size();
+				if (debugEnabled) log.debug("received " + n + " tasks from local executor" + (n > 0 ? ", first position=" + tasks.get(0).getPosition() : ""));
 				if (job.getResultListener() != null)
 				{
 					synchronized(job.getResultListener())
@@ -291,7 +298,7 @@ public class LoadBalancer
 		/**
 		 * The connection to the driver to use.
 		 */
-		private JPPFClientConnectionImpl connection = null;
+		private AbstractJPPFClientConnection connection = null;
 
 		/**
 		 * Initialize this execution thread for remote excution.
@@ -299,7 +306,7 @@ public class LoadBalancer
 		 * @param job the execution to perform.
 		 * @param connection the connection to the driver to use.
 		 */
-		public RemoteExecutionThread(List<JPPFTask> tasks, JPPFJob job, JPPFClientConnectionImpl connection)
+		public RemoteExecutionThread(List<JPPFTask> tasks, JPPFJob job, AbstractJPPFClientConnection connection)
 		{
 			super(tasks, job);
 			this.connection = connection;
@@ -316,16 +323,30 @@ public class LoadBalancer
 				long start = System.currentTimeMillis();
 				int count = 0;
 				boolean completed = false;
-				JPPFJob newJob = new JPPFJob(job.getDataProvider(), job.getJobSLA(), job.getJobMetadata(), job.isBlocking(), job.getResultListener());
+				//JPPFJob newJob = new JPPFJob(job.getDataProvider(), job.getJobSLA(), job.getJobMetadata(), job.isBlocking(), job.getResultListener());
+				JPPFJob newJob = new JPPFJob(job.getJobUuid());
+				newJob.setDataProvider(job.getDataProvider());
+				newJob.setJobSLA(job.getJobSLA());
+				newJob.setJobMetadata(job.getJobMetadata());
+				newJob.setBlocking(job.isBlocking());
+				newJob.setResultListener(job.getResultListener());
 				newJob.setId(job.getId());
-				for (JPPFTask task: tasks) newJob.addTask(task);
+				for (JPPFTask task: tasks)
+				{
+					// needed as JPPFJob.addTask() resets the position
+					int pos = task.getPosition();
+					newJob.addTask(task);
+					task.setPosition(pos);
+				}
 				while (!completed)
 				{
 					connection.sendTasks(newJob);
 					while (count < tasks.size())
 					{
 						Pair<List<JPPFTask>, Integer> p = connection.receiveResults();
-						count += p.first().size();
+						int n = p.first().size();
+						count += n;
+						if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + p.first().get(0).getPosition() : ""));
 						if (job.getResultListener() != null)
 						{
 							synchronized(newJob.getResultListener())
@@ -349,5 +370,23 @@ public class LoadBalancer
 				exception = e;
 			}
 		}
+	}
+
+	/**
+	 * Determine whether local execution is enabled on this client.
+	 * @return <code>true</code> if local execution is enabled, <code>false</code> otherwise.
+	 */
+	public boolean isLocalEnabled()
+	{
+		return localEnabled;
+	}
+
+	/**
+	 * Determine whether this load balancer is currently executing a job locally.
+	 * @return <code>true</code> if a local job is being executed, <code>false</code> otherwise.
+	 */
+	public boolean isLocallyExecuting()
+	{
+		return locallyExecuting.get();
 	}
 }

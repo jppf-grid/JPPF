@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jppf.client.loadbalancer.LoadBalancer;
 import org.jppf.comm.discovery.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -55,6 +56,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	 * 
 	 */
 	protected JPPFMulticastReceiverThread receiverThread = null;
+	/**
+	 * The load balancer for local versus remote execution.
+	 */
+	protected LoadBalancer loadBalancer = null;
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -91,10 +96,14 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	 */
 	protected void initPools()
 	{
+		loadBalancer = new LoadBalancer();
 		LinkedBlockingQueue queue = new LinkedBlockingQueue();
 		executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("JPPF Client"));
-		if (config.getBoolean("jppf.discovery.enabled", true)) initPoolsFromAutoDiscovery();
-		else initPoolsFromConfig();
+		if (config.getBoolean("jppf.remote.execution.enabled", true))
+		{
+			if (config.getBoolean("jppf.discovery.enabled", true)) initPoolsFromAutoDiscovery();
+			else initPoolsFromConfig();
+		}
 	}
 
 	/**
@@ -225,6 +234,15 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 		super.close();
 		if (receiverThread != null) receiverThread.setStopped(true);
 		if (executor != null) executor.shutdownNow();
+	}
+
+	/**
+	 * Get the load balancer for local versus remote execution.
+	 * @return a <code>LoadBalancer</code> instance.
+	 */
+	public LoadBalancer getLoadBalancer()
+	{
+		return loadBalancer;
 	}
 
 	/**

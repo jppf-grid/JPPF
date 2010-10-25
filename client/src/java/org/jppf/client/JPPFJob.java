@@ -96,6 +96,17 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	}
 
 	/**
+	 * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
+	 * This constructor generates a pseudo-random id as a string of 32 hexadecimal characters.
+	 * @param jobUuid the uuid to assign to this job.
+	 */
+	public JPPFJob(String jobUuid)
+	{
+		this.jobUuid = (jobUuid == null) ? new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString() : jobUuid;
+		id = jobUuid;
+	}
+
+	/**
 	 * Initialize a blocking job with the specified parameters.
 	 * @param dataProvider the container for data shared between tasks.
 	 */
@@ -219,14 +230,14 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 */
 	public JPPFTask addTask(Object taskObject, Object...args) throws JPPFException
 	{
-		JPPFTask tmp = null;
+		JPPFTask jppfTask = null;
 		if (taskObject == null) throw new JPPFException("null tasks are not accepted");
-		if (taskObject instanceof JPPFTask) tmp = (JPPFTask) taskObject;
-		else tmp = new JPPFAnnotatedTask(taskObject, args);
+		if (taskObject instanceof JPPFTask) jppfTask = (JPPFTask) taskObject;
+		else jppfTask = new JPPFAnnotatedTask(taskObject, args);
 		if (tasks == null) tasks = new ArrayList<JPPFTask>();
-		tasks.add(tmp);
-		tmp.setPosition(taskCount++);
-		return tmp;
+		tasks.add(jppfTask);
+		jppfTask.setPosition(taskCount++);
+		return jppfTask;
 	}
 
 	/**
@@ -366,6 +377,15 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	public JPPFJobMetadata getJobMetadata()
 	{
 		return jobMetadata;
+	}
+
+	/**
+	 * Set this job's metadata.
+	 * @param jobMetadata a {@link JPPFJobMetadata} instance.
+	 */
+	public void setJobMetadata(JPPFJobMetadata jobMetadata)
+	{
+		this.jobMetadata = jobMetadata;
 	}
 
 	/**

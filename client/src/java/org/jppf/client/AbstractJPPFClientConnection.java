@@ -22,6 +22,7 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.nio.channels.AsynchronousCloseException;
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
@@ -91,10 +92,8 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	protected String name = null;
 	/**
-	 * Priority given to the driver this client is connected to.
-	 * The client is always connected to the available driver(s) with the highest
-	 * priority. If multiple drivers have the same priority, they will be used as a
-	 * pool and tasks will be evenly distributed among them.
+	 * Priority given to the driver this client is connected to. The client is always connected to the available driver(s) with the highest
+	 * priority. If multiple drivers have the same priority, they will be used as a pool and tasks will be evenly distributed among them.
 	 */
 	protected int priority = 0;
 	/**
@@ -117,27 +116,10 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * This connection's UUID.
 	 */
 	private String connectionId = new JPPFUuid().toString();
-
 	/**
-	 * Default instantiation of this class is not allowed.
+	 * The pool of threads used for submitting execution requests.
 	 */
-	protected AbstractJPPFClientConnection()
-	{
-	}
-
-	/**
-	 * Initialize this client connection with the specified parameters.
-	 * @param uuid the unique identifier for this local client.
-	 * @param name configuration name for this local client.
-	 * @param host the name or IP address of the host the JPPF driver is running on.
-	 * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
-	 * @param classServerPort the TCP port the class server is listening to.
-	 * @param priority the assigned to this client connection.
-	 */
-	public AbstractJPPFClientConnection(String uuid, String name, String host, int driverPort, int classServerPort, int priority)
-	{
-		configure(uuid, name, host, driverPort, classServerPort, priority);
-	}
+	protected ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
 
 	/**
 	 * Configure this client connection with the specified parameters.
@@ -206,7 +188,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	/**
 	 * Send tasks to the server for execution.
 	 * @param header the task bundle to send to the driver.
-	 * @param job - the job to execute remotely.
+	 * @param job the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
 	public void sendTasks(JPPFTaskBundle header, JPPFJob job) throws Exception
@@ -218,6 +200,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		uuidPath.add(appUuid);
 		header.setUuidPath(uuidPath);
 		header.setTaskCount(count);
+		header.setRequestUuid(job.getJobUuid());
 		header.setParameter(BundleParameter.JOB_ID, job.getId());
 		header.setParameter(BundleParameter.JOB_UUID, job.getJobUuid());
 		header.setJobSLA(job.getJobSLA());

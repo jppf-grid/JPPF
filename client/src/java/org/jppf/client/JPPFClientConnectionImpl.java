@@ -21,11 +21,11 @@ package org.jppf.client;
 import static org.jppf.client.JPPFClientConnectionStatus.FAILED;
 
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.JPPFError;
 import org.jppf.client.event.*;
+import org.jppf.client.loadbalancer.LoadBalancer;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
@@ -55,11 +55,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 */
 	private ReentrantLock lock = new ReentrantLock();
 	/**
-	 * The pool of threads used for submitting execution requests.
-	 */
-	private ThreadPoolExecutor executor =
-		new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
-	/**
 	 * Provides access to the management functions of the driver.
 	 */
 	private JMXDriverConnectionWrapper jmxConnection = null;
@@ -71,17 +66,23 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * Contains the configuration properties for this client connection.
 	 */
 	private TypedProperties props = null;
+	/**
+	 * Distributes the load between local and remote execution.
+	 */
+	private LoadBalancer loadBalancer = null;
 
 	/**
 	 * Initialize this client with a specified application UUID.
 	 * @param uuid the unique identifier for this local client.
 	 * @param name configuration name for this local client.
 	 * @param info the connection properties for this connection.
+	 * @param loadBalancer distributes the load between local and remote execution.
 	 */
-	public JPPFClientConnectionImpl(String uuid, String name, JPPFConnectionInformation info)
+	public JPPFClientConnectionImpl(String uuid, String name, JPPFConnectionInformation info, LoadBalancer loadBalancer)
 	{
 		classServerPort = info.classServerPorts[0];
 		jmxPort = info.managementPort;
+		this.loadBalancer = loadBalancer;
 		//configure(uuid, name + " (" + info.host + ":" + info.managementPort + ")", info.host, info.applicationServerPorts[0], classServerPort, 0);
 		configure(uuid, name, info.host, info.applicationServerPorts[0], classServerPort, 0);
 		initializeJmxConnection();
@@ -159,12 +160,11 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 
 	/**
 	 * Submit the request to the server.
-	 * @param job - the job to execute remotely.
+	 * @param job the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
 	 */
-	public void submit(JPPFJob job)
-			throws Exception
+	public void submit(JPPFJob job) throws Exception
 	{
 		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(this, job);
 		executor.submit(proc);
@@ -232,5 +232,14 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	public JMXDriverConnectionWrapper getJmxConnection()
 	{
 		return jmxConnection;
+	}
+
+	/**
+	 * Get the load balancer that distributes the load between local and remote execution.
+	 * @return a {@link LoadBalancer} instance.
+	 */
+	public LoadBalancer getLoadBalancer()
+	{
+		return loadBalancer;
 	}
 }
