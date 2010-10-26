@@ -113,6 +113,15 @@ public class BundleWrapper
 	}
 
 	/**
+	 * Set the list of locations of the tasks.
+	 * @param tasks a list of <code>DataLocation</code> instances.
+	 */
+	public void setTasks(List<DataLocation> tasks)
+	{
+		this.tasks = tasks;
+	}
+
+	/**
 	 * Make a copy of this bundle wrapper containing only the first nbTasks tasks it contains.
 	 * @param nbTasks the number of tasks to include in the copy.
 	 * @return a new <code>BundleWrapper</code> instance.

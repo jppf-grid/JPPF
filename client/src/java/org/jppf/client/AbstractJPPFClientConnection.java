@@ -254,6 +254,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			ObjectSerializer ser = makeHelper().getSerializer();
 			JPPFTaskBundle bundle = (JPPFTaskBundle) unwrappedData(socketClient.receiveBytes(0), ser);
 			int count = bundle.getTaskCount();
+			if (debugEnabled) log.debug("received bundle with " + count + " tasks for job '" + bundle.getId() + "'");
 			List<JPPFTask> taskList = new ArrayList<JPPFTask>();
 			for (int i=0; i<count; i++)
 			{
@@ -265,6 +266,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
 			if (t != null)
 			{
+				if (debugEnabled) log.debug("server returned exception parameter in the header for job '" + bundle.getId() + "' : " + t);
 				Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
 				for (JPPFTask task: taskList) task.setException(e);
 			}

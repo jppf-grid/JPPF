@@ -75,7 +75,12 @@ class WaitingResultsState extends NodeServerState
 			// if an exception prevented the node from executing the tasks
 			if (newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM) != null)
 			{
-				newBundle.setTasks(bundle.getTasks());
+				if (debugEnabled)
+				{
+					Throwable t = (Throwable) newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
+					log.debug("node " + wrapper + " returned exception parameter in the header for job '" + newBundle.getId() + "' : " + t);
+				}
+				newBundleWrapper.setTasks(bundleWrapper.getTasks());
 				newBundle.setTaskCount(bundle.getTaskCount());
 			}
 			// updating stats

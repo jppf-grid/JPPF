@@ -21,7 +21,7 @@ import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
 import org.jppf.server.AbstractResultSender;
-import org.jppf.server.protocol.BundleWrapper;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.JPPFBuffer;
 import org.slf4j.*;
 
@@ -55,18 +55,26 @@ class ApplicationResultSender extends AbstractResultSender
 	}
 
 	/**
-	 * Send the results of the tasks in a bundle back to the client who
-	 * submitted the request.
-	 * @param bundle the bundle to get the task results from.
+	 * Send the results of the tasks in a bundle back to the client who submitted the request.
+	 * @param bundleWrapper the bundle to get the task results from.
 	 * @throws Exception if an IO exception occurred while sending the results back.
 	 */
-	public void sendPartialResults(BundleWrapper bundle) throws Exception
+	public void sendPartialResults(BundleWrapper bundleWrapper) throws Exception
 	{
-		if (debugEnabled) log.debug("Sending bundle with "+bundle.getBundle().getTaskCount()+" tasks");
-		byte[] data = helper.getSerializer().serialize(bundle.getBundle()).getBuffer();
+		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		if (debugEnabled)
+		{
+			Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
+			if (t != null)
+			{
+				int breakpoint = 0;
+			}
+			log.debug("Sending bundle for job '" + bundle.getId() + "' with " + bundle.getTaskCount()+" tasks, exception parameter = " + t);
+		}
+		byte[] data = helper.getSerializer().serialize(bundle).getBuffer();
 		data = JPPFDataTransformFactory.transform(true, data);
 		socketClient.sendBytes(new JPPFBuffer(data, data.length));
-		for (DataLocation task : bundle.getTasks())
+		for (DataLocation task : bundleWrapper.getTasks())
 		{
 			destination.writeInt(task.getSize());
 			task.transferTo(destination, true);

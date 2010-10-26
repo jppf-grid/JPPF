@@ -92,7 +92,6 @@ public class RemoteNodeIO extends AbstractNodeIO
 			{
 				JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
 				cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
-				//cont.deserializeObjects(socketWrapper, list, 1+count);
 				cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());
 			}
 			else
