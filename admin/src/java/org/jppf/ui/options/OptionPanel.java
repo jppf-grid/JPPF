@@ -25,7 +25,10 @@ import javax.swing.border.*;
 import net.miginfocom.swing.MigLayout;
 
 /**
- * Instances of this page represent dynamic UI components representing a page (or panel) container. 
+ * Instances of this page represent dynamic UI components representing a page (or panel) container,
+ * with the underlying Swing component being a JPanel.<br/>
+ * It also implements a specific behavior for radio buttons: any radio button that is a direct child is also
+ * added to a {@link javax.swing.ButtonGroup ButtonGroup}.  
  * @author Laurent Cohen
  */
 public class OptionPanel extends AbstractOptionElement implements OptionsPage
@@ -38,6 +41,10 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 * The panel used to display this options page.
 	 */
 	protected JPanel panel = null;
+	/**
+	 * An eventual button group to which any radio button direct child is added.
+	 */
+	protected ButtonGroup buttonGroup = null;
 
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
@@ -122,6 +129,11 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 		if (element instanceof AbstractOptionElement)
 		{
 			((AbstractOptionElement) element).setParent(this);
+			if (element instanceof RadioButtonOption)
+			{
+				if (buttonGroup == null) buttonGroup = new ButtonGroup();
+				buttonGroup.add((JRadioButton) element.getUIComponent());
+			}
 		}
 		panel.add(element.getUIComponent(), element.getComponentConstraints());
 	}

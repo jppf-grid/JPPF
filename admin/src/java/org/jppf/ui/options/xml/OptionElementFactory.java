@@ -288,6 +288,23 @@ public class OptionElementFactory
 	}
 
 	/**
+	 * Build a radsio button option from the specified option descriptor.
+	 * @param desc the descriptor to get the page properties from.
+	 * @return an <code>Option</code> instance, or null if the option could not be build.
+	 * @throws Exception if an error was raised while building the option.
+	 */
+	public Option buildRadio(OptionDescriptor desc) throws Exception
+	{
+		RadioButtonOption option = new RadioButtonOption();
+		option.setEventsEnabled(false);
+		builder.initCommonOptionAttributes(option, desc);
+		option.setValue(Boolean.valueOf(desc.getBoolean("value")));
+		option.createUI();
+		option.setEventsEnabled(true);
+		return option;
+	}
+
+	/**
 	 * Build a combo box option from the specified option descriptor.
 	 * @param desc the descriptor to get the page properties from.
 	 * @return an <code>Option</code> instance, or null if the option could not be build.

@@ -186,4 +186,13 @@ public class TextAreaOption extends AbstractOption
 	{
 		textArea.setEnabled(enabled);
 	}
+
+	/**
+	 * Get the underlying <code>JTextArea</code>.
+	 * @return an instance of {@link JTextArea}.
+	 */
+	public JTextArea getTextArea()
+	{
+		return textArea;
+	}
 }

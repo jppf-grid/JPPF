@@ -78,7 +78,7 @@ public class ComboBoxOption extends AbstractOption
 			for (Object o: items) combo.addItem(o);
 			if (value != null) combo.setSelectedItem(value);
 		}
-		JLabel comboLabel = new JLabel(label);
+		comboLabel = new JLabel(label);
 		if (toolTipText != null)
 		{
 			combo.setToolTipText(toolTipText);

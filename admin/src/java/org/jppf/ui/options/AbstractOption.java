@@ -143,6 +143,33 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	}
 
 	/**
+	 * Layout 2 components according to the specified layout constraints.
+	 * @param comp1 the first component to layout.
+	 * @param constraint1 the layout constraint for the 1st component.
+	 * @param comp2 the second component to layout.
+	 * @param constraint2 the layout constraint for the 2nd component.
+	 * @return a <code>JPanel</code> instance, enclosing the 2 components plus the filler.
+	 */
+	protected JPanel layoutComponents(JComponent comp1, String constraint1, JComponent comp2, String constraint2)
+	{
+		JPanel panel = new JPanel();
+		String s = getLayoutConstraints().trim();
+		MigLayout mig = new MigLayout(s);
+		panel.setLayout(mig);
+		if ((comp1 == null) && (comp2 == null)) return panel;
+		if ((comp1 != null) && (comp2 != null))
+		{
+			panel.add(comp1, constraint1);
+			panel.add(comp2, constraint2);
+		}
+		else
+		{
+			panel.add(comp1 != null ? comp1 : comp2);
+		}
+		return panel;
+	}
+
+	/**
 	 * Determine whether the value of this option should be saved in the user preferences.
 	 * @return true if the value should be saved, false otherwise.
 	 * @see org.jppf.ui.options.Option#isPersistent()

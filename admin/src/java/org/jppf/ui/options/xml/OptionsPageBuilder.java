@@ -293,6 +293,7 @@ public class OptionsPageBuilder
 		else if ("FormattedNumber".equalsIgnoreCase(desc.type)) list.add(f.buildFormattedNumber(desc));
 		else if ("SpinnerNumber".equalsIgnoreCase(desc.type)) list.add(f.buildSpinnerNumber(desc));
 		else if ("Boolean".equalsIgnoreCase(desc.type)) list.add(f.buildBoolean(desc));
+		else if ("Radio".equalsIgnoreCase(desc.type)) list.add(f.buildRadio(desc));
 		else if ("ComboBox".equalsIgnoreCase(desc.type)) list.add(f.buildComboBox(desc));
 		else if ("Filler".equalsIgnoreCase(desc.type)) list.add(f.buildFiller(desc));
 		else if ("List".equalsIgnoreCase(desc.type)) list.add(f.buildList(desc));

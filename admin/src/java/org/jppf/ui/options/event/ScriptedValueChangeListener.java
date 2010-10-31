@@ -115,7 +115,8 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 		}
 		catch(JPPFScriptingException e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
+			log.error("Error while executing script for " + option + "\nScript = \n" + scriptText, e);
 		}
 	}
 }

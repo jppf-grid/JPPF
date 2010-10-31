@@ -17,97 +17,94 @@
  */
 package org.jppf.ui.options;
 
+import java.awt.event.*;
+
 import javax.swing.*;
-import javax.swing.text.*;
 
 /**
- * Text option displayed as a text field.
+ * An option for boolean values, represented as a radio button.
  * @author Laurent Cohen
  */
-public abstract class TextOption extends AbstractOption
+public class RadioButtonOption extends AbstractOption
 {
-	/**
-	 * Text field containing the option value as text.
-	 */
-	protected JTextField field = null;
-	/**
-	 * Label associated with the text field.
-	 */
-	protected JLabel fieldLabel = null;
-
 	/**
 	 * Constructor provided as a convenience to facilitate the creation of
 	 * option elements through reflexion.
 	 */
-	public TextOption()
+	public RadioButtonOption()
 	{
 	}
 
 	/**
-	 * Initialize this text option with the specified parameters.
+	 * Initialize this boolean option with the specified parameters.
 	 * @param name this component's name.
 	 * @param label the label displayed with the checkbox. 
 	 * @param tooltip the tooltip associated with the checkbox.
 	 * @param value the initial value of this component.
 	 */
-	public TextOption(String name, String label, String tooltip, String value)
+	public RadioButtonOption(String name, String label, String tooltip, Boolean value)
 	{
 		this.name = name;
 		this.label = label;
 		setToolTipText(tooltip);
 		this.value = value;
+		createUI();
 	}
-	
+
 	/**
 	 * Create the UI components for this option.
 	 */
 	public void createUI()
 	{
-		fieldLabel = new JLabel(label);
-		field = createField();
-		field.setColumns(10);
-		if (toolTipText != null)
-		{
-			field.setToolTipText(toolTipText);
-			fieldLabel.setToolTipText(toolTipText);
-		}
-		//UIComponent = layoutComponents(fieldLabel, field);
-		//UIComponent = layoutComponents(fieldLabel, "align left, growx 0, pushx", field, "gap rel, grow");
-		UIComponent = layoutComponents(fieldLabel, "align left, grow 0", field, "gap rel, grow, push");
+		JRadioButton radioButton = new JRadioButton(label, (Boolean) value);
+		if (toolTipText != null) radioButton.setToolTipText(toolTipText);
+		UIComponent = radioButton;
 		setupValueChangeNotifications();
 	}
 
 	/**
-	 * Create the text field that holds the value of this option.
-	 * @return a JTextField instance.
-	 */
-	protected abstract JTextField createField();
-
-	/**
-	 * Get the text in the text field.
-	 * @return a string value.
+	 * Get the current value for this option.
+	 * @return a <code>Boolean</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#getValue()
 	 */
 	public Object getValue()
 	{
-		Document doc = field.getDocument();
-		try
-		{
-			value = doc.getText(0, doc.getLength());
-		}
-		catch(BadLocationException e)
-		{
-		}
+		value = ((JRadioButton) UIComponent).isSelected();
 		return value;
 	}
 
 	/**
-	 * Add a listener to the underlying text document, to receive and propagate change events.
+	 * Set the value of this option.
+	 * @param value the value as an <code>Object</code> instance.
+	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
+	 */
+	public void setValue(Object value)
+	{
+		if (value instanceof String) value = "true".equalsIgnoreCase((String) value);
+		super.setValue(value);
+		if (UIComponent != null)
+		{
+			((JRadioButton) UIComponent).setSelected((Boolean) value);
+			fireValueChanged();
+		}
+	}
+
+	/**
+	 * Propagate the state changes of the underlying checkbox to the listeners to this option.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	protected void setupValueChangeNotifications()
 	{
+		((JRadioButton) UIComponent).addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent event)
+			{
+				getValue();
+				fireValueChanged();
+			}
+		});
 	}
+
 
 	/**
 	 * Enable or disable this option.
@@ -116,7 +113,6 @@ public abstract class TextOption extends AbstractOption
 	 */
 	public void setEnabled(boolean enabled)
 	{
-		field.setEnabled(enabled);
-		fieldLabel.setEnabled(enabled);
+		UIComponent.setEnabled(enabled);
 	}
 }
