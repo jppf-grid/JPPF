@@ -69,6 +69,7 @@ public class ServiceFinder
 					}
 					catch(Exception e)
 					{
+						if (debugEnabled) log.debug(e.getMessage(), e);
 					}
 				}
 				if (clazz == null) clazz = cl.loadClass(s);

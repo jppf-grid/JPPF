@@ -172,7 +172,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 							case FAILED:
 								pool.clientList.remove(c);
 								size--;
-								if (pool.lastUsedIndex >= size) pool.lastUsedIndex--;
+								if (pool.getLastUsedIndex() >= size) pool.setLastUsedIndex(pool.getLastUsedIndex() - 1);
 								if (pool.clientList.isEmpty()) toRemove.add(priority);
 								break;
 						}
@@ -355,13 +355,13 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	public static class ClientPool
 	{
 		/**
-		 * The priority associated with this client pool.
+		 * The priority associated with this pool.
 		 */
-		public int priority = 0;
+		private int priority = 0;
 		/**
-		 * Index of the last used client in the pool.
+		 * Index of the last used connection in this pool.
 		 */
-		public int lastUsedIndex = 0;
+		private int lastUsedIndex = 0;
 		/**
 		 * List of <code>JPPFClientConnection</code> instances with the same priority.
 		 */
@@ -375,7 +375,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		{
 			if (clientList.isEmpty()) return null;
 			lastUsedIndex = ++lastUsedIndex % clientList.size();
-			return clientList.get(lastUsedIndex);
+			return clientList.get(getLastUsedIndex());
 		}
 
 		/**
@@ -385,6 +385,42 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		public int size()
 		{
 			return clientList.size();
+		}
+
+		/**
+		 * Get the priority associated with this pool.
+		 * @return the priority as an int.
+		 */
+		public int getPriority()
+		{
+			return priority;
+		}
+
+		/**
+		 * Set the priority associated with this pool.
+		 * @param priority the priority as an int.
+		 */
+		public void setPriority(int priority)
+		{
+			this.priority = priority;
+		}
+
+		/**
+		 * Get the index of the last used connection in this pool.
+		 * @return the last used index as an int.
+		 */
+		public int getLastUsedIndex()
+		{
+			return lastUsedIndex;
+		}
+
+		/**
+		 * Set the index of the last used connection in this pool.
+		 * @param lastUsedIndex the last used index as an int.
+		 */
+		public void setLastUsedIndex(int lastUsedIndex)
+		{
+			this.lastUsedIndex = lastUsedIndex;
 		}
 	}
 

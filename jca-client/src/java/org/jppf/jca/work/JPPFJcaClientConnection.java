@@ -18,7 +18,7 @@
 
 package org.jppf.jca.work;
 
-import static org.jppf.client.JPPFClientConnectionStatus.DISCONNECTED;
+import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.util.*;
 
@@ -187,6 +187,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 */
 	public void submit(JPPFJob job) throws Exception
 	{
+		setStatus(EXECUTING);
 		JcaResultProcessor proc = new JcaResultProcessor(this, job);
 		executor.submit(proc);
 		if (debugEnabled) log.debug("["+name+"] submitted " + job.getTasks().size() + " tasks");

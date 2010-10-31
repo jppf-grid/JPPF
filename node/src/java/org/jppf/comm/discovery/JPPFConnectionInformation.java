@@ -88,14 +88,14 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	}
 
 	/**
-	 * COmpute the hashcode of this object.
+	 * Compute the hashcode of this object.
 	 * @return the hashcode as an int.
 	 * @see java.lang.Object#hashCode()
 	 */
 	public int hashCode()
 	{
-		return managementPort + (host == null ? 0 : host.hashCode());
-		//return (uuid == null) ? 0 : uuid.hashCode();
+		//return managementPort + (host == null ? 0 : host.hashCode());
+		return (uuid == null) ? 0 : uuid.hashCode();
 	}
 
 	/**
@@ -110,10 +110,10 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 		if (this == obj) return true;
 		if (getClass() != obj.getClass()) return false;
 		JPPFConnectionInformation other = (JPPFConnectionInformation) obj;
-		if (host == null) return (other.host == null) && (other.managementPort == managementPort);
-		return (host.equals(other.host)) && (other.managementPort == managementPort);
-		//if (uuid == null) return other.uuid == null;
-		//return uuid.equals(other.uuid);
+		//if (host == null) return (other.host == null) && (other.managementPort == managementPort);
+		//return (host.equals(other.host)) && (other.managementPort == managementPort);
+		if (uuid == null) return other.uuid == null;
+		return uuid.equals(other.uuid);
 	}
 
 	/**

@@ -91,8 +91,9 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 */
 	public synchronized void setStatus(JPPFClientConnectionStatus status)
 	{
+		JPPFClientConnectionStatus oldStatus = getStatus();
 		this.status = status;
-		fireStatusChanged();
+		if (!status.equals(oldStatus)) fireStatusChanged(oldStatus);
 	}
 
 	/**
@@ -123,11 +124,11 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 
 	/**
 	 * Notify all listeners that the status of this connection has changed.
+	 * @param oldStatus the connection status before the change.
 	 */
-	protected synchronized void fireStatusChanged()
+	protected synchronized void fireStatusChanged(JPPFClientConnectionStatus oldStatus)
 	{
-		ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this);
-		// to avoid ConcurrentModificationException
+		ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
 		ClientConnectionStatusListener[] array = listeners.toArray(new ClientConnectionStatusListener[0]);
 		for (ClientConnectionStatusListener listener: array)
 		{

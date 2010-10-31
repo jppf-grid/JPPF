@@ -136,6 +136,7 @@ public final class NetworkUtils
 			{
 				NetworkInterface ni = interfaces.nextElement();
 				Enumeration<InetAddress> addresses = ni.getInetAddresses();
+				if (debugEnabled && addresses.hasMoreElements()) log.debug("found network interface: " + ni);
 				while (addresses.hasMoreElements())
 				{
 					InetAddress addr = addresses.nextElement();

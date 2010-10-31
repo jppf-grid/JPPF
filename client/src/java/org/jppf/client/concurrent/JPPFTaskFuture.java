@@ -20,7 +20,6 @@ package org.jppf.client.concurrent;
 
 import java.util.concurrent.*;
 
-import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.DateTimeUtils;
 
@@ -29,7 +28,7 @@ import org.jppf.utils.DateTimeUtils;
  * @param <V> the type of the result for the future.
  * @author Laurent Cohen
  */
-class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
+public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 {
 	/**
 	 * The collector that receives the results from the server.
@@ -39,14 +38,6 @@ class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 * The position of the task in the job.
 	 */
 	private int position = -1;
-	/**
-	 * The id of the job the task is a part of.
-	 */
-	private String jobId = null;
-	/**
-	 * JMX connection to the server to which the job was sent.
-	 */
-	private JMXDriverConnectionWrapper jmx = null;
 
 	/**
 	 * Initialize this future with the specified parameters.
@@ -55,22 +46,8 @@ class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 */
 	public JPPFTaskFuture(FutureResultCollector collector, int position)
 	{
-		this(collector, position, null, null);
-	}
-
-	/**
-	 * Initialize this future with the specified parameters.
-	 * @param collector the collector that receives the results from the server.
-	 * @param position the position of the task in the job.
-	 * @param jobId the id of the job the task is a part of.
-	 * @param jmx JMX connection to the server to which the job was sent.
-	 */
-	public JPPFTaskFuture(FutureResultCollector collector, int position, String jobId, JMXDriverConnectionWrapper jmx)
-	{
 		this.collector = collector;
 		this.position = position;
-		this.jobId = jobId;
-		this.jmx = jmx;
 	}
 
 	/**
@@ -138,5 +115,14 @@ class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	void setCancelled()
 	{
 		cancelled.set(true);
+	}
+
+	/**
+	 * Get the task associated with this future.
+	 * @return a {@link JPPFTask} instance.
+	 */
+	public JPPFTask getTask()
+	{
+		return collector.getTask(position);
 	}
 }

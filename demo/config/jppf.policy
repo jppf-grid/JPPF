@@ -62,6 +62,11 @@ permission java.io.FilePermission "C:/jdk1.5.0/jre/lib/xerces.properties", "read
 //permission java.io.FilePermission "jmxconfig/access.properties", "read";
 //permission java.io.FilePermission "jmxconfig/password.properties", "read";
 
+//permission java.io.FilePermission "C:/Users/lcohen/AppData/Local/Temp/-" "read,write,delete";
+//permission java.io.FilePermission "${user.home}/-" "read,write,delete";
+permission java.io.FilePermission "${java.io.tmpdir}/-" "read,write,delete";
+permission javax.management.MBeanTrustPermission "register";
+
 //------------------------------------------------------------------------------//
 // Property permissions.                                                        //
 // Please do not change these permissions. JPPF may not work any more if you do //

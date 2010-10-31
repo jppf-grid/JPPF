@@ -20,6 +20,8 @@ package org.jppf.client.event;
 
 import java.util.EventObject;
 
+import org.jppf.client.JPPFClientConnectionStatus;
+
 /**
  * Event sent to notify of a status change for a client connection.
  * @author Laurent Cohen
@@ -27,12 +29,19 @@ import java.util.EventObject;
 public class ClientConnectionStatusEvent extends EventObject
 {
 	/**
+	 * The connection status before the change.
+	 */
+	private JPPFClientConnectionStatus oldStatus = null;
+
+	/**
 	 * Initialize this event with a client connection as source.
 	 * @param source the event source.
+	 * @param oldStatus the connection status before the change.
 	 */
-	public ClientConnectionStatusEvent(ClientConnectionStatusHandler source)
+	public ClientConnectionStatusEvent(ClientConnectionStatusHandler source, JPPFClientConnectionStatus oldStatus)
 	{
 		super(source);
+		this.oldStatus = oldStatus;
 	}
 
 	/**
@@ -42,5 +51,14 @@ public class ClientConnectionStatusEvent extends EventObject
 	public ClientConnectionStatusHandler getClientConnectionStatusHandler()
 	{
 		return (ClientConnectionStatusHandler) getSource();
+	}
+
+	/**
+	 * Get the connection status before the change.
+	 * @return a {@link JPPFClientConnectionStatus} enum value.
+	 */
+	public JPPFClientConnectionStatus getOldStatus()
+	{
+		return oldStatus;
 	}
 }

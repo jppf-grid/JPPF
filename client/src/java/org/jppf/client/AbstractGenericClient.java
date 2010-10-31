@@ -184,7 +184,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 		if (pool == null)
 		{
 			pool = new ClientPool();
-			pool.priority = priority;
+			pool.setPriority(priority);
 			pools.put(priority, pool);
 		}
 		pool.clientList.add(c);

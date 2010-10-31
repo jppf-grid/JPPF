@@ -18,7 +18,6 @@
 
 package org.jppf.client.concurrent;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
@@ -26,7 +25,7 @@ import java.util.concurrent.atomic.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.DateTimeUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -60,9 +59,9 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 */
 	private AtomicBoolean terminated = new AtomicBoolean(false);
 	/**
-	 * Count of jobs created by this executor service.
+	 * Handles the batching of tasks.
 	 */
-	private static AtomicLong jobCount = new AtomicLong(0);
+	private BatchHandler batchHandler = null;
 
 	/**
 	 * Initialize this executor service with the specified JPPF client.
@@ -71,6 +70,8 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	public JPPFExecutorService(JPPFClient client)
 	{
 		this.client = client;
+		batchHandler = new BatchHandler(this);
+		new Thread(batchHandler, "BatchHandler").start();
 	}
 
 	/**
@@ -111,33 +112,27 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 		long start = System.currentTimeMillis();
 		long millis = DateTimeUtils.toMillis(timeout, unit);
 		if (debugEnabled) log.debug("timeout in millis: " + millis);
-		JPPFJob job = createJob();
-		FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
+		Pair<FutureResultCollector, Integer> pair = batchHandler.addTasks(tasks);
+		FutureResultCollector collector = pair.first();
+		int startPos = pair.second();
 		List<Future<T>> futureList = new ArrayList<Future<T>>(tasks.size());
 		try
 		{
-			int position = 0;
+			int position = startPos;
 			for (Callable<T> task: tasks)
 			{
 				if (task == null) throw new NullPointerException("a task cannot be null");
-				JPPFTask jppfTask = addToJob(job, task);
 				futureList.add(new JPPFTaskFuture<T>(collector, position++));
 			}
-			collector.setTaskCount(job.getTasks().size());
-			submitJob(job);
 			long elapsed = System.currentTimeMillis() - start;
 			if ((millis == 0) || (elapsed < millis)) collector.waitForResults(millis == 0 ? 0 : millis - elapsed);
 			elapsed = System.currentTimeMillis() - start;
 			if (debugEnabled) log.debug("elapsed=" + elapsed);
 			handleFutureList(futureList);
 		}
-		catch(InterruptedException e)
-		{
-			handleFutureList(futureList);
-			throw e;
-		}
 		catch(Exception e)
 		{
+			handleFutureList(futureList);
 			throw new RejectedExecutionException(e);
 		}
 		return futureList;
@@ -199,7 +194,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @throws IllegalArgumentException if tasks empty.
 	 * @throws ExecutionException if no task successfully completes.
 	 * @throws RejectedExecutionException if tasks cannot be scheduled for execution.
-	 * @throws TimeoutException - if the given timeout elapses before any task successfully completes.
+	 * @throws TimeoutException if the given timeout elapses before any task successfully completes.
 	 * @see java.util.concurrent.ExecutorService#invokeAny(java.util.Collection)
 	 * @see java.util.concurrent.ExecutorService#invokeAny(java.util.Collection, long, java.util.concurrent.TimeUnit)
 	 */
@@ -224,20 +219,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	public <T> Future<T> submit(Callable<T> task)
 	{
 		if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
-		JPPFJob job = createJob();
-		Future<T> future = null;
-		try
-		{
-			JPPFTask jppfTask = addToJob(job, task);
-			FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
-			future = new JPPFTaskFuture<T>(collector, jppfTask.getPosition());
-			submitJob(job);
-		}
-		catch(Exception e)
-		{
-			throw new RejectedExecutionException(e);
-		}
-		return future;
+		return batchHandler.addTask(task);
 	}
 
 	/**
@@ -248,6 +230,11 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 */
 	public Future<?> submit(Runnable task)
 	{
+		if (task instanceof JPPFTask)
+		{
+			if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
+			return batchHandler.addTask((JPPFTask) task);
+		}
 		return submit(new RunnableWrapper<Object>(task, null));
 	}
 
@@ -333,6 +320,8 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	{
 		shuttingDown.set(true);
 		terminated.compareAndSet(false, jobMap.isEmpty());
+		batchHandler.setStopped(true);
+		batchHandler.wakeUp();
 	}
 
 	/**
@@ -346,23 +335,10 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	{
 		shuttingDown.set(true);
 		terminated.compareAndSet(false, jobMap.isEmpty());
+		batchHandler.setStopped(true);
+		batchHandler.wakeUp();
 		waitForTerminated(0L);
 		return null;
-	}
-
-	/**
-	 * Create a new job with a FutureResultCollector a results listener.
-	 * @return a {@link JPPFJob} instance.
-	 */
-	private JPPFJob createJob()
-	{
-		JPPFJob job = new JPPFJob();
-		job.setId(getClass().getSimpleName() + " job " + jobCount.incrementAndGet());
-		FutureResultCollector collector = new FutureResultCollector(0, job.getJobUuid());
-		job.setResultListener(collector);
-		job.setBlocking(false);
-		collector.addListener(this);
-		return job;
 	}
 
 	/**
@@ -382,7 +358,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @param job the job to submit.
 	 * @throws Exception if any error occurs.
 	 */
-	private void submitJob(JPPFJob job) throws Exception
+	void submitJob(JPPFJob job) throws Exception
 	{
 		client.submit(job);
 		jobMap.put(job.getJobUuid(), job);
@@ -414,48 +390,6 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	}
 
 	/**
-	 * Callable wrapper around a Runnable.
-	 * @param <V> the type of result.
-	 */
-	private static class RunnableWrapper<V> implements Callable<V>, Serializable
-	{
-		/**
-		 * Explicit serialVersionUID.
-		 */
-		private static final long serialVersionUID = 1L;
-		/**
-		 * The runnable to execute.
-		 */
-		private Runnable runnable = null;
-		/**
-		 * The result to return.
-		 */
-		private V result = null;
-
-		/**
-		 * Initialize this callable with the specified parameters.
-		 * @param runnable the runnable to execute.
-		 * @param result he result to return.
-		 */
-		public RunnableWrapper(Runnable runnable, V result)
-		{
-			this.runnable = runnable;
-			this.result = result;
-		}
-
-		/**
-		 * Execute the task.
-		 * @return the result specified in the constructor.
-		 * @see java.util.concurrent.Callable#call()
-		 */
-		public V call()
-		{
-			runnable.run();
-			return result;
-		}
-	}
-
-	/**
 	 * Called when all results from a job have been received.
 	 * @param event the event object.
 	 * @see org.jppf.client.concurrent.FutureResultCollectorListener#resultsComplete(org.jppf.client.concurrent.FutureResultCollectorEvent)
@@ -465,5 +399,41 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 		String jobUuid = event.getCollector().getJobUuid();
 		jobMap.remove(jobUuid);
 		if (shuttingDown.get() && jobMap.isEmpty()) setTerminated();
+	}
+
+	/**
+	 * Get the minimum number of tasks that must be submitted before they are sent to the server.
+	 * @return the batch size as an int.
+	 */
+	public int getBatchSize()
+	{
+		return batchHandler.getBatchSize();
+	}
+
+	/**
+	 * Set the minimum number of tasks that must be submitted before they are sent to the server.
+	 * @param batchSize the batch size as an int.
+	 */
+	public void setBatchSize(int batchSize)
+	{
+		batchHandler.setBatchSize(batchSize);
+	}
+
+	/**
+	 * Get the maximum time to wait before the next batch of tasks is to be sent for execution.
+	 * @return the timeout as a long.
+	 */
+	public long getBatchTimeout()
+	{
+		return batchHandler.getBatchTimeout();
+	}
+
+	/**
+	 * Set the maximum time to wait before the next batch of tasks is to be sent for execution.
+	 * @param batchTimeout the timeout as a long.
+	 */
+	public void setBatchTimeout(long batchTimeout)
+	{
+		batchHandler.setBatchTimeout(batchTimeout);
 	}
 }
