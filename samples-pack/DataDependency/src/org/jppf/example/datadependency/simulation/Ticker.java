@@ -142,7 +142,7 @@ public class Ticker extends ThreadSynchronization implements Runnable
 	}
 
 	/**
-	 * Fire an event ot notify that the market data with the specified identifier was updated.
+	 * Fire an event to notify that the market data with the specified identifier was updated.
 	 * @param marketData the market data that was updated.
 	 */
 	private void fireTickerEvent(MarketData marketData)
