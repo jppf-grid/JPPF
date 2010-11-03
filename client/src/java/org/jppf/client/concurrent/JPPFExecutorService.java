@@ -114,11 +114,10 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 		if (debugEnabled) log.debug("timeout in millis: " + millis);
 		Pair<FutureResultCollector, Integer> pair = batchHandler.addTasks(tasks);
 		FutureResultCollector collector = pair.first();
-		int startPos = pair.second();
+		int position = pair.second();
 		List<Future<T>> futureList = new ArrayList<Future<T>>(tasks.size());
 		try
 		{
-			int position = startPos;
 			for (Callable<T> task: tasks)
 			{
 				if (task == null) throw new NullPointerException("a task cannot be null");
@@ -128,7 +127,6 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 			if ((millis == 0) || (elapsed < millis)) collector.waitForResults(millis == 0 ? 0 : millis - elapsed);
 			elapsed = System.currentTimeMillis() - start;
 			if (debugEnabled) log.debug("elapsed=" + elapsed);
-			handleFutureList(futureList);
 		}
 		catch(Exception e)
 		{
@@ -202,6 +200,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 			throws InterruptedException, ExecutionException, TimeoutException
 	{
 		List<Future<T>> futureList = invokeAll(tasks, timeout, unit);
+		handleFutureList(futureList);
 		for (Future<T> f: futureList)
 		{
 			if (f.isDone() && !f.isCancelled()) return f.get();
@@ -320,8 +319,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	{
 		shuttingDown.set(true);
 		terminated.compareAndSet(false, jobMap.isEmpty());
-		batchHandler.setStopped(true);
-		batchHandler.wakeUp();
+		batchHandler.close();
 	}
 
 	/**
@@ -335,8 +333,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	{
 		shuttingDown.set(true);
 		terminated.compareAndSet(false, jobMap.isEmpty());
-		batchHandler.setStopped(true);
-		batchHandler.wakeUp();
+		batchHandler.close();
 		waitForTerminated(0L);
 		return null;
 	}

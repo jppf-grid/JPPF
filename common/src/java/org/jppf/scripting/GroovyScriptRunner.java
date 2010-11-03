@@ -59,6 +59,8 @@ public class GroovyScriptRunner implements ScriptRunner
 	 */
 	public Object evaluate(String scriptId, String script, Map<String, Object> variables) throws JPPFScriptingException
 	{
+		try
+		{
 		//GroovyShell shell = new GroovyShell(binding);
 		GroovyShell shell = new GroovyShell();
 		Script groovyScript = scriptMap.get(scriptId);
@@ -71,6 +73,11 @@ public class GroovyScriptRunner implements ScriptRunner
 		for (Map.Entry<String, Object> entry: variables.entrySet()) binding.setVariable(entry.getKey(), entry.getValue());
 		groovyScript.setBinding(binding);
 		return groovyScript.run();
+		}
+		catch(Exception e)
+		{
+			throw new JPPFScriptingException(e);
+		}
 	}
 
 	/**

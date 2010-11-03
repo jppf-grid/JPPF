@@ -17,10 +17,12 @@
  */
 package sample.dist.tasklength;
 
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.Future;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
+import org.jppf.client.concurrent.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
@@ -56,8 +58,8 @@ public class LongTaskRunner
 			int nbTask = props.getInt("longtask.number");
 			int iterations = props.getInt("longtask.iterations");
 			print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
-			perform(nbTask, length, iterations);
-			//performLong(size, iterations);
+			//perform(nbTask, length, iterations);
+			perform3(nbTask, length, iterations);
 		}
 		catch(Exception e)
 		{
@@ -70,13 +72,13 @@ public class LongTaskRunner
 	}
 	
 	/**
-	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
-	 * @param nbTask the number of tasks to send at each iteration.
+	 * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
+	 * @param nbTasks the number of tasks to send at each iteration.
 	 * @param length the executionlength of each task.
 	 * @param iterations the number of times the the tasks will be sent.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static void perform(int nbTask, int length, int iterations) throws Exception
+	private static void perform(int nbTasks, int length, int iterations) throws Exception
 	{
 		try
 		{
@@ -89,7 +91,7 @@ public class LongTaskRunner
 				JPPFJob job = new JPPFJob();
 				job.setId("Long task iteration " + iter);
 				//job.getJobSLA().setMaxNodes(1);
-				for (int i=0; i<nbTask; i++)
+				for (int i=0; i<nbTasks; i++)
 				{
 					LongTask task = new LongTask(length, false);
 					task.setId("" + (iter+1) + ":" + (i+1));
@@ -121,6 +123,81 @@ public class LongTaskRunner
 	}
 
 	/**
+	 * Perform the test using <code>JPPFExecutorService.submit()</code> to submit the tasks individually.
+	 * @param nbTasks the number of tasks to send at each iteration.
+	 * @param length the executionlength of each task.
+	 * @param iterations the number of times the the tasks will be sent.
+	 * @throws Exception if an error is raised during the execution.
+	 */
+	private static void perform2(int nbTasks, int length, int iterations) throws Exception
+	{
+		
+		JPPFExecutorService executor = new JPPFExecutorService(jppfClient);
+		//executor.setBatchSize(50);
+		//executor.setBatchTimeout(1000L);
+		
+		long totalTime = System.currentTimeMillis();
+		List<Future<?>> futureList = new ArrayList<Future<?>>();
+		for (int i=0; i<nbTasks; i++)
+		{
+			LongTask task = new LongTask(length, false);
+			task.setId("" + (i+1));
+			futureList.add(executor.submit(task));
+		}
+		for (Future<?> f: futureList)
+		{
+			f.get();
+			JPPFTask t = ((JPPFTaskFuture<?>) f).getTask(); 
+			if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
+			else System.out.println("task result: " + t.getResult());
+		}
+		totalTime = System.currentTimeMillis() - totalTime;
+		print("Computation time: " + StringUtils.toStringDuration(totalTime));
+		executor.shutdownNow();
+	}
+
+	/**
+	 * Perform the test using <code>JPPFExecutorService.invokeAll()</code> to submit the tasks.
+	 * @param nbTasks the number of tasks to send at each iteration.
+	 * @param length the executionlength of each task.
+	 * @param iterations the number of times the the tasks will be sent.
+	 * @throws Exception if an error is raised during the execution.
+	 */
+	private static void perform3(int nbTasks, int length, int iterations) throws Exception
+	{
+		
+		JPPFExecutorService executor = new JPPFExecutorService(jppfClient);
+		//executor.setBatchSize(50);
+		//executor.setBatchTimeout(1000L);
+		long totalTime = 0L;
+		for (int iter=0; iter<iterations; iter++)
+		{
+			long iterTime = System.currentTimeMillis();
+			List<JPPFTaskCallable> tasks = new ArrayList<JPPFTaskCallable>();
+			List<Future<Object>> futureList = new ArrayList<Future<Object>>();
+			for (int i=0; i<nbTasks; i++)
+			{
+				LongTask task = new LongTask(length, false);
+				task.setId("" + (i+1));
+				tasks.add(new JPPFTaskCallable(task));
+			}
+			futureList = executor.invokeAll(tasks);
+			for (Future<?> f: futureList)
+			{
+				f.get();
+				JPPFTask t = ((JPPFTaskFuture<?>) f).getTask(); 
+				if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
+				else System.out.println("task result: " + t.getResult());
+			}
+			iterTime = System.currentTimeMillis() - iterTime;
+			print("Computation time for iteration " + (iter+1) + ": " + StringUtils.toStringDuration(iterTime));
+			totalTime += iterTime;
+		}
+		print("Average computation time per iteration: " + StringUtils.toStringDuration(totalTime/iterations));
+		executor.shutdownNow();
+	}
+
+	/**
 	 * Print a message tot he log and to the console.
 	 * @param msg the message to print.
 	 */
@@ -128,5 +205,44 @@ public class LongTaskRunner
 	{
 		log.info(msg);
 		System.out.println(msg);
+	}
+
+	/**
+	 * A <code>Callable</code> wrapper around a <code>JPPFTask</code>.
+	 */
+	public static class JPPFTaskCallable extends JPPFTask implements JPPFCallable<Object>
+	{
+		/**
+		 * The task to run.
+		 */
+		private JPPFTask task = null;
+
+		/**
+		 * Initialize this callable with the specified jppf task.
+		 * @param task a <code>JPPFTask</code> instance.
+		 */
+		public JPPFTaskCallable(JPPFTask task)
+		{
+			this.task = task;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public void run()
+		{
+			task.run();
+			setResult(task.getResult());
+			setException(task.getException());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public Object call() throws Exception
+		{
+			run();
+			return getResult();
+		}
 	}
 }

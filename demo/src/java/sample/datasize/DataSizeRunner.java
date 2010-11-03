@@ -59,7 +59,7 @@ public class DataSizeRunner
 	{
 		try
 		{
-			jppfClient = new JPPFClient("whatever");
+			jppfClient = new JPPFClient();
 			//perform();
 			perform2();
 		}
@@ -116,8 +116,8 @@ public class DataSizeRunner
 		else if ("m".equals(unit)) datasize *= MEGA;
 		
 		JPPFExecutorService executor = new JPPFExecutorService(jppfClient);
-		executor.setBatchSize(50);
-		executor.setBatchTimeout(1000L);
+		executor.setBatchSize(100);
+		executor.setBatchTimeout(30L);
 		
 		output("Running datasize demo with data size = " + datasize + " with " + nbTasks + " tasks");
 		long totalTime = System.currentTimeMillis();
