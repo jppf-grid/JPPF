@@ -25,6 +25,7 @@ import javax.crypto.*;
 
 import org.jppf.data.transform.JPPFDataTransform;
 import org.jppf.example.dataencryption.helper.Helper;
+import org.slf4j.*;
 
 /**
  * Sample data transform that uses the DES cyptographic algorithm with a 56 bits secret key. 
@@ -32,6 +33,14 @@ import org.jppf.example.dataencryption.helper.Helper;
  */
 public class SecureKeyCipherTransform implements JPPFDataTransform
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(SecureKeyCipherTransform.class);
+	/**
+	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Secret (symetric) key used for encryption and decryption.
 	 */
@@ -60,8 +69,16 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
 		dos.writeInt(keyBytes.length);
 		// write the key content
 		dos.write(keyBytes);
+
+		// get a new cipher for the actual encryption
+		cipher = Cipher.getInstance(Helper.getTransformation());
+		// init the cipher in encryption mode
+		cipher.init(Cipher.ENCRYPT_MODE, key);
+		// obtain a cipher output stream
+		CipherOutputStream cos = new CipherOutputStream(destination, cipher);
 		// finally, encrypt the data using the new key
-		transform(Cipher.ENCRYPT_MODE, source, destination, key);
+		transform(source, cos);
+		cos.close();
 	}
 
 	/**
@@ -84,8 +101,16 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
 		Cipher cipher = Cipher.getInstance(Helper.getTransformation());
 		cipher.init(Cipher.UNWRAP_MODE, getSecretKey());
 		SecretKey key = (SecretKey) cipher.unwrap(keyBytes, Helper.getAlgorithm(), Cipher.SECRET_KEY);
+
+		// get a new cipher for the actual decryption
+		cipher = Cipher.getInstance(Helper.getTransformation());
+		// init the cipher in decryption mode
+		cipher.init(Cipher.DECRYPT_MODE, key);
+		// obtain a cipher input stream
+		CipherInputStream cis = new CipherInputStream(source, cipher);
 		// finally, decrypt the data using the new key
-		transform(Cipher.DECRYPT_MODE, source, destination, key);
+		transform(cis, destination);
+		cis.close();
 	}
 
 	/**
@@ -115,6 +140,25 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
 		// init the cipher in encryption or decryption mode
 		cipher.init(mode, key);
 		CipherOutputStream cos = new CipherOutputStream(destination, cipher);
+		byte[] buffer = new byte[8192];
+		// encrypt or decrypt from source to destination
+		while (true)
+		{
+			int n = source.read(buffer);
+			if (n <= 0) break;
+			destination.write(buffer, 0, n);
+		}
+	}
+
+	/**
+	 * Transform the specified input source and write it into the specified destination.<br>
+	 * The transformation is either encrytion or decryption, depending on how the cipher was initialized.
+	 * @param source the input stream of data to encrypt/decrypt.
+	 * @param destination the stream into which the encrypted/decrypted data is written.
+	 * @throws Exception if any error occurs while encrypting or decrypting the data.
+	 */
+	private void transform(InputStream source, OutputStream destination) throws Exception
+	{
 		byte[] buffer = new byte[8192];
 		// encrypt or decrypt from source to destination
 		while (true)
