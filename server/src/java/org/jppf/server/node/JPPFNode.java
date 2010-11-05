@@ -126,7 +126,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 		buildNumber = VersionUtils.getBuildNumber();
 		setStopped(false);
 		boolean initialized = false;
-		if (debugEnabled) log.debug("Start of node main loop");
+		if (debugEnabled) log.debug("Start of node main loop, notifying = " + notifying);
 		while (!isStopped())
 		{
 			try
@@ -146,6 +146,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 			catch(Exception e)
 			{
 				log.error(e.getMessage(), e);
+				if (notifying) fireNodeEvent(NodeEventType.DISCONNECTED);
 				if (classLoader != null)
 				{
 					classLoader.reset();
@@ -153,7 +154,6 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 				}
 				try
 				{
-					if (notifying) fireNodeEvent(NodeEventType.DISCONNECTED);
 					synchronized(this)
 					{
 						closeDataChannel();
