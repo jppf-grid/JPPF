@@ -154,11 +154,6 @@ public abstract class AbstractNodeIO implements NodeIO
 	 */
 	public abstract void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception;
 
-	protected JPPFExceptionResult createExceptionResult(Throwable t, Object o)
-	{
-		return null;
-	}
-
 	/**
 	 * A pairing of a list of buffers and the total length of their usable data.
 	 */

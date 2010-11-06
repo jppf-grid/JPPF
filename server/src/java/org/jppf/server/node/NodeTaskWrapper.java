@@ -93,9 +93,15 @@ class NodeTaskWrapper implements Runnable
 			long startTime = System.currentTimeMillis();
 			long startCpuTime = execManager.getCpuTime(id);
 			task.run();
-			// convert cpu time from nanoseconds to milliseconds
-			cpuTime = (execManager.getCpuTime(id) - startCpuTime) / 1000000L;
-			elapsedTime = System.currentTimeMillis() - startTime;
+			try
+			{
+				// convert cpu time from nanoseconds to milliseconds
+				cpuTime = (execManager.getCpuTime(id) - startCpuTime) / 1000000L;
+				elapsedTime = System.currentTimeMillis() - startTime;
+			}
+			catch(Throwable ignore)
+			{
+			}
 		}
 		catch(Throwable t)
 		{

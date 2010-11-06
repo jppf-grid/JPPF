@@ -27,6 +27,7 @@ import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.AbstractJPPFQueue;
 import org.jppf.server.scheduler.bundle.*;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -183,6 +184,13 @@ class TaskQueueChecker implements Runnable
 	private boolean checkJobState(JPPFTaskBundle bundle)
 	{
 		JPPFJobSLA sla = bundle.getJobSLA();
+		if (debugEnabled)
+		{
+			String s = StringUtils.buildString("job '", bundle.getId(), "' : ",
+				"suspended=", sla.isSuspended(), ", pending=", bundle.getParameter(BundleParameter.JOB_PENDING, Boolean.FALSE),
+				", expired=", bundle.getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE));
+			log.debug(s);
+		}
 		if (sla.isSuspended()) return false;
 		boolean b = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING, Boolean.FALSE);
 		if (b) return false;

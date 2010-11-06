@@ -461,12 +461,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		{
 			synchronized(bundleWrapper)
 			{
+				JPPFTaskBundle bundle = bundleWrapper.getBundle();
 				if (debugEnabled)
 				{
-					String jobId = (String) bundleWrapper.getBundle().getParameter(BundleParameter.JOB_ID);
+					String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
 					log.debug("job '" + jobId + "' is resuming");
 				}
-				bundleWrapper.getBundle().setParameter(BundleParameter.JOB_PENDING, false);
+				bundle.setParameter(BundleParameter.JOB_PENDING, false);
 				jobManager.jobUpdated(bundleWrapper);
 			}
 		}
@@ -497,15 +498,15 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		 */
 		public void run()
 		{
-			synchronized(bundleWrapper)
+			//synchronized(bundleWrapper)
 			{
-				String jobId = (String) bundleWrapper.getBundle().getId();
+				JPPFTaskBundle bundle = bundleWrapper.getBundle();
+				String jobId = (String) bundle.getId();
 				try
 				{
 					if (debugEnabled) log.debug("job '" + jobId + "' is expiring");
 					//removeBundle(bundleWrapper);
-					bundleWrapper.getBundle().setParameter(BundleParameter.JOB_EXPIRED, true);
-					JPPFTaskBundle bundle = bundleWrapper.getBundle();
+					bundle.setParameter(BundleParameter.JOB_EXPIRED, true);
 					/*
 					*/
 					if (bundle.getTaskCount() > 0)
