@@ -19,6 +19,7 @@
 package org.jppf.test.setup;
 
 import org.jppf.server.protocol.JPPFTask;
+import org.slf4j.*;
 
 /**
  * A simple JPPF task for unit-testing.
@@ -29,7 +30,7 @@ public class SimpleTask extends JPPFTask
 	/**
 	 * Logger for this class.
 	 */
-	//private static Logger log = LoggerFactory.getLogger(SimpleTask.class);
+	private static Logger log = LoggerFactory.getLogger(SimpleTask.class);
 	/**
 	 * The duration of this task;
 	 */
@@ -60,7 +61,7 @@ public class SimpleTask extends JPPFTask
 		{
 			if (duration > 0) Thread.sleep(duration);
 			setResult(Setup1D1N1C.EXECUTION_SUCCESSFUL_MESSAGE);
-			//log.info("task id =" + getId() + ", duration=" + duration + ", result=" + OneDriverOneNodeSetup.EXECUTION_SUCCESSFUL_MESSAGE);
+			log.info("task id =" + getId() + ", duration=" + duration + ", result=" + getResult());
 		}
 		catch(Exception e)
 		{

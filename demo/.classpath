@@ -12,5 +12,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/admin"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/samples-pack"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

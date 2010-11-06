@@ -19,9 +19,11 @@
 package org.jppf.test.setup;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 
 import org.jppf.process.ProcessWrapper;
+import org.slf4j.*;
 
 /**
  * Super class for launching a JPPF driver or node.
@@ -29,6 +31,14 @@ import org.jppf.process.ProcessWrapper;
  */
 public class GenericProcessLauncher
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(GenericProcessLauncher.class);
+	/**
+	 * Determines whether debug-level logging is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * System path separator.
 	 */
@@ -77,6 +87,14 @@ public class GenericProcessLauncher
 	 * Fully qualifie name of the main class.
 	 */
 	private String mainClass = null;
+	/**
+	 * The server socket the driver listens to.
+	 */
+	private ServerSocket processServer = null;
+	/**
+	 * The port number the erver socket listens to.
+	 */ 
+	private int processPort = 0;
 
 	/**
 	 * Default constructor.
@@ -214,6 +232,7 @@ public class GenericProcessLauncher
 	 */
 	public void startProcess() throws IOException
 	{
+		startDriverSocket();
 		List<String> command = new ArrayList<String>();
 		command.add(System.getProperty("java.home")+"/bin/java");
 		command.add("-cp");
@@ -229,12 +248,15 @@ public class GenericProcessLauncher
 		command.add("-Dlog4j.configuration=" + log4j);
 		command.add("-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger");
 		command.add(mainClass);
-		command.addAll(arguments);
+		//command.addAll(arguments);
+		command.add("" + processPort);
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command(command);
 		if (dir != null) builder.directory(new File(dir));
 		wrapper = new ProcessWrapper();
 		wrapper.setProcess(builder.start());
+		Process process = wrapper.getProcess();
+		log.info("starting process " + process);
 	}
 
 	/**
@@ -242,6 +264,63 @@ public class GenericProcessLauncher
 	 */
 	public void stopProcess()
 	{
-		if ((wrapper != null) && (wrapper.getProcess() != null)) wrapper.getProcess().destroy();
+		if ((wrapper != null) && (wrapper.getProcess() != null))
+		{
+			Process process = wrapper.getProcess();
+			log.info("stopping process " + process);
+			process.destroy();
+		}
+	}
+
+	/**
+	 * Start a server socket that will accept one connection at a time with the JPPF driver, so the server can shtutdown properly,
+	 * when this driver is killed, by a way other than the API (ie CTRL-C or killing the process through the OS shell).<br>
+	 * The port the server socket listens to is dynamically attributed, which is obtained by using the constructor
+	 * <code>new ServerSocket(0)</code>.<br>
+	 * The driver will connect and listen to this port, and exit when the connection is broken.<br>
+	 * The single connection at a time is obtained by doing the <code>ServerSocket.accept()</code> and the
+	 * <code>Socket.getInputStream().read()</code> in the same thread.
+	 * @return the port number on which the server socket is listening.
+	 */
+	protected int startDriverSocket()
+	{
+		try
+		{
+			processServer = new ServerSocket(0);
+			processPort = processServer.getLocalPort();
+			Runnable r = new Runnable()
+			{
+				public void run()
+				{
+					while (true)
+					{
+						try
+						{
+							Socket s = processServer.accept();
+							s.getInputStream().read();
+						}
+						catch(IOException ioe)
+						{
+							if (debugEnabled) log.debug(ioe.getMessage(), ioe);
+						}
+					}
+				}
+			};
+			new Thread(r).start();
+		}
+		catch(Exception e)
+		{
+			try
+			{
+				processServer.close();
+			}
+			catch(IOException ioe)
+			{
+				ioe.printStackTrace();
+				if (debugEnabled) log.debug(ioe.getMessage(), ioe);
+				System.exit(1);
+			}
+		}
+		return processPort;
 	}
 }

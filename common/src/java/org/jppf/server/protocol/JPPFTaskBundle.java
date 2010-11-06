@@ -324,9 +324,14 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 		bundle.setTaskCount(nbTasks);
 		bundle.setDataProvider(dataProvider);
 		taskCount -= nbTasks;
-		bundle.getParametersMap().putAll(parameters);
+		//bundle.getParametersMap().putAll(parameters);
+		synchronized(bundle.getParametersMap())
+		{
+			for (Map.Entry<Object, Object> entry: parameters.entrySet()) bundle.setParameter(entry.getKey(), entry.getValue());
+		}
 		bundle.setQueueEntryTime(queueEntryTime);
 		bundle.setCompletionListener(completionListener);
+		bundle.setJobSLA(jobSLA);
 
 		return bundle;
 	}
@@ -383,7 +388,10 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	 */
 	public void setParameter(Object name, Object value)
 	{
-		parameters.put(name, value);
+		synchronized(parameters)
+		{
+			parameters.put(name, value);
+		}
 	}
 
 	/**

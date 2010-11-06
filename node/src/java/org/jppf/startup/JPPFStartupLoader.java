@@ -52,6 +52,7 @@ public class JPPFStartupLoader<S extends JPPFStartup>
 			{
 				S s = it.next();
 				s.run();
+				if (debugEnabled) log.debug("successful run of startup class " + s.getClass().getName());
 			}
 			catch(Error e)
 			{

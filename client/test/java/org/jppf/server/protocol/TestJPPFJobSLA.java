@@ -49,7 +49,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
 	/**
 	 * A "long" duration for this test.
 	 */
-	private static final long TIME_LONG = 6000L;
+	private static final long TIME_LONG = 5000L;
 	/**
 	 * A "rest" duration for this test.
 	 */
@@ -58,26 +58,6 @@ public class TestJPPFJobSLA extends Setup1D1N1C
 	 * A the date format used in the tests.
 	 */
 	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
-
-	/**
-	 * Simply test that a job does expires at a specified date.
-	 * @throws Exception if any error occurs.
-	 */
-	//@Test
-	public void temp() throws Exception
-	{
-		try
-		{
-			testJobExpirationAtDate();
-			testJobExpirationAtDateTooLate();
-			testJobExpirationAfterDelay();
-			testJobExpirationAfterDelayTooLate();
-		}
-		finally
-		{
-			Thread.sleep(1500L);
-		}
-	}
 
 	/**
 	 * Simply test that a job does expires at a specified date.
@@ -181,7 +161,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
 		for (int i=0; i<nbTasks; i++)
 		{
 			JPPFTask task = new SimpleTask(duration);
-			task.setId("task " + (i+1));
+			task.setId(job.getId()  + " - task " + (i+1));
 			job.addTask(task);
 		}
 		return job;

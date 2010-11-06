@@ -20,6 +20,7 @@ package org.jppf.server.job.management;
 import org.jppf.management.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.slf4j.*;
 
 /**
@@ -70,8 +71,10 @@ class CancelJobTask implements Runnable
 	{
 		try
 		{
-			if (debugEnabled) log.debug("Request to cancel jobId = '" + jobId + "' on node " + channel + ", requeue = " + requeue);
+			AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
+			context.setJobCanceled(true);
 			JPPFManagementInfo nodeInfo = JPPFDriver.getInstance().getNodeInformation(channel);
+			if (debugEnabled) log.debug("Request to cancel jobId = '" + jobId + "' on node " + channel + ", requeue = " + requeue);
 			if (nodeInfo == null) return;
 			JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(nodeInfo.getHost(), nodeInfo.getPort());
 			node.connect();

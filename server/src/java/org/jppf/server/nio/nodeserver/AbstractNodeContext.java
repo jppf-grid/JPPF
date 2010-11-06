@@ -58,6 +58,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * The uuid of the corresponding node.
 	 */
 	protected String nodeUuid = null;
+	/**
+	 * True means the job was cancelled and the task completion listener must not be called.
+	 */
+	protected boolean jobCanceled = false;
 
 	/**
 	 * Get the task bundle to send or receive.
@@ -254,5 +258,23 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
 	{
 		return getNodeMessage().write(channel);
+	}
+
+	/**
+	 * Determine whether the job was canceled.
+	 * @return true if the job was canceled, false otherwise.
+	 */
+	public synchronized boolean isJobCanceled()
+	{
+		return jobCanceled;
+	}
+
+	/**
+	 * Specify whether the job was canceled.
+	 * @param jobCanceled true if the job was canceled, false otherwise.
+	 */
+	public synchronized void setJobCanceled(boolean jobCanceled)
+	{
+		this.jobCanceled = jobCanceled;
 	}
 }

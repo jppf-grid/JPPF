@@ -68,16 +68,16 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 */
 	public void cancelJob(String jobUuid) throws Exception
 	{
+		cancelJobInNodes(jobUuid, false);
 		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
-		if (debugEnabled) log.debug("Request to cancel jobId = '" + bundleWrapper.getBundle().getId() + "'");
-		if (debugEnabled) log.debug("bundleWrapper=" + bundleWrapper);
 		if (bundleWrapper != null)
 		{
+			if (debugEnabled) log.debug("Request to cancel jobId = '" + bundleWrapper.getBundle().getId() + "'");
+			if (debugEnabled) log.debug("bundleWrapper=" + bundleWrapper);
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			BundleWrapper queuedWrapper = JPPFDriver.getQueue().nextBundle(bundleWrapper, bundle.getTaskCount());
 			//if ((queuedWrapper != null) && (bundle.getCompletionListener() != null)) bundle.getCompletionListener().taskCompleted(bundleWrapper);
 		}
-		cancelJobInNodes(jobUuid, false);
 	}
 
 	/**

@@ -47,6 +47,10 @@ public class Setup1D1N1C
 	 * Shutdown hook used to destroy the driver and node processes, in case the JVM terminates abnormally.
 	 */
 	protected static Thread shutdownHook = null;
+	/**
+	 * Specifies whether to launch the driver and node processes, or rely on externally launched ones.
+	 */
+	protected static boolean launchProcesses = true;
 
 	/**
 	 * Launches a driver and node and start the client.
@@ -56,31 +60,21 @@ public class Setup1D1N1C
 	public static void setup() throws Exception
 	{
 		System.out.println("performing setup");
-		/*
-		shutdownHook = new Thread()
+		if (launchProcesses)
 		{
-			public void run()
+			shutdownHook = new Thread()
 			{
-				node.stopProcess();
-				driver.stopProcess();
-			}
-		};
-		Runtime.getRuntime().addShutdownHook(shutdownHook);
-
-		driver = new DriverProcessLauncher();
-		driver.startProcess();
-		node = new NodeProcessLauncher(1);
-		node.startProcess();
-		*/
+				public void run()
+				{
+					stopProcesses();
+				}
+			};
+			Runtime.getRuntime().addShutdownHook(shutdownHook);
+	
+			(driver = new DriverProcessLauncher()).startProcess();
+			(node = new NodeProcessLauncher(1)).startProcess();
+		}
 		client = new JPPFClient();
-		// give some time for everyone to initialize
-		try
-		{
-			Thread.sleep(1000L);
-		}
-		catch(Exception e)
-		{
-		}
 	}
 
 	/**
@@ -90,19 +84,28 @@ public class Setup1D1N1C
 	@AfterClass
 	public static void cleanup() throws Exception
 	{
-		System.out.println("performing cleanup");
+		client.close();
+		Thread.sleep(1000L);
+		if (launchProcesses)
+		{
+			stopProcesses();
+			Runtime.getRuntime().removeShutdownHook(shutdownHook);
+		}
+	}
+
+	/**
+	 * Stop driver and node processes.
+	 */
+	private static void stopProcesses()
+	{
 		try
 		{
-			Thread.sleep(1000L);
+			if (node != null) node.stopProcess();
+			if (driver != null) driver.stopProcess();
 		}
-		catch(Exception e)
+		catch(Throwable t)
 		{
+			t.printStackTrace();
 		}
-		client.close();
-		/*
-		node.stopProcess();
-		driver.stopProcess();
-		Runtime.getRuntime().removeShutdownHook(shutdownHook);
-		*/
 	}
 }

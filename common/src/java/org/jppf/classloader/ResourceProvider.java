@@ -39,7 +39,7 @@ public class ResourceProvider
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
 
 	/**
 	 * Default constructor.

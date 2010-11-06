@@ -70,9 +70,9 @@ public class RemoteNodeIO extends AbstractNodeIO
 	{
 		if (debugEnabled) log.debug("waiting for next request");
 		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
-		if (debugEnabled) log.debug("got bundle");
 		data = JPPFDataTransformFactory.transform(false, data);
 		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
+		if (debugEnabled) log.debug("got bundle " + bundle);
 		return deserializeObjects(bundle);
 	}
 
