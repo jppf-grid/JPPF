@@ -60,10 +60,6 @@ class WaitingResultsState extends NodeServerState
 	public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
-		//if (debugEnabled) log.debug("exec() for " + wrapper);
-
-		// Wait the full byte[] of the bundle come to start processing.
-		// This makes the integration of non-blocking with ObjectInputStream easier.
 		if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage(), wrapper);
 		if (context.readMessage(wrapper))
 		{
@@ -83,16 +79,15 @@ class WaitingResultsState extends NodeServerState
 				newBundleWrapper.setTasks(bundleWrapper.getTasks());
 				newBundle.setTaskCount(bundle.getTaskCount());
 			}
-			// updating stats
 			else
 			{
 				long elapsed = System.currentTimeMillis() - bundle.getExecutionStartTime();
 				statsManager.taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getNodeMessage().getLength());
 				context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 			}
-			Boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE);
+			boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE, false);
 			jobManager.jobReturned(bundleWrapper, wrapper);
-			if ((requeue != null) && requeue)
+			if (requeue)
 			{
 				bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
 				bundle.getJobSLA().setSuspended(true);

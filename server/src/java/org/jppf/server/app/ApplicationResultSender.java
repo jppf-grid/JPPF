@@ -71,7 +71,11 @@ class ApplicationResultSender extends AbstractResultSender
 			}
 			log.debug("Sending bundle for job '" + bundle.getId() + "' with " + bundle.getTaskCount()+" tasks, exception parameter = " + t);
 		}
-		byte[] data = helper.getSerializer().serialize(bundle).getBuffer();
+		byte[] data = null;
+		synchronized(bundle.getParametersMap())
+		{
+			data = helper.getSerializer().serialize(bundle).getBuffer();
+		}
 		data = JPPFDataTransformFactory.transform(true, data);
 		socketClient.sendBytes(new JPPFBuffer(data, data.length));
 		for (DataLocation task : bundleWrapper.getTasks())
