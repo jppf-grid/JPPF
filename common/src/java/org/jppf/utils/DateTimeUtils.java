@@ -36,7 +36,7 @@ public final class DateTimeUtils
 	 */
 	public static long toMillis(long time, TimeUnit unit)
 	{
-		long millis = unit.convert(time, TimeUnit.MILLISECONDS);
+		long millis = TimeUnit.MILLISECONDS.equals(unit) ? time : unit.convert(time, TimeUnit.MILLISECONDS);
 		long remainder = 0L;
 		if (TimeUnit.NANOSECONDS.equals(unit))
 		{
