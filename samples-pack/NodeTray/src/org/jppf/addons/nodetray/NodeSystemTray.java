@@ -62,7 +62,7 @@ public class NodeSystemTray
 	/**
 	 * Proxy to the task monitor MBean.
 	 */
-	private JPPFNodeTaskMonitorMBean proxy = null;
+	private JPPFNodeTaskMonitorMBean taskMonitor = null;
 	/**
 	 * Used to synchronize tooltip and icon updates.
 	 */
@@ -111,8 +111,8 @@ public class NodeSystemTray
 			trayIcon.setImage(image);
 			ObjectName objectName = new ObjectName(JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME);
 		  MBeanServerConnection mbsc = wrapper.getMbeanConnection();
-		  proxy = (JPPFNodeTaskMonitorMBean) MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, JPPFNodeTaskMonitorMBean.class, true);
-		  proxy.addNotificationListener(new JMXNotificationListener(), null, null);
+		  taskMonitor = (JPPFNodeTaskMonitorMBean) MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, JPPFNodeTaskMonitorMBean.class, true);
+		  taskMonitor.addNotificationListener(new JMXNotificationListener(), null, null);
 		}
 		catch(Exception e)
 		{
@@ -143,13 +143,13 @@ public class NodeSystemTray
 	{
     StringBuilder sb = new StringBuilder();
     sb.append("Node localhost:").append(JPPFConfiguration.getProperties().getInt("jppf.management.port")).append("\n");
-    if (proxy != null)
+    if (taskMonitor != null)
     {
-	    sb.append("Tasks executed: ").append(proxy.getTotalTasksExecuted()).append("\n");
-	    sb.append("  successfull: ").append(proxy.getTotalTasksSucessfull()).append("\n");
-	    sb.append("  in error: ").append(proxy.getTotalTasksInError()).append("\n");
-	    sb.append("CPU time: ").append(StringUtils.toStringDuration(proxy.getTotalTaskCpuTime())).append("\n");
-	    sb.append("Clock time: ").append(StringUtils.toStringDuration(proxy.getTotalTaskElapsedTime()));
+	    sb.append("Tasks executed: ").append(taskMonitor.getTotalTasksExecuted()).append("\n");
+	    sb.append("  successful: ").append(taskMonitor.getTotalTasksSucessfull()).append("\n");
+	    sb.append("  in error: ").append(taskMonitor.getTotalTasksInError()).append("\n");
+	    sb.append("CPU time: ").append(StringUtils.toStringDuration(taskMonitor.getTotalTaskCpuTime())).append("\n");
+	    sb.append("Clock time: ").append(StringUtils.toStringDuration(taskMonitor.getTotalTaskElapsedTime()));
     }
     return sb.toString();
 	}
@@ -218,7 +218,7 @@ public class NodeSystemTray
 			// if the node has reconnected to the server
 			else if (NodeEventType.END_CONNECT.equals(type))
 			{
-				trayIcon.displayMessage("JPPF Node re-connected", null, MessageType.INFO);
+				trayIcon.displayMessage("JPPF Node connected", null, MessageType.INFO);
 			}
 			lastEventType = type;
   		lock.lock();
