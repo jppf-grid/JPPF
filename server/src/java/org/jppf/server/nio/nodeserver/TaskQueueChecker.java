@@ -152,10 +152,18 @@ class TaskQueueChecker implements Runnable
 			if (!ch.isOpen())
 			{
 				channelsToRemove.add(i);
+				if (debugEnabled) log.debug("channel is not opened: " + ch);
 				continue;
 			}
 			AbstractNodeContext context = (AbstractNodeContext) ch.getContext();
-			if (uuidPath.contains(context.getNodeUuid())) continue;
+			if (uuidPath.contains(context.getNodeUuid()))
+			{
+				if (log.isTraceEnabled())
+				{
+					log.trace("bundle uuid path already contains node " + ch + " : uuidPath=" + uuidPath + ", nodeUuid=" + context.getNodeUuid());
+				}
+				continue;
+			}
 			if (rule != null)
 			{
 				JPPFManagementInfo mgtInfo = driver.getNodeInformation(ch);

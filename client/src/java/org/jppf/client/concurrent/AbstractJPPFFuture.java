@@ -36,6 +36,18 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
 	 * The cancellation status of the task represented by this future.
 	 */
 	protected AtomicBoolean cancelled = new AtomicBoolean(false);
+	/**
+	 * TDetrmines whether the task execution timed out.
+	 */
+	protected AtomicBoolean timedout = new AtomicBoolean(false);
+	/**
+	 * The execution result.
+	 */
+	protected V result = null;
+	/**
+	 * An exception that may be rasied by the execution of the task.
+	 */
+	protected Exception exception = null;
 
 	/**
 	 * Attempts to cancel execution of this task. This attempt will fail if the task has already completed,

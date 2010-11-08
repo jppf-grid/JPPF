@@ -20,8 +20,6 @@ package org.jppf.test.setup;
 
 import java.io.Serializable;
 
-import org.jppf.client.concurrent.TestJPPFExecutorService;
-
 /**
  * A simple runnable task implementation.
  */
@@ -58,6 +56,6 @@ public class SimpleRunnable implements Runnable, Serializable
 	 */
 	public void run()
 	{
-		executionResult.message = TestJPPFExecutorService.EXECUTION_SUCCESSFUL_MESSAGE;
+		executionResult.message = BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE;
 	}
 }

@@ -20,9 +20,8 @@ package org.jppf.client.concurrent;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
@@ -87,7 +86,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 */
 	public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException
 	{
-		return invokeAll(tasks, 0L, TimeUnit.MILLISECONDS);
+		return invokeAll(tasks, Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 	}
 
 	/**
@@ -104,34 +103,25 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @throws RejectedExecutionException if any task cannot be scheduled for execution.
 	 * @see java.util.concurrent.ExecutorService#invokeAll(java.util.Collection, long, java.util.concurrent.TimeUnit)
 	 */
-	public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
-			throws InterruptedException
+	public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException
 	{
 		if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
 		if (timeout < 0) throw new IllegalArgumentException("timeout cannot be negative");
 		long start = System.currentTimeMillis();
-		long millis = DateTimeUtils.toMillis(timeout, unit);
+		long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
 		if (debugEnabled) log.debug("timeout in millis: " + millis);
 		Pair<FutureResultCollector, Integer> pair = batchHandler.addTasks(tasks);
 		FutureResultCollector collector = pair.first();
 		int position = pair.second();
 		List<Future<T>> futureList = new ArrayList<Future<T>>(tasks.size());
-		try
+		for (Callable<T> task: tasks)
 		{
-			for (Callable<T> task: tasks)
-			{
-				if (task == null) throw new NullPointerException("a task cannot be null");
-				futureList.add(new JPPFTaskFuture<T>(collector, position++));
-			}
+			if (task == null) throw new NullPointerException("a task cannot be null");
+			JPPFTaskFuture future = new JPPFTaskFuture<T>(collector, position);
+			futureList.add(future);
 			long elapsed = System.currentTimeMillis() - start;
-			if ((millis == 0) || (elapsed < millis)) collector.waitForResults(millis == 0 ? 0 : millis - elapsed);
-			elapsed = System.currentTimeMillis() - start;
-			if (debugEnabled) log.debug("elapsed=" + elapsed);
-		}
-		catch(Exception e)
-		{
-			handleFutureList(futureList);
-			throw new RejectedExecutionException(e);
+			future.getResult(millis - elapsed);
+			position++;
 		}
 		return futureList;
 	}
@@ -171,7 +161,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	{
 		try
 		{
-			return invokeAny(tasks, 0L, TimeUnit.MILLISECONDS);
+			return invokeAny(tasks, Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 		}
 		catch(TimeoutException e)
 		{
@@ -274,7 +264,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	{
 		long millis = DateTimeUtils.toMillis(timeout, unit);
 		waitForTerminated(millis);
-		return terminated.get();
+		return isTerminated();
 	}
 
 	/**
@@ -318,7 +308,11 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	public void shutdown()
 	{
 		shuttingDown.set(true);
-		terminated.compareAndSet(false, jobMap.isEmpty());
+		synchronized(jobMap)
+		{
+			if (debugEnabled) log.debug("normal shutdown requested, " + jobMap.size() + " jobs pending");
+			terminated.compareAndSet(false, jobMap.isEmpty());
+		}
 		batchHandler.close();
 	}
 
@@ -332,22 +326,16 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	public List<Runnable> shutdownNow()
 	{
 		shuttingDown.set(true);
-		terminated.compareAndSet(false, jobMap.isEmpty());
+		synchronized(jobMap)
+		{
+			if (debugEnabled) log.debug("immediate shutdown requested, " + jobMap.size() + " jobs pending");
+			//terminated.compareAndSet(false, jobMap.isEmpty());
+			jobMap.clear();
+		}
+		setTerminated();
 		batchHandler.close();
-		waitForTerminated(0L);
+		waitForTerminated(Long.MAX_VALUE);
 		return null;
-	}
-
-	/**
-	 * Add the specified task to the specified job.
-	 * @param job the job to add a task to.
-	 * @param object the task to add to the job.
-	 * @return the task eventually wrapped in a {@link JPPFTask} instance.
-	 * @throws JPPFException if any error occurs.
-	 */
-	private JPPFTask addToJob(JPPFJob job, Object object) throws JPPFException
-	{
-		return job.addTask(object);
 	}
 
 	/**
@@ -357,8 +345,12 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 */
 	void submitJob(JPPFJob job) throws Exception
 	{
+		if (debugEnabled) log.debug("submitting job '" + job.getId() + "' with " + job.getTasks().size() + " tasks");
 		client.submit(job);
-		jobMap.put(job.getJobUuid(), job);
+		synchronized(jobMap)
+		{
+			jobMap.put(job.getJobUuid(), job);
+		}
 	}
 
 	/**
@@ -369,13 +361,13 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	{
 		long elapsed = 0L;
 		long start = System.currentTimeMillis();
-		while (!terminated.get() && ((timeout == 0L) || (elapsed < timeout)))
+		while (!isTerminated() && (elapsed < timeout))
 		{
 			synchronized (this)
 			{
 				try
 				{
-					wait(timeout == 0L ? 0L : timeout - elapsed);
+					wait(timeout - elapsed);
 				}
 				catch(InterruptedException e)
 				{
@@ -394,8 +386,11 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	public void resultsComplete(FutureResultCollectorEvent event)
 	{
 		String jobUuid = event.getCollector().getJobUuid();
-		jobMap.remove(jobUuid);
-		if (shuttingDown.get() && jobMap.isEmpty()) setTerminated();
+		synchronized(jobMap)
+		{
+			jobMap.remove(jobUuid);
+			if (isShutdown() && jobMap.isEmpty()) setTerminated();
+		}
 	}
 
 	/**

@@ -126,7 +126,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 		buildNumber = VersionUtils.getBuildNumber();
 		setStopped(false);
 		boolean initialized = false;
-		if (debugEnabled) log.debug("Start of node main loop, notifying = " + notifying);
+		if (debugEnabled) log.debug("Start of node main loop, nodeUuid=" + uuid);
 		while (!isStopped())
 		{
 			try

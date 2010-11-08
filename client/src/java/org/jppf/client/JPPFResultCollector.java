@@ -83,7 +83,7 @@ public class JPPFResultCollector implements TaskResultListener
 	 */
 	public synchronized List<JPPFTask> waitForResults()
 	{
-		return waitForResults(0);
+		return waitForResults(Long.MAX_VALUE);
 	}
 
 	/**
@@ -98,12 +98,12 @@ public class JPPFResultCollector implements TaskResultListener
 		if (debugEnabled) log.debug("timeout = " + millis);
 		long start = System.currentTimeMillis();
 		long elapsed = 0;
-		while (((millis == 0) || (elapsed < millis)) && (pendingCount > 0))
+		while ((elapsed < millis) && (pendingCount > 0))
 		{
 			try
 			{
-				wait(millis == 0 ? 0 : millis - elapsed);
-				if ((millis > 0) && (elapsed >= millis)) return null;
+				wait(millis - elapsed);
+				if (elapsed >= millis) return null;
 			}
 			catch(InterruptedException e)
 			{

@@ -18,8 +18,6 @@
 
 package org.jppf.test.setup;
 
-import java.io.IOException;
-
 import org.junit.*;
 
 /**
@@ -30,10 +28,6 @@ import org.junit.*;
  */
 public class Setup1D1N
 {
-	/**
-	 * Message used for successful task execution.
-	 */
-	public static final String EXECUTION_SUCCESSFUL_MESSAGE = "execution successful";
 	/**
 	 * The node to lunch for the test.
 	 */
@@ -46,58 +40,72 @@ public class Setup1D1N
 	 * Shutdown hook used to destroy the driver and node processes, in case the JVM terminates abnormally.
 	 */
 	protected static Thread shutdownHook = null;
+	/**
+	 * Specifies whether to launch the driver and node processes, or rely on externally launched ones.
+	 */
+	protected static boolean launchProcesses = true;
 
 	/**
-	 * Launches a driver and node and start the client.
-	 * @throws IOException if a process could not be started.
+	 * Stop driver and node processes.
 	 */
-	@BeforeClass
-	public static void setup() throws IOException
+	protected static void stopProcesses()
 	{
-		/*
-		*/
+		try
+		{
+			if (node != null) node.stopProcess();
+			if (driver != null) driver.stopProcess();
+		}
+		catch(Throwable t)
+		{
+			t.printStackTrace();
+		}
+	}
+
+	/**
+	 * Create the shutdown hook.
+	 */
+	protected static void createShutdownHook()
+	{
 		shutdownHook = new Thread()
 		{
 			public void run()
 			{
-				node.stopProcess();
-				driver.stopProcess();
+				stopProcesses();
 			}
 		};
 		Runtime.getRuntime().addShutdownHook(shutdownHook);
+	}
 
-		driver = new DriverProcessLauncher();
-		driver.startProcess();
-		node = new NodeProcessLauncher(1);
-		node.startProcess();
-		// give some time for everyone to initialize
-		try
+	/**
+	 * Launches a driver and node and start the client.
+	 * @throws Exception if a process could not be started.
+	 */
+	@BeforeClass
+	public static void setup() throws Exception
+	{
+		System.out.println("performing setup");
+		if (launchProcesses)
 		{
-			Thread.sleep(1000L);
-		}
-		catch(Exception e)
-		{
+			createShutdownHook();
+			(driver = new DriverProcessLauncher()).startProcess();
+			// to avoid driver and node producing the same UUID
+			Thread.sleep(51L);
+			(node = new NodeProcessLauncher(1)).startProcess();
 		}
 	}
 
 	/**
 	 * Stops the driver and node and close the client.
-	 * @throws IOException if a process could not be stopped.
+	 * @throws Exception if a process could not be stopped.
 	 */
 	@AfterClass
-	public static void cleanup() throws IOException
+	public static void cleanup() throws Exception
 	{
-		/*
-		*/
-		try
+		Thread.sleep(1000L);
+		if (launchProcesses)
 		{
-			Thread.sleep(1000L);
+			stopProcesses();
+			Runtime.getRuntime().removeShutdownHook(shutdownHook);
 		}
-		catch(Exception e)
-		{
-		}
-		node.stopProcess();
-		driver.stopProcess();
-		Runtime.getRuntime().removeShutdownHook(shutdownHook);
 	}
 }

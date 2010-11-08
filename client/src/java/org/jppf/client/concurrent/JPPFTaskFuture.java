@@ -22,6 +22,7 @@ import java.util.concurrent.*;
 
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.DateTimeUtils;
+import org.slf4j.*;
 
 /**
  * Implementation of a future handled by a {@link JPPFExecutorService}.
@@ -30,6 +31,14 @@ import org.jppf.utils.DateTimeUtils;
  */
 public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(JPPFTaskFuture.class);
+	/**
+	 * Determines whether debug-level logging is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The collector that receives the results from the server.
 	 */
@@ -58,7 +67,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 */
 	public boolean isDone()
 	{
-		done.compareAndSet(false, collector.isTaskReceived(position));
+		//done.compareAndSet(false, collector.isTaskReceived(position));
 		return done.get();
 	}
 
@@ -71,12 +80,16 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 */
 	public V get() throws InterruptedException, ExecutionException
 	{
-		if (isDone())
+		V v = null;
+		try
 		{
-			JPPFTask task = collector.getTask(position);
-			return task == null ? null : (V) task.getResult();
+			v = get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 		}
-		return (V) collector.waitForTask(position).getResult();
+		catch(TimeoutException e)
+		{
+			if (debugEnabled) log.debug("wait timed out, but it shouldn't have", e);
+		}
+		return v;
 	}
 
 	/**
@@ -92,13 +105,36 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 */
 	public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
 	{
-		if (isDone())
+		long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
+		getResult(millis);
+		if (timedout.get()) throw new TimeoutException("wait timed out");
+		else if (exception != null) throw new ExecutionException(exception);
+		return result;
+	}
+
+	/**
+	 * Wait until the execution is complete, or the specified timeout has expired, whichever happens first.
+	 * @param timeout the maximum time to wait.
+	 */
+	void getResult(long timeout)
+	{
+		if (!isDone())
 		{
-			JPPFTask task = collector.getTask(position);
-			return task == null ? null : (V) task.getResult();
+			JPPFTask task = null;
+			task = (timeout > 0) ? collector.waitForTask(position, timeout) : collector.getTask(position);
+			setDone();
+			if (task == null)
+			{
+				setCancelled();
+				timedout.set(timeout > 0);
+			}
+			else
+			{
+				result = (V) task.getResult();
+				exception = task.getException();
+			}
 		}
-		long millis = DateTimeUtils.toMillis(timeout, unit);
-		return (V) collector.waitForTask(position, millis).getResult();
+		return;
 	}
 
 	/**

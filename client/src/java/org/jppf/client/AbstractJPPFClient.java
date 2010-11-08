@@ -87,6 +87,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	protected AbstractJPPFClient(String uuid)
 	{
 		this.uuid = uuid;
+		if (debugEnabled) log.debug("Instantiating JPPF client with uuid=" + uuid);
 	}
 
 	/**

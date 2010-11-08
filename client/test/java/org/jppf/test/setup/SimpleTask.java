@@ -60,7 +60,7 @@ public class SimpleTask extends JPPFTask
 		try
 		{
 			if (duration > 0) Thread.sleep(duration);
-			setResult(Setup1D1N1C.EXECUTION_SUCCESSFUL_MESSAGE);
+			setResult(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE);
 			log.info("task id =" + getId() + ", duration=" + duration + ", result=" + getResult());
 		}
 		catch(Exception e)

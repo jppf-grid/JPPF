@@ -30,7 +30,9 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * This class is a processor for tasks submitted via a {@link JPPFExecutorService}.
+ * It handles both normal mode and batching mode, where the tasks throughput is streamlined
+ * by specifying how many tasks should be sent to the grid, and a which intervals.
  * @author Laurent Cohen
  */
 public class BatchHandler extends ThreadSynchronization implements Runnable
@@ -60,11 +62,12 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 */
 	private JPPFExecutorService executor = null;
 	/**
-	 * 
+	 * The job to send for execution. If the reference is ont null, then the job is sent immediately.
 	 */
 	private AtomicReference<JPPFJob> currentJobRef = new AtomicReference<JPPFJob>(null);
 	/**
-	 * 
+	 * The next job being prepared. It will be assigned to <code>currentJobRef</code> when it is ready for execution,
+	 * depending on the batching parameters.
 	 */
 	private AtomicReference<JPPFJob> nextJobRef = new AtomicReference<JPPFJob>(null);
 	/**
@@ -76,11 +79,11 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 */
 	private long elapsed = 0L;
 	/**
-	 * 
+	 * Used to synchronize access to <code>currentJobRef</code> and <code>nextJobRef</code>
 	 */
 	private ReentrantLock lock = new ReentrantLock();
 	/**
-	 * 
+	 * Represents a condtion to await for and corresponding to when <code>currentJobRef</code> is not null.
 	 */
 	private Condition jobReady = lock.newCondition();
 
@@ -157,8 +160,9 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 					if (isStopped()) break;
 					JPPFJob job = currentJobRef.get();
 					if (debugEnabled) log.debug("submitting job " + job.getId() + " with " + job.getTasks().size() + " tasks");
+					FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
+					collector.setTaskCount(job.getTasks().size());
 					executor.submitJob(job);
-					job = null;
 					currentJobRef.set(null);
 					elapsed = System.currentTimeMillis() - start;
 				}
@@ -267,7 +271,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 * Submit a list of tasks for execution.
 	 * @param <T> the type of the results.
 	 * @param tasks the tasks to submit.
-	 * @return a pair representing the reuslt collector used in the current job, along with the position of the first task. 
+	 * @return a pair representing the result collector used in the current job, along with the position of the first task. 
 	 */
 	<T> Pair<FutureResultCollector, Integer> addTasks(Collection<? extends Callable<T>> tasks)
 	{

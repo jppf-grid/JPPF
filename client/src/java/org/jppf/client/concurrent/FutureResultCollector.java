@@ -85,25 +85,25 @@ class FutureResultCollector extends JPPFResultCollector
 	 */
 	synchronized JPPFTask waitForTask(int position)
 	{
-		return waitForTask(position, 0L);
+		return waitForTask(position, Long.MAX_VALUE);
 	}
 
 	/**
 	 * Wait for the execution results of the specified task to be received.
 	 * @param position the position of the task in the job it is a part of.
 	 * @param millis maximum number of miliseconds to wait.
-	 * @return the task whose results were received.
+	 * @return the task whose results were received, or null if the tiemout expired before it was received.
 	 */
 	synchronized JPPFTask waitForTask(int position, long millis)
 	{
 		long start = System.currentTimeMillis();
 		long elapsed = 0;
 		boolean taskReceived = isTaskReceived(position);
-		while (((millis == 0) || (elapsed < millis)) && !taskReceived)
+		while ((elapsed < millis) && !taskReceived)
 		{
 			try
 			{
-				wait(millis == 0 ? 0 : millis - elapsed);
+				wait(millis - elapsed);
 			}
 			catch(InterruptedException e)
 			{
@@ -111,7 +111,7 @@ class FutureResultCollector extends JPPFResultCollector
 			}
 			elapsed = System.currentTimeMillis() - start;
 			taskReceived = isTaskReceived(position);
-			if ((millis > 0) && (elapsed >= millis) && !taskReceived) return null;
+			if ((elapsed >= millis) && !taskReceived) return null;
 		}
 		return resultMap.get(position);
 	}

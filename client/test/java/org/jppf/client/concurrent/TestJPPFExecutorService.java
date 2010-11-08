@@ -36,7 +36,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
 	/**
 	 * Default duration for tasks that use a duration. Adjust the value for slow hardware.
 	 */
-	protected static final long TASK_DURATION = 200L;
+	protected static final long TASK_DURATION = 1000L;
 	/**
 	 * The executor we are testing.
 	 */
@@ -69,7 +69,8 @@ public class TestJPPFExecutorService extends Setup1D1N1C
 	@Test
 	public void testSubmitRunnable() throws Exception
 	{
-		SimpleRunnable sr = new SimpleRunnable();
+		Result result = new Result();
+		SimpleRunnable sr = new SimpleRunnable(result);
 		Future<?> future = executor.submit(sr);
 		future.get();
 		assertTrue(future.isDone());
@@ -91,7 +92,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
 		assertTrue(future.isDone());
 		assertFalse(future.isCancelled());
 		assertNotNull(finalResult);
-		assertEquals(EXECUTION_SUCCESSFUL_MESSAGE, finalResult.message);
+		assertEquals(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE, finalResult.message);
 	}
 
 	/**
@@ -108,7 +109,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
 		assertTrue(future.isDone());
 		assertFalse(future.isCancelled());
 		assertNotNull(finalResult);
-		assertEquals(EXECUTION_SUCCESSFUL_MESSAGE, finalResult.message);
+		assertEquals(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE, finalResult.message);
 	}
 
 	/**
@@ -132,7 +133,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
 			assertTrue(future.isDone());
 			assertFalse(future.isCancelled());
 			assertNotNull(finalResult);
-			assertEquals(EXECUTION_SUCCESSFUL_MESSAGE, finalResult.message);
+			assertEquals(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE, finalResult.message);
 			assertEquals(i, finalResult.position);
 		}
 	}
@@ -173,7 +174,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
 		for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i));
 		Result result = executor.invokeAny(tasks);
 		assertNotNull(result);
-		assertEquals(EXECUTION_SUCCESSFUL_MESSAGE, result.message);
+		assertEquals(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE, result.message);
 		assertTrue(result.position >= 0);
 	}
 
@@ -245,6 +246,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
 	public void testAwaitTermination2() throws Exception
 	{
 		executor.submit(new SimpleCallable(0, TASK_DURATION));
+		Thread.sleep(100L);
 		executor.shutdown();
 		assertFalse(executor.awaitTermination(TASK_DURATION/2L, TimeUnit.MILLISECONDS));
 		assertTrue(executor.isShutdown());

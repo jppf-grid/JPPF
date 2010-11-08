@@ -28,9 +28,9 @@ import org.junit.*;
 public class Setup1D1N1C
 {
 	/**
-	 * Message used for successful task execution.
+	 * The jppf client to use.
 	 */
-	public static final String EXECUTION_SUCCESSFUL_MESSAGE = "execution successful";
+	protected static JPPFClient client = null;
 	/**
 	 * The node to lunch for the test.
 	 */
@@ -40,10 +40,6 @@ public class Setup1D1N1C
 	 */
 	protected static DriverProcessLauncher driver = null;
 	/**
-	 * The jppf client to use.
-	 */
-	protected static JPPFClient client = null;
-	/**
 	 * Shutdown hook used to destroy the driver and node processes, in case the JVM terminates abnormally.
 	 */
 	protected static Thread shutdownHook = null;
@@ -51,6 +47,37 @@ public class Setup1D1N1C
 	 * Specifies whether to launch the driver and node processes, or rely on externally launched ones.
 	 */
 	protected static boolean launchProcesses = true;
+
+	/**
+	 * Stop driver and node processes.
+	 */
+	protected static void stopProcesses()
+	{
+		try
+		{
+			if (node != null) node.stopProcess();
+			if (driver != null) driver.stopProcess();
+		}
+		catch(Throwable t)
+		{
+			t.printStackTrace();
+		}
+	}
+
+	/**
+	 * Create the shutdown hook.
+	 */
+	protected static void createShutdownHook()
+	{
+		shutdownHook = new Thread()
+		{
+			public void run()
+			{
+				stopProcesses();
+			}
+		};
+		Runtime.getRuntime().addShutdownHook(shutdownHook);
+	}
 
 	/**
 	 * Launches a driver and node and start the client.
@@ -62,19 +89,14 @@ public class Setup1D1N1C
 		System.out.println("performing setup");
 		if (launchProcesses)
 		{
-			shutdownHook = new Thread()
-			{
-				public void run()
-				{
-					stopProcesses();
-				}
-			};
-			Runtime.getRuntime().addShutdownHook(shutdownHook);
-	
+			createShutdownHook();
 			(driver = new DriverProcessLauncher()).startProcess();
+			// to avoid driver and node producing the same UUID
+			Thread.sleep(51L);
 			(node = new NodeProcessLauncher(1)).startProcess();
 		}
 		client = new JPPFClient();
+		Thread.sleep(1000L);
 	}
 
 	/**
@@ -90,22 +112,6 @@ public class Setup1D1N1C
 		{
 			stopProcesses();
 			Runtime.getRuntime().removeShutdownHook(shutdownHook);
-		}
-	}
-
-	/**
-	 * Stop driver and node processes.
-	 */
-	private static void stopProcesses()
-	{
-		try
-		{
-			if (node != null) node.stopProcess();
-			if (driver != null) driver.stopProcess();
-		}
-		catch(Throwable t)
-		{
-			t.printStackTrace();
 		}
 	}
 }

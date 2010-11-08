@@ -93,7 +93,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
 		assertEquals(results.size(), 1);
 		JPPFTask task = results.get(0);
 		assertNotNull(task.getResult());
-		assertEquals(Setup1D1N1C.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+		assertEquals(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
 		assertEquals(results.size(), 1);
 		JPPFTask task = results.get(0);
 		assertNotNull(task.getResult());
-		assertEquals(Setup1D1N1C.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+		assertEquals(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
 	}
 
 	/**

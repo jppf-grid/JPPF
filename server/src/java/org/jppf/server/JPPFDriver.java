@@ -133,6 +133,7 @@ public class JPPFDriver
 		new JmxMessageNotifier();
 		statsManager.addListener(statsUpdater);
 		credentials = new DriverInitializer(this).initCredentials();
+		if (debugEnabled) log.debug("instantiating JPPF driver with uuid=" + uuid);
 	}
 
 	/**

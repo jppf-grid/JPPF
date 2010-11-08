@@ -21,8 +21,6 @@ package org.jppf.test.setup;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 
-import org.jppf.client.concurrent.TestJPPFExecutorService;
-
 /**
  * A simple callable task implementation.
  */
@@ -76,7 +74,7 @@ public class SimpleCallable implements Callable<Result>, Serializable
 	public Result call()
 	{
 		Result executionResult = new Result();
-		executionResult.message = TestJPPFExecutorService.EXECUTION_SUCCESSFUL_MESSAGE;
+		executionResult.message = BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE;
 		executionResult.position = position;
 		if (duration > 0)
 		{
