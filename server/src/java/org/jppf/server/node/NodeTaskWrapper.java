@@ -49,7 +49,7 @@ class NodeTaskWrapper implements Runnable
 	/**
 	 * The execution manager.
 	 */
-	private NodeExecutionManager execManager = null;
+	private NodeExecutionManager executionManager = null;
 
 	/**
 	 * Initialize this task wrapper with a specified JPPF task.
@@ -61,7 +61,7 @@ class NodeTaskWrapper implements Runnable
 	public NodeTaskWrapper(JPPFNode node, JPPFTask task, List<String> uuidPath, long number)
 	{
 		this.node = node;
-		this.execManager = node.getExecutionManager();
+		this.executionManager = node.getExecutionManager();
 		this.task = task;
 		this.uuidPath = uuidPath;
 		this.number = number;
@@ -90,13 +90,14 @@ class NodeTaskWrapper implements Runnable
 			}
 			Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
 			long id = Thread.currentThread().getId();
+			executionManager.processTaskTimeout(task, number);
 			long startTime = System.currentTimeMillis();
-			long startCpuTime = execManager.getCpuTime(id);
+			long startCpuTime = executionManager.getCpuTime(id);
 			task.run();
 			try
 			{
 				// convert cpu time from nanoseconds to milliseconds
-				cpuTime = (execManager.getCpuTime(id) - startCpuTime) / 1000000L;
+				cpuTime = (executionManager.getCpuTime(id) - startCpuTime) / 1000000L;
 				elapsedTime = System.currentTimeMillis() - startTime;
 			}
 			catch(Throwable ignore)
@@ -113,7 +114,7 @@ class NodeTaskWrapper implements Runnable
 			if (nodeAdmin != null) nodeAdmin.taskEnded(task.getId());
 			task.removeJPPFTaskListener(nodeAdmin);
 			if (node.isNotifying()) node.decrementExecutingCount();
-			execManager.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
+			executionManager.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
 		}
 	}
 

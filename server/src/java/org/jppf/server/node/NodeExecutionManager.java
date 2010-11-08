@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
-import org.jppf.scheduling.JPPFScheduleHandler;
+import org.jppf.scheduling.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -175,7 +175,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 		}
 		if ((task.getTimeout() > 0L) || (task.getTimeoutDate() != null))
 		{
-			processTaskTimeout(task, number);
+			processTaskExpirationDate(task, number);
 		}
 		return number;
 	}
@@ -269,7 +269,23 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 * @param number a number identifying the task submitted to the thread pool.
 	 * @throws Exception if any error occurs.
 	 */
-	private void processTaskTimeout(JPPFTask task, long number) throws Exception
+	private void processTaskExpirationDate(JPPFTask task, long number) throws Exception
+	{
+		JPPFSchedule schedule = task.getTimeoutSchedule();
+		if ((schedule != null) && schedule.hasDate())
+		{
+			TimeoutTimerTask tt = new TimeoutTimerTask(this, number, task);
+			timeoutHandler.scheduleAction(getFutureFromNumber(number), task.getTimeoutSchedule(), tt);
+		}
+	}
+
+	/**
+	 * Notify the timer that a task must be aborted if its timeout period expired.
+	 * @param task the JPPF task for which to set the timeout.
+	 * @param number a number identifying the task submitted to the thread pool.
+	 * @throws Exception if any error occurs.
+	 */
+	void processTaskTimeout(JPPFTask task, long number) throws Exception
 	{
 		if (task.getTimeoutSchedule() != null)
 		{
