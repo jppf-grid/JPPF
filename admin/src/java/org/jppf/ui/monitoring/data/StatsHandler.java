@@ -488,7 +488,9 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	 */
 	public JMXDriverConnectionWrapper currentJmxConnection()
 	{
-		return ((JPPFClientConnectionImpl) getCurrentConnection()).getJmxConnection();
+		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getCurrentConnection();
+		if (c == null) return null;
+		return c.getJmxConnection();
 	}
 
 	/**

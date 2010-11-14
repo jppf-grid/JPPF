@@ -17,7 +17,7 @@
  */
 package org.jppf.node.screensaver;
 
-import org.jppf.*;
+import org.jppf.JPPFNodeReloadNotification;
 import org.jppf.node.*;
 import org.jppf.node.event.NodeListener;
 

@@ -22,6 +22,7 @@ import java.net.*;
 import java.nio.channels.*;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 /**
@@ -285,7 +286,7 @@ public final class StringUtils
 	}
 
 	/**
-	 * COnvert an array of int values into a space-separated string.
+	 * Convert an array of int values into a space-separated string.
 	 * @param ports list of port numbers
 	 * @return a space-separated list of ports.
 	 */
@@ -367,6 +368,59 @@ public final class StringUtils
 			if (s.startsWith(s2)) return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Convert an IP address int array.
+	 * @param addr the source address to convert.
+	 * @return an array of int values, or null if the source could not be parsed.
+	 */
+	public static int[] toIntArray(InetAddress addr)
+	{
+		try
+		{
+			byte[] bytes = addr.getAddress();
+			String ip = addr.getHostAddress();
+			int[] result = null;
+			if (addr instanceof Inet6Address)
+			{
+				result = new int[8];
+				String[] comp = ip.split(":");
+				for (int i=0; i<comp.length; i++) result[i] = Integer.decode("0x" + comp[i].toLowerCase());
+			}
+			else
+			{
+				result = new int[8];
+				String[] comp = ip.split("\\.");
+				for (int i=0; i<comp.length; i++) result[i] = Integer.valueOf(comp[i]);
+			}
+			return result;
+		}
+		catch (Exception e)
+		{
+			return null;
+		}
+	}
+
+	/**
+	 * Convert a string with <code>separator</code>-separated values into an int array.
+	 * @param source the source string to convert.
+	 * @param separatorPattern the values separator, expressed as a regular expression, must comply with the specifications for {@link java.util.regex.Pattern}.
+	 * @return an array of int value, or null if the source cvould not be parsed.
+	 */
+	public static int[] toIntArray(String source, Pattern separatorPattern)
+	{
+		try
+		{
+			String[] vals = separatorPattern.split(source);
+			int[] result = new int[vals.length];
+			for (int i=0; i<vals.length; i++) result[i] = Integer.valueOf(vals[i]);
+			return result;
+		}
+		catch (Exception e)
+		{
+			return null;
+		}
 	}
 
 	/**

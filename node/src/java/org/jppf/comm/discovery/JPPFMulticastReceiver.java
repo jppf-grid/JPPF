@@ -44,7 +44,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 	/**
 	 * Reference to the JPPF configuration.
 	 */
-	private static TypedProperties props = JPPFConfiguration.getProperties();
+	private static TypedProperties config = JPPFConfiguration.getProperties();
 	/**
 	 * Multicast group to join.
 	 */
@@ -69,15 +69,29 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 	 * Count of connection information objects used for ordering.
 	 */
 	private AtomicLong count = new AtomicLong(0L);
+	/**
+	 * Handles include and exclude IP filters.
+	 */
+	private IPFilter ipFilter = null;
 
 	/**
 	 * Default constructor.
 	 */
 	public JPPFMulticastReceiver()
 	{
-		group = props.getString("jppf.discovery.group", "230.0.0.1");
-		port = props.getInt("jppf.discovery.port", 11111);
-		timeout = props.getInt("jppf.discovery.timeout", 5000);
+		this(null);
+	}
+
+	/**
+	 * Default constructor.
+	 * @param ipFilter handles include and exclude IP filters.
+	 */
+	public JPPFMulticastReceiver(IPFilter ipFilter)
+	{
+		group = config.getString("jppf.discovery.group", "230.0.0.1");
+		port = config.getInt("jppf.discovery.port", 11111);
+		timeout = config.getInt("jppf.discovery.timeout", 5000);
+		this.ipFilter = ipFilter;
 	}
 
 	/**
@@ -141,6 +155,14 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 	 */
 	private synchronized void addConnectionInfo(JPPFConnectionInformation info)
 	{
+		try
+		{
+			if ((ipFilter != null) && !ipFilter.isAddressAccepted(InetAddress.getByName(info.host))) return;
+		}
+		catch (UnknownHostException e)
+		{
+			return;
+		}
 		infoList.remove(info);
 		infoList.addFirst(info);
 		if (debugEnabled) log.debug("nb connections: " + infoList.size());
@@ -226,7 +248,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 							byte[] bytes = new byte[len];
 							buffer.get(bytes);
 							info = JPPFConnectionInformation.fromBytes(bytes);
-							String host = props.getString("jppf.management.host", null);
+							String host = config.getString("jppf.management.host", null);
 							if (host == null) host = addr.getHostAddress();
 							info.managementHost = host;
 							addConnectionInfo(info);

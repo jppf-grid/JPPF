@@ -87,6 +87,10 @@ public class NodeRunner
 	 * This node's universal identifier.
 	 */
 	private static String uuid = new JPPFUuid().toString();
+	/**
+	 * Handles include and exclude IP filters.
+	 */
+	private static IPFilter ipFilter = new IPFilter(JPPFConfiguration.getProperties());
 
 	/**
 	 * Run a node as a standalone application.
@@ -101,7 +105,7 @@ public class NodeRunner
 			new JmxMessageNotifier();
 			if (debugEnabled) log.debug("launching the JPPF node");
 			if ((args == null) || (args.length <= 0))
-				throw new JPPFException("The node should be run with an argument representing a valid TCP port, 'noLauncher' or 'local'");
+				throw new JPPFException("The node should be run with an argument representing a valid TCP port or 'noLauncher'");
 			if (!"noLauncher".equals(args[0]))
 			{
 				int port = Integer.parseInt(args[0]);
@@ -198,7 +202,7 @@ public class NodeRunner
 	 */
 	public static void discoverDriver()
 	{
-		JPPFMulticastReceiver receiver = new JPPFMulticastReceiver();
+		JPPFMulticastReceiver receiver = new JPPFMulticastReceiver(ipFilter);
 		JPPFConnectionInformation info = receiver.receive();
 		receiver.setStopped(true);
 		if (info == null)

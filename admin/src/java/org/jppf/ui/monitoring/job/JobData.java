@@ -167,9 +167,7 @@ public class JobData
 		{
 			try
 			{
-				ObjectName objectName = new ObjectName(JPPFAdminMBean.DRIVER_JOB_MANAGEMENT_MBEAN_NAME);
-				MBeanServerConnection mbsc = jmxWrapper.getMbeanConnection();
-				proxy = (DriverJobManagementMBean) MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, DriverJobManagementMBean.class, true);
+				proxy = jmxWrapper.getProxy(JPPFAdminMBean.DRIVER_JOB_MANAGEMENT_MBEAN_NAME, DriverJobManagementMBean.class);
 			}
 			catch(Exception e)
 			{

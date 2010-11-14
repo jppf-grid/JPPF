@@ -18,7 +18,7 @@
 package org.jppf.process;
 
 import java.io.*;
-import java.util.*;
+import java.util.List;
 
 import org.jppf.process.event.*;
 import org.jppf.utils.EventEmitter;

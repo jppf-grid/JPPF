@@ -18,6 +18,7 @@
 package org.jppf.security;
 
 import java.io.Serializable;
+
 import org.jppf.utils.JPPFUuid;
 
 /**

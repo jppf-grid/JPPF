@@ -39,7 +39,7 @@ public final class NetworkUtils
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * Contains a set of all possible loopback addresses.
-	 * These are all the IPs in the 127.0.0.0/8 range.
+	 * These are all the IPs in the 127.0.0.0-8 range.
 	 */
 	private static final Set<String> LOOPBACK_ADDRESSES = createLoopbackAddresses();
 
@@ -204,6 +204,62 @@ public final class NetworkUtils
 	}
 
 	/**
+	 * Get the subnet mask length of a given address.
+	 * @param addr the address for which to get the subnet mask.
+	 * @return the length (number of bits set to 1) for the corresponding subnet mask. 
+	 */
+	public static int getSubnetMaskLength(InetAddress addr)
+	{
+		try
+		{
+			NetworkInterface ni = NetworkInterface.getByInetAddress(addr);
+			List<InterfaceAddress> intAddresses = ni.getInterfaceAddresses();
+			for (InterfaceAddress ia: intAddresses)
+			{
+				if (addr.equals(ia.getAddress())) return ia.getNetworkPrefixLength();
+			}
+		}
+		catch (Exception e)
+		{
+			log.error("Error getting subnet mask for address "  + addr, e);
+		}
+		return 0;
+	}
+
+	/**
+	 * Get a {@link JPPFConnectionInformation} object for each non local address of the currrent host.
+	 * @return a list of {@link JPPFConnectionInformation} instance. This list may be empty, but never null.
+	 */
+	public static List<SubnetInformation> getAllNonLocalSubnetInfo()
+	{
+		List<SubnetInformation> result = new ArrayList<SubnetInformation>();
+		List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
+		for (InetAddress addr: addresses)
+		{
+			int n = getSubnetMaskLength(addr);
+			result.add(new SubnetInformation(addr, n));
+		}
+		return result;
+	}
+
+	/**
+	 * Determine whether the 2 specified IP addresses are on the same subnet.
+	 * @param si1 the first IP address to compare.
+	 * @param si2 the second IP address to compare.
+	 * @return true if the 2 addreses are on the same subnet, false otherwise.
+	 */
+	public static boolean isSameSubnet(SubnetInformation si1, SubnetInformation si2)
+	{
+		if (!(si1.address() instanceof Inet4Address) || !(si2.address() instanceof Inet4Address)) return false;
+		int[] ip = new int[] { si1.rawIPAsInt(), si2.rawIPAsInt() };
+		int[] l = new int[] { si1.subnetMaskLength(), si2.subnetMaskLength() };
+		int[] mask = new int[] { si1.subnetMask(), si2.subnetMask() };
+		int[] n = new int[2];
+		for (int i=0; i<2; i++) n[i] =  (ip[i] & mask[i]) >> (32-l[i]);
+		return n[0] == n[1];
+	}
+
+	/**
 	 * Filter interface for the methods discovering available IP addresses. 
 	 */
 	private interface InetAddressFilter
@@ -214,6 +270,66 @@ public final class NetworkUtils
 		 * @return true if the address is accepted, false otherwise.
 		 */
 		boolean accepts(InetAddress addr);
+	}
+
+	/**
+	 * A pair grouping an {@link InetAddress} and the corresponding subnet mask length.
+	 */
+	public static class SubnetInformation extends Pair<InetAddress, Integer>
+	{
+		/**
+		 * Initialze this pair with the specified InetAddress and subnet mask length.
+		 * @param addr the address.
+		 * @param subnetMaskLength the subnet mask length.
+		 */
+		public SubnetInformation(InetAddress addr, Integer subnetMaskLength)
+		{
+			super(addr, subnetMaskLength);
+		}
+
+		/**
+		 * Get the internet address.
+		 * @return an {@link InetAddress} instance.
+		 */
+		public InetAddress address()
+		{
+			return first();
+		}
+
+		/**
+		 * Get the subnet mask length.
+		 * @return the subnet mask length as an integer.
+		 */
+		public Integer subnetMaskLength()
+		{
+			return second();
+		}
+
+		/**
+		 * Convert an {@link Inet4Address} to a raw IP value.
+		 * @return the IP as a single int value.
+		 */
+		public int rawIPAsInt()
+		{
+			byte[] ip = address().getAddress();
+			int result = ip[0] << 24;
+			result &= ip[1] << 16;
+			result &= ip[2] << 8;
+			result &= ip[3];
+			return result;
+		}
+
+		/**
+		 * Get the subnet mask for this subnet information.
+		 * @return the subnet amsk as an int value.
+		 */
+		public int subnetMask()
+		{
+			int length = subnetMaskLength();
+			int mask = (length == 0) ? 0 : 1;
+			for (int i=0; i<32; i++) mask = (mask << 1) & ((i < length) ? 1 : 0);
+			return mask;
+		}
 	}
 
 	/**

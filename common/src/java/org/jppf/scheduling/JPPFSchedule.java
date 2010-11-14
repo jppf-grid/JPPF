@@ -179,4 +179,22 @@ public class JPPFSchedule implements Serializable
 		sb.append("]");
 		return sb.toString();
 	}
+
+	/**
+	 * Determine whether this schedule was initialized with a date or not.
+	 * @return true if a date was specified when constructing this schedule, false otherwise.
+	 */
+	public boolean hasDate()
+	{
+		return (date != null) && (format != null);
+	}
+
+	/**
+	 * Determine whether this schedule was initialized with a duration or not.
+	 * @return true if a duration (or timeout) was specified when constructing this schedule, false otherwise.
+	 */
+	public boolean hasDuration()
+	{
+		return duration > 0;
+	}
 }

@@ -496,4 +496,13 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 			listener.newConnection(new ClientEvent(c));
 		}
 	}
+
+	/**
+	 * Get the unique universal identifier for this JPPF client.
+	 * @return the uuid as a string.
+	 */
+	public String getUuid()
+	{
+		return uuid;
+	}
 }

@@ -21,8 +21,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.Timer;
+
 import javax.swing.*;
-//import org.jdesktop.jdic.screensaver.*;
+
 import org.jppf.utils.*;
 
 /**

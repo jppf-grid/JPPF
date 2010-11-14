@@ -17,12 +17,10 @@
  */
 package org.jppf.client;
 
-import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.loadbalancer.LoadBalancer;
-import org.jppf.comm.discovery.*;
+import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -150,7 +148,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	{
 		try
 		{
-			receiverThread = new JPPFMulticastReceiverThread();
+			receiverThread = new JPPFMulticastReceiverThread(this);
 			new Thread(receiverThread).start();
 			waitForPools(false);
 		}
@@ -246,6 +244,15 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	}
 
 	/**
+	 * Get the JPPF configuration properties.
+	 * @return the configurationa as a {@link TypedProperties} instance.
+	 */
+	public TypedProperties getConfig()
+	{
+		return config;
+	}
+
+	/**
 	 * Wrapper class for the initialization of a client connection.
 	 */
 	protected static class ConnectionInitializer implements Runnable
@@ -271,60 +278,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 		{
 			if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
 			c.init();
-		}
-	}
-
-	/**
-	 * This class listens to information broadcast by JPPF servers on the network and uses it
-	 * to establish a connection with one or more servers. 
-	 */
-	protected class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runnable
-	{
-		/**
-		 * Contains the set of retrieved connection information objects.
-		 */
-		private Set<JPPFConnectionInformation> infoSet = new HashSet<JPPFConnectionInformation>();
-		/**
-		 * Count of distinct retrieved connection information objects.
-		 */
-		private AtomicInteger count = new AtomicInteger(0);
-
-		/**
-		 * Lookup server configurations from UDP multicasts.
-		 * @see java.lang.Runnable#run()
-		 */
-		public void run()
-		{
-			JPPFMulticastReceiver receiver = new JPPFMulticastReceiver();
-			try
-			{
-				while (!isStopped())
-				{
-					JPPFConnectionInformation info = receiver.receive();
-					if ((info != null) && !infoSet.contains(info))
-					{
-						if (debugEnabled) log.debug("Found connection information: " + info);
-						infoSet.add(info);
-						int n = config.getInt("jppf.pool.size", 1);
-						if (n < 1) n = 1;
-						int currentCount = count.incrementAndGet();
-						for (int i=1; i<=n; i++)
-						{
-							String name = "driver-" + currentCount  + (n == 1 ? "" : "-" + i);
-							AbstractJPPFClientConnection c = createConnection(uuid, name, info);
-							newConnection(c);
-						}
-					}
-				}
-			}
-			catch(Exception e)
-			{
-				log.error(e.getMessage(), e);
-			}
-			finally
-			{
-				if (receiver != null) receiver.setStopped(true);
-			}
 		}
 	}
 }

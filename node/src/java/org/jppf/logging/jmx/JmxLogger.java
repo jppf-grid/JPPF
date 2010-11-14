@@ -18,7 +18,7 @@
 
 package org.jppf.logging.jmx;
 
-import javax.management.*;
+import javax.management.NotificationEmitter;
 
 
 /**

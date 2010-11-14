@@ -18,7 +18,7 @@
 
 package org.jppf.management;
 
-import javax.management.*;
+import javax.management.NotificationEmitter;
 
 
 /**

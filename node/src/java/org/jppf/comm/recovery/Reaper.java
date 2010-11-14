@@ -21,7 +21,7 @@ package org.jppf.comm.recovery;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**

@@ -34,7 +34,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
-	 * The driver host name.
+	 * The host name.
 	 */
 	public String host = null;
 	/**
@@ -66,6 +66,10 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * Identifier for this object.
 	 */
 	public String uuid = null;
+	/**
+	 * The length of the subnet mask for the host address.
+	 */
+	public int subnetMaskLength = 0;
 
 	/**
 	 * Default constructor.
@@ -94,8 +98,8 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 */
 	public int hashCode()
 	{
-		//return managementPort + (host == null ? 0 : host.hashCode());
-		return (uuid == null) ? 0 : uuid.hashCode();
+		return managementPort + (host == null ? 0 : host.hashCode());
+		//return (uuid == null) ? 0 : uuid.hashCode();
 	}
 
 	/**
@@ -110,10 +114,10 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 		if (this == obj) return true;
 		if (getClass() != obj.getClass()) return false;
 		JPPFConnectionInformation other = (JPPFConnectionInformation) obj;
-		//if (host == null) return (other.host == null) && (other.managementPort == managementPort);
-		//return (host.equals(other.host)) && (other.managementPort == managementPort);
-		if (uuid == null) return other.uuid == null;
-		return uuid.equals(other.uuid);
+		if (host == null) return (other.host == null) && (other.managementPort == managementPort);
+		return (host.equals(other.host)) && (other.managementPort == managementPort);
+		//if (uuid == null) return other.uuid == null;
+		//return uuid.equals(other.uuid);
 	}
 
 	/**

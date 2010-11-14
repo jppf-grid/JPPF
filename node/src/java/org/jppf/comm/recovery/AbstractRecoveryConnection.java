@@ -21,7 +21,7 @@ package org.jppf.comm.recovery;
 import java.net.SocketTimeoutException;
 
 import org.jppf.JPPFException;
-import org.jppf.comm.socket.*;
+import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
