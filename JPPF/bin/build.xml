@@ -75,6 +75,7 @@
 		<pathelement location="${server}/classes"/>
 		<pathelement location="${demo}/classes"/>
 		<pathelement location="${jca-client}/classes"/>
+		<pathelement location="${samples-pack}/DataEncryption/classes"/>
 		<fileset dir="${lib}">
 			<include name="**/*.jar"/>
 		</fileset>
