@@ -186,6 +186,14 @@ $title = "JPPF " . $version . " Release Notes";
 											<div class="<?php echo $itemClass; ?>">
 											<a href="/wiki" class="<?php echo $itemClass; ?>">&raquo; Documentation</a><br>
 											</div>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Patches") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/patches.php" class="<?php echo $itemClass; ?>">&raquo; Patches</a><br>
+											</div>
 															<a href="/api-2.0" class="<?php if ($currentPage == Javadoc) echo 'aboutMenuItem'; else echo 'aboutMenuItem2'; ?>">&raquo; Javadoc</a><br>
 															<?php
 											$itemClass = "";

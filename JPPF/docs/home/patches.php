@@ -1,7 +1,7 @@
-<?php $currentPage="Screenshots" ?>
+<?php $currentPage="Patches" ?>
 <html>
 		<head>
-		<title>JPPF Screenshots
+		<title>JPPF Patches
 </title>
 		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
 		<meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, gloud, open source">
@@ -257,129 +257,56 @@
 				</div>
 				<div class="content">
 <?php
-	$screenshot = $_REQUEST["screenshot"];
-	if (($screenshot == NULL) || ($screenshot == ""))
-	{
-		$screenshot = "Charts-01.gif
-";
-	}
+	// Connecting, selecting database
+	$link = mysql_connect('localhost', 'pervasiv_jppfadm', 'tri75den')
+		 or die('Could not connect: ' . mysql_error());
+	mysql_select_db('pervasiv_jppfweb') or die('Could not select database');
+	// Performing SQL query
+	$query = 'SELECT DISTINCT jppf_version FROM patch ORDER BY jppf_version DESC';
+	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 ?>
 	<div align="center">
-		<table border="0" cellspacing="0" cellpadding="0" width="80%">
-			<tr>
-				<td>
-										<table align="center" border="0" cellspacing="0" cellpadding="5">
-						<tr>
-														<td align="center">
-								<a href="screenshots.php?screenshot=Charts-01.gif">
-									<img src="screenshots/_th_Charts-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=Charts-02.gif">
-									<img src="screenshots/_th_Charts-02.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=Charts-03.gif">
-									<img src="screenshots/_th_Charts-03.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=LoadBalancerSettings-01.gif">
-									<img src="screenshots/_th_LoadBalancerSettings-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=MandelbrotFractals.jpg">
-									<img src="screenshots/_th_MandelbrotFractals.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=ManyJobs-01.gif">
-									<img src="screenshots/_th_ManyJobs-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=ManyJobs-02.gif">
-									<img src="screenshots/_th_ManyJobs-02.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=ManyJobs-03.gif">
-									<img src="screenshots/_th_ManyJobs-03.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=MaxtrixSample-01.gif">
-									<img src="screenshots/_th_MaxtrixSample-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-						</tr>
-						<tr>
-														<td align="center">
-								<a href="screenshots.php?screenshot=NodeSystemInformation.gif">
-									<img src="screenshots/_th_NodeSystemInformation.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=NodeThreads-01.gif">
-									<img src="screenshots/_th_NodeThreads-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=NodeTrayAddon-01.gif">
-									<img src="screenshots/_th_NodeTrayAddon-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=NodeTrayAddon-02.gif">
-									<img src="screenshots/_th_NodeTrayAddon-02.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=NodeTrayAddon-03.gif">
-									<img src="screenshots/_th_NodeTrayAddon-03.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=ProteinSequenceAlignment.gif">
-									<img src="screenshots/_th_ProteinSequenceAlignment.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=ServerStats-01.gif">
-									<img src="screenshots/_th_ServerStats-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=Topology-01.gif">
-									<img src="screenshots/_th_Topology-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=UpdateNodeConfiguration.gif">
-									<img src="screenshots/_th_UpdateNodeConfiguration.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
-		<br>
-								<div>
-					<h3 align="center"><?php echo $screenshot; ?></h3>
-				<div  style="margin: 1px">
-				<br>
-				<img src="screenshots/<?php echo $screenshot; ?>" border="0" alt="screenshot"/>
-				</div>
-									</div>
-		<table border="0" cellspacing="0" cellpadding="0">
-			<tr><td align="center">
-			</td></tr>
-		</table>
+	<h1>JPPF Patches</h1>
+	<table border="1" cellspacing="0" cellpadding="5">
+		<!--
+		<tr>
+			<td><b>JPPF version</b></td>
+			<td><b>Patches</b></td>
+			<td><b>Details</b></td>
+		</tr>
+		-->
+<?php
+	while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
+	{
+		$jppf_ver = $line["jppf_version"];
+?>
+		<tr><td colspan="3"><h3 style="margin: 0px">JPPF <?php echo $jppf_ver ?></h3></td></tr>
+<?php
+		$query2 = "SELECT * FROM patch where jppf_version = '" . $jppf_ver . "' ORDER BY patch_number ASC";
+		$result2 = mysql_query($query2) or die('Query failed: ' . mysql_error());
+		while ($line2 = mysql_fetch_array($result2, MYSQL_ASSOC))
+		{
+?>
+		<tr>
+			<td>patch <?php echo $line2['patch_number'] ?></td>
+			<td><a href="patch_info.php?patch_id=<?php echo $line2['id'] ?>">full details</a></td>
+			<td><a href="<?php echo $line2['patch_url'] ?>">patch <?php echo $line2['patch_url'] ?></a></td>
+		</tr>
+<?php
+		}
+		// Free resultset
+		mysql_free_result($result2);
+	}
+?>
+	</table>
+	<br/>
 	</div>
+<?php
+	// Free resultset
+	mysql_free_result($result);
+	// Closing connection
+	mysql_close($link);
+?>
 				</div>
 									</td>
 				</tr>

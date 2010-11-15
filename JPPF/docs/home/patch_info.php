@@ -1,7 +1,7 @@
-<?php $currentPage="Screenshots" ?>
+<?php $currentPage="Patches" ?>
 <html>
 		<head>
-		<title>JPPF Screenshots
+		<title>JPPF Patches
 </title>
 		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
 		<meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, gloud, open source">
@@ -257,129 +257,46 @@
 				</div>
 				<div class="content">
 <?php
-	$screenshot = $_REQUEST["screenshot"];
-	if (($screenshot == NULL) || ($screenshot == ""))
+	$patch_id = $_REQUEST["patch_id"];
+	// Connecting, selecting database
+	$link = mysql_connect('localhost', 'pervasiv_jppfadm', 'tri75den')
+		 or die('Could not connect: ' . mysql_error());
+	mysql_select_db('pervasiv_jppfweb') or die('Could not select database');
+	// Performing SQL query
+	$query = "SELECT * FROM patch where id = " . $patch_id;
+	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$jppf_ver = $line["jppf_version"];
+	$patch_number = $line["patch_number"];
+	$patch_url = $line["patch_url"];
+	$readme = preg_replace('@\n@', '<br/>', $line['readme']);
+	$readme = preg_replace('@(^ )+@', '&nbsp;', $readme);
+?>
+	<h1>JPPF <?php echo $jppf_ver ?> patch <?php echo $patch_number ?></h1>
+	<h3>Download:</h3>
+	<a href="<?php echo $patch_url ?>"><?php echo $patch_url ?></a>
+	<h3>Description (included readme.txt):</h3>
+	<?php echo preg_replace('/\n/', '<br/>', $line['readme']) ?>
+	<h3>Fixed bugs:</h3>
+	<ul>
+<?php
+	mysql_free_result($result);
+	$query = "SELECT * FROM patch_bugs where jppf_version = '" . $jppf_ver . "' AND patch_number = '" . $patch_number . "'";
+	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+	while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
 	{
-		$screenshot = "Charts-01.gif
-";
+?>
+		<li><a href="<?php echo $line['bug_url'] ?>"><?php echo $line['bug_id'] ?> <?php echo $line['bug_title'] ?></a></li>
+<?php
 	}
 ?>
-	<div align="center">
-		<table border="0" cellspacing="0" cellpadding="0" width="80%">
-			<tr>
-				<td>
-										<table align="center" border="0" cellspacing="0" cellpadding="5">
-						<tr>
-														<td align="center">
-								<a href="screenshots.php?screenshot=Charts-01.gif">
-									<img src="screenshots/_th_Charts-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=Charts-02.gif">
-									<img src="screenshots/_th_Charts-02.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=Charts-03.gif">
-									<img src="screenshots/_th_Charts-03.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=LoadBalancerSettings-01.gif">
-									<img src="screenshots/_th_LoadBalancerSettings-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=MandelbrotFractals.jpg">
-									<img src="screenshots/_th_MandelbrotFractals.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=ManyJobs-01.gif">
-									<img src="screenshots/_th_ManyJobs-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=ManyJobs-02.gif">
-									<img src="screenshots/_th_ManyJobs-02.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=ManyJobs-03.gif">
-									<img src="screenshots/_th_ManyJobs-03.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=MaxtrixSample-01.gif">
-									<img src="screenshots/_th_MaxtrixSample-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-						</tr>
-						<tr>
-														<td align="center">
-								<a href="screenshots.php?screenshot=NodeSystemInformation.gif">
-									<img src="screenshots/_th_NodeSystemInformation.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=NodeThreads-01.gif">
-									<img src="screenshots/_th_NodeThreads-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=NodeTrayAddon-01.gif">
-									<img src="screenshots/_th_NodeTrayAddon-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=NodeTrayAddon-02.gif">
-									<img src="screenshots/_th_NodeTrayAddon-02.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=NodeTrayAddon-03.gif">
-									<img src="screenshots/_th_NodeTrayAddon-03.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=ProteinSequenceAlignment.gif">
-									<img src="screenshots/_th_ProteinSequenceAlignment.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=ServerStats-01.gif">
-									<img src="screenshots/_th_ServerStats-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=Topology-01.gif">
-									<img src="screenshots/_th_Topology-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-														<td align="center">
-								<a href="screenshots.php?screenshot=UpdateNodeConfiguration.gif">
-									<img src="screenshots/_th_UpdateNodeConfiguration.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
-		<br>
-								<div>
-					<h3 align="center"><?php echo $screenshot; ?></h3>
-				<div  style="margin: 1px">
-				<br>
-				<img src="screenshots/<?php echo $screenshot; ?>" border="0" alt="screenshot"/>
-				</div>
-									</div>
-		<table border="0" cellspacing="0" cellpadding="0">
-			<tr><td align="center">
-			</td></tr>
-		</table>
-	</div>
+	</ul>
+<?php
+	// Free resultset
+	mysql_free_result($result);
+	// Closing connection
+	mysql_close($link);
+?>
 				</div>
 									</td>
 				</tr>
