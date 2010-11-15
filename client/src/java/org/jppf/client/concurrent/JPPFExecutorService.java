@@ -28,7 +28,29 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Implementatation of an {@link ExecutorService} wrapper around a {@link JPPFClient}.
+ * Implementation of an {@link ExecutorService} wrapper around a {@link JPPFClient}.
+ * <p>This executor has two modes in which it functions:
+ * <p>1) Standard mode: in this mode each task or set of tasks submitted via one of the
+ * <code>invokeXXX()</code> or <code>submit()</code> methods is sent immediately to the server
+ * in its own JPPF job.
+ * <p>2) Batch mode: the <code>JPPFExecutorService</code> can be configured to only send tasks to the server
+ * when a number of tasks, submitted via one of the <code>invokeXXX()</code> or <code>submit()</code> methods,
+ * has been reached, or when a timeout specified in milliseconds has expired, or a combination of both.<br/>
+ * This facility is designed to optimize the task execution throughput, especially when many individual tasks are submitted
+ * using one of the <code>submit()</code> methods. This way, the tasks are sent to the server as a single job,
+ * instead of one job per task, and the execution will fully benefit from the parallel features of the JPPF server, including
+ * scheduling, load-balancing and parallel I/O.
+ * <p>In batch mode, the following behavior is to be noted:
+ * <ul>
+ * <li>If both size-based and time-based batching are used, tasks will be sent whenever one of the two thresholds is reached.
+ * Whenever this happens, both counters are reset. For instance, if the size-based threshold is reached, then the time-based counter
+ * will be reset as well, and the timeout counting will start from 0 again</li>
+ * <li>When a collection of tasks is submitted via one of the <code>invokeXXX()</code> methods, they are guaranteed
+ * to be all sent together in the same JPPF job. This is the one exception to the batch size threshold.</li>
+ * <li>If one of the treshold is changed while tasks are still pending execution, the behavior is unspecified</li>
+ * </ul>
+ * @see org.jppf.client.concurrent.JPPFExecutorService#setBatchSize(int)
+ * @see org.jppf.client.concurrent.JPPFExecutorService#setBatchTimeout(long)
  * @author Laurent Cohen
  */
 public class JPPFExecutorService implements ExecutorService, FutureResultCollectorListener
