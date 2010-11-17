@@ -121,7 +121,7 @@ public final class ProcessWrapper extends EventEmitter<ProcessWrapperEventListen
 		}
 
 		/**
-		 * Monitor the stream for avalaible data and write that data to the buffer.
+		 * Monitor the stream for available data and write that data to the buffer.
 		 * @see java.lang.Thread#run()
 		 */
 		public void run()
@@ -129,13 +129,24 @@ public final class ProcessWrapper extends EventEmitter<ProcessWrapperEventListen
 			try
 			{
 				BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-				String s = "";
-				while (s != null)
+				boolean end = false;
+				int bufferSize = 8*1024;
+				StringBuilder sb = new StringBuilder(bufferSize);
+				int count = 0;
+				while (!end)
 				{
-					s = reader.readLine();
-					if (s != null) fireStreamEvent(output, s);
+					int c = reader.read();
+					if (c == -1) break;      // end of file (the process has exited)
+					if (c == '\r') continue; // skip the line feed
+					count++;
+					sb.append((char) c);
+					if ((sb.length() >= bufferSize) || (c == '\n'))
+					{
+						fireStreamEvent(output, sb.toString());
+						sb = new StringBuilder(bufferSize);
+					}
 				}
-				Thread.sleep(10);
+				Thread.sleep(1);
 			}
 			catch(IOException ignore)
 			{

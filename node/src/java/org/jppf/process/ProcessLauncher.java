@@ -329,7 +329,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	 */
 	public void errorStreamAltered(ProcessWrapperEvent event)
 	{
-		System.err.println(event.getContent());
+		System.err.print(event.getContent());
 	}
 
 	/**
@@ -339,7 +339,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	 */
 	public void outputStreamAltered(ProcessWrapperEvent event)
 	{
-		System.out.println(event.getContent());
+		System.out.print(event.getContent());
 	}
 
 	/**
