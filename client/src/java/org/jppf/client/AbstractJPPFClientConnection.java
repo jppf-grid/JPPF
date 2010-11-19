@@ -28,6 +28,8 @@ import org.jppf.JPPFException;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
 import org.jppf.data.transform.*;
+import org.jppf.io.DataLocation;
+import org.jppf.io.FileLocation;
 import org.jppf.security.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
@@ -222,6 +224,35 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	private void sendData(SocketWrapper socketWrapper, Object o, ObjectSerializer ser) throws Exception
 	{
+		DataLocation dl = new FileLocation("", 0);
+		List<JPPFBuffer> list = null;
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
+		ser.serialize(o, mbos);
+		int size = mbos.size();
+		if (transform != null)
+		{
+			MultipleBuffersInputStream mbis = new MultipleBuffersInputStream(mbos.toBufferList());
+			mbos = new MultipleBuffersOutputStream();
+			transform.wrap(mbis, mbos);
+			list = mbos.toBufferList();
+			size = mbos.size();
+		}
+		else list = mbos.toBufferList();
+		socketWrapper.writeInt(size);
+		for (JPPFBuffer buf: list) socketWrapper.write(buf.buffer, 0, buf.length);
+	}
+
+	/**
+	 * Serialize an object and send it to the server.
+	 * @param socketWrapper the socket client used to send data to the server.
+	 * @param o the object to serialize.
+	 * @param ser the object serializer.
+	 * @throws Exception if any error occurs.
+	 */
+	private void serializeData(SocketWrapper socketWrapper, Object o, ObjectSerializer ser) throws Exception
+	{
+		
 		List<JPPFBuffer> list = null;
 		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
 		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();

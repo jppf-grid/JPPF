@@ -62,6 +62,19 @@ public class FileLocation extends AbstractDataLocation
 	 * The current count of bytes read from/written to the block of data currently being transferred.
 	 */
 	private int blockCount = 0;
+	/**
+	 * Determines whether the size was unknown at creation time.
+	 */
+	private boolean sizeUnknown = false;
+
+	/**
+	 * Initialize this file location with the specified file path and an unknown size.
+	 * @param path the path to the underlying file.
+	 */
+	public FileLocation(String path)
+	{
+		this(path, UNKNOWN_SIZE);
+	}
 
 	/**
 	 * Initialize this file location with the specified file path and size.
@@ -72,6 +85,16 @@ public class FileLocation extends AbstractDataLocation
 	{
 		filePath = path;
 		this.size = size;
+		if (size == UNKNOWN_SIZE) sizeUnknown = true;
+	}
+
+	/**
+	 * Initialize this file location with the specified file and unknown size.
+	 * @param file an abstract path to the underlying file.
+	 */
+	public FileLocation(File file)
+	{
+		this(file, UNKNOWN_SIZE);
 	}
 
 	/**
@@ -81,8 +104,7 @@ public class FileLocation extends AbstractDataLocation
 	 */
 	public FileLocation(File file, int size)
 	{
-		filePath = file.getPath();
-		this.size = size;
+		this(file.getPath(), size);
 	}
 
 	/**
@@ -173,6 +195,46 @@ public class FileLocation extends AbstractDataLocation
 	 * @throws Exception if an IO error occurs.
 	 */
 	private int blockingTransferFrom(InputSource source) throws Exception
+	{
+		while (count < size)
+		{
+			int remaining = size - count;
+			if ((remaining < buffer.limit()) && (remaining > 0))  buffer.limit(remaining);
+			int n = source.read(buffer);
+			if (n < 0)
+			{
+				transferring = false;
+				return -1;
+			}
+			else if (n > 0)
+			{
+				count += n;
+				buffer.flip();
+				int tempCount = 0;
+				while (tempCount < n)
+				{
+					int tmp = fileChannel.write(buffer);
+					if (tmp < 0)
+					{
+						transferring = false;
+						return -1;
+					}
+					tempCount += tmp;
+				}
+				buffer.clear();
+			}
+		}
+		transferring = false;
+		return count;
+	}
+
+	/**
+	 * Perform a blocking transfer to this data location from the specified input source.
+	 * @param source the input source to transfer from.
+	 * @return the number of bytes actually transferred. 
+	 * @throws Exception if an IO error occurs.
+	 */
+	private int blockingTransferFromUnknownSize(InputSource source) throws Exception
 	{
 		while (count < size)
 		{
