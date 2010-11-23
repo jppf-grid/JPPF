@@ -236,14 +236,14 @@ public class FileLocation extends AbstractDataLocation
 	 */
 	private int blockingTransferFromUnknownSize(InputSource source) throws Exception
 	{
-		while (count < size)
+		while (true)
 		{
-			int remaining = size - count;
-			if ((remaining < buffer.limit()) && (remaining > 0))  buffer.limit(remaining);
 			int n = source.read(buffer);
 			if (n < 0)
 			{
 				transferring = false;
+				size = count;
+				sizeUnknown = false;
 				return -1;
 			}
 			else if (n > 0)
@@ -257,6 +257,8 @@ public class FileLocation extends AbstractDataLocation
 					if (tmp < 0)
 					{
 						transferring = false;
+						size = count;
+						sizeUnknown = false;
 						return -1;
 					}
 					tempCount += tmp;
@@ -264,8 +266,8 @@ public class FileLocation extends AbstractDataLocation
 				buffer.clear();
 			}
 		}
-		transferring = false;
-		return count;
+		//transferring = false;
+		//return count;
 	}
 
 	/**

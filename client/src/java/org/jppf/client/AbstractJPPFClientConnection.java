@@ -28,8 +28,6 @@ import org.jppf.JPPFException;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
 import org.jppf.data.transform.*;
-import org.jppf.io.DataLocation;
-import org.jppf.io.FileLocation;
 import org.jppf.security.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
@@ -122,6 +120,10 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * The pool of threads used for submitting execution requests.
 	 */
 	protected ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
+	/**
+	 * Handles data serialization and deserialization to and from the server.
+	 */
+	protected DataHandler dataHandler = new DataHandler();
 
 	/**
 	 * Configure this client connection with the specified parameters.
@@ -209,66 +211,10 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		header.setParameter(BundleParameter.JOB_METADATA, job.getJobMetadata());
 
 		SocketWrapper socketClient = taskServerConnection.getSocketClient();
-		sendData(socketClient, header, ser);
-		sendData(socketClient, job.getDataProvider(), ser);
-		for (JPPFTask task : job.getTasks()) sendData(socketClient, task, ser);
+		dataHandler.sendData(socketClient, header, ser);
+		dataHandler.sendData(socketClient, job.getDataProvider(), ser);
+		for (JPPFTask task : job.getTasks()) dataHandler.sendData(socketClient, task, ser);
 		socketClient.flush();
-	}
-
-	/**
-	 * Serialize an object and send it to the server.
-	 * @param socketWrapper the socket client used to send data to the server.
-	 * @param o the object to serialize.
-	 * @param ser the object serializer.
-	 * @throws Exception if any error occurs.
-	 */
-	private void sendData(SocketWrapper socketWrapper, Object o, ObjectSerializer ser) throws Exception
-	{
-		DataLocation dl = new FileLocation("", 0);
-		List<JPPFBuffer> list = null;
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
-		ser.serialize(o, mbos);
-		int size = mbos.size();
-		if (transform != null)
-		{
-			MultipleBuffersInputStream mbis = new MultipleBuffersInputStream(mbos.toBufferList());
-			mbos = new MultipleBuffersOutputStream();
-			transform.wrap(mbis, mbos);
-			list = mbos.toBufferList();
-			size = mbos.size();
-		}
-		else list = mbos.toBufferList();
-		socketWrapper.writeInt(size);
-		for (JPPFBuffer buf: list) socketWrapper.write(buf.buffer, 0, buf.length);
-	}
-
-	/**
-	 * Serialize an object and send it to the server.
-	 * @param socketWrapper the socket client used to send data to the server.
-	 * @param o the object to serialize.
-	 * @param ser the object serializer.
-	 * @throws Exception if any error occurs.
-	 */
-	private void serializeData(SocketWrapper socketWrapper, Object o, ObjectSerializer ser) throws Exception
-	{
-		
-		List<JPPFBuffer> list = null;
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
-		ser.serialize(o, mbos);
-		int size = mbos.size();
-		if (transform != null)
-		{
-			MultipleBuffersInputStream mbis = new MultipleBuffersInputStream(mbos.toBufferList());
-			mbos = new MultipleBuffersOutputStream();
-			transform.wrap(mbis, mbos);
-			list = mbos.toBufferList();
-			size = mbos.size();
-		}
-		else list = mbos.toBufferList();
-		socketWrapper.writeInt(size);
-		for (JPPFBuffer buf: list) socketWrapper.write(buf.buffer, 0, buf.length);
 	}
 
 	/**

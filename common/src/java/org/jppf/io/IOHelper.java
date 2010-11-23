@@ -82,9 +82,7 @@ public final class IOHelper
 				if (debugEnabled) log.debug("OOM when allocating in-memory data location", oome);
 			}
 		}
-		File file = File.createTempFile("jppf", ".tmp");
-		if (debugEnabled) log.debug("disk overflow: creating temp file '" + file.getCanonicalPath() + "' with size=" + size);
-		file.deleteOnExit();
+		File file = createTempFile(size);
 		return new FileLocation(file, size);
 	}
 
@@ -101,5 +99,19 @@ public final class IOHelper
 		DataLocation dl = createDataLocationMemorySensitive(n);
 		dl.transferFrom(source, true);
 		return dl;
+	}
+
+	/**
+	 * Create a temporary file.
+	 * @param size the file size (for logging purposes only).
+	 * @return the created <code>File</code>.
+	 * @throws Exception if an IO error occurs.
+	 */
+	public static File createTempFile(int size) throws Exception
+	{
+		File file = File.createTempFile("jppf", ".tmp");
+		if (debugEnabled) log.debug("disk overflow: creating temp file '" + file.getCanonicalPath() + "' with size=" + size);
+		file.deleteOnExit();
+		return file;
 	}
 }
