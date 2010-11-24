@@ -411,7 +411,16 @@ public class OptionElementFactory
 		else if ("plugin".equalsIgnoreCase(source))
 		{
 			List<String> pathList = new ServiceFinder().findServiceDefinitions(location, getClass().getClassLoader());
-			for (String def: pathList) list.add(builder.buildPage(def, null));
+			Set<String> names = new HashSet<String>();
+			for (String def: pathList)
+			{
+				OptionElement elt = builder.buildPage(def, null);
+				if (!names.contains(elt.getName()))
+				{
+					names.add(elt.getName());
+					list.add(builder.buildPage(def, null));
+				}
+			}
 		}
 		if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false))
 		{
