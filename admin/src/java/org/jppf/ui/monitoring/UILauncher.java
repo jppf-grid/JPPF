@@ -67,7 +67,8 @@ public class UILauncher
 			int n = 3;
 			try
 			{
-				UIManager.setLookAndFeel(laf[n]);
+				if (s != null) UIManager.setLookAndFeel(s);
+				else UIManager.setLookAndFeel(laf[n]);
 			}
 			catch(Throwable t)
 			{
