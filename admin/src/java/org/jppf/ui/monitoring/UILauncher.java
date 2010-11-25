@@ -17,8 +17,6 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.security.*;
-
 import javax.swing.UIManager;
 
 import org.jppf.ui.options.OptionElement;
@@ -41,10 +39,6 @@ public class UILauncher
 	 */
 	static Logger log = LoggerFactory.getLogger(UILauncher.class);
 	/**
-	 * The permissions for the UI.
-	 */
-	private static Permissions permissions = makePermissions();
-	/**
 	 * The splash screen window.
 	 */
 	private static JPPFSplash splash = null;
@@ -57,22 +51,36 @@ public class UILauncher
 	{
 		try
 		{
-			//configureSecurity();
 			if ((args  == null) || (args.length < 2)) throw new Exception("Usage: UILauncher page_location location_source");
-			String s = System.getProperty("swing.defaultlaf");
-			//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			//System.out.println("system L&F: " + UIManager.getSystemLookAndFeelClassName());
 			String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
 				"com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
 			int n = 3;
-			try
+			boolean success = false;
+			String s = System.getProperty("swing.defaultlaf");
+			if (!success && (s != null))
 			{
-				if (s != null) UIManager.setLookAndFeel(s);
-				else UIManager.setLookAndFeel(laf[n]);
+				try
+				{
+					UIManager.setLookAndFeel(s);
+					success = true;
+				}
+				catch(Throwable t)
+				{
+					log.error("could not set specified look and feel '" + s + "' : " + t.getMessage());
+					System.getProperties().remove("swing.defaultlaf");
+				}
 			}
-			catch(Throwable t)
+			if (!success)
 			{
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				try
+				{
+					UIManager.setLookAndFeel(laf[n]);
+				}
+				catch(Throwable t)
+				{
+					log.error("could not set look and feel '" + laf[n] + "' : " + t.getMessage());
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				}
 			}
 			boolean showSplash = JPPFConfiguration.getProperties().getBoolean("jppf.ui.splash", true);
 			if (showSplash)
@@ -93,41 +101,5 @@ public class UILauncher
 			log.error(e.getMessage(), e);
 			System.exit(1);
 		}
-	}
-
-	/**
-	 * 
-	 */
-	public static void configureSecurity()
-	{
-		Policy p = new Policy()
-		{
-			public PermissionCollection getPermissions(CodeSource codesource)
-			{
-				return permissions;
-			}
-			public PermissionCollection getPermissions(ProtectionDomain domain)
-			{
-				return permissions;
-			}
-			public boolean implies(ProtectionDomain domain, Permission permission)
-			{
-				return true;
-			}
-			public void refresh(){}
-		};
-		Policy.setPolicy(p);
-		System.setSecurityManager(new SecurityManager());
-	}
-
-	/**
-	 * 
-	 * @return a Permissions instance that contains AllPermission.
-	 */
-	private static Permissions makePermissions()
-	{
-		Permissions permissions = new Permissions();
-		permissions.add(new AllPermission());
-		return permissions;
 	}
 }
