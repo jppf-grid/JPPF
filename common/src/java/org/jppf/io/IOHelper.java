@@ -68,9 +68,7 @@ public final class IOHelper
 	 */
 	public static DataLocation createDataLocationMemorySensitive(int size) throws Exception
 	{
-		long freeMem = SystemUtils.maxFreeHeap();
-		if (traceEnabled) log.trace("free mem / requested size : " + freeMem + "/" + size);
-		if ((long) (FREE_MEM_TO_SIZE_RATIO * size) < freeMem)
+		if (fitsInMemory(size))
 		{
 			try
 			{
@@ -83,7 +81,7 @@ public final class IOHelper
 			}
 		}
 		File file = createTempFile(size);
-		return new FileLocation(file, size);
+		return new FileDataLocation(file, size);
 	}
 
 	/**
@@ -113,5 +111,17 @@ public final class IOHelper
 		if (debugEnabled) log.debug("disk overflow: creating temp file '" + file.getCanonicalPath() + "' with size=" + size);
 		file.deleteOnExit();
 		return file;
+	}
+
+	/**
+	 * Determines whether the data of the specified size would fit in memory.
+	 * @param size the data size to check.
+	 * @return true if the data would fit in memory, false otherwise.
+	 */
+	public static boolean fitsInMemory(int size)
+	{
+		long freeMem = SystemUtils.maxFreeHeap();
+		if (traceEnabled) log.trace("free mem / requested size : " + freeMem + "/" + size);
+		return (long) (FREE_MEM_TO_SIZE_RATIO * size) < freeMem;
 	}
 }

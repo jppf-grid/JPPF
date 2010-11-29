@@ -239,7 +239,11 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 			{
 				if (!key.isValid()) continue;
 				if (key.isAcceptable()) doAccept(key);
-				else transitionManager.submitTransition(new SelectionKeyWrapper(key));
+				else
+				{
+					NioContext context = (NioContext) key.attachment();
+					transitionManager.submitTransition(context.getChannel());
+				}
 			}
 			catch (Exception e)
 			{
@@ -270,7 +274,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	/**
 	 * accept the incoming connection.
 	 * It accept and put it in a state to define what type of peer is.
-	 * @param key the selection key that represents the channel's registration witht the selector.
+	 * @param key the selection key that represents the channel's registration with the selector.
 	 */
 	private void doAccept(SelectionKey key)
 	{
@@ -308,7 +312,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 		try
 		{
 			SelectionKey selKey = channel.register(selector,	getInitialInterest(), context);
-			postAccept(new SelectionKeyWrapper(selKey), serverSocketChannel);
+			SelectionKeyWrapper wrapper = new SelectionKeyWrapper(selKey);
+			context.setChannel(wrapper);
+			postAccept(wrapper, serverSocketChannel);
 		}
 		catch (ClosedChannelException e)
 		{

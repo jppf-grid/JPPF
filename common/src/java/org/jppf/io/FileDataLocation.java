@@ -28,12 +28,12 @@ import org.slf4j.*;
  * Data location backed by a file.
  * @author Laurent Cohen
  */
-public class FileLocation extends AbstractDataLocation
+public class FileDataLocation extends AbstractDataLocation
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Logger log = LoggerFactory.getLogger(FileLocation.class);
+	private static Logger log = LoggerFactory.getLogger(FileDataLocation.class);
 	/**
 	 * Determines whether debug-level logging is enabled.
 	 */
@@ -71,7 +71,7 @@ public class FileLocation extends AbstractDataLocation
 	 * Initialize this file location with the specified file path and an unknown size.
 	 * @param path the path to the underlying file.
 	 */
-	public FileLocation(String path)
+	public FileDataLocation(String path)
 	{
 		this(path, UNKNOWN_SIZE);
 	}
@@ -81,7 +81,7 @@ public class FileLocation extends AbstractDataLocation
 	 * @param path the path to the underlying file.
 	 * @param size the size of the data represented by this file location.
 	 */
-	public FileLocation(String path, int size)
+	public FileDataLocation(String path, int size)
 	{
 		filePath = path;
 		this.size = size;
@@ -92,7 +92,7 @@ public class FileLocation extends AbstractDataLocation
 	 * Initialize this file location with the specified file and unknown size.
 	 * @param file an abstract path to the underlying file.
 	 */
-	public FileLocation(File file)
+	public FileDataLocation(File file)
 	{
 		this(file, UNKNOWN_SIZE);
 	}
@@ -102,7 +102,7 @@ public class FileLocation extends AbstractDataLocation
 	 * @param file an abstract path to the underlying file.
 	 * @param size the size of the data represented by this file location.
 	 */
-	public FileLocation(File file, int size)
+	public FileDataLocation(File file, int size)
 	{
 		this(file.getPath(), size);
 	}
@@ -127,7 +127,7 @@ public class FileLocation extends AbstractDataLocation
 		}
 		try
 		{
-			int n = blocking ? blockingTransferFrom(source) : nonBlockingTransferFrom(source);
+			int n = blocking ? (size == UNKNOWN_SIZE ? blockingTransferFromUnknownSize(source) : blockingTransferFrom(source)) : nonBlockingTransferFrom(source);
 			if ((n < 0) || (count >= size)) transferring = false;
 			return n;
 		}
@@ -411,6 +411,6 @@ public class FileLocation extends AbstractDataLocation
 	 */
 	public DataLocation copy()
 	{
-		return new FileLocation(filePath, size);
+		return new FileDataLocation(filePath, size);
 	}
 }

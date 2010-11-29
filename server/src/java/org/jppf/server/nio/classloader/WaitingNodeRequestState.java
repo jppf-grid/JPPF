@@ -88,31 +88,6 @@ class WaitingNodeRequestState extends ClassServerState
 	}
 
 	/**
-	 * Find a provider connection for the specified provider uuid.
-	 * @param uuid the uuid for which to find a conenction.
-	 * @return a <code>SelectableChannel</code> instance.
-	 * @throws Exception if an error occurs while searching for a connection.
-	 */
-	private ChannelWrapper findProviderConnection(String uuid) throws Exception
-	{
-		ChannelWrapper result = null;
-		List<ChannelWrapper<?>> connections = server.providerConnections.get(uuid);
-		int minRequests = Integer.MAX_VALUE;
-		for (ChannelWrapper channel: connections)
-		{
-			ClassContext ctx = (ClassContext) channel.getContext();
-			int size = ctx.getNbPendingRequests();
-			//size += ctx.getCurrentRequest() == null ? 0 : 1;
-			if (size < minRequests)
-			{
-				minRequests = size;
-				result = channel;
-			}
-		}
-		return result;
-	}
-
-	/**
 	 * Process a request to the driver's resource provider.
 	 * @param wrapper encapsulates the context and channel.
 	 * @param resource the resource request description
@@ -191,18 +166,47 @@ class WaitingNodeRequestState extends ClassServerState
 			ChannelWrapper provider = findProviderConnection(uuid);
 			if (provider != null)
 			{
-				if (debugEnabled) log.debug("request resource [" + name + "] from client: " + provider + " for node: " + wrapper);
-				ClassContext providerContext = (ClassContext) provider.getContext();
-				providerContext.addRequest(wrapper);
-				if (ClassState.IDLE_PROVIDER.equals(providerContext.getState()))
+				synchronized(provider)
 				{
-					server.getTransitionManager().transitionChannel(provider, TO_SENDING_PROVIDER_REQUEST);
-					if (debugEnabled) log.debug("node " + wrapper + " transitioned provider " + provider);
+					if (debugEnabled) log.debug("request resource [" + name + "] from client: " + provider + " for node: " + wrapper);
+					ClassContext providerContext = (ClassContext) provider.getContext();
+					providerContext.addRequest(wrapper);
+					/*
+					if (ClassState.IDLE_PROVIDER.equals(providerContext.getState()))
+					{
+						server.getTransitionManager().transitionChannel(provider, TO_SENDING_PROVIDER_REQUEST);
+						if (debugEnabled) log.debug("node " + wrapper + " transitioned provider " + provider);
+					}
+					*/
+					t = TO_IDLE_NODE;
 				}
-				t = TO_IDLE_NODE;
 			}
 		}
 		return new ByteTransitionPair(b, t);
+	}
+
+	/**
+	 * Find a provider connection for the specified provider uuid.
+	 * @param uuid the uuid for which to find a conenction.
+	 * @return a <code>SelectableChannel</code> instance.
+	 * @throws Exception if an error occurs while searching for a connection.
+	 */
+	private ChannelWrapper findProviderConnection(String uuid) throws Exception
+	{
+		ChannelWrapper result = null;
+		List<ChannelWrapper<?>> connections = server.providerConnections.get(uuid);
+		int minRequests = Integer.MAX_VALUE;
+		for (ChannelWrapper channel: connections)
+		{
+			ClassContext ctx = (ClassContext) channel.getContext();
+			int size = ctx.getNbPendingRequests();
+			if (size < minRequests)
+			{
+				minRequests = size;
+				result = channel;
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -221,4 +225,3 @@ class WaitingNodeRequestState extends ClassServerState
 		}
 	}
 }
-

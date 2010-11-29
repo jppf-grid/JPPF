@@ -24,6 +24,7 @@ import java.util.List;
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.ByteBufferInputStream;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -42,6 +43,10 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * Determines whther DEBUG logging level is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Reference to the transition manager.
+	 */
+	private static StateTransitionManager transitionManager = JPPFDriver.getInstance().getClassServer().getTransitionManager();
 	/**
 	 * The resource read from or written to the associated channel.
 	 */
@@ -127,6 +132,11 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	public synchronized void addRequest(ChannelWrapper<?> request)
 	{
 		pendingRequests.add(request);
+		if (ClassState.IDLE_PROVIDER.equals(state))
+		{
+			transitionManager.transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST);
+			if (debugEnabled) log.debug("node " + request + " transitioned provider " + getChannel());
+		}
 	}
 
 	/**

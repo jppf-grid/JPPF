@@ -55,6 +55,10 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	 * Count of bytes written.
 	 */
 	public int writeByteCount = -1;
+	/**
+	 * The associated channel.
+	 */
+	private ChannelWrapper<?> channel = null;
 
 	/**
 	 * {@inheritDoc}
@@ -115,5 +119,21 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	public void setMessage(NioMessage message)
 	{
 		this.message = message;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public ChannelWrapper<?> getChannel()
+	{
+		return channel;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setChannel(ChannelWrapper<?> channel)
+	{
+		this.channel = channel;
 	}
 }

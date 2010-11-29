@@ -65,18 +65,12 @@ public class ResourceProvider
 	 * The search order is defined as follows:<br>
 	 * - first the search is performed in the order specified by {@link java.lang.ClassLoader#getResourceAsStream(java.lang.String) ClassLoader.getResourceAsStream(String)}<br>
 	 * - if the resource is not found, it will be looked up in the file system <br>
-	 * @param resName - the name of the resource to load.
-	 * @param cl - the class loader to use to load the request resource.
+	 * @param resName the name of the resource to load.
+	 * @param cl the class loader to use to load the request resource.
 	 * @return an array of bytes, or nll if the resource could not be found.
 	 */
 	public byte[] getResourceAsBytes(String resName, ClassLoader cl)
 	{
-		if ("org/jppf/utils/ObjectSerializerImpl.class".equals(resName))
-		{
-			ClassLoader cl1 = Thread.currentThread().getContextClassLoader();
-			ClassLoader cl2 = getClass().getClassLoader();
-			int breakpoint = 0;
-		}
 		try
 		{
 			if (cl == null) cl = Thread.currentThread().getContextClassLoader();

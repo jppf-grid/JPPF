@@ -75,6 +75,8 @@ public class MatrixRunner implements NotificationListener
 		MatrixRunner runner = null;
 		try
 		{
+			System.out.println("press any key when ready to start");
+			int c = System.in.read();
 			TypedProperties props = JPPFConfiguration.getProperties();
 			if ((args != null) && (args.length > 0)) jppfClient = new JPPFClient(args[0]);
 			else jppfClient = new JPPFClient();

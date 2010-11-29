@@ -72,4 +72,15 @@ public interface NioContext<S extends Enum<S>>
 	 */
 	void handleException(ChannelWrapper<?> channel);
 
+	/**
+	 * Get the associated channel.
+	 * @return a {@link ChannelWrapper} instance.
+	 */
+	ChannelWrapper<?> getChannel();
+
+	/**
+	 * Set the associated channel.
+	 * @param channel a {@link ChannelWrapper} instance.
+	 */
+	void setChannel(ChannelWrapper<?> channel);
 }
