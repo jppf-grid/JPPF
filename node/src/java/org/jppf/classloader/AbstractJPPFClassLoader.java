@@ -391,7 +391,6 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	public Enumeration<URL> findResources(String name) throws IOException
 	{
 		List<URL> urlList = null;
-		//if (loading.get()) return null;
 		if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
 		try
 		{
@@ -418,6 +417,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 				for (String path: locationsList)
 				{
 					File file = new File(path);
+					if (urlList == null) urlList = new ArrayList<URL>();
 					urlList.add(file.toURI().toURL());
 				}
 				if (debugEnabled) log.debug("found the following URLs for resource [" + name + "] : " + urlList);
