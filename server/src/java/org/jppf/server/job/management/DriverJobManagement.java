@@ -76,8 +76,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 			if (debugEnabled) log.debug("bundleWrapper=" + bundleWrapper);
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			BundleWrapper queuedWrapper = JPPFDriver.getQueue().nextBundle(bundleWrapper, bundle.getTaskCount());
-			//if ((queuedWrapper != null) && (bundle.getCompletionListener() != null)) bundle.getCompletionListener().taskCompleted(bundleWrapper);
 		}
+		else if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + "'");
 	}
 
 	/**
@@ -91,8 +91,12 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	public void suspendJob(String jobUuid, Boolean requeue) throws Exception
 	{
 		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+		if (bundleWrapper == null)
+		{
+			if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + "'");
+			return;
+		}
 		if (debugEnabled) log.debug("Request to suspend jobId = '" + bundleWrapper.getBundle().getId() + "'");
-		if (bundleWrapper == null) return;
 		if (bundleWrapper.getBundle().getJobSLA().isSuspended()) return;
 		bundleWrapper.getBundle().getJobSLA().setSuspended(true);
 		getJobManager().jobUpdated(bundleWrapper);
@@ -108,8 +112,12 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	public void resumeJob(String jobUuid) throws Exception
 	{
 		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+		if (bundleWrapper == null)
+		{
+			if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + "'");
+			return;
+		}
 		if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getBundle().getId() + "'");
-		if (bundleWrapper == null) return;
 		if (!bundleWrapper.getBundle().getJobSLA().isSuspended()) return;
 		bundleWrapper.getBundle().getJobSLA().setSuspended(false);
 		getJobManager().jobUpdated(bundleWrapper);
@@ -125,8 +133,12 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	public void updateMaxNodes(String jobUuid, Integer maxNodes) throws Exception
 	{
 		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+		if (bundleWrapper == null)
+		{
+			if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + "'");
+			return;
+		}
 		if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + bundleWrapper.getBundle().getId() + "'");
-		if (bundleWrapper == null) return;
 		if (maxNodes <= 0) return;
 		bundleWrapper.getBundle().getJobSLA().setMaxNodes(maxNodes);
 		getJobManager().jobUpdated(bundleWrapper);
@@ -145,7 +157,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	}
 
 	/**
-	 * Get an object describing the job with the specified id. 
+	 * Get an object describing the job with the specified uuid. 
 	 * @param jobUuid the id of the job to get information about.
 	 * @return an instance of <code>JobInformation</code>.
 	 * @throws Exception if any error occurs.
