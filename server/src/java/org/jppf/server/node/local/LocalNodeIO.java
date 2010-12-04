@@ -21,16 +21,14 @@ package org.jppf.server.node.local;
 import static java.nio.channels.SelectionKey.*;
 import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 
-import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.data.transform.JPPFDataTransformFactory;
-import org.jppf.io.*;
+import org.jppf.io.DataLocation;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.MultipleBuffersInputStream;
 import org.slf4j.*;
 
 /**
@@ -156,73 +154,5 @@ public class LocalNodeIO extends AbstractNodeIO
 		// wait until the message has been read by the server
 		while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
 		channel.setReadyOps(0);
-	}
-
-	/**
-	 * The goal of this class is to serialize an object before sending it back to the server,
-	 * and catch an eventual exception.
-	 */
-	protected class ObjectSerializationTask implements Callable<DataLocation>
-	{
-		/**
-		 * The data to send over the network connection.
-		 */
-		private Object object = null;
-
-		/**
-		 * Initialize this task with the psecicfied data buffer.
-		 * @param object the object to serialize.
-		 */
-		public ObjectSerializationTask(Object object)
-		{
-			this.object = object;
-		}
-
-		/**
-		 * Execute this task.
-		 * @return the serialized object.
-		 */
-		public DataLocation call()
-		{
-			BufferList data = null;
-			int p = (object instanceof JPPFTask) ? ((JPPFTask) object).getPosition() : -1;
-			try
-			{
-				if (log.isTraceEnabled()) log.trace("before serialization of object at position " + p);
-				data = serialize(object);
-				if (log.isTraceEnabled()) log.trace("serialized object at position " + p);
-			}
-			catch(Throwable t)
-			{
-				data = null;
-				log.error(t.getMessage(), t);
-				try
-				{
-					JPPFExceptionResult result = new JPPFExceptionResult(t, object);
-					object = null;
-					result.setPosition(p);
-					data = serialize(result);
-				}
-				catch(Exception e2)
-				{
-					log.error(e2.getMessage(), e2);
-				}
-			}
-			object = null;
-			DataLocation location = null;
-			try
-			{
-				location = IOHelper.createDataLocationMemorySensitive(data.second());
-				InputStream is = new MultipleBuffersInputStream(data.first());
-				InputSource source = new StreamInputSource(is);
-				location.transferFrom(source, true);
-				int i=0;
-			}
-			catch(Throwable t)
-			{
-				log.error(t.getMessage(), t);
-			}
-			return location;
-		}
 	}
 }

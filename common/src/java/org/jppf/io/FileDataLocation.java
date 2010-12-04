@@ -62,10 +62,6 @@ public class FileDataLocation extends AbstractDataLocation
 	 * The current count of bytes read from/written to the block of data currently being transferred.
 	 */
 	private int blockCount = 0;
-	/**
-	 * Determines whether the size was unknown at creation time.
-	 */
-	private boolean sizeUnknown = false;
 
 	/**
 	 * Initialize this file location with the specified file path and an unknown size.
@@ -73,7 +69,7 @@ public class FileDataLocation extends AbstractDataLocation
 	 */
 	public FileDataLocation(String path)
 	{
-		this(path, UNKNOWN_SIZE);
+		this(new File(path));
 	}
 
 	/**
@@ -85,7 +81,6 @@ public class FileDataLocation extends AbstractDataLocation
 	{
 		filePath = path;
 		this.size = size;
-		if (size == UNKNOWN_SIZE) sizeUnknown = true;
 	}
 
 	/**
@@ -94,7 +89,7 @@ public class FileDataLocation extends AbstractDataLocation
 	 */
 	public FileDataLocation(File file)
 	{
-		this(file, UNKNOWN_SIZE);
+		this(file, (int) file.length());
 	}
 
 	/**
@@ -127,7 +122,7 @@ public class FileDataLocation extends AbstractDataLocation
 		}
 		try
 		{
-			int n = blocking ? (size == UNKNOWN_SIZE ? blockingTransferFromUnknownSize(source) : blockingTransferFrom(source)) : nonBlockingTransferFrom(source);
+			int n = blocking ? blockingTransferFrom(source) : nonBlockingTransferFrom(source);
 			if ((n < 0) || (count >= size)) transferring = false;
 			return n;
 		}
@@ -226,48 +221,6 @@ public class FileDataLocation extends AbstractDataLocation
 		}
 		transferring = false;
 		return count;
-	}
-
-	/**
-	 * Perform a blocking transfer to this data location from the specified input source.
-	 * @param source the input source to transfer from.
-	 * @return the number of bytes actually transferred. 
-	 * @throws Exception if an IO error occurs.
-	 */
-	private int blockingTransferFromUnknownSize(InputSource source) throws Exception
-	{
-		while (true)
-		{
-			int n = source.read(buffer);
-			if (n < 0)
-			{
-				transferring = false;
-				size = count;
-				sizeUnknown = false;
-				return -1;
-			}
-			else if (n > 0)
-			{
-				count += n;
-				buffer.flip();
-				int tempCount = 0;
-				while (tempCount < n)
-				{
-					int tmp = fileChannel.write(buffer);
-					if (tmp < 0)
-					{
-						transferring = false;
-						size = count;
-						sizeUnknown = false;
-						return -1;
-					}
-					tempCount += tmp;
-				}
-				buffer.clear();
-			}
-		}
-		//transferring = false;
-		//return count;
 	}
 
 	/**

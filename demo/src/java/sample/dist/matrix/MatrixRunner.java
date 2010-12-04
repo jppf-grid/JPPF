@@ -75,8 +75,10 @@ public class MatrixRunner implements NotificationListener
 		MatrixRunner runner = null;
 		try
 		{
+			/*
 			System.out.println("press any key when ready to start");
 			int c = System.in.read();
+			*/
 			TypedProperties props = JPPFConfiguration.getProperties();
 			if ((args != null) && (args.length > 0)) jppfClient = new JPPFClient(args[0]);
 			else jppfClient = new JPPFClient();
@@ -157,7 +159,8 @@ public class MatrixRunner implements NotificationListener
 	 */
 	private long performParallelMultiplication(Matrix a, Matrix b, int nbRows, ExecutionPolicy policy) throws Exception
 	{
-		long start = System.currentTimeMillis();
+		//long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 		int size = a.getSize();
 		// create a task for each row in matrix a
 		JPPFJob job = new JPPFJob();
@@ -196,7 +199,9 @@ public class MatrixRunner implements NotificationListener
 			}
 			rowIdx += rows.length;
 		}
-		return System.currentTimeMillis() - start;
+		//long elapsed = System.currentTimeMillis() - start;
+		long elapsed = System.nanoTime() - start;
+		return elapsed/1000000L;
 	}
 
 	/**

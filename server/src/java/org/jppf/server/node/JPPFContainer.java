@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
-import org.jppf.data.transform.JPPFDataTransformFactory;
+import org.jppf.io.*;
 import org.jppf.utils.SerializationHelper;
 import org.slf4j.*;
 
@@ -156,22 +156,22 @@ public abstract class JPPFContainer
 	protected class ObjectDeserializationTask implements Callable<Object>
 	{
 		/**
-		 * The data to send over the network connection.
+		 * The data received over the network connection.
 		 */
-		private byte[] buffer = null;
+		DataLocation dl = null;
 		/**
 		 * Index of the object to deserialize in the incoming IO message; used for debugging purposes.
 		 */
 		private int index = 0;
 
 		/**
-		 * Initialize this task with the specicfied data buffer.
-		 * @param buffer the data read from the network connection.
+		 * Initialize this task with the specified data buffer.
+		 * @param dl the data read from the network connection, stored in a meomory-sensitive location.
 		 * @param index index of the object to deserialize in the incoming IO message; used for debugging purposes.
 		 */
-		public ObjectDeserializationTask(byte[] buffer, int index)
+		public ObjectDeserializationTask(DataLocation dl, int index)
 		{
-			this.buffer = buffer;
+			this.dl = dl;
 			this.index = index;
 		}
 
@@ -187,11 +187,7 @@ public abstract class JPPFContainer
 			{
 				Thread.currentThread().setContextClassLoader(getClassLoader());
 				if (traceEnabled) log.debug("deserializing object index = " + index);
-				buffer = JPPFDataTransformFactory.transform(false, buffer);
-				Object o = helper.getSerializer().deserialize(buffer);
-				buffer = null;
-				if (traceEnabled) log.debug("deserialized object index = " + index);
-				return o;
+				return IOHelper.unwrappedData(dl, helper.getSerializer());
 			}
 			catch(Throwable t)
 			{
@@ -200,7 +196,6 @@ public abstract class JPPFContainer
 			}
 			finally
 			{
-				buffer = null;
 				Thread.currentThread().setContextClassLoader(cl);
 			}
 		}

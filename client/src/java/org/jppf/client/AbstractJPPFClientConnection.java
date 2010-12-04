@@ -27,7 +27,7 @@ import java.util.concurrent.*;
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
-import org.jppf.data.transform.*;
+import org.jppf.io.IOHelper;
 import org.jppf.security.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
@@ -120,10 +120,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * The pool of threads used for submitting execution requests.
 	 */
 	protected ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
-	/**
-	 * Handles data serialization and deserialization to and from the server.
-	 */
-	protected DataHandler dataHandler = new DataHandler();
 
 	/**
 	 * Configure this client connection with the specified parameters.
@@ -211,9 +207,9 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		header.setParameter(BundleParameter.JOB_METADATA, job.getJobMetadata());
 
 		SocketWrapper socketClient = taskServerConnection.getSocketClient();
-		dataHandler.sendData(socketClient, header, ser);
-		dataHandler.sendData(socketClient, job.getDataProvider(), ser);
-		for (JPPFTask task : job.getTasks()) dataHandler.sendData(socketClient, task, ser);
+		IOHelper.sendData(socketClient, header, ser);
+		IOHelper.sendData(socketClient, job.getDataProvider(), ser);
+		for (JPPFTask task : job.getTasks()) IOHelper.sendData(socketClient, task, ser);
 		socketClient.flush();
 	}
 
@@ -229,14 +225,11 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		{
 			SocketWrapper socketClient = taskServerConnection.getSocketClient();
 			ObjectSerializer ser = makeHelper().getSerializer();
-			JPPFTaskBundle bundle = (JPPFTaskBundle) unwrappedData(socketClient.receiveBytes(0), ser);
+			JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, ser);
 			int count = bundle.getTaskCount();
 			if (debugEnabled) log.debug("received bundle with " + count + " tasks for job '" + bundle.getId() + "'");
 			List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-			for (int i=0; i<count; i++)
-			{
-				taskList.add((JPPFTask) unwrappedData(socketClient.receiveBytes(0), ser));
-			}
+			for (int i=0; i<count; i++) taskList.add((JPPFTask) IOHelper.unwrappedData(socketClient, ser));
 	
 			int startIndex = (taskList.isEmpty()) ? -1 : taskList.get(0).getPosition();
 			// if an exception prevented the node from executing the tasks
@@ -265,21 +258,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			log.error(e.getMessage(), e);
 			throw e;
 		}
-	}
-
-	/**
-	 * Transform an array of bytes received from the network into an object.
-	 * @param buffer the data to unwrap.
-	 * @param ser the object serializer to use.
-	 * @return the transformed result as an object.
-	 * @throws Exception if an error occurs while preparing the data.
-	 */
-	private Object unwrappedData(JPPFBuffer buffer, ObjectSerializer ser) throws Exception
-	{
-		byte[] data = buffer.getBuffer();
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		if (transform != null) data = JPPFDataTransformFactory.transform(transform, false, data);
-		return ser.deserialize(data);
 	}
 
 	/**

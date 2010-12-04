@@ -22,8 +22,8 @@ import java.util.concurrent.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.io.*;
 import org.jppf.server.node.JPPFContainer;
-import org.jppf.utils.JPPFBuffer;
 import org.slf4j.*;
 
 /**
@@ -81,11 +81,17 @@ public class JPPFRemoteContainer extends JPPFContainer
 		{
 			Thread.currentThread().setContextClassLoader(classLoader);
 			List<Future<Object>> futureList = new ArrayList<Future<Object>>();
+			InputSource is = new SocketWrapperInputSource(socketClient);
 			for (int i=0; i<count; i++)
 			{
+				DataLocation dl = IOHelper.readData(is);
+				if (traceEnabled) log.trace("i = " + i + ", read data size = " + dl.getSize());
+				futureList.add(executor.submit(new ObjectDeserializationTask(dl, i)));
+				/*
 				JPPFBuffer buf = socketClient.receiveBytes(0);
 				if (traceEnabled) log.trace("i = " + i + ", read buffer size = " + buf.getLength());
 				futureList.add(executor.submit(new ObjectDeserializationTask(buf.getBuffer(), i)));
+				*/
 			}
 			for (Future<Object> f: futureList)
 			{

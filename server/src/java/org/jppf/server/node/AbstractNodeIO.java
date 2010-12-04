@@ -22,8 +22,9 @@ import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 
 import java.io.InvalidClassException;
 import java.util.*;
+import java.util.concurrent.Callable;
 
-import org.jppf.data.transform.*;
+import org.jppf.io.*;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
@@ -43,6 +44,10 @@ public abstract class AbstractNodeIO implements NodeIO
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
 	 * The node who owns this TaskIO.
 	 */
@@ -171,26 +176,59 @@ public abstract class AbstractNodeIO implements NodeIO
 	}
 
 	/**
-	 * Serialize the specified object
-	 * @param o the object to serialize.
-	 * @return the serialized object as an array of bytes.
-	 * @throws Exception if any error occurs.
+	 * The goal of this class is to serialize an object before sending it back to the server,
+	 * and catch an eventual exception.
 	 */
-	protected BufferList serialize(Object o) throws Exception
+	protected class ObjectSerializationTask implements Callable<DataLocation>
 	{
-		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
-		node.getHelper().getSerializer().serialize(o, mbos);
-		List<JPPFBuffer> data = mbos.toBufferList();
-		int length = mbos.size();
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		if (transform != null)
+		/**
+		 * The data to send over the network connection.
+		 */
+		private Object object = null;
+
+		/**
+		 * Initialize this task with the psecicfied data buffer.
+		 * @param object the object to serialize.
+		 */
+		public ObjectSerializationTask(Object object)
 		{
-			MultipleBuffersInputStream mbis = new MultipleBuffersInputStream(mbos.toBufferList());
-			mbos = new MultipleBuffersOutputStream();
-			transform.wrap(mbis, mbos);
-			data = mbos.toBufferList();
-			length = mbos.size();
+			this.object = object;
 		}
-		return new BufferList(data, length);
+
+		/**
+		 * Execute this task.
+		 * @return the serialized object.
+		 * @see java.util.concurrent.Callable#call()
+		 */
+		public DataLocation call()
+		{
+			ObjectSerializer ser = null;
+			DataLocation dl = null;
+			int p = (object instanceof JPPFTask) ? ((JPPFTask) object).getPosition() : -1;
+			try
+			{
+				ser = node.getHelper().getSerializer();
+				if (traceEnabled) log.trace("before serialization of object at position " + p);
+				dl = IOHelper.serializeData(object, ser);
+				if (traceEnabled) log.trace("serialized object at position " + p);
+			}
+			catch(Throwable t)
+			{
+				log.error(t.getMessage(), t);
+				try
+				{
+					JPPFExceptionResult result = new JPPFExceptionResult(t, object);
+					object = null;
+					result.setPosition(p);
+					dl = IOHelper.serializeData(result, ser);
+				}
+				catch(Exception e2)
+				{
+					log.error(e2.getMessage(), e2);
+				}
+			}
+			object = null;
+			return dl;
+		}
 	}
 }

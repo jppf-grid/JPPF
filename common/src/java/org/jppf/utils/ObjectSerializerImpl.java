@@ -86,7 +86,6 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @param o the object to Serialize.
 	 * @param location the location to serialize to.
 	 * @throws Exception if the object can't be serialized.
-	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object, java.io.OutputStream)
 	 */
 	public void serialize(Object o, DataLocation location) throws Exception
 	{

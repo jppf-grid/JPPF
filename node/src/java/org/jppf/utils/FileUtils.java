@@ -19,7 +19,6 @@ package org.jppf.utils;
 
 import java.io.*;
 import java.net.*;
-import java.nio.ByteBuffer;
 import java.util.*;
 
 /**
@@ -315,14 +314,13 @@ public final class FileUtils
 
 	/**
 	 * Copy the data read from the specified input stream to the specified output stream. 
-	 * @param is - the input stream to read from.
-	 * @param os - the output stream to write to.
+	 * @param is the input stream to read from.
+	 * @param os the output stream to write to.
 	 * @throws IOException if an I/O error occurs.
 	 */
 	public static void copyStream(InputStream is, OutputStream os) throws IOException
 	{
-		ByteBuffer tmp = ByteBuffer.wrap(new byte[TEMP_BUFFER_SIZE]);
-		byte[] bytes = tmp.array();
+		byte[] bytes = new byte[TEMP_BUFFER_SIZE];
 		while(true)
 		{
 			int n = is.read(bytes);

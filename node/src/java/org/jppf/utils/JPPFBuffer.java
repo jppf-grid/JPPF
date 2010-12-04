@@ -35,7 +35,7 @@ public class JPPFBuffer
 	/**
 	 * Current position in this buffer.
 	 */
-	int pos = 0;
+	public int pos = 0;
 
 	/**
 	 * Initialize this buffer.
@@ -106,7 +106,7 @@ public class JPPFBuffer
 	 * Return the number of bytes available for writing in this buffer.
 	 * @return the available bytes as an int value.
 	 */
-	int remaining()
+	public int remaining()
 	{
 		return buffer.length - length;
 	}
@@ -115,7 +115,7 @@ public class JPPFBuffer
 	 * Return the number of bytes available for reading in this buffer.
 	 * @return the available bytes as an int value.
 	 */
-	int remainingFromPos()
+	public int remainingFromPos()
 	{
 		return length - pos;
 	}

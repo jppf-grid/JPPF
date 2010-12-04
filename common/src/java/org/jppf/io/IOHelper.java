@@ -18,8 +18,10 @@
 
 package org.jppf.io;
 
-import java.io.File;
+import java.io.*;
 
+import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.data.transform.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -72,8 +74,11 @@ public final class IOHelper
 		{
 			try
 			{
+				/*
 				byte[] bytes = new byte[size];
 				return new ByteBufferLocation(bytes, 0, size);
+				*/
+				return new MultipleBuffersLocation(size);
 			}
 			catch (OutOfMemoryError oome)
 			{
@@ -123,5 +128,174 @@ public final class IOHelper
 		long freeMem = SystemUtils.maxFreeHeap();
 		if (traceEnabled) log.trace("free mem / requested size : " + freeMem + "/" + size);
 		return (long) (FREE_MEM_TO_SIZE_RATIO * size) < freeMem;
+	}
+
+	/**
+	 * Deserialize the next object available via a network connection.
+	 * @param socketWrapper the network connection used to read data.
+	 * @param ser the object serializer to use.
+	 * @return the transformed result as an object.
+	 * @throws Exception if an error occurs while preparing the data.
+	 */
+	public static Object unwrappedData(SocketWrapper socketWrapper, ObjectSerializer ser) throws Exception
+	{
+		if (traceEnabled) log.trace("unwrapping from network connection");
+		InputSource sis = new SocketWrapperInputSource(socketWrapper);
+		DataLocation dl = IOHelper.readData(sis);
+		return unwrappedData(dl, ser);
+	}
+
+	/**
+	 * Deserialize the specified data into an object.
+	 * @param dl the data, stored in a memory-aware location.
+	 * @param ser the object serializer to use.
+	 * @return the transformed result as an object.
+	 * @throws Exception if an error occurs while preparing the data.
+	 */
+	public static Object unwrappedData(DataLocation dl, ObjectSerializer ser) throws Exception
+	{
+		if (traceEnabled) log.trace("unwrapping " + dl);
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		File file = null;
+		InputStream is = null;
+		try
+		{
+			if (transform != null)
+			{
+				is = fitsInMemory(dl.getSize()) ? unwrapData(transform, dl) : unwrapDataToFile(transform, dl);
+			}
+			else is = dl.getInputStream();
+			return ser.deserialize(is);
+		}
+		finally
+		{
+			if ((file != null) && file.exists()) file.delete();
+		}
+	}
+
+	/**
+	 * Apply a {@link JPPFDataTransform} to the specified source and store the results in memory. 
+	 * @param transform the {@link JPPFDataTransform} to apply.
+	 * @param source the source data to transform.
+	 * @return the transformed data as an <code>InputStream</code>.
+	 * @throws Exception if an error occurs while preparing the data.
+	 */
+	public static InputStream unwrapData(JPPFDataTransform transform, DataLocation source) throws Exception
+	{
+		if (traceEnabled) log.trace("unwrapping to memory " + source);
+		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
+		transform.unwrap(source.getInputStream(), mbos);
+		return new MultipleBuffersInputStream(mbos.toBufferList());
+	}
+
+	/**
+	 * Apply a {@link JPPFDataTransform} to the specified source and store the results in a temporary file. 
+	 * @param transform the {@link JPPFDataTransform} to apply.
+	 * @param source the source data to transform.
+	 * @return the transformed data as a <code>File</code>.
+	 * @throws Exception if an error occurs while preparing the data.
+	 */
+	public static InputStream unwrapDataToFile(JPPFDataTransform transform, DataLocation source) throws Exception
+	{
+		if (traceEnabled) log.trace("unwrapping to file " + source);
+		File file = IOHelper.createTempFile(-1);
+		OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
+		transform.unwrap(source.getInputStream(), os);
+		return new BufferedInputStream(new FileInputStream(file));
+	}
+
+	/**
+	 * Serialize an object and send it to the server.
+	 * @param socketWrapper the socket client used to send data to the server.
+	 * @param o the object to serialize.
+	 * @param ser the object serializer.
+	 * @throws Exception if any error occurs.
+	 */
+	public static void sendData(SocketWrapper socketWrapper, Object o, ObjectSerializer ser) throws Exception
+	{
+		DataLocation dl = null;
+		if (traceEnabled) log.trace("sending object " + o);
+		try
+		{
+			dl = serializeDataToMemory(o, ser);
+		}
+		catch(OutOfMemoryError e)
+		{
+			dl = serializeDataToFile(o, ser);
+		}
+		socketWrapper.writeInt(dl.getSize());
+		OutputDestination od = new SocketWrapperOutputDestination(socketWrapper);
+		dl.transferTo(od, true);
+	}
+
+	/**
+	 * Serialize an object and send it to the server.
+	 * @param o the object to serialize.
+	 * @param ser the object serializer.
+	 * @return a {@link DataLocation} instance.
+	 * @throws Exception if any error occurs.
+	 */
+	public static DataLocation serializeData(Object o, ObjectSerializer ser) throws Exception
+	{
+		if (traceEnabled) log.trace("serializing object " + o);
+		DataLocation dl = null;
+		try
+		{
+			dl = serializeDataToMemory(o, ser);
+		}
+		catch(OutOfMemoryError e)
+		{
+			dl = serializeDataToFile(o, ser);
+		}
+		return dl;
+	}
+
+	/**
+	 * Serialize an object to a bugffer in memory.
+	 * @param o the object to serialize.
+	 * @param ser the object serializer.
+	 * @return an instance of {@link MultipleBuffersOutputStream}.
+	 * @throws Exception if any error occurs.
+	 */
+	public static DataLocation serializeDataToMemory(Object o, ObjectSerializer ser) throws Exception
+	{
+		if (traceEnabled) log.trace("serializing object to memory " + o);
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
+		ser.serialize(o, mbos);
+		if (transform != null)
+		{
+			MultipleBuffersInputStream mbis = new MultipleBuffersInputStream(mbos.toBufferList());
+			mbos = new MultipleBuffersOutputStream();
+			transform.wrap(mbis, mbos);
+		}
+		return new MultipleBuffersLocation(mbos.toBufferList(), mbos.size());
+	}
+
+	/**
+	 * Serialize an object and send it to the server.
+	 * @param o the object to serialize.
+	 * @param ser the object serializer.
+	 * @return an instance of {@link FileDataLocation}.
+	 * @throws Exception if any error occurs.
+	 */
+	public static DataLocation serializeDataToFile(Object o, ObjectSerializer ser) throws Exception
+	{
+		if (traceEnabled) log.trace("serializing object to file " + o);
+		File file = IOHelper.createTempFile(-1);
+		OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
+		ser.serialize(o, os);
+		DataLocation dl = null;
+		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		if (transform != null)
+		{
+			InputStream is = new BufferedInputStream(new FileInputStream(file));
+			File file2 = IOHelper.createTempFile(-1);
+			os = new BufferedOutputStream(new FileOutputStream(file2));
+			transform.wrap(is, os);
+			dl = new FileDataLocation(file2);
+		}
+		else dl = new FileDataLocation(file);
+		return dl;
 	}
 }

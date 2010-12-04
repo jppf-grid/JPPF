@@ -32,7 +32,7 @@ public class MultipleBuffersInputStream extends InputStream
 	 */
 	private List<JPPFBuffer> list = new ArrayList<JPPFBuffer>();
 	/**
-	 * The JPPFBuffer currently being written to.
+	 * The JPPFBuffer currently being read from.
 	 */
 	private JPPFBuffer currentBuffer = null;
 	/**
@@ -80,7 +80,7 @@ public class MultipleBuffersInputStream extends InputStream
 	{
 		if ((currentBuffer == null) || (currentBuffer.remainingFromPos() < 1)) nextBuffer();
 		if (eofReached) return -1;
-		int n = currentBuffer.buffer[currentBuffer.length];
+		int n = currentBuffer.buffer[currentBuffer.pos];
 		currentBuffer.pos++;
 		return n;
 	}
@@ -140,5 +140,16 @@ public class MultipleBuffersInputStream extends InputStream
 		}
 		currentBuffer = list.get(bufferIndex);
 		currentBuffer.pos = 0;
+	}
+
+	/**
+	 * Get the JPPFBuffer currently being read from.
+	 * @return a {@link JPPFBuffer} instance.
+	 */
+	public JPPFBuffer getCurrentBuffer()
+	{
+		if (eofReached) return null;
+		if ((currentBuffer == null) || (currentBuffer.remainingFromPos() <= 0)) nextBuffer();
+		return currentBuffer;
 	}
 }
