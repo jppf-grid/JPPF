@@ -17,7 +17,7 @@
  */
 package org.jppf.client;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
@@ -104,7 +104,7 @@ public class JPPFClient extends AbstractGenericClient
 	 */
 	protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
 	{
-		return new JPPFClientConnectionImpl(uuid, name, info, getLoadBalancer());
+		return new JPPFClientConnectionImpl(this, uuid, name, info);
 	}
 
 	/**

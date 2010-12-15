@@ -113,7 +113,8 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 					boolean found = true;
 					resource = readResource();
 					String name = resource.getName();
-					if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name);
+					ClassLoader cl = getClassLoader(resource.getRequestUuid());
+					if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name + " using classloader=" + cl);
 					if (resource.getData("multiple") == null)
 					{
 						byte[] b = null;
@@ -121,8 +122,8 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 						if (callable != null) b = resourceProvider.computeCallable(callable);
 						else
 						{
-							if (resource.isAsResource()) b = resourceProvider.getResource(name);
-							else b = resourceProvider.getResourceAsBytes(name);
+							if (resource.isAsResource()) b = resourceProvider.getResource(name, cl);
+							else b = resourceProvider.getResourceAsBytes(name, cl);
 						}
 						if (b == null) found = false;
 						if (callable == null) resource.setDefinition(b);
@@ -135,7 +136,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 					}
 					else
 					{
-						List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, null);
+						List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
 						if (list != null) resource.setData("resource_list", list);
 					}
 					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
@@ -188,5 +189,15 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	protected SocketInitializer createSocketInitializer()
 	{
 		return new SocketInitializerImpl();
+	}
+
+	/**
+	 * Retrieve the class laoder to use from the client.
+	 * @param uuid the uuid of the request from which the class loader was obtained.
+	 * @return a <code>ClassLoader</code> instance, or null if none could be found.
+	 */
+	private ClassLoader getClassLoader(String uuid)
+	{
+		return ((JPPFClientConnectionImpl) owner).getClient().getRequestClassLoader(uuid);
 	}
 }

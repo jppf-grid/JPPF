@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.proportional.ProportionalTuneProfile;
 import org.jppf.utils.*;
@@ -323,14 +323,7 @@ public class LoadBalancer
 				long start = System.currentTimeMillis();
 				int count = 0;
 				boolean completed = false;
-				//JPPFJob newJob = new JPPFJob(job.getDataProvider(), job.getJobSLA(), job.getJobMetadata(), job.isBlocking(), job.getResultListener());
-				JPPFJob newJob = new JPPFJob(job.getJobUuid());
-				newJob.setDataProvider(job.getDataProvider());
-				newJob.setJobSLA(job.getJobSLA());
-				newJob.setJobMetadata(job.getJobMetadata());
-				newJob.setBlocking(job.isBlocking());
-				newJob.setResultListener(job.getResultListener());
-				newJob.setId(job.getId());
+				JPPFJob newJob = createNewJob(job);
 				for (JPPFTask task: tasks)
 				{
 					// needed as JPPFJob.addTask() resets the position
@@ -340,10 +333,12 @@ public class LoadBalancer
 				}
 				while (!completed)
 				{
-					connection.sendTasks(newJob);
+					JPPFTaskBundle bundle = createBundle(newJob);
+					connection.sendTasks(bundle, newJob);
+					ClassLoader cl = connection.getClient().getRequestClassLoader(bundle.getRequestUuid());
 					while (count < tasks.size())
 					{
-						Pair<List<JPPFTask>, Integer> p = connection.receiveResults();
+						Pair<List<JPPFTask>, Integer> p = connection.receiveResults(cl);
 						int n = p.first().size();
 						count += n;
 						if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + p.first().get(0).getPosition() : ""));
@@ -369,6 +364,45 @@ public class LoadBalancer
 				if (debugEnabled) log.debug(e.getMessage(), e);
 				exception = e;
 			}
+		}
+
+		/**
+		 * Create a new job based on the initial one.
+		 * @param job the initial job.
+		 * @return a new {@link JPPFJob} with the same characteristics as the initial one, except for the tasks.
+		 */
+		private JPPFJob createNewJob(JPPFJob job)
+		{
+			JPPFJob newJob = new JPPFJob(job.getJobUuid());
+			newJob.setDataProvider(job.getDataProvider());
+			newJob.setJobSLA(job.getJobSLA());
+			newJob.setJobMetadata(job.getJobMetadata());
+			newJob.setBlocking(job.isBlocking());
+			newJob.setResultListener(job.getResultListener());
+			newJob.setId(job.getId());
+			return newJob;
+		}
+
+		/**
+		 * Create a task bundle for the specified job.
+		 * @param job the job to use as a base.
+		 * @return a JPPFTaskBundle instance.
+		 */
+		private JPPFTaskBundle createBundle(JPPFJob job)
+		{
+			String requestUuid = job.getJobUuid();
+			JPPFTaskBundle bundle = new JPPFTaskBundle();
+			bundle.setRequestUuid(requestUuid);
+			ClassLoader cl = null;
+			ClassLoader oldCl = null;
+			if (!job.getTasks().isEmpty())
+			{
+				JPPFTask task = job.getTasks().get(0);
+				cl = task.getClass().getClassLoader();
+				connection.getClient().addRequestClassLoader(requestUuid, cl);
+				if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
+			}
+			return bundle;
 		}
 	}
 

@@ -17,6 +17,7 @@
  */
 package org.jppf.client;
 
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.client.loadbalancer.LoadBalancer;
@@ -58,6 +59,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	 * The load balancer for local versus remote execution.
 	 */
 	protected LoadBalancer loadBalancer = null;
+	/**
+	 * Mapping of class laoder to requests uuids.
+	 */
+	private Map<String, ClassLoader> classLoaderMap = new Hashtable<String, ClassLoader>();
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -279,5 +284,34 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 			if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
 			c.init();
 		}
+	}
+
+	/**
+	 * Add a request uuid to class loader mapping to this submission manager.
+	 * @param uuid the uuid of the request.
+	 * @param cl the class loader for the request.
+	 */
+	public void addRequestClassLoader(String uuid, ClassLoader cl)
+	{
+		classLoaderMap.put(uuid, cl);
+	}
+
+	/**
+	 * Add a request uuid to class loader mapping to this submission manager.
+	 * @param uuid the uuid of the request.
+	 */
+	public void removeRequestClassLoader(String uuid)
+	{
+		classLoaderMap.remove(uuid);
+	}
+
+	/**
+	 * Get a class loader from its request uuid.
+	 * @param uuid the uuid of the request.
+	 * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
+	 */
+	public ClassLoader getRequestClassLoader(String uuid)
+	{
+		return classLoaderMap.get(uuid);
 	}
 }

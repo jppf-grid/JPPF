@@ -17,7 +17,7 @@
  */
 package org.jppf.utils;
 
-import org.jppf.classloader.AbstractJPPFClassLoader;
+import org.jppf.classloader.*;
 import org.slf4j.*;
 
 /**
@@ -66,6 +66,11 @@ public class SerializationHelperImpl implements SerializationHelper
 			{
 				serializer = (ObjectSerializer)
 					((AbstractJPPFClassLoader) cl).loadJPPFClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
+			}
+			else if (cl instanceof NonDelegatingClassLoader)
+			{
+				serializer = (ObjectSerializer)
+					((NonDelegatingClassLoader) cl).loadClassDirect("org.jppf.utils.ObjectSerializerImpl").newInstance();
 			}
 			else
 			{

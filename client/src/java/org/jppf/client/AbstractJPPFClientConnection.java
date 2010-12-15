@@ -25,7 +25,9 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.JPPFException;
+import org.jppf.classloader.NonDelegatingClassLoader;
 import org.jppf.client.event.*;
+import org.jppf.client.loadbalancer.LoadBalancer;
 import org.jppf.comm.socket.*;
 import org.jppf.io.IOHelper;
 import org.jppf.security.*;
@@ -120,6 +122,10 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * The pool of threads used for submitting execution requests.
 	 */
 	protected ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
+	/**
+	 * The JPPF client that owns this connection.
+	 */
+	protected AbstractGenericClient client = null;
 
 	/**
 	 * Configure this client connection with the specified parameters.
@@ -261,6 +267,29 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	}
 
 	/**
+	 * Receive results of tasks execution.
+	 * @return a pair of objects representing the executed tasks results, and the index
+	 * of the first result within the initial task execution request.
+	 * @param cl the cintext classloader to use to deserialize the results.
+	 * @throws Exception if an error is raised while reading the results from the server.
+	 */
+	public Pair<List<JPPFTask>, Integer> receiveResults(ClassLoader cl) throws Exception
+	{
+		ClassLoader prevCl = Thread.currentThread().getContextClassLoader();
+		if (cl != null) Thread.currentThread().setContextClassLoader(cl);
+		Pair<List<JPPFTask>, Integer> results = null;
+		try
+		{
+			results = receiveResults();
+		}
+		finally
+		{
+			if (cl != null) Thread.currentThread().setContextClassLoader(prevCl);
+		}
+		return results;
+	}
+
+	/**
 	 * Instantiate a <code>SerializationHelper</code> using the current context class loader.
 	 * @return a <code>SerializationHelper</code> instance.
 	 * @throws Exception if the serialiozation helper could not be instantiated.
@@ -279,13 +308,14 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	protected SerializationHelper makeHelper(ClassLoader cl) throws Exception
 	{
 		if (cl == null) cl = Thread.currentThread().getContextClassLoader();
+		NonDelegatingClassLoader ndCl = new NonDelegatingClassLoader(null, cl);
 		String helperClassName = getSerializationHelperClassName();
 		Class clazz = null;
 		if (cl != null)
 		{
 			try
 			{
-				clazz = cl.loadClass(helperClassName);
+				clazz = ndCl.loadClassDirect(helperClassName);
 			}
 			catch(ClassNotFoundException e)
 			{
@@ -504,5 +534,23 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 				else if (!taskConnectionStatus.equals(this.getStatus())) setStatus(taskConnectionStatus);
 			}
 		}
+	}
+
+	/**
+	 * Get the load balancer that distributes the load between local and remote execution.
+	 * @return a {@link LoadBalancer} instance.
+	 */
+	public LoadBalancer getLoadBalancer()
+	{
+		return client.getLoadBalancer();
+	}
+
+	/**
+	 * Get the JPPF client that owns this connection.
+	 * @return an <code>AbstractGenericClient</code> instance.
+	 */
+	public AbstractGenericClient getClient()
+	{
+		return client;
 	}
 }
