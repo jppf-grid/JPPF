@@ -90,8 +90,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 
 	/**
 	 * Change the bundle size tuning settings.
-	 * @param algorithm - the name opf the load-balancing algorithm to set.
-	 * @param parameters - the algorithm's parameters.
+	 * @param algorithm the name of the load-balancing algorithm to set.
+	 * @param parameters the algorithm's parameters.
 	 * @return an acknowledgement or error message.
 	 * @throws Exception if an error occurred while updating the settings.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#changeLoadBalancerSettings(java.lang.String, java.util.Map)
