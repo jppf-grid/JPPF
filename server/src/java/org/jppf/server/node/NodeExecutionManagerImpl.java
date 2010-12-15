@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
+import org.jppf.node.NodeExecutionManager;
 import org.jppf.scheduling.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
@@ -32,12 +33,12 @@ import org.slf4j.*;
  * Instances of this class manage the execution of JPPF tasks by a node.
  * @author Laurent Cohen
  */
-public class NodeExecutionManager extends ThreadSynchronization
+public class NodeExecutionManagerImpl extends ThreadSynchronization implements NodeExecutionManager
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Logger log = LoggerFactory.getLogger(NodeExecutionManager.class);
+	private static Logger log = LoggerFactory.getLogger(NodeExecutionManagerImpl.class);
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
@@ -70,6 +71,10 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 * The bundle whose tasks are currently being executed.
 	 */
 	private JPPFTaskBundle bundle = null;
+	/**
+	 * The list of tasks to execute.
+	 */
+	private List<JPPFTask> taskList = null;
 	/**
 	 * The uuid path of the current bundle.
 	 */
@@ -104,7 +109,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 * Initialize this execution manager with the specified node.
 	 * @param node the node that uses this excecution manager.
 	 */
-	public NodeExecutionManager(JPPFNode node)
+	public NodeExecutionManagerImpl(JPPFNode node)
 	{
 		this.node = node;
 		TypedProperties props = JPPFConfiguration.getProperties();
@@ -120,7 +125,6 @@ public class NodeExecutionManager extends ThreadSynchronization
 		threadFactory = new JPPFThreadFactory("node processing", cpuTimeEnabled);
 		LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
 		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory);
-		//timeoutTimer = new Timer("Node Task Timeout Timer");
 		if (debugEnabled) log.debug("thread cpu time supported = " + cpuTimeEnabled);
 		if (cpuTimeEnabled) threadMXBean.setThreadCpuTimeEnabled(true);
 	}
@@ -136,7 +140,7 @@ public class NodeExecutionManager extends ThreadSynchronization
 		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
 		NodeExecutionInfo info = null;
 		if (cpuTimeEnabled) info = computeExecutionInfo();
-		setup(bundle);
+		setup(bundle, taskList);
 		for (JPPFTask task : taskList) performTask(task);
 		waitForResults();
 		cleanup();
@@ -160,7 +164,6 @@ public class NodeExecutionManager extends ThreadSynchronization
 		String id = task.getId();
 		long number = incTaskCount();
 		taskMap.put(number, task);
-		//if (debugEnabled) log.debug("submitting task with number " + number);
 		Future<?> f = threadPool.submit(new NodeTaskWrapper(node, task, uuidList, number));
 		if (!f.isDone()) futureMap.put(number, f);
 		if (id != null)
@@ -354,12 +357,15 @@ public class NodeExecutionManager extends ThreadSynchronization
 	/**
 	 * Prepare this execution manager for executing the tasks of a bundle.
 	 * @param bundle the bundle whose tasks are to be executed.
+	 * @param taskList the list of tasks to execute.
 	 */
-	public void setup(JPPFTaskBundle bundle)
+	public void setup(JPPFTaskBundle bundle, List<JPPFTask> taskList)
 	{
 		this.bundle = bundle;
+		this.taskList = taskList;
 		this.uuidList = bundle.getUuidPath().getList();
 		taskCount = new AtomicLong(0L);
+		node.getLifeCycleEventHandler().fireJobStarting();
 	}
 
 	/**
@@ -367,7 +373,9 @@ public class NodeExecutionManager extends ThreadSynchronization
 	 */
 	public void cleanup()
 	{
+		node.getLifeCycleEventHandler().fireJobEnding();
 		this.bundle = null;
+		this.taskList = null;
 		this.uuidList = null;
 		futureMap.clear();
 		taskMap.clear();
@@ -392,7 +400,6 @@ public class NodeExecutionManager extends ThreadSynchronization
 	public synchronized void removeFuture(long number)
 	{
 		Future<?> future = futureMap.remove(number);
-		//if (debugEnabled) log.debug("removing task with number " + number + ", future = " + future);
 		if (future != null) timeoutHandler.cancelAction(future);
 		wakeUp();
 	}
@@ -481,8 +488,23 @@ public class NodeExecutionManager extends ThreadSynchronization
 	}
 
 	/**
-	 * Get the id of the job currently being executed.
-	 * @return the job id as a string, or null if no job is being executed.
+	 * {@inheritDoc}
+	 */
+	public JPPFDistributedJob getCurrentJob()
+	{
+		return bundle;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<JPPFTask> getCurrentTasks()
+	{
+		return taskList == null ? null : Collections.unmodifiableList(taskList);
+	}
+
+	/**
+	 * {@inheritDoc}
 	 */
 	public String getCurrentJobId()
 	{

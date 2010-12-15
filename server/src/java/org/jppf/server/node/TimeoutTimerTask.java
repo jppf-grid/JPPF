@@ -43,7 +43,7 @@ class TimeoutTimerTask implements Runnable
 	/**
 	 * The execution manager that started this task.
 	 */
-	private NodeExecutionManager executionManager = null;
+	private NodeExecutionManagerImpl executionManager = null;
 
 	/**
 	 * Initialize this timer task with the specified future.
@@ -51,7 +51,7 @@ class TimeoutTimerTask implements Runnable
 	 * @param number the number identifying the task.
 	 * @param task the task to cancel.
 	 */
-	public TimeoutTimerTask(NodeExecutionManager executionManager, long number, JPPFTask task)
+	public TimeoutTimerTask(NodeExecutionManagerImpl executionManager, long number, JPPFTask task)
 	{
 		this.executionManager = executionManager;
 		this.number = number;

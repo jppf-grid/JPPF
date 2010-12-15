@@ -19,6 +19,7 @@
 package org.jppf.node;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.comm.socket.*;
 import org.jppf.node.event.*;
@@ -62,6 +63,10 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	 * This node's universal identifier.
 	 */
 	protected String uuid = null;
+	/**
+	 * Holds the count of currently executing tasks. Used to determine when this node is busy or idle.
+	 */
+	protected AtomicInteger executingCount = new AtomicInteger(0);
 
 	/**
 	 * Add a listener to the list of listener for this node.
@@ -168,5 +173,24 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	public SerializationHelper getHelper()
 	{
 		return helper;
+	}
+
+	/**
+	 * Decrement the count of currently executing tasks and determine whether
+	 * an idle notification should be sent.
+	 */
+	public void decrementExecutingCount()
+	{
+		if (executingCount.decrementAndGet() == 0) fireNodeEvent(NodeEventType.END_EXEC);
+		fireNodeEvent(NodeEventType.TASK_EXECUTED);
+	}
+	
+	/**
+	 * Increment the count of currently executing tasks and determine whether
+	 * a busy notification should be sent.
+	 */
+	public void incrementExecutingCount()
+	{
+		if (executingCount.incrementAndGet() == 1) fireNodeEvent(NodeEventType.START_EXEC);
 	}
 }

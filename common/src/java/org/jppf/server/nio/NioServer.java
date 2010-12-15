@@ -276,6 +276,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * It accept and put it in a state to define what type of peer is.
 	 * @param key the selection key that represents the channel's registration with the selector.
 	 */
+	@SuppressWarnings("unchecked")
 	private void doAccept(SelectionKey key)
 	{
 		ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();

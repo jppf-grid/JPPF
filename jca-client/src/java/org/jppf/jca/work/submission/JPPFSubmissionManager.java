@@ -63,10 +63,6 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 * JPPF submissions.
 	 */
 	private WorkManager workManager = null;
-	/**
-	 * Mapping of class laoder to requests uuids.
-	 */
-	private Map<String, ClassLoader> classLoaderMap = new Hashtable<String, ClassLoader>();
 
 	/**
 	 * Initialize this submission worker with the specified JPPF client.
@@ -204,34 +200,5 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	public Collection<String> getAllSubmissionIds()
 	{
 		return Collections.unmodifiableSet(submissionMap.keySet());
-	}
-
-	/**
-	 * Add a request uuid to class loader mapping to this submission manager.
-	 * @param uuid the uuid of the request.
-	 * @param cl trhe class loader for the request.
-	 */
-	public void addRequestClassLoader(String uuid, ClassLoader cl)
-	{
-		classLoaderMap.put(uuid, cl);
-	}
-
-	/**
-	 * Add a request uuid to class loader mapping to this submission manager.
-	 * @param uuid the uuid of the request.
-	 */
-	public void removeRequestClassLoader(String uuid)
-	{
-		classLoaderMap.remove(uuid);
-	}
-
-	/**
-	 * Get a class loader from its request uuid.
-	 * @param uuid the uuid of the request.
-	 * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
-	 */
-	public ClassLoader getRequestClassLoader(String uuid)
-	{
-		return classLoaderMap.get(uuid);
 	}
 }

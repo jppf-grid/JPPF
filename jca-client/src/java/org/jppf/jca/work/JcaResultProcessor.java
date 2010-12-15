@@ -20,15 +20,12 @@ package org.jppf.jca.work;
 import static org.jppf.jca.work.submission.SubmissionStatus.*;
 
 import java.io.NotSerializableException;
-import java.util.List;
 
 import javax.resource.spi.work.Work;
 
 import org.jppf.client.*;
-import org.jppf.client.event.TaskResultEvent;
 import org.jppf.jca.work.submission.*;
-import org.jppf.server.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
 /**
@@ -130,14 +127,14 @@ public class JcaResultProcessor implements Work
 	{
 		int count = 0;
 		String requestUuid = job.getJobUuid();
-		JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
+		AbstractGenericClient client = connection.getClient();
 		ClassLoader cl = null;
 		ClassLoader oldCl = null;
 		if (!job.getTasks().isEmpty())
 		{
 			JPPFTask task = job.getTasks().get(0);
 			cl = task.getClass().getClassLoader();
-			mgr.addRequestClassLoader(requestUuid, cl);
+			client.addRequestClassLoader(requestUuid, cl);
 			if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
 		}
 		try
@@ -149,59 +146,7 @@ public class JcaResultProcessor implements Work
 			}
 			connection.getClient().getLoadBalancer().execute(job, connection);
 			result.waitForResults(0);
-			mgr.removeRequestClassLoader(requestUuid);
-			result.setStatus(COMPLETE);
-			connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
-		}
-		finally
-		{
-			if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
-		}
-		return true;
-	}
-
-	/**
-	 * Perform the actual tasks submission.
-	 * @param result the submission result.
-	 * @return true if the submission is successfull.
-	 * @throws Exception if an error is raised while submitting the tasks or receiving the results.
-	 */
-	private boolean performSubmission2(JPPFSubmissionResult result) throws Exception
-	{
-		int count = 0;
-		JPPFTaskBundle bundle = new JPPFTaskBundle();
-		String requestUuid = new JPPFUuid().toString();
-		bundle.setRequestUuid(requestUuid);
-		JPPFSubmissionManager mgr = connection.getClient().getSubmissionManager();
-		bundle.setJobSLA(job.getJobSLA());
-		bundle.setParameter(BundleParameter.JOB_METADATA, job.getJobMetadata());
-		ClassLoader cl = null;
-		ClassLoader oldCl = null;
-		if (!job.getTasks().isEmpty())
-		{
-			JPPFTask task = job.getTasks().get(0);
-			cl = task.getClass().getClassLoader();
-			mgr.addRequestClassLoader(requestUuid, cl);
-			if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
-		}
-		try
-		{
-			if (cl != null)
-			{
-				oldCl = Thread.currentThread().getContextClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
-			}
-			connection.sendTasks(cl, bundle, job);
-			while (count < job.getTasks().size())
-			{
-				Pair<List<JPPFTask>, Integer> p = connection.receiveResults(cl);
-				count += p.first().size();
-				if (result != null)
-				{
-					result.resultsReceived(new TaskResultEvent(p.first()));
-				}
-			}
-			mgr.removeRequestClassLoader(requestUuid);
+			client.removeRequestClassLoader(requestUuid);
 			result.setStatus(COMPLETE);
 			connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
 		}

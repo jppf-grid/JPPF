@@ -254,6 +254,6 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 */
 	private ClassLoader getClassLoader(String uuid)
 	{
-		return client.getSubmissionManager().getRequestClassLoader(uuid);
+		return client.getRequestClassLoader(uuid);
 	}
 }

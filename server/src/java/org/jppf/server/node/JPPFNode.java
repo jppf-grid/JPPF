@@ -20,11 +20,10 @@ package org.jppf.server.node;
 import java.security.*;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.*;
 
-import org.jppf.*;
+import org.jppf.JPPFError;
 import org.jppf.classloader.*;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
@@ -67,22 +66,13 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 */
 	private LinkedList<JPPFContainer> containerList = new LinkedList<JPPFContainer>();
 	/**
-	 * Current build number for this node.
-	 */
-	private int buildNumber = -1;
-	/**
 	 * The task execution manager for this node.
 	 */
-	private NodeExecutionManager executionManager = null;
+	protected NodeExecutionManagerImpl executionManager = null;
 	/**
 	 * The object responsible for this node's I/O.
 	 */
 	protected NodeIO nodeIO = null;
-	/**
-	 * Holds the count of currently executing tasks.
-	 * Used to determine when this node is busy or idle.
-	 */
-	private AtomicInteger executingCount = new AtomicInteger(0);
 	/**
 	 * Determines whether JMX management and monitoring is enabled for this node.
 	 */
@@ -107,6 +97,10 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 * The callback used to create the class loader in each {@link JPPFContainer}.
 	 */
 	private Callable<JPPFClassLoader> classLoaderCreator = null;
+	/**
+	 * Handles the firing of node life cycle events and the listeners that subscribe to these events.
+	 */
+	private LifeCycleEventHandler lifeCycleEventHandler = null;
 
 	/**
 	 * Default constructor.
@@ -114,7 +108,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	public JPPFNode()
 	{
 		uuid = NodeRunner.getUuid();
-		executionManager = new NodeExecutionManager(this);
+		executionManager = new NodeExecutionManagerImpl(this);
 	}
 
 	/**
@@ -123,7 +117,6 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 */
 	public void run()
 	{
-		buildNumber = VersionUtils.getBuildNumber();
 		setStopped(false);
 		boolean initialized = false;
 		if (debugEnabled) log.debug("Start of node main loop, nodeUuid=" + uuid);
@@ -293,6 +286,9 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
 		initDataChannel();
 		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
+		lifeCycleEventHandler = new LifeCycleEventHandler(executionManager);
+		lifeCycleEventHandler.loadListeners();
+		lifeCycleEventHandler.fireNodeStarting();
 		if (debugEnabled) log.debug("end node initialization");
 	}
 
@@ -412,25 +408,6 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	protected abstract Callable<AbstractJPPFClassLoader> newClassLoaderCreator(List<String> uuidPath);
 
 	/**
-	 * Decrement the count of currently executing tasks and determine whether
-	 * an idle notification should be sent.
-	 */
-	void decrementExecutingCount()
-	{
-		if (executingCount.decrementAndGet() == 0) fireNodeEvent(NodeEventType.END_EXEC);
-		fireNodeEvent(NodeEventType.TASK_EXECUTED);
-	}
-	
-	/**
-	 * Increment the count of currently executing tasks and determine whether
-	 * a busy notification should be sent.
-	 */
-	void incrementExecutingCount()
-	{
-		if (executingCount.incrementAndGet() == 1) fireNodeEvent(NodeEventType.START_EXEC);
-	}
-
-	/**
 	 * Get the administration and monitoring MBean for this node.
 	 * @return a <code>JPPFNodeAdmin</code>m instance.
 	 */
@@ -452,7 +429,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 * Get the task execution manager for this node.
 	 * @return a <code>NodeExecutionManager</code> instance.
 	 */
-	public NodeExecutionManager getExecutionManager()
+	public NodeExecutionManagerImpl getExecutionManager()
 	{
 		return executionManager;
 	}
@@ -474,6 +451,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	public synchronized void stopNode(boolean closeSocket)
 	{
 		if (debugEnabled) log.debug("stopping node");
+		lifeCycleEventHandler.fireNodeEnding();
 		setStopped(true);
 		executionManager.shutdown();
 		if (closeSocket)
@@ -506,6 +484,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 */
 	public void shutdown(boolean restart)
 	{
+		lifeCycleEventHandler.fireNodeEnding();
 		NodeRunner.shutdown(this, restart);
 	}
 
@@ -565,5 +544,14 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 			}
 		}
 		return jmxServer;
+	}
+
+	/**
+	 * Get the object that handles the firing of node life cycle events and the listeners that subscribe to these events.
+	 * @return an instance of <code>LifeCycleEventHandler</code>.
+	 */
+	public LifeCycleEventHandler getLifeCycleEventHandler()
+	{
+		return lifeCycleEventHandler;
 	}
 }

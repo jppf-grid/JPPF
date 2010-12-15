@@ -49,7 +49,7 @@ class NodeTaskWrapper implements Runnable
 	/**
 	 * The execution manager.
 	 */
-	private NodeExecutionManager executionManager = null;
+	private NodeExecutionManagerImpl executionManager = null;
 
 	/**
 	 * Initialize this task wrapper with a specified JPPF task.

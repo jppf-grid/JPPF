@@ -26,9 +26,8 @@ import org.jppf.JPPFError;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.comm.socket.*;
-import org.jppf.server.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.comm.socket.SocketInitializer;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.slf4j.*;
 
 /**
@@ -49,10 +48,6 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The JPPF client that manages connections to the JPPF drivers.
-	 */
-	private JPPFJcaClient client = null;
 
 	/**
 	 * Initialize this client with a specified application UUID.
@@ -77,7 +72,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	{
 		try
 		{
-			delegate = new JcaClassServerDelegate(name, appUuid, host, classServerPort, client);
+			delegate = new JcaClassServerDelegate(name, appUuid, host, classServerPort, (JPPFJcaClient) client);
 			//setStatus(CONNECTING);
 			initCredentials();
 			//taskServerConnection.init();
@@ -194,29 +189,6 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	}
 
 	/**
-	 * Receive results of tasks execution.
-	 * @return a pair of objects representing the executed tasks results, and the index
-	 * of the first result within the initial task execution request.
-	 * @param cl the cintext classloader to use to deserialize the results.
-	 * @throws Exception if an error is raised while reading the results from the server.
-	 */
-	public Pair<List<JPPFTask>, Integer> receiveResults(ClassLoader cl) throws Exception
-	{
-		ClassLoader prevCl = Thread.currentThread().getContextClassLoader();
-		if (cl != null) Thread.currentThread().setContextClassLoader(cl);
-		Pair<List<JPPFTask>, Integer> results = null;
-		try
-		{
-			results = super.receiveResults();
-		}
-		finally
-		{
-			if (cl != null) Thread.currentThread().setContextClassLoader(prevCl);
-		}
-		return results;
-	}
-
-	/**
 	 * Get the name of the serialization helper implementation class name to use.
 	 * @return the fully qualified class name of a <code>SerializationHelper</code> implementation.
 	 * @see org.jppf.client.AbstractJPPFClientConnection#getSerializationHelperClassName()
@@ -289,6 +261,6 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 */
 	public JPPFJcaClient getClient()
 	{
-		return client;
+		return (JPPFJcaClient) client;
 	}
 }
