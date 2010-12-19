@@ -59,6 +59,7 @@
 						Each task waits for a configurable time after inserting a database row, to give the applicatione enough time to simulate a node crash and restart.</li>
 						<li><a href="src/org/jppf/example/nodelifecycle/client/DBRunner.java.html">DBRunner.java</a> : this is the code for the client application.
 						It submits a job with a configurable number of tasks, waits for a configurable delay, then restarts the node, and finally gets the execution results and displays the rows inserted in the database</li>
+						<li><a href="config/jppf-client.properties">jppf-client.properties</a> : the jppf configuration files, which also allows you to modify some parameters of the sample application</li>
 					</ul>
 
 					<h3>Sample directory structure</h3>
@@ -77,9 +78,9 @@
 					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have installed a server and node, perform the following steps:
 					<ol>
-						<li>open a command prompt in JPPF-x.y-samples-pack/NodeNodeLifeCycle</li>
+						<li>open a command prompt in JPPF-x.y-samples-pack/NodeLifeCycle</li>
 						<li>build the sample: type "<b>ant jar</b>" or simply "<b>ant</b>"; this will create a file named <b>NodeLifeCycle.jar</b></li>
-						<li>copy NodeLifeCycle.jar in the "lib" folder of the JPPF driver installation, to add it to the driver's classpath. This is enough to deploy the add-on.</li>
+						<li>copy NodeLifeCycle.jar in the "lib" folder of the JPPF driver installation, as well as all the *.jar files in <tt>NodeLifeCycle/lib</tt>, to add them to the driver's classpath. This is enough to deploy the add-on.</li>
 						<li>start the database server: open a command prompt in NodeNodeLifeCycle/db and type "<b>startH2.bat</b>" (on Windows) or "<b>./startH2.sh</b>" (on Linux). Alternatively you can run an Ant target instead: "<b>ant start.db.server</b>"</li>
 						<li>open a command prompt in the driver's install folder and start the driver by typing "<b>ant run</b>"</li>
 						<li>open a command prompt in the node's install folder and start the node by typing "<b>ant run</b>"</li>

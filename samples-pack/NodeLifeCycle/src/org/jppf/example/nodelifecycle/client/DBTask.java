@@ -106,7 +106,7 @@ public class DBTask extends JPPFTask
 				ps = c.prepareStatement(sql);
 				ps.setString(1, getId());
 				ps.setString(2, getId() + ": task execution successful");
-				NodeListener.output("before executing prepared statement: " + ps);
+				//NodeListener.output("before executing prepared statement: " + ps);
 				int n = ps.executeUpdate();
 				return n;
 			}

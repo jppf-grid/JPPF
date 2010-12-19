@@ -85,12 +85,12 @@
 						<li>from the sample's "config" folder, open the client configuration file "<b>jppf.properties</b>" in a text editor</li>
 						<li>find the line containing "<b>jppf.pool.size = value</b>" and update the value as you see fit (server connection pool size)</li>
 						<li>At the end of the file, you will find the configuration of the simulation parameters, for instance:
-<pre style="background: #D8D8D8"><font color="green">#------------------------------------------------------------------------------#
-#         Parameters specific to the data dependency application               #
-#------------------------------------------------------------------------------#</font>
+<pre style="background: #D8D8D8"><font color="green">#------------------------------------------------------------------------------#</font>
+<font color="green">#         Parameters specific to the data dependency application               #</font>
+<font color="green">#------------------------------------------------------------------------------#</font>
 
-<font color="green"># Pseudo-random number generator, either "gaussian" or "uniform" (the default).
-# This determines the distribution of randomly generated data</font>
+<font color="green"># Pseudo-random number generator, either "gaussian" or "uniform" (the default).</font>
+<font color="green"># This determines the distribution of randomly generated data</font>
 dataFactoryImpl = gaussian
 
 <font color="green"># run mode, either snapshot-based or event-based. Possible values: event | snapshot</font>
@@ -106,8 +106,8 @@ nbTrades = 10000
 minDataPerTrade = 1
 maxDataPerTrade = 6
 
-<font color="green"># min and max intervals in milliseconds between ticker events
-# (computed randomly in the specified range)</font>
+<font color="green"># min and max intervals in milliseconds between ticker events</font>
+<font color="green"># (computed randomly in the specified range)</font>
 minTickerInterval = 50
 maxTickerInterval = 200
 
@@ -117,8 +117,8 @@ nbTickerEvents = 0
 <font color="green"># duration of the simulation in milliseconds (after that the ticker stops emitting events)</font>
 simulationDuration = 10000
 
-<font color="green"># min and max simulated task duration in milliseconds
-# (task duration is computed randomly in the specified range)</font>
+<font color="green"># min and max simulated task duration in milliseconds</font>
+<font color="green"># (task duration is computed randomly in the specified range)</font>
 minTaskDuration = 50
 maxTaskDuration = 100
 
