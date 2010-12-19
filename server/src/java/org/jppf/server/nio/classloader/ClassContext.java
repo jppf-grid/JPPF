@@ -129,6 +129,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * Add a new pending request to this resource provider.
 	 * @param request the request as a <code>SelectionKey</code> instance. 
 	 */
+	@SuppressWarnings("unchecked")
 	public synchronized void addRequest(ChannelWrapper<?> request)
 	{
 		pendingRequests.add(request);
