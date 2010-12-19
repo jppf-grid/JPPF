@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><head>
+<title></title>
+  <style type="text/css">
+    <!--code { font-family: Courier New, Courier; font-size: 10pt; margin: 0px; }-->
+  </style>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head><body>
+
+
+<!-- ======================================================== -->
+<!-- = Java Sourcecode to HTML automatically converted code = -->
+<!-- =   Java2Html Converter 5.0 [2006-02-26] by Markus Gebhard  markus@jave.de   = -->
+<!-- =     Further information: http://www.java2html.de     = -->
+<div align="left" class="java">
+<table border="0" cellpadding="3" cellspacing="0" bgcolor="#ffffff">
+  <!-- start headline -->
+   <tr>
+    <td colspan="2">
+     <center><font size="+2">
+      <code><b>
+DBTask.java
+      </b></code>
+     </font></center>
+    </td>
+   </tr>
+  <!-- end headline -->
+   <tr>
+  <!-- start source code -->
+   <td nowrap="nowrap" valign="top" align="left">
+    <code>
+<font color="#3f7f5f">/*</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;JPPF.</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;Copyright&nbsp;(C)&nbsp;2005-2010&nbsp;JPPF&nbsp;Team.</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;http://www.jppf.org</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;Licensed&nbsp;under&nbsp;the&nbsp;Apache&nbsp;License,&nbsp;Version&nbsp;2.0&nbsp;(the&nbsp;&#34;License&#34;);</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;you&nbsp;may&nbsp;not&nbsp;use&nbsp;this&nbsp;file&nbsp;except&nbsp;in&nbsp;compliance&nbsp;with&nbsp;the&nbsp;License.</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;You&nbsp;may&nbsp;obtain&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;License&nbsp;at</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;&nbsp;&nbsp;http://www.apache.org/licenses/LICENSE-2.0</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;Unless&nbsp;required&nbsp;by&nbsp;applicable&nbsp;law&nbsp;or&nbsp;agreed&nbsp;to&nbsp;in&nbsp;writing,&nbsp;software</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;distributed&nbsp;under&nbsp;the&nbsp;License&nbsp;is&nbsp;distributed&nbsp;on&nbsp;an&nbsp;&#34;AS&nbsp;IS&#34;&nbsp;BASIS,</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;WITHOUT&nbsp;WARRANTIES&nbsp;OR&nbsp;CONDITIONS&nbsp;OF&nbsp;ANY&nbsp;KIND,&nbsp;either&nbsp;express&nbsp;or&nbsp;implied.</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;See&nbsp;the&nbsp;License&nbsp;for&nbsp;the&nbsp;specific&nbsp;language&nbsp;governing&nbsp;permissions&nbsp;and</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;limitations&nbsp;under&nbsp;the&nbsp;License.</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*/</font><br />
+<font color="#ffffff"></font><br />
+<font color="#7f0055"><b>package&nbsp;</b></font><font color="#000000">org.jppf.example.nodelifecycle.client;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.sql.*;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.util.concurrent.Callable;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">org.jppf.example.nodelifecycle.node.NodeListener;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">org.jppf.server.protocol.JPPFTask;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">org.jppf.utils.StringUtils;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#3f5fbf">/**</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f5fbf">*&nbsp;A&nbsp;sample&nbsp;task&nbsp;that&nbsp;writes&nbsp;a&nbsp;row&nbsp;into&nbsp;the&nbsp;databse&nbsp;via&nbsp;a&nbsp;datasource.</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f5fbf">*&nbsp;</font><font color="#7f9fbf">@author&nbsp;</font><font color="#3f5fbf">Laurent&nbsp;Cohen</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#7f0055"><b>public&nbsp;class&nbsp;</b></font><font color="#000000">DBTask&nbsp;</font><font color="#7f0055"><b>extends&nbsp;</b></font><font color="#000000">JPPFTask</font><br />
+<font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f5fbf">/**</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;The&nbsp;time&nbsp;to&nbsp;wait&nbsp;after&nbsp;inserting&nbsp;a&nbsp;row&nbsp;in&nbsp;the&nbsp;database.</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;</b></font><font color="#7f0055"><b>long&nbsp;</b></font><font color="#000000">sleepTime;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f5fbf">/**</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;Initialize&nbsp;this&nbsp;task&nbsp;with&nbsp;the&nbsp;specified&nbsp;sleep&nbsp;time.</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;</font><font color="#7f9fbf">@param&nbsp;</font><font color="#3f5fbf">sleepTime&nbsp;the&nbsp;time&nbsp;to&nbsp;wait&nbsp;after&nbsp;inserting&nbsp;a&nbsp;row&nbsp;in&nbsp;the&nbsp;database&nbsp;(in&nbsp;milliseconds).</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#000000">DBTask</font><font color="#000000">(</font><font color="#7f0055"><b>long&nbsp;</b></font><font color="#000000">sleepTime</font><font color="#000000">)</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>this</b></font><font color="#000000">.sleepTime&nbsp;=&nbsp;sleepTime;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff"></font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f5fbf">/**</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;Execute&nbsp;this&nbsp;JPPF&nbsp;task.</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;The&nbsp;actual&nbsp;database&nbsp;operations&nbsp;are&nbsp;executed&nbsp;on&nbsp;the&nbsp;single&nbsp;transaction&nbsp;thread.</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;This&nbsp;means&nbsp;they&nbsp;are&nbsp;sequentialized&nbsp;and&nbsp;we&nbsp;loose&nbsp;some&nbsp;of&nbsp;the&nbsp;parallelism.</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;However,&nbsp;any&nbsp;non&nbsp;DB-related&nbsp;operation&nbsp;can&nbsp;be&nbsp;executed&nbsp;safely&nbsp;in&nbsp;a&nbsp;different&nbsp;thread.</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">run</font><font color="#000000">()</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try</b></font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">SQLCallable&nbsp;callable&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">SQLCallable</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">Integer&nbsp;n&nbsp;=&nbsp;NodeListener.submit</font><font color="#000000">(</font><font color="#000000">callable</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">Throwable&nbsp;t&nbsp;=&nbsp;callable.throwable;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">t&nbsp;!=&nbsp;</font><font color="#7f0055"><b>null</b></font><font color="#000000">)</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">t&nbsp;</font><font color="#7f0055"><b>instanceof&nbsp;</b></font><font color="#000000">Exception</font><font color="#000000">)&nbsp;</font><font color="#000000">setException</font><font color="#000000">((</font><font color="#000000">Exception</font><font color="#000000">)&nbsp;</font><font color="#000000">t</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>else&nbsp;</b></font><font color="#000000">setException</font><font color="#000000">(</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">Exception</font><font color="#000000">(</font><font color="#2a00ff">&#34;Error&nbsp;while&nbsp;executing&nbsp;SQL&nbsp;statement&#34;</font><font color="#000000">,&nbsp;t</font><font color="#000000">))</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">NodeListener.output</font><font color="#000000">(</font><font color="#000000">StringUtils.getStackTrace</font><font color="#000000">(</font><font color="#000000">t</font><font color="#000000">))</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>else</b></font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">setResult</font><font color="#000000">(</font><font color="#2a00ff">&#34;task&nbsp;&#34;&nbsp;</font><font color="#000000">+&nbsp;getId</font><font color="#000000">()&nbsp;</font><font color="#000000">+&nbsp;</font><font color="#2a00ff">&#34;&nbsp;execution&nbsp;successful,&nbsp;sql&nbsp;return&nbsp;code&nbsp;=&nbsp;&#34;&nbsp;</font><font color="#000000">+&nbsp;n</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">NodeListener.output</font><font color="#000000">(</font><font color="#000000">getResult</font><font color="#000000">()</font><font color="#000000">.toString</font><font color="#000000">())</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//&nbsp;sleep&nbsp;to&nbsp;allow&nbsp;enough&nbsp;time&nbsp;to&nbsp;kill&nbsp;the&nbsp;node&nbsp;and&nbsp;test&nbsp;recovery&nbsp;mechanism.</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">Thread.sleep</font><font color="#000000">(</font><font color="#000000">sleepTime</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>catch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">Exception&nbsp;e</font><font color="#000000">)</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">setException</font><font color="#000000">(</font><font color="#000000">e</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff"></font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f5fbf">/**</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;This&nbsp;task&nbsp;is&nbsp;executed&nbsp;on&nbsp;the&nbsp;transaction&nbsp;thread&nbsp;and&nbsp;performs&nbsp;the&nbsp;database&nbsp;update.</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;class&nbsp;</b></font><font color="#000000">SQLCallable&nbsp;</font><font color="#7f0055"><b>implements&nbsp;</b></font><font color="#000000">Callable&lt;Integer&gt;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;An&nbsp;eventual&nbsp;throwable&nbsp;that&nbsp;may&nbsp;occur&nbsp;while&nbsp;executing&nbsp;the&nbsp;DB&nbsp;update.</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#000000">Throwable&nbsp;throwable&nbsp;=&nbsp;</font><font color="#7f0055"><b>null</b></font><font color="#000000">;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;Insert&nbsp;a&nbsp;row&nbsp;into&nbsp;the&nbsp;database.</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;</font><font color="#7f9fbf">@return&nbsp;</font><font color="#3f5fbf">the&nbsp;number&nbsp;of&nbsp;updated&nbsp;rows,&nbsp;or&nbsp;null&nbsp;if&nbsp;the&nbsp;operation&nbsp;failed.</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#000000">Integer&nbsp;call</font><font color="#000000">()</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">Connection&nbsp;c&nbsp;=&nbsp;</font><font color="#7f0055"><b>null</b></font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">PreparedStatement&nbsp;ps&nbsp;=&nbsp;</font><font color="#7f0055"><b>null</b></font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try</b></font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">c&nbsp;=&nbsp;NodeListener.getDataSource</font><font color="#000000">()</font><font color="#000000">.getConnection</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">String&nbsp;sql&nbsp;=&nbsp;</font><font color="#2a00ff">&#34;INSERT&nbsp;INTO&nbsp;task_result&nbsp;(task_id,&nbsp;message)&nbsp;VALUES(?,&nbsp;?)&#34;</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">ps&nbsp;=&nbsp;c.prepareStatement</font><font color="#000000">(</font><font color="#000000">sql</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">ps.setString</font><font color="#000000">(</font><font color="#990000">1</font><font color="#000000">,&nbsp;getId</font><font color="#000000">())</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">ps.setString</font><font color="#000000">(</font><font color="#990000">2</font><font color="#000000">,&nbsp;getId</font><font color="#000000">()&nbsp;</font><font color="#000000">+&nbsp;</font><font color="#2a00ff">&#34;:&nbsp;task&nbsp;execution&nbsp;successful&#34;</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">NodeListener.output</font><font color="#000000">(</font><font color="#2a00ff">&#34;before&nbsp;executing&nbsp;prepared&nbsp;statement:&nbsp;&#34;&nbsp;</font><font color="#000000">+&nbsp;ps</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">n&nbsp;=&nbsp;ps.executeUpdate</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">n;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>catch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">Throwable&nbsp;t</font><font color="#000000">)</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">throwable&nbsp;=&nbsp;t;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;null</b></font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>finally</b></font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try</b></font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">ps&nbsp;!=&nbsp;</font><font color="#7f0055"><b>null</b></font><font color="#000000">)&nbsp;</font><font color="#000000">ps.close</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>catch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">Throwable&nbsp;t</font><font color="#000000">)</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">throwable&nbsp;==&nbsp;</font><font color="#7f0055"><b>null</b></font><font color="#000000">)&nbsp;</font><font color="#000000">throwable&nbsp;=&nbsp;t;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try</b></font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">c&nbsp;!=&nbsp;</font><font color="#7f0055"><b>null</b></font><font color="#000000">)&nbsp;</font><font color="#000000">c.close</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>catch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">Throwable&nbsp;t</font><font color="#000000">)</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">throwable&nbsp;==&nbsp;</font><font color="#7f0055"><b>null</b></font><font color="#000000">)&nbsp;</font><font color="#000000">throwable&nbsp;=&nbsp;t;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#000000">}</font></code>
+    
+   </td>
+  <!-- end source code -->
+   </tr>
+</table>
+</div>
+<!-- =       END of automatically generated HTML code       = -->
+<!-- ======================================================== -->
+
+
+</body></html>

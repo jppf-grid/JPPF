@@ -127,32 +127,6 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
 	/**
 	 * Transform the specified input source and write it into the specified destination.<br>
 	 * The transformation is either encrytion or decryption, depending on how the cipher was initialized.
-	 * @param mode the cipher mode to use for encryption/decryption.
-	 * @param source the input stream of data to encrypt/decrypt.
-	 * @param destination the stream into which the encrypted/decrypted data is written.
-	 * @param key the secret key to use with the cipher.
-	 * @throws Exception if any error occurs while encrypting or decrypting the data.
-	 */
-	private void transform(int mode, InputStream source, OutputStream destination, SecretKey key) throws Exception
-	{
-		// get the cipher and parameters
-		Cipher cipher = Cipher.getInstance(Helper.getTransformation());
-		// init the cipher in encryption or decryption mode
-		cipher.init(mode, key);
-		CipherOutputStream cos = new CipherOutputStream(destination, cipher);
-		byte[] buffer = new byte[8192];
-		// encrypt or decrypt from source to destination
-		while (true)
-		{
-			int n = source.read(buffer);
-			if (n <= 0) break;
-			destination.write(buffer, 0, n);
-		}
-	}
-
-	/**
-	 * Transform the specified input source and write it into the specified destination.<br>
-	 * The transformation is either encrytion or decryption, depending on how the cipher was initialized.
 	 * @param source the input stream of data to encrypt/decrypt.
 	 * @param destination the stream into which the encrypted/decrypted data is written.
 	 * @throws Exception if any error occurs while encrypting or decrypting the data.

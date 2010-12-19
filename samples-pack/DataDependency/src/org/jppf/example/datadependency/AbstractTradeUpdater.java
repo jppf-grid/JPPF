@@ -180,7 +180,10 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 				if (debugEnabled) log.debug("processing update for " + marketData);
 				// determine which trades are impacted
 				Set<Trade> tradeSet = new HashSet<Trade>();
-				for (MarketData md: marketData) tradeSet.addAll(dataToTradeMap.get(md.getId()));
+				for (MarketData md: marketData)
+				{
+					tradeSet.addAll(dataToTradeMap.get(md.getId()));
+				}
 				if (tradeSet.isEmpty()) return;
 				// associate each node with a list of impacted trades
 				Map<Integer, List<Trade>> nodeMap = new HashMap<Integer, List<Trade>>();

@@ -27,6 +27,7 @@
 
 				<!-- start content -->
 				<div align="left" style="margin: 10px">
+					<!-- ${SAMPLE_START_CONTENT} -->
 					<h3>What does the sample do?</h3>
 					<p>This sample simulates near real-time updates of a portfolio, based on simulated "live" events from financial markets.
 
@@ -68,7 +69,7 @@
 					<p>To make it easy to simulate various scenarios, the application provides a configuration property for most of the the parameters it uses:
 					number of market data pieces, number of trades, number of market data dependencies per trade, interval between ticker events, event vs. snapshot run mode, duration of each trade computation, etc...
 					<p>As all events and resulting job submissions are fully asynchronous, the application relies on a pool of connections to the JPPF driver, rather than on a single connection.
-					See <a href="http://www.jppf.org/wiki/index.php?title=Configuration_guide#Server_discovery_3">server discovery</a> and 
+					See <a href="http://www.jppf.org/wiki/index.php?title=Configuration_guide#Server_discovery_3">server discovery</a> and
 					<a href="http://www.jppf.org/wiki/index.php?title=Configuration_guide#Manual_network_configuration_2">manual configuration</a> in the JPPF documentation for details on how to do this.
 
 					<h3>How do I run it?</h3>
@@ -150,6 +151,7 @@ snapshotInterval = 3250</pre>
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
+					<!-- ${SAMPLE_END_CONTENT} -->
 				</div>
 				<!-- end content -->
 

@@ -27,6 +27,7 @@
 
 				<!-- start content -->
 				<div align="left" style="margin: 10px">
+					<!-- ${SAMPLE_START_CONTENT} -->
 					<h3>What does the sample do?</h3>
 					This samples illustrates the implementation of a custom transformation for all JPPF network traffic.
 					The network data is encrypted using a DES cipher with a 56 bits symetric secret key.<br/>
@@ -42,7 +43,7 @@
 					There remains, however, one vulnerability: we still need the keystore password to be stored somewhere, so that we can use the keystore.
 					To avoid storing this password in clear, we obfuscate it by using a Base64 encoding, thanks to the excellent <a href="http://iharder.sourceforge.net/current/java/base64/">iHarder.net public domain Base64 library</a>.
 					The obfuscated password is then stored in a file, which is also included in the jar file to deploy.
-					
+
 					<h3>Related source files</h3>
 					<ul>
 						<li><a href="src/org/jppf/example/dataencryption/SecureKeyCipherTransform.java.html">SecureKeyCipherTransform.java</a> : the data transformer that performs the encryption and decryption</li>
@@ -68,7 +69,7 @@
 
 					<h3>What features of JPPF are demonstrated?</h3>
 					Custom transformation and encryption of the JPPF network traffic, allowing to work securely with a JPPF grid.
-					For a detailed explanation, please refer to the related documentation in the 
+					For a detailed explanation, please refer to the related documentation in the
 					<a href="http://www.jppf.org/wiki/index.php?title=Extending_and_Customizing_JPPF#Transforming_and_encrypting_networked_data">Extending and Customizing JPPF &gt; Transforming and encrypting networked data</a> section.
 
 					<h3>I have additional questions and comments, where can I go?</h3>
@@ -78,6 +79,7 @@
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
+					<!-- ${SAMPLE_END_CONTENT} -->
 				</div>
 				<!-- end content -->
 
