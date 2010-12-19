@@ -92,6 +92,8 @@ public class HtmlDocGenerator
 		System.out.println("Processing source file " + source);
 		String s = FileUtils.readTextFile(source);
 		s = processTemplates(new HashMap<String, String>(), s, templateFolder);
+		File targetFile = new File(target);
+		targetFile.getParentFile().mkdirs();
 		FileUtils.writeTextFile(target, s);
 	}
 
