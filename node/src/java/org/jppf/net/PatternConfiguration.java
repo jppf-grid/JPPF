@@ -55,7 +55,7 @@ final class PatternConfiguration
 	/**
 	 * Constant representing the [minValue,maxValue] range.
 	 */
-	final Range fullRange;
+	final Range<Integer> fullRange;
 	/**
 	 * Number of components in the address.
 	 */
@@ -87,7 +87,7 @@ final class PatternConfiguration
 		this.minValue = minValue;
 		this.maxValue = maxValue;
 		this.compSeparator = compSeparator;
-		fullRange = new Range(minValue, maxValue);
+		fullRange = new Range<Integer>(minValue, maxValue);
 		compSeparatorPattern = Pattern.compile((compSeparator == '.' ? "\\" : "") + compSeparator);
 		this.valuePrefix = valuePrefix;
 	}

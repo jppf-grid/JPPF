@@ -139,10 +139,10 @@ public abstract class AbstractIPAddressPattern
 	 * @return a <code>Range</code> instance, or null if the pattern is invalid.
 	 * @throws IllegalArgumentException if the pattern is invalid.
 	 */
-	private Range parseRangePattern(String src) throws IllegalArgumentException
+	private Range<Integer> parseRangePattern(String src) throws IllegalArgumentException
 	{
 		if ((src == null) || "".equals(src)) return config.fullRange;
-		if (src.indexOf('-') < 0) return new Range(parseValue(src));
+		if (src.indexOf('-') < 0) return new Range<Integer>(parseValue(src));
 		String[] vals = MINUS_PATTERN.split(src);
 		if ((vals == null) || vals.length == 0) return config.fullRange;
 		if (vals.length > 2) throw new IllegalArgumentException(buildString("invalid range pattern (pattern: ", src, ")"));
@@ -167,7 +167,7 @@ public abstract class AbstractIPAddressPattern
 			upper = "".equals(vals[1]) ? config.maxValue : parseValue(vals[1]);
 		}
 		if (upper < lower) throw new IllegalArgumentException(buildString("lower bound must be <= upper bound (pattern: ", src, ")"));
-		return new Range(lower, upper);
+		return new Range<Integer>(lower, upper);
 	}
 
 	/**

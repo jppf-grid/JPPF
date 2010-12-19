@@ -127,10 +127,10 @@ public class Range<T extends Comparable<T>>
 	 */
 	public Range<T> merge(Range<T> other)
 	{
-		if (other == null) return new Range(getLower(), getUpper());
+		if (other == null) return new Range<T>(getLower(), getUpper());
 		T minLower = lower.compareTo(other.getLower()) <= 0 ? lower : other.getLower();
 		T maxUpper = upper.compareTo(other.getUpper()) >= 0 ? upper : other.getUpper();
-		return new Range(minLower, maxUpper);
+		return new Range<T>(minLower, maxUpper);
 	}
 
 	/**
@@ -146,6 +146,6 @@ public class Range<T extends Comparable<T>>
 		if ((other == null) || !intersects(other)) return null;
 		T maxLower = lower.compareTo(other.getLower()) >= 0 ? lower : other.getLower();
 		T minUpper = upper.compareTo(other.getUpper()) <= 0 ? upper : other.getUpper();
-		return new Range(maxLower, minUpper);
+		return new Range<T>(maxLower, minUpper);
 	}
 }

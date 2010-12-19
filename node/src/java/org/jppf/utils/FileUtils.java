@@ -79,6 +79,17 @@ public final class FileUtils
 
 	/**
 	 * Read the content of a specified file into a string.
+	 * @param file the file to read.
+	 * @return the content of the file as a string.
+	 * @throws IOException if the file can't be found or read.
+	 */
+	public static String readTextFile(File file) throws IOException
+	{
+		return readTextFile(new FileReader(file));
+	}
+
+	/**
+	 * Read the content of a specified file into a string.
 	 * @param filename the location of the file to read.
 	 * @return the content of the file as a string.
 	 * @throws IOException if the file can't be found or read.
@@ -105,8 +116,30 @@ public final class FileUtils
 	 */
 	public static void writeTextFile(String filename, String content) throws IOException
 	{
-		LineNumberReader reader = new LineNumberReader(new StringReader(content));
-		Writer writer = new BufferedWriter(new FileWriter(filename));
+		writeTextFile(new FileWriter(filename), content);
+	}
+
+	/**
+	 * Write the content of a string into a specified file.
+	 * @param file the location of the file to write to.
+	 * @param content the content to wwrite into the file.
+	 * @throws IOException if the file can't be found or read.
+	 */
+	public static void writeTextFile(File file, String content) throws IOException
+	{
+		writeTextFile(new FileWriter(file), content);
+	}
+
+	/**
+	 * Write the content of a string into a specified file.
+	 * @param dest the file to write to.
+	 * @param content the content to wwrite into the file.
+	 * @throws IOException if the file can't be found or read.
+	 */
+	public static void writeTextFile(Writer dest, String content) throws IOException
+	{
+		BufferedReader reader = new BufferedReader(new StringReader(content));
+		Writer writer = (dest instanceof BufferedWriter) ? dest : new BufferedWriter(dest);
 		String s = "";
 		while (s != null)
 		{
