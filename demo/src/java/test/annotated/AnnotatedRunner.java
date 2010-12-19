@@ -17,6 +17,8 @@
  */
 package test.annotated;
 
+import java.io.File;
+import java.net.*;
 import java.util.*;
 
 import org.jppf.client.*;
@@ -50,7 +52,7 @@ public class AnnotatedRunner
 		try
 		{
 			jppfClient = new JPPFClient();
-			perform();
+			perform2();
 		}
 		catch(Exception e)
 		{
@@ -68,7 +70,7 @@ public class AnnotatedRunner
 	 */
 	private static void perform() throws Exception
 	{
-		int nbJobs = 5000;
+		int nbJobs = 50;
 		long time = 0L;
 		
 		output("Running demo with time = " + time + " for " + nbJobs + " jobs");
@@ -79,6 +81,45 @@ public class AnnotatedRunner
 			JPPFJob job = new JPPFJob();
 			job.setId("demo job " + (i+1));
 			job.addTask(new AnnotatedTask(time, (i+1)));
+			JPPFResultCollector collector = new JPPFResultCollector(1);
+			job.setResultListener(collector);
+			job.setBlocking(false);
+			jobs.add(job);
+			jppfClient.submit(job);
+		}
+		for (JPPFJob job: jobs)
+		{
+			JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+			List<JPPFTask> results = collector.waitForResults();
+			JPPFTask t = results.get(0);
+			output((String) t.getResult());
+		}
+		totalTime = System.currentTimeMillis() - totalTime;
+		output("Computation time: " + StringUtils.toStringDuration(totalTime));
+	}
+
+	/**
+	 * Perform the test.
+	 * @throws Exception if an error is raised during the execution.
+	 */
+	private static void perform2() throws Exception
+	{
+		int nbJobs = 1;
+		long time = 0L;
+		
+		output("Running demo with time = " + time + " for " + nbJobs + " jobs");
+		File file = new File("../jppftest/bin");
+		URL url = file.toURI().toURL();
+		URLClassLoader cl = new URLClassLoader(new URL[] { url }, AnnotatedRunner.class.getClassLoader());
+		Thread.currentThread().setContextClassLoader(cl);
+		long totalTime = System.currentTimeMillis();
+		List<JPPFJob> jobs = new ArrayList<JPPFJob>();
+		for (int i=0; i<nbJobs; i++)
+		{
+			JPPFJob job = new JPPFJob();
+			job.setId("demo job " + (i+1));
+			JPPFTask task = (JPPFTask) cl.loadClass("test.TestClass").newInstance();
+			job.addTask(task);
 			JPPFResultCollector collector = new JPPFResultCollector(1);
 			job.setResultListener(collector);
 			job.setBlocking(false);
