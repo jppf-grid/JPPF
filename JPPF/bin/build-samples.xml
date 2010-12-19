@@ -39,6 +39,7 @@
 		<antcall target="include.code"><param name="sample" value="DataEncryption"/></antcall>
 		<antcall target="include.code"><param name="sample" value="TaskNotifications"/></antcall>
 		<antcall target="include.code"><param name="sample" value="IdleSystem"/></antcall>
+		<antcall target="include.code"><param name="sample" value="NodeLifeCycle"/></antcall>
 		<property name="samples.pack.prefix" value="${app.ver}-samples-pack"/>
 		<property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>
 		<delete file="samples.pack.file" quiet="true"/>
@@ -64,6 +65,7 @@
 				<exclude name="**/package.html"/>
 				<exclude name="**/Readme.html"/>
 				<include name="CustomLoadBalancer/**/*.properties"/>
+				<include name="NodeLifeCycle/config/jppf-client.properties"/>
 				<exclude name="**/classes/**/*.*"/>
 				<include name="shared/images/*.*"/>
 				<include name="DataDependency/images/*.gif"/>
@@ -75,6 +77,7 @@
 		<delete><fileset dir="${samples-pack}/DataEncryption" includes="**/*.java.html, **/services/*.html"/></delete>
 		<delete><fileset dir="${samples-pack}/TaskNotifications" includes="**/*.java.html, **/services/*.html"/></delete>
 		<delete><fileset dir="${samples-pack}/IdleSystem" includes="**/*.java.html, **/services/*.html"/></delete>
+		<delete><fileset dir="${samples-pack}/NodeLifeCycle" includes="**/*.java.html, **/services/*.html"/></delete>
   </target>
 
 	<target name="include.code">
