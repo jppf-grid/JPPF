@@ -19,6 +19,7 @@ $template{name="samples-page-header" title="JPPF Samples Pack"}$
 	<li><a href="CustomLoadBalancer/Readme.php">An example of a sophisticated load-balancer implementation</a></li>
 	<li><a href="TaskNotifications/Readme.php">A customization that allows tasks to send notifications while executing</a></li>
 	<li><a href="IdleSystem/Readme.php">An extension that enables nodes to run only when the machine is idle</a></li>
+	<li><a href="NodeLifeCycle/Readme.php">Control of database transactions via node life cycle events</a></li>
 </ul>
 <br>
 

@@ -19,7 +19,10 @@ $template{name="about-page-header" title="Patches"}$
 ?>
 	<h1>JPPF <?php echo $jppf_ver ?> patch <?php echo $patch_number ?></h1>
 	<h3>Download:</h3>
-	<a href="<?php echo $patch_url ?>"><?php echo $patch_url ?></a>
+<?php
+	$port = ($_SERVER['SERVER_PORT'] == 80) ? '' : ':' . $_SERVER['SERVER_PORT'];
+?>
+	<a href="<?php echo $patch_url ?>"><?php echo 'http://' . $_SERVER['SERVER_NAME'] . $port . $patch_url ?></a>
 	<h3>Description (included readme.txt):</h3>
 	<?php echo preg_replace('/\n/', '<br/>', $line['readme']) ?>
 	<h3>Fixed bugs:</h3>
@@ -31,7 +34,7 @@ $template{name="about-page-header" title="Patches"}$
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
 	{
 ?>
-		<li><a href="<?php echo $line['bug_url'] ?>"><?php echo $line['bug_id'] ?> <?php echo $line['bug_title'] ?></a></li>
+		<li><a href="<?php echo $line['bug_url'] ?>"><?php echo $line['bug_id'] ?> - <?php echo $line['bug_title'] ?></a></li>
 <?php
 	}
 ?>

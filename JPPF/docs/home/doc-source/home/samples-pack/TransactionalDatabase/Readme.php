@@ -1,5 +1,6 @@
 <?php $currentPage="Samples" ?>
-$template{name="samples-page-header" title="Transactional Database sample"}$
+$template{name="samples-page-header" title="Startup Classes sample"}$
+
 
 					<h3>What does the sample do?</h3>
 					This samples illustrates the implementation of custom startup classes for a JPPF server and node.
@@ -32,5 +33,6 @@ $template{name="samples-page-header" title="Transactional Database sample"}$
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
+					
 
 $template{name="about-page-footer"}$
