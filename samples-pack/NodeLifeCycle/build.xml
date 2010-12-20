@@ -97,6 +97,7 @@
 	  <jar jarfile="${result.file}" index="true">
 			<fileset dir="${classes.dir}">
 	  		<include name="org/jppf/example/nodelifecycle/node/**/*.*"/>
+	  		<include name="**/*.properties"/>
 	  		<include name="META-INF/services/*.*"/>
 	  	</fileset>
 	  </jar>
