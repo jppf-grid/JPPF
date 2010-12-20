@@ -21,12 +21,26 @@ package org.jppf.utils;
 import java.io.*;
 import java.util.*;
 
+import org.slf4j.*;
+
 /**
  * An output stream implementation that minimizes memory usage.
  * @author Laurent Cohen
  */
 public class MultipleBuffersInputStream extends InputStream
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(MultipleBuffersInputStream.class);
+	/**
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
 	 * Contains the data written to this ouptput stream, as a sequence of {@link JPPFBuffer} instances.
 	 */
@@ -67,7 +81,11 @@ public class MultipleBuffersInputStream extends InputStream
 	 */
 	public MultipleBuffersInputStream(List<JPPFBuffer> buffers)
 	{
-		list.addAll(buffers);
+		for (JPPFBuffer b: buffers)
+		{
+			list.add(b);
+			totalSize += b.length;
+		}
 	}
 
 	/**
@@ -82,6 +100,7 @@ public class MultipleBuffersInputStream extends InputStream
 		if (eofReached) return -1;
 		int n = currentBuffer.buffer[currentBuffer.pos];
 		currentBuffer.pos++;
+		if (traceEnabled) log.trace("read one byte '" + n + "' from " + this);
 		return n;
 	}
 
@@ -110,6 +129,8 @@ public class MultipleBuffersInputStream extends InputStream
 			count += n;
 			currentBuffer.pos += n;
 		}
+		if (traceEnabled) log.trace("read " + count + " bytes from " + this +
+			", bytes = " + StringUtils.dumpBytes(currentBuffer.buffer, currentBuffer.pos - count, Math.min(100, count)));
 		return count;
 	}
 
@@ -151,5 +172,26 @@ public class MultipleBuffersInputStream extends InputStream
 		if (eofReached) return null;
 		if ((currentBuffer == null) || (currentBuffer.remainingFromPos() <= 0)) nextBuffer();
 		return currentBuffer;
+	}
+
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(getClass().getSimpleName()).append("[");
+		sb.append("totalSize=").append(totalSize);
+		sb.append(", nbBuffers=").append(list.size());
+		sb.append(", bufferIndex=").append(bufferIndex);
+		if (currentBuffer == null) sb.append(", currentBuffer=null");
+		else
+		{
+			sb.append(", currentBuffer.pos=").append(currentBuffer.pos);
+			sb.append(", currentBuffer.length=").append(currentBuffer.length);
+		}
+		sb.append("]");
+		return sb.toString();
 	}
 }

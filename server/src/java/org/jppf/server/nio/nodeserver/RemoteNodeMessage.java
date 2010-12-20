@@ -105,4 +105,20 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 		currentObject = null;
 		return true;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("[");
+		sb.append("nb locations=").append(locations == null ? -1 : locations.size());
+		sb.append(", position=").append(position);
+		sb.append(", nbObjects=").append(nbObjects);
+		sb.append(", length=").append(length);
+		sb.append(", count=").append(count);
+		sb.append(", currentLength=").append(currentLength);
+		sb.append("]");
+		return sb.toString();
+	}
 }

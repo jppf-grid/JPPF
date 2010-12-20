@@ -123,7 +123,6 @@ public class NioObject
 		{
 			if (debugEnabled) log.debug("count = " + count + ", size = " + size);
 			if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().flip();
-			//if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().rewind();
 			return true;
 		}
 		return false;

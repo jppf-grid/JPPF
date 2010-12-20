@@ -74,10 +74,6 @@ public final class IOHelper
 		{
 			try
 			{
-				/*
-				byte[] bytes = new byte[size];
-				return new ByteBufferLocation(bytes, 0, size);
-				*/
 				return new MultipleBuffersLocation(size);
 			}
 			catch (OutOfMemoryError oome)
@@ -99,6 +95,7 @@ public final class IOHelper
 	public static DataLocation readData(InputSource source) throws Exception
 	{
 		int n = source.readInt();
+		if (traceEnabled) log.trace("read data size = " + n);
 		DataLocation dl = createDataLocationMemorySensitive(n);
 		dl.transferFrom(source, true);
 		return dl;

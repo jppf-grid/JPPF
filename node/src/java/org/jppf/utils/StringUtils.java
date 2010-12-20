@@ -115,10 +115,13 @@ public final class StringUtils
 	public static String dumpBytes(byte[] bytes, int start, int length)
 	{
 		StringBuilder sb = new StringBuilder();
-		for (int i=start; i<start+length; i++)
+		if (length >= 0)
 		{
-			if (i > start) sb.append(' ');
-			sb.append(toHexString(bytes[i]));
+			for (int i=start; i<Math.min(bytes.length, start+length); i++)
+			{
+				if (i > start) sb.append(' ');
+				sb.append(toHexString(bytes[i]));
+			}
 		}
 		return sb.toString();
 	}

@@ -129,7 +129,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 		{
 			int remaining = size - count;
 			int n = source.read(currentBuffer.buffer, currentBuffer.pos, remaining);
-			if (debugEnabled) log.debug("blocking transfer: remaining=" + remaining + ", read " + n +" bytes");
+			if (debugEnabled) log.debug("blocking transfer: remaining=" + remaining + ", read " + n +" bytes from source=" + source +
+				", bytes=" + StringUtils.dumpBytes(currentBuffer.buffer, currentBuffer.pos, Math.min(100, n)));
 			if (n < 0) throw new EOFException();
 			if (n < remaining) currentBuffer.pos += n;
 			count += n;
@@ -206,7 +207,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 				if (n <= 0) break;
 				if (n < remaining) buf.pos += n;
 				count += n;
-				nbRead = n;
+				nbRead += n;
 			}
 		}
 		return count;

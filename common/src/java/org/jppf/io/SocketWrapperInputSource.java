@@ -68,8 +68,7 @@ public class SocketWrapperInputSource implements InputSource
 	 */
 	public int read(ByteBuffer data) throws Exception
 	{
-		ByteBuffer tmp = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
-		byte[] buf = tmp.array();
+		byte[] buf = new byte[IOHelper.TEMP_BUFFER_SIZE];
 		int size = Math.min(buf.length, data.remaining());
 		int n = read(buf, 0, size);
 		if (n > 0) data.put(buf, 0, n);

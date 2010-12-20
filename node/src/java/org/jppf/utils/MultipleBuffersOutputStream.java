@@ -21,12 +21,26 @@ package org.jppf.utils;
 import java.io.*;
 import java.util.*;
 
+import org.slf4j.*;
+
 /**
  * An output stream implementation that minimizes memory usage.
  * @author Laurent Cohen
  */
 public class MultipleBuffersOutputStream extends OutputStream
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(MultipleBuffersOutputStream.class);
+	/**
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
 	 * Default length of each new buffer.
 	 */
@@ -74,6 +88,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 		currentBuffer.buffer[currentBuffer.length] = (byte) b;
 		currentBuffer.length++;
 		totalSize++;
+		if (traceEnabled) log.trace("wrote one byte '" + b + "' to " + this);
 	}
 
 	/**
@@ -93,6 +108,8 @@ public class MultipleBuffersOutputStream extends OutputStream
 		System.arraycopy(b, off, currentBuffer.buffer, currentBuffer.length, len);
 		currentBuffer.length += len;
 		totalSize += len;
+		if (traceEnabled) log.trace("wrote " + len + " bytes to " + this +
+			", bytes = " + StringUtils.dumpBytes(currentBuffer.buffer, currentBuffer.length - len, Math.min(100, len)));
 	}
 
 	/**
@@ -113,6 +130,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 */
 	private void newCurrentBuffer(int size)
 	{
+		if (traceEnabled) log.trace("creating new buffer with size=" + size + " for " + this);
 		currentBuffer = new JPPFBuffer(new byte[size], 0);
 		list.add(currentBuffer);
 	}
@@ -141,7 +159,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 */
 	public byte[] toByteArray()
 	{
-		if ((totalSize == 1) && (list.get(0).length == totalSize)) return list.get(0).buffer;
+		if ((totalSize >= 1) && (list.get(0).length == totalSize)) return list.get(0).buffer;
 		int pos = 0;
 		byte[] tmp = new byte[totalSize];
 		for (JPPFBuffer buf: list)
@@ -150,5 +168,21 @@ public class MultipleBuffersOutputStream extends OutputStream
 			pos += buf.length;
 		}
 		return tmp;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(getClass().getSimpleName()).append("[");
+		sb.append("defaultLength=").append(defaultLength);
+		sb.append(", totalSize=").append(totalSize);
+		sb.append(", nbBuffers=").append(list.size());
+		if (currentBuffer == null) sb.append(", currentBuffer=null");
+		else sb.append(", currentBuffer.length=").append(currentBuffer.length);
+		sb.append("]");
+		return sb.toString();
 	}
 }

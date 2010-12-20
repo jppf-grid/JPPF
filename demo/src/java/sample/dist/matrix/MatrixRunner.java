@@ -200,6 +200,7 @@ public class MatrixRunner implements NotificationListener
 			rowIdx += rows.length;
 		}
 		//long elapsed = System.currentTimeMillis() - start;
+		//return elapsed;
 		long elapsed = System.nanoTime() - start;
 		return elapsed/1000000L;
 	}
@@ -211,10 +212,10 @@ public class MatrixRunner implements NotificationListener
 	 */
 	private void performSequentialMultiplication(Matrix a, Matrix b)
 	{
-		long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 		Matrix c = a.multiply(b);
-		long elapsed = System.currentTimeMillis() - start;
-		output("Sequential computation performed in "+StringUtils.toStringDuration(elapsed));
+		long elapsed = System.nanoTime() - start;
+		output("Sequential computation performed in "+StringUtils.toStringDuration(elapsed/100000));
 	}
 
 	/**
