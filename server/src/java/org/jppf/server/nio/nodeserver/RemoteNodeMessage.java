@@ -52,7 +52,10 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 	protected boolean readNextObject(ChannelWrapper<?> wrapper) throws Exception
 	{
 		SocketChannel channel = (SocketChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
-		if (currentLengthObject == null) currentLengthObject = new NioObject(4, false);
+		if (currentLengthObject == null)
+		{
+			currentLengthObject = new NioObject(4, false);
+		}
 		InputSource is = new ChannelInputSource(channel);
 		if (!currentLengthObject.read(is)) return false;
 		if (currentLength <= 0)

@@ -124,13 +124,13 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 */
 	private int blockingTransferFrom(InputSource source) throws Exception
 	{
-		if (debugEnabled) log.debug("blocking transfer: size=" + size);
+		//if (debugEnabled) log.debug("blocking transfer: size=" + size);
 		while (count < size)
 		{
 			int remaining = size - count;
 			int n = source.read(currentBuffer.buffer, currentBuffer.pos, remaining);
-			if (debugEnabled) log.debug("blocking transfer: remaining=" + remaining + ", read " + n +" bytes from source=" + source +
-				", bytes=" + StringUtils.dumpBytes(currentBuffer.buffer, currentBuffer.pos, Math.min(100, n)));
+			//if (debugEnabled) log.debug("blocking transfer: remaining=" + remaining + ", read " + n +" bytes from source=" + source +
+			//	", bytes=" + StringUtils.dumpBytes(currentBuffer.buffer, currentBuffer.pos, Math.min(100, n)));
 			if (n < 0) throw new EOFException();
 			if (n < remaining) currentBuffer.pos += n;
 			count += n;
@@ -148,7 +148,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	private int nonBlockingTransferFrom(InputSource source) throws Exception
 	{
 		int remaining = size - count;
-		if (debugEnabled) log.debug("blocking transfer: size="+size+", remaining="+remaining);
+		//if (debugEnabled) log.debug("blocking transfer: size="+size+", remaining="+remaining);
 		int n = source.read(currentBuffer.buffer, currentBuffer.pos, remaining);
 		if (n > 0)
 		{
@@ -170,6 +170,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 			if (!blocking)
 			{
 				currentBuffer = list.get(0);
+				currentBuffer.pos = 0;
 				currentBufferIndex = 0;
 			}
 			count = 0;
@@ -224,6 +225,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 		if (currentBuffer == null) return -1;
 		int remaining = currentBuffer.remainingFromPos();
 		int n = dest.write(currentBuffer.buffer, currentBuffer.pos, remaining);
+		if (traceEnabled) log.trace("count/size=" + count + "/" + size + ", n/remaining=" + n + "/" + remaining +
+			", currentBufferIndex/listSize=" + currentBufferIndex + "/" + list.size() + ", pos=" + currentBuffer.pos + " (" + this + ")");
 		if (n > 0) count += n;
 		if (n < remaining) currentBuffer.pos += n;
 		else
@@ -233,6 +236,11 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 				currentBufferIndex++;
 				currentBuffer = list.get(currentBufferIndex);
 				currentBuffer.pos = 0;
+			}
+			else
+			{
+				currentBuffer = null;
+				//transferring = false;
 			}
 		}
 		return n;
@@ -259,7 +267,9 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 */
 	public DataLocation copy()
 	{
-		return new MultipleBuffersLocation(list, size);
+		List<JPPFBuffer> copyList = new ArrayList<JPPFBuffer>();
+		for (JPPFBuffer buf: list) copyList.add(new JPPFBuffer(buf.buffer, buf.length));
+		return new MultipleBuffersLocation(copyList, size);
 	}
 
 }
