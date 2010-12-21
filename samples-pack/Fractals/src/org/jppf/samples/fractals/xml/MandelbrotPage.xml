@@ -89,7 +89,7 @@
 				<property name="label" value="center X"/>
 				<property name="tooltip" value="X coordinate of the image center"/>
 				<property name="value" value="-0.7"/>
-				<property name="pattern" value="0.###,###,###,###"/>
+				<property name="pattern" value="0.############"/>
 				<property name="orientation" value="horizontal"/>
 				<property name="persistent" value="true"/>
 			</child>
@@ -98,7 +98,7 @@
 				<property name="label" value="center Y"/>
 				<property name="tooltip" value="Y coordinate of the image center"/>
 				<property name="value" value="0.0"/>
-				<property name="pattern" value="0.###,###,###,###"/>
+				<property name="pattern" value="0.############"/>
 				<property name="orientation" value="horizontal"/>
 				<property name="persistent" value="true"/>
 			</child>
@@ -113,7 +113,7 @@
 				<property name="label" value="diameter"/>
 				<property name="tooltip" value="Diameter of the area in which the Mandelbrot set is computed"/>
 				<property name="value" value="3.0769"/>
-				<property name="pattern" value="0.###,###,###,###"/>
+				<property name="pattern" value="0.############"/>
 				<property name="orientation" value="horizontal"/>
 				<property name="persistent" value="true"/>
 			</child>
