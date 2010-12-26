@@ -106,6 +106,7 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 			UIComponent = sp;
 		}
 		else UIComponent = panel;
+		//panel.setBackground(new Color(0, 0, 255));
 	}
 
 	/**

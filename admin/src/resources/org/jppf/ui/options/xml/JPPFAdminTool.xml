@@ -31,7 +31,7 @@
 	<!-- ===================================================================== -->
 	<!--                    Server Chooser Panel                               -->
 	<!-- ===================================================================== -->
-	
+
 	<child name="Tabs" type="page">
 		<property name="tooltip" value="The list of drivers to connect to"/>
 		<property name="layoutConstraints" value="flowy, fill, insets 2 2 2 2"/>
@@ -54,6 +54,7 @@
 	<child name="AdminPanels" type="TabbedPane">
 		<property name="componentConstraints" value="push, grow"/>
 		<property name="layoutConstraints" value="fill"/>
+		<property name="bordered" value="false"/>
 		<property name="tooltip" value="Perform the remote administration of the server"/>
 		<import source="plugin" location="jppf-plugins/jppf-ui-plugin"/>
 		<!--

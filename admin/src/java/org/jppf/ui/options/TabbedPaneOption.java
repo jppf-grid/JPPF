@@ -50,7 +50,7 @@ public class TabbedPaneOption extends AbstractOptionElement implements OptionsPa
 		pane.setDoubleBuffered(true);
 		if (!bordered) pane.setBorder(BorderFactory.createEmptyBorder());
 		UIComponent = pane;
-		pane.setOpaque(false);
+		//pane.setOpaque(false);
 	}
 
 	/**
