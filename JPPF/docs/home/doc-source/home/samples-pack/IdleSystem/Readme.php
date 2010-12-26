@@ -1,6 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Idle Mode for JPPF Nodes"}$
 
+<div align="justify">
 
 					<p>This sample is an implementation of a JPPF API that allows a node to start when the machine on which it is running is idle, and to stop when the machine is busy again.
 					By idle we mean that no keyboard or mouse input has occurred for a specified time.
@@ -45,5 +46,6 @@ $template{name="samples-page-header" title="Idle Mode for JPPF Nodes"}$
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
 					
+</div>
 
 $template{name="about-page-footer"}$

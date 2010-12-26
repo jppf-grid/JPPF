@@ -1,6 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Dense Matrix Multiplication sample"}$
 
+<div align="justify">
 
 					<h3>What does the sample do?</h3>
 					This sample performs the multplication of 2 square dense matrices by dividing the operation into as many JPPF tasks as there are rows in each matrix. Each task multiplies a row of the first matrix by the second matrix.
@@ -42,5 +43,6 @@ $template{name="samples-page-header" title="Dense Matrix Multiplication sample"}
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
 					
+</div>
 
 $template{name="about-page-footer"}$

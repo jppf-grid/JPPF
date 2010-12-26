@@ -1,6 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Custom MBeans sample"}$
 
+<div align="justify">
 
 					<h3>What does the sample do?</h3>
 					This sample proposes a design to enable JPPF tasks to send real-time notifications, and to allow any client to subscribe to these notifications.
@@ -70,5 +71,6 @@ $template{name="samples-page-header" title="Custom MBeans sample"}$
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
 					
+</div>
 
 $template{name="about-page-footer"}$

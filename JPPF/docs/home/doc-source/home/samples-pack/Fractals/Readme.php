@@ -1,6 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Generation of Mandelbrot Fractals"}$
 
+<div align="justify">
 
 					<h3>What does the sample do?</h3>
 					This sample generates <a href="http://en.wikipedia.org/wiki/Mandelbrot_set">Mandelbrot fractals</a> images by submitting the computation
@@ -45,5 +46,6 @@ $template{name="samples-page-header" title="Generation of Mandelbrot Fractals"}$
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
 					
+</div>
 
 $template{name="about-page-footer"}$

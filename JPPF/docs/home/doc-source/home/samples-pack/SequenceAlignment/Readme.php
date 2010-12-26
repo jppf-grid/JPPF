@@ -1,6 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="DNA / Protein Sequence Alignment"}$
 
+<div align="justify">
 
 					<h3>What does the sample do?</h3>
 					<p align="justify">This sample searches, in a database of DNA or protein sequences, a sequence that is as close as possible to an input sequence.
@@ -43,5 +44,6 @@ $template{name="samples-page-header" title="DNA / Protein Sequence Alignment"}$
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
 					
+</div>
 
 $template{name="about-page-footer"}$

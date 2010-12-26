@@ -1,6 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Custom Load Balancer sample"}$
 
+<div align="justify">
 
 					<h3>What does the sample do?</h3>
 					This sample illustrates the implementation of a custom load-balancer that uses information about the nodes and the submitted jobs, to dispatch JPPF tasks to the nodes.
@@ -111,5 +112,6 @@ $template{name="samples-page-header" title="Custom Load Balancer sample"}$
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
 					
+</div>
 
 $template{name="about-page-footer"}$

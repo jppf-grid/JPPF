@@ -1,6 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Tomcat Port of the JPPF Client"}$
 
+<div align="justify">
 
 					<h3>What does the sample do?</h3>
 					This sample is a simple demonstration of a JPPF client embedded in a web application and running within a Tomcat container.<br>
@@ -32,5 +33,6 @@ $template{name="samples-page-header" title="Tomcat Port of the JPPF Client"}$
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
 					
+</div>
 
 $template{name="about-page-footer"}$

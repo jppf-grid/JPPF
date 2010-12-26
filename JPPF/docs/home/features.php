@@ -210,7 +210,7 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="/release_notes.php?version=2.3" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
+											<a href="/release_notes.php?version=2.4" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -256,7 +256,7 @@
 				<br/>
 				</div>
 				<div class="content">
-<h1>JPPF 2.3 features</h1>
+<h1>JPPF 2.4 features</h1>
 <h3>Ease of use</h3>
 <ul>
 	<li>simple APIs requiring small or no learning curve</li>
@@ -265,7 +265,7 @@
 	<li>"happy path" with no additional configuration</li>
 	<li>automatic server discovery</li>
 	<li>convenient reusable application template to quickly and easily start developing JPPF applications</li>
-	<li>straightforward Executor Service interface to the JPPF grid</li>
+	<li>straightforward Executor Service interface to the JPPF grid, with high throughput enhancements</li>
 </ul>
 <h3>Self-repair and recovery</h3>
 <ul>
@@ -294,7 +294,7 @@
 	<li>cpu utilization monitoring</li>
 	<li>management of load-balancing</li>
 	<li>management and monitoring available via APIs and graphical user interface (administration console)</li>
-	<li>access to remote sevrers and nodes logs via the JMX-based logger (integrates with Log4j and JDK logging)</li>
+	<li>access to remote servers and nodes logs via the JMX-based logger (integrates with Log4j and JDK logging)</li>
 </ul>
 <h3>Platform extensibility</h3>
 <ul>
@@ -303,12 +303,13 @@
 	<li>Security: any data transiting over the network can now be encrypted by the way of user-defined transformations</li>
 	<li>Pluggable load-balancing modules allow users to write their own load balancing strategies</li>
 	<li>Ability to specify alternative serialization schemes</li>
+	<li>Subscription to nodes life cycle events</li>
 </ul>
 <h3>Performance and resources efficiency</h3>
 <ul>
 	<li>multiple configurable load-balancing algorithms</li>
 	<li>adaptive load-balancing adjusts in real-time to workload changes</li>
-	<li>memory-aware servers and nodes with disk overflow</li>
+	<li>memory-aware components with disk overflow</li>
 	<li>client-side server connection pools</li>
 </ul>
 <h3>Dynamic topology scaling</h3>
@@ -358,6 +359,7 @@
 	<li><a href="samples-pack/CustomLoadBalancer/Readme.php">An example of a sophisticated load-balancer implementation</a></li>
 	<li><a href="samples-pack/TaskNotifications/Readme.php">A customization that allows tasks to send notifications while executing</a></li>
 	<li><a href="samples-pack/IdleSystem/Readme.php">An extension that enables nodes to run only when the machine is idle</a></li>
+	<li><a href="samples-pack/NodeLifeCycle/Readme.php">Control of database transactions via node life cycle events</a></li>
 </ul>
 				</div>
 									</td>

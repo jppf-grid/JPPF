@@ -59,12 +59,13 @@ div.u_link > a { text-decoration: underline; font-weight: normal }
 
 .noborder_        { border: 0px }
 
-h1, h2, h3 , h4  { font-family: Arial, Verdana, sans-serif;  color: #6D78B6 } /* 109, 120, 182 */
+h1, h2, h3 , h4, h5  { font-family: Arial, Verdana, sans-serif; color: #6D78B6 } /* 109, 120, 182 */
 h1 { font-family: Arial Black, Arial, Verdana, sans-serif; font-weight: 900 }
 h1.header {	font-family: Arial Black, Arial, Verdana, sans-serif;  color: #6D78B6; font-size: 24pt }
-h2,h3 { margin-top: 10px; padding-top: 0px; margin-bottom: 10px; padding-bottom: 0px; }
+h2,h3, h4 { margin-top: 10px; padding-top: 0px; margin-bottom: 10px; padding-bottom: 0px; }
 h3 { font-size: 14pt; }
 h4 { font-size: 12pt; font-weight: bold }
+h5 { font-size: 10pt; font-weight: bold; margin-top: 10pt; margin-bottom: 10pt }
 table  {font-size: 10pt; font-family: Arial, Verdana, sans-serif; margin: 0px }
 .blockHeader { font-size: 14pt; color: yellow;  color: white; font-weight: bold; font-family: Arial, Verdana, Sans-serif }
 .simpleList { list-style: none; text-indent: -20 }
@@ -72,6 +73,7 @@ table  {font-size: 10pt; font-family: Arial, Verdana, sans-serif; margin: 0px }
 .news { font-size: 9pt; font-family: Times New Roman, Times, serif;  color: #6D78B6 }
 .links { color: #000060; font-size: 10pt; font-family: Arial, Verdana, sans-serif }
 .linksub { font-size: 12pt; color: #8080FF; font-weight: bold }
+.headerlink { text-decoration: underline; color: #6D78B6 }
 /*.newsTitle { color: #7678BE; font-size: 11pt; font-family: Comic Sans MS, Arial, Helvetica, sans-serif; font-weight: bold }*/
 .newsTitle { font-family: Arial, Helvetica, sans-serif; font-size: 12pt; color: #6D78B6; font-weight: bold }
 

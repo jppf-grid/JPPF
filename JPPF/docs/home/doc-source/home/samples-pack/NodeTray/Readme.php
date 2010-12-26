@@ -1,6 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Node Tray sample"}$
 
+<div align="justify">
 
 					<h3>What does the sample do?</h3>
 					This sample provides a node health monitor that sits in the system tray.<br>
@@ -45,5 +46,6 @@ $template{name="samples-page-header" title="Node Tray sample"}$
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
 					
+</div>
 
 $template{name="about-page-footer"}$
