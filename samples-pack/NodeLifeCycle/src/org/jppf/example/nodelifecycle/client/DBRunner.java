@@ -46,11 +46,12 @@ public class DBRunner
 	 */
 	private static JMXNodeConnectionWrapper jmxNode = null;
 
-	/**
-	 * Entry point for this class, performs a matrix multiplication a number of times.,<br>
-	 * The number of times is specified as a configuration property named &quot;matrix.iterations&quot;.<br>
-	 * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
-	 * @param args not used.
+	/***
+	 * Send a job with a number of tasks that insert a row in a database table.
+	 * We use the management APIs to kill a node before the job execution is complete,
+	 * so we can demonstrate the transaction recovery mechanism (implemented in Atomikos)
+	 * on the node side. Once the job is complete, we display all the rows in the table.
+	 * @param args the first argument, if any, will be used as the JPPF client's uuid.
 	 */
 	public static void main(String...args)
 	{
@@ -74,7 +75,7 @@ public class DBRunner
 				job.addTask(task);
 			}
 			job.setBlocking(false);
-			// customize the reuslt listener to display a message each time a task result is received
+			// customize the result listener to display a message each time a task result is received
 			JPPFResultCollector collector = new JPPFResultCollector(nbTasks)
 			{
 				public synchronized void resultsReceived(TaskResultEvent event)
@@ -140,7 +141,7 @@ public class DBRunner
 		}
 		catch(Exception e)
 		{
-			System.out.println("Could not restart a node:\n" + StringUtils.getStackTrace(e));
+			output("Could not restart a node:\n" + StringUtils.getStackTrace(e));
 		}
 	}
 
@@ -157,7 +158,7 @@ public class DBRunner
 		Statement stmt = c.createStatement();
 		ResultSet rs = stmt.executeQuery(sql);
 		int count = 1;
-		output("***** displaying the DB table content *****"); 
+		output("\n***** displaying the DB table content *****"); 
 		while (rs.next())
 		{
 			StringBuilder sb = new StringBuilder();
@@ -176,7 +177,7 @@ public class DBRunner
 
 	/**
 	 * Print a message to the console and/or log file.
-	 * @param message - the message to print.
+	 * @param message the message to print.
 	 */
 	private static void output(String message)
 	{

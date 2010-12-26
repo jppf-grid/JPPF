@@ -48,7 +48,7 @@ public class NodeListener implements NodeLifeCycleListener
 	 */
 	private static Logger log = LoggerFactory.getLogger(NodeListener.class);
 	/**
-	 * The XA data source ot use.
+	 * The XA data source to use.
 	 */
 	private static DataSource dataSource = null;
 	/**
