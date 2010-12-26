@@ -374,6 +374,26 @@ public final class StringUtils
 	}
 
 	/**
+	 * Determine whether the specified source string is equal to one of the specified values.
+	 * @param source the string to match with the values.
+	 * @param ignoreCase specifies whether case should be ignore in the string matching.
+	 * @param values the values to match the source with.
+	 * @return true if the source matches one of the values, false otherwise.
+	 */
+	public static boolean isOneOf(String source, boolean ignoreCase, String...values)
+	{
+		if ((source == null) || (values == null)) return false;
+		String s = ignoreCase ? source.toLowerCase(): source;
+		for (String val: values)
+		{
+			if (val == null) continue;
+			String s2 = ignoreCase ? val.toLowerCase() : val;
+			if (s.equals(s2)) return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Convert an IP address int array.
 	 * @param addr the source address to convert.
 	 * @return an array of int values, or null if the source could not be parsed.

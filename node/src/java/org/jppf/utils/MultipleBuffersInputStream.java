@@ -70,7 +70,7 @@ public class MultipleBuffersInputStream extends InputStream
 	{
 		for (JPPFBuffer b: buffers)
 		{
-			list.add(b);
+			list.add(new JPPFBuffer(b.buffer, b.length));
 			totalSize += b.length;
 		}
 	}
@@ -83,7 +83,7 @@ public class MultipleBuffersInputStream extends InputStream
 	{
 		for (JPPFBuffer b: buffers)
 		{
-			list.add(b);
+			list.add(new JPPFBuffer(b.buffer, b.length));
 			totalSize += b.length;
 		}
 	}
@@ -96,7 +96,7 @@ public class MultipleBuffersInputStream extends InputStream
 	 */
 	public int read() throws IOException
 	{
-		if ((currentBuffer == null) || (currentBuffer.remainingFromPos() < 1)) nextBuffer();
+		if ((currentBuffer == null) || (currentBuffer.length - currentBuffer.pos < 1)) nextBuffer();
 		if (eofReached) return -1;
 		int n = currentBuffer.buffer[currentBuffer.pos];
 		currentBuffer.pos++;
@@ -122,9 +122,11 @@ public class MultipleBuffersInputStream extends InputStream
 		int count = 0;
 		while (count < len)
 		{
-			if ((currentBuffer == null) || (currentBuffer.remainingFromPos() <= 0)) nextBuffer();
+			//if ((currentBuffer == null) || (currentBuffer.remainingFromPos() <= 0)) nextBuffer();
+			if ((currentBuffer == null) || (currentBuffer.length - currentBuffer.pos <= 0)) nextBuffer();
 			if (eofReached) break;
-			int n = Math.min(currentBuffer.remainingFromPos(), len - count);
+			//int n = Math.min(currentBuffer.remainingFromPos(), len - count);
+			int n = Math.min(currentBuffer.length - currentBuffer.pos, len - count);
 			System.arraycopy(currentBuffer.buffer, currentBuffer.pos, b, off + count, n);
 			count += n;
 			currentBuffer.pos += n;
@@ -173,7 +175,6 @@ public class MultipleBuffersInputStream extends InputStream
 		if ((currentBuffer == null) || (currentBuffer.remainingFromPos() <= 0)) nextBuffer();
 		return currentBuffer;
 	}
-
 
 	/**
 	 * {@inheritDoc}

@@ -125,7 +125,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		else
 		{
 			connectionThread.set(new JMXConnectionThread());
-			Thread t = new Thread(connectionThread.get(), "JMX connection thread for " + getId());
+			Thread t = new Thread(connectionThread.get(), "JMX connection " + getId());
 			t.setDaemon(true);
 			t.start();
 		}
@@ -155,7 +155,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
     jmxc = JMXConnectorFactory.connect(url, env);
   	mbeanConnection.set(jmxc.getMBeanServerConnection());
   	setConnectedStatus(true);
-		log.info(getId() + " JMX connection successfully established");
+		if (debugEnabled) log.debug(getId() + " JMX connection successfully established");
 	}
 
 	/**
@@ -198,7 +198,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 				if (debugEnabled) log.debug(e2.getMessage(), e2);
 			}
 			if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
-			log.info(getId() + " : error while invoking the JMX connection", e);
+			if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
 		}
 		return result;
 	}

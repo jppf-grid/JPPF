@@ -139,6 +139,12 @@ public final class SerializationUtils
     result    += convertByte(data[pos++]) << 16;
     result    += convertByte(data[pos++]) <<  8;
     result    += convertByte(data[pos++]) <<  0;
+		/*
+    int result = data[pos++] << 24;
+    result    += data[pos++] << 16;
+    result    += data[pos++] <<  8;
+    result    += data[pos++] <<  0;
+    */
     return result;
 	}
 
@@ -154,6 +160,12 @@ public final class SerializationUtils
     result    += convertByte(is.read()) << 16;
     result    += convertByte(is.read()) <<  8;
     result    += convertByte(is.read()) <<  0;
+		/*
+    int result = is.read() << 24;
+    result    += is.read() << 16;
+    result    += is.read() <<  8;
+    result    += is.read() <<  0;
+    */
     return result;
 	}
 

@@ -57,12 +57,30 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 * The total number of bytes written into this output stream.
 	 */
 	private int totalSize = 0;
+	/**
+	 * Determines whether this output stream was created with an initial list of buffers.
+	 */
+	private boolean hasInitialBuffers = false;
+	/**
+	 * Current position in th elist of buffers.
+	 */
+	private int bufferIndex = 0;
 
 	/**
 	 * Intialize this output stream with a default buffer length of 32768.
 	 */
 	public MultipleBuffersOutputStream()
 	{
+	}
+
+	/**
+	 * Intialize this output stream with a default buffer length of 32768.
+	 * @param initialList contains the data that is written to this output stream.
+	 */
+	public MultipleBuffersOutputStream(List<JPPFBuffer> initialList)
+	{
+		for (JPPFBuffer buf: initialList) this.list.add(new JPPFBuffer(buf.buffer, 0));
+		hasInitialBuffers = true;
 	}
 
 	/**
@@ -92,7 +110,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	}
 
 	/**
-	 * Writes len bytes from the specified byte array starting at offset off to this output stream.
+	 * Writes <code>len</code> bytes from the specified byte array starting at offset <code>off</code> to this output stream.
 	 * @param b the data.
 	 * @param off the start offset in the data.
 	 * @param len the number of bytes to write.
@@ -131,8 +149,16 @@ public class MultipleBuffersOutputStream extends OutputStream
 	private void newCurrentBuffer(int size)
 	{
 		if (traceEnabled) log.trace("creating new buffer with size=" + size + " for " + this);
-		currentBuffer = new JPPFBuffer(new byte[size], 0);
-		list.add(currentBuffer);
+		if (hasInitialBuffers)
+		{
+			currentBuffer = list.get(bufferIndex++);
+			currentBuffer.length = 0;
+		}
+		else
+		{
+			currentBuffer = new JPPFBuffer(new byte[size], 0);
+			list.add(currentBuffer);
+		}
 	}
 
 	/**
