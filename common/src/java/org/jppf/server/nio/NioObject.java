@@ -59,7 +59,8 @@ public class NioObject
 	 */
 	public NioObject(int size, boolean blocking)
 	{
-		this(new ByteBufferLocation(size), blocking);
+		//this(new ByteBufferLocation(size), blocking);
+		this(new MultipleBuffersLocation(size), blocking);
 	}
 
 	/**
@@ -69,10 +70,12 @@ public class NioObject
 	 * @param len the size in bytes of the data to write.
 	 * @param blocking specifIes whether the I/O performed by this object are blocking.
 	 */
+	/*
 	public NioObject(byte[] data, int offset, int len, boolean blocking)
 	{
 		this(new ByteBufferLocation(data, offset, len), blocking);
 	}
+	*/
 
 	/**
 	 * Initialize this NioObject with the specified size.
@@ -83,7 +86,7 @@ public class NioObject
 	{
 		this.size = data.getSize();
 		this.data = data;
-		if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().rewind();
+		//if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().rewind();
 	}
 
 	/**
@@ -101,7 +104,7 @@ public class NioObject
 		if (count >= size)
 		{
 			if (debugEnabled) log.debug("count = " + count + ", size = " + size);
-			if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().flip();
+			//if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().flip();
 			return true;
 		}
 		return false;
@@ -125,7 +128,7 @@ public class NioObject
 		}
 		if (count >= size)
 		{
-			if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().flip();
+			//if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().flip();
 			return true;
 		}
 		return false;

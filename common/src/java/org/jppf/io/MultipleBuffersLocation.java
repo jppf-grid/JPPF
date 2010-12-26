@@ -65,10 +65,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 */
 	public MultipleBuffersLocation(int size)
 	{
-		/*
 		list = new ArrayList<JPPFBuffer>();
 		list.add(new JPPFBuffer(new byte[size], size));
-		*/
 		this.size = size;
 	}
 
@@ -84,6 +82,17 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	}
 
 	/**
+	 * Initialize this location from a single buffer.
+	 * @param buffer the buffer that contains the data.
+	 */
+	public MultipleBuffersLocation(JPPFBuffer buffer)
+	{
+		this.list = new ArrayList<JPPFBuffer>();
+		this.list.add(buffer);
+		this.size = buffer.length;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public int transferFrom(InputSource source, boolean blocking) throws Exception
@@ -91,9 +100,10 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 		if (!transferring)
 		{
 			transferring = true;
-			list = new ArrayList<JPPFBuffer>();
-			currentBuffer = new JPPFBuffer(new byte[size], size);
-			list.add(currentBuffer);
+			//list = new ArrayList<JPPFBuffer>();
+			//currentBuffer = new JPPFBuffer(new byte[size], size);
+			//list.add(currentBuffer);
+			currentBuffer = list.get(0);
 			currentBufferIndex = 0;
 			currentBuffer.pos = 0;
 			if (!blocking)
@@ -259,7 +269,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 */
 	public OutputStream getOutputStream() throws Exception
 	{
-		return new MultipleBuffersOutputStream();
+		return new MultipleBuffersOutputStream(list);
 	}
 
 	/**
@@ -271,5 +281,4 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 		for (JPPFBuffer buf: list) copyList.add(new JPPFBuffer(buf.buffer, buf.length));
 		return new MultipleBuffersLocation(copyList, size);
 	}
-
 }
