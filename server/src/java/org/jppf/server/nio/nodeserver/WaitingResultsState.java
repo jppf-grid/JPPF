@@ -81,7 +81,8 @@ class WaitingResultsState extends NodeServerState
 			}
 			else
 			{
-				long elapsed = System.currentTimeMillis() - bundle.getExecutionStartTime();
+				//long elapsed = System.currentTimeMillis() - bundle.getExecutionStartTime();
+				long elapsed = (System.nanoTime() - bundle.getExecutionStartTime())/1000000;
 				statsManager.taskExecuted(newBundle.getTaskCount(), elapsed, newBundle.getNodeExecutionTime(), context.getNodeMessage().getLength());
 				context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 			}

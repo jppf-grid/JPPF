@@ -18,14 +18,12 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import java.io.InputStream;
 import java.util.*;
 
-import org.jppf.data.transform.JPPFDataTransformFactory;
-import org.jppf.io.DataLocation;
-import org.jppf.server.nio.*;
+import org.jppf.io.*;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.utils.*;
+import org.jppf.utils.SerializationHelperImpl;
 
 /**
  * Common abstract superclass representing a message sent or received by a node.
@@ -80,11 +78,14 @@ public abstract class AbstractNodeMessage
 		{
 			if (position != 0) position = 0;
 			if (!readNextObject(wrapper)) return false;
+			/*
 			InputStream is = locations.get(0).getInputStream();
 			byte[] data = FileUtils.getInputStreamAsByte(is);
 			data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
 			SerializationHelper helper = new SerializationHelperImpl();
 			bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
+			*/
+			bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0), new SerializationHelperImpl().getSerializer());
 			nbObjects = bundle.getTaskCount() + 1;
 		}
 		while (position < nbObjects)

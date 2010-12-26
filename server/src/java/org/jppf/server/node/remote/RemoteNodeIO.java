@@ -85,7 +85,8 @@ public class RemoteNodeIO extends AbstractNodeIO
 		list.add(bundle);
 		try
 		{
-			bundle.setNodeExecutionTime(System.currentTimeMillis());
+			//bundle.setNodeExecutionTime(System.currentTimeMillis());
+			bundle.setNodeExecutionTime(System.nanoTime());
 			int count = bundle.getTaskCount();
 			if (debugEnabled) log.debug("bundle task count = " + count + ", state = " + bundle.getState());
 			if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
@@ -132,7 +133,8 @@ public class RemoteNodeIO extends AbstractNodeIO
 	public void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
 	{
 		ExecutorService executor = node.getExecutionManager().getExecutor();
-		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
+		//long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
+		long elapsed = (System.nanoTime() - bundle.getNodeExecutionTime())/1000000;
 		bundle.setNodeExecutionTime(elapsed);
 		List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>();
 		futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
@@ -141,6 +143,7 @@ public class RemoteNodeIO extends AbstractNodeIO
 		for (Future<DataLocation> f: futureList)
 		{
 			DataLocation dl = f.get();
+			if (debugEnabled) log.debug("writing object size = " + dl.getSize());
 			dest.writeInt(dl.getSize());
 			dl.transferTo(dest, true);
 		}

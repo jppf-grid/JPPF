@@ -18,11 +18,11 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import org.jppf.io.*;
 import org.jppf.server.nio.*;
+import org.jppf.utils.SerializationUtils;
 
 /**
  * Representation of a message sent or received by a remote node.
@@ -60,7 +60,8 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 		if (!currentLengthObject.read(is)) return false;
 		if (currentLength <= 0)
 		{
-			currentLength = ((ByteBufferLocation) currentLengthObject.getData()).buffer().getInt();
+			//currentLength = ((ByteBufferLocation) currentLengthObject.getData()).buffer().getInt();
+			currentLength = SerializationUtils.readInt(currentLengthObject.getData().getInputStream());
 			count += 4;
 		}
 		if (currentObject == null)
@@ -90,9 +91,10 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 		if (currentLengthObject == null)
 		{
 			currentLengthObject = new NioObject(4, false);
-			ByteBuffer buffer = ((ByteBufferLocation) currentLengthObject.getData()).buffer();
-			buffer.putInt(locations.get(position).getSize());
-			buffer.flip();
+			//ByteBuffer buffer = ((ByteBufferLocation) currentLengthObject.getData()).buffer();
+			//buffer.putInt(locations.get(position).getSize());
+			//buffer.flip();
+			SerializationUtils.writeInt(locations.get(position).getSize(), currentLengthObject.getData().getOutputStream());
 		}
 		OutputDestination od = new ChannelOutputDestination(channel);
 		if (!currentLengthObject.write(od)) return false;

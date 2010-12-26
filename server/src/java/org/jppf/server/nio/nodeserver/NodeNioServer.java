@@ -25,7 +25,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.comm.recovery.*;
-import org.jppf.io.ByteBufferLocation;
+import org.jppf.io.MultipleBuffersLocation;
 import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
@@ -305,7 +305,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 				bundle.setTaskCount(0);
 				bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
 				initialBundle = new BundleWrapper(bundle);
-				initialBundle.setDataProvider(new ByteBufferLocation(dataProviderBytes, 0, dataProviderBytes.length));
+				initialBundle.setDataProvider(new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)));
 			}
 			catch(Exception e)
 			{

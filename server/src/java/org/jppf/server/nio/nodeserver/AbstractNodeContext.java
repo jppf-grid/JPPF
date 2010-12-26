@@ -20,7 +20,6 @@ package org.jppf.server.nio.nodeserver;
 
 import java.util.List;
 
-import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
@@ -154,11 +153,12 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	public void serializeBundle(ChannelWrapper<?> wrapper) throws Exception
 	{
 		//if (nodeMessage == null)
-		
 		AbstractNodeMessage message = newMessage();
-		byte[] data = helper.getSerializer().serialize(bundle.getBundle()).getBuffer();
-		data = JPPFDataTransformFactory.transform(true, data, 0, data.length);
-		message.addLocation(new ByteBufferLocation(data, 0, data.length));
+		//byte[] data = helper.getSerializer().serialize(bundle.getBundle()).getBuffer();
+		//data = JPPFDataTransformFactory.transform(true, data, 0, data.length);
+		//message.addLocation(new ByteBufferLocation(data, 0, data.length));
+		//message.addLocation(new MultipleBuffersLocation(new JPPFBuffer(data, data.length)));
+		message.addLocation(IOHelper.serializeData(bundle.getBundle(), helper.getSerializer()));
 		message.addLocation(bundle.getDataProvider());
 		for (DataLocation dl: bundle.getTasks()) message.addLocation(dl);
 		message.setBundle(bundle.getBundle());

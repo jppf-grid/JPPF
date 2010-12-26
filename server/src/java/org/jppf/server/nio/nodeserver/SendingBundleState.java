@@ -85,7 +85,8 @@ class SendingBundleState extends NodeServerState
 					server.addIdleChannel(wrapper);
 					return TO_IDLE;
 				}
-				bundle.setExecutionStartTime(System.currentTimeMillis());
+				//bundle.setExecutionStartTime(System.currentTimeMillis());
+				bundle.setExecutionStartTime(System.nanoTime());
 				context.serializeBundle(wrapper);
 			}
 			else
