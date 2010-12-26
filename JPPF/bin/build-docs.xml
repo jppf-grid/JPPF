@@ -22,8 +22,7 @@
 	<!--                     Build the web site content                            -->
 	<!-- ========================================================================= -->
 
-  <target name="doc" depends="doc.screenshots, doc.samples.pack, doc.home">
-	</target>
+  <target name="doc" depends="doc.screenshots, doc.samples.pack, doc.home"/>
 
   <target name="doc.home" description="generates the project web site pages">
 		<antcall target="doc.gen">
@@ -46,7 +45,7 @@
 			<arg value="-t"/>
 			<arg value="${templates}"/>
 			<arg value="-r"/>
-		</java>       
+		</java>
 	</target>
 
 	<target name="doc.screenshots" description="generates the project web site pages">
@@ -57,7 +56,7 @@
 			<arg value="72"/>
 			<arg value="${home}/templates"/>
 			<arg value="9"/>
-		</java>       
+		</java>
 	</target>
 
 	<target name="doc.samples.pack" description="generates the Readme.php for each sample">
@@ -66,7 +65,7 @@
 			<arg value="${samples-pack}"/>
 			<arg value="${home}/doc-source/home/samples-pack"/>
 			<arg value="${home}/templates/sample-readme.html"/>
-		</java>       
+		</java>
 	</target>
 
 	<!-- ========================================================================= -->
