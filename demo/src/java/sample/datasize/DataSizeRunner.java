@@ -59,9 +59,10 @@ public class DataSizeRunner
 	{
 		try
 		{
-			jppfClient = new JPPFClient();
+			//jppfClient = new JPPFClient();
 			//perform();
-			perform2();
+			//perform2();
+			perform3();
 		}
 		catch(Exception e)
 		{
@@ -142,31 +143,21 @@ public class DataSizeRunner
 	private static void perform3() throws Exception
 	{
 		TypedProperties config = JPPFConfiguration.getProperties();
-		boolean inNodeOnly = config.getBoolean("datasize.inNodeOnly", false);
-		int datasize = config.getInt("datasize.size", 1);
-		int nbTasks = config.getInt("datasize.nbTasks", 10);
-		String unit = config.getString("datasize.unit", "b").toLowerCase();
-		if ("k".equals(unit)) datasize *= KILO;
-		else if ("m".equals(unit)) datasize *= MEGA;
-		
-		JPPFExecutorService executor = new JPPFExecutorService(jppfClient);
-		executor.setBatchSize(50);
-		executor.setBatchTimeout(1000L);
-		
-		output("Running datasize demo with data size = " + datasize + " with " + nbTasks + " tasks");
+		int iterations = config.getInt("datasize.iterations", 1);
+		output("Running test for " + iterations + " iterations");
 		long totalTime = System.currentTimeMillis();
-		List<Future<?>> futureList = new ArrayList<Future<?>>();
-		for (int i=0; i<nbTasks; i++) futureList.add(executor.submit(new DataTask(datasize, inNodeOnly)));
-		for (Future<?> f: futureList)
+		for (int n=1; n<=iterations; n++)
 		{
-			f.get();
-			JPPFTask t = ((JPPFTaskFuture<?>) f).getTask(); 
-			if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
-			else System.out.println("task result: " + t.getResult());
+			jppfClient = new JPPFClient();
+			JPPFJob job = new JPPFJob();
+			job.setId("job " + n);
+			job.addTask(new DataTask(10, true));
+			List<JPPFTask> results = jppfClient.submit(job);
+			if (n % 1000 == 0) output("executed " + n + " jobs");
+			jppfClient.close();
 		}
 		totalTime = System.currentTimeMillis() - totalTime;
 		output("Computation time: " + StringUtils.toStringDuration(totalTime));
-		executor.shutdownNow();
 	}
 
 	/**

@@ -207,15 +207,15 @@ public class MatrixRunner implements NotificationListener
 
 	/**
 	 * Perform the sequential multiplication of 2 squares matrices of equal sizes.
-	 * @param a - the left-hand matrix.
-	 * @param b - the right-hand matrix.
+	 * @param a the left-hand matrix.
+	 * @param b the right-hand matrix.
 	 */
 	private void performSequentialMultiplication(Matrix a, Matrix b)
 	{
 		long start = System.nanoTime();
 		Matrix c = a.multiply(b);
 		long elapsed = System.nanoTime() - start;
-		output("Sequential computation performed in "+StringUtils.toStringDuration(elapsed/100000));
+		output("Sequential computation performed in "+StringUtils.toStringDuration(elapsed/1000000));
 	}
 
 	/**
