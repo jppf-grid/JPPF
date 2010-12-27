@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2010 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="MandelbrotSet" type="page">
+	<property name="label" value="Mandelbrot Set"/>
+	<property name="layoutConstraints" value="fill, flowy"/>
+	<script language="javascript"><![CDATA[
+		importPackage(java.lang);
+		importPackage(java.util);
+		importPackage(Packages.org.jppf.server.protocol);
+		importPackage(Packages.org.jppf.server.protocol);
+		importPackage(Packages.org.jppf.ui.monitoring.data);
+		importPackage(Packages.org.jppf.ui.options);
+		importPackage(Packages.org.jppf.ui.options.factory);
+		importPackage(Packages.org.jppf.ui.options.event);
+		importPackage(Packages.org.jppf.samples.fractals);
+		importPackage(Packages.sun.java2d);
+		importPackage(Packages.java.awt);
+		importPackage(Packages.javax.swing);
+	]]></script>
+	<script language="javascript"><![CDATA[
+		function computeMandelbrot()
+		{
+			var x = option.findFirstWithName("/centerX").getValue();
+			var y = option.findFirstWithName("/centerY").getValue();
+			var d = option.findFirstWithName("/diameter").getValue();
+			var iter = option.findFirstWithName("/iterations").getValue();
+			var config = new FractalConfiguration(x, y, d, 800, 600, iter);
+			FractalRunner.perform(true, config, option.findFirstWithName("/mandelbrotImage"));
+		}
+	]]></script>
+
+	<!-- ===================================================================== -->
+	<!--         Mandelbrot algorithm configuration parameters                 -->
+	<!-- ===================================================================== -->
+
+	<child name="MandelbrotConfig" type="page">
+
+		<child name="ButtonPanel" type="page">
+			<property name="label" value="ButtonPanel"/>
+			<property name="layoutConstraints" value="flowy, fill"/>
+
+			<child name="computeMandelbrot" type="Button">
+				<property name="label" value="Compute"/>
+				<property name="tooltip" value="Compute an image for the Mandelbrot set according to the parameters entered on this page"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+					computeMandelbrot();
+					]]></script>
+				</listener>
+			</child>
+
+			<child name="resetMandelbrot" type="Button">
+				<property name="label" value="Reset Default"/>
+				<property name="tooltip" value="Reset to the default values"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						option.findFirstWithName("/centerX").setValue(new Double(-0.7));
+						option.findFirstWithName("/centerY").setValue(new Double(0.0));
+						option.findFirstWithName("/diameter").setValue(new Double(3.0));
+						option.findFirstWithName("/iterations").setValue(new Integer(100));
+					]]></script>
+				</listener>
+			</child>
+
+		</child>
+
+		<child name="centerXYPanel" type="page">
+			<property name="layoutConstraints" value="flowy, fill"/>
+			<property name="bordered" value="true"/>
+
+			<child name="centerX" type="FormattedNumber">
+				<property name="label" value="center X"/>
+				<property name="tooltip" value="X coordinate of the image center"/>
+				<property name="value" value="-0.7"/>
+				<property name="pattern" value="0.############"/>
+				<property name="orientation" value="horizontal"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+			<child name="centerY" type="FormattedNumber">
+				<property name="label" value="center Y"/>
+				<property name="tooltip" value="Y coordinate of the image center"/>
+				<property name="value" value="0.0"/>
+				<property name="pattern" value="0.############"/>
+				<property name="orientation" value="horizontal"/>
+				<property name="persistent" value="true"/>
+			</child>
+
+		</child>
+
+		<child name="otherPanel" type="page">
+			<property name="layoutConstraints" value="flowy, fill"/>
+			<property name="bordered" value="true"/>
+
+			<child name="diameter" type="FormattedNumber">
+				<property name="label" value="diameter"/>
+				<property name="tooltip" value="Diameter of the area in which the Mandelbrot set is computed"/>
+				<property name="value" value="3.0769"/>
+				<property name="pattern" value="0.############"/>
+				<property name="orientation" value="horizontal"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+			<child name="iterations" type="SpinnerNumber">
+				<property name="label" value="iterations"/>
+				<property name="tooltip" value="Maximum number of iterations for escaping the Mandelbrot set"/>
+				<property name="value" value="100"/>
+				<property name="minValue" value="1"/>
+				<property name="maxValue" value="1000000"/>
+				<property name="persistent" value="true"/>
+			</child>
+
+		</child>
+
+		<child name="mandelbrotZoomPanel" type="page">
+			<property name="layoutConstraints" value="flowy, fill"/>
+			<property name="bordered" value="true"/>
+
+			<child name="mandelbrotZoomFactor" type="SpinnerNumber">
+				<property name="label" value="Zoom factor"/>
+				<property name="tooltip" value="Maximum number of iterations for escaping the Mandelbrot set"/>
+				<property name="value" value="2"/>
+				<property name="minValue" value="1"/>
+				<property name="maxValue" value="100"/>
+				<property name="persistent" value="true"/>
+			</child>
+
+			<child name="mandelbrotZoomButtons" type="page">
+	
+				<child name="mandelbrotZoomIn" type="Button">
+					<property name="icon" value="/icons/zoomIn.gif"/>
+					<property name="tooltip" value="Zoom-in the image by the current zoom factor"/>
+					<property name="width" value="20"/>
+					<property name="height" value="20"/>
+					<listener type="script">
+						<script language="javascript"><![CDATA[
+						var diameterOpt = option.findFirstWithName("/diameter");
+						var d = diameterOpt.getValue();
+						var f = option.findFirstWithName("/mandelbrotZoomFactor").getValue();
+						diameterOpt.setValue(d/f);
+						computeMandelbrot();
+						]]></script>
+					</listener>
+				</child>
+	
+				<child name="mandelbrotZoomOut" type="Button">
+					<property name="icon" value="/icons/zoomOut.gif"/>
+					<property name="tooltip" value="Zoom-out the image by the inverse of the current zoom factor"/>
+					<property name="width" value="20"/>
+					<property name="height" value="20"/>
+					<listener type="script">
+						<script language="javascript"><![CDATA[
+						var diameterOpt = option.findFirstWithName("/diameter");
+						var d = diameterOpt.getValue();
+						var f = option.findFirstWithName("/mandelbrotZoomFactor").getValue();
+						diameterOpt.setValue(d*f);
+						computeMandelbrot();
+						]]></script>
+					</listener>
+				</child>
+
+			</child>
+
+		</child>
+
+		<child name="filler" type="page">
+			<property name="layoutConstraints" value="fill"/>
+			<property name="componentConstraints" value="growx, pushx"/>
+		</child>
+
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--                        Image area                                     -->
+	<!-- ===================================================================== -->
+
+	<child name="mandelbrotImage" type="Java">
+		<property name="class" value="org.jppf.samples.fractals.ImagePanel"/>
+		<property name="mouseListenerClass" value="org.jppf.samples.fractals.MandelbrotMouseListener"/>
+		<property name="layoutConstraints" value="fill"/>
+		<property name="componentConstraints" value="grow, push"/>
+		<initializer type="script">
+			<script language="javascript"><![CDATA[
+				var comp = option.getUIComponent();
+				comp.setImage("data/mandelbrot.jpg");
+				comp.setVisible(false);
+				comp.setVisible(true);
+			]]></script>
+		</initializer>
+	</child>
+
+</opt:main>
