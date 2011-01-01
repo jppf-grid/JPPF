@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2010 JPPF Team.
+ * Copyright (C) 2005-2011 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -156,7 +156,12 @@ public class FileReplacer
 
 	/**
 	 * Main entry point.
-	 * @param args not used yet.
+	 * <p>The arguments must be specified as follows:<br/>
+	 * args[0] : the file containing the text to search for<br/>
+	 * args[1] : the file containing the replacement text<br/>
+	 * args[2] : a list of comma-separated file extensions, without dots and no spaces allowed (e.g. "java,xml")<br/>
+	 * args[3] : true to indicate that the replacements should only be simulated (i.e changes preview), false to really peform the replacements.
+	 * @param args defines the text search, the text to replace it with, the file extensions to process, and whether changes are only simulated.
 	 */
 	public static void main(String...args)
 	{
