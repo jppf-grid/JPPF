@@ -23,8 +23,10 @@ import java.util.concurrent.Future;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.concurrent.*;
+import org.jppf.management.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.JPPFStats;
+import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -59,7 +61,8 @@ public class LongTaskRunner
 			int iterations = props.getInt("longtask.iterations");
 			print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
 			//perform(nbTask, length, iterations);
-			perform3(nbTask, length, iterations);
+			//perform3(nbTask, length, iterations);
+			perform4();
 		}
 		catch(Exception e)
 		{
@@ -244,5 +247,54 @@ public class LongTaskRunner
 			run();
 			return getResult();
 		}
+	}
+
+	/**
+	 * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
+	 * @throws Exception if an error is raised during the execution.
+	 */
+	private static void perform4() throws Exception
+	{
+		long start = System.currentTimeMillis();
+		JPPFJob job = new JPPFJob();
+		job.setId("Long task job");
+		LongTask task = new LongTask(8000L, false);
+		task.setId("1");
+		job.addTask(task);
+		JPPFResultCollector collector = new JPPFResultCollector(1);
+		job.setResultListener(collector);
+		job.setBlocking(false);
+		jppfClient.submit(job);
+		/*
+		*/
+		DriverJobManagementMBean jobManager = getJobManagement();
+		Thread.sleep(3000L);
+		System.out.println("suspending the job");
+		jobManager.suspendJob(job.getJobUuid(), true);
+		System.out.println("job suspended ... resuming in 3 seconds");
+		Thread.sleep(3000L);
+		System.out.println("resuming the job");
+		jobManager.resumeJob(job.getJobUuid());
+		List<JPPFTask> results = collector.waitForResults();
+		for (JPPFTask t: results)
+		{
+			Exception e = task.getException();
+			if (e != null) throw e;
+			else System.out.println("result for task " + t.getId() + " : " + t.getResult());
+		}
+		long elapsed = System.currentTimeMillis() - start;
+		print("Iteration performed in "+StringUtils.toStringDuration(elapsed));
+	}
+
+	/**
+	 * Get a proxy to the driver's job management MBean.
+	 * @return an instance of {@link DriverJobManagementMBean}.
+	 * @throws Exception if any error occurs.
+	 */
+	private static DriverJobManagementMBean getJobManagement() throws Exception
+	{
+		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
+		JMXDriverConnectionWrapper wrapper = c.getJmxConnection();
+		return wrapper.getProxy(JPPFAdminMBean.DRIVER_JOB_MANAGEMENT_MBEAN_NAME, DriverJobManagementMBean.class);
 	}
 }

@@ -52,29 +52,29 @@ class WaitingResultsState extends NodeServerState
 
 	/**
 	 * Execute the action associated with this channel state.
-	 * @param wrapper the selection key corresponding to the channel and selector for this state.
+	 * @param channel the selection key corresponding to the channel and selector for this state.
 	 * @return a state transition as an <code>NioTransition</code> instance.
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public NodeTransition performTransition(ChannelWrapper<?> channel) throws Exception
 	{
-		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
-		if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage(), wrapper);
-		if (context.readMessage(wrapper))
+		AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
+		if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage(), channel);
+		if (context.readMessage(channel))
 		{
 			BundleWrapper bundleWrapper = context.getBundle();
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			BundleWrapper newBundleWrapper = context.deserializeBundle();
 			JPPFTaskBundle newBundle = newBundleWrapper.getBundle();
-			if (debugEnabled) log.debug("read bundle" + newBundle + " from node " + wrapper + " done");
+			if (debugEnabled) log.debug("read bundle" + newBundle + " from node " + channel + " done");
 			// if an exception prevented the node from executing the tasks
 			if (newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM) != null)
 			{
 				if (debugEnabled)
 				{
 					Throwable t = (Throwable) newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
-					log.debug("node " + wrapper + " returned exception parameter in the header for job '" + newBundle.getId() + "' : " + t);
+					log.debug("node " + channel + " returned exception parameter in the header for job '" + newBundle.getId() + "' : " + t);
 				}
 				newBundleWrapper.setTasks(bundleWrapper.getTasks());
 				newBundle.setTaskCount(bundle.getTaskCount());
@@ -87,12 +87,13 @@ class WaitingResultsState extends NodeServerState
 				context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
 			}
 			boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE, false);
-			jobManager.jobReturned(bundleWrapper, wrapper);
+			jobManager.jobReturned(bundleWrapper, channel);
 			if (requeue)
 			{
 				bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
 				bundle.getJobSLA().setSuspended(true);
 				context.setBundle(null);
+				context.setJobCanceled(false);
 				context.resubmitBundle(bundleWrapper);
 			}
 			else
@@ -110,9 +111,9 @@ class WaitingResultsState extends NodeServerState
 			if ((systemInfo != null) && (bundler instanceof NodeAwareness)) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
 			// there is nothing left to do, so this instance will wait for a task bundle
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
-			context.setNodeMessage(null, wrapper);
+			context.setNodeMessage(null, channel);
 			context.setBundle(null);
-			server.addIdleChannel(wrapper);
+			server.addIdleChannel(channel);
 			return TO_IDLE;
 		}
 		return TO_WAITING;

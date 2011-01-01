@@ -20,7 +20,7 @@ package org.jppf.server.job.management;
 
 import java.util.*;
 
-import javax.management.NotificationBroadcasterSupport;
+import javax.management.*;
 
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
@@ -284,5 +284,18 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		{
 			sendNotification(event);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void sendNotification(Notification notification)
+	{
+		if (debugEnabled && (notification instanceof JobNotification))
+		{
+			JobNotification event = (JobNotification) notification;
+			log.debug("sending event " + event.getEventType() + " for job " + event.getJobInformation().getJobId());
+		}
+		super.sendNotification(notification);
 	}
 }

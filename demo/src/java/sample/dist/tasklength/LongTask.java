@@ -65,6 +65,7 @@ public class LongTask extends JPPFTask
 	 */
 	public void run()
 	{
+		System.out.println("Starting task " + getId());
 		taskStart = System.currentTimeMillis();
 		long elapsed = 0L;
 		if (useCPU)
@@ -80,6 +81,8 @@ public class LongTask extends JPPFTask
 			try
 			{
 				Thread.sleep(taskLength);
+				setResult("task has run for " + elapsed + " ms");
+				System.out.println("Task " + getId() + " complete");
 			}
 			catch(InterruptedException e)
 			{
@@ -88,7 +91,6 @@ public class LongTask extends JPPFTask
 			}
 			elapsed = System.currentTimeMillis() - taskStart;
 		}
-		setResult("task has run for " + elapsed + " ms");
 	}
 
 	/**
@@ -97,6 +99,8 @@ public class LongTask extends JPPFTask
 	 */
 	public void onCancel()
 	{
-		setResult("this task has been cancelled");
+		String s = "task " + getId() + " has been cancelled";
+		setResult(s);
+		System.out.println(s);
 	}
 }

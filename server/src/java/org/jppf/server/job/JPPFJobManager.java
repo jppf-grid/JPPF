@@ -65,7 +65,7 @@ public class JPPFJobManager implements QueueListener
 	 */
 	public JPPFJobManager()
 	{
-		executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("Job manager event thread"));
+		executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("JobManager event"));
 	}
 
 	/**

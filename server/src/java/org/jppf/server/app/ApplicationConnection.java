@@ -160,7 +160,7 @@ class ApplicationConnection extends JPPFConnection
 			resultSender.run(count);
 		}
 		else resultSender.sendPartialResults(headerWrapper);
-		driver.getJobManager().jobEnded(headerWrapper);
+		jobEnded();
 		return;
 	}
 
@@ -171,12 +171,21 @@ class ApplicationConnection extends JPPFConnection
 	public void close()
 	{
 		if (debugEnabled) log.debug("closing " + this);
-		if (currentJobId != null)
-		{
-			JPPFDriver.getInstance().getJobManager().jobEnded(headerWrapper);
-		}
+		jobEnded();
 		super.close();
 		driver.getStatsManager().clientConnectionClosed();
+	}
+
+	/**
+	 * Send the job ended notification.
+	 */
+	private synchronized void jobEnded()
+	{
+		if (currentJobId != null)
+		{
+			currentJobId = null;
+			JPPFDriver.getInstance().getJobManager().jobEnded(headerWrapper);
+		}
 	}
 
 	/**

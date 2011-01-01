@@ -115,8 +115,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			if (other != null)
 			{
 				other.merge(bundleWrapper, false);
-				if (debugEnabled) log.debug("re-submitting bundle with [jobId=" + jobId + ", priority=" + sla.getPriority()+", initialTasksCount=" +
-					bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + "]");
+				if (debugEnabled) log.debug("re-submitting bundle with " + bundle);
 				bundle.setParameter("real.task.count", bundle.getTaskCount());
 				fireQueueEvent(new QueueEvent(this, other, true));
 			}
@@ -127,8 +126,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 				putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
 				Boolean requeued = (Boolean) bundle.removeParameter(BundleParameter.JOB_REQUEUE);
 				if (requeued == null) requeued = false;
-				if (debugEnabled) log.debug("adding bundle with [jobId=" + jobId + ", priority=" + sla.getPriority()+", initialTasksCount=" +
-					bundle.getInitialTaskCount() + ", taskCount=" + bundle.getTaskCount() + ", requeue=" + requeued + "]");
+				if (debugEnabled) log.debug("adding bundle with " + bundle);
 				if (!requeued)
 				{
 					handleStartJobSchedule(bundleWrapper);

@@ -72,15 +72,18 @@ public class CommandLineTaskRunner
 	private static void performCommand() throws Exception
 	{
 		JPPFJob job = new JPPFJob();
+		/*
 		job.addTask(new ListDirectoryTask("/usr/local"));
 		job.addTask(new ListDirectoryTask("C:\\Windows"));
+		*/
+		job.addTask(new TestTask("1"));
 		for (JPPFTask t: job.getTasks()) t.setTimeout(5000);
 		
 		List<JPPFTask> results = jppfClient.submit(job);
 		for (JPPFTask task: results)
 		{
 			if (task.getException() != null) task.getException().printStackTrace();
-			else System.out.println("result: " + task.getResult());
+			System.out.println("result: " + task.getResult());
 		}
 	}
 }

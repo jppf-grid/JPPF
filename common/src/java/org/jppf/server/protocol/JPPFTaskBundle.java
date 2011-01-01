@@ -462,6 +462,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 		sb.append(", jobUuid=").append(getParameter(BundleParameter.JOB_UUID));
 		sb.append(", initialTaskCount=").append(initialTaskCount);
 		sb.append(", taskCount=").append(taskCount);
+		sb.append(", requeue=").append(getParameter(BundleParameter.JOB_REQUEUE));
 		sb.append("]");
 		return sb.toString();
 	}

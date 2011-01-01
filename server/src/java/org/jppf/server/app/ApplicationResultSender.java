@@ -65,10 +65,6 @@ class ApplicationResultSender extends AbstractResultSender
 		if (debugEnabled)
 		{
 			Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
-			if (t != null)
-			{
-				int breakpoint = 0;
-			}
 			log.debug("Sending bundle for job '" + bundle.getId() + "' with " + bundle.getTaskCount()+" tasks, exception parameter = " + t);
 		}
 		byte[] data = null;
