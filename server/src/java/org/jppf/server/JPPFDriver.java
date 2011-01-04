@@ -114,7 +114,7 @@ public class JPPFDriver
 	/**
 	 * Uuid for this driver.
 	 */
-	private String uuid = new JPPFUuid().toString();
+	private String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString().toUpperCase();
 	/**
 	 * The thread that broadcasts the server connection information using UDP multicast.
 	 */
@@ -185,7 +185,7 @@ public class JPPFDriver
 		{
 			if (config.getBoolean("jppf.management.enabled", true))
 			{
-				jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX);
+				jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX, uuid);
 				jmxServer.start(getClass().getClassLoader());
 				info.managementPort = JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198);
 				init.registerProviderMBeans();

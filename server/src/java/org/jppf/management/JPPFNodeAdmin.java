@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.jppf.JPPFNodeReconnectionNotification;
+import org.jppf.node.NodeRunner;
 import org.jppf.node.event.*;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.server.protocol.*;
@@ -134,7 +135,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	 */
 	public JPPFSystemInformation systemInformation() throws Exception
 	{
-		JPPFSystemInformation info = new JPPFSystemInformation();
+		JPPFSystemInformation info = new JPPFSystemInformation(NodeRunner.getUuid());
 		info.populate();
 		info.getRuntime().setProperty("cpuTime", ""+node.getExecutionManager().getCpuTime());
 		return info;

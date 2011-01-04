@@ -236,7 +236,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 		if (debugEnabled) log.debug("processing results for job '" + bundle.getId() + "'");
 		if (executionManager.checkConfigChanged())
 		{
-			JPPFSystemInformation info = new JPPFSystemInformation();
+			JPPFSystemInformation info = new JPPFSystemInformation(NodeRunner.getUuid());
 			info.populate();
 			bundle.setParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM, info);
 		}
@@ -537,7 +537,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 		{
 			if ((jmxServer == null) || jmxServer.isStopped())
 			{
-				jmxServer = new JMXServerImpl(JPPFAdminMBean.NODE_SUFFIX);
+				jmxServer = new JMXServerImpl(JPPFAdminMBean.NODE_SUFFIX, NodeRunner.getUuid());
 				jmxServer.start(getClass().getClassLoader());
 				registerProviderMBeans();
 				System.out.println("JPPF Node management initialized");

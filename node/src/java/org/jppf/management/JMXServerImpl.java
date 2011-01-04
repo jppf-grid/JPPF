@@ -63,7 +63,7 @@ public class JMXServerImpl
 	/**
 	 * This server's unique id.
 	 */
-	private String id = new JPPFUuid(JPPFUuid.ALPHA_NUM, 24).toString();
+	private final String id;
 	/**
 	 * Used to distinguish between driver and node RMI registries.
 	 */
@@ -72,10 +72,12 @@ public class JMXServerImpl
 	/**
 	 * Initialize this JMX server with the specified namespace suffix.
 	 * @param namespaceSuffix used to distinguish between driver and node RMI registries.
+	 * @param id the unique id of the driver or node holding this jmx server.
 	 */
-	public JMXServerImpl(String namespaceSuffix)
+	public JMXServerImpl(String namespaceSuffix, String id)
 	{
 		this.namespaceSuffix = namespaceSuffix;
+		this.id = id;
 	}
 
 	/**

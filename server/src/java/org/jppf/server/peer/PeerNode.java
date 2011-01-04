@@ -163,7 +163,7 @@ class PeerNode extends AbstractMonitoredNode
 				bundle.setBundleUuid(uuid);
 				bundle.setParameter(BundleParameter.IS_PEER, true);
 				bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
-				JPPFSystemInformation sysInfo = new JPPFSystemInformation();
+				JPPFSystemInformation sysInfo = new JPPFSystemInformation(uuid);
 				sysInfo.populate();
 				bundle.setParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM, sysInfo);
 			}

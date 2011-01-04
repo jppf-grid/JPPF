@@ -107,8 +107,7 @@ public abstract class ExecutionPolicy implements Serializable
 	 */
 	public String getProperty(JPPFSystemInformation info, String name)
 	{
-		TypedProperties[] propsArray = { info.getJppf(), info.getSystem(), info.getEnv(), info.getNetwork(), info.getRuntime(), info.getStorage() };
-		for (TypedProperties props: propsArray)
+		for (TypedProperties props: info.getPropertiesArray())
 		{
 			String value = props.getString(name);
 			if (value != null) return value;

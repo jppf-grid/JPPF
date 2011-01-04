@@ -86,7 +86,7 @@ public class NodeRunner
 	/**
 	 * This node's universal identifier.
 	 */
-	private static String uuid = new JPPFUuid().toString();
+	private static String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString().toUpperCase();
 	/**
 	 * Handles include and exclude IP filters.
 	 */

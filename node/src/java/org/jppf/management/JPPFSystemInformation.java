@@ -65,6 +65,24 @@ public class JPPFSystemInformation implements Serializable
 	 * A map of the available storage information.
 	 */
 	private TypedProperties storage = null;
+	/**
+	 * A <code>TypedProperties</code> wrapper for the uuid of the corresponding JPPF component.
+	 */
+	private TypedProperties uuidProps = null;
+	/**
+	 * An array of all the sets of properties.
+	 */
+	private TypedProperties[] propertiesArray = null;
+
+	/**
+	 * Initialize this system information object with the specified uuid.
+	 * @param uuid the uuid of the corresponding JPPF component.
+	 */
+	public JPPFSystemInformation(String uuid)
+	{
+		uuidProps = new TypedProperties();
+		uuidProps.setProperty("jppf.uuid", uuid);
+	}
 
 	/**
 	 * Get the map holding the system properties.
@@ -164,6 +182,7 @@ public class JPPFSystemInformation implements Serializable
 		jppf = JPPFConfiguration.getProperties();
 		network = SystemUtils.getNetwork();
 		storage = SystemUtils.getStorageInformation();
+		propertiesArray = new TypedProperties[] { uuidProps, jppf, system, env, network, runtime, storage };
 	}
 
 	/**
@@ -242,5 +261,23 @@ public class JPPFSystemInformation implements Serializable
 		{
 			return second();
 		}
+	}
+
+	/**
+	 * Get the properties object holding the uuid.
+	 * @return a <code>TypedProperties</code> wrapper for the uuid of the corresponding JPPF component.
+	 */
+	public TypedProperties getUuid()
+	{
+		return uuidProps;
+	}
+
+	/**
+	 * Get all the proeprties as an array.
+	 * @return an array of all the sets of properties.
+	 */
+	public TypedProperties[] getPropertiesArray()
+	{
+		return propertiesArray;
 	}
 }
