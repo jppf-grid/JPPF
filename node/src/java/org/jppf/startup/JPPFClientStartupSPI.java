@@ -19,23 +19,23 @@
 package org.jppf.startup;
 
 /**
- * This interface class represents objects that are run at server startup time.
- * <p>More precisely, they are run just after the server MBeans have been registered.
+ * This interface class represents objects that are run at client startup time.
+ * <p>More precisely, they are run just before any connection with a driver is established.
  * <p>Classes implementing this interface must have a public no-arg constructor and implement the {@link java.lang.Runnable#run() run()} method.
- * <p>Server startup classes allow a developer to perform initializations at runtime, such as load specific APIs,
+ * <p>Client startup classes allow a developer to perform initializations at runtime, such as load specific APIs,
  * create connection pools, subscribe to the monitoring MBeans notifications, etc. The range of applications is quite broad.
  * <p>They are looked up by using the Service Provider Interface (SPI) lookup mechanism.
  * For the SPI to find them, proceed as follows:
  * <ul>
  * <li>in the classpath root create, if it does not exist, a folder named META-INF/services</li>
- * <li>in this folder create a file named &quot;org.jppf.startup.JPPFDriverStartupSPI&quot;</li>
+ * <li>in this folder create a file named &quot;org.jppf.startup.JPPFClientStartupSPI&quot;</li>
  * <li>the content of this file is one or more line(s) with the fully qualified class name of an implementation of this interface</li>
  * <li>to specifiy multiple implementations, just put one per line in the file</li>
- * <li>there can also be multiple META-INF/services/org.jppf.startup.JPPFDriverStartupSPI resources in the classpath
+ * <li>there can also be multiple META-INF/services/org.jppf.startup.JPPFClientStartupSPI resources in the classpath
  * (for instance in multiple jar files); all of them will be looked up and processed</li>
  * </ul>
  * @author Laurent Cohen
  */
-public interface JPPFDriverStartupSPI extends JPPFStartup
+public interface JPPFClientStartupSPI extends JPPFStartup
 {
 }

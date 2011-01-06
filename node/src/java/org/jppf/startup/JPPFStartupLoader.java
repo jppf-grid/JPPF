@@ -25,10 +25,9 @@ import org.slf4j.*;
 
 /**
  * Loader for the JPPF startup SPI implementations.
- * @param <S> the type of startup SPI.
  * @author Laurent Cohen
  */
-public class JPPFStartupLoader<S extends JPPFStartup>
+public class JPPFStartupLoader
 {
 	/**
 	 * Logger for this class.
@@ -41,9 +40,10 @@ public class JPPFStartupLoader<S extends JPPFStartup>
 
 	/**
 	 * Load all instances found in the class path.
+	 * @param <S> the type of startup SPI.
 	 * @param clazz the type of startup classes to lookup and run. 
 	 */
-	public void load(Class<S> clazz)
+	public <S extends JPPFStartup> void load(Class<S> clazz)
 	{
 		Iterator<S> it = ServiceFinder.lookupProviders(clazz);
 		while (it.hasNext())

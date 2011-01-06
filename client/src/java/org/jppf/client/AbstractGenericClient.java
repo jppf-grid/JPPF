@@ -22,6 +22,7 @@ import java.util.concurrent.*;
 
 import org.jppf.client.loadbalancer.LoadBalancer;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.startup.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -52,7 +53,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	 */
 	protected TypedProperties config = null;
 	/**
-	 * 
+	 * Performs server discovery.
 	 */
 	protected JPPFMulticastReceiverThread receiverThread = null;
 	/**
@@ -72,6 +73,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	{
 		super();
 		initConfig(configuration);
+		new JPPFStartupLoader().load(JPPFClientStartupSPI.class);
 		initPools();
 	}
 
@@ -84,6 +86,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	{
 		super(uuid);
 		initConfig(configuration);
+		new JPPFStartupLoader().load(JPPFClientStartupSPI.class);
 		initPools();
 	}
 

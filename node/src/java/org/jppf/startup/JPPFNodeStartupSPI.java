@@ -32,7 +32,7 @@ package org.jppf.startup;
  * <ul>
  * <li>in the classpath root create, if it does not exist, a folder named META-INF/services</li>
  * <li>in this folder create a file named &quot;org.jppf.startup.JPPFNodeStartupSPI&quot;</li>
- * <li>the content of this file is a line with the fully qualified class name of this interface's implementation</li>
+ * <li>the content of this file is one or more line(s) with the fully qualified class name of an implementation of this interface</li>
  * <li>to specifiy multiple implementations, just put one per line in the file</li>
  * <li>there can also be multiple META-INF/services/org.jppf.startup.JPPFNodeStartupSPI resources in the classpath
  * (for instance in multiple jar files); all of them will be looked up and processed</li>
