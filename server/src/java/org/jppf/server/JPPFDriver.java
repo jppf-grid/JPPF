@@ -201,7 +201,7 @@ public class JPPFDriver
 			System.out.println("JPPF Driver management failed to initialize, with error message: '" + s + "'");
 			System.out.println("Management features are disabled. Please consult the driver's log file for more information");
 		}
-		new JPPFStartupLoader<JPPFDriverStartupSPI>().load(JPPFDriverStartupSPI.class);
+		new JPPFStartupLoader().load(JPPFDriverStartupSPI.class);
 
 		if (config.getBoolean("jppf.discovery.enabled", true))
 		{

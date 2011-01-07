@@ -282,7 +282,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 				log.error("Error creating the JMX server", e);
 			}
 		}
-		new JPPFStartupLoader<JPPFNodeStartupSPI>().load(JPPFNodeStartupSPI.class);
+		new JPPFStartupLoader().load(JPPFNodeStartupSPI.class);
 		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
 		initDataChannel();
 		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
