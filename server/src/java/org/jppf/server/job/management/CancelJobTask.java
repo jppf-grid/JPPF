@@ -40,7 +40,7 @@ class CancelJobTask implements Runnable
 	/**
 	 * The id of the job to manage.
 	 */
-	private String jobId = null;
+	private String jobUuid = null;
 	/**
 	 * The node on which to perform this task.
 	 */
@@ -52,13 +52,13 @@ class CancelJobTask implements Runnable
 
 	/**
 	 * Initialize this task.
-	 * @param jobId the id of the job to manage.
+	 * @param jobUuid the id of the job to manage.
 	 * @param channel the node on which to perform this task.
 	 * @param requeue true if the job should be requeued on the server side, false otherwise.
 	 */
-	public CancelJobTask(String jobId, ChannelWrapper channel, boolean requeue)
+	public CancelJobTask(String jobUuid, ChannelWrapper channel, boolean requeue)
 	{
-		this.jobId = jobId;
+		this.jobUuid = jobUuid;
 		this.channel = channel;
 		this.requeue = requeue;
 	}
@@ -74,12 +74,12 @@ class CancelJobTask implements Runnable
 			AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
 			context.setJobCanceled(true);
 			JPPFManagementInfo nodeInfo = JPPFDriver.getInstance().getNodeInformation(channel);
-			if (debugEnabled) log.debug("Request to cancel jobId = '" + jobId + "' on node " + channel + ", requeue = " + requeue);
+			if (debugEnabled) log.debug("Request to cancel jobUuid = '" + jobUuid + "' on node " + channel + ", requeue = " + requeue);
 			if (nodeInfo == null) return;
 			JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(nodeInfo.getHost(), nodeInfo.getPort());
 			node.connect();
 			while (!node.isConnected()) Thread.sleep(10);
-			node.invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelJob", new Object[] { jobId, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
+			node.invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelJob", new Object[] { jobUuid, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
 			node.close();
 		}
 		catch(Exception e)

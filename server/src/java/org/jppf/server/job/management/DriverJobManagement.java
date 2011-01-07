@@ -73,7 +73,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		if (bundleWrapper != null)
 		{
 			if (debugEnabled) log.debug("Request to cancel jobId = '" + bundleWrapper.getBundle().getId() + "'");
-			if (debugEnabled) log.debug("bundleWrapper=" + bundleWrapper);
+			//if (debugEnabled) log.debug("bundleWrapper=" + bundleWrapper);
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
 			BundleWrapper queuedWrapper = JPPFDriver.getQueue().nextBundle(bundleWrapper, bundle.getTaskCount());
 		}
