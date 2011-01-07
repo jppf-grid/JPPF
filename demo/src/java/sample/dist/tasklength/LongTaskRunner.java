@@ -63,6 +63,7 @@ public class LongTaskRunner
 			//perform(nbTask, length, iterations);
 			//perform3(nbTask, length, iterations);
 			perform4();
+			perform5();
 		}
 		catch(Exception e)
 		{
@@ -250,11 +251,12 @@ public class LongTaskRunner
 	}
 
 	/**
-	 * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
+	 * This test submits a job and suspends, then resumes it using the maangement APIs.
 	 * @throws Exception if an error is raised during the execution.
 	 */
 	private static void perform4() throws Exception
 	{
+		System.out.println("\n********** job suspend/resume test **********");
 		long start = System.currentTimeMillis();
 		JPPFJob job = new JPPFJob();
 		job.setId("Long task job");
@@ -276,6 +278,47 @@ public class LongTaskRunner
 		System.out.println("resuming the job");
 		jobManager.resumeJob(job.getJobUuid());
 		List<JPPFTask> results = collector.waitForResults();
+		for (JPPFTask t: results)
+		{
+			Exception e = task.getException();
+			if (e != null) throw e;
+			else System.out.println("result for task " + t.getId() + " : " + t.getResult());
+		}
+		long elapsed = System.currentTimeMillis() - start;
+		print("Iteration performed in "+StringUtils.toStringDuration(elapsed));
+	}
+
+	/**
+	 * This test submits a job and suspends, then resumes it using the maangement APIs.
+	 * @throws Exception if an error is raised during the execution.
+	 */
+	private static void perform5() throws Exception
+	{
+		System.out.println("\n********** job cancel test **********");
+		long start = System.currentTimeMillis();
+		JPPFJob job = new JPPFJob();
+		job.setId("Long task job 1");
+		LongTask task = new LongTask(6000L, false);
+		task.setId("1");
+		job.addTask(task);
+		JPPFResultCollector collector = new JPPFResultCollector(1);
+		job.setResultListener(collector);
+		job.setBlocking(false);
+		jppfClient.submit(job);
+		/*
+		*/
+		DriverJobManagementMBean jobManager = getJobManagement();
+		Thread.sleep(3000L);
+		System.out.println("cancelling the first job");
+		jobManager.cancelJob(job.getJobUuid());
+		List<JPPFTask> results = collector.waitForResults();
+		System.out.println("job cancelled");
+		job.setId("Long task job 2");
+		collector = new JPPFResultCollector(1);
+		job.setResultListener(collector);
+		System.out.println("submitting the second job");
+		jppfClient.submit(job);
+		results = collector.waitForResults();
 		for (JPPFTask t: results)
 		{
 			Exception e = task.getException();
