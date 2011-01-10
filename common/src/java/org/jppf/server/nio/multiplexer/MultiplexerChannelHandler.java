@@ -82,7 +82,7 @@ public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
 		MultiplexerContext context = (MultiplexerContext) server.createNioContext();
 		context.setLinkedKey(initialKey);
 		context.setState(MultiplexerState.SENDING_MULTIPLEXING_INFO);
-		server.getTransitionManager().registerChannel(channel, SelectionKey.OP_READ | SelectionKey.OP_WRITE, context,
+		ChannelWrapper wrapper = server.getTransitionManager().registerChannel(channel, SelectionKey.OP_READ | SelectionKey.OP_WRITE, context,
 			new StateTransitionManager.ChannelRegistrationAction()
 			{
 				public void run()
@@ -93,6 +93,7 @@ public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
 				}
 			}
 		);
+		context.setChannel(wrapper);
 		if (debugEnabled) log.debug("registered multiplexer channel");
 	}
 }

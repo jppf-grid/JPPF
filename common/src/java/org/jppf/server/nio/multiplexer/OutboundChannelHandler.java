@@ -82,7 +82,7 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 		MultiplexerContext context = (MultiplexerContext) server.createNioContext();
 		context.setLinkedKey(initialKey);
 		context.setState(MultiplexerState.SENDING_OR_RECEIVING);
-		server.getTransitionManager().registerChannel(channel, SelectionKey.OP_READ, context,
+		ChannelWrapper wrapper = server.getTransitionManager().registerChannel(channel, SelectionKey.OP_READ, context,
 			new StateTransitionManager.ChannelRegistrationAction()
 			{
 				public void run()
@@ -93,6 +93,7 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 				}
 			}
 		);
+		context.setChannel(wrapper);
 		if (debugEnabled) log.debug("registered outbound channel " + StringUtils.getRemoteHost(channel));
 	}
 }
