@@ -93,7 +93,6 @@ public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
 				}
 			}
 		);
-		context.setChannel(wrapper);
 		if (debugEnabled) log.debug("registered multiplexer channel");
 	}
 }

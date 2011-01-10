@@ -93,7 +93,6 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 				}
 			}
 		);
-		context.setChannel(wrapper);
 		if (debugEnabled) log.debug("registered outbound channel " + StringUtils.getRemoteHost(channel));
 	}
 }

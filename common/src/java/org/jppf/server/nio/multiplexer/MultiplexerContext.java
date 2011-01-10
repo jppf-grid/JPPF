@@ -45,6 +45,14 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	private int multiplexerPort = -1;
 
 	/**
+	 * Default constructor.
+	 */
+	public MultiplexerContext()
+	{
+		int breakpoint = 1;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public void handleException(ChannelWrapper<?> channel)
