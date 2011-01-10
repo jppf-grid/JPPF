@@ -164,6 +164,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 		int port = serverChannel.socket().getLocalPort();
 		if (debugEnabled) log.debug("accepting on port " + port);
 		MultiplexerContext context = (MultiplexerContext) channel.getContext();
+		context.setChannel(channel);
 		if (multiplexerPorts.contains(port)) context.setMultiplexerPort(port);
 		else if (boundPorts.contains(port)) context.setBoundPort(port);
 		postAccept(channel);
