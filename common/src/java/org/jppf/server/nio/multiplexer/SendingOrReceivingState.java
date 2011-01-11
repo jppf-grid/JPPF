@@ -57,15 +57,15 @@ public class SendingOrReceivingState extends MultiplexerServerState
 		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
 		if (context.getMessage() != null)
 		{
-			if (debugEnabled) log.debug("returning TO_SENDING for " + wrapper);
+			//if (debugEnabled) log.debug("returning TO_SENDING for " + wrapper);
 			return TO_SENDING;
 		}
 		else if (wrapper.isReadable())
 		{
-			if (debugEnabled) log.debug("returning TO_RECEIVING for " + wrapper);
+			//if (debugEnabled) log.debug("returning TO_RECEIVING for " + wrapper);
 			return TO_RECEIVING;
 		}
-		if (debugEnabled) log.debug("returning TO_SENDING_OR_RECEIVING for " + wrapper);
+		//if (debugEnabled) log.debug("returning TO_SENDING_OR_RECEIVING for " + wrapper);
 		return TO_SENDING_OR_RECEIVING;
 	}
 }

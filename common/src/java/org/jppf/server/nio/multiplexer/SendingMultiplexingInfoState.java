@@ -60,11 +60,11 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 		{
 			throw new ConnectException("multiplexer channel " + wrapper + " has been disconnected");
 		}
-		if (debugEnabled) log.debug("exec() for " + wrapper);
+		//if (debugEnabled) log.debug("exec() for " + wrapper);
 		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
+		MultiplexerContext linkedContext = (MultiplexerContext) context.getLinkedKey().getContext();
 		if (context.getMessage() == null)
 		{
-			MultiplexerContext linkedContext = (MultiplexerContext) context.getLinkedKey().getContext();
 			NioMessage msg = new NioMessage();
 			msg.length = 4;
 			msg.buffer = ByteBuffer.wrap(new byte[4]);
@@ -74,7 +74,7 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 		}
 		if (context.writeMessage(wrapper))
 		{
-			if (debugEnabled) log.debug("message sent to remote multiplexer " + wrapper);
+			if (debugEnabled) log.debug("message sent to remote multiplexer " + wrapper + " for port " + linkedContext.getBoundPort());
 			context.setMessage(null);
 			return TO_SENDING_OR_RECEIVING;
 		}

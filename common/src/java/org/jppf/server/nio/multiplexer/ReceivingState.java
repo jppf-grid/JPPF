@@ -55,10 +55,9 @@ public class ReceivingState extends MultiplexerServerState
 	public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
-		if (debugEnabled) log.debug("exec() for " + wrapper);
+		//if (debugEnabled) log.debug("exec() for " + wrapper);
 		if (context.readMessage(wrapper))
 		{
-			if (debugEnabled) log.debug("read message for " + wrapper + " done");
 			ChannelWrapper linkedKey = context.getLinkedKey();
 			NioMessage msg = context.getMessage();
 			msg.buffer.flip();
@@ -66,6 +65,7 @@ public class ReceivingState extends MultiplexerServerState
 			MultiplexerContext linkedContext = (MultiplexerContext) linkedKey.getContext();
 			linkedContext.setMessage(msg);
 			server.getTransitionManager().transitionChannel(linkedKey, MultiplexerTransition.TO_SENDING);
+			if (debugEnabled) log.debug("read message for " + wrapper + " done, sending to outbound port " + linkedContext.getBoundPort());
 			return TO_SENDING_OR_RECEIVING;
 		}
 		return TO_RECEIVING;

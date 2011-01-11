@@ -55,11 +55,11 @@ public class IdentifyingInboundChannelState extends MultiplexerServerState
 	public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
-		if (debugEnabled) log.debug("exec() for " + wrapper);
+		//if (debugEnabled) log.debug("exec() for " + wrapper);
 		if (context.readMessage(wrapper))
 		{
 			int port = context.readOutBoundPort();
-			if (debugEnabled) log.debug("read port number for " + wrapper + ": " + port);
+			if (debugEnabled) log.debug("read port number for inbound channel " + wrapper + " : " + port);
 			if (port <= 0)
 			{
 				throw new IOException("outbound port could not be read from this channel");
