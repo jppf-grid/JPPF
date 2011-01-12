@@ -59,7 +59,8 @@ public class ReceivingState extends MultiplexerServerState
 		if (context.readMessage(wrapper))
 		{
 			ChannelWrapper linkedKey = context.getLinkedKey();
-			MultiplexerMessage msg = new MultiplexerMessage();
+			//MultiplexerMessage msg = new MultiplexerMessage();
+			MultiplexerMessage msg = context.getMultiplexerMessage();
 			context.setMultiplexerMessage(null);
 			MultiplexerContext linkedContext = (MultiplexerContext) linkedKey.getContext();
 			linkedContext.setMultiplexerMessage(msg);
