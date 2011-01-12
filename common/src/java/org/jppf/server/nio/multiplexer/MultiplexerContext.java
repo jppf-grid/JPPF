@@ -19,6 +19,7 @@
 package org.jppf.server.nio.multiplexer;
 
 import org.jppf.server.nio.*;
+import org.jppf.utils.SerializationUtils;
 import org.slf4j.*;
 
 /**
@@ -43,6 +44,10 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * The multiplexer port to which the channel may be bound.
 	 */
 	private int multiplexerPort = -1;
+	/**
+	 * Encapsulates the data sent or received.
+	 */
+	private MultiplexerMessage multiplexerMessage = null;
 
 	/**
 	 * Default constructor.
@@ -50,6 +55,29 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	public MultiplexerContext()
 	{
 		int breakpoint = 1;
+	}
+
+	/**
+	 * Read data from a channel.
+	 * @param wrapper the channel to read the data from.
+	 * @return true if all the data has been read, false otherwise.
+	 * @throws Exception if an error occurs while reading the data.
+	 */
+	public boolean readMessage(ChannelWrapper<?> wrapper) throws Exception
+	{
+		if (multiplexerMessage == null) multiplexerMessage = new MultiplexerMessage();
+		return multiplexerMessage.read(wrapper);
+	}
+
+	/**
+	 * Write data to a channel.
+	 * @param wrapper the channel to write the data to.
+	 * @return true if all the data has been written, false otherwise.
+	 * @throws Exception if an error occurs while writing the data.
+	 */
+	public boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception
+	{
+		return multiplexerMessage.write(wrapper);
 	}
 
 	/**
@@ -156,8 +184,32 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 */
 	public int readOutBoundPort()
 	{
-		if (message == null) return -1;
-		message.buffer.flip();
-		return message.buffer.getInt();
+		if (multiplexerMessage == null) return -1;
+		try
+		{
+			return SerializationUtils.readInt(multiplexerMessage.location.getInputStream());
+		}
+		catch (Exception e)
+		{
+			return -1;
+		}
+	}
+
+	/**
+	 * Get the message that encapsulates the data sent or received.
+	 * @return a {@link MultiplexerMessage} instance.
+	 */
+	public MultiplexerMessage getMultiplexerMessage()
+	{
+		return multiplexerMessage;
+	}
+
+	/**
+	 * Set the message that encapsulates the data sent or received.
+	 * @param multiplexerMessage a {@link MultiplexerMessage} instance.
+	 */
+	public void setMultiplexerMessage(MultiplexerMessage multiplexerMessage)
+	{
+		this.multiplexerMessage = multiplexerMessage;
 	}
 }

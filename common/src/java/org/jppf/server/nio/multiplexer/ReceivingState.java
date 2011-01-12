@@ -59,11 +59,10 @@ public class ReceivingState extends MultiplexerServerState
 		if (context.readMessage(wrapper))
 		{
 			ChannelWrapper linkedKey = context.getLinkedKey();
-			NioMessage msg = context.getMessage();
-			msg.buffer.flip();
-			context.setMessage(null);
+			MultiplexerMessage msg = new MultiplexerMessage();
+			context.setMultiplexerMessage(null);
 			MultiplexerContext linkedContext = (MultiplexerContext) linkedKey.getContext();
-			linkedContext.setMessage(msg);
+			linkedContext.setMultiplexerMessage(msg);
 			server.getTransitionManager().transitionChannel(linkedKey, MultiplexerTransition.TO_SENDING);
 			if (debugEnabled) log.debug("read message for " + wrapper + " done, sending to outbound port " + linkedContext.getBoundPort());
 			return TO_SENDING_OR_RECEIVING;

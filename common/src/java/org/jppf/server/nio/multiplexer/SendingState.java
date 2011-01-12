@@ -62,7 +62,7 @@ public class SendingState extends MultiplexerServerState
 		if (context.writeMessage(wrapper))
 		{
 			if (debugEnabled) log.debug(wrapper.toString() + " message sent");
-			context.setMessage(null);
+			context.setMultiplexerMessage(null);
 			return TO_SENDING_OR_RECEIVING;
 		}
 		return TO_SENDING;

@@ -21,9 +21,10 @@ package org.jppf.server.nio.multiplexer;
 import static org.jppf.server.nio.multiplexer.MultiplexerTransition.*;
 
 import java.net.ConnectException;
-import java.nio.ByteBuffer;
 
-import org.jppf.server.nio.*;
+import org.jppf.io.MultipleBuffersLocation;
+import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.utils.SerializationUtils;
 import org.slf4j.*;
 
 /**
@@ -65,12 +66,11 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 		MultiplexerContext linkedContext = (MultiplexerContext) context.getLinkedKey().getContext();
 		if (context.getMessage() == null)
 		{
-			NioMessage msg = new NioMessage();
+			MultiplexerMessage msg = new MultiplexerMessage();
 			msg.length = 4;
-			msg.buffer = ByteBuffer.wrap(new byte[4]);
-			msg.buffer.putInt(linkedContext.getBoundPort());
-			msg.buffer.flip();
-			context.setMessage(msg);
+			msg.location = new MultipleBuffersLocation(4);
+			SerializationUtils.writeInt(linkedContext.getBoundPort(), msg.location.getOutputStream());
+			context.setMultiplexerMessage(msg);
 		}
 		if (context.writeMessage(wrapper))
 		{

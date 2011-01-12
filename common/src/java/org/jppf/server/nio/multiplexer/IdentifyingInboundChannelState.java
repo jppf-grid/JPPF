@@ -66,7 +66,7 @@ public class IdentifyingInboundChannelState extends MultiplexerServerState
 			}
 			OutboundChannelHandler handler = new OutboundChannelHandler(server, "localhost", port, wrapper);
 			MultiplexerChannelInitializer init = new MultiplexerChannelInitializer(handler);
-			context.setMessage(null);
+			context.setMultiplexerMessage(null);
 			server.getTransitionManager().transitionChannel(wrapper, TO_IDLE);
 			new Thread(init).start();
 			return TO_IDLE;
