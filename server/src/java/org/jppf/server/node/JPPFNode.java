@@ -52,7 +52,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	/**
 	 * Maximum number of containers kept by this node's cache.
 	 */
-	private static final int MAX_CONTAINERS = 1000;
+	private static int maxContainers = JPPFConfiguration.getProperties().getInt("jppf.classloader.cache.size", 50);
 	/**
 	 * Class loader used for dynamic loading and updating of client classes.
 	 */
@@ -379,7 +379,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 					}
 				});
 				container = newJPPFContainer(uuidPath, cl);
-				if (containerList.size() >= MAX_CONTAINERS)
+				if (containerList.size() >= maxContainers)
 				{
 					JPPFContainer toRemove = containerList.removeFirst();
 					containerMap.remove(toRemove.getAppUuid());
