@@ -191,6 +191,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 		}
 		catch (Exception e)
 		{
+			log.warn(e.getClass().getSimpleName() + " : " + e.getMessage());
 			return -1;
 		}
 	}
