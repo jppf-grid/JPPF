@@ -23,6 +23,7 @@ import java.nio.channels.SocketChannel;
 import org.jppf.io.*;
 import org.jppf.server.nio.*;
 import org.jppf.utils.SerializationUtils;
+import org.slf4j.*;
 
 /**
  * This class encapsulates messages sent to or from a multiplexer, with the associated read and write operations (non blocking). 
@@ -30,6 +31,14 @@ import org.jppf.utils.SerializationUtils;
  */
 public class MultiplexerMessage
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(MultiplexerMessage.class);
+	/**
+	 * Determines whether DEBUG logging level is enabled.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
 	 * The location containing the data to send or receive.
 	 */
@@ -60,16 +69,14 @@ public class MultiplexerMessage
 	protected boolean read(ChannelWrapper<?> wrapper) throws Exception
 	{
 		SocketChannel channel = (SocketChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
-		if (currentLengthObject == null)
-		{
-			currentLengthObject = new NioObject(4, false);
-		}
+		if (currentLengthObject == null) currentLengthObject = new NioObject(4, false);
 		InputSource is = new ChannelInputSource(channel);
 		if (!currentLengthObject.read(is)) return false;
 		if (length <= 0)
 		{
 			length = SerializationUtils.readInt(currentLengthObject.getData().getInputStream());
 			count += 4;
+			if (traceEnabled) log.trace("read length=" + length + " from channel " + wrapper);
 		}
 		if (currentObject == null)
 		{
@@ -98,6 +105,7 @@ public class MultiplexerMessage
 		{
 			currentLengthObject = new NioObject(4, false);
 			SerializationUtils.writeInt(location.getSize(), currentLengthObject.getData().getOutputStream());
+			if (traceEnabled) log.trace("writing length=" + length + " to channel " + wrapper);
 		}
 		OutputDestination od = new ChannelOutputDestination(channel);
 		if (!currentLengthObject.write(od)) return false;

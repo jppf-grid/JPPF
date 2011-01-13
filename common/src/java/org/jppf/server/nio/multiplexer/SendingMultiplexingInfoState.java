@@ -64,7 +64,7 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 		//if (debugEnabled) log.debug("exec() for " + wrapper);
 		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
 		MultiplexerContext linkedContext = (MultiplexerContext) context.getLinkedKey().getContext();
-		if (context.getMessage() == null)
+		if (context.getMultiplexerMessage() == null)
 		{
 			MultiplexerMessage msg = new MultiplexerMessage();
 			msg.length = 4;
@@ -75,7 +75,7 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 		if (context.writeMessage(wrapper))
 		{
 			if (debugEnabled) log.debug("message sent to remote multiplexer " + wrapper + " for port " + linkedContext.getBoundPort());
-			context.setMessage(null);
+			context.setMultiplexerMessage(null);
 			return TO_SENDING_OR_RECEIVING;
 		}
 		return TO_SENDING_MULTIPLEXING_INFO;
