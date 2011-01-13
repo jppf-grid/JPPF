@@ -105,7 +105,7 @@ public class MultiplexerMessage
 		{
 			currentLengthObject = new NioObject(4, false);
 			SerializationUtils.writeInt(location.getSize(), currentLengthObject.getData().getOutputStream());
-			if (traceEnabled) log.trace("writing length=" + length + " to channel " + wrapper);
+			if (traceEnabled) log.trace("writing length=" + location.getSize() + " to channel " + wrapper);
 		}
 		OutputDestination od = new ChannelOutputDestination(channel);
 		if (!currentLengthObject.write(od)) return false;
