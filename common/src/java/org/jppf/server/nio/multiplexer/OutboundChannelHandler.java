@@ -22,7 +22,6 @@ import java.nio.channels.*;
 
 import org.jppf.comm.socket.SocketChannelClient;
 import org.jppf.server.nio.*;
-import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -93,6 +92,6 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 				}
 			}
 		);
-		if (debugEnabled) log.debug("registered outbound channel " + StringUtils.getRemoteHost(channel));
+		if (debugEnabled) log.debug("registered outbound channel " + wrapper);
 	}
 }
