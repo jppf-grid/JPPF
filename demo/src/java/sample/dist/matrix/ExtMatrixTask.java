@@ -101,4 +101,19 @@ public class ExtMatrixTask extends BaseDemoTask
 			setException(e);
 		}
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(getClass().getSimpleName()).append("[");
+		sb.append("position=").append(getPosition());
+		sb.append(",id=").append(getId());
+		sb.append(",result=").append(getResult());
+		sb.append(",exception=").append(getException());
+		sb.append("]");
+		return sb.toString();
+	}
 }
