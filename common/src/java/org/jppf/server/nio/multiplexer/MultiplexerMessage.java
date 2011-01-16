@@ -149,6 +149,10 @@ public class MultiplexerMessage
 		sb.append(JPPFResourceWrapper.class.getSimpleName()).append("[");
 		sb.append("name=").append(res.getName());
 		sb.append(",state=").append(res.getState());
+		sb.append(",definition=");
+		byte[] def = res.getDefinition();
+		if (def == null) sb.append("null");
+		else sb.append("byte[").append(def.length).append("]");
 		sb.append("]");
 		return sb.toString();
 	}
