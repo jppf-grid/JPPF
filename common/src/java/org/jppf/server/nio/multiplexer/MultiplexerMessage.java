@@ -132,8 +132,9 @@ public class MultiplexerMessage
 				if (o instanceof JPPFResourceWrapper) o = toString((JPPFResourceWrapper) o);
 				log.trace("current object in message=" + o);
 			}
-			catch(Throwable ignore)
+			catch(Throwable t)
 			{
+				log.trace(t.getClass().getSimpleName() + " : " + t.getMessage());
 			}
 		}
 	}
