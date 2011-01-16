@@ -457,7 +457,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	 */
 	public String toString()
 	{
-		StringBuilder sb = new StringBuilder("[");
+		StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("[");
 		sb.append("jobId=").append(getParameter(BundleParameter.JOB_ID));
 		sb.append(", jobUuid=").append(getParameter(BundleParameter.JOB_UUID));
 		sb.append(", initialTaskCount=").append(initialTaskCount);

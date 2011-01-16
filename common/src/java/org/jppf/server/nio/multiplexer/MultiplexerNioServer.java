@@ -35,7 +35,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	/**
 	 * Name given to this thread.
 	 */
-	private static final String THIS_NAME = "MultiplexerServer Thread";
+	private static final String THIS_NAME = "MultiplexerServer";
 	/**
 	 * Logger for this class.
 	 */
