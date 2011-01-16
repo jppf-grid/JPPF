@@ -20,6 +20,7 @@ package org.jppf.server.nio.multiplexer;
 
 import java.nio.channels.SocketChannel;
 
+import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.io.*;
 import org.jppf.server.nio.*;
 import org.jppf.utils.*;
@@ -128,11 +129,27 @@ public class MultiplexerMessage
 			try
 			{
 				Object o = new ObjectSerializerImpl().deserialize(location.getInputStream());
+				if (o instanceof JPPFResourceWrapper) o = toString((JPPFResourceWrapper) o);
 				log.trace("current object in message=" + o);
 			}
 			catch(Throwable ignore)
 			{
 			}
 		}
+	}
+
+	/**
+	 * Prints a resource wrapper to a string.
+	 * @param res the resource to print.
+	 * @return astring representation of the resource wrapper.
+	 */
+	String toString(JPPFResourceWrapper res)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(JPPFResourceWrapper.class.getSimpleName()).append("[");
+		sb.append("name=").append(res.getName());
+		sb.append(",state=").append(res.getState());
+		sb.append("]");
+		return sb.toString();
 	}
 }
