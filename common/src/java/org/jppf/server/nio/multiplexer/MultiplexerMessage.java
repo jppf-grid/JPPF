@@ -22,7 +22,7 @@ import java.nio.channels.SocketChannel;
 
 import org.jppf.io.*;
 import org.jppf.server.nio.*;
-import org.jppf.utils.SerializationUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -89,6 +89,7 @@ public class MultiplexerMessage
 		currentLengthObject = null;
 		currentObject = null;
 		length = 0;
+		if (traceEnabled) deserialize();
 		return true;
 	}
 
@@ -115,5 +116,23 @@ public class MultiplexerMessage
 		currentLengthObject = null;
 		currentObject = null;
 		return true;
+	}
+
+	/**
+	 * This method is for debugging purposes ONLY.
+	 */
+	void deserialize()
+	{
+		if (traceEnabled)
+		{
+			try
+			{
+				Object o = new ObjectSerializerImpl().deserialize(location.getInputStream());
+				log.trace("current object in message=" + o);
+			}
+			catch(Throwable ignore)
+			{
+			}
+		}
 	}
 }
