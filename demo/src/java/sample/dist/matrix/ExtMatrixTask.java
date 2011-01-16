@@ -27,6 +27,10 @@ import sample.BaseDemoTask;
 public class ExtMatrixTask extends BaseDemoTask
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Data provider key mapping to the second matrix operand in the multiplication.
 	 */
 	public static final String DATA_KEY = "matrix";
