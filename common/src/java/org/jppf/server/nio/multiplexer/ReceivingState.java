@@ -68,8 +68,12 @@ public class ReceivingState extends MultiplexerServerState
 			if (!MultiplexerState.SENDING.equals(linkedContext.getState())) server.getTransitionManager().transitionChannel(linkedKey, MultiplexerTransition.TO_SENDING);
 			if (debugEnabled)
 			{
-				if (linkedContext.isApplicationPort()) log.debug("read message for " + wrapper + " done, sending to outbound port " + linkedContext.getBoundPort());
-				else log.debug("read message for " + wrapper + " done, sending to multiplexer port " + linkedContext.getMultiplexerPort());
+				String s = "read message from " + wrapper + " done, sending it via " + linkedKey;
+				/*
+				if (linkedContext.isApplicationPort()) log.debug(s + "to outbound port " + linkedContext.getBoundPort());
+				else if (linkedContext.isMultiplexerPort()) log.debug(s + "to multiplexer port " + linkedContext.getMultiplexerPort());
+				*/
+				log.debug(s);
 			}
 			return TO_SENDING_OR_RECEIVING;
 		}

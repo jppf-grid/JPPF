@@ -68,6 +68,7 @@ public class SendingState extends MultiplexerServerState
 		{
 			if (debugEnabled) log.debug(wrapper.toString() + " message sent");
 			context.setMultiplexerMessage(null);
+			if (context.hasQueuedMessage()) return TO_SENDING;
 			return TO_SENDING_OR_RECEIVING;
 		}
 		return TO_SENDING;
