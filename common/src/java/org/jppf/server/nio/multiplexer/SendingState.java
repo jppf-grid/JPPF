@@ -59,6 +59,11 @@ public class SendingState extends MultiplexerServerState
 			throw new ConnectException("multiplexer " + wrapper + " has been disconnected");
 		}
 		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
+		if (context.getMultiplexerMessage() == null)
+		{
+			if (!context.hasQueuedMessage()) return TO_SENDING_OR_RECEIVING;
+			else context.setMultiplexerMessage(context.nextQueuedMessage());
+		}
 		if (context.writeMessage(wrapper))
 		{
 			if (debugEnabled) log.debug(wrapper.toString() + " message sent");

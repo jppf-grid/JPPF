@@ -55,7 +55,7 @@ public class SendingOrReceivingState extends MultiplexerServerState
 	{
 		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(key.channel()));
 		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
-		if (context.getMultiplexerMessage() != null)
+		if ((context.getMultiplexerMessage() != null) || context.hasQueuedMessage())
 		{
 			//if (debugEnabled) log.debug("returning TO_SENDING for " + wrapper);
 			return TO_SENDING;

@@ -18,6 +18,9 @@
 
 package org.jppf.server.nio.multiplexer;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.jppf.server.nio.*;
 import org.jppf.utils.SerializationUtils;
 import org.slf4j.*;
@@ -48,6 +51,10 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * Encapsulates the data sent or received.
 	 */
 	private MultiplexerMessage multiplexerMessage = null;
+	/**
+	 * Contains pending messages to send.
+	 */
+	private Queue<MultiplexerMessage> messageQueue = new ConcurrentLinkedQueue<MultiplexerMessage>(); 
 
 	/**
 	 * Default constructor.
@@ -179,7 +186,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	}
 
 	/**
-	 * Get the port outbound port number for this channel, sent as the initial message.
+	 * Get the outbound port number for this channel, sent as the initial message.
 	 * @return the port number as an int, or -1 if it could not be read.
 	 */
 	public int readOutBoundPort()
@@ -212,5 +219,32 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	public void setMultiplexerMessage(MultiplexerMessage multiplexerMessage)
 	{
 		this.multiplexerMessage = multiplexerMessage;
+	}
+
+	/**
+	 * Add a message to the message queue.
+	 * @param message the message to add.
+	 */
+	public void queueMessage(MultiplexerMessage message)
+	{
+		messageQueue.offer(message);
+	}
+
+	/**
+	 * Get the next queued mmessage and remove it from the queue.
+	 * @return a {@link MultiplexerMessage} instance or null if the queue is empty.
+	 */
+	public MultiplexerMessage nextQueuedMessage()
+	{
+		return messageQueue.isEmpty() ? null : messageQueue.poll();
+	}
+
+	/**
+	 * Determine whether there is at least one queue message.
+	 * @return true if there is a least one message in the queue, false otherwise.
+	 */
+	public boolean hasQueuedMessage()
+	{
+		return !messageQueue.isEmpty();
 	}
 }
