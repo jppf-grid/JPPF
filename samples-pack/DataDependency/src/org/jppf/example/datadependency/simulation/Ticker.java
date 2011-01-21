@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.example.datadependency.model.MarketData;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -63,7 +63,7 @@ public class Ticker extends ThreadSynchronization implements Runnable
 	/**
 	 * Executes the event notifications.
 	 */
-	private ExecutorService notificationExecutor = Executors.newFixedThreadPool(1);
+	private ExecutorService notificationExecutor = Executors.newFixedThreadPool(1, new JPPFThreadFactory("Ticker"));
 	/**
 	 * The count of generated events.
 	 */
