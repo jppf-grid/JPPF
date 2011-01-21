@@ -27,6 +27,7 @@ import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.AbstractJPPFQueue;
 import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.fixedsize.*;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
@@ -107,18 +108,7 @@ class TaskQueueChecker implements Runnable
 						if (channel == null) log.debug("no channel found for bundle");
 						else log.debug("channel found for bundle: " + channel);
 					}
-					if (channel != null)
-					{
-						synchronized(channel)
-						{
-							AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
-							updateBundler(server.getBundler(), selectedBundle.getBundle(), context);
-							BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, context.getBundler().getBundleSize());
-							context.setBundle(bundleWrapper);
-							server.getTransitionManager().transitionChannel(channel, NodeTransition.TO_SENDING);
-							driver.getJobManager().jobDispatched(context.getBundle(), channel);
-						}
-					}
+					if (channel != null) dispatchJob(channel, selectedBundle);
 				}
 				finally
 				{
@@ -129,6 +119,36 @@ class TaskQueueChecker implements Runnable
 		finally
 		{
 			setRunning(false);
+		}
+	}
+
+	/**
+	 * Dispatch the specified job to the selected channel, after applying the load balancer to the job.
+	 * @param channel the node channel to dispatch the job to.
+	 * @param selectedBundle the job to dispatch.
+	 */
+	private void dispatchJob(ChannelWrapper<?> channel, BundleWrapper selectedBundle)
+	{
+		synchronized(channel)
+		{
+			AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
+			int size = 1;
+			try
+			{
+				updateBundler(server.getBundler(), selectedBundle.getBundle(), context);
+				size = context.getBundler().getBundleSize();
+			}
+			catch (Exception e)
+			{
+				log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1", e);
+				FixedSizeProfile profile = new FixedSizeProfile();
+				profile.setSize(1);
+				server.setBundler(new FixedSizeBundler(profile));
+			}
+			BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, size);
+			context.setBundle(bundleWrapper);
+			server.getTransitionManager().transitionChannel(channel, NodeTransition.TO_SENDING);
+			driver.getJobManager().jobDispatched(context.getBundle(), channel);
 		}
 	}
 
