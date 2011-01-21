@@ -18,8 +18,12 @@
 
 package org.jppf.example.datadependency;
 
-import org.jppf.example.datadependency.model.Trade;
+import java.util.*;
+
+import org.jppf.example.datadependency.model.*;
+import org.jppf.example.datadependency.startup.DataDependencyStartup;
 import org.jppf.server.protocol.JPPFTask;
+import org.slf4j.*;
 
 /**
  * JPPF task whose role is to recompute a trade when some market data was updated.
@@ -28,9 +32,17 @@ import org.jppf.server.protocol.JPPFTask;
 public class TradeUpdateTask extends JPPFTask
 {
 	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(TradeUpdateTask.class);
+	/**
+	 * Debug enabled flag.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
 	 * The trade to recompute
 	 */
-	private Trade trade = null;
+	private String tradeId = null;
 	/**
 	 * The identifiers for the market data that was updated.
 	 */
@@ -42,12 +54,12 @@ public class TradeUpdateTask extends JPPFTask
 
 	/**
 	 * Initialize this task with the specified trade and ids of updated market data. 
-	 * @param trade the trade to recompute.
+	 * @param tradeId the id of the trade to recompute.
 	 * @param marketDataId the identifiers for the market data that was updated.
 	 */
-	public TradeUpdateTask(Trade trade, String...marketDataId)
+	public TradeUpdateTask(String tradeId, String...marketDataId)
 	{
-		this.trade = trade;
+		this.tradeId = tradeId;
 		this.marketDataId = marketDataId;
 	}
 
@@ -57,22 +69,32 @@ public class TradeUpdateTask extends JPPFTask
 	 */
 	public void run()
 	{
+		String msg = "updating trade " + tradeId;
+		//log.info(msg);
 		long taskStart = System.currentTimeMillis();
+		/*
+		*/
+		Trade trade = DataDependencyStartup.getTrade(tradeId);
+		List<MarketData> data = new ArrayList<MarketData>();
+		for (String id: trade.getDataDependencies()) data.add(DataDependencyStartup.getMarketData(id));
 		// perform some dummy cpu-consuming computation
 		for (long elapsed = 0L; elapsed < taskDuration; elapsed = System.currentTimeMillis() - taskStart)
 		{
 			String s = "";
 			for (int i=0; i<10; i++) s += "A"+"10";
 		}
+		msg = "updated trade " + tradeId;
+		//log.info(msg);
+		setResult(msg);
 	}
 
 	/**
 	 * Get the trade.
 	 * @return a trade object.
 	 */
-	public Trade getTrade()
+	public String getTradeId()
 	{
-		return trade;
+		return tradeId;
 	}
 
 	/**

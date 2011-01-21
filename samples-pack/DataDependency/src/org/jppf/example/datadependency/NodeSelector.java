@@ -35,14 +35,14 @@ public class NodeSelector
 	/**
 	 * The list of node ids.
 	 */
-	private List<Integer> idList = null;
+	private List<String> idList = null;
 
 	/**
 	 * Initialize this node selector.
 	 * @param trades the list of trades to distribute among the nodes.
 	 * @param idList the list of node ids.
 	 */
-	public NodeSelector(List<Trade> trades, List<Integer> idList)
+	public NodeSelector(List<Trade> trades, List<String> idList)
 	{
 		this.idList = idList;
 		int nbNodes = idList.size();
@@ -57,9 +57,9 @@ public class NodeSelector
 	/**
 	 * Determine the id of the node where the specified trade was initialized.
 	 * @param trade the trade for which to determine a processing node.
-	 * @return the id of the node as an int.
+	 * @return the id of the node as a string.
 	 */
-	public int getNodeId(Trade trade)
+	public String getNodeId(Trade trade)
 	{
 		return getNodeId(trade.getId());
 	}
@@ -67,14 +67,14 @@ public class NodeSelector
 	/**
 	 * Determine the id of the node where the specified trade was initialized.
 	 * @param tradeId the id of the trade for which to determine a processing node.
-	 * @return the id of the node as an int.
+	 * @return the id of the node as a string.
 	 */
-	public int getNodeId(String tradeId)
+	public String getNodeId(String tradeId)
 	{
 		for (int i=0; i<tradeSets.size(); i++)
 		{
 			if (tradeSets.get(i).contains(tradeId)) return idList.get(i);
 		}
-		return -1;
+		return null;
 	}
 }

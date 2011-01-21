@@ -16,23 +16,8 @@
  * limitations under the License.
  */
 
-package org.jppf.example.datadependency.mbean;
-
-import org.jppf.example.datadependency.model.MarketData;
-
 /**
- * Exposes one method that queries the node's JVM for the number of available processors.
- * @author Laurent Cohen
+ * Data dependency sample implementation of the startup class
+ * that handles the market data update events.
  */
-public interface DataMBean
-{
-	/**
-	 * The object name of this MBEAN.
-	 */
-	String MBEAN_NAME = "org.jppf.example.mbean:name=Data,type=node";
-	/**
-	 * Update the specified market data.
-	 * @param data the pieces of data to update.
-	 */
-	void updateMarketData(MarketData...data);
-}
+package org.jppf.example.datadependency.startup;

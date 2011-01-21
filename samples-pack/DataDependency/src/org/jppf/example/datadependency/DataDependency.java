@@ -29,8 +29,7 @@ public class DataDependency
 {
 	/**
 	 * The entry point for this application runner to be run from a Java command line.
-	 * @param args by default, we do not use the command line arguments,
-	 * however nothing prevents us from using them if need be.
+	 * @param args by default, we do not use the command line arguments.
 	 */
 	public static void main(String...args)
 	{

@@ -21,11 +21,12 @@ package org.jppf.example.datadependency;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.example.datadependency.model.MarketData;
+import org.jppf.example.datadependency.model.*;
 import org.jppf.example.datadependency.simulation.*;
 import org.jppf.management.*;
-import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
+
+import com.hazelcast.core.*;
 
 /**
  * 
@@ -50,6 +51,14 @@ public class NodeHandler implements TickerListener
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Mapping of the market data.
+	 */
+	private static Map<String, MarketData> dataMap = null;
+	/**
+	 * Mapping of the trades.
+	 */
+	private static Map<String, Trade> tradeMap = null;
+	/**
 	 * The driver's JMX wrapper.
 	 */
 	private JMXDriverConnectionWrapper driver = null;
@@ -68,31 +77,38 @@ public class NodeHandler implements TickerListener
 	 * @return the list of node ids. 
 	 * @throws Exception if any error is raised.
 	 */
-	public List<Integer> initNodes(List<MarketData> marketDataList) throws Exception
+	public List<String> initNodes(List<MarketData> marketDataList) throws Exception
 	{
+		dataMap = Hazelcast.getMap("MarketData");
+		try
+		{
+			((IMap) dataMap).lockMap(1000L, TimeUnit.SECONDS);
+			//for (MarketData data: marketDataList) ((IMap) dataMap).put(data.getId(), data, 1000L, TimeUnit.SECONDS);
+			for (MarketData data: marketDataList) dataMap.put(data.getId(), data);
+		}
+		finally
+		{
+			((IMap) dataMap).unlockMap();
+		}
+		/*
 		JMXDriverConnectionWrapper driver = new JMXDriverConnectionWrapper("localhost", 11198);
 		driver.connectAndWait(0);
 		Collection<JPPFManagementInfo> nodesInfo = driver.nodesInformation();
 		
 		MarketData[] data = marketDataList.toArray(new MarketData[0]);
-		List<Integer> idList = new ArrayList<Integer>();
+		List<String> idList = new ArrayList<String>();
 		int nodeCount = 0;
 		for (JPPFManagementInfo info: nodesInfo)
 		{
 			JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());
 			node.connectAndWait(0);
-			JPPFSystemInformation sysInfo = node.systemInformation();
-			TypedProperties config = sysInfo.getJppf();
 			nodeCount++;
-			int n = config.getInt("id", -1);
-			if (n >= 0)
-			{
-				nodes.add(node);
-				idList.add(n);
-			}
-			node.invoke("org.jppf.example.mbean:name=Data,type=node", "updateMarketData", new Object[] { data }, SIGNATURE );
+			idList.add(node.getId());
+			node.invoke(DataMBean.MBEAN_NAME, "updateMarketData", new Object[] { data }, SIGNATURE );
 		}
 		return idList;
+		*/
+		return null;
 	}
 
 	/**
@@ -102,7 +118,8 @@ public class NodeHandler implements TickerListener
 	 */
 	public void marketDataUpdated(TickerEvent event)
 	{
-		nodeExecutor.submit(new NodesUpdateTask(new MarketData[] { event.getMarketData() }));
+		//nodeExecutor.submit(new NodesUpdateTask(new MarketData[] { event.getMarketData() }));
+		nodeExecutor.submit(new NodesUpdateTask(event.getMarketData()));
 	}
 
 	/**
@@ -132,13 +149,65 @@ public class NodeHandler implements TickerListener
 		/**
 		 * The update data to send to the nodes.
 		 */
+		private MarketData data;
+		
+		/**
+		 * Initialize this task with the update dmarket data.
+		 * @param data the update ddata.
+		 */
+		public NodesUpdateTask(final MarketData data)
+		{
+			this.data = data;
+		}
+
+		/**
+		 * Execute this task.
+		 * @see java.lang.Runnable#run()
+		 */
+		public void run()
+		{
+			for (int i=0; i<nodes.size(); i++)
+			{
+				final JMXNodeConnectionWrapper node = nodes.get(i);
+				Runnable r = new Runnable()
+				{
+					public void run()
+					{
+						try
+						{
+							((IMap) dataMap).lockMap(1000L, TimeUnit.SECONDS);
+							dataMap.put(data.getId(), data);
+						}
+						catch (Exception e)
+						{
+							e.printStackTrace();
+						}
+						finally
+						{
+							((IMap) dataMap).unlockMap();
+						}
+					}
+				};
+				new Thread(r).start();
+			}
+		}
+	}
+
+	/**
+	 * Performs the nodes updates.
+	 */
+	public class NodesUpdateTask2 implements Runnable
+	{
+		/**
+		 * The update data to send to the nodes.
+		 */
 		private Object[] arguments;
 		
 		/**
 		 * Initialize this task with the update dmarket data.
 		 * @param data the update ddata.
 		 */
-		public NodesUpdateTask(final MarketData[] data)
+		public NodesUpdateTask2(final MarketData[] data)
 		{
 			arguments = new Object[] { data };
 		}

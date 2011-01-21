@@ -40,5 +40,7 @@
 	<classpathentry kind="lib" path="shared/lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="NodeLifeCycle/lib/geronimo-jta_1.1_spec-1.1.1.jar"/>
 	<classpathentry kind="lib" path="NodeLifeCycle/lib/transactions-essentials-all.jar" sourcepath="C:/ftp/dev/Database/Atomikos/AtomikosTransactionsEssentials-3.7.0M5/sources"/>
+	<classpathentry kind="lib" path="shared/lib/hazelcast-1.9.1.jar"/>
+	<classpathentry kind="lib" path="shared/lib/commons-pool-1.5.2.jar"/>
 	<classpathentry kind="output" path="shared/classes"/>
 </classpath>

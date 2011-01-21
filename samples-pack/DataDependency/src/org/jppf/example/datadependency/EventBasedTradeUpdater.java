@@ -21,6 +21,8 @@ package org.jppf.example.datadependency;
 import org.jppf.example.datadependency.simulation.*;
 import org.slf4j.*;
 
+import com.hazelcast.core.Hazelcast;
+
 /**
  * Instances of this class start a simulated ticker and process
  * the market data updates on a per-event basis.
@@ -74,6 +76,8 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater
 			statsCollector.setTotalTime(elapsed);
 			print(statsCollector.toString());
 			nodeHandler.close();
+			Hazelcast.shutdownAll();
+			System.exit(0);
 		}
 		catch(Exception e)
 		{
