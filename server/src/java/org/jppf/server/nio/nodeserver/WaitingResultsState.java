@@ -102,15 +102,6 @@ class WaitingResultsState extends NodeServerState
 				// notify the client thread about the end of a bundle
 				if (listener != null) listener.taskCompleted(context.isJobCanceled() ? bundleWrapper : newBundleWrapper);
 				context.setJobCanceled(false);
-				/*
-				if (!context.isJobCanceled())
-				{
-					// notify the client thread about the end of a bundle
-					TaskCompletionListener listener = bundle.getCompletionListener();
-					if (listener != null) listener.taskCompleted(newBundleWrapper);
-				}
-				else context.setJobCanceled(false);
-				*/
 			}
 			Bundler bundler = context.getBundler();
 			JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
