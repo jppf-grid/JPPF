@@ -29,6 +29,10 @@ import org.slf4j.*;
 public class ClientDataProvider extends MemoryMapDataProvider
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Logger for this class.
 	 */
 	private static Logger log = LoggerFactory.getLogger(ClientDataProvider.class);

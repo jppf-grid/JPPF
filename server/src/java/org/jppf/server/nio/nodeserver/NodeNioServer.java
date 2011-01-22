@@ -133,7 +133,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 				selector.wakeup();
 			}
 		});
-		RecoveryServer recoveryServer = JPPFDriver.getInstance().getRecoveryServer();
+		RecoveryServer recoveryServer = driver.getInitializer().getRecoveryServer();
 		if (recoveryServer != null) recoveryServer.getReaper().addReaperListener(this);
 	}
 
@@ -335,7 +335,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 		{
 			driver.getStatsManager().nodeConnectionClosed();
 			NodeNioServer server = driver.getNodeNioServer();
-			driver.removeNodeInformation(channel);
+			driver.getNodeHandler().removeNodeInformation(channel);
 			server.removeIdleChannel(channel);
 			if (context != null)
 			{

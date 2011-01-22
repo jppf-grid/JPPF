@@ -63,7 +63,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 	 */
 	public PeerDiscoveryThread()
 	{
-		localInfo = new DriverInitializer(JPPFDriver.getInstance()).createConnectionInformation();
+		localInfo = new DriverInitializer(JPPFDriver.getInstance()).getConnectionInformation();
 	}
 
 	/**

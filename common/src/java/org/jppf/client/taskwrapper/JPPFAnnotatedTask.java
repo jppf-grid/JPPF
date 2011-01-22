@@ -31,6 +31,10 @@ import org.jppf.server.protocol.JPPFTask;
 public class JPPFAnnotatedTask extends JPPFTask
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Wrapper around a task that is not an instance of {@link org.jppf.server.protocol.JPPFTask JPPFTask}.
 	 */
 	protected TaskObjectWrapper taskObjectWrapper = null;

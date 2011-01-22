@@ -22,6 +22,7 @@ import java.io.*;
 
 import org.jppf.serialization.JPPFObjectStreamFactory;
 import org.jppf.utils.*;
+import org.jppf.utils.streams.JPPFByteArrayOutputStream;
 
 /**
  * This serializer is used solely by the nodes to enable their bootstrapping.

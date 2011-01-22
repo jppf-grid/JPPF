@@ -30,6 +30,10 @@ import org.jppf.io.*;
 public class MemoryLocation extends AbstractLocation<byte[]>
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Start offset in the byte array.
 	 */
 	private int offset = 0;

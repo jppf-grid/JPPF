@@ -21,6 +21,7 @@ import java.io.*;
 
 import org.jppf.io.DataLocation;
 import org.jppf.serialization.JPPFObjectStreamFactory;
+import org.jppf.utils.streams.JPPFByteArrayOutputStream;
 
 /**
  * Instances of this class are used to serialize or deserialize objects to or from an array of bytes.<br>

@@ -83,7 +83,7 @@ class DefiningChannelTypeState extends ClassServerState
 				context.setMessage(null);
 				if (managementEnabled)
 				{
-					resource.setManagementId(driver.getJmxServer().getId());
+					resource.setManagementId(driver.getInitializer().getJmxServer().getId());
 				}
 				context.serializeResource(wrapper);
 				return TO_SENDING_INITIAL_PROVIDER_RESPONSE;

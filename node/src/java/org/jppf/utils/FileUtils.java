@@ -21,6 +21,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import org.jppf.utils.streams.JPPFByteArrayOutputStream;
+
 /**
  * This class provides a set of utility methods for reading, writing and manipulating files. 
  * @author Laurent Cohen
@@ -243,6 +245,42 @@ public final class FileUtils
 		int idx = filePath.lastIndexOf(".");
 		if (idx >=0) return filePath.substring(idx+1);
 		return null;
+	}
+
+	/**
+	 * Get the name of a file from its full path.
+	 * @param filePath the file from which to get the file name.
+	 * @return the file name without path information.
+	 */
+	public static String getFileName(String filePath)
+	{
+		int idx = getLastFileSeparatorPosition(filePath);
+		return idx >= 0 ? filePath.substring(idx + 1) : filePath;
+	}
+
+	/**
+	 * Get the parent folder of a file or directory from its full path.
+	 * @param filePath the path from which to get the parent path.
+	 * @return the parent folder path.
+	 */
+	public static String getParentFolder(String filePath)
+	{
+		int idx = getLastFileSeparatorPosition(filePath);
+		return idx >= 0 ? filePath.substring(0, idx) : filePath;
+	}
+
+	/**
+	 * Get the last position of a file separator in a file path.
+	 * @param path the path to parse.
+	 * @return the position as an positive integer, or -1 if no separator was found.
+	 */
+	private static int getLastFileSeparatorPosition(String path)
+	{
+		int idx1 = path.lastIndexOf("/");
+		int idx2 = path.lastIndexOf("\\");
+		if ((idx1 < 0) && (idx2 < 0)) return -1;
+		int idx = idx1 < 0 ? idx2 : idx2 < 0 ? idx1 : Math.max(idx1, idx2);
+		return idx;
 	}
 
 	/**

@@ -22,9 +22,12 @@ import java.util.List;
 
 import javax.management.MBeanServer;
 
-import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.comm.discovery.*;
+import org.jppf.comm.recovery.RecoveryServer;
+import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.security.*;
+import org.jppf.server.peer.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -46,6 +49,30 @@ public class DriverInitializer
 	 * 
 	 */
 	private JPPFDriver driver = null;
+	/**
+	 * The thread that performs the peer servers discovery.
+	 */
+	private PeerDiscoveryThread peerDiscoveryThread = null;
+	/**
+	 * The thread that broadcasts the server connection information using UDP multicast.
+	 */
+	private JPPFBroadcaster broadcaster = null;
+	/**
+	 * The JPPF configuration.
+	 */
+	private TypedProperties config = null;
+	/**
+	 * Represents the connection information for this driver.
+	 */
+	private JPPFConnectionInformation connectionInfo = null;
+	/**
+	 * The jmx server used to manage and monitor this driver.
+	 */
+	private JMXServerImpl jmxServer = null;
+	/**
+	 * The server used to detect that individual connections are broken due to hardware failures.
+	 */
+	private RecoveryServer recoveryServer = null;
 
 	/**
 	 * Instantiate this initializer with the specified driver.
@@ -54,6 +81,7 @@ public class DriverInitializer
 	public DriverInitializer(JPPFDriver driver)
 	{
 		this.driver = driver;
+		config = JPPFConfiguration.getProperties();
 	}
 
 	/**
@@ -63,7 +91,7 @@ public class DriverInitializer
 	@SuppressWarnings("unchecked")
 	void registerProviderMBeans() throws Exception
 	{
-  	MBeanServer server = driver.getJmxServer().getServer();
+  	MBeanServer server = getJmxServer().getServer();
     JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager<JPPFDriverMBeanProvider>(JPPFDriverMBeanProvider.class, server);
 		List<JPPFDriverMBeanProvider> list = mgr.getAllProviders();
 		for (JPPFDriverMBeanProvider provider: list)
@@ -79,22 +107,24 @@ public class DriverInitializer
 	 * Read configuration for the host name and ports used to conenct to this driver.
 	 * @return a <code>DriverConnectionInformation</code> instance.
 	 */
-	public JPPFConnectionInformation createConnectionInformation()
+	public JPPFConnectionInformation getConnectionInformation()
 	{
-		TypedProperties config = JPPFConfiguration.getProperties();
-		JPPFConnectionInformation info = new JPPFConnectionInformation();
-		info.uuid = driver.getUuid();
-		String s = config.getString("class.server.port", "11111");
-		info.classServerPorts = StringUtils.parseIntValues(s);
-		s = config.getString("app.server.port", "11112");
-		info.applicationServerPorts = StringUtils.parseIntValues(s);
-		s = config.getString("node.server.port", "11113");
-		info.nodeServerPorts = StringUtils.parseIntValues(s);
-		info.host = NetworkUtils.getManagementHost();
-		if (config.getBoolean("jppf.management.enabled", true)) info.managementPort = config.getInt("jppf.management.port", 11198);
-		boolean recoveryEnabled = config.getBoolean("jppf.recovery.enabled", true);
-		if (recoveryEnabled) info.recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
-		return info;
+		if (connectionInfo == null)
+		{
+			connectionInfo = new JPPFConnectionInformation();
+			connectionInfo.uuid = driver.getUuid();
+			String s = config.getString("class.server.port", "11111");
+			connectionInfo.classServerPorts = StringUtils.parseIntValues(s);
+			s = config.getString("app.server.port", "11112");
+			connectionInfo.applicationServerPorts = StringUtils.parseIntValues(s);
+			s = config.getString("node.server.port", "11113");
+			connectionInfo.nodeServerPorts = StringUtils.parseIntValues(s);
+			connectionInfo.host = NetworkUtils.getManagementHost();
+			if (config.getBoolean("jppf.management.enabled", true)) connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
+			boolean recoveryEnabled = config.getBoolean("jppf.recovery.enabled", true);
+			if (recoveryEnabled) connectionInfo.recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
+		}
+		return connectionInfo;
 	}
 
 	/**
@@ -126,4 +156,151 @@ public class DriverInitializer
 		return new JPPFSecurityContext(driver.getUuid(), sb.toString(), new JPPFCredentials());
 	}
 
+	/**
+	 * Initialize and start the discovery service.
+	 */
+	void initBroadcaster()
+	{
+		if (config.getBoolean("jppf.discovery.enabled", true))
+		{
+			broadcaster = new JPPFBroadcaster(getConnectionInformation());
+			new Thread(broadcaster, "JPPF Broadcaster").start();
+		}
+	}
+
+	/**
+	 * Stop the discovery service if it is running.
+	 */
+	void stopBroadcaster()
+	{
+		if (broadcaster != null)
+		{
+			broadcaster.setStopped(true);
+			broadcaster = null;
+		}
+	}
+
+	/**
+	 * Initialize this driver's peers.
+	 */
+	void initPeers()
+	{
+		TypedProperties props = JPPFConfiguration.getProperties();
+		if (props.getBoolean("jppf.peer.discovery.enabled", false))
+		{
+			if (debugEnabled) log.debug("starting peers discovery");
+			peerDiscoveryThread = new PeerDiscoveryThread();
+			new Thread(peerDiscoveryThread).start();
+		}
+		else
+		{
+			String peerNames = props.getString("jppf.peers");
+			if ((peerNames == null) || "".equals(peerNames.trim())) return;
+			if (debugEnabled) log.debug("found peers in the configuration");
+			String[] names = peerNames.split("\\s");
+			for (String peerName: names) new JPPFPeerInitializer(peerName).start();
+		}
+	}
+
+	/**
+	 * Get the thread that performs the peer servers discovery.
+	 * @return a <code>PeerDiscoveryThread</code> instance.
+	 */
+	public PeerDiscoveryThread getPeerDiscoveryThread()
+	{
+		return peerDiscoveryThread;
+	}
+
+	/**
+	 * Stop the peer discovery thread if it is running.
+	 */
+	void stopPeerDiscoveryThread()
+	{
+		if (peerDiscoveryThread != null)
+		{
+			peerDiscoveryThread.setStopped(true);
+			peerDiscoveryThread = null;
+		}
+	}
+
+	/**
+	 * Get the jmx server used to manage and monitor this driver.
+	 * @return a <code>JMXServerImpl</code> instance.
+	 */
+	public synchronized JMXServerImpl getJmxServer()
+	{
+		return jmxServer;
+	}
+
+	/**
+	 * Initialize the JMX server.
+	 */
+	void initJmxServer()
+	{
+		JPPFConnectionInformation info = getConnectionInformation();
+		try
+		{
+			if (config.getBoolean("jppf.management.enabled", true))
+			{
+				jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX, driver.getUuid());
+				jmxServer.start(getClass().getClassLoader());
+				info.managementPort = JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198);
+				registerProviderMBeans();
+				System.out.println("JPPF Driver management initialized");
+			}
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+			config.setProperty("jppf.management.enabled", "false");
+			String s = e.getMessage();
+			s = (s == null) ? "<none>" : s.replace("\t", "  ").replace("\n", " - ");
+			System.out.println("JPPF Driver management failed to initialize, with error message: '" + s + "'");
+			System.out.println("Management features are disabled. Please consult the driver's log file for more information");
+		}
+	}
+
+	/**
+	 * Stop the JMX server.
+	 */
+	void stopJmxServer()
+	{
+		try
+		{
+			if (jmxServer != null) jmxServer.stop();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * The server used to detect that individual connections are broken due to hardware failures.
+	 * @return a {@link RecoveryServer} instance.
+	 */
+	public RecoveryServer getRecoveryServer()
+	{
+		return recoveryServer;
+	}
+
+	/**
+	 * Initialize the JMX server.
+	 */
+	void initRecoveryServer()
+	{
+		if (config.getBoolean("jppf.recovery.enabled", true))
+		{
+			recoveryServer = new RecoveryServer();
+			new Thread(recoveryServer, "RecoveryServer thread").start();
+		}
+	}
+
+	/**
+	 * Stop the JMX server.
+	 */
+	void stopRecoveryServer()
+	{
+		if (recoveryServer != null) recoveryServer.close();
+	}
 }

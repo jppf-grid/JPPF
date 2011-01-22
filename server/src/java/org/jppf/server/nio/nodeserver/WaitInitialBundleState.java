@@ -90,7 +90,7 @@ class WaitInitialBundleState extends NodeServerState
 					int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM);
 					JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE);
 					if (systemInfo != null) info.setSystemInfo(systemInfo);
-					driver.addNodeInformation(wrapper, info);
+					driver.getNodeHandler().addNodeInformation(wrapper, info);
 				}
 			}
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.

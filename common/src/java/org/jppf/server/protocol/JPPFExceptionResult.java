@@ -33,6 +33,10 @@ import org.jppf.JPPFException;
 public final class JPPFExceptionResult extends JPPFTask
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * This captures the result of ("" + object).
 	 */
 	private String objectDescriptor = null;

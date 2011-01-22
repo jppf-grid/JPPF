@@ -27,6 +27,10 @@ import java.util.*;
 public class MemoryMapDataProvider implements DataProvider
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The actual store implementation for the shared data.
 	 */
 	private Map<Object, Object> store = new HashMap<Object, Object>();

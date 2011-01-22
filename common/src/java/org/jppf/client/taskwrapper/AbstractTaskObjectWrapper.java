@@ -27,6 +27,10 @@ package org.jppf.client.taskwrapper;
 public abstract class AbstractTaskObjectWrapper implements TaskObjectWrapper
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The type of the method to execute on the object.
 	 */
 	protected MethodType methodType = MethodType.INSTANCE;

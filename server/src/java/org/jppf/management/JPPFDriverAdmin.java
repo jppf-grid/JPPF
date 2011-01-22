@@ -59,7 +59,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		try
 		{
 			List<JPPFManagementInfo> list = new ArrayList<JPPFManagementInfo>();
-			list.addAll(driver.getNodeInformationMap().values());
+			list.addAll(driver.getNodeHandler().getNodeInformationMap().values());
 			return list;
 		}
 		catch(Exception e)
@@ -101,11 +101,11 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		try
 		{
 			if (algorithm == null) return "Error: no algorithm specified (null value)";
-			JPPFBundlerFactory factory = driver.getBundlerFactory();
+			JPPFBundlerFactory factory = driver.getNodeNioServer().getBundlerFactory();
 			if (!factory.getBundlerProviderNames().contains(algorithm)) return "Error: unknown algorithm '" + algorithm + "'";
 			TypedProperties props = new TypedProperties(parameters);
 			Bundler bundler = factory.createBundler(algorithm, props);
-			driver.setBundler(bundler);
+			driver.getNodeNioServer().setBundler(bundler);
 			//return new JPPFManagementResponse(localize((manual ? "manual" : "automatic") + ".settings.changed"), null);
 			return "Load-balancing settings updated";
 		}
@@ -118,8 +118,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 
 	/**
 	 * Perform a shutdown or restart of the server.
-	 * @param shutdownDelay - the delay before shutting down the server, once the command is received. 
-	 * @param restartDelay - the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
+	 * @param shutdownDelay the delay before shutting down the server, once the command is received. 
+	 * @param restartDelay the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
 	 * @return an acknowledgement message.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#restartShutdown(java.lang.Long, java.lang.Long)
@@ -154,7 +154,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		String profileName = props.getString("jppf.load.balancing.strategy", null);
 		// for compatibility with v1.x configuration files
 		if (profileName == null) profileName = props.getString("task.bundle.autotuned.strategy", "jppf");
-		JPPFBundlerFactory factory = driver.getBundlerFactory();
+		JPPFBundlerFactory factory = driver.getNodeNioServer().getBundlerFactory();
 		TypedProperties params = factory.convertJPPFConfiguration(profileName, props);
 		return new LoadBalancingInformation(algorithm, params, factory.getBundlerProviderNames());
 	}

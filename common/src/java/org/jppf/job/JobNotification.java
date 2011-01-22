@@ -29,6 +29,10 @@ import org.jppf.management.JPPFManagementInfo;
 public class JobNotification extends Notification
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Information about a node.
 	 */
 	private JPPFManagementInfo nodeInfo = null;

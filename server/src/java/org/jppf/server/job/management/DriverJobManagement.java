@@ -190,7 +190,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		NodeJobInformation[] result = new NodeJobInformation[nodes.size()];
 		for (int i=0; i<nodes.size(); i++)
 		{
-			JPPFManagementInfo nodeInfo = driver.getNodeInformation(nodes.get(i).first());
+			JPPFManagementInfo nodeInfo = driver.getNodeHandler().getNodeInformation(nodes.get(i).first());
 			JPPFTaskBundle bundle = nodes.get(i).second().getBundle();
 			Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
 			JobInformation jobInfo = new JobInformation(jobUuid, bundle.getId(),

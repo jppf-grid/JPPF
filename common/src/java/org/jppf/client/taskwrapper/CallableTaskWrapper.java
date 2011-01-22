@@ -27,6 +27,10 @@ import java.util.concurrent.Callable;
 public class CallableTaskWrapper extends AbstractTaskObjectWrapper
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The callable object to execute.
 	 */
 	private Callable callable = null;

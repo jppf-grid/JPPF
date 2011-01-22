@@ -186,7 +186,7 @@ class TaskQueueChecker implements Runnable
 			}
 			if (rule != null)
 			{
-				JPPFManagementInfo mgtInfo = driver.getNodeInformation(ch);
+				JPPFManagementInfo mgtInfo = driver.getNodeHandler().getNodeInformation(ch);
 				JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
 				if (!rule.accepts(info)) continue;
 			}

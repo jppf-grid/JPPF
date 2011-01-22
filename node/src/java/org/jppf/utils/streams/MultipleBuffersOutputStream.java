@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-package org.jppf.utils;
+package org.jppf.utils.streams;
 
 import java.io.*;
 import java.util.*;
 
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**

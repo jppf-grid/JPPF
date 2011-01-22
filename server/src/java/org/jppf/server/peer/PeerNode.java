@@ -96,7 +96,7 @@ class PeerNode extends AbstractMonitoredNode
 				if (socketInitializer != null) socketInitializer.close();
 				TypedProperties props = JPPFConfiguration.getProperties();
 				if (props.getBoolean("jppf.discovery.enabled", true) && props.getBoolean("jppf.peer.discovery.enabled", true))
-					driver.getPeerDiscoveryThread().removePeer(peerName);
+					driver.getInitializer().getPeerDiscoveryThread().removePeer(peerName);
 				if (debugEnabled) log.debug(getName() + " : " + e.getMessage(), e);
 			}
 			if (!stopped)
@@ -152,7 +152,7 @@ class PeerNode extends AbstractMonitoredNode
 						TypedProperties props = JPPFConfiguration.getProperties();
 						bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
 						bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
-						bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, driver.getJmxServer().getId());
+						bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, driver.getInitializer().getJmxServer().getId());
 					}
 					catch(Exception e)
 					{

@@ -33,6 +33,10 @@ import org.jppf.utils.ReflectionUtils;
 class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The runnable object to execute.
 	 */
 	private Object taskObject = null;

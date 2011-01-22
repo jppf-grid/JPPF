@@ -32,6 +32,10 @@ import org.jppf.utils.ReflectionUtils;
 public class PojoTaskWrapper extends AbstractTaskObjectWrapper
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The runnable object to execute.
 	 */
 	private Object taskObject = null;

@@ -27,6 +27,11 @@ import java.io.*;
 public class FileLocation extends AbstractLocation<File>
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Initialize this location with the specified file path.
 	 * @param file an abstract file path.
 	 */

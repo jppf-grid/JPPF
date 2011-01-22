@@ -27,6 +27,10 @@ import javax.management.*;
 public class TaskExecutionNotification extends Notification
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Information about the task that triggered this notification.
 	 */
 	private TaskInformation taskInformation = null;

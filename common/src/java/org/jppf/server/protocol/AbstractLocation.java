@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.*;
 
 import org.jppf.io.IOHelper;
-import org.jppf.utils.JPPFByteArrayOutputStream;
+import org.jppf.utils.streams.JPPFByteArrayOutputStream;
 
 /**
  * Instances of this class represent the location of an artifact, generally a file or the data found at a url.

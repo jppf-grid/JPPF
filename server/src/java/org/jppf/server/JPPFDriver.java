@@ -17,26 +17,20 @@
  */
 package org.jppf.server;
 
-import java.util.*;
+import java.util.Timer;
 
 import org.jppf.JPPFException;
 import org.jppf.classloader.LocalClassLoaderChannel;
-import org.jppf.comm.discovery.*;
-import org.jppf.comm.recovery.RecoveryServer;
+import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.logging.jmx.JmxMessageNotifier;
-import org.jppf.management.*;
 import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.job.JPPFJobManager;
-import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.local.JPPFLocalNode;
-import org.jppf.server.peer.*;
 import org.jppf.server.queue.*;
-import org.jppf.server.scheduler.bundle.Bundler;
-import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.startup.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -88,18 +82,6 @@ public class JPPFDriver
 	 */
 	private JPPFSecurityContext credentials = null;
 	/**
-	 * The jmx server used to manage and monitor this driver.
-	 */
-	private JMXServerImpl jmxServer = null;
-	/**
-	 * A list of objects containing the information required to connect to the nodes JMX servers.
-	 */
-	private Map<ChannelWrapper<?>, JPPFManagementInfo> nodeInfo = new HashMap<ChannelWrapper<?>, JPPFManagementInfo>();
-	/**
-	 * The thread that performs the peer servers discovery.
-	 */
-	private PeerDiscoveryThread peerDiscoveryThread = null;
-	/**
 	 * This listener gathers the statistics published through the management interface.
 	 */
 	private JPPFDriverStatsUpdater statsUpdater = new JPPFDriverStatsUpdater();
@@ -116,13 +98,13 @@ public class JPPFDriver
 	 */
 	private String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString().toUpperCase();
 	/**
-	 * The thread that broadcasts the server connection information using UDP multicast.
+	 * Performs initialization of the driver's components.
 	 */
-	private JPPFBroadcaster broadcaster = null;
+	private DriverInitializer initializer = null;
 	/**
-	 * The server used to detect that individual connections are broken due to hardware failures.
+	 * Manages information about the nodes.
 	 */
-	private RecoveryServer recoveryServer = null;
+	private NodeInformationHandler nodeHandler = null;
 
 	/**
 	 * Initialize this JPPFDriver.
@@ -131,8 +113,10 @@ public class JPPFDriver
 	{
 		// initialize the jmx logger
 		new JmxMessageNotifier();
+		nodeHandler = new NodeInformationHandler();
 		statsManager.addListener(statsUpdater);
-		credentials = new DriverInitializer(this).initCredentials();
+		initializer = new DriverInitializer(this);
+		credentials = initializer.initCredentials();
 		if (debugEnabled) log.debug("instantiating JPPF driver with uuid=" + uuid);
 	}
 
@@ -142,22 +126,17 @@ public class JPPFDriver
 	 */
 	public void run() throws Exception
 	{
-		DriverInitializer init = new DriverInitializer(this);
 		jobManager = new JPPFJobManager();
 		taskQueue = new JPPFPriorityQueue();
 		((JPPFPriorityQueue) taskQueue).addQueueListener(jobManager);
-		JPPFConnectionInformation info = init.createConnectionInformation();
+		JPPFConnectionInformation info = initializer.getConnectionInformation();
 		TypedProperties config = JPPFConfiguration.getProperties();
 
-		if (config.getBoolean("jppf.recovery.enabled", true))
-		{
-			recoveryServer = new RecoveryServer();
-			new Thread(recoveryServer, "RecoveryServer thread").start();
-		}
+		initializer.initRecoveryServer();
 
 		classServer = new ClassNioServer(info.classServerPorts);
 		classServer.start();
-		init.printInitializedMessage(info.classServerPorts, "Class Server");
+		initializer.printInitializedMessage(info.classServerPorts, "Class Server");
 
 		applicationServers = new JPPFApplicationServer[info.applicationServerPorts.length];
 		for (int i=0; i<info.applicationServerPorts.length; i++)
@@ -165,11 +144,11 @@ public class JPPFDriver
 			applicationServers[i] = new JPPFApplicationServer(info.applicationServerPorts[i]);
 			applicationServers[i].start();
 		}
-		init.printInitializedMessage(info.applicationServerPorts, "Client Server");
+		initializer.printInitializedMessage(info.applicationServerPorts, "Client Server");
 
 		nodeNioServer = new NodeNioServer(info.nodeServerPorts);
 		nodeNioServer.start();
-		init.printInitializedMessage(info.nodeServerPorts, "Tasks Server");
+		initializer.printInitializedMessage(info.nodeServerPorts, "Tasks Server");
 
 		if (config.getBoolean("jppf.local.node.enabled", false))
 		{
@@ -181,66 +160,20 @@ public class JPPFDriver
 			new Thread(node, "Local node").start();
 		}
 		
-		try
-		{
-			if (config.getBoolean("jppf.management.enabled", true))
-			{
-				jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX, uuid);
-				jmxServer.start(getClass().getClassLoader());
-				info.managementPort = JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198);
-				init.registerProviderMBeans();
-				System.out.println("JPPF Driver management initialized");
-			}
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-			config.setProperty("jppf.management.enabled", "false");
-			String s = e.getMessage();
-			s = (s == null) ? "<none>" : s.replace("\t", "  ").replace("\n", " - ");
-			System.out.println("JPPF Driver management failed to initialize, with error message: '" + s + "'");
-			System.out.println("Management features are disabled. Please consult the driver's log file for more information");
-		}
+		initializer.initJmxServer();
 		new JPPFStartupLoader().load(JPPFDriverStartupSPI.class);
 
-		if (config.getBoolean("jppf.discovery.enabled", true))
-		{
-			broadcaster = new JPPFBroadcaster(info);
-			new Thread(broadcaster, "JPPF Broadcaster").start();
-		}
-		initPeers();
+		initializer.initBroadcaster();
+		initializer.initPeers();
 		System.out.println("JPPF Driver initialization complete");
 	}
 
-	/**
-	 * Initialize this driver's peers.
-	 */
-	private void initPeers()
-	{
-		TypedProperties props = JPPFConfiguration.getProperties();
-		if (props.getBoolean("jppf.peer.discovery.enabled", false))
-		{
-			if (debugEnabled) log.debug("starting peers discovery");
-			peerDiscoveryThread = new PeerDiscoveryThread();
-			new Thread(peerDiscoveryThread).start();
-		}
-		else
-		{
-			String peerNames = props.getString("jppf.peers");
-			if ((peerNames == null) || "".equals(peerNames.trim())) return;
-			if (debugEnabled) log.debug("found peers in the configuration");
-			String[] names = peerNames.split("\\s");
-			for (String peerName: names) new JPPFPeerInitializer(peerName).start();
-		}
-	}
-	
 	/**
 	 * Get the singleton instance of the JPPFDriver.
 	 * @return a <code>JPPFDriver</code> instance.
 	 */
 	public static JPPFDriver getInstance()
 	{
-		//if (instance == null) instance = new JPPFDriver();
 		return instance;
 	}
 
@@ -269,24 +202,6 @@ public class JPPFDriver
 	public NodeNioServer getNodeNioServer()
 	{
 		return nodeNioServer;
-	}
-
-	/**
-	 * Get the jmx server used to manage and monitor this driver.
-	 * @return a <code>JMXServerImpl</code> instance.
-	 */
-	public synchronized JMXServerImpl getJmxServer()
-	{
-		return jmxServer;
-	}
-
-	/**
-	 * Get the thread that performs the peer servers discovery.
-	 * @return a <code>PeerDiscoveryThread</code> instance.
-	 */
-	public PeerDiscoveryThread getPeerDiscoveryThread()
-	{
-		return peerDiscoveryThread;
 	}
 
 	/**
@@ -343,16 +258,8 @@ public class JPPFDriver
 	public void shutdown()
 	{
 		log.info("Shutting down");
-		if (broadcaster != null)
-		{
-			broadcaster.setStopped(true);
-			broadcaster = null;
-		}
-		if (peerDiscoveryThread != null)
-		{
-			peerDiscoveryThread.setStopped(true);
-			peerDiscoveryThread = null;
-		}
+		initializer.stopBroadcaster();
+		initializer.stopPeerDiscoveryThread();
 		classServer.end();
 		classServer = null;
 		if (nodeNioServer != null)
@@ -366,65 +273,9 @@ public class JPPFDriver
 			applicationServers[i] = null;
 		}
 		applicationServers = null;
-		try
-		{
-			if (getJmxServer() != null) getJmxServer().stop();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
+		initializer.stopJmxServer();
 		jobManager.close();
-	}
-
-	/**
-	 * Add a node information object to the map of node information.
-	 * @param channel a <code>SocketChannel</code> instance.
-	 * @param info a <code>JPPFNodeManagementInformation</code> instance.
-	 */
-	public void addNodeInformation(ChannelWrapper<?> channel, JPPFManagementInfo info)
-	{
-		synchronized (nodeInfo)
-		{
-			nodeInfo.put(channel, info);
-		}
-	}
-
-	/**
-	 * Remove a node information object from the map of node information.
-	 * @param channel a <code>SocketChannel</code> instance.
-	 */
-	public void removeNodeInformation(ChannelWrapper channel)
-	{
-		synchronized (nodeInfo)
-		{
-			nodeInfo.remove(channel);
-		}
-	}
-
-	/**
-	 * Remove a node information object from the map of node information.
-	 * @return channel a <code>SocketChannel</code> instance.
-	 */
-	public Map<ChannelWrapper<?>, JPPFManagementInfo> getNodeInformationMap()
-	{
-		synchronized (nodeInfo)
-		{
-			return Collections.unmodifiableMap(nodeInfo);
-		}
-	}
-
-	/**
-	 * Get the system information for the specified node.
-	 * @param channel the node for which ot get the information.
-	 * @return a <code>NodeManagementInfo</code> instance, or null if no informaiton is recorded for the node.
-	 */
-	public JPPFManagementInfo getNodeInformation(ChannelWrapper channel)
-	{
-		synchronized (nodeInfo)
-		{
-			return nodeInfo.get(channel);
-		}
+		initializer.stopRecoveryServer();
 	}
 
 	/**
@@ -455,21 +306,21 @@ public class JPPFDriver
 	}
 
 	/**
-	 * Get the bundle factory used by the node server.
-	 * @return a <code>JPPFBundlerFactory</code> instance.
+	 * Get this driver's initializer.
+	 * @return a <code>DriverInitializer</code> instance.
 	 */
-	public JPPFBundlerFactory getBundlerFactory()
+	public DriverInitializer getInitializer()
 	{
-		return nodeNioServer.getBundlerFactory();
+		return initializer;
 	}
 
 	/**
-	 * Set the bundler used by the node server.
-	 * @param bundler a <code>Bundler</code> instance.
+	 * Get the object that manages information about the nodes.
+	 * @return a {@link NodeInformationHandler} instance.
 	 */
-	public void setBundler(Bundler bundler)
+	public NodeInformationHandler getNodeHandler()
 	{
-		nodeNioServer.setBundler(bundler);
+		return nodeHandler;
 	}
 
 	/**
@@ -502,14 +353,5 @@ public class JPPFDriver
 			log.error(e.getMessage(), e);
 			System.exit(1);
 		}
-	}
-
-	/**
-	 * The server used to detect that individual connections are broken due to hardware failures.
-	 * @return a {@link RecoveryServer} instance.
-	 */
-	public RecoveryServer getRecoveryServer()
-	{
-		return recoveryServer;
 	}
 }

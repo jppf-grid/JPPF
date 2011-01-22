@@ -28,6 +28,11 @@ import java.net.*;
 public class URLLocation extends AbstractLocation<URL>
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Initialize this location with the specified file path.
 	 * @param url a URL.
 	 */

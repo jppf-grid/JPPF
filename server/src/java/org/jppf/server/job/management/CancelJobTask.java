@@ -73,7 +73,7 @@ class CancelJobTask implements Runnable
 		{
 			AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
 			context.setJobCanceled(true);
-			JPPFManagementInfo nodeInfo = JPPFDriver.getInstance().getNodeInformation(channel);
+			JPPFManagementInfo nodeInfo = JPPFDriver.getInstance().getNodeHandler().getNodeInformation(channel);
 			if (debugEnabled) log.debug("Request to cancel jobUuid = '" + jobUuid + "' on node " + channel + ", requeue = " + requeue);
 			if (nodeInfo == null) return;
 			JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(nodeInfo.getHost(), nodeInfo.getPort());

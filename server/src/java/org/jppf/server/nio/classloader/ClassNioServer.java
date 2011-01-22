@@ -68,6 +68,10 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * Mapping of channels to their uuid.
 	 */
 	private Map<String, ChannelWrapper<?>> nodeConnections = new HashMap<String, ChannelWrapper<?>>();
+	/**
+	 * Reference to the driver.
+	 */
+	private static JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
 	 * Initialize this class server with the port it will listen to.
@@ -87,7 +91,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	public ClassNioServer(final int[] ports) throws JPPFException
 	{
 		super(ports, "ClassServer", false);
-		RecoveryServer recoveryServer = JPPFDriver.getInstance().getRecoveryServer();
+		RecoveryServer recoveryServer = driver.getInitializer().getRecoveryServer();
 		if (recoveryServer != null) recoveryServer.getReaper().addReaperListener(this);
 		//selectTimeout = 1L;
 	}
@@ -125,7 +129,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	protected boolean externalStopCondition()
 	{
-		return JPPFDriver.getInstance().isShuttingDown();
+		return driver.isShuttingDown();
 	}
 
 	/**
@@ -159,7 +163,10 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	public synchronized void removeAllConnections()
 	{
 		if (!isStopped()) return;
-		providerConnections.clear();
+		synchronized(providerConnections)
+		{
+			providerConnections.clear();
+		}
 		super.removeAllConnections();
 	}
 
@@ -179,13 +186,16 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	public void addProviderConnection(String uuid, ChannelWrapper<?> channel)
 	{
-		List<ChannelWrapper<?>> list = providerConnections.get(uuid);
-		if (list == null)
+		synchronized(providerConnections)
 		{
-			list = new ArrayList<ChannelWrapper<?>>();
-			providerConnections.put(uuid, list);
+			List<ChannelWrapper<?>> list = providerConnections.get(uuid);
+			if (list == null)
+			{
+				list = new ArrayList<ChannelWrapper<?>>();
+				providerConnections.put(uuid, list);
+			}
+			list.add(channel);
 		}
-		list.add(channel);
 	}
 
 	/**
@@ -195,9 +205,12 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	public void removeProviderConnection(String uuid, ChannelWrapper channel)
 	{
-		List<ChannelWrapper<?>> list = providerConnections.get(uuid);
-		if (list == null) return;
-		list.remove(channel);
+		synchronized(providerConnections)
+		{
+			List<ChannelWrapper<?>> list = providerConnections.get(uuid);
+			if (list == null) return;
+			list.remove(channel);
+		}
 	}
 
 	/**

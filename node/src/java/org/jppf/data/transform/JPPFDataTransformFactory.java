@@ -21,6 +21,7 @@ package org.jppf.data.transform;
 import java.io.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.streams.MultipleBuffersOutputStream;
 import org.slf4j.*;
 
 /**
