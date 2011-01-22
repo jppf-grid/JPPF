@@ -20,7 +20,7 @@ package org.jppf.fileserver.ftp;
 
 import java.io.*;
 
-import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.*;
 import org.jppf.fileserver.*;
 
 /**
@@ -102,5 +102,18 @@ public class FtpFileClient extends ConfigurableAdapter implements FileClient
 	public FTPClient getFtpClient()
 	{
 		return ftpClient;
+	}
+
+	/**
+	 * Get information on a remote file. 
+	 * @param remotePath the file path on the remote server, with regards to the FTP user root directory.
+	 * @return a FTPFile instance, or null if the fille could not be found.
+	 * @throws Exception if any error occurs.
+	 */
+	private FTPFile getRemoteFileInfo(String remotePath) throws Exception
+	{
+		FTPFile[] files = ftpClient.listFiles(remotePath);
+		if ((files == null) || (files.length == 0)) return null;
+		return files[0];
 	}
 }
