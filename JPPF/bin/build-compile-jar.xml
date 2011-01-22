@@ -32,6 +32,7 @@
   </target>
 
 	<target name="compile.module">
+		<echo message="compiling ${path}"/>
  		<mkdir dir="${path}/classes"/>
 		<javac srcdir="" destdir="${path}/classes"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
