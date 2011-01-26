@@ -18,7 +18,7 @@
 
 package org.jppf.ui.monitoring.job;
 
-import javax.management.*;
+import javax.management.NotificationListener;
 
 import org.jppf.client.*;
 import org.jppf.job.JobInformation;
@@ -167,7 +167,7 @@ public class JobData
 		{
 			try
 			{
-				proxy = jmxWrapper.getProxy(JPPFAdminMBean.DRIVER_JOB_MANAGEMENT_MBEAN_NAME, DriverJobManagementMBean.class);
+				proxy = jmxWrapper.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
 			}
 			catch(Exception e)
 			{

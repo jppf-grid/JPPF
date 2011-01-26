@@ -46,11 +46,11 @@ public class MatrixRunner implements NotificationListener
 	/**
 	 * JPPF client used to submit execution requests.
 	 */
-	private static JPPFClient jppfClient = null;
+	private JPPFClient jppfClient = null;
 	/**
 	 * Keeps track of the current iteration number.
 	 */
-	private static int iterationsCount = 0;
+	private int iterationsCount = 0;
 	/**
 	 * Proxies to the MBean server of each node.
 	 */
@@ -79,39 +79,38 @@ public class MatrixRunner implements NotificationListener
 			System.out.println("press any key when ready to start");
 			int c = System.in.read();
 			*/
+			String clientUuid = ((args != null) && (args.length > 0)) ? args[0] : null;
 			TypedProperties props = JPPFConfiguration.getProperties();
-			if ((args != null) && (args.length > 0)) jppfClient = new JPPFClient(args[0]);
-			else jppfClient = new JPPFClient();
 			int size = props.getInt("matrix.size", 300);
 			int iterations = props.getInt("matrix.iterations", 10);
 			int nbRows = props.getInt("task.nbRows", 1);
 			output("Running Matrix demo with matrix size = "+size+"*"+size+" for "+iterations+" iterations");
 			runner = new MatrixRunner();
 			//runner.registerToMBeans();
-			runner.perform(size, iterations, nbRows);
+			runner.perform(size, iterations, nbRows, clientUuid);
+			//runner.perform2(size, iterations, nbRows, clientUuid);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-		finally
-		{
-			//if (runner != null) runner.close();
-			if (jppfClient != null) jppfClient.close();
-		}
 	}
 	
 	/**
 	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
-	 * @param size - the size of the matrices.
-	 * @param iterations - the number of times the multiplication will be performed.
-	 * @param nbRows - number of rows of matrix a per task.
+	 * @param size the size of the matrices.
+	 * @param iterations the number of times the multiplication will be performed.
+	 * @param nbRows number of rows of matrix a per task.
+	 * @param clientUuid an optional uuid to set on the JPPF client.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	public void perform(int size, int iterations, int nbRows) throws Exception
+	public void perform(int size, int iterations, int nbRows, String clientUuid) throws Exception
 	{
 		try
 		{
+			if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
+			else jppfClient = new JPPFClient();
+
 			// initialize the 2 matrices to multiply
 			Matrix a = new Matrix(size);
 			a.assignRandomValues();
@@ -142,9 +141,9 @@ public class MatrixRunner implements NotificationListener
 				output("End statistics :\n" + stats.toString());
 			}
 		}
-		catch(Exception e)
+		finally
 		{
-			throw e;
+			if (jppfClient != null) jppfClient.close();
 		}
 	}
 
@@ -203,6 +202,50 @@ public class MatrixRunner implements NotificationListener
 		//return elapsed;
 		long elapsed = System.nanoTime() - start;
 		return elapsed/1000000L;
+	}
+
+	/**
+	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
+	 * Here we create and close a JPPF client for each iteration.
+	 * @param size the size of the matrices.
+	 * @param iterations the number of times the multiplication will be performed.
+	 * @param nbRows number of rows of matrix a per task.
+	 * @param clientUuid an optional uuid to set on the JPPF client.
+	 * @throws Exception if an error is raised during the execution.
+	 */
+	public void perform2(int size, int iterations, int nbRows, String clientUuid) throws Exception
+	{
+		try
+		{
+			// initialize the 2 matrices to multiply
+			Matrix a = new Matrix(size);
+			a.assignRandomValues();
+			Matrix b = new Matrix(size);
+			b.assignRandomValues();
+			long totalIterationTime = 0L;
+	
+			// perform "iteration" times
+			for (int iter=0; iter<iterations; iter++)
+			{
+				try
+				{
+					if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
+					else jppfClient = new JPPFClient();
+					long elapsed = performParallelMultiplication(a, b, nbRows, null);
+					totalIterationTime += elapsed;
+					output("Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
+				}
+				finally
+				{
+					jppfClient.close();
+				}
+			}
+			output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations));
+		}
+		catch(Exception e)
+		{
+			throw e;
+		}
 	}
 
 	/**

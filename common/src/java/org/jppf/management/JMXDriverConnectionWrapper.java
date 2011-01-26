@@ -22,7 +22,7 @@ import java.util.*;
 
 import org.jppf.job.JobInformation;
 import org.jppf.server.JPPFStats;
-import org.jppf.server.job.management.NodeJobInformation;
+import org.jppf.server.job.management.*;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 
 /**
@@ -127,7 +127,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 */
 	public void cancelJob(String jobId) throws Exception
 	{
-		invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "cancelJob", new Object[] { jobId }, new String[] { "java.lang.String" });
+		invoke(DriverJobManagementMBean.MBEAN_NAME, "cancelJob", new Object[] { jobId }, new String[] { "java.lang.String" });
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 */
 	public void suspendJob(String jobId, Boolean requeue) throws Exception
 	{
-		invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "suspendJob", new Object[] { jobId, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
+		invoke(DriverJobManagementMBean.MBEAN_NAME, "suspendJob", new Object[] { jobId, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 */
 	public void resumeJob(String jobId) throws Exception
 	{
-		invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "resumeJob", new Object[] { jobId }, new String[] { "java.lang.String" });
+		invoke(DriverJobManagementMBean.MBEAN_NAME, "resumeJob", new Object[] { jobId }, new String[] { "java.lang.String" });
 	}
 
 	/**
@@ -163,7 +163,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 */
 	public void updateMaxNodes(String jobId, Integer maxNodes) throws Exception
 	{
-		invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "updateMaxNodes", new Object[] { jobId, maxNodes }, new String[] { "java.lang.String", "java.lang.Integer" }); 
+		invoke(DriverJobManagementMBean.MBEAN_NAME, "updateMaxNodes", new Object[] { jobId, maxNodes }, new String[] { "java.lang.String", "java.lang.Integer" }); 
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 */
 	public String[] getAllJobIds() throws Exception
 	{
-		return (String[]) invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "getAllJobIds", (Object[]) null, (String[]) null);
+		return (String[]) invoke(DriverJobManagementMBean.MBEAN_NAME, "getAllJobIds", (Object[]) null, (String[]) null);
 	}
 
 	/**
@@ -186,7 +186,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 */
 	public JobInformation getJobInformation(String jobId) throws Exception
 	{
-		return (JobInformation) invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "getJobInformation", new Object[] { jobId }, new String[] { "java.lang.String" });
+		return (JobInformation) invoke(DriverJobManagementMBean.MBEAN_NAME, "getJobInformation", new Object[] { jobId }, new String[] { "java.lang.String" });
 	}
 
 	/**
@@ -198,6 +198,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 */
 	public NodeJobInformation[] getNodeInformation(String jobId) throws Exception
 	{
-		return (NodeJobInformation[]) invoke(DRIVER_JOB_MANAGEMENT_MBEAN_NAME, "getNodeInformation", new Object[] { jobId }, new String[] { "java.lang.String" });
+		return (NodeJobInformation[]) invoke(DriverJobManagementMBean.MBEAN_NAME, "getNodeInformation", new Object[] { jobId }, new String[] { "java.lang.String" });
 	}
 }

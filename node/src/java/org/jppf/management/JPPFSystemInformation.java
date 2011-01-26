@@ -182,6 +182,7 @@ public class JPPFSystemInformation implements Serializable
 		jppf = JPPFConfiguration.getProperties();
 		network = SystemUtils.getNetwork();
 		storage = SystemUtils.getStorageInformation();
+		if (uuidProps == null) uuidProps = new TypedProperties();
 		propertiesArray = new TypedProperties[] { uuidProps, jppf, system, env, network, runtime, storage };
 	}
 

@@ -59,6 +59,10 @@ public class JPPFJobSLA implements Serializable
 	 * The job expiration schedule configuration.
 	 */
 	private JPPFSchedule jobExpirationSchedule = null;
+	/**
+	 * Specifies whether the job is a broadcast job.
+	 */
+	private boolean broadcastJob = false;
 
 	/**
 	 * Default constructor.
@@ -207,5 +211,40 @@ public class JPPFJobSLA implements Serializable
 	public void setJobExpirationSchedule(JPPFSchedule jobExpirationSchedule)
 	{
 		this.jobExpirationSchedule = jobExpirationSchedule;
+	}
+
+	/**
+	 * Determine whether the job is a broadcast job.
+	 * @return true for a broadcast job, false otherwise.
+	 */
+	public boolean isBroadcastJob()
+	{
+		return broadcastJob;
+	}
+
+	/**
+	 * Specify whether the job is a broadcast job.
+	 * @param broadcastJob true for a broadcast job, false otherwise.
+	 */
+	public void setBroadcastJob(boolean broadcastJob)
+	{
+		this.broadcastJob = broadcastJob;
+	}
+
+	/**
+	 * Create a copy of this job SLA.
+	 * @return a {@link JPPFJobSLA} instance.
+	 */
+	public JPPFJobSLA copy()
+	{
+		JPPFJobSLA sla = new JPPFJobSLA();
+		sla.setBroadcastJob(broadcastJob);
+		sla.setExecutionPolicy(executionPolicy);
+		sla.setJobExpirationSchedule(jobExpirationSchedule);
+		sla.setJobSchedule(jobSchedule);
+		sla.setMaxNodes(maxNodes);
+		sla.setPriority(priority);
+		sla.setSuspended(suspended);
+		return sla;
 	}
 }

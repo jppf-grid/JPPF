@@ -33,6 +33,10 @@ public class NodeInformationHandler
 	 * A list of objects containing the information required to connect to the nodes JMX servers.
 	 */
 	private Map<ChannelWrapper<?>, JPPFManagementInfo> nodeInfo = new HashMap<ChannelWrapper<?>, JPPFManagementInfo>();
+	/**
+	 * A list of objects containing the information required to connect to the nodes JMX servers.
+	 */
+	private Map<String, JPPFManagementInfo> uuidMap = new HashMap<String, JPPFManagementInfo>();
 
 	/**
 	 * Add a node information object to the map of node information.
@@ -45,23 +49,32 @@ public class NodeInformationHandler
 		{
 			nodeInfo.put(channel, info);
 		}
+		synchronized (uuidMap)
+		{
+			uuidMap.put(info.getId(), info);
+		}
 	}
 
 	/**
 	 * Remove a node information object from the map of node information.
 	 * @param channel a <code>SocketChannel</code> instance.
 	 */
-	public void removeNodeInformation(ChannelWrapper channel)
+	public void removeNodeInformation(ChannelWrapper<?> channel)
 	{
+		JPPFManagementInfo info = null;
 		synchronized (nodeInfo)
 		{
-			nodeInfo.remove(channel);
+			info = nodeInfo.remove(channel);
+		}
+		synchronized (uuidMap)
+		{
+			uuidMap.remove(info.getId());
 		}
 	}
 
 	/**
-	 * Remove a node information object from the map of node information.
-	 * @return channel a <code>SocketChannel</code> instance.
+	 * Get the mapping of channels to corresponding node information.
+	 * @return channel a map of <code>ChannelWrapper</code> keys to <code>JPPFManagementInfo</code> values.
 	 */
 	public Map<ChannelWrapper<?>, JPPFManagementInfo> getNodeInformationMap()
 	{
@@ -72,15 +85,53 @@ public class NodeInformationHandler
 	}
 
 	/**
-	 * Get the system information for the specified node.
-	 * @param channel the node for which ot get the information.
-	 * @return a <code>NodeManagementInfo</code> instance, or null if no informaiton is recorded for the node.
+	 * Get the mapping of node uuid to corresponding node information.
+	 * @return channel a map of <code>String</code> keys to <code>JPPFManagementInfo</code> values.
 	 */
-	public JPPFManagementInfo getNodeInformation(ChannelWrapper channel)
+	public Map<String, JPPFManagementInfo> getUuidMap()
+	{
+		synchronized (uuidMap)
+		{
+			return Collections.unmodifiableMap(uuidMap);
+		}
+	}
+
+	/**
+	 * Get the system information for the specified node.
+	 * @param channel the node for which to get the information.
+	 * @return a <code>JPPFManagementInfo</code> instance, or null if no information is recorded for the node.
+	 */
+	public JPPFManagementInfo getNodeInformation(ChannelWrapper<?> channel)
 	{
 		synchronized (nodeInfo)
 		{
 			return nodeInfo.get(channel);
+		}
+	}
+
+	/**
+	 * Get the system information for the specified node uuid.
+	 * @param uuid the uuid of the node for which to get the information.
+	 * @return a <code>JPPFManagementInfo</code> instance, or null if no information is recorded for the node.
+	 */
+	public JPPFManagementInfo getNodeInformation(String uuid)
+	{
+		synchronized (uuidMap)
+		{
+			return uuidMap.get(uuid);
+		}
+	}
+
+
+	/**
+	 * The uuids of all the currently connected nodes.
+	 * @return a set of uuids for all the nodes connected to the driver.
+	 */
+	public Set<String> getNodeUuids()
+	{
+		synchronized (uuidMap)
+		{
+			return Collections.unmodifiableSet(uuidMap.keySet());
 		}
 	}
 }

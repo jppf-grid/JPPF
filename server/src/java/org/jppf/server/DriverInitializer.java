@@ -26,7 +26,6 @@ import org.jppf.comm.discovery.*;
 import org.jppf.comm.recovery.RecoveryServer;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
-import org.jppf.security.*;
 import org.jppf.server.peer.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -139,21 +138,6 @@ public class DriverInitializer
 		if (ports.length > 1) sb.append("s");
 		for (int n: ports) sb.append(" ").append(n);
 		System.out.println(sb.toString());
-	}
-
-	/**
-	 * Initialize the security credentials associated with this JPPF driver.
-	 * @return a {@link JPPFSecurityContext} instance.
-	 */
-	JPPFSecurityContext initCredentials()
-	{
-		StringBuilder sb = new StringBuilder("Driver:");
-		sb.append(VersionUtils.getLocalIpAddress()).append(":");
-		TypedProperties props = JPPFConfiguration.getProperties();
-		sb.append(props.getInt("class.server.port", 11111)).append(":");
-		sb.append(props.getInt("app.server.port", 11112)).append(":");
-		sb.append(props.getInt("node.server.port", 11113));
-		return new JPPFSecurityContext(driver.getUuid(), sb.toString(), new JPPFCredentials());
 	}
 
 	/**

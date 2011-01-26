@@ -338,6 +338,6 @@ public class LongTaskRunner
 	{
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
 		JMXDriverConnectionWrapper wrapper = c.getJmxConnection();
-		return wrapper.getProxy(JPPFAdminMBean.DRIVER_JOB_MANAGEMENT_MBEAN_NAME, DriverJobManagementMBean.class);
+		return wrapper.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
 	}
 }

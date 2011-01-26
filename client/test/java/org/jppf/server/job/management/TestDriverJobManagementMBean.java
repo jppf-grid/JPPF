@@ -108,6 +108,6 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
 	protected DriverJobManagementMBean getProxy() throws Exception
 	{
 		JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) client.getClientConnection()).getJmxConnection();
-		return wrapper.getProxy(JPPFAdminMBean.DRIVER_JOB_MANAGEMENT_MBEAN_NAME, DriverJobManagementMBean.class);
+		return wrapper.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
 	}
 }

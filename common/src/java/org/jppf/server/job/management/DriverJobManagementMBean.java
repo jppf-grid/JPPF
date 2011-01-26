@@ -30,6 +30,10 @@ import org.jppf.job.JobInformation;
 public interface DriverJobManagementMBean extends NotificationEmitter
 {
 	/**
+	 * The name under which this MBean is registered with the MBean server.
+	 */
+	String MBEAN_NAME = "org.jppf:name=jobManagement,type=driver";
+	/**
 	 * Cancel the job with the specified id.
 	 * @param jobId the id of the job to cancel.
 	 * @throws Exception if any error occurs.

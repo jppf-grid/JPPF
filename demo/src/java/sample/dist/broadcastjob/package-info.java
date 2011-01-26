@@ -16,30 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.management;
-
-import java.io.Serializable;
-
 /**
- * Management interface for the administration of a JPPF component, driver or node.
- * @author Laurent Cohen
+ * Test of the broadcast jobs feature.
  */
-public interface JPPFAdminMBean extends Serializable
-{
-	/**
-	 * RMI registry namespace suffix for drivers. 
-	 */
-	String DRIVER_SUFFIX = "/jppf/driver";
-	/**
-	 * RMI registry namespace suffix for nodes. 
-	 */
-	String NODE_SUFFIX = "/jppf/node";
-	/**
-	 * Name of the node's admin MBean.
-	 */
-	String NODE_MBEAN_NAME = "org.jppf:name=admin,type=node";
-	/**
-	 * Name of the driver's admin MBean.
-	 */
-	String DRIVER_MBEAN_NAME = "org.jppf:name=admin,type=driver";
-}
+package sample.dist.broadcastjob;

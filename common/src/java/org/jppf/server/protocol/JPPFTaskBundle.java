@@ -311,20 +311,17 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	}
 
 	/**
-	 * Make a copy of this bundle containing only the first nbTasks tasks it contains.
-	 * @param nbTasks the number of tasks to include in the copy.
+	 * Make a copy of this bundle.
 	 * @return a new <code>JPPFTaskBundle</code> instance.
 	 */
-	public JPPFTaskBundle copy(int nbTasks)
+	public JPPFTaskBundle copy()
 	{
 		JPPFTaskBundle bundle = new JPPFTaskBundle();
 		bundle.setBundleUuid(uuid);
 		bundle.setUuidPath(uuidPath);
 		bundle.setRequestUuid(requestUuid);
-		bundle.setTaskCount(nbTasks);
+		bundle.setTaskCount(taskCount);
 		bundle.setDataProvider(dataProvider);
-		taskCount -= nbTasks;
-		//bundle.getParametersMap().putAll(parameters);
 		synchronized(bundle.getParametersMap())
 		{
 			for (Map.Entry<Object, Object> entry: parameters.entrySet()) bundle.setParameter(entry.getKey(), entry.getValue());
@@ -332,7 +329,21 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 		bundle.setQueueEntryTime(queueEntryTime);
 		bundle.setCompletionListener(completionListener);
 		bundle.setJobSLA(jobSLA);
+		//bundle.setParameter(BundleParameter.JOB_METADATA, getJobMetadata());
 
+		return bundle;
+	}
+
+	/**
+	 * Make a copy of this bundle containing only the first nbTasks tasks it contains.
+	 * @param nbTasks the number of tasks to include in the copy.
+	 * @return a new <code>JPPFTaskBundle</code> instance.
+	 */
+	public JPPFTaskBundle copy(int nbTasks)
+	{
+		JPPFTaskBundle bundle = copy();
+		bundle.setTaskCount(nbTasks);
+		taskCount -= nbTasks;
 		return bundle;
 	}
 

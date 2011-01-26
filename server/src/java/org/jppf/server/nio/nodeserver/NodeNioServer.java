@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.comm.recovery.*;
 import org.jppf.io.MultipleBuffersLocation;
-import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.*;
@@ -289,7 +288,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 		{
 			try
 			{
-				JPPFSecurityContext cred = driver.getCredentials();
 				SerializationHelper helper = new SerializationHelperImpl();
 				// serializing a null data provider.
 				JPPFBuffer buf = helper.getSerializer().serialize(null);

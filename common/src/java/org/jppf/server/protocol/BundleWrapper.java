@@ -40,7 +40,8 @@ public class BundleWrapper
 	/**
 	 * The list of locations of the tasks.
 	 */
-	private List<DataLocation> tasks = new ArrayList<DataLocation>();
+	//private List<DataLocation> tasks = new ArrayList<DataLocation>();
+	private List<DataLocation> tasks = new LinkedList<DataLocation>();
 
 	/**
 	 * Default constructor.
@@ -122,6 +123,22 @@ public class BundleWrapper
 	}
 
 	/**
+	 * Make a copy of this bundle wrapper.
+	 * @return a new <code>BundleWrapper</code> instance.
+	 */
+	public BundleWrapper copy()
+	{
+		BundleWrapper wrapper = null;
+		synchronized(this)
+		{
+			wrapper = new BundleWrapper(bundle.copy());
+			for (DataLocation dl: tasks) wrapper.addTask(dl);
+		}
+		wrapper.setDataProvider(dataProvider.copy());
+		return wrapper;
+	}
+
+	/**
 	 * Make a copy of this bundle wrapper containing only the first nbTasks tasks it contains.
 	 * @param nbTasks the number of tasks to include in the copy.
 	 * @return a new <code>BundleWrapper</code> instance.
@@ -132,7 +149,8 @@ public class BundleWrapper
 		synchronized(this)
 		{
 			wrapper = new BundleWrapper(bundle.copy(nbTasks));
-			for (int i=0; i<nbTasks; i++) wrapper.addTask(tasks.remove(0));
+			LinkedList<DataLocation> tmp = (LinkedList<DataLocation>) tasks;
+			for (int i=0; i<nbTasks; i++) wrapper.addTask(tmp.removeFirst());
 		}
 		wrapper.setDataProvider(dataProvider.copy());
 		return wrapper;

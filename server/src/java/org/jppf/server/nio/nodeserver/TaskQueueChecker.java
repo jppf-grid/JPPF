@@ -45,6 +45,10 @@ class TaskQueueChecker implements Runnable
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether TRACE logging level is enabled.
+	 */
+	private static boolean traceEnabled = log.isDebugEnabled();
+	/**
 	 * Random number generator used to randomize the choice of idle channel.
 	 */
 	private Random random = new Random(System.currentTimeMillis());
@@ -129,6 +133,7 @@ class TaskQueueChecker implements Runnable
 	 */
 	private void dispatchJob(ChannelWrapper<?> channel, BundleWrapper selectedBundle)
 	{
+		if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getBundle().getJobUuid() + " to nodeUuid=" + ((AbstractNodeContext) channel.getContext()).nodeUuid);
 		synchronized(channel)
 		{
 			AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
@@ -162,7 +167,7 @@ class TaskQueueChecker implements Runnable
 		List<ChannelWrapper<?>> idleChannels = server.getIdleChannels();
 		int n = -1;
 		ExecutionPolicy rule = bundle.getJobSLA().getExecutionPolicy();
-		//if (debugEnabled && (rule != null)) log.debug("Bundle has an execution policy:\n" + rule);
+		if (debugEnabled && (rule != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + rule);
 		List<Integer> acceptableChannels = new ArrayList<Integer>();
 		List<Integer> channelsToRemove =  new ArrayList<Integer>();
 		List<String> uuidPath = bundle.getUuidPath().getList();
@@ -188,7 +193,9 @@ class TaskQueueChecker implements Runnable
 			{
 				JPPFManagementInfo mgtInfo = driver.getNodeHandler().getNodeInformation(ch);
 				JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
-				if (!rule.accepts(info)) continue;
+				boolean b = rule.accepts(info);
+				if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getJobUuid() + ", nodeUuid=" + mgtInfo.getId());
+				if (!b) continue;
 			}
 			acceptableChannels.add(i);
 		}

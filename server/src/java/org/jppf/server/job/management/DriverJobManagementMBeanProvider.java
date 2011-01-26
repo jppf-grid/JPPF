@@ -18,7 +18,6 @@
 
 package org.jppf.server.job.management;
 
-import org.jppf.management.*;
 import org.jppf.management.spi.JPPFDriverMBeanProvider;
 
 /**
@@ -57,6 +56,6 @@ public class DriverJobManagementMBeanProvider implements JPPFDriverMBeanProvider
 	 */
 	public String getMBeanName()
 	{
-		return JPPFAdminMBean.DRIVER_JOB_MANAGEMENT_MBEAN_NAME;
+		return DriverJobManagementMBean.MBEAN_NAME;
 	}
 }

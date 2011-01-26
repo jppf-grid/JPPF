@@ -23,14 +23,13 @@ import static org.jppf.utils.CollectionUtils.*;
 import java.text.ParseException;
 import java.util.*;
 
-import javax.management.*;
-
-import org.jppf.management.*;
+import org.jppf.management.JPPFManagementInfo;
+import org.jppf.node.policy.*;
 import org.jppf.scheduling.*;
 import org.jppf.server.*;
 import org.jppf.server.job.JPPFJobManager;
-import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.*;
+import org.jppf.utils.JPPFUuid;
 import org.slf4j.*;
 
 /**
@@ -71,10 +70,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * Handles the expiration schedule of each job that has one.
 	 */
 	private JPPFScheduleHandler jobExpirationHandler = new JPPFScheduleHandler("Job Expiration Handler");
-	/**
-	 * Proxy to the job management MBean.
-	 */
-	private DriverJobManagementMBean jobManagamentMBean = null;
 
 	/**
 	 * Initialize this queue.
@@ -83,18 +78,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	{
 		statsManager = JPPFDriver.getInstance().getStatsManager();
 		jobManager = JPPFDriver.getInstance().getJobManager();
-		try
-		{
-			JMXDriverConnectionWrapper jmxWrapper = new JMXDriverConnectionWrapper();
-			jmxWrapper.connect();
-			MBeanServerConnection mbsc = jmxWrapper.getMbeanConnection();
-			ObjectName objectName = new ObjectName(JPPFAdminMBean.DRIVER_JOB_MANAGEMENT_MBEAN_NAME);
-			jobManagamentMBean = (DriverJobManagementMBean) MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, DriverJobManagementMBean.class, true);
-		}
-		catch(Exception e)
-		{
-			log.error("Could not initialize a proxy to the job management MBean", e);
-		}
 	}
 
 	/**
@@ -106,6 +89,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
 		JPPFJobSLA sla = bundle.getJobSLA();
+		if (sla.isBroadcastJob() && (bundle.getParameter(BundleParameter.NODE_BROADCAST_UUID) == null))
+		{
+			if (debugEnabled) log.debug("before processing broadcast job with id=" + bundle.getId() + ", uuid=" + bundle.getJobUuid() + ", task count=" + bundle.getTaskCount());
+			processBroadcastJob(bundleWrapper);
+			return;
+		}
 		String jobId = bundle.getId();
 		String jobUuid = bundle.getJobUuid();
 		try
@@ -273,7 +262,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 */
 	public Iterator<BundleWrapper> iterator()
 	{
-		return new BundleIterator();
+		return new BundleIterator(priorityMap, lock);
 	}
 
 	/**
@@ -345,180 +334,38 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	}
 
 	/**
-	 * Iterator that traverses the collection of task bundles in descending order of their priority.
-	 * This iterator is read-only and does not support the <code>remove()</code> operation.
+	 * Process the specified broadcast job.
+	 * <b/>This consists in creating one job per node, each containing the same tasks,
+	 * and with an execution policy that enforces its execution ont he designated node only.
+	 * @param bundleWrapper the broadcast job to process.
 	 */
-	private class BundleIterator implements Iterator<BundleWrapper>
+	private void processBroadcastJob(BundleWrapper bundleWrapper)
 	{
-		/**
-		 * Iterator over the entries in the priority map.
-		 */
-		private Iterator<Map.Entry<JPPFPriority, List<BundleWrapper>>> entryIterator = null;
-		/**
-		 * Iterator over the task bundles in the map entry specified by <code>entryIterator</code>.
-		 */
-		private Iterator<BundleWrapper> listIterator = null;
-
-		/**
-		 * Initialize this iterator.
-		 */
-		public BundleIterator()
+		Map<String, JPPFManagementInfo> uuidMap = JPPFDriver.getInstance().getNodeHandler().getUuidMap();
+		if (uuidMap.isEmpty()) return;
+		BroadcastJobCompletionListener completionListener = new BroadcastJobCompletionListener(bundleWrapper, uuidMap.keySet());
+		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFJobSLA sla = bundle.getJobSLA();
+		ExecutionPolicy policy = sla.getExecutionPolicy();
+		List<BundleWrapper> jobList = new ArrayList<BundleWrapper>();
+		for (Map.Entry<String, JPPFManagementInfo> entry: uuidMap.entrySet())
 		{
-			lock.lock();
-			try
-			{
-				entryIterator = priorityMap.entrySet().iterator();
-				if (entryIterator.hasNext()) listIterator = entryIterator.next().getValue().iterator();
-			}
-			finally
-			{
-				lock.unlock();
-			}
+			BundleWrapper job = bundleWrapper.copy();
+			JPPFTaskBundle newBundle = job.getBundle();
+			String uuid = entry.getKey();
+			JPPFManagementInfo info = entry.getValue();
+			newBundle.setParameter(BundleParameter.NODE_BROADCAST_UUID, uuid);
+			if ((policy != null) && !policy.accepts(info.getSystemInfo())) continue;
+			ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
+			if (policy != null) broadcastPolicy = broadcastPolicy.and(policy);
+			newBundle.setJobSLA(sla.copy());
+			newBundle.getJobSLA().setExecutionPolicy(broadcastPolicy);
+			newBundle.setCompletionListener(completionListener);
+			newBundle.setParameter(BundleParameter.JOB_ID, bundle.getId() + " [node: " + info.toString() + "]");
+			newBundle.setParameter(BundleParameter.JOB_UUID, new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
+			if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getJobUuid() + " :\n" + broadcastPolicy);
+			jobList.add(job);
 		}
-
-		/**
-		 * Determines whether an element remains to visit.
-		 * @return true if there is at least one element that hasn't been visited, false otherwise.
-		 * @see java.util.Iterator#hasNext()
-		 */
-		public boolean hasNext()
-		{
-			lock.lock();
-			try
-			{
-				return entryIterator.hasNext() || ((listIterator != null) && listIterator.hasNext());
-			}
-			finally
-			{
-				lock.unlock();
-			}
-		}
-
-		/**
-		 * Get the next element for this iterator.
-		 * @return the next element as a <code>JPPFTaskBundle</code> instance.
-		 * @see java.util.Iterator#next()
-		 */
-		public BundleWrapper next()
-		{
-			lock.lock();
-			try
-			{
-				if (listIterator != null)
-				{
-					if (listIterator.hasNext()) return listIterator.next();
-					if (entryIterator.hasNext())
-					{
-						listIterator = entryIterator.next().getValue().iterator();
-						if (listIterator.hasNext()) return listIterator.next();
-					}
-				}
-				throw new NoSuchElementException("no more element in this BundleIterator");
-			}
-			finally
-			{
-				lock.unlock();
-			}
-		}
-
-		/**
-		 * This operation is not supported and throws an <code>UnsupportedOperationException</code>.
-		 * @throws UnsupportedOperationException as this operation is not supported.
-		 * @see java.util.Iterator#remove()
-		 */
-		public void remove() throws UnsupportedOperationException
-		{
-			throw new UnsupportedOperationException("remove() is not supported on a BundleIterator");
-		}
-	}
-
-	/**
-	 * Action triggered when a job reaches its scheduled execution date.
-	 */
-	private class JobScheduleAction implements Runnable
-	{
-		/**
-		 * The bundle wrapper encapsulating the job.
-		 */
-		private BundleWrapper bundleWrapper = null;
-
-		/**
-		 * Initialize this action witht he specified bundle wrapper.
-		 * @param bundleWrapper the bundle wrapper encapsulating the job.
-		 */
-		public JobScheduleAction(BundleWrapper bundleWrapper)
-		{
-			this.bundleWrapper = bundleWrapper;
-		}
-
-		/**
-		 * Execute this action.
-		 * @see java.lang.Runnable#run()
-		 */
-		public void run()
-		{
-			synchronized(bundleWrapper)
-			{
-				JPPFTaskBundle bundle = bundleWrapper.getBundle();
-				if (debugEnabled)
-				{
-					String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
-					log.debug("job '" + jobId + "' is resuming");
-				}
-				bundle.setParameter(BundleParameter.JOB_PENDING, false);
-				jobManager.jobUpdated(bundleWrapper);
-			}
-		}
-	}
-
-	/**
-	 * Action triggered when a job reaches its scheduled execution date.
-	 */
-	private class JobExpirationAction implements Runnable
-	{
-		/**
-		 * The bundle wrapper encapsulating the job.
-		 */
-		private BundleWrapper bundleWrapper = null;
-
-		/**
-		 * Initialize this action witht he specified bundle wrapper.
-		 * @param bundleWrapper the bundle wrapper encapsulating the job.
-		 */
-		public JobExpirationAction(BundleWrapper bundleWrapper)
-		{
-			this.bundleWrapper = bundleWrapper;
-		}
-
-		/**
-		 * Execute this action.
-		 * @see java.lang.Runnable#run()
-		 */
-		public void run()
-		{
-			//synchronized(bundleWrapper)
-			{
-				JPPFTaskBundle bundle = bundleWrapper.getBundle();
-				String jobId = (String) bundle.getId();
-				try
-				{
-					if (debugEnabled) log.debug("job '" + jobId + "' is expiring");
-					//removeBundle(bundleWrapper);
-					bundle.setParameter(BundleParameter.JOB_EXPIRED, true);
-					/*
-					*/
-					if (bundle.getTaskCount() > 0)
-					{
-						if (bundle.getCompletionListener() != null) bundle.getCompletionListener().taskCompleted(bundleWrapper);
-					}
-					String jobUuid = bundleWrapper.getBundle().getJobUuid();
-					jobManagamentMBean.cancelJob(jobUuid);
-				}
-				catch (Exception e)
-				{
-					log.error("Error while cancelling job id = " + jobId, e);
-				}
-			}
-		}
+		for (BundleWrapper job: jobList) addBundle(job);
 	}
 }

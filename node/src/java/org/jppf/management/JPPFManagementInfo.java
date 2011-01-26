@@ -51,7 +51,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 */
 	private int port = 11198;
 	/**
-	 * Unique id for the node's mbean server. 
+	 * Unique id for the node. 
 	 */
 	private String id = null;
 	/**
@@ -193,5 +193,24 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	public int getType()
 	{
 		return type;
+	}
+
+	/**
+	 * Determine whether this information represents a real node.
+	 * @return true if this information represents a node, false otherwise.
+	 */
+	public boolean isNode()
+	{
+		return type == NODE;
+	}
+
+	/**
+	 * Determine whether this information represents a driver, connected as a peer to the
+	 * driver from which this information is obtained.
+	 * @return true if this information represents a driver, false otherwise.
+	 */
+	public boolean isDriver()
+	{
+		return type == DRIVER;
 	}
 }

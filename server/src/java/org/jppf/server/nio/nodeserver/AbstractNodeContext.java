@@ -139,9 +139,12 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getBundle().getState()))
 		{
 			JPPFDriver.getInstance().getJobManager().jobReturned(bundle, channel);
-			BundleWrapper tmp = bundle;
+			BundleWrapper tmpWrapper = bundle;
 			bundle = null;
-			resubmitBundle(tmp);
+			JPPFTaskBundle tmpBundle = tmpWrapper.getBundle();
+			// broadcast jobs are not resubmitted.
+			if (tmpBundle.getJobSLA().isBroadcastJob()) tmpBundle.getCompletionListener().taskCompleted(tmpWrapper);
+			else resubmitBundle(tmpWrapper);
 		}
 	}
 

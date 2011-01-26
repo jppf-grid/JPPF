@@ -24,7 +24,6 @@ import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.process.LauncherListener;
-import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.classloader.*;
@@ -78,10 +77,6 @@ public class JPPFDriver
 	 */
 	private boolean shuttingDown = false;
 	/**
-	 * Security credentials associated with this JPPF driver.
-	 */
-	private JPPFSecurityContext credentials = null;
-	/**
 	 * This listener gathers the statistics published through the management interface.
 	 */
 	private JPPFDriverStatsUpdater statsUpdater = new JPPFDriverStatsUpdater();
@@ -116,7 +111,6 @@ public class JPPFDriver
 		nodeHandler = new NodeInformationHandler();
 		statsManager.addListener(statsUpdater);
 		initializer = new DriverInitializer(this);
-		credentials = initializer.initCredentials();
 		if (debugEnabled) log.debug("instantiating JPPF driver with uuid=" + uuid);
 	}
 
@@ -211,15 +205,6 @@ public class JPPFDriver
 	public boolean isShuttingDown()
 	{
 		return shuttingDown;
-	}
-
-	/**
-	 * Get the security credentials associated with this JPPF driver.
-	 * @return a <code>JPPFSecurityContext</code> instance.
-	 */
-	public JPPFSecurityContext getCredentials()
-	{
-		return credentials;
 	}
 
 	/**

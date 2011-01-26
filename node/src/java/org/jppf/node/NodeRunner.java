@@ -119,7 +119,7 @@ public class NodeRunner
 		}
 		try
 		{
-			log.info("starting node");
+			log.info("starting node, uuid=" + uuid);
 			// to ensure VersionUtils is loaded by the same class loader as this class.
 			VersionUtils.getBuildNumber();
 			while (true)

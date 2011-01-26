@@ -87,5 +87,9 @@ public enum  BundleParameter
 	/**
 	 * Time at which the job is received on the server side.
 	 */
-	JOB_RECEIVED_TIME_MILLIS
+	JOB_RECEIVED_TIME_MILLIS,
+	/**
+	 * Uuid of the node to which a broadcast job is dispatched.
+	 */
+	NODE_BROADCAST_UUID
 }
