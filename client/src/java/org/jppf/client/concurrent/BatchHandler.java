@@ -81,7 +81,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	/**
 	 * Used to synchronize access to <code>currentJobRef</code> and <code>nextJobRef</code>
 	 */
-	private ReentrantLock lock = new ReentrantLock();
+	private ReentrantLock lock = new ReentrantLock(true);
 	/**
 	 * Represents a condtion to await for and corresponding to when <code>currentJobRef</code> is not null.
 	 */
@@ -131,7 +131,6 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	synchronized void setBatchTimeout(long batchTimeout)
 	{
 		this.batchTimeout = batchTimeout;
-		
 	}
 
 	/**
@@ -184,38 +183,34 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 */
 	private void updateNextJob(boolean sendSignal)
 	{
-		lock.lock();
-		try
+		JPPFJob job = nextJobRef.get();
+		int size = 0;
+		if (job.getTasks() == null) size = 0;
+		else size = job.getTasks().size();
+		if (batchTimeout > 0L) elapsed = System.currentTimeMillis() - start;
+		if (size == 0)
 		{
-			JPPFJob job = nextJobRef.get();
-			int size = 0;
-			if (job.getTasks() == null) size = 0;
-			else size = job.getTasks().size();
-			if (batchTimeout > 0L) elapsed = System.currentTimeMillis() - start;
-			if (size == 0)
-			{
-				if ((batchTimeout > 0L) && (elapsed >= batchTimeout))
-				{
-					start = System.currentTimeMillis();
-					elapsed = 0L;
-				}
-				return;
-			}
-			if (((batchTimeout > 0L) && (elapsed >= batchTimeout)) ||
-					((batchSize > 0) && (size >= batchSize)) ||
-					((batchSize <= 0) && (batchTimeout <= 0L)))
-			{
-				currentJobRef.set(job);
-				nextJobRef.set(createJob());
-				start = System.currentTimeMillis();
-				elapsed = 0;
-				if (sendSignal) jobReady.signal();
-			}
+			if ((batchTimeout > 0L) && (elapsed >= batchTimeout)) resetTimeout();
+			return;
 		}
-		finally
+		if (((batchTimeout > 0L) && (elapsed >= batchTimeout)) ||
+				((batchSize > 0) && (size >= batchSize)) ||
+				((batchSize <= 0) && (batchTimeout <= 0L)))
 		{
-			lock.unlock();
+			currentJobRef.set(job);
+			nextJobRef.set(createJob());
+			resetTimeout();
+			if (sendSignal) jobReady.signal();
 		}
+	}
+
+	/**
+	 * Reset the timeout counter.
+	 */
+	private void resetTimeout()
+	{
+		start = System.currentTimeMillis();
+		elapsed = 0L;
 	}
 
 	/**
@@ -225,21 +220,30 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 */
 	Future<Object> addTask(JPPFTask task)
 	{
-		if (debugEnabled) log.debug("submitting one JPPFTask");
-		Future<Object> future = null;
-		JPPFJob job = nextJobRef.get();
+		lock.lock();
 		try
 		{
-			FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
-			job.addTask(task);
-			future = new JPPFTaskFuture<Object>(collector, task.getPosition());
+			if (debugEnabled) log.debug("submitting one JPPFTask");
+			Future<Object> future = null;
+			JPPFJob job = nextJobRef.get();
+			try
+			{
+				FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
+				job.addTask(task);
+				future = new JPPFTaskFuture<Object>(collector, task.getPosition());
+			}
+			catch (JPPFException e)
+			{
+				log.error(e.getMessage(), e);
+				throw new RejectedExecutionException(e);
+			}
+			updateNextJob(true);
+			return future;
 		}
-		catch (JPPFException e)
+		finally
 		{
-			log.error(e.getMessage(), e);
+			lock.unlock();
 		}
-		updateNextJob(true);
-		return future;
 	}
 
 	/**
@@ -250,21 +254,30 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 */
 	<T> Future<T> addTask(Callable<T> task)
 	{
-		if (debugEnabled) log.debug("submitting one Callable Task");
-		Future<T> future = null;
-		JPPFJob job = nextJobRef.get();
+		lock.lock();
 		try
 		{
-			FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
-			JPPFTask jppfTask = job.addTask(task);
-			future = new JPPFTaskFuture<T>(collector, jppfTask.getPosition());
+			if (debugEnabled) log.debug("submitting one Callable Task");
+			Future<T> future = null;
+			JPPFJob job = nextJobRef.get();
+			try
+			{
+				FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
+				JPPFTask jppfTask = job.addTask(task);
+				future = new JPPFTaskFuture<T>(collector, jppfTask.getPosition());
+			}
+			catch (JPPFException e)
+			{
+				log.error(e.getMessage(), e);
+				throw new RejectedExecutionException(e);
+			}
+			updateNextJob(true);
+			return future;
 		}
-		catch (JPPFException e)
+		finally
 		{
-			log.error(e.getMessage(), e);
+			lock.unlock();
 		}
-		updateNextJob(true);
-		return future;
 	}
 
 	/**
@@ -275,24 +288,33 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 */
 	<T> Pair<FutureResultCollector, Integer> addTasks(Collection<? extends Callable<T>> tasks)
 	{
-		if (debugEnabled) log.debug("submitting " + tasks.size() + " Callable Tasks");
-		Pair<FutureResultCollector, Integer> pair = null;
-		JPPFJob job = nextJobRef.get();
-		FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
-		int start = 0;
+		lock.lock();
 		try
 		{
-			List<JPPFTask> jobTasks = job.getTasks();
-			start = (jobTasks == null) ? 0 : jobTasks.size();
-			for (Callable<?> task: tasks) job.addTask(task);
+			if (debugEnabled) log.debug("submitting " + tasks.size() + " Callable Tasks");
+			Pair<FutureResultCollector, Integer> pair = null;
+			JPPFJob job = nextJobRef.get();
+			FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
+			int start = 0;
+			try
+			{
+				List<JPPFTask> jobTasks = job.getTasks();
+				start = (jobTasks == null) ? 0 : jobTasks.size();
+				for (Callable<?> task: tasks) job.addTask(task);
+			}
+			catch (JPPFException e)
+			{
+				log.error(e.getMessage(), e);
+				throw new RejectedExecutionException(e);
+			}
+			pair = new Pair(collector, start);
+			updateNextJob(true);
+			return pair;
 		}
-		catch (JPPFException e)
+		finally
 		{
-			log.error(e.getMessage(), e);
+			lock.unlock();
 		}
-		pair = new Pair(collector, start);
-		updateNextJob(true);
-		return pair;
 	}
 
 	/**
