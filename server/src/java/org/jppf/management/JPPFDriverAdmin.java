@@ -60,6 +60,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 		{
 			List<JPPFManagementInfo> list = new ArrayList<JPPFManagementInfo>();
 			list.addAll(driver.getNodeInformationMap().values());
+			log.info("sending information for " + list.size() + " nodes");
 			return list;
 		}
 		catch(Exception e)

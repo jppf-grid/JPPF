@@ -18,10 +18,11 @@
 package sample.datasize;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.apache.commons.logging.*;
 import org.jppf.client.*;
-import org.jppf.server.JPPFStats;
+import org.jppf.client.concurrent.JPPFExecutorService;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 
@@ -44,7 +45,7 @@ public class DataSizeRunner
 	 */
 	private static final int KILO = 1024;
 	/**
-	 * One kilobyte.
+	 * One megabyte.
 	 */
 	private static final int MEGA = 1024 * KILO;
 
@@ -60,6 +61,7 @@ public class DataSizeRunner
 		{
 			jppfClient = new JPPFClient();
 			perform();
+			//perform2();
 		}
 		catch(Exception e)
 		{
@@ -82,22 +84,62 @@ public class DataSizeRunner
 		int datasize = config.getInt("datasize.size", 1);
 		int nbTasks = config.getInt("datasize.nbTasks", 10);
 		String unit = config.getString("datasize.unit", "b").toLowerCase();
-		if ("k".equals(unit)) datasize *= KILO;
-		else if ("m".equals(unit)) datasize *= MEGA;
+		int size = datasize;
+		if ("k".equals(unit)) size *= KILO;
+		else if ("m".equals(unit)) size *= MEGA;
 		
-		output("Running datasize demo with data size = " + datasize + " with " + nbTasks + " tasks");
+		String s = StringUtils.buildString("JPPFJob, data size = ", datasize, unit, ", nbTasks = ", nbTasks, ", inNodeOnly = ", inNodeOnly);
+		output("Running datasize demo with " + s);
 		long totalTime = System.currentTimeMillis();
 		JPPFJob job = new JPPFJob();
-		for (int i=0; i<nbTasks; i++) job.addTask(new DataTask(datasize, inNodeOnly));
+		job.setId("Datasize job [" + s + "]");
+		for (int i=0; i<nbTasks; i++)
+		{
+			JPPFTask task = new DataTask(size, inNodeOnly);
+			task.setId("task " + (i+1));
+			job.addTask(task);
+		}
 		List<JPPFTask> results = jppfClient.submit(job);
 		for (JPPFTask t: results)
 		{
-			if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
-			else System.out.println("task result: " + t.getResult());
+			if (t.getException() != null) System.out.println("error for " +t.getId() + " : " +  t.getException().getMessage());
+			else System.out.println("result for " + t.getId() + " : " + t.getResult());
 		}
 		totalTime = System.currentTimeMillis() - totalTime;
 		output("Computation time: " + StringUtils.toStringDuration(totalTime));
-		JPPFStats stats = jppfClient.requestStatistics();
+	}
+
+	/**
+	 * Perform the test.
+	 * @throws Exception if an error is raised during the execution.
+	 */
+	private static void perform2() throws Exception
+	{
+		TypedProperties config = JPPFConfiguration.getProperties();
+		boolean inNodeOnly = config.getBoolean("datasize.inNodeOnly", false);
+		int datasize = config.getInt("datasize.size", 1);
+		int nbTasks = config.getInt("datasize.nbTasks", 10);
+		String unit = config.getString("datasize.unit", "b").toLowerCase();
+		int size = datasize;
+		if ("k".equals(unit)) size *= KILO;
+		else if ("m".equals(unit)) size *= MEGA;
+		
+		String s = StringUtils.buildString("JPFFExecutor, data size = ", datasize, unit, ", nbTasks = ", nbTasks, ", inNodeOnly = ", inNodeOnly);
+		output("Running datasize demo with " + s);
+		long totalTime = System.currentTimeMillis();
+		ExecutorService executor = new JPPFExecutorService(jppfClient);
+		List<Future<String>> futureList = new ArrayList<Future<String>>();
+		for (int i=0; i<nbTasks; i++)
+		{
+			Callable<String> c = new CallableDataTask(size, inNodeOnly);
+			futureList.add(executor.submit(c));
+		}
+		for (Future<String> f: futureList)
+		{
+			System.out.println("task result: " + f.get());
+		}
+		totalTime = System.currentTimeMillis() - totalTime;
+		output("Computation time: " + StringUtils.toStringDuration(totalTime));
 	}
 
 	/**

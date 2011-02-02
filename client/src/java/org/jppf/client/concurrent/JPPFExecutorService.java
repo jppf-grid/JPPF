@@ -199,7 +199,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @throws IllegalArgumentException if tasks empty.
 	 * @throws ExecutionException if no task successfully completes.
 	 * @throws RejectedExecutionException if tasks cannot be scheduled for execution.
-	 * @throws TimeoutException - if the given timeout elapses before any task successfully completes.
+	 * @throws TimeoutException if the given timeout elapses before any task successfully completes.
 	 * @see java.util.concurrent.ExecutorService#invokeAny(java.util.Collection)
 	 * @see java.util.concurrent.ExecutorService#invokeAny(java.util.Collection, long, java.util.concurrent.TimeUnit)
 	 */

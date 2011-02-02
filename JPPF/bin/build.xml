@@ -103,6 +103,16 @@
     <delete dir="${build}" quiet="true"/>
   </target>               
 
+  <target name="clean.all" depends="clean.deploy" description="">
+    <delete dir="${node}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${common}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${server}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${cient}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${admin}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${demo}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${jca-client}/classes" quiet="true" includes="**/*.*"/>
+  </target>               
+
   <target name="clean.deploy" description="clean the deploy folder">
     <delete dir="${deploy}" quiet="true"/>
 	  <delete dir="${runtime}" quiet="true"/>
@@ -138,8 +148,8 @@
 	<!--                           Build the application                           -->
 	<!-- ========================================================================= -->
 
-  <target name="build" depends="init, compile, jar"/>
-	<target name="rebuild" depends="clean, init, compile, jar"/>
+  <target name="build" depends="init, compile, jar, jar.src"/>
+	<target name="rebuild" depends="clean.all, build"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
 		depends="clean.deploy, rebuild, javadoc, init.deploy, jca, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, application.template, user.guide, installer"/>
@@ -305,6 +315,40 @@
   </target>
 
 	<!-- ========================================================================= -->
+	<!--                     Build the source jar files                            -->
+	<!-- ========================================================================= -->
+
+	<target name="jar.src" description="generates the application jar" depends="compile">
+		<antcall target="jar.src.module"><param name="module" value="common"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="node"/><param name="jar" value="common-node"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="admin"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="client"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="server"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="demo"/></antcall>
+	</target>
+
+	<target name="jar.src.module">
+		<condition property="jar" value="${module}">
+			<not>
+				<isset property="jar"/>
+			</not>
+		</condition>
+		<tstamp>
+			<format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
+		</tstamp>
+    <jar jarfile="${build}/jppf-${jar}-src.jar" index="true">
+			<fileset dir="${basedir}/../${module}/src/java"/>
+			<fileset dir="${basedir}/../${module}/src/resources"/>
+			<fileset file="${bin}/build.number"/>
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+      </manifest>
+    </jar>
+  </target>
+
+	<!-- ========================================================================= -->
 	<!--                 Package the application for deployment                    -->
 	<!-- ========================================================================= -->
 
@@ -328,7 +372,7 @@
 			<zipfileset dir="${client}" prefix="${zip.prefix}/client"/>
 			<zipfileset dir="${server}" prefix="${zip.prefix}/server"/>
 			<zipfileset dir="${admin}" prefix="${zip.prefix}/admin"/>
-			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
+			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log, *.hprof"/>
 			<zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
 		</zip>
 	</target>

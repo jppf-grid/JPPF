@@ -57,8 +57,8 @@ public class MatrixRunner
 		try
 		{
 			TypedProperties props = JPPFConfiguration.getProperties();
-			if ((args != null) && (args.length > 0)) jppfClient = new JPPFClient(args[0]);
-			else jppfClient = new JPPFClient();
+			//if ((args != null) && (args.length > 0)) jppfClient = new JPPFClient(args[0]);
+			//else jppfClient = new JPPFClient();
 			int size = props.getInt("matrix.size", 300);
 			int iterations = props.getInt("matrix.iterations", 10);
 			int nbRows = props.getInt("task.nbRows", 1);
@@ -105,9 +105,17 @@ public class MatrixRunner
 			// perform "iteration" times
 			for (int iter=0; iter<iterations; iter++)
 			{
-				long elapsed = performParallelMultiplication(a, b, nbRows, policy);
-				totalIterationTime += elapsed;
-				output("Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
+				try
+				{
+					jppfClient = new JPPFClient();
+					long elapsed = performParallelMultiplication(a, b, nbRows, policy);
+					totalIterationTime += elapsed;
+					output("Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
+				}
+				finally
+				{
+					jppfClient.close();
+				}
 			}
 			output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations));
 			if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled"))
