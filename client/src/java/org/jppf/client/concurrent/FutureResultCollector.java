@@ -63,7 +63,7 @@ class FutureResultCollector extends JPPFResultCollector
 	 * Set the pending tasks count for this result collector.
 	 * @param count the task count ot set.
 	 */
-	void setTaskCount(int count)
+	synchronized void setTaskCount(int count)
 	{
 		pendingCount = count;
 	}

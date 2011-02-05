@@ -95,7 +95,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			processBroadcastJob(bundleWrapper);
 			return;
 		}
-		String jobId = bundle.getId();
 		String jobUuid = bundle.getJobUuid();
 		try
 		{

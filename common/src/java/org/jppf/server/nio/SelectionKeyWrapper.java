@@ -72,7 +72,6 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
 	 */
 	public String toString()
 	{
-		SelectableChannel ch = ((SelectionKey) getChannel()).channel();
 		if (channel.isValid()) return super.toString();
 		return "[invalid channel]";
 	}

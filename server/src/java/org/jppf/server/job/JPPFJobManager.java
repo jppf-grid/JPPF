@@ -175,7 +175,6 @@ public class JPPFJobManager implements QueueListener
 	public synchronized void jobUpdated(BundleWrapper bundleWrapper)
 	{
 		JPPFTaskBundle bundle = bundleWrapper.getBundle();
-		String jobUuid = bundle.getJobUuid();
 		if (debugEnabled) log.debug("jobId '" + bundle.getId() + "' updated");
 		submitEvent(JobEventType.JOB_UPDATED, bundle, null);
 	}

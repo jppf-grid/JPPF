@@ -30,10 +30,6 @@ import org.jppf.server.protocol.BundleWrapper;
 class BundleIterator implements Iterator<BundleWrapper>
 {
 	/**
-	 * An of task bundles, ordered by descending priority.
-	 */
-	private TreeMap<JPPFPriority, List<BundleWrapper>> priorityMap = new TreeMap<JPPFPriority, List<BundleWrapper>>();
-	/**
 	 * Iterator over the entries in the priority map.
 	 */
 	private Iterator<Map.Entry<JPPFPriority, List<BundleWrapper>>> entryIterator = null;
@@ -53,7 +49,6 @@ class BundleIterator implements Iterator<BundleWrapper>
 	 */
 	public BundleIterator(TreeMap<JPPFPriority, List<BundleWrapper>> priorityMap, ReentrantLock lock)
 	{
-		this.priorityMap = priorityMap;
 		this.lock = lock;
 		lock.lock();
 		try

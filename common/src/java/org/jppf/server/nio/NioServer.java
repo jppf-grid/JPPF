@@ -400,12 +400,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * Get the factory for this server.
 	 * @return an <code>NioServerFactory</code> instance.
 	 */
-	public NioServerFactory<S, T> getFactory()
+	public synchronized NioServerFactory<S, T> getFactory()
 	{
-		synchronized(this)
-		{
-			if (factory == null) factory = createFactory();
-		}
+		if (factory == null) factory = createFactory();
 		return factory;
 	}
 

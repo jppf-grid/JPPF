@@ -29,6 +29,10 @@ import org.jppf.server.protocol.BundleWrapper;
 public class QueueEvent extends EventObject
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Represents part or the totality of a job that was submitted.
 	 */
 	private transient BundleWrapper bundleWrapper = null;

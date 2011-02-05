@@ -18,8 +18,6 @@
 
 package org.jppf.server.nio;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.jppf.utils.ThreadSynchronization;
 
 /**
@@ -36,10 +34,6 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
 	 * The server that handles the channel.
 	 */
 	private NioServer<?, ?> server = null;
-	/**
-	 * 
-	 */
-	private ReentrantLock lock = new ReentrantLock(); 
 
 	/**
 	 * Initialize this selector with the specified channel.
