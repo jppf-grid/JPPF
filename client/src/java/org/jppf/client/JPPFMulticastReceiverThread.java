@@ -74,8 +74,14 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 			while (!isStopped())
 			{
 				JPPFConnectionInformation info = receiver.receive();
+				if (info == null)
+				{
+					setStopped(true);
+					log.error("Abnormal situation: connection information should not be null");
+					break;
+				}
 				InetAddress ip = InetAddress.getByName(info.host);
-				if ((info != null) && !hasConnectionInformation(info))
+				if (!hasConnectionInformation(info))
 				{
 					if (debugEnabled) log.debug("Found connection information: " + info);
 					addConnectionInformation(info);
