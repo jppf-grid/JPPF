@@ -63,10 +63,6 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * Determines whether the message should be reset.
 	 */
 	protected boolean resetMessage = false;
-	/**
-	 * The uuid for the remote peer.
-	 */
-	protected String uuid = null;
 
 	/**
 	 * Deserialize a resource wrapper from an array of bytes.
@@ -184,23 +180,5 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	public void setPendingRequests(List<ChannelWrapper<?>> pendingRequests)
 	{
 		this.pendingRequests = pendingRequests;
-	}
-
-	/**
-	 * Get the uuid for the remote peer.
-	 * @return the uuid as a string.
-	 */
-	public String getUuid()
-	{
-		return uuid;
-	}
-
-	/**
-	 * Set the uuid for the remote peer.
-	 * @param uuid the uuid as a string.
-	 */
-	public void setUuid(String uuid)
-	{
-		this.uuid = uuid;
 	}
 }
