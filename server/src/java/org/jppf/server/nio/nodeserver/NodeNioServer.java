@@ -145,7 +145,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 		if (JPPFConfiguration.getProperties().getBoolean("jppf.local.node.enabled", false))
 		{
 			this.localChannel = localChannel;
-			ChannelSelector channelSelector = new LocalChannelSelector(localChannel, this);
+			ChannelSelector channelSelector = new LocalChannelSelector(localChannel);
 			localChannel.setSelector(channelSelector);
 			selectorThread = new ChannelSelectorThread(channelSelector, this);
 			localChannel.setKeyOps(getInitialInterest());

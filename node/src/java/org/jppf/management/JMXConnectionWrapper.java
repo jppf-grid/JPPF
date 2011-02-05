@@ -317,7 +317,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 					goToSleep();
 					continue;
 				}
-				if (connecting)
+				if (isConnecting())
 				{
 					try
 					{

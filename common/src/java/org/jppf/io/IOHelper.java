@@ -154,21 +154,13 @@ public final class IOHelper
 	{
 		if (traceEnabled) log.trace("unwrapping " + dl);
 		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		File file = null;
 		InputStream is = null;
-		try
+		if (transform != null)
 		{
-			if (transform != null)
-			{
-				is = fitsInMemory(dl.getSize()) ? unwrapData(transform, dl) : unwrapDataToFile(transform, dl);
-			}
-			else is = dl.getInputStream();
-			return ser.deserialize(is);
+			is = fitsInMemory(dl.getSize()) ? unwrapData(transform, dl) : unwrapDataToFile(transform, dl);
 		}
-		finally
-		{
-			if ((file != null) && file.exists()) file.delete();
-		}
+		else is = dl.getInputStream();
+		return ser.deserialize(is);
 	}
 
 	/**

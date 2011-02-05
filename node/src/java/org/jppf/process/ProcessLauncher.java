@@ -131,7 +131,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	{
 		stoppedOnBusyState.set(false);
 		process = buildProcess();
-		ProcessWrapper wrapper = createProcessWrapper(process);
+		createProcessWrapper(process);
 		if (debugEnabled) log.debug("started driver process [" + process + "]");
 	}
 

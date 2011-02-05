@@ -29,7 +29,7 @@ public class JPPFFileFilter extends AbstractFileFilter
 	/**
 	 * Default excluded directory names.
 	 */
-	public static final String[] DEFAULT_INCLUDES = { "html", "htm", "php" };
+	static final String[] DEFAULT_INCLUDES = { "html", "htm", "php" };
 
 	/**
 	 * Initialize a filter accepting all directory names except those excluded by default. 

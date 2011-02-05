@@ -30,20 +30,14 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
 	 * The channel polled by this selector.
 	 */
 	private ChannelWrapper<?> channel = null;
-	/**
-	 * The server that handles the channel.
-	 */
-	private NioServer<?, ?> server = null;
 
 	/**
 	 * Initialize this selector with the specified channel.
 	 * @param channel the channel polled by this selector.
-	 * @param server the server that handles the channel.
 	 */
-	public LocalChannelSelector(ChannelWrapper<?> channel, NioServer<?, ?> server)
+	public LocalChannelSelector(ChannelWrapper<?> channel)
 	{
 		this.channel = channel;
-		this.server = server;
 	}
 
 	/**

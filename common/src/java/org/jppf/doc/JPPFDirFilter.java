@@ -28,7 +28,7 @@ public class JPPFDirFilter extends AbstractFileFilter
 	/**
 	 * Default excluded directory names.
 	 */
-	public static final String[] DEFAULT_EXCLUDES = { "CVS", ".svn" };
+	static final String[] DEFAULT_EXCLUDES = { "CVS", ".svn" };
 
 	/**
 	 * Initialize a filter accepting all directory names except those excluded by default. 

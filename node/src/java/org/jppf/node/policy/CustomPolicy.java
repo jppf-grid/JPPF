@@ -26,6 +26,10 @@ package org.jppf.node.policy;
 public abstract class CustomPolicy extends ExecutionPolicy
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The list of user-defined arguments.
 	 */
 	private String[] args = null;

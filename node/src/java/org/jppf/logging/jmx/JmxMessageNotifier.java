@@ -23,8 +23,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.management.*;
 
-import org.jppf.management.JMXConnectionWrapper;
-
 /**
  * Instances of this class send messages as JMX notifications.
  * @author Laurent Cohen
@@ -35,10 +33,6 @@ public class JmxMessageNotifier
 	 * The logger to which appends are delegated for a JPPF driver.
 	 */
 	private JmxLogger jmxLogger = null;
-	/**
-	 * A wrapper to a connection to the local MBean server.
-	 */
-	private JMXConnectionWrapper wrapper = new JMXConnectionWrapper();
 	/**
 	 * The name of the MBean that sends the log messages as JMX notifications.
 	 */

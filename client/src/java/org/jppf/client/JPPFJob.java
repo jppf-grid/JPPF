@@ -413,11 +413,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 		if (obj == null) return false;
 		if (!(obj instanceof JPPFJob)) return false;
 		JPPFJob other = (JPPFJob) obj;
-		if (jobUuid == null)
-		{
-			if (other.jobUuid != null) return false;
-			else return other.jobUuid == null;
-		}
+		if (jobUuid == null) return other.jobUuid == null;
 		return jobUuid.equals(other.jobUuid);
 	}
 }

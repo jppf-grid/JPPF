@@ -155,6 +155,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	public void createUI()
 	{
 	  treeTable = new JPPFTreeTable(model);
+	  treeTable.getTree().setLargeModel(true);
 	  treeTable.getTree().setRootVisible(false);
 	  treeTable.getTree().setShowsRootHandles(true);
 		treeTable.getColumnModel().getColumn(0).setPreferredWidth(300);

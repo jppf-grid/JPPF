@@ -273,19 +273,22 @@ public class NodeRunner
 	 */
 	public static AbstractJPPFClassLoader getJPPFClassLoader()
 	{
-		if (classLoader == null)
+		synchronized(JPPFClassLoader.class)
 		{
-			classLoader = AccessController.doPrivileged(new PrivilegedAction<JPPFClassLoader>()
+			if (classLoader == null)
 			{
-				public JPPFClassLoader run()
+				classLoader = AccessController.doPrivileged(new PrivilegedAction<JPPFClassLoader>()
 				{
-					JPPFClassLoader cl = new JPPFClassLoader(NodeRunner.class.getClassLoader());
-					return cl;
-				}
-			});
-			Thread.currentThread().setContextClassLoader(classLoader);
+					public JPPFClassLoader run()
+					{
+						JPPFClassLoader cl = new JPPFClassLoader(NodeRunner.class.getClassLoader());
+						return cl;
+					}
+				});
+				Thread.currentThread().setContextClassLoader(classLoader);
+			}
+			return classLoader;
 		}
-		return classLoader;
 	}
 
 	/**

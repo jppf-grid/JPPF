@@ -35,6 +35,10 @@ import org.jppf.jca.util.JPPFAccessorImpl;
 public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements ManagedConnectionFactory, ResourceAdapterAssociation
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Handle to the resource adapter.
 	 */
 	private transient ResourceAdapter resourceAdapter = null;

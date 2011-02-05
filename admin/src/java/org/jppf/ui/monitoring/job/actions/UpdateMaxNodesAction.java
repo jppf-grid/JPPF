@@ -137,7 +137,7 @@ public class UpdateMaxNodesAction extends AbstractJobAction
 		AbstractOption noLimitOption = (AbstractOption) panel.findFirstWithName("job.nolimit.toggle");
 		AbstractOption maxNodesOption = (AbstractOption) panel.findFirstWithName("job.max.nodes");
 		boolean noLimit = (Boolean) noLimitOption.getValue();
-		maxNodes = (Integer) maxNodesOption.getValue();
+		maxNodes = noLimit ? Integer.MAX_VALUE : (Integer) maxNodesOption.getValue();
 		Runnable r = new Runnable()
 		{
 			public void run()

@@ -104,6 +104,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	public void createUI()
 	{
 	  treeTable = new JPPFTreeTable(model);
+	  treeTable.getTree().setLargeModel(true);
 	  treeTable.getTree().setRootVisible(false);
 	  treeTable.getTree().setShowsRootHandles(true);
 		treeTable.expandAll();

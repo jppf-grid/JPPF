@@ -31,6 +31,10 @@ import org.jppf.management.JPPFSystemInformation;
 public class RegExp extends ExecutionPolicy
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The name of the property to compare.
 	 */
 	private String propertyName = null;

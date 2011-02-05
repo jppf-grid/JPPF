@@ -91,7 +91,7 @@ public class ServerConnection extends AbstractRecoveryConnection
 	 */
 	private void performCheck()
 	{
-		String response = doSendReceive("check");
+		doSendReceive("check");
 	}
 
 	/**

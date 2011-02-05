@@ -165,8 +165,11 @@ public class JPPFSubmissionResult extends ThreadSynchronization implements TaskR
 	 */
 	public void addSubmissionStatusListener(SubmissionStatusListener listener)
 	{
-		if (debugEnabled) log.debug("submission [" + id + "] adding status listener " + listener);
-		if (listener != null) listeners.add(listener);
+		synchronized(listeners)
+		{
+			if (debugEnabled) log.debug("submission [" + id + "] adding status listener " + listener);
+			if (listener != null) listeners.add(listener);
+		}
 	}
 
 	/**
@@ -175,8 +178,11 @@ public class JPPFSubmissionResult extends ThreadSynchronization implements TaskR
 	 */
 	public void removeSubmissionStatusListener(SubmissionStatusListener listener)
 	{
-		if (debugEnabled) log.debug("submission [" + id + "] removing status listener " + listener);
-		if (listener != null) listeners.remove(listener);
+		synchronized(listeners)
+		{
+			if (debugEnabled) log.debug("submission [" + id + "] removing status listener " + listener);
+			if (listener != null) listeners.remove(listener);
+		}
 	}
 
 	/**
@@ -184,19 +190,22 @@ public class JPPFSubmissionResult extends ThreadSynchronization implements TaskR
 	 */
 	protected void fireStatusChangeEvent()
 	{
-		if (listeners.isEmpty()) return;
-		if (debugEnabled) log.debug("submission [" + id + "] firng status changed event for '" + status + "'");
-		SubmissionStatusEvent event = new SubmissionStatusEvent(id, status);
-		for (SubmissionStatusListener listener: listeners)
+		synchronized(listeners)
 		{
-			listener.submissionStatusChanged(event);
+			if (listeners.isEmpty()) return;
+			if (debugEnabled) log.debug("submission [" + id + "] firng status changed event for '" + status + "'");
+			SubmissionStatusEvent event = new SubmissionStatusEvent(id, status);
+			for (SubmissionStatusListener listener: listeners)
+			{
+				listener.submissionStatusChanged(event);
+			}
 		}
 	}
 
 	/**
 	 * Reset this submission result for new submission of the same tasks. 
 	 */
-	void reset()
+	synchronized void reset()
 	{
 		resultMap.clear();
 		results = null;
