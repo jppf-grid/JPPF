@@ -56,11 +56,13 @@ public class ExampleGridRunner {
 			log.log(Level.WARNING, null, ex);
 		}
 
-		for (JPPFTask task : results) {
-			if (task.getException() != null) {
-				System.out.println("An exception was raised: " + task.getException().getMessage());
-			} else {
-				System.out.println("Execution result: " + task.getResult());
+		if (results != null) {
+			for (JPPFTask task : results) {
+				if (task.getException() != null) {
+					System.out.println("An exception was raised: " + task.getException().getMessage());
+				} else {
+					System.out.println("Execution result: " + task.getResult());
+				}
 			}
 		}
 
