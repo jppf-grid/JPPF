@@ -60,9 +60,9 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 */
 	protected ChannelWrapper<?> currentRequest = null;
 	/**
-	 * Determines whether the message should be reset.
+	 * Determines whether this context relates to a provider or node connection. 
 	 */
-	protected boolean resetMessage = false;
+	protected boolean provider = false;
 
 	/**
 	 * Deserialize a resource wrapper from an array of bytes.
@@ -168,7 +168,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * Get the list of pending resource requests for a resource provider.
 	 * @return a <code>List</code> of <code>SelectionKey</code> instances. 
 	 */
-	public List<ChannelWrapper<?>> getPendingRequests()
+	public synchronized List<ChannelWrapper<?>> getPendingRequests()
 	{
 		return pendingRequests;
 	}
@@ -177,8 +177,26 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * Set the list of pending resource requests for a resource provider.
 	 * @param pendingRequests a <code>List</code> of <code>SelectionKey</code> instances. 
 	 */
-	public void setPendingRequests(List<ChannelWrapper<?>> pendingRequests)
+	public synchronized void setPendingRequests(List<ChannelWrapper<?>> pendingRequests)
 	{
 		this.pendingRequests = pendingRequests;
+	}
+
+	/**
+	 * Determine whether this context relates to a provider or node connection. 
+	 * @return true if this is a provider context, false otherwise.
+	 */
+	public boolean isProvider()
+	{
+		return provider;
+	}
+
+	/**
+	 * Specify whether this context relates to a provider or node connection. 
+	 * @param provider true if this is a provider context, false otherwise.
+	 */
+	public void setProvider(boolean provider)
+	{
+		this.provider = provider;
 	}
 }

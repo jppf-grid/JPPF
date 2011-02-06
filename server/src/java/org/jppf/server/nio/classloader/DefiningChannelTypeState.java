@@ -74,6 +74,7 @@ class DefiningChannelTypeState extends ClassServerState
 			if (debugEnabled) log.debug("channel: " + wrapper + " read resource [" + resource.getName() + "] done");
 			if (PROVIDER_INITIATION.equals(resource.getState()))
 			{
+				context.setProvider(true);
 				if (debugEnabled) log.debug("initiating provider: " + wrapper);
 				String uuid = resource.getUuidPath().getFirst();
 				// it is a provider
@@ -90,6 +91,7 @@ class DefiningChannelTypeState extends ClassServerState
 			}
 			else if (NODE_INITIATION.equals(resource.getState()))
 			{
+				context.setProvider(false);
 				if (debugEnabled) log.debug("initiating node: " + wrapper);
 				String uuid = (String) resource.getData("node.uuid");
 				if (uuid != null)

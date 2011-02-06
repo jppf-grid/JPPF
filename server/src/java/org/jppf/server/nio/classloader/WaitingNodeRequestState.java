@@ -194,7 +194,7 @@ class WaitingNodeRequestState extends ClassServerState
 	private ChannelWrapper findProviderConnection(String uuid) throws Exception
 	{
 		ChannelWrapper result = null;
-		List<ChannelWrapper<?>> connections = server.providerConnections.get(uuid);
+		List<ChannelWrapper<?>> connections = server.getProviderConnections(uuid);
 		int minRequests = Integer.MAX_VALUE;
 		for (ChannelWrapper channel: connections)
 		{
