@@ -159,7 +159,14 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	public synchronized void removeAllConnections()
 	{
 		if (!isStopped()) return;
-		providerConnections.clear();
+		synchronized(providerConnections)
+		{
+			providerConnections.clear();
+		}
+		synchronized(nodeConnections)
+		{
+			nodeConnections.clear();
+		}
 		super.removeAllConnections();
 	}
 
@@ -179,13 +186,16 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	public void addProviderConnection(String uuid, ChannelWrapper<?> channel)
 	{
-		List<ChannelWrapper<?>> list = providerConnections.get(uuid);
-		if (list == null)
+		synchronized(providerConnections)
 		{
-			list = new ArrayList<ChannelWrapper<?>>();
-			providerConnections.put(uuid, list);
+			List<ChannelWrapper<?>> list = providerConnections.get(uuid);
+			if (list == null)
+			{
+				list = new ArrayList<ChannelWrapper<?>>();
+				providerConnections.put(uuid, list);
+			}
+			list.add(channel);
 		}
-		list.add(channel);
 	}
 
 	/**
@@ -195,9 +205,27 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	public void removeProviderConnection(String uuid, ChannelWrapper channel)
 	{
-		List<ChannelWrapper<?>> list = providerConnections.get(uuid);
-		if (list == null) return;
-		list.remove(channel);
+		synchronized(providerConnections)
+		{
+			List<ChannelWrapper<?>> list = providerConnections.get(uuid);
+			if (list == null) return;
+			list.remove(channel);
+		}
+	}
+
+	/**
+	 * Get all the provider connections for the specified client uuid.
+	 * @param uuid the uuid of the client for which to get connections.
+	 * @return a list of connection channels.
+	 */
+	public List<ChannelWrapper<?>> getProviderConnections(String uuid)
+	{
+		synchronized(providerConnections)
+		{
+			List<ChannelWrapper<?>> list = providerConnections.get(uuid);
+			if (list == null) return null;
+			return Collections.unmodifiableList(list);
+		}
 	}
 
 	/**
@@ -278,7 +306,11 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 		ClassNioServer server = JPPFDriver.getInstance().getClassServer();
 		ClassContext context = (ClassContext) channel.getContext();
 		String uuid = context.getUuid();
-		if (uuid != null) server.removeNodeConnection(uuid);
+		if (uuid != null)
+		{
+			if (context.isProvider()) server.removeProviderConnection(uuid, channel);
+			else server.removeNodeConnection(uuid);
+		}
 		try
 		{
 			channel.close();

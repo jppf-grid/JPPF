@@ -44,7 +44,7 @@ class WaitingNodeRequestState extends ClassServerState
 
 	/**
 	 * Initialize this state with a specified NioServer.
-	 * @param server the JPPFNIOServer this state relates to.
+	 * @param server the NioServer this state relates to.
 	 */
 	public WaitingNodeRequestState(ClassNioServer server)
 	{
@@ -194,7 +194,7 @@ class WaitingNodeRequestState extends ClassServerState
 	private ChannelWrapper findProviderConnection(String uuid) throws Exception
 	{
 		ChannelWrapper result = null;
-		List<ChannelWrapper<?>> connections = server.providerConnections.get(uuid);
+		List<ChannelWrapper<?>> connections = server.getProviderConnections(uuid);
 		int minRequests = Integer.MAX_VALUE;
 		for (ChannelWrapper channel: connections)
 		{
@@ -204,6 +204,7 @@ class WaitingNodeRequestState extends ClassServerState
 			{
 				minRequests = size;
 				result = channel;
+				if (size == 0) break;
 			}
 		}
 		return result;
