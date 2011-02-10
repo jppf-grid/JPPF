@@ -72,6 +72,15 @@ public class JMXServerImpl
 	/**
 	 * Initialize this JMX server with the specified namespace suffix.
 	 * @param namespaceSuffix used to distinguish between driver and node RMI registries.
+	 */
+	public JMXServerImpl(String namespaceSuffix)
+	{
+		this(namespaceSuffix, new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
+	}
+
+	/**
+	 * Initialize this JMX server with the specified namespace suffix and uuid.
+	 * @param namespaceSuffix used to distinguish between driver and node RMI registries.
 	 * @param id the unique id of the driver or node holding this jmx server.
 	 */
 	public JMXServerImpl(String namespaceSuffix, String id)

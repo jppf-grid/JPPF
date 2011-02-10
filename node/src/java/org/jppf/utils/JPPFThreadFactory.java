@@ -103,7 +103,7 @@ public class JPPFThreadFactory implements ThreadFactory
 	 * @return the constructed thread.
 	 * @see java.util.concurrent.ThreadFactory#newThread(java.lang.Runnable)
 	 */
-	public Thread newThread(Runnable r)
+	public synchronized Thread newThread(Runnable r)
 	{
 		Thread thread = new Thread(threadGroup, r, name + "-thread-" + incrementCount());
 		if (monitoringEnabled) threadIDs.add(thread.getId());

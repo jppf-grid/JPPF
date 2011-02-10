@@ -74,12 +74,12 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	/**
 	 * Names of the columns.
 	 */
-	static protected String[] cNames = { "Name", "Size", "Type", "Modified" };
+	static String[] cNames = { "Name", "Size", "Type", "Modified" };
 
 	/**
 	 * Types of the columns.
 	 */
-	static protected Class[] cTypes = { TreeTableModel.class, Integer.class, String.class, Date.class };
+	static Class[] cTypes = { TreeTableModel.class, Integer.class, String.class, Date.class };
 
 	/**
 	 * The the returned file length for directories.

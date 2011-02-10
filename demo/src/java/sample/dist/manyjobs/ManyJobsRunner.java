@@ -50,13 +50,15 @@ public class ManyJobsRunner
 	{
 		try
 		{
+			TypedProperties props = JPPFConfiguration.getProperties();
+			props.setProperty("jppf.discovery.enabled", "true");
+			props.setProperty("jppf.pool.size", "50");
 			jppfClient = new JPPFClient();
 			Thread.sleep(1000);
-			TypedProperties props = JPPFConfiguration.getProperties();
-			int length = 1000;
-			int nbTask = 35;
-			int nbJobs = 3;
-			print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+nbJobs+" iterations");
+			int length = 3000;
+			int nbTask = 500;
+			int nbJobs = 1;
+			print("Running Long Task demo with " + nbTask + " tasks of length = " + length + " ms for " + nbJobs + " iterations");
 			perform(nbTask, length, nbJobs);
 			//performLong(size, iterations);
 		}

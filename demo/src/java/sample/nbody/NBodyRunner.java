@@ -43,6 +43,18 @@ public class NBodyRunner
 	 * JPPF client used to submit execution requests.
 	 */
 	private static JPPFClient jppfClient = null;
+	/**
+	 * The panel displaying the animation.
+	 */
+	private static NBodyPanel panel;
+	/**
+	 * Random number generator.
+	 */
+	private static Random rand = new Random(System.nanoTime());
+	/**
+	 * The radius for the simulation.
+	 */
+	private static double radius = 0d;
 
 	/**
 	 * Entry point for this class, submits the tasks with a set duration to the server.
@@ -75,44 +87,27 @@ public class NBodyRunner
 		double qp = config.getDouble("nbody.qp");
 		double b = config.getDouble("nbody.b");
 		double dt = config.getDouble("nbody.dt");
-		double r = config.getDouble("nbody.radius");
+		radius = config.getDouble("nbody.radius");
 		int nbBodies = config.getInt("nbody.n");
 		int bodiesPerTask = config.getInt("nbody.bodies.per.task", 1);
 		int iterations = config.getInt("nbody.time.steps");
-		Random rand = new Random(System.currentTimeMillis());
 
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		JFrame frame = new JFrame("N-Body demo");
-		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				System.exit(0);
-			}
-		});
-		NBodyPanel panel = new NBodyPanel();
-		Dimension dim = new Dimension((int) r, (int) r);
-		panel.setMinimumSize(dim);
-		panel.setMaximumSize(dim);
-		panel.setPreferredSize(dim);
-		frame.getContentPane().add(panel);
-		frame.setSize((int) r+50, (int) r+50);
-		frame.setVisible(true);
 		int nbTasks = nbBodies / bodiesPerTask + (nbBodies % bodiesPerTask == 0 ? 0 : 1);
 		print("Running N-Body demo with "+nbBodies+" bodies (protons), dt = "+dt+", for "+iterations+" time steps");
 		// perform "iteration" times
 		long totalTime = 0L;
-		List<JPPFTask> tasks = new ArrayList<JPPFTask>();
 		Vector2d[] positions = new Vector2d[nbBodies];
 		for (int i=0; i<nbBodies; i++)
 		{
-			positions[i] = new Vector2d(rand.nextDouble()*r/2d+r/4d, rand.nextDouble()*r/2d+r/4d);
+			positions[i] = new Vector2d(rand.nextDouble()*radius/2d+radius/4d, rand.nextDouble()*radius/2d+radius/4d);
 		}
+		createUI();
 		int count = 0;
 		DataProvider dp = new MemoryMapDataProvider();
 		dp.setValue("qp_qp", Double.valueOf(qp*qp));
 		dp.setValue("qp_b", Double.valueOf(qp*b));
 		dp.setValue("dt", Double.valueOf(dt));
-		JPPFJob job = new JPPFJob(dp);
+		List<JPPFTask> tasks = new ArrayList<JPPFTask>(nbTasks);
 		for (int i=0; i<nbTasks; i++)
 		{
 			NBody[] bodies = new NBody[count + bodiesPerTask < nbBodies ? bodiesPerTask : nbBodies - count];
@@ -121,10 +116,12 @@ public class NBodyRunner
 				bodies[j] = new NBody(count, positions[count]);
 				count++;
 			}
-			job.addTask(new NBodyTask(bodies));
+			tasks.add(new NBodyTask(bodies));
 		}
 		for (int iter=0; iter<iterations; iter++)
 		{
+			JPPFJob job = new JPPFJob(dp);
+			for (JPPFTask task: tasks) job.addTask(task);
 			panel.updatePositions(positions);
 			dp.setValue("positions", positions);
 			long start = System.currentTimeMillis();
@@ -149,6 +146,30 @@ public class NBodyRunner
 		}
 		print("Total time:  " + StringUtils.toStringDuration(totalTime) + " (" + (totalTime/1000) + " seconds)" +
 			", Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
+	}
+
+	/**
+	 * Create the UI.
+	 * @throws Exception if any error occurs.
+	 */
+	private static void createUI() throws Exception
+	{
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		JFrame frame = new JFrame("N-Body demo");
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				System.exit(0);
+			}
+		});
+		panel = new NBodyPanel();
+		Dimension dim = new Dimension((int) radius, (int) radius);
+		panel.setMinimumSize(dim);
+		panel.setMaximumSize(dim);
+		panel.setPreferredSize(dim);
+		frame.getContentPane().add(panel);
+		frame.setSize((int) radius+50, (int) radius+50);
+		frame.setVisible(true);
 	}
 
 	/**

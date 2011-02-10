@@ -178,14 +178,13 @@ public class LongTaskRunner
 		{
 			long iterTime = System.currentTimeMillis();
 			List<JPPFTaskCallable> tasks = new ArrayList<JPPFTaskCallable>();
-			List<Future<Object>> futureList = new ArrayList<Future<Object>>();
 			for (int i=0; i<nbTasks; i++)
 			{
 				LongTask task = new LongTask(length, false);
 				task.setId("" + (i+1));
 				tasks.add(new JPPFTaskCallable(task));
 			}
-			futureList = executor.invokeAll(tasks);
+			List<Future<Object>> futureList = executor.invokeAll(tasks);
 			for (Future<?> f: futureList)
 			{
 				f.get();

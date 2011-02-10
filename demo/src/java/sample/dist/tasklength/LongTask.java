@@ -89,7 +89,6 @@ public class LongTask extends JPPFTask
 				//setException(e);
 				setResult(e.getMessage());
 			}
-			elapsed = System.currentTimeMillis() - taskStart;
 		}
 	}
 
