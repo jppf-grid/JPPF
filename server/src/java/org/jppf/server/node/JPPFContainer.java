@@ -19,10 +19,11 @@ package org.jppf.server.node;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.io.*;
-import org.jppf.utils.SerializationHelper;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -58,6 +59,14 @@ public abstract class JPPFContainer
 	 * The unique identifier for the submitting application.
 	 */
 	protected List<String> uuidPath = new ArrayList<String>();
+	/**
+	 * Used to prevent parallel deserialization.
+	 */
+	private Lock lock = new ReentrantLock();
+	/**
+	 * Determines whether tasks deserialization should be sequential rather than parallel.
+	 */
+	private final boolean sequentialDeserialization = JPPFConfiguration.getProperties().getBoolean("jppf.sequential.deserialization", false);
 
 	/**
 	 * Initialize this container with a specified application uuid.
@@ -187,7 +196,15 @@ public abstract class JPPFContainer
 			{
 				Thread.currentThread().setContextClassLoader(getClassLoader());
 				if (traceEnabled) log.debug("deserializing object index = " + index);
-				return IOHelper.unwrappedData(dl, helper.getSerializer());
+				if (sequentialDeserialization) lock.lock();
+				try
+				{
+					return IOHelper.unwrappedData(dl, helper.getSerializer());
+				}
+				finally
+				{
+					if (sequentialDeserialization) lock.unlock();
+				}
 			}
 			catch(Throwable t)
 			{
