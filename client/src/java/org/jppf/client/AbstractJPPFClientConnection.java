@@ -23,6 +23,7 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 import java.nio.channels.AsynchronousCloseException;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.*;
 
 import org.jppf.JPPFException;
 import org.jppf.classloader.NonDelegatingClassLoader;
@@ -57,6 +58,14 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * Name of the SerializationHelper implementation class.
 	 */
 	private static String SERIALIZATION_HELPER_IMPL = "org.jppf.utils.SerializationHelperImpl";
+	/**
+	 * Used to prevent parallel deserialization.
+	 */
+	private static Lock lock = new ReentrantLock();
+	/**
+	 * Determines whether tasks deserialization should be sequential rather than parallel.
+	 */
+	private static final boolean SEQUENTIAL_DESERIALIZATION = JPPFConfiguration.getProperties().getBoolean("jppf.sequential.deserialization", false);
 	/**
 	 * Handler for the connection to the task server.
 	 */
@@ -114,10 +123,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * Determines whether this connection has been shut down;
 	 */
 	protected boolean isShutdown = false;
-	/**
-	 * This connection's UUID.
-	 */
-	private String connectionId = new JPPFUuid().toString();
 	/**
 	 * The pool of threads used for submitting execution requests.
 	 */
@@ -235,7 +240,15 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			int count = bundle.getTaskCount();
 			if (debugEnabled) log.debug("received bundle with " + count + " tasks for job '" + bundle.getId() + "'");
 			List<JPPFTask> taskList = new ArrayList<JPPFTask>();
-			for (int i=0; i<count; i++) taskList.add((JPPFTask) IOHelper.unwrappedData(socketClient, ser));
+			if (SEQUENTIAL_DESERIALIZATION) lock.lock();
+			try
+			{
+				for (int i=0; i<count; i++) taskList.add((JPPFTask) IOHelper.unwrappedData(socketClient, ser));
+			}
+			finally
+			{
+				if (SEQUENTIAL_DESERIALIZATION) lock.unlock();
+			}
 	
 			int startIndex = (taskList.isEmpty()) ? -1 : taskList.get(0).getPosition();
 			// if an exception prevented the node from executing the tasks
@@ -465,15 +478,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	public void setCurrentJob(JPPFJob currentExecution)
 	{
 		this.job = currentExecution;
-	}
-
-	/**
-	 * Get this connection's UUID.
-	 * @return the uuid as a string.
-	 */
-	public String getConnectionId()
-	{
-		return connectionId;
 	}
 
 	/**
