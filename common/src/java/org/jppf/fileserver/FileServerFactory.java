@@ -48,8 +48,8 @@ public class FileServerFactory implements JPPFNodeStartupSPI, JPPFClientStartupS
 	public void run()
 	{
 		TypedProperties jppfConfig = JPPFConfiguration.getProperties();
-		clientConfiguration = jppfConfig.getProperties("jppf.file.client.config", new TypedProperties());
-		serverConfiguration = jppfConfig.getProperties("jppf.file.server.config", new TypedProperties());
+		clientConfiguration = jppfConfig.getProperties("jppf.file.client.config", jppfConfig);
+		serverConfiguration = jppfConfig.getProperties("jppf.file.server.config", jppfConfig);
 	}
 
 	/**
@@ -75,20 +75,7 @@ public class FileServerFactory implements JPPFNodeStartupSPI, JPPFClientStartupS
 	{
 		Class<? extends FileClient> implClass =
 			(Class<? extends FileClient>) FileServerFactory.class.getClassLoader().loadClass(implementationName);
-		return createFileClient(implClass, configuration);
-	}
-
-	/**
-	 * Create a file server client.
-	 * @param implementationClass the class of the client implementation;
-	 * the class must implement the {@link FileClient} interface and have a no-args constructor.
-	 * @param configuration the properties used to configure the client.
-	 * @return a {@link FileClient} instance.
-	 * @throws Exception if any error occurs while creating the client.
-	 */
-	public static FileClient createFileClient(Class<? extends FileClient> implementationClass, Properties configuration) throws Exception
-	{
-		FileClient client = implementationClass.newInstance();
+		FileClient client = implClass.newInstance();
 		client.configure(configuration);
 		return client;
 	}
