@@ -69,19 +69,21 @@ class JobDataPanelManager
 	public void driverAdded(final JPPFClientConnection clientConnection)
 	{
 		JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
-		if (findDriver(wrapper.getId()) != null) return;
+		String driverName = wrapper.getId();
+		int index = driverInsertIndex(driverName);
+		if (index < 0) return;
 		JobData data = new JobData(clientConnection);
 		if (listenerMap.get(wrapper.getId()) == null)
 		{
 			ConnectionStatusListener listener = new ConnectionStatusListener(wrapper.getId());
 			clientConnection.addClientConnectionStatusListener(listener);
-			listenerMap.put(wrapper.getId(), listener);
+			listenerMap.put(driverName, listener);
 		}
 		DriverJobManagementMBean proxy = data.getProxy();
 		if (proxy != null) proxy.addNotificationListener(new JobNotificationListener(jobPanel, wrapper.getId()), null, null);
 		DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(data);
-		if (debugEnabled) log.debug("adding driver: " + wrapper.getId());
-		jobPanel.getModel().insertNodeInto(driverNode, jobPanel.getTreeTableRoot(), jobPanel.getTreeTableRoot().getChildCount());
+		if (debugEnabled) log.debug("adding driver: " + driverName + " at index " + index);
+		jobPanel.getModel().insertNodeInto(driverNode, jobPanel.getTreeTableRoot(), index);
 		jobPanel.getTreeTable().expand(driverNode);
 	}
 
@@ -118,14 +120,12 @@ class JobDataPanelManager
 		JobData data = new JobData(jobInfo);
 		JobData driverData = (JobData) driverNode.getUserObject();
 		data.setJmxWrapper(driverData.getJmxWrapper());
-		DefaultMutableTreeNode jobNode = findJob(driverNode, jobInfo);
-		if (jobNode == null)
-		{
-			jobNode = new DefaultMutableTreeNode(data);
-			if (debugEnabled) log.debug("adding job: " + jobInfo.getJobId() + " to driver " + driverName);
-			jobPanel.getModel().insertNodeInto(jobNode, driverNode, driverNode.getChildCount());
-			jobPanel.getTreeTable().expand(driverNode);
-		}
+		int index  = jobInsertIndex(driverNode, jobInfo);
+		if (index < 0) return;
+		DefaultMutableTreeNode jobNode = new DefaultMutableTreeNode(data);
+		if (debugEnabled) log.debug("adding job: " + jobInfo.getJobId() + " to driver " + driverName + " at index " + index);
+		jobPanel.getModel().insertNodeInto(jobNode, driverNode, index);
+		jobPanel.getTreeTable().expand(driverNode);
 	}
 
 	/**
@@ -177,11 +177,11 @@ class JobDataPanelManager
 		DefaultMutableTreeNode jobNode = findJob(driverNode, jobInfo);
 		if (jobNode == null) return;
 		JobData data = new JobData(jobInfo, nodeInfo);
-		DefaultMutableTreeNode subJobNode = findSubJob(jobNode, nodeInfo);
-		if (subJobNode != null) return;
-		subJobNode = new DefaultMutableTreeNode(data);
-		if (debugEnabled) log.debug("sub-job: " + jobInfo.getJobId() + " dispatched to node " + nodeInfo.getHost() + ":" + nodeInfo.getPort());
-		jobPanel.getModel().insertNodeInto(subJobNode, jobNode, jobNode.getChildCount());
+		int index = subJobInsertIndex(jobNode, nodeInfo);
+		if (index < 0) return;
+		DefaultMutableTreeNode subJobNode = new DefaultMutableTreeNode(data);
+		if (debugEnabled) log.debug("sub-job: " + jobInfo.getJobId() + " dispatched to node " + nodeInfo.getHost() + ":" + nodeInfo.getPort() + "(index " + index + ")");
+		jobPanel.getModel().insertNodeInto(subJobNode, jobNode, index);
 		jobPanel.getTreeTable().expand(jobNode);
 	}
 
@@ -255,6 +255,70 @@ class JobDataPanelManager
 			if (data.getNodeInformation().getId().equals(nodeInfo.getId())) return node;
 		}
 		return null;
+	}
+
+	/**
+	 * Find the position at which to insert a driver,
+	 * using the sorted lexical order of driver names. 
+	 * @param driverName the name of the driver to insert.
+	 * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
+	 */
+	int driverInsertIndex(String driverName)
+	{
+		DefaultMutableTreeNode root = jobPanel.getTreeTableRoot();
+		int n = root.getChildCount();
+		for (int i=0; i<n; i++)
+		{
+			DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) root.getChildAt(i);
+			JobData data = (JobData) driverNode.getUserObject();
+			String name = data.getJmxWrapper().getId();
+			if (name.equals(driverName)) return -1;
+			else if (driverName.compareTo(name) < 0) return i;
+		}
+		return n;
+	}
+
+	/**
+	 * Find the position at which to insert a job, using the sorted lexical order of job names. 
+	 * @param driverNode name the parent tree node of the job to insert.
+	 * @param jobInfo information about the job to insert.
+	 * @return the index at which to insert the job, or -1 if the job is already in the tree.
+	 */
+	int jobInsertIndex(DefaultMutableTreeNode driverNode, JobInformation jobInfo)
+	{
+		int n = driverNode.getChildCount();
+		String jobName = jobInfo.getJobId();
+		for (int i=0; i<n; i++)
+		{
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
+			JobData jobData = (JobData) node.getUserObject();
+			String name = jobData.getJobInformation().getJobId();
+			if (jobName.equals(name)) return -1;
+			else if (jobName.compareTo(name) < 0) return i;
+		}
+		return n;
+	}
+
+	/**
+	 * Find the position at which to insert a subjob, using the sorted lexical order of subjob names. 
+	 * @param jobNode the parent tree node of the subjob to insert.
+	 * @param nodeInfo information about the subjob to insert.
+	 * @return the index at which to insert the subjob, or -1 if the subjob is already in the tree.
+	 */
+	int subJobInsertIndex(DefaultMutableTreeNode jobNode, JPPFManagementInfo nodeInfo)
+	{
+		int n = jobNode.getChildCount();
+		String subJobName = nodeInfo.toString();
+		for (int i=0; i<n; i++)
+		{
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) jobNode.getChildAt(i);
+			JobData jobData = (JobData) node.getUserObject();
+			if ((jobData == null) || (jobData.getNodeInformation() == null)) continue;
+			String name = jobData.getNodeInformation().toString();
+			if (subJobName.equals(name)) return -1;
+			else if (subJobName.compareTo(name) < 0) return i;
+		}
+		return n;
 	}
 
 	/**
