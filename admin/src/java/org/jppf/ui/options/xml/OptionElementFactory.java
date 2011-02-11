@@ -418,7 +418,7 @@ public class OptionElementFactory
 				if (!names.contains(elt.getName()))
 				{
 					names.add(elt.getName());
-					list.add(builder.buildPage(def, null));
+					list.add(elt);
 				}
 			}
 		}

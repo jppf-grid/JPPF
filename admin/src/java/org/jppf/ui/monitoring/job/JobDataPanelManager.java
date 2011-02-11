@@ -123,7 +123,7 @@ class JobDataPanelManager
 		int index  = jobInsertIndex(driverNode, jobInfo);
 		if (index < 0) return;
 		DefaultMutableTreeNode jobNode = new DefaultMutableTreeNode(data);
-		if (debugEnabled) log.debug("adding job: " + jobInfo.getJobId() + " to driver " + driverName);
+		if (debugEnabled) log.debug("adding job: " + jobInfo.getJobId() + " to driver " + driverName + " at index " + index);
 		jobPanel.getModel().insertNodeInto(jobNode, driverNode, index);
 		jobPanel.getTreeTable().expand(driverNode);
 	}
@@ -180,7 +180,7 @@ class JobDataPanelManager
 		int index = subJobInsertIndex(jobNode, nodeInfo);
 		if (index < 0) return;
 		DefaultMutableTreeNode subJobNode = new DefaultMutableTreeNode(data);
-		if (debugEnabled) log.debug("sub-job: " + jobInfo.getJobId() + " dispatched to node " + nodeInfo.getHost() + ":" + nodeInfo.getPort());
+		if (debugEnabled) log.debug("sub-job: " + jobInfo.getJobId() + " dispatched to node " + nodeInfo.getHost() + ":" + nodeInfo.getPort() + "(index " + index + ")");
 		jobPanel.getModel().insertNodeInto(subJobNode, jobNode, index);
 		jobPanel.getTreeTable().expand(jobNode);
 	}
@@ -308,12 +308,13 @@ class JobDataPanelManager
 	int subJobInsertIndex(DefaultMutableTreeNode jobNode, JPPFManagementInfo nodeInfo)
 	{
 		int n = jobNode.getChildCount();
-		String subJobName = nodeInfo.getId();
+		String subJobName = nodeInfo.toString();
 		for (int i=0; i<n; i++)
 		{
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) jobNode.getChildAt(i);
 			JobData jobData = (JobData) node.getUserObject();
-			String name = jobData.getNodeInformation().getId();
+			if ((jobData == null) || (jobData.getNodeInformation() == null)) continue;
+			String name = jobData.getNodeInformation().toString();
 			if (subJobName.equals(name)) return -1;
 			else if (subJobName.compareTo(name) < 0) return i;
 		}

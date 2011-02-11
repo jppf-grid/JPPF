@@ -69,8 +69,21 @@ public class OptionDescriptorParser
 	 */
 	public OptionDescriptor parse(String docPath) throws Exception
 	{
+		if (docPath.indexOf("NodeDataPage") >= 0)
+		{
+			log.info("loading doc from paht = " + docPath);
+		}
 		InputStream is = FileUtils.getFileInputStream(docPath);
-		if (is == null) is = this.getClass().getClassLoader().getResourceAsStream(docPath);
+		//if (is == null) is = this.getClass().getClassLoader().getResourceAsStream(docPath);
+		if (is == null)
+		{
+			URL url = this.getClass().getClassLoader().getResource(docPath);
+			if (docPath.indexOf("NodeDataPage") >= 0)
+			{
+				log.info("loading doc form url = " + url);
+			}
+			is = url.openStream();
+		}
 		if (is == null) return null;
 		Document doc = parser.parse(is);
 		return generateTree(findFirstElement(doc));
