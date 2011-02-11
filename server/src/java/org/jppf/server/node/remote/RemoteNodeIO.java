@@ -147,6 +147,5 @@ public class RemoteNodeIO extends AbstractNodeIO
 			dest.writeInt(dl.getSize());
 			dl.transferTo(dest, true);
 		}
-		//ioHandler.flush();
 	}
 }
