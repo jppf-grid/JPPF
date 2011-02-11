@@ -21,6 +21,7 @@ package org.jppf.client;
 import static org.jppf.client.JPPFClientConnectionStatus.FAILED;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.JPPFError;
@@ -162,7 +163,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	public void submit(JPPFJob job) throws Exception
 	{
 		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(this, job);
-		executor.submit(proc);
+		executor.submit(proc, proc);
 		if (debugEnabled) log.debug("["+name+"] submitted " + job.getTasks().size() + " tasks");
 	}
 
@@ -193,8 +194,17 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 			if (job != null) result.add(job);
 			while (!pending.isEmpty())
 			{
-				AsynchronousResultProcessor proc = (AsynchronousResultProcessor) pending.remove(0);
-				result.add(proc.getJob());
+				Future<?> f = (Future<?>) pending.remove(0);
+				AsynchronousResultProcessor proc;
+				try
+				{
+					proc = (AsynchronousResultProcessor) f.get();
+					result.add(proc.getJob());
+				}
+				catch (Exception e)
+				{
+					log.error(e.getMessage(), e);
+				}
 			}
 			return result;
 		}
