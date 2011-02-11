@@ -66,6 +66,6 @@ public class CacheClassKey
 	 */
 	public int hashCode()
 	{
-		return uuid.hashCode() + res.hashCode();
+		return uuid.hashCode() + 13*res.hashCode();
 	}
 }

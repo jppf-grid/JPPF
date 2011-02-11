@@ -28,7 +28,7 @@ import org.jppf.classloader.ResourceProvider;
 import org.jppf.comm.recovery.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -46,6 +46,10 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether TRACE logging level is enabled.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * A mapping of the remote resource provider connections handled by this socket server, to their unique uuid.<br>
 	 * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine in
 	 * which application classpath to look for the requested resources.
@@ -55,7 +59,8 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * The cache of class definition, this is done to not flood the provider when it dispatch many tasks. it use
 	 * WeakHashMap to minimize the OutOfMemory.
 	 */
-	Map<CacheClassKey, CacheClassContent> classCache = new WeakHashMap<CacheClassKey, CacheClassContent>();
+	//Map<CacheClassKey, CacheClassContent> classCache = new WeakHashMap<CacheClassKey, CacheClassContent>();
+	Map<CacheClassKey, CacheClassContent> classCache = new SoftReferenceValuesMap<CacheClassKey, CacheClassContent>();
 	/**
 	 * The thread polling the local channel.
 	 */
@@ -240,9 +245,13 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	public void setCacheContent(String uuid, String name, byte[] content)
 	{
+		if (traceEnabled) log.trace("adding cache entry with key=[" + uuid + ", " + name + "]");
 		CacheClassContent cacheContent = new CacheClassContent(content);
 		CacheClassKey cacheKey = new CacheClassKey(uuid, name);
-		classCache.put(cacheKey, cacheContent);
+		synchronized(classCache)
+		{
+			classCache.put(cacheKey, cacheContent);
+		}
 	}
 
 	/**
@@ -253,7 +262,12 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	public byte[] getCacheContent(String uuid, String name)
 	{
-		CacheClassContent content = classCache.get(new CacheClassKey(uuid, name));
+		if (traceEnabled) log.trace("looking up key=[" + uuid + ", " + name + "]");
+		CacheClassContent content;
+		synchronized(classCache)
+		{
+			content = classCache.get(new CacheClassKey(uuid, name));
+		}
 		return content != null ? content.getContent() : null;
 	}
 
