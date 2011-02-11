@@ -183,6 +183,7 @@ class ApplicationConnection extends JPPFConnection
 	{
 		if (currentJobId != null)
 		{
+			if (debugEnabled) log.debug("Ending job uuid=" + currentJobId);
 			currentJobId = null;
 			JPPFDriver.getInstance().getJobManager().jobEnded(headerWrapper);
 		}
