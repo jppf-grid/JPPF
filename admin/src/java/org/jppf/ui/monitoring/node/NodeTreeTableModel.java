@@ -26,38 +26,38 @@ import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
 /**
  * Tree table model for the tree table.
  */
-public class JPPFNodeTreeTableModel extends AbstractJPPFTreeTableModel
+public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 {
 	/**
 	 * Column number for the node's url.
 	 */
-	private static final int NODE_URL = 0;
+	static final int NODE_URL = 0;
 	/**
 	 * Column number for the node's thread pool size.
 	 */
-	private static final int NODE_THREADS = 1;
+	static final int NODE_THREADS = 1;
 	/**
 	 * Column number for the node's last event.
 	 */
-	private static final int NODE_STATUS = 2;
+	static final int NODE_STATUS = 2;
 	/**
 	 * Column number for the node's last event.
 	 */
-	private static final int EXECUTION_STATUS = 3;
+	static final int EXECUTION_STATUS = 3;
 	/**
 	 * Column number for the node's number of tasks executed.
 	 */
-	private static final int NB_TASKS = 4;
+	static final int NB_TASKS = 4;
 	/**
 	 * Column number for the node's latest task event.
 	 */
-	private static final int TASK_EVENT = 5;
+	static final int TASK_EVENT = 5;
 
 	/**
 	 * Initialize this model witht he specified tree.
 	 * @param node the root of the tree.
 	 */
-	public JPPFNodeTreeTableModel(TreeNode node)
+	public NodeTreeTableModel(TreeNode node)
 	{
 		super(node);
 		BASE = "org.jppf.ui.i18n.NodeDataPage";

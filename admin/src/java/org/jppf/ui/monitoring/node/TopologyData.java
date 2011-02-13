@@ -20,7 +20,6 @@ package org.jppf.ui.monitoring.node;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.utils.NetworkUtils;
 import org.slf4j.*;
 
 /**
@@ -64,7 +63,7 @@ public class TopologyData
 
 	/**
 	 * Initialize topology job data with the specified type.
-	 * @param type - the type of this job data object as a <code>JobDataType</code> enum value.
+	 * @param type the type of this job data object as a <code>JobDataType</code> enum value.
 	 */
 	protected TopologyData(TopologyDataType type)
 	{
@@ -73,7 +72,7 @@ public class TopologyData
 
 	/**
 	 * Initialize this topology data as a driver related object.
-	 * @param clientConnection - a reference to the driver connection.
+	 * @param clientConnection a reference to the driver connection.
 	 */
 	public TopologyData(JPPFClientConnection clientConnection)
 	{
@@ -84,15 +83,14 @@ public class TopologyData
 
 	/**
 	 * Initialize this topology data as holding information about a node.
-	 * @param nodeInformation - information on the JPPF node.
+	 * @param nodeInformation information on the JPPF node.
 	 */
 	public TopologyData(JPPFManagementInfo nodeInformation)
 	{
 		this(TopologyDataType.NODE);
 		this.nodeInformation = nodeInformation;
 		this.nodeState = new JPPFNodeState();
-		String host = NetworkUtils.getHostName(nodeInformation.getHost());
-		jmxWrapper = new JMXNodeConnectionWrapper(host, nodeInformation.getPort());
+		jmxWrapper = new JMXNodeConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort());
 		jmxWrapper.connect();
 	}
 
@@ -144,7 +142,7 @@ public class TopologyData
 
 	/**
 	 * Set the object describing the current state of a node.
-	 * @param nodeState - a <code>JPPFNodeState</code> instance.
+	 * @param nodeState a <code>JPPFNodeState</code> instance.
 	 */
 	public void setNodeState(JPPFNodeState nodeState)
 	{

@@ -24,10 +24,9 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import org.jppf.client.JPPFClientConnectionStatus;
-import org.jppf.management.JPPFManagementInfo;
+import org.jppf.management.*;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.ui.utils.GuiUtils;
-import org.jppf.utils.JPPFConfiguration;
 
 /**
  * Renderer used to render the tree nodes in the node data panel.
@@ -103,12 +102,18 @@ public class NodeRenderer extends AbstractTreeCellRenderer
 							backgroundSelected = INACTIVE_SELECTION_COLOR;
 							font = getItalicFont(f);
 						}
+						else
+						{
+							JMXConnectionWrapper wrapper = data.getJmxWrapper();
+							boolean b = wrapper == null ? false : wrapper.isConnected();
+							if (!b) foreground = UNMANAGED_COLOR;
+						}
 						break;
 				}
 				if (font != null) setFont(font);
 				ImageIcon icon = GuiUtils.loadIcon(path);
 				renderer.setIcon(icon);
-				if (JPPFConfiguration.getProperties().getBoolean("jppf.state.highlighting.enabled", true))
+				if (highlightingEnabled)
 				{
 					renderer.setBackgroundNonSelectionColor(background);
 					renderer.setBackgroundSelectionColor(backgroundSelected);

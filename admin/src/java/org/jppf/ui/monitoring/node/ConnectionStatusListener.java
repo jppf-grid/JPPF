@@ -65,7 +65,7 @@ class ConnectionStatusListener implements ClientConnectionStatusListener
 	{
 		ClientConnectionStatusHandler ccsh =  event.getClientConnectionStatusHandler();
 		if (debugEnabled) log.debug("Received connection status changed event for " + ccsh + " : " + ccsh.getStatus());
-		DefaultMutableTreeNode driverNode = panel.findDriver(driverName);
+		DefaultMutableTreeNode driverNode = panel.getManager().findDriver(driverName);
 		if (driverNode != null) panel.getModel().changeNode(driverNode);
 	}
 }

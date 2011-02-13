@@ -26,7 +26,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
-import org.jppf.utils.NetworkUtils;
 import org.slf4j.*;
 
 /**
@@ -92,61 +91,13 @@ public class NodeRefreshHandler
 	/**
 	 * Refresh the tree structure asynchonously (not in the AWT event thread).
 	 */
-	public synchronized void refresh()
+	public void refresh()
 	{
 		if (refreshing.get()) return;
 		refreshing.set(true);
-		Runnable r = new Runnable()
-		{
-			public void run()
-			{
-				refresh0();
-			}
-		};
-		new Thread(r, "node panel refresh " + refreshCount.incrementAndGet()).start();
-	}
-
-	/**
-	 * Refresh the tree structure.
-	 */
-	public synchronized void refresh0()
-	{
 		try
 		{
-			Collection<JPPFClientConnection> connectionList = jppfClient.getAllConnections();
-			Map<String, JPPFClientConnection> map = new HashMap<String, JPPFClientConnection>();
-			for (JPPFClientConnection c: connectionList) map.put(((JPPFClientConnectionImpl) c).getJmxConnection().getId(), c);
-			Map<String, JPPFClientConnection> connectionMap = nodeDataPanel.getAllDriverNames();
-	
-			// handle drivers that were removed
-			List<String> driversToProcess = new ArrayList<String>();
-			for (Map.Entry<String, JPPFClientConnection> entry: connectionMap.entrySet())
-			{
-				String name = entry.getKey();
-				if (!map.containsKey(name)) driversToProcess.add(name);
-				else refreshNodes(name);
-			}
-			for (String name: driversToProcess)
-			{
-				if (debugEnabled) log.debug("removing driver " + name); 
-				removeDriver(name);
-			}
-	
-			// handle drivers that were added
-			driversToProcess = new ArrayList<String>();
-			for (Map.Entry<String, JPPFClientConnection> entry: map.entrySet())
-			{
-				String name = entry.getKey();
-				if (!connectionMap.containsKey(name)) driversToProcess.add(name);
-			}
-			for (String name: driversToProcess)
-			{
-				if (debugEnabled) log.debug("adding driver " + name); 
-				addDriver(map.get(name));
-			}
-			nodeDataPanel.refreshNodeStates();
-			nodeDataPanel.getTreeTable().invalidate();
-			nodeDataPanel.getTreeTable().repaint();
+			refresh0();
 		}
 		finally
 		{
@@ -155,12 +106,52 @@ public class NodeRefreshHandler
 	}
 
 	/**
+	 * Refresh the tree structure.
+	 */
+	private synchronized void refresh0()
+	{
+		Collection<JPPFClientConnection> connectionList = jppfClient.getAllConnections();
+		Map<String, JPPFClientConnection> map = new HashMap<String, JPPFClientConnection>();
+		for (JPPFClientConnection c: connectionList) map.put(((JPPFClientConnectionImpl) c).getJmxConnection().getId(), c);
+		Map<String, JPPFClientConnection> connectionMap = nodeDataPanel.getAllDriverNames();
+
+		// handle drivers that were removed
+		List<String> driversToProcess = new ArrayList<String>();
+		for (Map.Entry<String, JPPFClientConnection> entry: connectionMap.entrySet())
+		{
+			String name = entry.getKey();
+			if (!map.containsKey(name)) driversToProcess.add(name);
+			else refreshNodes(name);
+		}
+		for (String name: driversToProcess)
+		{
+			if (debugEnabled) log.debug("removing driver " + name); 
+			nodeDataPanel.driverRemoved(name, false);
+		}
+
+		// handle drivers that were added
+		driversToProcess = new ArrayList<String>();
+		for (Map.Entry<String, JPPFClientConnection> entry: map.entrySet())
+		{
+			String name = entry.getKey();
+			if (!connectionMap.containsKey(name)) driversToProcess.add(name);
+		}
+		for (String name: driversToProcess)
+		{
+			if (debugEnabled) log.debug("adding driver " + name); 
+			nodeDataPanel.driverAdded(map.get(name));
+		}
+		nodeDataPanel.refreshNodeStates();
+		nodeDataPanel.repaintTreeTable();
+	}
+
+	/**
 	 * Refresh the nodes currently attached to the specified driver.
-	 * @param driverName - the name of the driver.
+	 * @param driverName the name of the driver.
 	 */
 	private synchronized void refreshNodes(String driverName)
 	{
-		DefaultMutableTreeNode driverNode = nodeDataPanel.findDriver(driverName);
+		DefaultMutableTreeNode driverNode = nodeDataPanel.getManager().findDriver(driverName);
 		if (driverNode == null) return;
 		Set<String> panelNames = new HashSet<String>();
 		for (int i=0; i<driverNode.getChildCount(); i++)
@@ -184,7 +175,8 @@ public class NodeRefreshHandler
 		}
 		if (nodesInfo == null) return;
 		Map<String, JPPFManagementInfo> actualMap = new HashMap<String, JPPFManagementInfo>();
-		for (JPPFManagementInfo info: nodesInfo) actualMap.put(NetworkUtils.getHostName(info.getHost()) + ":" + info.getPort(), info);
+		//for (JPPFManagementInfo info: nodesInfo) actualMap.put(NetworkUtils.getHostName(info.getHost()) + ":" + info.getPort(), info);
+		for (JPPFManagementInfo info: nodesInfo) actualMap.put(info.getHost() + ":" + info.getPort(), info);
 		List<String> nodesToProcess = new ArrayList<String>();
 		for (String name: panelNames)
 		{
@@ -192,7 +184,7 @@ public class NodeRefreshHandler
 		}
 		for (String name: nodesToProcess)
 		{
-			if (debugEnabled) log.debug("removing node " + name); 
+			if (debugEnabled) log.debug("removing node " + name);
 			nodeDataPanel.nodeRemoved(driverName, name);
 		}
 		nodesToProcess = new ArrayList<String>();
@@ -205,24 +197,6 @@ public class NodeRefreshHandler
 			if (debugEnabled) log.debug("adding node " + name); 
 			nodeDataPanel.nodeAdded(driverName, actualMap.get(name));
 		}
-	}
-
-	/**
-	 * Add a driver connection to the currently monitored set of connections.
-	 * @param connection - the driver connection to add.
-	 */
-	private synchronized void addDriver(JPPFClientConnection connection)
-	{
-		nodeDataPanel.driverAdded(connection);
-	}
-
-	/**
-	 * Remove a driver connection from the currently monitored set of connections.
-	 * @param driverName the name of the connection to remove.
-	 */
-	private synchronized void removeDriver(String driverName)
-	{
-		nodeDataPanel.driverRemoved(driverName, false);
 	}
 
 	/**

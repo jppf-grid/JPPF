@@ -22,6 +22,8 @@ import java.awt.*;
 
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.jppf.utils.JPPFConfiguration;
+
 /**
  * Renderer used to render the tree nodes in the node data panel.
  * @author Laurent Cohen
@@ -29,49 +31,57 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
 {
 	/**
+	 * Is tree nodes highlighting enabled?
+	 */
+	public static boolean highlightingEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.state.highlighting.enabled", true);
+	/**
 	 * Path to the location of the icon files.
 	 */
-	protected static final String RESOURCES = "/org/jppf/ui/resources/";
+	public static final String RESOURCES = "/org/jppf/ui/resources/";
 	/**
 	 * Path to the icon used for a driver.
 	 */
-	protected static final String DRIVER_ICON = RESOURCES + "mainframe.gif";
+	public static final String DRIVER_ICON = RESOURCES + "mainframe.gif";
 	/**
 	 * Path to the icon used for an inactive driver connection.
 	 */
-	protected static final String DRIVER_INACTIVE_ICON = RESOURCES + "mainframe_inactive.gif";
+	public static final String DRIVER_INACTIVE_ICON = RESOURCES + "mainframe_inactive.gif";
 	/**
 	 * Path to the icon used for a node.
 	 */
-	protected static final String NODE_ICON = RESOURCES + "buggi_server.gif";
+	public static final String NODE_ICON = RESOURCES + "buggi_server.gif";
 	/**
 	 * Path to the icon used for a job.
 	 */
-	protected static final String JOB_ICON = RESOURCES + "rack.gif";
+	public static final String JOB_ICON = RESOURCES + "rack.gif";
 	/**
 	 * Highlighting color for active driver connections.
 	 */
-	protected static final Color ACTIVE_COLOR = new Color(144, 213, 149);
+	public static final Color ACTIVE_COLOR = new Color(144, 213, 149);
 	/**
 	 * Highlighting color for non-selected inactive driver connections.
 	 */
-	protected static final Color INACTIVE_COLOR = new Color(244, 99, 107);
+	public static final Color INACTIVE_COLOR = new Color(244, 99, 107);
 	/**
 	 * Highlighting color for selected inactive driver connections.
 	 */
-	protected static final Color INACTIVE_SELECTION_COLOR = new Color(214, 127, 255);
+	public static final Color INACTIVE_SELECTION_COLOR = new Color(214, 127, 255);
 	/**
 	 * Highlighting color for non-selected suspended jobs.
 	 */
-	protected static final Color SUSPENDED_COLOR = new Color(255, 216, 0);
+	public static final Color SUSPENDED_COLOR = new Color(255, 216, 0);
 	/**
 	 * Default foreground color.
 	 */
-	protected static final Color DEFAULT_FOREGROUND = Color.BLACK;
+	public static final Color DEFAULT_FOREGROUND = Color.BLACK;
 	/**
 	 * Default foreground color.
 	 */
-	protected static final Color DIMMED_FOREGROUND = Color.GRAY;
+	public static final Color DIMMED_FOREGROUND = Color.GRAY;
+	/**
+	 * FOreground color for non-managed nodes.
+	 */
+	public static final Color UNMANAGED_COLOR = new Color(255, 28, 28);
 	/**
 	 * Default non-selection background.
 	 */

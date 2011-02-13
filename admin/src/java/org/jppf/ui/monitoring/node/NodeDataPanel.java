@@ -19,14 +19,15 @@
 package org.jppf.ui.monitoring.node;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.*;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.management.*;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
@@ -64,6 +65,14 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * Number of active nodes.
 	 */
 	private AtomicInteger nbNodes = new AtomicInteger(0);
+	/**
+	 * Manages the tree table updates.
+	 */
+	private NodeDataPanelManager manager;
+	/**
+	 * Separate thread used to sequentialize events that impact the tree table.
+	 */
+	private ExecutorService executor = Executors.newSingleThreadExecutor();
 
 	/**
 	 * Initialize this panel with the specified information.
@@ -72,6 +81,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	{
 		BASE = "org.jppf.ui.i18n.NodeDataPage";
 		if (debugEnabled) log.debug("initializing NodeDataPanel");
+		manager = new NodeDataPanelManager(this);
 		createTreeTableModel();
 		populateTreeTableModel();
 		refreshNodeStates();
@@ -85,7 +95,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	private void createTreeTableModel()
 	{
 		treeTableRoot = new DefaultMutableTreeNode(localize("tree.root.name"));
-		model = new JPPFNodeTreeTableModel(treeTableRoot);
+		model = new NodeTreeTableModel(treeTableRoot);
 	}
 
 	/**
@@ -113,6 +123,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		treeTable.doLayout();
 		treeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		treeTable.getTree().setCellRenderer(new NodeRenderer());
+		treeTable.setDefaultRenderer(Object.class, new NodeTableCellRenderer());
 		JScrollPane sp = new JScrollPane(treeTable);
 		setUIComponent(sp);
 		//setupActions();
@@ -124,47 +135,34 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * @param driverName the name of the driver to which the node is attached.
 	 * @param nodeName the name of the node to update.
 	 */
-	public synchronized void nodeDataUpdated(String driverName, String nodeName)
+	public void nodeDataUpdated(final String driverName, final String nodeName)
 	{
-		final DefaultMutableTreeNode driverNode = findDriver(driverName);
-		if (driverNode == null) return;
-		final DefaultMutableTreeNode node = findNode(driverNode, nodeName);
-		if (node != null) model.changeNode(node);
+		//Runnable r = new SynchronizedTask(this)
+		Runnable r = new Runnable()
+		{
+			public void run()
+			{
+				manager.nodeDataUpdated(driverName, nodeName);
+			}
+		};
+		executor.submit(r);
 	}
 
 	/**
 	 * Called to notify that a driver was added.
 	 * @param connection a reference to the driver connection.
 	 */
-	public synchronized void driverAdded(final JPPFClientConnection connection)
+	public void driverAdded(final JPPFClientConnection connection)
 	{
-		JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) connection).getJmxConnection();
-		String driverName = wrapper.getId();
-		int index = driverInsertIndex(driverName);
-		if (index < 0) return;
-		TopologyData driverData = new TopologyData(connection);
-		DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driverData);
-		if (debugEnabled) log.debug("adding driver: " + driverName + " at index " + index);
-		model.insertNodeInto(driverNode, treeTableRoot, index);
-		if (listenerMap.get(wrapper.getId()) == null)
+		//Runnable r = new SynchronizedTask(this)
+		Runnable r = new Runnable()
 		{
-			ConnectionStatusListener listener = new ConnectionStatusListener(this, wrapper.getId());
-			connection.addClientConnectionStatusListener(listener);
-			listenerMap.put(wrapper.getId(), listener);
-		}
-		Collection<JPPFManagementInfo> nodes = null;
-		try
-		{
-			nodes = wrapper.nodesInformation();
-		}
-		catch(Exception e)
-		{
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			return;
-		}
-		if (nodes != null) for (JPPFManagementInfo nodeInfo: nodes) nodeAdded(driverNode, nodeInfo);
-		if (treeTable != null) treeTable.expand(driverNode);
-		updateStatusBar("/StatusNbServers", 1);
+			public void run()
+			{
+				manager.driverAdded(connection);
+			}
+		};
+		executor.submit(r);
 	}
 
 	/**
@@ -172,24 +170,17 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * @param driverName the name of the driver to remove.
 	 * @param removeNodesOnly true if only the nodes attached to the driver are to be removed.
 	 */
-	public synchronized void driverRemoved(String driverName, boolean removeNodesOnly)
+	public void driverRemoved(final String driverName, final boolean removeNodesOnly)
 	{
-		final DefaultMutableTreeNode driverNode = findDriver(driverName);
-		if (debugEnabled) log.debug("removing driver: " + driverName);
-		if (driverNode == null) return;
-		if (removeNodesOnly)
+		//Runnable r = new SynchronizedTask(this)
+		Runnable r = new Runnable()
 		{
-			for (int i=driverNode.getChildCount()-1; i>=0; i--)
+			public void run()
 			{
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode ) driverNode.getChildAt(i);
-				model.removeNodeFromParent(node);
+				manager.driverRemoved(driverName, removeNodesOnly);
 			}
-		}
-		else
-		{
-			model.removeNodeFromParent(driverNode);
-			updateStatusBar("/StatusNbServers", -1);
-		}
+		};
+		executor.submit(r);
 	}
 
 	/**
@@ -197,9 +188,9 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * @param driverName the name of the driver to which the node is added.
 	 * @param nodeInfo the object that encapsulates the node addition.
 	 */
-	public synchronized void nodeAdded(String driverName, JPPFManagementInfo nodeInfo)
+	public void nodeAdded(String driverName, JPPFManagementInfo nodeInfo)
 	{
-		final DefaultMutableTreeNode driverNode = findDriver(driverName);
+		final DefaultMutableTreeNode driverNode = manager.findDriver(driverName);
 		if (driverNode == null) return;
 		nodeAdded(driverNode, nodeInfo);
 	}
@@ -209,24 +200,17 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * @param driverNode the driver to which the node is added.
 	 * @param nodeInfo the object that encapsulates the node addition.
 	 */
-	public synchronized void nodeAdded(DefaultMutableTreeNode driverNode, JPPFManagementInfo nodeInfo)
+	public void nodeAdded(final DefaultMutableTreeNode driverNode, final JPPFManagementInfo nodeInfo)
 	{
-		String nodeName = nodeInfo.getHost() + ":" + nodeInfo.getPort();
-		int index = nodeInsertIndex(driverNode, nodeName);
-		if (index < 0) return;
-		if (debugEnabled) log.debug("adding node: " + nodeName + " at index " + index);
-		TopologyData data = new TopologyData(nodeInfo);
-		DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(data);
-		model.insertNodeInto(nodeNode, driverNode, index);
-		if (nodeInfo.getType() == JPPFManagementInfo.NODE) updateStatusBar("/StatusNbNodes", 1);
-
-		for (int i=0; i<treeTableRoot.getChildCount(); i++)
+		//Runnable r = new SynchronizedTask(this)
+		Runnable r = new Runnable()
 		{
-			DefaultMutableTreeNode driverNode2 = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
-			if (driverNode2 == driverNode) continue;
-			DefaultMutableTreeNode nodeNode2 = findNode(driverNode2, nodeName);
-			if (nodeNode2 != null) model.removeNodeFromParent(nodeNode2);
-		}
+			public void run()
+			{
+				manager.nodeAdded(driverNode, nodeInfo);
+			}
+		};
+		executor.submit(r);
 	}
 
 	/**
@@ -234,90 +218,31 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * @param driverName the name of the driver from which the node is removed.
 	 * @param nodeName the name of the node to remove.
 	 */
-	public synchronized void nodeRemoved(String driverName, String nodeName)
+	public void nodeRemoved(final String driverName, final String nodeName)
 	{
-		DefaultMutableTreeNode driverNode = findDriver(driverName);
-		if (driverNode == null) return;
-		final DefaultMutableTreeNode node = findNode(driverNode, nodeName);
-		if (node == null) return;
-		if (debugEnabled) log.debug("removing node: " + nodeName);
-		model.removeNodeFromParent(node);
-		TopologyData data = (TopologyData) node.getUserObject();
-		if ((data != null) && (data.getNodeInformation().getType() == JPPFManagementInfo.NODE)) updateStatusBar("/StatusNbNodes", -1);
+		//Runnable r = new SynchronizedTask(this)
+		Runnable r = new Runnable()
+		{
+			public void run()
+			{
+				manager.nodeRemoved(driverName, nodeName);
+			}
+		};
+		executor.submit(r);
 	}
 
 	/**
-	 * Find the driver tree node with the specified driver name.
-	 * @param driverName name of the dirver to find.
-	 * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
+	 * Repaint the tree table area.
 	 */
-	public synchronized DefaultMutableTreeNode findDriver(String driverName)
+	void repaintTreeTable()
 	{
-		for (int i=0; i<treeTableRoot.getChildCount(); i++)
+		executor.submit(new Runnable()
 		{
-			DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
-			TopologyData data = (TopologyData) driverNode.getUserObject();
-			String name = data.getJmxWrapper().getId();
-			if (name.equals(driverName)) return driverNode;
-		}
-		return null;
-	}
-
-	/**
-	 * Find the node tree node with the specified driver name and node information.
-	 * @param driverNode name the parent of the node to find.
-	 * @param nodeName the name of the node to find.
-	 * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
-	 */
-	public synchronized DefaultMutableTreeNode findNode(DefaultMutableTreeNode driverNode, String nodeName)
-	{
-		for (int i=0; i<driverNode.getChildCount(); i++)
-		{
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
-			TopologyData nodeData = (TopologyData) node.getUserObject();
-			if (nodeName.equals(nodeData.getJmxWrapper().getId())) return node;
-		}
-		return null;
-	}
-
-	/**
-	 * Find the position at which to insert a driver,
-	 * using the sorted lexical order of driver names. 
-	 * @param driverName the name of the driver to insert.
-	 * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
-	 */
-	public synchronized int driverInsertIndex(String driverName)
-	{
-		int n = treeTableRoot.getChildCount();
-		for (int i=0; i<n; i++)
-		{
-			DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
-			TopologyData data = (TopologyData) driverNode.getUserObject();
-			String name = data.getJmxWrapper().getId();
-			if (name.equals(driverName)) return -1;
-			else if (driverName.compareTo(name) < 0) return i;
-		}
-		return n;
-	}
-
-	/**
-	 * Find the position at which to insert a node, using the sorted lexical order of node names. 
-	 * @param driverNode name the parent of the node to insert.
-	 * @param nodeName the name of the node to insert.
-	 * @return the index at which to insert the node, or -1 if the node is already in the tree.
-	 */
-	public synchronized int nodeInsertIndex(DefaultMutableTreeNode driverNode, String nodeName)
-	{
-		int n = driverNode.getChildCount();
-		for (int i=0; i<n; i++)
-		{
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
-			TopologyData nodeData = (TopologyData) node.getUserObject();
-			String name = nodeData.getJmxWrapper().getId();
-			if (nodeName.equals(name)) return -1;
-			else if (nodeName.compareTo(name) < 0) return i;
-		}
-		return n;
+			public void run()
+			{
+				manager.repaintTreeTable();
+			}
+		});
 	}
 
 	/**
@@ -398,7 +323,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * @param name the name of the field to update.
 	 * @param n the number of servers to add or subtract.
 	 */
-	private void updateStatusBar(String name, int n)
+	void updateStatusBar(String name, int n)
 	{
 		try
 		{
@@ -423,5 +348,23 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		if (option != null) option.setValue(Double.valueOf(nbServers.get()));
 		option = (FormattedNumberOption) findFirstWithName("/StatusNbNodes");
 		if (option != null) option.setValue(Double.valueOf(nbNodes.get()));
+	}
+
+	/**
+	 * Get the mapping of connection names to status listener.
+	 * @return a map of string keys to <code>ConnectionStatusListener</code> values.
+	 */
+	Map<String, ConnectionStatusListener> getListenerMap()
+	{
+		return listenerMap;
+	}
+
+	/**
+	 * Get the tree table updates manager.
+	 * @return a {@link NodeDataPanelManager} instance.
+	 */
+	NodeDataPanelManager getManager()
+	{
+		return manager;
 	}
 }

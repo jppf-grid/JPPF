@@ -198,9 +198,15 @@ public final class NetworkUtils
 	 */
 	public static String getHostName(String ip)
 	{
-		InetSocketAddress addr = new InetSocketAddress(ip, 0);
-		String s = addr.getHostName();
-		return s == null ? ip : s;
+		try
+		{
+			InetAddress a = InetAddress.getByName(ip);
+			return a.getHostName();
+		}
+		catch(Exception e)
+		{
+			return ip;
+		}
 	}
 
 	/**
