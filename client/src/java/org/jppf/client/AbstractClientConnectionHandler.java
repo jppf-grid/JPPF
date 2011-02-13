@@ -24,10 +24,12 @@ import java.util.*;
 
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * Common abstract superclass for client connections to a server.
  * @author Laurent Cohen
+ * @author Jeff Rosen
  */
 public abstract class AbstractClientConnectionHandler implements ClientConnectionHandler
 {
@@ -39,6 +41,11 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * Used to synchronize access to the underlying socket from multiple threads.
 	 */
 	protected SocketInitializer socketInitializer = createSocketInitializer();
+	/**
+	 * The maximum time the underlying socket may be idle, before it is considered
+	 * suspect and recycled.
+	 */
+	private long maxSocketIdleMillis;
 	/**
 	 * The name or IP address of the host the class server is running on.
 	 */
@@ -72,6 +79,8 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	{
 		this.owner = owner;
 		if (owner != null) this.name = owner.getName();
+		long configSocketIdle = JPPFConfiguration.getProperties().getLong("jppf.socket.max-idle", -1L);
+		maxSocketIdleMillis = (configSocketIdle > 10L) ? configSocketIdle * 1000L : -1L; 
 	}
 
 	/**
@@ -137,11 +146,18 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	}
 
 	/**
-	 * Get the socket client uses to communicate over a socket connection.
+	 * Get the socket client used to communicate over a socket connection.
 	 * @return a <code>SocketWrapper</code> instance.
+	 * @throws Exception if any error occurs.
 	 */
-	public SocketWrapper getSocketClient()
+	public SocketWrapper getSocketClient() throws Exception
 	{
+		// If the socket has been idle too long, recycle the connection.
+		if ((maxSocketIdleMillis > 10000L) 
+			&& (System.currentTimeMillis() - maxSocketIdleMillis > socketClient.getSocketTimestamp())) {
+			close();
+			init();
+		}
 		return socketClient;
 	}
 }

@@ -29,6 +29,7 @@ import org.slf4j.*;
  * This SocketWrapper implementation relies on an underlying SocketChannel, in order to allow
  * writing to, and reading from, at the same time from the same socket connection. 
  * @author Laurent Cohen
+ * @author Jeff Rosen
  */
 public class SocketChannelClient implements SocketWrapper
 {
@@ -439,5 +440,18 @@ public class SocketChannelClient implements SocketWrapper
 	public void write(byte[] data) throws Exception
 	{
 		write(data, 0, data.length);
+	}
+
+	/**
+	 * Returns a timestamp that should reflect the system millisecond counter at the
+	 * last known good usage of the underlying socket.  
+	 * 
+	 * NOTE: In this case we assume that the channel is "known good" and just return
+	 * the current system tick.
+	 *   
+	 * @return the socket usage timestamp  
+	 */
+	public long getSocketTimestamp() {
+		return System.currentTimeMillis();
 	}
 }
