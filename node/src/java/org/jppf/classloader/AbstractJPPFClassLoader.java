@@ -166,7 +166,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("name", resName);
 			JPPFResourceWrapper resource = loadResourceData(map, false);
-			if (resource == null) throw new ClassNotFoundException("could not find reosurce " + name);
+			if (resource == null) throw new ClassNotFoundException("could not find resource " + name);
 			b = resource.getDefinition();
 			if ((b == null) || (b.length == 0))
 			{
