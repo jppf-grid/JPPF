@@ -69,17 +69,20 @@ public class NodeTableCellRenderer extends DefaultTableCellRenderer
 			}
 			JPPFTreeTable treeTable = (JPPFTreeTable) table;
 			TreePath path = treeTable.getPathForRow(row);
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-			//System.out.println("row="+row+", col="+column+", node="+node);
-			Object o = node.getUserObject();
-			if (o instanceof TopologyData)
+			if (path != null)
 			{
-				TopologyData data = (TopologyData) o;
-				if (TopologyDataType.NODE.equals(data.getType()))
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+				//System.out.println("row="+row+", col="+column+", node="+node);
+				Object o = node.getUserObject();
+				if (o instanceof TopologyData)
 				{
-					JMXConnectionWrapper wrapper = data.getJmxWrapper();
-					if ((wrapper == null) || !wrapper.isConnected()) renderer.setForeground(AbstractTreeCellRenderer.UNMANAGED_COLOR);
-					else renderer.setForeground(AbstractTreeCellRenderer.DEFAULT_FOREGROUND);
+					TopologyData data = (TopologyData) o;
+					if (TopologyDataType.NODE.equals(data.getType()))
+					{
+						JMXConnectionWrapper wrapper = data.getJmxWrapper();
+						if ((wrapper == null) || !wrapper.isConnected()) renderer.setForeground(AbstractTreeCellRenderer.UNMANAGED_COLOR);
+						else renderer.setForeground(AbstractTreeCellRenderer.DEFAULT_FOREGROUND);
+					}
 				}
 			}
 			renderer.setHorizontalAlignment(alignment);
