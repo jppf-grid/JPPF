@@ -46,6 +46,10 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether debugging level is set for logging.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * Mapping of individual bundler to corresponding performance data.
 	 */
 	private static Set<AbstractProportionalBundler> bundlers = new HashSet<AbstractProportionalBundler>();
@@ -65,7 +69,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	public AbstractProportionalBundler(LoadBalancingProfile profile)
 	{
 		super(profile);
-		if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size - the initial size is " + bundleSize + ", profile: " + profile);
+		if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": Using proportional bundle size - the initial size is " + bundleSize + ", profile: " + profile);
 		dataHolder = new BundleDataHolder(((ProportionalTuneProfile) profile).getPerformanceCacheSize());
 	}
 
@@ -97,6 +101,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 */
 	public void feedback(int size, double time)
 	{
+		if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": new performance sample [size=" + size + ", time=" + (long) time + "]");
 		if (size <= 0) return;
 		BundlePerformanceSample sample = new BundlePerformanceSample((double) time / (double) size, size);
 		synchronized(bundlers)
@@ -186,11 +191,11 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 			{
 				StringBuilder sb = new StringBuilder();
 				sb.append("bundler info:\n");
-				sb.append("minMean = ").append(minMean).append(", maxMean = ").append(maxMean).append(", maxSize = ").append(max).append("\n");
+				sb.append("  minMean = ").append(minMean).append(", maxMean = ").append(maxMean).append(", maxSize = ").append(max).append("\n");
 				for (AbstractProportionalBundler b: bundlers)
 				{
-					sb.append("bundler #").append(b.getBundlerNumber()).append(" : ").append(b.getBundleSize()).append(":\n");
-					sb.append("  ").append(b.getDataHolder()).append("\n");
+					sb.append("  bundler #").append(b.getBundlerNumber()).append(" : bundleSize=").append(b.getBundleSize()).append(", ");
+					sb.append(b.getDataHolder()).append("\n");
 				}
 				log.debug(sb.toString());
 			}
