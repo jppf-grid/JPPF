@@ -30,7 +30,7 @@ import org.jppf.ui.utils.GuiUtils;
 import org.slf4j.*;
 
 /**
- * This action stops a node.
+ * This action stops a server and optionally restarts it after a specified delay.
  */
 public class ServerShutdownRestartAction extends AbstractTopologyAction
 {

@@ -45,7 +45,7 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 
 	/**
 	 * Update this action's enabled state based on a list of selected elements.
-	 * @param selectedElements - a list of objects.
+	 * @param selectedElements a list of objects.
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
 	public void updateState(List<Object> selectedElements)
@@ -54,11 +54,6 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 		List<TopologyData> list = new ArrayList<TopologyData>();
 		for (Object o: selectedElements)
 		{
-			/*
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) o;
-			if (!(node.getUserObject() instanceof TopologyData)) continue;
-			TopologyData data = (TopologyData) node.getUserObject();
-			*/
 			TopologyData data = (TopologyData) o;
 			if (TopologyDataType.NODE.equals(data.getType()))
 			{
