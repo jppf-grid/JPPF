@@ -200,4 +200,12 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	{
 		return (NodeJobInformation[]) invoke(DriverJobManagementMBean.MBEAN_NAME, "getNodeInformation", new Object[] { jobId }, new String[] { "java.lang.String" });
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void resetStatistics() throws Exception
+	{
+		invoke(DRIVER_MBEAN_NAME, "resetStatistics", (Object[]) null, (String[]) null);
+	}
 }

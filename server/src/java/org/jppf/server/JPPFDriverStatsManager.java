@@ -25,7 +25,7 @@ import org.jppf.utils.EventEmitter;
  * @see org.jppf.server.JPPFDriver#getStatsManager()
  * @author Laurent Cohen
  */
-public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListener>
+public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListener> implements JPPFDriverListener
 {
 	/**
 	 * Called to notify that a new client is connected to he JPPF server.
@@ -61,7 +61,7 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 
 	/**
 	 * Called to notify that a task was added to the queue.
-	 * @param count - the number of tasks that have been added to the queue.
+	 * @param count the number of tasks that have been added to the queue.
 	 */
 	public synchronized void taskInQueue(int count)
 	{
@@ -70,8 +70,8 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 
 	/**
 	 * Called to notify that a task was removed from the queue.
-	 * @param count - the number of tasks that have been removed from the queue.
-	 * @param time - the time the task remained in the queue.
+	 * @param count the number of tasks that have been removed from the queue.
+	 * @param time the time the task remained in the queue.
 	 */
 	public synchronized void taskOutOfQueue(int count, long time)
 	{
@@ -80,13 +80,21 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	
 	/**
 	 * Called when a task execution has completed.
-	 * @param count - the number of tasks that have been executed.
-	 * @param time - the time it took to execute the task, including transport to and from the node.
-	 * @param remoteTime - the time it took to execute the in the node only.
-	 * @param size - the size in bytes of the bundle that was sent to the node.
+	 * @param count the number of tasks that have been executed.
+	 * @param time the time it took to execute the task, including transport to and from the node.
+	 * @param remoteTime the time it took to execute the in the node only.
+	 * @param size the size in bytes of the bundle that was sent to the node.
 	 */
 	public synchronized void taskExecuted(int count, long time, long remoteTime, long size)
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.taskExecuted(count, time, remoteTime, size);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void reset()
+	{
+		for (JPPFDriverListener listener: eventListeners) listener.reset();
 	}
 }

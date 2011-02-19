@@ -386,4 +386,25 @@ public class JPPFStats implements Serializable
 	{
 		return maxClients;
 	}
+
+	/**
+	 * Reset all fields of this <code>JPPFStats</code> object to their initial values.
+	 */
+	public synchronized void reset()
+	{
+		totalTasksExecuted = 0;
+		execution = new TimeSnapshot("execution");
+		nodeExecution = new TimeSnapshot("node execution");
+		transport = new TimeSnapshot("transport");
+		server = new TimeSnapshot("server");
+		footprint = 0L;
+		queue = new TimeSnapshot("queue");
+		totalQueued = 0;
+		queueSize = 0;
+		maxQueueSize = 0;
+		nbNodes = 0;
+		maxNodes = 0;
+		nbClients = 0;
+		maxClients = 0;
+	}
 }

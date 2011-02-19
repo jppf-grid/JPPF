@@ -67,4 +67,9 @@ public interface JPPFDriverListener extends EventListener
 	 * @param size the size in bytes of the bundle that was sent to the node.
 	 */
 	void taskExecuted(int count, long time, long remoteTime, long size);
+
+	/**
+	 * Notification that a reset of this server's statistics has been requested.
+	 */
+	void reset();
 }

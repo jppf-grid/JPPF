@@ -173,4 +173,12 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	{
 		return LocalizationUtils.getLocalized(I18N_BASE, message);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void resetStatistics() throws Exception
+	{
+		driver.getStatsManager().reset();
+	}
 }

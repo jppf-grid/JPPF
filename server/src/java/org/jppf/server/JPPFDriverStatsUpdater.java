@@ -118,4 +118,12 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	{
 		return stats.getNbNodes();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void reset()
+	{
+		stats.reset();
+	}
 }
