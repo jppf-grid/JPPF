@@ -45,10 +45,6 @@ class TaskQueueChecker implements Runnable
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Determines whether TRACE logging level is enabled.
-	 */
-	private static boolean traceEnabled = log.isDebugEnabled();
-	/**
 	 * Random number generator used to randomize the choice of idle channel.
 	 */
 	private Random random = new Random(System.currentTimeMillis());
@@ -88,7 +84,7 @@ class TaskQueueChecker implements Runnable
 			{
 				if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return;
 				if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
-				ChannelWrapper channel = null;
+				ChannelWrapper<?> channel = null;
 				BundleWrapper selectedBundle = null;
 				AbstractJPPFQueue queue = (AbstractJPPFQueue) server.getQueue();
 				queue.getLock().lock();
@@ -114,11 +110,19 @@ class TaskQueueChecker implements Runnable
 					}
 					if (channel != null) dispatchJob(channel, selectedBundle);
 				}
+				catch(Exception ex)
+				{
+					log.error("An error occurred while attempting to dispatch task bundles. This is most likely due to an error in the load balancer implementation.", ex);
+				}
 				finally
 				{
 					queue.getLock().unlock();
 				}
 			}
+		}
+		catch (Exception ex)
+		{
+			log.error("An error occured while preparing for bundle creation and dispatching.", ex);
 		}
 		finally
 		{
@@ -173,7 +177,7 @@ class TaskQueueChecker implements Runnable
 		List<String> uuidPath = bundle.getUuidPath().getList();
 		for (int i=0; i<idleChannels.size(); i++)
 		{
-			ChannelWrapper ch = idleChannels.get(i);
+			ChannelWrapper<?> ch = idleChannels.get(i);
 			if (!ch.isOpen())
 			{
 				channelsToRemove.add(i);
@@ -193,7 +197,15 @@ class TaskQueueChecker implements Runnable
 			{
 				JPPFManagementInfo mgtInfo = driver.getNodeHandler().getNodeInformation(ch);
 				JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
-				boolean b = rule.accepts(info);
+				boolean b = false;
+				try
+				{
+					b = rule.accepts(info);
+				}
+				catch(Exception ex)
+				{
+					log.error("An error occurred while running the execution policy to determine node participation.",ex);
+				}
 				if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getJobUuid() + ", nodeUuid=" + mgtInfo.getId());
 				if (!b) continue;
 			}
