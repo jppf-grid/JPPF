@@ -58,7 +58,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 
 	/**
 	 * Set the location at which to display any window or dialog created by this action. 
-	 * @param location - a <code>Point</code> instance.
+	 * @param location a <code>Point</code> instance.
 	 */
 	public void setLocation(Point location)
 	{
@@ -67,7 +67,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 
 	/**
 	 * Update this action's enabled state based on a list of selected elements.
-	 * @param selectedElements - a list of objects.
+	 * @param selectedElements a list of objects.
 	 * @see org.jppf.ui.actions.UpdatableAction#updateState(java.util.List)
 	 */
 	public void updateState(List<Object> selectedElements)
@@ -76,8 +76,8 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 	}
 
 	/**
-	 * Method called when the value of an option has changed.
-	 * @param event - the event encapsulating the source of the event.
+	 * Method called when the action is triggered.
+	 * @param event the event encapsulating the source of the event.
 	 * @see org.jppf.ui.options.event.ValueChangeListener#valueChanged(org.jppf.ui.options.event.ValueChangeEvent)
 	 */
 	public void valueChanged(ValueChangeEvent event)
@@ -87,7 +87,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 
 	/**
 	 * Set the icon for this action using the specified image file name.
-	 * @param name - the name of the icon image file.
+	 * @param name  the name of the icon image file.
 	 */
 	protected void setupIcon(String name)
 	{

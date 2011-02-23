@@ -36,7 +36,7 @@ public class JTreeTableActionHandler extends AbstractActionHandler
 
 	/**
 	 * Initialize this action manager with the specified JTreeTable component.
-	 * @param treeTable - the JTreeTable whose actions are managed.
+	 * @param treeTable the JTreeTable whose actions are managed.
 	 */
 	public JTreeTableActionHandler(JTreeTable treeTable)
 	{

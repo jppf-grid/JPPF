@@ -28,13 +28,13 @@ public interface ActionHandler
 {
 	/**
 	 * Add an action with the specified name to this action manager.
-	 * @param name - the name of the action to add.
-	 * @param action - the action to add.
+	 * @param name the name of the action to add.
+	 * @param action the action to add.
 	 */
 	void putAction(String name, UpdatableAction action);
 	/**
 	 * Get the action with the specified name.
-	 * @param name - the name of the action to find.
+	 * @param name the name of the action to find.
 	 * @return an <code>Action</code> or null if the specified name could not be found.
 	 */
 	UpdatableAction getAction(String name);

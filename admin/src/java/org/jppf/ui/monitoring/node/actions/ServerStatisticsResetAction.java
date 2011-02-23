@@ -78,7 +78,8 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
 			{
 				if (!(o instanceof TopologyData)) continue;
 				TopologyData data = (TopologyData) o;
-				if (TopologyDataType.DRIVER.equals(data.getType())) driverConnections.add((JMXDriverConnectionWrapper) data.getJmxWrapper());
+				if (TopologyDataType.DRIVER.equals(data.getType()))
+					driverConnections.add((JMXDriverConnectionWrapper) data.getJmxWrapper());
 			}
 			Runnable r = new Runnable() {
 				public void run() {
@@ -99,5 +100,4 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
 			log.error(e.getMessage(), e);
 		}
 	}
-
 }
