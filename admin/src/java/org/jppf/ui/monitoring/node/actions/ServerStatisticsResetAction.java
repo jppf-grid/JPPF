@@ -39,7 +39,7 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
 	 */
 	public ServerStatisticsResetAction()
 	{
-		setupIcon("/org/jppf/ui/resources/server_restart.gif");
+		setupIcon("/org/jppf/ui/resources/server_reset_stats.gif");
 		setupNameAndTooltip("driver.reset.statistics");
 	}
 
@@ -51,6 +51,7 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
 	 */
 	public void updateState(List<Object> selectedElements)
 	{
+		this.selectedElements = selectedElements;
 		for (Object o: selectedElements)
 		{
 			if (!(o instanceof TopologyData)) continue;

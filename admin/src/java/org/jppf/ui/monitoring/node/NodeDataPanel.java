@@ -294,6 +294,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	{
 		actionHandler = new JTreeTableActionHandler(treeTable);
 		actionHandler.putAction("shutdown.restart.driver", new ServerShutdownRestartAction());
+		actionHandler.putAction("driver.reset.statistics", new ServerStatisticsResetAction());
 		actionHandler.putAction("update.configuration", new NodeConfigurationAction());
 		actionHandler.putAction("show.information", new NodeInformationAction());
 		actionHandler.putAction("update.threads", new NodeThreadsAction());

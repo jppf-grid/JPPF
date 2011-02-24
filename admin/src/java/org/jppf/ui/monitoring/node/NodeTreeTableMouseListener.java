@@ -66,7 +66,7 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 
 	/**
 	 * Initialize this mouse listener.
-	 * @param actionHandler - the object that handles tollbar and menu actions.
+	 * @param actionHandler the object that handles tollbar and menu actions.
 	 */
 	public NodeTreeTableMouseListener(JTreeTableActionHandler actionHandler)
 	{
@@ -124,6 +124,7 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 		Point p = comp.getLocationOnScreen();
 		JPopupMenu menu = new JPopupMenu();
 		menu.add(createMenuItem(actionHandler.getAction("shutdown.restart.driver"), p));
+		menu.add(createMenuItem(actionHandler.getAction("driver.reset.statistics"), p));
 		menu.addSeparator();
 		menu.add(createMenuItem(actionHandler.getAction("show.information"), p));
 		menu.add(createMenuItem(actionHandler.getAction("update.configuration"), p));
