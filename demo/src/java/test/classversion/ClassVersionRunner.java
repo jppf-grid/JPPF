@@ -24,8 +24,9 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
+
 /**
- * Runner class for the matrix multiplication demo.
+ * Runner class for the class version demo.
  * @author Laurent Cohen
  */
 public class ClassVersionRunner
