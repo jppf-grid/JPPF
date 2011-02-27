@@ -17,6 +17,8 @@
  */
 package sample.dist.broadcastjob;
 
+import static org.jppf.utils.StringUtils.*;
+
 import java.util.List;
 
 import org.jppf.JPPFException;
@@ -26,8 +28,6 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 import sample.dist.tasklength.LongTask;
-
-import static org.jppf.utils.StringUtils.*;
 
 /**
  * Runner class for the &quot;Long Task&quot; demo.
