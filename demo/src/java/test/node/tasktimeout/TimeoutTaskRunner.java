@@ -78,7 +78,7 @@ public class TimeoutTaskRunner
 
 	/**
 	 * Create a JPPF job that can be submitted for execution.
-	 * @return an instance of the {@link org.jppf.client.JPPFJob JPPFJob} class.
+	 * @return an instance of the {@link test.org.jppf.client.JPPFJob JPPFJob} class.
 	 * @throws Exception if an error occurs while creating the job or adding tasks.
 	 */
 	public JPPFJob createJob() throws Exception
