@@ -19,17 +19,13 @@ package org.jppf.ui.monitoring.charts;
 
 import static org.jppf.utils.ReflectionHelper.*;
 
-import java.awt.Color;
-import java.awt.Paint;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.awt.*;
+import java.lang.reflect.*;
 import java.text.NumberFormat;
 import java.util.Map;
 
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
-import org.jppf.ui.monitoring.data.Fields;
-import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.data.*;
 
 /**
  * Instances of this class are used to create and update 3D bar charts with an horizontal orientation.

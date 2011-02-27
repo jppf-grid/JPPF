@@ -18,22 +18,15 @@
 
 package org.jppf.ui.utils;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Toolkit;
-import java.awt.Window;
+import java.awt.*;
+import java.util.*;
 import java.util.Timer;
-import java.util.TimerTask;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-
-import org.jppf.utils.JPPFConfiguration;
+import javax.swing.*;
 
 import net.miginfocom.swing.MigLayout;
+
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * This class handles the splash screen displaed while starting the admin console.

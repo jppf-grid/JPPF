@@ -17,10 +17,10 @@
  */
 package org.jppf.ui.utils;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URL;
 import java.util.*;
-import java.util.regex.*;
+import java.util.regex.Pattern;
 
 import javax.swing.*;
 

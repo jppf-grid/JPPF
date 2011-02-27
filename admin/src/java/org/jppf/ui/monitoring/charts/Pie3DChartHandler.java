@@ -22,8 +22,7 @@ import static org.jppf.utils.ReflectionHelper.*;
 import java.util.Map;
 
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
-import org.jppf.ui.monitoring.data.Fields;
-import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.data.*;
 
 /**
  * Instances of this class are used to create and update 3D pie charts.

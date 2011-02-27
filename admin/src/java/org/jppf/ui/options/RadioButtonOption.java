@@ -19,7 +19,7 @@ package org.jppf.ui.options;
 
 import java.awt.event.*;
 
-import javax.swing.*;
+import javax.swing.JRadioButton;
 
 /**
  * An option for boolean values, represented as a radio button.

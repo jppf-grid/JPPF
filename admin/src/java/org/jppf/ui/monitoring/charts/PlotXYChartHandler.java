@@ -20,15 +20,11 @@ package org.jppf.ui.monitoring.charts;
 import static org.jppf.utils.ReflectionHelper.*;
 
 import java.awt.BasicStroke;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.*;
+import java.util.*;
 
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
-import org.jppf.ui.monitoring.data.Fields;
-import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.data.*;
 import org.jppf.utils.StringUtils;
 
 /**
