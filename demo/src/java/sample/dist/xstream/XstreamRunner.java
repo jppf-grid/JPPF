@@ -17,7 +17,7 @@
  */
 package sample.dist.xstream;
 
-import java.util.*;
+import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
