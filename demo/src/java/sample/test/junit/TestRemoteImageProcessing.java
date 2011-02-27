@@ -20,7 +20,7 @@ package sample.test.junit;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.*;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
