@@ -18,13 +18,13 @@
 
 package org.jppf.jca.spi;
 
-import java.util.*;
+import java.util.Set;
 
-import javax.resource.*;
+import javax.resource.ResourceException;
 import javax.resource.spi.*;
 import javax.security.auth.Subject;
 
-import org.jppf.jca.cci.*;
+import org.jppf.jca.cci.JPPFConnectionFactory;
 import org.jppf.jca.util.JPPFAccessorImpl;
 
 
