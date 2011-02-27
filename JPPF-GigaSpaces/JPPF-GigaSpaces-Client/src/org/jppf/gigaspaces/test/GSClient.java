@@ -19,9 +19,10 @@
 package org.jppf.gigaspaces.test;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.gigaspaces.*;
+import org.jppf.gigaspaces.JPPFService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 
 /**
  * Client class used to invoke a JPPF job submission service deployed as a processing unit.
