@@ -89,6 +89,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	public V put(K key, V value)
 	{
 		cleanup();
