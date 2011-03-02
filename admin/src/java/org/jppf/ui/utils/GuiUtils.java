@@ -17,7 +17,7 @@
  */
 package org.jppf.ui.utils;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -113,5 +113,16 @@ public final class GuiUtils
 		if (tooltip == null) return null;
 		String s = TOOLTIP_PATTERN.matcher(tooltip).replaceAll("<br>");
 		return "<html>" + s + "</html>";
+	}
+
+	/**
+	 * Retrieve the top frame ro which a component belongs.
+	 * @param comp the component whose frame to retrieve.
+	 * @return a {@link Frame} instance if it can be found, null otherwise.
+	 */
+	public static Frame getTopFrame(Component comp)
+	{
+		Component tmp = SwingUtilities.getRoot(comp);
+		return (tmp instanceof Frame) ? (Frame) tmp : null;
 	}
 }

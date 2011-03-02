@@ -17,6 +17,7 @@
  */
 package org.jppf.ui.options.factory;
 
+import java.awt.Frame;
 import java.util.*;
 import java.util.prefs.*;
 
@@ -299,18 +300,54 @@ public final class OptionsHandler
 	}
 
 	/**
+	 * Load the application's main window state from the preferences store.
+	 * @param pref the preferences node from where the attributes are loaded.
+	 */
+	public static void loadMainWindowAttributes(Preferences pref)
+	{
+		loadFrameAttributes(mainWindow, pref);
+	}
+
+	/**
 	 * Save the application's main window state to the preferences store.
 	 * @param pref the preferences node where the attributes are saved.
 	 */
 	public static void saveMainWindowAttributes(Preferences pref)
 	{
-		int state = mainWindow.getExtendedState();
-		boolean maximized = (state & java.awt.Frame.MAXIMIZED_BOTH) > 0;
-		if (maximized) mainWindow.setExtendedState(java.awt.Frame.NORMAL);
-		java.awt.Point p = mainWindow.getLocation();
+		saveFrameAttributes(mainWindow, pref);
+	}
+
+	/**
+	 * Load the specified frame state from the preferences store.
+	 * @param frame the frame for which the attributes are retieved.
+	 * @param pref the preferences node from where the attributes are loaded.
+	 */
+	public static void loadFrameAttributes(Frame frame, Preferences pref)
+	{
+		int x = pref.getInt("locationx", 0);
+		int y = pref.getInt("locationy", 0);
+		int width = pref.getInt("width", 600);
+		int height = pref.getInt("height", 768);
+		frame.setSize(width, height);
+		frame.setLocation(x, y);
+		boolean maximized = pref.getBoolean("maximized", false);
+		if (maximized) frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+	}
+
+	/**
+	 * Save the specified frame state to the preferences store.
+	 * @param frame the frame for which the attributes are saved.
+	 * @param pref the preferences node where the attributes are saved.
+	 */
+	public static void saveFrameAttributes(Frame frame, Preferences pref)
+	{
+		int state = frame.getExtendedState();
+		boolean maximized = (state & Frame.MAXIMIZED_BOTH) > 0;
+		if (maximized) frame.setExtendedState(Frame.NORMAL);
+		java.awt.Point p = frame.getLocation();
 		pref.putInt("locationx", p.x);
 		pref.putInt("locationy", p.y);
-		java.awt.Dimension d = mainWindow.getSize();
+		java.awt.Dimension d = frame.getSize();
 		pref.putInt("width", d.width);
 		pref.putInt("height", d.height);
 		pref.putBoolean("maximized", maximized);
@@ -322,22 +359,6 @@ public final class OptionsHandler
 		catch(BackingStoreException e)
 		{
 		}
-	}
-
-	/**
-	 * Load the application's main window state from the preferences store.
-	 * @param pref the preferences node from where the attributes are loaded.
-	 */
-	public static void loadMainWindowAttributes(Preferences pref)
-	{
-		int x = pref.getInt("locationx", 0);
-		int y = pref.getInt("locationy", 0);
-		int width = pref.getInt("width", 600);
-		int height = pref.getInt("height", 768);
-		mainWindow.setSize(width, height);
-		mainWindow.setLocation(x, y);
-		boolean maximized = pref.getBoolean("maximized", false);
-		if (maximized) mainWindow.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
 	}
 
 	/**
