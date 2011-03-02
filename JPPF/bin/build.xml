@@ -145,7 +145,7 @@
 	<!-- ========================================================================= -->
 
   <target name="build" depends="init, compile, jar, jar.src"/>
-	<target name="rebuild" depends="clean.all, init, compile, jar"/>
+	<target name="rebuild" depends="clean.all, build"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
 		depends="clean.all, rebuild, javadoc, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide, installer, doc"/>
