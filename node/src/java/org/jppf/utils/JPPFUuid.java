@@ -73,7 +73,7 @@ public class JPPFUuid implements Serializable
   /**
 	 * Random number generator, static to ensure generated uuid are unique.
 	 */
-	private static Random rand = new Random(System.currentTimeMillis());
+	private static Random rand = new Random(System.nanoTime());
 	/**
 	 * String holding a generated unique identifier.
 	 */
