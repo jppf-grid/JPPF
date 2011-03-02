@@ -36,7 +36,7 @@
 		<javac srcdir="" destdir="${path}/classes"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 	    <classpath refid="project.classpath"/>
-	    <compilerarg line="-Xlint:unchecked"/>
+	    <compilerarg line="-Xlint:unchecked -target 1.5"/>
 			<src path="${path}/src/java"/>
 	    <src path="${path}/src/resources"/>
 		</javac>
