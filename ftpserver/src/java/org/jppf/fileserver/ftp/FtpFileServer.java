@@ -18,11 +18,7 @@
 
 package org.jppf.fileserver.ftp;
 
-import java.net.URL;
-
-import org.apache.ftpserver.*;
-import org.apache.ftpserver.listener.ListenerFactory;
-import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
+import org.apache.ftpserver.FtpServer;
 import org.jppf.fileserver.*;
 
 /**
@@ -31,7 +27,7 @@ import org.jppf.fileserver.*;
  * @see <a href="http://mina.apache.org/ftpserver">http://mina.apache.org/ftpserver</a>
  * @author Laurent Cohen
  */
-public class FtpFileServer extends ConfigurableAdapter implements FileServer
+public class FtpFileServer extends ConfigurableAdapter implements FileServer, FileServerStartup
 {
 	/**
 	 * The underlying embedded FTP server.
@@ -41,18 +37,24 @@ public class FtpFileServer extends ConfigurableAdapter implements FileServer
 	/**
 	 * {@inheritDoc}
 	 */
+	public void run()
+	{
+		try
+		{
+			start();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public void start() throws Exception
 	{
-		FtpServerFactory serverFactory = new FtpServerFactory();
-		ListenerFactory listenerFactory = new ListenerFactory();
-		listenerFactory.setPort(configuration.getInt("jppf.file.server.port", 12221));
-		serverFactory.addListener("default", listenerFactory.createListener());
-		URL url = getClass().getClassLoader().getResource("users.properties");
-		PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
-		userManagerFactory.setUrl(url);
-		serverFactory.setUserManager(userManagerFactory.createUserManager());
-		// start the server
-		server = serverFactory.createServer(); 
+		server = new CommandLineExt("config/ftpd.xml").createServer();
 		server.start();
 	}
 

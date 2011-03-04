@@ -32,11 +32,11 @@ public class FileServerFactory implements JPPFNodeStartupSPI, JPPFClientStartupS
 	/**
 	 * Default configuration properties for the file client.
 	 */
-	private static TypedProperties clientConfiguration = null;
+	private static TypedProperties clientConfig = null;
 	/**
 	 * Default configuration properties for the file server.
 	 */
-	private static TypedProperties serverConfiguration = null;
+	private static TypedProperties serverConfig = null;
 	/**
 	 * A singleton instance of the file server.
 	 */
@@ -48,8 +48,8 @@ public class FileServerFactory implements JPPFNodeStartupSPI, JPPFClientStartupS
 	public void run()
 	{
 		TypedProperties jppfConfig = JPPFConfiguration.getProperties();
-		clientConfiguration = jppfConfig.getProperties("jppf.file.client.config", jppfConfig);
-		serverConfiguration = jppfConfig.getProperties("jppf.file.server.config", jppfConfig);
+		clientConfig = jppfConfig.getProperties("jppf.file.client.config", jppfConfig);
+		serverConfig = jppfConfig.getProperties("jppf.file.server.config", jppfConfig);
 	}
 
 	/**
@@ -59,42 +59,46 @@ public class FileServerFactory implements JPPFNodeStartupSPI, JPPFClientStartupS
 	 */
 	public static FileClient createFileClient() throws Exception
 	{
-		String className = clientConfiguration.getString("jppf.file.client.class");
-		return createFileClient(className, clientConfiguration);
+		String className = clientConfig.getString("jppf.file.client.class", null);
+		if (className == null) return null;
+		return createFileClient(className, clientConfig);
 	}
 
 	/**
 	 * Create a file server client.
-	 * @param implementationName the fully qualified class name of the client implementation;
+	 * @param className the fully qualified class name of the client implementation;
 	 * the class must implement the {@link FileClient} interface and have a no-args constructor.
 	 * @param configuration the properties used to configure the client.
 	 * @return a {@link FileClient} instance.
 	 * @throws Exception if any error occurs while creating the client.
 	 */
-	public static FileClient createFileClient(String implementationName, Properties configuration) throws Exception
+	@SuppressWarnings("unchecked")
+	public static FileClient createFileClient(String className, Properties configuration) throws Exception
 	{
 		Class<? extends FileClient> implClass =
-			(Class<? extends FileClient>) FileServerFactory.class.getClassLoader().loadClass(implementationName);
+			(Class<? extends FileClient>) FileServerFactory.class.getClassLoader().loadClass(className);
 		FileClient client = implClass.newInstance();
 		client.configure(configuration);
 		return client;
 	}
 
 	/**
-	 * Get the default configuration properties for the file client.
-	 * @return the configuration as a {@link TypedProperties} instance.
+	 * Create a file server from the default configuration.
+	 * @return a {@link FileServer} instance.
+	 * @throws Exception if any error occurs while creating the client.
 	 */
-	public static TypedProperties getClientConfiguration()
+	@SuppressWarnings("unchecked")
+	public static FileServer getFileServer() throws Exception
 	{
-		return clientConfiguration;
-	}
-
-	/**
-	 * Get the default configuration properties for the file server.
-	 * @return the configuration as a {@link TypedProperties} instance.
-	 */
-	public static TypedProperties getServerConfiguration()
-	{
-		return serverConfiguration;
+		if (server == null)
+		{
+			String className = serverConfig.getString("jppf.file.server.class", null);
+			if (className == null) return null;
+			Class<? extends FileServer> implClass =
+				(Class<? extends FileServer>) FileServerFactory.class.getClassLoader().loadClass(className);
+			server = implClass.newInstance();
+			server.configure(serverConfig);
+		}
+		return server;
 	}
 }

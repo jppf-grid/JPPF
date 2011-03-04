@@ -79,9 +79,16 @@ public class FtpFileClient extends ConfigurableAdapter implements FileClient
 	 */
 	public void download(String localPath, String remotePath) throws Exception
 	{
-		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(localPath));
-		boolean ret = ftpClient.retrieveFile(remotePath, bos);
-		bos.close();
+		BufferedOutputStream bos = null;
+		try
+		{
+			bos = new BufferedOutputStream(new FileOutputStream(localPath));
+			boolean ret = ftpClient.retrieveFile(remotePath, bos);
+		}
+		finally
+		{
+			if (bos != null) bos.close();
+		}
 	}
 
 	/**
@@ -89,9 +96,16 @@ public class FtpFileClient extends ConfigurableAdapter implements FileClient
 	 */
 	public void upload(String localPath, String remotePath) throws Exception
 	{
-		BufferedInputStream bis = new BufferedInputStream(new FileInputStream(localPath));
-		boolean ret = ftpClient.storeFile(remotePath, bis);
-		bis.close();
+		BufferedInputStream bis = null;
+		try
+		{
+			bis = new BufferedInputStream(new FileInputStream(localPath));
+			boolean ret = ftpClient.storeFile(remotePath, bis);
+		}
+		finally
+		{
+			if (bis != null) bis.close();
+		}
 	}
 
 	/**

@@ -1,1 +1,1 @@
-org.jppf.fileserver.FileServerFactory
+org.jppf.fileserver.ftp.FtpFileServer

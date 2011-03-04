@@ -1,1 +1,3 @@
-org.jppf.fileserver.FileServerFactory
+# FTP server is normally not needed on the node side
+# uncomment the next line if you want ot have one
+#org.jppf.fileserver.ftp.FtpFileServer
