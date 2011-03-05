@@ -69,15 +69,11 @@ class WaitingNodeRequestState extends ClassServerState
 			boolean dynamic = resource.isDynamic();
 			String name = resource.getName();
 			byte[] b = null;
-			String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
-			ByteTransitionPair p = null;
-			if (!dynamic || (resource.getRequestUuid() == null))
-			{
-				p = processNonDynamic(channel, resource);
-				if (p.second() != null) return p.second();
-				b = p.first();
-			}
-			else
+			String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null; 
+			ByteTransitionPair p = processNonDynamic(channel, resource);
+			if (p.second() != null) return p.second();
+			b = p.first();
+			if ((b == null) && dynamic)
 			{
 				p = processDynamic(channel, resource);
 				if (p.second() != null) return p.second();
@@ -125,13 +121,10 @@ class WaitingNodeRequestState extends ClassServerState
 				if (uuid != null) b = server.getCacheContent(uuid, name);
 				boolean alreadyInCache = (b != null);
 				if (debugEnabled) log.debug("resource " + (alreadyInCache ? "" : "not ") + "found [" + name + "] in cache for node: " + channel);
-				if (!alreadyInCache)
-				{
-					b = server.getResourceProvider().getResourceAsBytes(name);
-					if (debugEnabled) log.debug("resource " + (b == null ? "not " : "") + "found [" + name + "] in the driver's classpath for node: " + channel);
-				}
+				if (!alreadyInCache) b = server.getResourceProvider().getResourceAsBytes(name);
 				if ((b != null) || !resource.isDynamic())
 				{
+					if (debugEnabled) log.debug("resource " + (b == null ? "not " : "") + "found [" + name + "] in the driver's classpath for node: " + channel);
 					if ((b != null) && !alreadyInCache) server.setCacheContent(driver.getUuid(), name, b);
 					resource.setDefinition(b);
 					context.serializeResource(channel);
@@ -167,7 +160,6 @@ class WaitingNodeRequestState extends ClassServerState
 		}
 		else
 		{
-			if (debugEnabled) log.debug("request uuid=" + resource.getRequestUuid());
 			uuidPath.decPosition();
 			String uuid = uuidPath.getCurrentElement();
 			ChannelWrapper provider = findProviderConnection(uuid);
@@ -191,12 +183,12 @@ class WaitingNodeRequestState extends ClassServerState
 	 * @return a <code>SelectableChannel</code> instance.
 	 * @throws Exception if an error occurs while searching for a connection.
 	 */
-	private ChannelWrapper<?> findProviderConnection(String uuid) throws Exception
+	private ChannelWrapper findProviderConnection(String uuid) throws Exception
 	{
-		ChannelWrapper<?> result = null;
+		ChannelWrapper result = null;
 		List<ChannelWrapper<?>> connections = server.getProviderConnections(uuid);
 		int minRequests = Integer.MAX_VALUE;
-		for (ChannelWrapper<?> channel: connections)
+		for (ChannelWrapper channel: connections)
 		{
 			ClassContext ctx = (ClassContext) channel.getContext();
 			int size = ctx.getNbPendingRequests();
