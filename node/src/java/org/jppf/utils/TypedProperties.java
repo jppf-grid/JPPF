@@ -19,6 +19,7 @@ package org.jppf.utils;
 
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 
 /**
@@ -38,7 +39,7 @@ public class TypedProperties extends Properties
 	/**
 	 * Initialize this object with a set of existing properties.
 	 * This will copy into the present object all map entries such that both key and value are strings.
-	 * @param map - the properties to be copied. No reference to this parameter is kept in this TypedProperties object.
+	 * @param map the properties to be copied. No reference to this parameter is kept in this TypedProperties object.
 	 */
 	public TypedProperties(Map<Object, Object> map)
 	{
@@ -236,7 +237,7 @@ public class TypedProperties extends Properties
 
 	/**
 	 * Get the value of a property with the specified name as a set of a properties.
-	 * @param key - the name of the property to look for.
+	 * @param key the name of the property to look for.
 	 * Its value is the path to another properties file. Relative paths are evaluated against the current application directory. 
 	 * @return the value of the property as another set of properties, or null if it is not found.
 	 */
@@ -246,10 +247,10 @@ public class TypedProperties extends Properties
 	}
 
 	/**
-	 * Get the value of a property with the specified name as a set of a properties.
-	 * @param key - the name of the property to look for.
+	 * Get the value of a property with the specified name as a set of properties.
+	 * @param key the name of the property to look for.
 	 * Its value is the path to another properties file. Relative paths are evaluated against the current application directory. 
-	 * @param def - a default value to return if the property is not found.
+	 * @param def a default value to return if the property is not found.
 	 * @return the value of the property as another set of properties, or the default value if it is not found.
 	 */
 	public TypedProperties getProperties(String key, TypedProperties def)
@@ -267,6 +268,36 @@ public class TypedProperties extends Properties
 			return def;
 		}
 		return res;
+	}
+
+	/**
+	 * Get the value of a property with the specified name as an {@link InetAddress}.
+	 * @param key the name of the property to retrieve.
+	 * @return the property as an {@link InetAddress} instance, or null if the property is not defined or the host doesn't exist. 
+	 */
+	public InetAddress getInetAddress(String key)
+	{
+		return getInetAddress(key, null);
+	}
+
+	/**
+	 * Get the value of a property with the specified name as an {@link InetAddress}.
+	 * @param key the name of the property to retrieve.
+	 * @param def the default value to use if the property is not defined.
+	 * @return the property as an {@link InetAddress} instance, or the sdpecified default value if the property is not defined. 
+	 */
+	public InetAddress getInetAddress(String key, InetAddress def)
+	{
+		String val = getString(key);
+		if (val == null) return def;
+		try
+		{
+			return InetAddress.getByName(val);
+		}
+		catch(UnknownHostException e)
+		{
+			return def;
+		}
 	}
 
 	/**
