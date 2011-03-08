@@ -33,6 +33,7 @@
 	<property name="gigaspaces"            value="${basedir}/../JPPF-GigaSpaces"/>
 	<property name="application.template"  value="${basedir}/../application-template"/>
 	<property name="samples-pack"          value="${basedir}/../samples-pack"/>
+	<property name="ftpserver"                  value="${basedir}/../ftpserver"/>
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${gigaspaces}/build.properties"/>
@@ -108,10 +109,11 @@
     <delete dir="${node}/classes" quiet="true" includes="**/*.*"/>
     <delete dir="${common}/classes" quiet="true" includes="**/*.*"/>
     <delete dir="${server}/classes" quiet="true" includes="**/*.*"/>
-    <delete dir="${cient}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${client}/classes" quiet="true" includes="**/*.*"/>
     <delete dir="${admin}/classes" quiet="true" includes="**/*.*"/>
     <delete dir="${demo}/classes" quiet="true" includes="**/*.*"/>
     <delete dir="${jca-client}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${ftpserver}/classes" quiet="true" includes="**/*.*"/>
   </target>               
 
   <target name="clean.deploy" description="clean the deploy folder">
