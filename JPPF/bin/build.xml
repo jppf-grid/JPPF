@@ -33,7 +33,7 @@
 	<property name="gigaspaces"            value="${basedir}/../JPPF-GigaSpaces"/>
 	<property name="application.template"  value="${basedir}/../application-template"/>
 	<property name="samples-pack"          value="${basedir}/../samples-pack"/>
-	<property name="ftpserver"                  value="${basedir}/../ftpserver"/>
+	<property name="ftpserver"             value="${basedir}/../ftpserver"/>
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${gigaspaces}/build.properties"/>
@@ -78,6 +78,9 @@
 		<pathelement location="${jca-client}/classes"/>
 		<pathelement location="${samples-pack}/DataEncryption/classes"/>
 		<fileset dir="${lib}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${ftpserver}/lib">
 			<include name="**/*.jar"/>
 		</fileset>
 	</path>
