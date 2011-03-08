@@ -24,6 +24,7 @@ import org.jppf.comm.socket.SocketWrapper;
 /**
  * Interface for wrappers around a socket connection to the server on the client side.
  * @author Laurent Cohen
+ * @author Jeff Rosen
  */
 public interface ClientConnectionHandler extends ClientConnectionStatusHandler
 {
@@ -40,8 +41,9 @@ public interface ClientConnectionHandler extends ClientConnectionStatusHandler
 	/**
 	 * Get the socket client uses to communicate over a socket connection.
 	 * @return a <code>SocketWrapper</code> instance.
+	 * @throws Exception if the connection has failed or timed out.
 	 */
-	SocketWrapper getSocketClient();
+	SocketWrapper getSocketClient() throws Exception;
 	/**
 	 * Close and cleanup this connection handler.
 	 */

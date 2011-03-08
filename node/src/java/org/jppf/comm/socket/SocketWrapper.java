@@ -27,6 +27,7 @@ import org.jppf.utils.*;
  * The underlying socket API can be either based on a socket channel (blocking or non-blocking),
  * or just based on a plain socket.
  * @author Laurent Cohen
+ * @author Jeff Rosen
  */
 public interface SocketWrapper
 {
@@ -190,4 +191,11 @@ public interface SocketWrapper
 	 * @param socket a Socket instance.
 	 */
 	void setSocket(Socket socket);
+
+	/**
+	 * Returns a timestamp that should reflect the system millisecond counter at the
+	 * last known good usage of the underlying socket. 
+	 * @return the socket usage timestamp  
+	 */
+	long getSocketTimestamp();
 }

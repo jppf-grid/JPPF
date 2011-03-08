@@ -31,6 +31,7 @@ import org.slf4j.*;
  * {@link org.jppf.comm.socket.SocketWrapper SocketWrapper} interface.
  * @author Laurent Cohen
  * @author Domingos Creado
+ * @author Jeff Rosen
  */
 public abstract class AbstractSocketWrapper implements SocketWrapper
 {
@@ -42,6 +43,11 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * The underlying socket wrapped by this SocketClient.
 	 */
 	protected Socket socket = null;
+	/**
+	 * A timestamp that should reflect the system millisecond counter at the
+	 * last known good usage of the underlying socket.
+	 */
+	private long socketTimestamp = 0l;
 	/**
 	 * A reference to the underlying socket's output stream.
 	 */
@@ -161,6 +167,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 */
 	public void flush() throws IOException
 	{
+		updateSocketTimestamp();
 		dos.flush();
 	}
 
@@ -200,6 +207,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 		{
 			// disable the timeout on subsequent read operations.
 			if (timeout > 0) socket.setSoTimeout(0);
+			updateSocketTimestamp();
 		}
 		return buf;
 	}
@@ -225,6 +233,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			if (n < 0) break;
 			else count += n;
 		}
+		updateSocketTimestamp();
 		return count;
 	}
 
@@ -236,7 +245,9 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 */
 	public int readInt() throws Exception
 	{
-    return dis.readInt();
+		int intRead = dis.readInt();
+		updateSocketTimestamp();
+		return intRead;
 	}
 
 	/**
@@ -407,6 +418,24 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 			if (p <= 0) break;
 			else count += p;
 		}
+		updateSocketTimestamp();
 		return count;
+	}
+
+	/**
+	 * Returns a timestamp that should reflect the system millisecond counter at the
+	 * last known good usage of the underlying socket. 
+	 * @return the socket usage timestamp  
+	 */
+	public long getSocketTimestamp() {
+		return socketTimestamp;
+	}
+
+	/**
+	 * Marks the socket "known good" usage timestamp with the current value of the 
+	 * system millisecond counter.
+	 */
+	protected void updateSocketTimestamp() {
+		socketTimestamp = System.currentTimeMillis();
 	}
 }
