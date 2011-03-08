@@ -72,13 +72,13 @@ public class FileServerRunner
 		TypedProperties config = JPPFConfiguration.getProperties();
 		
 		output("Running demo");
-		long totalTime = System.currentTimeMillis();
+		long totalTime = System.nanoTime();
 		JPPFJob job = new JPPFJob();
 		Properties props = new Properties();
-		props.setProperty("jppf.ftp.host", "localhost");
-		props.setProperty("jppf.ftp.port", "12221");
-		props.setProperty("jppf.ftp.user", "admin");
-		props.setProperty("jppf.ftp.password", "admin");
+		props.setProperty("jppf.ftp.client.host", "localhost");
+		props.setProperty("jppf.ftp.client.port", "12221");
+		props.setProperty("jppf.ftp.client.user", "admin");
+		props.setProperty("jppf.ftp.client.password", "admin");
 		DataProvider dataProvider = new MemoryMapDataProvider();
 		dataProvider.setValue("ftp.config", props);
 		job.setDataProvider(dataProvider);
@@ -87,11 +87,11 @@ public class FileServerRunner
 		List<JPPFTask> results = jppfClient.submit(job);
 		for (JPPFTask t: results)
 		{
-			if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
+			if (t.getException() != null) System.out.println("task error: " +  StringUtils.getStackTrace(t.getException()));
 			else System.out.println("task result: " + t.getResult());
 		}
-		totalTime = System.currentTimeMillis() - totalTime;
-		output("Computation time: " + StringUtils.toStringDuration(totalTime));
+		totalTime = System.nanoTime() - totalTime;
+		output("Computation time: " + StringUtils.toStringDuration(totalTime/1000000L));
 	}
 
 	/**
