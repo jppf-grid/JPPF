@@ -271,7 +271,7 @@ $title = "JPPF " . $version . " Release Notes";
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 	<h1>
 	<?php	printf('%s JPPF %s release notes', date("n/j/Y", strtotime($line["date"])), $version); ?>
 	</h1>

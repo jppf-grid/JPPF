@@ -255,7 +255,7 @@
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 	<?php
 	// Connecting, selecting database
 	$link = mysql_connect('localhost', 'pervasiv_jppfadm', 'tri75den')

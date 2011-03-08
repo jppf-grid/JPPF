@@ -255,7 +255,7 @@
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 	<div align="justify">
 		<h3>What it is</h3>
 		Simply put, JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.

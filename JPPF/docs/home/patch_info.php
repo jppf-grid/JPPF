@@ -255,7 +255,7 @@
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 <?php
 	$patch_id = $_REQUEST["patch_id"];
 	// Connecting, selecting database

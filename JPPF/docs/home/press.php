@@ -256,7 +256,7 @@
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 <div align="justify">
 	<h1>JPPF Press Kit</h1>
 	<h3>Content</h3>

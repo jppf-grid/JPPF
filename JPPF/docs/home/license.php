@@ -255,7 +255,7 @@
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 <div align="center">
 	<h1>JPPF is released under the Apache 2.0 license</h1>
 	<p>Apache License<br>

@@ -255,7 +255,7 @@
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 	<div align="justify">
 		<h3>Community Support</h3>
 		<p>Looking for support from the users community and JPPF contributors? The best place to start is in our <a href="/forums">community forums</a>.

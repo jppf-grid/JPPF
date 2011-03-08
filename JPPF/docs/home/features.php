@@ -255,7 +255,7 @@
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 <h1>JPPF 2.4 features</h1>
 <h3>Ease of use</h3>
 <ul>

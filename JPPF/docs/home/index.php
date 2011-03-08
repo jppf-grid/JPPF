@@ -255,7 +255,7 @@
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 	<table border="0" cellpadding="0" cellspacing="0" style="vertical-align: middle; height: 250px; width: 750px; background-image: url('/images/test1.gif'); background-repeat: no-repeat; background-attachment: scroll">
 	<tr><td align="center" valign="center"><img src="/images/Animation1.gif" border="0" alt="JPPF" style="background: transparent"/></td></tr>
 	</table>

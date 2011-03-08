@@ -255,7 +255,7 @@
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 	<br><b>The JPPF team is announcing the availability of JPPF 2.0 for the end of summmer 2009.</b>
 	<p>This version will bring tremendous improvements of the framework in all its aspects.
 	<p>Below you will find an overview of what JPPF 2.0 will bring:

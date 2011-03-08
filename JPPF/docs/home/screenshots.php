@@ -255,7 +255,7 @@
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 <?php
 	$screenshot = $_REQUEST["screenshot"];
 	if (($screenshot == NULL) || ($screenshot == ""))

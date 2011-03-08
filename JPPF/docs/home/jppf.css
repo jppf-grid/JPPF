@@ -26,7 +26,7 @@ a:hover { text-decoration: underline; color: red; font-weight: normal }
 
 .gwrapper { width: 900px; max-width: 900px; background: white; }
 .sidebar   { width:  90px; float: left; padding-left: 0px; background-color: white; }
-.content   { width: 766px; float: right; padding-left: 15px; padding-right: 5px; margin-bottom: 5px; background-color: white; }
+.jppf_content   { width: 766px; float: right; padding-left: 15px; padding-right: 5px; margin-bottom: 5px; background-color: white; }
 /*
 .column1   { width: 250px; float: left; }
 .column2   { width: 456px; float: right; padding-left: 20px; padding-right: 20px }

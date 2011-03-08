@@ -255,7 +255,7 @@
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 	<table border="0" cellpadding="0" cellspacing="10">
 		<tr>
 			<td width="200"><b>Contact</b></td>

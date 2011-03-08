@@ -255,7 +255,7 @@
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 		<h1 align="center">Related Links</h1>
 <?php
 		$link = mysql_connect('localhost', 'pervasiv_jppfadm', 'tri75den')

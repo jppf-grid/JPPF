@@ -255,7 +255,7 @@
 											</div>
 				<br/>
 				</div>
-				<div class="content">
+				<div class="jppf_content">
 	<h2><a href="http://www.yourkit.com">YourKit</a></h2>
 	YourKit is kindly supporting open source projects with its full-featured Java Profiler.<br>
 	YourKit, LLC is the creator of innovative and intelligent tools for profiling Java and .NET applications.<br>
