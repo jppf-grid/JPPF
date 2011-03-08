@@ -38,14 +38,25 @@ public class ToolbarSeparatorOption extends AbstractOption
 	}
 
 	/**
-	 * Initialize this boolean option with the specified parameters.
+	 * Initialize this separator with the specified parameters.
 	 * @param width the filler's width
 	 * @param height the filler's height.
 	 */
 	public ToolbarSeparatorOption(int width, int height)
 	{
+		this(" ", width, height);
+	}
+
+	/**
+	 * Initialize this separator with the specified parameters.
+	 * @param labelText the filler's text.
+	 * @param width the filler's width
+	 * @param height the filler's height.
+	 */
+	public ToolbarSeparatorOption(String labelText, int width, int height)
+	{
 		//UIComponent = new JToolBar.Separator();
-		UIComponent = new JLabel(" ");
+		UIComponent = new JLabel(labelText);
 		((JLabel) UIComponent).setHorizontalAlignment(SwingConstants.CENTER);
 		((JLabel) UIComponent).setVerticalAlignment(SwingConstants.CENTER);
 		UIComponent.setForeground(UIComponent.getForeground().brighter());

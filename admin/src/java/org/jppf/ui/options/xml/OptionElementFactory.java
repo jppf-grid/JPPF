@@ -371,7 +371,8 @@ public class OptionElementFactory
 	{
 		int width = desc.getInt("width", 1);
 		int height = desc.getInt("height", 1);
-		ToolbarSeparatorOption option = new ToolbarSeparatorOption(width, height);
+		String text = desc.getString("text", " ");
+		ToolbarSeparatorOption option = new ToolbarSeparatorOption(text, width, height);
 		return option;
 	}
 
