@@ -20,15 +20,23 @@ package org.jppf.fileserver.ftp;
 
 import org.apache.ftpserver.FtpServer;
 import org.jppf.fileserver.*;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This file server implementation relies on an underlying FTP server
  * provided by the Apache Mina FTPServer library.
- * @see <a href="http://mina.apache.org/ftpserver">http://mina.apache.org/ftpserver</a>
+ * <p>The server configuration is done via the mechanism provided by Mina FTPServer, the ftpd.xml file.
+ * The location of this file is specified in the JPPF configuration via <code>jppf.file.server.config = my/path/ftpd.xml</code>.
+ * @see <a href="http://mina.apache.org/ftpserver">Apache Mina FTPServer</a>
  * @author Laurent Cohen
  */
 public class FtpFileServer extends ConfigurableAdapter implements FileServer, FileServerStartup
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(FtpFileServer.class);
 	/**
 	 * The underlying embedded FTP server.
 	 */
@@ -45,7 +53,7 @@ public class FtpFileServer extends ConfigurableAdapter implements FileServer, Fi
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			log.error("FTP server initialization failed", e);
 		}
 	}
 
@@ -54,7 +62,9 @@ public class FtpFileServer extends ConfigurableAdapter implements FileServer, Fi
 	 */
 	public void start() throws Exception
 	{
-		server = new CommandLineExt("config/ftpd.xml").createServer();
+		configure(JPPFConfiguration.getProperties());
+		String configPath = configuration.getString("jppf.file.server.config", "config/ftpd.xml");
+		server = new CommandLineExt(configPath).createServer();
 		server.start();
 	}
 

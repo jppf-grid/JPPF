@@ -22,7 +22,7 @@ import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.main.CommandLine;
 
 /**
- * This class extends the Appache <code>CommandLine</code> class to enable access to the ftp server
+ * This class extends the Apache <code>CommandLine</code> class to enable access to the ftp server
  * while keeping the convenience of the XML configuration file. 
  * @author Laurent Cohen
  */

@@ -22,11 +22,12 @@ import java.io.*;
 
 import org.apache.commons.net.ftp.*;
 import org.jppf.fileserver.*;
+import org.jppf.utils.TypedProperties;
 
 /**
  * Implementation of a file server client that uses the FTP client provided
  * by the Apache Commons Net library.
- * @see <a href="http://commons.apache.org/net">http://commons.apache.org/net</a>
+ * @see <a href="http://commons.apache.org/net">Apache Commons Net</a>
  * @author Laurent Cohen
  */
 public class FtpFileClient extends ConfigurableAdapter implements FileClient
@@ -41,13 +42,20 @@ public class FtpFileClient extends ConfigurableAdapter implements FileClient
 	 */
 	public void open() throws Exception
 	{
-		String host = configuration.getString("jppf.ftp.host", "localhost");
-		int port = configuration.getInt("jppf.ftp.port", 12221);
-		String user = configuration.getString("jppf.ftp.user", "anonymous");
-		String password = configuration.getString("jppf.ftp.password", "");
-		ftpClient = new FTPClient();
+		TypedProperties c = getConfiguration();
+		String host = c.getString("jppf.ftp.client.host", "localhost");
+		int port = c.getInt("jppf.ftp.client.port", 12221);
+		String user = c.getString("jppf.ftp.client.user", "anonymous");
+		String password = c.getString("jppf.ftp.client.password", "");
+		ftpClient = c.getBoolean("jppf.ftp.client.secure", false) ? new FTPSClient() : new FTPClient();
+		ftpClient.setBufferSize(c.getInt("jppf.ftp.client.bufferSize", 32768));
+		ftpClient.setRemoteVerificationEnabled(c.getBoolean("jppf.ftp.client.remoteVerificationEnabled", false));
+		ftpClient.setListHiddenFiles(c.getBoolean("jppf.ftp.client.listHiddenFiles", false));
 		ftpClient.connect(host, port);
 		ftpClient.login(user, password);
+		ftpClient.setFileStructure(c.getInt("jppf.ftp.client.fileStructure", FTP.FILE_STRUCTURE));
+		ftpClient.setFileType(c.getInt("jppf.ftp.client.fileType", FTP.ASCII_FILE_TYPE), c.getInt("jppf.ftp.client.fileFormat", FTP.NON_PRINT_TEXT_FORMAT));
+		ftpClient.setFileTransferMode(c.getInt("jppf.ftp.client.fileTransferMode", FTP.STREAM_TRANSFER_MODE));
 	}
 
 	/**
