@@ -20,7 +20,7 @@
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JobDataPage" type="page">
 	<!-- test comment for save -->
 	<property name="label" value="Job Data"/>
-	<property name="layoutConstraints" value="flowy, fill, gap rel"/>
+	<property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
 
 	<!-- ===================================================================== -->
 	<!--                        Buttons area                                   -->
@@ -64,6 +64,7 @@
 		</child>
 
 		<child name="sep3" type="ToolbarSeparator"/>
+
 		<child name="job.button.expand" type="Button">
 			<property name="icon" value="/org/jppf/ui/resources/expand.gif"/>
 			<listener type="script">

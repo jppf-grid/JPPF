@@ -31,4 +31,9 @@ public interface ClientListener extends EventListener
 	 * @param event the event to notify this listener of.
 	 */
 	void newConnection(ClientEvent event);
+	/**
+	 * Notifiy this listener that a driver connection has failed.
+	 * @param event the event to notify this listener of.
+	 */
+	void connectionFailed(ClientEvent event);
 }

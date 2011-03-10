@@ -299,6 +299,15 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public void connectionFailed(ClientEvent event)
+	{
+		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
+		driverRemoved(c.getJmxConnection().getId());
+	}
+
+	/**
 	 * Refreshes the tree table display.
 	 */
 	public void refreshUI()

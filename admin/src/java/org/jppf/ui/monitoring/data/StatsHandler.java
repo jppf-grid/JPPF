@@ -58,7 +58,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	/**
 	 * The current client connection for which statistics and charts are displayed.
 	 */
-	private JPPFClientConnectionImpl currentConnection = null;
+	JPPFClientConnectionImpl currentConnection = null;
 	/**
 	 * The object holding the current statistics values.
 	 */
@@ -70,11 +70,11 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	/**
 	 * Timer used to query the stats from the server. 
 	 */
-	private java.util.Timer timer = null;
+	java.util.Timer timer = null;
 	/**
 	 * Interval, in milliseconds, between refreshes from the server.
 	 */
-	private long refreshInterval = 2000L;
+	long refreshInterval = 2000L;
 	/**
 	 * Number of data snapshots kept in memory.
 	 */
@@ -82,7 +82,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	/**
 	 * Contains all the data and its converted values received from the server.
 	 */
-	private Map<String, ConnectionDataHolder> dataHolderMap = new HashMap<String, ConnectionDataHolder>();
+	Map<String, ConnectionDataHolder> dataHolderMap = new HashMap<String, ConnectionDataHolder>();
 	/**
 	 * Number of data updates so far.
 	 */
@@ -94,7 +94,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	/**
 	 * Thread pool used to process new conneciton events.
 	 */
-	private ExecutorService executor = Executors.newFixedThreadPool(1);
+	private ExecutorService executor = Executors.newFixedThreadPool(1, new JPPFThreadFactory("StasHandler"));
 
 	/**
 	 * Get the singleton instance of this class.
@@ -318,7 +318,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	{
 		if (getCurrentConnection() == null) return 0;
 		ConnectionDataHolder dataHolder = dataHolderMap.get(getCurrentConnection().getName());
-		return dataHolder.getDataList().size();
+		return (dataHolder == null) ? -1 : dataHolder.getDataList().size();
 	}
 
 	/**
@@ -457,7 +457,15 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	 */
 	public synchronized void newConnection(ClientEvent event)
 	{
-		executor.submit(new NewConnectionTask(event.getConnection()));
+		executor.submit(new NewConnectionTask(this, event.getConnection()));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void connectionFailed(ClientEvent event)
+	{
+		executor.submit(new ConnectionFailedTask(this, event.getConnection()));
 	}
 
 	/**
@@ -476,9 +484,9 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	public synchronized void setServerListOption(OptionElement serverListOption)
 	{
 		this.serverListOption = serverListOption;
-		if (debugEnabled) log.debug("setting serverList option=" + serverListOption);
 		List<JPPFClientConnection> list = getJppfClient(null).getAllConnections();
-		for (JPPFClientConnection c: list)executor.submit(new NewConnectionTask(c));
+		if (debugEnabled) log.debug("setting serverList option=" + serverListOption + ", connections = " + list);
+		for (JPPFClientConnection c: list) executor.submit(new NewConnectionTask(this, c));
 		notifyAll();
 	}
 
@@ -491,82 +499,5 @@ public final class StatsHandler implements StatsConstants, ClientListener
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getCurrentConnection();
 		if (c == null) return null;
 		return c.getJmxConnection();
-	}
-
-	/**
-	 * Task executed when a new driver connection is created.
-	 */
-	private class NewConnectionTask extends ThreadSynchronization implements Runnable
-	{
-		/**
-		 * The new connection that was created.
-		 */
-		private JPPFClientConnection c = null;
-
-		/**
-		 * Initialized this task with the specified client connection.
-		 * @param c the new connection that was created.
-		 */
-		public NewConnectionTask(JPPFClientConnection c)
-		{
-			this.c = c;
-		}
-
-		/**
-		 * Perform the task.
-		 * @see java.lang.Runnable#run()
-		 */
-		public void run()
-		{
-			if (dataHolderMap.get(c.getName()) == null)
-			{
-				dataHolderMap.put(c.getName(), new ConnectionDataHolder());
-			}
-			if (timer != null)
-			{
-				TimerTask task = new StatsRefreshTask((JPPFClientConnectionImpl) c);
-				timer.schedule(task, 1000L, refreshInterval);
-			}
-			JComboBox box = null;
-			while (getServerListOption() == null) goToSleep(50L);
-			synchronized(StatsHandler.this)
-			{
-				if (debugEnabled) log.debug("adding client connection " + c.getName());
-				box = ((ComboBoxOption) getServerListOption()).getComboBox();
-				int count = box.getItemCount();
-				boolean found = false;
-				for (int i=0; i<count; i++)
-				{
-					Object o = box.getItemAt(i);
-					if (c.equals(o))
-					{
-						found = true;
-						break;
-					}
-				}
-				if (!found)
-				{
-					box.addItem(c);
-					int maxLen = 0;
-					Object proto = null;
-					for (int i=0; i<box.getItemCount(); i++)
-					{
-						Object o = box.getItemAt(i);
-						int n = o.toString().length();
-						if (n > maxLen)
-						{
-							maxLen = n;
-							proto = o;
-						}
-					}
-					if (proto != null) box.setPrototypeDisplayValue(proto);
-				}
-				if (currentConnection == null)
-				{
-					currentConnection = (JPPFClientConnectionImpl) c;
-					box.setSelectedItem(c);
-				}
-			}
-		}
 	}
 }

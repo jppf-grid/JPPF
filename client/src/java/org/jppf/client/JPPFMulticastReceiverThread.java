@@ -76,9 +76,10 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 				JPPFConnectionInformation info = receiver.receive();
 				if (info == null)
 				{
-					setStopped(true);
-					log.error("Abnormal situation: connection information should not be null");
-					break;
+					//setStopped(true);
+					//log.error("Abnormal situation: connection information should not be null");
+					//break;
+					continue;
 				}
 				InetAddress ip = InetAddress.getByName(info.host);
 				if (!hasConnectionInformation(info))

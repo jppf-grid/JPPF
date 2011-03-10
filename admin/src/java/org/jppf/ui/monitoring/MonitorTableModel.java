@@ -30,6 +30,10 @@ import org.jppf.ui.monitoring.data.*;
 class MonitorTableModel extends AbstractTableModel
 {
 	/**
+	 * Default values to use when the driver connection is no longer available.
+	 */
+	private static final Map<Fields, String> EMPTY_VALUES = StatsFormatter.getStringValuesMap(new JPPFStats());
+	/**
 	 * The list of fields whose values are displayed in the table.
 	 */
 	private Fields[] fields = null;
@@ -76,7 +80,7 @@ class MonitorTableModel extends AbstractTableModel
 		if (column == 0) return name;
 		Map<Fields, String> valuesMap = null;
 		if (StatsHandler.getInstance().getStatsCount() > 0) valuesMap = StatsHandler.getInstance().getLatestStringValues();
-		else valuesMap = StatsFormatter.getStringValuesMap(new JPPFStats());
+		else valuesMap = EMPTY_VALUES;
 		return valuesMap.get(name);
 	}
 }

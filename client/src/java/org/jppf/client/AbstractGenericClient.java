@@ -194,8 +194,12 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 			pools.put(priority, pool);
 		}
 		pool.clientList.add(c);
-		allConnections.add(c);
-		int n = allConnections.size();
+		int n = 0;
+		synchronized(allConnections)
+		{
+			allConnections.add(c);
+			n = allConnections.size();
+		}
 		if (executor.getCorePoolSize() < n)
 		{
 			executor.setMaximumPoolSize(n);

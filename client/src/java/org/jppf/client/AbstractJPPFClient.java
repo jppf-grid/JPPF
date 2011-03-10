@@ -17,10 +17,8 @@
  */
 package org.jppf.client;
 
-import java.io.Serializable;
 import java.util.*;
 
-import org.jppf.JPPFError;
 import org.jppf.client.event.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.security.JPPFSecurityContext;
@@ -323,12 +321,30 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		c.removeClientConnectionStatusListener(this);
 		int priority = c.getPriority();
 		ClientPool pool = pools.get(priority);
+		boolean emptyPools = false;
 		if (pool != null)
 		{
 			pool.clientList.remove(c);
 			if (pool.clientList.isEmpty()) pools.remove(priority);
-			if (pools.isEmpty()) throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
+			//if (pools.isEmpty()) throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
+			if (pools.isEmpty())
+			{
+				log.error("FATAL ERROR: No more driver connection available for this client");
+				emptyPools = true;
+			}
+			synchronized(allConnections)
+			{
+				allConnections.remove(c);
+			}
 		}
+		synchronized(listeners)
+		{
+			for (ClientListener listener: listeners)
+			{
+				listener.connectionFailed(new ClientEvent(c));
+			}
+		}
+		if (emptyPools) return;
 		List<JPPFJob> toResubmit = c.close();
 		int taskCount = 0;
 		int execCount = toResubmit.size();
@@ -347,104 +363,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		catch(Exception e)
 		{
 			log.error(e.getMessage());
-		}
-	}
-
-	/**
-	 * Instances of this class manage a list of client connections with the same priority.
-	 */
-	public static class ClientPool
-	{
-		/**
-		 * The priority associated with this pool.
-		 */
-		private int priority = 0;
-		/**
-		 * Index of the last used connection in this pool.
-		 */
-		private int lastUsedIndex = 0;
-		/**
-		 * List of <code>JPPFClientConnection</code> instances with the same priority.
-		 */
-		public List<JPPFClientConnection> clientList = new ArrayList<JPPFClientConnection>();
-
-		/**
-		 * Get the next client connection.
-		 * @return a <code>JPPFClientConnection</code> instances.
-		 */
-		public JPPFClientConnection nextClient()
-		{
-			if (clientList.isEmpty()) return null;
-			lastUsedIndex = ++lastUsedIndex % clientList.size();
-			return clientList.get(getLastUsedIndex());
-		}
-
-		/**
-		 * Get the current size of this pool.
-		 * @return the size as an int.
-		 */
-		public int size()
-		{
-			return clientList.size();
-		}
-
-		/**
-		 * Get the priority associated with this pool.
-		 * @return the priority as an int.
-		 */
-		public int getPriority()
-		{
-			return priority;
-		}
-
-		/**
-		 * Set the priority associated with this pool.
-		 * @param priority the priority as an int.
-		 */
-		public void setPriority(int priority)
-		{
-			this.priority = priority;
-		}
-
-		/**
-		 * Get the index of the last used connection in this pool.
-		 * @return the last used index as an int.
-		 */
-		public int getLastUsedIndex()
-		{
-			return lastUsedIndex;
-		}
-
-		/**
-		 * Set the index of the last used connection in this pool.
-		 * @param lastUsedIndex the last used index as an int.
-		 */
-		public void setLastUsedIndex(int lastUsedIndex)
-		{
-			this.lastUsedIndex = lastUsedIndex;
-		}
-	}
-
-	/**
-	 * This comparator defines a decending value order for integers.
-	 */
-	protected static class DescendingIntegerComparator implements Comparator<Integer>, Serializable
-	{
-		/**
-		 * Explicit serialVersionUID.
-		 */
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * Compare two integers. This comparator defines a descending order for integers.
-		 * @param o1 first integer to compare.
-		 * @param o2 second integer to compare.
-		 * @return -1 if o1 > o2, 0 if o1 == o2, 1 if o1 < o2
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
-		public int compare(Integer o1, Integer o2)
-		{
-			return o2 - o1; 
 		}
 	}
 
@@ -471,29 +389,38 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * Add a listener to the list of listeners to this client.
 	 * @param listener the listener to add.
 	 */
-	public synchronized void addClientListener(ClientListener listener)
+	public void addClientListener(ClientListener listener)
 	{
-		listeners.add(listener);
+		synchronized(listeners)
+		{
+			listeners.add(listener);
+		}
 	}
 
 	/**
 	 * Remove a listener from the list of listeners to this client.
 	 * @param listener the listener to remove.
 	 */
-	public synchronized void removeClientListener(ClientListener listener)
+	public void removeClientListener(ClientListener listener)
 	{
-		listeners.remove(listener);
+		synchronized(listeners)
+		{
+			listeners.remove(listener);
+		}
 	}
 
 	/**
 	 * Notify all listeners that a new connection was created.
 	 * @param c the connection that was created.
 	 */
-	public synchronized void newConnection(JPPFClientConnection c)
+	public void newConnection(JPPFClientConnection c)
 	{
-		for (ClientListener listener: listeners)
+		synchronized(listeners)
 		{
-			listener.newConnection(new ClientEvent(c));
+			for (ClientListener listener: listeners)
+			{
+				listener.newConnection(new ClientEvent(c));
+			}
 		}
 	}
 

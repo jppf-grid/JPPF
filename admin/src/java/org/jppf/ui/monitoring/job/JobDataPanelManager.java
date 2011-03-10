@@ -27,6 +27,7 @@ import org.jppf.client.event.*;
 import org.jppf.job.JobInformation;
 import org.jppf.management.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.jppf.ui.treetable.JPPFTreeTable;
 import org.slf4j.*;
 
 /**
@@ -84,7 +85,12 @@ class JobDataPanelManager
 		DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(data);
 		if (debugEnabled) log.debug("adding driver: " + driverName + " at index " + index);
 		jobPanel.getModel().insertNodeInto(driverNode, jobPanel.getTreeTableRoot(), index);
-		jobPanel.getTreeTable().expand(driverNode);
+		JPPFTreeTable treeTable = jobPanel.getTreeTable();
+		if (treeTable != null)
+		{
+			treeTable.expand(jobPanel.getTreeTableRoot());
+			treeTable.expand(driverNode);
+		}
 	}
 
 	/**

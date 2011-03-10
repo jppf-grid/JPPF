@@ -100,7 +100,12 @@ public class NodeDataPanelManager
 			return;
 		}
 		if (nodes != null) for (JPPFManagementInfo nodeInfo: nodes) nodeAdded(driverNode, nodeInfo);
-		if (panel.getTreeTable() != null) panel.getTreeTable().expand(driverNode);
+		JPPFTreeTable treeTable = panel.getTreeTable();
+		if (treeTable != null)
+		{
+			treeTable.expand(panel.getTreeTableRoot());
+			treeTable.expand(driverNode);
+		}
 		panel.updateStatusBar("/StatusNbServers", 1);
 		repaintTreeTable();
 	}
@@ -115,18 +120,38 @@ public class NodeDataPanelManager
 		final DefaultMutableTreeNode driverNode = findDriver(driverName);
 		if (debugEnabled) log.debug("removing driver: " + driverName);
 		if (driverNode == null) return;
-		if (removeNodesOnly)
+		try
 		{
-			for (int i=driverNode.getChildCount()-1; i>=0; i--)
+			int n = driverNode.getChildCount();
+			int count = 0;
+			for (int i=n-1; i>=0; i--)
 			{
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode ) driverNode.getChildAt(i);
-				panel.getModel().removeNodeFromParent(node);
+				TopologyData data = (TopologyData) node.getUserObject();
+				if (TopologyDataType.NODE.equals(data.getType()))
+				{
+					try
+					{
+						if (data.getJmxWrapper() != null) data.getJmxWrapper().close();
+					}
+					catch (Exception e)
+					{
+						log.error(e.getMessage(), e);
+					}
+					panel.getModel().removeNodeFromParent(node);
+					count++;
+				}
+			}
+			panel.updateStatusBar("/StatusNbNodes", -count);
+			if (!removeNodesOnly)
+			{
+				panel.getModel().removeNodeFromParent(driverNode);
+				panel.updateStatusBar("/StatusNbServers", -1);
 			}
 		}
-		else
+		catch (Exception e)
 		{
-			panel.getModel().removeNodeFromParent(driverNode);
-			panel.updateStatusBar("/StatusNbServers", -1);
+			log.error(e.getMessage(), e);
 		}
 		repaintTreeTable();
 	}

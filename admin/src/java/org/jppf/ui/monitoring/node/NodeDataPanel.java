@@ -126,7 +126,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		treeTable.setDefaultRenderer(Object.class, new NodeTableCellRenderer());
 		JScrollPane sp = new JScrollPane(treeTable);
 		setUIComponent(sp);
-		//setupActions();
 		treeTable.expandAll();
 	}
 
@@ -137,7 +136,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 */
 	public void nodeDataUpdated(final String driverName, final String nodeName)
 	{
-		//Runnable r = new SynchronizedTask(this)
 		Runnable r = new Runnable()
 		{
 			public void run()
@@ -154,7 +152,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 */
 	public void driverAdded(final JPPFClientConnection connection)
 	{
-		//Runnable r = new SynchronizedTask(this)
 		Runnable r = new Runnable()
 		{
 			public void run()
@@ -172,7 +169,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 */
 	public void driverRemoved(final String driverName, final boolean removeNodesOnly)
 	{
-		//Runnable r = new SynchronizedTask(this)
 		Runnable r = new Runnable()
 		{
 			public void run()
@@ -202,7 +198,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 */
 	public void nodeAdded(final DefaultMutableTreeNode driverNode, final JPPFManagementInfo nodeInfo)
 	{
-		//Runnable r = new SynchronizedTask(this)
 		Runnable r = new Runnable()
 		{
 			public void run()
@@ -220,7 +215,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 */
 	public void nodeRemoved(final String driverName, final String nodeName)
 	{
-		//Runnable r = new SynchronizedTask(this)
 		Runnable r = new Runnable()
 		{
 			public void run()
@@ -367,5 +361,14 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	NodeDataPanelManager getManager()
 	{
 		return manager;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void connectionFailed(ClientEvent event)
+	{
+		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
+		driverRemoved(c.getJmxConnection().getId(), false);
 	}
 }
