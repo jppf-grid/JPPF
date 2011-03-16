@@ -81,7 +81,6 @@ public class IPFilter
 	 */
 	private void configureIPAddressPatterns(String source, List<AbstractIPAddressPattern> addToList)
 	{
-		addToList.clear();
 		if (source == null) return;
 		source = source.trim();
 		if ("".equals(source)) return;
