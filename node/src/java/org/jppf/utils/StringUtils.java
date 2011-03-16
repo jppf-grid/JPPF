@@ -413,7 +413,7 @@ public final class StringUtils
 			}
 			else
 			{
-				result = new int[8];
+				result = new int[4];
 				String[] comp = ip.split("\\.");
 				for (int i=0; i<comp.length; i++) result[i] = Integer.valueOf(comp[i]);
 			}
