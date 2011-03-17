@@ -235,7 +235,15 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	{
 		if (currentBuffer == null) return -1;
 		int remaining = currentBuffer.remainingFromPos();
-		int n = dest.write(currentBuffer.buffer, currentBuffer.pos, remaining);
+		int n = 0;
+		try
+		{
+			n = dest.write(currentBuffer.buffer, currentBuffer.pos, remaining);
+		}
+		catch(Error e)
+		{
+			log.error(e.getMessage(), e);
+		}
 		if (traceEnabled) log.trace("count/size=" + count + "/" + size + ", n/remaining=" + n + "/" + remaining +
 			", currentBufferIndex/listSize=" + currentBufferIndex + "/" + list.size() + ", pos=" + currentBuffer.pos + " (" + this + ")");
 		if (n > 0) count += n;

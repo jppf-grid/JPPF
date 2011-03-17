@@ -59,10 +59,10 @@ public class DataSizeRunner
 	{
 		try
 		{
-			//jppfClient = new JPPFClient();
-			//perform();
+			jppfClient = new JPPFClient();
+			perform();
 			//perform2();
-			perform3();
+			//perform3();
 		}
 		catch(Exception e)
 		{
@@ -82,24 +82,35 @@ public class DataSizeRunner
 	{
 		TypedProperties config = JPPFConfiguration.getProperties();
 		boolean inNodeOnly = config.getBoolean("datasize.inNodeOnly", false);
+		int iterations = config.getInt("datasize.iterations", 1);
 		int datasize = config.getInt("datasize.size", 1);
 		int nbTasks = config.getInt("datasize.nbTasks", 10);
 		String unit = config.getString("datasize.unit", "b").toLowerCase();
 		if ("k".equals(unit)) datasize *= KILO;
 		else if ("m".equals(unit)) datasize *= MEGA;
 		
-		output("Running datasize demo with data size = " + datasize + " with " + nbTasks + " tasks");
-		long totalTime = System.currentTimeMillis();
-		JPPFJob job = new JPPFJob();
-		for (int i=0; i<nbTasks; i++) job.addTask(new DataTask(datasize, inNodeOnly));
-		List<JPPFTask> results = jppfClient.submit(job);
-		for (JPPFTask t: results)
+		output("Running datasize demo with data size = " + datasize + " with " + nbTasks + " tasks for " + iterations + " iterations");
+		long totalTime = 0;
+		for (int i=1; i<=iterations; i++)
 		{
-			if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
-			else System.out.println("task result: " + t.getResult());
+			long start = System.nanoTime();
+			JPPFJob job = new JPPFJob();
+			job.setId("Datasize job " + i);
+			for (int j=0; j<nbTasks; j++) job.addTask(new DataTask(datasize, inNodeOnly));
+			List<JPPFTask> results = jppfClient.submit(job);
+			/*
+			for (JPPFTask t: results)
+			{
+				if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
+				else System.out.println("task result: " + t.getResult());
+			}
+			*/
+			long elapsed = System.nanoTime() - start;
+			totalTime += elapsed;
+			output("iteration " + i + " performed in " + StringUtils.toStringDuration(elapsed/1000000L));
 		}
-		totalTime = System.currentTimeMillis() - totalTime;
-		output("Computation time: " + StringUtils.toStringDuration(totalTime));
+		//totalTime = System.currentTimeMillis() - totalTime;
+		output("Computation time: " + StringUtils.toStringDuration(totalTime/1000000L));
 	}
 
 	/**
