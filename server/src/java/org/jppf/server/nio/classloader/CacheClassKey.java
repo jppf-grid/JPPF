@@ -68,4 +68,12 @@ public class CacheClassKey
 	{
 		return uuid.hashCode() + 13*res.hashCode();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{
+		return "CacheClassKey[uuid=" + uuid + ", res=" + res + "]";
+	}
 }

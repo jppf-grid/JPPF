@@ -43,19 +43,19 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	/**
 	 * The soft references queue.
 	 */
-	private ReferenceQueue<Pair<K,V>> refQueue;
+	private ReferenceQueue<V> refQueue;
 	/**
 	 * The underlying map that backs this soft map.
 	 */
-	private Map<K, SoftReference<Pair<K,V>>> map; 
+	private Map<K, SoftValue<K, V>> map; 
 
 	/**
 	 * Default constructor.
 	 */
 	public SoftReferenceValuesMap()
 	{
-		refQueue = new ReferenceQueue<Pair<K,V>>();
-		map = new HashMap<K, SoftReference<Pair<K,V>>>();
+		refQueue = new ReferenceQueue<V>();
+		map = new HashMap<K, SoftValue<K, V>>();
 	}
 
 	/**
@@ -82,8 +82,8 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	public V get(Object key)
 	{
 		cleanup();
-		SoftReference<Pair<K,V>> ref = map.get(key);
-		return ref == null ? null : ref.get().second();
+		SoftReference<V> ref = map.get(key);
+		return ref == null ? null : ref.get();
 	}
 
 	/**
@@ -93,8 +93,8 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	public V put(K key, V value)
 	{
 		cleanup();
-		SoftReference<Pair<K,V>> ref = map.put(key, new SoftReference(new Pair(key, value), refQueue));
-		return ref == null ? null : ref.get().second();
+		SoftReference<V> ref = map.put(key, new SoftValue(key, value, refQueue));
+		return ref == null ? null : ref.get();
 	}
 
 	/**
@@ -103,16 +103,16 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	public V remove(Object key)
 	{
 		cleanup();
-		SoftReference<Pair<K,V>> ref = map.remove(key);
-		return ref == null ? null : ref.get().second();
+		SoftReference<V> ref = map.remove(key);
+		return ref == null ? null : ref.get();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public Set<java.util.Map.Entry<K, V>> entrySet()
+	public Set<Map.Entry<K, V>> entrySet()
 	{
-		return null;
+		throw new UnsupportedOperationException("This operation is not implemented");
 	}
 
 	/**
@@ -120,12 +120,40 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	 */
 	private void cleanup()
 	{
-		Reference<? extends Pair<K,V>> ref = null;
-		while ((ref = refQueue.poll()) != null)
+		SoftValue<K, V> ref;
+		while ((ref = (SoftValue) refQueue.poll()) != null)
 		{
-			K key = ref.get().first();
+			// NPE on this line ==>
+			K key = ref.key;
+			if (key == null) continue;
 			if (traceEnabled) log.trace("removing entry for key=" + key);
 			map.remove(key);
+		}
+	}
+
+	/**
+	 * Extension of SoftReference that holds the map key, so the corresponding entry
+	 * can be removed from the map.
+	 * @param <K> the type of the key.
+	 * @param <V> the type of the value.
+	 */
+	private static class SoftValue<K, V> extends SoftReference<V>
+	{
+		/**
+		 * The associated key.
+		 */
+		private final K key;
+
+		/**
+		 * Initialize this reference with the specified key and value.
+		 * @param key the key.
+		 * @param value the value.
+		 * @param queue the reference queue to use.
+		 */
+		public SoftValue(K key, V value, ReferenceQueue<V> queue)
+		{
+			super(value, queue);
+			this.key = key;
 		}
 	}
 }

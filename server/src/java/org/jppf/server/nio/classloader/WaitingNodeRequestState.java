@@ -125,10 +125,13 @@ class WaitingNodeRequestState extends ClassServerState
 				if (uuid != null) b = server.getCacheContent(uuid, name);
 				boolean alreadyInCache = (b != null);
 				if (debugEnabled) log.debug("resource " + (alreadyInCache ? "" : "not ") + "found [" + name + "] in cache for node: " + channel);
-				if (!alreadyInCache) b = server.getResourceProvider().getResourceAsBytes(name);
+				if (!alreadyInCache)
+				{
+					b = server.getResourceProvider().getResourceAsBytes(name);
+					if (debugEnabled) log.debug("resource " + (b == null ? "not " : "") + "found [" + name + "] in the driver's classpath for node: " + channel);
+				}
 				if ((b != null) || !resource.isDynamic())
 				{
-					if (debugEnabled) log.debug("resource " + (b == null ? "not " : "") + "found [" + name + "] in the driver's classpath for node: " + channel);
 					if ((b != null) && !alreadyInCache) server.setCacheContent(driver.getUuid(), name, b);
 					resource.setDefinition(b);
 					context.serializeResource(channel);
