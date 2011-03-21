@@ -7,6 +7,7 @@
 	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src"/>
 	<classpathentry kind="src" output="IdleSystem/classes" path="IdleSystem/src"/>
 	<classpathentry kind="src" output="MatrixMultiplication/classes" path="MatrixMultiplication/src"/>
+	<classpathentry kind="src" output="Nbody/classes" path="Nbody/src"/>
 	<classpathentry kind="src" output="NodeTray/classes" path="NodeTray/src"/>
 	<classpathentry kind="src" output="NodeLifeCycle/classes" path="NodeLifeCycle/src"/>
 	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src"/>
