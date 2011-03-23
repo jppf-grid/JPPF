@@ -59,10 +59,10 @@ public class DataSizeRunner
 	{
 		try
 		{
-			jppfClient = new JPPFClient();
-			perform();
+			//jppfClient = new JPPFClient();
+			//perform();
 			//perform2();
-			//perform3();
+			perform3();
 		}
 		catch(Exception e)
 		{
