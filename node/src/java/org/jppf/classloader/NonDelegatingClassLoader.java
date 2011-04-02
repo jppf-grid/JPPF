@@ -23,6 +23,7 @@ import java.net.*;
 import java.util.*;
 
 import org.jppf.utils.FileUtils;
+import org.jppf.utils.streams.StreamConstants;
 
 /**
  * 
@@ -87,7 +88,7 @@ public class NonDelegatingClassLoader extends URLClassLoader
 					b = FileUtils.getInputStreamAsByte(is);
 					if (b != null) resourceMap.put(name, b);
 					// we won't have to search it again
-					else resourceMap.put(name, new byte[0]);
+					else resourceMap.put(name, StreamConstants.EMPTY_BYTES);
 				}
 				catch(Exception e)
 				{
