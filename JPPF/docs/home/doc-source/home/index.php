@@ -1,12 +1,28 @@
 <?php $currentPage="Home" ?>
 $template{name="about-page-header" title="Home"}$
-	<table border="0" cellpadding="0" cellspacing="0" style="vertical-align: middle; height: 250px; width: 750px; background-image: url('/images/test1.gif'); background-repeat: no-repeat; background-attachment: scroll">
-	<tr><td align="center" valign="center"><img src="/images/Animation1.gif" border="0" alt="JPPF" style="background: transparent"/></td></tr>
-	</table>
+	<script src="scripts/jquery.js"></script>
+	<script src="scripts/tabs.min.js"></script>
+	<script src="scripts/tabs.slideshow.min.js"></script>
+	<script src="scripts/jppf.js"></script>
+	<div style="vertical-align: middle; height: 250px; width: 750px; background-image: url('/images/test1.gif'); background-repeat: no-repeat; background-attachment: scroll">
+		<div align="center" id="images" style="vertical-align: middle; height: 150px; width: 700px;">
+			<div><img src="/images/anim/Animation2.gif" border="0" alt="JPPF"/></div>
+			<div><img src="/images/anim/Animation4.gif" border="0" alt="JPPF"/></div>
+			<div><img src="/images/anim/Animation6.gif" border="0" alt="JPPF"/></div>
+			<div><img src="/images/anim/Animation8.gif" border="0" alt="JPPF"/></div>
+		</div>
+	</div>
+	<div id="slidetabs" align="center">
+		<a href="#"></a>
+		<a href="#"></a>
+		<a href="#"></a>
+		<a href="#"></a>
+	</div>
+	<script>anim_main2();</script>
 	<div style="margin: 15px; ">
-	<p style="text-align: justify; font-size: 12pt">JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.
-	This is done by splitting an application into smaller parts that can be executed simultaneously on different machines.
-	<p style="text-align: justify; font-size: 12pt">Start easily with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">JPPF Tutorial</a>.
+		<p style="text-align: justify; font-size: 12pt">JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.
+		This is done by splitting an application into smaller parts that can be executed simultaneously on different machines.
+		<p style="text-align: justify; font-size: 12pt">Take an easy start with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">JPPF Tutorial</a>.
 	</div>
 
 	<div class="column1">
