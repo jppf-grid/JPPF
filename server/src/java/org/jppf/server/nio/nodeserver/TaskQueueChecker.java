@@ -18,6 +18,7 @@
 package org.jppf.server.nio.nodeserver;
 
 import java.util.*;
+import java.util.concurrent.locks.Lock;
 
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
@@ -28,13 +29,13 @@ import org.jppf.server.protocol.*;
 import org.jppf.server.queue.AbstractJPPFQueue;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.fixedsize.*;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
  */
-class TaskQueueChecker implements Runnable
+class TaskQueueChecker extends ThreadSynchronization implements Runnable
 {
 	/**
 	 * Logger for this class.
@@ -51,11 +52,23 @@ class TaskQueueChecker implements Runnable
 	/**
 	 * The owner of this queue checker.
 	 */
-	private NodeNioServer server = null;
+	private final NodeNioServer server;
+	/**
+	 * Reference to the job queue.
+	 */
+	private final AbstractJPPFQueue queue;
+	/**
+	 * Lock on the job queue.
+	 */
+	private final Lock queueLock;
+	/**
+	 * The list of idle node channels.
+	 */
+	private final List<ChannelWrapper<?>> idleChannels;
 	/**
 	 * Reference to the driver.
 	 */
-	private JPPFDriver driver = JPPFDriver.getInstance();
+	private final JPPFDriver driver = JPPFDriver.getInstance();
 	/**
 	 * Determines whether this instance is already running its run() method.
 	 */
@@ -63,11 +76,14 @@ class TaskQueueChecker implements Runnable
 
 	/**
 	 * Initialize this task queue checker with the specified node server. 
-	 * @param server - the owner of this queue checker.
+	 * @param server the owner of this queue checker.
 	 */
 	public TaskQueueChecker(NodeNioServer server)
 	{
 		this.server = server;
+		this.idleChannels = server.getIdleChannels();
+		this.queue = (AbstractJPPFQueue) server.getQueue();
+		this.queueLock = queue.getLock();
 	}
 
 	/**
@@ -76,39 +92,44 @@ class TaskQueueChecker implements Runnable
 	 */
 	public void run()
 	{
-		setRunning(true);
+		while (!isStopped())
+		{
+			if (!dispatch()) goToSleep(1000L, 10000);
+		}
+	}
+
+	/**
+	 * Perform the assignment of tasks.
+	 * @return true if a job was dispatched, false otherwise.
+	 * @see java.lang.Runnable#run()
+	 */
+	public boolean dispatch()
+	{
+		boolean dispatched = false;
 		try
 		{
-			List<ChannelWrapper<?>> idleChannels = server.getIdleChannels();
 			synchronized(idleChannels)
 			{
-				if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return;
+				if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return false;
 				if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
 				ChannelWrapper<?> channel = null;
 				BundleWrapper selectedBundle = null;
-				AbstractJPPFQueue queue = (AbstractJPPFQueue) server.getQueue();
-				queue.getLock().lock();
+				queueLock.lock();
 				try
 				{
 					Iterator<BundleWrapper> it = queue.iterator();
 					while ((channel == null) && it.hasNext() && !idleChannels.isEmpty())
 					{
 						BundleWrapper bundleWrapper = it.next();
-						JPPFTaskBundle bundle = bundleWrapper.getBundle();
-						if (!checkJobState(bundle)) continue;
-						int n = findIdleChannelIndex(bundle);
-						if (n >= 0)
-						{
-							channel = server.removeIdleChannel(n);
-							selectedBundle = bundleWrapper;
-						}
+						channel = retrieveChannel(bundleWrapper);
+						if (channel != null) selectedBundle = bundleWrapper;
 					}
-					if (debugEnabled)
+					if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
+					if (channel != null)
 					{
-						if (channel == null) log.debug("no channel found for bundle");
-						else log.debug("channel found for bundle: " + channel);
+						dispatchJobToChannel(channel, selectedBundle);
+						dispatched = true;
 					}
-					if (channel != null) dispatchJob(channel, selectedBundle);
 				}
 				catch(Exception ex)
 				{
@@ -116,7 +137,7 @@ class TaskQueueChecker implements Runnable
 				}
 				finally
 				{
-					queue.getLock().unlock();
+					queueLock.unlock();
 				}
 			}
 		}
@@ -124,10 +145,25 @@ class TaskQueueChecker implements Runnable
 		{
 			log.error("An error occured while preparing for bundle creation and dispatching.", ex);
 		}
-		finally
+		return dispatched;
+	}
+
+	/**
+	 * Retrieve a suitable channel for the specirfied job.
+	 * @param bundleWrapper the job to execute.
+	 * @return a channel for a node on which to execute the job.
+	 * @throws Exception if any error occurs.
+	 */
+	private ChannelWrapper<?> retrieveChannel(BundleWrapper bundleWrapper) throws Exception
+	{
+		ChannelWrapper<?> channel = null;
+		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		if (checkJobState(bundle))
 		{
-			setRunning(false);
+			int n = findIdleChannelIndex(bundle);
+			if (n >= 0) channel = server.removeIdleChannel(n);
 		}
+		return channel;
 	}
 
 	/**
@@ -135,7 +171,7 @@ class TaskQueueChecker implements Runnable
 	 * @param channel the node channel to dispatch the job to.
 	 * @param selectedBundle the job to dispatch.
 	 */
-	private void dispatchJob(ChannelWrapper<?> channel, BundleWrapper selectedBundle)
+	private void dispatchJobToChannel(ChannelWrapper<?> channel, BundleWrapper selectedBundle)
 	{
 		if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getBundle().getJobUuid() + " to nodeUuid=" + ((AbstractNodeContext) channel.getContext()).nodeUuid);
 		synchronized(channel)

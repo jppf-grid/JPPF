@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 
 import org.jppf.io.*;
 import org.jppf.server.nio.*;
@@ -87,13 +87,10 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 	 */
 	protected boolean writeNextObject(ChannelWrapper<?> wrapper) throws Exception
 	{
-		SocketChannel channel = (SocketChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
+		SocketChannel channel = (SocketChannel) ((SelectionKey) wrapper.getChannel()).channel();
 		if (currentLengthObject == null)
 		{
 			currentLengthObject = new NioObject(4, false);
-			//ByteBuffer buffer = ((ByteBufferLocation) currentLengthObject.getData()).buffer();
-			//buffer.putInt(locations.get(position).getSize());
-			//buffer.flip();
 			SerializationUtils.writeInt(locations.get(position).getSize(), currentLengthObject.getData().getOutputStream());
 		}
 		OutputDestination od = new ChannelOutputDestination(channel);

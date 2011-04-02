@@ -21,7 +21,6 @@ package org.jppf.server.nio.nodeserver;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.comm.recovery.*;
@@ -95,10 +94,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 */
 	private ChannelWrapper<?> localChannel = null;
 	/**
-	 * 
-	 */
-	private ExecutorService checkerExecutor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("JobChecker"));
-	/**
 	 * Mapping of channels to their uuid.
 	 */
 	private Map<String, ChannelWrapper<?>> uuidMap = new HashMap<String, ChannelWrapper<?>>();
@@ -130,8 +125,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 			public void newBundle(QueueEvent event)
 			{
 				selector.wakeup();
+				taskQueueChecker.wakeUp();
 			}
 		});
+		new Thread(taskQueueChecker, "TaskQueueChecker").start();
 		RecoveryServer recoveryServer = driver.getInitializer().getRecoveryServer();
 		if (recoveryServer != null) recoveryServer.getReaper().addReaperListener(this);
 	}
@@ -190,20 +187,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	public void postSelect()
-	{
-		if (idleChannels.isEmpty() || getQueue().isEmpty()) return;
-		if (!taskQueueChecker.isRunning())
-		{
-			taskQueueChecker.setRunning(true);
-			checkerExecutor.submit(taskQueueChecker);
-			//transitionManager.submit(taskQueueChecker);
-		}
-	}
-
-	/**
 	 * Add a channel to the list of idle channels.
 	 * @param channel the channel to add to the list.
 	 */
@@ -214,6 +197,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 		{
 			idleChannels.add(channel);
 		}
+		taskQueueChecker.wakeUp();
 	}
 
 	/**

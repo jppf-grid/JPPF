@@ -78,13 +78,6 @@ public abstract class AbstractNodeMessage
 		{
 			if (position != 0) position = 0;
 			if (!readNextObject(wrapper)) return false;
-			/*
-			InputStream is = locations.get(0).getInputStream();
-			byte[] data = FileUtils.getInputStreamAsByte(is);
-			data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
-			SerializationHelper helper = new SerializationHelperImpl();
-			bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
-			*/
 			bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0), new SerializationHelperImpl().getSerializer());
 			nbObjects = bundle.getTaskCount() + 1;
 		}
@@ -116,7 +109,6 @@ public abstract class AbstractNodeMessage
 			nbObjects = bundle.getTaskCount() + 2;
 			position = 0;
 		}
-		//if (!writeLength(channel)) return false;
 		while (position < nbObjects)
 		{
 			if (!writeNextObject(wrapper)) return false;
