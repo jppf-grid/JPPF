@@ -18,7 +18,6 @@
 
 package org.jppf.server.node;
 
-import java.lang.management.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
@@ -26,14 +25,13 @@ import java.util.concurrent.atomic.*;
 import org.jppf.node.NodeExecutionManager;
 import org.jppf.scheduling.*;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
  * Instances of this class manage the execution of JPPF tasks by a node.
  * @author Laurent Cohen
  */
-public class NodeExecutionManagerImpl extends ThreadSynchronization implements NodeExecutionManager
+public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecutionManager
 {
 	/**
 	 * Logger for this class.
@@ -44,21 +42,13 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The Thread Pool that really process the tasks
-	 */
-	private ThreadPoolExecutor threadPool = null;
-	/**
-	 * The factory used to create thread in the pool.
-	 */
-	private JPPFThreadFactory threadFactory = null;
-	/**
 	 * The node that uses this excecution manager.
 	 */
 	private JPPFNode node = null;
 	/**
 	 * Timer managing the tasks timeout.
 	 */
-	private JPPFScheduleHandler timeoutHandler = new JPPFScheduleHandler("Node Task Timeout Timer");
+	private JPPFScheduleHandler timeoutHandler = new JPPFScheduleHandler("Task Timeout Timer");
 	/**
 	 * Mapping of tasks numbers to their id.
 	 */
@@ -85,21 +75,13 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 	private Map<Long, Future<?>> futureMap = new Hashtable<Long, Future<?>>();
 	/**
 	 * Counter for the number of tasks whose execution is over,
-	 * including tasks that were completed normally, were cancelled or timed out. 
+	 * including tasks that completed normally, were cancelled or timed out. 
 	 */
 	private AtomicLong taskCount = new AtomicLong(0L);
 	/**
-	 * The platform MBean used to gather statistics about the JVM threads.
-	 */
-	private ThreadMXBean threadMXBean = null;
-	/**
-	 * Determines wheather the thread cpu time measurement is supported and enabled.
-	 */
-	private boolean cpuTimeEnabled = false;
-	/**
 	 * List of listeners to task execution events.
 	 */
-	private List<TaskExecutionListener> taskExecutionListeners = new ArrayList<TaskExecutionListener>();
+	private List<TaskExecutionListener> taskExecutionListeners = new Vector<TaskExecutionListener>();
 	/**
 	 * Determines whether the number of threads or their priority has changed.
 	 */
@@ -111,22 +93,8 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 	 */
 	public NodeExecutionManagerImpl(JPPFNode node)
 	{
+		super();
 		this.node = node;
-		TypedProperties props = JPPFConfiguration.getProperties();
-		int poolSize = props.getInt("processing.threads", -1);
-		if (poolSize < 0)
-		{
-			poolSize = Runtime.getRuntime().availableProcessors();
-			props.setProperty("processing.threads", "" + poolSize);
-		}
-		log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
-		threadMXBean = ManagementFactory.getThreadMXBean();
-		cpuTimeEnabled = threadMXBean.isThreadCpuTimeSupported();
-		threadFactory = new JPPFThreadFactory("node processing", cpuTimeEnabled);
-		LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
-		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory);
-		if (debugEnabled) log.debug("thread cpu time supported = " + cpuTimeEnabled);
-		if (cpuTimeEnabled) threadMXBean.setThreadCpuTimeEnabled(true);
 	}
 
 	/**
@@ -139,12 +107,12 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 	{
 		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
 		NodeExecutionInfo info = null;
-		if (cpuTimeEnabled) info = computeExecutionInfo();
+		if (isCpuTimeEnabled()) info = computeExecutionInfo();
 		setup(bundle, taskList);
 		for (JPPFTask task : taskList) performTask(task);
 		waitForResults();
 		cleanup();
-		if (cpuTimeEnabled)
+		if (isCpuTimeEnabled())
 		{
 			NodeExecutionInfo info2 = computeExecutionInfo();
 			info2.cpuTime -= info.cpuTime;
@@ -164,7 +132,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 		String id = task.getId();
 		long number = incTaskCount();
 		taskMap.put(number, task);
-		Future<?> f = threadPool.submit(new NodeTaskWrapper(node, task, uuidList, number));
+		Future<?> f = getThreadPool().submit(new NodeTaskWrapper(node, task, uuidList, number));
 		if (!f.isDone()) futureMap.put(number, f);
 		if (id != null)
 		{
@@ -215,8 +183,8 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 
 	/**
 	 * Cancel the execution of the tasks with the specified id.
-	 * @param number - the index of the task to cancel.
-	 * @param callOnCancel - determines whether the onCancel() callback method of each task should be invoked.
+	 * @param number the index of the task to cancel.
+	 * @param callOnCancel determines whether the onCancel() callback method of each task should be invoked.
 	 */
 	private synchronized void cancelTask(Long number, boolean callOnCancel)
 	{
@@ -302,56 +270,8 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 	 */
 	public void shutdown()
 	{
-		threadPool.shutdownNow();
+		getThreadPool().shutdownNow();
 		timeoutHandler.clear(true);
-	}
-
-	/**
-	 * Set the size of the node's thread pool.
-	 * @param size the size as an int.
-	 */
-	public void setThreadPoolSize(int size)
-	{
-		if (size <= 0)
-		{
-			log.warn("ignored attempt to set the thread pool size to 0 or less: " + size);
-			return;
-		}
-		int n = getThreadPoolSize();
-		if (n == size) return;
-		ThreadPoolExecutor tpe = (ThreadPoolExecutor) threadPool;
-		if (size > tpe.getCorePoolSize())
-		{
-			tpe.setMaximumPoolSize(size);
-			tpe.setCorePoolSize(size);
-		}
-		else if (size < tpe.getCorePoolSize())
-		{
-			tpe.setCorePoolSize(size);
-			tpe.setMaximumPoolSize(size);
-		}
-		log.info("Node thread pool size changed from " + n + " to " + size);
-		JPPFConfiguration.getProperties().setProperty("processing.threads", "" + size);
-	}
-
-	/**
-	 * Get the size of the node's thread pool.
-	 * @return the size as an int.
-	 */
-	public int getThreadPoolSize()
-	{
-		if (threadPool == null) return 0;
-		return ((ThreadPoolExecutor) threadPool).getCorePoolSize();
-	}
-
-	/**
-	 * Get the total cpu time used by the task processing threads.
-	 * @return the cpu time on milliseconds.
-	 */
-	public long getCpuTime()
-	{
-		if (!cpuTimeEnabled) return 0L;
-		return computeExecutionInfo().cpuTime;
 	}
 
 	/**
@@ -414,7 +334,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 	}
 
 	/**
-	 * Notifiaction sent by a node task wrapper when a task is complete.
+	 * Notification sent by a node task wrapper when a task is complete.
 	 * @param taskNumber the number identifying the task.
 	 * @param cpuTime the cpu time taken by the task.
 	 * @param elapsedTime the wall clock time taken by the task
@@ -438,53 +358,6 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 	public synchronized Future<?> getFutureFromNumber(long number)
 	{
 		return futureMap.get(number);
-	}
-
-	/**
-	 * Computes the total CPU time used by the execution threads.
-	 * @return a <code>NodeExecutionInfo</code> instance.
-	 */
-	private NodeExecutionInfo computeExecutionInfo()
-	{
-		if (!cpuTimeEnabled) return null;
-		NodeExecutionInfo info = new NodeExecutionInfo();
-		List<Long> ids = threadFactory.getThreadIDs();
-		for (Long id: ids)
-		{
-			info.cpuTime += threadMXBean.getThreadCpuTime(id);
-			info.userTime += threadMXBean.getThreadUserTime(id);
-		}
-		info.cpuTime /= 1e6;
-		info.userTime /= 1e6;
-		return info;
-	}
-
-	/**
-	 * Get the current cpu time for the thread identified by the specified id.
-	 * @param threadId the id of the thread to the cpu time from.
-	 * @return the cpu time as a long value.
-	 */
-	public long getCpuTime(long threadId)
-	{
-		return threadMXBean.getThreadCpuTime(threadId);
-	}
-
-	/**
-	 * Get the priority assigned to the execution threads.
-	 * @return the priority as an int value.
-	 */
-	public int getThreadsPriority()
-	{
-		return threadFactory.getPriority();
-	}
-
-	/**
-	 * Update the priority of all execution threads.
-	 * @param newPriority the new priority to set.
-	 */
-	public void updateThreadsPriority(int newPriority)
-	{
-		threadFactory.updatePriority(newPriority);
 	}
 
 	/**
@@ -517,10 +390,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 	 */
 	public void addTaskExecutionListener(TaskExecutionListener listener)
 	{
-		synchronized(taskExecutionListeners)
-		{
-			taskExecutionListeners.add(listener);
-		}
+		taskExecutionListeners.add(listener);
 	}
 
 	/**
@@ -529,10 +399,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 	 */
 	public void removeTaskExecutionListener(TaskExecutionListener listener)
 	{
-		synchronized(taskExecutionListeners)
-		{
-			taskExecutionListeners.remove(listener);
-		}
+		taskExecutionListeners.remove(listener);
 	}
 
 	/**
@@ -541,7 +408,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 	 */
 	public ExecutorService getExecutor()
 	{
-		return threadPool;
+		return getThreadPool();
 	}
 
 	/**
