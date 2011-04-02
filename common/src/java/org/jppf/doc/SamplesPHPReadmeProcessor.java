@@ -25,7 +25,7 @@ import org.jppf.JPPFException;
 import org.jppf.utils.FileUtils;
 
 /**
- * 
+ * This utility generates the doc-source php files for the samples pack from the readme in each sample.
  * @author Laurent Cohen
  */
 public class SamplesPHPReadmeProcessor implements Runnable
@@ -124,15 +124,13 @@ public class SamplesPHPReadmeProcessor implements Runnable
 		if (s.startsWith("/") || s.startsWith("\\")) s = s.substring(1);
 		s += "/Readme.php";
 		File outFile = new File(destDir, s);
-		if (outFile.getParentFile().mkdirs())
-		{
-			FileUtils.writeTextFile(outFile, result);
-			System.out.println("writing output file " + outFile);
-		}
+		outFile.getParentFile().mkdirs();
+		FileUtils.writeTextFile(outFile, result);
+		System.out.println("writing output file " + outFile);
 	}
 
 	/**
-	 * 
+	 * Run this utility with the specified command-line parameters.
 	 * @param args the source and destination directories.
 	 */
 	public static void main(String[] args)
