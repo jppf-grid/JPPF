@@ -86,3 +86,37 @@ table  {font-size: 10pt; font-family: Arial, Verdana, sans-serif; margin: 0px }
 div.aboutMenuItem { background-color: #6D78B6;}
 
 .codeBlock { font-family: Courrier New, Courrier, Console; border: 1px dashed blue }
+
+.anim_initial
+{
+	background: transparent;
+	display: visible;
+}
+
+.anim_div
+{
+	background: transparent;
+	/*position: relative;
+	top: 0px;
+	left: 0px;*/
+}
+
+
+#images div {
+	display: none;
+	float: left;
+	position: absolute;
+	top: 180;
+	left: 50%;
+	margin-left: -290px;
+}
+
+/* single tab */
+#slidetabs a {
+	display: none;
+	float: left;
+	display: block;
+	position: relative;
+	top: -150;
+	left: 0;
+}

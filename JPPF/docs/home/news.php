@@ -172,13 +172,28 @@
 											</div>
 															<?php
 											$itemClass = "";
+											if ($currentPage == "FAQ") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/faq" class="<?php echo $itemClass; ?>">&raquo; FAQ</a><br>
+											</div>
+															<?php
+											$itemClass = "";
 											if ($currentPage == "Patches") $itemClass = 'aboutMenuItem';
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
 											<a href="/patches.php" class="<?php echo $itemClass; ?>">&raquo; Patches</a><br>
 											</div>
-															<a href="/api-2.0" class="<?php if ($currentPage == Javadoc) echo 'aboutMenuItem'; else echo 'aboutMenuItem2'; ?>">&raquo; Javadoc</a><br>
+															<?php
+											$itemClass = "";
+											if ($currentPage == "Javadoc") $itemClass = 'aboutMenuItem';
+											else $itemClass = 'aboutMenuItem2'; 
+											?>
+											<div class="<?php echo $itemClass; ?>">
+											<a href="/api-2.0" class="<?php echo $itemClass; ?>">&raquo; Javadoc</a><br>
+											</div>
 															<?php
 											$itemClass = "";
 											if ($currentPage == "Samples") $itemClass = 'aboutMenuItem';
@@ -298,12 +313,11 @@
 				<!--<div align="center" style="width: 100%; border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">-->
 		<table border="0" cellspacing="0" cellpadding="0" width="100%" class="jppffooter">
 			<tr><td colspan="*" style="height: 10px"></td></tr>
-			</tr>
 			<tr>
 				<td align="center" style="font-size: 9pt; color: #6D78B6">
 					<a href="http://sourceforge.net/donate/index.php?group_id=135654"><img src="http://images.sourceforge.net/images/project-support.jpg" width="88" height="32" border="0" alt="Support This Project" /></a>
 				</td>
-				<td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2010 JPPF.org</td>
+				<td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2011 JPPF.org</td>
 				<td align="right">
 					<a href="http://www.parallel-matters.com"><img src="/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
 					<a href="http://sourceforge.net/projects/jppf-project">
