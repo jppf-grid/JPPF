@@ -45,7 +45,8 @@ public class MultipleBuffersOutputStream extends OutputStream
 	/**
 	 * Default length of each new buffer.
 	 */
-	private int defaultLength = 32768;
+	private int defaultLength = 4096;
+	//private int defaultLength = 32768;
 	/**
 	 * Contains the data written to this ouptput stream, as a sequence of {@link JPPFBuffer} instances.
 	 */
@@ -121,8 +122,10 @@ public class MultipleBuffersOutputStream extends OutputStream
 	public void write(byte[] b, int off, int len) throws IOException
 	{
 		if (b == null) throw new NullPointerException("the input buffer must not be null");
+		/*
 		if ((off < 0) || (off > b.length) || (len < 0) || (off + len > b.length))
 			throw new ArrayIndexOutOfBoundsException("b.length=" + b.length + ", off=" + off + ", len=" + len);
+		*/
 		if ((currentBuffer == null) || (currentBuffer.remaining() < len)) newCurrentBuffer(Math.max(defaultLength, len));
 		System.arraycopy(b, off, currentBuffer.buffer, currentBuffer.length, len);
 		currentBuffer.length += len;
@@ -139,7 +142,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 */
 	public void write(byte[] b) throws IOException
 	{
-		if (b == null) throw new NullPointerException("the input buffer must not be null");
+		//if (b == null) throw new NullPointerException("the input buffer must not be null");
 		write(b, 0, b.length);
 	}
 

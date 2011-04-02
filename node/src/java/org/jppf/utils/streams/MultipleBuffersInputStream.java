@@ -45,7 +45,7 @@ public class MultipleBuffersInputStream extends InputStream
 	/**
 	 * Contains the data written to this ouptput stream, as a sequence of {@link JPPFBuffer} instances.
 	 */
-	private List<JPPFBuffer> list = new ArrayList<JPPFBuffer>();
+	private List<JPPFBuffer> list;
 	/**
 	 * The JPPFBuffer currently being read from.
 	 */
@@ -69,6 +69,7 @@ public class MultipleBuffersInputStream extends InputStream
 	 */
 	public MultipleBuffersInputStream(JPPFBuffer...buffers)
 	{
+		list = new ArrayList<JPPFBuffer>(buffers.length);
 		for (JPPFBuffer b: buffers)
 		{
 			list.add(new JPPFBuffer(b.buffer, b.length));
@@ -82,6 +83,7 @@ public class MultipleBuffersInputStream extends InputStream
 	 */
 	public MultipleBuffersInputStream(List<JPPFBuffer> buffers)
 	{
+		list = new ArrayList<JPPFBuffer>(buffers.size());
 		for (JPPFBuffer b: buffers)
 		{
 			list.add(new JPPFBuffer(b.buffer, b.length));
@@ -117,16 +119,16 @@ public class MultipleBuffersInputStream extends InputStream
 	public int read(byte[] b, int off, int len) throws IOException
 	{
 		if (b == null) throw new NullPointerException("the destination buffer must not be null");
+		/*
 		if ((off < 0) || (off > b.length) || (len < 0) || (off + len > b.length))
 			throw new ArrayIndexOutOfBoundsException("b.length=" + b.length + ", off=" + off + ", len=" + len);
+		*/
 		if (eofReached) return -1;
 		int count = 0;
 		while (count < len)
 		{
-			//if ((currentBuffer == null) || (currentBuffer.remainingFromPos() <= 0)) nextBuffer();
-			if ((currentBuffer == null) || (currentBuffer.length - currentBuffer.pos <= 0)) nextBuffer();
+			if ((currentBuffer == null) || (currentBuffer.length <= currentBuffer.pos)) nextBuffer();
 			if (eofReached) break;
-			//int n = Math.min(currentBuffer.remainingFromPos(), len - count);
 			int n = Math.min(currentBuffer.length - currentBuffer.pos, len - count);
 			System.arraycopy(currentBuffer.buffer, currentBuffer.pos, b, off + count, n);
 			count += n;
@@ -146,7 +148,7 @@ public class MultipleBuffersInputStream extends InputStream
 	 */
 	public int read(byte[] b) throws IOException
 	{
-		if (b == null) throw new NullPointerException("the destination buffer must not be null");
+		//if (b == null) throw new NullPointerException("the destination buffer must not be null");
 		return read(b, 0, b.length);
 	}
 
