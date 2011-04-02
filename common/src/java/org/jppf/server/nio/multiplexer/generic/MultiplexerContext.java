@@ -23,9 +23,9 @@ import java.nio.channels.*;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.jppf.io.IOHelper;
 import org.jppf.server.nio.*;
 import org.jppf.utils.StringUtils;
+import org.jppf.utils.streams.StreamConstants;
 import org.slf4j.*;
 
 /**
@@ -188,7 +188,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 */
 	public ByteBuffer readMultiplexerMessage(ChannelWrapper<?> wrapper) throws Exception
 	{
-		ByteBuffer msg = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
+		ByteBuffer msg = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
 		int count = 0;
 		int n = 0;
 		ReadableByteChannel channel = (ReadableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel();
