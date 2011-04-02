@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 
 import org.jppf.utils.SerializationUtils;
+import org.jppf.utils.streams.StreamConstants;
 
 /**
  * Output destination backed by a {@link java.nio.channels.WritableByteChannel WritableByteChannel}.
@@ -62,7 +63,7 @@ public class ChannelOutputDestination implements OutputDestination
 	 */
 	public int write(byte[] data, int offset, int len) throws Exception
 	{
-		int cap = IOHelper.TEMP_BUFFER_SIZE;
+		int cap = StreamConstants.TEMP_BUFFER_SIZE;
 		if (tmpBuffer == null) tmpBuffer = ByteBuffer.allocateDirect(cap);
 		boolean end = false;
 		int count = 0;

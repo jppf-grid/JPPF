@@ -22,6 +22,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+import org.jppf.utils.streams.StreamConstants;
 import org.slf4j.*;
 
 /**
@@ -116,7 +117,7 @@ public class FileDataLocation extends AbstractDataLocation
 		{
 			transferring = true;
 			fileChannel = new FileOutputStream(filePath).getChannel();
-			buffer = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
+			buffer = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
 			if (size < buffer.limit()) buffer.limit(size);
 			count = 0;
 		}
@@ -237,7 +238,7 @@ public class FileDataLocation extends AbstractDataLocation
 		{
 			transferring = true;
 			fileChannel = new FileInputStream(filePath).getChannel();
-			buffer = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
+			buffer = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
 			count = 0;
 		}
 		try

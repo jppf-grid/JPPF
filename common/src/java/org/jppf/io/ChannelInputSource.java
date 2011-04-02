@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 
 import org.jppf.utils.SerializationUtils;
+import org.jppf.utils.streams.StreamConstants;
 
 /**
  * Input source backed by a {@link java.nio.channels.ReadableByteChannel ReadableByteChannel}.
@@ -79,7 +80,7 @@ public class ChannelInputSource implements InputSource
 	 */
 	public int read(ByteBuffer data) throws Exception
 	{
-		if (tmpDirectBuffer == null) tmpDirectBuffer = ByteBuffer.allocateDirect(IOHelper.TEMP_BUFFER_SIZE);
+		if (tmpDirectBuffer == null) tmpDirectBuffer = ByteBuffer.allocateDirect(StreamConstants.TEMP_BUFFER_SIZE);
 		else tmpDirectBuffer.clear();
 		int remaining = data.remaining();
 		int count = 0;

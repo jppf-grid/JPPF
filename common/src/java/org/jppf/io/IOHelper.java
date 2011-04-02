@@ -46,10 +46,6 @@ public final class IOHelper
 	 */
 	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
-	 * Size of temporary buffers used in I/O transfers.
-	 */
-	public static final int TEMP_BUFFER_SIZE = 32 * 1024;
-	/**
 	 * Free memory / requested allocation size ration threshold that triggers disk overflow.
 	 */
 	private static final double FREE_MEM_TO_SIZE_RATIO = JPPFConfiguration.getProperties().getDouble("jppf.disk.overflow.threshold", 2.0d);

@@ -21,7 +21,8 @@ package org.jppf.io;
 import java.io.*;
 import java.nio.ByteBuffer;
 
-import org.jppf.utils.*;
+import org.jppf.utils.SerializationUtils;
+import org.jppf.utils.streams.StreamConstants;
 
 
 /**
@@ -70,7 +71,7 @@ public class StreamInputSource implements InputSource
 	public int read(ByteBuffer buffer) throws Exception
 	{
 		int pos = buffer.position();
-		ByteBuffer tmp = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
+		ByteBuffer tmp = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
 		byte[] bytes = tmp.array();
 		while (buffer.remaining() > 0)
 		{

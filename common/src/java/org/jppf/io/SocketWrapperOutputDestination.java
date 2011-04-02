@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.utils.streams.StreamConstants;
 
 /**
  * Output destination backed by a {@link org.jppf.comm.socket.SocketWrapper SocketWrapper}.
@@ -68,7 +69,7 @@ public class SocketWrapperOutputDestination implements OutputDestination
 	 */
 	public int write(ByteBuffer data) throws Exception
 	{
-		ByteBuffer tmp = ByteBuffer.wrap(new byte[IOHelper.TEMP_BUFFER_SIZE]);
+		ByteBuffer tmp = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
 		byte[] buf = tmp.array();
 		int size = Math.min(buf.length, data.remaining());
 		data.get(buf, 0, size);
