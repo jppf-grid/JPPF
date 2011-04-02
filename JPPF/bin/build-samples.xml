@@ -70,6 +70,7 @@
 				<include name="shared/images/*.*"/>
 				<include name="DataDependency/images/*.gif"/>
 				<include name="NodeTray/images/*.gif"/>
+				<include name="Nbody/images/*.gif"/>
 			</fileset>
 		</copy>
 		<move file="${home}/samples-pack/samples-pack-Readme.html" tofile="${home}/samples-pack/index.html"/>
