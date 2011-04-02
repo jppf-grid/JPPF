@@ -153,10 +153,11 @@ public abstract class AbstractRLBundler extends AbstractBundler
 		}
 		else if (d > threshold)
 		{
-			action = (int) -Math.signum(action) * Math.max(STEP, Math.abs(action/2));
+			//action = (int) -Math.signum(action) * Math.max(STEP, Math.abs(action/2));
+			action = (int) -Math.signum(action) * STEP;
 		}
 		//else action = (int) -Math.signum(d) * (int) Math.signum(action) * STEP;
-		else action = 0;
+		else action = STEP;
 		int maxActionRange = ((RLProfile) profile).getMaxActionRange();
 		if (action > maxActionRange) action = maxActionRange;
 		else if (action < -maxActionRange) action = -maxActionRange;
