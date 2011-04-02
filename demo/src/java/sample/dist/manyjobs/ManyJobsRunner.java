@@ -55,9 +55,9 @@ public class ManyJobsRunner
 			props.setProperty("jppf.pool.size", "50");
 			jppfClient = new JPPFClient();
 			Thread.sleep(1000);
-			int length = 3000;
-			int nbTask = 500;
-			int nbJobs = 1;
+			int length = 300;
+			int nbTask = 100;
+			int nbJobs = 50;
 			print("Running Long Task demo with " + nbTask + " tasks of length = " + length + " ms for " + nbJobs + " iterations");
 			perform(nbTask, length, nbJobs);
 			//performLong(size, iterations);

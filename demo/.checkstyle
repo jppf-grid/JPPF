@@ -11,9 +11,7 @@
     <filter-data value="java"/>
   </filter>
   <filter name="FilesFromPackage" enabled="true">
-    <filter-data value="src/java/test/client"/>
-    <filter-data value="src/java/test/client/nissalia"/>
-    <filter-data value="src/java/test/crash"/>
+    <filter-data value="src/java/test/hazelcast"/>
     <filter-data value="src/java/test/nathalie"/>
   </filter>
 </fileset-config>
