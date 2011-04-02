@@ -128,6 +128,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 			if (key == null) continue;
 			if (traceEnabled) log.trace("removing entry for key=" + key);
 			map.remove(key);
+			ref.key = null;
 		}
 	}
 
@@ -142,7 +143,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 		/**
 		 * The associated key.
 		 */
-		private final K key;
+		private K key;
 
 		/**
 		 * Initialize this reference with the specified key and value.
