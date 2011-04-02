@@ -110,7 +110,7 @@ public final class StringUtils
 	 * @param bytes the array that contains the sequence of byte values to convert.
 	 * @param start the index to start at in the byte array.
 	 * @param length the number of bytes to convert in the array.
-	 * @return the cinverted bytes as a string of space-separated hexadecimal numbers.
+	 * @return the converted bytes as a string of space-separated hexadecimal numbers.
 	 */
 	public static String dumpBytes(byte[] bytes, int start, int length)
 	{
