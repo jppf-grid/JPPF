@@ -17,6 +17,6 @@
  */
 
 /**
- * Stream utility and helper classes used throughout the JPPF code.
+ * Implementation of a new serialization scheme.
  */
-package org.jppf.utils.streams;
+package org.jppf.utils.streams.serialization;

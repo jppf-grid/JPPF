@@ -40,6 +40,13 @@ public class LongTask extends JPPFTask
 	private boolean useCPU = false;
 
 	/**
+	 * Default constructor.
+	 */
+	public LongTask()
+	{
+	}
+
+	/**
 	 * Initialize this task with a predefined length of time, in milliseconds, during which it will run.
 	 * @param taskLength - determines how long this task will run.
 	 * @param useCPU - determines whether this task should just sleep during its allocated time or do some cpu-intensive work.

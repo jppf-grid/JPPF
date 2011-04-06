@@ -89,7 +89,8 @@ public class ManyJobsRunner
 				long start = System.currentTimeMillis();
 				// create a task for each row in matrix a
 				jobs[n] = new JPPFJob();
-				jobs[n].setId("JPPF Job " + (n+1));
+				String s = StringUtils.padLeft(""+(n+1), '0', 4);
+				jobs[n].setId("JPPF Job " + s);
 				jobs[n].setBlocking(false);
 				//job.getJobSLA().setMaxNodes(1);
 				for (int i=0; i<nbTask; i++)
