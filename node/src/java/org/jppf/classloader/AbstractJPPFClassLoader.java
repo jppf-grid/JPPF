@@ -329,7 +329,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 				Map<String, Object> map = new HashMap<String, Object>();
 				map.put("name", name);
 				JPPFResourceWrapper resource = loadResourceData(map, true);
-				byte[] b = resource.getDefinition();
+				byte[] b = (resource == null) ? null : resource.getDefinition();
 				boolean found = (b != null) && (b.length > 0);
 				if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
 				if (!found) return null;
