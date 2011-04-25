@@ -17,6 +17,7 @@
  */
 package sample.dist.tasklength;
 
+import org.apache.commons.logging.*;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -25,6 +26,10 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class LongTask extends JPPFTask
 {
+	/**
+	 * Logger.
+	 */
+	private static Log log = LogFactory.getLog(LongTask.class);
 	/**
 	 * Determines how long this task will run.
 	 */

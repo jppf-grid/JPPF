@@ -22,7 +22,7 @@ import java.io.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFJob;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.streams.serialization.*;
 
 import sample.dist.tasklength.LongTask;
@@ -41,7 +41,7 @@ public class Test
 	{
 		try
 		{
-			test();
+			test2();
 		}
 		catch (Exception e)
 		{
@@ -63,8 +63,28 @@ public class Test
 		task.setException(new JPPFException("exception"));
 		job.addTask(task);
 		Test test = new Test();
-		byte[] data = test.serialize(task);
-		JPPFTask task2 = (JPPFTask) test.deserialize(data);
+		byte[] data = test.serialize(job);
+		JPPFJob job2 = (JPPFJob) test.deserialize(data);
+		print("the end");
+	}
+
+	/**
+	 * Perform a test.
+	 * @throws Exception if any error occurs.
+	 */
+	public static void test2() throws Exception
+	{
+		JPPFTaskBundle bundle = new JPPFTaskBundle();
+		bundle.setParameter(BundleParameter.JOB_ID, "server handshake");
+		bundle.setParameter(BundleParameter.JOB_UUID, "job uuid");
+		bundle.setBundleUuid("bundle_uuid");
+		bundle.setRequestUuid("0");
+		bundle.getUuidPath().add("driver_uuid");
+		bundle.setTaskCount(0);
+		bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
+		Test test = new Test();
+		byte[] data = test.serialize(bundle);
+		JPPFTaskBundle bundle2 = (JPPFTaskBundle) test.deserialize(data);
 		print("the end");
 	}
 

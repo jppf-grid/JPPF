@@ -24,7 +24,6 @@ import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.concurrent.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.JPPFTask;
@@ -61,10 +60,10 @@ public class LongTaskRunner
 			int nbTask = props.getInt("longtask.number");
 			int iterations = props.getInt("longtask.iterations");
 			print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
-			//perform(nbTask, length, iterations);
+			perform(nbTask, length, iterations);
 			//perform3(nbTask, length, iterations);
-			perform4();
-			perform5();
+			//perform4();
+			//perform5();
 		}
 		catch(Exception e)
 		{
@@ -92,7 +91,6 @@ public class LongTaskRunner
 			for (int iter=0; iter<iterations; iter++)
 			{
 				long start = System.currentTimeMillis();
-				// create a task for each row in matrix a
 				JPPFJob job = new JPPFJob();
 				job.setId("Long task iteration " + iter);
 				//job.getJobSLA().setMaxNodes(1);
@@ -102,9 +100,11 @@ public class LongTaskRunner
 					task.setId("" + (iter+1) + ":" + (i+1));
 					job.addTask(task);
 				}
+				/*
 				JPPFSchedule schedule = new JPPFSchedule(5000L);
 				job.getJobSLA().setJobSchedule(schedule);
 				job.getJobSLA().setSuspended(true);
+				*/
 				// submit the tasks for execution
 				List<JPPFTask> results = jppfClient.submit(job);
 				for (JPPFTask task: results)
