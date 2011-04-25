@@ -75,14 +75,15 @@
 	<!-- ========================================================================= -->
 
 	<target name="download" description="Download the JNA lib files">
-		<property name="jna.lib.url" value="https://jna.dev.java.net/source/browse/*checkout*/jna/trunk/jnalib/dist"/>
+		<!--<property name="jna.lib.url" value="https://jna.dev.java.net/source/browse/*checkout*/jna/trunk/jnalib/dist"/>-->
+		<property name="jna.lib.url" value="http://java.net/projects/jna/sources/svn/content/trunk/jnalib/dist"/>
 		<antcall target="get.lib"><param name="prefix" value="jna"/></antcall>
 		<antcall target="get.lib"><param name="prefix" value="platform"/></antcall>
 	</target>
 
 	<target name="get.lib" unless="${prefix}.jar.present">
-		<echo message="downloading ${prefix}.jar from ${jna.lib.url}/${prefix}.jar?rev=HEAD"/>
-		<get src="${jna.lib.url}/${prefix}.jar?rev=HEAD" dest="${lib.dir}/${prefix}.jar" verbose="on"/>
+		<echo message="downloading ${prefix}.jar from ${jna.lib.url}/${prefix}.jar"/>
+		<get src="${jna.lib.url}/${prefix}.jar" dest="${lib.dir}/${prefix}.jar" verbose="on"/>
 	</target>
 
 
