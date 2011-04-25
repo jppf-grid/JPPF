@@ -70,7 +70,13 @@
 		<izpack input="${installer}/install.xml" output="${web.installer.file}" installerType="web" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
 
 		<!-- Sign the web installer jar -->
-		<exec executable="c:/jdk1.5.0/bin/jarsigner.exe">
+		<!--	<exec executable="c:/jdk1.5.0/bin/jarsigner.exe">-->
+		<echo message="java.home = ${java.home}"/>
+		<condition property="jdk.bin" value="${java.home}/../bin" else="${java.home}/bin">
+			<contains string="${java.home}" substring="jre" casesensitive="false"/>
+		</condition>
+		<echo message="jdk.bin = ${jdk.bin}"/>
+		<exec executable="${jdk.bin}/jarsigner">
 			<arg value="-keystore"/>
 			<arg value="${bin}\security\jppf.keystore"/>
 			<arg value="-storepass"/>
