@@ -20,6 +20,8 @@ package org.jppf.utils.streams.serialization;
 
 import java.io.*;
 
+import org.jppf.utils.SerializationUtils;
+
 /**
  * 
  * @author Laurent Cohen
@@ -33,7 +35,15 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * The deserializer.
 	 */
-	private ObjectGraphDeserializer deserializer;
+	private Deserializer deserializer;
+	/**
+	 * Determines whether the stream is already reading an object graph.
+	 */
+	private boolean readingObject = false;
+	/**
+	 * Temporary buffer to write primitive types.
+	 */
+	private final byte[] buf = new byte[8];
 
 	/**
 	 * Initialize this object input stream witht he specified stream.
@@ -44,7 +54,7 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	{
 		super();
 		this.in = new DataInputStream(in);
-		deserializer = new ObjectGraphDeserializer(this);
+		deserializer = new Deserializer(this);
 	}
 
 	/**
@@ -53,15 +63,28 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	protected Object readObjectOverride() throws IOException, ClassNotFoundException
 	{
 		Object o = null;
+		boolean alreadyReading = readingObject;
 		try
 		{
-			o = deserializer.read();
+			if (!alreadyReading)
+			{
+				readingObject = true;
+				o = deserializer.readObject();
+			}
+			else
+			{
+				o = deserializer.readObject();
+			}
 		}
 		catch(Exception e)
 		{
 			if (e instanceof ClassNotFoundException) throw (ClassNotFoundException) e;
 			else if (e instanceof IOException) throw (IOException) e;
 			else throw new IOException(e.getMessage(), e);
+		}
+		finally
+		{
+			if (!alreadyReading) readingObject = false;
 		}
 		return o;
 	}
@@ -119,7 +142,9 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	 */
 	public int readInt() throws IOException
 	{
-		return in.readInt();
+		in.read(buf, 0, 4);
+		//return in.readInt();
+		return SerializationUtils.readInt(buf, 0);
 	}
 
 	/**
@@ -209,5 +234,22 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	public String readLine() throws IOException
 	{
 		return in.readLine();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void defaultReadObject() throws IOException, ClassNotFoundException
+	{
+		try
+		{
+			deserializer.readFields(deserializer.currentClassDescriptor, deserializer.currentObject);
+		}
+		catch(Exception e)
+		{
+			if (e instanceof ClassNotFoundException) throw (ClassNotFoundException) e;
+			else if (e instanceof IOException) throw (IOException) e;
+			else throw new IOException(e.getMessage(), e);
+		}
 	}
 }

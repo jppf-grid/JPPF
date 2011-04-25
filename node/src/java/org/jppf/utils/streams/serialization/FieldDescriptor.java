@@ -22,7 +22,7 @@ import java.io.*;
 import java.lang.reflect.Field;
 
 /**
- * 
+ * Instances of this class describe a non-transient field of a Java class with in order ot enable serialization and deserialization of this field.
  * @author Laurent Cohen
  */
 class FieldDescriptor
@@ -31,10 +31,6 @@ class FieldDescriptor
 	 * The name of this field.
 	 */
 	String name;
-	/**
-	 * The type signature of this field.
-	 */
-	//String signature;
 	/**
 	 * The corresponding field object.
 	 */
@@ -64,7 +60,6 @@ class FieldDescriptor
 	{
 		this.field = field;
 		name = field.getName();
-		//signature = ReflectionHelper.getTypeSignature(field.getType()).intern();
 	}
 
 

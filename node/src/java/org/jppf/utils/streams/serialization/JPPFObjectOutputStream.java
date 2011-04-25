@@ -20,6 +20,8 @@ package org.jppf.utils.streams.serialization;
 
 import java.io.*;
 
+import org.jppf.utils.SerializationUtils;
+
 /**
  * 
  * @author Laurent Cohen
@@ -30,6 +32,18 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * The stream serialized data is written to.
 	 */
 	private DataOutputStream out;
+	/**
+	 * Determines whether the stream is already writing an object graph.
+	 */
+	private boolean writingObject = false;
+	/**
+	 * The object graph serializer.
+	 */
+	private Serializer serializer = null;
+	/**
+	 * Temporary buffer to write primitive types.
+	 */
+	private final byte[] buf = new byte[8];
 
 	/**
 	 * Initialize this object stream.
@@ -40,21 +54,38 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	{
 		super();
 		this.out = new DataOutputStream(out);
+		serializer = new Serializer(this);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	protected void writeObjectOverride(Object obj) throws IOException
+	protected final void writeObjectOverride(Object obj) throws IOException
 	{
+		boolean alreadyWriting = writingObject;
 		try
 		{
-			ObjectGraphSerializer ser = new ObjectGraphSerializer(this);
-			ser.exploreRoot(obj);
+			if (!alreadyWriting)
+			{
+				writingObject = true;
+				serializer.writeObject(obj);
+			}
+			else
+			{
+				serializer.writeObject(obj);
+			}
 		}
 		catch (Exception e)
 		{
 			throw (e instanceof IOException) ? (IOException) e : new IOException(e.getMessage(), e);
+		}
+		finally
+		{
+			if (!alreadyWriting)
+			{
+				writingObject = false;
+				flush();
+			}
 		}
 	}
 
@@ -119,7 +150,9 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 */
 	public void writeInt(int val) throws IOException
 	{
-		out.writeInt(val);
+		SerializationUtils.writeInt(val, buf, 0);
+		out.write(buf, 0, 4);
+		//out.writeInt(val);
 	}
 
 	/**
@@ -143,7 +176,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 */
 	public void writeDouble(double val) throws IOException
 	{
-		out.writeDouble(val);
+		//out.writeDouble(val);
+		out.writeLong(Double.doubleToLongBits(val));
 	}
 
 	/**
@@ -168,5 +202,37 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	public void writeUTF(String str) throws IOException
 	{
 		out.writeUTF(str);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void defaultWriteObject() throws IOException
+	{
+		try
+		{
+			serializer.writeFields(serializer.currentObject, serializer.currentClassDescriptor);
+		}
+		catch(Exception e)
+		{
+			if (e instanceof IOException) throw (IOException) e;
+			else throw new IOException(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void flush() throws IOException
+	{
+		out.flush();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void close() throws IOException
+	{
+		out.close();
 	}
 }

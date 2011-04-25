@@ -23,8 +23,8 @@ import java.lang.reflect.*;
 import java.util.*;
 
 import org.jppf.JPPFException;
-
-import sun.reflect.ReflectionFactory;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * 
@@ -33,6 +33,14 @@ import sun.reflect.ReflectionFactory;
 public final class ReflectionHelper
 {
 	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(ReflectionHelper.class);
+	/**
+	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * Constant for empty Fields arrays.
 	 */
 	private static final Field[] EMPTY_FIELDS = new Field[0];
@@ -40,6 +48,42 @@ public final class ReflectionHelper
 	 * Constant for empty Class arrays.
 	 */
 	private static final Class<?>[] EMPTY_CLASSES = new Class<?>[0];
+	/**
+	 * Default byte value.
+	 */
+	private static final Byte DEFAULT_BYTE = Byte.valueOf((byte) 0);
+	/**
+	 * Default short value.
+	 */
+	private static final Short DEFAULT_SHORT = Short.valueOf((short) 0);
+	/**
+	 * Default int value.
+	 */
+	private static final Integer DEFAULT_INT = Integer.valueOf(0);
+	/**
+	 * Default long value.
+	 */
+	private static final Long DEFAULT_LONG = Long.valueOf(0L);
+	/**
+	 * Default float value.
+	 */
+	private static final Float DEFAULT_FLOAT = Float.valueOf(0f);
+	/**
+	 * Default double value.
+	 */
+	private static final Double DEFAULT_DOUBLE = Double.valueOf(0d);
+	/**
+	 * Default char value.
+	 */
+	private static final Character DEFAULT_CHAR = Character.valueOf((char) 0);
+	/**
+	 * Default boolean value.
+	 */
+	private static final Boolean DEFAULT_BOOLEAN = Boolean.FALSE;
+	/**
+	 * Default object reference value.
+	 */
+	private static final Object DEFAULT_REF = null;
 
 	/**
 	 * Get all declared non-transient fields of the given class.
@@ -134,34 +178,143 @@ public final class ReflectionHelper
 	}
 
 	/**
+	 * Determine whether the specified class has a writeObject() method with the signature specified in {@link Serializable}.
+	 * @param clazz the class to check.
+	 * @return true if the class has a writeObject() method, false otherwise.
+	 * @throws Exception if any error occurs.
+	 */
+	public static Method getReadObjectMethod(Class<?> clazz) throws Exception
+	{
+		Method m = null;
+		try
+		{
+			m = clazz.getDeclaredMethod("readObject", ObjectInputStream.class);
+			if (m.getReturnType() != Void.TYPE) return null;
+			int n = m.getModifiers();
+			return (!Modifier.isStatic(n) && Modifier.isPrivate(n)) ? m : null;
+		}
+		catch (NoSuchMethodException e)
+		{
+		}
+		return null;
+	}
+
+	/**
+	 * Class object for the reflection factory.
+	 */
+	private static Class<?> rfClass = null;
+	/**
+	 * A reflection factory instance, used to cretae instances of deserialized classes without calling a constructor.
+	 * If it cannot be created (for example on non Sun-based JVMs), then we lookup the constructors of the class until we
+	 * find one that doesn't throw an exception upon invocation. Default values are used if the constructor has parameters.
+	 */
+	private static Object rf = null;
+	/**
+	 * The method to invoke on the reflection factory to create a new instance of a deserialized object.
+	 */
+	private static Method rfMethod = null;
+	static
+	{
+		try
+		{
+			rfClass = Class.forName("sun.reflect.ReflectionFactory");
+		}
+		catch(Throwable t)
+		{
+		}
+		if (rfClass != null)
+		{
+			rf = initializeRF();
+			if (rf != null) rfMethod = initializeRFMethod();
+		}
+	}
+
+	/**
+	 * Initialize the reflection factory. The reflection factory is an internal JDK class in a sun.* package. 
+	 * It may not be available on JVM implementations that are not based on Sun's. We use purely reflective calls
+	 * to create it, to avoid static dependencies on internal APIs. 
+	 * @return a <code>sun.reflect.ReflectionFactory.ReflectionFactory</code> if it can be created, null otherwise.
+	 */
+	private static Object initializeRF()
+	{
+		try
+		{
+			Method m = rfClass.getDeclaredMethod("getReflectionFactory");
+			Object o = m.invoke(null);
+			return o;
+		}
+		catch(Throwable t)
+		{
+		}
+		return null;
+	}
+
+	/**
+	 * Initialize the reflection factory. The reflection factory is an internal JDK class in a sun.* package. 
+	 * It may not be available on JVM implementations that are not based on Sun's. We use purely reflective calls
+	 * to create it, to avoid static dependencies on internal APIs. 
+	 * @return a <code>sun.reflect.ReflectionFactory.ReflectionFactory</code> if it can be created, null otherwise.
+	 */
+	private static Method initializeRFMethod()
+	{
+		try
+		{
+			Method m = rfClass.getDeclaredMethod("newConstructorForSerialization", Class.class, Constructor.class);
+			return m;
+		}
+		catch(Throwable t)
+		{
+		}
+		return null;
+	}
+
+	/**
+	 * A cache of constructors used for deserialization.
+	 */
+	private static Map<Class<?>, Constructor> constructorMap = new SoftReferenceValuesMap<Class<?>, Constructor>();
+
+	/**
 	 * Create an object without calling any of its class constructors.
-	 * @param <T> the type of object to create.
 	 * @param clazz the object's class.
 	 * @return the newly created object.
 	 * @throws Exception if any error occurs.
 	 */
-	public static <T> T create(Class<T> clazz) throws Exception
+	static Object create(Class<?> clazz) throws Exception
 	{
+		//return createFromConstructor(clazz);
+		if (rfMethod == null) return createFromConstructor(clazz);
 		return create(clazz, Object.class);
 	}
 
 	/**
 	 * Create an object without calling any of its class constructors,
 	 * and calling the superclass no-arg constructor. 
-	 * @param <T> the type of object to create.
 	 * @param clazz the object's class.
 	 * @param parent the object's super class.
 	 * @return the newly created object.
 	 * @throws Exception if any error occurs.
 	 */
-	public static <T> T create(Class<T> clazz, Class<? super T> parent) throws Exception
+	static Object create(Class<?> clazz, Class<?> parent) throws Exception
 	{
 		try
 		{
-			ReflectionFactory rf = ReflectionFactory.getReflectionFactory();
-			Constructor objDef = parent.getDeclaredConstructor();
-			Constructor intConstr = rf.newConstructorForSerialization(clazz, objDef);
-			return clazz.cast(intConstr.newInstance());
+			Constructor constructor;
+			synchronized(constructorMap)
+			{
+				constructor = constructorMap.get(clazz);
+			}
+			if (constructor == null)
+			{
+				//ReflectionFactory rf = ReflectionFactory.getReflectionFactory();
+				Constructor superConstructor = parent.getDeclaredConstructor();
+				//constructor = rf.newConstructorForSerialization(clazz, superConstructor);
+				constructor = (Constructor) rfMethod.invoke(rf, clazz, superConstructor);
+				synchronized(constructorMap)
+				{
+					constructorMap.put(clazz, constructor);
+				}
+			}
+			return clazz.cast(constructor.newInstance());
 		}
 		catch (RuntimeException e)
 		{
@@ -171,5 +324,104 @@ public final class ReflectionHelper
 		{
 			throw new IllegalStateException("Cannot create object", e);
 		}
+	}
+
+	/**
+	 * A cache of constructors used for deserialization.
+	 */
+	private static Map<Class<?>, ConstructorWithParameters> defaultConstructorMap = new SoftReferenceValuesMap<Class<?>, ConstructorWithParameters>();
+
+	/**
+	 * Instantiate an object from one of its class' existing constructor.
+	 * The constructors of the class are looked up, until we can find one whose invocation with default paremeter values doesn't fail.
+	 * @param clazz the class for the objec to create.
+	 * @return an instance of the specified class.
+	 * @throws Exception if any error occurs.
+	 */
+	static Object createFromConstructor(Class<?> clazz) throws Exception
+	{
+		ConstructorWithParameters cwp = null;
+		synchronized(defaultConstructorMap)
+		{
+			cwp = defaultConstructorMap.get(clazz);
+		}
+		if (cwp == null)
+		{
+			Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+			Arrays.sort(constructors, new ConstructorComparator());
+			for (Constructor<?> c: constructors)
+			{
+				Class<?>[] paramTypes = c.getParameterTypes();
+				Object[] params = new Object[paramTypes.length];
+				for (int i=0; i<paramTypes.length; i++) params[i] = defaultValue(paramTypes[i]);
+				if (!c.isAccessible()) c.setAccessible(true);
+				try
+				{
+					Object result = c.newInstance(params);
+					cwp = new ConstructorWithParameters(c, params);
+					synchronized(defaultConstructorMap)
+					{
+						defaultConstructorMap.put(clazz, cwp);
+					}
+					return result;
+				}
+				catch(Throwable t)
+				{
+					log.info(t.getMessage(), t);
+				}
+			}
+		}
+		else return cwp.first().newInstance(cwp.second());
+		throw new InstantiationException("Could not create an instance of " + clazz);
+	}
+
+	/**
+	 * Compares two constructors based on their number of parameters.
+	 */
+	private static class ConstructorComparator implements Comparator<Constructor<?>>
+	{
+		/**
+		 * {@inheritDoc}
+		 */
+		public int compare(Constructor<?> c1, Constructor<?> c2)
+		{
+			int n1 = c1.getParameterTypes().length;
+			int n2 = c2.getParameterTypes().length;
+			return n1 < n2 ? -1 : (n1 > n2 ? 1 : 0);
+		}
+	}
+
+	/**
+	 * A class associating a constructor with a set of default values for its parameters.
+	 */
+	private static class ConstructorWithParameters extends Pair<Constructor<?>, Object[]>
+	{
+		/**
+		 * Initialize this object with the specified constructors and parameters. 
+		 * @param constructor the constructor.
+		 * @param params the array of parameters, may be null or empty.
+		 */
+		ConstructorWithParameters(Constructor<?> constructor, Object...params)
+		{
+			super(constructor, params);
+		}
+	}
+
+	/**
+	 * Get a default value for the psecified type.
+	 * @param c the type for which to get a value.
+	 * @return a valid default value for the type.
+	 */
+	private static Object defaultValue(Class<?> c)
+	{
+		if ((c == Byte.TYPE) || (c == Byte.class)) return DEFAULT_BYTE; 
+		else if ((c == Short.TYPE) || (c == Short.class)) return DEFAULT_SHORT; 
+		else if ((c == Integer.TYPE) || (c == Integer.class)) return DEFAULT_INT; 
+		else if ((c == Long.TYPE) || (c == Long.class)) return DEFAULT_LONG; 
+		else if ((c == Float.TYPE) || (c == Float.class)) return DEFAULT_FLOAT; 
+		else if ((c == Double.TYPE) || (c == Double.class)) return DEFAULT_DOUBLE; 
+		else if ((c == Character.TYPE) || (c == Character.class)) return DEFAULT_CHAR; 
+		else if ((c == Boolean.TYPE) || (c == Boolean.class)) return DEFAULT_BOOLEAN; 
+		return DEFAULT_REF;
 	}
 }

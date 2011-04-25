@@ -22,7 +22,8 @@ import java.io.*;
 import java.lang.reflect.*;
 
 /**
- * 
+ * Instances of this class describe a Java class with all its non-transient fields
+ * and characteristics relating to serialization.
  * @author Laurent Cohen
  */
 class ClassDescriptor
@@ -32,6 +33,26 @@ class ClassDescriptor
 	 */
 	static final FieldDescriptor[] NO_FIELDS = new FieldDescriptor[0];
 	/**
+	 * Indicates the class is a primitive type.
+	 */
+	static final byte PRIMITIVE = 1;
+	/**
+	 * Indicates the class is an array type.
+	 */
+	static final byte ARRAY = 2;
+	/**
+	 * Indicates the class is an enum type.
+	 */
+	static final byte ENUM_TYPE = 4;
+	/**
+	 * Indicates the class has the readObject() and writeObject() methods.
+	 */
+	static final byte HAS_WRITE_OBJECT = 8;
+	/**
+	 * Indicates the class implements the Exeternalizable interface.
+	 */
+	static final byte EXTERNALIZABLE = 16;
+	/**
 	 * The fields of the described class.
 	 */
 	FieldDescriptor[] fields = NO_FIELDS;
@@ -39,6 +60,10 @@ class ClassDescriptor
 	 * Is the described class externalizable.
 	 */
 	boolean hasWriteObject = false;
+	/**
+	 * Bitwise flags associated with the described class. 
+	 */
+	byte flags = 0;
 	/**
 	 * Is the described class externalizable.
 	 */
@@ -55,6 +80,10 @@ class ClassDescriptor
 	 * Is the class a primitive type.
 	 */
 	boolean primitive;
+	/**
+	 * Is the class an enum.
+	 */
+	boolean enumType;
 	/**
 	 * Unique signature for the class.
 	 */
@@ -100,26 +129,20 @@ class ClassDescriptor
 	{
 		this.clazz = clazz;
 		primitive = clazz.isPrimitive();
-		if (!primitive)
+		enumType = clazz.isEnum();
+		if (!primitive && !enumType)
 		{
-			//externalizable = clazz.isAssignableFrom(Externalizable.class);
 			externalizable = Externalizable.class.isAssignableFrom(clazz);
-			if (!externalizable)
+			writeObjectMethod = ReflectionHelper.getWriteObjectMethod(clazz);
+			hasWriteObject = writeObjectMethod != null;
+			array = clazz.isArray();
+			if (!array)
 			{
-				writeObjectMethod = ReflectionHelper.getWriteObjectMethod(clazz);
-				hasWriteObject = writeObjectMethod != null;
-				if (!hasWriteObject)
+				Field[] refFields = ReflectionHelper.getNonTransientFields(clazz);
+				if (refFields.length > 0)
 				{
-					array = clazz.isArray();
-					if (!array)
-					{
-						Field[] refFields = ReflectionHelper.getNonTransientFields(clazz);
-						if (refFields.length > 0)
-						{
-							fields = new FieldDescriptor[refFields.length];
-							for (int i=0; i<refFields.length; i++) fields[i] = new FieldDescriptor(refFields[i]);
-						}
-					}
+					fields = new FieldDescriptor[refFields.length];
+					for (int i=0; i<refFields.length; i++) fields[i] = new FieldDescriptor(refFields[i]);
 				}
 			}
 		}
@@ -135,16 +158,19 @@ class ClassDescriptor
 	{
 		out.writeInt(handle);
 		out.writeUTF(signature);
-		out.writeBoolean(primitive);
-		out.writeBoolean(hasWriteObject);
-		out.writeBoolean(externalizable);
-		out.writeBoolean(array);
+		flags = 0;
+		if (primitive) flags |= PRIMITIVE;
+		if (enumType) flags |= ENUM_TYPE;
+		if (hasWriteObject) flags |= HAS_WRITE_OBJECT;
+		if (externalizable) flags |= EXTERNALIZABLE;
+		if (array) flags |= ARRAY;
+		out.writeByte(flags);
 		out.writeInt((superClass != null) ? superClass.handle : 0);
 		if (array) out.writeInt(componentType.handle);
-		if (!primitive && !hasWriteObject && !externalizable)
+		if (!primitive)
 		{
 			out.writeInt(fields.length);
-			for (FieldDescriptor fd: fields) fd.write(out);
+			for (int i=0; i<fields.length; i++) fields[i].write(out);
 		}
 	}
 
@@ -157,13 +183,15 @@ class ClassDescriptor
 	{
 		handle = in.readInt();
 		signature = in.readUTF();
-		primitive = in.readBoolean();
-		hasWriteObject = in.readBoolean();
-		externalizable = in.readBoolean();
-		array = in.readBoolean();
+		flags = in.readByte();
+		primitive = (flags & PRIMITIVE) != 0;
+		enumType = (flags & ENUM_TYPE) != 0;
+		hasWriteObject = (flags & HAS_WRITE_OBJECT) != 0;
+		externalizable = (flags & EXTERNALIZABLE) != 0;
+		array = (flags & ARRAY) != 0;
 		superClassHandle = in.readInt();
 		if (array) componentTypeHandle = in.readInt();
-		if (!primitive && !hasWriteObject && !externalizable)
+		if (!primitive)
 		{
 			int n = in.readInt();
 			fields = new FieldDescriptor[n];

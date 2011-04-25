@@ -18,12 +18,13 @@
 
 package org.jppf.utils.streams.serialization;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 import org.slf4j.*;
 
 /**
- * 
+ * Instances of this class handle the caching and lookup of class descriptors and objects during deserialization.
  * @author Laurent Cohen
  */
 public class DeserializationCaches
@@ -33,10 +34,6 @@ public class DeserializationCaches
 	 */
 	private static Logger log = LoggerFactory.getLogger(DeserializationCaches.class);
 	/**
-	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
 	 * Mapping of handles to corresponding class descriptors. 
 	 */
 	Map<Integer, ClassDescriptor> handleToDescriptorMap = new HashMap<Integer, ClassDescriptor>();
@@ -44,16 +41,50 @@ public class DeserializationCaches
 	 * Mapping of handles to corresponding objects. 
 	 */
 	Map<Integer, Object> handleToObjectMap = new HashMap<Integer, Object>();
-	/**
-	 * Holds the set of missing object references in the object graph.
-	 */
-	Map<Integer, List<PendingReference>> pendingRefMap = new HashMap<Integer, List<PendingReference>>();
 
 	/**
 	 * Default constructor.
 	 */
 	DeserializationCaches()
 	{
+		Set<Map.Entry<Class<?>, ClassDescriptor>> entries = SerializationCaches.globalTypesMap.entrySet();
+		List<ClassDescriptor> list = new ArrayList<ClassDescriptor>(entries.size());
+		for (Map.Entry<Class<?>, ClassDescriptor> entry: entries)
+		{
+			ClassDescriptor cd = entry.getValue();
+			ClassDescriptor cd2 = new ClassDescriptor();
+			cd2.signature = cd.signature;
+			cd2.primitive = cd.primitive;
+			cd2.array = cd.array;
+			cd2.externalizable = cd.externalizable;
+			cd2.hasWriteObject = cd.hasWriteObject;
+			cd2.enumType = cd.enumType;
+			cd2.handle = cd.handle;
+			if (cd.superClass != null) cd2.superClassHandle = cd.superClass.handle;
+			if (cd.componentType != null) cd2.componentTypeHandle = cd.componentType.handle;
+			if (cd.fields.length > 0)
+			{
+				cd2.fields = new FieldDescriptor[cd.fields.length];
+				for (int i=0; i<cd.fields.length; i++)
+				{
+					FieldDescriptor fd = cd.fields[i];
+					FieldDescriptor fd2 = new FieldDescriptor();
+					fd2.name = fd.name;
+					if (fd.type != null) fd2.typeHandle = fd.type.handle;
+					cd2.fields[i] = fd2;
+				}
+			}
+			handleToDescriptorMap.put(cd2.handle, cd2);
+			list.add(cd2);
+		}
+		try
+		{
+			initializeDescriptorClasses(list, getClass().getClassLoader());
+		}
+		catch (Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -67,19 +98,39 @@ public class DeserializationCaches
 	}
 
 	/**
-	 * Add a pending reference.
-	 * @param handle the handle of the reference to set.
-	 * @param ref the reference to add.
+	 * Initialize the class object for each recently loaded class descriptor, including array types.
+	 * @param list the list of class descriptor to process.
+	 * @param classloader used to load the classes.
+	 * @throws Exception if any error occurs.
 	 */
-	void addPendingReference(int handle, PendingReference ref)
+	void initializeDescriptorClasses(Collection<ClassDescriptor> list, ClassLoader classloader) throws Exception
 	{
-		if (debugEnabled) log.debug("adding pending reference for handle=" + handle + " : " + ref);
-		List<PendingReference> list = pendingRefMap.get(handle);
-		if (list == null)
+		for (ClassDescriptor cd: list)
 		{
-			list = new ArrayList<PendingReference>();
-			pendingRefMap.put(handle, list);
+			if (cd.clazz != null) continue;
+			if (cd.array)
+			{
+				List<ClassDescriptor> types = new ArrayList<ClassDescriptor>();
+				ClassDescriptor tmp = cd;
+				while (tmp != null)
+				{
+					types.add(tmp);
+					tmp = tmp.array ? getDescriptor(tmp.componentTypeHandle) : null;
+				}
+				for (int i=types.size()-1; i>=0; i--)
+				{
+					tmp = types.get(i);
+					if (tmp.clazz != null) continue;
+					if (!tmp.array) tmp.clazz = ReflectionHelper.getNonArrayTypeFromSignature(tmp.signature, classloader);
+					else
+					{
+						Class<?> clazz = types.get(i+1).clazz;
+						Object array = Array.newInstance(clazz, 0);
+						tmp.clazz = array.getClass();
+					}
+				}
+			}
+			else cd.clazz = ReflectionHelper.getNonArrayTypeFromSignature(cd.signature, classloader);
 		}
-		list.add(ref);
 	}
 }

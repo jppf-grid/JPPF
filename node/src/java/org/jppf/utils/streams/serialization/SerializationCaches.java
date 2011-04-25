@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.*;
 
 /**
- * 
+ * Instances of this class handle the caching and lookup of class descriptors and objects during serialization.
  * @author Laurent Cohen
  */
 public class SerializationCaches
@@ -36,7 +36,7 @@ public class SerializationCaches
 	/**
 	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
 	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
 	 * List of all primitive types.
 	 */
@@ -44,15 +44,16 @@ public class SerializationCaches
 	/**
 	 * Mapping of primitive types to their descriptor.
 	 */
-	private static Map<Class<?>, ClassDescriptor> globalTypesMap = initGlobalTypes();
+	static Map<Class<?>, ClassDescriptor> globalTypesMap = initGlobalTypes();
 	/**
 	 * Mapping of classes to their descriptor.
 	 */
-	Map<Class<?>, ClassDescriptor> classToDescMap = new IdentityHashMap<Class<?>, ClassDescriptor>();
+	Map<Class<?>, ClassDescriptor> classToDescMap = new HashMap<Class<?>, ClassDescriptor>();
+	//Map<Class<?>, ClassDescriptor> classToDescMap = new IdentityHashMap<Class<?>, ClassDescriptor>(256);
 	/**
 	 * Mapping of objects to their handle.
 	 */
-	Map<Object, Integer> objectHandleMap = new IdentityHashMap<Object, Integer>();
+	Map<Object, Integer> objectHandleMap = new IdentityHashMap<Object, Integer>(256);
 	/**
 	 * Counter for the class handles.
 	 */
@@ -72,37 +73,14 @@ public class SerializationCaches
 		AtomicInteger counter = new AtomicInteger(0);
 		try
 		{
-			for (Class<?> c: PRIMITIVE_TYPES) getClassDescriptorGeneric(map, c, counter);
-			getClassDescriptorGeneric(map, Object.class, counter);
-			getClassDescriptorGeneric(map, String.class, counter);
+			for (Class<?> c: PRIMITIVE_TYPES) getClassDescriptorGeneric(c, counter, map, null);
+			getClassDescriptorGeneric(Object.class, counter, map, null);
+			getClassDescriptorGeneric(String.class, counter, map, null);
 		}
 		catch (Exception e)
 		{
 			log.error("error initializing global types", e);
 		}
-
-		/*
-		int handle = 0;
-		try
-		{
-			for (Class<?> c: PRIMITIVE_TYPES)
-			{
-				ClassDescriptor cd = new ClassDescriptor(c);
-				cd.handle = ++handle;
-				map.put(c, cd);
-			}
-			ClassDescriptor cd = new ClassDescriptor(Object.class);
-			cd.handle = ++handle;
-			map.put(Object.class, cd);
-			cd = new ClassDescriptor(String.class);
-			cd.handle = ++handle;
-			map.put(String.class, cd);
-		}
-		catch (Exception e)
-		{
-			log.error("error initializing global types", e);
-		}
-		*/
 		return map;
 	}
 
@@ -112,111 +90,72 @@ public class SerializationCaches
 	SerializationCaches()
 	{
 		classToDescMap.putAll(globalTypesMap);
-		classHandleCount.set(classToDescMap.size() + 1);
+		classHandleCount.set(classToDescMap.size());
 	}
 
 	/**
 	 * Get the descriptor for the specified class, and created it if needed.
 	 * @param clazz the class for which to get a descriptor.
+	 * @param map a temporary association map.
 	 * @return a {@link ClassDescriptor} object.
 	 * @throws Exception if nay error occurs.
 	 */
-	ClassDescriptor getClassDescriptor(Class<?> clazz) throws Exception
+	ClassDescriptor getClassDescriptor(Class<?> clazz, Map<Class<?>, ClassDescriptor> map) throws Exception
 	{
-		return getClassDescriptorGeneric(classToDescMap, clazz, classHandleCount);
-		/*
-		ClassDescriptor cd = classToDescMap.get(clazz);
-		if (cd == null) cd = addClass(clazz);
-		return cd;
-		*/
+		return getClassDescriptorGeneric(clazz, classHandleCount, classToDescMap, map);
 	}
 
 	/**
-	 * Add a class mapping.
-	 * @param clazz the class to map to a descriptor.
-	 * @return the {@link ClassDescriptor} object that was created.
-	 * @throws Exception if any error occurs.
-	 */
-	ClassDescriptor addClass(Class<?> clazz) throws Exception
-	{
-		ClassDescriptor cd = new ClassDescriptor(clazz);
-		cd.handle = classHandleCount.incrementAndGet();
-		classToDescMap.put(clazz, cd);
-		for (FieldDescriptor fd: cd.fields) fd.type = getClassDescriptor(fd.field.getType());
-		Class<?> tmpClazz = clazz.getSuperclass();
-		if ((tmpClazz != null) && (tmpClazz != Object.class)) cd.superClass = getClassDescriptor(tmpClazz);
-		if (debugEnabled) log.debug("created " + cd);
-		/*
-		ClassDescriptor tmpDesc = cd;
-		while ((tmpClazz != null) && (tmpClazz != Object.class))
-		{
-			tmpDesc.superClass = getClassDescriptor(tmpClazz);
-			tmpDesc = tmpDesc.superClass;
-			tmpClazz = tmpClazz.getSuperclass();
-		}
-		*/
-		return cd;
-	}
-
-	/**
-	 * Get the handle of the specified object, and create it if needed.
+	 * Create a new handle for the specified object, and the new entry in the map.
 	 * @param o the object for which to get a handle.
-	 * @return the handle as an int cvalue.
+	 * @return the handle as an int value.
 	 */
-	int getObjectHandle(Object o)
+	int newObjectHandle(Object o)
 	{
-		if (o == null) return 0;
-		Integer handle = objectHandleMap.get(o);
-		if (handle == null)
-		{
-			handle = objectHandleCount.incrementAndGet();
-			objectHandleMap.put(o, handle);
-			if (debugEnabled) log.debug("created handle " + handle);
-		}
+		int handle = objectHandleCount.incrementAndGet();
+		objectHandleMap.put(o, handle);
+		if (traceEnabled) try { log.trace("created handle " + handle  + " for o=" + o); } catch(Exception e) {}
 		return handle;
 	}
 
 	/**
 	 * Get the descriptor for the specified class, and create it if needed.
-	 * @param map the map that contains the handle to class descrioptor associations.
 	 * @param clazz the class for which to get a descriptor.
 	 * @param counter the handle as an auto-incrementing counter.
+	 * @param map the map that contains the handle to class descrioptor associations.
+	 * @param map2 a temporary association map.
 	 * @return a {@link ClassDescriptor} object.
 	 * @throws Exception if nay error occurs.
 	 */
-	static ClassDescriptor getClassDescriptorGeneric(Map<Class<?>, ClassDescriptor> map, Class<?> clazz, AtomicInteger counter) throws Exception
+	static ClassDescriptor getClassDescriptorGeneric(Class<?> clazz, AtomicInteger counter,
+			Map<Class<?>, ClassDescriptor> map, Map<Class<?>, ClassDescriptor> map2) throws Exception
 	{
 		ClassDescriptor cd = map.get(clazz);
-		if (cd == null) cd = addClassGeneric(map, clazz, counter);
+		if (cd == null) cd = addClassGeneric(clazz, counter, map, map2);
 		return cd;
 	}
 
 	/**
 	 * Add a class mapping.
-	 * @param map the map that contains the handle to class descrioptor associations.
 	 * @param clazz the class to map to a descriptor.
 	 * @param counter the handle as an auto-incrementing counter.
+	 * @param map the map that contains the handle to class descrioptor associations.
+	 * @param map2 a temporary association map.
 	 * @return the {@link ClassDescriptor} object that was created.
 	 * @throws Exception if any error occurs.
 	 */
-	static ClassDescriptor addClassGeneric(Map<Class<?>, ClassDescriptor> map, Class<?> clazz, AtomicInteger counter) throws Exception
+	static ClassDescriptor addClassGeneric(Class<?> clazz, AtomicInteger counter,
+			Map<Class<?>, ClassDescriptor> map, Map<Class<?>, ClassDescriptor> map2) throws Exception
 	{
 		ClassDescriptor cd = new ClassDescriptor(clazz);
 		cd.handle = counter.incrementAndGet();
+		if (traceEnabled) try { log.trace("created " + cd); } catch(Exception e) {}
 		map.put(clazz, cd);
-		for (FieldDescriptor fd: cd.fields) fd.type = getClassDescriptorGeneric(map, fd.field.getType(), counter);
+		if (map2 != null) map2.put(clazz, cd);
+		for (FieldDescriptor fd: cd.fields) fd.type = getClassDescriptorGeneric(fd.field.getType(), counter, map, map2);
 		Class<?> tmpClazz = clazz.getSuperclass();
-		if ((tmpClazz != null) && (tmpClazz != Object.class)) cd.superClass = getClassDescriptorGeneric(map, tmpClazz, counter);
-		if (debugEnabled) log.debug("created " + cd);
-		/*
-		ClassDescriptor tmpDesc = cd;
-		while ((tmpClazz != null) && (tmpClazz != Object.class))
-		{
-			tmpDesc.superClass = getClassDescriptor(tmpClazz);
-			tmpDesc = tmpDesc.superClass;
-			tmpClazz = tmpClazz.getSuperclass();
-		}
-		*/
+		if ((tmpClazz != null) && (tmpClazz != Object.class)) cd.superClass = getClassDescriptorGeneric(tmpClazz, counter, map, map2);
+		if (clazz.isArray()) cd.componentType = getClassDescriptorGeneric(clazz.getComponentType(), counter, map, map2);
 		return cd;
 	}
 
