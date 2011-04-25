@@ -87,11 +87,6 @@ public class JPPFRemoteContainer extends JPPFContainer
 				DataLocation dl = IOHelper.readData(is);
 				if (traceEnabled) log.trace("i = " + i + ", read data size = " + dl.getSize());
 				futureList.add(executor.submit(new ObjectDeserializationTask(dl, i)));
-				/*
-				JPPFBuffer buf = socketClient.receiveBytes(0);
-				if (traceEnabled) log.trace("i = " + i + ", read buffer size = " + buf.getLength());
-				futureList.add(executor.submit(new ObjectDeserializationTask(buf.getBuffer(), i)));
-				*/
 			}
 			for (Future<Object> f: futureList)
 			{
