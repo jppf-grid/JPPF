@@ -412,6 +412,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	 */
 	public Object getParameter(Object name)
 	{
+		//if (parameters == null) return null;
 		return parameters.get(name);
 	}
 
@@ -469,11 +470,11 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder("[");
-		sb.append("jobId=").append(getParameter(BundleParameter.JOB_ID));
-		sb.append(", jobUuid=").append(getParameter(BundleParameter.JOB_UUID));
+		sb.append("jobId=").append(parameters == null ? null : getParameter(BundleParameter.JOB_ID));
+		sb.append(", jobUuid=").append(parameters == null ? null : getParameter(BundleParameter.JOB_UUID));
 		sb.append(", initialTaskCount=").append(initialTaskCount);
 		sb.append(", taskCount=").append(taskCount);
-		sb.append(", requeue=").append(getParameter(BundleParameter.JOB_REQUEUE));
+		sb.append(", requeue=").append(parameters == null ? null : getParameter(BundleParameter.JOB_REQUEUE));
 		sb.append("]");
 		return sb.toString();
 	}
