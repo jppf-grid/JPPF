@@ -75,6 +75,10 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
 	 */
 	public static final Color DEFAULT_FOREGROUND = Color.BLACK;
 	/**
+	 * Default selection foreground color.
+	 */
+	public static final Color DEFAULT_SELECTION_FOREGROUND = Color.WHITE;
+	/**
 	 * Default foreground color.
 	 */
 	public static final Color DIMMED_FOREGROUND = Color.GRAY;
@@ -87,9 +91,13 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
 	 */
 	protected Color defaultNonSelectionBackground = null;
 	/**
-	 * Default non-selection background.
+	 * Default selection background.
 	 */
 	protected Color defaultSelectionBackground = null;
+	/**
+	 * Default selection background.
+	 */
+	protected Color defaultSelectionForeground = null;
 	/**
 	 * The default plain font.
 	 */
@@ -114,6 +122,7 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
 	{
 		defaultNonSelectionBackground = getBackgroundNonSelectionColor();
 		defaultSelectionBackground = getBackgroundSelectionColor();
+		defaultSelectionForeground = getTextSelectionColor();
 		//plainFont = new Font(Font.SANS_SERIF, 12, Font.PLAIN);
 		//italicFont = new Font(Font.SANS_SERIF, 12, Font.ITALIC);
 	}

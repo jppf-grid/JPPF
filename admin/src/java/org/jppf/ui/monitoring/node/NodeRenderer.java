@@ -67,7 +67,7 @@ public class NodeRenderer extends AbstractTreeCellRenderer
 				String path = null;
 				Color background = defaultNonSelectionBackground;
 				Color backgroundSelected = defaultSelectionBackground;
-				Color foreground = DEFAULT_FOREGROUND;
+				Color foreground = sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND;
 				Font f = renderer.getFont();
 				Font font = getPlainFont(f);
 				switch(data.getType())

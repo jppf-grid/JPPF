@@ -81,7 +81,8 @@ public class NodeTableCellRenderer extends DefaultTableCellRenderer
 					{
 						JMXConnectionWrapper wrapper = data.getJmxWrapper();
 						if ((wrapper == null) || !wrapper.isConnected()) renderer.setForeground(AbstractTreeCellRenderer.UNMANAGED_COLOR);
-						else renderer.setForeground(AbstractTreeCellRenderer.DEFAULT_FOREGROUND);
+						else renderer.setForeground(
+							isSelected ? AbstractTreeCellRenderer.DEFAULT_SELECTION_FOREGROUND : AbstractTreeCellRenderer.DEFAULT_FOREGROUND);
 					}
 				}
 			}

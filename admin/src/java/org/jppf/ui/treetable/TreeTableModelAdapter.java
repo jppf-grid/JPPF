@@ -284,14 +284,21 @@ public class TreeTableModelAdapter extends AbstractTableModel
 	 */
 	public void setSelectedPaths(TreePath[] paths)
 	{
-		if (paths == null) return;
-		List<TreePath> validPaths = new ArrayList<TreePath>();
-		for (TreePath path: paths)
+		try
 		{
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-			if ((node != null) && (node.getParent() != null)) validPaths.add(path);
+			if (paths == null) return;
+			List<TreePath> validPaths = new ArrayList<TreePath>();
+			for (TreePath path: paths)
+			{
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+				if ((node != null) && (node.getParent() != null)) validPaths.add(path);
+			}
+			tree.setSelectionPaths(validPaths.toArray(ZERO_PATH));
 		}
-		tree.setSelectionPaths(validPaths.toArray(ZERO_PATH));
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	/**
