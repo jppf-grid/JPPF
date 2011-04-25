@@ -104,17 +104,13 @@ public abstract class AbstractRLBundler extends AbstractBundler
 		double d = dataHolder.getPreviousMean() - dataHolder.getMean();
 		double threshold = ((RLProfile) profile).getPerformanceVariationThreshold() * dataHolder.getPreviousMean();
 		prevBundleSize = bundleSize;
-		if (d < -threshold)
+		if (action == 0) action = (int) -Math.signum(d);
+		if ((d < -threshold) || (d > threshold))
 		{
-			action += (int) Math.signum(action) * STEP;
+			action = (int) Math.signum(action) * (int) Math.round(d / threshold);
 		}
-		else if (d > threshold)
-		{
-			//action = (int) -Math.signum(action) * Math.max(STEP, Math.abs(action/2));
-			action = (int) -Math.signum(action) * STEP;
-		}
-		//else action = (int) -Math.signum(d) * (int) Math.signum(action) * STEP;
-		else action = STEP;
+		else action = 0;
+		if (debugEnabled) log.debug("bundler #" + getBundlerNumber() + ": d = " + d + ", threshold = " + threshold + ", action = " + action);
 		int maxActionRange = ((RLProfile) profile).getMaxActionRange();
 		if (action > maxActionRange) action = maxActionRange;
 		else if (action < -maxActionRange) action = -maxActionRange;
@@ -123,6 +119,7 @@ public abstract class AbstractRLBundler extends AbstractBundler
 		int max = maxSize();
 		if (bundleSize > max) bundleSize = max;
 		if (bundleSize <= 0) bundleSize = 1;
+		/*
 		if (debugEnabled)
 		{
 			StringBuilder sb = new StringBuilder();
@@ -130,6 +127,7 @@ public abstract class AbstractRLBundler extends AbstractBundler
 			sb.append(", ").append(getDataHolder());
 			log.debug(sb.toString());
 		}
+		*/
 	}
 
 	/**
