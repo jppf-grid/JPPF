@@ -80,6 +80,7 @@ public class JPPFSystemInformation implements Serializable
 	 */
 	public JPPFSystemInformation(String uuid)
 	{
+		if (uuid == null) uuid = "";
 		uuidProps = new TypedProperties();
 		uuidProps.setProperty("jppf.uuid", uuid);
 	}
