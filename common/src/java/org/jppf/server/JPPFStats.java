@@ -58,19 +58,27 @@ public class JPPFStats implements Serializable
 	/**
 	 * Time statistics for the queued tasks.
 	 */
-	private TimeSnapshot queue = new TimeSnapshot("queue");
+	//private TimeSnapshot queue = new TimeSnapshot("queue");
 	/**
 	 * Total number of tasks that have been queued.
 	 */
-	private int totalQueued = 0;
+	//private int totalQueued = 0;
 	/**
 	 * The current size of the queue.
 	 */
-	private int queueSize = 0;
+	//private int queueSize = 0;
 	/**
 	 * The maximum size of the queue.
 	 */
-	private int maxQueueSize = 0;
+	//private int maxQueueSize = 0;
+	/**
+	 * Statistics for the tasks in queue.
+	 */
+	private QueueStats taskQueue = new QueueStats("task");
+	/**
+	 * Statistics for the jobs in queue.
+	 */
+	private QueueStats jobQueue = new QueueStats("job");
 	/**
 	 * The current number of nodes connected to the server.
 	 */
@@ -100,10 +108,14 @@ public class JPPFStats implements Serializable
 		s.execution = execution.makeCopy();
 		s.nodeExecution = nodeExecution.makeCopy();
 		s.transport = transport.makeCopy();
+		s.taskQueue = taskQueue;
+		s.jobQueue = jobQueue;
+		/*
 		s.queue = queue.makeCopy();
 		s.totalQueued = totalQueued;
 		s.queueSize = queueSize;
 		s.maxQueueSize = maxQueueSize;
+		*/
 		s.nbNodes = nbNodes;
 		s.maxNodes = maxNodes;
 		s.nbClients = nbClients;
@@ -124,10 +136,13 @@ public class JPPFStats implements Serializable
 		sb.append(execution.toString());
 		sb.append(nodeExecution.toString());
 		sb.append(transport.toString());
-		sb.append(queue.toString());
+		sb.append(taskQueue.toString());
+		sb.append(jobQueue.toString());
+		/*
 		sb.append("totalQueued : ").append(totalQueued).append("\n");
 		sb.append("queueSize : ").append(queueSize).append("\n");
 		sb.append("maxQueueSize : ").append(maxQueueSize).append("\n");
+		*/
 		sb.append("nbNodes : ").append(nbNodes).append("\n");
 		sb.append("maxNodes : ").append(maxNodes).append("\n");
 		sb.append("nbClients : ").append(nbClients).append("\n");
@@ -244,78 +259,6 @@ public class JPPFStats implements Serializable
 	}
 
 	/**
-	 * Set the time statistics for the queued tasks.
-	 * @param queue - a <code>TimeSnapshot</code> instance.
-	 */
-	public void setQueue(TimeSnapshot queue)
-	{
-		this.queue = queue;
-	}
-
-	/**
-	 * Get the time statistics for the queued tasks.
-	 * @return a <code>TimeSnapshot</code> instance.
-	 */
-	public TimeSnapshot getQueue()
-	{
-		return queue;
-	}
-
-	/**
-	 * Set the total number of tasks that have been queued.
-	 * @param totalQueued - the number of tasks as an int value.
-	 */
-	public void setTotalQueued(int totalQueued)
-	{
-		this.totalQueued = totalQueued;
-	}
-
-	/**
-	 * Get the total number of tasks that have been queued.
-	 * @return the number of tasks as an int value.
-	 */
-	public int getTotalQueued()
-	{
-		return totalQueued;
-	}
-
-	/**
-	 * Set the current queue size.
-	 * @param queueSize - the current queue size as an int value.
-	 */
-	public void setQueueSize(int queueSize)
-	{
-		this.queueSize = queueSize;
-	}
-
-	/**
-	 * Get the current queue size.
-	 * @return the current queue size as an int value.
-	 */
-	public int getQueueSize()
-	{
-		return queueSize;
-	}
-
-	/**
-	 * Set the maximum queue size.
-	 * @param maxQueueSize - the maximum queue size as an int value.
-	 */
-	public void setMaxQueueSize(int maxQueueSize)
-	{
-		this.maxQueueSize = maxQueueSize;
-	}
-
-	/**
-	 * Get the maximum queue size.
-	 * @return the maximum queue size as an int value.
-	 */
-	public int getMaxQueueSize()
-	{
-		return maxQueueSize;
-	}
-
-	/**
 	 * Set the current number of nodes connected to the server.
 	 * @param nbNodes - the current number of nodes as an int value.
 	 */
@@ -398,13 +341,53 @@ public class JPPFStats implements Serializable
 		transport = new TimeSnapshot("transport");
 		server = new TimeSnapshot("server");
 		footprint = 0L;
+		taskQueue = new QueueStats("task");
+		jobQueue = new QueueStats("job");
+		/*
 		queue = new TimeSnapshot("queue");
 		totalQueued = 0;
 		queueSize = 0;
 		maxQueueSize = 0;
-		nbNodes = 0;
-		maxNodes = 0;
-		nbClients = 0;
-		maxClients = 0;
+		*/
+		//nbNodes = 0;
+		//nbClients = 0;
+		maxNodes = nbNodes;
+		maxClients = nbClients;
+	}
+
+	/**
+	 * Get the statistics for the tasks in queue.
+	 * @return a {@link QueueStats} instance.
+	 */
+	public QueueStats getTaskQueue()
+	{
+		return taskQueue;
+	}
+
+	/**
+	 * Set the statistics for the tasks in queue.
+	 * @param taskQueue a {@link QueueStats} instance.
+	 */
+	public void setTaskQueue(QueueStats taskQueue)
+	{
+		this.taskQueue = taskQueue;
+	}
+
+	/**
+	 * Get the statistics for the jobs in queue.
+	 * @return a {@link QueueStats} instance.
+	 */
+	public QueueStats getJobQueue()
+	{
+		return jobQueue;
+	}
+
+	/**
+	 * Set the statistics for the jobs in queue.
+	 * @param jobQueue a {@link QueueStats} instance.
+	 */
+	public void setJobQueue(QueueStats jobQueue)
+	{
+		this.jobQueue = jobQueue;
 	}
 }

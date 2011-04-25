@@ -23,7 +23,7 @@ import java.text.NumberFormat;
 import java.util.*;
 
 import org.jppf.server.JPPFStats;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -126,15 +126,16 @@ public final class StatsFormatter implements StatsConstants
 		stringValueMap.put(MIN_TRANSPORT_TIME, s);
 		stringValueMap.put(MAX_TRANSPORT_TIME, formatDouble(stats.getTransport().getMaxTime()));
 		stringValueMap.put(AVG_TRANSPORT_TIME, formatDouble(stats.getTransport().getAvgTime()));
-		stringValueMap.put(LATEST_QUEUE_TIME, formatDouble(stats.getQueue().getLatestTime()));
-		stringValueMap.put(TOTAL_QUEUE_TIME, formatTime(stats.getQueue().getTotalTime()));
-		s = (stats.getQueue().getMinTime() == Long.MAX_VALUE) ? "" : formatDouble(stats.getQueue().getMinTime());
+		QueueStats queue = stats.getTaskQueue();
+		stringValueMap.put(LATEST_QUEUE_TIME, formatDouble(queue.getTimes().getLatestTime()));
+		stringValueMap.put(TOTAL_QUEUE_TIME, formatTime(queue.getTimes().getTotalTime()));
+		s = (queue.getTimes().getMinTime() == Long.MAX_VALUE) ? "" : formatDouble(queue.getTimes().getMinTime());
 		stringValueMap.put(MIN_QUEUE_TIME, s);
-		stringValueMap.put(MAX_QUEUE_TIME, formatDouble(stats.getQueue().getMaxTime()));
-		stringValueMap.put(AVG_QUEUE_TIME, formatDouble(stats.getQueue().getAvgTime()));
-		stringValueMap.put(TOTAL_QUEUED, formatInt(stats.getTotalQueued()));
-		stringValueMap.put(QUEUE_SIZE, formatInt(stats.getQueueSize()));
-		stringValueMap.put(MAX_QUEUE_SIZE, formatInt(stats.getMaxQueueSize()));
+		stringValueMap.put(MAX_QUEUE_TIME, formatDouble(queue.getTimes().getMaxTime()));
+		stringValueMap.put(AVG_QUEUE_TIME, formatDouble(queue.getTimes().getAvgTime()));
+		stringValueMap.put(TOTAL_QUEUED, formatInt(queue.getTotalQueued()));
+		stringValueMap.put(QUEUE_SIZE, formatInt(queue.getQueueSize()));
+		stringValueMap.put(MAX_QUEUE_SIZE, formatInt(queue.getMaxQueueSize()));
 		stringValueMap.put(NB_NODES, formatInt(stats.getNbNodes()));
 		stringValueMap.put(MAX_NODES, formatInt(stats.getMaxNodes()));
 		stringValueMap.put(NB_CLIENTS, formatInt(stats.getNbClients()));
@@ -167,14 +168,15 @@ public final class StatsFormatter implements StatsConstants
 		doubleValueMap.put(MIN_TRANSPORT_TIME, (double) (stats.getTransport().getMinTime() == Long.MAX_VALUE ? 0L : stats.getTransport().getMinTime()));
 		doubleValueMap.put(MAX_TRANSPORT_TIME, (double) stats.getTransport().getMaxTime());
 		doubleValueMap.put(AVG_TRANSPORT_TIME, stats.getTransport().getAvgTime());
-		doubleValueMap.put(LATEST_QUEUE_TIME, (double) stats.getQueue().getLatestTime());
-		doubleValueMap.put(TOTAL_QUEUE_TIME, (double) stats.getQueue().getTotalTime());
-		doubleValueMap.put(MIN_QUEUE_TIME, (double) (stats.getQueue().getMinTime() == Long.MAX_VALUE ? 0L : stats.getQueue().getMinTime()));
-		doubleValueMap.put(MAX_QUEUE_TIME, (double) stats.getQueue().getMaxTime());
-		doubleValueMap.put(AVG_QUEUE_TIME, stats.getQueue().getAvgTime());
-		doubleValueMap.put(TOTAL_QUEUED, (double) stats.getTotalQueued());
-		doubleValueMap.put(QUEUE_SIZE, (double) stats.getQueueSize());
-		doubleValueMap.put(MAX_QUEUE_SIZE, (double) stats.getMaxQueueSize());
+		QueueStats queue = stats.getTaskQueue();
+		doubleValueMap.put(LATEST_QUEUE_TIME, (double) queue.getTimes().getLatestTime());
+		doubleValueMap.put(TOTAL_QUEUE_TIME, (double) queue.getTimes().getTotalTime());
+		doubleValueMap.put(MIN_QUEUE_TIME, (double) (queue.getTimes().getMinTime() == Long.MAX_VALUE ? 0L : queue.getTimes().getMinTime()));
+		doubleValueMap.put(MAX_QUEUE_TIME, (double) queue.getTimes().getMaxTime());
+		doubleValueMap.put(AVG_QUEUE_TIME, queue.getTimes().getAvgTime());
+		doubleValueMap.put(TOTAL_QUEUED, (double) queue.getTotalQueued());
+		doubleValueMap.put(QUEUE_SIZE, (double) queue.getQueueSize());
+		doubleValueMap.put(MAX_QUEUE_SIZE, (double) queue.getMaxQueueSize());
 		doubleValueMap.put(NB_NODES, (double) stats.getNbNodes());
 		doubleValueMap.put(MAX_NODES, (double) stats.getMaxNodes());
 		doubleValueMap.put(NB_CLIENTS, (double) stats.getNbClients());

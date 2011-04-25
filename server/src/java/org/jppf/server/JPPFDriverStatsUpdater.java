@@ -17,6 +17,8 @@
  */
 package org.jppf.server;
 
+import org.jppf.utils.QueueStats;
+
 
 /**
  * Instances of this class are used to collect statistics on the JPPF server.
@@ -69,8 +71,9 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 */
 	public synchronized void taskInQueue(int count)
 	{
-		stats.setQueueSize(stats.getQueueSize() + count);
-		if (stats.getQueueSize() > stats.getMaxQueueSize()) stats.setMaxQueueSize(stats.getQueueSize());
+		QueueStats queue = stats.getTaskQueue();
+		queue.setQueueSize(queue.getQueueSize() + count);
+		if (queue.getQueueSize() > queue.getMaxQueueSize()) queue.setMaxQueueSize(queue.getQueueSize());
 	}
 
 	/**
@@ -80,9 +83,10 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 */
 	public synchronized void taskOutOfQueue(int count, long time)
 	{
-		stats.setQueueSize(stats.getQueueSize() - count);
-		stats.setTotalQueued(stats.getTotalQueued() + count);
-		stats.getQueue().newTime(time, count, stats.getTotalQueued());
+		QueueStats queue = stats.getTaskQueue();
+		queue.setQueueSize(queue.getQueueSize() - count);
+		queue.setTotalQueued(queue.getTotalQueued() + count);
+		queue.getTimes().newTime(time, count, queue.getTotalQueued());
 	}
 	
 	/**
