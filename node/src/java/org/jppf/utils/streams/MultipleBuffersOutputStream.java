@@ -121,8 +121,8 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 */
 	public void write(byte[] b, int off, int len) throws IOException
 	{
-		if (b == null) throw new NullPointerException("the input buffer must not be null");
 		/*
+		if (b == null) throw new NullPointerException("the input buffer must not be null");
 		if ((off < 0) || (off > b.length) || (len < 0) || (off + len > b.length))
 			throw new ArrayIndexOutOfBoundsException("b.length=" + b.length + ", off=" + off + ", len=" + len);
 		*/
@@ -130,8 +130,10 @@ public class MultipleBuffersOutputStream extends OutputStream
 		System.arraycopy(b, off, currentBuffer.buffer, currentBuffer.length, len);
 		currentBuffer.length += len;
 		totalSize += len;
+		/*
 		if (traceEnabled) log.trace("wrote " + len + " bytes to " + this +
 			", bytes = " + StringUtils.dumpBytes(currentBuffer.buffer, currentBuffer.length - len, Math.min(100, len)));
+		*/
 	}
 
 	/**
@@ -142,7 +144,6 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 */
 	public void write(byte[] b) throws IOException
 	{
-		//if (b == null) throw new NullPointerException("the input buffer must not be null");
 		write(b, 0, b.length);
 	}
 

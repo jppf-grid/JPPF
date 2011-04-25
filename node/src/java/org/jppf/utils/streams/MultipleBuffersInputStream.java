@@ -101,10 +101,10 @@ public class MultipleBuffersInputStream extends InputStream
 	{
 		if ((currentBuffer == null) || (currentBuffer.length - currentBuffer.pos < 1)) nextBuffer();
 		if (eofReached) return -1;
-		int n = currentBuffer.buffer[currentBuffer.pos];
+		byte b = currentBuffer.buffer[currentBuffer.pos];
 		currentBuffer.pos++;
-		if (traceEnabled) log.trace("read one byte '" + n + "' from " + this);
-		return n;
+		if (traceEnabled) log.trace("read one byte '" + b + "' from " + this);
+		return b < 0 ? b + 256 : b;
 	}
 
 	/**
@@ -118,8 +118,8 @@ public class MultipleBuffersInputStream extends InputStream
 	 */
 	public int read(byte[] b, int off, int len) throws IOException
 	{
-		if (b == null) throw new NullPointerException("the destination buffer must not be null");
 		/*
+		if (b == null) throw new NullPointerException("the destination buffer must not be null");
 		if ((off < 0) || (off > b.length) || (len < 0) || (off + len > b.length))
 			throw new ArrayIndexOutOfBoundsException("b.length=" + b.length + ", off=" + off + ", len=" + len);
 		*/
@@ -134,8 +134,10 @@ public class MultipleBuffersInputStream extends InputStream
 			count += n;
 			currentBuffer.pos += n;
 		}
+		/*
 		if (traceEnabled) log.trace("read " + count + " bytes from " + this +
 			", bytes = " + StringUtils.dumpBytes(currentBuffer.buffer, currentBuffer.pos - count, Math.min(100, count)));
+		*/
 		return count;
 	}
 
