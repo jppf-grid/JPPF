@@ -18,10 +18,6 @@
 
 package org.jppf.server.nio.classloader;
 
-import static org.jppf.utils.StringUtils.getRemoteHost;
-
-import java.nio.channels.SocketChannel;
-
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.slf4j.*;
@@ -66,8 +62,7 @@ abstract class ClassServerState extends NioState<ClassTransition>
 	 */
 	protected void sendNullResponse(ChannelWrapper request) throws Exception
 	{
-		if (debugEnabled) log.debug("disconnected provider: sending null response to node " +
-			getRemoteHost((SocketChannel) ((SelectionKeyWrapper) request).getChannel().channel()));
+		if (debugEnabled) log.debug("disconnected provider: sending null response to node " + request);
 		ClassContext requestContext = (ClassContext) request.getContext();
 		requestContext.getResource().setDefinition(null);
 		requestContext.serializeResource(request);

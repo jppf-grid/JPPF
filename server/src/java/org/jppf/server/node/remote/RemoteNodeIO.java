@@ -70,6 +70,7 @@ public class RemoteNodeIO extends AbstractNodeIO
 	{
 		if (debugEnabled) log.debug("waiting for next request");
 		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
+		if (traceEnabled) log.trace("bundle bytes = " + data.length);
 		data = JPPFDataTransformFactory.transform(false, data);
 		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
 		if (debugEnabled) log.debug("got bundle " + bundle);
@@ -147,6 +148,7 @@ public class RemoteNodeIO extends AbstractNodeIO
 			dest.writeInt(dl.getSize());
 			dl.transferTo(dest, true);
 		}
+		socketWrapper.flush();
 		//ioHandler.flush();
 	}
 }
