@@ -1,3 +1,0 @@
-# FTP server is normally not needed on the client side
-# uncomment the next line if you want to have one
-#org.jppf.fileserver.ftp.FtpFileServer
