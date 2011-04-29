@@ -286,6 +286,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 * @param tasks the tasks to submit.
 	 * @return a pair representing the result collector used in the current job, along with the position of the first task. 
 	 */
+  @SuppressWarnings("unchecked")
 	<T> Pair<FutureResultCollector, Integer> addTasks(Collection<? extends Callable<T>> tasks)
 	{
 		lock.lock();

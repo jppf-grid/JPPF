@@ -62,6 +62,7 @@ public class TaskResultEvent extends EventObject
 	 * To properly order the results, developers should use {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()} for each task.
 	 * @return a list of <code>JPPFTask</code> instances.
 	 */
+  @SuppressWarnings("unchecked")
 	public List<JPPFTask> getTaskList()
 	{
 		return (List<JPPFTask>) getSource();

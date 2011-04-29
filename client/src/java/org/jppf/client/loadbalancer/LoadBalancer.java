@@ -75,6 +75,7 @@ public class LoadBalancer
 	/**
 	 * Default constructor.
 	 */
+  @SuppressWarnings("unchecked")
 	public LoadBalancer()
 	{
 		if (localEnabled)

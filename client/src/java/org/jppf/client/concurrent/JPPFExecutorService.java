@@ -125,6 +125,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @throws RejectedExecutionException if any task cannot be scheduled for execution.
 	 * @see java.util.concurrent.ExecutorService#invokeAll(java.util.Collection, long, java.util.concurrent.TimeUnit)
 	 */
+  @SuppressWarnings("unchecked")
 	public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException
 	{
 		if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");

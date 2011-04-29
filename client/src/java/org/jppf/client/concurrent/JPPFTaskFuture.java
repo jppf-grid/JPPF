@@ -116,6 +116,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 * Wait until the execution is complete, or the specified timeout has expired, whichever happens first.
 	 * @param timeout the maximum time to wait.
 	 */
+  @SuppressWarnings("unchecked")
 	void getResult(long timeout)
 	{
 		if (!isDone())

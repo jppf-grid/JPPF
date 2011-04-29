@@ -100,6 +100,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	 * Read all client connection information from the configuration and initialize
 	 * the connection pools accordingly.
 	 */
+  @SuppressWarnings("unchecked")
 	protected void initPools()
 	{
 		loadBalancer = new LoadBalancer();
