@@ -118,6 +118,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	/**
 	 * Cleanup the reference queue, by removing entries whose value was garbage collected.
 	 */
+  @SuppressWarnings("unchecked")
 	private void cleanup()
 	{
 		SoftValue<K, V> ref;

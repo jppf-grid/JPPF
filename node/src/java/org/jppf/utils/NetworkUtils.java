@@ -233,8 +233,8 @@ public final class NetworkUtils
 	}
 
 	/**
-	 * Get a {@link JPPFConnectionInformation} object for each non local address of the currrent host.
-	 * @return a list of {@link JPPFConnectionInformation} instance. This list may be empty, but never null.
+	 * Get a {@link SubnetInformation} object for each non local address of the currrent host.
+	 * @return a list of {@link SubnetInformation} instance. This list may be empty, but never null.
 	 */
 	public static List<SubnetInformation> getAllNonLocalSubnetInfo()
 	{

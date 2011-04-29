@@ -107,6 +107,7 @@ public class Deserializer
 	 * @param handle the handle of the object to read.
 	 * @throws Exception if any error occurs.
 	 */
+  @SuppressWarnings("unchecked")
 	private void readObject(int handle) throws Exception
 	{
 		int cdHandle = in.readInt();
@@ -160,6 +161,7 @@ public class Deserializer
 	 * @param obj the object ot set the field values on.
 	 * @throws Exception if any error occurs.
 	 */
+  @SuppressWarnings("unchecked")
 	private void readDeclaredFields(ClassDescriptor cd, Object obj) throws Exception
 	{
 		for (int i=0; i<cd.fields.length; i++)
@@ -205,6 +207,7 @@ public class Deserializer
 	 * @param cd the class descriptor for the array's class.
 	 * @throws Exception if any error occurs.
 	 */
+  @SuppressWarnings("unchecked")
 	private void readArray(int handle, ClassDescriptor cd) throws Exception
 	{
 		int len = in.readInt();
