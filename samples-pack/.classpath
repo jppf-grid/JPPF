@@ -5,6 +5,7 @@
 	<classpathentry kind="src" output="DataDependency/classes" path="DataDependency/src"/>
 	<classpathentry kind="src" output="DataEncryption/classes" path="DataEncryption/src"/>
 	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src"/>
+	<classpathentry kind="src" output="FTPServer/classes" path="FTPServer/src"/>
 	<classpathentry kind="src" output="IdleSystem/classes" path="IdleSystem/src"/>
 	<classpathentry kind="src" output="MatrixMultiplication/classes" path="MatrixMultiplication/src"/>
 	<classpathentry kind="src" output="Nbody/classes" path="Nbody/src"/>
@@ -43,5 +44,14 @@
 	<classpathentry kind="lib" path="NodeLifeCycle/lib/transactions-essentials-all.jar" sourcepath="C:/ftp/dev/Database/Atomikos/AtomikosTransactionsEssentials-3.7.0M5/sources"/>
 	<classpathentry kind="lib" path="shared/lib/hazelcast-1.9.1.jar"/>
 	<classpathentry kind="lib" path="shared/lib/commons-pool-1.5.2.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/aopalliance-1.0.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/commons-net-2.2.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/ftplet-api-1.0.5.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/ftpserver-core-1.0.5.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/mina-core-2.0.2.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/spring-beans-2.5.5.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/spring-context-2.5.5.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/spring-core-2.5.5.jar"/>
 	<classpathentry kind="output" path="shared/classes"/>
 </classpath>

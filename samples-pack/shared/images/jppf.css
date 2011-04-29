@@ -60,7 +60,7 @@ div.u_link > a { text-decoration: underline; font-weight: normal }
 .noborder_        { border: 0px }
 
 h1, h2, h3 , h4  { font-family: Arial, Helvetica, sans-serif;  color: #6D78B6 } /* 109, 120, 182 */
-h1 { font-family: Arial Black; font-weight: 900 }
+h1 { font-family: Arial Black, Arial, Verdana, Sans-serif; font-weight: 900 }
 h1.header {	font-family: Arial Black, Arial, Helvetica, sans-serif;  color: #6D78B6; font-size: 24pt }
 h2,h3 { margin-top: 10px; padding-top: 0px; margin-bottom: 10px; padding-bottom: 0px; }
 h3 { font-size: 14pt; }
