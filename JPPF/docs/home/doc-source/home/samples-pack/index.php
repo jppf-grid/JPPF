@@ -21,6 +21,7 @@ $template{name="samples-page-header" title="JPPF Samples Pack"}$
 	<li><a href="IdleSystem/Readme.php">An extension that enables nodes to run only when the machine is idle</a></li>
 	<li><a href="NodeLifeCycle/Readme.php">Control of database transactions via node life cycle events</a></li>
 	<li><a href="Nbody/Readme.php">Parallel N-body problem applied to anti-protons trapped in a  magnetic field</a></li>
+	<li><a href="FTPServer/Readme.php">How to embed and use an FTP server in JPPF</a></li>
 </ul>
 <br>
 
