@@ -62,7 +62,7 @@ public class FTPRunner
 			if (jppfClient != null) jppfClient.close();
 		}
 	}
-	
+
 	/**
 	 * Perform the test.
 	 * @throws Exception if an error is raised during the execution.
@@ -70,7 +70,7 @@ public class FTPRunner
 	private static void perform() throws Exception
 	{
 		TypedProperties config = JPPFConfiguration.getProperties();
-		
+
 		output("Running FTP demo");
 		long totalTime = System.nanoTime();
 		JPPFJob job = new JPPFJob();
@@ -83,7 +83,7 @@ public class FTPRunner
 		dataProvider.setValue("ftp.host", host);
 		job.setDataProvider(dataProvider);
 		// add a single task
-		job.addTask(new FTPTask("/driver/logging.properties", "./ftp/node/node-logging.properties"));
+		job.addTask(new FTPTask("input.txt", "output.html"));
 		List<JPPFTask> results = jppfClient.submit(job);
 		for (JPPFTask t: results)
 		{

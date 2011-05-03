@@ -20,10 +20,12 @@ package org.jppf.example.ftp.runner;
 import org.jppf.example.ftp.service.FTPClientWrapper;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
+import org.jppf.utils.FileUtils;
 
 
 /**
- * This task is for testing the netwrok transfer of task with various data sizes.
+ * This task processes a text file downloaded from an FTP server embedded within the JPPF driver.
+ * The text file is transformed into a resulting html file which is then uploaded to the same FTP server.
  * @author Laurent Cohen
  */
 public class FTPTask extends JPPFTask
@@ -33,7 +35,7 @@ public class FTPTask extends JPPFTask
 	 */
 	private String inFile;
 	/**
-	 * The place where to store the downloaded file.
+	 * The resulting file to upload to the server.
 	 */
 	private String outFile;
 
@@ -49,8 +51,7 @@ public class FTPTask extends JPPFTask
 	}
 	
 	/**
-	 * Download the file from the driver and store it in the out location.
-	 * @see sample.BaseDemoTask#doWork()
+	 * Download a text file from the driver, process it, store the result in an HTML file and upload it to the driver.
 	 */
 	public void run()
 	{
@@ -61,8 +62,24 @@ public class FTPTask extends JPPFTask
 			String host = (String) dataProvider.getValue("ftp.host");
 			FTPClientWrapper client = new FTPClientWrapper();
 			// this is just for demonstration purposes, the password should never be exposed like this!
-			client.open(host, 12221, "admin", "admin");
-			client.download(outFile, inFile);
+			client.open(host, 12222, "admin", "admin");
+
+			// dowload the input text file
+			client.download(inFile, inFile);
+			String text = FileUtils.readTextFile(inFile);
+			// transform double line breaks into paragraphs
+			text = text.replace("\n\n", "<p>");
+			// transform remaining line breaks into html line breaks
+			text = text.replace("\n", "<br/>");
+			// set all occurrences of JPPF in bold
+			text = text.replace("JPPF", "<b>JPPF</b>");
+			// add barebone HTML header and footer
+			StringBuilder sb = new StringBuilder();
+			sb.append("<html><body>").append(text).append("</body></html>");
+			FileUtils.writeTextFile(outFile, sb.toString());
+			// upload the HTML file to the server.
+			client.upload(outFile, outFile);
+
 			client.close();
 			setResult("execution successful");
 		}

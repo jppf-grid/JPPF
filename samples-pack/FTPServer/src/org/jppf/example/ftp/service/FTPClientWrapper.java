@@ -45,7 +45,8 @@ public class FTPClientWrapper
 	 */
 	public void open(String host, int port, String user, String password) throws Exception
 	{
-		ftpClient = new FTPSClient();
+		// create with implicit TLS
+		ftpClient = new FTPSClient(true);
 		ftpClient.connect(host, port);
 		ftpClient.login(user, password);
 	}

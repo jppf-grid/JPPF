@@ -107,8 +107,7 @@
 		<delete file="${zip.file}" quiet="true"/>
 		<zip destfile="${zip.file}">
 			<zipfileset dir="${basedir}" includes="${result.file}" prefix="lib"/>
-			<zipfileset dir="${lib.dir}" includes="*.jar" prefix="lib"/>
-			<zipfileset dir="${config.dir}" includes="**/*.*" prefix="config"/>
+			<zipfileset dir="${basedir}" includes="lib/*.jar, config/**/*.*, data/*.txt" excludes="config/log4j.properties, config/jppf.properties"/>
 		</zip>
 		<echo/>
 		<echo message="*** The file ${zip.file} is now ready to be deployed ***"/>
@@ -119,7 +118,8 @@
 		<property name="tar.gz.file" value="ftpserver-dist.tar.gz"/>
     <delete file="${tar.gz.file}" quiet="true"/>
   	<copy toDir="${lib.dir}" file="${result.file}"/>
-		<tar destfile="${tar.gz.file}" compression="gzip" basedir="${basedir}" includes="lib/*.*, config/**/*.*"/>
+		<tar destfile="${tar.gz.file}" compression="gzip" basedir="${basedir}"
+			includes="lib/*.*, config/**/*.*, data/*.txt" excludes="config/log4j.properties, config/jppf.properties"/>
 	  <delete file="${lib.dir}/${result.file}" quiet="true"/>
 		<echo/>
 		<echo message="*** The file ${tar.gz.file} is now ready to be deployed ***"/>
