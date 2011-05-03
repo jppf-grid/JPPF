@@ -25,6 +25,11 @@ public class Task extends JPPFTask {
         this.id = id;
     }
     
+    /**
+     * Get the shared Hazelcast map.
+     * @return a map of int keys to double values.
+     */
+    @SuppressWarnings("unchecked")
     private Map<Integer, Double> getMap()
     {
       String key = "sharedArray";

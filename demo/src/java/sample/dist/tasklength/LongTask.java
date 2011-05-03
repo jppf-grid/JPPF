@@ -17,8 +17,8 @@
  */
 package sample.dist.tasklength;
 
-import org.apache.commons.logging.*;
 import org.jppf.server.protocol.JPPFTask;
+import org.slf4j.*;
 
 /**
  * Instances of this class are defined as tasks with a predefined execution length, specified at their creation. 
@@ -29,7 +29,7 @@ public class LongTask extends JPPFTask
 	/**
 	 * Logger.
 	 */
-	private static Log log = LogFactory.getLog(LongTask.class);
+	private static Logger log = LoggerFactory.getLogger(LongTask.class);
 	/**
 	 * Determines how long this task will run.
 	 */
