@@ -224,7 +224,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	 */
 	public void outputStreamAltered(ProcessWrapperEvent event)
 	{
-		standardOutput.append(event.getContent()).append("\n");
+		standardOutput.append(event.getContent());
 	}
 
 	/**
@@ -234,6 +234,6 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	 */
 	public void errorStreamAltered(ProcessWrapperEvent event)
 	{
-		errorOutput.append(event.getContent()).append("\n");
+		errorOutput.append(event.getContent());
 	}
 }
