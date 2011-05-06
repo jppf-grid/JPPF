@@ -38,7 +38,7 @@ public class ProcessWrapperEvent extends EventObject
 
 	/**
 	 * Get the content of this event.
-	 * @return the content as a string.
+	 * @return the content as a string, which may include a line terminator.
 	 */
 	public String getContent()
 	{
