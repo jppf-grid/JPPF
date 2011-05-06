@@ -22,8 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.*;
 
-import org.jppf.utils.StringUtils;
-
 /**
  * Formats log records in format [yyyy/MM/dd hh:mm:ss.SSS][LEVEL][package.ClassName.method()]: message.
  * @author Laurent Cohen
@@ -45,7 +43,12 @@ public class JPPFLogFormatter extends Formatter
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(sdf.format(new Date(record.getMillis())));
-		sb.append("[").append(StringUtils.padRight(record.getLevel().getName(), ' ', 7)).append("]");
+		sb.append("[");
+		String name = record.getLevel().getName();
+		sb.append(name);
+		// pad to 7 chars 
+		for (int i=0; i<7-name.length(); i++) sb.append(' ');
+		sb.append("]");
 		sb.append("[");
 		/*
 		String s = record.getSourceClassName();
@@ -94,6 +97,7 @@ public class JPPFLogFormatter extends Formatter
 	 */
 	private String getShortName(String fqn)
 	{
+		if (fqn == null) return "";
 		int idx = fqn.lastIndexOf('.');
 		return idx >= 0 ? fqn.substring(idx+1) : fqn;
 	}
