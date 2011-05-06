@@ -87,7 +87,10 @@ public final class FileUtils
 	 */
 	public static String readTextFile(File file) throws IOException
 	{
-		return readTextFile(new FileReader(file));
+		Reader reader = new FileReader(file);
+		String result = readTextFile(reader);
+		reader.close();
+		return result;
 	}
 
 	/**
@@ -107,7 +110,9 @@ public final class FileUtils
 			if (is == null) return null;
 			reader = new InputStreamReader(is);
 		}
-		return readTextFile(reader);
+		String result = readTextFile(reader);
+		reader.close();
+		return result;
 	}
 
 	/**

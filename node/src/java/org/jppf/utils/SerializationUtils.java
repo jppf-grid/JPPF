@@ -52,13 +52,77 @@ public final class SerializationUtils
 	 * @param offset the position in the array of byte at which the serializatrion should start.
 	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
 	 */
+	public static byte[] writeBoolean(boolean value, byte[] data, int offset)
+	{
+		data[offset] = value ? (byte) 1 : 0;
+    return data;
+	}
+
+	/**
+	 * Serialize an int value into an array of bytes.
+	 * @param value the int value to serialize.
+	 * @param data the array of bytes into which to serialize the value.
+	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
+	 */
+	public static byte[] writeChar(char value, byte[] data, int offset)
+	{
+		int pos = offset;
+    data[pos++] = (byte) ((value >>>  8) & 0xFF);
+    data[pos++] = (byte) ((value       ) & 0xFF);
+    return data;
+	}
+
+	/**
+	 * Serialize an int value into an array of bytes.
+	 * @param value the int value to serialize.
+	 * @param data the array of bytes into which to serialize the value.
+	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
+	 */
+	public static byte[] writeShort(short value, byte[] data, int offset)
+	{
+		int pos = offset;
+    data[pos++] = (byte) ((value >>>  8) & 0xFF);
+    data[pos++] = (byte) ((value       ) & 0xFF);
+    return data;
+	}
+
+	/**
+	 * Serialize an int value into an array of bytes.
+	 * @param value the int value to serialize.
+	 * @param data the array of bytes into which to serialize the value.
+	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
+	 */
 	public static byte[] writeInt(int value, byte[] data, int offset)
 	{
 		int pos = offset;
     data[pos++] = (byte) ((value >>> 24) & 0xFF);
     data[pos++] = (byte) ((value >>> 16) & 0xFF);
     data[pos++] = (byte) ((value >>>  8) & 0xFF);
-    data[pos++] = (byte) ((value >>>  0) & 0xFF);
+    data[pos++] = (byte) ((value       ) & 0xFF);
+    return data;
+	}
+
+	/**
+	 * Serialize a long value into an array of bytes.
+	 * @param value the int value to serialize.
+	 * @param data the array of bytes into which to serialize the value.
+	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
+	 */
+	public static byte[] writeLong(long value, byte[] data, int offset)
+	{
+		int pos = offset;
+    data[pos++] = (byte) ((value >>> 56) & 0xFF);
+    data[pos++] = (byte) ((value >>> 48) & 0xFF);
+    data[pos++] = (byte) ((value >>> 40) & 0xFF);
+    data[pos++] = (byte) ((value >>> 32) & 0xFF);
+    data[pos++] = (byte) ((value >>> 24) & 0xFF);
+    data[pos++] = (byte) ((value >>> 16) & 0xFF);
+    data[pos++] = (byte) ((value >>>  8) & 0xFF);
+    data[pos++] = (byte) ((value       ) & 0xFF);
     return data;
 	}
 
@@ -73,7 +137,7 @@ public final class SerializationUtils
     os.write((byte) ((value >>> 24) & 0xFF));
     os.write((byte) ((value >>> 16) & 0xFF));
     os.write((byte) ((value >>>  8) & 0xFF));
-    os.write((byte) ((value >>>  0) & 0xFF));
+    os.write((byte) ((value       ) & 0xFF));
 	}
 
 	/**
@@ -132,19 +196,72 @@ public final class SerializationUtils
 	 * @param offset the position in the array of byte at which the serializatrion should start.
 	 * @return the int value read from the array of bytes
 	 */
+	public static boolean readBoolean(byte[] data, int offset)
+	{
+    return data[offset] != 0;
+	}
+
+	/**
+	 * Deserialize an int value from an array of bytes.
+	 * @param data the array of bytes into which to serialize the value.
+	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @return the int value read from the array of bytes
+	 */
+	public static char readChar(byte[] data, int offset)
+	{
+		int pos = offset;
+    int result = convertByte(data[pos++]) << 8;
+    result    += convertByte(data[pos++]);
+    return (char) result;
+	}
+
+	/**
+	 * Deserialize an int value from an array of bytes.
+	 * @param data the array of bytes into which to serialize the value.
+	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @return the int value read from the array of bytes
+	 */
+	public static short readShort(byte[] data, int offset)
+	{
+		int pos = offset;
+    int result = convertByte(data[pos++]) << 8;
+    result    += convertByte(data[pos++]);
+    return (short) result;
+	}
+
+	/**
+	 * Deserialize an int value from an array of bytes.
+	 * @param data the array of bytes into which to serialize the value.
+	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @return the int value read from the array of bytes
+	 */
 	public static int readInt(byte[] data, int offset)
 	{
 		int pos = offset;
     int result = convertByte(data[pos++]) << 24;
     result    += convertByte(data[pos++]) << 16;
     result    += convertByte(data[pos++]) <<  8;
-    result    += convertByte(data[pos++]) <<  0;
-		/*
-    int result = data[pos++] << 24;
-    result    += data[pos++] << 16;
-    result    += data[pos++] <<  8;
-    result    += data[pos++] <<  0;
-    */
+    result    += convertByte(data[pos++]);
+    return result;
+	}
+
+	/**
+	 * Deserialize an int value from an array of bytes.
+	 * @param data the array of bytes into which to serialize the value.
+	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @return the int value read from the array of bytes
+	 */
+	public static long readLong(byte[] data, int offset)
+	{
+		int pos = offset;
+    long result = convertByte(data[pos++]) << 56;
+    result     += convertByte(data[pos++]) << 48;
+    result     += convertByte(data[pos++]) << 40;
+    result     += convertByte(data[pos++]) << 32;
+    result     += convertByte(data[pos++]) << 24;
+    result     += convertByte(data[pos++]) << 16;
+    result     += convertByte(data[pos++]) <<  8;
+    result     += convertByte(data[pos++]);
     return result;
 	}
 
@@ -159,13 +276,26 @@ public final class SerializationUtils
     int result = convertByte(is.read()) << 24;
     result    += convertByte(is.read()) << 16;
     result    += convertByte(is.read()) <<  8;
-    result    += convertByte(is.read()) <<  0;
-		/*
-    int result = is.read() << 24;
-    result    += is.read() << 16;
-    result    += is.read() <<  8;
-    result    += is.read() <<  0;
-    */
+    result    += convertByte(is.read());
+    return result;
+	}
+
+	/**
+	 * Deserialize an int value from a stream.
+	 * @param is the stream to read from.
+	 * @return the int value read from the stream.
+	 * @throws IOException if an error occurs while reading the data.
+	 */
+	public static long readLong(InputStream is) throws IOException
+	{
+    long result = convertByte(is.read()) << 56;
+    result     += convertByte(is.read()) << 48;
+    result     += convertByte(is.read()) << 40;
+    result     += convertByte(is.read()) << 32;
+    result     += convertByte(is.read()) << 24;
+    result     += convertByte(is.read()) << 16;
+    result     += convertByte(is.read()) <<  8;
+    result     += convertByte(is.read());
     return result;
 	}
 

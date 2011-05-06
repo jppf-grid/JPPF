@@ -22,7 +22,7 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -63,6 +63,10 @@ public class Deserializer
 	 * The object currently being written.
 	 */
 	Object currentObject;
+	/**
+	 * Temporary buffer used to read arrays of primitive values from the stream.
+	 */
+	private byte[] buf = new byte[4096];
 
 	/**
 	 * Initialize this deserializer with the specified input stream.
@@ -219,6 +223,14 @@ public class Deserializer
 			switch(eltDesc.signature.charAt(0))
 			{
 				case 'B': byte[] barray = new byte[len];       obj = barray; in.read(barray, 0, len); break;
+				case 'S': obj = readShortArray(len); break;
+				case 'I': obj = readIntArray(len); break;
+				case 'J': obj = readIntArray(len); break;
+				case 'F': obj = readFloatArray(len); break;
+				case 'D': obj = readDoubleArray(len); break;
+				case 'C': obj = readCharArray(len); break;
+				case 'Z': obj = readBooleanArray(len); break;
+				/*
 				case 'S': short[] sarray = new short[len];     obj = sarray; for (int i=0; i<len; i++) sarray[i] = in.readShort(); break;
 				case 'I': int[] iarray = new int[len];         obj = iarray; for (int i=0; i<len; i++) iarray[i] = in.readInt(); break;
 				case 'J': long[] larray = new long[len];       obj = larray; for (int i=0; i<len; i++) larray[i] = in.readLong(); break;
@@ -226,6 +238,7 @@ public class Deserializer
 				case 'D': double[] darray = new double[len];   obj = darray; for (int i=0; i<len; i++) darray[i] = in.readDouble(); break;
 				case 'C': char[] carray = new char[len];       obj = carray; for (int i=0; i<len; i++) carray[i] = in.readChar(); break;
 				case 'Z': boolean[] zarray = new boolean[len]; obj = zarray; for (int i=0; i<len; i++) zarray[i] = in.readBoolean(); break;
+				*/
 			}
 			caches.handleToObjectMap.put(handle, obj);
 		}
@@ -305,5 +318,138 @@ public class Deserializer
 		return null;
 		*/
 		return ReflectionHelper.create(cd.clazz);
+	}
+
+	/**
+	 * Read an array of boolean values.
+	 * @param len the length of the array to read.
+	 * @return a boolean[] of the specified length.
+	 * @throws Exception if any error occurs.
+	 */
+	private boolean[] readBooleanArray(int len) throws Exception
+	{
+		boolean[] array = new boolean[len];
+		for (int count=0; count<len;)
+		{
+			int n = Math.min(buf.length, len-count);
+			in.read(buf, 0, n);
+			for (int i=0; i<n; i++) array[count+i] = buf[i] != 0;
+			count += n;
+		}
+		return array;
+	}
+
+	/**
+	 * Read an array of char values.
+	 * @param len the length of the array to read.
+	 * @return a char[] of the specified length.
+	 * @throws Exception if any error occurs.
+	 */
+	private char[] readCharArray(int len) throws Exception
+	{
+		char[] array = new char[len];
+		for (int count=0; count<len;)
+		{
+			int n = Math.min(buf.length/2, len-count);
+			in.read(buf, 0, 2*n);
+			for (int i=0; i<n; i++) array[count+i] = SerializationUtils.readChar(buf, 2*i);
+			count += n;
+		}
+		return array;
+	}
+
+	/**
+	 * Read an array of short values.
+	 * @param len the length of the array to read.
+	 * @return a short[] of the specified length.
+	 * @throws Exception if any error occurs.
+	 */
+	private short[] readShortArray(int len) throws Exception
+	{
+		short[] array = new short[len];
+		for (int count=0; count<len;)
+		{
+			int n = Math.min(buf.length/2, len-count);
+			in.read(buf, 0, 2*n);
+			for (int i=0; i<n; i++) array[count+i] = SerializationUtils.readShort(buf, 2*i);
+			count += n;
+		}
+		return array;
+	}
+
+	/**
+	 * Read an array of int values.
+	 * @param len the length of the array to read.
+	 * @return a int[] of the specified length.
+	 * @throws Exception if any error occurs.
+	 */
+	private int[] readIntArray(int len) throws Exception
+	{
+		int[] array = new int[len];
+		for (int count=0; count<len;)
+		{
+			int n = Math.min(buf.length/4, len-count);
+			in.read(buf, 0, 4*n);
+			for (int i=0; i<n; i++) array[count+i] = SerializationUtils.readInt(buf, 4*i);
+			count += n;
+		}
+		return array;
+	}
+
+	/**
+	 * Read an array of long values.
+	 * @param len the length of the array to read.
+	 * @return a long[] of the specified length.
+	 * @throws Exception if any error occurs.
+	 */
+	private long[] readLongArray(int len) throws Exception
+	{
+		long[] array = new long[len];
+		for (int count=0; count<len;)
+		{
+			int n = Math.min(buf.length/8, len-count);
+			in.read(buf, 0, 8*n);
+			for (int i=0; i<n; i++) array[count+i] = SerializationUtils.readLong(buf, 8*i);
+			count += n;
+		}
+		return array;
+	}
+
+	/**
+	 * Read an array of float values.
+	 * @param len the length of the array to read.
+	 * @return a float[] of the specified length.
+	 * @throws Exception if any error occurs.
+	 */
+	private float[] readFloatArray(int len) throws Exception
+	{
+		float[] array = new float[len];
+		for (int count=0; count<len;)
+		{
+			int n = Math.min(buf.length/4, len-count);
+			in.read(buf, 0, 4*n);
+			for (int i=0; i<n; i++) array[count+i] = Float.intBitsToFloat(SerializationUtils.readInt(buf, 4*i));
+			count += n;
+		}
+		return array;
+	}
+
+	/**
+	 * Read an array of double values.
+	 * @param len the length of the array to read.
+	 * @return a double[] of the specified length.
+	 * @throws Exception if any error occurs.
+	 */
+	private double[] readDoubleArray(int len) throws Exception
+	{
+		double[] array = new double[len];
+		for (int count=0; count<len;)
+		{
+			int n = Math.min(buf.length/8, len-count);
+			in.read(buf, 0, 8*n);
+			for (int i=0; i<n; i++) array[count+i] = Double.longBitsToDouble(SerializationUtils.readLong(buf, 8*i));
+			count += n;
+		}
+		return array;
 	}
 }

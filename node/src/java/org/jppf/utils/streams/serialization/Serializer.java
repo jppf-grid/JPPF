@@ -22,6 +22,7 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.util.*;
 
+import org.jppf.utils.SerializationUtils;
 import org.slf4j.*;
 
 /**
@@ -78,6 +79,10 @@ public class Serializer
 	 * The object currently being written.
 	 */
 	Object currentObject;
+	/**
+	 * Temporary buffer used to write arrays of primitive values to the stream.
+	 */
+	private byte[] buf = new byte[4096];
 
 	/**
 	 * Initialize this serializer with the specified output stream, and write the header.
@@ -218,6 +223,14 @@ public class Serializer
 			switch(eltDesc.signature.charAt(0))
 			{
 				case 'B': out.write((byte[]) obj, 0, n); break;
+				case 'S': writeShortArray((short[]) obj); break;
+				case 'I': writeIntArray((int[]) obj); break;
+				case 'J': writeLongArray((long[]) obj); break;
+				case 'F': writeFloatArray((float[]) obj); break;
+				case 'D': writeDoubleArray((double[]) obj); break;
+				case 'C': writeCharArray((char[]) obj); break;
+				case 'Z': writeBooleanArray((boolean[]) obj); break;
+				/*
 				case 'S': for (short v: (short[]) obj) out.writeShort(v); break;
 				case 'I': for (int v: (int[]) obj) out.writeInt(v); break;
 				case 'J': for (long v: (long[]) obj) out.writeLong(v); break;
@@ -225,6 +238,7 @@ public class Serializer
 				case 'D': for (double v: (double[]) obj) out.writeDouble(v); break;
 				case 'C': for (char v: (char[]) obj) out.writeChar(v); break;
 				case 'Z': for (boolean v: (boolean[]) obj) out.writeBoolean(v); break;
+				*/
 			}
 		}
 		else if (eltDesc.enumType)
@@ -258,5 +272,118 @@ public class Serializer
 		out.writeByte(CLASS_HEADER);
 		out.writeInt(map.size());
 		for (Map.Entry<Class<?>, ClassDescriptor> entry: map.entrySet()) entry.getValue().write(out);
+	}
+
+	/**
+	 * Write an array of booleans to the stream.
+	 * @param array the array of boolean values to write.
+	 * @throws Exception if any error occurs.
+	 */
+	private void writeBooleanArray(boolean[] array) throws Exception
+	{
+		for (int count=0; count < array.length;)
+		{
+			int n = Math.min(buf.length, array.length - count);
+			for (int i=0; i<n; i++) SerializationUtils.writeBoolean(array[count+i], buf, i);
+			out.write(buf, 0, n);
+			count += n;
+		}
+	}
+
+	/**
+	 * Write an array of chars to the stream.
+	 * @param array the array of char values to write.
+	 * @throws Exception if any error occurs.
+	 */
+	private void writeCharArray(char[] array) throws Exception
+	{
+		for (int count=0; count < array.length;)
+		{
+			int n = Math.min(buf.length / 2, array.length - count);
+			for (int i=0; i<n; i++) SerializationUtils.writeChar(array[count+i], buf, 2*i);
+			out.write(buf, 0, 2*n);
+			count += n;
+		}
+	}
+
+	/**
+	 * Write an array of chars to the stream.
+	 * @param array the array of char values to write.
+	 * @throws Exception if any error occurs.
+	 */
+	private void writeShortArray(short[] array) throws Exception
+	{
+		for (int count=0; count < array.length;)
+		{
+			int n = Math.min(buf.length / 2, array.length - count);
+			for (int i=0; i<n; i++) SerializationUtils.writeShort(array[count+i], buf, 2*i);
+			out.write(buf, 0, 2*n);
+			count += n;
+		}
+	}
+
+	/**
+	 * Write an array of ints to the stream.
+	 * @param array the array of int values to write.
+	 * @throws Exception if any error occurs.
+	 */
+	private void writeIntArray(int[] array) throws Exception
+	{
+		for (int count=0; count < array.length;)
+		{
+			int n = Math.min(buf.length / 4, array.length - count);
+			for (int i=0; i<n; i++) SerializationUtils.writeInt(array[count+i], buf, 4*i);
+			out.write(buf, 0, 4*n);
+			count += n;
+		}
+	}
+
+	/**
+	 * Write an array of longs to the stream.
+	 * @param array the array of long values to write.
+	 * @throws Exception if any error occurs.
+	 */
+	private void writeLongArray(long[] array) throws Exception
+	{
+		for (int count=0; count < array.length;)
+		{
+			int n = Math.min(buf.length / 8, array.length - count);
+			for (int i=0; i<n; i++) SerializationUtils.writeLong(array[count+i], buf, 8*i);
+			out.write(buf, 0, 8*n);
+			count += n;
+		}
+	}
+
+	/**
+	 * Write an array of floats to the stream.
+	 * @param array the array of float values to write.
+	 * @throws Exception if any error occurs.
+	 */
+	private void writeFloatArray(float[] array) throws Exception
+	{
+		for (int count=0; count < array.length;)
+		{
+			int n = Math.min(buf.length / 4, array.length - count);
+			
+			for (int i=0; i<n; i++) SerializationUtils.writeInt(Float.floatToIntBits(array[count+i]), buf, 4*i);
+			out.write(buf, 0, 4*n);
+			count += n;
+		}
+	}
+
+	/**
+	 * Write an array of doubles to the stream.
+	 * @param array the array of double values to write.
+	 * @throws Exception if any error occurs.
+	 */
+	private void writeDoubleArray(double[] array) throws Exception
+	{
+		for (int count=0; count < array.length;)
+		{
+			int n = Math.min(buf.length / 8, array.length - count);
+			for (int i=0; i<n; i++) SerializationUtils.writeLong(Double.doubleToLongBits(array[count+i]), buf, 8*i);
+			out.write(buf, 0, 8*n);
+			count += n;
+		}
 	}
 }
