@@ -29,7 +29,6 @@
 		<antcall target="compile.module"><param name="path" value="${admin}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${server}"/></antcall>
 		<antcall target="compile.module"><param name="path" value="${demo}"/></antcall>
-		<antcall target="compile.module"><param name="path" value="${ftpserver}"/></antcall>
   </target>
 
 	<target name="compile.module">
@@ -68,7 +67,6 @@
 		<antcall target="jar.module"><param name="module" value="client"/></antcall>
 		<antcall target="jar.module"><param name="module" value="server"/></antcall>
 		<antcall target="jar.module"><param name="module" value="demo"/></antcall>
-		<antcall target="jar.module"><param name="module" value="ftpserver"/></antcall>
 	</target>
 
 	<target name="jar.module">
@@ -102,7 +100,6 @@
 		<antcall target="jar.src.module"><param name="module" value="client"/></antcall>
 		<antcall target="jar.src.module"><param name="module" value="server"/></antcall>
 		<antcall target="jar.src.module"><param name="module" value="demo"/></antcall>
-		<antcall target="jar.src.module"><param name="module" value="ftpserver"/></antcall>
 	</target>
 
 	<target name="jar.src.module">
