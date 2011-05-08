@@ -4,7 +4,8 @@ $template{name="about-page-header" title="Home"}$
 	<script src="scripts/tabs.min.js"></script>
 	<script src="scripts/tabs.slideshow.min.js"></script>
 	<script src="scripts/jppf.js"></script>
-	<div style="vertical-align: middle; height: 250px; width: 750px; background-image: url('/images/test1.gif'); background-repeat: no-repeat; background-attachment: scroll">
+	<!--<div style="vertical-align: middle; height: 250px; width: 750px; background-image: url('/images/test1.gif'); background-repeat: no-repeat; background-attachment: scroll">-->
+	<div style="vertical-align: middle; height: 150px; width: 750px;">
 		<div align="center" id="images" style="vertical-align: middle; height: 150px; width: 700px;">
 			<div><img src="/images/anim/Animation2.gif" border="0" alt="JPPF"/></div>
 			<div><img src="/images/anim/Animation4.gif" border="0" alt="JPPF"/></div>
