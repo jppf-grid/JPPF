@@ -22,8 +22,8 @@ import java.io.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFJob;
+import org.jppf.serialization.*;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.streams.serialization.*;
 
 import sample.dist.tasklength.LongTask;
 
@@ -85,7 +85,7 @@ public class Test
 		Test test = new Test();
 		byte[] data = test.serialize(bundle);
 		JPPFTaskBundle bundle2 = (JPPFTaskBundle) test.deserialize(data);
-		print("the end");
+		print("the end 2");
 	}
 
 	/**
