@@ -322,4 +322,22 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	{
 		return classLoaderMap.get(uuid);
 	}
+
+	/**
+	 * Determine whether local execution is enabled on this client.
+	 * @return <code>true</code> if local execution is enabled, <code>false</code> otherwise.
+	 */
+	public boolean isLocalExecutionEnabled()
+	{
+		return loadBalancer == null ? false : loadBalancer.isLocalEnabled();
+	}
+
+	/**
+	 * Specifiy whether local execution is enabled on this client.
+	 * @param localExecutionEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
+	 */
+	public void setLocalExecutionEnabled(boolean localExecutionEnabled)
+	{
+		if (loadBalancer != null) loadBalancer.setLocalEnabled(localExecutionEnabled);
+	}
 }

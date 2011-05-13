@@ -181,7 +181,7 @@ public class MatrixRunner implements NotificationListener
 		job.setDataProvider(new MemoryMapDataProvider());
 		job.getDataProvider().setValue(MatrixTask.DATA_KEY, b);
 		job.getJobSLA().setExecutionPolicy(policy);
-		job.getJobSLA().setMaxNodes(8);
+		//job.getJobSLA().setMaxNodes(8);
 		// submit the tasks for execution
 		List<JPPFTask> results = jppfClient.submit(job);
 		// initialize the resulting matrix

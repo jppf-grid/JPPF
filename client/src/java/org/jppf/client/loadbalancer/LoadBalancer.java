@@ -60,6 +60,10 @@ public class LoadBalancer
 	 */
 	private boolean localEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.local.execution.enabled", false);
 	/**
+	 * Determines whether local execution has already been initialized.
+	 */
+	private boolean localInitialized = false;
+	/**
 	 * Thread pool for local execution.
 	 */
 	private ExecutorService threadPool = null;
@@ -78,23 +82,30 @@ public class LoadBalancer
   @SuppressWarnings("unchecked")
 	public LoadBalancer()
 	{
-		if (localEnabled)
-		{
-			int n = Runtime.getRuntime().availableProcessors();
-			int poolSize = JPPFConfiguration.getProperties().getInt("jppf.local.execution.threads", n);
-			log.info("local execution enabled with " + poolSize + " processing threads");
-			LinkedBlockingQueue queue = new LinkedBlockingQueue();
-			threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("client processing thread"));
-			ProportionalTuneProfile profile = new ProportionalTuneProfile();
-			profile.setPerformanceCacheSize(2000);
-			profile.setProportionalityFactor(4);
-			bundlers = new ClientProportionalBundler[2];
-			bundlers[LOCAL] = new ClientProportionalBundler(profile);
-			bundlers[REMOTE] = new ClientProportionalBundler(profile);
-			for (Bundler b: bundlers) b.setup();
-		}
+		if (isLocalEnabled()) initLocal();
 	}
 
+  /**
+   * Perform the required initialization for local execution.
+   */
+  private synchronized void initLocal()
+  {
+  	if (localInitialized) return;
+		int n = Runtime.getRuntime().availableProcessors();
+		int poolSize = JPPFConfiguration.getProperties().getInt("jppf.local.execution.threads", n);
+		log.info("local execution enabled with " + poolSize + " processing threads");
+		LinkedBlockingQueue queue = new LinkedBlockingQueue();
+		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("client processing thread"));
+		ProportionalTuneProfile profile = new ProportionalTuneProfile();
+		profile.setPerformanceCacheSize(2000);
+		profile.setProportionalityFactor(4);
+		bundlers = new ClientProportionalBundler[2];
+		bundlers[LOCAL] = new ClientProportionalBundler(profile);
+		bundlers[REMOTE] = new ClientProportionalBundler(profile);
+		for (Bundler b: bundlers) b.setup();
+		localInitialized = true;
+  }
+ 
 	/**
 	 * Stop this load-balancer and cleanup any resource it uses.
 	 */
@@ -114,7 +125,7 @@ public class LoadBalancer
 		int count = 0;
 		List<JPPFTask> tasks = job.getTasks();
 		//for (JPPFTask task : tasks) task.setPosition(count++);
-		if (localEnabled && locallyExecuting.compareAndSet(false, true))
+		if (isLocalEnabled() && locallyExecuting.compareAndSet(false, true))
 		{
 			try
 			{
@@ -413,7 +424,23 @@ public class LoadBalancer
 	 */
 	public boolean isLocalEnabled()
 	{
-		return localEnabled;
+		synchronized(this)
+		{
+			return localEnabled;
+		}
+	}
+
+	/**
+	 * Specifiy whether local execution is enabled on this client.
+	 * @param localEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
+	 */
+	public void setLocalEnabled(boolean localEnabled)
+	{
+		synchronized(this)
+		{
+			if (localEnabled && !this.localEnabled) initLocal();
+			this.localEnabled = localEnabled;
+		}
 	}
 
 	/**
