@@ -45,7 +45,10 @@ public class LongTaskRunner
 	 * JPPF client used to submit execution requests.
 	 */
 	private static JPPFClient jppfClient = null;
-
+	/**
+	 * JMX conenction to the driver.
+	 */
+	private static JMXDriverConnectionWrapper jmx = null;
 	/**
 	 * Entry point for this class, submits the tasks with a set duration to the server.
 	 * @param args not used.
@@ -60,9 +63,9 @@ public class LongTaskRunner
 			int nbTask = props.getInt("longtask.number");
 			int iterations = props.getInt("longtask.iterations");
 			print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
-			perform(nbTask, length, iterations);
+			//perform(nbTask, length, iterations);
 			//perform3(nbTask, length, iterations);
-			//perform4();
+			perform4();
 			//perform5();
 		}
 		catch(Exception e)
@@ -117,9 +120,8 @@ public class LongTaskRunner
 				totalTime += elapsed;
 			}
 			print("Average iteration time: "+StringUtils.toStringDuration(totalTime/iterations));
-			JPPFStats stats = jppfClient.requestStatistics();
+			JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
 			print("End statistics :\n"+stats.toString());
-	
 		}
 		catch(Exception e)
 		{
@@ -256,11 +258,17 @@ public class LongTaskRunner
 	 */
 	private static void perform4() throws Exception
 	{
-		System.out.println("\n********** job suspend/resume test **********");
+		//System.out.println("\n********** job suspend/resume test **********");
+		print("\n********** driver restart test **********");
+		print("getting the jmx connection");
 		long start = System.currentTimeMillis();
+		getJmxConnection();
+		long elapsed = System.currentTimeMillis() - start;
+		print("got it in " + elapsed + " ms");
+		start = System.currentTimeMillis();
 		JPPFJob job = new JPPFJob();
 		job.setId("Long task job");
-		LongTask task = new LongTask(8000L, false);
+		LongTask task = new LongTask(10000L, false);
 		task.setId("1");
 		job.addTask(task);
 		JPPFResultCollector collector = new JPPFResultCollector(1);
@@ -268,7 +276,6 @@ public class LongTaskRunner
 		job.setBlocking(false);
 		jppfClient.submit(job);
 		/*
-		*/
 		DriverJobManagementMBean jobManager = getJobManagement();
 		Thread.sleep(3000L);
 		System.out.println("suspending the job");
@@ -277,15 +284,19 @@ public class LongTaskRunner
 		Thread.sleep(3000L);
 		System.out.println("resuming the job");
 		jobManager.resumeJob(job.getJobUuid());
+		*/
+		Thread.sleep(2000L);
+		print("restarting the driver");
+		restartDriver();
 		List<JPPFTask> results = collector.waitForResults();
 		for (JPPFTask t: results)
 		{
 			Exception e = task.getException();
 			if (e != null) throw e;
-			else System.out.println("result for task " + t.getId() + " : " + t.getResult());
+			else print("result for task " + t.getId() + " : " + t.getResult());
 		}
-		long elapsed = System.currentTimeMillis() - start;
-		print("Iteration performed in "+StringUtils.toStringDuration(elapsed));
+		elapsed = System.currentTimeMillis() - start;
+		print("Iteration performed in " + StringUtils.toStringDuration(elapsed));
 	}
 
 	/**
@@ -336,8 +347,47 @@ public class LongTaskRunner
 	 */
 	private static DriverJobManagementMBean getJobManagement() throws Exception
 	{
-		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
-		JMXDriverConnectionWrapper wrapper = c.getJmxConnection();
-		return wrapper.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+		return getJmxConnection().getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+	}
+
+	/**
+	 * Get the jmx connection to the driver.
+	 * @return a {@link JMXDriverConnectionWrapper} instance.
+	 */
+	private static JMXDriverConnectionWrapper getJmxConnection()
+	{
+		if (jmx == null)
+		{
+			JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
+			jmx = c.getJmxConnection();
+			boolean b = jmx.isConnected();
+			if (!b) jmx.connect();
+		}
+		return jmx;
+	}
+
+	/**
+	 * Restart the driver.
+	 * @throws Exception if any error occurs.
+	 */
+	private static void restartDriver() throws Exception
+	{
+		Runnable r = new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					String s = getJmxConnection().restartShutdown(100L, 2000L);
+					System.out.println("response for restart: " + s);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		};
+		//new Thread(r).start();
+		r.run();
 	}
 }

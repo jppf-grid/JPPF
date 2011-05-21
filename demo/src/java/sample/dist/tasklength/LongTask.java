@@ -80,27 +80,28 @@ public class LongTask extends JPPFTask
 		System.out.println("Starting task " + getId());
 		taskStart = System.currentTimeMillis();
 		long elapsed = 0L;
-		if (useCPU)
+		try
 		{
-			for (; elapsed < taskLength; elapsed = System.currentTimeMillis() - taskStart)
+			if (useCPU)
 			{
-				String s = "";
-				for (int i=0; i<10; i++) s += "A"+"10";
+				for (; elapsed < taskLength; elapsed = System.currentTimeMillis() - taskStart)
+				{
+					String s = "";
+					for (int i=0; i<10; i++) s += "A"+"10";
+				}
 			}
-		}
-		else
-		{
-			try
+			else
 			{
 				Thread.sleep(taskLength);
-				setResult("task has run for " + elapsed + " ms");
-				System.out.println("Task " + getId() + " complete");
+				elapsed = System.currentTimeMillis() - taskStart;
 			}
-			catch(InterruptedException e)
-			{
-				//setException(e);
-				setResult(e.getMessage());
-			}
+			setResult("task has run for " + elapsed + " ms");
+			System.out.println("Task " + getId() + " complete");
+		}
+		catch(InterruptedException e)
+		{
+			//setException(e);
+			setResult(e.getClass().getName() + " : " + e.getMessage());
 		}
 	}
 
