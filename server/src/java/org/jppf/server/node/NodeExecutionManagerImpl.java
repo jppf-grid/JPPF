@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
+import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.node.NodeExecutionManager;
 import org.jppf.scheduling.*;
 import org.jppf.server.protocol.*;
@@ -86,6 +87,10 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 * Determines whether the number of threads or their priority has changed.
 	 */
 	private AtomicBoolean configChanged = new AtomicBoolean(true);
+	/**
+	 * Set if the node must reconnect to the driver. 
+	 */
+	private JPPFNodeReconnectionNotification reconnectionNotification = null;
 
 	/**
 	 * Initialize this execution manager with the specified node.
@@ -194,7 +199,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 		{
 			future.cancel(true);
 			JPPFTask task = taskMap.remove(number);
-			if (task != null) task.onCancel();
+			if (task != null && callOnCancel) task.onCancel();
 			removeFuture(number);
 		}
 	}
@@ -309,7 +314,15 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 */
 	public synchronized void waitForResults() throws Exception
 	{
-		while (!futureMap.isEmpty()) goToSleep();
+		while (!futureMap.isEmpty() && (getReconnectionNotification() == null))
+		{
+			goToSleep();
+		}
+		if (getReconnectionNotification() != null)
+		{
+			cancelAllTasks(false, false);
+			throw reconnectionNotification;
+		}
 	}
 
 	/**
@@ -418,5 +431,24 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	public boolean checkConfigChanged()
 	{
 		return configChanged.compareAndSet(true, false);
+	}
+
+	/**
+	 * Get the notification that the node must reconnect to the driver. 
+	 * @return a {@link JPPFNodeReconnectionNotification} instance. 
+	 */
+	synchronized JPPFNodeReconnectionNotification getReconnectionNotification()
+	{
+		return reconnectionNotification;
+	}
+
+	/**
+	 * Set the notification that the node must reconnect to the driver. 
+	 * @param reconnectionNotification a {@link JPPFNodeReconnectionNotification} instance.
+	 */
+	synchronized void setReconnectionNotification(JPPFNodeReconnectionNotification reconnectionNotification)
+	{
+		if (this.reconnectionNotification != null) return;
+		this.reconnectionNotification = reconnectionNotification;
 	}
 }

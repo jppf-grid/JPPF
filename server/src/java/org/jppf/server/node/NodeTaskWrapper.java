@@ -19,7 +19,7 @@ package org.jppf.server.node;
 
 import java.util.List;
 
-import org.jppf.JPPFException;
+import org.jppf.*;
 import org.jppf.management.JPPFNodeAdmin;
 import org.jppf.server.protocol.JPPFTask;
 
@@ -50,6 +50,10 @@ class NodeTaskWrapper implements Runnable
 	 * The execution manager.
 	 */
 	private NodeExecutionManagerImpl executionManager = null;
+	/**
+	 * Set if the node must reconnect to the driver. 
+	 */
+	private JPPFNodeReconnectionNotification reconnectionNotification = null;
 
 	/**
 	 * Initialize this task wrapper with a specified JPPF task.
@@ -104,6 +108,10 @@ class NodeTaskWrapper implements Runnable
 			{
 			}
 		}
+		catch(JPPFNodeReconnectionNotification t)
+		{
+			reconnectionNotification = t;
+		}
 		catch(Throwable t)
 		{
 			if (t instanceof Exception) task.setException((Exception) t);
@@ -111,10 +119,25 @@ class NodeTaskWrapper implements Runnable
 		}
 		finally
 		{
-			if (nodeAdmin != null) nodeAdmin.taskEnded(task.getId());
-			task.removeJPPFTaskListener(nodeAdmin);
-			if (node.isNotifying()) node.decrementExecutingCount();
-			executionManager.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
+			if (reconnectionNotification == null)
+			{
+				try
+				{
+					if (nodeAdmin != null) nodeAdmin.taskEnded(task.getId());
+					task.removeJPPFTaskListener(nodeAdmin);
+					if (node.isNotifying()) node.decrementExecutingCount();
+					executionManager.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
+				}
+				catch(JPPFNodeReconnectionNotification t)
+				{
+					reconnectionNotification = t;
+				}
+			}
+			if (reconnectionNotification != null)
+			{
+				executionManager.setReconnectionNotification(reconnectionNotification);
+				executionManager.wakeUp();
+			}
 		}
 	}
 

@@ -194,6 +194,7 @@ class WaitingNodeRequestState extends ClassServerState
 	{
 		ChannelWrapper result = null;
 		List<ChannelWrapper<?>> connections = server.getProviderConnections(uuid);
+		if (connections == null) return null;
 		int minRequests = Integer.MAX_VALUE;
 		for (ChannelWrapper channel: connections)
 		{

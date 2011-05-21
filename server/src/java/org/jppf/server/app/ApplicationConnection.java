@@ -18,11 +18,15 @@
 package org.jppf.server.app;
 
 import java.net.*;
+import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -131,6 +135,15 @@ class ApplicationConnection extends JPPFConnection
 	protected void executeTasks() throws Exception
 	{
 		JPPFTaskBundle header = headerWrapper.getBundle();
+		header.getUuidPath().incPosition();
+		String uuid = header.getUuidPath().getCurrentElement();
+		ClassNioServer classServer = JPPFDriver.getInstance().getClassServer();
+		List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
+		while ((list == null) || list.isEmpty())
+		{
+			Thread.sleep(1L);
+			list = classServer.getProviderConnections(uuid);
+		}
 		int count = header.getTaskCount();
 		if (debugEnabled) log.debug("Received " + count + " tasks");
 
@@ -171,7 +184,7 @@ class ApplicationConnection extends JPPFConnection
 	public void close()
 	{
 		if (debugEnabled) log.debug("closing " + this);
-		jobEnded();
+		cancelJobOnClose();
 		super.close();
 		driver.getStatsManager().clientConnectionClosed();
 	}
@@ -184,6 +197,31 @@ class ApplicationConnection extends JPPFConnection
 		if (currentJobId != null)
 		{
 			currentJobId = null;
+			JPPFDriver.getInstance().getJobManager().jobEnded(headerWrapper);
+		}
+	}
+
+	/**
+	 * Send the job ended notification.
+	 */
+	private synchronized void cancelJobOnClose()
+	{
+		if (currentJobId != null)
+		{
+			currentJobId = null;
+			JPPFTaskBundle header = headerWrapper.getBundle();
+			header.setCompletionListener(null);
+			JMXDriverConnectionWrapper wrapper = new JMXDriverConnectionWrapper();
+			wrapper.connect();
+			try
+			{
+				wrapper.cancelJob(header.getJobUuid());
+			}
+			catch (Exception e)
+			{
+				if (debugEnabled) log.error(e.getMessage(), e);
+				else log.warn(e.getMessage());
+			}
 			JPPFDriver.getInstance().getJobManager().jobEnded(headerWrapper);
 		}
 	}

@@ -195,6 +195,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	public void addProviderConnection(String uuid, ChannelWrapper<?> channel)
 	{
+		if (debugEnabled) log.debug("adding provider connection: uuid=" + uuid + ", channel=" + channel);
 		synchronized(providerConnections)
 		{
 			List<ChannelWrapper<?>> list = providerConnections.get(uuid);
@@ -214,6 +215,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	public void removeProviderConnection(String uuid, ChannelWrapper channel)
 	{
+		if (debugEnabled) log.debug("removing provider connection: uuid=" + uuid + ", channel=" + channel);
 		synchronized(providerConnections)
 		{
 			List<ChannelWrapper<?>> list = providerConnections.get(uuid);
@@ -291,6 +293,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	void addNodeConnection(String uuid, ChannelWrapper<?> channel)
 	{
+		if (debugEnabled) log.debug("adding node connection: uuid=" + uuid + ", channel=" + channel);
 		synchronized(nodeConnections)
 		{
 			nodeConnections.put(uuid, channel);
@@ -304,6 +307,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	ChannelWrapper<?> removeNodeConnection(String uuid)
 	{
+		if (debugEnabled) log.debug("removing node connection: uuid=" + uuid);
 		synchronized(nodeConnections)
 		{
 			return nodeConnections.remove(uuid);

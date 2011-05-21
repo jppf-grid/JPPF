@@ -88,12 +88,14 @@ public class JPPFRemoteContainer extends JPPFContainer
 				if (traceEnabled) log.trace("i = " + i + ", read data size = " + dl.getSize());
 				futureList.add(executor.submit(new ObjectDeserializationTask(dl, i)));
 			}
+			Throwable t = null;
 			for (Future<Object> f: futureList)
 			{
 				Object o = f.get();
-				if (o instanceof Throwable) throw (Throwable) o;
-				list.add(o);
+				if ((o instanceof Throwable) && (t == null)) t = (Throwable) o;
+				if (t == null) list.add(o);
 			}
+			if (t != null) throw t;
 			return 0;
 		}
 		finally
