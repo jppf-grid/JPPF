@@ -44,6 +44,16 @@ public class TaskResultEvent extends EventObject
 	}
 
 	/**
+	 * Initialize this event with a throwable eventually raised while receiving the results.
+	 * A <code>TaskResultListener</code> can use this information to reset its state before the job is resubmitted.
+	 * @param throwable the throwable that was raised while receiving the results.
+	 */
+	public TaskResultEvent(Throwable throwable)
+	{
+		super(throwable);
+	}
+
+	/**
 	 * Initialize this event with a specified list of tasks and start index.
 	 * @param taskList the list of tasks whose results have been received from the server.
 	 * @param startIndex index of the first task in the list, relative to the initial execution
@@ -65,7 +75,8 @@ public class TaskResultEvent extends EventObject
   @SuppressWarnings("unchecked")
 	public List<JPPFTask> getTaskList()
 	{
-		return (List<JPPFTask>) getSource();
+  	Object o = getSource();
+		return (o instanceof Throwable) ? null : (List<JPPFTask>) getSource();
 	}
 
 	/**
@@ -76,5 +87,15 @@ public class TaskResultEvent extends EventObject
 	public int getStartIndex()
 	{
 		return startIndex;
+	}
+
+	/**
+	 * Get the throwable eventually raised while receiving the results.
+	 * @return a <code>Throwable</code> instance, or null if no exception or error was raised.
+	 */
+	public Throwable getThrowable()
+	{
+  	Object o = getSource();
+		return (o instanceof Throwable) ? (Throwable) o : null;
 	}
 }

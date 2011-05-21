@@ -20,8 +20,7 @@ package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.FAILED;
 
-import java.util.*;
-import java.util.concurrent.Future;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.JPPFError;
@@ -107,6 +106,27 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 					taskServerConnectionStatusChanged(event);
 				}
 			});
+			connect();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+			setStatus(FAILED);
+		}
+		catch(JPPFError e)
+		{
+			setStatus(FAILED);
+			throw e;
+		}
+	}
+
+	/**
+	 * Connect to the driver.
+	 */
+	public void connect()
+	{
+		try
+		{
 			delegate.init();
 			initCredentials();
 			if (!delegate.isClosed())
@@ -163,7 +183,8 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	public void submit(JPPFJob job) throws Exception
 	{
 		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(this, job);
-		executor.submit(proc, proc);
+		getClient().getExecutor().submit(proc, proc);
+		//executor.submit(proc, proc);
 		if (debugEnabled) log.debug("["+name+"] submitted " + job.getTasks().size() + " tasks");
 	}
 
@@ -188,6 +209,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 				if (debugEnabled) log.debug("[" + name + "] "+ e.getMessage(), e);
 				else log.error("[" + name + "] "+ e.getMessage());
 			}
+			/*
 			List<Runnable> pending = new ArrayList<Runnable>();
 			pending.addAll(executor.shutdownNow());
 			List<JPPFJob> result = new ArrayList<JPPFJob>();
@@ -207,6 +229,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 				}
 			}
 			return result;
+			*/
 		}
 		return null;
 	}

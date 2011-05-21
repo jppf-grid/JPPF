@@ -38,7 +38,7 @@ public class AsynchronousResultProcessor implements Runnable
 	/**
 	 * Client connection owning this results processor.
 	 */
-	private final JPPFClientConnectionImpl connection;
+	private JPPFClientConnectionImpl connection;
 	/**
 	 * The execution processed by this task.
 	 */
@@ -70,28 +70,38 @@ public class AsynchronousResultProcessor implements Runnable
 			//for (JPPFTask task : job.getTasks()) task.setPosition(count++);
 			count = 0;
 			boolean completed = false;
-			try
+			while (!completed)
 			{
-				connection.getLoadBalancer().execute(job, connection);
-			}
-			catch(NotSerializableException e)
-			{
-				throw e;
-			}
-			catch(InterruptedException e)
-			{
-				throw e;
-			}
-			catch(Exception e)
-			{
-				log.error("["+connection.getName()+"] "+e.getMessage(), e);
-				connection.getTaskServerConnection().init();
+				try
+				{
+					connection.getLoadBalancer().execute(job, connection);
+					completed = true;
+				}
+				catch(NotSerializableException e)
+				{
+					throw e;
+				}
+				catch(InterruptedException e)
+				{
+					throw e;
+				}
+				catch(Exception e)
+				{
+					log.error("["+connection.getName()+"] "+ e.getClass().getName() + ": " + e.getMessage(), e);
+					final JPPFClient client = (JPPFClient) connection.getClient();
+					JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) client.getClientConnection();
+					if (c == null) throw e;
+					connection.setCurrentJob(null);
+					connection.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.FAILED);
+					connection = c;
+					connection.setCurrentJob(job);
+				}
 			}
 		}
 		catch(Exception e)
 		{
 			error = true;
-			log.error("["+connection.getName()+"] "+e.getMessage(), e);
+			log.error("["+connection.getName()+"] "+ e.getClass().getName() + ": " + e.getMessage(), e);
 		}
 		finally
 		{

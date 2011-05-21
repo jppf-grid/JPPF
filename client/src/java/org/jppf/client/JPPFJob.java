@@ -293,7 +293,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	public void setResultListener(TaskResultListener resultsListener)
 	{
 		this.resultsListener = resultsListener;
-		blocking = false;
+		//blocking = false;
 	}
 
 	/**

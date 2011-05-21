@@ -22,7 +22,6 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.nio.channels.AsynchronousCloseException;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.locks.*;
 
 import org.jppf.JPPFException;
@@ -123,10 +122,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * Determines whether this connection has been shut down;
 	 */
 	protected boolean isShutdown = false;
-	/**
-	 * The pool of threads used for submitting execution requests.
-	 */
-	protected ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
 	/**
 	 * The JPPF client that owns this connection.
 	 */
@@ -378,9 +373,12 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
 	 * @see org.jppf.client.JPPFClientConnection#getStatus()
 	 */
-	public synchronized JPPFClientConnectionStatus getStatus()
+	public JPPFClientConnectionStatus getStatus()
 	{
-		return status;
+		synchronized(status)
+		{
+			return status;
+		}
 	}
 
 	/**
@@ -388,11 +386,14 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @param status  a <code>JPPFClientConnectionStatus</code> enumerated value.
 	 * @see org.jppf.client.JPPFClientConnection#setStatus(org.jppf.client.JPPFClientConnectionStatus)
 	 */
-	public synchronized void setStatus(JPPFClientConnectionStatus status)
+	public void setStatus(JPPFClientConnectionStatus status)
 	{
-		JPPFClientConnectionStatus oldStatus = getStatus();
-		this.status = status;
-		if (!status.equals(oldStatus)) fireStatusChanged(oldStatus);
+		synchronized(this.status)
+		{
+			JPPFClientConnectionStatus oldStatus = getStatus();
+			this.status = status;
+			if (!status.equals(oldStatus)) fireStatusChanged(oldStatus);
+		}
 	}
 
 	/**
@@ -400,9 +401,12 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @param listener the listener to add to the list.
 	 * @see org.jppf.client.JPPFClientConnection#addClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
 	 */
-	public synchronized void addClientConnectionStatusListener(ClientConnectionStatusListener listener)
+	public void addClientConnectionStatusListener(ClientConnectionStatusListener listener)
 	{
-		listeners.add(listener);
+		synchronized(listeners)
+		{
+			listeners.add(listener);
+		}
 	}
 
 	/**
@@ -410,19 +414,26 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @param listener the listener to remove from the list.
 	 * @see org.jppf.client.JPPFClientConnection#removeClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
 	 */
-	public synchronized void removeClientConnectionStatusListener(ClientConnectionStatusListener listener)
+	public void removeClientConnectionStatusListener(ClientConnectionStatusListener listener)
 	{
-		listeners.remove(listener);
+		synchronized(listeners)
+		{
+			listeners.remove(listener);
+		}
 	}
 
 	/**
 	 * Notify all listeners that the status of this connection has changed.
 	 * @param oldStatus the connection status before the change.
 	 */
-	protected synchronized void fireStatusChanged(JPPFClientConnectionStatus oldStatus)
+	protected void fireStatusChanged(JPPFClientConnectionStatus oldStatus)
 	{
 		ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
-		ClientConnectionStatusListener[] array = listeners.toArray(new ClientConnectionStatusListener[0]);
+		ClientConnectionStatusListener[] array = null;
+		synchronized(listeners)
+		{
+			array = listeners.toArray(new ClientConnectionStatusListener[0]);
+		}
 		for (ClientConnectionStatusListener listener: array)
 		{
 			listener.statusChanged(event);

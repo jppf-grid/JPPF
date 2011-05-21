@@ -44,6 +44,10 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Determines if the handshake with the server has been performed.
+	 */
+	private boolean handshakeDone = false;
 
 	/**
 	 * Initialize class server delegate with a specified application uuid.
@@ -71,10 +75,13 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	{
 		try
 		{
+			handshakeDone = false;
 			socketInitializer.setName("[" + getName() + " - delegate] ");
 			setStatus(CONNECTING);
 			if (socketClient == null) initSocketClient();
-			System.out.println("[client: " + getName() + "] Attempting connection to the class server at " + host + ":" + port);
+			String msg = "[client: " + getName() + "] Attempting connection to the class server at " + host + ":" + port;
+			System.out.println(msg);
+			log.info(msg);
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isSuccessfull() && !socketInitializer.isClosed())
 			{
@@ -82,7 +89,9 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			}
 			if (!socketInitializer.isClosed())
 			{
-				System.out.println("[client: "+getName()+"] Reconnected to the class server");
+				msg = "[client: "+getName()+"] Reconnected to the class server";
+				System.out.println(msg);
+				log.info(msg);
 				setStatus(ACTIVE);
 			}
 		}
@@ -101,15 +110,12 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	{
 		try
 		{
-			JPPFResourceWrapper resource = new JPPFResourceWrapper();
-			resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
-			resource.addUuid(appUuid);
-			writeResource(resource);
-			resource = readResource();
+			JPPFResourceWrapper resource;
 			while (!stop)
 			{
 				try
 				{
+					if (!handshakeDone) handshake();
 					boolean found = true;
 					resource = readResource();
 					String name = resource.getName();
@@ -148,6 +154,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 					{
 						log.warn("["+getName()+"] caught " + e + ", will re-initialise ...", e);
 						init();
+						if  (debugEnabled) log.debug("["+this.getName()+"] : successfully iniitalized");
 					}
 				}
 			}
@@ -157,6 +164,20 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			log.error("["+getName()+"] "+e.getMessage(), e);
 			close();
 		}
+	}
+
+	/**
+	 * Perform the handshake with the server.
+	 * @throws Exception if any error occurs.
+	 */
+	private void handshake() throws Exception
+	{
+		JPPFResourceWrapper resource = new JPPFResourceWrapper();
+		resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
+		resource.addUuid(appUuid);
+		writeResource(resource);
+		resource = readResource();
+		handshakeDone = true;
 	}
 
 	/**

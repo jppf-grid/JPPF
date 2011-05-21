@@ -124,7 +124,6 @@ public class LoadBalancer
 	{
 		int count = 0;
 		List<JPPFTask> tasks = job.getTasks();
-		//for (JPPFTask task : tasks) task.setPosition(count++);
 		if (isLocalEnabled() && locallyExecuting.compareAndSet(false, true))
 		{
 			try
@@ -371,10 +370,21 @@ public class LoadBalancer
 					bundlers[REMOTE].feedback(tasks.size(), elapsed);
 				}
 			}
-			catch(Exception e)
+			catch(Throwable t)
 			{
-				if (debugEnabled) log.debug(e.getMessage(), e);
-				exception = e;
+				/*
+				if (debugEnabled) log.debug(t.getMessage(), t);
+				else log.error(t.getClass().getName() + ": " + t.getMessage());
+				*/
+				log.error(t.getMessage(), t);
+				exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
+				if (job.getResultListener() != null)
+				{
+					synchronized(job.getResultListener())
+					{
+						job.getResultListener().resultsReceived(new TaskResultEvent(t));
+					}
+				}
 			}
 		}
 

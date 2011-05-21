@@ -20,6 +20,7 @@ package org.jppf.client;
 import java.util.*;
 import java.util.concurrent.*;
 
+import org.jppf.client.event.ClientConnectionStatusEvent;
 import org.jppf.client.loadbalancer.LoadBalancer;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.startup.*;
@@ -64,6 +65,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	 * Mapping of class laoder to requests uuids.
 	 */
 	private Map<String, ClassLoader> classLoaderMap = new Hashtable<String, ClassLoader>();
+	/**
+	 * Keeps a list of the valid connections not currently executring tasks.
+	 */
+	protected Vector<JPPFClientConnection> availableConnections;
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -339,5 +344,62 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	public void setLocalExecutionEnabled(boolean localExecutionEnabled)
 	{
 		if (loadBalancer != null) loadBalancer.setLocalEnabled(localExecutionEnabled);
+	}
+
+	/**
+	 * Determine whether there is a client connection available for execution.
+	 * @return true if at least one ocnnection is available, false otherwise.
+	 */
+	public boolean hasAvailableConnection()
+	{
+		if (debugEnabled)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.append("available connections: ").append(getAvailableConnections().size()).append(", ");
+			sb.append("local execution enabled: ").append(loadBalancer.isLocalEnabled()).append(", ");
+			sb.append("localy executing: ").append(loadBalancer.isLocallyExecuting());
+			log.debug(sb.toString());
+		}
+		return (!getAvailableConnections().isEmpty() || (loadBalancer.isLocalEnabled() && !loadBalancer.isLocallyExecuting()));
+	}
+
+	/**
+	 * Invoked when the status of a client connection has changed.
+	 * @param event the event to notify of.
+	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+	 */
+	public void statusChanged(ClientConnectionStatusEvent event)
+	{
+		super.statusChanged(event);
+		JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
+		if (debugEnabled) log.debug("connection=" + c + ", availableConnections=" + availableConnections);
+		switch(c.getStatus())
+		{
+			case ACTIVE:
+				getAvailableConnections().add(c);
+				break;
+			default:
+				getAvailableConnections().remove(c);
+				break;
+		}
+	}
+
+	/**
+	 * Get the list of available connections.
+	 * @return a vector of connections instances.
+	 */
+	public Vector<JPPFClientConnection> getAvailableConnections()
+	{
+		if (availableConnections == null) availableConnections = new Vector<JPPFClientConnection>();
+		return availableConnections;
+	}
+
+	/**
+	 * Get the pool of threads used for submitting execution requests.
+	 * @return a {@link ThreadPoolExecutor} instance.
+	 */
+	public ThreadPoolExecutor getExecutor()
+	{
+		return executor;
 	}
 }

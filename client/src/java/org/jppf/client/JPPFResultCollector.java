@@ -41,6 +41,10 @@ public class JPPFResultCollector implements TaskResultListener
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * The initial task count in the job.
+	 */
+	private int count;
+	/**
 	 * Count of results notr yet received.
 	 */
 	protected int pendingCount = 0;
@@ -60,6 +64,7 @@ public class JPPFResultCollector implements TaskResultListener
 	 */
 	public JPPFResultCollector(int count)
 	{
+		this.count = count;
 		this.pendingCount = count;
 	}
 
@@ -70,11 +75,23 @@ public class JPPFResultCollector implements TaskResultListener
 	 */
 	public synchronized void resultsReceived(TaskResultEvent event)
 	{
-		List<JPPFTask> tasks = event.getTaskList();
-		if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks");
-		for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
-		pendingCount -= tasks.size();
-		notify();
+		if (event.getThrowable() == null)
+		{
+			List<JPPFTask> tasks = event.getTaskList();
+			if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks");
+			for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
+			pendingCount -= tasks.size();
+			notify();
+		}
+		else
+		{
+			Throwable t = event.getThrowable();
+			if (debugEnabled) log.debug("received throwable '" + t.getClass().getName() + ": " + t.getMessage() + "', resetting this result collector");
+			// reset this object's state to prepare for job resubmission
+			pendingCount = count;
+			resultMap = new TreeMap<Integer, JPPFTask>();
+			results = null;
+		}
 	}
 
 	/**
@@ -102,8 +119,8 @@ public class JPPFResultCollector implements TaskResultListener
 		{
 			try
 			{
-				wait(millis - elapsed);
 				if (elapsed >= millis) return null;
+				wait(millis - elapsed);
 			}
 			catch(InterruptedException e)
 			{

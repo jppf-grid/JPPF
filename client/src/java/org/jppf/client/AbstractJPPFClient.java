@@ -17,13 +17,12 @@
  */
 package org.jppf.client;
 
+import java.io.Serializable;
 import java.util.*;
 
 import org.jppf.client.event.*;
-import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.security.JPPFSecurityContext;
-import org.jppf.server.protocol.*;
-import org.jppf.task.storage.DataProvider;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.JPPFUuid;
 import org.slf4j.*;
 
@@ -146,27 +145,27 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public JPPFClientConnection getClientConnection(boolean oneAttempt)
 	{
-		JPPFClientConnection client = null;
+		JPPFClientConnection connection = null;
 		synchronized(pools)
 		{
-			while ((client == null) && !pools.isEmpty())
+			while ((connection == null) && !pools.isEmpty())
 			{
 				Set<Integer> toRemove = new HashSet<Integer>();
 				Iterator<Integer> poolIterator = pools.keySet().iterator();
-				while ((client == null) && poolIterator.hasNext())
+				while ((connection == null) && poolIterator.hasNext())
 				{
 					int priority = poolIterator.next();
 					ClientPool pool = pools.get(priority);
 					int size = pool.clientList.size();
 					int count = 0;
-					while ((client == null) && (count < pool.size()))
+					while ((connection == null) && (count < pool.size()))
 					{
 						JPPFClientConnection c = pool.nextClient();
 						if (c == null) break;
 						switch(c.getStatus())
 						{
 							case ACTIVE:
-								client = c;
+								connection = c;
 								break;
 							case FAILED:
 								pool.clientList.remove(c);
@@ -187,8 +186,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 				if (oneAttempt) break;
 			}
 		}
-		if (debugEnabled && (client != null)) log.debug("found client connection \"" + client + "\"");
-		return client;
+		if (debugEnabled && (connection != null)) log.debug("found client connection \"" + connection + "\"");
+		return connection;
 	}
 
 	/**
@@ -197,99 +196,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public void initCredentials() throws Exception
 	{
-	}
-
-	/**
-	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @return the list of executed tasks with their results.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead.
-	 */
-	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
-	{
-		return submit(taskList, dataProvider, null, 0);
-	}
-
-	/**
-	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
-	 * @return the list of executed tasks with their results.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead.
-	 */
-	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy) throws Exception
-	{
-		return submit(taskList, dataProvider, policy, 0);
-	}
-
-	/**
-	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
-	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
-	 * @return the list of executed tasks with their results.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead.
-	 */
-	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy, int priority) throws Exception
-	{
-		JPPFJobSLA sla = new JPPFJobSLA(policy, priority);
-		JPPFJob job = new JPPFJob(dataProvider, sla, true, null);
-		for (JPPFTask task: taskList) job.addTask(task);
-		return submit(job);
-	}
-
-	/**
-	 * Submit a non-blocking request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param listener listener to notify whenever a set of results have been received.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead.
-	 */
-	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener)
-		throws Exception
-	{
-			submitNonBlocking(taskList, dataProvider, listener, null, 0);
-	}
-
-	/**
-	 * Submit a non-blocking request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param listener listener to notify whenever a set of results have been received.
-	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead.
-	 */
-	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy)
-		throws Exception
-	{
-		submitNonBlocking(taskList, dataProvider, listener, policy, 0);
-	}
-
-	/**
-	 * Submit a non-blocking request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param listener listener to notify whenever a set of results have been received.
-	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
-	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead.
-	 */
-	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
-		throws Exception
-	{
-		JPPFJobSLA sla = new JPPFJobSLA(policy, priority);
-		JPPFJob job = new JPPFJob(dataProvider, sla, false, listener);
-		for (JPPFTask task: taskList) job.addTask(task);
-		submit(job);
 	}
 
 	/**
@@ -343,26 +249,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 			{
 				listener.connectionFailed(new ClientEvent(c));
 			}
-		}
-		if (emptyPools) return;
-		List<JPPFJob> toResubmit = c.close();
-		int taskCount = 0;
-		int execCount = toResubmit.size();
-		for (JPPFJob exec: toResubmit)
-		{
-			if (exec.getTasks() != null) taskCount += exec.getTasks().size();
-		}
-		if (taskCount > 0)
-		{
-			log.info("Connection [" + c.getName() + "] : resubmitting " + taskCount + "tasks for " + execCount + " executions");
-		}
-		try
-		{
-			for (JPPFJob job: toResubmit) submit(job);
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage());
 		}
 	}
 
@@ -431,5 +317,28 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	public String getUuid()
 	{
 		return uuid;
+	}
+
+	/**
+	 * This comparator defines a decending value order for integers.
+	 */
+	static class DescendingIntegerComparator implements Comparator<Integer>, Serializable
+	{
+		/**
+		 * Explicit serialVersionUID.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Compare two integers. This comparator defines a descending order for integers.
+		 * @param o1 first integer to compare.
+		 * @param o2 second integer to compare.
+		 * @return -1 if o1 > o2, 0 if o1 == o2, 1 if o1 < o2
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		public int compare(Integer o1, Integer o2)
+		{
+			return o2 - o1; 
+		}
 	}
 }

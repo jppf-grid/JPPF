@@ -17,15 +17,13 @@
  */
 package org.jppf.client;
 
-import java.util.*;
+import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFStats;
-import org.jppf.server.protocol.*;
-import org.jppf.task.storage.DataProvider;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -47,6 +45,10 @@ public class JPPFClient extends AbstractGenericClient
 	 * Determines whether debug-level logging is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * The submission manager.
+	 */
+	private SubmissionManager submissionManager;
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -108,22 +110,23 @@ public class JPPFClient extends AbstractGenericClient
 	}
 
 	/**
-	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
-	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
+	 * Submit a job execution request.
+	 * @param job the job to execute.
 	 * @return the list of executed tasks with their results.
 	 * @throws Exception if an error occurs while sending the request.
-	 * @see org.jppf.client.AbstractJPPFClient#submit(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.node.policy.ExecutionPolicy)
-	 * @deprecated {@link #submit(org.jppf.client.JPPFJob) submit(JPPFJob)} should be used instead.
+	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
 	 */
-	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider, ExecutionPolicy policy, int priority) throws Exception
+	public List<JPPFTask> submit(JPPFJob job) throws Exception
 	{
-		JPPFJobSLA sla = new JPPFJobSLA(policy, priority);
-		JPPFJob job = new JPPFJob(dataProvider, sla, true, null);
-		for (JPPFTask task: taskList) job.addTask(task);
-		return submit(job);
+		if ((job.getResultListener() == null) && !job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
+		else if (job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
+		submissionManager.submitJob(job);
+		if (job.isBlocking())
+		{
+			JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+			return collector.waitForResults();
+		}
+		return null;
 	}
 
 	/**
@@ -133,12 +136,8 @@ public class JPPFClient extends AbstractGenericClient
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
 	 */
-	public List<JPPFTask> submit(JPPFJob job) throws Exception
+	public List<JPPFTask> submit2(JPPFJob job) throws Exception
 	{
-		if (!job.isBlocking() && (job.getResultListener() == null))
-		{
-			job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
-		}
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getClientConnection(true);
 		if (job.isBlocking())
 		{
@@ -159,6 +158,7 @@ public class JPPFClient extends AbstractGenericClient
 		}
 		else
 		{
+			if (job.getResultListener() == null) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
 			if (c != null)
 			{
 				c.submit(job);
@@ -174,29 +174,11 @@ public class JPPFClient extends AbstractGenericClient
 	}
 
 	/**
-	 * Submit a non-blocking request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @param listener listener to notify whenever a set of results have been received.
-	 * @param policy an execution policy that determines on which node(s) the tasks will be permitted to run.
-	 * @param priority a value used by the JPPF driver to prioritize queued jobs.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @see org.jppf.client.AbstractJPPFClient#submitNonBlocking(java.util.List, org.jppf.task.storage.DataProvider, org.jppf.client.event.TaskResultListener, org.jppf.node.policy.ExecutionPolicy)
-	 * @deprecated {@link #submit(org.jppf.client.JPPFJob) submit(JPPFJob)} should be used instead.
-	 */
-	public void submitNonBlocking(List<JPPFTask> taskList, DataProvider dataProvider, TaskResultListener listener, ExecutionPolicy policy, int priority)
-		throws Exception
-	{
-		JPPFJobSLA sla = new JPPFJobSLA(policy, priority);
-		JPPFJob job = new JPPFJob(dataProvider, sla, false, listener);
-		for (JPPFTask task: taskList) job.addTask(task);
-		submit(job);
-	}
-
-	/**
 	 * Send a request to get the statistics collected by the JPPF server.
 	 * @return a <code>JPPFStats</code> instance.
 	 * @throws Exception if an error occurred while trying to get the server statistics.
+	 * @deprecated this method does not allow to chose which driver to get the statistics from.
+	 * Use <code>((JPPFClientConnectionImpl) getConnection(java.lang.String)).getJmxConnection().statistics()</code> instead.
 	 */
 	public JPPFStats requestStatistics() throws Exception
 	{
@@ -211,5 +193,31 @@ public class JPPFClient extends AbstractGenericClient
 	{
 		super.close();
 		if (loadBalancer != null) loadBalancer.stop();
+		if (submissionManager != null)
+		{
+			submissionManager.setStopped(true);
+			submissionManager.wakeUp();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected void initPools()
+	{
+		submissionManager = new SubmissionManager(this);
+		new Thread(submissionManager, "SubmissionManager").start();
+		super.initPools();
+	}
+
+	/**
+	 * Invoked when the status of a client connection has changed.
+	 * @param event the event to notify of.
+	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+	 */
+	public void statusChanged(ClientConnectionStatusEvent event)
+	{
+		super.statusChanged(event);
+		submissionManager.wakeUp();
 	}
 }
