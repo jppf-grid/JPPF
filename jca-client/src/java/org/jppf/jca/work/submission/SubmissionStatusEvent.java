@@ -20,6 +20,8 @@ package org.jppf.jca.work.submission;
 
 import java.util.EventObject;
 
+import org.jppf.client.SubmissionStatus;
+
 /**
  * Instances of this class represent a status chage notification for a jppf submission.
  * @author Laurent Cohen

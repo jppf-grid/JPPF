@@ -17,7 +17,7 @@
  */
 package org.jppf.jca.work;
 
-import static org.jppf.jca.work.submission.SubmissionStatus.*;
+import static org.jppf.client.SubmissionStatus.*;
 
 import java.io.NotSerializableException;
 

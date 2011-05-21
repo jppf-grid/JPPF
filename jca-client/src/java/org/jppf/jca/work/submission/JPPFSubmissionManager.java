@@ -18,7 +18,7 @@
 
 package org.jppf.jca.work.submission;
 
-import static org.jppf.jca.work.submission.SubmissionStatus.*;
+import static org.jppf.client.SubmissionStatus.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;

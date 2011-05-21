@@ -184,7 +184,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	{
 		setStatus(EXECUTING);
 		JcaResultProcessor proc = new JcaResultProcessor(this, job);
-		executor.submit(proc);
+		getClient().getExecutor().submit(proc);
 		if (debugEnabled) log.debug("["+name+"] submitted " + job.getTasks().size() + " tasks");
 	}
 

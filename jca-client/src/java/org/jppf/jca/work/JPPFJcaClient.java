@@ -25,7 +25,6 @@ import org.jppf.client.event.ClientConnectionStatusEvent;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.jca.work.submission.JPPFSubmissionManager;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -48,10 +47,6 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Keeps a list of the valid connections not currently executring tasks.
-	 */
-	private Vector<JPPFClientConnection> availableConnections;
-	/**
 	 * Manages asynchronous work submission to the JPPF driver.
 	 */
 	private JPPFSubmissionManager submissionManager = null;
@@ -64,31 +59,6 @@ public class JPPFJcaClient extends AbstractGenericClient
 	public JPPFJcaClient(String uuid, String configuration)
 	{
 		super(uuid, configuration);
-	}
-
-	/**
-	 * Submit the request to the server.
-	 * @param taskList the list of tasks to execute remotely.
-	 * @param dataProvider the provider of the data shared among tasks, may be null.
-	 * @return the list of executed tasks with their results.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @deprecated this method is deprecated, {@link #submit(JPPFJob) submit(JPPFJob)} should be used instead. 
-	 */
-	public List<JPPFTask> submit(List<JPPFTask> taskList, DataProvider dataProvider) throws Exception
-	{
-		JPPFJob job = new JPPFJob(dataProvider);
-		for (JPPFTask task: taskList) job.addTask(task);
-		return submit(job);
-		/*
-		JPPFSubmissionResult collector = new JPPFSubmissionResult(taskList.size());
-		List<JPPFTask> result = null;
-		while ((result == null) && !pools.isEmpty())
-		{
-			getClientConnection().submit(taskList, dataProvider, collector);
-			result = collector.getResults();
-		}
-		return result;
-		*/
 	}
 
 	/**
@@ -119,35 +89,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	public void statusChanged(ClientConnectionStatusEvent event)
 	{
 		super.statusChanged(event);
-		JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
-		if (debugEnabled) log.debug("connection=" + c + ", availableConnections=" + availableConnections);
-		switch(c.getStatus())
-		{
-			case ACTIVE:
-				getAvailableConnections().add(c);
-				break;
-			default:
-				getAvailableConnections().remove(c);
-				break;
-		}
 		if (submissionManager != null) submissionManager.wakeUp();
-	}
-
-	/**
-	 * Determine whether there is a client connection available for execution.
-	 * @return true if at least one ocnnection is available, false otherwise.
-	 */
-	public boolean hasAvailableConnection()
-	{
-		if (debugEnabled)
-		{
-			StringBuilder sb = new StringBuilder();
-			sb.append("available connections: ").append(getAvailableConnections().size()).append(", ");
-			sb.append("local execution enabled: ").append(loadBalancer.isLocalEnabled()).append(", ");
-			sb.append("localy executing: ").append(loadBalancer.isLocallyExecuting());
-			log.debug(sb.toString());
-		}
-		return (!getAvailableConnections().isEmpty() || (loadBalancer.isLocalEnabled() && !loadBalancer.isLocallyExecuting()));
 	}
 
 	/**
@@ -196,15 +138,5 @@ public class JPPFJcaClient extends AbstractGenericClient
 			log.error("Error while initializing the JPPF client configuration", e);
 		}
 		if (log.isDebugEnabled()) log.debug("config properties: " + config);
-	}
-
-	/**
-	 * Get the list of available connections.
-	 * @return a vector of connections instances.
-	 */
-	private Vector<JPPFClientConnection> getAvailableConnections()
-	{
-		if (availableConnections == null) availableConnections = new Vector<JPPFClientConnection>();
-		return availableConnections;
 	}
 }

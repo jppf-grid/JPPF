@@ -24,13 +24,11 @@ import javax.resource.*;
 import javax.resource.cci.*;
 import javax.resource.spi.ConnectionEvent;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.jca.spi.JPPFManagedConnection;
 import org.jppf.jca.util.JPPFAccessorImpl;
 import org.jppf.jca.work.submission.*;
-import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.server.protocol.*;
-import org.jppf.task.storage.DataProvider;
+import org.jppf.server.protocol.JPPFTask;
 
 /**
  * Implementation of a JCA connection. This class provides an API to send tasks to a JPPF driver.
@@ -112,80 +110,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * Submit an asynchronous execution request to the JPPF client.<br>
 	 * This method exits immediately after adding the request to the requests queue.<br>
 	 * The returned id is used to later retieve the results and sttaus of the execution. 
-	 * @param tasks - the list of tasks to execute remotely.
-	 * @param dataProvider - the provider of the data shared among tasks, may be null.
-	 * @return the id of the submission, to use for later retrieval of the results and status of the submission.
-	 * @throws Exception if an error occurs while submitting the request.
-	 * @deprecated this method is deprecated, {@link #submitNonBlocking(JPPFJob) submitNonBlocking(JPPFJob)} or
-	 * {@link #submitNonBlocking(JPPFJob,SubmissionStatusListener) submitNonBlocking(JPPFJob, SubmissionStatusListener)} should be used instead.
-	 */
-	public String submitNonBlocking(List<JPPFTask> tasks, DataProvider dataProvider) throws Exception
-	{
-		return submitNonBlocking(null, tasks, dataProvider, null);
-	}
-
-	/**
-	 * Submit an asynchronous execution request to the JPPF client.<br>
-	 * This method exits immediately after adding the request to the requests queue.<br>
-	 * The returned id is used to later retieve the results and sttaus of the execution. 
-	 * @param policy - an execution policy that deternmines on which node(s) the tasks will be permitted to run.
-	 * @param tasks - the list of tasks to execute remotely.
-	 * @param dataProvider - the provider of the data shared among tasks, may be null.
-	 * @return the id of the submission, to use for later retrieval of the results and status of the submission.
-	 * @throws Exception if an error occurs while submitting the request.
-	 * @deprecated this method is deprecated, {@link #submitNonBlocking(JPPFJob) submitNonBlocking(JPPFJob)} or
-	 * {@link #submitNonBlocking(JPPFJob,SubmissionStatusListener) submitNonBlocking(JPPFJob, SubmissionStatusListener)} should be used instead.
-	 */
-	public String submitNonBlocking(ExecutionPolicy policy, List<JPPFTask> tasks, DataProvider dataProvider) throws Exception
-	{
-		return submitNonBlocking(policy, tasks, dataProvider, null);
-	}
-
-	/**
-	 * Submit an asynchronous execution request to the JPPF client.<br>
-	 * This method exits immediately after adding the request to the requests queue.<br>
-	 * The returned id is used to later retieve the results and sttaus of the execution. 
-	 * @param tasks - the list of tasks to execute remotely.
-	 * @param dataProvider - the provider of the data shared among tasks, may be null.
-	 * @param listener - an optional listener to receive submission status change notifications, may be null.
-	 * @return the id of the submission, to use for later retrieval of the results and status of the submission.
-	 * @throws Exception if an error occurs while submitting the request.
-	 * @deprecated this method is deprecated, {@link #submitNonBlocking(JPPFJob) submitNonBlocking(JPPFJob)} or
-	 * {@link #submitNonBlocking(JPPFJob,SubmissionStatusListener) submitNonBlocking(JPPFJob, SubmissionStatusListener)} should be used instead.
-	 */
-	public String submitNonBlocking(List<JPPFTask> tasks, DataProvider dataProvider,
-		SubmissionStatusListener listener) throws Exception
-	{
-		return submitNonBlocking(null, tasks, dataProvider, listener);
-	}
-
-	/**
-	 * Submit an asynchronous execution request to the JPPF client.<br>
-	 * This method exits immediately after adding the request to the requests queue.<br>
-	 * The returned id is used to later retieve the results and sttaus of the execution. 
-	 * @param policy - an execution policy that deternmines on which node(s) the tasks will be permitted to run.
-	 * @param tasks - the list of tasks to execute remotely.
-	 * @param dataProvider - the provider of the data shared among tasks, may be null.
-	 * @param listener - an optional listener to receive submission status change notifications, may be null.
-	 * @return the id of the submission, to use for later retrieval of the results and status of the submission.
-	 * @throws Exception if an error occurs while submitting the request.
-	 * @deprecated this method is deprecated, {@link #submitNonBlocking(JPPFJob) submitNonBlocking(JPPFJob)} or
-	 * {@link #submitNonBlocking(JPPFJob,SubmissionStatusListener) submitNonBlocking(JPPFJob, SubmissionStatusListener)} should be used instead.
-	 */
-	public String submitNonBlocking(ExecutionPolicy policy, List<JPPFTask> tasks, DataProvider dataProvider,
-		SubmissionStatusListener listener) throws Exception
-	{
-		JPPFJobSLA sla = new JPPFJobSLA(policy);
-		JPPFJob job = new JPPFJob(dataProvider, sla);
-		for (JPPFTask task: tasks) job.addTask(task);
-		return getJppfClient().getSubmissionManager().addSubmission(job, listener);
-	}
-
-	/**
-	 * Submit an asynchronous execution request to the JPPF client.<br>
-	 * This method exits immediately after adding the request to the requests queue.<br>
-	 * The returned id is used to later retieve the results and sttaus of the execution. 
-	 * @param job - the job to execute.
+	 * @param job the job to execute.
 	 * @return the id of the submission, to use for later retrieval of the results and status of the submission.
 	 * @throws Exception if an error occurs while submitting the request.
 	 */
@@ -198,8 +123,8 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * Submit an asynchronous execution request to the JPPF client.<br>
 	 * This method exits immediately after adding the request to the requests queue.<br>
 	 * The returned id is used to later retieve the results and sttaus of the execution. 
-	 * @param job - the job to execute.
-	 * @param listener - an optional listener to receive submission status change notifications, may be null.
+	 * @param job the job to execute.
+	 * @param listener an optional listener to receive submission status change notifications, may be null.
 	 * @return the id of the submission, to use for later retrieval of the results and status of the submission.
 	 * @throws Exception if an error occurs while submitting the request.
 	 */
@@ -211,8 +136,8 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 
 	/**
 	 * Add a listener to the submission with the specified id.
-	 * @param submissionId - the id of the submission.
-	 * @param listener - the listener to add.
+	 * @param submissionId the id of the submission.
+	 * @param listener the listener to add.
 	 */
 	public void addSubmissionStatusListener(String submissionId, SubmissionStatusListener listener)
 	{

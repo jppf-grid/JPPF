@@ -20,6 +20,7 @@ package org.jppf.jca.work.submission;
 
 import java.util.*;
 
+import org.jppf.client.SubmissionStatus;
 import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
