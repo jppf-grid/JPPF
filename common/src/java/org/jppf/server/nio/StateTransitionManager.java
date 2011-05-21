@@ -150,6 +150,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 				server.getSelector().wakeup();
 				key = channel.register(server.getSelector(), ops, context);
 				wrapper = new SelectionKeyWrapper(key);
+				context.setChannel(wrapper);
 				if (action != null)
 				{
 					action.key = wrapper;
