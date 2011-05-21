@@ -101,7 +101,7 @@ public class PrimeRunner
 			}
 			totalTime = System.currentTimeMillis() - totalTime;
 			output("Computation time: " + StringUtils.toStringDuration(totalTime));
-			JPPFStats stats = jppfClient.requestStatistics();
+			JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
 			output("End statistics :\n"+stats.toString());
 		}
 		catch(Exception e)

@@ -98,7 +98,7 @@ public class TaskNotificationRunner
 				long elapsed = System.currentTimeMillis() - start;
 				System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
 			}
-			JPPFStats stats = jppfClient.requestStatistics();
+			JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
 			System.out.println("End statistics :\n"+stats.toString());
 		}
 		catch(Exception e)

@@ -137,7 +137,7 @@ public class MatrixRunner implements NotificationListener
 			output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations));
 			if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled"))
 			{
-				JPPFStats stats = jppfClient.requestStatistics();
+				JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
 				output("End statistics :\n" + stats.toString());
 			}
 		}
