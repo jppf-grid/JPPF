@@ -68,14 +68,21 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 
 	/**
 	 * Return the child at the specified index from the specified parent node.
-	 * @param parent - the parent to get the child from.
-	 * @param index - the index at which to get the child
+	 * @param parent the parent to get the child from.
+	 * @param index the index at which to get the child
 	 * @return the child node, or null if the index is not valid.
 	 * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
 	 */
 	public Object getChild(Object parent, int index)
 	{
-		return ((TreeNode) parent).getChildAt(index);
+		try
+		{
+			return ((TreeNode) parent).getChildAt(index);
+		}
+		catch (Exception e)
+		{
+			return null;
+		}
 	}
 
 	/**
