@@ -115,7 +115,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 			OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
 			JButton okBtn = (JButton) panel.findFirstWithName("driverShutdownRestartOK").getUIComponent();
 			JButton cancelBtn = (JButton) panel.findFirstWithName("serverShutdownRestartCancel").getUIComponent();
-			final JFrame frame = new JFrame("Enter the number of threads and their priority");
+			final JFrame frame = new JFrame(localize("shutdown.restart.driver.label"));
 			frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/server_restart.gif").getImage());
 			okBtn.addActionListener(new ActionListener()
 			{
