@@ -41,6 +41,10 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
 	 */
 	private boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * Date after which this task stop trying to connect the class loader.
 	 */
 	private Date latestAttemptDate = null;
@@ -139,7 +143,7 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
 			closed = true;
 			if (timer != null)
 			{
-				if (debugEnabled) log.debug(name + "timer not null");
+				if (debugEnabled) log.debug(name + " timer not null");
 				timer.cancel();
 				timer.purge();
 			}
@@ -161,18 +165,22 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
 			attemptCount++;
 			try
 			{
+				if (traceEnabled) log.trace(name + " opening the socket connection");
 				socketWrapper.open();
 				successfull = true;
+				if (traceEnabled) log.trace(name + " socket connection successfully opened");
 				reset();
 			}
 			catch(Exception e)
 			{
+				if (traceEnabled) log.trace(name + " socket connection open failed: " + e.getClass().getName() + " : " + e.getMessage());
 				if (latestAttemptDate != null)
 				{
 					Date now = new Date();
 					if (now.after(latestAttemptDate))
 					{
 						successfull = false;
+						if (traceEnabled) log.trace(name + " socket initialization unsuccessful");
 						reset();
 					}
 				}

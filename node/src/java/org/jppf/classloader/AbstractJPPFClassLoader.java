@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -199,7 +200,17 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		}
 		catch(IOException e)
 		{
-			if (debugEnabled) log.debug("connection with class server ended, re-initializing");
+			if (debugEnabled) log.debug("connection with class server ended, re-initializing, exception is:", e);
+			throw new JPPFNodeReconnectionNotification("connection with class server ended, re-initializing, exception is:", e);
+			/*
+			new Thread("classloader connection init")
+			{
+				public void run()
+				{
+					init();
+				}
+			}.start();
+			throw new ClassNotFoundException("could not load resource [" + map.get("name") + "]", e);
 			init();
 			try
 			{
@@ -213,6 +224,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 			{
 				if (debugEnabled) log.debug(e.getMessage(), e);
 			}
+			*/
 		}
 		catch(ClassNotFoundException e)
 		{

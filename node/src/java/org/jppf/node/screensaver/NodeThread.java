@@ -17,7 +17,6 @@
  */
 package org.jppf.node.screensaver;
 
-import org.jppf.JPPFNodeReloadNotification;
 import org.jppf.node.*;
 import org.jppf.node.event.NodeListener;
 
@@ -56,7 +55,7 @@ class NodeThread extends Thread
 		{
 			while (true)
 			{
-				try
+				//try
 				{
 					node = NodeRunner.createNode();
 					node.addNodeListener(listener);
@@ -66,10 +65,12 @@ class NodeThread extends Thread
 						//goToSleep();
 					}
 				}
+				/*
 				catch (JPPFNodeReloadNotification e)
 				{
-					//if (node != null) node.removeNodeListener(listener);
+					if (node != null) node.removeNodeListener(listener);
 				}
+				*/
 			}
 		}
 		catch(Exception e)

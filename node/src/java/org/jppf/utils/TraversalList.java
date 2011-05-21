@@ -102,7 +102,7 @@ public class TraversalList<E> implements Serializable
 	{
 		if (position <= 0)
 		{
-			throw new ArrayIndexOutOfBoundsException("position "+(position+1)+" les than 0");
+			throw new ArrayIndexOutOfBoundsException("position "+(position+1)+" less than 0");
 		}
 		position--;
 	}

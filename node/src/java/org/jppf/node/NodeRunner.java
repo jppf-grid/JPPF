@@ -129,6 +129,7 @@ public class NodeRunner
 					node = createNode();
 					node.run();
 				}
+				/*
 				catch(JPPFNodeReloadNotification notif)
 				{
 					if (debugEnabled) log.debug("received reload notification");
@@ -140,6 +141,7 @@ public class NodeRunner
 					node.stopNode(false);
 					unsetSecurity();
 				}
+				*/
 				catch(JPPFNodeReconnectionNotification e)
 				{
 					if (debugEnabled) log.debug("received reconnection notification");
