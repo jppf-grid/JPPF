@@ -95,18 +95,21 @@ public class NodeRenderer extends AbstractTreeCellRenderer
 							font = getBoldItalicFont(f);
 							foreground = DIMMED_FOREGROUND;
 						}
-						else path = NODE_ICON;
-						if (!TopologyDataStatus.UP.equals(data.getStatus()))
-						{
-							background = INACTIVE_COLOR;
-							backgroundSelected = INACTIVE_SELECTION_COLOR;
-							font = getItalicFont(f);
-						}
 						else
 						{
-							JMXConnectionWrapper wrapper = data.getJmxWrapper();
-							boolean b = wrapper == null ? false : wrapper.isConnected();
-							if (!b) foreground = UNMANAGED_COLOR;
+							path = NODE_ICON;
+							if (!TopologyDataStatus.UP.equals(data.getStatus()))
+							{
+								background = INACTIVE_COLOR;
+								backgroundSelected = INACTIVE_SELECTION_COLOR;
+								font = getItalicFont(f);
+							}
+							else
+							{
+								JMXConnectionWrapper wrapper = data.getJmxWrapper();
+								boolean b = wrapper == null ? false : wrapper.isConnected();
+								if (!b) foreground = UNMANAGED_COLOR;
+							}
 						}
 						break;
 				}
