@@ -18,6 +18,7 @@
 package org.jppf.server;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.DataLocation;
@@ -42,11 +43,11 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	/**
 	 * The list of task bundles whose execution has been completed.
 	 */
-	private List<BundleWrapper> resultList = new ArrayList<BundleWrapper>();
+	private AtomicReference<List<BundleWrapper>> resultList = new AtomicReference<List<BundleWrapper>>(new ArrayList<BundleWrapper>());
 	/**
 	 * Number of tasks that haven't yet been executed.
 	 */
-	private int pendingTasksCount = 0;
+	private AtomicInteger pendingTasksCount = new AtomicInteger(0);
 	/**
 	 * Used to serialize and deserialize the tasks data.
 	 */
@@ -159,35 +160,35 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 * Set the number of tasks that haven't yet been executed.
 	 * @param pendingTasksCount the number of tasks as an int. 
 	 */
-	protected synchronized void setPendingTasksCount(int pendingTasksCount)
+	protected void setPendingTasksCount(int pendingTasksCount)
 	{
-		this.pendingTasksCount = pendingTasksCount;
+		this.pendingTasksCount.set(pendingTasksCount);
 	}
 
 	/**
 	 * Get the number of tasks that haven't yet been executed.
 	 * @return the number of tasks as an int.
 	 */
-	protected synchronized int getPendingTasksCount()
+	protected int getPendingTasksCount()
 	{
-		return pendingTasksCount;
+		return pendingTasksCount.get();
 	}
 
 	/**
 	 * Set the list of task bundles whose execution has been completed.
 	 * @param resultList a list of <code>BundleWrapper</code> instances.
 	 */
-	protected synchronized void setResultList(List<BundleWrapper> resultList)
+	protected void setResultList(List<BundleWrapper> resultList)
 	{
-		this.resultList = resultList;
+		this.resultList.set(resultList);
 	}
 
 	/**
 	 * Get the list of task bundles whose execution has been completed.
 	 * @return a list of <code>JPPFTaskBundle</code> instances.
 	 */
-	protected synchronized List<BundleWrapper> getResultList()
+	protected List<BundleWrapper> getResultList()
 	{
-		return resultList;
+		return resultList.get();
 	}
 }
