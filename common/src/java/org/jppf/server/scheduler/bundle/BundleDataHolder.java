@@ -34,7 +34,7 @@ public class BundleDataHolder
 	/**
 	 * Current value of the moving average.
 	 */
-	private double mean = 0d;
+	private double mean = 1000d;
 	/**
 	 * Previous value of the moving average, generally before a new sample was added.
 	 */
@@ -46,7 +46,7 @@ public class BundleDataHolder
 	/**
 	 * Current number of samples.
 	 */
-	private long nbSamples = 0L;
+	private long nbSamples = 1L;
 	/**
 	 * Number of samples required to compute the moving average.
 	 */
