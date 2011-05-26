@@ -129,19 +129,6 @@ public class NodeRunner
 					node = createNode();
 					node.run();
 				}
-				/*
-				catch(JPPFNodeReloadNotification notif)
-				{
-					if (debugEnabled) log.debug("received reload notification");
-					nodeSocket = node.getSocketWrapper();
-					System.out.println(notif.getMessage());
-					System.out.println("Reloading this node");
-					classLoader.close();
-					classLoader = null;
-					node.stopNode(false);
-					unsetSecurity();
-				}
-				*/
 				catch(JPPFNodeReconnectionNotification e)
 				{
 					if (debugEnabled) log.debug("received reconnection notification");
@@ -158,7 +145,6 @@ public class NodeRunner
 		}
 	}
 
-	
 	/**
 	 * Run a node as a standalone application.
 	 * @param args not used.
@@ -221,7 +207,7 @@ public class NodeRunner
 		if (info.recoveryPort >= 0)
 		{
 			config.setProperty("jppf.recovery.server.port", "" + info.recoveryPort);
-			config.setProperty("jppf.recovery.enabled", "true");
+			//config.setProperty("jppf.recovery.enabled", "true");
 		}
 		else config.setProperty("jppf.recovery.enabled", "false");
 	}
