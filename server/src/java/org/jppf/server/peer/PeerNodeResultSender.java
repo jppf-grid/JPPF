@@ -62,7 +62,7 @@ class PeerNodeResultSender extends AbstractResultSender
 	 */
 	public synchronized void waitForExecution() throws Exception
 	{
-		long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 		while (getPendingTasksCount() > 0)
 		{
 			try
@@ -85,13 +85,13 @@ class PeerNodeResultSender extends AbstractResultSender
 						bundle.getTasks().clear();
 					}
 					first.getBundle().setTaskCount(count);
-					long elapsed = System.currentTimeMillis() - start;
-					first.getBundle().setNodeExecutionTime(elapsed);
+					long elapsed = System.nanoTime() - start;
+					first.getBundle().setNodeExecutionTime(elapsed/1000000);
 					sendPartialResults(first);
 				}
 				getResultList().clear();
 			}
-			catch (InterruptedException e)
+			catch (Exception e)
 			{
 				log.error(e.getMessage(), e);
 			}
