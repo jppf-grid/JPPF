@@ -120,7 +120,7 @@ public class DriverInitializer
 			connectionInfo.nodeServerPorts = StringUtils.parseIntValues(s);
 			connectionInfo.host = NetworkUtils.getManagementHost();
 			if (config.getBoolean("jppf.management.enabled", true)) connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
-			boolean recoveryEnabled = config.getBoolean("jppf.recovery.enabled", true);
+			boolean recoveryEnabled = config.getBoolean("jppf.recovery.enabled", false);
 			if (recoveryEnabled) connectionInfo.recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
 		}
 		return connectionInfo;
