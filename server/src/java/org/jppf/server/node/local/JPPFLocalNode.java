@@ -18,12 +18,9 @@
 
 package org.jppf.server.node.local;
 
-import java.util.List;
-import java.util.concurrent.Callable;
-
-import org.jppf.classloader.*;
+import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.nodeserver.LocalNodeChannel;
-import org.jppf.server.node.*;
+import org.jppf.server.node.JPPFNode;
 
 /**
  * Local (in-VM) node implementation.
@@ -42,13 +39,14 @@ public class JPPFLocalNode extends JPPFNode
 
 	/**
 	 * Initialize this local node with the specfied I/O handler.
-	 * @param handler the I/O handler for this node.
+	 * @param channel the I/O handler for this node.
 	 * @param classLoaderHandler the I/O handler for the class loader.
 	 */
-	public JPPFLocalNode(LocalNodeChannel handler, LocalClassLoaderChannel classLoaderHandler)
+	public JPPFLocalNode(LocalNodeChannel channel, LocalClassLoaderChannel classLoaderHandler)
 	{
-		this.channel = handler;
+		this.channel = channel;
 		this.classLoaderHandler = classLoaderHandler;
+		classLoaderManager = new LocalClassLoaderManager(this);
 	}
 
 	/**
@@ -67,44 +65,20 @@ public class JPPFLocalNode extends JPPFNode
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	protected AbstractJPPFClassLoader createClassLoader()
-	{
-		if (classLoader == null) classLoader = new JPPFLocalClassLoader(classLoaderHandler, this.getClass().getClassLoader());
-		return classLoader;
-	}
-
-	/**
-	 * @param uuidPath the uuid path containing the key to the container.
-	 * Instatiate the callback used to create the class loader in each {@link JPPFLocalContainer}.
-	 * @return a {@link Callable} instance.
-	 */
-	protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
-	{
-		return new Callable<AbstractJPPFClassLoader>()
-		{
-			public AbstractJPPFClassLoader call()
-			{
-				return new JPPFLocalClassLoader(getClassLoader(), uuidPath);
-			}
-		};
-	}
-
-	/**
 	 * Get the I/O handler for this node.
 	 * @return a {@link LocalNodeChannel} instance.
 	 */
-	public LocalNodeChannel getChannel()
+	LocalNodeChannel getChannel()
 	{
 		return channel;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Get the I/O handler for the class loader.
+	 * @return a {@link LocalClassLoaderChannel} instance.
 	 */
-	protected JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception
+	LocalClassLoaderChannel getClassLoaderHandler()
 	{
-		return new JPPFLocalContainer(channel, uuidPath, cl);
+		return classLoaderHandler;
 	}
 }

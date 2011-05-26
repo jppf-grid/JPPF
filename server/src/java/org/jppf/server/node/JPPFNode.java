@@ -17,9 +17,7 @@
  */
 package org.jppf.server.node;
 
-import java.security.*;
-import java.util.*;
-import java.util.concurrent.Callable;
+import java.util.List;
 
 import javax.management.*;
 
@@ -50,22 +48,6 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Maximum number of containers kept by this node's cache.
-	 */
-	private static int maxContainers = JPPFConfiguration.getProperties().getInt("jppf.classloader.cache.size", 50);
-	/**
-	 * Class loader used for dynamic loading and updating of client classes.
-	 */
-	protected AbstractJPPFClassLoader classLoader = null;
-	/**
-	 * Mapping of containers to their corresponding application uuid.
-	 */
-	private Map<String, JPPFContainer> containerMap = new HashMap<String, JPPFContainer>();
-	/**
-	 * A list retaining the container in chronological order of their creation.
-	 */
-	private LinkedList<JPPFContainer> containerList = new LinkedList<JPPFContainer>();
-	/**
 	 * The task execution manager for this node.
 	 */
 	protected NodeExecutionManagerImpl executionManager = null;
@@ -94,13 +76,13 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 */
 	private JPPFMBeanProviderManager providerManager = null;
 	/**
-	 * The callback used to create the class loader in each {@link JPPFContainer}.
-	 */
-	private Callable<JPPFClassLoader> classLoaderCreator = null;
-	/**
 	 * Handles the firing of node life cycle events and the listeners that subscribe to these events.
 	 */
 	private LifeCycleEventHandler lifeCycleEventHandler = null;
+	/**
+	 * Manages the class loaders and how they are used. 
+	 */
+	protected AbstractClassLoaderManager classLoaderManager = null;
 
 	/**
 	 * Default constructor.
@@ -140,18 +122,18 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 			{
 				log.error(e.getMessage(), e);
 				if (notifying) fireNodeEvent(NodeEventType.DISCONNECTED);
-				if (classLoader != null)
+				if (classLoaderManager.classLoader != null)
 				{
-					classLoader.reset();
-					setClassLoader(null);
+					classLoaderManager.classLoader.reset();
+					classLoaderManager.classLoader = null;
 				}
 				try
 				{
 					synchronized(this)
 					{
 						closeDataChannel();
-						containerMap.clear();
-						containerList.clear();
+						classLoaderManager.containerMap.clear();
+						classLoaderManager.containerList.clear();
 					}
 				}
 				catch(Exception ex)
@@ -310,23 +292,16 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 */
 	public AbstractJPPFClassLoader getClassLoader()
 	{
-		if (classLoader == null) classLoader = createClassLoader();
-		return classLoader;
+		return classLoaderManager.getClassLoader();
 	}
 
 	/**
-	 * Create the class loader for this node.
-	 * @return a {@link JPPFClassLoader} instance.
-	 */
-	protected abstract AbstractJPPFClassLoader createClassLoader();
-
-	/**
 	 * Set the main classloader for the node.
-	 * @param cl - the class loader to set.
+	 * @param cl the class loader to set.
 	 */
 	public void setClassLoader(JPPFClassLoader cl)
 	{
-		classLoader = cl;
+		classLoaderManager.setClassLoader(cl);
 	}
 
 	/**
@@ -355,57 +330,8 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 */
 	public JPPFContainer getContainer(final List<String> uuidPath) throws Exception
 	{
-		String uuid = uuidPath.get(0);
-		JPPFContainer container = null;
-		synchronized(this)
-		{
-			container = containerMap.get(uuid);
-			if (container == null)
-			{
-				if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
-				AbstractJPPFClassLoader cl = AccessController.doPrivileged(new PrivilegedAction<AbstractJPPFClassLoader>()
-				{
-					public AbstractJPPFClassLoader run()
-					{
-						try
-						{
-							return newClassLoaderCreator(uuidPath).call();
-						}
-						catch(Exception e)
-						{
-							log.error(e.getMessage(), e);
-						}
-						return null;
-					}
-				});
-				container = newJPPFContainer(uuidPath, cl);
-				if (containerList.size() >= maxContainers)
-				{
-					JPPFContainer toRemove = containerList.removeFirst();
-					containerMap.remove(toRemove.getAppUuid());
-				}
-				containerList.add(container);
-				containerMap.put(uuid, container);
-			}
-		}
-		return container;
+		return classLoaderManager.getContainer(uuidPath);
 	}
-
-	/**
-	 * Create a new container based on the uuid path and class loader.
-	 * @param uuidPath uuid path for the corresponding client.
-	 * @param cl the class loader to use.
-	 * @return a {@link JPPFContainer} instance.
-	 * @throws Exception if any error occurs
-	 */
-	protected abstract JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception;
-
-	/**
-	 * Instantiate the callback used to create the class loader in each {@link JPPFContainer}.
-	 * @param uuidPath the uuid path containing the key to the container.
-	 * @return a {@link Callable} instance.
-	 */
-	protected abstract Callable<AbstractJPPFClassLoader> newClassLoaderCreator(List<String> uuidPath);
 
 	/**
 	 * Get the administration and monitoring MBean for this node.
@@ -475,7 +401,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 			log.error(e.getMessage(), e);
 		}
 		setNodeAdmin(null);
-		classLoader = null;
+		classLoaderManager.classLoader = null;
 	}
 
 	/**

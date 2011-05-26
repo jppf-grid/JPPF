@@ -17,14 +17,9 @@
  */
 package org.jppf.server.node.remote;
 
-import java.util.List;
-import java.util.concurrent.Callable;
-
 import org.jppf.JPPFNodeReconnectionNotification;
-import org.jppf.classloader.*;
 import org.jppf.comm.recovery.*;
 import org.jppf.comm.socket.*;
-import org.jppf.node.NodeRunner;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -46,7 +41,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 	/**
 	 * Connection to the revoery server.
 	 */
-	private ClientConnection clientConnection = null;
+	private ClientConnection recoveryConnection = null;
 
 	/**
 	 * Default constructor.
@@ -54,6 +49,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 	public JPPFRemoteNode()
 	{
 		super();
+		classLoaderManager = new RemoteClassLoaderManager(this);
 	}
 
 	/**
@@ -87,14 +83,14 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 			if (debugEnabled) log.debug("end socket initializer");
 		}
 		nodeIO = new RemoteNodeIO(this);
-		if (JPPFConfiguration.getProperties().getBoolean("jppf.recovery.enabled", true))
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.recovery.enabled", false))
 		{
-			if (clientConnection == null)
+			if (recoveryConnection == null)
 			{
 				if (debugEnabled) log.debug("Initializing recovery");
-				clientConnection = new ClientConnection(uuid);
-				clientConnection.addClientConnectionListener(this);
-				new Thread(clientConnection, "reaper client connection").start();
+				recoveryConnection = new ClientConnection(uuid);
+				recoveryConnection.addClientConnectionListener(this);
+				new Thread(recoveryConnection, "reaper client connection").start();
 			}
 		}
 	}
@@ -106,55 +102,20 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 	 */
 	protected void closeDataChannel() throws Exception
 	{
-		if (debugEnabled) log.debug("closing data channel: socketClient=" + socketClient + ", clientConnection=" + clientConnection);
+		if (debugEnabled) log.debug("closing data channel: socketClient=" + socketClient + ", clientConnection=" + recoveryConnection);
 		if (socketClient != null)
 		{
 			SocketWrapper tmp = socketClient;
 			socketClient = null;
 			tmp.close();
 		}
-		if (clientConnection != null)
+		if (recoveryConnection != null)
 		{
 			//clientConnection.removeClientConnectionListener(this);
-			ClientConnection tmp = clientConnection;
-			clientConnection = null;
+			ClientConnection tmp = recoveryConnection;
+			recoveryConnection = null;
 			tmp.close();
 		}
-	}
-
-	/**
-	 * Create the class loader for this node.
-	 * @return a {@link JPPFClassLoader} instance.
-	 */
-	protected AbstractJPPFClassLoader createClassLoader()
-	{
-		if (debugEnabled) log.debug("Initializing classloader");
-		if (classLoader == null) classLoader = NodeRunner.getJPPFClassLoader();
-		return classLoader;
-	}
-
-	/**
-	 * Instantiate the callback used to create the class loader in each {@link JPPFRemoteContainer}.
-	 * @param uuidPath the uuid path containing the key to the container.
-	 * @return a {@link Callable} instance.
-	 */
-	protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
-	{
-		return new Callable<AbstractJPPFClassLoader>()
-		{
-			public AbstractJPPFClassLoader call()
-			{
-				return new JPPFClassLoader(getClassLoader(), uuidPath);
-			}
-		};
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected JPPFRemoteContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception
-	{
-		return new JPPFRemoteContainer(socketClient, uuidPath, cl);
 	}
 
 	/**
