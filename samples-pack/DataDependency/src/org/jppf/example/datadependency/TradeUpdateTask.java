@@ -69,6 +69,7 @@ public class TradeUpdateTask extends JPPFTask
 	 */
 	public void run()
 	{
+		//String uuid = NodeRunner.getUuid();
 		String msg = "updating trade " + tradeId;
 		//log.info(msg);
 		long taskStart = System.currentTimeMillis();

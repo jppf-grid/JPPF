@@ -23,7 +23,7 @@ import java.util.*;
 import org.jppf.example.datadependency.model.*;
 
 /**
- * 
+ * Instances of this class generate random MarketData and Trade objects according tot he configuration. 
  * @author Laurent Cohen
  */
 public abstract class AbstractDataFactory implements DataFactory

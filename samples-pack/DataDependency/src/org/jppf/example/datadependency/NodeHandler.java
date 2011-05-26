@@ -90,25 +90,12 @@ public class NodeHandler implements TickerListener
 		{
 			((IMap) dataMap).unlockMap();
 		}
-		/*
 		JMXDriverConnectionWrapper driver = new JMXDriverConnectionWrapper("localhost", 11198);
 		driver.connectAndWait(0);
 		Collection<JPPFManagementInfo> nodesInfo = driver.nodesInformation();
-		
-		MarketData[] data = marketDataList.toArray(new MarketData[0]);
 		List<String> idList = new ArrayList<String>();
-		int nodeCount = 0;
-		for (JPPFManagementInfo info: nodesInfo)
-		{
-			JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());
-			node.connectAndWait(0);
-			nodeCount++;
-			idList.add(node.getId());
-			node.invoke(DataMBean.MBEAN_NAME, "updateMarketData", new Object[] { data }, SIGNATURE );
-		}
+		for (JPPFManagementInfo info: nodesInfo) idList.add(info.getId());
 		return idList;
-		*/
-		return null;
 	}
 
 	/**

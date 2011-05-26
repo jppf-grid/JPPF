@@ -22,6 +22,8 @@ import java.util.*;
 
 import org.jppf.example.datadependency.model.Trade;
 
+import com.hazelcast.core.Hazelcast;
+
 /**
  * This class is used to determine the association between nodes and trades.
  * @author Laurent Cohen
@@ -32,6 +34,10 @@ public class NodeSelector
 	 * Distribution of trade sets among the nodes.
 	 */
 	private List<Set<String>> tradeSets = new ArrayList<Set<String>>();
+	/**
+	 * Distribution of trade sets among the nodes.
+	 */
+	private Map<String, Map<Object, Object>> tradesPerNodeMap = new HashMap<String, Map<Object, Object>>();
 	/**
 	 * The list of node ids.
 	 */
@@ -47,6 +53,10 @@ public class NodeSelector
 		this.idList = idList;
 		int nbNodes = idList.size();
 		for (int i=0; i<nbNodes; i++) tradeSets.add(new HashSet<String>());
+		for (String id: idList)
+		{
+			tradesPerNodeMap.put(id, Hazelcast.getMap("Trade-" + id));
+		}
 		for (int i=0; i<trades.size(); i++)
 		{
 			int n = i % nbNodes;
