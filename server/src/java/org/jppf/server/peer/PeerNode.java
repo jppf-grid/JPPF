@@ -84,7 +84,7 @@ class PeerNode extends AbstractMonitoredNode
 	{
 		stopped = false;
 		if (debugEnabled) log.debug(getName() + "Start of peer node main loop");
-		while (!stopped)
+		while (!isStopped())
 		{
 			try
 			{
@@ -92,14 +92,14 @@ class PeerNode extends AbstractMonitoredNode
 			}
 			catch(Exception e)
 			{
-				stopped = true;
+				setStopped(true);
 				if (socketInitializer != null) socketInitializer.close();
 				TypedProperties props = JPPFConfiguration.getProperties();
 				if (props.getBoolean("jppf.discovery.enabled", true) && props.getBoolean("jppf.peer.discovery.enabled", true))
 					driver.getInitializer().getPeerDiscoveryThread().removePeer(peerName);
 				if (debugEnabled) log.debug(getName() + " : " + e.getMessage(), e);
 			}
-			if (!stopped)
+			if (!isStopped())
 			{
 				try
 				{
