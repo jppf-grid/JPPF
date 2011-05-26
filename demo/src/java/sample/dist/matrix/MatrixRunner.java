@@ -24,6 +24,7 @@ import java.util.concurrent.*;
 import javax.management.*;
 
 import org.jppf.client.*;
+import org.jppf.client.utils.GridMonitor;
 import org.jppf.logging.jmx.JmxLogger;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
@@ -106,10 +107,13 @@ public class MatrixRunner implements NotificationListener
 	 */
 	public void perform(int size, int iterations, int nbRows, String clientUuid) throws Exception
 	{
+		GridMonitor monitor = null;
 		try
 		{
 			if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
 			else jppfClient = new JPPFClient();
+			monitor = new GridMonitor(jppfClient, 1000L);
+			monitor.startMonitoring();
 
 			// initialize the 2 matrices to multiply
 			Matrix a = new Matrix(size);
@@ -140,9 +144,12 @@ public class MatrixRunner implements NotificationListener
 				JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
 				output("End statistics :\n" + stats.toString());
 			}
+			monitor.stopMonitoring();
+			monitor.storeData("./GridMonitoring");
 		}
 		finally
 		{
+			if (monitor != null) monitor.close();
 			if (jppfClient != null) jppfClient.close();
 		}
 	}
