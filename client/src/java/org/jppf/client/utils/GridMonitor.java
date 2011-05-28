@@ -50,13 +50,21 @@ public class GridMonitor
 	 */
 	private JPPFClient jppfClient = null;
 	/**
+	 * The host of the driver. 
+	 */
+	private String driverHost;
+	/**
+	 * Management port used by the driver.
+	 */
+	private int managementPort;
+	/**
 	 * Wrapper for the driver's JMX connection.
 	 */
-	private JMXDriverConnectionWrapper driver;
+	private JPPFManagement driver;
 	/**
-	 * Holds the memory usage snapshots for al the nodes.
+	 * Holds the memory usage snapshots for all the nodes.
 	 */
-	private Map<String, NodeManagement> nodes = new TreeMap<String, NodeManagement>();
+	private Map<String, JPPFManagement> nodes = new TreeMap<String, JPPFManagement>();
 	/**
 	 * The timer that schedules regular memory snapshots of the nodes.
 	 */
@@ -66,7 +74,7 @@ public class GridMonitor
 	 */
 	private DataUpdateTask dataUpdateTask = null;
 	/**
-	 * Holds the memory usage snapshots for al the nodes.
+	 * Holds the memory usage snapshots for all the nodes.
 	 */
 	private Map<String, List<NodeData>> dataMap = new TreeMap<String, List<NodeData>>();
 	/**
@@ -80,8 +88,35 @@ public class GridMonitor
 	private long startTime = 0;
 
 	/**
+	 * Initialize this grid monitor with the specified parameters.
+	 * @param driverHost the host of the driver.
+	 * @param managementPort management port used by the driver.
+	 * @throws Exception if any error occurs.
+	 */
+	public GridMonitor(String driverHost, int managementPort) throws Exception
+	{
+		this.driverHost = driverHost;
+		this.managementPort = managementPort;
+		init();
+	}
+
+	/**
+	 * Initialize this grid monitor with the specified parameters.
+	 * @param driverHost the host of the driver.
+	 * @param managementPort management port used by the driver.
+	 * @param snapshotInterval the interval at which memory usage snapshots are taken.
+	 * @throws Exception if any error occurs.
+	 */
+	public GridMonitor(String driverHost, int managementPort, long snapshotInterval) throws Exception
+	{
+		this.driverHost = driverHost;
+		this.managementPort = managementPort;
+		init();
+	}
+
+	/**
 	 * Initialize this grid monitor with the specified JPPF client and the default (1 second) snpashot interval.
-	 * @param jppfClient the JPPF client from which to egt the JMX connections.
+	 * @param jppfClient the JPPF client from which to get the JMX connections.
 	 * @throws Exception if any error occurs during initialization.
 	 */
 	public GridMonitor(JPPFClient jppfClient) throws Exception
@@ -92,7 +127,7 @@ public class GridMonitor
 
 	/**
 	 * Initialize this grid monitor with the specified JPPF client and snpashot interval.
-	 * @param jppfClient the JPPF client from which to egt the JMX connections.
+	 * @param jppfClient the JPPF client from which to get the JMX connections.
 	 * @param snapshotInterval the interval at which memory usage snapshots are taken.
 	 * @throws Exception if any error occurs during initialization.
 	 */
@@ -113,20 +148,39 @@ public class GridMonitor
 	 */
 	private void init() throws Exception
 	{
-		JPPFClientConnectionImpl connection = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
-		// get the connection to the driver's JMX connection
-		driver = connection.getJmxConnection();
+		driver = new JPPFManagement();
+		// if the JPPF client was provided in the constructor
+		if (jppfClient != null)
+		{
+			JPPFClientConnectionImpl connection = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
+			// get the connection to the driver's JMX connection
+			driver.jmx = connection.getJmxConnection();
+		}
+		// else if we provided the driver host and jmx port
+		else
+		{
+			driver.jmx = new JMXDriverConnectionWrapper(driverHost, managementPort);
+			driver.jmx.connect();
+		}
+		// wait until the jmx connection is established with the driver
+		while (!driver.jmx.isConnected()) Thread.sleep(1L);
+		driver.memoryMBean = ManagementFactory.newPlatformMXBeanProxy(driver.jmx.getMbeanConnection(), "java.lang:type=Memory", MemoryMXBean.class);
+		driver.runtimeMBean = ManagementFactory.newPlatformMXBeanProxy(driver.jmx.getMbeanConnection(), "java.lang:type=Runtime", RuntimeMXBean.class);
 		// get the JMX connection information for the nodes attached to the driver 
-		Collection<JPPFManagementInfo> infoCollection = driver.nodesInformation();
+		Collection<JPPFManagementInfo> infoCollection = ((JMXDriverConnectionWrapper) driver.jmx).nodesInformation();
 		for (JPPFManagementInfo info: infoCollection)
 		{
 			// get the connection to the node's JMX connection
 			JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());
 			node.connect();
+			// wait until the jmx connection is established with the node
 			while (!node.isConnected()) Thread.sleep(1L);
 			// get a proxy to the MXBean that collects heap usage data for the node
-			MemoryMXBean proxy = ManagementFactory.newPlatformMXBeanProxy(node.getMbeanConnection(), "java.lang:type=Memory", MemoryMXBean.class);
-			nodes.put(node.getId(), new NodeManagement(node, proxy));
+			JPPFManagement nodeMgt = new JPPFManagement();
+			nodeMgt.jmx = node;
+			nodeMgt.memoryMBean = ManagementFactory.newPlatformMXBeanProxy(node.getMbeanConnection(), "java.lang:type=Memory", MemoryMXBean.class);
+			nodeMgt.runtimeMBean = ManagementFactory.newPlatformMXBeanProxy(node.getMbeanConnection(), "java.lang:type=Runtime", RuntimeMXBean.class);
+			nodes.put(node.getId(), nodeMgt);
 		}
 	}
 
@@ -164,9 +218,9 @@ public class GridMonitor
 	public void close() throws Exception
 	{
 		stopMonitoring();
-		driver.close();
+		driver.jmx.close();
 		driver = null;
-		for (NodeManagement node: nodes.values()) node.nodeMBean.close();
+		for (JPPFManagement node: nodes.values()) node.jmx.close();
 		nodes.clear();
 	}
 
@@ -174,27 +228,20 @@ public class GridMonitor
 	 * Container class that holds references to JMX-related objects for one node.
 	 * @see java.lang.management.MemoryMXBean
 	 */
-	public static class NodeManagement
+	public static class JPPFManagement
 	{
 		/**
 		 * Wrapper around the node JMX connection.
 		 */
-		public JMXNodeConnectionWrapper nodeMBean;
+		public JMXConnectionWrapper jmx;
 		/**
 		 * Proxy to the MXBean that collects heap usage data for the node.
 		 */
 		public MemoryMXBean memoryMBean;
-
 		/**
-		 * Initialize this object with the specified parameters.
-		 * @param nodeMBean rapper around the node JMX connection.
-		 * @param memoryMBean proxy to the MXBean that collects heap usage data for the node.
+		 * Proxy to the MXBean that holds runtime information about the JVM.
 		 */
-		public NodeManagement(JMXNodeConnectionWrapper nodeMBean, MemoryMXBean memoryMBean)
-		{
-			this.nodeMBean = nodeMBean;
-			this.memoryMBean = memoryMBean;
-		}
+		public RuntimeMXBean runtimeMBean;
 	}
 
 	/**
@@ -259,9 +306,9 @@ public class GridMonitor
 		{
 			try
 			{
-				for (Map.Entry<String, NodeManagement> entry: nodes.entrySet())
+				for (Map.Entry<String, JPPFManagement> entry: nodes.entrySet())
 				{
-					NodeManagement node = entry.getValue();
+					JPPFManagement node = entry.getValue();
 					String id = entry.getKey();
 					NodeData data = new NodeData();
 					// timestamps are relative to the start time.
@@ -324,5 +371,64 @@ public class GridMonitor
 		{
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Get the object that holds the JMX connection to the driver.
+	 * @return the <code>JPPFManagement</code> instance for the driver.
+	 */
+	public JPPFManagement getDriver()
+	{
+		return driver;
+	}
+
+
+	/**
+	 * Get the objects that hold the JMX connection to the nodes.
+	 * @return an array of <code>JPPFManagement</code> instances for the nodes.
+	 */
+	public JPPFManagement[] getNodes()
+	{
+		return nodes.values().toArray(new JPPFManagement[0]);
+	}
+
+	/**
+	 * This method demonstrates how the APIs in this class can be used to
+	 * find the Process ID for the driver and nodes. 
+	 */
+	public void testPIDs()
+	{
+		JPPFManagement driver = getDriver();
+		System.out.println("driver: " + getInfo(driver));
+		JPPFManagement[] nodes = getNodes();
+		for (JPPFManagement node: nodes) System.out.println("node: " + getInfo(node));
+	}
+
+	/**
+	 * Compute a string that provides information about a driver or node, including the PID
+	 * @param mgt the driver or node to process.
+	 * @return a string that contains the host name or IP, jmx port number and PID for the node or driver.
+	 */
+	public String getInfo(JPPFManagement mgt)
+	{
+		StringBuilder sb = new StringBuilder();
+		// toString() is "hostname:port" as displayed in the JPPF admin console
+		sb.append(mgt.jmx.getId()).append(", PID = ");
+		// we expect the name to be in '<pid>@hostname' format - this is JVM dependant
+		String name = mgt.runtimeMBean.getName();
+		int pid = -1;
+		int idx = name.indexOf('@');
+		if (idx >= 0)
+		{
+			try
+			{
+				pid = Integer.valueOf(name.substring(0, idx));
+			}
+			catch (Exception ignore)
+			{
+			}
+		}
+		sb.append(pid);
+		return sb.toString();
 	}
 }
