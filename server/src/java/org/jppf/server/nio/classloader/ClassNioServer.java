@@ -98,7 +98,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 		super(ports, "ClassServer", false);
 		RecoveryServer recoveryServer = driver.getInitializer().getRecoveryServer();
 		if (recoveryServer != null) recoveryServer.getReaper().addReaperListener(this);
-		//selectTimeout = 1L;
+		selectTimeout = 1L;
 	}
 
 	/**
