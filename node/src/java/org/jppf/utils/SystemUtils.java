@@ -19,6 +19,7 @@
 package org.jppf.utils;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.security.*;
@@ -337,5 +338,29 @@ public final class SystemUtils
 	public static boolean isMac()
 	{
 		return OS_TYPE == MAC_OS;
+	}
+
+	/**
+	 * Return the pid for the current process.
+	 * @return the pid as an int.
+	 */
+	public static int getPID()
+	{
+		int pid = -1;
+		String name = ManagementFactory.getRuntimeMXBean().getName();
+		int idx = name.indexOf("@");
+		if (idx >= 0)
+		{
+			try
+			{
+				pid = Integer.valueOf(name.substring(0, idx));
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		if (debugEnabled) log.debug("process name=" + name + ", pid=" + pid);
+		return pid;
 	}
 }

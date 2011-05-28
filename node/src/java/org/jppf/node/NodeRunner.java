@@ -119,6 +119,8 @@ public class NodeRunner
 		}
 		try
 		{
+			int pid = SystemUtils.getPID();
+			if (pid > 0) System.out.println("node process id: " + pid);
 			log.info("starting node, uuid=" + uuid);
 			// to ensure VersionUtils is loaded by the same class loader as this class.
 			VersionUtils.getBuildNumber();

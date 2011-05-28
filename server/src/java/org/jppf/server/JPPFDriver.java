@@ -106,6 +106,8 @@ public class JPPFDriver
 	 */
 	protected JPPFDriver()
 	{
+		int pid = SystemUtils.getPID();
+		if (pid > 0) System.out.println("driver process id: " + pid);
 		// initialize the jmx logger
 		new JmxMessageNotifier();
 		nodeHandler = new NodeInformationHandler();
