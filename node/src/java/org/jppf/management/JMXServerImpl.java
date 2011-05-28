@@ -124,7 +124,8 @@ public class JMXServerImpl
 				catch(Exception e)
 				{
 					Throwable cause = e.getCause();
-					if (cause instanceof BindException)
+					String s = cause.getMessage();
+					if ((cause instanceof BindException) || ((s != null) && (s.toLowerCase().indexOf("bind") >= 0)))
 					{
 						if (rmiPort >= 65530) rmiPort = 1024;
 						rmiPort++;
@@ -194,7 +195,8 @@ public class JMXServerImpl
     	catch(Exception e)
     	{
     		Throwable cause = e.getCause();
-				if (cause instanceof BindException)
+				String s = cause.getMessage();
+				if ((cause instanceof BindException) || ((s != null) && (s.toLowerCase().indexOf("bind") >= 0)))
 				{
 					if (port >= 65530) port = 1024;
 					port++;
