@@ -21,12 +21,13 @@ package org.jppf.example.datadependency;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.example.datadependency.model.Trade;
+import org.jppf.example.datadependency.model.*;
 
 import com.hazelcast.core.Hazelcast;
 
 /**
- * This class is used to determine the association between nodes and trades.
+ * This class is used to determine the association between nodes and trades,
+ * and distribute the trades among the nodes using a Hazelcast map for each node.
  * @author Laurent Cohen
  */
 public class NodeSelector
@@ -34,34 +35,34 @@ public class NodeSelector
 	/**
 	 * Mapping of tradeId to corresponding node uuid.
 	 */
-	private Map<String, String> tradeToNodeMap = new HashMap<String, String>();
+	private Map<String, String> tradeToNodeMap = new Hashtable<String, String>();
 	/**
 	 * Distribution of trade sets among the nodes.
 	 */
-	private Map<String, Map<Object, Object>> nodeToHazelcastMap = new HashMap<String, Map<Object, Object>>();
+	private Map<String, Map<String, Trade>> nodeToHazelcastMap = new Hashtable<String, Map<String, Trade>>();
 	/**
 	 * The list of node ids.
 	 */
-	private List<String> idList = null;
+	private List<String> nodeIdList = null;
 
 	/**
 	 * Initialize this node selector and distribute the trades among the nodes.
 	 * @param trades the list of trades to distribute among the nodes.
-	 * @param idList the list of node ids.
+	 * @param nodeIdList the list of node ids.
 	 */
-	public NodeSelector(List<Trade> trades, List<String> idList)
+	public NodeSelector(List<Trade> trades, List<String> nodeIdList)
 	{
 		System.out.println("populating the trades");
-		this.idList = idList;
-		final int nbNodes = idList.size();
+		this.nodeIdList = nodeIdList;
+		final int nbNodes = nodeIdList.size();
 		final Trade[] tradeArray = trades.toArray(new Trade[0]);
-		for (int i=0; i<tradeArray.length; i++) tradeToNodeMap.put(tradeArray[i].getId(), idList.get(i % nbNodes));
+		//for (int i=0; i<tradeArray.length; i++) tradeToNodeMap.put(tradeArray[i].getId(), nodeIdList.get(i % nbNodes));
 		ExecutorService executor = Executors.newFixedThreadPool(nbNodes);
 		List<Future<?>> futures = new ArrayList<Future<?>>();
 		for (int i=0; i<nbNodes; i++)
 		{
-			String nodeId = idList.get(i);
-			Map<Object, Object> hazelcastMap = Hazelcast.getMap("trades-" + nodeId);
+			String nodeId = nodeIdList.get(i);
+			Map<String, Trade> hazelcastMap = Hazelcast.getMap(ModelConstants.TRADE_MAP_PREFIX + nodeId);
 			nodeToHazelcastMap.put(nodeId, hazelcastMap);
 			futures.add(executor.submit(new PopulateTradesTask(tradeArray, i, nbNodes, hazelcastMap)));
 		}
@@ -91,9 +92,28 @@ public class NodeSelector
 	}
 
 	/**
+	 * Get the ids of all participating nodes.
+	 * @return  a list of string ids.
+	 */
+	public List<String> getAllNodeIds()
+	{
+		return nodeIdList;
+	}
+
+	/**
+	 * Get the trades porcessed by the specified node.
+	 * @param nodeId the uuid pf the node. 
+	 * @return a mapping of trade ids to the corresponding trade objects.
+	 */
+	public Map<String, Trade> getTradesForNode(String nodeId)
+	{
+		return nodeToHazelcastMap.get(nodeId);
+	}
+
+	/**
 	 * Populate the distributed map of trades for a given node.
 	 */
-	public static class PopulateTradesTask implements Runnable
+	public class PopulateTradesTask implements Runnable
 	{
 		/**
 		 * The trades to distribute.
@@ -102,7 +122,7 @@ public class NodeSelector
 		/**
 		 * The distributed map to populate.
 		 */
-		private final Map<Object, Object> hazelcastMap;
+		private final Map<String, Trade> hazelcastMap;
 		/**
 		 * The offset of the node in the list of nodes.
 		 */
@@ -119,7 +139,7 @@ public class NodeSelector
 		 * @param nbNodes the number of nodes.
 		 * @param hazelcastMap the distributed map to populate.
 		 */
-		public PopulateTradesTask(Trade[] tradeArray, int offset, int nbNodes, Map<Object, Object> hazelcastMap)
+		public PopulateTradesTask(Trade[] tradeArray, int offset, int nbNodes, Map<String, Trade> hazelcastMap)
 		{
 			this.tradeArray = tradeArray;
 			this.offset = offset;
@@ -132,9 +152,12 @@ public class NodeSelector
 		 */
 		public void run()
 		{
+			String nodeId = nodeIdList.get(offset);
+			hazelcastMap.clear();
 			for (int i=offset; i<tradeArray.length; i+= nbNodes)
 			{
 				hazelcastMap.put(tradeArray[i].getId(), tradeArray[i]);
+				tradeToNodeMap.put(tradeArray[i].getId(), nodeId);
 			}
 		}
 	}

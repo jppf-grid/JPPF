@@ -27,7 +27,9 @@ import org.jppf.startup.JPPFNodeStartupSPI;
 import com.hazelcast.core.*;
 
 /**
- * 
+ * This startup class initializes the distributed data.
+ * It creates a reference to the distributed map holding the market data objects, accessed by the client and all the nodes,
+ * as well as a map holding the trades processsed by this node. 
  * @author Laurent Cohen
  */
 public class DataDependencyStartup implements JPPFNodeStartupSPI
@@ -49,8 +51,8 @@ public class DataDependencyStartup implements JPPFNodeStartupSPI
 		//-Dhazelcast.wait.seconds.before.join=1
 		System.setProperty("hazelcast.wait.seconds.before.join", "1"); 
 		System.out.println("Initializing distributed maps");
-		dataMap = Hazelcast.getMap("MarketData");
-		tradeMap = Hazelcast.getMap("trades-" + NodeRunner.getUuid());
+		dataMap = Hazelcast.getMap(ModelConstants.MARKET_DATA_MAP_NAME);
+		tradeMap = Hazelcast.getMap(ModelConstants.TRADE_MAP_PREFIX + NodeRunner.getUuid());
 		System.out.println("Data initialization complete");
 	}
 
@@ -78,18 +80,8 @@ public class DataDependencyStartup implements JPPFNodeStartupSPI
 	 * Update the specified trade object.
 	 * @param trade the trade to update.
 	 */
-	//@SuppressWarnings("unchecked")
 	public static void updateTrade(Trade trade)
 	{
-		try
-		{
-			((IMap<String, Trade>) tradeMap).lock(trade.getId());
-			//((IMap) tradeMap).put(trade.getId(), trade, 1000L, TimeUnit.SECONDS);
-			tradeMap.put(trade.getId(), trade);
-		}
-		finally
-		{
-			((IMap) tradeMap).unlock(trade.getId());
-		}
+		tradeMap.put(trade.getId(), trade);
 	}
 }

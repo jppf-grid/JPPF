@@ -21,7 +21,7 @@ package org.jppf.example.datadependency;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.example.datadependency.model.MarketData;
+import org.jppf.example.datadependency.model.*;
 import org.jppf.example.datadependency.simulation.*;
 import org.slf4j.*;
 
@@ -44,11 +44,11 @@ public class MarketDataHandler implements TickerListener
 	/**
 	 * Mapping of the market data.
 	 */
-	private static Map<String, MarketData> dataMap = null;
+	private static Map<String, MarketData> dataMap;
 	/**
-	 * Executes the market data updates in the nodes.
+	 * Executes the market data updates in the Hazelcast cluster.
 	 */
-	private ExecutorService nodeExecutor = Executors.newFixedThreadPool(1);
+	private ExecutorService executor = Executors.newFixedThreadPool(1);
 
 	/**
 	 * Perform the nodes' initializations.
@@ -58,10 +58,35 @@ public class MarketDataHandler implements TickerListener
 	public void populateMarketData(List<MarketData> marketDataList) throws Exception
 	{
 		System.out.println("populating the market data");
-		dataMap = Hazelcast.getMap("MarketData");
+		dataMap = Hazelcast.getMap(ModelConstants.MARKET_DATA_MAP_NAME);
 		dataMap.clear();
-		for (MarketData data: marketDataList) dataMap.put(data.getId(), data);
+		//for (MarketData data: marketDataList) dataMap.put(data.getId(), data);
+		populateInParallel(marketDataList);
 		System.out.println("end of populating the market data");
+	}
+
+	/**
+	 * Populate the distributed market data in parallel to speed up the process.
+	 * @param marketDataList the list of data to distribute.
+	 */
+	private void populateInParallel(List<MarketData> marketDataList)
+	{
+		int nbThreads = 8;
+		ExecutorService tmpExecutor = Executors.newFixedThreadPool(nbThreads);
+		List<Future<?>> futures = new ArrayList<Future<?>>();
+		for (int i=0; i<nbThreads; i++) futures.add(tmpExecutor.submit(new PopulateTask(i, nbThreads, marketDataList)));
+		for (Future<?> f: futures)
+		{
+			try
+			{
+				f.get();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		tmpExecutor.shutdownNow();
 	}
 
 	/**
@@ -71,7 +96,7 @@ public class MarketDataHandler implements TickerListener
 	 */
 	public void marketDataUpdated(TickerEvent event)
 	{
-		nodeExecutor.submit(new NodesUpdateTask(event.getMarketData()));
+		executor.submit(new NodesUpdateTask(event.getMarketData()));
 	}
 
 	/**
@@ -79,7 +104,52 @@ public class MarketDataHandler implements TickerListener
 	 */
 	public void close()
 	{
-		nodeExecutor.shutdown();
+		executor.shutdown();
+	}
+
+	/**
+	 * Performs the nodes updates.
+	 */
+	public class PopulateTask implements Runnable
+	{
+		/**
+		 * The offset to use to partition the data.
+		 */
+		private int offset;
+		/**
+		 * The number of partitions.
+		 */
+		private int nbThreads;
+		/**
+		 * The data to populate.
+		 */
+		private List<MarketData> marketDataList;
+		
+		/**
+		 * Initialize this task with the specified parameters.
+		 * @param offset the offset to use to partition the data.
+		 * @param nbThreads the number of partitions.
+		 * @param marketDataList the data to populate.
+		 */
+		public PopulateTask(int offset, int nbThreads, List<MarketData> marketDataList)
+		{
+			this.offset = offset;
+			this.nbThreads = nbThreads;
+			this.marketDataList = marketDataList;
+		}
+
+		/**
+		 * Execute this task.
+		 * @see java.lang.Runnable#run()
+		 */
+		public void run()
+		{
+			for (int i=offset; i<marketDataList.size(); i += nbThreads)
+			{
+				MarketData marketData = marketDataList.get(i);
+				dataMap.put(marketData.getId(), marketData);
+			}
+		}
 	}
 
 	/**
@@ -107,22 +177,7 @@ public class MarketDataHandler implements TickerListener
 		 */
 		public void run()
 		{
-			try
-			{
-				((IMap) dataMap).lockMap(1000L, TimeUnit.SECONDS);
-				try
-				{
-					dataMap.put(data.getId(), data);
-				}
-				finally
-				{
-					((IMap) dataMap).unlockMap();
-				}
-			}
-			catch (Exception e)
-			{
-				//e.printStackTrace();
-			}
+			dataMap.put(data.getId(), data);
 		}
 	}
 }

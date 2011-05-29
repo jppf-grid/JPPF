@@ -200,7 +200,8 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 				Set<String> tradeIdSet = new HashSet<String>();
 				for (MarketData md: marketData)
 				{
-					tradeIdSet.addAll(dataToTradeMap.get(md.getId()));
+					Set<String> set = dataToTradeMap.get(md.getId());
+					if (set != null) tradeIdSet.addAll(set);
 				}
 				if (tradeIdSet.isEmpty()) return;
 				// associate each node with a list of impacted trades
@@ -332,7 +333,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 				{
 					if (i > 0) sb.append(", ");
 					TradeUpdateTask task = (TradeUpdateTask) results.get(i);
-					sb.append(task.getId());
+					sb.append(task.getTradeId());
 				}
 				long time = System.currentTimeMillis() - timestamp;
 				sb.append("[").append(time).append(" ms]");

@@ -89,12 +89,45 @@
 
 	<target name="jar" depends="compile">
 	  <jar jarfile="DataDependency.jar" index="true">
-			<fileset dir="${classes.dir}"/>
+			<fileset dir="${classes.dir}">
+				<include name="**/model/*.*"/>
+				<include name="**/startup/*.*"/>
+				<include name="META-INF/**/*.*"/>
+			</fileset>
 	  </jar>
 		<echo/>
 		<echo message="*** The file DataDependency.jar is now ready to be deployed ***"/>
 		<echo/>
   </target>
+	
+	<!-- ========================================================================= -->
+	<!--                     Build the deployment archive files                    -->
+	<!-- ========================================================================= -->
+
+	<target name="zip" depends="jar">
+		<property name="zip.file" value="DataDependency.zip"/>
+		<delete file="${zip.file}" quiet="true"/>
+		<zip destfile="${zip.file}">
+			<zipfileset dir="${basedir}" includes="DataDependency.jar" prefix="lib"/>
+			<zipfileset dir="${shared.lib}" includes="hazelcast*.jar" prefix="lib"/>
+		</zip>
+		<echo/>
+		<echo message="*** The file ${zip.file} is now ready to be deployed ***"/>
+		<echo/>
+	</target>
+
+	<target name="tar.gz" depends="jar">
+		<property name="tar.gz.file" value="DataDependency.tar.gz"/>
+    <delete file="${tar.gz.file}" quiet="true"/>
+ 		<mkdir dir="lib"/>
+  	<copy toDir="lib" file="DataDependency.jar"/>
+  	<copy toDir="lib" file="${shared.lib}/hazelcast-1.9.3.jar"/>
+		<tar destfile="${tar.gz.file}" compression="gzip" basedir="${basedir}" includes="lib/*.*"/>
+    <delete dir="lib" quiet="true"/>
+		<echo/>
+		<echo message="*** The file ${tar.gz.file} is now ready to be deployed ***"/>
+		<echo/>
+	</target>
 	
 	<!-- ========================================================================= -->
 	<!--                     Run the sample application                            -->

@@ -40,7 +40,7 @@ public class TradeUpdateTask extends JPPFTask
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The trade to recompute
+	 * The id of the trade to recompute
 	 */
 	private String tradeId = null;
 	/**
@@ -71,7 +71,6 @@ public class TradeUpdateTask extends JPPFTask
 	{
 		//String uuid = NodeRunner.getUuid();
 		String msg = "updating trade " + tradeId;
-		//log.info(msg);
 		long taskStart = System.currentTimeMillis();
 		/*
 		*/
