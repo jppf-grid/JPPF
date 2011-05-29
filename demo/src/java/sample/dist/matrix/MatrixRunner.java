@@ -112,7 +112,9 @@ public class MatrixRunner implements NotificationListener
 		{
 			if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
 			else jppfClient = new JPPFClient();
-			monitor = new GridMonitor(jppfClient, 1000L);
+			//monitor = new GridMonitor(jppfClient, 1000L);
+			monitor = new GridMonitor("localhost", 11198);
+			monitor.testPIDs();
 			monitor.startMonitoring();
 
 			// initialize the 2 matrices to multiply
