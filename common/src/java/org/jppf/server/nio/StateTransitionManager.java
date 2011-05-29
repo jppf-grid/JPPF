@@ -138,6 +138,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * @param action an action to perform upon registration of the channel.
 	 * @return a {@link ChannelWrapper} instance.
 	 */
+	@SuppressWarnings("unchecked")
 	public ChannelWrapper<?> registerChannel(SocketChannel channel, int ops, NioContext context,	ChannelRegistrationAction action)
 	{
 		ChannelWrapper<?> wrapper = null;
