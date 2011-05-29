@@ -58,7 +58,7 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater
 			// start the ticker
 			Ticker ticker = new Ticker(marketDataList, config.getInt("minTickerInterval", 50), config.getInt("maxTickerInterval", 1000),
 				config.getInt("nbTickerEvents", 0), dataFactory);
-			ticker.addTickerListener(nodeHandler);
+			ticker.addTickerListener(marketDataHandler);
 			ticker.addTickerListener(this);
 			print("starting ticker ...");
 			long start = System.currentTimeMillis();
@@ -75,15 +75,15 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater
 			long elapsed = System.currentTimeMillis() - start;
 			statsCollector.setTotalTime(elapsed);
 			print(statsCollector.toString());
-			nodeHandler.close();
+			marketDataHandler.close();
 			Hazelcast.shutdownAll();
-			System.exit(0);
 		}
 		catch(Exception e)
 		{
 			System.out.println(e.getMessage());
 			log.error(e.getMessage(), e);
 		}
+		System.exit(0);
 	}
 
 	/**

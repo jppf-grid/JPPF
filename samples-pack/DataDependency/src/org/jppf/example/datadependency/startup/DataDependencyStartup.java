@@ -21,6 +21,7 @@ package org.jppf.example.datadependency.startup;
 import java.util.Map;
 
 import org.jppf.example.datadependency.model.*;
+import org.jppf.node.NodeRunner;
 import org.jppf.startup.JPPFNodeStartupSPI;
 
 import com.hazelcast.core.*;
@@ -49,7 +50,7 @@ public class DataDependencyStartup implements JPPFNodeStartupSPI
 		System.setProperty("hazelcast.wait.seconds.before.join", "1"); 
 		System.out.println("Initializing distributed maps");
 		dataMap = Hazelcast.getMap("MarketData");
-		tradeMap = Hazelcast.getMap("Trade");
+		tradeMap = Hazelcast.getMap("trades-" + NodeRunner.getUuid());
 		System.out.println("Data initialization complete");
 	}
 
@@ -77,11 +78,12 @@ public class DataDependencyStartup implements JPPFNodeStartupSPI
 	 * Update the specified trade object.
 	 * @param trade the trade to update.
 	 */
+	//@SuppressWarnings("unchecked")
 	public static void updateTrade(Trade trade)
 	{
 		try
 		{
-			((IMap) tradeMap).lock(trade.getId());
+			((IMap<String, Trade>) tradeMap).lock(trade.getId());
 			//((IMap) tradeMap).put(trade.getId(), trade, 1000L, TimeUnit.SECONDS);
 			tradeMap.put(trade.getId(), trade);
 		}
@@ -89,6 +91,5 @@ public class DataDependencyStartup implements JPPFNodeStartupSPI
 		{
 			((IMap) tradeMap).unlock(trade.getId());
 		}
-		
 	}
 }

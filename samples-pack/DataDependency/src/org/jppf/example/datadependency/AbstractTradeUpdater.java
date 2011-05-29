@@ -25,12 +25,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.jppf.client.*;
 import org.jppf.example.datadependency.model.*;
 import org.jppf.example.datadependency.simulation.*;
+import org.jppf.management.*;
 import org.jppf.node.policy.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
-
-import com.hazelcast.core.*;
 
 /**
  * 
@@ -51,17 +50,13 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 	 */
 	protected static JPPFClient jppfClient =  null;
 	/**
-	 * Mapping of the trades.
-	 */
-	private static Map<String, Trade> tradeMap = null;
-	/**
 	 * The JPPF configuration.
 	 */
 	protected TypedProperties config = JPPFConfiguration.getProperties();
 	/**
-	 * Handles the nodes notifications and initializations. 
+	 * Handles the distributed market data. 
 	 */
-	protected NodeHandler nodeHandler = new NodeHandler();
+	protected MarketDataHandler marketDataHandler = new MarketDataHandler();
 	/**
 	 * The node selector.
 	 */
@@ -73,15 +68,15 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 	/**
 	 * Associations between market data and trades.
 	 */
-	protected SortedMap<String, Set<Trade>> dataToTradeMap = new TreeMap<String, Set<Trade>>();
+	protected SortedMap<String, Set<String>> dataToTradeMap = new TreeMap<String, Set<String>>();
 	/**
 	 * Executes the job submissions.
 	 */
-	protected ExecutorService jobExecutor = Executors.newFixedThreadPool(1);
+	protected ExecutorService jobExecutor = Executors.newFixedThreadPool(1, new JPPFThreadFactory("JobExecutor"));
 	/**
 	 * Executes the results collection and processing.
 	 */
-	protected ExecutorService resultsExecutor = Executors.newFixedThreadPool(1, new JPPFThreadFactory("TradeUpdater"));
+	protected ExecutorService resultsExecutor = Executors.newFixedThreadPool(1, new JPPFThreadFactory("ResultsExecutor"));
 	/**
 	 * Count of submitted jobs - used as part of their id.
 	 */
@@ -122,34 +117,41 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		// generate random market data
 		marketDataList = dataFactory.generateDataMarketObjects(config.getInt("nbMarketData", 10));
 		// generate random trades
-		tradeMap = Hazelcast.getMap("Trade");
 		List<Trade> tradeList = dataFactory.generateTradeObjects(config.getInt("nbTrades", 10), marketDataList,
 			config.getInt("minDataPerTrade", 1), config.getInt("maxDataPerTrade", 5));
 		// initialize the nodes: collect their id and send them the current market data
-		List<String> idList = nodeHandler.initNodes(marketDataList);
-		//nodeSelector = new NodeSelector(tradeList, idList);
-		try
+		marketDataHandler.populateMarketData(marketDataList);
+		List<String> idList = getNodeIds();
+		nodeSelector = new NodeSelector(tradeList, idList);
+		for (Trade t: tradeList)
 		{
-			((IMap) tradeMap).lockMap(1000L, TimeUnit.SECONDS);
-			for (Trade t: tradeList)
+			for (String marketDataId: t.getDataDependencies())
 			{
-				tradeMap.put(t.getId(), t);
-				for (String id: t.getDataDependencies())
+				Set<String> tradeSet = dataToTradeMap.get(marketDataId);
+				if (tradeSet == null)
 				{
-					Set<Trade> tradeSet = dataToTradeMap.get(id);
-					if (tradeSet == null)
-					{
-						tradeSet = new HashSet<Trade>();
-						dataToTradeMap.put(id, tradeSet);
-					}
-					tradeSet.add(t);
+					tradeSet = new HashSet<String>();
+					dataToTradeMap.put(marketDataId, tradeSet);
 				}
+				tradeSet.add(t.getId());
 			}
 		}
-		finally
-		{
-			((IMap) tradeMap).unlockMap();
-		}
+	}
+
+	/**
+	 * Get the uuids of all nodes using the management APIs.
+	 * @return the ids as a list of strings.
+	 * @throws Exception if azny error occurs.
+	 */
+	protected List<String> getNodeIds() throws Exception
+	{
+		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
+		JMXDriverConnectionWrapper driver = c.getJmxConnection();
+		while (!driver.isConnected()) Thread.sleep(1L);
+		Collection<JPPFManagementInfo> nodesInfo = driver.nodesInformation();
+		List<String> idList = new ArrayList<String>();
+		for (JPPFManagementInfo info: nodesInfo) idList.add(info.getId());
+		return idList;
 	}
 
 	/**
@@ -195,58 +197,29 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 			{
 				if (debugEnabled) log.debug("processing update for " + marketData);
 				// determine which trades are impacted
-				Set<Trade> tradeSet = new HashSet<Trade>();
+				Set<String> tradeIdSet = new HashSet<String>();
 				for (MarketData md: marketData)
 				{
-					Set<Trade> set = dataToTradeMap.get(md.getId());
-					for (Trade trade: set)
-					{
-						if (!tradeSet.contains(trade)) tradeSet.add(trade);
-					}
+					tradeIdSet.addAll(dataToTradeMap.get(md.getId()));
 				}
-				if (tradeSet.isEmpty()) return;
-				submitJob(tradeSet);
-			}
-			catch(Exception e)
-			{
-				System.out.println(e.getMessage());
-				log.error(e.getMessage(), e);
-			}
-		}
-
-		/**
-		 * Submits a job.
-		 * @see java.lang.Runnable#run()
-		 */
-		public void run2()
-		{
-			try
-			{
-				if (debugEnabled) log.debug("processing update for " + marketData);
-				// determine which trades are impacted
-				Set<Trade> tradeSet = new HashSet<Trade>();
-				for (MarketData md: marketData)
-				{
-					tradeSet.addAll(dataToTradeMap.get(md.getId()));
-				}
-				if (tradeSet.isEmpty()) return;
+				if (tradeIdSet.isEmpty()) return;
 				// associate each node with a list of impacted trades
-				Map<String, List<Trade>> nodeMap = new HashMap<String, List<Trade>>();
-				for (Trade trade: tradeSet)
+				Map<String, List<String>> nodeMap = new HashMap<String, List<String>>();
+				for (String tradeId: tradeIdSet)
 				{
-					String n = nodeSelector.getNodeId(trade);
-					List<Trade> list = nodeMap.get(n);
+					String nodeId = nodeSelector.getNodeId(tradeId);
+					List<String> list = nodeMap.get(nodeId);
 					if (list == null)
 					{
-						list = new ArrayList<Trade>();
-						nodeMap.put(n, list);
+						list = new ArrayList<String>();
+						nodeMap.put(nodeId, list);
 					}
-					list.add(trade);
+					list.add(tradeId);
 				}
 				// create a job for each node
 				for (String nodeId: nodeMap.keySet())
 				{
-					List<Trade> list = nodeMap.get(nodeId);
+					List<String> list = nodeMap.get(nodeId);
 					submitOneJobPerNode(nodeId, list);
 					//submitOneJobPerTrade(nodeId, list);
 				}
@@ -261,41 +234,21 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		/**
 		 * This method submits one job per node, each job comprising as many tasks
 		 * as there are trades to recompute on this node.
-		 * @param list the list of impacted trades to recompute on the node.
-		 * @throws Exception if any error occurs.
-		 */
-		private void submitJob(Collection<Trade> list) throws Exception
-		{
-			JPPFJob job = new JPPFJob();
-			job.setId("Trade Job " + jobCount.incrementAndGet());
-			job.setBlocking(false);
-			JPPFResultCollector collector = new JPPFResultCollector(list.size());
-			job.setResultListener(collector);
-			// create a task for each trade
-			for (Trade t: list) job.addTask(createTask(t));
-			jppfClient.submit(job);
-			resultsExecutor.submit(new ResultCollectionTask(collector, timestamp));
-		}
-
-
-		/**
-		 * This method submits one job per node, each job comprising as many tasks
-		 * as there are trades to recompute on this node.
 		 * @param nodeId the id of the node on which to execute the job.
-		 * @param list the list of impacted trades to recompute on the node.
+		 * @param tradeIdList the list of impacted trades to recompute on the node.
 		 * @throws Exception if any error occurs.
 		 */
-		private void submitOneJobPerNode(String nodeId, List<Trade> list) throws Exception
+		private void submitOneJobPerNode(String nodeId, List<String> tradeIdList) throws Exception
 		{
 			JPPFJob job = new JPPFJob();
-			job.setId("[Node id=" + nodeId + "] (" + jobCount.incrementAndGet() + ")");
+			job.setId("Job (" + jobCount.incrementAndGet() + ")");
 			job.setBlocking(false);
 			// set an execution policy that forces execution on the node with the specified id
-			job.getJobSLA().setExecutionPolicy(new Equal("id", false, nodeId));
-			JPPFResultCollector collector = new JPPFResultCollector(list.size());
+			job.getJobSLA().setExecutionPolicy(new Equal("jppf.uuid", false, nodeId));
+			JPPFResultCollector collector = new JPPFResultCollector(tradeIdList.size());
 			job.setResultListener(collector);
 			// create a task for each trade
-			for (Trade t: list) job.addTask(createTask(t));
+			for (String tradeId: tradeIdList) job.addTask(createTask(tradeId));
 			jppfClient.submit(job);
 			resultsExecutor.submit(new ResultCollectionTask(collector, timestamp));
 		}
@@ -304,23 +257,23 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		 * This method submits one job per trade, each job comprising a single task
 		 * that recomputes a single trade.
 		 * @param nodeId the id of the node on which to execute the job.
-		 * @param list the list of impacted trades to recompute on the node.
+		 * @param tardeIdList the list of impacted trades to recompute on the node.
 		 * @throws Exception if any error occurs.
 		 */
-		private void submitOneJobPerTrade(String nodeId, List<Trade> list) throws Exception
+		private void submitOneJobPerTrade(String nodeId, List<String> tardeIdList) throws Exception
 		{
-			ExecutionPolicy policy = new Equal("id", false, nodeId);
+			ExecutionPolicy policy = new Equal("jppf.uuid", false, nodeId);
 			// create a job for each trade
-			for (Trade trade: list)
+			for (String tradeId: tardeIdList)
 			{
 				JPPFJob job = new JPPFJob();
-				job.setId("[Node id=" + nodeId + "] trade=" + trade.getId() + " (" + jobCount.incrementAndGet() + ")");
+				job.setId("[Node id=" + nodeId + "] trade=" + tradeId + " (" + jobCount.incrementAndGet() + ")");
 				job.setBlocking(false);
 				// set an execution policy that forces execution on the node with the specified id
 				job.getJobSLA().setExecutionPolicy(policy);
 				JPPFResultCollector collector = new JPPFResultCollector(1);
 				job.setResultListener(collector);
-				job.addTask(createTask(trade));
+				job.addTask(createTask(tradeId));
 				jppfClient.submit(job);
 				resultsExecutor.submit(new ResultCollectionTask(collector, timestamp));
 			}
@@ -328,12 +281,12 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 
 		/**
 		 * Create a trade update task from the specified trade.
-		 * @param trade the trade t recompute.
+		 * @param tradeId the trade t recompute.
 		 * @return a new <code>TradeUpdateTask</code> instance.
 		 */
-		private TradeUpdateTask createTask(Trade trade)
+		private TradeUpdateTask createTask(String tradeId)
 		{
-			TradeUpdateTask task = new TradeUpdateTask(trade.getId());
+			TradeUpdateTask task = new TradeUpdateTask(tradeId);
 			task.setTaskDuration(dataFactory.getRandomInt(minTaskDuration, maxTaskDuration));
 			return task;
 		}
@@ -347,14 +300,14 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		/**
 		 * The object from which to get the results.
 		 */
-		private JPPFResultCollector collector = null;
+		private JPPFResultCollector collector;
 		/**
 		 * Event notification timestamp.
 		 */
-		private long timestamp = 0L;
+		private long timestamp;
 
 		/**
-		 * Initialize this task with the specified market data.
+		 * Initialize this task with the specified parameter.
 		 * @param collector the object from which to get the results.
 		 * @param timestamp the event notification timestamp.
 		 */
@@ -382,10 +335,8 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 					sb.append(task.getId());
 				}
 				long time = System.currentTimeMillis() - timestamp;
-				/*
 				sb.append("[").append(time).append(" ms]");
 				log.info(sb.toString());
-				*/
 				statsCollector.jobProcessed(results, time);
 			}
 			catch(Exception e)

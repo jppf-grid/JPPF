@@ -25,6 +25,8 @@ import org.jppf.example.datadependency.model.MarketData;
 import org.jppf.example.datadependency.simulation.*;
 import org.slf4j.*;
 
+import com.hazelcast.core.Hazelcast;
+
 /**
  * 
  * @author Laurent Cohen
@@ -75,7 +77,7 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
 			// start the ticker
 			Ticker ticker = new Ticker(marketDataList, config.getInt("minTickerInterval", 50), config.getInt("maxTickerInterval", 1000),
 				config.getInt("nbTickerEvents", 0), dataFactory);
-			ticker.addTickerListener(nodeHandler);
+			ticker.addTickerListener(marketDataHandler);
 			ticker.addTickerListener(this);
 			long snapshotInterval = config.getLong("snapshotInterval", 1000L);
 			ProcessSnapshotTask snapshotTask = new ProcessSnapshotTask();
@@ -106,13 +108,15 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
 			//timer.purge();
 			statsCollector.setTotalTime(elapsed);
 			print(statsCollector.toString());
-			nodeHandler.close();
+			marketDataHandler.close();
+			Hazelcast.shutdownAll();
 		}
 		catch(Exception e)
 		{
 			System.out.println(e.getMessage());
 			log.error(e.getMessage(), e);
 		}
+		System.exit(0);
 	}
 
 	/**

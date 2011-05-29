@@ -79,13 +79,15 @@ public class TradeUpdateTask extends JPPFTask
 		List<MarketData> data = new ArrayList<MarketData>();
 		for (String id: trade.getDataDependencies()) data.add(DataDependencyStartup.getMarketData(id));
 		// perform some dummy cpu-consuming computation
-		for (long elapsed = 0L; elapsed < taskDuration; elapsed = System.currentTimeMillis() - taskStart)
+		long elapsed = 0L;
+		for (; elapsed < taskDuration; elapsed = System.currentTimeMillis() - taskStart)
 		{
 			String s = "";
 			for (int i=0; i<10; i++) s += "A"+"10";
 		}
-		msg = "updated trade " + tradeId;
+		msg = "updated trade " + tradeId + " in " + elapsed + " ms";
 		//log.info(msg);
+		//System.out.println(msg);
 		setResult(msg);
 	}
 
