@@ -192,24 +192,24 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 		c.addClientConnectionStatusListener(this);
 		c.setStatus(JPPFClientConnectionStatus.NEW);
 		int priority = c.getPriority();
-		ClientPool pool = pools.get(priority);
-		if (pool == null)
-		{
-			pool = new ClientPool();
-			pool.setPriority(priority);
-			pools.put(priority, pool);
-		}
-		pool.clientList.add(c);
 		int n = 0;
 		synchronized(allConnections)
 		{
+			ClientPool pool = pools.get(priority);
+			if (pool == null)
+			{
+				pool = new ClientPool();
+				pool.setPriority(priority);
+				pools.put(priority, pool);
+			}
+			pool.clientList.add(c);
 			allConnections.add(c);
 			n = allConnections.size();
-		}
-		if (executor.getCorePoolSize() < n)
-		{
-			executor.setMaximumPoolSize(n);
-			executor.setCorePoolSize(n);
+			if (executor.getCorePoolSize() < n)
+			{
+				executor.setMaximumPoolSize(n);
+				executor.setCorePoolSize(n);
+			}
 		}
 		executor.submit(new ConnectionInitializer(c));
 		super.newConnection(c);

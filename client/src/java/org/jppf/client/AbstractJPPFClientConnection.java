@@ -22,6 +22,7 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.nio.channels.AsynchronousCloseException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.*;
 
 import org.jppf.JPPFException;
@@ -109,7 +110,11 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	/**
 	 * Status of the connection.
 	 */
-	protected JPPFClientConnectionStatus status = CONNECTING;
+	protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(CONNECTING);
+	/**
+	 * Used to synchronize access to the status.
+	 */
+	protected Object statusLock = new Object();
 	/**
 	 * List of status listeners for this connection.
 	 */
@@ -375,10 +380,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	public JPPFClientConnectionStatus getStatus()
 	{
-		synchronized(status)
-		{
-			return status;
-		}
+		return status.get();
 	}
 
 	/**
@@ -388,12 +390,9 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	public void setStatus(JPPFClientConnectionStatus status)
 	{
-		synchronized(this.status)
-		{
-			JPPFClientConnectionStatus oldStatus = getStatus();
-			this.status = status;
-			if (!status.equals(oldStatus)) fireStatusChanged(oldStatus);
-		}
+		JPPFClientConnectionStatus oldStatus = getStatus();
+		this.status.set(status);
+		if (!status.equals(oldStatus)) fireStatusChanged(oldStatus);
 	}
 
 	/**
