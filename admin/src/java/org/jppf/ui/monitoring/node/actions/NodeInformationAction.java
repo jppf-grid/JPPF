@@ -65,6 +65,7 @@ public class NodeInformationAction extends AbstractTopologyAction
 			JPPFSystemInformation info = connection.systemInformation();
 			PropertiesTableFormat format = new HTMLPropertiesTableFormat("information for node " + connection.getId());
 			format.start();
+			format.formatTable(info.getUuid(), "UUID");
 			format.formatTable(info.getSystem(), "System Properties");
 			format.formatTable(info.getEnv(), "Environment Variables");
 			format.formatTable(info.getRuntime(), "Runtime Information");
