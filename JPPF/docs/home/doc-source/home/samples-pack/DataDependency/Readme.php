@@ -41,6 +41,12 @@ $template{name="samples-page-header" title="Data Dependency sample"}$
 						<li>snapshot-based mode: the application simply aggregates the update events and, at regular intervals, submits trade update jobs to the JPPF grid.
 								This mode provides the best overall throughput, but does not allow real-time updates. This is a tradeoff to consider when the market pace is too fast to work in event-based mode.</li>
 					</ul>
+					<p>The implementation relies on the <a href="http://www.hazelcast.com">Hazelcast</a> distributed cache API to store the market data and to distribute the trades among the nodes:
+					<ul style="margin-bottom: 0px">
+						<li>the market data objects are stored in a Hazelcast distributed map that is accessed by the application and all the nodes</li>
+						<li>the trades are distributed among a number of distinct distributed maps, each of them accessed by the application and a single node only. This constitutes a partitioning of the set of trades according to the nodes</li>
+					</ul>
+					<p>A <a href="http://www.jppf.org/wiki/index.php?title=JPPF_startup_classes#Node_startup_classes">node startup class</a> is also used to initialize the Hazelcast data structures in each node at startup time, and provides a convenient API for the tasks to access the distributed data.
 					<p>To make it easy to simulate various scenarios, the application provides a configuration property for most of the the parameters it uses:
 					number of market data pieces, number of trades, number of market data dependencies per trade, interval between ticker events, event vs. snapshot run mode, duration of each trade computation, etc...
 					<p>As all events and resulting job submissions are fully asynchronous, the application relies on a pool of connections to the JPPF driver, rather than on a single connection.
@@ -52,11 +58,10 @@ $template{name="samples-page-header" title="Data Dependency sample"}$
 					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have installed a server and one or multiple nodes, perform the following steps:
 					<ol>
-						<li>for each node, go to the "<b>config</b>" folder and edit the node's configuration file. Add this line: <tt>id = &lt;x&gt;</tt>, where <i>x</i> is any positive number, distinct for each node.</li>
-						<li>build the custom pluggable MBean that will handle the ticker events notifications to the nodes: type "<b>ant jar</b>"; this will create a file named <b>DataDependency.jar</b></li>
-						<li>copy DataDependency.jar in the "<b>lib</b>" folder of the JPPF driver installation, to add it to the driver's classpath. This is enough, as the node will download the custom MBean code from the server.</li>
-						<li>open a command prompt in the driver's install folder and start the driver by typing "<b>ant run</b>"</li>
-						<li>open a command prompt in each node's install folder and start the node by typing "<b>ant run</b>"</li>
+						<li>build the archive that will contain the libraries to deploy in the JPPF driver's class path: run either the Ant target "<b>zip</b>" which will generate the file "<b>DataDependency.zip</b>",
+						or "<b>tar.gz</b>" which will generate the file "<b>DataDependency.tar.gz</b>"</li>
+						<li>extract the generated archive in the installation folder of the JPPF driver, this will add the files "DataDependency.jar" and "hazelcast-x.y.z.jar" in the "lib" directory. This ensures the nodes will download the startup class and Hazelcast APIs from the server's classpath.</li>
+						<li>start the driver and the nodes</li>
 						<li>from the sample's "config" folder, open the client configuration file "<b>jppf.properties</b>" in a text editor</li>
 						<li>find the line containing "<b>jppf.pool.size = value</b>" and update the value as you see fit (server connection pool size)</li>
 						<li>At the end of the file, you will find the configuration of the simulation parameters, for instance:
@@ -75,7 +80,7 @@ runMode = snapshot
 nbMarketData = 2000
 
 <font color="green"># number of trade objects</font>
-nbTrades = 10000
+nbTrades = 4000
 
 <font color="green"># min and max number of market data object a trade depends on (randomly chosen)</font>
 minDataPerTrade = 1
@@ -100,24 +105,23 @@ maxTaskDuration = 100
 <font color="green"># interval between 2 snapshots when running in snapshot-based mode</font>
 snapshotInterval = 3250</pre>
 						</li>
-						<li>once you have configured your scenario, in the sample's command prompt, type "<b>ant run</b>" to run the simulation</li>
+						<li>once you have configured your scenario, in the sample's command prompt, type either "<b>run.bat</b>" (on Windows), "<b>./run.sh</b>" (on Linux/Unix) or "<b>ant run</b>" to run the simulation</li>
 						<li>for a clearer visualization of what is happening during the simulation, it is recommended to start the JPPF administration UI in  the "Jobs" view:<br/>
-						<p>In "event" mode:
-						<p><img src="images/Jobs-Event.gif"/>
-						<p>In "snapshot" mode: <br/>
-						<p><img src="images/Jobs-Snapshot.gif"/>
-						<p>The "Topology" view shows:
-						<p><img src="images/Topology.gif"/>
+							<p>In "event" mode:
+							<p><img src="images/Jobs-Event.gif"/>
+							<p>In "snapshot" mode: <br/>
+							<p><img src="images/Jobs-Snapshot.gif"/>
+							<p>The "Topology" view shows:
+							<p><img src="images/Topology.gif"/>
 						</li>
 					</ol>
 
 					<h3>What features of JPPF are demonstrated?</h3>
-					Pluggable management beans for JPPF nodes<br>
-					Execution policy (to specify on which nodes the trades are computed).<br>
+					Integration with a Hazelcast data grid.<br/>
+					Use of a node startup class to facilitate the integration<br/>
+					Execution policy (to specify on which nodes the trades are computed).<br/>
 					Asynchronous job submissions.<br>
-					Extension of the JPPF configuration to application-specific parameters.<br>
-					For a detailed explanation, please refer to the related documentation in the
-					<a href="http://www.jppf.org/wiki/index.php?title=Extending_and_Customizing_JPPF#Pluggable_MBeans">Extending and Customizing JPPF &gt; Pluggable MBeans</a> section.
+					Extension of the JPPF configuration to application-specific parameters.<br/>
 
 					<h3>I have additional questions and comments, where can I go?</h3>
 					<p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>DataDependency/src</b> folder.

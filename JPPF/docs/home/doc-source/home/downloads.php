@@ -2,7 +2,7 @@
 $template{name="about-page-header" title="Downloads"}$
 
 	<?php
-		$jppfVersion = "2.4";
+		$jppfVersion = "2.5";
 		$base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $jppfVersion . "/";
 	?>
 	<a name="2.0"></a>
@@ -32,33 +32,6 @@ $template{name="about-page-header" title="Downloads"}$
 	Make sure to get started with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">online tutorial</a>
 
 	<hr>
-
-	<?php $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%201.9.2/"; ?>
-	<a name="1.9.2"></a>
-	<h1>JPPF 1.9.2 Downloads</h1>
-	<h3>Source distribution</h3>
-	<a href="<?php echo $base . 'jppf-src-1.9.2.zip/download'; ?>">Full distribution with source code and required libraries<p>
-
-	<h3>Deployable module binaries</h3>
-	<a href="<?php echo $base . 'jppf-driver-bin-1.9.2.zip/download'; ?>">JPPF server/driver distribution</a><br>
-	<a href="<?php echo $base . 'jppf-node-bin-1.9.2.zip/download'; ?>">JPPF node distribution</a><br>
-	<a href="<?php echo $base . 'jppf-gui-bin-1.9.2.zip/download'; ?>">JPPF administration and monitoring console</a><p>
-
-	<h3>Connectors</h3>
-	<a href="<?php echo $base . 'jppf-j2ee-connector-1.9.2.zip/download'; ?>">J2EE connector</a><br>
-	<a href="<?php echo $base . 'JPPF-GigaSpaces-1.9.2.zip/download'; ?>">GigaSpaces XAP connector</a><p>
-
-	<h3>Samples and add-ons</h3>
-	<a href="<?php echo $base . 'jppf-samples-pack-1.9.2.zip/download'; ?>">JPPF samples pack</a><br>
-	<a href="<?php echo $base . 'JPPFQuickStart-1.9.2.zip/download'; ?>">JPPF quick start guide</a><br>
-	<a href="<?php echo $base . 'jppf-1.9.2-screensaver-win32.zip/download'; ?>">JPPF Windows node screen saver</a><br>
-	<a href="<?php echo $base . 'jppf-multiplexer-bin-1.9.2.zip/download'; ?>">JPPF TCP multiplexer</a><p>
-
-	<h3>API Documentation (Javadoc)</h3>
-	<a href="<?php echo $base . 'jppf-api-1.9.2.zip/download'; ?>">Download</a> or <a href="/api-2.0">Browse online</a><p>
-
-	<h3>All 1.9.2 files</h3>
-	<a href="<?php echo $base ?>">All files</a><p>
 
 	<h3>All JPPF releases</h3>
 	All JPPF files can be found from <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project"><b>this location</b></a>.

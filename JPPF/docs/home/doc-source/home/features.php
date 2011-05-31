@@ -1,7 +1,7 @@
 <?php $currentPage="Features" ?>
 $template{name="about-page-header" title="Features"}$
 
-<h1>JPPF 2.4 features</h1>
+<h1>JPPF 2.5 features</h1>
 
 <h3>Ease of use</h3>
 <ul>
@@ -29,6 +29,7 @@ $template{name="about-page-header" title="Features"}$
 	<li>job prioritization</li>
 	<li>job scheduled start date</li>
 	<li>job scheduled expiration date</li>
+	<li>broadcast jobs</li>
 </ul>
 
 <h3>Management and monitoring</h3>
@@ -93,7 +94,7 @@ $template{name="about-page-header" title="Features"}$
 	<li>servers and nodes deployable as Linux/Unix daemons</li>
 	<li>servers and nodes deployable as Windows services</li>
 	<li>application client deployment as a Web, J2EE or GigaSpaces XAP application
-	<li>nodes can run in idle system mode (idle system scavenging)</li>
+	<li>nodes can run in idle system mode (CPU scavenging)</li>
 </ul>
 
 <h3>Execution modes</h3>
@@ -121,6 +122,8 @@ $template{name="about-page-header" title="Features"}$
 	<li><a href="samples-pack/TaskNotifications/Readme.php">A customization that allows tasks to send notifications while executing</a></li>
 	<li><a href="samples-pack/IdleSystem/Readme.php">An extension that enables nodes to run only when the machine is idle</a></li>
 	<li><a href="samples-pack/NodeLifeCycle/Readme.php">Control of database transactions via node life cycle events</a></li>
+	<li><a href="samples-pack/Nbody/Readme.php">Parallel N-body problem applied to anti-protons trapped in a  magnetic field</a></li>
+	<li><a href="samples-pack/FTPServer/Readme.php">How to embed and use an FTP server in JPPF</a></li>
 </ul>
 
 $template{name="about-page-footer"}$
