@@ -23,7 +23,15 @@ import java.io.*;
 import org.jppf.utils.SerializationUtils;
 
 /**
- * 
+ * Implementation of {@link ObjectOutputStream} that writes objects without regards to whether
+ * they implement {@link Serializable} or not. This allows using non-serializable classes in
+ * JPPF tasks, especially when their source code is not available.
+ * <p>The rest of the {@link ObjectOutputStream} specification is respected:
+ * <ul>
+ * <li>transient fields are not serialized</li>
+ * <li><code>private void writeObject(ObjectOutputStream)</code> is used whenever implemented</li>
+ * <li>the {@link Externalized} interface is respected</li>
+ * </ul>
  * @author Laurent Cohen
  */
 public class JPPFObjectOutputStream extends ObjectOutputStream

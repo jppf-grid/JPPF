@@ -341,8 +341,8 @@ public final class SystemUtils
 	}
 
 	/**
-	 * Return the pid for the current process.
-	 * @return the pid as an int.
+	 * Return the current process ID.
+	 * @return the pid as an int, or -1 if the pid could not be obtained.
 	 */
 	public static int getPID()
 	{
@@ -351,16 +351,19 @@ public final class SystemUtils
 		int idx = name.indexOf("@");
 		if (idx >= 0)
 		{
+			String sub = name.substring(0, idx);
 			try
 			{
-				pid = Integer.valueOf(name.substring(0, idx));
+				pid = Integer.valueOf(sub);
+				if (debugEnabled) log.debug("process name=" + name + ", pid=" + pid);
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+				String msg = "could not parse '" + sub +"' into a valid integer pid";
+				if (debugEnabled) log.debug(msg, e);
+				else log.warn(msg);
 			}
 		}
-		if (debugEnabled) log.debug("process name=" + name + ", pid=" + pid);
 		return pid;
 	}
 }

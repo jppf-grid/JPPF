@@ -23,7 +23,15 @@ import java.io.*;
 import org.jppf.utils.SerializationUtils;
 
 /**
- * 
+ * Implementation of {@link ObjectInputStream} that reads objects without regards to whether
+ * they implement {@link Serializable} or not. This allows using non-serializable classes in
+ * JPPF tasks, especially when their source code is not available.
+ * <p>The rest of the {@link ObjectInputStream} specification is respected:
+ * <ul>
+ * <li>transient fields are not deserialized</li>
+ * <li><code>private void readObject(ObjectInputStream)</code> is used whenever implemented</li>
+ * <li>the {@link Externalized} interface is respected</li>
+ * </ul>
  * @author Laurent Cohen
  */
 public class JPPFObjectInputStream extends ObjectInputStream
