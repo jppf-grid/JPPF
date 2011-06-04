@@ -5,25 +5,33 @@
 	  long duration = 500L;
 	  int nbTasks = 10;
 	  String jobId = "Demo job";
+
+		String text = request.getParameter("duration");
+		if (text != null)
+		{
+			try
+			{
+				duration = (long) (1000L * Float.parseFloat(text));
+				session.setAttribute("duration", text);
+			}
+			catch(NumberFormatException ignored) {}
+		}
+		text = request.getParameter("nbTasks");
+		if (text != null)
+		{
+			try
+			{
+				nbTasks = Integer.parseInt(text);
+				session.setAttribute("nbTasks", text);
+			}
+			catch(NumberFormatException ignored) {}
+		}
+		text = request.getParameter("jobId");
+		if ((text != null) && !"".equals(text.trim())) jobId = text;
+
 	  String perform = request.getParameter("perform");
 	  if (perform != null)
 	  {
-		  String text = request.getParameter("duration");
-		  try
-		  {
-		  	duration = (long) (1000L * Float.parseFloat(text));
-		  	session.setAttribute("duration", text);
-		  }
-		  catch(NumberFormatException ignored) {}
-		  text = request.getParameter("nbTasks");
-		  try
-		  {
-		  	nbTasks = Integer.parseInt(text);
-		  	session.setAttribute("nbTasks", text);
-		  }
-		  catch(NumberFormatException ignored) {}
-		  text = request.getParameter("jobId");
-		  if ((text != null) && !"".equals(text.trim())) jobId = text;
 		  session.setAttribute("jobId", text);
 			String msg = new Demo().submitJob(jobId, nbTasks, duration);
 	  	session.setAttribute("result", msg);
@@ -31,26 +39,6 @@
 	  }
 		else
 		{
-			String text = (String) session.getAttribute("duration");
-			if (text != null)
-			{
-			  try
-			  {
-			  	duration = (long) (1000L * Float.parseFloat(text));
-			  }
-			  catch(NumberFormatException ignored) {}
-			}
-			text = (String) session.getAttribute("nbTasks");
-			if (text != null)
-			{
-			  try
-			  {
-		  		nbTasks = Integer.parseInt(text);
-			  }
-			  catch(NumberFormatException ignored) {}
-			}
-			text = (String) session.getAttribute("jobId");
-			if (text != null) jobId = text;
 %>
 			<div align="center">
 			<h1>Submit a job</h1>

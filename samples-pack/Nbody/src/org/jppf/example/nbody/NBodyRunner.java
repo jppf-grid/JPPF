@@ -93,7 +93,7 @@ public class NBodyRunner
 			jppfClient = new JPPFClient();
 			perform();
 		}
-		catch(Exception e)
+		catch(Throwable e)
 		{
 			e.printStackTrace();
 		}
@@ -146,13 +146,16 @@ public class NBodyRunner
 		}
 		for (int iter=0; iter<iterations; iter++)
 		{
+			String msg = "got results for iteration " + iter;
 			JPPFJob job = new JPPFJob(dp);
+			job.setId("Time step #" + iter);
 			for (JPPFTask task: tasks) job.addTask(task);
 			panel.updatePositions(positions);
 			dp.setValue("positions", positions);
 			long start = System.currentTimeMillis();
 			// submit the tasks for execution
 			List<JPPFTask> results = jppfClient.submit(job);
+			//System.out.println(msg);
 			for (JPPFTask task: results)
 			{
 				Exception e = task.getException();
@@ -168,6 +171,7 @@ public class NBodyRunner
 			long elapsed = System.currentTimeMillis() - start;
 			totalTime += elapsed;
 			if (iter % 100 == 0) updateLabel("Time steps: " + iter);
+			//log.info(msg);
 		}
 		updateLabel("Total time:  " + StringUtils.toStringDuration(totalTime) + " (" + (totalTime/1000) + " seconds)" +
 			", Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
@@ -179,6 +183,7 @@ public class NBodyRunner
 	 */
 	private static void updateLabel(final String text)
 	{
+		if (panel.isUpdating()) return;
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

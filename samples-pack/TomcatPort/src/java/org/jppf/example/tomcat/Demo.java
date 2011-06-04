@@ -42,7 +42,15 @@ public class Demo
 	 */
 	public static synchronized JPPFClient getClient()
 	{
-		if (jppfClient == null) jppfClient = new JPPFClient();
+		if (jppfClient == null)
+		{
+			jppfClient = new JPPFClient();
+			try
+			{
+				Thread.sleep(500L);
+			}
+			catch(InterruptedException e) { }
+		}
 		return jppfClient;
 	}
 

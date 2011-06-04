@@ -40,9 +40,12 @@ package org.jppf.example.nbody;
 
 import java.awt.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JPanel;
+
+import org.jppf.utils.JPPFThreadFactory;
 
 /**
  * 
@@ -61,7 +64,7 @@ public class NBodyPanel extends JPanel
 	/**
 	 * Thread pool used to generate paint requests.
 	 */
-	private ExecutorService executor = Executors.newFixedThreadPool(1);
+	private ExecutorService executor = Executors.newFixedThreadPool(1, new JPPFThreadFactory("PanelUpdater"));
 	/**
 	 * Used to synchronize access to the current positions array.
 	 */
@@ -77,7 +80,7 @@ public class NBodyPanel extends JPanel
 	/**
 	 * determines wheher the display is being updated.
 	 */
-	private boolean updating = false;
+	private AtomicBoolean updating = new AtomicBoolean(false);
 
 	/**
 	 * Default constructor.
@@ -95,10 +98,10 @@ public class NBodyPanel extends JPanel
 	 */
 	protected void paintComponent(Graphics g)
 	{
-		lock.lock();
+		//lock.lock();
 		try
 		{
-			updating = true;
+			updating.set(true);
 			super.paintComponent(g);
 			if (positions != null) drawBodies(g, positions, BACKGROUND);
 			if (newPositions != null)
@@ -108,10 +111,14 @@ public class NBodyPanel extends JPanel
 			}
 			if (positions != null) drawBodies(g, positions, FOREGROUND);
 		}
+		catch(Throwable e)
+		{
+			e.printStackTrace();
+		}
 		finally
 		{
-			updating = false;
-			lock.unlock();
+			updating.set(false);
+			//lock.unlock();
 		}
 	}
 
@@ -137,7 +144,16 @@ public class NBodyPanel extends JPanel
 	 */
 	public void updatePositions(Vector2d[] pos)
 	{
-		executor.submit(new UpdateRequest(pos));
+		if (!isUpdating()) executor.submit(new UpdateRequest(pos));
+	}
+
+	/**
+	 * Determine whether this panel is currently being updated.
+	 * @return true if this panel is being updated, false otherwise.
+	 */
+	public boolean isUpdating()
+	{
+		return updating.get();
 	}
 
 	/**
@@ -164,8 +180,8 @@ public class NBodyPanel extends JPanel
 		 */
 		public void run()
 		{
-			if (updating) return;
-			lock.lock();
+			if (updating.get()) return;
+			//lock.lock();
 			try
 			{
 				newPositions = pos;
@@ -173,7 +189,7 @@ public class NBodyPanel extends JPanel
 			}
 			finally
 			{
-				lock.unlock();
+				//lock.unlock();
 			}
 		}
 	}
