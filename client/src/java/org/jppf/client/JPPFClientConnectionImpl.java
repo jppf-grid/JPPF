@@ -23,7 +23,7 @@ import static org.jppf.client.JPPFClientConnectionStatus.FAILED;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.jppf.JPPFError;
+import org.jppf.*;
 import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
@@ -179,13 +179,11 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * @param job the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
+	 * @deprecated job submissions should be performed via the {@link JPPFClient} directly.
 	 */
 	public void submit(JPPFJob job) throws Exception
 	{
-		AsynchronousResultProcessor proc = new AsynchronousResultProcessor(this, job);
-		getClient().getExecutor().submit(proc, proc);
-		//executor.submit(proc, proc);
-		if (debugEnabled) log.debug("["+name+"] submitted " + job.getTasks().size() + " tasks");
+		throw new JPPFUnsupportedOperationException("this operation is not supported");
 	}
 
 	/**
@@ -209,27 +207,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 				if (debugEnabled) log.debug("[" + name + "] "+ e.getMessage(), e);
 				else log.error("[" + name + "] "+ e.getMessage());
 			}
-			/*
-			List<Runnable> pending = new ArrayList<Runnable>();
-			pending.addAll(executor.shutdownNow());
-			List<JPPFJob> result = new ArrayList<JPPFJob>();
-			if (job != null) result.add(job);
-			while (!pending.isEmpty())
-			{
-				Future<?> f = (Future<?>) pending.remove(0);
-				AsynchronousResultProcessor proc;
-				try
-				{
-					proc = (AsynchronousResultProcessor) f.get();
-					result.add(proc.getJob());
-				}
-				catch (Exception e)
-				{
-					log.error(e.getMessage(), e);
-				}
-			}
-			return result;
-			*/
 		}
 		return null;
 	}

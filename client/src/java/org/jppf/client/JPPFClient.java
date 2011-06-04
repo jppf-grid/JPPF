@@ -19,7 +19,6 @@ package org.jppf.client;
 
 import java.util.List;
 
-import org.jppf.JPPFException;
 import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.server.JPPFStats;
@@ -118,8 +117,8 @@ public class JPPFClient extends AbstractGenericClient
 	 */
 	public List<JPPFTask> submit(JPPFJob job) throws Exception
 	{
-		if ((job.getResultListener() == null) && !job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
-		else if (job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
+		if ((job.getResultListener() == null) || job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
+		//else if (job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
 		submissionManager.submitJob(job);
 		if (job.isBlocking())
 		{
@@ -127,50 +126,6 @@ public class JPPFClient extends AbstractGenericClient
 			return collector.waitForResults();
 		}
 		return null;
-	}
-
-	/**
-	 * Submit a job execution request.
-	 * @param job the job to execute.
-	 * @return the list of executed tasks with their results.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
-	 */
-	public List<JPPFTask> submit2(JPPFJob job) throws Exception
-	{
-		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getClientConnection(true);
-		if (job.isBlocking())
-		{
-			if (c != null)
-			{
-				JPPFResultCollector collector = new JPPFResultCollector(job.getTasks().size());
-				job.setResultListener(collector);
-				c.submit(job);
-				return collector.waitForResults();
-			}
-			if (loadBalancer.isLocalEnabled())
-			{
-				JPPFResultCollector collector = new JPPFResultCollector(job.getTasks().size());
-				job.setResultListener(collector);
-				loadBalancer.execute(job, null);
-				return collector.waitForResults();
-			}
-		}
-		else
-		{
-			if (job.getResultListener() == null) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
-			if (c != null)
-			{
-				c.submit(job);
-				return null;
-			}
-			if (loadBalancer.isLocalEnabled())
-			{
-				loadBalancer.execute(job, null);
-				return null;
-			}
-		}
-		throw new JPPFException("Cannot execute: no driver connection available and local execution is disabled");
 	}
 
 	/**

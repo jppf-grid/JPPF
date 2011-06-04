@@ -20,7 +20,7 @@ package org.jppf.client;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -39,6 +39,10 @@ public class SubmissionManager extends ThreadSynchronization implements Runnable
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Maximum wait time in milliseconds in the the submission manager loop.
+	 */
+	private static final long MAX_WAIT = JPPFConfiguration.getProperties().getLong("jppf.submission.manager.max.wait", 1L);
 	/**
 	 * The queue of submissions pending execution.
 	 */
@@ -69,19 +73,19 @@ public class SubmissionManager extends ThreadSynchronization implements Runnable
 		JPPFJob job = null;
 		while (!isStopped())
 		{
-			while (((execQueue.peek() == null) || !client.hasAvailableConnection()) && !isStopped())
+			while ((execQueue.isEmpty() || !client.hasAvailableConnection()) && !isStopped())
 			{
-				goToSleep();
+				goToSleep(MAX_WAIT);
 			}
 			if (isStopped()) break;
 			synchronized(this)
 			{
 				job = execQueue.poll();
 				c = (JPPFClientConnectionImpl) client.getClientConnection(true);
+				if (c != null) c.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.EXECUTING);
+				JobSubmission submission = new JobSubmission(job, c, this);
+				client.getExecutor().submit(submission);
 			}
-			if (c != null) c.setStatus(JPPFClientConnectionStatus.EXECUTING);
-			JobSubmission submission = new JobSubmission(job, c, this);
-			client.getExecutor().submit(submission);
 		}
 	}
 

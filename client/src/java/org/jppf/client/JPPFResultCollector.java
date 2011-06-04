@@ -66,6 +66,7 @@ public class JPPFResultCollector implements TaskResultListener
 	{
 		this.count = count;
 		this.pendingCount = count;
+		//if (debugEnabled) log.debug("count = " + count);
 	}
 
 	/**
@@ -78,10 +79,10 @@ public class JPPFResultCollector implements TaskResultListener
 		if (event.getThrowable() == null)
 		{
 			List<JPPFTask> tasks = event.getTaskList();
-			if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks");
 			for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
 			pendingCount -= tasks.size();
-			notify();
+			if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + pendingCount);
+			notifyAll();
 		}
 		else
 		{
@@ -112,7 +113,7 @@ public class JPPFResultCollector implements TaskResultListener
 	public synchronized List<JPPFTask> waitForResults(long millis)
 	{
 		if (millis < 0) throw new IllegalArgumentException("wait time cannot be negative");
-		if (debugEnabled) log.debug("timeout = " + millis);
+		if (log.isTraceEnabled()) log.trace("timeout = " + millis);
 		long start = System.currentTimeMillis();
 		long elapsed = 0;
 		while ((elapsed < millis) && (pendingCount > 0))
@@ -134,7 +135,7 @@ public class JPPFResultCollector implements TaskResultListener
 			for (Map.Entry<Integer, JPPFTask> entry: resultMap.entrySet()) results.add(entry.getValue());
 			//resultMap.clear();
 		}
-		if (debugEnabled) log.debug("elapsed = " + elapsed);
+		if (log.isTraceEnabled()) log.trace("elapsed = " + elapsed);
 		return results;
 	}
 

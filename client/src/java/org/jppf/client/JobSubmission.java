@@ -18,8 +18,6 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.SubmissionStatus.*;
-
 import java.io.NotSerializableException;
 
 import org.slf4j.*;
@@ -82,7 +80,7 @@ public class JobSubmission implements Runnable
 			try
 			{
 				submissionManager.client.getLoadBalancer().execute(job, connection);
-				if (connection != null) connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
+				if (connection != null) connection.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.ACTIVE);
 			}
 			catch(NotSerializableException e)
 			{
@@ -125,31 +123,6 @@ public class JobSubmission implements Runnable
 		{
 			//if (!job.isBlocking()) connection.getLock().unlock();
 			if (!error) connection.job = null;
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void run2()
-	{
-		try
-		{
-			AbstractGenericClient client = connection.getClient(); 
-			if (connection != null) connection.submit(job);
-			else if (client.isLocalExecutionEnabled())
-			{
-				setStatus(EXECUTING);
-				client.getLoadBalancer().execute(job, null);
-				setStatus(COMPLETE);
-			}
-			connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
-		}
-		catch(Exception e)
-		{
-			setStatus(FAILED);
-			connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
-			log.error(e.getMessage(), e);
 		}
 	}
 

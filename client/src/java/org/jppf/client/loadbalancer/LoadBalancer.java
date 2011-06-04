@@ -360,6 +360,7 @@ public class LoadBalancer
 								newJob.getResultListener().resultsReceived(new TaskResultEvent(p.first()));
 							}
 						}
+						else log.warn("result listener is null for job " + newJob);
 					}
 					completed = true;
 				}
