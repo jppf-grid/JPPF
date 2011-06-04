@@ -63,9 +63,9 @@ public class LongTaskRunner
 			int nbTask = props.getInt("longtask.number");
 			int iterations = props.getInt("longtask.iterations");
 			print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
-			//perform(nbTask, length, iterations);
+			perform(nbTask, length, iterations);
 			//perform3(nbTask, length, iterations);
-			perform4();
+			//perform4();
 			//perform5();
 		}
 		catch(Exception e)
@@ -96,18 +96,12 @@ public class LongTaskRunner
 				long start = System.currentTimeMillis();
 				JPPFJob job = new JPPFJob();
 				job.setId("Long task iteration " + iter);
-				//job.getJobSLA().setMaxNodes(1);
 				for (int i=0; i<nbTasks; i++)
 				{
 					LongTask task = new LongTask(length, false);
 					task.setId("" + (iter+1) + ":" + (i+1));
 					job.addTask(task);
 				}
-				/*
-				JPPFSchedule schedule = new JPPFSchedule(5000L);
-				job.getJobSLA().setJobSchedule(schedule);
-				job.getJobSLA().setSuspended(true);
-				*/
 				// submit the tasks for execution
 				List<JPPFTask> results = jppfClient.submit(job);
 				for (JPPFTask task: results)
@@ -116,7 +110,7 @@ public class LongTaskRunner
 					if (e != null) throw e;
 				}
 				long elapsed = System.currentTimeMillis() - start;
-				print("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
+				//print("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
 				totalTime += elapsed;
 			}
 			print("Average iteration time: "+StringUtils.toStringDuration(totalTime/iterations));

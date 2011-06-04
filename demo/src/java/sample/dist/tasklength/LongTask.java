@@ -77,7 +77,7 @@ public class LongTask extends JPPFTask
 	 */
 	public void run()
 	{
-		System.out.println("Starting task " + getId());
+		//System.out.println("Starting task " + getId());
 		taskStart = System.currentTimeMillis();
 		long elapsed = 0L;
 		try
@@ -96,7 +96,7 @@ public class LongTask extends JPPFTask
 				elapsed = System.currentTimeMillis() - taskStart;
 			}
 			setResult("task has run for " + elapsed + " ms");
-			System.out.println("Task " + getId() + " complete");
+			//System.out.println("Task " + getId() + " complete");
 		}
 		catch(InterruptedException e)
 		{
