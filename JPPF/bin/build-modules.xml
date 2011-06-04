@@ -43,9 +43,8 @@
 					<include name="${license.file}"/>
 				</zipfileset>
 				<zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}"/>
-				<zipfileset dir="${build}" prefix="${@{module}.prefix}/lib">
-					<include name="jppf-common-node*.jar"/>
-				</zipfileset>
+				<zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-common-node.jar"/>
+				<zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-node-src.jar"/>
 				<zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/slf4j" prefix="${@{module}.prefix}/lib">
 					<include name="slf4j-api-*.jar"/>
@@ -65,8 +64,11 @@
 				<zipfileset dir="${config}/node/config" prefix="${driver.prefix}/config" includes="jppf.policy"/>
 				<zipfileset dir="${build}" prefix="${driver.prefix}/lib">
 					<include name="jppf-common.jar"/>
+					<include name="jppf-server.jar"/>
+				</zipfileset>
+				<zipfileset dir="${build}" prefix="${driver.prefix}/lib-src">
 					<include name="jppf-common-src.jar"/>
-					<include name="jppf-server*.jar"/>
+					<include name="jppf-server-src.jar"/>
 				</zipfileset>
 			</module-elements>
 		</package-module>
@@ -85,10 +87,13 @@
 			<module-elements>
 				<zipfileset dir="${build}" prefix="${gui.prefix}/lib">
 					<include name="jppf-common.jar"/>
+					<include name="jppf-client.jar"/>
+					<include name="jppf-admin.jar"/>
+				</zipfileset>
+				<zipfileset dir="${build}" prefix="${gui.prefix}/lib-src">
 					<include name="jppf-common-src.jar"/>
-					<include name="jppf-server*.jar"/>
-					<include name="jppf-client*.jar"/>
-					<include name="jppf-admin*.jar"/>
+					<include name="jppf-client-src.jar"/>
+					<include name="jppf-admin-src.jar"/>
 				</zipfileset>
 				<zipfileset dir="${lib}/JFreeChart" prefix="${gui.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/Rhino" prefix="${gui.prefix}/lib" includes="*.jar"/>
@@ -106,6 +111,8 @@
 			<module-elements>
 				<zipfileset dir="${build}" prefix="${multiplexer.prefix}/lib">
 					<include name="jppf-common.jar"/>
+				</zipfileset>
+				<zipfileset dir="${build}" prefix="${multiplexer.prefix}/lib-src">
 					<include name="jppf-common-src.jar"/>
 				</zipfileset>
 			</module-elements>
@@ -129,9 +136,14 @@
 		<zip destfile="${template.release.file}">
 			<zipfileset dir="${application.template}" prefix="${template.prefix}" excludes=".*"/>
 			<zipfileset dir="${build}" prefix="${template.prefix}/lib">
-				<include name="jppf-common-node*.jar"/>
-				<include name="jppf-common*.jar"/>
-				<include name="jppf-client*.jar"/>
+				<include name="jppf-common-node.jar"/>
+				<include name="jppf-common.jar"/>
+				<include name="jppf-client.jar"/>
+			</zipfileset>
+			<zipfileset dir="${build}" prefix="${template.prefix}/lib-src">
+				<include name="jppf-common-node-src.jar"/>
+				<include name="jppf-common-src.jar"/>
+				<include name="jppf-client-src.jar"/>
 			</zipfileset>
 			<zipfileset dir="${lib}/log4j" prefix="${template.prefix}/lib" includes="*.jar"/>
 			<zipfileset dir="${lib}/slf4j" prefix="${template.prefix}/lib">

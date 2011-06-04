@@ -13,7 +13,7 @@ $template{name="samples-page-header" title="FTP Server Sample"}$
 						<li><a href="src/org/jppf/example/ftp/service/CommandLineExt.java.html">CommandLineExt.java</a> : a utility class that reads the FTP server's configuration file and launches it</li>
 						<li><a href="src/org/jppf/example/ftp/service/FTPClientWrapper.java.html">FTPClientWrapper.java</a> : a wrapper around the Apache Commons-Net FTP client, as a convenience to easily upload and download files</li>
 						<li><a href="src/org/jppf/example/ftp/runner/FTPTask.java.html">FTPTask.java</a> : a JPPF task which downloads a file from the driver, processes it, then uploads a transformed file back to the server</li>
-						<li><a href="src/org/jppf/example/ftp/runner/FTPRunner.java.html">FTPRunner.java</a> : the client application that submitsd the task to the JPPF grid</li>
+						<li><a href="src/org/jppf/example/ftp/runner/FTPRunner.java.html">FTPRunner.java</a> : the client application that submits the task to the JPPF grid</li>
 					</ul>
 
 					<h3>How do I run the sample?</h3>
