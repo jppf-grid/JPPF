@@ -172,14 +172,6 @@
 											</div>
 															<?php
 											$itemClass = "";
-											if ($currentPage == "FAQ") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="/faq" class="<?php echo $itemClass; ?>">&raquo; FAQ</a><br>
-											</div>
-															<?php
-											$itemClass = "";
 											if ($currentPage == "Patches") $itemClass = 'aboutMenuItem';
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
@@ -340,6 +332,12 @@
 	<li>J2EE connector, JCA 1.5 compliant, deployed as a standard resource adapter</li>
 	<li>GigaSpaces XAP connector</li>
 	<li>Apache Tomcat connector</li>
+</ul>
+<h3>Ease of integration</h3>
+<ul>
+	<li><a href="samples-pack/FTPServer/Readme.php">Apache FTP server</a></li>
+	<li><a href="samples-pack/DataDependency/Readme.php">Hazelcast data grid</a></li>
+	<li><a href="samples-pack/NodeLifeCycle/Readme.php">Atomikos transaction manager and JDBC database</a></li>
 </ul>
 <h3>Add-ons</h3>
 <ul>

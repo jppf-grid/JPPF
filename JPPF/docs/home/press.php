@@ -1,5 +1,5 @@
 <?php $currentPage="Press" ?>
-<?php $jppfVersion="2.4" ?>
+<?php $jppfVersion="2.5" ?>
 <html>
 		<head>
 		<title>JPPF Press Kit
@@ -173,14 +173,6 @@
 											</div>
 															<?php
 											$itemClass = "";
-											if ($currentPage == "FAQ") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="/faq" class="<?php echo $itemClass; ?>">&raquo; FAQ</a><br>
-											</div>
-															<?php
-											$itemClass = "";
 											if ($currentPage == "Patches") $itemClass = 'aboutMenuItem';
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
@@ -285,22 +277,20 @@
 	</div>
 	<br>
 	<a name="original_release"></a>
-	<h3>Latest press release: JPPF <?php echo $jppfVersion ?></h3>
-	<p>This release provides critical bug fixes, performance and resources usage enhancements, along with new features that increase JPPF's ease of use and integration capabilities.
-	For the full list and details of the new features in JPPF <?php echo $jppfVersion ?>, do not hesitate to read the <a href="/release_notes.php?version=<?php echo $jppfVersion ?>">JPPF <?php echo $jppfVersion ?> release notes</a>.
-	<h5><a href="/wiki/index.php?title=JPPF_Executor_Services#Batch_modes" class="headerlink"><b>Executor service batch modes</b></a></h5>
-	<p>The executor service facade to JPPF now enables the grouping of tasks submitted individually, according to space (number of tasks) or time (via timeout settings).
-	Tasks submitted individually are grouped into JPPF jobs and thus benefit from full parallelism and a significant throughput increase.
-	<h5><a href="/wiki" class="headerlink"><b>Documentation</b></a></h5>
-	<p>A new <a href="/wiki/index.php?title=JPPF_Overview">JPPF overview</a> chapter was added.<br/>
-	The online documentation was reorganized for an easier navigation experience.
-	<h5><a href="/wiki/index.php?title=Receiving_notifications_of_node_life_cycle_events" class="headerlink"><b>New "node life cycle" extension point</b></a></h5>
-	<p>It is now possible to subscribe to node life cycle events, and perform actions accordingly.
-	<h5><a href="/samples-pack/NodeLifeCycle/Readme.php" class="headerlink"><b>New "Node Life Cycle" sample</b></a></h5>
-	<p>The "Node Life Cycle" sample was added to the <a href="/samples-pack">JPPF samples pack</a>, illustrating how transaction management can be controlled via node life cycle events.
-	<h5><b>Performance, memory footprint enhancements</b></h5>
-	<p>Disk overflow capabilities were added to the nodes and clients.<br/>
-	Reworked I/O processing results in faster network I/O and smaller memory footprint.
+<h3>Latest press release: JPPF <?php echo $jppfVersion ?></h3>
+<p>Broadcast jobs, flexible serialization, data grid integration, embedded FTP server and many other enhancements and fixes. For the full list and details of the new features in JPPF <?php echo $jppfVersion ?>, do not hesitate to read the <a href="http://localhost:8880/release_notes.php?version=<?php echo $jppfVersion ?>">JPPF <?php echo $jppfVersion ?> release notes</a>. 
+<p>A new <a href="/wiki/index.php?title=Specifying_alternate_object_streams#Generic_JPPF_serialization"><b>generic serialization framework</b></a> enables developers to use non-serializable classes in their JPPF tasks. This is especially useful when using third party libraries whose source code is not available.
+<p><a href="/wiki/index.php?title=Job_Service_Level_Agreement#Broadcast_jobs"><b>Broadcast jobs</b></a> bring the ability to run the same JPPF job on all available grid nodes
+<p><b>Class loading performance enhancements</b>: a new class definition cache on the server brings improved node startup time and faster job execution.
+<p><b>Administration console enhancements</b>:
+<ul>
+	<li>elements are now sorted in the tree views</li>
+	<li>ability to reset the server statistics</li>
+	<li>rendering and display fixes and enhancements</li>
+</ul>
+<p><b>Data grid integration</b>: the <a href="/samples-pack/DataDependency/Readme.php">real-time portfolio updates</a> sample now uses Hazelcast as its distributed data fabric
+<p>New integration sample: <a href="/samples-pack/FTPServer/Readme.php"><b>embedding a FTP server and client</b></a>, demonstrates how Apache ftpd server can be embedded within a JPPF server, and how FTP client APIs can access it from a JPPF task.
+<p>New sample: <a href="/samples-pack/Nbody/Readme.php"><b>parallel N-body problem implementation</b></a>, a JPPF-powered implementation of the N-body problem applied to anti-protons trapped in a magnetic field.
 	<a name="features"></a>
 	<h3>Features</h3>
 	<div class="u_link" style="margin-left: 10px">

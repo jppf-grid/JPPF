@@ -73,7 +73,6 @@ $template{name="about-page-header" title="Features"}$
 	<li>ability to run a node in the same JVM as the server</li>
 </ul>
 
-
 <h3>Third-party connectors</h3>
 <ul>
 	<li>J2EE connector, JCA 1.5 compliant, deployed as a standard resource adapter</li>
@@ -81,12 +80,17 @@ $template{name="about-page-header" title="Features"}$
 	<li>Apache Tomcat connector</li>
 </ul>
 
+<h3>Ease of integration</h3>
+<ul>
+	<li><a href="samples-pack/FTPServer/Readme.php">Apache FTP server</a></li>
+	<li><a href="samples-pack/DataDependency/Readme.php">Hazelcast data grid</a></li>
+	<li><a href="samples-pack/NodeLifeCycle/Readme.php">Atomikos transaction manager and JDBC database</a></li>
+</ul>
 
 <h3>Add-ons</h3>
 <ul>
 	<li>TCP multiplexer, routes JPPF traffic through a single TCP port to work with firewalled environments</li>
 </ul>
-
 
 <h3>Deployment modes</h3>
 <ul>

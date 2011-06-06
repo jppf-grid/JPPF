@@ -172,14 +172,6 @@
 											</div>
 															<?php
 											$itemClass = "";
-											if ($currentPage == "FAQ") $itemClass = 'aboutMenuItem';
-											else $itemClass = 'aboutMenuItem2'; 
-											?>
-											<div class="<?php echo $itemClass; ?>">
-											<a href="/faq" class="<?php echo $itemClass; ?>">&raquo; FAQ</a><br>
-											</div>
-															<?php
-											$itemClass = "";
 											if ($currentPage == "Patches") $itemClass = 'aboutMenuItem';
 											else $itemClass = 'aboutMenuItem2'; 
 											?>

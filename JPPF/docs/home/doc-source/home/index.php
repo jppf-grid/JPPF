@@ -21,7 +21,7 @@ $template{name="about-page-header" title="Home"}$
 	</div>
 	<script>anim_main2();</script>
 	<div style="margin: 15px; ">
-		<p style="text-align: justify; font-size: 12pt">JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.
+		<br/><p style="text-align: justify; font-size: 12pt">JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.
 		This is done by splitting an application into smaller parts that can be executed simultaneously on different machines.
 		<p style="text-align: justify; font-size: 12pt">Take an easy start with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">JPPF Tutorial</a>.
 	</div>
@@ -67,6 +67,7 @@ $template{name="about-page-header" title="Home"}$
 		<h3>Easy and powerful</h3>
 		&bull;&nbsp;a JPPF grid can be up and running in minutes<br>
 		&bull;&nbsp;dynamically scalable on-demand<br>
+		&bull;&nbsp;cloud-ready, cloud is a natural medium for JPPF<br>
 		&bull;&nbsp;connectors with leading J2EE application servers<br>
 		&bull;&nbsp;connector with GigaSpaces eXtreme Application Platform<br>
 		&bull;&nbsp;easy programming model<br>
