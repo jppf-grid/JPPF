@@ -1,0 +1,66 @@
+<!--
+	JPPF
+  Copyright (C) 2005-2011 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name="JPPF-connectors" basedir="..">
+
+	<!-- ========================================================================= -->
+	<!--                 Generate the JPPF-GigaSpaces integration                  -->
+	<!-- ========================================================================= -->
+
+	<target name="jppf.gigaspaces" description="Generate the JPPF-GigaSpaces integration package" depends="init, build">
+		<copy todir="${gigaspaces}/JPPF-GigaSpaces-Common/lib">
+			<fileset dir="${build}">
+				<include name="jppf-client*.jar"/>
+				<include name="jppf-common*.jar"/>
+				<include name="jppf-common-node*.jar"/>
+			</fileset>
+		</copy>
+		<ant antfile="${gigaspaces}/build.xml" target="build" inheritall="false"/>
+		<property name="gigaspaces.prefix" value="${app.ver}-GigaSpaces"/>
+		<property name="gigaspaces.file" value="${build}/${gigaspaces.prefix}.zip"/>
+		<delete file="gigaspaces.file" quiet="true"/>
+		<zip destfile="${gigaspaces.file}">
+			<zipfileset dir="${gigaspaces}" prefix="${gigaspaces.prefix}">
+				<exclude name="**/CVS/**"/>
+				<exclude name="**/*.log"/>
+				<exclude name="**/*.classpath"/>
+				<exclude name="**/*.project"/>
+			</zipfileset>
+		</zip>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--             Package the j2ee connector for deployment                     -->
+	<!-- ========================================================================= -->
+
+	<target name="j2ee.connector" description="" depends="rebuild">
+		<ant antfile="${basedir}/../jca-client/build.xml" inheritall="false"/>
+		<property name="j2ee.prefix" value="${app.ver}-j2ee-connector"/>
+		<property name="connector.release.file" value="${build}/${j2ee.prefix}.zip"/>
+		<delete file="${connector.release.file}" quiet="true"/>
+		<zip destfile="${connector.release.file}">
+			<zipfileset dir="${jca-client}" prefix="${j2ee.prefix}" excludes=".*"/>
+			<zipfileset dir="${build}" prefix="${j2ee.prefix}/lib-src">
+				<include name="jppf-common-node-src.jar"/>
+				<include name="jppf-common-src.jar"/>
+				<include name="jppf-client-src.jar"/>
+			</zipfileset>
+		</zip>
+	</target>
+
+</project> 

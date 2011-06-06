@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://geronimo.apache.org/xml/ns/j2ee/web-2.0"
+  xmlns:dep="http://geronimo.apache.org/xml/ns/deployment-1.2"
+  xmlns:naming="http://geronimo.apache.org/xml/ns/naming-1.2"
+  xmlns:security="http://geronimo.apache.org/xml/ns/security-1.2">
+
+  <dep:environment>
+    <dep:moduleId>
+      <dep:groupId>JPPF</dep:groupId>
+      <dep:artifactId>web.test</dep:artifactId>
+      <dep:version>2.0</dep:version>
+      <dep:type>war</dep:type>
+    </dep:moduleId>
+    <dep:dependencies/>
+    <dep:hidden-classes/>
+    <dep:non-overridable-classes/>
+  </dep:environment>
+
+  <context-root>/jppftest</context-root>
+
+  <!-- Optional JNDI references -->
+  <!--
+  <naming:ejb-ref> ... </ejb-ref>
+  <naming:ejb-local-ref> ... </ejb-local-ref>
+  <naming:gbean-ref> ... </gbean-ref>
+  <naming:resource-ref> ... </resource-ref>
+  <naming:resource-env-ref> ... </resource-env-ref>
+  <naming:service-ref> ... </service-ref>
+  -->
+
+</web-app>
+
