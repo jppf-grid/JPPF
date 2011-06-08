@@ -1,0 +1,78 @@
+/*
+	JPPF
+	Copyright (C) 2005-2011 JPPF Team.
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+*/
+
+/*body { background-color: #FFFFC0 }*/
+/*body { background-color: #FFFFFF }*/
+body { font-size=10pt; background: url("images/bkg_new2.jpg"); background-repeat: repeat; background-attachment: fixed }
+ 
+.pageTitle { font-family: Arial, Helvetica, sans-serif; font-size: 24pt; font-weight: bold; text-align: center;
+            color: #9B9DFD; background-color: #FFFFC0 } /* (155, 157, 253); (255, 255, 192) */
+
+.header     { background: #FCCF62; color: #000080; font-size: 14pt } /* 252, 207, 98 */
+.subheader  { background: #FCE6AC}  /* 252, 230, 171 */
+.centeredCell {font-size: 12pt; font-family: Arial, Helvetica, sans-serif; text-align: center; valign: middle }
+.nonCenteredCell {font-size: 12pt; font-family: Arial, Helvetica, sans-serif  }
+
+.menu_first { background: url("images/bkg-menu.gif"); background-repeat: repeat; background-attachment: fixed; color: #FFFFC0; font-weight: bold }
+.menu { background: url("images/bkg-menu.gif"); background-repeat: repeat; background-attachment: fixed; color: #FFFFC0; border-left: 1px solid #FFFFC0; font-weight: bold }
+.docmenu_first { background-color: #FFFFC0; color: #8080FF; font-weight: bold }
+.docmenu { background-color: #FFFFC0; color: #8080FF; border-left: 1px solid #8080FF; font-weight: bold }
+.table_ { border: 2px solid #8080FF; background: url("images/bkg_new2.jpg"); background-repeat: repeat; background-attachment: fixed }
+.noBorderTable_ { background: url("images/bkg_new2.jpg"); background-repeat: repeat; background-attachment: fixed }
+.table2_ { border-right: 2px solid #8080FF; border-top: 2px solid #8080FF; border-bottom: 2px solid #8080FF; background: url("images/bkg_new2.jpg"); background-repeat: repeat; background-attachment: fixed }
+
+.border_          { border: 2px solid #8080FF }
+.left_            { border-left: 2px solid #8080FF }
+.right_           { border-right: 2px solid #8080FF }
+.top_             { border-top: 2px solid #8080FF }
+.bottom_          { border-bottom: 2px solid #8080FF }
+.leftRight_       { border-left: 2px solid #8080FF; border-right: 2px solid #8080FF }
+.leftTop_         { border-left: 2px solid #8080FF; border-top: 2px solid #8080FF }
+.leftBottom_      { border-left: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
+.rightTop_        { border-right: 2px solid #8080FF; border-top: 2px solid #8080FF }
+.rightBottom_     { border-right: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
+.topBottom_       { border-top: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
+.leftRightTop_    { border-left: 2px solid #8080FF; border-right: 2px solid #8080FF; border-top: 2px solid #8080FF }
+.leftRightBottom_ { border-left: 2px solid #8080FF; border-right: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
+.rightTopBottom_  { border-right: 2px solid #8080FF; border-top: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
+
+
+.borderCell_ { border-left: 2px solid #8080FF; border-right: 2px solid #8080FF }
+.borderCell2_ { border: 2px solid #8080FF }
+.borderCell3_ { border-left: 2px solid #8080FF; border-right: 2px solid #8080FF; border-bottom: 2px solid #8080FF }
+
+.completed_cell { background-image: url("images/completed.gif"); background-repeat: no-repeat; background-position: center }
+
+h1, h2, h3 {font-family: Arial, Helvetica, sans-serif }
+h3 { font-size: 14pt; color: #8080FF }
+h4 { font-size: 12pt; color: #8080FF; font-weight: bold }
+table  {font-size: 10pt; font-family: Arial, Helvetica, sans-serif }
+.comic     {font-size: 10pt; font-family: Comic Sans MS, Arial, Helvetica, sans-serif }
+
+.simpleList { list-style: none; text-indent: -20 }
+
+.news { font-size: 9pt; font-family: Times New Roman, Times, serif;  color: #000060 }
+.links { color: #000060; font-size: 10pt; font-family: Arial, Helvetica, sans-serif }
+.linksub { font-size: 12pt; color: #8080FF; font-weight: bold }
+/*.newsTitle { color: #8789CF; font-size: 11pt; font-family: Comic Sans MS, Arial, Helvetica, sans-serif; font-size: 12pt }*/
+.newsTitle { color: #7678BE; font-size: 11pt; font-family: Comic Sans MS, Arial, Helvetica, sans-serif; font-weight: bold }
+.ackTitle { color: #000060; font-size: 16pt; font-family: Comic Sans MS, Arial, sans-serif; font-weight: bold }
+.ackText { text-align: center; color: #000060; font-size: 12pt; font-family: Comic Sans MS, Arial, sans-serif; /*font-weight: bold*/ }
+.archiHeader { color: #FFFF00; background-color: #8080FF; font-weight: bold; font-size: 20 }
+.archiContent { color: #000060; background: url("images/bkg_new2.jpg"); background-repeat: repeat; background-attachment: fixed }
+/*.archiHeader { border: 1px solid #000060; color: #FFFF00; background-color: #8080FF; font-weight: bold; font-size: 20 }*/

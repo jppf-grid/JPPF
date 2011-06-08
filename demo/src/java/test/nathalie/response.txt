@@ -1,0 +1,18 @@
+Hello Nathalie,
+
+
+Thank you for sending the code sample, now I believe the situation is a lot clearer in my mind.
+
+What I think is happening is a deadlock between the 2 jobs execution.
+In effect, when submitting the first job, the driver's load-balancer will distribute all the tasks in the job to all available nodes.
+Here's I'm assuming you have more tasks (1) than nodes.
+When a task submits the second job, the job is queued in the driver, but there is no node available to execute it, as they are all executing a task of the first job. Hence the deadlock, since the tasks in the first job are waiting for the tasks in the second job to complete, but these tasks cannot complete because they are waiting for a node to available and the nodes are aready used by the tasks in the first job.
+
+Also, when you use non-blocking jobs, the client.submit(job) will always return null, as the call submit() returns immediately, before the tasks are executed.
+For non-blocking jobs, you need to use a [url=http://www.jppf.org/api/org/jppf/client/event/TaskResultListener.html]TaskResultListener[/url]
+
+I see 2 ways to fix this situation:
+
+1) Transforming your tasks into a task flow that doesn't cause a deadlock (recommended way)
+
+The goal is to refactor your code so that all job submissions are performed on the client application side.
