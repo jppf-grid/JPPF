@@ -27,6 +27,7 @@ import org.jppf.process.LauncherListener;
 import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.classloader.*;
+import org.jppf.server.nio.client.ClientNioServer;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.local.JPPFLocalNode;
 import org.jppf.server.queue.*;
@@ -64,6 +65,10 @@ public class JPPFDriver
 	 * Serves the execution requests coming from client applications.
 	 */
 	private JPPFApplicationServer[] applicationServers = null;
+	/**
+	 * Serves the execution requests coming from client applications.
+	 */
+	private ClientNioServer clientNioServer = null;
 	/**
 	 * Serves the JPPF nodes.
 	 */
@@ -134,11 +139,19 @@ public class JPPFDriver
 		classServer.start();
 		initializer.printInitializedMessage(info.classServerPorts, "Class Server");
 
-		applicationServers = new JPPFApplicationServer[info.applicationServerPorts.length];
-		for (int i=0; i<info.applicationServerPorts.length; i++)
+		if (config.getBoolean("jppf.client.server.nio.enabled", true))
 		{
-			applicationServers[i] = new JPPFApplicationServer(info.applicationServerPorts[i]);
-			applicationServers[i].start();
+			clientNioServer = new ClientNioServer(info.applicationServerPorts);
+			clientNioServer.start();
+		}
+		else
+		{
+			applicationServers = new JPPFApplicationServer[info.applicationServerPorts.length];
+			for (int i=0; i<info.applicationServerPorts.length; i++)
+			{
+				applicationServers[i] = new JPPFApplicationServer(info.applicationServerPorts[i]);
+				applicationServers[i].start();
+			}
 		}
 		initializer.printInitializedMessage(info.applicationServerPorts, "Client Server");
 
@@ -182,6 +195,15 @@ public class JPPFDriver
 		return getInstance().taskQueue;
 	}
 	
+	/**
+	 * Get the JPPF client server.
+	 * @return a <code>ClientNioServer</code> instance.
+	 */
+	public ClientNioServer getClientNioServer()
+	{
+		return clientNioServer;
+	}
+
 	/**
 	 * Get the JPPF class server.
 	 * @return a <code>ClassNioServer</code> instance.
