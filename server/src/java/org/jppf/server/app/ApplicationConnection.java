@@ -45,10 +45,6 @@ class ApplicationConnection extends JPPFConnection
 	 */
 	private static Logger log = LoggerFactory.getLogger(ApplicationConnection.class);
 	/**
-	 * Base name used for localization lookups";
-	 */
-	private static final String I18N_BASE = "org.jppf.server.i18n.messages";
-	/**
 	 * Determines whether debug log statements are enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
