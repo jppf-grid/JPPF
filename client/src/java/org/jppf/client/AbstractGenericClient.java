@@ -108,6 +108,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   @SuppressWarnings("unchecked")
 	protected void initPools()
 	{
+  	if (debugEnabled) log.debug("initializing connections");
 		loadBalancer = new LoadBalancer();
 		LinkedBlockingQueue queue = new LinkedBlockingQueue();
 		executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("JPPF Client"));
@@ -126,6 +127,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	{
 		try
 		{
+	  	if (debugEnabled) log.debug("initializing connections from configuration");
 			String driverNames = config.getString("jppf.drivers", "default-driver");
 			if ((driverNames == null) || "".equals(driverNames.trim())) driverNames = "default-driver";
 			if (debugEnabled) log.debug("list of drivers: " + driverNames);
@@ -146,7 +148,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 					newConnection(c);
 				}
 			}
-			waitForPools(true);
+			//waitForPools(true);
 		}
 		catch(Exception e)
 		{
@@ -162,9 +164,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	{
 		try
 		{
+	  	if (debugEnabled) log.debug("initializing connections from discovery");
 			receiverThread = new JPPFMulticastReceiverThread(this);
 			new Thread(receiverThread).start();
-			waitForPools(false);
+			//waitForPools(false);
 		}
 		catch(Exception e)
 		{
@@ -204,7 +207,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 			}
 			pool.clientList.add(c);
 			allConnections.add(c);
-			n = allConnections.size();
+			n = allConnections.size() + 1;
 			if (executor.getCorePoolSize() < n)
 			{
 				executor.setMaximumPoolSize(n);

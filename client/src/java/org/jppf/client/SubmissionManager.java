@@ -69,8 +69,6 @@ public class SubmissionManager extends ThreadSynchronization implements Runnable
 	 */
 	public void run()
 	{
-		JPPFClientConnectionImpl c = null;
-		JPPFJob job = null;
 		while (!isStopped())
 		{
 			while ((execQueue.isEmpty() || !client.hasAvailableConnection()) && !isStopped())
@@ -80,8 +78,9 @@ public class SubmissionManager extends ThreadSynchronization implements Runnable
 			if (isStopped()) break;
 			synchronized(this)
 			{
-				job = execQueue.poll();
-				c = (JPPFClientConnectionImpl) client.getClientConnection(true);
+				JPPFJob job = execQueue.poll();
+				if (debugEnabled) log.debug("submiting jobId=" + job.getId());
+				JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) client.getClientConnection(true);
 				if (c != null) c.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.EXECUTING);
 				JobSubmission submission = new JobSubmission(job, c, this);
 				client.getExecutor().submit(submission);
