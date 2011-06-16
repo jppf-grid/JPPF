@@ -79,6 +79,7 @@ public class SubmissionManager extends ThreadSynchronization implements Runnable
 			synchronized(this)
 			{
 				JPPFJob job = execQueue.poll();
+				if (debugEnabled) log.debug("submiting jobId=" + job.getId());
 				JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) client.getClientConnection(true);
 				if (c != null) c.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.EXECUTING);
 				JobSubmission submission = new JobSubmission(job, c, this);
@@ -95,7 +96,7 @@ public class SubmissionManager extends ThreadSynchronization implements Runnable
 	public String submitJob(JPPFJob job)
 	{
 		if (debugEnabled) log.debug("adding new submission: jobId=" + job.getId());
-		execQueue.add(job);
+		execQueue.offer(job);
 		wakeUp();
 		return job.getId();
 	}
@@ -108,7 +109,7 @@ public class SubmissionManager extends ThreadSynchronization implements Runnable
 	public String resubmitJob(JPPFJob job)
 	{
 		if (debugEnabled) log.debug("resubmitting job with id=" + job.getId());
-		execQueue.add(job);
+		execQueue.offer(job);
 		wakeUp();
 		return job.getId();
 	}

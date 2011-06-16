@@ -95,14 +95,17 @@ public class LoadBalancer
 		int poolSize = JPPFConfiguration.getProperties().getInt("jppf.local.execution.threads", n);
 		log.info("local execution enabled with " + poolSize + " processing threads");
 		LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
-		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("client processing thread"));
-		ProportionalTuneProfile profile = new ProportionalTuneProfile();
-		profile.setPerformanceCacheSize(2000);
-		profile.setProportionalityFactor(4);
-		bundlers = new ClientProportionalBundler[2];
-		bundlers[LOCAL] = new ClientProportionalBundler(profile);
-		bundlers[REMOTE] = new ClientProportionalBundler(profile);
-		for (Bundler b: bundlers) b.setup();
+		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("LocalExec"));
+		if (bundlers == null)
+		{
+			ProportionalTuneProfile profile = new ProportionalTuneProfile();
+			profile.setPerformanceCacheSize(1000);
+			profile.setProportionalityFactor(1);
+			bundlers = new ClientProportionalBundler[2];
+			bundlers[LOCAL] = new ClientProportionalBundler(profile);
+			bundlers[REMOTE] = new ClientProportionalBundler(profile);
+			for (Bundler b: bundlers) b.setup();
+		}
 		localInitialized = true;
   }
  
@@ -112,6 +115,7 @@ public class LoadBalancer
 	public void stop()
 	{
 		if (threadPool != null) threadPool.shutdownNow();
+		localInitialized = false;
 	}
 
 	/**

@@ -119,6 +119,10 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 					boolean found = true;
 					resource = readResource();
 					String name = resource.getName();
+					if (name.indexOf("azelcast") >= 0)
+					{
+						int breakpoint = 0;
+					}
 					ClassLoader cl = getClassLoader(resource.getRequestUuid());
 					if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name + " using classloader=" + cl);
 					if (resource.getData("multiple") == null)
