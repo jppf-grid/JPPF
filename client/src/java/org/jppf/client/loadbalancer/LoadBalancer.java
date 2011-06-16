@@ -130,62 +130,55 @@ public class LoadBalancer
 		List<JPPFTask> tasks = job.getTasks();
 		if (isLocalEnabled() && locallyExecuting.compareAndSet(false, true))
 		{
-			try
+			if (connection != null)
 			{
-				if (connection != null)
+				int bundleSize[] = new int[2];
+				synchronized(bundlers)
 				{
-					int bundleSize[] = new int[2];
-					synchronized(bundlers)
-					{
-						for (int i=LOCAL; i<=REMOTE; i++)
-						{
-							((ClientProportionalBundler) bundlers[i]).setMaxSize(tasks.size());
-							bundleSize[i] = bundlers[i].getBundleSize();
-						}
-					}
-					if (bundleSize[LOCAL] > tasks.size()) bundleSize[LOCAL] = tasks.size() - 1;
-					if (sum(bundleSize) > tasks.size()) bundleSize[REMOTE] = tasks.size() - bundleSize[LOCAL];
-					int diff = tasks.size() - sum(bundleSize);
-					if (diff > 0)
-					{
-						for (int i=LOCAL; i<=REMOTE; i++) bundleSize[i] += diff/2;
-						if (tasks.size() > sum(bundleSize)) bundleSize[LOCAL]++;
-					}
-					if (debugEnabled) log.debug("bundlers[local=" + bundleSize[LOCAL] + ", remote=" + bundleSize[REMOTE] + "]");
-					List<List<JPPFTask>> list = new ArrayList<List<JPPFTask>>();
-					int idx = 0;
 					for (int i=LOCAL; i<=REMOTE; i++)
 					{
-						list.add(CollectionUtils.getAllElements(tasks, idx, bundleSize[i]));
-						idx += bundleSize[i];
+						((ClientProportionalBundler) bundlers[i]).setMaxSize(tasks.size());
+						bundleSize[i] = bundlers[i].getBundleSize();
 					}
-					ExecutionThread[] threads = { new LocalExecutionThread(list.get(LOCAL), job), new RemoteExecutionThread(list.get(REMOTE), job, connection) };
-					for (int i=LOCAL; i<=REMOTE; i++) threads[i].setContextClassLoader(Thread.currentThread().getContextClassLoader());
-					for (int i=LOCAL; i<=REMOTE; i++) threads[i].start();
-					if (job.isBlocking())
-					{
-						for (int i=LOCAL; i<=REMOTE; i++) threads[i].join();
-						for (int i=LOCAL; i<=REMOTE; i++) if (threads[i].getException() != null) throw threads[i].getException();
-					}
+				}
+				if (bundleSize[LOCAL] > tasks.size()) bundleSize[LOCAL] = tasks.size() - 1;
+				if (sum(bundleSize) > tasks.size()) bundleSize[REMOTE] = tasks.size() - bundleSize[LOCAL];
+				int diff = tasks.size() - sum(bundleSize);
+				if (diff > 0)
+				{
+					for (int i=LOCAL; i<=REMOTE; i++) bundleSize[i] += diff/2;
+					if (tasks.size() > sum(bundleSize)) bundleSize[LOCAL]++;
+				}
+				if (debugEnabled) log.debug("bundlers[local=" + bundleSize[LOCAL] + ", remote=" + bundleSize[REMOTE] + "]");
+				List<List<JPPFTask>> list = new ArrayList<List<JPPFTask>>();
+				int idx = 0;
+				for (int i=LOCAL; i<=REMOTE; i++)
+				{
+					list.add(CollectionUtils.getAllElements(tasks, idx, bundleSize[i]));
+					idx += bundleSize[i];
+				}
+				ExecutionThread[] threads = { new LocalExecutionThread(list.get(LOCAL), job), new RemoteExecutionThread(list.get(REMOTE), job, connection) };
+				for (int i=LOCAL; i<=REMOTE; i++) threads[i].setContextClassLoader(Thread.currentThread().getContextClassLoader());
+				for (int i=LOCAL; i<=REMOTE; i++) threads[i].start();
+				if (job.isBlocking())
+				{
+					for (int i=LOCAL; i<=REMOTE; i++) threads[i].join();
+					for (int i=LOCAL; i<=REMOTE; i++) if (threads[i].getException() != null) throw threads[i].getException();
+				}
+			}
+			else
+			{
+				ExecutionThread localThread = new LocalExecutionThread(tasks, job);
+				if (!job.isBlocking())
+				{
+					localThread.setContextClassLoader(Thread.currentThread().getContextClassLoader());
+					localThread.start();
 				}
 				else
 				{
-					ExecutionThread localThread = new LocalExecutionThread(tasks, job);
-					if (!job.isBlocking())
-					{
-						localThread.setContextClassLoader(Thread.currentThread().getContextClassLoader());
-						localThread.start();
-					}
-					else
-					{
-						localThread.run();
-						if (localThread.getException() != null) throw localThread.getException();
-					}
+					localThread.run();
+					if (localThread.getException() != null) throw localThread.getException();
 				}
-			}
-			finally
-			{
-				locallyExecuting.set(false);
 			}
 		}
 		else if (connection != null)
@@ -301,6 +294,10 @@ public class LoadBalancer
 			{
 				if (debugEnabled) log.debug(e.getMessage(), e);
 				exception = e;
+			}
+			finally
+			{
+				locallyExecuting.set(false);
 			}
 		}
 	}
