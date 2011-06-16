@@ -17,7 +17,7 @@
  */
 package test.localexecution;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
@@ -55,18 +55,26 @@ public class LocalExecutionRunner
 		{
 			TypedProperties props = JPPFConfiguration.getProperties();
 			props.setProperty("jppf.local.execution.enabled", "false");
-			jppfClient = new JPPFClient();
 			int length = props.getInt("longtask.length");
 			int nbTask = props.getInt("longtask.number");
-			print("Running demo with "+nbTask+" tasks of length = "+length+" ms");
-			print("run 1 with local execution off"); 
+			print("starting client ...");
+			long start = System.nanoTime();
+			jppfClient = new JPPFClient();
+			long elapsed = System.nanoTime() - start;
+			print("client started in "+StringUtils.toStringDuration(elapsed/1000000));
+			/*
+			print("run 1 with local execution off");
 			perform(nbTask, length, 1);
-			print("run 2 with local execution on"); 
-			jppfClient.setLocalExecutionEnabled(true);
-			perform(nbTask, length, 2);
+			*/
+			//print("run with local execution on"); 
+			//jppfClient.setLocalExecutionEnabled(true);
+			//perform2(100, 5, 200);
+			perform3();
+			/*
 			print("run 3 with local execution off"); 
 			jppfClient.setLocalExecutionEnabled(false);
 			perform(nbTask, length, 3);
+			*/
 		}
 		catch(Exception e)
 		{
@@ -116,6 +124,53 @@ public class LocalExecutionRunner
 	}
 
 	/**
+	 * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
+	 * @param nbTasks the number of tasks to send at each iteration.
+	 * @param length the executionlength of each task.
+	 * @param nbJobs the number of non-blocking jobs to submit.
+	 * @throws Exception if an error is raised during the execution.
+	 */
+	private static void perform2(int nbTasks, int length, int nbJobs) throws Exception
+	{
+		try
+		{
+			print("creating the jobs");
+			List<JPPFJob> jobs = new ArrayList<JPPFJob>(nbJobs);
+			for (int i=0; i<nbJobs; i++)
+			{
+				JPPFJob job = new JPPFJob();
+				job.setId("job " + i);
+				job.setBlocking(false);
+				job.setResultListener(new JPPFResultCollector(nbTasks));
+				for (int j=0; j<nbTasks; j++)
+				{
+					JPPFTask task = new LongTask(length, false);
+					task.setId("task " + i + ":" + j);
+					job.addTask(task);
+				}
+				jobs.add(job);
+			}
+			long start = System.nanoTime();
+			print("submitting the jobs");
+			for (JPPFJob job: jobs) jppfClient.submit(job);
+			print("getting the results");
+			for (JPPFJob job: jobs)
+			{
+				JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+				collector.waitForResults();
+				print("got results for " + job.getId());
+			}
+			long elapsed = System.nanoTime() - start;
+			print("ran " + nbJobs + " in: "+StringUtils.toStringDuration(elapsed/1000000));
+	
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e.getMessage(), e);
+		}
+	}
+
+	/**
 	 * Print a message tot he log and to the console.
 	 * @param msg the message to print.
 	 */
@@ -135,5 +190,34 @@ public class LocalExecutionRunner
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
 		JMXDriverConnectionWrapper wrapper = c.getJmxConnection();
 		return wrapper.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+	}
+
+	/**
+	 * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
+	 * @throws Exception if an error is raised during the execution.
+	 */
+	private static void perform3() throws Exception
+	{
+		try
+		{
+			long start = System.nanoTime();
+			JPPFJob job = new JPPFJob();
+			job.setId("test jaer download");
+			job.addTask(new Task());
+			// submit the tasks for execution
+			List<JPPFTask> results = jppfClient.submit(job);
+			for (JPPFTask task: results)
+			{
+				Exception e = task.getException();
+				if (e != null) throw e;
+			}
+			long elapsed = System.nanoTime() - start;
+			print("run time: " + StringUtils.toStringDuration(elapsed/1000000));
+	
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e.getMessage(), e);
+		}
 	}
 }
