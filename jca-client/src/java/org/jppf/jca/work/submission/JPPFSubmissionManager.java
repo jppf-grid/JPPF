@@ -27,7 +27,8 @@ import javax.resource.spi.work.*;
 
 import org.jppf.client.*;
 import org.jppf.jca.work.*;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.server.protocol.JPPFTask;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -95,34 +96,21 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	{
 		while (!isStopped())
 		{
-			while (((execQueue.peek() == null) || !client.hasAvailableConnection()) && !isStopped())
+			Pair<Boolean, Boolean> execFlags = null;
+			while (((execQueue.peek() == null) || !(execFlags = client.handleAvailableConnection()).first()) && !isStopped())
 			{
 				goToSleep();
 			}
 			if (isStopped()) break;
-			JPPFJob job = execQueue.poll();
-			JPPFJcaClientConnection c = null;
 			synchronized(client)
 			{
-				c = (JPPFJcaClientConnection) client.getClientConnection();
-				if (c != null) c.setStatus(JPPFClientConnectionStatus.EXECUTING);
-			}
-			JPPFSubmissionResult submission = (JPPFSubmissionResult) job.getResultListener();
-			try
-			{
-				if (c != null) c.submit(job);
-				else if (client.getLoadBalancer().isLocalEnabled())
-				{
-					submission.setStatus(EXECUTING);
-					client.getLoadBalancer().execute(job, null);
-					submission.setStatus(COMPLETE);
-				}
-			}
-			catch(Exception e)
-			{
-				submission.setStatus(FAILED);
-				c.setStatus(JPPFClientConnectionStatus.ACTIVE);
-				log.error(e.getMessage(), e);
+				JPPFJob job = execQueue.poll();
+				JPPFJcaClientConnection c = null;
+					c = (JPPFJcaClientConnection) client.getClientConnection();
+					if (c != null) c.setStatus(JPPFClientConnectionStatus.EXECUTING);
+				JobSubmission submission = new JobSubmission(job, c, execFlags.second());
+				client.getExecutor().submit(submission);
+				//submission.run();
 			}
 		}
 	}
@@ -200,5 +188,95 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	public Collection<String> getAllSubmissionIds()
 	{
 		return Collections.unmodifiableSet(submissionMap.keySet());
+	}
+
+	/**
+	 * Wrapper for submitting a job.
+	 */
+	public class JobSubmission implements Runnable
+	{
+		/**
+		 * The job to execute.
+		 */
+		private JPPFJob job;
+		/**
+		 * Flag indicating whether the job will be executed locally, at least partially.
+		 */
+		private boolean locallyExecuting = false;
+		/**
+		 * The connection to execute the job on.
+		 */
+		protected AbstractJPPFClientConnection connection;
+
+		/**
+		 * Initialize this job submission. 
+		 * @param job the submitted job.
+		 * @param connection the connection to execute the job on.
+		 * @param locallyExecuting determines whether the job will be executed locally, at least partially.
+		 */
+		JobSubmission(JPPFJob job, AbstractJPPFClientConnection connection, boolean locallyExecuting)
+		{
+			this.job = job;
+			this.connection = connection;
+			this.locallyExecuting = locallyExecuting;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public void run()
+		{
+			JPPFSubmissionResult result = (JPPFSubmissionResult) job.getResultListener();
+			String requestUuid = job.getJobUuid();
+			ClassLoader cl = null;
+			ClassLoader oldCl = null;
+			if (!job.getTasks().isEmpty())
+			{
+				JPPFTask task = job.getTasks().get(0);
+				cl = task.getClass().getClassLoader();
+				client.addRequestClassLoader(requestUuid, cl);
+				if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
+			}
+			try
+			{
+				if (cl != null)
+				{
+					oldCl = Thread.currentThread().getContextClassLoader();
+					Thread.currentThread().setContextClassLoader(cl);
+				}
+				client.getLoadBalancer().execute(job, connection, locallyExecuting);
+				result.waitForResults(0);
+				client.removeRequestClassLoader(requestUuid);
+				result.setStatus(COMPLETE);
+			}
+			catch (Exception e)
+			{
+				result.setStatus(FAILED);
+				log.error(e.getMessage(), e);
+			}
+			finally
+			{
+				if (connection != null) connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
+				if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
+			}
+		}
+
+		/**
+		 * Get the flag indicating whether the job will be executed locally, at least partially.
+		 * @return <code>true</code> if the job will execute locally, <code>false</code> otherwise.
+		 */
+		public boolean isLocallyExecuting()
+		{
+			return locallyExecuting;
+		}
+
+		/**
+		 * Set the flag indicating whether the job will be executed locally, at least partially.
+		 * @param locallyExecuting <code>true</code> if the job will execute locally, <code>false</code> otherwise.
+		 */
+		public void setLocallyExecuting(boolean locallyExecuting)
+		{
+			this.locallyExecuting = locallyExecuting;
+		}
 	}
 }

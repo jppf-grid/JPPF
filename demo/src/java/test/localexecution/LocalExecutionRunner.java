@@ -67,8 +67,7 @@ public class LocalExecutionRunner
 			perform(nbTask, length, 1);
 			*/
 			//print("run with local execution on"); 
-			jppfClient.setLocalExecutionEnabled(true);
-			perform2(100, 5, 20);
+			perform2(100, 5, 200);
 			//perform3();
 			/*
 			print("run 3 with local execution off"); 
@@ -134,6 +133,7 @@ public class LocalExecutionRunner
 	{
 		try
 		{
+			jppfClient.setLocalExecutionEnabled(true);
 			print("creating the jobs");
 			List<JPPFJob> jobs = new ArrayList<JPPFJob>(nbJobs);
 			for (int i=0; i<nbJobs; i++)

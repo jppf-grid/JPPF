@@ -75,6 +75,10 @@ public class LoadBalancer
 	 * Determines whether this load balancer is currently executing tasks locally.
 	 */
 	private AtomicBoolean locallyExecuting = new AtomicBoolean(false);
+	/**
+	 * Lock used when determining if a job can be executed immediately.
+	 */
+	private final Object availableConnectionLock = new Object();
 
 	/**
 	 * Default constructor.
@@ -95,12 +99,12 @@ public class LoadBalancer
 		int poolSize = JPPFConfiguration.getProperties().getInt("jppf.local.execution.threads", n);
 		log.info("local execution enabled with " + poolSize + " processing threads");
 		LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
-		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("client processing thread"));
+		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("LocalExec"));
 		if (bundlers == null)
 		{
 			ProportionalTuneProfile profile = new ProportionalTuneProfile();
-			profile.setPerformanceCacheSize(2000);
-			profile.setProportionalityFactor(4);
+			profile.setPerformanceCacheSize(1000);
+			profile.setProportionalityFactor(1);
 			bundlers = new ClientProportionalBundler[2];
 			bundlers[LOCAL] = new ClientProportionalBundler(profile);
 			bundlers[REMOTE] = new ClientProportionalBundler(profile);
@@ -122,14 +126,15 @@ public class LoadBalancer
 	 * Perform the execution.
 	 * @param job the execution to perform.
 	 * @param connection the client connection for sending remote execution requests.
+	 * @param localJob determines whether the job will be executed locally, at least partially.
 	 * @throws Exception if an error is raised during execution.
 	 */
-	public void execute(JPPFJob job, AbstractJPPFClientConnection connection) throws Exception
+	public void execute(JPPFJob job, AbstractJPPFClientConnection connection, boolean localJob) throws Exception
 	{
-		int count = 0;
-		List<JPPFTask> tasks = job.getTasks();
-		if (isLocalEnabled() && locallyExecuting.compareAndSet(false, true))
+		//if (isLocalEnabled() && !locallyExecuting.get())
+		if (isLocalEnabled() && localJob)
 		{
+			List<JPPFTask> tasks = job.getTasks();
 			if (connection != null)
 			{
 				int bundleSize[] = new int[2];
@@ -183,7 +188,7 @@ public class LoadBalancer
 		}
 		else if (connection != null)
 		{
-			ExecutionThread remoteThread = new RemoteExecutionThread(tasks, job, connection);
+			ExecutionThread remoteThread = new RemoteExecutionThread(job.getTasks(), job, connection);
 			remoteThread.run();
 			if (remoteThread.getException() != null) throw remoteThread.getException();
 		}
@@ -297,7 +302,7 @@ public class LoadBalancer
 			}
 			finally
 			{
-				locallyExecuting.set(false);
+				setLocallyExecuting(false);
 			}
 		}
 	}
@@ -371,6 +376,7 @@ public class LoadBalancer
 					double elapsed = System.currentTimeMillis() - start;
 					bundlers[REMOTE].feedback(tasks.size(), elapsed);
 				}
+				if (connection != null) connection.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.ACTIVE);
 			}
 			catch(Throwable t)
 			{
@@ -461,6 +467,31 @@ public class LoadBalancer
 	 */
 	public boolean isLocallyExecuting()
 	{
-		return locallyExecuting.get();
+		synchronized(getAvailableConnectionLock())
+		{
+			return locallyExecuting.get();
+		}
+	}
+
+	/**
+	 * Specify whether this load balancer is currently executing a job locally.
+	 * @param locallyExecuting <code>true</code> if a local job is being executed, <code>false</code> otherwise.
+	 */
+	public void setLocallyExecuting(boolean locallyExecuting)
+	{
+		synchronized(getAvailableConnectionLock())
+		{
+			this.locallyExecuting.set(locallyExecuting);
+			if (debugEnabled) log.debug("set locallyExecuting to " + locallyExecuting);
+		}
+	}
+
+	/**
+	 * Lock used when determining if a job can be executed immediately.
+	 * @return an <code>Object</code> instance.
+	 */
+	public Object getAvailableConnectionLock()
+	{
+		return availableConnectionLock;
 	}
 }

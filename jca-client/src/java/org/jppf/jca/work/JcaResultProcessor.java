@@ -144,7 +144,7 @@ public class JcaResultProcessor implements Work
 				oldCl = Thread.currentThread().getContextClassLoader();
 				Thread.currentThread().setContextClassLoader(cl);
 			}
-			connection.getClient().getLoadBalancer().execute(job, connection);
+			connection.getClient().getLoadBalancer().execute(job, connection, false);
 			result.waitForResults(0);
 			client.removeRequestClassLoader(requestUuid);
 			result.setStatus(COMPLETE);

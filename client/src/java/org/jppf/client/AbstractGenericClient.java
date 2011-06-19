@@ -46,6 +46,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether trace-level logging is enabled.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * The pool of threads used for submitting execution requests.
 	 */
 	protected ThreadPoolExecutor executor = null;
@@ -351,19 +355,57 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 
 	/**
 	 * Determine whether there is a client connection available for execution.
-	 * @return true if at least one ocnnection is available, false otherwise.
+	 * @return true if at least one connection is available, false otherwise.
 	 */
 	public boolean hasAvailableConnection()
 	{
-		if (debugEnabled)
+		if (traceEnabled)
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.append("available connections: ").append(getAvailableConnections().size()).append(", ");
 			sb.append("local execution enabled: ").append(loadBalancer.isLocalEnabled()).append(", ");
 			sb.append("localy executing: ").append(loadBalancer.isLocallyExecuting());
-			log.debug(sb.toString());
+			log.trace(sb.toString());
 		}
 		return (!getAvailableConnections().isEmpty() || (loadBalancer.isLocalEnabled() && !loadBalancer.isLocallyExecuting()));
+	}
+
+	/**
+	 * Determine whether there is a client connection available for execution.
+	 * @return true if at least one connection is available, false otherwise.
+	 */
+	public Pair<Boolean, Boolean> handleAvailableConnection()
+	{
+		synchronized(loadBalancer.getAvailableConnectionLock())
+		{
+			boolean b1 = hasAvailableConnection();
+			boolean b2 = false;
+			if (b1 && (loadBalancer.isLocalEnabled() && !loadBalancer.isLocallyExecuting()))
+			{
+				loadBalancer.setLocallyExecuting(true);
+				b2 = true;
+			}
+			return new Pair<Boolean, Boolean>(b1, b2);
+		}
+	}
+
+	/**
+	 * Determine whether there is a client connection available for execution.
+	 * @return true if at least one connection is available, false otherwise.
+	 */
+	public boolean handleAvailableConnection2()
+	{
+		synchronized(loadBalancer.getAvailableConnectionLock())
+		{
+			boolean b1 = hasAvailableConnection();
+			boolean b2 = false;
+			if (b1 && (loadBalancer.isLocalEnabled() && !loadBalancer.isLocallyExecuting()))
+			{
+				loadBalancer.setLocallyExecuting(true);
+				b2 = true;
+			}
+			return b1;
+		}
 	}
 
 	/**

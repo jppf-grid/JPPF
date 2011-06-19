@@ -47,23 +47,29 @@ public class JobSubmission implements Runnable
 	/**
 	 * The connection to execute the job on.
 	 */
-	protected JPPFClientConnectionImpl connection;
+	protected AbstractJPPFClientConnection connection;
 	/**
 	 * The submission manager.
 	 */
 	protected SubmissionManager submissionManager;
+	/**
+	 * Flag indicating whether the job will be executed locally, at least partially.
+	 */
+	protected final boolean locallyExecuting;
 
 	/**
 	 * Initialize this job submission. 
 	 * @param job the submitted job.
 	 * @param connection the connection to execute the job on.
 	 * @param submissionManager the submission manager.
+	 * @param locallyExecuting determines whether the job will be executed locally, at least partially.
 	 */
-	JobSubmission(JPPFJob job, JPPFClientConnectionImpl connection, SubmissionManager submissionManager)
+	JobSubmission(JPPFJob job, AbstractJPPFClientConnection connection, SubmissionManager submissionManager, boolean locallyExecuting)
 	{
 		this.job = job;
 		this.connection = connection;
 		this.submissionManager = submissionManager;
+		this.locallyExecuting = locallyExecuting;
 	}
 
 	/**
@@ -75,12 +81,10 @@ public class JobSubmission implements Runnable
 		boolean error = false;
 		try
 		{
-			//if (!job.isBlocking()) connection.getLock().lock();
 			if (connection != null) connection.job = job;
 			try
 			{
-				submissionManager.client.getLoadBalancer().execute(job, connection);
-				if (connection != null) connection.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.ACTIVE);
+				submissionManager.client.getLoadBalancer().execute(job, connection, locallyExecuting);
 			}
 			catch(NotSerializableException e)
 			{
@@ -104,7 +108,6 @@ public class JobSubmission implements Runnable
 				{
 					try
 					{
-						//connection.connect();
 						connection.getTaskServerConnection().init();
 					}
 					catch(Exception e2)
@@ -121,8 +124,8 @@ public class JobSubmission implements Runnable
 		}
 		finally
 		{
-			//if (!job.isBlocking()) connection.getLock().unlock();
-			if (!error) connection.job = null;
+			//if (debugEnabled) log.debug("job id '" + job.getId()  + "' ended with error = " + error);
+			if (!error && (connection != null)) connection.job = null;
 		}
 	}
 
@@ -165,19 +168,28 @@ public class JobSubmission implements Runnable
 
 	/**
 	 * Get the connection to execute the job on.
-	 * @return a {@link JPPFClientConnectionImpl} instance.
+	 * @return a {@link AbstractJPPFClientConnection} instance.
 	 */
-	public JPPFClientConnectionImpl getConnection()
+	public AbstractJPPFClientConnection getConnection()
 	{
 		return connection;
 	}
 
 	/**
 	 * Set the connection to execute the job on.
-	 * @param connection a {@link JPPFClientConnectionImpl} instance.
+	 * @param connection a {@link AbstractJPPFClientConnection} instance.
 	 */
-	public void setConnection(JPPFClientConnectionImpl connection)
+	public void setConnection(AbstractJPPFClientConnection connection)
 	{
 		this.connection = connection;
+	}
+
+	/**
+	 * Determine whether the job will be executed locally, at least partially.
+	 * @return <code>true</code> if the job is executed locally, <code>false</code> otherwise.
+	 */
+	public boolean isLocallyExecuting()
+	{
+		return locallyExecuting;
 	}
 }
