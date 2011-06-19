@@ -24,6 +24,7 @@ import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.task.storage.ClientDataProvider;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -68,8 +69,8 @@ public class LocalExecutionRunner
 			*/
 			//print("run with local execution on"); 
 			//jppfClient.setLocalExecutionEnabled(true);
-			//perform2(100, 5, 200);
-			perform3();
+			perform2(100, 5, 200);
+			//perform3();
 			/*
 			print("run 3 with local execution off"); 
 			jppfClient.setLocalExecutionEnabled(false);
@@ -134,6 +135,8 @@ public class LocalExecutionRunner
 	{
 		try
 		{
+			jppfClient.setLocalExecutionEnabled(true);
+			Thread.sleep(1000L);
 			print("creating the jobs");
 			List<JPPFJob> jobs = new ArrayList<JPPFJob>(nbJobs);
 			for (int i=0; i<nbJobs; i++)
@@ -204,6 +207,7 @@ public class LocalExecutionRunner
 			JPPFJob job = new JPPFJob();
 			job.setId("test jaer download");
 			job.addTask(new Task());
+			job.setDataProvider(new ClientDataProvider());
 			// submit the tasks for execution
 			List<JPPFTask> results = jppfClient.submit(job);
 			for (JPPFTask task: results)

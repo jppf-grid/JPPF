@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.jppf.classloader.JPPFClassLoader;
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.task.storage.ClientDataProvider;
 import org.jppf.utils.*;
 
 /**
@@ -35,6 +36,18 @@ public class Task extends JPPFTask
 	 * Explicit serialVersionUID.
 	 */
 	private static final long serialVersionUID = 1L;
+	/**
+	 * The cache mapping a resource key to its definition stored in a temp file.
+	 */
+	private static ResourceCache cache = new ResourceCache();
+	/**
+	 * Path to some jar on the client side.
+	 */
+	private static final String JAR_PATH = "../samples-pack/shared/lib/hazelcast-1.9.3.jar";
+	/**
+	 * To determine if we must load the jars or not.
+	 */
+	private static boolean initialized = false;
 
 	/**
 	 * {@inheritDoc}
@@ -44,12 +57,8 @@ public class Task extends JPPFTask
 		try
 		{
 			System.out.println("starting task");
+			if (!initialized) loadJars();
 			JPPFClassLoader cl = (JPPFClassLoader) getClass().getClassLoader();
-			ClassLoaderWrapper wrapper = new ClassLoaderWrapper(cl);
-			System.out.println("downloading jar file");
-			URL url = cl.getResource("../samples-pack/shared/lib/hazelcast-1.9.3.jar");
-			System.out.println("got URL: " + url);
-			wrapper.addURL(url);
 			Class c = cl.loadClass("com.hazelcast.core.Hazelcast");
 			System.out.println("found class " + c);
 			setResult(c.getName());
@@ -62,8 +71,37 @@ public class Task extends JPPFTask
 	}
 
 	/**
-	 * Downlaod the specified files.
-	 * @author Laurent Cohen
+	 * Load the required jars and add them to the classpath.
+	 * @throws Exception if any error occurs.
+	 */
+	private void loadJars() throws Exception
+	{
+		synchronized(cache)
+		{
+			if (initialized) return;
+			initialized = true;
+			System.out.println("loading jars");
+			JPPFClassLoader cl = (JPPFClassLoader) getClass().getClassLoader();
+			ClassLoaderWrapper wrapper = new ClassLoaderWrapper(cl);
+			List<String> jarList = new ArrayList<String>();
+			jarList.add(JAR_PATH);
+			System.out.println("downloading jar files: " + jarList);
+			ClientDataProvider provider = (ClientDataProvider) getDataProvider();
+			if (provider == null)
+			{
+				provider = new ClientDataProvider();
+				setDataProvider(provider);
+			}
+			Map<String, byte[]> map = (Map<String, byte[]>) provider.computeValue("jars", new DownloadCallable(jarList));
+			cache.registerResources(JAR_PATH, map.get(JAR_PATH));
+			URL url = cache.getResourceURL(JAR_PATH);
+			System.out.println("got URL: " + url);
+			wrapper.addURL(url);
+		}
+	}
+
+	/**
+	 * Download the specified files.
 	 */
 	public static class DownloadCallable implements JPPFCallable<Map<String, byte[]>>
 	{
@@ -92,7 +130,12 @@ public class Task extends JPPFTask
 				try
 				{
 					File file = new File(path);
-					if (!file.exists()) continue;
+					if (!file.exists())
+					{
+						System.out.println("could not find file " + file);
+						continue;
+					}
+					System.out.println("found file " + file);
 					byte[] bytes = FileUtils.getFileAsByte(file);
 					if (map == null) map = new HashMap<String, byte[]>();
 					map.put(path, bytes);
@@ -101,7 +144,7 @@ public class Task extends JPPFTask
 				{
 				}
 			}
-			return null;
+			return map;
 		}
 	}
 }
