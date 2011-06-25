@@ -18,14 +18,16 @@
 
 package org.jppf.server;
 
+import java.lang.management.ManagementFactory;
 import java.util.List;
 
-import javax.management.MBeanServer;
+import javax.management.*;
 
 import org.jppf.comm.discovery.*;
 import org.jppf.comm.recovery.RecoveryServer;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
+import org.jppf.server.debug.*;
 import org.jppf.server.peer.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -45,7 +47,7 @@ public class DriverInitializer
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * 
+	 * The instance of the driver.
 	 */
 	private JPPFDriver driver = null;
 	/**
@@ -69,6 +71,10 @@ public class DriverInitializer
 	 */
 	private JMXServerImpl jmxServer = null;
 	/**
+	 * The object that collects debug information.
+	 */
+	private ServerDebug serverDebug = null;
+	/**
 	 * The server used to detect that individual connections are broken due to hardware failures.
 	 */
 	private RecoveryServer recoveryServer = null;
@@ -81,6 +87,27 @@ public class DriverInitializer
 	{
 		this.driver = driver;
 		config = JPPFConfiguration.getProperties();
+	}
+
+	/**
+	 * Register the MBean that collects debug/troubleshooting information.
+	 */
+	void registerDebugMBean()
+	{
+		if (JPPFDriver.JPPF_DEBUG)
+		{
+			try
+			{
+				MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+				serverDebug = new ServerDebug();
+				StandardMBean mbean = new StandardMBean(serverDebug, ServerDebugMBean.class);
+				server.registerMBean(mbean, new ObjectName("org.jppf:name=debug,type=driver"));
+			}
+			catch (Exception e)
+			{
+				log.error(e.getMessage(), e);
+			}
+		}
 	}
 
 	/**
@@ -286,5 +313,14 @@ public class DriverInitializer
 	void stopRecoveryServer()
 	{
 		if (recoveryServer != null) recoveryServer.close();
+	}
+
+	/**
+	 * Get the object that collects debug information.
+	 * @return a {@link ServerDebug} instance.
+	 */
+	public ServerDebug getServerDebug()
+	{
+		return serverDebug;
 	}
 }

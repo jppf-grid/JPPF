@@ -48,7 +48,7 @@ class ResourceCache
 	 * @param name the name of the resource to lookup.
 	 * @return a list of file paths, or null if the resource is not found in the cache.
 	 */
-	public List<String> getResourcesLocations(String name)
+	public synchronized List<String> getResourcesLocations(String name)
 	{
 		return cache.get(name);
 	}
@@ -58,7 +58,7 @@ class ResourceCache
 	 * @param name the name of the resource to lookup.
 	 * @return a file path, or null if the resource is not found in the cache.
 	 */
-	public String getResourceLocation(String name)
+	public synchronized String getResourceLocation(String name)
 	{
 		List<String> locations = cache.get(name);
 		if ((locations == null) || locations.isEmpty()) return null;
@@ -70,7 +70,7 @@ class ResourceCache
 	 * @param name the name of the resource to lookup.
 	 * @param locations a list of file paths.
 	 */
-	public void setResourcesLocations(String name, List<String> locations)
+	public synchronized void setResourcesLocations(String name, List<String> locations)
 	{
 		cache.put(name, locations);
 	}
@@ -80,7 +80,7 @@ class ResourceCache
 	 * @param name the name of the resource to lookup.
 	 * @param location a file path.
 	 */
-	public void setResourceLocation(String name, String location)
+	public synchronized void setResourceLocation(String name, String location)
 	{
 		List<String> list = new ArrayList<String>();
 		list.add(location);
@@ -93,7 +93,7 @@ class ResourceCache
 	 * @param definitions a list of byte array definitions.
 	 * @throws Exception if any I/O error occurs.
 	 */
-	public void registerResources(String name, List<byte[]> definitions) throws Exception
+	public synchronized void registerResources(String name, List<byte[]> definitions) throws Exception
 	{
 		List<String> locations = new ArrayList<String>();
 		for (byte[] def: definitions) locations.add(saveToTempFile(def));

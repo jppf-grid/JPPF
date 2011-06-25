@@ -62,13 +62,16 @@ class WaitingProviderResponseState extends ClassServerState
 		boolean messageRead = false;
 		try
 		{
+			ChannelWrapper<?> request = context.getCurrentRequest();
+			while (!ClassState.SENDING_NODE_RESPONSE.equals(request.getContext().getState()) ||
+				(request.getKeyOps() != 0)) Thread.sleep(0L, 100000);
 			messageRead = context.readMessage(wrapper);
 		}
 		catch(IOException e)
 		{
 			if (debugEnabled) log.debug("an exception occurred while reading response from provider: " + wrapper);
 			server.removeProviderConnection(context.getUuid(), wrapper);
-			ChannelWrapper currentRequest = context.getCurrentRequest();
+			ChannelWrapper<?> currentRequest = context.getCurrentRequest();
 			if ((currentRequest != null) || !context.getPendingRequests().isEmpty())
 			{
 				if (debugEnabled) log.debug("provider: " + wrapper + " sending null response for disconnected provider");
@@ -91,14 +94,12 @@ class WaitingProviderResponseState extends ClassServerState
 			if ((resource.getDefinition() != null) && (resource.getCallable() == null))
 				server.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
 			// fowarding it to channel that requested
-			ChannelWrapper destinationKey = context.getCurrentRequest();
-			ClassContext destinationContext = (ClassContext) destinationKey.getContext();
+			ChannelWrapper<?> destinationChannel = context.getCurrentRequest();
+			ClassContext destinationContext = (ClassContext) destinationChannel.getContext();
 			resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
-			//destinationContext.setMessage(null);
 			destinationContext.setResource(resource);
-			destinationContext.serializeResource(destinationKey);
-			server.getTransitionManager().transitionChannel(destinationKey, TO_SENDING_NODE_RESPONSE);
-			//context.setMessage(null);
+			destinationContext.serializeResource(destinationChannel);
+			server.getTransitionManager().transitionChannel(destinationChannel, TO_SENDING_NODE_RESPONSE);
 			context.setCurrentRequest(null);
 			return TO_SENDING_PROVIDER_REQUEST;
 		}

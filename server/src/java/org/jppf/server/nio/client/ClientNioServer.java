@@ -64,7 +64,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	 */
 	public ClientNioServer(int[] ports) throws Exception
 	{
-		super(ports, "ClientServer", false);
+		super(ports, CLIENT_SERVER, false);
 		this.selectTimeout = 1L;
 	}
 
@@ -97,7 +97,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 		catch (Exception e)
 		{
 			log.error(e.getMessage(), e);
-			closeClient(channel, context);
+			closeClient(channel);
 		}
 		driver.getStatsManager().newClientConnection();
 	}
@@ -126,10 +126,10 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	/**
 	 * Close a connection to a node.
 	 * @param channel a <code>SocketChannel</code> that encapsulates the connection.
-	 * @param context the context data associated with the channel.
 	 */
-	public static void closeClient(ChannelWrapper<?> channel, ClientContext context)
+	public static void closeClient(ChannelWrapper<?> channel)
 	{
+		if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, CLIENT_SERVER);
 		try
 		{
 			channel.close();

@@ -53,12 +53,15 @@ public class JPPFDriver
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Flag indicating whether collection of debug information is available via JMX.
+	 */
+	public static final boolean JPPF_DEBUG = JPPFConfiguration.getProperties().getBoolean("jppf.debug.enabled", false);
+	/**
 	 * Singleton instance of the JPPFDriver.
 	 */
 	private static JPPFDriver instance = null;
 	/**
-	 * The queue that handles the tasks to execute. Objects are added to, and removed from, this queue, asynchronously and by
-	 * multiple threads.
+	 * The queue that handles the tasks to execute. Objects are added to, and removed from, this queue, asynchronously and by multiple threads.
 	 */
 	private JPPFQueue taskQueue = null;
 	/**
@@ -133,6 +136,7 @@ public class JPPFDriver
 		JPPFConnectionInformation info = initializer.getConnectionInformation();
 		TypedProperties config = JPPFConfiguration.getProperties();
 
+		initializer.registerDebugMBean();
 		initializer.initRecoveryServer();
 
 		classServer = new ClassNioServer(info.classServerPorts);
@@ -276,12 +280,23 @@ public class JPPFDriver
 			nodeNioServer.end();
 			nodeNioServer = null;
 		}
-		for (int i=0; i<applicationServers.length; i++)
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.client.server.nio.enabled", true))
 		{
-			applicationServers[i].end();
-			applicationServers[i] = null;
+			if (clientNioServer != null)
+			{
+				clientNioServer.end();
+				clientNioServer = null;
+			}
 		}
-		applicationServers = null;
+		else
+		{
+			for (int i=0; i<applicationServers.length; i++)
+			{
+				applicationServers[i].end();
+				applicationServers[i] = null;
+			}
+			applicationServers = null;
+		}
 		initializer.stopJmxServer();
 		jobManager.close();
 		initializer.stopRecoveryServer();

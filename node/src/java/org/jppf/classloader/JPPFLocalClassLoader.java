@@ -20,6 +20,7 @@ package org.jppf.classloader;
 import java.io.InputStream;
 import java.nio.channels.SelectionKey;
 import java.util.*;
+import java.util.concurrent.Future;
 
 import org.jppf.node.NodeRunner;
 import org.jppf.utils.*;
@@ -75,11 +76,8 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 		LOCK.lock();
 		try
 		{
-			//if (channel != null) return;
-			if (!isInitializing())
+			if (INITIALIZING.compareAndSet(false, true))
 			{
-				setInitializing(true);
-				// we need to do this in order to dramatically simplify the state machine of ClassServer
 				try
 				{
 					if (debugEnabled) log.debug("sending node initiation message");
@@ -101,18 +99,21 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 					while (channel.getNodeResource() == null) channel.getNodeLock().goToSleep();
 					channel.setNodeResource(null);
 					if (debugEnabled) log.debug("received node initiation response");
+					System.out.println(getClass().getSimpleName() + ".init(): Reconnected to the class server");
 				}
 				catch (Exception e)
 				{
 					throw new RuntimeException(e);
 				}
-				System.out.println(getClass().getSimpleName() + ".init(): Reconnected to the class server");
+				finally
+				{
+					INITIALIZING.set(false);
+				}
 			}
 		}
 		finally
 		{
 			LOCK.unlock();
-			setInitializing(false);
 		}
 	}
 
@@ -142,13 +143,6 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	{
 		if (debugEnabled) log.debug("looking up resource [" + name + "]");
 		Class<?> c = findLoadedClass(name);
-		/*
-		if (c == null)
-		{
-			ClassLoader parent = getParent();
-			if (parent instanceof AbstractJPPFClassLoader) c = ((AbstractJPPFClassLoader) parent).findLoadedClass(name);
-		}
-		*/
 		if (c == null)
 		{
 			if (debugEnabled) log.debug("resource [" + name + "] not already loaded");
@@ -185,9 +179,6 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 		}
 		if (debugEnabled) log.debug("definition for resource [" + name + "] : " + c);
 		return c;
-		/*
-		return loadClass(name);
-		*/
 	}
 
 	/**
@@ -209,17 +200,56 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 		resource.setAsResource(asResource);
 		resource.setRequestUuid(requestUuid);
 
-		synchronized(channel)
+		ResourceRequest request = new ResourceRequest(resource);
+		Future<?> future = executor.submit(request);
+		future.get();
+		Throwable t = request.getThrowable();
+		if (t != null)
 		{
-			channel.setServerResource(resource);
-			channel.setReadyOps(SelectionKey.OP_READ);
+			if (t instanceof Exception) throw (Exception) t;
+			throw (Error) t;
 		}
-		while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
-		
-		channel.setReadyOps(SelectionKey.OP_WRITE);
-		while (channel.getNodeResource() == null) channel.getNodeLock().goToSleep();
-		resource = channel.getNodeResource();
-		channel.setNodeResource(null);
-		return resource;
+		return request.getResponse();
+	}
+
+	/**
+	 * Encapsulates a remote resource request submitted asynchronously
+	 * via the single-thread executor.
+	 */
+	protected class ResourceRequest extends AbstractResourceRequest
+	{
+		/**
+		 * Initialize with the specified request.
+		 * @param request the request to send.
+		 */
+		public ResourceRequest(JPPFResourceWrapper request)
+		{
+			super(request);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public void run()
+		{
+			try
+			{
+				synchronized(channel)
+				{
+					channel.setServerResource(request);
+					channel.setReadyOps(SelectionKey.OP_READ);
+				}
+				while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
+				
+				channel.setReadyOps(SelectionKey.OP_WRITE);
+				while (channel.getNodeResource() == null) channel.getNodeLock().goToSleep();
+				response = channel.getNodeResource();
+				channel.setNodeResource(null);
+			}
+			catch (Throwable t)
+			{
+				throwable = t;
+			}
+		}
 	}
 }

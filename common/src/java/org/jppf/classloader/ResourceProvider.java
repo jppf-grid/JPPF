@@ -211,6 +211,19 @@ public class ResourceProvider
 		{
 			log.error(e.getMessage(), e);
 		}
+		try
+		{
+			File file = new File(name);
+			if (file.exists())
+			{
+				if (result == null) result = new ArrayList<byte[]>();
+				result.add(FileUtils.getFileAsByte(file));
+			}
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
 		return result;
 	}
 }

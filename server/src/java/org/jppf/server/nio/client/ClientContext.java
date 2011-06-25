@@ -108,7 +108,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 */
 	public void handleException(ChannelWrapper<?> channel)
 	{
-		ClientNioServer.closeClient(channel, this);
+		ClientNioServer.closeClient(channel);
 		cancelJobOnClose();
 	}
 

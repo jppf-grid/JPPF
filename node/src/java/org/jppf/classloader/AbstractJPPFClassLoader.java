@@ -20,6 +20,7 @@ package org.jppf.classloader;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -50,6 +51,10 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	 * Determines whether this class loader should handle dynamic class updating.
 	 */
 	protected static final AtomicBoolean INITIALIZING = new AtomicBoolean(false);
+	/**
+	 * The executor that handles asynchronous resource requests.
+	 */
+	protected static ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests"));
 	/**
 	 * Determines whether this class loader should handle dynamic class updating.
 	 */
@@ -118,13 +123,6 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 				ClassLoader cl = c.getClassLoader();
 				if (debugEnabled) log.debug("classloader = " + cl);
 			}
-			/*
-			if (c == null)
-			{
-				ClassLoader parent = getParent();
-				if (parent instanceof AbstractJPPFClassLoader) c = ((AbstractJPPFClassLoader) parent).findLoadedClass(name);
-			}
-			*/
 			if (c == null)
 			{
 				if (debugEnabled) log.debug("resource [" + name + "] not already loaded");
@@ -150,37 +148,37 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	{
 		try
 		{
-			LOCK.lock();
-			int i = name.lastIndexOf('.');
-			if (i >= 0)
-			{
-				String pkgName = name.substring(0, i);
-				Package pkg = getPackage(pkgName);
-				if (pkg == null)
-				{
-					definePackage(pkgName, null, null, null, null, null, null, null);
-				}
-			}
-			if (debugEnabled) log.debug("looking up definition for resource [" + name + "]");
-			byte[] b = null;
-			String resName = name.replace('.', '/') + ".class";
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("name", resName);
-			JPPFResourceWrapper resource = loadResourceData(map, false);
-			if (resource == null) throw new ClassNotFoundException("could not find resource " + name);
-			b = resource.getDefinition();
-			if ((b == null) || (b.length == 0))
-			{
-				if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
-				throw new ClassNotFoundException("Could not load class '" + name + "'");
-			}
-			if (debugEnabled) log.debug("found definition for resource [" + name + ", definitionLength=" + b.length + "]");
-			return defineClass(name, b, 0, b.length);
+			Class<?> c = super.findClass(name);
+			if (c != null) return c;
 		}
-		finally
+		catch(ClassNotFoundException ignore)
 		{
-			LOCK.unlock();
 		}
+		int i = name.lastIndexOf('.');
+		if (i >= 0)
+		{
+			String pkgName = name.substring(0, i);
+			Package pkg = getPackage(pkgName);
+			if (pkg == null)
+			{
+				definePackage(pkgName, null, null, null, null, null, null, null);
+			}
+		}
+		if (debugEnabled) log.debug("looking up definition for resource [" + name + "]");
+		byte[] b = null;
+		String resName = name.replace('.', '/') + ".class";
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("name", resName);
+		JPPFResourceWrapper resource = loadResourceData(map, false);
+		if (resource == null) throw new ClassNotFoundException("could not find resource " + name);
+		b = resource.getDefinition();
+		if ((b == null) || (b.length == 0))
+		{
+			if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
+			throw new ClassNotFoundException("Could not load class '" + name + "'");
+		}
+		if (debugEnabled) log.debug("found definition for resource [" + name + ", definitionLength=" + b.length + "]");
+		return defineClass(name, b, 0, b.length);
 	}
 
 	/**
@@ -202,29 +200,6 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		{
 			if (debugEnabled) log.debug("connection with class server ended, re-initializing, exception is:", e);
 			throw new JPPFNodeReconnectionNotification("connection with class server ended, re-initializing, exception is:", e);
-			/*
-			new Thread("classloader connection init")
-			{
-				public void run()
-				{
-					init();
-				}
-			}.start();
-			throw new ClassNotFoundException("could not load resource [" + map.get("name") + "]", e);
-			init();
-			try
-			{
-				resource = loadResourceData0(map, asResource);
-			}
-			catch(ClassNotFoundException ex)
-			{
-				throw ex;
-			}
-			catch(Exception ex)
-			{
-				if (debugEnabled) log.debug(e.getMessage(), e);
-			}
-			*/
 		}
 		catch(ClassNotFoundException e)
 		{
@@ -260,20 +235,12 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	 */
 	public byte[] computeRemoteData(byte[] callable) throws Exception
 	{
-		try
-		{
-			LOCK.lock();
-			if (debugEnabled) log.debug("requesting remote computation, requestUuid = " + requestUuid);
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("callable", callable);
-			byte[] b = loadRemoteData(map, false).getCallable();
-			if (debugEnabled) log.debug("remote definition for collable resource "+ (b==null ? "not " : "") + "found");
-			return b;
-		}
-		finally
-		{
-			LOCK.unlock();
-		}
+		if (debugEnabled) log.debug("requesting remote computation, requestUuid = " + requestUuid);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("callable", callable);
+		byte[] b = loadRemoteData(map, false).getCallable();
+		if (debugEnabled) log.debug("remote definition for collable resource "+ (b==null ? "not " : "") + "found");
+		return b;
 	}
 
 	/**
@@ -304,10 +271,6 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		catch(IOException e)
 		{
 		}
-		finally
-		{
-			//lock.unlock();
-		}
 		if (debugEnabled) log.debug("resource [" + name + "] " + (url == null ? "not " : "") + "found remotely");
 		return url;
 	}
@@ -330,14 +293,12 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	 */
 	public InputStream getResourceAsStream(String name)
 	{
-		InputStream is = getClass().getClassLoader().getResourceAsStream(name);
-		//if ((is == null) && !loading.get())
+		InputStream is = super.getResourceAsStream(name);
 		if (is == null)
 		{
 			if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
 			try
 			{
-				LOCK.lock();
 				Map<String, Object> map = new HashMap<String, Object>();
 				map.put("name", name);
 				JPPFResourceWrapper resource = loadResourceData(map, true);
@@ -351,10 +312,6 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 			{
 				if (debugEnabled) log.debug("resource [" + name + "] not found remotely");
 				return null;
-			}
-			finally
-			{
-				LOCK.unlock();
 			}
 		}
 		return is;
@@ -406,7 +363,6 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
 		try
 		{
-			LOCK.lock();
 			List<String> locationsList = cache.getResourcesLocations(name);
 			if (locationsList == null)
 			{
@@ -443,10 +399,6 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		{
 			if (debugEnabled) log.debug("resource [" + name + "] not found remotely");
 		}
-		finally
-		{
-			LOCK.unlock();
-		}
 		return urlList == null ? null : new IteratorEnumeration<URL>(urlList.iterator());
 	}
 
@@ -459,5 +411,60 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	{
 		if (serializer == null) serializer = (ObjectSerializer) getParent().loadClass("org.jppf.comm.socket.BootstrapObjectSerializer").newInstance();
 		return serializer;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addURL(URL url)
+	{
+		super.addURL(url);
+	}
+
+	/**
+	 * Encapsulates a remote resource request submitted asynchronously
+	 * via the single-thread executor.
+	 */
+	protected abstract class AbstractResourceRequest implements Runnable
+	{
+		/**
+		 * Used to collect any throwable raised during communication with the server. 
+		 */
+		protected Throwable throwable = null;
+		/**
+		 * The request to send.
+		 */
+		protected JPPFResourceWrapper request = null;
+		/**
+		 * The response received.
+		 */
+		protected JPPFResourceWrapper response = null;
+
+		/**
+		 * Initialize with the specified request.
+		 * @param request the request to send.
+		 */
+		public AbstractResourceRequest(JPPFResourceWrapper request)
+		{
+			this.request = request;
+		}
+
+		/**
+		 * Get the throwable eventually raised during communication with the server. 
+		 * @return a {@link Throwable} instance.
+		 */
+		public Throwable getThrowable()
+		{
+			return throwable;
+		}
+
+		/**
+		 * Get the response received.
+		 * @return a {@link JPPFResourceWrapper} instance.
+		 */
+		public JPPFResourceWrapper getResponse()
+		{
+			return response;
+		}
 	}
 }
