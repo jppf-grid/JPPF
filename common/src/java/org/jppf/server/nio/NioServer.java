@@ -53,8 +53,15 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * It is defined as the value of the configuration property 
 	 * &quot;transition.thread.pool.size&quot;, with a default value of 1.
 	 */
-	private static final int THREAD_POOL_SIZE =
-		JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", 1);
+	private static final int THREAD_POOL_SIZE = JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", 1);
+	/**
+	 * Name of the class server.
+	 */
+	public static final String CLASS_SERVER = "ClassServer";
+	/**
+	 * Name of the class server.
+	 */
+	public static final String NODE_SERVER = "NodeServer";
 	/**
 	 * the selector of all socket channels open with providers or nodes.
 	 */
@@ -328,7 +335,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * @param key the selection key for the socket channel to process.
 	 * @param serverChannel the ServerSocketChannel that accepted the channel.
 	 */
-	public void postAccept(ChannelWrapper key, ServerSocketChannel serverChannel)
+	public void postAccept(ChannelWrapper<?> key, ServerSocketChannel serverChannel)
 	{
 		postAccept(key);
 	}
@@ -337,13 +344,13 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * Process a channel that was accepted by the server socket channel.
 	 * @param key the selection key for the socket channel to process.
 	 */
-	public abstract void postAccept(ChannelWrapper key);
+	public abstract void postAccept(ChannelWrapper<?> key);
 
 	/**
 	 * Define a context for a newly created channel.
 	 * @return an <code>NioContext</code> instance.
 	 */
-	public abstract NioContext createNioContext();
+	public abstract NioContext<?> createNioContext();
 
 	/**
 	 * Get the IO operations a connection is initially interested in.

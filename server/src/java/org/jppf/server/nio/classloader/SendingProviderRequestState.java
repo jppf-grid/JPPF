@@ -63,7 +63,7 @@ class SendingProviderRequestState extends ClassServerState
 		if (wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
 		{
 			server.removeProviderConnection(context.getUuid(), wrapper);
-			ChannelWrapper currentRequest = context.getCurrentRequest();
+			ChannelWrapper<?> currentRequest = context.getCurrentRequest();
 			if (debugEnabled) log.debug("provider: " + wrapper + " sending null response for disconnected provider");
 			if ((currentRequest != null) || !context.getPendingRequests().isEmpty())
 			{
@@ -84,10 +84,7 @@ class SendingProviderRequestState extends ClassServerState
 			ClassContext requestContext = (ClassContext) request.getContext();
 			context.setMessage(null);
 			context.setResource(requestContext.getResource());
-			if (debugEnabled)
-			{
-				log.debug("provider " + wrapper + " serving new resource request [" + context.getResource().getName() + "] from node: " + request);
-			}
+			if (debugEnabled) log.debug("provider " + wrapper + " serving new resource request [" + context.getResource().getName() + "] from node: " + request);
 			context.serializeResource(wrapper);
 			context.setCurrentRequest(request);
 		}

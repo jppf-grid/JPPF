@@ -19,6 +19,7 @@ package org.jppf.classloader;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Future;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.*;
@@ -90,67 +91,59 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	 */
 	protected void init()
 	{
-		if (!isInitializing())
+		LOCK.lock();
+		try
 		{
-			try
+			if (INITIALIZING.compareAndSet(false, true))
 			{
-				LOCK.lock();
-				if (debugEnabled) log.debug("initializing connection");
-				setInitializing(true);
-				if (socketClient == null) initSocketClient();
-				System.out.println("Attempting connection to the class server at " + socketClient.getHost() + ":" + socketClient.getPort());
-				socketInitializer.initializeSocket(socketClient);
-				if (!socketInitializer.isSuccessfull())
-				{
-					socketClient = null;
-					throw new JPPFNodeReconnectionNotification("Could not reconnect to the server");
-				}
-
-				// we need to do this in order to dramatically simplify the state machine of ClassServer
 				try
 				{
-					if (debugEnabled) log.debug("sending node initiation message");
-					JPPFResourceWrapper resource = new JPPFResourceWrapper();
-					resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-					resource.setData("node.uuid", NodeRunner.getUuid());
-					ObjectSerializer serializer = socketClient.getSerializer();
-					JPPFBuffer buf = serializer.serialize(resource);
-					byte[] data = buf.getBuffer();
-					data = JPPFDataTransformFactory.transform(true, data);
-					socketClient.sendBytes(new JPPFBuffer(data, data.length));
-					socketClient.flush();
-					if (debugEnabled) log.debug("node initiation message sent, getting response");
-					socketClient.receiveBytes(0);
-					if (debugEnabled) log.debug("received node initiation response");
+					if (debugEnabled) log.debug("initializing connection");
+					if (socketClient == null) initSocketClient();
+					System.out.println("Attempting connection to the class server at " + socketClient.getHost() + ":" + socketClient.getPort());
+					socketInitializer.initializeSocket(socketClient);
+					if (!socketInitializer.isSuccessfull())
+					{
+						socketClient = null;
+						throw new JPPFNodeReconnectionNotification("Could not reconnect to the server");
+					}
+		
+					// we need to do this in order to dramatically simplify the state machine of ClassServer
+					try
+					{
+						if (debugEnabled) log.debug("sending node initiation message");
+						JPPFResourceWrapper resource = new JPPFResourceWrapper();
+						resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
+						resource.setData("node.uuid", NodeRunner.getUuid());
+						ObjectSerializer serializer = socketClient.getSerializer();
+						JPPFBuffer buf = serializer.serialize(resource);
+						byte[] data = buf.getBuffer();
+						data = JPPFDataTransformFactory.transform(true, data);
+						socketClient.sendBytes(new JPPFBuffer(data, data.length));
+						socketClient.flush();
+						if (debugEnabled) log.debug("node initiation message sent, getting response");
+						socketClient.receiveBytes(0);
+						if (debugEnabled) log.debug("received node initiation response");
+					}
+					catch (IOException e)
+					{
+						throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
+					}
+					catch (Exception e)
+					{
+						throw new RuntimeException(e);
+					}
+					System.out.println("Reconnected to the class server");
 				}
-				catch (IOException e)
+				finally
 				{
-					throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
+					INITIALIZING.set(false);
 				}
-				catch (Exception e)
-				{
-					throw new RuntimeException(e);
-				}
-				System.out.println("Reconnected to the class server");
-			}
-			finally
-			{
-				LOCK.unlock();
-				setInitializing(false);
 			}
 		}
-		else
+		finally
 		{
-			if (debugEnabled) log.debug("waiting for end of connection initialization");
-			// wait until initialization is over.
-			try
-			{
-				LOCK.lock();
-			}
-			finally
-			{
-				LOCK.unlock();
-			}
+			LOCK.unlock();
 		}
 	}
 
@@ -180,6 +173,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		LOCK.lock();
 		try
 		{
+			executor.shutdownNow();
 			if (socketInitializer != null) socketInitializer.close();
 			if (socketClient != null)
 			{
@@ -219,18 +213,58 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		resource.setAsResource(asResource);
 		resource.setRequestUuid(requestUuid);
 
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		ObjectSerializer serializer = getSerializer();
-		JPPFBuffer buf = serializer.serialize(resource);
-		byte[] data = buf.getBuffer();
-		if (transform != null) data = JPPFDataTransformFactory.transform(transform, true, data);
-		socketClient.writeInt(data.length);
-		socketClient.write(data, 0, data.length);
-		socketClient.flush();
-		buf = socketClient.receiveBytes(0);
-		data = buf.getBuffer();
-		if (transform != null) data = JPPFDataTransformFactory.transform(transform, false, data);
-		resource = (JPPFResourceWrapper) serializer.deserialize(data);
-		return resource;
+		ResourceRequest request = new ResourceRequest(resource);
+		Future<?> future = executor.submit(request);
+		future.get();
+		Throwable t = request.getThrowable();
+		if (t != null)
+		{
+			if (t instanceof Exception) throw (Exception) t;
+			throw (Error) t;
+		}
+		return request.getResponse();
+	}
+
+	/**
+	 * Encapsulates a remote resource request submitted asynchronously
+	 * via the single-thread executor.
+	 */
+	protected class ResourceRequest extends AbstractResourceRequest
+	{
+		/**
+		 * Initialize with the specified request.
+		 * @param request the request to send.
+		 */
+		public ResourceRequest(JPPFResourceWrapper request)
+		{
+			super(request);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public void run()
+		{
+			JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+			ObjectSerializer serializer;
+			try
+			{
+				serializer = getSerializer();
+				JPPFBuffer buf = serializer.serialize(request);
+				byte[] data = buf.getBuffer();
+				if (transform != null) data = JPPFDataTransformFactory.transform(transform, true, data);
+				socketClient.writeInt(data.length);
+				socketClient.write(data, 0, data.length);
+				socketClient.flush();
+				buf = socketClient.receiveBytes(0);
+				data = buf.getBuffer();
+				if (transform != null) data = JPPFDataTransformFactory.transform(transform, false, data);
+				response = (JPPFResourceWrapper) serializer.deserialize(data);
+			}
+			catch (Throwable t)
+			{
+				throwable = t;
+			}
+		}
 	}
 }

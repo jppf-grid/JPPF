@@ -169,7 +169,7 @@ class WaitingNodeRequestState extends ClassServerState
 		{
 			uuidPath.decPosition();
 			String uuid = uuidPath.getCurrentElement();
-			ChannelWrapper provider = findProviderConnection(uuid);
+			ChannelWrapper<?> provider = findProviderConnection(uuid);
 			if (provider != null)
 			{
 				synchronized(provider)
@@ -190,13 +190,13 @@ class WaitingNodeRequestState extends ClassServerState
 	 * @return a <code>SelectableChannel</code> instance.
 	 * @throws Exception if an error occurs while searching for a connection.
 	 */
-	private ChannelWrapper findProviderConnection(String uuid) throws Exception
+	private ChannelWrapper<?> findProviderConnection(String uuid) throws Exception
 	{
-		ChannelWrapper result = null;
+		ChannelWrapper<?> result = null;
 		List<ChannelWrapper<?>> connections = server.getProviderConnections(uuid);
 		if (connections == null) return null;
 		int minRequests = Integer.MAX_VALUE;
-		for (ChannelWrapper channel: connections)
+		for (ChannelWrapper<?> channel: connections)
 		{
 			ClassContext ctx = (ClassContext) channel.getContext();
 			int size = ctx.getNbPendingRequests();

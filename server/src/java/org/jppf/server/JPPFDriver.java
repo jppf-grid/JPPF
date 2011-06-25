@@ -48,6 +48,10 @@ public class JPPFDriver
 	 */
 	static Logger log = LoggerFactory.getLogger(JPPFDriver.class);
 	/**
+	 * Flag indicating whether collection of debug information is available via JMX.
+	 */
+	public static final boolean JPPF_DEBUG = JPPFConfiguration.getProperties().getBoolean("jppf.debug.enabled", false);
+	/**
 	 * Determines whether debug-level logging is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
@@ -56,8 +60,7 @@ public class JPPFDriver
 	 */
 	private static JPPFDriver instance = null;
 	/**
-	 * The queue that handles the tasks to execute. Objects are added to, and removed from, this queue, asynchronously and by
-	 * multiple threads.
+	 * The queue that handles the tasks to execute. Objects are added to, and removed from, this queue, asynchronously and by multiple threads.
 	 */
 	private JPPFQueue taskQueue = null;
 	/**
@@ -128,6 +131,7 @@ public class JPPFDriver
 		JPPFConnectionInformation info = initializer.getConnectionInformation();
 		TypedProperties config = JPPFConfiguration.getProperties();
 
+		initializer.registerDebugMBean();
 		initializer.initRecoveryServer();
 
 		classServer = new ClassNioServer(info.classServerPorts);

@@ -59,7 +59,6 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * The cache of class definition, this is done to not flood the provider when it dispatch many tasks. it use
 	 * WeakHashMap to minimize the OutOfMemory.
 	 */
-	//Map<CacheClassKey, CacheClassContent> classCache = new WeakHashMap<CacheClassKey, CacheClassContent>();
 	Map<CacheClassKey, CacheClassContent> classCache = new SoftReferenceValuesMap<CacheClassKey, CacheClassContent>();
 	/**
 	 * The thread polling the local channel.
@@ -95,7 +94,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	public ClassNioServer(final int[] ports) throws JPPFException
 	{
-		super(ports, "ClassServer", false);
+		super(ports, CLASS_SERVER, false);
 		RecoveryServer recoveryServer = driver.getInitializer().getRecoveryServer();
 		if (recoveryServer != null) recoveryServer.getReaper().addReaperListener(this);
 		selectTimeout = 1L;
@@ -140,7 +139,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	/**
 	 * {@inheritDoc}
 	 */
-	public NioContext createNioContext()
+	public NioContext<?> createNioContext()
 	{
 		return new ClassContext();
 	}
@@ -156,8 +155,9 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	/**
 	 * {@inheritDoc}
 	 */
-	public void postAccept(ChannelWrapper wrapper)
+	public void postAccept(ChannelWrapper<?> wrapper)
 	{
+		if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().addChannel(wrapper, getName());
 		((ClassContext) wrapper.getContext()).setState(DEFINING_TYPE);
 	}
 
@@ -216,6 +216,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	public void removeProviderConnection(String uuid, ChannelWrapper channel)
 	{
 		if (debugEnabled) log.debug("removing provider connection: uuid=" + uuid + ", channel=" + channel);
+		if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, getName());
 		synchronized(providerConnections)
 		{
 			List<ChannelWrapper<?>> list = providerConnections.get(uuid);
@@ -310,7 +311,9 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 		if (debugEnabled) log.debug("removing node connection: uuid=" + uuid);
 		synchronized(nodeConnections)
 		{
-			return nodeConnections.remove(uuid);
+			ChannelWrapper<?> channel = nodeConnections.remove(uuid);
+			if (JPPFDriver.JPPF_DEBUG && (channel != null)) driver.getInitializer().getServerDebug().removeChannel(channel, getName());
+			return channel;
 		}
 	}
 

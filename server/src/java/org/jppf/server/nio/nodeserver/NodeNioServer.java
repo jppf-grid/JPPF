@@ -115,7 +115,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 */
 	public NodeNioServer(int[] ports) throws Exception
 	{
-		super(ports, "NodeServer", false);
+		super(ports, NODE_SERVER, false);
 		taskQueueChecker = new TaskQueueChecker(this);
 		this.selectTimeout = 1L;
 		Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
@@ -170,8 +170,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	/**
 	 * {@inheritDoc}
 	 */
-	public void postAccept(ChannelWrapper channel)
+	public void postAccept(ChannelWrapper<?> channel)
 	{
+		if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().addChannel(channel, getName());
 		driver.getStatsManager().newNodeConnection();
 		AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
 		try
@@ -244,7 +245,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * @return an <code>NioContext</code> instance.
 	 * @see org.jppf.server.nio.NioServer#createNioContext()
 	 */
-	public NioContext createNioContext()
+	public NioContext<?> createNioContext()
 	{
 		return new RemoteNodeContext();
 	}
@@ -304,7 +305,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 */
 	public static void closeNode(ChannelWrapper<?> channel, AbstractNodeContext context)
 	{
-		// bug [993389 - Nodes are not removed from the console upon dying]
+		if (JPPFDriver.JPPF_DEBUG && (channel != null)) driver.getInitializer().getServerDebug().removeChannel(channel, NODE_SERVER);
 		try
 		{
 			channel.close();

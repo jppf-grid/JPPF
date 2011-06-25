@@ -308,4 +308,19 @@ public class JPPFResourceWrapper implements Serializable
 	{
 		data.put(key, value);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("JPPFResourceWrapper[");
+		sb.append("dynamic=").append(dynamic);
+		sb.append(", asResource=").append(asResource);
+		sb.append(", state=").append(state);
+		sb.append(", name=").append(data.get("name"));
+		sb.append("]");
+		return sb.toString();
+	}
 }
