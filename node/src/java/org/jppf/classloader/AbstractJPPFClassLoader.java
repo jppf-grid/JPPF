@@ -459,4 +459,12 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 			return response;
 		}
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addURL(URL url)
+	{
+		super.addURL(url);
+	}
 }
