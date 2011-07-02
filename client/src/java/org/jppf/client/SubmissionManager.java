@@ -42,7 +42,11 @@ public class SubmissionManager extends ThreadSynchronization implements Runnable
 	/**
 	 * Maximum wait time in milliseconds in the the submission manager loop.
 	 */
-	private static final long MAX_WAIT = JPPFConfiguration.getProperties().getLong("jppf.submission.manager.max.wait", 1L);
+	private static final long MAX_WAIT_MILLIS = JPPFConfiguration.getProperties().getLong("jppf.submission.manager.maxwait.millis", 0L);
+	/**
+	 * Maximum wait time in milliseconds in the the submission manager loop.
+	 */
+	private static final int MAX_WAIT_NANOS = JPPFConfiguration.getProperties().getInt("jppf.submission.manager.maxwait.nanos", 100000);
 	/**
 	 * The queue of submissions pending execution.
 	 */
@@ -74,7 +78,7 @@ public class SubmissionManager extends ThreadSynchronization implements Runnable
 			Pair<Boolean, Boolean> execFlags = null;
 			while ((execQueue.isEmpty() || !(execFlags = client.handleAvailableConnection()).first()) && !isStopped())
 			{
-				goToSleep(MAX_WAIT);
+				goToSleep(MAX_WAIT_MILLIS, MAX_WAIT_NANOS);
 			}
 			if (isStopped()) break;
 			synchronized(this)

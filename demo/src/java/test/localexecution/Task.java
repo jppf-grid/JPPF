@@ -17,14 +17,11 @@
  */
 package test.localexecution;
 
-import java.io.File;
 import java.net.URL;
-import java.util.*;
 
-import org.jppf.classloader.JPPFClassLoader;
+import org.jppf.classloader.*;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.ClientDataProvider;
-import org.jppf.utils.*;
+import org.jppf.utils.CollectionUtils;
 
 /**
  * Test task.
@@ -37,13 +34,13 @@ public class Task extends JPPFTask
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
-	 * The cache mapping a resource key to its definition stored in a temp file.
-	 */
-	private static ResourceCache cache = new ResourceCache();
-	/**
 	 * Path to some jar on the client side.
 	 */
 	private static final String JAR_PATH = "../samples-pack/shared/lib/hazelcast-1.9.3.jar";
+	/**
+	 * Path to some jar on the client side.
+	 */
+	private static final String[] JAR_PATHS = { "../samples-pack/shared/lib/hazelcast-1.9.3.jar", "../samples-pack/shared/lib/jaligner.jar", "../samples-pack/shared/lib/js.jar", "lib/jppf-common-node.jar" };
 	/**
 	 * To determine if we must load the jars or not.
 	 */
@@ -57,11 +54,15 @@ public class Task extends JPPFTask
 		try
 		{
 			System.out.println("starting task");
-			if (!initialized) loadJars();
-			JPPFClassLoader cl = (JPPFClassLoader) getClass().getClassLoader();
+			AbstractJPPFClassLoader cl = (AbstractJPPFClassLoader) getClass().getClassLoader();
+			if (!initialized) loadJars(cl);
 			Class c = cl.loadClass("com.hazelcast.core.Hazelcast");
 			System.out.println("found class " + c);
-			setResult(c.getName());
+			c = cl.loadClass("jaligner.Sequence");
+			System.out.println("found class " + c);
+			c = cl.loadClass("org.mozilla.javascript.Evaluator");
+			System.out.println("found class " + c);
+			setResult("ok");
 		}
 		catch (Exception e)
 		{
@@ -72,79 +73,21 @@ public class Task extends JPPFTask
 
 	/**
 	 * Load the required jars and add them to the classpath.
+	 * @param cl the class loader to use to laod the jars.
 	 * @throws Exception if any error occurs.
 	 */
-	private void loadJars() throws Exception
+	private static synchronized void loadJars(AbstractJPPFClassLoader cl) throws Exception
 	{
-		synchronized(cache)
-		{
-			if (initialized) return;
-			initialized = true;
-			System.out.println("loading jars");
-			JPPFClassLoader cl = (JPPFClassLoader) getClass().getClassLoader();
-			ClassLoaderWrapper wrapper = new ClassLoaderWrapper(cl);
-			List<String> jarList = new ArrayList<String>();
-			jarList.add(JAR_PATH);
-			System.out.println("downloading jar files: " + jarList);
-			ClientDataProvider provider = (ClientDataProvider) getDataProvider();
-			if (provider == null)
-			{
-				provider = new ClientDataProvider();
-				setDataProvider(provider);
-			}
-			Map<String, byte[]> map = (Map<String, byte[]>) provider.computeValue("jars", new DownloadCallable(jarList));
-			cache.registerResources(JAR_PATH, map.get(JAR_PATH));
-			URL url = cache.getResourceURL(JAR_PATH);
-			System.out.println("got URL: " + url);
-			wrapper.addURL(url);
-		}
-	}
-
-	/**
-	 * Download the specified files.
-	 */
-	public static class DownloadCallable implements JPPFCallable<Map<String, byte[]>>
-	{
-		/**
-		 * The local paths for the files to download.
-		 */
-		private List<String> paths;
-
-		/**
-		 * Initialize this callable.
-		 * @param paths the local paths for the files to download.
-		 */
-		public DownloadCallable(List<String> paths)
-		{
-			this.paths = paths;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public Map<String, byte[]> call() throws Exception
-		{
-			Map<String, byte[]> map = null;
-			for (String path: paths)
-			{
-				try
-				{
-					File file = new File(path);
-					if (!file.exists())
-					{
-						System.out.println("could not find file " + file);
-						continue;
-					}
-					System.out.println("found file " + file);
-					byte[] bytes = FileUtils.getFileAsByte(file);
-					if (map == null) map = new HashMap<String, byte[]>();
-					map.put(path, bytes);
-				}
-				catch (Exception e)
-				{
-				}
-			}
-			return map;
-		}
+		if (initialized) return;
+		initialized = true;
+		System.out.println("loading jars");
+		/*
+		URL url = cl.getResource(JAR_PATH);
+		System.out.println("got URL: " + url);
+		if (url != null) cl.addURL(url);
+		*/
+		URL[] urls = cl.getMultipleResources(JAR_PATHS);
+		System.out.println("got URLs: " + CollectionUtils.list(urls));
+		for (URL url: urls) if (url != null) cl.addURL(url);
 	}
 }

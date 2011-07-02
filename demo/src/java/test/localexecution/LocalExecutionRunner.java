@@ -69,8 +69,8 @@ public class LocalExecutionRunner
 			*/
 			//print("run with local execution on"); 
 			//jppfClient.setLocalExecutionEnabled(true);
-			perform2(100, 5, 200);
-			//perform3();
+			//perform2(100, 5, 200);
+			perform3();
 			/*
 			print("run 3 with local execution off"); 
 			jppfClient.setLocalExecutionEnabled(false);
@@ -205,7 +205,7 @@ public class LocalExecutionRunner
 		{
 			long start = System.nanoTime();
 			JPPFJob job = new JPPFJob();
-			job.setId("test jaer download");
+			job.setId("test jar download");
 			job.addTask(new Task());
 			job.setDataProvider(new ClientDataProvider());
 			// submit the tasks for execution

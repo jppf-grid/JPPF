@@ -35,6 +35,10 @@ import org.jppf.utils.JPPFConfiguration;
 public abstract class AbstractClientConnectionHandler implements ClientConnectionHandler
 {
 	/**
+	 * Constant for an empty arry of <code>ClientConnectionStatusListener</code>.
+	 */
+	static final ClientConnectionStatusListener[] ZERO_CONNECTION_STATUS_LISTENER = new ClientConnectionStatusListener[0];
+	/**
 	 * The socket client uses to communicate over a socket connection.
 	 */
 	protected SocketWrapper socketClient = null;
@@ -67,11 +71,6 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * Status of the connection.
 	 */
 	protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(DISCONNECTED);
-	//protected JPPFClientConnectionStatus status = DISCONNECTED;
-	/**
-	 * Lock for synchronizing acces to the status.
-	 */
-	protected Object statusLock = new Object();
 	/**
 	 * List of status listeners for this connection.
 	 */
@@ -79,7 +78,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	/**
 	 * Array of listeners on wich the iterations are performed.
 	 */
-	private ClientConnectionStatusListener[] listenerArray = new ClientConnectionStatusListener[0];
+	private ClientConnectionStatusListener[] listenerArray = ZERO_CONNECTION_STATUS_LISTENER;
 
 	/**
 	 * Initialize this connection with the specified owner.
@@ -100,25 +99,18 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 */
 	public JPPFClientConnectionStatus getStatus()
 	{
-		synchronized(statusLock)
-		{
-			return status.get();
-		}
+		return status.get();
 	}
 
 	/**
 	 * Set the status of this connection.
-	 * @param status  a <code>JPPFClientConnectionStatus</code> enumerated value.
+	 * @param newStatus a <code>JPPFClientConnectionStatus</code> enumerated value.
 	 * @see org.jppf.client.ClientConnectionHandler#setStatus(org.jppf.client.JPPFClientConnectionStatus)
 	 */
-	public void setStatus(JPPFClientConnectionStatus status)
+	public void setStatus(JPPFClientConnectionStatus newStatus)
 	{
-		synchronized(statusLock)
-		{
-			JPPFClientConnectionStatus oldStatus = getStatus();
-			this.status.set(status);
-			if (!status.equals(oldStatus)) fireStatusChanged(oldStatus);
-		}
+			JPPFClientConnectionStatus oldStatus = status.getAndSet(newStatus);
+			if (!newStatus.equals(oldStatus)) fireStatusChanged(oldStatus);
 	}
 
 	/**
@@ -131,7 +123,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 		synchronized(listeners)
 		{
 			listeners.add(listener);
-			listenerArray = listeners.toArray(new ClientConnectionStatusListener[0]); 
+			listenerArray = listeners.toArray(ZERO_CONNECTION_STATUS_LISTENER); 
 		}
 	}
 
@@ -145,7 +137,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 		synchronized(listeners)
 		{
 			listeners.remove(listener);
-			listenerArray = listeners.toArray(new ClientConnectionStatusListener[0]); 
+			listenerArray = listeners.toArray(ZERO_CONNECTION_STATUS_LISTENER); 
 		}
 	}
 
