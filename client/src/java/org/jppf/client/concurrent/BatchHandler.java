@@ -184,9 +184,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	private void updateNextJob(boolean sendSignal)
 	{
 		JPPFJob job = nextJobRef.get();
-		int size = 0;
-		if (job.getTasks() == null) size = 0;
-		else size = job.getTasks().size();
+		int size = job.getTasks().size();
 		if (batchTimeout > 0L) elapsed = System.currentTimeMillis() - start;
 		if (size == 0)
 		{
@@ -300,7 +298,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 			try
 			{
 				List<JPPFTask> jobTasks = job.getTasks();
-				start = (jobTasks == null) ? 0 : jobTasks.size();
+				start = jobTasks.size();
 				for (Callable<?> task: tasks) job.addTask(task);
 			}
 			catch (JPPFException e)
