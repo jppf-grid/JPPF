@@ -71,7 +71,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * The list of tasks to execute.
 	 */
-	private List<JPPFTask> results = null;
+	private List<JPPFTask> results = new ArrayList<JPPFTask>();
 	/**
 	 * The service level agreement between the job and the server.
 	 */
