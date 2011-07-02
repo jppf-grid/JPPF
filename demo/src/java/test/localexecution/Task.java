@@ -17,13 +17,11 @@
  */
 package test.localexecution;
 
-import java.io.File;
-import java.net.URL;
-import java.util.*;
+import java.util.Map;
 
-import org.jppf.classloader.JPPFClassLoader;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.*;
+
+import com.hazelcast.core.Hazelcast;
 
 /**
  * Test task.
@@ -43,65 +41,25 @@ public class Task extends JPPFTask
 	{
 		try
 		{
-			System.out.println("starting task");
-			JPPFClassLoader cl = (JPPFClassLoader) getClass().getClassLoader();
+			//System.out.println("starting task");
+			//JPPFClassLoader cl = (JPPFClassLoader) getClass().getClassLoader();
+			/*
 			ClassLoaderWrapper wrapper = new ClassLoaderWrapper(cl);
 			System.out.println("downloading jar file");
 			URL url = cl.getResource("../samples-pack/shared/lib/hazelcast-1.9.3.jar");
 			System.out.println("got URL: " + url);
 			wrapper.addURL(url);
-			Class c = cl.loadClass("com.hazelcast.core.Hazelcast");
-			System.out.println("found class " + c);
-			setResult(c.getName());
+			*/
+			//Class c = cl.loadClass("com.hazelcast.core.Hazelcast");
+			//System.out.println("found class " + c);
+			Map map = Hazelcast.getMap("lolo");
+			//setResult(c.getName());
+			setResult("ok");
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 			setException(e);
-		}
-	}
-
-	/**
-	 * Downlaod the specified files.
-	 * @author Laurent Cohen
-	 */
-	public static class DownloadCallable implements JPPFCallable<Map<String, byte[]>>
-	{
-		/**
-		 * The local paths for the files to download.
-		 */
-		private List<String> paths;
-
-		/**
-		 * Initialize this callable.
-		 * @param paths the local paths for the files to download.
-		 */
-		public DownloadCallable(List<String> paths)
-		{
-			this.paths = paths;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public Map<String, byte[]> call() throws Exception
-		{
-			Map<String, byte[]> map = null;
-			for (String path: paths)
-			{
-				try
-				{
-					File file = new File(path);
-					if (!file.exists()) continue;
-					byte[] bytes = FileUtils.getFileAsByte(file);
-					if (map == null) map = new HashMap<String, byte[]>();
-					map.put(path, bytes);
-				}
-				catch (Exception e)
-				{
-				}
-			}
-			return null;
 		}
 	}
 }

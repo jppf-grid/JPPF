@@ -67,11 +67,6 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * Status of the connection.
 	 */
 	protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(DISCONNECTED);
-	//protected JPPFClientConnectionStatus status = DISCONNECTED;
-	/**
-	 * Lock for synchronizing acces to the status.
-	 */
-	protected Object statusLock = new Object();
 	/**
 	 * List of status listeners for this connection.
 	 */
@@ -100,25 +95,18 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 */
 	public JPPFClientConnectionStatus getStatus()
 	{
-		synchronized(statusLock)
-		{
-			return status.get();
-		}
+		return status.get();
 	}
 
 	/**
 	 * Set the status of this connection.
-	 * @param status  a <code>JPPFClientConnectionStatus</code> enumerated value.
+	 * @param newStatus  a <code>JPPFClientConnectionStatus</code> enumerated value.
 	 * @see org.jppf.client.ClientConnectionHandler#setStatus(org.jppf.client.JPPFClientConnectionStatus)
 	 */
-	public void setStatus(JPPFClientConnectionStatus status)
+	public void setStatus(JPPFClientConnectionStatus newStatus)
 	{
-		synchronized(statusLock)
-		{
-			JPPFClientConnectionStatus oldStatus = getStatus();
-			this.status.set(status);
-			if (!status.equals(oldStatus)) fireStatusChanged(oldStatus);
-		}
+		JPPFClientConnectionStatus oldStatus = this.status.getAndSet(newStatus);
+		if (!newStatus.equals(oldStatus)) fireStatusChanged(oldStatus);
 	}
 
 	/**

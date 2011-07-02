@@ -60,6 +60,7 @@ public class LocalExecutionRunner
 			print("starting client ...");
 			long start = System.nanoTime();
 			jppfClient = new JPPFClient();
+			Thread.sleep(1000);
 			long elapsed = System.nanoTime() - start;
 			print("client started in "+StringUtils.toStringDuration(elapsed/1000000));
 			/*
@@ -67,8 +68,8 @@ public class LocalExecutionRunner
 			perform(nbTask, length, 1);
 			*/
 			//print("run with local execution on"); 
-			perform2(100, 5, 200);
-			//perform3();
+			//perform2(2000, 5, 1);
+			perform3();
 			/*
 			print("run 3 with local execution off"); 
 			jppfClient.setLocalExecutionEnabled(false);
@@ -202,8 +203,11 @@ public class LocalExecutionRunner
 		{
 			long start = System.nanoTime();
 			JPPFJob job = new JPPFJob();
-			job.setId("test jaer download");
-			job.addTask(new Task());
+			job.setId("test jar download");
+			for (int i=0; i<2000; i++)
+			{
+				job.addTask(new Task());
+			}
 			// submit the tasks for execution
 			List<JPPFTask> results = jppfClient.submit(job);
 			for (JPPFTask task: results)
