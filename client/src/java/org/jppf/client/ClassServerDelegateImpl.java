@@ -19,7 +19,7 @@ package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.classloader.JPPFResourceWrapper;
@@ -139,6 +139,12 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 							if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
 							else log.debug("["+this.getName()+"] resource not found: " + name);
 						}
+					}
+					else if (resource.getData("multiple.resources.names") == null)
+					{
+						String[] names = (String[]) resource.getData("multiple.resources.names");
+						Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, names);
+						resource.setData("resource_map", result);
 					}
 					else
 					{

@@ -18,13 +18,9 @@
 package org.jppf.classloader;
 
 import java.io.*;
-import java.net.*;
+import java.net.URL;
 import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
-import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -33,7 +29,7 @@ import org.slf4j.*;
  * application classes, to avoid costly redeployment system-wide.
  * @author Laurent Cohen
  */
-public abstract class AbstractJPPFClassLoader extends URLClassLoader
+public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLifeCycle
 {
 	/**
 	 * Logger for this class.
@@ -44,46 +40,12 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Used to synchronize access to the underlying socket from multiple threads.
-	 */
-	protected static final ReentrantLock LOCK = new ReentrantLock();
-	/**
-	 * Determines whether this class loader should handle dynamic class updating.
-	 */
-	protected static final AtomicBoolean INITIALIZING = new AtomicBoolean(false);
-	/**
-	 * The executor that handles asynchronous resource requests.
-	 */
-	protected static ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests"));
-	/**
-	 * Determines whether this class loader should handle dynamic class updating.
-	 */
-	protected boolean dynamic = false;
-	/**
-	 * The unique identifier for the submitting application.
-	 */
-	protected List<String> uuidPath = new ArrayList<String>();
-	/**
-	 * Uuid of the orignal task bundle that triggered a resource loading request. 
-	 */
-	protected String requestUuid = null;
-	/**
-	 * The cache handling resources temporarily stored to file.
-	 */
-	protected ResourceCache cache = new ResourceCache();
-	/**
-	 * The object used to serialize and deserialize resources.
-	 */
-	protected ObjectSerializer serializer = null;
-
-	/**
 	 * Initialize this class loader with a parent class loader.
 	 * @param parent a ClassLoader instance.
 	 */
 	public AbstractJPPFClassLoader(ClassLoader parent)
 	{
-		super(new URL[0], parent);
-		if (parent instanceof AbstractJPPFClassLoader) dynamic = true;
+		super(parent);
 	}
 
 	/**
@@ -93,18 +55,8 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	 */
 	public AbstractJPPFClassLoader(ClassLoader parent, List<String> uuidPath)
 	{
-		this(parent);
-		this.uuidPath = uuidPath;
+		super(parent, uuidPath);
 	}
-
-	/**
-	 * Initialize the underlying socket connection.
-	 */
-	protected abstract void init();
-	/**
-	 * Reset and reinitialize the connection ot the server. 
-	 */
-	public abstract void reset();
 
 	/**
 	 * Load a JPPF class from the server.
@@ -120,8 +72,11 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 			Class<?> c = findLoadedClass(name);
 			if (c != null)
 			{
-				ClassLoader cl = c.getClassLoader();
-				if (debugEnabled) log.debug("classloader = " + cl);
+				if (debugEnabled)
+				{
+					ClassLoader cl = c.getClassLoader();
+					log.debug("classloader = " + cl);
+				}
 			}
 			if (c == null)
 			{
@@ -182,54 +137,8 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	}
 
 	/**
-	 * Load the specified class from a socket connection.
-	 * @param map - contains the necessary resource request data.
-	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
-	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
-	 * @throws ClassNotFoundException if the class could not be loaded from the remote server.
-	 */
-	private JPPFResourceWrapper loadResourceData(Map<String, Object> map, boolean asResource) throws ClassNotFoundException
-	{
-		JPPFResourceWrapper resource = null;
-		try
-		{
-			if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + "]");
-			resource = loadResourceData0(map, asResource);
-		}
-		catch(IOException e)
-		{
-			if (debugEnabled) log.debug("connection with class server ended, re-initializing, exception is:", e);
-			throw new JPPFNodeReconnectionNotification("connection with class server ended, re-initializing, exception is:", e);
-		}
-		catch(ClassNotFoundException e)
-		{
-			throw e;
-		}
-		catch(Exception e)
-		{
-			if (debugEnabled) log.debug(e.getMessage(), e);
-		}
-		return resource;
-	}
-
-	/**
-	 * Load the specified class from a socket connection.
-	 * @param map - contains the necessary resource request data.
-	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
-	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
-	 * @throws Exception if the connection was lost and could not be reestablished.
-	 */
-	private JPPFResourceWrapper loadResourceData0(Map<String, Object> map, boolean asResource) throws Exception
-	{
-		if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + "], requestUuid = " + requestUuid);
-		JPPFResourceWrapper resource = loadRemoteData(map, false);
-		if (debugEnabled) log.debug("remote definition for resource [" + map.get("name") + "] "+ (resource.getDefinition()==null ? "not " : "") + "found");
-		return resource;
-	}
-
-	/**
 	 * Request the remote computation of a <code>JPPFCallable</code> on the client.
-	 * @param callable - the serialized callable to execute remotely.
+	 * @param callable the serialized callable to execute remotely.
 	 * @return an array of bytes containing the result of the callable's execution.
 	 * @throws Exception if the connection was lost and could not be reestablished.
 	 */
@@ -242,15 +151,6 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		if (debugEnabled) log.debug("remote definition for collable resource "+ (b==null ? "not " : "") + "found");
 		return b;
 	}
-
-	/**
-	 * Load the specified class from a socket connection.
-	 * @param map contains the necessary resource request data.
-	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
-	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
-	 * @throws Exception if the connection was lost and could not be reestablished.
-	 */
-	protected abstract JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception;
 
 	/**
 	 * Finds the resource with the specified name.
@@ -289,8 +189,23 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	 * </ul>
 	 * @param name name of the resource to obtain a stream from. 
 	 * @return an <code>InputStream</code> instance, or null if the resource was not found.
-	 * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)z
+	 * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
 	 */
+	public InputStream getResourceAsStream(String name)
+	{
+		InputStream is = null;
+		try
+		{
+			URL url = getResource(name);
+			if (url != null) is = url.openStream();
+		}
+		catch(IOException e)
+		{
+		}
+		return is;
+	}
+
+	/*
 	public InputStream getResourceAsStream(String name)
 	{
 		InputStream is = super.getResourceAsStream(name);
@@ -316,38 +231,7 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 		}
 		return is;
 	}
-
-	/**
-	 * Determine whether the socket client is being initialized.
-	 * @return true if the socket client is being initialized, false otherwise.
-	 */
-	static boolean isInitializing()
-	{
-		return INITIALIZING.get();
-	}
-
-	/**
-	 * Set the socket client initialization status.
-	 * @param initFlag true if the socket client is being initialized, false otherwise.
-	 */
-	static void setInitializing(boolean initFlag)
-	{
-		INITIALIZING.set(initFlag);
-	}
-
-	/**
-	 * Set the uuid for the orignal task bundle that triggered this resource request. 
-	 * @param requestUuid the uuid as a string.
-	 */
-	public void setRequestUuid(String requestUuid)
-	{
-		this.requestUuid = requestUuid;
-	}
-
-	/**
-	 * Terminate this classloader and clean the resources it uses.
-	 */
-	public abstract void close();
+	*/
 
 	/**
 	 * Find all resources with the specified name.
@@ -403,68 +287,113 @@ public abstract class AbstractJPPFClassLoader extends URLClassLoader
 	}
 
 	/**
-	 * Get the object used to serialize and deserialize resources.
-	 * @return an {@link ObjectSerializer} instance.
-	 * @throws Exception if any error occurs.
+	 * Get multiple reources, specified by their names, from the classpath.
+	 * This method functions like #getResource(String), except that it look up and returns multiple URLs.
+	 * @param names the names of te resources to find.
+	 * @return an array of URLs, one for each looked up resources. Some URLs may be null, however the returned array
+	 * is never null, and results are in the same order as the specified resource names.
 	 */
-	protected ObjectSerializer getSerializer() throws Exception
+	protected URL[] findMultipleResources(String...names)
 	{
-		if (serializer == null) serializer = (ObjectSerializer) getParent().loadClass("org.jppf.comm.socket.BootstrapObjectSerializer").newInstance();
-		return serializer;
+		if ((names == null) || (names.length <= 0)) return StringUtils.ZERO_URL;
+		URL[] results = new URL[names.length];
+		for (int i=0; i<results.length; i++) results[i] = null;
+		try
+		{
+			List<Integer> indices = new ArrayList<Integer>();
+			for (int i=0; i<names.length; i++)
+			{
+				String name = names[i];
+				List<String> locationsList = cache.getResourcesLocations(name);
+				if (locationsList == null)
+				{
+					if (debugEnabled) log.debug("resource " + name + " not found locally");
+					indices.add(i);
+				}
+				else if (!locationsList.isEmpty())
+				{
+					results[i] = cache.getURLFromPath(locationsList.get(0));
+					if (debugEnabled) log.debug("resource " + name + " found locally as " + results[i]);
+				}
+			}
+			if (indices.isEmpty())
+			{
+				if (debugEnabled) log.debug("all resources were found in the local cache");
+				return results;
+			}
+			Map<String, Object> map = new HashMap<String, Object>();
+			String[] namesToLookup = new String[indices.size()];
+			for (int i=0; i<indices.size(); i++) namesToLookup[i] = names[indices.get(i)];
+			map.put("name", StringUtils.arrayToString(namesToLookup, ", ", null, null));
+			map.put("multiple.resources.names", namesToLookup);
+			JPPFResourceWrapper resource = loadResourceData(map, true);
+			Map<String, List<byte[]>> dataMap = (Map<String, List<byte[]>>) resource.getData("resource_map");
+			for (int i=0; i<indices.size(); i++)
+			{
+				String name = names[indices.get(i)];
+				List<byte[]> dataList = dataMap.get(name);
+				boolean found = (dataList != null) && !dataList.isEmpty();
+				if (debugEnabled && !found) log.debug("resource [" + name + "] not found remotely");
+				if (found)
+				{
+					cache.registerResources(name, dataList);
+					URL url = cache.getResourceURL(name);
+					results[indices.get(i)] = url;
+					if (debugEnabled) log.debug("resource [" + name + "] found remotely as " + url);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			if (debugEnabled) log.debug(e.getMessage(), e);
+		}
+		return results;
 	}
 
 	/**
-	 * Encapsulates a remote resource request submitted asynchronously
-	 * via the single-thread executor.
+	 * Get multiple reources, specified by their names, from the classpath.
+	 * This method functions like #getResource(String), except that it looks up and returns multiple URLs.
+	 * @param names the names of te resources to find.
+	 * @return an array of URLs, one for each looked up resources. Some URLs may be null, however the returned array
+	 * is never null, and results are in the same order as the specified resource names.
 	 */
-	protected abstract class AbstractResourceRequest implements Runnable
+	public URL[] getMultipleResources(String...names)
 	{
-		/**
-		 * Used to collect any throwable raised during communication with the server. 
-		 */
-		protected Throwable throwable = null;
-		/**
-		 * The request to send.
-		 */
-		protected JPPFResourceWrapper request = null;
-		/**
-		 * The response received.
-		 */
-		protected JPPFResourceWrapper response = null;
-
-		/**
-		 * Initialize with the specified request.
-		 * @param request the request to send.
-		 */
-		public AbstractResourceRequest(JPPFResourceWrapper request)
+		if ((names == null) || (names.length <= 0)) return StringUtils.ZERO_URL;
+		int length = names.length;
+		URL[] results = new URL[length];
+		for (int i=0; i<length; i++) results[i] = null;
+		List<URL[]> resultList = new ArrayList<URL[]>();
+		try
 		{
-			this.request = request;
+			ClassLoader parent = getParent();
+			if (parent == null)
+			{
+				for (int i=0; i<length; i++) results[i] = getSystemResource(names[i]);
+			}
+			else if (!(parent instanceof AbstractJPPFClassLoader))
+			{
+				for (int i=0; i<length; i++) results[i] = parent.getResource(names[i]);
+			}
+			else
+			{
+				results = ((AbstractJPPFClassLoader) parent).getMultipleResources(names);
+			}
+			for (int i=0; i<length; i++) if (results[i] == null) results[i] = super.getResource(names[i]);
+			List<Integer> indices = new ArrayList<Integer>();
+			for (int i=0; i<length; i++) if (results[i] == null) indices.add(i);
+			if (!indices.isEmpty())
+			{
+				String[] namesToFind = new String[indices.size()];
+				for (int i=0; i<namesToFind.length; i++) namesToFind[i] = names[indices.get(i)];
+				URL[] foundURLs = findMultipleResources(namesToFind);
+				for (int i=0; i<namesToFind.length; i++) results[indices.get(i)] = foundURLs[i];
+			}
 		}
-
-		/**
-		 * Get the throwable eventually raised during communication with the server. 
-		 * @return a {@link Throwable} instance.
-		 */
-		public Throwable getThrowable()
+		catch(Exception e)
 		{
-			return throwable;
+			if (debugEnabled) log.debug(e.getMessage(), e);
 		}
-
-		/**
-		 * Get the response received.
-		 * @return a {@link JPPFResourceWrapper} instance.
-		 */
-		public JPPFResourceWrapper getResponse()
-		{
-			return response;
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void addURL(URL url)
-	{
-		super.addURL(url);
+		return results;
 	}
 }

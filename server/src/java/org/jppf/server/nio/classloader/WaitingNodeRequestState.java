@@ -20,7 +20,7 @@ package org.jppf.server.nio.classloader;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.nio.ChannelWrapper;
@@ -118,6 +118,14 @@ class WaitingNodeRequestState extends ClassServerState
 					t = TO_SENDING_NODE_RESPONSE;
 				}
 				if (debugEnabled) log.debug("multiple resources " + (list != null ? "" : "not ") + "found [" + name + "] in driver's classpath for node: " + channel);
+			}
+			else if (resource.getData("multiple.resources.names") != null)
+			{
+				String[] names = (String[]) resource.getData("multiple.resources.names");
+				Map<String, List<byte[]>> map = server.getResourceProvider().getMultipleResourcesAsBytes(null, names);
+				resource.setData("resource_map", map);
+				context.serializeResource(channel);
+				t = TO_SENDING_NODE_RESPONSE;
 			}
 			else
 			{

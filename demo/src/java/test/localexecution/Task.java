@@ -17,11 +17,11 @@
  */
 package test.localexecution;
 
-import java.util.Map;
+import java.net.URL;
 
+import org.jppf.classloader.*;
 import org.jppf.server.protocol.JPPFTask;
-
-import com.hazelcast.core.Hazelcast;
+import org.jppf.utils.CollectionUtils;
 
 /**
  * Test task.
@@ -33,6 +33,18 @@ public class Task extends JPPFTask
 	 * Explicit serialVersionUID.
 	 */
 	private static final long serialVersionUID = 1L;
+	/**
+	 * Path to some jar on the client side.
+	 */
+	private static final String JAR_PATH = "../samples-pack/shared/lib/hazelcast-1.9.3.jar";
+	/**
+	 * Path to some jar on the client side.
+	 */
+	private static final String[] JAR_PATHS = { "../samples-pack/shared/lib/hazelcast-1.9.3.jar", "../samples-pack/shared/lib/jaligner.jar", "../samples-pack/shared/lib/js.jar", "lib/jppf-common-node.jar" };
+	/**
+	 * To determine if we must load the jars or not.
+	 */
+	private static boolean initialized = false;
 
 	/**
 	 * {@inheritDoc}
@@ -41,19 +53,15 @@ public class Task extends JPPFTask
 	{
 		try
 		{
-			//System.out.println("starting task");
-			//JPPFClassLoader cl = (JPPFClassLoader) getClass().getClassLoader();
-			/*
-			ClassLoaderWrapper wrapper = new ClassLoaderWrapper(cl);
-			System.out.println("downloading jar file");
-			URL url = cl.getResource("../samples-pack/shared/lib/hazelcast-1.9.3.jar");
-			System.out.println("got URL: " + url);
-			wrapper.addURL(url);
-			*/
-			//Class c = cl.loadClass("com.hazelcast.core.Hazelcast");
-			//System.out.println("found class " + c);
-			Map map = Hazelcast.getMap("lolo");
-			//setResult(c.getName());
+			System.out.println("starting task");
+			AbstractJPPFClassLoader cl = (AbstractJPPFClassLoader) getClass().getClassLoader();
+			if (!initialized) loadJars(cl);
+			Class c = cl.loadClass("com.hazelcast.core.Hazelcast");
+			System.out.println("found class " + c);
+			c = cl.loadClass("jaligner.Sequence");
+			System.out.println("found class " + c);
+			c = cl.loadClass("org.mozilla.javascript.Evaluator");
+			System.out.println("found class " + c);
 			setResult("ok");
 		}
 		catch (Exception e)
@@ -61,5 +69,25 @@ public class Task extends JPPFTask
 			e.printStackTrace();
 			setException(e);
 		}
+	}
+
+	/**
+	 * Load the required jars and add them to the classpath.
+	 * @param cl the class loader to use to laod the jars.
+	 * @throws Exception if any error occurs.
+	 */
+	private static synchronized void loadJars(AbstractJPPFClassLoader cl) throws Exception
+	{
+		if (initialized) return;
+		initialized = true;
+		System.out.println("loading jars");
+		/*
+		URL url = cl.getResource(JAR_PATH);
+		System.out.println("got URL: " + url);
+		if (url != null) cl.addURL(url);
+		*/
+		URL[] urls = cl.getMultipleResources(JAR_PATHS);
+		System.out.println("got URLs: " + CollectionUtils.list(urls));
+		for (URL url: urls) if (url != null) cl.addURL(url);
 	}
 }

@@ -39,6 +39,10 @@ public class ClientConnection extends AbstractRecoveryConnection
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * COnstant for an empty azrray of <code>ClientConnectionListener</code>.
+	 */
+	private static final ClientConnectionListener[] ZERO_CONNECTION_LISTENER = new ClientConnectionListener[0];
+	/**
 	 * Used to synchronize access to the underlying socket from multiple threads.
 	 */
 	private SocketInitializer socketInitializer;
@@ -166,7 +170,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 		ClientConnectionListener[] tmp = null;
 		synchronized (listeners)
 		{
-			tmp = listeners.toArray(new ClientConnectionListener[0]);
+			tmp = listeners.toArray(ZERO_CONNECTION_LISTENER);
 		}
 		for (ClientConnectionListener listener : tmp) listener.clientConnectionFailed(event);
 	}

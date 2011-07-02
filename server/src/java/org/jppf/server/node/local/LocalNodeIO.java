@@ -29,6 +29,7 @@ import org.jppf.io.DataLocation;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -125,7 +126,7 @@ public class LocalNodeIO extends AbstractNodeIO
 			bundle.setTaskCount(0);
 			bundle.setParameter(NODE_EXCEPTION_PARAM, t);
 		}
-		return list.toArray(new Object[0]);
+		return list.toArray(StringUtils.ZERO_OBJECT);
 	}
 
 	/**

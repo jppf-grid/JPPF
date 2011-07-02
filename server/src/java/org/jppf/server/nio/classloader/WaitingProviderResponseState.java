@@ -62,9 +62,6 @@ class WaitingProviderResponseState extends ClassServerState
 		boolean messageRead = false;
 		try
 		{
-			ChannelWrapper<?> request = context.getCurrentRequest();
-			while (!ClassState.SENDING_NODE_RESPONSE.equals(request.getContext().getState()) ||
-				(request.getKeyOps() != 0)) Thread.sleep(0L, 100000);
 			messageRead = context.readMessage(wrapper);
 		}
 		catch(IOException e)
@@ -96,6 +93,8 @@ class WaitingProviderResponseState extends ClassServerState
 			// fowarding it to channel that requested
 			ChannelWrapper<?> destinationChannel = context.getCurrentRequest();
 			ClassContext destinationContext = (ClassContext) destinationChannel.getContext();
+			while (!ClassState.SENDING_NODE_RESPONSE.equals(destinationChannel.getContext().getState()) ||
+				(destinationChannel.getKeyOps() != 0)) Thread.sleep(0L, 100000);
 			resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
 			destinationContext.setResource(resource);
 			destinationContext.serializeResource(destinationChannel);

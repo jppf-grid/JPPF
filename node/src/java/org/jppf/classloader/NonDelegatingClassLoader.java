@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.net.*;
 import java.util.*;
 
-import org.jppf.utils.FileUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamConstants;
 
 /**
@@ -44,7 +44,7 @@ public class NonDelegatingClassLoader extends URLClassLoader
 	 */
 	public NonDelegatingClassLoader(URL[] urls, ClassLoader parent)
 	{
-		super(urls == null ? new URL[0] : urls, parent);
+		super(urls == null ? StringUtils.ZERO_URL : urls, parent);
 	}
 
 	/**

@@ -47,6 +47,18 @@ public final class StringUtils
 	 * Charset instance for UTF-8 encoding.
 	 */
 	public static final Charset UTF_8 = makeUTF8();
+	/**
+	 * Constant for an empty array of URLs.
+	 */
+	public static final String[] ZERO_STRING = new String[0];
+	/**
+	 * Constant for an empty array of Objects.
+	 */
+	public static final Object[] ZERO_OBJECT = new Object[0];
+	/**
+	 * Constant for an empty array of URLs.
+	 */
+	public static final URL[] ZERO_URL = new URL[0];
 
 	/**
 	 * Instantiation of this class is not permitted.
@@ -246,17 +258,31 @@ public final class StringUtils
 	 */
 	public static <T> String arrayToString(T[] array)
 	{
+		return arrayToString(array, ",", "[", "]");
+	}
+
+	/**
+	 * Get a String representation of an array of any type.
+	 * @param <T> the type of the array.
+	 * @param array the array from which to build a string representation.
+	 * @param sep the separator to use for values. If null, no separator is used.
+	 * @param prefix the prefix to use at the start of the resulting string. If null, no prefix is used.
+	 * @param suffix the suffix to use at the end of the resulting string. If null, no suffix is used.
+	 * @return the array's content as a string.
+	 */
+	public static <T> String arrayToString(T[] array, String sep, String prefix, String suffix)
+	{
   	StringBuilder sb = new StringBuilder();
   	if (array == null) sb.append("null");
   	else
   	{
-  		sb.append("[");
+  		if (prefix != null) sb.append(prefix);
   		for (int i=0; i<array.length; i++)
   		{
-  			if (i > 0) sb.append(",");
+  			if ((i > 0) && (sep == null)) sb.append(sep);
   			sb.append(array[i]);
   		}
-  		sb.append("]");
+  		if (suffix != null) sb.append(suffix);
   	}
   	return sb.toString();
 	}
