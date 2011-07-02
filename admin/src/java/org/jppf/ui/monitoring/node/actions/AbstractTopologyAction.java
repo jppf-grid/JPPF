@@ -31,9 +31,13 @@ import org.jppf.ui.monitoring.node.*;
 public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 {
 	/**
+	 * Constant for an empty <code>TopologyData</code> array.
+	 */
+	protected static final TopologyData[] EMPTY_TOPOLOGY_DATA_ARRAY = new TopologyData[0];
+	/**
 	 * The object representing the JPPF nodes in the tree table.
 	 */
-	protected TopologyData[] nodeDataArray = new TopologyData[0];
+	protected TopologyData[] nodeDataArray = EMPTY_TOPOLOGY_DATA_ARRAY;
 
 	/**
 	 * Iniitialize this action.
@@ -61,6 +65,6 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 				if ((info != null) && (JPPFManagementInfo.NODE == info.getType())) list.add(data);
 			}
 		}
-		nodeDataArray = list.toArray(new TopologyData[0]);
+		nodeDataArray = list.toArray(EMPTY_TOPOLOGY_DATA_ARRAY);
 	}
 }

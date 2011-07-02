@@ -19,6 +19,7 @@
 package org.jppf.classloader;
 
 import java.io.File;
+import java.net.*;
 import java.security.AccessController;
 import java.util.*;
 
@@ -112,5 +113,35 @@ class ResourceCache
 		File file = (File) AccessController.doPrivileged(action);
 		if (action.getException() != null) throw action.getException();
 		return file.getCanonicalPath();
+	}
+
+	/**
+	 * Get the URL for a cached resource.
+	 * @param name the name of the resource to find.
+	 * @return resource location expressed as a URL.
+	 */
+	public URL getResourceURL(String name)
+	{
+		String path = getResourceLocation(name);
+		if (path == null) return null;
+		return getURLFromPath(path);
+	}
+
+	/**
+	 * Transform a file path into a URL.
+	 * @param path the path to transform.
+	 * @return the path expressed as a URL.
+	 */
+	public URL getURLFromPath(String path)
+	{
+		File file = new File(path);
+		try
+		{
+			return file.toURI().toURL();
+		}
+		catch (MalformedURLException ignore)
+		{
+		}
+		return null;
 	}
 }

@@ -48,6 +48,10 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Constant for an empty <code>TopologyData</code> array.
+	 */
+	private static final TopologyData[] EMPTY_TOPOLOGY_DATA_ARRAY = new TopologyData[0];
+	/**
 	 * Path to the cancel icon resource.
 	 */
 	private static final String CANCEL_ICON = "/org/jppf/ui/resources/stop.gif";
@@ -103,7 +107,7 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 			TopologyData td = (TopologyData) node.getUserObject();
 			if (TopologyDataType.NODE.equals(td.getType())) dataList.add((TopologyData) node.getUserObject());
 		}
-		data = dataList.toArray(new TopologyData[0]);
+		data = dataList.toArray(EMPTY_TOPOLOGY_DATA_ARRAY);
 		
 		int button = event.getButton();
 		if (button == MouseEvent.BUTTON3)

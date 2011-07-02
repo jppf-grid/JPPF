@@ -64,7 +64,7 @@ public class SelectNodesAction extends AbstractSelectionAction
 					selectionPath.add(treeTable.getPathForNode(node));
 				}
 			}
-			model.setSelectedPaths(selectionPath.toArray(new TreePath[0]));
+			model.setSelectedPaths(selectionPath.toArray(EMPTY_TREE_PATH));
 		}
 	}
 }

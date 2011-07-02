@@ -30,13 +30,17 @@ import org.jppf.ui.monitoring.job.*;
 public abstract class AbstractJobAction extends AbstractUpdatableAction
 {
 	/**
+	 * Constant for an empty <code>JobData</code> array.
+	 */
+	private static final JobData[] EMPTY_JOB_DATA_ARRAY = new JobData[0];
+	/**
 	 * The object representing the JPPF jobs in the tree table.
 	 */
-	protected JobData[] jobDataArray = new JobData[0];
+	protected JobData[] jobDataArray = EMPTY_JOB_DATA_ARRAY;
 	/**
 	 * The object representing the JPPF sub-jobs in the tree table.
 	 */
-	protected JobData[] subjobDataArray = new JobData[0];
+	protected JobData[] subjobDataArray = EMPTY_JOB_DATA_ARRAY;
 
 	/**
 	 * Initialize this action.
@@ -62,7 +66,7 @@ public abstract class AbstractJobAction extends AbstractUpdatableAction
 			if (JobDataType.JOB.equals(data.getType())) jobList.add(data);
 			else if (JobDataType.SUB_JOB.equals(data.getType())) subjobList.add(data);
 		}
-		jobDataArray = jobList.toArray(new JobData[0]);
-		subjobDataArray = subjobList.toArray(new JobData[0]);
+		jobDataArray = jobList.toArray(EMPTY_JOB_DATA_ARRAY);
+		subjobDataArray = subjobList.toArray(EMPTY_JOB_DATA_ARRAY);
 	}
 }

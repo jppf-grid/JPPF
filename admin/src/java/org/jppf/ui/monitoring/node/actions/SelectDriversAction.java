@@ -54,7 +54,7 @@ public class SelectDriversAction extends AbstractSelectionAction
 			TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
 			List<TreePath> selectionPath = new ArrayList<TreePath>();
 			for (DefaultMutableTreeNode driverNode: getDriverNodes()) selectionPath.add(treeTable.getPathForNode(driverNode));
-			model.setSelectedPaths(selectionPath.toArray(new TreePath[0]));
+			model.setSelectedPaths(selectionPath.toArray(EMPTY_TREE_PATH));
 		}
 	}
 }

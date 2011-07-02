@@ -52,7 +52,7 @@ public class ResourceProvider
 	 * Load a resource file (including class files) from the class path into an array of byte.<br>
 	 * This method simply calls {@link #getResourceAsBytes(java.lang.String, java.lang.ClassLoader) getResourceAsBytes(String, ClassLoader)}
 	 * with a null class loader.
-	 * @param resName - the name of the resource to load.
+	 * @param resName the name of the resource to load.
 	 * @return an array of bytes, or nll if the resource could not be found.
 	 */
 	public byte[] getResourceAsBytes(String resName)
@@ -76,7 +76,7 @@ public class ResourceProvider
 			if (cl == null) cl = Thread.currentThread().getContextClassLoader();
 			if (cl == null) cl = getClass().getClassLoader();
 			InputStream is = cl.getResourceAsStream(resName);
-			if (is == null)
+			if ((is == null) && JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true))
 			{
 				File file = new File(resName);
 				if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
@@ -99,7 +99,7 @@ public class ResourceProvider
 	 * Get a resource as an array of byte using a call to <b>ClassLoader#getResource()</b>.
 	 * This method simply calls {@link #getResource(java.lang.String, java.lang.ClassLoader) getResource(String, ClassLoader)}
 	 * with a null class loader.
-	 * @param resName - the name of the resource to find.
+	 * @param resName the name of the resource to find.
 	 * @return the content of the resource as an array of bytes.
 	 */
 	public byte[] getResource(String resName)
@@ -109,8 +109,8 @@ public class ResourceProvider
 
 	/**
 	 * Get a resource as an array of byte using a call to <b>ClassLoader#getResource()</b>.
-	 * @param resName - the name of the resource to find.
-	 * @param cl - the class loader to use to load the request resource.
+	 * @param resName the name of the resource to find.
+	 * @param cl the class loader to use to load the request resource.
 	 * @return the content of the resource as an array of bytes.
 	 */
 	public byte[] getResource(String resName, ClassLoader cl)
@@ -122,7 +122,7 @@ public class ResourceProvider
 		{
 			URL url = cl.getResource(resName);
 			if (url != null) is = url.openStream();
-			if (is == null)
+			if ((is == null) && JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true))
 			{
 				File file = new File(resName);
 				if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
@@ -144,7 +144,7 @@ public class ResourceProvider
 
 	/**
 	 * Compute a callable sent through the JPPF class loader. 
-	 * @param serializedCallable - the callable to execute in serialized form.
+	 * @param serializedCallable the callable to execute in serialized form.
 	 * @return the serialized result of the callable's execution, or of an eventually resulting exception.
 	 */
 	public byte[] computeCallable(byte[] serializedCallable)
@@ -211,18 +211,38 @@ public class ResourceProvider
 		{
 			log.error(e.getMessage(), e);
 		}
-		try
+		if (JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true))
 		{
-			File file = new File(name);
-			if (file.exists())
+			try
 			{
-				if (result == null) result = new ArrayList<byte[]>();
-				result.add(FileUtils.getFileAsByte(file));
+				File file = new File(name);
+				if (file.exists())
+				{
+					if (result == null) result = new ArrayList<byte[]>();
+					result.add(FileUtils.getFileAsByte(file));
+				}
+			}
+			catch(Exception e)
+			{
+				log.error(e.getMessage(), e);
 			}
 		}
-		catch(Exception e)
+		return result;
+	}
+
+	/**
+	 * Get all resources asssociated with each specified resource name.
+	 * @param cl the class loader used to load the resources.
+	 * @param names the names of all the resources to look for.
+	 * @return A mapping of each resource names with a list of the byte content of corresponding resources in the classpath.
+	 */
+	public Map<String, List<byte[]>> getMultipleResourcesAsBytes(ClassLoader cl, String...names)
+	{
+		Map<String, List<byte[]>> result = new HashMap<String, List<byte[]>>();
+		for (String name: names)
 		{
-			log.error(e.getMessage(), e);
+			List<byte[]> resources = getMultipleResourcesAsBytes(name, cl);
+			if (resources != null) result.put(name, resources);
 		}
 		return result;
 	}

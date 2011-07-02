@@ -18,6 +18,8 @@
 
 package org.jppf.node.policy;
 
+import org.jppf.utils.StringUtils;
+
 /**
  * Instances of this class build an execution policy graph, based on a policy
  * descriptor parsed from an XML document.
@@ -369,7 +371,7 @@ public class PolicyBuilder
 	{
 		Class clazz = Class.forName(desc.className);
 		CustomPolicy policy = (CustomPolicy) clazz.newInstance();
-		policy.setArgs(desc.arguments.toArray(new String[0]));
+		policy.setArgs(desc.arguments.toArray(StringUtils.ZERO_STRING));
 		policy.initialize();
 		return policy;
 	}

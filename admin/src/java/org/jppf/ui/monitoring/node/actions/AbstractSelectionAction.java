@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.node.actions;
 
 import java.util.*;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.*;
 
 import org.jppf.ui.monitoring.node.NodeDataPanel;
 import org.jppf.ui.treetable.*;
@@ -31,7 +31,10 @@ import org.jppf.ui.treetable.*;
  */
 public abstract class AbstractSelectionAction extends AbstractTopologyAction
 {
-
+	/**
+	 * COnstant for an empty <code>TreePath</code>.
+	 */
+	protected static final TreePath[] EMPTY_TREE_PATH = new TreePath[0];
 	/**
 	 * The tree table panel to which this action applies.
 	 */

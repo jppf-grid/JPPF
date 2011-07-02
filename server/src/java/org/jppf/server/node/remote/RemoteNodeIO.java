@@ -28,6 +28,7 @@ import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -109,7 +110,7 @@ public class RemoteNodeIO extends AbstractNodeIO
 			bundle.setTaskCount(0);
 			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
 		}
-		return list.toArray(new Object[0]);
+		return list.toArray(StringUtils.ZERO_OBJECT);
 	}
 
 	/**

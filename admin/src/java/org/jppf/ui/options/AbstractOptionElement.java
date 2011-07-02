@@ -28,6 +28,10 @@ import javax.swing.tree.TreePath;
 public abstract class AbstractOptionElement extends AbstractOptionProperties implements OptionElement
 {
 	/**
+	 * Constant for an empty <code>OptionElement</code> array.
+	 */
+	private static OptionElement[] EMPTY_OPTION_ELEMENT_ARRAY = new OptionElement[0];
+	/**
 	 * The parent panel for this option element.
 	 */
 	protected OptionElement parent = null;
@@ -91,7 +95,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 			list.add(0, elt);
 			elt = elt.getParent();
 		}
-		return new TreePath(list.toArray(new OptionElement[0]));
+		return new TreePath(list.toArray(EMPTY_OPTION_ELEMENT_ARRAY));
 	}
 
 	/**
