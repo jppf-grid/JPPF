@@ -145,4 +145,22 @@ public abstract class AbstractClassLoaderManager
 	 * @return a {@link Callable} instance.
 	 */
 	protected abstract Callable<AbstractJPPFClassLoader> newClassLoaderCreator(List<String> uuidPath);
+
+	/**
+	 * Get a mapping of containers to their corresponding application uuid.
+	 * @return a mapping of <code>String</code> keys to <code>JPPFContainer</code> values.
+	 */
+	public Map<String, JPPFContainer> getContainerMap()
+	{
+		return containerMap;
+	}
+
+	/**
+	 * Get the list retaining the container in chronological order of their creation.
+	 * @return a list of <code>JPPFContainer</code> instances.
+	 */
+	public LinkedList<JPPFContainer> getContainerList()
+	{
+		return containerList;
+	}
 }

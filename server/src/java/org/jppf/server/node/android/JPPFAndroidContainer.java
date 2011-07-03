@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.node.remote;
+package org.jppf.server.node.android;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -33,12 +33,12 @@ import org.slf4j.*;
  * a client application, a provides the methods to enable the transport, serialization and deserialization of these classes.
  * @author Laurent Cohen
  */
-public class JPPFRemoteContainer extends JPPFContainer
+public class JPPFAndroidContainer extends JPPFContainer
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFRemoteContainer.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFAndroidContainer.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
@@ -59,7 +59,7 @@ public class JPPFRemoteContainer extends JPPFContainer
 	 * @param classLoader the class loader for this container.
 	 * @throws Exception if an error occurs while initializing.
 	 */
-	public JPPFRemoteContainer(SocketWrapper socketClient, List<String> uuidPath, AbstractJPPFClassLoader classLoader) throws Exception
+	public JPPFAndroidContainer(SocketWrapper socketClient, List<String> uuidPath, AbstractJPPFClassLoader classLoader) throws Exception
 	{
 		super(uuidPath, classLoader);
 		this.socketClient = socketClient;

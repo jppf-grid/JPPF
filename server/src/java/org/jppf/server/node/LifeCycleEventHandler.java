@@ -88,7 +88,7 @@ public class LifeCycleEventHandler
 	/**
 	 * Notify all listeners that the node is starting.
 	 */
-	void fireNodeStarting()
+	public void fireNodeStarting()
 	{
 		NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
 		synchronized (listeners)
@@ -100,7 +100,7 @@ public class LifeCycleEventHandler
 	/**
 	 * Notify all listeners that the node is terminating.
 	 */
-	void fireNodeEnding()
+	public void fireNodeEnding()
 	{
 		NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
 		synchronized (listeners)
@@ -112,7 +112,7 @@ public class LifeCycleEventHandler
 	/**
 	 * Notify all listeners that the node is starting a job.
 	 */
-	void fireJobStarting()
+	public void fireJobStarting()
 	{
 		NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
 		synchronized (listeners)
@@ -124,7 +124,7 @@ public class LifeCycleEventHandler
 	/**
 	 * Notify all listeners that the node is completing a job.
 	 */
-	void fireJobEnding()
+	public void fireJobEnding()
 	{
 		NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
 		synchronized (listeners)

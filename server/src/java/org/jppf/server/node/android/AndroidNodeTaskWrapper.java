@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.node;
+package org.jppf.server.node.android;
 
 import java.util.List;
 
 import org.jppf.*;
-import org.jppf.management.JPPFNodeAdmin;
+import org.jppf.server.node.AbstractNodeTaskWrapper;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -28,16 +28,16 @@ import org.jppf.server.protocol.JPPFTask;
  * @author Domingos Creado
  * @author Laurent Cohen
  */
-class NodeTaskWrapper extends AbstractNodeTaskWrapper
+class AndroidNodeTaskWrapper extends AbstractNodeTaskWrapper
 {
 	/**
 	 * The JPPF node that runs this task.
 	 */
-	private final JPPFNode node;
+	private final AbstractJPPFAndroidNode node;
 	/**
 	 * The execution manager.
 	 */
-	private NodeExecutionManagerImpl executionManager = null;
+	private AndroidNodeExecutionManager executionManager = null;
 
 	/**
 	 * Initialize this task wrapper with a specified JPPF task.
@@ -46,7 +46,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 	 * @param uuidPath the key to the JPPFContainer for the task's classloader.
 	 * @param number the internal number identifying the task for the thread pool.
 	 */
-	public NodeTaskWrapper(JPPFNode node, JPPFTask task, List<String> uuidPath, long number)
+	public AndroidNodeTaskWrapper(AbstractJPPFAndroidNode node, JPPFTask task, List<String> uuidPath, long number)
 	{
 		super(task, uuidPath, number);
 		this.node = node;
@@ -59,31 +59,18 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 	 */
 	public void run()
 	{
-		JPPFNodeAdmin nodeAdmin = null;
 		long cpuTime = 0L;
 		long elapsedTime = 0L;
 		try
 		{
 			if (node.isNotifying()) node.incrementExecutingCount();
-			if (node.isJmxEnabled())
-			{
-				nodeAdmin = node.getNodeAdmin();
-				if (nodeAdmin != null)
-				{
-					nodeAdmin.taskStarted(task.getId());
-					task.addJPPFTaskListener(nodeAdmin);
-				}
-			}
 			Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
 			long id = Thread.currentThread().getId();
 			executionManager.processTaskTimeout(task, number);
 			long startTime = System.currentTimeMillis();
-			long startCpuTime = executionManager.getCpuTime(id);
 			task.run();
 			try
 			{
-				// convert cpu time from nanoseconds to milliseconds
-				cpuTime = (executionManager.getCpuTime(id) - startCpuTime) / 1000000L;
 				elapsedTime = System.currentTimeMillis() - startTime;
 			}
 			catch(Throwable ignore)
@@ -105,8 +92,6 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 			{
 				try
 				{
-					if (nodeAdmin != null) nodeAdmin.taskEnded(task.getId());
-					task.removeJPPFTaskListener(nodeAdmin);
 					if (node.isNotifying()) node.decrementExecutingCount();
 					executionManager.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
 				}
@@ -121,14 +106,5 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 				executionManager.wakeUp();
 			}
 		}
-	}
-
-	/**
-	 * Get the task this wrapper executes within a try/catch block.
-	 * @return the task as a <code>JPPFTask</code> instance.
-	 */
-	public JPPFTask getTask()
-	{
-		return task;
 	}
 }

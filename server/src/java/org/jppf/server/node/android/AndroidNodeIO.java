@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.node.remote;
+package org.jppf.server.node.android;
 
 import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 
@@ -35,12 +35,12 @@ import org.slf4j.*;
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
  * @author Laurent Cohen
  */
-public class RemoteNodeIO extends AbstractNodeIO
+public class AndroidNodeIO extends AbstractNodeIO
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Logger log = LoggerFactory.getLogger(RemoteNodeIO.class);
+	private static Logger log = LoggerFactory.getLogger(AndroidNodeIO.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
@@ -53,14 +53,19 @@ public class RemoteNodeIO extends AbstractNodeIO
 	 * The underlying socket wrapper.
 	 */
 	private SocketWrapper socketWrapper = null;
+	/**
+	 * The node.
+	 */
+	private JPPFAndroidNode node = null; 
 
 	/**
 	 * Initialize this TaskIO with the specified node. 
 	 * @param node - the node who owns this TaskIO.
 	 */
-	public RemoteNodeIO(JPPFNode node)
+	public AndroidNodeIO(JPPFAndroidNode node)
 	{
-		super(node);
+		super(null);
+		this.node = node;
 		this.socketWrapper = node.getSocketWrapper();
 	}
 

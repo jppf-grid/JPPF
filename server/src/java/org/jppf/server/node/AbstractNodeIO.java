@@ -80,7 +80,7 @@ public abstract class AbstractNodeIO implements NodeIO
 	{
 		Object[] result = readObjects();
 		currentBundle = (JPPFTaskBundle) result[0];
-		List<JPPFTask> taskList = new ArrayList<JPPFTask>();
+		List<JPPFTask> taskList = new LinkedList<JPPFTask>();
 		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(currentBundle.getState()) &&
 			(currentBundle.getParameter(NODE_EXCEPTION_PARAM) == null))
 		{

@@ -43,7 +43,7 @@ public abstract class AbstractNodeMessage
 	/**
 	 * The data location objects abstracting the data to send or receive.
 	 */
-	protected LinkedList<DataLocation> locations = new LinkedList<DataLocation>();
+	protected List<DataLocation> locations = new ArrayList<DataLocation>();
 	/**
 	 * The current position in the list of data locations.
 	 */
@@ -68,41 +68,41 @@ public abstract class AbstractNodeMessage
 
 	/**
 	 * Read data from the channel.
-	 * @param wrapper the channel to read from.
+	 * @param channel the channel to read from.
 	 * @return true if the data has been completely read from the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	public boolean read(ChannelWrapper<?> wrapper) throws Exception
+	public boolean read(ChannelWrapper<?> channel) throws Exception
 	{
 		if (nbObjects <= 0)
 		{
 			if (position != 0) position = 0;
-			if (!readNextObject(wrapper)) return false;
+			if (!readNextObject(channel)) return false;
 			bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0), new SerializationHelperImpl().getSerializer());
 			nbObjects = bundle.getTaskCount() + 1;
 		}
 		while (position < nbObjects)
 		{
-			if (!readNextObject(wrapper)) return false;
+			if (!readNextObject(channel)) return false;
 		}
 		return true;
 	}
 
 	/**
 	 * Read the next serializable object from the specified channel.
-	 * @param wrapper the channel to read from.
+	 * @param channel the channel to read from.
 	 * @return true if the object has been completely read from the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	protected abstract boolean readNextObject(ChannelWrapper<?> wrapper) throws Exception;
+	protected abstract boolean readNextObject(ChannelWrapper<?> channel) throws Exception;
 
 	/**
 	 * Read data from the channel.
-	 * @param wrapper the channel to write to.
+	 * @param channel the channel to write to.
 	 * @return true if the data has been completely written the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	public boolean write(ChannelWrapper<?> wrapper) throws Exception
+	public boolean write(ChannelWrapper<?> channel) throws Exception
 	{
 		if (nbObjects <= 0)
 		{
@@ -111,18 +111,18 @@ public abstract class AbstractNodeMessage
 		}
 		while (position < nbObjects)
 		{
-			if (!writeNextObject(wrapper)) return false;
+			if (!writeNextObject(channel)) return false;
 		}
 		return true;
 	}
 
 	/**
 	 * Write the next object to the specified channel.
-	 * @param wrapper the channel to write to.
+	 * @param channel the channel to write to.
 	 * @return true if the object has been completely written the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	protected abstract boolean writeNextObject(ChannelWrapper<?> wrapper) throws Exception;
+	protected abstract boolean writeNextObject(ChannelWrapper<?> channel) throws Exception;
 
 	/**
 	 * Get the data location objects abstracting the data to send or receive.

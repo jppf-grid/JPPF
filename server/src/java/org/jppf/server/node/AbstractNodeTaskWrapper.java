@@ -1,0 +1,75 @@
+/*
+ * JPPF.
+ * Copyright (C) 2005-2011 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.jppf.server.node;
+
+import java.util.List;
+
+import org.jppf.JPPFNodeReconnectionNotification;
+import org.jppf.node.NodeExecutionManager;
+import org.jppf.server.protocol.JPPFTask;
+
+/**
+ * Wrapper around a JPPF task used to catch exceptions caused by the task execution.
+ * @author Domingos Creado
+ * @author Laurent Cohen
+ */
+public abstract class AbstractNodeTaskWrapper implements Runnable
+{
+	/**
+	 * The task to execute within a try/catch block.
+	 */
+	protected JPPFTask task = null;
+	/**
+	 * The key to the JPPFContainer for the task's classloader.
+	 */
+	protected List<String> uuidPath = null;
+	/**
+	 * The number identifying the task.
+	 */
+	protected long number = 0L;
+	/**
+	 * The execution manager.
+	 */
+	protected NodeExecutionManager executionManager = null;
+	/**
+	 * Set if the node must reconnect to the driver. 
+	 */
+	protected JPPFNodeReconnectionNotification reconnectionNotification = null;
+
+	/**
+	 * Initialize this task wrapper with a specified JPPF task.
+	 * @param task the task to execute within a try/catch block.
+	 * @param uuidPath the key to the JPPFContainer for the task's classloader.
+	 * @param number the internal number identifying the task for the thread pool.
+	 */
+	public AbstractNodeTaskWrapper(JPPFTask task, List<String> uuidPath, long number)
+	{
+		this.task = task;
+		this.uuidPath = uuidPath;
+		this.number = number;
+	}
+
+	/**
+	 * Get the task this wrapper executes within a try/catch block.
+	 * @return the task as a <code>JPPFTask</code> instance.
+	 */
+	public JPPFTask getTask()
+	{
+		return task;
+	}
+}
