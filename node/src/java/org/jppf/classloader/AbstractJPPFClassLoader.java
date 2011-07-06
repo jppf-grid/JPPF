@@ -293,6 +293,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	 * @return an array of URLs, one for each looked up resources. Some URLs may be null, however the returned array
 	 * is never null, and results are in the same order as the specified resource names.
 	 */
+	@SuppressWarnings("unchecked")
 	protected URL[] findMultipleResources(String...names)
 	{
 		if ((names == null) || (names.length <= 0)) return StringUtils.ZERO_URL;
