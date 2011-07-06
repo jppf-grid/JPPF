@@ -133,7 +133,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public JPPFClientConnection getClientConnection()
 	{
-		return getClientConnection(false);
+		return getClientConnection(true, true);
 	}
 
 	/**
@@ -144,6 +144,19 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * @return a <code>JPPFClientConnection</code> with the highest possible priority.
 	 */
 	public JPPFClientConnection getClientConnection(boolean oneAttempt)
+	{
+		return getClientConnection(oneAttempt, false);
+	}
+
+	/**
+	 * Get an available connection with the highest possible priority.
+	 * @param oneAttempt determines whether this method should wait until a connection
+	 * becomes available (ACTIVE status) or fail immeditately if no available connection is found.<br>
+	 * This enables the execution to be performed locally if the client is not connected to a server.
+	 * @param anyState specifies whether this method should look for an active connection or not care about the connection state. 
+	 * @return a <code>JPPFClientConnection</code> with the highest possible priority.
+	 */
+	public JPPFClientConnection getClientConnection(boolean oneAttempt, boolean anyState)
 	{
 		JPPFClientConnection connection = null;
 		synchronized(pools)
@@ -173,16 +186,15 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 								if (pool.getLastUsedIndex() >= size) pool.setLastUsedIndex(pool.getLastUsedIndex() - 1);
 								if (pool.clientList.isEmpty()) toRemove.add(priority);
 								break;
+							default:
+								if (anyState) connection = c;
+								break;
 						}
 						count++;
 					}
 				}
 				for (Integer n: toRemove) pools.remove(n);
-				if (pools.isEmpty())
-				{
-					//throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
-					log.warn("No more driver connection available for this client");
-				}
+				if (pools.isEmpty()) log.warn("No more driver connection available for this client");
 				if (oneAttempt) break;
 			}
 		}
