@@ -181,8 +181,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	{
 		try
 		{
-			JPPFTaskBundle bundle = new JPPFTaskBundle();
-			sendTasks(bundle, job);
+			sendTasks(new JPPFTaskBundle(), job);
 		}
 		catch(Exception e)
 		{
@@ -239,7 +238,8 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, ser);
 			int count = bundle.getTaskCount();
 			if (debugEnabled) log.debug("received bundle with " + count + " tasks for job '" + bundle.getId() + "'");
-			List<JPPFTask> taskList = new ArrayList<JPPFTask>();
+			//List<JPPFTask> taskList = new ArrayList<JPPFTask>();
+			List<JPPFTask> taskList = new LinkedList<JPPFTask>();
 			if (SEQUENTIAL_DESERIALIZATION) lock.lock();
 			try
 			{
