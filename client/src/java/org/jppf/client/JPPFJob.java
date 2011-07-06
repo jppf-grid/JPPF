@@ -46,7 +46,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * The list of tasks to execute.
 	 */
-	private List<JPPFTask> tasks = null;
+	private List<JPPFTask> tasks = new ArrayList<JPPFTask>();
 	/**
 	 * The container for data shared between tasks.
 	 * The data provider should be considered read-only, i.e. no modification will be returned back to the client application.
@@ -68,10 +68,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * The universal unique id for this job.
 	 */
 	private String jobUuid = null;
-	/**
-	 * The list of tasks to execute.
-	 */
-	private List<JPPFTask> results = new ArrayList<JPPFTask>();
 	/**
 	 * The service level agreement between the job and the server.
 	 */
@@ -234,7 +230,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 		if (taskObject == null) throw new JPPFException("null tasks are not accepted");
 		if (taskObject instanceof JPPFTask) jppfTask = (JPPFTask) taskObject;
 		else jppfTask = new JPPFAnnotatedTask(taskObject, args);
-		if (tasks == null) tasks = new ArrayList<JPPFTask>();
 		tasks.add(jppfTask);
 		jppfTask.setPosition(taskCount++);
 		return jppfTask;
@@ -252,7 +247,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	public JPPFTask addTask(String method, Object taskObject, Object...args) throws JPPFException
 	{
 		if (taskObject == null) throw new JPPFException("null tasks are not accepted");
-		if (tasks == null) tasks = new ArrayList<JPPFTask>();
 		JPPFTask jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
 		tasks.add(jppfTask);
 		jppfTask.setPosition(taskCount++);
