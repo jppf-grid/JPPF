@@ -70,7 +70,7 @@ public class LocalExecutionRunner
 			//print("run with local execution on"); 
 			//jppfClient.setLocalExecutionEnabled(true);
 			//perform2(100, 5, 200);
-			perform3();
+			perform4();
 			/*
 			print("run 3 with local execution off"); 
 			jppfClient.setLocalExecutionEnabled(false);
@@ -208,6 +208,35 @@ public class LocalExecutionRunner
 			job.setId("test jar download");
 			job.addTask(new Task());
 			job.setDataProvider(new ClientDataProvider());
+			// submit the tasks for execution
+			List<JPPFTask> results = jppfClient.submit(job);
+			for (JPPFTask task: results)
+			{
+				Exception e = task.getException();
+				if (e != null) throw e;
+			}
+			long elapsed = System.nanoTime() - start;
+			print("run time: " + StringUtils.toStringDuration(elapsed/1000000));
+	
+		}
+		catch(Exception e)
+		{
+			throw new JPPFException(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
+	 * @throws Exception if an error is raised during the execution.
+	 */
+	private static void perform4() throws Exception
+	{
+		try
+		{
+			long start = System.nanoTime();
+			JPPFJob job = new JPPFJob();
+			job.setId("test jdbc");
+			job.addTask(new JdbcTask());
 			// submit the tasks for execution
 			List<JPPFTask> results = jppfClient.submit(job);
 			for (JPPFTask task: results)

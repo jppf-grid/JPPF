@@ -14,5 +14,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/samples-pack"/>
 	<classpathentry kind="lib" path="/jca-client/lib/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="/samples-pack/shared/lib/commons-dbcp-1.4.jar"/>
+	<classpathentry kind="lib" path="/samples-pack/shared/lib/commons-pool-1.5.2.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
