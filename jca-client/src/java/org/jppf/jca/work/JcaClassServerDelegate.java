@@ -132,7 +132,18 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 						String requestUuid = resource.getRequestUuid();
 						ClassLoader cl = getClassLoader(requestUuid);
 						if (debugEnabled) log.debug("attempting resource lookup using classloader=" + cl + " for request uuid = " + requestUuid);
-						if (resource.getData("multiple") == null)
+						if (resource.getData("multiple") != null)
+						{
+							List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
+							if (list != null) resource.setData("resource_list", list);
+						}
+						else if (resource.getData("multiple.resources.names") != null)
+						{
+							String[] names = (String[]) resource.getData("multiple.resources.names");
+							Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, names);
+							resource.setData("resource_map", result);
+						}
+						else
 						{
 							byte[] b = null;
 							byte[] callable = resource.getCallable();
@@ -150,17 +161,6 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 								if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
 								else log.debug("["+this.getName()+"] resource not found: " + name);
 							}
-						}
-						else if (resource.getData("multiple.resources.names") == null)
-						{
-							String[] names = (String[]) resource.getData("multiple.resources.names");
-							Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, names);
-							resource.setData("resource_map", result);
-						}
-						else
-						{
-							List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
-							if (list != null) resource.setData("resource_list", list);
 						}
 						resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
 						writeResource(resource);

@@ -121,7 +121,18 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 					String name = resource.getName();
 					ClassLoader cl = getClassLoader(resource.getRequestUuid());
 					if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name + " using classloader=" + cl);
-					if (resource.getData("multiple") == null)
+					if (resource.getData("multiple") != null)
+					{
+						List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
+						if (list != null) resource.setData("resource_list", list);
+					}
+					else if (resource.getData("multiple.resources.names") != null)
+					{
+						String[] names = (String[]) resource.getData("multiple.resources.names");
+						Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, names);
+						resource.setData("resource_map", result);
+					}
+					else
 					{
 						byte[] b = null;
 						byte[] callable = resource.getCallable();
@@ -139,17 +150,6 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 							if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
 							else log.debug("["+this.getName()+"] resource not found: " + name);
 						}
-					}
-					else if (resource.getData("multiple.resources.names") == null)
-					{
-						String[] names = (String[]) resource.getData("multiple.resources.names");
-						Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, names);
-						resource.setData("resource_map", result);
-					}
-					else
-					{
-						List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
-						if (list != null) resource.setData("resource_list", list);
 					}
 					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
 					writeResource(resource);

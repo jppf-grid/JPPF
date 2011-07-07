@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.client.event.TaskResultEvent;
+import org.jppf.client.event.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.proportional.ProportionalTuneProfile;
@@ -275,25 +275,47 @@ public class LoadBalancer
 		{
 			try
 			{
-				long start = System.currentTimeMillis();
-				List<Future<?>> futures = new ArrayList<Future<?>>();
+				long accTime = JPPFConfiguration.getProperties().getLong("jppf.local.execution.accumulation.time", Long.MAX_VALUE);
+				//int accSize = JPPFConfiguration.getProperties().getInt("jppf.local.execution.accumulation.size", Integer.MAX_VALUE);
+				int accSize = 5;
+				long start = System.nanoTime();
+				LinkedList<Future<JPPFTask>> futures = new LinkedList<Future<JPPFTask>>();
 				for (JPPFTask task: tasks)
 				{
 					task.setDataProvider(job.getDataProvider());
-					futures.add(threadPool.submit(new TaskWrapper(task)));
+					futures.add(threadPool.submit(new TaskWrapper(task), task));
 				}
-				for (Future<?> f: futures) f.get();
-				int n = futures.size();
-				if (debugEnabled) log.debug("received " + n + " tasks from local executor" + (n > 0 ? ", first position=" + tasks.get(0).getPosition() : ""));
-				if (job.getResultListener() != null)
+				int count = 0;
+				List<JPPFTask> results = new LinkedList<JPPFTask>();
+				while (!futures.isEmpty())
 				{
-					synchronized(job.getResultListener())
+					Future<JPPFTask> f = futures.peek();
+					while ((f != null) && f.isDone() &&
+						((count == 0) || ((System.nanoTime() - start < accTime) && (count < accSize))))
 					{
-						job.getResultListener().resultsReceived(new TaskResultEvent(tasks));
+						results.add(futures.poll().get());
+						count++;
+						f = futures.peek();
 					}
+					if (count > 0)
+					{
+						if (debugEnabled) log.debug("received " + count + " tasks from local executor" + ", first position=" + results.get(0).getPosition());
+						TaskResultListener listener = job.getResultListener();
+						if (listener != null)
+						{
+							synchronized(listener)
+							{
+								listener.resultsReceived(new TaskResultEvent(results));
+							}
+						}
+						double elapsed = System.nanoTime() - start;
+						bundlers[LOCAL].feedback(count, elapsed);
+						start = System.nanoTime();
+						results.clear();
+						count = 0;
+					}
+					else if (f != null) f.get();
 				}
-				double elapsed = System.currentTimeMillis() - start;
-				bundlers[LOCAL].feedback(tasks.size(), elapsed);
 			}
 			catch(Exception e)
 			{
@@ -337,7 +359,7 @@ public class LoadBalancer
 		{
 			try
 			{
-				long start = System.currentTimeMillis();
+				long start = System.nanoTime();
 				int count = 0;
 				boolean completed = false;
 				JPPFJob newJob = createNewJob(job);
@@ -359,11 +381,12 @@ public class LoadBalancer
 						int n = p.first().size();
 						count += n;
 						if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + p.first().get(0).getPosition() : ""));
-						if (job.getResultListener() != null)
+						TaskResultListener listener = newJob.getResultListener();
+						if (listener != null)
 						{
-							synchronized(newJob.getResultListener())
+							synchronized(listener)
 							{
-								newJob.getResultListener().resultsReceived(new TaskResultEvent(p.first()));
+								listener.resultsReceived(new TaskResultEvent(p.first()));
 							}
 						}
 						else log.warn("result listener is null for job " + newJob);
@@ -373,17 +396,13 @@ public class LoadBalancer
 
 				if (localEnabled)
 				{
-					double elapsed = System.currentTimeMillis() - start;
+					double elapsed = System.nanoTime() - start;
 					bundlers[REMOTE].feedback(tasks.size(), elapsed);
 				}
 				if (connection != null) connection.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.ACTIVE);
 			}
 			catch(Throwable t)
 			{
-				/*
-				if (debugEnabled) log.debug(t.getMessage(), t);
-				else log.error(t.getClass().getName() + ": " + t.getMessage());
-				*/
 				log.error(t.getMessage(), t);
 				exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
 				if (job.getResultListener() != null)
