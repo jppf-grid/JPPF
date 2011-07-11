@@ -20,8 +20,6 @@ package org.jppf.comm.discovery;
 
 import java.io.*;
 
-import org.jppf.utils.StringUtils;
-
 /**
  * This class encapsulates the connection information for a JPPF driver.
  * The information includes the host, class server, application and node server ports. 
@@ -38,18 +36,9 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 */
 	public String host = null;
 	/**
-	 * The ports on which the class server is listening. 
+	 * The ports on which the server is listening. 
 	 */
-	public int[] classServerPorts = null;
-
-	/**
-	 * The ports on which the node server is listening. 
-	 */
-	public int[] nodeServerPorts = null;
-	/**
-	 * The ports on which the application server is listening. 
-	 */
-	public int[] applicationServerPorts = null;
+	public int[] serverPorts = null;
 	/**
 	 * Port number used for JMX management and monitoring.
 	 */
@@ -139,9 +128,6 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 		sb.append(getClass().getSimpleName()).append("[");
 		sb.append("uuid=").append(uuid);
 		sb.append(", host=").append(host);
-		sb.append(", class server=").append(StringUtils.buildString(classServerPorts));
-		sb.append(", node server=").append(StringUtils.buildString(nodeServerPorts));
-		sb.append(", app server=").append(StringUtils.buildString(applicationServerPorts));
 		sb.append(", management=").append(managementPort);
 		sb.append(", recoveryPort=").append(recoveryPort);
 		sb.append("]");

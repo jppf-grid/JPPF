@@ -112,8 +112,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 		sb.append(name);
 		props.setProperty("jppf.peers", sb.toString());
 		props.setProperty("jppf.peer." + name + ".server.host", info.host);
-		props.setProperty("class.peer."+name+".server.port", "" + info.classServerPorts[0]);
-		props.setProperty("node.peer."+name+".server.port", "" + info.nodeServerPorts[0]);
+		props.setProperty("jppf.peer." + name + ".server.port", "" + info.serverPorts[0]);
 		new JPPFPeerInitializer(name).start();
 	}
 
@@ -131,7 +130,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 		for (InetAddress addr: ipv4Addresses)
 		{
 			String ip = addr.getHostAddress();
-			if (info.host.equals(ip) && Arrays.equals(info.classServerPorts, localInfo.classServerPorts))
+			if (info.host.equals(ip) && Arrays.equals(info.serverPorts, localInfo.serverPorts))
 			{
 				return true;
 			}

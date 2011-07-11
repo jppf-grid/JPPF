@@ -57,15 +57,19 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	/**
 	 * Name of the class server.
 	 */
-	public static final String CLASS_SERVER = "ClassServer";
+	public static final String CLASS_SERVER = "Class Server";
 	/**
 	 * Name of the class server.
 	 */
-	public static final String NODE_SERVER = "NodeServer";
+	public static final String NODE_SERVER = "Tasks Server";
 	/**
 	 * Name of the client task server.
 	 */
-	public static final String CLIENT_SERVER = "ClientServer";
+	public static final String CLIENT_SERVER = "Client Server";
+	/**
+	 * Name of the acceptor server server.
+	 */
+	public static final String ACCEPTOR = "Acceptor";
 	/**
 	 * the selector of all socket channels open with providers or nodes.
 	 */
@@ -146,9 +150,12 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	public NioServer(final int[] ports, String name, boolean sequential) throws JPPFException
 	{
 		this(name, sequential);
-		this.ports = new int[ports.length];
-		System.arraycopy(ports, 0, this.ports, 0, ports.length);
-		init(ports);
+		if (ports != null)
+		{
+			this.ports = new int[ports.length];
+			System.arraycopy(ports, 0, this.ports, 0, ports.length);
+		}
+		init(this.ports);
 	}
 
 	/**
@@ -168,13 +175,16 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 		try
 		{
 			selector = Selector.open();
-			for (int port: ports)
+			if (ports != null)
 			{
-				ServerSocketChannel server = ServerSocketChannel.open();
-				server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-				server.socket().bind(new InetSocketAddress(port));
-				server.configureBlocking(false);
-				server.register(selector, SelectionKey.OP_ACCEPT);
+				for (int port: ports)
+				{
+					ServerSocketChannel server = ServerSocketChannel.open();
+					server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+					server.socket().bind(new InetSocketAddress(port));
+					server.configureBlocking(false);
+					server.register(selector, SelectionKey.OP_ACCEPT);
+				}
 			}
 		}
 		catch(IllegalArgumentException iae)
@@ -302,6 +312,17 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 			return;
 		}
 		if (channel == null) return;
+		accept(channel);
+	}
+
+	/**
+	 * Register an incoming connection witht his server's selector.
+	 * @param channel the socket channel representing the connection.
+	 * @return a wrpaper for the newly registered channel.
+	 */
+	@SuppressWarnings("unchecked")
+	public ChannelWrapper<?> accept(SocketChannel channel)
+	{
 		try
 		{
 			channel.socket().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
@@ -318,30 +339,23 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 			{
 				log.error(ignored.getMessage(), ignored);
 			}
-			return;
+			return null;
 		}
 		NioContext context = createNioContext();
+		SelectionKeyWrapper wrapper = null;
 		try
 		{
 			SelectionKey selKey = channel.register(selector,	getInitialInterest(), context);
-			SelectionKeyWrapper wrapper = new SelectionKeyWrapper(selKey);
+			wrapper = new SelectionKeyWrapper(selKey);
 			context.setChannel(wrapper);
-			postAccept(wrapper, serverSocketChannel);
+			postAccept(wrapper);
 		}
 		catch (ClosedChannelException e)
 		{
+			wrapper = null;
 			log.error(e.getMessage(), e);
 		}
-	}
-
-	/**
-	 * Process a channel that was accepted by the server socket channel.
-	 * @param key the selection key for the socket channel to process.
-	 * @param serverChannel the ServerSocketChannel that accepted the channel.
-	 */
-	public void postAccept(ChannelWrapper<?> key, ServerSocketChannel serverChannel)
-	{
-		postAccept(key);
+		return wrapper;
 	}
 
 	/**

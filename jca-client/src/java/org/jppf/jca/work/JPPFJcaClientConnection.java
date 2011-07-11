@@ -58,9 +58,11 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 */
 	public JPPFJcaClientConnection(String uuid, String name, JPPFConnectionInformation info, JPPFJcaClient client)
 	{
-		configure(uuid, name, info.host, info.applicationServerPorts[0], info.classServerPorts[0], 0);
+		//configure(uuid, name, info.host, info.applicationServerPorts[0], info.classServerPorts[0], 0);
+		configure(uuid, name, info.host, info.serverPorts[0], info.serverPorts[0], 0);
 		status.set(DISCONNECTED);
-		classServerPort = info.classServerPorts[0];
+		//classServerPort = info.classServerPorts[0];
+		classServerPort = info.serverPorts[0];
 		this.client = client;
 	}
 

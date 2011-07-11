@@ -144,8 +144,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 				{
 					JPPFConnectionInformation info = new JPPFConnectionInformation();
 					info.host = config.getString(name + ".jppf.server.host", "localhost");
-					info.classServerPorts = new int[] { config.getInt(name + ".class.server.port", 11111) };
-					info.applicationServerPorts = new int[] { config.getInt(name + ".app.server.port", 11112) };
+					info.serverPorts = new int[] { config.getInt(name + "jppf.server.port", 11111) };
 					info.managementPort = config.getInt(name + ".jppf.management.port", 11198);
 					AbstractJPPFClientConnection c = createConnection(uuid, (n > 1) ? name + "-" + i : name, info);
 					c.setPriority(config.getInt(name + ".priority", 0));

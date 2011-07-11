@@ -66,6 +66,7 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
 	{
 		try
 		{
+			socketClient.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
 			JPPFResourceWrapper resource = new JPPFResourceWrapper();
 			resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
 			socketClient.send(resource);

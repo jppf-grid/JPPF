@@ -139,6 +139,22 @@ public class DriverInitializer
 		{
 			connectionInfo = new JPPFConnectionInformation();
 			connectionInfo.uuid = driver.getUuid();
+			String s = config.getString("jppf.server.port", "11111");
+			connectionInfo.serverPorts = StringUtils.parseIntValues(s);
+			connectionInfo.host = NetworkUtils.getManagementHost();
+			if (config.getBoolean("jppf.management.enabled", true)) connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
+			boolean recoveryEnabled = config.getBoolean("jppf.recovery.enabled", false);
+			if (recoveryEnabled) connectionInfo.recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
+		}
+		return connectionInfo;
+	}
+	/*
+	public JPPFConnectionInformation getConnectionInformation()
+	{
+		if (connectionInfo == null)
+		{
+			connectionInfo = new JPPFConnectionInformation();
+			connectionInfo.uuid = driver.getUuid();
 			String s = config.getString("class.server.port", "11111");
 			connectionInfo.classServerPorts = StringUtils.parseIntValues(s);
 			s = config.getString("app.server.port", "11112");
@@ -152,6 +168,7 @@ public class DriverInitializer
 		}
 		return connectionInfo;
 	}
+	*/
 
 	/**
 	 * Print a message to the console to signify that the initialization of a server was succesfull.
@@ -161,9 +178,18 @@ public class DriverInitializer
 	void printInitializedMessage(int[] ports, String name)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(name).append(" initialized - listening on port");
-		if (ports.length > 1) sb.append("s");
-		for (int n: ports) sb.append(" ").append(n);
+		if (name != null)
+		{
+			sb.append(name);
+			sb.append(" initialized");
+		}
+		if (ports != null)
+		{
+			if (name != null) sb.append(" - ");
+			sb.append("accepting connections on port");
+			if (ports.length > 1) sb.append("s");
+			for (int n: ports) sb.append(" ").append(n);
+		}
 		System.out.println(sb.toString());
 	}
 

@@ -41,6 +41,10 @@ public class ServerDebug implements ServerDebugMBean
 	 * The client channels.
 	 */
 	private Set<ChannelWrapper<?>> clientSet = new HashSet<ChannelWrapper<?>>();
+	/**
+	 * The acceptor channels.
+	 */
+	private Set<ChannelWrapper<?>> acceptorSet = new HashSet<ChannelWrapper<?>>();
 
 	/**
 	 * {@inheritDoc}

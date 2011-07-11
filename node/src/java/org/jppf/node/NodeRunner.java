@@ -203,8 +203,7 @@ public class NodeRunner
 		if (debugEnabled) log.debug("Discovered driver: " + info);
 		TypedProperties config = JPPFConfiguration.getProperties();
 		config.setProperty("jppf.server.host", info.host);
-		config.setProperty("class.server.port", StringUtils.buildString(info.classServerPorts));
-		config.setProperty("node.server.port", StringUtils.buildString(info.nodeServerPorts));
+		config.setProperty("jppf.server.port", StringUtils.buildString(info.serverPorts));
 		if (info.managementHost != null) config.setProperty("jppf.management.host", info.managementHost);
 		if (info.recoveryPort >= 0)
 		{

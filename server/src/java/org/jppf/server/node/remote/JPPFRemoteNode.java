@@ -64,7 +64,8 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 			if (debugEnabled) log.debug("Initializing socket");
 			TypedProperties props = JPPFConfiguration.getProperties();
 			String host = props.getString("jppf.server.host", "localhost");
-			int port = props.getInt("node.server.port", 11113);
+			//int port = props.getInt("node.server.port", 11113);
+			int port = props.getInt("jppf.server.port", 11111);
 			socketClient = new SocketClient();
 			//socketClient = new SocketConnectorWrapper();
 			socketClient.setHost(host);
@@ -80,6 +81,8 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 				throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
 			}
 			System.out.println("Reconnected to the node server");
+			if (debugEnabled) log.debug("sending channel identifier");
+			socketClient.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
 			if (debugEnabled) log.debug("end socket initializer");
 		}
 		nodeIO = new RemoteNodeIO(this);

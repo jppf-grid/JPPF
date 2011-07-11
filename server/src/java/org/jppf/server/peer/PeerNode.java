@@ -214,6 +214,8 @@ class PeerNode extends AbstractMonitoredNode
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isSuccessfull()) throw new JPPFException(getName() + " : Unable to reconnect to peer server");
 			System.out.println(getName() + "Reconnected to the peer node server");
+			if (debugEnabled) log.debug("sending channel identifier");
+			socketClient.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
 			is = new SocketWrapperInputSource(socketClient);
 		}
 		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
@@ -228,7 +230,7 @@ class PeerNode extends AbstractMonitoredNode
 		if (debugEnabled) log.debug(getName() + "initializing socket client");
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String host = props.getString("jppf.peer."+peerName+".server.host", "localhost");
-		int port = props.getInt("node.peer."+peerName+".server.port", 11113);
+		int port = props.getInt("jppf.peer."+peerName+".server.port", 11111);
 		socketClient = new SocketClient();
 		socketClient.setHost(host);
 		socketClient.setPort(port);

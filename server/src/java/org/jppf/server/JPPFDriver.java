@@ -26,6 +26,8 @@ import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.process.LauncherListener;
 import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.job.JPPFJobManager;
+import org.jppf.server.nio.NioServer;
+import org.jppf.server.nio.acceptor.AcceptorNioServer;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.server.nio.client.ClientNioServer;
 import org.jppf.server.nio.nodeserver.*;
@@ -80,6 +82,10 @@ public class JPPFDriver
 	 * Serves class loading requests from the JPPF nodes.
 	 */
 	private ClassNioServer classServer = null;
+	/**
+	 * Handles the initial handshake and peer channel identification.
+	 */
+	private AcceptorNioServer acceptorServer = null;
 	/**
 	 * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
 	 */
@@ -139,30 +145,26 @@ public class JPPFDriver
 		initializer.registerDebugMBean();
 		initializer.initRecoveryServer();
 
-		classServer = new ClassNioServer(info.classServerPorts);
+		//classServer = new ClassNioServer(info.classServerPorts);
+		classServer = new ClassNioServer(null);
 		classServer.start();
-		initializer.printInitializedMessage(info.classServerPorts, "Class Server");
+		initializer.printInitializedMessage(null, NioServer.CLASS_SERVER);
 
-		if (config.getBoolean("jppf.client.server.nio.enabled", true))
-		{
-			clientNioServer = new ClientNioServer(info.applicationServerPorts);
-			clientNioServer.start();
-		}
-		else
-		{
-			applicationServers = new JPPFApplicationServer[info.applicationServerPorts.length];
-			for (int i=0; i<info.applicationServerPorts.length; i++)
-			{
-				applicationServers[i] = new JPPFApplicationServer(info.applicationServerPorts[i]);
-				applicationServers[i].start();
-			}
-		}
-		initializer.printInitializedMessage(info.applicationServerPorts, "Client Server");
+		//clientNioServer = new ClientNioServer(info.applicationServerPorts);
+		clientNioServer = new ClientNioServer(null);
+		clientNioServer.start();
+		initializer.printInitializedMessage(null, NioServer.CLIENT_SERVER);
 
-		nodeNioServer = new NodeNioServer(info.nodeServerPorts);
+		//nodeNioServer = new NodeNioServer(info.nodeServerPorts);
+		nodeNioServer = new NodeNioServer(null);
 		nodeNioServer.start();
-		initializer.printInitializedMessage(info.nodeServerPorts, "Tasks Server");
+		initializer.printInitializedMessage(null, NioServer.NODE_SERVER);
 
+		acceptorServer = new AcceptorNioServer(info.serverPorts);
+		acceptorServer.start();
+		//initializer.printInitializedMessage(info.serverPorts, "JPPF Driver");
+		initializer.printInitializedMessage(info.serverPorts, null);
+		
 		if (config.getBoolean("jppf.local.node.enabled", false))
 		{
 			LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
@@ -224,6 +226,15 @@ public class JPPFDriver
 	public NodeNioServer getNodeNioServer()
 	{
 		return nodeNioServer;
+	}
+
+	/**
+	 * Get the server which handles the initial handshake and peer channel identification.
+	 * @return a {@link AcceptorNioServer} instance.
+	 */
+	public AcceptorNioServer getAcceptorServer()
+	{
+		return acceptorServer;
 	}
 
 	/**

@@ -80,7 +80,8 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		if (debugEnabled) log.debug("initializing socket connection");
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String host = props.getString("jppf.server.host", "localhost");
-		int port = props.getInt("class.server.port", 11111);
+		//int port = props.getInt("class.server.port", 11111);
+		int port = props.getInt("jppf.server.port", 11111);
 		socketClient = new BootstrapSocketClient();
 		socketClient.setHost(host);
 		socketClient.setPort(port);
@@ -111,6 +112,8 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 					// we need to do this in order to dramatically simplify the state machine of ClassServer
 					try
 					{
+						if (debugEnabled) log.debug("sending channel identifier");
+						socketClient.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
 						if (debugEnabled) log.debug("sending node initiation message");
 						JPPFResourceWrapper resource = new JPPFResourceWrapper();
 						resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);

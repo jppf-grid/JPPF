@@ -80,7 +80,8 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 			try
 			{
 				NioState<T> state = factory.getState(ctx.getState());
-				transitionManager.transitionChannel(channel, state.performTransition(channel));
+				T transition = state.performTransition(channel);
+				if (transition != null) transitionManager.transitionChannel(channel, transition);
 			}
 			catch(Exception e)
 			{

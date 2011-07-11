@@ -76,10 +76,11 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	public JPPFClientConnectionImpl(JPPFClient client, String uuid, String name, JPPFConnectionInformation info)
 	{
 		this.client = client;
-		classServerPort = info.classServerPorts[0];
+		//classServerPort = info.classServerPorts[0];
+		classServerPort = info.serverPorts[0];
 		jmxPort = info.managementPort;
-		//configure(uuid, name + " (" + info.host + ":" + info.managementPort + ")", info.host, info.applicationServerPorts[0], classServerPort, 0);
-		configure(uuid, name, info.host, info.applicationServerPorts[0], classServerPort, 0);
+		//configure(uuid, name, info.host, info.applicationServerPorts[0], classServerPort, 0);
+		configure(uuid, name, info.host, info.serverPorts[0], classServerPort, 0);
 		initializeJmxConnection();
 	}
 
