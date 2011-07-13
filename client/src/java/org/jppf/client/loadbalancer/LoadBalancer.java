@@ -275,9 +275,8 @@ public class LoadBalancer
 		{
 			try
 			{
-				long accTime = JPPFConfiguration.getProperties().getLong("jppf.local.execution.accumulation.time", Long.MAX_VALUE);
-				//int accSize = JPPFConfiguration.getProperties().getInt("jppf.local.execution.accumulation.size", Integer.MAX_VALUE);
-				int accSize = 5;
+				long accTimeNanos = getAccTime();
+				int accSize = JPPFConfiguration.getProperties().getInt("jppf.local.execution.accumulation.size", Integer.MAX_VALUE);
 				long start = System.nanoTime();
 				LinkedList<Future<JPPFTask>> futures = new LinkedList<Future<JPPFTask>>();
 				for (JPPFTask task: tasks)
@@ -291,7 +290,7 @@ public class LoadBalancer
 				{
 					Future<JPPFTask> f = futures.peek();
 					while ((f != null) && f.isDone() &&
-						((count == 0) || ((System.nanoTime() - start < accTime) && (count < accSize))))
+						((count == 0) || ((System.nanoTime() - start < accTimeNanos) && (count < accSize))))
 					{
 						results.add(futures.poll().get());
 						count++;
@@ -326,6 +325,42 @@ public class LoadBalancer
 			{
 				setLocallyExecuting(false);
 			}
+		}
+
+		/**
+		 * Retrieve the accumulation time and convert it to nanoseconds.
+		 * @return the accumulation time in nanoseconods.
+		 */
+		private long getAccTime()
+		{
+			long time = JPPFConfiguration.getProperties().getLong("jppf.local.execution.accumulation.time", Long.MAX_VALUE);
+			char unitChar = JPPFConfiguration.getProperties().getChar("jppf.local.execution.accumulation.time.unit", 'n');
+			TimeUnit unit;
+			switch(unitChar)
+			{
+				case 'n':
+					unit = TimeUnit.NANOSECONDS;
+					break;
+				case 'm':
+					unit = TimeUnit.MILLISECONDS;
+					break;
+				case 's':
+					unit = TimeUnit.SECONDS;
+					break;
+				case 'M':
+					unit = TimeUnit.MINUTES;
+					break;
+				case 'h':
+					unit = TimeUnit.HOURS;
+					break;
+				case 'd':
+					unit = TimeUnit.DAYS;
+					break;
+				default:
+					unit = TimeUnit.NANOSECONDS;
+					break;
+			}
+			return unit.toNanos(time);
 		}
 	}
 

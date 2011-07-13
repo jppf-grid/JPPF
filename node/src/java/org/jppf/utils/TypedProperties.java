@@ -59,24 +59,23 @@ public class TypedProperties extends Properties
 	/**
 	 * Get the string value of a property with a specified name.
 	 * @param key the name of the property to look for.
+	 * @return the value of the property as a string, or null if it is not found.
+	 */
+	public String getString(String key)
+	{
+		return getString(key, null);
+	}
+	
+	/**
+	 * Get the string value of a property with a specified name.
+	 * @param key the name of the property to look for.
 	 * @param defValue a default value to return if the property is not found.
 	 * @return the value of the property as a string, or the default value if it is not found.
 	 */
 	public String getString(String key, String defValue)
 	{
 		String val = getProperty(key);
-		if (val == null) return defValue;
-		return val;
-	}
-	
-	/**
-	 * Get the string value of a property with a specified name.
-	 * @param key the name of the property to look for.
-	 * @return the value of the property as a string, or null if it is not found.
-	 */
-	public String getString(String key)
-	{
-		return getString(key, null);
+		return (val == null) ? defValue : val;
 	}
 	
 	/**
@@ -148,6 +147,16 @@ public class TypedProperties extends Properties
 	/**
 	 * Get the single precision value of a property with a specified name.
 	 * @param key the name of the property to look for.
+	 * @return the value of the property as a float, or zero if it is not found.
+	 */
+	public float getFloat(String key)
+	{
+		return getFloat(key, 0f);
+	}
+	
+	/**
+	 * Get the single precision value of a property with a specified name.
+	 * @param key the name of the property to look for.
 	 * @param defValue a default value to return if the property is not found.
 	 * @return the value of the property as a float, or the default value if it is not found.
 	 */
@@ -169,13 +178,14 @@ public class TypedProperties extends Properties
 	}
 	
 	/**
-	 * Get the single precision value of a property with a specified name.
+	 * Get the double precision value of a property with a specified name.
+	 * If the key is not found a default value of 0d is returned.
 	 * @param key the name of the property to look for.
-	 * @return the value of the property as a float, or zero if it is not found.
+	 * @return the value of the property as a double, or zero if it is not found.
 	 */
-	public float getFloat(String key)
+	public double getDouble(String key)
 	{
-		return getFloat(key, 0f);
+		return getDouble(key, 0d);
 	}
 	
 	/**
@@ -202,15 +212,16 @@ public class TypedProperties extends Properties
 	}
 	
 	/**
-	 * Get the double precision value of a property with a specified name.
+	 * Get the boolean value of a property with a specified name.
+	 * If the key is not found a default value of false is returned.
 	 * @param key the name of the property to look for.
-	 * @return the value of the property as a double, or zero if it is not found.
+	 * @return the value of the property as a boolean, or <code>false</code> if it is not found.
 	 */
-	public double getDouble(String key)
+	public boolean getBoolean(String key)
 	{
-		return getDouble(key, 0d);
+		return getBoolean(key, false);
 	}
-	
+
 	/**
 	 * Get the boolean value of a property with a specified name.
 	 * @param key the name of the property to look for.
@@ -226,15 +237,31 @@ public class TypedProperties extends Properties
 	}
 	
 	/**
-	 * Get the boolean value of a property with a specified name.
+	 * Get the char value of a property with a specified name.
+	 * If the key is not found a default value of ' ' is returned.
 	 * @param key the name of the property to look for.
-	 * @return the value of the property as a boolean, or false if it is not found.
+	 * @return the value of the property as a char, or the default value ' ' (space character) if it is not found.
 	 */
-	public boolean getBoolean(String key)
+	public char getChar(String key)
 	{
-		return getBoolean(key, false);
+		return getChar(key, ' ');
 	}
-
+	
+	/**
+	 * Get the char value of a property with a specified name.
+	 * If the value has more than one character, the first one will be used.
+	 * @param key the name of the property to look for.
+	 * @param defValue a default value to return if the property is not found.
+	 * @return the value of the property as a char, or the default value if it is not found.
+	 */
+	public char getChar(String key, char defValue)
+	{
+		char charVal = defValue;
+		String val = getProperty(key, null);
+		if ((val != null) && (val.length() > 0)) charVal = val.charAt(0);
+		return charVal;
+	}
+	
 	/**
 	 * Get the value of a property with the specified name as a set of a properties.
 	 * @param key the name of the property to look for.
