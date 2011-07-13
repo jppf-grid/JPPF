@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.client.event.TaskResultEvent;
+import org.jppf.client.event.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.proportional.ProportionalTuneProfile;
@@ -275,25 +275,46 @@ public class LoadBalancer
 		{
 			try
 			{
-				long start = System.currentTimeMillis();
-				List<Future<?>> futures = new ArrayList<Future<?>>();
+				long accTimeNanos = getAccTime();
+				int accSize = JPPFConfiguration.getProperties().getInt("jppf.local.execution.accumulation.size", Integer.MAX_VALUE);
+				long start = System.nanoTime();
+				LinkedList<Future<JPPFTask>> futures = new LinkedList<Future<JPPFTask>>();
 				for (JPPFTask task: tasks)
 				{
 					task.setDataProvider(job.getDataProvider());
-					futures.add(threadPool.submit(new TaskWrapper(task)));
+					futures.add(threadPool.submit(new TaskWrapper(task), task));
 				}
-				for (Future<?> f: futures) f.get();
-				int n = futures.size();
-				if (debugEnabled) log.debug("received " + n + " tasks from local executor" + (n > 0 ? ", first position=" + tasks.get(0).getPosition() : ""));
-				if (job.getResultListener() != null)
+				int count = 0;
+				List<JPPFTask> results = new LinkedList<JPPFTask>();
+				while (!futures.isEmpty())
 				{
-					synchronized(job.getResultListener())
+					Future<JPPFTask> f = futures.peek();
+					while ((f != null) && f.isDone() &&
+						((count == 0) || ((System.nanoTime() - start < accTimeNanos) && (count < accSize))))
 					{
-						job.getResultListener().resultsReceived(new TaskResultEvent(tasks));
+						results.add(futures.poll().get());
+						count++;
+						f = futures.peek();
 					}
+					if (count > 0)
+					{
+						if (debugEnabled) log.debug("received " + count + " tasks from local executor" + ", first position=" + results.get(0).getPosition());
+						TaskResultListener listener = job.getResultListener();
+						if (listener != null)
+						{
+							synchronized(listener)
+							{
+								listener.resultsReceived(new TaskResultEvent(results));
+							}
+						}
+						double elapsed = System.nanoTime() - start;
+						bundlers[LOCAL].feedback(count, elapsed);
+						start = System.nanoTime();
+						results.clear();
+						count = 0;
+					}
+					else if (f != null) f.get();
 				}
-				double elapsed = System.currentTimeMillis() - start;
-				bundlers[LOCAL].feedback(tasks.size(), elapsed);
 			}
 			catch(Exception e)
 			{
@@ -304,6 +325,42 @@ public class LoadBalancer
 			{
 				setLocallyExecuting(false);
 			}
+		}
+
+		/**
+		 * Retrieve the accumulation time and convert it to nanoseconds.
+		 * @return the accumulation time in nanoseconods.
+		 */
+		private long getAccTime()
+		{
+			long time = JPPFConfiguration.getProperties().getLong("jppf.local.execution.accumulation.time", Long.MAX_VALUE);
+			char unitChar = JPPFConfiguration.getProperties().getChar("jppf.local.execution.accumulation.time.unit", 'n');
+			TimeUnit unit;
+			switch(unitChar)
+			{
+				case 'n':
+					unit = TimeUnit.NANOSECONDS;
+					break;
+				case 'm':
+					unit = TimeUnit.MILLISECONDS;
+					break;
+				case 's':
+					unit = TimeUnit.SECONDS;
+					break;
+				case 'M':
+					unit = TimeUnit.MINUTES;
+					break;
+				case 'h':
+					unit = TimeUnit.HOURS;
+					break;
+				case 'd':
+					unit = TimeUnit.DAYS;
+					break;
+				default:
+					unit = TimeUnit.NANOSECONDS;
+					break;
+			}
+			return unit.toNanos(time);
 		}
 	}
 
