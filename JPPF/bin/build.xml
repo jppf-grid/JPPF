@@ -76,6 +76,8 @@
 		<pathelement location="${demo}/classes"/>
 		<pathelement location="${jca-client}/classes"/>
 		<pathelement location="${samples-pack}/DataEncryption/classes"/>
+		<pathelement location="${samples-pack}/shared/lib/commons-pool-1.5.2.jar"/>
+		<pathelement location="${samples-pack}/shared/lib/commons-dbcp-1.4.jar"/>
 		<fileset dir="${lib}">
 			<include name="**/*.jar"/>
 		</fileset>
