@@ -38,39 +38,23 @@ public class JPPFStats implements Serializable
 	/**
 	 * Time statistics for the tasks execution, including network transport time and node execution time.
 	 */
-	private TimeSnapshot execution = new TimeSnapshot("execution");
+	private StatsSnapshot execution = new StatsSnapshot("execution");
 	/**
 	 * Time statistics for the tasks execution within the nodes only.
 	 */
-	private TimeSnapshot nodeExecution = new TimeSnapshot("node execution");
+	private StatsSnapshot nodeExecution = new StatsSnapshot("node execution");
 	/**
 	 * Time statistics for the tasks network transport time between the nodes and server.
 	 */
-	private TimeSnapshot transport = new TimeSnapshot("transport");
+	private StatsSnapshot transport = new StatsSnapshot("transport");
 	/**
 	 * Time statistics for the tasks management overhead within the server.
 	 */
-	private TimeSnapshot server = new TimeSnapshot("server");
+	private StatsSnapshot server = new StatsSnapshot("server");
 	/**
 	 * Total footprint of all the data that was sent to the nodes.
 	 */
 	private long footprint = 0L;
-	/**
-	 * Time statistics for the queued tasks.
-	 */
-	//private TimeSnapshot queue = new TimeSnapshot("queue");
-	/**
-	 * Total number of tasks that have been queued.
-	 */
-	//private int totalQueued = 0;
-	/**
-	 * The current size of the queue.
-	 */
-	//private int queueSize = 0;
-	/**
-	 * The maximum size of the queue.
-	 */
-	//private int maxQueueSize = 0;
 	/**
 	 * Statistics for the tasks in queue.
 	 */
@@ -79,6 +63,10 @@ public class JPPFStats implements Serializable
 	 * Statistics for the jobs in queue.
 	 */
 	private QueueStats jobQueue = new QueueStats("job");
+	/**
+	 * Statistics for jobs execution times.
+	 */
+	private StatsSnapshot jobTimes = new StatsSnapshot("job execution");
 	/**
 	 * The current number of nodes connected to the server.
 	 */
@@ -172,7 +160,7 @@ public class JPPFStats implements Serializable
 	 * Set the time statistics for the tasks execution, including network transport and node execution time.
 	 * @param execution - a <code>TimeSnapshot</code> instance.
 	 */
-	public void setExecution(TimeSnapshot execution)
+	public void setExecution(StatsSnapshot execution)
 	{
 		this.execution = execution;
 	}
@@ -181,7 +169,7 @@ public class JPPFStats implements Serializable
 	 * Get the time statistics for the tasks execution, including network transport and node execution time.
 	 * @return a <code>TimeSnapshot</code> instance.
 	 */
-	public TimeSnapshot getExecution()
+	public StatsSnapshot getExecution()
 	{
 		return execution;
 	}
@@ -190,7 +178,7 @@ public class JPPFStats implements Serializable
 	 * Set the time statistics for execution within the nodes.
 	 * @param nodeExecution - a <code>TimeSnapshot</code> instance.
 	 */
-	public void setNodeExecution(TimeSnapshot nodeExecution)
+	public void setNodeExecution(StatsSnapshot nodeExecution)
 	{
 		this.nodeExecution = nodeExecution;
 	}
@@ -199,7 +187,7 @@ public class JPPFStats implements Serializable
 	 * Get the time statistics for execution within the nodes.
 	 * @return a <code>TimeSnapshot</code> instance.
 	 */
-	public TimeSnapshot getNodeExecution()
+	public StatsSnapshot getNodeExecution()
 	{
 		return nodeExecution;
 	}
@@ -208,7 +196,7 @@ public class JPPFStats implements Serializable
 	 * Set the time statistics for the network transport between nodes and server.
 	 * @param transport - a <code>TimeSnapshot</code> instance.
 	 */
-	public void setTransport(TimeSnapshot transport)
+	public void setTransport(StatsSnapshot transport)
 	{
 		this.transport = transport;
 	}
@@ -217,7 +205,7 @@ public class JPPFStats implements Serializable
 	 * Get the time statistics for the network transport between nodes and server.
 	 * @return a <code>TimeSnapshot</code> instance.
 	 */
-	public TimeSnapshot getTransport()
+	public StatsSnapshot getTransport()
 	{
 		return transport;
 	}
@@ -226,7 +214,7 @@ public class JPPFStats implements Serializable
 	 * Set the time statistics for the server overhead.
 	 * @param server - a <code>TimeSnapshot</code> instance.
 	 */
-	public void setServer(TimeSnapshot server)
+	public void setServer(StatsSnapshot server)
 	{
 		this.server = server;
 	}
@@ -235,7 +223,7 @@ public class JPPFStats implements Serializable
 	 * Get the time statistics for the server overhead.
 	 * @return a <code>TimeSnapshot</code> instance.
 	 */
-	public TimeSnapshot getServer()
+	public StatsSnapshot getServer()
 	{
 		return server;
 	}
@@ -336,21 +324,13 @@ public class JPPFStats implements Serializable
 	public synchronized void reset()
 	{
 		totalTasksExecuted = 0;
-		execution = new TimeSnapshot("execution");
-		nodeExecution = new TimeSnapshot("node execution");
-		transport = new TimeSnapshot("transport");
-		server = new TimeSnapshot("server");
+		execution = new StatsSnapshot("execution");
+		nodeExecution = new StatsSnapshot("node execution");
+		transport = new StatsSnapshot("transport");
+		server = new StatsSnapshot("server");
 		footprint = 0L;
 		taskQueue = new QueueStats("task");
 		jobQueue = new QueueStats("job");
-		/*
-		queue = new TimeSnapshot("queue");
-		totalQueued = 0;
-		queueSize = 0;
-		maxQueueSize = 0;
-		*/
-		//nbNodes = 0;
-		//nbClients = 0;
 		maxNodes = nbNodes;
 		maxClients = nbClients;
 	}

@@ -44,30 +44,12 @@ public final class StatsFormatter implements StatsConstants
 	 * Formatter for floating point values.
 	 */
 	private static NumberFormat doubleFormatter = initDoubleFormatter();
-	/**
-	 * Formatter for floating point values.
-	 */
-	private static NumberFormat smallDoubleFormatter = initSmallDoubleFormatter();
 
 	/**
 	 * Instantiation of this class is not allowed.
 	 */
 	private StatsFormatter()
 	{
-	}
-
-	/**
-	 * Initialize the formatter for double values.
-	 * @return a <code>NumberFormat</code> instance.
-	 */
-	private static NumberFormat initSmallDoubleFormatter()
-	{
-		NumberFormat doubleFormatter = NumberFormat.getInstance();
-		doubleFormatter.setGroupingUsed(true);
-		doubleFormatter.setMinimumFractionDigits(2);
-		doubleFormatter.setMaximumFractionDigits(10);
-		doubleFormatter.setMinimumIntegerDigits(1);
-		return doubleFormatter;
 	}
 
 	/**
@@ -107,35 +89,30 @@ public final class StatsFormatter implements StatsConstants
 	{
 		Map<Fields, String> stringValueMap = new HashMap<Fields, String>();
 		stringValueMap.put(TOTAL_TASKS_EXECUTED, formatInt(stats.getTotalTasksExecuted()));
-
-		stringValueMap.put(TOTAL_EXECUTION_TIME, formatTime(stats.getExecution().getTotalTime()));
-		stringValueMap.put(LATEST_EXECUTION_TIME, formatDouble(stats.getExecution().getLatestTime()));
-		String s = (stats.getExecution().getMinTime() == Long.MAX_VALUE) ? "" : formatDouble(stats.getExecution().getMinTime());
-		stringValueMap.put(MIN_EXECUTION_TIME, s);
-		stringValueMap.put(MAX_EXECUTION_TIME, formatDouble(stats.getExecution().getMaxTime()));
-		stringValueMap.put(AVG_EXECUTION_TIME, formatDouble(stats.getExecution().getAvgTime()));
-		stringValueMap.put(TOTAL_NODE_EXECUTION_TIME, formatTime(stats.getNodeExecution().getTotalTime()));
-		stringValueMap.put(LATEST_NODE_EXECUTION_TIME, formatDouble(stats.getNodeExecution().getLatestTime()));
-		s = (stats.getNodeExecution().getMinTime() == Long.MAX_VALUE) ? "" : formatDouble(stats.getNodeExecution().getMinTime());
-		stringValueMap.put(MIN_NODE_EXECUTION_TIME, s);
-		stringValueMap.put(MAX_NODE_EXECUTION_TIME, formatDouble(stats.getNodeExecution().getMaxTime()));
-		stringValueMap.put(AVG_NODE_EXECUTION_TIME, formatDouble(stats.getNodeExecution().getAvgTime()));
-		stringValueMap.put(TOTAL_TRANSPORT_TIME, formatTime(stats.getTransport().getTotalTime()));
-		stringValueMap.put(LATEST_TRANSPORT_TIME, formatDouble(stats.getTransport().getLatestTime()));
-		s = (stats.getTransport().getMinTime() == Long.MAX_VALUE) ? "" : formatDouble(stats.getTransport().getMinTime());
-		stringValueMap.put(MIN_TRANSPORT_TIME, s);
-		stringValueMap.put(MAX_TRANSPORT_TIME, formatDouble(stats.getTransport().getMaxTime()));
-		stringValueMap.put(AVG_TRANSPORT_TIME, formatDouble(stats.getTransport().getAvgTime()));
+		stringValueMap.put(TOTAL_EXECUTION_TIME, formatTime(stats.getExecution().getTotal()));
+		stringValueMap.put(LATEST_EXECUTION_TIME, formatDouble(stats.getExecution().getLatest()));
+		stringValueMap.put(MIN_EXECUTION_TIME, formatDouble(stats.getExecution().getMin()));
+		stringValueMap.put(MAX_EXECUTION_TIME, formatDouble(stats.getExecution().getMax()));
+		stringValueMap.put(AVG_EXECUTION_TIME, formatDouble(stats.getExecution().getAvg()));
+		stringValueMap.put(TOTAL_NODE_EXECUTION_TIME, formatTime(stats.getNodeExecution().getTotal()));
+		stringValueMap.put(LATEST_NODE_EXECUTION_TIME, formatDouble(stats.getNodeExecution().getLatest()));
+		stringValueMap.put(MIN_NODE_EXECUTION_TIME, formatDouble(stats.getNodeExecution().getMin()));
+		stringValueMap.put(MAX_NODE_EXECUTION_TIME, formatDouble(stats.getNodeExecution().getMax()));
+		stringValueMap.put(AVG_NODE_EXECUTION_TIME, formatDouble(stats.getNodeExecution().getAvg()));
+		stringValueMap.put(TOTAL_TRANSPORT_TIME, formatTime(stats.getTransport().getTotal()));
+		stringValueMap.put(LATEST_TRANSPORT_TIME, formatDouble(stats.getTransport().getLatest()));
+		stringValueMap.put(MIN_TRANSPORT_TIME, formatDouble(stats.getTransport().getMin()));
+		stringValueMap.put(MAX_TRANSPORT_TIME, formatDouble(stats.getTransport().getMax()));
+		stringValueMap.put(AVG_TRANSPORT_TIME, formatDouble(stats.getTransport().getAvg()));
 		QueueStats queue = stats.getTaskQueue();
-		stringValueMap.put(LATEST_QUEUE_TIME, formatDouble(queue.getTimes().getLatestTime()));
-		stringValueMap.put(TOTAL_QUEUE_TIME, formatTime(queue.getTimes().getTotalTime()));
-		s = (queue.getTimes().getMinTime() == Long.MAX_VALUE) ? "" : formatDouble(queue.getTimes().getMinTime());
-		stringValueMap.put(MIN_QUEUE_TIME, s);
-		stringValueMap.put(MAX_QUEUE_TIME, formatDouble(queue.getTimes().getMaxTime()));
-		stringValueMap.put(AVG_QUEUE_TIME, formatDouble(queue.getTimes().getAvgTime()));
-		stringValueMap.put(TOTAL_QUEUED, formatInt(queue.getTotalQueued()));
-		stringValueMap.put(QUEUE_SIZE, formatInt(queue.getQueueSize()));
-		stringValueMap.put(MAX_QUEUE_SIZE, formatInt(queue.getMaxQueueSize()));
+		stringValueMap.put(LATEST_QUEUE_TIME, formatDouble(queue.getTimes().getLatest()));
+		stringValueMap.put(TOTAL_QUEUE_TIME, formatTime(queue.getTimes().getTotal()));
+		stringValueMap.put(MIN_QUEUE_TIME, formatDouble(queue.getTimes().getMin()));
+		stringValueMap.put(MAX_QUEUE_TIME, formatDouble(queue.getTimes().getMax()));
+		stringValueMap.put(AVG_QUEUE_TIME, formatDouble(queue.getTimes().getAvg()));
+		stringValueMap.put(TOTAL_QUEUED, formatInt(queue.getSizes().getTotal()));
+		stringValueMap.put(QUEUE_SIZE, formatInt(queue.getSizes().getLatest()));
+		stringValueMap.put(MAX_QUEUE_SIZE, formatInt(queue.getSizes().getMax()));
 		stringValueMap.put(NB_NODES, formatInt(stats.getNbNodes()));
 		stringValueMap.put(MAX_NODES, formatInt(stats.getMaxNodes()));
 		stringValueMap.put(NB_CLIENTS, formatInt(stats.getNbClients()));
@@ -152,31 +129,30 @@ public final class StatsFormatter implements StatsConstants
 	{
 		Map<Fields, Double> doubleValueMap = new HashMap<Fields, Double>();
 		doubleValueMap.put(TOTAL_TASKS_EXECUTED, (double) stats.getTotalTasksExecuted());
-
-		doubleValueMap.put(TOTAL_EXECUTION_TIME, (double) stats.getExecution().getTotalTime());
-		doubleValueMap.put(LATEST_EXECUTION_TIME, (double) stats.getExecution().getLatestTime());
-		doubleValueMap.put(MIN_EXECUTION_TIME, (double) (stats.getExecution().getMinTime() == Long.MAX_VALUE ? 0L : stats.getExecution().getMinTime()));
-		doubleValueMap.put(MAX_EXECUTION_TIME, (double) stats.getExecution().getMaxTime());
-		doubleValueMap.put(AVG_EXECUTION_TIME, stats.getExecution().getAvgTime());
-		doubleValueMap.put(TOTAL_NODE_EXECUTION_TIME, (double) stats.getNodeExecution().getTotalTime());
-		doubleValueMap.put(LATEST_NODE_EXECUTION_TIME, (double) stats.getNodeExecution().getLatestTime());
-		doubleValueMap.put(MIN_NODE_EXECUTION_TIME, (double) (stats.getNodeExecution().getMinTime() == Long.MAX_VALUE ? 0L : stats.getNodeExecution().getMinTime()));
-		doubleValueMap.put(MAX_NODE_EXECUTION_TIME, (double) stats.getNodeExecution().getMaxTime());
-		doubleValueMap.put(AVG_NODE_EXECUTION_TIME, stats.getNodeExecution().getAvgTime());
-		doubleValueMap.put(TOTAL_TRANSPORT_TIME, (double) stats.getTransport().getTotalTime());
-		doubleValueMap.put(LATEST_TRANSPORT_TIME, (double) stats.getTransport().getLatestTime());
-		doubleValueMap.put(MIN_TRANSPORT_TIME, (double) (stats.getTransport().getMinTime() == Long.MAX_VALUE ? 0L : stats.getTransport().getMinTime()));
-		doubleValueMap.put(MAX_TRANSPORT_TIME, (double) stats.getTransport().getMaxTime());
-		doubleValueMap.put(AVG_TRANSPORT_TIME, stats.getTransport().getAvgTime());
+		doubleValueMap.put(TOTAL_EXECUTION_TIME, (double) stats.getExecution().getTotal());
+		doubleValueMap.put(LATEST_EXECUTION_TIME, (double) stats.getExecution().getLatest());
+		doubleValueMap.put(MIN_EXECUTION_TIME, (double) (stats.getExecution().getMin() == Long.MAX_VALUE ? 0L : stats.getExecution().getMin()));
+		doubleValueMap.put(MAX_EXECUTION_TIME, (double) stats.getExecution().getMax());
+		doubleValueMap.put(AVG_EXECUTION_TIME, stats.getExecution().getAvg());
+		doubleValueMap.put(TOTAL_NODE_EXECUTION_TIME, (double) stats.getNodeExecution().getTotal());
+		doubleValueMap.put(LATEST_NODE_EXECUTION_TIME, (double) stats.getNodeExecution().getLatest());
+		doubleValueMap.put(MIN_NODE_EXECUTION_TIME, (double) (stats.getNodeExecution().getMin() == Long.MAX_VALUE ? 0L : stats.getNodeExecution().getMin()));
+		doubleValueMap.put(MAX_NODE_EXECUTION_TIME, (double) stats.getNodeExecution().getMax());
+		doubleValueMap.put(AVG_NODE_EXECUTION_TIME, stats.getNodeExecution().getAvg());
+		doubleValueMap.put(TOTAL_TRANSPORT_TIME, (double) stats.getTransport().getTotal());
+		doubleValueMap.put(LATEST_TRANSPORT_TIME, (double) stats.getTransport().getLatest());
+		doubleValueMap.put(MIN_TRANSPORT_TIME, (double) (stats.getTransport().getMin() == Long.MAX_VALUE ? 0L : stats.getTransport().getMin()));
+		doubleValueMap.put(MAX_TRANSPORT_TIME, (double) stats.getTransport().getMax());
+		doubleValueMap.put(AVG_TRANSPORT_TIME, stats.getTransport().getAvg());
 		QueueStats queue = stats.getTaskQueue();
-		doubleValueMap.put(LATEST_QUEUE_TIME, (double) queue.getTimes().getLatestTime());
-		doubleValueMap.put(TOTAL_QUEUE_TIME, (double) queue.getTimes().getTotalTime());
-		doubleValueMap.put(MIN_QUEUE_TIME, (double) (queue.getTimes().getMinTime() == Long.MAX_VALUE ? 0L : queue.getTimes().getMinTime()));
-		doubleValueMap.put(MAX_QUEUE_TIME, (double) queue.getTimes().getMaxTime());
-		doubleValueMap.put(AVG_QUEUE_TIME, queue.getTimes().getAvgTime());
-		doubleValueMap.put(TOTAL_QUEUED, (double) queue.getTotalQueued());
-		doubleValueMap.put(QUEUE_SIZE, (double) queue.getQueueSize());
-		doubleValueMap.put(MAX_QUEUE_SIZE, (double) queue.getMaxQueueSize());
+		doubleValueMap.put(LATEST_QUEUE_TIME, (double) queue.getTimes().getLatest());
+		doubleValueMap.put(TOTAL_QUEUE_TIME, (double) queue.getTimes().getTotal());
+		doubleValueMap.put(MIN_QUEUE_TIME, (double) (queue.getTimes().getMin() == Long.MAX_VALUE ? 0L : queue.getTimes().getMin()));
+		doubleValueMap.put(MAX_QUEUE_TIME, (double) queue.getTimes().getMax());
+		doubleValueMap.put(AVG_QUEUE_TIME, queue.getTimes().getAvg());
+		doubleValueMap.put(TOTAL_QUEUED, (double) queue.getSizes().getTotal());
+		doubleValueMap.put(QUEUE_SIZE, (double) queue.getSizes().getLatest());
+		doubleValueMap.put(MAX_QUEUE_SIZE, (double) queue.getSizes().getMax());
 		doubleValueMap.put(NB_NODES, (double) stats.getNbNodes());
 		doubleValueMap.put(MAX_NODES, (double) stats.getMaxNodes());
 		doubleValueMap.put(NB_CLIENTS, (double) stats.getNbClients());
@@ -209,9 +185,9 @@ public final class StatsFormatter implements StatsConstants
 	 * @param value the value to format.
 	 * @return the formatted value as a string.
 	 */
-	protected static String formatSmallDouble(double value)
+	private static String formatDouble(long value)
 	{
-		return smallDoubleFormatter.format(value);
+		return (value == Long.MAX_VALUE) ? "" : doubleFormatter.format(value);
 	}
 	
 	/**

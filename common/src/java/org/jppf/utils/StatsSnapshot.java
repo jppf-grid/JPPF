@@ -22,7 +22,7 @@ import java.io.Serializable;
 /**
  * Convenience class for collecting time statistics.
  */
-public class TimeSnapshot implements Serializable
+public class StatsSnapshot implements Serializable
 {
 	/**
 	 * Explicit serialVersionUID.
@@ -35,29 +35,36 @@ public class TimeSnapshot implements Serializable
 	/**
 	 * The total cumulated time.
 	 */
-	private long totalTime = 0L;
+	private long total = 0L;
 	/**
 	 * The most recent time.
 	 */
-	private long latestTime = 0L;
+	private long latest = 0L;
 	/**
 	 * The minimum time.
 	 */
-	private long minTime = Long.MAX_VALUE;
+	private long min = Long.MAX_VALUE;
 	/**
 	 * The maximum task execution time.
 	 */
-	private long maxTime = 0L;
+	private long max = 0L;
 	/**
 	 * The average time.
 	 */
-	private double avgTime = 0d;
+	private double avg = 0d;
 	
+	/**
+	 * Initialize this time snapshot with a blank title.
+	 */
+	public StatsSnapshot()
+	{
+	}
+
 	/**
 	 * Initialize this time snapshot with a specified title.
 	 * @param title the title for this snapshot.
 	 */
-	public TimeSnapshot(String title)
+	public StatsSnapshot(String title)
 	{
 		this.title = title;
 	}
@@ -68,15 +75,15 @@ public class TimeSnapshot implements Serializable
 	 * @param count the unit count to which the time applies.
 	 * @param totalCount the total unit count to which the time applies.
 	 */
-	public void newTime(long time, int count, int totalCount)
+	public void newValues(long time, long count, long totalCount)
 	{
-		totalTime += time;
+		total += time;
 		if (count > 0)
 		{
-			latestTime = time/count;
-			if (latestTime > maxTime) maxTime = latestTime;
-			if (latestTime < minTime) minTime = latestTime;
-			if (totalCount > 0) avgTime = (double) totalTime / (double) totalCount;
+			latest = time/count;
+			if (latest > max) max = latest;
+			if (latest < min) min = latest;
+			if (totalCount > 0) avg = (double) total / (double) totalCount;
 		}
 	}
 	
@@ -84,14 +91,14 @@ public class TimeSnapshot implements Serializable
 	 * Make a copy of this time snapshot object.
 	 * @return a <code>TimeSnapshot</code> instance.
 	 */
-	public TimeSnapshot makeCopy()
+	public StatsSnapshot makeCopy()
 	{
-		TimeSnapshot ts = new TimeSnapshot(title);
-		ts.totalTime = totalTime;
-		ts.latestTime = latestTime;
-		ts.minTime = minTime;
-		ts.maxTime = maxTime;
-		ts.avgTime = avgTime;
+		StatsSnapshot ts = new StatsSnapshot(title);
+		ts.total = total;
+		ts.latest = latest;
+		ts.min = min;
+		ts.max = max;
+		ts.avg = avg;
 		return ts;
 	}
 
@@ -103,101 +110,101 @@ public class TimeSnapshot implements Serializable
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(title).append(" total time : ").append(totalTime).append("\n");
-		sb.append(title).append(" latest time : ").append(latestTime).append("\n");
-		sb.append(title).append(" min time : ").append(minTime).append("\n");
-		sb.append(title).append(" max time : ").append(maxTime).append("\n");
-		sb.append(title).append(" avg time : ").append(avgTime).append("\n");
+		sb.append(title).append(" total time : ").append(total).append("\n");
+		sb.append(title).append(" latest time : ").append(latest).append("\n");
+		sb.append(title).append(" min time : ").append(min).append("\n");
+		sb.append(title).append(" max time : ").append(max).append("\n");
+		sb.append(title).append(" avg time : ").append(avg).append("\n");
 		return sb.toString();
 	}
 
 	/**
 	 * Set the total cumulated time.
-	 * @param totalTime - the total time as a long value.
+	 * @param total the total time as a long value.
 	 */
-	public void setTotalTime(long totalTime)
+	public void setTotal(long total)
 	{
-		this.totalTime = totalTime;
+		this.total = total;
 	}
 
 	/**
 	 * Get the total cumulated time.
 	 * @return the total time as a long value.
 	 */
-	public long getTotalTime()
+	public long getTotal()
 	{
-		return totalTime;
+		return total;
 	}
 
 	/**
 	 * Set the most recent time observed.
-	 * @param latestTime - the most recent time as a long value.
+	 * @param latest the most recent time as a long value.
 	 */
-	public void setLatestTime(long latestTime)
+	public void setLatest(long latest)
 	{
-		this.latestTime = latestTime;
+		this.latest = latest;
 	}
 
 	/**
 	 * Get the minimum time observed.
 	 * @return the minimum time as a long value.
 	 */
-	public long getLatestTime()
+	public long getLatest()
 	{
-		return latestTime;
+		return latest;
 	}
 
 	/**
 	 * Set the smallest time observed.
-	 * @param minTime - the minimum time as a long value.
+	 * @param min the minimum time as a long value.
 	 */
-	public void setMinTime(long minTime)
+	public void setMin(long min)
 	{
-		this.minTime = minTime;
+		this.min = min;
 	}
 
 	/**
 	 * Get the smallest time observed.
 	 * @return the minimum time as a long value.
 	 */
-	public long getMinTime()
+	public long getMin()
 	{
-		return minTime;
+		return min;
 	}
 
 	/**
 	 * Set the peak time.
-	 * @param maxTime - the maximum time as a long value.
+	 * @param max the maximum time as a long value.
 	 */
-	public void setMaxTime(long maxTime)
+	public void setMax(long max)
 	{
-		this.maxTime = maxTime;
+		this.max = max;
 	}
 
 	/**
 	 * Get the peak time.
 	 * @return the maximum time as a long value.
 	 */
-	public long getMaxTime()
+	public long getMax()
 	{
-		return maxTime;
+		return max;
 	}
 
 	/**
 	 * Set the average time.
-	 * @param avgTime - the average time as a double value.
+	 * @param avg the average time as a double value.
 	 */
-	public void setAvgTime(double avgTime)
+	public void setAvg(double avg)
 	{
-		this.avgTime = avgTime;
+		this.avg = avg;
 	}
 
 	/**
 	 * Get the average time.
 	 * @return the average time as a double value.
 	 */
-	public double getAvgTime()
+	public double getAvg()
 	{
-		return avgTime;
+		return avg;
 	}
 }

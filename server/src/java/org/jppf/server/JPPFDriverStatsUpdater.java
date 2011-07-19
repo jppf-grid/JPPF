@@ -17,7 +17,7 @@
  */
 package org.jppf.server;
 
-import org.jppf.utils.QueueStats;
+import org.jppf.utils.*;
 
 
 /**
@@ -72,8 +72,10 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	public synchronized void taskInQueue(int count)
 	{
 		QueueStats queue = stats.getTaskQueue();
-		queue.setQueueSize(queue.getQueueSize() + count);
-		if (queue.getQueueSize() > queue.getMaxQueueSize()) queue.setMaxQueueSize(queue.getQueueSize());
+		StatsSnapshot sizes = queue.getSizes();
+		//queue.setQueueSize(queue.getQueueSize() + count);
+		sizes.setLatest(sizes.getLatest() + count);
+		if (sizes.getLatest() > sizes.getMax()) sizes.setMax(sizes.getLatest());
 	}
 
 	/**
@@ -84,9 +86,12 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	public synchronized void taskOutOfQueue(int count, long time)
 	{
 		QueueStats queue = stats.getTaskQueue();
-		queue.setQueueSize(queue.getQueueSize() - count);
-		queue.setTotalQueued(queue.getTotalQueued() + count);
-		queue.getTimes().newTime(time, count, queue.getTotalQueued());
+		StatsSnapshot sizes = queue.getSizes();
+		//queue.setQueueSize(queue.getQueueSize() - count);
+		sizes.setLatest(sizes.getLatest() - count);
+		//queue.setTotalQueued(queue.getTotalQueued() + count);
+		sizes.setTotal(sizes.getTotal() + count);
+		queue.getTimes().newValues(time, count, sizes.getTotal());
 	}
 	
 	/**
@@ -99,9 +104,9 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	public synchronized void taskExecuted(int count, long time, long remoteTime, long size)
 	{
 		stats.setTotalTasksExecuted(stats.getTotalTasksExecuted() + count);
-		stats.getExecution().newTime(time, count, stats.getTotalTasksExecuted());
-		stats.getNodeExecution().newTime(remoteTime, count, stats.getTotalTasksExecuted());
-		stats.getTransport().newTime(time - remoteTime, count, stats.getTotalTasksExecuted());
+		stats.getExecution().newValues(time, count, stats.getTotalTasksExecuted());
+		stats.getNodeExecution().newValues(remoteTime, count, stats.getTotalTasksExecuted());
+		stats.getTransport().newValues(time - remoteTime, count, stats.getTotalTasksExecuted());
 		stats.setFootprint(stats.getFootprint() + size);
 	}
 

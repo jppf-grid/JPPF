@@ -31,21 +31,13 @@ public class QueueStats implements Serializable
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
-	 * Total number of objects that have been queued.
+	 * Time statistics for the queued objects.
 	 */
-	private int totalQueued = 0;
-	/**
-	 * The current size of the queue.
-	 */
-	private int queueSize = 0;
-	/**
-	 * The maximum size of the queue.
-	 */
-	private int maxQueueSize = 0;
+	private StatsSnapshot times = new StatsSnapshot("time");
 	/**
 	 * Time statistics for the queued objects.
 	 */
-	private TimeSnapshot times = new TimeSnapshot("queue");
+	private StatsSnapshot sizes = new StatsSnapshot("size");
 	/**
 	 * Title for this queue snapshot, used in the {@link #toString()} method.
 	 */
@@ -58,77 +50,41 @@ public class QueueStats implements Serializable
 	public QueueStats(String title)
 	{
 		this.title = title;
-		times = new TimeSnapshot(title);
-	}
-
-	/**
-	 * Get the total number of objects that have been queued.
-	 * @return the number of objects as an int.
-	 */
-	public int getTotalQueued()
-	{
-		return totalQueued;
-	}
-
-	/**
-	 * Set the total number of objects that have been queued.
-	 * @param totalQueued the number of objects as an int.
-	 */
-	public void setTotalQueued(int totalQueued)
-	{
-		this.totalQueued = totalQueued;
-	}
-
-	/**
-	 * Get the current size of the queue.
-	 * @return the queue size as an int. 
-	 */
-	public int getQueueSize()
-	{
-		return queueSize;
-	}
-
-	/**
-	 * Set the current size of the queue.
-	 * @param queueSize the queue size as an int.
-	 */
-	public void setQueueSize(int queueSize)
-	{
-		this.queueSize = queueSize;
-	}
-
-	/**
-	 * Get the maximum size of the queue.
-	 * @return the maximum queue size as an int. 
-	 */
-	public int getMaxQueueSize()
-	{
-		return maxQueueSize;
-	}
-
-	/**
-	 * Set the maximum size of the queue.
-	 * @param maxQueueSize the maximum queue size as an int.
-	 */
-	public void setMaxQueueSize(int maxQueueSize)
-	{
-		this.maxQueueSize = maxQueueSize;
+		times = new StatsSnapshot(title);
 	}
 
 	/**
 	 * Get the time snapshot.
-	 * @return a {@link TimeSnapshot} instance.
+	 * @return a {@link StatsSnapshot} instance.
 	 */
-	public TimeSnapshot getTimes()
+	public StatsSnapshot getTimes()
 	{
 		return times;
 	}
 
 	/**
 	 * Set the time snapshot.
-	 * @param times a {@link TimeSnapshot} instance.
+	 * @param sizes a {@link StatsSnapshot} instance.
 	 */
-	public void setTimes(TimeSnapshot times)
+	public void setSizes(StatsSnapshot sizes)
+	{
+		this.sizes = sizes;
+	}
+
+	/**
+	 * Get the time snapshot.
+	 * @return a {@link StatsSnapshot} instance.
+	 */
+	public StatsSnapshot getSizes()
+	{
+		return sizes;
+	}
+
+	/**
+	 * Set the time snapshot.
+	 * @param times a {@link StatsSnapshot} instance.
+	 */
+	public void setTimes(StatsSnapshot times)
 	{
 		this.times = times;
 	}
@@ -149,9 +105,7 @@ public class QueueStats implements Serializable
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(title).append(" queue");
-		sb.append("queueSize : ").append(queueSize).append("\n");
-		sb.append("maxQueueSize : ").append(maxQueueSize).append("\n");
-		sb.append("totalQueued : ").append(totalQueued).append("\n");
+		sb.append(sizes.toString());
 		sb.append(times.toString());
 		return sb.toString();
 	}
@@ -163,9 +117,7 @@ public class QueueStats implements Serializable
 	public QueueStats makeCopy()
 	{
 		QueueStats qs = new QueueStats(title);
-		qs.setQueueSize(queueSize);
-		qs.setMaxQueueSize(maxQueueSize);
-		qs.setTotalQueued(totalQueued);
+		qs.setSizes(sizes.makeCopy());
 		qs.setTimes(times.makeCopy());
 		return qs;
 	}

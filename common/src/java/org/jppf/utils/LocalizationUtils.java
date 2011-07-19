@@ -68,8 +68,7 @@ public final class LocalizationUtils
 		}
 		catch (Exception e)
 		{
-			log.debug("Could not find resource bundle \""+baseName+"\"");
-			if (log.isDebugEnabled()) log.debug(e.getMessage(), e);
+			if (log.isDebugEnabled()) log.debug("Could not find resource bundle \""+baseName+"\"", e);
 			return def;
 		}
 		String result = null;
@@ -79,8 +78,7 @@ public final class LocalizationUtils
 		}
 		catch (Exception e)
 		{
-			log.debug("Could not find key \""+key+"\" in resource bundle \""+baseName+"\"");
-			if (log.isDebugEnabled()) log.debug(e.getMessage(), e);
+			if (log.isDebugEnabled()) log.debug("Could not find key \""+key+"\" in resource bundle \""+baseName+"\"", e);
 		}
 		return result == null ? def : result;
 	}
