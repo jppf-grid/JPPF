@@ -23,7 +23,6 @@ import java.net.*;
 import java.rmi.registry.*;
 import java.util.*;
 
-import javax.management.MBeanServer;
 import javax.management.remote.*;
 
 import org.jppf.utils.*;
@@ -34,7 +33,7 @@ import org.slf4j.*;
  * It is used essentially to hide the details of the remote management protocol used.
  * @author Laurent Cohen
  */
-public class JMXServerImpl
+public class JMXServerImpl extends AbstractJMXServer
 {
 	/**
 	 * Logger for this class.
@@ -48,22 +47,6 @@ public class JMXServerImpl
 	 * Reference to the embedded RMI registry.
 	 */
 	private static Registry registry = null;
-	/**
-	 * The mbean server.
-	 */
-	private MBeanServer server = null;
-	/**
-	 * The JMX connector server.
-	 */
-	private JMXConnectorServer connectorServer = null;
-	/**
-	 * Determines whether this JMX server is stopped.
-	 */
-	private boolean stopped = true;
-	/**
-	 * This server's unique id.
-	 */
-	private final String id;
 	/**
 	 * Used to distinguish between driver and node RMI registries.
 	 */
@@ -145,34 +128,6 @@ public class JMXServerImpl
 	}
 
 	/**
-	 * Stop the MBean server and associated resources.
-	 * @throws Exception if an error occurs when stopping the server or one of its components. 
-	 */
-	public void stop() throws Exception
-	{
-		stopped = true;
-    connectorServer.stop();
-	}
-
-	/**
-	 * Get a reference to the MBean server.
-	 * @return an <code>MBeanServer</code> instance.
-	 */
-	public MBeanServer getServer()
-	{
-		return server;
-	}
-
-	/**
-	 * Determine whether this JMX server is stopped.
-	 * @return true if this JMX server is stopped, false otherwise.
-	 */
-	public boolean isStopped()
-	{
-		return stopped;
-	}
-
-	/**
 	 * Locate an RMI registry specified by the configuration properties,
 	 * or create an embedded one if it cannot be found.
 	 * @return the port number to which the registry is bound.
@@ -206,15 +161,5 @@ public class JMXServerImpl
     }
     props.setProperty("jppf.management.port", "" + port);
 		return port;
-	}
-
-	/**
-	 * Get a unique identifier for this management server. This id must be unique accross JPPF nodes and servers,
-	 * and is used to identify this server if multiple nodes or servers share the same RMI registry.
-	 * @return the id as a string.
-	 */
-	public String getId()
-	{
-		return id;
 	}
 }

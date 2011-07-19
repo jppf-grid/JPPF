@@ -69,7 +69,7 @@ public class DriverInitializer
 	/**
 	 * The jmx server used to manage and monitor this driver.
 	 */
-	private JMXServerImpl jmxServer = null;
+	private JMXServer jmxServer = null;
 	/**
 	 * The object that collects debug information.
 	 */
@@ -227,7 +227,7 @@ public class DriverInitializer
 		{
 			if (debugEnabled) log.debug("starting peers discovery");
 			peerDiscoveryThread = new PeerDiscoveryThread();
-			new Thread(peerDiscoveryThread).start();
+			new Thread(peerDiscoveryThread, "PeerDiscoveryThread").start();
 		}
 		else
 		{
@@ -264,7 +264,7 @@ public class DriverInitializer
 	 * Get the jmx server used to manage and monitor this driver.
 	 * @return a <code>JMXServerImpl</code> instance.
 	 */
-	public synchronized JMXServerImpl getJmxServer()
+	public synchronized JMXServer getJmxServer()
 	{
 		return jmxServer;
 	}
@@ -279,7 +279,9 @@ public class DriverInitializer
 		{
 			if (config.getBoolean("jppf.management.enabled", true))
 			{
-				jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX, driver.getUuid());
+				//jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX, driver.getUuid());
+				//jmxServer = new JMXMPServer(driver.getUuid());
+				jmxServer = JMXServerFactory.createServer(driver.getUuid(), JPPFAdminMBean.DRIVER_SUFFIX);
 				jmxServer.start(getClass().getClassLoader());
 				info.managementPort = JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198);
 				registerProviderMBeans();

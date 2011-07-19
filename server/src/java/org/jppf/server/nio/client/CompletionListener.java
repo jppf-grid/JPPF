@@ -56,6 +56,7 @@ public class CompletionListener implements TaskCompletionListener
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	public void taskCompleted(BundleWrapper result)
 	{
 		context.offerCompletedBundle(result);

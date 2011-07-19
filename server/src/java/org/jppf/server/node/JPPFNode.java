@@ -70,7 +70,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	/**
 	 * The jmx server that handles administration and monitoring functions for this node.
 	 */
-	private static JMXServerImpl jmxServer = null;
+	private static JMXServer jmxServer = null;
 	/**
 	 * Manager for the MBean defined through the service provider interface.
 	 */
@@ -241,7 +241,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 		initHelper();
 		if (isJmxEnabled())
 		{
-			JMXServerImpl jmxServer = null;
+			JMXServer jmxServer = null;
 			try
 			{
 				jmxServer = getJmxServer();
@@ -457,13 +457,15 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 * @return a <code>JMXServerImpl</code> instance.
 	 * @throws Exception if any error occurs.
 	 */
-	public JMXServerImpl getJmxServer() throws Exception
+	public JMXServer getJmxServer() throws Exception
 	{
 		synchronized(this)
 		{
 			if ((jmxServer == null) || jmxServer.isStopped())
 			{
-				jmxServer = new JMXServerImpl(JPPFAdminMBean.NODE_SUFFIX, NodeRunner.getUuid());
+				//jmxServer = new JMXServerImpl(JPPFAdminMBean.NODE_SUFFIX, NodeRunner.getUuid());
+				//jmxServer = new JMXMPServer(NodeRunner.getUuid());
+				jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), JPPFAdminMBean.NODE_SUFFIX);
 				jmxServer.start(getClass().getClassLoader());
 				registerProviderMBeans();
 				System.out.println("JPPF Node management initialized");

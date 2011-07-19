@@ -62,6 +62,8 @@
 		<package-module module="driver">
 			<module-elements>
 				<zipfileset dir="${config}/node/config" prefix="${driver.prefix}/config" includes="jppf.policy"/>
+				<zipfileset dir="${lib}/jmxremote" prefix="${driver.prefix}/lib" includes="*.jar"/>
+				<zipfileset dir="${lib}/jmxremote" prefix="${driver.prefix}/lib/jmxremote-license" includes="*.html"/>
 				<zipfileset dir="${build}" prefix="${driver.prefix}/lib">
 					<include name="jppf-common.jar"/>
 					<include name="jppf-server.jar"/>
@@ -95,6 +97,8 @@
 					<include name="jppf-client-src.jar"/>
 					<include name="jppf-admin-src.jar"/>
 				</zipfileset>
+				<zipfileset dir="${lib}/jmxremote" prefix="${gui.prefix}/lib" includes="*.jar"/>
+				<zipfileset dir="${lib}/jmxremote" prefix="${gui.prefix}/lib/jmxremote-license" includes="*.html"/>
 				<zipfileset dir="${lib}/JFreeChart" prefix="${gui.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/Rhino" prefix="${gui.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/JGoodies" prefix="${gui.prefix}/lib" includes="*.jar"/>
@@ -134,6 +138,8 @@
 		<property name="template.release.file" value="${build}/${template.prefix}.zip"/>
 		<delete file="${template.release.file}" quiet="true"/>
 		<zip destfile="${template.release.file}">
+			<zipfileset dir="${lib}/jmxremote" prefix="${template.prefix}/lib" includes="*.jar"/>
+			<zipfileset dir="${lib}/jmxremote" prefix="${template.prefix}/lib/jmxremote-license" includes="*.html"/>
 			<zipfileset dir="${application.template}" prefix="${template.prefix}" excludes=".*"/>
 			<zipfileset dir="${build}" prefix="${template.prefix}/lib">
 				<include name="jppf-common-node.jar"/>
