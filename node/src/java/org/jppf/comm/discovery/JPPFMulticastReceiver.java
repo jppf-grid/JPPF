@@ -214,6 +214,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 		 */
 		public Receiver(InetAddress addr, int port)
 		{
+			super("Receiver@" + addr.getHostAddress() + ":" + port);
 			this.addr = addr;
 			this.port = port;
 		}
