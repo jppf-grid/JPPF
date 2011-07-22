@@ -84,14 +84,19 @@ public class JPPFConfiguration
 	private static void loadProperties()
 	{
 		props = new TypedProperties();
+		InputStream is = null;
 		try
 		{
-			InputStream is = getStream();
+			is = getStream();
 			if (is != null) props.load(is);
 		}
 		catch(Exception e)
 		{
 			log.error("error reading the configuration", e);
+		}
+		finally
+		{
+			FileUtils.closeInputStream(is, log);
 		}
 	}
 
