@@ -225,7 +225,7 @@ public class Deserializer
 				case 'B': byte[] barray = new byte[len];       obj = barray; in.read(barray, 0, len); break;
 				case 'S': obj = readShortArray(len); break;
 				case 'I': obj = readIntArray(len); break;
-				case 'J': obj = readIntArray(len); break;
+				case 'J': obj = readLongArray(len); break;
 				case 'F': obj = readFloatArray(len); break;
 				case 'D': obj = readDoubleArray(len); break;
 				case 'C': obj = readCharArray(len); break;
