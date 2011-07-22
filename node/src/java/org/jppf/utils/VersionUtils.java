@@ -20,6 +20,8 @@ package org.jppf.utils;
 import java.io.InputStream;
 import java.net.*;
 
+import org.slf4j.*;
+
 /**
  * This class provides a utility method to determine the JPPF build number available in the class path.<br>
  * It is used for the nodes to determine when their code is outdated, in which case they will automatically reload
@@ -28,6 +30,10 @@ import java.net.*;
  */
 public final class VersionUtils
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(VersionUtils.class);
 	/**
 	 * The current JPPF build number.
 	 */
@@ -52,9 +58,10 @@ public final class VersionUtils
 	{
 		if (buildNumber < 0)
 		{
+			InputStream is = null;
 			try
 			{
-				InputStream is = VersionUtils.class.getClassLoader().getResourceAsStream("build.number");
+				is = VersionUtils.class.getClassLoader().getResourceAsStream("build.number");
 				TypedProperties props = new TypedProperties();
 				props.load(is);
 				buildNumber = props.getInt("build.number");
@@ -62,6 +69,10 @@ public final class VersionUtils
 			catch(Exception ignored)
 			{
 				buildNumber = 0;
+			}
+			finally
+			{
+				FileUtils.closeInputStream(is, log);
 			}
 		}
 		return buildNumber;

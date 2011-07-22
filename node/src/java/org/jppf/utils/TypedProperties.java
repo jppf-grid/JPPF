@@ -22,6 +22,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import org.slf4j.*;
+
 /**
  * Extension of the <code>java.util.Properties</code> class to handle the conversion of
  * string values to other types.
@@ -29,6 +31,11 @@ import java.util.*;
  */
 public class TypedProperties extends Properties
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(TypedProperties.class);
+
 	/**
 	 * Default constructor.
 	 */
@@ -285,13 +292,19 @@ public class TypedProperties extends Properties
 		File file = new File(path);
 		if (!file.exists()) return def;
 		TypedProperties res = new TypedProperties();
+		InputStream is = null;
 		try
 		{
-			res.load(new BufferedInputStream(new FileInputStream(file)));
+			is = new BufferedInputStream(new FileInputStream(file));
+			res.load(is);
 		}
 		catch(IOException e)
 		{
 			return def;
+		}
+		finally
+		{
+			FileUtils.closeInputStream(is, log);
 		}
 		return res;
 	}

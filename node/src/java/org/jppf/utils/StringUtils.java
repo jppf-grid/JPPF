@@ -279,7 +279,7 @@ public final class StringUtils
   		if (prefix != null) sb.append(prefix);
   		for (int i=0; i<array.length; i++)
   		{
-  			if ((i > 0) && (sep == null)) sb.append(sep);
+  			if ((i > 0) && (sep != null)) sb.append(sep);
   			sb.append(array[i]);
   		}
   		if (suffix != null) sb.append(suffix);

@@ -22,6 +22,7 @@ import java.net.*;
 import java.util.*;
 
 import org.jppf.utils.streams.JPPFByteArrayOutputStream;
+import org.slf4j.Logger;
 
 /**
  * This class provides a set of utility methods for reading, writing and manipulating files. 
@@ -478,5 +479,29 @@ public final class FileUtils
 		bais.close();
 		os.flush();
 		os.close();
+	}
+
+	/**
+	 * Attempt to close the specified input stream and log any eventual error.
+	 * @param is the input stream to close.
+	 * @param log the logger to use; if null no logging occurs.
+	 */
+	public static void closeInputStream(InputStream is, Logger log)
+	{
+		if (is != null)
+		{
+			try
+			{
+				is.close();
+			}
+			catch (Exception e)
+			{
+				if (log != null)
+				{
+					if (log.isDebugEnabled()) log.debug("unable to close input stream", e);
+					else log.warn("unable to close input stream: " + e.getClass().getName() + ": " + e.getMessage());
+				}
+			}
+		}
 	}
 }
