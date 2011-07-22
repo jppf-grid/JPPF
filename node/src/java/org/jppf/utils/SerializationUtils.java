@@ -158,10 +158,6 @@ public final class SerializationUtils
 			while (n == 0) n = channel.write(buf);
 			if (n < 0) throw new ClosedChannelException();
 			count += n;
-			/*
-			count += channel.write(buf);
-			if (count < 0) throw new ClosedChannelException();
-			*/
 		}
 	}
 
@@ -181,10 +177,6 @@ public final class SerializationUtils
 			while (n == 0) n = channel.read(buf);
 			if (n < 0) throw new ClosedChannelException();
 			count += n;
-			/*
-			count += channel.read(buf);
-			if (count < 0) throw new ClosedChannelException();
-			*/
 		}
 		buf.flip();
 		return buf.getInt();
@@ -210,8 +202,8 @@ public final class SerializationUtils
 	public static char readChar(byte[] data, int offset)
 	{
 		int pos = offset;
-    int result = convertByte(data[pos++]) << 8;
-    result    += convertByte(data[pos++]);
+    int result = (data[pos++] & 0xFF) << 8;
+    result    += (data[pos++] & 0xFF);
     return (char) result;
 	}
 
@@ -224,8 +216,8 @@ public final class SerializationUtils
 	public static short readShort(byte[] data, int offset)
 	{
 		int pos = offset;
-    int result = convertByte(data[pos++]) << 8;
-    result    += convertByte(data[pos++]);
+    int result = (data[pos++] & 0xFF) << 8;
+    result    += (data[pos++] & 0xFF);
     return (short) result;
 	}
 
@@ -238,10 +230,10 @@ public final class SerializationUtils
 	public static int readInt(byte[] data, int offset)
 	{
 		int pos = offset;
-    int result = convertByte(data[pos++]) << 24;
-    result    += convertByte(data[pos++]) << 16;
-    result    += convertByte(data[pos++]) <<  8;
-    result    += convertByte(data[pos++]);
+    int result = (data[pos++] & 0xFF) << 24;
+    result    += (data[pos++] & 0xFF) << 16;
+    result    += (data[pos++] & 0xFF) <<  8;
+    result    += (data[pos++] & 0xFF);
     return result;
 	}
 
@@ -254,14 +246,14 @@ public final class SerializationUtils
 	public static long readLong(byte[] data, int offset)
 	{
 		int pos = offset;
-    long result = convertByte(data[pos++]) << 56;
-    result     += convertByte(data[pos++]) << 48;
-    result     += convertByte(data[pos++]) << 40;
-    result     += convertByte(data[pos++]) << 32;
-    result     += convertByte(data[pos++]) << 24;
-    result     += convertByte(data[pos++]) << 16;
-    result     += convertByte(data[pos++]) <<  8;
-    result     += convertByte(data[pos++]);
+    long result = (long) (data[pos++] & 0xFF) << 56;
+    result     += (long) (data[pos++] & 0xFF) << 48;
+    result     += (long) (data[pos++] & 0xFF) << 40;
+    result     += (long) (data[pos++] & 0xFF) << 32;
+    result     += (long) (data[pos++] & 0xFF) << 24;
+    result     += (long) (data[pos++] & 0xFF) << 16;
+    result     += (long) (data[pos++] & 0xFF) <<  8;
+    result     += (long) (data[pos++] & 0xFF);
     return result;
 	}
 
@@ -273,10 +265,10 @@ public final class SerializationUtils
 	 */
 	public static int readInt(InputStream is) throws IOException
 	{
-    int result = convertByte(is.read()) << 24;
-    result    += convertByte(is.read()) << 16;
-    result    += convertByte(is.read()) <<  8;
-    result    += convertByte(is.read());
+    int result = (is.read() & 0xFF) << 24;
+    result    += (is.read() & 0xFF) << 16;
+    result    += (is.read() & 0xFF) <<  8;
+    result    += (is.read() & 0xFF);
     return result;
 	}
 
@@ -288,24 +280,14 @@ public final class SerializationUtils
 	 */
 	public static long readLong(InputStream is) throws IOException
 	{
-    long result = convertByte(is.read()) << 56;
-    result     += convertByte(is.read()) << 48;
-    result     += convertByte(is.read()) << 40;
-    result     += convertByte(is.read()) << 32;
-    result     += convertByte(is.read()) << 24;
-    result     += convertByte(is.read()) << 16;
-    result     += convertByte(is.read()) <<  8;
-    result     += convertByte(is.read());
+    long result = (long) (is.read() & 0xFF) << 56;
+    result     += (long) (is.read() & 0xFF) << 48;
+    result     += (long) (is.read() & 0xFF) << 40;
+    result     += (long) (is.read() & 0xFF) << 32;
+    result     += (long) (is.read() & 0xFF) << 24;
+    result     += (long) (is.read() & 0xFF) << 16;
+    result     += (long) (is.read() & 0xFF) <<  8;
+    result     += (long) (is.read() & 0xFF);
     return result;
-	}
-
-	/**
-	 * Convert a byte value into an unsigned int value.
-	 * @param b the value to convert.
-	 * @return the unsigned int result.
-	 */
-	private static int convertByte(int b)
-	{
-		return b < 0 ? b + 256 : b;
 	}
 }
