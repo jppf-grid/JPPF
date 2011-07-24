@@ -17,14 +17,15 @@
  */
 package sample.dist.matrix;
 
-import sample.BaseDemoTask;
+import org.jppf.server.protocol.JPPFTask;
+
 
 /**
  * This task performs the multiplication of one or more matrixs rows by another matrix, as part of
  * the multiplication of 2 whole square matrices.
  * @author Laurent Cohen
  */
-public class ExtMatrixTask extends BaseDemoTask
+public class ExtMatrixTask extends JPPFTask
 {
 	/**
 	 * Data provider key mapping to the second matrix operand in the multiplication.
@@ -48,7 +49,8 @@ public class ExtMatrixTask extends BaseDemoTask
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
-	public void doWork()
+	//public void doWork()
+	public void run()
 	{
 		try
 		{
@@ -97,4 +99,27 @@ public class ExtMatrixTask extends BaseDemoTask
 			setException(e);
 		}
 	}
+
+	/**
+	 * Serialize this task.
+	 * @param out the object output stream to write to.
+	 * @throws IOException if any error occurs.
+	 * @see java.io.Serializable
+	private void writeObject(ObjectOutputStream out) throws IOException
+	{
+		serialize(out);
+	}
+	 */
+
+	/**
+	 * Deserialize this task.
+	 * @param in the stream to read from.
+	 * @throws IOException if any I/O error occurs.
+	 * @throws ClassNotFoundException if a class could not be found.
+	 * @see java.io.Serializable
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		deserialize(in);
+	}
+	 */
 }
