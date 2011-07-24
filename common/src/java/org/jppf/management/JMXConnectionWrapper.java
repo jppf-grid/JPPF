@@ -38,11 +38,15 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	/**
 	 * Logger for this class.
 	 */
-	static Logger log = LoggerFactory.getLogger(JMXConnectionWrapper.class);
+	private static Logger log = LoggerFactory.getLogger(JMXConnectionWrapper.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
-	static boolean debugEnabled = log.isDebugEnabled();
+	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Determines whether trace log statements are enabled.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
 	 * Determine whether we should use the RMI or JMXMP connector.
 	 */
@@ -144,19 +148,24 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	public void connectAndWait(long timeout)
 	{
 		if (isConnected()) return;
+		long start = System.currentTimeMillis();
 		connect();
+		long elapsed;
+		while (!isConnected() && ((elapsed = System.currentTimeMillis() - start) < timeout)) goToSleep(timeout - elapsed);
+		/*
 		if (isConnected()) return;
 		goToSleep(timeout);
+		*/
 	}
 
 	/**
 	 * Initialize the connection to the remote MBean server.
 	 * @throws Exception if the connection could not be established.
 	 */
-	synchronized void performConnection() throws Exception
+	void performConnection() throws Exception
 	{
-  	connected.set(false);
-    HashMap<String, ?> env = new HashMap<String, Object>(); 
+		setConnectedStatus(false);
+    HashMap<String, Object> env = new HashMap<String, Object>(); 
     jmxc = JMXConnectorFactory.connect(url, env);
   	mbeanConnection.set(jmxc.getMBeanServerConnection());
   	setConnectedStatus(true);
@@ -259,7 +268,9 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 */
 	protected void setConnectedStatus(boolean status)
 	{
+		boolean changed = status == connected.get();
   	connected.set(status);
+  	if (changed) wakeUp();
 	}
 
 	/**
