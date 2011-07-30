@@ -234,12 +234,29 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	protected class ResourceRequest extends AbstractResourceRequest
 	{
 		/**
+		 * The data transform to apply.
+		 */
+		protected JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+		/**
+		 * The object serializer to use.
+		 */
+		protected ObjectSerializer serializer;
+		/**
+		 * The data sent and received from the server.
+		 */
+		protected byte[] data;
+		/**
 		 * Initialize with the specified request.
 		 * @param request the request to send.
+		 * @throws Exception if any error occurs.
 		 */
-		public ResourceRequest(JPPFResourceWrapper request)
+		public ResourceRequest(JPPFResourceWrapper request) throws Exception
 		{
 			super(request);
+			transform = JPPFDataTransformFactory.getInstance();
+			serializer = getSerializer();
+			data = serializer.serialize(request).getBuffer();
+			if (transform != null) data = JPPFDataTransformFactory.transform(transform, true, data);
 		}
 
 		/**
@@ -247,26 +264,31 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		 */
 		public void run()
 		{
-			JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-			ObjectSerializer serializer;
 			try
 			{
-				serializer = getSerializer();
-				JPPFBuffer buf = serializer.serialize(request);
-				byte[] data = buf.getBuffer();
-				if (transform != null) data = JPPFDataTransformFactory.transform(transform, true, data);
 				socketClient.writeInt(data.length);
 				socketClient.write(data, 0, data.length);
 				socketClient.flush();
-				buf = socketClient.receiveBytes(0);
-				data = buf.getBuffer();
-				if (transform != null) data = JPPFDataTransformFactory.transform(transform, false, data);
-				response = (JPPFResourceWrapper) serializer.deserialize(data);
+				data = socketClient.receiveBytes(0).getBuffer();
 			}
 			catch (Throwable t)
 			{
 				throwable = t;
 			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public JPPFResourceWrapper getResponse() throws Exception
+		{
+			if (response == null)
+			{
+				if (transform != null) data = JPPFDataTransformFactory.transform(transform, false, data);
+				response = (JPPFResourceWrapper) serializer.deserialize(data);
+				data = null;
+			}
+			return response;
 		}
 	}
 }
