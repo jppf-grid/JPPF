@@ -96,7 +96,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		{
 			if (INITIALIZING.compareAndSet(false, true))
 			{
-				executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests"));
+				if (executor == null) executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests"));
 				try
 				{
 					if (debugEnabled) log.debug("initializing connection");
@@ -175,6 +175,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		try
 		{
 			executor.shutdownNow();
+			executor = null;
 			if (socketInitializer != null) socketInitializer.close();
 			if (socketClient != null)
 			{

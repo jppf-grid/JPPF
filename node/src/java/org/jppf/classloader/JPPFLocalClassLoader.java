@@ -78,7 +78,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 		{
 			if (INITIALIZING.compareAndSet(false, true))
 			{
-				executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests"));
+				if (executor == null) executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests"));
 				try
 				{
 					if (debugEnabled) log.debug("sending node initiation message");
@@ -136,6 +136,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 		try
 		{
 			executor.shutdownNow();
+			executor = null;
 		}
 		finally
 		{
