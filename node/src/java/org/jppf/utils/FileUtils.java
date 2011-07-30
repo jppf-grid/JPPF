@@ -416,7 +416,7 @@ public final class FileUtils
 	{
 		int len = names.length;
 		File[] files = new File[len];
-		for (int i=0; i<len; i++) files[i] = new File(dir.getPath() + System.getProperty("file.separator") + names[i]);
+		for (int i=0; i<len; i++) files[i] = new File(dir.getPath(), names[i]);
 		return files;
 	}
 
