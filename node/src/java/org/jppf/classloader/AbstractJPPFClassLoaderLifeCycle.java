@@ -252,8 +252,9 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 		/**
 		 * Get the response received.
 		 * @return a {@link JPPFResourceWrapper} instance.
+		 * @throws Exception if any error occurs.
 		 */
-		public JPPFResourceWrapper getResponse()
+		public JPPFResourceWrapper getResponse() throws Exception
 		{
 			return response;
 		}
