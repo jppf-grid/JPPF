@@ -54,7 +54,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 	/**
 	 * The executor that handles asynchronous resource requests.
 	 */
-	protected static ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests"));
+	protected static ExecutorService executor;
 	/**
 	 * Determines whether this class loader should handle dynamic class updating.
 	 */

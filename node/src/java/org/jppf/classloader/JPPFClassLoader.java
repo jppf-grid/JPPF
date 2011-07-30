@@ -19,7 +19,7 @@ package org.jppf.classloader;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.*;
@@ -97,6 +97,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		{
 			if (INITIALIZING.compareAndSet(false, true))
 			{
+				if (executor == null) executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests"));
 				try
 				{
 					if (debugEnabled) log.debug("initializing connection");
@@ -176,6 +177,8 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		LOCK.lock();
 		try
 		{
+			executor.shutdownNow();
+			executor = null;
 			if (socketInitializer != null) socketInitializer.close();
 			if (socketClient != null)
 			{

@@ -20,7 +20,7 @@ package org.jppf.classloader;
 import java.io.InputStream;
 import java.nio.channels.SelectionKey;
 import java.util.*;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 import org.jppf.node.NodeRunner;
 import org.jppf.utils.*;
@@ -78,6 +78,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 		{
 			if (INITIALIZING.compareAndSet(false, true))
 			{
+				if (executor == null) executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests"));
 				try
 				{
 					if (debugEnabled) log.debug("sending node initiation message");
@@ -131,6 +132,16 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	 */
 	public void close()
 	{
+		LOCK.lock();
+		try
+		{
+			executor.shutdownNow();
+			executor = null;
+		}
+		finally
+		{
+			LOCK.unlock();
+		}
 	}
 
 	/**
