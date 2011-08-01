@@ -48,7 +48,7 @@ $template{name="samples-page-header" title="Custom MBeans sample"}$
 						<li>copy TasksNotifications.jar in the "lib" folder of the JPPF driver installation, to add it to the driver's classpath. This is enough, as the nodes will download the custom MBean and startup class code from the server.</li>
 						<li>open a command prompt in the driver's install folder and start the driver by typing "<b>ant run</b>"</li>
 						<li>open a command prompt in the node's install folder and start the node by typing "<b>ant run</b>"</li>
-						<li>in the sample's command prompt, type "<b>ant run</b>" to run the sample</li>
+						<li>Once you have a server and node, you can either run the "<b>run.bat</b>" script (on Windows), "<b>./run.sh</b>" script (on Linux/Unix) or, from a command prompt, type: <b>&quot;ant run&quot;</b>.</li>
 						<li>you should see the following display:
 <pre style="background: #C0C0C0">  [java] received notification: Task '1' : reached stage 1
   [java] received notification: Task '1' : reached stage 2

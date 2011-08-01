@@ -10,7 +10,7 @@ $template{name="samples-page-header" title="Generation of Mandelbrot Fractals"}$
 					<h3>How do I run it?</h3>
 					Before running this sample application, you must have a JPPF server and at least one node running.<br>
 					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki">JPPF documentation</a>.<br>
-					Once you have a server and node, from a command prompt, type: <b>&quot;ant run&quot;</b>
+					Once you have a server and node, you can either run the "<b>run.bat</b>" script (on Windows), "<b>./run.sh</b>" script (on Linux/Unix) or, from a command prompt, type: <b>&quot;ant run&quot;</b>.
 
 					<h3>How do I use it?</h3>
 					<p>The GUI provides many options and a lot of interactivity.

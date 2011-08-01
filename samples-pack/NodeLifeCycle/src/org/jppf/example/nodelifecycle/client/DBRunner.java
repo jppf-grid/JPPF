@@ -119,7 +119,14 @@ public class DBRunner
 	{
 		if (jmxNode == null)
 		{
-			JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
+			JPPFClientConnectionImpl c = null;
+			do
+			{
+				Thread.sleep(100L);
+				c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
+			}
+			while (c == null);
+			while ((c.getJmxConnection() == null) || !c.getJmxConnection().isConnected()) Thread.sleep(100L);
 			JMXDriverConnectionWrapper jmxDriver = c.getJmxConnection();
 			Collection<JPPFManagementInfo> nodesInfo = jmxDriver.nodesInformation();
 			JPPFManagementInfo info = nodesInfo.iterator().next();
@@ -158,7 +165,7 @@ public class DBRunner
 		Statement stmt = c.createStatement();
 		ResultSet rs = stmt.executeQuery(sql);
 		int count = 1;
-		output("\n***** displaying the DB table content *****"); 
+		output("\n***** displaying the DB table content *****");
 		while (rs.next())
 		{
 			StringBuilder sb = new StringBuilder();
@@ -169,7 +176,7 @@ public class DBRunner
 			output(sb.toString());
 			count++;
 		}
-		output("***** end of DB table content *****"); 
+		output("***** end of DB table content *****");
 		rs.close();
 		stmt.close();
 		c.close();

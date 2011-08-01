@@ -69,10 +69,10 @@ public class TaskNotificationsRunner implements NotificationListener
 			{
 				// subscribe to the notifications from all nodes
 				runner.registerToMBeans();
-	
+
 				// Create a job
 				JPPFJob job = runner.createJob();
-	
+
 				// execute a blocking job
 				runner.executeBlockingJob(job);
 			}
@@ -154,11 +154,17 @@ public class TaskNotificationsRunner implements NotificationListener
 	public void registerToMBeans() throws Exception
 	{
 		// obtain the driver connection object
-		JPPFClientConnectionImpl connection = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
+		JPPFClientConnectionImpl connection = null;
+		do
+		{
+			Thread.sleep(100L);
+			connection = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
+		}
+		while (connection == null);
+		while ((connection.getJmxConnection() == null) || !connection.getJmxConnection().isConnected()) Thread.sleep(100L);
 		// get its jmx connection to the driver MBean server
 		JMXDriverConnectionWrapper jmxDriver = connection.getJmxConnection();
-	  jmxDriver.connectAndWait(5000L);
-	  // collect the information to connect to the nodes' mbean servers 
+	  // collect the information to connect to the nodes' mbean servers
 	  Collection<JPPFManagementInfo> nodes = jmxDriver.nodesInformation();
 	  ObjectName objectName = new ObjectName(TaskNotificationsMBean.MBEAN_NAME);
 	  for (JPPFManagementInfo node: nodes)
@@ -167,11 +173,11 @@ public class TaskNotificationsRunner implements NotificationListener
 	  	JMXNodeConnectionWrapper jmxNode = new JMXNodeConnectionWrapper(node.getHost(), node.getPort());
 		  jmxNode.connectAndWait(5000L);
 
-		  // obtain a proxy to the task notifications MBean 
+		  // obtain a proxy to the task notifications MBean
 		  MBeanServerConnection mbsc = jmxNode.getMbeanConnection();
-		  TaskNotificationsMBean proxy = (TaskNotificationsMBean) 
+		  TaskNotificationsMBean proxy = (TaskNotificationsMBean)
 		    MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, TaskNotificationsMBean.class, true);
-		 
+
 		  // subbscribe to all notifications from the MBean
 		  proxy.addNotificationListener(this, null, null);
 		  nodeConnections.add(jmxNode);
