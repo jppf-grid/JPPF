@@ -19,6 +19,7 @@
 package org.jppf.serialization;
 
 import java.io.*;
+import java.util.Map;
 
 import org.jppf.utils.SerializationUtils;
 
@@ -52,6 +53,10 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * Temporary buffer to write primitive types.
 	 */
 	private final byte[] buf = new byte[8];
+	/**
+	 * The latest generated PutField instance.
+	 */
+	private PutField currentPutField = null;
 
 	/**
 	 * Initialize this object stream.
@@ -242,5 +247,55 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	public void close() throws IOException
 	{
 		out.close();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public PutField putFields() throws IOException
+	{
+		//return super.putFields();
+		if (currentPutField == null) currentPutField = new JPPFPutField(this);
+		return currentPutField;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void writeFields() throws IOException
+	{
+		//super.writeFields();
+		try
+		{
+			JPPFPutField f = (JPPFPutField) currentPutField;
+			writeFields0(f.primitiveFields);
+			writeFields0(f.objectFields);
+		}
+		catch (Exception e)
+		{
+			if (e instanceof IOException) throw (IOException) e;
+			else throw new IOException(e);
+		}
+	}
+
+	/**
+	 * Write the primitive or object fields of the current PutField.
+	 * @param map the map containing fields names and values.
+	 * @throws Exception if any error occurs.
+	 */
+	private void writeFields0(Map<String, Object> map) throws Exception
+	{
+		int n = map.size();
+		String[] names = new String[n];
+		Object[] values = new Object[n];
+		int count = 0;
+		for (Map.Entry<String, Object> entry: map.entrySet())
+		{
+			names[count] = entry.getKey();
+			values[count] = entry.getValue();
+			count++;
+		}
+		serializer.writeObject(names);
+		serializer.writeObject(values);
 	}
 }

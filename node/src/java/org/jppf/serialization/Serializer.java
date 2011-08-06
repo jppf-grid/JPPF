@@ -52,6 +52,10 @@ public class Serializer
 	 */
 	static final byte NULL_OBJECT_HEADER = 3;
 	/**
+	 * Special treatment when an object to serialize is a class.
+	 */
+	static final byte CLASS_OBJECT_HEADER = 4;
+	/**
 	 * Logger for this class.
 	 */
 	private static Logger log = LoggerFactory.getLogger(Serializer.class);
@@ -103,6 +107,7 @@ public class Serializer
 	void writeObject(Object obj) throws Exception
 	{
 		if (obj == null) out.writeByte(NULL_OBJECT_HEADER);
+		else if (obj instanceof Class) writeClassObject((Class) obj);
 		else
 		{
 			Integer handle = caches.objectHandleMap.get(obj);
@@ -151,6 +156,22 @@ public class Serializer
 			writeObject(name);
 		}
 		else writeFields(obj, cd);
+	}
+
+	/**
+	 * Write the specified object to the output stream.
+	 * @param obj the object to write.
+	 * @throws Exception if any error occurs.
+	 */
+	private void writeClassObject(Class obj) throws Exception
+	{
+		Map<Class<?>, ClassDescriptor> map = new HashMap<Class<?>, ClassDescriptor>();
+		ClassDescriptor cd = caches.getClassDescriptor(obj, map);
+		currentObject = obj;
+		currentClassDescriptor = cd;
+		writeClassDescriptors(map);
+		out.writeByte(CLASS_OBJECT_HEADER);
+		out.writeInt(cd.handle);
 	}
 
 	/**

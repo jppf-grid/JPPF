@@ -24,7 +24,7 @@ import org.jppf.management.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -76,7 +76,16 @@ class WaitInitialBundleState extends NodeServerState
 			Bundler bundler = server.getBundler().copy();
 			JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
 			if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
-			if (debugEnabled) log.debug("processing threads for node " + wrapper + " = " + (systemInfo == null ? "?" : systemInfo.getJppf().getInt("processing.threads", -1)));
+			if (debugEnabled)
+			{
+				if (systemInfo == null) log.debug("system info for node is null");
+				else
+				{
+					TypedProperties jppf = systemInfo.getJppf();
+					if (jppf == null) log.debug("jppf config for node is not available");
+					else log.debug("processing threads for node " + wrapper + " = " + jppf.getInt("processing.threads", -1));
+				}
+			}
 			bundler.setup();
 			context.setBundler(bundler);
 			boolean isPeer = (Boolean) bundle.getParameter(BundleParameter.IS_PEER, Boolean.FALSE);

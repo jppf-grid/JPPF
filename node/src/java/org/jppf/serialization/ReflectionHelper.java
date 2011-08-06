@@ -150,7 +150,10 @@ public final class ReflectionHelper
 			case 'D': return Double.TYPE;
 			case 'C': return Character.TYPE;
 			case 'Z': return Boolean.TYPE;
-			case 'L': return cl.loadClass(signature.substring(1));
+			case 'L': 
+				String s = signature.substring(1);
+				if ("void".equals(s)) return Void.TYPE;
+				return cl.loadClass(s);
 		}
 		throw new JPPFException("Could not load type with signature '" + signature + "'");
 	}
