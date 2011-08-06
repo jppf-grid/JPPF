@@ -99,6 +99,7 @@ public class Deserializer
 			b = in.readByte();
 		}
 		if (b == Serializer.NULL_OBJECT_HEADER) return null;
+		else if (b == Serializer.CLASS_OBJECT_HEADER) return readClassObject();
 		int handle = in.readInt();
 		Object o = caches.handleToObjectMap.get(handle);
 		if (o != null) return o;
@@ -141,6 +142,19 @@ public class Deserializer
 			else if (cd.externalizable) ((Externalizable) obj).readExternal(in);
 			else readFields(cd, obj);
 		}
+	}
+
+	/**
+	 * Read the next object in the stream, which is a class object.
+	 * @return the class object whose handle was read.
+	 * @throws Exception if any error occurs.
+	 */
+  @SuppressWarnings("unchecked")
+	private Object readClassObject() throws Exception
+	{
+		int cdHandle = in.readInt();
+		ClassDescriptor cd = caches.getDescriptor(cdHandle);
+		return cd.clazz;
 	}
 
 	/**

@@ -19,6 +19,7 @@
 package org.jppf.serialization;
 
 import java.io.*;
+import java.util.Map;
 
 import org.jppf.utils.SerializationUtils;
 
@@ -259,5 +260,37 @@ public class JPPFObjectInputStream extends ObjectInputStream
 			else if (e instanceof IOException) throw (IOException) e;
 			else throw new IOException(e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public GetField readFields() throws IOException, ClassNotFoundException
+	{
+		try
+		{
+			JPPFGetField getFields = new JPPFGetField();
+			readFields0(getFields.primitiveFields);
+			readFields0(getFields.objectFields);
+			return getFields;
+		}
+		catch (Exception e)
+		{
+			if (e instanceof ClassNotFoundException) throw (ClassNotFoundException) e;
+			else if (e instanceof IOException) throw (IOException) e;
+			else throw new IOException(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Read the primitive or object fields of the current GetField.
+	 * @param map a map that receives the names and values of the fields.
+	 * @throws Exception if any error occurs.
+	 */
+	private void readFields0(Map<String, Object> map) throws Exception
+	{
+		String[] names = (String[]) deserializer.readObject();
+		Object[] values = (Object[]) deserializer.readObject();
+		for (int i=0; i<names.length; i++) map.put(names[i], values[i]);
 	}
 }
