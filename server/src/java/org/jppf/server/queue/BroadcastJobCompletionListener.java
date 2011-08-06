@@ -68,7 +68,7 @@ public class BroadcastJobCompletionListener implements TaskCompletionListener
 	{
 		this.bundleWrapper = bundleWrapper;
 		this.nodeUuids = nodeUuids;
-		int taskCount = bundleWrapper.getBundle().getTaskCount();
+		int taskCount = ((JPPFTaskBundle) bundleWrapper.getJob()).getTaskCount();
 		for (String uuid: nodeUuids) completionMap.put(uuid, taskCount);
 		if (debugEnabled) log.debug("task count=" + taskCount + ", completionMap=" + completionMap);
 	}
@@ -78,7 +78,7 @@ public class BroadcastJobCompletionListener implements TaskCompletionListener
 	 */
 	public synchronized void taskCompleted(BundleWrapper result)
 	{
-		JPPFTaskBundle bundle = result.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) result.getJob();
 		String uuid = (String) bundle.getParameter(BundleParameter.NODE_BROADCAST_UUID);
 		int n = bundle.getTaskCount();
 		if (debugEnabled) log.debug("received " + n + " tasks for node uuid=" + uuid);
@@ -92,7 +92,7 @@ public class BroadcastJobCompletionListener implements TaskCompletionListener
 		else completionMap.put(uuid, pending);
 		if (completionMap.isEmpty())
 		{
-			bundleWrapper.getBundle().getCompletionListener().taskCompleted(bundleWrapper);
+			((JPPFTaskBundle) bundleWrapper.getJob()).getCompletionListener().taskCompleted(bundleWrapper);
 		}
 	}
 }

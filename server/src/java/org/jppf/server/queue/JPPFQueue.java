@@ -18,7 +18,7 @@
 
 package org.jppf.server.queue;
 
-import org.jppf.server.protocol.BundleWrapper;
+import org.jppf.server.protocol.*;
 
 /**
  * Implementation of a generic non-blocking queue, to allow asynchronous access from a large number of threads.
@@ -37,7 +37,7 @@ public interface JPPFQueue extends Iterable<BundleWrapper>
 	 * @param nbTasks the maximum number of tasks to get out of the bundle.
 	 * @return the most recent object that was added to the queue.
 	 */
-	BundleWrapper nextBundle(int nbTasks);
+	ServerJob nextBundle(int nbTasks);
 
 	/**
 	 * Get the next object in the queue.
@@ -64,5 +64,5 @@ public interface JPPFQueue extends Iterable<BundleWrapper>
 	 * @param bundleWrapper the bundle to remove.
 	 * @return the bundle that was removed.
 	 */
-	BundleWrapper removeBundle(BundleWrapper bundleWrapper);
+	ServerJob removeBundle(BundleWrapper bundleWrapper);
 }

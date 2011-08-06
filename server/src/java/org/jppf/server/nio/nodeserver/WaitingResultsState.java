@@ -64,9 +64,9 @@ class WaitingResultsState extends NodeServerState
 		if (context.readMessage(channel))
 		{
 			BundleWrapper bundleWrapper = context.getBundle();
-			JPPFTaskBundle bundle = bundleWrapper.getBundle();
+			JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 			BundleWrapper newBundleWrapper = context.deserializeBundle();
-			JPPFTaskBundle newBundle = newBundleWrapper.getBundle();
+			JPPFTaskBundle newBundle = (JPPFTaskBundle) newBundleWrapper.getJob();
 			if (debugEnabled) log.debug("read bundle" + newBundle + " from node " + channel + " done");
 			// if an exception prevented the node from executing the tasks
 			if (newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM) != null)

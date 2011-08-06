@@ -136,12 +136,12 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	{
 		if (getBundler() != null) getBundler().dispose();
 		NodeNioServer.closeNode(channel, this);
-		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getBundle().getState()))
+		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(((JPPFTaskBundle) bundle.getJob()).getState()))
 		{
 			JPPFDriver.getInstance().getJobManager().jobReturned(bundle, channel);
 			BundleWrapper tmpWrapper = bundle;
 			bundle = null;
-			JPPFTaskBundle tmpBundle = tmpWrapper.getBundle();
+			JPPFTaskBundle tmpBundle = (JPPFTaskBundle) tmpWrapper.getJob();
 			// broadcast jobs are not resubmitted.
 			if (tmpBundle.getJobSLA().isBroadcastJob()) tmpBundle.getCompletionListener().taskCompleted(tmpWrapper);
 			else resubmitBundle(tmpWrapper);
@@ -161,10 +161,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 		//data = JPPFDataTransformFactory.transform(true, data, 0, data.length);
 		//message.addLocation(new ByteBufferLocation(data, 0, data.length));
 		//message.addLocation(new MultipleBuffersLocation(new JPPFBuffer(data, data.length)));
-		message.addLocation(IOHelper.serializeData(bundle.getBundle(), helper.getSerializer()));
+		message.addLocation(IOHelper.serializeData(bundle.getJob(), helper.getSerializer()));
 		message.addLocation(bundle.getDataProvider());
 		for (DataLocation dl: bundle.getTasks()) message.addLocation(dl);
-		message.setBundle(bundle.getBundle());
+		message.setBundle((JPPFTaskBundle) bundle.getJob());
 		setNodeMessage(message, wrapper);
 	}
 

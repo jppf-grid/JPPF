@@ -76,7 +76,7 @@ class PeerNodeResultSender extends AbstractResultSender
 					int size = getResultList().size();
 					for (int i=0; i<size; i++)
 					{
-						BundleWrapper bundle = getResultList().remove(0);
+						ServerJob bundle = getResultList().remove(0);
 						for (DataLocation task: bundle.getTasks())
 						{
 							first.addTask(task);
@@ -84,9 +84,10 @@ class PeerNodeResultSender extends AbstractResultSender
 						}
 						bundle.getTasks().clear();
 					}
-					first.getBundle().setTaskCount(count);
+					JPPFTaskBundle firstJob = (JPPFTaskBundle) first.getJob();
+					firstJob.setTaskCount(count);
 					long elapsed = System.nanoTime() - start;
-					first.getBundle().setNodeExecutionTime(elapsed/1000000);
+					firstJob.setNodeExecutionTime(elapsed/1000000);
 					sendPartialResults(first);
 				}
 				getResultList().clear();
@@ -104,9 +105,9 @@ class PeerNodeResultSender extends AbstractResultSender
 	 * @param bundleWrapper the bundle to get the task results from.
 	 * @throws Exception if an IO exception occurred while sending the results back.
 	 */
-	public void sendPartialResults(BundleWrapper bundleWrapper) throws Exception
+	public void sendPartialResults(ServerJob bundleWrapper) throws Exception
 	{
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		if (debugEnabled) log.debug("Sending bundle with "+bundle.getTaskCount()+" tasks");
 		//long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		//bundle.setNodeExecutionTime(elapsed);

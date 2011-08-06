@@ -73,14 +73,14 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper != null)
 		{
-			if (debugEnabled) log.debug("Request to cancel jobId = '" + bundleWrapper.getBundle().getId() + "'");
+			if (debugEnabled) log.debug("Request to cancel jobId = '" + bundleWrapper.getJob().getId() + "'");
 			//cancelJobInNodes(jobUuid, false);
 			//if (debugEnabled) log.debug("bundleWrapper=" + bundleWrapper);
-			JPPFTaskBundle bundle = bundleWrapper.getBundle();
+			JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 			BundleWrapper queuedWrapper = JPPFDriver.getQueue().nextBundle(bundleWrapper, bundle.getTaskCount());
 			if (queuedWrapper != null)
 			{
-				bundle = queuedWrapper.getBundle();
+				bundle = (JPPFTaskBundle) queuedWrapper.getJob();
 				TaskCompletionListener listener = bundle.getCompletionListener();
 				if (listener != null) listener.taskCompleted(queuedWrapper);
 			}
@@ -98,15 +98,15 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 */
 	public void suspendJob(String jobUuid, Boolean requeue) throws Exception
 	{
-		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+		ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null)
 		{
 			if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + "'");
 			return;
 		}
-		if (debugEnabled) log.debug("Request to suspend jobId = '" + bundleWrapper.getBundle().getId() + "'");
-		if (bundleWrapper.getBundle().getJobSLA().isSuspended()) return;
-		bundleWrapper.getBundle().getJobSLA().setSuspended(true);
+		if (debugEnabled) log.debug("Request to suspend jobId = '" + bundleWrapper.getJob().getId() + "'");
+		if (bundleWrapper.getJob().getJobSLA().isSuspended()) return;
+		bundleWrapper.getJob().getJobSLA().setSuspended(true);
 		getJobManager().jobUpdated(bundleWrapper);
 		if (requeue) cancelJobInNodes(jobUuid, true);
 	}
@@ -119,15 +119,15 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 */
 	public void resumeJob(String jobUuid) throws Exception
 	{
-		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+		ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null)
 		{
 			if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + "'");
 			return;
 		}
-		if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getBundle().getId() + "'");
-		if (!bundleWrapper.getBundle().getJobSLA().isSuspended()) return;
-		bundleWrapper.getBundle().getJobSLA().setSuspended(false);
+		if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getJob().getId() + "'");
+		if (!bundleWrapper.getJob().getJobSLA().isSuspended()) return;
+		bundleWrapper.getJob().getJobSLA().setSuspended(false);
 		getJobManager().jobUpdated(bundleWrapper);
 	}
 
@@ -140,15 +140,15 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 */
 	public void updateMaxNodes(String jobUuid, Integer maxNodes) throws Exception
 	{
-		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+		ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null)
 		{
 			if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + "'");
 			return;
 		}
-		if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + bundleWrapper.getBundle().getId() + "'");
+		if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + bundleWrapper.getJob().getId() + "'");
 		if (maxNodes <= 0) return;
-		bundleWrapper.getBundle().getJobSLA().setMaxNodes(maxNodes);
+		bundleWrapper.getJob().getJobSLA().setMaxNodes(maxNodes);
 		getJobManager().jobUpdated(bundleWrapper);
 	}
 
@@ -173,9 +173,9 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 */
 	public JobInformation getJobInformation(String jobUuid) throws Exception
 	{
-		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+		ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null) return null;
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
 		JobInformation job = new JobInformation(jobUuid, bundle.getId(),
 			bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getJobSLA().getPriority(),
@@ -193,13 +193,13 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 */
 	public NodeJobInformation[] getNodeInformation(String jobUuid) throws Exception
 	{
-		List<ChannelBundlePair> nodes = getJobManager().getNodesForJob(jobUuid);
+		List<ChannelJobPair> nodes = getJobManager().getNodesForJob(jobUuid);
 		if (nodes == null) return null;
 		NodeJobInformation[] result = new NodeJobInformation[nodes.size()];
 		for (int i=0; i<nodes.size(); i++)
 		{
 			JPPFManagementInfo nodeInfo = driver.getNodeHandler().getNodeInformation(nodes.get(i).first());
-			JPPFTaskBundle bundle = nodes.get(i).second().getBundle();
+			JPPFTaskBundle bundle = (JPPFTaskBundle) nodes.get(i).second().getJob();
 			Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
 			JobInformation jobInfo = new JobInformation(jobUuid, bundle.getId(),
 				bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getJobSLA().getPriority(),
@@ -218,10 +218,10 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 */
 	private void cancelJobInNodes(String jobUuid, boolean requeue)
 	{
-		List<ChannelBundlePair> list = getJobManager().getNodesForJob(jobUuid);
+		List<ChannelJobPair> list = getJobManager().getNodesForJob(jobUuid);
 		if (debugEnabled) log.debug("Cancelling jobId = '" + jobUuid + "' in nodes: " + list);
 		if (list == null) return;
-		for (ChannelBundlePair pair: list)
+		for (ChannelJobPair pair: list)
 		{
 			CancelJobTask task = new CancelJobTask(jobUuid, pair.first(), requeue);
 			new Thread(task).start();

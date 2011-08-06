@@ -72,7 +72,7 @@ class SendingBundleState extends NodeServerState
 		if (context.getNodeMessage() == null)
 		{
 			BundleWrapper bundleWrapper = context.getBundle();
-			JPPFTaskBundle bundle = (bundleWrapper == null) ? null : bundleWrapper.getBundle();
+			JPPFTaskBundle bundle = (bundleWrapper == null) ? null : (JPPFTaskBundle) bundleWrapper.getJob();
 			if (bundle != null)
 			{
 				if (debugEnabled) log.debug("got bundle from the queue for " + wrapper);
@@ -98,7 +98,7 @@ class SendingBundleState extends NodeServerState
 		}
 		if (context.writeMessage(wrapper))
 		{
-			if (debugEnabled) log.debug("sent entire bundle" + context.getBundle().getBundle() + " to node " + wrapper);
+			if (debugEnabled) log.debug("sent entire bundle" + context.getBundle().getJob() + " to node " + wrapper);
 			context.setNodeMessage(null, wrapper);
 			//JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
 			return TO_WAITING;

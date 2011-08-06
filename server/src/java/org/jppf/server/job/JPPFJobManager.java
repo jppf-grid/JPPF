@@ -46,7 +46,7 @@ public class JPPFJobManager implements QueueListener
 	/**
 	 * Mapping of jobs to the nodes they are executing on.
 	 */
-	private Map<String, List<ChannelBundlePair>> jobMap = new HashMap<String, List<ChannelBundlePair>>();
+	private Map<String, List<ChannelJobPair>> jobMap = new HashMap<String, List<ChannelJobPair>>();
 	/**
 	 * Mapping of job ids to the corresponding <code>JPPFTaskBundle</code>.
 	 */
@@ -73,10 +73,10 @@ public class JPPFJobManager implements QueueListener
 	 * @param jobUuid the id of the job.
 	 * @return a list of <code>SelectableChannel</code> instances.
 	 */
-	public synchronized List<ChannelBundlePair> getNodesForJob(String jobUuid)
+	public synchronized List<ChannelJobPair> getNodesForJob(String jobUuid)
 	{
 		if (jobUuid == null) return null;
-		List<ChannelBundlePair> list = jobMap.get(jobUuid);
+		List<ChannelJobPair> list = jobMap.get(jobUuid);
 		return list == null ? null : Collections.unmodifiableList(list);
 	}
 
@@ -104,17 +104,17 @@ public class JPPFJobManager implements QueueListener
 	 * @param bundleWrapper the dispatched job.
 	 * @param channel the node to which the job is dispatched.
 	 */
-	public synchronized void jobDispatched(BundleWrapper bundleWrapper, ChannelWrapper channel)
+	public synchronized void jobDispatched(ServerJob bundleWrapper, ChannelWrapper channel)
 	{
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		String jobUuid = bundle.getJobUuid();
-		List<ChannelBundlePair> list = jobMap.get(jobUuid);
+		List<ChannelJobPair> list = jobMap.get(jobUuid);
 		if (list == null)
 		{
-			list = new ArrayList<ChannelBundlePair>();
+			list = new ArrayList<ChannelJobPair>();
 			jobMap.put(jobUuid, list);
 		}
-		list.add(new ChannelBundlePair(channel, bundleWrapper));
+		list.add(new ChannelJobPair(channel, bundleWrapper));
 		if (debugEnabled) log.debug("jobId '" + bundle.getId() + "' : added node " + channel);
 		submitEvent(JobEventType.JOB_DISPATCHED, bundle, channel);
 	}
@@ -124,17 +124,17 @@ public class JPPFJobManager implements QueueListener
 	 * @param bundleWrapper the returned job.
 	 * @param channel the node to which the job is dispatched.
 	 */
-	public synchronized void jobReturned(BundleWrapper bundleWrapper, ChannelWrapper channel)
+	public synchronized void jobReturned(ServerJob bundleWrapper, ChannelWrapper channel)
 	{
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		String jobUuid = bundle.getJobUuid();
-		List<ChannelBundlePair> list = jobMap.get(jobUuid);
+		List<ChannelJobPair> list = jobMap.get(jobUuid);
 		if (list == null)
 		{
 			log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getId());
 			return;
 		}
-		list.remove(new ChannelBundlePair(channel, bundleWrapper));
+		list.remove(new ChannelJobPair(channel, bundleWrapper));
 		if (debugEnabled) log.debug("jobId '" + bundle.getId() + "' : removed node " + channel);
 		submitEvent(JobEventType.JOB_RETURNED, bundle, channel);
 	}
@@ -145,10 +145,10 @@ public class JPPFJobManager implements QueueListener
 	 */
 	public synchronized void jobQueued(BundleWrapper bundleWrapper)
 	{
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		String jobUuid = bundle.getJobUuid();
 		bundleMap.put(jobUuid, bundleWrapper);
-		jobMap.put(jobUuid, new ArrayList<ChannelBundlePair>());
+		jobMap.put(jobUuid, new ArrayList<ChannelJobPair>());
 		if (debugEnabled) log.debug("jobId '" + bundle.getId() + "' queued");
 		submitEvent(JobEventType.JOB_QUEUED, bundle, null);
 	}
@@ -157,9 +157,9 @@ public class JPPFJobManager implements QueueListener
 	 * Called when a job is complete and returned to the client.
 	 * @param bundleWrapper the completed job.
 	 */
-	public synchronized void jobEnded(BundleWrapper bundleWrapper)
+	public synchronized void jobEnded(ServerJob bundleWrapper)
 	{
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		String jobUuid = bundle.getJobUuid();
 		jobMap.remove(jobUuid);
 		bundleMap.remove(jobUuid);
@@ -172,9 +172,9 @@ public class JPPFJobManager implements QueueListener
 	 * Called when a job is added to the server queue.
 	 * @param bundleWrapper the queued job.
 	 */
-	public synchronized void jobUpdated(BundleWrapper bundleWrapper)
+	public synchronized void jobUpdated(ServerJob bundleWrapper)
 	{
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		if (debugEnabled) log.debug("jobId '" + bundle.getId() + "' updated");
 		submitEvent(JobEventType.JOB_UPDATED, bundle, null);
 	}

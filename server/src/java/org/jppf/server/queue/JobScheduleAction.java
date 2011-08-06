@@ -38,13 +38,13 @@ class JobScheduleAction implements Runnable
 	/**
 	 * The bundle wrapper encapsulating the job.
 	 */
-	private BundleWrapper bundleWrapper = null;
+	private ServerJob bundleWrapper = null;
 
 	/**
 	 * Initialize this action witht he specified bundle wrapper.
 	 * @param bundleWrapper the bundle wrapper encapsulating the job.
 	 */
-	public JobScheduleAction(BundleWrapper bundleWrapper)
+	public JobScheduleAction(ServerJob bundleWrapper)
 	{
 		this.bundleWrapper = bundleWrapper;
 	}
@@ -56,7 +56,7 @@ class JobScheduleAction implements Runnable
 	{
 		synchronized(bundleWrapper)
 		{
-			JPPFTaskBundle bundle = bundleWrapper.getBundle();
+			JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 			if (debugEnabled)
 			{
 				String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);

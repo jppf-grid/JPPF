@@ -142,7 +142,7 @@ class PeerNode extends AbstractMonitoredNode
 		while (!stopped)
 		{
 			BundleWrapper bundleWrapper = readBundle();
-			JPPFTaskBundle bundle = bundleWrapper.getBundle();
+			JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 			if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 			{
 				if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))

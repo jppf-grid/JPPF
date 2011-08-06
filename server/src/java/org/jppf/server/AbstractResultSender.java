@@ -93,7 +93,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 * @param bundle the bundle to get the task results from.
 	 * @throws Exception if an IO exception occurred while sending the results back.
 	 */
-	public abstract void sendPartialResults(BundleWrapper bundle) throws Exception;
+	public abstract void sendPartialResults(ServerJob bundle) throws Exception;
 
 	/**
 	 * This method waits until all tasks of a request have been completed.
@@ -109,7 +109,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 				if (debugEnabled) log.debug(""+getResultList().size()+" in result list");
 				if (asynch)
 				{
-					for (BundleWrapper bundle : getResultList()) sendPartialResults(bundle);
+					for (ServerJob bundle : getResultList()) sendPartialResults(bundle);
 				}
 				else if (!getResultList().isEmpty())
 				{
@@ -118,7 +118,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 					int size = getResultList().size();
 					for (int i=0; i<size; i++)
 					{
-						BundleWrapper bundle = getResultList().remove(0);
+						ServerJob bundle = getResultList().remove(0);
 						for (DataLocation task: bundle.getTasks())
 						{
 							first.addTask(task);
@@ -126,7 +126,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 						}
 						bundle.getTasks().clear();
 					}
-					first.getBundle().setTaskCount(count);
+					((JPPFTaskBundle) first.getJob()).setTaskCount(count);
 					sendPartialResults(first);
 				}
 				getResultList().clear();
@@ -146,10 +146,11 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 */
 	public synchronized void taskCompleted(BundleWrapper result)
 	{
-		setPendingTasksCount(getPendingTasksCount() - result.getBundle().getTaskCount());
+		JPPFTaskBundle resultJob = (JPPFTaskBundle) result.getJob();
+		setPendingTasksCount(getPendingTasksCount() - resultJob.getTaskCount());
 		if (debugEnabled)
 		{
-			log.debug("Received results for : " + result.getBundle().getTaskCount() + " [size=" + result.getTasks().size() + "] tasks");
+			log.debug("Received results for : " + resultJob.getTaskCount() + " [size=" + result.getTasks().size() + "] tasks");
 			log.debug("Pending tasks: " + getPendingTasksCount());
 		}
 		getResultList().add(result);

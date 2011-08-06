@@ -60,7 +60,7 @@ class JobExpirationAction implements Runnable
 	 */
 	public void run()
 	{
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		String jobId = (String) bundle.getId();
 		try
 		{
@@ -70,7 +70,7 @@ class JobExpirationAction implements Runnable
 			{
 				if (bundle.getCompletionListener() != null) bundle.getCompletionListener().taskCompleted(bundleWrapper);
 			}
-			String jobUuid = bundleWrapper.getBundle().getJobUuid();
+			String jobUuid = bundleWrapper.getJob().getJobUuid();
 			jobManagamentMBean.cancelJob(jobUuid);
 		}
 		catch (Exception e)

@@ -27,12 +27,12 @@ import org.jppf.io.DataLocation;
  * This allows the tasks data to be processed with the same semantics no matter where it is stored, comes from or goes to. 
  * @author Laurent Cohen
  */
-public class BundleWrapper
+public class BundleWrapper implements ServerJob
 {
 	/**
 	 * The underlying task bundle.
 	 */
-	private JPPFTaskBundle bundle = null;
+	private JPPFTaskBundle job = null;
 	/**
 	 * The location of the data provider.
 	 */
@@ -56,30 +56,28 @@ public class BundleWrapper
 	 */
 	public BundleWrapper(JPPFTaskBundle bundle)
 	{
-		this.bundle = bundle;
+		this.job = bundle;
 	}
 
 	/**
-	 * Get the underlying task bundle.
-	 * @return a <code>JPPFTaskBundle</code> instance.
+	 * {@inheritDoc}
 	 */
-	public JPPFTaskBundle getBundle()
+	public JPPFDistributedJob getJob()
 	{
-		return bundle;
+		return job;
 	}
 
 	/**
 	 * Set the underlying task bundle.
-	 * @param bundle a <code>JPPFTaskBundle</code> instance.
+	 * @param job a <code>JPPFTaskBundle</code> instance.
 	 */
-	public void setBundle(JPPFTaskBundle bundle)
+	public void setJob(JPPFTaskBundle job)
 	{
-		this.bundle = bundle;
+		this.job = job;
 	}
 
 	/**
-	 * Get the location of the data provider.
-	 * @return a <code>JPPFTaskBundle</code> instance.
+	 * {@inheritDoc}
 	 */
 	public DataLocation getDataProvider()
 	{
@@ -105,8 +103,7 @@ public class BundleWrapper
 	}
 
 	/**
-	 * Get the list of locations of the tasks.
-	 * @return a list of <code>DataLocation</code> instances.
+	 * {@inheritDoc}
 	 */
 	public List<DataLocation> getTasks()
 	{
@@ -131,7 +128,7 @@ public class BundleWrapper
 		BundleWrapper wrapper = null;
 		synchronized(this)
 		{
-			wrapper = new BundleWrapper(bundle.copy());
+			wrapper = new BundleWrapper(job.copy());
 			for (DataLocation dl: tasks) wrapper.addTask(dl);
 		}
 		wrapper.setDataProvider(dataProvider.copy());
@@ -148,7 +145,7 @@ public class BundleWrapper
 		BundleWrapper wrapper = null;
 		synchronized(this)
 		{
-			wrapper = new BundleWrapper(bundle.copy(nbTasks));
+			wrapper = new BundleWrapper(job.copy(nbTasks));
 			LinkedList<DataLocation> tmp = (LinkedList<DataLocation>) tasks;
 			for (int i=0; i<nbTasks; i++) wrapper.addTask(tmp.removeFirst());
 		}
@@ -161,11 +158,11 @@ public class BundleWrapper
 	 * @param other the wrapper to merge with.
 	 * @param after determines whether the tasks from other should be added first or last.
 	 */
-	public void merge(BundleWrapper other, boolean after)
+	public void merge(ServerJob other, boolean after)
 	{
-		int n = other.getBundle().getTaskCount();
-		bundle.setTaskCount(bundle.getTaskCount() + n);
-		bundle.getJobSLA().setSuspended(other.getBundle().getJobSLA().isSuspended());
+		int n = ((JPPFTaskBundle) other.getJob()).getTaskCount();
+		job.setTaskCount(job.getTaskCount() + n);
+		job.getJobSLA().setSuspended(other.getJob().getJobSLA().isSuspended());
 		if (after)
 		{
 			for (DataLocation task: other.getTasks()) tasks.add(task);

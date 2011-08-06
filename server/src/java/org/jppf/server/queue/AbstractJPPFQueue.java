@@ -21,7 +21,7 @@ package org.jppf.server.queue;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.jppf.server.protocol.BundleWrapper;
+import org.jppf.server.protocol.*;
 import org.slf4j.*;
 
 /**
@@ -94,10 +94,10 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	 * @param bundleWrapper the bundle to get the size from.
 	 * @return the bundle size as an int.
 	 */
-	protected int getSize(BundleWrapper bundleWrapper)
+	protected int getSize(ServerJob bundleWrapper)
 	{
 		//return bundle.getTaskCount();
-		return bundleWrapper.getBundle().getInitialTaskCount();
+		return ((JPPFTaskBundle) bundleWrapper.getJob()).getInitialTaskCount();
 	}
 
 	/**

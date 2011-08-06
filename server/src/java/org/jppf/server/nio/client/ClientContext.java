@@ -55,7 +55,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	/**
 	 * The task bundle to send or receive.
 	 */
-	protected BundleWrapper bundle = null;
+	protected ServerJob bundle = null;
 	/**
 	 * Helper used to serialize the bundle objects.
 	 */
@@ -83,13 +83,13 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	/**
 	 * The job as initially submitted by the client.
 	 */
-	private BundleWrapper initialBundleWrapper;
+	private ServerJob initialBundleWrapper;
 
 	/**
 	 * Get the task bundle to send or receive.
 	 * @return a <code>BundleWrapper</code> instance.
 	 */
-	public BundleWrapper getBundle()
+	public ServerJob getBundle()
 	{
 		return bundle;
 	}
@@ -98,7 +98,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Set the task bundle to send or receive.
 	 * @param bundle a {@link JPPFTaskBundle} instance.
 	 */
-	public void setBundle(BundleWrapper bundle)
+	public void setBundle(ServerJob bundle)
 	{
 		this.bundle = bundle;
 	}
@@ -119,9 +119,9 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	public void serializeBundle() throws Exception
 	{
 		ClientMessage message = newMessage();
-		message.addLocation(IOHelper.serializeData(bundle.getBundle(), helper.getSerializer()));
+		message.addLocation(IOHelper.serializeData(bundle.getJob(), helper.getSerializer()));
 		for (DataLocation dl: bundle.getTasks()) message.addLocation(dl);
-		message.setBundle(bundle.getBundle());
+		message.setBundle((JPPFTaskBundle) bundle.getJob());
 		setClientMessage(message);
 	}
 
@@ -239,7 +239,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Get the next bundle in the queue.
 	 * @return A {@link BundleWrapper} instance, or null if the queue is empty.
 	 */
-	public BundleWrapper pollCompletedBundle()
+	public ServerJob pollCompletedBundle()
 	{
 		synchronized(completedBundles)
 		{
@@ -313,7 +313,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 		if (currentJobId != null)
 		{
 			currentJobId = null;
-			JPPFTaskBundle header = initialBundleWrapper.getBundle();
+			JPPFTaskBundle header = (JPPFTaskBundle) initialBundleWrapper.getJob();
 			header.setCompletionListener(null);
 			JMXDriverConnectionWrapper wrapper = new JMXDriverConnectionWrapper();
 			wrapper.connect();
@@ -335,7 +335,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Set the job as initially submitted by the client.
 	 * @param initialBundleWrapper <code>BundleWrapper</code> instance.
 	 */
-	void setInitialBundleWrapper(BundleWrapper initialBundleWrapper)
+	void setInitialBundleWrapper(ServerJob initialBundleWrapper)
 	{
 		this.initialBundleWrapper = initialBundleWrapper;
 	}

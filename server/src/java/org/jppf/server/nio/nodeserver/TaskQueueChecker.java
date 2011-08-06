@@ -23,7 +23,7 @@ import java.util.concurrent.locks.Lock;
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.job.ChannelBundlePair;
+import org.jppf.server.job.ChannelJobPair;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.AbstractJPPFQueue;
@@ -154,10 +154,10 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	 * @return a channel for a node on which to execute the job.
 	 * @throws Exception if any error occurs.
 	 */
-	private ChannelWrapper<?> retrieveChannel(BundleWrapper bundleWrapper) throws Exception
+	private ChannelWrapper<?> retrieveChannel(ServerJob bundleWrapper) throws Exception
 	{
 		ChannelWrapper<?> channel = null;
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		if (checkJobState(bundle))
 		{
 			int n = findIdleChannelIndex(bundle);
@@ -173,14 +173,14 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	 */
 	private void dispatchJobToChannel(ChannelWrapper<?> channel, BundleWrapper selectedBundle)
 	{
-		if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getBundle().getJobUuid() + " to nodeUuid=" + ((AbstractNodeContext) channel.getContext()).nodeUuid);
+		if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getJob().getJobUuid() + " to nodeUuid=" + ((AbstractNodeContext) channel.getContext()).nodeUuid);
 		synchronized(channel)
 		{
 			AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
 			int size = 1;
 			try
 			{
-				updateBundler(server.getBundler(), selectedBundle.getBundle(), context);
+				updateBundler(server.getBundler(), (JPPFTaskBundle) selectedBundle.getJob(), context);
 				size = context.getBundler().getBundleSize();
 			}
 			catch (Exception e)
@@ -281,7 +281,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 		if (b) return false;
 		String jobId = bundle.getJobUuid();
 		int maxNodes = sla.getMaxNodes();
-		List<ChannelBundlePair> list = server.getJobManager().getNodesForJob(jobId);
+		List<ChannelJobPair> list = server.getJobManager().getNodesForJob(jobId);
 		int n = (list == null) ? 0 : list.size();
 		if (debugEnabled) log.debug("current nodes = " + n + ", maxNodes = " + maxNodes);
 		return n < maxNodes;

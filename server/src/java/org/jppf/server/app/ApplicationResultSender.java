@@ -59,9 +59,9 @@ class ApplicationResultSender extends AbstractResultSender
 	 * @param bundleWrapper the bundle to get the task results from.
 	 * @throws Exception if an IO exception occurred while sending the results back.
 	 */
-	public void sendPartialResults(BundleWrapper bundleWrapper) throws Exception
+	public void sendPartialResults(ServerJob bundleWrapper) throws Exception
 	{
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		if (debugEnabled)
 		{
 			Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);

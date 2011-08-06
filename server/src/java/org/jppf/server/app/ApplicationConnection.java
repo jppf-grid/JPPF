@@ -130,7 +130,7 @@ class ApplicationConnection extends JPPFConnection
 	 */
 	protected void executeTasks() throws Exception
 	{
-		JPPFTaskBundle header = headerWrapper.getBundle();
+		JPPFTaskBundle header = (JPPFTaskBundle) headerWrapper.getJob();
 		header.getUuidPath().incPosition();
 		String uuid = header.getUuidPath().getCurrentElement();
 		ClassNioServer classServer = JPPFDriver.getInstance().getClassServer();
@@ -205,7 +205,7 @@ class ApplicationConnection extends JPPFConnection
 		if (currentJobId != null)
 		{
 			currentJobId = null;
-			JPPFTaskBundle header = headerWrapper.getBundle();
+			JPPFTaskBundle header = (JPPFTaskBundle) headerWrapper.getJob();
 			header.setCompletionListener(null);
 			JMXDriverConnectionWrapper wrapper = new JMXDriverConnectionWrapper();
 			wrapper.connect();

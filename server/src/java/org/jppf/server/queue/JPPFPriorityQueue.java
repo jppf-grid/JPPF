@@ -87,7 +87,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 */
 	public void addBundle(BundleWrapper bundleWrapper)
 	{
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		JPPFJobSLA sla = bundle.getJobSLA();
 		if (sla.isBroadcastJob() && (bundle.getParameter(BundleParameter.NODE_BROADCAST_UUID) == null))
 		{
@@ -138,7 +138,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @return the most recent object that was added to the queue.
 	 * @see org.jppf.server.queue.AbstractJPPFQueue#nextBundle(int)
 	 */
-	public BundleWrapper nextBundle(int nbTasks)
+	public ServerJob nextBundle(int nbTasks)
 	{
 		Iterator<BundleWrapper> it = iterator();
 		return it.hasNext() ? nextBundle(it.next(),  nbTasks) : null;
@@ -153,7 +153,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 */
 	public BundleWrapper nextBundle(BundleWrapper bundleWrapper, int nbTasks)
 	{
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		BundleWrapper result = null;
 		try
 		{
@@ -194,7 +194,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		}
 		if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " +
 			formatSizeMapInfo("sizeMap", sizeMap));
-		statsManager.taskOutOfQueue(result.getBundle().getTaskCount(), System.currentTimeMillis() - result.getBundle().getQueueEntryTime());
+		JPPFTaskBundle resultJob = (JPPFTaskBundle) result.getJob();
+		statsManager.taskOutOfQueue(resultJob.getTaskCount(), System.currentTimeMillis() - resultJob.getQueueEntryTime());
 		return result;
 	}
 
@@ -238,12 +239,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	/**
 	 * {@inheritDoc}
 	 */
-	public BundleWrapper removeBundle(BundleWrapper bundleWrapper)
+	public ServerJob removeBundle(BundleWrapper bundleWrapper)
 	{
 		lock.lock();
 		try
 		{
-			JPPFTaskBundle bundle = bundleWrapper.getBundle();
+			JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 			if (debugEnabled) log.debug("removing bundle from queue, jobId=" + bundle.getId());
 			removeFromListMap(new JPPFPriority(bundle.getJobSLA().getPriority()), bundleWrapper, priorityMap);
 			return jobMap.remove(bundle.getJobUuid());
@@ -268,9 +269,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * Process the start schedule specified in the job SLA.
 	 * @param bundleWrapper the job to process.
 	 */
-	private void handleStartJobSchedule(BundleWrapper bundleWrapper)
+	private void handleStartJobSchedule(ServerJob bundleWrapper)
 	{
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		JPPFSchedule schedule = bundle.getJobSLA().getJobSchedule();
 		if (schedule != null)
 		{
@@ -299,7 +300,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 */
 	private void handleExpirationJobSchedule(BundleWrapper bundleWrapper)
 	{
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		bundle.setParameter(BundleParameter.JOB_EXPIRED, false);
 		JPPFSchedule schedule = bundle.getJobSLA().getJobExpirationSchedule();
 		if (schedule != null)
@@ -343,14 +344,14 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		Map<String, JPPFManagementInfo> uuidMap = JPPFDriver.getInstance().getNodeHandler().getUuidMap();
 		if (uuidMap.isEmpty()) return;
 		BroadcastJobCompletionListener completionListener = new BroadcastJobCompletionListener(bundleWrapper, uuidMap.keySet());
-		JPPFTaskBundle bundle = bundleWrapper.getBundle();
+		JPPFDistributedJob bundle = bundleWrapper.getJob();
 		JPPFJobSLA sla = bundle.getJobSLA();
 		ExecutionPolicy policy = sla.getExecutionPolicy();
 		List<BundleWrapper> jobList = new ArrayList<BundleWrapper>();
 		for (Map.Entry<String, JPPFManagementInfo> entry: uuidMap.entrySet())
 		{
 			BundleWrapper job = bundleWrapper.copy();
-			JPPFTaskBundle newBundle = job.getBundle();
+			JPPFTaskBundle newBundle = (JPPFTaskBundle) job.getJob();
 			String uuid = entry.getKey();
 			JPPFManagementInfo info = entry.getValue();
 			newBundle.setParameter(BundleParameter.NODE_BROADCAST_UUID, uuid);
