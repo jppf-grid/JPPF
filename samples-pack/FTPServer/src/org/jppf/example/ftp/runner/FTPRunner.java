@@ -76,7 +76,14 @@ public class FTPRunner
 		JPPFJob job = new JPPFJob();
 		job.setId("FTP server example job");
 		// fetch the host from the JPPF client, so we don't have to hard-code it in the task.
-		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
+		JPPFClientConnectionImpl c = null;
+		do
+		{
+			Thread.sleep(100L);
+			c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
+		}
+		while (c == null);
+		while ((c.getJmxConnection() == null) || !c.getJmxConnection().isConnected()) Thread.sleep(100L);
 		String host = c.getJmxConnection().getHost();
 		// store the host in a data provider
 		DataProvider dataProvider = new MemoryMapDataProvider();
