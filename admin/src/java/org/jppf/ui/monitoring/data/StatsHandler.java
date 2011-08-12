@@ -426,10 +426,13 @@ public final class StatsHandler implements StatsConstants, ClientListener
 			{
 				public void run()
 				{
-					currentConnection = connection;
-					if (JPPFClientConnectionStatus.ACTIVE.equals(connection.getStatus()))
+					synchronized(StatsHandler.this)
 					{
-						fireStatsHandlerEvent(StatsHandlerEvent.Type.RESET);
+						currentConnection = connection;
+						if (JPPFClientConnectionStatus.ACTIVE.equals(connection.getStatus()))
+						{
+							fireStatsHandlerEvent(StatsHandlerEvent.Type.RESET);
+						}
 					}
 				}
 			});

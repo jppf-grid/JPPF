@@ -92,7 +92,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	{
 		try
 		{
-			delegate = new ClassServerDelegateImpl(this, appUuid, host, classServerPort);
+			delegate = new ClassServerDelegateImpl(this, uuid, host, classServerPort);
 			delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
 			{
 				public void statusChanged(ClientConnectionStatusEvent event)

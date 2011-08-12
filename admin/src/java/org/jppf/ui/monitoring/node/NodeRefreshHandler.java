@@ -111,8 +111,15 @@ public class NodeRefreshHandler
 	private synchronized void refresh0()
 	{
 		Collection<JPPFClientConnection> connectionList = jppfClient.getAllConnections();
+		Set<String> uuidSet = new HashSet<String>();
 		Map<String, JPPFClientConnection> map = new HashMap<String, JPPFClientConnection>();
-		for (JPPFClientConnection c: connectionList) map.put(((JPPFClientConnectionImpl) c).getJmxConnection().getId(), c);
+		for (JPPFClientConnection c: connectionList)
+		{
+			JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) c;
+			if (uuidSet.contains(conn.getUuid())) continue;
+			uuidSet.add(conn.getUuid());
+			map.put(conn.getJmxConnection().getId(), c);
+		}
 		Map<String, JPPFClientConnection> connectionMap = nodeDataPanel.getAllDriverNames();
 
 		// handle drivers that were removed
@@ -152,6 +159,7 @@ public class NodeRefreshHandler
 	private synchronized void refreshNodes(String driverName)
 	{
 		DefaultMutableTreeNode driverNode = nodeDataPanel.getManager().findDriver(driverName);
+		//if (debugEnabled) log.debug("driverNode = " + driverNode);
 		if (driverNode == null) return;
 		Set<String> panelNames = new HashSet<String>();
 		for (int i=0; i<driverNode.getChildCount(); i++)

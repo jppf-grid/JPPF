@@ -22,7 +22,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.ui.actions.JTreeTableActionHandler;
+import org.jppf.ui.actions.*;
 import org.jppf.ui.options.AbstractOption;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.utils.LocalizationUtils;
@@ -31,7 +31,7 @@ import org.jppf.utils.LocalizationUtils;
  * Abstract implementation of a tree table-based option.
  * @author Laurent Cohen
  */
-public abstract class AbstractTreeTableOption extends AbstractOption
+public abstract class AbstractTreeTableOption extends AbstractOption implements ActionHolder
 {
 	/**
 	 * Base name for localization bundle lookups.

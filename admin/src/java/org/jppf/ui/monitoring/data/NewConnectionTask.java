@@ -114,7 +114,8 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable
 			}
 			if (statsHandler.currentConnection == null)
 			{
-				statsHandler.currentConnection = (JPPFClientConnectionImpl) c;
+				//statsHandler.currentConnection = (JPPFClientConnectionImpl) c;
+				statsHandler.setCurrentConnection((JPPFClientConnectionImpl) c);
 				box.setSelectedItem(c);
 			}
 		}

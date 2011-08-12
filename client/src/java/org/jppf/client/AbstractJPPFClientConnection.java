@@ -75,9 +75,9 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	protected ClassServerDelegate delegate = null;
 	/**
-	 * Unique identifier for this JPPF client.
+	 * Unique identifier of the remote driver.
 	 */
-	protected String appUuid = null;
+	protected String uuid = null;
 	/**
 	 * The name or IP address of the host the JPPF driver is running on.
 	 */
@@ -143,7 +143,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	protected void configure(String uuid, String name, String host, int driverPort, int classServerPort, int priority)
 	{
-		this.appUuid = uuid;
+		this.uuid = uuid;
 		this.host = NetworkUtils.getHostName(host);
 		this.port = driverPort;
 		this.priority = priority;
@@ -169,7 +169,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		TypedProperties props = JPPFConfiguration.getProperties();
 		sb.append(props.getInt("class.server.port", 11111)).append(":");
 		sb.append(port).append(":");
-		credentials = new JPPFSecurityContext(appUuid, sb.toString(), new JPPFCredentials());
+		credentials = new JPPFSecurityContext(uuid, sb.toString(), new JPPFCredentials());
 	}
 
 	/**
@@ -207,7 +207,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		int count = job.getTasks().size();
 		if (debugEnabled) log.debug("[client: " + name + "] sending job '" + job.getId() + "' with " + count + " tasks");
 		TraversalList<String> uuidPath = new TraversalList<String>();
-		uuidPath.add(appUuid);
+		uuidPath.add(uuid);
 		header.setUuidPath(uuidPath);
 		header.setTaskCount(count);
 		header.setRequestUuid(job.getJobUuid());
@@ -566,5 +566,14 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	public AbstractGenericClient getClient()
 	{
 		return client;
+	}
+
+	/**
+	 * Get the unique identifier of the remote driver.
+	 * @return the uuid as a string.
+	 */
+	public String getUuid()
+	{
+		return uuid;
 	}
 }

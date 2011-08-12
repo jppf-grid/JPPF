@@ -31,6 +31,7 @@ import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
+import org.jppf.ui.monitoring.node.graph.GraphOption;
 import org.jppf.ui.options.FormattedNumberOption;
 import org.jppf.ui.treetable.*;
 import org.slf4j.*;
@@ -39,7 +40,7 @@ import org.slf4j.*;
  * Panel displaying the tree of all driver connections and attached nodes.
  * @author Laurent Cohen
  */
-public class NodeDataPanel extends AbstractTreeTableOption implements ClientListener, ActionHolder
+public class NodeDataPanel extends AbstractTreeTableOption implements ClientListener
 {
 	/**
 	 * Logger for this class.
@@ -73,6 +74,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * Separate thread used to sequentialize events that impact the tree table.
 	 */
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
+	/**
+	 * The graph view of the topology.
+	 */
+	private GraphOption graphOption;
 
 	/**
 	 * Initialize this panel with the specified information.
@@ -83,9 +88,11 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		if (debugEnabled) log.debug("initializing NodeDataPanel");
 		manager = new NodeDataPanelManager(this);
 		createTreeTableModel();
+		/*
 		populateTreeTableModel();
 		refreshNodeStates();
 		refreshHandler = new NodeRefreshHandler(this);
+		*/
 		createUI();
 	}
 
@@ -370,5 +377,33 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	{
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
 		driverRemoved(c.getJmxConnection().getId(), false);
+	}
+
+	/**
+	 * Get the graph view of the topology.
+	 * @return a {@link GraphOption} instance.
+	 */
+	public GraphOption getGraphOption()
+	{
+		return graphOption;
+	}
+
+	/**
+	 * Set the graph view of the topology.
+	 * @param graphOption a {@link GraphOption} instance.
+	 */
+	public void setGraphOption(GraphOption graphOption)
+	{
+		if (debugEnabled) log.debug("start");
+		if (this.graphOption == null)
+		{
+			graphOption.setTreeTableOption(this);
+			populateTreeTableModel();
+			refreshNodeStates();
+			graphOption.populate();
+			refreshHandler = new NodeRefreshHandler(this);
+		}
+		this.graphOption = graphOption;
+		if (debugEnabled) log.debug("end");
 	}
 }

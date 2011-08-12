@@ -90,8 +90,12 @@ public class TopologyData
 		this(TopologyDataType.NODE);
 		this.nodeInformation = nodeInformation;
 		this.nodeState = new JPPFNodeState();
-		jmxWrapper = new JMXNodeConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort());
-		jmxWrapper.connect();
+		if (nodeInformation.isNode())
+		{
+			jmxWrapper = new JMXNodeConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort());
+			jmxWrapper.connect();
+		}
+		else jmxWrapper = new JMXDriverConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort());
 	}
 
 	/**
@@ -194,5 +198,14 @@ public class TopologyData
 	public void setStatus(TopologyDataStatus status)
 	{
 		this.status = status;
+	}
+
+	/**
+	 * Get the id of this topology element.
+	 * @return the id as a string.
+	 */
+	public String getId()
+	{
+		return (jmxWrapper == null) ? null : jmxWrapper.getId();
 	}
 }

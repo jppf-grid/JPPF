@@ -83,6 +83,7 @@ public class NodeDataPanelManager
 		DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driverData);
 		if (debugEnabled) log.debug("adding driver: " + driverName + " at index " + index);
 		panel.getModel().insertNodeInto(driverNode, panel.getTreeTableRoot(), index);
+		if (panel.getGraphOption() != null) panel.getGraphOption().driverAdded(driverData);
 		if (panel.getListenerMap().get(wrapper.getId()) == null)
 		{
 			ConnectionStatusListener listener = new ConnectionStatusListener(panel, wrapper.getId());
@@ -146,6 +147,7 @@ public class NodeDataPanelManager
 			if (!removeNodesOnly)
 			{
 				panel.getModel().removeNodeFromParent(driverNode);
+				if (panel.getGraphOption() != null) panel.getGraphOption().driverAdded((TopologyData) driverNode.getUserObject());
 				panel.updateStatusBar("/StatusNbServers", -1);
 			}
 		}
@@ -176,13 +178,15 @@ public class NodeDataPanelManager
 	void nodeAdded(DefaultMutableTreeNode driverNode, JPPFManagementInfo nodeInfo)
 	{
 		String nodeName = nodeInfo.getHost() + ":" + nodeInfo.getPort();
+		if (debugEnabled) log.debug("attempting to add node=" + nodeName + " to driver=" + driverNode);
 		int index = nodeInsertIndex(driverNode, nodeName);
 		if (index < 0) return;
 		if (debugEnabled) log.debug("adding node: " + nodeName + " at index " + index);
 		TopologyData data = new TopologyData(nodeInfo);
-		if (debugEnabled) log.debug("created TopologyData instance");
+		//if (debugEnabled) log.debug("created TopologyData instance");
 		DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(data);
 		panel.getModel().insertNodeInto(nodeNode, driverNode, index);
+		if (panel.getGraphOption() != null) panel.getGraphOption().nodeAdded((TopologyData) driverNode.getUserObject(), data);
 		if (nodeInfo.getType() == JPPFManagementInfo.NODE) panel.updateStatusBar("/StatusNbNodes", 1);
 
 		for (int i=0; i<panel.getTreeTableRoot().getChildCount(); i++)
@@ -190,7 +194,11 @@ public class NodeDataPanelManager
 			DefaultMutableTreeNode driverNode2 = (DefaultMutableTreeNode) panel.getTreeTableRoot().getChildAt(i);
 			if (driverNode2 == driverNode) continue;
 			DefaultMutableTreeNode nodeNode2 = findNode(driverNode2, nodeName);
-			if (nodeNode2 != null) panel.getModel().removeNodeFromParent(nodeNode2);
+			if (nodeNode2 != null)
+			{
+				TopologyData tmp = (TopologyData) nodeNode2.getUserObject();
+				if (tmp.getNodeInformation().getType() == JPPFManagementInfo.NODE) panel.getModel().removeNodeFromParent(nodeNode2);
+			}
 		}
 		repaintTreeTable();
 	}
@@ -202,6 +210,7 @@ public class NodeDataPanelManager
 	 */
 	void nodeRemoved(String driverName, String nodeName)
 	{
+		if (debugEnabled) log.debug("attempting to remove node=" + nodeName + " from driver=" + driverName);
 		DefaultMutableTreeNode driverNode = findDriver(driverName);
 		if (driverNode == null) return;
 		final DefaultMutableTreeNode node = findNode(driverNode, nodeName);
@@ -209,6 +218,7 @@ public class NodeDataPanelManager
 		if (debugEnabled) log.debug("removing node: " + nodeName);
 		panel.getModel().removeNodeFromParent(node);
 		TopologyData data = (TopologyData) node.getUserObject();
+		if (panel.getGraphOption() != null) panel.getGraphOption().nodeRemoved((TopologyData) driverNode.getUserObject(), data);
 		if ((data != null) && (data.getNodeInformation().getType() == JPPFManagementInfo.NODE)) panel.updateStatusBar("/StatusNbNodes", -1);
 		repaintTreeTable();
 	}

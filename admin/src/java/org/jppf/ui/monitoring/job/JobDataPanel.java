@@ -40,7 +40,7 @@ import org.slf4j.*;
  * Panel displaying the tree of all driver connections and attached nodes.
  * @author Laurent Cohen
  */
-public class JobDataPanel extends AbstractTreeTableOption implements ClientListener, ActionHolder
+public class JobDataPanel extends AbstractTreeTableOption implements ClientListener
 {
 	/**
 	 * Logger for this class.
