@@ -51,6 +51,11 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 	 * The JPPF client for which servers are discovered.
 	 */
 	private AbstractGenericClient client = null;
+	/**
+	 * Determines whether we keep the addresses of all discovered network interfaces for the ssame driver,
+	 * or if we only use the first one that is discovered.
+	 */
+	private boolean acceptMultipleInterfaces = JPPFConfiguration.getProperties().getBoolean("jppf.discovery.acceptMultipleInterfaces", false);
 
 	/**
 	 * Initialize this discovery thread with the specified JPPF client.
@@ -109,15 +114,19 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 	}
 
 	/**
-	 * Detrmine whether a connection information object is already present in the map.
+	 * Determine whether a connection information object is already present in the map.
 	 * @param info the connection information to lookup.
 	 * @return true if the connection information is in the map, false otherwise.
 	 */
 	private boolean hasConnectionInformation(JPPFConnectionInformation info)
 	{
-		Set<JPPFConnectionInformation> set = infoMap.get(info.uuid);
-		if (set == null) return false;
-		return set.contains(info);
+		if (acceptMultipleInterfaces)
+		{
+			Set<JPPFConnectionInformation> set = infoMap.get(info.uuid);
+			if (set == null) return false;
+			return set.contains(info);
+		}
+		return infoMap.get(info.uuid) != null;
 	}
 
 	/**
