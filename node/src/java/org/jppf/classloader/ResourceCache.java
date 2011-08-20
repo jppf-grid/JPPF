@@ -23,6 +23,7 @@ import java.net.*;
 import java.security.AccessController;
 import java.util.*;
 
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -40,9 +41,26 @@ class ResourceCache
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
+	 * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
+	/**
 	 * Map of resource names to temporary file names to which their content is stored.
 	 */
 	private Map<String, List<String>> cache = new Hashtable<String, List<String>>();
+	/**
+	 * List of temp folders used by this cache.
+	 */
+	private List<String> tempFolders = new LinkedList<String>();
+
+	/**
+	 * Default initializations.
+	 */
+	ResourceCache()
+	{
+		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook()));
+		initTempFolders();
+	}
 
 	/**
 	 * Get the list of locations for the resource with the specified name.
@@ -83,7 +101,7 @@ class ResourceCache
 	 */
 	public synchronized void setResourceLocation(String name, String location)
 	{
-		List<String> list = new ArrayList<String>();
+		List<String> list = new LinkedList<String>();
 		list.add(location);
 		cache.put(name, list);
 	}
@@ -96,9 +114,11 @@ class ResourceCache
 	 */
 	public synchronized void registerResources(String name, List<byte[]> definitions) throws Exception
 	{
-		List<String> locations = new ArrayList<String>();
-		for (byte[] def: definitions) locations.add(saveToTempFile(def));
-		setResourcesLocations(name, locations);
+		if (isAbsolutePath(name)) return;
+		List<String> locations = new LinkedList<String>();
+		//for (byte[] def: definitions) locations.add(saveToTempFile(def));
+		for (byte[] def: definitions) locations.add(saveToTempFile(name, def));
+		if (!locations.isEmpty()) setResourcesLocations(name, locations);
 	}
 
 	/**
@@ -110,6 +130,21 @@ class ResourceCache
 	private String saveToTempFile(final byte[] definition) throws Exception
 	{
 		SaveFileAction action = new SaveFileAction(definition);
+		File file = (File) AccessController.doPrivileged(action);
+		if (action.getException() != null) throw action.getException();
+		return file.getCanonicalPath();
+	}
+
+	/**
+	 * Save the specified reosurce definition to a temporary file.
+	 * @param name the original name of the resource to save.
+	 * @param definition the definition to save, specified as a byte array.
+	 * @return the path to the created file.
+	 * @throws Exception if any I/O error occurs.
+	 */
+	private String saveToTempFile(final String name, final byte[] definition) throws Exception
+	{
+		SaveFileAction action = new SaveFileAction(tempFolders, name, definition);
 		File file = (File) AccessController.doPrivileged(action);
 		if (action.getException() != null) throw action.getException();
 		return file.getCanonicalPath();
@@ -143,5 +178,99 @@ class ResourceCache
 		{
 		}
 		return null;
+	}
+
+	/**
+	 * Initializations of the temps folders.
+	 */
+	private void initTempFolders()
+	{
+		try
+		{
+			String base = System.getProperty("java.io.tmpdir");
+			if (base == null) base = System.getProperty("user.home");
+			if (base == null) base = System.getProperty("user.dir");
+			if (base == null) base = ".";
+			String jppfTemp = "jppf_" + new JPPFUuid(JPPFUuid.ALPHA_NUM, 22).toString();
+			String s = base + File.separator + jppfTemp;
+			File baseDir = new File(s + File.separator);
+			if (!baseDir.exists()) baseDir.mkdirs();
+			//baseDir.deleteOnExit();
+			tempFolders.add(s);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Determine wether the specified path is absolute, in a system-independant way.
+	 * @param path the path to verify.
+	 * @return true if the path is absolute, false otherwise
+	 */
+	private boolean isAbsolutePath(String path)
+	{
+		if (path.startsWith("/") || path.startsWith("\\")) return true;
+		if (path.length() < 3) return false;
+		char c = path.charAt(0);
+		if ((((c >= 'A') && (c <='Z')) || ((c >= 'a') && (c <= 'z'))) && (path.charAt(1) == ':')) return true;
+		return false;
+	}
+
+	/**
+	 * Delete the specified path, recursively if this is a directory.
+	 * @param path the path to delete.
+	 */
+	private void deletePath(File path)
+	{
+		if ((path == null) || !path.exists()) return;
+		boolean success = true;
+		try
+		{
+			if (path.isDirectory())
+			{
+				for (File child: path.listFiles()) deletePath(child);
+			}
+			success = path.delete();
+		}
+		catch (Exception e)
+		{
+			success = false;
+		}
+		if (traceEnabled) log.trace("" + (success ? "successfully deleted " : "failed to delete ")  + path);
+	}
+
+	/**
+	 * A runnable invoked whenever this resource cache is garbage collected or the JVM shuts down,
+	 * so as to cleanup all cached resources on the file system.
+	 */
+	private class ShutdownHook implements Runnable
+	{
+		/**
+		 * {@inheritDoc}
+		 */
+		public void run()
+		{
+			while (!tempFolders.isEmpty()) deletePath(new File(tempFolders.remove(0)));
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected void finalize() throws Throwable
+	{
+		Runnable r = new Runnable()
+		{
+			public void run()
+			{
+				String[] paths = tempFolders.toArray(StringUtils.ZERO_STRING);
+				tempFolders.clear();
+				for (String path: paths) deletePath(new File(tempFolders.remove(0)));
+				paths = null;
+			}
+		};
+		new Thread(r).start();
 	}
 }

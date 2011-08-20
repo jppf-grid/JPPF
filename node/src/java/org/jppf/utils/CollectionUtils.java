@@ -72,11 +72,21 @@ public final class CollectionUtils
 	{
 		if (arrays == null) return null;
 		List<T> result = new ArrayList<T>();
+		T[] tmp = null;
+		for (T[] array: arrays)
+		{
+			if (array.length > 0)
+			{
+				tmp = array;
+				break;
+			}
+		}
+		if (tmp == null) return Arrays.copyOf(arrays[0], 0);
 		for (T[] array: arrays)
 		{
 			for (T t: array) result.add(t);
 		}
-		return result.toArray((T[]) Array.newInstance(arrays[0][0].getClass(), 0));
+		return result.toArray((T[]) Array.newInstance(tmp[0].getClass(), 0));
 	}
 
 	/**

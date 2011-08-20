@@ -162,6 +162,12 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	public URL findResource(String name)
 	{
 		URL url = null;
+		url = cache.getResourceURL(name);
+		if (url != null)
+		{
+			if (debugEnabled) log.debug("resource [" + name + "] found in local cache");
+			return url;
+		}
 		if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
 		try
 		{

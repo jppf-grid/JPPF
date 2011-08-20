@@ -92,7 +92,9 @@ public class ServiceFinder
 	 */
 	public <T> List<T> findProviders(Class<T> providerClass)
 	{
-		return findProviders(providerClass, Thread.currentThread().getContextClassLoader());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if (cl == null) cl = getClass().getClassLoader();
+		return findProviders(providerClass, cl);
 	}
 
 	/**
