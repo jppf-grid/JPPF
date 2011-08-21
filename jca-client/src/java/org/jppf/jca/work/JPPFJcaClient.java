@@ -107,6 +107,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 */
 	public void setSubmissionManager(JPPFSubmissionManager submissionManager)
 	{
+		//log.info("setting submission maneger: " + submissionManager);
 		this.submissionManager = submissionManager;
 	}
 

@@ -4,7 +4,7 @@
   <no-tx-connection-factory>
     <jndi-name>eis/JPPFConnectionFactory</jndi-name>
     <application-managed-security/>
-    <rar-name>jppf_ra_JBoss-4.0.rar</rar-name> 
+    <rar-name>jppf_ra_JBoss.rar</rar-name> 
     <connection-definition>javax.resource.cci.ConnectionFactory</connection-definition>
     <adapter-display-name>JPPF</adapter-display-name>
     <min-pool-size>0</min-pool-size>
