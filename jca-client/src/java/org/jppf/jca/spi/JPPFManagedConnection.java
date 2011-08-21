@@ -45,6 +45,15 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	private List<ConnectionEventListener> listeners = new ArrayList<ConnectionEventListener>();
 
 	/**
+	 * Default constructor.
+	 */
+	public JPPFManagedConnection()
+	{
+		//System.out.println("creating managed connection, call stack:");
+		//System.out.println(StringUtils.getStackTrace(new Exception()));
+	}
+
+	/**
 	 * Add a listener to the list of connection event listeners for this managed connection.
 	 * @param listener the listener to add.
 	 * @see javax.resource.spi.ManagedConnection#addConnectionEventListener(javax.resource.spi.ConnectionEventListener)

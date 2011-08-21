@@ -74,7 +74,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	{
 		try
 		{
-			delegate = new JcaClassServerDelegate(name, appUuid, host, classServerPort, (JPPFJcaClient) client);
+			delegate = new JcaClassServerDelegate(name, uuid, host, classServerPort, (JPPFJcaClient) client);
 			//setStatus(CONNECTING);
 			initCredentials();
 			//taskServerConnection.init();

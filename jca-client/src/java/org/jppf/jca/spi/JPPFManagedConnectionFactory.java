@@ -26,6 +26,7 @@ import javax.security.auth.Subject;
 
 import org.jppf.jca.cci.JPPFConnectionFactory;
 import org.jppf.jca.util.JPPFAccessorImpl;
+import org.jppf.jca.work.JPPFJcaClient;
 
 
 /**
@@ -42,6 +43,15 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
 	 * Handle to the resource adapter.
 	 */
 	private transient ResourceAdapter resourceAdapter = null;
+
+	/**
+	 * Default constructor.
+	 */
+	public JPPFManagedConnectionFactory()
+	{
+		//System.out.println("creating managed connection factory, call stack:");
+		//System.out.println(StringUtils.getStackTrace(new Exception()));
+	}
 
 	/**
 	 * Create a jca connection factory. This method is called by the application server.
@@ -142,5 +152,18 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
 	public int hashCode()
 	{
 		return super.hashCode();
+	}
+
+	/**
+   * Get the JPPF client used to submit tasks.
+	 * @return a <code>JPPFJcaClient</code> instance.
+	 */
+	public JPPFJcaClient getJppfClient()
+	{
+		if (jppfClient == null)
+		{
+			if (resourceAdapter != null) jppfClient = ((JPPFResourceAdapter) resourceAdapter).getJppfClient();
+		}
+		return jppfClient;
 	}
 }

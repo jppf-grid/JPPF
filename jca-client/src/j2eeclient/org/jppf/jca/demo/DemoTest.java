@@ -261,8 +261,9 @@ public class DemoTest
 	public JPPFConnection getConnection() throws Exception
 	{
 		Object objref = getInitialContext().lookup(jndiBinding);
-		//ConnectionFactory cf = (ConnectionFactory) PortableRemoteObject.narrow(objref, ConnectionFactory.class);
-		JPPFConnectionFactory cf = (JPPFConnectionFactory) javax.rmi.PortableRemoteObject.narrow(objref, ConnectionFactory.class);
+		JPPFConnectionFactory cf;
+		if (objref instanceof JPPFConnectionFactory) cf = (JPPFConnectionFactory) objref;
+		else cf = (JPPFConnectionFactory) javax.rmi.PortableRemoteObject.narrow(objref, ConnectionFactory.class);
 		return (JPPFConnection) cf.getConnection();
 	}
 }

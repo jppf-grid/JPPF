@@ -46,7 +46,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	/**
 	 * Logger for this class.
 	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFJcaClient.class);
+	private static Logger log = LoggerFactory.getLogger(JPPFResourceAdapter.class);
 	/**
 	 * Host name or IP address for the JPPF driver.
 	 */
