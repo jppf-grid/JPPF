@@ -82,6 +82,7 @@ class WaitingJobState extends ClientServerState
 				list = classServer.getProviderConnections(uuid);
 			}
 			header.getUuidPath().add(driver.getUuid());
+			if (debugEnabled) log.debug("uuid path=" + header.getUuidPath().getList());
 			header.setCompletionListener(new CompletionListener(channel));
 			context.setPendingTasksCount(header.getTaskCount());
 			context.setInitialBundleWrapper(bundleWrapper);

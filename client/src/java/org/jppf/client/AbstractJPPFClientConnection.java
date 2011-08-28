@@ -205,10 +205,10 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	{
 		ObjectSerializer ser = makeHelper().getSerializer();
 		int count = job.getTasks().size();
-		if (debugEnabled) log.debug("[client: " + name + "] sending job '" + job.getId() + "' with " + count + " tasks");
 		TraversalList<String> uuidPath = new TraversalList<String>();
-		uuidPath.add(uuid);
+		uuidPath.add(client.getUuid());
 		header.setUuidPath(uuidPath);
+		if (debugEnabled) log.debug("[client: " + name + "] sending job '" + job.getId() + "' with " + count + " tasks, uuidPath=" + uuidPath.getList());
 		header.setTaskCount(count);
 		header.setRequestUuid(job.getJobUuid());
 		header.setParameter(BundleParameter.JOB_ID, job.getId());

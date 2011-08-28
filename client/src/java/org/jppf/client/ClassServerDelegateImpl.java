@@ -61,7 +61,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	public ClassServerDelegateImpl(JPPFClientConnection owner, String uuid, String host, int port) throws Exception
 	{
 		super(owner);
-		this.appUuid = uuid;
+		this.clientUuid = uuid;
 		this.host = host;
 		this.port = port;
 		setName(owner.getName());
@@ -184,7 +184,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 		if  (debugEnabled) log.debug("[" + getName() + "] : sending initial resource");
 		JPPFResourceWrapper resource = new JPPFResourceWrapper();
 		resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
-		resource.addUuid(appUuid);
+		resource.addUuid(clientUuid);
 		writeResource(resource);
 		resource = readResource();
 		handshakeDone = true;

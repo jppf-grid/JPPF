@@ -53,7 +53,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	/**
 	 * Unique identifier for this class server delegate, obtained from the local JPPF client.
 	 */
-	protected String appUuid = null;
+	protected String clientUuid = null;
 
 	/**
 	 * Default instantiation of this class is not permitted.

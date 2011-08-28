@@ -34,7 +34,7 @@ public class TraversalList<E> implements Serializable
 	/**
 	 * The actual list that backs this traversal list.
 	 */
-	private List<E> list = new ArrayList<E>();
+	private List<E> list = new LinkedList<E>();
 	/**
 	 * The current position in the list.
 	 */

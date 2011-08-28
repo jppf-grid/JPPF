@@ -76,6 +76,7 @@ public abstract class JPPFContainer
 	 */
 	public JPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader classLoader) throws Exception
 	{
+		if (debugEnabled) log.debug("bew JPPFContainer with uuidPath=" + uuidPath + ", classLoader=" + classLoader);
 		this.uuidPath = uuidPath;
 		this.classLoader = classLoader;
 		init();

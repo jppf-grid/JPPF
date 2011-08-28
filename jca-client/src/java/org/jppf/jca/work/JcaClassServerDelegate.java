@@ -64,7 +64,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	public JcaClassServerDelegate(String name, String uuid, String host, int port, JPPFJcaClient client) throws Exception
 	{
 		super(null);
-		this.appUuid = uuid;
+		this.clientUuid = client.getUuid();
 		this.host = host;
 		this.port = port;
 		this.client = client;
@@ -203,7 +203,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 			if  (debugEnabled) log.debug("[" + getName() + "] : sending initial resource");
 			JPPFResourceWrapper resource = new JPPFResourceWrapper();
 			resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
-			resource.addUuid(appUuid);
+			resource.addUuid(clientUuid);
 			writeResource(resource);
 			// receive the initial response from the server.
 			readResource();
