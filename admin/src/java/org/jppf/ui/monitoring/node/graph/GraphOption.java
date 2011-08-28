@@ -71,6 +71,10 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * Manages the actions for this graph.
 	 */
 	protected ActionHandler actionHandler = null;
+	/**
+	 * 
+	 */
+	protected Map<String, mxCell> groupsMap = new HashMap<String, mxCell>();
 
 	/**
 	 * {@inheritDoc}
@@ -135,14 +139,14 @@ public class GraphOption extends AbstractOption implements ActionHolder
 		try
 		{
 			Map<String, DefaultMutableTreeNode> drivers = new HashMap<String, DefaultMutableTreeNode>();
-			Map<String, Object> vertices = new HashMap<String, Object>();
+			Map<String, mxCell> vertices = new HashMap<String, mxCell>();
 			for (int i=0; i<root.getChildCount(); i++)
 			{
 				DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
 				TopologyData data = (TopologyData) child.getUserObject();
 				String id = data.getJmxWrapper().getId();
 				drivers.put(id, child);
-				Object vertex = insertDriverVertex(data);
+				mxCell vertex = insertDriverVertex(data);
 				vertices.put(id, vertex);
 				if (debugEnabled) log.debug("added vertex for " + id);
 			}
@@ -151,7 +155,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 				DefaultMutableTreeNode driver = (DefaultMutableTreeNode) root.getChildAt(i);
 				TopologyData driverData = (TopologyData) driver.getUserObject();
 				String id = driverData.getJmxWrapper().getId();
-				Object v1 = vertices.get(id);
+				mxCell v1 = vertices.get(id);
 				for (int j=0; j<driver.getChildCount(); j++)
 				{
 					DefaultMutableTreeNode child = (DefaultMutableTreeNode) driver.getChildAt(j);
@@ -159,20 +163,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 					String childId = childData.getJmxWrapper().getId();
 					JPPFManagementInfo info = childData.getNodeInformation();
 					if (info == null) continue;
-					if (JPPFManagementInfo.DRIVER == info.getType())
-					{
-						Object v2 = vertices.get(childId);
-						graph.insertEdge(parent, null, null, v1, v2);
-						if (debugEnabled) log.debug("inserted edge between " + id + " and " + childId);
-					}
-					else
-					{
-						Object v2 = insertNodeVertex(v1, childData);
-						if (debugEnabled) log.debug("added vertex for " + childId);
-						graph.insertEdge(parent, null, null, v1, v2);
-						if (debugEnabled) log.debug("inserted edge between " + id + " and " + childId);
-					}
-						
+					mxCell v2 = insertNodeVertex(v1, childData);
 				}
 			}
 			layout.execute(parent);
@@ -234,8 +225,10 @@ public class GraphOption extends AbstractOption implements ActionHolder
 		actionHandler.putAction("graph.reset.counter", new ResetTaskCounterAction());
 		actionHandler.putAction("graph.restart.node", new RestartNodeAction());
 		actionHandler.putAction("graph.shutdown.node", new ShutdownNodeAction());
-		//actionHandler.putAction("select.drivers", new SelectDriversAction(this));
-		//actionHandler.putAction("select.nodes", new SelectNodesAction(this));
+		actionHandler.putAction("graph.select.drivers", new SelectGraphDriversAction(this));
+		actionHandler.putAction("graph.select.nodes", new SelectGraphNodesAction(this));
+		actionHandler.putAction("graph.button.collapse", new ExpandOrCollapseGraphAction(this, true));
+		actionHandler.putAction("graph.button.expand", new ExpandOrCollapseGraphAction(this, false));
 		actionHandler.updateActions();
 		//treeTable.addMouseListener(new NodeTreeTableMouseListener(actionHandler));
 		Runnable r = new ActionsInitializer(this, "/graph.topology.toolbar");
@@ -282,6 +275,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 			{
 				for (int i=0; i<vertex.getEdgeCount(); i++) model.remove(vertex.getEdgeAt(i));
 				model.remove(vertex);
+				graph.getView().invalidate();
 				if (debugEnabled) log.debug("removed driver " + id + " from graph");
 			}
 		}
@@ -308,19 +302,14 @@ public class GraphOption extends AbstractOption implements ActionHolder
 		model.beginUpdate();
 		try
 		{
-			Object v1 = model.getCell(id);
+			mxCell v1 = (mxCell) model.getCell(id);
 			if (v1 != null)
 			{
-				if (node.getNodeInformation().isDriver())
+				insertNodeVertex(v1, node);
+				if (debugEnabled)
 				{
-					Object v2 = model.getCell(node.getId());
-					graph.insertEdge(parent, null, null, v1, v2);
-					if (debugEnabled) log.debug("linking driver " + id + " to peer driver " + node.getId());
-				}
-				else
-				{
-					insertNodeVertex(v1, node);
-					if (debugEnabled) log.debug("added node " + node.getId() + " to driver " + id);
+					String s = node.getNodeInformation().isDriver() ? "peer driver" : "node";
+					log.debug("added " + s + " " + node.getId() + " to driver " + id);
 				}
 			}
 		}
@@ -341,17 +330,18 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 */
 	public void nodeRemoved(TopologyData driver, TopologyData node)
 	{
-		String id = node.getId();
 		mxGraphModel model = (mxGraphModel) graph.getModel();
 		model.beginUpdate();
 		try
 		{
-			mxCell vertex = (mxCell) model.getCell(id);
+			mxCell vertex = (mxCell) model.getCell(node.getId());
 			if (vertex != null)
 			{
 				for (int i=0; i<vertex.getEdgeCount(); i++) model.remove(vertex.getEdgeAt(i));
 				model.remove(vertex);
 			}
+			Object driverVertex = model.getCell(driver.getId());
+			graph.getView().invalidate(driverVertex);
 			if (debugEnabled) log.debug("removed node " + node.getId() + " from driver " + driver.getId());
 		}
 		catch(Throwable t)
@@ -378,13 +368,19 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * @param driver data for the driver to add.
 	 * @return the new vertex object.
 	 */
-	private Object insertDriverVertex(TopologyData driver)
+	private mxCell insertDriverVertex(TopologyData driver)
 	{
 		StringBuilder style = new StringBuilder();
 		style.append("shape=image;image=/org/jppf/ui/resources/mainframe.gif");
-		style.append(";verticalLabelPosition=bottom;label='").append(driver.getId()).append("'");
-		Object vertex = graph.insertVertex(graph.getDefaultParent(), driver.getId(), driver, 0, 0, 40, 30, style.toString());
-		if (layout != null) layout.execute(vertex);
+		//style.append(";verticalLabelPosition=bottom;label='").append(driver.getId()).append("'");
+		style.append(";verticalLabelPosition=bottom");
+		mxCell vertex = (mxCell) graph.insertVertex(graph.getDefaultParent(), driver.getId(), driver, 0, 0, 30, 20, style.toString());
+		vertex.setCollapsed(false);
+		if (layout != null)
+		{
+			//layout.execute(graph.getDefaultParent());
+			layout.execute(vertex);
+		}
 		return vertex;
 	}
 
@@ -394,14 +390,34 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * @param node data for the newly added node.
 	 * @return the new vertex object.
 	 */
-	private Object insertNodeVertex(Object driverVertex, TopologyData node)
+	private mxCell insertNodeVertex(mxCell driverVertex, TopologyData node)
 	{
-		StringBuilder style = new StringBuilder();
-		style.append("shape=image;image=/org/jppf/ui/resources/buggi_server.gif");
-		style.append(";verticalLabelPosition=bottom;label='").append(node.getId()).append("'");
-		Object nodeVertex = graph.insertVertex(graph.getDefaultParent(), node.getId(), node, 0, 0, 40, 30, style.toString());
-		graph.insertEdge(graph.getDefaultParent(), null, null, driverVertex, nodeVertex);
-		if (layout != null) layout.execute(nodeVertex);
+		mxCell nodeVertex;
+		if (node.getNodeInformation().isDriver()) nodeVertex = (mxCell) ((mxGraphModel) graph.getModel()).getCell(node.getId());
+		else
+		{
+			StringBuilder style = new StringBuilder();
+			style.append("shape=image;image=/org/jppf/ui/resources/buggi_server.gif");
+			//style.append(";verticalLabelPosition=bottom;label='").append(node.getId()).append("'");
+			style.append(";verticalLabelPosition=bottom");
+			nodeVertex = (mxCell) graph.insertVertex(driverVertex, node.getId(), node, 0, 0, 20, 20, style.toString());
+		}
+		mxCell edge = (mxCell) graph.insertEdge(driverVertex, null, null, driverVertex, nodeVertex);
+		if (layout != null)
+		{
+			//layout.execute(graph.getDefaultParent());
+			layout.execute(driverVertex);
+			//layout.execute(nodeVertex);
+		}
 		return nodeVertex;
+	}
+
+	/**
+	 * Get the displayed graph.
+	 * @return a <code>mxGraph</code> instance.
+	 */
+	public mxGraph getGraph()
+	{
+		return graph;
 	}
 }

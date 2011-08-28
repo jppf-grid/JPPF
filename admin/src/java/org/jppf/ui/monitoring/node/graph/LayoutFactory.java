@@ -72,6 +72,8 @@ class LayoutFactory
 	{
 		mxCompactTreeLayout layout = new mxCompactTreeLayout(graph);
 		layout.setNodeDistance(60);
+		layout.setResetEdges(true);
+		layout.setResizeParent(false);
 		return layout;
 	}
 
@@ -122,17 +124,13 @@ class LayoutFactory
 	private mxIGraphLayout newOrganicLayout()
 	{
 		mxOrganicLayout layout = new mxOrganicLayout(graph);
-		/*
-		layout.setOptimizeEdgeCrossing(true);
-		layout.setOptimizeEdgeDistance(true);
-		layout.setOptimizeEdgeLength(true);
-		layout.setOptimizeNodeDistribution(true);
-		*/
-		layout.setEdgeLengthCostFactor(1d);
-		layout.setEdgeCrossingCostFactor(10000d);
-		layout.setNodeDistributionCostFactor(0d);
-		layout.setMinMoveRadius(1000d);
-		return layout;
+    layout.setRadiusScaleFactor(1.0);
+    layout.setApproxNodeDimensions(false);
+    layout.setEdgeCrossingCostFactor(8000);
+    layout.setNodeDistributionCostFactor(layout.getNodeDistributionCostFactor() * 5);
+	  layout.setEdgeDistanceCostFactor(layout.getEdgeDistanceCostFactor() * 5);
+	  layout.setEdgeLengthCostFactor(layout.getEdgeLengthCostFactor() / 1000);
+	  return layout;
 	}
 
 	/**
@@ -161,7 +159,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newPartitionLayout()
 	{
-		mxPartitionLayout layout = new mxPartitionLayout(graph);
+		mxPartitionLayout layout = new mxPartitionLayout(graph, false, 10);
 		return layout;
 	}
 

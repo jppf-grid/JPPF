@@ -19,6 +19,7 @@
 package org.jppf.ui.monitoring.node.graph;
 
 import org.jppf.ui.actions.AbstractActionHandler;
+import org.jppf.ui.monitoring.node.TopologyData;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.util.*;
@@ -63,7 +64,7 @@ public class GraphActionHandler extends AbstractActionHandler
 		for (Object o: sel)
 		{
 			mxCell cell = (mxCell) o;
-			if (cell.isVertex()) selectedElements.add(cell.getValue());
+			if (cell.isVertex() && (cell.getValue() instanceof TopologyData)) selectedElements.add(cell.getValue());
 		}
 	}
 }
