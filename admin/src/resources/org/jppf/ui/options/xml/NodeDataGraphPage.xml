@@ -42,23 +42,6 @@
 		<child name="graph.shutdown.node" type="Button"/>
 
 		<child name="sep2" type="ToolbarSeparator"/>
-		<child name="graph.Auto" type="Boolean">
-			<property name="label" value="Auto refresh"/>
-			<property name="tooltip" value="Toggles between automatic and manual refresh of the tree structure"/>
-			<property name="value" value="true"/>
-			<property name="persistent" value="true"/>
-			<listener type="script">
-				<script language="groovy"><![CDATA[
-					/*
-					def b = option.getValue().booleanValue();
-					def handler = option.findFirstWithName("/NodeTreeTable").getRefreshHandler();
-					if (b) handler.startRefreshTimer();
-					else handler.stopRefreshTimer();
-					*/
-				]]></script>
-			</listener>
-		</child>
-
 		<child name="graph.button.refresh" type="Button">
 			<property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
 			<listener type="script">
@@ -66,7 +49,7 @@
 			</listener>
 		</child>
 
-		<child name="ServerChooser" type="ComboBox">
+		<child name="Layout" type="ComboBox">
 			<property name="label" value="Layout"/>
 			<property name="tooltip" value="choose a graph layout form the list"/>
 			<property name="value" value="Circle"/>
@@ -87,19 +70,8 @@
 		</child>
 		
 		<child name="sep3" type="ToolbarSeparator"/>
-		<child name="graph.button.expand" type="Button">
-			<property name="icon" value="/org/jppf/ui/resources/expand.gif"/>
-			<listener type="script">
-				<script language="groovy">//option.findFirstWithName("/NodeTreeTable").getTreeTable().expandAll()</script>
-			</listener>
-		</child>
-
-		<child name="graph.button.collapse" type="Button">
-			<property name="icon" value="/org/jppf/ui/resources/collapse.gif"/>
-			<listener type="script">
-				<script language="groovy">//option.findFirstWithName("/NodeTreeTable").getTreeTable().collapseAll()</script>
-			</listener>
-		</child>
+		<child name="graph.button.expand" type="Button"/>
+		<child name="graph.button.collapse" type="Button"/>
 
 		<child name="sep4" type="ToolbarSeparator"/>
 		<child name="graph.select.drivers" type="Button"/>
