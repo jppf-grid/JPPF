@@ -88,13 +88,13 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 					synchronized(channel)
 					{
 						channel.setServerResource(resource);
+						channel.setNodeResource(null);
 						channel.setReadyOps(SelectionKey.OP_READ);
 					}
 					while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
 					if (debugEnabled) log.debug("node initiation message sent");
 					synchronized(channel)
 					{
-						channel.setNodeResource(null);
 						channel.setReadyOps(SelectionKey.OP_WRITE);
 					}
 					while (channel.getNodeResource() == null) channel.getNodeLock().goToSleep();
