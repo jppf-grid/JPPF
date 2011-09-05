@@ -79,6 +79,7 @@ public abstract class JPPFContainer
 		this.uuidPath = uuidPath;
 		this.classLoader = classLoader;
 		init();
+		if (debugEnabled) log.debug("created contained with uuidPath = " + uuidPath);
 	}
 
 	/**
