@@ -58,7 +58,7 @@ class IdleState extends NodeServerState
 	public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		if (debugEnabled) log.debug("exec() for " + wrapper);
-		if (wrapper.isReadable())
+		if (CHECK_CONNECTION && wrapper.isReadable())
 		{
 			/*
 			if (debugEnabled)

@@ -63,7 +63,7 @@ class SendingBundleState extends NodeServerState
 	public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		//if (debugEnabled) log.debug("exec() for " + getRemostHost(channel));
-		if (wrapper.isReadable())
+		if (CHECK_CONNECTION && wrapper.isReadable())
 		{
 			if (!(wrapper instanceof LocalNodeChannel)) throw new ConnectException("node " + wrapper + " has been disconnected");
 		}

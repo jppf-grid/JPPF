@@ -59,7 +59,7 @@ class IdleProviderState extends ClassServerState
 	 */
 	public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
-		if (wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
+		if (CHECK_CONNECTION && wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
 		{
 			ClassContext context = (ClassContext) wrapper.getContext();
 			server.removeProviderConnection(context.getUuid(), wrapper);
