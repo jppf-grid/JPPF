@@ -504,4 +504,28 @@ public final class FileUtils
 			}
 		}
 	}
+
+	/**
+	 * Delete the specified path, recursively if this is a directory.
+	 * @param path the path to delete.
+	 * @return true if the folder and all contained files and subfolders were deleted, false otherwise.
+	 */
+	public static boolean deletePath(File path)
+	{
+		if ((path == null) || !path.exists()) return false;
+		boolean success = true;
+		try
+		{
+			if (path.isDirectory())
+			{
+				for (File child: path.listFiles()) success &= deletePath(child);
+			}
+			success &= path.delete();
+		}
+		catch (Exception e)
+		{
+			success = false;
+		}
+		return success;
+	}
 }

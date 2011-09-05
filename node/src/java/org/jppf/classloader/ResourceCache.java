@@ -18,7 +18,7 @@
 
 package org.jppf.classloader;
 
-import java.io.File;
+import java.io.*;
 import java.net.*;
 import java.security.AccessController;
 import java.util.*;
@@ -147,6 +147,7 @@ class ResourceCache
 		SaveFileAction action = new SaveFileAction(tempFolders, name, definition);
 		File file = (File) AccessController.doPrivileged(action);
 		if (action.getException() != null) throw action.getException();
+		if (traceEnabled) log.trace("saved resource [" + name + "] to file " + file);
 		return file.getCanonicalPath();
 	}
 
@@ -187,21 +188,57 @@ class ResourceCache
 	{
 		try
 		{
-			String base = System.getProperty("java.io.tmpdir");
+			String base = JPPFConfiguration.getProperties().getString("jppf.resource.cache.dir", null);
+			if (base == null) base = System.getProperty("java.io.tmpdir");
 			if (base == null) base = System.getProperty("user.home");
 			if (base == null) base = System.getProperty("user.dir");
 			if (base == null) base = ".";
-			String jppfTemp = "jppf_" + new JPPFUuid(JPPFUuid.ALPHA_NUM, 22).toString();
-			String s = base + File.separator + jppfTemp;
+			//String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
+			//String s = base + File.separator + "jppf_" + uuid;
+			int n = findFolderIndex(base, "jppf_");
+			String s = base + File.separator + "jppf_" + n;
 			File baseDir = new File(s + File.separator);
 			if (!baseDir.exists()) baseDir.mkdirs();
 			//baseDir.deleteOnExit();
 			tempFolders.add(s);
+			if (traceEnabled) log.trace("added temp folder " + s);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Find an index that doesn't exist for the folder suffix.
+	 * @param folder the folder to which the new folder will belong.
+	 * @param base the new folder name prefix.
+	 * @return the maximum existing index + 1, or 0 if no such folder already exists. 
+	 */
+	private int findFolderIndex(String folder, final String base)
+	{
+		File dir = new File(folder);
+		File[] subdirs = dir.listFiles(new FileFilter()
+		{
+			public boolean accept(File path)
+			{
+				return path.isDirectory() && path.getName().startsWith(base);
+			}
+		});
+		int max = -1;
+		for (File f: subdirs)
+		{
+			try
+			{
+				int n = Integer.valueOf(f.getName().substring(base.length()));
+				if (n > max) max = n;
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		if (traceEnabled) log.trace("max index = " + max);
+		return max + 1;
 	}
 
 	/**
@@ -219,29 +256,6 @@ class ResourceCache
 	}
 
 	/**
-	 * Delete the specified path, recursively if this is a directory.
-	 * @param path the path to delete.
-	 */
-	private void deletePath(File path)
-	{
-		if ((path == null) || !path.exists()) return;
-		boolean success = true;
-		try
-		{
-			if (path.isDirectory())
-			{
-				for (File child: path.listFiles()) deletePath(child);
-			}
-			success = path.delete();
-		}
-		catch (Exception e)
-		{
-			success = false;
-		}
-		if (traceEnabled) log.trace("" + (success ? "successfully deleted " : "failed to delete ")  + path);
-	}
-
-	/**
 	 * A runnable invoked whenever this resource cache is garbage collected or the JVM shuts down,
 	 * so as to cleanup all cached resources on the file system.
 	 */
@@ -252,7 +266,7 @@ class ResourceCache
 		 */
 		public void run()
 		{
-			while (!tempFolders.isEmpty()) deletePath(new File(tempFolders.remove(0)));
+			while (!tempFolders.isEmpty()) FileUtils.deletePath(new File(tempFolders.remove(0)));
 		}
 	}
 
@@ -267,7 +281,7 @@ class ResourceCache
 			{
 				String[] paths = tempFolders.toArray(StringUtils.ZERO_STRING);
 				tempFolders.clear();
-				for (String path: paths) deletePath(new File(tempFolders.remove(0)));
+				for (String path: paths) FileUtils.deletePath(new File(tempFolders.remove(0)));
 				paths = null;
 			}
 		};
