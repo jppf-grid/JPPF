@@ -1,1 +1,2 @@
 org.jppf.example.loadbalancer.server.CustomLoadBalancerProvider
+org.jppf.example.loadbalancer.server.NodeThreadsLoadBalancerProvider

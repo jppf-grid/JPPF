@@ -208,7 +208,8 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		int count = job.getTasks().size();
 		if (debugEnabled) log.debug("[client: " + name + "] sending job '" + job.getId() + "' with " + count + " tasks");
 		TraversalList<String> uuidPath = new TraversalList<String>();
-		uuidPath.add(appUuid);
+		//uuidPath.add(appUuid);
+		uuidPath.add(getClient().getUuid());
 		header.setUuidPath(uuidPath);
 		header.setTaskCount(count);
 		header.setRequestUuid(job.getJobUuid());

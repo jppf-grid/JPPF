@@ -182,17 +182,6 @@ public final class FileUtils
 	}
 
 	/**
-	 * Get an output stream given a file path.
-	 * @param path the path to the file to lookup.
-	 * @return an <code>OutputStream</code> instance, or null if the file could not be created.
-	 * @throws IOException if an IO error occurs while looking up the file.
-	 */
-	public static OutputStream getFileOutputStream(String path) throws IOException
-	{
-		return new BufferedOutputStream(new FileOutputStream(path));
-	}
-
-	/**
 	 * Load a file from the specified path.
 	 * This method looks up the schema first in the file system, then in the classpath
 	 * if it is not found in the file system.
@@ -503,5 +492,29 @@ public final class FileUtils
 				}
 			}
 		}
+	}
+
+	/**
+	 * Delete the specified path, recursively if this is a directory.
+	 * @param path the path to delete.
+	 * @return true if the folder and all contained files and subfolders were deleted, false otherwise.
+	 */
+	public static boolean deletePath(File path)
+	{
+		if ((path == null) || !path.exists()) return false;
+		boolean success = true;
+		try
+		{
+			if (path.isDirectory())
+			{
+				for (File child: path.listFiles()) success &= deletePath(child);
+			}
+			success &= path.delete();
+		}
+		catch (Exception e)
+		{
+			success = false;
+		}
+		return success;
 	}
 }
