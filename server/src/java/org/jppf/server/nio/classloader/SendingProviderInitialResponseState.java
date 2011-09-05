@@ -60,7 +60,7 @@ class SendingProviderInitialResponseState extends ClassServerState
 	public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		ClassContext context = (ClassContext) wrapper.getContext();
-		if (wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
+		if (CHECK_CONNECTION && wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
 		{
 			throw new ConnectException("provider " + wrapper + " has been disconnected");
 		}

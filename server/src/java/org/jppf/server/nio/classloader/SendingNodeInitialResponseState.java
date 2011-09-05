@@ -59,7 +59,7 @@ class SendingNodeInitialResponseState extends ClassServerState
 	 */
 	public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
-		if (wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
+		if (CHECK_CONNECTION && wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
 		{
 			throw new ConnectException("node " + wrapper + " has been disconnected");
 		}

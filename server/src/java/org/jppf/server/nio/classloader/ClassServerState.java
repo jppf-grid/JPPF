@@ -20,6 +20,7 @@ package org.jppf.server.nio.classloader;
 
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
+import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
@@ -36,6 +37,10 @@ abstract class ClassServerState extends NioState<ClassTransition>
 	 * Determines whether DEBUG logging level is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Workaround for the issue described in <a href="http://www.jppf.org/forums/index.php/topic,1626.0.html">this forum thread</a>.
+	 */
+	protected static final boolean CHECK_CONNECTION = JPPFConfiguration.getProperties().getBoolean("jppf.nio.check.connection", true); 
 	/**
 	 * The server that handles this state.
 	 */

@@ -58,7 +58,7 @@ class IdleState extends ClientServerState
 	public ClientTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		if (debugEnabled) log.debug("exec() for " + wrapper);
-		if (wrapper.isReadable())
+		if (CHECK_CONNECTION && wrapper.isReadable())
 		{
 			throw new ConnectException("node " + wrapper + " has been disconnected");
 		}
