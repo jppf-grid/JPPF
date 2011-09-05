@@ -21,7 +21,6 @@ import java.io.*;
 import java.security.PrivilegedAction;
 import java.util.List;
 
-import org.jppf.JPPFException;
 import org.jppf.utils.FileUtils;
 
 /**
@@ -81,7 +80,6 @@ class SaveFileAction implements PrivilegedAction<File>
 		{
 			for (String s: tmpDirs)
 			{
-				//File f = new File(s, fileName);
 				File f = new File(s, name);
 				if (!f.exists())
 				{
@@ -98,59 +96,12 @@ class SaveFileAction implements PrivilegedAction<File>
 					f.mkdirs();
 					f.deleteOnExit();
 				}
-				//tmp = new File(f, fileName);
 				tmp = new File(f, name);
 				tmpDirs.add(dir);
 			}
 			tmp.getParentFile().mkdirs();
 			tmp.deleteOnExit();
-			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(tmp));
-			bos.write(definition);
-			bos.flush();
-			bos.close();
-		}
-		catch(Exception e)
-		{
-			exception = e;
-		}
-		return tmp;
-	}
-
-	/**
-	 * Execute this action.
-	 * @return the abstract path for the created file.
-	 * @see java.security.PrivilegedAction#run()
-	 */
-	public File run2()
-	{
-		File tmp = null;
-		try
-		{
-			/*
-			System.out.println("tmpDir: " + System.getProperty("java.io.tmpdir") + ", user.name: " + System.getProperty("user.name") +
-				", user.home: " + System.getProperty("user.home") + ", user.dir: " + System.getProperty("user.dir"));
-			*/
-			try
-			{
-				if (name != null)
-				{
-					File tmp2 = File.createTempFile("jppftemp_", ".tmp");
-				}
-				tmp = File.createTempFile("jppftemp_", ".tmp");
-			}
-			catch(IOException e)
-			{
-				File tmpDir = new File(System.getProperty("user.dir") + File.separator + "temp" + File.separator);
-				boolean created = true;
-				if (!tmpDir.exists() || !tmpDir.isDirectory()) created = tmpDir.mkdirs();
-				if (created) tmp = File.createTempFile("jppftemp_", ".tmp", tmpDir);
-				else throw new JPPFException("Could not create temp dir " + tmpDir.getCanonicalPath());
-			}
-			tmp.deleteOnExit();
-			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(tmp));
-			bos.write(definition);
-			bos.flush();
-			bos.close();
+			FileUtils.writeBytesToFile(definition, tmp);
 		}
 		catch(Exception e)
 		{
