@@ -95,18 +95,12 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 */
 	public void createUI()
 	{
-		graph = new mxGraph();
+		graph = new JPPFGraph();
 		graphComponent =  new mxGraphComponent(graph);
 		graphComponent.getViewport().setOpaque(true);
 		graphComponent.getViewport().setBackground(Color.WHITE);
 		graphComponent.setDragEnabled(false);
 		layout = new mxCompactTreeLayout(graph);
-		graph.getSelectionModel().setSingleSelection(false);
-		graph.getSelectionModel().setEventsEnabled(true);
-		graph.setDisconnectOnMove(false);
-		graph.setCellsEditable(false);
-		graph.setCellsResizable(false);
-		graph.setCellsSelectable(true);
 		//graphComponent.set
 	}
 
@@ -372,13 +366,11 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	{
 		StringBuilder style = new StringBuilder();
 		style.append("shape=image;image=/org/jppf/ui/resources/mainframe.gif");
-		//style.append(";verticalLabelPosition=bottom;label='").append(driver.getId()).append("'");
 		style.append(";verticalLabelPosition=bottom");
 		mxCell vertex = (mxCell) graph.insertVertex(graph.getDefaultParent(), driver.getId(), driver, 0, 0, 30, 20, style.toString());
 		vertex.setCollapsed(false);
 		if (layout != null)
 		{
-			//layout.execute(graph.getDefaultParent());
 			layout.execute(vertex);
 		}
 		return vertex;
@@ -393,21 +385,23 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	private mxCell insertNodeVertex(mxCell driverVertex, TopologyData node)
 	{
 		mxCell nodeVertex;
-		if (node.getNodeInformation().isDriver()) nodeVertex = (mxCell) ((mxGraphModel) graph.getModel()).getCell(node.getId());
+		if (node.getNodeInformation().isDriver())
+		{
+			nodeVertex = (mxCell) ((mxGraphModel) graph.getModel()).getCell(node.getId());
+			mxCell edge = (mxCell) graph.insertEdge(driverVertex, null, null, driverVertex, nodeVertex);
+		}
 		else
 		{
 			StringBuilder style = new StringBuilder();
 			style.append("shape=image;image=/org/jppf/ui/resources/buggi_server.gif");
-			//style.append(";verticalLabelPosition=bottom;label='").append(node.getId()).append("'");
 			style.append(";verticalLabelPosition=bottom");
 			nodeVertex = (mxCell) graph.insertVertex(driverVertex, node.getId(), node, 0, 0, 20, 20, style.toString());
+			mxCell edge = (mxCell) graph.insertEdge(driverVertex, null, null, driverVertex, nodeVertex);
+			nodeVertex.setParent(edge);
 		}
-		mxCell edge = (mxCell) graph.insertEdge(driverVertex, null, null, driverVertex, nodeVertex);
 		if (layout != null)
 		{
-			//layout.execute(graph.getDefaultParent());
 			layout.execute(driverVertex);
-			//layout.execute(nodeVertex);
 		}
 		return nodeVertex;
 	}
