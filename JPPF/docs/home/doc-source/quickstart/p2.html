@@ -1,0 +1,48 @@
+$template{name="quickstart-page-header" title="2 Writing your first JPPF task"}$
+$template{name="nav" url1="p1.html" url2="p3.html"}$
+<br>
+<h1>2 Writing your first JPPF task</h1>
+<h2>2.1 Some definitions</h2>
+<p>In JPPF terminology, the basic unit of execution is called a task. It is the smallest self-contained piece of code that can be executed remotely.
+<p>JPPF is particularly suited for a class of problems called <a href="http://en.wikipedia.org/wiki/Embarrassingly_parallel">embarassingly parallel problems</a>,
+where a problem or program can be split into many independent tasks, and each task can be executed in parallel. We will see how to write such tasks with JPPF.
+
+<h2>2.2 Writing a "hello world" task</h2>
+<p>Here is our first JPPF task. The goal of this task is to create a string message &quot;Hello World&quot;, display it in the console of the JVM where it is running,
+and finally set this message as the task's execution result.
+<p>
+
+$template{name="code_start"}$
+package org.jppf.helloworld;
+import org.jppf.server.protocol.JPPFTask;
+<font color="green">/**
+ * A simple hello world JPPF task.
+ */</font>
+public class HelloWorld extends <a href="http://www.jppf.org/api/org/jppf/server/protocol/JPPFTask.html">JPPFTask</a>
+{
+  <font color="green">/**
+   * Execute the task.
+   * @see java.lang.Runnable#run()
+   */</font>
+  public void <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/lang/Runnable.html#run()">run()</a>
+  {
+    String hello = "Hello, World";
+    System.out.println(hello);
+    <a href="http://www.jppf.org/api/org/jppf/server/protocol/JPPFTask.html#setResult(java.lang.Object)">setResult(hello);</a>
+  }
+}$template{name="code_end"}$
+
+<p>Note: <i>the elements of text in bold in the code above are hyperlinks that will lead you to the Javadoc for the related API.</i>
+<p>The first thing we can see is that our class HelloWord extends the JPPF class <a href="http://www.jppf.org/api/org/jppf/server/protocol/JPPFTask.html">JPPFTask</a>.
+This is the base class for all tasks that can be executed with JPPF. We will see later on that, even when reusing existing code that does not use any JPPF API,
+this code is actually wrapped into a sublcass of JPPFTask.
+<p>The JPPFTask class requires that we implement the <code>run()</code> method. This method is inherited from the Java <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/lang/Runnable.html">Runnable</a> interface,
+which JPPFTask implements and adds functionality to.
+<p>Finally, we can observe that our code is calling the <code>setResult(hello)</code> method, to set the "Hello World" message as the task's execution result.
+This result can be later retrieved by calling <code>getResult()</code>, when the task has been returned to the JPPF client that submitted it.
+
+<p>The Java file for this code can be downloaded here: <a href="../src/org/jppf/helloworld/HelloWorld.java">HelloWorld.java</a>
+
+$template{name="nav" url1="p1.html" url2="p3.html"}$
+
+$template{name="quickstart-page-footer"}$
