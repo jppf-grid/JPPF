@@ -60,6 +60,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	{
 		configure(uuid, name, info.host, info.applicationServerPorts[0], info.classServerPorts[0], 0);
 		status.set(DISCONNECTED);
+		//status = new AtomicReference<JPPFClientConnectionStatus>(DISCONNECTED);
 		classServerPort = info.classServerPorts[0];
 		this.client = client;
 	}
