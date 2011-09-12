@@ -191,4 +191,20 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	{
 		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelJob", new Object[] { jobId, requeue }, new String[] { "java.util.String", "java.util.Boolean" }); 
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Integer getDelegationModel() throws Exception
+	{
+		return (Integer) invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "getDelegationModel", (Object[]) null, (String[]) null); 
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setDelegationModel(Integer model) throws Exception
+	{
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "setDelegationModel", new Object[] { model }, new String[] { "java.lang.Integer" }); 
+	}
 }

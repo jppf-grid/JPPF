@@ -17,41 +17,35 @@
  */
 package test.classloader;
 
-import java.util.List;
+import java.io.File;
+import java.net.URL;
+import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.StringUtils;
-import org.slf4j.*;
+import org.jppf.task.storage.ClientDataProvider;
 
 
-/**
- * Runner class for the class version demo.
- * @author Laurent Cohen
- */
 public class ClassLoaderTest
 {
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(ClassLoaderTest.class);
-	/**
-	 * JPPF client used to submit execution requests.
-	 */
 	private static JPPFClient jppfClient = null;
 
-	/**
-	 * Entry point for this class, performs a matrix multiplication a number of times.,<br>
-	 * The number of times is specified as a configuration property named &quot;matrix.iterations&quot;.<br>
-	 * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
-	 * @param args not used.
-	 */
 	public static void main(String...args)
 	{
 		try
 		{
 			jppfClient = new JPPFClient();
-			perform();
+			JPPFJob job = new JPPFJob();
+			job.setId("broadcast");
+			job.getJobSLA().setBroadcastJob(true);
+			Map<ByteKey, URL> map = processJars("ClassLoaderTest.jar", "../JPPF/lib/Hazelcast/hazelcast.jar");
+			job.addTask(new JPPFTaskPreInit(map));
+			job.setDataProvider(new ClientDataProvider());
+			displayResults("Results for job '" + job.getId() + "'", jppfClient.submit(job));
+			JPPFJob job2 = new JPPFJob();
+			job2.setId("test class loader");
+			job2.addTask(new ClassLoadingTask());
+			displayResults("Results for job '" + job2.getId() + "'", jppfClient.submit(job2));
 		}
 		catch(Exception e)
 		{
@@ -62,35 +56,27 @@ public class ClassLoaderTest
 			if (jppfClient != null) jppfClient.close();
 		}
 	}
-	
-	/**
-	 * Perform the test.
-	 * @throws Exception if an error is raised during the execution.
-	 */
-	private static void perform() throws Exception
+
+	private static void displayResults(String title, List<JPPFTask> results)
 	{
-		long totalTime = System.currentTimeMillis();
-		JPPFJob job = new JPPFJob();
-		job.setId("test class loader");
-		job.addTask(new Task1());
-		job.addTask(new Task2());
-		List<JPPFTask> results = jppfClient.submit(job);
+		System.out.println("***** " + title + " *****");
 		for (JPPFTask t: results)
 		{
 			if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
 			else System.out.println("task result: " + t.getResult());
 		}
-		totalTime = System.currentTimeMillis() - totalTime;
-		output("Computation time: " + StringUtils.toStringDuration(totalTime));
 	}
 
-	/**
-	 * Print a message to the console and/or log file.
-	 * @param message the message to print.
-	 */
-	private static void output(String message)
+	private static Map<ByteKey, URL> processJars(String...paths) throws Exception
 	{
-		System.out.println(message);
-		log.info(message);
+		Map<ByteKey, URL> map = new HashMap<ByteKey, URL>();
+		for (String path: paths)
+		{
+			File file = new File(path);
+			URL url = file.toURI().toURL();
+			ByteKey key = new ByteKey(JPPFUtils.makeKey(url));
+			map.put(key, url);
+		}
+		return map;
 	}
 }

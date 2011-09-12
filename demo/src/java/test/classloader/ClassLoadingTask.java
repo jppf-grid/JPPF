@@ -18,49 +18,32 @@
 
 package test.classloader;
 
-import java.io.Serializable;
-
 import org.jppf.server.protocol.JPPFTask;
 
-/**
- * 
- * @author Laurent Cohen
- */
-public class Task1 extends JPPFTask
+public class ClassLoadingTask extends JPPFTask
 {
-	/**
-	 * Test field.
-	 */
-	private MyStaticClass msc = null;
-
-	/**
-	 * Default constructor.
-	 */
-	public Task1()
-	{
-		msc = new MyStaticClass();
-	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void run()
 	{
-		msc.run();
-		setResult("Task1 successful");
-	}
-
-	/**
-	 * Static inner class.
-	 */
-	public static class MyStaticClass implements Serializable
-	{
-		/**
-		 * Run this class.
-		 */
-		public void run()
+		try
 		{
-			System.out.println("from " + this.getClass()  + " instance");
+			/*
+      AbstractJPPFClassLoader jppfClassLoader = (AbstractJPPFClassLoader) getClass().getClassLoader();
+      System.out.println("jppfClassLoader = " + jppfClassLoader);
+      Class c = jppfClassLoader.loadClass("com.hazelcast.core.Hazelcast");
+      */
+      Class c = Class.forName("com.hazelcast.core.Hazelcast");
+      String s = "loaded " + c + ", classloader = " + c.getClassLoader() + ", task class loader = " + getClass().getClassLoader();
+      System.out.println(s);
+      setResult(s);
+		}
+		catch (Exception e)
+		{
+			setException(e);
 		}
 	}
+
 }

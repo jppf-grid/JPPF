@@ -156,7 +156,11 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 */
 	public String toString()
 	{
-		return host + ":" + port;
+		StringBuilder sb = new StringBuilder();
+		sb.append(host).append(":").append(port);
+		sb.append(", type=").append(type);
+		sb.append(", id=").append(id);
+		return sb.toString();
 	}
 
 	/**
