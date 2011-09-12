@@ -18,6 +18,8 @@
 
 package org.jppf.management;
 
+import java.util.concurrent.locks.*;
+
 import javax.management.MBeanServer;
 import javax.management.remote.JMXConnectorServer;
 
@@ -38,6 +40,10 @@ public abstract class AbstractJMXServer implements JMXServer
 	 * Determines whether debug log statements are enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Used to synchronize lookup for available port.
+	 */
+	protected static Lock lock = new ReentrantLock();
 	/**
 	 * The mbean server.
 	 */

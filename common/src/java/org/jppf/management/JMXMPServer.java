@@ -66,6 +66,7 @@ public class JMXMPServer extends AbstractJMXServer
 	{
     if (debugEnabled) log.debug("starting remote connector server");
     ClassLoader tmp = Thread.currentThread().getContextClassLoader();
+    lock.lock();
     try
     {
 	    Thread.currentThread().setContextClassLoader(cl);
@@ -106,6 +107,7 @@ public class JMXMPServer extends AbstractJMXServer
     }
     finally
     {
+    	lock.unlock();
 	    Thread.currentThread().setContextClassLoader(tmp);
     }
 	}
