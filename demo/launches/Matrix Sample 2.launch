@@ -38,7 +38,7 @@
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sample.dist.matrix.MatrixRunner"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="demo"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Djppf.config=jppf-client-2.properties -Dlog4j.configuration=log4j-client-2.properties -Xmx256m"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Djppf.config=jppf-client-2.properties -Dlog4j.configuration=log4j-client-2.properties -Xmx512m"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:demo}"/>
 <stringAttribute key="yk-options" value="&#13;&#10;force-jvmti=true&#13;&#10;additional-options=&#13;&#10;snapshots-dir=&#13;&#10;disable-j2ee=true&#13;&#10;startup=0&#13;&#10;"/>
 </launchConfiguration>

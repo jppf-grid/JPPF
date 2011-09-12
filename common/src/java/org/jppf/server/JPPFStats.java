@@ -96,8 +96,9 @@ public class JPPFStats implements Serializable
 		s.execution = execution.makeCopy();
 		s.nodeExecution = nodeExecution.makeCopy();
 		s.transport = transport.makeCopy();
-		s.taskQueue = taskQueue;
-		s.jobQueue = jobQueue;
+		s.taskQueue = taskQueue.makeCopy();
+		s.jobQueue = jobQueue.makeCopy();
+		s.jobTimes = jobTimes.makeCopy();
 		/*
 		s.queue = queue.makeCopy();
 		s.totalQueued = totalQueued;

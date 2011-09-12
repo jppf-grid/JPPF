@@ -11,6 +11,7 @@
     <filter-data value="java"/>
   </filter>
   <filter name="FilesFromPackage" enabled="true">
+    <filter-data value="src/java/test/classloader"/>
     <filter-data value="src/java/test/hazelcast"/>
     <filter-data value="src/java/test/nathalie"/>
   </filter>

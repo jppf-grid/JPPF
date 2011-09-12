@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  * Instances of this class manage information on the nodes obtained via JMX.
@@ -29,6 +30,14 @@ import org.jppf.server.nio.ChannelWrapper;
  */
 public class NodeInformationHandler
 {
+	/**
+	 * Logger for this class.
+	 */
+	static Logger log = LoggerFactory.getLogger(NodeInformationHandler.class);
+	/**
+	 * Determines whether debug-level logging is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * A list of objects containing the information required to connect to the nodes JMX servers.
 	 */
@@ -45,6 +54,7 @@ public class NodeInformationHandler
 	 */
 	public void addNodeInformation(ChannelWrapper<?> channel, JPPFManagementInfo info)
 	{
+		if (debugEnabled) log.debug("adding node information for " + info + ", channel=" + channel);
 		synchronized (nodeInfo)
 		{
 			nodeInfo.put(channel, info);
@@ -61,6 +71,7 @@ public class NodeInformationHandler
 	 */
 	public void removeNodeInformation(ChannelWrapper<?> channel)
 	{
+		if (debugEnabled) log.debug("removing node information for channel=" + channel);
 		JPPFManagementInfo info = null;
 		synchronized (nodeInfo)
 		{
