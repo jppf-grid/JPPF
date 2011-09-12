@@ -217,7 +217,7 @@
 											else $itemClass = 'aboutMenuItem2'; 
 											?>
 											<div class="<?php echo $itemClass; ?>">
-											<a href="/release_notes.php?version=2.4" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
+											<a href="/release_notes.php?version=2.5" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br>
 											</div>
 															<?php
 											$itemClass = "";
@@ -264,7 +264,7 @@
 				</div>
 				<div class="jppf_content">
 	<?php
-		$jppfVersion = "2.5";
+		$jppfVersion = "2.5.3";
 		$base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $jppfVersion . "/";
 	?>
 	<a name="2.0"></a>
