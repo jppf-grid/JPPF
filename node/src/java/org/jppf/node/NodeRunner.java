@@ -177,7 +177,7 @@ public class NodeRunner
 		if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true)) discoverDriver();
 		setSecurity();
 		String className = "org.jppf.server.node.remote.JPPFRemoteNode";
-		Class clazz = getJPPFClassLoader().loadClass(className);
+		Class clazz = getJPPFClassLoader().loadJPPFClass(className);
 		MonitoredNode node = (MonitoredNode) clazz.newInstance();
 		if (debugEnabled) log.debug("Created new node instance: " + node);
 		node.setSocketWrapper(nodeSocket);
