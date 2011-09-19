@@ -40,17 +40,9 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Flag for standard delegation model to parent first.
-	 */
-	private static final int PARENT_FIRST = 1;
-	/**
-	 * Flag for delegation model to local URL classpath first.
-	 */
-	private static final int LOCAL_FIRST = 2;
-	/**
 	 * Determines the class loading delegation model to use.
 	 */
-	private static int delegationModel = initDelegationModel();
+	private static DelegationModel delegationModel = initDelegationModel();
 
 	/**
 	 * Initialize this class loader with a parent class loader.
@@ -394,7 +386,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	{
 		if (!isBootstrapClass(name))
 		{
-			if (delegationModel == LOCAL_FIRST) return loadClassLocalFirst(name, resolve);
+			if (delegationModel == DelegationModel.LOCAL_FIRST) return loadClassLocalFirst(name, resolve);
 		}
 		return super.loadClass(name, resolve);
 	}
@@ -481,7 +473,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	 * Determine the class loading delegation model currently in use.
 	 * @return an int value representing the model, either {@link #PARENT_FIRST PARENT_FIRST} or {@link #LOCAL_FIRST LOCAL_FIRST}.
 	 */
-	public synchronized static int getDelegationModel()
+	public synchronized static DelegationModel getDelegationModel()
 	{
 		return delegationModel;
 	}
@@ -491,18 +483,18 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	 * @param model an int value, either {@link #PARENT_FIRST PARENT_FIRST} or {@link #LOCAL_FIRST LOCAL_FIRST}.
 	 * If any other value is specified then calling this method has no effect.
 	 */
-	public synchronized static void setDelegationModel(int model)
+	public synchronized static void setDelegationModel(DelegationModel model)
 	{
-		if ((model >= PARENT_FIRST) && (model <= LOCAL_FIRST)) AbstractJPPFClassLoader.delegationModel = model;
+		if (model != null) AbstractJPPFClassLoader.delegationModel = model;
 	}
 
 	/**
 	 * Initialize the delegation model from the JPPF configuration.
 	 * @return the delegation model indicator as computed from the configuration.
 	 */
-	private static synchronized int initDelegationModel()
+	private static synchronized DelegationModel initDelegationModel()
 	{
 		String s = JPPFConfiguration.getProperties().getString("jppf.classloader.delegation", "parent");
-		return "local".equalsIgnoreCase(s) ? LOCAL_FIRST : PARENT_FIRST;
+		return "local".equalsIgnoreCase(s) ? DelegationModel.LOCAL_FIRST : DelegationModel.PARENT_FIRST;
 	}
 }

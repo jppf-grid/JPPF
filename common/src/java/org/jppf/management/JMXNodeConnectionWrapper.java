@@ -21,6 +21,8 @@ package org.jppf.management;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.jppf.classloader.DelegationModel;
+
 /**
  * Node-specific connection wrapper, implementing a user-friendly interface for the monitoring
  * and management of the node.
@@ -195,16 +197,16 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	/**
 	 * {@inheritDoc}
 	 */
-	public Integer getDelegationModel() throws Exception
+	public DelegationModel getDelegationModel() throws Exception
 	{
-		return (Integer) invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "getDelegationModel", (Object[]) null, (String[]) null); 
+		return (DelegationModel) invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "getDelegationModel", (Object[]) null, (String[]) null); 
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setDelegationModel(Integer model) throws Exception
+	public void setDelegationModel(DelegationModel model) throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "setDelegationModel", new Object[] { model }, new String[] { "java.lang.Integer" }); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "setDelegationModel", new Object[] { model }, new String[] { "org.jppf.classloader.DelegationModel" }); 
 	}
 }

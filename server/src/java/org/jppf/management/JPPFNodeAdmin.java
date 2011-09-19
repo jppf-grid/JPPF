@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.jppf.JPPFNodeReconnectionNotification;
-import org.jppf.classloader.AbstractJPPFClassLoader;
+import org.jppf.classloader.*;
 import org.jppf.node.NodeRunner;
 import org.jppf.node.event.*;
 import org.jppf.server.node.JPPFNode;
@@ -315,7 +315,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	/**
 	 * {@inheritDoc}
 	 */
-	public Integer getDelegationModel() throws Exception
+	public DelegationModel getDelegationModel() throws Exception
 	{
 		return AbstractJPPFClassLoader.getDelegationModel();
 	}
@@ -323,7 +323,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean, JPPFTaskListener, Node
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setDelegationModel(Integer model) throws Exception
+	public void setDelegationModel(DelegationModel model) throws Exception
 	{
 		if (model != null) AbstractJPPFClassLoader.setDelegationModel(model);
 	}

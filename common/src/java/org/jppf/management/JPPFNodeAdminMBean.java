@@ -21,6 +21,8 @@ package org.jppf.management;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.jppf.classloader.DelegationModel;
+
 
 /**
  * Exposed interface of the JPPF node management bean.
@@ -109,17 +111,17 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
 	void cancelJob(String jobId, Boolean requeue) throws Exception;
 	/**
 	 * Get the current class loader delegation model for the node.
-	 * @return either {@link org.jppf.classloader.AbstractJPPFClassLoader#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.AbstractJPPFClassLoader#LOCAL_FIRST LOCAL_FIRST}.
+	 * @return either {@link org.jppf.classloader.DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.DelegationModel#LOCAL_FIRST LOCAL_FIRST}.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.classloader.AbstractJPPFClassLoader#getDelegationModel()
 	 */
-	Integer getDelegationModel() throws Exception;
+	DelegationModel getDelegationModel() throws Exception;
 	/**
 	 * Set the current class loader delegation model for the node.
-	 * @param model either either {@link org.jppf.classloader.AbstractJPPFClassLoader#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.AbstractJPPFClassLoader#LOCAL_FIRST LOCAL_FIRST}.
+	 * @param model either either {@link org.jppf.classloader.DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.DelegationModel#LOCAL_FIRST LOCAL_FIRST}.
 	 * If any other value is specified then this method has no effect. 
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.classloader.AbstractJPPFClassLoader#setDelegationModel(int)
 	 */
-	void setDelegationModel(Integer model) throws Exception;
+	void setDelegationModel(DelegationModel model) throws Exception;
 }
