@@ -75,7 +75,8 @@ public abstract class CustomPolicy extends ExecutionPolicy
 	 * @return an XML string representation of this object
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		if (computedToString == null)
 		{

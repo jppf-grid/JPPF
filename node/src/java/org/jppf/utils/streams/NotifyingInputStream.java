@@ -54,7 +54,8 @@ public class NotifyingInputStream extends InputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public int read() throws IOException
+	@Override
+    public int read() throws IOException
 	{
 		int n = delegate.read();
 		if (n >= 0) callback.bytesNotification(1);
@@ -64,7 +65,8 @@ public class NotifyingInputStream extends InputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public int read(byte[] b) throws IOException
+	@Override
+    public int read(byte[] b) throws IOException
 	{
 		return read(b, 0, b.length);
 	}
@@ -72,7 +74,8 @@ public class NotifyingInputStream extends InputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public int read(byte[] b, int off, int len) throws IOException
+	@Override
+    public int read(byte[] b, int off, int len) throws IOException
 	{
 		int n = delegate.read(b, off, len);
 		if (n >= 0) callback.bytesNotification(n);
@@ -82,7 +85,8 @@ public class NotifyingInputStream extends InputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public long skip(long n) throws IOException
+	@Override
+    public long skip(long n) throws IOException
 	{
 		long l = delegate.skip(n);
 		if (l >= 0) callback.bytesNotification(l);
@@ -92,7 +96,8 @@ public class NotifyingInputStream extends InputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void close() throws IOException
+	@Override
+    public void close() throws IOException
 	{
 		delegate.close();
 	}

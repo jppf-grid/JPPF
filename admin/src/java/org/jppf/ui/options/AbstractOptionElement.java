@@ -113,7 +113,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 			elt = elt.getParent();
 		}
 		StringBuilder sb = new StringBuilder("/");
-		for (int i=0; i<list.size(); i++) sb.append("/").append(list.get(i));
+        for (String aList : list) sb.append('/').append(aList);
 		return sb.toString();
 	}
 

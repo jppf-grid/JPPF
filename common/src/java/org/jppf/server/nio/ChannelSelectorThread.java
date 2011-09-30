@@ -59,7 +59,8 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
 	 * Perform the selection loop.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		while (!isStopped())
 		{

@@ -65,7 +65,8 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 	 * @param o the object to send.
 	 * @throws Exception if the underlying output stream throws an exception.
 	 */
-	public void send(Object o) throws Exception
+	@Override
+    public void send(Object o) throws Exception
 	{
 		// Remove references kept by the stream, otherwise leads to OutOfMemory.
 		JPPFBuffer buffer = getSerializer().serialize(o);
@@ -79,7 +80,8 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 	 * @return the object that was read from the underlying input stream or null if the operation timed out.
 	 * @throws Exception if the underlying input stream throws an exception.
 	 */
-	public Object receive(int timeout) throws Exception
+	@Override
+    public Object receive(int timeout) throws Exception
 	{
 		checkOpened();
 		Object o = null;
@@ -102,7 +104,8 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 	 * @return  an instance of <code>ObjectSerializer</code>.
 	 * @see org.jppf.comm.socket.AbstractSocketWrapper#getSerializer()
 	 */
-	public ObjectSerializer getSerializer()
+	@Override
+    public ObjectSerializer getSerializer()
 	{
 		if (serializer == null) serializer = new BootstrapObjectSerializer();
 		return serializer;

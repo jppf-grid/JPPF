@@ -112,7 +112,8 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 * @return the hashcode as an int.
 	 * @see java.lang.Object#hashCode()
 	 */
-	public int hashCode()
+	@Override
+    public int hashCode()
 	{
 		return (id == null) ? 0 : id.hashCode();
 	}
@@ -123,14 +124,15 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 * @return true if the two objects are equal, false otherwise.
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object obj)
+	@Override
+    public boolean equals(Object obj)
 	{
 		if (this == obj) return true;
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
 		final JPPFManagementInfo other = (JPPFManagementInfo) obj;
 		if (other.id == null) return id == null;
-		return (id == null) ? false : id.equals(other.id);
+		return (id != null) && id.equals(other.id);
 	}
 
 	/**
@@ -139,7 +141,8 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 * @return a negative number if this object is less than the other, 0 if they are equal, a positive number otherwise.
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(JPPFManagementInfo o)
+	@Override
+    public int compareTo(JPPFManagementInfo o)
 	{
 		if (o == null) return 1;
 		if (this.equals(o)) return 0;
@@ -154,10 +157,11 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 * @return a string with the host:port format.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(host).append(":").append(port);
+		sb.append(host).append(':').append(port);
 		sb.append(", type=").append(type);
 		sb.append(", id=").append(id);
 		return sb.toString();

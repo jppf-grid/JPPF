@@ -64,12 +64,14 @@ public abstract class AbstractJMXServer implements JMXServer
 	/**
 	 * {@inheritDoc}
 	 */
-	public abstract void start(ClassLoader cl) throws Exception;
+	@Override
+    public abstract void start(ClassLoader cl) throws Exception;
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void stop() throws Exception
+	@Override
+    public void stop() throws Exception
 	{
 		stopped = true;
     connectorServer.stop();
@@ -78,7 +80,8 @@ public abstract class AbstractJMXServer implements JMXServer
 	/**
 	 * {@inheritDoc}
 	 */
-	public MBeanServer getServer()
+	@Override
+    public MBeanServer getServer()
 	{
 		return server;
 	}
@@ -86,7 +89,8 @@ public abstract class AbstractJMXServer implements JMXServer
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean isStopped()
+	@Override
+    public boolean isStopped()
 	{
 		return stopped;
 	}
@@ -94,7 +98,8 @@ public abstract class AbstractJMXServer implements JMXServer
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getId()
+	@Override
+    public String getId()
 	{
 		return id;
 	}

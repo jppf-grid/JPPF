@@ -53,7 +53,8 @@ public class StreamOutputDestination implements OutputDestination
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.OutputDestination#write(byte[], int, int)
 	 */
-	public int write(byte[] buffer, int offset, int len) throws Exception
+	@Override
+    public int write(byte[] buffer, int offset, int len) throws Exception
 	{
 		os.write(buffer, offset, len);
 		return len;
@@ -66,7 +67,8 @@ public class StreamOutputDestination implements OutputDestination
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
 	 */
-	public int write(ByteBuffer buffer) throws Exception
+	@Override
+    public int write(ByteBuffer buffer) throws Exception
 	{
 		int pos = buffer.position();
 		ByteBuffer tmp = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
@@ -88,7 +90,8 @@ public class StreamOutputDestination implements OutputDestination
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.OutputDestination#writeInt(int)
 	 */
-	public void writeInt(int value) throws Exception
+	@Override
+    public void writeInt(int value) throws Exception
 	{
 		byte[] bytes = SerializationUtils.writeInt(value);
 		os.write(bytes);
@@ -99,7 +102,8 @@ public class StreamOutputDestination implements OutputDestination
 	 * @throws IOException if an IO error occurs.
 	 * @see java.io.Closeable#close()
 	 */
-	public void close() throws IOException
+	@Override
+    public void close() throws IOException
 	{
 		os.close();
 	}

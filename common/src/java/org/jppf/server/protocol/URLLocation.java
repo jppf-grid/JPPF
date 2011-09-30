@@ -57,7 +57,8 @@ public class URLLocation extends AbstractLocation<URL>
 	 * @throws Exception if an I/O error occurs.
 	 * @see org.jppf.server.protocol.Location#getInputStream()
 	 */
-	public InputStream getInputStream() throws Exception
+	@Override
+    public InputStream getInputStream() throws Exception
 	{
 		return path.openStream();
 	}
@@ -68,7 +69,8 @@ public class URLLocation extends AbstractLocation<URL>
 	 * @throws Exception if an I/O error occurs.
 	 * @see org.jppf.server.protocol.Location#getOutputStream()
 	 */
-	public OutputStream getOutputStream() throws Exception
+	@Override
+    public OutputStream getOutputStream() throws Exception
 	{
 		URLConnection conn = path.openConnection();
 		conn.setDoOutput(true);
@@ -80,7 +82,8 @@ public class URLLocation extends AbstractLocation<URL>
 	 * @return -1.
 	 * @see org.jppf.server.protocol.Location#size()
 	 */
-	public long size()
+	@Override
+    public long size()
 	{
 		return -1;
 	}

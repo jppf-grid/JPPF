@@ -145,9 +145,9 @@ public final class PermissionsFactory
 			TypedProperties props = JPPFConfiguration.getProperties();
 			String host = props.getString("jppf.server.host", "localhost");
 			int port = props.getInt("class.server.port", 11111);
-			addPermission(new SocketPermission(host + ":" + port, "connect,listen"), "dynamic");
+			addPermission(new SocketPermission(host + ':' + port, "connect,listen"), "dynamic");
 			port = props.getInt("node.server.port", 11113);
-			addPermission(new SocketPermission(host + ":" + port, "connect,listen"), "dynamic");
+			addPermission(new SocketPermission(host + ':' + port, "connect,listen"), "dynamic");
 			host = props.getString("jppf.discovery.group", "230.0.0.1");
 			//port = props.getInt("jppf.discovery.port", 11111);
 			addPermission(new SocketPermission(host + ":0-", "accept,connect,listen,resolve"), "dynamic");

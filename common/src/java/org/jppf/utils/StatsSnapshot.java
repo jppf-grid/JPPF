@@ -51,7 +51,7 @@ public class StatsSnapshot implements Serializable
 	/**
 	 * The average time.
 	 */
-	private double avg = 0d;
+	private double avg = 0.0d;
 	
 	/**
 	 * Initialize this time snapshot with a blank title.
@@ -107,14 +107,15 @@ public class StatsSnapshot implements Serializable
 	 * @return a string display the various stats values.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(title).append(" total time : ").append(total).append("\n");
-		sb.append(title).append(" latest time : ").append(latest).append("\n");
-		sb.append(title).append(" min time : ").append(min).append("\n");
-		sb.append(title).append(" max time : ").append(max).append("\n");
-		sb.append(title).append(" avg time : ").append(avg).append("\n");
+		sb.append(title).append(" total time : ").append(total).append('\n');
+		sb.append(title).append(" latest time : ").append(latest).append('\n');
+		sb.append(title).append(" min time : ").append(min).append('\n');
+		sb.append(title).append(" max time : ").append(max).append('\n');
+		sb.append(title).append(" avg time : ").append(avg).append('\n');
 		return sb.toString();
 	}
 

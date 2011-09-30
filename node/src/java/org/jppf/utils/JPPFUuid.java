@@ -124,7 +124,8 @@ public class JPPFUuid implements Serializable
 	 * @return a string containing the uuid.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return uuid;
 	}

@@ -130,7 +130,7 @@ class ResourceCache
 	private String saveToTempFile(final byte[] definition) throws Exception
 	{
 		SaveFileAction action = new SaveFileAction(definition);
-		File file = (File) AccessController.doPrivileged(action);
+		File file = AccessController.doPrivileged(action);
 		if (action.getException() != null) throw action.getException();
 		return file.getCanonicalPath();
 	}
@@ -145,7 +145,7 @@ class ResourceCache
 	private String saveToTempFile(final String name, final byte[] definition) throws Exception
 	{
 		SaveFileAction action = new SaveFileAction(tempFolders, name, definition);
-		File file = (File) AccessController.doPrivileged(action);
+		File file = AccessController.doPrivileged(action);
 		if (action.getException() != null) throw action.getException();
 		if (traceEnabled) log.trace("saved resource [" + name + "] to file " + file);
 		return file.getCanonicalPath();
@@ -220,7 +220,8 @@ class ResourceCache
 		File dir = new File(folder);
 		File[] subdirs = dir.listFiles(new FileFilter()
 		{
-			public boolean accept(File path)
+			@Override
+            public boolean accept(File path)
 			{
 				return path.isDirectory() && path.getName().startsWith(base);
 			}
@@ -264,7 +265,8 @@ class ResourceCache
 		/**
 		 * {@inheritDoc}
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			while (!tempFolders.isEmpty()) FileUtils.deletePath(new File(tempFolders.remove(0)));
 		}
@@ -273,18 +275,23 @@ class ResourceCache
 	/**
 	 * {@inheritDoc}
 	 */
-	protected void finalize() throws Throwable
+	@Override
+    protected void finalize() throws Throwable
 	{
-		Runnable r = new Runnable()
-		{
-			public void run()
-			{
-				String[] paths = tempFolders.toArray(StringUtils.ZERO_STRING);
-				tempFolders.clear();
-				for (String path: paths) FileUtils.deletePath(new File(tempFolders.remove(0)));
-				paths = null;
-			}
-		};
-		new Thread(r).start();
-	}
+        try {
+            Runnable r = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    String[] paths = tempFolders.toArray(new String[tempFolders.size()]);
+                    tempFolders.clear();
+                    for (String path: paths) FileUtils.deletePath(new File(path));
+                }
+            };
+            new Thread(r).start();
+        } finally {
+            super.finalize();
+        }
+    }
 }

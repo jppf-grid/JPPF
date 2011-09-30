@@ -77,7 +77,8 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
 	/**
 	 * {@inheritDoc}
 	 */
-	public NioContext getContext()
+	@Override
+    public NioContext getContext()
 	{
 		return getChannel();
 	}
@@ -85,7 +86,8 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
 	/**
 	 * {@inheritDoc}
 	 */
-	public int getKeyOps()
+	@Override
+    public int getKeyOps()
 	{
 		return keyOps.get();
 	}
@@ -93,7 +95,8 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setKeyOps(int keyOps)
+	@Override
+    public void setKeyOps(int keyOps)
 	{
 		this.keyOps.set(keyOps);
 		if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
@@ -103,7 +106,8 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
 	/**
 	 * {@inheritDoc}
 	 */
-	public int getReadyOps()
+	@Override
+    public int getReadyOps()
 	{
 		return readyOps.get();
 	}

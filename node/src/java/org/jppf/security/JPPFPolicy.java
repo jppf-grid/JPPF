@@ -59,7 +59,8 @@ public class JPPFPolicy extends Policy
 	 * @return a collection of permissions.
 	 * @see java.security.Policy#getPermissions(java.security.CodeSource)
 	 */
-	public PermissionCollection getPermissions(final CodeSource codesource)
+	@Override
+    public PermissionCollection getPermissions(final CodeSource codesource)
 	{
 		if (debugEnabled) log.debug("in getPermissions(CodeSource) : " + toString(codesource));
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -74,7 +75,8 @@ public class JPPFPolicy extends Policy
 	 * @return a <code>PermissionCollection</code> instance.
 	 * @see java.security.Policy#getPermissions(java.security.ProtectionDomain)
 	 */
-	public PermissionCollection getPermissions(final ProtectionDomain domain)
+	@Override
+    public PermissionCollection getPermissions(final ProtectionDomain domain)
 	{
 		// domain.toString() causes a StackOverflowException - because it makes its own security checks that invoke this policy
 		if (debugEnabled) log.debug("in getPermissions(ProtectionDomain) : " + toString(domain));
@@ -88,7 +90,8 @@ public class JPPFPolicy extends Policy
 	 * This method does nothing.
 	 * @see java.security.Policy#refresh()
 	 */
-	public void refresh()
+	@Override
+    public void refresh()
 	{
 	}
 
@@ -97,7 +100,7 @@ public class JPPFPolicy extends Policy
 	 * @param code the code source to print.
 	 * @return a string representing the specified code source.
 	 */
-	private String toString(CodeSource code)
+	private static String toString(CodeSource code)
 	{
 		if (code == null) return "null";
 		StringBuilder sb = new StringBuilder().append("location = ").append(code.getLocation());
@@ -109,10 +112,10 @@ public class JPPFPolicy extends Policy
 	 * @param domain the protection domain to print.
 	 * @return a string representing the specified protection domain.
 	 */
-	private String toString(ProtectionDomain domain)
+	private static String toString(ProtectionDomain domain)
 	{
 		StringBuilder sb = new StringBuilder().append("class loader = ").append(domain.getClassLoader());
-		sb.append(", code source = [").append(toString(domain.getCodeSource())).append("]");
+		sb.append(", code source = [").append(toString(domain.getCodeSource())).append(']');
 		return sb.toString();
 	}
 
@@ -123,7 +126,8 @@ public class JPPFPolicy extends Policy
 	 * @return .
 	 * @see java.security.Policy#implies(java.security.ProtectionDomain, java.security.Permission)
 	 */
-	public boolean implies(ProtectionDomain domain, Permission permission)
+	@Override
+    public boolean implies(ProtectionDomain domain, Permission permission)
 	{
 		if (debugEnabled)
 		{

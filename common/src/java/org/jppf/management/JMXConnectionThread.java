@@ -61,7 +61,8 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
 	 * 
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		while (!isStopped())
 		{

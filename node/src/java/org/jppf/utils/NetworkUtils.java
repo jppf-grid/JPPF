@@ -68,7 +68,8 @@ public final class NetworkUtils
 	{
 		return getIPAddresses(new InetAddressFilter()
 		{
-			public boolean accepts(InetAddress addr)
+			@Override
+            public boolean accepts(InetAddress addr)
 			{
 				return addr instanceof Inet4Address;
 			}
@@ -83,7 +84,8 @@ public final class NetworkUtils
 	{
 		return getIPAddresses(new InetAddressFilter()
 		{
-			public boolean accepts(InetAddress addr)
+			@Override
+            public boolean accepts(InetAddress addr)
 			{
 				return (addr instanceof Inet4Address)
 					&& !(LOOPBACK_ADDRESSES.contains(addr.getHostAddress()) || "localhost".equals(addr.getHostName()));
@@ -99,7 +101,8 @@ public final class NetworkUtils
 	{
 		return getIPAddresses(new InetAddressFilter()
 		{
-			public boolean accepts(InetAddress addr)
+			@Override
+            public boolean accepts(InetAddress addr)
 			{
 				return addr instanceof Inet6Address;
 			}
@@ -114,7 +117,8 @@ public final class NetworkUtils
 	{
 		return getIPAddresses(new InetAddressFilter()
 		{
-			public boolean accepts(InetAddress addr)
+			@Override
+            public boolean accepts(InetAddress addr)
 			{
 				return (addr instanceof Inet6Address) && !(addr.isLoopbackAddress() || "localhost".equals(addr.getHostName()));
 			}

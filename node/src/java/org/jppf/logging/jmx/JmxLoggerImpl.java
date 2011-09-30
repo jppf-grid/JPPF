@@ -48,7 +48,8 @@ public class JmxLoggerImpl extends NotificationBroadcasterSupport implements Jmx
 	 * Log the specified message as a JMX notification.
 	 * @param message the message to log.
 	 */
-	public void log(String message)
+	@Override
+    public void log(String message)
 	{
 		Notification notif = new Notification("JmxLogNotification", OBJECT_NAME, sequence.incrementAndGet(), message);
 		sendNotification(notif);
@@ -66,7 +67,7 @@ public class JmxLoggerImpl extends NotificationBroadcasterSupport implements Jmx
 		}
 		catch(Exception e)
 		{
-			System.out.println("Error: failed to send JMX log notification (" + e.getMessage() + ")");
+			System.out.println("Error: failed to send JMX log notification (" + e.getMessage() + ')');
 		}
 		return null;
 	}

@@ -50,7 +50,8 @@ public abstract class SynchronizedTask implements Runnable
 	 * Wrap the task execution within a synchronized block within a try/catch block.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{

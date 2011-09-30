@@ -57,8 +57,9 @@ public class HostPort extends Pair<String, Integer>
 	 * @return a string formatted as host:port.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
-		return "" + host() + ":" + port();
+		return host() + ':' + port();
 	}
 }

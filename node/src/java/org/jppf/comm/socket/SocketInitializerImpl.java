@@ -74,7 +74,8 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
 	 * @param socketWrapper the socket wrapper to initialize.
 	 * @see org.jppf.comm.socket.SocketInitializer#initializeSocket(org.jppf.comm.socket.SocketWrapper)
 	 */
-	public void initializeSocket(SocketWrapper socketWrapper)
+	@Override
+    public void initializeSocket(SocketWrapper socketWrapper)
 	{
 		String errMsg = "SocketInitializer.initializeSocket(): Could not reconnect to the remote server";
 		String fatalErrMsg = "FATAL: could not initialize the Socket Wrapper!";
@@ -135,7 +136,8 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
 	 * Close this initializer.
 	 * @see org.jppf.comm.socket.SocketInitializer#close()
 	 */
-	public void close()
+	@Override
+    public void close()
 	{
 		if (!closed)
 		{
@@ -160,7 +162,8 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
 		 * Attempt to connect to the remote server.
 		 * @see java.util.TimerTask#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			attemptCount++;
 			try

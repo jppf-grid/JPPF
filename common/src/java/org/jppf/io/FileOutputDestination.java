@@ -52,7 +52,8 @@ public class FileOutputDestination extends ChannelOutputDestination
 	 * @throws IOException if an IO error occurs.
 	 * @see java.io.Closeable#close()
 	 */
-	public void close() throws IOException
+	@Override
+    public void close() throws IOException
 	{
 		((FileChannel) channel).force(false);
 		channel.close();

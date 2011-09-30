@@ -151,7 +151,8 @@ public final class JPPFSecurityContext implements Serializable
 	 * @return a string displaying information about these credentials.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return "JPPF Credentials id=" + id;
 	}

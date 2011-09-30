@@ -66,7 +66,8 @@ public class JPPFDirFilter extends AbstractFileFilter
 	 * @return true if the file is a directory, false otherwise.
 	 * @see java.io.FileFilter#accept(java.io.File)
 	 */
-	public boolean accept(File path)
+	@Override
+    public boolean accept(File path)
 	{
 		if (!path.isDirectory()) return false;
 		String name = path.getName();

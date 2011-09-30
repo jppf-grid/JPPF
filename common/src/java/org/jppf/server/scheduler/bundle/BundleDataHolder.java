@@ -34,15 +34,15 @@ public class BundleDataHolder
 	/**
 	 * Current value of the moving average.
 	 */
-	private double mean = 1000d;
+	private double mean = 1000.0d;
 	/**
 	 * Previous value of the moving average, generally before a new sample was added.
 	 */
-	private double previousMean = 0d;
+	private double previousMean = 0.0d;
 	/**
 	 * Current value of the moving average.
 	 */
-	private double totalTime = 0d;
+	private double totalTime = 0.0d;
 	/**
 	 * Current number of samples.
 	 */
@@ -154,7 +154,8 @@ public class BundleDataHolder
 	 * @return a string representing the state of this object.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("mean = ").append(mean).append(", previousMean = ").append(previousMean);

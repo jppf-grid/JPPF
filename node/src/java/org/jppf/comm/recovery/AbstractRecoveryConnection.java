@@ -104,7 +104,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 				buffer = socketWrapper.receiveBytes(socketReadTimeout);
 				success = true;
 				message = buffer.asString();
-				if (traceEnabled) log.trace(this + " received '" + message + "'");
+				if (traceEnabled) log.trace(this + " received '" + message + '\'');
 			}
 			catch (SocketTimeoutException e)
 			{
@@ -125,7 +125,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	{
 		JPPFBuffer buffer = new JPPFBuffer(message);
 		socketWrapper.sendBytes(buffer);
-		if (traceEnabled) log.trace(this + " sent '" + message + "'");
+		if (traceEnabled) log.trace(this + " sent '" + message + '\'');
 	}
 
 	/**

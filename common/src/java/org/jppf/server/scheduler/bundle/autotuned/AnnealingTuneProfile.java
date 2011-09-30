@@ -94,7 +94,7 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 */
 	public AnnealingTuneProfile(String profileName)
 	{
-		String prefix = "strategy." + profileName + ".";
+		String prefix = "strategy." + profileName + '.';
 		TypedProperties props = JPPFConfiguration.getProperties();
 		minSamplesToAnalyse = props.getInt(prefix + "minSamplesToAnalyse", 500);
 		minSamplesToCheckConvergence = props.getInt(prefix + "minSamplesToCheckConvergence", 300);
@@ -165,8 +165,8 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 */
 	public int createDiff(int bestSize, int collectedSamples, Random rnd)
 	{
-		double max = Math.max(Math.round(bestSize * (getSizeRatioDeviation()-1f)), 1);
-		if (max < 1d) return 1;
+		double max = Math.max(Math.round(bestSize * (getSizeRatioDeviation()- 1.0f)), 1);
+		if (max < 1.0d) return 1;
 		return rnd.nextInt((int) max) + 1;
 	}
 	
@@ -269,7 +269,8 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * @return a newly created <code>AutoTuneProfile</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.LoadBalancingProfile#copy()
 	 */
-	public LoadBalancingProfile copy()
+	@Override
+    public LoadBalancingProfile copy()
 	{
 		AnnealingTuneProfile p = new AnnealingTuneProfile();
 		p.minSamplesToAnalyse = minSamplesToAnalyse;

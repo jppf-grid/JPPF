@@ -46,7 +46,8 @@ public class LauncherListener extends Thread
 	 * Create a socket connection and listen to it, and exit this process when the conneciton is broken.
 	 * @see java.lang.Thread#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{

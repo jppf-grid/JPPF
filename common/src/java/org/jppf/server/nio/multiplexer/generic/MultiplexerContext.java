@@ -74,7 +74,8 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	/**
 	 * {@inheritDoc}
 	 */
-	public void handleException(ChannelWrapper channel)
+	@Override
+    public void handleException(ChannelWrapper channel)
 	{
 		try
 		{
@@ -200,8 +201,8 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 		while ((count > 0) && msg.hasRemaining());
 		if (debugEnabled)
 		{
-			log.debug("[" + getShortClassName() + "] " + "read " + n + " bytes from " +
-				StringUtils.getRemoteHost((SocketChannel) channel));
+			log.debug('[' + getShortClassName() + "] " + "read " + n + " bytes from " +
+				StringUtils.getRemoteHost(channel));
 		}
 		if (count < 0) setEof(true);
 		if (msg.position() > 0)
@@ -230,8 +231,8 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 		while ((count > 0) && msg.hasRemaining());
 		if (debugEnabled)
 		{
-			log.debug("[" + getShortClassName() + "] " + "written " + count + " bytes to " +
-				StringUtils.getRemoteHost((SocketChannel) channel));
+			log.debug('[' + getShortClassName() + "] " + "written " + count + " bytes to " +
+				StringUtils.getRemoteHost(channel));
 		}
 		return !msg.hasRemaining();
 	}

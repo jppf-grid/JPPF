@@ -170,7 +170,7 @@ class ClassDescriptor
 		if (!primitive)
 		{
 			out.writeInt(fields.length);
-			for (int i=0; i<fields.length; i++) fields[i].write(out);
+            for (FieldDescriptor field : fields) field.write(out);
 		}
 	}
 
@@ -206,10 +206,11 @@ class ClassDescriptor
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(getClass().getSimpleName()).append("[");
+		sb.append(getClass().getSimpleName()).append('[');
 		sb.append("handle=").append(handle).append(", ");
 		sb.append("signature=").append(signature).append(", ");
 		sb.append("primitive=").append(primitive).append(", ");
@@ -226,7 +227,7 @@ class ClassDescriptor
 			if (i > 0) sb.append(", ");
 			sb.append(fields[i]);
 		}
-		sb.append("}");
+		sb.append('}');
 		return sb.toString();
 	}
 }

@@ -66,11 +66,12 @@ public class Range<T extends Comparable<T>>
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(lower);
-		if (!lower.equals(upper)) sb.append("-").append(upper);
+		if (!lower.equals(upper)) sb.append('-').append(upper);
 		return sb.toString();
 	}
 

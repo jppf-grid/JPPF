@@ -62,7 +62,8 @@ public class BundleWrapper implements ServerJob
 	/**
 	 * {@inheritDoc}
 	 */
-	public JPPFDistributedJob getJob()
+	@Override
+    public JPPFDistributedJob getJob()
 	{
 		return job;
 	}
@@ -79,7 +80,8 @@ public class BundleWrapper implements ServerJob
 	/**
 	 * {@inheritDoc}
 	 */
-	public DataLocation getDataProvider()
+	@Override
+    public DataLocation getDataProvider()
 	{
 		return dataProvider;
 	}
@@ -105,7 +107,8 @@ public class BundleWrapper implements ServerJob
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<DataLocation> getTasks()
+	@Override
+    public List<DataLocation> getTasks()
 	{
 		return tasks;
 	}

@@ -82,7 +82,8 @@ public class SocketClient extends AbstractSocketWrapper
 	 * @throws Exception if the underlying output stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#send(java.lang.Object)
 	 */
-	public void send(Object o) throws Exception
+	@Override
+    public void send(Object o) throws Exception
 	{
 	  JPPFBuffer buf = getSerializer().serialize(o);
 	  sendBytes(buf);
@@ -96,7 +97,8 @@ public class SocketClient extends AbstractSocketWrapper
 	 * @throws Exception if the underlying input stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#receive(int)
 	 */
-	public Object receive(int timeout) throws Exception
+	@Override
+    public Object receive(int timeout) throws Exception
 	{
 		checkOpened();
 		Object o = null;
@@ -119,7 +121,8 @@ public class SocketClient extends AbstractSocketWrapper
 	 * @return an <code>ObjectSerializer</code> instance.
 	 * @see org.jppf.comm.socket.SocketWrapper#getSerializer()
 	 */
-	public ObjectSerializer getSerializer()
+	@Override
+    public ObjectSerializer getSerializer()
 	{
 		if (serializer == null)
 		{
@@ -150,7 +153,8 @@ public class SocketClient extends AbstractSocketWrapper
 	 * @param serializer an <code>ObjectSerializer</code> instance.
 	 * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.utils.ObjectSerializer)
 	 */
-	public void setSerializer(ObjectSerializer serializer)
+	@Override
+    public void setSerializer(ObjectSerializer serializer)
 	{
 		this.serializer = serializer;
 	}
@@ -160,8 +164,9 @@ public class SocketClient extends AbstractSocketWrapper
 	 * @return as string describing this object.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
-		return "SocketClient[" + this.host + ":" + this.port + ", open=" + this.opened + "]";
+		return "SocketClient[" + this.host + ':' + this.port + ", open=" + this.opened + ']';
 	}
 }

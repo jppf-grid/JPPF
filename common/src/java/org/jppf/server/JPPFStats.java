@@ -118,10 +118,11 @@ public class JPPFStats implements Serializable
 	 * @return a string display the various stats values.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("totalTasksExecuted : ").append(totalTasksExecuted).append("\n");
+		sb.append("totalTasksExecuted : ").append(totalTasksExecuted).append('\n');
 		sb.append(execution.toString());
 		sb.append(nodeExecution.toString());
 		sb.append(transport.toString());
@@ -132,10 +133,10 @@ public class JPPFStats implements Serializable
 		sb.append("queueSize : ").append(queueSize).append("\n");
 		sb.append("maxQueueSize : ").append(maxQueueSize).append("\n");
 		*/
-		sb.append("nbNodes : ").append(nbNodes).append("\n");
-		sb.append("maxNodes : ").append(maxNodes).append("\n");
-		sb.append("nbClients : ").append(nbClients).append("\n");
-		sb.append("maxClients : ").append(maxClients).append("\n");
+		sb.append("nbNodes : ").append(nbNodes).append('\n');
+		sb.append("maxNodes : ").append(maxNodes).append('\n');
+		sb.append("nbClients : ").append(nbClients).append('\n');
+		sb.append("maxClients : ").append(maxClients).append('\n');
 		return sb.toString();
 	}
 

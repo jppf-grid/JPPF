@@ -52,7 +52,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	/**
 	 * Mapping of individual bundler to corresponding performance data.
 	 */
-	private static Set<AbstractProportionalBundler> bundlers = new HashSet<AbstractProportionalBundler>();
+	private static final Set<AbstractProportionalBundler> bundlers = new HashSet<AbstractProportionalBundler>();
 	/**
 	 * Bounded memory of the past performance updates.
 	 */
@@ -78,7 +78,8 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 * @return the bundle size as an int value.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
-	public int getBundleSize()
+	@Override
+    public int getBundleSize()
 	{
 		return bundleSize;
 	}
@@ -99,11 +100,12 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 * @param time the time in milliseconds it took to execute the tasks.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
 	 */
-	public void feedback(int size, double time)
+	@Override
+    public void feedback(int size, double time)
 	{
-		if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": new performance sample [size=" + size + ", time=" + (long) time + "]");
+		if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": new performance sample [size=" + size + ", time=" + (long) time + ']');
 		if (size <= 0) return;
-		BundlePerformanceSample sample = new BundlePerformanceSample((double) time / (double) size, size);
+		BundlePerformanceSample sample = new BundlePerformanceSample(time / (double) size, size);
 		synchronized(bundlers)
 		{
 			dataHolder.addSample(sample);
@@ -115,7 +117,8 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 * Perform context-independant initializations.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#setup()
 	 */
-	public void setup()
+	@Override
+    public void setup()
 	{
 		synchronized(bundlers)
 		{
@@ -127,7 +130,8 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 * Release the resources used by this bundler.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#dispose()
 	 */
-	public void dispose()
+	@Override
+    public void dispose()
 	{
 		synchronized(bundlers)
 		{
@@ -154,7 +158,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 			double maxMean = Double.NEGATIVE_INFINITY;
 			double minMean = Double.POSITIVE_INFINITY;
 			AbstractProportionalBundler minBundler = null;
-			double meanSum = 0d;
+			double meanSum = 0.0d;
 			for (AbstractProportionalBundler b: bundlers)
 			{
 				BundleDataHolder h = b.getDataHolder();
@@ -191,11 +195,11 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 			{
 				StringBuilder sb = new StringBuilder();
 				sb.append("bundler info:\n");
-				sb.append("  minMean = ").append(minMean).append(", maxMean = ").append(maxMean).append(", maxSize = ").append(max).append("\n");
+				sb.append("  minMean = ").append(minMean).append(", maxMean = ").append(maxMean).append(", maxSize = ").append(max).append('\n');
 				for (AbstractProportionalBundler b: bundlers)
 				{
 					sb.append("  bundler #").append(b.getBundlerNumber()).append(" : bundleSize=").append(b.getBundleSize()).append(", ");
-					sb.append(b.getDataHolder()).append("\n");
+					sb.append(b.getDataHolder()).append('\n');
 				}
 				log.debug(sb.toString());
 			}
@@ -211,9 +215,9 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	{
 		//return 1d / (1d + (x <= 0d ? 0d : Math.log(1d + ((ProportionalTuneProfile) profile).getProportionalityFactor() * x)));
 		//return Math.exp(-((ProportionalTuneProfile) profile).getProportionalityFactor() * x);
-		double r = 1d;
+		double r = 1.0d;
 		for (int i=0; i<((ProportionalTuneProfile) profile).getProportionalityFactor(); i++) r *= x;
-		return 1d/r;
+		return 1.0d /r;
 		/*
 		*/
 	}

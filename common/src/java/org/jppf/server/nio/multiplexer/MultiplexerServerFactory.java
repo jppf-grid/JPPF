@@ -47,7 +47,8 @@ public final class MultiplexerServerFactory
 	 * @return a mapping of the states enumeration to the corresponding NioState instances.
 	 * @see org.jppf.server.nio.NioServerFactory#createStateMap()
 	 */
-	public Map<MultiplexerState, NioState<MultiplexerTransition>> createStateMap()
+	@Override
+    public Map<MultiplexerState, NioState<MultiplexerTransition>> createStateMap()
 	{
 		MultiplexerNioServer server = (MultiplexerNioServer) this.server;
 		Map<MultiplexerState, NioState<MultiplexerTransition>> map =
@@ -66,7 +67,8 @@ public final class MultiplexerServerFactory
 	 * @return a mapping of the transitions enumeration to the corresponding NioTransition instances.
 	 * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
 	 */
-	public Map<MultiplexerTransition, NioTransition<MultiplexerState>> createTransitionMap()
+	@Override
+    public Map<MultiplexerTransition, NioTransition<MultiplexerState>> createTransitionMap()
 	{
 		Map<MultiplexerTransition, NioTransition<MultiplexerState>> map =
 			new EnumMap<MultiplexerTransition, NioTransition<MultiplexerState>>(MultiplexerTransition.class);
@@ -85,7 +87,7 @@ public final class MultiplexerServerFactory
 	 * @param ops the operations allowed.
 	 * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
 	 */
-	private NioTransition<MultiplexerState> transition(MultiplexerState state, int ops)
+	private static NioTransition<MultiplexerState> transition(MultiplexerState state, int ops)
 	{
 		return new NioTransition<MultiplexerState>(state, ops);
 	}

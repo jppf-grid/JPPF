@@ -63,7 +63,8 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	/**
 	 * {@inheritDoc}
 	 */
-	public S getState()
+	@Override
+    public S getState()
 	{
 		return state;
 	}
@@ -71,7 +72,8 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setState(S state)
+	@Override
+    public void setState(S state)
 	{
 		this.state = state;
 	}
@@ -79,7 +81,8 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getUuid()
+	@Override
+    public String getUuid()
 	{
 		return uuid;
 	}
@@ -87,7 +90,8 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setUuid(String uuid)
+	@Override
+    public void setUuid(String uuid)
 	{
 		this.uuid = uuid;
 	}
@@ -99,7 +103,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	protected String getShortClassName()
 	{
 		String fqn = getClass().getName();
-		int idx = fqn.lastIndexOf(".");
+		int idx = fqn.lastIndexOf('.');
 		return fqn.substring(idx + 1);
 	}
 
@@ -124,7 +128,8 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	/**
 	 * {@inheritDoc}
 	 */
-	public ChannelWrapper<?> getChannel()
+	@Override
+    public ChannelWrapper<?> getChannel()
 	{
 		return channel;
 	}
@@ -132,7 +137,8 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setChannel(ChannelWrapper<?> channel)
+	@Override
+    public void setChannel(ChannelWrapper<?> channel)
 	{
 		this.channel = channel;
 	}

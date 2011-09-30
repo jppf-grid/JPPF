@@ -43,7 +43,8 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean select()
+	@Override
+    public boolean select()
 	{
 		return select(0);
 	}
@@ -51,7 +52,8 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean select(long timeout)
+	@Override
+    public boolean select(long timeout)
 	{
 		if (timeout < 0L) throw new IllegalArgumentException("timeout must be >= 0");
 		long start = System.currentTimeMillis();
@@ -69,7 +71,8 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean selectNow()
+	@Override
+    public boolean selectNow()
 	{
 		return (channel.getKeyOps() & channel.getReadyOps()) != 0;
 	}
@@ -77,7 +80,8 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
 	/**
 	 * {@inheritDoc}
 	 */
-	public ChannelWrapper<?> getChannel()
+	@Override
+    public ChannelWrapper<?> getChannel()
 	{
 		return channel;
 	}

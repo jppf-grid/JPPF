@@ -79,7 +79,8 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	 * @throws Exception if an I/O error occurs.
 	 * @see org.jppf.server.protocol.Location#getInputStream()
 	 */
-	public InputStream getInputStream() throws Exception
+	@Override
+    public InputStream getInputStream() throws Exception
 	{
 		return new ByteArrayInputStream(path, offset, len);
 	}
@@ -90,7 +91,8 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	 * @throws Exception if an I/O error occurs.
 	 * @see org.jppf.server.protocol.Location#getOutputStream()
 	 */
-	public OutputStream getOutputStream() throws Exception
+	@Override
+    public OutputStream getOutputStream() throws Exception
 	{
 		return new ByteBufferOutputStream(ByteBuffer.wrap(path, offset, len));
 	}
@@ -100,7 +102,8 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	 * @return the size as a long value, or -1 if the file does not exist.
 	 * @see org.jppf.server.protocol.Location#size()
 	 */
-	public long size()
+	@Override
+    public long size()
 	{
 		return len;
 	}
@@ -112,7 +115,8 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	 * @throws Exception if an I/O error occurs.
 	 * @see org.jppf.server.protocol.AbstractLocation#toByteArray()
 	 */
-	public byte[] toByteArray() throws Exception
+	@Override
+    public byte[] toByteArray() throws Exception
 	{
 		return path;
 	}

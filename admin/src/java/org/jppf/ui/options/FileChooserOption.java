@@ -92,7 +92,8 @@ public class FileChooserOption extends AbstractOption
 	 * Create the UI components for this option.
 	 * @see org.jppf.ui.options.AbstractOptionElement#createUI()
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		button = new JButton();
 		if ((label != null) && !"".equals(label.trim())) button.setText(label);
@@ -107,7 +108,8 @@ public class FileChooserOption extends AbstractOption
 		}
 		button.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent event)
+			@Override
+            public void actionPerformed(ActionEvent event)
 			{
 				doChooseFile();
 			}
@@ -120,7 +122,8 @@ public class FileChooserOption extends AbstractOption
 	 * to all value change listeners that registered with this option.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
 	}
 
@@ -129,7 +132,8 @@ public class FileChooserOption extends AbstractOption
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 		if (button != null) button.setEnabled(enabled);
 	}
@@ -204,7 +208,7 @@ public class FileChooserOption extends AbstractOption
 			{
 				String ext = "";
 				String desc = "";
-				int idx = s.indexOf(";");
+				int idx = s.indexOf(';');
 				if (idx < 0) ext = s.trim();
 				else
 				{
@@ -247,13 +251,14 @@ public class FileChooserOption extends AbstractOption
 		 * @return true if the file is accepted, false otherwise.
 		 * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
 		 */
-		public boolean accept(File f)
+		@Override
+        public boolean accept(File f)
 		{
 			if (f == null) return false;
 			if (f.isDirectory()) return true;
 			if ("*".equals(ext)) return true;
 			String s = f.getAbsolutePath();
-			int idx = s.lastIndexOf(".");
+			int idx = s.lastIndexOf('.');
 			if ((idx < 0) && "".equals(ext)) return true;
 			return ext.equals(s.substring(idx + 1));
 		}
@@ -263,7 +268,8 @@ public class FileChooserOption extends AbstractOption
 		 * @return the description as a string.
 		 * @see javax.swing.filechooser.FileFilter#getDescription()
 		 */
-		public String getDescription()
+		@Override
+        public String getDescription()
 		{
 			return desc;
 		}

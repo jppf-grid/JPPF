@@ -146,12 +146,12 @@ public class FileReplacer
 		{
 			nbFilesChanged++;
 			nbReplacements += nbFound;
-			log.info("Found "+nbFound+" occurrence"+(nbFound > 1 ? "s" : "")+" of the sequence in file '"+file+"'");
+			log.info("Found "+nbFound+" occurrence"+(nbFound > 1 ? "s" : "")+" of the sequence in file '"+file+ '\'');
 			String s = matcher.replaceAll(dest);
 			if (debugEnabled) log.debug("Content with replacements performed:\n" + s);
 			if (!searchOnly) FileUtils.writeTextFile(file.getPath(), s);
 		}
-		else if (debugEnabled) log.debug("Sequence not found in file '"+file+"'");
+		else if (debugEnabled) log.debug("Sequence not found in file '"+file+ '\'');
 	}
 
 	/**
@@ -208,7 +208,8 @@ public class FileReplacer
 		 * @return true if and only if pathname  should be included.
 		 * @see java.io.FileFilter#accept(java.io.File)
 		 */
-		public boolean accept(File file)
+		@Override
+        public boolean accept(File file)
 		{
 			if (file.isDirectory()) return true;
 			String ext = FileUtils.getFileExtension(file);

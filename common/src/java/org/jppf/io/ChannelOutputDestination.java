@@ -61,7 +61,8 @@ public class ChannelOutputDestination implements OutputDestination
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.OutputDestination#write(byte[], int, int)
 	 */
-	public int write(byte[] data, int offset, int len) throws Exception
+	@Override
+    public int write(byte[] data, int offset, int len) throws Exception
 	{
 		int cap = StreamConstants.TEMP_BUFFER_SIZE;
 		if (tmpBuffer == null) tmpBuffer = ByteBuffer.allocateDirect(cap);
@@ -89,7 +90,8 @@ public class ChannelOutputDestination implements OutputDestination
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
 	 */
-	public int write(ByteBuffer data) throws Exception
+	@Override
+    public int write(ByteBuffer data) throws Exception
 	{
 		return channel.write(data);
 	}
@@ -100,7 +102,8 @@ public class ChannelOutputDestination implements OutputDestination
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.OutputDestination#writeInt(int)
 	 */
-	public void writeInt(int value) throws Exception
+	@Override
+    public void writeInt(int value) throws Exception
 	{
 		SerializationUtils.writeInt(channel, value);
 	}
@@ -110,7 +113,8 @@ public class ChannelOutputDestination implements OutputDestination
 	 * @throws IOException if an IO error occurs.
 	 * @see java.io.Closeable#close()
 	 */
-	public void close() throws IOException
+	@Override
+    public void close() throws IOException
 	{
 	}
 }

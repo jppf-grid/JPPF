@@ -72,7 +72,8 @@ class SaveFileAction implements PrivilegedAction<File>
 	 * @return the abstract path for the created file.
 	 * @see java.security.PrivilegedAction#run()
 	 */
-	public File run()
+	@Override
+    public File run()
 	{
 		File tmp = null;
 		String fileName = FileUtils.getFileName(name);
@@ -89,7 +90,7 @@ class SaveFileAction implements PrivilegedAction<File>
 			}
 			if (tmp == null)
 			{
-				String dir = tmpDirs.get(0) + "_" + tmpDirs.size();
+				String dir = tmpDirs.get(0) + '_' + tmpDirs.size();
 				File f = new File(dir + File.separator);
 				if (!f.exists())
 				{

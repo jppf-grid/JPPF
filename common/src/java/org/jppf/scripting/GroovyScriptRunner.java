@@ -41,7 +41,8 @@ public class GroovyScriptRunner implements ScriptRunner
 	 * @throws JPPFScriptingException if an error occurs while evaluating the script.
 	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.util.Map)
 	 */
-	public Object evaluate(String script, Map<String, Object> variables) throws JPPFScriptingException
+	@Override
+    public Object evaluate(String script, Map<String, Object> variables) throws JPPFScriptingException
 	{
 		return evaluate(null, script, variables);
 	}
@@ -57,7 +58,8 @@ public class GroovyScriptRunner implements ScriptRunner
 	 * @throws JPPFScriptingException if an error occurs while evaluating the script.
 	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.lang.String, java.util.Map)
 	 */
-	public Object evaluate(String scriptId, String script, Map<String, Object> variables) throws JPPFScriptingException
+	@Override
+    public Object evaluate(String scriptId, String script, Map<String, Object> variables) throws JPPFScriptingException
 	{
 		try
 		{
@@ -84,7 +86,8 @@ public class GroovyScriptRunner implements ScriptRunner
 	 * Initialize the execution environment.
 	 * @see org.jppf.scripting.ScriptRunner#init()
 	 */
-	public void init()
+	@Override
+    public void init()
 	{
 	}
 
@@ -92,7 +95,8 @@ public class GroovyScriptRunner implements ScriptRunner
 	 * Perform cleanup after we're done using this script runner.
 	 * @see org.jppf.scripting.ScriptRunner#cleanup()
 	 */
-	public void cleanup()
+	@Override
+    public void cleanup()
 	{
 	}
 }

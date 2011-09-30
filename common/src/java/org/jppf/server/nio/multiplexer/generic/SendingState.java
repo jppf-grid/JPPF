@@ -50,7 +50,8 @@ public class SendingState extends MultiplexerServerState
 	/**
 	 * {@inheritDoc}
 	 */
-	public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	@Override
+    public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
 		if (context.hasPendingMessage() && (context.getCurrentMessage() == null))

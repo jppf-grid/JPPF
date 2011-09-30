@@ -41,7 +41,8 @@ public class FixedSizeBundler extends AbstractBundler
 	 * @return the bundle size defined in the JPPF driver configuration.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
-	public int getBundleSize()
+	@Override
+    public int getBundleSize()
 	{
 		return ((FixedSizeProfile) profile).getSize();
 	}
@@ -51,7 +52,8 @@ public class FixedSizeBundler extends AbstractBundler
 	 * @return a reference to this bundler, no copy is actually made.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
-	public Bundler copy()
+	@Override
+    public Bundler copy()
 	{
 		return new FixedSizeBundler(profile.copy());
 	}
@@ -61,7 +63,8 @@ public class FixedSizeBundler extends AbstractBundler
 	 * @return the bundle size as an int.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
-	protected int maxSize()
+	@Override
+    protected int maxSize()
 	{
 		return -1;
 	}

@@ -37,11 +37,12 @@ public class WindowClosingListener extends WindowAdapter
 	 * @param event the event we're interested in.
 	 * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
 	 */
-	public void windowClosing(WindowEvent event)
+	@Override
+    public void windowClosing(WindowEvent event)
 	{
 		Preferences pref = OptionsHandler.getPreferences();
 		List<OptionElement> list = OptionsHandler.getPageList();
-		if (list.size() > 0)
+		if (!list.isEmpty())
 		{
 			OptionElement elt = list.get(0);
 			OptionsPageBuilder builder = new OptionsPageBuilder();

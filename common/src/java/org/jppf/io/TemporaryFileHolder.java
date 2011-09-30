@@ -46,10 +46,15 @@ public class TemporaryFileHolder
 	 * @throws Throwable if an error occurs.
 	 * @see java.lang.Object#finalize()
 	 */
-	protected void finalize() throws Throwable
+	@Override
+    protected void finalize() throws Throwable
 	{
-		if ((file != null) && file.exists()) file.delete();
-	}
+        try {
+            if ((file != null) && file.exists()) file.delete();
+        } finally {
+            super.finalize();
+        }
+    }
 
 	/**
 	 * Get the underlying file.

@@ -135,9 +135,9 @@ public class OptionsPageBuilder
 		if (baseName == null)
 		{
 			String path = xmlPath.replace("\\", "/");
-			int idx = path.lastIndexOf("/");
+			int idx = path.lastIndexOf('/');
 			this.baseName = BASE_NAME + ((idx < 0) ? path : path.substring(idx + 1));
-			idx = this.baseName.lastIndexOf(".");
+			idx = this.baseName.lastIndexOf('.');
 			if (idx >= 0) this.baseName = this.baseName.substring(0, idx);
 		}
 		else this.baseName = baseName;
@@ -183,7 +183,8 @@ public class OptionsPageBuilder
 		{
 			Runnable r = new Runnable()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					listener.valueChanged(new ValueChangeEvent(elt));
 				}

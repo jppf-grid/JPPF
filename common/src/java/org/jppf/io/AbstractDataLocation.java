@@ -42,7 +42,8 @@ public abstract class AbstractDataLocation implements DataLocation
 	 * @return the data size as an int.
 	 * @see org.jppf.io.DataLocation#getSize()
 	 */
-	public int getSize()
+	@Override
+    public int getSize()
 	{
 		return size;
 	}

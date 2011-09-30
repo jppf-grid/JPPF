@@ -120,7 +120,7 @@ public final class IOHelper
 	public static boolean fitsInMemory(int size)
 	{
 		long freeMem = SystemUtils.maxFreeHeap();
-		if (traceEnabled) log.trace("free mem / requested size : " + freeMem + "/" + size);
+		if (traceEnabled) log.trace("free mem / requested size : " + freeMem + '/' + size);
 		return (long) (FREE_MEM_TO_SIZE_RATIO * size) < freeMem;
 	}
 

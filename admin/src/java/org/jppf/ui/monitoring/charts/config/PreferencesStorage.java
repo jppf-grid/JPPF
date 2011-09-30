@@ -163,12 +163,11 @@ public class PreferencesStorage
 		String fields = child.get("fields", "");
 		String[] sFields = fields.split("\\|");
 		List<Fields> list = new ArrayList<Fields>();
-		for (int i=0; i<sFields.length; i++)
-		{
-			Fields f = lookupEnum(sFields[i]);
-			if (f != null) list.add(f);
-		}
-		config.fields = list.toArray(new Fields[0]);
+        for (String sField : sFields) {
+            Fields f = lookupEnum(sField);
+            if (f != null) list.add(f);
+        }
+		config.fields = list.toArray(new Fields[list.size()]);
 		String type = child.get("type", CHART_PLOTXY.name());
 		try
 		{
@@ -187,7 +186,7 @@ public class PreferencesStorage
 	 * @param name the name of the field to find.
 	 * @return a <code>Fields</code>, or null if the field could not be found.
 	 */
-	private Fields lookupEnum(String name)
+	private static Fields lookupEnum(String name)
 	{
 		Fields field = null;
 		try

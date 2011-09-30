@@ -57,7 +57,7 @@ public class IdleDetectionTask extends TimerTask
 	/**
 	 * The list of listeners to this object's events.
 	 */
-	private List<IdleStateListener> listeners = new ArrayList<IdleStateListener>();
+	private final List<IdleStateListener> listeners = new ArrayList<IdleStateListener>();
 
 	/**
 	 * Initialize this task with the specified idle timeout and listeners.
@@ -79,7 +79,8 @@ public class IdleDetectionTask extends TimerTask
 	/**
 	 * {@inheritDoc}
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		if (detector == null)
 		{

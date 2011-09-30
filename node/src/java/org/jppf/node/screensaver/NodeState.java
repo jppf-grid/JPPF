@@ -80,15 +80,13 @@ class NodeState implements NodeListener
 			statusLabels[i][1] = new JLabel(NodePanel.BRIGHT_RED);
 		}
 		Dimension d = new Dimension(8, 8);
-		for (int i=0; i<statusLabels.length; i++)
-		{
-			for (int j=0; j<statusLabels[i].length; j++)
-			{
-				statusLabels[i][j].setMinimumSize(d);
-				statusLabels[i][j].setMaximumSize(d);
-				statusLabels[i][j].setBackground(Color.BLACK);
-			}
-		}
+        for (JLabel[] statusLabel : statusLabels) {
+            for (JLabel aStatusLabel : statusLabel) {
+                aStatusLabel.setMinimumSize(d);
+                aStatusLabel.setMaximumSize(d);
+                aStatusLabel.setBackground(Color.BLACK);
+            }
+        }
 		countLabel = new JLabel("" + taskCount);
 		d = new Dimension(60, 20);
 		countLabel.setMinimumSize(d);
@@ -103,7 +101,8 @@ class NodeState implements NodeListener
 		btn[0] = new JButton("Start");
 		btn[0].addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent event)
+			@Override
+            public void actionPerformed(ActionEvent event)
 			{
 				startNode();
 			}
@@ -112,7 +111,8 @@ class NodeState implements NodeListener
 		btn[1] = new JButton("Stop");
 		btn[1].addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent event)
+			@Override
+            public void actionPerformed(ActionEvent event)
 			{
 				stopNode();
 			}
@@ -150,7 +150,8 @@ class NodeState implements NodeListener
 	 * @param event the event that triggered the call to this method.
 	 * @see org.jppf.node.event.NodeListener#eventOccurred(org.jppf.node.event.NodeEvent)
 	 */
-	public void eventOccurred(NodeEvent event)
+	@Override
+    public void eventOccurred(NodeEvent event)
 	{
 		switch (event.getType())
 		{
@@ -183,7 +184,7 @@ class NodeState implements NodeListener
 
 			case TASK_EXECUTED:
 				int n = taskCount.incrementAndGet();
-				countLabel.setText("" + n);
+				countLabel.setText(Integer.toString(n));
 				break;
 		}
 	}

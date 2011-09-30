@@ -77,7 +77,8 @@ public class JMXServerImpl extends AbstractJMXServer
 	 * @param cl - the default classloader to be used by the JMX remote connector.
 	 * @throws Exception if an error occurs when starting the server or one of its components. 
 	 */
-	public void start(ClassLoader cl) throws Exception
+	@Override
+    public void start(ClassLoader cl) throws Exception
 	{
     if (debugEnabled) log.debug("starting remote connector server");
     ClassLoader tmp = Thread.currentThread().getContextClassLoader();
@@ -97,7 +98,7 @@ public class JMXServerImpl extends AbstractJMXServer
 				try
 				{
 					InetAddress addr = InetAddress.getByName(host);
-			    url = new JMXServiceURL("service:jmx:rmi://" + host + ":" + rmiPort + "/jndi/rmi://localhost:" + port + namespaceSuffix);
+			    url = new JMXServiceURL("service:jmx:rmi://" + host + ':' + rmiPort + "/jndi/rmi://localhost:" + port + namespaceSuffix);
 			    Map<String, Object> env = new HashMap<String, Object>();
 			    env.put("jmx.remote.default.class.loader", cl);
 			    env.put("jmx.remote.protocol.provider.class.loader", cl);
@@ -117,7 +118,7 @@ public class JMXServerImpl extends AbstractJMXServer
 					else throw e;
 				}
 			}
-			props.setProperty("jppf.management.rmi.port", "" + rmiPort);
+			props.setProperty("jppf.management.rmi.port", Integer.toString(rmiPort));
 	    if (debugEnabled) log.debug("starting connector server with RMI registry port = " + port + " and RMI server port = " + rmiPort);
 	    stopped = false;
 	    if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);
@@ -153,7 +154,7 @@ public class JMXServerImpl extends AbstractJMXServer
     	{
     		Throwable cause = e.getCause();
 				String s = cause.getMessage();
-				if ((cause instanceof BindException) || ((s != null) && (s.toLowerCase().indexOf("bind") >= 0)))
+				if ((cause instanceof BindException) || ((s != null) && (s.toLowerCase().contains("bind"))))
 				{
 					if (port >= 65530) port = 1024;
 					port++;
@@ -161,7 +162,7 @@ public class JMXServerImpl extends AbstractJMXServer
     		else throw e;
     	}
     }
-    props.setProperty("jppf.management.port", "" + port);
+    props.setProperty("jppf.management.port", Integer.toString(port));
 		return port;
 	}
 }

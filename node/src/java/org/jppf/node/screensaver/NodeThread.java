@@ -49,7 +49,8 @@ class NodeThread extends Thread
 	 * Launch a JPPF node.
 	 * @see java.lang.Thread#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{

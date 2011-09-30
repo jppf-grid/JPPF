@@ -52,7 +52,8 @@ public class IdentifyingInboundChannelState extends MultiplexerServerState
 	/**
 	 * {@inheritDoc}
 	 */
-	public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	@Override
+    public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
 		if (debugEnabled) log.debug("exec() for " + wrapper);

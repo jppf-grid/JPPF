@@ -182,8 +182,8 @@ public class ThumbnailGenerator
 		{
 			String s = path;
 			if (s.endsWith("/") || s.endsWith("\\")) s = s.substring(0, s.length() - 1);
-			s += "/" + TH_PREFIX + file.getName();
-			int idx = s.lastIndexOf(".");
+			s += '/' + TH_PREFIX + file.getName();
+			int idx = s.lastIndexOf('.');
 			s = s.substring(0, idx+1) + "jpg";
 			fileMap.put(file, new File(s));
 		}
@@ -230,7 +230,8 @@ public class ThumbnailGenerator
 		 * @return true if and only if pathname  should be included.
 		 * @see java.io.FileFilter#accept(java.io.File)
 		 */
-		public boolean accept(File file)
+		@Override
+        public boolean accept(File file)
 		{
 			String ext = FileUtils.getFileExtension(file);
 			if (file.getName().startsWith(TH_PREFIX)) return false;

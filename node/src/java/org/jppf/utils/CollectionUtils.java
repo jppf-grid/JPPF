@@ -150,7 +150,7 @@ public final class CollectionUtils
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(name).append("[shallow size=").append(map.size());
-		sb.append(", total elements=").append(sizeOfListMap(map)).append("]");
+		sb.append(", total elements=").append(sizeOfListMap(map)).append(']');
 		return sb.toString();
 	}
 

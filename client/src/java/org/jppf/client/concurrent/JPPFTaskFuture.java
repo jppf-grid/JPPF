@@ -135,8 +135,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 				exception = task.getException();
 			}
 		}
-		return;
-	}
+    }
 
 	/**
 	 * Mark the task as done.

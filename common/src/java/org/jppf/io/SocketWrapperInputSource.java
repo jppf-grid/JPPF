@@ -53,7 +53,8 @@ public class SocketWrapperInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#read(byte[], int, int)
 	 */
-	public int read(byte[] data, int offset, int len) throws Exception
+	@Override
+    public int read(byte[] data, int offset, int len) throws Exception
 	{
 		int n = socketWrapper.read(data, offset, len);
 		if (n < 0) throw new EOFException();
@@ -67,7 +68,8 @@ public class SocketWrapperInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#read(java.nio.ByteBuffer)
 	 */
-	public int read(ByteBuffer data) throws Exception
+	@Override
+    public int read(ByteBuffer data) throws Exception
 	{
 		byte[] buf = new byte[StreamConstants.TEMP_BUFFER_SIZE];
 		int size = Math.min(buf.length, data.remaining());
@@ -82,7 +84,8 @@ public class SocketWrapperInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#readInt()
 	 */
-	public int readInt() throws Exception
+	@Override
+    public int readInt() throws Exception
 	{
 		return socketWrapper.readInt();
 	}
@@ -94,7 +97,8 @@ public class SocketWrapperInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#skip(int)
 	 */
-	public int skip(int n) throws Exception
+	@Override
+    public int skip(int n) throws Exception
 	{
 		return socketWrapper.skip(n);
 	}
@@ -104,7 +108,8 @@ public class SocketWrapperInputSource implements InputSource
 	 * @throws IOException if an IO error occurs.
 	 * @see java.io.Closeable#close()
 	 */
-	public void close() throws IOException
+	@Override
+    public void close() throws IOException
 	{
 	}
 }

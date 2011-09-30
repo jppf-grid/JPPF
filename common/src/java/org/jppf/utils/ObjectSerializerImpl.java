@@ -45,7 +45,8 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @throws Exception if the object can't be serialized.
 	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object)
 	 */
-	public JPPFBuffer serialize(Object o) throws Exception
+	@Override
+    public JPPFBuffer serialize(Object o) throws Exception
 	{
 		return serialize(o, false);
 	}
@@ -58,13 +59,13 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @throws Exception if the object can't be serialized.
 	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object)
 	 */
-	public JPPFBuffer serialize(Object o, boolean noCopy) throws Exception
+	@Override
+    public JPPFBuffer serialize(Object o, boolean noCopy) throws Exception
 	{
 		JPPFByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		serialize(o, baos);
 		byte[] data = noCopy ? baos.getBuf() : baos.toByteArray();
-		JPPFBuffer buf = new JPPFBuffer(data, baos.size());
-		return buf;
+        return new JPPFBuffer(data, baos.size());
 	}
 
 	/**
@@ -74,7 +75,8 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @throws Exception if the object can't be serialized.
 	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object, java.io.OutputStream)
 	 */
-	public void serialize(Object o, OutputStream os) throws Exception
+	@Override
+    public void serialize(Object o, OutputStream os) throws Exception
 	{
 		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(os);
 		oos.writeObject(o);
@@ -88,7 +90,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @param location the location to serialize to.
 	 * @throws Exception if the object can't be serialized.
 	 */
-	public void serialize(Object o, DataLocation location) throws Exception
+	public static void serialize(Object o, DataLocation location) throws Exception
 	{
 		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(location.getOutputStream());
 		oos.writeObject(o);
@@ -103,7 +105,8 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(org.jppf.utils.JPPFBuffer)
 	 */
-	public Object deserialize(JPPFBuffer buf) throws Exception
+	@Override
+    public Object deserialize(JPPFBuffer buf) throws Exception
 	{
 		return deserialize(new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength()));
 	}
@@ -115,7 +118,8 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(byte[])
 	 */
-	public Object deserialize(byte[] bytes) throws Exception
+	@Override
+    public Object deserialize(byte[] bytes) throws Exception
 	{
 		return deserialize(new ByteArrayInputStream(bytes));
 	}
@@ -129,7 +133,8 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(byte[], int, int)
 	 */
-	public Object deserialize(byte[] bytes, int offset, int length) throws Exception
+	@Override
+    public Object deserialize(byte[] bytes, int offset, int length) throws Exception
 	{
 		return deserialize(new ByteArrayInputStream(bytes, offset, length));
 	}
@@ -141,7 +146,8 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(java.io.InputStream)
 	 */
-	public Object deserialize(InputStream is) throws Exception
+	@Override
+    public Object deserialize(InputStream is) throws Exception
 	{
 		Object o = null;
 		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);

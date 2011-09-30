@@ -67,7 +67,7 @@ public abstract class AbstractIPAddressPattern
 		src = postProcess(src);
 		String[] rangeArray = config.compSeparatorPattern.split(src);
 		if ((rangeArray == null) || (rangeArray.length == 0)) throw new IllegalArgumentException("invalid empty pattern");
-		if (rangeArray.length > config.nbComponents) throw new IllegalArgumentException("pattern describes more than " + config.nbComponents + " components : \"" + source + "\"");
+		if (rangeArray.length > config.nbComponents) throw new IllegalArgumentException("pattern describes more than " + config.nbComponents + " components : \"" + source + '\"');
 		try
 		{
 			for (String s: rangeArray) ranges.add(parseRangePattern(s));
@@ -194,7 +194,8 @@ public abstract class AbstractIPAddressPattern
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		for (int i=0; i<ranges.size(); i++)

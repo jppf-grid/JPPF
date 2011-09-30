@@ -85,7 +85,8 @@ public class SamplesPHPReadmeProcessor implements Runnable
 	/**
 	 * {@inheritDoc}
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{

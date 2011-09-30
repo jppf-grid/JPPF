@@ -49,7 +49,8 @@ public class JPPFByteArrayOutputStream extends ByteArrayOutputStream
 	 * @return the content of the stream as an array of bytes.
 	 * @see java.io.ByteArrayOutputStream#toByteArray()
 	 */
-	public synchronized byte[] toByteArray()
+	@Override
+    public synchronized byte[] toByteArray()
 	{
 		return buf.length == count ? buf : super.toByteArray();
 	}

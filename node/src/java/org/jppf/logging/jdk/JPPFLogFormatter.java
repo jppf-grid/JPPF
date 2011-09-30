@@ -39,17 +39,18 @@ public class JPPFLogFormatter extends Formatter
 	 * @return a string representation of the record according to this formatter.
 	 * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
 	 */
-	public String format(LogRecord record)
+	@Override
+    public String format(LogRecord record)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(sdf.format(new Date(record.getMillis())));
-		sb.append("[");
+		sb.append('[');
 		String name = record.getLevel().getName();
 		sb.append(name);
 		// pad to 7 chars 
 		for (int i=0; i<7-name.length(); i++) sb.append(' ');
-		sb.append("]");
-		sb.append("[");
+		sb.append(']');
+		sb.append('[');
 		/*
 		String s = record.getSourceClassName();
 		if (s != null) sb.append(s);
@@ -58,35 +59,33 @@ public class JPPFLogFormatter extends Formatter
 		String shortName = getShortName(s);
 		StackTraceElement[] elts = new Throwable().getStackTrace();
 		StackTraceElement elt = null;
-		for (int i=0; i<elts.length; i++)
-		{
-			if (getShortName(elts[i].getClassName()).equals(shortName))
-			{
-				elt = elts[i];
-				break;
-			}
-		}
+        for (StackTraceElement elt1 : elts) {
+            if (getShortName(elt1.getClassName()).equals(shortName)) {
+                elt = elt1;
+                break;
+            }
+        }
 		if (elt != null)
 		{
 			sb.append(elt.getClassName());
-			if (elt.getMethodName() != null) sb.append(".").append(elt.getMethodName());
-			sb.append("(");
+			if (elt.getMethodName() != null) sb.append('.').append(elt.getMethodName());
+			sb.append('(');
 			if (elt.getLineNumber() >= 0) sb.append(elt.getLineNumber());
-			sb.append(")");
+			sb.append(')');
 		}
 		else
 		{
 			if (s != null) sb.append(s);
 			s = record.getSourceMethodName();
-			if (s != null) sb.append(".").append(s).append("()");
+			if (s != null) sb.append('.').append(s).append("()");
 		}
-		sb.append("]");
+		sb.append(']');
 		sb.append(": ");
 		s = record.getMessage();
 		if (s != null) sb.append(s);
 		Object[] params = record.getParameters();
-		if (params != null) for (Object o: params) sb.append("|").append(o);
-		sb.append("\n");
+		if (params != null) for (Object o: params) sb.append('|').append(o);
+		sb.append('\n');
 		return sb.toString();
 	}
 
@@ -95,7 +94,7 @@ public class JPPFLogFormatter extends Formatter
 	 * @param fqn - the fully qualified name of the class. 
 	 * @return a string representing the short name of a class.
 	 */
-	private String getShortName(String fqn)
+	private static String getShortName(String fqn)
 	{
 		if (fqn == null) return "";
 		int idx = fqn.lastIndexOf('.');

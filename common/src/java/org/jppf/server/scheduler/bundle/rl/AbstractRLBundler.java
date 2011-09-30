@@ -75,7 +75,8 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 * @return  the bundle size as an int value.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
-	public int getBundleSize()
+	@Override
+    public int getBundleSize()
 	{
 		return bundleSize;
 	}
@@ -95,10 +96,11 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 * @param totalTime the time in milliseconds it took to execute the tasks.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
 	 */
-	public void feedback(int size, double totalTime)
+	@Override
+    public void feedback(int size, double totalTime)
 	{
 		if (size <= 0) return;
-		BundlePerformanceSample sample = new BundlePerformanceSample((double) totalTime / (double) size, size);
+		BundlePerformanceSample sample = new BundlePerformanceSample(totalTime / (double) size, size);
 		dataHolder.addSample(sample);
 
 		double d = dataHolder.getPreviousMean() - dataHolder.getMean();
@@ -139,7 +141,7 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	public void feedback2(int size, double totalTime)
 	{
 		if (size <= 0) return;
-		BundlePerformanceSample sample = new BundlePerformanceSample((double) totalTime / (double) size, size);
+		BundlePerformanceSample sample = new BundlePerformanceSample(totalTime / (double) size, size);
 		dataHolder.addSample(sample);
 
 		double d = dataHolder.getPreviousMean() - dataHolder.getMean();
@@ -177,7 +179,8 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 * Perform context-independant initializations.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#setup()
 	 */
-	public void setup()
+	@Override
+    public void setup()
 	{
 	}
 	
@@ -185,7 +188,8 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 * Release the resources used by this bundler.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#dispose()
 	 */
-	public void dispose()
+	@Override
+    public void dispose()
 	{
 		dataHolder = null;
 	}

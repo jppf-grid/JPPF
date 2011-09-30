@@ -90,7 +90,8 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	/**
 	 * Initialize the underlying socket connection.
 	 */
-	protected void init()
+	@Override
+    protected void init()
 	{
 		LOCK.lock();
 		try
@@ -102,7 +103,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 				{
 					if (debugEnabled) log.debug("initializing connection");
 					if (socketClient == null) initSocketClient();
-					System.out.println("Attempting connection to the class server at " + socketClient.getHost() + ":" + socketClient.getPort());
+					System.out.println("Attempting connection to the class server at " + socketClient.getHost() + ':' + socketClient.getPort());
 					socketInitializer.initializeSocket(socketClient);
 					if (!socketInitializer.isSuccessfull())
 					{
@@ -154,7 +155,8 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	/**
 	 * {@inheritDoc}
 	 */
-	public void reset()
+	@Override
+    public void reset()
 	{
 		LOCK.lock();
 		try
@@ -172,7 +174,8 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	 * Terminate this classloader and clean the resources it uses.
 	 * @see org.jppf.classloader.AbstractJPPFClassLoader#close()
 	 */
-	public void close()
+	@Override
+    public void close()
 	{
 		LOCK.lock();
 		try
@@ -206,7 +209,8 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
 	 * @throws Exception if the connection was lost and could not be reestablished.
 	 */
-	protected JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception
+	@Override
+    protected JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception
 	{
 		JPPFResourceWrapper resource = new JPPFResourceWrapper();
 		resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
@@ -265,7 +269,8 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		/**
 		 * {@inheritDoc}
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			try
 			{
@@ -283,7 +288,8 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		/**
 		 * {@inheritDoc}
 		 */
-		public JPPFResourceWrapper getResponse() throws Exception
+		@Override
+        public JPPFResourceWrapper getResponse() throws Exception
 		{
 			if (response == null)
 			{

@@ -52,7 +52,8 @@ public class RunnableTaskWrapper extends AbstractTaskObjectWrapper
 	 * @throws Exception if an error occurs during the execution.
 	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#execute()
 	 */
-	public Object execute() throws Exception
+	@Override
+    public Object execute() throws Exception
 	{
 		runnable.run();
 		return null;
@@ -63,7 +64,8 @@ public class RunnableTaskWrapper extends AbstractTaskObjectWrapper
 	 * @return an object or null if the invoked method is static. 
 	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getTaskObject()
 	 */
-	public Object getTaskObject()
+	@Override
+    public Object getTaskObject()
 	{
 		return runnable;
 	}

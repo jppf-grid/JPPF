@@ -67,7 +67,8 @@ public class IPv6AddressPattern extends AbstractIPAddressPattern
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean matches(InetAddress ip)
+	@Override
+    public boolean matches(InetAddress ip)
 	{
 		if (!(ip instanceof Inet6Address)) return false;
 		return super.matches(ip);
@@ -76,7 +77,8 @@ public class IPv6AddressPattern extends AbstractIPAddressPattern
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		for (int i=0; i<ranges.size(); i++)

@@ -207,7 +207,7 @@ public class SchemaValidator
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("Document ").append(name).append(" at ");
-		sb.append(e.getLineNumber()).append(":").append(e.getColumnNumber()).append("\n");
+		sb.append(e.getLineNumber()).append(':').append(e.getColumnNumber()).append('\n');
 		sb.append(e.getMessage());
 		return sb.toString();
 	}
@@ -250,7 +250,8 @@ public class SchemaValidator
 		 * @throws SAXException any SAX exception, possibly wrapping another exception.
 		 * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
 		 */
-		public void error(SAXParseException exception) throws SAXException
+		@Override
+        public void error(SAXParseException exception) throws SAXException
 		{
 			errorCount++;
 			reporter.errors.add(printSAXParseException(exception, reporter.name));
@@ -262,7 +263,8 @@ public class SchemaValidator
 		 * @throws SAXException any SAX exception, possibly wrapping another exception.
 		 * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
 		 */
-		public void fatalError(SAXParseException exception) throws SAXException
+		@Override
+        public void fatalError(SAXParseException exception) throws SAXException
 		{
 			fatalCount++;
 			reporter.fatalErrors.add(printSAXParseException(exception, reporter.name));
@@ -274,7 +276,8 @@ public class SchemaValidator
 		 * @throws SAXException any SAX exception, possibly wrapping another exception.
 		 * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
 		 */
-		public void warning(SAXParseException exception) throws SAXException
+		@Override
+        public void warning(SAXParseException exception) throws SAXException
 		{
 			warningCount++;
 			reporter.warnings.add(printSAXParseException(exception, reporter.name));

@@ -18,8 +18,6 @@
 
 package org.jppf.node.policy;
 
-import org.jppf.utils.StringUtils;
-
 /**
  * Instances of this class build an execution policy graph, based on a policy
  * descriptor parsed from an XML document.
@@ -124,7 +122,7 @@ public class PolicyBuilder
 		}
 		catch(NumberFormatException e)
 		{
-			throw new IllegalArgumentException("'"+s+"' is not a double value", e);
+			throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
 		}
 		return new LessThan(desc.operands.get(0), value);
 	}
@@ -144,7 +142,7 @@ public class PolicyBuilder
 		}
 		catch(NumberFormatException e)
 		{
-			throw new IllegalArgumentException("'"+s+"' is not a double value", e);
+			throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
 		}
 		return new AtMost(desc.operands.get(0), value);
 	}
@@ -164,7 +162,7 @@ public class PolicyBuilder
 		}
 		catch(NumberFormatException e)
 		{
-			throw new IllegalArgumentException("'"+s+"' is not a double value", e);
+			throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
 		}
 		return new MoreThan(desc.operands.get(0), value);
 	}
@@ -184,7 +182,7 @@ public class PolicyBuilder
 		}
 		catch(NumberFormatException e)
 		{
-			throw new IllegalArgumentException("'"+s+"' is not a double value", e);
+			throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
 		}
 		return new AtLeast(desc.operands.get(0), value);
 	}
@@ -207,7 +205,7 @@ public class PolicyBuilder
 		}
 		catch(NumberFormatException e)
 		{
-			throw new IllegalArgumentException("'"+s+"' is not a double value", e);
+			throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
 		}
 		return new BetweenII(desc.operands.get(0), value1, value2);
 	}
@@ -230,7 +228,7 @@ public class PolicyBuilder
 		}
 		catch(NumberFormatException e)
 		{
-			throw new IllegalArgumentException("'"+s+"' is not a double value", e);
+			throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
 		}
 		return new BetweenIE(desc.operands.get(0), value1, value2);
 	}
@@ -253,7 +251,7 @@ public class PolicyBuilder
 		}
 		catch(NumberFormatException e)
 		{
-			throw new IllegalArgumentException("'"+s+"' is not a double value", e);
+			throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
 		}
 		return new BetweenEI(desc.operands.get(0), value1, value2);
 	}
@@ -276,7 +274,7 @@ public class PolicyBuilder
 		}
 		catch(NumberFormatException e)
 		{
-			throw new IllegalArgumentException("'"+s+"' is not a double value", e);
+			throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
 		}
 		return new BetweenEE(desc.operands.get(0), value1, value2);
 	}
@@ -304,7 +302,7 @@ public class PolicyBuilder
 			}
 			catch(NumberFormatException e)
 			{
-				throw new IllegalArgumentException("'"+s+"' is not a double value", e);
+				throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
 			}
 		}
 		return new Equal(desc.operands.get(0), Boolean.valueOf(s));
@@ -340,7 +338,7 @@ public class PolicyBuilder
 				}
 				catch(NumberFormatException e)
 				{
-					throw new IllegalArgumentException("'"+s+"' is not a double value", e);
+					throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
 				}
 			}
 			return new OneOf(desc.operands.get(0), values);
@@ -356,7 +354,7 @@ public class PolicyBuilder
 	 * @param desc the descriptor to use.
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 */
-	private ExecutionPolicy buildRegExpPolicy(PolicyDescriptor desc)
+	private static ExecutionPolicy buildRegExpPolicy(PolicyDescriptor desc)
 	{
 		return new RegExp(desc.operands.get(0), desc.operands.get(1));
 	}
@@ -367,11 +365,11 @@ public class PolicyBuilder
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 * @throws Exception if an error occurs while generating the custom policy object.
 	 */
-	private ExecutionPolicy buildCustomPolicy(PolicyDescriptor desc) throws Exception
+	private static ExecutionPolicy buildCustomPolicy(PolicyDescriptor desc) throws Exception
 	{
 		Class clazz = Class.forName(desc.className);
 		CustomPolicy policy = (CustomPolicy) clazz.newInstance();
-		policy.setArgs(desc.arguments.toArray(StringUtils.ZERO_STRING));
+		policy.setArgs(desc.arguments.toArray(new String[desc.arguments.size()]));
 		policy.initialize();
 		return policy;
 	}

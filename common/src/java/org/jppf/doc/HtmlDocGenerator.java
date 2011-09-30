@@ -157,7 +157,7 @@ public class HtmlDocGenerator
 				String paramName = templateCall.substring(pos, index).trim();
 				String paramValue = "";
 				index = templateCall.indexOf(QUOTE, pos);
-				if (index < 0) throw new Exception("Missing opening quote for parameter '"+paramName+"'");
+				if (index < 0) throw new Exception("Missing opening quote for parameter '"+paramName+ '\'');
 				pos = index+QUOTE.length();
 				String sub = templateCall.substring(pos);
 				if (sub.startsWith(CONTENT_START))
@@ -165,7 +165,7 @@ public class HtmlDocGenerator
 					pos += CONTENT_START.length();
 					index = templateCall.indexOf(CONTENT_END+QUOTE, pos);
 					if (index < 0) throw new Exception("Missing closing content string for parameter '"+paramName+"' in template call: '"
-							+ templateCall + "'");
+							+ templateCall + '\'');
 					paramValue = templateCall.substring(pos, index).trim();
 					paramValue = processParameters(callerMap, paramValue);
 					pos = index + (CONTENT_END+QUOTE).length();
@@ -174,7 +174,7 @@ public class HtmlDocGenerator
 				{
 					pos = index + QUOTE.length();
 					index = templateCall.indexOf(QUOTE, pos);
-					if (index < 0) throw new Exception("Missing closing quote for parameter '"+paramName+"'");
+					if (index < 0) throw new Exception("Missing closing quote for parameter '"+paramName+ '\'');
 					paramValue = templateCall.substring(pos, index).trim();
 					pos = index + QUOTE.length();
 				}
@@ -203,7 +203,7 @@ public class HtmlDocGenerator
 	 * been replaced with parameter values, and all nested template calls with corresponding instances.
 	 * @throws Exception if an error occurs while parsing the template or building its instance.
 	 */
-	private String processParameters(Map<String, String> parameterMap, String content) throws Exception
+	private static String processParameters(Map<String, String> parameterMap, String content) throws Exception
 	{
 		LineNumberReader reader = new LineNumberReader(new StringReader(content));
 		StringBuilder sb = new StringBuilder();
@@ -215,7 +215,7 @@ public class HtmlDocGenerator
 			if (s == null) break;
 			String s2 = s.trim();
 			if ("".equals(s2) || s2.startsWith(COMMENT)) continue;
-			sb.append(s).append("\n");
+			sb.append(s).append('\n');
 		}
 		reader.close();
 		String template = sb.toString();
@@ -292,7 +292,7 @@ public class HtmlDocGenerator
 		{
 			if (!destDir.exists()) destDir.mkdirs();
 			String target = destDir.getPath();
-			if (!target.endsWith("/") && !target.endsWith("\\")) target += "/";
+			if (!target.endsWith("/") && !target.endsWith("\\")) target += '/';
 			target += file.getName();
 			docGen.generatePage(file.getPath(), target, templateDir.getPath());
 		}

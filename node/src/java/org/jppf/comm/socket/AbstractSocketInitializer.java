@@ -56,7 +56,8 @@ public abstract class AbstractSocketInitializer implements SocketInitializer
 	 * @return true if this socket initializer has been intentionally closed, false otherwise.
 	 * @see org.jppf.comm.socket.SocketInitializer#isClosed()
 	 */
-	public boolean isClosed()
+	@Override
+    public boolean isClosed()
 	{
 		return closed;
 	}
@@ -66,7 +67,8 @@ public abstract class AbstractSocketInitializer implements SocketInitializer
 	 * @return true if any attempt was successfull, false otherwise.
 	 * @see org.jppf.comm.socket.SocketInitializer#isSuccessfull()
 	 */
-	public boolean isSuccessfull()
+	@Override
+    public boolean isSuccessfull()
 	{
 		return successfull;
 	}
@@ -76,7 +78,8 @@ public abstract class AbstractSocketInitializer implements SocketInitializer
 	 * @return the name as a string.
 	 * @see org.jppf.comm.socket.SocketInitializer#getName()
 	 */
-	public String getName()
+	@Override
+    public String getName()
 	{
 		return name;
 	}
@@ -86,7 +89,8 @@ public abstract class AbstractSocketInitializer implements SocketInitializer
 	 * @param name the name as a string.
 	 * @see org.jppf.comm.socket.SocketInitializer#setName(java.lang.String)
 	 */
-	public void setName(String name)
+	@Override
+    public void setName(String name)
 	{
 		this.name = name;
 	}

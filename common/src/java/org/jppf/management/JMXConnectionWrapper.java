@@ -50,7 +50,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	/**
 	 * Determine whether we should use the RMI or JMXMP connector.
 	 */
-	private static boolean useRMIConnector = JPPFConfiguration.getProperties().getString("jppf.management.connector", "jmxmp").equalsIgnoreCase("rmi");
+	private static boolean useRMIConnector = "rmi".equalsIgnoreCase(JPPFConfiguration.getProperties().getString("jppf.management.connector", "jmxmp"));
 	/**
 	 * URL of the MBean server, in a JMX-compliant format.
 	 */
@@ -109,7 +109,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 
 		try
 		{
-			idString = host + ":" + port;
+			idString = host + ':' + port;
 			String s = !JMXServerFactory.isUsingRMIConnector() && JMXServerFactory.isJMXMPPresent()
 				? "service:jmx:jmxmp://" + idString : "service:jmx:rmi:///jndi/rmi://" + idString + rmiSuffix;
 			url = new JMXServiceURL(s);

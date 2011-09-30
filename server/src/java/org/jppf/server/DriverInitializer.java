@@ -175,7 +175,7 @@ public class DriverInitializer
 	 * @param ports the ports on which the server is listening.
 	 * @param name the name to use for the server.
 	 */
-	void printInitializedMessage(int[] ports, String name)
+    static void printInitializedMessage(int[] ports, String name)
 	{
 		StringBuilder sb = new StringBuilder();
 		if (name != null)
@@ -187,8 +187,8 @@ public class DriverInitializer
 		{
 			if (name != null) sb.append(" - ");
 			sb.append("accepting connections on port");
-			if (ports.length > 1) sb.append("s");
-			for (int n: ports) sb.append(" ").append(n);
+			if (ports.length > 1) sb.append('s');
+			for (int n: ports) sb.append(' ').append(n);
 		}
 		System.out.println(sb.toString());
 	}
@@ -294,7 +294,7 @@ public class DriverInitializer
 			config.setProperty("jppf.management.enabled", "false");
 			String s = e.getMessage();
 			s = (s == null) ? "<none>" : s.replace("\t", "  ").replace("\n", " - ");
-			System.out.println("JPPF Driver management failed to initialize, with error message: '" + s + "'");
+			System.out.println("JPPF Driver management failed to initialize, with error message: '" + s + '\'');
 			System.out.println("Management features are disabled. Please consult the driver's log file for more information");
 		}
 	}

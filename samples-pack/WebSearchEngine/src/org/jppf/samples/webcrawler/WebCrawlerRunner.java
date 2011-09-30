@@ -276,7 +276,7 @@ public class WebCrawlerRunner
 				for (LinkMatch lm: results)
 				{
 					sb.append(StringUtils.padLeft(""+lm.relevance, ' ', 6)).append("     ");
-					sb.append(lm.url).append("\n");
+					sb.append(lm.url).append('\n');
 				}
 				((AbstractOption) option.findFirstWithName("/resultText")).setValue(sb.toString());
 				long elapsed = System.currentTimeMillis() - start;

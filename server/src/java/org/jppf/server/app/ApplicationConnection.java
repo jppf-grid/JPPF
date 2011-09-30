@@ -109,7 +109,8 @@ class ApplicationConnection extends JPPFConnection
 	 * @throws Exception if an error is raised while processing an execution request.
 	 * @see org.jppf.server.app.JPPFConnection#perform()
 	 */
-	public void perform() throws Exception
+	@Override
+    public void perform() throws Exception
 	{
 		if (debugEnabled) log.debug("before reading header");
 		// Read the request header - with tasks count information
@@ -154,7 +155,7 @@ class ApplicationConnection extends JPPFConnection
 			else
 			{
 				headerWrapper.addTask(dl);
-				if (log.isTraceEnabled()) log.trace("received task #"+ i + " from client, data length = " + dl.getSize());
+				if (log.isTraceEnabled()) log.trace("received task #" + i + " from client, data length = " + dl.getSize());
 			}
 		}
 
@@ -170,14 +171,14 @@ class ApplicationConnection extends JPPFConnection
 		}
 		else resultSender.sendPartialResults(headerWrapper);
 		jobEnded();
-		return;
-	}
+    }
 
 	/**
 	 * Close this application connection.
 	 * @see org.jppf.server.app.JPPFConnection#close()
 	 */
-	public void close()
+	@Override
+    public void close()
 	{
 		if (debugEnabled) log.debug("closing " + this);
 		cancelJobOnClose();
@@ -227,7 +228,8 @@ class ApplicationConnection extends JPPFConnection
 	 * @return a string representation of this connection.
 	 * @see org.jppf.server.app.JPPFConnection#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return "application connection : " + super.toString();
 	}

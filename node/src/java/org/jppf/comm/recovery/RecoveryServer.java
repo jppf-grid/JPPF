@@ -62,7 +62,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
 	/**
 	 * The list of active connections.
 	 */
-	private List<ServerConnection> connections = new ArrayList<ServerConnection>();
+	private final List<ServerConnection> connections = new ArrayList<ServerConnection>();
 	/**
 	 * The count of connections that have been opened.
 	 */
@@ -95,7 +95,8 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
 	/**
 	 * {@inheritDoc}
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{
@@ -158,7 +159,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
 	{
 		synchronized(connections)
 		{
-			return connections.toArray(EMPTY_CONNECTION_ARRAY);
+			return connections.toArray(new ServerConnection[connections.size()]);
 		}
 	}
 

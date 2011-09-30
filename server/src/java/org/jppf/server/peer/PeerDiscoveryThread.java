@@ -70,7 +70,8 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 	 * Lookup server configurations from UDP multicasts.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{
@@ -106,13 +107,13 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 		{
 			for (String s: allNames)
 			{
-				if (!name.equals(s)) sb.append(s).append(" ");
+				if (!name.equals(s)) sb.append(s).append(' ');
 			}
 		}
 		sb.append(name);
 		props.setProperty("jppf.peers", sb.toString());
 		props.setProperty("jppf.peer." + name + ".server.host", info.host);
-		props.setProperty("jppf.peer." + name + ".server.port", "" + info.serverPorts[0]);
+		props.setProperty("jppf.peer." + name + ".server.port", Integer.toString(info.serverPorts[0]));
 		new JPPFPeerInitializer(name).start();
 	}
 

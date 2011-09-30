@@ -108,7 +108,7 @@ public class CrawlerResultCollector implements TaskResultListener
 			}
 		}
 		results = new ArrayList<JPPFTask>();
-		for (Integer n: resultMap.keySet()) results.add(resultMap.get(n));
+		for (final Map.Entry<Integer, JPPFTask> entry : resultMap.entrySet()) results.add(entry.getValue());
 		resultMap.clear();
 		return results;
 	}

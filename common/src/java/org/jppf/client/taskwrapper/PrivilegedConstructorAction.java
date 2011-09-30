@@ -45,7 +45,8 @@ class PrivilegedConstructorAction extends AbstractPrivilegedAction<Object>
 	 * @return the object constructed through the constructor's invocation.
 	 * @see java.security.PrivilegedAction#run()
 	 */
-	public Object run()
+	@Override
+    public Object run()
 	{
 		Object result = null;
 		try

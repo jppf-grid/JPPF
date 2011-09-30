@@ -222,7 +222,8 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	 * @param event encapsulates the output stream's content.
 	 * @see org.jppf.process.event.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
 	 */
-	public void outputStreamAltered(ProcessWrapperEvent event)
+	@Override
+    public void outputStreamAltered(ProcessWrapperEvent event)
 	{
 		standardOutput.append(event.getContent());
 	}
@@ -232,7 +233,8 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	 * @param event encapsulate the error stream's content.
 	 * @see org.jppf.process.event.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
 	 */
-	public void errorStreamAltered(ProcessWrapperEvent event)
+	@Override
+    public void errorStreamAltered(ProcessWrapperEvent event)
 	{
 		errorOutput.append(event.getContent());
 	}

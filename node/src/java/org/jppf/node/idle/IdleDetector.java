@@ -91,14 +91,16 @@ public class IdleDetector implements Runnable
 	/**
 	 * {@inheritDoc}
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{
 			if (factory == null) init();
 			IdleStateListener tmp = new IdleStateListener()
 			{
-				public void idleStateChanged(IdleStateEvent event)
+				@Override
+                public void idleStateChanged(IdleStateEvent event)
 				{
 					System.out.println("System is now " + event.getState());
 				}
@@ -130,7 +132,8 @@ public class IdleDetector implements Runnable
 			IdleDetectionTask task = new IdleDetectionTask(factory, 6000L);
 			task.addIdleStateListener(new IdleStateListener()
 			{
-				public void idleStateChanged(IdleStateEvent event)
+				@Override
+                public void idleStateChanged(IdleStateEvent event)
 				{
 					if (IdleState.IDLE.equals(event.getState())) System.out.println("System is now idle !");
 					else System.out.println("System is now busy");

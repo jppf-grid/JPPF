@@ -246,7 +246,8 @@ public class NodeRunner
 			if (debugEnabled) log.debug("un-setting security");
 			AccessController.doPrivileged(new PrivilegedAction<Object>()
 			{
-				public Object run()
+				@Override
+                public Object run()
 				{
 					System.setSecurityManager(null);
 					return null;
@@ -268,10 +269,10 @@ public class NodeRunner
 			{
 				classLoader = AccessController.doPrivileged(new PrivilegedAction<JPPFClassLoader>()
 				{
-					public JPPFClassLoader run()
+					@Override
+                    public JPPFClassLoader run()
 					{
-						JPPFClassLoader cl = new JPPFClassLoader(NodeRunner.class.getClassLoader());
-						return cl;
+                        return new JPPFClassLoader(NodeRunner.class.getClassLoader());
 					}
 				});
 				Thread.currentThread().setContextClassLoader(classLoader);
@@ -353,11 +354,13 @@ public class NodeRunner
 		 * Execute this task.
 		 * @see java.lang.Runnable#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			AccessController.doPrivileged(new PrivilegedAction<Object>()
 			{
-				public Object run()
+				@Override
+                public Object run()
 				{
 					System.exit(restart ? 2 : 0);
 					return null;

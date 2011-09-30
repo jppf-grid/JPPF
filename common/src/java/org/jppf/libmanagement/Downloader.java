@@ -87,14 +87,15 @@ public class Downloader
 			if (l == null) l = new LocationEventListener()
 			{
 				private int count = 0;
-				public void dataTransferred(LocationEvent event)
+				@Override
+                public void dataTransferred(LocationEvent event)
 				{
 					int oneMB = 1024*1024;
 					int n = event.bytesTransferred();
 					int p = count % oneMB;
 					if (n + p >= oneMB)
 					{
-						System.out.println("" + ((n+count)/oneMB) +" MB downloaded");
+						System.out.println(String.valueOf(((n + count) / oneMB)) +" MB downloaded");
 					}
 					count += n;
 				}

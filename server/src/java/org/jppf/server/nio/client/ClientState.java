@@ -36,5 +36,5 @@ public enum ClientState
 	/**
 	 * Idle state for a client channel.
 	 */
-	IDLE;
+	IDLE
 }

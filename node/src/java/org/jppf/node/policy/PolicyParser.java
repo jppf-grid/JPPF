@@ -37,9 +37,8 @@ public class PolicyParser
 	/**
 	 * List of possible rule names.
 	 */
-	private static final List<String> RULE_NAMES = Arrays.asList(new String[] {
-		"NOT", "AND", "OR", "XOR", "LessThan", "AtMost", "AtLeast", "MoreThan",
-		"BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule"});
+	private static final List<String> RULE_NAMES = Arrays.asList("NOT", "AND", "OR", "XOR", "LessThan", "AtMost", "AtLeast", "MoreThan",
+            "BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule");
 	/**
 	 * The DOM parser used to build the descriptor tree.
 	 */
@@ -306,9 +305,9 @@ public class PolicyParser
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.append("The XML document has errors:\n");
-			if (!reporter.fatalErrors.isEmpty()) sb.append("fatal errors: ").append(reporter.allFatalErrorsAsStrings()).append("\n");
-			if (!reporter.errors.isEmpty())      sb.append("errors      : ").append(reporter.allErrorsAsStrings()).append("\n");
-			if (!reporter.warnings.isEmpty())    sb.append("warnings    : ").append(reporter.allWarningsAsStrings()).append("\n");
+			if (!reporter.fatalErrors.isEmpty()) sb.append("fatal errors: ").append(reporter.allFatalErrorsAsStrings()).append('\n');
+			if (!reporter.errors.isEmpty())      sb.append("errors      : ").append(reporter.allErrorsAsStrings()).append('\n');
+			if (!reporter.warnings.isEmpty())    sb.append("warnings    : ").append(reporter.allWarningsAsStrings()).append('\n');
 			throw new JPPFException(sb.toString());
 		}
 	}

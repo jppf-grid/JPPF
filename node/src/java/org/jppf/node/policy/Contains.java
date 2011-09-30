@@ -63,7 +63,8 @@ public class Contains extends ExecutionPolicy
 	 * @return true if the node is accepted, false otherwise.
 	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 	 */
-	public boolean accepts(JPPFSystemInformation info)
+	@Override
+    public boolean accepts(JPPFSystemInformation info)
 	{
 		if (value == null) return false;
 		String s = getProperty(info, propertyName);
@@ -77,7 +78,8 @@ public class Contains extends ExecutionPolicy
 	 * @return an XML string representation of this object
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		if (computedToString == null)
 		{

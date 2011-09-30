@@ -40,7 +40,8 @@ public abstract class AbstractTaskObjectWrapper implements TaskObjectWrapper
 	 * @return a <code>MethodType</code> enum value.
 	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getMethodType()
 	 */
-	public MethodType getMethodType()
+	@Override
+    public MethodType getMethodType()
 	{
 		return null;
 	}

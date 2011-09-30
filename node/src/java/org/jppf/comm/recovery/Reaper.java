@@ -62,7 +62,7 @@ public class Reaper
 	/**
 	 * The list of listeners to this object's events.
 	 */
-	private List<ReaperListener> listeners = new ArrayList<ReaperListener>();
+	private final List<ReaperListener> listeners = new ArrayList<ReaperListener>();
 
 	/**
 	 * Initialize this reaper with the specified recovery server.
@@ -88,7 +88,8 @@ public class Reaper
 	{
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				connection.run();
 				checkConnection(connection);
@@ -163,7 +164,8 @@ public class Reaper
 		/**
 		 * {@inheritDoc}
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			ServerConnection[] connections = server.connections();
 			List<Future<?>> futures = new ArrayList<Future<?>>(connections.length);

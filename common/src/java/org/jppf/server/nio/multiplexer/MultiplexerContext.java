@@ -47,7 +47,8 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	/**
 	 * {@inheritDoc}
 	 */
-	public void handleException(ChannelWrapper<?> channel)
+	@Override
+    public void handleException(ChannelWrapper<?> channel)
 	{
 		try
 		{

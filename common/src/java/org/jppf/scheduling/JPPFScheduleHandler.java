@@ -57,7 +57,7 @@ public class JPPFScheduleHandler
 	/**
 	 * Used to debug date information.
 	 */
-	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+	private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
 	/**
 	 * Initialize this schedule handler with a default name.
@@ -126,8 +126,7 @@ public class JPPFScheduleHandler
 	public void cancelAction(Object key)
 	{
 		if (key == null) return;
-		TimerTask task = null;
-		task = timerTaskMap.remove(key);
+		TimerTask task = timerTaskMap.remove(key);
 		if (debugEnabled) log.debug(name + " : cancelling action for key=" + key + ", task=" + task);
 		if (task != null) task.cancel();
 	}
@@ -161,7 +160,8 @@ public class JPPFScheduleHandler
 		 * Check if the scheduled date has been reached and execute the corresponding action 
 		 * @see java.util.TimerTask#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			if (debugEnabled) log.debug("triggering scheduled action: key=" + key + ", action=" + action);
 			timerTaskMap.remove(key);

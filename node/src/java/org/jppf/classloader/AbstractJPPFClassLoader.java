@@ -71,7 +71,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	 */
 	public synchronized Class<?> loadJPPFClass(String name) throws ClassNotFoundException
 	{
-		if (debugEnabled) log.debug("looking up resource [" + name + "]");
+		if (debugEnabled) log.debug("looking up resource [" + name + ']');
 		Class<?> c = findLoadedClass(name);
 		if (c != null)
 		{
@@ -97,7 +97,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	 * @throws ClassNotFoundException if the class could not be loaded.
 	 * @see java.lang.ClassLoader#findClass(java.lang.String)
 	 */
-	protected Class<?> findClass(String name) throws ClassNotFoundException
+	@Override
+    protected Class<?> findClass(String name) throws ClassNotFoundException
 	{
 		return findClass(name, true);
 	}
@@ -125,7 +126,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 				definePackage(pkgName, null, null, null, null, null, null, null);
 			}
 		}
-		if (debugEnabled) log.debug("looking up definition for resource [" + name + "]");
+		if (debugEnabled) log.debug("looking up definition for resource [" + name + ']');
 		byte[] b = null;
 		String resName = name.replace('.', '/') + ".class";
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -136,9 +137,9 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 		if ((b == null) || (b.length == 0))
 		{
 			if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
-			throw new ClassNotFoundException("Could not load class '" + name + "'");
+			throw new ClassNotFoundException("Could not load class '" + name + '\'');
 		}
-		if (debugEnabled) log.debug("found definition for resource [" + name + ", definitionLength=" + b.length + "]");
+		if (debugEnabled) log.debug("found definition for resource [" + name + ", definitionLength=" + b.length + ']');
 		return defineClass(name, b, 0, b.length);
 	}
 
@@ -165,7 +166,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	 * @return the URL of the resource.
 	 * @see java.lang.ClassLoader#findResource(java.lang.String)
 	 */
-	public URL findResource(String name)
+	@Override
+    public URL findResource(String name)
 	{
 		URL url = null;
 		url = cache.getResourceURL(name);
@@ -203,7 +205,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	 * @return an <code>InputStream</code> instance, or null if the resource was not found.
 	 * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
 	 */
-	public InputStream getResourceAsStream(String name)
+	@Override
+    public InputStream getResourceAsStream(String name)
 	{
 		InputStream is = null;
 		try
@@ -224,7 +227,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	 * @throws IOException if an error occurs.
 	 * @see java.lang.ClassLoader#findResources(java.lang.String)
 	 */
-	@SuppressWarnings("unchecked")
+	@Override
+    @SuppressWarnings("unchecked")
 	public Enumeration<URL> findResources(String name) throws IOException
 	{
 		List<URL> urlList = null;
@@ -310,20 +314,18 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 			map.put("multiple.resources.names", namesToLookup);
 			JPPFResourceWrapper resource = loadResourceData(map, true);
 			Map<String, List<byte[]>> dataMap = (Map<String, List<byte[]>>) resource.getData("resource_map");
-			for (int i=0; i<indices.size(); i++)
-			{
-				String name = names[indices.get(i)];
-				List<byte[]> dataList = dataMap.get(name);
-				boolean found = (dataList != null) && !dataList.isEmpty();
-				if (debugEnabled && !found) log.debug("resource [" + name + "] not found remotely");
-				if (found)
-				{
-					cache.registerResources(name, dataList);
-					URL url = cache.getResourceURL(name);
-					results[indices.get(i)] = url;
-					if (debugEnabled) log.debug("resource [" + name + "] found remotely as " + url);
-				}
-			}
+            for (Integer indice : indices) {
+                String name = names[indice];
+                List<byte[]> dataList = dataMap.get(name);
+                boolean found = (dataList != null) && !dataList.isEmpty();
+                if (debugEnabled && !found) log.debug("resource [" + name + "] not found remotely");
+                if (found) {
+                    cache.registerResources(name, dataList);
+                    URL url = cache.getResourceURL(name);
+                    results[indice] = url;
+                    if (debugEnabled) log.debug("resource [" + name + "] found remotely as " + url);
+                }
+            }
 		}
 		catch(Exception e)
 		{
@@ -382,7 +384,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	/**
 	 * {@inheritDoc}
 	 */
-	protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
+	@Override
+    protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
 	{
 		if (!isBootstrapClass(name))
 		{
@@ -463,7 +466,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	 * @param name the fully qualified class name to check.
 	 * @return <code>true</code> if the custom delegation model should be <code>bypassed</code>, false otherwise. 
 	 */
-	private boolean isBootstrapClass(String name)
+	private static boolean isBootstrapClass(String name)
 	{
 		if (name == null) return false;
 		return name.startsWith("java.") || name.startsWith("javax.") || name.startsWith("sun.") || name.startsWith("com.sun.");

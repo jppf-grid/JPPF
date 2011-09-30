@@ -58,7 +58,8 @@ public class ChannelInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#read(byte[], int, int)
 	 */
-	public int read(byte[] data, int offset, int len) throws Exception
+	@Override
+    public int read(byte[] data, int offset, int len) throws Exception
 	{
 		ByteBuffer buffer = ByteBuffer.wrap(data, offset, len);
 		return read(buffer);
@@ -78,7 +79,8 @@ public class ChannelInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#read(java.nio.ByteBuffer)
 	 */
-	public int read(ByteBuffer data) throws Exception
+	@Override
+    public int read(ByteBuffer data) throws Exception
 	{
 		if (tmpDirectBuffer == null) tmpDirectBuffer = ByteBuffer.allocateDirect(StreamConstants.TEMP_BUFFER_SIZE);
 		else tmpDirectBuffer.clear();
@@ -107,7 +109,8 @@ public class ChannelInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#readInt()
 	 */
-	public int readInt() throws Exception
+	@Override
+    public int readInt() throws Exception
 	{
 		return SerializationUtils.readInt(channel);
 	}
@@ -119,7 +122,8 @@ public class ChannelInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#skip(int)
 	 */
-	public int skip(int n) throws Exception
+	@Override
+    public int skip(int n) throws Exception
 	{
 		ByteBuffer buf = ByteBuffer.allocate(n);
 		read(buf);
@@ -131,7 +135,8 @@ public class ChannelInputSource implements InputSource
 	 * @throws IOException if an IO error occurs.
 	 * @see java.io.Closeable#close()
 	 */
-	public void close() throws IOException
+	@Override
+    public void close() throws IOException
 	{
 	}
 }

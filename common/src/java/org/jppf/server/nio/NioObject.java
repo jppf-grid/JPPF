@@ -100,7 +100,7 @@ public class NioObject
 		if (count >= size) return true;
 		int n = data.transferFrom(source, blocking);
 		if (n > 0) count += n;
-		if (debugEnabled) log.debug("read " + n + " bytes from input source, count/size = " + count + "/" + size);
+		if (debugEnabled) log.debug("read " + n + " bytes from input source, count/size = " + count + '/' + size);
 		if (count >= size)
 		{
 			if (debugEnabled) log.debug("count = " + count + ", size = " + size);
@@ -121,7 +121,7 @@ public class NioObject
 		if (count >= size) return true;
 		int n = data.transferTo(dest, blocking);
 		if (n > 0) count += n;
-		if (debugEnabled) log.debug("wrote " + n + " bytes to output destination, count/size = " + count + "/" + size + " (dl = " + data + ")");
+		if (debugEnabled) log.debug("wrote " + n + " bytes to output destination, count/size = " + count + '/' + size + " (dl = " + data + ')');
 		if (count > size)
 		{
 			int breakpoint = 0;

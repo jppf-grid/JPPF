@@ -31,7 +31,8 @@ public class GenericObjectStreamBuilder implements JPPFObjectStreamBuilder
 	/**
 	 * {@inheritDoc}
 	 */
-	public ObjectInputStream newObjectInputStream(InputStream in) throws Exception
+	@Override
+    public ObjectInputStream newObjectInputStream(InputStream in) throws Exception
 	{
 		return new JPPFObjectInputStream(in);
 	}
@@ -39,7 +40,8 @@ public class GenericObjectStreamBuilder implements JPPFObjectStreamBuilder
 	/**
 	 * {@inheritDoc}
 	 */
-	public ObjectOutputStream newObjectOutputStream(OutputStream out) throws Exception
+	@Override
+    public ObjectOutputStream newObjectOutputStream(OutputStream out) throws Exception
 	{
 		return new JPPFObjectOutputStream(out);
 	}

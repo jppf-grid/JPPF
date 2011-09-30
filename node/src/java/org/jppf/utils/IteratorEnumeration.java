@@ -44,7 +44,8 @@ public class IteratorEnumeration<T> implements Enumeration<T>
    * @return true if and only if this enumeration object contains at least one more element to provide, false otherwise.
 	 * @see java.util.Enumeration#hasMoreElements()
 	 */
-	public boolean hasMoreElements()
+	@Override
+    public boolean hasMoreElements()
 	{
 		return iterator.hasNext();
 	}
@@ -55,7 +56,8 @@ public class IteratorEnumeration<T> implements Enumeration<T>
    * @exception NoSuchElementException if no more elements exist.
 	 * @see java.util.Enumeration#nextElement()
 	 */
-	public T nextElement()
+	@Override
+    public T nextElement()
 	{
 		if (!iterator.hasNext()) throw new NoSuchElementException("this enumeration has no more element to provide");
 		return iterator.next();

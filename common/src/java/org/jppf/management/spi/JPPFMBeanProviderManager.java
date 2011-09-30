@@ -105,7 +105,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
 	{
 		try
 		{
-			if (debugEnabled) log.debug("found MBean provider: [name="+name+", inf="+intf+", impl="+impl.getClass().getName()+"]");
+			if (debugEnabled) log.debug("found MBean provider: [name="+name+", inf="+intf+", impl="+impl.getClass().getName()+ ']');
 			ObjectName objectName = new ObjectName(name);
 			if (!server.isRegistered(objectName))
 			{

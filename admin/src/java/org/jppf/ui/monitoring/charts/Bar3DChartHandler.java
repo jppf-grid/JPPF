@@ -206,7 +206,7 @@ public class Bar3DChartHandler implements ChartHandler
 				//Object key = dataset.getColumnKey(col);
 				Object key = invokeMethod(args[0].getClass(), args[0], "getColumnKey", args[2]);
 				StringBuilder sb = new StringBuilder(""+key).append(" : ").append(nf.format(val));
-				if (unit != null) sb.append(" ").append(unit);
+				if (unit != null) sb.append(' ').append(unit);
 				return sb.toString();
 			}
 			else

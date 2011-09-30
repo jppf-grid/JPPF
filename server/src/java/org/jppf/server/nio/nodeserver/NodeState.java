@@ -44,5 +44,5 @@ public enum NodeState
 	/**
 	 * Idle state for a node channel.
 	 */
-	IDLE;
+	IDLE
 }

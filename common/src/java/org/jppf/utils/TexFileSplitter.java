@@ -58,17 +58,17 @@ public class TexFileSplitter
 			{
 				int nb = (i < nbFiles - 1) ? n : lines - (nbFiles - 1)*n;
 				s = "";
-				File out = new File(props.getString("outputDir") + "/" + props.getString("prefix") + "-" + i + props.getString("extension"));
+				File out = new File(props.getString("outputDir") + '/' + props.getString("prefix") + '-' + i + props.getString("extension"));
 				out.getParentFile().mkdirs();
 				BufferedWriter writer = new BufferedWriter(new FileWriter(out));
 				for (int j=0; j<nb && s != null; j++)
 				{
 					s = reader.readLine();
-					if (s != null) writer.write(s + "\n");
+					if (s != null) writer.write(s + '\n');
 				}
 				writer.flush();
 				writer.close();
-				System.out.println("created file '" + out.getName() + "'");
+				System.out.println("created file '" + out.getName() + '\'');
 			}
 			reader.close();
 			System.out.println("wrote all files");

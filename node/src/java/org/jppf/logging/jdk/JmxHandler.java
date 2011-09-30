@@ -50,7 +50,8 @@ public class JmxHandler extends Handler
 	/**
 	 * {@inheritDoc}
 	 */
-	public void publish(LogRecord record)
+	@Override
+    public void publish(LogRecord record)
 	{
 		if (notifier == null) init();
 		Formatter f = getFormatter();
@@ -62,14 +63,16 @@ public class JmxHandler extends Handler
 	/**
 	 * {@inheritDoc}
 	 */
-	public void flush()
+	@Override
+    public void flush()
 	{
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void close() throws SecurityException
+	@Override
+    public void close() throws SecurityException
 	{
 	}
 }

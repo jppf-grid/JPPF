@@ -73,7 +73,8 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * @return -1 if this connection information is less than the other, 1 if it is greater, 0 if they are equal.
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(JPPFConnectionInformation ci)
+	@Override
+    public int compareTo(JPPFConnectionInformation ci)
 	{
 		if ((ci == null) || (ci.uuid == null)) return 1;
 		if (uuid == null) return -1;
@@ -85,7 +86,8 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * @return the hashcode as an int.
 	 * @see java.lang.Object#hashCode()
 	 */
-	public int hashCode()
+	@Override
+    public int hashCode()
 	{
 		return managementPort + (host == null ? 0 : host.hashCode());
 		//return (uuid == null) ? 0 : uuid.hashCode();
@@ -97,7 +99,8 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * @return true if the 2 objects are equal, false otherwise.
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object obj)
+	@Override
+    public boolean equals(Object obj)
 	{
 		if (obj == null) return false;
 		if (this == obj) return true;
@@ -112,7 +115,8 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object clone() throws CloneNotSupportedException
+	@Override
+    public Object clone() throws CloneNotSupportedException
 	{
 		return super.clone();
 	}
@@ -122,15 +126,16 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * @return a string describing this object.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(getClass().getSimpleName()).append("[");
+		sb.append(getClass().getSimpleName()).append('[');
 		sb.append("uuid=").append(uuid);
 		sb.append(", host=").append(host);
 		sb.append(", management=").append(managementPort);
 		sb.append(", recoveryPort=").append(recoveryPort);
-		sb.append("]");
+		sb.append(']');
 		return sb.toString();
 	}
 

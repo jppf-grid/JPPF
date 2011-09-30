@@ -55,37 +55,33 @@ public class ReflectionUtils
 		Class clazz = o.getClass();
 		StringBuilder sb = new StringBuilder();
 
-		sb.append(clazz.getName()).append("@").append(Integer.toHexString(o.hashCode())).append(separator);
+		sb.append(clazz.getName()).append('@').append(Integer.toHexString(o.hashCode())).append(separator);
 		Method[] methods = clazz.getMethods();
 		Method getter = null;
 		// we want the attributes in ascending alphabetical order
 		SortedMap<String, Object> attrMap = new TreeMap<String, Object>();
-		for (int i=0; i<methods.length; i++)
-		{
-			if (isGetter(methods[i]))
-			{
-				getter = methods[i];
-				String attrName = null;
-				attrName = getter.getName().substring(getter.getName().startsWith("get") ? 3 : 2);
-				attrName = attrName.substring(0, 1).toLowerCase() + attrName.substring(1);
-				Object value = null;
-				try
-				{
-					value = getter.invoke(o, (Object[])null);
-					if (value == null) value = "null";
-				}
-				catch(Exception e)
-				{
-					value = "*Error: "+e.getMessage()+"*";
-				}
-				attrMap.put(attrName, value);
-			}
-		}
+        for (Method method : methods) {
+            if (isGetter(method)) {
+                getter = method;
+                String attrName = null;
+                attrName = getter.getName().substring(getter.getName().startsWith("get") ? 3 : 2);
+                attrName = attrName.substring(0, 1).toLowerCase() + attrName.substring(1);
+                Object value = null;
+                try {
+                    value = getter.invoke(o, (Object[]) null);
+                    if (value == null) value = "null";
+                }
+                catch (Exception e) {
+                    value = "*Error: " + e.getMessage() + '*';
+                }
+                attrMap.put(attrName, value);
+            }
+        }
 		Iterator<Map.Entry<String, Object>> it = attrMap.entrySet().iterator();
 		while (it.hasNext())
 		{
 			Map.Entry<String, Object> entry = it.next();
-			sb.append(entry.getKey()).append("=").append(entry.getValue());
+			sb.append(entry.getKey()).append('=').append(entry.getValue());
 			if (it.hasNext()) sb.append(separator);
 		}
 		return sb.toString();
@@ -106,9 +102,8 @@ public class ReflectionUtils
 			if (!Boolean.class.equals(type) && !Boolean.TYPE.equals(type)) return false;
 		}
 		Class[] paramTypes = meth.getParameterTypes();
-		if ((paramTypes != null) && (paramTypes.length > 0)) return false;
-		return true;
-	}
+        return !((paramTypes != null) && (paramTypes.length > 0));
+    }
 
 	/**
 	 * Determines whether a method is a setter (mutator), according to Sun's naming conventions.
@@ -121,9 +116,8 @@ public class ReflectionUtils
 		if (!Void.TYPE.equals(type)) return false;
 		if (!meth.getName().startsWith("set")) return false;
 		Class[] paramTypes = meth.getParameterTypes();
-		if ((paramTypes == null) || (paramTypes.length != 1)) return false;
-		return true;
-	}
+        return !((paramTypes == null) || (paramTypes.length != 1));
+    }
 
 	/**
 	 * Get a getter with a given name from a class.
@@ -135,14 +129,12 @@ public class ReflectionUtils
 	{
 		Method[] methods = clazz.getMethods();
 		Method getter = null;
-		for (int i=0; i<methods.length; i++)
-		{
-			if (isGetter(methods[i]) && name.equals(methods[i].getName()))
-			{
-				getter = methods[i];
-				break;
-			}
-		}
+        for (Method method : methods) {
+            if (isGetter(method) && name.equals(method.getName())) {
+                getter = method;
+                break;
+            }
+        }
 		return getter;
 	}
 
@@ -156,14 +148,12 @@ public class ReflectionUtils
 	{
 		Method[] methods = clazz.getMethods();
 		Method setter = null;
-		for (int i=0; i<methods.length; i++)
-		{
-			if (isSetter(methods[i]) && name.equals(methods[i].getName()))
-			{
-				setter = methods[i];
-				break;
-			}
-		}
+        for (Method method : methods) {
+            if (isSetter(method) && name.equals(method.getName())) {
+                setter = method;
+                break;
+            }
+        }
 		return setter;
 	}
 
@@ -214,7 +204,7 @@ public class ReflectionUtils
 				methodList.add(meth);
 			}
 		}
-		return methodList.toArray(new Method[0]);
+		return methodList.toArray(new Method[methodList.size()]);
 	}
 
 	/**

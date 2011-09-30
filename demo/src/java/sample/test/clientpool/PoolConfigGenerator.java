@@ -44,23 +44,23 @@ public class PoolConfigGenerator
 			StringBuilder sb = new StringBuilder();
 			sb.append("jppf.discovery.enabled = false\n\n");
 			sb.append("jppf.drivers =");
-			for (int i=1; i<=144; i++) sb.append(" ").append("d").append(i);
+			for (int i=1; i<=144; i++) sb.append(' ').append('d').append(i);
 			sb.append("\n\n");
 			for (int i=1; i<=144; i++)
 			{
 				String name = "d" + i;
-				sb.append(name).append(".jppf.server.host = ").append(driverHost).append("\n");
-				sb.append(name).append(".class.server.port = ").append(classPort).append("\n");
-				sb.append(name).append(".app.server.port = ").append(appPort).append("\n");
-				sb.append(name).append(".priority = ").append(priority).append("\n");
-				sb.append(name).append(".jppf.management.host = ").append(jmxHost).append("\n");
-				sb.append(name).append(".jppf.management.port = ").append(jmxPort).append("\n");
-				sb.append("\n");
+				sb.append(name).append(".jppf.server.host = ").append(driverHost).append('\n');
+				sb.append(name).append(".class.server.port = ").append(classPort).append('\n');
+				sb.append(name).append(".app.server.port = ").append(appPort).append('\n');
+				sb.append(name).append(".priority = ").append(priority).append('\n');
+				sb.append(name).append(".jppf.management.host = ").append(jmxHost).append('\n');
+				sb.append(name).append(".jppf.management.port = ").append(jmxPort).append('\n');
+				sb.append('\n');
 			}
 			sb.append("matrix.size = 300\n");
 			sb.append("task.nbRows = 1\n");
 			sb.append("matrix.iterations = 50\n");
-			sb.append("\n");
+			sb.append('\n');
 
 			writer.write(sb.toString());
 			writer.flush();

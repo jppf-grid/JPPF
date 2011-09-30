@@ -59,7 +59,7 @@ public class TestTask extends CommandLineTask
 			/*
 			setCommandList("cat", "etc/file", "|", "grep", "-s", "A", ">", "output-"+ number +".txt");
 			StringBuilder sb = new StringBuilder();
-			for (String cmd: this.getCommandList()) sb.append(cmd).append(" ");
+			for (String cmd: this.getCommandList()) sb.append(cmd).append(' ');
 			System.out.println("command to run: " + sb.toString());
 			setCaptureOutput(true);
 			launchProcess();
@@ -72,8 +72,8 @@ public class TestTask extends CommandLineTask
 			//setCommandList("/bin/sh", "-c", "cat etc/file|grep -s A > " + "output-"+ number + ".txt");
 			//setCommandList("/bin/sh", "-c", "cat /etc/file|grep -s A > " + outputPath);
 			StringBuilder sb = new StringBuilder();
-			for (String cmd: this.getCommandList()) sb.append(cmd).append(" ");
-			System.out.println("command to run: " + sb.toString());
+			for (String cmd: this.getCommandList()) sb.append(cmd).append(' ');
+			System.out.println("command to run: " + sb);
 			setCaptureOutput(true);
 			launchProcess();
 			FileLocation fileLoc = new FileLocation(outputPath);

@@ -73,7 +73,8 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	 * @param listener the listener to add.
 	 * @see org.jppf.node.MonitoredNode#addNodeListener(org.jppf.node.event.NodeListener)
 	 */
-	public void addNodeListener(NodeListener listener)
+	@Override
+    public void addNodeListener(NodeListener listener)
 	{
 		if (listener == null) return;
 		listeners.add(listener);
@@ -85,7 +86,8 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	 * @param listener the listener to remove.
 	 * @see org.jppf.node.MonitoredNode#removeNodeListener(org.jppf.node.event.NodeListener)
 	 */
-	public void removeNodeListener(NodeListener listener)
+	@Override
+    public void removeNodeListener(NodeListener listener)
 	{
 		if (listener == null) return;
 		listeners.remove(listener);
@@ -97,7 +99,8 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	 * @param eventType the type of the event as an enumerated value.
 	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(org.jppf.node.event.NodeEventType)
 	 */
-	public synchronized void fireNodeEvent(NodeEventType eventType)
+	@Override
+    public synchronized void fireNodeEvent(NodeEventType eventType)
 	{
 		NodeEvent event = new NodeEvent(eventType);
 		for (NodeListener listener : listeners) listener.eventOccurred(event);
@@ -108,7 +111,8 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	 * @param nbTasks the number of tasks as an int.
 	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(int)
 	 */
-	public synchronized void fireNodeEvent(int nbTasks)
+	@Override
+    public synchronized void fireNodeEvent(int nbTasks)
 	{
 		NodeEvent event = new NodeEvent(nbTasks);
 		for (NodeListener listener : listeners) listener.eventOccurred(event);
@@ -118,7 +122,8 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	 * Get the underlying socket wrapper used by this node.
 	 * @return a <code>SocketWrapper</code> instance.
 	 */
-	public SocketWrapper getSocketWrapper()
+	@Override
+    public SocketWrapper getSocketWrapper()
 	{
 		return socketClient;
 	}
@@ -127,7 +132,8 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	 * Get the underlying socket wrapper used by this node.
 	 * @param wrapper a <code>SocketWrapper</code> instance.
 	 */
-	public void setSocketWrapper(SocketWrapper wrapper)
+	@Override
+    public void setSocketWrapper(SocketWrapper wrapper)
 	{
 		this.socketClient = wrapper;
 	}
@@ -146,7 +152,8 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	 * @param closeSocket determines whether the underlying socket should be closed.
 	 * @see org.jppf.node.MonitoredNode#stopNode(boolean)
 	 */
-	public abstract void stopNode(boolean closeSocket);
+	@Override
+    public abstract void stopNode(boolean closeSocket);
 
 	/**
 	 * Get the total number of tasks executed.

@@ -53,7 +53,8 @@ class JPPFPutField extends PutField
 	/**
 	 * {@inheritDoc}
 	 */
-	public void put(String name, boolean val)
+	@Override
+    public void put(String name, boolean val)
 	{
 		primitiveFields.put(name, val);
 	}
@@ -61,7 +62,8 @@ class JPPFPutField extends PutField
 	/**
 	 * {@inheritDoc}
 	 */
-	public void put(String name, byte val)
+	@Override
+    public void put(String name, byte val)
 	{
 		primitiveFields.put(name, val);
 	}
@@ -69,7 +71,8 @@ class JPPFPutField extends PutField
 	/**
 	 * {@inheritDoc}
 	 */
-	public void put(String name, char val)
+	@Override
+    public void put(String name, char val)
 	{
 		primitiveFields.put(name, val);
 	}
@@ -77,7 +80,8 @@ class JPPFPutField extends PutField
 	/**
 	 * {@inheritDoc}
 	 */
-	public void put(String name, short val)
+	@Override
+    public void put(String name, short val)
 	{
 		primitiveFields.put(name, val);
 	}
@@ -85,7 +89,8 @@ class JPPFPutField extends PutField
 	/**
 	 * {@inheritDoc}
 	 */
-	public void put(String name, int val)
+	@Override
+    public void put(String name, int val)
 	{
 		primitiveFields.put(name, val);
 	}
@@ -93,7 +98,8 @@ class JPPFPutField extends PutField
 	/**
 	 * {@inheritDoc}
 	 */
-	public void put(String name, long val)
+	@Override
+    public void put(String name, long val)
 	{
 		primitiveFields.put(name, val);
 	}
@@ -101,7 +107,8 @@ class JPPFPutField extends PutField
 	/**
 	 * {@inheritDoc}
 	 */
-	public void put(String name, float val)
+	@Override
+    public void put(String name, float val)
 	{
 		primitiveFields.put(name, val);
 	}
@@ -109,7 +116,8 @@ class JPPFPutField extends PutField
 	/**
 	 * {@inheritDoc}
 	 */
-	public void put(String name, double val)
+	@Override
+    public void put(String name, double val)
 	{
 		primitiveFields.put(name, val);
 	}
@@ -117,7 +125,8 @@ class JPPFPutField extends PutField
 	/**
 	 * {@inheritDoc}
 	 */
-	public void put(String name, Object val)
+	@Override
+    public void put(String name, Object val)
 	{
 		objectFields.put(name, val);
 	}
@@ -125,7 +134,8 @@ class JPPFPutField extends PutField
 	/**
 	 * {@inheritDoc}
 	 */
-	public void write(ObjectOutput out) throws IOException
+	@Override
+    public void write(ObjectOutput out) throws IOException
 	{
 		if (out != this.out) throw new IOException("not using the right stream");
 		this.out.writeFields();

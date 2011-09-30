@@ -96,7 +96,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	/**
 	 * {@inheritDoc}
 	 */
-	public int transferFrom(InputSource source, boolean blocking) throws Exception
+	@Override
+    public int transferFrom(InputSource source, boolean blocking) throws Exception
 	{
 		if (!transferring)
 		{
@@ -173,7 +174,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	/**
 	 * {@inheritDoc}
 	 */
-	public int transferTo(OutputDestination dest, boolean blocking) throws Exception
+	@Override
+    public int transferTo(OutputDestination dest, boolean blocking) throws Exception
 	{
 		if (!transferring)
 		{
@@ -244,8 +246,10 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 		{
 			log.error(e.getMessage(), e);
 		}
-		if (traceEnabled) log.trace("count/size=" + count + "/" + size + ", n/remaining=" + n + "/" + remaining +
-			", currentBufferIndex/listSize=" + currentBufferIndex + "/" + list.size() + ", pos=" + currentBuffer.pos + " (" + this + ")");
+		if (traceEnabled) {
+            log.trace("count/size=" + count + '/' + size + ", n/remaining=" + n + '/' + remaining +
+                    ", currentBufferIndex/listSize=" + currentBufferIndex + '/' + list.size() + ", pos=" + currentBuffer.pos + " (" + this + ')');
+        }
 		if (n > 0) count += n;
 		if (n < remaining) currentBuffer.pos += n;
 		else
@@ -268,7 +272,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	/**
 	 * {@inheritDoc}
 	 */
-	public InputStream getInputStream() throws Exception
+	@Override
+    public InputStream getInputStream() throws Exception
 	{
 		return new MultipleBuffersInputStream(list);
 	}
@@ -276,7 +281,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	/**
 	 * {@inheritDoc}
 	 */
-	public OutputStream getOutputStream() throws Exception
+	@Override
+    public OutputStream getOutputStream() throws Exception
 	{
 		return new MultipleBuffersOutputStream(list);
 	}
@@ -284,7 +290,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	/**
 	 * {@inheritDoc}
 	 */
-	public DataLocation copy()
+	@Override
+    public DataLocation copy()
 	{
 		List<JPPFBuffer> copyList = new ArrayList<JPPFBuffer>();
 		for (JPPFBuffer buf: list) copyList.add(new JPPFBuffer(buf.buffer, buf.length));

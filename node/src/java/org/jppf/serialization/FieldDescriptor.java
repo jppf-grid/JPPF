@@ -88,8 +88,9 @@ class FieldDescriptor
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
-		return "FieldDescriptor[name=" + name + ", type=" + type + ", typeHandle=" + typeHandle + "]";
+		return "FieldDescriptor[name=" + name + ", type=" + type + ", typeHandle=" + typeHandle + ']';
 	}
 }

@@ -183,7 +183,7 @@ public class SequenceAlignmentRunner
 	private static String loadSampleSequence(String path) throws IOException
 	{
 		InputStream is = null;
-		StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 		try
 		{
 			is = SequenceAlignmentRunner.class.getClassLoader().getResourceAsStream(path);

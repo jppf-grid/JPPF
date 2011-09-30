@@ -69,7 +69,8 @@ public class JPPFAnnotatedTask extends JPPFTask
 	 * Run the <code>JPPFRunnable</code>-annotated method of the task object.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{
@@ -87,7 +88,8 @@ public class JPPFAnnotatedTask extends JPPFTask
 	 * @return an objet or class that is JPPF-annotated.
 	 * @see org.jppf.server.protocol.JPPFTask#getTaskObject()
 	 */
-	public Object getTaskObject()
+	@Override
+    public Object getTaskObject()
 	{
 		return taskObjectWrapper.getTaskObject();
 	}

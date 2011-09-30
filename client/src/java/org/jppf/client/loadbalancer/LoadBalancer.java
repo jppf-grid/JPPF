@@ -200,10 +200,10 @@ public class LoadBalancer
 	 * @param array the input array. 
 	 * @return the result sum as an int value.
 	 */
-	private int sum(int array[])
+	private static int sum(int array[])
 	{
 		int sum = 0;
-		for (int i=0; i<array.length; i++) sum += array[i];
+        for (int anArray : array) sum += anArray;
 		return sum;
 	}
 
@@ -240,7 +240,8 @@ public class LoadBalancer
 		 * Perform the execution.
 		 * @see java.lang.Runnable#run()
 		 */
-		public abstract void run();
+		@Override
+        public abstract void run();
 
 		/**
 		 * Get the resulting exception.
@@ -271,7 +272,8 @@ public class LoadBalancer
 		 * Perform the execution.
 		 * @see java.lang.Runnable#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			try
 			{
@@ -390,7 +392,8 @@ public class LoadBalancer
 		 * Perform the execution.
 		 * @see java.lang.Runnable#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			try
 			{

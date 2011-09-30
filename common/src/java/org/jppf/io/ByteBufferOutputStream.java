@@ -55,7 +55,8 @@ public class ByteBufferOutputStream extends OutputStream
 	 * @throws IOException if an I/O error occurs.
 	 * @see java.io.OutputStream#close()
 	 */
-	public void close() throws IOException
+	@Override
+    public void close() throws IOException
 	{
 		super.close();
 		buffer = null;
@@ -66,7 +67,8 @@ public class ByteBufferOutputStream extends OutputStream
 	 * @throws IOException if an I/O error occurs.
 	 * @see java.io.OutputStream#flush()
 	 */
-	public void flush() throws IOException
+	@Override
+    public void flush() throws IOException
 	{
 		super.flush();
 	}
@@ -79,7 +81,8 @@ public class ByteBufferOutputStream extends OutputStream
 	 * @exception IOException if an I/O error occurs. 
 	 * @see java.io.OutputStream#write(byte[], int, int)
 	 */
-	public void write(byte[] b, int off, int len) throws IOException
+	@Override
+    public void write(byte[] b, int off, int len) throws IOException
 	{
 		if (b == null) throw new NullPointerException();
 		else if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0))
@@ -96,7 +99,8 @@ public class ByteBufferOutputStream extends OutputStream
 	 * @throws IOException if an I/O error occurs.
 	 * @see java.io.OutputStream#write(byte[])
 	 */
-	public void write(byte[] b) throws IOException
+	@Override
+    public void write(byte[] b) throws IOException
 	{
 		if (b == null) throw new NullPointerException();
 		write(b, 0, b.length);
@@ -108,7 +112,8 @@ public class ByteBufferOutputStream extends OutputStream
 	 * @throws IOException if an I/O error occurs.
 	 * @see java.io.OutputStream#write(int)
 	 */
-	public void write(int b) throws IOException
+	@Override
+    public void write(int b) throws IOException
 	{
 		buffer.put((byte) b);
 	}

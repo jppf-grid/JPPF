@@ -38,7 +38,7 @@ public class JMXServerFactory
 	/**
 	 * Determine whether we should use the RMI or JMXMP connector.
 	 */
-	private static boolean usingRMIConnector = JPPFConfiguration.getProperties().getString("jppf.management.connector", "jmxmp").equalsIgnoreCase("rmi");
+	private static boolean usingRMIConnector = "rmi".equalsIgnoreCase(JPPFConfiguration.getProperties().getString("jppf.management.connector", "jmxmp"));
 
 	/**
 	 * Create a JMXServer instance based on the specified parameters.

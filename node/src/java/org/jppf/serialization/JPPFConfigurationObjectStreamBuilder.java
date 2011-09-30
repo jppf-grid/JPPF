@@ -98,7 +98,8 @@ public class JPPFConfigurationObjectStreamBuilder implements JPPFObjectStreamBui
 	 * @throws Exception if an error is raised while creating the stream.
 	 * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectInputStream(java.io.InputStream)
 	 */
-	public ObjectInputStream newObjectInputStream(InputStream in) throws Exception
+	@Override
+    public ObjectInputStream newObjectInputStream(InputStream in) throws Exception
 	{
 		return (ObjectInputStream) oisConstructor.newInstance(in);
 	}
@@ -110,7 +111,8 @@ public class JPPFConfigurationObjectStreamBuilder implements JPPFObjectStreamBui
 	 * @throws Exception if an error is raised while creating the stream.
 	 * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectOutputStream(java.io.OutputStream)
 	 */
-	public ObjectOutputStream newObjectOutputStream(OutputStream out) throws Exception
+	@Override
+    public ObjectOutputStream newObjectOutputStream(OutputStream out) throws Exception
 	{
 		return (ObjectOutputStream) oosConstructor.newInstance(out);
 	}

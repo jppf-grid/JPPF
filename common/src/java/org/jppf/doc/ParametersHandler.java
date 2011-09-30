@@ -36,7 +36,7 @@ public class ParametersHandler
 	public Map<ParameterNames, Object> parseArguments(String...args) throws Exception
 	{
 		if ((args == null) || (args.length < 3)) throw new IllegalArgumentException("not enough arguments there must be at least the 3 arguments: -s sourceDir -d destDir -t templatesDir");
-		Map<ParameterNames, Object> map = new HashMap<ParameterNames, Object>();
+		Map<ParameterNames, Object> map = new EnumMap<ParameterNames, Object>(ParameterNames.class);
 		int i = 0;
 		while (i < args.length)
 		{
@@ -50,7 +50,7 @@ public class ParametersHandler
 			else if ("-di".equals(cmd)) map.put(DIR_INCLUDES, parseCommaSeparatedNames(args[i++]));
 			else if ("-de".equals(cmd)) map.put(DIR_EXCLUDES, parseCommaSeparatedNames(args[i++]));
 			else if ("-r".equals(cmd)) map.put(RECURSIVE, true);
-			else throw new IllegalArgumentException("unknown option '" + cmd + "'");
+			else throw new IllegalArgumentException("unknown option '" + cmd + '\'');
 		}
 		List<String> errors = new ArrayList<String>();
 		if (map.get(SOURCE_DIR) == null) errors.add("missing option '-s sourceDir'");
@@ -74,7 +74,7 @@ public class ParametersHandler
 	 * @param source the string to parse.
 	 * @return an array of strings.
 	 */
-	private String[] parseCommaSeparatedNames(String source)
+	private static String[] parseCommaSeparatedNames(String source)
 	{
 		if (source == null) return null;
 		String[] result = source.split(",");

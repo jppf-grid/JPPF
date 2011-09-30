@@ -170,13 +170,14 @@ public class JPPFSchedule implements Serializable
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder("schedule[");
 		if ((dateFormat == null) && (format != null)) dateFormat = new SimpleDateFormat(format);
 		if (date != null) sb.append("date=").append(date).append(", format=").append(dateFormat == null ? "null" : dateFormat.toPattern());
 		else sb.append("delay=").append(duration);
-		sb.append("]");
+		sb.append(']');
 		return sb.toString();
 	}
 

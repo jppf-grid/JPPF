@@ -93,7 +93,8 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	/**
 	 * Start the socket listener and the subprocess.
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		idleMode = JPPFConfiguration.getProperties().getBoolean("jppf.idle.mode.enabled", false);
 		boolean end = false;
@@ -132,7 +133,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 		stoppedOnBusyState.set(false);
 		process = buildProcess();
 		createProcessWrapper(process);
-		if (debugEnabled) log.debug("started driver process [" + process + "]");
+		if (debugEnabled) log.debug("started driver process [" + process + ']');
 	}
 
 	/**
@@ -173,11 +174,11 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 		}
 		command.add(sb.toString());
 		//command.add(System.getProperty("java.class.path"));
-		command.add("-D" + JPPFConfiguration.CONFIG_PROPERTY + "=" + System.getProperty(JPPFConfiguration.CONFIG_PROPERTY));
+		command.add("-D" + JPPFConfiguration.CONFIG_PROPERTY + '=' + System.getProperty(JPPFConfiguration.CONFIG_PROPERTY));
 		command.add("-Dlog4j.configuration=" + System.getProperty("log4j.configuration"));
 		for (String opt: jvmOptions) command.add(opt);
 		command.add(mainClass);
-		command.add("" + processPort);
+		command.add(Integer.toString(processPort));
 		if (debugEnabled) log.debug("process command:\n" + command);
 		ProcessBuilder builder = new ProcessBuilder(command);
 		return builder.start();
@@ -228,7 +229,8 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	{
 		Runnable hook = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				if (process != null) process.destroy();
 			}
@@ -254,7 +256,8 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 			processPort = processServer.getLocalPort();
 			Runnable r = new Runnable()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					while (true)
 					{
@@ -307,7 +310,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 				while (s != null)
 				{
 					s = reader.readLine();
-					if (s != null) sb.append(s).append("\n");
+					if (s != null) sb.append(s).append('\n');
 				}
 			}
 			finally
@@ -327,7 +330,8 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	 * @param event encapsulate the error stream's content.
 	 * @see org.jppf.process.event.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
 	 */
-	public void errorStreamAltered(ProcessWrapperEvent event)
+	@Override
+    public void errorStreamAltered(ProcessWrapperEvent event)
 	{
 		System.err.print(event.getContent());
 	}
@@ -337,7 +341,8 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	 * @param event encapsulate the output stream's content.
 	 * @see org.jppf.process.event.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
 	 */
-	public void outputStreamAltered(ProcessWrapperEvent event)
+	@Override
+    public void outputStreamAltered(ProcessWrapperEvent event)
 	{
 		System.out.print(event.getContent());
 	}
@@ -345,7 +350,8 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void idleStateChanged(IdleStateEvent event)
+	@Override
+    public void idleStateChanged(IdleStateEvent event)
 	{
 		IdleState state = event.getState();
 		if (IdleState.BUSY.equals(state))

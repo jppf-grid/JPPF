@@ -118,7 +118,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 		JPPFResourceWrapper resource = null;
 		try
 		{
-			if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + "]");
+			if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + ']');
 			resource = loadResourceData0(map, asResource);
 		}
 		catch(IOException e)
@@ -207,7 +207,8 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addURL(URL url)
+	@Override
+    public void addURL(URL url)
 	{
 		super.addURL(url);
 	}

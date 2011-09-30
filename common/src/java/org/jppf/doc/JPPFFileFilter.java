@@ -67,7 +67,8 @@ public class JPPFFileFilter extends AbstractFileFilter
 	 * @return true if the file is accepted, false otherwise.
 	 * @see java.io.FileFilter#accept(java.io.File)
 	 */
-	public boolean accept(File path)
+	@Override
+    public boolean accept(File path)
 	{
 		if (path.isDirectory()) return false;
 		String ext = FileUtils.getFileExtension(path);

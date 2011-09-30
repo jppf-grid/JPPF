@@ -51,7 +51,8 @@ public class FileInputSource extends ChannelInputSource
 	 * @throws IOException if an IO error occurs.
 	 * @see java.io.Closeable#close()
 	 */
-	public void close() throws IOException
+	@Override
+    public void close() throws IOException
 	{
 		channel.close();
 	}

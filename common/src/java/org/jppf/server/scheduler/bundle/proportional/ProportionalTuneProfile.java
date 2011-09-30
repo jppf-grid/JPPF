@@ -67,7 +67,7 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	public ProportionalTuneProfile(String profileName)
 	{
 		if (debugEnabled) log.debug("in constructor with profile name");
-		String prefix = "strategy." + profileName + ".";
+		String prefix = "strategy." + profileName + '.';
 		TypedProperties props = JPPFConfiguration.getProperties();
 		performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000);
 		proportionalityFactor = props.getInt(prefix + "proportionalityFactor", 2);
@@ -89,7 +89,8 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	 * @return a new <code>AutoTuneProfile</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.LoadBalancingProfile#copy()
 	 */
-	public LoadBalancingProfile copy()
+	@Override
+    public LoadBalancingProfile copy()
 	{
 		ProportionalTuneProfile other = new ProportionalTuneProfile();
 		other.setPerformanceCacheSize(performanceCacheSize);
@@ -147,7 +148,8 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	 * @return this profile represented as a string value.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return "performanceCacheSize="+performanceCacheSize+", proportionalityFactor="+proportionalityFactor;
 	}

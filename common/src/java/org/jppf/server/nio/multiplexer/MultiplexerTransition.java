@@ -48,5 +48,5 @@ public enum MultiplexerTransition
 	/**
 	 * Transition from a state to SENDING in idle mode.
 	 */
-	TO_IDLE;
+	TO_IDLE
 }

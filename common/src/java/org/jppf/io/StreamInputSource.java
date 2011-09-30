@@ -54,7 +54,8 @@ public class StreamInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#read(byte[], int, int)
 	 */
-	public int read(byte[] data, int offset, int len) throws Exception
+	@Override
+    public int read(byte[] data, int offset, int len) throws Exception
 	{
 		int n = is.read(data, offset, len);
 		if (n < 0) throw new EOFException();
@@ -68,7 +69,8 @@ public class StreamInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#read(java.nio.ByteBuffer)
 	 */
-	public int read(ByteBuffer buffer) throws Exception
+	@Override
+    public int read(ByteBuffer buffer) throws Exception
 	{
 		int pos = buffer.position();
 		ByteBuffer tmp = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
@@ -88,7 +90,8 @@ public class StreamInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#readInt()
 	 */
-	public int readInt() throws Exception
+	@Override
+    public int readInt() throws Exception
 	{
 		byte[] value = new byte[4];
 		read(value, 0, 4);
@@ -102,7 +105,8 @@ public class StreamInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#skip(int)
 	 */
-	public int skip(int n) throws Exception
+	@Override
+    public int skip(int n) throws Exception
 	{
 		return (int) is.skip(n);
 	}
@@ -112,7 +116,8 @@ public class StreamInputSource implements InputSource
 	 * @throws IOException if an IO error occurs.
 	 * @see java.io.Closeable#close()
 	 */
-	public void close() throws IOException
+	@Override
+    public void close() throws IOException
 	{
 		is.close();
 	}

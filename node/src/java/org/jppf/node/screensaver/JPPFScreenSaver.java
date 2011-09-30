@@ -106,7 +106,8 @@ class JPPFScreenSaver //extends SimpleScreensaver
 				SwingUtilities.updateComponentTreeUI(frame);
 				frame.addWindowListener(new WindowAdapter()
 				{
-					public void windowClosing(WindowEvent e)
+					@Override
+                    public void windowClosing(WindowEvent e)
 					{
 						destroy();
 						System.exit(0);
@@ -158,7 +159,8 @@ class JPPFScreenSaver //extends SimpleScreensaver
 			timer.schedule(new LogoDisplayTask(), 500, 25);
 			TimerTask task = new TimerTask()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					
 					String s = NodePanel.toStringDuration(System.currentTimeMillis() - node.nodeState.startedAt);
@@ -197,7 +199,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 	 */
 	private void initializeFlyingLogos()
 	{
-		logo = NodePanel.loadImage(NodePanel.IMAGE_PATH + "/" + "logo-small.gif");
+		logo = NodePanel.loadImage(NodePanel.IMAGE_PATH + '/' + "logo-small.gif");
 		logoImg = logo.getImage();
 		imgw = logo.getIconWidth();
 		imgh = logo.getIconHeight();
@@ -207,7 +209,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 	 * Set a hierarchy of Swing components as double buffered.
 	 * @param comp the root of the components hierarchy.
 	 */
-	private void setDoubledBuffering(JComponent comp)
+	private static void setDoubledBuffering(JComponent comp)
 	{
 		comp.setDoubleBuffered(true);
 		for (int i=0; i<comp.getComponentCount(); i++)
@@ -223,7 +225,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 	 * @param defValue the default value to use if the setting is not defined.
 	 * @return the setting as an int value.
 	 */
-	private int getIntSetting(String name, int defValue)
+	private static int getIntSetting(String name, int defValue)
 	{
 		int result = defValue;
 		try
@@ -310,7 +312,8 @@ class JPPFScreenSaver //extends SimpleScreensaver
 		{
 			task = new Runnable()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					updateLogos();
 				}
@@ -321,7 +324,8 @@ class JPPFScreenSaver //extends SimpleScreensaver
 		 * Update the position and direction of the flying logos.
 		 * @see java.util.TimerTask#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			SwingUtilities.invokeLater(task);
 		}
@@ -336,7 +340,8 @@ class JPPFScreenSaver //extends SimpleScreensaver
 		 * Update the position and direction of the flying logos.
 		 * @see java.util.TimerTask#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			Dimension dim = parent.getSize();
 			for (int i=0; i<data.length; i++)

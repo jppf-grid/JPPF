@@ -356,7 +356,7 @@ public class TypedProperties extends Properties
 		{
 			if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
 			{
-				sb.append(entry.getKey()).append(" = ").append(entry.getValue()).append("\n");
+				sb.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
 			}
 		}
 		return sb.toString();

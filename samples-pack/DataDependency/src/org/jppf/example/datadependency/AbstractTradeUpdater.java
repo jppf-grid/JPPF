@@ -191,11 +191,12 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		 * Submits a job.
 		 * @see java.lang.Runnable#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			try
 			{
-				if (debugEnabled) log.debug("processing update for " + marketData);
+				if (debugEnabled) log.debug("processing update for " + Arrays.toString(marketData));
 				// determine which trades are impacted
 				Set<String> tradeIdSet = new HashSet<String>();
 				for (MarketData md: marketData)
@@ -218,10 +219,10 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 					list.add(tradeId);
 				}
 				// create a job for each node
-				for (String nodeId: nodeMap.keySet())
+				for (final Map.Entry<String, List<String>> entry : nodeMap.entrySet())
 				{
-					List<String> list = nodeMap.get(nodeId);
-					submitOneJobPerNode(nodeId, list);
+					List<String> list = entry.getValue();
+					submitOneJobPerNode(entry.getKey(), list);
 					//submitOneJobPerTrade(nodeId, list);
 				}
 			}
@@ -322,7 +323,8 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		 * Process a set of results.
 		 * @see java.lang.Runnable#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			try
 			{
@@ -336,7 +338,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 					sb.append(task.getTradeId());
 				}
 				long time = System.currentTimeMillis() - timestamp;
-				sb.append("[").append(time).append(" ms]");
+				sb.append('[').append(time).append(" ms]");
 				log.info(sb.toString());
 				statsCollector.jobProcessed(results, time);
 			}

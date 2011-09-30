@@ -86,7 +86,8 @@ abstract class JPPFConnection extends Thread
 	 * </ol>
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{
@@ -160,10 +161,11 @@ abstract class JPPFConnection extends Thread
 	 * @return a string representation of this connection.
 	 * @see java.lang.Thread#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		if (socketClient != null) sb.append(socketClient.getHost()).append(":").append(socketClient.getPort());
+		if (socketClient != null) sb.append(socketClient.getHost()).append(':').append(socketClient.getPort());
 		else sb.append("socket is null");
 		return sb.toString();
 	}

@@ -71,7 +71,8 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	/**
 	 * Initialize the underlying socket connection.
 	 */
-	protected void init()
+	@Override
+    protected void init()
 	{
 		LOCK.lock();
 		try
@@ -121,7 +122,8 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	/**
 	 * {@inheritDoc}
 	 */
-	public void reset()
+	@Override
+    public void reset()
 	{
 		init();
 	}
@@ -130,7 +132,8 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	 * Terminate this classloader and clean the resources it uses.
 	 * @see org.jppf.classloader.AbstractJPPFClassLoader#close()
 	 */
-	public void close()
+	@Override
+    public void close()
 	{
 		LOCK.lock();
 		try
@@ -150,9 +153,10 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	 * @return the resulting <tt>Class</tt> object
 	 * @throws ClassNotFoundException if the class could not be found
 	 */
-	public synchronized Class<?> loadJPPFClass(String name) throws ClassNotFoundException
+	@Override
+    public synchronized Class<?> loadJPPFClass(String name) throws ClassNotFoundException
 	{
-		if (debugEnabled) log.debug("looking up resource [" + name + "]");
+		if (debugEnabled) log.debug("looking up resource [" + name + ']');
 		Class<?> c = findLoadedClass(name);
 		if (c == null)
 		{
@@ -199,7 +203,8 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
 	 * @throws Exception if the connection was lost and could not be reestablished.
 	 */
-	protected JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception
+	@Override
+    protected JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception
 	{
 		JPPFResourceWrapper resource = new JPPFResourceWrapper();
 		resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
@@ -241,7 +246,8 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 		/**
 		 * {@inheritDoc}
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			try
 			{

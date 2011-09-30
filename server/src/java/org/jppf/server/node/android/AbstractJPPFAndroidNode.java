@@ -79,7 +79,8 @@ public abstract class AbstractJPPFAndroidNode extends AbstractMonitoredNode
 	 * Main processing loop of this node.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		setStopped(false);
 		boolean initialized = false;
@@ -148,7 +149,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractMonitoredNode
 			JPPFTaskBundle bundle = pair.first();
 			checkInitialBundle(bundle);
 			List<JPPFTask> taskList = pair.second();
-			boolean notEmpty = (taskList != null) && (taskList.size() > 0);
+			boolean notEmpty = (taskList != null) && (!taskList.isEmpty());
 			if (debugEnabled)
 			{
 				if (notEmpty) log.debug("received a bundle with " + taskList.size()  + " tasks");
@@ -183,7 +184,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractMonitoredNode
 	 */
 	private void processResults(JPPFTaskBundle bundle, List<JPPFTask> taskList) throws Exception
 	{
-		if (debugEnabled) log.debug("processing results for job '" + bundle.getId() + "'");
+		if (debugEnabled) log.debug("processing results for job '" + bundle.getId() + '\'');
 		if (executionManager.checkConfigChanged())
 		{
 			JPPFSystemInformation info = new JPPFSystemInformation(NodeRunner.getUuid());
@@ -191,7 +192,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractMonitoredNode
 			bundle.setParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM, info);
 		}
 		nodeIO.writeResults(bundle, taskList);
-		if ((taskList != null) && (taskList.size() > 0))
+		if ((taskList != null) && (!taskList.isEmpty()))
 		{
 			setTaskCount(getTaskCount() + taskList.size());
 			if (debugEnabled) log.debug("tasks executed: " + getTaskCount());
@@ -289,7 +290,8 @@ public abstract class AbstractJPPFAndroidNode extends AbstractMonitoredNode
 	 * @param closeSocket determines whether the underlying socket should be closed.
 	 * @see org.jppf.node.MonitoredNode#stopNode(boolean)
 	 */
-	public synchronized void stopNode(boolean closeSocket)
+	@Override
+    public synchronized void stopNode(boolean closeSocket)
 	{
 		if (debugEnabled) log.debug("stopping node");
 		lifeCycleEventHandler.fireNodeEnding();

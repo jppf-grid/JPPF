@@ -110,7 +110,8 @@ public final class SystemUtils
 			// in the security policy file. 
 			Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>()
 			{
-				public Properties run()
+				@Override
+                public Properties run()
 				{
 					return System.getProperties();
 				}
@@ -147,13 +148,13 @@ public final class SystemUtils
 		String s = null;
 		try
 		{
-			s = "" + Runtime.getRuntime().availableProcessors();
+			s = String.valueOf(Runtime.getRuntime().availableProcessors());
 			props.setProperty("availableProcessors", s);
-			s = "" + Runtime.getRuntime().freeMemory();
+			s = String.valueOf(Runtime.getRuntime().freeMemory());
 			props.setProperty("freeMemory", s);
-			s = "" + Runtime.getRuntime().totalMemory();
+			s = String.valueOf(Runtime.getRuntime().totalMemory());
 			props.setProperty("totalMemory", s);
-			s = "" + Runtime.getRuntime().maxMemory();
+			s = String.valueOf(Runtime.getRuntime().maxMemory());
 			props.setProperty("maxMemory", s);
 		}
 		catch(SecurityException e)
@@ -193,24 +194,24 @@ public final class SystemUtils
 		{
 			atLeastJdk16 = false;
 		}
-		props.setProperty("host.roots.number", "" + roots.length);
+		props.setProperty("host.roots.number", String.valueOf(roots.length));
 		StringBuilder sb = new StringBuilder();
 		for (int i=0; i<roots.length; i++)
 		{
 			try
 			{
-				if (i > 0) sb.append(" ");
+				if (i > 0) sb.append(' ');
 				String s = roots[i].getCanonicalPath();
 				sb.append(s);
 				String prefix = "root." + i;
 				props.setProperty(prefix + ".name", s);
 				if (!atLeastJdk16) continue;
 				long space = (Long) totalSpaceMethod.invoke(roots[i]);
-				props.setProperty(prefix + ".space.total", "" + space);
+                props.setProperty(prefix + ".space.total", Long.toString(space));
 				space = (Long) freeSpaceMethod.invoke(roots[i]);
-				props.setProperty(prefix + ".space.free", "" + space);
+				props.setProperty(prefix + ".space.free", Long.toString(space));
 				space = (Long) usableSpaceMethod.invoke(roots[i]);
-				props.setProperty(prefix + ".space.usable", "" + space);
+				props.setProperty(prefix + ".space.usable", Long.toString(space));
 			}
 			catch(Exception e)
 			{
@@ -278,13 +279,13 @@ public final class SystemUtils
 	 */
 	private static String formatAddresses(List<? extends InetAddress> addresses)
 	{
-		StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 		for (InetAddress addr: addresses)
 		{
 			String name = addr.getHostName();
 			String ip = addr.getHostAddress();
-			if (sb.length() > 0) sb.append(" ");
-			sb.append(name).append("|").append(ip);
+			if (sb.length() > 0) sb.append(' ');
+			sb.append(name).append('|').append(ip);
 		}
 		return sb.toString();
 	}
@@ -348,7 +349,7 @@ public final class SystemUtils
 	{
 		int pid = -1;
 		String name = ManagementFactory.getRuntimeMXBean().getName();
-		int idx = name.indexOf("@");
+		int idx = name.indexOf('@');
 		if (idx >= 0)
 		{
 			String sub = name.substring(0, idx);

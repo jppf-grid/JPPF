@@ -121,15 +121,15 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 			{
 				groupInetAddress = InetAddress.getByName(group);
 				List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
-				if (addresses.isEmpty()) addresses.add((Inet4Address) InetAddress.getByName("127.0.0.1"));
+				if (addresses.isEmpty()) addresses.add(InetAddress.getByName("127.0.0.1"));
 				int len = addresses.size();
 				if (debugEnabled)
 				{
 					StringBuilder sb = new StringBuilder();
 					sb.append("Found ").append(len).append(" address");
 					if (len > 1) sb.append("es");
-					sb.append(":");
-					for (InetAddress addr: addresses) sb.append(" ").append(addr.getHostAddress());
+					sb.append(':');
+					for (InetAddress addr: addresses) sb.append(' ').append(addr.getHostAddress());
 					log.debug(sb.toString());
 				}
 				Receiver[] receivers = new Receiver[len];
@@ -214,7 +214,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 		 */
 		public Receiver(InetAddress addr, int port)
 		{
-			super("Receiver@" + addr.getHostAddress() + ":" + port);
+			super("Receiver@" + addr.getHostAddress() + ':' + port);
 			this.addr = addr;
 			this.port = port;
 		}
@@ -223,12 +223,13 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 		 * 
 		 * @see java.lang.Runnable#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			MulticastSocket socket = null;
 			try
 			{
-				int t = (int) 1000;
+				int t = 1000;
 				//socket = new MulticastSocket(new InetSocketAddress(addr, port));
 				socket = new MulticastSocket(port);
 				socket.setInterface(addr);

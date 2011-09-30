@@ -69,7 +69,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	protected Object readObjectOverride() throws IOException, ClassNotFoundException
+	@Override
+    protected Object readObjectOverride() throws IOException, ClassNotFoundException
 	{
 		Object o = null;
 		boolean alreadyReading = readingObject;
@@ -101,7 +102,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public int read() throws IOException
+	@Override
+    public int read() throws IOException
 	{
 		return in.read();
 	}
@@ -109,7 +111,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public int read(byte[] buf, int off, int len) throws IOException
+	@Override
+    public int read(byte[] buf, int off, int len) throws IOException
 	{
 		return in.read(buf, off, len);
 	}
@@ -117,7 +120,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean readBoolean() throws IOException
+	@Override
+    public boolean readBoolean() throws IOException
 	{
 		return in.readBoolean();
 	}
@@ -125,7 +129,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public byte readByte() throws IOException
+	@Override
+    public byte readByte() throws IOException
 	{
 		return in.readByte();
 	}
@@ -133,7 +138,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public char readChar() throws IOException
+	@Override
+    public char readChar() throws IOException
 	{
 		return in.readChar();
 	}
@@ -141,7 +147,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public short readShort() throws IOException
+	@Override
+    public short readShort() throws IOException
 	{
 		return in.readShort();
 	}
@@ -149,7 +156,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public int readInt() throws IOException
+	@Override
+    public int readInt() throws IOException
 	{
 		in.read(buf, 0, 4);
 		//return in.readInt();
@@ -159,7 +167,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public long readLong() throws IOException
+	@Override
+    public long readLong() throws IOException
 	{
 		return in.readLong();
 	}
@@ -167,7 +176,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public float readFloat() throws IOException
+	@Override
+    public float readFloat() throws IOException
 	{
 		return in.readFloat();
 	}
@@ -175,7 +185,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public double readDouble() throws IOException
+	@Override
+    public double readDouble() throws IOException
 	{
 		return in.readDouble();
 	}
@@ -183,7 +194,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public int skipBytes(int len) throws IOException
+	@Override
+    public int skipBytes(int len) throws IOException
 	{
 		return in.skipBytes(len);
 	}
@@ -191,7 +203,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public String readUTF() throws IOException
+	@Override
+    public String readUTF() throws IOException
 	{
 		return in.readUTF();
 	}
@@ -199,7 +212,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void close() throws IOException
+	@Override
+    public void close() throws IOException
 	{
 		in.close();
 	}
@@ -207,7 +221,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public int readUnsignedByte() throws IOException
+	@Override
+    public int readUnsignedByte() throws IOException
 	{
 		return in.readUnsignedByte();
 	}
@@ -215,7 +230,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public int readUnsignedShort() throws IOException
+	@Override
+    public int readUnsignedShort() throws IOException
 	{
 		return in.readUnsignedShort();
 	}
@@ -223,7 +239,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void readFully(byte[] buf) throws IOException
+	@Override
+    public void readFully(byte[] buf) throws IOException
 	{
 		in.readFully(buf);
 	}
@@ -231,7 +248,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void readFully(byte[] buf, int off, int len) throws IOException
+	@Override
+    public void readFully(byte[] buf, int off, int len) throws IOException
 	{
 		in.readFully(buf, off, len);
 	}
@@ -239,7 +257,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("deprecation")
+	@Override
+    @SuppressWarnings("deprecation")
 	public String readLine() throws IOException
 	{
 		return in.readLine();
@@ -248,7 +267,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void defaultReadObject() throws IOException, ClassNotFoundException
+	@Override
+    public void defaultReadObject() throws IOException, ClassNotFoundException
 	{
 		try
 		{
@@ -265,7 +285,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public GetField readFields() throws IOException, ClassNotFoundException
+	@Override
+    public GetField readFields() throws IOException, ClassNotFoundException
 	{
 		try
 		{

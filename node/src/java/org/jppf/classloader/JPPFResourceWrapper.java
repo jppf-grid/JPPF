@@ -312,7 +312,8 @@ public class JPPFResourceWrapper implements Serializable
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("JPPFResourceWrapper[");
@@ -320,7 +321,7 @@ public class JPPFResourceWrapper implements Serializable
 		sb.append(", asResource=").append(asResource);
 		sb.append(", state=").append(state);
 		sb.append(", name=").append(data.get("name"));
-		sb.append("]");
+		sb.append(']');
 		return sb.toString();
 	}
 }

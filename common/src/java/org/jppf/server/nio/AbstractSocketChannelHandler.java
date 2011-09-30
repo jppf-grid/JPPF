@@ -85,9 +85,9 @@ public abstract class AbstractSocketChannelHandler
 	public synchronized void init() throws Exception
 	{
 		if (socketClient == null) socketClient = initSocketChannel();
-		if (debugEnabled) log.debug("Attempting connection to the remote host [" + host + ":" + port + "]");
+		if (debugEnabled) log.debug("Attempting connection to the remote host [" + host + ':' + port + ']');
 		socketInitializer.initializeSocket(socketClient);
-		if (debugEnabled) log.debug("Connected to the remote host [" + host + ":" + port + "]");
+		if (debugEnabled) log.debug("Connected to the remote host [" + host + ':' + port + ']');
 		postInit();
 	}
 

@@ -75,14 +75,14 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 		int port = props.getInt("jppf.discovery.port", 11111);
 
 		List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
-		if (addresses.isEmpty()) addresses.add((Inet4Address) InetAddress.getByName("127.0.0.1"));
+		if (addresses.isEmpty()) addresses.add(InetAddress.getByName("127.0.0.1"));
 		if (debugEnabled)
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.append("Found ").append(addresses.size()).append(" address");
 			if (addresses.size() > 1) sb.append("es");
-			sb.append(":");
-			for (InetAddress addr: addresses) sb.append(" ").append(addr.getHostAddress());
+			sb.append(':');
+			for (InetAddress addr: addresses) sb.append(' ').append(addr.getHostAddress());
 			log.debug(sb.toString());
 		}
 		for (InetAddress addr: addresses)
@@ -112,7 +112,8 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 	 * 
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{

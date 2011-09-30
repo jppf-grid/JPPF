@@ -64,7 +64,8 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 	 * @throws Exception if an error is raised during initialization.
 	 * @see org.jppf.server.nio.AbstractSocketChannelHandler#initSocketChannel()
 	 */
-	protected SocketChannelClient initSocketChannel() throws Exception
+	@Override
+    protected SocketChannelClient initSocketChannel() throws Exception
 	{
 		return new SocketChannelClient(host, port, false);
 	}
@@ -74,7 +75,8 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 	 * @throws Exception if an error is raised while performing the initialization.
 	 * @see org.jppf.server.nio.AbstractSocketChannelHandler#postInit()
 	 */
-	@SuppressWarnings("unchecked")
+	@Override
+    @SuppressWarnings("unchecked")
 	protected void postInit() throws Exception
 	{
 		SocketChannel channel = socketClient.getChannel();
@@ -85,7 +87,8 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 		server.getTransitionManager().registerChannel(channel, SelectionKey.OP_READ, context,
 			new StateTransitionManager.ChannelRegistrationAction()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					MultiplexerContext initialContext = (MultiplexerContext ) initialKey.getContext();
 					initialContext.setLinkedKey(key);

@@ -144,7 +144,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
 		for (int i=0; i<treeTable.getColumnCount(); i++)
 		{
 			int width = treeTable.getColumnModel().getColumn(i).getPreferredWidth();
-			if (i > 0) sb.append(" ");
+			if (i > 0) sb.append(' ');
 			sb.append(width);
 		}
 		pref.put(key, sb.toString());

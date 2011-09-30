@@ -101,7 +101,8 @@ public class QueueStats implements Serializable
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(title).append(" queue");

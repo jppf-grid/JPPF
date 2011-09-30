@@ -42,7 +42,8 @@ public class PolicyRuleTest extends ExecutionPolicy
 	 * @return true if the node is accepted, false otherwise.
 	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 	 */
-	public boolean accepts(JPPFSystemInformation info)
+	@Override
+    public boolean accepts(JPPFSystemInformation info)
 	{
 		boolean result = false;
 		if (info != null)

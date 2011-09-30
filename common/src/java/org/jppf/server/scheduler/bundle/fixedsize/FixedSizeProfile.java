@@ -53,7 +53,8 @@ public class FixedSizeProfile implements LoadBalancingProfile
 	 * @return a newly created <code>FixedSizeProfile</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.LoadBalancingProfile#copy()
 	 */
-	public LoadBalancingProfile copy()
+	@Override
+    public LoadBalancingProfile copy()
 	{
 		FixedSizeProfile other = new FixedSizeProfile();
 		other.setSize(size);

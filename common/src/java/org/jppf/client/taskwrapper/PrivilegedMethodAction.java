@@ -51,7 +51,8 @@ class PrivilegedMethodAction extends AbstractPrivilegedAction<Object>
 	 * @return the method's return result, or null if the method has a <code>void</code> return type.
 	 * @see java.security.PrivilegedAction#run()
 	 */
-	public Object run()
+	@Override
+    public Object run()
 	{
 		Object result = null;
 		try

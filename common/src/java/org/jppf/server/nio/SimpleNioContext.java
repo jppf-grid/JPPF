@@ -46,7 +46,8 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
 	 * @return true if all the data has been read, false otherwise.
 	 * @throws Exception if an error occurs while reading the data.
 	 */
-	public boolean readMessage(ChannelWrapper<?> wrapper) throws Exception
+	@Override
+    public boolean readMessage(ChannelWrapper<?> wrapper) throws Exception
 	{
 		ReadableByteChannel channel = (ReadableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
 		if (message == null) message = new NioMessage();
@@ -59,8 +60,8 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
 		readByteCount += channel.read(message.buffer);
 		if (traceEnabled)
 		{
-			log.trace("[" + getShortClassName() + "] " + "read " + readByteCount + " bytes out of " +
-				message.length + " for " + StringUtils.getRemoteHost((SocketChannel) channel));
+			log.trace('[' + getShortClassName() + "] " + "read " + readByteCount + " bytes out of " +
+				message.length + " for " + StringUtils.getRemoteHost(channel));
 		}
 		return readByteCount >= message.length;
 	}
@@ -71,7 +72,8 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
 	 * @return true if all the data has been written, false otherwise.
 	 * @throws Exception if an error occurs while writing the data.
 	 */
-	public boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception
+	@Override
+    public boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception
 	{
 		WritableByteChannel channel = (WritableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
 		if (!message.lengthWritten)
@@ -83,8 +85,8 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
 		writeByteCount += channel.write(message.buffer);
 		if (traceEnabled)
 		{
-			log.trace("[" + getShortClassName() + "] " + "written " + writeByteCount + " bytes out of " +
-				message.length + " for " + StringUtils.getRemoteHost((SelectableChannel) channel));
+			log.trace('[' + getShortClassName() + "] " + "written " + writeByteCount + " bytes out of " +
+				message.length + " for " + StringUtils.getRemoteHost(channel));
 		}
 		return writeByteCount >= message.length;
 	}

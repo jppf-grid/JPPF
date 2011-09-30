@@ -66,7 +66,8 @@ public class IPv4AddressPattern extends AbstractIPAddressPattern
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean matches(InetAddress ip)
+	@Override
+    public boolean matches(InetAddress ip)
 	{
 		if (!(ip instanceof Inet4Address)) return false;
 		return super.matches(ip);

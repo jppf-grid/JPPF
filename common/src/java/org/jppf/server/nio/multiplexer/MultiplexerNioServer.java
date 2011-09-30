@@ -80,7 +80,8 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	/**
 	 * {@inheritDoc}
 	 */
-	protected NioServerFactory<MultiplexerState, MultiplexerTransition> createFactory()
+	@Override
+    protected NioServerFactory<MultiplexerState, MultiplexerTransition> createFactory()
 	{
 		return new MultiplexerServerFactory(this);
 	}
@@ -140,7 +141,8 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	/**
 	 * {@inheritDoc}
 	 */
-	public NioContext createNioContext()
+	@Override
+    public NioContext createNioContext()
 	{
 		return new MultiplexerContext();
 	}
@@ -151,7 +153,8 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 * {@link java.nio.channels.SelectionKey SelectionKey} constants definitions.
 	 * @see org.jppf.server.nio.NioServer#getInitialInterest()
 	 */
-	public int getInitialInterest()
+	@Override
+    public int getInitialInterest()
 	{
 		return SelectionKey.OP_READ | SelectionKey.OP_WRITE;
 	}
@@ -172,7 +175,8 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	/**
 	 * {@inheritDoc}
 	 */
-	public void postAccept(ChannelWrapper channel)
+	@Override
+    public void postAccept(ChannelWrapper channel)
 	{
 		
 		MultiplexerContext context = (MultiplexerContext) channel.getContext();

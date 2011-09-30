@@ -61,7 +61,8 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	/**
 	 * {@inheritDoc}
 	 */
-	public int size()
+	@Override
+    public int size()
 	{
 		cleanup();
 		return map.size();
@@ -70,7 +71,8 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean isEmpty()
+	@Override
+    public boolean isEmpty()
 	{
 		cleanup();
 		return map.isEmpty();
@@ -79,7 +81,8 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	/**
 	 * {@inheritDoc}
 	 */
-	public V get(Object key)
+	@Override
+    public V get(Object key)
 	{
 		cleanup();
 		SoftReference<V> ref = map.get(key);
@@ -89,7 +92,8 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
+	@Override
+    @SuppressWarnings("unchecked")
 	public V put(K key, V value)
 	{
 		cleanup();
@@ -100,7 +104,8 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	/**
 	 * {@inheritDoc}
 	 */
-	public V remove(Object key)
+	@Override
+    public V remove(Object key)
 	{
 		cleanup();
 		SoftReference<V> ref = map.remove(key);
@@ -110,7 +115,8 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	/**
 	 * {@inheritDoc}
 	 */
-	public Set<Map.Entry<K, V>> entrySet()
+	@Override
+    public Set<Map.Entry<K, V>> entrySet()
 	{
 		throw new UnsupportedOperationException("This operation is not implemented");
 	}

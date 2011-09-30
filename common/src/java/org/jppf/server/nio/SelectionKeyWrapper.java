@@ -42,7 +42,8 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
 	 * @return a {@link AbstractNioContext} instance.
 	 * @see org.jppf.server.nio.AbstractChannelWrapper#getContext()
 	 */
-	public NioContext getContext()
+	@Override
+    public NioContext getContext()
 	{
 		return (NioContext) getChannel().attachment();
 	}
@@ -51,7 +52,8 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
 	 * Close the channel.
 	 * @throws Exception if any error occurs while closing the channel.
 	 */
-	public void close() throws Exception
+	@Override
+    public void close() throws Exception
 	{
 		getChannel().channel().close();
 	}
@@ -60,7 +62,8 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
 	 * Determine whether the channel is opened.
 	 * @return true if the channel is opened, false otherwise.
 	 */
-	public boolean isOpen()
+	@Override
+    public boolean isOpen()
 	{
 		return getChannel().channel().isOpen();
 	}
@@ -70,7 +73,8 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
 	 * @return a string that represents this channel wrapper.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		if (channel.isValid()) return super.toString();
 		return "[invalid channel]";
@@ -79,9 +83,10 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getId()
+	@Override
+    public String getId()
 	{
-		return StringUtils.getRemoteHost(((SelectionKey) getChannel()).channel());
+		return StringUtils.getRemoteHost(getChannel().channel());
 	}
 
 	/**
@@ -89,7 +94,8 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
 	 * @return the operations as an int value.
 	 * @see org.jppf.server.nio.AbstractChannelWrapper#getKeyOps()
 	 */
-	public int getKeyOps()
+	@Override
+    public int getKeyOps()
 	{
 		return getChannel().interestOps();
 	}
@@ -99,9 +105,10 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
 	 * @param keyOps the operations as an int value.
 	 * @see org.jppf.server.nio.AbstractChannelWrapper#setKeyOps(int)
 	 */
-	public void setKeyOps(int keyOps)
+	@Override
+    public void setKeyOps(int keyOps)
 	{
-		SelectionKey key = (SelectionKey) channel;
+		SelectionKey key = channel;
 		key.selector().wakeup();
 		channel.interestOps(keyOps);
 	}
@@ -111,7 +118,8 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
 	 * @return the operations as an int value.
 	 * @see org.jppf.server.nio.AbstractChannelWrapper#getReadyOps()
 	 */
-	public int getReadyOps()
+	@Override
+    public int getReadyOps()
 	{
 		return getChannel().readyOps();
 	}

@@ -117,7 +117,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 				jppfClient.submit(job);
 				waitForResults();
 				List<JPPFTask> results = new ArrayList<JPPFTask>();
-				for (Integer n: resultMap.keySet()) results.add(resultMap.get(n));
+				for (final Map.Entry<Integer, JPPFTask> entry : resultMap.entrySet()) results.add(entry.getValue());
 				// initialize the resulting matrix
 				Matrix c = new Matrix(size);
 				// Get the matrix values from the tasks results
@@ -174,7 +174,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 				jppfClient.submit(job);
 				waitForResults();
 				List<JPPFTask> results = new ArrayList<JPPFTask>();
-				for (Integer n: resultMap.keySet()) results.add(resultMap.get(n));
+				for (final Map.Entry<Integer, JPPFTask> entry : resultMap.entrySet()) results.add(entry.getValue());
 				// initialize the resulting matrix
 				Matrix c = new Matrix(size);
 				// Get the matrix values from the tasks results

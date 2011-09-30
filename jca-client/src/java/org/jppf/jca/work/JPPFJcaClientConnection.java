@@ -154,7 +154,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 		header.setRequestUuid(job.getJobUuid());
 		if (debugEnabled) log.debug("sending tasks bundle with requestUuid=" + header.getRequestUuid());
 		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-		ClassLoader cl = (job.getTasks().size() > 0) ? job.getTasks().get(0).getClass().getClassLoader() : null;
+		ClassLoader cl = (!job.getTasks().isEmpty()) ? job.getTasks().get(0).getClass().getClassLoader() : null;
 		try
 		{
 			if (cl != null) Thread.currentThread().setContextClassLoader(cl);

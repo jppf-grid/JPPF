@@ -62,7 +62,8 @@ public class JMXMPServer extends AbstractJMXServer
 	/**
 	 * {@inheritDoc}
 	 */
-	public void start(ClassLoader cl) throws Exception
+	@Override
+    public void start(ClassLoader cl) throws Exception
 	{
     if (debugEnabled) log.debug("starting remote connector server");
     ClassLoader tmp = Thread.currentThread().getContextClassLoader();
@@ -81,7 +82,7 @@ public class JMXMPServer extends AbstractJMXServer
 				try
 				{
 					InetAddress addr = InetAddress.getByName(host);
-			    url = new JMXServiceURL("service:jmx:jmxmp://" + host + ":" + port);
+			    url = new JMXServiceURL("service:jmx:jmxmp://" + host + ':' + port);
 			    Map<String, Object> env = new HashMap<String, Object>();
 			    env.put("jmx.remote.default.class.loader", cl);
 			    env.put("jmx.remote.protocol.provider.class.loader", cl);
@@ -92,7 +93,7 @@ public class JMXMPServer extends AbstractJMXServer
 				catch(Exception e)
 				{
 					String s = e.getMessage();
-					if ((e instanceof BindException) || ((s != null) && (s.toLowerCase().indexOf("bind") >= 0)))
+					if ((e instanceof BindException) || ((s != null) && (s.toLowerCase().contains("bind"))))
 					{
 						if (port >= 65530) port = 1024;
 						port++;
@@ -100,7 +101,7 @@ public class JMXMPServer extends AbstractJMXServer
 					else throw e;
 				}
 			}
-			props.setProperty("jppf.management.port", "" + port);
+			props.setProperty("jppf.management.port", Integer.toString(port));
 	    //if (debugEnabled) log.debug("starting connector server with port = " + port);
 	    stopped = false;
 	    if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);

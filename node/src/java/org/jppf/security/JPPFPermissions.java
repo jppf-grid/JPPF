@@ -47,7 +47,8 @@ public class JPPFPermissions extends PermissionCollection
 	 * @param permission the Permission object to add.
 	 * @see java.security.PermissionCollection#add(java.security.Permission)
 	 */
-	public synchronized void add(Permission permission)
+	@Override
+    public synchronized void add(Permission permission)
 	{
 		if (permission == null) return;
 		permissions.add(permission);
@@ -58,7 +59,8 @@ public class JPPFPermissions extends PermissionCollection
 	 * @return an enumeration of all the Permissions.
 	 * @see java.security.PermissionCollection#elements()
 	 */
-	public synchronized Enumeration<Permission> elements()
+	@Override
+    public synchronized Enumeration<Permission> elements()
 	{
 		return new Enumerator();
 	}
@@ -69,7 +71,8 @@ public class JPPFPermissions extends PermissionCollection
 	 * @return true if "permission" is implied by the permissions in the collection, false if not.
 	 * @see java.security.PermissionCollection#implies(java.security.Permission)
 	 */
-	public synchronized boolean implies(Permission permission)
+	@Override
+    public synchronized boolean implies(Permission permission)
 	{
 		if (permission instanceof RuntimePermission)
 		{
@@ -93,7 +96,8 @@ public class JPPFPermissions extends PermissionCollection
 	 * no new Permission objects can be added to it using add. 
 	 * @see java.security.PermissionCollection#setReadOnly()
 	 */
-	public void setReadOnly()
+	@Override
+    public void setReadOnly()
 	{
 		//super.setReadOnly();
 	}
@@ -135,7 +139,8 @@ public class JPPFPermissions extends PermissionCollection
 		 * @return true if and only if this enumeration object contains at least one more element to provide; false otherwise.
 		 * @see java.util.Enumeration#hasMoreElements()
 		 */
-		public boolean hasMoreElements()
+		@Override
+        public boolean hasMoreElements()
 		{
 			return count > index;
 		}
@@ -146,7 +151,8 @@ public class JPPFPermissions extends PermissionCollection
 		 * @throws NoSuchElementException - if no more elements exist.
 		 * @see java.util.Enumeration#nextElement()
 		 */
-		public Permission nextElement() throws NoSuchElementException
+		@Override
+        public Permission nextElement() throws NoSuchElementException
 		{
 			if (!hasMoreElements()) throw new NoSuchElementException("no more element in this enumeration");
 			return enumPermissions.get(index++);

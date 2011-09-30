@@ -32,5 +32,5 @@ public enum AcceptorState
 	/**
 	 * Idle state for a client channel.
 	 */
-	IDLE;
+	IDLE
 }

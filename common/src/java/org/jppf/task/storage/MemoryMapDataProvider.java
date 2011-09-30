@@ -41,7 +41,8 @@ public class MemoryMapDataProvider implements DataProvider
 	 * @return the value as an <code>Object</code>.
 	 * @see org.jppf.task.storage.DataProvider#getValue(java.lang.Object)
 	 */
-	public Object getValue(Object key)
+	@Override
+    public Object getValue(Object key)
 	{
 		return store.get(key);
 	}
@@ -52,7 +53,8 @@ public class MemoryMapDataProvider implements DataProvider
 	 * @param value the value to store, associated with the key.
 	 * @see org.jppf.task.storage.DataProvider#setValue(java.lang.Object, java.lang.Object)
 	 */
-	public void setValue(Object key, Object value)
+	@Override
+    public void setValue(Object key, Object value)
 	{
 		store.put(key, value);
 	}

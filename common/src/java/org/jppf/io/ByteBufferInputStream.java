@@ -57,7 +57,8 @@ public class ByteBufferInputStream extends InputStream
 	 * @throws IOException if an I/O error occurs.
 	 * @see java.io.InputStream#read()
 	 */
-	public int read() throws IOException
+	@Override
+    public int read() throws IOException
 	{
 		if (!buffer.hasRemaining()) return -1;
 		return buffer.get();
@@ -69,7 +70,8 @@ public class ByteBufferInputStream extends InputStream
 	 * @throws IOException if an I/O error occurs.
 	 * @see java.io.InputStream#available()
 	 */
-	public int available() throws IOException
+	@Override
+    public int available() throws IOException
 	{
 		return buffer.remaining();
 	}
@@ -79,7 +81,8 @@ public class ByteBufferInputStream extends InputStream
 	 * @throws IOException if an I/O error occurs.
 	 * @see java.io.InputStream#close()
 	 */
-	public void close() throws IOException
+	@Override
+    public void close() throws IOException
 	{
 		super.close();
 	}
@@ -89,7 +92,8 @@ public class ByteBufferInputStream extends InputStream
 	 * @param readlimit the maximum limit of bytes that can be read before the mark position becomes invalid.
 	 * @see java.io.InputStream#mark(int)
 	 */
-	public synchronized void mark(int readlimit)
+	@Override
+    public synchronized void mark(int readlimit)
 	{
 		super.mark(readlimit);
 	}
@@ -99,7 +103,8 @@ public class ByteBufferInputStream extends InputStream
 	 * @return <code>true</code> if this stream instance supports the mark and reset methods, <code>false</code> otherwise.
 	 * @see java.io.InputStream#markSupported()
 	 */
-	public boolean markSupported()
+	@Override
+    public boolean markSupported()
 	{
 		return super.markSupported();
 	}
@@ -113,7 +118,8 @@ public class ByteBufferInputStream extends InputStream
 	 * @exception IOException if an I/O error occurs.
 	 * @see java.io.InputStream#read(byte[], int, int)
 	 */
-	public int read(byte[] b, int off, int len) throws IOException
+	@Override
+    public int read(byte[] b, int off, int len) throws IOException
 	{
 		if (b == null) throw new NullPointerException();
 		else if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0))
@@ -135,7 +141,8 @@ public class ByteBufferInputStream extends InputStream
 	 * @exception IOException if an I/O error occurs.
 	 * @see java.io.InputStream#read(byte[])
 	 */
-	public int read(byte[] b) throws IOException
+	@Override
+    public int read(byte[] b) throws IOException
 	{
 		if (b == null) throw new NullPointerException();
 		return read(b, 0, b.length);
@@ -146,7 +153,8 @@ public class ByteBufferInputStream extends InputStream
 	 * @throws IOException if this stream has not been marked or if the mark has been invalidated.
 	 * @see java.io.InputStream#reset()
 	 */
-	public synchronized void reset() throws IOException
+	@Override
+    public synchronized void reset() throws IOException
 	{
 		super.reset();
 	}
@@ -158,7 +166,8 @@ public class ByteBufferInputStream extends InputStream
 	 * @throws IOException if an I/O error occurs.
 	 * @see java.io.InputStream#skip(long)
 	 */
-	public long skip(long n) throws IOException
+	@Override
+    public long skip(long n) throws IOException
 	{
 		if (n < 0) return 0;
 		int pos = buffer.position();

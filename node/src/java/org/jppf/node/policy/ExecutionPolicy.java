@@ -94,7 +94,7 @@ public abstract class ExecutionPolicy implements Serializable
 	 * @param ruleArray the array of other rules.
 	 * @return an array of <code>ExceutionPolicy</code> instances.
 	 */
-	private ExecutionPolicy[] makeRuleArray(ExecutionPolicy rule, ExecutionPolicy[] ruleArray)
+	private static ExecutionPolicy[] makeRuleArray(ExecutionPolicy rule, ExecutionPolicy[] ruleArray)
 	{
 		ExecutionPolicy[] result = new ExecutionPolicy[ruleArray.length + 1];
 		int count = 0;
@@ -154,7 +154,8 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @return an XML string representation of this object
 		 * @see java.lang.Object#toString()
 		 */
-		public String toString()
+		@Override
+        public String toString()
 		{
 			synchronized(ExecutionPolicy.class)
 			{
@@ -191,7 +192,8 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @return true if and only if the 2 operands' accepts() method return true or an empty or null operand list was specified.
 		 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 		 */
-		public boolean accepts(JPPFSystemInformation info)
+		@Override
+        public boolean accepts(JPPFSystemInformation info)
 		{
 			if ((rules == null) || (rules.length <= 0)) return true;
 			boolean b = true;
@@ -204,7 +206,8 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @return an XML string representation of this object
 		 * @see java.lang.Object#toString()
 		 */
-		public String toString()
+		@Override
+        public String toString()
 		{
 			if (computedToString == null)
 			{
@@ -237,7 +240,8 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @return true if at least one of the operands' accepts() method returns true.
 		 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 		 */
-		public boolean accepts(JPPFSystemInformation info)
+		@Override
+        public boolean accepts(JPPFSystemInformation info)
 		{
 			if ((rules == null) || (rules.length <= 0)) return true;
 			boolean b = false;
@@ -250,7 +254,8 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @return an XML string representation of this object
 		 * @see java.lang.Object#toString()
 		 */
-		public String toString()
+		@Override
+        public String toString()
 		{
 			if (computedToString == null)
 			{
@@ -283,7 +288,8 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @return true if and only if the operands' accepts() method return different values.
 		 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 		 */
-		public boolean accepts(JPPFSystemInformation info)
+		@Override
+        public boolean accepts(JPPFSystemInformation info)
 		{
 			if ((rules == null) || (rules.length <= 0)) return true;
 			boolean b = rules[0].accepts(info);
@@ -296,7 +302,8 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @return an XML string representation of this object
 		 * @see java.lang.Object#toString()
 		 */
-		public String toString()
+		@Override
+        public String toString()
 		{
 			if (computedToString == null)
 			{
@@ -334,7 +341,8 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @return true if and only if the 2 operands' accepts() method return true.
 		 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 		 */
-		public boolean accepts(JPPFSystemInformation info)
+		@Override
+        public boolean accepts(JPPFSystemInformation info)
 		{
 			return !rule.accepts(info);
 		}
@@ -344,7 +352,8 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @return an XML string representation of this object
 		 * @see java.lang.Object#toString()
 		 */
-		public String toString()
+		@Override
+        public String toString()
 		{
 			if (computedToString == null)
 			{

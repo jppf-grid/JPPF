@@ -69,7 +69,8 @@ public class RhinoScriptRunner implements ScriptRunner
 	 * @throws JPPFScriptingException if an error occurs while evaluating the script.
 	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String script, java.util.Map)
 	 */
-	public Object evaluate(String script, Map<String, Object> variables) throws JPPFScriptingException
+	@Override
+    public Object evaluate(String script, Map<String, Object> variables) throws JPPFScriptingException
 	{
 		return evaluate(null, script, variables);
 	}
@@ -85,7 +86,8 @@ public class RhinoScriptRunner implements ScriptRunner
 	 * @throws JPPFScriptingException if an error occurs while evaluating the script.
 	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.lang.String, java.util.Map)
 	 */
-	public Object evaluate(String scriptId, String script, Map<String, Object> variables) throws JPPFScriptingException
+	@Override
+    public Object evaluate(String scriptId, String script, Map<String, Object> variables) throws JPPFScriptingException
 	{
 		init();
 		errorHandler.errors.clear();
@@ -121,7 +123,7 @@ public class RhinoScriptRunner implements ScriptRunner
 			StringBuilder sb = new StringBuilder();
 			for (String s: errorHandler.errors)
 			{
-				if (sb.length() > 0) sb.append("\n");
+				if (sb.length() > 0) sb.append('\n');
 				sb.append(s);
 			}
 			sb.insert(0, "Errors occurred while executing the script:\n");
@@ -134,7 +136,8 @@ public class RhinoScriptRunner implements ScriptRunner
 	 * Initialize the execution environment.
 	 * @see org.jppf.scripting.ScriptRunner#init()
 	 */
-	public void init()
+	@Override
+    public void init()
 	{
 		context = new ContextFactory().enterContext();
 		//scope = context.initStandardObjects(null);
@@ -146,7 +149,8 @@ public class RhinoScriptRunner implements ScriptRunner
 	 * Perform cleanup after we're done using this script runner.
 	 * @see org.jppf.scripting.ScriptRunner#cleanup()
 	 */
-	public void cleanup()
+	@Override
+    public void cleanup()
 	{
 		Context.exit();
 	}
@@ -174,7 +178,8 @@ public class RhinoScriptRunner implements ScriptRunner
      * @param lineOffset the offset into lineSource where problem was detected
 		 * @see org.mozilla.javascript.ErrorReporter#error(java.lang.String, java.lang.String, int, java.lang.String, int)
 		 */
-		public void error(String message, String sourceName, int line, String lineSource, int lineOffset)
+		@Override
+        public void error(String message, String sourceName, int line, String lineSource, int lineOffset)
 		{
 			errors.add(makeErrorString(message, sourceName, line, lineSource, lineOffset));
 		}
@@ -189,7 +194,8 @@ public class RhinoScriptRunner implements ScriptRunner
      * @param lineOffset the offset into lineSource where problem was detected
 		 * @see org.mozilla.javascript.ErrorReporter#warning(java.lang.String, java.lang.String, int, java.lang.String, int)
 		 */
-		public void warning(String message, String sourceName, int line, String lineSource, int lineOffset)
+		@Override
+        public void warning(String message, String sourceName, int line, String lineSource, int lineOffset)
 		{
 		}
 	
@@ -205,7 +211,8 @@ public class RhinoScriptRunner implements ScriptRunner
      * @return an EvaluatorException that will be thrown.
 		 * @see org.mozilla.javascript.ErrorReporter#runtimeError(java.lang.String, java.lang.String, int, java.lang.String, int)
 		 */
-		public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset)
+		@Override
+        public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset)
 		{
 			String s = makeErrorString(message, sourceName, line, lineSource, lineOffset);
 			errors.add(s);
@@ -222,10 +229,10 @@ public class RhinoScriptRunner implements ScriptRunner
      * @param lineOffset the offset into lineSource where problem was detected
 		 * @return a string containing the information about the error.
 		 */
-		private String makeErrorString(String message, String sourceName, int line, String lineSource, int lineOffset)
+		private static String makeErrorString(String message, String sourceName, int line, String lineSource, int lineOffset)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.append(message).append(" at ").append(line).append(":").append(lineOffset).append(":\n");
+			sb.append(message).append(" at ").append(line).append(':').append(lineOffset).append(":\n");
 			sb.append("Source = ").append(lineSource);
 			return sb.toString();
 		}

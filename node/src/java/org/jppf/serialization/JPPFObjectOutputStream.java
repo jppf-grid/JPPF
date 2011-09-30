@@ -73,7 +73,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	protected final void writeObjectOverride(Object obj) throws IOException
+	@Override
+    protected final void writeObjectOverride(Object obj) throws IOException
 	{
 		boolean alreadyWriting = writingObject;
 		try
@@ -105,7 +106,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void write(int val) throws IOException
+	@Override
+    public void write(int val) throws IOException
 	{
 		out.write(val);
 	}
@@ -113,7 +115,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void write(byte[] buf) throws IOException
+	@Override
+    public void write(byte[] buf) throws IOException
 	{
 		out.write(buf);
 	}
@@ -121,7 +124,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void write(byte[] buf, int off, int len) throws IOException
+	@Override
+    public void write(byte[] buf, int off, int len) throws IOException
 	{
 		out.write(buf, off, len);
 	}
@@ -129,7 +133,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeBoolean(boolean val) throws IOException
+	@Override
+    public void writeBoolean(boolean val) throws IOException
 	{
 		out.writeBoolean(val);
 	}
@@ -137,7 +142,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeByte(int val) throws IOException
+	@Override
+    public void writeByte(int val) throws IOException
 	{
 		out.writeByte(val);
 	}
@@ -145,7 +151,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeShort(int val) throws IOException
+	@Override
+    public void writeShort(int val) throws IOException
 	{
 		out.writeShort(val);
 	}
@@ -153,7 +160,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeChar(int val) throws IOException
+	@Override
+    public void writeChar(int val) throws IOException
 	{
 		out.writeChar(val);
 	}
@@ -161,7 +169,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeInt(int val) throws IOException
+	@Override
+    public void writeInt(int val) throws IOException
 	{
 		SerializationUtils.writeInt(val, buf, 0);
 		out.write(buf, 0, 4);
@@ -171,7 +180,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeLong(long val) throws IOException
+	@Override
+    public void writeLong(long val) throws IOException
 	{
 		out.writeLong(val);
 	}
@@ -179,7 +189,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeFloat(float val) throws IOException
+	@Override
+    public void writeFloat(float val) throws IOException
 	{
 		out.writeFloat(val);
 	}
@@ -187,7 +198,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeDouble(double val) throws IOException
+	@Override
+    public void writeDouble(double val) throws IOException
 	{
 		//out.writeDouble(val);
 		out.writeLong(Double.doubleToLongBits(val));
@@ -196,7 +208,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeBytes(String str) throws IOException
+	@Override
+    public void writeBytes(String str) throws IOException
 	{
 		out.writeBytes(str);
 	}
@@ -204,7 +217,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeChars(String str) throws IOException
+	@Override
+    public void writeChars(String str) throws IOException
 	{
 		out.writeChars(str);
 	}
@@ -212,7 +226,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeUTF(String str) throws IOException
+	@Override
+    public void writeUTF(String str) throws IOException
 	{
 		out.writeUTF(str);
 	}
@@ -220,7 +235,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void defaultWriteObject() throws IOException
+	@Override
+    public void defaultWriteObject() throws IOException
 	{
 		try
 		{
@@ -236,7 +252,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void flush() throws IOException
+	@Override
+    public void flush() throws IOException
 	{
 		out.flush();
 	}
@@ -244,7 +261,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void close() throws IOException
+	@Override
+    public void close() throws IOException
 	{
 		out.close();
 	}
@@ -252,7 +270,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public PutField putFields() throws IOException
+	@Override
+    public PutField putFields() throws IOException
 	{
 		//return super.putFields();
 		if (currentPutField == null) currentPutField = new JPPFPutField(this);
@@ -262,7 +281,8 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeFields() throws IOException
+	@Override
+    public void writeFields() throws IOException
 	{
 		//super.writeFields();
 		try

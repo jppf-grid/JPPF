@@ -80,7 +80,8 @@ public abstract class AbstractBundler implements Bundler
 	 * @param totalTime not used.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
 	 */
-	public void feedback(int bundleSize, double totalTime)
+	@Override
+    public void feedback(int bundleSize, double totalTime)
 	{
 	}
 
@@ -90,7 +91,8 @@ public abstract class AbstractBundler implements Bundler
 	 * @return the timestamp as a long value.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getTimestamp()
 	 */
-	public long getTimestamp()
+	@Override
+    public long getTimestamp()
 	{
 		return timestamp;
 	}
@@ -108,7 +110,8 @@ public abstract class AbstractBundler implements Bundler
 	 * Perform context-independant initializations.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#setup()
 	 */
-	public void setup()
+	@Override
+    public void setup()
 	{
 	}
 
@@ -116,7 +119,8 @@ public abstract class AbstractBundler implements Bundler
 	 * Release the resources used by this bundler.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#dispose()
 	 */
-	public void dispose()
+	@Override
+    public void dispose()
 	{
 	}
 
@@ -125,7 +129,8 @@ public abstract class AbstractBundler implements Bundler
 	 * @return an instance of <code>LoadBalancingProfile</code>.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getProfile()
 	 */
-	public LoadBalancingProfile getProfile()
+	@Override
+    public LoadBalancingProfile getProfile()
 	{
 		return profile;
 	}

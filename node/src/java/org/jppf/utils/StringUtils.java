@@ -181,11 +181,11 @@ public final class StringUtils
 	public static String toStringDuration(long elapsed)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(padLeft(""+(elapsed / 3600000L), '0', 2)).append(":");
+		sb.append(padLeft(""+(elapsed / 3600000L), '0', 2)).append(':');
 		elapsed = elapsed % 3600000L;
-		sb.append(padLeft(""+(elapsed / 60000L), '0', 2)).append(":");
+		sb.append(padLeft(""+(elapsed / 60000L), '0', 2)).append(':');
 		elapsed = elapsed % 60000L;
-		sb.append(padLeft(""+(elapsed / 1000L), '0', 2)).append(".");
+		sb.append(padLeft(""+(elapsed / 1000L), '0', 2)).append('.');
 		sb.append(padLeft(""+(elapsed % 1000L), '0', 3));
 		return sb.toString();
 	}
@@ -217,7 +217,7 @@ public final class StringUtils
 			if (channel.isOpen())
 			{
 				Socket s = ((SocketChannel)channel).socket();
-				sb.append(getRemoteHost((InetSocketAddress) s.getRemoteSocketAddress()));
+				sb.append(getRemoteHost(s.getRemoteSocketAddress()));
 			}
 			else
 			{
@@ -243,7 +243,7 @@ public final class StringUtils
 		if (address instanceof InetSocketAddress)
 		{
 			InetSocketAddress add = (InetSocketAddress) address;
-			sb.append(add.getHostName()).append(":").append(add.getPort());
+			sb.append(add.getHostName()).append(':').append(add.getPort());
 		}
 		else sb.append("socket address type not handled: " + address); 
 		//sb.append("]");
@@ -325,7 +325,7 @@ public final class StringUtils
 		StringBuilder sb = new StringBuilder();
 		for (int i=0; i<ports.length; i++)
 		{
-			if (i > 0) sb.append(" ");
+			if (i > 0) sb.append(' ');
 			sb.append(ports[i]);
 		}
 		return sb.toString();

@@ -68,7 +68,7 @@ public final class LocalizationUtils
 		}
 		catch (Exception e)
 		{
-			if (log.isDebugEnabled()) log.debug("Could not find resource bundle \""+baseName+"\"", e);
+			if (log.isDebugEnabled()) log.debug("Could not find resource bundle \""+baseName+ '\"', e);
 			return def;
 		}
 		String result = null;
@@ -78,7 +78,7 @@ public final class LocalizationUtils
 		}
 		catch (Exception e)
 		{
-			if (log.isDebugEnabled()) log.debug("Could not find key \""+key+"\" in resource bundle \""+baseName+"\"", e);
+			if (log.isDebugEnabled()) log.debug("Could not find key \""+key+"\" in resource bundle \""+baseName+ '\"', e);
 		}
 		return result == null ? def : result;
 	}
@@ -96,9 +96,9 @@ public final class LocalizationUtils
 		{
 			File file = new File(filename);
 			result = file.getName();
-			int idx = result.lastIndexOf(".");
+			int idx = result.lastIndexOf('.');
 			if (idx >= 0) result = result.substring(0, idx);
-			result = base + "/" + result;
+			result = base + '/' + result;
 		}
 		catch (Exception e)
 		{

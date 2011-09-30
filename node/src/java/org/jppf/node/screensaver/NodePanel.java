@@ -38,19 +38,19 @@ class NodePanel extends JPanel
 	/**
 	 * Image dispalying a bright green traffic light.
 	 */
-	static final ImageIcon BRIGHT_GREEN = loadImage(IMAGE_PATH + "/" + "active_greenlight.gif");
+	static final ImageIcon BRIGHT_GREEN = loadImage(IMAGE_PATH + '/' + "active_greenlight.gif");
 	/**
 	 * Image dispalying a dark green traffic light.
 	 */
-	static final ImageIcon DARK_GREEN = loadImage(IMAGE_PATH + "/" + "inactive_greenlight.gif");
+	static final ImageIcon DARK_GREEN = loadImage(IMAGE_PATH + '/' + "inactive_greenlight.gif");
 	/**
 	 * Image dispalying a bright red traffic light.
 	 */
-	static final ImageIcon BRIGHT_RED = loadImage(IMAGE_PATH + "/" + "active_redlight.gif");
+	static final ImageIcon BRIGHT_RED = loadImage(IMAGE_PATH + '/' + "active_redlight.gif");
 	/**
 	 * Image dispalying a dark red traffic light.
 	 */
-	static final ImageIcon DARK_RED = loadImage(IMAGE_PATH + "/" + "inactive_redlight.gif");
+	static final ImageIcon DARK_RED = loadImage(IMAGE_PATH + '/' + "inactive_redlight.gif");
 	/**
 	 * Holds the states of all nodes.
 	 */
@@ -105,7 +105,7 @@ class NodePanel extends JPanel
     GridBagConstraints c = new GridBagConstraints();
     c.gridx = 0;
 		setBackground(Color.BLACK);
-		ImageIcon logo = loadImage(IMAGE_PATH + "/" + "jppf-at-home.gif");
+		ImageIcon logo = loadImage(IMAGE_PATH + '/' + "jppf-at-home.gif");
 		JLabel logoLabel = new JLabel(logo);
 		addLayoutComp(this, g, c, logoLabel);
 		addLayoutComp(this, g, c, Box.createVerticalStrut(10));

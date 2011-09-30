@@ -65,7 +65,8 @@ public class JmxAppender extends AppenderSkeleton
 	 * @param event the event to log.
 	 * @see org.apache.log4j.AppenderSkeleton#append(org.apache.log4j.spi.LoggingEvent)
 	 */
-	protected void append(LoggingEvent event)
+	@Override
+    protected void append(LoggingEvent event)
 	{
 		if (notifier == null) init();
 		Layout layout = getLayout();
@@ -83,7 +84,8 @@ public class JmxAppender extends AppenderSkeleton
 	 * Close this appender. This method does nothing.
 	 * @see org.apache.log4j.Appender#close()
 	 */
-	public void close()
+	@Override
+    public void close()
 	{
 	}
 
@@ -92,7 +94,8 @@ public class JmxAppender extends AppenderSkeleton
 	 * @return true.
 	 * @see org.apache.log4j.Appender#requiresLayout()
 	 */
-	public boolean requiresLayout()
+	@Override
+    public boolean requiresLayout()
 	{
 		return true;
 	}

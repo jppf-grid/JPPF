@@ -63,7 +63,8 @@ public class ServerConnection extends AbstractRecoveryConnection
 	/**
 	 * {@inheritDoc}
 	 */
-	public synchronized void run()
+	@Override
+    public synchronized void run()
 	{
 		if (!isOk()) return;
 		if (!initialized) performHandshake();
@@ -121,7 +122,8 @@ public class ServerConnection extends AbstractRecoveryConnection
 	/**
 	 * Close this server connection and release the resources it is using.
 	 */
-	public synchronized void close()
+	@Override
+    public synchronized void close()
 	{
 		try
 		{
@@ -142,7 +144,8 @@ public class ServerConnection extends AbstractRecoveryConnection
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return StringUtils.buildString("ServerConnection[socketWrapper=", socketWrapper, ", ok=", ok, ", initialized=", initialized, ", uuid=", uuid, "]");
 	}

@@ -235,7 +235,7 @@ public class DemoTest
 			if (results == null) msg = "submission is not in queue anymore";
 			else
 			{
-				StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
 				for (JPPFTask task: results)
 				{
 					if (task.getException() == null) sb.append(task.getResult());

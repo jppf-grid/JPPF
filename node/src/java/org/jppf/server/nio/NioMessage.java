@@ -44,9 +44,10 @@ public class NioMessage
 	 * @return a string representing this <code>NioMessage</code> instance.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder("NioMessage [length = ").append(length).append(", lengthWritten = ").append(lengthWritten);
-		return sb.append(", buffer = ").append(buffer).append("]").toString();
+		return sb.append(", buffer = ").append(buffer).append(']').toString();
 	}
 }

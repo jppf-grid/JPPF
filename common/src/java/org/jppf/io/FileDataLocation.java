@@ -111,7 +111,8 @@ public class FileDataLocation extends AbstractDataLocation
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.DataLocation#transferFrom(org.jppf.io.InputSource, boolean)
 	 */
-	public int transferFrom(InputSource source, boolean blocking) throws Exception
+	@Override
+    public int transferFrom(InputSource source, boolean blocking) throws Exception
 	{
 		if (!transferring)
 		{
@@ -134,7 +135,7 @@ public class FileDataLocation extends AbstractDataLocation
 		}
 		finally
 		{
-			if (transferring == false)
+			if (!transferring)
 			{
 				buffer = null;
 				if (fileChannel != null)
@@ -176,7 +177,7 @@ public class FileDataLocation extends AbstractDataLocation
 					return -1;
 				}
 				tempCount += tmp;
-				if (traceEnabled) log.trace("written " + tmp + " bytes (total: " + tempCount + "/" + n + ")");
+				if (traceEnabled) log.trace("written " + tmp + " bytes (total: " + tempCount + '/' + n + ')');
 			}
 			buffer.clear();
 		}
@@ -232,7 +233,8 @@ public class FileDataLocation extends AbstractDataLocation
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.DataLocation#transferTo(org.jppf.io.OutputDestination, boolean)
 	 */
-	public int transferTo(OutputDestination dest, boolean blocking) throws Exception
+	@Override
+    public int transferTo(OutputDestination dest, boolean blocking) throws Exception
 	{
 		if (!transferring)
 		{
@@ -329,11 +331,16 @@ public class FileDataLocation extends AbstractDataLocation
 	 * @throws Throwable if an error occurs.
 	 * @see java.lang.Object#finalize()
 	 */
-	protected void finalize() throws Throwable
+	@Override
+    protected void finalize() throws Throwable
 	{
-		File file = new File(filePath);
-		if (file.exists()) file.delete();
-	}
+        try {
+            File file = new File(filePath);
+            if (file.exists()) file.delete();
+        } finally {
+            super.finalize();
+        }
+    }
 
 	/**
 	 * Get an input stream for this location.
@@ -341,7 +348,8 @@ public class FileDataLocation extends AbstractDataLocation
 	 * @throws Exception if an I/O error occurs.
 	 * @see org.jppf.io.DataLocation#getInputStream()
 	 */
-	public InputStream getInputStream() throws Exception
+	@Override
+    public InputStream getInputStream() throws Exception
 	{
 		return new BufferedInputStream(new FileInputStream(filePath));
 	}
@@ -352,7 +360,8 @@ public class FileDataLocation extends AbstractDataLocation
 	 * @throws Exception if an I/O error occurs.
 	 * @see org.jppf.io.DataLocation#getOutputStream()
 	 */
-	public OutputStream getOutputStream() throws Exception
+	@Override
+    public OutputStream getOutputStream() throws Exception
 	{
 		return new BufferedOutputStream(new FileOutputStream(filePath));
 	}
@@ -363,7 +372,8 @@ public class FileDataLocation extends AbstractDataLocation
 	 * @return a new DataLocation instance pointing to the same data.
 	 * @see org.jppf.io.DataLocation#copy()
 	 */
-	public DataLocation copy()
+	@Override
+    public DataLocation copy()
 	{
 		return new FileDataLocation(filePath, size);
 	}

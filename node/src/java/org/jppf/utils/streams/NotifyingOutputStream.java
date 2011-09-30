@@ -54,7 +54,8 @@ public class NotifyingOutputStream extends OutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void write(int n) throws IOException
+	@Override
+    public void write(int n) throws IOException
 	{
 		delegate.write(n);
 		callback.bytesNotification(1);
@@ -63,7 +64,8 @@ public class NotifyingOutputStream extends OutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void write(byte[] b) throws IOException
+	@Override
+    public void write(byte[] b) throws IOException
 	{
 		write(b, 0, b.length);
 	}
@@ -71,7 +73,8 @@ public class NotifyingOutputStream extends OutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void write(byte[] b, int off, int len) throws IOException
+	@Override
+    public void write(byte[] b, int off, int len) throws IOException
 	{
 		delegate.write(b, off, len);
 		callback.bytesNotification(len);
@@ -80,7 +83,8 @@ public class NotifyingOutputStream extends OutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void close() throws IOException
+	@Override
+    public void close() throws IOException
 	{
 		delegate.close();
 	}
@@ -88,7 +92,8 @@ public class NotifyingOutputStream extends OutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public void flush() throws IOException
+	@Override
+    public void flush() throws IOException
 	{
 		delegate.flush();
 	}

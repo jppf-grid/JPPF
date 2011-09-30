@@ -85,7 +85,7 @@ public class ClientDataProvider extends MemoryMapDataProvider
 	 * @return the looked-up value, or null if the value could not be found.
 	 * @see org.jppf.utils.JPPFCallable
 	 */
-	private <V> Object getValueFromClient(JPPFCallable<V> callable)
+	private static <V> Object getValueFromClient(JPPFCallable<V> callable)
 	{
 		ClassLoader cl = callable.getClass().getClassLoader();
 		if (!(cl instanceof JPPFClassLoader)) return null;

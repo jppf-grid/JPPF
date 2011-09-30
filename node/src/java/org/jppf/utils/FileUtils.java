@@ -309,14 +309,14 @@ public final class FileUtils
 			if (sb.length() >= splitSize)
 			{
 				count++;
-				writeTextFile(file +"." + count, sb.toString());
+				writeTextFile(file + '.' + count, sb.toString());
 				sb = new StringBuilder();
 			}
 		}
 		if (sb.length() > 0)
 		{
 			count++;
-			writeTextFile(file +"." + count, sb.toString());
+			writeTextFile(file + '.' + count, sb.toString());
 		}
 		reader.close();
 	}

@@ -107,7 +107,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	/**
 	 * Map holding the parameters of the request.
 	 */
-	private Map<Object, Object> parameters = new HashMap<Object, Object>();
+	private final Map<Object, Object> parameters = new HashMap<Object, Object>();
 	/**
 	 * The service level agreement between the job and the server.
 	 */
@@ -292,7 +292,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	 * or a negative int if this bundless is less than the other.
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(JPPFTaskBundle bundle)
+	@Override
+    public int compareTo(JPPFTaskBundle bundle)
 	{
 		if (bundle == null) return 1;
 		int otherPriority = bundle.getJobSLA().getPriority();
@@ -450,7 +451,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	/**
 	 * {@inheritDoc}
 	 */
-	public JPPFJobSLA getJobSLA()
+	@Override
+    public JPPFJobSLA getJobSLA()
 	{
 		return jobSLA;
 	}
@@ -467,7 +469,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder("[");
 		sb.append("jobId=").append(parameters == null ? null : getParameter(BundleParameter.JOB_ID));
@@ -475,14 +478,15 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 		sb.append(", initialTaskCount=").append(initialTaskCount);
 		sb.append(", taskCount=").append(taskCount);
 		sb.append(", requeue=").append(parameters == null ? null : getParameter(BundleParameter.JOB_REQUEUE));
-		sb.append("]");
+		sb.append(']');
 		return sb.toString();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getId()
+	@Override
+    public String getId()
 	{
 		return (String) getParameter(BundleParameter.JOB_ID);
 	}
@@ -490,7 +494,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	/**
 	 * {@inheritDoc}
 	 */
-	public JPPFJobMetadata getJobMetadata()
+	@Override
+    public JPPFJobMetadata getJobMetadata()
 	{
 		return (JPPFJobMetadata) getParameter(BundleParameter.JOB_METADATA);
 	}
@@ -498,7 +503,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getJobUuid()
+	@Override
+    public String getJobUuid()
 	{
 		return (String) getParameter(BundleParameter.JOB_UUID);
 	}

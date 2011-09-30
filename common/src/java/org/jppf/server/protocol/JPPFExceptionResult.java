@@ -54,7 +54,7 @@ public final class JPPFExceptionResult extends JPPFTask
 	{
 		if (throwable instanceof Exception) setException((Exception) throwable);
 		else setException(new JPPFException(throwable));
-		objectDescriptor = "" + object;
+		objectDescriptor = String.valueOf(object);
 		if (object != null) className = object.getClass().getName();
 	}
 
@@ -62,7 +62,8 @@ public final class JPPFExceptionResult extends JPPFTask
 	 * Display the error context captured in this task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		System.out.println(toString());
 	}
@@ -72,7 +73,8 @@ public final class JPPFExceptionResult extends JPPFTask
 	 * @return a string representing this JPPFExceptionResult.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("Error occurred on object [").append(objectDescriptor).append("], class=").append(className);

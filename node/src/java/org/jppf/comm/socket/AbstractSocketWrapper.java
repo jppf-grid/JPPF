@@ -124,7 +124,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @throws IOException if the underlying output stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#sendBytes(org.jppf.utils.JPPFBuffer)
 	 */
-	public void sendBytes(JPPFBuffer buf) throws IOException
+	@Override
+    public void sendBytes(JPPFBuffer buf) throws IOException
 	{
 		checkOpened();
 		dos.writeInt(buf.getLength());
@@ -140,7 +141,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @throws Exception if the underlying output stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#write(byte[], int, int)
 	 */
-	public void write(byte[] data, int offset, int len) throws Exception
+	@Override
+    public void write(byte[] data, int offset, int len) throws Exception
 	{
 		checkOpened();
 		dos.write(data, offset, len);
@@ -153,7 +155,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @throws Exception if the underlying output stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#writeInt(int)
 	 */
-	public void writeInt(int n) throws Exception
+	@Override
+    public void writeInt(int n) throws Exception
 	{
 		checkOpened();
 		dos.writeInt(n);
@@ -165,7 +168,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @throws IOException if an I/O error occurs.
 	 * @see org.jppf.comm.socket.SocketWrapper#flush()
 	 */
-	public void flush() throws IOException
+	@Override
+    public void flush() throws IOException
 	{
 		updateSocketTimestamp();
 		dos.flush();
@@ -178,7 +182,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @throws Exception if the underlying input stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#receive()
 	 */
-	public Object receive() throws Exception
+	@Override
+    public Object receive() throws Exception
 	{
 		return receive(0);
 	}
@@ -191,7 +196,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @throws IOException if the underlying input stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#receiveBytes(int)
 	 */
-	public JPPFBuffer receiveBytes(int timeout) throws IOException
+	@Override
+    public JPPFBuffer receiveBytes(int timeout) throws IOException
 	{
 		checkOpened();
 		JPPFBuffer buf = null;
@@ -223,7 +229,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @throws IOException if the underlying input stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#read(byte[], int, int)
 	 */
-	public int read(byte[] data, int offset, int len) throws IOException
+	@Override
+    public int read(byte[] data, int offset, int len) throws IOException
 	{
 		checkOpened();
 		int count = 0;
@@ -243,7 +250,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @throws Exception if the underlying input stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketWrapper#readInt()
 	 */
-	public int readInt() throws Exception
+	@Override
+    public int readInt() throws Exception
 	{
 		int intRead = dis.readInt();
 		updateSocketTimestamp();
@@ -256,7 +264,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @throws IOException if the underlying input and output streams raise an error.
 	 * @see org.jppf.comm.socket.SocketWrapper#open()
 	 */
-	public final void open() throws ConnectException, IOException
+	@Override
+    public final void open() throws ConnectException, IOException
 	{
 		if (!opened)
 		{
@@ -299,7 +308,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @throws IOException if the underlying input and output streams raise an error.
 	 * @see org.jppf.comm.socket.SocketWrapper#close()
 	 */
-	public void close() throws ConnectException, IOException
+	@Override
+    public void close() throws ConnectException, IOException
 	{
 		opened = false;
 		if (socket != null) socket.close();
@@ -310,7 +320,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @return true if this client is opened, false otherwise.
 	 * @see org.jppf.comm.socket.SocketWrapper#isOpened()
 	 */
-	public boolean isOpened()
+	@Override
+    public boolean isOpened()
 	{
 		return opened;
 	}
@@ -329,7 +340,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @return null.
 	 * @see org.jppf.comm.socket.SocketWrapper#getSerializer()
 	 */
-	public ObjectSerializer getSerializer()
+	@Override
+    public ObjectSerializer getSerializer()
 	{
 		return null;
 	}
@@ -339,7 +351,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @param serializer not used.
 	 * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.utils.ObjectSerializer)
 	 */
-	public void setSerializer(ObjectSerializer serializer)
+	@Override
+    public void setSerializer(ObjectSerializer serializer)
 	{
 	}
 
@@ -347,7 +360,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * Get the remote host the underlying socket connects to.
 	 * @return the host name or ip address as a string.
 	 */
-	public String getHost()
+	@Override
+    public String getHost()
 	{
 		return host;
 	}
@@ -356,7 +370,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * Set the remote host the underlying socket connects to.
 	 * @param host the host name or ip address as a string.
 	 */
-	public void setHost(String host)
+	@Override
+    public void setHost(String host)
 	{
 		this.host = host;
 	}
@@ -365,7 +380,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * Get the remote port the underlying socket connects to.
 	 * @return the port number on the remote host.
 	 */
-	public int getPort()
+	@Override
+    public int getPort()
 	{
 		return port;
 	}
@@ -374,7 +390,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * Get the remote port the underlying socket connects to.
 	 * @param port the port number on the remote host.
 	 */
-	public void setPort(int port)
+	@Override
+    public void setPort(int port)
 	{
 		this.port = port;
 	}
@@ -384,7 +401,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @return a Socket instance.
 	 * @see org.jppf.comm.socket.SocketWrapper#getSocket()
 	 */
-	public Socket getSocket()
+	@Override
+    public Socket getSocket()
 	{
 		return socket;
 	}
@@ -394,7 +412,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @param socket a Socket instance.
 	 * @see org.jppf.comm.socket.SocketWrapper#setSocket(java.net.Socket)
 	 */
-	public void setSocket(Socket socket)
+	@Override
+    public void setSocket(Socket socket)
 	{
 		this.socket = socket;
 	}
@@ -406,7 +425,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.comm.socket.SocketWrapper#skip(int)
 	 */
-	public int skip(int n) throws Exception
+	@Override
+    public int skip(int n) throws Exception
 	{
 		if (n < 0) throw new IllegalArgumentException("number of bytes to skip must be >= 0");
 		else if (n == 0) return 0;
@@ -427,7 +447,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * last known good usage of the underlying socket. 
 	 * @return the socket usage timestamp  
 	 */
-	public long getSocketTimestamp() {
+	@Override
+    public long getSocketTimestamp() {
 		return socketTimestamp;
 	}
 

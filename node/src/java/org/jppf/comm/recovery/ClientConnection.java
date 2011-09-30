@@ -49,7 +49,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 	/**
 	 * The list of listeners to this object's events.
 	 */
-	private List<ClientConnectionListener> listeners = new ArrayList<ClientConnectionListener>();
+	private final List<ClientConnectionListener> listeners = new ArrayList<ClientConnectionListener>();
 
 	/**
 	 * Initialize this cliet connection with the specified uuid.
@@ -63,7 +63,8 @@ public class ClientConnection extends AbstractRecoveryConnection
 	/**
 	 * {@inheritDoc}
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{
@@ -113,7 +114,8 @@ public class ClientConnection extends AbstractRecoveryConnection
 	/**
 	 * Close this client and release any resources it is using.
 	 */
-	public void close()
+	@Override
+    public void close()
 	{
 		setStopped(true);
 		try
@@ -167,10 +169,10 @@ public class ClientConnection extends AbstractRecoveryConnection
 	private void fireClientConnectionEvent()
 	{
 		ClientConnectionEvent event = new ClientConnectionEvent(this);
-		ClientConnectionListener[] tmp = null;
+		ClientConnectionListener[] tmp;
 		synchronized (listeners)
 		{
-			tmp = listeners.toArray(ZERO_CONNECTION_LISTENER);
+			tmp = listeners.toArray(new ClientConnectionListener[listeners.size()]);
 		}
 		for (ClientConnectionListener listener : tmp) listener.clientConnectionFailed(event);
 	}

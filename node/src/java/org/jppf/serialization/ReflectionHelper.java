@@ -101,7 +101,7 @@ public final class ReflectionHelper
 			int mod = f.getModifiers();
 			if (!Modifier.isTransient(mod) && !Modifier.isStatic(mod)) fields.add(f); 
 		}
-		return fields.toArray(EMPTY_FIELDS);
+		return fields.toArray(new Field[fields.size()]);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public final class ReflectionHelper
 				if ("void".equals(s)) return Void.TYPE;
 				return cl.loadClass(s);
 		}
-		throw new JPPFException("Could not load type with signature '" + signature + "'");
+		throw new JPPFException("Could not load type with signature '" + signature + '\'');
 	}
 
 	/**
@@ -274,7 +274,7 @@ public final class ReflectionHelper
 	/**
 	 * A cache of constructors used for deserialization.
 	 */
-	private static Map<Class<?>, Constructor> constructorMap = new SoftReferenceValuesMap<Class<?>, Constructor>();
+	private static final Map<Class<?>, Constructor> constructorMap = new SoftReferenceValuesMap<Class<?>, Constructor>();
 
 	/**
 	 * Create an object without calling any of its class constructors.
@@ -332,7 +332,7 @@ public final class ReflectionHelper
 	/**
 	 * A cache of constructors used for deserialization.
 	 */
-	private static Map<Class<?>, ConstructorWithParameters> defaultConstructorMap = new SoftReferenceValuesMap<Class<?>, ConstructorWithParameters>();
+	private static final Map<Class<?>, ConstructorWithParameters> defaultConstructorMap = new SoftReferenceValuesMap<Class<?>, ConstructorWithParameters>();
 
 	/**
 	 * Instantiate an object from one of its class' existing constructor.
@@ -386,7 +386,8 @@ public final class ReflectionHelper
 		/**
 		 * {@inheritDoc}
 		 */
-		public int compare(Constructor<?> c1, Constructor<?> c2)
+		@Override
+        public int compare(Constructor<?> c1, Constructor<?> c2)
 		{
 			int n1 = c1.getParameterTypes().length;
 			int n2 = c2.getParameterTypes().length;

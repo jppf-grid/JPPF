@@ -36,5 +36,5 @@ public enum ClientTransition
 	/**
 	 * Transition from a state to IDLE.
 	 */
-	TO_IDLE;
+	TO_IDLE
 }

@@ -83,8 +83,8 @@ public class JPPFObjectStreamFactory
 				StringBuilder sb = new StringBuilder();
 				sb.append("Could not instantiate object stream builder for [").append(OIS_CLASS).append(" = ").append(oisName);
 				sb.append(", ").append(OOS_CLASS).append(" = ").append(oosName).append("]\nTerminating this application\n");
-				log.error(sb.toString() + e.getMessage(), e);
-				throw new JPPFError(sb.toString() + e.getMessage(), e);
+				log.error(sb + e.getMessage(), e);
+				throw new JPPFError(sb + e.getMessage(), e);
 			}
 		}
 		String builderName = props.getString(BUILDER_CLASS);
@@ -99,8 +99,8 @@ public class JPPFObjectStreamFactory
 				StringBuilder sb = new StringBuilder();
 				sb.append("Could not instantiate object stream builder for [").append(BUILDER_CLASS).append(" = ");
 				sb.append(builderName).append("]\nTerminating this application\n");
-				log.error(sb.toString() + e.getMessage(), e);
-				throw new JPPFError(sb.toString() + e.getMessage(), e);
+				log.error(sb + e.getMessage(), e);
+				throw new JPPFError(sb + e.getMessage(), e);
 			}
 		}
 		return new JPPFObjectStreamBuilderImpl();

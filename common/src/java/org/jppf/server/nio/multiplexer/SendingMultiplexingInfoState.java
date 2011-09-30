@@ -54,7 +54,8 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 	/**
 	 * {@inheritDoc}
 	 */
-	public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	@Override
+    public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		if (wrapper.isReadable())
 		{

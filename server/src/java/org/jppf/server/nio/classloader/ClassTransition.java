@@ -58,5 +58,5 @@ public enum ClassTransition
 	/**
 	 * Transition to the IDLE_PROVIDER state in idle mode.
 	 */
-	TO_IDLE_PROVIDER;
+	TO_IDLE_PROVIDER
 }

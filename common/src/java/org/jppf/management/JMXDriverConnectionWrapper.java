@@ -63,7 +63,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#nodesInformation()
 	 */
-	@SuppressWarnings("unchecked")
+	@Override
+    @SuppressWarnings("unchecked")
 	public Collection<JPPFManagementInfo> nodesInformation() throws Exception
 	{
 		return (Collection<JPPFManagementInfo>) invoke(DRIVER_MBEAN_NAME, "nodesInformation", (Object[]) null, (String[]) null);
@@ -75,7 +76,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#statistics()
 	 */
-	public JPPFStats statistics() throws Exception
+	@Override
+    public JPPFStats statistics() throws Exception
 	{
     return (JPPFStats) invoke(DRIVER_MBEAN_NAME, "statistics", (Object[]) null, (String[]) null);
 	}
@@ -88,7 +90,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#restartShutdown(java.lang.Long, java.lang.Long)
 	 */
-	public String restartShutdown(Long shutdownDelay, Long restartDelay) throws Exception
+	@Override
+    public String restartShutdown(Long shutdownDelay, Long restartDelay) throws Exception
 	{
 		return (String) invoke(DRIVER_MBEAN_NAME, "restartShutdown",
 			new Object[] {shutdownDelay, restartDelay}, new String[] {Long.class.getName(), Long.class.getName()});
@@ -102,7 +105,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @throws Exception if an error occurred while updating the settings.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#changeLoadBalancerSettings(java.lang.String, java.util.Map)
 	 */
-	public String changeLoadBalancerSettings(String algorithm, Map parameters) throws Exception
+	@Override
+    public String changeLoadBalancerSettings(String algorithm, Map parameters) throws Exception
 	{
 		return (String) invoke(DRIVER_MBEAN_NAME, "changeLoadBalancerSettings",
 			new Object[] {algorithm, parameters}, new String[] {String.class.getName(), Map.class.getName()});
@@ -114,7 +118,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#loadBalancerInformation()
 	 */
-	public LoadBalancingInformation loadBalancerInformation() throws Exception
+	@Override
+    public LoadBalancingInformation loadBalancerInformation() throws Exception
 	{
 		return (LoadBalancingInformation) invoke(DRIVER_MBEAN_NAME, "loadBalancerInformation", (Object[]) null, (String[]) null);
 	}
@@ -204,7 +209,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void resetStatistics() throws Exception
+	@Override
+    public void resetStatistics() throws Exception
 	{
 		invoke(DRIVER_MBEAN_NAME, "resetStatistics", (Object[]) null, (String[]) null);
 	}

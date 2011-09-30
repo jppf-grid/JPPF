@@ -102,7 +102,8 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 * @throws IOException if any error occurs.
 	 * @see java.io.OutputStream#write(int)
 	 */
-	public void write(int b) throws IOException
+	@Override
+    public void write(int b) throws IOException
 	{
 		if ((currentBuffer == null) || (currentBuffer.remaining() < 1)) newCurrentBuffer(defaultLength);
 		currentBuffer.buffer[currentBuffer.length] = (byte) b;
@@ -119,7 +120,8 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 * @throws IOException if any error occurs.
 	 * @see java.io.OutputStream#write(byte[], int, int)
 	 */
-	public void write(byte[] b, int off, int len) throws IOException
+	@Override
+    public void write(byte[] b, int off, int len) throws IOException
 	{
 		/*
 		if (b == null) throw new NullPointerException("the input buffer must not be null");
@@ -142,7 +144,8 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 * @throws IOException if any error occurs.
 	 * @see java.io.OutputStream#write(byte[])
 	 */
-	public void write(byte[] b) throws IOException
+	@Override
+    public void write(byte[] b) throws IOException
 	{
 		write(b, 0, b.length);
 	}
@@ -204,16 +207,17 @@ public class MultipleBuffersOutputStream extends OutputStream
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(getClass().getSimpleName()).append("[");
+		sb.append(getClass().getSimpleName()).append('[');
 		sb.append("defaultLength=").append(defaultLength);
 		sb.append(", totalSize=").append(totalSize);
 		sb.append(", nbBuffers=").append(list.size());
 		if (currentBuffer == null) sb.append(", currentBuffer=null");
 		else sb.append(", currentBuffer.length=").append(currentBuffer.length);
-		sb.append("]");
+		sb.append(']');
 		return sb.toString();
 	}
 }

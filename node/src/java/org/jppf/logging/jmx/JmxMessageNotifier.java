@@ -116,14 +116,13 @@ public class JmxMessageNotifier
 		{
 			try
 			{
-				System.out.println("Error in logging configuration: JMX logger name '" + name + "' is invalid (" + e.getMessage() + ")");
+				System.out.println("Error in logging configuration: JMX logger name '" + name + "' is invalid (" + e.getMessage() + ')');
 				objectName = new ObjectName(JmxLogger.DEFAULT_MBEAN_NAME);
 			}
 			catch (Exception e2)
 			{
 				System.out.println("Failed to initialize jmx based logging with default MBean name:" + e2.getMessage());
-				return;
-			}
+            }
 		}
 	}
 
@@ -134,7 +133,7 @@ public class JmxMessageNotifier
 	{
 		try
 		{
-			if (jmxLogger == null) jmxLogger = (JmxLogger) MBeanServerInvocationHandler.newProxyInstance(server, objectName, JmxLogger.class, true);
+			if (jmxLogger == null) jmxLogger = MBeanServerInvocationHandler.newProxyInstance(server, objectName, JmxLogger.class, true);
 		}
 		catch (Exception e)
 		{
@@ -165,8 +164,7 @@ public class JmxMessageNotifier
 			catch (Exception e)
 			{
 				System.out.println("Error registering the JMX logger MBean '" + objectName + "' : " + e.getMessage());
-				return;
-			}
+            }
 		}
 		finally
 		{

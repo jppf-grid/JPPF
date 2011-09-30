@@ -201,17 +201,14 @@ public class MatrixRunner implements NotificationListener
 		Matrix c = new Matrix(size);
 		// Get the matrix values from the tasks results
 		int rowIdx = 0;
-		for (int i=0; i<results.size(); i++)
-		{
-			JPPFTask matrixTask = results.get(i);
-			if (matrixTask.getException() != null) throw matrixTask.getException();
-			double[][] rows = (double[][]) matrixTask.getResult();
-			for (int j=0; j<rows.length; j++)
-			{
-				for (int k=0; k<size; k++) c.setValueAt(rowIdx + j, k, rows[j][k]);
-			}
-			rowIdx += rows.length;
-		}
+        for (JPPFTask matrixTask : results) {
+            if (matrixTask.getException() != null) throw matrixTask.getException();
+            double[][] rows = (double[][]) matrixTask.getResult();
+            for (int j = 0; j < rows.length; j++) {
+                for (int k = 0; k < size; k++) c.setValueAt(rowIdx + j, k, rows[j][k]);
+            }
+            rowIdx += rows.length;
+        }
 		//long elapsed = System.currentTimeMillis() - start;
 		//return elapsed;
 		long elapsed = System.nanoTime() - start;

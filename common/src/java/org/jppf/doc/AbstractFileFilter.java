@@ -71,7 +71,7 @@ public abstract class AbstractFileFilter implements FileFilter
 	 * @param returnValueIfEmpty the value to return if the array is null or empty.
 	 * @return true if the name matches one of the values in the array, false otherwise.
 	 */
-	private boolean checkFilter(String name, boolean ignoreCase, String[] array, boolean returnValueIfEmpty)
+	private static boolean checkFilter(String name, boolean ignoreCase, String[] array, boolean returnValueIfEmpty)
 	{
 		if ((array == null) || (array.length == 0)) return returnValueIfEmpty;
 		for (String s: array)

@@ -74,7 +74,8 @@ public class Pair<U, V> implements Serializable
 	 * @return the hashcode as an int value.
 	 * @see java.lang.Object#hashCode()
 	 */
-	public int hashCode()
+	@Override
+    public int hashCode()
 	{
 		final int prime = 31;
 		int result = 1;
@@ -89,7 +90,8 @@ public class Pair<U, V> implements Serializable
 	 * @return <code>true</code> if this object is the same as the obj.
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object obj)
+	@Override
+    public boolean equals(Object obj)
 	{
 		if (this == obj) return true;
 		if (obj == null) return false;

@@ -99,8 +99,7 @@ public class JPPFBundlerFactory
 	public List<String> getBundlerProviderNames() throws Exception
 	{
 		if (providerMap == null) loadProviders();
-		List<String> list = new ArrayList<String>(providerMap.keySet());
-		return list;
+        return new ArrayList<String>(providerMap.keySet());
 	}
 
 	/**
@@ -115,7 +114,7 @@ public class JPPFBundlerFactory
 		{
 			JPPFBundlerProvider provider = it.next();
 			map.put(provider.getAlgorithmName(), provider);
-			if (debugEnabled) log.debug("registering new load-balancing algorithm provider '" + provider.getAlgorithmName() + "'");
+			if (debugEnabled) log.debug("registering new load-balancing algorithm provider '" + provider.getAlgorithmName() + '\'');
 		}
 		providerMap = map;
 	}
@@ -130,7 +129,7 @@ public class JPPFBundlerFactory
 	public TypedProperties convertJPPFConfiguration(String profileName, TypedProperties configuration)
 	{
 		TypedProperties profile = extractJPPFConfiguration(profileName, configuration);
-		String prefix = "strategy." + profileName + ".";
+		String prefix = "strategy." + profileName + '.';
 		Set<Map.Entry<Object, Object>> entries = profile.entrySet();
 		TypedProperties result = new TypedProperties();
 		for (Map.Entry<Object, Object> entry: entries)
@@ -151,7 +150,7 @@ public class JPPFBundlerFactory
 	public TypedProperties extractJPPFConfiguration(String profileName, TypedProperties configuration)
 	{
 		TypedProperties profile = new TypedProperties();
-		String prefix = "strategy." + profileName + ".";
+		String prefix = "strategy." + profileName + '.';
 		Set<Map.Entry<Object, Object>> entries = configuration.entrySet();
 		for (Map.Entry<Object, Object> entry: entries)
 		{
