@@ -194,7 +194,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	public NodeJobInformation[] getNodeInformation(String jobUuid) throws Exception
 	{
 		List<ChannelJobPair> nodes = getJobManager().getNodesForJob(jobUuid);
-		if (nodes == null) return null;
+		if (nodes.isEmpty()) return NodeJobInformation.EMPTY_ARRAY;
 		NodeJobInformation[] result = new NodeJobInformation[nodes.size()];
 		for (int i=0; i<nodes.size(); i++)
 		{
@@ -220,8 +220,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	{
 		List<ChannelJobPair> list = getJobManager().getNodesForJob(jobUuid);
 		if (debugEnabled) log.debug("Cancelling jobId = '" + jobUuid + "' in nodes: " + list);
-		if (list == null) return;
-		for (ChannelJobPair pair: list)
+
+		for (ChannelJobPair pair : list)
 		{
 			CancelJobTask task = new CancelJobTask(jobUuid, pair.first(), requeue);
 			new Thread(task).start();

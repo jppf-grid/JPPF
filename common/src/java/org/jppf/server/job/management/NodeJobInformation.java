@@ -33,6 +33,10 @@ public class NodeJobInformation implements Serializable
 	 * Explicit serialVersionUID.
 	 */
 	private static final long serialVersionUID = 1L;
+    /**
+     * Empty array
+     */
+    public static final NodeJobInformation[]    EMPTY_ARRAY = new NodeJobInformation[0];
 	/**
 	 * The information about the node.
 	 */

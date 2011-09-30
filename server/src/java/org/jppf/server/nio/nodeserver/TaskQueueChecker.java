@@ -282,7 +282,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 		String jobId = bundle.getJobUuid();
 		int maxNodes = sla.getMaxNodes();
 		List<ChannelJobPair> list = server.getJobManager().getNodesForJob(jobId);
-		int n = (list == null) ? 0 : list.size();
+		int n = list.size();
 		if (debugEnabled) log.debug("current nodes = " + n + ", maxNodes = " + maxNodes);
 		return n < maxNodes;
 	}

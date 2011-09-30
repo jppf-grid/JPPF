@@ -75,9 +75,9 @@ public class JPPFJobManager implements QueueListener
 	 */
 	public synchronized List<ChannelJobPair> getNodesForJob(String jobUuid)
 	{
-		if (jobUuid == null) return null;
+		if (jobUuid == null) return Collections.emptyList();
 		List<ChannelJobPair> list = jobMap.get(jobUuid);
-		return list == null ? null : Collections.unmodifiableList(list);
+		return list == null ? Collections.<ChannelJobPair>emptyList() : Collections.unmodifiableList(list);
 	}
 
 	/**

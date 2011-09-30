@@ -56,7 +56,7 @@ public final class FileUtils
 		while (s != null)
 		{
 			s = reader.readLine();
-			if (s != null) sb.append(s).append("\n");
+			if (s != null) sb.append(s).append('\n');
 		}
 		return sb.toString();
 	}
@@ -248,7 +248,7 @@ public final class FileUtils
 	{
 		if ((file == null) || !file.exists() || !file.isFile()) return null;
 		String filePath = file.getPath();
-		int idx = filePath.lastIndexOf(".");
+		int idx = filePath.lastIndexOf('.');
 		if (idx >=0) return filePath.substring(idx+1);
 		return null;
 	}
@@ -282,8 +282,8 @@ public final class FileUtils
 	 */
 	private static int getLastFileSeparatorPosition(String path)
 	{
-		int idx1 = path.lastIndexOf("/");
-		int idx2 = path.lastIndexOf("\\");
+		int idx1 = path.lastIndexOf('/');
+		int idx2 = path.lastIndexOf('\\');
 		if ((idx1 < 0) && (idx2 < 0)) return -1;
 		int idx = idx1 < 0 ? idx2 : idx2 < 0 ? idx1 : Math.max(idx1, idx2);
 		return idx;
@@ -305,7 +305,7 @@ public final class FileUtils
 		{
 			s = reader.readLine();
 			if (s == null) break;
-			sb.append(s).append("\n");
+			sb.append(s).append('\n');
 			if (sb.length() >= splitSize)
 			{
 				count++;
@@ -518,7 +518,11 @@ public final class FileUtils
 		{
 			if (path.isDirectory())
 			{
-				for (File child: path.listFiles()) success &= deletePath(child);
+                File[] files = path.listFiles();
+                if(files != null)
+                {
+                    for (File child: files) success &= deletePath(child);
+                }
 			}
 			success &= path.delete();
 		}

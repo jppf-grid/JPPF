@@ -134,17 +134,15 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 				if (jobInfo == null) continue;
 				panelManager.jobAdded(driverName, jobInfo);
 				DefaultMutableTreeNode jobNode = panelManager.findJob(driverNode, jobInfo);
-				NodeJobInformation[] subJobInfo = null;
 				try
 				{
-					subJobInfo = proxy.getNodeInformation(id);
+					NodeJobInformation[] subJobInfo = proxy.getNodeInformation(id);
+                    for (NodeJobInformation nji: subJobInfo) panelManager.subJobAdded(driverName, nji.jobInfo, nji.nodeInfo);
 				}
 				catch(Exception e)
 				{
 					if (debugEnabled) log.debug("populating model: " + e.getMessage(), e);
-					continue;
 				}
-				for (NodeJobInformation nji: subJobInfo) panelManager.subJobAdded(driverName, nji.jobInfo, nji.nodeInfo);
 			}
 		}
 	}
