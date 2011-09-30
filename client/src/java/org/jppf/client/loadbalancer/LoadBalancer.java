@@ -134,7 +134,7 @@ public class LoadBalancer
 		//if (isLocalEnabled() && !locallyExecuting.get())
 		if (isLocalEnabled() && localJob)
 		{
-			List<JPPFTask> tasks = job.getTasks();
+			List<JPPFTask> tasks = job.getPendingTasks();
 			if (connection != null)
 			{
 				int[] bundleSize = new int[2];
@@ -154,7 +154,7 @@ public class LoadBalancer
 					for (int i=LOCAL; i<=REMOTE; i++) bundleSize[i] += diff/2;
 					if (tasks.size() > sum(bundleSize)) bundleSize[LOCAL]++;
 				}
-				if (debugEnabled) log.debug("bundlers[local=" + bundleSize[LOCAL] + ", remote=" + bundleSize[REMOTE] + ']');
+				if (debugEnabled) log.debug("bundlers[local=" + bundleSize[LOCAL] + ", remote=" + bundleSize[REMOTE] + "]");
 				List<List<JPPFTask>> list = new ArrayList<List<JPPFTask>>();
 				int idx = 0;
 				for (int i=LOCAL; i<=REMOTE; i++)
@@ -188,7 +188,7 @@ public class LoadBalancer
 		}
 		else if (connection != null)
 		{
-			ExecutionThread remoteThread = new RemoteExecutionThread(job.getTasks(), job, connection);
+			ExecutionThread remoteThread = new RemoteExecutionThread(job.getPendingTasks(), job, connection);
 			remoteThread.run();
 			if (remoteThread.getException() != null) throw remoteThread.getException();
 		}
@@ -200,10 +200,10 @@ public class LoadBalancer
 	 * @param array the input array. 
 	 * @return the result sum as an int value.
 	 */
-	private static int sum(int[] array)
+	private int sum(int[] array)
 	{
 		int sum = 0;
-        for (int anArray : array) sum += anArray;
+		for (int i=0; i<array.length; i++) sum += array[i];
 		return sum;
 	}
 
@@ -241,7 +241,7 @@ public class LoadBalancer
 		 * @see java.lang.Runnable#run()
 		 */
 		@Override
-        public abstract void run();
+		public abstract void run();
 
 		/**
 		 * Get the resulting exception.
@@ -273,7 +273,7 @@ public class LoadBalancer
 		 * @see java.lang.Runnable#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			try
 			{
@@ -393,7 +393,7 @@ public class LoadBalancer
 		 * @see java.lang.Runnable#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			try
 			{

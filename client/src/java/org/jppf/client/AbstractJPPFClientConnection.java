@@ -157,7 +157,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @see org.jppf.client.JPPFClientConnection#init()
 	 */
 	@Override
-    public abstract void init();
+	public abstract void init();
 
 	/**
 	 * Initialize this client's security credentials.
@@ -205,7 +205,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	public void sendTasks(JPPFTaskBundle header, JPPFJob job) throws Exception
 	{
 		ObjectSerializer ser = makeHelper().getSerializer();
-		int count = job.getTasks().size();
+		int count = job.getTasks().size() - job.getResultMap().size();
 		TraversalList<String> uuidPath = new TraversalList<String>();
 		uuidPath.add(client.getUuid());
 		header.setUuidPath(uuidPath);
@@ -220,7 +220,10 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		SocketWrapper socketClient = taskServerConnection.getSocketClient();
 		IOHelper.sendData(socketClient, header, ser);
 		IOHelper.sendData(socketClient, job.getDataProvider(), ser);
-		for (JPPFTask task : job.getTasks()) IOHelper.sendData(socketClient, task, ser);
+		for (JPPFTask task : job.getTasks())
+		{
+			if (!job.getResultMap().containsKey(task.getPosition())) IOHelper.sendData(socketClient, task, ser);
+		}
 		socketClient.flush();
 	}
 
@@ -260,7 +263,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 				Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
 				for (JPPFTask task: taskList) task.setException(e);
 			}
-            return new Pair<List<JPPFTask>, Integer>(taskList, startIndex);
+			return new Pair<List<JPPFTask>, Integer>(taskList, startIndex);
 		}
 		catch(AsynchronousCloseException e)
 		{
@@ -340,8 +343,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			cl = this.getClass().getClassLoader();
 			clazz = cl.loadClass(helperClassName);
 		}
-
-        return (SerializationHelper) clazz.newInstance();
+		return (SerializationHelper) clazz.newInstance();
 	}
 
 	/**
@@ -359,7 +361,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @see org.jppf.client.JPPFClientConnection#getPriority()
 	 */
 	@Override
-    public int getPriority()
+	public int getPriority()
 	{
 		return priority;
 	}
@@ -379,7 +381,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @see org.jppf.client.JPPFClientConnection#getStatus()
 	 */
 	@Override
-    public JPPFClientConnectionStatus getStatus()
+	public JPPFClientConnectionStatus getStatus()
 	{
 		return status.get();
 	}
@@ -390,7 +392,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @see org.jppf.client.JPPFClientConnection#setStatus(org.jppf.client.JPPFClientConnectionStatus)
 	 */
 	@Override
-    public void setStatus(JPPFClientConnectionStatus status)
+	public void setStatus(JPPFClientConnectionStatus status)
 	{
 		JPPFClientConnectionStatus oldStatus = getStatus();
 		this.status.set(status);
@@ -403,7 +405,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @see org.jppf.client.JPPFClientConnection#addClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
 	 */
 	@Override
-    public void addClientConnectionStatusListener(ClientConnectionStatusListener listener)
+	public void addClientConnectionStatusListener(ClientConnectionStatusListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -417,7 +419,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @see org.jppf.client.JPPFClientConnection#removeClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
 	 */
 	@Override
-    public void removeClientConnectionStatusListener(ClientConnectionStatusListener listener)
+	public void removeClientConnectionStatusListener(ClientConnectionStatusListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -435,7 +437,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		ClientConnectionStatusListener[] array = null;
 		synchronized(listeners)
 		{
-			array = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
+			array = listeners.toArray(AbstractClientConnectionHandler.ZERO_CONNECTION_STATUS_LISTENER);
 		}
 		for (ClientConnectionStatusListener listener: array)
 		{
@@ -449,7 +451,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @see org.jppf.client.JPPFClientConnection#close()
 	 */
 	@Override
-    public abstract List<JPPFJob> close();
+	public abstract List<JPPFJob> close();
 
 	/**
 	 * Get the name assigned tothis client connection.
@@ -457,7 +459,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @see org.jppf.client.JPPFClientConnection#getName()
 	 */
 	@Override
-    public String getName()
+	public String getName()
 	{
 		return name;
 	}
@@ -468,7 +470,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return name + " : " + status;
 	}

@@ -80,6 +80,11 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * The number of tasks in this job.
 	 */
 	private int taskCount = 0;
+	/**
+	 * A map containing the tasks that have been successfully executed,
+	 * ordered by ascending position in the submitted list of tasks.
+	 */
+	protected Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
 
 	/**
 	 * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -185,7 +190,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String getJobUuid()
+	public String getJobUuid()
 	{
 		return jobUuid;
 	}
@@ -194,7 +199,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String getId()
+	public String getId()
 	{
 		return id;
 	}
@@ -215,6 +220,20 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	public List<JPPFTask> getTasks()
 	{
 		return tasks;
+	}
+
+	/**
+	 * Get the list of tasks that have not yet been executed.
+	 * @return a list of <code>JPPFTask</code> objects.
+	 */
+	public List<JPPFTask> getPendingTasks()
+	{
+		List<JPPFTask> list = new LinkedList<JPPFTask>();
+		for (JPPFTask t: tasks)
+		{
+			if (!resultMap.containsKey(t.getPosition())) list.add(t);
+		}
+		return list;
 	}
 
 	/**
@@ -356,7 +375,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * {@inheritDoc}
 	 */
 	@Override
-    public JPPFJobSLA getJobSLA()
+	public JPPFJobSLA getJobSLA()
 	{
 		return jobSLA;
 	}
@@ -374,7 +393,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * {@inheritDoc}
 	 */
 	@Override
-    public JPPFJobMetadata getJobMetadata()
+	public JPPFJobMetadata getJobMetadata()
 	{
 		return jobMetadata;
 	}
@@ -394,7 +413,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
-    public int hashCode()
+	public int hashCode()
 	{
 		final int prime = 31;
 		int result = 1;
@@ -409,7 +428,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-    public boolean equals(Object obj)
+	public boolean equals(Object obj)
 	{
 		if (this == obj) return true;
 		if (obj == null) return false;
@@ -417,5 +436,23 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 		JPPFJob other = (JPPFJob) obj;
 		if (jobUuid == null) return other.jobUuid == null;
 		return jobUuid.equals(other.jobUuid);
+	}
+
+	/**
+	 * Get a map of the tasks that have been successfully executed.
+	 * @return a mapping of task objects to their position in the job.
+	 */
+	public Map<Integer, JPPFTask> getResultMap()
+	{
+		return resultMap;
+	}
+
+	/**
+	 * Set a map of the tasks that have been successfully executed.
+	 * @param resultMap a mapping of task objects to their position in the job.
+	 */
+	public void setResultMap(Map<Integer, JPPFTask> resultMap)
+	{
+		this.resultMap = resultMap;
 	}
 }

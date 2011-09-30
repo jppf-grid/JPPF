@@ -43,7 +43,7 @@ public class JPPFResultCollector implements TaskResultListener
 	/**
 	 * The initial task count in the job.
 	 */
-	private int count;
+	protected int count;
 	/**
 	 * Count of results notr yet received.
 	 */
@@ -57,6 +57,28 @@ public class JPPFResultCollector implements TaskResultListener
 	 * The list of final resulting tasks.
 	 */
 	protected List<JPPFTask> results = null;
+	/**
+	 * 
+	 */
+	private JPPFJob job = null;
+
+	/**
+	 * Default constructor, provided as a convenience for subclasses.
+	 */
+	protected JPPFResultCollector()
+	{
+	}
+
+	/**
+	 * Initialize this collector with the specified job. 
+	 * @param job the job to execute.
+	 */
+	public JPPFResultCollector(JPPFJob job)
+	{
+		this.job = job;
+		count = job.getTasks().size() - job.getResultMap().size();
+		pendingCount = count;
+	}
 
 	/**
 	 * Initialize this collector with a specified number of tasks. 
@@ -75,12 +97,16 @@ public class JPPFResultCollector implements TaskResultListener
 	 * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
 	 */
 	@Override
-    public synchronized void resultsReceived(TaskResultEvent event)
+	public synchronized void resultsReceived(TaskResultEvent event)
 	{
 		if (event.getThrowable() == null)
 		{
 			List<JPPFTask> tasks = event.getTaskList();
-			for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
+			for (JPPFTask task: tasks)
+			{
+				resultMap.put(task.getPosition(), task);
+				if (job != null) job.getResultMap().put(task.getPosition(), task);
+			}
 			pendingCount -= tasks.size();
 			if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + pendingCount);
 			notifyAll();
@@ -90,6 +116,7 @@ public class JPPFResultCollector implements TaskResultListener
 			Throwable t = event.getThrowable();
 			if (debugEnabled) log.debug("received throwable '" + t.getClass().getName() + ": " + t.getMessage() + "', resetting this result collector");
 			// reset this object's state to prepare for job resubmission
+			if (job != null) count = job.getTasks().size() - job.getResultMap().size();
 			pendingCount = count;
 			resultMap = new TreeMap<Integer, JPPFTask>();
 			results = null;
@@ -130,12 +157,7 @@ public class JPPFResultCollector implements TaskResultListener
 			}
 			elapsed = System.currentTimeMillis() - start;
 		}
-		if (pendingCount <= 0)
-		{
-			results = new ArrayList<JPPFTask>();
-			for (Map.Entry<Integer, JPPFTask> entry: resultMap.entrySet()) results.add(entry.getValue());
-			//resultMap.clear();
-		}
+		if (pendingCount <= 0) buildResults();
 		if (log.isTraceEnabled()) log.trace("elapsed = " + elapsed);
 		return results;
 	}
@@ -147,5 +169,21 @@ public class JPPFResultCollector implements TaskResultListener
 	public List<JPPFTask> getResults()
 	{
 		return results;
+	}
+
+	/**
+	 * Build the results list based on a map of executed tasks.
+	 */
+	protected void buildResults()
+	{
+		results = new ArrayList<JPPFTask>();
+		if (job == null)
+		{
+			for (Map.Entry<Integer, JPPFTask> entry: resultMap.entrySet())results.add(entry.getValue());
+		}
+		else
+		{
+			for (Map.Entry<Integer, JPPFTask> entry: job.getResultMap().entrySet()) results.add(entry.getValue());
+		}
 	}
 }
