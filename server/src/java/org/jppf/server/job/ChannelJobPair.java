@@ -44,7 +44,8 @@ public class ChannelJobPair extends Pair<ChannelWrapper<?>, ServerJob>
 	 * @return <code>true</code> if this object is the same as the obj.
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object obj)
+	@Override
+    public boolean equals(Object obj)
 	{
 		if (obj == null) return false;
 		if (!obj.getClass().equals(this.getClass())) return false;

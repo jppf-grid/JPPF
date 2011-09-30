@@ -29,7 +29,6 @@ import org.jppf.io.DataLocation;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -66,7 +65,8 @@ public class LocalNodeIO extends AbstractNodeIO
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.node.AbstractNodeIO#handleReload()
 	 */
-	protected void handleReload() throws Exception
+	@Override
+    protected void handleReload() throws Exception
 	{
 		node.setClassLoader(null);
 		node.initHelper();
@@ -75,7 +75,8 @@ public class LocalNodeIO extends AbstractNodeIO
 	/**
 	 * {@inheritDoc}.
 	 */
-	protected Object[] deserializeObjects() throws Exception
+	@Override
+    protected Object[] deserializeObjects() throws Exception
 	{
 		channel.setReadyOps(OP_WRITE);
 		if (debugEnabled) log.debug("waiting for next request");
@@ -98,7 +99,8 @@ public class LocalNodeIO extends AbstractNodeIO
 	/**
 	 * {@inheritDoc}
 	 */
-	protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
+	@Override
+    protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
 	{
 		List<Object> list = new ArrayList<Object>();
 		list.add(bundle);
@@ -126,13 +128,14 @@ public class LocalNodeIO extends AbstractNodeIO
 			bundle.setTaskCount(0);
 			bundle.setParameter(NODE_EXCEPTION_PARAM, t);
 		}
-		return list.toArray(StringUtils.ZERO_OBJECT);
+		return list.toArray(new Object[list.size()]);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
+	@Override
+    public void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
 	{
 		if (debugEnabled) log.debug("writing results");
 		ExecutorService executor = node.getExecutionManager().getExecutor();

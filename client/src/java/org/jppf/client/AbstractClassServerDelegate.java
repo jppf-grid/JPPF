@@ -69,7 +69,8 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	 * @return true if the socket connection is closed, false otherwise
 	 * @see org.jppf.client.ClassServerDelegate#isClosed()
 	 */
-	public boolean isClosed()
+	@Override
+    public boolean isClosed()
 	{
 		return closed;
 	}
@@ -79,7 +80,8 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	 * @return the name as a string.
 	 * @see org.jppf.client.ClassServerDelegate#getName()
 	 */
-	public String getName()
+	@Override
+    public String getName()
 	{
 		return name;
 	}
@@ -89,7 +91,8 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	 * @param name the name as a string.
 	 * @see org.jppf.client.ClassServerDelegate#setName(java.lang.String)
 	 */
-	public void setName(String name)
+	@Override
+    public void setName(String name)
 	{
 		this.name = name;
 	}
@@ -99,7 +102,8 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	 * @throws Exception if an error is raised during initialization.
 	 * @see org.jppf.client.ClassServerDelegate#initSocketClient()
 	 */
-	public void initSocketClient() throws Exception
+	@Override
+    public void initSocketClient() throws Exception
 	{
 		socketClient = new SocketClient();
 		socketClient.setHost(host);

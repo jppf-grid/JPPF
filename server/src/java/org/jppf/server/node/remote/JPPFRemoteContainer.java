@@ -74,7 +74,8 @@ public class JPPFRemoteContainer extends JPPFContainer
 	 * @return the new position in the source data after deserialization.
 	 * @throws Throwable if an error occurs while deserializing.
 	 */
-	public int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Throwable
+	@Override
+    public int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Throwable
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try

@@ -43,8 +43,9 @@ public class Result implements Serializable
 	 * @return a string representing this object.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
-		return "Result[\"" + message + "\", " + position + "]";
+		return "Result[\"" + message + "\", " + position + ']';
 	}
 }

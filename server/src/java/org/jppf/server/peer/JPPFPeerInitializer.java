@@ -44,16 +44,17 @@ public class JPPFPeerInitializer extends Thread
 	public JPPFPeerInitializer(String peerName)
 	{
 		this.peerName = peerName;
-		setName("Peer Initializer ["+peerName+"]");
+		setName("Peer Initializer ["+peerName+ ']');
 	}
 
 	/**
 	 * Perform the peer initialization.
 	 * @see java.lang.Thread#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
-		log.info("start initialization of peer ["+peerName+"]");
+		log.info("start initialization of peer [" + peerName + ']');
 		try
 		{
 			new PeerResourceProvider(peerName, JPPFDriver.getInstance().getClassServer()).init();
@@ -63,6 +64,6 @@ public class JPPFPeerInitializer extends Thread
 		{
 			log.error(e.getMessage(), e);
 		}
-		log.info("end initialization of peer ["+peerName+"]");
+		log.info("end initialization of peer [" + peerName + ']');
 	}
 }

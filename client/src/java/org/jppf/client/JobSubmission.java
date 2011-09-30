@@ -76,7 +76,8 @@ public class JobSubmission implements Runnable
 	 * This method executes until all partial results have been received.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		boolean error = false;
 		try
@@ -97,7 +98,7 @@ public class JobSubmission implements Runnable
 			catch(Exception e)
 			{
 				String src = (connection == null) ? "local execution" : connection.getName();
-				log.error("[" + src + "] " + e.getClass().getName() + ": " + e.getMessage(), e);
+				log.error('[' + src + "] " + e.getClass().getName() + ": " + e.getMessage(), e);
 				if (connection != null)
 				{
 					connection.setCurrentJob(null);
@@ -120,7 +121,7 @@ public class JobSubmission implements Runnable
 		catch(Exception e)
 		{
 			error = true;
-			log.error("["+connection.getName()+"] "+ e.getClass().getName() + ": " + e.getMessage(), e);
+			log.error('['+connection.getName()+"] "+ e.getClass().getName() + ": " + e.getMessage(), e);
 		}
 		finally
 		{
@@ -144,7 +145,7 @@ public class JobSubmission implements Runnable
 	 */
 	public synchronized void setStatus(SubmissionStatus status)
 	{
-		if (debugEnabled) log.debug("submission [" + job.getJobUuid() + "] status changing from '" + this.status + "' to '" + status + "'");
+		if (debugEnabled) log.debug("submission [" + job.getJobUuid() + "] status changing from '" + this.status + "' to '" + status + '\'');
 		this.status = status;
 	}
 

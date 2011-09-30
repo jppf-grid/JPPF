@@ -88,21 +88,24 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * Initialize this client connection.
 	 * @see org.jppf.client.JPPFClientConnection#init()
 	 */
-	public void init()
+	@Override
+    public void init()
 	{
 		try
 		{
 			delegate = new ClassServerDelegateImpl(this, client.getUuid(), host, classServerPort);
 			delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
 			{
-				public void statusChanged(ClientConnectionStatusEvent event)
+				@Override
+                public void statusChanged(ClientConnectionStatusEvent event)
 				{
 					delegateStatusChanged(event);
 				}
 			});
 			taskServerConnection.addClientConnectionStatusListener(new ClientConnectionStatusListener()
 			{
-				public void statusChanged(ClientConnectionStatusEvent event)
+				@Override
+                public void statusChanged(ClientConnectionStatusEvent event)
 				{
 					taskServerConnectionStatusChanged(event);
 				}
@@ -133,7 +136,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 			if (!delegate.isClosed())
 			{
 				Thread t = new Thread(delegate);
-				t.setName("[" + delegate.getName() + " : class delegate]");
+				t.setName('[' + delegate.getName() + " : class delegate]");
 				t.start();
 				taskServerConnection.init();
 				//setStatus(delegate.getStatus());
@@ -160,7 +163,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 		int port = -1;
 		if (props != null)
 		{
-			String prefix = name + ".";
+			String prefix = name + '.';
 			mHost = props.getString(prefix + "jppf.management.host", "localhost");
 			port = props.getInt(prefix + "jppf.management.port", 11198);
 		}
@@ -182,7 +185,8 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
 	 * @deprecated job submissions should be performed via the {@link JPPFClient} directly.
 	 */
-	public void submit(JPPFJob job) throws Exception
+	@Override
+    public void submit(JPPFJob job) throws Exception
 	{
 		throw new JPPFUnsupportedOperationException("this operation is not supported");
 	}
@@ -192,7 +196,8 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * @return a list of <code>JPPFJob</code> instances to resubmit.
 	 * @see org.jppf.client.JPPFClientConnection#close()
 	 */
-	public List<JPPFJob> close()
+	@Override
+    public List<JPPFJob> close()
 	{
 		if (!isShutdown)
 		{
@@ -205,8 +210,8 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 			}
 			catch(Exception e)
 			{
-				if (debugEnabled) log.debug("[" + name + "] "+ e.getMessage(), e);
-				else log.error("[" + name + "] "+ e.getMessage());
+				if (debugEnabled) log.debug('[' + name + "] "+ e.getMessage(), e);
+				else log.error('[' + name + "] "+ e.getMessage());
 			}
 		}
 		return null;
@@ -217,7 +222,8 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * @return an instance of <code>SocketInitializerImpl</code>.
 	 * @see org.jppf.client.AbstractJPPFClientConnection#createSocketInitializer()
 	 */
-	protected SocketInitializer createSocketInitializer()
+	@Override
+    protected SocketInitializer createSocketInitializer()
 	{
 		return new SocketInitializerImpl();
 	}

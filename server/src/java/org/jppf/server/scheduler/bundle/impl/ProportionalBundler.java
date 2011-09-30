@@ -60,9 +60,10 @@ public class ProportionalBundler extends AbstractProportionalBundler
 	 * @return a <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
-	public Bundler copy()
+	@Override
+    public Bundler copy()
 	{
-		return new ProportionalBundler((ProportionalTuneProfile) profile);
+		return new ProportionalBundler(profile);
 	}
 
 	/**
@@ -70,7 +71,8 @@ public class ProportionalBundler extends AbstractProportionalBundler
 	 * @return the bundle size as an int.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
-	protected int maxSize()
+	@Override
+    protected int maxSize()
 	{
 		return JPPFDriver.getQueue() == null ? 300 : JPPFDriver.getQueue().getMaxBundleSize();
 	}

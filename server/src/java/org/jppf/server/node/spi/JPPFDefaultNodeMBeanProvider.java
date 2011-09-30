@@ -34,7 +34,8 @@ public class JPPFDefaultNodeMBeanProvider implements JPPFNodeMBeanProvider
 	 * @return the fully qualified interface name as a string.
 	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#getMBeanInterfaceName()
 	 */
-	public String getMBeanInterfaceName()
+	@Override
+    public String getMBeanInterfaceName()
 	{
 		return JPPFNodeAdminMBean.class.getName();
 	}
@@ -46,7 +47,8 @@ public class JPPFDefaultNodeMBeanProvider implements JPPFNodeMBeanProvider
 	 * @return an <code>Object</code> that is an implementation of the MBean interface.
 	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.MonitoredNode)
 	 */
-	public Object createMBean(MonitoredNode node)
+	@Override
+    public Object createMBean(MonitoredNode node)
 	{
 		return new JPPFNodeAdmin((JPPFNode) node);
 	}
@@ -58,7 +60,8 @@ public class JPPFDefaultNodeMBeanProvider implements JPPFNodeMBeanProvider
 	 * @return the MBean name for this MBean provider.
 	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#getMBeanName()
 	 */
-	public String getMBeanName()
+	@Override
+    public String getMBeanName()
 	{
 		return JPPFAdminMBean.NODE_MBEAN_NAME;
 	}

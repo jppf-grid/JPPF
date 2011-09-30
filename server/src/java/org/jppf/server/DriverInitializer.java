@@ -125,7 +125,7 @@ public class DriverInitializer
 			Object o = provider.createMBean();
 			Class<?> inf = Class.forName(provider.getMBeanInterfaceName());
 			boolean b = mgr.registerProviderMBean(o, inf, provider.getMBeanName());
-			if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + provider.getMBeanName() + "]");
+			if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + provider.getMBeanName() + ']');
 		}
 	}
 

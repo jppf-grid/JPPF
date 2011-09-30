@@ -60,7 +60,8 @@ class SendingResultsState extends ClientServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ClientTransition performTransition(ChannelWrapper<?> channel) throws Exception
+	@Override
+    public ClientTransition performTransition(ChannelWrapper<?> channel) throws Exception
 	{
 		//if (debugEnabled) log.debug("exec() for " + getRemostHost(channel));
 		if (CHECK_CONNECTION && channel.isReadable())

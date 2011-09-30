@@ -66,7 +66,7 @@ public class ThreadManager extends ThreadSynchronization
 		if (poolSize < 0)
 		{
 			poolSize = Runtime.getRuntime().availableProcessors();
-			props.setProperty("processing.threads", "" + poolSize);
+			props.setProperty("processing.threads", Integer.toString(poolSize));
 		}
 		log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
 		threadMXBean = ManagementFactory.getThreadMXBean();
@@ -91,7 +91,7 @@ public class ThreadManager extends ThreadSynchronization
 		}
 		int n = getThreadPoolSize();
 		if (n == size) return;
-		ThreadPoolExecutor tpe = (ThreadPoolExecutor) threadPool;
+		ThreadPoolExecutor tpe = threadPool;
 		if (size > tpe.getCorePoolSize())
 		{
 			tpe.setMaximumPoolSize(size);
@@ -103,7 +103,7 @@ public class ThreadManager extends ThreadSynchronization
 			tpe.setMaximumPoolSize(size);
 		}
 		log.info("Node thread pool size changed from " + n + " to " + size);
-		JPPFConfiguration.getProperties().setProperty("processing.threads", "" + size);
+		JPPFConfiguration.getProperties().setProperty("processing.threads", Integer.toString(size));
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class ThreadManager extends ThreadSynchronization
 	public int getThreadPoolSize()
 	{
 		if (threadPool == null) return 0;
-		return ((ThreadPoolExecutor) threadPool).getCorePoolSize();
+		return threadPool.getCorePoolSize();
 	}
 
 	/**
@@ -140,8 +140,8 @@ public class ThreadManager extends ThreadSynchronization
 			info.cpuTime += threadMXBean.getThreadCpuTime(id);
 			info.userTime += threadMXBean.getThreadUserTime(id);
 		}
-		info.cpuTime /= 1e6;
-		info.userTime /= 1e6;
+		info.cpuTime /= 1.0e6;
+		info.userTime /= 1.0e6;
 		return info;
 	}
 

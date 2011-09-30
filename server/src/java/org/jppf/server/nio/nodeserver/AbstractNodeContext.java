@@ -132,7 +132,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	/**
 	 * {@inheritDoc}
 	 */
-	public void handleException(ChannelWrapper<?> channel)
+	@Override
+    public void handleException(ChannelWrapper<?> channel)
 	{
 		if (getBundler() != null) getBundler().dispose();
 		NodeNioServer.closeNode(channel, this);
@@ -249,7 +250,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean readMessage(ChannelWrapper<?> channel) throws Exception
+	@Override
+    public boolean readMessage(ChannelWrapper<?> channel) throws Exception
 	{
 		if (nodeMessage == null) nodeMessage = newMessage();
 		return getNodeMessage().read(channel);
@@ -258,7 +260,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
+	@Override
+    public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
 	{
 		return getNodeMessage().write(channel);
 	}

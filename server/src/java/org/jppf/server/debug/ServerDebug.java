@@ -32,24 +32,25 @@ public class ServerDebug implements ServerDebugMBean
 	/**
 	 * The class loader channels.
 	 */
-	private Set<ChannelWrapper<?>> classLoaderSet = new HashSet<ChannelWrapper<?>>();
+	private final Set<ChannelWrapper<?>> classLoaderSet = new HashSet<ChannelWrapper<?>>();
 	/**
 	 * The node channels.
 	 */
-	private Set<ChannelWrapper<?>> nodeSet = new HashSet<ChannelWrapper<?>>();
+	private final Set<ChannelWrapper<?>> nodeSet = new HashSet<ChannelWrapper<?>>();
 	/**
 	 * The client channels.
 	 */
-	private Set<ChannelWrapper<?>> clientSet = new HashSet<ChannelWrapper<?>>();
+	private final Set<ChannelWrapper<?>> clientSet = new HashSet<ChannelWrapper<?>>();
 	/**
 	 * The acceptor channels.
 	 */
-	private Set<ChannelWrapper<?>> acceptorSet = new HashSet<ChannelWrapper<?>>();
+	private final Set<ChannelWrapper<?>> acceptorSet = new HashSet<ChannelWrapper<?>>();
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public String[] classLoaderChannels()
+	@Override
+    public String[] classLoaderChannels()
 	{
 		String[] result = null;
 		synchronized(classLoaderSet)
@@ -63,9 +64,9 @@ public class ServerDebug implements ServerDebugMBean
 				ClassContext ctx = (ClassContext) channel.getContext();
 				sb.append(", type=").append(ctx.isProvider() ? "provider" : "node");
 				sb.append(", state=").append(ctx.getState());
-				sb.append(", pending requests=" + ctx.getNbPendingRequests());
-				sb.append(", current request=" + ctx.getCurrentRequest());
-				sb.append(", resource=" + ctx.getResource());
+                sb.append(", pending requests=").append(ctx.getNbPendingRequests());
+                sb.append(", current request=").append(ctx.getCurrentRequest());
+                sb.append(", resource=").append(ctx.getResource());
 				result[count++] = sb.toString();
 			}
 		}
@@ -76,7 +77,8 @@ public class ServerDebug implements ServerDebugMBean
 	/**
 	 * {@inheritDoc}
 	 */
-	public String[] nodeDataChannels()
+	@Override
+    public String[] nodeDataChannels()
 	{
 		return viewChannels(nodeSet);
 	}
@@ -94,7 +96,7 @@ public class ServerDebug implements ServerDebugMBean
 	 * @param set the set to view.
 	 * @return an array of state strings for each channel.
 	 */
-	private String[] viewChannels(Set<ChannelWrapper<?>> set)
+	private static String[] viewChannels(Set<ChannelWrapper<?>> set)
 	{
 		String[] result = null;
 		synchronized(set)

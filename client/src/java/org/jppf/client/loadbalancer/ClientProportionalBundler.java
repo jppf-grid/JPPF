@@ -57,9 +57,10 @@ public class ClientProportionalBundler extends AbstractProportionalBundler
 	 * @return a <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
-	public Bundler copy()
+	@Override
+    public Bundler copy()
 	{
-		return new ClientProportionalBundler((ProportionalTuneProfile) profile);
+		return new ClientProportionalBundler(profile);
 	}
 
 	/**
@@ -67,7 +68,8 @@ public class ClientProportionalBundler extends AbstractProportionalBundler
 	 * @return the bundle size as an int.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
-	protected int maxSize()
+	@Override
+    protected int maxSize()
 	{
 		return maxBundleSize;
 	}

@@ -74,7 +74,8 @@ public class JPPFResultCollector implements TaskResultListener
 	 * @param event a notification of completion for a set of submitted tasks.
 	 * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
 	 */
-	public synchronized void resultsReceived(TaskResultEvent event)
+	@Override
+    public synchronized void resultsReceived(TaskResultEvent event)
 	{
 		if (event.getThrowable() == null)
 		{

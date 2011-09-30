@@ -71,7 +71,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	/**
 	 * Mapping of channels to their uuid.
 	 */
-	private Map<String, ChannelWrapper<?>> nodeConnections = new HashMap<String, ChannelWrapper<?>>();
+	private final Map<String, ChannelWrapper<?>> nodeConnections = new HashMap<String, ChannelWrapper<?>>();
 	/**
 	 * Reference to the driver.
 	 */
@@ -121,7 +121,8 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	/**
 	 * {@inheritDoc}
 	 */
-	protected NioServerFactory<ClassState, ClassTransition> createFactory()
+	@Override
+    protected NioServerFactory<ClassState, ClassTransition> createFactory()
 	{
 		return new ClassServerFactory(this);
 	}
@@ -131,7 +132,8 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * @return true if the driver is shutting down, false otherwise.
 	 * @see org.jppf.server.nio.NioServer#externalStopCondition()
 	 */
-	protected boolean externalStopCondition()
+	@Override
+    protected boolean externalStopCondition()
 	{
 		return driver.isShuttingDown();
 	}
@@ -139,7 +141,8 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	/**
 	 * {@inheritDoc}
 	 */
-	public NioContext<?> createNioContext()
+	@Override
+    public NioContext<?> createNioContext()
 	{
 		return new ClassContext();
 	}
@@ -147,7 +150,8 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	/**
 	 * {@inheritDoc}
 	 */
-	public int getInitialInterest()
+	@Override
+    public int getInitialInterest()
 	{
 		return SelectionKey.OP_READ;
 	}
@@ -155,7 +159,8 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	/**
 	 * {@inheritDoc}
 	 */
-	public void postAccept(ChannelWrapper<?> wrapper)
+	@Override
+    public void postAccept(ChannelWrapper<?> wrapper)
 	{
 		((ClassContext) wrapper.getContext()).setState(DEFINING_TYPE);
 	}
@@ -164,7 +169,8 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * Close and remove all connections accepted by this server.
 	 * @see org.jppf.server.nio.NioServer#removeAllConnections()
 	 */
-	public synchronized void removeAllConnections()
+	@Override
+    public synchronized void removeAllConnections()
 	{
 		if (!isStopped()) return;
 		synchronized(providerConnections)
@@ -247,7 +253,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	public void setCacheContent(String uuid, String name, byte[] content)
 	{
-		if (traceEnabled) log.trace("adding cache entry with key=[" + uuid + ", " + name + "]");
+		if (traceEnabled) log.trace("adding cache entry with key=[" + uuid + ", " + name + ']');
 		CacheClassContent cacheContent = new CacheClassContent(content);
 		CacheClassKey cacheKey = new CacheClassKey(uuid, name);
 		synchronized(classCache)
@@ -264,7 +270,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	public byte[] getCacheContent(String uuid, String name)
 	{
-		if (traceEnabled) log.trace("looking up key=[" + uuid + ", " + name + "]");
+		if (traceEnabled) log.trace("looking up key=[" + uuid + ", " + name + ']');
 		CacheClassContent content;
 		synchronized(classCache)
 		{
@@ -349,7 +355,8 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	/**
 	 * {@inheritDoc}
 	 */
-	public void connectionFailed(ReaperEvent event)
+	@Override
+    public void connectionFailed(ReaperEvent event)
 	{
 		ServerConnection c = event.getConnection();
 		if (!c.isOk())

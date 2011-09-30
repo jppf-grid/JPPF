@@ -56,7 +56,8 @@ public class JPPFAndroidNode extends AbstractJPPFAndroidNode
 	 * @throws Exception if an error is raised during initialization.
 	 * @see org.jppf.server.node.JPPFNode#initDataChannel()
 	 */
-	protected void initDataChannel() throws Exception
+	@Override
+    protected void initDataChannel() throws Exception
 	{
 		if (socketClient == null)
 		{
@@ -71,7 +72,7 @@ public class JPPFAndroidNode extends AbstractJPPFAndroidNode
 			socketClient.setSerializer(serializer);
 			if (debugEnabled) log.debug("end socket client initialization");
 			if (debugEnabled) log.debug("start socket initializer");
-			System.out.println("Attempting connection to the node server at " + host + ":" + port);
+			System.out.println("Attempting connection to the node server at " + host + ':' + port);
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isSuccessfull())
 			{
@@ -89,7 +90,8 @@ public class JPPFAndroidNode extends AbstractJPPFAndroidNode
 	 * @throws Exception if an error is raised during initialization.
 	 * @see org.jppf.server.node.JPPFNode#closeDataChannel()
 	 */
-	protected void closeDataChannel() throws Exception
+	@Override
+    protected void closeDataChannel() throws Exception
 	{
 		if (debugEnabled) log.debug("closing data channel: socketClient=" + socketClient + ", clientConnection=" + recoveryConnection);
 		if (socketClient != null)

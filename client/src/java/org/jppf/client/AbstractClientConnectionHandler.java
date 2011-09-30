@@ -97,7 +97,8 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
 	 * @see org.jppf.client.ClientConnectionHandler#getStatus()
 	 */
-	public JPPFClientConnectionStatus getStatus()
+	@Override
+    public JPPFClientConnectionStatus getStatus()
 	{
 		return status.get();
 	}
@@ -107,7 +108,8 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * @param newStatus a <code>JPPFClientConnectionStatus</code> enumerated value.
 	 * @see org.jppf.client.ClientConnectionHandler#setStatus(org.jppf.client.JPPFClientConnectionStatus)
 	 */
-	public void setStatus(JPPFClientConnectionStatus newStatus)
+	@Override
+    public void setStatus(JPPFClientConnectionStatus newStatus)
 	{
 			JPPFClientConnectionStatus oldStatus = status.getAndSet(newStatus);
 			if (!newStatus.equals(oldStatus)) fireStatusChanged(oldStatus);
@@ -118,12 +120,13 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * @param listener the listener to add to the list.
 	 * @see org.jppf.client.ClientConnectionHandler#addClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
 	 */
-	public void addClientConnectionStatusListener(ClientConnectionStatusListener listener)
+	@Override
+    public void addClientConnectionStatusListener(ClientConnectionStatusListener listener)
 	{
 		synchronized(listeners)
 		{
 			listeners.add(listener);
-			listenerArray = listeners.toArray(ZERO_CONNECTION_STATUS_LISTENER); 
+			listenerArray = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
 		}
 	}
 
@@ -132,12 +135,13 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * @param listener the listener to remove from the list.
 	 * @see org.jppf.client.ClientConnectionHandler#removeClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
 	 */
-	public void removeClientConnectionStatusListener(ClientConnectionStatusListener listener)
+	@Override
+    public void removeClientConnectionStatusListener(ClientConnectionStatusListener listener)
 	{
 		synchronized(listeners)
 		{
 			listeners.remove(listener);
-			listenerArray = listeners.toArray(ZERO_CONNECTION_STATUS_LISTENER); 
+			listenerArray = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
 		}
 	}
 
@@ -167,7 +171,8 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * @return a <code>SocketWrapper</code> instance.
 	 * @throws Exception if any error occurs.
 	 */
-	public SocketWrapper getSocketClient() throws Exception
+	@Override
+    public SocketWrapper getSocketClient() throws Exception
 	{
 		// If the socket has been idle too long, recycle the connection.
 		if ((maxSocketIdleMillis > 10000L) 

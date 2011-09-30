@@ -340,9 +340,8 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			cl = this.getClass().getClassLoader();
 			clazz = cl.loadClass(helperClassName);
 		}
-		SerializationHelper helper = (SerializationHelper) clazz.newInstance();
-		
-		return helper;
+
+        return (SerializationHelper) clazz.newInstance();
 	}
 
 	/**
@@ -478,7 +477,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * Create a socket initializer.
 	 * @return an instance of a class implementing <code>SocketInitializer</code>.
 	 */
-	abstract protected SocketInitializer createSocketInitializer();
+	protected abstract SocketInitializer createSocketInitializer();
 
 	/**
 	 * Get the object that holds the tasks, data provider and submission mode for the current execution.

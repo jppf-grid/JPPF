@@ -49,7 +49,8 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 	 * @return true if the object has been completely read from the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	protected boolean readNextObject(ChannelWrapper<?> wrapper) throws Exception
+	@Override
+    protected boolean readNextObject(ChannelWrapper<?> wrapper) throws Exception
 	{
 		SocketChannel channel = (SocketChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
 		if (currentLengthObject == null)
@@ -85,7 +86,8 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 	 * @return true if the object has been completely written the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	protected boolean writeNextObject(ChannelWrapper<?> wrapper) throws Exception
+	@Override
+    protected boolean writeNextObject(ChannelWrapper<?> wrapper) throws Exception
 	{
 		SocketChannel channel = (SocketChannel) ((SelectionKey) wrapper.getChannel()).channel();
 		if (currentLengthObject == null)
@@ -111,16 +113,17 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
-		StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("[");
+		StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
 		sb.append("nb locations=").append(locations == null ? -1 : locations.size());
 		sb.append(", position=").append(position);
 		sb.append(", nbObjects=").append(nbObjects);
 		sb.append(", length=").append(length);
 		sb.append(", count=").append(count);
 		sb.append(", currentLength=").append(currentLength);
-		sb.append("]");
+		sb.append(']');
 		return sb.toString();
 	}
 }

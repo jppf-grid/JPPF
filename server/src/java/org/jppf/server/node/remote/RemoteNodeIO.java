@@ -28,7 +28,6 @@ import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -67,7 +66,8 @@ public class RemoteNodeIO extends AbstractNodeIO
 	/**
 	 * {@inheritDoc}.
 	 */
-	protected Object[] deserializeObjects() throws Exception
+	@Override
+    protected Object[] deserializeObjects() throws Exception
 	{
 		if (debugEnabled) log.debug("waiting for next request");
 		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
@@ -81,7 +81,8 @@ public class RemoteNodeIO extends AbstractNodeIO
 	/**
 	 * {@inheritDoc}
 	 */
-	protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
+	@Override
+    protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
 	{
 		List<Object> list = new LinkedList<Object>();
 		list.add(bundle);
@@ -110,7 +111,7 @@ public class RemoteNodeIO extends AbstractNodeIO
 			bundle.setTaskCount(0);
 			bundle.setParameter(NODE_EXCEPTION_PARAM, e);
 		}
-		return list.toArray(StringUtils.ZERO_OBJECT);
+		return list.toArray(new Object[list.size()]);
 	}
 
 	/**
@@ -118,7 +119,8 @@ public class RemoteNodeIO extends AbstractNodeIO
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.node.AbstractNodeIO#handleReload()
 	 */
-	protected void handleReload() throws Exception
+	@Override
+    protected void handleReload() throws Exception
 	{
 		node.setClassLoader(null);
 		node.initHelper();
@@ -132,7 +134,8 @@ public class RemoteNodeIO extends AbstractNodeIO
 	 * @throws Exception if an error occurs while writtng to the socket stream.
 	 * @see org.jppf.server.node.NodeIO#writeResults(org.jppf.server.protocol.JPPFTaskBundle, java.util.List)
 	 */
-	public void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
+	@Override
+    public void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
 	{
 		ExecutorService executor = node.getExecutionManager().getExecutor();
 		//long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();

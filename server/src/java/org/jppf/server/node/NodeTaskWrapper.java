@@ -57,7 +57,8 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 	 * Execute the task within a try/catch block.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		JPPFNodeAdmin nodeAdmin = null;
 		long cpuTime = 0L;
@@ -127,7 +128,8 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 	 * Get the task this wrapper executes within a try/catch block.
 	 * @return the task as a <code>JPPFTask</code> instance.
 	 */
-	public JPPFTask getTask()
+	@Override
+    public JPPFTask getTask()
 	{
 		return task;
 	}

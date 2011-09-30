@@ -76,7 +76,8 @@ public class BroadcastJobCompletionListener implements TaskCompletionListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public synchronized void taskCompleted(BundleWrapper result)
+	@Override
+    public synchronized void taskCompleted(BundleWrapper result)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) result.getJob();
 		String uuid = (String) bundle.getParameter(BundleParameter.NODE_BROADCAST_UUID);

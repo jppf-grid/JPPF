@@ -52,7 +52,8 @@ class JobScheduleAction implements Runnable
 	/**
 	 * {@inheritDoc}
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		synchronized(bundleWrapper)
 		{

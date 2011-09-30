@@ -376,7 +376,8 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	/**
 	 * {@inheritDoc}
 	 */
-	public JPPFDistributedJob getCurrentJob()
+	@Override
+    public JPPFDistributedJob getCurrentJob()
 	{
 		return bundle;
 	}
@@ -384,7 +385,8 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<JPPFTask> getCurrentTasks()
+	@Override
+    public List<JPPFTask> getCurrentTasks()
 	{
 		return taskList == null ? null : Collections.unmodifiableList(taskList);
 	}
@@ -392,7 +394,8 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getCurrentJobId()
+	@Override
+    public String getCurrentJobId()
 	{
 		return (bundle != null) ? bundle.getJobUuid() : null;
 	}

@@ -184,7 +184,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getJobUuid()
+	@Override
+    public String getJobUuid()
 	{
 		return jobUuid;
 	}
@@ -192,7 +193,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getId()
+	@Override
+    public String getId()
 	{
 		return id;
 	}
@@ -353,7 +355,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * {@inheritDoc}
 	 */
-	public JPPFJobSLA getJobSLA()
+	@Override
+    public JPPFJobSLA getJobSLA()
 	{
 		return jobSLA;
 	}
@@ -370,7 +373,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * {@inheritDoc}
 	 */
-	public JPPFJobMetadata getJobMetadata()
+	@Override
+    public JPPFJobMetadata getJobMetadata()
 	{
 		return jobMetadata;
 	}
@@ -389,7 +393,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * @return th hascode as an int.
 	 * @see java.lang.Object#hashCode()
 	 */
-	public int hashCode()
+	@Override
+    public int hashCode()
 	{
 		final int prime = 31;
 		int result = 1;
@@ -403,7 +408,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * @return true if the two objects are equal, false otherwise.
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object obj)
+	@Override
+    public boolean equals(Object obj)
 	{
 		if (this == obj) return true;
 		if (obj == null) return false;

@@ -57,7 +57,8 @@ class AndroidNodeTaskWrapper extends AbstractNodeTaskWrapper
 	 * Execute the task within a try/catch block.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		long cpuTime = 0L;
 		long elapsedTime = 0L;

@@ -68,7 +68,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	/**
 	 * Holds the currently idle channels.
 	 */
-	private List<ChannelWrapper<?>> idleChannels = new ArrayList<ChannelWrapper<?>>();
+	private final List<ChannelWrapper<?>> idleChannels = new ArrayList<ChannelWrapper<?>>();
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
@@ -96,7 +96,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	/**
 	 * Mapping of channels to their uuid.
 	 */
-	private Map<String, ChannelWrapper<?>> uuidMap = new HashMap<String, ChannelWrapper<?>>();
+	private final Map<String, ChannelWrapper<?>> uuidMap = new HashMap<String, ChannelWrapper<?>>();
 
 	/**
 	 * Initialize this server with a specified port number.
@@ -122,7 +122,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 		this.bundlerRef = new AtomicReference<Bundler>(bundler);
 		((JPPFPriorityQueue) getQueue()).addQueueListener(new QueueListener()
 		{
-			public void newBundle(QueueEvent event)
+			@Override
+            public void newBundle(QueueEvent event)
 			{
 				selector.wakeup();
 				taskQueueChecker.wakeUp();
@@ -154,7 +155,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	/**
 	 * {@inheritDoc}
 	 */
-	protected NioServerFactory<NodeState, NodeTransition> createFactory()
+	@Override
+    protected NioServerFactory<NodeState, NodeTransition> createFactory()
 	{
 		return new NodeServerFactory(this);
 	}
@@ -162,7 +164,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	/**
 	 * {@inheritDoc}
 	 */
-	protected boolean externalStopCondition()
+	@Override
+    protected boolean externalStopCondition()
 	{
 		return driver.isShuttingDown();
 	}
@@ -170,7 +173,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	/**
 	 * {@inheritDoc}
 	 */
-	public void postAccept(ChannelWrapper channel)
+	@Override
+    public void postAccept(ChannelWrapper channel)
 	{
 		if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().addChannel(channel, getName());
 		driver.getStatsManager().newNodeConnection();
@@ -245,7 +249,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * @return an <code>NioContext</code> instance.
 	 * @see org.jppf.server.nio.NioServer#createNioContext()
 	 */
-	public NioContext createNioContext()
+	@Override
+    public NioContext createNioContext()
 	{
 		return new RemoteNodeContext();
 	}
@@ -256,7 +261,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * {@link java.nio.channels.SelectionKey SelectionKey} constants definitions.
 	 * @see org.jppf.server.nio.NioServer#getInitialInterest()
 	 */
-	public int getInitialInterest()
+	@Override
+    public int getInitialInterest()
 	{
 		return SelectionKey.OP_READ;
 	}
@@ -393,7 +399,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	/**
 	 * {@inheritDoc}
 	 */
-	public void connectionFailed(ReaperEvent event)
+	@Override
+    public void connectionFailed(ReaperEvent event)
 	{
 		ServerConnection c = event.getConnection();
 		if (!c.isOk())

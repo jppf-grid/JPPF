@@ -32,7 +32,8 @@ public class JPPFDefaultDriverMBeanProvider implements JPPFDriverMBeanProvider
 	 * @return the fully qualified interface name as a string.
 	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#getMBeanInterfaceName()
 	 */
-	public String getMBeanInterfaceName()
+	@Override
+    public String getMBeanInterfaceName()
 	{
 		return JPPFDriverAdminMBean.class.getName();
 	}
@@ -43,7 +44,8 @@ public class JPPFDefaultDriverMBeanProvider implements JPPFDriverMBeanProvider
 	 * @return an <code>Object</code> that is an implementation of the MBean interface.
 	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.MonitoredNode)
 	 */
-	public Object createMBean()
+	@Override
+    public Object createMBean()
 	{
 		return new JPPFDriverAdmin();
 	}
@@ -55,7 +57,8 @@ public class JPPFDefaultDriverMBeanProvider implements JPPFDriverMBeanProvider
 	 * @return the MBean name for this MBean provider.
 	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#getMBeanName()
 	 */
-	public String getMBeanName()
+	@Override
+    public String getMBeanName()
 	{
 		return JPPFAdminMBean.DRIVER_MBEAN_NAME;
 	}

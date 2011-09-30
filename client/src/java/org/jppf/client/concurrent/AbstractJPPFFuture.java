@@ -58,7 +58,8 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
 	 * @return this method always returns false.
 	 * @see java.util.concurrent.Future#cancel(boolean)
 	 */
-	public boolean cancel(boolean mayInterruptIfRunning)
+	@Override
+    public boolean cancel(boolean mayInterruptIfRunning)
 	{
 		return false;
 	}
@@ -70,7 +71,8 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
 	 * @throws ExecutionException if the computation threw an exception.
 	 * @see java.util.concurrent.Future#get()
 	 */
-	public V get() throws InterruptedException, ExecutionException
+	@Override
+    public V get() throws InterruptedException, ExecutionException
 	{
 		return null;
 	}
@@ -86,7 +88,8 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
 	 * @throws TimeoutException if the wait timed out.
 	 * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
 	 */
-	public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
+	@Override
+    public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
 	{
 		return null;
 	}
@@ -96,7 +99,8 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
 	 * @return true if this task was cancelled before it completed normally.
 	 * @see java.util.concurrent.Future#isCancelled()
 	 */
-	public boolean isCancelled()
+	@Override
+    public boolean isCancelled()
 	{
 		return cancelled.get();
 	}
@@ -107,7 +111,8 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
 	 * @return true if the task completed.
 	 * @see java.util.concurrent.Future#isDone()
 	 */
-	public boolean isDone()
+	@Override
+    public boolean isDone()
 	{
 		return done.get();
 	}

@@ -40,7 +40,8 @@ public class LocalNodeContext extends AbstractNodeContext
 	/**
 	 * {@inheritDoc}.
 	 */
-	public AbstractNodeMessage newMessage()
+	@Override
+    public AbstractNodeMessage newMessage()
 	{
 		return new LocalNodeMessage();
 	}
@@ -48,7 +49,8 @@ public class LocalNodeContext extends AbstractNodeContext
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean readMessage(ChannelWrapper<?> channel) throws Exception
+	@Override
+    public boolean readMessage(ChannelWrapper<?> channel) throws Exception
 	{
 		if (debugEnabled) log.debug("reading message from " + channel);
 		LocalNodeChannel handler = (LocalNodeChannel) channel;
@@ -61,7 +63,8 @@ public class LocalNodeContext extends AbstractNodeContext
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
+	@Override
+    public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
 	{
 		LocalNodeChannel handler = (LocalNodeChannel) channel;
 		boolean b = super.writeMessage(channel);
@@ -73,7 +76,8 @@ public class LocalNodeContext extends AbstractNodeContext
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setNodeMessage(AbstractNodeMessage nodeMessage, ChannelWrapper<?> channel)
+	@Override
+    public void setNodeMessage(AbstractNodeMessage nodeMessage, ChannelWrapper<?> channel)
 	{
 		super.setNodeMessage(nodeMessage, channel);
 		((LocalNodeChannel) channel).wakeUp();
@@ -82,7 +86,8 @@ public class LocalNodeContext extends AbstractNodeContext
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setState(NodeState state)
+	@Override
+    public void setState(NodeState state)
 	{
 		if (NodeState.SENDING_BUNDLE.equals(this.state) && NodeState.IDLE.equals(state))
 		{

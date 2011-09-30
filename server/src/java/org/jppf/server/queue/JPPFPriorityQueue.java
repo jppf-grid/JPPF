@@ -85,7 +85,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @param bundleWrapper the object to add to the queue.
 	 * @see org.jppf.server.queue.JPPFQueue#addBundle(org.jppf.server.protocol.BundleWrapper)
 	 */
-	public void addBundle(BundleWrapper bundleWrapper)
+	@Override
+    public void addBundle(BundleWrapper bundleWrapper)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		JPPFJobSLA sla = bundle.getJobSLA();
@@ -138,7 +139,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @return the most recent object that was added to the queue.
 	 * @see org.jppf.server.queue.AbstractJPPFQueue#nextBundle(int)
 	 */
-	public ServerJob nextBundle(int nbTasks)
+	@Override
+    public ServerJob nextBundle(int nbTasks)
 	{
 		Iterator<BundleWrapper> it = iterator();
 		return it.hasNext() ? nextBundle(it.next(),  nbTasks) : null;
@@ -151,7 +153,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @return the most recent object that was added to the queue.
 	 * @see org.jppf.server.queue.AbstractJPPFQueue#nextBundle(org.jppf.server.protocol.BundleWrapper, int)
 	 */
-	public BundleWrapper nextBundle(BundleWrapper bundleWrapper, int nbTasks)
+	@Override
+    public BundleWrapper nextBundle(BundleWrapper bundleWrapper, int nbTasks)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		BundleWrapper result = null;
@@ -204,7 +207,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @return true if the queue is empty, false otherwise.
 	 * @see org.jppf.server.queue.JPPFQueue#isEmpty()
 	 */
-	public boolean isEmpty()
+	@Override
+    public boolean isEmpty()
 	{
 		lock.lock();
 		try
@@ -222,7 +226,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @return the bundle size as an int.
 	 * @see org.jppf.server.queue.JPPFQueue#getMaxBundleSize()
 	 */
-	public int getMaxBundleSize()
+	@Override
+    public int getMaxBundleSize()
 	{
 		lock.lock();
 		try
@@ -239,7 +244,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	/**
 	 * {@inheritDoc}
 	 */
-	public ServerJob removeBundle(BundleWrapper bundleWrapper)
+	@Override
+    public ServerJob removeBundle(BundleWrapper bundleWrapper)
 	{
 		lock.lock();
 		try
@@ -260,7 +266,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @return an iterator.
 	 * @see java.lang.Iterable#iterator()
 	 */
-	public Iterator<BundleWrapper> iterator()
+	@Override
+    public Iterator<BundleWrapper> iterator()
 	{
 		return new BundleIterator(priorityMap, lock);
 	}
@@ -361,7 +368,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			newBundle.setJobSLA(sla.copy());
 			newBundle.getJobSLA().setExecutionPolicy(broadcastPolicy);
 			newBundle.setCompletionListener(completionListener);
-			newBundle.setParameter(BundleParameter.JOB_ID, bundle.getId() + " [node: " + info.toString() + "]");
+			newBundle.setParameter(BundleParameter.JOB_ID, bundle.getId() + " [node: " + info.toString() + ']');
 			newBundle.setParameter(BundleParameter.JOB_UUID, new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
 			if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getJobUuid() + " :\n" + broadcastPolicy);
 			jobList.add(job);

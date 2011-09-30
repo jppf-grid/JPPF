@@ -61,7 +61,8 @@ class IdentifyingPeerState extends AcceptorServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public AcceptorTransition performTransition(ChannelWrapper<?> channel) throws Exception
+	@Override
+    public AcceptorTransition performTransition(ChannelWrapper<?> channel) throws Exception
 	{
 		AcceptorContext context = (AcceptorContext) channel.getContext();
 		if (context.readMessage(channel))

@@ -131,7 +131,8 @@ class FutureResultCollector extends JPPFResultCollector
 	 * @param event a notification of completion for a set of submitted tasks.
 	 * @see org.jppf.client.JPPFResultCollector#resultsReceived(org.jppf.client.event.TaskResultEvent)
 	 */
-	public synchronized void resultsReceived(TaskResultEvent event)
+	@Override
+    public synchronized void resultsReceived(TaskResultEvent event)
 	{
 		super.resultsReceived(event);
 		if (pendingCount <= 0) fireEvent();

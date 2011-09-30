@@ -31,7 +31,8 @@ public class DriverJobManagementMBeanProvider implements JPPFDriverMBeanProvider
 	 * @return the fully qualified interface name as a string.
 	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#getMBeanInterfaceName()
 	 */
-	public String getMBeanInterfaceName()
+	@Override
+    public String getMBeanInterfaceName()
 	{
 		return DriverJobManagementMBean.class.getName();
 	}
@@ -42,7 +43,8 @@ public class DriverJobManagementMBeanProvider implements JPPFDriverMBeanProvider
 	 * @return an <code>Object</code> that is an implementation of the MBean interface.
 	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.MonitoredNode)
 	 */
-	public Object createMBean()
+	@Override
+    public Object createMBean()
 	{
 		return new DriverJobManagement();
 	}
@@ -54,7 +56,8 @@ public class DriverJobManagementMBeanProvider implements JPPFDriverMBeanProvider
 	 * @return the MBean name for this MBean provider.
 	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#getMBeanName()
 	 */
-	public String getMBeanName()
+	@Override
+    public String getMBeanName()
 	{
 		return DriverJobManagementMBean.MBEAN_NAME;
 	}

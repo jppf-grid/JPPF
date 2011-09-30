@@ -71,7 +71,8 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	/**
 	 * {@inheritDoc}
 	 */
-	protected NioServerFactory<ClientState, ClientTransition> createFactory()
+	@Override
+    protected NioServerFactory<ClientState, ClientTransition> createFactory()
 	{
 		return new ClientServerFactory(this);
 	}
@@ -79,7 +80,8 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	/**
 	 * {@inheritDoc}
 	 */
-	protected boolean externalStopCondition()
+	@Override
+    protected boolean externalStopCondition()
 	{
 		return driver.isShuttingDown();
 	}
@@ -87,7 +89,8 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	/**
 	 * {@inheritDoc}
 	 */
-	public void postAccept(ChannelWrapper channel)
+	@Override
+    public void postAccept(ChannelWrapper channel)
 	{
 		ClientContext context = (ClientContext) channel.getContext();
 		try
@@ -107,7 +110,8 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	 * @return an <code>NioContext</code> instance.
 	 * @see org.jppf.server.nio.NioServer#createNioContext()
 	 */
-	public NioContext createNioContext()
+	@Override
+    public NioContext createNioContext()
 	{
 		return new ClientContext();
 	}
@@ -118,7 +122,8 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	 * {@link java.nio.channels.SelectionKey SelectionKey} constants definitions.
 	 * @see org.jppf.server.nio.NioServer#getInitialInterest()
 	 */
-	public int getInitialInterest()
+	@Override
+    public int getInitialInterest()
 	{
 		return SelectionKey.OP_READ;
 	}

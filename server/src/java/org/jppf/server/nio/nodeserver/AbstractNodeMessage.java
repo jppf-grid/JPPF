@@ -163,15 +163,16 @@ public abstract class AbstractNodeMessage
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
-		StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("[");
+		StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
 		sb.append("nb locations=").append(locations == null ? -1 : locations.size());
 		sb.append(", position=").append(position);
 		sb.append(", nbObjects=").append(nbObjects);
 		sb.append(", length=").append(length);
 		sb.append(", count=").append(count);
-		sb.append("]");
+		sb.append(']');
 		return sb.toString();
 	}
 }

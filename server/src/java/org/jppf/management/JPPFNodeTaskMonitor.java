@@ -89,7 +89,8 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	 * @param event the event encapsulating the task-related data.
 	 * @see org.jppf.server.node.TaskExecutionListener#taskExecuted(org.jppf.server.node.TaskExecutionEvent)
 	 */
-	public void taskExecuted(TaskExecutionEvent event)
+	@Override
+    public void taskExecuted(TaskExecutionEvent event)
 	{
 		TaskInformation info = event.getTaskInformation();
 		taskCount.incrementAndGet();
@@ -105,7 +106,8 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	 * @return the number of tasks as an integer value.
 	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTasksExecuted()
 	 */
-	public Integer getTotalTasksExecuted()
+	@Override
+    public Integer getTotalTasksExecuted()
 	{
 		return taskCount.get();
 	}
@@ -115,7 +117,8 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	 * @return the cpu time as long value.
 	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTaskCpuTime()
 	 */
-	public Long getTotalTaskCpuTime()
+	@Override
+    public Long getTotalTaskCpuTime()
 	{
 		return totalCpuTime.get();
 	}
@@ -125,7 +128,8 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	 * @return the elapsed time as long value.
 	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTaskElapsedTime()
 	 */
-	public Long getTotalTaskElapsedTime()
+	@Override
+    public Long getTotalTaskElapsedTime()
 	{
 		return totalElapsedTime.get();
 	}
@@ -135,7 +139,8 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	 * @return the number as an integer value.
 	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTasksInError()
 	 */
-	public Integer getTotalTasksInError()
+	@Override
+    public Integer getTotalTasksInError()
 	{
 		return taskInErrorCount.get();
 	}
@@ -145,7 +150,8 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	 * @return the number as an integer value.
 	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTasksSucessfull()
 	 */
-	public Integer getTotalTasksSucessfull()
+	@Override
+    public Integer getTotalTasksSucessfull()
 	{
 		return taskSucessfullCount.get();
 	}

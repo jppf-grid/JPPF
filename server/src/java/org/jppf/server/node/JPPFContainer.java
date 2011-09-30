@@ -190,7 +190,8 @@ public abstract class JPPFContainer
 		 * @return a deserialized object.
 		 * @see java.util.concurrent.Callable#call()
 		 */
-		public Object call()
+		@Override
+        public Object call()
 		{
 			ClassLoader cl = Thread.currentThread().getContextClassLoader();
 			try
@@ -209,7 +210,7 @@ public abstract class JPPFContainer
 			}
 			catch(Throwable t)
 			{
-				log.error(t.getMessage() + " [object index: " + index + "]", t);
+				log.error(t.getMessage() + " [object index: " + index + ']', t);
 				return t;
 			}
 			finally

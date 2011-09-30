@@ -72,21 +72,22 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 * @throws Exception if an error is raised during initialization.
 	 * @see org.jppf.client.ClassServerDelegate#init()
 	 */
-	public final void init() throws Exception
+	@Override
+    public final void init() throws Exception
 	{
 		try
 		{
 			handshakeDone = false;
-			socketInitializer.setName("[" + getName() + " - delegate] ");
+			socketInitializer.setName('[' + getName() + " - delegate] ");
 			setStatus(CONNECTING);
 			if (socketClient == null) initSocketClient();
-			String msg = "[client: " + getName() + "] Attempting connection to the class server at " + host + ":" + port;
+			String msg = "[client: " + getName() + "] Attempting connection to the class server at " + host + ':' + port;
 			System.out.println(msg);
 			log.info(msg);
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isSuccessfull() && !socketInitializer.isClosed())
 			{
-				throw new JPPFException("["+getName()+"] Could not reconnect to the class server");
+				throw new JPPFException('[' +getName()+"] Could not reconnect to the class server");
 			}
 			if (!socketInitializer.isClosed())
 			{
@@ -107,7 +108,8 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 * Main processing loop of this delegate.
 	 * @see org.jppf.client.ClassServerDelegate#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{
@@ -121,7 +123,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 					resource = readResource();
 					String name = resource.getName();
 					ClassLoader cl = getClassLoader(resource.getRequestUuid());
-					if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name + " using classloader=" + cl);
+					if  (debugEnabled) log.debug('['+this.getName()+"] resource requested: " + name + " using classloader=" + cl);
 					if (resource.getData("multiple") != null)
 					{
 						List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
@@ -148,8 +150,8 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 						else resource.setCallable(b);
 						if  (debugEnabled)
 						{
-							if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
-							else log.debug("["+this.getName()+"] resource not found: " + name);
+							if (found) log.debug('['+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
+							else log.debug('['+this.getName()+"] resource not found: " + name);
 						}
 					}
 					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
@@ -159,16 +161,16 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 				{
 					if (!closed)
 					{
-						log.warn("["+getName()+"] caught " + e + ", will re-initialise ...", e);
+						log.warn('['+getName()+"] caught " + e + ", will re-initialise ...", e);
 						init();
-						if  (debugEnabled) log.debug("["+this.getName()+"] : successfully iniitalized");
+						if  (debugEnabled) log.debug('['+this.getName()+"] : successfully iniitalized");
 					}
 				}
 			}
 		}
 		catch (Exception e)
 		{
-			log.error("["+getName()+"] "+e.getMessage(), e);
+			log.error('['+getName()+"] "+e.getMessage(), e);
 			close();
 		}
 	}
@@ -179,23 +181,24 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 */
 	private void handshake() throws Exception
 	{
-		if  (debugEnabled) log.debug("[" + getName() + "] : sending channel identifier");
+		if  (debugEnabled) log.debug('[' + getName() + "] : sending channel identifier");
 		socketClient.writeInt(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL);
-		if  (debugEnabled) log.debug("[" + getName() + "] : sending initial resource");
+		if  (debugEnabled) log.debug('[' + getName() + "] : sending initial resource");
 		JPPFResourceWrapper resource = new JPPFResourceWrapper();
 		resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
 		resource.addUuid(clientUuid);
 		writeResource(resource);
 		resource = readResource();
 		handshakeDone = true;
-		if  (debugEnabled) log.debug("[" + getName() + "] : server handshake done");
+		if  (debugEnabled) log.debug('[' + getName() + "] : server handshake done");
 	}
 
 	/**
 	 * Close the socket connection.
 	 * @see org.jppf.client.ClassServerDelegate#close()
 	 */
-	public void close()
+	@Override
+    public void close()
 	{
 		if (!closed)
 		{
@@ -209,7 +212,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			}
 			catch (Exception e)
 			{
-				log.error("["+getName()+"] "+e.getMessage(), e);
+				log.error('['+getName()+"] "+e.getMessage(), e);
 			}
 		}
 	}
@@ -218,7 +221,8 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 * Create a socket initializer for this delegate.
 	 * @return a <code>SocketInitializer</code> instance.
 	 */
-	protected SocketInitializer createSocketInitializer()
+	@Override
+    protected SocketInitializer createSocketInitializer()
 	{
 		return new SocketInitializerImpl();
 	}

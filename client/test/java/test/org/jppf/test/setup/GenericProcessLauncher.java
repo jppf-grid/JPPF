@@ -249,7 +249,7 @@ public class GenericProcessLauncher
 		command.add("-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger");
 		command.add(mainClass);
 		//command.addAll(arguments);
-		command.add("" + processPort);
+		command.add(Integer.toString(processPort));
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command(command);
 		if (dir != null) builder.directory(new File(dir));
@@ -290,7 +290,8 @@ public class GenericProcessLauncher
 			processPort = processServer.getLocalPort();
 			Runnable r = new Runnable()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					while (true)
 					{

@@ -58,7 +58,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @return a collection of <code>NodeManagementInfo</code> instances.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#nodesInformation()
 	 */
-	public Collection<JPPFManagementInfo> nodesInformation()
+	@Override
+    public Collection<JPPFManagementInfo> nodesInformation()
 	{
 		try
 		{
@@ -79,7 +80,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#statistics()
 	 */
-	public JPPFStats statistics() throws Exception
+	@Override
+    public JPPFStats statistics() throws Exception
 	{
 		try
 		{
@@ -100,13 +102,14 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @throws Exception if an error occurred while updating the settings.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#changeLoadBalancerSettings(java.lang.String, java.util.Map)
 	 */
-	public String changeLoadBalancerSettings(String algorithm, Map<Object, Object> parameters) throws Exception
+	@Override
+    public String changeLoadBalancerSettings(String algorithm, Map<Object, Object> parameters) throws Exception
 	{
 		try
 		{
 			if (algorithm == null) return "Error: no algorithm specified (null value)";
 			JPPFBundlerFactory factory = driver.getNodeNioServer().getBundlerFactory();
-			if (!factory.getBundlerProviderNames().contains(algorithm)) return "Error: unknown algorithm '" + algorithm + "'";
+			if (!factory.getBundlerProviderNames().contains(algorithm)) return "Error: unknown algorithm '" + algorithm + '\'';
 			TypedProperties props = new TypedProperties(parameters);
 			Bundler bundler = factory.createBundler(algorithm, props);
 			driver.getNodeNioServer().setBundler(bundler);
@@ -128,7 +131,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#restartShutdown(java.lang.Long, java.lang.Long)
 	 */
-	public String restartShutdown(Long shutdownDelay, Long restartDelay) throws Exception
+	@Override
+    public String restartShutdown(Long shutdownDelay, Long restartDelay) throws Exception
 	{
 		try
 		{
@@ -150,7 +154,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#loadBalancerInformation()
 	 */
-	public LoadBalancingInformation loadBalancerInformation() throws Exception
+	@Override
+    public LoadBalancingInformation loadBalancerInformation() throws Exception
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String algorithm = props.getString("jppf.load.balancing.algorithm", null);
@@ -170,7 +175,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @return a message in the current locale, or the default locale 
 	 * if the localization for the current locale is not found. 
 	 */
-	private String localize(String message)
+	private static String localize(String message)
 	{
 		return LocalizationUtils.getLocalized(I18N_BASE, message);
 	}
@@ -178,7 +183,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	/**
 	 * {@inheritDoc}
 	 */
-	public void resetStatistics() throws Exception
+	@Override
+    public void resetStatistics() throws Exception
 	{
 		driver.getStatsManager().reset();
 	}

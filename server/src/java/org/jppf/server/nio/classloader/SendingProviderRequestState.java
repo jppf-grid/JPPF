@@ -57,7 +57,8 @@ class SendingProviderRequestState extends ClassServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	@Override
+    public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		ClassContext context = (ClassContext) wrapper.getContext();
 		if (CHECK_CONNECTION && wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
@@ -80,7 +81,7 @@ class SendingProviderRequestState extends ClassServerState
 		}
 		if ((context.getCurrentRequest() == null) && !context.getPendingRequests().isEmpty())
 		{
-			ChannelWrapper<?> request = (ChannelWrapper<?>) context.getPendingRequests().remove(0);
+			ChannelWrapper<?> request = context.getPendingRequests().remove(0);
 			ClassContext requestContext = (ClassContext) request.getContext();
 			context.setMessage(null);
 			context.setResource(requestContext.getResource());

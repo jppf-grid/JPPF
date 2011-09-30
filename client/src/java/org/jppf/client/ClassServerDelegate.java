@@ -34,7 +34,8 @@ public interface ClassServerDelegate extends Runnable, ClientConnectionHandler
 	/**
 	 * Close the socket connection.
 	 */
-	void close();
+    @Override
+    void close();
 
 	/**
 	 * Get the name of this delegate.

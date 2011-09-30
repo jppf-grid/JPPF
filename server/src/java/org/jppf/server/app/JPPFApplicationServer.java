@@ -48,7 +48,8 @@ public class JPPFApplicationServer extends JPPFServer
 	 * @return a <code>JPPFServerConnection</code> instance.
 	 * @throws JPPFException if an exception is raised while creating the socket handler.
 	 */
-	protected JPPFConnection createConnection(Socket socket) throws JPPFException
+	@Override
+    protected JPPFConnection createConnection(Socket socket) throws JPPFException
 	{
 		return new ApplicationConnection(this, socket);
 	}

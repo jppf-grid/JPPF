@@ -62,7 +62,8 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
 	 * Initialize this node's resources.
 	 * @throws Exception if an error is raised during initialization.
 	 */
-	public synchronized void postInit() throws Exception
+	@Override
+    public synchronized void postInit() throws Exception
 	{
 		try
 		{
@@ -99,12 +100,12 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
 	 * @return a non-connected <code>SocketChannelClient</code> instance.
 	 * @throws Exception if an error is raised during initialization.
 	 */
-	public SocketChannelClient initSocketChannel() throws Exception
+	@Override
+    public SocketChannelClient initSocketChannel() throws Exception
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String host = props.getString("jppf.peer." + peerName + ".server.host", "localhost");
 		int port = props.getInt("class.peer." + peerName + ".server.port", 11111);
-		SocketChannelClient client = new SocketChannelClient(host, port, false);
-		return client;
+        return new SocketChannelClient(host, port, false);
 	}
 }

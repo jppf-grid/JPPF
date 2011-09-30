@@ -60,7 +60,8 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	 * @return the bundle size as an int.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
-	public int getBundleSize()
+	@Override
+    public int getBundleSize()
 	{
 		return currentSize;
 	}
@@ -79,7 +80,8 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	 * @param time total execution time of the new sample.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
 	 */
-	public void feedback(int bundleSize, double time)
+	@Override
+    public void feedback(int bundleSize, double time)
 	{
 		assert bundleSize > 0;
 		if (debugEnabled)
@@ -187,10 +189,10 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	 * @return a new <code>AutoTunedBundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
-	public Bundler copy()
+	@Override
+    public Bundler copy()
 	{
-		AutoTunedBundler b = new AutoTunedBundler((AnnealingTuneProfile) profile.copy());
-		return b;
+        return new AutoTunedBundler(profile.copy());
 	}
 
 	/**
@@ -198,7 +200,8 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	 * @return the bundle size as an int.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
-	protected int maxSize()
+	@Override
+    protected int maxSize()
 	{
 		return JPPFDriver.getQueue().getMaxBundleSize()/2;
 	}

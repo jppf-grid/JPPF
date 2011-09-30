@@ -90,7 +90,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
 	protected synchronized JPPFJob createJob(String id, int nbTasks, long duration, boolean blocking) throws JPPFException
 	{
 		JPPFJob job = new JPPFJob();
-		job.setId(id + "(" + jobCount.incrementAndGet() + ")");
+		job.setId(id + '(' + jobCount.incrementAndGet() + ')');
 		for (int i=0; i<nbTasks; i++)
 		{
 			JPPFTask task = new LifeCycleTask(duration);

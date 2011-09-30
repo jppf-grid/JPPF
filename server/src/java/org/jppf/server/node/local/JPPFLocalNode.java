@@ -52,7 +52,8 @@ public class JPPFLocalNode extends JPPFNode
 	/**
 	 * {@inheritDoc}
 	 */
-	protected void initDataChannel() throws Exception
+	@Override
+    protected void initDataChannel() throws Exception
 	{
 		nodeIO = new LocalNodeIO(this);
 	}
@@ -60,7 +61,8 @@ public class JPPFLocalNode extends JPPFNode
 	/**
 	 * {@inheritDoc}
 	 */
-	protected void closeDataChannel() throws Exception
+	@Override
+    protected void closeDataChannel() throws Exception
 	{
 	}
 

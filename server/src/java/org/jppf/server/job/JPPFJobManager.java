@@ -184,7 +184,8 @@ public class JPPFJobManager implements QueueListener
 	 * @param event a queue event.
 	 * @see org.jppf.server.queue.QueueListener#newBundle(org.jppf.server.queue.QueueEvent)
 	 */
-	public void newBundle(QueueEvent event)
+	@Override
+    public void newBundle(QueueEvent event)
 	{
 		if (!event.isRequeued()) jobQueued(event.getBundleWrapper());
 		else jobUpdated(event.getBundleWrapper());

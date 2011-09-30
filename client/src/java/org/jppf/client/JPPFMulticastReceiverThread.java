@@ -70,7 +70,8 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 	 * Lookup server configurations from UDP multicasts.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		TypedProperties config = client.getConfig();
 		JPPFMulticastReceiver receiver = new JPPFMulticastReceiver(new IPFilter(config));

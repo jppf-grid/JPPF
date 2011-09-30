@@ -46,7 +46,8 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
 	 * @return a mapping of the states enumeration to the corresponding NioState instances.
 	 * @see org.jppf.server.nio.NioServerFactory#createStateMap()
 	 */
-	public Map<NodeState, NioState<NodeTransition>> createStateMap()
+	@Override
+    public Map<NodeState, NioState<NodeTransition>> createStateMap()
 	{
 		Map<NodeState, NioState<NodeTransition>> map = new EnumMap<NodeState, NioState<NodeTransition>>(NodeState.class);
 		map.put(SEND_INITIAL_BUNDLE, new SendInitialBundleState((NodeNioServer) server));
@@ -62,7 +63,8 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
 	 * @return a mapping of the transitions enumeration to the corresponding NioTransition instances.
 	 * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
 	 */
-	public Map<NodeTransition, NioTransition<NodeState>> createTransitionMap()
+	@Override
+    public Map<NodeTransition, NioTransition<NodeState>> createTransitionMap()
 	{
 		Map<NodeTransition, NioTransition<NodeState>> map =
 			new EnumMap<NodeTransition, NioTransition<NodeState>>(NodeTransition.class);
@@ -82,7 +84,7 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
 	 * @param ops the operations allowed.
 	 * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
 	 */
-	private NioTransition<NodeState> transition(NodeState state, int ops)
+	private static NioTransition<NodeState> transition(NodeState state, int ops)
 	{
 		return new NioTransition<NodeState>(state, ops);
 	}

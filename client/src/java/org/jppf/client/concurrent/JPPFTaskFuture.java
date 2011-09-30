@@ -65,7 +65,8 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 * @return true if the task completed.
 	 * @see org.jppf.client.concurrent.AbstractJPPFFuture#isDone()
 	 */
-	public boolean isDone()
+	@Override
+    public boolean isDone()
 	{
 		//done.compareAndSet(false, collector.isTaskReceived(position));
 		return done.get();
@@ -78,7 +79,8 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 * @throws ExecutionException if the computation threw an exception.
 	 * @see java.util.concurrent.Future#get()
 	 */
-	public V get() throws InterruptedException, ExecutionException
+	@Override
+    public V get() throws InterruptedException, ExecutionException
 	{
 		V v = null;
 		try
@@ -103,7 +105,8 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 * @throws TimeoutException if the wait timed out.
 	 * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
 	 */
-	public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
+	@Override
+    public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
 	{
 		long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
 		getResult(millis);

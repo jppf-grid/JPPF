@@ -76,7 +76,8 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	 * @return the bundle size as an int.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
-	public int getBundleSize()
+	@Override
+    public int getBundleSize()
 	{
 		return currentSize;
 	}
@@ -95,7 +96,8 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	 * @param time total execution time of the new sample.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
 	 */
-	public void feedback(int bundleSize, double time)
+	@Override
+    public void feedback(int bundleSize, double time)
 	{
 		assert bundleSize > 0;
 		if (debugEnabled)

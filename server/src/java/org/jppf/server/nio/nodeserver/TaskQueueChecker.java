@@ -90,7 +90,8 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	 * Perform the assignment of tasks.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		while (!isStopped())
 		{

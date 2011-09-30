@@ -66,7 +66,8 @@ class ShutdownRestartTask extends TimerTask
 	 * Perform the actual shutdown, and eventually restart, as specified in the constructor.
 	 * @see java.util.TimerTask#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		log.info("Initiating shutdown");
 		JPPFDriver.getInstance().shutdown();
@@ -79,7 +80,8 @@ class ShutdownRestartTask extends TimerTask
 		{
 			TimerTask task = new TimerTask()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					try
 					{

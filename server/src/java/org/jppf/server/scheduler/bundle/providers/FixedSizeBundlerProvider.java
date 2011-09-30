@@ -35,7 +35,8 @@ public class FixedSizeBundlerProvider implements JPPFBundlerProvider
 	 * @return an instance of the bundler implementation defined by this provider.
 	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createBundler(org.jppf.server.scheduler.bundle.LoadBalancingProfile)
 	 */
-	public Bundler createBundler(LoadBalancingProfile profile)
+	@Override
+    public Bundler createBundler(LoadBalancingProfile profile)
 	{
 		return new FixedSizeBundler(profile);
 	}
@@ -46,7 +47,8 @@ public class FixedSizeBundlerProvider implements JPPFBundlerProvider
 	 * @return an {@link org.jppf.server.scheduler.bundle.fixedsize.FixedSizeProfile FixedSizeProfile} instance.
 	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
 	 */
-	public LoadBalancingProfile createProfile(TypedProperties configuration)
+	@Override
+    public LoadBalancingProfile createProfile(TypedProperties configuration)
 	{
 		return new FixedSizeProfile(configuration);
 	}
@@ -56,7 +58,8 @@ public class FixedSizeBundlerProvider implements JPPFBundlerProvider
 	 * @return the algorithm's name as a string.
 	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#getAlgorithmName()
 	 */
-	public String getAlgorithmName()
+	@Override
+    public String getAlgorithmName()
 	{
 		return "manual";
 	}

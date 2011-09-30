@@ -71,7 +71,8 @@ public class JPPFLocalContainer extends JPPFContainer
 	 * @return the new position in the source data after deserialization.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	public int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Exception
+	@Override
+    public int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Exception
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try
@@ -124,7 +125,8 @@ public class JPPFLocalContainer extends JPPFContainer
 		 * @return a deserialized object.
 		 * @see java.util.concurrent.Callable#call()
 		 */
-		public Object call()
+		@Override
+        public Object call()
 		{
 			ClassLoader cl = Thread.currentThread().getContextClassLoader();
 			try
@@ -139,7 +141,7 @@ public class JPPFLocalContainer extends JPPFContainer
 			}
 			catch(Throwable t)
 			{
-				log.error(t.getMessage() + " [object index: " + index + "]", t);
+				log.error(t.getMessage() + " [object index: " + index + ']', t);
 				return t;
 			}
 			finally

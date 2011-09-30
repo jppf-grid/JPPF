@@ -98,7 +98,8 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	/**
 	 * {@inheritDoc}
 	 */
-	public void handleException(ChannelWrapper<?> channel)
+	@Override
+    public void handleException(ChannelWrapper<?> channel)
 	{
 		ClassNioServer.closeConnection(channel);
 	}

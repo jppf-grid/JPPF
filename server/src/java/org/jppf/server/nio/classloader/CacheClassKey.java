@@ -49,7 +49,8 @@ public class CacheClassKey
 	 * @return true if the 2 keys a re equal, false otherwise.
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object obj)
+	@Override
+    public boolean equals(Object obj)
 	{
 		if (obj instanceof CacheClassKey)
 		{
@@ -64,7 +65,8 @@ public class CacheClassKey
 	 * @return the hashcode as an int value.
 	 * @see java.lang.Object#hashCode()
 	 */
-	public int hashCode()
+	@Override
+    public int hashCode()
 	{
 		return uuid.hashCode() + 13*res.hashCode();
 	}
@@ -72,8 +74,9 @@ public class CacheClassKey
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
-		return "CacheClassKey[uuid=" + uuid + ", res=" + res + "]";
+		return "CacheClassKey[uuid=" + uuid + ", res=" + res + ']';
 	}
 }

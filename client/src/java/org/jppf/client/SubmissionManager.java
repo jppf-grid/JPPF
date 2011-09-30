@@ -71,7 +71,8 @@ public class SubmissionManager extends ThreadSynchronization implements Runnable
 	 * when the queue has one and a connnection is available.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		while (!isStopped())
 		{

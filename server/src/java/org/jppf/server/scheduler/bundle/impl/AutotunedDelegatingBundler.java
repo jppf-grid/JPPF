@@ -80,7 +80,8 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	 * @return a <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
-	public Bundler copy()
+	@Override
+    public Bundler copy()
 	{
 		return new AutotunedDelegatingBundler(profile);
 	}
@@ -90,7 +91,8 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	 * @return  the bundle size as an int value.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
-	public int getBundleSize()
+	@Override
+    public int getBundleSize()
 	{
 		return simpleBundler.getBundleSize();
 	}
@@ -101,7 +103,8 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	 * @param totalTime the time in milliseconds it took to execute the tasks.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
 	 */
-	public void feedback(int bundleSize, double totalTime)
+	@Override
+    public void feedback(int bundleSize, double totalTime)
 	{
 		simpleBundler.feedback(bundleSize, totalTime);
 	}
@@ -111,7 +114,8 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	 * @return the bundle size as an int.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
-	protected int maxSize()
+	@Override
+    protected int maxSize()
 	{
 		int max = 0;
 		synchronized(simpleBundler)

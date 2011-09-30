@@ -109,7 +109,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	 * Read all client connection information from the configuration and initialize
 	 * the connection pools accordingly.
 	 */
-  @SuppressWarnings("unchecked")
+    @Override
+    @SuppressWarnings("unchecked")
 	protected void initPools()
 	{
   	if (debugEnabled) log.debug("initializing connections");
@@ -146,7 +147,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 					info.host = config.getString(name + ".jppf.server.host", "localhost");
 					info.serverPorts = new int[] { config.getInt(name + "jppf.server.port", 11111) };
 					info.managementPort = config.getInt(name + ".jppf.management.port", 11198);
-					AbstractJPPFClientConnection c = createConnection(uuid, (n > 1) ? name + "-" + i : name, info);
+					AbstractJPPFClientConnection c = createConnection(uuid, (n > 1) ? name + '-' + i : name, info);
 					c.setPriority(config.getInt(name + ".priority", 0));
 					newConnection(c);
 				}
@@ -192,7 +193,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	 * @param c the connection that failed.
 	 * @see org.jppf.client.AbstractJPPFClient#newConnection(org.jppf.client.JPPFClientConnection)
 	 */
-	public void newConnection(JPPFClientConnection c)
+	@Override
+    public void newConnection(JPPFClientConnection c)
 	{
 		log.info("Connection [" + c.getName() + "] created");
 		c.addClientConnectionStatusListener(this);
@@ -251,7 +253,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	/**
 	 * Close this client and release all the resources it is using.
 	 */
-	public void close()
+	@Override
+    public void close()
 	{
 		super.close();
 		if (receiverThread != null) receiverThread.setStopped(true);
@@ -298,9 +301,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 		 * Perform the initialization of a client connection.
 		 * @see java.lang.Runnable#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
-			if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
+			if (debugEnabled) log.debug("initializing driver connection '" + c+ '\'');
 			c.init();
 		}
 	}
@@ -340,7 +344,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	 */
 	public boolean isLocalExecutionEnabled()
 	{
-		return loadBalancer == null ? false : loadBalancer.isLocalEnabled();
+		return loadBalancer != null && loadBalancer.isLocalEnabled();
 	}
 
 	/**
@@ -412,7 +416,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	 * @param event the event to notify of.
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
-	public void statusChanged(ClientConnectionStatusEvent event)
+	@Override
+    public void statusChanged(ClientConnectionStatusEvent event)
 	{
 		super.statusChanged(event);
 		JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();

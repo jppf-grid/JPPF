@@ -43,7 +43,8 @@ public class TaskWrapper implements Runnable
 	 * Run the task and handle uncaught exceptions.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{

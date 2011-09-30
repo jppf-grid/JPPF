@@ -36,7 +36,8 @@ public class AutoTunedBundlerProvider implements JPPFBundlerProvider
 	 * @return an instance of the bundler implementation defined by this provider.
 	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createBundler(org.jppf.server.scheduler.bundle.LoadBalancingProfile)
 	 */
-	public Bundler createBundler(LoadBalancingProfile profile)
+	@Override
+    public Bundler createBundler(LoadBalancingProfile profile)
 	{
 		return new AutoTunedBundler(profile);
 	}
@@ -47,7 +48,8 @@ public class AutoTunedBundlerProvider implements JPPFBundlerProvider
 	 * @return an {@link org.jppf.server.scheduler.bundle.autotuned.AnnealingTuneProfile AnnealingTuneProfile} instance.
 	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
 	 */
-	public LoadBalancingProfile createProfile(TypedProperties configuration)
+	@Override
+    public LoadBalancingProfile createProfile(TypedProperties configuration)
 	{
 		return new AnnealingTuneProfile(configuration);
 	}
@@ -57,7 +59,8 @@ public class AutoTunedBundlerProvider implements JPPFBundlerProvider
 	 * @return the algorithm's name as a string.
 	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#getAlgorithmName()
 	 */
-	public String getAlgorithmName()
+	@Override
+    public String getAlgorithmName()
 	{
 		return "autotuned";
 	}

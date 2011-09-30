@@ -57,7 +57,8 @@ public class AnsdroidClassLoaderManager extends AbstractClassLoaderManager
 	/**
 	 * {@inheritDoc}
 	 */
-	protected AbstractJPPFClassLoader createClassLoader()
+	@Override
+    protected AbstractJPPFClassLoader createClassLoader()
 	{
 		if (debugEnabled) log.debug("Initializing classloader");
 		if (classLoader == null) classLoader = NodeRunner.getJPPFClassLoader();
@@ -67,7 +68,8 @@ public class AnsdroidClassLoaderManager extends AbstractClassLoaderManager
 	/**
 	 * {@inheritDoc}
 	 */
-	protected JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception
+	@Override
+    protected JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception
 	{
 		return new JPPFAndroidContainer(node.getSocketWrapper(), uuidPath, cl);
 	}
@@ -75,11 +77,13 @@ public class AnsdroidClassLoaderManager extends AbstractClassLoaderManager
 	/**
 	 * {@inheritDoc}
 	 */
-	protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
+	@Override
+    protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
 	{
 		return new Callable<AbstractJPPFClassLoader>()
 		{
-			public AbstractJPPFClassLoader call()
+			@Override
+            public AbstractJPPFClassLoader call()
 			{
 				return new JPPFClassLoader(getClassLoader(), uuidPath);
 			}

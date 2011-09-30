@@ -30,7 +30,8 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	/**
 	 * Called to notify that a new client is connected to he JPPF server.
 	 */
-	public synchronized void newClientConnection()
+	@Override
+    public synchronized void newClientConnection()
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.newClientConnection();
 	}
@@ -38,7 +39,8 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	/**
 	 * Called to notify that a new client has disconnected from he JPPF server.
 	 */
-	public synchronized void clientConnectionClosed()
+	@Override
+    public synchronized void clientConnectionClosed()
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.clientConnectionClosed();
 	}
@@ -46,7 +48,8 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	/**
 	 * Called to notify that a new node is connected to he JPPF server.
 	 */
-	public synchronized void newNodeConnection()
+	@Override
+    public synchronized void newNodeConnection()
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.newNodeConnection();
 	}
@@ -54,7 +57,8 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	/**
 	 * Called to notify that a new node is connected to he JPPF server.
 	 */
-	public synchronized void nodeConnectionClosed()
+	@Override
+    public synchronized void nodeConnectionClosed()
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.nodeConnectionClosed();
 	}
@@ -63,7 +67,8 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	 * Called to notify that a task was added to the queue.
 	 * @param count the number of tasks that have been added to the queue.
 	 */
-	public synchronized void taskInQueue(int count)
+	@Override
+    public synchronized void taskInQueue(int count)
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.taskInQueue(count);
 	}
@@ -73,7 +78,8 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	 * @param count the number of tasks that have been removed from the queue.
 	 * @param time the time the task remained in the queue.
 	 */
-	public synchronized void taskOutOfQueue(int count, long time)
+	@Override
+    public synchronized void taskOutOfQueue(int count, long time)
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.taskOutOfQueue(count, time);
 	}
@@ -85,7 +91,8 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	 * @param remoteTime the time it took to execute the in the node only.
 	 * @param size the size in bytes of the bundle that was sent to the node.
 	 */
-	public synchronized void taskExecuted(int count, long time, long remoteTime, long size)
+	@Override
+    public synchronized void taskExecuted(int count, long time, long remoteTime, long size)
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.taskExecuted(count, time, remoteTime, size);
 	}
@@ -93,7 +100,8 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	/**
 	 * {@inheritDoc}
 	 */
-	public void reset()
+	@Override
+    public void reset()
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.reset();
 	}

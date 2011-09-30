@@ -76,7 +76,7 @@ public class GridMonitor
 	/**
 	 * Holds the memory usage snapshots for all the nodes.
 	 */
-	private Map<String, List<NodeData>> dataMap = new TreeMap<String, List<NodeData>>();
+	private final Map<String, List<NodeData>> dataMap = new TreeMap<String, List<NodeData>>();
 	/**
 	 * Interval at which memory usage snapshots are taken.
 	 */
@@ -283,9 +283,9 @@ public class GridMonitor
 		public String toCSV()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.append(timestamp).append(",");
-			sb.append(committed).append(",");
-			sb.append(used).append(",");
+			sb.append(timestamp).append(',');
+			sb.append(committed).append(',');
+			sb.append(used).append(',');
 			sb.append(maxAvailable);
 			return sb.toString();
 		}
@@ -302,7 +302,8 @@ public class GridMonitor
 		/**
 		 * {@inheritDoc}
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			try
 			{
@@ -357,11 +358,11 @@ public class GridMonitor
 				// create a file for each node, named node-x.csv
 				BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dir, "node-" + nodeCount + ".csv")));
 				// write the node name or ip
-				writer.write("node:," + entry.getKey() + "\n");
+				writer.write("node:," + entry.getKey() + '\n');
 				// write the comumn names
-				writer.write(NodeData.getHeader() + "\n");
+				writer.write(NodeData.getHeader() + '\n');
 				// write each sdapshot as a CSV-formatted row
-				for (NodeData data: entry.getValue()) writer.write(data.toCSV() + "\n");
+				for (NodeData data: entry.getValue()) writer.write(data.toCSV() + '\n');
 				writer.flush();
 				writer.close();
 				nodeCount++;
@@ -389,7 +390,7 @@ public class GridMonitor
 	 */
 	public JPPFManagement[] getNodes()
 	{
-		return nodes.values().toArray(new JPPFManagement[0]);
+		return nodes.values().toArray(new JPPFManagement[nodes.size()]);
 	}
 
 	/**

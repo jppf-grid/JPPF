@@ -46,7 +46,8 @@ final class AcceptorServerFactory extends NioServerFactory<AcceptorState, Accept
 	 * @return a mapping of the states enumeration to the corresponding NioState instances.
 	 * @see org.jppf.server.nio.NioServerFactory#createStateMap()
 	 */
-	public Map<AcceptorState, NioState<AcceptorTransition>> createStateMap()
+	@Override
+    public Map<AcceptorState, NioState<AcceptorTransition>> createStateMap()
 	{
 		Map<AcceptorState, NioState<AcceptorTransition>> map = new EnumMap<AcceptorState, NioState<AcceptorTransition>>(AcceptorState.class);
 		map.put(IDENTIFYING_PEER, new IdentifyingPeerState((AcceptorNioServer) server));
@@ -59,7 +60,8 @@ final class AcceptorServerFactory extends NioServerFactory<AcceptorState, Accept
 	 * @return a mapping of the transitions enumeration to the corresponding NioTransition instances.
 	 * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
 	 */
-	public Map<AcceptorTransition, NioTransition<AcceptorState>> createTransitionMap()
+	@Override
+    public Map<AcceptorTransition, NioTransition<AcceptorState>> createTransitionMap()
 	{
 		Map<AcceptorTransition, NioTransition<AcceptorState>> map =
 			new EnumMap<AcceptorTransition, NioTransition<AcceptorState>>(AcceptorTransition.class);
@@ -74,7 +76,7 @@ final class AcceptorServerFactory extends NioServerFactory<AcceptorState, Accept
 	 * @param ops the operations allowed.
 	 * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
 	 */
-	private NioTransition<AcceptorState> transition(AcceptorState state, int ops)
+	private static NioTransition<AcceptorState> transition(AcceptorState state, int ops)
 	{
 		return new NioTransition<AcceptorState>(state, ops);
 	}

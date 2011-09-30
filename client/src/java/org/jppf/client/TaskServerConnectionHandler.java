@@ -58,7 +58,8 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
 	 * @return a <code>SocketInitializer</code> instance.
 	 * @see org.jppf.client.AbstractClientConnectionHandler#createSocketInitializer()
 	 */
-	protected SocketInitializer createSocketInitializer()
+	@Override
+    protected SocketInitializer createSocketInitializer()
 	{
 		return new SocketInitializerImpl();
 	}
@@ -67,19 +68,20 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
 	 * Initialize the connection.
 	 * @throws Exception if an error is raised while initializing the connection.
 	 */
-	public void init() throws Exception
+	@Override
+    public void init() throws Exception
 	{
 		try
 		{
 			setStatus(CONNECTING);
 			if (socketClient == null) initSocketClient();
-			String msg = "[client: "+name+"] Attempting connection to the JPPF task server at " + host + ":" + port;
+			String msg = "[client: "+name+"] Attempting connection to the JPPF task server at " + host + ':' + port;
 			System.out.println(msg);
 			if (debugEnabled) log.debug(msg);
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isSuccessfull())
 			{
-				throw new JPPFException("["+name+"] Could not reconnect to the JPPF task server");
+				throw new JPPFException('[' +name+"] Could not reconnect to the JPPF task server");
 			}
 			if (debugEnabled) log.debug("sending JPPF identifier");
 			socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
@@ -100,7 +102,8 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
 	 * @throws Exception if an error is raised during initialization.
 	 * @see org.jppf.client.AbstractClientConnectionHandler#initSocketClient()
 	 */
-	public void initSocketClient() throws Exception
+	@Override
+    public void initSocketClient() throws Exception
 	{
 		socketClient = new SocketClient();
 		socketClient.setHost(host);
@@ -111,7 +114,8 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
 	 * Close and cleanup this connection handler.
 	 * @see org.jppf.client.ClientConnectionHandler#close()
 	 */
-	public void close()
+	@Override
+    public void close()
 	{
 		try
 		{
@@ -120,7 +124,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
 		}
 		catch(Exception e)
 		{
-			log.error("[" + name + "] "+ e.getMessage(), e);
+			log.error('[' + name + "] "+ e.getMessage(), e);
 		}
 	}
 }

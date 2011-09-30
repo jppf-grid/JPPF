@@ -46,7 +46,8 @@ final class ClassServerFactory	extends NioServerFactory<ClassState, ClassTransit
 	 * @return a mapping of the states enumeration to the corresponding NioStateInstances.
 	 * @see org.jppf.server.nio.NioServerFactory#createStateMap()
 	 */
-	public Map<ClassState, NioState<ClassTransition>> createStateMap()
+	@Override
+    public Map<ClassState, NioState<ClassTransition>> createStateMap()
 	{
 		Map<ClassState, NioState<ClassTransition>> map =
 			new EnumMap<ClassState, NioState<ClassTransition>>(ClassState.class);
@@ -66,7 +67,8 @@ final class ClassServerFactory	extends NioServerFactory<ClassState, ClassTransit
 	 * @return a mapping of the states enumeration to the corresponding NioStateInstances.
 	 * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
 	 */
-	public Map<ClassTransition, NioTransition<ClassState>> createTransitionMap()
+	@Override
+    public Map<ClassTransition, NioTransition<ClassState>> createTransitionMap()
 	{
 		Map<ClassTransition, NioTransition<ClassState>> map =
 			new EnumMap<ClassTransition, NioTransition<ClassState>>(ClassTransition.class);

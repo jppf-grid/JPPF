@@ -198,7 +198,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 				if (oneAttempt) break;
 			}
 		}
-		if (debugEnabled && (connection != null)) log.debug("found client connection \"" + connection + "\"");
+		if (debugEnabled && (connection != null)) log.debug("found client connection \"" + connection + '\"');
 		return connection;
 	}
 
@@ -223,7 +223,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * @param event the event to notify of.
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
-	public void statusChanged(ClientConnectionStatusEvent event)
+	@Override
+    public void statusChanged(ClientConnectionStatusEvent event)
 	{
 		JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
 		if (c.getStatus().equals(JPPFClientConnectionStatus.FAILED)) connectionFailed(c);
@@ -348,7 +349,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		 * @return -1 if o1 > o2, 0 if o1 == o2, 1 if o1 < o2
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
-		public int compare(Integer o1, Integer o2)
+		@Override
+        public int compare(Integer o1, Integer o2)
 		{
 			return o2 - o1; 
 		}

@@ -106,7 +106,8 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	/**
 	 * {@inheritDoc}
 	 */
-	public void handleException(ChannelWrapper<?> channel)
+	@Override
+    public void handleException(ChannelWrapper<?> channel)
 	{
 		ClientNioServer.closeClient(channel);
 		cancelJobOnClose();
@@ -191,7 +192,8 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean readMessage(ChannelWrapper<?> channel) throws Exception
+	@Override
+    public boolean readMessage(ChannelWrapper<?> channel) throws Exception
 	{
 		if (clientMessage == null) clientMessage = newMessage();
 		return getClientMessage().read(channel);
@@ -200,7 +202,8 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
+	@Override
+    public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
 	{
 		return getClientMessage().write(channel);
 	}

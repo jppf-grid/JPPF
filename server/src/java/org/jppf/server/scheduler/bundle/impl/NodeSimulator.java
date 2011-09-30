@@ -58,7 +58,7 @@ public class NodeSimulator
 	/**
 	 * Relative speed of the node.
 	 */
-	private double speed = 0d;
+	private double speed = 0.0d;
 
 	/**
 	 * Initialize this simulator with the specified parameters.
@@ -87,7 +87,7 @@ public class NodeSimulator
 		{
 			long start = System.currentTimeMillis();
 			long a = (long) latency;
-			int b = (int) ((latency - a) * 1e6);
+			int b = (int) ((latency - a) * 1.0e6);
 			Thread.sleep(a, b);
 			Thread.sleep((long) (sizeMB * dynamicOverhead));
 			for (int i=0; i<nbTasks; i++) Thread.sleep((long) (timePerTask/speed));
@@ -114,8 +114,8 @@ public class NodeSimulator
 
 			nbNodes = 2;
 			int maxTasks = 1000;
-			double size = 16d;
-			double dataProviderSize = 8d;
+			double size = 16.0d;
+			double dataProviderSize = 8.0d;
 			long timePerTask = 5;
 			int nbIter = 20;
 
@@ -216,7 +216,8 @@ public class NodeSimulator
 		 * Run this task.
 		 * @see java.lang.Runnable#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			simulator.run(bundler, sizeMB, nbTasks, timePerTask);
 		}
@@ -249,7 +250,8 @@ public class NodeSimulator
 		 * @return the bundle size as an int.
 		 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 		 */
-		protected int maxSize()
+		@Override
+        protected int maxSize()
 		{
 			return maximumSize;
 		}
@@ -259,7 +261,8 @@ public class NodeSimulator
 	 * @return a <code>Bundler</code> instance.
 		 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 		 */
-		public Bundler copy()
+		@Override
+        public Bundler copy()
 		{
 			return new SimulatedProportionalBundler(profile, maximumSize);
 		}

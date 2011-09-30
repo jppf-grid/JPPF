@@ -56,7 +56,8 @@ class RunnableWrapper<V> implements Callable<V>, Serializable
 	 * @return the result specified in the constructor.
 	 * @see java.util.concurrent.Callable#call()
 	 */
-	public V call()
+	@Override
+    public V call()
 	{
 		runnable.run();
 		return result;

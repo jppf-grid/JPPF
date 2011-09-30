@@ -80,7 +80,8 @@ class PeerNode extends AbstractMonitoredNode
 	 * Main processing loop of this node.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		stopped = false;
 		if (debugEnabled) log.debug(getName() + "Start of peer node main loop");
@@ -252,7 +253,7 @@ class PeerNode extends AbstractMonitoredNode
 	private BundleWrapper readBundle() throws Exception
 	{
 		// Read the request header - with tasks count information
-		byte bytes[] = socketClient.receiveBytes(0).getBuffer();
+		byte[] bytes = socketClient.receiveBytes(0).getBuffer();
 		JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(bytes);
 		if (debugEnabled) log.debug("received header from peer driver, data length = " + bytes.length);
 		bytes = null;
@@ -283,7 +284,8 @@ class PeerNode extends AbstractMonitoredNode
 	 * @param closeSocket determines whether the underlying socket should be closed.
 	 * @see org.jppf.node.MonitoredNode#stopNode(boolean)
 	 */
-	public void stopNode(boolean closeSocket)
+	@Override
+    public void stopNode(boolean closeSocket)
 	{
 		if (debugEnabled) log.debug(getName() + "closing node");
 		stopped = true;

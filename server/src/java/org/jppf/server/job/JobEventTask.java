@@ -71,7 +71,8 @@ public class JobEventTask implements Runnable
 	 * Execute this task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		JPPFJobSLA sla = bundle.getJobSLA();
 		Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);

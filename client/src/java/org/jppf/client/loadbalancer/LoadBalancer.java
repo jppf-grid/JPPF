@@ -137,7 +137,7 @@ public class LoadBalancer
 			List<JPPFTask> tasks = job.getTasks();
 			if (connection != null)
 			{
-				int bundleSize[] = new int[2];
+				int[] bundleSize = new int[2];
 				synchronized(bundlers)
 				{
 					for (int i=LOCAL; i<=REMOTE; i++)
@@ -154,7 +154,7 @@ public class LoadBalancer
 					for (int i=LOCAL; i<=REMOTE; i++) bundleSize[i] += diff/2;
 					if (tasks.size() > sum(bundleSize)) bundleSize[LOCAL]++;
 				}
-				if (debugEnabled) log.debug("bundlers[local=" + bundleSize[LOCAL] + ", remote=" + bundleSize[REMOTE] + "]");
+				if (debugEnabled) log.debug("bundlers[local=" + bundleSize[LOCAL] + ", remote=" + bundleSize[REMOTE] + ']');
 				List<List<JPPFTask>> list = new ArrayList<List<JPPFTask>>();
 				int idx = 0;
 				for (int i=LOCAL; i<=REMOTE; i++)
@@ -200,7 +200,7 @@ public class LoadBalancer
 	 * @param array the input array. 
 	 * @return the result sum as an int value.
 	 */
-	private static int sum(int array[])
+	private static int sum(int[] array)
 	{
 		int sum = 0;
         for (int anArray : array) sum += anArray;

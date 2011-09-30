@@ -79,7 +79,8 @@ abstract class JPPFServer extends Thread
 	 * Start the underlying server socket by making it accept incoming connections.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{
@@ -198,7 +199,7 @@ abstract class JPPFServer extends Thread
 			}
 			catch(Exception e)
 			{
-				log.error("["+connection.toString()+"] "+e.getMessage(), e);
+				log.error('['+connection.toString()+"] "+e.getMessage(), e);
 			}
 		}
 		connections.clear();

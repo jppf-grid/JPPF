@@ -58,7 +58,8 @@ class WaitingNodeRequestState extends ClassServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ClassTransition performTransition(ChannelWrapper<?> channel) throws Exception
+	@Override
+    public ClassTransition performTransition(ChannelWrapper<?> channel) throws Exception
 	{
 		ClassContext context = (ClassContext) channel.getContext();
 		if (context.readMessage(channel))

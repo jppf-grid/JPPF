@@ -40,14 +40,16 @@ public class LocalClassContext extends ClassContext
 	/**
 	 * {@inheritDoc}
 	 */
-	public void serializeResource(ChannelWrapper<?> wrapper) throws Exception
+	@Override
+    public void serializeResource(ChannelWrapper<?> wrapper) throws Exception
 	{
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public JPPFResourceWrapper deserializeResource() throws Exception
+	@Override
+    public JPPFResourceWrapper deserializeResource() throws Exception
 	{
 		return resource;
 	}
@@ -58,7 +60,8 @@ public class LocalClassContext extends ClassContext
 	 * @return true if all the data has been read, false otherwise.
 	 * @throws Exception if an error occurs while reading the data.
 	 */
-	public boolean readMessage(ChannelWrapper<?> wrapper) throws Exception
+	@Override
+    public boolean readMessage(ChannelWrapper<?> wrapper) throws Exception
 	{
 		LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
 		if (traceEnabled) log.trace("reading message for " + wrapper + ", message = " + message);
@@ -75,7 +78,8 @@ public class LocalClassContext extends ClassContext
 	 * @return true if all the data has been written, false otherwise.
 	 * @throws Exception if an error occurs while writing the data.
 	 */
-	public boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception
+	@Override
+    public boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception
 	{
 		if (traceEnabled) log.trace("writing message for " + wrapper + ", resource=" + resource);
 		LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;

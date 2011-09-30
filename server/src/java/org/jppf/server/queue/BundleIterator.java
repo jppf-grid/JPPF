@@ -67,7 +67,8 @@ class BundleIterator implements Iterator<BundleWrapper>
 	 * @return true if there is at least one element that hasn't been visited, false otherwise.
 	 * @see java.util.Iterator#hasNext()
 	 */
-	public boolean hasNext()
+	@Override
+    public boolean hasNext()
 	{
 		lock.lock();
 		try
@@ -85,7 +86,8 @@ class BundleIterator implements Iterator<BundleWrapper>
 	 * @return the next element as a <code>JPPFTaskBundle</code> instance.
 	 * @see java.util.Iterator#next()
 	 */
-	public BundleWrapper next()
+	@Override
+    public BundleWrapper next()
 	{
 		lock.lock();
 		try
@@ -112,7 +114,8 @@ class BundleIterator implements Iterator<BundleWrapper>
 	 * @throws UnsupportedOperationException as this operation is not supported.
 	 * @see java.util.Iterator#remove()
 	 */
-	public void remove() throws UnsupportedOperationException
+	@Override
+    public void remove() throws UnsupportedOperationException
 	{
 		throw new UnsupportedOperationException("remove() is not supported on a BundleIterator");
 	}

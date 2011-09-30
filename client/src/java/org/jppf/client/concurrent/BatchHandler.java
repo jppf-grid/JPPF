@@ -136,7 +136,8 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	/**
 	 * {@inheritDoc}
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		start = System.currentTimeMillis();
 		while (!isStopped())

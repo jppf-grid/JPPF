@@ -71,7 +71,8 @@ public class SimpleCallable implements Callable<Result>, Serializable
 	 * @return a {@link Result} object.
 	 * @see java.util.concurrent.Callable#call()
 	 */
-	public Result call()
+	@Override
+    public Result call()
 	{
 		Result executionResult = new Result();
 		executionResult.message = BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE;

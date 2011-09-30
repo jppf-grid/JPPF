@@ -58,10 +58,11 @@ class JobExpirationAction implements Runnable
 	 * Execute this action.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-		String jobId = (String) bundle.getId();
+		String jobId = bundle.getId();
 		try
 		{
 			if (debugEnabled) log.debug("job '" + jobId + "' is expiring");

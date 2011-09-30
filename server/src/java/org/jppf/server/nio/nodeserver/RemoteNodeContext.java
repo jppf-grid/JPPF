@@ -29,7 +29,8 @@ public class RemoteNodeContext extends AbstractNodeContext
 	/**
 	 * {@inheritDoc}.
 	 */
-	public AbstractNodeMessage newMessage()
+	@Override
+    public AbstractNodeMessage newMessage()
 	{
 		return new RemoteNodeMessage();
 	}

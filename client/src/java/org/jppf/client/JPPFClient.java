@@ -91,7 +91,8 @@ public class JPPFClient extends AbstractGenericClient
 	 * Initialize this client's configuration.
 	 * @param configuration an object holding the JPPF configuration.
 	 */
-	protected void initConfig(Object configuration)
+	@Override
+    protected void initConfig(Object configuration)
 	{
 		config = (TypedProperties) configuration;
 	}
@@ -103,7 +104,8 @@ public class JPPFClient extends AbstractGenericClient
 	 * @param info the driver connection information.
 	 * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
 	 */
-	protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
+	@Override
+    protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
 	{
 		return new JPPFClientConnectionImpl(this, uuid, name, info);
 	}
@@ -115,7 +117,8 @@ public class JPPFClient extends AbstractGenericClient
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
 	 */
-	public List<JPPFTask> submit(JPPFJob job) throws Exception
+	@Override
+    public List<JPPFTask> submit(JPPFJob job) throws Exception
 	{
 		if ((job.getResultListener() == null) || job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
 		//else if (job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
@@ -144,7 +147,8 @@ public class JPPFClient extends AbstractGenericClient
 	/**
 	 * Close this client and release all the resources it is using.
 	 */
-	public void close()
+	@Override
+    public void close()
 	{
 		super.close();
 		if (loadBalancer != null) loadBalancer.stop();
@@ -158,7 +162,8 @@ public class JPPFClient extends AbstractGenericClient
 	/**
 	 * {@inheritDoc}
 	 */
-	protected void initPools()
+	@Override
+    protected void initPools()
 	{
 		submissionManager = new SubmissionManager(this);
 		new Thread(submissionManager, "SubmissionManager").start();
@@ -170,7 +175,8 @@ public class JPPFClient extends AbstractGenericClient
 	 * @param event the event to notify of.
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
-	public void statusChanged(ClientConnectionStatusEvent event)
+	@Override
+    public void statusChanged(ClientConnectionStatusEvent event)
 	{
 		super.statusChanged(event);
 		submissionManager.wakeUp();

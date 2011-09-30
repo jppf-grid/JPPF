@@ -57,7 +57,8 @@ class SendingProviderInitialResponseState extends ClassServerState
 	 * @throws Exception if an error occurs while transitioning to another state.
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
-	public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	@Override
+    public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		ClassContext context = (ClassContext) wrapper.getContext();
 		if (CHECK_CONNECTION && wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))

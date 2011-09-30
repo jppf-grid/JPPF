@@ -52,7 +52,8 @@ public class JPPFPriority implements Comparable<JPPFPriority>, Serializable
 	 * @return a positive value if this priority is greater, a negative value if it is less, otherwise 0.
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(JPPFPriority o)
+	@Override
+    public int compareTo(JPPFPriority o)
 	{
 		if (o == null) return 1;
 		int v2 = o.getValue();
@@ -74,7 +75,8 @@ public class JPPFPriority implements Comparable<JPPFPriority>, Serializable
 	 * @return true if the 2 objects are equal, false otherwise.
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object obj)
+	@Override
+    public boolean equals(Object obj)
 	{
 		if (!(obj instanceof JPPFPriority)) return false; 
 		return value == ((JPPFPriority) obj).getValue();
@@ -85,7 +87,8 @@ public class JPPFPriority implements Comparable<JPPFPriority>, Serializable
 	 * @return the priority value.
 	 * @see java.lang.Object#hashCode()
 	 */
-	public int hashCode()
+	@Override
+    public int hashCode()
 	{
 		return value;
 	}

@@ -37,7 +37,8 @@ public class RLBundlerProvider implements JPPFBundlerProvider
 	 * @return an instance of the bundler implementation defined by this provider.
 	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createBundler(org.jppf.server.scheduler.bundle.LoadBalancingProfile)
 	 */
-	public Bundler createBundler(LoadBalancingProfile profile)
+	@Override
+    public Bundler createBundler(LoadBalancingProfile profile)
 	{
 		return new RLBundler(profile);
 	}
@@ -48,7 +49,8 @@ public class RLBundlerProvider implements JPPFBundlerProvider
 	 * @return an {@link org.jppf.server.scheduler.bundle.rl.RLProfile RLProfile} instance.
 	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
 	 */
-	public LoadBalancingProfile createProfile(TypedProperties configuration)
+	@Override
+    public LoadBalancingProfile createProfile(TypedProperties configuration)
 	{
 		return new RLProfile(configuration);
 	}
@@ -58,7 +60,8 @@ public class RLBundlerProvider implements JPPFBundlerProvider
 	 * @return the algorithm's name as a string.
 	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#getAlgorithmName()
 	 */
-	public String getAlgorithmName()
+	@Override
+    public String getAlgorithmName()
 	{
 		return "rl";
 	}

@@ -90,7 +90,7 @@ class ApplicationConnection extends JPPFConnection
 		is = new SocketWrapperInputSource(socketClient);
 		resultSender = new ApplicationResultSender(socketClient);
 		InetAddress addr = socket.getInetAddress();
-		setName("appl [" + addr.getHostAddress() + ":" + socket.getPort() + "]");
+		setName("appl [" + addr.getHostAddress() + ':' + socket.getPort() + ']');
 		driver.getStatsManager().newClientConnection();
 	}
 

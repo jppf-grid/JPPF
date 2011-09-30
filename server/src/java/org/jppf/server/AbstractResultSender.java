@@ -144,7 +144,8 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 * have completed, this connection sends all results back.
 	 * @param result the result of the task's execution.
 	 */
-	public synchronized void taskCompleted(BundleWrapper result)
+	@Override
+    public synchronized void taskCompleted(BundleWrapper result)
 	{
 		JPPFTaskBundle resultJob = (JPPFTaskBundle) result.getJob();
 		setPendingTasksCount(getPendingTasksCount() - resultJob.getTaskCount());

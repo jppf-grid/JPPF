@@ -60,7 +60,8 @@ public class RLBundler extends AbstractRLBundler
 	 * @return a <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
-	public Bundler copy()
+	@Override
+    public Bundler copy()
 	{
 		return new RLBundler(profile);
 	}
@@ -70,7 +71,8 @@ public class RLBundler extends AbstractRLBundler
 	 * @return the bundle size as an int.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
-	protected int maxSize()
+	@Override
+    protected int maxSize()
 	{
 		return JPPFDriver.getQueue().getMaxBundleSize();
 	}

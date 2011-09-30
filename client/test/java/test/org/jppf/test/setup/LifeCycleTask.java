@@ -76,7 +76,8 @@ public class LifeCycleTask extends JPPFTask
 	/**
 	 * {@inheritDoc}
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		start = System.currentTimeMillis();
 		try
@@ -95,7 +96,8 @@ public class LifeCycleTask extends JPPFTask
 	/**
 	 * {@inheritDoc}
 	 */
-	public void onCancel()
+	@Override
+    public void onCancel()
 	{
 		elapsed = System.currentTimeMillis() - start;
 		cancelled = true;
@@ -105,7 +107,8 @@ public class LifeCycleTask extends JPPFTask
 	/**
 	 * {@inheritDoc}
 	 */
-	public void onRestart()
+	@Override
+    public void onRestart()
 	{
 		elapsed = System.currentTimeMillis() - start;
 		restarted = true;
@@ -115,7 +118,8 @@ public class LifeCycleTask extends JPPFTask
 	/**
 	 * {@inheritDoc}
 	 */
-	public void onTimeout()
+	@Override
+    public void onTimeout()
 	{
 		elapsed = System.currentTimeMillis() - start;
 		timedout = true;

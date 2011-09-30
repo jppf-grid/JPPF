@@ -47,7 +47,8 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
 	/**
 	 * {@inheritDoc}
 	 */
-	protected AbstractJPPFClassLoader createClassLoader()
+	@Override
+    protected AbstractJPPFClassLoader createClassLoader()
 	{
 		if (classLoader == null) classLoader = new JPPFLocalClassLoader(node.getClassLoaderHandler(), this.getClass().getClassLoader());
 		return classLoader;
@@ -56,7 +57,8 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
 	/**
 	 * {@inheritDoc}
 	 */
-	protected JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception
+	@Override
+    protected JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception
 	{
 		return new JPPFLocalContainer(node.getChannel(), uuidPath, cl);
 	}
@@ -64,11 +66,13 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
 	/**
 	 * {@inheritDoc}
 	 */
-	protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
+	@Override
+    protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
 	{
 		return new Callable<AbstractJPPFClassLoader>()
 		{
-			public AbstractJPPFClassLoader call()
+			@Override
+            public AbstractJPPFClassLoader call()
 			{
 				return new JPPFLocalClassLoader(getClassLoader(), uuidPath);
 			}

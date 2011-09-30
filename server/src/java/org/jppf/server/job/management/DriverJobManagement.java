@@ -27,7 +27,6 @@ import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.*;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -67,13 +66,14 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
 	 */
-	public void cancelJob(String jobUuid) throws Exception
+	@Override
+    public void cancelJob(String jobUuid) throws Exception
 	{
 		cancelJobInNodes(jobUuid, false);
 		BundleWrapper bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper != null)
 		{
-			if (debugEnabled) log.debug("Request to cancel jobId = '" + bundleWrapper.getJob().getId() + "'");
+			if (debugEnabled) log.debug("Request to cancel jobId = '" + bundleWrapper.getJob().getId() + '\'');
 			//cancelJobInNodes(jobUuid, false);
 			//if (debugEnabled) log.debug("bundleWrapper=" + bundleWrapper);
 			JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
@@ -85,7 +85,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 				if (listener != null) listener.taskCompleted(queuedWrapper);
 			}
 		}
-		else if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + "'");
+		else if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
 	}
 
 	/**
@@ -96,15 +96,16 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#suspendJob(java.lang.String,java.lang.Boolean)
 	 */
-	public void suspendJob(String jobUuid, Boolean requeue) throws Exception
+	@Override
+    public void suspendJob(String jobUuid, Boolean requeue) throws Exception
 	{
 		ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null)
 		{
-			if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + "'");
+			if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
 			return;
 		}
-		if (debugEnabled) log.debug("Request to suspend jobId = '" + bundleWrapper.getJob().getId() + "'");
+		if (debugEnabled) log.debug("Request to suspend jobId = '" + bundleWrapper.getJob().getId() + '\'');
 		if (bundleWrapper.getJob().getJobSLA().isSuspended()) return;
 		bundleWrapper.getJob().getJobSLA().setSuspended(true);
 		getJobManager().jobUpdated(bundleWrapper);
@@ -117,15 +118,16 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#resumeJob(java.lang.String)
 	 */
-	public void resumeJob(String jobUuid) throws Exception
+	@Override
+    public void resumeJob(String jobUuid) throws Exception
 	{
 		ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null)
 		{
-			if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + "'");
+			if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
 			return;
 		}
-		if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getJob().getId() + "'");
+		if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getJob().getId() + '\'');
 		if (!bundleWrapper.getJob().getJobSLA().isSuspended()) return;
 		bundleWrapper.getJob().getJobSLA().setSuspended(false);
 		getJobManager().jobUpdated(bundleWrapper);
@@ -138,15 +140,16 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#updateMaxNodes(java.lang.String, java.lang.Integer)
 	 */
-	public void updateMaxNodes(String jobUuid, Integer maxNodes) throws Exception
+	@Override
+    public void updateMaxNodes(String jobUuid, Integer maxNodes) throws Exception
 	{
 		ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null)
 		{
-			if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + "'");
+			if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
 			return;
 		}
-		if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + bundleWrapper.getJob().getId() + "'");
+		if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + bundleWrapper.getJob().getId() + '\'');
 		if (maxNodes <= 0) return;
 		bundleWrapper.getJob().getJobSLA().setMaxNodes(maxNodes);
 		getJobManager().jobUpdated(bundleWrapper);
@@ -158,10 +161,11 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getAllJobIds()
 	 */
-	public String[] getAllJobIds() throws Exception
+	@Override
+    public String[] getAllJobIds() throws Exception
 	{
 		Set<String> set = getJobManager().getAllJobIds();
-		return set.toArray(StringUtils.ZERO_STRING);
+		return set.toArray(new String[set.size()]);
 	}
 
 	/**
@@ -171,7 +175,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getJobInformation(java.lang.String)
 	 */
-	public JobInformation getJobInformation(String jobUuid) throws Exception
+	@Override
+    public JobInformation getJobInformation(String jobUuid) throws Exception
 	{
 		ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null) return null;
@@ -191,7 +196,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getNodeInformation(java.lang.String)
 	 */
-	public NodeJobInformation[] getNodeInformation(String jobUuid) throws Exception
+	@Override
+    public NodeJobInformation[] getNodeInformation(String jobUuid) throws Exception
 	{
 		List<ChannelJobPair> nodes = getJobManager().getNodesForJob(jobUuid);
 		if (nodes.isEmpty()) return NodeJobInformation.EMPTY_ARRAY;
@@ -248,7 +254,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		 * @param event encapsulates the information about the event.
 		 * @see org.jppf.job.JobListener#jobQueued(org.jppf.job.JobNotification)
 		 */
-		public void jobQueued(JobNotification event)
+		@Override
+        public void jobQueued(JobNotification event)
 		{
 			sendNotification(event);
 		}
@@ -258,7 +265,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		 * @param event - encapsulates the information about the event.
 		 * @see org.jppf.job.JobListener#jobEnded(org.jppf.job.JobNotification)
 		 */
-		public void jobEnded(JobNotification event)
+		@Override
+        public void jobEnded(JobNotification event)
 		{
 			sendNotification(event);
 		}
@@ -268,7 +276,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		 * @param event - encapsulates the information about the event.
 		 * @see org.jppf.job.JobListener#jobUpdated(org.jppf.job.JobNotification)
 		 */
-		public void jobUpdated(JobNotification event)
+		@Override
+        public void jobUpdated(JobNotification event)
 		{
 			sendNotification(event);
 		}
@@ -278,7 +287,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		 * @param event - encapsulates the information about the event.
 		 * @see org.jppf.job.JobListener#jobDispatched(org.jppf.job.JobNotification)
 		 */
-		public void jobDispatched(JobNotification event)
+		@Override
+        public void jobDispatched(JobNotification event)
 		{
 			sendNotification(event);
 		}
@@ -288,7 +298,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		 * @param event - encapsulates the information about the event.
 		 * @see org.jppf.job.JobListener#jobReturned(org.jppf.job.JobNotification)
 		 */
-		public void jobReturned(JobNotification event)
+		@Override
+        public void jobReturned(JobNotification event)
 		{
 			sendNotification(event);
 		}
@@ -297,7 +308,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	/**
 	 * {@inheritDoc}
 	 */
-	public void sendNotification(Notification notification)
+	@Override
+    public void sendNotification(Notification notification)
 	{
 		if (debugEnabled && (notification instanceof JobNotification))
 		{
