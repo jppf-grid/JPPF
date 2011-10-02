@@ -81,15 +81,6 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected boolean externalStopCondition()
-	{
-		return driver.isShuttingDown();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
     public void postAccept(ChannelWrapper channel)
 	{
 		AcceptorContext context = (AcceptorContext) channel.getContext();

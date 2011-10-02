@@ -22,9 +22,11 @@ import java.util.Timer;
 import org.jppf.JPPFException;
 import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.comm.recovery.RecoveryServer;
+import org.jppf.comm.recovery.ReaperListener;
+import org.jppf.comm.recovery.Reaper;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.process.LauncherListener;
-import org.jppf.server.app.JPPFApplicationServer;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.NioServer;
 import org.jppf.server.nio.acceptor.AcceptorNioServer;
@@ -66,10 +68,6 @@ public class JPPFDriver
 	 * The queue that handles the tasks to execute. Objects are added to, and removed from, this queue, asynchronously and by multiple threads.
 	 */
 	private JPPFQueue taskQueue = null;
-	/**
-	 * Serves the execution requests coming from client applications.
-	 */
-	private JPPFApplicationServer[] applicationServers = null;
 	/**
 	 * Serves the execution requests coming from client applications.
 	 */
@@ -145,25 +143,17 @@ public class JPPFDriver
 		initializer.registerDebugMBean();
 		initializer.initRecoveryServer();
 
+        RecoveryServer recoveryServer = initializer.getRecoveryServer();
 		//classServer = new ClassNioServer(info.classServerPorts);
-		classServer = new ClassNioServer(null);
-		classServer.start();
-		printInitializedMessage(null, NioServer.CLASS_SERVER);
+        classServer = startServer(recoveryServer, new ClassNioServer(null), null);
 
 		//clientNioServer = new ClientNioServer(info.applicationServerPorts);
-		clientNioServer = new ClientNioServer(null);
-		clientNioServer.start();
-		printInitializedMessage(null, NioServer.CLIENT_SERVER);
+        clientNioServer = startServer(recoveryServer, new ClientNioServer(null), null);
 
 		//nodeNioServer = new NodeNioServer(info.nodeServerPorts);
-		nodeNioServer = new NodeNioServer(null);
-		nodeNioServer.start();
-		printInitializedMessage(null, NioServer.NODE_SERVER);
+        nodeNioServer = startServer(recoveryServer, new NodeNioServer(null), null);
 
-		acceptorServer = new AcceptorNioServer(info.serverPorts);
-		acceptorServer.start();
-		//initializer.printInitializedMessage(info.serverPorts, "JPPF Driver");
-		printInitializedMessage(info.serverPorts, null);
+        acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts), info.serverPorts);
 		
 		if (config.getBoolean("jppf.local.node.enabled", false))
 		{
@@ -269,7 +259,13 @@ public class JPPFDriver
 	public void initiateShutdownRestart(long shutdownDelay, boolean restart, long restartDelay)
 	{
 		log.info("Scheduling server shutdown in " + shutdownDelay + " ms");
-		shuttingDown = true;
+        shuttingDown = true;
+
+        if(classServer != null) classServer.shutdown();
+        if(nodeNioServer != null) nodeNioServer.shutdown();
+        if(clientNioServer != null) clientNioServer.shutdown();
+        if(acceptorServer != null) acceptorServer.shutdown();
+
 		if (shutdownDelay <= 0L) shutdownDelay = 0L;
 		Timer timer = new Timer();
 		ShutdownRestartTask task = new ShutdownRestartTask(timer, restart, restartDelay);
@@ -284,30 +280,25 @@ public class JPPFDriver
 		log.info("Shutting down");
 		initializer.stopBroadcaster();
 		initializer.stopPeerDiscoveryThread();
-		classServer.end();
-		classServer = null;
+        if(classServer != null) {
+		    classServer.end();
+		    classServer = null;
+        }
 		if (nodeNioServer != null)
 		{
 			nodeNioServer.end();
 			nodeNioServer = null;
 		}
-		if (JPPFConfiguration.getProperties().getBoolean("jppf.client.server.nio.enabled", true))
-		{
-			if (clientNioServer != null)
-			{
-				clientNioServer.end();
-				clientNioServer = null;
-			}
-		}
-		else
-		{
-			for (int i=0; i<applicationServers.length; i++)
-			{
-				applicationServers[i].end();
-				applicationServers[i] = null;
-			}
-			applicationServers = null;
-		}
+        if (acceptorServer != null)
+        {
+            acceptorServer.end();
+            acceptorServer = null;
+        }
+        if (clientNioServer != null)
+        {
+            clientNioServer.end();
+            clientNioServer = null;
+        }
 		initializer.stopJmxServer();
 		jobManager.close();
 		initializer.stopRecoveryServer();
@@ -391,11 +382,30 @@ public class JPPFDriver
 	}
 
     /**
+     * Start server, register it to recovery server if requested and print initialization message.
+     * @param recoveryServer - Recovery server for nioServers that implements ReaperListener
+     * @param nioServer - starting nio server
+     * @param ports     - ports for initialization message
+     * @param <T>
+     * @return started nioServer
+     */
+    protected static <T extends NioServer> T startServer(final RecoveryServer recoveryServer, final T nioServer, final int[] ports) {
+        if(nioServer == null) throw new IllegalArgumentException("nioServer is null");
+        if(recoveryServer != null && nioServer instanceof ReaperListener) {
+            Reaper reaper = recoveryServer.getReaper();
+            reaper.addReaperListener((ReaperListener) nioServer);
+        }
+        nioServer.start();
+        printInitializedMessage(ports, nioServer.getName());
+        return nioServer;
+    }
+
+    /**
 	 * Print a message to the console to signify that the initialization of a server was succesfull.
      * @param ports the ports on which the server is listening.
      * @param name the name to use for the server.
      */
-    protected static void printInitializedMessage(int[] ports, String name)
+    protected static void printInitializedMessage(final int[] ports, final String name)
     {
         StringBuilder sb = new StringBuilder();
         if (name != null)

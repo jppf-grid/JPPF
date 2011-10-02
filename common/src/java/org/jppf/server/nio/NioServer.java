@@ -103,6 +103,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * Performs all operations that relate to channel states.
 	 */
 	protected StateTransitionManager<S, T> transitionManager = null;
+    /**
+     * Shutdown requested for this server
+     */
+    private final AtomicBoolean requestShutdown = new AtomicBoolean(false);
 
 	/**
 	 * Initialize this server with a specified port number and name.
@@ -210,8 +214,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	{
 		try
 		{
-			boolean hasTimeout = selectTimeout > 0L;
-			while (!isStopped() && !externalStopCondition())
+            while (!isStopped() && !externalStopCondition())
 			{
 				try
 				{
@@ -221,29 +224,37 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 				{
 					lock.unlock();
 				}
-				int n = hasTimeout ? selector.select(selectTimeout) : selector.select();
+				int n = selectTimeout > 0L ? selector.select(selectTimeout) : selector.select();
 				if (n > 0) go(selector.selectedKeys());
 				postSelect();
 			}
-			end();
 		}
 		catch (Throwable t)
 		{
 			log.error(t.getMessage(), t);
-			end();
-		}
+		} finally 
+        {
+            end();
+        }
 	}
 
 	/**
 	 * Determine whether a stop condition external to this server has been reached.
-	 * The default implementation always returns false.<br>
+	 * The default implementation always returns wheter shutdown was requested.<br>
 	 * Subclasses may override this behavior.
 	 * @return true if this server should be stopped, false otherwise.
 	 */
 	protected boolean externalStopCondition()
 	{
-		return false;
+		return requestShutdown.get();
 	}
+
+    /**
+     * Initiates shutdown of this server.
+     */
+    public void shutdown() {
+        requestShutdown.set(true);
+    }
 
 	/**
 	 * Process the keys selected by the selector for IO operations.

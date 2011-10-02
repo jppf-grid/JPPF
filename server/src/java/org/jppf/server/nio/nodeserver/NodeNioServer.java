@@ -130,8 +130,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 			}
 		});
 		new Thread(taskQueueChecker, "TaskQueueChecker").start();
-		RecoveryServer recoveryServer = driver.getInitializer().getRecoveryServer();
-		if (recoveryServer != null) recoveryServer.getReaper().addReaperListener(this);
 	}
 
 	/**
@@ -159,15 +157,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     protected NioServerFactory<NodeState, NodeTransition> createFactory()
 	{
 		return new NodeServerFactory(this);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-    protected boolean externalStopCondition()
-	{
-		return driver.isShuttingDown();
 	}
 
 	/**
@@ -314,7 +303,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 		if (JPPFDriver.JPPF_DEBUG && (channel != null)) driver.getInitializer().getServerDebug().removeChannel(channel, NODE_SERVER);
 		try
 		{
-			channel.close();
+			if(channel != null) channel.close();
 		}
 		catch (Exception e)
 		{

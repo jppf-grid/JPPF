@@ -54,12 +54,12 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine in
 	 * which application classpath to look for the requested resources.
 	 */
-	protected Map<String, List<ChannelWrapper<?>>> providerConnections = new Hashtable<String, List<ChannelWrapper<?>>>();
+	protected final Map<String, List<ChannelWrapper<?>>> providerConnections = new Hashtable<String, List<ChannelWrapper<?>>>();
 	/**
 	 * The cache of class definition, this is done to not flood the provider when it dispatch many tasks. it use
 	 * WeakHashMap to minimize the OutOfMemory.
 	 */
-	Map<CacheClassKey, CacheClassContent> classCache = new SoftReferenceValuesMap<CacheClassKey, CacheClassContent>();
+	final Map<CacheClassKey, CacheClassContent> classCache = new SoftReferenceValuesMap<CacheClassKey, CacheClassContent>();
 	/**
 	 * The thread polling the local channel.
 	 */
@@ -95,8 +95,6 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	public ClassNioServer(final int[] ports) throws JPPFException
 	{
 		super(ports, CLASS_SERVER, false);
-		RecoveryServer recoveryServer = driver.getInitializer().getRecoveryServer();
-		if (recoveryServer != null) recoveryServer.getReaper().addReaperListener(this);
 		selectTimeout = 1L;
 	}
 
@@ -125,17 +123,6 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
     protected NioServerFactory<ClassState, ClassTransition> createFactory()
 	{
 		return new ClassServerFactory(this);
-	}
-
-	/**
-	 * Determine whether a stop condition external to this server has been reached.
-	 * @return true if the driver is shutting down, false otherwise.
-	 * @see org.jppf.server.nio.NioServer#externalStopCondition()
-	 */
-	@Override
-    protected boolean externalStopCondition()
-	{
-		return driver.isShuttingDown();
 	}
 
 	/**

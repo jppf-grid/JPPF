@@ -81,15 +81,6 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected boolean externalStopCondition()
-	{
-		return driver.isShuttingDown();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
     public void postAccept(ChannelWrapper channel)
 	{
 		ClientContext context = (ClientContext) channel.getContext();
