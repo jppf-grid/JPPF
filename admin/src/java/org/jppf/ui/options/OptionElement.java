@@ -37,7 +37,8 @@ public interface OptionElement extends OptionProperties
 	 * Get the root of the option tree this option belongs to.
 	 * @return a <code>OptionElement</code> instance. 
 	 */
-	OptionElement getRoot();
+    @Override
+    OptionElement getRoot();
 	/**
 	 * Get the path of this element in the option tree.
 	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances. 

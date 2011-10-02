@@ -38,7 +38,8 @@ public class LabelOption extends AbstractOption
 	/**
 	 * Create the UI components for this option.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		JLabel lab = new JLabel();
 		lab.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -57,7 +58,8 @@ public class LabelOption extends AbstractOption
 	 * @param value the value as an <code>Object</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
-	public void setValue(Object value)
+	@Override
+    public void setValue(Object value)
 	{
 		this.value = value;
 		if (UIComponent != null) ((JLabel) UIComponent).setText((String) value);
@@ -67,7 +69,8 @@ public class LabelOption extends AbstractOption
 	 * Propagate the state changes of the underlying checkbox to the listeners to this option.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
 	}
 
@@ -76,7 +79,8 @@ public class LabelOption extends AbstractOption
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 		UIComponent.setEnabled(enabled);
 	}
@@ -86,7 +90,8 @@ public class LabelOption extends AbstractOption
 	 * @return false.
 	 * @see org.jppf.ui.options.AbstractOption#isPersistent()
 	 */
-	public boolean isPersistent()
+	@Override
+    public boolean isPersistent()
 	{
 		return false;
 	}

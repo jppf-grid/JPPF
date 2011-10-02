@@ -71,7 +71,8 @@ public class DebugMouseListener extends MouseAdapter
 	 * @param event - the mouse event to process.
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
-	public void mousePressed(MouseEvent event)
+	@Override
+    public void mousePressed(MouseEvent event)
 	{
 		if (event.getButton() != MouseEvent.BUTTON3) return;
 		Component comp = event.getComponent();
@@ -82,7 +83,8 @@ public class DebugMouseListener extends MouseAdapter
 		JMenuItem item = new JMenuItem("Reload");
 		item.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent ev)
+			@Override
+            public void actionPerformed(ActionEvent ev)
 			{
 				doReloadPage();
 			}
@@ -101,7 +103,7 @@ public class DebugMouseListener extends MouseAdapter
 			OptionsPage parent = (OptionsPage) option.getParent();
 			parent.remove(option);
 			OptionsPageBuilder builder = new OptionsPageBuilder(true);
-			OptionElement elt = null;
+			OptionElement elt;
 			if ("url".equalsIgnoreCase(source)) elt = builder.buildPageFromURL(location, builder.getBaseName());
 			else elt = builder.buildPage(location, null);
 			builder.getFactory().addDebugComp(elt, source, location);

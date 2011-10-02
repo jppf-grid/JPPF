@@ -64,7 +64,8 @@ public class ButtonOption extends AbstractOption
 	/**
 	 * Create the UI components for this option.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		JButton button = new JButton();
 		if (label != null) button.setText(label);
@@ -82,12 +83,14 @@ public class ButtonOption extends AbstractOption
 	 * This method does nothing.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
 		JButton button = (JButton) UIComponent;
 		button.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+            public void actionPerformed(ActionEvent e)
 			{
 				fireValueChanged();
 			}
@@ -99,9 +102,10 @@ public class ButtonOption extends AbstractOption
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
-		((JButton) UIComponent).setEnabled(enabled);
+		UIComponent.setEnabled(enabled);
 	}
 
 	/**
@@ -109,7 +113,8 @@ public class ButtonOption extends AbstractOption
 	 * @return false.
 	 * @see org.jppf.ui.options.AbstractOption#isPersistent()
 	 */
-	public boolean isPersistent()
+	@Override
+    public boolean isPersistent()
 	{
 		return false;
 	}

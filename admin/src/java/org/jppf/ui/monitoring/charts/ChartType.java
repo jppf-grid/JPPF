@@ -67,7 +67,8 @@ public enum ChartType
 	 * @return the name as a string.
 	 * @see java.lang.Enum#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return name;
 	}

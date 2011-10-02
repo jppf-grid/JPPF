@@ -52,7 +52,8 @@ public class ResetTaskCounterAction extends AbstractTopologyAction
 	 * @param selectedElements - a list of objects.
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
-	public void updateState(List<Object> selectedElements)
+	@Override
+    public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		setEnabled(nodeDataArray.length > 0);
@@ -63,7 +64,8 @@ public class ResetTaskCounterAction extends AbstractTopologyAction
 	 * @param event not used.
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
-	public void actionPerformed(ActionEvent event)
+	@Override
+    public void actionPerformed(ActionEvent event)
 	{
 		for (TopologyData data: nodeDataArray)
 		{

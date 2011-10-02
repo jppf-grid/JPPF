@@ -37,16 +37,18 @@ public class TextPropertiesTableFormat extends PropertiesTableFormat
 	/**
 	 * Write the prologue for the formatted text.
 	 */
-	public void start()
+	@Override
+    public void start()
 	{
-		sb.append(docTitle).append("\n");
+		sb.append(docTitle).append('\n');
 	}
 
 	/**
 	 * Write the prologue of a table.
 	 * @param title the title for the table.
 	 */
-	public void tableStart(String title)
+	@Override
+    public void tableStart(String title)
 	{
 		sb.append("\n\n").append(title).append("\n\n");
 	}
@@ -54,15 +56,17 @@ public class TextPropertiesTableFormat extends PropertiesTableFormat
 	/**
 	 * Write the prologue of a table row.
 	 */
-	public void rowEnd()
+	@Override
+    public void rowEnd()
 	{
-		sb.append("\n");
+		sb.append('\n');
 	}
 
 	/**
 	 * Write the separator between 2 cells.
 	 */
-	public void cellSeparator()
+	@Override
+    public void cellSeparator()
 	{
 		sb.append(" = ");
 	}

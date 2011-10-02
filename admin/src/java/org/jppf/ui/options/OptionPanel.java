@@ -85,7 +85,8 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	/**
 	 * Initialize the panel used to display this options page.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		panel = new JPanel();
 		if (bordered)
@@ -114,7 +115,8 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 * @return a list of <code>Option</code> instances.
 	 * @see org.jppf.ui.options.OptionsPage#getChildren()
 	 */
-	public List<OptionElement> getChildren()
+	@Override
+    public List<OptionElement> getChildren()
 	{
 		return children;
 	}
@@ -124,7 +126,8 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 * @param element the element to add.
 	 * @see org.jppf.ui.options.OptionsPage#add(org.jppf.ui.options.OptionElement)
 	 */
-	public void add(OptionElement element)
+	@Override
+    public void add(OptionElement element)
 	{
 		children.add(element);
 		if (element instanceof AbstractOptionElement)
@@ -144,7 +147,8 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 * @param element the element to remove.
 	 * @see org.jppf.ui.options.OptionsPage#remove(org.jppf.ui.options.OptionElement)
 	 */
-	public void remove(OptionElement element)
+	@Override
+    public void remove(OptionElement element)
 	{
 		children.remove(element);
 		if (element instanceof AbstractOption)
@@ -159,7 +163,8 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 		for (OptionElement elt: children) elt.setEnabled(enabled);
 	}
@@ -169,7 +174,8 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
 	 * @param enabled true to enable the events, false to disable them.
 	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
 	 */
-	public void setEventsEnabled(boolean enabled)
+	@Override
+    public void setEventsEnabled(boolean enabled)
 	{
 		for (OptionElement elt: children) elt.setEventsEnabled(enabled);
 	}

@@ -52,7 +52,8 @@ class MonitorTableModel extends AbstractTableModel
 	 * @return 2.
 	 * @see javax.swing.table.TableModel#getColumnCount()
 	 */
-	public int getColumnCount()
+	@Override
+    public int getColumnCount()
 	{
 		return 2;
 	}
@@ -62,7 +63,8 @@ class MonitorTableModel extends AbstractTableModel
 	 * @return the number of fields displayed in the table.
 	 * @see javax.swing.table.TableModel#getRowCount()
 	 */
-	public int getRowCount()
+	@Override
+    public int getRowCount()
 	{
 		return fields.length;
 	}
@@ -74,7 +76,8 @@ class MonitorTableModel extends AbstractTableModel
 	 * @return the value as an object.
 	 * @see javax.swing.table.TableModel#getValueAt(int, int)
 	 */
-	public Object getValueAt(int row, int column)
+	@Override
+    public Object getValueAt(int row, int column)
 	{
 		Fields name = fields[row];
 		if (column == 0) return name;

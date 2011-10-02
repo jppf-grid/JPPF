@@ -130,7 +130,8 @@ public class TopologyData
 	 * @return a string displaying the host and port of the underlying jmx connection.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return jmxWrapper.getId();
 	}

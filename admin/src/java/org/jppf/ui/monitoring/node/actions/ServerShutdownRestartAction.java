@@ -57,7 +57,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 	/**
 	 * Threads priority.
 	 */
-	private long restartDelay = 0;
+	private long restartDelay = 0L;
 
 	/**
 	 * Initialize this action.
@@ -74,7 +74,8 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 	 * @param selectedElements a list of objects.
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
-	public void updateState(List<Object> selectedElements)
+	@Override
+    public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		for (Object o: selectedElements)
@@ -95,7 +96,8 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 	 * @param event encapsulates the source of the event and additional information.
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
-	public void actionPerformed(ActionEvent event)
+	@Override
+    public void actionPerformed(ActionEvent event)
 	{
 		final List<JMXDriverConnectionWrapper> list = new ArrayList<JMXDriverConnectionWrapper>();
 		for (Object o: selectedElements)
@@ -119,7 +121,8 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 			frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/server_restart.gif").getImage());
 			okBtn.addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent event)
+				@Override
+                public void actionPerformed(ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();
@@ -128,7 +131,8 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 			});
 			cancelBtn.addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent event)
+				@Override
+                public void actionPerformed(ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();
@@ -164,7 +168,8 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 		else restartDelay = -1L;
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				for (JMXDriverConnectionWrapper jmx: driverConnections)
 				{

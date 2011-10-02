@@ -49,7 +49,8 @@ public class JavaOption extends AbstractOption
 	/**
 	 * {@inheritDoc}
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		try
 		{
@@ -77,7 +78,8 @@ public class JavaOption extends AbstractOption
 	 * Propagate the state changes of the underlying component to the listeners to this component.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
 	}
 
@@ -87,7 +89,8 @@ public class JavaOption extends AbstractOption
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 	}
 
@@ -112,7 +115,7 @@ public class JavaOption extends AbstractOption
 	/**
 	 * Abstract superclass for mouse listeners set on this type of option.
 	 */
-	public static abstract class JavaOptionMouseListener extends MouseAdapter
+	public abstract static class JavaOptionMouseListener extends MouseAdapter
 	{
 		/**
 		 * The option on which this listener is set.

@@ -68,7 +68,8 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 	 * @return the number of columns as an int.
 	 * @see org.jppf.ui.treetable.TreeTableModel#getColumnCount()
 	 */
-	public int getColumnCount()
+	@Override
+    public int getColumnCount()
 	{
 		return 6;
 	}
@@ -80,7 +81,8 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 	 * @return the value from the specified node and column.
 	 * @see org.jppf.ui.treetable.TreeTableModel#getValueAt(java.lang.Object, int)
 	 */
-	public Object getValueAt(Object node, int column)
+	@Override
+    public Object getValueAt(Object node, int column)
 	{
 		Object res = "";
 		if (node instanceof DefaultMutableTreeNode)
@@ -104,13 +106,13 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 						}
 						break;
 					case TASK_COUNT:
-						if (data.getType().equals(JobDataType.SUB_JOB) || data.getType().equals(JobDataType.JOB)) res = "" + jobInfo.getTaskCount();
+						if (data.getType().equals(JobDataType.SUB_JOB) || data.getType().equals(JobDataType.JOB)) res = Integer.toString(jobInfo.getTaskCount());
 						break;
 					case INITIAL_TASK_COUNT:
-						if (data.getType().equals(JobDataType.JOB)) res = "" + jobInfo.getInitialTaskCount();
+						if (data.getType().equals(JobDataType.JOB)) res = Integer.toString(jobInfo.getInitialTaskCount());
 						break;
 					case PRIORITY:
-						if (data.getType().equals(JobDataType.JOB)) res = "" + jobInfo.getPriority();
+						if (data.getType().equals(JobDataType.JOB)) res = Integer.toString(jobInfo.getPriority());
 						break;
 					case MAX_NODES:
 						if (data.getType().equals(JobDataType.JOB))
@@ -118,7 +120,7 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 							int n = jobInfo.getMaxNodes();
 							// \u221E = infinity symbol
 							if (n == Integer.MAX_VALUE) res = "\u221E";
-							else res = "" + n;
+							else res = Integer.toString(n);
 						}
 						break;
 					default:
@@ -135,7 +137,8 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 	 * @return the column title as a string.
 	 * @see org.jppf.ui.treetable.TreeTableModel#getColumnName(int)
 	 */
-	public String getColumnName(int column)
+	@Override
+    public String getColumnName(int column)
 	{
 		String res = "";
 		switch (column)

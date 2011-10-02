@@ -68,7 +68,8 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 	 * @return the number of columns as an int.
 	 * @see org.jppf.ui.treetable.TreeTableModel#getColumnCount()
 	 */
-	public int getColumnCount()
+	@Override
+    public int getColumnCount()
 	{
 		return 6;
 	}
@@ -80,7 +81,8 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 	 * @return the value from the specified node and column.
 	 * @see org.jppf.ui.treetable.TreeTableModel#getValueAt(java.lang.Object, int)
 	 */
-	public Object getValueAt(Object node, int column)
+	@Override
+    public Object getValueAt(Object node, int column)
 	{
 		Object res = "";
 		if (node instanceof DefaultMutableTreeNode)
@@ -108,16 +110,16 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 						}
 						break;
 					case NODE_STATUS:
-						if (isNode) res = "" + state.getConnectionStatus();
+						if (isNode) res = state.getConnectionStatus();
 						break;
 					case EXECUTION_STATUS:
-						if (isNode) res = "" + state.getExecutionStatus();
+						if (isNode) res = state.getExecutionStatus();
 						break;
 					case NB_TASKS:
-						if (isNode) res = "" + state.getNbTasksExecuted();
+						if (isNode) res = Integer.toString(state.getNbTasksExecuted());
 						break;
 					case TASK_EVENT:
-						if (isNode) res = "" + state.getTaskNotification();
+						if (isNode) res = String.valueOf(state.getTaskNotification());
 						break;
 				}
 			}
@@ -135,7 +137,8 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 	 * @return the column title as a string.
 	 * @see org.jppf.ui.treetable.TreeTableModel#getColumnName(int)
 	 */
-	public String getColumnName(int column)
+	@Override
+    public String getColumnName(int column)
 	{
 		String res = "";
 		switch (column)

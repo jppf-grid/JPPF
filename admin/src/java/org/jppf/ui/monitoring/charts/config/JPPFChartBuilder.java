@@ -188,7 +188,8 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 	 * Update the data displayed in the charts.
 	 * @param event holds the new stats values.
 	 */
-	public void dataUpdated(final StatsHandlerEvent event)
+	@Override
+    public void dataUpdated(final StatsHandlerEvent event)
 	{
 		for (TabConfiguration tab: tabMap.values())
 		{
@@ -196,7 +197,8 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 			{
 				SwingUtilities.invokeLater(new Runnable()
 				{
-					public void run()
+					@Override
+                    public void run()
 					{
 						if (event.getType().equals(StatsHandlerEvent.Type.UPDATE))
 						{

@@ -38,7 +38,7 @@ public abstract class AbstractSelectionAction extends AbstractTopologyAction
 	/**
 	 * The tree table panel to which this action applies.
 	 */
-	protected NodeDataPanel panel = null;
+	protected final NodeDataPanel panel;
 
 	/**
 	 * Initialize this action with the specified tree table panel.

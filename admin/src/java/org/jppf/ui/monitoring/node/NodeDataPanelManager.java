@@ -177,7 +177,7 @@ public class NodeDataPanelManager
 	 */
 	void nodeAdded(DefaultMutableTreeNode driverNode, JPPFManagementInfo nodeInfo)
 	{
-		String nodeName = nodeInfo.getHost() + ":" + nodeInfo.getPort();
+		String nodeName = nodeInfo.getHost() + ':' + nodeInfo.getPort();
 		if (debugEnabled) log.debug("attempting to add node=" + nodeName + " to driver=" + driverNode);
 		int index = nodeInsertIndex(driverNode, nodeName);
 		if (index < 0) return;

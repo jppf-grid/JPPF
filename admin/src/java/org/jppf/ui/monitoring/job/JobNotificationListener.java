@@ -61,7 +61,8 @@ public class JobNotificationListener implements NotificationListener
 	 * @param handback - not used.
 	 * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
 	 */
-	public void handleNotification(Notification notification, Object handback)
+	@Override
+    public void handleNotification(Notification notification, Object handback)
 	{
 		if (!(notification instanceof JobNotification)) return;
 		JobNotification notif = (JobNotification) notification;

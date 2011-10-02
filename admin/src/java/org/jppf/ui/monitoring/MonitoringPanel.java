@@ -84,13 +84,15 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	 * Called when new stats have been received from the server.
 	 * @param event holds the new stats values.
 	 */
-	public void dataUpdated(StatsHandlerEvent event)
+	@Override
+    public void dataUpdated(StatsHandlerEvent event)
 	{
 		for (final MonitorTableModel model: tableModels)
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					model.fireTableDataChanged();
 				}
@@ -111,7 +113,8 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		panel.setBorder(BorderFactory.createTitledBorder(title));
 		JTable table = new JTable()
 		{
-			public boolean isCellEditable(int row, int column)
+			@Override
+            public boolean isCellEditable(int row, int column)
 			{
 				return false;
 			}

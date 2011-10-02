@@ -55,7 +55,8 @@ public abstract class AbstractJobAction extends AbstractUpdatableAction
 	 * @param selectedElements - a list of objects.
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
-	public void updateState(List<Object> selectedElements)
+	@Override
+    public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		List<JobData> jobList = new ArrayList<JobData>();
@@ -66,7 +67,7 @@ public abstract class AbstractJobAction extends AbstractUpdatableAction
 			if (JobDataType.JOB.equals(data.getType())) jobList.add(data);
 			else if (JobDataType.SUB_JOB.equals(data.getType())) subjobList.add(data);
 		}
-		jobDataArray = jobList.toArray(EMPTY_JOB_DATA_ARRAY);
-		subjobDataArray = subjobList.toArray(EMPTY_JOB_DATA_ARRAY);
+		jobDataArray = jobList.toArray(new JobData[jobList.size()]);
+		subjobDataArray = subjobList.toArray(new JobData[subjobList.size()]);
 	}
 }

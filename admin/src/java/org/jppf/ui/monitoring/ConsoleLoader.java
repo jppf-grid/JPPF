@@ -158,7 +158,8 @@ public class ConsoleLoader
 		doDownload = false;
 		yesBtn.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent event)
+			@Override
+            public void actionPerformed(ActionEvent event)
 			{
 				doDownload = true;
 				closeDialog(dialog);
@@ -166,7 +167,8 @@ public class ConsoleLoader
 		});
 		noBtn.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent event)
+			@Override
+            public void actionPerformed(ActionEvent event)
 			{
 				closeDialog(dialog);
 			}
@@ -177,7 +179,8 @@ public class ConsoleLoader
 		frame.setVisible(true);
 		SwingUtilities.invokeAndWait(new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				dialog.pack();
 				dialog.setVisible(true);
@@ -194,7 +197,8 @@ public class ConsoleLoader
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				if (d != null)
 				{
@@ -229,7 +233,7 @@ public class ConsoleLoader
 		/**
 		 * 
 		 */
-		private double max = 7542745;
+		private double max = 7542745.0;
 
 		/**
 		 * Default constructor.
@@ -261,7 +265,8 @@ public class ConsoleLoader
 		 * @param event - the event that encapsulates the transfer informaiton.
 		 * @see org.jppf.server.protocol.LocationEventListener#dataTransferred(org.jppf.server.protocol.LocationEvent)
 		 */
-		public void dataTransferred(LocationEvent event)
+		@Override
+        public void dataTransferred(LocationEvent event)
 		{
 			count += event.bytesTransferred();
 			label.setText(nf.format((double) count / max));
@@ -288,7 +293,8 @@ public class ConsoleLoader
 		 * @param url - the url to add.
 		 * @see java.net.URLClassLoader#addURL(java.net.URL)
 		 */
-		public void addURL(URL url)
+		@Override
+        public void addURL(URL url)
 		{
 			super.addURL(url);
 		}

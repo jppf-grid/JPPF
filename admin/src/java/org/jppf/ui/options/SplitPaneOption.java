@@ -76,7 +76,8 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	/**
 	 * Initialize the panel used to display this options page.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		JSplitPane pane = new JSplitPane();
 		if (orientation == HORIZONTAL)
@@ -102,7 +103,8 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 		if (UIComponent != null) UIComponent.setEnabled(enabled);
 		for (OptionElement elt: children) elt.setEnabled(enabled);
@@ -113,7 +115,8 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * @param enabled true to enable the events, false to disable them.
 	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
 	 */
-	public void setEventsEnabled(boolean enabled)
+	@Override
+    public void setEventsEnabled(boolean enabled)
 	{
 		for (OptionElement elt: children) elt.setEventsEnabled(enabled);
 	}
@@ -123,7 +126,8 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * @param element the element to add.
 	 * @see org.jppf.ui.options.OptionsPage#add(org.jppf.ui.options.OptionElement)
 	 */
-	public void add(OptionElement element)
+	@Override
+    public void add(OptionElement element)
 	{
 		JSplitPane pane = (JSplitPane) UIComponent;
 		if (FILLER1 == children.get(0))
@@ -140,7 +144,7 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 		}
 		else
 		{
-			String msg = "["+ this.toString() + "] This split pane can't contain more than 2 elements";
+			String msg = '['+ this.toString() + "] This split pane can't contain more than 2 elements";
 			System.err.println(msg);
 			log.error(msg);
 			return;
@@ -154,7 +158,8 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * @param element the element to remove.
 	 * @see org.jppf.ui.options.OptionsPage#remove(org.jppf.ui.options.OptionElement)
 	 */
-	public void remove(OptionElement element)
+	@Override
+    public void remove(OptionElement element)
 	{
 		int idx = children.indexOf(element);
 		if (idx < 0) return;
@@ -180,7 +185,8 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * @return a list of <code>Option</code> instances.
 	 * @see org.jppf.ui.options.OptionsPage#getChildren()
 	 */
-	public List<OptionElement> getChildren()
+	@Override
+    public List<OptionElement> getChildren()
 	{
 		return Collections.unmodifiableList(children);
 	}

@@ -54,7 +54,8 @@ public class BooleanOption extends AbstractOption
 	/**
 	 * Create the UI components for this option.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		JCheckBox checkBox = new JCheckBox(label, (Boolean) value);
 		if (toolTipText != null) checkBox.setToolTipText(toolTipText);
@@ -67,7 +68,8 @@ public class BooleanOption extends AbstractOption
 	 * @return a <code>Boolean</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#getValue()
 	 */
-	public Object getValue()
+	@Override
+    public Object getValue()
 	{
 		value = ((JCheckBox) UIComponent).isSelected();
 		return value;
@@ -78,7 +80,8 @@ public class BooleanOption extends AbstractOption
 	 * @param value the value as an <code>Object</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
-	public void setValue(Object value)
+	@Override
+    public void setValue(Object value)
 	{
 		if (value instanceof String) value = "true".equalsIgnoreCase((String) value);
 		super.setValue(value);
@@ -93,11 +96,13 @@ public class BooleanOption extends AbstractOption
 	 * Propagate the state changes of the underlying checkbox to the listeners to this option.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
 		((JCheckBox) UIComponent).addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent event)
+			@Override
+            public void actionPerformed(ActionEvent event)
 			{
 				getValue();
 				fireValueChanged();
@@ -111,8 +116,9 @@ public class BooleanOption extends AbstractOption
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
-		((JCheckBox) UIComponent).setEnabled(enabled);
+		UIComponent.setEnabled(enabled);
 	}
 }

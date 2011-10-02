@@ -160,7 +160,8 @@ public enum Fields
 	 * @return the localized nbame as a string.
 	 * @see java.lang.Enum#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return localName;
 	}

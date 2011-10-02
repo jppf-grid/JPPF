@@ -52,7 +52,8 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 	 * @param selectedElements a list of objects.
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
-	public void updateState(List<Object> selectedElements)
+	@Override
+    public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		List<TopologyData> list = new ArrayList<TopologyData>();
@@ -65,6 +66,6 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 				if ((info != null) && (JPPFManagementInfo.NODE == info.getType())) list.add(data);
 			}
 		}
-		nodeDataArray = list.toArray(EMPTY_TOPOLOGY_DATA_ARRAY);
+		nodeDataArray = list.toArray(new TopologyData[list.size()]);
 	}
 }

@@ -53,11 +53,12 @@ public class PlotXYChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration createChart(ChartConfiguration config)
+	@Override
+    public ChartConfiguration createChart(ChartConfiguration config)
 	{
 		Object ds = createDataset(config);
 		String s = config.name;
-		if (config.unit != null) s += " ("+config.unit+")";
+		if (config.unit != null) s += " (" + config.unit + ')';
 		//JFreeChart chart = ChartFactory.createXYLineChart(s, null, null, ds, PlotOrientation.VERTICAL, true, true, false);
 		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createXYLineChart",
 			s, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "VERTICAL"), true, true, false);
@@ -73,7 +74,7 @@ public class PlotXYChartHandler implements ChartHandler
 			getCurrentClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
 		invokeMethod(rendClass, rend, "setLegendItemLabelGenerator", labelGenerator);
 		//rend.setBaseStroke(new BasicStroke(2f));
-		invokeMethod(rendClass, rend, "setBaseStroke", new BasicStroke(2f));
+		invokeMethod(rendClass, rend, "setBaseStroke", new BasicStroke(2.0f));
 		config.chart = chart;
 		return config;
 	}
@@ -107,7 +108,8 @@ public class PlotXYChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration populateDataset(ChartConfiguration config)
+	@Override
+    public ChartConfiguration populateDataset(ChartConfiguration config)
 	{
 		//XYSeriesCollection ds= (XYSeriesCollection) config.dataset;
 		Object ds = config.dataset;
@@ -142,7 +144,8 @@ public class PlotXYChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration updateDataset(ChartConfiguration config)
+	@Override
+    public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
 		//XYSeriesCollection ds = (XYSeriesCollection) config.dataset;
 		Object ds = config.dataset;
@@ -174,7 +177,8 @@ public class PlotXYChartHandler implements ChartHandler
 		 * @throws Throwable if any error occurs.
 		 * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 		 */
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+		@Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
 			Fields key = (Fields) invokeMethod(args[0].getClass(), args[0], "getSeriesKey", args[1]);
 			return StringUtils.shortenLabel(key.toString());

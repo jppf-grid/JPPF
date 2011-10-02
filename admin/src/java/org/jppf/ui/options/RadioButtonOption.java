@@ -54,7 +54,8 @@ public class RadioButtonOption extends AbstractOption
 	/**
 	 * Create the UI components for this option.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		JRadioButton radioButton = new JRadioButton(label, (Boolean) value);
 		if (toolTipText != null) radioButton.setToolTipText(toolTipText);
@@ -67,7 +68,8 @@ public class RadioButtonOption extends AbstractOption
 	 * @return a <code>Boolean</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#getValue()
 	 */
-	public Object getValue()
+	@Override
+    public Object getValue()
 	{
 		value = ((JRadioButton) UIComponent).isSelected();
 		return value;
@@ -78,7 +80,8 @@ public class RadioButtonOption extends AbstractOption
 	 * @param value the value as an <code>Object</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
-	public void setValue(Object value)
+	@Override
+    public void setValue(Object value)
 	{
 		if (value instanceof String) value = "true".equalsIgnoreCase((String) value);
 		super.setValue(value);
@@ -93,11 +96,13 @@ public class RadioButtonOption extends AbstractOption
 	 * Propagate the state changes of the underlying checkbox to the listeners to this option.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
 		((JRadioButton) UIComponent).addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent event)
+			@Override
+            public void actionPerformed(ActionEvent event)
 			{
 				getValue();
 				fireValueChanged();
@@ -111,7 +116,8 @@ public class RadioButtonOption extends AbstractOption
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 		UIComponent.setEnabled(enabled);
 	}

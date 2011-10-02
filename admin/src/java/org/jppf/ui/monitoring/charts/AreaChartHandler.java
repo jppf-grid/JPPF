@@ -52,7 +52,8 @@ public class AreaChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration createChart(ChartConfiguration config)
+	@Override
+    public ChartConfiguration createChart(ChartConfiguration config)
 	{
 		Object ds = createDataset(config);
 		//JFreeChart chart = ChartFactory.createAreaChart(null, null, config.name, ds, PlotOrientation.VERTICAL, true, true, false);
@@ -97,7 +98,8 @@ public class AreaChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration populateDataset(ChartConfiguration config)
+	@Override
+    public ChartConfiguration populateDataset(ChartConfiguration config)
 	{
 		Object ds = config.dataset;
 		//ds.clear();
@@ -121,7 +123,8 @@ public class AreaChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration updateDataset(ChartConfiguration config)
+	@Override
+    public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
 		Object ds = config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
@@ -156,7 +159,8 @@ public class AreaChartHandler implements ChartHandler
 		 * @throws Throwable if any error occurs.
 		 * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 		 */
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+		@Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
 			Fields key = (Fields) invokeMethod(args[0].getClass(), args[0], "getRowKey", args[1]);
 			return StringUtils.shortenLabel(key.toString());

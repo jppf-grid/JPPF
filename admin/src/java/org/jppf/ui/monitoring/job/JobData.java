@@ -183,7 +183,8 @@ public class JobData
 	 * @return a string representing this object.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		String s = "";
 		switch(type)
@@ -196,7 +197,7 @@ public class JobData
 				break;
 			case SUB_JOB:
 				if (nodeInformation == null) s = "no information";
-				else s = nodeInformation.getHost() + ":" + nodeInformation.getPort();
+				else s = nodeInformation.getHost() + ':' + nodeInformation.getPort();
 				break;
 		}
 		return s;

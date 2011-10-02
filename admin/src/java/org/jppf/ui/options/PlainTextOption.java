@@ -56,7 +56,8 @@ public class PlainTextOption extends TextOption
 	 * @return a JTextField instance.
 	 * @see org.jppf.ui.options.TextOption#createField()
 	 */
-	protected JTextField createField()
+	@Override
+    protected JTextField createField()
 	{
 		return new JTextField((String) value);
 	}
@@ -66,7 +67,8 @@ public class PlainTextOption extends TextOption
 	 * @param value the value as an <code>Object</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
-	public void setValue(Object value)
+	@Override
+    public void setValue(Object value)
 	{
 		this.value = value;
 		if ((value != null) && (field != null)) field.setText(value.toString());

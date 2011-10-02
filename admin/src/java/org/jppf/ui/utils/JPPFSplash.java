@@ -100,7 +100,8 @@ public class JPPFSplash extends Window
 	{
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				/*
 				try { Thread.sleep(2000); }
@@ -131,7 +132,8 @@ public class JPPFSplash extends Window
 		 * Execute this task.
 		 * @see java.util.TimerTask#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			pos = (pos + 1) % images.length;
 			label.setIcon(images[pos]);

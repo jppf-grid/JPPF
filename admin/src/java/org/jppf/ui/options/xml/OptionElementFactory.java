@@ -357,8 +357,7 @@ public class OptionElementFactory
 	{
 		int width = desc.getInt("width", 1);
 		int height = desc.getInt("height", 1);
-		FillerOption option = new FillerOption(width, height);
-		return option;
+        return new FillerOption(width, height);
 	}
 
 	/**
@@ -372,8 +371,7 @@ public class OptionElementFactory
 		int width = desc.getInt("width", 1);
 		int height = desc.getInt("height", 1);
 		String text = desc.getString("text", " ");
-		ToolbarSeparatorOption option = new ToolbarSeparatorOption(text, width, height);
-		return option;
+        return new ToolbarSeparatorOption(text, width, height);
 	}
 
 	/**
@@ -440,7 +438,8 @@ public class OptionElementFactory
 	{
 		JLabel label = new JLabel("X")
 		{
-			public java.awt.Color getBackground()
+			@Override
+            public java.awt.Color getBackground()
 			{
 				return java.awt.Color.red;
 			}

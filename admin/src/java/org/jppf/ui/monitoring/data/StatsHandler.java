@@ -100,7 +100,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	 * Get the singleton instance of this class.
 	 * @return a <code>StatsHandler</code> instance.
 	 */
-	public synchronized static StatsHandler getInstance()
+	public static synchronized StatsHandler getInstance()
 	{
 		if (instance.get() == null) instance.set(new StatsHandler());
 		return instance.get();
@@ -190,7 +190,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 		try
 		{
 			if (debugEnabled) log.debug("command: CHANGE_SETTINGS, parameters: " + params);
-			msg = (String) currentJmxConnection().changeLoadBalancerSettings(algorithm, params);
+			msg = currentJmxConnection().changeLoadBalancerSettings(algorithm, params);
 		}
 		catch(Exception e)
 		{
@@ -212,7 +212,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 		String msg = null;
 		try
 		{
-			return (String) currentJmxConnection().restartShutdown(shutdownDelay.longValue(), restartDelay.longValue());
+			return currentJmxConnection().restartShutdown(shutdownDelay.longValue(), restartDelay.longValue());
 		}
 		catch(Exception e)
 		{
@@ -424,7 +424,8 @@ public final class StatsHandler implements StatsConstants, ClientListener
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					synchronized(StatsHandler.this)
 					{
@@ -458,7 +459,8 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	 * @param event the event to notify this listener of.
 	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
 	 */
-	public synchronized void newConnection(ClientEvent event)
+	@Override
+    public synchronized void newConnection(ClientEvent event)
 	{
 		executor.submit(new NewConnectionTask(this, event.getConnection()));
 	}
@@ -466,7 +468,8 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public void connectionFailed(ClientEvent event)
+	@Override
+    public void connectionFailed(ClientEvent event)
 	{
 		executor.submit(new ConnectionFailedTask(this, event.getConnection()));
 	}

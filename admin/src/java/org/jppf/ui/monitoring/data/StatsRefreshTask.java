@@ -47,7 +47,8 @@ public class StatsRefreshTask extends TimerTask
 	 * Request an update from the JPPF driver.
 	 * @see java.util.TimerTask#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		if (JPPFClientConnectionStatus.ACTIVE.equals(connection.getStatus()))
 			StatsHandler.getInstance().requestUpdate(connection);

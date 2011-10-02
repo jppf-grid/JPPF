@@ -205,7 +205,7 @@ public final class OptionsHandler
 		else if (node.elt instanceof Option)
 		{
 			Option option = (Option) node.elt;
-			if (option.isPersistent()) prefs.put(option.getName(), ""+option.getValue());
+			if (option.isPersistent()) prefs.put(option.getName(), String.valueOf(option.getValue()));
 		}
 	}
 

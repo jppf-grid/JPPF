@@ -68,7 +68,8 @@ public class UpdateMaxNodesAction extends AbstractJobAction
 	 * @param selectedElements - a list of objects.
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
-	public void updateState(List<Object> selectedElements)
+	@Override
+    public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		setEnabled(jobDataArray.length > 0);
@@ -79,7 +80,8 @@ public class UpdateMaxNodesAction extends AbstractJobAction
 	 * @param event not used.
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
-	public void actionPerformed(ActionEvent event)
+	@Override
+    public void actionPerformed(ActionEvent event)
 	{
 		AbstractButton btn = (AbstractButton) event.getSource();
 		if (btn.isShowing()) location = btn.getLocationOnScreen();
@@ -102,7 +104,8 @@ public class UpdateMaxNodesAction extends AbstractJobAction
 			frame.setIconImage(((ImageIcon) getValue(Action.SMALL_ICON)).getImage());
 			okBtn.addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent event)
+				@Override
+                public void actionPerformed(ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();
@@ -111,7 +114,8 @@ public class UpdateMaxNodesAction extends AbstractJobAction
 			});
 			cancelBtn.addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent event)
+				@Override
+                public void actionPerformed(ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();
@@ -140,13 +144,14 @@ public class UpdateMaxNodesAction extends AbstractJobAction
 		maxNodes = noLimit ? Integer.MAX_VALUE : (Integer) maxNodesOption.getValue();
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				for (JobData data: jobDataArray)
 				{
 					try
 					{
-						JMXDriverConnectionWrapper jmx = (JMXDriverConnectionWrapper) data.getJmxWrapper();
+						JMXDriverConnectionWrapper jmx = data.getJmxWrapper();
 						jmx.updateMaxNodes(data.getJobInformation().getJobUuid(), maxNodes);
 					}
 					catch(Exception e)

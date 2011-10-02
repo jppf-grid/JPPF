@@ -105,7 +105,8 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object getRoot()
+	@Override
+    public Object getRoot()
 	{
 		return root;
 	}
@@ -113,7 +114,8 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean isLeaf(Object node)
+	@Override
+    public boolean isLeaf(Object node)
 	{
 		return getChildCount(node) == 0;
 	}
@@ -121,14 +123,16 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	/**
 	 * {@inheritDoc}
 	 */
-	public void valueForPathChanged(TreePath path, Object newValue)
+	@Override
+    public void valueForPathChanged(TreePath path, Object newValue)
 	{
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public int getIndexOfChild(Object parent, Object child)
+	@Override
+    public int getIndexOfChild(Object parent, Object child)
 	{
 		// This is not called in the JTree's default mode: use a naive implementation.
 		for (int i = 0; i < getChildCount(parent); i++)
@@ -144,7 +148,8 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addTreeModelListener(TreeModelListener l)
+	@Override
+    public void addTreeModelListener(TreeModelListener l)
 	{
 		listenerList.add(TreeModelListener.class, l);
 	}
@@ -152,7 +157,8 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeTreeModelListener(TreeModelListener l)
+	@Override
+    public void removeTreeModelListener(TreeModelListener l)
 	{
 		listenerList.remove(TreeModelListener.class, l);
 	}
@@ -279,7 +285,8 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	/**
 	 * {@inheritDoc}
 	 */
-	public Class getColumnClass(int column)
+	@Override
+    public Class getColumnClass(int column)
 	{
 		return Object.class;
 	}
@@ -289,7 +296,8 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	 * JTable to forward mouse and keyboard events in the Tree column to the underlying JTree.
 	 * {@inheritDoc}
 	 */
-	public boolean isCellEditable(Object node, int column)
+	@Override
+    public boolean isCellEditable(Object node, int column)
 	{
 		return getColumnClass(column) == TreeTableModel.class;
 	}
@@ -297,7 +305,8 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setValueAt(Object aValue, Object node, int column)
+	@Override
+    public void setValueAt(Object aValue, Object node, int column)
 	{
 	}
 

@@ -81,7 +81,8 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 	 * @param event the event encapsulating the source of the event.
 	 * @see org.jppf.ui.options.event.ValueChangeListener#valueChanged(org.jppf.ui.options.event.ValueChangeEvent)
 	 */
-	public void valueChanged(ValueChangeEvent event)
+	@Override
+    public void valueChanged(ValueChangeEvent event)
 	{
 		OptionElement option = event.getOption();
 		if (scriptText == null)
@@ -95,7 +96,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 				OptionElement elt = (OptionElement) o;
 				for (ScriptDescriptor desc: elt.getScripts())
 				{
-					if (language.equals(desc.language)) sb.append(desc.content).append("\n");
+					if (language.equals(desc.language)) sb.append(desc.content).append('\n');
 				}
 			}
 			sb.append(script);
@@ -109,7 +110,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 			long start = System.currentTimeMillis();
 			runner.evaluate(uuid, scriptText, variables);
 			long elapsed = System.currentTimeMillis() - start;
-			StringBuilder sb = new StringBuilder("executed ").append(language).append(" script in ").append(elapsed).append(" ms for [").append(option).append("]");
+			StringBuilder sb = new StringBuilder("executed ").append(language).append(" script in ").append(elapsed).append(" ms for [").append(option).append(']');
 			if (debugEnabled) log.debug(sb.toString());
 			//System.out.println(sb.toString());
 		}

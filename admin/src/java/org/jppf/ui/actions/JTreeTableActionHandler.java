@@ -43,7 +43,8 @@ public class JTreeTableActionHandler extends AbstractActionHandler
 		this.treeTable = treeTable;
 		treeTable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
 		{
-			public void valueChanged(ListSelectionEvent e)
+			@Override
+            public void valueChanged(ListSelectionEvent e)
 			{
 				synchronized(JTreeTableActionHandler.this)
 				{

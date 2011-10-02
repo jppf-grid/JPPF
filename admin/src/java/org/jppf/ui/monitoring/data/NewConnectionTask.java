@@ -47,7 +47,7 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable
 	/**
 	 * The {@link StatsHandler}.
 	 */
-	private StatsHandler statsHandler = null;
+	private final StatsHandler statsHandler;
 
 	/**
 	 * Initialized this task with the specified client connection.
@@ -64,7 +64,8 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable
 	 * Perform the task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		synchronized(statsHandler)
 		{

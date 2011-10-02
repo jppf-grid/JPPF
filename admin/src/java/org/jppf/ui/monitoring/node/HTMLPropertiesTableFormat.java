@@ -38,7 +38,8 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 	 * Write the prologue for the formatted text.
 	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#start()
 	 */
-	public void start()
+	@Override
+    public void start()
 	{
 		sb.append("<html><head></head><body style=\"font-family: Arial; font-size: 12pt\">");
 		sb.append("<h1>").append(docTitle).append("</h1>");
@@ -48,7 +49,8 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 	 * Write the epilogue for the formatted text.
 	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#end()
 	 */
-	public void end()
+	@Override
+    public void end()
 	{
 		sb.append("</body></html>");
 	}
@@ -58,7 +60,8 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 	 * @param title the title for the table.
 	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#tableStart(java.lang.String)
 	 */
-	public void tableStart(String title)
+	@Override
+    public void tableStart(String title)
 	{
 		sb.append("<h2>").append(title).append("</h2>");
 		sb.append("<table cellspacing=\"0\" cellpadding=\"1\">");
@@ -68,7 +71,8 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 	 * Write the prologue of a table.
 	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#tableEnd()
 	 */
-	public void tableEnd()
+	@Override
+    public void tableEnd()
 	{
 		sb.append("</table>");
 	}
@@ -77,7 +81,8 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 	 * Write the prologue of a table row.
 	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#rowStart()
 	 */
-	public void rowStart()
+	@Override
+    public void rowStart()
 	{
 		sb.append("<tr>");
 	}
@@ -86,7 +91,8 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 	 * Write the prologue of a table row.
 	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#rowEnd()
 	 */
-	public void rowEnd()
+	@Override
+    public void rowEnd()
 	{
 		sb.append("</tr>");
 	}
@@ -95,7 +101,8 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 	 * Write the prologue of a table cell.
 	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#cellStart()
 	 */
-	public void cellStart()
+	@Override
+    public void cellStart()
 	{
 		sb.append("<td>");
 	}
@@ -104,7 +111,8 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 	 * Write the prologue of a table cell.
 	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#cellEnd()
 	 */
-	public void cellEnd()
+	@Override
+    public void cellEnd()
 	{
 		sb.append("</td>");
 	}
@@ -113,7 +121,8 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 	 * Write the separator between 2 cells.
 	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#cellSeparator()
 	 */
-	public void cellSeparator()
+	@Override
+    public void cellSeparator()
 	{
 		sb.append("<td width\"5\"/");
 	}

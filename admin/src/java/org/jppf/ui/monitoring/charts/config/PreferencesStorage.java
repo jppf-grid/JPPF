@@ -82,13 +82,14 @@ public class PreferencesStorage
 			tab.name = child.get("name", "Tab"+cnt);
 			tab.position = child.getInt("position", -1);
 			ChartConfiguration[] configs = loadTabCharts(child);
-			for (ChartConfiguration config: configs) tab.configs.add(config);
+            tab.configs.addAll(Arrays.asList(configs));
 			tabs[cnt] = tab;
 			cnt++;
 		}
 		Arrays.sort(tabs, new Comparator<TabConfiguration>()
 		{
-			public int compare(TabConfiguration o1, TabConfiguration o2)
+			@Override
+            public int compare(TabConfiguration o1, TabConfiguration o2)
 			{
 				if (o1 == o2) return 0;
 				if (o1 == null) return -1;
@@ -138,7 +139,8 @@ public class PreferencesStorage
 		}
 		Arrays.sort(result, new Comparator<ChartConfiguration>()
 		{
-			public int compare(ChartConfiguration o1, ChartConfiguration o2)
+			@Override
+            public int compare(ChartConfiguration o1, ChartConfiguration o2)
 			{
 				if (o1 == o2) return 0;
 				if (o1 == null) return -1;
@@ -256,7 +258,7 @@ public class PreferencesStorage
 	{
 		String tabNodeName = "TabConfiguration"+tab.position;
 		String nodeName = "ChartConfiguration"+config.position;
-		Preferences pref = CHART_CONFIG_PREFERENCES.node(tabNodeName+"/"+nodeName);
+		Preferences pref = CHART_CONFIG_PREFERENCES.node(tabNodeName + '/' + nodeName);
 		pref.put("name", config.name);
 		pref.putInt("precision", config.precision);
 		if (config.unit != null ) pref.put("unit", config.unit);
@@ -264,7 +266,7 @@ public class PreferencesStorage
 		StringBuilder sb = new StringBuilder();
 		for (int i=0; i<config.fields.length; i++)
 		{
-			if (i > 0) sb.append("|");
+			if (i > 0) sb.append('|');
 			sb.append(config.fields[i].name());
 		}
 		pref.put("fields", sb.toString());

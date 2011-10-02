@@ -126,10 +126,10 @@ class LayoutFactory
 		mxOrganicLayout layout = new mxOrganicLayout(graph);
     layout.setRadiusScaleFactor(1.0);
     layout.setApproxNodeDimensions(false);
-    layout.setEdgeCrossingCostFactor(8000);
-    layout.setNodeDistributionCostFactor(layout.getNodeDistributionCostFactor() * 5);
-	  layout.setEdgeDistanceCostFactor(layout.getEdgeDistanceCostFactor() * 5);
-	  layout.setEdgeLengthCostFactor(layout.getEdgeLengthCostFactor() / 1000);
+    layout.setEdgeCrossingCostFactor(8000.0);
+    layout.setNodeDistributionCostFactor(layout.getNodeDistributionCostFactor() * 5.0);
+	  layout.setEdgeDistanceCostFactor(layout.getEdgeDistanceCostFactor() * 5.0);
+	  layout.setEdgeLengthCostFactor(layout.getEdgeLengthCostFactor() / 1000.0);
 	  return layout;
 	}
 

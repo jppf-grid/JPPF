@@ -150,7 +150,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	/**
 	 * Create, initialize and layout the GUI components displayed in this panel.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 	  treeTable = new JPPFTreeTable(model);
 	  treeTable.getTree().setLargeModel(true);
@@ -175,7 +176,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	{
 		Runnable r = new SynchronizedTask(this)
 		{
-			public void perform()
+			@Override
+            public void perform()
 			{
 				panelManager.driverAdded(clientConnection);
 			}
@@ -191,7 +193,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	{
 		Runnable r = new SynchronizedTask(this)
 		{
-			public void perform()
+			@Override
+            public void perform()
 			{
 				panelManager.driverRemoved(driverName);
 			}
@@ -208,7 +211,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	{
 		Runnable r = new SynchronizedTask(this)
 		{
-			public void perform()
+			@Override
+            public void perform()
 			{
 				panelManager.jobAdded(driverName, jobInfo);
 			}
@@ -225,7 +229,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	{
 		Runnable r = new SynchronizedTask(this)
 		{
-			public void perform()
+			@Override
+            public void perform()
 			{
 				panelManager.jobRemoved(driverName, jobInfo);
 			}
@@ -242,7 +247,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	{
 		Runnable r = new SynchronizedTask(this)
 		{
-			public void perform()
+			@Override
+            public void perform()
 			{
 				panelManager.jobUpdated(driverName, jobInfo);
 			}
@@ -260,7 +266,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	{
 		Runnable r = new SynchronizedTask(this)
 		{
-			public void perform()
+			@Override
+            public void perform()
 			{
 				panelManager.subJobAdded(driverName, jobInfo, nodeInfo);
 			}
@@ -278,7 +285,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	{
 		Runnable r = new SynchronizedTask(this)
 		{
-			public void perform()
+			@Override
+            public void perform()
 			{
 				panelManager.subJobRemoved(driverName, jobInfo, nodeInfo);
 			}
@@ -291,7 +299,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	 * @param event the event to notify this listener of.
 	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
 	 */
-	public synchronized void newConnection(ClientEvent event)
+	@Override
+    public synchronized void newConnection(ClientEvent event)
 	{
 		driverAdded(event.getConnection());
 	}
@@ -299,7 +308,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	/**
 	 * {@inheritDoc}
 	 */
-	public void connectionFailed(ClientEvent event)
+	@Override
+    public void connectionFailed(ClientEvent event)
 	{
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
 		driverRemoved(c.getJmxConnection().getId());
@@ -312,7 +322,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				treeTable.invalidate();
 				treeTable.doLayout();
@@ -354,7 +365,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		/**
 		 * Perform the refresh.
 		 */
-		public void perform()
+		@Override
+        public void perform()
 		{
 			int n = treeTableRoot.getChildCount();
 			for (int i=n-1; i>=0; i--)

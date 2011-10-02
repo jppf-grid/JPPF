@@ -54,7 +54,8 @@ public class PasswordOption extends TextOption
 	 * @return a <code>JPasswordField</code> instance.
 	 * @see org.jppf.ui.options.TextOption#createField()
 	 */
-	protected JTextField createField()
+	@Override
+    protected JTextField createField()
 	{
 		field = new JPasswordField((String) value);
 		return field;
@@ -65,7 +66,8 @@ public class PasswordOption extends TextOption
 	 * @return the password as a string value.
 	 * @see org.jppf.ui.options.TextOption#getValue()
 	 */
-	public Object getValue()
+	@Override
+    public Object getValue()
 	{
 		value = new String(((JPasswordField) field).getPassword());
 		return value;

@@ -45,7 +45,8 @@ public class GraphActionHandler extends AbstractActionHandler
 		this.graph = graph;
 		graph.getSelectionModel().addListener(null, new mxEventSource.mxIEventListener()
 		{
-			public void invoke(Object source, mxEventObject event)
+			@Override
+            public void invoke(Object source, mxEventObject event)
 			{
 				computeSelectedElements();
 				updateActions();

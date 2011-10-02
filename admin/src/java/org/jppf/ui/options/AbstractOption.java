@@ -66,7 +66,8 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	 * @return the value as an <code>Object</code> instance.
 	 * @see org.jppf.ui.options.Option#getValue()
 	 */
-	public Object getValue()
+	@Override
+    public Object getValue()
 	{
 		return value;
 	}
@@ -174,7 +175,8 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 	 * @return true if the value should be saved, false otherwise.
 	 * @see org.jppf.ui.options.Option#isPersistent()
 	 */
-	public boolean isPersistent()
+	@Override
+    public boolean isPersistent()
 	{
 		return persistent;
 	}

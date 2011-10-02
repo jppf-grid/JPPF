@@ -46,7 +46,8 @@ public class SelectDriversAction extends AbstractSelectionAction
 	/**
 	 * {@inheritDoc}
 	 */
-	public void actionPerformed(ActionEvent e)
+	@Override
+    public void actionPerformed(ActionEvent e)
 	{
 		synchronized(panel)
 		{
@@ -54,7 +55,7 @@ public class SelectDriversAction extends AbstractSelectionAction
 			TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
 			List<TreePath> selectionPath = new ArrayList<TreePath>();
 			for (DefaultMutableTreeNode driverNode: getDriverNodes()) selectionPath.add(treeTable.getPathForNode(driverNode));
-			model.setSelectedPaths(selectionPath.toArray(EMPTY_TREE_PATH));
+			model.setSelectedPaths(selectionPath.toArray(new TreePath[selectionPath.size()]));
 		}
 	}
 }

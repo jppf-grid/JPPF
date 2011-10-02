@@ -110,7 +110,8 @@ public class ChartConfiguration
 	 * @return a string containg this configuration's name.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return name == null ? "no name" : name;
 	}

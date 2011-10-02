@@ -69,7 +69,8 @@ public abstract class AbstractCellEditor implements CellEditor
    * @return <code>null</code>.
 	 * @see javax.swing.CellEditor#getCellEditorValue()
 	 */
-	public Object getCellEditorValue()
+	@Override
+    public Object getCellEditorValue()
 	{
 		return null;
 	}
@@ -80,7 +81,8 @@ public abstract class AbstractCellEditor implements CellEditor
    * @return <code>true</code>.
 	 * @see javax.swing.CellEditor#isCellEditable(java.util.EventObject)
 	 */
-	public boolean isCellEditable(EventObject event)
+	@Override
+    public boolean isCellEditable(EventObject event)
 	{
 		return true;
 	}
@@ -88,7 +90,8 @@ public abstract class AbstractCellEditor implements CellEditor
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean shouldSelectCell(EventObject anEvent)
+	@Override
+    public boolean shouldSelectCell(EventObject anEvent)
 	{
 		return false;
 	}
@@ -96,7 +99,8 @@ public abstract class AbstractCellEditor implements CellEditor
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean stopCellEditing()
+	@Override
+    public boolean stopCellEditing()
 	{
 		return true;
 	}
@@ -104,14 +108,16 @@ public abstract class AbstractCellEditor implements CellEditor
 	/**
 	 * {@inheritDoc}
 	 */
-	public void cancelCellEditing()
+	@Override
+    public void cancelCellEditing()
 	{
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addCellEditorListener(CellEditorListener l)
+	@Override
+    public void addCellEditorListener(CellEditorListener l)
 	{
 		listenerList.add(CellEditorListener.class, l);
 	}
@@ -119,7 +125,8 @@ public abstract class AbstractCellEditor implements CellEditor
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeCellEditorListener(CellEditorListener l)
+	@Override
+    public void removeCellEditorListener(CellEditorListener l)
 	{
 		listenerList.remove(CellEditorListener.class, l);
 	}

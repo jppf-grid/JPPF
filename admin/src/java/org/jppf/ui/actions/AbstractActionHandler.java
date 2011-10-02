@@ -41,7 +41,8 @@ public abstract class AbstractActionHandler implements ActionHandler
 	 * @param action the action to add.
 	 * @see org.jppf.ui.actions.ActionHandler#putAction(java.lang.String, org.jppf.ui.actions.UpdatableAction)
 	 */
-	public void putAction(String name, UpdatableAction action)
+	@Override
+    public void putAction(String name, UpdatableAction action)
 	{
 		actionMap.put(name, action);
 	}
@@ -52,7 +53,8 @@ public abstract class AbstractActionHandler implements ActionHandler
 	 * @return an <code>Action</code> or null if the specified name could not be found.
 	 * @see org.jppf.ui.actions.ActionHandler#getAction(java.lang.String)
 	 */
-	public UpdatableAction getAction(String name)
+	@Override
+    public UpdatableAction getAction(String name)
 	{
 		return actionMap.get(name);
 	}
@@ -62,7 +64,8 @@ public abstract class AbstractActionHandler implements ActionHandler
 	 * @return a list of objects.
 	 * @see org.jppf.ui.actions.ActionHandler#getSelectedElements()
 	 */
-	public synchronized List<Object> getSelectedElements()
+	@Override
+    public synchronized List<Object> getSelectedElements()
 	{
 		return selectedElements;
 	}
@@ -71,7 +74,8 @@ public abstract class AbstractActionHandler implements ActionHandler
 	 * Update the state of all actions registered with this <code>ActionHandler</code>.
 	 * @see org.jppf.ui.actions.ActionHandler#updateActions()
 	 */
-	public synchronized void updateActions()
+	@Override
+    public synchronized void updateActions()
 	{
 		for (UpdatableAction action: actionMap.values()) action.updateState(selectedElements);
 	}

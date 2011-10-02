@@ -53,7 +53,8 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * @return an <code>ElementOption</code> instance.
 	 * @see org.jppf.ui.options.OptionElement#getParent()
 	 */
-	public OptionElement getParent()
+	@Override
+    public OptionElement getParent()
 	{
 		return parent;
 	}
@@ -73,7 +74,8 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * @return a <code>OptionElement</code> instance. 
 	 * @see org.jppf.ui.options.OptionElement#getRoot()
 	 */
-	public OptionElement getRoot()
+	@Override
+    public OptionElement getRoot()
 	{
 		OptionElement elt = this;
 		while (elt.getParent() != null) elt = elt.getParent();
@@ -86,7 +88,8 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances. 
 	 * @see org.jppf.ui.options.OptionElement#getPath()
 	 */
-	public TreePath getPath()
+	@Override
+    public TreePath getPath()
 	{
 		List<OptionElement> list = new ArrayList<OptionElement>();
 		OptionElement elt = this;
@@ -103,7 +106,8 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances. 
 	 * @see org.jppf.ui.options.OptionElement#getPath()
 	 */
-	public String getStringPath()
+	@Override
+    public String getStringPath()
 	{
 		List<String> list = new ArrayList<String>();
 		OptionElement elt = this;
@@ -124,7 +128,8 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specfied path. 
 	 * @see org.jppf.ui.options.OptionElement#findElement(java.lang.String)
 	 */
-	public OptionElement findElement(String path)
+	@Override
+    public OptionElement findElement(String path)
 	{
 		if (path == null) return null;
 		else if ("".equals(path)) return this;
@@ -163,10 +168,11 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * @return a strign providing information about this option element.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("[").append((this instanceof OptionsPage) ? "Page" : "Option").append(" : ");
+		sb.append('[').append((this instanceof OptionsPage) ? "Page" : "Option").append(" : ");
 		sb.append(getClass().getName()).append("] ");
 		sb.append("name=").append(name);
 		sb.append("; label=").append(label);
@@ -181,7 +187,8 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * could be found with the specfied name. The resulting list can be empty, but never null.
 	 * @see org.jppf.ui.options.OptionElement#findAllWithName(java.lang.String)
 	 */
-	public List<OptionElement> findAllWithName(String name)
+	@Override
+    public List<OptionElement> findAllWithName(String name)
 	{
 		if (name.startsWith("/"))
 		{
@@ -199,7 +206,8 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specfied name.
 	 * @see org.jppf.ui.options.OptionElement#findFirstWithName(java.lang.String)
 	 */
-	public OptionElement findFirstWithName(String name)
+	@Override
+    public OptionElement findFirstWithName(String name)
 	{
 		List<OptionElement> list = findAllWithName(name);
 		return list.isEmpty() ? null : list.get(0);
@@ -212,7 +220,8 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specfied name.
 	 * @see org.jppf.ui.options.OptionElement#findLastWithName(java.lang.String)
 	 */
-	public OptionElement findLastWithName(String name)
+	@Override
+    public OptionElement findLastWithName(String name)
 	{
 		List<OptionElement> list = findAllWithName(name);
 		return list.isEmpty() ? null : list.get(list.size() - 1);

@@ -102,7 +102,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @return the label as a string.
 	 * @see org.jppf.ui.options.Option#getLabel()
 	 */
-	public String getLabel()
+	@Override
+    public String getLabel()
 	{
 		return label;
 	}
@@ -121,7 +122,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @return the name as a string.
 	 * @see org.jppf.ui.options.Option#getName()
 	 */
-	public String getName()
+	@Override
+    public String getName()
 	{
 		return name;
 	}
@@ -140,7 +142,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @return a <code>JComponent</code> instance.
 	 * @see org.jppf.ui.options.Option#getUIComponent()
 	 */
-	public JComponent getUIComponent()
+	@Override
+    public JComponent getUIComponent()
 	{
 		return UIComponent;
 	}
@@ -159,7 +162,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @return the tooltip as a string.
 	 * @see org.jppf.ui.options.OptionElement#getToolTipText()
 	 */
-	public String getToolTipText()
+	@Override
+    public String getToolTipText()
 	{
 		return toolTipText;
 	}
@@ -171,7 +175,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	public void setToolTipText(String tooltip)
 	{
 		if (((tooltip == null) || "".equals(tooltip.trim()))) tooltip = null;
-		else if (tooltip.indexOf("\\n") >= 0)
+		else if (tooltip.contains("\\n"))
 			tooltip = "<html>"+tooltip.replace("\\n", "<br>")+"</html>";
 		this.toolTipText = tooltip;
 	}
@@ -181,7 +185,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @return true if the page is to be enclosed in a scroll pabe, false otherwise.
 	 * @see org.jppf.ui.options.OptionElement#isScrollable()
 	 */
-	public boolean isScrollable()
+	@Override
+    public boolean isScrollable()
 	{
 		return scrollable;
 	}
@@ -200,7 +205,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @return true if the page has a border, false otherwise.
 	 * @see org.jppf.ui.options.OptionElement#isBordered()
 	 */
-	public boolean isBordered()
+	@Override
+    public boolean isBordered()
 	{
 		return bordered;
 	}
@@ -219,7 +225,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @return a list of <code>ScriptDescriptor</code> instances.
 	 * @see org.jppf.ui.options.OptionElement#getScripts()
 	 */
-	public List<ScriptDescriptor> getScripts()
+	@Override
+    public List<ScriptDescriptor> getScripts()
 	{
 		return scripts;
 	}
@@ -229,7 +236,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @return a <code>ValueChangeListener</code> instance. 
 	 * @see org.jppf.ui.options.OptionElement#getInitializer()
 	 */
-	public ValueChangeListener getInitializer()
+	@Override
+    public ValueChangeListener getInitializer()
 	{
 		return initializer;
 	}
@@ -248,7 +256,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @return a <code>ValueChangeListener</code> instance. 
 	 * @see org.jppf.ui.options.OptionElement#getFinalizer()
 	 */
-	public ValueChangeListener getFinalizer()
+	@Override
+    public ValueChangeListener getFinalizer()
 	{
 		return finalizer;
 	}
@@ -266,7 +275,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * Get the path to an eventual icon displayed in the button.
 	 * @return the path as a string.
 	 */
-	public String getIconPath()
+	@Override
+    public String getIconPath()
 	{
 		return iconPath;
 	}
@@ -285,7 +295,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @return enabled true if the events are enabled, false otherwise.
 	 * @see org.jppf.ui.options.OptionElement#isEventsEnabled()
 	 */
-	public boolean isEventsEnabled()
+	@Override
+    public boolean isEventsEnabled()
 	{
 		return eventsEnabled;
 	}
@@ -295,7 +306,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @param enabled true to enable the events, false to disable them.
 	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
 	 */
-	public void setEventsEnabled(boolean enabled)
+	@Override
+    public void setEventsEnabled(boolean enabled)
 	{
 		eventsEnabled = enabled;
 	}
@@ -305,7 +317,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @return the constraints as a string.
 	 * @see org.jppf.ui.options.OptionProperties#getLayoutConstraints()
 	 */
-	public String getLayoutConstraints()
+	@Override
+    public String getLayoutConstraints()
 	{
 		return layoutConstraints;
 	}
@@ -315,7 +328,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @param layoutConstraints - the constraints as a string.
 	 * @see org.jppf.ui.options.OptionProperties#setLayoutConstraints(java.lang.String)
 	 */
-	public void setLayoutConstraints(String layoutConstraints)
+	@Override
+    public void setLayoutConstraints(String layoutConstraints)
 	{
 		this.layoutConstraints = layoutConstraints;
 	}
@@ -325,7 +339,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @return the constraints as a string.
 	 * @see org.jppf.ui.options.OptionProperties#getComponentConstraints()
 	 */
-	public String getComponentConstraints()
+	@Override
+    public String getComponentConstraints()
 	{
 		return componentConstraints;
 	}
@@ -335,7 +350,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @param componentConstraints - the constraints as a string.
 	 * @see org.jppf.ui.options.OptionProperties#setComponentConstraints(java.lang.String)
 	 */
-	public void setComponentConstraints(String componentConstraints)
+	@Override
+    public void setComponentConstraints(String componentConstraints)
 	{
 		this.componentConstraints = componentConstraints;
 	}
@@ -343,7 +359,8 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setEditable(boolean editable)
+	@Override
+    public void setEditable(boolean editable)
 	{
 	}
 }

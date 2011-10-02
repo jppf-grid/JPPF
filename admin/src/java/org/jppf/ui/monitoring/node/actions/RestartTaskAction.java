@@ -59,13 +59,15 @@ public class RestartTaskAction extends JPPFAbstractNodeAction
 	 * @param event not used.
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
-	public void actionPerformed(ActionEvent event)
+	@Override
+    public void actionPerformed(ActionEvent event)
 	{
 		try
 		{
 			Runnable r = new Runnable()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					try
 					{

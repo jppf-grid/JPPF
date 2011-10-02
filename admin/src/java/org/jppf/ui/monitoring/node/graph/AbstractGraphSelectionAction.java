@@ -38,7 +38,7 @@ public abstract class AbstractGraphSelectionAction extends AbstractTopologyActio
 	/**
 	 * The tree table panel to which this action applies.
 	 */
-	protected GraphOption panel = null;
+	protected final GraphOption panel;
 
 	/**
 	 * Initialize this action with the specified tree table panel.

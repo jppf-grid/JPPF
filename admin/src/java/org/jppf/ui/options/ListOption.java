@@ -84,15 +84,17 @@ public class ListOption extends AbstractOption
 	 * all value change listeners that registered with this option.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
 		selectionListener = new ListSelectionListener()
 		{
-			public void valueChanged(ListSelectionEvent e)
+			@Override
+            public void valueChanged(ListSelectionEvent e)
 			{
 				if (e.getValueIsAdjusting()) return;
 				List<Object> sel = new ArrayList<Object>();
-				for (Object o: list.getSelectedValues()) sel.add(o);
+                sel.addAll(Arrays.asList(list.getSelectedValues()));
 				value = sel;
 				fireValueChanged();
 			}
@@ -104,7 +106,8 @@ public class ListOption extends AbstractOption
 	 * Create the UI components for this option.
 	 * @see org.jppf.ui.options.AbstractOptionElement#createUI()
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		list = new JList();
 		if (toolTipText != null) list.setToolTipText(toolTipText);
@@ -179,7 +182,8 @@ public class ListOption extends AbstractOption
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 		list.setEnabled(enabled);
 	}
@@ -189,7 +193,8 @@ public class ListOption extends AbstractOption
 	 * @param value the value as an <code>Object</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
-	public void setValue(Object value)
+	@Override
+    public void setValue(Object value)
 	{
 		this.value = value;
 		populateList();

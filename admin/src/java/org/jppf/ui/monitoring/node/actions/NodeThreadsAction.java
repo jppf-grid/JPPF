@@ -74,7 +74,8 @@ public class NodeThreadsAction extends AbstractTopologyAction
 	 * @param selectedElements - a list of objects.
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
-	public void updateState(List<Object> selectedElements)
+	@Override
+    public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		setEnabled(nodeDataArray.length > 0);
@@ -85,7 +86,8 @@ public class NodeThreadsAction extends AbstractTopologyAction
 	 * @param event not used.
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
-	public void actionPerformed(ActionEvent event)
+	@Override
+    public void actionPerformed(ActionEvent event)
 	{
 		AbstractButton btn = (AbstractButton) event.getSource();
 		if (btn.isShowing()) location = btn.getLocationOnScreen();
@@ -107,7 +109,8 @@ public class NodeThreadsAction extends AbstractTopologyAction
 			frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/threads.gif").getImage());
 			okBtn.addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent event)
+				@Override
+                public void actionPerformed(ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();
@@ -116,7 +119,8 @@ public class NodeThreadsAction extends AbstractTopologyAction
 			});
 			cancelBtn.addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent event)
+				@Override
+                public void actionPerformed(ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();
@@ -145,7 +149,8 @@ public class NodeThreadsAction extends AbstractTopologyAction
 		priority = (Integer) priorityOption.getValue();
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				for (TopologyData data: nodeDataArray)
 				{

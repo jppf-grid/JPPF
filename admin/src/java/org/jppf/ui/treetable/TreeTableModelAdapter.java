@@ -109,7 +109,8 @@ public class TreeTableModelAdapter extends AbstractTableModel
 			/**
 			 * Don't use fireTableRowsInserted() here; the selection model would get updated twice.
 			 */
-			public void treeExpanded(TreeExpansionEvent event)
+			@Override
+            public void treeExpanded(TreeExpansionEvent event)
 			{
 				TreePath[] paths = getSelectedPaths();
 				if (debugEnabled) log.debug("selected paths = " + dumpTreePaths(paths));
@@ -117,7 +118,8 @@ public class TreeTableModelAdapter extends AbstractTableModel
 				setSelectedPaths(paths);
 			}
 
-			public void treeCollapsed(TreeExpansionEvent event)
+			@Override
+            public void treeCollapsed(TreeExpansionEvent event)
 			{
 				TreePath[] paths = getSelectedPaths();
 				if (debugEnabled) log.debug("selected paths = " + dumpTreePaths(paths));
@@ -130,19 +132,23 @@ public class TreeTableModelAdapter extends AbstractTableModel
 		 // as we can not be guaranteed the tree will have finished processing the event before us.
 		treeTableModel.addTreeModelListener(new TreeModelListener()
 		{
-			public void treeNodesChanged(TreeModelEvent e)
+			@Override
+            public void treeNodesChanged(TreeModelEvent e)
 			{
 				delayedFireTableDataChanged();
 			}
-			public void treeNodesInserted(TreeModelEvent e)
+			@Override
+            public void treeNodesInserted(TreeModelEvent e)
 			{
 				delayedFireTableDataChanged();
 			}
-			public void treeNodesRemoved(TreeModelEvent e)
+			@Override
+            public void treeNodesRemoved(TreeModelEvent e)
 			{
 				delayedFireTableDataChanged();
 			}
-			public void treeStructureChanged(TreeModelEvent e)
+			@Override
+            public void treeStructureChanged(TreeModelEvent e)
 			{
 				delayedFireTableDataChanged();
 			}
@@ -156,7 +162,8 @@ public class TreeTableModelAdapter extends AbstractTableModel
 	 * @return the number of columns in the model.
 	 * @see javax.swing.table.TableModel#getColumnCount()
 	 */
-	public int getColumnCount()
+	@Override
+    public int getColumnCount()
 	{
 		return treeTableModel.getColumnCount();
 	}
@@ -167,7 +174,8 @@ public class TreeTableModelAdapter extends AbstractTableModel
 	 * @return the default name of the column as a string.
 	 * @see javax.swing.table.AbstractTableModel#getColumnName(int)
 	 */
-	public String getColumnName(int column)
+	@Override
+    public String getColumnName(int column)
 	{
 		return treeTableModel.getColumnName(column);
 	}
@@ -178,7 +186,8 @@ public class TreeTableModelAdapter extends AbstractTableModel
    * @return the <code>Object.class</code> object.
 	 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
 	 */
-	public Class getColumnClass(int column)
+	@Override
+    public Class getColumnClass(int column)
 	{
 		return treeTableModel.getColumnClass(column);
 	}
@@ -188,7 +197,8 @@ public class TreeTableModelAdapter extends AbstractTableModel
 	 * @return the number of rows in the model.
 	 * @see javax.swing.table.TableModel#getRowCount()
 	 */
-	public int getRowCount()
+	@Override
+    public int getRowCount()
 	{
 		return tree.getRowCount();
 	}
@@ -220,7 +230,8 @@ public class TreeTableModelAdapter extends AbstractTableModel
 	 * @return the value of the specified cell.
 	 * @see javax.swing.table.TableModel#getValueAt(int, int)
 	 */
-	public Object getValueAt(int row, int column)
+	@Override
+    public Object getValueAt(int row, int column)
 	{
 		Object o = nodeForRow(row);
 		if (o == null) return null;
@@ -234,7 +245,8 @@ public class TreeTableModelAdapter extends AbstractTableModel
 	 * @return true if the cell is editable, false otherwise.
 	 * @see javax.swing.table.AbstractTableModel#isCellEditable(int, int)
 	 */
-	public boolean isCellEditable(int row, int column)
+	@Override
+    public boolean isCellEditable(int row, int column)
 	{
 		return treeTableModel.isCellEditable(nodeForRow(row), column);
 	}
@@ -246,7 +258,8 @@ public class TreeTableModelAdapter extends AbstractTableModel
 	 * @param column the column coordinate.
 	 * @see javax.swing.table.AbstractTableModel#setValueAt(java.lang.Object, int, int)
 	 */
-	public void setValueAt(Object value, int row, int column)
+	@Override
+    public void setValueAt(Object value, int row, int column)
 	{
 		treeTableModel.setValueAt(value, nodeForRow(row), column);
 	}
@@ -259,7 +272,8 @@ public class TreeTableModelAdapter extends AbstractTableModel
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				//fireTableRowsUpdated( 0, getRowCount() - 1 );
 				TreePath[] paths = getSelectedPaths();
@@ -293,7 +307,7 @@ public class TreeTableModelAdapter extends AbstractTableModel
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
 				if ((node != null) && (node.getParent() != null)) validPaths.add(path);
 			}
-			tree.setSelectionPaths(validPaths.toArray(ZERO_PATH));
+			tree.setSelectionPaths(validPaths.toArray(new TreePath[validPaths.size()]));
 		}
 		catch(Exception e)
 		{
@@ -312,13 +326,13 @@ public class TreeTableModelAdapter extends AbstractTableModel
 		if (paths == null) sb.append("null");
 		else
 		{
-			sb.append("[");
+			sb.append('[');
 			for (int i=0; i<paths.length; i++)
 			{
 				if (i > 0) sb.append(", ");
 				sb.append(paths[i]);
 			}
-			sb.append("]");
+			sb.append(']');
 		}
 		return sb.toString();
 	}

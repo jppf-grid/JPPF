@@ -43,7 +43,8 @@ public class SelectGraphDriversAction extends AbstractGraphSelectionAction
 	/**
 	 * {@inheritDoc}
 	 */
-	public void actionPerformed(ActionEvent e)
+	@Override
+    public void actionPerformed(ActionEvent e)
 	{
 		synchronized(panel)
 		{

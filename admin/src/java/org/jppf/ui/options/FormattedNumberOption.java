@@ -78,7 +78,8 @@ public class FormattedNumberOption extends AbstractOption
 	/**
 	 * Create the UI components for this option.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		fieldLabel = new JLabel(label);
 		field = createField();
@@ -111,9 +112,10 @@ public class FormattedNumberOption extends AbstractOption
 	 * @return the value of the formatted text field as a <code>Number</code>.
 	 * @see org.jppf.ui.options.TextOption#getValue()
 	 */
-	public Object getValue()
+	@Override
+    public Object getValue()
 	{
-		JFormattedTextField tmp = (JFormattedTextField) field;
+		JFormattedTextField tmp = field;
 		return tmp.getValue();
 	}
 
@@ -122,7 +124,8 @@ public class FormattedNumberOption extends AbstractOption
 	 * @param value the value as an <code>Object</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
-	public void setValue(Object value)
+	@Override
+    public void setValue(Object value)
 	{
 		if (value instanceof String)
 		{
@@ -143,7 +146,8 @@ public class FormattedNumberOption extends AbstractOption
 	 * Add a listener to the underlying text document, to receive and propagate change events.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
 	}
 
@@ -152,7 +156,8 @@ public class FormattedNumberOption extends AbstractOption
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 		field.setEnabled(enabled);
 		fieldLabel.setEnabled(enabled);
@@ -180,7 +185,8 @@ public class FormattedNumberOption extends AbstractOption
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setEditable(boolean editable)
+	@Override
+    public void setEditable(boolean editable)
 	{
 		if (field != null) field.setEditable(editable);
 	}

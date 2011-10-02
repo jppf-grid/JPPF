@@ -53,7 +53,8 @@ public class Bar3DChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration createChart(ChartConfiguration config)
+	@Override
+    public ChartConfiguration createChart(ChartConfiguration config)
 	{
 		Object ds = createDataset(config);
 		//JFreeChart chart = ChartFactory.createBarChart3D(null, null, config.name, ds, PlotOrientation.HORIZONTAL, false, true, false);
@@ -128,7 +129,8 @@ public class Bar3DChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration populateDataset(ChartConfiguration config)
+	@Override
+    public ChartConfiguration populateDataset(ChartConfiguration config)
 	{
 		//((DefaultCategoryDataset) config.dataset).clear();
 		invokeMethod(config.dataset.getClass(), config.dataset, "clear");
@@ -141,7 +143,8 @@ public class Bar3DChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration updateDataset(ChartConfiguration config)
+	@Override
+    public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
 		Object ds = config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
@@ -197,7 +200,8 @@ public class Bar3DChartHandler implements ChartHandler
 		 * @throws Throwable if any error occurs.
 		 * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 		 */
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+		@Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
 			if ("".equals(method.getName()))
 			{
@@ -205,7 +209,7 @@ public class Bar3DChartHandler implements ChartHandler
 				double val = (Double) invokeMethod(args[0].getClass(), args[0], "getValue", args[1], args[2]);
 				//Object key = dataset.getColumnKey(col);
 				Object key = invokeMethod(args[0].getClass(), args[0], "getColumnKey", args[2]);
-				StringBuilder sb = new StringBuilder(""+key).append(" : ").append(nf.format(val));
+				StringBuilder sb = new StringBuilder(String.valueOf(key)).append(" : ").append(nf.format(val));
 				if (unit != null) sb.append(' ').append(unit);
 				return sb.toString();
 			}

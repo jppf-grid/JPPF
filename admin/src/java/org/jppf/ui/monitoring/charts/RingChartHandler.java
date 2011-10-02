@@ -43,13 +43,14 @@ public class RingChartHandler extends Pie3DChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration createChart(ChartConfiguration config)
+	@Override
+    public ChartConfiguration createChart(ChartConfiguration config)
 	{
 		Object ds = createDataset(config);
 		//JFreeChart chart = ChartFactory.createRingChart(config.name, ds, false, true, Locale.getDefault());
 		Class[] classes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE};
 		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createRingChart", classes,
-			(String) config.name, ds, false, true, false);
+                config.name, ds, false, true, false);
 		config.chart = chart;
 		return config;
 	}

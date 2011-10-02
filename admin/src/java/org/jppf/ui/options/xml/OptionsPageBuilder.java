@@ -46,7 +46,7 @@ public class OptionsPageBuilder
 	/**
 	 * Base name used to localize labels and tooltips.
 	 */
-	public final static String BASE_NAME = "org.jppf.ui.i18n.";
+	public static final String BASE_NAME = "org.jppf.ui.i18n.";
 	/**
 	 * Base name used to localize labels and tooltips.
 	 */
@@ -120,8 +120,12 @@ public class OptionsPageBuilder
 			return null;
 		}
 		Reader reader = new InputStreamReader(url.openStream());
-		return buildPageFromContent(FileUtils.readTextFile(reader), baseName);
-	}
+        try {
+            return buildPageFromContent(FileUtils.readTextFile(reader), baseName);
+        } finally {
+            reader.close();
+        }
+    }
 
 	/**
 	 * Build an option page from the specified XML descriptor.
@@ -175,7 +179,7 @@ public class OptionsPageBuilder
 	 * @param elt the root element of the options on which to trigger the events.
 	 * @param initial true to trigger the initializers, false to trigger the finalizers.
 	 */
-	private void triggerLifeCycleEvents(final OptionElement elt, boolean initial)
+	private static void triggerLifeCycleEvents(final OptionElement elt, boolean initial)
 	{
 		if (elt == null) return;
 		final ValueChangeListener listener = initial ? elt.getInitializer() : elt.getFinalizer();

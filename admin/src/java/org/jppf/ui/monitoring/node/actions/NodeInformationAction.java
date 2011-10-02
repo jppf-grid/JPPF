@@ -45,7 +45,8 @@ public class NodeInformationAction extends AbstractTopologyAction
 	 * @param selectedElements - a list of objects.
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
-	public void updateState(List<Object> selectedElements)
+	@Override
+    public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		setEnabled(nodeDataArray.length > 0);
@@ -56,7 +57,8 @@ public class NodeInformationAction extends AbstractTopologyAction
 	 * @param event not used.
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
-	public void actionPerformed(ActionEvent event)
+	@Override
+    public void actionPerformed(ActionEvent event)
 	{
 		String s = null;
 		try
@@ -84,7 +86,8 @@ public class NodeInformationAction extends AbstractTopologyAction
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter()
 		{
-			public void windowClosing(WindowEvent e)
+			@Override
+            public void windowClosing(WindowEvent e)
 			{
 				frame.dispose();
 			}

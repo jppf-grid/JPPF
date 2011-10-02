@@ -67,7 +67,8 @@ public class TabConfiguration
 	 * @return a string with the tab name.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return name == null ? "unnamed tab" : name;
 	}

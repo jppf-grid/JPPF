@@ -61,7 +61,8 @@ public abstract class TextOption extends AbstractOption
 	/**
 	 * Create the UI components for this option.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		fieldLabel = new JLabel(label);
 		field = createField();
@@ -88,7 +89,8 @@ public abstract class TextOption extends AbstractOption
 	 * @return a string value.
 	 * @see org.jppf.ui.options.AbstractOption#getValue()
 	 */
-	public Object getValue()
+	@Override
+    public Object getValue()
 	{
 		Document doc = field.getDocument();
 		try
@@ -105,7 +107,8 @@ public abstract class TextOption extends AbstractOption
 	 * Add a listener to the underlying text document, to receive and propagate change events.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
 	}
 
@@ -114,7 +117,8 @@ public abstract class TextOption extends AbstractOption
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 		field.setEnabled(enabled);
 		fieldLabel.setEnabled(enabled);

@@ -118,7 +118,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	/**
 	 * Create, initialize and layout the GUI components displayed in this panel.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 	  treeTable = new JPPFTreeTable(model);
 	  treeTable.getTree().setLargeModel(true);
@@ -145,7 +146,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	{
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				manager.nodeDataUpdated(driverName, nodeName);
 			}
@@ -161,7 +163,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	{
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				manager.driverAdded(connection);
 			}
@@ -178,7 +181,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	{
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				manager.driverRemoved(driverName, removeNodesOnly);
 			}
@@ -207,7 +211,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	{
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				manager.nodeAdded(driverNode, nodeInfo);
 			}
@@ -224,7 +229,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	{
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				manager.nodeRemoved(driverName, nodeName);
 			}
@@ -239,7 +245,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	{
 		executor.submit(new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				manager.repaintTreeTable();
 			}
@@ -315,7 +322,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * @param event the event to notify this listener of.
 	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
 	 */
-	public synchronized void newConnection(ClientEvent event)
+	@Override
+    public synchronized void newConnection(ClientEvent event)
 	{
 		driverAdded(event.getConnection());
 	}
@@ -373,7 +381,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	/**
 	 * {@inheritDoc}
 	 */
-	public void connectionFailed(ClientEvent event)
+	@Override
+    public void connectionFailed(ClientEvent event)
 	{
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
 		driverRemoved(c.getJmxConnection().getId(), false);

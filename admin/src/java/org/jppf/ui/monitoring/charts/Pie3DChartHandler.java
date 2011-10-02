@@ -50,7 +50,8 @@ public class Pie3DChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration createChart(ChartConfiguration config)
+	@Override
+    public ChartConfiguration createChart(ChartConfiguration config)
 	{
 		Object ds = createDataset(config);
 		Class[] paramTypes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE };
@@ -80,7 +81,8 @@ public class Pie3DChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration populateDataset(ChartConfiguration config)
+	@Override
+    public ChartConfiguration populateDataset(ChartConfiguration config)
 	{
 		return updateDataset(config);
 	}
@@ -91,7 +93,8 @@ public class Pie3DChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration updateDataset(ChartConfiguration config)
+	@Override
+    public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
 		Object ds = config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();

@@ -74,7 +74,8 @@ public class SpinnerNumberOption extends AbstractOption
 	/**
 	 * Create the UI components for this option.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		SpinnerNumberModel model =
 			new SpinnerNumberModel(((Integer) value).intValue(), min.intValue(), max.intValue(), 1);
@@ -96,9 +97,10 @@ public class SpinnerNumberOption extends AbstractOption
 	 * @return a <code>Number</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#getValue()
 	 */
-	public Object getValue()
+	@Override
+    public Object getValue()
 	{
-		value = ((SpinnerNumberModel) spinner.getModel()).getValue();
+		value = spinner.getModel().getValue();
 		return value;
 	}
 
@@ -107,7 +109,8 @@ public class SpinnerNumberOption extends AbstractOption
 	 * @param value a <code>Number</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
-	public void setValue(Object value)
+	@Override
+    public void setValue(Object value)
 	{
 		if (value instanceof String)
 		{
@@ -124,7 +127,7 @@ public class SpinnerNumberOption extends AbstractOption
 		else this.value = Integer.valueOf(((Number) value).intValue());
 		if (spinner != null)
 		{
-			((SpinnerNumberModel) spinner.getModel()).setValue(this.value);
+			spinner.getModel().setValue(this.value);
 		}
 	}
 
@@ -132,12 +135,14 @@ public class SpinnerNumberOption extends AbstractOption
 	 * Propagate the selection changes in the underlying combo box to the listeners to this option.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
 		SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
 		model.addChangeListener(new ChangeListener()
 		{
-			public void stateChanged(ChangeEvent e)
+			@Override
+            public void stateChanged(ChangeEvent e)
 			{
 				getValue();
 				fireValueChanged();
@@ -150,7 +155,8 @@ public class SpinnerNumberOption extends AbstractOption
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 		spinner.setEnabled(enabled);
 		spinnerLabel.setEnabled(enabled);

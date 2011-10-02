@@ -70,7 +70,8 @@ public class ComboBoxOption extends AbstractOption
 	/**
 	 * Create the UI components for this option.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		combo = new JComboBox();
 		if (items != null)
@@ -94,7 +95,8 @@ public class ComboBoxOption extends AbstractOption
 	 * @return a <code>Boolean</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#getValue()
 	 */
-	public Object getValue()
+	@Override
+    public Object getValue()
 	{
 		value = combo.getSelectedItem();
 		return value;
@@ -105,13 +107,14 @@ public class ComboBoxOption extends AbstractOption
 	 * @param value a <code>Boolean</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
-	public void setValue(Object value)
+	@Override
+    public void setValue(Object value)
 	{
 		if (value instanceof String)
 		{
 			for (Object o: items)
 			{
-				if (((String) value).equals(o.toString()))
+				if (value.equals(o.toString()))
 				{
 					value = o;
 					break;
@@ -126,11 +129,13 @@ public class ComboBoxOption extends AbstractOption
 	 * Propagate the selection changes in the underlying combo box to the listeners to this option.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
 		combo.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent event)
+			@Override
+            public void actionPerformed(ActionEvent event)
 			{
 				getValue();
 				fireValueChanged();
@@ -143,7 +148,8 @@ public class ComboBoxOption extends AbstractOption
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 		combo.setEnabled(enabled);
 		comboLabel.setEnabled(enabled);

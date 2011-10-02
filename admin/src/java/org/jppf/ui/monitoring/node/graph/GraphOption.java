@@ -79,21 +79,24 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		graph = new JPPFGraph();
 		graphComponent =  new mxGraphComponent(graph);
@@ -107,7 +110,8 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	/**
 	 * {@inheritDoc}
 	 */
-	public JComponent getUIComponent()
+	@Override
+    public JComponent getUIComponent()
 	{
 		return graphComponent;
 	}
@@ -200,7 +204,8 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	/**
 	 * {@inheritDoc}
 	 */
-	public ActionHandler getActionHandler()
+	@Override
+    public ActionHandler getActionHandler()
 	{
 		return actionHandler;
 	}
@@ -303,7 +308,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 				if (debugEnabled)
 				{
 					String s = node.getNodeInformation().isDriver() ? "peer driver" : "node";
-					log.debug("added " + s + " " + node.getId() + " to driver " + id);
+					log.debug("added " + s + ' ' + node.getId() + " to driver " + id);
 				}
 			}
 		}
@@ -367,7 +372,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 		StringBuilder style = new StringBuilder();
 		style.append("shape=image;image=/org/jppf/ui/resources/mainframe.gif");
 		style.append(";verticalLabelPosition=bottom");
-		mxCell vertex = (mxCell) graph.insertVertex(graph.getDefaultParent(), driver.getId(), driver, 0, 0, 30, 20, style.toString());
+		mxCell vertex = (mxCell) graph.insertVertex(graph.getDefaultParent(), driver.getId(), driver, 0.0, 0.0, 30.0, 20.0, style.toString());
 		vertex.setCollapsed(false);
 		if (layout != null)
 		{
@@ -395,7 +400,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 			StringBuilder style = new StringBuilder();
 			style.append("shape=image;image=/org/jppf/ui/resources/buggi_server.gif");
 			style.append(";verticalLabelPosition=bottom");
-			nodeVertex = (mxCell) graph.insertVertex(driverVertex, node.getId(), node, 0, 0, 20, 20, style.toString());
+			nodeVertex = (mxCell) graph.insertVertex(driverVertex, node.getId(), node, 0.0, 0.0, 20.0, 20.0, style.toString());
 			mxCell edge = (mxCell) graph.insertEdge(driverVertex, null, null, driverVertex, nodeVertex);
 			nodeVertex.setParent(edge);
 		}

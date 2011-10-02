@@ -49,7 +49,8 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	 * @return true if the cell can be edited, false otherwise.
 	 * @see org.jppf.ui.treetable.AbstractTreeTableModel#isCellEditable(java.lang.Object, int)
 	 */
-	public boolean isCellEditable(Object node, int column)
+	@Override
+    public boolean isCellEditable(Object node, int column)
 	{
 		//return false;
 		return super.isCellEditable(node, column);
@@ -62,7 +63,8 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	 * @param column not used.
 	 * @see org.jppf.ui.treetable.AbstractTreeTableModel#setValueAt(java.lang.Object, java.lang.Object, int)
 	 */
-	public void setValueAt(Object value, Object node, int column)
+	@Override
+    public void setValueAt(Object value, Object node, int column)
 	{
 	}
 
@@ -73,7 +75,8 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	 * @return the child node, or null if the index is not valid.
 	 * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
 	 */
-	public Object getChild(Object parent, int index)
+	@Override
+    public Object getChild(Object parent, int index)
 	{
 		try
 		{
@@ -91,7 +94,8 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	 * @return the number of children as an int.
 	 * @see javax.swing.tree.TreeModel#getChildCount(java.lang.Object)
 	 */
-	public int getChildCount(Object parent)
+	@Override
+    public int getChildCount(Object parent)
 	{
 		return ((TreeNode) parent).getChildCount();
 	}
@@ -137,7 +141,8 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	 * @return a <code>Class</code> instance.
 	 * @see org.jppf.ui.treetable.AbstractTreeTableModel#getColumnClass(int)
 	 */
-	public Class getColumnClass(int column)
+	@Override
+    public Class getColumnClass(int column)
 	{
 		return (column == 0) ? TreeTableModel.class : String.class;
 	}

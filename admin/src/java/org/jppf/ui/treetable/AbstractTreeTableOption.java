@@ -58,7 +58,8 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
 	 * Get the object that handles all actions in toolbars or popup menus.
 	 * @return a <code>JTreeTableActionHandler</code> instance.
 	 */
-	public JTreeTableActionHandler getActionHandler()
+	@Override
+    public JTreeTableActionHandler getActionHandler()
 	{
 		return actionHandler;
 	}
@@ -77,7 +78,8 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
 	 * @param enabled not used.
 	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 	}
 
@@ -86,7 +88,8 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
 	 * @param enabled not used.
 	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
 	 */
-	public void setEventsEnabled(boolean enabled)
+	@Override
+    public void setEventsEnabled(boolean enabled)
 	{
 	}
 
@@ -94,7 +97,8 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
 	 * Not implemented.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
 	}
 

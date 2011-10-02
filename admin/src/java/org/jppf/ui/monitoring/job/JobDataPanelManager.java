@@ -186,7 +186,7 @@ class JobDataPanelManager
 		int index = subJobInsertIndex(jobNode, nodeInfo);
 		if (index < 0) return;
 		DefaultMutableTreeNode subJobNode = new DefaultMutableTreeNode(data);
-		if (debugEnabled) log.debug("sub-job: " + jobInfo.getJobId() + " dispatched to node " + nodeInfo.getHost() + ":" + nodeInfo.getPort() + "(index " + index + ")");
+		if (debugEnabled) log.debug("sub-job: " + jobInfo.getJobId() + " dispatched to node " + nodeInfo.getHost() + ':' + nodeInfo.getPort() + "(index " + index + ')');
 		jobPanel.getModel().insertNodeInto(subJobNode, jobNode, index);
 		jobPanel.getTreeTable().expand(jobNode);
 	}
@@ -205,7 +205,7 @@ class JobDataPanelManager
 		if (jobNode == null) return;
 		DefaultMutableTreeNode subJobNode = findSubJob(jobNode, nodeInfo);
 		if (subJobNode == null) return;
-		if (debugEnabled) log.debug("removing sub-job: " + jobInfo.getJobId() + " from node " + nodeInfo.getHost() + ":" + nodeInfo.getPort());
+		if (debugEnabled) log.debug("removing sub-job: " + jobInfo.getJobId() + " from node " + nodeInfo.getHost() + ':' + nodeInfo.getPort());
 		jobPanel.getModel().removeNodeFromParent(subJobNode);
 		jobPanel.getTreeTable().repaint();
 	}
@@ -351,7 +351,8 @@ class JobDataPanelManager
 		 * @param event the connection status event.
 		 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 		 */
-		public void statusChanged(ClientConnectionStatusEvent event)
+		@Override
+        public void statusChanged(ClientConnectionStatusEvent event)
 		{
 			DefaultMutableTreeNode driverNode = findDriver(driverName);
 			if (driverNode != null) jobPanel.getModel().changeNode(driverNode);

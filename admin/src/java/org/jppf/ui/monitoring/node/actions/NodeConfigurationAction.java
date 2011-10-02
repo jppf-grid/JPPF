@@ -72,7 +72,8 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	 * @param selectedElements - a list of objects.
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
-	public void updateState(List<Object> selectedElements)
+	@Override
+    public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		setEnabled(nodeDataArray.length > 0);
@@ -83,7 +84,8 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	 * @param event - not used.
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
-	public void actionPerformed(ActionEvent event)
+	@Override
+    public void actionPerformed(ActionEvent event)
 	{
 		try
 		{
@@ -99,7 +101,8 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 			frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/update.gif").getImage());
 			okBtn.addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent event)
+				@Override
+                public void actionPerformed(ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();
@@ -108,7 +111,8 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 			});
 			cancelBtn.addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent event)
+				@Override
+                public void actionPerformed(ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();
@@ -136,7 +140,8 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 		final Boolean b = (Boolean) ((BooleanOption) panel.findFirstWithName("forceReconnect")).getValue();
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				try
 				{
@@ -164,7 +169,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 		TypedProperties props = info.getJppf();
 		Set<String> keys = new TreeSet<String>();
 		for (Object o: props.keySet()) keys.add((String) o);
-		for (String s: keys) sb.append(s).append(" = ").append(props.get(s)).append("\n");
+		for (String s: keys) sb.append(s).append(" = ").append(props.get(s)).append('\n');
 		return sb.toString();
 	}
 
@@ -173,24 +178,27 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	 * @param source - the text from which to read the properties.
 	 * @return a map of string keys to string values.
 	 */
-	private Map<String, String> getPropertiesAsMap(String source)
+	private static Map<String, String> getPropertiesAsMap(String source)
 	{
 		try
 		{
 			Map<String, String> map = new HashMap<String, String>();
 			BufferedReader reader = new BufferedReader(new StringReader(source));
-			while (true)
-			{
-				String s = reader.readLine();
-				if (s == null) break;
-				int idx = s.indexOf('=');
-				if (idx < 0) idx = s.indexOf(' ');
-				if (idx < 0) continue;
-				String key = s.substring(0, idx).trim();
-				String value = s.substring(idx+1).trim();
-				map.put(key, value);
-			}
-			reader.close();
+            try {
+                while (true)
+                {
+                    String s = reader.readLine();
+                    if (s == null) break;
+                    int idx = s.indexOf('=');
+                    if (idx < 0) idx = s.indexOf(' ');
+                    if (idx < 0) continue;
+                    String key = s.substring(0, idx).trim();
+                    String value = s.substring(idx+1).trim();
+                    map.put(key, value);
+                }
+            } finally {
+                reader.close();
+            }
 			return map;
 		}
 		catch(Exception e)

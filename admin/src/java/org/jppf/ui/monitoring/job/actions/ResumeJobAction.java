@@ -52,7 +52,8 @@ public class ResumeJobAction extends AbstractJobAction
 	 * @param selectedElements - a list of objects.
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
-	public void updateState(List<Object> selectedElements)
+	@Override
+    public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		if (jobDataArray.length > 0)
@@ -74,17 +75,19 @@ public class ResumeJobAction extends AbstractJobAction
 	 * @param event not used.
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
-	public void actionPerformed(ActionEvent event)
+	@Override
+    public void actionPerformed(ActionEvent event)
 	{
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				for (JobData data: jobDataArray)
 				{
 					try
 					{
-						((JMXDriverConnectionWrapper) data.getJmxWrapper()).resumeJob(data.getJobInformation().getJobUuid());
+						data.getJmxWrapper().resumeJob(data.getJobInformation().getJobUuid());
 					}
 					catch(Exception e)
 					{

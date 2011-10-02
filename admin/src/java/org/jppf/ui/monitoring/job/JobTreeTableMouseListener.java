@@ -61,7 +61,8 @@ public class JobTreeTableMouseListener extends MouseAdapter
 	 * @param event the mouse event to process.
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
-	public void mousePressed(MouseEvent event)
+	@Override
+    public void mousePressed(MouseEvent event)
 	{
 		Component comp = event.getComponent();
 		if (!(comp instanceof JPPFTreeTable)) return;
@@ -101,7 +102,7 @@ public class JobTreeTableMouseListener extends MouseAdapter
 	 * @param location - the location to use for any window create by the action.
 	 * @return a <code>JMenuItem</code> instance.
 	 */
-	private JMenuItem createMenuItem(Action action, Point location)
+	private static JMenuItem createMenuItem(Action action, Point location)
 	{
 		if (action instanceof AbstractUpdatableAction) ((AbstractUpdatableAction) action).setLocation(location);
 		return new JMenuItem(action);

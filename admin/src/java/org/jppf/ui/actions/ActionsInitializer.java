@@ -66,7 +66,8 @@ public class ActionsInitializer implements Runnable
 	 * Execute this task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		OptionsPage page = null;
 		while (page == null)
@@ -75,7 +76,7 @@ public class ActionsInitializer implements Runnable
 			if (parent != null) page = (OptionsPage) mainPanel.findFirstWithName(btnContainerName);
 			try
 			{
-				Thread.sleep(100);
+				Thread.sleep(100L);
 			}
 			catch(InterruptedException e)
 			{

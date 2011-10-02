@@ -184,7 +184,7 @@ public class NodeRefreshHandler
 		if (nodesInfo == null) return;
 		Map<String, JPPFManagementInfo> actualMap = new HashMap<String, JPPFManagementInfo>();
 		//for (JPPFManagementInfo info: nodesInfo) actualMap.put(NetworkUtils.getHostName(info.getHost()) + ":" + info.getPort(), info);
-		for (JPPFManagementInfo info: nodesInfo) actualMap.put(info.getHost() + ":" + info.getPort(), info);
+		for (JPPFManagementInfo info: nodesInfo) actualMap.put(info.getHost() + ':' + info.getPort(), info);
 		List<String> nodesToProcess = new ArrayList<String>();
 		for (String name: panelNames)
 		{
@@ -229,7 +229,8 @@ public class NodeRefreshHandler
 		refreshTimer = new Timer("JPPF Topology Update Timer");
 		TimerTask task = new TimerTask()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				refresh();
 			}

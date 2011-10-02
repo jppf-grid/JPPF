@@ -54,11 +54,12 @@ public class DifferenceChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration createChart(ChartConfiguration config)
+	@Override
+    public ChartConfiguration createChart(ChartConfiguration config)
 	{
 		Object ds = createDataset(config);
 		String s = config.name;
-		if (config.unit != null) s += " ("+config.unit+")";
+		if (config.unit != null) s += " (" + config.unit+ ')';
 		//JFreeChart chart = ChartFactory.createXYLineChart(s, null, null, ds, PlotOrientation.VERTICAL, true, true, false);
 		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createXYLineChart",
 			s, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "VERTICAL"), true, true, false);
@@ -76,7 +77,7 @@ public class DifferenceChartHandler implements ChartHandler
 			getCurrentClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
 		invokeMethod(rend.getClass(), rend, "setLegendItemLabelGenerator", labelGenerator);
 		//rend.setBaseStroke(new BasicStroke(2f));
-		invokeMethod(rend.getClass(), rend, "setBaseStroke", new Class[] {Stroke.class}, new BasicStroke(2f));
+		invokeMethod(rend.getClass(), rend, "setBaseStroke", new Class[] {Stroke.class}, new BasicStroke(2.0f));
 		config.chart = chart;
 		return config;
 	}
@@ -114,7 +115,8 @@ public class DifferenceChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration populateDataset(ChartConfiguration config)
+	@Override
+    public ChartConfiguration populateDataset(ChartConfiguration config)
 	{
 		if (config.fields == null) return config;
 		int len = config.fields.length;
@@ -149,7 +151,8 @@ public class DifferenceChartHandler implements ChartHandler
 	 * @return a <code>ChartConfiguration</code> instance.
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
-	public ChartConfiguration updateDataset(ChartConfiguration config)
+	@Override
+    public ChartConfiguration updateDataset(ChartConfiguration config)
 	{
 		Object ds = config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();

@@ -123,7 +123,8 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public int getChildCount(Object node)
+	@Override
+    public int getChildCount(Object node)
 	{
 		Object[] children = getChildren(node);
 		return (children == null) ? 0 : children.length;
@@ -132,7 +133,8 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object getChild(Object node, int i)
+	@Override
+    public Object getChild(Object node, int i)
 	{
 		return getChildren(node)[i];
 	}
@@ -140,7 +142,8 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean isLeaf(Object node)
+	@Override
+    public boolean isLeaf(Object node)
 	{
 		// The superclass's implementation would work, but this is more efficient.
 		return getFile(node).isFile();
@@ -153,7 +156,8 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public int getColumnCount()
+	@Override
+    public int getColumnCount()
 	{
 		return cNames.length;
 	}
@@ -161,7 +165,8 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getColumnName(int column)
+	@Override
+    public String getColumnName(int column)
 	{
 		return cNames[column];
 	}
@@ -169,7 +174,8 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public Class getColumnClass(int column)
+	@Override
+    public Class getColumnClass(int column)
 	{
 		return cTypes[column];
 	}
@@ -177,7 +183,8 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object getValueAt(Object node, int column)
+	@Override
+    public Object getValueAt(Object node, int column)
 	{
 		File file = getFile(node);
 		try
@@ -230,7 +237,8 @@ class FileNode
 	/**
 	 * {@inheritDoc}
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return file.getName();
 	}

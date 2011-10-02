@@ -61,7 +61,8 @@ class ConnectionStatusListener implements ClientConnectionStatusListener
 	 * @param event the connection status event.
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
-	public void statusChanged(ClientConnectionStatusEvent event)
+	@Override
+    public void statusChanged(ClientConnectionStatusEvent event)
 	{
 		ClientConnectionStatusHandler ccsh =  event.getClientConnectionStatusHandler();
 		if (debugEnabled) log.debug("Received connection status changed event for " + ccsh + " : " + ccsh.getStatus());

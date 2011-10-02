@@ -65,7 +65,8 @@ public class TextAreaOption extends AbstractOption
 	/**
 	 * Create the UI components for this option.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		textArea = new JTextArea((String) value);
 		textArea.setBorder(BorderFactory.createEmptyBorder());
@@ -93,7 +94,8 @@ public class TextAreaOption extends AbstractOption
 	 * @return a <code>String</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#getValue()
 	 */
-	public Object getValue()
+	@Override
+    public Object getValue()
 	{
 		value = textArea.getText();
 		return value;
@@ -104,12 +106,14 @@ public class TextAreaOption extends AbstractOption
 	 * @param value a <code>String</code> instance.
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
-	public void setValue(Object value)
+	@Override
+    public void setValue(Object value)
 	{
 		this.value = value;
 		SwingUtilities.invokeLater( new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				textArea.setText((String) TextAreaOption.this.value);
 			}
@@ -125,7 +129,8 @@ public class TextAreaOption extends AbstractOption
 	{
 		SwingUtilities.invokeLater( new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				textArea.append(value);
 			}
@@ -136,22 +141,26 @@ public class TextAreaOption extends AbstractOption
 	 * Add a listener to the underlying text document, to receive and propagate change events.
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
-	protected void setupValueChangeNotifications()
+	@Override
+    protected void setupValueChangeNotifications()
 	{
-		Document doc = (Document) textArea.getDocument();
+		Document doc = textArea.getDocument();
 		doc.addDocumentListener(new DocumentListener()
 		{
-			public void changedUpdate(DocumentEvent e)
+			@Override
+            public void changedUpdate(DocumentEvent e)
 			{
 				fireValueChanged();
 			}
 
-			public void insertUpdate(DocumentEvent e)
+			@Override
+            public void insertUpdate(DocumentEvent e)
 			{
 				fireValueChanged();
 			}
 
-			public void removeUpdate(DocumentEvent e)
+			@Override
+            public void removeUpdate(DocumentEvent e)
 			{
 				fireValueChanged();
 			}
@@ -171,7 +180,8 @@ public class TextAreaOption extends AbstractOption
 	 * Specifiy whether the text area is editable.
 	 * @param editable true if the text area is editable, false otherwise.
 	 */
-	public void setEditable(boolean editable)
+	@Override
+    public void setEditable(boolean editable)
 	{
 		this.editable = editable;
 		if (textArea != null) textArea.setEditable(editable);
@@ -182,7 +192,8 @@ public class TextAreaOption extends AbstractOption
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 		textArea.setEnabled(enabled);
 	}

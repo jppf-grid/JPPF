@@ -70,7 +70,8 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 	 * @param selectedElements a list of objects.
 	 * @see org.jppf.ui.actions.UpdatableAction#updateState(java.util.List)
 	 */
-	public void updateState(List<Object> selectedElements)
+	@Override
+    public void updateState(List<Object> selectedElements)
 	{
 		this.selectedElements = selectedElements;
 	}
@@ -80,7 +81,8 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 	 * @param event the event encapsulating the source of the event.
 	 * @see org.jppf.ui.options.event.ValueChangeListener#valueChanged(org.jppf.ui.options.event.ValueChangeEvent)
 	 */
-	public void valueChanged(ValueChangeEvent event)
+	@Override
+    public void valueChanged(ValueChangeEvent event)
 	{
 		actionPerformed(new ActionEvent(event.getSource(), ActionEvent.ACTION_PERFORMED, ""));
 	}

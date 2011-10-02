@@ -42,7 +42,8 @@ public class ToolbarOption extends AbstractOptionElement implements OptionsPage
 	/**
 	 * Initialize the panel used to display this options page.
 	 */
-	public void createUI()
+	@Override
+    public void createUI()
 	{
 		JToolBar toolbar = new JToolBar(JToolBar.HORIZONTAL);
 		toolbar.setFloatable(false);
@@ -55,7 +56,8 @@ public class ToolbarOption extends AbstractOptionElement implements OptionsPage
 	 * @param enabled true to enable this option, false to disable it.
 	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
 	 */
-	public void setEnabled(boolean enabled)
+	@Override
+    public void setEnabled(boolean enabled)
 	{
 		if (UIComponent != null) UIComponent.setEnabled(enabled);
 		for (OptionElement elt: children) elt.setEnabled(enabled);
@@ -66,7 +68,8 @@ public class ToolbarOption extends AbstractOptionElement implements OptionsPage
 	 * @param enabled true to enable the events, false to disable them.
 	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
 	 */
-	public void setEventsEnabled(boolean enabled)
+	@Override
+    public void setEventsEnabled(boolean enabled)
 	{
 		for (OptionElement elt: children) elt.setEventsEnabled(enabled);
 	}
@@ -76,7 +79,8 @@ public class ToolbarOption extends AbstractOptionElement implements OptionsPage
 	 * @param element the element to add.
 	 * @see org.jppf.ui.options.OptionsPage#add(org.jppf.ui.options.OptionElement)
 	 */
-	public void add(OptionElement element)
+	@Override
+    public void add(OptionElement element)
 	{
 		JToolBar toolbar = (JToolBar) UIComponent;
 		children.add(element);
@@ -90,7 +94,8 @@ public class ToolbarOption extends AbstractOptionElement implements OptionsPage
 	 * @param element the element to remove.
 	 * @see org.jppf.ui.options.OptionsPage#remove(org.jppf.ui.options.OptionElement)
 	 */
-	public void remove(OptionElement element)
+	@Override
+    public void remove(OptionElement element)
 	{
 		JToolBar toolbar = (JToolBar) UIComponent;
 		children.remove(element);
@@ -104,7 +109,8 @@ public class ToolbarOption extends AbstractOptionElement implements OptionsPage
 	 * @return a list of <code>Option</code> instances.
 	 * @see org.jppf.ui.options.OptionsPage#getChildren()
 	 */
-	public List<OptionElement> getChildren()
+	@Override
+    public List<OptionElement> getChildren()
 	{
 		return Collections.unmodifiableList(children);
 	}

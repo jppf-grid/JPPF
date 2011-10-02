@@ -55,7 +55,8 @@ public class NodeRenderer extends AbstractTreeCellRenderer
 	 * @return a component used to paint the node.
 	 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
 	 */
-	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
+	@Override
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
 	{
 		DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 		if (value instanceof DefaultMutableTreeNode)
@@ -107,7 +108,7 @@ public class NodeRenderer extends AbstractTreeCellRenderer
 							else
 							{
 								JMXConnectionWrapper wrapper = data.getJmxWrapper();
-								boolean b = wrapper == null ? false : wrapper.isConnected();
+								boolean b = wrapper != null && wrapper.isConnected();
 								if (!b) foreground = UNMANAGED_COLOR;
 							}
 						}
