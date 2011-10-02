@@ -68,7 +68,8 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * @throws Exception if an error occurs while sending the job for execution.
 	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
 	 */
-	public List<JPPFTask> submit(JPPFJob job) throws Exception
+	@Override
+    public List<JPPFTask> submit(JPPFJob job) throws Exception
 	{
 		return null;
 	}
@@ -76,7 +77,8 @@ public class JPPFJcaClient extends AbstractGenericClient
 	/**
 	 * Close this client and release all the resources it is using.
 	 */
-	public void close()
+	@Override
+    public void close()
 	{
 		super.close();
 	}
@@ -86,7 +88,8 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * @param event the event to notify of.
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
-	public void statusChanged(ClientConnectionStatusEvent event)
+	@Override
+    public void statusChanged(ClientConnectionStatusEvent event)
 	{
 		super.statusChanged(event);
 		if (submissionManager != null) submissionManager.wakeUp();
@@ -113,7 +116,8 @@ public class JPPFJcaClient extends AbstractGenericClient
 	/**
 	 * {@inheritDoc}
 	 */
-	protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
+	@Override
+    protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
 	{
 		return new JPPFJcaClientConnection(uuid, name, info, this);
 	}
@@ -121,7 +125,8 @@ public class JPPFJcaClient extends AbstractGenericClient
 	/**
 	 * {@inheritDoc}
 	 */
-	protected void initConfig(Object configuration)
+	@Override
+    protected void initConfig(Object configuration)
 	{
 		if (log.isDebugEnabled()) log.debug("initializing configuration:\n" + configuration);
 		try

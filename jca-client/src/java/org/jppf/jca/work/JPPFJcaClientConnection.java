@@ -70,7 +70,8 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * 
 	 * @see org.jppf.client.JPPFClientConnection#init()
 	 */
-	public void init()
+	@Override
+    public void init()
 	{
 		try
 		{
@@ -80,14 +81,16 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 			//taskServerConnection.init();
 			delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
 			{
-				public void statusChanged(ClientConnectionStatusEvent event)
+				@Override
+                public void statusChanged(ClientConnectionStatusEvent event)
 				{
 					delegateStatusChanged(event);
 				}
 			});
 			taskServerConnection.addClientConnectionStatusListener(new ClientConnectionStatusListener()
 			{
-				public void statusChanged(ClientConnectionStatusEvent event)
+				@Override
+                public void statusChanged(ClientConnectionStatusEvent event)
 				{
 					taskServerConnectionStatusChanged(event);
 				}
@@ -149,7 +152,8 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	/**
 	 * {@inheritDoc}
 	 */
-	public void sendTasks(JPPFTaskBundle header, JPPFJob job) throws Exception
+	@Override
+    public void sendTasks(JPPFTaskBundle header, JPPFJob job) throws Exception
 	{
 		header.setRequestUuid(job.getJobUuid());
 		if (debugEnabled) log.debug("sending tasks bundle with requestUuid=" + header.getRequestUuid());
@@ -182,7 +186,8 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @throws Exception if an error occurs while sending the job for execution.
 	 * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
 	 */
-	public void submit(JPPFJob job) throws Exception
+	@Override
+    public void submit(JPPFJob job) throws Exception
 	{
 		setStatus(EXECUTING);
 		JcaResultProcessor proc = new JcaResultProcessor(this, job);
@@ -195,7 +200,8 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @return the fully qualified class name of a <code>SerializationHelper</code> implementation.
 	 * @see org.jppf.client.AbstractJPPFClientConnection#getSerializationHelperClassName()
 	 */
-	protected String getSerializationHelperClassName()
+	@Override
+    protected String getSerializationHelperClassName()
 	{
 		return "org.jppf.jca.serialization.JcaSerializationHelperImpl";
 	}
@@ -206,7 +212,8 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @return a list of <code>JPPFJob</code> instances to resubmit.
 	 * @see org.jppf.client.JPPFClientConnection#close()
 	 */
-	public List<JPPFJob> close()
+	@Override
+    public List<JPPFJob> close()
 	{
 		if (!isShutdown)
 		{
@@ -218,7 +225,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 			}
 			catch(Exception e)
 			{
-				log.error("[" + name + "] "+ e.getMessage(), e);
+				log.error('[' + name + "] "+ e.getMessage(), e);
 			}
 			List<JPPFJob> result = new ArrayList<JPPFJob>();
 			if (job != null) result.add(job);
@@ -232,7 +239,8 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @return the name as a string.
 	 * @see org.jppf.client.JPPFClientConnection#getName()
 	 */
-	public String getName()
+	@Override
+    public String getName()
 	{
 		return name;
 	}
@@ -242,7 +250,8 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @return a string representing this connection.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return name + " : " + status;
 	}
@@ -252,7 +261,8 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @return an instance of <code>SocketInitializerImpl</code>.
 	 * @see org.jppf.client.AbstractJPPFClientConnection#createSocketInitializer()
 	 */
-	protected SocketInitializer createSocketInitializer()
+	@Override
+    protected SocketInitializer createSocketInitializer()
 	{
 		return new JcaSocketInitializer();
 	}
@@ -261,7 +271,8 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * Get the JPPF client that manages connections to the JPPF drivers.
 	 * @return a <code>JPPFJcaClient</code> instance.
 	 */
-	public JPPFJcaClient getClient()
+	@Override
+    public JPPFJcaClient getClient()
 	{
 		return (JPPFJcaClient) client;
 	}

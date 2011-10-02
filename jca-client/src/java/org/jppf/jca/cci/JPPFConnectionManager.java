@@ -35,7 +35,8 @@ public class JPPFConnectionManager implements ConnectionManager
 	 * @throws ResourceException if the connection could not be obtained.
 	 * @see javax.resource.spi.ConnectionManager#allocateConnection(javax.resource.spi.ManagedConnectionFactory, javax.resource.spi.ConnectionRequestInfo)
 	 */
-	 public Object allocateConnection(ManagedConnectionFactory mcf, ConnectionRequestInfo cxRequestInfo)
+	 @Override
+     public Object allocateConnection(ManagedConnectionFactory mcf, ConnectionRequestInfo cxRequestInfo)
 	 	throws ResourceException
 	 {
 	    ManagedConnection conn = mcf.createManagedConnection(null, cxRequestInfo);

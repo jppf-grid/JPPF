@@ -59,7 +59,8 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
 	 * @throws ResourceException if the connection factory could not be created.
 	 * @see javax.resource.spi.ManagedConnectionFactory#createConnectionFactory()
 	 */
-	public Object createConnectionFactory() throws ResourceException
+	@Override
+    public Object createConnectionFactory() throws ResourceException
 	{
 		JPPFConnectionFactory jcf = new JPPFConnectionFactory();
 		if (jcf.getJppfClient() == null) jcf.setJppfClient(getJppfClient());
@@ -73,7 +74,8 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
 	 * @throws ResourceException if the connection factory could not be created.
 	 * @see javax.resource.spi.ManagedConnectionFactory#createConnectionFactory(javax.resource.spi.ConnectionManager)
 	 */
-	public Object createConnectionFactory(ConnectionManager manager) throws ResourceException
+	@Override
+    public Object createConnectionFactory(ConnectionManager manager) throws ResourceException
 	{
 		JPPFConnectionFactory jcf = new JPPFConnectionFactory(this, manager);
 		if (jcf.getJppfClient() == null) jcf.setJppfClient(getJppfClient());
@@ -88,7 +90,8 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
 	 * @throws ResourceException if the managed connection could not be created.
 	 * @see javax.resource.spi.ManagedConnectionFactory#createManagedConnection(javax.security.auth.Subject, javax.resource.spi.ConnectionRequestInfo)
 	 */
-	public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo cri) throws ResourceException
+	@Override
+    public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo cri) throws ResourceException
 	{
 		JPPFManagedConnection conn = new JPPFManagedConnection();
 		if (conn.getJppfClient() == null) conn.setJppfClient(getJppfClient());
@@ -104,7 +107,8 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
 	 * @throws ResourceException always.
 	 * @see javax.resource.spi.ManagedConnectionFactory#matchManagedConnections(java.util.Set, javax.security.auth.Subject, javax.resource.spi.ConnectionRequestInfo)
 	 */
-	public ManagedConnection matchManagedConnections(Set set, Subject subject, ConnectionRequestInfo cri)
+	@Override
+    public ManagedConnection matchManagedConnections(Set set, Subject subject, ConnectionRequestInfo cri)
 			throws ResourceException
 	{
 		if (!set.isEmpty()) return (ManagedConnection) set.iterator().next();
@@ -116,7 +120,8 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
 	 * @return a <code>ResourceAdapter</code>.
 	 * @see javax.resource.spi.ResourceAdapterAssociation#getResourceAdapter()
 	 */
-	public ResourceAdapter getResourceAdapter()
+	@Override
+    public ResourceAdapter getResourceAdapter()
 	{
 		return resourceAdapter;
 	}
@@ -127,7 +132,8 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
 	 * @throws ResourceException if the resource adapter could not be set.
 	 * @see javax.resource.spi.ResourceAdapterAssociation#setResourceAdapter(javax.resource.spi.ResourceAdapter)
 	 */
-	public void setResourceAdapter(ResourceAdapter resourceAdapter) throws ResourceException
+	@Override
+    public void setResourceAdapter(ResourceAdapter resourceAdapter) throws ResourceException
 	{
 		this.resourceAdapter = resourceAdapter;
 		setJppfClient(((JPPFResourceAdapter) resourceAdapter).getJppfClient());
@@ -139,7 +145,8 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
 	 * @return true if the objects are equal, false otherwise.
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object obj)
+	@Override
+    public boolean equals(Object obj)
 	{
 		return super.equals(obj);
 	}
@@ -149,7 +156,8 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
 	 * @return the hashcode as an int.
 	 * @see java.lang.Object#hashCode()
 	 */
-	public int hashCode()
+	@Override
+    public int hashCode()
 	{
 		return super.hashCode();
 	}
@@ -158,7 +166,8 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
    * Get the JPPF client used to submit tasks.
 	 * @return a <code>JPPFJcaClient</code> instance.
 	 */
-	public JPPFJcaClient getJppfClient()
+	@Override
+    public JPPFJcaClient getJppfClient()
 	{
 		if (jppfClient == null)
 		{

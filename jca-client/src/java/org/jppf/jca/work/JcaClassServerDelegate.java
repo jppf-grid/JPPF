@@ -77,7 +77,8 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * @throws Exception if an error is raised during initialization.
 	 * @see org.jppf.client.ClassServerDelegate#init()
 	 */
-	public final void init() throws Exception
+	@Override
+    public final void init() throws Exception
 	{
 		try
 		{
@@ -114,7 +115,8 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * Main processing loop of this delegate.
 	 * @see org.jppf.client.ClassServerDelegate#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{
@@ -222,7 +224,8 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * Close the socket connection.
 	 * @see org.jppf.client.ClassServerDelegate#close()
 	 */
-	public void close()
+	@Override
+    public void close()
 	{
 		if (!closed)
 		{
@@ -245,7 +248,8 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * Create a socket initializer for this delegate.
 	 * @return a <code>SocketInitializer</code> instance.
 	 */
-	protected SocketInitializer createSocketInitializer()
+	@Override
+    protected SocketInitializer createSocketInitializer()
 	{
 		return new JcaSocketInitializer();
 	}
@@ -254,7 +258,8 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * This method does nothing.
 	 * @see javax.resource.spi.work.Work#release()
 	 */
-	public void release()
+	@Override
+    public void release()
 	{
 	}
 

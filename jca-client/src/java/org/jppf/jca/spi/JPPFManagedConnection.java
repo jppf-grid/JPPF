@@ -58,7 +58,8 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @param listener the listener to add.
 	 * @see javax.resource.spi.ManagedConnection#addConnectionEventListener(javax.resource.spi.ConnectionEventListener)
 	 */
-	public void addConnectionEventListener(ConnectionEventListener listener)
+	@Override
+    public void addConnectionEventListener(ConnectionEventListener listener)
 	{
 		listeners.add(listener);
 	}
@@ -68,7 +69,8 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @param listener the listener to remove.
 	 * @see javax.resource.spi.ManagedConnection#removeConnectionEventListener(javax.resource.spi.ConnectionEventListener)
 	 */
-	public void removeConnectionEventListener(ConnectionEventListener listener)
+	@Override
+    public void removeConnectionEventListener(ConnectionEventListener listener)
 	{
 		listeners.remove(listener);
 	}
@@ -81,7 +83,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 */
 	public void fireConnectionEvent(JPPFConnection connection, int eventId, Exception exception)
 	{
-		ConnectionEvent event = null;
+		ConnectionEvent event;
 		if (exception == null) event = new ConnectionEvent(this, eventId);
 		else event = new ConnectionEvent(this, eventId, exception);
 		event.setConnectionHandle(connection);
@@ -119,7 +121,8 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @throws ResourceException if the association raised an error.
 	 * @see javax.resource.spi.ManagedConnection#associateConnection(java.lang.Object)
 	 */
-	public void associateConnection(Object conn) throws ResourceException
+	@Override
+    public void associateConnection(Object conn) throws ResourceException
 	{
 		connection = (JPPFConnectionImpl) conn;
 		connection.setManagedConnection(this);
@@ -130,7 +133,8 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @throws ResourceException .
 	 * @see javax.resource.spi.ManagedConnection#cleanup()
 	 */
-	public void cleanup() throws ResourceException
+	@Override
+    public void cleanup() throws ResourceException
 	{
 	}
 
@@ -139,7 +143,8 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @throws ResourceException .
 	 * @see javax.resource.spi.ManagedConnection#destroy()
 	 */
-	public void destroy() throws ResourceException
+	@Override
+    public void destroy() throws ResourceException
 	{
 	}
 
@@ -151,7 +156,8 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @throws ResourceException if the connection could not be obtained.
 	 * @see javax.resource.spi.ManagedConnection#getConnection(javax.security.auth.Subject, javax.resource.spi.ConnectionRequestInfo)
 	 */
-	public Object getConnection(Subject subject, ConnectionRequestInfo cri) throws ResourceException
+	@Override
+    public Object getConnection(Subject subject, ConnectionRequestInfo cri) throws ResourceException
 	{
 		if (connection == null)
 		{
@@ -168,7 +174,8 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @throws ResourceException always.
 	 * @see javax.resource.spi.ManagedConnection#getLocalTransaction()
 	 */
-	public LocalTransaction getLocalTransaction() throws ResourceException
+	@Override
+    public LocalTransaction getLocalTransaction() throws ResourceException
 	{
 		throw new NotSupportedException("Method not supported");
 	}
@@ -179,7 +186,8 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @throws ResourceException if the metadata could not be obtained.
 	 * @see javax.resource.spi.ManagedConnection#getMetaData()
 	 */
-	public ManagedConnectionMetaData getMetaData() throws ResourceException
+	@Override
+    public ManagedConnectionMetaData getMetaData() throws ResourceException
 	{
 		return new JPPFManagedConnectionMetaData(null);
 	}
@@ -190,7 +198,8 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @throws ResourceException always.
 	 * @see javax.resource.spi.ManagedConnection#getXAResource()
 	 */
-	public XAResource getXAResource() throws ResourceException
+	@Override
+    public XAResource getXAResource() throws ResourceException
 	{
 		throw new NotSupportedException("Method not supported");
 	}

@@ -47,7 +47,8 @@ public class JPPFManagedConnectionMetaData implements ManagedConnectionMetaData
 	 * @throws ResourceException if the product name could not be obtained.
 	 * @see javax.resource.spi.ManagedConnectionMetaData#getEISProductName()
 	 */
-	public String getEISProductName() throws ResourceException
+	@Override
+    public String getEISProductName() throws ResourceException
 	{
 		return "JPPF";
 	}
@@ -58,7 +59,8 @@ public class JPPFManagedConnectionMetaData implements ManagedConnectionMetaData
 	 * @throws ResourceException if the version could not be obtained.
 	 * @see javax.resource.spi.ManagedConnectionMetaData#getEISProductVersion()
 	 */
-	public String getEISProductVersion() throws ResourceException
+	@Override
+    public String getEISProductVersion() throws ResourceException
 	{
 		return "JPPF 1.0 beta";
 	}
@@ -69,7 +71,8 @@ public class JPPFManagedConnectionMetaData implements ManagedConnectionMetaData
 	 * @throws ResourceException if the number of connections could not be obtained.
 	 * @see javax.resource.spi.ManagedConnectionMetaData#getMaxConnections()
 	 */
-	public int getMaxConnections() throws ResourceException
+	@Override
+    public int getMaxConnections() throws ResourceException
 	{
 		return 10;
 	}
@@ -80,7 +83,8 @@ public class JPPFManagedConnectionMetaData implements ManagedConnectionMetaData
 	 * @throws ResourceException if the name could not be obrained.
 	 * @see javax.resource.spi.ManagedConnectionMetaData#getUserName()
 	 */
-	public String getUserName() throws ResourceException
+	@Override
+    public String getUserName() throws ResourceException
 	{
 		return userName;
 	}

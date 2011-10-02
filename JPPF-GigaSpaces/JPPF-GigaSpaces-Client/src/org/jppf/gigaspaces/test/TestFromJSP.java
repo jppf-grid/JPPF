@@ -37,12 +37,11 @@ public class TestFromJSP
 	 */
 	public static String testGS(String jobName, int nbTasks, long taskDuration)
 	{
-		JPPFJob job = null;
 		StringBuilder sb = new StringBuilder();
 		sb.append("<h2>Results for job ").append(jobName).append("</h2>");
 		try
 		{
-			job = GSClient.execute(jobName, nbTasks, taskDuration);
+			JPPFJob job = GSClient.execute(jobName, nbTasks, taskDuration);
 			for (JPPFTask task: job.getTasks())
 			{
 				sb.append("Task ").append(task.getId()).append(" : ").append(task.getResult()).append("<br/>");

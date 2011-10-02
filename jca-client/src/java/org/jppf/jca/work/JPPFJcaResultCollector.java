@@ -62,7 +62,8 @@ public class JPPFJcaResultCollector implements TaskResultListener
 	 * @param event a notification of completion for a set of submitted tasks.
 	 * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
 	 */
-	public void resultsReceived(TaskResultEvent event)
+	@Override
+    public void resultsReceived(TaskResultEvent event)
 	{
 		List<JPPFTask> tasks = event.getTaskList();
 		if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks ");

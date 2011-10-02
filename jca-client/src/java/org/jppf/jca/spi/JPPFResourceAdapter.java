@@ -79,7 +79,8 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @throws ResourceAdapterInternalException if an error occurred while starting this resource adapter.
 	 * @see javax.resource.spi.ResourceAdapter#start(javax.resource.spi.BootstrapContext)
 	 */
-	public void start(BootstrapContext ctx) throws ResourceAdapterInternalException
+	@Override
+    public void start(BootstrapContext ctx) throws ResourceAdapterInternalException
 	{
 		this.ctx = ctx;
 		log.info("Starting JPPF resource adapter");
@@ -103,7 +104,8 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * Stop this resource adapter.
 	 * @see javax.resource.spi.ResourceAdapter#stop()
 	 */
-	public void stop()
+	@Override
+    public void stop()
 	{
 		if (jppfClient != null) jppfClient.close();
 	}
@@ -115,7 +117,8 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @throws ResourceException always.
 	 * @see javax.resource.spi.ResourceAdapter#endpointActivation(javax.resource.spi.endpoint.MessageEndpointFactory, javax.resource.spi.ActivationSpec)
 	 */
-	public void endpointActivation(MessageEndpointFactory arg0, ActivationSpec arg1) throws ResourceException
+	@Override
+    public void endpointActivation(MessageEndpointFactory arg0, ActivationSpec arg1) throws ResourceException
 	{
 		throw new NotSupportedException("Method not supported");
 	}
@@ -126,7 +129,8 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @param arg1 not used.
 	 * @see javax.resource.spi.ResourceAdapter#endpointDeactivation(javax.resource.spi.endpoint.MessageEndpointFactory, javax.resource.spi.ActivationSpec)
 	 */
-	public void endpointDeactivation(MessageEndpointFactory arg0, ActivationSpec arg1) 
+	@Override
+    public void endpointDeactivation(MessageEndpointFactory arg0, ActivationSpec arg1)
 	{
 	}
 
@@ -137,7 +141,8 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @throws ResourceException .
 	 * @see javax.resource.spi.ResourceAdapter#getXAResources(javax.resource.spi.ActivationSpec[])
 	 */
-	public XAResource[] getXAResources(ActivationSpec[] arg0) throws ResourceException
+	@Override
+    public XAResource[] getXAResources(ActivationSpec[] arg0) throws ResourceException
 	{
 		return null;
 	}

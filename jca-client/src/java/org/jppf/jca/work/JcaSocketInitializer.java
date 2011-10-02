@@ -41,7 +41,8 @@ public class JcaSocketInitializer extends AbstractSocketInitializer
 	 * 
 	 * @see org.jppf.comm.socket.SocketInitializer#close()
 	 */
-	public void close()
+	@Override
+    public void close()
 	{
 		closed = true;
 	}
@@ -51,7 +52,8 @@ public class JcaSocketInitializer extends AbstractSocketInitializer
 	 * @param socketWrapper wrapper around the socket to initialize.
 	 * @see org.jppf.comm.socket.SocketInitializer#initializeSocket(org.jppf.comm.socket.SocketWrapper)
 	 */
-	public void initializeSocket(SocketWrapper socketWrapper)
+	@Override
+    public void initializeSocket(SocketWrapper socketWrapper)
 	{
 		attemptCount = 0;
 		successfull = false;

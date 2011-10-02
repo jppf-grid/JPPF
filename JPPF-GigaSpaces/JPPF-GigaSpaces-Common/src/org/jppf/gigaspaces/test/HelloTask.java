@@ -26,12 +26,15 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class HelloTask extends JPPFTask
 {
+
+    private static final long serialVersionUID = -3172628037383355176L;
+
 	/**
 	 * Duration of this task in milliseconds.
 	 */
 	private long duration = 0L;
-	
-	/**
+
+    /**
 	 * Default constructor.
 	 */
 	public HelloTask()
@@ -51,9 +54,10 @@ public class HelloTask extends JPPFTask
 	 * Execute the task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
-		String s = null;
+		String s;
 		try
 		{
 			if (duration <= 0L)

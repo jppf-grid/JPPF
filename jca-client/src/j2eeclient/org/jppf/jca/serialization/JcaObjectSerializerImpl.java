@@ -43,12 +43,14 @@ public class JcaObjectSerializerImpl extends ObjectSerializerImpl
 	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(java.io.InputStream)
 	 */
-	public Object deserialize(InputStream is) throws Exception
+	@Override
+    public Object deserialize(InputStream is) throws Exception
 	{
-		Object o = null;
 		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
-		o = ois.readObject();
-		ois.close();
-		return o;
+        try {
+            return ois.readObject();
+        } finally {
+            ois.close();
+        }
 	}
 }

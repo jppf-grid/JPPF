@@ -28,6 +28,9 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class DurationTask extends JPPFTask
 {
+
+    private static final long serialVersionUID = -6106765904127535863L;
+
 	/**
 	 * Counts the number of times this task was run.
 	 */
@@ -41,7 +44,7 @@ public class DurationTask extends JPPFTask
 	 */
 	private long duration = 1;
 
-	/**
+    /**
 	 * Initialize this task withe specified duration.
 	 * @param duration duration of this task in milliseconds.
 	 */
@@ -56,7 +59,8 @@ public class DurationTask extends JPPFTask
 	 * Run this task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		DecimalFormat nf = new DecimalFormat("0.###");
 		String res = nf.format(duration/1000f);

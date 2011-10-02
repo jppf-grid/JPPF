@@ -58,7 +58,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	/**
 	 * The JPPF client that manages connections to the JPPF drivers.
 	 */
-	private JPPFJcaClient client = null;
+	private final JPPFJcaClient client;
 	/**
 	 * The work manager provided by the applications server, used to submit asynchronous
 	 * JPPF submissions.
@@ -81,7 +81,8 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 * Stop this submission manager.
 	 * @see javax.resource.spi.work.Work#release()
 	 */
-	public void release()
+	@Override
+    public void release()
 	{
 		setStopped(true);
 		wakeUp();
@@ -92,7 +93,8 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 * when the queue has one and a connnection is available.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		while (!isStopped())
 		{
@@ -105,7 +107,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 			synchronized(client)
 			{
 				JPPFJob job = execQueue.poll();
-				JPPFJcaClientConnection c = null;
+				JPPFJcaClientConnection c;
 					c = (JPPFJcaClientConnection) client.getClientConnection();
 					if (c != null) c.setStatus(JPPFClientConnectionStatus.EXECUTING);
 				JobSubmission submission = new JobSubmission(job, c, execFlags.second());
@@ -224,7 +226,8 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 		/**
 		 * {@inheritDoc}
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			JPPFSubmissionResult result = (JPPFSubmissionResult) job.getResultListener();
 			String requestUuid = job.getJobUuid();

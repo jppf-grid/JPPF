@@ -65,7 +65,8 @@ public class JcaResultProcessor implements Work
 	 * This method executes until all partial results have been received.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		boolean error = false;
 		JPPFSubmissionResult result = (JPPFSubmissionResult) job.getResultListener();
@@ -73,7 +74,7 @@ public class JcaResultProcessor implements Work
 		try
 		{
 			connection.setCurrentJob(job);
-			int count = 0;
+//			int count = 0;
 			//for (JPPFTask task : job.getTasks()) task.setPosition(count++);
 			boolean completed = false;
 			while (!completed)
@@ -125,7 +126,7 @@ public class JcaResultProcessor implements Work
 	 */
 	private boolean performSubmission(JPPFSubmissionResult result) throws Exception
 	{
-		int count = 0;
+//		int count = 0;
 		String requestUuid = job.getJobUuid();
 		AbstractGenericClient client = connection.getClient();
 		ClassLoader cl = null;
@@ -170,7 +171,8 @@ public class JcaResultProcessor implements Work
 	 * Stop this result processor.
 	 * @see javax.resource.spi.work.Work#release()
 	 */
-	public void release()
+	@Override
+    public void release()
 	{
 	}
 }

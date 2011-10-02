@@ -68,7 +68,7 @@ public class JPPFSubmissionResult extends ThreadSynchronization implements TaskR
 	/**
 	 * List of listeners registered to receive this submission's status change notifications.
 	 */
-	private List<SubmissionStatusListener> listeners = new ArrayList<SubmissionStatusListener>();
+	private final List<SubmissionStatusListener> listeners = new ArrayList<SubmissionStatusListener>();
 
 	/**
 	 * Initialize this collector. 
@@ -87,7 +87,8 @@ public class JPPFSubmissionResult extends ThreadSynchronization implements TaskR
 	 * @param event the event that encapsulates the tasks that were received and related information.
 	 * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
 	 */
-	public synchronized void resultsReceived(TaskResultEvent event)
+	@Override
+    public synchronized void resultsReceived(TaskResultEvent event)
 	{
 		List<JPPFTask> tasks = event.getTaskList();
 		int n = tasks.size();

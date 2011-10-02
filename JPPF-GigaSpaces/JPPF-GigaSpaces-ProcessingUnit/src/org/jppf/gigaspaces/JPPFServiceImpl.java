@@ -33,7 +33,7 @@ public class JPPFServiceImpl implements JPPFService
 	/**
 	 * Unique reference to the JPPF client.
 	 */
-	private static AtomicReference<JPPFClient> client = new AtomicReference<JPPFClient>(newJPPFClient());
+	private static final AtomicReference<JPPFClient> client = new AtomicReference<JPPFClient>(newJPPFClient());
 
 	/**
 	 * Default constructor.
@@ -48,14 +48,14 @@ public class JPPFServiceImpl implements JPPFService
 	 * @return  the job with the initial tasks replaced with the results.
 	 * @see org.jppf.gigaspaces.JPPFService#submitJob(org.jppf.client.JPPFJob)
 	 */
-	public JPPFJob submitJob(JPPFJob job)
+	@Override
+    public JPPFJob submitJob(JPPFJob job)
 	{
 		int n = job.getTasks().size();
 		System.out.println("received job with " + n + " task" + (n > 1 ? "s" : ""));
-		List<JPPFTask> results = null;
 		try
 		{
-			results = getJPPFClient().submit(job);
+			List<JPPFTask> results = getJPPFClient().submit(job);
 			job.getTasks().clear();
 			for (JPPFTask task: results) job.addTask(task);
 		}
@@ -72,8 +72,7 @@ public class JPPFServiceImpl implements JPPFService
 	 */
 	private static synchronized JPPFClient newJPPFClient()
 	{
-		JPPFClient client = new JPPFClient();
-		return client;
+        return new JPPFClient();
 	}
 
 	/**

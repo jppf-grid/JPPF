@@ -50,7 +50,8 @@ public abstract class JPPFAccessorImpl implements JPPFAccessor
    * Get the JPPF client used to submit tasks.
 	 * @return a <code>JPPFJcaClient</code> instance.
 	 */
-	public JPPFJcaClient getJppfClient()
+	@Override
+    public JPPFJcaClient getJppfClient()
 	{
 		return jppfClient;
 	}
@@ -59,7 +60,8 @@ public abstract class JPPFAccessorImpl implements JPPFAccessor
    * Set the JPPF client used to submit tasks.
 	 * @param jppfClient a <code>JPPFJcaClient</code> instance.
 	 */
-	public void setJppfClient(JPPFJcaClient jppfClient)
+	@Override
+    public void setJppfClient(JPPFJcaClient jppfClient)
 	{
 		this.jppfClient = jppfClient;
 	}
@@ -70,7 +72,8 @@ public abstract class JPPFAccessorImpl implements JPPFAccessor
 	 * @throws ResourceException if the log writer could not be obtained.
 	 * @see javax.resource.spi.ManagedConnectionFactory#getLogWriter()
 	 */
-	public PrintWriter getLogWriter() throws ResourceException
+	@Override
+    public PrintWriter getLogWriter() throws ResourceException
 	{
 		return logWriter;
 	}
@@ -81,7 +84,8 @@ public abstract class JPPFAccessorImpl implements JPPFAccessor
 	 * @throws ResourceException if the log writer could not be set.
 	 * @see javax.resource.spi.ManagedConnectionFactory#setLogWriter(java.io.PrintWriter)
 	 */
-	public void setLogWriter(PrintWriter writer) throws ResourceException
+	@Override
+    public void setLogWriter(PrintWriter writer) throws ResourceException
 	{
 		this.logWriter = writer;
 	}

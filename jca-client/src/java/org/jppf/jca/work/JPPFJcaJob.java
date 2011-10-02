@@ -56,7 +56,8 @@ public class JPPFJcaJob implements Work
 	 * Run all the tasks in sequence. 
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		while (!isStopped())
 		{
@@ -78,7 +79,8 @@ public class JPPFJcaJob implements Work
 	 * Stop this job and release the resources it is using.
 	 * @see javax.resource.spi.work.Work#release()
 	 */
-	public void release()
+	@Override
+    public void release()
 	{
 		setStopped(true);
 		tasks = null;

@@ -70,7 +70,8 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
 	 * @throws ResourceException if a connection could not be obtained.
 	 * @see javax.resource.cci.ConnectionFactory#getConnection()
 	 */
-	public Connection getConnection() throws ResourceException
+	@Override
+    public Connection getConnection() throws ResourceException
 	{
 		JPPFConnection conn = (JPPFConnection) manager.allocateConnection(factory, null);
 		if (conn == null) return null;
@@ -86,7 +87,8 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
 	 * @throws ResourceException this method always throws a NotSupportedException.
 	 * @see javax.resource.cci.ConnectionFactory#getConnection(javax.resource.cci.ConnectionSpec)
 	 */
-	public Connection getConnection(ConnectionSpec spec) throws ResourceException
+	@Override
+    public Connection getConnection(ConnectionSpec spec) throws ResourceException
 	{
 		throw new NotSupportedException("getConnection(ConnectionSpec) is not supported");
 	}
@@ -97,7 +99,8 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
 	 * @throws ResourceException if the metadata could not be obtained.
 	 * @see javax.resource.cci.ConnectionFactory#getMetaData()
 	 */
-	public ResourceAdapterMetaData getMetaData() throws ResourceException
+	@Override
+    public ResourceAdapterMetaData getMetaData() throws ResourceException
 	{
 		return new JPPFResourceAdapterMetaData();
 	}
@@ -108,7 +111,8 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
 	 * @throws ResourceException if the record factory could not be obtained.
 	 * @see javax.resource.cci.ConnectionFactory#getRecordFactory()
 	 */
-	public RecordFactory getRecordFactory() throws ResourceException
+	@Override
+    public RecordFactory getRecordFactory() throws ResourceException
 	{
 		return new JPPFRecordFactory();
 	}
@@ -118,7 +122,8 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
 	 * @param ref a <code>Referenceable</code> instance.
 	 * @see javax.resource.Referenceable#setReference(javax.naming.Reference)
 	 */
-	public void setReference(Reference ref)
+	@Override
+    public void setReference(Reference ref)
 	{
 		this.ref = ref;
 	}
@@ -129,7 +134,8 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
 	 * @throws NamingException if the reference could not be obtained.
 	 * @see javax.naming.Referenceable#getReference()
 	 */
-	public Reference getReference() throws NamingException
+	@Override
+    public Reference getReference() throws NamingException
 	{
 		return ref;
 	}

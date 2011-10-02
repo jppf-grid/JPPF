@@ -32,7 +32,8 @@ public class JPPFResourceAdapterMetaData implements ResourceAdapterMetaData
 	 * @return the name as a string.
 	 * @see javax.resource.cci.ResourceAdapterMetaData#getAdapterName()
 	 */
-	public String getAdapterName()
+	@Override
+    public String getAdapterName()
 	{
 		return "JPPF Adapter";
 	}
@@ -42,7 +43,8 @@ public class JPPFResourceAdapterMetaData implements ResourceAdapterMetaData
 	 * @return the short description as a string.
 	 * @see javax.resource.cci.ResourceAdapterMetaData#getAdapterShortDescription()
 	 */
-	public String getAdapterShortDescription()
+	@Override
+    public String getAdapterShortDescription()
 	{
 		return "JPPF Adapter";
 	}
@@ -52,7 +54,8 @@ public class JPPFResourceAdapterMetaData implements ResourceAdapterMetaData
 	 * @return the vendor name as a string.
 	 * @see javax.resource.cci.ResourceAdapterMetaData#getAdapterVendorName()
 	 */
-	public String getAdapterVendorName()
+	@Override
+    public String getAdapterVendorName()
 	{
 		return "JPPF.org";
 	}
@@ -62,7 +65,8 @@ public class JPPFResourceAdapterMetaData implements ResourceAdapterMetaData
 	 * @return the version as a string.
 	 * @see javax.resource.cci.ResourceAdapterMetaData#getAdapterVersion()
 	 */
-	public String getAdapterVersion()
+	@Override
+    public String getAdapterVersion()
 	{
 		return "1.0";
 	}
@@ -72,7 +76,8 @@ public class JPPFResourceAdapterMetaData implements ResourceAdapterMetaData
 	 * @return the list as a array of strings.
 	 * @see javax.resource.cci.ResourceAdapterMetaData#getInteractionSpecsSupported()
 	 */
-	public String[] getInteractionSpecsSupported()
+	@Override
+    public String[] getInteractionSpecsSupported()
 	{
 		return new String[] { "ExampleInteraction" };
 	}
@@ -82,7 +87,8 @@ public class JPPFResourceAdapterMetaData implements ResourceAdapterMetaData
 	 * @return the version of the specs as a string.
 	 * @see javax.resource.cci.ResourceAdapterMetaData#getSpecVersion()
 	 */
-	public String getSpecVersion()
+	@Override
+    public String getSpecVersion()
 	{
 		return "1.0";
 	}
@@ -92,7 +98,8 @@ public class JPPFResourceAdapterMetaData implements ResourceAdapterMetaData
 	 * @return false
 	 * @see javax.resource.cci.ResourceAdapterMetaData#supportsExecuteWithInputAndOutputRecord()
 	 */
-	public boolean supportsExecuteWithInputAndOutputRecord()
+	@Override
+    public boolean supportsExecuteWithInputAndOutputRecord()
 	{
 		return false;
 	}
@@ -102,7 +109,8 @@ public class JPPFResourceAdapterMetaData implements ResourceAdapterMetaData
 	 * @return false
 	 * @see javax.resource.cci.ResourceAdapterMetaData#supportsExecuteWithInputRecordOnly()
 	 */
-	public boolean supportsExecuteWithInputRecordOnly()
+	@Override
+    public boolean supportsExecuteWithInputRecordOnly()
 	{
 		return false;
 	}
@@ -112,7 +120,8 @@ public class JPPFResourceAdapterMetaData implements ResourceAdapterMetaData
 	 * @return false.
 	 * @see javax.resource.cci.ResourceAdapterMetaData#supportsLocalTransactionDemarcation()
 	 */
-	public boolean supportsLocalTransactionDemarcation()
+	@Override
+    public boolean supportsLocalTransactionDemarcation()
 	{
 		return false;
 	}

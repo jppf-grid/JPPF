@@ -32,7 +32,8 @@ public class JPPFRecord implements Record
 	 * @return null.
 	 * @see javax.resource.cci.Record#getRecordName()
 	 */
-	public String getRecordName()
+	@Override
+    public String getRecordName()
 	{
 		return null;
 	}
@@ -42,7 +43,8 @@ public class JPPFRecord implements Record
 	 * @param name the name of the record.
 	 * @see javax.resource.cci.Record#setRecordName(java.lang.String)
 	 */
-	public void setRecordName(String name)
+	@Override
+    public void setRecordName(String name)
 	{
 	}
 
@@ -51,7 +53,8 @@ public class JPPFRecord implements Record
 	 * @return null.
 	 * @see javax.resource.cci.Record#getRecordShortDescription()
 	 */
-	public String getRecordShortDescription()
+	@Override
+    public String getRecordShortDescription()
 	{
 		return null;
 	}
@@ -61,7 +64,8 @@ public class JPPFRecord implements Record
 	 * @param desc this record's short description.
 	 * @see javax.resource.cci.Record#setRecordShortDescription(java.lang.String)
 	 */
-	public void setRecordShortDescription(String desc)
+	@Override
+    public void setRecordShortDescription(String desc)
 	{
 	}
 
@@ -71,7 +75,8 @@ public class JPPFRecord implements Record
 	 * @throws CloneNotSupportedException is always thrown.
 	 * @see java.lang.Object#clone()
 	 */
-	public Object clone() throws CloneNotSupportedException
+	@Override
+    public Object clone() throws CloneNotSupportedException
 	{
 		throw new CloneNotSupportedException();
 	}

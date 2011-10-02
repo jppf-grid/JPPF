@@ -48,7 +48,8 @@ public class ConnectionInitializerTask implements Runnable
 	 * Perform the initialization of a client connection.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		//if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
 		if (c.getStatus().equals(DISCONNECTED)) c.init();

@@ -26,6 +26,9 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class DemoTask extends JPPFTask
 {
+
+    private static final long serialVersionUID = 1441035751363821022L;
+
 	/**
 	 * Counts the number of times this task was run.
 	 */
@@ -35,7 +38,7 @@ public class DemoTask extends JPPFTask
 	 */
 	private int counter = 0;
 
-	/**
+    /**
 	 * Default constructor.
 	 */
 	public DemoTask()
@@ -48,7 +51,8 @@ public class DemoTask extends JPPFTask
 	 * Run this task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		String s = "***** Hello JPPF !!! [" + counter + "] *****";
 		System.out.println(s);

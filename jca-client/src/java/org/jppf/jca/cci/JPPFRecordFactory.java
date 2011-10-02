@@ -35,7 +35,8 @@ public class JPPFRecordFactory implements RecordFactory
 	 * @throws ResourceException always.
 	 * @see javax.resource.cci.RecordFactory#createIndexedRecord(java.lang.String)
 	 */
-	public IndexedRecord createIndexedRecord(final String name) throws ResourceException
+	@Override
+    public IndexedRecord createIndexedRecord(final String name) throws ResourceException
 	{
     throw new NotSupportedException("Method not supported");
 	}
@@ -47,7 +48,8 @@ public class JPPFRecordFactory implements RecordFactory
 	 * @throws ResourceException always.
 	 * @see javax.resource.cci.RecordFactory#createMappedRecord(java.lang.String)
 	 */
-	public MappedRecord createMappedRecord(final String name) throws ResourceException
+	@Override
+    public MappedRecord createMappedRecord(final String name) throws ResourceException
 	{
     throw new NotSupportedException("Method not supported");
   }

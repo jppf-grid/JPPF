@@ -29,7 +29,7 @@ public class GSSerializationHelper extends SerializationHelperImpl
 	/**
 	 * Fully qualified name of the ObjectSerializer implementation class to use.
 	 */
-	private static String SERIALIZER_CLASS_NAME = "org.jppf.gigaspaces.serialization.GSObjectSerializer";
+	private static final String SERIALIZER_CLASS_NAME = "org.jppf.gigaspaces.serialization.GSObjectSerializer";
 
 	/**
 	 * Default constructor.
@@ -44,7 +44,8 @@ public class GSSerializationHelper extends SerializationHelperImpl
 	 * @throws Exception if the object serializer could not be instantiated.
 	 * @see org.jppf.utils.SerializationHelper#getSerializer()
 	 */
-	public ObjectSerializer getSerializer() throws Exception
+	@Override
+    public ObjectSerializer getSerializer() throws Exception
 	{
 		if (serializer == null)
 		{
