@@ -90,7 +90,8 @@ public class TaskNotification implements Serializable
 	 * @return a string representation of this notification's internal state.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return "[task: " + taskId + ", stage: " + stage + "] " + message;
 	}

@@ -36,7 +36,8 @@ public class OutOfMemoryTestTask extends JPPFTask
 	/**
 	 * This method throws a <code>OutOfMemoryError</code>.
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		int n = 50 * 1024 * 1024;
 		byte[][] data = new byte[n][];

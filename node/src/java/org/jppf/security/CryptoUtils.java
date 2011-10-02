@@ -163,8 +163,7 @@ public class CryptoUtils
 		Signature sig = Signature.getInstance("SHA1withDSA");
 		sig.initSign(getPrivateKey());
 		sig.update(data);
-		byte[] signature = sig.sign();
-		return signature;
+        return sig.sign();
 	}
 
 	/**

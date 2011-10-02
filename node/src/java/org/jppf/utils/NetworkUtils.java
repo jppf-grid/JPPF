@@ -261,9 +261,9 @@ public final class NetworkUtils
 	public static boolean isSameSubnet(SubnetInformation si1, SubnetInformation si2)
 	{
 		if (!(si1.address() instanceof Inet4Address) || !(si2.address() instanceof Inet4Address)) return false;
-		int[] ip = new int[] { si1.rawIPAsInt(), si2.rawIPAsInt() };
-		int[] l = new int[] { si1.subnetMaskLength(), si2.subnetMaskLength() };
-		int[] mask = new int[] { si1.subnetMask(), si2.subnetMask() };
+		int[] ip = { si1.rawIPAsInt(), si2.rawIPAsInt() };
+		int[] l = { si1.subnetMaskLength(), si2.subnetMaskLength() };
+		int[] mask = { si1.subnetMask(), si2.subnetMask() };
 		int[] n = new int[2];
 		for (int i=0; i<2; i++) n[i] =  (ip[i] & mask[i]) >> (32-l[i]);
 		return n[0] == n[1];

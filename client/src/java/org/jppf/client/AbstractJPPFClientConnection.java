@@ -437,7 +437,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		ClientConnectionStatusListener[] array = null;
 		synchronized(listeners)
 		{
-			array = listeners.toArray(AbstractClientConnectionHandler.ZERO_CONNECTION_STATUS_LISTENER);
+			array = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
 		}
 		for (ClientConnectionStatusListener listener: array)
 		{

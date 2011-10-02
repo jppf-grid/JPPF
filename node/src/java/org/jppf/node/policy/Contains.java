@@ -69,8 +69,8 @@ public class Contains extends ExecutionPolicy
 		if (value == null) return false;
 		String s = getProperty(info, propertyName);
 		if (s == null) return false;
-		if (ignoreCase) return s.toLowerCase().indexOf(value.toLowerCase()) >= 0;
-		return s.indexOf(value) >= 0;
+		if (ignoreCase) return s.toLowerCase().contains(value.toLowerCase());
+		return s.contains(value);
 	}
 
 	/**

@@ -96,7 +96,7 @@ public class ManyJobsRunner
 				for (int i=0; i<nbTask; i++)
 				{
 					LongTask task = new LongTask(length, false);
-					task.setId("" + (n+1) + ":" + (i+1));
+					task.setId("" + (n+1) + ':' + (i+1));
 					jobs[n].addTask(task);
 				}
 				/*

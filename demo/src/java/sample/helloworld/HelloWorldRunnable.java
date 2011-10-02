@@ -38,7 +38,8 @@ public class HelloWorldRunnable implements Runnable, Serializable
 	 * Execute the task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		this.hello = "Hello, World (runnable)";
 		System.out.println(this.hello);
@@ -49,7 +50,8 @@ public class HelloWorldRunnable implements Runnable, Serializable
 	 * @return a string. 
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return hello;
 	}

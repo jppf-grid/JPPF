@@ -34,7 +34,8 @@ public class ExampleTask extends JPPFTask
 	/**
 	 * {@inheritDoc}
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		setResult("all your base are belong to " + System.getProperty("user.name"));
 	}

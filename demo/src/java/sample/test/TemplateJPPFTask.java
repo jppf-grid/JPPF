@@ -63,7 +63,8 @@ public class TemplateJPPFTask extends JPPFTask
 	 * </ul> 
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{

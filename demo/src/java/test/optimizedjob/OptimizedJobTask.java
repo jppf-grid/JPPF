@@ -52,7 +52,8 @@ public class OptimizedJobTask extends JPPFTask
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		String s = null;
 		try
@@ -63,7 +64,7 @@ public class OptimizedJobTask extends JPPFTask
 		catch(Exception e)
 		{
 			setException(e);
-			s = "task #" + id + " " + e.getMessage();
+			s = "task #" + id + ' ' + e.getMessage();
 		}
 		setResult(s);
 		System.out.println(s);

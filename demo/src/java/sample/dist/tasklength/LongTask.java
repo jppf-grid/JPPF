@@ -75,7 +75,8 @@ public class LongTask extends JPPFTask
 	 * Perform the execution of this task.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		//System.out.println("Starting task " + getId());
 		taskStart = System.currentTimeMillis();
@@ -87,7 +88,7 @@ public class LongTask extends JPPFTask
 				for (; elapsed < taskLength; elapsed = System.currentTimeMillis() - taskStart)
 				{
 					String s = "";
-					for (int i=0; i<10; i++) s += "A"+"10";
+					for (int i=0; i<10; i++) s += "A10";
 				}
 			}
 			else
@@ -109,7 +110,8 @@ public class LongTask extends JPPFTask
 	 * Called when this task is cancelled.
 	 * @see org.jppf.server.protocol.JPPFTask#onCancel()
 	 */
-	public void onCancel()
+	@Override
+    public void onCancel()
 	{
 		String s = "task " + getId() + " has been cancelled";
 		setResult(s);

@@ -129,7 +129,8 @@ public class Main
 		 * {@inheritDoc}
 		 */
 		// @Override
-		public Integer call() throws Exception
+		@Override
+        public Integer call() throws Exception
 		{
 			logger.info("From logger {}", number);
 			logger.info("From stdout " + number);

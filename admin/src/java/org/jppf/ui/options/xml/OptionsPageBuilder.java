@@ -147,10 +147,9 @@ public class OptionsPageBuilder
 		else this.baseName = baseName;
 		OptionDescriptor desc = new OptionDescriptorParser().parse(xmlPath);
 		if (desc == null) return null;
-		OptionElement page = build(desc).get(0);
-		
-		//if (eventEnabled) triggerInitialEvents(page);
-		return page;
+
+        //if (eventEnabled) triggerInitialEvents(page);
+		return build(desc).get(0);
 	}
 
 	/**

@@ -42,7 +42,7 @@ public class CascadingTestRunner
 	/**
 	 * Separator for each test.
 	 */
-	private static String banner = "\n"+StringUtils.padLeft("", '-', 80)+"\n";
+	private static String banner = '\n' + StringUtils.padLeft("", '-', 80)+ '\n';
 
 	/**
 	 * Entry point for this class, performs a matrix multiplication a number of times.

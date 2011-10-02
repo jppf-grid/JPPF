@@ -40,9 +40,10 @@ public class SourceTask extends JPPFTask
 	 * Perform the execution of this task.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
-		System.out.println("Starting source task '" + getId() + "'");
+		System.out.println("Starting source task '" + getId() + '\'');
 		print("starting JPPF client");
 		JPPFClient client = new JPPFClient();
 		try
@@ -82,7 +83,8 @@ public class SourceTask extends JPPFTask
 	 * Called when this task is cancelled.
 	 * @see org.jppf.server.protocol.JPPFTask#onCancel()
 	 */
-	public void onCancel()
+	@Override
+    public void onCancel()
 	{
 		String s = "task '" + getId() + "' has been cancelled";
 		setResult(s);

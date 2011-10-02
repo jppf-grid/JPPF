@@ -52,7 +52,8 @@ public class TimeoutTask extends JPPFTestTask
 	 * Called when this task times out.
 	 * @see org.jppf.server.protocol.JPPFTask#onTimeout()
 	 */
-	public void onTimeout()
+	@Override
+    public void onTimeout()
 	{
 		setResult("this task timed out");
 	}

@@ -92,7 +92,8 @@ public class PhoneNumber
 	 * @return this phone number as a string.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return "(" + code + ") " + number;
 	}

@@ -66,7 +66,7 @@ public final class PermissionsFactory
 	 * Reset the current permissions to enable their reload.
 	 * @see java.security.Permissions
 	 */
-	public synchronized static void resetPermissions()
+	public static synchronized void resetPermissions()
 	{
 		permList = null;
 	}
@@ -227,7 +227,7 @@ public final class PermissionsFactory
 					continue;
 				}
 				line = line.substring("permission".length());
-				if (line.indexOf("PropertyPermission") >= 0)
+				if (line.contains("PropertyPermission"))
 				{
 					String breakpoint = "pause here";
 				}
@@ -284,7 +284,7 @@ public final class PermissionsFactory
 		String name = null;
 		String actions = null;
 
-		int idx = source.indexOf("\"");
+		int idx = source.indexOf('"');
 		if (idx < 0)
 		{
 			err(file, line, "permission entry has no name/action, or missing opening quote");
@@ -293,7 +293,7 @@ public final class PermissionsFactory
 		className = source.substring(0, idx).trim();
 
 		idx++;
-		int idx2 = source.indexOf("\"", idx);
+		int idx2 = source.indexOf('"', idx);
 		if (idx2 < 0)
 		{
 			err(file, line, "missing closing quote on permission name");
@@ -301,11 +301,11 @@ public final class PermissionsFactory
 		}
 		name = source.substring(idx, idx2);
 
-		idx = source.indexOf("\"", idx2+1);
+		idx = source.indexOf('"', idx2+1);
 		if (idx >= 0)
 		{
 			idx++;
-			idx2 = source.indexOf("\"", idx);
+			idx2 = source.indexOf('"', idx);
 			if (idx2 < 0)
 			{
 				err(file, line, "missing closing quote on permission action");
@@ -415,7 +415,7 @@ public final class PermissionsFactory
 			}
 			if (idx > pos) sb.append(source.substring(pos, idx));
 			pos = idx + 2;
-			idx = source.indexOf("}", pos);
+			idx = source.indexOf('}', pos);
 			if (idx < 0)
 			{
 				err(file, line, "missing closing \"}\" on property expansion");

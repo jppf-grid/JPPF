@@ -83,8 +83,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newCircleLayout()
 	{
-		mxCircleLayout layout = new mxCircleLayout(graph);
-		return layout;
+        return new mxCircleLayout(graph);
 	}
 
 	/**
@@ -93,8 +92,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newEdgeLabelLayout()
 	{
-		mxEdgeLabelLayout layout = new mxEdgeLabelLayout(graph);
-		return layout;
+        return new mxEdgeLabelLayout(graph);
 	}
 
 	/**
@@ -103,8 +101,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newFastOrganicLayout()
 	{
-		mxFastOrganicLayout layout = new mxFastOrganicLayout(graph);
-		return layout;
+        return new mxFastOrganicLayout(graph);
 	}
 
 	/**
@@ -113,8 +110,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newHierarchicalLayout()
 	{
-		mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
-		return layout;
+        return new mxHierarchicalLayout(graph);
 	}
 
 	/**
@@ -139,8 +135,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newOrthogonalLayout()
 	{
-		mxOrthogonalLayout layout = new mxOrthogonalLayout(graph);
-		return layout;
+        return new mxOrthogonalLayout(graph);
 	}
 
 	/**
@@ -149,8 +144,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newParallelEdgeLayout()
 	{
-		mxParallelEdgeLayout layout = new mxParallelEdgeLayout(graph);
-		return layout;
+        return new mxParallelEdgeLayout(graph);
 	}
 
 	/**
@@ -159,8 +153,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newPartitionLayout()
 	{
-		mxPartitionLayout layout = new mxPartitionLayout(graph, false, 10);
-		return layout;
+        return new mxPartitionLayout(graph, false, 10);
 	}
 
 	/**
@@ -169,7 +162,6 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newStackLayout()
 	{
-		mxStackLayout layout = new mxStackLayout(graph);
-		return layout;
+        return new mxStackLayout(graph);
 	}
 }

@@ -44,7 +44,8 @@ public class CallableTask implements Callable<String>, Serializable
 	 * @return a string.
 	 * @see java.util.concurrent.Callable#call()
 	 */
-	public String call()
+	@Override
+    public String call()
 	{
 		throw new NullPointerException("Throwing unchecked exception");
 	}

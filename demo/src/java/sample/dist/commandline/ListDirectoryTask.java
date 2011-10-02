@@ -48,7 +48,8 @@ public class ListDirectoryTask extends CommandLineTask
 	 * Execute the script.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{
@@ -59,14 +60,14 @@ public class ListDirectoryTask extends CommandLineTask
 			boolean found = false;
 			for (String s: nix_oses)
 			{
-				if (os.indexOf(s) >= 0)
+				if (os.contains(s))
 				{
 					found = true;
 					break;
 				}
 			}
 			if (found) setCommandList("ls", "-a", dir, ">", "dirlist.txt");
-			else if (os.indexOf("windows") >= 0) setCommandList("cmd", "/C", "dir", dir, ">", "dirlist.txt");
+			else if (os.contains("windows")) setCommandList("cmd", "/C", "dir", dir, ">", "dirlist.txt");
 			else
 			{
 				setResult("OS '" + os + "' not recognized");

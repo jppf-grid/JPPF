@@ -49,7 +49,8 @@ public class Task extends JPPFTask
 	/**
 	 * {@inheritDoc}
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{

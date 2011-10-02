@@ -46,7 +46,8 @@ public abstract class JPPFTestTask extends JPPFTask
 	 * Run the test.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		runTestMethods();
 	}
@@ -121,15 +122,16 @@ public abstract class JPPFTestTask extends JPPFTask
 	 * @return a string describing the task execution result.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		for (ExecutionReport r: reports)
 		{
 			sb.append("----------------------------------------------------------\n");
-			sb.append("method name: ").append(r.methodName).append("\n");
-			sb.append("description: ").append(r.description).append("\n");
-			sb.append("stack trace:\n").append(r.stackTrace).append("\n");
+			sb.append("method name: ").append(r.methodName).append('\n');
+			sb.append("description: ").append(r.description).append('\n');
+			sb.append("stack trace:\n").append(r.stackTrace).append('\n');
 		}
 		return sb.toString();
 	}

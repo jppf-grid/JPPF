@@ -58,17 +58,17 @@ public class MBeanClient extends JMXConnectionWrapper implements NotificationLis
 			client.connect();
 			while (!client.isConnected()) Thread.sleep(100);
 			MBeanServerConnection mbsc = client.getMbeanConnection();
-			JPPFNodeTaskMonitorMBean proxy = (JPPFNodeTaskMonitorMBean) MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, JPPFNodeTaskMonitorMBean.class, true);
+			JPPFNodeTaskMonitorMBean proxy = MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, JPPFNodeTaskMonitorMBean.class, true);
 			proxy.getTotalTasksExecuted();
 			//client.invoke(mbeanName, "test", (Object[]) null, (String[]) null);
 			Set set = mbsc.queryNames(null, null);
 			System.out.println("all mbeans: " + set);
 			boolean b = mbsc.isInstanceOf(objectName, "javax.management.NotificationBroadcaster");
-			System.out.println("\""+mbeanName+"\" instance of NotificationBroadcaster: "+b);
+			System.out.println('\"'+mbeanName+"\" instance of NotificationBroadcaster: "+b);
 			if (b)
 			{
 				mbsc.addNotificationListener(objectName, client, null, null);
-				Thread.currentThread().sleep(1000000);
+				Thread.sleep(1000000L);
 			}
 			client.close();
 		}
@@ -94,7 +94,8 @@ public class MBeanClient extends JMXConnectionWrapper implements NotificationLis
 	 * @param handback - handback object.
 	 * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
 	 */
-	public void handleNotification(Notification notification, Object handback)
+	@Override
+    public void handleNotification(Notification notification, Object handback)
 	{
 		TaskInformation info = ((TaskExecutionNotification) notification).getTaskInformation();
 		int n = taskCount.incrementAndGet();

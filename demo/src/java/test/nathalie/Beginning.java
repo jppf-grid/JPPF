@@ -25,7 +25,7 @@ public class Beginning
     ExecutionPolicy policy = new Equal("id", 1);
     job.getJobSLA().setExecutionPolicy(policy);
     List<JPPFTask> results = client.submit(job);
-    Vector<String> auxs = new Vector<String>();
+    List<String> auxs = new Vector<String>();
     int count = 0;
     for(JPPFTask task: results)
     {

@@ -148,22 +148,22 @@ public class JPPFDriver
 		//classServer = new ClassNioServer(info.classServerPorts);
 		classServer = new ClassNioServer(null);
 		classServer.start();
-		initializer.printInitializedMessage(null, NioServer.CLASS_SERVER);
+		printInitializedMessage(null, NioServer.CLASS_SERVER);
 
 		//clientNioServer = new ClientNioServer(info.applicationServerPorts);
 		clientNioServer = new ClientNioServer(null);
 		clientNioServer.start();
-		initializer.printInitializedMessage(null, NioServer.CLIENT_SERVER);
+		printInitializedMessage(null, NioServer.CLIENT_SERVER);
 
 		//nodeNioServer = new NodeNioServer(info.nodeServerPorts);
 		nodeNioServer = new NodeNioServer(null);
 		nodeNioServer.start();
-		initializer.printInitializedMessage(null, NioServer.NODE_SERVER);
+		printInitializedMessage(null, NioServer.NODE_SERVER);
 
 		acceptorServer = new AcceptorNioServer(info.serverPorts);
 		acceptorServer.start();
 		//initializer.printInitializedMessage(info.serverPorts, "JPPF Driver");
-		initializer.printInitializedMessage(info.serverPorts, null);
+		printInitializedMessage(info.serverPorts, null);
 		
 		if (config.getBoolean("jppf.local.node.enabled", false))
 		{
@@ -389,4 +389,27 @@ public class JPPFDriver
 			System.exit(1);
 		}
 	}
+
+    /**
+	 * Print a message to the console to signify that the initialization of a server was succesfull.
+     * @param ports the ports on which the server is listening.
+     * @param name the name to use for the server.
+     */
+    protected static void printInitializedMessage(int[] ports, String name)
+    {
+        StringBuilder sb = new StringBuilder();
+        if (name != null)
+        {
+            sb.append(name);
+            sb.append(" initialized");
+        }
+        if (ports != null)
+        {
+            if (name != null) sb.append(" - ");
+            sb.append("accepting connections on port");
+            if (ports.length > 1) sb.append('s');
+            for (int n: ports) sb.append(' ').append(n);
+        }
+        System.out.println(sb.toString());
+    }
 }

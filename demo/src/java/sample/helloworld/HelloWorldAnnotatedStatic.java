@@ -40,7 +40,7 @@ public class HelloWorldAnnotatedStatic implements Serializable
 	@JPPFRunnable
 	public static String helloStaticMethod(String message, int number)
 	{
-		String hello = "Hello, World (annotated static, " + message + ", " + number + ")";
+		String hello = "Hello, World (annotated static, " + message + ", " + number + ')';
 		System.out.println(hello);
 		return hello;
 	}

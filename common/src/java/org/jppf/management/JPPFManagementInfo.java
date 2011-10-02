@@ -149,7 +149,10 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 		// we want ascending alphabetical order
 		int n = -1 * host.compareTo(o.getHost());
 		if (n != 0) return n;
-		return port - o.getPort();
+
+        if(port > o.getPort()) return +1;
+        if(port < o.getPort()) return -1;
+		return 0;
 	}
 
 	/**

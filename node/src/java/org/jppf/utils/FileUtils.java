@@ -285,8 +285,7 @@ public final class FileUtils
 		int idx1 = path.lastIndexOf('/');
 		int idx2 = path.lastIndexOf('\\');
 		if ((idx1 < 0) && (idx2 < 0)) return -1;
-		int idx = idx1 < 0 ? idx2 : idx2 < 0 ? idx1 : Math.max(idx1, idx2);
-		return idx;
+        return idx1 < 0 ? idx2 : idx2 < 0 ? idx1 : Math.max(idx1, idx2);
 	}
 
 	/**

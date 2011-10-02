@@ -31,7 +31,8 @@ public class Task2 extends JPPFTask
 	 * Run this task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		System.out.println("Hello, this is Task2");
 		setResult("Task2 executed successfully");

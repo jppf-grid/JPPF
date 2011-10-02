@@ -41,11 +41,11 @@ public class ClassLoaderTest
 			Map<ByteKey, URL> map = processJars("ClassLoaderTest.jar", "../JPPF/lib/Hazelcast/hazelcast.jar");
 			job.addTask(new JPPFTaskPreInit(map));
 			job.setDataProvider(new ClientDataProvider());
-			displayResults("Results for job '" + job.getId() + "'", jppfClient.submit(job));
+			displayResults("Results for job '" + job.getId() + '\'', jppfClient.submit(job));
 			JPPFJob job2 = new JPPFJob();
 			job2.setId("test class loader");
 			job2.addTask(new ClassLoadingTask());
-			displayResults("Results for job '" + job2.getId() + "'", jppfClient.submit(job2));
+			displayResults("Results for job '" + job2.getId() + '\'', jppfClient.submit(job2));
 		}
 		catch(Exception e)
 		{

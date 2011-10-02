@@ -30,7 +30,8 @@ public abstract class BaseDemoTask extends JPPFTask
 	 * Run the task with start and end event notifications.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		//fireNotification("start exec");
 		try

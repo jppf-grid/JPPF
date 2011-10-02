@@ -170,30 +170,7 @@ public class DriverInitializer
 	}
 	*/
 
-	/**
-	 * Print a message to the console to signify that the initialization of a server was succesfull.
-	 * @param ports the ports on which the server is listening.
-	 * @param name the name to use for the server.
-	 */
-    static void printInitializedMessage(int[] ports, String name)
-	{
-		StringBuilder sb = new StringBuilder();
-		if (name != null)
-		{
-			sb.append(name);
-			sb.append(" initialized");
-		}
-		if (ports != null)
-		{
-			if (name != null) sb.append(" - ");
-			sb.append("accepting connections on port");
-			if (ports.length > 1) sb.append('s');
-			for (int n: ports) sb.append(' ').append(n);
-		}
-		System.out.println(sb.toString());
-	}
-
-	/**
+    /**
 	 * Initialize and start the discovery service.
 	 */
 	void initBroadcaster()

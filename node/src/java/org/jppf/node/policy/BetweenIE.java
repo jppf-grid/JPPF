@@ -38,11 +38,11 @@ public class BetweenIE extends ExecutionPolicy
 	/**
 	 * The interval's lower bound.
 	 */
-	private double a = 0d;
+	private double a = 0.0d;
 	/**
 	 * The interval's upper bound.
 	 */
-	private double b = 0d;
+	private double b = 0.0d;
 
 	/**
 	 * Define a comparison of type value between a and b with a included and b excluded.

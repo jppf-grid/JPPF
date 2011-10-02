@@ -110,7 +110,7 @@ public class JMXServerImpl extends AbstractJMXServer
 				{
 					Throwable cause = e.getCause();
 					String s = cause.getMessage();
-					if ((cause instanceof BindException) || ((s != null) && (s.toLowerCase().indexOf("bind") >= 0)))
+					if ((cause instanceof BindException) || ((s != null) && (s.toLowerCase().contains("bind"))))
 					{
 						if (rmiPort >= 65530) rmiPort = 1024;
 						rmiPort++;

@@ -34,11 +34,11 @@ public class Serializer
 	/**
 	 * The stream header ('JPPF' in ascii).
 	 */
-	static final byte[] HEADER = new byte[] { 74, 80, 80, 70 };
+	static final byte[] HEADER = { 74, 80, 80, 70 };
 	/**
 	 * Handle for null references.
 	 */
-	static final byte[] NULL_HANDLE = new byte[] { 0, 0, 0, 0 };
+	static final byte[] NULL_HANDLE = { 0, 0, 0, 0 };
 	/**
 	 * Header written before a class descriptor.
 	 */

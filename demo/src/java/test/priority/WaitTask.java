@@ -44,7 +44,8 @@ public class WaitTask extends JPPFTask
 	 * Execute this task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{

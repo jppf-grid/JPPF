@@ -37,7 +37,7 @@ public class HelloWorldPojo implements Serializable
 	 */
 	public String helloPojoMethod(String message, int number)
 	{
-		String hello = "Hello, World (pojo, " + message + ", " + number + ")";
+		String hello = "Hello, World (pojo, " + message + ", " + number + ')';
 		System.out.println(hello);
 		return hello;
 	}

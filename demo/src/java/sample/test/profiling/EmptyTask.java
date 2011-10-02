@@ -48,7 +48,8 @@ public class EmptyTask extends JPPFTask
 	 * Perform the excution of this task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 	}
 }

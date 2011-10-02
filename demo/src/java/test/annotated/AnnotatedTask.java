@@ -54,7 +54,8 @@ public class AnnotatedTask extends JPPFTask
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{
@@ -68,7 +69,7 @@ public class AnnotatedTask extends JPPFTask
 		catch(Exception e)
 		{
 			setException(e);
-			setResult("task #" + id + " " + e.getMessage());
+			setResult("task #" + id + ' ' + e.getMessage());
 		}
 		//System.out.print(StringUtils.padRight(result, ' ', 250));
 	}

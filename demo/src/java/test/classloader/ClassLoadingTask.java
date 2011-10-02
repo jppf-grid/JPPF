@@ -26,7 +26,8 @@ public class ClassLoadingTask extends JPPFTask
 	/**
 	 * {@inheritDoc}
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{

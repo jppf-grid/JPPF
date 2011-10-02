@@ -117,7 +117,8 @@ public class Person
 	 * @return this person as a string.
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return
 			"first name = " + firstname +

@@ -44,7 +44,8 @@ public class PrioritizedTask extends JPPFTask
 	 * Execute this task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		System.out.println("executing task with priority " + priority);
 	}

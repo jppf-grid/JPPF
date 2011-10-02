@@ -44,7 +44,8 @@ public class MyCallable implements Callable<String>, Serializable
 	/**
 	 * {@inheritDoc}
 	 */
-	public String call() throws Exception
+	@Override
+    public String call() throws Exception
 	{
 		return null;
 	}

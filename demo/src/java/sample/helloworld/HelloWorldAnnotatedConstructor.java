@@ -44,7 +44,7 @@ public class HelloWorldAnnotatedConstructor implements Serializable
 	@JPPFRunnable
 	public HelloWorldAnnotatedConstructor(String message, int number)
 	{
-		this.hello = "Hello, World (annotated constructor, " + message + ", " + number + ")";
+		this.hello = "Hello, World (annotated constructor, " + message + ", " + number + ')';
 		System.out.println(this.hello);
 	}
 
@@ -52,7 +52,8 @@ public class HelloWorldAnnotatedConstructor implements Serializable
 	 * Get the string resulting from the task execution.
 	 * @return a string. 
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		return hello;
 	}

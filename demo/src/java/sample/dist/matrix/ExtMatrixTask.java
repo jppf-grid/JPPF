@@ -50,7 +50,8 @@ public class ExtMatrixTask extends JPPFTask
 	 * @see sample.BaseDemoTask#doWork()
 	 */
 	//public void doWork()
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{
@@ -64,7 +65,7 @@ public class ExtMatrixTask extends JPPFTask
 				// for each column of matrix b
 				for (int col=0; col<size; col++)
 				{
-					double sum = 0d;
+					double sum = 0.0d;
 					for (int row=0; row<size; row++)
 					{
 						sum += matrix.getValueAt(row, col) * rowValues[n][row];

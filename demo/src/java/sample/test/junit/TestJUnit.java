@@ -47,6 +47,7 @@ public class TestJUnit extends TestCase implements Serializable
 		job.addTask(new JPPFTask()
 		{
       private static final long serialVersionUID = 1L;
+      @Override
       public void run()
       {
     		System.out.println("executing task");

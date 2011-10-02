@@ -35,7 +35,8 @@ public class Task1 extends JPPFTask
 	 * Run this task.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		JPPFClient client = null;
 		try
@@ -46,7 +47,7 @@ public class Task1 extends JPPFTask
 			job.addTask(new Task2());
 			job.getJobSLA().setExecutionPolicy(new Equal("id", 2));
 			List<JPPFTask> results = client.submit(job);
-			System.out.println("Result of Task2: [" + results.get(0).getResult() + "]");
+			System.out.println("Result of Task2: [" + results.get(0).getResult() + ']');
 			setResult("Task1 executed successfully");
 		}
 		catch(Exception e)

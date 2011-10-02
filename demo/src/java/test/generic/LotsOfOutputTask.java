@@ -51,7 +51,8 @@ public class LotsOfOutputTask extends JPPFTask
 	 * Output <i>nbLines</i> of length <i>lineLength</i> to the console.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		StringBuilder sb = new StringBuilder();
 		for (int i=0; i<lineLength; i++) sb.append('X');

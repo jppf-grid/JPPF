@@ -215,7 +215,7 @@ class NodePanel extends JPanel
 			return null;
 		}
 		BufferedInputStream bis = new BufferedInputStream(is);
-		byte buf[] = new byte[MAX_IMAGE_SIZE];
+		byte[] buf = new byte[MAX_IMAGE_SIZE];
 		try
 		{
 			count = bis.read(buf);

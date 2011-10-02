@@ -63,7 +63,7 @@ public class LongTypeMatrix implements Serializable
 		{
 			for (int j=0; j<values[i].length; j++)
 				// values in ]-RANDOM_RANGE, +RANDOM_RANGE[
-				values[i][j] = 2 * rand.nextInt((int) RANDOM_RANGE + 1) - RANDOM_RANGE;
+				values[i][j] = 2L * rand.nextInt((int) RANDOM_RANGE + 1) - RANDOM_RANGE;
 		}
 	}
 
@@ -142,7 +142,7 @@ public class LongTypeMatrix implements Serializable
 		double[] result = new double[size];
 		for (int col=0; col<size; col++)
 		{
-			double sum = 0d;
+			double sum = 0.0d;
 			for (int row=0; row<size; row++)
 			{
 				sum += matrix.getValueAt(row, col) * getValueAt(n, row);

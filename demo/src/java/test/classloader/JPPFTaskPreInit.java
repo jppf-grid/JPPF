@@ -30,6 +30,7 @@ public class JPPFTaskPreInit extends JPPFTask {
         this.map = map;
     }
 
+    @Override
     public void run() {
         System.out.println("Task init");
         long totalDur = System.nanoTime();
@@ -104,6 +105,7 @@ public class JPPFTaskPreInit extends JPPFTask {
             this.file = file;
         }
 
+        @Override
         public byte[] call() throws Exception {
             System.out.printf("Downloading: %s%n", file.toExternalForm());
             InputStream is = null;

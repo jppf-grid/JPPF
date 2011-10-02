@@ -12,9 +12,10 @@ public class Final extends JPPFTask
 		this.c = c;
 	}
 
-	public void run()
+	@Override
+    public void run()
 	{
-		System.out.println("in Final(" + c + ")"); 
+		System.out.println("in Final(" + c + ')');
 		res = (int) (c * Math.sin(c + 10));
 		setResult("Result... " + res);
 	}

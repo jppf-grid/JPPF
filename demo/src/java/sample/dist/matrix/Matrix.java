@@ -33,7 +33,7 @@ public class Matrix implements Serializable
 	/**
 	 * The range of values for random values.
 	 */
-	private static final double RANDOM_RANGE = 1e6d;
+	private static final double RANDOM_RANGE = 1.0e6d;
 	/**
 	 * The size of this matrix. The matrix contains size*size values.
 	 */
@@ -63,7 +63,7 @@ public class Matrix implements Serializable
 		{
 			for (int j=0; j<values[i].length; j++)
 				// values in ]-RANDOM_RANGE, +RANDOM_RANGE[
-				values[i][j] = RANDOM_RANGE * (2d * rand.nextDouble() - 1d);
+				values[i][j] = RANDOM_RANGE * (2.0d * rand.nextDouble() - 1.0d);
 		}
 	}
 
@@ -122,7 +122,7 @@ public class Matrix implements Serializable
 		{
 			for (int j=0; j<size; j++)
 			{
-				double value = 0d;
+				double value = 0.0d;
 				for (int k=0; k< size; k++) value += matrix.getValueAt(k, j) * values[i][k];
 				result.setValueAt(j, i, value);
 			}
@@ -142,7 +142,7 @@ public class Matrix implements Serializable
 		double[] result = new double[size];
 		for (int col=0; col<size; col++)
 		{
-			double sum = 0d;
+			double sum = 0.0d;
 			for (int row=0; row<size; row++)
 			{
 				sum += matrix.getValueAt(row, col) * getValueAt(n, row);

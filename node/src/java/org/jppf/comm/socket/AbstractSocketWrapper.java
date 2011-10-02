@@ -47,7 +47,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * A timestamp that should reflect the system millisecond counter at the
 	 * last known good usage of the underlying socket.
 	 */
-	private long socketTimestamp = 0l;
+	private long socketTimestamp = 0L;
 	/**
 	 * A reference to the underlying socket's output stream.
 	 */

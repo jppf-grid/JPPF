@@ -38,11 +38,11 @@ public final class StringUtils
 	/**
 	 * Keywords to look for and replace in the legend items of the charts.
 	 */
-	private static final String[] KEYWORDS = new String[] { "Execution", "Maximum", "Minimum", "Average", "Cumulated" };
+	private static final String[] KEYWORDS = { "Execution", "Maximum", "Minimum", "Average", "Cumulated" };
 	/**
 	 * The the replacements words for the keywords in the legend items. Used to shorten the legend labels.
 	 */
-	private static final String[] REPLACEMENTS = new String[] { "Exec", "Max", "Min", "Avg", "Cumul" };
+	private static final String[] REPLACEMENTS = { "Exec", "Max", "Min", "Avg", "Cumul" };
 	/**
 	 * Charset instance for UTF-8 encoding.
 	 */
@@ -115,7 +115,7 @@ public final class StringUtils
 	 * An array of char containing the hex digits in ascending order.
 	 */
 	private static char[] hexDigits =
-		new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 	/**
 	 * Convert a part of an array of bytes, into a string of space-separated hexadecimal numbers.<br>
 	 * This method is proposed as a convenience for debugging purposes.
@@ -199,7 +199,7 @@ public final class StringUtils
 	{
 		for (int i=0; i<KEYWORDS.length; i++)
 		{
-			if (key.indexOf(KEYWORDS[i]) >= 0) key = key.replace(KEYWORDS[i], REPLACEMENTS[i]);
+			if (key.contains(KEYWORDS[i])) key = key.replace(KEYWORDS[i], REPLACEMENTS[i]);
 		}
 		return key;
 	}
@@ -245,7 +245,7 @@ public final class StringUtils
 			InetSocketAddress add = (InetSocketAddress) address;
 			sb.append(add.getHostName()).append(':').append(add.getPort());
 		}
-		else sb.append("socket address type not handled: " + address); 
+		else sb.append("socket address type not handled: ").append(address);
 		//sb.append("]");
 		return sb.toString();
 	}

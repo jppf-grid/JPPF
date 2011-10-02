@@ -69,7 +69,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 			TypedProperties props = JPPFConfiguration.getProperties();
 			int size = props.getInt("matrix.size",300);
 			int iterations = props.getInt("matrix.iterations",10);
-			System.out.println("Running Matrix demo with matrix size = "+size+"*"+size+" for "+iterations+" iterations");
+			System.out.println("Running Matrix demo with matrix size = "+size+ '*' + size + " for " + iterations + " iterations");
 			NonBlockingMatrixRunner runner = new NonBlockingMatrixRunner();
 			runner.perform(size, iterations);
 			jppfClient.close();
@@ -201,7 +201,8 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 	 * @param event notification that a set of tasks results have been received. 
 	 * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
 	 */
-	public synchronized void resultsReceived(TaskResultEvent event)
+	@Override
+    public synchronized void resultsReceived(TaskResultEvent event)
 	{
 		List<JPPFTask> tasks = event.getTaskList();
 		System.out.println("Received results for " + tasks.size() + " tasks ");

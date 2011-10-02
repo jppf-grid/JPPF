@@ -37,14 +37,16 @@ public class AllInOne
 		{
 			Thread driverThread = new Thread()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					JPPFDriver.main("noLauncher");
 				}
 			};
 			Thread nodeThread = new Thread()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					NodeRunner.main("noLauncher");
 				}

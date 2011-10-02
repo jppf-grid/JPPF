@@ -40,7 +40,7 @@ public class HelloWorldAnnotated implements Serializable
 	@JPPFRunnable
 	public String helloMethod(String message, int number)
 	{
-		String hello = "Hello, World (annotated, " + message + ", " + number + ")";
+		String hello = "Hello, World (annotated, " + message + ", " + number + ')';
 		System.out.println(hello);
 		return hello;
 	}

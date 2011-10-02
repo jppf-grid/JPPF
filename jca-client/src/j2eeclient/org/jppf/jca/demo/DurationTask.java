@@ -63,7 +63,7 @@ public class DurationTask extends JPPFTask
     public void run()
 	{
 		DecimalFormat nf = new DecimalFormat("0.###");
-		String res = nf.format(duration/1000f);
+		String res = nf.format(duration / 1000.0f);
 		try
 		{
 			Thread.sleep(duration);

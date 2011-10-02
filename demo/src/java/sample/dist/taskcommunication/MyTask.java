@@ -40,7 +40,8 @@ public class MyTask extends JPPFTask implements ItemListener
 	 * Execute this task.
 	 * @see java.lang.Runnable#run()
 	 */
-	@SuppressWarnings("unchecked")
+	@Override
+    @SuppressWarnings("unchecked")
 	public void run()
 	{
 		try
@@ -93,7 +94,8 @@ public class MyTask extends JPPFTask implements ItemListener
 	 * @param item the item that was added.
 	 * @see com.hazelcast.core.ItemListener#itemAdded(java.lang.Object)
 	 */
-	public void itemAdded(Object item)
+	@Override
+    public void itemAdded(Object item)
 	{
 		conditionReached.set(true);
 	}
@@ -103,7 +105,8 @@ public class MyTask extends JPPFTask implements ItemListener
 	 * @param item the item that was removed.
 	 * @see com.hazelcast.core.ItemListener#itemRemoved(java.lang.Object)
 	 */
-	public void itemRemoved(Object item)
+	@Override
+    public void itemRemoved(Object item)
 	{
 	}
 

@@ -49,7 +49,7 @@ public final class TestAnnotatedStaticTask implements Serializable
 	@JPPFRunnable
 	public static String someStaticMethod(int intArg, String stringArg)
 	{
-		String s = "int arg = " + intArg + ", string arg = \"" + stringArg + "\"";
+		String s = "int arg = " + intArg + ", string arg = \"" + stringArg + '\"';
 		System.out.println(s);
 		return s;
 	}

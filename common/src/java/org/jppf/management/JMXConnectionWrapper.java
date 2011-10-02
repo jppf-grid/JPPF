@@ -21,6 +21,7 @@ package org.jppf.management;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.*;
 
 import javax.management.*;
@@ -165,7 +166,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	void performConnection() throws Exception
 	{
 		setConnectedStatus(false);
-    HashMap<String, Object> env = new HashMap<String, Object>(); 
+    Map<String, Object> env = new HashMap<String, Object>();
     jmxc = JMXConnectorFactory.connect(url, env);
   	mbeanConnection.set(jmxc.getMBeanServerConnection());
   	setConnectedStatus(true);

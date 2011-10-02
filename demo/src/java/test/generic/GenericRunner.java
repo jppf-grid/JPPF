@@ -51,7 +51,8 @@ public class GenericRunner
 			//results = client.submit(job);
 			JPPFResultCollector collector = new JPPFResultCollector(job.getTasks().size())
 			{
-				public synchronized void resultsReceived(TaskResultEvent event)
+				@Override
+                public synchronized void resultsReceived(TaskResultEvent event)
 				{
 					System.out.println("received " + event.getTaskList().size() + " tasks");
 					super.resultsReceived(event);

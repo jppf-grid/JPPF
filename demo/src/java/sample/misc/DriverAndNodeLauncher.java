@@ -37,14 +37,16 @@ public class DriverAndNodeLauncher
 		{
 			Runnable driver = new Runnable()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					JPPFDriver.main("noLauncher");
 				}
 			};
 			Runnable node = new Runnable()
 			{
-				public void run()
+				@Override
+                public void run()
 				{
 					NodeRunner.main("noLauncher");
 				}

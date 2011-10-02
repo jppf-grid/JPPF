@@ -30,7 +30,8 @@ public class AnonymousInnerClassTask extends JPPFTestTask
 	 */
 	Runnable r = new Runnable()
 	{
-		public void run()
+		@Override
+        public void run()
 		{
 		}
 	};

@@ -140,7 +140,8 @@ public class TestRemoteTaskManagement extends TestCase implements Serializable
 		 * Execute this task.
 		 * @see java.lang.Runnable#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			try
 			{
@@ -158,7 +159,8 @@ public class TestRemoteTaskManagement extends TestCase implements Serializable
 		 * Called when the task is cancelled.
 		 * @see org.jppf.server.protocol.JPPFTask#onCancel()
 		 */
-		public void onCancel()
+		@Override
+        public void onCancel()
 		{
 			setResult("cancelled");
 		}
@@ -167,7 +169,8 @@ public class TestRemoteTaskManagement extends TestCase implements Serializable
 		 * Called when the task is restarted.
 		 * @see org.jppf.server.protocol.JPPFTask#onRestart()
 		 */
-		public void onRestart()
+		@Override
+        public void onRestart()
 		{
 			setResult("restarted");
 		}

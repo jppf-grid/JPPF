@@ -200,17 +200,17 @@ public class LoadBalancer
 	 * @param array the input array. 
 	 * @return the result sum as an int value.
 	 */
-	private int sum(int[] array)
+	private static int sum(int[] array)
 	{
 		int sum = 0;
-		for (int i=0; i<array.length; i++) sum += array[i];
+        for (int anArray : array) sum += anArray;
 		return sum;
 	}
 
 	/**
 	 * Instances of this class are intended to perform local and remote task executions concurrently.
 	 */
-	public abstract class ExecutionThread extends Thread
+	public abstract static class ExecutionThread extends Thread
 	{
 		/**
 		 * The tasks to execute.

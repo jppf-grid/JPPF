@@ -171,7 +171,7 @@ public class LoggingRunner implements NotificationListener
 	  jmxDriver.connectAndWait(5000L);
 	  JmxLogger driverProxy = jmxDriver.getProxy(name, JmxLogger.class);
 	  // used as handback object so we know where the log messages comes from.
-	  String source = "driver " + jmxDriver.getHost() + ":" + jmxDriver.getPort();
+	  String source = "driver " + jmxDriver.getHost() + ':' + jmxDriver.getPort();
 	  // subbscribe to all notifications from the MBean
 	  driverProxy.addNotificationListener(this, null, source);
 	  /*
@@ -187,7 +187,7 @@ public class LoggingRunner implements NotificationListener
 			  JmxLogger nodeProxy = jmxNode.getProxy(name, JmxLogger.class);
 			 
 			  // used as handback object so we know where the log messages comes from.
-			  source = "node   " + jmxNode.getHost() + ":" + jmxNode.getPort();
+			  source = "node   " + jmxNode.getHost() + ':' + jmxNode.getPort();
 			  // subbscribe to all notifications from the MBean
 			  nodeProxy.addNotificationListener(this, null, source);
 			  jmxConnections.add(jmxNode);
@@ -202,14 +202,16 @@ public class LoggingRunner implements NotificationListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public void handleNotification(Notification notification, final Object handback)
+	@Override
+    public void handleNotification(Notification notification, final Object handback)
 	{
 		// to smoothe the throughput of notfications processing,
 		// we submit each notification to a queue instead of handling it directly
 		final String message = notification.getMessage();
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				String s = handback.toString() + ": " + message;
 				// process the notification; here we simply display the message

@@ -57,7 +57,8 @@ public class StagedTask extends JPPFTask
 	 * Execute this task's work.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		for (int i=1; i<= nbStages; i++)
 		{

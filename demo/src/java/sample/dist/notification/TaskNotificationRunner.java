@@ -140,7 +140,8 @@ public class TaskNotificationRunner
 		// create a task that will periodically query each node for the latest task notification
 		TimerTask timerTask = new TimerTask()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				for (JMXNodeConnectionWrapper jmxClient: jmxConnections)
 				{

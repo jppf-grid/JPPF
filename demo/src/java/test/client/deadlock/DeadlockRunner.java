@@ -152,7 +152,8 @@ public class DeadlockRunner
 		/**
 		 * {@inheritDoc}
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			try
 			{
@@ -211,7 +212,8 @@ public class DeadlockRunner
 		/**
 		 * {@inheritDoc}
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			try
 			{
@@ -222,7 +224,7 @@ public class DeadlockRunner
 				for (int j=0; j<nbTasks; j++)
 				{
 					JPPFTask task = new Task(length, nanos);
-					task.setId("task " + jobNumber + ":" + j);
+					task.setId("task " + jobNumber + ':' + j);
 					job.addTask(task);
 				}
 				jppfClient.submit(job);

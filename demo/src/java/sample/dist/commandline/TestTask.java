@@ -51,7 +51,8 @@ public class TestTask extends CommandLineTask
 	 * Execute the script.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{

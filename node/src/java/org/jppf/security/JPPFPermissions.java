@@ -78,7 +78,7 @@ public class JPPFPermissions extends PermissionCollection
 		{
 			RuntimePermission rtp = (RuntimePermission) permission;
 			String actions = rtp.getActions();
-			if ((actions != null) && (actions.indexOf("exitVM") >= 0))
+			if ((actions != null) && (actions.contains("exitVM")))
 			{
 				int breakpoint = 0;
 			}

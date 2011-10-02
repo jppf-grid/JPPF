@@ -75,7 +75,7 @@
 					</tr>
 					<tr>
 						<td>Duration of each task in seconds:</td>
-						<td><input type="text" value="<%= (float) duration / 1000f %>" name="duration" maxLength="10"></td>
+						<td><input type="text" value="<%= (float) duration / 1000.0f %>" name="duration" maxLength="10"></td>
 					</tr>
 					<tr><td align="center" colspan="*"><input type="hidden" value="true" name="perform"><input type="submit" value="Submit"></td></tr>
 				</table>

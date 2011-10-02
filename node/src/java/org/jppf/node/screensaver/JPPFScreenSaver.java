@@ -154,9 +154,9 @@ class JPPFScreenSaver //extends SimpleScreensaver
 		if (timer == null)
 		{
 			timer = new Timer();
-			timer.schedule(new LogoUpdateTask(), 100, 25 + 5 * (11 - speed));
+			timer.schedule(new LogoUpdateTask(), 100, 25L + 5L * (11L - speed));
 			// 25 frames/sec = 40ms/frame
-			timer.schedule(new LogoDisplayTask(), 500, 25);
+			timer.schedule(new LogoDisplayTask(), 500L, 25L);
 			TimerTask task = new TimerTask()
 			{
 				@Override
@@ -167,7 +167,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 					node.nodeState.timeLabel.setText("Active for: "+s);
 				}
 			};
-			timer.scheduleAtFixedRate(task, 1000, 1000);
+			timer.scheduleAtFixedRate(task, 1000L, 1000L);
 		}
 	}
 

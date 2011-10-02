@@ -184,7 +184,8 @@ public abstract class JPPFTask implements Runnable, Serializable
 	{
 		JPPFTaskEvent event = new JPPFTaskEvent(source);
 		// to avoid ConcurrentModificationException
-		JPPFTaskListener[] array = getListeners().toArray(new JPPFTaskListener[0]);
+        List<JPPFTaskListener> listeners = getListeners();
+        JPPFTaskListener[] array = listeners.toArray(new JPPFTaskListener[listeners.size()]);
 		for (JPPFTaskListener listener: array) listener.eventOccurred(event);
 	}
 

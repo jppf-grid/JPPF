@@ -263,7 +263,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 		TabConfiguration bar = new TabConfiguration("Bar Charts", 2);
 		addTab(bar);
 
-		Fields[] fields = new Fields[] { AVG_EXECUTION_TIME, LATEST_EXECUTION_TIME, AVG_NODE_EXECUTION_TIME, LATEST_NODE_EXECUTION_TIME };
+		Fields[] fields = { AVG_EXECUTION_TIME, LATEST_EXECUTION_TIME, AVG_NODE_EXECUTION_TIME, LATEST_NODE_EXECUTION_TIME };
 		addChart(network, new ChartConfiguration("Execution time", CHART_PLOTXY, "ms", 2, fields));
 		fields = new Fields[] { AVG_EXECUTION_TIME, LATEST_EXECUTION_TIME, MAX_EXECUTION_TIME };
 		addChart(bar, new ChartConfiguration("Execution time (bar chart)", CHART_3DBAR, "ms", 2, fields));

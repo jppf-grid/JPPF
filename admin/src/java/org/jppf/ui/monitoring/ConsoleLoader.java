@@ -112,7 +112,7 @@ public class ConsoleLoader
 	{
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		ClassLoader cl = ConsoleLoader.class.getClassLoader();
-		String[] names = new String[] { "jcommon-1.0.15.jar", "jfreechart-1.0.12.jar" };
+		String[] names = { "jcommon-1.0.15.jar", "jfreechart-1.0.12.jar" };
 		File folder = new File("lib");
 		File[] files = FileUtils.toFiles(folder, names);
 		Downloader downloader = new Downloader();

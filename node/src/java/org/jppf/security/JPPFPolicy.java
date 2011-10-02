@@ -135,7 +135,7 @@ public class JPPFPolicy extends Policy
 			{
 				RuntimePermission rp = (RuntimePermission) permission;
 				String action = rp.getActions();
-				if ((action != null) && (action.indexOf("exitVM") >= 0))
+				if ((action != null) && (action.contains("exitVM")))
 				{
 					log.debug("in implies(exitVM)", new Exception());
 				}

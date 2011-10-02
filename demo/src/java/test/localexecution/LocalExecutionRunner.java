@@ -104,7 +104,7 @@ public class LocalExecutionRunner
 			for (int i=0; i<nbTasks; i++)
 			{
 				LongTask task = new LongTask(length, false);
-				task.setId("" + (iter+1) + ":" + (i+1));
+				task.setId("" + (iter+1) + ':' + (i+1));
 				job.addTask(task);
 			}
 			// submit the tasks for execution
@@ -148,7 +148,7 @@ public class LocalExecutionRunner
 				for (int j=0; j<nbTasks; j++)
 				{
 					JPPFTask task = new LongTask(length, false);
-					task.setId("task " + i + ":" + j);
+					task.setId("task " + i + ':' + j);
 					job.addTask(task);
 				}
 				jobs.add(job);

@@ -123,7 +123,8 @@ public class SocketPerformance
 		 * Main processing loop.
 		 * @see java.lang.Thread#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			try
 			{
@@ -172,7 +173,8 @@ public class SocketPerformance
 		 * Main processing loop.
 		 * @see java.lang.Thread#run()
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			try
 			{

@@ -13,7 +13,7 @@ public class Execution
 	{
 		try
 		{
-			System.out.println("in execute(" + c + ")");
+			System.out.println("in execute(" + c + ')');
 			JPPFClient client = new JPPFClient();
 			JPPFJob jobIsland  = new JPPFJob();
 	    //jobIsland.setBlocking(false);
@@ -23,7 +23,7 @@ public class Execution
 	    ExecutionPolicy policy = new Equal("id", 2);
 	    jobIsland.getJobSLA().setExecutionPolicy(policy);
 	    List<JPPFTask> results = client.submit(jobIsland);
-	    Vector<String> auxs = new Vector<String>();
+	    List<String> auxs = new Vector<String>();
 	    for(JPPFTask task: results) auxs.add((String) task.getResult());
 		}
 		catch(Exception e)

@@ -93,7 +93,7 @@ public class BroadcastJobRunner
 				for (int i=0; i<nbTasks; i++)
 				{
 					LongTask task = new LongTask(length, false);
-					task.setId("" + (iter+1) + ":" + (i+1));
+					task.setId("" + (iter+1) + ':' + (i+1));
 					job.addTask(task);
 				}
 				job.getJobSLA().setBroadcastJob(true);

@@ -99,7 +99,7 @@ public class LongTaskRunner
 				for (int i=0; i<nbTasks; i++)
 				{
 					LongTask task = new LongTask(length, false);
-					task.setId("" + (iter+1) + ":" + (i+1));
+					task.setId("" + (iter+1) + ':' + (i+1));
 					job.addTask(task);
 				}
 				// submit the tasks for execution
@@ -229,7 +229,8 @@ public class LongTaskRunner
 		/**
 		 * {@inheritDoc}
 		 */
-		public void run()
+		@Override
+        public void run()
 		{
 			task.run();
 			setResult(task.getResult());
@@ -239,7 +240,8 @@ public class LongTaskRunner
 		/**
 		 * {@inheritDoc}
 		 */
-		public Object call() throws Exception
+		@Override
+        public Object call() throws Exception
 		{
 			run();
 			return getResult();
@@ -368,7 +370,8 @@ public class LongTaskRunner
 	{
 		Runnable r = new Runnable()
 		{
-			public void run()
+			@Override
+            public void run()
 			{
 				try
 				{

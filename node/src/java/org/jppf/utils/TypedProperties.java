@@ -162,7 +162,7 @@ public class TypedProperties extends Properties
 	 */
 	public float getFloat(String key)
 	{
-		return getFloat(key, 0f);
+		return getFloat(key, 0.0f);
 	}
 	
 	/**
@@ -196,7 +196,7 @@ public class TypedProperties extends Properties
 	 */
 	public double getDouble(String key)
 	{
-		return getDouble(key, 0d);
+		return getDouble(key, 0.0d);
 	}
 	
 	/**

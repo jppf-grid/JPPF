@@ -476,7 +476,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	 * Determine the class loading delegation model currently in use.
 	 * @return an int value representing the model, either {@link #PARENT_FIRST PARENT_FIRST} or {@link #LOCAL_FIRST LOCAL_FIRST}.
 	 */
-	public synchronized static DelegationModel getDelegationModel()
+	public static synchronized DelegationModel getDelegationModel()
 	{
 		return delegationModel;
 	}
@@ -486,7 +486,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	 * @param model an int value, either {@link #PARENT_FIRST PARENT_FIRST} or {@link #LOCAL_FIRST LOCAL_FIRST}.
 	 * If any other value is specified then calling this method has no effect.
 	 */
-	public synchronized static void setDelegationModel(DelegationModel model)
+	public static synchronized void setDelegationModel(DelegationModel model)
 	{
 		if (model != null) AbstractJPPFClassLoader.delegationModel = model;
 	}

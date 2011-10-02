@@ -44,7 +44,8 @@ public class LoggingTask extends JPPFTask
 	 * This method contains the code that will be executed by a node.
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		log.info("task " + getId() + " has started");
 		try

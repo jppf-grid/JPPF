@@ -59,7 +59,7 @@ public class NonBlockingPoolMatrixRunner
 			int size = props.getInt("matrix.size", 300);
 			int iterations = props.getInt("matrix.iterations", 10);
 			int nbSubmissions = props.getInt("nb.submissions", 5);
-			System.out.println("Running Matrix demo with matrix size = "+size+"*"+size+" for "+iterations+" iterations");
+			System.out.println("Running Matrix demo with matrix size = "+size+ '*' + size + " for " + iterations + " iterations");
 			NonBlockingPoolMatrixRunner runner = new NonBlockingPoolMatrixRunner();
 			runner.perform(size, iterations, nbSubmissions);
 			System.exit(0);

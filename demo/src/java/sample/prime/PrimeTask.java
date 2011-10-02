@@ -91,7 +91,8 @@ public class PrimeTask extends JPPFTask
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
-	public void run()
+	@Override
+    public void run()
 	{
 		try
 		{

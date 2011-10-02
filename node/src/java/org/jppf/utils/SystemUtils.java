@@ -87,7 +87,7 @@ public final class SystemUtils
 	 * {@link java.lang.System#getProperties() System.getProperties()}.
 	 * @return the properties as a <code>TypedProperties</code> instance.
 	 */
-	public synchronized static TypedProperties getSystemProperties()
+	public static synchronized TypedProperties getSystemProperties()
 	{
 		if (systemProps == null)
 		{

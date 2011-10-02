@@ -53,7 +53,8 @@ public class MatrixTask extends BaseDemoTask
 	 * @return a matrix column as an array of <code>double</code> values.
 	 * @see org.jppf.server.protocol.JPPFTask#getResult()
 	 */
-	public Object getResult()
+	@Override
+    public Object getResult()
 	{
 		return result;
 	}
@@ -62,7 +63,8 @@ public class MatrixTask extends BaseDemoTask
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
-	public void doWork()
+	@Override
+    public void doWork()
 	{
 		try
 		{
@@ -72,7 +74,7 @@ public class MatrixTask extends BaseDemoTask
 	
 			for (int col=0; col<size; col++)
 			{
-				double sum = 0d;
+				double sum = 0.0d;
 				for (int row=0; row<size; row++)
 				{
 					sum += matrix.getValueAt(row, col) * rowValues[row];

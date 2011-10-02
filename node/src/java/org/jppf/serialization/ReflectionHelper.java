@@ -67,11 +67,11 @@ public final class ReflectionHelper
 	/**
 	 * Default float value.
 	 */
-	private static final Float DEFAULT_FLOAT = Float.valueOf(0f);
+	private static final Float DEFAULT_FLOAT = Float.valueOf(0.0f);
 	/**
 	 * Default double value.
 	 */
-	private static final Double DEFAULT_DOUBLE = Double.valueOf(0d);
+	private static final Double DEFAULT_DOUBLE = Double.valueOf(0.0d);
 	/**
 	 * Default char value.
 	 */

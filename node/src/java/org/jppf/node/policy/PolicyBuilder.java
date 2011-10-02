@@ -115,7 +115,7 @@ public class PolicyBuilder
 	private ExecutionPolicy buildLessThanPolicy(PolicyDescriptor desc)
 	{
 		String s = desc.operands.get(1);
-		double value = 0d;
+		double value = 0.0d;
 		try
 		{
 			value = Double.valueOf(s);
@@ -135,7 +135,7 @@ public class PolicyBuilder
 	private ExecutionPolicy buildAtMostPolicy(PolicyDescriptor desc)
 	{
 		String s = desc.operands.get(1);
-		double value = 0d;
+		double value = 0.0d;
 		try
 		{
 			value = Double.valueOf(s);
@@ -155,7 +155,7 @@ public class PolicyBuilder
 	private ExecutionPolicy buildMoreThanPolicy(PolicyDescriptor desc)
 	{
 		String s = desc.operands.get(1);
-		double value = 0d;
+		double value = 0.0d;
 		try
 		{
 			value = Double.valueOf(s);
@@ -175,7 +175,7 @@ public class PolicyBuilder
 	private ExecutionPolicy buildAtLeastPolicy(PolicyDescriptor desc)
 	{
 		String s = desc.operands.get(1);
-		double value = 0d;
+		double value = 0.0d;
 		try
 		{
 			value = Double.valueOf(s);
@@ -195,8 +195,8 @@ public class PolicyBuilder
 	private ExecutionPolicy buildBetweenIIPolicy(PolicyDescriptor desc)
 	{
 		String s = desc.operands.get(1);
-		double value1 = 0d;
-		double value2 = 0d;
+		double value1 = 0.0d;
+		double value2 = 0.0d;
 		try
 		{
 			value1 = Double.valueOf(s);
@@ -218,8 +218,8 @@ public class PolicyBuilder
 	private ExecutionPolicy buildBetweenIEPolicy(PolicyDescriptor desc)
 	{
 		String s = desc.operands.get(1);
-		double value1 = 0d;
-		double value2 = 0d;
+		double value1 = 0.0d;
+		double value2 = 0.0d;
 		try
 		{
 			value1 = Double.valueOf(s);
@@ -241,8 +241,8 @@ public class PolicyBuilder
 	private ExecutionPolicy buildBetweenEIPolicy(PolicyDescriptor desc)
 	{
 		String s = desc.operands.get(1);
-		double value1 = 0d;
-		double value2 = 0d;
+		double value1 = 0.0d;
+		double value2 = 0.0d;
 		try
 		{
 			value1 = Double.valueOf(s);
@@ -264,8 +264,8 @@ public class PolicyBuilder
 	private ExecutionPolicy buildBetweenEEPolicy(PolicyDescriptor desc)
 	{
 		String s = desc.operands.get(1);
-		double value1 = 0d;
-		double value2 = 0d;
+		double value1 = 0.0d;
+		double value2 = 0.0d;
 		try
 		{
 			value1 = Double.valueOf(s);
@@ -294,7 +294,7 @@ public class PolicyBuilder
 		}
 		if ("numeric".equals(desc.valueType))
 		{
-			double value = 0d;
+			double value = 0.0d;
 			try
 			{
 				value = Double.valueOf(s);
