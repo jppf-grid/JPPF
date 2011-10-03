@@ -169,7 +169,7 @@ public class JPPFDriver
 		new JPPFStartupLoader().load(JPPFDriverStartupSPI.class);
 
 		initializer.initBroadcaster();
-		initializer.initPeers();
+		initializer.initPeers(classServer);
 		System.out.println("JPPF Driver initialization complete");
 	}
 

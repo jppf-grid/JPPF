@@ -29,6 +29,7 @@ import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.server.debug.*;
 import org.jppf.server.peer.*;
+import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -196,14 +197,15 @@ public class DriverInitializer
 
 	/**
 	 * Initialize this driver's peers.
-	 */
-	void initPeers()
+     * @param classServer JPPF class server
+     */
+	void initPeers(final ClassNioServer classServer)
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
 		if (props.getBoolean("jppf.peer.discovery.enabled", false))
 		{
 			if (debugEnabled) log.debug("starting peers discovery");
-			peerDiscoveryThread = new PeerDiscoveryThread();
+			peerDiscoveryThread = new PeerDiscoveryThread(getConnectionInformation(), classServer);
 			new Thread(peerDiscoveryThread, "PeerDiscoveryThread").start();
 		}
 		else
@@ -212,7 +214,12 @@ public class DriverInitializer
 			if ((peerNames == null) || "".equals(peerNames.trim())) return;
 			if (debugEnabled) log.debug("found peers in the configuration");
 			String[] names = peerNames.split("\\s");
-			for (String peerName: names) new JPPFPeerInitializer(peerName).start();
+			for (String peerName: names) {
+                JPPFConnectionInformation connectionInfo = new JPPFConnectionInformation();
+                connectionInfo.host = props.getString(String.format("jppf.peer.%s.server.host", peerName), "localhost");
+                connectionInfo.serverPorts = new int[] { props.getInt(String.format("jppf.peer.%s.server.port", peerName), 11111) };
+                new JPPFPeerInitializer(peerName, connectionInfo, classServer).start();
+            }
 		}
 	}
 

@@ -91,10 +91,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	protected int classServerPort = -1;
 	/**
-	 * Security credentials associated with the application.
-	 */
-	protected JPPFSecurityContext credentials = null;
-	/**
 	 * Total count of the tasks submitted by this client.
 	 */
 	protected int totalTaskCount = 0;
@@ -158,20 +154,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	@Override
 	public abstract void init();
-
-	/**
-	 * Initialize this client's security credentials.
-	 * @throws Exception if an error is raised during initialization.
-	 */
-	public void initCredentials() throws Exception
-	{
-		StringBuilder sb = new StringBuilder("Client:");
-		sb.append(VersionUtils.getLocalIpAddress()).append(':');
-		TypedProperties props = JPPFConfiguration.getProperties();
-		sb.append(props.getInt("class.server.port", 11111)).append(':');
-		sb.append(port).append(':');
-		credentials = new JPPFSecurityContext(uuid, sb.toString(), new JPPFCredentials());
-	}
 
 	/**
 	 * Send tasks to the server for execution.

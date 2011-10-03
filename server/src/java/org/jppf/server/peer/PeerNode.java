@@ -19,6 +19,7 @@ package org.jppf.server.peer;
 
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.SocketClient;
+import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.io.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.AbstractMonitoredNode;
@@ -50,7 +51,11 @@ class PeerNode extends AbstractMonitoredNode
 	/**
 	 * The name of the peer in the configuration file.
 	 */
-	private String peerName = null;
+	private final String peerName;
+    /**
+     * Peer connection information.
+     */
+    private final JPPFConnectionInformation connectionInfo;
 	/**
 	 * Input source for the socket client.
 	 */
@@ -67,10 +72,15 @@ class PeerNode extends AbstractMonitoredNode
 	/**
 	 * Initialize this peer node with the specified configuration name.
 	 * @param peerName the name of the peer int he configuration file.
+     * @param connectionInfo peer connection information.
 	 */
-	public PeerNode(String peerName)
+	public PeerNode(final String peerName, final JPPFConnectionInformation connectionInfo)
 	{
+        if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
+        if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
+
 		this.peerName = peerName;
+        this.connectionInfo = connectionInfo;
 		//this.uuid = new JPPFUuid().toString();
 		this.uuid = driver.getUuid();
 		this.helper = new SerializationHelperImpl();
@@ -95,9 +105,7 @@ class PeerNode extends AbstractMonitoredNode
 			{
 				setStopped(true);
 				if (socketInitializer != null) socketInitializer.close();
-				TypedProperties props = JPPFConfiguration.getProperties();
-				if (props.getBoolean("jppf.discovery.enabled", true) && props.getBoolean("jppf.peer.discovery.enabled", true))
-					driver.getInitializer().getPeerDiscoveryThread().removePeer(peerName);
+                driver.getInitializer().getPeerDiscoveryThread().removePeer(connectionInfo);
 				if (debugEnabled) log.debug(getName() + " : " + e.getMessage(), e);
 			}
 			if (!isStopped())
@@ -180,7 +188,7 @@ class PeerNode extends AbstractMonitoredNode
 				resultSender.run(n);
 				//resultSender.sendPartialResults(bundleWrapper);
 				setTaskCount(getTaskCount() + n);
-				if (debugEnabled) log.debug(getName() + "tasks executed: "+getTaskCount());
+				if (debugEnabled) log.debug(getName() + "tasks executed: " + getTaskCount());
 			}
 			else
 			{
@@ -229,9 +237,8 @@ class PeerNode extends AbstractMonitoredNode
 	public void initSocketClient() throws Exception
 	{
 		if (debugEnabled) log.debug(getName() + "initializing socket client");
-		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = props.getString("jppf.peer."+peerName+".server.host", "localhost");
-		int port = props.getInt("jppf.peer."+peerName+".server.port", 11111);
+        String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
+        int port = connectionInfo.serverPorts[0];
 		socketClient = new SocketClient();
 		socketClient.setHost(host);
 		socketClient.setPort(port);

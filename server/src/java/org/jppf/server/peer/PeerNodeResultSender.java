@@ -49,9 +49,10 @@ class PeerNodeResultSender extends AbstractResultSender
 	 * Initialize this result sender with a specified socket client.
 	 * @param socketClient the socket client used to send results back.
 	 */
-	public PeerNodeResultSender(SocketWrapper socketClient)
+	public PeerNodeResultSender(final SocketWrapper socketClient)
 	{
 		super(socketClient, false);
+
 		destination = new SocketWrapperOutputDestination(socketClient);
 	}
 
@@ -69,7 +70,7 @@ class PeerNodeResultSender extends AbstractResultSender
 			try
 			{
 				wait();
-				if (debugEnabled) log.debug(""+getResultList().size()+" in result list");
+				if (debugEnabled) log.debug(Integer.toString(getResultList().size()) + " in result list");
 				if (!getResultList().isEmpty())
 				{
 					BundleWrapper first = getResultList().remove(0);
@@ -107,10 +108,10 @@ class PeerNodeResultSender extends AbstractResultSender
 	 * @throws Exception if an IO exception occurred while sending the results back.
 	 */
 	@Override
-    public void sendPartialResults(ServerJob bundleWrapper) throws Exception
+    public void sendPartialResults(final ServerJob bundleWrapper) throws Exception
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-		if (debugEnabled) log.debug("Sending bundle with "+bundle.getTaskCount()+" tasks");
+		if (debugEnabled) log.debug("Sending bundle with " + bundle.getTaskCount() + " tasks");
 		//long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		//bundle.setNodeExecutionTime(elapsed);
 

@@ -17,7 +17,8 @@
  */
 package org.jppf.server.peer;
 
-import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.classloader.ClassNioServer;
+import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.slf4j.*;
 
 
@@ -35,16 +36,31 @@ public class JPPFPeerInitializer extends Thread
 	/**
 	 * Name of the peer in the configuration file.
 	 */
-	private String peerName = null;
+	private final String peerName;
+    /**
+     * Peer connection information.
+     */
+    private final JPPFConnectionInformation connectionInfo;
+    /**
+     * JPPF class server
+     */
+    private final ClassNioServer classServer;
 
 	/**
 	 * Initialize this peer initializer from a specified peerName.
 	 * @param peerName the name of the peer in the configuration file.
+     * @param connectionInfo peer connection information.
+     * @param classServer JPPF class server
 	 */
-	public JPPFPeerInitializer(String peerName)
+	public JPPFPeerInitializer(final String peerName, final JPPFConnectionInformation connectionInfo, final ClassNioServer classServer)
 	{
-		this.peerName = peerName;
-		setName("Peer Initializer ["+peerName+ ']');
+        if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
+        if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
+
+		this.peerName       = peerName;
+        this.connectionInfo = connectionInfo;
+        this.classServer    = classServer;
+		setName("Peer Initializer [" + peerName + ']');
 	}
 
 	/**
@@ -57,13 +73,15 @@ public class JPPFPeerInitializer extends Thread
 		log.info("start initialization of peer [" + peerName + ']');
 		try
 		{
-			new PeerResourceProvider(peerName, JPPFDriver.getInstance().getClassServer()).init();
-			new PeerNode(peerName).run();
+			new PeerResourceProvider(peerName, connectionInfo, classServer).init();
+			new PeerNode(peerName, connectionInfo).run();
 		}
 		catch(Exception e)
 		{
 			log.error(e.getMessage(), e);
-		}
-		log.info("end initialization of peer [" + peerName + ']');
+		} finally
+        {
+            log.info("end initialization of peer [" + peerName + ']');
+        }
 	}
 }

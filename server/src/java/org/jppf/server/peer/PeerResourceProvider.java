@@ -23,6 +23,7 @@ import java.util.Vector;
 
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.comm.socket.SocketChannelClient;
+import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
@@ -45,17 +46,26 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
 	/**
 	 * The name of the peer in the configuration file.
 	 */
-	private String peerName = null;
+	private final String peerName;
+    /**
+     * Peer connection information.
+     */
+    private final JPPFConnectionInformation connectionInfo;
 
 	/**
 	 * Initialize this peer provider with the specified configuration name.
 	 * @param peerName the name of the peer in the configuration file.
-	 * @param server the NioServer to which the channel is registred.
+	 * @param connectionInfo peer connection information.
+     * @param server the NioServer to which the channel is registred.
 	 */
-	public PeerResourceProvider(String peerName, NioServer server)
+	public PeerResourceProvider(final String peerName, final JPPFConnectionInformation connectionInfo, final NioServer server)
 	{
 		super(server);
+        if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
+        if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
+
 		this.peerName = peerName;
+        this.connectionInfo = connectionInfo;
 	}
 
 	/**
@@ -103,9 +113,8 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
 	@Override
     public SocketChannelClient initSocketChannel() throws Exception
 	{
-		TypedProperties props = JPPFConfiguration.getProperties();
-		String host = props.getString("jppf.peer." + peerName + ".server.host", "localhost");
-		int port = props.getInt("class.peer." + peerName + ".server.port", 11111);
+        String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
+        int port = connectionInfo.serverPorts[0];
         return new SocketChannelClient(host, port, false);
 	}
 }

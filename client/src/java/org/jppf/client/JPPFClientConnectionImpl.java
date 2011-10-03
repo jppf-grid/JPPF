@@ -132,7 +132,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 		try
 		{
 			delegate.init();
-			initCredentials();
 			if (!delegate.isClosed())
 			{
 				Thread t = new Thread(delegate);

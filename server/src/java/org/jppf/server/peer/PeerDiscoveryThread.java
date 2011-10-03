@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.comm.discovery.*;
-import org.jppf.server.*;
+import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -44,26 +44,32 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 	/**
 	 * Contains the set of retrieved connection information objects.
 	 */
-	private Set<JPPFConnectionInformation> infoSet = new HashSet<JPPFConnectionInformation>();
+	private final Set<JPPFConnectionInformation> infoSet = new HashSet<JPPFConnectionInformation>();
 	/**
 	 * Count of distinct retrieved connection informaiton objects.
 	 */
-	private AtomicInteger count = new AtomicInteger(0);
+	private final AtomicInteger count = new AtomicInteger(0);
 	/**
 	 * Connection information for this JPPF driver.
 	 */
-	private JPPFConnectionInformation localInfo = null;
-	/**
-	 * Map of peer server conneciton information to their name.
-	 */
-	private Map<String, JPPFConnectionInformation> peersMap = new HashMap<String, JPPFConnectionInformation>();
+	private final JPPFConnectionInformation localInfo;
+    /**
+     * JPPF class server
+     */
+    private final ClassNioServer classServer;
 
-	/**
+    /**
 	 * Default constructor.
-	 */
-	public PeerDiscoveryThread()
+     * @param localInfo Connection information for this JPPF driver.
+     * @param classServer JPPF class server
+     */
+	public PeerDiscoveryThread(final JPPFConnectionInformation localInfo, final ClassNioServer classServer)
 	{
-		localInfo = new DriverInitializer(JPPFDriver.getInstance()).getConnectionInformation();
+        if(localInfo == null) throw new IllegalArgumentException("localInfo is null");
+        if(classServer == null) throw new IllegalArgumentException("classServer is null");
+
+        this.localInfo = localInfo;
+        this.classServer = classServer;
 	}
 
 	/**
@@ -92,29 +98,13 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 	 * Add a newly found peer.
 	 * @param info the peer's connection information.
 	 */
-	public synchronized void addPeer(JPPFConnectionInformation info)
+	public synchronized void addPeer(final JPPFConnectionInformation info)
 	{
 		if (debugEnabled) log.debug("Found peer connection information: " + info);
 		infoSet.add(info);
-		String name = "Peer-" + count.incrementAndGet();
-		peersMap.put(name, info);
-		int n = count.get();
-		TypedProperties props = JPPFConfiguration.getProperties();
-		String peerNames = (n <= 0) ? "" : props.getString("jppf.peers", "").trim();
-		String[] allNames = peerNames.split("\\s");
-		StringBuilder sb = new StringBuilder();
-		if (allNames.length > 0)
-		{
-			for (String s: allNames)
-			{
-				if (!name.equals(s)) sb.append(s).append(' ');
-			}
-		}
-		sb.append(name);
-		props.setProperty("jppf.peers", sb.toString());
-		props.setProperty("jppf.peer." + name + ".server.host", info.host);
-		props.setProperty("jppf.peer." + name + ".server.port", Integer.toString(info.serverPorts[0]));
-		new JPPFPeerInitializer(name).start();
+        String name = "Peer-" + count.incrementAndGet();
+
+		new JPPFPeerInitializer(name, info, classServer).start();
 	}
 
 	/**
@@ -125,7 +115,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 	 * @return true if the host/port combination in the connection information can be resolved
 	 * as the configuration for this driver.
 	 */
-	private boolean isSelf(JPPFConnectionInformation info)
+	private boolean isSelf(final JPPFConnectionInformation info)
 	{
 		List<InetAddress> ipv4Addresses = NetworkUtils.getIPV4Addresses();
 		for (InetAddress addr: ipv4Addresses)
@@ -141,15 +131,10 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 
 	/**
 	 * Remove a disconnected peer.
-	 * @param name the name of the peer to remove.
+     * @param connectionInfo connection info of the peer to remove
 	 */
-	public synchronized void removePeer(String name)
+	public synchronized void removePeer(final JPPFConnectionInformation connectionInfo)
 	{
-		JPPFConnectionInformation info = peersMap.get(name);
-		if (info != null)
-		{
-			infoSet.remove(info);
-			peersMap.remove(name);
-		}
+        infoSet.remove(connectionInfo);
 	}
 }
