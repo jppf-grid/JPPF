@@ -21,6 +21,7 @@ package org.jppf.server.nio.client;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
+import org.slf4j.*;
 
 /**
  * Completion listener that is used to notify that results were received from a node,
@@ -29,6 +30,14 @@ import org.jppf.server.protocol.*;
  */
 public class CompletionListener implements TaskCompletionListener
 {
+	/**
+	 * Logger for this class.
+	 */
+	private static Logger log = LoggerFactory.getLogger(CompletionListener.class);
+	/**
+	 * Determines whether debug-level logging is enabled.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * The transition manager for the server to client channels.
 	 */
@@ -41,7 +50,6 @@ public class CompletionListener implements TaskCompletionListener
 	 * The client context associated with the channel.
 	 */
 	private ClientContext context;
-
 
 	/**
 	 * Initialize this completion listener with the specified channel.
@@ -57,13 +65,21 @@ public class CompletionListener implements TaskCompletionListener
 	 * {@inheritDoc}
 	 */
 	@Override
-    @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
 	public void taskCompleted(BundleWrapper result)
 	{
 		context.offerCompletedBundle(result);
 		if (ClientState.IDLE.equals(context.getState()))
 		{
-			transitionManager.transitionChannel(channel, ClientTransition.TO_SENDING_RESULTS);
+			try
+			{
+				transitionManager.transitionChannel(channel, ClientTransition.TO_SENDING_RESULTS);
+			}
+			catch(Exception e)
+			{
+				if (debugEnabled) log.debug(e.getMessage(), e);
+				else log.info(e.getClass().getName() + " : " + e.getMessage());
+			}
 		}
 	}
 }

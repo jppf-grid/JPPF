@@ -61,7 +61,7 @@ class IdleState extends ClientServerState
 		if (debugEnabled) log.debug("exec() for " + wrapper);
 		if (CHECK_CONNECTION && wrapper.isReadable())
 		{
-			throw new ConnectException("node " + wrapper + " has been disconnected");
+			throw new ConnectException("client " + wrapper + " has been disconnected");
 		}
 		return TO_IDLE;
 	}
