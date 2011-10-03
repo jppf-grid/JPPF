@@ -20,7 +20,6 @@ package org.jppf.ui.monitoring.job.actions;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
-import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.monitoring.job.JobData;
 import org.slf4j.*;
 
@@ -53,7 +52,7 @@ public class CancelJobAction extends AbstractJobAction
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
 	@Override
-    public void updateState(List<Object> selectedElements)
+	public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		setEnabled(jobDataArray.length > 0);
@@ -65,7 +64,7 @@ public class CancelJobAction extends AbstractJobAction
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	@Override
-    public void actionPerformed(ActionEvent event)
+	public void actionPerformed(ActionEvent event)
 	{
 		Runnable r = new Runnable()
 		{

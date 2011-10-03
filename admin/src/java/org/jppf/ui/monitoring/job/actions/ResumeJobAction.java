@@ -20,7 +20,6 @@ package org.jppf.ui.monitoring.job.actions;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
-import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.monitoring.job.JobData;
 import org.slf4j.*;
 

@@ -106,11 +106,9 @@ public class TreeTableModelAdapter extends AbstractTableModel
 
 		tree.addTreeExpansionListener(new TreeExpansionListener()
 		{
-			/**
-			 * Don't use fireTableRowsInserted() here; the selection model would get updated twice.
-			 */
+			/** Don't use fireTableRowsInserted() here; the selection model would get updated twice. */
 			@Override
-            public void treeExpanded(TreeExpansionEvent event)
+			public void treeExpanded(TreeExpansionEvent event)
 			{
 				TreePath[] paths = getSelectedPaths();
 				if (debugEnabled) log.debug("selected paths = " + dumpTreePaths(paths));
@@ -119,7 +117,7 @@ public class TreeTableModelAdapter extends AbstractTableModel
 			}
 
 			@Override
-            public void treeCollapsed(TreeExpansionEvent event)
+			public void treeCollapsed(TreeExpansionEvent event)
 			{
 				TreePath[] paths = getSelectedPaths();
 				if (debugEnabled) log.debug("selected paths = " + dumpTreePaths(paths));
@@ -128,28 +126,24 @@ public class TreeTableModelAdapter extends AbstractTableModel
 			}
 		});
 
-		 //Install a TreeModelListener that can update the table when tree changes. We use delayedFireTableDataChanged
-		 // as we can not be guaranteed the tree will have finished processing the event before us.
+		//Install a TreeModelListener that can update the table when tree changes. We use delayedFireTableDataChanged
+		// as we can not be guaranteed the tree will have finished processing the event before us.
 		treeTableModel.addTreeModelListener(new TreeModelListener()
 		{
 			@Override
-            public void treeNodesChanged(TreeModelEvent e)
-			{
+			public void treeNodesChanged(TreeModelEvent e) {
 				delayedFireTableDataChanged();
 			}
 			@Override
-            public void treeNodesInserted(TreeModelEvent e)
-			{
+			public void treeNodesInserted(TreeModelEvent e) {
 				delayedFireTableDataChanged();
 			}
 			@Override
-            public void treeNodesRemoved(TreeModelEvent e)
-			{
+			public void treeNodesRemoved(TreeModelEvent e) {
 				delayedFireTableDataChanged();
 			}
 			@Override
-            public void treeStructureChanged(TreeModelEvent e)
-			{
+			public void treeStructureChanged(TreeModelEvent e) {
 				delayedFireTableDataChanged();
 			}
 		});
