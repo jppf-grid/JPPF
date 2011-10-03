@@ -67,11 +67,11 @@ public final class ReflectionHelper
 	/**
 	 * Default float value.
 	 */
-	private static final Float DEFAULT_FLOAT = Float.valueOf(0.0f);
+	private static final Float DEFAULT_FLOAT = Float.valueOf(0f);
 	/**
 	 * Default double value.
 	 */
-	private static final Double DEFAULT_DOUBLE = Double.valueOf(0.0d);
+	private static final Double DEFAULT_DOUBLE = Double.valueOf(0d);
 	/**
 	 * Default char value.
 	 */
@@ -274,7 +274,7 @@ public final class ReflectionHelper
 	/**
 	 * A cache of constructors used for deserialization.
 	 */
-	private static final Map<Class<?>, Constructor> constructorMap = new SoftReferenceValuesMap<Class<?>, Constructor>();
+	private static final Map<Class<?>, Constructor> CONSTRUCTOR_MAP = new SoftReferenceValuesMap<Class<?>, Constructor>();
 
 	/**
 	 * Create an object without calling any of its class constructors.
@@ -302,9 +302,9 @@ public final class ReflectionHelper
 		try
 		{
 			Constructor constructor;
-			synchronized(constructorMap)
+			synchronized(CONSTRUCTOR_MAP)
 			{
-				constructor = constructorMap.get(clazz);
+				constructor = CONSTRUCTOR_MAP.get(clazz);
 			}
 			if (constructor == null)
 			{
@@ -312,9 +312,9 @@ public final class ReflectionHelper
 				Constructor superConstructor = parent.getDeclaredConstructor();
 				//constructor = rf.newConstructorForSerialization(clazz, superConstructor);
 				constructor = (Constructor) rfMethod.invoke(rf, clazz, superConstructor);
-				synchronized(constructorMap)
+				synchronized(CONSTRUCTOR_MAP)
 				{
-					constructorMap.put(clazz, constructor);
+					CONSTRUCTOR_MAP.put(clazz, constructor);
 				}
 			}
 			return clazz.cast(constructor.newInstance());
@@ -332,7 +332,7 @@ public final class ReflectionHelper
 	/**
 	 * A cache of constructors used for deserialization.
 	 */
-	private static final Map<Class<?>, ConstructorWithParameters> defaultConstructorMap = new SoftReferenceValuesMap<Class<?>, ConstructorWithParameters>();
+	private static final Map<Class<?>, ConstructorWithParameters> DEFAULT_CONSTRUCTOR_MAP = new SoftReferenceValuesMap<Class<?>, ConstructorWithParameters>();
 
 	/**
 	 * Instantiate an object from one of its class' existing constructor.
@@ -344,9 +344,9 @@ public final class ReflectionHelper
 	static Object createFromConstructor(Class<?> clazz) throws Exception
 	{
 		ConstructorWithParameters cwp = null;
-		synchronized(defaultConstructorMap)
+		synchronized(DEFAULT_CONSTRUCTOR_MAP)
 		{
-			cwp = defaultConstructorMap.get(clazz);
+			cwp = DEFAULT_CONSTRUCTOR_MAP.get(clazz);
 		}
 		if (cwp == null)
 		{
@@ -362,9 +362,9 @@ public final class ReflectionHelper
 				{
 					Object result = c.newInstance(params);
 					cwp = new ConstructorWithParameters(c, params);
-					synchronized(defaultConstructorMap)
+					synchronized(DEFAULT_CONSTRUCTOR_MAP)
 					{
-						defaultConstructorMap.put(clazz, cwp);
+						DEFAULT_CONSTRUCTOR_MAP.put(clazz, cwp);
 					}
 					return result;
 				}

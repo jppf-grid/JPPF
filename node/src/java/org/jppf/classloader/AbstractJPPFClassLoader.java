@@ -498,6 +498,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	private static synchronized DelegationModel initDelegationModel()
 	{
 		String s = JPPFConfiguration.getProperties().getString("jppf.classloader.delegation", "parent");
-		return "local".equalsIgnoreCase(s) ? DelegationModel.LOCAL_FIRST : DelegationModel.PARENT_FIRST;
+		DelegationModel model = "local".equalsIgnoreCase(s) ? DelegationModel.LOCAL_FIRST : DelegationModel.PARENT_FIRST;
+		if (debugEnabled) log.debug("Using " + model + " class loader delegation model");
+		return model;
 	}
 }
