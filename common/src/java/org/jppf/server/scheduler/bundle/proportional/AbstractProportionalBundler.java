@@ -52,7 +52,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	/**
 	 * Mapping of individual bundler to corresponding performance data.
 	 */
-	private static final Set<AbstractProportionalBundler> bundlers = new HashSet<AbstractProportionalBundler>();
+	private static final Set<AbstractProportionalBundler> BUNDLERS = new HashSet<AbstractProportionalBundler>();
 	/**
 	 * Bounded memory of the past performance updates.
 	 */
@@ -106,7 +106,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 		if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": new performance sample [size=" + size + ", time=" + (long) time + ']');
 		if (size <= 0) return;
 		BundlePerformanceSample sample = new BundlePerformanceSample(time / (double) size, size);
-		synchronized(bundlers)
+		synchronized(BUNDLERS)
 		{
 			dataHolder.addSample(sample);
 			computeBundleSizes();
@@ -120,9 +120,9 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	@Override
     public void setup()
 	{
-		synchronized(bundlers)
+		synchronized(BUNDLERS)
 		{
-			bundlers.add(this);
+			BUNDLERS.add(this);
 		}
 	}
 	
@@ -133,9 +133,9 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	@Override
     public void dispose()
 	{
-		synchronized(bundlers)
+		synchronized(BUNDLERS)
 		{
-			bundlers.remove(this);
+			BUNDLERS.remove(this);
 		}
 	}
 
@@ -153,13 +153,13 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 */
 	private void computeBundleSizes()
 	{
-		synchronized(bundlers)
+		synchronized(BUNDLERS)
 		{
 			double maxMean = Double.NEGATIVE_INFINITY;
 			double minMean = Double.POSITIVE_INFINITY;
 			AbstractProportionalBundler minBundler = null;
 			double meanSum = 0.0d;
-			for (AbstractProportionalBundler b: bundlers)
+			for (AbstractProportionalBundler b: BUNDLERS)
 			{
 				BundleDataHolder h = b.getDataHolder();
 				double m = h.getMean();
@@ -170,14 +170,14 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 					minBundler = b;
 				}
 			}
-			for (AbstractProportionalBundler b: bundlers)
+			for (AbstractProportionalBundler b: BUNDLERS)
 			{
 				BundleDataHolder h = b.getDataHolder();
 				meanSum += normalize(h.getMean());
 			}
 			int max = maxSize();
 			int sum = 0;
-			for (AbstractProportionalBundler b: bundlers)
+			for (AbstractProportionalBundler b: BUNDLERS)
 			{
 				BundleDataHolder h = b.getDataHolder();
 				double p = normalize(h.getMean()) / meanSum;
@@ -196,7 +196,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 				StringBuilder sb = new StringBuilder();
 				sb.append("bundler info:\n");
 				sb.append("  minMean = ").append(minMean).append(", maxMean = ").append(maxMean).append(", maxSize = ").append(max).append('\n');
-				for (AbstractProportionalBundler b: bundlers)
+				for (AbstractProportionalBundler b: BUNDLERS)
 				{
 					sb.append("  bundler #").append(b.getBundlerNumber()).append(" : bundleSize=").append(b.getBundleSize()).append(", ");
 					sb.append(b.getDataHolder()).append('\n');
