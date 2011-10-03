@@ -53,7 +53,7 @@ public class OptimizedJobTask extends JPPFTask
 	 * @see sample.BaseDemoTask#doWork()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		String s = null;
 		try
@@ -64,7 +64,8 @@ public class OptimizedJobTask extends JPPFTask
 		catch(Exception e)
 		{
 			setException(e);
-			s = "task #" + id + ' ' + e.getMessage();
+			s = "task #" + id + " " + e.getMessage();
+			e.printStackTrace();
 		}
 		setResult(s);
 		System.out.println(s);

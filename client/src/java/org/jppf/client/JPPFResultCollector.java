@@ -60,7 +60,7 @@ public class JPPFResultCollector implements TaskResultListener
 	/**
 	 * 
 	 */
-	private JPPFJob job = null;
+	protected JPPFJob job = null;
 
 	/**
 	 * Default constructor, provided as a convenience for subclasses.
@@ -102,10 +102,13 @@ public class JPPFResultCollector implements TaskResultListener
 		if (event.getThrowable() == null)
 		{
 			List<JPPFTask> tasks = event.getTaskList();
-			for (JPPFTask task: tasks)
+			for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
+			if (job != null)
 			{
-				resultMap.put(task.getPosition(), task);
-				if (job != null) job.getResultMap().put(task.getPosition(), task);
+				synchronized(job)
+				{
+					for (JPPFTask task: tasks) job.getResultMap().put(task.getPosition(), task);
+				}
 			}
 			pendingCount -= tasks.size();
 			if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + pendingCount);

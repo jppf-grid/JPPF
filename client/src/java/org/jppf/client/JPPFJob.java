@@ -226,7 +226,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Get the list of tasks that have not yet been executed.
 	 * @return a list of <code>JPPFTask</code> objects.
 	 */
-	public List<JPPFTask> getPendingTasks()
+	public synchronized List<JPPFTask> getPendingTasks()
 	{
 		List<JPPFTask> list = new LinkedList<JPPFTask>();
 		for (JPPFTask t: tasks)
@@ -445,14 +445,5 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	public Map<Integer, JPPFTask> getResultMap()
 	{
 		return resultMap;
-	}
-
-	/**
-	 * Set a map of the tasks that have been successfully executed.
-	 * @param resultMap a mapping of task objects to their position in the job.
-	 */
-	public void setResultMap(Map<Integer, JPPFTask> resultMap)
-	{
-		this.resultMap = resultMap;
 	}
 }

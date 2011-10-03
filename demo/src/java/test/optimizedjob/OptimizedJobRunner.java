@@ -50,6 +50,10 @@ public class OptimizedJobRunner
 		try
 		{
 			jppfClient = new JPPFClient();
+			/*
+			while (!jppfClient.hasAvailableConnection()) Thread.sleep(50L);
+			jppfClient.setLocalExecutionEnabled(true);
+			*/
 			perform();
 		}
 		catch(Exception e)
@@ -86,6 +90,7 @@ public class OptimizedJobRunner
 			jobs.add(job);
 			jppfClient.submit(job);
 		}
+		output("" + nbJobs + " job" + (nbJobs > 1 ? "s" : "") + " submitted");
 		for (JPPFJob job: jobs)
 		{
 			JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();

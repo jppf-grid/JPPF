@@ -47,7 +47,7 @@ public class JPPFClient extends AbstractGenericClient
 	/**
 	 * The submission manager.
 	 */
-	private SubmissionManager submissionManager;
+	private SubmissionManagerImpl submissionManager;
 
 	/**
 	 * Initialize this client with an automatically generated application UUID.
@@ -92,7 +92,7 @@ public class JPPFClient extends AbstractGenericClient
 	 * @param configuration an object holding the JPPF configuration.
 	 */
 	@Override
-    protected void initConfig(Object configuration)
+	protected void initConfig(Object configuration)
 	{
 		config = (TypedProperties) configuration;
 	}
@@ -105,7 +105,7 @@ public class JPPFClient extends AbstractGenericClient
 	 * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
 	 */
 	@Override
-    protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
+	protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
 	{
 		return new JPPFClientConnectionImpl(this, uuid, name, info);
 	}
@@ -118,9 +118,9 @@ public class JPPFClient extends AbstractGenericClient
 	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
 	 */
 	@Override
-    public List<JPPFTask> submit(JPPFJob job) throws Exception
+	public List<JPPFTask> submit(JPPFJob job) throws Exception
 	{
-		if ((job.getResultListener() == null) || job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
+		if ((job.getResultListener() == null) || job.isBlocking()) job.setResultListener(new JPPFResultCollector(job));
 		//else if (job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
 		submissionManager.submitJob(job);
 		if (job.isBlocking())
@@ -148,7 +148,7 @@ public class JPPFClient extends AbstractGenericClient
 	 * Close this client and release all the resources it is using.
 	 */
 	@Override
-    public void close()
+	public void close()
 	{
 		super.close();
 		if (loadBalancer != null) loadBalancer.stop();
@@ -163,9 +163,9 @@ public class JPPFClient extends AbstractGenericClient
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected void initPools()
+  protected void initPools()
 	{
-		submissionManager = new SubmissionManager(this);
+		submissionManager = new SubmissionManagerImpl(this);
 		new Thread(submissionManager, "SubmissionManager").start();
 		super.initPools();
 	}
@@ -176,7 +176,7 @@ public class JPPFClient extends AbstractGenericClient
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
 	@Override
-    public void statusChanged(ClientConnectionStatusEvent event)
+  public void statusChanged(ClientConnectionStatusEvent event)
 	{
 		super.statusChanged(event);
 		submissionManager.wakeUp();
