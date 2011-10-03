@@ -25,7 +25,6 @@ import javax.resource.cci.Connection;
 import org.jppf.client.*;
 import org.jppf.jca.spi.JPPFManagedConnection;
 import org.jppf.jca.util.JPPFAccessor;
-import org.jppf.jca.work.submission.SubmissionStatusListener;
 import org.jppf.server.protocol.JPPFTask;
 
 /**

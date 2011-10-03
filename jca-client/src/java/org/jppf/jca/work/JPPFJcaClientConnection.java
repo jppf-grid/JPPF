@@ -58,30 +58,26 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 */
 	public JPPFJcaClientConnection(String uuid, String name, JPPFConnectionInformation info, JPPFJcaClient client)
 	{
-		//configure(uuid, name, info.host, info.applicationServerPorts[0], info.classServerPorts[0], 0);
 		configure(uuid, name, info.host, info.serverPorts[0], info.serverPorts[0], 0);
 		status.set(DISCONNECTED);
-		//classServerPort = info.classServerPorts[0];
 		classServerPort = info.serverPorts[0];
 		this.client = client;
 	}
 
 	/**
-	 * 
+	 * Initialize this connection
 	 * @see org.jppf.client.JPPFClientConnection#init()
 	 */
 	@Override
-    public void init()
+	public void init()
 	{
 		try
 		{
 			delegate = new JcaClassServerDelegate(name, uuid, host, classServerPort, (JPPFJcaClient) client);
-			//setStatus(CONNECTING);
-			//taskServerConnection.init();
+			initCredentials();
 			delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
 			{
-				@Override
-                public void statusChanged(ClientConnectionStatusEvent event)
+				public void statusChanged(ClientConnectionStatusEvent event)
 				{
 					delegateStatusChanged(event);
 				}
@@ -89,12 +85,11 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 			taskServerConnection.addClientConnectionStatusListener(new ClientConnectionStatusListener()
 			{
 				@Override
-                public void statusChanged(ClientConnectionStatusEvent event)
+				public void statusChanged(ClientConnectionStatusEvent event)
 				{
 					taskServerConnectionStatusChanged(event);
 				}
 			});
-			//delegate.init();
 			((JcaClassServerDelegate) delegate).performConnection();
 			if (!delegate.isClosed())
 			{
@@ -103,16 +98,13 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 				t.start();
 				taskServerConnection.init();
 			}
-			//setStatus(ACTIVE);
 		}
 		catch(Exception e)
 		{
 			log.debug(e.getMessage());
-			//setStatus(DISCONNECTED);
 		}
 		catch(JPPFError e)
 		{
-			//setStatus(FAILED);
 			throw e;
 		}
 	}
@@ -152,7 +144,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void sendTasks(JPPFTaskBundle header, JPPFJob job) throws Exception
+	public void sendTasks(JPPFTaskBundle header, JPPFJob job) throws Exception
 	{
 		header.setRequestUuid(job.getJobUuid());
 		if (debugEnabled) log.debug("sending tasks bundle with requestUuid=" + header.getRequestUuid());
@@ -186,12 +178,9 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
 	 */
 	@Override
-    public void submit(JPPFJob job) throws Exception
+	public void submit(JPPFJob job) throws Exception
 	{
-		setStatus(EXECUTING);
-		JcaResultProcessor proc = new JcaResultProcessor(this, job);
-		getClient().getExecutor().submit(proc);
-		if (debugEnabled) log.debug("["+name+"] submitted " + job.getTasks().size() + " tasks");
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -200,7 +189,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @see org.jppf.client.AbstractJPPFClientConnection#getSerializationHelperClassName()
 	 */
 	@Override
-    protected String getSerializationHelperClassName()
+	protected String getSerializationHelperClassName()
 	{
 		return "org.jppf.jca.serialization.JcaSerializationHelperImpl";
 	}
@@ -212,7 +201,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @see org.jppf.client.JPPFClientConnection#close()
 	 */
 	@Override
-    public List<JPPFJob> close()
+	public List<JPPFJob> close()
 	{
 		if (!isShutdown)
 		{
@@ -239,7 +228,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @see org.jppf.client.JPPFClientConnection#getName()
 	 */
 	@Override
-    public String getName()
+	public String getName()
 	{
 		return name;
 	}
@@ -250,7 +239,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return name + " : " + status;
 	}
@@ -261,7 +250,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @see org.jppf.client.AbstractJPPFClientConnection#createSocketInitializer()
 	 */
 	@Override
-    protected SocketInitializer createSocketInitializer()
+	protected SocketInitializer createSocketInitializer()
 	{
 		return new JcaSocketInitializer();
 	}
@@ -271,7 +260,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @return a <code>JPPFJcaClient</code> instance.
 	 */
 	@Override
-    public JPPFJcaClient getClient()
+	public JPPFJcaClient getClient()
 	{
 		return (JPPFJcaClient) client;
 	}

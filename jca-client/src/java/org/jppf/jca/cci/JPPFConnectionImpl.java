@@ -59,7 +59,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @see javax.resource.cci.Connection#close()
 	 */
 	@Override
-    public void close()
+	public void close()
 	{
 		closed = true;
 		if (managedConnection != null) managedConnection.fireConnectionEvent(this, ConnectionEvent.CONNECTION_CLOSED, null);
@@ -71,7 +71,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @see javax.resource.cci.Connection#createInteraction()
 	 */
 	@Override
-    public Interaction createInteraction()
+	public Interaction createInteraction()
 	{
 		return new JPPFInteraction(this);
 	}
@@ -83,7 +83,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @see javax.resource.cci.Connection#getLocalTransaction()
 	 */
 	@Override
-    public LocalTransaction getLocalTransaction() throws ResourceException
+	public LocalTransaction getLocalTransaction() throws ResourceException
 	{
 		throw new NotSupportedException("Method not supported");
 	}
@@ -94,7 +94,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @see javax.resource.cci.Connection#getMetaData()
 	 */
 	@Override
-    public ConnectionMetaData getMetaData()
+	public ConnectionMetaData getMetaData()
 	{
 		return new JPPFConnectionMetaData(null);
 	}
@@ -106,7 +106,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @see javax.resource.cci.Connection#getResultSetInfo()
 	 */
 	@Override
-    public ResultSetInfo getResultSetInfo() throws ResourceException
+	public ResultSetInfo getResultSetInfo() throws ResourceException
 	{
 		throw new NotSupportedException("Method not supported");
 	}
@@ -120,9 +120,9 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @throws Exception if an error occurs while submitting the request.
 	 */
 	@Override
-    public String submitNonBlocking(JPPFJob job) throws Exception
+	public String submitNonBlocking(JPPFJob job) throws Exception
 	{
-		return getJppfClient().getSubmissionManager().addSubmission(job);
+		return getJppfClient().getSubmissionManager().submitJob(job);
 	}
 
 	/**
@@ -135,10 +135,10 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @throws Exception if an error occurs while submitting the request.
 	 */
 	@Override
-    public String submitNonBlocking(JPPFJob job, SubmissionStatusListener listener) throws Exception
+	public String submitNonBlocking(JPPFJob job, SubmissionStatusListener listener) throws Exception
 	{
 		job.setBlocking(false);
-		return getJppfClient().getSubmissionManager().addSubmission(job, listener);
+		return getJppfClient().getSubmissionManager().submitJob(job, listener);
 	}
 
 	/**
@@ -147,9 +147,9 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @param listener the listener to add.
 	 */
 	@Override
-    public void addSubmissionStatusListener(String submissionId, SubmissionStatusListener listener)
+	public void addSubmissionStatusListener(String submissionId, SubmissionStatusListener listener)
 	{
-		JPPFSubmissionResult res = getSubmissionResult(submissionId);
+		JcaSubmissionResult res = getSubmissionResult(submissionId);
 		if (res != null) res.addSubmissionStatusListener(listener);
 	}
 
@@ -159,9 +159,9 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @param listener the listener to remove.
 	 */
 	@Override
-    public void removeSubmissionStatusListener(String submissionId, SubmissionStatusListener listener)
+	public void removeSubmissionStatusListener(String submissionId, SubmissionStatusListener listener)
 	{
-		JPPFSubmissionResult res = getSubmissionResult(submissionId);
+		JcaSubmissionResult res = getSubmissionResult(submissionId);
 		if (res != null) res.removeSubmissionStatusListener(listener);
 	}
 
@@ -172,9 +172,9 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @throws Exception if an error occurs while submitting the request.
 	 */
 	@Override
-    public SubmissionStatus getSubmissionStatus(String submissionId) throws Exception
+	public SubmissionStatus getSubmissionStatus(String submissionId) throws Exception
 	{
-		JPPFSubmissionResult res = getSubmissionResult(submissionId);
+		JcaSubmissionResult res = getSubmissionResult(submissionId);
 		if (res == null) return null;
 		return res.getStatus();
 	}
@@ -190,10 +190,10 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @throws Exception if an error occurs while submitting the request.
 	 */
 	@Override
-    public List<JPPFTask> getSubmissionResults(String submissionId) throws Exception
+	public List<JPPFTask> getSubmissionResults(String submissionId) throws Exception
 	{
-		JPPFSubmissionManager mgr = getJppfClient().getSubmissionManager();
-		JPPFSubmissionResult res = mgr.peekSubmission(submissionId);
+		JcaSubmissionManager mgr = getJppfClient().getSubmissionManager();
+		JcaSubmissionResult res = mgr.peekSubmission(submissionId);
 		if (res == null) return null;
 		res = mgr.pollSubmission(submissionId);
 		return res.getResults();
@@ -204,7 +204,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @param submissionId the id of the submission to find.
 	 * @return a <code>JPPFSubmissionResult</code> instance, or null if no submission can be found for the specified id.
 	 */
-	private JPPFSubmissionResult getSubmissionResult(String submissionId)
+	private JcaSubmissionResult getSubmissionResult(String submissionId)
 	{
 		return getJppfClient().getSubmissionManager().peekSubmission(submissionId);
 	}
@@ -214,7 +214,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @return a collection of ids as strings.
 	 */
 	@Override
-    public Collection<String> getAllSubmissionIds()
+	public Collection<String> getAllSubmissionIds()
 	{
 		return getJppfClient().getSubmissionManager().getAllSubmissionIds();
 	}
@@ -224,7 +224,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @return true if the connection was closed, false otherwise.
 	 */
 	@Override
-    public boolean isClosed()
+	public boolean isClosed()
 	{
 		return closed;
 	}
@@ -233,7 +233,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * Set the closed  state of this connection.
 	 */
 	@Override
-    public void setAvailable()
+	public void setAvailable()
 	{
 		this.closed = false;
 	}
@@ -243,7 +243,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @return a <code>JPPFManagedConnection</code> instance.
 	 */
 	@Override
-    public JPPFManagedConnection getManagedConnection()
+	public JPPFManagedConnection getManagedConnection()
 	{
 		return managedConnection;
 	}
@@ -253,7 +253,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @param conn a <code>JPPFManagedConnection</code> instance.
 	 */
 	@Override
-    public void setManagedConnection(JPPFManagedConnection conn)
+	public void setManagedConnection(JPPFManagedConnection conn)
 	{
 		this.managedConnection = conn;
 	}
@@ -262,9 +262,9 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * {@inheritDoc}
 	 */
 	@Override
-    public List<JPPFTask> waitForResults(String submissionId) throws Exception
+	public List<JPPFTask> waitForResults(String submissionId) throws Exception
 	{
-		JPPFSubmissionResult result = getSubmissionResult(submissionId);
+		JcaSubmissionResult result = getSubmissionResult(submissionId);
 		if (result == null) return null;
 		result.waitForResults(0L);
 		return result.getResults();

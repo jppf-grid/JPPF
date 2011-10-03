@@ -28,7 +28,7 @@ import javax.transaction.xa.XAResource;
 
 import org.jppf.jca.util.JPPFAccessorImpl;
 import org.jppf.jca.work.JPPFJcaClient;
-import org.jppf.jca.work.submission.JPPFSubmissionManager;
+import org.jppf.jca.work.submission.JcaSubmissionManager;
 import org.jppf.utils.JPPFUuid;
 import org.slf4j.*;
 
@@ -80,14 +80,14 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @see javax.resource.spi.ResourceAdapter#start(javax.resource.spi.BootstrapContext)
 	 */
 	@Override
-    public void start(BootstrapContext ctx) throws ResourceAdapterInternalException
+	public void start(BootstrapContext ctx) throws ResourceAdapterInternalException
 	{
 		this.ctx = ctx;
 		log.info("Starting JPPF resource adapter");
 		WorkManager workManager = ctx.getWorkManager();
 		jppfClient = new JPPFJcaClient(new JPPFUuid().toString(), getClientConfiguration());
 		log.info("Starting JPPF resource adapter: jppf client="+jppfClient);
-		JPPFSubmissionManager submissionManager = new JPPFSubmissionManager(jppfClient, workManager);
+		JcaSubmissionManager submissionManager = new JcaSubmissionManager(jppfClient, workManager);
 		jppfClient.setSubmissionManager(submissionManager);
 		try
 		{
@@ -105,7 +105,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @see javax.resource.spi.ResourceAdapter#stop()
 	 */
 	@Override
-    public void stop()
+	public void stop()
 	{
 		if (jppfClient != null) jppfClient.close();
 	}
@@ -118,7 +118,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @see javax.resource.spi.ResourceAdapter#endpointActivation(javax.resource.spi.endpoint.MessageEndpointFactory, javax.resource.spi.ActivationSpec)
 	 */
 	@Override
-    public void endpointActivation(MessageEndpointFactory arg0, ActivationSpec arg1) throws ResourceException
+	public void endpointActivation(MessageEndpointFactory arg0, ActivationSpec arg1) throws ResourceException
 	{
 		throw new NotSupportedException("Method not supported");
 	}
@@ -130,7 +130,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @see javax.resource.spi.ResourceAdapter#endpointDeactivation(javax.resource.spi.endpoint.MessageEndpointFactory, javax.resource.spi.ActivationSpec)
 	 */
 	@Override
-    public void endpointDeactivation(MessageEndpointFactory arg0, ActivationSpec arg1)
+	public void endpointDeactivation(MessageEndpointFactory arg0, ActivationSpec arg1) 
 	{
 	}
 
@@ -142,7 +142,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @see javax.resource.spi.ResourceAdapter#getXAResources(javax.resource.spi.ActivationSpec[])
 	 */
 	@Override
-    public XAResource[] getXAResources(ActivationSpec[] arg0) throws ResourceException
+	public XAResource[] getXAResources(ActivationSpec[] arg0) throws ResourceException
 	{
 		return null;
 	}

@@ -27,7 +27,6 @@ import javax.resource.spi.work.*;
 
 import org.jppf.client.*;
 import org.jppf.jca.work.*;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -37,12 +36,12 @@ import org.slf4j.*;
  * It also provides methods to check the status of a submission and retrieve the results.
  * @author Laurent Cohen
  */
-public class JPPFSubmissionManager extends ThreadSynchronization implements Work
+public class JcaSubmissionManager extends ThreadSynchronization implements Work, SubmissionManager
 {
 	/**
 	 * Logger for this class.
 	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFSubmissionManager.class);
+	static Logger log = LoggerFactory.getLogger(JcaSubmissionManager.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
@@ -54,11 +53,11 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	/**
 	 * Mapping of submissions to their submission id.
 	 */
-	private Map<String, JPPFSubmissionResult> submissionMap = new Hashtable<String, JPPFSubmissionResult>();
+	private Map<String, JcaSubmissionResult> submissionMap = new Hashtable<String, JcaSubmissionResult>();
 	/**
 	 * The JPPF client that manages connections to the JPPF drivers.
 	 */
-	private final JPPFJcaClient client;
+	private JPPFJcaClient client = null;
 	/**
 	 * The work manager provided by the applications server, used to submit asynchronous
 	 * JPPF submissions.
@@ -71,7 +70,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 * @param workManager the work manager provided by the applications server, used to submit asynchronous
 	 * JPPF submissions.
 	 */
-	public JPPFSubmissionManager(JPPFJcaClient client, WorkManager workManager)
+	public JcaSubmissionManager(JPPFJcaClient client, WorkManager workManager)
 	{
 		this.client = client;
 		this.workManager = workManager;
@@ -81,8 +80,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 * Stop this submission manager.
 	 * @see javax.resource.spi.work.Work#release()
 	 */
-	@Override
-    public void release()
+	public void release()
 	{
 		setStopped(true);
 		wakeUp();
@@ -93,8 +91,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 * when the queue has one and a connnection is available.
 	 * @see java.lang.Runnable#run()
 	 */
-	@Override
-    public void run()
+	public void run()
 	{
 		while (!isStopped())
 		{
@@ -107,12 +104,11 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 			synchronized(client)
 			{
 				JPPFJob job = execQueue.poll();
-				JPPFJcaClientConnection c;
-					c = (JPPFJcaClientConnection) client.getClientConnection();
-					if (c != null) c.setStatus(JPPFClientConnectionStatus.EXECUTING);
-				JobSubmission submission = new JobSubmission(job, c, execFlags.second());
+				JPPFJcaClientConnection c = null;
+				c = (JPPFJcaClientConnection) client.getClientConnection();
+				if (c != null) c.setStatus(JPPFClientConnectionStatus.EXECUTING);
+				JobSubmission submission = new JcaJobSubmission(job, c, execFlags.second());
 				client.getExecutor().submit(submission);
-				//submission.run();
 			}
 		}
 	}
@@ -122,9 +118,9 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 * @param job encapsulation of the execution data.
 	 * @return the unique id of the submission.
 	 */
-	public String addSubmission(JPPFJob job)
+	public String submitJob(JPPFJob job)
 	{
-		return addSubmission(job, null);
+		return submitJob(job, null);
 	}
 
 	/**
@@ -133,10 +129,10 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 * @param listener an optional listener to receive submission status change notifications, may be null.
 	 * @return the unique id of the submission.
 	 */
-	public String addSubmission(JPPFJob job, SubmissionStatusListener listener)
+	public String submitJob(JPPFJob job, SubmissionStatusListener listener)
 	{
 		int count = job.getTasks().size();
-		JPPFSubmissionResult submission = new JPPFSubmissionResult(count, job.getJobUuid());
+		JcaSubmissionResult submission = new JcaSubmissionResult(job);
 		if (debugEnabled) log.debug("adding new submission: jobId=" + job.getId() + ", nbTasks=" + count + ", submission id=" + submission.getId());
 		if (listener != null) submission.addSubmissionStatusListener(listener);
 		job.setResultListener(submission);
@@ -152,10 +148,10 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 * @param job encapsulation of the execution data.
 	 * @return the unique id of the submission.
 	 */
-	public String addExistingSubmission(JPPFJob job)
+	public String resubmitJob(JPPFJob job)
 	{
-		JPPFSubmissionResult submission = (JPPFSubmissionResult) job.getResultListener();
-		submission.reset();
+		JcaSubmissionResult submission = (JcaSubmissionResult) job.getResultListener();
+		//submission.reset();
 		submission.setStatus(PENDING);
 		execQueue.add(job);
 		submissionMap.put(submission.getId(), submission);
@@ -168,7 +164,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 * @param id the id of the submission to find.
 	 * @return the submisison corresponding to the id, or null if the submission could not be found.
 	 */
-	public JPPFSubmissionResult peekSubmission(String id)
+	public JcaSubmissionResult peekSubmission(String id)
 	{
 		return submissionMap.get(id);
 	}
@@ -178,7 +174,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 * @param id the id of the submission to find.
 	 * @return the submisison corresponding to the id, or null if the submission could not be found.
 	 */
-	public JPPFSubmissionResult pollSubmission(String id)
+	public JcaSubmissionResult pollSubmission(String id)
 	{
 		return submissionMap.remove(id);
 	}
@@ -190,96 +186,5 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	public Collection<String> getAllSubmissionIds()
 	{
 		return Collections.unmodifiableSet(submissionMap.keySet());
-	}
-
-	/**
-	 * Wrapper for submitting a job.
-	 */
-	public class JobSubmission implements Runnable
-	{
-		/**
-		 * The job to execute.
-		 */
-		private JPPFJob job;
-		/**
-		 * Flag indicating whether the job will be executed locally, at least partially.
-		 */
-		private boolean locallyExecuting = false;
-		/**
-		 * The connection to execute the job on.
-		 */
-		protected AbstractJPPFClientConnection connection;
-
-		/**
-		 * Initialize this job submission. 
-		 * @param job the submitted job.
-		 * @param connection the connection to execute the job on.
-		 * @param locallyExecuting determines whether the job will be executed locally, at least partially.
-		 */
-		JobSubmission(JPPFJob job, AbstractJPPFClientConnection connection, boolean locallyExecuting)
-		{
-			this.job = job;
-			this.connection = connection;
-			this.locallyExecuting = locallyExecuting;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-        public void run()
-		{
-			JPPFSubmissionResult result = (JPPFSubmissionResult) job.getResultListener();
-			String requestUuid = job.getJobUuid();
-			ClassLoader cl = null;
-			ClassLoader oldCl = null;
-			if (!job.getTasks().isEmpty())
-			{
-				JPPFTask task = job.getTasks().get(0);
-				cl = task.getClass().getClassLoader();
-				client.addRequestClassLoader(requestUuid, cl);
-				if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
-			}
-			try
-			{
-				if (cl != null)
-				{
-					oldCl = Thread.currentThread().getContextClassLoader();
-					Thread.currentThread().setContextClassLoader(cl);
-				}
-				client.getLoadBalancer().execute(job, connection, locallyExecuting);
-				result.waitForResults(0);
-				client.removeRequestClassLoader(requestUuid);
-				result.setStatus(COMPLETE);
-			}
-			catch (Exception e)
-			{
-				result.setStatus(FAILED);
-				log.error(e.getMessage(), e);
-			}
-			finally
-			{
-				if (connection != null) connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
-				if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
-			}
-		}
-
-		/**
-		 * Get the flag indicating whether the job will be executed locally, at least partially.
-		 * @return <code>true</code> if the job will execute locally, <code>false</code> otherwise.
-		 */
-		public boolean isLocallyExecuting()
-		{
-			return locallyExecuting;
-		}
-
-		/**
-		 * Set the flag indicating whether the job will be executed locally, at least partially.
-		 * @param locallyExecuting <code>true</code> if the job will execute locally, <code>false</code> otherwise.
-		 */
-		public void setLocallyExecuting(boolean locallyExecuting)
-		{
-			this.locallyExecuting = locallyExecuting;
-		}
 	}
 }

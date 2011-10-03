@@ -23,7 +23,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.client.event.ClientConnectionStatusEvent;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.jca.work.submission.JPPFSubmissionManager;
+import org.jppf.jca.work.submission.JcaSubmissionManager;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -49,7 +49,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	/**
 	 * Manages asynchronous work submission to the JPPF driver.
 	 */
-	private JPPFSubmissionManager submissionManager = null;
+	private JcaSubmissionManager submissionManager = null;
 
 	/**
 	 * Initialize this client with a specified application UUID.
@@ -69,7 +69,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
 	 */
 	@Override
-    public List<JPPFTask> submit(JPPFJob job) throws Exception
+	public List<JPPFTask> submit(JPPFJob job) throws Exception
 	{
 		return null;
 	}
@@ -78,7 +78,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * Close this client and release all the resources it is using.
 	 */
 	@Override
-    public void close()
+	public void close()
 	{
 		super.close();
 	}
@@ -89,7 +89,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
 	@Override
-    public void statusChanged(ClientConnectionStatusEvent event)
+	public void statusChanged(ClientConnectionStatusEvent event)
 	{
 		super.statusChanged(event);
 		if (submissionManager != null) submissionManager.wakeUp();
@@ -99,7 +99,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * Get the submission manager for thsi JPPF client.
 	 * @return a <code>JPPFSubmissionManager</code> instance.
 	 */
-	public JPPFSubmissionManager getSubmissionManager()
+	public JcaSubmissionManager getSubmissionManager()
 	{
 		return submissionManager;
 	}
@@ -108,7 +108,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * Set the submission manager for thsi JPPF client.
 	 * @param submissionManager a <code>JPPFSubmissionManager</code> instance.
 	 */
-	public void setSubmissionManager(JPPFSubmissionManager submissionManager)
+	public void setSubmissionManager(JcaSubmissionManager submissionManager)
 	{
 		this.submissionManager = submissionManager;
 	}
@@ -117,7 +117,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
+	protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
 	{
 		return new JPPFJcaClientConnection(uuid, name, info, this);
 	}
@@ -126,7 +126,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected void initConfig(Object configuration)
+	protected void initConfig(Object configuration)
 	{
 		if (log.isDebugEnabled()) log.debug("initializing configuration:\n" + configuration);
 		try
