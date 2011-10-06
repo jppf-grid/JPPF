@@ -442,8 +442,47 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Get a map of the tasks that have been successfully executed.
 	 * @return a mapping of task objects to their position in the job.
 	 */
+	/*
 	public Map<Integer, JPPFTask> getResultMap()
 	{
 		return resultMap;
+	}
+	*/
+
+	/**
+	 * Get the current number of received results.
+	 * @return the number of results as an int.
+	 */
+	public synchronized int getResultSize()
+	{
+		return resultMap.size();
+	}
+
+	/**
+	 * Determine whether this job received a result for the task at the specified position.
+	 * @param position the task position to check.
+	 * @return <code>true</code> if a result was received, <code>false</code> otherwise.
+	 */
+	public synchronized boolean hasResult(int position)
+	{
+		return resultMap.containsKey(position);
+	}
+
+	/**
+	 * Add the specified results to this job.
+	 * @param tasks the list of tasks for which results were received.
+	 */
+	public synchronized void putResults(List<JPPFTask> tasks)
+	{
+		for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
+	}
+
+	/**
+	 * Get the tasks received as results for this job.
+	 * @return a collection of {@link JPPFTask} instances.
+	 */
+	public synchronized Collection<JPPFTask> getResults()
+	{
+		return Collections.unmodifiableCollection(resultMap.values());
 	}
 }

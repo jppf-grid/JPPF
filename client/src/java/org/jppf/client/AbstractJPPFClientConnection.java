@@ -31,7 +31,6 @@ import org.jppf.client.event.*;
 import org.jppf.client.loadbalancer.LoadBalancer;
 import org.jppf.comm.socket.*;
 import org.jppf.io.IOHelper;
-import org.jppf.security.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -187,7 +186,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	public void sendTasks(JPPFTaskBundle header, JPPFJob job) throws Exception
 	{
 		ObjectSerializer ser = makeHelper().getSerializer();
-		int count = job.getTasks().size() - job.getResultMap().size();
+		int count = job.getTasks().size() - job.getResultSize();
 		TraversalList<String> uuidPath = new TraversalList<String>();
 		uuidPath.add(client.getUuid());
 		header.setUuidPath(uuidPath);
@@ -204,7 +203,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		IOHelper.sendData(socketClient, job.getDataProvider(), ser);
 		for (JPPFTask task : job.getTasks())
 		{
-			if (!job.getResultMap().containsKey(task.getPosition())) IOHelper.sendData(socketClient, task, ser);
+			if (!job.hasResult(task.getPosition())) IOHelper.sendData(socketClient, task, ser);
 		}
 		socketClient.flush();
 	}
