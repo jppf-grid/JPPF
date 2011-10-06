@@ -26,7 +26,9 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class DemoTask extends JPPFTask
 {
-
+	/**
+	 * Explicit serialVersionUID.
+	 */
     private static final long serialVersionUID = 1441035751363821022L;
 
 	/**
