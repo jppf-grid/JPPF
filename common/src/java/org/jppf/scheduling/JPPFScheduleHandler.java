@@ -20,8 +20,10 @@ package org.jppf.scheduling;
 
 import java.text.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jppf.utils.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**
@@ -39,9 +41,9 @@ public class JPPFScheduleHandler
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Timer that will trigger an action when a schedule date is reached.
+	 * The sceduled executor used for scheduling actions.
 	 */
-	private Timer timer = null;
+	private ScheduledExecutorService executor;
 	/**
 	 * Count of the instances of this class, added as a suffix to the timer's name.
 	 */
@@ -49,7 +51,7 @@ public class JPPFScheduleHandler
 	/**
 	 * Mapping of timer tasks to a key.
 	 */
-	private Map<Object, TimerTask> timerTaskMap = new Hashtable<Object, TimerTask>();
+	private Map<Object, ScheduledFuture<?>> futureMap = new Hashtable<Object, ScheduledFuture<?>>();
 	/**
 	 * The name given to this schedule handler's internal timer.
 	 */
@@ -74,7 +76,7 @@ public class JPPFScheduleHandler
 	public JPPFScheduleHandler(String name)
 	{
 		this.name = name;
-		timer = new Timer(name);
+		createExecutor();
 	}
 
 	/**
@@ -94,7 +96,7 @@ public class JPPFScheduleHandler
 	 * @param key key used to retrieve or cancel the action at a later time.
 	 * @param schedule the schedule at which the action is triggered.
 	 * @param action the action to perform when the schedule date is reached.
-	 * @param start the start time to use if the schedule is expressed as a durartion.
+	 * @param start the start time to use if the schedule is expressed as a duration.
 	 * @throws ParseException if the schedule date could not be parsed
 	 */
 	public void scheduleAction(Object key, JPPFSchedule schedule, Runnable action, long start) throws ParseException
@@ -107,16 +109,15 @@ public class JPPFScheduleHandler
 			}
 		}
 		Date date = schedule.toDate(start);
-		ScheduleHandlerTask task = new ScheduleHandlerTask(key, action);
-		timerTaskMap.put(key, task);
+		ScheduledFuture<?> future = executor.schedule(action, date.getTime() - start, TimeUnit.MILLISECONDS);
+		futureMap.put(key, future);
 		if (debugEnabled)
 		{
 			synchronized(sdf)
 			{
-				log.debug(name + " : date=" + sdf.format(date) + ", key=" + key + ", timerTaskMap=" + timerTaskMap);
+				log.debug(name + " : date=" + sdf.format(date) + ", key=" + key + ", future=" + future);
 			}
 		}
-		timer.schedule(task, date);
 	}
 
 	/**
@@ -126,49 +127,10 @@ public class JPPFScheduleHandler
 	public void cancelAction(Object key)
 	{
 		if (key == null) return;
-		TimerTask task = timerTaskMap.remove(key);
-		if (debugEnabled) log.debug(name + " : cancelling action for key=" + key + ", task=" + task);
-		if (task != null) task.cancel();
+		ScheduledFuture<?> future = futureMap.remove(key);
+		if (debugEnabled) log.debug(name + " : cancelling action for key=" + key + ", future=" + future);
+		if (future != null) future.cancel(true);
 	}
-
-	/**
-	 * Timer task that triggers an action when the corresponding schedule date is reached.
-	 */
-	public class ScheduleHandlerTask extends TimerTask
-	{
-		/**
-		 * Runnable action to perform.
-		 */
-		private Runnable action = null;
-		/**
-		 * The key associated witht this action.
-		 */
-		private Object key = null;
-
-		/**
-		 * Timer task wrapping a scheduled action.
-		 * @param key the key associated with the action.
-		 * @param action the action to perform when the schedule date is reached.
-		 */
-		public ScheduleHandlerTask(Object key, Runnable action)
-		{
-			this.key = key;
-			this.action = action;
-		}
-
-		/**
-		 * Check if the scheduled date has been reached and execute the corresponding action 
-		 * @see java.util.TimerTask#run()
-		 */
-		@Override
-        public void run()
-		{
-			if (debugEnabled) log.debug("triggering scheduled action: key=" + key + ", action=" + action);
-			timerTaskMap.remove(key);
-			action.run();
-		}
-	}
-
 	/**
 	 * Cleanup this schedule handler.
 	 */
@@ -183,9 +145,16 @@ public class JPPFScheduleHandler
 	 */
 	public void clear(boolean shutdown)
 	{
-		timer.cancel();
-		timer.purge();
-		timerTaskMap.clear();
-		if (!shutdown) timer = new Timer(name);
+		executor.shutdownNow();
+		futureMap.clear();
+		if (!shutdown) createExecutor();
+	}
+
+	/**
+	 * Cretae the executor used for task scheduliing.
+	 */
+	private void createExecutor()
+	{
+		executor = Executors.newScheduledThreadPool(1, new JPPFThreadFactory(this.name));
 	}
 }
