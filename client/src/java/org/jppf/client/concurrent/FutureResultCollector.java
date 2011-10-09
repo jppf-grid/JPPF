@@ -20,7 +20,7 @@ package org.jppf.client.concurrent;
 
 import java.util.*;
 
-import org.jppf.client.JPPFResultCollector;
+import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
@@ -53,10 +53,22 @@ class FutureResultCollector extends JPPFResultCollector
 	 * @param count the count of submitted tasks.
 	 * @param jobUuid the uuid of the corresponding job.
 	 */
+	/*
 	FutureResultCollector(int count, String jobUuid)
 	{
 		super(count);
 		this.jobUuid = jobUuid;
+	}
+	*/
+
+	/**
+	 * Initialize this collector with a specified number of tasks. 
+	 * @param job the job to execute.
+	 */
+	FutureResultCollector(JPPFJob job)
+	{
+		super(job);
+		this.jobUuid = job.getJobUuid();
 	}
 
 	/**

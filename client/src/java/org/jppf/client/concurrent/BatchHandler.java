@@ -159,9 +159,9 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 					}
 					if (isStopped()) break;
 					JPPFJob job = currentJobRef.get();
-					if (debugEnabled) log.debug("submitting job " + job.getId() + " with " + job.getTasks().size() + " tasks");
+					if (debugEnabled) log.debug("submitting job " + job.getName() + " with " + job.getTasks().size() + " tasks");
 					FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
-					collector.setTaskCount(job.getTasks().size());
+					collector.setTaskCount(job.getTasks().size() - job.getResults().size());
 					executor.submitJob(job);
 					currentJobRef.set(null);
 					elapsed = System.currentTimeMillis() - start;
@@ -324,8 +324,8 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	private JPPFJob createJob()
 	{
 		JPPFJob job = new JPPFJob();
-		job.setId(getClass().getSimpleName() + " job " + jobCount.incrementAndGet());
-		FutureResultCollector collector = new FutureResultCollector(0, job.getJobUuid());
+		job.setName(getClass().getSimpleName() + " job " + jobCount.incrementAndGet());
+		FutureResultCollector collector = new FutureResultCollector(job);
 		job.setResultListener(collector);
 		job.setBlocking(false);
 		collector.addListener(executor);
