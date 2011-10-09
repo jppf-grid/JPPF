@@ -18,6 +18,8 @@
 
 package org.jppf.client;
 
+import org.jppf.client.event.SubmissionStatusListener;
+
 /**
  * 
  * @author Laurent Cohen

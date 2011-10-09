@@ -68,7 +68,7 @@ public class JobSubmissionImpl extends AbstractJobSubmission
 		boolean error = false;
 		try
 		{
-			if (connection != null) connection.job = job;
+			if (connection != null) connection.setCurrentJob(job);
 			try
 			{
 				submissionManager.client.getLoadBalancer().execute(this, connection, locallyExecuting);

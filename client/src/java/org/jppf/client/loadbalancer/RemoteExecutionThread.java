@@ -136,7 +136,7 @@ class RemoteExecutionThread extends ExecutionThread
 		newJob.setJobMetadata(job.getJobMetadata());
 		newJob.setBlocking(job.isBlocking());
 		newJob.setResultListener(job.getResultListener());
-		newJob.setId(job.getId());
+		newJob.setName(job.getName());
 		return newJob;
 	}
 

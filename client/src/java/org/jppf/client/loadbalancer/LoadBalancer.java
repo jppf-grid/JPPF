@@ -137,7 +137,7 @@ public class LoadBalancer
 			List<JPPFTask> tasks = job.getPendingTasks();
 			if (connection != null)
 			{
-				if (debugEnabled) log.debug("mixed local and remote execution for job '" + job.getId() + '\'');
+				if (debugEnabled) log.debug("mixed local and remote execution for job '" + job.getName() + '\'');
 				int[] bundleSize = new int[2];
 				synchronized(bundlers)
 				{
@@ -171,7 +171,7 @@ public class LoadBalancer
 			}
 			else
 			{
-				if (debugEnabled) log.debug("purely local execution for job '" + job.getId() + '\'');
+				if (debugEnabled) log.debug("purely local execution for job '" + job.getName() + '\'');
 				ExecutionThread localThread = new LocalExecutionThread(tasks, job, this);
 				localThread.run();
 				if (localThread.getException() != null) throw localThread.getException();
@@ -179,7 +179,7 @@ public class LoadBalancer
 		}
 		else if (connection != null)
 		{
-			if (debugEnabled) log.debug("purely remote execution for job '" + job.getId() + '\'');
+			if (debugEnabled) log.debug("purely remote execution for job '" + job.getName() + '\'');
 			ExecutionThread remoteThread = new RemoteExecutionThread(job.getPendingTasks(), job, connection, this);
 			remoteThread.run();
 			if (remoteThread.getException() != null) throw remoteThread.getException();

@@ -24,7 +24,6 @@ import java.util.*;
 import org.jppf.JPPFException;
 import org.jppf.client.event.TaskResultListener;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
-import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.JPPFUuid;
@@ -46,7 +45,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * The list of tasks to execute.
 	 */
-	private List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+	private final List<JPPFTask> tasks = new ArrayList<JPPFTask>();
 	/**
 	 * The container for data shared between tasks.
 	 * The data provider should be considered read-only, i.e. no modification will be returned back to the client application.
@@ -63,7 +62,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * The user-defined display name for this job.
 	 */
-	private String id = null;
+	private String name = null;
 	/**
 	 * The universal unique id for this job.
 	 */
@@ -81,10 +80,9 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 */
 	private int taskCount = 0;
 	/**
-	 * A map containing the tasks that have been successfully executed,
-	 * ordered by ascending position in the submitted list of tasks.
+	 * The object that holds the results of executed tasks.
 	 */
-	protected Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
+	private final JobResults results = new JobResults();
 
 	/**
 	 * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -92,8 +90,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 */
 	public JPPFJob()
 	{
-		jobUuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
-		id = jobUuid;
+		this(new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
 	}
 
 	/**
@@ -104,7 +101,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	public JPPFJob(String jobUuid)
 	{
 		this.jobUuid = (jobUuid == null) ? new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString() : jobUuid;
-		id = jobUuid;
+		name = jobUuid;
 	}
 
 	/**
@@ -197,20 +194,40 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 
 	/**
 	 * {@inheritDoc}
+	 * @deprecated use {@link #getName() getName()} instead.
 	 */
 	@Override
 	public String getId()
 	{
-		return id;
+		return name;
 	}
 
 	/**
 	 * Set the user-defined display name for this job.
 	 * @param id the display name as a string. 
+	 * @deprecated use {@link #setName(java.lang.String) setName(String)} instead.
 	 */
 	public void setId(String id)
 	{
-		this.id = id;
+		this.name = id;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 * Set the user-defined display name for this job.
+	 * @param name the display name as a string. 
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 
 	/**
@@ -231,7 +248,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 		List<JPPFTask> list = new LinkedList<JPPFTask>();
 		for (JPPFTask t: tasks)
 		{
-			if (!resultMap.containsKey(t.getPosition())) list.add(t);
+			if (!results.hasResult(t.getPosition())) list.add(t);
 		}
 		return list;
 	}
@@ -251,7 +268,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 		if (taskObject == null) throw new JPPFException("null tasks are not accepted");
 		if (taskObject instanceof JPPFTask) jppfTask = (JPPFTask) taskObject;
 		else jppfTask = new JPPFAnnotatedTask(taskObject, args);
-		//if (tasks == null) tasks = new ArrayList<JPPFTask>();
 		tasks.add(jppfTask);
 		jppfTask.setPosition(taskCount++);
 		return jppfTask;
@@ -269,7 +285,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	public JPPFTask addTask(String method, Object taskObject, Object...args) throws JPPFException
 	{
 		if (taskObject == null) throw new JPPFException("null tasks are not accepted");
-		//if (tasks == null) tasks = new ArrayList<JPPFTask>();
 		JPPFTask jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
 		tasks.add(jppfTask);
 		jppfTask.setPosition(taskCount++);
@@ -310,7 +325,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	public void setResultListener(TaskResultListener resultsListener)
 	{
 		this.resultsListener = resultsListener;
-		//blocking = false;
 	}
 
 	/**
@@ -329,46 +343,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	public void setBlocking(boolean blocking)
 	{
 		this.blocking = blocking;
-	}
-
-	/**
-	 * Get the tasks execution policy.
-	 * @return an <code>ExecutionPolicy</code> instance.
-	 * @deprecated use {@link org.jppf.server.protocol.JPPFJobSLA#getExecutionPolicy() JPPFJobSLA.getExecutionPolicy()} instead.
-	 */
-	public ExecutionPolicy getExecutionPolicy()
-	{
-		return jobSLA.getExecutionPolicy();
-	}
-
-	/**
-	 * Set the tasks execution policy.
-	 * @param executionPolicy an <code>ExecutionPolicy</code> instance.
-	 * @deprecated use {@link org.jppf.server.protocol.JPPFJobSLA#setExecutionPolicy(org.jppf.node.policy.ExecutionPolicy) JPPFJobSLA.setExecutionPolicy(ExecutionPolicy)} instead.
-	 */
-	public void setExecutionPolicy(ExecutionPolicy executionPolicy)
-	{
-		jobSLA.setExecutionPolicy(executionPolicy);
-	}
-
-	/**
-	 * Get the priority of this job.
-	 * @return the priority as an int.
-	 * @deprecated use {@link org.jppf.server.protocol.JPPFJobSLA#getPriority() JPPFJobSLA.getPriority()} instead.
-	 */
-	public int getPriority()
-	{
-		return jobSLA.getPriority();
-	}
-
-	/**
-	 * Set the priority of this job.
-	 * @param priority the priority as an int.
-	 * @deprecated use {@link org.jppf.server.protocol.JPPFJobSLA#setPriority(int) JPPFJobSLA.setPriority(int)} instead.
-	 */
-	public void setPriority(int priority)
-	{
-		jobSLA.setPriority(priority);
 	}
 
 	/**
@@ -439,50 +413,11 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	}
 
 	/**
-	 * Get a map of the tasks that have been successfully executed.
-	 * @return a mapping of task objects to their position in the job.
+	 * Get the object that holds the results of executed tasks.
+	 * @return a {@link JobResults} instance.
 	 */
-	/*
-	public Map<Integer, JPPFTask> getResultMap()
+	public JobResults getResults()
 	{
-		return resultMap;
-	}
-	*/
-
-	/**
-	 * Get the current number of received results.
-	 * @return the number of results as an int.
-	 */
-	public synchronized int getResultSize()
-	{
-		return resultMap.size();
-	}
-
-	/**
-	 * Determine whether this job received a result for the task at the specified position.
-	 * @param position the task position to check.
-	 * @return <code>true</code> if a result was received, <code>false</code> otherwise.
-	 */
-	public synchronized boolean hasResult(int position)
-	{
-		return resultMap.containsKey(position);
-	}
-
-	/**
-	 * Add the specified results to this job.
-	 * @param tasks the list of tasks for which results were received.
-	 */
-	public synchronized void putResults(List<JPPFTask> tasks)
-	{
-		for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
-	}
-
-	/**
-	 * Get the tasks received as results for this job.
-	 * @return a collection of {@link JPPFTask} instances.
-	 */
-	public synchronized Collection<JPPFTask> getResults()
-	{
-		return Collections.unmodifiableCollection(resultMap.values());
+		return results;
 	}
 }

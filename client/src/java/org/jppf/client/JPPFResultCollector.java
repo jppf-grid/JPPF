@@ -76,7 +76,7 @@ public class JPPFResultCollector implements TaskResultListener
 	public JPPFResultCollector(JPPFJob job)
 	{
 		this.job = job;
-		count = job.getTasks().size() - job.getResultSize();
+		count = job.getTasks().size() - job.getResults().size();
 		pendingCount = count;
 	}
 
@@ -103,7 +103,7 @@ public class JPPFResultCollector implements TaskResultListener
 		{
 			List<JPPFTask> tasks = event.getTaskList();
 			for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
-			if (job != null) job.putResults(tasks);
+			if (job != null) job.getResults().putResults(tasks);
 			pendingCount -= tasks.size();
 			if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + pendingCount);
 			notifyAll();
@@ -113,7 +113,7 @@ public class JPPFResultCollector implements TaskResultListener
 			Throwable t = event.getThrowable();
 			if (debugEnabled) log.debug("received throwable '" + t.getClass().getName() + ": " + t.getMessage() + "', resetting this result collector");
 			// reset this object's state to prepare for job resubmission
-			if (job != null) count = job.getTasks().size() - job.getResultSize();
+			if (job != null) count = job.getTasks().size() - job.getResults().size();
 			pendingCount = count;
 			resultMap = new TreeMap<Integer, JPPFTask>();
 			results = null;
@@ -180,7 +180,7 @@ public class JPPFResultCollector implements TaskResultListener
 		}
 		else
 		{
-			for (JPPFTask task: job.getResults()) results.add(task);
+			for (JPPFTask task: job.getResults().getAll()) results.add(task);
 		}
 	}
 }

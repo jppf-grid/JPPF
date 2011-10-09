@@ -24,6 +24,7 @@ import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
+import org.jppf.utils.SystemUtils;
 
 /**
  * This class monitors each of the nodes and their memory usage during execution.
@@ -413,23 +414,7 @@ public class GridMonitor
 	public String getInfo(JPPFManagement mgt)
 	{
 		StringBuilder sb = new StringBuilder();
-		// toString() is "hostname:port" as displayed in the JPPF admin console
-		sb.append(mgt.jmx.getId()).append(", PID = ");
-		// we expect the name to be in '<pid>@hostname' format - this is JVM dependant
-		String name = mgt.runtimeMBean.getName();
-		int pid = -1;
-		int idx = name.indexOf('@');
-		if (idx >= 0)
-		{
-			try
-			{
-				pid = Integer.valueOf(name.substring(0, idx));
-			}
-			catch (Exception ignore)
-			{
-			}
-		}
-		sb.append(pid);
+		sb.append(mgt.jmx.getId()).append(", PID = ").append(SystemUtils.getPID());
 		return sb.toString();
 	}
 }

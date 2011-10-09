@@ -20,6 +20,7 @@ package org.jppf.client;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.jppf.client.event.SubmissionStatusListener;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -85,7 +86,7 @@ public class SubmissionManagerImpl extends ThreadSynchronization implements Subm
 			synchronized(this)
 			{
 				JPPFJob job = execQueue.poll();
-				if (debugEnabled) log.debug("submiting jobId=" + job.getId());
+				if (debugEnabled) log.debug("submiting jobId=" + job.getName());
 				JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) client.getClientConnection(true);
 				if (c != null) c.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.EXECUTING);
 				JobSubmission submission = new JobSubmissionImpl(job, c, this, execFlags.second());
@@ -99,10 +100,10 @@ public class SubmissionManagerImpl extends ThreadSynchronization implements Subm
 	 */
 	public String submitJob(JPPFJob job)
 	{
-		if (debugEnabled) log.debug("adding new submission: jobId=" + job.getId());
+		if (debugEnabled) log.debug("adding new submission: jobId=" + job.getName());
 		execQueue.offer(job);
 		wakeUp();
-		return job.getId();
+		return job.getName();
 	}
 
 	/**
@@ -118,9 +119,9 @@ public class SubmissionManagerImpl extends ThreadSynchronization implements Subm
 	 */
 	public String resubmitJob(JPPFJob job)
 	{
-		if (debugEnabled) log.debug("resubmitting job with id=" + job.getId());
+		if (debugEnabled) log.debug("resubmitting job with id=" + job.getName());
 		execQueue.offer(job);
 		wakeUp();
-		return job.getId();
+		return job.getName();
 	}
 }

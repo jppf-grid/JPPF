@@ -186,14 +186,14 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	public void sendTasks(JPPFTaskBundle header, JPPFJob job) throws Exception
 	{
 		ObjectSerializer ser = makeHelper().getSerializer();
-		int count = job.getTasks().size() - job.getResultSize();
+		int count = job.getTasks().size() - job.getResults().size();
 		TraversalList<String> uuidPath = new TraversalList<String>();
 		uuidPath.add(client.getUuid());
 		header.setUuidPath(uuidPath);
-		if (debugEnabled) log.debug("[client: " + name + "] sending job '" + job.getId() + "' with " + count + " tasks, uuidPath=" + uuidPath.getList());
+		if (debugEnabled) log.debug("[client: " + name + "] sending job '" + job.getName() + "' with " + count + " tasks, uuidPath=" + uuidPath.getList());
 		header.setTaskCount(count);
 		header.setRequestUuid(job.getJobUuid());
-		header.setParameter(BundleParameter.JOB_ID, job.getId());
+		header.setParameter(BundleParameter.JOB_ID, job.getName());
 		header.setParameter(BundleParameter.JOB_UUID, job.getJobUuid());
 		header.setJobSLA(job.getJobSLA());
 		header.setParameter(BundleParameter.JOB_METADATA, job.getJobMetadata());
@@ -203,7 +203,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		IOHelper.sendData(socketClient, job.getDataProvider(), ser);
 		for (JPPFTask task : job.getTasks())
 		{
-			if (!job.hasResult(task.getPosition())) IOHelper.sendData(socketClient, task, ser);
+			if (!job.getResults().hasResult(task.getPosition())) IOHelper.sendData(socketClient, task, ser);
 		}
 		socketClient.flush();
 	}
@@ -222,8 +222,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			ObjectSerializer ser = makeHelper().getSerializer();
 			JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, ser);
 			int count = bundle.getTaskCount();
-			if (debugEnabled) log.debug("received bundle with " + count + " tasks for job '" + bundle.getId() + '\'');
-			//List<JPPFTask> taskList = new ArrayList<JPPFTask>();
+			if (debugEnabled) log.debug("received bundle with " + count + " tasks for job '" + bundle.getName() + '\'');
 			List<JPPFTask> taskList = new LinkedList<JPPFTask>();
 			if (SEQUENTIAL_DESERIALIZATION) lock.lock();
 			try
@@ -240,7 +239,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
 			if (t != null)
 			{
-				if (debugEnabled) log.debug("server returned exception parameter in the header for job '" + bundle.getId() + "' : " + t);
+				if (debugEnabled) log.debug("server returned exception parameter in the header for job '" + bundle.getName() + "' : " + t);
 				Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
 				for (JPPFTask task: taskList) task.setException(e);
 			}

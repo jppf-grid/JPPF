@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-package org.jppf.client;
+package org.jppf.client.event;
 
 import java.util.EventObject;
+
+import org.jppf.client.SubmissionStatus;
 
 
 /**
