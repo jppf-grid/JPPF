@@ -121,7 +121,7 @@ public class CustomLoadBalancerRunner
 		JPPFJob job = new JPPFJob();
 
 		// Give this job a readable unique id that we can use to monitor and manage it.
-		job.setId(jobName);
+		job.setName(jobName);
 
 		// Specifiy the job metadata.
 		job.getJobMetadata().setParameter("task.memory", "" + size);
@@ -159,7 +159,7 @@ public class CustomLoadBalancerRunner
 	public void processJobResults(JPPFJob job) throws Exception
 	{
 		// Print a banner to visually separate the results for each job. 
-		System.out.println("\n********** Results for job : " + job.getId() + " **********\n");
+		System.out.println("\n********** Results for job : " + job.getName() + " **********\n");
 
 		// Get the results collector.
 		JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();

@@ -76,7 +76,8 @@
 
 	<target name="download" description="Download the JNA lib files">
 		<!--<property name="jna.lib.url" value="https://jna.dev.java.net/source/browse/*checkout*/jna/trunk/jnalib/dist"/>-->
-		<property name="jna.lib.url" value="http://java.net/projects/jna/sources/svn/content/trunk/jnalib/dist"/>
+		<!--<property name="jna.lib.url" value="http://java.net/projects/jna/sources/svn/content/trunk/jnalib/dist"/>-->
+		<property name="jna.lib.url" value="https://github.com/twall/jna/raw/master/dist"/>
 		<antcall target="get.lib"><param name="prefix" value="jna"/></antcall>
 		<antcall target="get.lib"><param name="prefix" value="platform"/></antcall>
 	</target>

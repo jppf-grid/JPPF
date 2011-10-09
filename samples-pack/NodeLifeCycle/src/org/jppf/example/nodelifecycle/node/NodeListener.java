@@ -85,7 +85,7 @@ public class NodeListener implements NodeLifeCycleListener
 	 */
 	public void jobStarting(NodeLifeCycleEvent event)
 	{
-		output("node starting job '" + event.getJob().getId() + "'");
+		output("node starting job '" + event.getJob().getName() + "'");
 		startTransaction(false);
 	}
 
@@ -94,7 +94,7 @@ public class NodeListener implements NodeLifeCycleListener
 	 */
 	public void jobEnding(NodeLifeCycleEvent event)
 	{
-		output("node finished job '" + event.getJob().getId() + "'");
+		output("node finished job '" + event.getJob().getName() + "'");
 		endTransaction(false);
 	}
 

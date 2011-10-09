@@ -243,7 +243,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		private void submitOneJobPerNode(String nodeId, List<String> tradeIdList) throws Exception
 		{
 			JPPFJob job = new JPPFJob();
-			job.setId("Job (" + jobCount.incrementAndGet() + ")");
+			job.setName("Job (" + jobCount.incrementAndGet() + ")");
 			job.setBlocking(false);
 			// set an execution policy that forces execution on the node with the specified id
 			job.getJobSLA().setExecutionPolicy(new Equal("jppf.uuid", false, nodeId));
@@ -269,7 +269,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 			for (String tradeId: tardeIdList)
 			{
 				JPPFJob job = new JPPFJob();
-				job.setId("[Node id=" + nodeId + "] trade=" + tradeId + " (" + jobCount.incrementAndGet() + ")");
+				job.setName("[Node id=" + nodeId + "] trade=" + tradeId + " (" + jobCount.incrementAndGet() + ")");
 				job.setBlocking(false);
 				// set an execution policy that forces execution on the node with the specified id
 				job.getJobSLA().setExecutionPolicy(policy);

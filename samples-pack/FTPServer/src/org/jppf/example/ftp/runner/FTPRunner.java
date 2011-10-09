@@ -74,7 +74,7 @@ public class FTPRunner
 		output("Running FTP demo");
 		long totalTime = System.nanoTime();
 		JPPFJob job = new JPPFJob();
-		job.setId("FTP server example job");
+		job.setName("FTP server example job");
 		// fetch the host from the JPPF client, so we don't have to hard-code it in the task.
 		JPPFClientConnectionImpl c = null;
 		do

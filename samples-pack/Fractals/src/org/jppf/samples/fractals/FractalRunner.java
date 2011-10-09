@@ -104,7 +104,7 @@ public class FractalRunner
 		DataProvider dp = new MemoryMapDataProvider();
 		dp.setValue("config", config);
 		JPPFJob job = new JPPFJob(dp);
-		job.setId("Mandelbrot fractal");
+		job.setName("Mandelbrot fractal");
 		long start = System.currentTimeMillis();
 		for (int i=0; i<nbTask; i++) job.addTask(doMandelbrot ? new MandelbrotTask(i) : new LyapunovTask(i));
 		// submit the tasks for execution

@@ -138,7 +138,7 @@ public class MatrixRunner
 		int size = a.getSize();
 		// create a task for each row in matrix a
 		JPPFJob job = new JPPFJob();
-		job.setId("matrix sample " + (iterationsCount++));
+		job.setName("matrix sample " + (iterationsCount++));
 		int remaining = size;
 		for (int i=0; i<size; i+= nbRows)
 		{

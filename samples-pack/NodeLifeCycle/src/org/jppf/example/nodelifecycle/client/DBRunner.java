@@ -67,7 +67,7 @@ public class DBRunner
 			getNode();
 			// Create a job with the specified number of tasks
 			JPPFJob job = new JPPFJob();
-			job.setId("NodeLifeCycle demo job");
+			job.setName("NodeLifeCycle demo job");
 			for (int i=1; i<=nbTasks; i++)
 			{
 				DBTask task = new DBTask(taskSleepTime);

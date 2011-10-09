@@ -148,7 +148,7 @@ public class NBodyRunner
 		{
 			String msg = "got results for iteration " + iter;
 			JPPFJob job = new JPPFJob(dp);
-			job.setId("Time step #" + iter);
+			job.setName("Time step #" + iter);
 			for (JPPFTask task: tasks) job.addTask(task);
 			panel.updatePositions(positions);
 			dp.setValue("positions", positions);

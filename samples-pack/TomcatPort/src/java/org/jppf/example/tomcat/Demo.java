@@ -70,7 +70,7 @@ public class Demo
 		try
 		{
 			job = new JPPFJob();
-			job.setId(jobName);
+			job.setName(jobName);
 			for (int i=1; i<=nbTasks; i++)
 			{
 				LongTask task = new LongTask(taskDuration);
