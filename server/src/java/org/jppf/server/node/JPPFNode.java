@@ -216,7 +216,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 */
 	private void processResults(JPPFTaskBundle bundle, List<JPPFTask> taskList) throws Exception
 	{
-		if (debugEnabled) log.debug("processing results for job '" + bundle.getId() + '\'');
+		if (debugEnabled) log.debug("processing results for job '" + bundle.getName() + '\'');
 		if (executionManager.checkConfigChanged())
 		{
 			JPPFSystemInformation info = new JPPFSystemInformation(NodeRunner.getUuid());

@@ -50,7 +50,7 @@ public class JPPFJobManager implements QueueListener
 	/**
 	 * Mapping of job ids to the corresponding <code>JPPFTaskBundle</code>.
 	 */
-	private Map<String, BundleWrapper> bundleMap = new HashMap<String, BundleWrapper>();
+	private Map<String, ServerJob> bundleMap = new HashMap<String, ServerJob>();
 	/**
 	 * Processes the event queue asynchronously.
 	 */
@@ -94,7 +94,7 @@ public class JPPFJobManager implements QueueListener
 	 * @param jobUuid the id of the job to look for.
 	 * @return a <code>BundleWrapper</code> instance, or null if the job is not queued anymore.
 	 */
-	public synchronized BundleWrapper getBundleForJob(String jobUuid)
+	public synchronized ServerJob getBundleForJob(String jobUuid)
 	{
 		return bundleMap.get(jobUuid);
 	}
@@ -115,7 +115,7 @@ public class JPPFJobManager implements QueueListener
 			jobMap.put(jobUuid, list);
 		}
 		list.add(new ChannelJobPair(channel, bundleWrapper));
-		if (debugEnabled) log.debug("jobId '" + bundle.getId() + "' : added node " + channel);
+		if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : added node " + channel);
 		submitEvent(JobEventType.JOB_DISPATCHED, bundle, channel);
 	}
 
@@ -131,11 +131,11 @@ public class JPPFJobManager implements QueueListener
 		List<ChannelJobPair> list = jobMap.get(jobUuid);
 		if (list == null)
 		{
-			log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getId());
+			log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getName());
 			return;
 		}
 		list.remove(new ChannelJobPair(channel, bundleWrapper));
-		if (debugEnabled) log.debug("jobId '" + bundle.getId() + "' : removed node " + channel);
+		if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : removed node " + channel);
 		submitEvent(JobEventType.JOB_RETURNED, bundle, channel);
 	}
 
@@ -143,13 +143,13 @@ public class JPPFJobManager implements QueueListener
 	 * Called when a job is added to the server queue.
 	 * @param bundleWrapper the queued job.
 	 */
-	public synchronized void jobQueued(BundleWrapper bundleWrapper)
+	public synchronized void jobQueued(ServerJob bundleWrapper)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		String jobUuid = bundle.getJobUuid();
 		bundleMap.put(jobUuid, bundleWrapper);
 		jobMap.put(jobUuid, new ArrayList<ChannelJobPair>());
-		if (debugEnabled) log.debug("jobId '" + bundle.getId() + "' queued");
+		if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
 		submitEvent(JobEventType.JOB_QUEUED, bundle, null);
 	}
 
@@ -164,7 +164,7 @@ public class JPPFJobManager implements QueueListener
 		jobMap.remove(jobUuid);
 		bundleMap.remove(jobUuid);
 		((JPPFPriorityQueue) JPPFDriver.getInstance().getQueue()).clearSchedules(jobUuid);
-		if (debugEnabled) log.debug("jobId '" + bundle.getId() + "' ended");
+		if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
 		submitEvent(JobEventType.JOB_ENDED, bundle, null);
 	}
 
@@ -175,7 +175,7 @@ public class JPPFJobManager implements QueueListener
 	public synchronized void jobUpdated(ServerJob bundleWrapper)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-		if (debugEnabled) log.debug("jobId '" + bundle.getId() + "' updated");
+		if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' updated");
 		submitEvent(JobEventType.JOB_UPDATED, bundle, null);
 	}
 

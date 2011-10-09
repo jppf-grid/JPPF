@@ -64,7 +64,7 @@ class WaitingResultsState extends NodeServerState
 		if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage(), channel);
 		if (context.readMessage(channel))
 		{
-			BundleWrapper bundleWrapper = context.getBundle();
+			ServerJob bundleWrapper = context.getBundle();
 			JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 			BundleWrapper newBundleWrapper = context.deserializeBundle();
 			JPPFTaskBundle newBundle = (JPPFTaskBundle) newBundleWrapper.getJob();
@@ -75,7 +75,7 @@ class WaitingResultsState extends NodeServerState
 				if (debugEnabled)
 				{
 					Throwable t = (Throwable) newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
-					log.debug("node " + channel + " returned exception parameter in the header for job '" + newBundle.getId() + "' : " + t);
+					log.debug("node " + channel + " returned exception parameter in the header for job '" + newBundle.getName() + "' : " + t);
 				}
 				newBundleWrapper.setTasks(bundleWrapper.getTasks());
 				newBundle.setTaskCount(bundle.getTaskCount());

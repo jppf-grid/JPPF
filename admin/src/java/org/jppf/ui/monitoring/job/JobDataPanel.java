@@ -267,7 +267,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		Runnable r = new SynchronizedTask(this)
 		{
 			@Override
-            public void perform()
+			public void perform()
 			{
 				panelManager.subJobAdded(driverName, jobInfo, nodeInfo);
 			}
@@ -286,7 +286,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		Runnable r = new SynchronizedTask(this)
 		{
 			@Override
-            public void perform()
+			public void perform()
 			{
 				panelManager.subJobRemoved(driverName, jobInfo, nodeInfo);
 			}
@@ -300,7 +300,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
 	 */
 	@Override
-    public synchronized void newConnection(ClientEvent event)
+	public synchronized void newConnection(ClientEvent event)
 	{
 		driverAdded(event.getConnection());
 	}
@@ -309,7 +309,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void connectionFailed(ClientEvent event)
+	public void connectionFailed(ClientEvent event)
 	{
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
 		driverRemoved(c.getJmxConnection().getId());
@@ -343,6 +343,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		actionHandler.putAction("suspend_requeue.job", new SuspendRequeueJobAction());
 		actionHandler.putAction("resume.job", new ResumeJobAction());
 		actionHandler.putAction("max.nodes.job", new UpdateMaxNodesAction());
+		actionHandler.putAction("update.priority.job", new UpdatePriorityAction());
 		actionHandler.updateActions();
 		treeTable.addMouseListener(new JobTreeTableMouseListener(actionHandler));
 		Runnable r = new ActionsInitializer(this, "/job.toolbar");
@@ -366,7 +367,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		 * Perform the refresh.
 		 */
 		@Override
-        public void perform()
+		public void perform()
 		{
 			int n = treeTableRoot.getChildCount();
 			for (int i=n-1; i>=0; i--)

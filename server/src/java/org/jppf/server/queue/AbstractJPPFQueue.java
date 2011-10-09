@@ -45,7 +45,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	/**
 	 * An ordered map of bundle sizes, mapping to a list of bundles of this size.
 	 */
-	protected TreeMap<Integer, List<BundleWrapper>> sizeMap = new TreeMap<Integer, List<BundleWrapper>>();
+	protected TreeMap<Integer, List<ServerJob>> sizeMap = new TreeMap<Integer, List<ServerJob>>();
 	/**
 	 * 
 	 */

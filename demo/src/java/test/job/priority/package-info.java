@@ -15,19 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.protocol;
-
-
 
 /**
- * Listener providing a callback to invoke when a task's execution has completed.
- * @author Laurent Cohen
+ * Sample test of dynamically updating the priority of a job.
  */
-public interface TaskCompletionListener
-{
-	/**
-	 * Callback method invoked when the execution of a task has completed.
-	 * @param result the result of the task's execution.
-	 */
-	void taskCompleted(ServerJob result);
-}
+package test.job.priority;

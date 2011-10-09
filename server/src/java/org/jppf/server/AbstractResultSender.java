@@ -43,7 +43,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	/**
 	 * The list of task bundles whose execution has been completed.
 	 */
-	private AtomicReference<List<BundleWrapper>> resultList = new AtomicReference<List<BundleWrapper>>(new ArrayList<BundleWrapper>());
+	private AtomicReference<List<ServerJob>> resultList = new AtomicReference<List<ServerJob>>(new ArrayList<ServerJob>());
 	/**
 	 * Number of tasks that haven't yet been executed.
 	 */
@@ -82,7 +82,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	public void run(int count) throws Exception
 	{
 		if (debugEnabled) log.debug("Pending tasks: "+count);
-		setResultList(new ArrayList<BundleWrapper>());
+		setResultList(new ArrayList<ServerJob>());
 		setPendingTasksCount(count);
 		waitForExecution();
 	}
@@ -113,7 +113,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 				}
 				else if (!getResultList().isEmpty())
 				{
-					BundleWrapper first = getResultList().remove(0);
+					ServerJob first = getResultList().remove(0);
 					int count = first.getTasks().size();
 					int size = getResultList().size();
 					for (int i=0; i<size; i++)
@@ -121,7 +121,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 						ServerJob bundle = getResultList().remove(0);
 						for (DataLocation task: bundle.getTasks())
 						{
-							first.addTask(task);
+							((BundleWrapper) first).addTask(task);
 							count++;
 						}
 						bundle.getTasks().clear();
@@ -145,7 +145,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 * @param result the result of the task's execution.
 	 */
 	@Override
-    public synchronized void taskCompleted(BundleWrapper result)
+    public synchronized void taskCompleted(ServerJob result)
 	{
 		JPPFTaskBundle resultJob = (JPPFTaskBundle) result.getJob();
 		setPendingTasksCount(getPendingTasksCount() - resultJob.getTaskCount());
@@ -180,7 +180,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 * Set the list of task bundles whose execution has been completed.
 	 * @param resultList a list of <code>BundleWrapper</code> instances.
 	 */
-	protected void setResultList(List<BundleWrapper> resultList)
+	protected void setResultList(List<ServerJob> resultList)
 	{
 		this.resultList.set(resultList);
 	}
@@ -189,7 +189,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 * Get the list of task bundles whose execution has been completed.
 	 * @return a list of <code>JPPFTaskBundle</code> instances.
 	 */
-	protected List<BundleWrapper> getResultList()
+	protected List<ServerJob> getResultList()
 	{
 		return resultList.get();
 	}

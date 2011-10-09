@@ -73,7 +73,7 @@ class PeerNodeResultSender extends AbstractResultSender
 				if (debugEnabled) log.debug(Integer.toString(getResultList().size()) + " in result list");
 				if (!getResultList().isEmpty())
 				{
-					BundleWrapper first = getResultList().remove(0);
+					ServerJob first = getResultList().remove(0);
 					int count = first.getTasks().size();
 					int size = getResultList().size();
 					for (int i=0; i<size; i++)
@@ -81,7 +81,7 @@ class PeerNodeResultSender extends AbstractResultSender
 						ServerJob bundle = getResultList().remove(0);
 						for (DataLocation task: bundle.getTasks())
 						{
-							first.addTask(task);
+							((BundleWrapper) first).addTask(task);
 							count++;
 						}
 						bundle.getTasks().clear();

@@ -66,7 +66,7 @@ public class CompletionListener implements TaskCompletionListener
 	 */
 	@Override
   @SuppressWarnings("unchecked")
-	public void taskCompleted(BundleWrapper result)
+	public void taskCompleted(ServerJob result)
 	{
 		context.offerCompletedBundle(result);
 		if (ClientState.IDLE.equals(context.getState()))

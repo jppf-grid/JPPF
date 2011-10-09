@@ -383,10 +383,10 @@ public class JPPFDriver
 
     /**
      * Start server, register it to recovery server if requested and print initialization message.
-     * @param recoveryServer - Recovery server for nioServers that implements ReaperListener
-     * @param nioServer - starting nio server
-     * @param ports     - ports for initialization message
-     * @param <T>
+     * @param recoveryServer Recovery server for nioServers that implements ReaperListener
+     * @param nioServer starting nio server
+     * @param ports ports for initialization message
+     * @param <T> the type of the server to start
      * @return started nioServer
      */
     protected static <T extends NioServer> T startServer(final RecoveryServer recoveryServer, final T nioServer, final int[] ports) {

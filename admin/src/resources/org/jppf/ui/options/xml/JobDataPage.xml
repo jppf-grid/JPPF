@@ -37,6 +37,7 @@
 
 		<child name="sep1" type="ToolbarSeparator"/>
 		<child name="max.nodes.job" type="Button"/>
+		<child name="update.priority.job" type="Button"/>
 
 		<child name="sep2" type="ToolbarSeparator"/>
 		<child name="job.refresh.toggle" type="Boolean">

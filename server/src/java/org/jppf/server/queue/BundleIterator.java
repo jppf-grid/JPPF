@@ -21,22 +21,22 @@ package org.jppf.server.queue;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.jppf.server.protocol.BundleWrapper;
+import org.jppf.server.protocol.*;
 
 /**
  * Iterator that traverses the collection of task bundles in descending order of their priority.
  * This iterator is read-only and does not support the <code>remove()</code> operation.
  */
-class BundleIterator implements Iterator<BundleWrapper>
+class BundleIterator implements Iterator<ServerJob>
 {
 	/**
 	 * Iterator over the entries in the priority map.
 	 */
-	private Iterator<Map.Entry<JPPFPriority, List<BundleWrapper>>> entryIterator = null;
+	private Iterator<Map.Entry<JPPFPriority, List<ServerJob>>> entryIterator = null;
 	/**
 	 * Iterator over the task bundles in the map entry specified by <code>entryIterator</code>.
 	 */
-	private Iterator<BundleWrapper> listIterator = null;
+	private Iterator<ServerJob> listIterator = null;
 	/**
 	 * Used for synchronized access to the queue.
 	 */
@@ -47,7 +47,7 @@ class BundleIterator implements Iterator<BundleWrapper>
 	 * @param priorityMap the map of prioritized jobs.
 	 * @param lock used to synchronize with the queue.
 	 */
-	public BundleIterator(TreeMap<JPPFPriority, List<BundleWrapper>> priorityMap, ReentrantLock lock)
+	public BundleIterator(TreeMap<JPPFPriority, List<ServerJob>> priorityMap, ReentrantLock lock)
 	{
 		this.lock = lock;
 		lock.lock();
@@ -87,7 +87,7 @@ class BundleIterator implements Iterator<BundleWrapper>
 	 * @see java.util.Iterator#next()
 	 */
 	@Override
-    public BundleWrapper next()
+    public ServerJob next()
 	{
 		lock.lock();
 		try

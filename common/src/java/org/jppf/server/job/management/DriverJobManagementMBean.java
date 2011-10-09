@@ -80,4 +80,10 @@ public interface DriverJobManagementMBean extends NotificationEmitter
 	 * @throws Exception if any error occurs.
 	 */
 	NodeJobInformation[] getNodeInformation(String jobId) throws Exception;
+	/**
+	 * Update the priroirty of a job.
+	 * @param jobId the uuid of the job to update.
+	 * @param newPriority the job's new priority value.
+	 */
+	void updatePriority(String jobId, Integer newPriority);
 }

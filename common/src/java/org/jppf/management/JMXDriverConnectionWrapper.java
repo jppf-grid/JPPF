@@ -172,6 +172,18 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	}
 
 	/**
+	 * Update the priority of a job.
+	 * @param jobId the id of the job to update.
+	 * @param newPriority the new priority of the job.
+	 * @throws Exception if any error occurs.
+	 * @see org.jppf.server.job.management.DriverJobManagementMBean#updateMaxNodes(java.lang.String, java.lang.Integer)
+	 */
+	public void updateJobPriority(String jobId, Integer newPriority) throws Exception
+	{
+		invoke(DriverJobManagementMBean.MBEAN_NAME, "updatePriority", new Object[] { jobId, newPriority }, new String[] { "java.lang.String", "java.lang.Integer" }); 
+	}
+
+	/**
 	 * Get the set of ids for all the jobs currently queued or executing.
 	 * @return an array of ids as strings.
 	 * @throws Exception if any error occurs.

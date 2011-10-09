@@ -40,7 +40,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	/**
 	 * The task bundle to send or receive.
 	 */
-	protected BundleWrapper bundle = null;
+	protected ServerJob bundle = null;
 	/**
 	 * Bundler used to schedule tasks for the corresponding node.
 	 */
@@ -66,7 +66,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * Get the task bundle to send or receive.
 	 * @return a <code>BundleWrapper</code> instance.
 	 */
-	public BundleWrapper getBundle()
+	public ServerJob getBundle()
 	{
 		return bundle;
 	}
@@ -75,7 +75,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * Set the task bundle to send or receive.
 	 * @param bundle a {@link JPPFTaskBundle} instance.
 	 */
-	public void setBundle(BundleWrapper bundle)
+	public void setBundle(ServerJob bundle)
 	{
 		this.bundle = bundle;
 	}
@@ -123,7 +123,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * when a node is disconnected while it was executing a task bundle.
 	 * @param bundle the task bundle to resubmit.
 	 */
-	public void resubmitBundle(BundleWrapper bundle)
+	public void resubmitBundle(ServerJob bundle)
 	{
 		//bundle.getBundle().setPriority(10);
 		JPPFDriver.getQueue().addBundle(bundle);
@@ -140,7 +140,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 		if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(((JPPFTaskBundle) bundle.getJob()).getState()))
 		{
 			JPPFDriver.getInstance().getJobManager().jobReturned(bundle, channel);
-			BundleWrapper tmpWrapper = bundle;
+			ServerJob tmpWrapper = bundle;
 			bundle = null;
 			JPPFTaskBundle tmpBundle = (JPPFTaskBundle) tmpWrapper.getJob();
 			// broadcast jobs are not resubmitted.

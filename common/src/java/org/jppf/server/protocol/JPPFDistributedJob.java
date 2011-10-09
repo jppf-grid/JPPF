@@ -27,10 +27,17 @@ package org.jppf.server.protocol;
 public interface JPPFDistributedJob
 {
 	/**
-	 * Get the user-defined display name for this job. This is th name displayed in the administration console.
-	 * @return the id as a string. 
+	 * Get the user-defined display name for this job. This is the name displayed in the administration console.
+	 * @return the id as a string.
+	 * @deprecated use {@link #getName() getName()} instead.
 	 */
 	String getId();
+
+	/**
+	 * Get the user-defined display name for this job. This is the name displayed in the administration console.
+	 * @return the name as a string. 
+	 */
+	String getName();
 
 	/**
 	 * Get the universal unique id for this job.

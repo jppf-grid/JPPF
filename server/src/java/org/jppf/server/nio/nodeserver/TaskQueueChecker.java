@@ -114,14 +114,14 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 				if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return false;
 				if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
 				ChannelWrapper<?> channel = null;
-				BundleWrapper selectedBundle = null;
+				ServerJob selectedBundle = null;
 				queueLock.lock();
 				try
 				{
-					Iterator<BundleWrapper> it = queue.iterator();
+					Iterator<ServerJob> it = queue.iterator();
 					while ((channel == null) && it.hasNext() && !idleChannels.isEmpty())
 					{
-						BundleWrapper bundleWrapper = it.next();
+						ServerJob bundleWrapper = it.next();
 						channel = retrieveChannel(bundleWrapper);
 						if (channel != null) selectedBundle = bundleWrapper;
 					}
@@ -172,7 +172,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	 * @param channel the node channel to dispatch the job to.
 	 * @param selectedBundle the job to dispatch.
 	 */
-	private void dispatchJobToChannel(ChannelWrapper<?> channel, BundleWrapper selectedBundle)
+	private void dispatchJobToChannel(ChannelWrapper<?> channel, ServerJob selectedBundle)
 	{
 		if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getJob().getJobUuid() + " to nodeUuid=" + ((AbstractNodeContext) channel.getContext()).nodeUuid);
 		synchronized(channel)
@@ -191,7 +191,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 				profile.setSize(1);
 				server.setBundler(new FixedSizeBundler(profile));
 			}
-			BundleWrapper bundleWrapper = server.getQueue().nextBundle(selectedBundle, size);
+			ServerJob bundleWrapper = server.getQueue().nextBundle(selectedBundle, size);
 			context.setBundle(bundleWrapper);
 			server.getTransitionManager().transitionChannel(channel, NodeTransition.TO_SENDING);
 			driver.getJobManager().jobDispatched(context.getBundle(), channel);
@@ -270,7 +270,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 		JPPFJobSLA sla = bundle.getJobSLA();
 		if (debugEnabled)
 		{
-			String s = StringUtils.buildString("job '", bundle.getId(), "' : ",
+			String s = StringUtils.buildString("job '", bundle.getName(), "' : ",
 				"suspended=", sla.isSuspended(), ", pending=", bundle.getParameter(BundleParameter.JOB_PENDING, Boolean.FALSE),
 				", expired=", bundle.getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE));
 			log.debug(s);

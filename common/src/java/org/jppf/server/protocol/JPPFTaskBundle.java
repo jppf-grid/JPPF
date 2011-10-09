@@ -470,7 +470,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+ 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder("[");
 		sb.append("jobId=").append(parameters == null ? null : getParameter(BundleParameter.JOB_ID));
@@ -484,9 +484,19 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 
 	/**
 	 * {@inheritDoc}
+	 * @deprecated use {@link #getName() getName()} instead.
 	 */
 	@Override
-    public String getId()
+	public String getId()
+	{
+		return getName();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getName()
 	{
 		return (String) getParameter(BundleParameter.JOB_ID);
 	}
@@ -495,7 +505,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	 * {@inheritDoc}
 	 */
 	@Override
-    public JPPFJobMetadata getJobMetadata()
+	public JPPFJobMetadata getJobMetadata()
 	{
 		return (JPPFJobMetadata) getParameter(BundleParameter.JOB_METADATA);
 	}
@@ -504,7 +514,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String getJobUuid()
+	public String getJobUuid()
 	{
 		return (String) getParameter(BundleParameter.JOB_UUID);
 	}

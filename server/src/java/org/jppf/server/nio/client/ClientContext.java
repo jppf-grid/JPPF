@@ -71,7 +71,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	/**
 	 * List of completed bundles to send to the client.
 	 */
-	protected LinkedList<BundleWrapper> completedBundles = new LinkedList<BundleWrapper>();
+	protected LinkedList<ServerJob> completedBundles = new LinkedList<ServerJob>();
 	/**
 	 * Number of tasks that remain to be sent to the client.
 	 */
@@ -131,7 +131,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * @return a {@link ClientContext} instance.
 	 * @throws Exception if an error occurs during the deserialization.
 	 */
-	public BundleWrapper deserializeBundle() throws Exception
+	public ServerJob deserializeBundle() throws Exception
 	{
 		List<DataLocation> locations = clientMessage.getLocations();
 		JPPFTaskBundle bundle = clientMessage.getBundle();
@@ -230,7 +230,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Add a completed bundle to the queue of bundles to send to the client
 	 * @param bundleWrapper the bundle to add.
 	 */
-	public void offerCompletedBundle(BundleWrapper bundleWrapper)
+	public void offerCompletedBundle(ServerJob bundleWrapper)
 	{
 		synchronized(completedBundles)
 		{
@@ -270,9 +270,9 @@ public class ClientContext extends AbstractNioContext<ClientState>
 
 	/**
 	 * Get the list of completed bundles to send to the client.
-	 * @return a linked list of <code>BundleWrapper</code> instances.
+	 * @return a linked list of <code>ServerJob</code> instances.
 	 */
-	public LinkedList<BundleWrapper> getCompletedBundles()
+	public LinkedList<ServerJob> getCompletedBundles()
 	{
 		return completedBundles;
 	}

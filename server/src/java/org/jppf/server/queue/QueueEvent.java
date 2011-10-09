@@ -20,7 +20,7 @@ package org.jppf.server.queue;
 
 import java.util.EventObject;
 
-import org.jppf.server.protocol.BundleWrapper;
+import org.jppf.server.protocol.*;
 
 /**
  * Instances of this class represent <code>JPPFQueue</code> events.
@@ -35,7 +35,7 @@ public class QueueEvent extends EventObject
 	/**
 	 * Represents part or the totality of a job that was submitted.
 	 */
-	private transient BundleWrapper bundleWrapper = null;
+	private transient ServerJob bundleWrapper = null;
 	/**
 	 * Determines if the event is a requeued bundle, following a node failure for instance.
 	 */
@@ -57,7 +57,7 @@ public class QueueEvent extends EventObject
 	 * @param bundleWrapper - represents part or the totality of a job that was submitted.
 	 * @param requeue - determines if the event is a requeued bundle, following a node failure for instance.
 	 */
-	public QueueEvent(JPPFQueue queue, BundleWrapper bundleWrapper, boolean requeue)
+	public QueueEvent(JPPFQueue queue, ServerJob bundleWrapper, boolean requeue)
 	{
 		super(queue);
 		this.bundleWrapper = bundleWrapper;
@@ -77,7 +77,7 @@ public class QueueEvent extends EventObject
 	 * Get the task bundle that is the cause of the event.
 	 * @return  an instance of <code>BundleWrapper</code>.
 	 */
-	public BundleWrapper getBundleWrapper()
+	public ServerJob getBundleWrapper()
 	{
 		return bundleWrapper;
 	}

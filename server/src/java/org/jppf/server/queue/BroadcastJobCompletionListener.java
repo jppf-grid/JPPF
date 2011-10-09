@@ -45,7 +45,7 @@ public class BroadcastJobCompletionListener implements TaskCompletionListener
 	/**
 	 * The broadcast job to dispatch ot each node.
 	 */
-	private BundleWrapper bundleWrapper;
+	private ServerJob bundleWrapper;
 	/**
 	 * The uuids of the nodes to which the job will be dispatched.
 	 */
@@ -64,7 +64,7 @@ public class BroadcastJobCompletionListener implements TaskCompletionListener
 	 * @param bundleWrapper the broadcast job to dispatch ot each node.
 	 * @param nodeUuids the uuids of the nodes to which the job will be dispatched.
 	 */
-	public BroadcastJobCompletionListener(BundleWrapper bundleWrapper, Set<String> nodeUuids)
+	public BroadcastJobCompletionListener(ServerJob bundleWrapper, Set<String> nodeUuids)
 	{
 		this.bundleWrapper = bundleWrapper;
 		this.nodeUuids = nodeUuids;
@@ -77,7 +77,7 @@ public class BroadcastJobCompletionListener implements TaskCompletionListener
 	 * {@inheritDoc}
 	 */
 	@Override
-    public synchronized void taskCompleted(BundleWrapper result)
+    public synchronized void taskCompleted(ServerJob result)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) result.getJob();
 		String uuid = (String) bundle.getParameter(BundleParameter.NODE_BROADCAST_UUID);
