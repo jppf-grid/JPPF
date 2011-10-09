@@ -80,7 +80,7 @@ public class GSClient implements InitializingBean
 	public JPPFJob runJob(String jobName, int nbTasks, long taskDuration) throws Exception
 	{
 		JPPFJob job = new JPPFJob();
-		job.setId(jobName);
+		job.setName(jobName);
 		for (int i=1; i<= nbTasks; i++)
 		{
 			HelloTask task = new HelloTask(taskDuration);

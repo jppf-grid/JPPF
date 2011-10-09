@@ -26,7 +26,9 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class HelloTask extends JPPFTask
 {
-
+	/**
+	 * Explicit serialVersionUID.
+	 */
     private static final long serialVersionUID = -3172628037383355176L;
 
 	/**
