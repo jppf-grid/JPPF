@@ -21,6 +21,7 @@ package org.jppf.jca.work.submission;
 import java.util.*;
 
 import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.slf4j.*;
 
 /**

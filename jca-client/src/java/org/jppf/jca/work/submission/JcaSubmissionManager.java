@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.resource.spi.work.*;
 
 import org.jppf.client.*;
+import org.jppf.client.event.SubmissionStatusListener;
 import org.jppf.jca.work.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -133,7 +134,7 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	{
 		int count = job.getTasks().size();
 		JcaSubmissionResult submission = new JcaSubmissionResult(job);
-		if (debugEnabled) log.debug("adding new submission: jobId=" + job.getId() + ", nbTasks=" + count + ", submission id=" + submission.getId());
+		if (debugEnabled) log.debug("adding new submission: jobId=" + job.getName() + ", nbTasks=" + count + ", submission id=" + submission.getId());
 		if (listener != null) submission.addSubmissionStatusListener(listener);
 		job.setResultListener(submission);
 		submission.setStatus(PENDING);

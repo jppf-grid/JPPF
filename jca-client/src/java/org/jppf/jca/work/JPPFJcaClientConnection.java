@@ -196,7 +196,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 
 	/**
 	 * Shutdown this client and retrieve all pending executions for resubmission.
-	 * @return a list of <code>JPPFJob</code> instances to resubmit.
+	 * @return a list of <code>JPPFJob</code> instances to resubmit; this list may be empty, but never null.
 	 * @see org.jppf.client.JPPFClientConnection#close()
 	 */
 	@Override
@@ -218,7 +218,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 			if (job != null) result.add(job);
 			return result;
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
 	/**
