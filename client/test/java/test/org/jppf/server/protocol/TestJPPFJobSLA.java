@@ -159,11 +159,11 @@ public class TestJPPFJobSLA extends Setup1D1N1C
 	protected synchronized JPPFJob createJob(String id, int nbTasks, long duration) throws JPPFException
 	{
 		JPPFJob job = new JPPFJob();
-		job.setId(id + '(' + jobCount.incrementAndGet() + ')');
+		job.setName(id + '(' + jobCount.incrementAndGet() + ')');
 		for (int i=0; i<nbTasks; i++)
 		{
 			JPPFTask task = new SimpleTask(duration);
-			task.setId(job.getId()  + " - task " + (i+1));
+			task.setId(job.getName()  + " - task " + (i+1));
 			job.addTask(task);
 		}
 		return job;
