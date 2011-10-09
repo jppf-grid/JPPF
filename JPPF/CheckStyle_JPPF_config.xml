@@ -25,7 +25,9 @@
       <metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="80 lines max"/>
     </module>
     <module name="FinalClass"/>
-    <module name="ConstantName"/>
+    <module name="ConstantName">
+      <property name="severity" value="ignore"/>
+    </module>
     <module name="RedundantModifier"/>
     <module name="RedundantImport"/>
     <module name="UnusedImports"/>
