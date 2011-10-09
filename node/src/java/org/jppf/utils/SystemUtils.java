@@ -348,6 +348,7 @@ public final class SystemUtils
 	public static int getPID()
 	{
 		int pid = -1;
+		// we expect the name to be in '<pid>@hostname' format - this is JVM dependent
 		String name = ManagementFactory.getRuntimeMXBean().getName();
 		int idx = name.indexOf('@');
 		if (idx >= 0)
