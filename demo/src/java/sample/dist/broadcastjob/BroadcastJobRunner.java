@@ -88,7 +88,7 @@ public class BroadcastJobRunner
 				long start = System.currentTimeMillis();
 				// create a task for each row in matrix a
 				JPPFJob job = new JPPFJob();
-				job.setId("Long task iteration " + iter);
+				job.setName("Long task iteration " + iter);
 				//job.getJobSLA().setMaxNodes(1);
 				for (int i=0; i<nbTasks; i++)
 				{

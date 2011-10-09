@@ -72,7 +72,7 @@ public class ClassVersionRunner
 	{
 		long totalTime = System.currentTimeMillis();
 		JPPFJob job = new JPPFJob();
-		job.setId("task version");
+		job.setName("task version");
 		job.addTask(new TaskVersion());
 		List<JPPFTask> results = jppfClient.submit(job);
 		for (JPPFTask t: results)

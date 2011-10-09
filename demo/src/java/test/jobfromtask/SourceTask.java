@@ -51,7 +51,7 @@ public class SourceTask extends JPPFTask
 			long start = System.currentTimeMillis();
 			print("creating destination job");
 			JPPFJob job = new JPPFJob();
-			job.setId("Destination job");
+			job.setName("Destination job");
 			job.getJobSLA().setMaxNodes(1);
 			DestinationTask task = new DestinationTask();
 			task.setId("destination");

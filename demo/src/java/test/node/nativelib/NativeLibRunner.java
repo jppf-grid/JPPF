@@ -58,7 +58,7 @@ public class NativeLibRunner
 				System.out.println("submitting job #" + (i+1) + " ...");
 				// Create a job
 				JPPFJob job = runner.createJob();
-				job.setId("" + (i+1));
+				job.setName("" + (i+1));
 
 				// execute a blocking job
 				runner.executeBlockingJob(job);
@@ -87,7 +87,7 @@ public class NativeLibRunner
 		JPPFJob job = new JPPFJob();
 
 		// give this job a readable unique id that we can use to monitor and manage it.
-		job.setId("Template Job Id");
+		job.setName("Template Job Id");
 
 		// add a task to the job.
 		NativeLibTask task = new NativeLibTask();

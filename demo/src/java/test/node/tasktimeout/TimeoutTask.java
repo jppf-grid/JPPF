@@ -57,7 +57,7 @@ public class TimeoutTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		// write your task code here.
 		System.out.println("Hello, this is the node executing a template JPPF task");
@@ -65,7 +65,7 @@ public class TimeoutTask extends JPPFTask
 		// ...
 		try
 		{
-			Thread.sleep(1100);
+			Thread.sleep(15000);
 			// eventually set the execution results
 			setResult("the execution was performed successfully");
 		}
@@ -80,7 +80,7 @@ public class TimeoutTask extends JPPFTask
 	 * @see org.jppf.server.protocol.JPPFTask#onTimeout()
 	 */
 	@Override
-    public void onTimeout()
+	public void onTimeout()
 	{
 		setResult("this task has timed out!");
 	}

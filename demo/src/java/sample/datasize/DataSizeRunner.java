@@ -95,7 +95,7 @@ public class DataSizeRunner
 		{
 			long start = System.nanoTime();
 			JPPFJob job = new JPPFJob();
-			job.setId("Datasize job " + i);
+			job.setName("Datasize job " + i);
 			for (int j=0; j<nbTasks; j++) job.addTask(new DataTask(datasize, inNodeOnly));
 			List<JPPFTask> results = jppfClient.submit(job);
 			/*
@@ -161,7 +161,7 @@ public class DataSizeRunner
 		{
 			jppfClient = new JPPFClient();
 			JPPFJob job = new JPPFJob();
-			job.setId("job " + n);
+			job.setName("job " + n);
 			job.addTask(new DataTask(10, true));
 			List<JPPFTask> results = jppfClient.submit(job);
 			if (n % 1000 == 0) output("executed " + n + " jobs");

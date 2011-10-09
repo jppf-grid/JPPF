@@ -100,7 +100,7 @@ public class LocalExecutionRunner
 		{
 			long start = System.currentTimeMillis();
 			JPPFJob job = new JPPFJob();
-			job.setId("Long task iteration " + iter);
+			job.setName("Long task iteration " + iter);
 			for (int i=0; i<nbTasks; i++)
 			{
 				LongTask task = new LongTask(length, false);
@@ -142,7 +142,7 @@ public class LocalExecutionRunner
 			for (int i=0; i<nbJobs; i++)
 			{
 				JPPFJob job = new JPPFJob();
-				job.setId("job " + i);
+				job.setName("job " + i);
 				job.setBlocking(false);
 				job.setResultListener(new JPPFResultCollector(nbTasks));
 				for (int j=0; j<nbTasks; j++)
@@ -161,7 +161,7 @@ public class LocalExecutionRunner
 			{
 				JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
 				collector.waitForResults();
-				print("got results for " + job.getId());
+				print("got results for " + job.getName());
 			}
 			long elapsed = System.nanoTime() - start;
 			print("ran " + nbJobs + " in: "+StringUtils.toStringDuration(elapsed/1000000));
@@ -205,7 +205,7 @@ public class LocalExecutionRunner
 		{
 			long start = System.nanoTime();
 			JPPFJob job = new JPPFJob();
-			job.setId("test jar download");
+			job.setName("test jar download");
 			job.addTask(new Task());
 			job.setDataProvider(new ClientDataProvider());
 			// submit the tasks for execution

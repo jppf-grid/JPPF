@@ -107,7 +107,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 				long start = System.currentTimeMillis();
 				// create a task for each row in matrix a
 				JPPFJob job = new JPPFJob();
-				job.setId("non-blocking matrix sample");
+				job.setName("non-blocking matrix sample");
 				for (int i=0; i<size; i++) job.addTask(new MatrixTask(a.getRow(i)));
 				// create a data provider to share matrix b among all tasks
 				job.setDataProvider(new MemoryMapDataProvider());

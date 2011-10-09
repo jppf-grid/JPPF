@@ -46,7 +46,7 @@ public class DataProviderTestRunner
 				jobs[i] = new JPPFJob();
 				for (int j=1; j<=nbTasks; j++) jobs[i].addTask(new DataProviderTestTask(i+1, j));
 				jobs[i].setDataProvider(new ClientDataProvider());
-				jobs[i].setId("job " + (i+1));
+				jobs[i].setName("job " + (i+1));
 				jobs[i].setBlocking(false);
 				jobs[i].setResultListener(new JPPFResultCollector(nbTasks));
 			}

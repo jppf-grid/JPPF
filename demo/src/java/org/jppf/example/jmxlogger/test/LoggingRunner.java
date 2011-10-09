@@ -109,7 +109,7 @@ public class LoggingRunner implements NotificationListener
 		JPPFJob job = new JPPFJob();
 
 		// give this job a readable unique id that we can use to monitor and manage it.
-		job.setId("Task Notification Job");
+		job.setName("Task Notification Job");
 
 		int nbTasks = 1;
 		for (int i=1; i<=nbTasks; i++)

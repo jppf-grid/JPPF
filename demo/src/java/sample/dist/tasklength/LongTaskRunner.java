@@ -95,7 +95,7 @@ public class LongTaskRunner
 			{
 				long start = System.currentTimeMillis();
 				JPPFJob job = new JPPFJob();
-				job.setId("Long task iteration " + iter);
+				job.setName("Long task iteration " + iter);
 				for (int i=0; i<nbTasks; i++)
 				{
 					LongTask task = new LongTask(length, false);
@@ -263,7 +263,7 @@ public class LongTaskRunner
 		print("got it in " + elapsed + " ms");
 		start = System.currentTimeMillis();
 		JPPFJob job = new JPPFJob();
-		job.setId("Long task job");
+		job.setName("Long task job");
 		LongTask task = new LongTask(10000L, false);
 		task.setId("1");
 		job.addTask(task);
@@ -304,7 +304,7 @@ public class LongTaskRunner
 		System.out.println("\n********** job cancel test **********");
 		long start = System.currentTimeMillis();
 		JPPFJob job = new JPPFJob();
-		job.setId("Long task job 1");
+		job.setName("Long task job 1");
 		LongTask task = new LongTask(6000L, false);
 		task.setId("1");
 		job.addTask(task);
@@ -320,7 +320,7 @@ public class LongTaskRunner
 		jobManager.cancelJob(job.getJobUuid());
 		List<JPPFTask> results = collector.waitForResults();
 		System.out.println("job cancelled");
-		job.setId("Long task job 2");
+		job.setName("Long task job 2");
 		collector = new JPPFResultCollector(1);
 		job.setResultListener(collector);
 		System.out.println("submitting the second job");

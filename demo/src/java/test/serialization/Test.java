@@ -56,7 +56,7 @@ public class Test
 	public static void test() throws Exception
 	{
 		JPPFJob job = new JPPFJob();
-		job.setId("my job id");
+		job.setName("my job id");
 		JPPFTask task = new LongTask(1000);
 		task.setId("someID");
 		task.setResult("result");

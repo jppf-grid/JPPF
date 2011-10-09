@@ -50,7 +50,7 @@ public class JobManagementTestRunner
 		String jobId = "test1";
 		JPPFResultCollector collector = new JPPFResultCollector(nbTasks);
 		JPPFJob job = new JPPFJob();
-		job.setId(jobId);
+		job.setName(jobId);
 		job.setBlocking(false);
 		job.setResultListener(collector);
 		for (int i=0; i<nbTasks; i++)

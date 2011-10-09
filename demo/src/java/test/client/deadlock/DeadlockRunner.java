@@ -213,12 +213,12 @@ public class DeadlockRunner
 		 * {@inheritDoc}
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			try
 			{
 				job = new JPPFJob();
-				job.setId("job " + jobNumber);
+				job.setName("job " + jobNumber);
 				job.setBlocking(false);
 				job.setResultListener(new JPPFResultCollector(nbTasks));
 				for (int j=0; j<nbTasks; j++)

@@ -82,7 +82,7 @@ public class OptimizedJobRunner
 		for (int i=0; i<nbJobs; i++)
 		{
 			JPPFJob job = new JPPFJob();
-			job.setId("demo job " + (i+1));
+			job.setName("demo job " + (i+1));
 			for (int j=0; j<nbTasks; j++) job.addTask(new OptimizedJobTask(time, (j+1)));
 			JPPFResultCollector collector = new JPPFResultCollector(job);
 			job.setResultListener(collector);
@@ -95,7 +95,7 @@ public class OptimizedJobRunner
 		{
 			JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
 			List<JPPFTask> results = collector.waitForResults();
-			output("\n***** results for job " + job.getId() + " *****\n");
+			output("\n***** results for job " + job.getName() + " *****\n");
 			for (JPPFTask t: results) output((String) t.getResult());
 		}
 		totalTime = System.currentTimeMillis() - totalTime;

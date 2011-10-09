@@ -52,7 +52,7 @@ public class JobFromTaskRunner
 			print("Running Long Task demo with");
 			long start = System.currentTimeMillis();
 			JPPFJob job = new JPPFJob();
-			job.setId("Source job");
+			job.setName("Source job");
 			job.getJobSLA().setMaxNodes(1);
 			SourceTask task = new SourceTask();
 			task.setId("source");
