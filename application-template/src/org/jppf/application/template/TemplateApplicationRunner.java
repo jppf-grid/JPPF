@@ -82,7 +82,7 @@ public class TemplateApplicationRunner
 		JPPFJob job = new JPPFJob();
 
 		// give this job a readable unique id that we can use to monitor and manage it.
-		job.setId("Template Job Id");
+		job.setName("Template Job Id");
 
 		// add a task to the job.
 		job.addTask(new TemplateJPPFTask());
