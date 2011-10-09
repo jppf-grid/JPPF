@@ -129,7 +129,7 @@ public class DemoTest
 		{
 			connection = getConnection();
 			JPPFJob job = new JPPFJob();
-			job.setId(jobId);
+			job.setName(jobId);
 			for (int i=0; i<nbTasks; i++)
 			{
 				DurationTask task = new DurationTask(duration);
@@ -162,7 +162,7 @@ public class DemoTest
 		{
 			connection = getConnection();
 			JPPFJob job = new JPPFJob();
-			job.setId(jobId);
+			job.setName(jobId);
 			for (int i=0; i<nbTasks; i++)
 			{
 				DurationTask task = new DurationTask(duration);
@@ -171,7 +171,7 @@ public class DemoTest
 			}
 			id = connection.submitNonBlocking(job);
 			List<JPPFTask> results = connection.waitForResults(id);
-			System.out.println("received " + results.size() + " results for job '" + job.getId() + "'");
+			System.out.println("received " + results.size() + " results for job '" + job.getName() + "'");
 		}
 		finally
 		{
