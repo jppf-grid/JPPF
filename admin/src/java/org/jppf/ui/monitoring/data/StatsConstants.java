@@ -31,7 +31,7 @@ public interface StatsConstants
 	 * List of stats properties related to network connections.
 	 */
 	Fields[] CONNECTION_PROPS = {
-		NB_NODES, MAX_NODES, NB_CLIENTS, MAX_CLIENTS
+		NB_NODES, MAX_NODES, NB_IDLE_NODES, NB_CLIENTS, MAX_CLIENTS
 	};
 	/**
 	 * List of stats properties related to queue operations.

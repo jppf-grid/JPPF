@@ -130,6 +130,10 @@ public enum Fields
 	 */
 	MAX_NODES,
 	/**
+	 * Name for the current number of idle nodes connected to the server.
+	 */
+	NB_IDLE_NODES,
+	/**
 	 * Name for the current number of clients connected to the server.
 	 */
 	NB_CLIENTS,
@@ -161,7 +165,7 @@ public enum Fields
 	 * @see java.lang.Enum#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return localName;
 	}

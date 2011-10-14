@@ -69,6 +69,12 @@ public interface JPPFDriverListener extends EventListener
 	void taskExecuted(int count, long time, long remoteTime, long size);
 
 	/**
+	 * Called when a node becomes idle or busy.
+	 * @param nbIdleNodes the number of currently idle nodes.
+	 */
+	void idleNodes(int nbIdleNodes);
+
+	/**
 	 * Notification that a reset of this server's statistics has been requested.
 	 */
 	void reset();

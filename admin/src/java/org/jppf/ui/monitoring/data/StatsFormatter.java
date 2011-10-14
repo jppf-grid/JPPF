@@ -113,8 +113,9 @@ public final class StatsFormatter implements StatsConstants
 		stringValueMap.put(TOTAL_QUEUED, formatInt(queue.getSizes().getTotal()));
 		stringValueMap.put(QUEUE_SIZE, formatInt(queue.getSizes().getLatest()));
 		stringValueMap.put(MAX_QUEUE_SIZE, formatInt(queue.getSizes().getMax()));
-		stringValueMap.put(NB_NODES, formatInt(stats.getNbNodes()));
-		stringValueMap.put(MAX_NODES, formatInt(stats.getMaxNodes()));
+		stringValueMap.put(NB_NODES, formatInt(stats.getNodes().getLatest()));
+		stringValueMap.put(MAX_NODES, formatInt(stats.getNodes().getMax()));
+		stringValueMap.put(NB_IDLE_NODES, formatInt(stats.getIdleNodes().getLatest()));
 		stringValueMap.put(NB_CLIENTS, formatInt(stats.getNbClients()));
 		stringValueMap.put(MAX_CLIENTS, formatInt(stats.getMaxClients()));
 		return stringValueMap;
@@ -153,8 +154,9 @@ public final class StatsFormatter implements StatsConstants
 		doubleValueMap.put(TOTAL_QUEUED, (double) queue.getSizes().getTotal());
 		doubleValueMap.put(QUEUE_SIZE, (double) queue.getSizes().getLatest());
 		doubleValueMap.put(MAX_QUEUE_SIZE, (double) queue.getSizes().getMax());
-		doubleValueMap.put(NB_NODES, (double) stats.getNbNodes());
-		doubleValueMap.put(MAX_NODES, (double) stats.getMaxNodes());
+		doubleValueMap.put(NB_NODES, (double) stats.getNodes().getLatest());
+		doubleValueMap.put(MAX_NODES, (double) stats.getNodes().getMax());
+		doubleValueMap.put(NB_IDLE_NODES, (double) stats.getIdleNodes().getLatest());
 		doubleValueMap.put(NB_CLIENTS, (double) stats.getNbClients());
 		doubleValueMap.put(MAX_CLIENTS, (double) stats.getMaxClients());
 		return doubleValueMap;

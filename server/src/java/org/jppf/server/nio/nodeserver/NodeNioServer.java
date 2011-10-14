@@ -123,7 +123,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 		((JPPFPriorityQueue) getQueue()).addQueueListener(new QueueListener()
 		{
 			@Override
-            public void newBundle(QueueEvent event)
+			public void newBundle(QueueEvent event)
 			{
 				selector.wakeup();
 				taskQueueChecker.wakeUp();
@@ -192,6 +192,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 			idleChannels.add(channel);
 		}
 		taskQueueChecker.wakeUp();
+		driver.getStatsManager().idleNodes(idleChannels.size());
 	}
 
 	/**
@@ -206,6 +207,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 		{
 			idleChannels.remove(channel);
 		}
+		driver.getStatsManager().idleNodes(idleChannels.size());
 		return channel;
 	}
 
@@ -230,6 +232,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 				else log.warn("error removing channel at index " + index + " : " + e.getMessage());
 			}
 		}
+		driver.getStatsManager().idleNodes(idleChannels.size());
 		return channel;
 	}
 

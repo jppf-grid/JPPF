@@ -68,13 +68,13 @@ public class JPPFStats implements Serializable
 	 */
 	private StatsSnapshot jobTimes = new StatsSnapshot("job execution");
 	/**
-	 * The current number of nodes connected to the server.
+	 * Statistics for the number of nodes in the grid.
 	 */
-	private int nbNodes = 0;
+	private StatsSnapshot nodes = new StatsSnapshot("nodes");
 	/**
-	 * The maximum number of nodes connected to the server.
+	 * Statistics for the number of nodes in the grid.
 	 */
-	private int maxNodes = 0;
+	private StatsSnapshot idleNodes = new StatsSnapshot("idle nodes");
 	/**
 	 * The current number of clients connected to the server.
 	 */
@@ -99,14 +99,16 @@ public class JPPFStats implements Serializable
 		s.taskQueue = taskQueue.makeCopy();
 		s.jobQueue = jobQueue.makeCopy();
 		s.jobTimes = jobTimes.makeCopy();
+		s.nodes = nodes.makeCopy();
+		s.idleNodes = idleNodes.makeCopy();
 		/*
 		s.queue = queue.makeCopy();
 		s.totalQueued = totalQueued;
 		s.queueSize = queueSize;
 		s.maxQueueSize = maxQueueSize;
-		*/
 		s.nbNodes = nbNodes;
 		s.maxNodes = maxNodes;
+		*/
 		s.nbClients = nbClients;
 		s.maxClients = maxClients;
 		s.footprint = footprint;
@@ -128,13 +130,14 @@ public class JPPFStats implements Serializable
 		sb.append(transport.toString());
 		sb.append(taskQueue.toString());
 		sb.append(jobQueue.toString());
+		sb.append(nodes.toString());
 		/*
 		sb.append("totalQueued : ").append(totalQueued).append("\n");
 		sb.append("queueSize : ").append(queueSize).append("\n");
 		sb.append("maxQueueSize : ").append(maxQueueSize).append("\n");
-		*/
 		sb.append("nbNodes : ").append(nbNodes).append('\n');
 		sb.append("maxNodes : ").append(maxNodes).append('\n');
+		*/
 		sb.append("nbClients : ").append(nbClients).append('\n');
 		sb.append("maxClients : ").append(maxClients).append('\n');
 		return sb.toString();
@@ -249,42 +252,6 @@ public class JPPFStats implements Serializable
 	}
 
 	/**
-	 * Set the current number of nodes connected to the server.
-	 * @param nbNodes - the current number of nodes as an int value.
-	 */
-	public void setNbNodes(int nbNodes)
-	{
-		this.nbNodes = nbNodes;
-	}
-
-	/**
-	 * Get the current number of nodes connected to the server.
-	 * @return the current number of nodes as an int value. 
-	 */
-	public int getNbNodes()
-	{
-		return nbNodes;
-	}
-
-	/**
-	 * Set the maximum number of nodes connected to the server.
-	 * @param maxNodes - the maximum number of nodes as an int value.
-	 */
-	public void setMaxNodes(int maxNodes)
-	{
-		this.maxNodes = maxNodes;
-	}
-
-	/**
-	 * Get the maximum number of nodes connected to the server.
-	 * @return the maximum number of nodes as an int value. 
-	 */
-	public int getMaxNodes()
-	{
-		return maxNodes;
-	}
-
-	/**
 	 * Set the current number of clients connected to the server.
 	 * @param nbClients - the current number of clients as an int value.
 	 */
@@ -333,7 +300,7 @@ public class JPPFStats implements Serializable
 		footprint = 0L;
 		taskQueue = new QueueStats("task");
 		jobQueue = new QueueStats("job");
-		maxNodes = nbNodes;
+		nodes.setMax(nodes.getLatest());
 		maxClients = nbClients;
 	}
 
@@ -371,5 +338,41 @@ public class JPPFStats implements Serializable
 	public void setJobQueue(QueueStats jobQueue)
 	{
 		this.jobQueue = jobQueue;
+	}
+
+	/**
+	 * Get the statistics for the number of nodes in the grid.
+	 * @return a {@link StatsSnapshot} instance.
+	 */
+	public StatsSnapshot getNodes()
+	{
+		return nodes;
+	}
+
+	/**
+	 * Set the statistics for the number of nodes in the grid.
+	 * @param nodes a {@link StatsSnapshot} instance.
+	 */
+	public void setNodes(StatsSnapshot nodes)
+	{
+		this.nodes = nodes;
+	}
+
+	/**
+	 * Get the statistics for the number of idle nodes in the grid.
+	 * @return a {@link StatsSnapshot} instance.
+	 */
+	public StatsSnapshot getIdleNodes()
+	{
+		return idleNodes;
+	}
+
+	/**
+	 * Set the statistics for the number of idle nodes in the grid.
+	 * @param idleNodes a {@link StatsSnapshot} instance.
+	 */
+	public void setIdleNodes(StatsSnapshot idleNodes)
+	{
+		this.idleNodes = idleNodes;
 	}
 }

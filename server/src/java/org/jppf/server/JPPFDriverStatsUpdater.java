@@ -35,7 +35,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 * Called to notify that a new client is connected to he JPPF server.
 	 */
 	@Override
-    public synchronized void newClientConnection()
+	public synchronized void newClientConnection()
 	{
 		stats.setNbClients(stats.getNbClients() + 1);
 		if (stats.getNbClients() > stats.getMaxClients()) stats.setMaxClients(stats.getMaxClients() + 1);
@@ -45,7 +45,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 * Called to notify that a new client has disconnected from he JPPF server.
 	 */
 	@Override
-    public synchronized void clientConnectionClosed()
+	public synchronized void clientConnectionClosed()
 	{
 		stats.setNbClients(stats.getNbClients() - 1);
 	}
@@ -54,19 +54,21 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 * Called to notify that a new node is connected to he JPPF server.
 	 */
 	@Override
-    public synchronized void newNodeConnection()
+	public synchronized void newNodeConnection()
 	{
-		stats.setNbNodes(stats.getNbNodes() + 1);
-		if (stats.getNbNodes() > stats.getMaxNodes()) stats.setMaxNodes(stats.getMaxNodes() + 1);
+		long n = stats.getNodes().getLatest() + 1;
+		stats.getNodes().setLatest(n);
+		if (n > stats.getNodes().getMax()) stats.getNodes().setMax(n);
 	}
 
 	/**
 	 * Called to notify that a new node is connected to he JPPF server.
 	 */
 	@Override
-    public synchronized void nodeConnectionClosed()
+	public synchronized void nodeConnectionClosed()
 	{
-		stats.setNbNodes(stats.getNbNodes() - 1);
+		long n = stats.getNodes().getLatest() - 1;
+		stats.getNodes().setLatest(n);
 	}
 
 	/**
@@ -74,7 +76,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 * @param count the number of tasks that have been added to the queue.
 	 */
 	@Override
-    public synchronized void taskInQueue(int count)
+	public synchronized void taskInQueue(int count)
 	{
 		QueueStats queue = stats.getTaskQueue();
 		StatsSnapshot sizes = queue.getSizes();
@@ -89,7 +91,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 * @param time the time the task remained in the queue.
 	 */
 	@Override
-    public synchronized void taskOutOfQueue(int count, long time)
+	public synchronized void taskOutOfQueue(int count, long time)
 	{
 		QueueStats queue = stats.getTaskQueue();
 		StatsSnapshot sizes = queue.getSizes();
@@ -108,7 +110,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 * @param size the size in bytes of the bundle that was sent to the node.
 	 */
 	@Override
-    public synchronized void taskExecuted(int count, long time, long remoteTime, long size)
+	public synchronized void taskExecuted(int count, long time, long remoteTime, long size)
 	{
 		stats.setTotalTasksExecuted(stats.getTotalTasksExecuted() + count);
 		stats.getExecution().newValues(time, count, stats.getTotalTasksExecuted());
@@ -127,20 +129,21 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	}
 
 	/**
-	 * Get the current number of nodes connected to the server.
-	 * @return the numbe rof nodes as an int.
+	 * {@inheritDoc}
 	 */
-	public int getNbNodes()
+	@Override
+	public void reset()
 	{
-		return stats.getNbNodes();
+		stats.reset();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void reset()
+	public synchronized void idleNodes(final int nbIdleNodes)
 	{
-		stats.reset();
+		stats.getIdleNodes().setLatest(nbIdleNodes);
+		//stats.getIdleNodes().newValues(1, inc, n);
 	}
 }
