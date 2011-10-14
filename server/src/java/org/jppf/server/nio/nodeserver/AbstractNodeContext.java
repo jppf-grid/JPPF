@@ -21,10 +21,11 @@ package org.jppf.server.nio.nodeserver;
 import java.util.List;
 
 import org.jppf.io.*;
+import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
-import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
 
 /**
@@ -61,6 +62,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * True means the job was cancelled and the task completion listener must not be called.
 	 */
 	protected boolean jobCanceled = false;
+	/**
+	 * Represents the node system information.
+	 */
+	protected JPPFSystemInformation nodeInfo = null;
 
 	/**
 	 * Get the task bundle to send or receive.
@@ -113,6 +118,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 			this.bundler.dispose();
 			this.bundler = serverBundler.copy();
 			this.bundler.setup();
+			if (this.bundler instanceof NodeAwareness) ((NodeAwareness) this.bundler).setNodeConfiguration(nodeInfo);
 			return true;
 		}
 		return false;
@@ -125,7 +131,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 */
 	public void resubmitBundle(ServerJob bundle)
 	{
-		//bundle.getBundle().setPriority(10);
 		JPPFDriver.getQueue().addBundle(bundle);
 	}
 
@@ -133,7 +138,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void handleException(ChannelWrapper<?> channel)
+	public void handleException(ChannelWrapper<?> channel)
 	{
 		if (getBundler() != null) getBundler().dispose();
 		NodeNioServer.closeNode(channel, this);
@@ -156,12 +161,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 */
 	public void serializeBundle(ChannelWrapper<?> wrapper) throws Exception
 	{
-		//if (nodeMessage == null)
 		AbstractNodeMessage message = newMessage();
-		//byte[] data = helper.getSerializer().serialize(bundle.getBundle()).getBuffer();
-		//data = JPPFDataTransformFactory.transform(true, data, 0, data.length);
-		//message.addLocation(new ByteBufferLocation(data, 0, data.length));
-		//message.addLocation(new MultipleBuffersLocation(new JPPFBuffer(data, data.length)));
 		message.addLocation(IOHelper.serializeData(bundle.getJob(), helper.getSerializer()));
 		message.addLocation(bundle.getDataProvider());
 		for (DataLocation dl: bundle.getTasks()) message.addLocation(dl);
@@ -251,7 +251,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean readMessage(ChannelWrapper<?> channel) throws Exception
+	public boolean readMessage(ChannelWrapper<?> channel) throws Exception
 	{
 		if (nodeMessage == null) nodeMessage = newMessage();
 		return getNodeMessage().read(channel);
@@ -261,7 +261,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
+	public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
 	{
 		return getNodeMessage().write(channel);
 	}
@@ -282,5 +282,23 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	public synchronized void setJobCanceled(boolean jobCanceled)
 	{
 		this.jobCanceled = jobCanceled;
+	}
+
+	/**
+	 * Get the node system information.
+	 * @return a {@link JPPFSystemInformation} instance.
+	 */
+	public JPPFSystemInformation getNodeInfo()
+	{
+		return nodeInfo;
+	}
+
+	/**
+	 * Set the node system information.
+	 * @param nodeInfo a {@link JPPFSystemInformation} instance.
+	 */
+	public void setNodeInfo(JPPFSystemInformation nodeInfo)
+	{
+		this.nodeInfo = nodeInfo;
 	}
 }
