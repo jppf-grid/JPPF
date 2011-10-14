@@ -211,7 +211,7 @@ public class TreeTableModelAdapter extends AbstractTableModel
 		}
 		catch(Exception e)
 		{
-			log.error(e.getMessage(), e);
+			if (debugEnabled) log.debug(e.getMessage(), e);
 		}
 		if (treePath == null) return null;
 		return treePath.getLastPathComponent();
