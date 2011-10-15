@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
+package org.jppf.node.protocol;
+
 
 
 /**
@@ -47,13 +48,13 @@ public interface JPPFDistributedJob
 
 	/**
 	 * Get the service level agreement between the job and the server.
-	 * @return an instance of <code>JPPFJobSLA</code>.
+	 * @return an instance of {@link JobSLA}.
 	 */
-	JPPFJobSLA getJobSLA();
+	JobSLA getSLA();
 
 	/**
 	 * Get the user-defined metadata asoociated with this job.
-	 * @return a {@link JPPFJobMetadata} instance.
+	 * @return a {@link JobMetadata} instance.
 	 */
-	JPPFJobMetadata getJobMetadata();
+	JobMetadata getMetadata();
 }

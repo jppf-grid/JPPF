@@ -23,7 +23,7 @@ import java.util.List;
 import org.jppf.client.*;
 import org.jppf.example.loadbalancer.common.MyCustomPolicy;
 import org.jppf.node.policy.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 
 /**
  * This is a fully commented job runner for the Custom Load Balancer sample.
@@ -124,10 +124,11 @@ public class CustomLoadBalancerRunner
 		job.setName(jobName);
 
 		// Specifiy the job metadata.
-		job.getJobMetadata().setParameter("task.memory", "" + size);
-		job.getJobMetadata().setParameter("task.time", "" + duration);
-		job.getJobMetadata().setParameter("allowed.time", "" + allowedTime);
-		job.getJobMetadata().setParameter("id", jobName);
+		JPPFJobMetadata metadata = (JPPFJobMetadata) job.getMetadata();
+		metadata.setParameter("task.memory", "" + size);
+		metadata.setParameter("task.time", "" + duration);
+		metadata.setParameter("allowed.time", "" + allowedTime);
+		metadata.setParameter("id", jobName);
 
 		// Add the tasks to the job.
 		for (int i=1; i<=nbTasks; i++)
@@ -140,7 +141,7 @@ public class CustomLoadBalancerRunner
 		}
 
 		// Assign an execution policy to the job.
-		job.getJobSLA().setExecutionPolicy(policy);
+		((JPPFJobSLA) job.getSLA()).setExecutionPolicy(policy);
 
 		// Set the job in non-blocking (asynchonous) mode.
 		job.setBlocking(false);

@@ -2,6 +2,7 @@ package test.classloader;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.client.JPPFJob;
+import org.jppf.server.protocol.JPPFJobSLA;
 import org.jppf.task.storage.ClientDataProvider;
 
 import java.io.Closeable;
@@ -62,7 +63,7 @@ public class JPPFUtils {
                 JPPFJob job = new JPPFJob(new ClientDataProvider());
                 job.addTask(new JPPFTaskPreInit(urlMap));
                 job.setBlocking(true);
-                job.getJobSLA().setBroadcastJob(true);
+                ((JPPFJobSLA) job.getSLA()).setBroadcastJob(true);
                 client.submit(job);
 
                 durInit = System.nanoTime() - durInit;

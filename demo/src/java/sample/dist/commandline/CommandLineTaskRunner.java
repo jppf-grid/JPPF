@@ -20,6 +20,7 @@ package sample.dist.commandline;
 import java.util.List;
 
 import org.jppf.client.*;
+import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
@@ -77,7 +78,7 @@ public class CommandLineTaskRunner
 		job.addTask(new ListDirectoryTask("C:\\Windows"));
 		*/
 		job.addTask(new TestTask("1"));
-		for (JPPFTask t: job.getTasks()) t.setTimeout(5000);
+		for (JPPFTask t: job.getTasks()) t.setTimeoutSchedule(new JPPFSchedule(5000));
 		
 		List<JPPFTask> results = jppfClient.submit(job);
 		for (JPPFTask task: results)

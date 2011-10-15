@@ -21,6 +21,7 @@ package org.jppf.server.protocol;
 import java.util.*;
 
 import org.jppf.io.DataLocation;
+import org.jppf.node.protocol.JPPFDistributedJob;
 
 /**
  * This class wraps a task bundle to express it in terms of {@link org.jppf.io.DataLocation DataLocation}.
@@ -165,7 +166,7 @@ public class BundleWrapper implements ServerJob
 	{
 		int n = ((JPPFTaskBundle) other.getJob()).getTaskCount();
 		job.setTaskCount(job.getTaskCount() + n);
-		job.getJobSLA().setSuspended(other.getJob().getJobSLA().isSuspended());
+		((JPPFJobSLA) job.getSLA()).setSuspended(other.getJob().getSLA().isSuspended());
 		if (after)
 		{
 			for (DataLocation task: other.getTasks()) tasks.add(task);

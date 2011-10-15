@@ -26,7 +26,7 @@ import org.jppf.classloader.*;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.node.*;
-import org.jppf.node.event.NodeEventType;
+import org.jppf.node.event.*;
 import org.jppf.server.protocol.*;
 import org.jppf.startup.*;
 import org.jppf.utils.*;

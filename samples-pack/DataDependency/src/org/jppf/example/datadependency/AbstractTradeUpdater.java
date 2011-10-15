@@ -27,7 +27,7 @@ import org.jppf.example.datadependency.model.*;
 import org.jppf.example.datadependency.simulation.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -246,7 +246,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 			job.setName("Job (" + jobCount.incrementAndGet() + ")");
 			job.setBlocking(false);
 			// set an execution policy that forces execution on the node with the specified id
-			job.getJobSLA().setExecutionPolicy(new Equal("jppf.uuid", false, nodeId));
+			((JPPFJobSLA) job.getSLA()).setExecutionPolicy(new Equal("jppf.uuid", false, nodeId));
 			JPPFResultCollector collector = new JPPFResultCollector(tradeIdList.size());
 			job.setResultListener(collector);
 			// create a task for each trade
@@ -272,7 +272,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 				job.setName("[Node id=" + nodeId + "] trade=" + tradeId + " (" + jobCount.incrementAndGet() + ")");
 				job.setBlocking(false);
 				// set an execution policy that forces execution on the node with the specified id
-				job.getJobSLA().setExecutionPolicy(policy);
+				((JPPFJobSLA) job.getSLA()).setExecutionPolicy(policy);
 				JPPFResultCollector collector = new JPPFResultCollector(1);
 				job.setResultListener(collector);
 				job.addTask(createTask(tradeId));

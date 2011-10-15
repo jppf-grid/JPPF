@@ -16,25 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.server.scheduler.bundle;
-
-import org.jppf.node.protocol.JobMetadata;
-import org.jppf.server.protocol.*;
-
 /**
- * Bundler implementations should implement this interface if they wish to have access to a job's metadata.
- * @author Laurent Cohen
+ * Support for tasks to access and share read-only data.<br/>
+ * The data is transported to the nodes along with he tasks, so it is immediately accessible without
+ * need for reading it from or writing it to a specified source.
  */
-public interface JobAwareness
-{
-	/**
-	 * Get the current job's metadata.
-	 * @return a {@link JPPFJobMetadata} instance.
-	 */
-	JobMetadata getJobMetadata();
-	/**
-	 * Set the current job's metadata.
-	 * @param metadata a {@link JPPFJobMetadata} instance.
-	 */
-	void setJobMetadata(JobMetadata metadata);
-}
+package org.jppf.task.storage;

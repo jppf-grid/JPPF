@@ -21,7 +21,7 @@ package org.jppf.server.node;
 import java.util.EventObject;
 
 import org.jppf.management.TaskInformation;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * Instances of this class represent events that occur during the life span of an individual JPPF task.
@@ -42,7 +42,7 @@ public class TaskExecutionEvent extends EventObject
 	 * @param elapsedTime the wall clock time taken by the task.
 	 * @param error determines whether the task had an exception.
 	 */
-	public TaskExecutionEvent(JPPFTask task, String jobId, long cpuTime, long elapsedTime, boolean error)
+	public TaskExecutionEvent(Task task, String jobId, long cpuTime, long elapsedTime, boolean error)
 	{
 		super(task);
 		this.taskInformation = new TaskInformation(task.getId(), jobId, cpuTime, elapsedTime, error);
@@ -52,9 +52,9 @@ public class TaskExecutionEvent extends EventObject
 	 * Get the JPPF task from which the event originates.
 	 * @return a <code>JPPFTask</code> instance.
 	 */
-	public JPPFTask getTask()
+	public Task getTask()
 	{
-		return (JPPFTask) getSource();
+		return (Task) getSource();
 	}
 
 	/**

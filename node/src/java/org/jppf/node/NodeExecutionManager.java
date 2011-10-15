@@ -16,43 +16,33 @@
  * limitations under the License.
  */
 
-package org.jppf.node.event;
+package org.jppf.node;
 
-import java.util.*;
+import java.util.List;
 
-import org.jppf.node.NodeExecutionManager;
-import org.jppf.server.protocol.*;
+import org.jppf.node.protocol.*;
 
 /**
- * Instances of this class represent node life cycle events
+ * Instances of this interface manage the execution of JPPF tasks by a node.
  * @author Laurent Cohen
  */
-public class NodeLifeCycleEvent extends EventObject
+public interface NodeExecutionManager
 {
-	/**
-	 * Initialize this event with the specified execution manager.
-	 * @param executionManager the execution that handles the execution of tasks by a node.
-	 */
-	public NodeLifeCycleEvent(NodeExecutionManager executionManager)
-	{
-		super(executionManager);
-	}
-
 	/**
 	 * Get the job currently being executed.
 	 * @return a {@link JPPFDistributedJob} instance, or null if no job is being executed.
 	 */
-	public JPPFDistributedJob getJob()
-	{
-		return ((NodeExecutionManager) getSource()).getCurrentJob();
-	}
+	JPPFDistributedJob getCurrentJob();
 
 	/**
-	 * Get the tasks currently being executed.
+	 * Get the list of tasks currently being executed.
 	 * @return a list of {@link JPPFTask} instances, or null if the node is idle.
 	 */
-	public List<JPPFTask> getTasks()
-	{
-		return ((NodeExecutionManager) getSource()).getCurrentTasks();
-	}
+	List<Task> getTasks();
+
+	/**
+	 * Get the id of the job currently being executed.
+	 * @return the job id as a string, or null if no job is being executed.
+	 */
+	String getCurrentJobId();
 }

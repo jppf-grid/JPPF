@@ -195,8 +195,8 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		header.setRequestUuid(job.getJobUuid());
 		header.setParameter(BundleParameter.JOB_ID, job.getName());
 		header.setParameter(BundleParameter.JOB_UUID, job.getJobUuid());
-		header.setJobSLA(job.getJobSLA());
-		header.setParameter(BundleParameter.JOB_METADATA, job.getJobMetadata());
+		header.setSLA(job.getSLA());
+		header.setParameter(BundleParameter.JOB_METADATA, job.getMetadata());
 
 		SocketWrapper socketClient = taskServerConnection.getSocketClient();
 		IOHelper.sendData(socketClient, header, ser);

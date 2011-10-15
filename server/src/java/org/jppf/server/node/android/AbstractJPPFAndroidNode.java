@@ -23,7 +23,7 @@ import org.jppf.JPPFError;
 import org.jppf.classloader.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.*;
-import org.jppf.node.event.NodeEventType;
+import org.jppf.node.event.*;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
 import org.jppf.startup.*;

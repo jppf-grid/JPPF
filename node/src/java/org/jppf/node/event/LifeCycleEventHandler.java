@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 
-package org.jppf.server.node;
+package org.jppf.node.event;
 
 import java.util.*;
 
 import org.jppf.node.NodeExecutionManager;
-import org.jppf.node.event.*;
 import org.jppf.utils.ServiceFinder;
 import org.slf4j.*;
 

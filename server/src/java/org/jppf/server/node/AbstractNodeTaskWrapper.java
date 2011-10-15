@@ -21,7 +21,8 @@ import java.util.List;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.node.NodeExecutionManager;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
+import org.jppf.server.protocol.*;
 
 /**
  * Wrapper around a JPPF task used to catch exceptions caused by the task execution.
@@ -68,7 +69,7 @@ public abstract class AbstractNodeTaskWrapper implements Runnable
 	 * Get the task this wrapper executes within a try/catch block.
 	 * @return the task as a <code>JPPFTask</code> instance.
 	 */
-	public JPPFTask getTask()
+	public Task getTask()
 	{
 		return task;
 	}

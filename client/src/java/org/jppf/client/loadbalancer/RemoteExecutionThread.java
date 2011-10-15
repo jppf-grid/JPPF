@@ -22,6 +22,7 @@ import java.util.List;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.Pair;
 import org.slf4j.*;
@@ -132,8 +133,8 @@ class RemoteExecutionThread extends ExecutionThread
 	{
 		JPPFJob newJob = new JPPFJob(job.getJobUuid());
 		newJob.setDataProvider(job.getDataProvider());
-		newJob.setJobSLA(job.getJobSLA());
-		newJob.setJobMetadata(job.getJobMetadata());
+		newJob.setSLA(job.getSLA());
+		newJob.setMetadata(job.getMetadata());
 		newJob.setBlocking(job.isBlocking());
 		newJob.setResultListener(job.getResultListener());
 		newJob.setName(job.getName());
@@ -154,7 +155,7 @@ class RemoteExecutionThread extends ExecutionThread
 		ClassLoader oldCl = null;
 		if (!job.getTasks().isEmpty())
 		{
-			JPPFTask task = job.getTasks().get(0);
+			Task task = job.getTasks().get(0);
 			cl = task.getClass().getClassLoader();
 			connection.getClient().addRequestClassLoader(requestUuid, cl);
 			if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);

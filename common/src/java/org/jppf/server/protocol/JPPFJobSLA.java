@@ -21,6 +21,7 @@ package org.jppf.server.protocol;
 import java.io.Serializable;
 
 import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.protocol.JobSLA;
 import org.jppf.scheduling.JPPFSchedule;
 
 /**
@@ -28,7 +29,7 @@ import org.jppf.scheduling.JPPFSchedule;
  * It determines the state, conditions and order in which a job will be executed. 
  * @author Laurent Cohen
  */
-public class JPPFJobSLA implements Serializable
+public class JPPFJobSLA implements Serializable, JobSLA
 {
 	/**
 	 * Explicit serialVersionUID.
@@ -106,9 +107,9 @@ public class JPPFJobSLA implements Serializable
 	}
 
 	/**
-	 * Get the tasks execution policy.
-	 * @return an <code>ExecutionPolicy</code> instance.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public ExecutionPolicy getExecutionPolicy()
 	{
 		return executionPolicy;
@@ -124,9 +125,9 @@ public class JPPFJobSLA implements Serializable
 	}
 
 	/**
-	 * Get the priority of this job.
-	 * @return the priority as an int.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getPriority()
 	{
 		return priority;
@@ -142,9 +143,9 @@ public class JPPFJobSLA implements Serializable
 	}
 
 	/**
-	 * Get the maximum number of nodes this job can run on.
-	 * @return the number of nodes as an int value.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getMaxNodes()
 	{
 		return maxNodes;
@@ -160,9 +161,9 @@ public class JPPFJobSLA implements Serializable
 	}
 
 	/**
-	 * Determine whether this job is initially suspended.
-	 * @return true if the job is suspended, false otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isSuspended()
 	{
 		return suspended;
@@ -178,9 +179,9 @@ public class JPPFJobSLA implements Serializable
 	}
 
 	/**
-	 * Get the job schedule.
-	 * @return a <code>JPPFSchedule</code> instance.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public JPPFSchedule getJobSchedule()
 	{
 		return jobSchedule;
@@ -196,9 +197,9 @@ public class JPPFJobSLA implements Serializable
 	}
 
 	/**
-	 * Get the job expiration schedule configuration.
-	 * @return a {@link JPPFSchedule} instance.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public JPPFSchedule getJobExpirationSchedule()
 	{
 		return jobExpirationSchedule;
@@ -214,9 +215,9 @@ public class JPPFJobSLA implements Serializable
 	}
 
 	/**
-	 * Determine whether the job is a broadcast job.
-	 * @return true for a broadcast job, false otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isBroadcastJob()
 	{
 		return broadcastJob;

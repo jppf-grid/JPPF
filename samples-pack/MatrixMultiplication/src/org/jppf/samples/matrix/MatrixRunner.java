@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.node.policy.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.task.storage.MemoryMapDataProvider;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -155,21 +155,21 @@ public class MatrixRunner
 		// create a data provider to share matrix b among all tasks
 		job.setDataProvider(new MemoryMapDataProvider());
 		job.getDataProvider().setValue(MatrixTask.DATA_KEY, b);
-		job.getJobSLA().setExecutionPolicy(policy);
+		((JPPFJobSLA) job.getSLA()).setExecutionPolicy(policy);
 		// submit the tasks for execution
 		List<JPPFTask> results = jppfClient.submit(job);
 		// initialize the resulting matrix
 		Matrix c = new Matrix(size);
 		// Get the matrix values from the tasks results
 		int rowIdx = 0;
-        for (JPPFTask matrixTask : results) {
-            if (matrixTask.getException() != null) throw matrixTask.getException();
-            double[][] rows = (double[][]) matrixTask.getResult();
-            for (int j = 0; j < rows.length; j++) {
-                for (int k = 0; k < size; k++) c.setValueAt(rowIdx + j, k, rows[j][k]);
-            }
-            rowIdx += rows.length;
-        }
+		for (JPPFTask matrixTask : results) {
+			if (matrixTask.getException() != null) throw matrixTask.getException();
+			double[][] rows = (double[][]) matrixTask.getResult();
+			for (int j = 0; j < rows.length; j++) {
+				for (int k = 0; k < size; k++) c.setValueAt(rowIdx + j, k, rows[j][k]);
+			}
+			rowIdx += rows.length;
+		}
 		return System.currentTimeMillis() - start;
 	}
 

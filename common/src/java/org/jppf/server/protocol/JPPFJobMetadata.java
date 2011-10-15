@@ -21,6 +21,8 @@ package org.jppf.server.protocol;
 import java.io.Serializable;
 import java.util.*;
 
+import org.jppf.node.protocol.JobMetadata;
+
 /**
  * Instances of this class hold metadata about a job, that can be used from a load-balancer,
  * to adapt the load balancing to the computational weight of the job and/or the contained tasks.
@@ -28,7 +30,7 @@ import java.util.*;
  * @see org.jppf.server.scheduler.bundle.JobAwareness
  * @author Laurent Cohen
  */
-public class JPPFJobMetadata implements Serializable
+public class JPPFJobMetadata implements Serializable, JobMetadata
 {
 	/**
 	 * Explicit serialVersionUID.
@@ -37,7 +39,7 @@ public class JPPFJobMetadata implements Serializable
 	/**
 	 * The metadata map.
 	 */
-	private Map<Object, Object> metadata = new HashMap<Object, Object>();
+	private final Map<Object, Object> metadata = new HashMap<Object, Object>();
 
 	/**
 	 * Set a parameter in the metadata.
@@ -51,21 +53,18 @@ public class JPPFJobMetadata implements Serializable
 	}
 
 	/**
-	 * Retrieve a parameter in the metadata.
-	 * @param key the parameter's key.
-	 * @return the parameter's value or null if no parameter with the specified key exists.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public Object getParameter(Object key)
 	{
 		return metadata.get(key);
 	}
 
 	/**
-	 * Retrieve a parameter in the metadata.
-	 * @param key the parameter's key.
-	 * @param def a default value to return if no parameter with the specified key can be found.
-	 * @return the parameter's value or null if no parameter with the specified key exists.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public Object getParameter(Object key, Object def)
 	{
 		Object value = metadata.get(key);
@@ -83,9 +82,9 @@ public class JPPFJobMetadata implements Serializable
 	}
 
 	/**
-	 * Get a copy of the metadata map.
-	 * @return a map of the metadata contained in this object.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public Map<Object, Object> getAll()
 	{
 		Map<Object, Object> map = new HashMap<Object, Object>();

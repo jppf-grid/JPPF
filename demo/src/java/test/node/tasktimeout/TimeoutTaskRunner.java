@@ -20,6 +20,7 @@ package test.node.tasktimeout;
 import java.util.List;
 
 import org.jppf.client.*;
+import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -91,7 +92,7 @@ public class TimeoutTaskRunner
 
 		// add a task to the job.
 		TimeoutTask task = new TimeoutTask();
-		task.setTimeout(1000);
+		task.setTimeoutSchedule(new JPPFSchedule(1000));
 		job.addTask(task);
 
 		// add more tasks here ...

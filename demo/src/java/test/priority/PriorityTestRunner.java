@@ -21,7 +21,7 @@ package test.priority;
 import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 
 /**
  * 
@@ -110,7 +110,7 @@ public class PriorityTestRunner
 	{
 		JPPFJob job = new JPPFJob();
 		job.addTask(task);
-		job.getJobSLA().setPriority(priority);
+		((JPPFJobSLA) job.getSLA()).setPriority(priority);
 		job.setBlocking(false);
 		job.setResultListener(new JPPFResultCollector(1));
 		return job;

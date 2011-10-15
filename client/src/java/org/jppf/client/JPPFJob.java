@@ -24,6 +24,7 @@ import java.util.*;
 import org.jppf.JPPFException;
 import org.jppf.client.event.TaskResultListener;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
+import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.JPPFUuid;
@@ -70,11 +71,11 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * The service level agreement between the job and the server.
 	 */
-	private JPPFJobSLA jobSLA = new JPPFJobSLA();
+	private JobSLA jobSLA = new JPPFJobSLA();
 	/**
 	 * The user-defined metadata asoociated with this job.
 	 */
-	private JPPFJobMetadata jobMetadata = new JPPFJobMetadata();
+	private JobMetadata jobMetadata = new JPPFJobMetadata();
 	/**
 	 * The number of tasks in this job.
 	 */
@@ -347,9 +348,18 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 
 	/**
 	 * {@inheritDoc}
+	 * @deprecated use {@link #getSLA() getSLA()} instead
+	 */
+	public JPPFJobSLA getJobSLA()
+	{
+		return (JPPFJobSLA) jobSLA;
+	}
+
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
-	public JPPFJobSLA getJobSLA()
+	public JobSLA getSLA()
 	{
 		return jobSLA;
 	}
@@ -358,16 +368,25 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Get the service level agreement between the job and the server.
 	 * @param jobSLA an instance of <code>JPPFJobSLA</code>.
 	 */
-	public void setJobSLA(JPPFJobSLA jobSLA)
+	public void setSLA(JobSLA jobSLA)
 	{
 		this.jobSLA = jobSLA;
 	}
 
 	/**
 	 * {@inheritDoc}
+	 * @deprecated use {@link #getMetadata() getMetadata()} instead
+	 */
+	public JPPFJobMetadata getJobMetadata()
+	{
+		return (JPPFJobMetadata) jobMetadata;
+	}
+
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
-	public JPPFJobMetadata getJobMetadata()
+	public JobMetadata getMetadata()
 	{
 		return jobMetadata;
 	}
@@ -376,7 +395,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Set this job's metadata.
 	 * @param jobMetadata a {@link JPPFJobMetadata} instance.
 	 */
-	public void setJobMetadata(JPPFJobMetadata jobMetadata)
+	public void setMetadata(JobMetadata jobMetadata)
 	{
 		this.jobMetadata = jobMetadata;
 	}

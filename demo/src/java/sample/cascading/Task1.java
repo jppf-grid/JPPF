@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.node.policy.Equal;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 
 /**
  * This task submits a JPPF job.
@@ -45,7 +45,7 @@ public class Task1 extends JPPFTask
 			client = new JPPFClient();
 			JPPFJob job = new JPPFJob();
 			job.addTask(new Task2());
-			job.getJobSLA().setExecutionPolicy(new Equal("id", 2));
+			((JPPFJobSLA) job.getSLA()).setExecutionPolicy(new Equal("id", 2));
 			List<JPPFTask> results = client.submit(job);
 			System.out.println("Result of Task2: [" + results.get(0).getResult() + ']');
 			setResult("Task1 executed successfully");

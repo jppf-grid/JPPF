@@ -20,6 +20,7 @@ package org.jppf.server.protocol;
 import java.io.Serializable;
 import java.util.*;
 
+import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 
 /**
@@ -111,7 +112,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	/**
 	 * The service level agreement between the job and the server.
 	 */
-	private JPPFJobSLA jobSLA = new JPPFJobSLA();
+	private JobSLA jobSLA = new JPPFJobSLA();
 
 	/**
 	 * Initialize this task bundle and set its build number.
@@ -329,7 +330,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 		}
 		bundle.setQueueEntryTime(queueEntryTime);
 		bundle.setCompletionListener(completionListener);
-		bundle.setJobSLA(jobSLA);
+		bundle.setSLA(jobSLA);
 		//bundle.setParameter(BundleParameter.JOB_METADATA, getJobMetadata());
 
 		return bundle;
@@ -450,9 +451,18 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 
 	/**
 	 * {@inheritDoc}
+	 * @deprecated use {@link #getSLA() getSLA()} instead
+	 */
+	public JPPFJobSLA getJobSLA()
+	{
+		return (JPPFJobSLA) jobSLA;
+	}
+
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
-    public JPPFJobSLA getJobSLA()
+	public JobSLA getSLA()
 	{
 		return jobSLA;
 	}
@@ -461,7 +471,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	 * Get the service level agreement between the job and the server.
 	 * @param jobSLA an instance of <code>JPPFJobSLA</code>.
 	 */
-	public void setJobSLA(JPPFJobSLA jobSLA)
+	public void setSLA(JobSLA jobSLA)
 	{
 		this.jobSLA = jobSLA;
 	}
@@ -504,10 +514,19 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public JPPFJobMetadata getJobMetadata()
 	{
 		return (JPPFJobMetadata) getParameter(BundleParameter.JOB_METADATA);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @deprecated use {@link #getMetadata() getMetadata()} instead
+	 */
+	@Override
+	public JobMetadata getMetadata()
+	{
+		return (JobMetadata) getParameter(BundleParameter.JOB_METADATA);
 	}
 
 	/**

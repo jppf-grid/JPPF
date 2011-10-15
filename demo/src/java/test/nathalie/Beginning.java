@@ -4,7 +4,7 @@ import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.node.policy.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 
 public class Beginning
 {
@@ -23,7 +23,7 @@ public class Beginning
     }
     // we execute these tasks on node with id = 1;
     ExecutionPolicy policy = new Equal("id", 1);
-    job.getJobSLA().setExecutionPolicy(policy);
+    ((JPPFJobSLA) job.getSLA()).setExecutionPolicy(policy);
     List<JPPFTask> results = client.submit(job);
     List<String> auxs = new Vector<String>();
     int count = 0;

@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -96,7 +96,7 @@ public class BroadcastJobRunner
 					task.setId("" + (iter+1) + ':' + (i+1));
 					job.addTask(task);
 				}
-				job.getJobSLA().setBroadcastJob(true);
+				((JPPFJobSLA) job.getSLA()).setBroadcastJob(true);
 				// submit the tasks for execution
 				List<JPPFTask> results = jppfClient.submit(job);
 				for (JPPFTask task: results)

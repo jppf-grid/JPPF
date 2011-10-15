@@ -22,6 +22,7 @@ import java.util.concurrent.locks.Lock;
 
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.ChannelJobPair;
 import org.jppf.server.nio.ChannelWrapper;
@@ -207,7 +208,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	{
 		List<ChannelWrapper<?>> idleChannels = server.getIdleChannels();
 		int n = -1;
-		ExecutionPolicy rule = bundle.getJobSLA().getExecutionPolicy();
+		ExecutionPolicy rule = bundle.getSLA().getExecutionPolicy();
 		if (debugEnabled && (rule != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + rule);
 		List<Integer> acceptableChannels = new ArrayList<Integer>();
 		List<Integer> channelsToRemove =  new ArrayList<Integer>();
@@ -267,7 +268,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	 */
 	private boolean checkJobState(JPPFTaskBundle bundle)
 	{
-		JPPFJobSLA sla = bundle.getJobSLA();
+		JobSLA sla = bundle.getSLA();
 		if (debugEnabled)
 		{
 			String s = StringUtils.buildString("job '", bundle.getName(), "' : ",
@@ -299,7 +300,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 		context.checkBundler(server.getBundler());
 		if (context.getBundler() instanceof JobAwareness)
 		{
-			JPPFJobMetadata metadata = taskBundle.getJobMetadata();
+			JobMetadata metadata = taskBundle.getJobMetadata();
 			((JobAwareness) context.getBundler()).setJobMetadata(metadata);
 		}
 	}

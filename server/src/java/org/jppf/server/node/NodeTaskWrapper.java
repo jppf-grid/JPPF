@@ -21,7 +21,8 @@ import java.util.List;
 
 import org.jppf.*;
 import org.jppf.management.JPPFNodeAdmin;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
+import org.jppf.server.protocol.*;
 
 /**
  * Wrapper around a JPPF task used to catch exceptions caused by the task execution.
@@ -129,7 +130,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 	 * @return the task as a <code>JPPFTask</code> instance.
 	 */
 	@Override
-    public JPPFTask getTask()
+    public Task getTask()
 	{
 		return task;
 	}

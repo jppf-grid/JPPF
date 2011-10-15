@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.*;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.node.NodeExecutionManager;
+import org.jppf.node.protocol.*;
 import org.jppf.scheduling.*;
 import org.jppf.server.protocol.*;
 import org.slf4j.*;
@@ -65,7 +66,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	/**
 	 * The list of tasks to execute.
 	 */
-	protected List<JPPFTask> taskList = null;
+	protected List<? extends Task> taskList = null;
 	/**
 	 * The uuid path of the current bundle.
 	 */
@@ -149,7 +150,8 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 			}
 			pairList.add(number);
 		}
-		if ((task.getTimeout() > 0L) || (task.getTimeoutDate() != null))
+		JPPFSchedule schedule = task.getTimeoutSchedule();
+		if ((schedule.getDuration() > 0L) || (schedule.getDate() != null))
 		{
 			processTaskExpirationDate(task, number);
 		}
@@ -167,7 +169,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 		if (requeue)
 		{
 			bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
-			bundle.getJobSLA().setSuspended(true);
+			((JPPFJobSLA) bundle.getSLA()).setSuspended(true);
 		}
 		List<Long> list = new ArrayList<Long>(futureMap.keySet());
 		for (Long n: list) cancelTask(n, callOnCancel);
@@ -386,7 +388,15 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 * {@inheritDoc}
 	 */
 	@Override
-    public List<JPPFTask> getCurrentTasks()
+	public List<Task> getTasks()
+	{
+		return taskList == null ? null : Collections.unmodifiableList(taskList);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<? extends Task> getCurrentTasks()
 	{
 		return taskList == null ? null : Collections.unmodifiableList(taskList);
 	}
@@ -395,7 +405,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String getCurrentJobId()
+	public String getCurrentJobId()
 	{
 		return (bundle != null) ? bundle.getJobUuid() : null;
 	}

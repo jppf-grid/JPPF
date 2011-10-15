@@ -70,7 +70,8 @@ public class TestJPPFTask extends Setup1D1N1C
 	{
 		JPPFJob job = createJob("testTaskTimeoutDuration", 2, TIME_LONG);
 		List<JPPFTask> tasks = job.getTasks();
-		tasks.get(1).setTimeout(TIME_SHORT);
+		JPPFSchedule schedule = new JPPFSchedule(TIME_SHORT);
+		tasks.get(1).setTimeoutSchedule(schedule);
 		List<JPPFTask> results = client.submit(job);
 		assertNotNull(results);
 		assertEquals(results.size(), 2);

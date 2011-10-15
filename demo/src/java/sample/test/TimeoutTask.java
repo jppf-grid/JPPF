@@ -18,6 +18,8 @@
 
 package sample.test;
 
+import org.jppf.scheduling.JPPFSchedule;
+
 
 /**
  * Test task to check that the timeout period triggers the task's abortion.
@@ -30,7 +32,7 @@ public class TimeoutTask extends JPPFTestTask
 	 */
 	public TimeoutTask()
 	{
-		setTimeout(2000L);
+		setTimeoutSchedule(new JPPFSchedule(2000L));
 	}
 
 	/**

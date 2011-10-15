@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.task.storage.ClientDataProvider;
 
 
@@ -37,7 +37,7 @@ public class ClassLoaderTest
 			jppfClient = new JPPFClient();
 			JPPFJob job = new JPPFJob();
 			job.setName("broadcast");
-			job.getJobSLA().setBroadcastJob(true);
+			((JPPFJobSLA) job.getSLA()).setBroadcastJob(true);
 			Map<ByteKey, URL> map = processJars("ClassLoaderTest.jar", "../JPPF/lib/Hazelcast/hazelcast.jar");
 			job.addTask(new JPPFTaskPreInit(map));
 			job.setDataProvider(new ClientDataProvider());

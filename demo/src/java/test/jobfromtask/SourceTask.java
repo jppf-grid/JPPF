@@ -20,7 +20,7 @@ package test.jobfromtask;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.StringUtils;
 
 /**
@@ -52,7 +52,7 @@ public class SourceTask extends JPPFTask
 			print("creating destination job");
 			JPPFJob job = new JPPFJob();
 			job.setName("Destination job");
-			job.getJobSLA().setMaxNodes(1);
+			((JPPFJobSLA) job.getSLA()).setMaxNodes(1);
 			DestinationTask task = new DestinationTask();
 			task.setId("destination");
 			job.addTask(task);

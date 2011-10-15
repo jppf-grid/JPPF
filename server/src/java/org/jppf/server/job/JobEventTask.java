@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
+import org.jppf.node.protocol.JobSLA;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
@@ -74,7 +75,7 @@ public class JobEventTask implements Runnable
 	@Override
     public void run()
 	{
-		JPPFJobSLA sla = bundle.getJobSLA();
+		JobSLA sla = bundle.getSLA();
 		Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
 		JobInformation jobInfo = new JobInformation(bundle.getJobUuid(), bundle.getName(), bundle.getTaskCount(),
 			bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);

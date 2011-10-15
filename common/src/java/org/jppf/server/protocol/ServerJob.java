@@ -21,6 +21,7 @@ package org.jppf.server.protocol;
 import java.util.List;
 
 import org.jppf.io.DataLocation;
+import org.jppf.node.protocol.JPPFDistributedJob;
 
 /**
  * 

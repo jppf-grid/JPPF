@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.text.*;
 import java.util.*;
 
+import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.task.storage.DataProvider;
 
@@ -41,7 +42,7 @@ import org.jppf.task.storage.DataProvider;
  * </pre>
  * @author Laurent Cohen
  */
-public abstract class JPPFTask implements Runnable, Serializable
+public abstract class JPPFTask implements Runnable, Serializable, Task
 {
 	/**
 	 * Explicit serialVersionUID.
@@ -87,9 +88,9 @@ public abstract class JPPFTask implements Runnable, Serializable
 	private String id = null;
 
 	/**
-	 * Get the result of the task execution.
-	 * @return the result as an array of bytes.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public Object getResult()
 	{
 		return result;
@@ -105,10 +106,9 @@ public abstract class JPPFTask implements Runnable, Serializable
 	}
 
 	/**
-	 * Get the exception that was raised by this task's execution. If the task raised a
-	 * {@link Throwable}, the exception is embedded into a {@link org.jppf.JPPFException}.
-	 * @return a <code>Exception</code> instance, or null if no exception was raised.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public Exception getException()
 	{
 		return exception;
@@ -125,9 +125,9 @@ public abstract class JPPFTask implements Runnable, Serializable
 	}
 
 	/**
-	 * Get the provider of shared data for this task.
-	 * @return a <code>DataProvider</code> instance. 
+	 * {@inheritDoc}
 	 */
+	@Override
 	public DataProvider getDataProvider()
 	{
 		return dataProvider;
@@ -184,8 +184,8 @@ public abstract class JPPFTask implements Runnable, Serializable
 	{
 		JPPFTaskEvent event = new JPPFTaskEvent(source);
 		// to avoid ConcurrentModificationException
-        List<JPPFTaskListener> listeners = getListeners();
-        JPPFTaskListener[] array = listeners.toArray(new JPPFTaskListener[listeners.size()]);
+		List<JPPFTaskListener> listeners = getListeners();
+		JPPFTaskListener[] array = listeners.toArray(new JPPFTaskListener[listeners.size()]);
 		for (JPPFTaskListener listener: array) listener.eventOccurred(event);
 	}
 
@@ -200,9 +200,10 @@ public abstract class JPPFTask implements Runnable, Serializable
 	}
 
 	/**
-	 * Get the timeout for this task.
-	 * @return the timeout in milliseconds.
+	 * {@inheritDoc}
+	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
 	 */
+	@Override
 	public long getTimeout()
 	{
 		if (timeoutSchedule == null) return 0L;
@@ -212,6 +213,7 @@ public abstract class JPPFTask implements Runnable, Serializable
 	/**
 	 * Set the timeout for this task.
 	 * @param timeout the timeout in milliseconds.
+	 * @deprecated use a {@link JPPFSchedule} object with {@link #setTimeoutSchedule(org.jppf.scheduling.JPPFSchedule) setTimeoutSchedule(JPPFSchedule)} instead.
 	 */
 	public void setTimeout(long timeout)
 	{
@@ -219,9 +221,10 @@ public abstract class JPPFTask implements Runnable, Serializable
 	}
 
 	/**
-	 * Get the timeout date for this task.
-	 * @return the date in string format.
+	 * {@inheritDoc}
+	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
 	 */
+	@Override
 	public String getTimeoutDate()
 	{
 		if (timeoutSchedule == null) return null;
@@ -229,20 +232,10 @@ public abstract class JPPFTask implements Runnable, Serializable
 	}
 
 	/**
-	 * Get the format of timeout date for this task.
-	 * @return a <code>SimpleDateFormat</code> instance.
-	 * @deprecated use {@link #getTimeoutFormat() getTimeoutFormat()} instead.
+	 * {@inheritDoc}
+	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
 	 */
-	public SimpleDateFormat getTimeoutDateFormat()
-	{
-		if (timeoutSchedule == null) return null;
-		return new SimpleDateFormat(timeoutSchedule.getFormat());
-	}
-
-	/**
-	 * Get the format of timeout date for this task.
-	 * @return the timeout date format as a string pattern, as decribed in the specification for {@link SimpleDateFormat}.
-	 */
+	@Override
 	public String getTimeoutFormat()
 	{
 		if (timeoutSchedule == null) return null;
@@ -251,23 +244,11 @@ public abstract class JPPFTask implements Runnable, Serializable
 
 	/**
 	 * Set the timeout date for this task.<br>
-	 * Calling this method will reset the timeout value, as both timeout duration and timeout date
-	 * are mutually exclusive.
-	 * @param timeoutDate the date to set in string representation.
-	 * @param timeoutDateFormat the format of of the date to set.
-	 * @deprecated use {@link #setTimeoutDate(java.lang.String, java.lang.String) getTimeoutFormat(String, String)} instead.
-	 */
-	public void setTimeoutDate(String timeoutDate, SimpleDateFormat timeoutDateFormat)
-	{
-		timeoutSchedule = new JPPFSchedule(timeoutDate, timeoutDateFormat.toPattern());
-	}
-
-	/**
-	 * Set the timeout date for this task.<br>
 	 * Calling this method will reset the timeout value, as both timeout duration and timeout date are mutually exclusive.
 	 * @param timeoutDate the date to set in string representation.
 	 * @param format the format of of the date to set, as described in the specfication for {@link SimpleDateFormat}.
 	 * @see java.text.SimpleDateFormat
+	 * @deprecated use a {@link JPPFSchedule} object with {@link #setTimeoutSchedule(org.jppf.scheduling.JPPFSchedule) setTimeoutSchedule(JPPFSchedule)} instead.
 	 */
 	public void setTimeoutDate(String timeoutDate, String format)
 	{
@@ -275,9 +256,9 @@ public abstract class JPPFTask implements Runnable, Serializable
 	}
 
 	/**
-	 * Get the user-assigned id for this task.
-	 * @return the id as a string.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getId()
 	{
 		return id;
@@ -321,18 +302,18 @@ public abstract class JPPFTask implements Runnable, Serializable
 
 
 	/**
-	 * Get the <code>JPPFRunnable</code>-annotated object or POJO wrapped by this task.
-	 * @return an objet or class that is JPPF-annotated.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public Object getTaskObject()
 	{
 		return null;
 	}
 
 	/**
-	 * Get the task timeout schedule configuration.
-	 * @return a <code>JPPFScheduleConfiguration</code> instance.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public JPPFSchedule getTimeoutSchedule()
 	{
 		return timeoutSchedule;

@@ -19,8 +19,9 @@
 package org.jppf.example.loadbalancer.server;
 
 import org.jppf.management.JPPFSystemInformation;
+import org.jppf.node.protocol.JobMetadata;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.protocol.JPPFJobMetadata;
+import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
@@ -51,7 +52,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	/**
 	 * Holds metadata about the cuirrent job being dispatched.
 	 */
-	private JPPFJobMetadata jobMetadata = null;
+	private JobMetadata jobMetadata = null;
 	/**
 	 * The current number of tasks to send to the node.
 	 */
@@ -124,7 +125,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	 * @return a {@link JPPFJobMetadata} instance.
 	 * @see org.jppf.server.scheduler.bundle.JobAwareness#getJobMetadata()
 	 */
-	public JPPFJobMetadata getJobMetadata()
+	public JobMetadata getJobMetadata()
 	{
 		return jobMetadata;
 	}
@@ -134,7 +135,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	 * @param metadata a {@link JPPFJobMetadata} instance.
 	 * @see org.jppf.server.scheduler.bundle.JobAwareness#setJobMetadata(org.jppf.server.protocol.JPPFJobMetadata)
 	 */
-	public void setJobMetadata(JPPFJobMetadata metadata)
+	public void setJobMetadata(JobMetadata metadata)
 	{
 		this.jobMetadata = metadata;
 		// compute the number of tasks to send to the node,

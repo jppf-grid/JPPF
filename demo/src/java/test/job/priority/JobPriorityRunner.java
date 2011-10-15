@@ -23,7 +23,7 @@ import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -115,7 +115,7 @@ public class JobPriorityRunner
 	{
 		JPPFJob job = new JPPFJob();
 		job.setName(name);
-		job.getJobSLA().setPriority(priority);
+		((JPPFJobSLA) job.getSLA()).setPriority(priority);
 		for (int i=0; i<nbTasks; i++)
 		{
 			LongTask task = new LongTask(length, false);

@@ -20,7 +20,7 @@ package org.jppf.jca.work.submission;
 import static org.jppf.client.SubmissionStatus.*;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * Wrapper for submitting a job.
@@ -49,7 +49,7 @@ public class JcaJobSubmission extends AbstractJobSubmission
 		ClassLoader oldCl = null;
 		if (!job.getTasks().isEmpty())
 		{
-			JPPFTask task = job.getTasks().get(0);
+			Task task = job.getTasks().get(0);
 			cl = task.getClass().getClassLoader();
 			connection.getClient().addRequestClassLoader(requestUuid, cl);
 			if (JcaSubmissionManager.log.isDebugEnabled()) JcaSubmissionManager.log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);

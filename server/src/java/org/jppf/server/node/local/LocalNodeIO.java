@@ -26,6 +26,7 @@ import java.util.concurrent.*;
 
 import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.DataLocation;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
@@ -143,7 +144,7 @@ public class LocalNodeIO extends AbstractNodeIO
 		bundle.setNodeExecutionTime(elapsed);
 		List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>();
 		futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
-		for (JPPFTask task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
+		for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
 		LocalNodeContext ctx = channel.getChannel();
 		LocalNodeMessage message = (LocalNodeMessage) ctx.newMessage();
 		for (Future<DataLocation> f: futureList)
