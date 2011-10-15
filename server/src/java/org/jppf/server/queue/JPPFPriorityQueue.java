@@ -353,7 +353,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		if (uuidMap.isEmpty()) return;
 		BroadcastJobCompletionListener completionListener = new BroadcastJobCompletionListener(bundleWrapper, uuidMap.keySet());
 		JPPFDistributedJob bundle = bundleWrapper.getJob();
-		JPPFJobSLA sla = (JPPFJobSLA) bundle.getSLA();
+		JobSLA sla = bundle.getSLA();
 		ExecutionPolicy policy = sla.getExecutionPolicy();
 		List<BundleWrapper> jobList = new ArrayList<BundleWrapper>();
 		for (Map.Entry<String, JPPFManagementInfo> entry: uuidMap.entrySet())
@@ -366,8 +366,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			if ((policy != null) && !policy.accepts(info.getSystemInfo())) continue;
 			ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
 			if (policy != null) broadcastPolicy = broadcastPolicy.and(policy);
-			newBundle.setSLA(sla.copy());
-			((JPPFJobSLA) newBundle.getSLA()).setExecutionPolicy(broadcastPolicy);
+			newBundle.setSLA(((JPPFJobSLA) sla).copy());
+			newBundle.getSLA().setExecutionPolicy(broadcastPolicy);
 			newBundle.setCompletionListener(completionListener);
 			newBundle.setParameter(BundleParameter.JOB_ID, bundle.getName() + " [node: " + info.toString() + ']');
 			newBundle.setParameter(BundleParameter.JOB_UUID, new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
@@ -392,7 +392,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			int oldPriority = job.getJob().getSLA().getPriority();
 			if (oldPriority != newPriority)
 			{
-				((JPPFJobSLA) job.getJob().getSLA()).setPriority(newPriority);
+				job.getJob().getSLA().setPriority(newPriority);
 				removeFromListMap(new JPPFPriority(oldPriority), job, priorityMap);
 				putInListMap(new JPPFPriority(newPriority), job, priorityMap);
 				jobManager.jobUpdated(job);

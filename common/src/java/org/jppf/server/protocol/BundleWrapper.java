@@ -166,7 +166,7 @@ public class BundleWrapper implements ServerJob
 	{
 		int n = ((JPPFTaskBundle) other.getJob()).getTaskCount();
 		job.setTaskCount(job.getTaskCount() + n);
-		((JPPFJobSLA) job.getSLA()).setSuspended(other.getJob().getSLA().isSuspended());
+		job.getSLA().setSuspended(other.getJob().getSLA().isSuspended());
 		if (after)
 		{
 			for (DataLocation task: other.getTasks()) tasks.add(task);

@@ -1,18 +1,12 @@
 package test.classloader;
 
-import org.jppf.client.JPPFClient;
-import org.jppf.client.JPPFJob;
-import org.jppf.server.protocol.JPPFJobSLA;
-import org.jppf.task.storage.ClientDataProvider;
-
-import java.io.Closeable;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.io.*;
+import java.net.*;
 import java.security.MessageDigest;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+
+import org.jppf.client.*;
+import org.jppf.task.storage.ClientDataProvider;
 
 /**
  * Created by IntelliJ IDEA.
@@ -63,7 +57,7 @@ public class JPPFUtils {
                 JPPFJob job = new JPPFJob(new ClientDataProvider());
                 job.addTask(new JPPFTaskPreInit(urlMap));
                 job.setBlocking(true);
-                ((JPPFJobSLA) job.getSLA()).setBroadcastJob(true);
+                job.getSLA().setBroadcastJob(true);
                 client.submit(job);
 
                 durInit = System.nanoTime() - durInit;

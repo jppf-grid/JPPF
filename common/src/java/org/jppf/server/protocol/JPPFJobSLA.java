@@ -120,9 +120,9 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	}
 
 	/**
-	 * Set the tasks execution policy.
-	 * @param executionPolicy an <code>ExecutionPolicy</code> instance.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setExecutionPolicy(ExecutionPolicy executionPolicy)
 	{
 		this.executionPolicy = executionPolicy;
@@ -138,9 +138,9 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	}
 
 	/**
-	 * Set the priority of this job.
-	 * @param priority the priority as an int.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setPriority(int priority)
 	{
 		this.priority = priority;
@@ -156,9 +156,9 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	}
 
 	/**
-	 * Set the maximum number of nodes this job can run on.
-	 * @param maxNodes the number of nodes as an int value. A value <= 0 means no limit on the number of nodes.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMaxNodes(int maxNodes)
 	{
 		this.maxNodes = maxNodes > 0 ? maxNodes : Integer.MAX_VALUE;
@@ -174,9 +174,9 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	}
 
 	/**
-	 * Specify whether this job is initially suspended.
-	 * @param suspended true if the job is suspended, false otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setSuspended(boolean suspended)
 	{
 		this.suspended = suspended;
@@ -192,9 +192,9 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	}
 
 	/**
-	 * Set the job schedule.
-	 * @param jobSchedule a <code>JPPFSchedule</code> instance. 
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setJobSchedule(JPPFSchedule jobSchedule)
 	{
 		this.jobSchedule = jobSchedule;
@@ -210,9 +210,9 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	}
 
 	/**
-	 * Set the job expiration schedule configuration.
-	 * @param jobExpirationSchedule a {@link JPPFSchedule} instance.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setJobExpirationSchedule(JPPFSchedule jobExpirationSchedule)
 	{
 		this.jobExpirationSchedule = jobExpirationSchedule;
@@ -228,9 +228,9 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	}
 
 	/**
-	 * Specify whether the job is a broadcast job.
-	 * @param broadcastJob true for a broadcast job, false otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setBroadcastJob(boolean broadcastJob)
 	{
 		this.broadcastJob = broadcastJob;
@@ -246,9 +246,9 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	}
 
 	/**
-	 * Specifiy whether the job should be canceled by the driver if the client gets disconnected.
-	 * @param cancelUponClientDisconnect <code>true</code> if the job should be canceled, <code>false</code> otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setCancelUponClientDisconnect(boolean cancelUponClientDisconnect)
 	{
 		this.cancelUponClientDisconnect = cancelUponClientDisconnect;

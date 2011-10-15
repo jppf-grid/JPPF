@@ -155,7 +155,7 @@ public class MatrixRunner
 		// create a data provider to share matrix b among all tasks
 		job.setDataProvider(new MemoryMapDataProvider());
 		job.getDataProvider().setValue(MatrixTask.DATA_KEY, b);
-		((JPPFJobSLA) job.getSLA()).setExecutionPolicy(policy);
+		job.getSLA().setExecutionPolicy(policy);
 		// submit the tasks for execution
 		List<JPPFTask> results = jppfClient.submit(job);
 		// initialize the resulting matrix

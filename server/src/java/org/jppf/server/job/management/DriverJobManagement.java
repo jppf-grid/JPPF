@@ -24,6 +24,7 @@ import javax.management.*;
 
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
+import org.jppf.node.protocol.JobSLA;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.*;
 import org.jppf.server.protocol.*;
@@ -107,7 +108,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 			return;
 		}
 		if (debugEnabled) log.debug("Request to suspend jobId = '" + bundleWrapper.getJob().getName() + '\'');
-		JPPFJobSLA sla = (JPPFJobSLA) bundleWrapper.getJob().getSLA();
+		JobSLA sla = bundleWrapper.getJob().getSLA();
 		if (sla.isSuspended()) return;
 		sla.setSuspended(true);
 		getJobManager().jobUpdated(bundleWrapper);
@@ -130,7 +131,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 			return;
 		}
 		if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getJob().getName() + '\'');
-		JPPFJobSLA sla = (JPPFJobSLA) bundleWrapper.getJob().getSLA();
+		JobSLA sla = bundleWrapper.getJob().getSLA();
 		if (!sla.isSuspended()) return;
 		sla.setSuspended(false);
 		getJobManager().jobUpdated(bundleWrapper);
@@ -154,8 +155,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		}
 		if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + bundleWrapper.getJob().getName() + '\'');
 		if (maxNodes <= 0) return;
-		JPPFJobSLA sla = (JPPFJobSLA) bundleWrapper.getJob().getSLA();
-		sla.setMaxNodes(maxNodes);
+		bundleWrapper.getJob().getSLA().setMaxNodes(maxNodes);
 		getJobManager().jobUpdated(bundleWrapper);
 	}
 

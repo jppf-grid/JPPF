@@ -36,10 +36,22 @@ public interface JobSLA
 	ExecutionPolicy getExecutionPolicy();
 
 	/**
+	 * Set the tasks execution policy.
+	 * @param executionPolicy an <code>ExecutionPolicy</code> instance.
+	 */
+	void setExecutionPolicy(ExecutionPolicy executionPolicy);
+
+	/**
 	 * Get the priority of this job.
 	 * @return the priority as an int.
 	 */
 	int getPriority();
+
+	/**
+	 * Set the priority of this job.
+	 * @param priority the priority as an int.
+	 */
+	void setPriority(int priority);
 
 	/**
 	 * Get the maximum number of nodes this job can run on.
@@ -48,10 +60,22 @@ public interface JobSLA
 	int getMaxNodes();
 
 	/**
+	 * Set the maximum number of nodes this job can run on.
+	 * @param maxNodes the number of nodes as an int value. A value <= 0 means no limit on the number of nodes.
+	 */
+	void setMaxNodes(int maxNodes);
+
+	/**
 	 * Determine whether this job is initially suspended.
 	 * @return true if the job is suspended, false otherwise.
 	 */
 	boolean isSuspended();
+
+	/**
+	 * Specify whether this job is initially suspended.
+	 * @param suspended true if the job is suspended, false otherwise.
+	 */
+	void setSuspended(boolean suspended);
 
 	/**
 	 * Get the job schedule.
@@ -60,10 +84,22 @@ public interface JobSLA
 	JPPFSchedule getJobSchedule();
 
 	/**
+	 * Set the job schedule.
+	 * @param jobSchedule a <code>JPPFSchedule</code> instance. 
+	 */
+	void setJobSchedule(JPPFSchedule jobSchedule);
+
+	/**
 	 * Get the job expiration schedule configuration.
 	 * @return a {@link JPPFSchedule} instance.
 	 */
 	JPPFSchedule getJobExpirationSchedule();
+
+	/**
+	 * Set the job expiration schedule configuration.
+	 * @param jobExpirationSchedule a {@link JPPFSchedule} instance.
+	 */
+	void setJobExpirationSchedule(JPPFSchedule jobExpirationSchedule);
 
 	/**
 	 * Determine whether the job is a broadcast job.
@@ -72,8 +108,20 @@ public interface JobSLA
 	boolean isBroadcastJob();
 
 	/**
+	 * Specify whether the job is a broadcast job.
+	 * @param broadcastJob true for a broadcast job, false otherwise.
+	 */
+	void setBroadcastJob(boolean broadcastJob);
+
+	/**
 	 * Determine whether the job should be canceled by the driver if the client gets disconnected.
 	 * @return <code>true</code> if the job should be canceled (this is the default), <code>false</code> otherwise.
 	 */
 	boolean isCancelUponClientDisconnect();
+
+	/**
+	 * Specifiy whether the job should be canceled by the driver if the client gets disconnected.
+	 * @param cancelUponClientDisconnect <code>true</code> if the job should be canceled, <code>false</code> otherwise.
+	 */
+	void setCancelUponClientDisconnect(boolean cancelUponClientDisconnect);
 }

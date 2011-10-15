@@ -52,7 +52,7 @@ public class SourceTask extends JPPFTask
 			print("creating destination job");
 			JPPFJob job = new JPPFJob();
 			job.setName("Destination job");
-			((JPPFJobSLA) job.getSLA()).setMaxNodes(1);
+			job.getSLA().setMaxNodes(1);
 			DestinationTask task = new DestinationTask();
 			task.setId("destination");
 			job.addTask(task);

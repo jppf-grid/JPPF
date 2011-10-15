@@ -45,7 +45,7 @@ public class Task1 extends JPPFTask
 			client = new JPPFClient();
 			JPPFJob job = new JPPFJob();
 			job.addTask(new Task2());
-			((JPPFJobSLA) job.getSLA()).setExecutionPolicy(new Equal("id", 2));
+			job.getSLA().setExecutionPolicy(new Equal("id", 2));
 			List<JPPFTask> results = client.submit(job);
 			System.out.println("Result of Task2: [" + results.get(0).getResult() + ']');
 			setResult("Task1 executed successfully");

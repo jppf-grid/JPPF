@@ -74,7 +74,7 @@ public class CascadingTestRunner
 	{
 		JPPFJob job = new JPPFJob();
 		job.addTask(new Task1());
-		((JPPFJobSLA) job.getSLA()).setExecutionPolicy(new Equal("id", 1));
+		job.getSLA().setExecutionPolicy(new Equal("id", 1));
 		List<JPPFTask> results = jppfClient.submit(job);
 		for (JPPFTask task: results)
 		{

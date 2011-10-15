@@ -141,7 +141,7 @@ public class CustomLoadBalancerRunner
 		}
 
 		// Assign an execution policy to the job.
-		((JPPFJobSLA) job.getSLA()).setExecutionPolicy(policy);
+		job.getSLA().setExecutionPolicy(policy);
 
 		// Set the job in non-blocking (asynchonous) mode.
 		job.setBlocking(false);

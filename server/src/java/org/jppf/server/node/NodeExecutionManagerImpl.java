@@ -169,7 +169,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 		if (requeue)
 		{
 			bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
-			((JPPFJobSLA) bundle.getSLA()).setSuspended(true);
+			bundle.getSLA().setSuspended(true);
 		}
 		List<Long> list = new ArrayList<Long>(futureMap.keySet());
 		for (Long n: list) cancelTask(n, callOnCancel);

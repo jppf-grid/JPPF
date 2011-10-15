@@ -115,7 +115,7 @@ public class JobPriorityRunner
 	{
 		JPPFJob job = new JPPFJob();
 		job.setName(name);
-		((JPPFJobSLA) job.getSLA()).setPriority(priority);
+		job.getSLA().setPriority(priority);
 		for (int i=0; i<nbTasks; i++)
 		{
 			LongTask task = new LongTask(length, false);

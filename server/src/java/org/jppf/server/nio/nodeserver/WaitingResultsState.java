@@ -92,7 +92,7 @@ class WaitingResultsState extends NodeServerState
 			if (requeue)
 			{
 				bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
-				((JPPFJobSLA) bundle.getSLA()).setSuspended(true);
+				bundle.getSLA().setSuspended(true);
 				context.setBundle(null);
 				context.setJobCanceled(false);
 				context.resubmitBundle(bundleWrapper);

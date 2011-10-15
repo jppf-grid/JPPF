@@ -27,13 +27,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFJob;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
 
 /**
- * Unit tests for {@link JPPFJobSLA}.
+ * Unit tests for {@link org.jppf.node.protocol.JobSLA JobSLA}.
  * In this class, we test that the behavior is the expected one, from the client point of view,
  * as specified in the job SLA. 
  * @author Laurent Cohen
@@ -71,7 +71,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
 		JPPFJob job = createJob("testJobExpirationAtDate", 1, TIME_LONG);
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 		Date date = new Date(System.currentTimeMillis() + TIME_SHORT);
-		((JPPFJobSLA) job.getSLA()).setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), DATE_FORMAT));
+		job.getSLA().setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), DATE_FORMAT));
 		List<JPPFTask> results = client.submit(job);
 		assertNotNull(results);
 		assertEquals(results.size(), 1);
@@ -89,7 +89,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
 		JPPFJob job = createJob("testJobExpirationAtDateTooLate", 1, TIME_SHORT);
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 		Date date = new Date(System.currentTimeMillis() + TIME_LONG);
-		((JPPFJobSLA) job.getSLA()).setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), DATE_FORMAT));
+		job.getSLA().setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), DATE_FORMAT));
 		List<JPPFTask> results = client.submit(job);
 		assertNotNull(results);
 		assertEquals(results.size(), 1);
@@ -106,7 +106,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
 	public void testJobExpirationAfterDelay() throws Exception
 	{
 		JPPFJob job = createJob("testJobExpirationAfterDelay", 1, TIME_LONG);
-		((JPPFJobSLA) job.getSLA()).setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
+		job.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
 		List<JPPFTask> results = client.submit(job);
 		assertNotNull(results);
 		assertEquals(results.size(), 1);
@@ -122,7 +122,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
 	public void testJobExpirationAfterDelayTooLate() throws Exception
 	{
 		JPPFJob job = createJob("testJobExpirationAfterDelayTooLate", 1, TIME_SHORT);
-		((JPPFJobSLA) job.getSLA()).setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
+		job.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
 		List<JPPFTask> results = client.submit(job);
 		assertNotNull(results);
 		assertEquals(results.size(), 1);
@@ -139,8 +139,8 @@ public class TestJPPFJobSLA extends Setup1D1N1C
 	public void testSuspendedJobExpiration() throws Exception
 	{
 		JPPFJob job = createJob("testJobExpirationAfterDelay", 1, TIME_LONG);
-		((JPPFJobSLA) job.getSLA()).setSuspended(true);
-		((JPPFJobSLA) job.getSLA()).setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
+		job.getSLA().setSuspended(true);
+		job.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
 		List<JPPFTask> results = client.submit(job);
 		assertNotNull(results);
 		assertEquals(results.size(), 1);

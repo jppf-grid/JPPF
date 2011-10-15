@@ -96,7 +96,7 @@ public class BroadcastJobRunner
 					task.setId("" + (iter+1) + ':' + (i+1));
 					job.addTask(task);
 				}
-				((JPPFJobSLA) job.getSLA()).setBroadcastJob(true);
+				job.getSLA().setBroadcastJob(true);
 				// submit the tasks for execution
 				List<JPPFTask> results = jppfClient.submit(job);
 				for (JPPFTask task: results)

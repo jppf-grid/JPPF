@@ -110,7 +110,7 @@ public class PriorityTestRunner
 	{
 		JPPFJob job = new JPPFJob();
 		job.addTask(task);
-		((JPPFJobSLA) job.getSLA()).setPriority(priority);
+		job.getSLA().setPriority(priority);
 		job.setBlocking(false);
 		job.setResultListener(new JPPFResultCollector(1));
 		return job;

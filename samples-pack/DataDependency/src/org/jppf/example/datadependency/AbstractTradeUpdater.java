@@ -246,7 +246,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 			job.setName("Job (" + jobCount.incrementAndGet() + ")");
 			job.setBlocking(false);
 			// set an execution policy that forces execution on the node with the specified id
-			((JPPFJobSLA) job.getSLA()).setExecutionPolicy(new Equal("jppf.uuid", false, nodeId));
+			job.getSLA().setExecutionPolicy(new Equal("jppf.uuid", false, nodeId));
 			JPPFResultCollector collector = new JPPFResultCollector(tradeIdList.size());
 			job.setResultListener(collector);
 			// create a task for each trade
@@ -272,7 +272,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 				job.setName("[Node id=" + nodeId + "] trade=" + tradeId + " (" + jobCount.incrementAndGet() + ")");
 				job.setBlocking(false);
 				// set an execution policy that forces execution on the node with the specified id
-				((JPPFJobSLA) job.getSLA()).setExecutionPolicy(policy);
+				job.getSLA().setExecutionPolicy(policy);
 				JPPFResultCollector collector = new JPPFResultCollector(1);
 				job.setResultListener(collector);
 				job.addTask(createTask(tradeId));

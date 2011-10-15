@@ -23,7 +23,7 @@ public class Beginning
     }
     // we execute these tasks on node with id = 1;
     ExecutionPolicy policy = new Equal("id", 1);
-    ((JPPFJobSLA) job.getSLA()).setExecutionPolicy(policy);
+    job.getSLA().setExecutionPolicy(policy);
     List<JPPFTask> results = client.submit(job);
     List<String> auxs = new Vector<String>();
     int count = 0;
