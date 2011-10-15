@@ -64,6 +64,10 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	 * Specifies whether the job is a broadcast job.
 	 */
 	private boolean broadcastJob = false;
+	/**
+	 * Determines whether the job should be canceled by the driver if the client gets disconnected.
+	 */
+	private boolean cancelUponClientDisconnect = true;
 
 	/**
 	 * Default constructor.
@@ -233,6 +237,24 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isCancelUponClientDisconnect()
+	{
+		return cancelUponClientDisconnect;
+	}
+
+	/**
+	 * Specifiy whether the job should be canceled by the driver if the client gets disconnected.
+	 * @param cancelUponClientDisconnect <code>true</code> if the job should be canceled, <code>false</code> otherwise.
+	 */
+	public void setCancelUponClientDisconnect(boolean cancelUponClientDisconnect)
+	{
+		this.cancelUponClientDisconnect = cancelUponClientDisconnect;
+	}
+
+	/**
 	 * Create a copy of this job SLA.
 	 * @return a {@link JPPFJobSLA} instance.
 	 */
@@ -246,6 +268,7 @@ public class JPPFJobSLA implements Serializable, JobSLA
 		sla.setMaxNodes(maxNodes);
 		sla.setPriority(priority);
 		sla.setSuspended(suspended);
+		sla.setCancelUponClientDisconnect(cancelUponClientDisconnect);
 		return sla;
 	}
 }

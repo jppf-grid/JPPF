@@ -71,4 +71,9 @@ public interface JobSLA
 	 */
 	boolean isBroadcastJob();
 
+	/**
+	 * Determine whether the job should be canceled by the driver if the client gets disconnected.
+	 * @return <code>true</code> if the job should be canceled (this is the default), <code>false</code> otherwise.
+	 */
+	boolean isCancelUponClientDisconnect();
 }

@@ -318,16 +318,19 @@ public class ClientContext extends AbstractNioContext<ClientState>
 			currentJobId = null;
 			JPPFTaskBundle header = (JPPFTaskBundle) initialBundleWrapper.getJob();
 			header.setCompletionListener(null);
-			JMXDriverConnectionWrapper wrapper = new JMXDriverConnectionWrapper();
-			wrapper.connect();
-			try
+			if (header.getSLA().isCancelUponClientDisconnect())
 			{
-				wrapper.cancelJob(header.getJobUuid());
-			}
-			catch (Exception e)
-			{
-				if (debugEnabled) log.error(e.getMessage(), e);
-				else log.warn(e.getMessage());
+				JMXDriverConnectionWrapper wrapper = new JMXDriverConnectionWrapper();
+				wrapper.connect();
+				try
+				{
+					wrapper.cancelJob(header.getJobUuid());
+				}
+				catch (Exception e)
+				{
+					if (debugEnabled) log.error(e.getMessage(), e);
+					else log.warn(e.getMessage());
+				}
 			}
 			jobManager.jobEnded(initialBundleWrapper);
 			initialBundleWrapper = null;
