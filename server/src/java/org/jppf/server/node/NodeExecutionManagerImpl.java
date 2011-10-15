@@ -151,7 +151,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 			pairList.add(number);
 		}
 		JPPFSchedule schedule = task.getTimeoutSchedule();
-		if ((schedule.getDuration() > 0L) || (schedule.getDate() != null))
+		if ((schedule != null) && ((schedule.getDuration() > 0L) || (schedule.getDate() != null)))
 		{
 			processTaskExpirationDate(task, number);
 		}

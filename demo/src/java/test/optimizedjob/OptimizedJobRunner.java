@@ -20,6 +20,7 @@ package test.optimizedjob;
 import java.util.*;
 
 import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
@@ -81,7 +82,15 @@ public class OptimizedJobRunner
 		List<JPPFJob> jobs = new ArrayList<JPPFJob>();
 		for (int i=0; i<nbJobs; i++)
 		{
-			JPPFJob job = new JPPFJob();
+			final JPPFJob job = new JPPFJob();
+			job.addJobListener(new JobListener() {
+				public void jobStarted(JobEvent event) {
+					output("Job '" + job.getName() + "' starting"); 
+				}
+				public void jobEnded(JobEvent event) {
+					output("Job '" + job.getName() + "' ended"); 
+				}
+			});
 			job.setName("demo job " + (i+1));
 			for (int j=0; j<nbTasks; j++) job.addTask(new OptimizedJobTask(time, (j+1)));
 			JPPFResultCollector collector = new JPPFResultCollector(job);

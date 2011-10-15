@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import org.jppf.JPPFException;
-import org.jppf.client.event.TaskResultListener;
+import org.jppf.client.event.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
@@ -84,6 +84,10 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * The object that holds the results of executed tasks.
 	 */
 	private final JobResults results = new JobResults();
+	/**
+	 * The list of listeners registered with this job.
+	 */
+	private final List<JobListener> listeners = new ArrayList<JobListener>();
 
 	/**
 	 * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -438,5 +442,53 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	public JobResults getResults()
 	{
 		return results;
+	}
+
+	/**
+	 * Add a listener to the list of job listeners.
+	 * @param listener a {@link JobListener} instance.
+	 */
+	public void addJobListener(JobListener listener)
+	{
+		synchronized(listeners)
+		{
+			listeners.add(listener);
+		}
+	}
+
+	/**
+	 * Add a listener to the list of job listeners.
+	 * @param listener a {@link JobListener} instance.
+	 */
+	public void removeJobListener(JobListener listener)
+	{
+		synchronized(listeners)
+		{
+			listeners.remove(listener);
+		}
+	}
+
+	/**
+	 * Notify all listeners of the specified event type.
+	 * @param type the type of the event.
+	 */
+	public void fireJobEvent(JobEvent.Type type)
+	{
+		JobEvent event = new JobEvent(this);
+		synchronized(listeners)
+		{
+			for (JobListener listener: listeners)
+			{
+				switch(type)
+				{
+					case JOB_START:
+						listener.jobStarted(event);
+						break;
+					case JOB_END:
+						listener.jobEnded(event);
+						break;
+				}
+			}
+		}
 	}
 }

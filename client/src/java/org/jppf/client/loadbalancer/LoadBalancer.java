@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
+import org.jppf.client.event.JobEvent.Type;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.proportional.ProportionalTuneProfile;
@@ -165,15 +166,19 @@ public class LoadBalancer
 				}
 				ExecutionThread[] threads = { new LocalExecutionThread(list.get(LOCAL), job, this), new RemoteExecutionThread(list.get(REMOTE), job, connection, this) };
 				for (int i=LOCAL; i<=REMOTE; i++) threads[i].setContextClassLoader(Thread.currentThread().getContextClassLoader());
+				job.fireJobEvent(Type.JOB_START);
 				for (int i=LOCAL; i<=REMOTE; i++) threads[i].start();
 				for (int i=LOCAL; i<=REMOTE; i++) threads[i].join();
+				job.fireJobEvent(Type.JOB_END);
 				for (int i=LOCAL; i<=REMOTE; i++) if (threads[i].getException() != null) throw threads[i].getException();
 			}
 			else
 			{
 				if (debugEnabled) log.debug("purely local execution for job '" + job.getName() + '\'');
 				ExecutionThread localThread = new LocalExecutionThread(tasks, job, this);
+				job.fireJobEvent(Type.JOB_START);
 				localThread.run();
+				job.fireJobEvent(Type.JOB_END);
 				if (localThread.getException() != null) throw localThread.getException();
 			}
 		}
@@ -181,7 +186,9 @@ public class LoadBalancer
 		{
 			if (debugEnabled) log.debug("purely remote execution for job '" + job.getName() + '\'');
 			ExecutionThread remoteThread = new RemoteExecutionThread(job.getPendingTasks(), job, connection, this);
+			job.fireJobEvent(Type.JOB_START);
 			remoteThread.run();
+			job.fireJobEvent(Type.JOB_END);
 			if (remoteThread.getException() != null) throw remoteThread.getException();
 		}
 		else throw new JPPFException("Null driver connection and local executor is "  + (localEnabled ? "busy" : "disabled"));
