@@ -28,6 +28,7 @@ import org.jppf.comm.recovery.RecoveryServer;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.server.debug.*;
+import org.jppf.server.event.NodeConnectionEventHandler;
 import org.jppf.server.peer.*;
 import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.utils.*;
@@ -79,6 +80,10 @@ public class DriverInitializer
 	 * The server used to detect that individual connections are broken due to hardware failures.
 	 */
 	private RecoveryServer recoveryServer = null;
+	/**
+	 * Handles listeners to node connection events.
+	 */
+	private final NodeConnectionEventHandler nodeConnectionEventHandler = new NodeConnectionEventHandler();
 
 	/**
 	 * Instantiate this initializer with the specified driver.
@@ -149,27 +154,6 @@ public class DriverInitializer
 		}
 		return connectionInfo;
 	}
-	/*
-	public JPPFConnectionInformation getConnectionInformation()
-	{
-		if (connectionInfo == null)
-		{
-			connectionInfo = new JPPFConnectionInformation();
-			connectionInfo.uuid = driver.getUuid();
-			String s = config.getString("class.server.port", "11111");
-			connectionInfo.classServerPorts = StringUtils.parseIntValues(s);
-			s = config.getString("app.server.port", "11112");
-			connectionInfo.applicationServerPorts = StringUtils.parseIntValues(s);
-			s = config.getString("node.server.port", "11113");
-			connectionInfo.nodeServerPorts = StringUtils.parseIntValues(s);
-			connectionInfo.host = NetworkUtils.getManagementHost();
-			if (config.getBoolean("jppf.management.enabled", true)) connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
-			boolean recoveryEnabled = config.getBoolean("jppf.recovery.enabled", false);
-			if (recoveryEnabled) connectionInfo.recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
-		}
-		return connectionInfo;
-	}
-	*/
 
     /**
 	 * Initialize and start the discovery service.
@@ -334,5 +318,14 @@ public class DriverInitializer
 	public ServerDebug getServerDebug()
 	{
 		return serverDebug;
+	}
+
+	/**
+	 * Get the object that handles listeners to node connection events.
+	 * @return a {@link NodeConnectionEventHandler} instance.
+	 */
+	public NodeConnectionEventHandler getNodeConnectionEventHandler()
+	{
+		return nodeConnectionEventHandler;
 	}
 }

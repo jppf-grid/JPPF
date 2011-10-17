@@ -21,7 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import java.util.List;
 
 import org.jppf.io.*;
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.management.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;

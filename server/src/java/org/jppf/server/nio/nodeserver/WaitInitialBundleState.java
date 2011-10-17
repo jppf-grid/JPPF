@@ -60,7 +60,7 @@ class WaitInitialBundleState extends NodeServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-    public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
 		if (debugEnabled) log.debug("exec() for " + wrapper);
@@ -93,6 +93,7 @@ class WaitInitialBundleState extends NodeServerState
 					JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE);
 					if (systemInfo != null) info.setSystemInfo(systemInfo);
 					driver.getNodeHandler().addNodeInformation(wrapper, info);
+					driver.getInitializer().getNodeConnectionEventHandler().fireNodeConnected(info);
 				}
 			}
 			// make sure the context is reset so as not to resubmit the last bundle executed by the node.

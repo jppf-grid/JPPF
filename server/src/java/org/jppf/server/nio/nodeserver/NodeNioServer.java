@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.comm.recovery.*;
 import org.jppf.io.MultipleBuffersLocation;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.*;
@@ -68,7 +69,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	/**
 	 * Holds the currently idle channels.
 	 */
-	private final List<ChannelWrapper<?>> idleChannels = new ArrayList<ChannelWrapper<?>>();
+	private final List<ChannelWrapper<?>> idleChannels = new ArrayList<ChannelWrapper<?>>(100);
 	/**
 	 * A reference to the driver's tasks queue.
 	 */
@@ -314,6 +315,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 		}
 		try
 		{
+			JPPFManagementInfo info = driver.getNodeHandler().getNodeInformation(channel);
+			if (info == null) info = new JPPFManagementInfo("unknown host", -1, "unknown id");
+			driver.getInitializer().getNodeConnectionEventHandler().fireNodeDisconnected(info);
 			driver.getStatsManager().nodeConnectionClosed();
 			NodeNioServer server = driver.getNodeNioServer();
 			driver.getNodeHandler().removeNodeInformation(channel);

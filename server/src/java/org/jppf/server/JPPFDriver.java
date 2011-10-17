@@ -141,19 +141,15 @@ public class JPPFDriver
 		TypedProperties config = JPPFConfiguration.getProperties();
 
 		initializer.registerDebugMBean();
+		new JPPFStartupLoader().load(JPPFDriverStartupSPI.class);
+		initializer.getNodeConnectionEventHandler().loadListeners();
 		initializer.initRecoveryServer();
 
-        RecoveryServer recoveryServer = initializer.getRecoveryServer();
-		//classServer = new ClassNioServer(info.classServerPorts);
-        classServer = startServer(recoveryServer, new ClassNioServer(null), null);
-
-		//clientNioServer = new ClientNioServer(info.applicationServerPorts);
-        clientNioServer = startServer(recoveryServer, new ClientNioServer(null), null);
-
-		//nodeNioServer = new NodeNioServer(info.nodeServerPorts);
-        nodeNioServer = startServer(recoveryServer, new NodeNioServer(null), null);
-
-        acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts), info.serverPorts);
+		RecoveryServer recoveryServer = initializer.getRecoveryServer();
+		classServer = startServer(recoveryServer, new ClassNioServer(null), null);
+		clientNioServer = startServer(recoveryServer, new ClientNioServer(null), null);
+		nodeNioServer = startServer(recoveryServer, new NodeNioServer(null), null);
+		acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts), info.serverPorts);
 		
 		if (config.getBoolean("jppf.local.node.enabled", false))
 		{
@@ -166,7 +162,6 @@ public class JPPFDriver
 		}
 		
 		initializer.initJmxServer();
-		new JPPFStartupLoader().load(JPPFDriverStartupSPI.class);
 
 		initializer.initBroadcaster();
 		initializer.initPeers(classServer);
@@ -280,25 +275,25 @@ public class JPPFDriver
 		log.info("Shutting down");
 		initializer.stopBroadcaster();
 		initializer.stopPeerDiscoveryThread();
-        if(classServer != null) {
-		    classServer.end();
-		    classServer = null;
-        }
+		if(classServer != null) {
+			classServer.end();
+			classServer = null;
+		}
 		if (nodeNioServer != null)
 		{
 			nodeNioServer.end();
 			nodeNioServer = null;
 		}
-        if (acceptorServer != null)
-        {
-            acceptorServer.end();
-            acceptorServer = null;
-        }
-        if (clientNioServer != null)
-        {
-            clientNioServer.end();
-            clientNioServer = null;
-        }
+		if (acceptorServer != null)
+		{
+			acceptorServer.end();
+			acceptorServer = null;
+		}
+		if (clientNioServer != null)
+		{
+			clientNioServer.end();
+			clientNioServer = null;
+		}
 		initializer.stopJmxServer();
 		jobManager.close();
 		initializer.stopRecoveryServer();
