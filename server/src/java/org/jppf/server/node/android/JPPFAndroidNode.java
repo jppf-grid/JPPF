@@ -64,7 +64,7 @@ public class JPPFAndroidNode extends AbstractJPPFAndroidNode
 			if (debugEnabled) log.debug("Initializing socket");
 			TypedProperties props = JPPFConfiguration.getProperties();
 			String host = props.getString("jppf.server.host", "localhost");
-			int port = props.getInt("node.server.port", 11113);
+			int port = props.getInt("jppf.server.port", 11111);
 			socketClient = new SocketClient();
 			//socketClient = new SocketConnectorWrapper();
 			socketClient.setHost(host);

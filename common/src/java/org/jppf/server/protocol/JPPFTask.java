@@ -42,7 +42,7 @@ import org.jppf.task.storage.DataProvider;
  * </pre>
  * @author Laurent Cohen
  */
-public abstract class JPPFTask implements Runnable, Serializable, Task
+public abstract class JPPFTask implements Task
 {
 	/**
 	 * Explicit serialVersionUID.
@@ -97,9 +97,9 @@ public abstract class JPPFTask implements Runnable, Serializable, Task
 	}
 
 	/**
-	 * Set the result of the task execution.
-	 * @param  result the result of this task's execution.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setResult(Object  result)
 	{
 		this.result = result;
@@ -115,10 +115,9 @@ public abstract class JPPFTask implements Runnable, Serializable, Task
 	}
 
 	/**
-	 * Sets the exception that was raised by this task's execution in the <code>run</code> method.
-	 * The exception is set by the JPPF framework.
-	 * @param exception a <code>ClientApplicationException</code> instance.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setException(Exception exception)
 	{
 		this.exception = exception;
@@ -134,9 +133,9 @@ public abstract class JPPFTask implements Runnable, Serializable, Task
 	}
 
 	/**
-	 * Set the provider of shared data for this task.
-	 * @param dataProvider a <code>DataProvider</code> instance.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setDataProvider(DataProvider dataProvider)
 	{
 		this.dataProvider = dataProvider;
@@ -195,7 +194,7 @@ public abstract class JPPFTask implements Runnable, Serializable, Task
 	 */
 	protected synchronized List<JPPFTaskListener> getListeners()
 	{
-		if (listeners == null) listeners = new ArrayList<JPPFTaskListener>();
+		if (listeners == null) listeners = new LinkedList<JPPFTaskListener>();
 		return listeners;
 	}
 
@@ -203,7 +202,6 @@ public abstract class JPPFTask implements Runnable, Serializable, Task
 	 * {@inheritDoc}
 	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
 	 */
-	@Override
 	public long getTimeout()
 	{
 		if (timeoutSchedule == null) return 0L;
@@ -224,7 +222,6 @@ public abstract class JPPFTask implements Runnable, Serializable, Task
 	 * {@inheritDoc}
 	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
 	 */
-	@Override
 	public String getTimeoutDate()
 	{
 		if (timeoutSchedule == null) return null;
@@ -235,7 +232,6 @@ public abstract class JPPFTask implements Runnable, Serializable, Task
 	 * {@inheritDoc}
 	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
 	 */
-	@Override
 	public String getTimeoutFormat()
 	{
 		if (timeoutSchedule == null) return null;
@@ -265,41 +261,37 @@ public abstract class JPPFTask implements Runnable, Serializable, Task
 	}
 
 	/**
-	 * Set the user-assigned id for this task.
-	 * @param id the id as a string.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setId(String id)
 	{
 		this.id = id;
 	}
 
 	/**
-	 * Callback invoked when this task is cancelled.
-	 * The default implementation does nothing and should be overriden by
-	 * subclasses that desire to implement a specific behaviour on cancellation.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void onCancel()
 	{
 	}
 
 	/**
-	 * Callback invoked when this task is restarted.
-	 * The default implementation does nothing and should be overriden by
-	 * subclasses that desire to implement a specific behaviour on restart.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void onRestart()
 	{
 	}
 
 	/**
-	 * Callback invoked when this task times out.
-	 * The default implementation does nothing and should be overriden by
-	 * subclasses that desire to implement a specific behaviour on timeout.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void onTimeout()
 	{
 	}
-
 
 	/**
 	 * {@inheritDoc}
@@ -320,9 +312,9 @@ public abstract class JPPFTask implements Runnable, Serializable, Task
 	}
 
 	/**
-	 * Get the task timeout schedule configuration.
-	 * @param timeoutSchedule a <code>JPPFScheduleConfiguration</code> instance. 
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setTimeoutSchedule(JPPFSchedule timeoutSchedule)
 	{
 		this.timeoutSchedule = timeoutSchedule;

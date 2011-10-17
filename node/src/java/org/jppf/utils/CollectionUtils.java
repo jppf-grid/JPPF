@@ -55,7 +55,7 @@ public final class CollectionUtils
 	 */
 	public static <T> List<T> list(T...array)
 	{
-		List<T> list = new ArrayList<T>();
+		List<T> list = new ArrayList<T>(array.length);
 		for (T element: array) list.add(element);
 		return list;
 	}
@@ -71,7 +71,9 @@ public final class CollectionUtils
 	public static <T> T[] concatArrays(T[]...arrays)
 	{
 		if (arrays == null) return null;
-		List<T> result = new ArrayList<T>();
+		int size = 0;
+		for (T[] array: arrays) size += array.length;
+		List<T> result = new ArrayList<T>(size);
 		T[] tmp = null;
 		for (T[] array: arrays)
 		{
@@ -165,7 +167,7 @@ public final class CollectionUtils
 	 */
 	public static <T> List<T> getAllElements(List<T> source, int start, int size)
 	{
-		List<T> result = new ArrayList<T>();
+		List<T> result = new ArrayList<T>(size);
 		for (int i=0; i<size; i++) result.add(source.get(i+start));
 		return result;
 	}

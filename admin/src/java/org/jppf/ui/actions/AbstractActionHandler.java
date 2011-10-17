@@ -33,7 +33,7 @@ public abstract class AbstractActionHandler implements ActionHandler
 	/**
 	 * List of elements selected in the managed component.
 	 */
-	protected List<Object> selectedElements = new ArrayList<Object>();
+	protected List<Object> selectedElements = new LinkedList<Object>();
 
 	/**
 	 * Add an action with the specified name to this action manager.

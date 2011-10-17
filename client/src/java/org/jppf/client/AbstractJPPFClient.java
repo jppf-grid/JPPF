@@ -63,7 +63,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	/**
 	 * A list of all the connections initially created. 
 	 */
-	protected List<JPPFClientConnection> allConnections = new ArrayList<JPPFClientConnection>();
+	protected List<JPPFClientConnection> allConnections = new LinkedList<JPPFClientConnection>();
 	/**
 	 * List of listeners to this JPPF client.
 	 */
@@ -99,7 +99,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public List<JPPFClientConnection> getAllConnections()
 	{
-		return new ArrayList<JPPFClientConnection>(allConnections);
+		return Collections.unmodifiableList((allConnections));
 	}
 
 	/**
@@ -108,7 +108,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public List<String> getAllConnectionNames()
 	{
-		List<String> names = new ArrayList<String>();
+		List<String> names = new LinkedList<String>();
 		for (JPPFClientConnection c: allConnections) names.add(c.getName());
 		return names;
 	}

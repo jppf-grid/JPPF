@@ -35,8 +35,7 @@ public class PoolConfigGenerator
 		try
 		{
 			String driverHost = "cyffcb1-a";
-			int classPort = 11111;
-			int appPort = 11112;
+			int port = 11111;
 			String jmxHost = "cyffcb1-a";
 			int jmxPort = 11198;
 			int priority = 1;
@@ -50,8 +49,7 @@ public class PoolConfigGenerator
 			{
 				String name = "d" + i;
 				sb.append(name).append(".jppf.server.host = ").append(driverHost).append('\n');
-				sb.append(name).append(".class.server.port = ").append(classPort).append('\n');
-				sb.append(name).append(".app.server.port = ").append(appPort).append('\n');
+				sb.append(name).append(".jppf.server.port = ").append(port).append('\n');
 				sb.append(name).append(".priority = ").append(priority).append('\n');
 				sb.append(name).append(".jppf.management.host = ").append(jmxHost).append('\n');
 				sb.append(name).append(".jppf.management.port = ").append(jmxPort).append('\n');

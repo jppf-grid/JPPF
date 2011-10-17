@@ -44,7 +44,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 	/**
 	 * The UDP sockets to broadcast to, each bound to a different network interface.
 	 */
-	private List<Pair<MulticastSocket, DatagramPacket>> socketsInfo = new ArrayList<Pair<MulticastSocket, DatagramPacket>>();
+	private List<Pair<MulticastSocket, DatagramPacket>> socketsInfo;
 	/**
 	 * Frequency of the broadcast in milliseconds.
 	 */
@@ -85,6 +85,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 			for (InetAddress addr: addresses) sb.append(' ').append(addr.getHostAddress());
 			log.debug(sb.toString());
 		}
+		socketsInfo = new ArrayList<Pair<MulticastSocket, DatagramPacket>>(addresses.size());
 		for (InetAddress addr: addresses)
 		{
 			try
@@ -113,7 +114,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

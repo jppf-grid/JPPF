@@ -42,7 +42,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	/**
 	 * The list of command-line arguments.
 	 */
-	private List<String> commandList = new ArrayList<String>();
+	private List<String> commandList = new LinkedList<String>();
 	/**
 	 * The environment variables to set.
 	 */

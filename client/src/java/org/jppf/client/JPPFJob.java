@@ -87,7 +87,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * The list of listeners registered with this job.
 	 */
-	private final List<JobListener> listeners = new ArrayList<JobListener>();
+	private final List<JobListener> listeners = new LinkedList<JobListener>();
 
 	/**
 	 * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.

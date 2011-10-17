@@ -82,7 +82,6 @@ public class GridMonitor
 	 * Interval at which memory usage snapshots are taken.
 	 */
 	private long snapshotInterval = 1000L;
-
 	/**
 	 * The time at which this monitor is started.
 	 */
@@ -304,7 +303,7 @@ public class GridMonitor
 		 * {@inheritDoc}
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			try
 			{
@@ -328,7 +327,7 @@ public class GridMonitor
 						List<NodeData> list = dataMap.get(id);
 						if (list == null)
 						{
-							list = new ArrayList<NodeData>();
+							list = new LinkedList<NodeData>();
 							dataMap.put(id, list);
 						}
 						list.add(data);

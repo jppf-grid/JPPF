@@ -42,7 +42,7 @@ class FutureResultCollector extends JPPFResultCollector
 	/**
 	 * A lst of the listeners to this results collector.
 	 */
-	private List<FutureResultCollectorListener> listeners = new ArrayList<FutureResultCollectorListener>();
+	private List<FutureResultCollectorListener> listeners = new LinkedList<FutureResultCollectorListener>();
 	/**
 	 * The uuid of the corresponding job.
 	 */

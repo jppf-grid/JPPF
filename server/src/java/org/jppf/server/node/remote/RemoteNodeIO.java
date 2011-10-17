@@ -83,15 +83,14 @@ public class RemoteNodeIO extends AbstractNodeIO
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
+	protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
 	{
-		List<Object> list = new LinkedList<Object>();
-		list.add(bundle);
+		bundle.setNodeExecutionTime(System.nanoTime());
+		int count = bundle.getTaskCount();
+		List<Object> list = new ArrayList<Object>(count + 2);
 		try
 		{
-			//bundle.setNodeExecutionTime(System.currentTimeMillis());
-			bundle.setNodeExecutionTime(System.nanoTime());
-			int count = bundle.getTaskCount();
+			list.add(bundle);
 			if (debugEnabled) log.debug("bundle task count = " + count + ", state = " + bundle.getState());
 			if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 			{
@@ -121,7 +120,7 @@ public class RemoteNodeIO extends AbstractNodeIO
 	 * @see org.jppf.server.node.AbstractNodeIO#handleReload()
 	 */
 	@Override
-    protected void handleReload() throws Exception
+	protected void handleReload() throws Exception
 	{
 		node.setClassLoader(null);
 		node.initHelper();
@@ -142,7 +141,7 @@ public class RemoteNodeIO extends AbstractNodeIO
 		//long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		long elapsed = (System.nanoTime() - bundle.getNodeExecutionTime())/1000000;
 		bundle.setNodeExecutionTime(elapsed);
-		List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>();
+		List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>(tasks.size() + 1);
 		futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
 		for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
 		OutputDestination dest = new SocketWrapperOutputDestination(socketWrapper);

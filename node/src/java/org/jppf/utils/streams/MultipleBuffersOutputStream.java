@@ -50,7 +50,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	/**
 	 * Contains the data written to this ouptput stream, as a sequence of {@link JPPFBuffer} instances.
 	 */
-	private List<JPPFBuffer> list = new ArrayList<JPPFBuffer>();
+	private final List<JPPFBuffer> list;
 	/**
 	 * The JPPFBuffer currently being written to.
 	 */
@@ -73,6 +73,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 */
 	public MultipleBuffersOutputStream()
 	{
+		list = new ArrayList<JPPFBuffer>();
 	}
 
 	/**
@@ -81,6 +82,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 */
 	public MultipleBuffersOutputStream(List<JPPFBuffer> initialList)
 	{
+		list = new ArrayList<JPPFBuffer>(initialList.size() + 10);
 		for (JPPFBuffer buf: initialList) this.list.add(new JPPFBuffer(buf.buffer, 0));
 		hasInitialBuffers = true;
 	}
@@ -92,6 +94,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 */
 	public MultipleBuffersOutputStream(int defaultLength) throws IllegalArgumentException
 	{
+		list = new ArrayList<JPPFBuffer>();
 		if (defaultLength <= 0) throw new IllegalArgumentException("the default buffer length must be > 0");
 		this.defaultLength = defaultLength;
 	}
@@ -103,7 +106,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 * @see java.io.OutputStream#write(int)
 	 */
 	@Override
-    public void write(int b) throws IOException
+	public void write(int b) throws IOException
 	{
 		if ((currentBuffer == null) || (currentBuffer.remaining() < 1)) newCurrentBuffer(defaultLength);
 		currentBuffer.buffer[currentBuffer.length] = (byte) b;
@@ -121,21 +124,12 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 * @see java.io.OutputStream#write(byte[], int, int)
 	 */
 	@Override
-    public void write(byte[] b, int off, int len) throws IOException
+	public void write(byte[] b, int off, int len) throws IOException
 	{
-		/*
-		if (b == null) throw new NullPointerException("the input buffer must not be null");
-		if ((off < 0) || (off > b.length) || (len < 0) || (off + len > b.length))
-			throw new ArrayIndexOutOfBoundsException("b.length=" + b.length + ", off=" + off + ", len=" + len);
-		*/
 		if ((currentBuffer == null) || (currentBuffer.remaining() < len)) newCurrentBuffer(Math.max(defaultLength, len));
 		System.arraycopy(b, off, currentBuffer.buffer, currentBuffer.length, len);
 		currentBuffer.length += len;
 		totalSize += len;
-		/*
-		if (traceEnabled) log.trace("wrote " + len + " bytes to " + this +
-			", bytes = " + StringUtils.dumpBytes(currentBuffer.buffer, currentBuffer.length - len, Math.min(100, len)));
-		*/
 	}
 
 	/**
@@ -145,7 +139,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 * @see java.io.OutputStream#write(byte[])
 	 */
 	@Override
-    public void write(byte[] b) throws IOException
+	public void write(byte[] b) throws IOException
 	{
 		write(b, 0, b.length);
 	}
@@ -208,7 +202,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(getClass().getSimpleName()).append('[');

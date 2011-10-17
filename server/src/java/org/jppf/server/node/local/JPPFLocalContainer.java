@@ -80,7 +80,7 @@ public class JPPFLocalContainer extends JPPFContainer
 			Thread.currentThread().setContextClassLoader(classLoader);
 			LocalNodeMessage message = channel.getNodeResource();
 			List<DataLocation> locations = message.getLocations();
-			List<Future<Object>> futureList = new ArrayList<Future<Object>>();
+			List<Future<Object>> futureList = new ArrayList<Future<Object>>(count);
 			for (int i=0; i<count; i++)
 			{
 				futureList.add(executor.submit(new ObjectDeserializationTask(locations.get(i+1), i)));

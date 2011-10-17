@@ -81,7 +81,7 @@ public class JPPFRemoteContainer extends JPPFContainer
 		try
 		{
 			Thread.currentThread().setContextClassLoader(classLoader);
-			List<Future<Object>> futureList = new LinkedList<Future<Object>>();
+			List<Future<Object>> futureList = new ArrayList<Future<Object>>(count);
 			InputSource is = new SocketWrapperInputSource(socketClient);
 			for (int i=0; i<count; i++)
 			{

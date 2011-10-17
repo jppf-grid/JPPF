@@ -182,8 +182,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 		TypedProperties props = JPPFConfiguration.getProperties();
 		/*
 		props.setProperty("jppf.server.host", settings.getProperty("host"));
-		props.setProperty("class.server.port", settings.getProperty("classServerPort"));
-		props.setProperty("node.server.port", settings.getProperty("nodeServerPort"));
+		props.setProperty("jppf.server.port", settings.getProperty("classServerPort"));
 		props.setProperty("processing.threads", settings.getProperty("nbThreads"));
 		*/
 		props.setProperty("jppf.management.port", "12010");

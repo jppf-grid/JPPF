@@ -58,17 +58,15 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 	 * @see org.jppf.server.node.JPPFNode#initDataChannel()
 	 */
 	@Override
-    protected void initDataChannel() throws Exception
+	protected void initDataChannel() throws Exception
 	{
 		if (socketClient == null)
 		{
 			if (debugEnabled) log.debug("Initializing socket");
 			TypedProperties props = JPPFConfiguration.getProperties();
 			String host = props.getString("jppf.server.host", "localhost");
-			//int port = props.getInt("node.server.port", 11113);
 			int port = props.getInt("jppf.server.port", 11111);
 			socketClient = new SocketClient();
-			//socketClient = new SocketConnectorWrapper();
 			socketClient.setHost(host);
 			socketClient.setPort(port);
 			socketClient.setSerializer(serializer);
@@ -105,7 +103,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 	 * @see org.jppf.server.node.JPPFNode#closeDataChannel()
 	 */
 	@Override
-    protected void closeDataChannel() throws Exception
+	protected void closeDataChannel() throws Exception
 	{
 		if (debugEnabled) log.debug("closing data channel: socketClient=" + socketClient + ", clientConnection=" + recoveryConnection);
 		if (socketClient != null)
@@ -127,7 +125,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void clientConnectionFailed(ClientConnectionEvent event)
+	public void clientConnectionFailed(ClientConnectionEvent event)
 	{
 		try
 		{

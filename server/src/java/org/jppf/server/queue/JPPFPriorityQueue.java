@@ -87,7 +87,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @see org.jppf.server.queue.JPPFQueue#addBundle(org.jppf.server.protocol.BundleWrapper)
 	 */
 	@Override
-    public void addBundle(ServerJob bundleWrapper)
+	public void addBundle(ServerJob bundleWrapper)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		JobSLA sla = bundle.getSLA();
@@ -355,7 +355,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 		JPPFDistributedJob bundle = bundleWrapper.getJob();
 		JobSLA sla = bundle.getSLA();
 		ExecutionPolicy policy = sla.getExecutionPolicy();
-		List<BundleWrapper> jobList = new ArrayList<BundleWrapper>();
+		List<ServerJob> jobList = new ArrayList<ServerJob>(uuidMap.size());
 		for (Map.Entry<String, JPPFManagementInfo> entry: uuidMap.entrySet())
 		{
 			BundleWrapper job = ((BundleWrapper) bundleWrapper).copy();
@@ -374,7 +374,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getJobUuid() + " :\n" + broadcastPolicy);
 			jobList.add(job);
 		}
-		for (BundleWrapper job: jobList) addBundle(job);
+		for (ServerJob job: jobList) addBundle(job);
 	}
 
 	/**

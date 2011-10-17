@@ -97,7 +97,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int transferFrom(InputSource source, boolean blocking) throws Exception
+	public int transferFrom(InputSource source, boolean blocking) throws Exception
 	{
 		if (!transferring)
 		{

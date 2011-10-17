@@ -157,7 +157,7 @@ public class LoadBalancer
 					if (tasks.size() > sum(bundleSize)) bundleSize[LOCAL]++;
 				}
 				if (debugEnabled) log.debug("bundlers[local=" + bundleSize[LOCAL] + ", remote=" + bundleSize[REMOTE] + "]");
-				List<List<JPPFTask>> list = new ArrayList<List<JPPFTask>>();
+				List<List<JPPFTask>> list = new ArrayList<List<JPPFTask>>(REMOTE - LOCAL + 1);
 				int idx = 0;
 				for (int i=LOCAL; i<=REMOTE; i++)
 				{

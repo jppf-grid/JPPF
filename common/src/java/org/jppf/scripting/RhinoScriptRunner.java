@@ -163,7 +163,7 @@ public class RhinoScriptRunner implements ScriptRunner
 		/**
 		 * Errors thrown during execution or translation of a script.
 		 */
-		public List<String> errors = new ArrayList<String>();
+		public List<String> errors = new LinkedList<String>();
 
 		/**
      * Report an error.
@@ -179,7 +179,7 @@ public class RhinoScriptRunner implements ScriptRunner
 		 * @see org.mozilla.javascript.ErrorReporter#error(java.lang.String, java.lang.String, int, java.lang.String, int)
 		 */
 		@Override
-        public void error(String message, String sourceName, int line, String lineSource, int lineOffset)
+		public void error(String message, String sourceName, int line, String lineSource, int lineOffset)
 		{
 			errors.add(makeErrorString(message, sourceName, line, lineSource, lineOffset));
 		}
@@ -195,7 +195,7 @@ public class RhinoScriptRunner implements ScriptRunner
 		 * @see org.mozilla.javascript.ErrorReporter#warning(java.lang.String, java.lang.String, int, java.lang.String, int)
 		 */
 		@Override
-        public void warning(String message, String sourceName, int line, String lineSource, int lineOffset)
+		public void warning(String message, String sourceName, int line, String lineSource, int lineOffset)
 		{
 		}
 	
@@ -212,7 +212,7 @@ public class RhinoScriptRunner implements ScriptRunner
 		 * @see org.mozilla.javascript.ErrorReporter#runtimeError(java.lang.String, java.lang.String, int, java.lang.String, int)
 		 */
 		@Override
-        public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset)
+		public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset)
 		{
 			String s = makeErrorString(message, sourceName, line, lineSource, lineOffset);
 			errors.add(s);

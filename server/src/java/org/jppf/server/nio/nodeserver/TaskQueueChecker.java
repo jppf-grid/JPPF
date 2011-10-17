@@ -207,13 +207,14 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	private int findIdleChannelIndex(JPPFTaskBundle bundle)
 	{
 		List<ChannelWrapper<?>> idleChannels = server.getIdleChannels();
+		int idleChannelsSize = idleChannels.size();
 		int n = -1;
 		ExecutionPolicy rule = bundle.getSLA().getExecutionPolicy();
 		if (debugEnabled && (rule != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + rule);
-		List<Integer> acceptableChannels = new ArrayList<Integer>();
-		List<Integer> channelsToRemove =  new ArrayList<Integer>();
+		List<Integer> acceptableChannels = new ArrayList<Integer>(idleChannelsSize);
+		List<Integer> channelsToRemove =  new ArrayList<Integer>(idleChannelsSize);
 		List<String> uuidPath = bundle.getUuidPath().getList();
-		for (int i=0; i<idleChannels.size(); i++)
+		for (int i=0; i<idleChannelsSize; i++)
 		{
 			ChannelWrapper<?> ch = idleChannels.get(i);
 			if (!ch.isOpen())
@@ -250,10 +251,11 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 			acceptableChannels.add(i);
 		}
 		for (Integer i: channelsToRemove) server.removeIdleChannel(i);
-		if (debugEnabled) log.debug("found " + acceptableChannels.size() + " acceptable channels");
-		if (!acceptableChannels.isEmpty())
+		int size = acceptableChannels.size();
+		if (debugEnabled) log.debug("found " + size + " acceptable channels");
+		if (size > 0)
 		{
-			int rnd = random.nextInt(acceptableChannels.size());
+			int rnd = random.nextInt(size);
 			n = acceptableChannels.remove(rnd);
 		}
 		return n;

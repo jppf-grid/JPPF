@@ -173,14 +173,7 @@ public class JPPFResultCollector implements TaskResultListener
 	 */
 	protected void buildResults()
 	{
-		results = new ArrayList<JPPFTask>();
-		if (job == null)
-		{
-			for (Map.Entry<Integer, JPPFTask> entry: resultMap.entrySet()) results.add(entry.getValue());
-		}
-		else
-		{
-			for (JPPFTask task: job.getResults().getAll()) results.add(task);
-		}
+		if (job == null) results = new ArrayList<JPPFTask>(resultMap.values());
+		else results = new ArrayList<JPPFTask>(job.getResults().getAll());
 	}
 }

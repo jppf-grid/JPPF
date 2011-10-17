@@ -113,7 +113,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	/**
 	 * List of status listeners for this connection.
 	 */
-	protected List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
+	protected final List<ClientConnectionStatusListener> listeners = new LinkedList<ClientConnectionStatusListener>();
 	/**
 	 * Holds the tasks, data provider and submission mode for the current execution.
 	 */

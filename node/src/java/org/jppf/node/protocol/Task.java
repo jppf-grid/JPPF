@@ -18,14 +18,16 @@
 
 package org.jppf.node.protocol;
 
+import java.io.Serializable;
+
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.task.storage.DataProvider;
 
 /**
- * 
+ * Interface for all tasks submitted to the execution server.
  * @author Laurent Cohen
  */
-public interface Task
+public interface Task extends Runnable, Serializable
 {
 
 	/**
@@ -35,11 +37,24 @@ public interface Task
 	Object getResult();
 
 	/**
+	 * Set the result of the task execution.
+	 * @param  result the result of this task's execution.
+	 */
+	void setResult(Object  result);
+
+	/**
 	 * Get the exception that was raised by this task's execution. If the task raised a
 	 * {@link Throwable}, the exception is embedded into a {@link org.jppf.JPPFException}.
 	 * @return a <code>Exception</code> instance, or null if no exception was raised.
 	 */
 	Exception getException();
+
+	/**
+	 * Sets the exception that was raised by this task's execution in the <code>run</code> method.
+	 * The exception is set by the JPPF framework.
+	 * @param exception a <code>ClientApplicationException</code> instance.
+	 */
+	void setException(Exception exception);
 
 	/**
 	 * Get the provider of shared data for this task.
@@ -48,31 +63,43 @@ public interface Task
 	DataProvider getDataProvider();
 
 	/**
-	 * Get the timeout for this task.
-	 * @return the timeout in milliseconds.
-	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
+	 * Set the provider of shared data for this task.
+	 * @param dataProvider a <code>DataProvider</code> instance.
 	 */
-	long getTimeout();
-
-	/**
-	 * Get the timeout date for this task.
-	 * @return the date in string format.
-	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
-	 */
-	String getTimeoutDate();
-
-	/**
-	 * Get the format of timeout date for this task.
-	 * @return the timeout date format as a string pattern, as decribed in the specification for {@link SimpleDateFormat}.
-	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
-	 */
-	String getTimeoutFormat();
+	void setDataProvider(DataProvider dataProvider);
 
 	/**
 	 * Get the user-assigned id for this task.
 	 * @return the id as a string.
 	 */
 	String getId();
+
+	/**
+	 * Set the user-assigned id for this task.
+	 * @param id the id as a string.
+	 */
+	void setId(String id);
+
+	/**
+	 * Callback invoked when this task is cancelled.
+	 * The default implementation does nothing and should be overriden by
+	 * subclasses that desire to implement a specific behaviour on cancellation.
+	 */
+	void onCancel();
+
+	/**
+	 * Callback invoked when this task is restarted.
+	 * The default implementation does nothing and should be overriden by
+	 * subclasses that desire to implement a specific behaviour on restart.
+	 */
+	void onRestart();
+
+	/**
+	 * Callback invoked when this task times out.
+	 * The default implementation does nothing and should be overriden by
+	 * subclasses that desire to implement a specific behaviour on timeout.
+	 */
+	void onTimeout();
 
 	/**
 	 * Get the <code>JPPFRunnable</code>-annotated object or POJO wrapped by this task.
@@ -85,4 +112,10 @@ public interface Task
 	 * @return a <code>JPPFScheduleConfiguration</code> instance.
 	 */
 	JPPFSchedule getTimeoutSchedule();
+
+	/**
+	 * Get the task timeout schedule configuration.
+	 * @param timeoutSchedule a <code>JPPFScheduleConfiguration</code> instance. 
+	 */
+	void setTimeoutSchedule(JPPFSchedule timeoutSchedule);
 }

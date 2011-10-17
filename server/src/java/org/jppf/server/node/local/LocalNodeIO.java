@@ -103,12 +103,12 @@ public class LocalNodeIO extends AbstractNodeIO
 	@Override
     protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
 	{
-		List<Object> list = new ArrayList<Object>();
+		int count = bundle.getTaskCount();
+		List<Object> list = new ArrayList<Object>(count + 1);
 		list.add(bundle);
 		try
 		{
 			bundle.setNodeExecutionTime(System.currentTimeMillis());
-			int count = bundle.getTaskCount();
 			if (debugEnabled) log.debug("bundle task count = " + count + ", state = " + bundle.getState());
 			if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 			{
@@ -142,7 +142,7 @@ public class LocalNodeIO extends AbstractNodeIO
 		ExecutorService executor = node.getExecutionManager().getExecutor();
 		long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
 		bundle.setNodeExecutionTime(elapsed);
-		List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>();
+		List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>(tasks.size() + 1);
 		futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
 		for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
 		LocalNodeContext ctx = channel.getChannel();

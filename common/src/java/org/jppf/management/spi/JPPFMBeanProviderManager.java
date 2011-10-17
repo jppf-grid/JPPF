@@ -86,7 +86,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
 	{
 		if (providerList == null)
 		{
-			providerList = new ArrayList<S>();
+			providerList = new LinkedList<S>();
 			Iterator<S> it = ServiceFinder.lookupProviders(providerClass, cl);
 			while (it.hasNext()) providerList.add(it.next());
 		}

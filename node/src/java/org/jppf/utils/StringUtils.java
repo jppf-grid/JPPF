@@ -160,16 +160,15 @@ public final class StringUtils
 	 */
 	public static byte[] toBytes(String hexString)
 	{
-		List<Byte> list = new ArrayList<Byte>();
 		String[] bytes = hexString.split("\\s");
-		for (String bStr: bytes)
-		{
-			int n = Byte.parseByte(bStr.substring(0, 1), 16);
-			n = 16 * n + Byte.parseByte(bStr.substring(1), 16);
-			list.add(Byte.valueOf((byte) n));
-		}
+		List<Byte> list = new ArrayList<Byte>(bytes.length);
 		byte[] result = new byte[list.size()];
-		for (int i=0; i<list.size(); i++) result[i] = list.get(i);
+		for (int i=0; i<bytes.length; i++)
+		{
+			int n = Byte.parseByte(bytes[i].substring(0, 1), 16);
+			n = 16 * n + Byte.parseByte(bytes[i].substring(1), 16);
+			result[i] = Byte.valueOf((byte) n);
+		}
 		return result;
 	}
 	
@@ -295,22 +294,19 @@ public final class StringUtils
 	public static int[] parseIntValues(String s)
 	{
 		String[] strPorts = s.split("\\s");
-		List<Integer> portList = new ArrayList<Integer>();
-		for (String sp: strPorts)
+		int[] ports = new int[strPorts.length];
+		for (int i=0; i<strPorts.length; i++)
 		{
 			try
 			{
-				int n = Integer.valueOf(sp.trim());
-				portList.add(n);
+				int n = Integer.valueOf(strPorts[i].trim());
+				ports[i] = n;
 			}
 			catch(NumberFormatException e)
 			{
-				//log.error("invalid port number format: " + sp);
 				return null;
 			}
 		}
-		int[] ports = new int[portList.size()];
-		for (int i=0; i<portList.size(); i++) ports[i] = portList.get(i);
 		return ports;
 	}
 

@@ -37,7 +37,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	/**
 	 * The list of listeners to this location.
 	 */
-	protected List<LocationEventListener> listeners = new ArrayList<LocationEventListener>();
+	protected List<LocationEventListener> listeners = new LinkedList<LocationEventListener>();
 	/**
 	 * Boolean flag that determines if at least one listener is registered.
 	 * Used to minimize the overhead of sending events if there is no listener.
@@ -59,7 +59,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * @see org.jppf.server.protocol.Location#getPath()
 	 */
 	@Override
-    public T getPath()
+	public T getPath()
 	{
 		return path;
 	}
@@ -71,7 +71,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * @see org.jppf.server.protocol.Location#copyTo(org.jppf.server.protocol.Location)
 	 */
 	@Override
-    public void copyTo(Location location) throws Exception
+	public void copyTo(Location location) throws Exception
 	{
 		InputStream is = getInputStream();
 		OutputStream os = location.getOutputStream();
@@ -88,7 +88,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * @see org.jppf.server.protocol.Location#toByteArray()
 	 */
 	@Override
-    public byte[] toByteArray() throws Exception
+	public byte[] toByteArray() throws Exception
 	{
 		InputStream is = getInputStream();
 		JPPFByteArrayOutputStream os = new JPPFByteArrayOutputStream();
@@ -105,7 +105,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return String.valueOf(getPath());
 	}
@@ -117,7 +117,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * @see org.jppf.server.protocol.Location#addLocationEventListener(org.jppf.server.protocol.LocationEventListener)
 	 */
 	@Override
-    public void addLocationEventListener(LocationEventListener listener)
+	public void addLocationEventListener(LocationEventListener listener)
 	{
 		if (listener == null) throw new NullPointerException("null listener not accepted");
 		listeners.add(listener);
@@ -131,7 +131,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * @see org.jppf.server.protocol.Location#removeLocationEventListener(org.jppf.server.protocol.LocationEventListener)
 	 */
 	@Override
-    public void removeLocationEventListener(LocationEventListener listener)
+	public void removeLocationEventListener(LocationEventListener listener)
 	{
 		if (listener == null) throw new NullPointerException("null listener not accepted");
 		listeners.remove(listener);

@@ -41,7 +41,6 @@ public class BundleWrapper implements ServerJob
 	/**
 	 * The list of locations of the tasks.
 	 */
-	//private List<DataLocation> tasks = new ArrayList<DataLocation>();
 	private List<DataLocation> tasks = new LinkedList<DataLocation>();
 
 	/**

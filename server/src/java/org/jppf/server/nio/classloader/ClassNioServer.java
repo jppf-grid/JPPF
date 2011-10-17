@@ -56,8 +56,8 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	protected final Map<String, List<ChannelWrapper<?>>> providerConnections = new Hashtable<String, List<ChannelWrapper<?>>>();
 	/**
-	 * The cache of class definition, this is done to not flood the provider when it dispatch many tasks. it use
-	 * WeakHashMap to minimize the OutOfMemory.
+	 * The cache of class definition, this is done to not flood the provider when it dispatch many tasks. it uses
+	 * a soft map to minimize the OutOfMemory.
 	 */
 	final Map<CacheClassKey, CacheClassContent> classCache = new SoftReferenceValuesMap<CacheClassKey, CacheClassContent>();
 	/**
@@ -120,7 +120,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected NioServerFactory<ClassState, ClassTransition> createFactory()
+	protected NioServerFactory<ClassState, ClassTransition> createFactory()
 	{
 		return new ClassServerFactory(this);
 	}
@@ -129,7 +129,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * {@inheritDoc}
 	 */
 	@Override
-    public NioContext<?> createNioContext()
+	public NioContext<?> createNioContext()
 	{
 		return new ClassContext();
 	}
@@ -138,7 +138,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int getInitialInterest()
+	public int getInitialInterest()
 	{
 		return SelectionKey.OP_READ;
 	}
@@ -147,7 +147,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void postAccept(ChannelWrapper<?> wrapper)
+	public void postAccept(ChannelWrapper<?> wrapper)
 	{
 		((ClassContext) wrapper.getContext()).setState(DEFINING_TYPE);
 	}
@@ -157,7 +157,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * @see org.jppf.server.nio.NioServer#removeAllConnections()
 	 */
 	@Override
-    public synchronized void removeAllConnections()
+	public synchronized void removeAllConnections()
 	{
 		if (!isStopped()) return;
 		synchronized(providerConnections)
@@ -343,7 +343,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void connectionFailed(ReaperEvent event)
+	public void connectionFailed(ReaperEvent event)
 	{
 		ServerConnection c = event.getConnection();
 		if (!c.isOk())

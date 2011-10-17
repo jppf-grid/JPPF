@@ -314,18 +314,18 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 			map.put("multiple.resources.names", namesToLookup);
 			JPPFResourceWrapper resource = loadResourceData(map, true);
 			Map<String, List<byte[]>> dataMap = (Map<String, List<byte[]>>) resource.getData("resource_map");
-            for (Integer indice : indices) {
-                String name = names[indice];
-                List<byte[]> dataList = dataMap.get(name);
-                boolean found = (dataList != null) && !dataList.isEmpty();
-                if (debugEnabled && !found) log.debug("resource [" + name + "] not found remotely");
-                if (found) {
-                    cache.registerResources(name, dataList);
-                    URL url = cache.getResourceURL(name);
-                    results[indice] = url;
-                    if (debugEnabled) log.debug("resource [" + name + "] found remotely as " + url);
-                }
-            }
+			for (Integer indice : indices) {
+				String name = names[indice];
+				List<byte[]> dataList = dataMap.get(name);
+				boolean found = (dataList != null) && !dataList.isEmpty();
+				if (debugEnabled && !found) log.debug("resource [" + name + "] not found remotely");
+				if (found) {
+					cache.registerResources(name, dataList);
+					URL url = cache.getResourceURL(name);
+					results[indice] = url;
+					if (debugEnabled) log.debug("resource [" + name + "] found remotely as " + url);
+				}
+			}
 		}
 		catch(Exception e)
 		{

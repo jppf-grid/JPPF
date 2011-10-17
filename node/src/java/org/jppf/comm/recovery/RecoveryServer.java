@@ -62,7 +62,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
 	/**
 	 * The list of active connections.
 	 */
-	private final List<ServerConnection> connections = new ArrayList<ServerConnection>();
+	private final List<ServerConnection> connections = new ArrayList<ServerConnection>(100);
 	/**
 	 * The count of connections that have been opened.
 	 */

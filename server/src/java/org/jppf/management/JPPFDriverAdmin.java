@@ -59,12 +59,11 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @see org.jppf.management.JPPFDriverAdminMBean#nodesInformation()
 	 */
 	@Override
-    public Collection<JPPFManagementInfo> nodesInformation()
+	public Collection<JPPFManagementInfo> nodesInformation()
 	{
 		try
 		{
-			List<JPPFManagementInfo> list = new ArrayList<JPPFManagementInfo>();
-			list.addAll(driver.getNodeHandler().getNodeInformationMap().values());
+			List<JPPFManagementInfo> list = new LinkedList<JPPFManagementInfo>(driver.getNodeHandler().getNodeInformationMap().values());
 			return list;
 		}
 		catch(Exception e)
@@ -81,7 +80,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @see org.jppf.management.JPPFDriverAdminMBean#statistics()
 	 */
 	@Override
-    public JPPFStats statistics() throws Exception
+	public JPPFStats statistics() throws Exception
 	{
 		try
 		{
@@ -103,7 +102,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @see org.jppf.management.JPPFDriverAdminMBean#changeLoadBalancerSettings(java.lang.String, java.util.Map)
 	 */
 	@Override
-    public String changeLoadBalancerSettings(String algorithm, Map<Object, Object> parameters) throws Exception
+	public String changeLoadBalancerSettings(String algorithm, Map<Object, Object> parameters) throws Exception
 	{
 		try
 		{
@@ -132,7 +131,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @see org.jppf.management.JPPFDriverAdminMBean#restartShutdown(java.lang.Long, java.lang.Long)
 	 */
 	@Override
-    public String restartShutdown(Long shutdownDelay, Long restartDelay) throws Exception
+	public String restartShutdown(Long shutdownDelay, Long restartDelay) throws Exception
 	{
 		try
 		{
@@ -155,7 +154,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @see org.jppf.management.JPPFDriverAdminMBean#loadBalancerInformation()
 	 */
 	@Override
-    public LoadBalancingInformation loadBalancerInformation() throws Exception
+	public LoadBalancingInformation loadBalancerInformation() throws Exception
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String algorithm = props.getString("jppf.load.balancing.algorithm", null);
@@ -184,7 +183,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void resetStatistics() throws Exception
+	public void resetStatistics() throws Exception
 	{
 		driver.getStatsManager().reset();
 	}
