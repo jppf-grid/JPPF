@@ -9,8 +9,9 @@
 	<classpathentry kind="src" output="IdleSystem/classes" path="IdleSystem/src"/>
 	<classpathentry kind="src" output="MatrixMultiplication/classes" path="MatrixMultiplication/src"/>
 	<classpathentry kind="src" output="Nbody/classes" path="Nbody/src"/>
-	<classpathentry kind="src" output="NodeTray/classes" path="NodeTray/src"/>
+	<classpathentry kind="src" path="NodeConnectionEvents/src"/>
 	<classpathentry kind="src" output="NodeLifeCycle/classes" path="NodeLifeCycle/src"/>
+	<classpathentry kind="src" output="NodeTray/classes" path="NodeTray/src"/>
 	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src"/>
 	<classpathentry kind="src" output="StartupClasses/classes" path="StartupClasses/src"/>
 	<classpathentry kind="src" output="TaskNotifications/classes" path="TaskNotifications/src"/>
@@ -53,5 +54,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
-	<classpathentry kind="output" path="shared/classes"/>
+	<classpathentry kind="output" path="NodeConnectionEvents/classes"/>
 </classpath>
