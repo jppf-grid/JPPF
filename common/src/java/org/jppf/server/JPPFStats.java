@@ -64,9 +64,9 @@ public class JPPFStats implements Serializable
 	 */
 	private QueueStats jobQueue = new QueueStats("job");
 	/**
-	 * Statistics for jobs execution times.
+	 * Statistics for the of takss in the jobs.
 	 */
-	private StatsSnapshot jobTimes = new StatsSnapshot("job execution");
+	private StatsSnapshot jobTasks = new StatsSnapshot("job stats");
 	/**
 	 * Statistics for the number of nodes in the grid.
 	 */
@@ -76,13 +76,9 @@ public class JPPFStats implements Serializable
 	 */
 	private StatsSnapshot idleNodes = new StatsSnapshot("idle nodes");
 	/**
-	 * The current number of clients connected to the server.
+	 * Statistics for the number of nodes in the grid.
 	 */
-	private int nbClients = 0;
-	/**
-	 * The maximum number of clients connected to the server.
-	 */
-	private int maxClients = 0;
+	private StatsSnapshot clients = new StatsSnapshot("clients");
 
 	/**
 	 * Build a copy of this stats object.
@@ -98,7 +94,7 @@ public class JPPFStats implements Serializable
 		s.transport = transport.makeCopy();
 		s.taskQueue = taskQueue.makeCopy();
 		s.jobQueue = jobQueue.makeCopy();
-		s.jobTimes = jobTimes.makeCopy();
+		s.jobTasks = jobTasks.makeCopy();
 		s.nodes = nodes.makeCopy();
 		s.idleNodes = idleNodes.makeCopy();
 		/*
@@ -109,8 +105,7 @@ public class JPPFStats implements Serializable
 		s.nbNodes = nbNodes;
 		s.maxNodes = maxNodes;
 		*/
-		s.nbClients = nbClients;
-		s.maxClients = maxClients;
+		s.clients = clients.makeCopy();
 		s.footprint = footprint;
 		return s;
 	}
@@ -121,7 +116,7 @@ public class JPPFStats implements Serializable
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("totalTasksExecuted : ").append(totalTasksExecuted).append('\n');
@@ -130,16 +125,18 @@ public class JPPFStats implements Serializable
 		sb.append(transport.toString());
 		sb.append(taskQueue.toString());
 		sb.append(jobQueue.toString());
+		sb.append(jobTasks.toString());
 		sb.append(nodes.toString());
+		sb.append(clients.toString());
 		/*
 		sb.append("totalQueued : ").append(totalQueued).append("\n");
 		sb.append("queueSize : ").append(queueSize).append("\n");
 		sb.append("maxQueueSize : ").append(maxQueueSize).append("\n");
 		sb.append("nbNodes : ").append(nbNodes).append('\n');
 		sb.append("maxNodes : ").append(maxNodes).append('\n');
-		*/
 		sb.append("nbClients : ").append(nbClients).append('\n');
 		sb.append("maxClients : ").append(maxClients).append('\n');
+		*/
 		return sb.toString();
 	}
 
@@ -162,30 +159,12 @@ public class JPPFStats implements Serializable
 	}
 
 	/**
-	 * Set the time statistics for the tasks execution, including network transport and node execution time.
-	 * @param execution - a <code>TimeSnapshot</code> instance.
-	 */
-	public void setExecution(StatsSnapshot execution)
-	{
-		this.execution = execution;
-	}
-
-	/**
 	 * Get the time statistics for the tasks execution, including network transport and node execution time.
 	 * @return a <code>TimeSnapshot</code> instance.
 	 */
 	public StatsSnapshot getExecution()
 	{
 		return execution;
-	}
-
-	/**
-	 * Set the time statistics for execution within the nodes.
-	 * @param nodeExecution - a <code>TimeSnapshot</code> instance.
-	 */
-	public void setNodeExecution(StatsSnapshot nodeExecution)
-	{
-		this.nodeExecution = nodeExecution;
 	}
 
 	/**
@@ -198,30 +177,12 @@ public class JPPFStats implements Serializable
 	}
 
 	/**
-	 * Set the time statistics for the network transport between nodes and server.
-	 * @param transport - a <code>TimeSnapshot</code> instance.
-	 */
-	public void setTransport(StatsSnapshot transport)
-	{
-		this.transport = transport;
-	}
-
-	/**
 	 * Get the time statistics for the network transport between nodes and server.
 	 * @return a <code>TimeSnapshot</code> instance.
 	 */
 	public StatsSnapshot getTransport()
 	{
 		return transport;
-	}
-
-	/**
-	 * Set the time statistics for the server overhead.
-	 * @param server - a <code>TimeSnapshot</code> instance.
-	 */
-	public void setServer(StatsSnapshot server)
-	{
-		this.server = server;
 	}
 
 	/**
@@ -235,7 +196,7 @@ public class JPPFStats implements Serializable
 
 	/**
 	 * Set the total footprint of all the data that was sent to the nodes.
-	 * @param footprint - the footprint as a long value.
+	 * @param footprint the footprint as a long value.
 	 */
 	public void setFootprint(long footprint)
 	{
@@ -252,39 +213,12 @@ public class JPPFStats implements Serializable
 	}
 
 	/**
-	 * Set the current number of clients connected to the server.
-	 * @param nbClients - the current number of clients as an int value.
+	 * Get the statistics for the number of nodes in the grid.
+	 * @return a {@link StatsSnapshot} instance.
 	 */
-	public void setNbClients(int nbClients)
+	public StatsSnapshot getClients()
 	{
-		this.nbClients = nbClients;
-	}
-
-	/**
-	 * Get the current number of clients connected to the server.
-	 * @return the current number of clients as an int value. 
-	 */
-	public int getNbClients()
-	{
-		return nbClients;
-	}
-
-	/**
-	 * Set the maximum number of clients connected to the server.
-	 * @param maxClients - the maximum number of clients as an int value.
-	 */
-	public void setMaxClients(int maxClients)
-	{
-		this.maxClients = maxClients;
-	}
-
-	/**
-	 * Get the maximum number of clients connected to the server.
-	 * @return the maximum number of clients as an int value. 
-	 */
-	public int getMaxClients()
-	{
-		return maxClients;
+		return clients;
 	}
 
 	/**
@@ -300,8 +234,11 @@ public class JPPFStats implements Serializable
 		footprint = 0L;
 		taskQueue = new QueueStats("task");
 		jobQueue = new QueueStats("job");
+		jobTasks = new StatsSnapshot("job tasks");
 		nodes.setMax(nodes.getLatest());
-		maxClients = nbClients;
+		nodes.setMin(nodes.getLatest());
+		clients.setMax(clients.getLatest());
+		clients.setMin(clients.getLatest());
 	}
 
 	/**
@@ -314,15 +251,6 @@ public class JPPFStats implements Serializable
 	}
 
 	/**
-	 * Set the statistics for the tasks in queue.
-	 * @param taskQueue a {@link QueueStats} instance.
-	 */
-	public void setTaskQueue(QueueStats taskQueue)
-	{
-		this.taskQueue = taskQueue;
-	}
-
-	/**
 	 * Get the statistics for the jobs in queue.
 	 * @return a {@link QueueStats} instance.
 	 */
@@ -332,12 +260,12 @@ public class JPPFStats implements Serializable
 	}
 
 	/**
-	 * Set the statistics for the jobs in queue.
-	 * @param jobQueue a {@link QueueStats} instance.
+	 * Get the statistics for the tasks in the jobs.
+	 * @return a {@link StatsSnapshot} instance.
 	 */
-	public void setJobQueue(QueueStats jobQueue)
+	public StatsSnapshot getJobTasks()
 	{
-		this.jobQueue = jobQueue;
+		return jobTasks;
 	}
 
 	/**
@@ -350,29 +278,11 @@ public class JPPFStats implements Serializable
 	}
 
 	/**
-	 * Set the statistics for the number of nodes in the grid.
-	 * @param nodes a {@link StatsSnapshot} instance.
-	 */
-	public void setNodes(StatsSnapshot nodes)
-	{
-		this.nodes = nodes;
-	}
-
-	/**
 	 * Get the statistics for the number of idle nodes in the grid.
 	 * @return a {@link StatsSnapshot} instance.
 	 */
 	public StatsSnapshot getIdleNodes()
 	{
 		return idleNodes;
-	}
-
-	/**
-	 * Set the statistics for the number of idle nodes in the grid.
-	 * @param idleNodes a {@link StatsSnapshot} instance.
-	 */
-	public void setIdleNodes(StatsSnapshot idleNodes)
-	{
-		this.idleNodes = idleNodes;
 	}
 }

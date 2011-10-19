@@ -37,8 +37,10 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	@Override
 	public synchronized void newClientConnection()
 	{
-		stats.setNbClients(stats.getNbClients() + 1);
-		if (stats.getNbClients() > stats.getMaxClients()) stats.setMaxClients(stats.getMaxClients() + 1);
+		StatsSnapshot clients = stats.getClients();
+		long n = clients.getLatest() + 1;
+		clients.setLatest(n);
+		if (n > clients.getMax()) clients.setMax(n);
 	}
 
 	/**
@@ -47,7 +49,8 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	@Override
 	public synchronized void clientConnectionClosed()
 	{
-		stats.setNbClients(stats.getNbClients() - 1);
+		StatsSnapshot clients = stats.getClients();
+		clients.setLatest(clients.getLatest() - 1);
 	}
 
 	/**
@@ -95,9 +98,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	{
 		QueueStats queue = stats.getTaskQueue();
 		StatsSnapshot sizes = queue.getSizes();
-		//queue.setQueueSize(queue.getQueueSize() - count);
 		sizes.setLatest(sizes.getLatest() - count);
-		//queue.setTotalQueued(queue.getTotalQueued() + count);
 		sizes.setTotal(sizes.getTotal() + count);
 		queue.getTimes().newValues(time, count, sizes.getTotal());
 	}
@@ -145,5 +146,30 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	{
 		stats.getIdleNodes().setLatest(nbIdleNodes);
 		//stats.getIdleNodes().newValues(1, inc, n);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public synchronized void jobQueued(final int nbTasks)
+	{
+		StatsSnapshot sizes = stats.getJobQueue().getSizes();
+		long n = sizes.getLatest() + 1; 
+		StatsSnapshot jobTasks = stats.getJobTasks();
+		jobTasks.newValues(nbTasks, sizes.getTotal());
+		sizes.setLatest(n);
+		sizes.setTotal(sizes.getTotal() + 1);
+		if (n > sizes.getMax()) sizes.setMax(n);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public synchronized void jobEnded(final long time)
+	{
+		StatsSnapshot sizes = stats.getJobQueue().getSizes();
+		StatsSnapshot times = stats.getJobQueue().getTimes();
+		times.newValues(time, sizes.getTotal() - 1L);
+		sizes.setLatest(sizes.getLatest() - 1);
 	}
 }

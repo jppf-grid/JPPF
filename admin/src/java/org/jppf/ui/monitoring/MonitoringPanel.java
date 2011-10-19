@@ -65,6 +65,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		addTablePanel(EXECUTION_PROPS, "ExecutionTable.label");
 		addTablePanel(NODE_EXECUTION_PROPS, "NodeExecutionTable.label");
 		addTablePanel(TRANSPORT_PROPS, "NetworkOverheadTable.label");
+		addTablePanel(JOB_PROPS, "JobTable.label");
 		addTablePanel(QUEUE_PROPS, "QueueTable.label");
 		addTablePanel(CONNECTION_PROPS, "ConnectionsTable.label");
 		statsHandler.addStatsHandlerListener(this);

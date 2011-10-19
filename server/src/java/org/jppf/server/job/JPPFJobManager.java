@@ -151,6 +151,7 @@ public class JPPFJobManager implements QueueListener
 		jobMap.put(jobUuid, new ArrayList<ChannelJobPair>());
 		if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
 		submitEvent(JobEventType.JOB_QUEUED, bundle, null);
+		JPPFDriver.getInstance().getStatsUpdater().jobQueued(bundle.getTaskCount());
 	}
 
 	/**
@@ -160,12 +161,14 @@ public class JPPFJobManager implements QueueListener
 	public synchronized void jobEnded(ServerJob bundleWrapper)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
+		long time = System.nanoTime() - (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
 		String jobUuid = bundle.getJobUuid();
 		jobMap.remove(jobUuid);
 		bundleMap.remove(jobUuid);
 		((JPPFPriorityQueue) JPPFDriver.getInstance().getQueue()).clearSchedules(jobUuid);
 		if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
 		submitEvent(JobEventType.JOB_ENDED, bundle, null);
+		JPPFDriver.getInstance().getStatsUpdater().jobEnded(time/1000000L);
 	}
 
 	/**

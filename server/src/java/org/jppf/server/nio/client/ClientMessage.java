@@ -61,7 +61,7 @@ public class ClientMessage extends AbstractNodeMessage
 	 * @throws Exception if an IO error occurs.
 	 */
 	@Override
-    public boolean read(ChannelWrapper<?> wrapper) throws Exception
+	public boolean read(ChannelWrapper<?> wrapper) throws Exception
 	{
 		if (nbObjects <= 0)
 		{
@@ -70,8 +70,6 @@ public class ClientMessage extends AbstractNodeMessage
 			bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0), new SerializationHelperImpl().getSerializer());
 			nbObjects = bundle.getTaskCount() + 2;
 			if (debugEnabled) log.debug("received header from client, data length = " + locations.get(0).getSize());
-			if (bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME_MILLIS) == null)
-				bundle.setParameter(BundleParameter.JOB_RECEIVED_TIME_MILLIS, System.currentTimeMillis());
 		}
 		while (position < nbObjects)
 		{

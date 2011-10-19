@@ -75,6 +75,17 @@ public interface JPPFDriverListener extends EventListener
 	void idleNodes(int nbIdleNodes);
 
 	/**
+	 * Called when a job is added to the job queue.
+	 * @param nbTasks the number of tasks in the job at the time it is queued.
+	 */
+	void jobQueued(int nbTasks);
+	/**
+	 * Called when a job is completes.
+	 * @param time the total execution time of the job.
+	 */
+	void jobEnded(long time);
+
+	/**
 	 * Notification that a reset of this server's statistics has been requested.
 	 */
 	void reset();

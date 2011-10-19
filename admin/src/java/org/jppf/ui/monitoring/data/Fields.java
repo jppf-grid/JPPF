@@ -140,7 +140,43 @@ public enum Fields
 	/**
 	 * Name for the maximum number of clients ever connected to the server.
 	 */
-	MAX_CLIENTS;
+	MAX_CLIENTS,
+	/**
+	 * Total number of jobs submitted to the server.
+	 */
+	JOBS_TOTAL,
+	/**
+	 * Latest number of jobs present in the server.
+	 */
+	JOBS_LATEST,
+	/**
+	 * Maximum number of jobs present in the server.
+	 */
+	JOBS_MAX,
+	/**
+	 * Minimum execution time of a job in the server.
+	 */
+	JOBS_MIN_TIME,
+	/**
+	 * Maximum execution time of a job in the server.
+	 */
+	JOBS_MAX_TIME,
+	/**
+	 * Average execution time of a job in the server.
+	 */
+	JOBS_AVG_TIME,
+	/**
+	 * Minimum number of tasks of a job in the server.
+	 */
+	JOBS_MIN_TASKS,
+	/**
+	 * Maximum number of tasks of a job in the server.
+	 */
+	JOBS_MAX_TASKS,
+	/**
+	 * Average number of tasks of a job in the server.
+	 */
+	JOBS_AVG_TASKS;
 
 	/**
 	 * The localized name of this enum item.

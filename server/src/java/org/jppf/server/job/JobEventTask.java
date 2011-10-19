@@ -73,7 +73,7 @@ public class JobEventTask implements Runnable
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		JobSLA sla = bundle.getSLA();
 		Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
@@ -96,7 +96,7 @@ public class JobEventTask implements Runnable
 					break;
 
 				case JOB_UPDATED:
-					Integer n = (Integer) bundle.getParameter("real.task.count");
+					Integer n = (Integer) bundle.getParameter(BundleParameter.REAL_TASK_COUNT);
 					if (n != null) jobInfo.setTaskCount(n);
 					for (JobListener listener: listeners) listener.jobUpdated(event);
 					break;

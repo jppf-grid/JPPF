@@ -44,7 +44,7 @@ public class QueueStats implements Serializable
 	public String title = "";
 
 	/**
-	 * Initialize this time snapshot with a specified title.
+	 * Initialize this queue snapshot with a specified title.
 	 * @param title the title for this snapshot.
 	 */
 	public QueueStats(String title)

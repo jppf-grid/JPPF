@@ -119,8 +119,8 @@ class ApplicationConnection extends JPPFConnection
 		data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
 		JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
 		if (debugEnabled) log.debug("received header from client, data length = " + data.length);
-		if (header.getParameter(BundleParameter.JOB_RECEIVED_TIME_MILLIS) == null)
-			header.setParameter(BundleParameter.JOB_RECEIVED_TIME_MILLIS, System.currentTimeMillis());
+		if (header.getParameter(BundleParameter.JOB_RECEIVED_TIME) == null)
+			header.setParameter(BundleParameter.JOB_RECEIVED_TIME, System.currentTimeMillis());
 		headerWrapper = new BundleWrapper(header);
 		executeTasks();
 	}

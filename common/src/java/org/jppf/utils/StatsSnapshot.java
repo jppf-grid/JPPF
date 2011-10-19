@@ -88,6 +88,20 @@ public class StatsSnapshot implements Serializable
 	}
 	
 	/**
+	 * Called when a new time has been collected.
+	 * @param updateCount the number of units in the update.
+	 * @param totalUpdates the total number of updates since the start, not including the current update.
+	 */
+	public void newValues(long updateCount, long totalUpdates)
+	{
+		total += updateCount;
+		latest = updateCount;
+		if (latest > max) max = latest;
+		if (latest < min) min = latest;
+		avg = (double) total / (double) (totalUpdates + 1L);
+	}
+	
+	/**
 	 * Make a copy of this time snapshot object.
 	 * @return a <code>TimeSnapshot</code> instance.
 	 */

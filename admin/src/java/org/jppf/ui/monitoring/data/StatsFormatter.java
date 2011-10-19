@@ -116,8 +116,18 @@ public final class StatsFormatter implements StatsConstants
 		stringValueMap.put(NB_NODES, formatInt(stats.getNodes().getLatest()));
 		stringValueMap.put(MAX_NODES, formatInt(stats.getNodes().getMax()));
 		stringValueMap.put(NB_IDLE_NODES, formatInt(stats.getIdleNodes().getLatest()));
-		stringValueMap.put(NB_CLIENTS, formatInt(stats.getNbClients()));
-		stringValueMap.put(MAX_CLIENTS, formatInt(stats.getMaxClients()));
+		stringValueMap.put(NB_CLIENTS, formatInt(stats.getClients().getLatest()));
+		stringValueMap.put(MAX_CLIENTS, formatInt(stats.getClients().getMax()));
+		queue = stats.getJobQueue();
+		stringValueMap.put(JOBS_TOTAL, formatInt(queue.getSizes().getTotal()));
+		stringValueMap.put(JOBS_LATEST, formatInt(queue.getSizes().getLatest()));
+		stringValueMap.put(JOBS_MAX, formatInt(queue.getSizes().getMax()));
+		stringValueMap.put(JOBS_MIN_TIME, formatDouble(queue.getTimes().getMin()));
+		stringValueMap.put(JOBS_MAX_TIME, formatDouble(queue.getTimes().getMax()));
+		stringValueMap.put(JOBS_AVG_TIME, formatDouble(queue.getTimes().getAvg()));
+		stringValueMap.put(JOBS_MIN_TASKS, formatInt(stats.getJobTasks().getMin()));
+		stringValueMap.put(JOBS_MAX_TASKS, formatInt(stats.getJobTasks().getMax()));
+		stringValueMap.put(JOBS_AVG_TASKS, formatDouble(stats.getJobTasks().getAvg()));
 		return stringValueMap;
 	}
 	
@@ -157,8 +167,18 @@ public final class StatsFormatter implements StatsConstants
 		doubleValueMap.put(NB_NODES, (double) stats.getNodes().getLatest());
 		doubleValueMap.put(MAX_NODES, (double) stats.getNodes().getMax());
 		doubleValueMap.put(NB_IDLE_NODES, (double) stats.getIdleNodes().getLatest());
-		doubleValueMap.put(NB_CLIENTS, (double) stats.getNbClients());
-		doubleValueMap.put(MAX_CLIENTS, (double) stats.getMaxClients());
+		doubleValueMap.put(NB_CLIENTS, (double) stats.getClients().getLatest());
+		doubleValueMap.put(MAX_CLIENTS, (double) stats.getClients().getMax());
+		queue = stats.getJobQueue();
+		doubleValueMap.put(JOBS_TOTAL, (double) queue.getSizes().getTotal());
+		doubleValueMap.put(JOBS_LATEST, (double) queue.getSizes().getLatest());
+		doubleValueMap.put(JOBS_MAX, (double) queue.getSizes().getMax());
+		doubleValueMap.put(JOBS_MIN_TIME, (double) queue.getTimes().getMin());
+		doubleValueMap.put(JOBS_MAX_TIME, (double) queue.getTimes().getMax());
+		doubleValueMap.put(JOBS_AVG_TIME, (double) queue.getTimes().getAvg());
+		doubleValueMap.put(JOBS_MIN_TASKS, (double) stats.getJobTasks().getMin());
+		doubleValueMap.put(JOBS_MAX_TASKS, (double) stats.getJobTasks().getMax());
+		doubleValueMap.put(JOBS_AVG_TASKS, (double) stats.getJobTasks().getAvg());
 		return doubleValueMap;
 	}
 
@@ -169,7 +189,7 @@ public final class StatsFormatter implements StatsConstants
 	 */
 	private static String formatInt(long value)
 	{
-		return integerFormatter.format(value);
+		return (value == Long.MAX_VALUE) ? "" : integerFormatter.format(value);
 	}
 
 	/**

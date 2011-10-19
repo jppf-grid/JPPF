@@ -106,7 +106,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			{
 				((BundleWrapper) other).merge(bundleWrapper, false);
 				if (debugEnabled) log.debug("re-submitting bundle with " + bundle);
-				bundle.setParameter("real.task.count", bundle.getTaskCount());
+				bundle.setParameter(BundleParameter.REAL_TASK_COUNT, bundle.getTaskCount());
 				fireQueueEvent(new QueueEvent(this, other, true));
 			}
 			else
@@ -169,7 +169,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			{
 				result = bundleWrapper;
 				removeBundle(bundleWrapper);
-				bundle.setParameter("real.task.count", 0);
+				bundle.setParameter(BundleParameter.REAL_TASK_COUNT, 0);
 			}
 			else
 			{
@@ -184,7 +184,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 					sizeMap.put(size, list);
 				}
 				list.add(bundleWrapper);
-				bundle.setParameter("real.task.count", bundle.getTaskCount());
+				bundle.setParameter(BundleParameter.REAL_TASK_COUNT, bundle.getTaskCount());
 				List<ServerJob> bundleList = priorityMap.get(new JPPFPriority(bundle.getSLA().getPriority()));
 				bundleList.remove(bundleWrapper);
 				bundleList.add(bundleWrapper);
@@ -289,7 +289,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			if (debugEnabled) log.debug("found start " + schedule + " for jobId = " + jobId);
 			try
 			{
-				long dt = (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME_MILLIS);
+				long dt = (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
 				jobScheduleHandler.scheduleAction(uuid, schedule, new JobScheduleAction(bundleWrapper), dt);
 			}
 			catch(ParseException e)
@@ -316,7 +316,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
 			String uuid = bundle.getJobUuid();
 			if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + jobId);
-			long dt = (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME_MILLIS);
+			long dt = (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
 			try
 			{
 				jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(bundleWrapper), dt);
