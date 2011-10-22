@@ -18,47 +18,34 @@
 package org.jppf.node;
 
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.node.event.*;
+import org.jppf.node.event.LifeCycleEventHandler;
 
 /**
  * Interface for a node that provides information about its activity.
  * @author Laurent Cohen
  */
-public interface MonitoredNode extends Runnable
+public interface Node extends Runnable
 {
 	/**
 	 * Get the underlying socket used by this node.
 	 * @return a SocketWrapper instance.
 	 */
 	SocketWrapper getSocketWrapper();
+
 	/**
 	 * Set the underlying socket to be used by this node.
 	 * @param socketWrapper a SocketWrapper instance.
 	 */
 	void setSocketWrapper(SocketWrapper socketWrapper);
-	/**
-	 * Add a listener to the list of listener for this node.
-	 * @param listener the listener to add.
-	 */
-	void addNodeListener(NodeListener listener);
-	/**
-	 * Remove a listener from the list of listener for this node.
-	 * @param listener the listener to remove.
-	 */
-	void removeNodeListener(NodeListener listener);
-	/**
-	 * Notify all listeners that an event has occurred.
-	 * @param eventType the type of the event as an enumerated value.
-	 */
-	void fireNodeEvent(NodeEventType eventType);
-	/**
-	 * Create an event for the execution of a specified number of tasks.
-	 * @param nbTasks the number of tasks as an int.
-	 */
-	void fireNodeEvent(int nbTasks);
+
 	/**
 	 * Stop this node and release the resources it is using.
-	 * @param closeDataChannel determines whether the underlying data channel should be closed.
 	 */
-	void stopNode(boolean closeDataChannel);
+	void stopNode();
+
+	/**
+	 * Get the object that manages the node life cycle events.
+	 * @return a {@link LifeCycleEventHandler} instance.
+	 */
+	LifeCycleEventHandler getLifeCycleEventHandler();
 }

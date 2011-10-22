@@ -22,8 +22,7 @@ import org.jppf.comm.socket.SocketClient;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.io.*;
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.node.AbstractMonitoredNode;
-import org.jppf.node.event.NodeEventType;
+import org.jppf.node.AbstractNode;
 import org.jppf.server.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
@@ -34,7 +33,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Domingos Creado
  */
-class PeerNode extends AbstractMonitoredNode
+class PeerNode extends AbstractNode
 {
 	/**
 	 * Logger for this class.
@@ -137,7 +136,6 @@ class PeerNode extends AbstractMonitoredNode
 			}
 		}
 		if (debugEnabled) log.debug(getName() + "End of peer node main loop");
-		if (notifying) fireNodeEvent(NodeEventType.DISCONNECTED);
 	}
 
 	/**
@@ -176,7 +174,6 @@ class PeerNode extends AbstractMonitoredNode
 				sysInfo.populate();
 				bundle.setParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM, sysInfo);
 			}
-			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
 			//boolean notEmpty = (bundle.getTasks() != null) && (bundle.getTaskCount() > 0);
 			boolean notEmpty = !bundleWrapper.getTasks().isEmpty();
 			if (notEmpty)
@@ -196,7 +193,6 @@ class PeerNode extends AbstractMonitoredNode
 			}
 			if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 				driver.getJobManager().jobEnded(bundleWrapper);
-			if (notifying) fireNodeEvent(NodeEventType.END_EXEC);
 		}
 		if (debugEnabled) log.debug(getName() + " End of peer node secondary loop");
 	}
@@ -215,7 +211,6 @@ class PeerNode extends AbstractMonitoredNode
 			initSocketClient();
 		}
 		initCredentials();
-		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
 		if (mustInit)
 		{
 			if (debugEnabled) log.debug(getName() + "initializing socket");
@@ -227,7 +222,6 @@ class PeerNode extends AbstractMonitoredNode
 			socketClient.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
 			is = new SocketWrapperInputSource(socketClient);
 		}
-		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
 	}
 
 	/**
@@ -288,27 +282,23 @@ class PeerNode extends AbstractMonitoredNode
 
 	/**
 	 * Stop this node and release the resources it is using.
-	 * @param closeSocket determines whether the underlying socket should be closed.
-	 * @see org.jppf.node.MonitoredNode#stopNode(boolean)
+	 * @see org.jppf.node.Node#stopNode()
 	 */
 	@Override
-    public void stopNode(boolean closeSocket)
+	public void stopNode()
 	{
 		if (debugEnabled) log.debug(getName() + "closing node");
 		stopped = true;
-		if (closeSocket)
+		try
 		{
-			try
-			{
-				if (debugEnabled) log.debug(getName() + "closing socket: " + socketClient.getSocket());
-				socketClient.close();
-			}
-			catch(Exception ex)
-			{
-				log.error(ex.getMessage(), ex);
-			}
-			socketClient = null;
+			if (debugEnabled) log.debug(getName() + "closing socket: " + socketClient.getSocket());
+			socketClient.close();
 		}
+		catch(Exception ex)
+		{
+			log.error(ex.getMessage(), ex);
+		}
+		socketClient = null;
 	}
 
 	/**

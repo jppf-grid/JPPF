@@ -25,22 +25,22 @@ import org.jppf.task.storage.DataProvider;
 
 /**
  * Interface for all tasks submitted to the execution server.
+ * @param <T> the type of results produced by the task.
  * @author Laurent Cohen
  */
-public interface Task extends Runnable, Serializable
+public interface Task<T> extends Runnable, Serializable
 {
-
 	/**
 	 * Get the result of the task execution.
 	 * @return the result as an array of bytes.
 	 */
-	Object getResult();
+	T getResult();
 
 	/**
 	 * Set the result of the task execution.
 	 * @param  result the result of this task's execution.
 	 */
-	void setResult(Object  result);
+	void setResult(T  result);
 
 	/**
 	 * Get the exception that was raised by this task's execution. If the task raised a
@@ -118,4 +118,16 @@ public interface Task extends Runnable, Serializable
 	 * @param timeoutSchedule a <code>JPPFScheduleConfiguration</code> instance. 
 	 */
 	void setTimeoutSchedule(JPPFSchedule timeoutSchedule);
+
+	/**
+	 * Returns the position of this task in the job in which it was submitted.
+	 * @return the position of this task as an <code>int</code>.
+	 */
+	int getPosition();
+
+	/**
+	 * Set the position of this task in the job in which it was submitted.
+	 * @param position the position of this task as an <code>int</code>.
+	 */
+	void setPosition(int position);
 }

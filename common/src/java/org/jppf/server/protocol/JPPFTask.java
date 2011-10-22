@@ -18,8 +18,6 @@
 package org.jppf.server.protocol;
 
 import java.io.Serializable;
-import java.text.*;
-import java.util.*;
 
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
@@ -42,7 +40,7 @@ import org.jppf.task.storage.DataProvider;
  * </pre>
  * @author Laurent Cohen
  */
-public abstract class JPPFTask implements Task
+public abstract class JPPFTask implements Task<Object>
 {
 	/**
 	 * Explicit serialVersionUID.
@@ -64,10 +62,6 @@ public abstract class JPPFTask implements Task
 	 * The provider of shared data for this task.
 	 */
 	private transient DataProvider dataProvider = null;
-	/**
-	 * List of listeners for this task.
-	 */
-	protected transient List<JPPFTaskListener> listeners = null;
 	/**
 	 * The task timeout schedule configuration.
 	 */
@@ -142,17 +136,17 @@ public abstract class JPPFTask implements Task
 	}
 
 	/**
-	 * Returns the position of this task at the submission.
-	 * @return Returns the position of this task at the submission.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public final int getPosition() {
 		return position;
 	}
 
 	/**
-	 * Sets the position of this task into the submission.
-	 * @param position The position of this task into the submission.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public final void setPosition(int position) {
 		this.position = position;
 	}
@@ -160,42 +154,34 @@ public abstract class JPPFTask implements Task
 	/**
 	 * Add a connection status listener to this connection's list of listeners.
 	 * @param listener the listener to add to the list.
+	 * @deprecated this method does nothing. Sending task notifications via this means has very little, if any, usefulness,
+	 * as only the latest notification is kept and processed. In a multithreaded/parallel context,
+	 * this doesn't make any sense. It is much better to use the approach described in the <a href="http://www.jppf.org/samples-pack/TaskNotifications/Readme.php">Tasks Notifications sample</a>
 	 */
 	public synchronized void addJPPFTaskListener(JPPFTaskListener listener)
 	{
-		getListeners().add(listener);
 	}
 
 	/**
 	 * Remove a connection status listener from this connection's list of listeners.
 	 * @param listener the listener to remove from the list.
+	 * @deprecated this method does nothing. Sending task notifications via this means has very little, if any, usefulness,
+	 * as only the latest notification is kept and processed. In a multithreaded/parallel context,
+	 * this doesn't make any sense. It is much better to use the approach described in the <a href="http://www.jppf.org/samples-pack/TaskNotifications/Readme.php">Tasks Notifications sample</a>
 	 */
 	public synchronized void removeJPPFTaskListener(JPPFTaskListener listener)
 	{
-		getListeners().remove(listener);
 	}
 
 	/**
 	 * Notify all listeners that an event has occurred within this task.
 	 * @param source an object describing the event, must be serializable.
+	 * @deprecated this method does nothing. Sending task notifications via this means has very little, if any, usefulness,
+	 * as only the latest notification is kept and processed. In a multithreaded/parallel context,
+	 * this doesn't make any sense. It is much better to use the approach described in the <a href="http://www.jppf.org/samples-pack/TaskNotifications/Readme.php">Tasks Notifications sample</a>
 	 */
 	public synchronized void fireNotification(Serializable source)
 	{
-		JPPFTaskEvent event = new JPPFTaskEvent(source);
-		// to avoid ConcurrentModificationException
-		List<JPPFTaskListener> listeners = getListeners();
-		JPPFTaskListener[] array = listeners.toArray(new JPPFTaskListener[listeners.size()]);
-		for (JPPFTaskListener listener: array) listener.eventOccurred(event);
-	}
-
-	/**
-	 * Get the list of listeners for this task.
-	 * @return a list of <code>JPPFTaskListener</code> instances.
-	 */
-	protected synchronized List<JPPFTaskListener> getListeners()
-	{
-		if (listeners == null) listeners = new LinkedList<JPPFTaskListener>();
-		return listeners;
 	}
 
 	/**

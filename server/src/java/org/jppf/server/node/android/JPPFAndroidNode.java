@@ -57,7 +57,7 @@ public class JPPFAndroidNode extends AbstractJPPFAndroidNode
 	 * @see org.jppf.server.node.JPPFNode#initDataChannel()
 	 */
 	@Override
-    protected void initDataChannel() throws Exception
+	protected void initDataChannel() throws Exception
 	{
 		if (socketClient == null)
 		{
@@ -91,7 +91,7 @@ public class JPPFAndroidNode extends AbstractJPPFAndroidNode
 	 * @see org.jppf.server.node.JPPFNode#closeDataChannel()
 	 */
 	@Override
-    protected void closeDataChannel() throws Exception
+	protected void closeDataChannel() throws Exception
 	{
 		if (debugEnabled) log.debug("closing data channel: socketClient=" + socketClient + ", clientConnection=" + recoveryConnection);
 		if (socketClient != null)

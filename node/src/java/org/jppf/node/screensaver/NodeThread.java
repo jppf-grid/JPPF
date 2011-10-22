@@ -18,7 +18,6 @@
 package org.jppf.node.screensaver;
 
 import org.jppf.node.*;
-import org.jppf.node.event.NodeListener;
 
 /**
  * Instances of this class encapsulate separate threads in which nodes are launched.
@@ -29,20 +28,20 @@ class NodeThread extends Thread
 	/**
 	 * Reference to the underlying JPPF node.
 	 */
-	private MonitoredNode node = null;
+	private Node node = null;
 	/**
 	 * Receives event notifications from the node.
 	 */
-	private NodeListener listener = null;
+	private NodeState nodeState = null;
 
 	/**
 	 * Initialize this node thread with a specified listener.
-	 * @param listener receives notifications of events occurring within the node. 
+	 * @param nodeState receives notifications of events occurring within the node. 
 	 */
-	public NodeThread(NodeListener listener)
+	public NodeThread(NodeState nodeState)
 	{
 		super("NodeThread thread");
-		this.listener = listener;
+		this.nodeState = nodeState;
 	}
 
 	/**
@@ -50,28 +49,19 @@ class NodeThread extends Thread
 	 * @see java.lang.Thread#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
 			while (true)
 			{
-				//try
+				node = NodeRunner.createNode();
+				node.getLifeCycleEventHandler().addNodeLifeCycleListener(nodeState);
+				while (true)
 				{
-					node = NodeRunner.createNode();
-					node.addNodeListener(listener);
-					while (true)
-					{
-						node.run();
-						//goToSleep();
-					}
+					node.run();
+					//goToSleep();
 				}
-				/*
-				catch (JPPFNodeReloadNotification e)
-				{
-					if (node != null) node.removeNodeListener(listener);
-				}
-				*/
 			}
 		}
 		catch(Exception e)
@@ -93,14 +83,14 @@ class NodeThread extends Thread
 	 */
 	public void stopNode()
 	{
-		if (node != null) node.stopNode(true);
+		if (node != null) node.stopNode();
 	}
 
 	/**
 	 * Get a reference to the underlying JPPF node.
 	 * @return a <code>MonitoredNode</code> instance.
 	 */
-	public MonitoredNode getNode()
+	public Node getNode()
 	{
 		return node;
 	}

@@ -85,6 +85,17 @@ public class LifeCycleEventHandler
 	}
 
 	/**
+	 * Remove all listeners from the list of listeners.
+	 */
+	public void removeAllListeners()
+	{
+		synchronized (listeners)
+		{
+			listeners.clear();
+		}
+	}
+
+	/**
 	 * Notify all listeners that the node is starting.
 	 */
 	public void fireNodeStarting()

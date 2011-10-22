@@ -1,2 +1,0 @@
-org.jppf.server.node.spi.JPPFDefaultNodeMBeanProvider
-org.jppf.server.node.spi.JPPFNodeTaskMonitorProvider

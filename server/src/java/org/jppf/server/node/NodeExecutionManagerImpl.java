@@ -58,7 +58,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	/**
 	 * Mapping of internal number to the coresponding tasks.
 	 */
-	protected Map<Long, JPPFTask> taskMap = new Hashtable<Long, JPPFTask>();
+	protected Map<Long, Task> taskMap = new Hashtable<Long, Task>();
 	/**
 	 * The bundle whose tasks are currently being executed.
 	 */
@@ -83,7 +83,11 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	/**
 	 * List of listeners to task execution events.
 	 */
-	protected List<TaskExecutionListener> taskExecutionListeners = new Vector<TaskExecutionListener>();
+	protected List<TaskExecutionListener> taskExecutionListeners = new ArrayList<TaskExecutionListener>();
+	/**
+	 * 
+	 */
+	protected TaskExecutionListener listenerArray[] = new TaskExecutionListener[0];
 	/**
 	 * Determines whether the number of threads or their priority has changed.
 	 */
@@ -109,13 +113,13 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 * @param taskList the list of tasks to execute.
 	 * @throws Exception if the execution failed.
 	 */
-	public void execute(JPPFTaskBundle bundle, List<JPPFTask> taskList) throws Exception
+	public void execute(JPPFTaskBundle bundle, List<? extends Task> taskList) throws Exception
 	{
 		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
 		NodeExecutionInfo info = null;
 		if (isCpuTimeEnabled()) info = computeExecutionInfo();
 		setup(bundle, taskList);
-		for (JPPFTask task : taskList) performTask(task);
+		for (Task task : taskList) performTask(task);
 		waitForResults();
 		cleanup();
 		if (isCpuTimeEnabled())
@@ -133,7 +137,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 * @return a number identifying the task that was submitted.
 	 * @throws Exception if the execution failed.
 	 */
-	public synchronized long performTask(JPPFTask task) throws Exception
+	public synchronized long performTask(Task task) throws Exception
 	{
 		String id = task.getId();
 		long number = incTaskCount();
@@ -200,7 +204,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 		if (!future.isDone())
 		{
 			future.cancel(true);
-			JPPFTask task = taskMap.remove(number);
+			Task task = taskMap.remove(number);
 			if (task != null && callOnCancel) task.onCancel();
 			removeFuture(number);
 		}
@@ -223,7 +227,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 			if (!future.isDone())
 			{
 				future.cancel(true);
-				JPPFTask task = taskMap.remove(number);
+				Task task = taskMap.remove(number);
 				removeFuture(number);
 				if (task != null)
 				{
@@ -247,7 +251,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 * @param number a number identifying the task submitted to the thread pool.
 	 * @throws Exception if any error occurs.
 	 */
-	private void processTaskExpirationDate(JPPFTask task, long number) throws Exception
+	private void processTaskExpirationDate(Task task, long number) throws Exception
 	{
 		JPPFSchedule schedule = task.getTimeoutSchedule();
 		if ((schedule != null) && schedule.hasDate())
@@ -263,7 +267,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 * @param number a number identifying the task submitted to the thread pool.
 	 * @throws Exception if any error occurs.
 	 */
-	public void processTaskTimeout(JPPFTask task, long number) throws Exception
+	public void processTaskTimeout(Task task, long number) throws Exception
 	{
 		if (task.getTimeoutSchedule() != null)
 		{
@@ -286,7 +290,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 * @param bundle the bundle whose tasks are to be executed.
 	 * @param taskList the list of tasks to execute.
 	 */
-	public void setup(JPPFTaskBundle bundle, List<JPPFTask> taskList)
+	public void setup(JPPFTaskBundle bundle, List<? extends Task> taskList)
 	{
 		this.bundle = bundle;
 		this.taskList = taskList;
@@ -359,10 +363,12 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	{
 		TaskExecutionEvent event = new TaskExecutionEvent(taskMap.get(taskNumber), getCurrentJobId(), cpuTime, elapsedTime, hasError);
 		removeFuture(taskNumber);
+		TaskExecutionListener tmp[];
 		synchronized(taskExecutionListeners)
 		{
-			for (TaskExecutionListener listener: taskExecutionListeners) listener.taskExecuted(event);
+			tmp = listenerArray;
 		}
+		for (TaskExecutionListener listener: tmp) listener.taskExecuted(event);
 	}
 
 	/**
@@ -379,7 +385,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 * {@inheritDoc}
 	 */
 	@Override
-    public JPPFDistributedJob getCurrentJob()
+	public JPPFDistributedJob getCurrentJob()
 	{
 		return bundle;
 	}
@@ -416,7 +422,11 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 */
 	public void addTaskExecutionListener(TaskExecutionListener listener)
 	{
-		taskExecutionListeners.add(listener);
+		synchronized(taskExecutionListeners)
+		{
+			taskExecutionListeners.add(listener);
+			listenerArray = taskExecutionListeners.toArray(new TaskExecutionListener[taskExecutionListeners.size()]);
+		}
 	}
 
 	/**
@@ -425,7 +435,11 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 */
 	public void removeTaskExecutionListener(TaskExecutionListener listener)
 	{
-		taskExecutionListeners.remove(listener);
+		synchronized(taskExecutionListeners)
+		{
+			taskExecutionListeners.remove(listener);
+			listenerArray = taskExecutionListeners.toArray(new TaskExecutionListener[taskExecutionListeners.size()]);
+		}
 	}
 
 	/**

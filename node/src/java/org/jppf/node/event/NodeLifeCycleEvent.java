@@ -49,7 +49,7 @@ public class NodeLifeCycleEvent extends EventObject
 
 	/**
 	 * Get the tasks currently being executed.
-	 * @return a list of {@link JPPFTask} instances, or null if the node is idle.
+	 * @return a list of {@link Task} instances, or null if the node is idle.
 	 */
 	public List<Task> getTasks()
 	{

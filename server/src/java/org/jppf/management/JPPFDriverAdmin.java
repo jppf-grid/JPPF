@@ -45,7 +45,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Base name used for localization lookups";
+	 * Base name used for localization lookups.
 	 */
 	private static final String I18N_BASE = "org.jppf.server.i18n.messages";
 	/**
@@ -113,7 +113,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 			Bundler bundler = factory.createBundler(algorithm, props);
 			driver.getNodeNioServer().setBundler(bundler);
 			//return new JPPFManagementResponse(localize((manual ? "manual" : "automatic") + ".settings.changed"), null);
-			return "Load-balancing settings updated";
+			return localize("load.balancing.updated");
 		}
 		catch(Exception e)
 		{

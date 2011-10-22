@@ -20,7 +20,7 @@ package org.jppf.server.node.spi;
 
 import org.jppf.management.*;
 import org.jppf.management.spi.JPPFNodeMBeanProvider;
-import org.jppf.node.MonitoredNode;
+import org.jppf.node.Node;
 import org.jppf.server.node.JPPFNode;
 
 /**
@@ -45,10 +45,10 @@ public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider
 	 * The class of this MBean must implement the interface defined by {@link #getMBeanInterfaceName() getMBeanInterfaceName()}.
 	 * @param node - the JPPF node that is managed or monitored by the MBean.
 	 * @return an <code>Object</code> that is an implementation of the MBean interface.
-	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.MonitoredNode)
+	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.Node)
 	 */
 	@Override
-    public Object createMBean(MonitoredNode node)
+    public Object createMBean(Node node)
 	{
 		JPPFNodeTaskMonitor monitor = new JPPFNodeTaskMonitor(JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME);
 		((JPPFNode) node).getExecutionManager().addTaskExecutionListener(monitor);

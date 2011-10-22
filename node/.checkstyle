@@ -7,6 +7,9 @@
   <fileset name="all" enabled="true" check-config-name="JPPF Checks" local="true">
     <file-match-pattern match-pattern="." include-pattern="true"/>
   </fileset>
+  <filter name="FileTypesFilter" enabled="true">
+    <filter-data value="java"/>
+  </filter>
   <filter name="FilesFromPackage" enabled="false">
     <filter-data value="src/java/org/jppf/node/policy"/>
   </filter>

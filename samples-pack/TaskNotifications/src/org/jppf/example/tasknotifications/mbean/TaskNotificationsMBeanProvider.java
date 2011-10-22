@@ -19,7 +19,7 @@
 package org.jppf.example.tasknotifications.mbean;
 
 import org.jppf.management.spi.JPPFNodeMBeanProvider;
-import org.jppf.node.MonitoredNode;
+import org.jppf.node.Node;
 
 /**
  * TaskNotifications MBean provider implementation.
@@ -41,9 +41,9 @@ public class TaskNotificationsMBeanProvider implements JPPFNodeMBeanProvider
 	 * Create a concrete MBean instance.
 	 * @param node not used.
 	 * @return the created MBean implementation.
-	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.MonitoredNode)
+	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.Node)
 	 */
-	public Object createMBean(MonitoredNode node)
+	public Object createMBean(Node node)
 	{
 		return new TaskNotifications();
 	}

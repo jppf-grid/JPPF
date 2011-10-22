@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 
 import org.jppf.io.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
@@ -77,11 +78,11 @@ public abstract class AbstractNodeIO implements NodeIO
 	 * @see org.jppf.server.node.NodeIO#readTask()
 	 */
 	@Override
-    public Pair<JPPFTaskBundle, List<JPPFTask>> readTask() throws Exception
+	public Pair<JPPFTaskBundle, List<Task>> readTask() throws Exception
 	{
 		Object[] result = readObjects();
 		currentBundle = (JPPFTaskBundle) result[0];
-		List<JPPFTask> taskList = new LinkedList<JPPFTask>();
+		List<Task> taskList = new LinkedList<Task>();
 		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(currentBundle.getState()) &&
 			(currentBundle.getParameter(NODE_EXCEPTION_PARAM) == null))
 		{
@@ -93,7 +94,7 @@ public abstract class AbstractNodeIO implements NodeIO
 				taskList.add(task);
 			}
 		}
-		return new Pair<JPPFTaskBundle, List<JPPFTask>>(currentBundle, taskList);
+		return new Pair<JPPFTaskBundle, List<Task>>(currentBundle, taskList);
 	}
 
 	/**
@@ -159,7 +160,7 @@ public abstract class AbstractNodeIO implements NodeIO
 	 * @see org.jppf.server.node.NodeIO#writeResults(org.jppf.server.protocol.JPPFTaskBundle, java.util.List)
 	 */
 	@Override
-    public abstract void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception;
+	public abstract void writeResults(JPPFTaskBundle bundle, List<Task> tasks) throws Exception;
 
 	/**
 	 * A pairing of a list of buffers and the total length of their usable data.

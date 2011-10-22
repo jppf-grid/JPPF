@@ -21,8 +21,6 @@ package org.jppf.example.nodeconnectionevents;
 import org.jppf.management.*;
 import org.jppf.server.event.*;
 
-
-
 /**
  * This is a test of a driver startup class.
  * @author Laurent Cohen

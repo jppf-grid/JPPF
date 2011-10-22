@@ -22,13 +22,17 @@ import java.util.EventListener;
 
 /**
  * Listener interface for receiving notifications of tasks events.
+ * @deprecated sending task notifications via this means has very little, if any, usefulness,
+ * as only the latest notification is kept and processed. In a multithreaded/parallel context,
+ * this doesn't make any sense. It is much better to use the approach described in the <a href="http://www.jppf.org/samples-pack/TaskNotifications/Readme.php">TaskNotification sample</a>
  * @author Laurent Cohen
  */
 public interface JPPFTaskListener extends EventListener
 {
 	/**
-	 * Notify this listerer that an event has occurred during a task's life cycle.
+	 * Notify this listener that an event has occurred during a task's life cycle.
 	 * @param event the event this listener is notified of.
+	 * @deprecated
 	 */
 	void eventOccurred(JPPFTaskEvent event);
 }

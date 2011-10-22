@@ -22,7 +22,6 @@ import java.util.List;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.node.NodeExecutionManager;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.*;
 
 /**
  * Wrapper around a JPPF task used to catch exceptions caused by the task execution.
@@ -34,15 +33,15 @@ public abstract class AbstractNodeTaskWrapper implements Runnable
 	/**
 	 * The task to execute within a try/catch block.
 	 */
-	protected JPPFTask task = null;
+	protected final Task task;
 	/**
 	 * The key to the JPPFContainer for the task's classloader.
 	 */
-	protected List<String> uuidPath = null;
+	protected final List<String> uuidPath;
 	/**
 	 * The number identifying the task.
 	 */
-	protected long number = 0L;
+	protected final long number;
 	/**
 	 * The execution manager.
 	 */
@@ -58,7 +57,7 @@ public abstract class AbstractNodeTaskWrapper implements Runnable
 	 * @param uuidPath the key to the JPPFContainer for the task's classloader.
 	 * @param number the internal number identifying the task for the thread pool.
 	 */
-	public AbstractNodeTaskWrapper(JPPFTask task, List<String> uuidPath, long number)
+	public AbstractNodeTaskWrapper(Task task, List<String> uuidPath, long number)
 	{
 		this.task = task;
 		this.uuidPath = uuidPath;

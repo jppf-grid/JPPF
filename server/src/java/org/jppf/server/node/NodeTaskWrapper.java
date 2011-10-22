@@ -22,7 +22,6 @@ import java.util.List;
 import org.jppf.*;
 import org.jppf.management.JPPFNodeAdmin;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.*;
 
 /**
  * Wrapper around a JPPF task used to catch exceptions caused by the task execution.
@@ -35,10 +34,6 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 	 * The JPPF node that runs this task.
 	 */
 	private final JPPFNode node;
-	/**
-	 * The execution manager.
-	 */
-	private NodeExecutionManagerImpl executionManager = null;
 
 	/**
 	 * Initialize this task wrapper with a specified JPPF task.
@@ -47,7 +42,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 	 * @param uuidPath the key to the JPPFContainer for the task's classloader.
 	 * @param number the internal number identifying the task for the thread pool.
 	 */
-	public NodeTaskWrapper(JPPFNode node, JPPFTask task, List<String> uuidPath, long number)
+	public NodeTaskWrapper(JPPFNode node, Task task, List<String> uuidPath, long number)
 	{
 		super(task, uuidPath, number);
 		this.node = node;
@@ -59,33 +54,32 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		JPPFNodeAdmin nodeAdmin = null;
+		NodeExecutionManagerImpl em = (NodeExecutionManagerImpl) executionManager;
 		long cpuTime = 0L;
 		long elapsedTime = 0L;
 		try
 		{
-			if (node.isNotifying()) node.incrementExecutingCount();
 			if (node.isJmxEnabled())
 			{
 				nodeAdmin = node.getNodeAdmin();
 				if (nodeAdmin != null)
 				{
 					nodeAdmin.taskStarted(task.getId());
-					task.addJPPFTaskListener(nodeAdmin);
 				}
 			}
 			Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
 			long id = Thread.currentThread().getId();
-			executionManager.processTaskTimeout(task, number);
+			em.processTaskTimeout(task, number);
 			long startTime = System.currentTimeMillis();
-			long startCpuTime = executionManager.getCpuTime(id);
+			long startCpuTime = em.getCpuTime(id);
 			task.run();
 			try
 			{
 				// convert cpu time from nanoseconds to milliseconds
-				cpuTime = (executionManager.getCpuTime(id) - startCpuTime) / 1000000L;
+				cpuTime = (em.getCpuTime(id) - startCpuTime) / 1000000L;
 				elapsedTime = System.currentTimeMillis() - startTime;
 			}
 			catch(Throwable ignore)
@@ -108,9 +102,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 				try
 				{
 					if (nodeAdmin != null) nodeAdmin.taskEnded(task.getId());
-					task.removeJPPFTaskListener(nodeAdmin);
-					if (node.isNotifying()) node.decrementExecutingCount();
-					executionManager.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
+					em.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
 				}
 				catch(JPPFNodeReconnectionNotification t)
 				{
@@ -119,8 +111,8 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 			}
 			if (reconnectionNotification != null)
 			{
-				executionManager.setReconnectionNotification(reconnectionNotification);
-				executionManager.wakeUp();
+				em.setReconnectionNotification(reconnectionNotification);
+				em.wakeUp();
 			}
 		}
 	}
@@ -130,7 +122,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 	 * @return the task as a <code>JPPFTask</code> instance.
 	 */
 	@Override
-    public Task getTask()
+	public Task getTask()
 	{
 		return task;
 	}

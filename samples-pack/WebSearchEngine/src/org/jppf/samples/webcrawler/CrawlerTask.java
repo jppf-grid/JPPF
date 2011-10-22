@@ -112,7 +112,6 @@ public class CrawlerTask extends JPPFTask
 	 */
 	private void crawl() throws Exception
 	{
-		fireNotification("Starting crawl of " + url);
 		URL u = new URL(url);
 		String server = u.getProtocol() + "://" + u.getHost();
 		while (server.endsWith("/")) server = server.substring(0, server.length() -1);
@@ -137,14 +136,11 @@ public class CrawlerTask extends JPPFTask
 			public void parse(ParserEvent event)
 			{
 				String url = event.getLink().getURI();
-				fireNotification("Visiting " + url);
 				if (!toVisit.contains(url)) toVisit.add(url);
 			}
 		});
 
 		crawler.start(server, start);
-
-		fireNotification("task#" + getId() + ": done visiting " + url);
 	}
 
 	/**
@@ -153,8 +149,6 @@ public class CrawlerTask extends JPPFTask
 	 */
 	private void search() throws Exception
 	{
-		fireNotification("Starting search of '" + query + "' in " + url);
-
 		QueryParser parser = new QueryParser("contents", new StandardAnalyzer());
 		Query q = parser.parse(query);
 
@@ -175,8 +169,6 @@ public class CrawlerTask extends JPPFTask
 			}
 			matchedLinks.add(new LinkMatch(url, relevance));
 		}
-
-		fireNotification("task#" + getId() + ": done searching " + url + ", score = " + relevance);
 	}
 	
 	/**

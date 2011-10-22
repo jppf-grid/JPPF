@@ -141,7 +141,7 @@ public class AndroidNodeIO extends AbstractNodeIO
 	 * @see org.jppf.server.node.NodeIO#writeResults(org.jppf.server.protocol.JPPFTaskBundle, java.util.List)
 	 */
 	@Override
-    public void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
+    public void writeResults(JPPFTaskBundle bundle, List<Task> tasks) throws Exception
 	{
 		ExecutorService executor = node.getExecutionManager().getExecutor();
 		//long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();

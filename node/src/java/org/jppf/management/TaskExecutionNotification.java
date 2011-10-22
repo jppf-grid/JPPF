@@ -43,7 +43,7 @@ public class TaskExecutionNotification extends Notification
 	 */
 	public TaskExecutionNotification(ObjectName source, long sequenceNumber, TaskInformation taskInformation)
 	{
-		super("task.monitor", source, sequenceNumber);
+		super("task.monitor", source, sequenceNumber, taskInformation.getTimestamp());
 		this.taskInformation = taskInformation;
 	}
 

@@ -20,6 +20,7 @@ package org.jppf.server.node.android;
 
 import java.util.List;
 
+import org.jppf.node.protocol.Task;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
 import org.slf4j.*;
@@ -60,13 +61,13 @@ public class AndroidNodeExecutionManager extends NodeExecutionManagerImpl
 	 * @throws Exception if the execution failed.
 	 */
 	@Override
-    public void execute(JPPFTaskBundle bundle, List<JPPFTask> taskList) throws Exception
+    public void execute(JPPFTaskBundle bundle, List<? extends Task> taskList) throws Exception
 	{
 		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
 		NodeExecutionInfo info = null;
 		if (isCpuTimeEnabled()) info = computeExecutionInfo();
 		setup(bundle, taskList);
-		for (JPPFTask task : taskList) performTask(task);
+		for (Task task : taskList) performTask(task);
 		waitForResults();
 		cleanup();
 	}

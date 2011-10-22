@@ -64,7 +64,6 @@ class AndroidNodeTaskWrapper extends AbstractNodeTaskWrapper
 		long elapsedTime = 0L;
 		try
 		{
-			if (node.isNotifying()) node.incrementExecutingCount();
 			Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
 			long id = Thread.currentThread().getId();
 			executionManager.processTaskTimeout(task, number);
@@ -93,7 +92,6 @@ class AndroidNodeTaskWrapper extends AbstractNodeTaskWrapper
 			{
 				try
 				{
-					if (node.isNotifying()) node.decrementExecutingCount();
 					executionManager.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
 				}
 				catch(JPPFNodeReconnectionNotification t)

@@ -191,7 +191,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 */
 	public String[] getAllJobIds() throws Exception
 	{
-		return (String[]) invoke(DriverJobManagementMBean.MBEAN_NAME, "getAllJobIds", (Object[]) null, (String[]) null);
+		//return (String[]) invoke(DriverJobManagementMBean.MBEAN_NAME, "getAllJobIds", (Object[]) null, (String[]) null);
+		return (String[]) getAttribute(DriverJobManagementMBean.MBEAN_NAME, "AllJobIds");
 	}
 
 	/**

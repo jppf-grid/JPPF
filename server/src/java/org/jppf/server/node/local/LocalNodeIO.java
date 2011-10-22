@@ -101,7 +101,7 @@ public class LocalNodeIO extends AbstractNodeIO
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
+	protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
 	{
 		int count = bundle.getTaskCount();
 		List<Object> list = new ArrayList<Object>(count + 1);
@@ -136,7 +136,7 @@ public class LocalNodeIO extends AbstractNodeIO
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void writeResults(JPPFTaskBundle bundle, List<JPPFTask> tasks) throws Exception
+	public void writeResults(JPPFTaskBundle bundle, List<Task> tasks) throws Exception
 	{
 		if (debugEnabled) log.debug("writing results");
 		ExecutorService executor = node.getExecutionManager().getExecutor();

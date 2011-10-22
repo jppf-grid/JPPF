@@ -21,7 +21,7 @@ package org.jppf.management;
 import java.io.Serializable;
 import java.util.*;
 
-import org.jppf.node.event.NodeEventType;
+import org.jppf.utils.LocalizationUtils;
 
 /**
  * Instances of this class represent the state of a node.
@@ -35,17 +35,13 @@ public class JPPFNodeState implements Serializable
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
-	 * The latest event received from a task.
-	 */
-	private Serializable taskEvent = "";
-	/**
 	 * Status of the connection between the node and the server.
 	 */
-	private String connectionStatus = NodeEventType.UNKNOWN.toString();
+	private String connectionStatus = LocalizationUtils.getLocalized("org.jppf.server.i18n.messages", "unknown");
 	/**
 	 * Latest execution status of the node.
 	 */
-	private String executionStatus = NodeEventType.UNKNOWN.toString();
+	private String executionStatus = LocalizationUtils.getLocalized("org.jppf.server.i18n.messages", "node.idle");
 	/**
 	 * The number of tasks executed by the node.
 	 */
@@ -73,21 +69,22 @@ public class JPPFNodeState implements Serializable
 	//private int threadPriority = Thread.NORM_PRIORITY;
 
 	/**
-	 * Get the latest event received from a task.
-	 * @return the event as an object.
+	 * This method returns <code>null</code>.
+	 * @return <code>null</code>.
+	 * @deprecated see {@link org.jppf.server.protocol.JPPFTaskListener JPPFTaskListener} for a rationale.
 	 */
 	public synchronized Serializable getTaskNotification()
 	{
-		return taskEvent;
+		return null;
 	}
 
 	/**
-	 * Set the latest event received from a task.
+	 * This method does nothing.
 	 * @param taskEvent the event as an object.
+	 * @deprecated see {@link org.jppf.server.protocol.JPPFTaskListener JPPFTaskListener} for a rationale.
 	 */
 	public synchronized void setTaskEvent(Serializable taskEvent)
 	{
-		this.taskEvent = taskEvent;
 	}
 
 	/**
@@ -258,7 +255,6 @@ public class JPPFNodeState implements Serializable
 		s.setNbTasksExecuted(getNbTasksExecuted());
 		s.setConnectionStatus(getConnectionStatus());
 		s.setExecutionStatus(getExecutionStatus());
-		s.setTaskEvent(getTaskNotification());
 		s.setTaskIdSet(getAllTaskIds());
 		s.setThreadPoolSize(getThreadPoolSize());
 		s.setThreadPriority(getThreadPriority());

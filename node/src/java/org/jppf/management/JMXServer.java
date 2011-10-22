@@ -21,12 +21,11 @@ package org.jppf.management;
 import javax.management.MBeanServer;
 
 /**
- * 
+ * Interface for JMX remote servers associated to drivers and nodes.
  * @author Laurent Cohen
  */
 public interface JMXServer
 {
-
 	/**
 	 * Start the MBean server and associated resources.
 	 * @param cl - the default classloader to be used by the JMX remote connector.
@@ -48,15 +47,13 @@ public interface JMXServer
 
 	/**
 	 * Determine whether this JMX server is stopped.
-	 * @return true if this JMX server is stopped, false otherwise.
+	 * @return <code>true</code> if this JMX server is stopped, <code>false</code> otherwise.
 	 */
 	boolean isStopped();
 
 	/**
-	 * Get a unique identifier for this management server. This id must be unique accross JPPF nodes and servers,
-	 * and is used to identify this server if multiple nodes or servers share the same RMI registry.
+	 * Get a unique identifier for this management server. This id must be unique accross JPPF nodes and servers.
 	 * @return the id as a string.
 	 */
 	String getId();
-
 }

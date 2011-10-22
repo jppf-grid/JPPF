@@ -28,7 +28,7 @@ import org.jppf.node.event.*;
 /**
  * Instances of this class represent information about a node.
  */
-class NodeState implements NodeListener
+class NodeState implements NodeLifeCycleListener
 {
 	/**
 	 * Contains the threads in which the nodes run.
@@ -80,13 +80,13 @@ class NodeState implements NodeListener
 			statusLabels[i][1] = new JLabel(NodePanel.BRIGHT_RED);
 		}
 		Dimension d = new Dimension(8, 8);
-        for (JLabel[] statusLabel : statusLabels) {
-            for (JLabel aStatusLabel : statusLabel) {
-                aStatusLabel.setMinimumSize(d);
-                aStatusLabel.setMaximumSize(d);
-                aStatusLabel.setBackground(Color.BLACK);
-            }
-        }
+		for (JLabel[] statusLabel : statusLabels) {
+			for (JLabel aStatusLabel : statusLabel) {
+				aStatusLabel.setMinimumSize(d);
+				aStatusLabel.setMaximumSize(d);
+				aStatusLabel.setBackground(Color.BLACK);
+			}
+		}
 		countLabel = new JLabel("" + taskCount);
 		d = new Dimension(60, 20);
 		countLabel.setMinimumSize(d);
@@ -102,7 +102,7 @@ class NodeState implements NodeListener
 		btn[0].addActionListener(new ActionListener()
 		{
 			@Override
-            public void actionPerformed(ActionEvent event)
+			public void actionPerformed(ActionEvent event)
 			{
 				startNode();
 			}
@@ -150,8 +150,9 @@ class NodeState implements NodeListener
 	 * @param event the event that triggered the call to this method.
 	 * @see org.jppf.node.event.NodeListener#eventOccurred(org.jppf.node.event.NodeEvent)
 	 */
+	/*
 	@Override
-    public void eventOccurred(NodeEvent event)
+	public void eventOccurred(NodeEvent event)
 	{
 		switch (event.getType())
 		{
@@ -187,5 +188,46 @@ class NodeState implements NodeListener
 				countLabel.setText(Integer.toString(n));
 				break;
 		}
+	}
+	*/
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void nodeStarting(NodeLifeCycleEvent event)
+	{
+		statusLabels[0][0].setIcon(NodePanel.BRIGHT_GREEN);
+		statusLabels[0][1].setIcon(NodePanel.DARK_RED);
+		statusLabels[1][0].setIcon(NodePanel.DARK_GREEN);
+		statusLabels[1][1].setIcon(NodePanel.BRIGHT_RED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void nodeEnding(NodeLifeCycleEvent event)
+	{
+		statusLabels[0][0].setIcon(NodePanel.DARK_GREEN);
+		statusLabels[0][1].setIcon(NodePanel.BRIGHT_RED);
+		statusLabels[1][0].setIcon(NodePanel.DARK_GREEN);
+		statusLabels[1][1].setIcon(NodePanel.DARK_RED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void jobStarting(NodeLifeCycleEvent event)
+	{
+		statusLabels[1][0].setIcon(NodePanel.BRIGHT_GREEN);
+		statusLabels[1][1].setIcon(NodePanel.DARK_RED);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void jobEnding(NodeLifeCycleEvent event)
+	{
+		statusLabels[1][0].setIcon(NodePanel.DARK_GREEN);
+		statusLabels[1][1].setIcon(NodePanel.BRIGHT_RED);
 	}
 }

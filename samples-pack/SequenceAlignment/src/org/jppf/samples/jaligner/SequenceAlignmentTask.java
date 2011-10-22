@@ -68,7 +68,6 @@ public class SequenceAlignmentTask extends JPPFTask
 			Alignment a = SmithWatermanGotoh.align(seq, target, matrix, 10.0f, 0.5f);
 			setResult(a.calculateScore());
 			String s = "task#" + getId() + ": score=" + a.getScore() + ", sequence=" + seq.getDescription();
-			fireNotification(s);
 		}
 		catch(Exception e)
 		{

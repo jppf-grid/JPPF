@@ -19,7 +19,7 @@ package org.jppf.server.node;
 
 import java.util.concurrent.Future;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * Instances of this class are scheduled by a timer to execute one time, check
@@ -39,7 +39,7 @@ public class TimeoutTimerTask implements Runnable
 	/**
 	 * The task to cancel.
 	 */
-	private JPPFTask task = null;
+	private Task task = null;
 	/**
 	 * The execution manager that started this task.
 	 */
@@ -51,7 +51,7 @@ public class TimeoutTimerTask implements Runnable
 	 * @param number the number identifying the task.
 	 * @param task the task to cancel.
 	 */
-	public TimeoutTimerTask(NodeExecutionManagerImpl executionManager, long number, JPPFTask task)
+	public TimeoutTimerTask(NodeExecutionManagerImpl executionManager, long number, Task task)
 	{
 		this.executionManager = executionManager;
 		this.number = number;

@@ -24,6 +24,7 @@ import org.jppf.classloader.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.*;
 import org.jppf.node.event.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
 import org.jppf.startup.*;
@@ -35,7 +36,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Domingos Creado
  */
-public abstract class AbstractJPPFAndroidNode extends AbstractMonitoredNode
+public abstract class AbstractJPPFAndroidNode extends AbstractNode
 {
 	/**
 	 * Logger for this class.
@@ -80,7 +81,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractMonitoredNode
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		setStopped(false);
 		boolean initialized = false;
@@ -104,7 +105,6 @@ public abstract class AbstractJPPFAndroidNode extends AbstractMonitoredNode
 			catch(Exception e)
 			{
 				log.error(e.getMessage(), e);
-				if (notifying) fireNodeEvent(NodeEventType.DISCONNECTED);
 				if (classLoaderManager.getClassLoader() != null)
 				{
 					classLoaderManager.getClassLoader().reset();
@@ -144,11 +144,10 @@ public abstract class AbstractJPPFAndroidNode extends AbstractMonitoredNode
 		if (debugEnabled) log.debug("Start of node secondary loop");
 		while (!isStopped())
 		{
-			Pair<JPPFTaskBundle, List<JPPFTask>> pair = nodeIO.readTask();
-			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
+			Pair<JPPFTaskBundle, List<Task>> pair = nodeIO.readTask();
 			JPPFTaskBundle bundle = pair.first();
 			checkInitialBundle(bundle);
-			List<JPPFTask> taskList = pair.second();
+			List<Task> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (!taskList.isEmpty());
 			if (debugEnabled)
 			{
@@ -182,7 +181,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractMonitoredNode
 	 * @param taskList - the tasks results.
 	 * @throws Exception if any error occurs.
 	 */
-	private void processResults(JPPFTaskBundle bundle, List<JPPFTask> taskList) throws Exception
+	private void processResults(JPPFTaskBundle bundle, List<Task> taskList) throws Exception
 	{
 		if (debugEnabled) log.debug("processing results for job '" + bundle.getName() + '\'');
 		if (executionManager.checkConfigChanged())
@@ -208,9 +207,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractMonitoredNode
 		if (debugEnabled) log.debug("start node initialization");
 		initHelper();
 		new JPPFStartupLoader().load(JPPFNodeStartupSPI.class);
-		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
 		initDataChannel();
-		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
 		lifeCycleEventHandler = new LifeCycleEventHandler(executionManager);
 		lifeCycleEventHandler.loadListeners();
 		lifeCycleEventHandler.fireNodeStarting();
@@ -287,26 +284,22 @@ public abstract class AbstractJPPFAndroidNode extends AbstractMonitoredNode
 
 	/**
 	 * Stop this node and release the resources it is using.
-	 * @param closeSocket determines whether the underlying socket should be closed.
-	 * @see org.jppf.node.MonitoredNode#stopNode(boolean)
+	 * @see org.jppf.node.Node#stopNode(boolean)
 	 */
 	@Override
-    public synchronized void stopNode(boolean closeSocket)
+	public synchronized void stopNode()
 	{
 		if (debugEnabled) log.debug("stopping node");
 		lifeCycleEventHandler.fireNodeEnding();
 		setStopped(true);
 		executionManager.shutdown();
-		if (closeSocket)
+		try
 		{
-			try
-			{
-				closeDataChannel();
-			}
-			catch(Exception ex)
-			{
-				log.error(ex.getMessage(), ex);
-			}
+			closeDataChannel();
+		}
+		catch(Exception ex)
+		{
+			log.error(ex.getMessage(), ex);
 		}
 		classLoaderManager.setClassLoader(null);
 	}

@@ -36,7 +36,7 @@ public interface NodeExecutionManager
 
 	/**
 	 * Get the list of tasks currently being executed.
-	 * @return a list of {@link JPPFTask} instances, or null if the node is idle.
+	 * @return a list of {@link Task} instances, or null if the node is idle.
 	 */
 	List<Task> getTasks();
 

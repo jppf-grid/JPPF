@@ -20,7 +20,6 @@ package org.jppf.addons.nodetray;
 
 import java.awt.*;
 import java.awt.TrayIcon.MessageType;
-import java.util.EnumSet;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.management.*;
@@ -37,7 +36,7 @@ import org.slf4j.*;
  * and changes the icon accordingly.
  * @author Laurent Cohen
  */
-public class NodeSystemTray
+public class NodeSystemTray implements NodeLifeCycleListener
 {
 	/**
 	 * Logger for this class.
@@ -55,10 +54,6 @@ public class NodeSystemTray
 	 * The wrapper used to access management functionalities.
 	 */
 	private JMXNodeConnectionWrapper wrapper = null;
-	/**
-	 * A reference to the node.
-	 */
-	private MonitoredNode node = null;
 	/**
 	 * Proxy to the task monitor MBean.
 	 */
@@ -79,7 +74,6 @@ public class NodeSystemTray
 			images = new Image[2];
 			images[0] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/addons/nodetray/node_green.gif"));
 			images[1] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/addons/nodetray/node_red.gif"));
-			node = NodeRunner.getNode();
 			TrayIcon oldTrayIcon = (TrayIcon) NodeRunner.getPersistentData("JPPFNodeTrayIcon");
 			if (oldTrayIcon != null) tray.remove(oldTrayIcon);
 			trayIcon = new TrayIcon(images[1]);
@@ -87,9 +81,7 @@ public class NodeSystemTray
 			tray.add(trayIcon);
 			NodeRunner.setPersistentData("JPPFNodeTrayIcon", trayIcon);
 			initJMX();
-			initNodeListener();
-			String s = generateTooltipText();
-			trayIcon.setToolTip(s);
+			trayIcon.setToolTip(generateTooltipText());
 		}
 		catch(Exception e)
 		{
@@ -106,28 +98,9 @@ public class NodeSystemTray
 		{
 			wrapper = new JMXNodeConnectionWrapper();
 			wrapper.connectAndWait(5000);
-			NodeEventType status = NodeEventType.valueOf(wrapper.state().getConnectionStatus());
-			Image image = (NodeEventType.END_CONNECT.equals(status)) ? images[0] : images[1];
-			trayIcon.setImage(image);
-			ObjectName objectName = new ObjectName(JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME);
-		  MBeanServerConnection mbsc = wrapper.getMbeanConnection();
-		  taskMonitor = (JPPFNodeTaskMonitorMBean) MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, JPPFNodeTaskMonitorMBean.class, true);
+			trayIcon.setImage(images[1]);
+		  taskMonitor = wrapper.getProxy(JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME, JPPFNodeTaskMonitorMBean.class);
 		  taskMonitor.addNotificationListener(new JMXNotificationListener(), null, null);
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-	}
-
-	/**
-	 * Initialize adds a node listener to be notified of server connection state changes.
-	 */
-	private void initNodeListener()
-	{
-		try
-		{
-			node.addNodeListener(new NodeStateListener());
 		}
 		catch(Exception e)
 		{
@@ -183,54 +156,52 @@ public class NodeSystemTray
 	}
 
 	/**
-	 * Listens to the node state changes, display appropriates messages in the tray notification area,
-	 * and manages the icon accordingly.
+	 * {@inheritDoc}
 	 */
-	public class NodeStateListener implements NodeListener
+	public void nodeStarting(NodeLifeCycleEvent event)
 	{
-		/**
-		 * The latest node connection state.
-		 */
-		private NodeEventType lastEventType = NodeEventType.DISCONNECTED;
-		/**
-		 * The states we're interested in.
-		 */
-		private EnumSet<NodeEventType> interestStates = EnumSet.of(NodeEventType.START_CONNECT, NodeEventType.END_CONNECT, NodeEventType.DISCONNECTED);
-
-		/**
-		 * Called to notify a listener that a node event has occurred.
-		 * This method detects whether the node was disconnected or just re-connected, and displays a corresponding
-		 * message in the tray notification area. It also changes the icon to green/red depending on the state.
-		 * @param event the event that triggered the notification.
-		 * @see org.jppf.node.event.NodeListener#eventOccurred(org.jppf.node.event.NodeEvent)
-		 */
-		public void eventOccurred(NodeEvent event)
+		trayIcon.displayMessage("JPPF Node connected", null, MessageType.INFO);
+		lock.lock();
+		try
 		{
-			NodeEventType type = event.getType();
-			// if not a state we're interested in, or no connection state change occurred, do nothing.
-			if (!interestStates.contains(type) || type.equals(lastEventType)) return;
-			Image image = NodeEventType.END_CONNECT.equals(type) ? images[0] : images[1];
-			// if the node was disconnected from the server
-			if (NodeEventType.START_CONNECT.equals(type) || NodeEventType.DISCONNECTED.equals(type))
-			{
-				trayIcon.displayMessage("JPPF Node disconnected from the server!", "attempting reconnection ...", MessageType.ERROR);
-			}
-			// if the node has reconnected to the server
-			else if (NodeEventType.END_CONNECT.equals(type))
-			{
-				trayIcon.displayMessage("JPPF Node connected", null, MessageType.INFO);
-			}
-			lastEventType = type;
-  		lock.lock();
-  		try
-  		{
-  			// display the green or red icon, depending on the connection state
-      	trayIcon.setImage(image);
-  		}
-  		finally
-  		{
-  			lock.unlock();
-  		}
+			// node is disconnected, display the green icon
+    	trayIcon.setImage(images[0]);
 		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void nodeEnding(NodeLifeCycleEvent event)
+	{
+		trayIcon.displayMessage("JPPF Node disconnected from the server!", "attempting reconnection ...", MessageType.ERROR);
+		lock.lock();
+		try
+		{
+			// node is disconnected, display the red icon
+    	trayIcon.setImage(images[1]);
+		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void jobStarting(NodeLifeCycleEvent event)
+	{
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void jobEnding(NodeLifeCycleEvent event)
+	{
 	}
 }

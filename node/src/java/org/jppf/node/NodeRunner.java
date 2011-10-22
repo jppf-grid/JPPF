@@ -78,7 +78,7 @@ public class NodeRunner
 	/**
 	 * The JPPF node.
 	 */
-	private static MonitoredNode node = null;
+	private static Node node = null;
 	/**
 	 * Used to synchronize start and stop methods when the node is run as a service.
 	 */
@@ -121,7 +121,7 @@ public class NodeRunner
 		{
 			int pid = SystemUtils.getPID();
 			if (pid > 0) System.out.println("node process id: " + pid);
-			log.info("starting node, uuid=" + uuid);
+			log.info("starting node, uuid=" + uuid + ", PID=" + pid);
 			// to ensure VersionUtils is loaded by the same class loader as this class.
 			VersionUtils.getBuildNumber();
 			while (true)
@@ -136,7 +136,7 @@ public class NodeRunner
 					if (debugEnabled) log.debug("received reconnection notification");
 					if (classLoader != null) classLoader.close();
 					classLoader = null;
-					if (node != null) node.stopNode(true);
+					if (node != null) node.stopNode();
 					unsetSecurity();
 				}
 			}
@@ -172,13 +172,13 @@ public class NodeRunner
 	 * @return the node that was started, as a <code>MonitoredNode</code> instance.
 	 * @throws Exception if the node failed to run or couldn't connect to the server.
 	 */
-	public static MonitoredNode createNode() throws Exception
+	public static Node createNode() throws Exception
 	{
 		if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true)) discoverDriver();
 		setSecurity();
 		String className = "org.jppf.server.node.remote.JPPFRemoteNode";
 		Class clazz = getJPPFClassLoader().loadJPPFClass(className);
-		MonitoredNode node = (MonitoredNode) clazz.newInstance();
+		Node node = (Node) clazz.newInstance();
 		if (debugEnabled) log.debug("Created new node instance: " + node);
 		node.setSocketWrapper(nodeSocket);
 		return node;
@@ -315,7 +315,7 @@ public class NodeRunner
 	 * Get the JPPF node.
 	 * @return a <code>MonitoredNode</code> instance.
 	 */
-	public static MonitoredNode getNode()
+	public static Node getNode()
 	{
 		return node;
 	}
@@ -325,7 +325,7 @@ public class NodeRunner
 	 * @param node the node to shutdown or restart.
 	 * @param restart determines whether this node should be restarted by the node launcher.
 	 */
-	public static void shutdown(MonitoredNode node, final boolean restart)
+	public static void shutdown(Node node, final boolean restart)
 	{
 		//node.stopNode(true);
 		executor.submit(restart ? RESTART_TASK : SHUTDOWN_TASK);

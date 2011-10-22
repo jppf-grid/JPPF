@@ -90,7 +90,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	 * Initialize the underlying socket connection.
 	 */
 	@Override
-    protected void init()
+	protected void init()
 	{
 		LOCK.lock();
 		try
@@ -155,7 +155,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void reset()
+	public void reset()
 	{
 		LOCK.lock();
 		try
@@ -174,13 +174,16 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	 * @see org.jppf.classloader.AbstractJPPFClassLoader#close()
 	 */
 	@Override
-    public void close()
+	public void close()
 	{
 		LOCK.lock();
 		try
 		{
-			executor.shutdownNow();
-			executor = null;
+			if (executor != null)
+			{
+				executor.shutdownNow();
+				executor = null;
+			}
 			if (socketInitializer != null) socketInitializer.close();
 			if (socketClient != null)
 			{
@@ -209,7 +212,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	 * @throws Exception if the connection was lost and could not be reestablished.
 	 */
 	@Override
-    protected JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception
+	protected JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception
 	{
 		JPPFResourceWrapper resource = new JPPFResourceWrapper();
 		resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);

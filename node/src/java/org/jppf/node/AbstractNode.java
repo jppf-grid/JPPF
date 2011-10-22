@@ -18,18 +18,17 @@
 
 package org.jppf.node;
 
-import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.comm.socket.*;
-import org.jppf.node.event.*;
+import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.utils.*;
 
 /**
  * Abstract implementation of the <code>MonitoredNode</code> interface.
  * @author Laurent Cohen
  */
-public abstract class AbstractMonitoredNode extends ThreadSynchronization implements MonitoredNode, Runnable
+public abstract class AbstractNode extends ThreadSynchronization implements Node, Runnable
 {
 	/**
 	 * Utility for deserialization and serialization.
@@ -48,10 +47,6 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	 */
 	protected SocketInitializer socketInitializer = new SocketInitializerImpl();
 	/**
-	 * The list of listeners that receive notifications from this node.
-	 */
-	protected List<NodeListener> listeners = new ArrayList<NodeListener>();
-	/**
 	 * This flag is true if there is at least one listener, and false otherwise.
 	 */
 	protected boolean notifying = false;
@@ -69,61 +64,11 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	protected AtomicInteger executingCount = new AtomicInteger(0);
 
 	/**
-	 * Add a listener to the list of listener for this node.
-	 * @param listener the listener to add.
-	 * @see org.jppf.node.MonitoredNode#addNodeListener(org.jppf.node.event.NodeListener)
-	 */
-	@Override
-    public void addNodeListener(NodeListener listener)
-	{
-		if (listener == null) return;
-		listeners.add(listener);
-		notifying = true;
-	}
-
-	/**
-	 * Remove a listener from the list of listener for this node.
-	 * @param listener the listener to remove.
-	 * @see org.jppf.node.MonitoredNode#removeNodeListener(org.jppf.node.event.NodeListener)
-	 */
-	@Override
-    public void removeNodeListener(NodeListener listener)
-	{
-		if (listener == null) return;
-		listeners.remove(listener);
-		if (listeners.size() <= 0) notifying = false;
-	}
-
-	/**
-	 * Notify all listeners that an event has occurred.
-	 * @param eventType the type of the event as an enumerated value.
-	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(org.jppf.node.event.NodeEventType)
-	 */
-	@Override
-    public synchronized void fireNodeEvent(NodeEventType eventType)
-	{
-		NodeEvent event = new NodeEvent(eventType);
-		for (NodeListener listener : listeners) listener.eventOccurred(event);
-	}
-
-	/**
-	 * Create an event for the execution of a specified number of tasks.
-	 * @param nbTasks the number of tasks as an int.
-	 * @see org.jppf.node.MonitoredNode#fireNodeEvent(int)
-	 */
-	@Override
-    public synchronized void fireNodeEvent(int nbTasks)
-	{
-		NodeEvent event = new NodeEvent(nbTasks);
-		for (NodeListener listener : listeners) listener.eventOccurred(event);
-	}
-
-	/**
 	 * Get the underlying socket wrapper used by this node.
 	 * @return a <code>SocketWrapper</code> instance.
 	 */
 	@Override
-    public SocketWrapper getSocketWrapper()
+	public SocketWrapper getSocketWrapper()
 	{
 		return socketClient;
 	}
@@ -133,7 +78,7 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	 * @param wrapper a <code>SocketWrapper</code> instance.
 	 */
 	@Override
-    public void setSocketWrapper(SocketWrapper wrapper)
+  public void setSocketWrapper(SocketWrapper wrapper)
 	{
 		this.socketClient = wrapper;
 	}
@@ -149,11 +94,10 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 
 	/**
 	 * Stop this node and release the resources it is using.
-	 * @param closeSocket determines whether the underlying socket should be closed.
-	 * @see org.jppf.node.MonitoredNode#stopNode(boolean)
+	 * @see org.jppf.node.Node#stopNode()
 	 */
 	@Override
-    public abstract void stopNode(boolean closeSocket);
+	public abstract void stopNode();
 
 	/**
 	 * Get the total number of tasks executed.
@@ -183,21 +127,13 @@ public abstract class AbstractMonitoredNode extends ThreadSynchronization implem
 	}
 
 	/**
-	 * Decrement the count of currently executing tasks and determine whether
-	 * an idle notification should be sent.
+	 * Default implementation
+	 * @return this method always returns null.
+	 * @see org.jppf.node.Node#getLifeCycleEventHandler()
 	 */
-	public void decrementExecutingCount()
+	@Override
+	public LifeCycleEventHandler getLifeCycleEventHandler()
 	{
-		if (executingCount.decrementAndGet() == 0) fireNodeEvent(NodeEventType.END_EXEC);
-		fireNodeEvent(NodeEventType.TASK_EXECUTED);
-	}
-	
-	/**
-	 * Increment the count of currently executing tasks and determine whether
-	 * a busy notification should be sent.
-	 */
-	public void incrementExecutingCount()
-	{
-		if (executingCount.incrementAndGet() == 1) fireNodeEvent(NodeEventType.START_EXEC);
+		return null;
 	}
 }

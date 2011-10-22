@@ -25,6 +25,9 @@ import java.util.EventObject;
  * Instances of this class represent events sent by a JPPF task.
  * These events are notifications of things happening during a task's lifecycle,
  * and can be used for user-defined monitoring of the tasks.
+ * @deprecated sending task notifications via this means has very little, if any, usefulness,
+ * as only the latest notification is kept and processed. In a multithreaded/parallel context,
+ * this doesn't make any sense. It is much better to use the approach described in the <a href="http://www.jppf.org/samples-pack/TaskNotifications/Readme.php">TaskNotification sample</a>
  * @author Laurent Cohen
  */
 public class JPPFTaskEvent extends EventObject
@@ -32,6 +35,7 @@ public class JPPFTaskEvent extends EventObject
 	/**
 	 * Initialize this event with the specified source.
 	 * @param source an object describing the event, must be serializable.
+	 * @deprecated
 	 */
 	public JPPFTaskEvent(Serializable source)
 	{

@@ -219,6 +219,39 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	}
 
 	/**
+	 * Get the value of an attribute of the specified MBean.
+	 * @param name the name of the MBean.
+	 * @param attribute the name of the attribute to read.
+	 * @return an object or null.
+	 * @throws Exception if the invocation failed.
+	 */
+	public synchronized Object getAttribute(String name, String attribute) throws Exception
+	{
+		if ((connectionThread.get() != null) && connectionThread.get().isConnecting()) return null;
+		Object result = null;
+		try
+		{
+	    ObjectName mbeanName = new ObjectName(name);
+  		result = getMbeanConnection().getAttribute(mbeanName, attribute);
+		}
+		catch(IOException e)
+		{
+			setConnectedStatus(false);
+			try
+			{
+		    if (jmxc != null) jmxc.close();
+			}
+			catch(Exception e2)
+			{
+				if (debugEnabled) log.debug(e2.getMessage(), e2);
+			}
+			if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
+			if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
+		}
+		return result;
+	}
+
+	/**
 	 * Get the host the server is running on.
 	 * @return the host as a string.
 	 */

@@ -48,10 +48,6 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 	 * Column number for the node's number of tasks executed.
 	 */
 	static final int NB_TASKS = 4;
-	/**
-	 * Column number for the node's latest task event.
-	 */
-	static final int TASK_EVENT = 5;
 
 	/**
 	 * Initialize this model witht he specified tree.
@@ -69,9 +65,9 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 	 * @see org.jppf.ui.treetable.TreeTableModel#getColumnCount()
 	 */
 	@Override
-    public int getColumnCount()
+	public int getColumnCount()
 	{
-		return 6;
+		return 5;
 	}
 
 	/**
@@ -82,7 +78,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 	 * @see org.jppf.ui.treetable.TreeTableModel#getValueAt(java.lang.Object, int)
 	 */
 	@Override
-    public Object getValueAt(Object node, int column)
+	public Object getValueAt(Object node, int column)
 	{
 		Object res = "";
 		if (node instanceof DefaultMutableTreeNode)
@@ -117,9 +113,6 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 						break;
 					case NB_TASKS:
 						if (isNode) res = Integer.toString(state.getNbTasksExecuted());
-						break;
-					case TASK_EVENT:
-						if (isNode) res = String.valueOf(state.getTaskNotification());
 						break;
 				}
 			}
@@ -157,9 +150,6 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 				break;
 			case NB_TASKS:
 				res = localize("column.nb.tasks");
-				break;
-			case TASK_EVENT:
-				res = localize("column.task.status");
 				break;
 		}
 		return res;

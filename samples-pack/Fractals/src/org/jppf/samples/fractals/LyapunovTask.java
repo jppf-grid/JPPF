@@ -49,8 +49,6 @@ public class LyapunovTask extends JPPFTask
 	{
 		try
 		{
-			// send a start notification
-			fireNotification("starting line "+(b+1));
 			// retrieve the configuration from the data provider
 			FractalConfiguration config =
 				(FractalConfiguration) getDataProvider().getValue("config");
@@ -77,8 +75,6 @@ public class LyapunovTask extends JPPFTask
 			}
 			// set the results
 			setResult(lambda);
-			// send an end notification
-			fireNotification("completed line "+(b+1));
 		}
 		catch(Exception e)
 		{

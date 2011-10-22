@@ -27,6 +27,7 @@ import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.node.*;
 import org.jppf.node.event.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.*;
 import org.jppf.startup.*;
 import org.jppf.utils.*;
@@ -37,7 +38,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Domingos Creado
  */
-public abstract class JPPFNode extends AbstractMonitoredNode
+public abstract class JPPFNode extends AbstractNode
 {
 	/**
 	 * Logger for this class.
@@ -76,13 +77,13 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 */
 	private JPPFMBeanProviderManager providerManager = null;
 	/**
-	 * Handles the firing of node life cycle events and the listeners that subscribe to these events.
-	 */
-	private LifeCycleEventHandler lifeCycleEventHandler = null;
-	/**
 	 * Manages the class loaders and how they are used. 
 	 */
 	protected AbstractClassLoaderManager classLoaderManager = null;
+	/**
+	 * Handles the firing of node life cycle events and the listeners that subscribe to these events.
+	 */
+	protected LifeCycleEventHandler lifeCycleEventHandler = null;
 
 	/**
 	 * Default constructor.
@@ -91,6 +92,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	{
 		uuid = NodeRunner.getUuid();
 		executionManager = new NodeExecutionManagerImpl(this);
+		lifeCycleEventHandler = new LifeCycleEventHandler(executionManager);
 	}
 
 	/**
@@ -98,7 +100,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		setStopped(false);
 		boolean initialized = false;
@@ -122,25 +124,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 			catch(Exception e)
 			{
 				log.error(e.getMessage(), e);
-				if (notifying) fireNodeEvent(NodeEventType.DISCONNECTED);
-				if (classLoaderManager.classLoader != null)
-				{
-					classLoaderManager.classLoader.reset();
-					classLoaderManager.classLoader = null;
-				}
-				try
-				{
-					synchronized(this)
-					{
-						closeDataChannel();
-						classLoaderManager.containerMap.clear();
-						classLoaderManager.containerList.clear();
-					}
-				}
-				catch(Exception ex)
-				{
-					log.error(ex.getMessage(), ex);
-				}
+				reset();
 			}
 		}
 		if (debugEnabled) log.debug("End of node main loop");
@@ -162,11 +146,10 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 		if (debugEnabled) log.debug("Start of node secondary loop");
 		while (!isStopped())
 		{
-			Pair<JPPFTaskBundle, List<JPPFTask>> pair = nodeIO.readTask();
-			if (notifying) fireNodeEvent(NodeEventType.START_EXEC);
+			Pair<JPPFTaskBundle, List<Task>> pair = nodeIO.readTask();
 			JPPFTaskBundle bundle = pair.first();
 			checkInitialBundle(bundle);
-			List<JPPFTask> taskList = pair.second();
+			List<Task> taskList = pair.second();
 			boolean notEmpty = (taskList != null) && (!taskList.isEmpty());
 			if (debugEnabled)
 			{
@@ -214,7 +197,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	 * @param taskList - the tasks results.
 	 * @throws Exception if any error occurs.
 	 */
-	private void processResults(JPPFTaskBundle bundle, List<JPPFTask> taskList) throws Exception
+	private void processResults(JPPFTaskBundle bundle, List<Task> taskList) throws Exception
 	{
 		if (debugEnabled) log.debug("processing results for job '" + bundle.getName() + '\'');
 		if (executionManager.checkConfigChanged())
@@ -246,7 +229,10 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 			try
 			{
 				jmxServer = getJmxServer();
-				if (!jmxServer.getServer().isRegistered(new ObjectName(JPPFAdminMBean.NODE_MBEAN_NAME))) registerProviderMBeans();
+				if (!jmxServer.getServer().isRegistered(new ObjectName(JPPFAdminMBean.NODE_MBEAN_NAME)))
+				{
+					registerProviderMBeans();
+				}
 			}
 			catch(Exception e)
 			{
@@ -266,10 +252,7 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 			}
 		}
 		new JPPFStartupLoader().load(JPPFNodeStartupSPI.class);
-		if (notifying) fireNodeEvent(NodeEventType.START_CONNECT);
 		initDataChannel();
-		if (notifying) fireNodeEvent(NodeEventType.END_CONNECT);
-		lifeCycleEventHandler = new LifeCycleEventHandler(executionManager);
 		lifeCycleEventHandler.loadListeners();
 		lifeCycleEventHandler.fireNodeStarting();
 		if (debugEnabled) log.debug("end node initialization");
@@ -372,38 +355,15 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 
 	/**
 	 * Stop this node and release the resources it is using.
-	 * @param closeSocket determines whether the underlying socket should be closed.
-	 * @see org.jppf.node.MonitoredNode#stopNode(boolean)
+	 * @see org.jppf.node.Node#stopNode(boolean)
 	 */
 	@Override
-    public synchronized void stopNode(boolean closeSocket)
+	public synchronized void stopNode()
 	{
 		if (debugEnabled) log.debug("stopping node");
-		lifeCycleEventHandler.fireNodeEnding();
 		setStopped(true);
 		executionManager.shutdown();
-		if (closeSocket)
-		{
-			try
-			{
-				closeDataChannel();
-			}
-			catch(Exception ex)
-			{
-				log.error(ex.getMessage(), ex);
-			}
-		}
-		try
-		{
-			providerManager.unregisterProviderMBeans();
-			if (jmxServer != null) jmxServer.stop();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-		setNodeAdmin(null);
-		classLoaderManager.classLoader = null;
+		reset();
 	}
 
 	/**
@@ -414,6 +374,43 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 	{
 		lifeCycleEventHandler.fireNodeEnding();
 		NodeRunner.shutdown(this, restart);
+	}
+
+	/**
+	 * Reset this node for shutdown/restart/reconnection.
+	 */
+	private void reset()
+	{
+		lifeCycleEventHandler.fireNodeEnding();
+		lifeCycleEventHandler.removeAllListeners();
+		setNodeAdmin(null);
+		if (classLoaderManager.classLoader != null)
+		{
+			classLoaderManager.classLoader.close();
+			classLoaderManager.classLoader = null;
+		}
+		try
+		{
+			synchronized(this)
+			{
+				closeDataChannel();
+				classLoaderManager.containerMap.clear();
+				classLoaderManager.containerList.clear();
+			}
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		try
+		{
+			providerManager.unregisterProviderMBeans();
+			if (jmxServer != null) jmxServer.stop();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -465,11 +462,8 @@ public abstract class JPPFNode extends AbstractMonitoredNode
 		{
 			if ((jmxServer == null) || jmxServer.isStopped())
 			{
-				//jmxServer = new JMXServerImpl(JPPFAdminMBean.NODE_SUFFIX, NodeRunner.getUuid());
-				//jmxServer = new JMXMPServer(NodeRunner.getUuid());
 				jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), JPPFAdminMBean.NODE_SUFFIX);
 				jmxServer.start(getClass().getClassLoader());
-				registerProviderMBeans();
 				System.out.println("JPPF Node management initialized");
 			}
 		}
