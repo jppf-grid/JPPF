@@ -96,7 +96,6 @@ public class PrimeTask extends JPPFTask
 	{
 		try
 		{
-			fireNotification("Testing exponent: " + exponent);
 			if (test()) setResult(Integer.valueOf(exponent));
 		}
 		catch(Exception e)

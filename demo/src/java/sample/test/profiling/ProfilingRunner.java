@@ -55,7 +55,7 @@ public class ProfilingRunner
 			TypedProperties props = JPPFConfiguration.getProperties();
 			int nbTask = props.getInt("profiling.nbTasks");
 			int iterations = props.getInt("profiling.iterations");
-			System.out.println("Running with "+nbTask+" tasks for "+iterations+" iterations");
+			System.out.println("Running with " + nbTask + " tasks of size=" + dataSize + " for " + iterations + " iterations");
 			performSequential(nbTask, true);
 			performSequential(nbTask, false);
 			perform(nbTask, iterations);

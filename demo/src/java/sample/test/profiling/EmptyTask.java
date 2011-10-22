@@ -29,19 +29,19 @@ public class EmptyTask extends JPPFTask
 	/**
 	 * The data size in KB.
 	 */
-	private int dataSizeKB = 0;
+	private int dataSize = 0;
 	/**
 	 * The data in this task.
 	 */
 	private byte[] data = null;
 	/**
 	 * Initialize with the specified data size.
-	 * @param dataSizeKB the data size in KB.
+	 * @param dataSize the data size in bytes.
 	 */
-	public EmptyTask(int dataSizeKB)
+	public EmptyTask(int dataSize)
 	{
-		this.dataSizeKB = dataSizeKB;
-		data = new byte[1024*dataSizeKB];
+		this.dataSize = dataSize;
+		data = new byte[dataSize];
 	}
 
 	/**

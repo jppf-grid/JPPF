@@ -94,9 +94,8 @@ public class TestRemoteImageProcessing extends TestCase implements Serializable
 		 * @see java.lang.Runnable#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
-			fireNotification("Task [id="+getId()+"] started");
 			try
 			{
 				int[] rgb = (int[]) getDataProvider().getValue("image.rgb");
@@ -109,7 +108,6 @@ public class TestRemoteImageProcessing extends TestCase implements Serializable
 			{
 				setException(e);
 			}
-			fireNotification("Task [id="+getId()+"] completed");
 		}
 
 		/**

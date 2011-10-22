@@ -145,9 +145,7 @@ public class TestRemoteTaskManagement extends TestCase implements Serializable
 		{
 			try
 			{
-				fireNotification("Task [id="+getId()+"] started");
 				Thread.sleep(time);
-				fireNotification("Task [id="+getId()+"] completed");
 			}
 			catch(InterruptedException e)
 			{
