@@ -34,15 +34,15 @@ public class BundleDataHolder
 	/**
 	 * Current value of the moving average.
 	 */
-	private double mean = 1000.0d;
+	private double mean = 1000d;
 	/**
 	 * Previous value of the moving average, generally before a new sample was added.
 	 */
-	private double previousMean = 0.0d;
+	private double previousMean = 0d;
 	/**
 	 * Current value of the moving average.
 	 */
-	private double totalTime = 0.0d;
+	private double totalTime = 0d;
 	/**
 	 * Current number of samples.
 	 */
@@ -50,22 +50,33 @@ public class BundleDataHolder
 	/**
 	 * Number of samples required to compute the moving average.
 	 */
-	private int performanceCacheSize = 0;
+	private final int performanceCacheSize;
 
 	/**
 	 * Initialize this data holder with the maximum number of samples in the performance cache.
-	 * @param performanceCacheSize - the number of samples as an int.
+	 * @param performanceCacheSize the number of samples as an int.
 	 */
-	public BundleDataHolder(int performanceCacheSize)
+	public BundleDataHolder(final int performanceCacheSize)
 	{
 		this.performanceCacheSize = performanceCacheSize;
 	}
 
 	/**
-	 * Add the specified performance sample to the list of samples.
-	 * @param sample - the performance sample to add.
+	 * Initialize this data holder with the maximum number of samples in the performance cache, and initial mean execution time.
+	 * @param performanceCacheSize the number of samples as an int.
+	 * @param mean the initial mean execution time.
 	 */
-	public void addSample(BundlePerformanceSample sample)
+	public BundleDataHolder(final int performanceCacheSize, final double mean)
+	{
+		this.performanceCacheSize = performanceCacheSize;
+		this.mean = mean;
+	}
+
+	/**
+	 * Add the specified performance sample to the list of samples.
+	 * @param sample the performance sample to add.
+	 */
+	public void addSample(final BundlePerformanceSample sample)
 	{
 		boolean b = (sample.samples + nbSamples > performanceCacheSize) || samples.isEmpty();
 		if (b)
@@ -115,9 +126,9 @@ public class BundleDataHolder
 
 	/**
 	 * Get the computed mean execution time for the corresponding node.
-	 * @param mean - the mean value as a double.
+	 * @param mean the mean value as a double.
 	 */
-	public void setMean(double mean)
+	public void setMean(final double mean)
 	{
 		this.mean = mean;
 	}
@@ -141,26 +152,17 @@ public class BundleDataHolder
 	}
 
 	/**
-	 * Set the number of samples required to compute the moving average.
-	 * @param performanceCacheSize - the number of samples as an int.
-	 */
-	public void setPerformanceCacheSize(int performanceCacheSize)
-	{
-		this.performanceCacheSize = performanceCacheSize;
-	}
-
-	/**
 	 * Get a string representation of this bundler data holder.
 	 * @return a string representing the state of this object.
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("mean = ").append(mean).append(", previousMean = ").append(previousMean);
-		sb.append(", totalTime = ").append(totalTime).append(", nbSamples = ").append(nbSamples);
-		sb.append(", maLength = ").append(performanceCacheSize).append(", samples.size() = ").append(samples.size());
+		sb.append("mean=").append(mean).append(", previousMean=").append(previousMean);
+		sb.append(", totalTime=").append(totalTime).append(", nbSamples=").append(nbSamples);
+		sb.append(", performanceCacheSize=").append(performanceCacheSize).append(", samples.size()=").append(samples.size());
 		return sb.toString();
 	}
 

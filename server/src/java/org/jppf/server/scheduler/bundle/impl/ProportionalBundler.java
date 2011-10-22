@@ -26,8 +26,7 @@ import org.slf4j.*;
 /**
  * This bundler implementation computes bundle sizes propertional to the mean execution
  * time for each node to the power of n, where n is an integer value specified in the configuration file as "proportionality factor".<br>
- * The scope of this bundler is all nodes, which means that it computes the size for all nodes,
- * unless an override is specified by the nodes.<br>
+ * The scope of this bundler is all nodes, which means that it computes the size for all nodes.<br>
  * The mean execution time is computed as a moving average over a number of tasks, specified in the bundling
  * algorithm profile configuration as &quot;minSamplesToAnalyse&quot;<br>
  * This algorithm is well suited for relatively small networks (a few dozen nodes at most). It generates an overhead
@@ -61,7 +60,7 @@ public class ProportionalBundler extends AbstractProportionalBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
 	@Override
-    public Bundler copy()
+	public Bundler copy()
 	{
 		return new ProportionalBundler(profile);
 	}
@@ -72,7 +71,7 @@ public class ProportionalBundler extends AbstractProportionalBundler
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
 	@Override
-    protected int maxSize()
+	protected int maxSize()
 	{
 		return JPPFDriver.getQueue() == null ? 300 : JPPFDriver.getQueue().getMaxBundleSize();
 	}

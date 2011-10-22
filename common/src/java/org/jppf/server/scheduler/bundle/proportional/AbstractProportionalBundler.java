@@ -56,7 +56,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	/**
 	 * Bounded memory of the past performance updates.
 	 */
-	protected BundleDataHolder dataHolder = null;
+	protected final BundleDataHolder dataHolder;
 	/**
 	 * The current bundle size.
 	 */
@@ -66,11 +66,15 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 * Creates a new instance with the initial size of bundle as the start size.
 	 * @param profile the parameters of the load-balancing algorithm,
 	 */
-	public AbstractProportionalBundler(LoadBalancingProfile profile)
+	public AbstractProportionalBundler(final LoadBalancingProfile profile)
 	{
 		super(profile);
+		if (this.profile == null) this.profile = new ProportionalTuneProfile();
+		ProportionalTuneProfile prof = (ProportionalTuneProfile) this.profile;
+		dataHolder = new BundleDataHolder(prof.getPerformanceCacheSize(), prof.getInitialMeanTime());
+		bundleSize = prof.getInitialSize();
+		if (bundleSize < 1) bundleSize = 1;
 		if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": Using proportional bundle size - the initial size is " + bundleSize + ", profile: " + profile);
-		dataHolder = new BundleDataHolder(((ProportionalTuneProfile) profile).getPerformanceCacheSize());
 	}
 
 	/**
@@ -79,7 +83,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
 	@Override
-    public int getBundleSize()
+	public int getBundleSize()
 	{
 		return bundleSize;
 	}
@@ -89,7 +93,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 * @param size the bundle size as an int value.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
-	public void setBundleSize(int size)
+	public void setBundleSize(final int size)
 	{
 		bundleSize = (size <= 0) ? 1 : size;
 	}
@@ -101,7 +105,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
 	 */
 	@Override
-    public void feedback(int size, double time)
+	public void feedback(final int size, final double time)
 	{
 		if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": new performance sample [size=" + size + ", time=" + (long) time + ']');
 		if (size <= 0) return;
@@ -118,7 +122,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#setup()
 	 */
 	@Override
-    public void setup()
+	public void setup()
 	{
 		synchronized(BUNDLERS)
 		{
@@ -131,7 +135,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#dispose()
 	 */
 	@Override
-    public void dispose()
+	public void dispose()
 	{
 		synchronized(BUNDLERS)
 		{
@@ -191,17 +195,17 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 				int size = minBundler.getBundleSize();
 				minBundler.setBundleSize(size + (max - sum));
 			}
-			if (debugEnabled)
+			if (traceEnabled)
 			{
 				StringBuilder sb = new StringBuilder();
 				sb.append("bundler info:\n");
-				sb.append("  minMean = ").append(minMean).append(", maxMean = ").append(maxMean).append(", maxSize = ").append(max).append('\n');
+				sb.append("  minMean=").append(minMean).append(", maxMean=").append(maxMean).append(", maxSize=").append(max).append('\n');
 				for (AbstractProportionalBundler b: BUNDLERS)
 				{
 					sb.append("  bundler #").append(b.getBundlerNumber()).append(" : bundleSize=").append(b.getBundleSize()).append(", ");
 					sb.append(b.getDataHolder()).append('\n');
 				}
-				log.debug(sb.toString());
+				log.trace(sb.toString());
 			}
 		}
 	}
@@ -211,7 +215,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	 * @param x .
 	 * @return .
 	 */
-	public double normalize(double x)
+	public double normalize(final double x)
 	{
 		//return 1d / (1d + (x <= 0d ? 0d : Math.log(1d + ((ProportionalTuneProfile) profile).getProportionalityFactor() * x)));
 		//return Math.exp(-((ProportionalTuneProfile) profile).getProportionalityFactor() * x);

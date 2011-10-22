@@ -123,6 +123,23 @@ public class TypedProperties extends Properties
 	}
 	
 	/**
+	 * Get the integer value of a property with a specified name.
+	 * @param key the name of the property to look for.
+	 * @param defValue a default value to return if the property is not found.
+	 * @param min the minimum value the property can have.
+	 * @param max the maximum value the property can have.
+	 * @return the value of the property as a float, or the default value if it is not found, adjusted to ensure it is in the [min, max] range.
+	 */
+	public int getInt(final String key, final int defValue, final int min, final int max)
+	{
+		if (min > max) throw new IllegalArgumentException("min (" + min + ") must be <= max (" + max + ')');
+		int val = getInt(key, defValue);
+		if (val > max) val = max;
+		if (val < min) val = min;
+		return val;
+	}
+
+	/**
 	 * Get the long integer value of a property with a specified name.
 	 * @param key the name of the property to look for.
 	 * @return the value of the property as a long, or zero if it is not found.
@@ -154,7 +171,24 @@ public class TypedProperties extends Properties
 		}
 		return longVal;
 	}
-	
+
+	/**
+	 * Get the long value of a property with a specified name.
+	 * @param key the name of the property to look for.
+	 * @param defValue a default value to return if the property is not found.
+	 * @param min the minimum value the property can have.
+	 * @param max the maximum value the property can have.
+	 * @return the value of the property as a float, or the default value if it is not found, adjusted to ensure it is in the [min, max] range.
+	 */
+	public long getLong(final String key, final long defValue, final long min, final long max)
+	{
+		if (min > max) throw new IllegalArgumentException("min (" + min + ") must be <= max (" + max + ')');
+		long val = getLong(key, defValue);
+		if (val > max) val = max;
+		if (val < min) val = min;
+		return val;
+	}
+
 	/**
 	 * Get the single precision value of a property with a specified name.
 	 * @param key the name of the property to look for.
@@ -164,7 +198,7 @@ public class TypedProperties extends Properties
 	{
 		return getFloat(key, 0.0f);
 	}
-	
+
 	/**
 	 * Get the single precision value of a property with a specified name.
 	 * @param key the name of the property to look for.
@@ -187,7 +221,24 @@ public class TypedProperties extends Properties
 		}
 		return floatVal;
 	}
-	
+
+	/**
+	 * Get the single precision value of a property with a specified name.
+	 * @param key the name of the property to look for.
+	 * @param defValue a default value to return if the property is not found.
+	 * @param min the minimum value the property can have.
+	 * @param max the maximum value the property can have.
+	 * @return the value of the property as a float, or the default value if it is not found, adjusted to ensure it is in the [min, max] range.
+	 */
+	public float getFloat(final String key, final float defValue, final float min, final float max)
+	{
+		if (min > max) throw new IllegalArgumentException("min (" + min + ") must be <= max (" + max + ')');
+		float val = getFloat(key, defValue);
+		if (val > max) val = max;
+		if (val < min) val = min;
+		return val;
+	}
+
 	/**
 	 * Get the double precision value of a property with a specified name.
 	 * If the key is not found a default value of 0d is returned.
@@ -220,6 +271,23 @@ public class TypedProperties extends Properties
 			}
 		}
 		return doubleVal;
+	}
+	
+	/**
+	 * Get the double precision value of a property with a specified name.
+	 * @param key the name of the property to look for.
+	 * @param defValue a default value to return if the property is not found.
+	 * @param min the minimum value the property can have.
+	 * @param max the maximum value the property can have.
+	 * @return the value of the property as a double, or the default value if it is not found, adjusted to ensure it is in the [min, max] range.
+	 */
+	public double getDouble(final String key, final double defValue, final double min, final double max)
+	{
+		if (min > max) throw new IllegalArgumentException("min (" + min + ") must be <= max (" + max + ')');
+		double val = getDouble(key, defValue);
+		if (val > max) val = max;
+		if (val < min) val = min;
+		return val;
 	}
 	
 	/**

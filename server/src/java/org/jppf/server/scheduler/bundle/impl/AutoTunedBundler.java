@@ -32,7 +32,6 @@ import org.slf4j.*;
  * 
  * @author Domingos Creado
  * @author Laurent Cohen
- * 
  */
 public class AutoTunedBundler extends AbstractAutoTunedBundler
 {
@@ -44,6 +43,10 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	 * Determines whether debugging level is set for logging.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+	/**
+	 * Determines whether trace level is set for logging.
+	 */
+	private static boolean traceEnabled = log.isTraceEnabled();
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.
@@ -61,7 +64,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
 	@Override
-    public int getBundleSize()
+	public int getBundleSize()
 	{
 		return currentSize;
 	}
@@ -81,13 +84,12 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
 	 */
 	@Override
-    public void feedback(int bundleSize, double time)
+	public void feedback(int bundleSize, double time)
 	{
 		assert bundleSize > 0;
-		if (debugEnabled)
+		if (traceEnabled)
 		{
-			log.debug("Bundler#" + bundlerNumber + ": Got another sample with bundleSize="
-				+ bundleSize + " and totalTime=" + time);
+			log.trace("Bundler#" + bundlerNumber + ": Got another sample with bundleSize=" + bundleSize + " and totalTime=" + time);
 		}
 
 		// retrieving the record of the bundle size
@@ -111,7 +113,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 		if (samples > ((AnnealingTuneProfile) profile).getMinSamplesToAnalyse())
 		{
 			performAnalysis();
-			if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": bundle size = " + currentSize);
+			if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": bundle size = " + currentSize);
 		}
 	}
 
@@ -138,10 +140,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 				currentSize = bestSize + diff;
 				if (samplesMap.get(currentSize) == null)
 				{
-					if (debugEnabled)
-					{
-						log.debug("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + currentSize);
-					}
+					if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + currentSize);
 					return;
 				}
 				counter++;
@@ -156,8 +155,8 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 				samplesMap.put(currentSize, sample);
 			}
 		}
-		log.info("Bundler#" + bundlerNumber + ": The bundle size converged to " + currentSize
-				+ " with the mean execution of " + stableMean);
+		if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The bundle size converged to " + currentSize
+			+ " with the mean execution of " + stableMean);
 	}
 
 	/**
@@ -177,10 +176,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 				minorMean = sample.mean;
 			}
 		}
-		if (debugEnabled)
-		{
-			log.debug("Bundler#" + bundlerNumber + ": best size found = " + bestSize);
-		}
+		if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": best size found = " + bestSize);
 		return bestSize;
 	}
 
@@ -190,9 +186,9 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
 	@Override
-    public Bundler copy()
+	public Bundler copy()
 	{
-        return new AutoTunedBundler(profile.copy());
+		return new AutoTunedBundler(profile.copy());
 	}
 
 	/**
@@ -201,7 +197,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
 	@Override
-    protected int maxSize()
+	protected int maxSize()
 	{
 		return JPPFDriver.getQueue().getMaxBundleSize()/2;
 	}

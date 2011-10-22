@@ -47,7 +47,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	/**
 	 * Base name used for localization lookups.
 	 */
-	private static final String I18N_BASE = "org.jppf.server.i18n.messages";
+	private static final String I18N_BASE = "org.jppf.server.i18n.server_messages";
 	/**
 	 * Reference to the driver.
 	 */

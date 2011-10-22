@@ -193,7 +193,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 	 * @see org.jppf.management.JPPFNodeAdminMBean#setTaskCounter(java.lang.Integer)
 	 */
 	@Override
-	public void setTaskCounter(Integer n) throws Exception
+	public synchronized void setTaskCounter(Integer n) throws Exception
 	{
 		node.setTaskCount(n);
 		nodeState.setNbTasksExecuted(n);
