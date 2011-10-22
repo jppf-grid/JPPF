@@ -223,8 +223,16 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void resetStatistics() throws Exception
+	public void resetStatistics() throws Exception
 	{
 		invoke(DRIVER_MBEAN_NAME, "resetStatistics", (Object[]) null, (String[]) null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public JPPFSystemInformation systemInformation() throws Exception
+	{
+		return (JPPFSystemInformation) invoke(DRIVER_MBEAN_NAME, "systemInformation", (Object[]) null, (String[]) null);
 	}
 }

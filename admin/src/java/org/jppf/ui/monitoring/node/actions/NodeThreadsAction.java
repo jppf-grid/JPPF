@@ -78,7 +78,7 @@ public class NodeThreadsAction extends AbstractTopologyAction
     public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
-		setEnabled(nodeDataArray.length > 0);
+		setEnabled(dataArray.length > 0);
 	}
 
 	/**
@@ -95,10 +95,10 @@ public class NodeThreadsAction extends AbstractTopologyAction
 		try
 		{
 			panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/NodeThreadPoolPanel.xml");
-			if (nodeDataArray.length == 1)
+			if (dataArray.length == 1)
 			{
-				nbThreads = nodeDataArray[0].getNodeState().getThreadPoolSize();
-				priority = nodeDataArray[0].getNodeState().getThreadPriority();
+				nbThreads = dataArray[0].getNodeState().getThreadPoolSize();
+				priority = dataArray[0].getNodeState().getThreadPriority();
 			}
 			((AbstractOption) panel.findFirstWithName("nbThreads")).setValue(nbThreads);
 			((AbstractOption) panel.findFirstWithName("threadPriority")).setValue(priority);
@@ -152,7 +152,7 @@ public class NodeThreadsAction extends AbstractTopologyAction
 			@Override
             public void run()
 			{
-				for (TopologyData data: nodeDataArray)
+				for (TopologyData data: dataArray)
 				{
 					try
 					{

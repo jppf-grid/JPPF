@@ -304,7 +304,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		actionHandler.putAction("shutdown.restart.driver", new ServerShutdownRestartAction());
 		actionHandler.putAction("driver.reset.statistics", new ServerStatisticsResetAction());
 		actionHandler.putAction("update.configuration", new NodeConfigurationAction());
-		actionHandler.putAction("show.information", new NodeInformationAction());
+		actionHandler.putAction("show.information", new SystemInformationAction());
 		actionHandler.putAction("update.threads", new NodeThreadsAction());
 		actionHandler.putAction("reset.counter", new ResetTaskCounterAction());
 		actionHandler.putAction("restart.node", new RestartNodeAction());

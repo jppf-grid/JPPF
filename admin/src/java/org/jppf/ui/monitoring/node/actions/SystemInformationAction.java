@@ -18,7 +18,7 @@
 package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.*;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -27,14 +27,14 @@ import org.jppf.ui.monitoring.node.*;
 import org.jppf.utils.StringUtils;
 
 /**
- * This action displays the node environment information in a spearate frame.
+ * This action displays the driver or node environment information in a separate frame.
  */
-public class NodeInformationAction extends AbstractTopologyAction
+public class SystemInformationAction extends AbstractTopologyAction
 {
 	/**
 	 * Initialize this action.
 	 */
-	public NodeInformationAction()
+	public SystemInformationAction()
 	{
 		setupIcon("/org/jppf/ui/resources/info.gif");
 		setupNameAndTooltip("show.information");
@@ -42,14 +42,17 @@ public class NodeInformationAction extends AbstractTopologyAction
 
 	/**
 	 * Update this action's enabled state based on a list of selected elements.
-	 * @param selectedElements - a list of objects.
+	 * @param selectedElements a list of objects.
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
 	@Override
-    public void updateState(List<Object> selectedElements)
+	public void updateState(final List<Object> selectedElements)
 	{
-		super.updateState(selectedElements);
-		setEnabled(nodeDataArray.length > 0);
+		this.selectedElements = selectedElements;
+		dataArray = new TopologyData[selectedElements.size()];
+		int count = 0;
+		for (Object o: selectedElements) dataArray[count++] = (TopologyData) o;
+		setEnabled(dataArray.length > 0);
 	}
 
 	/**
@@ -58,14 +61,15 @@ public class NodeInformationAction extends AbstractTopologyAction
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	@Override
-    public void actionPerformed(ActionEvent event)
+	public void actionPerformed(ActionEvent event)
 	{
 		String s = null;
 		try
 		{
-			JMXNodeConnectionWrapper connection = (JMXNodeConnectionWrapper) nodeDataArray[0].getJmxWrapper();
+			JMXConnectionWrapper connection = (JMXConnectionWrapper) dataArray[0].getJmxWrapper();
 			JPPFSystemInformation info = connection.systemInformation();
-			PropertiesTableFormat format = new HTMLPropertiesTableFormat("information for node " + connection.getId());
+			boolean isNode = dataArray[0].getType().equals(TopologyDataType.NODE);
+			PropertiesTableFormat format = new HTMLPropertiesTableFormat("information for " + (isNode ? "node " : "driver ") + connection.getId());
 			format.start();
 			format.formatTable(info.getUuid(), "UUID");
 			format.formatTable(info.getSystem(), "System Properties");
@@ -87,7 +91,7 @@ public class NodeInformationAction extends AbstractTopologyAction
 		frame.addWindowListener(new WindowAdapter()
 		{
 			@Override
-            public void windowClosing(WindowEvent e)
+			public void windowClosing(WindowEvent e)
 			{
 				frame.dispose();
 			}

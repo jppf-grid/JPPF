@@ -76,7 +76,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
     public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
-		setEnabled(nodeDataArray.length > 0);
+		setEnabled(dataArray.length > 0);
 	}
 
 	/**
@@ -145,7 +145,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 			{
 				try
 				{
-					((JMXNodeConnectionWrapper) nodeDataArray[0].getJmxWrapper()).updateConfiguration(map, b);
+					((JMXNodeConnectionWrapper) dataArray[0].getJmxWrapper()).updateConfiguration(map, b);
 				}
 				catch(Exception e)
 				{
@@ -164,7 +164,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	private String getPropertiesAsString() throws Exception
 	{
 		StringBuilder sb = new StringBuilder();
-		JMXNodeConnectionWrapper wrapper = ((JMXNodeConnectionWrapper) nodeDataArray[0].getJmxWrapper());
+		JMXNodeConnectionWrapper wrapper = ((JMXNodeConnectionWrapper) dataArray[0].getJmxWrapper());
 		JPPFSystemInformation info = wrapper.systemInformation();
 		TypedProperties props = info.getJppf();
 		Set<String> keys = new TreeSet<String>();

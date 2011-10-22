@@ -56,7 +56,7 @@ public class ResetTaskCounterAction extends AbstractTopologyAction
     public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
-		setEnabled(nodeDataArray.length > 0);
+		setEnabled(dataArray.length > 0);
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class ResetTaskCounterAction extends AbstractTopologyAction
 	@Override
     public void actionPerformed(ActionEvent event)
 	{
-		for (TopologyData data: nodeDataArray)
+		for (TopologyData data: dataArray)
 		{
 			try
 			{

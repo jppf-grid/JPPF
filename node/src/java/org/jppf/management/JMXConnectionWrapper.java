@@ -20,13 +20,13 @@ package org.jppf.management;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.*;
 
 import javax.management.*;
 import javax.management.remote.*;
 
+import org.jppf.JPPFException;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -34,7 +34,7 @@ import org.slf4j.*;
  * Wrapper around a JMX connection, providing a thread-safe way of handling disconnections and recovery.
  * @author Laurent Cohen
  */
-public class JMXConnectionWrapper extends ThreadSynchronization
+public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFAdminMBean
 {
 	/**
 	 * Logger for this class.
@@ -345,5 +345,13 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	  MBeanServerConnection mbsc = getMbeanConnection();
 	  // finally obtain and return a proxy to the specified remote MBean
 	  return (T) MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, inf, true);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public JPPFSystemInformation systemInformation() throws Exception
+	{
+		throw new JPPFException("this method is not implemented");
 	}
 }

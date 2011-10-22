@@ -37,7 +37,7 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 	/**
 	 * The object representing the JPPF nodes in the tree table.
 	 */
-	protected TopologyData[] nodeDataArray = EMPTY_TOPOLOGY_DATA_ARRAY;
+	protected TopologyData[] dataArray = EMPTY_TOPOLOGY_DATA_ARRAY;
 
 	/**
 	 * Iniitialize this action.
@@ -53,7 +53,7 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
 	@Override
-    public void updateState(List<Object> selectedElements)
+	public void updateState(List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		List<TopologyData> list = new ArrayList<TopologyData>();
@@ -66,6 +66,6 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 				if ((info != null) && (JPPFManagementInfo.NODE == info.getType())) list.add(data);
 			}
 		}
-		nodeDataArray = list.toArray(new TopologyData[list.size()]);
+		dataArray = list.toArray(new TopologyData[list.size()]);
 	}
 }

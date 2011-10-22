@@ -187,4 +187,14 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	{
 		driver.getStatsManager().reset();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public JPPFSystemInformation systemInformation() throws Exception
+	{
+		JPPFSystemInformation info = new JPPFSystemInformation(driver.getUuid());
+		info.populate();
+		return info;
+	}
 }

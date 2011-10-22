@@ -68,13 +68,6 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
 	 */
 	void updateThreadsPriority(Integer newPriority) throws Exception;
 	/**
-	 * Get detailed information about the node's JVM properties, environment variables
-	 * and runtime information such as memory usage and available processors.
-	 * @return a <code>JPPFSystemInformation</code> instance.
-	 * @throws Exception if any error occurs.
-	 */
-	JPPFSystemInformation systemInformation() throws Exception;
-	/**
 	 * Restart the node.
 	 * @throws Exception if any error occurs.
 	 */

@@ -42,4 +42,12 @@ public interface JPPFAdminMBean extends Serializable
 	 * Name of the driver's admin MBean.
 	 */
 	String DRIVER_MBEAN_NAME = "org.jppf:name=admin,type=driver";
+
+	/**
+	 * Get detailed information about the node's JVM properties, environment variables
+	 * and runtime information such as memory usage and available processors.
+	 * @return a <code>JPPFSystemInformation</code> instance.
+	 * @throws Exception if any error occurs.
+	 */
+	JPPFSystemInformation systemInformation() throws Exception;
 }
