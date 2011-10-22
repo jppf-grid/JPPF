@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="/jca-client/lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="/samples-pack/shared/lib/commons-dbcp-1.4.jar"/>
 	<classpathentry kind="lib" path="/samples-pack/shared/lib/commons-pool-1.5.2.jar"/>
+	<classpathentry kind="lib" path="C:/ftp/dev/Apache/bsh-2.0b2.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

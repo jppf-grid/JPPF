@@ -38,15 +38,15 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	/**
 	 * Logger for this class.
 	 */
-	private static Logger log = LoggerFactory.getLogger(JMXConnectionWrapper.class);
+	static Logger log = LoggerFactory.getLogger(JMXConnectionWrapper.class);
 	/**
 	 * Determines whether debug log statements are enabled.
 	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+	static boolean debugEnabled = log.isDebugEnabled();
 	/**
 	 * URL of the MBean server, in a JMX-compliant format.
 	 */
-	private JMXServiceURL url = null;
+	final JMXServiceURL url;
 	/**
 	 * The JMX client.
 	 */
@@ -78,7 +78,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
   /**
    * Determines whether the connection to the JMX server has been established.
    */
-  protected boolean local = false;
+  protected boolean local;
 
 	/**
 	 * Initialize a local connection (same JVM) to the MBean server.
@@ -86,6 +86,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	public JMXConnectionWrapper()
 	{
 		local = true;
+		url = null;
 	}
 
 	/**
@@ -99,17 +100,19 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		this.host = host;
 		this.port = port;
 
+		JMXServiceURL tmp = null;
 		try
 		{
 			//String s = NetworkUtils.getHostName(host);
 			//idString = (s == null ? "_" : s) + ":" + port;
 			idString = host + ":" + port;
-			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + rmiSuffix);
+			tmp = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + rmiSuffix);
 		}
 		catch(Exception e)
 		{
 			log.error(e.getMessage(), e);
 		}
+		url = tmp;
 		local = false;
 	}
 
@@ -125,7 +128,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		}
 		else
 		{
-			connectionThread.set(new JMXConnectionThread());
+			connectionThread.set(new JMXConnectionThread(this));
 			Thread t = new Thread(connectionThread.get(), "JMX connection " + getId());
 			t.setDaemon(true);
 			t.start();
@@ -149,7 +152,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	 * Initialize the connection to the remote MBean server.
 	 * @throws Exception if the connection could not be established.
 	 */
-	private synchronized void performConnection() throws Exception
+	synchronized void performConnection() throws Exception
 	{
   	connected.set(false);
     HashMap<String, ?> env = new HashMap<String, Object>(); 
@@ -186,6 +189,39 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 		{
 	    ObjectName mbeanName = new ObjectName(name);
   		result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
+		}
+		catch(IOException e)
+		{
+			setConnectedStatus(false);
+			try
+			{
+		    if (jmxc != null) jmxc.close();
+			}
+			catch(Exception e2)
+			{
+				if (debugEnabled) log.debug(e2.getMessage(), e2);
+			}
+			if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
+			if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
+		}
+		return result;
+	}
+
+	/**
+	 * Get the value of an attribute of the specified MBean.
+	 * @param name the name of the MBean.
+	 * @param attribute the name of the attribute to read.
+	 * @return an object or null.
+	 * @throws Exception if the invocation failed.
+	 */
+	public synchronized Object getAttribute(String name, String attribute) throws Exception
+	{
+		if ((connectionThread.get() != null) && connectionThread.get().isConnecting()) return null;
+		Object result = null;
+		try
+		{
+	    ObjectName mbeanName = new ObjectName(name);
+  		result = getMbeanConnection().getAttribute(mbeanName, attribute);
 		}
 		catch(IOException e)
 		{
@@ -287,129 +323,5 @@ public class JMXConnectionWrapper extends ThreadSynchronization
 	  MBeanServerConnection mbsc = getMbeanConnection();
 	  // finally obtain and return a proxy to the specified remote MBean
 	  return (T) MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, inf, true);
-	}
-	
-	/**
-	 * This class is intended to be used as a thread that attempts to (re-)connect to
-	 * the management server.
-	 */
-	public class JMXConnectionThread extends ThreadSynchronization implements Runnable
-	{
-		/**
-		 * Determines the suspended state of this connection thread.
-		 */
-		private boolean suspended = false;
-		/**
-		 * Determines the connecting state of this connection thread.
-		 */
-		private boolean connecting = true;
-
-		/**
-		 * 
-		 * @see java.lang.Runnable#run()
-		 */
-		public void run()
-		{
-			while (!isStopped())
-			{
-				if (isSuspended())
-				{
-					if (debugEnabled) log.debug(getId() + " about to go to sleep");
-					goToSleep();
-					continue;
-				}
-				if (isConnecting())
-				{
-					try
-					{
-						if (debugEnabled) log.debug(getId() + " about to perform RMI connection attempts");
-						performConnection();
-						if (debugEnabled) log.debug(getId() + " about to suspend RMI connection attempts");
-						suspend();
-						wakeUp();
-						JMXConnectionWrapper.this.wakeUp();
-					}
-					catch(Exception ignored)
-					{
-						if (debugEnabled) log.debug(getId()+ " JMX URL = "+url, ignored);
-						try
-						{
-							Thread.sleep(100);
-						}
-						catch(InterruptedException e)
-						{
-							log.error(e.getMessage(), e);
-						}
-					}
-				}
-			}
-		}
-
-		/**
-		 * Suspend the current thread.
-		 */
-		public synchronized void suspend()
-		{
-			if (debugEnabled) log.debug(getId() + " suspending RMI connection attempts");
-			setConnecting(false);
-			setSuspended(true);
-		}
-
-		/**
-		 * Resume the current thread's execution.
-		 */
-		public synchronized void resume()
-		{
-			if (debugEnabled) log.debug(getId() + " resuming RMI connection attempts");
-			setConnecting(true);
-			setSuspended(false);
-			wakeUp();
-		}
-
-		/**
-		 * Stop this thread.
-		 */
-		public synchronized void close()
-		{
-			setConnecting(false);
-			setStopped(true);
-			wakeUp();
-		}
-
-		/**
-		 * Get the connecting state of this connection thread.
-		 * @return true if the connection is established, false otherwise.
-		 */
-		public synchronized boolean isConnecting()
-		{
-			return connecting;
-		}
-
-		/**
-		 * Get the connecting state of this connection thread.
-		 * @param connecting true if the connection is established, false otherwise.
-		 */
-		public synchronized void setConnecting(boolean connecting)
-		{
-			this.connecting = connecting;
-		}
-
-		/**
-		 * Determines the suspended state of this connection thread.
-		 * @return true if the thread is suspended, false otherwise. 
-		 */
-		public synchronized boolean isSuspended()
-		{
-			return suspended;
-		}
-
-		/**
-		 * Set the suspended state of this connection thread.
-		 * @param suspended true if the connection is suspended, false otherwise.
-		 */
-		public synchronized void setSuspended(boolean suspended)
-		{
-			this.suspended = suspended;
-		}
 	}
 }

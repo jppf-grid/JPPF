@@ -21,6 +21,7 @@ package sample.test.job.management;
 import java.util.List;
 
 import org.jppf.client.*;
+import org.jppf.job.JobInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
@@ -46,7 +47,8 @@ public class JobManagementTestRunner
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
 		int nbTasks = props.getInt("job.management.nbTasks", 2);
-		long duration = props.getLong("job.management.duration", 1000L);
+		//long duration = props.getLong("job.management.duration", 10000L);
+		long duration = 10000L;
 		String jobId = "test1";
 		JPPFResultCollector collector = new JPPFResultCollector(nbTasks);
 		JPPFJob job = new JPPFJob();
@@ -63,9 +65,15 @@ public class JobManagementTestRunner
 		while (!driver.isConnected()) Thread.sleep(10);
 		// wait to ensure the job has been dispatched to the nodes
 		Thread.sleep(1000);
-		driver.cancelJob(jobId);
-		driver.close();
+		JobInformation info = driver.getJobInformation(job.getJobUuid());
+		System.out.println("job info = " + info);
+		String[] ids = driver.getAllJobIds();
+		//String[] ids = (String[]) driver.getMbeanConnection().getAttribute(new ObjectName(DriverJobManagementMBean.MBEAN_NAME),"AllJobIds");
+		System.out.println("job ids = " + ids);
+		Thread.sleep(2000);
+		driver.cancelJob(job.getJobUuid());
 		List<JPPFTask> results = collector.waitForResults();
+		driver.close();
 		System.out.println("Test ended");
 	}
 
