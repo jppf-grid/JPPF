@@ -35,10 +35,6 @@ import org.jppf.utils.JPPFConfiguration;
 public abstract class AbstractClientConnectionHandler implements ClientConnectionHandler
 {
 	/**
-	 * Constant for an empty arry of <code>ClientConnectionStatusListener</code>.
-	 */
-	static final ClientConnectionStatusListener[] ZERO_CONNECTION_STATUS_LISTENER = new ClientConnectionStatusListener[0];
-	/**
 	 * The socket client uses to communicate over a socket connection.
 	 */
 	protected SocketWrapper socketClient = null;
@@ -70,15 +66,11 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	/**
 	 * Status of the connection.
 	 */
-	protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(DISCONNECTED);
+	protected final AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(DISCONNECTED);
 	/**
 	 * List of status listeners for this connection.
 	 */
-	protected List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
-	/**
-	 * Array of listeners on wich the iterations are performed.
-	 */
-	private ClientConnectionStatusListener[] listenerArray = ZERO_CONNECTION_STATUS_LISTENER;
+	private final List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
 
 	/**
 	 * Initialize this connection with the specified owner.
@@ -111,8 +103,8 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	@Override
     public void setStatus(JPPFClientConnectionStatus newStatus)
 	{
-			JPPFClientConnectionStatus oldStatus = status.getAndSet(newStatus);
-			if (!newStatus.equals(oldStatus)) fireStatusChanged(oldStatus);
+        JPPFClientConnectionStatus oldStatus = status.getAndSet(newStatus);
+        if (!newStatus.equals(oldStatus)) fireStatusChanged(oldStatus);
 	}
 
 	/**
@@ -121,12 +113,11 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * @see org.jppf.client.ClientConnectionHandler#addClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
 	 */
 	@Override
-    public void addClientConnectionStatusListener(ClientConnectionStatusListener listener)
+    public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
 	{
 		synchronized(listeners)
 		{
 			listeners.add(listener);
-			listenerArray = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
 		}
 	}
 
@@ -136,12 +127,11 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * @see org.jppf.client.ClientConnectionHandler#removeClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
 	 */
 	@Override
-    public void removeClientConnectionStatusListener(ClientConnectionStatusListener listener)
+    public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
 	{
 		synchronized(listeners)
 		{
 			listeners.remove(listener);
-			listenerArray = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
 		}
 	}
 
@@ -155,15 +145,15 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * Notify all listeners that the status of this connection has changed.
 	 * @param oldStatus the connection status before the change.
 	 */
-	protected void fireStatusChanged(JPPFClientConnectionStatus oldStatus)
+	protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus)
 	{
 		ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
-		ClientConnectionStatusListener[] temp = null;
-		synchronized(listenerArray)
+		ClientConnectionStatusListener[] array;
+		synchronized(listeners)
 		{
-			temp = listenerArray;
+			array = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
 		}
-		for (ClientConnectionStatusListener listener: temp) listener.statusChanged(event);
+		for (ClientConnectionStatusListener listener: array) listener.statusChanged(event);
 	}
 
 	/**

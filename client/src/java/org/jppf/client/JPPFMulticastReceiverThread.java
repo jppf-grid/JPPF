@@ -17,13 +17,18 @@
  */
 package org.jppf.client;
 
-import java.net.InetAddress;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.jppf.comm.discovery.IPFilter;
+import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.comm.discovery.JPPFMulticastReceiver;
+import org.jppf.utils.ThreadSynchronization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.jppf.comm.discovery.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class listens to information broadcast by JPPF servers on the network and uses it
@@ -42,29 +47,34 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 	/**
 	 * Contains the set of retrieved connection information objects.
 	 */
-	private Map<String, Set<JPPFConnectionInformation>> infoMap = new HashMap<String, Set<JPPFConnectionInformation>>();
+	private final Map<String, Set<JPPFConnectionInformation>> infoMap = new HashMap<String, Set<JPPFConnectionInformation>>();
 	/**
 	 * Count of distinct retrieved connection information objects.
 	 */
-	private AtomicInteger count = new AtomicInteger(0);
+	private final AtomicInteger count = new AtomicInteger(0);
 	/**
-	 * The JPPF client for which servers are discovered.
-	 */
-	private AbstractGenericClient client = null;
-	/**
-	 * Determines whether we keep the addresses of all discovered network interfaces for the ssame driver,
+	 * Determines whether we keep the addresses of all discovered network interfaces for the same driver,
 	 * or if we only use the first one that is discovered.
 	 */
-	private boolean acceptMultipleInterfaces = JPPFConfiguration.getProperties().getBoolean("jppf.discovery.acceptMultipleInterfaces", false);
+	private final boolean acceptMultipleInterfaces;
 
-	/**
-	 * Initialize this discovery thread with the specified JPPF client.
-	 * @param client the JPPF client for which servers are discovered.
-	 */
-	JPPFMulticastReceiverThread(AbstractGenericClient client)
+    private final ConnectionHandler connectionHandler;
+    private final IPFilter ipFilter;
+
+    /**
+     * Initialize this discovery thread with the specified JPPF client.
+     * @param connectionHandler handler for adding new connection
+     * @param ipFilter for accepted IP addresses
+     * @param acceptMultipleInterfaces accept all discovered interfaces for same driver
+     */
+	JPPFMulticastReceiverThread(final ConnectionHandler connectionHandler, final IPFilter ipFilter, final boolean acceptMultipleInterfaces)
 	{
-		this.client = client;
-	}
+        if(connectionHandler == null) throw new IllegalArgumentException("connectionHandler is null");
+
+        this.connectionHandler = connectionHandler;
+        this.ipFilter = ipFilter;
+        this.acceptMultipleInterfaces = acceptMultipleInterfaces;
+    }
 
 	/**
 	 * Lookup server configurations from UDP multicasts.
@@ -73,34 +83,18 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 	@Override
     public void run()
 	{
-		TypedProperties config = client.getConfig();
-		JPPFMulticastReceiver receiver = new JPPFMulticastReceiver(new IPFilter(config));
+		JPPFMulticastReceiver receiver = null;
 		try
 		{
+            receiver = new JPPFMulticastReceiver(ipFilter);
 			while (!isStopped())
 			{
 				JPPFConnectionInformation info = receiver.receive();
-				if (info == null)
-				{
-					//setStopped(true);
-					//log.error("Abnormal situation: connection information should not be null");
-					//break;
-					continue;
-				}
-				InetAddress ip = InetAddress.getByName(info.host);
-				if (!hasConnectionInformation(info))
+				if ((info != null) && !hasConnectionInformation(info))
 				{
 					if (debugEnabled) log.debug("Found connection information: " + info);
 					addConnectionInformation(info);
-					int n = config.getInt("jppf.pool.size", 1);
-					if (n < 1) n = 1;
-					int currentCount = count.incrementAndGet();
-					for (int i=1; i<=n; i++)
-					{
-						String name = "driver-" + currentCount  + (n == 1 ? "" : "-" + i);
-						AbstractJPPFClientConnection c = client.createConnection(info.uuid, name, info);
-						client.newConnection(c);
-					}
+                    onNewConnection("driver-" + count.incrementAndGet(), info);
 				}
 			}
 		}
@@ -110,16 +104,26 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 		}
 		finally
 		{
-			if (receiver != null) receiver.setStopped(true);
+			if(receiver != null) receiver.setStopped(true);
 		}
 	}
 
+    /**
+     * Add a newly found connection.
+     * @param name for the connection
+     * @param info the peer's connection information.
+     */
+    protected synchronized void onNewConnection(final String name, final JPPFConnectionInformation info)
+    {
+        connectionHandler.onNewConnection(name, info);
+    }
+
 	/**
-	 * Detrmine whether a connection information object is already present in the map.
+	 * Detrmine whether a connection information object is already discovered.
 	 * @param info the connection information to lookup.
 	 * @return true if the connection information is in the map, false otherwise.
 	 */
-	private boolean hasConnectionInformation(JPPFConnectionInformation info)
+	private boolean hasConnectionInformation(final JPPFConnectionInformation info)
 	{
 		if (acceptMultipleInterfaces)
 		{
@@ -131,10 +135,10 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 	}
 
 	/**
-	 * Add the specified connection information to the map.
+	 * Add the specified connection information to discovered map.
 	 * @param info a {@link JPPFConnectionInformation} instance.
 	 */
-	private void addConnectionInformation(JPPFConnectionInformation info)
+	public synchronized void addConnectionInformation(final JPPFConnectionInformation info)
 	{
 		Set<JPPFConnectionInformation> set = infoMap.get(info.uuid);
 		if (set == null)
@@ -144,4 +148,26 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 		}
 		set.add(info);
 	}
+
+    /**
+     * Remove a disconnected connection.
+     * @param info connection info of the peer to remove
+     * @return whether connection was successfully removed
+     */
+    public synchronized boolean removeConnectionInformation(final JPPFConnectionInformation info)
+    {
+        if(acceptMultipleInterfaces)
+        {
+            Set<JPPFConnectionInformation> set = infoMap.get(info.uuid);
+            return set != null && set.remove(info);
+        } else
+        {
+            return infoMap.remove(info.uuid) != null;
+        }
+    }
+
+    public static interface ConnectionHandler
+    {
+        public void onNewConnection(final String name, final JPPFConnectionInformation info);
+    }
 }

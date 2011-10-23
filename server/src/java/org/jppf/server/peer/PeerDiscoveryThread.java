@@ -23,7 +23,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.comm.discovery.*;
-import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -33,108 +32,141 @@ import org.slf4j.*;
  */
 public class PeerDiscoveryThread extends ThreadSynchronization implements Runnable
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(PeerNode.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Contains the set of retrieved connection information objects.
-	 */
-	private final Set<JPPFConnectionInformation> infoSet = new HashSet<JPPFConnectionInformation>();
-	/**
-	 * Count of distinct retrieved connection informaiton objects.
-	 */
-	private final AtomicInteger count = new AtomicInteger(0);
-	/**
-	 * Connection information for this JPPF driver.
-	 */
-	private final JPPFConnectionInformation localInfo;
     /**
-     * JPPF class server
+     * Logger for this class.
      */
-    private final ClassNioServer classServer;
+    private static Logger log = LoggerFactory.getLogger(PeerNode.class);
+    /**
+     * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+     */
+    private static boolean debugEnabled = log.isDebugEnabled();
+    /**
+     * Contains the set of retrieved connection information objects.
+     */
+    private final Set<JPPFConnectionInformation> infoSet = new HashSet<JPPFConnectionInformation>();
+    /**
+     * Count of distinct retrieved connection information objects.
+     */
+    private final AtomicInteger count = new AtomicInteger(0);
+    /**
+     * Connection information for this JPPF driver.
+     */
+    private final JPPFConnectionInformation localInfo;
+
+    private final ConnectionHandler connectionHandler;
+    private final IPFilter ipFilter;
 
     /**
-	 * Default constructor.
+     * Default constructor.
+     * @param connectionHandler handler for adding new connection
+     * @param ipFilter for accepted IP addresses
      * @param localInfo Connection information for this JPPF driver.
-     * @param classServer JPPF class server
      */
-	public PeerDiscoveryThread(final JPPFConnectionInformation localInfo, final ClassNioServer classServer)
-	{
+    public PeerDiscoveryThread(final ConnectionHandler connectionHandler, final IPFilter ipFilter, final JPPFConnectionInformation localInfo)
+    {
         if(localInfo == null) throw new IllegalArgumentException("localInfo is null");
-        if(classServer == null) throw new IllegalArgumentException("classServer is null");
+        if(connectionHandler == null) throw new IllegalArgumentException("connectionHandler is null");
 
+        this.connectionHandler = connectionHandler;
+        this.ipFilter = ipFilter;
         this.localInfo = localInfo;
-        this.classServer = classServer;
-	}
+    }
 
-	/**
-	 * Lookup server configurations from UDP multicasts.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
+    /**
+     * Lookup server configurations from UDP multicasts.
+     * @see java.lang.Runnable#run()
+     */
+    @Override
     public void run()
-	{
-		try
-		{
-			JPPFMulticastReceiver receiver = new JPPFMulticastReceiver();
-			while (!isStopped())
-			{
-				JPPFConnectionInformation info = receiver.receive();
-				if ((info != null) && !infoSet.contains(info) && !info.equals(localInfo) && !isSelf(info)) addPeer(info);
-			}
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-	}
+    {
+        JPPFMulticastReceiver receiver = null;
+        try
+        {
+            receiver = new JPPFMulticastReceiver(ipFilter);
+            while (!isStopped())
+            {
+                JPPFConnectionInformation info = receiver.receive();
+                if ((info != null) && !hasConnectionInformation(info))
+                {
+                    if (debugEnabled) log.debug("Found peer connection information: " + info);
+                    addConnectionInformation(info);
+                    onNewConnection("Peer-" + count.incrementAndGet(), info);
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        finally
+        {
+            if(receiver != null) receiver.setStopped(true);
+        }
+    }
+
+    /**
+     * Add a newly found connection.
+     * @param name for the connection
+     * @param info the peer's connection information.
+     */
+    protected synchronized void onNewConnection(final String name, final JPPFConnectionInformation info)
+    {
+        connectionHandler.onNewConnection(name, info);
+    }
 
 	/**
-	 * Add a newly found peer.
-	 * @param info the peer's connection information.
+	 * Detrmine whether a connection information object is already discovered.
+	 * @param info the connection information to lookup.
+	 * @return true if the connection information is in the map, false otherwise.
 	 */
-	public synchronized void addPeer(final JPPFConnectionInformation info)
-	{
-		if (debugEnabled) log.debug("Found peer connection information: " + info);
-		infoSet.add(info);
-        String name = "Peer-" + count.incrementAndGet();
+    protected boolean hasConnectionInformation(final JPPFConnectionInformation info)
+    {
+        return infoSet.contains(info) || info.equals(localInfo) || isSelf(info);
+    }
 
-		new JPPFPeerInitializer(name, info, classServer).start();
-	}
+    /**
+     * Add the specified connection information to discovered map.
+     * @param info a {@link JPPFConnectionInformation} instance.
+     */
+    public synchronized void addConnectionInformation(final JPPFConnectionInformation info)
+    {
+        infoSet.add(info);
+    }
 
-	/**
-	 * Determine whether the specified connection information refers to this driver.
-	 * This situation may arise if the host has multiple network interfaces, each with its own IP address.
-	 * Making thios distinction is important to prevent a driver from connecting to itself.
-	 * @param info the peer's connection information.
-	 * @return true if the host/port combination in the connection information can be resolved
-	 * as the configuration for this driver.
-	 */
-	private boolean isSelf(final JPPFConnectionInformation info)
-	{
-		List<InetAddress> ipv4Addresses = NetworkUtils.getIPV4Addresses();
-		for (InetAddress addr: ipv4Addresses)
-		{
-			String ip = addr.getHostAddress();
-			if (info.host.equals(ip) && Arrays.equals(info.serverPorts, localInfo.serverPorts))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * Remove a disconnected connection.
+     * @param info connection info of the peer to remove
+     * @return whether connection was successfully removed
+     */
+    public synchronized boolean removeConnectionInformation(final JPPFConnectionInformation info)
+    {
+        return infoSet.remove(info);
+    }
 
-	/**
-	 * Remove a disconnected peer.
-     * @param connectionInfo connection info of the peer to remove
-	 */
-	public synchronized void removePeer(final JPPFConnectionInformation connectionInfo)
-	{
-        infoSet.remove(connectionInfo);
-	}
+    /**
+     * Determine whether the specified connection information refers to this driver.
+     * This situation may arise if the host has multiple network interfaces, each with its own IP address.
+     * Making this distinction is important to prevent a driver from connecting to itself.
+     * @param info the peer's connection information.
+     * @return true if the host/port combination in the connection information can be resolved
+     * as the configuration for this driver.
+     */
+    private boolean isSelf(final JPPFConnectionInformation info)
+    {
+        List<InetAddress> ipv4Addresses = NetworkUtils.getIPV4Addresses();
+        for (InetAddress addr: ipv4Addresses)
+        {
+            String ip = addr.getHostAddress();
+            if (info.host.equals(ip) && Arrays.equals(info.serverPorts, localInfo.serverPorts))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static interface ConnectionHandler
+    {
+        public void onNewConnection(final String name, final JPPFConnectionInformation info);
+    }
 }

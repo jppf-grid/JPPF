@@ -49,7 +49,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	/**
 	 * Random number generator used to randomize the choice of idle channel.
 	 */
-	private Random random = new Random(System.currentTimeMillis());
+	private final Random random = new Random(System.currentTimeMillis());
 	/**
 	 * The owner of this queue checker.
 	 */
@@ -65,26 +65,84 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	/**
 	 * The list of idle node channels.
 	 */
-	private final List<ChannelWrapper<?>> idleChannels;
+    private final List<ChannelWrapper<?>> idleChannels = new ArrayList<ChannelWrapper<?>>();
 	/**
 	 * Reference to the driver.
 	 */
 	private final JPPFDriver driver = JPPFDriver.getInstance();
-	/**
-	 * Determines whether this instance is already running its run() method.
-	 */
-	private boolean running = false;
 
 	/**
 	 * Initialize this task queue checker with the specified node server. 
 	 * @param server the owner of this queue checker.
 	 */
-	public TaskQueueChecker(NodeNioServer server)
+	public TaskQueueChecker(final NodeNioServer server)
 	{
 		this.server = server;
-		this.idleChannels = server.getIdleChannels();
 		this.queue = (AbstractJPPFQueue) server.getQueue();
 		this.queueLock = queue.getLock();
+	}
+
+    	/**
+	 * Add a channel to the list of idle channels.
+	 * @param channel the channel to add to the list.
+	 */
+	public void addIdleChannel(final ChannelWrapper<?> channel)
+	{
+		if (debugEnabled) log.trace("Adding idle channel " + channel);
+		synchronized(idleChannels)
+		{
+			idleChannels.add(channel);
+		}
+		wakeUp();
+        driver.getStatsManager().idleNodes(idleChannels.size());
+	}
+
+    public List<ChannelWrapper<?>> getIdleChannels() {
+        synchronized (idleChannels)
+        {
+            return new ArrayList<ChannelWrapper<?>>(idleChannels);
+        }
+    }
+
+    /**
+	 * Remove a channel from the list of idle channels.
+	 * @param channel the channel to remove from the list.
+	 * @return a reference to the removed channel.
+	 */
+	public ChannelWrapper<?> removeIdleChannel(final ChannelWrapper<?> channel)
+	{
+		if (debugEnabled) log.trace("Removing idle channel " + channel);
+		synchronized(idleChannels)
+		{
+			idleChannels.remove(channel);
+		}
+        driver.getStatsManager().idleNodes(idleChannels.size());
+		return channel;
+	}
+
+	/**
+	 * Remove the channel at the specified index from the list of idle channels.
+	 * @param index the index of the channel to remove from the list.
+	 * @return a reference to the removed channel.
+	 */
+	public ChannelWrapper<?> removeIdleChannel(final int index)
+	{
+		ChannelWrapper<?> channel = null;
+		synchronized(idleChannels)
+		{
+			try
+			{
+				channel = idleChannels.remove(index);
+				if (debugEnabled) log.trace("Removed idle chanel " + channel + " at index " + index);
+			}
+			catch(Exception e)
+			{
+				if (debugEnabled) log.debug("error removing channel at index " + index, e);
+				else log.warn("error removing channel at index " + index + " : " + e.getMessage());
+			}
+		}
+        driver.getStatsManager().idleNodes(idleChannels.size());
+		return channel;
 	}
 
 	/**
@@ -112,8 +170,8 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 		{
 			synchronized(idleChannels)
 			{
-				if (idleChannels.isEmpty() || server.getQueue().isEmpty()) return false;
-				if (debugEnabled) log.debug(""+idleChannels.size()+" channels idle");
+				if (idleChannels.isEmpty() || queue.isEmpty()) return false;
+				if (debugEnabled) log.debug(Integer.toString(idleChannels.size()) + " channels idle");
 				ChannelWrapper<?> channel = null;
 				ServerJob selectedBundle = null;
 				queueLock.lock();
@@ -151,19 +209,19 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	}
 
 	/**
-	 * Retrieve a suitable channel for the specirfied job.
+	 * Retrieve a suitable channel for the specified job.
 	 * @param bundleWrapper the job to execute.
 	 * @return a channel for a node on which to execute the job.
 	 * @throws Exception if any error occurs.
 	 */
-	private ChannelWrapper<?> retrieveChannel(ServerJob bundleWrapper) throws Exception
+	private ChannelWrapper<?> retrieveChannel(final ServerJob bundleWrapper) throws Exception
 	{
 		ChannelWrapper<?> channel = null;
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		if (checkJobState(bundle))
 		{
 			int n = findIdleChannelIndex(bundle);
-			if (n >= 0) channel = server.removeIdleChannel(n);
+			if (n >= 0) channel = removeIdleChannel(n);
 		}
 		return channel;
 	}
@@ -173,7 +231,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	 * @param channel the node channel to dispatch the job to.
 	 * @param selectedBundle the job to dispatch.
 	 */
-	private void dispatchJobToChannel(ChannelWrapper<?> channel, ServerJob selectedBundle)
+	private void dispatchJobToChannel(final ChannelWrapper<?> channel, final ServerJob selectedBundle)
 	{
 		if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getJob().getJobUuid() + " to nodeUuid=" + ((AbstractNodeContext) channel.getContext()).nodeUuid);
 		synchronized(channel)
@@ -192,7 +250,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 				profile.setSize(1);
 				server.setBundler(new FixedSizeBundler(profile));
 			}
-			ServerJob bundleWrapper = server.getQueue().nextBundle(selectedBundle, size);
+			ServerJob bundleWrapper = queue.nextBundle(selectedBundle, size);
 			context.setBundle(bundleWrapper);
 			server.getTransitionManager().transitionChannel(channel, NodeTransition.TO_SENDING);
 			driver.getJobManager().jobDispatched(context.getBundle(), channel);
@@ -204,12 +262,11 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	 * @param bundle the bundle to execute.
 	 * @return the index of an available and acceptable channel, or -1 if no channel could be found.
 	 */
-	private int findIdleChannelIndex(JPPFTaskBundle bundle)
+	private int findIdleChannelIndex(final JPPFTaskBundle bundle)
 	{
-		List<ChannelWrapper<?>> idleChannels = server.getIdleChannels();
-		int idleChannelsSize = idleChannels.size();
 		int n = -1;
-		ExecutionPolicy rule = bundle.getSLA().getExecutionPolicy();
+        int idleChannelsSize = idleChannels.size();
+        ExecutionPolicy rule = bundle.getSLA().getExecutionPolicy();
 		if (debugEnabled && (rule != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + rule);
 		List<Integer> acceptableChannels = new ArrayList<Integer>(idleChannelsSize);
 		List<Integer> channelsToRemove =  new ArrayList<Integer>(idleChannelsSize);
@@ -250,8 +307,8 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 			}
 			acceptableChannels.add(i);
 		}
-		for (Integer i: channelsToRemove) server.removeIdleChannel(i);
-		int size = acceptableChannels.size();
+		for (Integer i: channelsToRemove) removeIdleChannel(i);
+        int size = acceptableChannels.size();
 		if (debugEnabled) log.debug("found " + size + " acceptable channels");
 		if (size > 0)
 		{
@@ -268,7 +325,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	 * @param bundle the bundle from which to get the job information.
 	 * @return true if the job can be dispatched to at least one more node, false otherwise.
 	 */
-	private boolean checkJobState(JPPFTaskBundle bundle)
+	private boolean checkJobState(final JPPFTaskBundle bundle)
 	{
 		JobSLA sla = bundle.getSLA();
 		if (debugEnabled)
@@ -297,31 +354,13 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	 * @param taskBundle the job.
 	 * @param context the current node context.
 	 */
-	private void updateBundler(Bundler bundler, JPPFTaskBundle taskBundle, AbstractNodeContext context)
+	private void updateBundler(final Bundler bundler, final JPPFTaskBundle taskBundle, final AbstractNodeContext context)
 	{
 		context.checkBundler(server.getBundler());
 		if (context.getBundler() instanceof JobAwareness)
 		{
-			JobMetadata metadata = taskBundle.getJobMetadata();
+            JobMetadata metadata = taskBundle.getJobMetadata();
 			((JobAwareness) context.getBundler()).setJobMetadata(metadata);
 		}
-	}
-
-	/**
-	 * Determine whether this instance is already running its run() method.
-	 * @return true if this instance is running, false otherwise.
-	 */
-	public synchronized boolean isRunning()
-	{
-		return running;
-	}
-
-	/**
-	 * Specifiy whether this instance is already running its run() method.
-	 * @param running true if this instance is running, false otherwise.
-	 */
-	public synchronized void setRunning(boolean running)
-	{
-		this.running = running;
 	}
 }

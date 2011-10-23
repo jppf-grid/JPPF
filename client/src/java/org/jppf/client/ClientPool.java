@@ -28,7 +28,7 @@ class ClientPool
 	/**
 	 * The priority associated with this pool.
 	 */
-	private int priority = 0;
+	private final int priority;
 	/**
 	 * Index of the last used connection in this pool.
 	 */
@@ -36,9 +36,13 @@ class ClientPool
 	/**
 	 * List of <code>JPPFClientConnection</code> instances with the same priority.
 	 */
-	public List<JPPFClientConnection> clientList = new ArrayList<JPPFClientConnection>();
+	private final List<JPPFClientConnection> clientList = new ArrayList<JPPFClientConnection>();
 
-	/**
+    public ClientPool(final int priority) {
+        this.priority = priority;
+    }
+
+    /**
 	 * Get the next client connection.
 	 * @return a <code>JPPFClientConnection</code> instances.
 	 */
@@ -49,6 +53,10 @@ class ClientPool
 		return clientList.get(getLastUsedIndex());
 	}
 
+    public boolean isEmpty() {
+        return clientList.isEmpty();
+    }
+
 	/**
 	 * Get the current size of this pool.
 	 * @return the size as an int.
@@ -57,6 +65,18 @@ class ClientPool
 	{
 		return clientList.size();
 	}
+
+    public boolean add(final JPPFClientConnection client) {
+        return clientList.add(client);
+    }
+
+    public boolean remove(final JPPFClientConnection client) {
+        if(clientList.remove(client)) {
+            if(lastUsedIndex >= clientList.size() && lastUsedIndex > 0) lastUsedIndex--;
+            return true;
+        } else
+            return false;
+    }
 
 	/**
 	 * Get the priority associated with this pool.
@@ -68,29 +88,11 @@ class ClientPool
 	}
 
 	/**
-	 * Set the priority associated with this pool.
-	 * @param priority the priority as an int.
-	 */
-	public void setPriority(int priority)
-	{
-		this.priority = priority;
-	}
-
-	/**
 	 * Get the index of the last used connection in this pool.
 	 * @return the last used index as an int.
 	 */
 	public int getLastUsedIndex()
 	{
 		return lastUsedIndex;
-	}
-
-	/**
-	 * Set the index of the last used connection in this pool.
-	 * @param lastUsedIndex the last used index as an int.
-	 */
-	public void setLastUsedIndex(int lastUsedIndex)
-	{
-		this.lastUsedIndex = lastUsedIndex;
 	}
 }

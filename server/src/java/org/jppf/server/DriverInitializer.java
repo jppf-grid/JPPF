@@ -48,6 +48,10 @@ public class DriverInitializer
 	 * Determines whether debug-level logging is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
+    /**
+     * Constant for JPPF automatic connection discovery
+     */
+    protected static final String VALUE_JPPF_DISCOVERY = "jppf_discovery";
 	/**
 	 * The instance of the driver.
 	 */
@@ -185,26 +189,53 @@ public class DriverInitializer
      */
 	void initPeers(final ClassNioServer classServer)
 	{
+        boolean initPeers;
 		TypedProperties props = JPPFConfiguration.getProperties();
-		if (props.getBoolean("jppf.peer.discovery.enabled", false))
-		{
-			if (debugEnabled) log.debug("starting peers discovery");
-			peerDiscoveryThread = new PeerDiscoveryThread(getConnectionInformation(), classServer);
-			new Thread(peerDiscoveryThread, "PeerDiscoveryThread").start();
-		}
-		else
-		{
-			String peerNames = props.getString("jppf.peers");
-			if ((peerNames == null) || "".equals(peerNames.trim())) return;
-			if (debugEnabled) log.debug("found peers in the configuration");
-			String[] names = peerNames.split("\\s");
-			for (String peerName: names) {
-                JPPFConnectionInformation connectionInfo = new JPPFConnectionInformation();
-                connectionInfo.host = props.getString(String.format("jppf.peer.%s.server.host", peerName), "localhost");
-                connectionInfo.serverPorts = new int[] { props.getInt(String.format("jppf.peer.%s.server.port", peerName), 11111) };
-                new JPPFPeerInitializer(peerName, connectionInfo, classServer).start();
+        if (props.getBoolean("jppf.peer.discovery.enabled", false))
+        {
+            if (debugEnabled) log.debug("starting peers discovery");
+            peerDiscoveryThread = new PeerDiscoveryThread(new PeerDiscoveryThread.ConnectionHandler() {
+                @Override
+                public void onNewConnection(final String name, final JPPFConnectionInformation info) {
+                    new JPPFPeerInitializer(name, info, classServer).start();
+                }
+            }, null, getConnectionInformation());
+            initPeers = false;
+        }
+        else
+        {
+            peerDiscoveryThread = null;
+            initPeers = true;
+        }
+
+        String discoveryNames = props.getString("jppf.peers");
+        if ((discoveryNames != null) && !"".equals(discoveryNames.trim()))
+        {
+            if (debugEnabled) log.debug("found peers in the configuration");
+            String[] names = discoveryNames.split("\\s");
+            for (String name : names) {
+                initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
             }
-		}
+
+            if(initPeers)
+            {
+                for (String name : names) {
+                    if(!VALUE_JPPF_DISCOVERY.equals(name))
+                    {
+                        JPPFConnectionInformation info = new JPPFConnectionInformation();
+                        info.host = props.getString(String.format("jppf.peer.%s.server.host", name), "localhost");
+                        info.serverPorts = new int[] { props.getInt(String.format("jppf.peer.%s.server.port", name), 11111) };
+                        if(peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
+                        new JPPFPeerInitializer(name, info, classServer).start();
+                    }
+                }
+            }
+        }
+
+        if(peerDiscoveryThread != null)
+        {
+            new Thread(peerDiscoveryThread, "PeerDiscoveryThread").start();
+        }
 	}
 
 	/**

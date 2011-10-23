@@ -104,7 +104,7 @@ class PeerNode extends AbstractNode
 			{
 				setStopped(true);
 				if (socketInitializer != null) socketInitializer.close();
-                driver.getInitializer().getPeerDiscoveryThread().removePeer(connectionInfo);
+                driver.getInitializer().getPeerDiscoveryThread().removeConnectionInformation(connectionInfo);
 				if (debugEnabled) log.debug(getName() + " : " + e.getMessage(), e);
 			}
 			if (!isStopped())

@@ -67,10 +67,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 */
 	private BundleWrapper initialBundle = null;
 	/**
-	 * Holds the currently idle channels.
-	 */
-	private final List<ChannelWrapper<?>> idleChannels = new ArrayList<ChannelWrapper<?>>(100);
-	/**
 	 * A reference to the driver's tasks queue.
 	 */
 	private JPPFQueue queue = null;
@@ -188,12 +184,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	public void addIdleChannel(ChannelWrapper<?> channel)
 	{
 		if (traceEnabled) log.trace("Adding idle channel " + channel);
-		synchronized(idleChannels)
-		{
-			idleChannels.add(channel);
-		}
-		taskQueueChecker.wakeUp();
-		driver.getStatsManager().idleNodes(idleChannels.size());
+        taskQueueChecker.addIdleChannel(channel);
 	}
 
 	/**
@@ -204,37 +195,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	public ChannelWrapper<?> removeIdleChannel(ChannelWrapper<?> channel)
 	{
 		if (traceEnabled) log.trace("Removing idle channel " + channel);
-		synchronized(idleChannels)
-		{
-			idleChannels.remove(channel);
-		}
-		driver.getStatsManager().idleNodes(idleChannels.size());
-		return channel;
-	}
-
-	/**
-	 * Remove the channel at the specified index from the list of idle channels.
-	 * @param index the index of the channel to remove from the list.
-	 * @return a reference to the removed channel.
-	 */
-	public ChannelWrapper<?> removeIdleChannel(int index)
-	{
-		ChannelWrapper<?> channel = null;
-		synchronized(idleChannels)
-		{
-			try
-			{
-				channel = idleChannels.remove(index);
-				if (traceEnabled) log.trace("Removed idle chanel " + channel + " at index " + index);
-			}
-			catch(Exception e)
-			{
-				if (debugEnabled) log.debug("error removing channel at index " + index, e);
-				else log.warn("error removing channel at index " + index + " : " + e.getMessage());
-			}
-		}
-		driver.getStatsManager().idleNodes(idleChannels.size());
-		return channel;
+        return taskQueueChecker.removeIdleChannel(channel);
 	}
 
 	/**
@@ -389,7 +350,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 */
 	public List<ChannelWrapper<?>> getIdleChannels()
 	{
-		return idleChannels;
+        return taskQueueChecker.getIdleChannels();
 	}
 
 	/**
