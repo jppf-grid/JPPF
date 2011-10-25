@@ -39,6 +39,7 @@
 		<antcall target="include.code"><param name="sample" value="DataEncryption"/></antcall>
 		<antcall target="include.code"><param name="sample" value="FTPServer"/></antcall>
 		<antcall target="include.code"><param name="sample" value="IdleSystem"/></antcall>
+		<antcall target="include.code"><param name="sample" value="JobRecovery"/></antcall>
 		<antcall target="include.code"><param name="sample" value="NodeLifeCycle"/></antcall>
 		<antcall target="include.code"><param name="sample" value="TaskNotifications"/></antcall>
 		<property name="samples.pack.prefix" value="${app.ver}-samples-pack"/>
@@ -79,6 +80,7 @@
 		<delete><fileset dir="${samples-pack}/DataEncryption" includes="**/*.java.html, **/services/*.html"/></delete>
 		<delete><fileset dir="${samples-pack}/FTPServer" includes="**/*.java.html, **/services/*.html"/></delete>
 		<delete><fileset dir="${samples-pack}/IdleSystem" includes="**/*.java.html, **/services/*.html"/></delete>
+		<delete><fileset dir="${samples-pack}/JobRecovery" includes="**/*.java.html, **/services/*.html"/></delete>
 		<delete><fileset dir="${samples-pack}/NodeLifeCycle" includes="**/*.java.html, **/services/*.html"/></delete>
 		<delete><fileset dir="${samples-pack}/TaskNotifications" includes="**/*.java.html, **/services/*.html"/></delete>
   </target>

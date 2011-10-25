@@ -81,7 +81,7 @@ public interface ObjectSerializer
 
 	/**
 	 * Read an object from an input stream.
-	 * @param is - the input stream to deserialize from.
+	 * @param is the input stream to deserialize from.
 	 * @return the object that was deserialized from the array of bytes.
 	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
 	 */

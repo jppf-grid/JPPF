@@ -45,6 +45,8 @@
 				<zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}"/>
 				<zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-common-node.jar"/>
 				<zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-node-src.jar"/>
+				<zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
+				<zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib/jmxremote-license" includes="*.html"/>
 				<zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/slf4j" prefix="${@{module}.prefix}/lib">
 					<include name="slf4j-api-*.jar"/>
@@ -62,8 +64,6 @@
 		<package-module module="driver">
 			<module-elements>
 				<zipfileset dir="${config}/node/config" prefix="${driver.prefix}/config" includes="jppf.policy"/>
-				<zipfileset dir="${lib}/jmxremote" prefix="${driver.prefix}/lib" includes="*.jar"/>
-				<zipfileset dir="${lib}/jmxremote" prefix="${driver.prefix}/lib/jmxremote-license" includes="*.html"/>
 				<zipfileset dir="${build}" prefix="${driver.prefix}/lib">
 					<include name="jppf-common.jar"/>
 					<include name="jppf-server.jar"/>

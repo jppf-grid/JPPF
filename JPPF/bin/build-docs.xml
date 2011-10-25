@@ -30,8 +30,10 @@
 			<param name="dest" value="${home}/"/>
 			<param name="templates" value="${home}/templates/"/>
 		</antcall>
-  	<copy toDir="${home}/wiki/includes" file="${home}/jppf_header.php"/>
-  	<copy toDir="${home}/wiki/includes" file="${home}/jppf_menu.php"/>
+  	<copy toDir="${home}/doc/v2/includes" file="${home}/jppf_header.php"/>
+  	<copy toDir="${home}/doc/v2/includes" file="${home}/jppf_menu.php"/>
+  	<copy toDir="${home}/doc/v3/includes" file="${home}/jppf_header.php"/>
+  	<copy toDir="${home}/doc/v3/includes" file="${home}/jppf_menu.php"/>
   	<!--<copy toDir="${home}/forums" file="${home}/jppf_header.php"/>-->
 	</target>
 
