@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
+import org.jppf.client.persistence.JobPersistence;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
@@ -87,7 +88,11 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * The list of listeners registered with this job.
 	 */
-	private final transient List<JobListener> listeners = new LinkedList<JobListener>();
+	private transient List<JobListener> listeners = new LinkedList<JobListener>();
+	/**
+	 * The persistence manager that enables saving aznd restoring the state of this job. 
+	 */
+	private transient JobPersistence<?> persistenceManager = null;
 
 	/**
 	 * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -103,7 +108,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * This constructor generates a pseudo-random id as a string of 32 hexadecimal characters.
 	 * @param jobUuid the uuid to assign to this job.
 	 */
-	public JPPFJob(String jobUuid)
+	public JPPFJob(final String jobUuid)
 	{
 		this.jobUuid = (jobUuid == null) ? new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString() : jobUuid;
 		name = jobUuid;
@@ -113,7 +118,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Initialize a blocking job with the specified parameters.
 	 * @param dataProvider the container for data shared between tasks.
 	 */
-	public JPPFJob(DataProvider dataProvider)
+	public JPPFJob(final DataProvider dataProvider)
 	{
 		this(dataProvider, null, true, null);
 	}
@@ -123,7 +128,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * @param dataProvider the container for data shared between tasks.
 	 * @param jobSLA sevice level agreement between job and server.
 	 */
-	public JPPFJob(DataProvider dataProvider, JPPFJobSLA jobSLA)
+	public JPPFJob(final DataProvider dataProvider, final JPPFJobSLA jobSLA)
 	{
 		this(dataProvider, jobSLA, true, null);
 	}
@@ -132,7 +137,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Initialize a non-blocking job with the specified parameters.
 	 * @param resultsListener the listener that receives notifications of completed tasks.
 	 */
-	public JPPFJob(TaskResultListener resultsListener)
+	public JPPFJob(final TaskResultListener resultsListener)
 	{
 		this(null, null, false, resultsListener);
 	}
@@ -142,7 +147,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * @param dataProvider the container for data shared between tasks.
 	 * @param resultsListener the listener that receives notifications of completed tasks.
 	 */
-	public JPPFJob(DataProvider dataProvider, TaskResultListener resultsListener)
+	public JPPFJob(final DataProvider dataProvider, final TaskResultListener resultsListener)
 	{
 		this(dataProvider, null, false, resultsListener);
 	}
@@ -153,7 +158,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * @param jobSLA sevice level agreement between job and server.
 	 * @param resultsListener the listener that receives notifications of completed tasks.
 	 */
-	public JPPFJob(DataProvider dataProvider, JPPFJobSLA jobSLA, TaskResultListener resultsListener)
+	public JPPFJob(final DataProvider dataProvider, final JPPFJobSLA jobSLA, final TaskResultListener resultsListener)
 	{
 		this(dataProvider, jobSLA, false, resultsListener);
 	}
@@ -165,7 +170,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * @param blocking determines whether this job is blocking.
 	 * @param resultsListener the listener that receives notifications of completed tasks.
 	 */
-	public JPPFJob(DataProvider dataProvider, JPPFJobSLA jobSLA, boolean blocking, TaskResultListener resultsListener)
+	public JPPFJob(final DataProvider dataProvider, final JPPFJobSLA jobSLA, final boolean blocking, final TaskResultListener resultsListener)
 	{
 		this(dataProvider, jobSLA, null, blocking, resultsListener);
 	}
@@ -178,7 +183,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * @param blocking determines whether this job is blocking.
 	 * @param resultsListener the listener that receives notifications of completed tasks.
 	 */
-	public JPPFJob(DataProvider dataProvider, JPPFJobSLA jobSLA, JPPFJobMetadata jobMetadata, boolean blocking, TaskResultListener resultsListener)
+	public JPPFJob(final DataProvider dataProvider, final JPPFJobSLA jobSLA, final JPPFJobMetadata jobMetadata,
+		final boolean blocking, final TaskResultListener resultsListener)
 	{
 		this();
 		this.dataProvider = dataProvider;
@@ -230,7 +236,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Set the user-defined display name for this job.
 	 * @param name the display name as a string. 
 	 */
-	public void setName(String name)
+	public void setName(final String name)
 	{
 		this.name = name;
 	}
@@ -267,7 +273,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * or a wrapper around the input object in the other cases.
 	 * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
 	 */
-	public JPPFTask addTask(Object taskObject, Object...args) throws JPPFException
+	public JPPFTask addTask(final Object taskObject, final Object...args) throws JPPFException
 	{
 		JPPFTask jppfTask = null;
 		if (taskObject == null) throw new JPPFException("null tasks are not accepted");
@@ -287,7 +293,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * @return an instance of <code>JPPFTask</code> that is a wrapper around the input task object.
 	 * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
 	 */
-	public JPPFTask addTask(String method, Object taskObject, Object...args) throws JPPFException
+	public JPPFTask addTask(final String method, final Object taskObject, final Object...args) throws JPPFException
 	{
 		if (taskObject == null) throw new JPPFException("null tasks are not accepted");
 		JPPFTask jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
@@ -309,7 +315,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Set the container for data shared between tasks.
 	 * @param dataProvider a <code>DataProvider</code> instance.
 	 */
-	public void setDataProvider(DataProvider dataProvider)
+	public void setDataProvider(final DataProvider dataProvider)
 	{
 		this.dataProvider = dataProvider;
 	}
@@ -327,7 +333,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Set the listener that receives notifications of completed tasks.
 	 * @param resultsListener a <code>TaskCompletionListener</code> instance.
 	 */
-	public void setResultListener(TaskResultListener resultsListener)
+	public void setResultListener(final TaskResultListener resultsListener)
 	{
 		this.resultsListener = resultsListener;
 	}
@@ -345,7 +351,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Specify whether the execution of this job is blocking on the client side.
 	 * @param blocking true if the execution is blocking, false otherwise.
 	 */
-	public void setBlocking(boolean blocking)
+	public void setBlocking(final boolean blocking)
 	{
 		this.blocking = blocking;
 	}
@@ -372,7 +378,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Get the service level agreement between the job and the server.
 	 * @param jobSLA an instance of <code>JPPFJobSLA</code>.
 	 */
-	public void setSLA(JobSLA jobSLA)
+	public void setSLA(final JobSLA jobSLA)
 	{
 		this.jobSLA = jobSLA;
 	}
@@ -399,13 +405,13 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Set this job's metadata.
 	 * @param jobMetadata a {@link JPPFJobMetadata} instance.
 	 */
-	public void setMetadata(JobMetadata jobMetadata)
+	public void setMetadata(final JobMetadata jobMetadata)
 	{
 		this.jobMetadata = jobMetadata;
 	}
 
 	/**
-	 * COmpute the hascode of this job.
+	 * Compute the hascode of this job.
 	 * @return th hascode as an int.
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -445,12 +451,22 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	}
 
 	/**
+	 * Get the list of job listeners.
+	 * @return a list of <code>JobListener</code> instances.
+	 */
+	private synchronized List<JobListener> getListeners()
+	{
+		if (listeners == null) listeners = new LinkedList<JobListener>();
+		return listeners;
+	}
+
+	/**
 	 * Add a listener to the list of job listeners.
 	 * @param listener a {@link JobListener} instance.
 	 */
-	public void addJobListener(JobListener listener)
+	public void addJobListener(final JobListener listener)
 	{
-		synchronized(listeners)
+		synchronized(getListeners())
 		{
 			listeners.add(listener);
 		}
@@ -460,9 +476,9 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Add a listener to the list of job listeners.
 	 * @param listener a {@link JobListener} instance.
 	 */
-	public void removeJobListener(JobListener listener)
+	public void removeJobListener(final JobListener listener)
 	{
-		synchronized(listeners)
+		synchronized(getListeners())
 		{
 			listeners.remove(listener);
 		}
@@ -472,10 +488,10 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * Notify all listeners of the specified event type.
 	 * @param type the type of the event.
 	 */
-	public void fireJobEvent(JobEvent.Type type)
+	public void fireJobEvent(final JobEvent.Type type)
 	{
 		JobEvent event = new JobEvent(this);
-		synchronized(listeners)
+		synchronized(getListeners())
 		{
 			for (JobListener listener: listeners)
 			{
@@ -490,5 +506,25 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get the persistence manager that enables saving aznd restoring the state of this job. 
+	 * @return a {@link JobPersistence} instance.
+	 * @param <T> the type of the keys used by the persistence manager.
+	 */
+	public <T> JobPersistence<T> getPersistenceManager()
+	{
+		return (JobPersistence<T>) persistenceManager;
+	}
+
+	/**
+	 * Set the persistence manager that enables saving aznd restoring the state of this job. 
+	 * @param persistenceManager a {@link JobPersistence} instance.
+	 * @param <T> the type of the keys used by the persistence manager.
+	 */
+	public <T> void setPersistenceManager(final JobPersistence<T> persistenceManager)
+	{
+		this.persistenceManager = persistenceManager;
 	}
 }

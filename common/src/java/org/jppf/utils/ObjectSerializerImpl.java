@@ -46,7 +46,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object)
 	 */
 	@Override
-    public JPPFBuffer serialize(Object o) throws Exception
+	public JPPFBuffer serialize(Object o) throws Exception
 	{
 		return serialize(o, false);
 	}
@@ -60,12 +60,12 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object)
 	 */
 	@Override
-    public JPPFBuffer serialize(Object o, boolean noCopy) throws Exception
+	public JPPFBuffer serialize(Object o, boolean noCopy) throws Exception
 	{
 		JPPFByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		serialize(o, baos);
 		byte[] data = noCopy ? baos.getBuf() : baos.toByteArray();
-        return new JPPFBuffer(data, baos.size());
+		return new JPPFBuffer(data, baos.size());
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object, java.io.OutputStream)
 	 */
 	@Override
-    public void serialize(Object o, OutputStream os) throws Exception
+	public void serialize(Object o, OutputStream os) throws Exception
 	{
 		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(os);
 		oos.writeObject(o);
@@ -106,7 +106,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(org.jppf.utils.JPPFBuffer)
 	 */
 	@Override
-    public Object deserialize(JPPFBuffer buf) throws Exception
+	public Object deserialize(JPPFBuffer buf) throws Exception
 	{
 		return deserialize(new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength()));
 	}
@@ -119,7 +119,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(byte[])
 	 */
 	@Override
-    public Object deserialize(byte[] bytes) throws Exception
+	public Object deserialize(byte[] bytes) throws Exception
 	{
 		return deserialize(new ByteArrayInputStream(bytes));
 	}
@@ -134,25 +134,33 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(byte[], int, int)
 	 */
 	@Override
-    public Object deserialize(byte[] bytes, int offset, int length) throws Exception
+	public Object deserialize(byte[] bytes, int offset, int length) throws Exception
 	{
 		return deserialize(new ByteArrayInputStream(bytes, offset, length));
 	}
 
 	/**
-	 * Read an object from an input stream.
-	 * @param is - the input stream to deserialize from.
-	 * @return the object that was deserialized from the array of bytes.
-	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
-	 * @see org.jppf.utils.ObjectSerializer#deserialize(java.io.InputStream)
+	 * {@inheritDoc}
 	 */
 	@Override
-    public Object deserialize(InputStream is) throws Exception
+	public Object deserialize(InputStream is) throws Exception
+	{
+		return deserialize(is, true);
+	}
+
+	/**
+	 * Read an object from an input stream.
+	 * @param is the input stream to deserialize from.
+	 * @param closeStream <code>true</code> to close the stream, <code>false</code> otherwise.
+	 * @return the object that was deserialized from the array of bytes.
+	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
+	 */
+	public Object deserialize(InputStream is, boolean closeStream) throws Exception
 	{
 		Object o = null;
 		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
 		o = ois.readObject();
-		ois.close();
+		if (closeStream) ois.close();
 		return o;
 	}
 }

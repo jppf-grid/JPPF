@@ -21,6 +21,7 @@ package org.jppf.client;
 import java.util.*;
 
 import org.jppf.client.event.*;
+import org.jppf.client.persistence.JobPersistenceException;
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
@@ -107,6 +108,17 @@ public class JPPFResultCollector implements TaskResultListener
 			pendingCount -= tasks.size();
 			if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + pendingCount);
 			notifyAll();
+			if ((job != null) && (job.getPersistenceManager() != null))
+			{
+				try
+				{
+					job.getPersistenceManager().storeJob(job.getJobUuid(), job, tasks);
+				}
+				catch (JobPersistenceException e)
+				{
+					log.error(e.getMessage(), e);
+				}
+			}
 		}
 		else
 		{
