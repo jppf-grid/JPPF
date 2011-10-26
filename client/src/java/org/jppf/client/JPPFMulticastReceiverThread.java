@@ -81,20 +81,23 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		JPPFMulticastReceiver receiver = null;
 		try
 		{
-            receiver = new JPPFMulticastReceiver(ipFilter);
+			receiver = new JPPFMulticastReceiver(ipFilter);
 			while (!isStopped())
 			{
 				JPPFConnectionInformation info = receiver.receive();
-				if ((info != null) && !hasConnectionInformation(info))
+				synchronized(this)
 				{
-					if (debugEnabled) log.debug("Found connection information: " + info);
-					addConnectionInformation(info);
-                    onNewConnection("driver-" + count.incrementAndGet(), info);
+					if ((info != null) && !hasConnectionInformation(info))
+					{
+						if (debugEnabled) log.debug("Found connection information: " + info);
+						addConnectionInformation(info);
+						onNewConnection("driver-" + count.incrementAndGet(), info);
+					}
 				}
 			}
 		}
